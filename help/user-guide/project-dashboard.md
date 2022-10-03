@@ -17,9 +17,9 @@ The dashboard is accessible to all project members through a button on the proje
 
 ![dashboard button](/images/user-guide/dashboard/dashboard-button.png){:.screenshot}
 
-## Contributions
+## Submissions
 
-The contributions graph shows all project assets that have been created over the time period. The interval can be changed to group results by day, month or year. Asset types can be excluded from the graph by clicking their entry in the legend on the right-hand side. Double-clicking an asset type will hide all asset types *except* that one.
+The submissions graph shows all project assets that have been created over the time period. The interval can be changed to group results by day, month or year. Asset types can be excluded from the graph by clicking their entry in the legend on the right-hand side. Double-clicking an asset type will hide all asset types *except* that one.
 
 ![dashboard contributions](/images/user-guide/dashboard/dashboard-contributions.png){:.screenshot}
 
@@ -39,6 +39,6 @@ The three levels of accessibility are:
 
 The most viewed/downloaded asset panels show simple "top 10" lists of assets by their number of views/downloads over the time period. They can also be filtered by type.
 
-## Most active contributors
+## Most active submitters
 
-The most active contributors panel shows the top 10 people by number of contributions in the project over the time period. Creating or updating a SEEK asset counts as a contribution.
+The most active submitters panel shows the top 10 people by number of submissions in the project over the time period. Creating a SEEK asset counts as a submission.
