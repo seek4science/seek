@@ -24,4 +24,7 @@ titles.each do |title|
   end
 end
 
+if (ModelFormat.count - count) > 0
+  puts "Seeded #{ModelFormat.count - count} model formats"
+end
 

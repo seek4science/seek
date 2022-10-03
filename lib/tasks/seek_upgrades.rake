@@ -17,6 +17,8 @@ namespace :seek do
     db:seed:013_formats_controlled_vocab
     db:seed:014_data_controlled_vocab
     db:seed:015_isa_tags
+    db:seed:003_model_formats
+    db:seed:004_model_recommended_environments
     remove_orphaned_versions
     seek:rebuild_workflow_internals
     remove_scale_annotations

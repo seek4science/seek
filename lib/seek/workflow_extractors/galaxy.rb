@@ -30,8 +30,16 @@ module Seek
         metadata[:license] = galaxy['license'] if galaxy['license'].present?
 
         if galaxy['creator']
-          creators = Array(galaxy['creator']).select { |c| c['class'] == 'Person' }.map { |c| c['name'] }
-          metadata[:other_creators] = creators.join(', ') if creators.any?
+          people, others = Array(galaxy['creator']).partition { |c| c['class'] == 'Person' }
+          people.each_with_index do |c, i|
+            author = extract_author(c)
+            unless author.blank?
+              metadata[:assets_creators_attributes] ||= {}
+              metadata[:assets_creators_attributes][i.to_s] = author.merge(pos: i)
+            end
+          end
+          other_creators = others.map { |c| c['name'] }.reject(&:blank?)
+          metadata[:other_creators] = other_creators.join(', ') if other_creators.any?
         end
 
         metadata[:internals][:steps] = []
