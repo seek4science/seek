@@ -9,11 +9,11 @@
 
 	<% if show_batch_miappe_button? %>
 		<h4>Upload studies from file:</h4>
-		<%= link_to "MIAPPE Study batch upload", batch_uploader_studies_path, class: "btn btn-primary" %>
-		<div>
-    		<%=link_to "Download MIAPPE template here", "#{request.base_url}/batch_upload_template/MIAPPE Sudy batch template.zip" %>
-  		</div>
-		<h4>Or create a study with the form:</h4>
+    <%= link_to "MIAPPE Study batch upload", batch_uploader_studies_path, class: "btn btn-primary" %>
+    <div>
+      <%= link_to "Download MIAPPE template here", asset_path('batch_upload_template/MIAPPE Study batch template.zip', skip_pipeline: true) %>
+    </div>
+    <h4>Or create a study with the form:</h4>
 	<% end %>
 	<div class="asset_form">
 		<%= form_for @study do |f| %>
