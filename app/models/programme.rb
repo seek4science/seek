@@ -46,6 +46,7 @@ class Programme < ApplicationRecord
   scope :activated, -> { where(is_activated: true) }
   scope :not_activated, -> { where(is_activated: false) }
   scope :rejected, -> { where('is_activated = ? AND activation_rejection_reason IS NOT NULL', false) }
+  scope :open_for_projects, -> { where(open_for_projects: true) }
 
   has_annotation_type :funding_code
   has_many :funding_codes_as_text, through: :funding_code_annotations, source: :value, source_type: 'TextValue'
@@ -107,8 +108,15 @@ class Programme < ApplicationRecord
     open_for_projects? && Seek::Config.programmes_open_for_projects_enabled
   end
 
+  def self.any_programmes_open_for_projects?
+    return false unless Seek::Config.programmes_open_for_projects_enabled
+
+    open_for_projects.any?
+  end
+
   def self.can_create?
     return false unless Seek::Config.programmes_enabled
+
     User.admin_logged_in? || (User.logged_in_and_registered? && Seek::Config.programme_user_creation_enabled)
   end
 

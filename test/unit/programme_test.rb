@@ -508,4 +508,31 @@ class ProgrammeTest < ActiveSupport::TestCase
       refute prog2.allows_user_projects?
     end
   end
+
+  test 'open for projects scope' do
+    prog = Factory(:programme, open_for_projects: true)
+    prog2 = Factory(:programme, open_for_projects: false)
+    prog3 = Factory(:programme, open_for_projects: true)
+
+    assert_equal [prog, prog3].sort, Programme.open_for_projects.sort
+  end
+
+  test 'any_programmes_open_for_projects?' do
+
+    # no programmes
+    with_config_value(:programmes_open_for_projects_enabled,true) do
+      refute Programme.any_programmes_open_for_projects?
+    end
+
+    Factory(:programme, open_for_projects: true)
+    Factory(:programme, open_for_projects: false)
+
+    with_config_value(:programmes_open_for_projects_enabled, true) do
+      assert Programme.any_programmes_open_for_projects?
+    end
+    with_config_value(:programmes_open_for_projects_enabled, false) do
+      refute Programme.any_programmes_open_for_projects?
+    end
+
+  end
 end
