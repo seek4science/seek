@@ -3270,6 +3270,44 @@ class ProjectsControllerTest < ActionController::TestCase
                   order_investigations_project_path(project), count: 1
   end
 
+  test 'ordering menu item hidden if isa disabled' do
+
+    person = Factory(:admin)
+    login_as(person)
+    project_with_invs = Factory(:project)
+    project_with_invs.investigations += [Factory(:investigation, contributor:person)]
+    project_with_invs.investigations += [Factory(:investigation, contributor:person)]
+
+    project_without_invs = Factory(:project)
+    person.add_to_project_and_institution(project_without_invs, person.institutions.first)
+    person.save!
+    person.reload
+
+    with_config_value(:isa_enabled, true) do
+      get :show, params: { id: project_with_invs.id }
+      assert_response :success
+      assert_select 'a[href=?]',
+                    order_investigations_project_path(project_with_invs), count: 1
+
+      #shown but disabled
+      get :show, params: { id: project_without_invs.id }
+      assert_response :success
+      assert_select 'ul#item-admin-menu li span.disabled', text:/order investigations/i, count: 1
+    end
+
+    with_config_value(:isa_enabled, false) do
+      get :show, params: { id: project_with_invs.id }
+      assert_response :success
+      assert_select 'a[href=?]',
+                    order_investigations_project_path(project_with_invs), count: 0
+
+      get :show, params: { id: project_without_invs.id }
+      assert_response :success
+      assert_select 'ul#item-admin-menu li span.disabled', text:/order investigations/i, count: 0
+    end
+
+  end
+
   test 'ordering only by editor' do
     person = Factory(:admin)
     login_as(person)
