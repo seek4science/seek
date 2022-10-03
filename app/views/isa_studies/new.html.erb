@@ -1,8 +1,7 @@
 <script type="text/javascript">
   var CREATE_INVESTIGATION_PATH='<%= create_investigation_path %>';
 </script>
-<% investigations = Investigation.all.select &:can_view? -%>
-<% if investigations.blank? %>
+<% if Investigation.authorized_for('view').none? %>
     <%= button_link_to("New #{t('investigation')}", 'arrow_right', new_investigation_path) -%>
 <% else %>
 	<span id='modal-dialogues'>
