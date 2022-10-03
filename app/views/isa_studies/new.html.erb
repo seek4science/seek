@@ -1,28 +1,25 @@
-<script type="text/javascript">
-  var CREATE_INVESTIGATION_PATH='<%= create_investigation_path %>';
-</script>
 <% if Investigation.authorized_for('view').none? %>
-    <%= button_link_to("New #{t('investigation')}", 'arrow_right', new_investigation_path) -%>
+  <%= button_link_to("New #{t('investigation')}", 'arrow_right', new_investigation_path) -%>
 <% else %>
-	<span id='modal-dialogues'>
+  <span id='modal-dialogues'>
     	<%= sample_controlled_vocab_model_dialog('cv-modal') %>
 	</span>
-	<h1>New <%=t('isa_study')%></h1>
+  <h1>New <%=t('isa_study')%></h1>
 
-	<% if show_batch_miappe_button? %>
-		<h4>Upload studies from file:</h4>
-		<%= link_to "MIAPPE Study batch upload", batch_uploader_studies_path, class: "btn btn-primary" %>
+  <% if show_batch_miappe_button? %>
+    <h4>Upload studies from file:</h4>
+    <%= link_to "MIAPPE Study batch upload", batch_uploader_studies_path, class: "btn btn-primary" %>
     <div>
       <%= link_to "Download MIAPPE template here", asset_path('batch_upload_template/MIAPPE Study batch template.zip', skip_pipeline: true) %>
     </div>
-		<h4>Or create a study with the form:</h4>
-	<% end %>
+    <h4>Or create a study with the form:</h4>
+  <% end %>
 
-	<%= render :partial => "templates/template_modal" -%>
-	
-	<div class="show_basic">	
-		<%= form_for @isa_study do |f| %>
-			<%= render :partial => "form", :locals => { :f => f, :action=>:new } -%>
-		<% end -%>
-	</div>
+  <%= render :partial => "templates/template_modal" -%>
+
+  <div class="show_basic">
+    <%= form_for @isa_study do |f| %>
+      <%= render :partial => "form", :locals => { :f => f, :action=>:new } -%>
+    <% end -%>
+  </div>
 <% end -%>
