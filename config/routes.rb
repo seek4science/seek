@@ -444,6 +444,7 @@ SEEK::Application.routes.draw do
   end
 
   resources :assays, concerns: [:publishable, :has_snapshots, :isa] do
+    resources :nels, only: [:index]
     resources :people, :programmes, :projects, :investigations, :samples, :studies, :models, :sops, :workflows, :data_files, :publications, :documents, :strains, :organisms, :human_diseases, :placeholders, only: [:index]
   end
 
