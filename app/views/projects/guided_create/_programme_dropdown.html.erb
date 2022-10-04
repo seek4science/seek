@@ -6,8 +6,16 @@
     You can also choose the <%= "#{Seek::Config.instance_admins_name} managed #{t('programme')}" %>, <%= link_to Programme.site_managed_programme.title, Programme.site_managed_programme %>, and if so you will need to wait for approval.
   </div>
 <% end %>
-<% programmes = (Programme.all.select{|p| User.current_user.person.is_programme_administrator?(p)} + [Programme.site_managed_programme]).compact.uniq %>
+
+<%
+  programmes = (User.current_user.person.administered_programmes.activated + [Programme.site_managed_programme]).compact.uniq
+  if Programme.any_programmes_open_for_projects?
+    programmes = programmes | Programme.open_for_projects
+  end
+%>
+
 <%= select_tag :programme_id,options_from_collection_for_select(programmes,:id, :title), class: 'form-control' %>
+
 <% if Seek::ProjectFormProgrammeOptions.creation_allowed? %>
   <div class="help-block">
     Alternatively you can choose to create a new <%= t('programme') %>, which your new <%= t('project') %> will be associated with.
