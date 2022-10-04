@@ -1,0 +1,16 @@
+
+<%
+add_row||="SampleAddNewRow()"
+paste_cb||="SamplePasteFromClipboard()"
+delete||="SampleSetAsDeleted()"
+save||="SampleSave()"
+permissions||=""
+%>
+
+<div class="btn-group">
+  <input class="btn btn-default" type="button" value="Add row" onClick=<%=add_row%> />
+  <input class="btn btn-default" type="button" value="Paste From Clipboard" onClick=<%=paste_cb%> />
+  <input class="btn btn-default" type="button" value="Delete selected" onClick=<%=delete%> />
+  <input class="btn btn-default dt-action" type="button" value="Batch sharing permissions" onClick=<%=permissions%>/>
+  <button class="btn btn-primary dt-action" id="btn_save_assay_sample" onClick=<%=save%>>Save</button>
+</div>
