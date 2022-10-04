@@ -187,7 +187,7 @@ class ProjectsController < ApplicationController
 
       @programme = Programme.find(params[:programme_id])
       raise "no #{t('programme')} can be found" if @programme.nil?
-      if @programme.can_manage?
+      if @programme.can_manage? || @programme.allows_user_projects?
         log = ProjectCreationMessageLog.log_request(sender:current_person, programme:@programme, project:@project, institution:@institution)
       elsif @programme.site_managed?
         log = ProjectCreationMessageLog.log_request(sender:current_person, programme:@programme, project:@project, institution:@institution)
@@ -217,7 +217,7 @@ class ProjectsController < ApplicationController
       flash.now[:notice]="Thank you, your request for a new #{t('project')} has been sent"
     end
 
-    if (@programme && @programme.can_manage?) || User.admin_logged_in?
+    if User.admin_logged_in? || (@programme && (@programme.can_manage? || @programme.allows_user_projects?))
       redirect_to administer_create_project_request_projects_path(message_log_id: log.id)
     else
       respond_to do |format|
@@ -570,7 +570,7 @@ class ProjectsController < ApplicationController
         validate_error_msg << "The #{t('institution')} is invalid, #{@institution.errors.full_messages.join(', ')}"
       end
 
-      unless Institution.can_create?
+      unless @programme.allows_user_projects? || Institution.can_create?
         validate_error_msg << "The #{t('institution')} cannot be created, as you do not have access rights"
       end
 
@@ -836,7 +836,7 @@ class ProjectsController < ApplicationController
     if @programme.new_record?
       error_msg = "You need to be an administrator" unless User.admin_logged_in?
     else
-      error_msg = "No rights to administer #{t('programme')}" unless @programme.can_manage?
+      error_msg = "No rights to administer #{t('programme')}" unless ( @programme.can_manage? || @programme.allows_user_projects?)
     end
 
     if error_msg
