@@ -247,18 +247,19 @@ module Nels
         end
         args << opts
 
-        # 404 and 302 exceptions have to be caught, as they are valid responses from NeLS
-        begin
-          response = base[path].send(*args)
-        rescue RestClient::ResourceNotFound => err
-          return 404
-        rescue RestClient::Found => err
-          return 302
-        # rescue RestClient::MovedPermanently, #301
-        #        RestClient::TemporaryRedirect #307
-        #   puts "Other exception"
-        #   return response
-        end
+        response = base[path].send(*args)
+        # # 404 and 302 exceptions have to be caught, as they are valid responses from NeLS
+        # begin
+        #   response = base[path].send(*args)
+        # rescue RestClient::ResourceNotFound => err
+        #   return 404
+        # rescue RestClient::Found => err
+        #   return 302
+        # # rescue RestClient::MovedPermanently, #301
+        # #        RestClient::TemporaryRedirect #307
+        # #   puts "Other exception"
+        # #   return response
+        # end
 
         return response if opts[:skip_parse]
 
