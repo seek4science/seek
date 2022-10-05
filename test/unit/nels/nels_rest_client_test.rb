@@ -64,4 +64,11 @@ class NelsRestClientTest < ActiveSupport::TestCase
     end
   end
 
+  test 'check metadata exists' do
+    VCR.use_cassette('nels/check_metadata_exists') do
+      refute @rest_client.check_metadata_exists(@project_id, @dataset_id, @subtype)
+      assert @rest_client.check_metadata_exists(@project_id, @dataset_id+1, @subtype)
+    end
+  end
+
 end

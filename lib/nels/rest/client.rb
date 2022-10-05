@@ -61,12 +61,8 @@ module Nels
       # Checks if there is a metadata file associated with the given dataset->subtype
       # NeLS responds 404 if no metadata exists, and 302 if it does
       def check_metadata_exists(project_id, dataset_id, subtype_name)
-        if perform("seek/sbi/projects/#{project_id}/datasets/#{dataset_id}/#{subtype_name}/metadata/do", :post,
-          body: { method: 'exist'}) == 302
-          return true
-        else
-          return false
-        end
+        perform("seek/sbi/projects/#{project_id}/datasets/#{dataset_id}/#{subtype_name}/metadata/do", :post,
+          body: { method: 'seek_metadata_exist'})['state']
       end
 
       def get_metadata(project_id, dataset_id, subtype_name)
