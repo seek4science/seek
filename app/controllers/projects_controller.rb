@@ -582,7 +582,10 @@ class ProjectsController < ApplicationController
 
       if validate_error_msg.blank?
         @project.save!
-        @institution.save!
+
+        # they are soon to become a project administrator, with permission to create
+        disable_authorization_checks { @institution.save! }
+
         requester.add_to_project_and_institution(@project, @institution)
         requester.is_project_administrator = true,@project
         requester.is_programme_administrator = true, @programme if make_programme_admin
