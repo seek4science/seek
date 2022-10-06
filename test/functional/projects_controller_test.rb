@@ -1780,6 +1780,33 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'guided create with programmes that allow user projects' do
+    person = Factory(:person)
+    closed_programme = Factory(:programme)
+    open_programme = Factory(:programme, open_for_projects:true)
+    login_as(person)
+    assert Seek::Config.programme_user_creation_enabled # config allows creation of Programmes
+
+    # don't show if disabled
+    with_config_value(:programmes_open_for_projects_enabled, false) do
+      get :guided_create
+      assert_response :success
+      assert_select 'select#programme_id', count: 0
+      assert_select 'input#programme_title', count: 1
+    end
+
+    with_config_value(:programmes_open_for_projects_enabled, true) do
+      get :guided_create
+      assert_response :success
+      assert_select 'select#programme_id' do
+        assert_select 'option', count: 1
+        assert_select 'option', value: open_programme.id, text: open_programme.title
+        assert_select 'option', value: closed_programme.id, text: closed_programme.title, count: 0
+      end
+      assert_select 'input#programme_title', count: 1
+    end
+  end
+
   test 'request_join_project with known project and institution' do
     person = Factory(:person_not_in_project)
     project = Factory(:project_administrator).projects.first #project needs to have an admin
@@ -2496,6 +2523,114 @@ class ProjectsControllerTest < ActionController::TestCase
           assert_no_difference('Institution.count') do
             assert_no_difference('GroupMembership.count') do
               post :respond_create_project_request, params:params
+            end
+          end
+        end
+      end
+    end
+
+    assert_redirected_to :root
+    refute_nil flash[:error]
+
+    log.reload
+    refute log.responded?
+  end
+
+  test 'respond create project request - programme open for projects (enabled)' do
+    person = Factory(:person)
+    login_as(person)
+    project = Project.new(title:'new project',web_page:'my new project')
+    programme = Factory(:programme, open_for_projects: true)
+    institution = Institution.new({title:'institution', country:'DE'})
+    log = ProjectCreationMessageLog.log_request(sender: person, programme:programme, project:project, institution:institution)
+    params = {
+      message_log_id:log.id,
+      accept_request: '1',
+      project:{
+        title:'new project',
+        web_page:'http://proj.org'
+      },
+      programme:{
+        id: programme.id
+      },
+      institution:{
+        title:'new institution',
+        city:'Paris',
+        country:'FR'
+      }
+    }
+
+    assert_no_enqueued_emails do
+      assert_no_difference('Programme.count') do
+        assert_difference('Project.count') do
+          assert_difference('Institution.count') do
+            assert_difference('GroupMembership.count') do
+              assert_difference('WorkGroup.count') do
+                with_config_value(:programmes_open_for_projects_enabled, true) do
+                  post :respond_create_project_request, params:params
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+
+    project = Project.last
+    institution = Institution.last
+    programme.reload
+
+    assert_equal 'new project', project.title
+    assert_equal 'new institution', institution.title
+
+    assert_includes programme.projects,project
+    assert_includes project.people, person
+    assert_includes project.institutions, institution
+    refute_includes programme.programme_administrators, person
+    assert_includes project.project_administrators, person
+
+    assert_equal WorkGroup.last, person.work_groups.last
+    assert_equal institution, person.work_groups.last.institution
+    assert_equal project, person.work_groups.last.project
+
+    assert_redirected_to(project_path(project))
+
+  end
+
+  test 'respond create project request - programme open for projects (disabled)' do
+    person = Factory(:person)
+    login_as(person)
+    project = Project.new(title:'new project',web_page:'my new project')
+    programme = Factory(:programme, open_for_projects: true)
+    institution = Institution.new({title:'institution', country:'DE'})
+    log = ProjectCreationMessageLog.log_request(sender: person, programme:programme, project:project, institution:institution)
+    params = {
+      message_log_id:log.id,
+      accept_request: '1',
+      project:{
+        title:'new project',
+        web_page:'http://proj.org'
+      },
+      programme:{
+        id: programme.id
+      },
+      institution:{
+        title:'new institution',
+        city:'Paris',
+        country:'FR'
+      }
+    }
+
+    assert_no_enqueued_emails do
+      assert_no_difference('Programme.count') do
+        assert_no_difference('Project.count') do
+          assert_no_difference('Institution.count') do
+            assert_no_difference('GroupMembership.count') do
+              assert_no_difference('WorkGroup.count') do
+                with_config_value(:programmes_open_for_projects_enabled, false) do
+                  post :respond_create_project_request, params:params
+                end
+              end
             end
           end
         end
