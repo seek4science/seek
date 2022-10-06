@@ -187,7 +187,7 @@ class ProjectsController < ApplicationController
 
       @programme = Programme.find(params[:programme_id])
       raise "no #{t('programme')} can be found" if @programme.nil?
-      if @programme.can_manage? || @programme.allows_user_projects?
+      if @programme.can_associate_projects?
         log = ProjectCreationMessageLog.log_request(sender:current_person, programme:@programme, project:@project, institution:@institution)
       elsif @programme.site_managed?
         log = ProjectCreationMessageLog.log_request(sender:current_person, programme:@programme, project:@project, institution:@institution)
@@ -217,7 +217,7 @@ class ProjectsController < ApplicationController
       flash.now[:notice]="Thank you, your request for a new #{t('project')} has been sent"
     end
 
-    if User.admin_logged_in? || (@programme && (@programme.can_manage? || @programme.allows_user_projects?))
+    if User.admin_logged_in? || @programme&.can_associate_projects?
       redirect_to administer_create_project_request_projects_path(message_log_id: log.id)
     else
       respond_to do |format|
@@ -685,7 +685,7 @@ class ProjectsController < ApplicationController
 
     if params[:project][:programme_id].present?
       prog = Programme.find_by_id(params[:project][:programme_id])
-      if prog&.can_manage? || prog&.allows_user_projects?
+      if prog&.can_associate_projects?
         permitted_params += [:programme_id]
       end
     end
@@ -839,7 +839,7 @@ class ProjectsController < ApplicationController
     if @programme.new_record?
       error_msg = "You need to be an administrator" unless User.admin_logged_in?
     else
-      error_msg = "No rights to administer #{t('programme')}" unless ( @programme.can_manage? || @programme.allows_user_projects?)
+      error_msg = "No rights to administer #{t('programme')}" unless ( @programme.can_associate_projects? )
     end
 
     if error_msg

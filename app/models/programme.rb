@@ -104,6 +104,11 @@ class Programme < ApplicationRecord
     user && user.is_admin? && !is_activated?
   end
 
+  # whether there is permission to associate projects
+  def can_associate_projects?(user = User.current_user)
+    can_manage?(user) || allows_user_projects?
+  end
+
   def allows_user_projects?
     open_for_projects? && Seek::Config.programmes_open_for_projects_enabled
   end

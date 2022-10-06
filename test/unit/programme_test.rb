@@ -535,4 +535,43 @@ class ProgrammeTest < ActiveSupport::TestCase
     end
 
   end
+
+  test 'can_associate_project' do
+    person = Factory(:person)
+    programme_admin = Factory(:person)
+    open_programme = Factory(:programme, open_for_projects: true)
+    closed_programme = Factory(:programme, open_for_projects: false)
+
+    disable_authorization_checks {
+      open_programme.programme_administrators = [programme_admin]
+      closed_programme.programme_administrators = [programme_admin]
+      open_programme.save!
+      closed_programme.save!
+    }
+
+    with_config_value(:programmes_open_for_projects_enabled, true) do
+      User.with_current_user(person.user) do
+        assert open_programme.can_associate_projects?
+        refute closed_programme.can_associate_projects?
+      end
+
+      User.with_current_user(programme_admin.user) do
+        assert open_programme.can_associate_projects?
+        assert closed_programme.can_associate_projects?
+      end
+    end
+
+    with_config_value(:programmes_open_for_projects_enabled, false) do
+      User.with_current_user(person.user) do
+        refute open_programme.can_associate_projects?
+        refute closed_programme.can_associate_projects?
+      end
+
+      User.with_current_user(programme_admin.user) do
+        assert open_programme.can_associate_projects?
+        assert closed_programme.can_associate_projects?
+      end
+    end
+
+  end
 end
