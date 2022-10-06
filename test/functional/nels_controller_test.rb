@@ -110,12 +110,15 @@ class NelsControllerTest < ActionController::TestCase
     end
 
     assert_response :success
-    assert_equal 2, JSON.parse(response.body).length
+    # 2 datasets, 6 subtypes (3 each)
+    assert_equal 8, JSON.parse(response.body).length
   end
 
   test 'can load dataset' do
     VCR.use_cassette('nels/get_dataset') do
-      get :dataset, params: { assay_id: @assay.id, project_id: @project_id, dataset_id: @dataset_id }
+      VCR.use_cassette('nels/check_metadata_exists') do
+        get :dataset, params: { assay_id: @assay.id, project_id: @project_id, dataset_id: @dataset_id }
+      end
     end
 
     assert_response :success
