@@ -217,7 +217,7 @@ class ProjectsController < ApplicationController
       flash.now[:notice]="Thank you, your request for a new #{t('project')} has been sent"
     end
 
-    if User.admin_logged_in? || @programme&.can_associate_projects?
+    if @programme&.can_associate_projects?
       redirect_to administer_create_project_request_projects_path(message_log_id: log.id)
     else
       respond_to do |format|
