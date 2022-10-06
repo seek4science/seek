@@ -8,7 +8,7 @@
 <% end %>
 
 <%
-  programmes = (User.current_user.person.administered_programmes.activated + [Programme.site_managed_programme]).compact.uniq
+  programmes = (User.current_user.person.administered_programmes.activated | [Programme.site_managed_programme]).compact.uniq
   if Programme.any_programmes_open_for_projects?
     programmes = programmes | Programme.open_for_projects
   end
