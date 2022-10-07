@@ -107,7 +107,7 @@ namespace :seek do
              Sop::Version, Workflow::Version]
     disable_authorization_checks do
       types.each do |type|
-        found = type.all.select { |v| v.parent.nil? }
+        found = type.where.missing(:parent)
         count += found.length
         found.each(&:destroy)
       end
