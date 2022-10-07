@@ -839,7 +839,7 @@ class ProjectsController < ApplicationController
     if @programme.new_record?
       error_msg = "You need to be an administrator" unless User.admin_logged_in?
     else
-      error_msg = "No rights to administer #{t('programme')}" unless ( @programme.can_associate_projects? )
+      error_msg = "No rights to administer #{t('programme')}" unless @programme.can_associate_projects?
     end
 
     if error_msg
