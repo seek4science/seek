@@ -766,6 +766,11 @@ SEEK::Application.routes.draw do
       get :dynamic_table_data
       get :export_isa, action: :export_isa
     end
+    collection do
+      get :batch_sharing_permission_preview
+      post :batch_change_permssion_for_selected_items
+      post :batch_sharing_permission_changed
+    end
   end
 
   ### ISA STUDY

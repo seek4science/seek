@@ -1,6 +1,8 @@
 require 'isatab_converter'
 class SinglePagesController < ApplicationController
   include Seek::AssetsCommon
+  include Seek::Sharing::SharingCommon
+
   before_action :set_up_instance_variable
   before_action :project_single_page_enabled?
   before_action :find_authorized_investigation, only: :export_isa

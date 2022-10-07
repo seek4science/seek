@@ -1,6 +1,10 @@
+<%
+  single_page = params[:single_page]
+%>
+
 <%= show_title "New sharing policy and permissions" -%>
 
-<%= form_tag :action => :batch_sharing_permission_changed do %>
+<%= form_tag({ :action => :batch_sharing_permission_changed }, id: "change-permission-form") do %>
   <% resource = (controller_name == 'people') ? current_user.person : @asset %>
   <%= folding_panel('Sharing', false, id: 'sharing_form',
                     help_text: "Here you can specify who can view, access and manage this.") do %>
@@ -32,9 +36,10 @@
     <% end %>
   <% end %>
 
-  <%= submit_tag "Confirm", data: { disable_with: 'Confirm....' }, :class => 'btn btn-primary confirm-button', disabled: true  -%>
+  <%= submit_tag "Confirm", data: { disable_with: 'Confirm....' }, :class => 'btn btn-primary confirm-button',
+    disabled: true, onclick: "submitBatchPermissionForm()"  -%>
   or
-  <%= cancel_button(resource) %>
+  <%= cancel_button(resource, { id: "cancel-batch-permission" }) %>
 <% end %>
 
 
@@ -55,6 +60,32 @@
                     $j(".confirm-button").prop("disabled", false);
                 }
         });
+
+        $j("#change-permission-form").submit(function(){
+          <% if single_page %>
+            return false;
+          <% end %>
+        });
+
+        $j("#cancel-batch-permission").on("click", function(e){
+          <% if single_page %>
+            e.preventDefault()
+            $j('#change-batch-permission-modal').modal('hide')
+          <% end %>
+        })
+
     });
+
+    function submitBatchPermissionForm () {
+      <% if single_page %>        
+        $j.ajax({
+          method: "POST",
+          url: '<%= batch_sharing_permission_changed_single_pages_path -%>?id=change-permission-form&single_page=true',
+          data: $j("#change-permission-form").serialize(),
+          success: (res) => { $j('#change-batch-permission').html(res) },
+          error: (e) => { console.log(e) }
+        });
+      <% end %>
+    }
 
 </script>
