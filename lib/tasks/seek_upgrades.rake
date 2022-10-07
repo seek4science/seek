@@ -25,6 +25,7 @@ namespace :seek do
     remove_spreadsheet_annotations
     convert_roles
     update_edam_annotation_attributes
+    remove_orphaned_project_subscriptions
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -237,6 +238,12 @@ namespace :seek do
         puts "Updating key for #{old_key} controlled vocabulary"
         query.update_all(key: new_key)
       end
+    end
+  end
+
+  task(remove_orphaned_project_subscriptions: [:environment]) do
+    disable_authorization_checks do
+      ProjectSubscription.where.missing(:project).destroy_all
     end
   end
 
