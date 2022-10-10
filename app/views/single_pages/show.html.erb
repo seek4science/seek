@@ -73,6 +73,13 @@
 
 				setSplitters();
 				updateContainerHeight();
+        // Permissions modal:
+        $j('#change-batch-permission').on('click', '[data-dismiss="modal"]', function (e) { e.stopPropagation(); });
+        $j('html').click(function(e) {
+          if($j(e.target).hasClass("modal-backdrop")) {
+            $j('.modal-backdrop').remove();
+          } 
+        });
     });
 
     function toggleItem(e, type){
