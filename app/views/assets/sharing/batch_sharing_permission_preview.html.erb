@@ -13,8 +13,8 @@
   all_related_items_hash = get_related_resources(current_user.person).slice(*Seek::Util.authorized_types.map(&:name)).except!('Publication')
 
   if single_page
-    all_related_items_hash = all_related_items_hash.slice('Sample')
-    all_related_items_hash['Sample'][:items].delete_if { |s| !sample_ids.include? s.id }    
+    samples = authorised_assets(Sample, nil, 'manage').delete_if { |s| !sample_ids.include? s.id }
+    all_related_items_hash = { 'Sample' => { items: samples }}
   end
 
   items_not_in_isa = filter_items_not_in_ISA(all_related_items_hash)
@@ -337,7 +337,13 @@
           method: "POST",
           url: '<%= batch_change_permssion_for_selected_items_single_pages_path -%>?single_page=true',
           data: $j("#change-permission-preview-form").serialize(),
-          success: (res) => { $j('#change-batch-permission').html(res) },
+          success: (res) => { 
+            $j('#change-batch-permission').html(res);
+            // Handling 'remaining backdrop' issue when multiple modals
+            $j('#add-person-permission-modal').data("backdrop", "")
+            $j('#add-project-permission-modal').data("backdrop", "")
+            loadObjectInputs() 
+          },
           error: (e) => { console.log(e) }
         });
       <% end %>
