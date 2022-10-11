@@ -71,4 +71,12 @@ class NelsRestClientTest < ActiveSupport::TestCase
     end
   end
 
+  # test 'download file' do
+  #   VCR.configure do |c|
+  #     c.allow_http_connections_when_no_cassette = true
+  #   end
+  #
+  #   @rest_client.download_file(1125299, 1124840, 'aligned', '', 'pegion.png')
+  # end
+
 end

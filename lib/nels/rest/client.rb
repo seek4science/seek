@@ -190,26 +190,35 @@ module Nels
         # 1. Retrieve upload-reference-uri to upload the file to
         response = perform("seek/sbi/projects/#{project_id}/datasets/#{dataset_id}/#{subtype_name}/data/do", :post,
           body: {
-            "method": "fetch_file",
+            "method": "initiate_download",
             "payload":{
-              "location-in-sub-type": path,
-              "file-name": file_name,
+              "location_in_sub_type": path,
+              "file_name": file_name,
             }
           }
         );
-        job_id = response.job_id;
+        job_id = response['jobId'];
+        puts "JOBID: #{job_id}"
 
         # TODO: Poll given job_id until status is 101
-        response = perform("seek/sbi/projects/#{project_id}/datasets/#{dataset_id}/#{subtype_name}/data/do", :post,
-          body: {
-            "method": "fetch_file",
-            "payload":{
-              "job_id": job_id
-            }
-          }
-        );
-        job_state = response.job_state
-        completion_percentage = response.completion
+        job_state = 0
+
+        while job_state != 101 do
+          response = perform("seek/sbi/projects/#{project_id}/datasets/#{dataset_id}/#{subtype_name}/data/do", :post,
+                             body: {
+                               "method": "job_state",
+                               "payload":{
+                                 "job_id": job_id
+                               }
+                             }
+          );
+          job_state = response['state_id']
+          completion_percentage = response['completion']
+          puts "STATE = #{job_state}"
+          puts "COMP % = #{completion_percentage}"
+          sleep(2)
+        end
+
         if (job_state == 101)
           # Once the file has been transfered, request download-uri
           response = perform("seek/sbi/projects/#{project_id}/datasets/#{dataset_id}/#{subtype_name}/data/do", :post,
