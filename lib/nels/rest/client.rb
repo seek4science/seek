@@ -137,8 +137,8 @@ module Nels
           body: {
             "method": "initiate_upload",
             "payload":{
-              "location-in-sub-type": path,
-              "file-name": file_name,
+              "location_in_sub_type": path,
+              "file_name": file_name,
             }
           }
         );
@@ -146,28 +146,37 @@ module Nels
         reflink = response.url
         job_id = response.job_id
 
+        puts "REFLINK = #{reflink}"
+        puts "JOBID = #{jobid}"
+
         # Upload the file, 204 if success (maybe 200 in new API) 400 with errors otherwise
-        if perform(reflink, :post, :body => IO.read(file_path)) != 400
+        response = perform(reflink, :post, :body => IO.read(file_path))
+        puts "UPLOAD RESPONSE = #{response}"
+
           # Once upload is done, trigger NeLS transfer
-          perform("seek/sbi/projects/#{project_id}/datasets/#{dataset_id}/#{subtype_name}/data/do", :post,
-            body: {
-              "method": "upload_done",
-              "payload":{
-                "job_id": job_id,
-              }
-            });
-        else
-          # handle
-          return false
+        response = perform("seek/sbi/projects/#{project_id}/datasets/#{dataset_id}/#{subtype_name}/data/do", :post,
+          body: {
+            "method": "upload_done",
+            "payload":{
+              "job_id": job_id,
+            }
+          });
+
+        puts "UPLOAD DONE RESPONSE = #{response}"
+        job_state = 0
+        while (job_state != 101)
+          response = upload_check_progress(project_id, dataset_id, subtype_name, jobid)
+          job_state = response['state_id']
+          puts "JOB STATE = #{job_state}"
+          puts "COMPLETION = #{response['completion']}"
+          sleep(2)
         end
 
-        # At this point the data is being transfered from NeLS to storebioinfo
-        return job_id
       end
       
       # returns {job_state: state-enums, completion: completion-percentage} 
       # state-enums: SUCCESS(101), FAILURE(102), SUBMITTED(100), PROCESSING(103);
-      def upload_check_progress(project_id, dataset_id, subtype_name, path, job_id)
+      def upload_check_progress(project_id, dataset_id, subtype_name, job_id)
         path = sanitiseStoragePath(path)
 
         perform("seek/sbi/projects/#{project_id}/datasets/#{dataset_id}/#{subtype_name}/data/do", :post,
@@ -216,7 +225,7 @@ module Nels
           completion_percentage = response['completion']
           puts "STATE = #{job_state}"
           puts "COMP % = #{completion_percentage}"
-          sleep(2)
+          sleep(0.25)
         end
 
         if (job_state == 101)
@@ -229,12 +238,16 @@ module Nels
               }
             }
           );
-          download_uri = response.download-uri
-          # download file from given one-time use URI
-          response_file = perform(download_uri, :get, skip_parse: true, raw_response: true)
+          download_uri = response['url']
+          puts "DOWNLOAD URL = #{download_uri}"
+
 
           tmp_file = Tempfile.new()
-          File.open(tmp_file.path, 'wb'){|f| f << response_file.to_str}
+          URI.open(download_uri) do |stream|
+            File.open(tmp_file.path, 'wb') do |file|
+              file.write(stream.read)
+            end
+          end
           return file_name, tmp_file.path
         end
       end

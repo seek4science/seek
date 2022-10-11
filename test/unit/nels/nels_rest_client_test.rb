@@ -71,12 +71,26 @@ class NelsRestClientTest < ActiveSupport::TestCase
     end
   end
 
-  # test 'download file' do
+  test 'download file' do
+    filename, path = nil
+
+    VCR.use_cassette('nels/download_file') do
+      filename, path = @rest_client.download_file(1125299, 1124840, 'analysis', '', 'pegion.png')
+    end
+
+    assert_equal 'pegion.png', filename
+    assert File.exists?(path)
+    File.delete(path)
+  end
+
+  # test 'upload file' do
   #   VCR.configure do |c|
   #     c.allow_http_connections_when_no_cassette = true
   #   end
   #
-  #   @rest_client.download_file(1125299, 1124840, 'aligned', '', 'pegion.png')
+  #   file_path = File.join(Rails.root, 'test','fixtures','files','little_file.txt')
+  #   assert File.exist?(file_path)
+  #   @rest_client.upload_file(1125299, 1124840, 'aligned', '', 'little_file.txt', file_path)
   # end
 
 end
