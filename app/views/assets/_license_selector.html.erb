@@ -1,14 +1,26 @@
-<% default_license ||= Seek::Config.default_license %>
-<% accessor ||= :license %>
-<% selected_license = resource.send(accessor) %>
-<% selected_license = (resource.new_record? ? default_license : Seek::License::NULL_LICENSE) if selected_license.nil? %>
-<% license_group ||= :data %>
-<% if license_group == :data %>
-  <% recommended_licenses ||= Seek::Config.recommended_data_licenses %>
-<% else %>
-  <% recommended_licenses ||= Seek::Config.recommended_software_licenses %>
-<% end %>
-<% label ||= 'License' %>
+<%
+  default_license ||= Seek::Config.default_license
+  accessor ||= :license
+  selected_license = resource.send(accessor)
+
+  using_default = false
+  if selected_license.nil?
+    if resource.new_record?
+      selected_license = default_license
+      using_default = true
+    else
+      selected_license = Seek::License::NULL_LICENSE
+    end
+  end
+
+  license_group ||= :data
+  if license_group == :data
+    recommended_licenses ||= Seek::Config.recommended_data_licenses
+  else
+    recommended_licenses ||= Seek::Config.recommended_software_licenses
+  end
+  label ||= 'License'
+%>
 
 <%= folding_panel(label, false,
                   :help_text => "Here you can choose which license this #{text_for_resource(resource)} is available under.") do %>
@@ -16,9 +28,10 @@
       <label><%= label %></label>
 
       <%= grouped_license_select("#{resource.class.name.underscore}[#{accessor.to_s}]", selected_license,
-                                 :id => 'license-select', :class => 'form-control',
-      :source => Seek::License::OPENDEFINITION[:all],
-      :recommended => recommended_licenses) %>
+                                 id: 'license-select', class: 'form-control',
+                                 data: { 'can-overwrite': using_default },
+                                 source: Seek::License::OPENDEFINITION[:all],
+                                 recommended: recommended_licenses) %>
 
       <span class="help-block license-url-block">
         For more information on this license, please visit <a id="license-url" href="" target="_blank"></a>
