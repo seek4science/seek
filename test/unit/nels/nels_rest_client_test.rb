@@ -83,14 +83,12 @@ class NelsRestClientTest < ActiveSupport::TestCase
     File.delete(path)
   end
 
-  # test 'upload file' do
-  #   VCR.configure do |c|
-  #     c.allow_http_connections_when_no_cassette = true
-  #   end
-  #
-  #   file_path = File.join(Rails.root, 'test','fixtures','files','little_file.txt')
-  #   assert File.exist?(file_path)
-  #   @rest_client.upload_file(1125299, 1124840, 'aligned', '', 'little_file.txt', file_path)
-  # end
+  test 'upload file' do
+    VCR.use_cassette('nels/upload_file') do
+      file_path = File.join(Rails.root, 'test','fixtures','files','little_file.txt')
+      assert File.exist?(file_path)
+      @rest_client.upload_file(1125299, 1124840, 'analysis', '', 'little_file.txt', file_path)
+    end
+  end
 
 end

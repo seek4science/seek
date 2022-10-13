@@ -78,7 +78,7 @@ module Nels
       def upload_metadata(project_id, dataset_id, subtype_name, file_path)
         perform("seek/sbi/projects/#{project_id}/datasets/#{dataset_id}/#{subtype_name}/metadata", :post,
           :body => IO.read(file_path),
-          :content_type => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+          :content_type => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
       end
 
       def delete_metadata(project_id, dataset_id, subtype_name, file_path)
@@ -118,7 +118,7 @@ module Nels
               "project_id": project_id,
               "dataset_id": dataset_id
             }
-          })['elements'];
+          })['elements']
       end
 
       # UPLOAD FILE FLOW
@@ -142,16 +142,15 @@ module Nels
             }
           }
         );
-        puts (response)
-        reflink = response.url
-        job_id = response.job_id
+
+        reflink = response['url']
+        job_id = response['jobId']
 
         puts "REFLINK = #{reflink}"
-        puts "JOBID = #{jobid}"
+        puts "JOBID = #{job_id}"
 
-        # Upload the file, 204 if success (maybe 200 in new API) 400 with errors otherwise
-        response = perform(reflink, :post, :body => IO.read(file_path))
-        puts "UPLOAD RESPONSE = #{response}"
+        response = RestClient.post(reflink, { file: File.new(file_path, 'r'), multipart: true }, { Accept: '*/*' })
+        raise 'upload failed' unless response.code == 200
 
           # Once upload is done, trigger NeLS transfer
         response = perform("seek/sbi/projects/#{project_id}/datasets/#{dataset_id}/#{subtype_name}/data/do", :post,
@@ -160,16 +159,16 @@ module Nels
             "payload":{
               "job_id": job_id,
             }
-          });
+          })
 
         puts "UPLOAD DONE RESPONSE = #{response}"
         job_state = 0
         while (job_state != 101)
-          response = upload_check_progress(project_id, dataset_id, subtype_name, jobid)
+          response = upload_check_progress(project_id, dataset_id, subtype_name, job_id)
           job_state = response['state_id']
           puts "JOB STATE = #{job_state}"
           puts "COMPLETION = #{response['completion']}"
-          sleep(2)
+          sleep(0.2)
         end
 
       end
@@ -177,7 +176,6 @@ module Nels
       # returns {job_state: state-enums, completion: completion-percentage} 
       # state-enums: SUCCESS(101), FAILURE(102), SUBMITTED(100), PROCESSING(103);
       def upload_check_progress(project_id, dataset_id, subtype_name, job_id)
-        path = sanitiseStoragePath(path)
 
         perform("seek/sbi/projects/#{project_id}/datasets/#{dataset_id}/#{subtype_name}/data/do", :post,
           body: {
@@ -185,7 +183,7 @@ module Nels
             "payload":{
               "job_id": job_id,
             }
-          });
+          })
       end
 
       # DOWNLOAD FILE FLOW
@@ -205,8 +203,8 @@ module Nels
               "file_name": file_name,
             }
           }
-        );
-        job_id = response['jobId'];
+        )
+        job_id = response['jobId']
         puts "JOBID: #{job_id}"
 
         # TODO: Poll given job_id until status is 101
