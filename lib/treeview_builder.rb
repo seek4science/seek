@@ -37,7 +37,9 @@ class TreeviewBuilder
   end
 
   def create_node(obj)
-    unless obj[:resource].can_view?
+    resource = obj[:resource].class.name.underscore
+    can_view = resource == 'sample_type' ? "can_view_in_single_page?" : "can_view?"
+    unless obj[:resource].send(can_view)
       obj[:text] = 'hidden item'
       obj[:a_attr] = { 'style': 'font-style:italic;font-weight:bold;color:#ccc' }
     end
