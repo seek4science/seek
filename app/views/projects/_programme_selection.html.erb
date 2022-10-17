@@ -1,7 +1,8 @@
 <%
     include_blank = (admin_logged_in? && params[:programme_id].blank?) ? "No associated #{t('programme')}" : nil
-    available = User.current_user.person.administered_programmes.activated +
-        Programme.select { |p| p.allows_user_projects? }
+    available = User.current_user.person.administered_programmes.activated
+    available = available | Programme.open_for_projects if Programme.any_programmes_open_for_projects?
+
     if params[:programme_id]
       available =   available.select{|p| p.id.to_s == params[:programme_id]}
     end
