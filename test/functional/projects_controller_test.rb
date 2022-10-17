@@ -3505,6 +3505,18 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_select 'div.panel div.panel-body a[href=?]','https://edamontology.github.io/edam-browser/#topic_3314',text:/Chemistry/, count:1
   end
 
+  test 'request membership button disabled if membership already requested' do
+    person = Factory(:person)
+    project = Factory(:project)
+    ProjectMembershipMessageLog.log_request(sender: person, project: project, institution: Factory(:institution))
+
+    login_as(person)
+
+    get :show, params: { id: project.id }
+
+    assert_select 'a.btn[disabled=disabled]', text: 'Request membership', count: 1
+  end
+
   private
 
   def check_project(project)
