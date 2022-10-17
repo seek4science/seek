@@ -16,7 +16,7 @@
     </div>
 
 
-    <ul class="sharing_options">
+    <ul class="sharing_options" style="max-height:200px;overflow-y:scroll">
       <% @items_for_sharing.each do |item| %>
         <%= hidden_field_tag sharing_item_param(item), 1 %>
         <li class="type_and_title">
