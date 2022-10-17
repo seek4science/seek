@@ -3161,8 +3161,20 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_select 'a[href=?]',
                   order_investigations_project_path(project), count: 0
   end
-  
-    private
+
+  test 'request membership button disabled if membership already requested' do
+    person = Factory(:person)
+    project = Factory(:project)
+    ProjectMembershipMessageLog.log_request(sender: person, project: project, institution: Factory(:institution))
+
+    login_as(person)
+
+    get :show, params: { id: project.id }
+
+    assert_select 'a.btn[disabled=disabled]', text: 'Request membership', count: 1
+  end
+
+  private
 
   def edit_max_object(project)
     for i in 1..5
