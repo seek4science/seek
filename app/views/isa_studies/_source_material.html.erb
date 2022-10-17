@@ -38,12 +38,14 @@
                 },
                 callback: () => studyDynamicTable.table.ajax.reload(),
                 enableLoading: () => {
-                    elem.append("<span class='loader' style='margin:2px 0 2px 5px'></span>")
-                    $j(".dt-action").addClass("disabled")
+                  $j("#dt-overlay").css("display", "flex")
+                  elem.append("<span class='loader' style='margin:2px 0 2px 5px'></span>")
+                  $j(".dt-action").addClass("disabled")
                 },
                 disableLoading: () => {
-                    elem.find(".loader").remove();
-                    $j(".dt-action").removeClass("disabled")
+                  $j("#dt-overlay").css("display", "none")
+                  elem.find(".loader").remove();
+                  $j(".dt-action").removeClass("disabled")
                 }
             }
             sourceDynamicTable.init(dt.rows, dt.columns, options)

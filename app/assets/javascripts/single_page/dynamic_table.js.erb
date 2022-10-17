@@ -442,10 +442,10 @@ const handleFailure = (table, res) => {
 			const idx = this.index().column;
 			const colTitle = $j(table.column(idx).header()).text().replace("*", "");
 			if (errorColNames.includes(colTitle)) {
-				$j(this.node()).addClass(dtErrClass);
+				$j(this.node()).removeClass(dtSuccessClass).addClass(dtErrClass);
 				$j(this.node()).attr("title", error.error[colTitle]);
 			} else if (error.error == "Can not be deleted.") {
-				$j(this.node()).addClass(dtErrClass);
+				$j(this.node()).removeClass(dtSuccessClass).addClass(dtErrClass);
 			}
 		});
 	});
@@ -464,7 +464,7 @@ const handleSuccess = (table, sampleTypes, res) => {
 					this.data(id);
 				}
 				sampleStatus(table, rowId, sampleTypeId, rowStatus.noAction);
-				$j(this.node()).addClass(dtSuccessClass);
+				$j(this.node()).removeClass(dtErrClass).addClass(dtSuccessClass);
 			});
 		});
 	});
