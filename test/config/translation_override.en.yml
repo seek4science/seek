@@ -1,151 +1,76 @@
 #The terms should be capitalized at the first character.
 en:
-  search_label: ""
-  search_prompt: "Search here..."
-  seek_id: "SEEK ID"
-
-  login:
-    elixir_aai: 'LS Login'
-    ldap: 'LDAP'
-    github: 'GitHub'
-
   investigation: &investigation "Investigation_test"
   study: &study "Study_test"
   assay: &assay "Assay_test"
-  assays:
-    assay: "Assay"
-    experimental_assay: "Experimental assay"
-    modelling_analysis:  "Modelling analysis"
-  
-  isa_study: "ISA Study"  
-  study_design: "Study Design"
-  isa_assay: "ISA Assay"
-
   data_file: &data_file "Data file_test"
-  discipline: "Discipline_test"
   document: &document "Document_test"
   model: &model "Model_test"
   sop: &sop "SOP_test"
   workflow: &workflow "Workflow_test"
   workflow_class: "Workflow Type"
-  workflows:
-    workflow: "Workflow"
-    cwl_workflow: "CWL workflow"
-    galaxy_workflow: "Galaxy workflow"
-    knime_workflow: "KNIME workflow"
-    ro_workflow: "Research Object workflow"
-    register:
-      files: 'Upload/Import Files'
-      git: 'Import Git Repository'
-      ro_crate: 'Upload/Import Workflow RO-Crate'
   publication: &publication "Publication_test"
-  
   presentation: &presentation "Presentation_test"
   event: &event "Event_test"
   file_template: &file_template "File Template_test"
-  placeholder: "Placeholder"
   collection: &collection "Collection_test"
-
   sample: &sample "Sample_test"
   sample_type: &sample_type "Sample type_test"
   template: &template "Template_test"
   strain: &strain "Strain_test"
-  scale: "Scale"
   organism: &organism "Organism_test"
-  human_disease: "Human Disease"
-
   person: &person "Person_test"
   project: &project "Project_test"
   institution: &institution "Institution_test"
   programme: &programme "Programme_test"
-  avatar: "Avatar"
-  private_asset: 'Hidden item'
-
-  openbis_endpoint: "OpenBis endpoint"
-
-  samples:
-    pid_info_text: 'The identifier assigns a unique and unequivocal meaning to the attribute name.'
-
-  gadget:
-    new_heading: "New or upload"
-    create_button: "CREATE"
-
-  menu:
-    yellow_pages: "Yellow pages"
-    isa:  "Experiments"
-    assets: "Assets"
-    activities: "Activities"
-    samples: "Samples"
-    documentation: "Help"
-    admin: "Server administration"
-    help: "Help documentation"
-    api: "API documentation"    
-    account: "Account"
-    faq: "FAQ"
-    jerm_templates: "JERM templates"
-    feedback: "Provide feedback"
-    report_issue: 'Report an issue'
-    isa_best_practice: "ISA best practice"
-    vocabularies: "Vocabularies"
-
-  favourite_group: "favourite groups"
-
-  add_new_dropdown:
-    button: "Add new"
-    option: "Add new"
-
-  actions_button: "Actions"
-  submit_button:
-    upload: 'Register'
-    create: 'Create'
-    update: 'Update'
-
-  access:
-    determined_by_group: "Individual access rights for each member"
-    no_access: "No access"
-    #the appended _downloadable allows a different message for downloadable items - e.g Workflows can be downloaded, assays cannot
-    visible: "View summary"
-    visible_downloadable: "View summary only"
-    accessible: "View summary"
-    accessible_downloadable: "View summary and get contents"
-    editing: "View and edit summary"
-    editing_downloadable: "View and edit summary and contents"
-    managing: "Manage"
-
-  asset_housekeeper: 'Asset housekeeper'
-  asset_gatekeeper: 'Asset gatekeeper'
-  project_administrator: 'Project administrator'
-  pal: 'PAL'
-  programme_administrator: 'Programme administrator'
-  admin: 'Admin'
-
-  roles:
-    scopes:
-      system: 'System'
-
-  contributor: 'submitter' # A person who submitted the resource to SEEK
-  contribution: 'submission'
-  creator: 'creator' # A person who was involved with the creation of the resource  
-
-  jerm_harvester_name: 'The JERM Harvester'
-  deleted_contributor_name: 'Deleted submitter'
-
-  null_license: 'No license - no permission to use unless the owner grants a licence'
-
-  licenses:
-    other: 'Other'
-    recommended: 'Suggested'
 
   attributes: # Applies to attributes for any model
-    other_creators: Additional credit
-    ro_crate: RO-Crate
-    abstract_cwl: "Abstract CWL"
-    doi: DOI
-    data_type_annotation_values: 'Data type annotations'
-    data_format_annotation_values: 'Data format annotations'
-    topic_annotation_values: 'Topic annotations'
-    operation_annotation_values: 'Operation annotations'
-    contributor: 'Submitter'
+    # Mostly for associations in other models (has_one or has_many)
+    programme: *programme
+    project: *project
+    institution: *institution
+    person: *person
+    investigation: *investigation
+    study: *study
+    assay: *assay
+    data_file: *data_file
+    model: *model
+    sop: *sop
+    workflow: *workflow
+    publication: *publication
+    document: *document
+    file_template: *file_template
+    collection: *collection
+    presentation: *presentation
+    event: *event
+    sample: *sample
+    template: *template
+    sample_type: *sample_type
+    strain: *strain
+    organism: *organism
+
+    programmes: 'Programmes_test_attr'
+    projects: 'Projects_test_attr'
+    institutions: 'Institutions_test_attr'
+    persons: 'Persons_test_attr'
+    investigations: 'Investigations_test_attr'
+    studys: 'Studies_test_attr'
+    assays: 'Assays_test_attr'
+    data_files: 'Data files_test_attr'
+    models: 'Models_test_attr'
+    sops: 'Sops_test_attr'
+    workflows: 'Workflows_test_attr'
+    publications: 'Publications_test_attr'
+    documents: 'Documents_test_attr'
+    file_templates: 'Files templates_test_attr'
+    collections: 'Collections_test_attr'
+    presentations: 'Presentations_test_attr'
+    events: 'Events_test_attr'
+    samples: 'Samples_test_attr'
+    templates: 'Templates_test_attr'
+    sample_types: 'Samples types_test_attr'
+    strains: 'Strains_test_attr'
+    organisms: 'Organisms_test_attr'
 
   activerecord:
     errors:
@@ -156,7 +81,6 @@ en:
         # The variable :count is also available
         body: "There were problems with the following fields:"
     models:
-      workflow_class: Workflow Type
       programme: *programme
       project: *project
       institution: *institution
@@ -179,84 +103,3 @@ en:
       sample_type: *sample_type
       strain: *strain
       organism: *organism
-    attributes:
-      person:
-        title: "Full name"
-      collection:
-        creators: 'Maintainers'
-      workflow_class:
-        url: URL
-      assay:
-        assay_type_uri: 'Assay Type'
-        technology_type_uri: 'Technology Type'
-
-  oauth_session: 'OAuth Session'
-  identity: 'Identity'
-  api_token: 'API token'
-  maturity_level:
-    released: 'Stable'
-    work_in_progress: 'Work-in-progress'
-  test_status:
-    all_passing: 'Passing'
-    some_passing: 'Some failures'
-    all_failing: 'All failing'
-    not_available: 'Not available'
-  git_annotation_label:
-    main_workflow: 'Main Workflow'
-    abstract_cwl: 'Abstract CWL'
-    diagram: 'Diagram'
-    remote_source: 'Remote'
-  git:
-    modify_immutable_remote_error: 'You cannot make changes to an imported repository.'
-    modify_immutable_error: 'You cannot make changes to a frozen version.'
-
-  about_project: "You need to be a member of a <strong>%{project}</strong> before you can register content.
-    A %{project} can contain one or more people, and gives some additional background details, and credit, about the content being registered. It can be used to describe and promote
-    the work you are doing.
-    Being in a %{project} allows you to easily share with others whilst collaborating, and also provides useful defaults such as Sharing permissions and License."
-
-  create_join_project_options: "You have the option to either <strong>Join</strong> a %{project} you already know about, or <b>Create</b> a new one."    
-    
-
-  about_programme: "A <strong>%{programme}</strong> holds a collection of one or more %{projects}. If you create a %{programme} you become its administrator and you have the ability to
-create and administer additional %{projects} within it without additional approval from a site administrator. A %{programme} can describe and promote
-an activity that is larger than a %{project}, and can be associated with a funding."
-
-  about_managed_programme: "If you don't think a %{programme} is necessary, and you won't expect to need to create additional %{projects} in the future, 
-you can choose to have a %{project} linked to a site managed %{programme} instead."
-
-  report_a_bug: '<h2>Issue tracker</h2>
-  <p>
-  To report a bug or other issue, it is preferable to use the %{issue_tracker_link}. A Github account is required, and your report will be public and open 
-  to comments. Before reporting the issue, have a look and search through the current issues to see if the problem has already been raised - if so, add a comment so
-   we know it is also affecting you.
-  </p>
-  <h2>Feedback form</h2>
-  <p>
-  Alternatively, if you are unable to use the %{issue_tracker_link}, or the issue is of a private nature, then you can use the %{feedback_link}.
-  <p>'
-
-  controlled_vocabs:
-    add_new_term_disabled_reason: "You are unable to add new terms when linked to an Ontology"
-
-  info_text:
-    institution: "An Institution in SEEK is where someone is employed or works or a person’s affiliation."
-    person: "A Person (People) in SEEK is a registered user or a Profile of a person that has not registered with SEEK. A Person is someone who participates directly or indirectly in the scientific research described within SEEK."
-    programme: "A Programme is an umbrella to group one or more Projects.  A Programme is usually, but not always, associated with a particular funded piece of research (Funding details)."
-    project: "A Project is a research carried out as part of a Programme. Project creator and Project members must provide one Institution they are associated with in relation to the Project. To allow users to request membership of a Project, the Project must have a Project administrator. A Project can have one or more Investigations."
-    investigation: "Investigation is a high level description of the research carried out within a particular Project and typically reflects the general aims of the research. If your research project has several “sub-projects” that do not share any data, you should define an Investigation for each within the same SEEK Project. Investigation must be associated with one or more Projects (with exceptions in Single Page) and it can contain one or more Studies."
-    study: "A Study is a particular biological hypothesis, which you are planning to test in various ways, using various techniques, which could be experimental, informatics, modelling, or a mixture. A Study must belong to one Investigation and it can contain one or more Assays."
-    assay: "An Assay is in general the application of a protocol (SOP) that converts an input material or data (incoming samples) into a new material or data (outgoing samples). An Assay must belong to one Study. Assays can be of two types: Experimental assay or Modelling analyses."
-    model: "A Model is a file containing a computer model of a biological or biochemical network or process. A Model file must be associated with one or more Projects and can be associated with one or more Modelling analyses (a type of Assay)."
-    sop: "SOP stands for Standard Operating Procedure and it describes a protocol. SOP files can be in any format (word files, e-lab notebooks, code, annotated spreadsheets etc). A SOP file must be associated with one or more Projects and can be associated with one or more Assays (with exceptions in Single Page). If associated with an Assay, the SOP describes the protocol to reproduce the Assay it is associated with."
-    data_file: "Data files can be any file containing data relevant to Projects and/or to Assays (raw data, processed data, calibration information etc). They can be in any format (word files, e-lab notebooks, code, annotated spreadsheets etc). A Data file must be associated with one or more Projects and can be associated with one or more Assays, assets and activities."
-    publication: "Publications can be registered in SEEK. A Publication must be associated with one or more Projects and can be associated with assets, experiments and activities."
-    workflow: "A Computational Workflow describes the complex multi-step methods that are used for data collection, data preparation, analytics, predictive modelling, and simulation that lead to new data products. Workflow can be registered in SEEK by referencing or uploading files in several formats. A Workflow must be associated with one or more Teams (Projects)."
-    document: "Documents can be registered in SEEK. A Document can be any descriptive documentation that describes experiments, assets and activities. A Document must be associated with one or more Projects and can be associated with experiments, assets and activities."
-    collection: "A collection is a group of items that are conceptually related to each other."
-    presentation: "Presentations can be registered in SEEK. A Presentation can be in any format, it must be associated with  one or more Projects and can be associated to assets and activities."
-    event: "Events can be registered in SEEK. An Event must be associated with one or more Projects, happening on specified dates and at a specific location, actual or virtual."
-    sample: "Samples can be registered in SEEK. ​A Sample is an entity (material or data) that is converted into a new item (material or data) via a process (physical or computational). Samples must be associated with one or more Projects. Samples can be linked to Assay (and also to Study in Single Page)."
-    sample_type: "Sample Types are templates that detail the key information that needs to be included to describe a given sample correctly. A Sample type must be associated with one or more Projects (with exceptions in Single Page)."
-    template: "Templates consist of a set of defined attributes needed to create Sample Types in Single Page. Templates act as blueprints that can be shared, reused and applied for creating Sample Types in Single Page. Templates must be associated with one or more Projects."
-    organism: "Organisms can be registered in SEEK. An Organism is an organism as identified by an entry in the NCBI ontology."

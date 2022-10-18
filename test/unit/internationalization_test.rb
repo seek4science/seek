@@ -1,6 +1,9 @@
 require 'test_helper'
 
 class InternationalizationTest < ActiveSupport::TestCase
+
+  include AuthenticatedTestHelper
+  
   setup do
     @original_load_path = I18n.load_path
     apply_overrides

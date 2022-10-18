@@ -146,6 +146,52 @@ en:
     topic_annotation_values: 'Topic annotations'
     operation_annotation_values: 'Operation annotations'
     contributor: 'Submitter'
+    # Mostly for associations in other models (has_one or has_many)
+    programme: *programme
+    project: *project
+    institution: *institution
+    person: *person
+    investigation: *investigation
+    study: *study
+    assay: *assay
+    data_file: *data_file
+    model: *model
+    sop: *sop
+    workflow: *workflow
+    publication: *publication
+    document: *document
+    file_template: *file_template
+    collection: *collection
+    presentation: *presentation
+    event: *event
+    sample: *sample
+    template: *template
+    sample_type: *sample_type
+    strain: *strain
+    organism: *organism
+
+    programmes: 'Programmes'
+    projects: 'Projects'
+    institutions: 'Institutions'
+    persons: 'Persons'
+    investigations: 'Investigations'
+    studys: 'Studies'
+    assays: 'Assays'
+    data_files: 'Data files'
+    models: 'Models'
+    sops: 'Sops'
+    workflows: 'Workflows'
+    publications: 'Publications'
+    documents: 'Documents'
+    file_templates: 'Files templates'
+    collections: 'Collections'
+    presentations: 'Presentations'
+    events: 'Events'
+    samples: 'Samples'
+    templates: 'Templates'
+    sample_types: 'Samples types'
+    strains: 'Strains'
+    organisms: 'Organisms'
 
   activerecord:
     errors:
