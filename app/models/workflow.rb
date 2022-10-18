@@ -3,6 +3,7 @@ class Workflow < ApplicationRecord
   include Seek::UploadHandling::ExamineUrl
   include Seek::BioSchema::Support
   include WorkflowExtraction
+  include HasTools
 
   belongs_to :workflow_class, optional: true
   has_filter workflow_type: Seek::Filtering::Filter.new(value_field: 'workflow_classes.key',

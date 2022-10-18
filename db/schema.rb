@@ -10,8 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_09_07_085132) do
-
+ActiveRecord::Schema.define(version: 2022_10_18_114253) do
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
     t.string "format"
@@ -2145,6 +2144,16 @@ ActiveRecord::Schema.define(version: 2022_09_07_085132) do
     t.string "title"
     t.datetime "created_at"
     t.datetime "updated_at"
+  end
+
+  create_table "tool_annotations", force: :cascade do |t|
+    t.string "resource_type"
+    t.bigint "resource_id"
+    t.string "bio_tools_id"
+    t.string "name"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["resource_type", "resource_id"], name: "index_tool_annotations_on_resource"
   end
 
   create_table "units", id: :integer, force: :cascade do |t|

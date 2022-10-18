@@ -1,10 +1,9 @@
 <%
   resource_text ||= text_for_resource(resource)
-  field_name = "#{resource.class.name.underscore}[workflow_tools_attributes]"
+  field_name = "#{resource.class.name.underscore}[tools_attributes]"
 
   collapse_panel = resource.tool_annotations.empty?
-  associated_tools_json = '[]'
-
+  associated_tools_json = resource.tool_annotations.map { |t| { title: t.name, id: t.bio_tools_id } }.to_json
 -%>
 
 <%= folding_panel(t('tool').pluralize, collapse_panel, body_options: { id: 'associate_tool_fold_content' },
@@ -28,9 +27,3 @@
 
   <% end %>
 <% end %>
-
-
-<script>
-
-</script>
-
