@@ -28,6 +28,7 @@ en:
   sop: "SOP"
   workflow: "Workflow"
   workflow_class: "Workflow Type"
+  tool: "Tool"
   workflows:
     workflow: "Workflow"
     cwl_workflow: "CWL workflow"
