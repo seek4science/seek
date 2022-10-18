@@ -1,6 +1,6 @@
 <h1>New <%= t('programme') %></h1>
 
-<%= index_and_new_help_icon klass_from_controller(controller_name) %>
+<%= index_and_new_help_icon controller_name %>
 
 <%= form_for(@programme) do |f| %>
     <%= render :partial => "form", :locals => { :f => f, :programme => nil } -%>

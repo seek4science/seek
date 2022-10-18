@@ -25,7 +25,8 @@ module HelpHelper
     image('info', :alt => 'help', 'data-tooltip' => tooltip(text), :style => "vertical-align: middle;#{extra_style}")
   end
 
-  def index_and_new_help_icon(clz)
+  def index_and_new_help_icon(controller_name)
+    clz = klass_from_controller(controller_name)
     key = "info_text." + clz.to_s.underscore
     if (I18n.exists?(key))
       help_icon_with_link(clz.to_s, t(key))

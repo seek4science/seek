@@ -23,7 +23,7 @@
   <h2><%= subtitle %></h2>
 <% end %>
 
-<%= index_and_new_help_icon klass_from_controller(controller_name) %>
+<%= index_and_new_help_icon controller_name %>
 
 <div class="index-container">
   <%= render partial: 'assets/resource_filtering' if Seek::Config.filtering_enabled %>

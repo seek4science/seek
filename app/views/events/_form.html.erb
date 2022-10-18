@@ -2,7 +2,7 @@
 
 <h1><%= @event.new_record? ? "New #{t('event')}" : ("Editing #{t('event')}: ".html_safe + link_to(@event.title, event_path(@event))) -%></h1>
 
-<%= index_and_new_help_icon klass_from_controller(controller_name) %>
+<%= index_and_new_help_icon controller_name %>
 
 <%= form_for @event do |f| %>
     <div class="asset_form">
