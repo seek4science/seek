@@ -1351,4 +1351,24 @@ class WorkflowsControllerTest < ActionController::TestCase
     json = JSON.parse(response.body)
     assert_equal Seek::BioSchema::Serializer.new(workflow.latest_version).json_representation, json
   end
+
+  test 'license should be overwritable by project default if not present' do
+    post :create_from_ro_crate, params: {
+      ro_crate: { data: fixture_file_upload('workflows/1-PreProcessing.crate.zip', 'application/zip') }
+    }
+
+    assert_response :success
+    assert_nil assigns(:workflow).license
+    assert_select '#license-select[data-can-overwrite="true"]', count: 1
+  end
+
+  test 'license should not be overwritable by project default if extracted from ro-crate metadata' do
+    post :create_from_ro_crate, params: {
+      ro_crate: { data: fixture_file_upload('workflows/author_test.crate.zip', 'application/zip') }
+    }
+
+    assert_response :success
+    assert_equal 'MIT', assigns(:workflow).license
+    assert_select '#license-select[data-can-overwrite="false"]', count: 1
+  end
 end
