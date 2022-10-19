@@ -65,7 +65,7 @@ Now install the packages:
 
     sudo apt install build-essential cmake git imagemagick libcurl4-gnutls-dev libgmp-dev \
         libmagick++-dev libmysqlclient-dev libpq-dev libreadline-dev libreoffice libssl-dev \
-        libxml++2.6-dev libxslt1-dev mysql-server nodejs openjdk-11-jdk openssh-server poppler-utils zip
+        libxml++2.6-dev libxslt1-dev mysql-server nodejs openjdk-11-jdk openssh-server poppler-utils shared-mime-info zip
 
 Installing these packages now will make installing Ruby easier later on:
 
