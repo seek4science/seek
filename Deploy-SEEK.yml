@@ -12,6 +12,7 @@
       become: true
       become_user: root
       ansible.builtin.apt:
+        update_cache: yes
         name: "*"
         state: latest
 
@@ -22,7 +23,9 @@
         pkg:
         - build-essential
         - cmake
+        - gettext
         - git
+        - graphviz
         - imagemagick
         - libcurl4-gnutls-dev
         - libgmp-dev
@@ -36,7 +39,6 @@
         - libxslt1-dev
         - mysql-server
         - nodejs
-        - openjdk-8-jre
         - openjdk-11-jdk
         - openssh-server
         - poppler-utils
@@ -51,6 +53,7 @@
         - libncurses5-dev
         - libsqlite3-dev
         - libyaml-dev
+        - shared-mime-info
         - sqlite3
 
     - name: Correct java version selected
@@ -58,7 +61,7 @@
       become_user: root
       community.general.alternatives:
         name: java
-        path: /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
+        path: /usr/lib/jvm/java-11-openjdk-amd64/bin/java
 
 ########## Install rvm
     - name: Add repository to install rvm
@@ -87,7 +90,7 @@
       ansible.builtin.git:
         repo: 'https://github.com/seek4science/seek.git'
         dest: '{{git_dest}}/SEEK'
-        version: 'v1.12.3'
+        version: 'master'
         force: yes
 
     - name: Configure git
@@ -104,6 +107,13 @@
         pkg:
         - libssl-dev=1.1.1l-1ubuntu1.4
         force: yes
+      when: ansible_distribution_version is version('22.04', '>=')
+
+    - name: Roll back to Ruby 2.7.5 on Ubuntu 22.04 or greater
+      ansible.builtin.copy:
+        content: 'ruby-2.7.5'
+        dest: '{{git_dest}}/SEEK/.ruby-version'
+      when: ansible_distribution_version is version('22.04', '>=')
 
     - name: Reset connection  #To allow user changes to affect 'current login user'
       meta: reset_connection
@@ -123,13 +133,12 @@
       shell: bash -lc "{{ item }}"
       with_items:
         - rvm all do rvm docs generate
+      ignore_errors: yes                  #Generating docs fails often, and it is not actually necessary...
         
     - name: Install bundler
       shell: bash -lc "{{ item }}"
       with_items:
         - gem install bundler
-#when: ansible_distribution_version is version('22.04', '>=')
-# ! "bundle" from bundler conflicts with /usr/share/rvm/rubies/ruby-2.7.5/bin/bundle      #Error in Ubuntu 20.04. If I ssh then install it works fine... reset connection doesn't help
 
 ########## Install SEEK Gems
 
@@ -146,6 +155,9 @@
       become_user: root
       ansible.builtin.apt_repository:
         repo: ppa:deadsnakes/ppa
+
+    - name: Reset connection 2  #To allow user changes to affect 'current login user'
+      meta: reset_connection
 
     - name: Install python tools
       become: true
