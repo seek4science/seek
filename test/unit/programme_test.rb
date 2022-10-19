@@ -508,4 +508,70 @@ class ProgrammeTest < ActiveSupport::TestCase
       refute prog2.allows_user_projects?
     end
   end
+
+  test 'open for projects scope' do
+    prog = Factory(:programme, open_for_projects: true)
+    prog2 = Factory(:programme, open_for_projects: false)
+    prog3 = Factory(:programme, open_for_projects: true)
+
+    assert_equal [prog, prog3].sort, Programme.open_for_projects.sort
+  end
+
+  test 'any_programmes_open_for_projects?' do
+
+    # no programmes
+    with_config_value(:programmes_open_for_projects_enabled,true) do
+      refute Programme.any_programmes_open_for_projects?
+    end
+
+    Factory(:programme, open_for_projects: true)
+    Factory(:programme, open_for_projects: false)
+
+    with_config_value(:programmes_open_for_projects_enabled, true) do
+      assert Programme.any_programmes_open_for_projects?
+    end
+    with_config_value(:programmes_open_for_projects_enabled, false) do
+      refute Programme.any_programmes_open_for_projects?
+    end
+
+  end
+
+  test 'can_associate_project' do
+    person = Factory(:person)
+    programme_admin = Factory(:person)
+    open_programme = Factory(:programme, open_for_projects: true)
+    closed_programme = Factory(:programme, open_for_projects: false)
+
+    disable_authorization_checks {
+      open_programme.programme_administrators = [programme_admin]
+      closed_programme.programme_administrators = [programme_admin]
+      open_programme.save!
+      closed_programme.save!
+    }
+
+    with_config_value(:programmes_open_for_projects_enabled, true) do
+      User.with_current_user(person.user) do
+        assert open_programme.can_associate_projects?
+        refute closed_programme.can_associate_projects?
+      end
+
+      User.with_current_user(programme_admin.user) do
+        assert open_programme.can_associate_projects?
+        assert closed_programme.can_associate_projects?
+      end
+    end
+
+    with_config_value(:programmes_open_for_projects_enabled, false) do
+      User.with_current_user(person.user) do
+        refute open_programme.can_associate_projects?
+        refute closed_programme.can_associate_projects?
+      end
+
+      User.with_current_user(programme_admin.user) do
+        assert open_programme.can_associate_projects?
+        assert closed_programme.can_associate_projects?
+      end
+    end
+
+  end
 end
