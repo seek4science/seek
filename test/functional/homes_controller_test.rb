@@ -691,4 +691,20 @@ class HomesControllerTest < ActionController::TestCase
     path = File.join(Rails.root, 'test', 'fixtures', 'files', 'mocking', filename)
     URI.join('file:///', path).to_s
   end
+
+  test 'Should render the right url for Samples' do
+    login_as(:quentin)
+    get :index
+    assert_select '#browse-menu' do
+      assert_select 'li' do
+        assert_select 'a[href=?]', select_sample_types_path, text: 'Samples'
+      end
+    end
+    assert_select '#create-menu' do
+      assert_select 'li' do
+        assert_select 'a[href=?]', select_sample_types_path(act: :create), text: 'Sample'
+      end
+    end
+  end
+
 end

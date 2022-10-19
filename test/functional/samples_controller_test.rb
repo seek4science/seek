@@ -30,7 +30,7 @@ class SamplesControllerTest < ActionController::TestCase
   test 'new without sample type id' do
     login_as(Factory(:person))
     get :new
-    assert_redirected_to select_sample_types_path
+    assert_redirected_to select_sample_types_path(act: :create)
   end
 
   test 'show' do
