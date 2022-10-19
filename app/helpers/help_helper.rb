@@ -26,10 +26,11 @@ module HelpHelper
   end
 
   def index_and_new_help_icon(controller_name)
-    clz = klass_from_controller(controller_name)
-    key = "info_text." + clz.to_s.underscore
+    key_name = controller_name.singularize.camelize
+    
+    key = "info_text." + key_name.underscore
     if (I18n.exists?(key))
-      help_icon_with_link(clz.to_s, t(key))
+      help_icon_with_link(key_name, t(key))
     end
   end
 
