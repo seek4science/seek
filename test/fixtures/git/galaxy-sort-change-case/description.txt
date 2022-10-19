@@ -1,5 +1,5 @@
 # Galaxy workflow RO-Crate taken from https://github.com/ResearchObject/ro-crate-py/tree/08647d9bb522008da60b3a7762bdb40cd3a0fa30/test/test-data/ro-crate-galaxy-sortchangecase
-# Branches: master
+# Branches: master, tests
 # Commits:
 # commit 20eabdc95c69df04d9a43f0a345c4b8349c6a4ff (HEAD -> master)
 #  Author: Finn Bacall <finn.bacall@manchester.ac.uk>
