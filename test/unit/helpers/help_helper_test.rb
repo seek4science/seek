@@ -41,7 +41,7 @@ class HelpHelperTest < ActionView::TestCase
   end
 
   test 'help icon' do
-    link = index_and_new_help_icon :Collection
+    link = index_and_new_help_icon 'collection'
     tag = Nokogiri::HTML::DocumentFragment.parse(link).children.first
     assert_equal 'https://docs.seek4science.org/help/user-guide/collections.html', tag['href']
     assert_equal '_blank', tag['target']
@@ -62,7 +62,7 @@ class HelpHelperTest < ActionView::TestCase
   end
 
   test 'help icon no key' do
-    span_tag = index_and_new_help_icon :Mailer
+    span_tag = index_and_new_help_icon 'not_an_entity'
     tag = Nokogiri::HTML::DocumentFragment.parse(span_tag).children.first
     assert_nil tag
   end
