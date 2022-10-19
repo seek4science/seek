@@ -30,7 +30,10 @@ Factory.define(:workflow_ro_crate_repository, class: Git::Repository) do |f|
   end
 end
 
-Factory.define(:remote_workflow_ro_crate_repository, parent: :workflow_ro_crate_repository) do |f|
+Factory.define(:remote_workflow_ro_crate_repository, class: Git::Repository) do |f|
+  f.after_create do |r|
+    FileUtils.cp_r(File.join(Rails.root, 'test', 'fixtures', 'git', 'galaxy-sort-change-case-remote', '_git', '.'), File.join(r.local_path, '.git'))
+  end
   f.remote "https://somewhere.internets/repo.git"
 end
 

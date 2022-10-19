@@ -1,0 +1,31 @@
+# Galaxy workflow RO-Crate taken from https://github.com/ResearchObject/ro-crate-py/tree/08647d9bb522008da60b3a7762bdb40cd3a0fa30/test/test-data/ro-crate-galaxy-sortchangecase
+# Branches: master, tests
+# Commits:
+# commit 20eabdc95c69df04d9a43f0a345c4b8349c6a4ff (HEAD -> master)
+#  Author: Finn Bacall <finn.bacall@manchester.ac.uk>
+#  Date:   Mon Oct 11 13:04:30 2021 +0100
+#
+#      Revert "Oops, deleted the workflow"
+#
+#      This reverts commit 1d201610715e67db278010b5231c8c207886d311.
+#
+#  commit 1d201610715e67db278010b5231c8c207886d311
+#  Author: Finn Bacall <finn.bacall@manchester.ac.uk>
+#  Date:   Mon Oct 11 13:04:18 2021 +0100
+#
+#      Oops, deleted the workflow
+#
+#  commit a321b6e4dd2cfb5219cf03bb9e2743db344f537a
+#  Author: Finn Bacall <finn.bacall@manchester.ac.uk>
+#  Date:   Mon Oct 11 12:48:22 2021 +0100
+#
+#      Add files
+#
+# Files on branch "master":
+LICENSE
+README.md
+ro-crate-metadata.json
+sort-and-change-case.ga
+test/test1/input.bed
+test/test1/output_exp.bed
+test/test1/sort-and-change-case-test.yml
