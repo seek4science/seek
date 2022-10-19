@@ -236,7 +236,7 @@ Factory.define(:ro_crate_git_workflow, class: Workflow) do |f|
   f.git_version_attributes do
     repo = Factory(:remote_workflow_ro_crate_repository)
     { git_repository_id: repo.id,
-      ref: 'refs/heads/master',
+      ref: 'refs/remotes/origin/master',
       commit: 'a321b6e',
       main_workflow_path: 'sort-and-change-case.ga',
       mutable: false
@@ -295,7 +295,7 @@ Factory.define(:ro_crate_git_workflow_with_tests, class: Workflow) do |f|
   f.git_version_attributes do
     repo = Factory(:remote_workflow_ro_crate_repository)
     { git_repository_id: repo.id,
-      ref: 'refs/heads/tests',
+      ref: 'refs/remotes/origin/tests',
       commit: '612f7f7',
       main_workflow_path: 'sort-and-change-case.ga',
       mutable: false
