@@ -45,8 +45,8 @@ module Seek
         if File.exist?(cache_path)
           Marshal.load(File.binread(cache_path))
         elsif block_given?
+          v = block.call
           File.open(cache_path, 'wb') do |f|
-            v = block.call
             f.write(Marshal.dump(v))
             v
           end
