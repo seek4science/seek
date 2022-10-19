@@ -76,7 +76,7 @@ SEEK's Solr implementation currently requires Java 11, so you may need to switch
 
     sudo update-alternatives --config java
     
-...and select the version named `/usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java` or similar.
+...and select the version named `/usr/lib/jvm/java-11-openjdk-amd64/bin/java` or similar.
 
 ## Development or Production?
 
