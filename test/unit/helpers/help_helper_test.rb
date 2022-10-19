@@ -43,6 +43,7 @@ class HelpHelperTest < ActionView::TestCase
   test 'help icon' do
     link = index_and_new_help_icon 'collection'
     tag = Nokogiri::HTML::DocumentFragment.parse(link).children.first
+    
     assert_equal 'https://docs.seek4science.org/help/user-guide/collections.html', tag['href']
     assert_equal '_blank', tag['target']
     assert_equal t("info_text.collection"), tag['data-tooltip']
@@ -52,9 +53,7 @@ class HelpHelperTest < ActionView::TestCase
   test 'help icon with text' do
     link = help_icon_with_link 'Collection', 'chicken soup'
     tag = Nokogiri::HTML::DocumentFragment.parse(link).children.first
-    pp tag
-    pp tag.children[1]
-    pp tag.children[1].content
+
     assert_equal 'https://docs.seek4science.org/help/user-guide/collections.html', tag['href']
     assert_equal '_blank', tag['target']
     assert_equal 'What is a Collection?', tag.children[1].content
