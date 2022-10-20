@@ -62,7 +62,7 @@ const handleSelect = (e) => {
 			// If it's Assay level table keep the first, otherwise hide all of them
 			if (options.level == "assay") multi_link_idx = multi_link_idx.slice(1);
 			this.hiddenColumns = multi_link_idx;
-			columns.unshift(...defaultCols);
+			if (!options.readonly) columns.unshift(...defaultCols);
 			const columnDefs = [
 				{ orderable: false, targets: options.readonly ? [0] : [0, 1, 2] },
 				{
@@ -140,7 +140,7 @@ const handleSelect = (e) => {
 				.columns()
 				.header()
 				.each((x, i) => {
-					if (i == 0) $j(x).append(`<input type='checkbox' onClick='selectAll(this)'/>`);
+					if (i == 0 && !this.options.readonly) $j(x).append(`<input type='checkbox' onClick='selectAll(this)'/>`);
 					else if (requiredCols.includes(i)) {
 						$j(x).append("<span class='required-attribute'>*</span>");
 					}
