@@ -8,6 +8,8 @@ class ScraperTest < ActiveSupport::TestCase
   end
 
   test 'can create or re-use an account for the scraper bot' do
+    disable_authorization_checks { Person.where(last_name: 'Bot').destroy_all }
+
     refute Person.where(last_name: 'Bot').exists?
 
     acc = nil
