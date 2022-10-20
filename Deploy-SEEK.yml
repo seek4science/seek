@@ -170,12 +170,18 @@
         - python3-wheel
         - python3-psutil
         - python3.7
+        - python3.7-distutils
         - python3-pymysql
 
     - name: Force-reinstall setuptools<58.0
       ansible.builtin.pip:
         name: 'setuptools<58.0.0'
         state: forcereinstall
+
+    - name: Install jupyter for python3.7
+      shell: bash -lc "{{ item }}"
+      with_items:
+        - python3.7 -m pip install jupyter
 
     - name: Install SEEK's python requirements
       ansible.builtin.pip:
