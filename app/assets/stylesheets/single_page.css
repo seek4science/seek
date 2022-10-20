@@ -563,3 +563,20 @@ td.highlight {
 .dt-btn-item-last {
 	margin-left: 5px;
 }
+
+.dt-select-all {
+  background: none!important;
+  border: none;
+  padding: 0!important;
+  color: #069;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.dt-select-all :hover {
+  text-decoration: underline;
+}
+
+.dt-select-all :active {
+  color: rgb(0, 71, 106);
+}
