@@ -616,7 +616,7 @@ class WorkflowTest < ActiveSupport::TestCase
   test 'associate tools with workflow' do
     wf = Factory(:workflow)
 
-    assert_difference('ToolAnnotation.count', 3) do
+    assert_difference('BioToolsLink.count', 3) do
       wf.tools_attributes = [
         { bio_tools_id: 'thing-doer', name: 'ThingDoer'},
         { bio_tools_id: 'database-accessor', name: 'DatabaseAccessor'},
@@ -625,7 +625,7 @@ class WorkflowTest < ActiveSupport::TestCase
 
       disable_authorization_checks { wf.save! }
       assert_equal %w[database-accessor ruby thing-doer],
-                   wf.tool_annotations.pluck(:bio_tools_id).sort
+                   wf.bio_tools_links.pluck(:bio_tools_id).sort
     end
   end
 
@@ -640,10 +640,10 @@ class WorkflowTest < ActiveSupport::TestCase
       ]
       wf.save!
     end
-    thing_doer = wf.tool_annotations.where(bio_tools_id: 'thing-doer').first
+    thing_doer = wf.bio_tools_links.where(bio_tools_id: 'thing-doer').first
     orig_id = thing_doer.id
 
-    assert_difference('ToolAnnotation.count', -1, 'should have removed redundant annotation') do
+    assert_difference('BioToolsLink.count', -1, 'should have removed redundant annotation') do
       wf.tools_attributes = [
         { bio_tools_id: 'thing-doer', name: 'ThingDoer!!!'},
         { bio_tools_id: 'database-accessor', name: 'DatabaseAccessor'},
@@ -651,10 +651,10 @@ class WorkflowTest < ActiveSupport::TestCase
       ]
 
       disable_authorization_checks { wf.save! }
-      assert_includes wf.tool_annotation_ids, orig_id
+      assert_includes wf.bio_tools_link_ids, orig_id
       assert_equal 'ThingDoer!!!', thing_doer.reload.name, 'Should update name of tool'
       assert_equal %w[database-accessor javascript thing-doer],
-                   wf.tool_annotations.pluck(:bio_tools_id).sort
+                   wf.bio_tools_links.pluck(:bio_tools_id).sort
     end
   end
 end

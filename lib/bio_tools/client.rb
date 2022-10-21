@@ -3,6 +3,7 @@ require 'rest-client'
 module BioTools
   class Client
     ENDPOINT = 'https://bio.tools/api'.freeze
+    BASE = 'https://bio.tools/'.freeze
 
     def initialize(endpoint = nil)
       endpoint ||= ENDPOINT
@@ -15,6 +16,10 @@ module BioTools
 
     def tool(id)
       perform("tool/#{id}")
+    end
+
+    def self.tool_url(id)
+      "#{BASE}#{id}"
     end
 
     private
