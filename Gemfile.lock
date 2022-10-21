@@ -460,7 +460,7 @@ GEM
     net-ldap (0.17.1)
     netrc (0.11.0)
     nio4r (2.5.8)
-    nokogiri (1.13.8)
+    nokogiri (1.13.9)
       mini_portile2 (~> 2.8.0)
       racc (~> 1.4)
     nori (1.1.5)
@@ -976,7 +976,7 @@ DEPENDENCIES
   minitest-reporters
   my_responds_to_parent!
   mysql2
-  nokogiri (~> 1.13.6)
+  nokogiri (~> 1.13.9)
   omniauth (~> 2.1.0)
   omniauth-github
   omniauth-rails_csrf_protection
