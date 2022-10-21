@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://localhost:8000/workflows/56c50ac0-529b-0139-9132-000c29a94011/1
+    uri: https://localhost:8443/workflows/86da0a30-d2cd-013a-a07d-000c29a94011/versions
     body:
       encoding: US-ASCII
       string: ''
@@ -10,37 +10,74 @@ http_interactions:
       Accept:
       - "*/*"
       User-Agent:
-      - rest-client/2.1.0 (linux-gnu x86_64) ruby/2.6.6p146
+      - rest-client/2.1.0 (linux x86_64) ruby/2.7.5p203
       Content-Type:
       - application/json
       Authorization:
-      - Bearer 0KFv5bXGD4FhEFTuqLJ8uAaJVNI0cNIgYeIeWR5XqR
+      - Bearer FUY30D5gtDOeEPE2qu0MbWg2afrrst4whOOB1zHDtF
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Host:
-      - localhost:8000
+      - localhost:8443
   response:
     status:
       code: 200
       message: OK
     headers:
+      Server:
+      - nginx
+      Date:
+      - Wed, 22 Jun 2022 19:01:23 GMT
       Content-Type:
       - application/json
       Content-Length:
-      - '167'
-      Server:
-      - Werkzeug/1.0.1 Python/3.7.9
-      Date:
-      - Mon, 22 Feb 2021 13:40:34 GMT
+      - '1158'
+      Connection:
+      - keep-alive
+      Access-Control-Allow-Origin:
+      - "*"
+      X-Frame-Options:
+      - SAMEORIGIN
     body:
       encoding: UTF-8
       string: |
         {
-          "name": "This Workflow",
-          "roc_link": "https://myseek:3000/workflows/10/ro_crate?version=1",
-          "uuid": "56c50ac0-529b-0139-9132-000c29a94011",
-          "version": "1"
+          "links": {
+            "self": "https://172.20.0.7:8000/workflows/86da0a30-d2cd-013a-a07d-000c29a94011/versions"
+          },
+          "meta": {
+            "api_version": "0.7.3",
+            "base_url": "https://172.20.0.7:8000",
+            "created": "2022-06-21T14:33:07.897806",
+            "modified": "2022-06-21T14:33:08.350346",
+            "resource": "/workflows/86da0a30-d2cd-013a-a07d-000c29a94011/versions"
+          },
+          "versions": [
+            {
+              "is_latest": true,
+              "ro_crate": {
+                "links": {
+                  "download": "https://172.20.0.7:8000/workflows/86da0a30-d2cd-013a-a07d-000c29a94011/rocrate/1/download",
+                  "metadata": "https://172.20.0.7:8000/workflows/86da0a30-d2cd-013a-a07d-000c29a94011/rocrate/1/metadata",
+                  "origin": "https://myseek:3000/workflows/293?version=1"
+                }
+              },
+              "submitter": {
+                "id": 2,
+                "username": "FinnBacall"
+              },
+              "uuid": "077b6467-9012-4f85-8339-570d8607445e",
+              "version": "1"
+            }
+          ],
+          "workflow": {
+            "links": {
+              "self": "https://172.20.0.7:8000/workflows/86da0a30-d2cd-013a-a07d-000c29a94011/versions"
+            },
+            "name": "Concat two files",
+            "uuid": "86da0a30-d2cd-013a-a07d-000c29a94011"
+          }
         }
     http_version: 
-  recorded_at: Mon, 22 Feb 2021 13:40:34 GMT
+  recorded_at: Wed, 22 Jun 2022 19:01:23 GMT
 recorded_with: VCR 2.9.3

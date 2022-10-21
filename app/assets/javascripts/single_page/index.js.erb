@@ -22,8 +22,8 @@ function updateBreadcrumb(item) {
     const elements = {
       project: ["project", "folder"],
       investigation: ["investigation"],
-      study: ["study", "source_material", "sample_collection", "study_samples", "study_table"],
-      assay: ["assay", "sop", "data_file", "document", "sample"]
+      study: ["study", "source_table", "study_protocol", "study_samples_table", "study_experiment_overview"],
+      assay: ["assay", "assay_protocol", "assay_samples_table", "assay_experiment_overview"]
     };
     item = Object.keys(elements).find((e) => elements[e].includes(item.toLowerCase()));
     let index = ["project", "investigation", "study", "assay"].indexOf(item);

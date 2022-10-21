@@ -131,6 +131,8 @@ class ApplicationRecord < ActiveRecord::Base
   has_filter query: Seek::Filtering::SearchFilter.new
   has_filter created_at: Seek::Filtering::DateFilter.new(field: :created_at,
                                                          presets: [24.hours, 1.week, 1.month, 1.year, 5.years])
+  has_filter updated_at: Seek::Filtering::DateFilter.new(field: :updated_at,
+                                                         presets: [24.hours, 1.week, 1.month, 1.year, 5.years])
 
   def is_a_version?
     false

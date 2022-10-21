@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-gem 'rails', '~> 6.1.5', '>= 6.1.5.1'
+gem 'rails', '~> 6.1.7'
 gem 'rdoc'
 
 #database adaptors
@@ -50,7 +50,9 @@ gem 'will_paginate', '~> 3.1'
 gem 'yaml_db'
 gem 'rails_autolink'
 gem 'rfc-822'
-gem 'nokogiri', '~> 1.13.6'
+gem 'nokogiri', '~> 1.13.9'
+#necessary for newer hashie dependency, original api_smith is no longer active
+gem 'api_smith', git: 'https://github.com/youroute/api_smith.git', ref: '1fb428cebc17b9afab25ac9f809bde87b0ec315b'
 gem 'rdf-virtuoso', '>= 0.2.0'
 gem 'terrapin'
 gem 'lograge'
@@ -93,11 +95,12 @@ gem 'citeproc-ruby', '~> 2.0.0'
 gem 'csl-styles', '~> 2.0.0'
 gem 'bibtex-ruby', '~> 5.1.0'
 
-gem 'omniauth', '~> 1.3.1'
-gem 'omniauth-ldap', '~> 1.0.5'
+gem 'omniauth', '~> 2.1.0'
+gem 'gitlab_omniauth-ldap', '~> 2.2.0'
 gem 'omniauth_openid_connect'
-gem 'omniauth-rails_csrf_protection', '~> 0.1'
-gem 'omniauth-github', '~> 1.2.0'
+gem 'openid_connect','1.3.0'
+gem 'omniauth-rails_csrf_protection'
+gem 'omniauth-github'
 
 gem 'ransack'
 
@@ -140,6 +143,8 @@ gem 'rack-cors', require: 'rack/cors'
 gem 'addressable'
 
 gem 'json-schema'
+
+gem 'cff', '~> 0.9.0'
 
 group :production do
   gem 'passenger'

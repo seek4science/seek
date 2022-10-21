@@ -1,10 +1,13 @@
-
-<% assay = params[:isa_assay] ? params[:isa_assay][:assay] : nil %>
+<% assay = params[:isa_assay][:assay] if params.dig(:isa_assay, :assay) %>
 <% study = Study.find(params[:study_id] || assay[:study_id]) %>
-<% input_sample_type_id = study.sample_types.last.id
-	if !params[:is_source] && study.assays.present?
-		input_sample_type_id = study.assays.last.sample_type.id 
-	end
+<%
+input_sample_type_id = params[:isa_assay][:input_sample_type_id] if params.dig(:isa_assay, :input_sample_type_id)
+input_sample_type_id ||= 
+  if params[:is_source]
+    study.sample_types.second.id
+  else
+    Assay.find(params[:source_assay_id]).sample_type.id if params[:source_assay_id]
+  end
 %>
 
 <%= error_messages_for :isa_assay %>
@@ -37,7 +40,7 @@
 
   <% if User.current_user -%>
     <%= render partial: 'assets/manage_specific_attributes', locals:{f:f} if show_form_manage_specific_attributes? %>
-    <%= assay_fields.fancy_multiselect(:sops, other_projects_checkbox: true, name: "isa_assay[assay][sop_ids]") %>
+    <%= assay_fields.fancy_multiselect(:sops, other_projects_checkbox: true, name: "isa_assay[assay][sop_ids]") unless action == :edit %>
     <%= assay_fields.fancy_multiselect :publications, { other_projects_checkbox: true, name: "isa_assay[assay][publication_ids]" } %>
     <%= assay_fields.fancy_multiselect :documents, { other_projects_checkbox: true, name: "isa_assay[assay][document_ids]" } %>
   <% end -%>
@@ -48,14 +51,16 @@
 
 <%= f.hidden_field :input_sample_type_id, value: input_sample_type_id  -%>
 
-<%= folding_panel("Define #{t(:sample_type)} for #{t(:assay)}") do %>
-	<%= render partial: 'isa_studies/sample_types_form', locals: {f: f, sample_type: @isa_assay.sample_type, id_suffix: "_sample_type", isa_element: "assay" } %>
+<% if @isa_assay.sample_type %>
+  <%= folding_panel("Define #{t(:sample_type)} for #{t(:assay)}") do %>
+    <%= render partial: 'isa_studies/sample_types_form', locals: {f: f, sample_type: @isa_assay.sample_type, id_suffix: "_sample_type", isa_element: "assay", action: action} %>
+  <% end %>
 <% end %>
  
 <%= form_submit_buttons(@isa_assay.assay) %>
 
 
-<%= render partial: 'projects/implicit_project_selector', locals: { action: :new,
+<%= render partial: 'projects/implicit_project_selector', locals: { action: action,
                                                                     select_id: '#isa_assay_assay_study_id',
                                                                     parents: Study.authorized_for('edit') } %>
 

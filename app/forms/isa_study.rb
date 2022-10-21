@@ -25,16 +25,16 @@ class IsaStudy
 
   def save
     if valid?
-      input_attribute = @sample_collection_sample_type.sample_attributes.detect(&:seek_sample_multi?)
-      input_attribute.linked_sample_type = @source_sample_type
-      title = @source_sample_type.sample_attributes.detect(&:is_title).title
-      input_attribute.title = "Input (#{title})"
-
+      if @study.new_record?
+        input_attribute = @sample_collection_sample_type.sample_attributes.detect(&:seek_sample_multi?)
+        input_attribute.linked_sample_type = @source_sample_type
+        title = @source_sample_type.sample_attributes.detect(&:is_title).title
+        input_attribute.title = "Input (#{title})"
+        @study.sample_types = [@source_sample_type, @sample_collection_sample_type]
+      end
       @study.save
       @source_sample_type.save
       @sample_collection_sample_type.save
-      @study.sample_types = [@source_sample_type, @sample_collection_sample_type]
-      @study.save
     else
       false
     end
@@ -58,11 +58,17 @@ class IsaStudy
     @study
   end
 
+  def populate(id)
+    @study = Study.find(id)
+    @source_sample_type = @study.sample_types.first
+    @sample_collection_sample_type = @study.sample_types.second
+  end
+
   private
 
   def validate_objects
-    @study.errors.each { |e| errors[:base] << "[Study]: #{e}" } unless @study.valid?
-    errors[:base] << 'SOP is required' unless @study.sop_id
+    @study.errors.each { |e| errors[:base] << "[Study]: #{e.full_message}" } unless @study.valid?
+    errors[:base] << '[SOP]: SOP is required' unless @study.sop_id
 
     unless @source_sample_type.valid?
       @source_sample_type.errors.full_messages.each { |e| errors[:base] << "[Source sample type]: #{e}" }

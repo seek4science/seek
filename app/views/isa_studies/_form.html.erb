@@ -39,24 +39,24 @@
 
     <%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @isa_study.study} -%>
 
-    <%= render partial: 'projects/implicit_project_selector', locals: { action: :new,
+    <%= render partial: 'projects/implicit_project_selector', locals: { action: action,
                                                                           select_id: '#study_investigation_id',
                                                                           parents: Investigation.authorized_for('edit') } %>
     
     <%= folding_panel("Define #{t(:sample_type)} for Source") do %>
-      <%= render partial: 'sample_types_form', locals: {f: f, sample_type: @isa_study.source, id_suffix: "_source_sample_type" } %>
+      <%= render partial: 'sample_types_form', locals: {f: f, sample_type: @isa_study.source, id_suffix: "_source_sample_type", action: action } if @isa_study.source %>
     <% end %>
 
-    <%= folding_panel("SOP") do %>
-      <p class="help-block">The following SOP is associated with this study:</p>
-      <%= study_fields.collection_select(:sop, authorised_assets(Sop, current_user.person.projects, "view"),
-                              :id, :title,
-                              {prompt:'Select'},
-                              {class:"form-control", id:'isa_study_sop_selector', name: "isa_study[study][sop_id]"}) %>
-    <% end %>
+		<%= folding_panel("SOP") do %>
+			<p class="help-block">The following SOP is associated with this study:</p>
+			<%= study_fields.collection_select(:sop, authorised_assets(Sop, current_user.person.projects, "view"),
+															:id, :title,
+															{prompt:'Select'},
+															{class:"form-control", id:'isa_study_sop_selector', name: "isa_study[study][sop_id]"}) %>
+		<% end %>
 
     <%= folding_panel("Define #{t(:sample_type)} for Sample") do %>
-      <%= render partial: 'sample_types_form', locals: {f: f, sample_type: @isa_study.sample_collection, id_suffix: "_sample_collection_sample_type"  } %>
+      <%= render partial: 'sample_types_form', locals: {f: f, sample_type: @isa_study.sample_collection, id_suffix: "_sample_collection_sample_type", action: action  } if @isa_study.sample_collection %>
     <% end %>
 
 <% end -%> 

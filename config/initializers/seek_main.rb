@@ -26,6 +26,7 @@ require 'seek/search/common_fields'
 require 'mimemagic'
 require 'private_address_check_monkeypatch'
 require 'libreconv'
+require 'omniauth-ldap'
 
 SEEK::Application.configure do
   ASSET_ORDER = ['Person', 'Programme', 'Project', 'Institution', 'Investigation', 'Study', 'Assay', 'Strain', 'DataFile', 'Model', 'Sop', 'Publication', 'Presentation','SavedSearch', 'Organism', 'HumanDisease', 'Event']

@@ -31,6 +31,7 @@ module Seek
       instance_variable_set("@#{controller_name}", assets)
     end
 
+    # returns either the related assets if there is a parent resource, or the controller model if the result would be all of them.
     def fetch_assets
       if @parent_resource
         @parent_resource.get_related(controller_name.classify)

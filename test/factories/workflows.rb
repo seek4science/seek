@@ -174,13 +174,6 @@ Factory.define(:workflow_with_tests, parent: :workflow) do |f|
   f.association :content_blob, factory: :ro_crate_with_tests
 end
 
-Factory.define(:monitored_workflow, parent: :workflow) do |f|
-  f.association :content_blob, factory: :ro_crate_with_tests
-  f.after_create do |workflow|
-    workflow.latest_version.update_column(:monitored, true)
-  end
-end
-
 Factory.define(:spaces_ro_crate_workflow, parent: :workflow) do |f|
   f.association :content_blob, factory: :spaces_ro_crate
   f.workflow_class { WorkflowClass.find_by_title('Jupyter Notebook') || Factory(:jupyter_workflow_class) }
@@ -242,6 +235,21 @@ Factory.define(:ro_crate_git_workflow, class: Workflow) do |f|
   f.workflow_class { WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class) }
   f.git_version_attributes do
     repo = Factory(:remote_workflow_ro_crate_repository)
+    { git_repository_id: repo.id,
+      ref: 'refs/heads/master',
+      commit: 'a321b6e',
+      main_workflow_path: 'sort-and-change-case.ga',
+      mutable: false
+    }
+  end
+end
+
+Factory.define(:local_ro_crate_git_workflow, class: Workflow) do |f|
+  f.title 'Sort and change case'
+  f.with_project_contributor
+  f.workflow_class { WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class) }
+  f.git_version_attributes do
+    repo = Factory(:workflow_ro_crate_repository)
     { git_repository_id: repo.id,
       ref: 'refs/heads/master',
       commit: 'a321b6e',

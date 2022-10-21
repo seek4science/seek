@@ -58,13 +58,43 @@ class IsaStudiesControllerTest < ActionController::TestCase
     end
     i = assigns(:isa_study)
     assert_redirected_to controller: 'single_pages', action: 'show', id: i.study.projects.first.id,
-                         params: { notice: 'The ISA study was created successfully!',
-                                   item_type: 'study', item_id: Study.last.id }
+                         params: { item_type: 'study', item_id: Study.last.id }
 
     sample_types = SampleType.last(2)
     title = sample_types[0].sample_attributes.detect(&:is_title).title
     sample_multi = sample_types[1].sample_attributes.detect(&:seek_sample_multi?)
 
     assert_equal "Input (#{title})", sample_multi.title
+  end
+
+  test 'should edit isa study' do
+    person = User.current_user.person
+    project = person.projects.first
+    investigation = Factory(:investigation, projects: [project])
+
+    source_type = Factory(:isa_source_sample_type, contributor: person, projects: [project])
+    sample_collection_type = Factory(:isa_sample_collection_sample_type, contributor: person, projects: [project],
+                                                                         linked_sample_type: source_type)
+
+    study = Factory(:study, investigation: investigation,
+                            sop_id: Factory(:sop, policy: Factory(:public_policy)).id,
+                            sample_types: [source_type, sample_collection_type])
+
+    put :update, params: { id: study, isa_study: { study: { title: 'study title' },
+                                                   source_sample_type: { title: 'source title' },
+                                                   sample_collection_sample_type: { title: 'sample title' } } }
+
+    assert_not_nil flash[:error]
+
+    study.contributor = person
+    study.save!
+    put :update, params: { id: study, isa_study: { study: { title: 'study title' },
+                                                   source_sample_type: { title: 'source title' },
+                                                   sample_collection_sample_type: { title: 'sample title' } } }
+    isa_study = assigns(:isa_study)
+    assert_equal 'study title', isa_study.study.title
+    assert_equal 'source title', isa_study.source.title
+    assert_equal 'sample title', isa_study.sample_collection.title
+    assert_redirected_to single_page_path(id: project, item_type: 'study', item_id: study.id)
   end
 end

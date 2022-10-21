@@ -17,4 +17,6 @@ if model_type = ModelType.find_by(title: 'Partial differential equations')
   model_type.update(title: 'Partial differential equations (PDE)')
 end
 
-puts "Seeded #{ModelType.count - count} model types"
+if (ModelType.count - count) > 0
+  puts "Seeded #{ModelType.count - count} model types"
+end

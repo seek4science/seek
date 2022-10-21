@@ -103,9 +103,9 @@ module LicenseHelper
   end
 
   def group_licenses(opts)
-
-    grouped = license_values(opts).group_by do |l|
-      if opts[:recommended]&.include?(l['id'])
+    recommended = opts.delete(:recommended)
+    license_values(opts).group_by do |l|
+      if recommended&.include?(l['id'])
         'recommended'
       else
         'other'

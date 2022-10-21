@@ -246,6 +246,17 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def requested_item_authorized?(object)
+    privilege = Seek::Permissions::Translator.translate(action_name)
+    return false if privilege.nil?
+
+    if is_auth?(object, privilege)
+      true
+    else
+      false
+    end
+  end
+
   def handle_authorization_failure_redirect(object, privilege)
     redirect_to(object)
   end
@@ -555,19 +566,6 @@ class ApplicationController < ActionController::Base
                        details: 'This action is not permitted for API clients using OAuth.' }] }, status: :forbidden }
       end
     end
-  end
-
-  def determine_custom_metadata_keys
-    keys = []
-    root_key = controller_name.singularize.to_sym
-    attribute_params = params[root_key][:custom_metadata_attributes]
-    if attribute_params && attribute_params[:custom_metadata_type_id].present?
-      metadata_type = CustomMetadataType.find(attribute_params[:custom_metadata_type_id])
-      if metadata_type
-        keys = [:custom_metadata_type_id] + metadata_type.custom_metadata_attributes.collect(&:method_name)
-      end
-    end
-    keys
   end
 
   # Dynamically get parent resource from URL.

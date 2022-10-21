@@ -80,4 +80,17 @@ class DynamicTableHelperTest < ActionView::TestCase
       assert_equal false, (dt[:rows][0].any? { |x| x == '' })
     end
   end
+
+  test 'Should return the sequence of sample_type links' do
+    type1 = Factory(:simple_sample_type)
+    type2 = Factory(:multi_linked_sample_type)
+    type3 = Factory(:multi_linked_sample_type)
+    type2.sample_attributes.detect(&:seek_sample_multi?).linked_sample_type = type1
+    type3.sample_attributes.detect(&:seek_sample_multi?).linked_sample_type = type2
+    type2.save!
+    type3.save!
+
+    sequence = link_sequence(type3)
+    assert_equal sequence, [type3, type2, type1]
+  end
 end

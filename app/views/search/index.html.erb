@@ -23,5 +23,5 @@
   <%= render partial: "assets/resource_listing_tabbed_by_class",
              locals: { resource_hash: resource_hash,
                        display_immediately: true,
-                       index_params: { filter: { query: params[:search_query] || params[:q] } } } -%>
+                       index_params: { filter: { query: @search_query || params[:q] } } } -%>
 <% end %>

@@ -32,4 +32,14 @@ class SinglePagesControllerTest < ActionController::TestCase
     assert_equal 'hidden item', json['children'][0]['text']
     assert_equal inv_two.title, json['children'][1]['text']
   end
+
+  test 'should not export isa from unauthorized investigation' do
+    with_config_value(:project_single_page_enabled, true) do
+      project = Factory(:project)
+      investigation = Factory(:investigation, policy: Factory(:private_policy), projects: [project])
+      get :export_isa, params: { id: project.id, investigation_id: investigation.id }
+      assert_equal flash[:error], "The investigation cannot be found!"
+      assert_redirected_to action: :show
+    end
+  end
 end

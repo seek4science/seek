@@ -96,4 +96,30 @@ class IsaAssaysControllerTest < ActionController::TestCase
 
     assert_template :new
   end
+
+  test 'should edit isa assay' do
+    person = User.current_user.person
+    project = person.projects.first
+    investigation = Factory(:investigation, projects: [project])
+
+    source_type = Factory(:isa_source_sample_type, contributor: person, projects: [project])
+    sample_collection_type = Factory(:isa_sample_collection_sample_type, contributor: person, projects: [project],
+                                                                         linked_sample_type: source_type)
+    assay_type = Factory(:isa_assay_sample_type, contributor: person, projects: [project],
+                                                 linked_sample_type: sample_collection_type)
+
+    study = Factory(:study, investigation: investigation, contributor: person,
+                            sop_id: Factory(:sop, policy: Factory(:public_policy)).id,
+                            sample_types: [source_type, sample_collection_type])
+
+    assay = Factory(:assay, study: study, sample_type: assay_type, contributor: person)
+
+    put :update, params: { id: assay, isa_assay: { assay: { title: 'assay title',  sop_ids: [Factory(:sop, policy: Factory(:public_policy)).id] },
+                                                   sample_type: { title: 'sample type title' } } }
+
+    isa_assay = assigns(:isa_assay)
+    assert_equal 'assay title', isa_assay.assay.title
+    assert_equal 'sample type title', isa_assay.sample_type.title
+    assert_redirected_to single_page_path(id: project, item_type: 'assay', item_id: assay.id)
+  end
 end
