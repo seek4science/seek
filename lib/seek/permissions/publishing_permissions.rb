@@ -3,7 +3,7 @@ module Seek
     module PublishingPermissions
       def self.included(klass)
         klass.class_eval do
-          before_validation :temporary_policy_while_waiting_for_publishing_approval
+          before_save :temporary_policy_while_waiting_for_publishing_approval
           has_many :resource_publish_logs, as: :resource
 
           def self.publishing_embargo_period

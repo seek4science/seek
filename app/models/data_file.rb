@@ -176,7 +176,7 @@ class DataFile < ApplicationRecord
       sample.contributor = contributor
       sample.originating_data_file = self
       sample.policy = policy
-      sample.save if confirm && sample.valid?
+      sample.save if sample.valid? && confirm
 
       extracted << sample
     end
