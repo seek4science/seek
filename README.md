@@ -68,3 +68,23 @@ Install SEEK and all its dependencies in the hosts by running
 ```
 ansible-playbook Deploy-SEEK.yml
 ```
+
+### Local deploy
+
+If you are using this ansible to install SEEK on your local machine, the configuration has to be slightly different:
+- Replace the first line of *Deploy-SEEK.yml* (`- hosts: [servers]`) with the lines:
+```
+- hosts: localhost
+  connection: local 
+```
+(Make sure to keep the indentation as is!)
+- Remove the last two lines of the *ansible.cfg* file (`[ssh_connection]` and `pipelining = true`).
+
+- Add the option --ask-become-pass to the deploy command, like so:
+```
+ansible-playbook Deploy-SEEK.yml --ask-become-pass
+```
+This will prompt you for your sudo password at the begining of the ansible deploy.
+Alternatively, you can rename the ***local_vm_become_password*** variable to ***ansible_become_password***, which should have your sudo password.
+
+**Note:** Some steps in the ansible playbook require "reconnection", which would be the equivalent to closing the terminal and opening a new one. If the local ansible deploy fails, it is likely because of this. Close the terminal, open a new one, and re-run the deploy command.
