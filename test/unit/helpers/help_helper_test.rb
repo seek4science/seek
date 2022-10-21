@@ -50,6 +50,13 @@ class HelpHelperTest < ActionView::TestCase
     assert_equal 'What is a Collection?', tag.children[1].content
   end
 
+  test 'help icon indefinite article do adapt' do
+    link = index_and_new_help_icon 'assay'
+    tag = Nokogiri::HTML::DocumentFragment.parse(link).children.first
+
+    assert_equal 'What is an Assay?', tag.children[1].content
+  end
+
   test 'help icon with text' do
     link = help_icon_with_link 'Collection', 'chicken soup'
     tag = Nokogiri::HTML::DocumentFragment.parse(link).children.first
