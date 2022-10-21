@@ -63,12 +63,12 @@ module LicenseHelper
         link_to(title, url, target: :_blank)
       end
     else
-      link_to(Seek::License::NULL_LICENSE_TEXT,Seek::Help::HelpDictionary.instance.help_link(:null_license),target: :_blank)
+      link_to(t('null_license') ,Seek::Help::HelpDictionary.instance.help_link(:null_license),target: :_blank)
     end
   end
 
   def license_values(opts = {})
-    opts.delete(:source) || Seek::License::OPENDEFINITION[:all]
+    opts.delete(:source) || Seek::License.open_definition[:all]
   end
 
   def license_options(opts = {})

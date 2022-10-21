@@ -30,7 +30,7 @@
       <%= grouped_license_select("#{resource.class.name.underscore}[#{accessor.to_s}]", selected_license,
                                  id: 'license-select', class: 'form-control',
                                  data: { 'can-overwrite': using_default },
-                                 source: Seek::License::OPENDEFINITION[:all],
+                                 source: Seek::License.open_definition[:all],
                                  recommended: recommended_licenses) %>
 
       <span class="help-block license-url-block">
