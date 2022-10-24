@@ -28,7 +28,7 @@ class ProjectCreationMessageLog < MessageLog
     if programme.id.nil?
       person.is_admin?
     else
-      (person.is_admin? && programme.site_managed?) || person.is_programme_administrator?(programme)
+      (person.is_admin? && programme.site_managed?) || person.is_programme_administrator?(programme) || programme.allows_user_projects?
     end
   end
 end

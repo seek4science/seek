@@ -1,4 +1,7 @@
 <h1>New Strain</h1>
+
+<%= index_and_new_help_icon controller_name %>
+
 <%= form_for @strain do |f| %>
     <%= render :partial => "form", :locals => { :f => f, :action => "create"}-%>
 <% end %>

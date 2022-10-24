@@ -196,6 +196,29 @@ class WorkflowTest < ActiveSupport::TestCase
     end
   end
 
+  test 'creates life monitor submission job on create if tests present for git workflow' do
+    workflow = nil
+    with_config_value(:life_monitor_enabled, true) do
+      assert_enqueued_with(job: LifeMonitorSubmissionJob) do
+        workflow = Factory(:ro_crate_git_workflow_with_tests, uuid: '86da0a30-d2cd-013a-a07d-000c29a94011',
+                           policy: Factory(:public_policy))
+        assert workflow.latest_git_version.has_tests?
+        assert workflow.can_download?(nil)
+      end
+
+      VCR.use_cassette('life_monitor/get_token') do
+        VCR.use_cassette('life_monitor/non_existing_workflow_get') do
+          VCR.use_cassette('life_monitor/submit_workflow') do
+            assert_nothing_raised do
+              User.current_user = workflow.contributor.user
+              LifeMonitorSubmissionJob.perform_now(workflow.latest_version)
+            end
+          end
+        end
+      end
+    end
+  end
+
   test 'does not create life monitor submission job if life monitor disabled' do
     with_config_value(:life_monitor_enabled, false) do
       assert_no_enqueued_jobs(only: LifeMonitorSubmissionJob) do
@@ -210,6 +233,16 @@ class WorkflowTest < ActiveSupport::TestCase
     with_config_value(:life_monitor_enabled, true) do
       assert_no_enqueued_jobs(only: LifeMonitorSubmissionJob) do
         workflow = Factory(:generated_galaxy_no_diagram_ro_crate_workflow, policy: Factory(:public_policy))
+        refute workflow.latest_version.has_tests?
+        assert workflow.can_download?(nil)
+      end
+    end
+  end
+
+  test 'does not create life monitor submission job if no tests in git workflow' do
+    with_config_value(:life_monitor_enabled, true) do
+      assert_no_enqueued_jobs(only: LifeMonitorSubmissionJob) do
+        workflow = Factory(:ro_crate_git_workflow, policy: Factory(:public_policy))
         refute workflow.latest_version.has_tests?
         assert workflow.can_download?(nil)
       end
