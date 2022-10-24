@@ -70,7 +70,7 @@ class Workflow < ApplicationRecord
     end
 
     def submit_to_life_monitor
-      if Seek::Config.life_monitor_enabled && extractor.has_tests? && workflow.can_download?(nil)
+      if Seek::Config.life_monitor_enabled && extractor.has_tests? && parent.can_download?(nil)
         LifeMonitorSubmissionJob.perform_later(self)
       end
     end

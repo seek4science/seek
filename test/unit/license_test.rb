@@ -2,8 +2,8 @@ require 'test_helper'
 
 class LicenseTest < ActiveSupport::TestCase
   setup do
-    @zenodo = Seek::License::ZENODO[:all]
-    @od = Seek::License::OPENDEFINITION[:all]
+    @zenodo = Seek::License.zenodo[:all]
+    @od = Seek::License.open_definition[:all]
   end
 
   test 'can find licenses in zenodo vocab' do
@@ -53,7 +53,7 @@ class LicenseTest < ActiveSupport::TestCase
     assert_equal 'https://choosealicense.com/no-permission/',license['url']
 
     #double check the main hash
-    license_json = Seek::License::OPENDEFINITION[:all].find{|x| x['id']=='notspecified'}
+    license_json = Seek::License.open_definition[:all].find{|x| x['id']=='notspecified'}
     assert_equal license,Seek::License.new(license_json)
   end
 
