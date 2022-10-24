@@ -47,8 +47,8 @@
       <%= render partial: 'sample_types_form', locals: {f: f, sample_type: @isa_study.source, id_suffix: "_source_sample_type", action: action } if @isa_study.source %>
     <% end %>
 
-		<%= folding_panel("SOPs") do %>
-			<p class="help-block">The following SOPs are associated with this study:</p>
+		<%= folding_panel(t(:sop).pluralize) do %>
+			<p class="help-block">The following <%= t(:sop).pluralize %> are associated with this <%= t(:study) %>:</p>
 			
       <%= study_fields.fancy_multiselect :sops, { other_projects_checkbox: true, name: "isa_study[study][sop_ids]" } %>
      

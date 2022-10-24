@@ -71,13 +71,13 @@ class Study < ApplicationRecord
   end
 
   def related_sop_ids
-    Array(sop_ids) | assay_sop_ids
+    sop_ids | assay_sop_ids
   end
 
   def positioned_assays
     assays.order(position: :asc)
   end
-  
+
   def self.user_creatable?
     Seek::Config.studies_enabled
 
