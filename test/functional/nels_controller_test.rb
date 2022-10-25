@@ -145,6 +145,19 @@ class NelsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'download file' do
+    project_id = '1125299'
+    dataset_id = '1124840'
+    subtype = 'analysis'
+
+
+    VCR.use_cassette('nels/download_file') do
+      get :download_file, params: { dataset_id: dataset_id, project_id: project_id, subtype_name: subtype, filename: 'pegion.png'}
+      assert_response :success
+      assert_equal 94353, @response.body.length
+    end
+  end
+
   test 'raises error on NeLS callback if no code provided' do
     get :callback
 

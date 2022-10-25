@@ -84,7 +84,7 @@ class NelsController < ApplicationController
   end
 
   def download_file
-    file_name, file_path = @rest_client.download_file(params[:project_id].to_i, params[:dataset_id].to_i,params[:subtype_name],params[:path],params[:file_name])
+    file_name, file_path = @rest_client.download_file(params[:project_id].to_i, params[:dataset_id].to_i,params[:subtype_name],'',params[:filename])
     send_file file_path, filename: file_name, disposition: 'attachment'
   end
 
