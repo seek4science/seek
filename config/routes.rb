@@ -787,6 +787,12 @@ SEEK::Application.routes.draw do
 
   resources :culture_growth_types, only: [:show]
 
+  resources :tools, only: [] do
+    collection do
+      get :filter
+    end
+  end
+
   ### ASSAY AND TECHNOLOGY TYPES ###
 
   get '/assay_types/', to: 'assay_types#show', as: 'assay_types'

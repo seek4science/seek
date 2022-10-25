@@ -645,4 +645,49 @@ class WorkflowTest < ActiveSupport::TestCase
     refute wf.respond_to?(:data_format_annotations)
     refute wf.respond_to?(:data_type_annotations)
   end
+
+  test 'associate tools with workflow' do
+    wf = Factory(:workflow)
+
+    assert_difference('BioToolsLink.count', 3) do
+      wf.tools_attributes = [
+        { bio_tools_id: 'thing-doer', name: 'ThingDoer'},
+        { bio_tools_id: 'database-accessor', name: 'DatabaseAccessor'},
+        { bio_tools_id: 'ruby', name: 'Ruby'}
+      ]
+
+      disable_authorization_checks { wf.save! }
+      assert_equal %w[database-accessor ruby thing-doer],
+                   wf.bio_tools_links.pluck(:bio_tools_id).sort
+    end
+  end
+
+  test 'associating tools with workflow does not create duplicate annotation records' do
+    wf = Factory(:workflow)
+    disable_authorization_checks do
+      wf.tools_attributes = [
+        { bio_tools_id: 'thing-doer', name: 'ThingDoer'},
+        { bio_tools_id: 'database-accessor', name: 'DatabaseAccessor'},
+        { bio_tools_id: 'python', name: 'Python'},
+        { bio_tools_id: 'ruby', name: 'Ruby'}
+      ]
+      wf.save!
+    end
+    thing_doer = wf.bio_tools_links.where(bio_tools_id: 'thing-doer').first
+    orig_id = thing_doer.id
+
+    assert_difference('BioToolsLink.count', -1, 'should have removed redundant annotation') do
+      wf.tools_attributes = [
+        { bio_tools_id: 'thing-doer', name: 'ThingDoer!!!'},
+        { bio_tools_id: 'database-accessor', name: 'DatabaseAccessor'},
+        { bio_tools_id: 'javascript', name: 'JavaScript'}
+      ]
+
+      disable_authorization_checks { wf.save! }
+      assert_includes wf.bio_tools_link_ids, orig_id
+      assert_equal 'ThingDoer!!!', thing_doer.reload.name, 'Should update name of tool'
+      assert_equal %w[database-accessor javascript thing-doer],
+                   wf.bio_tools_links.pluck(:bio_tools_id).sort
+    end
+  end
 end

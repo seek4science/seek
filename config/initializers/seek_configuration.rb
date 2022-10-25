@@ -252,6 +252,7 @@ def load_seek_config_defaults!
 
   Seek::Config.default :life_monitor_enabled, false
   Seek::Config.default :git_support_enabled, false
+  Seek::Config.default :bio_tools_enabled, false
 
   load_seek_testing_defaults! if Rails.env.test?
 end

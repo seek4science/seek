@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_09_07_085132) do
+ActiveRecord::Schema.define(version: 2022_10_21_131037) do
 
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
@@ -255,6 +255,16 @@ ActiveRecord::Schema.define(version: 2022_09_07_085132) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.index ["owner_type", "owner_id"], name: "index_avatars_on_owner_type_and_owner_id"
+  end
+
+  create_table "bio_tools_links", force: :cascade do |t|
+    t.string "resource_type"
+    t.bigint "resource_id"
+    t.string "bio_tools_id"
+    t.string "name"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["resource_type", "resource_id"], name: "index_bio_tools_links_on_resource"
   end
 
   create_table "bioportal_concepts", id: :integer, force: :cascade do |t|
