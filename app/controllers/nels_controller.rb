@@ -83,6 +83,7 @@ class NelsController < ApplicationController
     filename = params["content_blobs"][0]["data"].original_filename
     data_path = params["content_blobs"][0]["data"].path
     @rest_client.upload_file(params[:project_id].to_i, params[:dataset_id].to_i,params[:subtype_name], '', filename, data_path)
+    redirect_to nels_path
   end
 
   def download_file

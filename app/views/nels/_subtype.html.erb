@@ -4,7 +4,7 @@
 
 <%# Use @path to create a series of folder links as breadcrumb %>
 <%# Remove the first "Storebioinfo/" item and only make elements beyond project clickable%>
-<% full_path="Storebioinfo"%>
+<% full_path="Storebioinfo" %>
 <p>
   <% @path.split('/')[1..].each_with_index do |path_item, index | %>
     <% full_path += "/"+ path_item %>
@@ -66,8 +66,8 @@ table, th, td {
       <%= render :partial=>"assets/upload_box",:locals=>{:action_text=>"upload"} -%>
     <% end %>
     <%= modal_footer do %>
-      <%= create_button id:"data_file_submit_btn", button_text:'Add',
-                          onclick:"return validateResourceFields('data_file');",
+      <%= create_button id:"file_submit_btn", button_text:'Add',
+                          onclick:"return validateResourceFields('data');",
                           class:'btn btn-primary' %>
       <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
     <% end %>
@@ -75,6 +75,21 @@ table, th, td {
 <% end %>
 
 <script type="text/javascript">
+  function updateFolderList(path){
+      $j('#nels-dataset').html('').spinner('add').show();
+      $j.ajax({ url: '<%= subtype_nels_path(:assay_id=>params[:assay_id]) -%>',
+          data: {
+              project_id: '<%= @project_id -%>',
+              dataset_id: '<%= @dataset['id'] -%>',
+              subtype: '<%= @subtype -%>',
+              path: path,
+          },
+          success: function (data) {
+              $j('#nels-dataset').html(data).spinner('remove');
+          }
+      });
+  }
+
   $j(document).ready(function () {
 
     sessionStorage.setItem('nels_folder_state','Folder 1/Folder 2')
@@ -86,21 +101,6 @@ table, th, td {
       pathHTML=pathHTML.concat(`/<a href="" onclick="return false;" path="${path}">${element}</a>`);
     });
     $j('#nels_breadcrumb').html(pathHTML)
-
-    function updateFolderList(path){
-      $j('#nels-dataset').html('').spinner('add').show();
-      $j.ajax({ url: '<%= subtype_nels_path(:assay_id=>params[:assay_id]) -%>',
-        data: {
-          project_id: '<%= @project_id -%>',
-          dataset_id: '<%= @dataset['id'] -%>',
-          subtype: '<%= @subtype -%>',
-          path: path,
-        },
-        success: function (data) {
-          $j('#nels-dataset').html(data).spinner('remove');
-        }
-      });
-    }
 
     $j('.nels-folder').click(function() {
       updateFolderList($j(this).attr('path'));
