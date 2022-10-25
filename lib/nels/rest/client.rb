@@ -127,7 +127,7 @@ module Nels
       # 3. Upload file to retrieved URI
       # 4. Once the file is uploaded, trigger transfer to next storage area
       # 5. Return job-id, which can be used in upload_check_progress() to check progress
-      def upload_file(project_id, dataset_id,subtype_name, path, file_name, file_path)
+      def upload_file(project_id, dataset_id, subtype_name, path, file_name, file_path)
 
         path = sanitiseStoragePath(path)
         file_path = sanitiseStoragePath(file_path)

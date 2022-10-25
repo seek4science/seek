@@ -158,6 +158,22 @@ class NelsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'upload file' do
+    project_id = '1125299'
+    dataset_id = '1124840'
+    subtype = 'analysis'
+
+    file_path = File.join(Rails.root, 'test','fixtures','files','little_file.txt')
+    assert File.exist?(file_path)
+
+    file_data = fixture_file_upload('little_file.txt', 'text/plain')
+
+    VCR.use_cassette('nels/upload_file') do
+      post :upload_file, params:{ dataset_id: dataset_id, project_id: project_id, subtype_name: subtype, content_blobs: [{ data: file_data }]}
+      assert_response :success
+    end
+  end
+
   test 'raises error on NeLS callback if no code provided' do
     get :callback
 

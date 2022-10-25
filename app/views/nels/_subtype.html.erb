@@ -63,7 +63,7 @@ table, th, td {
   <%= form_tag({:action => :upload_file}, :multipart => true) do %>
     <%= modal_header('Upload file') %>
     <%= modal_body do %>
-      <%= render :partial=>"assets/upload_box",:locals=>{:resource=>@data_file, :action_text=>"upload"} -%>
+      <%= render :partial=>"assets/upload_box",:locals=>{:action_text=>"upload"} -%>
     <% end %>
     <%= modal_footer do %>
       <%= create_button id:"data_file_submit_btn", button_text:'Add',
