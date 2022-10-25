@@ -31,8 +31,8 @@ table, th, td {
 }
 </style>
 
-<%= button_link_to('New Folder', 'add', nil, { id: "", class:"add_metadata"}) %>
-<%= button_link_to('Upload', 'arrow_up', nil, { id: "", class:"upload_file"}) %>
+<%#= button_link_to('New Folder', 'add', nil, { id: "", class:"add_metadata"}) %>
+<%= button_link_to('Upload', 'arrow_up', nil, { id: :upload_file, class: :upload_file}) %>
 
 <table class="table table-hover table-bordered">
   <thead>
@@ -106,7 +106,7 @@ table, th, td {
       updateFolderList($j(this).attr('path'));
     });
 
-    $j('.upload_file').on('click', function () {
+    $j('#upload_file').on('click', function () {
       // Show upload file form and populate the params as hidden fields
       $j('#upload-file').modal('show');
       button_id = $j(this).attr('id')
