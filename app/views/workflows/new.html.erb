@@ -1,5 +1,7 @@
 <h1>New <%= t('workflow') %></h1>
 
+<%= index_and_new_help_icon controller_name %>
+
 <% if Seek::Config.git_support_enabled %>
   <%= panel do %>
     Currently there are three ways to register a workflow:
@@ -16,7 +18,7 @@
       <li>
         <strong><%= t('workflows.register.ro_crate') %></strong> -
         upload or import a <em>Workflow RO-Crate</em> (Note: this format is under development, click
-        <a href="https://github.com/workflowhub-eu/about/wiki/Workflow-RO-Crate" target="_blank">here</a>
+        <a href="https://about.workflowhub.eu/Workflow-RO-Crate/" target="_blank">here</a>
         to find out more)</li>
     </ul>
     <br/>

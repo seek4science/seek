@@ -1758,7 +1758,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
   test 'guided create with administered programmes as admin' do
     person = Factory(:programme_administrator)
-    managed_prog = Factory(:programme, title:'THE MANAGED ONE')
+    managed_prog = Factory(:programme, title: 'THE MANAGED ONE')
     person_prog = person.programmes.first
     another_prog = Factory(:programme)
     admin = Factory(:admin)
@@ -1770,13 +1770,40 @@ class ProjectsControllerTest < ActionController::TestCase
       get :guided_create
     end
     assert_response :success
-    assert_select 'input#managed_programme', count:0
+    assert_select 'input#managed_programme', count: 0
     assert_select 'select#programme_id' do
-      assert_select 'option',count:2
-      assert_select 'option',value:managed_prog.id,text:managed_prog.title
-      assert_select 'option',value:admin_prog.id,text:admin_prog.title
-      assert_select 'option',value:person_prog.id,text:person_prog.title, count:0
-      assert_select 'option',value:another_prog.id,text:another_prog.title, count:0
+      assert_select 'option', count: 2
+      assert_select 'option', value: managed_prog.id, text: managed_prog.title
+      assert_select 'option', value: admin_prog.id, text: admin_prog.title
+      assert_select 'option', value: person_prog.id, text: person_prog.title, count: 0
+      assert_select 'option', value: another_prog.id, text: another_prog.title, count: 0
+    end
+  end
+
+  test 'guided create with programmes that allow user projects' do
+    person = Factory(:person)
+    closed_programme = Factory(:programme)
+    open_programme = Factory(:programme, open_for_projects:true)
+    login_as(person)
+    assert Seek::Config.programme_user_creation_enabled # config allows creation of Programmes
+
+    # don't show if disabled
+    with_config_value(:programmes_open_for_projects_enabled, false) do
+      get :guided_create
+      assert_response :success
+      assert_select 'select#programme_id', count: 0
+      assert_select 'input#programme_title', count: 1
+    end
+
+    with_config_value(:programmes_open_for_projects_enabled, true) do
+      get :guided_create
+      assert_response :success
+      assert_select 'select#programme_id' do
+        assert_select 'option', count: 1
+        assert_select 'option', value: open_programme.id, text: open_programme.title
+        assert_select 'option', value: closed_programme.id, text: closed_programme.title, count: 0
+      end
+      assert_select 'input#programme_title', count: 1
     end
   end
 
@@ -2496,6 +2523,114 @@ class ProjectsControllerTest < ActionController::TestCase
           assert_no_difference('Institution.count') do
             assert_no_difference('GroupMembership.count') do
               post :respond_create_project_request, params:params
+            end
+          end
+        end
+      end
+    end
+
+    assert_redirected_to :root
+    refute_nil flash[:error]
+
+    log.reload
+    refute log.responded?
+  end
+
+  test 'respond create project request - programme open for projects (enabled)' do
+    person = Factory(:person)
+    login_as(person)
+    project = Project.new(title:'new project',web_page:'my new project')
+    programme = Factory(:programme, open_for_projects: true)
+    institution = Institution.new({title:'institution', country:'DE'})
+    log = ProjectCreationMessageLog.log_request(sender: person, programme:programme, project:project, institution:institution)
+    params = {
+      message_log_id:log.id,
+      accept_request: '1',
+      project:{
+        title:'new project',
+        web_page:'http://proj.org'
+      },
+      programme:{
+        id: programme.id
+      },
+      institution:{
+        title:'new institution',
+        city:'Paris',
+        country:'FR'
+      }
+    }
+
+    assert_no_enqueued_emails do
+      assert_no_difference('Programme.count') do
+        assert_difference('Project.count') do
+          assert_difference('Institution.count') do
+            assert_difference('GroupMembership.count') do
+              assert_difference('WorkGroup.count') do
+                with_config_value(:programmes_open_for_projects_enabled, true) do
+                  post :respond_create_project_request, params:params
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+
+    project = Project.last
+    institution = Institution.last
+    programme.reload
+
+    assert_equal 'new project', project.title
+    assert_equal 'new institution', institution.title
+
+    assert_includes programme.projects,project
+    assert_includes project.people, person
+    assert_includes project.institutions, institution
+    refute_includes programme.programme_administrators, person
+    assert_includes project.project_administrators, person
+
+    assert_equal WorkGroup.last, person.work_groups.last
+    assert_equal institution, person.work_groups.last.institution
+    assert_equal project, person.work_groups.last.project
+
+    assert_redirected_to(project_path(project))
+
+  end
+
+  test 'respond create project request - programme open for projects (disabled)' do
+    person = Factory(:person)
+    login_as(person)
+    project = Project.new(title:'new project',web_page:'my new project')
+    programme = Factory(:programme, open_for_projects: true)
+    institution = Institution.new({title:'institution', country:'DE'})
+    log = ProjectCreationMessageLog.log_request(sender: person, programme:programme, project:project, institution:institution)
+    params = {
+      message_log_id:log.id,
+      accept_request: '1',
+      project:{
+        title:'new project',
+        web_page:'http://proj.org'
+      },
+      programme:{
+        id: programme.id
+      },
+      institution:{
+        title:'new institution',
+        city:'Paris',
+        country:'FR'
+      }
+    }
+
+    assert_no_enqueued_emails do
+      assert_no_difference('Programme.count') do
+        assert_no_difference('Project.count') do
+          assert_no_difference('Institution.count') do
+            assert_no_difference('GroupMembership.count') do
+              assert_no_difference('WorkGroup.count') do
+                with_config_value(:programmes_open_for_projects_enabled, false) do
+                  post :respond_create_project_request, params:params
+                end
+              end
             end
           end
         end
@@ -3368,6 +3503,18 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_select 'div.panel div.panel-heading',text:/Annotated Properties/i, count:1
     assert_select 'div.panel div.panel-body div strong',text:/#{I18n.t('attributes.topic_annotation_values')}/, count:1
     assert_select 'div.panel div.panel-body a[href=?]','https://edamontology.github.io/edam-browser/#topic_3314',text:/Chemistry/, count:1
+  end
+
+  test 'request membership button disabled if membership already requested' do
+    person = Factory(:person)
+    project = Factory(:project)
+    ProjectMembershipMessageLog.log_request(sender: person, project: project, institution: Factory(:institution))
+
+    login_as(person)
+
+    get :show, params: { id: project.id }
+
+    assert_select 'a.btn[disabled=disabled]', text: 'Request membership', count: 1
   end
 
   private
