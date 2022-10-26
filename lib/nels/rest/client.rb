@@ -105,6 +105,8 @@ module Nels
         path = sanitise_storage_path(path)
         file_path = sanitise_storage_path(file_path)
 
+        Rails.logger.info("Starting upload of #{file_path}")
+
         # 1. Retrieve upload-reference-uri to upload the file to
         response = perform("seek/sbi/projects/#{project_id}/datasets/#{dataset_id}/#{subtype_name}/data/do", :post,
                            body: {
@@ -118,8 +120,7 @@ module Nels
         reflink = response['url']
         job_id = response['jobId']
 
-        puts "REFLINK = #{reflink}"
-        puts "JOBID = #{job_id}"
+        Rails.logger.info("Job ID: #{job_id} ; Upload URL: #{reflink}")
 
         response = RestClient.post(reflink, { file: File.new(file_path, 'r'), multipart: true }, { Accept: '*/*' })
         raise 'upload failed' unless response.code == 200
@@ -133,13 +134,12 @@ module Nels
                              }
                            })
 
-        puts "UPLOAD DONE RESPONSE = #{response}"
+        Rails.logger.info("upload_done response code: #{response.code}")
         job_state = 0
         while job_state != 101
           response = upload_check_progress(project_id, dataset_id, subtype_name, job_id)
           job_state = response['state_id']
-          puts "JOB STATE = #{job_state}"
-          puts "COMPLETION = #{response['completion']}"
+          Rails.logger.info("Waiting for transfer, Job state: #{job_state}; Completion: #{response['completion']}")
           sleep(0.2)
         end
       end
@@ -164,6 +164,8 @@ module Nels
       def download_file(project_id, dataset_id, subtype_name, path, file_name)
         path = sanitise_storage_path(path)
 
+        Rails.logger.info("Starting download file")
+
         # 1. Retrieve upload-reference-uri to upload the file to
         response = perform("seek/sbi/projects/#{project_id}/datasets/#{dataset_id}/#{subtype_name}/data/do", :post,
                            body: {
@@ -174,7 +176,7 @@ module Nels
                              }
                            })
         job_id = response['jobId']
-        puts "JOBID: #{job_id}"
+        Rails.logger.info("initiate_download, job id: #{job_id}")
 
         job_state = 0
         while job_state != 101
@@ -186,9 +188,7 @@ module Nels
                                }
                              })
           job_state = response['state_id']
-          completion_percentage = response['completion']
-          puts "STATE = #{job_state}"
-          puts "COMP % = #{completion_percentage}"
+          Rails.logger.info("Waiting for transfer, Job state: #{job_state}; Completion: #{response['completion']}")
           sleep(0.25)
         end
 
@@ -202,7 +202,7 @@ module Nels
                              }
                            })
         download_uri = response['url']
-        puts "DOWNLOAD URL = #{download_uri}"
+        Rails.logger.info("Download url: #{download_uri}")
 
         tmp_file = Tempfile.new
         URI.open(download_uri) do |stream|
@@ -217,8 +217,8 @@ module Nels
       def perform(path, method, opts = {})
         opts[:content_type] ||= :json
         opts[:Authorization] = "Bearer #{@access_token}"
-        puts('DEBUG MODE PRINT ACCESS TOKEN')
-        puts "Bearer #{@access_token}"
+
+        Rails.logger.debug("In perform, #{opts[:Authorization]}")
         body = opts.delete(:body)
         args = [method]
         if body
