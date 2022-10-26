@@ -38,7 +38,7 @@ class NelsController < ApplicationController
 
   def new_dataset
     # Populate all the necessary information for the view
-    @datasettypes = @rest_client.datasettypes
+    @datasettypes = @rest_client.dataset_types
     
     @projects = []
     # If project information is already defined
