@@ -1,5 +1,4 @@
 class NelsController < ApplicationController
-
   before_action :nels_enabled?
   before_action :check_user_logged_in, only: :callback
   before_action :check_code_present, only: :callback
@@ -9,8 +8,8 @@ class NelsController < ApplicationController
   before_action :nels_oauth_session, except: :callback
   before_action :rest_client, except: :callback
 
-  rescue_from RestClient::Unauthorized, :with => :unauthorized_response
-  rescue_from RestClient::InternalServerError, :with => :nels_error_response
+  rescue_from RestClient::Unauthorized, with: :unauthorized_response
+  rescue_from RestClient::InternalServerError, with: :nels_error_response
 
   def callback
     hash = @oauth_client.get_token(params[:code])
@@ -19,13 +18,13 @@ class NelsController < ApplicationController
     oauth_session.update(access_token: hash['access_token'], expires_in: 2.hours)
     if (match = params[:state].match(/assay_id:(\d+)/))
       params[:assay_id] = match[1].to_i
-      redirect_to nels_path(:assay_id=> params[:assay_id])
+      redirect_to nels_path(assay_id: params[:assay_id])
     elsif (match = params[:state].match(/data_file_id:(\d+)/))
       redirect_to retrieve_nels_sample_metadata_data_file_path(match[1].to_i)
     else
       # flash[:error] = "Bad redirect - Missing assay or data file ID from state parameter."
       # redirect_to root_path
-      redirect_to nels_path()
+      redirect_to nels_path
     end
   end
 
@@ -39,31 +38,32 @@ class NelsController < ApplicationController
   def new_dataset
     # Populate all the necessary information for the view
     @datasettypes = @rest_client.dataset_types
-    
+
     @projects = []
     # If project information is already defined
-    if (params.has_key?(:project_id) && params.has_key?(:project_name))
-      @projects = [
-        {
-          "id" => params[:project_id],
-          "name"=> params[:project_name]
-        }
-      ]
-    else
-      @projects = @rest_client.projects
-    end
+    @projects = if params.has_key?(:project_id) && params.has_key?(:project_name)
+                  [
+                    {
+                      'id' => params[:project_id],
+                      'name' => params[:project_name]
+                    }
+                  ]
+                else
+                  @rest_client.projects
+                end
     respond_to do |format|
       format.html
     end
   end
 
   def create_dataset
-    @rest_client.create_dataset(params["project"],params["datasettype"], params["title"], params["description"])
+    @rest_client.create_dataset(params['project'], params['datasettype'], params['title'], params['description'])
     render :index
   end
 
   def get_metadata
-    file_name, file_path = @rest_client.get_metadata(params[:project_id].to_i, params[:dataset_id].to_i,params[:subtype_name])
+    file_name, file_path = @rest_client.get_metadata(params[:project_id].to_i, params[:dataset_id].to_i,
+                                                     params[:subtype_name])
     send_file file_path, filename: file_name, disposition: 'attachment'
   end
 
@@ -75,19 +75,22 @@ class NelsController < ApplicationController
 
     # SampleType.sample_types_matching_content_blob(IO.read(params["content_blobs"][0]["data"].path))
 
-    @rest_client.upload_metadata(params[:project_id].to_i, params[:dataset_id].to_i,params[:subtype_name], params["content_blobs"][0]["data"].path)
-    redirect_to action: "index"
+    @rest_client.upload_metadata(params[:project_id].to_i, params[:dataset_id].to_i, params[:subtype_name],
+                                 params['content_blobs'][0]['data'].path)
+    redirect_to action: 'index'
   end
 
   def upload_file
-    filename = params["content_blobs"][0]["data"].original_filename
-    data_path = params["content_blobs"][0]["data"].path
-    @rest_client.upload_file(params[:project_id].to_i, params[:dataset_id].to_i,params[:subtype_name], '', filename, data_path)
+    filename = params['content_blobs'][0]['data'].original_filename
+    data_path = params['content_blobs'][0]['data'].path
+    @rest_client.upload_file(params[:project_id].to_i, params[:dataset_id].to_i, params[:subtype_name], '', filename,
+                             data_path)
     redirect_to nels_path
   end
 
   def download_file
-    file_name, file_path = @rest_client.download_file(params[:project_id].to_i, params[:dataset_id].to_i,params[:subtype_name],'',params[:filename])
+    file_name, file_path = @rest_client.download_file(params[:project_id].to_i, params[:dataset_id].to_i,
+                                                      params[:subtype_name], '', params[:filename])
     send_file file_path, filename: file_name, disposition: 'attachment'
   end
 
@@ -115,20 +118,19 @@ class NelsController < ApplicationController
 
   def dataset
     @dataset = @rest_client.dataset(params[:project_id].to_i, params[:dataset_id].to_i)
-        @register_mode = params[:register_mode]
+    @register_mode = params[:register_mode]
 
     # Populates the "metadata" field for each subtype, indicating if there is associated metadata with it
-    @dataset['subtypes'].each_with_index do |subtype, index |
-      @dataset['subtypes'][index]['metadata'] = 
+    @dataset['subtypes'].each_with_index do |subtype, index|
+      @dataset['subtypes'][index]['metadata'] =
         @rest_client.check_metadata_exists(params[:project_id].to_i, params[:dataset_id].to_i, subtype['type'])
     end
-    
+
     respond_to do |format|
       format.html { render partial: 'nels/dataset' }
     end
   end
 
-  
   def subtype
     @project_id = params[:project_id].to_i
     @dataset_id = params[:dataset_id].to_i
@@ -137,7 +139,7 @@ class NelsController < ApplicationController
     @subtype = params[:subtype]
 
     @file_list = @rest_client.sbi_storage_list(params[:project_id].to_i, params[:dataset_id].to_i, params[:path])
-    
+
     respond_to do |format|
       format.html { render partial: 'nels/subtype' }
     end
@@ -161,12 +163,12 @@ class NelsController < ApplicationController
   end
 
   private
-  
+
   def authorize
-    if (params[:assay_id])
-      find_and_authorize_assay()
-    elsif (current_user.person.projects.any?(&:nels_enabled))
-      return true
+    if params[:assay_id]
+      find_and_authorize_assay
+    elsif current_user.person.projects.any?(&:nels_enabled)
+      true
     end
   end
 
@@ -182,7 +184,7 @@ class NelsController < ApplicationController
     unless @assay.projects.any?(&:nels_enabled)
       flash[:error] = "This assay is not associated with a NeLS-enabled #{t('project').downcase}."
       redirect_to @assay
-      return false
+      false
     end
   end
 
@@ -213,8 +215,8 @@ class NelsController < ApplicationController
   end
 
   def nels_error_response
-      render json: { error: 'NeLS API Error',
-                     message: 'An error occurred whilst accessing the NeLS API.' }, status: :internal_server_error
+    render json: { error: 'NeLS API Error',
+                   message: 'An error occurred whilst accessing the NeLS API.' }, status: :internal_server_error
   end
 
   def check_code_present

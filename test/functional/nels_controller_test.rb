@@ -133,7 +133,9 @@ class NelsControllerTest < ActionController::TestCase
       assert_difference('ContentBlob.count', 1) do
         VCR.use_cassette('nels/get_dataset') do
           VCR.use_cassette('nels/get_persistent_url') do
-            post :register, params: { assay_id: @assay.id, project_id: @project_id, dataset_id: @dataset_id, subtype_name: @subtype }
+            post :register,
+                 params: { assay_id: @assay.id, project_id: @project_id, dataset_id: @dataset_id,
+                           subtype_name: @subtype }
 
             assert_redirected_to provide_metadata_data_files_path(project_ids: project_ids)
 
@@ -150,11 +152,11 @@ class NelsControllerTest < ActionController::TestCase
     dataset_id = '1124840'
     subtype = 'analysis'
 
-
     VCR.use_cassette('nels/download_file') do
-      get :download_file, params: { dataset_id: dataset_id, project_id: project_id, subtype_name: subtype, filename: 'pegion.png'}
+      get :download_file,
+          params: { dataset_id: dataset_id, project_id: project_id, subtype_name: subtype, filename: 'pegion.png' }
       assert_response :success
-      assert_equal 94353, @response.body.length
+      assert_equal 94_353, @response.body.length
     end
   end
 
@@ -163,13 +165,15 @@ class NelsControllerTest < ActionController::TestCase
     dataset_id = '1124840'
     subtype = 'analysis'
 
-    file_path = File.join(Rails.root, 'test','fixtures','files','little_file.txt')
+    file_path = File.join(Rails.root, 'test', 'fixtures', 'files', 'little_file.txt')
     assert File.exist?(file_path)
 
     file_data = fixture_file_upload('little_file.txt', 'text/plain')
 
     VCR.use_cassette('nels/upload_file') do
-      post :upload_file, params:{ dataset_id: dataset_id, project_id: project_id, subtype_name: subtype, content_blobs: [{ data: file_data }]}
+      post :upload_file,
+           params: { dataset_id: dataset_id, project_id: project_id, subtype_name: subtype,
+                     content_blobs: [{ data: file_data }] }
       assert_redirected_to nels_path
     end
   end
