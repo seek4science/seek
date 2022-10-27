@@ -65,7 +65,7 @@ module Seek
         end
 
         packed_cwl_string = ''
-        status = Open4.popen4("cwltool --skip-schemas --quiet --enable-dev --non-strict --pack #{path}") do |_pid, _stdin, stdout, stderr|
+        status = Open4.popen4(Seek::Util.python_exec("cwltool --skip-schemas --quiet --enable-dev --non-strict --pack #{path}")) do |_pid, _stdin, stdout, stderr|
           while (line = stdout.gets) != nil
             packed_cwl_string << line
           end
