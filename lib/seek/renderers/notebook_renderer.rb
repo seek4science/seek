@@ -34,13 +34,11 @@ module Seek
         mathjax_path = asset_path('assets/mathjax.js', skip_pipeline: true)
         out = ''
         err = ''
-        status = Open4.popen4(Seek::Util.python_exec("nbconvert --log-level WARN --to html #{f.path} --template lab --stdout --HTMLExporter.mathjax_url=#{mathjax_path} --HTMLExporter.require_js_url=#{require_path}")) do |_pid, _stdin, stdout, stderr|
+        status = Open4.popen4(Seek::Util.python_exec("-m nbconvert --log-level WARN --to html #{f.path} --template lab --stdout --HTMLExporter.mathjax_url=#{mathjax_path} --HTMLExporter.require_js_url=#{require_path}")) do |_pid, _stdin, stdout, stderr|
           while (line = stdout.gets) != nil
             out << line
           end
-          while (line = stderr.gets) != nil
-            err << line
-          end
+          err = stderr.read.strip
           stdout.close
           stderr.close
         end
