@@ -14,7 +14,7 @@ module Seek
         f.write(galaxy_string)
         f.rewind
         cf = Tempfile.new('cwl')
-        Open4.popen4("gxwf-abstract-export #{f.path} #{cf.path}") {}
+        Open4.popen4(Seek::Util.python_exec("gxwf-abstract-export #{f.path} #{cf.path}")) {}
         cf.rewind
         metadata = Seek::WorkflowExtractors::CWL.new(cf).metadata
         galaxy = JSON.parse(galaxy_string)
