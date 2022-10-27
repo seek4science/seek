@@ -109,7 +109,7 @@ class IsaAssaysControllerTest < ActionController::TestCase
                                                  linked_sample_type: sample_collection_type)
 
     study = Factory(:study, investigation: investigation, contributor: person,
-                            sop_id: Factory(:sop, policy: Factory(:public_policy)).id,
+                            sops: [Factory(:sop, policy: Factory(:public_policy))],
                             sample_types: [source_type, sample_collection_type])
 
     assay = Factory(:assay, study: study, sample_type: assay_type, contributor: person)
