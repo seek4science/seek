@@ -5,11 +5,13 @@ require 'pathname'
 
 module Scrapers
   class GithubScraper
+    attr_reader :output
+
     GIT_DESTINATION = Rails.root.join('tmp', 'scrapers', 'git')
     CRATE_DESTINATION = Rails.root.join('tmp', 'scrapers', 'crates')
     CACHE_DESTINATION = Rails.root.join('tmp', 'scrapers', 'cache')
 
-    def initialize(organization, project, contributor, main_branch: 'master', debug: false)
+    def initialize(organization, project, contributor, main_branch: 'master', debug: false, output: STDOUT)
       @organization = organization # The GitHub organization to scrape
       raise "Missing GitHub organization" unless @organization
       @project = project # The SEEK project who will own the resources
@@ -19,35 +21,36 @@ module Scrapers
       @debug = debug # If debug is set, don't persist anything to database
       @main_branch = main_branch # The name of the main/master branch
       if @debug
-        puts "Org: #{@organization}"
-        puts "Project: #{@project.title} (ID: #{@project.id})"
-        puts "Contributor: #{@contributor.title} (ID: #{@contributor.id}, user ID: #{@contributor.user.id})"
+        output.puts "Org: #{@organization}"
+        output.puts "Project: #{@project.title} (ID: #{@project.id})"
+        output.puts "Contributor: #{@contributor.title} (ID: #{@contributor.id}, user ID: #{@contributor.user.id})"
       end
+      @output = output
     end
 
     def scrape
       User.with_current_user(@contributor.user) do
-        puts "Listing #{@organization} repos"
+        output.puts "Listing #{@organization} repos"
         repo_list = list_repositories
 
-        puts "Cloning #{@organization} repos"
+        output.puts "Cloning #{@organization} repos"
         repositories = clone_repositories(repo_list)
 
-        puts "Creating resources"
+        output.puts "Creating resources"
         resources = create_resources(repositories)
 
         successes, failures = resources.partition(&:persisted?)
 
         if successes.any?
-          puts "Registered:"
-          successes.each { |w| puts " * #{w} - #{w.title}" }
+          output.puts "Registered:"
+          successes.each { |w| output.puts " * /workflows/#{w.id} - #{w.title}" }
         end
 
         if failures.any?
-          puts "Not registered#{@debug ? ' (DEBUG MODE)' : ''}:"
+          output.puts "Not registered#{@debug ? ' (DEBUG MODE)' : ''}:"
           failures.each do |w|
-            puts " * #{w.title}"
-            w.errors.full_messages.each { |e| puts "     #{e}" }
+            output.puts " * #{w.title}"
+            w.errors.full_messages.each { |e| output.puts "     #{e}" }
           end
         end
 
@@ -64,8 +67,12 @@ module Scrapers
 
     def create_resources(repositories)
       repositories.map do |repo|
-        puts "  Considering #{repo.remote.chomp('.git')}..."
+        output.puts "  Considering #{repo.remote.chomp('.git')}..."
         latest_tag = `cd #{repo.git_base.path}/.. && git describe --tags --abbrev=0 remotes/origin/#{@main_branch}`.chomp
+        unless $?.success?
+          output.puts "    Error while getting latest tag - wrong branch name?"
+          next
+        end
         wiz = GitWorkflowWizard.new(params: {
           git_version_attributes: {
             git_repository_id: repo.id,
@@ -80,29 +87,30 @@ module Scrapers
           new_version = true
           wiz.workflow = workflow
           unless workflow.git_versions.none? { |gv| gv.name == latest_tag }
-            puts "    Version #{latest_tag} already registered, doing nothing"
+            output.puts "    Version #{latest_tag} already registered, doing nothing"
             next
           end
-          puts "    New version detected! (#{latest_tag}), creating new version"
+          output.puts "    New version detected! (#{latest_tag}), creating new version"
         else
-          puts "    Creating new workflow"
+          output.puts "    Creating new workflow"
         end
 
         workflow = wiz.run
+        workflow.contributor = @contributor
+        workflow.projects = Array(@project)
+        workflow.policy = Policy.projects_policy(workflow.projects)
+        workflow.policy.access_type = Policy::ACCESSIBLE
+        workflow.source_link_url = repo.remote.chomp('.git')
         if wiz.next_step == :provide_metadata
-          workflow.contributor = @contributor
-          workflow.projects = Array(@project)
-          workflow.policy = Policy.projects_policy(workflow.projects)
-          workflow.policy.access_type = Policy::ACCESSIBLE
-          workflow.source_link_url = repo.remote.chomp('.git')
           unless @debug
             if new_version
               workflow.git_version.resource_attributes = workflow.attributes
               workflow.git_version.save
             end
-            workflow.git_versions.reset
             workflow.save
           end
+        else
+          workflow.valid?
         end
 
         workflow

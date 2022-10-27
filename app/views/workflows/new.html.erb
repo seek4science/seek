@@ -1,5 +1,7 @@
 <h1>New <%= t('workflow') %></h1>
 
+<%= index_and_new_help_icon controller_name %>
+
 <% if Seek::Config.git_support_enabled %>
   <%= panel do %>
     Currently there are three ways to register a workflow:
