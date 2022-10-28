@@ -991,5 +991,26 @@ class StudiesControllerTest < ActionController::TestCase
       assert_select 'a[href=?]', study_path(study2), text: study2.title, count: 0
     end
   end
- 
+
+  test 'shows "New Investigation" button if no investigations available' do
+    Investigation.delete_all
+    person = Factory(:person)
+    login_as(person)
+    assert Investigation.authorized_for('view', person.user).none?
+
+    get :new
+
+    assert_select 'a.btn[href=?]', new_investigation_path, count: 1
+  end
+
+  test 'does not show "New Investigation" button if investigations available' do
+    person = Factory(:person)
+    login_as(person)
+    Factory(:investigation, contributor: person)
+    assert Investigation.authorized_for('view', person.user).any?
+
+    get :new
+
+    assert_select 'a.btn[href=?]', new_investigation_path, count: 0
+  end
 end

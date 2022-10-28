@@ -1212,4 +1212,23 @@ class SamplesControllerTest < ActionController::TestCase
     sample.save!
     sample
   end
+
+  test 'unauthorized users should not do batch operations' do
+    sample = Factory(:sample)
+
+    post :batch_create
+    assert_redirected_to :root
+    assert_not_nil flash[:error]
+
+    params = { data: [
+      { id: sample.id,
+        data: { type: 'samples',
+                attributes: { attribute_map: { "full name": 'Alfred Marcus', "age": '22', "weight": '22.1' } } } }
+    ] }
+    put :batch_update, params: params
+    assert_equal JSON.parse(response.body)['status'], 'unprocessable_entity'
+
+    delete :batch_delete, params: { data: [{ id: sample.id }] }
+    assert_equal JSON.parse(response.body)['status'], 'unprocessable_entity'
+  end
 end
