@@ -43,6 +43,7 @@ RUN touch config/using-docker #allows us to see within SEEK we are running in a 
 
 # Python dependencies from requirements.txt
 ENV PATH="/var/www/.local/bin:$PATH"
+RUN python3.7 -m pip install setuptools==58
 RUN python3.7 -m pip install -r requirements.txt
 
 # SQLite Database (for asset compilation)
