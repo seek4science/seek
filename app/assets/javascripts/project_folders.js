@@ -229,7 +229,7 @@ $j.jstree.plugins.separate = function (options, parent) {
 			if (n.state.separate) {
 				var p = d.createElement("p");
 				p.innerHTML = "<span>" + n.state.separate.label + "</span>";
-				p.className = "separator";
+				p.className = "isa-separator";
 				if (n.state.separate.action) {
 					var a = d.createElement("a");
 					a.href = n.state.separate.action;
