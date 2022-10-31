@@ -27,6 +27,8 @@ namespace :seek do
     convert_roles
     update_edam_annotation_attributes
     remove_orphaned_project_subscriptions
+    remove_node_activity_logs
+    remove_node_asset_creators
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -255,6 +257,18 @@ namespace :seek do
     disable_authorization_checks do
       ProjectSubscription.where.missing(:project).destroy_all
     end
+  end
+
+  task(remove_node_activity_logs: [:environment]) do
+    logs = ActivityLog.where(activity_loggable_type: 'Node')
+    puts "Removing #{logs.count} Node related activity logs" if logs.count > 0
+    logs.delete_all
+  end
+
+  task(remove_node_asset_creators: [:environment]) do
+    creators = AssetsCreator.where(asset_type: 'Node')
+    puts "Removing #{creators.count} Node related asset creators" if creators.count > 0
+    creators.delete_all
   end
 
 end
