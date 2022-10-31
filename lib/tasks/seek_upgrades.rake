@@ -23,6 +23,7 @@ namespace :seek do
     seek:rebuild_workflow_internals
     remove_scale_annotations
     remove_spreadsheet_annotations
+    remove_node_annotations
     convert_roles
     update_edam_annotation_attributes
   ]
@@ -166,6 +167,15 @@ namespace :seek do
     annotations.destroy_all
     AnnotationAttribute.where(name:'annotation').destroy_all
     puts "Removed #{count} spreadsheet related annotations" if count > 0
+  end
+
+  task(remove_node_annotations: [:environment]) do
+    annotations = Annotation.where(annotatable_type: 'Node')
+    count = annotations.count
+    values = TextValue.joins(:annotations).where(annotations: { annotatable_type: 'Node' })
+    values.select{|v| v.annotations.count == 1}.each(&:destroy)
+    annotations.destroy_all
+    puts "Removed #{count} Node related annotations" if count > 0
   end
 
   task(convert_roles: [:environment]) do
