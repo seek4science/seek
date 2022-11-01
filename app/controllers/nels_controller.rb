@@ -22,8 +22,6 @@ class NelsController < ApplicationController
     elsif (match = params[:state].match(/data_file_id:(\d+)/))
       redirect_to retrieve_nels_sample_metadata_data_file_path(match[1].to_i)
     else
-      # flash[:error] = "Bad redirect - Missing assay or data file ID from state parameter."
-      # redirect_to root_path
       redirect_to nels_path
     end
   end
@@ -205,12 +203,12 @@ class NelsController < ApplicationController
   end
 
   def unauthorized_response
-    if action_name == 'index'
-      redirect_to @oauth_client.authorize_url
-    else
+    if request.format == :json
       render json: { error: 'Unauthorized',
                      message: 'Attempting to reauthenticate...',
                      url: @oauth_client.authorize_url }, status: :unauthorized
+    else
+      redirect_to @oauth_client.authorize_url
     end
   end
 
