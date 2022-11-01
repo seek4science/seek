@@ -31,8 +31,9 @@ table, th, td {
 }
 </style>
 
-<%#= button_link_to('New Folder', 'add', nil, { id: "", class:"add_metadata"}) %>
-<%= button_link_to('Upload', 'arrow_up', nil, { id: :upload_file, class: :upload_file}) %>
+<p>
+  <%= button_link_to('Upload', 'arrow_up', nil, { id: :upload_file, class: :upload_file}) %>
+</p>
 
 <table class="table table-hover table-bordered">
   <thead>
@@ -46,14 +47,18 @@ table, th, td {
       <% next if file_item['isFolder'] %>
       <tr>
         <td>
-          <%= icon_link_to('', 'big_download', {:action => :download_file,
-            :project_id => @project_id, :dataset_id => @dataset_id ,:subtype_name => @subtype,:path => file_item["path"], filename: file_item['name'] }, method: :get) %>
-            <%= file_item["name"]%>
+            <%= file_type_icon_for_filename(file_item["name"]) %>
+            <%= file_item["name"] %>
           </span>
-          <span style="float: right;"> <%= icon_link_to('Open in NeLS', 'git_repository_search', 'https://test-fe.cbu.uib.no/nels-web/#/sbi-storage',options = {target:'blank'})
-          %></span>
+          <span style="float: right;">
+            <%= icon_link_to('', 'download',
+                             {
+                              action: :download_file,project_id: @project_id, dataset_id: @dataset_id, subtype_name: @subtype, path: file_item["path"], filename: file_item['name']
+                             },
+                             method: :get) %>
+          </span>
         </td>
-        <td><%= file_item["size"]%></td>
+        <td><%= number_to_human_size(file_item["size"]) %></td>
       </tr>
     <% end %>
   </tbody>
