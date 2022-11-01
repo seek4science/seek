@@ -23,8 +23,12 @@ namespace :seek do
     seek:rebuild_workflow_internals
     remove_scale_annotations
     remove_spreadsheet_annotations
+    remove_node_annotations
     convert_roles
     update_edam_annotation_attributes
+    remove_orphaned_project_subscriptions
+    remove_node_activity_logs
+    remove_node_asset_creators
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -106,48 +110,12 @@ namespace :seek do
              Sop::Version, Workflow::Version]
     disable_authorization_checks do
       types.each do |type|
-        found = type.all.select { |v| v.parent.nil? }
+        found = type.where.missing(:parent)
         count += found.length
         found.each(&:destroy)
       end
     end
     puts "... finished removing #{count} orphaned versions"
-  end
-
-  task(convert_mysql_charset: [:environment]) do
-    if ActiveRecord::Base.connection.instance_values["config"][:adapter] == 'mysql2'
-      puts "Attempting MySQL database conversion"
-      # Get charset from database.yml, then find appropriate collation from mysql
-      db = ActiveRecord::Base.connection.current_database
-      charset = ActiveRecord::Base.connection.instance_values["config"][:encoding] || 'utf8mb4'
-      collation = "#{charset}_unicode_ci" # Prefer e.g. utf8_unicode_ci over utf8_general_ci
-      collation = ActiveRecord::Base.connection.execute("SHOW COLLATION WHERE Charset = '#{charset}' AND Collation = '#{collation}';").first&.first
-      unless collation
-        # Pick default collation for given charset if above collation not available
-        collation = ActiveRecord::Base.connection.execute("SHOW COLLATION WHERE Charset = '#{charset}' `Default` = 'Yes';").first&.first
-        unless collation
-          puts "Could not find collation for charset: #{charset}, aborting"
-          return
-        end
-      end
-
-      puts "Converting database: #{db} to character set: #{charset}, collation: #{collation}"
-
-      # Set database defaults
-      puts "Setting default charset and collation"
-      ActiveRecord::Base.connection.execute("ALTER DATABASE #{db} DEFAULT CHARACTER SET #{charset} DEFAULT COLLATE #{collation};")
-
-      # Set/convert each table
-      tables = ActiveRecord::Base.connection.exec_query("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES where TABLE_SCHEMA='#{db}' AND TABLE_COLLATION != '#{collation}';").rows.flatten
-      puts "#{tables.count} tables to convert"
-      tables.each do |table|
-        puts "  Converting #{table}"
-        ActiveRecord::Base.connection.execute("ALTER TABLE #{table} CONVERT TO CHARACTER SET #{charset} COLLATE #{collation};")
-      end
-      puts "Done"
-    else
-      puts "Database adapter is: #{ActiveRecord::Base.connection.instance_values["config"][:adapter]}, doing nothing"
-    end
   end
 
   task(remove_scale_annotations: [:environment]) do
@@ -166,6 +134,15 @@ namespace :seek do
     annotations.destroy_all
     AnnotationAttribute.where(name:'annotation').destroy_all
     puts "Removed #{count} spreadsheet related annotations" if count > 0
+  end
+
+  task(remove_node_annotations: [:environment]) do
+    annotations = Annotation.where(annotatable_type: 'Node')
+    count = annotations.count
+    values = TextValue.joins(:annotations).where(annotations: { annotatable_type: 'Node' })
+    values.select{|v| v.annotations.count == 1}.each(&:destroy)
+    annotations.destroy_all
+    puts "Removed #{count} Node related annotations" if count > 0
   end
 
   task(convert_roles: [:environment]) do
@@ -238,6 +215,24 @@ namespace :seek do
         query.update_all(key: new_key)
       end
     end
+  end
+
+  task(remove_orphaned_project_subscriptions: [:environment]) do
+    disable_authorization_checks do
+      ProjectSubscription.where.missing(:project).destroy_all
+    end
+  end
+
+  task(remove_node_activity_logs: [:environment]) do
+    logs = ActivityLog.where(activity_loggable_type: 'Node')
+    puts "Removing #{logs.count} Node related activity logs" if logs.count > 0
+    logs.delete_all
+  end
+
+  task(remove_node_asset_creators: [:environment]) do
+    creators = AssetsCreator.where(asset_type: 'Node')
+    puts "Removing #{creators.count} Node related asset creators" if creators.count > 0
+    creators.delete_all
   end
 
 end

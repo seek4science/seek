@@ -73,7 +73,7 @@ class InvestigationTest < ActiveSupport::TestCase
     t << json
     t.close
 
-    result = `python script/check-isa.py #{t.path}`
+    result = `#{Seek::Util.python_exec("script/check-isa.py #{t.path}")}`
 
     assert result.blank?, "check-isa.py result was not blank, returned: #{result}"
   end

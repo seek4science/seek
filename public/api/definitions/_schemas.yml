@@ -3932,6 +3932,10 @@ personResponse:
               $ref: "#/components/schemas/multipleReferences"
             events:
               $ref: "#/components/schemas/multipleReferences"
+            collections:
+              $ref: "#/components/schemas/multipleReferences"
+            workflows:
+              $ref: "#/components/schemas/multipleReferences"
           required:
             - projects
             - institutions
@@ -3945,6 +3949,8 @@ personResponse:
             - publications
             - presentations
             - events
+            - collections
+            - workflows
           additionalProperties: false
         links:
           $ref: "#/components/schemas/links"
@@ -4072,6 +4078,10 @@ programmeResponse:
               $ref: "#/components/schemas/multipleReferences"
             events:
               $ref: "#/components/schemas/multipleReferences"
+            workflows:
+              $ref: "#/components/schemas/multipleReferences"
+            collections:
+              $ref: "#/components/schemas/multipleReferences"
           required:
             - people
             - projects
@@ -4086,6 +4096,8 @@ programmeResponse:
             - publications
             - presentations
             - events
+            - workflows
+            - collections
           additionalProperties: false
         links:
           $ref: "#/components/schemas/links"
@@ -4183,6 +4195,8 @@ projectResponse:
               $ref: "#/components/schemas/multipleReferences"
             workflows:
               $ref: "#/components/schemas/multipleReferences"
+            collections:
+              $ref: "#/components/schemas/multipleReferences"
             file_templates:
               $ref: "#/components/schemas/multipleReferences"
             placeholders:
@@ -4212,6 +4226,8 @@ projectResponse:
             - presentations
             - events
             - programmes
+            - workflows
+            - collections
             - file_templates
             - placeholders
             - human_diseases
