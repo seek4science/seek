@@ -5,6 +5,9 @@ require 'tempfile'
 module Nels
   module Rest
     class Client
+      class UploadError < StandardError; end
+      class TransferError < StandardError; end
+
       attr_reader :base, :access_token
 
       def initialize(access_token, base = nil)
@@ -50,7 +53,7 @@ module Nels
       end
 
       def create_dataset(project_id, datasettype, name, description)
-        perform('v2/sbi/projects/' + project_id + '/datasets/', :post,
+        perform("v2/sbi/projects/#{project_id}/datasets/", :post,
                 body: { datasettypeid: datasettype.to_i, name: name, description: description })
       end
 
@@ -117,13 +120,15 @@ module Nels
                              }
                            })
 
-        reflink = response['url']
+        upload_url = response['url']
         job_id = response['jobId']
 
-        Rails.logger.info("Job ID: #{job_id} ; Upload URL: #{reflink}")
+        Rails.logger.info("Job ID: #{job_id} ; Upload URL: #{upload_url}")
 
-        response = RestClient.post(reflink, { file: File.new(file_path, 'r'), multipart: true }, { Accept: '*/*' })
-        raise 'upload failed' unless response.code == 200
+        response = RestClient.post(upload_url, { file: File.new(file_path, 'r'), multipart: true }, { Accept: '*/*' })
+        unless response.code == 200
+          raise UploadError, "There was an error uploading the file #{file_path}, response was #{response.code}"
+        end
 
         # Once upload is done, trigger NeLS transfer
         response = perform("seek/sbi/projects/#{project_id}/datasets/#{dataset_id}/#{subtype_name}/data/do", :post,
@@ -137,23 +142,25 @@ module Nels
         Rails.logger.info("upload_done response code: #{response.code}")
         job_state = 0
         while job_state != 101
-          response = upload_check_progress(project_id, dataset_id, subtype_name, job_id)
-          job_state = response['state_id']
-          Rails.logger.info("Waiting for transfer, Job state: #{job_state}; Completion: #{response['completion']}")
+          job_state, progress = upload_transfer_check_progress(project_id, dataset_id, subtype_name, job_id)
+          Rails.logger.info("Waiting for transfer, Job state: #{job_state}; Completion: #{progress}")
+          raise TransferError, 'There was an error with the transfer job after upload.' if job_state == 102
+
           sleep(0.2)
         end
       end
 
-      # returns {job_state: state-enums, completion: completion-percentage}
+      # returns job_state, completion
       # state-enums: SUCCESS(101), FAILURE(102), SUBMITTED(100), PROCESSING(103);
-      def upload_check_progress(project_id, dataset_id, subtype_name, job_id)
-        perform("seek/sbi/projects/#{project_id}/datasets/#{dataset_id}/#{subtype_name}/data/do", :post,
-                body: {
-                  "method": 'job_state',
-                  "payload": {
-                    "job_id": job_id
-                  }
-                })
+      def upload_transfer_check_progress(project_id, dataset_id, subtype_name, job_id)
+        response = perform("seek/sbi/projects/#{project_id}/datasets/#{dataset_id}/#{subtype_name}/data/do", :post,
+                           body: {
+                             "method": 'job_state',
+                             "payload": {
+                               "job_id": job_id
+                             }
+                           })
+        [response['state_id'], response['completion']]
       end
 
       # DOWNLOAD FILE FLOW
@@ -164,9 +171,8 @@ module Nels
       def download_file(project_id, dataset_id, subtype_name, path, file_name)
         path = sanitise_storage_path(path)
 
-        Rails.logger.info("Starting download file")
+        Rails.logger.info('Starting download file')
 
-        # 1. Retrieve upload-reference-uri to upload the file to
         response = perform("seek/sbi/projects/#{project_id}/datasets/#{dataset_id}/#{subtype_name}/data/do", :post,
                            body: {
                              "method": 'initiate_download',
@@ -180,18 +186,12 @@ module Nels
 
         job_state = 0
         while job_state != 101
-          response = perform("seek/sbi/projects/#{project_id}/datasets/#{dataset_id}/#{subtype_name}/data/do", :post,
-                             body: {
-                               "method": 'job_state',
-                               "payload": {
-                                 "job_id": job_id
-                               }
-                             })
-          job_state = response['state_id']
-          Rails.logger.info("Waiting for transfer, Job state: #{job_state}; Completion: #{response['completion']}")
+          job_state, progress = check_download_transfer_progress(project_id, dataset_id, subtype_name, job_id)
+          raise TransferError, 'There was an problem with the transfer before download' if job_state == 102
+
+          Rails.logger.info("Waiting for transfer, Job state: #{job_state}; Completion: #{progress}")
           sleep(0.25)
         end
-
 
         # Once the file has been transfered, request download-uri
         response = perform("seek/sbi/projects/#{project_id}/datasets/#{dataset_id}/#{subtype_name}/data/do", :post,
@@ -201,17 +201,27 @@ module Nels
                                "job_id": job_id
                              }
                            })
-        download_uri = response['url']
-        Rails.logger.info("Download url: #{download_uri}")
+        download_url = response['url']
+        Rails.logger.info("Download url: #{download_url}")
 
         tmp_file = Tempfile.new
-        URI.open(download_uri) do |stream|
+        URI.open(download_url) do |stream|
           File.open(tmp_file.path, 'wb') do |file|
             file.write(stream.read)
           end
         end
         [file_name, tmp_file.path]
+      end
 
+      def check_download_transfer_progress(project_id, dataset_id, subtype_name, job_id)
+        response = perform("seek/sbi/projects/#{project_id}/datasets/#{dataset_id}/#{subtype_name}/data/do", :post,
+                           body: {
+                             "method": 'job_state',
+                             "payload": {
+                               "job_id": job_id
+                             }
+                           })
+        [response['state_id'], response['completion']]
       end
 
       def perform(path, method, opts = {})
