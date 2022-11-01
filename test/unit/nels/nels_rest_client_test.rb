@@ -89,4 +89,11 @@ class NelsRestClientTest < ActiveSupport::TestCase
       @rest_client.upload_file(1_125_299, 1_124_840, 'analysis', '', 'little_file.txt', file_path)
     end
   end
+
+  test 'create dataset' do
+    VCR.use_cassette('nels/create_dataset') do
+      @rest_client.create_dataset(1125299, 225, 'test dataset', 'testing creating a dataset')
+    end
+  end
+
 end

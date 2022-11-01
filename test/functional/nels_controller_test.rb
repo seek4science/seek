@@ -193,4 +193,18 @@ class NelsControllerTest < ActionController::TestCase
     assert_redirected_to root_path
     assert flash[:error].present?
   end
+
+  test 'create dataset' do
+    project_id='1125299'
+    datasettypeid='225'
+    name = 'test dataset'
+    description = 'testing creating a dataset'
+
+    VCR.use_cassette('nels/create_dataset') do
+      VCR.use_cassette('nels/get_user_info') do
+        post :create_dataset, params: { project: project_id, datasettype: datasettypeid, name: name, description: description}
+      end
+    end
+
+  end
 end

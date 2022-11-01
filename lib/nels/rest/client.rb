@@ -187,9 +187,9 @@ module Nels
         job_state = 0
         while job_state != 101
           job_state, progress = check_download_transfer_progress(project_id, dataset_id, subtype_name, job_id)
-          raise TransferError, 'There was an problem with the transfer before download' if job_state == 102
 
           Rails.logger.info("Waiting for transfer, Job state: #{job_state}; Completion: #{progress}")
+          raise TransferError, 'There was an problem with the transfer before download' if job_state == 102
           sleep(0.25)
         end
 
