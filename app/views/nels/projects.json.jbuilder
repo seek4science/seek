@@ -4,6 +4,7 @@ json.array! @projects do |project|
   json.parent '#'
   json.icon "glyphicon glyphicon-book"
   json.state do
+    json.opened true
     json.loaded false
   end
   json.data do

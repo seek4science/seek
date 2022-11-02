@@ -3,6 +3,10 @@
 Logged in as <%= @rest_client.user_info['name'] %><br/><br/>
 
 <div class="row">
+      <%= button_link_to('Open in NeLS', 'git_repository_search', 'https://test-fe.cbu.uib.no/nels-web/#/sbi-storage',options = {target:'blank'}) %>
+</div>
+
+<div class="row">
   <div class="col-sm-3">
     <div id="nels-tree" style="min-height: 300px; border-right: 1px solid #ddd"></div>
   </div>
