@@ -1,8 +1,9 @@
 name: ansible-install
 run-name: ${{ github.actor }} is testing Ansible install
 on:
-  branches:
-    - ansible
+  push:
+    branches:
+      - ansible
   workflow_dispatch:
 
 jobs:
