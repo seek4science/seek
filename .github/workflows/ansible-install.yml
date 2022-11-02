@@ -32,4 +32,6 @@ jobs:
 
 
       - name: Install SEEK through ansible
-        run: ansible-playbook Deploy-SEEK.yml
+        run: |
+          cd script/ansible/
+          ansible-playbook Deploy-SEEK.yml
