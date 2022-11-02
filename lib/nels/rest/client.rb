@@ -7,6 +7,7 @@ module Nels
     class Client
       class UploadError < StandardError; end
       class TransferError < StandardError; end
+      class FetchFileError < StandardError; end
 
       attr_reader :base, :access_token
 
@@ -204,7 +205,7 @@ module Nels
         download_url = response['url']
         Rails.logger.info("Download url: #{download_url}")
 
-        tmp_file = Tempfile.new
+        tmp_file = Tempfile.new('nels-download-')
         URI.open(download_url) do |stream|
           File.open(tmp_file.path, 'wb') do |file|
             file.write(stream.read)

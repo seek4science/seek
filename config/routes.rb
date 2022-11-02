@@ -462,6 +462,7 @@ SEEK::Application.routes.draw do
       post :add_metadata
       post :upload_file
       get :download_file
+      get :fetch_file
     end
   end
   # to be removed as STI does not work in too many places

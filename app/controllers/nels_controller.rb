@@ -87,9 +87,21 @@ class NelsController < ApplicationController
   end
 
   def download_file
-    file_name, file_path = @rest_client.download_file(params[:project_id].to_i, params[:dataset_id].to_i,
-                                                      params[:subtype_name], '', params[:filename])
-    send_file file_path, filename: file_name, disposition: 'attachment'
+    filename, path = @rest_client.download_file(params[:project_id].to_i, params[:dataset_id].to_i,
+                                                       params[:subtype_name], '', params[:filename])
+
+    respond_to do |format|
+      format.json { render json:{filename: filename, file_path: path} }
+    end
+  end
+
+  def fetch_file
+    filename = params[:filename]
+    path = params[:file_path]
+
+    raise Nels::Rest::Client::FetchFileError.new('invalid location') unless path.start_with?('/tmp/nels-download-')
+    raise Nels::Rest::Client::FetchFileError.new('temp copy of file doesnt exist') unless File.exist?(path)
+    send_file path, filename: filename, disposition: 'attachment'
   end
 
   def projects

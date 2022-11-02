@@ -1,4 +1,3 @@
-<i>Non Working prototype, links not working!!</i>
 <p><% @file_list -%></p>
 <h2>You are at:</h2>
 
@@ -43,7 +42,7 @@ table, th, td {
     </tr>
   </thead>
   <tbody>
-    <% @file_list.each do |file_item| %>
+    <% @file_list.each_with_index do |file_item, index| %>
       <% next if file_item['isFolder'] %>
       <tr>
         <td>
@@ -51,11 +50,7 @@ table, th, td {
             <%= file_item["name"] %>
           </span>
           <span style="float: right;">
-            <%= icon_link_to('', 'download',
-                             {
-                              action: :download_file,project_id: @project_id, dataset_id: @dataset_id, subtype_name: @subtype, path: file_item["path"], filename: file_item['name']
-                             },
-                             method: :get) %>
+            <%= icon_link_to('', 'download','#',{ class:'nels-download-link','data-index':index }) %>
           </span>
         </td>
         <td><%= number_to_human_size(file_item["size"]) %></td>
@@ -79,7 +74,10 @@ table, th, td {
   <% end %>
 <% end %>
 
+<%= content_tag(:script, nels_file_details_json(@file_list, @subtype).to_json.html_safe, type: 'application/json', id: 'file-items-json') %>
+
 <script type="text/javascript">
+
   function updateFolderList(path){
       $j('#nels-dataset').html('').spinner('add').show();
       $j.ajax({ url: '<%= subtype_nels_path(:assay_id=>params[:assay_id]) -%>',
@@ -122,5 +120,37 @@ table, th, td {
       $j('#upload-file form').append(`<input type="hidden" name="file_path" value="<%= @path %>" />`);
       return false;
     });
+
+      $j('.nels-download-link').on('click', function () {
+          var index = $j(this).data('index');
+          var json = JSON.parse($j('#file-items-json').html());
+          json = json[index];
+          var element = $j(this)
+          element.spinner('add');
+          $j.ajax({
+              url: '<%= download_file_nels_path() %>',
+              data: {
+                  project_id: json['project_id'],
+                  dataset_id: json['dataset_id'],
+                  subtype_name: json['subtype_name'],
+                  path: json['path'],
+                  filename: json['filename']
+              },
+              success: function (data) {
+
+                  let download_url = `<%= fetch_file_nels_path %>`;
+                  download_url = download_url + '?' + $j.param(data)
+                  const a = document.createElement('a');
+                  a.style.display = 'none';
+                  a.href = download_url;
+                  a.download = data['filename'];
+                  document.body.appendChild(a);
+                  a.click();
+                  document.body.removeChild(a);
+                  element.spinner('remove');
+
+              }
+          });
+      });
   });
 </script>

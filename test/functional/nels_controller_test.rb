@@ -154,9 +154,12 @@ class NelsControllerTest < ActionController::TestCase
 
     VCR.use_cassette('nels/download_file') do
       get :download_file,
-          params: { dataset_id: dataset_id, project_id: project_id, subtype_name: subtype, filename: 'pegion.png' }
+          params: { dataset_id: dataset_id, project_id: project_id, subtype_name: subtype, filename: 'pegion.png' },
+          format: :json
       assert_response :success
-      assert_equal 94_353, @response.body.length
+      json = JSON.parse(@response.body)
+      assert_equal 'pegion.png',json['filename']
+      assert json['file_path'].start_with?('/tmp/nels-download-')
     end
   end
 

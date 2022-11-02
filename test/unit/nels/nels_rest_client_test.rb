@@ -78,6 +78,7 @@ class NelsRestClientTest < ActiveSupport::TestCase
     end
 
     assert_equal 'pegion.png', filename
+    assert path.start_with?('/tmp/nels-download-')
     assert File.exist?(path)
     File.delete(path)
   end
