@@ -1,7 +1,10 @@
 name: ansible-install
 run-name: ${{ github.actor }} is testing Ansible install
 on:
+  branches:
+    - ansible
   workflow_dispatch:
+
 jobs:
   install-seek-from-ansible:
     runs-on: ${{matrix.os}}
