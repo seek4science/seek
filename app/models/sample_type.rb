@@ -116,16 +116,13 @@ class SampleType < ApplicationRecord
       end.nil?
   end
 
-  def can_view?(user = User.current_user, referring_sample = nil)
-    return false if Seek::Config.project_single_page_advanced_enabled && !template_id.nil?
+  def can_view?(user = User.current_user, referring_sample = nil, view_in_single_page = false)
+    return false if Seek::Config.project_single_page_advanced_enabled && template_id.present? && !view_in_single_page
 
-    can_view_in_single_page?(user, referring_sample)
-  end
-
-  def can_view_in_single_page?(user = User.current_user, referring_sample = nil)
     project_membership = user&.person && (user.person.projects & projects).any?
     project_membership || public_samples? || check_referring_sample_permission(user, referring_sample)
   end
+
 
   def editing_constraints
     Seek::Samples::SampleTypeEditingConstraints.new(self)
