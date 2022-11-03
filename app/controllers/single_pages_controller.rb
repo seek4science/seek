@@ -7,7 +7,7 @@ class SinglePagesController < ApplicationController
   before_action :project_single_page_enabled?
   before_action :find_authorized_investigation, only: :export_isa
   before_action :check_user_logged_in,
-                only: %i[batch_sharing_permission_preview batch_change_permssion_for_selected_items]
+                only: %i[batch_sharing_permission_preview batch_change_permission_for_selected_items]
   respond_to :html, :js
 
   def show
