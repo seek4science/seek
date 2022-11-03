@@ -1,13 +1,23 @@
+
+<% return unless data_file.can_manage? %>
+<% return if data_file.sample_persistence_task&.success? || data_file.sample_persistence_task&.in_progress?  %>
 <% task =  data_file.sample_extraction_task %>
 <% return unless task&.persisted? %>
 
 <% job_status ||= task.status %>
 <% in_progress = task.in_progress? %>
-<% persistence_in_progress = data_file.sample_persistence_task&.in_progress? %>
+<% failed = task.failed? %>
+<% success = task.success? && Seek::Samples::Extractor.new(data_file).fetch.present? %>
+
+<%
+  alert_style = 'alert-info'
+  alert_style = 'alert-warning' if failed
+  alert_style = 'alert-success' if success
+%>
 
 <div id="sample-extraction-status">
-  <% if data_file.can_manage? && !persistence_in_progress && (in_progress || !Seek::Samples::Extractor.new(data_file).fetch.nil?) %>
-      <div class="alert alert-info" role="alert">
+  <% if in_progress || failed || success %>
+      <div class="alert <%= alert_style %>" role="alert">
         <strong>Sample extraction:</strong>
         <% if in_progress %>
             <%= job_status.to_s.humanize %>
@@ -23,7 +33,9 @@
                 );
               }, 5000);
             </script>
-        <% else %>
+        <% elsif failed %>
+          Failed. An administrator will have been notified of the problem, but you could try again.
+        <% elsif success  %>
             Waiting for confirmation
             <p>
               Please review the extracted samples by clicking the button below, and decide whether to continue or cancel
