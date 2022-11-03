@@ -13,10 +13,14 @@ class TaskJob < ApplicationJob
   end
 
   rescue_from(StandardError) do |exception|
-    task.update_attribute(:status, Task::STATUS_FAILED)
+    handle_error(exception)
   end
 
   def task
     raise 'implement me'
+  end
+
+  def handle_error(exception)
+    task.update_attribute(:status, Task::STATUS_FAILED)
   end
 end
