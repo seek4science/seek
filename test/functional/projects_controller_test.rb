@@ -2074,6 +2074,18 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test 'administer join request, message deleted' do
+    person = Factory(:project_administrator)
+    project = person.projects.first
+    login_as(person)
+
+    id = (MessageLog.last&.id || 0) + 1
+    get :administer_join_request, params:{id:project.id,message_log_id: id}
+    assert_redirected_to :root
+    refute_nil flash[:error]
+    assert_match /deleted/i, flash[:error]
+  end
+
   test 'administer join request with new institution that was since created' do
     person = Factory(:project_administrator)
     project = person.projects.first
@@ -2351,6 +2363,16 @@ class ProjectsControllerTest < ActionController::TestCase
     log = ProjectCreationMessageLog.log_request(sender:Factory(:person), programme:programme, project:project, institution:institution)
     get :administer_create_project_request, params:{message_log_id:log.id}
     assert_response :success
+  end
+
+  test 'administer create project request, message log deleted' do
+    person = Factory(:admin)
+    login_as(person)
+    id = (MessageLog.last&.id || 0) + 1
+    get :administer_create_project_request, params:{message_log_id:id}
+    assert_redirected_to :root
+    refute_nil flash[:error]
+    assert_match /deleted/i, flash[:error]
   end
 
   test 'administer create request project with institution already created' do
