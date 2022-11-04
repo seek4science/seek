@@ -11,26 +11,24 @@
       </div>
 
       <div class="col-sm-2 text-right list_item_actions">
-        <%
-           download_link = resource.download_link
-           description_for_import = resource.description
-        -%>
 
-        <%= image_tag_for_key "download", download_link, "download", {}, "Download" %>
-            <%= image_tag_for_key "import",
-                {:controller => "events",
-            :action => "new",
-            :event => {:title => resource.title,
-	    :description => description_for_import,
-	    :url => resource.url,
-	    :address => resource.address,
-	    :city => resource.city,
-	    :country => resource.country,
-	    :start_date => resource.start_date,
-	    :end_date => resource.end_date}
-            },
-            "import", {},
-            "Import" %>
+
+        <%= image_tag_for_key "visit_pubmed", resource.url, "visit", {}, "Visit" %>
+
+        <%= image_tag_for_key "import",
+                              { :controller => "events",
+                                :action => "new",
+                                :event => { :title => resource.title,
+                                            :description => resource.description,
+                                            :url => resource.url,
+                                            :address => resource.address,
+                                            :city => resource.city,
+                                            :country => resource.country,
+                                            :start_date => resource.start_date,
+                                            :end_date => resource.end_date }
+                              },
+                              "import", {},
+                              "Import" %>
       </div>
     </div>
   </div>
