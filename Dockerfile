@@ -13,12 +13,11 @@ RUN apt-get update -qq && \
 		libcurl4-gnutls-dev libmagick++-dev libpq-dev libreadline-dev \
 		libreoffice libsqlite3-dev libssl-dev libxml++2.6-dev \
 		libxslt1-dev locales default-mysql-client nginx nodejs openjdk-11-jdk-headless \
-		python3 python3-pip python3-setuptools python3-wheel python3-psutil python3.7-dev \
+		python3.7-dev python3.7-distutils python3-pip \
 		poppler-utils postgresql-client shared-mime-info sqlite3 links telnet vim-tiny zip && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
-    locale-gen en_US.UTF-8 && \
-    update-alternatives --install /usr/bin/python python /usr/bin/python3.7 1
+    locale-gen en_US.UTF-8
 
 RUN mkdir -p $APP_DIR
 RUN chown -R www-data $APP_DIR /var/www
@@ -44,7 +43,8 @@ RUN touch config/using-docker #allows us to see within SEEK we are running in a 
 
 # Python dependencies from requirements.txt
 ENV PATH="/var/www/.local/bin:$PATH"
-RUN pip3 install -r requirements.txt
+RUN python3.7 -m pip install setuptools==58
+RUN python3.7 -m pip install -r requirements.txt
 
 # SQLite Database (for asset compilation)
 RUN mkdir sqlite3-db && \

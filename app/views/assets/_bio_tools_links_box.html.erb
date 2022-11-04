@@ -1,0 +1,13 @@
+<% tools = resource.bio_tools_links %>
+<%= panel(t('tool').pluralize(tools.size), body_options: { id: 'bio-tools-box', class: 'text-center' }) do %>
+  <% tools.each_with_index do |tool, i| %>
+    <div class="bio-tools-link">
+      <%= link_to(bio_tools_url(tool), 'data-tooltip' => "Click to view #{tool.bio_tools_id} on bio.tools", target: :_blank) do %>
+        <%= tool.name %> <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+      <% end %>
+      <% unless i == tools.size - 1 %>
+        <hr class="discussion-links-divider"/>
+      <% end %>
+    </div>
+  <% end %>
+<% end %>
