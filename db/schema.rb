@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_10_21_131037) do
+ActiveRecord::Schema.define(version: 2022_11_04_140342) do
 
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
@@ -2083,6 +2083,7 @@ ActiveRecord::Schema.define(version: 2022_10_21_131037) do
     t.integer "attempts", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "exception"
     t.index ["resource_type", "resource_id"], name: "index_tasks_on_resource_type_and_resource_id"
   end
 
