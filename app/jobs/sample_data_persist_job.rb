@@ -5,7 +5,6 @@ class SampleDataPersistJob < TaskJob
 
   def perform(data_file, sample_type, assay_ids: [])
     @extractor = Seek::Samples::Extractor.new(data_file, sample_type)
-    raise 'wibble'
     Rails.logger.info('Starting to persist samples')
     time = Benchmark.measure do
       samples = extractor.persist.select(&:persisted?)
