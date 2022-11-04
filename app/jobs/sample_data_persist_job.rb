@@ -21,7 +21,7 @@ class SampleDataPersistJob < TaskJob
 
   def handle_error(exception)
     super
-    @extractor.clear
+    @extractor.clear if @extractor
   end
 
 end
