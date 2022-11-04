@@ -11,9 +11,11 @@
       </div>
 
       <div class="col-sm-2 text-right list_item_actions">
+        <%
+          tess_url = Seek::TessSearch::SearchTessAdaptor::TESS_BASE_URL + resource.self_link
+        %>
 
-
-        <%= image_tag_for_key "visit", resource.url, "visit", {}, "Visit" %>
+        <%= image_tag_for_key "visit", tess_url, "visit", {target: :_blank}, "Visit" %>
 
         <%= image_tag_for_key "import",
                               { :controller => "events",
