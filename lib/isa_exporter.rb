@@ -292,6 +292,7 @@ module IsaExporter
       end
       attributes.map do |s|
         # Check if the sample_attribute title is an ontology term
+        p "===============", "#characteristic_category/#{s.title}_#{s.id}", normalize_id("#characteristic_category/#{s.title}_#{s.id}")
         ontology = s.pid.present? ? get_ontology_details(s, s.title, false) : { termAccession: '', termSource: '' }
         {
           '@id': normalize_id("#characteristic_category/#{s.title}_#{s.id}"),
@@ -537,7 +538,7 @@ module IsaExporter
     end
 
     def normalize_id(str)
-      str.tr!(' ', '_')
+      str.tr!(' ', '_') || str
     end
 
     def get_unit
