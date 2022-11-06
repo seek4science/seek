@@ -145,6 +145,10 @@ module Seek
       @_routes ||= Rails.application.routes.url_helpers
     end
 
+    def self.python_exec(cmd)
+      "python3.7 #{cmd}"
+    end
+
     private
 
     def self.cache(name, &block)
