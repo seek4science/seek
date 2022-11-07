@@ -1,13 +1,17 @@
 
-<% return unless data_file.can_manage? %>
-<% return if data_file.sample_persistence_task&.success? || data_file.sample_persistence_task&.in_progress?  %>
-<% task =  data_file.sample_extraction_task %>
-<% return unless task&.persisted? %>
+<% return unless show_sample_extraction_status?(data_file) %>
 
-<% job_status ||= task.status %>
-<% in_progress = task.in_progress? %>
-<% failed = task.failed? %>
-<% success = task.success? && Seek::Samples::Extractor.new(data_file).fetch.present? %>
+<%
+  task = data_file.sample_extraction_task
+  job_status ||= task.status
+  in_progress = task.in_progress?
+  failed = task.failed?
+  begin
+    success = task.success? && Seek::Samples::Extractor.new(data_file).fetch.present?
+  rescue Seek::Samples::FetchException
+    success = false
+  end
+%>
 
 <%
   alert_style = 'alert-info'
