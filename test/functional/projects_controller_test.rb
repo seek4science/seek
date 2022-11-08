@@ -1981,6 +1981,36 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'request create project as admin but no programme' do
+    person = Factory(:admin)
+
+    institution = Factory(:institution)
+    login_as(person)
+    with_config_value(:managed_programme_id, nil) do
+      params = {
+        project: { title: 'The Project',description:'description',web_page:'web_page'},
+        institution: {id: institution.id}
+      }
+      assert_enqueued_emails(0) do
+        assert_difference('ProjectCreationMessageLog.count',1) do
+          with_config_value(:programmes_enabled, false) do
+            post :request_create, params: params
+          end
+        end
+      end
+      log = ProjectCreationMessageLog.last
+      assert_redirected_to administer_create_project_request_projects_path(message_log_id:log.id)
+
+      details = log.parsed_details
+      assert_equal institution.title, details.institution.title
+      assert_equal institution.id, details.institution.id
+      assert_equal institution.country, details.institution.country
+
+      assert_equal 'description', details.project.description
+      assert_equal 'The Project', details.project.title
+    end
+  end
+
   test 'request create project with new programme and institution' do
     Factory(:admin)
     person = Factory(:person_not_in_project)
