@@ -570,7 +570,7 @@ class ProjectsController < ApplicationController
         validate_error_msg << "The #{t('institution')} is invalid, #{@institution.errors.full_messages.join(', ')}"
       end
 
-      unless @programme.allows_user_projects? || Institution.can_create?
+      unless @programme&.allows_user_projects? || Institution.can_create?
         validate_error_msg << "The #{t('institution')} cannot be created, as you do not have access rights"
       end
 
