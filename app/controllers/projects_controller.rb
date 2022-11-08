@@ -217,7 +217,7 @@ class ProjectsController < ApplicationController
       flash.now[:notice]="Thank you, your request for a new #{t('project')} has been sent"
     end
 
-    if @programme&.can_associate_projects?
+    if (@programme.nil? && admin_logged_in?) || @programme&.can_associate_projects?
       redirect_to administer_create_project_request_projects_path(message_log_id: log.id)
     else
       respond_to do |format|
@@ -570,7 +570,7 @@ class ProjectsController < ApplicationController
         validate_error_msg << "The #{t('institution')} is invalid, #{@institution.errors.full_messages.join(', ')}"
       end
 
-      unless @programme.allows_user_projects? || Institution.can_create?
+      unless @programme&.allows_user_projects? || Institution.can_create?
         validate_error_msg << "The #{t('institution')} cannot be created, as you do not have access rights"
       end
 
