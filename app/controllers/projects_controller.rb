@@ -217,7 +217,7 @@ class ProjectsController < ApplicationController
       flash.now[:notice]="Thank you, your request for a new #{t('project')} has been sent"
     end
 
-    if @programme&.can_associate_projects?
+    if (@programme.nil? && admin_logged_in?) || @programme&.can_associate_projects?
       redirect_to administer_create_project_request_projects_path(message_log_id: log.id)
     else
       respond_to do |format|
@@ -570,7 +570,7 @@ class ProjectsController < ApplicationController
         validate_error_msg << "The #{t('institution')} is invalid, #{@institution.errors.full_messages.join(', ')}"
       end
 
-      unless @programme.allows_user_projects? || Institution.can_create?
+      unless @programme&.allows_user_projects? || Institution.can_create?
         validate_error_msg << "The #{t('institution')} cannot be created, as you do not have access rights"
       end
 
@@ -785,10 +785,13 @@ class ProjectsController < ApplicationController
   def validate_message_log_for_join
     @message_log = ProjectMembershipMessageLog.find_by_id(params[:message_log_id])
 
-    error_msg ||= "message log not found" unless @message_log
-    error_msg ||= ("message log doesn't match #{t('project')}" if @message_log.subject != @project)
-    error_msg ||= ("incorrect type of message log" unless @message_log.project_membership_request?)
-    error_msg ||= ("message has already been responded to" if @message_log.responded?)
+    if @message_log
+      error_msg ||= ("message log doesn't match #{t('project')}" if @message_log.subject != @project)
+      error_msg ||= ("incorrect type of message log" unless @message_log.project_membership_request?)
+      error_msg ||= ("message has already been responded to" if @message_log.responded?)
+    else
+      error_msg = "message cannot be found, it is possible it has been deleted by another administrator"
+    end
 
     if error_msg
       error(error_msg, error_msg)
@@ -798,10 +801,13 @@ class ProjectsController < ApplicationController
 
   def validate_message_log_for_create
     @message_log = ProjectCreationMessageLog.find_by_id(params[:message_log_id])
-    error_msg ||= "you do not have permission to respond to this request" unless @message_log.can_respond_project_creation_request?(current_user)
-    error_msg ||= "message log not found" unless @message_log
-    error_msg ||= ("incorrect type of message log" unless @message_log.project_creation_request?)
-    error_msg ||= ("message has already been responded to" if @message_log.responded?)
+    if @message_log
+      error_msg ||= "you do not have permission to respond to this request" unless @message_log.can_respond_project_creation_request?(current_user)
+      error_msg ||= ("incorrect type of message log" unless @message_log.project_creation_request?)
+      error_msg ||= ("message has already been responded to" if @message_log.responded?)
+    else
+      error_msg = "message cannot be found, it is possible it has been deleted by another administrator"
+    end
 
     if error_msg
       error(error_msg, error_msg)

@@ -4,7 +4,7 @@ Hi <%= @requester.name -%>,
     <% @items_and_comments.each do |item_and_comment| %>
         <% item = item_and_comment[:item] %>
         <% controller=item.class.name.underscore.pluralize -%>
-        <%= item.class.name.humanize -%>: <%= item.title -%> - <%= url_for(:action=>:show,:controller=>controller,:id=>item, :only_path => false) -%>
+        <%= item.model_name.human -%>: <%= item.title -%> - <%= url_for(:action=>:show,:controller=>controller,:id=>item, :only_path => false) -%>
 
         Comment: <%= item_and_comment[:comment].blank? ? 'No comment' : item_and_comment[:comment] %>
 

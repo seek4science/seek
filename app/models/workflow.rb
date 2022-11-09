@@ -3,6 +3,7 @@ class Workflow < ApplicationRecord
   include Seek::UploadHandling::ExamineUrl
   include Seek::BioSchema::Support
   include WorkflowExtraction
+  include HasTools
 
   belongs_to :workflow_class, optional: true
   has_filter workflow_type: Seek::Filtering::Filter.new(value_field: 'workflow_classes.key',
@@ -70,7 +71,7 @@ class Workflow < ApplicationRecord
     end
 
     def submit_to_life_monitor
-      if Seek::Config.life_monitor_enabled && extractor.has_tests? && workflow.can_download?(nil)
+      if Seek::Config.life_monitor_enabled && extractor.has_tests? && parent.can_download?(nil)
         LifeMonitorSubmissionJob.perform_later(self)
       end
     end

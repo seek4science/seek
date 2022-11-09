@@ -319,7 +319,7 @@ def create_basic_isa_project
       :study,
       investigation: @investigation,
       sample_types: [source, sample_collection],
-      sop: Factory(:sop, policy: Factory(:public_policy))
+      sops: [Factory(:sop, policy: Factory(:public_policy))]
     )
 
   Factory(

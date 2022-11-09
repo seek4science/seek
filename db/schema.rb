@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_09_07_085132) do
+ActiveRecord::Schema.define(version: 2022_10_21_131037) do
 
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
@@ -24,8 +24,8 @@ ActiveRecord::Schema.define(version: 2022_09_07_085132) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string "http_referer"
-    t.text "user_agent", size: :medium
-    t.text "data", size: :long
+    t.text "user_agent"
+    t.text "data", size: :medium
     t.string "controller_name"
     t.index ["action"], name: "act_logs_action_index"
     t.index ["activity_loggable_type", "activity_loggable_id"], name: "act_logs_act_loggable_index"
@@ -255,6 +255,16 @@ ActiveRecord::Schema.define(version: 2022_09_07_085132) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.index ["owner_type", "owner_id"], name: "index_avatars_on_owner_type_and_owner_id"
+  end
+
+  create_table "bio_tools_links", force: :cascade do |t|
+    t.string "resource_type"
+    t.bigint "resource_id"
+    t.string "bio_tools_id"
+    t.string "name"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["resource_type", "resource_id"], name: "index_bio_tools_links_on_resource"
   end
 
   create_table "bioportal_concepts", id: :integer, force: :cascade do |t|
@@ -1909,6 +1919,13 @@ ActiveRecord::Schema.define(version: 2022_09_07_085132) do
     t.index ["contributor_id"], name: "index_sops_on_contributor"
   end
 
+  create_table "sops_studies", force: :cascade do |t|
+    t.bigint "sop_id"
+    t.bigint "study_id"
+    t.index ["sop_id"], name: "index_sops_studies_on_sop_id"
+    t.index ["study_id"], name: "index_sops_studies_on_study_id"
+  end
+
   create_table "sops_workflows", id: false, force: :cascade do |t|
     t.integer "workflow_id", null: false
     t.integer "sop_id", null: false
@@ -1997,7 +2014,6 @@ ActiveRecord::Schema.define(version: 2022_09_07_085132) do
     t.text "other_creators"
     t.string "deleted_contributor"
     t.integer "position"
-    t.integer "sop_id"
   end
 
   create_table "study_auth_lookup", force: :cascade do |t|
@@ -2195,7 +2211,7 @@ ActiveRecord::Schema.define(version: 2022_09_07_085132) do
     t.index ["user_id", "can_view"], name: "index_w_auth_lookup_on_user_id_and_can_view"
   end
 
-  create_table "workflow_classes", force: :cascade do |t|
+  create_table "workflow_classes", id: :integer, force: :cascade do |t|
     t.string "title"
     t.text "description"
     t.string "key"

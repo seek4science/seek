@@ -25,6 +25,8 @@ Factory.define(:max_person, class: Person) do |f|
     p.created_publications = [Factory(:publication, contributor: p)]
     p.created_documents = [Factory(:public_document, contributor: p)]
     p.created_events = [Factory(:event, contributor: p, policy: Factory(:public_policy))]
+    p.created_collections = [Factory(:collection, contributor: p, policy: Factory(:public_policy))]
+    p.created_workflows = [Factory(:workflow, contributor: p, policy: Factory(:public_policy))]
     p.annotate_with(['golf', 'fishing'], 'expertise', p)
     p.annotate_with(['fishing rod'], 'tool', p)
     p.save!

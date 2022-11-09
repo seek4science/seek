@@ -10,8 +10,12 @@
 
 <% if resource.is_discussable? -%>
   <% if resource.discussion_links.select{|link| link.url.present?}.any?  %>
-    <%= render partial: 'assets/discussion_links_box', locals: {resource: resource } -%>
+    <%= render partial: 'assets/discussion_links_box', locals: { resource: resource } -%>
   <% end -%>
+<% end -%>
+
+<% if Seek::Config.bio_tools_enabled && resource.respond_to?(:bio_tools_links) && resource.bio_tools_links.any?  %>
+  <%= render partial: 'assets/bio_tools_links_box', locals: { resource: resource } -%>
 <% end -%>
 
 <% if resource.respond_to?(:snapshots)  %>

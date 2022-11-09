@@ -87,6 +87,14 @@ class BaseSerializer < SimpleBaseSerializer
     associated('Organism')
   end
 
+  def workflows
+    associated('Workflow')
+  end
+
+  def collections
+    associated('Collection')
+  end
+
   link(:self) { polymorphic_path(object) }
 
   # avoid dash-erizing attribute names
