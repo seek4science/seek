@@ -178,14 +178,11 @@
         name: 'setuptools<58.0.0'
         state: forcereinstall
 
-    - name: Install jupyter for python3.7
+    - name: Install SEEK's python requirements
       shell: bash -lc "{{ item }}"
       with_items:
         - python3.7 -m pip install jupyter
-
-    - name: Install SEEK's python requirements
-      ansible.builtin.pip:
-        requirements: requirements.txt
+        - python3.7 -m pip install -r requirements.txt
       args:
         chdir: '{{git_dest}}/SEEK'
 
