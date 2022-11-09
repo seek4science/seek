@@ -1,0 +1,15 @@
+$navbar-default-bg: rgba(170, 240, 107, 0.38);
+$navbar-default-border: darken($navbar-default-bg, 6.5%);
+$navbar-default-link-active-bg: darken($navbar-default-bg, 6.5%);
+$navbar-default-link-color: #2c5c15;
+$navbar-default-link-active-color: lighten($navbar-default-link-color, 30%);
+$navbar-default-link-hover-color: lighten($navbar-default-link-color, 40%);
+
+$body-bg: rgba(234, 250, 217, 0.2);
+$panel-bg: lighten($body-bg, 25%);
+$panel-default-heading-bg: darken($body-bg, 15%);
+$panel-footer-bg: $panel-default-heading-bg;
+
+.filter-category-title {
+  background: $panel-default-heading-bg;
+}
