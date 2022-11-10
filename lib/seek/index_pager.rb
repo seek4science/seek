@@ -3,7 +3,7 @@ module Seek
     extend ActiveSupport::Concern
 
     included do
-      after_action :index_fair_signposting, only: [:index]
+      after_action :index_fair_signposting, only: [:index], if: -> { controller_model.schema_org_supported? }
     end
 
     def index
@@ -164,9 +164,7 @@ module Seek
     end
 
     def index_fair_signposting
-      links = []
-      links << [request.url, { rel: :describedby, type: :jsonld }] if controller_model.schema_org_supported?
-      @fair_signposting_links = links
+      @fair_signposting_links = [[polymorphic_url(controller_model), { rel: :describedby, type: :jsonld }]]
     end
   end
 end

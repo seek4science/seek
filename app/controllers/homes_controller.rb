@@ -92,8 +92,6 @@ class HomesController < ApplicationController
   private
 
   def fair_signposting
-    links = []
-    links << [root_url, { rel: :describedby, type: :jsonld }]
-    @fair_signposting_links = links
+    @fair_signposting_links = [[root_url, { rel: :describedby, type: :jsonld }]]
   end
 end
