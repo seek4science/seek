@@ -13,12 +13,29 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       Factory :activity_log, activity_loggable: Factory(:person), action: 'create', controller_name: 'people'
     end
 
+
     expected = {
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => 'DataCatalog',
+      '@id' => 'http://fairyhub.org',
       'dct:conformsTo' => 'https://bioschemas.org/profiles/DataCatalog/0.3-RELEASE-2019_07_01/',
       'name' => 'Sysmo SEEK',
       'url' => 'http://fairyhub.org',
+      'dataset' => [
+        { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/collections', 'name' => 'Collections' },
+        { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/data_files', 'name' => 'Data files' },
+        { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/documents', 'name' => 'Documents' },
+        { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/events', 'name' => 'Events' },
+        { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/human_diseases', 'name' => 'Human diseases' },
+        { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/institutions', 'name' => 'Institutions' },
+        { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/organisms', 'name' => 'Organisms' },
+        { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/people', 'name' => 'People' },
+        { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/presentations', 'name' => 'Presentations' },
+        { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/programmes', 'name' => 'Programmes' },
+        { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/projects', 'name' => 'Projects' },
+        { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/samples', 'name' => 'Samples' },
+        { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/workflows', 'name' => 'Workflows' }
+      ],
       'description' => 'a lovely project',
       'keywords' => 'a, b, c, d',
       'provider' => {

@@ -39,9 +39,9 @@ module Seek
         Seek::Util.routes.root_url.chomp('/')
       end
 
-      def data_dumps
+      def datasets
         Seek::Util.searchable_types.select(&:schema_org_supported?).map do |t|
-          Seek::BioSchema::DataDump.new(t.model_name.plural, t.authorized_for('view', nil))
+          Dataset.new(t)
         end
       end
 

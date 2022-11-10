@@ -3,8 +3,6 @@ module Seek
     class DataDump
       include Seek::BioSchema::Support
 
-      CONTENT_LICENSE = 'CC-BY-4.0'
-
       attr_reader :name
 
       def initialize(name, records)
@@ -14,9 +12,12 @@ module Seek
       end
 
       def file
-        unless File.exist?(file_path)
-          clear_old_dumps
-          f = File.open(file_path, 'w')
+        File.open(file_path, 'r')
+      end
+
+      def write
+        FileUtils.mkdir_p(file_path_base)
+        File.atomic_write(file_path) do |f|
           f.write("[\n")
           first = true
           # Write each record at a time to avoid loading entire set into memory
@@ -28,55 +29,54 @@ module Seek
             first = false
           end
           f.write("\n]")
-          f.close
         end
-
-        File.open(file_path, 'r')
       end
 
       def dump
         if block_given?
-          @records.find_each do |record|
+          @records.each do |record|
             yield Seek::BioSchema::Serializer.new(record).json_representation
           end
         else
-          @records.find_each.map { |record| Seek::BioSchema::Serializer.new(record).json_representation }
+          @records.each.map { |record| Seek::BioSchema::Serializer.new(record).json_representation }
         end
       end
 
-      def file_name(date = date_stamp)
-        "#{@name}-bioschemas-dump-#{date}.json"
+      def file_name
+        "#{@name}-bioschemas-dump.json"
       end
 
-      # Bioschemas compatibility
-      def license
-        Seek::License.find(CONTENT_LICENSE)&.url
+      def exists?
+        File.exist?(file_path)
       end
 
-      def schema_org_supported?
-        true
+      def size
+        File.size(file_path)
       end
 
-      def is_a_version?
-        false
+      def date_modified
+        File.mtime(file_path)
+      end
+
+      def download_path
+        File.join('data_dumps', file_name)
+      end
+
+      def self.generate_dumps
+        Seek::Util.searchable_types.select(&:schema_org_supported?).map do |model|
+          generate_dump(model)
+        end
+      end
+
+      def self.generate_dump(model)
+        dump = new(model.model_name.plural, model.authorized_for('view', nil))
+        dump.write
       end
 
       private
 
-      def date_stamp
-        Time.now.iso8601.first(10)
-      end
-
-      def clear_old_dumps
-        Dir.glob(file_path("*")).each do |file|
-          next if file == file_path
-          puts 'delete'
-          File.delete(file)
-        end
-      end
-
-      def file_path(date = date_stamp)
-        "#{file_path_base}#{file_name(date)}"
+      def file_path
+        File.join(file_path_base, file_name)
       end
 
       def file_path_base

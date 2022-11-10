@@ -24,6 +24,7 @@ module Seek
         def decorator_class(type)
           type_name = type.name
           type_name = 'DataCatalog' if type == Seek::BioSchema::DataCatalogMockModel
+          type_name = 'Dataset' if type == Seek::BioSchema::Dataset
           @decorator_classes[type] ||
             @decorator_classes[type] = "Seek::BioSchema::ResourceDecorators::#{type_name}".constantize
         end
