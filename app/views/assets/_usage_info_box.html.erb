@@ -22,6 +22,11 @@
       <p>
         <strong>Last updated</strong>: <%= date_as_string(resource.updated_at, true) -%>
       </p>
+      <% unless ActivityLog.where(activity_loggable:resource, action:'update').last.culprit.nil? -%>
+        <p>
+          <strong>Last updated by</strong>: <%= ActivityLog.where(activity_loggable:resource, action:'update').last.culprit.person.name -%>
+        </p>
+      <% end -%>
     <% end -%>
 
     <% unless @last_used_before_now.blank? -%>
