@@ -24,7 +24,10 @@ class SamplesControllerTest < ActionController::TestCase
     Factory(:sample, policy: Factory(:public_policy))
     get :index
     assert_response :success
-    assert_select '#samples-table table', count: 0
+    assert_select 'div.index-filters'
+    assert_select 'div.index-content' do
+      assert_select 'div.list_item', count: 1
+    end
   end
 
   test 'new without sample type id' do
