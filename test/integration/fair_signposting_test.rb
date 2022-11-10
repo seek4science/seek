@@ -106,11 +106,34 @@ class FairSignpostingTest < ActionDispatch::IntegrationTest
   end
 
   test 'fair signposting for home' do
-    doi_citation_mock
-    p = Factory(:presentation)
-    login_as(p.contributor.user)
-
     get root_path(p)
+
+    assert_response :success
+    links = parse_link_header
+    assert_equal 1, links.size
+    assert_link(links, root_url, rel: 'describedby', type: :jsonld)
+  end
+
+  test 'fair signposting for index page' do
+    assert Workflow.schema_org_supported?
+    get workflows_path
+
+    assert_response :success
+    links = parse_link_header
+    assert_equal 1, links.size
+    assert_link(links, workflows_url, rel: 'describedby', type: :jsonld)
+  end
+
+  test 'fair signposting for index page that does not support bioschemas' do
+    refute FileTemplate.schema_org_supported?
+    get file_templates_path
+
+    assert_response :success
+    assert_nil response.headers['Link'], 'Should not have any signposting links'
+  end
+
+  test 'fair signposting for privacy page' do
+    get privacy_home_path(p)
 
     assert_response :success
     assert_nil response.headers['Link'], 'Should not have any signposting links'
