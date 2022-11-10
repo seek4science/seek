@@ -5,10 +5,9 @@ module Seek
 
       attr_reader :name
 
-      def initialize(name, records)
-        raise "Name too short!" if name.length < 3
-        @name = name
-        @records = records
+      def initialize(model, name: nil, records: nil)
+        @name = name || model.model_name.plural
+        @records = records || model.authorized_for('view', nil)
       end
 
       def file
@@ -21,7 +20,7 @@ module Seek
           f.write("[\n")
           first = true
           # Write each record at a time to avoid loading entire set into memory
-          dump do |record|
+          bioschemas do |record|
             f.write(",\n") unless first
             JSON.pretty_generate(record).each_line do |line|
               f.write('  ', line) # Indent 2 spaces
@@ -32,7 +31,7 @@ module Seek
         end
       end
 
-      def dump
+      def bioschemas
         if block_given?
           @records.each do |record|
             yield Seek::BioSchema::Serializer.new(record).json_representation
@@ -58,10 +57,6 @@ module Seek
         File.mtime(file_path)
       end
 
-      def download_path
-        File.join('data_dumps', file_name)
-      end
-
       def self.generate_dumps
         Seek::Util.searchable_types.select(&:schema_org_supported?).map do |model|
           generate_dump(model)
@@ -69,8 +64,9 @@ module Seek
       end
 
       def self.generate_dump(model)
-        dump = new(model.model_name.plural, model.authorized_for('view', nil))
+        dump = new(model)
         dump.write
+        dump
       end
 
       private

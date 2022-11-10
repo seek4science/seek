@@ -10,7 +10,7 @@ module Seek
 
       class_methods do
         def public_schema_ld_dump
-          Seek::BioSchema::DataDump.new(model_name.plural, authorized_for('view', nil))
+          Seek::BioSchema::DataDump.new(self)
         end
       end
     end
