@@ -175,13 +175,12 @@
 
     - name: Force-reinstall setuptools<58.0
       ansible.builtin.pip:
-        name: 'setuptools<58.0.0'
+        name: 'setuptools==58.0.0'
         state: forcereinstall
 
     - name: Install SEEK's python requirements
       shell: bash -lc "{{ item }}"
       with_items:
-        - python3.7 -m pip install jupyter
         - python3.7 -m pip install -r requirements.txt
       args:
         chdir: '{{git_dest}}/SEEK'
