@@ -24,7 +24,7 @@ module Seek
               "encodingFormat": "application/ld+json",
               'name': dump.file_name,
               'description': "A collection of public #{title} in #{Seek::Config.instance_name}, serialized as an array of JSON-LD objects conforming to Bioschemas profiles.",
-              'dateModified': dump.date_modified
+              'dateModified': dump.date_modified.iso8601
             }
           end
         end
