@@ -39,6 +39,11 @@ module Seek
         supported_types.include?(resource.class)
       end
 
+      # Check if a class is supported
+      def self.supported_type?(klass)
+        supported_types.include?(klass)
+      end
+
       def self.supported_types
         SUPPORTED_TYPES
       end
@@ -57,13 +62,7 @@ module Seek
       end
 
       def attributes_json
-        result = {}
-        resource_decorator.attributes.each do |attr|
-          if (value = attr.invoke(resource_decorator))
-            result[attr.property.to_s] = value
-          end
-        end
-        result
+        resource_decorator.attributes_json
       end
     end
   end

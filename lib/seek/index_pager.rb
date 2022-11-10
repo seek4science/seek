@@ -12,6 +12,12 @@ module Seek
                      api_version: ActiveModel::Serializer.config.api_version
                  }
         end
+        format.jsonld do
+          if controller_model.schema_org_supported?
+            dump = Seek::BioSchema::DataDump.new(controller_name, controller_model.authorized_for('view', nil))
+            send_file dump.file
+          end
+        end
       end
     end
 

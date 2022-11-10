@@ -13,4 +13,8 @@ ActiveRecord::Base.class_eval do
   def schema_org_supported?
     Seek::BioSchema::Serializer.supported?(self)
   end
+
+  def self.schema_org_supported?
+    Seek::BioSchema::Serializer.supported_type?(self)
+  end
 end
