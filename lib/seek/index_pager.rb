@@ -1,5 +1,11 @@
 module Seek
   module IndexPager
+    extend ActiveSupport::Concern
+
+    included do
+      after_action :index_fair_signposting, only: [:index]
+    end
+
     def index
       respond_to do |format|
         format.html
@@ -18,8 +24,8 @@ module Seek
               dump = controller_model.public_schema_ld_dump
               send_file dump.file
             else
-              dataset = Seek::BioSchema::Dataset.new(controller_model)
-              render json: Seek::BioSchema::Serializer.new(dataset).json_representation, adapter: :attributes
+              resource = determine_resource_for_schema_ld
+              render json: Seek::BioSchema::Serializer.new(resource).json_representation, adapter: :attributes
             end
           end
         end
@@ -155,6 +161,12 @@ module Seek
       t = Time.now
       block.call
       Rails.logger.debug("#{message} (#{((Time.now - t) * 1000.0).round(1)}ms)")
+    end
+
+    def index_fair_signposting
+      links = []
+      links << [request.url, { rel: :describedby, type: :jsonld }] if controller_model.schema_org_supported?
+      @fair_signposting_links = links
     end
   end
 end
