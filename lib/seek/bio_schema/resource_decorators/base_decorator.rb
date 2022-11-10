@@ -6,6 +6,7 @@ module Seek
       # for Schema.org (Bioschemas.org)
       class BaseDecorator
         include ActionView::Helpers::SanitizeHelper
+        include ActionView::Helpers::AssetUrlHelper
         include Seek::Util.routes
 
         attr_reader :resource
@@ -58,6 +59,10 @@ module Seek
             '@id': identifier,
             'name': sanitize(title)
           }
+        end
+
+        def reference
+          { '@id': identifier.to_s }
         end
 
         def resource_url(resource, opts = {})
