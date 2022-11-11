@@ -270,8 +270,13 @@ if File.expand_path(Seek::Config.filestore_path).start_with?(File.expand_path(Fi
 end
 
 class ActionController::TestCase
+  def self._get_base_host
+    # Cache host_with_port in a variable to avoid adding lots of overhead to each test
+    @host_with_port ||= Seek::Config.host_with_port
+  end
+
   # Ensure the Host in requests is the configured host from the settings instead of the default "test.host"
   setup do
-    request.host = Seek::Config.site_base_host
+    request.host = self.class._get_base_host
   end
 end
