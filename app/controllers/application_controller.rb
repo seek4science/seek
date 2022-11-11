@@ -136,20 +136,6 @@ class ApplicationController < ActionController::Base
     @user_content_actions ||= (superclass.respond_to?(:user_content_actions) ? superclass.user_content_actions.dup : []) + actions.map(&:to_sym)
   end
 
-  def determine_resource_for_schema_ld
-    if action_name == 'index'
-      if controller_name == 'homes'
-        Seek::BioSchema::DataCatalogMockModel.new
-      elsif controller_model&.schema_org_supported?
-        Seek::BioSchema::Dataset.new(controller_model)
-      end
-    elsif action_name == 'show'
-      versioned_resource_for_controller || resource_for_controller
-    end
-  end
-
-  helper_method :determine_resource_for_schema_ld
-
   private
 
   def project_membership_required
