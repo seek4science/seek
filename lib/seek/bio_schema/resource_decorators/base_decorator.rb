@@ -25,16 +25,6 @@ module Seek
           end
         end
 
-        def attributes_json
-          result = {}
-          attributes.each do |attr|
-            if (value = attr.invoke(self))
-              result[attr.property.to_s] = value
-            end
-          end
-          result
-        end
-
         # The @context to be used for the JSON-LD
         def context
           Seek::BioSchema::Serializer::SCHEMA_ORG
@@ -69,7 +59,7 @@ module Seek
           strip_version = opts.delete(:strip_version)
           opts.reverse_merge!(Seek::Config.site_url_options)
           resource = Array(resource).map do |r|
-            if r.is_a_version?
+            if r.respond_to?(:is_a_version?) && r.is_a_version?
               opts[:version] = r.version unless strip_version
               r.parent
             else

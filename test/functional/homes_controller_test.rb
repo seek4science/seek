@@ -19,11 +19,14 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test 'rdf and json not acceptable' do
+    # This does not raise an exception because it is caught by the `rdf_enabled?` before_action
     get :index, format: :rdf
     assert_response :not_acceptable
 
-    get :index, format: :json
-    assert_response :not_acceptable
+    # This raises an exception due to no `format.json`
+    assert_raises(ActionController::UnknownFormat) do
+      get :index, format: :json
+    end
   end
 
   test 'test title' do
@@ -669,6 +672,15 @@ class HomesControllerTest < ActionController::TestCase
     assert_select 'div#ft a[href=?]', 'http://external_contact.com', count:1
     assert_select 'div#ft a[href=?]', 'http://external_funding.com', count:1
 
+  end
+
+  test 'get dataset jsonld from index' do
+    get :index, format: :jsonld
+    assert_response :success
+    assert_equal 'application/ld+json; charset=utf-8', response.headers['Content-Type']
+    res = JSON.parse(response.body)
+    assert_equal 'DataCatalog', res['@type']
+    assert_equal 'http://localhost:3000', res['@id']
   end
 
   def uri_to_guardian_feedtest

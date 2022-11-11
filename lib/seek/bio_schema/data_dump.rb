@@ -50,11 +50,11 @@ module Seek
       end
 
       def size
-        File.size(file_path)
+        File.size(file_path) if exists?
       end
 
       def date_modified
-        File.mtime(file_path)
+        File.mtime(file_path) if exists?
       end
 
       def self.generate_dumps

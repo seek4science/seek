@@ -1599,4 +1599,36 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_redirected_to login_path
     assert flash[:error].include?('need to be logged in')
   end
+
+  test 'get dataset jsonld from index' do
+    get :index, format: :jsonld
+    assert_response :success
+    assert_equal 'application/ld+json; charset=utf-8', response.headers['Content-Type']
+    res = JSON.parse(response.body)
+    assert_equal 'Dataset', res['@type']
+    assert_equal workflows_url, res['@id']
+  end
+
+  test 'get bioschemas dump' do
+    workflow = Factory(:public_workflow, title: 'Analysis of bananas')
+    dump = Workflow.public_schema_ld_dump
+    dump.write
+    assert dump.exists?
+
+    get :index, params: { dump: true }, format: :jsonld
+
+    assert_response :success
+    # Charset does not get set when using send_file( ... type: :jsonld), not sure why!
+    assert_equal 'application/ld+json', response.headers['Content-Type']
+    res = JSON.parse(response.body)
+    assert_equal Workflow.authorized_for('view', nil).length, res.length
+    wf = res.detect { |r| r['name'] == 'Analysis of bananas' }
+    assert_equal workflow_url(workflow), wf['@id']
+  end
+
+  test 'throw error on trying to get non-existing bioschemas dump' do
+    refute Workflow.public_schema_ld_dump.exists?
+    get :index, params: { dump: true }, format: :jsonld
+    assert_response :not_found
+  end
 end

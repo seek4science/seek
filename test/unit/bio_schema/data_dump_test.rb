@@ -92,6 +92,15 @@ class DataDumpTest < ActiveSupport::TestCase
     assert_in_delta Time.now, dump.date_modified, 60
   end
 
+  test 'can read dump metadata even if file does not yet exist' do
+    dump = create_workflow_dump
+
+    assert_equal 'workflows-bioschemas-dump.json', dump.file_name
+    refute dump.exists?
+    assert_nil dump.size
+    assert_nil dump.date_modified
+  end
+
   test 'can generate dumps for all types' do
     Seek::Util.clear_cached
     types = Seek::Util.searchable_types.select(&:schema_org_supported?)

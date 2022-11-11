@@ -10,8 +10,8 @@ module Seek
 
         DATASET_PROFILE = 'https://bioschemas.org/profiles/Dataset/0.3-RELEASE-2019_06_14/'.freeze
 
-        def resource_url(resource, opts = {})
-          polymorphic_url(resource.model, opts)
+        def resource_url(r, opts = {})
+          super(r.model, opts) # For some reason delegation doesn't work here, so have to call `model` explicitly.
         end
 
         def distribution
@@ -20,7 +20,7 @@ module Seek
             {
               '@type': 'DataDownload',
               'contentSize': number_to_human_size(dump.size),
-              'contentUrl': polymorphic_url(resource.model, dump: true, format: :jsonld),
+              'contentUrl': resource_url(resource, dump: true, format: :jsonld),
               "encodingFormat": "application/ld+json",
               'name': dump.file_name,
               'description': "A collection of public #{title} in #{Seek::Config.instance_name}, serialized as an array of JSON-LD objects conforming to Bioschemas profiles.",

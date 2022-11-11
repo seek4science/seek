@@ -6,12 +6,9 @@ class HomesController < ApplicationController
   before_action :redirect_to_create_or_join_if_no_member, only: %i[index]
   after_action :fair_signposting, only: [:index]
 
-  respond_to :html, only: [:index]
-
   def index
-    respond_with do |format|
+    respond_to do |format|
       format.html
-      format.json { render status: :not_acceptable }
       format.jsonld do
         resource = determine_resource_for_schema_ld
         render json: Seek::BioSchema::Serializer.new(resource).json_representation, adapter: :attributes

@@ -4,7 +4,7 @@ module FairSignposting
   RO_CRATE_PROFILE='https://w3id.org/ro/crate'
 
   included do
-    after_action :generate_fair_signposting_header
+    after_action :generate_fair_signposting_header, if: -> { @fair_signposting_links&.any? }
   end
 
   private
@@ -37,16 +37,14 @@ module FairSignposting
   end
 
   def generate_fair_signposting_header
-    if @fair_signposting_links&.any?
-      h = @fair_signposting_links.map do |url, props|
-        s = "<#{url}>"
-        props.each do |k, v|
-          v = Mime::Type.lookup_by_extension(v).to_str if k == :type && v.is_a?(Symbol)
-          s << " ; #{k}=\"#{v}\""
-        end
-        s
-      end.join(', ')
-      response.set_header('Link', h)
-    end
+    h = @fair_signposting_links.map do |url, props|
+      s = "<#{url}>"
+      props.each do |k, v|
+        v = Mime::Type.lookup_by_extension(v).to_str if k == :type && v.is_a?(Symbol)
+        s << " ; #{k}=\"#{v}\""
+      end
+      s
+    end.join(', ')
+    response.set_header('Link', h)
   end
 end
