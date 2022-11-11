@@ -176,6 +176,6 @@ class ApplicationRecord < ActiveRecord::Base
   end
 
   def updated_last_by
-    ActivityLog.where(activity_loggable:self, action:'update').last&.culprit
+    ActivityLog.where(activity_loggable:self, action:'update').last&.culprit&.person
   end
 end
