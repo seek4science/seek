@@ -125,28 +125,28 @@ class SessionsControllerTest < ActionController::TestCase
 
   test 'should redirect to root after logging out from the search result page' do
     login_as :quentin
-    @request.env['HTTP_REFERER'] = 'http://test.host/search/'
+    @request.env['HTTP_REFERER'] = search_url
     get :destroy
     assert_redirected_to :root
   end
 
   test 'should redirect to back after logging out from the page excepting search result page' do
     login_as :quentin
-    @request.env['HTTP_REFERER'] = 'http://test.host/data_files/'
+    @request.env['HTTP_REFERER'] = data_files_url
     get :destroy
-    assert_redirected_to 'http://test.host/data_files/'
+    assert_redirected_to data_files_url
   end
 
   test 'should redirect to root after logging in from the search result page' do
-    @request.env['HTTP_REFERER'] = 'http://test.host/search'
+    @request.env['HTTP_REFERER'] = search_url
     post :create, params: { login: 'quentin', password: 'test' }
     assert_redirected_to :root
   end
 
   test 'should redirect to back after logging in from the page excepting search result page' do
-    @request.env['HTTP_REFERER'] = 'http://test.host/data_files/'
+    @request.env['HTTP_REFERER'] = data_files_url
     post :create, params: { login: 'quentin', password: 'test' }
-    assert_redirected_to 'http://test.host/data_files/'
+    assert_redirected_to data_files_url
   end
 
   test 'should redirect to given path' do
@@ -161,7 +161,7 @@ class SessionsControllerTest < ActionController::TestCase
     assert session[:user_id]
 
     assert_not_includes @response.location, 'not.our.domain'
-    assert_includes @response.location, 'test.host'
+    assert_includes @response.location, Seek::Config.site_base_host
   end
 
   test 'should have only seek login' do
