@@ -175,4 +175,7 @@ class ApplicationRecord < ActiveRecord::Base
     "rli_title_#{cache_key}"
   end
 
+  def updated_last_by
+    ActivityLog.where(activity_loggable:self, action:'update').last&.culprit
+  end
 end
