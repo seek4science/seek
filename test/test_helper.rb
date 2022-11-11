@@ -268,3 +268,10 @@ WebMock.disable_net_connect!(allow_localhost: true) # Need to comment this line 
 if File.expand_path(Seek::Config.filestore_path).start_with?(File.expand_path(File.join(Rails.root, 'tmp')))
   FileUtils.rm_r(Seek::Config.filestore_path)
 end
+
+class ActionController::TestCase
+  # Ensure the Host in requests is the configured host from the settings instead of the default "test.host"
+  setup do
+    request.host = Seek::Config.site_base_host
+  end
+end
