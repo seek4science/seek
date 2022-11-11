@@ -62,7 +62,13 @@ module Seek
       end
 
       def attributes_json
-        resource_decorator.attributes_json
+        result = {}
+        resource_decorator.attributes.each do |attr|
+          if (value = attr.invoke(resource_decorator))
+            result[attr.property.to_s] = value
+          end
+        end
+        result
       end
     end
   end

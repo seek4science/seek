@@ -22,7 +22,11 @@ module Seek
           format.jsonld do
             if params[:dump]
               dump = controller_model.public_schema_ld_dump
-              send_file dump.file
+              if dump.exists?
+                send_file(dump.file, type: :jsonld)
+              else
+                head :not_found
+              end
             else
               resource = determine_resource_for_schema_ld
               render json: Seek::BioSchema::Serializer.new(resource).json_representation, adapter: :attributes
