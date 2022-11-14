@@ -6,7 +6,6 @@ module Seek
       # for Schema.org (Bioschemas.org)
       class BaseDecorator
         include ActionView::Helpers::SanitizeHelper
-        include ActionView::Helpers::AssetUrlHelper
         include Seek::Util.routes
 
         attr_reader :resource

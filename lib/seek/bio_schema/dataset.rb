@@ -3,7 +3,7 @@ module Seek
     class Dataset
       include Seek::BioSchema::Support
 
-      CONTENT_LICENSE = 'CC-BY-4.0'
+      CONTENT_LICENSE = 'CC-BY-4.0' # TODO: This needs to be configurable per-instance!
 
       delegate_missing_to :@model
       attr_reader :model
