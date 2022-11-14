@@ -212,7 +212,9 @@ module WorkflowExtraction
 
   def ro_crate_zip
     ro_crate do |crate|
-      ROCrate::Writer.new(crate).write_zip(ro_crate_path)
+      path = ro_crate_path
+      File.delete(path) if File.exist?(path)
+      ROCrate::Writer.new(crate).write_zip(path)
     end
 
     ro_crate_path

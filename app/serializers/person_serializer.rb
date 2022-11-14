@@ -31,4 +31,6 @@ class PersonSerializer < AvatarObjSerializer
   has_many :presentations
   has_many :events
   has_many :documents
+  has_many :workflows
+  has_many :collections
 end

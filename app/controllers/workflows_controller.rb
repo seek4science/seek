@@ -347,6 +347,7 @@ class WorkflowsController < ApplicationController
                                                                 :git_repository_id, :main_workflow_path,
                                                                 :abstract_cwl_path, :diagram_path, :remote,
                                                                 { remote_sources: {} }] }, :is_git_versioned,
+                                     { tools_attributes: [:bio_tools_id, :name] },
                                       *creator_related_params)
   end
 

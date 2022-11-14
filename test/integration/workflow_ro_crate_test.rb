@@ -73,4 +73,44 @@ class WorkflowRoCrateTest < ActionDispatch::IntegrationTest
       end
     end
   end
+
+  test 'generate Workflow RO-Crate when RO-Crate was previously generated' do
+    git_version = Factory(:remote_git_version)
+    git_version = Workflow::Git::Version.find(git_version.id)
+    assert_nothing_raised do
+      refute File.exist?(git_version.send(:ro_crate_path))
+      git_version.ro_crate_zip
+      assert File.exist?(git_version.send(:ro_crate_path))
+      zip = git_version.ro_crate_zip
+
+      Zip::File.open(zip) do |zipfile|
+        assert zipfile.find_entry('README.md')
+        assert zipfile.find_entry('concat_two_files.ga')
+        assert zipfile.find_entry('ro-crate-metadata.json')
+        assert zipfile.find_entry('ro-crate-preview.html')
+      end
+    end
+  end
+
+  test 'generate Workflow RO-Crate containing symlink when it was previously generated' do
+    git_version = Factory(:remote_git_version, ref: 'refs/remotes/heads/symlink',
+                          commit: '728337a507db00b8b8ba9979330a4f53d6d43b18')
+    git_version = Workflow::Git::Version.find(git_version.id)
+    assert_nothing_raised do
+      refute File.exist?(git_version.send(:ro_crate_path))
+      git_version.ro_crate_zip
+      assert File.exist?(git_version.send(:ro_crate_path))
+      zip = git_version.ro_crate_zip
+
+      Zip::File.open(zip) do |zipfile|
+        assert zipfile.find_entry('LICENSE')
+        assert zipfile.find_entry('README.md')
+        assert zipfile.find_entry('concat_two_files.ga')
+        assert zipfile.find_entry('images/workflow-diagram.png').symlink?
+        refute zipfile.find_entry('diagram.png').symlink?
+        assert zipfile.find_entry('ro-crate-metadata.json')
+        assert zipfile.find_entry('ro-crate-preview.html')
+      end
+    end
+  end
 end

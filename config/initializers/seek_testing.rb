@@ -140,5 +140,6 @@ def load_seek_testing_defaults!
       Settings.defaults[:life_monitor_client_secret] = 'Ne1kK6NljWRayqzDfgMWBfVplkRGZto6MCjdfhK1jY7r8RVp'
       Settings.defaults[:git_support_enabled] = true
       Settings.defaults[:fair_signposting_enabled] = true
+      Settings.defaults[:bio_tools_enabled] = true
     end
 end
