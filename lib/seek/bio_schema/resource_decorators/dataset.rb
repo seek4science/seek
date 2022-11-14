@@ -7,7 +7,6 @@ module Seek
         schema_mappings distribution: :distribution,
                         data_catalog: :includedInDataCatalog
 
-
         DATASET_PROFILE = 'https://bioschemas.org/profiles/Dataset/0.3-RELEASE-2019_06_14/'.freeze
 
         def resource_url(r, opts = {})
