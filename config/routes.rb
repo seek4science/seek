@@ -778,6 +778,12 @@ SEEK::Application.routes.draw do
 
   resources :culture_growth_types, only: [:show]
 
+  resources :tools, only: [] do
+    collection do
+      get :filter
+    end
+  end
+
   ### ASSAY AND TECHNOLOGY TYPES ###
 
   get '/assay_types/', to: 'assay_types#show', as: 'assay_types'
@@ -828,6 +834,7 @@ SEEK::Application.routes.draw do
 
   # error rendering
   get '/404' => 'errors#error_404'
+  get '/406' => 'errors#error_406'
   get '/422' => 'errors#error_422'
   get '/500' => 'errors#error_500'
   get '/503' => 'errors#error_503'

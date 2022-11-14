@@ -1981,6 +1981,36 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'request create project as admin but no programme' do
+    person = Factory(:admin)
+
+    institution = Factory(:institution)
+    login_as(person)
+    with_config_value(:managed_programme_id, nil) do
+      params = {
+        project: { title: 'The Project',description:'description',web_page:'web_page'},
+        institution: {id: institution.id}
+      }
+      assert_enqueued_emails(0) do
+        assert_difference('ProjectCreationMessageLog.count',1) do
+          with_config_value(:programmes_enabled, false) do
+            post :request_create, params: params
+          end
+        end
+      end
+      log = ProjectCreationMessageLog.last
+      assert_redirected_to administer_create_project_request_projects_path(message_log_id:log.id)
+
+      details = log.parsed_details
+      assert_equal institution.title, details.institution.title
+      assert_equal institution.id, details.institution.id
+      assert_equal institution.country, details.institution.country
+
+      assert_equal 'description', details.project.description
+      assert_equal 'The Project', details.project.title
+    end
+  end
+
   test 'request create project with new programme and institution' do
     Factory(:admin)
     person = Factory(:person_not_in_project)
@@ -2072,6 +2102,18 @@ class ProjectsControllerTest < ActionController::TestCase
     log = ProjectMembershipMessageLog.log_request(sender:Factory(:person), project:project, institution:institution, comments: 'some comments')
     get :administer_join_request, params:{id:project.id,message_log_id:log.id}
     assert_response :success
+  end
+
+  test 'administer join request, message deleted' do
+    person = Factory(:project_administrator)
+    project = person.projects.first
+    login_as(person)
+
+    id = (MessageLog.last&.id || 0) + 1
+    get :administer_join_request, params:{id:project.id,message_log_id: id}
+    assert_redirected_to :root
+    refute_nil flash[:error]
+    assert_match /deleted/i, flash[:error]
   end
 
   test 'administer join request with new institution that was since created' do
@@ -2351,6 +2393,16 @@ class ProjectsControllerTest < ActionController::TestCase
     log = ProjectCreationMessageLog.log_request(sender:Factory(:person), programme:programme, project:project, institution:institution)
     get :administer_create_project_request, params:{message_log_id:log.id}
     assert_response :success
+  end
+
+  test 'administer create project request, message log deleted' do
+    person = Factory(:admin)
+    login_as(person)
+    id = (MessageLog.last&.id || 0) + 1
+    get :administer_create_project_request, params:{message_log_id:id}
+    assert_redirected_to :root
+    refute_nil flash[:error]
+    assert_match /deleted/i, flash[:error]
   end
 
   test 'administer create request project with institution already created' do
@@ -3052,6 +3104,68 @@ class ProjectsControllerTest < ActionController::TestCase
     log.reload
     assert log.responded?
     assert_equal 'not very good',log.response
+
+  end
+
+  test 'respond create project request - programmes disabled' do
+    person = Factory(:admin)
+    login_as(person)
+    project = Project.new(title:'new project',web_page:'my new project')
+    institution = Institution.new({title:'institution', country:'DE'})
+    requester = Factory(:person)
+    log = ProjectCreationMessageLog.log_request(sender:requester, project:project, institution:institution)
+    params = {
+      message_log_id:log.id,
+      accept_request: '1',
+      project:{
+        title:'new project updated',
+        web_page:'http://proj.org'
+      },
+      institution:{
+        title:'new institution updated',
+        city:'Paris',
+        country:'FR'
+      }
+    }
+
+    assert_enqueued_emails(2) do
+      assert_no_difference('Programme.count') do
+        assert_difference('Project.count') do
+          assert_difference('Institution.count') do
+            assert_difference('GroupMembership.count') do
+              assert_difference('WorkGroup.count') do
+                with_config_value(:programmes_enabled, false) do
+                  post :respond_create_project_request, params:params
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+
+    project = Project.last
+    institution = Institution.last
+    requester.reload
+
+    assert_redirected_to(project_path(project))
+    assert_equal "Request accepted and #{log.sender.name} added to Project and notified",flash[:notice]
+
+    assert_equal 'new project updated', project.title
+    assert_nil project.programme
+    assert_equal 'new institution updated', institution.title
+
+    assert_includes project.people, requester
+    assert_includes project.institutions, institution
+    assert_includes project.project_administrators, requester
+
+    assert_equal WorkGroup.last, requester.work_groups.last
+    assert_equal institution, requester.work_groups.last.institution
+    assert_equal project, requester.work_groups.last.project
+
+    log.reload
+    assert log.responded?
+    assert_equal 'Accepted',log.response
 
   end
 
