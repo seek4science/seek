@@ -697,7 +697,7 @@ class HomesControllerTest < ActionController::TestCase
     get :index
     assert_select '#browse-menu' do
       assert_select 'li' do
-        assert_select 'a[href=?]', select_sample_types_path, text: 'Samples'
+        assert_select 'a[href=?]', samples_path, text: 'Samples'
       end
     end
     assert_select '#create-menu' do
