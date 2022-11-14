@@ -1860,4 +1860,35 @@ class AssaysControllerTest < ActionController::TestCase
     end
   end
 
+  test 'last updated by' do
+    person1 = Factory(:person)
+    person2 = Factory(:person)
+    a = Factory :assay, policy: Factory(:public_policy)
+    Factory :activity_log, activity_loggable: a, action: 'create', created_at: 15.minute.ago, culprit: person1
+    get :show, params: { id: a.id }
+    assert_response :success
+    # assert_nil a.updated_last_by
+    Factory :activity_log, activity_loggable: a, action: 'update', created_at: 10.minute.ago, culprit: person1
+    assert_equal person1.name, a.updated_last_by.name
+    assert_not_nil a.updated_at
+    assert_not_equal a.updated_at, a.created_at
+    get :show, params: { id: a.id }
+    assert_response :success
+    assert_select "strong", "Views:"
+    assert_select "strong", "Last updated by"
+
+    Factory :activity_log, activity_loggable: a, action: 'update', created_at: 5.minute.ago, culprit: person1.user
+    get :show, params: { id: a.id }
+    assert_response :success
+    # assert_equal person1, a.updated_last_by
+    Factory :activity_log, activity_loggable: a, action: 'update', created_at: 1.minute.ago, culprit: person2
+    get :show, params: { id: a.id }
+    assert_response :success
+    # assert_equal person2, a.updated_last_by
+    person2.delete
+    get :show, params: { id: a.id }
+    assert_response :success
+    # assert_nil a.updated_last_by
+  end
+
 end
