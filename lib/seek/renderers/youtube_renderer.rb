@@ -18,7 +18,7 @@ module Seek
       end
 
       def extract_video_code(url)
-        match = url.match(/\?v\=([-_a-zA-Z0-9]+)/) ||
+        match = url.match(/[\?\&]v[i]?\=([-_a-zA-Z0-9]+)/) ||
                 url.match(/youtu\.be\/([-_a-zA-Z0-9]+)/) ||
                 url.match(/\/v\/([-_a-zA-Z0-9]+)/) ||
                 url.match(/\/embed\/([-_a-zA-Z0-9]+)/)
