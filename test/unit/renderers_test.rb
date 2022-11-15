@@ -134,11 +134,11 @@ class RenderersTest < ActiveSupport::TestCase
     renderer = Seek::Renderers::YoutubeRenderer.new(cb)
     assert renderer.can_render?
 
-    ['https://www.youtube.com/watch?v=1234abcd', 'https://youtu.be/1234abcd',
-     'https://www.youtube.com/embed/1234abcd', 'https://www.youtube.com/v/1234abcd'].each do |url|
+    ['https://www.youtube.com/watch?v=1234abcd-_z', 'https://youtu.be/1234abcd-_z',
+     'https://www.youtube.com/embed/1234abcd-_z', 'https://www.youtube.com/v/1234abcd-_z'].each do |url|
       stub_request(:head, url).to_timeout
       cb = Factory(:content_blob, url: url)
-      assert_equal "<iframe width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/1234abcd\" frameborder=\"0\" allowfullscreen></iframe>",
+      assert_equal "<iframe width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/1234abcd-_z\" frameborder=\"0\" allowfullscreen></iframe>",
                    Seek::Renderers::YoutubeRenderer.new(cb).render
     end
 
