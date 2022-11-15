@@ -1,0 +1,169 @@
+{
+  "data": {
+    "id": "<%= res.id %>",
+    "type": "models",
+    "attributes": {
+      "policy": {
+        "access": "no_access",
+        "permissions": []
+      },
+      "tags": [
+        "Model-tag1",
+        "Model-tag2",
+        "Model-tag3",
+        "Model-tag4",
+        "Model-tag5"
+      ],
+      "title": "A Maximal Model",
+      "description": "Hidden Markov Model",
+      "license": null,
+      "latest_version": 1,
+      "versions": [
+        {
+          "version": 1,
+          "revision_comments": null,
+          "url": "http://localhost:3000/models/<%= res.id %>?version=1",
+          "doi": null
+        }
+      ],
+      "version": 1,
+      "revision_comments": null,
+      "doi": null,
+      "created_at": "<%= res.find_version(1).created_at.as_json %>",
+      "updated_at": "<%= res.find_version(1).updated_at.as_json %>",
+      "content_blobs": [
+        {
+          "original_filename": "cronwright.xml",
+          "url": null,
+          "md5sum": "6b9283ed4ca52a081398b715aaeb8113",
+          "sha1sum": "454e4b6067f577b680bb8538772b12ebcdb6c4a4",
+          "content_type": "application/xml",
+          "link": "http://localhost:3000/models/<%= res.id %>/content_blobs/<%= res.content_blob_ids.first %>",
+          "size": 5933
+        },
+        {
+          "original_filename": "rightfield.xls",
+          "url": null,
+          "md5sum": "01788bca93265d80e8127ca0039bb69b",
+          "sha1sum": "ffd634ac7564083ab7b66bc3eb2053cbc3d608f5",
+          "content_type": "application/vnd.ms-excel",
+          "link": "http://localhost:3000/models/<%= res.id %>/content_blobs/<%= res.content_blobs.last.id %>",
+          "size": 9216
+        }
+      ],
+      "model_type": "Ordinary differential equations (ODE)",
+      "model_format": "SBML",
+      "environment": "JWS Online",
+      "model_image_link": null,
+      "other_creators": "Blogs, Joe",
+      "creators": [
+        {
+          "profile": "/people/<%= res.assets_creators.first.creator_id %>",
+          "family_name": "<%= res.assets_creators.first.family_name %>",
+          "given_name": "<%= res.assets_creators.first.given_name %>",
+          "affiliation": "<%= res.assets_creators.first.affiliation %>",
+          "orcid": null
+        }
+      ],
+      "discussion_links": [
+        {
+          "id":
+          "<%= res.discussion_link_ids.first %>",
+          "url": "http://www.slack.com/",
+          "label": "Slack"
+        }
+      ]
+    },
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "<%= res.creator_ids.first %>",
+            "type": "people"
+          }
+        ]
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "<%= current_person.id %>",
+            "type": "people"
+          }
+        ]
+      },
+      "organisms": {
+        "data": [
+          {
+            "id": "<%= res.organism.id %>",
+            "type": "organisms"
+          }
+        ]
+      },
+      "people": {
+        "data": [
+          {
+            "id": "<%= res.creator_ids.first %>",
+            "type": "people"
+          },
+          {
+            "id": "<%= current_person.id %>",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "<%= res.project_ids.first %>",
+            "type": "projects"
+          }
+        ]
+      },
+      "investigations": {
+        "data": [
+          {
+            "id": "<%= res.investigation_ids.first %>",
+            "type": "investigations"
+          }
+        ]
+      },
+      "studies": {
+        "data": [
+          {
+            "id": "<%= res.study_ids.first %>",
+            "type": "studies"
+          }
+        ]
+      },
+      "assays": {
+        "data": [
+          {
+            "id": "<%= res.assay_ids.first %>",
+            "type": "assays"
+          }
+        ]
+      },
+      "publications": {
+        "data": [
+          {
+            "id": "<%= res.publication_ids.first %>",
+            "type": "publications"
+          }
+        ]
+      }
+    },
+    "links": {
+      "self": "/models/<%= res.id %>?version=1"
+    },
+    "meta": {
+      "created": "<%= res.created_at.as_json %>",
+      "modified": "<%= res.updated_at.as_json %>",
+      "uuid": "<%= res.uuid %>",
+      "base_url": "http://localhost:3000",
+      "api_version": "0.3"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

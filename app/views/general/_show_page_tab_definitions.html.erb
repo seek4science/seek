@@ -1,9 +1,25 @@
+<% versioned_resource ||= nil %>
+<% resource ||= nil %>
+<% resource_name = resource ? resource.class.name : nil %>
+
 <ul class="nav nav-tabs">
   <%= tab('overview') do %>
     <span class="glyphicon glyphicon-list-alt"></span> Overview
   <% end %>
 
+  <% if versioned_resource&.is_git_versioned? %>
+    <%= tab('files') do %>
+      <span class="glyphicon glyphicon-folder-close"></span> Files
+    <% end %>
+  <% end %>
+
   <%= tab('related-items') do %>
     <span class="glyphicon glyphicon-th-list"></span> Related items
   <% end %>
+
+	<% if Seek::Config.project_single_page_advanced_enabled && displaying_single_page? && resource %>
+		<%= tab(resource_name&.downcase + "_design") do %>
+			<span class="glyphicon glyphicon-th-list"></span> <%=resource_name&.camelize%> design
+		<% end %>
+	<% end %>
 </ul>

@@ -1,5 +1,7 @@
 <h1>New <%= t('model') %></h1>
 
+<%= index_and_new_help_icon controller_name %>
+
 <%= form_tag({:action => :create}, :multipart => true) do -%>
     <div class="asset_form">
       <%= error_messages_for :model -%>
@@ -30,23 +32,21 @@
         <%= text_area_tag 'model[description]', model_description_value, :class=>"form-control rich-text-edit" -%>
       </div>
 
-      <%= render :partial => "projects/project_selector", :locals => { :resource => @model, :allow_nil => Seek::Config.is_virtualliver } -%>
+      <%= render partial: "projects/project_selector", locals: { resource: @model } -%>
 
-      <%= render :partial => 'assets/license_selector', :locals => { :resource => @model } %>
+      <%= render partial: 'assets/license_selector', locals: { resource: @model } %>
 
-      <%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @model} -%>
+      <%= render partial: "assets/discussion_links_form", locals: {resource: @model} -%>
 
-      <%= render :partial => "model_metadata" -%>
+      <%= render partial: "model_metadata" -%>
 
-      <%= render :partial => "organisms/select_organism",:locals=>{:model_class=>Model} -%>
+      <%= render partial: "organisms/select_organism",locals: {model_class: Model} -%>
 
-      <%= render :partial => "human_diseases/select_human_disease",:locals=>{:model_class=>Model} -%>
+      <%= render partial: "human_diseases/select_human_disease", locals: {model_class: Model} -%>
 
-      <%= render :partial => "scales/scales_selector",:locals=>{:object=>@model} if show_scales?%>
+      <%= fields_for(@model) {|f| render partial: "assets/asset_form_bottom", locals: {f: f}} -%>
 
-      <%= fields_for(@model) {|f| render :partial=>"assets/asset_form_bottom", :locals=> {:f => f}} -%>
-
-      <%= render :partial => "assays/associate_assays", :locals=>{:resource => @model, :show_relationships => false} -%>
+      <%= render partial:  "assays/associate_assays", locals: {resource: @model, show_relationships: false} -%>
 
       <%= form_submit_buttons(@model) %>
     </div>

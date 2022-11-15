@@ -14,9 +14,7 @@
 
 %>
 
-<div class="show_basic">
-  <%= show_title "Change permissions of items related to #{link_to(h(current_user.person.name),current_user.person)} in batch".html_safe -%>
-</div>
+<%= show_title "Change permissions of items related to #{link_to(h(current_user.person.name),current_user.person)} in batch".html_safe -%>
 
 <div class="alert alert-info">
   <ul>
@@ -53,7 +51,7 @@
     <% if resource_type == "Investigation" %>
       <%  resource_items[:items].each do |item| %>
         <% options ||= { depth: 4, parent_depth: nil, sibling_depth: nil, include_self: true } %>
-        <%  hash = Seek::IsaGraphGenerator.new(item).generate(options) %>
+        <%  hash = Seek::IsaGraphGenerator.new(item).generate(**options) %>
         <% tree = JSON.parse(build_tree_json(hash, item)) %>
         <% tree = add_permissions_to_tree_json (tree) %>
         <% investigation_tree =  eval(tree.join) %>
@@ -156,19 +154,16 @@
             }
 
             var $tree = $j(this);
-            $j($tree.jstree().get_json($tree, {
+            $j($tree.jstree(true).get_json('#', {
                 flat: true
-            }))
-                .each(function(index, value) {
+            })).each(function(index, value) {
+                var asset = this.id.split('-')[0]
+                var asset_id = this.id.split('-')[1]
+                if ( index != 0 && asset != "Permission" && asset_id != "not_isa"){
+                    addCheckboxToAssetNode(asset,asset_id,'share_not_isa');
+                }
+            });
 
-                    var node = $j("#jstree").jstree().get_node(this.id);
-                    var asset = this.id.split('-')[0]
-                    var asset_id = this.id.split('-')[1]
-                    if ((index!= 0) && (asset!= "Permission") && (asset_id)!= "not_isa"){
-                        addCheckboxToAssetNode(asset,asset_id,'share_not_isa');
-                    }
-
-                });
         })
             .jstree({
                 'core': {
@@ -223,18 +218,17 @@
             }
 
             var $tree = $j(this);
-            $j($tree.jstree().get_json($tree, {
+            $j($tree.jstree(true).get_json('#', {
                 flat: true
-            }))
-                .each(function(index, value) {
-                    var node = $j("#jstree").jstree().get_node(this.id);
-                    var asset = this.id.split('-')[0]
-                    var asset_id = this.id.split('-')[1]
+            })).each(function(index, value) {
+                var asset = this.id.split('-')[0]
+                var asset_id = this.id.split('-')[1]
 
-                    if ((index!= 0) && (asset!= "Permission")) {
-                        addCheckboxToAssetNode(asset,asset_id,'share_isa');
-                    }
-                });
+                if (index!= 0 && asset!= "Permission") {
+                    addCheckboxToAssetNode(asset,asset_id,'share_isa');
+                }
+            });
+
 
         })
             .jstree({

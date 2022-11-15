@@ -1,0 +1,36 @@
+<h1>New <%= t('file_template') %></h1>
+
+<%= index_and_new_help_icon controller_name %>
+
+<%= form_tag({:action => :create}, :multipart => true) do -%>
+    <div class="asset_form">
+      <%= error_messages_for :file_template -%>
+
+      <%= render :partial=>"assets/upload_box",:locals=>{:resource=>@file_template} -%>
+
+      <div class="form-group">
+        <label class="required">Title</label>
+        <% file_template_title_value = (params[:file_template].blank? || params[:file_template][:title].blank?) ? nil : params[:file_template][:title] -%>
+        <%= text_field_tag 'file_template[title]', file_template_title_value, :class=>"form-control" -%>
+      </div>
+
+      <div class="form-group">
+        <label>Description</label>
+        <% file_template_description_value = (params[:file_template].blank? || params[:file_template][:description].blank?) ? nil : params[:file_template][:description] -%>
+        <%= text_area_tag 'file_template[description]', file_template_description_value, :class=>"form-control rich-text-edit" -%>
+      </div>
+
+      <%= render :partial => "projects/project_selector", :locals => { :resource => @file_template } %>
+
+      <%= render partial: 'assets/controlled_vocab_annotations_form_properties', :locals => { :resource => @file_template } -%>
+
+      <%= render :partial => 'assets/license_selector', :locals => { :resource => @file_template } %>
+
+      <%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @file_template} -%>
+
+      <%= fields_for(@file_template) { |f| render :partial=>"assets/asset_form_bottom", :locals=> {:show_publications=>false, :f => f} }-%>
+
+      <%= form_submit_buttons(@file_template) %>
+
+    </div>
+<% end -%>

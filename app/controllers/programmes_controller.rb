@@ -1,7 +1,6 @@
 class ProgrammesController < ApplicationController
   include Seek::IndexPager
   include Seek::DestroyHandling
-  include ApiHelper
 
   before_action :programmes_enabled?
   before_action :login_required, except: [:show, :index]
@@ -27,12 +26,9 @@ class ProgrammesController < ApplicationController
     respond_to do |format|
       if @programme.save
         flash[:notice] = "The #{t('programme').capitalize} was successfully created."
-
         # current person becomes the programme administrator, unless they are logged in
         # also activation email is sent
         unless User.admin_logged_in?
-          current_person.is_programme_administrator = true, @programme
-          disable_authorization_checks { current_person.save! }
           if Seek::Config.email_enabled
             Mailer.programme_activation_required(@programme,current_person).deliver_later
           end
@@ -48,21 +44,19 @@ class ProgrammesController < ApplicationController
 
   def update
     respond_to do |format|
-      if @programme.update_attributes(programme_params)
+      if @programme.update(programme_params)
         flash[:notice] = "The #{t('programme').capitalize} was successfully updated"
         format.html { redirect_to(@programme) }
-        format.xml { head :ok }
         format.json { render json: @programme, include: [params[:include]] }
       else
         format.html { render action: 'edit' }
-        format.xml { render xml: @programme.errors, status: :unprocessable_entity }
         format.json { render json: json_api_errors(@programme), status: :unprocessable_entity }
       end
     end
   end
 
   def handle_administrators
-    params[:programme][:administrator_ids] = params[:programme][:administrator_ids].split(',')
+    params[:programme][:programme_administrator_ids] = params[:programme][:programme_administrator_ids].split(',')
     prevent_removal_of_self_as_programme_administrator
   end
 
@@ -71,7 +65,7 @@ class ProgrammesController < ApplicationController
     return if User.admin_logged_in?
     return unless @programme
     if current_person.is_programme_administrator?(@programme)
-      params[:programme][:administrator_ids] << current_person.id.to_s
+      params[:programme][:programme_administrator_ids] << current_person.id.to_s
     end
   end
 
@@ -119,8 +113,6 @@ class ProgrammesController < ApplicationController
     end
   end
 
-
-
   private
 
   #whether the item needs or can be activated, which affects steps around activation of rejection
@@ -134,27 +126,35 @@ class ProgrammesController < ApplicationController
   #is the item inactive, and if so can the current person view it
   def inactive_view_allowed?
     return true if @programme.is_activated? || User.admin_logged_in?
-    unless result=(User.logged_in_and_registered? && @programme.programme_administrators.include?(current_person))
+    result=(User.logged_in_and_registered? && current_person.is_programme_administrator?(@programme))
+    unless result
       error("This #{t('programme').downcase} is not activated and cannot be viewed", "cannot view (not activated)", :forbidden)
     end
     result
   end
 
   def fetch_assets
-    if User.admin_logged_in?
-      @programmes = Programme.all
-    elsif User.programme_administrator_logged_in?
-      @programmes = Programme.activated | current_person.administered_programmes
+    @programmes = super
+    return @programmes if User.admin_logged_in?
+
+    if User.programme_administrator_logged_in?
+       @programmes = @programmes.all if @programmes.eql?(Programme) #necessary because the super can return the class to defer calling .all, here it is ok to do so
+       @programmes = @programmes.activated | (@programmes & current_person.administered_programmes)
     else
-      @programmes = Programme.activated
+       @programmes = @programmes.activated
     end
   end
 
   def programme_params
-    handle_administrators if params[:programme][:administrator_ids] && !(params[:programme][:administrator_ids].is_a? Array)
+    handle_administrators if params[:programme][:programme_administrator_ids] && !(params[:programme][:programme_administrator_ids].is_a? Array)
+    if action_name == 'create' && !User.admin_logged_in?
+      params[:programme][:programme_administrator_ids] ||= []
+      params[:programme][:programme_administrator_ids] << current_person.id.to_s
+    end
+    params[:programme][:programme_administrator_ids].uniq! if params[:programme][:programme_administrator_ids]
 
     params.require(:programme).permit(:avatar_id, :description, :first_letter, :title, :uuid, :web_page,
-                                      { project_ids: [] }, :funding_details, { administrator_ids: [] },
+                                      { project_ids: [] }, :funding_details, { programme_administrator_ids: [] },
                                       :activation_rejection_reason, :funding_codes,
                                       :open_for_projects,
                                       discussion_links_attributes:[:id, :url, :label, :_destroy])

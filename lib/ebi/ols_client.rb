@@ -16,7 +16,8 @@ module Ebi
     def all_children(term_json, parent_iri = nil)
       @collected_iris << term_json['iri']
       term = { iri: term_json['iri'],
-               label: term_json['label'] }
+               label: term_json['label'],
+               description: term_json['description'] }
 
       term[:parent_iri] = parent_iri if parent_iri
 

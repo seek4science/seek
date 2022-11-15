@@ -53,7 +53,7 @@ class SampleControlledVocabsController < ApplicationController
   end
 
   def update
-    @sample_controlled_vocab.update_attributes(cv_params)
+    @sample_controlled_vocab.update(cv_params)
     respond_to do |format|
       if @sample_controlled_vocab.save
         format.html do
@@ -129,7 +129,6 @@ class SampleControlledVocabsController < ApplicationController
   def cv_params
     params.require(:sample_controlled_vocab).permit(:title, :description, :group, :source_ontology, :ols_root_term_uri,
                                                     :required, :short_name,
-                                                    { repository_standard_attributes: %i[title url group_tag description repo_type] },
                                                     { sample_controlled_vocab_terms_attributes: %i[id _destroy label
                                                                                                    iri parent_iri] })
   end

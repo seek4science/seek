@@ -33,7 +33,7 @@ class Sample < ApplicationRecord
   has_many :linking_samples, through: :reverse_sample_resource_links, source: :sample
 
   validates :title, :sample_type, presence: true
-  include ActiveModel::Validations
+
   validates_with SampleAttributeValidator
 
   before_validation :set_title_to_title_attribute_value
@@ -41,6 +41,9 @@ class Sample < ApplicationRecord
   before_save :update_sample_resource_links
   after_save :queue_sample_type_update_job
   after_destroy :queue_sample_type_update_job
+
+
+  has_filter :sample_type
 
   def sample_type=(type)
     super
@@ -130,6 +133,11 @@ class Sample < ApplicationRecord
     organism_ids | ncbi_linked_organisms.map(&:id)
   end
 
+  #overides default to include sample_type key at the start
+  def list_item_title_cache_key_prefix
+    "#{sample_type.list_item_title_cache_key_prefix}/#{cache_key}"
+  end
+
   private
 
   # organisms linked through an NCBI attribute type
@@ -181,4 +189,5 @@ class Sample < ApplicationRecord
   def attribute_class
     SampleAttribute
   end
+
 end

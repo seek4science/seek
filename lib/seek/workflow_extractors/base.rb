@@ -7,28 +7,12 @@ module Seek
           "name" => "Unrecognized Workflow Type"
       }
 
-      def self.available_diagram_formats(formats)
-        formats = formats.with_indifferent_access
-        @default_diagram_format = formats.delete(:default) || formats.keys.first.to_sym
-        @diagram_formats = formats.freeze
-      end
-
-      def self.diagram_formats
-        @diagram_formats || superclass.diagram_formats
-      end
-
-      def self.default_diagram_format
-        @default_diagram_format || superclass.default_diagram_format
-      end
-
-      available_diagram_formats(png: 'image/png', svg: 'image/svg+xml', jpg: 'image/jpeg', default: :png)
-
       def initialize(io)
-        @io = io
+        @io = io.is_a?(String) ? StringIO.new(io) : io
       end
 
       def metadata
-        { warnings: [], errors: [] }
+        { }
       end
 
       def has_tests?
@@ -39,16 +23,54 @@ module Seek
         false
       end
 
-      def diagram(format = default_diagram_format)
+      def generate_diagram
         nil
       end
 
-      def default_diagram_format
-        self.class.default_diagram_format
+      def diagram_extension
+        'svg'
       end
 
       def self.workflow_class
         WorkflowClass.find_by_key(name.demodulize.underscore)
+      end
+
+      def self.file_extensions
+        []
+      end
+
+      private
+
+      # Extract author from a string or a Hash complying to schema.org's `Person`
+      def extract_author(obj)
+        author = {}
+        if obj.is_a?(String)
+          if obj.present?
+            given_name, family_name = obj.split(' ', 2)
+            author[:given_name] = given_name if given_name.present?
+            author[:family_name] = family_name if family_name.present?
+          end
+        else
+          name = obj['name'] || obj['@id'] || ''
+          given_name, family_name = name.split(' ', 2)
+          family_name = obj['familyName'] if obj['familyName'].present?
+          given_name = obj['givenName'] if obj['givenName'].present?
+          affiliation = obj['affiliation']
+          if affiliation.present?
+            if affiliation.is_a?(String)
+              author[:affiliation] = affiliation
+            else
+              affiliation = affiliation.dereference if affiliation.respond_to?(:dereference)
+              author[:affiliation] = affiliation['name'] if affiliation && affiliation['name'].present?
+            end
+          end
+          orcid = obj['identifier'] || obj['@id']
+          author[:orcid] = orcid if orcid.present? && orcid.include?('orcid.org')
+          author[:given_name] = given_name if given_name.present?
+          author[:family_name] = family_name if family_name.present?
+        end
+
+        author
       end
     end
   end

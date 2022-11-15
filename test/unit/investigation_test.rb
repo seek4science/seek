@@ -73,7 +73,7 @@ class InvestigationTest < ActiveSupport::TestCase
     t << json
     t.close
 
-    result = `python script/check-isa.py #{t.path}`
+    result = `#{Seek::Util.python_exec("script/check-isa.py #{t.path}")}`
 
     assert result.blank?, "check-isa.py result was not blank, returned: #{result}"
   end
@@ -219,6 +219,15 @@ class InvestigationTest < ActiveSupport::TestCase
                    )
     )
     assert_equal ['James','25'].sort, item.custom_metadata_attribute_values_for_search.sort
+  end
+  
+  test 'related sop ids' do
+    investigation = Factory(:investigation)
+    study = Factory(:study, investigation: investigation)
+    assay = Factory(:assay, study: study)
+    assay_sop = Factory(:sop, assays: [assay])
+    study_sop = Factory(:sop, study: study)
+    assert_equal investigation.related_sop_ids.sort, [assay_sop.id, study_sop.id].sort
   end
 
 end

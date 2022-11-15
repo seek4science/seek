@@ -3,7 +3,7 @@ class NcbiConceptUriValidator < ActiveModel::EachValidator
     # already checked it is a valid url
 
     unless validate_against_purl(value) || validate_against_indentifiers(value)
-      record.errors[attribute] << (options[:message] || "isn't a valid NCBI Taxonomy identifier")
+      record.errors.add(attribute, options[:message] || "isn't a valid NCBI Taxonomy identifier")
     end
   end
 

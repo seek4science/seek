@@ -56,25 +56,13 @@ class DataFileTest < ActiveSupport::TestCase
     end
   end
 
-  test 'sort by updated_at' do
-    assert_equal DataFile.all.sort_by { |df| df.updated_at.to_i * -1 }, DataFile.all
-  end
-
   test 'validation' do
     asset = DataFile.new title: 'fred', projects: [projects(:sysmo_project)], policy: Factory(:private_policy)
     assert asset.valid?
 
     asset = DataFile.new projects: [projects(:sysmo_project)], policy: Factory(:private_policy)
-    assert !asset.valid?
+    refute asset.valid?
 
-    # VL only:allow no projects
-    as_virtualliver do
-      asset = DataFile.new title: 'fred', policy: Factory(:private_policy)
-      assert asset.valid?
-
-      asset = DataFile.new title: 'fred', projects: [], policy: Factory(:private_policy)
-      assert asset.valid?
-    end
   end
 
   test 'version created on save' do
@@ -194,7 +182,7 @@ class DataFileTest < ActiveSupport::TestCase
     df = Factory :data_file, title: unupdated_title
     User.current_user = nil
 
-    assert !df.update_attributes(title: 'Updated Title')
+    assert !df.update(title: 'Updated Title')
     assert_equal unupdated_title, df.reload.title
   end
 
@@ -209,53 +197,6 @@ class DataFileTest < ActiveSupport::TestCase
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count > 0
       assert_equal RDF::URI.new("http://localhost:3000/data_files/#{df.id}"), reader.statements.first.subject
-    end
-  end
-
-  test 'fs_search_fields' do
-    user = Factory :user
-    User.with_current_user user do
-      df = Factory :data_file, contributor: user.person
-      sf1 = Factory :studied_factor_link, substance: Factory(:compound, name: 'sugar')
-      sf2 = Factory :studied_factor_link, substance: Factory(:compound, name: 'iron')
-      comp = sf2.substance
-      Factory :synonym, name: 'metal', substance: comp
-      Factory :mapping_link, substance: comp, mapping: Factory(:mapping, chebi_id: '12345', kegg_id: '789', sabiork_id: 111)
-      studied_factor = Factory :studied_factor, studied_factor_links: [sf1, sf2], data_file: df
-      assert df.fs_search_fields.include?('sugar')
-      assert df.fs_search_fields.include?('metal')
-      assert df.fs_search_fields.include?('iron')
-      assert df.fs_search_fields.include?('concentration')
-      assert df.fs_search_fields.include?('CHEBI:12345')
-      assert df.fs_search_fields.include?('12345')
-      assert df.fs_search_fields.include?('111')
-      assert df.fs_search_fields.include?('789')
-      assert_equal 8, df.fs_search_fields.count
-    end
-  end
-
-  test 'fs_search_fields_with_synonym_substance' do
-    user = Factory :user
-    User.with_current_user user do
-      df = Factory :data_file, contributor: user.person
-      suger = Factory(:compound, name: 'sugar')
-      iron = Factory(:compound, name: 'iron')
-      metal = Factory :synonym, name: 'metal', substance: iron
-      Factory :mapping_link, substance: iron, mapping: Factory(:mapping, chebi_id: '12345', kegg_id: '789', sabiork_id: 111)
-
-      sf1 = Factory :studied_factor_link, substance: suger
-      sf2 = Factory :studied_factor_link, substance: metal
-
-      Factory :studied_factor, studied_factor_links: [sf1, sf2], data_file: df
-      assert df.fs_search_fields.include?('sugar')
-      assert df.fs_search_fields.include?('metal')
-      assert df.fs_search_fields.include?('iron')
-      assert df.fs_search_fields.include?('concentration')
-      assert df.fs_search_fields.include?('CHEBI:12345')
-      assert df.fs_search_fields.include?('12345')
-      assert df.fs_search_fields.include?('111')
-      assert df.fs_search_fields.include?('789')
-      assert_equal 8, df.fs_search_fields.count
     end
   end
 
@@ -342,21 +283,6 @@ class DataFileTest < ActiveSupport::TestCase
     assert blob.file_exists?
     assert_equal 'simple_populated_rightfield.xls', blob.original_filename
     assert_equal 'application/vnd.ms-excel', blob.content_type
-  end
-
-  test 'spreadsheet annotation search fields' do
-    df = Factory(:data_file)
-    cr = Factory(:cell_range, worksheet: Factory(:worksheet, content_blob: df.content_blob))
-
-    Annotation.create(source: Factory(:user),
-                      annotatable: cr,
-                      attribute_name: 'annotation',
-                      value: 'fish')
-
-    df.reload
-    refute_empty df.content_blob.worksheets
-    fields = df.spreadsheet_annotation_search_fields
-    assert_equal ['fish'], fields
   end
 
   test 'openbis?' do
@@ -547,5 +473,20 @@ class DataFileTest < ActiveSupport::TestCase
 
       assert_equal aa1.direction, s1.assay_assets.where(assay_id: aa1.assay_id).first.direction
     end
+  end
+
+  test 'ontology cv annotation properties'do
+    data_file = Factory(:data_file)
+
+    assert data_file.supports_controlled_vocab_annotations?
+    refute data_file.supports_controlled_vocab_annotations?(:topics)
+    refute data_file.supports_controlled_vocab_annotations?(:operations)
+    assert data_file.supports_controlled_vocab_annotations?(:data_formats)
+    assert data_file.supports_controlled_vocab_annotations?(:data_types)
+
+    refute data_file.respond_to?(:topic_annotations)
+    refute data_file.respond_to?(:operation_annotations)
+    assert data_file.respond_to?(:data_format_annotations)
+    assert data_file.respond_to?(:data_type_annotations)
   end
 end

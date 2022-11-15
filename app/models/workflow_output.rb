@@ -1,3 +1,0 @@
-class WorkflowOutput < WorkflowPort
-
-end

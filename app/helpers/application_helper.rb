@@ -52,7 +52,7 @@ module ApplicationHelper
     js.empty? ? '' : javascript_include_tag(*js)
   end
 
-  def date_as_string(date, show_time_of_day = false, year_only_1st_jan = false)
+  def date_as_string(date, show_time_of_day = false, year_only_1st_jan = false, time_zone = nil)
     # for publications, if it is the first of jan, then it can be assumed it is just the year (unlikely have a publication on New Years Day)
 
     if date.to_s == nil
@@ -66,6 +66,12 @@ module ApplicationHelper
       else
         str = date.localtime.strftime("#{date.day.ordinalize} %b %Y")
         str = date.localtime.strftime("#{str} at %H:%M") if show_time_of_day
+        if time_zone.present?
+          date_in_tz = date.in_time_zone(time_zone)
+          tz_str = date_in_tz.strftime("#{date_in_tz.day.ordinalize} %b %Y")
+          tz_str = date_in_tz.strftime("#{tz_str} at %H:%M") if show_time_of_day
+          str += "\t(#{tz_str} (#{time_zone}))"
+        end
       end
     end
 
@@ -77,7 +83,7 @@ module ApplicationHelper
   def persistent_resource_id(resource)
     # FIXME: this contains some duplication of Seek::Rdf::RdfGeneration#rdf_resource - however not every model includes that Module at this time.
     # ... its also a bit messy handling the version
-    url = if resource.class.name.include?('::Version')
+    url = if resource.is_a_version?
             polymorphic_url(resource.parent, version: resource.version, **Seek::Config.site_url_options)
           else
             polymorphic_url(resource, **Seek::Config.site_url_options)
@@ -100,11 +106,7 @@ module ApplicationHelper
 
   def authorized_list(all_items, attribute, sort = true, max_length = 75, count_hidden_items = false)
     items = all_items.select(&:can_view?)
-    title_only_items = if Seek::Config.is_virtualliver
-                         (all_items - items).select(&:title_is_public?)
-                       else
-                         []
-                       end
+    title_only_items = []
 
     if count_hidden_items
       original_size = all_items.size
@@ -295,12 +297,12 @@ module ApplicationHelper
     resource = resource_for_controller
     if resource && resource.respond_to?(:title) && resource.title
       h(resource.title)
-    elsif PAGE_TITLES[controller_name]
+    elsif (page_title = get_page_title).present?
       title = ''
       if @parent_resource
         title << "#{h(@parent_resource.title)} - "
       end
-      t = PAGE_TITLES[controller_name]
+      t = page_title
       if t.is_a?(Hash)
         t = t[action_name] || t['*']
       end
@@ -434,16 +436,6 @@ module ApplicationHelper
     c.singularize.camelize.constantize
   end
 
-  # returns the instance for the resource for the controller, e.g @data_file for data_files
-  def resource_for_controller(c = controller_name)
-    instance_variable_get("@#{c.singularize}")
-  end
-
-  # returns the current version of the resource for the controller, e.g @display_data_file for data_files
-  def versioned_resource_for_controller(c = controller_name)
-    instance_variable_get("@display_#{c.singularize}")
-  end
-
   def cancel_button(path, html_options = {})
     html_options[:class] ||= ''
     html_options[:class] << ' btn btn-default'
@@ -476,7 +468,7 @@ module ApplicationHelper
 
   # whether manage attributes should be shown, dont show if editing (rather than new or managing)
   def show_form_manage_specific_attributes?
-    !(action_name == 'edit' || action_name == 'update')
+    !(action_name == 'edit' || action_name == 'update' || action_name == 'update_paths') # TODO: Figure out a better check here...
   end
 
   def pending_project_creation_request?
@@ -520,17 +512,25 @@ module ApplicationHelper
     html
   end
 
-  PAGE_TITLES = { 'home' => 'Home', 'projects' => I18n.t('project').pluralize, 'institutions' => I18n.t('institution').pluralize,
-                  'people' => 'People', 'sessions' => 'Login', 'users' => { 'new' => 'Signup', '*' => 'Account' }, 'search' => 'Search',
-                  'assays' => I18n.t('assays.assay').pluralize.capitalize, 'sops' => I18n.t('sop').pluralize, 'models' => I18n.t('model').pluralize, 'data_files' => I18n.t('data_file').pluralize, 'documents' => 'Documents',
-                  'publications' => 'Publications', 'investigations' => I18n.t('investigation').pluralize, 'studies' => I18n.t('study').pluralize,
-                  'samples' => 'Samples', 'strains' => 'Strains', 'organisms' => 'Organisms', 'human_disease' => 'Human Diseases', 'biosamples' => 'Biosamples', 'sample_types' => 'Sample Types',
-                  'presentations' => I18n.t('presentation').pluralize, 'programmes' => I18n.t('programme').pluralize, 'events' => I18n.t('event').pluralize, 'help_documents' => 'Help' }.freeze
+  PAGE_TITLES = { 'home' => 'Home', 'sessions' => 'Login', 'users' => { 'new' => 'Signup', '*' => 'Account' },
+                  'search' => 'Search', 'biosamples' => 'Biosamples', 'help_documents' => 'Help' }.freeze
 
   def show_page_tab
     return 'overview' unless params.key?(:tab)
 
     params[:tab]
+  end
+
+  def get_page_title
+    class_name = controller_name.classify
+
+    if PAGE_TITLES.key?(controller_name)
+      PAGE_TITLES[controller_name]
+    elsif Seek::Util.searchable_types.any? { |t| t.name == class_name }
+      I18n.t(class_name.underscore).pluralize
+    else
+      nil
+    end
   end
 end
 

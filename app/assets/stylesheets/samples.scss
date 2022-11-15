@@ -1,0 +1,38 @@
+@import 'variables';
+@import 'mixins';
+
+input.sample_attribute_integer, input.sample_attribute_float {
+    width: 10em;
+}
+
+input.sample_attribute_datetime,
+input.sample_attribute_date {
+    width: 25em;
+}
+
+textarea.sample_attribute_text {
+    height: 7em;
+}
+
+span.sample-attribute-title {
+    font-style: italic;
+}
+
+.samples-table-container {
+    overflow: auto;
+}
+
+table > tbody > tr > td.sample-field-error {
+  background-color: $state-danger-bg;
+  padding: 0;
+
+  > div {
+    padding: 8px;
+  }
+}
+
+.sample-attribute .attribute-handle { }
+
+.sample-attribute .attribute-position .glyphicon {
+  color: #fff;
+}

@@ -1,0 +1,105 @@
+#The terms should be capitalized at the first character.
+en:
+  investigation: &investigation "Investigation_test"
+  study: &study "Study_test"
+  assay: &assay "Assay_test"
+  data_file: &data_file "Data file_test"
+  document: &document "Document_test"
+  model: &model "Model_test"
+  sop: &sop "SOP_test"
+  workflow: &workflow "Workflow_test"
+  workflow_class: "Workflow Type"
+  publication: &publication "Publication_test"
+  presentation: &presentation "Presentation_test"
+  event: &event "Event_test"
+  file_template: &file_template "File Template_test"
+  collection: &collection "Collection_test"
+  sample: &sample "Sample_test"
+  sample_type: &sample_type "Sample type_test"
+  template: &template "Template_test"
+  strain: &strain "Strain_test"
+  organism: &organism "Organism_test"
+  person: &person "Person_test"
+  project: &project "Project_test"
+  institution: &institution "Institution_test"
+  programme: &programme "Programme_test"
+
+  attributes: # Applies to attributes for any model
+    # Mostly for associations in other models (has_one or has_many)
+    programme: *programme
+    project: *project
+    institution: *institution
+    person: *person
+    investigation: *investigation
+    study: *study
+    assay: *assay
+    data_file: *data_file
+    model: *model
+    sop: *sop
+    workflow: *workflow
+    publication: *publication
+    document: *document
+    file_template: *file_template
+    collection: *collection
+    presentation: *presentation
+    event: *event
+    sample: *sample
+    template: *template
+    sample_type: *sample_type
+    strain: *strain
+    organism: *organism
+
+    programmes: 'Programmes_test_attr'
+    projects: 'Projects_test_attr'
+    institutions: 'Institutions_test_attr'
+    persons: 'Persons_test_attr'
+    investigations: 'Investigations_test_attr'
+    studys: 'Studies_test_attr'
+    assays: 'Assays_test_attr'
+    data_files: 'Data files_test_attr'
+    models: 'Models_test_attr'
+    sops: 'Sops_test_attr'
+    workflows: 'Workflows_test_attr'
+    publications: 'Publications_test_attr'
+    documents: 'Documents_test_attr'
+    file_templates: 'Files templates_test_attr'
+    collections: 'Collections_test_attr'
+    presentations: 'Presentations_test_attr'
+    events: 'Events_test_attr'
+    samples: 'Samples_test_attr'
+    templates: 'Templates_test_attr'
+    sample_types: 'Samples types_test_attr'
+    strains: 'Strains_test_attr'
+    organisms: 'Organisms_test_attr'
+
+  activerecord:
+    errors:
+      template:
+        header:
+          one: "1 error prohibited this %{model} from being saved"
+          other: "%{count} errors prohibited this %{model} from being saved"
+        # The variable :count is also available
+        body: "There were problems with the following fields:"
+    models:
+      programme: *programme
+      project: *project
+      institution: *institution
+      person: *person
+      investigation: *investigation
+      study: *study
+      assay: *assay
+      data_file: *data_file
+      model: *model
+      sop: *sop
+      workflow: *workflow
+      publication: *publication
+      document: *document
+      file_template: *file_template
+      collection: *collection
+      presentation: *presentation
+      event: *event
+      sample: *sample
+      template: *template
+      sample_type: *sample_type
+      strain: *strain
+      organism: *organism

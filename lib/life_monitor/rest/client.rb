@@ -17,41 +17,42 @@ module LifeMonitor
       end
 
       def status(workflow_version)
-        perform("/workflows/#{workflow_version.workflow.uuid}/#{workflow_version.version}/status", :get)
+        perform("/workflows/#{workflow_version.parent.uuid}/status", :get, {
+          version: workflow_version.version
+        })
       end
 
       def submit(workflow_version)
-        perform("/workflows", :post,
+        perform("/registries/current/workflows", :post,
                 content_type: :json,
                 body: {
-                    uuid: workflow_version.workflow.uuid,
+                    identifier: workflow_version.parent.id.to_s,
                     version: workflow_version.version.to_s,
-                    roc_link: ro_crate_workflow_url(workflow_version.workflow, version: workflow_version.version),
-                    name: workflow_version.workflow.title,
-                    submitter_id: workflow_version.contributor.id.to_s
+                    public: workflow_version.parent.can_download?(nil)
                 })
       end
 
-      def replace(workflow_version)
-        raise 'not implemented' # Wait for this to be implemented by LifeMonitor
-        perform("/workflows/#{workflow_version.workflow.uuid}/#{workflow_version.version}", :put,
+      def update(workflow_version)
+        perform("/workflows/#{workflow_version.parent.uuid}/versions/#{workflow_version.version}", :put,
                 content_type: :json,
                 body: {
-                    uuid: workflow_version.workflow.uuid,
-                    version: workflow_version.version.to_s,
-                    roc_link: ro_crate_workflow_url(workflow_version.workflow, version: workflow_version.version),
-                    name: workflow_version.workflow.title,
-                    submitter_id: workflow_version.contributor.id.to_s
+                    name: workflow_version.title,
+                    version: workflow_version.version.to_s
                 })
       end
 
       def exists?(workflow_version)
         begin
-          perform("/workflows/#{workflow_version.workflow.uuid}/#{workflow_version.version}", :get)
-          true
+          response = perform("/workflows/#{workflow_version.parent.uuid}/versions", :get)
+          response['versions'].any? { |v| v['version'] == workflow_version.version.to_s }
         rescue RestClient::NotFound
           false
         end
+      end
+
+      # Not yet implemented on LifeMonitor side
+      def list_workflows
+        perform("/registries/current/workflows?status=true&versions=true", :get, content_type: :json)
       end
 
       private

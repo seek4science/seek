@@ -4,7 +4,7 @@ module Seek
     AVAILABLE_FILTERS = {
         Publication: [:query, :programme, :project, :published_year, :publication_type, :author, :organism, :human_disease, :tag],
         Event: [:query, :created_at, :country],
-        Person: [:query, :programme, :project, :institution, :location, :project_position, :expertise, :tool]
+        Person: [:query, :programme, :project, :institution, :location, :expertise, :tool]
     }.freeze
 
     # Misc mappings/transformations that might be used in multiple filters.
@@ -109,6 +109,11 @@ module Seek
             value_field: 'publication_types.key',
             label_field: 'publication_types.title',
             joins: [:publication_type]
+        ),
+        sample_type: Seek::Filtering::Filter.new(
+          value_field: 'sample_types.id',
+          label_field: 'sample_types.title',
+          joins: [:sample_type]
         ),
     }.freeze
 

@@ -5,25 +5,10 @@ class DocumentsControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
-  include RestTestCases
   include SharingFormTestHelper
   include MockHelper
   include HtmlHelper
   include GeneralAuthorizationTestCases
-
-  def test_json_content
-    login_as(Factory(:user))
-    super
-  end
-
-  def rest_api_test_object
-    @object = Factory(:public_document)
-  end
-
-  def edit_max_object(document)
-    add_tags_to_test_object(document)
-    add_creator_to_test_object(document)
-  end
 
   test 'should return 406 when requesting RDF' do
     login_as(Factory(:user))
@@ -112,7 +97,7 @@ class DocumentsControllerTest < ActionController::TestCase
       assert_no_difference('Document.count') do
         assert_difference('Document::Version.count') do
           assert_difference('ContentBlob.count') do
-            post :create_version, params: { id: document.id, content_blobs: [{ data: fixture_file_upload('files/little_file.txt') }], revision_comments: 'new version!' }
+            post :create_version, params: { id: document.id, content_blobs: [{ data: fixture_file_upload('little_file.txt') }], revision_comments: 'new version!' }
           end
         end
       end
@@ -1221,6 +1206,26 @@ class DocumentsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'sharing with programme only shows if enabled' do
+    doc = Factory :document
+    login_as(doc.contributor)
+
+    with_config_value :programmes_enabled, true do
+      get :manage, params: { id: doc }
+      assert_response :success
+
+      assert_select 'a#add-programme-permission-button', text: /Share with a Programme/, count: 1
+    end
+
+    with_config_value :programmes_enabled, false do
+      get :manage, params: { id: doc }
+      assert_response :success
+
+      assert_select 'a#add-programme-permission-button', text: /Share with a Programme/, count: 0
+    end
+
+  end
+
   private
 
   def valid_document
@@ -1228,6 +1233,6 @@ class DocumentsControllerTest < ActionController::TestCase
   end
 
   def valid_content_blob
-    { data: fixture_file_upload('files/a_pdf_file.pdf'), data_url: '' }
+    { data: fixture_file_upload('a_pdf_file.pdf'), data_url: '' }
   end
 end

@@ -13,9 +13,9 @@
         <%= button_link_to("New #{t('study')}", 'arrow_right', new_study_path) -%>
     </div>
 <% else %>
-    <div class="contribution_title">
-        <h1><%=  @assay.is_modelling? ? "#{t('assays.modelling_analysis')} creation" : "#{t('assays.assay')} creation" -%></h1>
-    </div>
+    <h1><%=  @assay.is_modelling? ? "#{t('assays.modelling_analysis')} creation" : "#{t('assays.assay')} creation" -%></h1>
+
+    <%= index_and_new_help_icon controller_name %>
 
     <% unless @assay.assay_class %>
         <div class="text-center">

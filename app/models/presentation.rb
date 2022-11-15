@@ -10,7 +10,7 @@ class Presentation < ApplicationRecord
 
   has_one :content_blob, -> (r) { where('content_blobs.asset_version =?', r.version) }, :as => :asset, :foreign_key => :asset_id
 
-  validates :projects, presence: true, projects: { self: true }, unless: Proc.new {Seek::Config.is_virtualliver }
+  validates :projects, presence: true, projects: { self: true }
 
   explicit_versioning(:version_column => "version") do
     acts_as_versioned_resource
@@ -27,14 +27,6 @@ class Presentation < ApplicationRecord
   #
   # Parameters:
   # - user - user that performs the action; this is required for authorization
-
-  # Returns the columns to be shown on the table view for the resource
-  def columns_default
-    super + ['version','license']
-  end
-  def columns_allowed
-    columns_default + ['last_used_at','other_creators']
-  end
 
   def use_mime_type_for_avatar?
     true

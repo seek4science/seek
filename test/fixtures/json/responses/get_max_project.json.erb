@@ -1,0 +1,183 @@
+{
+  "data": {
+    "id": "<%= res.id %>",
+    "type": "projects",
+    "attributes": {
+      "avatar": "/projects/<%= res.id %>/avatars/<%= res.avatar_id %>",
+      "title": "A Maximal Project",
+      "description": "A Taverna project",
+      "web_page": "http://www.taverna.org.uk",
+      "wiki_page": "http://www.mygrid.org.uk",
+      "default_license": "Other (Open)",
+      "default_policy": {
+        "access": "no_access",
+        "permissions": []
+      },
+      "members": <%= res.current_group_memberships.includes(:institution).map { |g| { person_id: g.person_id.to_s, institution_id: g.institution.id.to_s } }.to_json %>,
+      "start_date": "2010-01-01",
+      "end_date": "2014-06-21",
+      "use_default_policy": true,
+      "discussion_links": [
+        {
+          "id":
+          "<%= res.discussion_link_ids.first %>",
+          "url": "http://www.slack.com/",
+          "label": "Slack"
+        }
+      ],
+      "topic_annotations": [
+        {
+          "label": "Biomedical science",
+          "identifier": "http://edamontology.org/topic_3344"
+        },
+        {
+          "label": "Chemistry",
+          "identifier": "http://edamontology.org/topic_3314"
+        }
+      ]
+    },
+    "relationships": {
+      "organisms": {
+        "data": []
+      },
+      "human_diseases": {
+        "data": []
+      },
+      "pals": {
+        "data": []
+      },
+      "project_administrators": {
+        "data": []
+      },
+      "asset_housekeepers": {
+        "data": []
+      },
+      "asset_gatekeepers": {
+        "data": []
+      },
+      "people": {
+        "data":
+        <%= res.people.map { |p| { id: p.id.to_s, type: 'people' } }.to_json %>
+      },
+      "institutions": {
+        "data":
+        <%= res.institutions.map { |i| { id: i.id.to_s, type: 'institutions' } }.to_json %>
+      },
+      "programmes": {
+        "data": [
+          {
+            "id": "<%= res.programme_id %>",
+            "type": "programmes"
+          }
+        ]
+      },
+      "investigations": {
+        "data": [
+          {
+            "id": "<%= res.investigation_ids.first %>",
+            "type": "investigations"
+          }
+        ]
+      },
+      "studies": {
+        "data": [
+          {
+            "id": "<%= res.study_ids.first %>",
+            "type": "studies"
+          }
+        ]
+      },
+      "assays": {
+        "data": [
+          {
+            "id": "<%= res.assay_ids.first %>",
+            "type": "assays"
+          }
+        ]
+      },
+      "data_files": {
+        "data": [
+          {
+            "id": "<%= res.data_file_ids.first %>",
+            "type": "data_files"
+          }
+        ]
+      },
+      "models": {
+        "data": [
+          {
+            "id": "<%= res.model_ids.first %>",
+            "type": "models"
+          }
+        ]
+      },
+      "sops": {
+        "data": [
+          {
+            "id": "<%= res.sop_ids.first %>",
+            "type": "sops"
+          }
+        ]
+      },
+      "publications": {
+        "data": [
+          {
+            "id": "<%= res.publication_ids.first %>",
+            "type": "publications"
+          }
+        ]
+      },
+      "presentations": {
+        "data": [
+          {
+            "id": "<%= res.presentation_ids.first %>",
+            "type": "presentations"
+          }
+        ]
+      },
+      "events": {
+        "data": [
+          {
+            "id": "<%= res.event_ids.first %>",
+            "type": "events"
+          }
+        ]
+      },
+      "documents": {
+        "data": [
+          {
+            "id": "<%= res.document_ids.first %>",
+            "type": "documents"
+          }
+        ]
+      },
+      "workflows": {
+        "data": [
+          {
+            "id": "<%= res.workflow_ids.first %>",
+            "type": "workflows"
+          }
+        ]
+      },
+      "file_templates": {
+        "data": []
+      },
+      "placeholders": {
+        "data": []
+      }
+    },
+    "links": {
+      "self": "/projects/<%= res.id %>"
+    },
+    "meta": {
+      "created": "<%= res.created_at.as_json %>",
+      "modified": "<%= res.updated_at.as_json %>",
+      "uuid": "<%= res.uuid %>",
+      "base_url": "http://localhost:3000",
+      "api_version": "0.3"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

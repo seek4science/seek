@@ -1,0 +1,158 @@
+{
+  "data": {
+    "id": "<%= res.id %>",
+    "type": "workflows",
+    "attributes": {
+      "policy": {
+        "access": "no_access",
+        "permissions": []
+      },
+      "tags": [
+        "Workflow-tag1",
+        "Workflow-tag2",
+        "Workflow-tag3",
+        "Workflow-tag4",
+        "Workflow-tag5"
+      ],
+      "title": "A Maximal Workflow",
+      "description": "How to run a simulation in GROMACS",
+      "operation_annotations": [
+        {
+          "label": "Clustering",
+          "identifier": "http://edamontology.org/operation_3432"
+        }
+      ],
+      "topic_annotations": [
+        {
+          "label": "Chemistry",
+          "identifier": "http://edamontology.org/topic_3314"
+        }
+      ],
+      "license": null,
+      "latest_version": 1,
+      "versions": [
+        {
+          "version": 1,
+          "revision_comments": null,
+          "url": "http://localhost:3000/workflows/<%= res.id %>?version=1"
+        }
+      ],
+      "version": 1,
+      "revision_comments": null,
+      "created_at": "<%= res.find_version(1).created_at.as_json %>",
+      "updated_at": "<%= res.find_version(1).updated_at.as_json %>",
+      "content_blobs": [
+        {
+          "original_filename": "rp2-to-rp2path.cwl",
+          "url": null,
+          "md5sum": "ef2ea32522098acc937199f6c2b64f41",
+          "sha1sum": "a5133ccdb0376324d039431e4eff4f7d21a751cd",
+          "content_type": "application/x-yaml",
+          "link": "http://localhost:3000/workflows/<%= res.id %>/content_blobs/<%= res.content_blob.id %>",
+          "size": 732
+        }
+      ],
+      "other_creators": "Blogs, Joe",
+      "creators": [
+        {
+          "profile": "/people/<%= res.assets_creators.first.creator_id %>",
+          "family_name": "<%= res.assets_creators.first.family_name %>",
+          "given_name": "<%= res.assets_creators.first.given_name %>",
+          "affiliation": "<%= res.assets_creators.first.affiliation %>",
+          "orcid": null
+        }
+      ],
+      "discussion_links": [
+        {
+          "id":
+          "<%= res.discussion_link_ids.first %>",
+          "url": "http://www.slack.com/",
+          "label": "Slack"
+        }
+      ]
+    },
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "<%= res.creator_ids.first %>",
+            "type": "people"
+          }
+        ]
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "<%= current_person.id %>",
+            "type": "people"
+          }
+        ]
+      },
+      "people": {
+        "data": [
+          {
+            "id": "<%= res.creator_ids.first %>",
+            "type": "people"
+          },
+          {
+            "id": "<%= current_person.id %>",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "<%= res.project_ids.first %>",
+            "type": "projects"
+          }
+        ]
+      },
+      "investigations": {
+        "data": [
+          {
+            "id": "<%= res.investigation_ids.first %>",
+            "type": "investigations"
+          }
+        ]
+      },
+      "studies": {
+        "data": [
+          {
+            "id": "<%= res.study_ids.first %>",
+            "type": "studies"
+          }
+        ]
+      },
+      "assays": {
+        "data": [
+          {
+            "id": "<%= res.assay_ids.first %>",
+            "type": "assays"
+          }
+        ]
+      },
+      "publications": {
+        "data": [
+          {
+            "id": "<%= res.publication_ids.first %>",
+            "type": "publications"
+          }
+        ]
+      }
+    },
+    "links": {
+      "self": "/workflows/<%= res.id %>?version=1"
+    },
+    "meta": {
+      "created": "<%= res.created_at.as_json %>",
+      "modified": "<%= res.updated_at.as_json %>",
+      "uuid": "<%= res.uuid %>",
+      "base_url": "http://localhost:3000",
+      "api_version": "0.3"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

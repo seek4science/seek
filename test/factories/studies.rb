@@ -7,6 +7,15 @@ Factory.define(:study) do |f|
   end
 end
 
+Factory.define(:public_study, parent: :study) do |f|
+  f.policy { Factory(:public_policy) }
+  f.investigation { Factory(:public_investigation) }
+end
+
+Factory.define(:study_with_assay, parent: :study) do |f|
+  f.assays { [Factory(:assay)] }
+end
+
 Factory.define(:min_study, class: Study) do |f|
   f.title "A Minimal Study"
   f.association :contributor, factory: :person
@@ -24,4 +33,5 @@ Factory.define(:max_study, parent: :min_study) do |f|
   f.after_build do |s|
     s.assays = [Factory(:max_assay, contributor: s.contributor, policy: Factory(:public_policy))]
   end
+  f.assets_creators { [AssetsCreator.new(affiliation: 'University of Somewhere', creator: Factory(:person, first_name: 'Some', last_name: 'One'))] }
 end

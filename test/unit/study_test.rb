@@ -29,10 +29,6 @@ class StudyTest < ActiveSupport::TestCase
     end
   end
 
-  test 'sort by updated_at' do
-    assert_equal Study.all.sort_by { |s| s.updated_at.to_i * -1 }, Study.all
-  end
-
   # only authorized people can delete a study, and a study must have no assays
   test 'can delete' do
     project_member = Factory(:person)
@@ -71,6 +67,13 @@ class StudyTest < ActiveSupport::TestCase
     assert_equal 2, study.assays.size
     assert_equal 3, study.related_publications.size
     assert_equal [pub1, pub2, pub3], study.related_publications.sort_by(&:id)
+  end
+
+  test 'directly associated sop' do
+    study = studies(:metabolomics_study)
+    sop = Factory(:sop)
+    study.sop = sop
+    assert_equal 3, study.related_sops.size
   end
 
   test 'sops through assays' do

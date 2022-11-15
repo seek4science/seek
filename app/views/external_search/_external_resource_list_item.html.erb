@@ -4,6 +4,6 @@
 <% content_partial = "#{Rails.root}/#{resource.partial_path}" -%>
 
 <div class="list_item">
-  <%= render :file=> content_partial, :locals=>{:resource => resource, :resource_origin => resource_type} %>
+  <%= render partial: resource.partial_path, locals: { resource: resource, resource_origin: resource_type } %>
 </div>
 <br style="clear:both"/>

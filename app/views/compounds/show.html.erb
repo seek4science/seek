@@ -1,4 +1,0 @@
-<% unless @tagged_objects.blank? %>
-  <% resource_hash = classify_for_tabs @tagged_objects -%>
-  <%= render :partial => "assets/resource_listing_tabbed_by_class", :locals => { :resource_hash => resource_hash } -%>
-<% end %>

@@ -11,7 +11,6 @@ class AssaysController < ApplicationController
   #defined in the application controller
   before_action :project_membership_required_appended, :only=>[:new_object_based_on_existing_one]
 
-
   include Seek::Publishing::PublishingCommon
 
   include Seek::IsaGraphExtensions
@@ -79,14 +78,12 @@ class AssaysController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.xml
     end
   end
 
   def edit
     respond_to do |format|
       format.html
-      format.xml
     end
   end
 
@@ -123,7 +120,7 @@ class AssaysController < ApplicationController
     update_relationships(@assay, params)
 
     respond_to do |format|
-      if @assay.update_attributes(assay_params)
+      if @assay.update(assay_params)
         flash[:notice] = "#{t('assays.assay')} was successfully updated."
         format.html { redirect_to(@assay) }
         format.json {render json: @assay, include: [params[:include]]}
@@ -156,7 +153,6 @@ class AssaysController < ApplicationController
   def show
     respond_to do |format|
       format.html { render(params[:only_content] ? { layout: false } : {})}
-      format.xml
       format.rdf { render :template=>'rdf/show'}
       format.json {render json: @assay, include: [params[:include]]}
 
@@ -168,12 +164,13 @@ class AssaysController < ApplicationController
   def assay_params
     params.require(:assay).permit(:title, :description, :study_id, :assay_class_id, :assay_type_uri, :technology_type_uri,
                                   :license, *creator_related_params, :position, { document_ids: []},
-                                  { scales: [] }, { sop_ids: [] }, { model_ids: [] },
+                                  { sop_ids: [] }, { model_ids: [] },
                                   { samples_attributes: [:asset_id, :direction] },
                                   { data_files_attributes: [:asset_id, :direction, :relationship_type_id] },
+                                  { placeholders_attributes: [:asset_id, :direction, :relationship_type_id] },
                                   { publication_ids: [] },
                                   { custom_metadata_attributes: determine_custom_metadata_keys },
-				  { discussion_links_attributes:[:id, :url, :label, :_destroy] }
+          { discussion_links_attributes:[:id, :url, :label, :_destroy] }
                                   ).tap do |assay_params|
       assay_params[:document_ids].select! { |id| Document.find_by_id(id).try(:can_view?) } if assay_params.key?(:document_ids)
       assay_params[:sop_ids].select! { |id| Sop.find_by_id(id).try(:can_view?) } if assay_params.key?(:sop_ids)

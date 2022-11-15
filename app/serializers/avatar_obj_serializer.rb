@@ -1,5 +1,5 @@
 class AvatarObjSerializer < BaseSerializer
   attribute :avatar do
-    avatar_href_link(object)
+    polymorphic_path([object, object.avatar]) unless object.avatar.nil?
   end
 end

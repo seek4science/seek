@@ -1,104 +1,163 @@
 {
-    "data": {
-        "id": "253",
-        "type": "presentations",
-        "attributes": {
-            "tags": [],
-            "title": "Data and model Management in Systems Biology",
-            "description": "Presentation at the 10th anniversary of SABIO-RK, Heidelberg 2016",
-            "license": null,
-            "latest_version": 1,
-            "versions": [
-                {
-                    "version": 1,
-                    "revision_comments": null,
-                    "url": "https://fairdomhub.org/presentations/253?version=1"
-                }
-            ],
-            "version": 1,
-            "revision_comments": null,
-            "created_at": "2016-05-31T09:08:57.000Z",
-            "updated_at": "2016-06-01T20:19:00.000Z",
-            "content_blobs": [
-                {
-                    "original_filename": "data-and-model-management-in-systems-biology",
-                    "url": "https://www.slideshare.net/dagwa/data-and-model-management-in-systems-biology",
-                    "md5sum": "1173007d7340ce19abbe015ffb9881f0",
-                    "sha1sum": "9a72a5bfa4b73d2aa5ee7a02024ad45cadcc9cd5",
-                    "content_type": "text/html",
-                    "link": "https://fairdomhub.org/presentations/253/content_blobs/2505",
-                    "size": 157861
-                }
-            ]
-        },
-        "relationships": {
-            "creators": {
-                "data": [
-                    {
-                        "id": "600",
-                        "type": "people"
-                    }
-                ]
-            },
-            "submitter": {
-                "data": [
-                    {
-                        "id": "600",
-                        "type": "people"
-                    }
-                ]
-            },
-            "people": {
-                "data": [
-                    {
-                        "id": "600",
-                        "type": "people"
-                    }
-                ]
-            },
-            "projects": {
-                "data": [
-                    {
-                        "id": "35",
-                        "type": "projects"
-                    },
-                    {
-                        "id": "49",
-                        "type": "projects"
-                    }
-                ]
-            },
-            "investigations": {
-                "data": []
-            },
-            "studies": {
-                "data": []
-            },
-            "assays": {
-                "data": []
-            },
-            "publications": {
-                "data": []
-            },
-            "events": {
-                "data": []
-            },
-            "workflows": {
-                "data": []
-            }
-        },
-        "links": {
-            "self": "/presentations/253?version=1"
-        },
-        "meta": {
-            "created": "2016-05-31T09:08:57.000Z",
-            "modified": "2016-06-01T20:19:00.000Z",
-            "api_version": "0.1",
-            "uuid": "3acc9170-093d-0134-4373-549f350973c0",
-            "base_url": "https://fairdomhub.org"
+  "data": {
+    "id": "11",
+    "type": "presentations",
+    "attributes": {
+      "policy": {
+        "access": "no_access",
+        "permissions": [
+
+        ]
+      },
+      "discussion_links": [
+        {
+          "id": "18",
+          "label": "Slack",
+          "url": "http://www.slack.com/"
         }
+      ],
+      "title": "A Maximal Presentation",
+      "license": null,
+      "description": "Non-equilibrium Free Energy Calculations and their caveats",
+      "latest_version": 1,
+      "tags": [
+        "Presentation-tag1",
+        "Presentation-tag2",
+        "Presentation-tag3",
+        "Presentation-tag4",
+        "Presentation-tag5"
+      ],
+      "versions": [
+        {
+          "version": 1,
+          "revision_comments": null,
+          "url": "http://localhost:3000/presentations/11?version=1"
+        }
+      ],
+      "version": 1,
+      "revision_comments": null,
+      "created_at": "2022-06-07T14:13:03.000Z",
+      "updated_at": "2022-06-07T14:13:03.000Z",
+      "content_blobs": [
+        {
+          "original_filename": "test.pdf",
+          "url": null,
+          "md5sum": "726de0a3f94d65056b909b9736e10349",
+          "sha1sum": "fbcc0dee4b5415de4c82ef5b137d8231fec1331b",
+          "content_type": "application/pdf",
+          "link": "http://localhost:3000/presentations/11/content_blobs/120",
+          "size": 8
+        }
+      ],
+      "creators": [
+        {
+          "profile": "/people/274",
+          "family_name": "One",
+          "given_name": "Some",
+          "affiliation": "University of Somewhere",
+          "orcid": null
+        }
+      ],
+      "other_creators": "Blogs, Joe"
     },
-    "jsonapi": {
-        "version": "1.0"
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "274",
+            "type": "people"
+          }
+        ]
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "275",
+            "type": "people"
+          }
+        ]
+      },
+      "people": {
+        "data": [
+          {
+            "id": "274",
+            "type": "people"
+          },
+          {
+            "id": "275",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "287",
+            "type": "projects"
+          }
+        ]
+      },
+      "investigations": {
+        "data": [
+          {
+            "id": "40",
+            "type": "investigations"
+          }
+        ]
+      },
+      "studies": {
+        "data": [
+          {
+            "id": "38",
+            "type": "studies"
+          }
+        ]
+      },
+      "assays": {
+        "data": [
+          {
+            "id": "36",
+            "type": "assays"
+          }
+        ]
+      },
+      "publications": {
+        "data": [
+          {
+            "id": "17",
+            "type": "publications"
+          }
+        ]
+      },
+      "events": {
+        "data": [
+          {
+            "id": "9",
+            "type": "events"
+          }
+        ]
+      },
+      "workflows": {
+        "data": [
+          {
+            "id": "19",
+            "type": "workflows"
+          }
+        ]
+      }
+    },
+    "links": {
+      "self": "/presentations/11?version=1"
+    },
+    "meta": {
+      "created": "2022-06-07T14:13:03.000Z",
+      "modified": "2022-06-07T14:13:03.000Z",
+      "api_version": "0.3",
+      "base_url": "http://localhost:3000",
+      "uuid": "de40d2f0-c899-013a-0f7e-0a81884ed284"
     }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
 }

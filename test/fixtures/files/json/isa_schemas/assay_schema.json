@@ -1,0 +1,77 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Assay JSON Schema",
+  "name": "Assay JSON Schema",
+  "description": "JSON Schema describing an Assay",
+  "@context": {
+    "@base": "http://purl.org/isaterms/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#"
+  },
+  "type": "object",
+  "properties": {
+    "@id": { "type": "string", "format": "uri" },
+    "filename" : { "type" : "string" },
+    "measurementType" : {
+      "$ref": "ontology_annotation_schema.json#"
+    },
+    "technologyType" : {
+      "type" : "object",
+      "properties": {
+        "ontologyAnnotation" : {
+          "$ref": "ontology_annotation_schema.json#"
+        }
+      }
+    },
+    "technologyPlatform" : { "type" : "string"},
+    "dataFiles" : {
+      "type": "array",
+      "items" : {
+        "$ref": "data_schema.json#"
+      }
+    },
+    "materials": {
+      "type": "object",
+      "properties": {
+        "samples": {
+          "type": "array",
+          "items": {
+            "$ref": "sample_schema.json#"
+          }
+        },
+        "otherMaterials": {
+          "type": "array",
+          "items": {
+            "$ref": "material_schema.json#"
+          }
+        }
+      }
+    },
+    "characteristicCategories": {
+      "description": "List of all the characteristics categories (or material attributes) defined in the study, used to avoid duplication of their declaration when each material_attribute_value is created. ",
+      "type": "array",
+      "items": {
+        "$ref": "material_attribute_schema.json#"
+      }
+    },
+    "unitCategories": {
+      "description": "List of all the unitsdefined in the study, used to avoid duplication of their declaration when each value is created. ",
+      "type": "array",
+      "items": {
+        "$ref": "ontology_annotation_schema.json#"
+      }
+    },
+    "processSequence": {
+      "type": "array",
+      "items" : {
+        "$ref" : "process_schema.json#"
+      }
+    },
+    "comments" : {
+      "type": "array",
+      "items": {
+        "$ref": "comment_schema.json#"
+      }
+    }
+  },
+  "additionalProperties": false
+}

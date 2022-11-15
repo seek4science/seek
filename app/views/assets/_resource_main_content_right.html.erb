@@ -10,8 +10,12 @@
 
 <% if resource.is_discussable? -%>
   <% if resource.discussion_links.select{|link| link.url.present?}.any?  %>
-    <%= render partial: 'assets/discussion_links_box', locals: {resource: resource } -%>
+    <%= render partial: 'assets/discussion_links_box', locals: { resource: resource } -%>
   <% end -%>
+<% end -%>
+
+<% if Seek::Config.bio_tools_enabled && resource.respond_to?(:bio_tools_links) && resource.bio_tools_links.any?  %>
+  <%= render partial: 'assets/bio_tools_links_box', locals: { resource: resource } -%>
 <% end -%>
 
 <% if resource.respond_to?(:snapshots)  %>
@@ -32,14 +36,26 @@
   <% end %>
 <% end %>
 
+<% if Seek::Config.file_templates_enabled && resource.respond_to?(:file_template) && !resource.file_template.nil? %>
+  <%= render :partial => "assets/file_template_box", :locals => { :resource => resource } -%>
+<% end %>
+
+<% suffix = 'the Data file'
+   if resource.instance_of? FileTemplate
+   suffix = 'Data files'
+   elsif resource.instance_of? Placeholder
+   suffix = 'actual Data files'
+   end
+   %>
+
 <% if resource.respond_to?(:license) %>
   <%= render :partial => "assets/license_box", :locals => { :resource => resource, :versioned_resource=> versioned_resource } -%>
 <% end %>
 
 <%= render :partial => "assets/usage_info_box",:locals => { :resource => resource } -%>
 
-<% if resource.edam_annotations? %>
-  <%= render partial:'assets/edam_properties_box', :locals => { :resource => resource }  %>
+<% if resource.controlled_vocab_annotations? %>
+  <%= render partial:'assets/controlled_vocab_annotations_properties_box', :locals => { :resource => resource } -%>
 <% end %>
 
 <% if resource.class.is_taggable? %>
@@ -55,6 +71,3 @@
 <% if resource.respond_to?(:collections) && resource.collections.any? -%>
     <%= render partial: 'assets/resource_collections_box', locals: { resource: resource } -%>
 <% end -%>
-
-<%= render :partial => "assets/resource_scales_box", :locals => { :resource => resource} if resource.respond_to?(:scales) && show_scales?-%>
-

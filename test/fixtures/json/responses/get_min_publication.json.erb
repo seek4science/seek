@@ -1,0 +1,129 @@
+{
+  "data": {
+    "id": "<%= res.id %>",
+    "type": "publications",
+    "attributes": {
+      "policy": {
+        "access": "download",
+        "permissions": [
+        ]
+      },
+      "discussion_links": [
+      ],
+      "misc_links": [
+      ],
+      "title": "A Minimal Publication",
+      "license": null,
+      "latest_version": 1,
+      "tags": [
+      ],
+      "versions": [
+        {
+          "version": 1,
+          "revision_comments": null,
+          "url": "http://localhost:3000/publications/<%= res.id %>?version=1",
+          "doi": "10.5075/abcd"
+        }
+      ],
+      "version": 1,
+      "revision_comments": null,
+      "doi": "10.5075/abcd",
+      "created_at": "<%= res.find_version(1).created_at.as_json %>",
+      "updated_at": "<%= res.find_version(1).updated_at.as_json %>",
+      "content_blobs": [
+      ],
+      "creators": [
+      ],
+      "other_creators": null,
+      "journal": null,
+      "published_date": null,
+      "doi": "10.5075/abcd",
+      "pubmed_id": null,
+      "abstract": null,
+      "citation": null,
+      "editor": null,
+      "booktitle": null,
+      "publisher": null,
+      "url": null,
+      "link_to_pub": "https://doi.org/10.5075/abcd",
+      "publication_type": "Journal",
+      "authors": [
+      ]
+    },
+    "relationships": {
+      "creators": {
+        "data": [
+        ]
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "<%= current_person.id %>",
+            "type": "people"
+          }
+        ]
+      },
+      "people": {
+        "data": [
+          {
+            "id": "<%= current_person.id %>",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "<%= res.project_ids.first %>",
+            "type": "projects"
+          }
+        ]
+      },
+      "investigations": {
+        "data": [
+        ]
+      },
+      "studies": {
+        "data": [
+        ]
+      },
+      "assays": {
+        "data": [
+        ]
+      },
+      "data_files": {
+        "data": [
+        ]
+      },
+      "models": {
+        "data": [
+        ]
+      },
+      "presentations": {
+        "data": [
+        ]
+      },
+      "events": {
+        "data": [
+        ]
+      },
+      "workflows": {
+        "data": [
+        ]
+      }
+    },
+    "links": {
+      "self": "/publications/<%= res.id %>?version=1"
+    },
+    "meta": {
+      "created": "<%= res.created_at.as_json %>",
+      "modified": "<%= res.updated_at.as_json %>",
+      "api_version": "0.3",
+      "uuid": "<%= res.uuid %>",
+      "base_url": "http://localhost:3000"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

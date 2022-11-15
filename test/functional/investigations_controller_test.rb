@@ -4,17 +4,12 @@ class InvestigationsControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
-  include RestTestCases
   include SharingFormTestHelper
   include RdfTestCases
   include GeneralAuthorizationTestCases
 
   def setup
     login_as(:quentin)
-  end
-
-  def rest_api_test_object
-    @object = Factory(:investigation, policy: Factory(:public_policy))
   end
 
   def test_title
@@ -32,7 +27,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     inv = Factory :investigation, contributor: User.current_user.person
     get :show, params: { id: inv, format: 'ro' }
     assert_response :success
-    assert_equal "attachment; filename=\"investigation-#{inv.id}.ro.zip\"", @response.header['Content-Disposition']
+    assert_equal "attachment; filename=\"investigation-#{inv.id}.ro.zip\"; filename*=UTF-8''investigation-#{inv.id}.ro.zip", @response.header['Content-Disposition']
     assert_equal 'application/vnd.wf4ever.robundle+zip', @response.header['Content-Type']
     assert @response.header['Content-Length'].to_i > 10
   end
@@ -659,11 +654,6 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert inv=assigns(:investigation)
     refute inv.valid?
 
-  end
-
-  def edit_max_object(investigation)
-    investigation.creators = [Factory(:person)]
-    disable_authorization_checks { investigation.save! }
   end
 
   test 'should create with discussion link' do

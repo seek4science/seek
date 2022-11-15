@@ -1,0 +1,10 @@
+0000000000000000000000000000000000000000 a321b6e4dd2cfb5219cf03bb9e2743db344f537a Finn Bacall <finn.bacall@manchester.ac.uk> 1633952902 +0100	commit (initial): Add files
+a321b6e4dd2cfb5219cf03bb9e2743db344f537a 1d201610715e67db278010b5231c8c207886d311 Finn Bacall <finn.bacall@manchester.ac.uk> 1633953858 +0100	commit: Oops, deleted the workflow
+1d201610715e67db278010b5231c8c207886d311 20eabdc95c69df04d9a43f0a345c4b8349c6a4ff Finn Bacall <finn.bacall@manchester.ac.uk> 1633953870 +0100	revert: Revert "Oops, deleted the workflow"
+20eabdc95c69df04d9a43f0a345c4b8349c6a4ff 20eabdc95c69df04d9a43f0a345c4b8349c6a4ff Finn Bacall <finn.bacall@manchester.ac.uk> 1666185134 +0100	checkout: moving from master to master
+20eabdc95c69df04d9a43f0a345c4b8349c6a4ff 20eabdc95c69df04d9a43f0a345c4b8349c6a4ff Finn Bacall <finn.bacall@manchester.ac.uk> 1666185138 +0100	reset: moving to master
+20eabdc95c69df04d9a43f0a345c4b8349c6a4ff a65ad5538a19c541aa1bf7350d6b937b7787a31a Finn Bacall <finn.bacall@manchester.ac.uk> 1666185190 +0100	commit: Correctly reference test
+a65ad5538a19c541aa1bf7350d6b937b7787a31a 20eabdc95c69df04d9a43f0a345c4b8349c6a4ff Finn Bacall <finn.bacall@manchester.ac.uk> 1666185217 +0100	reset: moving to HEAD~1
+20eabdc95c69df04d9a43f0a345c4b8349c6a4ff 20eabdc95c69df04d9a43f0a345c4b8349c6a4ff Finn Bacall <finn.bacall@manchester.ac.uk> 1666185259 +0100	checkout: moving from master to tests
+20eabdc95c69df04d9a43f0a345c4b8349c6a4ff 612f7f7d516367b2365fef86a52a3c72512d2454 Finn Bacall <finn.bacall@manchester.ac.uk> 1666185290 +0100	commit: Fixed tests
+612f7f7d516367b2365fef86a52a3c72512d2454 20eabdc95c69df04d9a43f0a345c4b8349c6a4ff Finn Bacall <finn.bacall@manchester.ac.uk> 1666186028 +0100	checkout: moving from tests to master

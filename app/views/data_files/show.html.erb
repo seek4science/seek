@@ -10,6 +10,7 @@
     <div class="row">
       <div class="col-md-9 col-sm-8 box_about_actor">
         <%= render :partial => "data_files/sample_extraction_status", :locals => {:data_file => @data_file} %>
+        <%= render :partial => "data_files/sample_persistence_status", :locals => {:data_file => @data_file} %>
 
         <%= item_description @display_data_file.description -%>
 
@@ -38,8 +39,6 @@
         <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @data_file, :versioned_resource=>@display_data_file } %>
       </div>
     </div>
-
-    <%= render :partial=>"data_files/studied_factors" if Seek::Config.factors_studied_enabled %>
 
     <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_data_file, :resource=>@data_file} %>
   <% end %>

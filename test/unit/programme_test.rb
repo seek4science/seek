@@ -166,36 +166,38 @@ class ProgrammeTest < ActiveSupport::TestCase
   end
 
   test 'assign adminstrator ids' do
-    programme = Factory(:programme)
-    person = Factory(:person)
-    person2 = Factory(:person)
+    disable_authorization_checks do
+      programme = Factory(:programme)
+      person = Factory(:person)
+      person2 = Factory(:person)
 
-    programme.update_attributes(administrator_ids: [person.id.to_s])
-    person.reload
-    person2.reload
-    programme.reload
+      programme.update(programme_administrator_ids: [person.id.to_s])
+      person.reload
+      person2.reload
+      programme.reload
 
-    assert person.is_programme_administrator?(programme)
-    refute person2.is_programme_administrator?(programme)
-    assert_equal [person], programme.programme_administrators
+      assert person.is_programme_administrator?(programme)
+      refute person2.is_programme_administrator?(programme)
+      assert_equal [person], programme.programme_administrators
 
-    programme.update_attributes(administrator_ids: [person2.id])
-    person.reload
-    person2.reload
-    programme.reload
+      programme.update(programme_administrator_ids: [person2.id])
+      person.reload
+      person2.reload
+      programme.reload
 
-    refute person.is_programme_administrator?(programme)
-    assert person2.is_programme_administrator?(programme)
-    assert_equal [person2], programme.programme_administrators
+      refute person.is_programme_administrator?(programme)
+      assert person2.is_programme_administrator?(programme)
+      assert_equal [person2], programme.programme_administrators
 
-    programme.update_attributes(administrator_ids: [person2.id, person.id])
-    person.reload
-    person2.reload
-    programme.reload
+      programme.update(programme_administrator_ids: [person2.id, person.id])
+      person.reload
+      person2.reload
+      programme.reload
 
-    assert person.is_programme_administrator?(programme)
-    assert person2.is_programme_administrator?(programme)
-    assert_equal [person2, person].sort, programme.programme_administrators.sort
+      assert person.is_programme_administrator?(programme)
+      assert person2.is_programme_administrator?(programme)
+      assert_equal [person2, person].sort, programme.programme_administrators.sort
+    end
   end
 
   test 'can create' do
@@ -281,7 +283,7 @@ class ProgrammeTest < ActiveSupport::TestCase
     assert pa.has_role?('programme_administrator')
 
     assert_difference('Programme.count', -1) do
-      assert_difference('AdminDefinedRoleProgramme.count', -1) do
+      assert_difference('Role.count', -1) do
         prog.destroy
       end
     end
@@ -307,7 +309,7 @@ class ProgrammeTest < ActiveSupport::TestCase
     assert pa.has_role?('programme_administrator')
 
     assert_difference('Programme.count', -1) do
-      assert_difference('AdminDefinedRoleProgramme.count', -1) do
+      assert_difference('Role.count', -1) do
         prog.destroy
       end
     end
@@ -505,5 +507,71 @@ class ProgrammeTest < ActiveSupport::TestCase
       refute prog.allows_user_projects?
       refute prog2.allows_user_projects?
     end
+  end
+
+  test 'open for projects scope' do
+    prog = Factory(:programme, open_for_projects: true)
+    prog2 = Factory(:programme, open_for_projects: false)
+    prog3 = Factory(:programme, open_for_projects: true)
+
+    assert_equal [prog, prog3].sort, Programme.open_for_projects.sort
+  end
+
+  test 'any_programmes_open_for_projects?' do
+
+    # no programmes
+    with_config_value(:programmes_open_for_projects_enabled,true) do
+      refute Programme.any_programmes_open_for_projects?
+    end
+
+    Factory(:programme, open_for_projects: true)
+    Factory(:programme, open_for_projects: false)
+
+    with_config_value(:programmes_open_for_projects_enabled, true) do
+      assert Programme.any_programmes_open_for_projects?
+    end
+    with_config_value(:programmes_open_for_projects_enabled, false) do
+      refute Programme.any_programmes_open_for_projects?
+    end
+
+  end
+
+  test 'can_associate_project' do
+    person = Factory(:person)
+    programme_admin = Factory(:person)
+    open_programme = Factory(:programme, open_for_projects: true)
+    closed_programme = Factory(:programme, open_for_projects: false)
+
+    disable_authorization_checks {
+      open_programme.programme_administrators = [programme_admin]
+      closed_programme.programme_administrators = [programme_admin]
+      open_programme.save!
+      closed_programme.save!
+    }
+
+    with_config_value(:programmes_open_for_projects_enabled, true) do
+      User.with_current_user(person.user) do
+        assert open_programme.can_associate_projects?
+        refute closed_programme.can_associate_projects?
+      end
+
+      User.with_current_user(programme_admin.user) do
+        assert open_programme.can_associate_projects?
+        assert closed_programme.can_associate_projects?
+      end
+    end
+
+    with_config_value(:programmes_open_for_projects_enabled, false) do
+      User.with_current_user(person.user) do
+        refute open_programme.can_associate_projects?
+        refute closed_programme.can_associate_projects?
+      end
+
+      User.with_current_user(programme_admin.user) do
+        assert open_programme.can_associate_projects?
+        assert closed_programme.can_associate_projects?
+      end
+    end
+
   end
 end

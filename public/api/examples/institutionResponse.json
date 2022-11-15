@@ -1,35 +1,47 @@
 {
-    "data": {
-        "id": "70",
-        "type": "institutions",
-        "attributes": {
-            "avatar": null,
-            "title": "Some university",
-            "country": "FR",
-            "city": null,
-            "address": null,
-            "web_page": null
-        },
-        "relationships": {
-            "people": {
-                "data": []
-            },
-            "projects": {
-                "data": []
-            }
-        },
-        "links": {
-            "self": "/institutions/70"
-        },
-        "meta": {
-            "created": "2018-04-12T09:46:10.695Z",
-            "modified": "2018-04-12T09:46:10.695Z",
-            "api_version": "0.1",
-            "uuid": "414f8a70-2064-0136-17ed-54bed9b4c528",
-            "base_url": "https://testing.sysmo-db.org"
+  "data": {
+    "id": "638",
+    "type": "institutions",
+    "attributes": {
+      "discussion_links": [
+        {
+          "id": "56",
+          "label": "Slack",
+          "url": "http://www.slack.com/"
         }
+      ],
+      "avatar": null,
+      "title": "A Maximal Institution",
+      "country": "United Kingdom",
+      "country_code": "GB",
+      "city": "Manchester",
+      "address": "Manchester Centre for Integrative Systems Biology, MIB/CEAS, The University of Manchester Faraday Building, Sackville Street, Manchester M60 1QD United Kingdom",
+      "web_page": "http://www.mib.ac.uk/"
     },
-    "jsonapi": {
-        "version": "1.0"
+    "relationships": {
+      "people": {
+        "data": [
+
+        ]
+      },
+      "projects": {
+        "data": [
+
+        ]
+      }
+    },
+    "links": {
+      "self": "/institutions/638"
+    },
+    "meta": {
+      "created": "2022-06-07T14:14:01.000Z",
+      "modified": "2022-06-07T14:14:01.000Z",
+      "api_version": "0.3",
+      "base_url": "http://localhost:3000",
+      "uuid": "00bfa1b0-c89a-013a-0f7e-0a81884ed284"
     }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
 }

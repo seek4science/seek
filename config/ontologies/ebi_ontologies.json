@@ -12196,7 +12196,7 @@
         "annotations" : {
           "bug-database" : [ "https://github.com/EnvironmentOntology/envo/issues/" ],
           "license" : [ "https://creativecommons.org/publicdomain/zero/1.0/" ],
-          "GitRepository" : [ "https://github.com/EnvironmentOntology/envo/" ],
+          "Git::Repository" : [ "https://github.com/EnvironmentOntology/envo/" ],
           "creator" : [ "http://orcid.org/0000-0002-8343-612X", "http://orcid.org/0000-0003-1604-1512", "http://orcid.org/0000-0002-6601-2165", "0000-0002-4366-3088" ],
           "default-namespace" : [ "ENVO" ],
           "comment" : [ "Includes Ontology(OntologyID(OntologyIRI(<http://purl.obolibrary.org/obo/envo/modules/chemical_concentration.owl>) VersionIRI(<null>))) [Axioms: 499 Logical Axioms: 88]", "Includes Ontology(OntologyID(OntologyIRI(<http://purl.obolibrary.org/obo/envo/modules/process_attribute.owl>) VersionIRI(<null>))) [Axioms: 21 Logical Axioms: 2]", "Includes Ontology(OntologyID(OntologyIRI(<http://purl.obolibrary.org/obo/envo/modules/entity_quality_location.owl>) VersionIRI(<null>))) [Axioms: 40 Logical Axioms: 6]", "Includes Ontology(OntologyID(OntologyIRI(<http://purl.obolibrary.org/obo/envo/modules/entity_attribute.owl>) VersionIRI(<null>))) [Axioms: 114 Logical Axioms: 19]", "Includes Ontology(OntologyID(OntologyIRI(<http://purl.obolibrary.org/obo/envo/modules/entity_attribute_location.owl>) VersionIRI(<null>))) [Axioms: 135 Logical Axioms: 22]" ]

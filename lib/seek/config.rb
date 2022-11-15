@@ -197,10 +197,18 @@ module Seek
       append_filestore_path 'rebranding'
     end
 
-    def append_filestore_path(inner_dir)
+    def git_filestore_path
+      append_filestore_path 'git'
+    end
+
+    def git_temporary_filestore_path
+      append_filestore_path 'tmp', 'git'
+    end
+
+    def append_filestore_path(*inner_dir)
       path = filestore_path
       path = File.join(Rails.root, path) unless path.start_with? '/'
-      check_path_exists(File.join(path, inner_dir))
+      check_path_exists(File.join(path, *inner_dir))
     end
 
     def check_path_exists(path)
@@ -215,10 +223,6 @@ module Seek
     def set_smtp_settings(field, value)
       merge! :smtp, field => (value.blank? ? nil : value)
       value
-    end
-
-    def facet_enable_for_page(controller)
-      facet_enable_for_pages.with_indifferent_access[controller.to_s]
     end
 
     def sorting_for(controller)
@@ -384,12 +388,13 @@ module Seek
 
     if use_db
       def get_value(setting, conversion = nil)
-        result = Settings.global.fetch(setting)
-        if result
-          val = result.value
+        val = Settings.defaults[setting.to_s]
+        if Thread.current[:use_settings_cache]
+          result = settings_cache[setting]
         else
-          val = Settings.defaults[setting.to_s]
+          result = Settings.global.fetch(setting)
         end
+        val = result.value if result
         val = val.send(conversion) if conversion && val
         val
       end
@@ -503,5 +508,36 @@ module Seek
       true
     end
 
+    def self.enable_cache!
+      Thread.current[:use_settings_cache] = true
+    end
+
+    def self.disable_cache!
+      Thread.current[:use_settings_cache] = nil
+    end
+
+    def self.settings_cache
+      RequestStore.fetch(:config_cache) do
+        Rails.cache.fetch(cache_key, expires_in: 1.week) do
+          cache_setting = Thread.current[:use_settings_cache]
+          begin
+            hash = {}
+            disable_cache! # Disable cache whilst loading settings to prevent infinite loop via `attr_encrypted_key_path`
+            Settings.global.to_a.each { |s| hash[s.var] = s }
+            hash
+          ensure
+            Thread.current[:use_settings_cache] = cache_setting
+          end
+        end
+      end
+    end
+
+    def self.clear_cache
+      Rails.cache.delete(cache_key)
+    end
+
+    def self.cache_key
+      'seek_config'
+    end
   end
 end

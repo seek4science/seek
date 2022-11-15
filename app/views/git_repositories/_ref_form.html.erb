@@ -1,0 +1,90 @@
+<div id="repo-ref-form" data-field-name="<%= name -%>">
+  <div id="repo-fetching-status" style="display: none">
+    <div class="alert alert-info" role="alert">
+      <strong>Checking out: <%= git_repository.remote %></strong><br/>
+      <span id="fetch-status">Waiting...</span>
+      <%= image 'spinner' %>
+    </div>
+  </div>
+
+  <div id="repo-fetching-error" class="alert alert-danger" role="alert" style="display: none"></div>
+
+  <div id="repo-ref-list" style="display: none">
+    <ul class="nav nav-tabs" role="tablist">
+      <li class="active">
+        <a href="#refs-branches" aria-controls="refs-branches" role="tab" data-toggle="tab">Branches</a>
+      </li>
+      <li>
+        <a href="#refs-tags" aria-controls="refs-tags" role="tab" data-toggle="tab">Tags</a>
+      </li>
+    </ul>
+
+    <div class="tab-content">
+      <div role="tabpanel" class="tab-pane select-ref-pane active" id="refs-branches"></div>
+      <div role="tabpanel" class="tab-pane select-ref-pane" id="refs-tags"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+    var GitRepository = {};
+    GitRepository.error = function (message) {
+        $j('#repo-fetching-status').hide();
+        $j('#repo-fetching-error').html(message).show();
+    };
+
+    GitRepository.fetchStatus = function () {
+        $j('#repo-fetching-status').show();
+        $j.ajax('<%= status_git_repository_path(git_repository) %>', {
+            success: function (json) {
+                $j('#fetch-status').html(json.text);
+                if (json.status === 'done') {
+                    GitRepository.fetchRefs();
+                    clearInterval(GitRepository.pollInterval);
+                } else if (json.status === 'failed') {
+                    GitRepository.error("Failed to fetch git repository, please check the URL is correct.");
+                    clearInterval(GitRepository.pollInterval);
+                }
+            },
+            error: function () {
+                 GitRepository.error("A server error occurred whilst trying to fetch the git repository.");
+                clearInterval(GitRepository.pollInterval);
+            }
+        });
+    };
+
+    GitRepository.fetchRefs = function () {
+        $j.ajax('<%= refs_git_repository_path(git_repository) %>', {
+            success: function (json) {
+                GitRepository.renderRefs(json);
+            },
+            error: function () {
+                GitRepository.error("A server error occurred whilst trying to fetch the git repository refs.");
+            }
+        });
+    };
+
+    GitRepository.renderRefs = function (refs) {
+        var field = $j('#repo-ref-form').data('fieldName');
+        $j('#repo-fetching-status').hide();
+        $j('#repo-ref-list').show();
+        $j('#git-create-button').show();
+        var branches = $j('#refs-branches');
+        refs.branches.forEach(function (ref) {
+            branches.append(HandlebarsTemplates['git/ref']({ ref: ref, field: field }));
+        });
+        var tags = $j('#refs-tags');
+        refs.tags.forEach(function (ref) {
+            tags.append(HandlebarsTemplates['git/ref']({ ref: ref, field: field }));
+        });
+    };
+
+    <% if git_repository.remote_git_fetch_task&.in_progress? %>
+    $j('#repo-fetching-status').show();
+    GitRepository.pollInterval = setInterval(GitRepository.fetchStatus, 2000);
+    <% elsif git_repository.remote_git_fetch_task&.failed? %>
+    GitRepository.error("An error occurred whilst trying to fetch the git repository refs.");
+    <% else %>
+    GitRepository.fetchRefs();
+    <% end %>
+</script>

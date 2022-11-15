@@ -3,5 +3,6 @@ SEEK::Application.configure do
 
   ActiveSupport::Inflector.inflections do |inflect|
     inflect.irregular "specimen","specimens"
+    inflect.irregular "data","data"
   end
 end

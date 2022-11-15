@@ -1,0 +1,193 @@
+
+<%= javascript_include_tag "single_page/index" %>
+<% projects = Project.all %>
+<% templates = load_templates %>
+
+
+<h1>Query Samples</h1>
+
+<% # Part of the browse from Sample_type     %>
+<%= index_and_new_help_icon controller_name %>
+
+<div id="query_samples">
+	
+	<div class="row" style="padding-top:10px">
+		<div class="col-md-4">
+			<%= help_icon("Select one or more #{t('project').pluralize} to which the Samples must belong.") -%>
+			<label>Select Project(s)</label>
+			<select id="projects" class="form-control select2" multiple="multiple">
+				<% projects.each do |p| %>
+					<option value='<%= p[:id] %>'><%= p[:title] %></option>
+				<% end %>
+			</select>
+		</div>
+	</div>
+	<div class="row" style="padding-top:10px;padding-bottom:10px">
+		<div class="col-md-4">
+			<%= help_icon("Select the #{t('template')} used to create the Samples.") -%>
+			<label>Select a Template<span class="required">*</span></label>
+			<select id="template" class="form-control select2">
+				<option value="">Not selected</option>
+				<% templates.pluck(:group).uniq.each do |group_name| %>
+					<optgroup label='<%= group_name %>'>
+						<% templates.select{|t| t[:group]==group_name}.each do |t| %>
+							<option value='<%= t[:template_id] %>'><%=t[:title]%></option>
+						<% end %>
+					</optgroup>
+				<% end %>
+			</select>
+		</div>
+		<div class="col-md-4">
+			<label>Select an Attribute</label>
+			<select id="template_attribute" class="form-control select2">
+				<option value="">Not selected</option>
+			</select>
+		</div>
+		<div class="col-md-4">
+			<label>Enter value</label>
+			<input id="attribute_value" class="form-control"/>
+		</div>
+	</div>
+	
+	<%= folding_panel('Advanced filtering', false, { style: "margin-top:15px" }) do %>
+		<div class="row">
+			<div class="col-md-4">
+				<h4>
+					<%= help_icon("Select the #{t('template')} used to create the parent Samples from which your Samples of interest derive from.") -%>
+					Input sample(s)
+				</h4>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-4">
+				<label>Select a Template</label>
+				<select id="input_template" class="form-control select2">
+					<option value="">Not selected</option>
+					<% templates.pluck(:group).uniq.each do |group_name| %>
+						<optgroup label='<%= group_name %>'>
+							<% templates.select{|t| t[:group]==group_name}.each do |t| %>
+								<option value='<%= t[:template_id] %>'><%= t[:title] %></option>
+							<% end %>
+						</optgroup>
+					<% end %>
+				</select>
+			</div>
+			<div class="col-md-4">
+				<label>Select an Attribute</label>
+				<select id="input_template_attribute" class="form-control select2">
+					<option value="">Not selected</option>
+				</select>
+			</div>
+			<div class="col-md-4">
+				<label>Enter value</label>
+				<input id="input_attribute_value" class="form-control"/>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-4">
+				<h4>
+					<%= help_icon("Select the #{t('template')} used to create the child Samples that derive from your Samples of interest.") -%>
+					Output sample(s)
+				</h4>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-4">
+				<label>Select a Template</label>
+				<select id="output_template" class="form-control select2">
+					<option value="">Not selected</option>
+					<% templates.pluck(:group).uniq.each do |group_name| %>
+						<optgroup label='<%= group_name %>'>
+							<% templates.select{|t| t[:group]==group_name}.each do |t| %>
+								<option value='<%= t[:template_id] %>'><%= t[:title] %></option>
+							<% end %>
+						</optgroup>
+					<% end %>
+				</select>
+			</div>
+			<div class="col-md-4">
+				<label>Select an Attribute</label>
+				<select id="output_template_attribute" class="form-control select2">
+					<option value="">Not selected</option>
+				</select>
+			</div>
+			<div class="col-md-4">
+				<label>Enter value</label>
+				<input id="output_attribute_value" class="form-control"/>
+			</div>
+		</div>
+	<% end %>
+
+	<div class="row">
+		<div class="col-md-4" style="margin-bottom:20px">
+			<button id="btn_submit" class="btn btn-primary" onclick="submit()">Query</button>
+			<br>
+			<em id="sample-count"></em>
+		</div>
+	</div>
+
+	<div id="samples-table">
+		<%= render partial: "samples/table_view", locals: { samples: @result, link: true }%>
+	</div>
+
+</div>
+
+
+<script>
+	$j(document).ready(function () {
+		initSelect2($j('.select2'), $j('#query_samples'))
+		Samples.initTable($j('#samples-table'));
+	});
+
+	$j("#template").on("change", function(){
+		loadAttributes($j(this).val(), $j("#template_attribute"))
+	})
+
+	$j("#input_template").on("change", function(){
+		loadAttributes($j(this).val(), $j("#input_template_attribute"))
+	})
+
+	$j("#output_template").on("change", function(){
+		loadAttributes($j(this).val(), $j("#output_template_attribute"))
+	})
+
+	async function loadAttributes(template_id, object) {
+		object.empty().append($j('<option value="">Not selected</option>'))
+		if(template_id > 0){
+			const path = "<%=template_attributes_template_path('SET_ME')%>"
+			const res = await ajaxCall(path.replace('SET_ME', template_id), "POST", {})
+			object.empty().append($j('<option value="">Not selected</option>'))
+			$j.each(res, (i, attribute) => {
+				object.append($j(`<option value='${attribute.id}'>${attribute.title}</option>`))
+			})
+		}	
+	}
+
+	$j("#template").on("change", function(){
+		$j(this).val() && $j(this).parent().removeClass("has-error")
+	})
+
+	function submit(){
+		if(!$j("#template").val()){
+			$j("#template").parent().addClass("has-error")
+			return alert('Template is required!')
+		}
+		const data = {
+			project_ids: $j('#projects').select2('data').map(x=>x.id),
+			template_id: $j("#template").val(),
+			template_attribute_id: $j("#template_attribute").val(),
+			template_attribute_value: $j("#attribute_value").val(),
+			input_template_id: $j("#input_template").val(),
+			input_attribute_id: $j("#input_template_attribute").val(),
+			input_attribute_value: $j("#input_attribute_value").val(),
+			output_template_id: $j("#output_template").val(),
+			output_attribute_id: $j("#output_template_attribute").val(),
+			output_attribute_value: $j("#output_attribute_value").val(),
+		}
+		$j.ajax({
+				url: "<%=query_samples_path%>",
+				method: "POST",
+				data
+		})
+	}
+</script>

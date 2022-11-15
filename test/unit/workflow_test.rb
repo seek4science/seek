@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'minitest/mock'
 
 class WorkflowTest < ActiveSupport::TestCase
   test 'validations' do
@@ -64,7 +65,7 @@ class WorkflowTest < ActiveSupport::TestCase
     crate = workflow.ro_crate
 
     assert crate.main_workflow
-    refute crate.main_workflow_diagram
+    assert crate.main_workflow_diagram
     refute crate.main_workflow_cwl
     assert_equal 'Common Workflow Language', crate.main_workflow.programming_language['name']
 
@@ -135,30 +136,29 @@ class WorkflowTest < ActiveSupport::TestCase
   end
 
   test 'generates RO-Crate and diagram for workflow/abstract workflow' do
-    with_config_value(:cwl_viewer_url, 'http://localhost:8080/cwl_viewer') do
-      workflow = Factory(:generated_galaxy_no_diagram_ro_crate_workflow)
-      assert workflow.should_generate_crate?
-      crate = nil
+    workflow = Factory(:generated_galaxy_no_diagram_ro_crate_workflow)
+    assert workflow.should_generate_crate?
+    crate = nil
 
-      VCR.use_cassette('workflows/cwl_viewer_galaxy_workflow_abstract_cwl_diagram') do
-        crate = workflow.ro_crate
-      end
+    crate = workflow.ro_crate
 
-      assert crate.main_workflow
-      assert crate.main_workflow_diagram
-      assert crate.main_workflow_cwl
-    end
+    assert crate.main_workflow
+    assert crate.main_workflow_diagram
+    assert crate.main_workflow_cwl
   end
 
   test 'generates RO-Crate and gracefully handles diagram error for workflow/abstract workflow' do
-    with_config_value(:cwl_viewer_url, 'http://localhost:8080/cwl_viewer') do
+    bad_generator = MiniTest::Mock.new
+    def bad_generator.write_graph(struct)
+      raise 'oh dear'
+    end
+
+    Seek::WorkflowExtractors::CwlDotGenerator.stub :new, bad_generator do
       workflow = Factory(:generated_galaxy_no_diagram_ro_crate_workflow)
       assert workflow.should_generate_crate?
       crate = nil
 
-      VCR.use_cassette('workflows/cwl_viewer_error') do
-        crate = workflow.ro_crate
-      end
+      crate = workflow.ro_crate
 
       assert crate.main_workflow
       refute crate.main_workflow_diagram
@@ -177,7 +177,7 @@ class WorkflowTest < ActiveSupport::TestCase
     workflow = nil
     with_config_value(:life_monitor_enabled, true) do
       assert_enqueued_with(job: LifeMonitorSubmissionJob) do
-        workflow = Factory(:workflow_with_tests, uuid: '56c50ac0-529b-0139-9132-000c29a94011',
+        workflow = Factory(:workflow_with_tests, uuid: '86da0a30-d2cd-013a-a07d-000c29a94011',
                            policy: Factory(:public_policy))
         assert workflow.latest_version.has_tests?
         assert workflow.can_download?(nil)
@@ -188,9 +188,30 @@ class WorkflowTest < ActiveSupport::TestCase
           VCR.use_cassette('life_monitor/submit_workflow') do
             assert_nothing_raised do
               User.current_user = workflow.contributor.user
-              refute workflow.latest_version.monitored
               LifeMonitorSubmissionJob.perform_now(workflow.latest_version)
-              assert workflow.latest_version.reload.monitored
+            end
+          end
+        end
+      end
+    end
+  end
+
+  test 'creates life monitor submission job on create if tests present for git workflow' do
+    workflow = nil
+    with_config_value(:life_monitor_enabled, true) do
+      assert_enqueued_with(job: LifeMonitorSubmissionJob) do
+        workflow = Factory(:ro_crate_git_workflow_with_tests, uuid: '86da0a30-d2cd-013a-a07d-000c29a94011',
+                           policy: Factory(:public_policy))
+        assert workflow.latest_git_version.has_tests?
+        assert workflow.can_download?(nil)
+      end
+
+      VCR.use_cassette('life_monitor/get_token') do
+        VCR.use_cassette('life_monitor/non_existing_workflow_get') do
+          VCR.use_cassette('life_monitor/submit_workflow') do
+            assert_nothing_raised do
+              User.current_user = workflow.contributor.user
+              LifeMonitorSubmissionJob.perform_now(workflow.latest_version)
             end
           end
         end
@@ -218,6 +239,16 @@ class WorkflowTest < ActiveSupport::TestCase
     end
   end
 
+  test 'does not create life monitor submission job if no tests in git workflow' do
+    with_config_value(:life_monitor_enabled, true) do
+      assert_no_enqueued_jobs(only: LifeMonitorSubmissionJob) do
+        workflow = Factory(:ro_crate_git_workflow, policy: Factory(:public_policy))
+        refute workflow.latest_version.has_tests?
+        assert workflow.can_download?(nil)
+      end
+    end
+  end
+
   test 'does not create life monitor submission job if workflow not publicly accessible' do
     with_config_value(:life_monitor_enabled, true) do
       assert_no_enqueued_jobs(only: LifeMonitorSubmissionJob) do
@@ -228,29 +259,14 @@ class WorkflowTest < ActiveSupport::TestCase
     end
   end
 
-  test 'does not create life monitor submission job if workflow already monitored' do
-    workflow = Factory(:workflow_with_tests, policy: Factory(:private_policy))
-    workflow.latest_version.update_column(:monitored, true)
-    workflow.policy.update_column(:access_type, Policy::ACCESSIBLE)
-    with_config_value(:life_monitor_enabled, true) do
-      assert_no_enqueued_jobs(only: LifeMonitorSubmissionJob) do
-        assert workflow.latest_version.has_tests?
-        assert workflow.latest_version.monitored
-        assert workflow.can_download?(nil)
-        disable_authorization_checks { workflow.save! }
-      end
-    end
-  end
-
   test 'creates lifemonitor submission job on update if workflow made public' do
     workflow = nil
     with_config_value(:life_monitor_enabled, true) do
       assert_no_enqueued_jobs(only: LifeMonitorSubmissionJob) do
-        workflow = Factory(:workflow_with_tests, uuid: '56c50ac0-529b-0139-9132-000c29a94011', policy: Factory(:private_policy))
+        workflow = Factory(:workflow_with_tests, uuid: '86da0a30-d2cd-013a-a07d-000c29a94011', policy: Factory(:private_policy))
         User.current_user = workflow.contributor.user
         assert workflow.latest_version.has_tests?
         refute workflow.can_download?(nil)
-        refute workflow.latest_version.monitored
       end
 
       assert_enqueued_with(job: LifeMonitorSubmissionJob) do
@@ -258,16 +274,13 @@ class WorkflowTest < ActiveSupport::TestCase
         disable_authorization_checks { workflow.save! }
         assert workflow.latest_version.has_tests?
         assert workflow.can_download?(nil)
-        refute workflow.latest_version.monitored
       end
 
       VCR.use_cassette('life_monitor/get_token') do
         VCR.use_cassette('life_monitor/non_existing_workflow_get') do
           VCR.use_cassette('life_monitor/submit_workflow') do
             assert_nothing_raised do
-              refute workflow.latest_version.monitored
               LifeMonitorSubmissionJob.perform_now(workflow.latest_version)
-              assert workflow.latest_version.reload.monitored
             end
           end
         end
@@ -276,7 +289,7 @@ class WorkflowTest < ActiveSupport::TestCase
   end
 
   test 'does not resubmit if workflow is already on life monitor' do
-    workflow = Factory(:workflow_with_tests, uuid: '56c50ac0-529b-0139-9132-000c29a94011', policy: Factory(:public_policy))
+    workflow = Factory(:workflow_with_tests, uuid: '86da0a30-d2cd-013a-a07d-000c29a94011', policy: Factory(:public_policy))
 
     VCR.use_cassette('life_monitor/get_token') do
       VCR.use_cassette('life_monitor/existing_workflow_get') do
@@ -342,9 +355,267 @@ class WorkflowTest < ActiveSupport::TestCase
     assert_nil v2.reload.test_status
   end
 
-  test 'tags and edam in json api' do
-    Factory(:edam_topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.edam_topics_controlled_vocab
-    Factory(:edam_operations_controlled_vocab) unless SampleControlledVocab::SystemVocabs.edam_operations_controlled_vocab
+  test 'test_status is not carried over to new git versions' do
+    workflow = Factory(:ro_crate_git_workflow)
+    disable_authorization_checks { workflow.update_test_status(:all_passing) }
+    v1 = workflow.find_version(1)
+    assert_equal :all_passing, v1.test_status
+    assert_equal :all_passing, workflow.reload.test_status
+
+    disable_authorization_checks do
+      s = workflow.save_as_new_git_version(ref: 'refs/heads/master')
+      assert s
+    end
+
+    assert_nil workflow.reload.test_status
+    assert_nil workflow.latest_version.test_status
+    assert_equal :all_passing, v1.test_status
+  end
+
+  test 'update test status for git versioned workflows' do
+    # Default latest version
+    workflow = Factory(:local_ro_crate_git_workflow, test_status: nil)
+    v1 = workflow.find_version(1)
+    disable_authorization_checks { workflow.save_as_new_git_version }
+    v2 = workflow.find_version(2)
+    assert_nil workflow.reload.test_status
+    assert_nil workflow.latest_version.reload.test_status
+    disable_authorization_checks { workflow.update_test_status(:all_failing) }
+    assert_equal :all_failing, workflow.reload.test_status
+    assert_nil v1.test_status
+    assert_equal :all_failing, v2.reload.test_status
+
+    # Explicit latest version
+    workflow = Factory(:local_ro_crate_git_workflow, test_status: nil)
+    v1 = workflow.find_version(1)
+    disable_authorization_checks { workflow.save_as_new_git_version }
+    v2 = workflow.find_version(2)
+    assert_nil workflow.reload.test_status
+    assert_nil workflow.latest_version.reload.test_status
+    disable_authorization_checks { workflow.update_test_status(:all_failing, 2) }
+    assert_equal :all_failing, workflow.reload.test_status
+    assert_nil v1.reload.test_status
+    assert_equal :all_failing, v2.reload.test_status
+
+    # Explicit non-latest version
+    workflow = Factory(:local_ro_crate_git_workflow, test_status: nil)
+    v1 = workflow.find_version(1)
+    disable_authorization_checks { workflow.save_as_new_git_version }
+    v2 = workflow.find_version(2)
+    assert_nil workflow.reload.test_status
+    assert_nil workflow.latest_version.reload.test_status
+    disable_authorization_checks { workflow.update_test_status(:all_failing, 1) }
+    assert_nil workflow.reload.test_status
+    assert_equal :all_failing, v1.reload.test_status
+    assert_nil v2.reload.test_status
+  end
+
+  test 'changing main workflow path refreshes internals structure' do
+    workflow = Factory(:local_git_workflow)
+    v = workflow.git_version
+
+    disable_authorization_checks do
+      v.refresh_internals
+      v.save!
+      v.add_file('1-PreProcessing.ga', open_fixture_file('workflows/1-PreProcessing.ga'))
+    end
+
+    assert_equal 'concat_two_files.ga', v.main_workflow_path
+    assert_equal 2, v.inputs.count
+    assert_equal 1, v.steps.count
+    assert_equal 1, v.outputs.count
+
+    disable_authorization_checks do
+      v.main_workflow_path = '1-PreProcessing.ga'
+      assert v.main_workflow_path_changed?
+      v.save!
+    end
+
+    assert_equal '1-PreProcessing.ga', v.main_workflow_path
+    assert_equal 2, v.inputs.length
+    assert_equal 15, v.steps.length
+    assert_equal 31, v.outputs.length
+  end
+
+  test 'changing diagram path clears the cached diagram' do
+    workflow = Factory(:local_git_workflow)
+    v = workflow.git_version
+    original_diagram = v.diagram
+    assert original_diagram
+
+    disable_authorization_checks do
+      v.add_file('new-diagram.png', open_fixture_file('file_picture.png'))
+    end
+
+    assert_equal 'diagram.png', v.diagram_path
+    assert original_diagram.exists?
+    assert_equal 32248, original_diagram.size
+
+    disable_authorization_checks do
+      v.diagram_path = 'new-diagram.png'
+      assert v.diagram_path_changed?
+      v.save!
+    end
+
+    assert_equal 'new-diagram.png', v.diagram_path
+    refute v.diagram_exists?
+    new_diagram = v.diagram
+
+    assert new_diagram.exists?
+    assert_equal 2728, new_diagram.size
+  end
+
+  test 'adding diagram path clears the cached auto-generated diagram' do
+    workflow = Factory(:annotationless_local_git_workflow,
+                       workflow_class: WorkflowClass.find_by_key('cwl') || Factory(:cwl_workflow_class))
+
+    v = workflow.git_version
+    disable_authorization_checks do
+      v.main_workflow_path = 'Concat_two_files.cwl'
+      v.save!
+    end
+
+    assert v.can_render_diagram?
+    original_diagram = v.diagram # Generates a diagram from the CWL
+    assert original_diagram
+
+    disable_authorization_checks do
+      v.add_file('new-diagram.png', open_fixture_file('file_picture.png'))
+    end
+
+    assert_nil v.diagram_path, 'Diagram path should not be set, it is generated.'
+    assert original_diagram.exists?
+    original_size = original_diagram.size
+    assert original_size > 100
+    assert original_size < 50000
+    original_sha1sum = original_diagram.sha1sum
+
+    disable_authorization_checks do
+      v.diagram_path = 'new-diagram.png'
+      assert v.diagram_path_changed?
+      v.save!
+    end
+
+    assert_equal 'new-diagram.png', v.diagram_path
+    refute v.diagram_exists?
+    new_diagram = v.diagram
+
+    assert new_diagram.exists?
+    assert_equal 2728, new_diagram.size
+    assert_not_equal original_sha1sum, new_diagram.sha1sum
+  end
+
+
+  test 'removing diagram path reverts to the auto-generated diagram' do
+    workflow = Factory(:annotationless_local_git_workflow,
+                       workflow_class: WorkflowClass.find_by_key('cwl') || Factory(:cwl_workflow_class))
+
+    v = workflow.git_version
+    disable_authorization_checks do
+      v.main_workflow_path = 'Concat_two_files.cwl'
+      v.diagram_path = 'diagram.png'
+      v.save!
+    end
+
+    v = workflow.git_version
+    original_diagram = v.diagram
+    assert original_diagram
+
+    disable_authorization_checks do
+      v.add_file('new-diagram.png', open_fixture_file('file_picture.png'))
+    end
+
+    assert_equal 'diagram.png', v.diagram_path
+    assert original_diagram.exists?
+    assert_equal 32248, original_diagram.size
+    original_sha1sum = original_diagram.sha1sum
+
+    disable_authorization_checks do
+      v.diagram_path = nil
+      assert v.diagram_path_changed?
+      v.save!
+    end
+
+    assert_nil v.diagram_path
+    refute v.diagram_exists?
+    assert v.can_render_diagram?
+    new_diagram = v.diagram # Generates diagram
+
+    assert new_diagram.exists?
+    assert new_diagram.size > 100
+    assert new_diagram.size < 50000
+    assert_not_equal original_sha1sum, new_diagram.sha1sum
+  end
+
+  test 'generates RO-Crate for workflow with auto-generated diagram' do
+    workflow = Factory(:annotationless_local_git_workflow,
+                       workflow_class: WorkflowClass.find_by_key('cwl') || Factory(:cwl_workflow_class))
+
+    v = workflow.git_version
+    disable_authorization_checks do
+      v.main_workflow_path = 'Concat_two_files.cwl'
+      v.save!
+    end
+
+    v = workflow.git_version
+    original_diagram = v.diagram
+    assert original_diagram
+    assert_nil v.diagram_path, 'Diagram path should not be set, it is generated.'
+
+    assert_nothing_raised do
+      crate = workflow.ro_crate
+      assert crate.main_workflow
+      assert crate.main_workflow_diagram
+      assert_equal original_diagram.size, crate.main_workflow_diagram.content_size
+    end
+  end
+
+  test 'search terms for git workflows' do
+    workflow = Factory(:annotationless_local_git_workflow, workflow_class: Factory(:unextractable_workflow_class))
+
+    v = nil
+    disable_authorization_checks do
+      v = workflow.git_version
+      c = v.add_files(
+        [['main.ga', StringIO.new('{ "a_galaxy_workflow" : true, "Yes" : "yep", "OK" : "yep", "Cool" : "yep" } ')],
+         ['README.md', StringIO.new('unique_string_banana a b c d e')],
+         ['LICENSE', StringIO.new('unique_string_grapefruit f g h i j k')]])
+      v.main_workflow_path = 'main.ga'
+      v.commit = c
+      v.save!
+    end
+
+    terms = v.search_terms
+
+    assert(terms.any? { |t| t.include?('a_galaxy_workflow') })
+    assert(terms.any? { |t| t.include?('unique_string_banana') })
+    refute(terms.any? { |t| t.include?('unique_string_grapefruit') })
+  end
+
+  test 'updating workflow synchronizes metadata on git version' do
+    workflow = Factory(:annotationless_local_git_workflow, workflow_class: Factory(:unextractable_workflow_class))
+    assert workflow.git_version.mutable
+    disable_authorization_checks do
+      workflow.update!(title: 'new title')
+      assert_equal 'new title', workflow.reload.title
+      assert_equal 'new title', workflow.git_version.reload.title
+    end
+  end
+
+  test 'updating workflow synchronizes metadata on immutable git version' do
+    workflow = Factory(:annotationless_local_git_workflow, workflow_class: Factory(:unextractable_workflow_class))
+    disable_authorization_checks do
+      workflow.git_version.lock
+      refute workflow.git_version.mutable
+      workflow.update!(title: 'new title')
+      assert_equal 'new title', workflow.reload.title
+      assert_equal 'new title', workflow.git_version.reload.title
+    end
+  end
+
+  test 'tags and ontology annotations in json api' do
+    Factory(:topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.topics_controlled_vocab
+    Factory(:operations_controlled_vocab) unless SampleControlledVocab::SystemVocabs.operations_controlled_vocab
 
     user = Factory(:user)
 
@@ -354,10 +625,69 @@ class WorkflowTest < ActiveSupport::TestCase
 
     json = WorkflowSerializer.new(workflow).as_json
 
-    assert_equal ['blue','green','red'], json[:tags]
+    assert_equal ["Workflow-tag1", "Workflow-tag2", "Workflow-tag3", "Workflow-tag4", "Workflow-tag5"], json[:tags]
 
-    assert_equal [{label:'Clustering', identifier: 'http://edamontology.org/operation_3432'}], json[:edam_operations]
-    assert_equal [{label:'Chemistry', identifier: 'http://edamontology.org/topic_3314'}], json[:edam_topics]
+    assert_equal [{label:'Clustering', identifier: 'http://edamontology.org/operation_3432'}], json[:operation_annotations]
+    assert_equal [{label:'Chemistry', identifier: 'http://edamontology.org/topic_3314'}], json[:topic_annotations]
+  end
 
+  test 'ontology annotation properties'do
+    wf = Factory(:workflow)
+
+    assert wf.supports_controlled_vocab_annotations?
+    assert wf.supports_controlled_vocab_annotations?(:topics)
+    assert wf.supports_controlled_vocab_annotations?(:operations)
+    refute wf.supports_controlled_vocab_annotations?(:data_formats)
+    refute wf.supports_controlled_vocab_annotations?(:data_types)
+
+    assert wf.respond_to?(:topic_annotations)
+    assert wf.respond_to?(:operation_annotations)
+    refute wf.respond_to?(:data_format_annotations)
+    refute wf.respond_to?(:data_type_annotations)
+  end
+
+  test 'associate tools with workflow' do
+    wf = Factory(:workflow)
+
+    assert_difference('BioToolsLink.count', 3) do
+      wf.tools_attributes = [
+        { bio_tools_id: 'thing-doer', name: 'ThingDoer'},
+        { bio_tools_id: 'database-accessor', name: 'DatabaseAccessor'},
+        { bio_tools_id: 'ruby', name: 'Ruby'}
+      ]
+
+      disable_authorization_checks { wf.save! }
+      assert_equal %w[database-accessor ruby thing-doer],
+                   wf.bio_tools_links.pluck(:bio_tools_id).sort
+    end
+  end
+
+  test 'associating tools with workflow does not create duplicate annotation records' do
+    wf = Factory(:workflow)
+    disable_authorization_checks do
+      wf.tools_attributes = [
+        { bio_tools_id: 'thing-doer', name: 'ThingDoer'},
+        { bio_tools_id: 'database-accessor', name: 'DatabaseAccessor'},
+        { bio_tools_id: 'python', name: 'Python'},
+        { bio_tools_id: 'ruby', name: 'Ruby'}
+      ]
+      wf.save!
+    end
+    thing_doer = wf.bio_tools_links.where(bio_tools_id: 'thing-doer').first
+    orig_id = thing_doer.id
+
+    assert_difference('BioToolsLink.count', -1, 'should have removed redundant annotation') do
+      wf.tools_attributes = [
+        { bio_tools_id: 'thing-doer', name: 'ThingDoer!!!'},
+        { bio_tools_id: 'database-accessor', name: 'DatabaseAccessor'},
+        { bio_tools_id: 'javascript', name: 'JavaScript'}
+      ]
+
+      disable_authorization_checks { wf.save! }
+      assert_includes wf.bio_tools_link_ids, orig_id
+      assert_equal 'ThingDoer!!!', thing_doer.reload.name, 'Should update name of tool'
+      assert_equal %w[database-accessor javascript thing-doer],
+                   wf.bio_tools_links.pluck(:bio_tools_id).sort
+    end
   end
 end

@@ -7,7 +7,7 @@ module SamplesHelper
   end
 
   def controlled_vocab_form_field(sample_controlled_vocab, element_name, values, limit=1)
-    if sample_controlled_vocab.sample_controlled_vocab_terms.count < Seek::Config.cv_dropdown_limit
+    if sample_controlled_vocab.sample_controlled_vocab_terms.count < Seek::Config.cv_dropdown_limit && sample_controlled_vocab.source_ontology.blank?
       options = options_from_collection_for_select(
         sample_controlled_vocab.sample_controlled_vocab_terms.sort_by(&:label),
         :label, :label,
@@ -19,13 +19,14 @@ module SamplesHelper
                  include_blank: ""
     else
       scv_id = sample_controlled_vocab.id
+      is_ontology = sample_controlled_vocab.source_ontology.present?
       existing_objects = Array(values).collect do |value|
         Struct.new(:id, :name).new(value, value)
       end
       objects_input(element_name, existing_objects,
                     typeahead: { query_url: typeahead_sample_controlled_vocabs_path + "?query=%QUERY&scv_id=#{scv_id}", 
                     handlebars_template: 'typeahead/controlled_vocab_term' }, 
-                    limit: limit)
+                    limit: limit, ontology: is_ontology)
     end
   end
 
@@ -168,6 +169,35 @@ module SamplesHelper
   def ols_root_term_link(ols_id, term_uri)
     ols_link = "https://www.ebi.ac.uk/ols/ontologies/#{ols_id}/terms?iri=#{term_uri}"
     link_to(term_uri, ols_link, target: :_blank)
+  end
+
+  def get_extra_info(sample)
+    studies = sample.sample_type.studies.authorized_for('view')
+    assays = sample.sample_type.assays.authorized_for('view')
+    {
+      project_ids: sample.project_ids.join(','),
+      project_names: sample.projects.map { |p| link_to(p.title, p, target: :_blank) }.join(',').html_safe,
+      study_ids: studies.map(&:id).join(','),
+      study_names: studies.map { |s| link_to(s.title, s, target: :_blank) }.join(',').html_safe,
+      assay_ids: assays.map(&:id).join(','),
+      assay_names: assays.map { |a| link_to(a.title, a, target: :_blank) }.join(',').html_safe
+    }
+  end
+
+  def show_extract_samples_button?(asset, display_asset)
+    return false unless ( asset.can_manage? && (display_asset.version == asset.version) && asset.sample_template? && asset.extracted_samples.empty? )
+    return ! ( asset.sample_extraction_task&.in_progress? || ( asset.sample_extraction_task&.success? && Seek::Samples::Extractor.new(asset).fetch.present? ) )
+
+    rescue Seek::Samples::FetchException
+      return true # allows to try again
+
+  end
+
+  def show_sample_extraction_status?(data_file)
+    # there is permission and a task
+    return false unless data_file.can_manage? && data_file.sample_extraction_task&.persisted?
+    # persistence isn't currently running or already taken place
+    return !( data_file.sample_persistence_task&.success? || data_file.sample_persistence_task&.in_progress? )
   end
 
   private

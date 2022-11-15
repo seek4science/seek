@@ -18,7 +18,7 @@ PUBLICATION_TYPE = [{ title: "Journal", key: "article" },
 before_n = PublicationType.count
 PUBLICATION_TYPE.each do |type|
   publication_type= PublicationType.find_or_initialize_by(key: type[:key])
-  publication_type.update_attributes(title: type[:title])
+  publication_type.update(title: type[:title])
 end
 
 seeded_n = PublicationType.count - before_n

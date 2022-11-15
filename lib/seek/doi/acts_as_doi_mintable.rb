@@ -20,6 +20,7 @@ module Seek
           self.datacite_resource_type_general = general_type
 
           include Seek::Doi::ActsAsDoiMintable::InstanceMethods
+          include Git::DoiCompatibility if ancestors.include?(Git::Version)
 
           include Seek::Util.routes # For URL generation
         end

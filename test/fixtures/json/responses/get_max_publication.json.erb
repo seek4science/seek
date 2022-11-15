@@ -1,0 +1,182 @@
+{
+  "data": {
+    "id": "<%= res.id %>",
+    "type": "publications",
+    "attributes": {
+      "policy": {
+        "access": "download",
+        "permissions": [
+        ]
+      },
+      "discussion_links": [
+        {
+          "id": "<%= res.discussion_link_ids.first %>",
+          "label": "Slack",
+          "url": "http://www.slack.com/"
+        }
+      ],
+      "misc_links": [
+        {
+          "id": "<%= res.misc_link_ids.first %>",
+          "label": "A link",
+          "url": "http://www.slack.com/"
+        }
+      ],
+      "title": "A Maximal Publication",
+      "license": null,
+      "latest_version": 1,
+      "tags": [
+      ],
+      "versions": [
+        {
+          "version": 1,
+          "revision_comments": null,
+          "url": "http://localhost:3000/publications/<%= res.id %>?version=1",
+          "doi": "10.5072/abcd"
+        }
+      ],
+      "version": 1,
+      "revision_comments": null,
+      "doi": "10.5072/abcd",
+      "created_at": "<%= res.find_version(1).created_at.as_json %>",
+      "updated_at": "<%= res.find_version(1).updated_at.as_json %>",
+      "content_blobs": [
+        {
+          "original_filename": "min file",
+          "url": null,
+          "md5sum": "726de0a3f94d65056b909b9736e10349",
+          "sha1sum": "fbcc0dee4b5415de4c82ef5b137d8231fec1331b",
+          "content_type": "application/pdf",
+          "link": "http://localhost:3000/publications/<%= res.id %>/content_blobs/<%= res.content_blob.id %>",
+          "size": 8
+        }
+      ],
+      "creators": [
+      ],
+      "other_creators": null,
+      "journal": "Journal of Molecular Biology",
+      "published_date": "2017-10-10",
+      "doi": "10.5072/abcd",
+      "pubmed_id": 873864488,
+      "abstract": "Amazing insights into the mechanism of TF2",
+      "citation": "JMB Oct 2017, 12:234-245",
+      "editor": "Richling, S. and Baumann, M. and Heuveline, V.",
+      "booktitle": "Proceedings of the 3rd bwHPC-Symposium: Heidelberg 2016",
+      "publisher": "Heidelberg University Library, heiBOOKS",
+      "url": null,
+      "link_to_pub": "https://www.ncbi.nlm.nih.gov/pubmed/873864488",
+      "publication_type": "Journal",
+      "authors": [
+        "Author_non_registered LastNonReg",
+        "Author_registered LastReg"
+      ]
+    },
+    "relationships": {
+      "creators": {
+        "data": [
+        ]
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "<%= current_person.id %>",
+            "type": "people"
+          }
+        ]
+      },
+      "people": {
+        "data": [
+          {
+            "id": "<%= current_person.id %>",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "<%= res.project_ids.first %>",
+            "type": "projects"
+          }
+        ]
+      },
+      "investigations": {
+        "data": [
+          {
+            "id": "<%= res.investigation_ids.first %>",
+            "type": "investigations"
+          }
+        ]
+      },
+      "studies": {
+        "data": [
+          {
+            "id": "<%= res.study_ids.first %>",
+            "type": "studies"
+          }
+        ]
+      },
+      "assays": {
+        "data": [
+          {
+            "id": "<%= res.assay_ids.first %>",
+            "type": "assays"
+          }
+        ]
+      },
+      "data_files": {
+        "data": [
+          {
+            "id": "<%= res.data_file_ids.first %>",
+            "type": "data_files"
+          }
+        ]
+      },
+      "models": {
+        "data": [
+          {
+            "id": "<%= res.model_ids.first %>",
+            "type": "models"
+          }
+        ]
+      },
+      "presentations": {
+        "data": [
+          {
+            "id": "<%= res.presentation_ids.first %>",
+            "type": "presentations"
+          }
+        ]
+      },
+      "events": {
+        "data": [
+          {
+            "id": "<%= res.event_ids.first %>",
+            "type": "events"
+          }
+        ]
+      },
+      "workflows": {
+        "data": [
+          {
+            "id": "<%= res.workflow_ids.first %>",
+            "type": "workflows"
+          }
+        ]
+      }
+    },
+    "links": {
+      "self": "/publications/<%= res.id %>?version=1"
+    },
+    "meta": {
+      "created": "<%= res.created_at.as_json %>",
+      "modified": "<%= res.updated_at.as_json %>",
+      "api_version": "0.3",
+      "uuid": "<%= res.uuid %>",
+      "base_url": "http://localhost:3000"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

@@ -11,6 +11,14 @@
             <strong>Eligible in:</strong> <%= time_ago_in_words(versioned_resource.doi_time_lock_end) %>
           </p>
         </div>
+    <% elsif versioned_resource.is_git_versioned? && versioned_resource.mutable? %>
+      <div class="alert alert-info">
+        <p>This <%= type_text -%> version must be frozen before being eligible for a DOI.</p>
+
+        <p class="text-center">
+          <%= button_link_to('Freeze version', 'freeze', polymorphic_path([resource, :git_freeze_preview], version: versioned_resource.version)) %>
+        </p>
+      </div>
     <% elsif !(versioned_resource.visibility == :public) %>
       <div class="alert alert-warning">
         <p>This version must be set to "<%= VersionHelper::VISIBILITY_LABELS[:public].downcase -%>" before being eligible for a DOI.</p>

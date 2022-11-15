@@ -1,0 +1,37 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <div class="list_item_title">
+      <%= h(resource.title) %>
+    </div>
+  </div>
+  <div class="panel-body">
+    <div class="row">
+      <div class="col-md-10 col-sm-9 list_item_content">
+        <%= list_item_description resource.description %>
+      </div>
+
+      <div class="col-sm-2 text-right list_item_actions">
+        <%
+          tess_url = Seek::TessSearch::SearchTessAdaptor::TESS_BASE_URL + resource.self_link
+        %>
+
+        <%= image_tag_for_key "visit", tess_url, "visit", {target: :_blank}, "Visit" %>
+
+        <%= image_tag_for_key "import",
+                              { :controller => "events",
+                                :action => "new",
+                                :event => { :title => resource.title,
+                                            :description => resource.description,
+                                            :url => resource.url,
+                                            :address => resource.address,
+                                            :city => resource.city,
+                                            :country => resource.country,
+                                            :start_date => resource.start_date,
+                                            :end_date => resource.end_date }
+                              },
+                              "import", {},
+                              "Import" %>
+      </div>
+    </div>
+  </div>
+</div>

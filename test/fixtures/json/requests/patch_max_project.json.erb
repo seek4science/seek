@@ -1,0 +1,68 @@
+{
+  "data": {
+    "id": "<%= id %>",
+    "type": "projects",
+    "attributes": {
+      "avatar": null,
+      "title": "Updated Project",
+      "description": "with a new description!",
+      "web_page": "http://www.taverna.org.uk",
+      "wiki_page": "http://www.mygrid.org.uk",
+      "default_license": "Other (Open)",
+      "default_policy": {
+        "access": "no_access",
+        "permissions": [
+          {
+            "resource": {
+              "id": "<%= @person.id %>",
+              "type": "people"
+            },
+            "access": "manage"
+          },
+          {
+            "resource": {
+              "id": "<%= @project.id %>",
+              "type": "projects"
+            },
+            "access": "download"
+          },
+          {
+            "resource": {
+              "id": "<%= @institution.id %>",
+              "type": "institutions"
+            },
+            "access": "view"
+          }
+        ]
+      },
+      "topic_annotations": [
+        {
+          "label": "Biomedical science",
+          "identifier": "http://edamontology.org/topic_3344"
+        },
+        {
+          "label": "Chemistry",
+          "identifier": "http://edamontology.org/topic_3314"
+        }
+      ]
+    },
+    "relationships": {
+      "programmes": {
+        "data": [
+          {
+            "id": "<%= @programme.id %>",
+            "type": "programmes"
+          }
+        ]
+      },
+      "organisms": {
+        "data": [
+          {
+            "id": "<%= @organism.id %>",
+            "type": "organisms"
+          }
+        ]
+      }
+    }
+  }
+}

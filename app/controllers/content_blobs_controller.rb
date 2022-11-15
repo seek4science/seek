@@ -1,10 +1,11 @@
 class ContentBlobsController < ApplicationController
-  before_action :find_and_authorize_associated_asset, only: %i[get_pdf view_content view_pdf_content download show update]
-  before_action :find_and_authorize_content_blob, only: %i[get_pdf view_content view_pdf_content download show update]
+  before_action :find_and_authorize_associated_asset, only: %i[get_pdf view_content download show update]
+  before_action :find_and_authorize_content_blob, only: %i[get_pdf view_content download show update]
   before_action :set_asset_version, only: %i[get_pdf download]
 
   skip_before_action :check_json_id_type, only: [:update]
 
+  include RawDisplay
   include Seek::AssetsCommon
   include Seek::UploadHandling::ExamineUrl
 
@@ -26,23 +27,9 @@ class ContentBlobsController < ApplicationController
   end
 
   def view_content
-    if @content_blob.is_text? || @content_blob.is_cwl?
-      view_text_content
-    else
-      @pdf_url = pdf_url
-      view_pdf_content
-    end
-  end
-
-  def view_text_content
-    render plain: File.read(@content_blob.filepath, encoding: 'iso-8859-1'), layout: false, content_type: 'text/plain'
-  end
-
-  def view_pdf_content
-    @pdf_url = pdf_url
-    respond_to do |format|
-      format.html { render 'view_pdf_content', layout: false }
-    end
+    opts = {}
+    opts[:code] = params[:code] if params[:code]
+    render_display(@content_blob, url_options: opts)
   end
 
   def csv_data
@@ -63,7 +50,6 @@ class ContentBlobsController < ApplicationController
     respond_to do |format|
       format.json { render json: @content_blob, include: [params[:include]] }
       format.html { render plain: 'Format not supported', status: :not_acceptable }
-      format.xml { render plain: 'Format not supported', status: :not_acceptable }
       format.csv { csv_data }
     end
   end
@@ -88,13 +74,17 @@ class ContentBlobsController < ApplicationController
         format.html { handle_openbis_download(@asset, params[:perm_id]) }
       end
     else
-      disposition = params[:disposition] || 'attachment'
-      image_size = params[:image_size]
+      if render_display?
+        render_display(@content_blob)
+      else
+        disposition = params[:disposition] || 'attachment'
+        image_size = params[:image_size]
 
-      respond_to do |format|
-        format.html { handle_download(disposition, image_size) }
-        format.pdf { get_pdf }
-        format.json { handle_download(disposition, image_size) }
+        respond_to do |format|
+          format.html { handle_download(disposition, image_size) }
+          format.pdf { get_pdf }
+          format.json { handle_download(disposition, image_size) }
+        end
       end
     end
   end

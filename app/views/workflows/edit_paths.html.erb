@@ -1,0 +1,20 @@
+<h1>Annotate Files</h1>
+<%= error_messages_for(@workflow) %>
+<%= error_messages_for(@display_workflow) %>
+
+<%= form_tag(update_paths_workflow_path(@workflow, version: @display_workflow.version), method: :patch) do %>
+  <%= render partial: 'workflows/select_paths', locals: { field_prefix: 'git_version', workflow: @workflow, git_version: @display_workflow } %>
+
+  <div class="checkbox">
+    <label>
+      <%= check_box_tag(:extract_metadata, '1', false) %>
+      <strong>Re-extract metadata?</strong>
+    </label>
+    <p class="help-block">
+      If you have re-selected the main workflow file, check this box to re-run the metadata extraction process.
+    </p>
+  </div>
+
+  <%= submit_tag('Continue', class: 'btn btn-primary') %>
+  or <%= cancel_button(workflow_path(@workflow)) -%>
+<% end %>

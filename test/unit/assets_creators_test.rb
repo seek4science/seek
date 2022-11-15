@@ -34,7 +34,7 @@ class AssetsCreatorsTest < ActiveSupport::TestCase
 
     assert_difference('@resource.creators.count') do
       assert_difference('AssetsCreator.count') do
-        @resource.update_attributes(params)
+        @resource.update(params)
       end
     end
   end
@@ -43,7 +43,7 @@ class AssetsCreatorsTest < ActiveSupport::TestCase
     # Set creator
     creator = Factory :person
     params = { creator_ids: [creator.id] }
-    @resource.update_attributes(params)
+    @resource.update(params)
 
     # Update creator
     new_creator = Factory :person
@@ -51,7 +51,7 @@ class AssetsCreatorsTest < ActiveSupport::TestCase
 
     assert_no_difference('AssetsCreator.count') do
       assert_no_difference('@resource.creators.count') do
-        @resource.update_attributes(params)
+        @resource.update(params)
       end
     end
 
@@ -63,14 +63,14 @@ class AssetsCreatorsTest < ActiveSupport::TestCase
     # Set creator
     creator = Factory :person
     params = { creator_ids: [creator.id] }
-    @resource.update_attributes(params)
+    @resource.update(params)
 
     # Remove creator
     params = { creator_ids: [] }
 
     assert_difference('@resource.creators.count', -1) do
       assert_difference('AssetsCreator.count', -1) do
-        @resource.update_attributes(params)
+        @resource.update(params)
       end
     end
   end
@@ -80,12 +80,12 @@ class AssetsCreatorsTest < ActiveSupport::TestCase
     creator_to_stay = Factory :person
     creator_to_remove = Factory :person
     params = { creator_ids: [creator_to_stay.id, creator_to_remove.id] }
-    @resource.update_attributes(params)
+    @resource.update(params)
 
     # Change creators
     new_creator = Factory :person
     params = { creator_ids: [creator_to_stay.id, new_creator.id] }
-    @resource.update_attributes(params)
+    @resource.update(params)
 
     creators = @resource.creators
     assert_equal creators.count, 2
@@ -97,7 +97,7 @@ class AssetsCreatorsTest < ActiveSupport::TestCase
   test 'cannot add duplicate assets creators by creator_id' do
     disable_authorization_checks do
       assert_no_difference('AssetsCreator.count') do
-        @sop.update_attributes(assets_creators_attributes: {
+        @sop.update(assets_creators_attributes: {
           '1233' => {
             creator_id: @person.id
           }
@@ -111,7 +111,7 @@ class AssetsCreatorsTest < ActiveSupport::TestCase
   test 'cannot add duplicate assets creators by orcid' do
     disable_authorization_checks do
       assert_no_difference('AssetsCreator.count') do
-        @sop.update_attributes(assets_creators_attributes: {
+        @sop.update(assets_creators_attributes: {
           '4634' => {
             given_name: 'Someone',
             family_name: 'Else',
@@ -127,7 +127,7 @@ class AssetsCreatorsTest < ActiveSupport::TestCase
   test 'cannot add duplicate assets creators by name in same institution' do
     disable_authorization_checks do
       assert_no_difference('AssetsCreator.count') do
-        @sop.update_attributes(assets_creators_attributes: {
+        @sop.update(assets_creators_attributes: {
           '4634' => {
             given_name: 'Jess',
             family_name: 'Jenkins',
@@ -143,7 +143,7 @@ class AssetsCreatorsTest < ActiveSupport::TestCase
   test 'can add assets creators with same names in different institutions' do
     disable_authorization_checks do
       assert_difference('AssetsCreator.count', 1) do
-        @sop.update_attributes(assets_creators_attributes: {
+        @sop.update(assets_creators_attributes: {
           '4634' => {
             given_name: 'Jess',
             family_name: 'Jenkins',
@@ -161,7 +161,7 @@ class AssetsCreatorsTest < ActiveSupport::TestCase
 
     disable_authorization_checks do
       assert_difference('AssetsCreator.count', 1) do
-        other_sop.update_attributes(assets_creators_attributes: {
+        other_sop.update(assets_creators_attributes: {
           '4634' => {
             given_name: 'Jess',
             family_name: 'Jenkins',

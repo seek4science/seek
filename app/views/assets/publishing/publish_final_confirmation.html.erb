@@ -1,23 +1,21 @@
-<div class="show_basic">
-  <%= show_title "Confirm publishing" -%>
-  <p>
-    You are about the publish the following items.
-  </p>
-  <%= form_tag :action => :publish do %>
-      <ul class="publishing_options">
-        <% @items_for_publishing.each do |item| %>
-            <%= hidden_field_tag publishing_item_param(item), 1 %>
-            <li class="type_and_title">
-              <%= text_for_resource item -%>: <%= link_to item.title, item -%>
-            </li>
-        <% end %>
-      </ul>
-      <br/>
+<%= show_title "Confirm publishing" -%>
+<p>
+  You are about the publish the following items.
+</p>
+<%= form_tag :action => :publish do %>
+  <ul class="publishing_options">
+    <% @items_for_publishing.each do |item| %>
+      <%= hidden_field_tag publishing_item_param(item), 1 %>
+      <li class="type_and_title">
+        <%= text_for_resource item -%>: <%= link_to item.title, item -%>
+      </li>
+    <% end %>
+  </ul>
+  <br/>
 
-      <% resource = (controller_name == 'people') ? current_user.person : @asset %>
+  <% resource = (controller_name == 'people') ? current_user.person : @asset %>
 
-      <%= submit_tag "Confirm",data: { disable_with: 'Confirm' }, :class => 'btn btn-primary' -%>
-      or
-      <%= cancel_button(resource) %>
-  <% end %>
-</div>
+  <%= submit_tag "Confirm",data: { disable_with: 'Confirm' }, :class => 'btn btn-primary' -%>
+  or
+  <%= cancel_button(resource) %>
+<% end %>

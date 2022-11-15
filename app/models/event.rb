@@ -6,6 +6,8 @@ class Event < ApplicationRecord
 
   before_destroy {documents.clear}
 
+  before_save :set_timezone
+
   enforce_authorization_on_association :documents, :view
 
   include Seek::Subscribable
@@ -48,16 +50,13 @@ class Event < ApplicationRecord
     errors.add(:end_date, 'is before start date.') unless end_date.nil? || start_date.nil? || end_date >= start_date
   end
 
-  def show_contributor_avatars?
-    false
+  validate :validate_time_zone 
+  def validate_time_zone
+    errors.add(:time_zone, 'is not valid.') unless time_zone_valid?
   end
 
-  # Returns the columns to be shown on the table view for the resource
-  def columns_default
-    super + ['city','country','start_date','end_date']
-  end
-  def columns_allowed
-    columns_default + ['address','url','title']
+  def show_contributor_avatars?
+    false
   end
 
   def self.user_creatable?
@@ -67,4 +66,20 @@ class Event < ApplicationRecord
   def self.can_create?
     Seek::Config.events_enabled && User.logged_in_and_member?
   end
+
+  def time_zone_valid?
+    time_zone.blank? || (ActiveSupport::TimeZone.all.map { |t| t.tzinfo.name }.include? time_zone)
+  end
+
+  def set_timezone
+    return unless time_zone.present? && time_zone_valid?
+
+    if start_date.present? && (start_date_changed? || time_zone_changed?)
+      self.start_date = start_date.to_s(:db).in_time_zone(time_zone)
+    end
+    if end_date.present? && (end_date_changed? || time_zone_changed?)
+      self.end_date = end_date.to_s(:db).in_time_zone(time_zone)
+    end
+  end
+
 end

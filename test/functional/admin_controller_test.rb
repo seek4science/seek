@@ -116,7 +116,7 @@ class AdminControllerTest < ActionController::TestCase
       assert_select '#address[value=?]', '255.255.255.255'
       assert_select '#domain[value=?]', 'email.example.com'
     end
-  end  
+  end
 
   test 'update visible tags and threshold' do
     Seek::Config.max_visible_tags = 2
@@ -177,6 +177,7 @@ class AdminControllerTest < ActionController::TestCase
     assert !quentin.is_admin?
     assert aaron.is_admin?
     assert aaron.is_admin?
+    assert User.current_user.person.is_admin?
   end
 
   test 'get project content stats' do
@@ -349,7 +350,7 @@ class AdminControllerTest < ActionController::TestCase
                 copyright_addendum_content: 'copyright content', imprint_description: 'imprint description',
                 terms_page: 'terms page', privacy_page: 'privacy page', about_page: 'about page',
                 about_instance_link_enabled: 1, about_instance_admins_link_enabled: 1,
-                header_image_file: fixture_file_upload('files/file_picture.png', 'image/png') }
+                header_image_file: fixture_file_upload('file_picture.png', 'image/png') }
 
     assert_difference('Avatar.count', 1) do
       post :update_rebrand, params: settings
@@ -490,6 +491,17 @@ class AdminControllerTest < ActionController::TestCase
     new_value = []
     post :update_settings, params: {recommended_software_licenses: new_value}
     assert_nil Seek::Config.recommended_software_licenses
+  end
+
+  test 'publication fulltext enabled' do
+    with_config_value(:allow_publications_fulltext, false) do
+      post :update_settings, params: { allow_publications_fulltext: '1' }
+      assert_equal true, Seek::Config.allow_publications_fulltext
+    end
+    with_config_value(:allow_publications_fulltext, true) do
+      post :update_settings, params: { allow_publications_fulltext: '0' }
+      assert_equal false, Seek::Config.allow_publications_fulltext
+    end
   end
 
   test 'update session store timeout' do

@@ -184,4 +184,22 @@ class RegularMaintenaceJobTest < ActiveSupport::TestCase
 
 
   end
+
+  test 'cleans redundant repositories' do
+    redundant = Factory(:blank_repository, created_at: 5.years.ago)
+    redundant_but_in_grace = Factory(:blank_repository, created_at: 1.second.ago)
+    not_redundant = Factory(:git_version).git_repository
+
+    assert_difference('Git::Repository.count', -1) do
+      RegularMaintenanceJob.perform_now
+    end
+
+    assert_nil Git::Repository.find_by_id(redundant.id)
+    refute redundant_but_in_grace.destroyed?
+    refute not_redundant.destroyed?
+
+    refute File.exist?(redundant.local_path)
+    assert File.exist?(redundant_but_in_grace.local_path)
+    assert File.exist?(not_redundant.local_path)
+  end
 end

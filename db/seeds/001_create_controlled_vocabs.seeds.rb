@@ -41,20 +41,6 @@ end
 
 puts "Seeded organisms"
 
-ActiveRecord::FixtureSet.create_fixtures(File.join(Rails.root, "config/default_data"), "recommended_model_environments")
-
-puts "Seeded recommended model environments"
-
-ActiveRecord::FixtureSet.create_fixtures(File.join(Rails.root, "config/default_data"), "measured_items")
-
-puts "Seeded measured items"
-
-
-
-ActiveRecord::FixtureSet.create_fixtures(File.join(Rails.root, "config/default_data"), "project_positions")
-
-puts "Seeded project positions"
-
 ActiveRecord::FixtureSet.create_fixtures(File.join(Rails.root, "config/default_data"), "assay_classes")
 
 puts "Seeded assay classes"
@@ -74,10 +60,3 @@ File.open('config/default_data/tools.list').each do |item|
 end
 
 puts "Seeded expertise and tools"
-
-ActiveRecord::FixtureSet.create_fixtures(File.join(Rails.root, "config/default_data"), "compounds")
-ActiveRecord::FixtureSet.create_fixtures(File.join(Rails.root, "config/default_data"), "synonyms")
-ActiveRecord::FixtureSet.create_fixtures(File.join(Rails.root, "config/default_data"), "mappings")
-ActiveRecord::FixtureSet.create_fixtures(File.join(Rails.root, "config/default_data"), "mapping_links")
-
-puts "Seeded compounds and synonyms"

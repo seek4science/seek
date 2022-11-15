@@ -1,0 +1,88 @@
+<!-- misc_channel_form -->
+<%
+
+  resource_type = resource.class.name.underscore
+  resource_type_text = text_for_resource(resource)
+  collapsed = resource.misc_links.empty?
+  help_text = "You can add a remote URL for any website related to this #{resource_type_text}"
+%>
+
+<%= folding_panel('Related links', collapsed, :body_options => {:id => 'misc_channel_urls'},
+                  :help_text => help_text) do %>
+
+    <p class="help-block">
+      You can add one or more URL related to this <%= resource_type_text %>:
+    </p>
+
+    <div id='new-link-form' style="display:none;">
+      <div class='link-row row'>
+        <div class="col-xs-6">
+          <%=  text_field_tag("#{resource_type}[misc_links_attributes][INDEX][url]",'',class: 'form-control',placeholder:'URL') %>
+        </div>
+        <div class="col-xs-3">
+          <%=  text_field_tag("#{resource_type}[misc_links_attributes][INDEX][label]",'',class: 'form-control', placeholder:'(Optional) Alternative display label') %>
+        </div>
+        <div class="col">
+          <label class="btn btn-danger">
+            Remove
+            <%= check_box_tag "#{resource_type}[misc_links_attributes][INDEX][_destroy]", '1', false,
+                              class: 'destroy-link', autocomplete: 'off', style:'display:none;' %>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div id='misc-links'>
+      <%= fields_for(resource) do |f| %>
+        <%= f.fields_for :misc_links do |ff| %>
+          <div class='link-row row'>
+            <span class="col-xs-6">
+              <%= ff.text_field :url, class:'form-control', placeholder:'URL' %>
+            </span>
+            <span class="col-xs-3">
+              <%= ff.text_field :label, class:'form-control', placeholder:'(Optional) Alternative display label' %>
+            </span>
+            <span class="col">
+              <label class="btn btn-danger">
+                Remove
+                <%= ff.check_box :_destroy, class: 'destroy-link', autocomplete: 'off',style:'display:none;' %>
+              </label>
+            </span>
+          </div>
+        <% end %>
+      <% end %>
+      <div id='new-link-row'></div>
+    </div>
+
+    <%= button_link_to('Add new link', 'add', '#', :id => 'add-misc-link') %>
+
+<% end %>
+
+<script type="application/javascript">
+
+    $j(document).ready(function () {
+        $j('#add-misc-link').click(function () {
+            var newRow = $j('#new-link-form').clone().html();
+            var currentRows = $j('.link-row').length - 2;
+            newRow = newRow.replace(/INDEX/g, currentRows+1);
+            $j('#misc-links #new-link-row').before($j(newRow));
+            return false;
+        });
+
+        $j('form').submit(function () {
+          $j('#new-link-form').remove();
+          return;
+        });
+
+        $j('#misc-links').on('change', '.destroy-link', function() {
+            $j(this).closest('.link-row').fadeOut(100);
+        });
+
+
+    });
+
+
+
+
+
+</script>

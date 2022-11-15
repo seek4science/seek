@@ -31,14 +31,17 @@ Factory.define(:max_presentation, class: Presentation) do |f|
   f.title 'A Maximal Presentation'
   f.description 'Non-equilibrium Free Energy Calculations and their caveats'
   f.discussion_links { [Factory.build(:discussion_link, label:'Slack')] }
-  f.assays {[Factory.build(:max_assay, policy: Factory(:public_policy))]}
+  f.assays { [Factory(:public_assay)] }
   f.events {[Factory.build(:event, policy: Factory(:public_policy))]}
   f.workflows {[Factory.build(:workflow, policy: Factory(:public_policy))]}
   f.relationships {[Factory(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: Factory(:publication))]}
   f.after_create do |presentation|
     presentation.content_blob = Factory.create(:min_content_blob, original_filename: 'test.pdf', content_type: 'application/pdf', asset: presentation, asset_version: presentation.version)
+    presentation.annotate_with(['Presentation-tag1', 'Presentation-tag2', 'Presentation-tag3', 'Presentation-tag4', 'Presentation-tag5'], 'tag', presentation.contributor)
+    presentation.save!
   end
   f.other_creators 'Blogs, Joe'
+  f.assets_creators { [AssetsCreator.new(affiliation: 'University of Somewhere', creator: Factory(:person, first_name: 'Some', last_name: 'One'))] }
 end
 
 Factory.define(:ppt_presentation, parent: :presentation) do |f|
@@ -85,4 +88,8 @@ Factory.define(:presentation_with_specified_project, class: Presentation) do |f|
   f.projects { [Factory(:project, title: 'Specified Project')] }
   f.with_project_contributor
   f.title 'Pres With Specified Project'
+end
+
+Factory.define(:public_presentation, parent: :presentation) do |f|
+  f.policy { Factory(:downloadable_public_policy) }
 end

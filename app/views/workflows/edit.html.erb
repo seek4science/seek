@@ -24,7 +24,7 @@
       <p class="help-block">If this workflow came from an external repository (i.e. GitHub), you can include its original URL here.</p>
     </div>
 
-    <%= render partial: 'assets/edam_form_properties', locals: { resource: @workflow } %>
+    <%= render partial: 'assets/controlled_vocab_annotations_form_properties', locals: { resource: @workflow } %>
 
     <div class="form-group">
       <label>Maturity</label>
@@ -38,9 +38,12 @@
     <%= render partial: 'assets/asset_form_bottom', locals: { f: f }-%>
     <%= render partial: 'assays/associate_assays', locals: { resource: @workflow } -%>
 
+    <%= hidden_field_tag 'workflow[internals]', raw(@workflow.internals.to_json) -%>
+
     <%= f.fancy_multiselect :presentations, other_projects_checkbox: true %>
     <%= f.fancy_multiselect :documents, other_projects_checkbox: true  if Seek::Config.documents_enabled %>
     <%= render partial: 'associate_data_file', locals: {:f=>f, :resource => @workflow } if Seek::Config.data_files_enabled %>
+    <%= render partial: 'tools/associate_tools', locals: { f: f, resource: @workflow } if Seek::Config.bio_tools_enabled %>
 
     <%= form_submit_buttons(@workflow) %>
   </div>

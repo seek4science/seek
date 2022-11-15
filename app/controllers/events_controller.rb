@@ -17,7 +17,6 @@ class EventsController < ApplicationController
   def show
     respond_to do |format|
       format.html # show.html.erb
-      format.xml
       format.json {render json: @event, include: [params[:include]]}
     end
   end
@@ -53,7 +52,7 @@ class EventsController < ApplicationController
   private
 
   def event_params
-    params.require(:event).permit(:title, :description, :start_date, :end_date, :url, :address, :city, :country,
+    params.require(:event).permit(:title, :description, :start_date, :end_date, :url, :address, :city, :country, :time_zone,
                                   { project_ids: [] }, { publication_ids: [] }, { presentation_ids: [] },
                                   { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                   { data_file_ids: [] },{document_ids: []}, { publication_ids: [] })

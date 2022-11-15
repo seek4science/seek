@@ -1,0 +1,50 @@
+{
+  "data": {
+    "id": "<%= res.id %>",
+    "type": "organisms",
+    "attributes": {
+      "title": "A Maximal Organism",
+      "concept_uri": "http://purl.bioontology.org/ontology/NCBITAXON/9606",
+      "ontology_id": "23"
+    },
+    "relationships": {
+      "projects": {
+        "data": [
+          {
+            "id": "<%= res.project_ids.first %>",
+            "type": "projects"
+          }
+        ]
+      },
+      "assays": {
+        "data": [
+          {
+            "id": "<%= res.assay_ids.first %>",
+            "type": "assays"
+          }
+        ]
+      },
+      "models": {
+        "data": [
+          {
+            "id": "<%= res.model_ids.first %>",
+            "type": "models"
+          }
+        ]
+      }
+    },
+    "links": {
+      "self": "/organisms/<%= res.id %>"
+    },
+    "meta": {
+      "created": "<%= res.created_at.as_json %>",
+      "modified": "<%= res.updated_at.as_json %>",
+      "uuid": "<%= res.uuid %>",
+      "base_url": "http://localhost:3000",
+      "api_version": "0.3"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

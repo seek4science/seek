@@ -23,10 +23,10 @@ require 'seek/search/background_reindexing'
 require 'seek/subscribable'
 require 'seek/permissions/publishing_permissions'
 require 'seek/search/common_fields'
-require 'seek/project_hierarchies/project_extension'
 require 'mimemagic'
 require 'private_address_check_monkeypatch'
 require 'libreconv'
+require 'omniauth-ldap'
 
 SEEK::Application.configure do
   ASSET_ORDER = ['Person', 'Programme', 'Project', 'Institution', 'Investigation', 'Study', 'Assay', 'Strain', 'DataFile', 'Model', 'Sop', 'Publication', 'Presentation','SavedSearch', 'Organism', 'HumanDisease', 'Event']
@@ -48,32 +48,6 @@ SEEK::Application.configure do
     puts "#" * 40
     puts "\n" * 3
   end
-
-  #Need to load defaut_locale file for internationalization used in Inflector below
-  #coz this file is loaded at a later point
-  I18n.load_path << File.join(File.dirname(__FILE__), "../locales/en.yml")
-  #these inflections are put here, because the config variables are just loaded after the propagation
-  ActiveSupport::Inflector.inflections do |inflect|
-    inflect.human 'Assay', I18n.t('assays.assay')
-    inflect.human 'assay', I18n.t('assays.assay')
-    inflect.human 'Sop', I18n.t('sop')
-    inflect.human 'sop', I18n.t('sop')
-    inflect.human 'Presentation', I18n.t('presentation')
-    inflect.human 'presentation', I18n.t('presentation')
-    inflect.human 'DataFile', I18n.t('data_file')
-    inflect.human 'data_file', I18n.t('data_file')
-    inflect.human 'Investigation', I18n.t('investigation')
-    inflect.human 'investigation', I18n.t('investigation')
-    inflect.human 'Study', I18n.t('study')
-    inflect.human 'study', I18n.t('study')
-    inflect.human 'Model', I18n.t('model')
-    inflect.human 'model', I18n.t('model')
-    inflect.human 'Event', I18n.t('event')
-    inflect.human 'event', I18n.t('event')
-    inflect.human 'Project', I18n.t('project')
-    inflect.human 'project', I18n.t('project')
-  end
-
 
   Annotations::Config.attribute_names_to_allow_duplicates.concat(["tag"])
   Annotations::Config.versioning_enabled = false

@@ -1,8 +1,6 @@
 #Default values required for the automated unit, functional and integration testing to behave as expected.
 def load_seek_testing_defaults!
     silence_warnings do
-      Settings.defaults[:is_virtualliver] = false
-      Settings.defaults[:project_hierarchy_enabled] = true
       Settings.defaults[:instance_name] = 'Sysmo SEEK'
 
       Settings.defaults[:noreply_sender] ="no-reply@sysmo-db.org"
@@ -24,21 +22,18 @@ def load_seek_testing_defaults!
       Settings.defaults[:filestore_path] = "tmp/testing-filestore"
       Settings.defaults[:tagging_enabled] = true
       Settings.defaults[:authorization_checks_enabled] = true
-      Settings.defaults[:magic_guest_enabled] = false
       Settings.defaults[:modelling_analysis_enabled] = true
       Settings.defaults[:show_as_external_link_enabled] = false
-      Settings.defaults[:factors_studied_enabled] = true
-      Settings.defaults[:experimental_conditions_enabled] = true
+      Settings.defaults[:allow_publications_fulltext] = true
+      Settings.defaults[:allow_edit_of_registered_publ] = false
       Settings.defaults[:programme_user_creation_enabled] = true
       Settings.defaults[:programmes_open_for_projects_enabled] = true
-
-      Settings.defaults[:project_hierarchy_enabled] = true
-      Settings.defaults[:tabs_lazy_load_enabled] = false
 
       # Types
       Settings.defaults[:collections_enabled] = true
       Settings.defaults[:documents_enabled] = true
       Settings.defaults[:events_enabled] = true
+      Settings.defaults[:file_templates_enabled] = true
       Settings.defaults[:human_diseases_enabled] = true
       Settings.defaults[:isa_enabled] = true
       Settings.defaults[:models_enabled] = true
@@ -47,6 +42,9 @@ def load_seek_testing_defaults!
       Settings.defaults[:publications_enabled] = true
       Settings.defaults[:samples_enabled] = true
       Settings.defaults[:workflows_enabled] = true
+      Settings.defaults[:sample_type_template_enabled] = true
+      Settings.defaults[:placeholders_enabled] = true
+      Settings.defaults[:file_templates_enabled] = true
 
       Settings.defaults[:instance_link] = 'http://www.sysmo.net'
       Settings.defaults[:application_name] = 'FAIRDOM-SEEK'
@@ -75,10 +73,6 @@ def load_seek_testing_defaults!
       Seek::Config.fixed :css_prepended,''
       Seek::Config.fixed :css_appended,''
       Seek::Config.fixed :main_layout,'application'
-
-      Settings.defaults[:faceted_browsing_enabled] = false
-      Settings.defaults[:facet_enable_for_pages] = {:people => true, :projects => false, :institutions => false, :programmes => false, :investigations => false,:studies => false, :assays => true, :data_files => true, :models => true,:sops => true, :publications => true,:events => false, :strains => false, :presentations => false}
-      Settings.defaults[:faceted_search_enabled] =  false
 
       Settings.defaults[:recaptcha_enabled] = true
 
@@ -141,9 +135,11 @@ def load_seek_testing_defaults!
 
       Settings.defaults[:ga4gh_trs_api_enabled] = true
 
-      Settings.defaults[:life_monitor_url] = 'https://localhost:8000'
-      Settings.defaults[:life_monitor_client_id] = 'xyz'
-      Settings.defaults[:life_monitor_client_secret] = 'xyzabc'
+      Settings.defaults[:life_monitor_url] = 'https://localhost:8443'
+      Settings.defaults[:life_monitor_client_id] = 'fWWLbOAw0pLlRKIWOQlkO4b4'
+      Settings.defaults[:life_monitor_client_secret] = 'Ne1kK6NljWRayqzDfgMWBfVplkRGZto6MCjdfhK1jY7r8RVp'
+      Settings.defaults[:git_support_enabled] = true
+      Settings.defaults[:fair_signposting_enabled] = true
+      Settings.defaults[:bio_tools_enabled] = true
     end
 end
-

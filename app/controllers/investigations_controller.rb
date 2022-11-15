@@ -44,7 +44,6 @@ class InvestigationsController < ApplicationController
 
     respond_to do |format|
       format.html { render(params[:only_content] ? { layout: false } : {})}
-      format.xml
       format.rdf { render :template=>'rdf/show' }
       format.json {render json: @investigation}
 
@@ -71,7 +70,9 @@ class InvestigationsController < ApplicationController
     if @investigation.save
       respond_to do |format|
         flash[:notice] = "The #{t('investigation')} was successfully created."
-        format.html { redirect_to investigation_path(@investigation) }
+        format.html { redirect_to params[:single_page] ?
+          single_page_path(id: params[:single_page], item_type: 'investigation', item_id: @investigation) 
+          : investigation_path(@investigation) }
         format.json { render json: @investigation }
       end
     else
@@ -113,7 +114,7 @@ class InvestigationsController < ApplicationController
         format.html { redirect_to(@investigation) }
       end
     else
-      @investigation.update_attributes(investigation_params)
+      @investigation.update(investigation_params)
       update_sharing_policies @investigation
       update_relationships(@investigation, params)
 
@@ -136,7 +137,7 @@ class InvestigationsController < ApplicationController
 
   def investigation_params
     params.require(:investigation).permit(:title, :description, { project_ids: [] }, *creator_related_params,
-                                          :position, { scales: [] }, { publication_ids: [] },
+                                          :position, { publication_ids: [] },
                                           { discussion_links_attributes:[:id, :url, :label, :_destroy] },
                                           { custom_metadata_attributes: determine_custom_metadata_keys })
   end

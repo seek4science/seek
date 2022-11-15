@@ -1,0 +1,20 @@
+<%
+
+  resource_type = resource.class.name.underscore
+  resource_type_text = text_for_resource(resource)
+
+%>
+<%= folding_panel('Template', false, :body_options => {:id => 'file_template_selection'}) do %>
+
+    <p class="help-block">
+      Specify a file template for this <%= resource_type_text %>.
+    </p>
+
+    <% unless resource.file_template.nil? %>
+      <%= select_tag 'file_template_id', options_for_select(templates.collect{ |t| [t.title, t.id] },resource.file_template.id),
+	:include_blank => 'No template' %>
+      <% else %>
+      <%= select_tag 'file_template_id', options_for_select(templates.collect{ |t| [t.title, t.id] }),
+	:include_blank => 'No template' %>
+      <% end %>
+<% end %>

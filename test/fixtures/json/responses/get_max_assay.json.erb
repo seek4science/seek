@@ -1,0 +1,172 @@
+{
+  "data": {
+    "id": "<%= res.id %>",
+    "type": "assays",
+    "attributes": {
+      "snapshots": [],
+      "policy": {
+        "access": "no_access",
+        "permissions": []
+      },
+      "other_creators": "Anonymous creator",
+      "position": null,
+      "creators": [
+        {
+          "profile": "/people/<%= res.assets_creators.first.creator_id %>",
+          "family_name": "<%= res.assets_creators.first.family_name %>",
+          "given_name": "<%= res.assets_creators.first.given_name %>",
+          "affiliation": "<%= res.assets_creators.first.affiliation %>",
+          "orcid": null
+        }
+      ],
+      "title": "A Maximal Modelling Assay",
+      "description": "A Western Blot Assay",
+      "assay_class": {
+        "title": "Modelling analysis",
+        "key": "MODEL",
+        "description": null
+      },
+      "assay_type": {
+        "label": "Model analysis type",
+        "uri": "http://jermontology.org/ontology/JERMOntology#Model_analysis_type"
+      },
+      "technology_type": {
+        "label": null,
+        "uri": null
+      },
+      "discussion_links": [
+        {
+          "id":
+          "<%= res.discussion_link_ids.first %>",
+          "url": "http://www.slack.com/",
+          "label": "Slack"
+        }
+      ]
+    },
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "<%= res.creator_ids.first %>",
+            "type": "people"
+          }
+        ]
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "<%= current_person.id %>",
+            "type": "people"
+          }
+        ]
+      },
+      "organisms": {
+        "data": [
+          {
+            "id": "<%= res.organism_ids.first %>",
+            "type": "organisms"
+          }
+        ]
+      },
+      "human_diseases": {
+        "data": []
+      },
+      "people": {
+        "data": [
+          {
+            "id": "<%= res.creator_ids.first %>",
+            "type": "people"
+          },
+          {
+            "id": "<%= current_person.id %>",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "<%= res.project_ids.first %>",
+            "type": "projects"
+          }
+        ]
+      },
+      "investigation": {
+        "data": {
+          "id": "<%= res.investigation.id %>",
+          "type": "investigations"
+        }
+      },
+      "study": {
+        "data": {
+          "id": "<%= res.study.id %>",
+          "type": "studies"
+        }
+      },
+      "data_files": {
+        "data": [
+          {
+            "id": "<%= res.data_file_ids.first %>",
+            "type": "data_files"
+          }
+        ]
+      },
+      "samples": {
+        "data": [
+          {
+            "id": "<%= res.sample_ids.first %>",
+            "type": "samples"
+          }
+        ]
+      },
+      "placeholders": {
+        "data": []
+      },
+      "models": {
+        "data": [
+          {
+            "id": "<%= res.model_ids.first %>",
+            "type": "models"
+          }
+        ]
+      },
+      "sops": {
+        "data": [
+          {
+            "id": "<%= res.sop_ids.first %>",
+            "type": "sops"
+          }
+        ]
+      },
+      "publications": {
+        "data": [
+          {
+            "id": "<%= res.publication_ids.first %>",
+            "type": "publications"
+          }
+        ]
+      },
+      "documents": {
+        "data": [
+          {
+            "id": "<%= res.document_ids.first %>",
+            "type": "documents"
+          }
+        ]
+      }
+    },
+    "links": {
+      "self": "/assays/<%= res.id %>"
+    },
+    "meta": {
+      "created": "<%= res.created_at.as_json %>",
+      "modified": "<%= res.updated_at.as_json %>",
+      "uuid": "<%= res.uuid %>",
+      "base_url": "http://localhost:3000",
+      "api_version": "0.3"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

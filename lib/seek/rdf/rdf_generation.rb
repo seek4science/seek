@@ -126,7 +126,7 @@ module Seek
                      data_file_masters sop_masters model_masters
                      assets
                      assays studies investigations
-                     institutions creators owners owner contributors contributor projects events presentations compounds organisms strains]
+                     institutions creators owners owner contributors contributor projects events presentations organisms strains]
         methods.each do |method|
           next unless respond_to?(method)
           deps = Array(send(method))

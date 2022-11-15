@@ -321,7 +321,7 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
   test 'can access typeahead with samples disabled' do
     person = Factory(:person)
     login_as(person)
-    scv = Factory(:edam_topics_controlled_vocab)
+    scv = Factory(:topics_controlled_vocab)
     with_config_value(:samples_enabled, false) do
       get :typeahead, params: { format: :json, query: 'sam', scv_id:scv.id }
       assert_response :success

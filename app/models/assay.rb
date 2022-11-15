@@ -3,8 +3,10 @@ class Assay < ApplicationRecord
   include Seek::Rdf::RdfGeneration
   include Seek::Ontologies::AssayOntologyTypes
   include Seek::Taggable
-  include Seek::ProjectHierarchies::ItemsProjectsExtension if Seek::Config.project_hierarchy_enabled
 
+  enum status: [:planned, :running, :completed, :cancelled, :failed]
+  belongs_to :assignee, class_name: 'Person'
+  
   # needs to before acts_as_isa - otherwise auto_index=>false is overridden by Seek::Search::CommonFields
   if Seek::Config.solr_enabled
     searchable(auto_index: false) do
@@ -24,9 +26,7 @@ class Assay < ApplicationRecord
   acts_as_isa
   acts_as_snapshottable
 
-  belongs_to :institution
   belongs_to :sample_type 
-
 
   belongs_to :assay_class
   has_many :assay_organisms, dependent: :destroy, inverse_of: :assay
@@ -42,6 +42,7 @@ class Assay < ApplicationRecord
   has_many :assay_assets, dependent: :destroy, inverse_of: :assay, autosave: true
 
   has_many :data_files, through: :assay_assets, source: :asset, source_type: 'DataFile', inverse_of: :assays
+  has_many :placeholders, through: :assay_assets, source: :asset, source_type: 'Placeholder', inverse_of: :assays
   has_many :sops, through: :assay_assets, source: :asset, source_type: 'Sop', inverse_of: :assays
   has_many :models, through: :assay_assets, source: :asset, source_type: 'Model', inverse_of: :assays
   has_many :samples, through: :assay_assets, source: :asset, source_type: 'Sample', inverse_of: :assays
@@ -56,7 +57,7 @@ class Assay < ApplicationRecord
   validates_with TechnologyTypeUriValidator
   validates_presence_of :contributor
   validates_presence_of :assay_class
-  validates :study, presence: { message: ' must be selected and valid' }, projects: true
+  validates :study, presence: { message: 'must be selected and valid' }, projects: true
 
   before_validation :default_assay_and_technology_type
 
@@ -79,14 +80,6 @@ class Assay < ApplicationRecord
 
   def state_allows_delete?(*args)
     assets.empty? && publications.empty? && super
-  end
-  
-  # Returns the columns to be shown on the table view for the resource
-  def columns_default
-    super + ['creators','projects','assay_type_uri']
-  end
-  def columns_allowed
-    columns_default + ['tags']
   end
 
   # returns true if this is a modelling class of assay
@@ -134,7 +127,7 @@ class Assay < ApplicationRecord
 
   # Associations where there is additional metadata on the association, i.e. `direction`
   def self.complex_associated_asset_types
-    [:data_files, :samples]
+    [:data_files, :samples, :placeholders]
   end
 
   def assets
@@ -237,6 +230,10 @@ class Assay < ApplicationRecord
     set_assay_assets_for('DataFile', attributes)
   end
 
+  def placeholders_attributes= attributes
+    set_assay_assets_for('Placeholder', attributes)
+  end
+
   def self.filter_by_projects(projects)
     joins(:projects).where(studies: { investigations: { investigations_projects: { project_id: projects } } })
   end
@@ -266,5 +263,9 @@ class Assay < ApplicationRecord
 
   def related_publication_ids
     publication_ids
+  end
+
+  def related_sop_ids
+    sop_ids
   end
 end

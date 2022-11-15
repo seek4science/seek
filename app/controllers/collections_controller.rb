@@ -16,7 +16,7 @@ class CollectionsController < ApplicationController
     respond_to do |format|
       format.html
       format.rdf { render template: 'rdf/show' }
-      format.json { render json: @collection, scope: { requested_version: params[:version] }, include: json_api_include_param }
+      format.json { render json: @collection, include: json_api_include_param }
     end
   end
 
@@ -31,7 +31,7 @@ class CollectionsController < ApplicationController
     update_relationships(@collection, params)
 
     respond_to do |format|
-      if @collection.update_attributes(collection_params)
+      if @collection.update(collection_params)
         flash[:notice] = "#{t('collection')} metadata was successfully updated."
         format.html { redirect_to collection_path(@collection) }
         format.json { render json: @collection, include: json_api_include_param }
@@ -45,7 +45,7 @@ class CollectionsController < ApplicationController
   def collection_params
     params.require(:collection).permit(:title, :description, { project_ids: [] }, :license, *creator_related_params,
                                        { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
-                                        { scales: [] }, { publication_ids: [] },
+                                       { publication_ids: [] },
                                        { items_attributes: [:id, :asset_type, :asset_id, :order, :comment, :_destroy]})
   end
 

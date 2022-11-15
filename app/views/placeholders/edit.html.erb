@@ -1,0 +1,34 @@
+<h1>Editing <%= t('placeholder') %>: <%= link_to(h(@placeholder.title), placeholder_path(@placeholder)) -%></h1>
+
+<%= form_for(@placeholder) do |f| %>
+    <div class="asset_form">
+      <%= f.error_messages %>
+
+      <div class="form-group">
+        <label class="required">Title</label>
+        <%= f.text_field :title, :class=>"form-control" -%>
+      </div>
+
+      <div class="form-group">
+        <label>Description</label>
+        <%= f.text_area :description, :class=>"form-control rich-text-edit", :rows => 5 -%>
+      </div>
+
+      <%= render :partial => "assets/select_template", :locals => {:resource => (@placeholder ? @placeholder : Placeholder.new),
+      :templates => FileTemplate.all } %>
+      
+	<%= render :partial => "resolve", :locals => {:resource => (@placeholder ? @placeholder : Placeholder.new) } -%>
+	
+      <%= render partial: 'assets/controlled_vocab_annotations_form_properties', :locals => { :resource => (@placeholder ? @placeholder : Placeholder.new) } -%>
+
+      <%= render :partial => 'assets/license_selector', :locals => { :resource => @placeholder } %>
+
+      <%= render :partial=>"assets/asset_form_bottom", :locals=> {:show_publications=>false, :f => f}-%>
+
+      <%= form_submit_buttons(@placeholder) %>
+
+    </div>
+<% end %>
+
+
+

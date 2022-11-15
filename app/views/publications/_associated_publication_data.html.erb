@@ -1,4 +1,4 @@
-<%= render :partial => 'projects/project_selector', :locals => {:resource => @publication, :allow_nil => Seek::Config.is_virtualliver } %>
+<%= render :partial => 'projects/project_selector', :locals => {:resource => @publication } %>
 <div class="form-group">
   <label>Abstract</label>
   <p class="help-block">
@@ -10,7 +10,7 @@
 
 <%= render partial: 'associate_authors_form', :locals => { :f=> publication_form, :publication => @publication} %>
 
-<%= render partial: 'scales/scales_selector', locals: { object: @publication } if show_scales?%>
+<%= render :partial=> "assets/misc_links_form", :locals=>{:resource => @publication} -%>
 
 <%= render partial: 'assets/select_tags' -%>
 

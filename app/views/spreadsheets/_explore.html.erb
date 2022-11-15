@@ -1,0 +1,33 @@
+<%= stylesheet_link_tag 'spreadsheet_explorer' -%>
+<%= javascript_include_tag 'spreadsheet_explorer' %>
+
+<div id="spreadsheet-explorer">
+  <div id="spreadsheet_errors"></div>
+
+  <div id="cell-info" class="panel panel-default">
+    <div class="panel-heading">Selected Cell</div>
+    <div class="panel-body">
+      <div>
+        <strong>Cell:</strong>
+        <span id="selected_cell"/>
+      </div>
+
+      <div>
+        <strong>Value:</strong>
+        <span id="cell_value"/>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="spreadsheet_viewer" id="spreadsheet_outer_frame">
+    <%
+      spreadsheet = Rails.cache.fetch(resource.content_blob.cache_key) do
+        resource.spreadsheet
+      end
+    %>
+    <%= render partial: "spreadsheets/spreadsheet_styles", locals: { styles: spreadsheet.styles } %>
+    <%= render partial: "spreadsheets/spreadsheet", locals: { workbook: spreadsheet } %>
+
+  </div>
+</div>

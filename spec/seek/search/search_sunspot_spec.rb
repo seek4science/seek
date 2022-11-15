@@ -1,9 +1,7 @@
 require 'rails_helper'
 require 'factory_girl'
-require_relative '../../../test/password_helper.rb'
-
-include ActionDispatch::TestProcess::FixtureFile
-include PasswordHelper
+require_relative '../../../test/factories_helper.rb'
+include FactoriesHelper
 
 FactoryGirl.find_definitions
 
@@ -21,9 +19,10 @@ describe DataFile do
 
   it { should have_searchable_field(:assay_type_titles) }
   it { should have_searchable_field(:technology_type_titles) }
-  it { should have_searchable_field(:spreadsheet_annotation_search_fields) }
-  it { should have_searchable_field(:fs_search_fields) }
- #it { should have_searchable_field(:spreadsheet_contents_for_search) }
+
+  it { should have_searchable_field(:data_type_annotations) }
+  it { should have_searchable_field(:data_format_annotations) }
+
 end
 
 describe Sop do
@@ -39,7 +38,6 @@ describe Sop do
 
   it { should have_searchable_field(:assay_type_titles) }
   it { should have_searchable_field(:technology_type_titles) }
-  it { should have_searchable_field(:exp_conditions_search_fields) }
 end
 
 describe Model do
@@ -117,7 +115,7 @@ describe Study do
   it { should have_searchable_field(:contributor) }
   it { should have_searchable_field(:projects) }
 
-  it { should have_searchable_field(:experimentalists) }  
+  it { should have_searchable_field(:experimentalists) }
 end
 
 describe Investigation do
@@ -140,7 +138,6 @@ describe Person do
 
   #this goes through institutions
   it { should have_searchable_field(:locations) }
-  it { should have_searchable_field(:project_positions) }
   it { should have_searchable_field(:disciplines) }
   #all the assets contributed by the person
 #  it { should have_searchable_field(:contributed_assets) }
@@ -161,6 +158,8 @@ describe Project do
 #  it { should have_searchable_field(:programme) }
   #all the assets associated with the project
 #  it { should have_searchable_field(:associated_assets) }
+
+  it { should have_searchable_field(:topic_annotations) }
 end
 
 describe Institution do
@@ -244,5 +243,21 @@ describe SampleType do
   it { should have_searchable_field(:title) }
   it { should have_searchable_field(:content_blob) }
   it { should have_searchable_field(:attribute_search_terms) }
+end
+
+describe Workflow do
+  it { should have_searchable_field(:title) }
+  it { should have_searchable_field(:description) }
+  it { should have_searchable_field(:searchable_tags) }
+  it { should have_searchable_field(:contributor) }
+  it { should have_searchable_field(:projects) }
+  it { should have_searchable_field(:creators) }
+  it { should have_searchable_field(:unregistered_creators) }
+  it { should have_searchable_field(:content_blob) }
+  it { should have_searchable_field(:git_content) }
+
+  it { should have_searchable_field(:topic_annotations) }
+  it { should have_searchable_field(:operation_annotations) }
+
 end
 

@@ -49,15 +49,6 @@ class SopTest < ActiveSupport::TestCase
     assert !asset.valid?
   end
 
-  test 'virtual liver allows blank projects' do
-    # VL only:allow no projects
-    as_virtualliver do
-      asset = Sop.new title: 'fred', policy: Factory(:private_policy)
-      assert asset.save!
-    end
-  end
-
-
   test 'assay association' do
     sop = sops(:sop_with_fully_public_policy)
     assay = assays(:modelling_assay_with_data_and_relationship)
@@ -164,7 +155,7 @@ class SopTest < ActiveSupport::TestCase
       another_project = Factory(:project)
       @person.add_to_project_and_institution(another_project,@person.institutions.first)
       projects = [@project, another_project]
-      sop.update_attributes(project_ids: projects.map(&:id))
+      sop.update(project_ids: projects.map(&:id))
       sop.save!
       sop.reload
       assert_equal projects.sort, sop.projects.sort
@@ -350,5 +341,26 @@ class SopTest < ActiveSupport::TestCase
     assert_nil v3.doi
     assert v3.latest_version?
     refute v3.can_change_visibility?
+  end
+
+  test 'should not destroy if sop has associated studies with single page enabled' do
+    person = Factory(:person)
+    with_config_value(:project_single_page_advanced_enabled, true) do
+      sop = Factory(:sop, contributor: person)
+      assert_equal true, sop.can_delete?(person)
+      study = Factory(:study, sop: sop)
+      disable_authorization_checks do
+        sop.study = study
+        sop.save!
+      end
+      assert_equal false, sop.can_delete?(person)
+    end
+    sop = Factory(:sop, contributor: person)
+    study = Factory(:study, sop: sop)
+    disable_authorization_checks do
+      sop.study = study
+      sop.save!
+    end
+    assert_equal true, sop.can_delete?(person)
   end
 end

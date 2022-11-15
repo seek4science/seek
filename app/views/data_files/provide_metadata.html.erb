@@ -37,6 +37,11 @@
 
                 <%= content_tag(:div, id: "step-#{step += 1}", class: 'multi-step-block') do %>
                   <span class='multi-step-progress-indicator'></span>
+                  <%= render partial: 'data_files/multi-steps/template',locals:{f: f} %>
+                <% end %>
+
+                <%= content_tag(:div, id: "step-#{step += 1}", class: 'multi-step-block') do %>
+                  <span class='multi-step-progress-indicator'></span>
                   <%= render partial: 'data_files/multi-steps/license_and_permissions',locals:{f: f} %>
                 <% end %>
 
@@ -53,6 +58,9 @@
                 <% end %>
               </div>
             </div>
+            <% if displaying_single_page?%>
+              <input name="single_page" type="hidden" value=<%=params[:single_page]%> />
+            <% end %>
         <% end -%>
       </div>
     </div>

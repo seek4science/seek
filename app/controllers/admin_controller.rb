@@ -17,7 +17,8 @@ class AdminController < ApplicationController
 
   def update_admins
     admin_ids = params[:admins].split(',') || []
-    current_admins = Person.admins
+    # Don't let admin remove themselves or they won't be able to manage roles
+    current_admins = Person.admins.where.not(id: current_person)
     admins = admin_ids.map { |id| Person.find(id) }
     current_admins.each { |ca| ca.is_admin = false }
     admins.each { |admin| admin.is_admin = true }
@@ -38,6 +39,7 @@ class AdminController < ApplicationController
   def update_features_enabled
     Seek::Config.email_enabled = string_to_boolean params[:email_enabled]
     Seek::Config.pdf_conversion_enabled = string_to_boolean params[:pdf_conversion_enabled]
+    Seek::Config.fair_signposting_enabled = string_to_boolean params[:fair_signposting_enabled]
     # Seek::Config.delete_asset_version_enabled = string_to_boolean params[:delete_asset_version_enabled]
     Seek::Config.project_admin_sample_type_restriction = string_to_boolean params[:project_admin_sample_type_restriction]
     Seek::Config.programme_user_creation_enabled = string_to_boolean params[:programme_user_creation_enabled]
@@ -89,9 +91,10 @@ class AdminController < ApplicationController
     Seek::Config.internal_help_enabled = string_to_boolean params[:internal_help_enabled]
     Seek::Config.external_help_url = params[:external_help_url]
 
-    Seek::Config.cwl_viewer_url = params[:cwl_viewer_url]
     Seek::Config.ga4gh_trs_api_enabled = string_to_boolean(params[:ga4gh_trs_api_enabled])
     # Types enabled
+    Seek::Config.file_templates_enabled = string_to_boolean params[:file_templates_enabled]
+    Seek::Config.placeholders_enabled = string_to_boolean params[:placeholders_enabled]
     Seek::Config.collections_enabled = string_to_boolean params[:collections_enabled]
     Seek::Config.data_files_enabled = string_to_boolean params[:data_files_enabled]
     Seek::Config.documents_enabled = string_to_boolean params[:documents_enabled]
@@ -132,6 +135,8 @@ class AdminController < ApplicationController
     Seek::Config.openbis_enabled = string_to_boolean(params[:openbis_enabled])
     Seek::Config.copasi_enabled = string_to_boolean(params[:copasi_enabled])
     Seek::Config.project_single_page_enabled = string_to_boolean(params[:project_single_page_enabled])
+    Seek::Config.project_single_page_advanced_enabled = string_to_boolean(params[:project_single_page_advanced_enabled])
+    Seek::Config.sample_type_template_enabled = string_to_boolean(params[:sample_type_template_enabled])
 
     Seek::Config.nels_enabled = string_to_boolean(params[:nels_enabled])
     Seek::Config.nels_client_id = params[:nels_client_id]&.strip
@@ -144,6 +149,8 @@ class AdminController < ApplicationController
     Seek::Config.life_monitor_url = params[:life_monitor_url]&.strip&.chomp('/')
     Seek::Config.life_monitor_client_id = params[:life_monitor_client_id]&.strip
     Seek::Config.life_monitor_client_secret = params[:life_monitor_client_secret]&.strip
+
+    Seek::Config.bio_tools_enabled = string_to_boolean(params[:bio_tools_enabled])
 
     time_lock_doi_for = params[:time_lock_doi_for]
     time_lock_is_integer = only_integer time_lock_doi_for, 'time lock doi for'
@@ -241,7 +248,7 @@ class AdminController < ApplicationController
 
   def update_pagination
     %w[people projects projects programmes institutions investigations
-        studies assays data_files models sops publications presentations events documents].each do |type|
+        studies assays data_files models sops publications presentations events documents file_templates placeholders].each do |type|
       Seek::Config.set_sorting_for(type, params[:sorting][type])
       Seek::Config.set_results_per_page_for(type, params[:results_per_page][type])
     end
@@ -272,6 +279,8 @@ class AdminController < ApplicationController
     pubmed_email_valid = check_valid_email(pubmed_email, 'pubmed API email address')
     crossref_email = params[:crossref_api_email]
     crossref_email_valid = check_valid_email(crossref_email, 'crossref API email address')
+    Seek::Config.allow_publications_fulltext = string_to_boolean params[:allow_publications_fulltext]
+    Seek::Config.allow_edit_of_registered_publ = string_to_boolean params[:allow_edit_of_registered_publ]
     Seek::Config.pubmed_api_email = pubmed_email if pubmed_email == '' || pubmed_email_valid
     Seek::Config.crossref_api_email = crossref_email if crossref_email == '' || crossref_email_valid
 
@@ -283,7 +292,6 @@ class AdminController < ApplicationController
     end
 
     Seek::Config.bioportal_api_key = params[:bioportal_api_key]
-    Seek::Config.sabiork_ws_base_url = params[:sabiork_ws_base_url] unless params[:sabiork_ws_base_url].nil?
     Seek::Config.recaptcha_enabled = string_to_boolean params[:recaptcha_enabled]
     Seek::Config.recaptcha_private_key = params[:recaptcha_private_key]
     Seek::Config.recaptcha_public_key = params[:recaptcha_public_key]
@@ -443,8 +451,6 @@ class AdminController < ApplicationController
     when 'invalid_users_profiles'
       partial = 'invalid_user_stats_list'
       invalid_users = {}
-      pal_position = ProjectPosition.pal_position
-      invalid_users[:pal_mismatch] = Person.all.reject { |p| p.is_pal_of_any_project? == p.project_positions.include?(pal_position) }
       invalid_users[:duplicates] = Person.duplicates
       invalid_users[:no_person] = User.without_profile
       collection = invalid_users

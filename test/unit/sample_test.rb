@@ -34,7 +34,7 @@ class SampleTest < ActiveSupport::TestCase
   test 'mass assignment' do
     sample = Sample.new title: 'testing'
     sample.sample_type = Factory(:patient_sample_type)
-    sample.update_attributes(data: { 'full name': 'Fred Bloggs', age: 25, postcode: 'M12 9QL', weight: 0.22, address: 'somewhere' })
+    sample.update(data: { 'full name': 'Fred Bloggs', age: 25, postcode: 'M12 9QL', weight: 0.22, address: 'somewhere' })
     assert_equal 'Fred Bloggs', sample.get_attribute_value('full name')
     assert_equal 25, sample.get_attribute_value(:age)
     assert_equal 0.22, sample.get_attribute_value(:weight)
@@ -152,7 +152,7 @@ class SampleTest < ActiveSupport::TestCase
     sample = Sample.new(title: 'testing', sample_type: sample_type, project_ids: [Factory(:project).id])
 
     # Update attributes
-    sample.update_attributes(data: { the_title: 'fish', bool: '0' })
+    sample.update(data: { the_title: 'fish', bool: '0' })
     assert sample.valid?
     disable_authorization_checks { sample.save! }
     assert !sample.data[:bool]
@@ -184,45 +184,45 @@ class SampleTest < ActiveSupport::TestCase
     sample.sample_type = sample_type
 
     # the simple cases
-    sample.update_attributes(data: { the_title: 'fish', bool: true })
+    sample.update(data: { the_title: 'fish', bool: true })
     assert sample.valid?
     disable_authorization_checks { sample.save! }
     assert sample.get_attribute_value(:bool)
 
-    sample.update_attributes(data: { the_title: 'fish', bool: false })
+    sample.update(data: { the_title: 'fish', bool: false })
     assert sample.valid?
     disable_authorization_checks { sample.save! }
     refute sample.get_attribute_value(:bool)
 
     # from a form
-    sample.update_attributes(data: { the_title: 'fish', bool: '1' })
+    sample.update(data: { the_title: 'fish', bool: '1' })
     assert sample.valid?
     disable_authorization_checks { sample.save! }
     assert sample.get_attribute_value(:bool)
 
-    sample.update_attributes(data: { the_title: 'fish', bool: '0' })
+    sample.update(data: { the_title: 'fish', bool: '0' })
     assert sample.valid?
     disable_authorization_checks { sample.save! }
     refute sample.get_attribute_value(:bool)
 
     # as text
-    sample.update_attributes(data: { the_title: 'fish', bool: 'true' })
+    sample.update(data: { the_title: 'fish', bool: 'true' })
     assert sample.valid?
     disable_authorization_checks { sample.save! }
     assert sample.get_attribute_value(:bool)
 
-    sample.update_attributes(data: { the_title: 'fish', bool: 'false' })
+    sample.update(data: { the_title: 'fish', bool: 'false' })
     assert sample.valid?
     disable_authorization_checks { sample.save! }
     refute sample.get_attribute_value(:bool)
 
     # as text2
-    sample.update_attributes(data: { the_title: 'fish', bool: 'TRUE' })
+    sample.update(data: { the_title: 'fish', bool: 'TRUE' })
     assert sample.valid?
     disable_authorization_checks { sample.save! }
     assert sample.get_attribute_value(:bool)
 
-    sample.update_attributes(data: { the_title: 'fish', bool: 'FALSE' })
+    sample.update(data: { the_title: 'fish', bool: 'FALSE' })
     assert sample.valid?
     disable_authorization_checks { sample.save! }
     refute sample.get_attribute_value(:bool)
@@ -255,15 +255,15 @@ class SampleTest < ActiveSupport::TestCase
     disable_authorization_checks { sample.save! }
     refute sample.get_attribute_value(:bool)
 
-    sample.update_attributes(data: { the_title: 'fish', bool: '' })
+    sample.update(data: { the_title: 'fish', bool: '' })
     assert sample.valid?
-    sample.update_attributes(data: { the_title: 'fish', bool: nil })
+    sample.update(data: { the_title: 'fish', bool: nil })
     assert sample.valid?
     disable_authorization_checks { sample.save! }
     assert_nil sample.get_attribute_value(:bool)
 
     # not valid
-    sample.update_attributes(data: { the_title: 'fish', bool: 'fish' })
+    sample.update(data: { the_title: 'fish', bool: 'fish' })
     refute sample.valid?
     sample.set_attribute_value(:bool, 'true')
     assert sample.valid?
@@ -278,17 +278,17 @@ class SampleTest < ActiveSupport::TestCase
     sample_type.save!
     sample.sample_type = sample_type
 
-    sample.update_attributes(data: { the_title: 'fish', bool: 'true' })
+    sample.update(data: { the_title: 'fish', bool: 'true' })
     assert sample.valid?
-    sample.update_attributes(data: { the_title: 'fish', bool: true })
+    sample.update(data: { the_title: 'fish', bool: true })
     assert sample.valid?
-    sample.update_attributes(data: { the_title: 'fish', bool: false })
+    sample.update(data: { the_title: 'fish', bool: false })
     assert sample.valid?
-    sample.update_attributes(data: { the_title: 'fish', bool: 'false' })
+    sample.update(data: { the_title: 'fish', bool: 'false' })
     assert sample.valid?
-    sample.update_attributes(data: { the_title: 'fish', bool: nil })
+    sample.update(data: { the_title: 'fish', bool: nil })
     refute sample.valid?
-    sample.update_attributes(data: { the_title: 'fish', bool: '' })
+    sample.update(data: { the_title: 'fish', bool: '' })
     refute sample.valid?
   end
 
@@ -349,7 +349,7 @@ class SampleTest < ActiveSupport::TestCase
     sample = Factory(:sample, contributor: person)
     project = Factory(:project)
     person.add_to_project_and_institution(project, person.institutions.first)
-    sample.update_attributes(project_ids: [project.id])
+    sample.update(project_ids: [project.id])
     disable_authorization_checks { sample.save! }
     sample.reload
     assert_equal [project], sample.projects
@@ -1087,7 +1087,7 @@ class SampleTest < ActiveSupport::TestCase
     project = Factory(:project)
     sample_type = Factory(:sample_type_with_symbols, project_ids: [project.id])
     sample = Sample.new(sample_type: sample_type, project_ids: [project.id])
-    sample.update_attributes(data: { 'title&': 'A', 'name ++##!': 'B', 'size range (bp)': 'C' })
+    sample.update(data: { 'title&': 'A', 'name ++##!': 'B', 'size range (bp)': 'C' })
     assert_equal 'A', sample.get_attribute_value('title&')
     assert_equal 'B', sample.get_attribute_value('name ++##!')
     assert_equal 'C', sample.get_attribute_value('size range (bp)')
@@ -1099,7 +1099,7 @@ class SampleTest < ActiveSupport::TestCase
     sample = Sample.new(sample_type: sample_type, project_ids: [project.id])
     df = Factory(:data_file)
 
-    sample.update_attributes(data:{'data file':df.id})
+    sample.update(data:{'data file':df.id})
     assert sample.valid?
     sample.save!
 
@@ -1160,6 +1160,22 @@ class SampleTest < ActiveSupport::TestCase
     attribute_map = json['data']['attributes']['attribute_map']
     assert attribute_map.key?('CAPITAL key')
     assert_equal 'key must remain capitalised', attribute_map['CAPITAL key']
+  end
+
+  test 'list_item_title_cache_key_prefix' do
+    sample = Factory(:sample)
+    sample_type = sample.sample_type
+
+    assert_equal "#{sample_type.list_item_title_cache_key_prefix}/#{sample.cache_key}", sample.list_item_title_cache_key_prefix
+
+    #check it changes
+    old = sample.list_item_title_cache_key_prefix
+    disable_authorization_checks { sample_type.update(title:'changed', updated_at: 1.minute.from_now) }
+    refute_equal old, sample.list_item_title_cache_key_prefix
+    old = sample.list_item_title_cache_key_prefix
+    disable_authorization_checks { sample.update(title:'changed', updated_at: 1.minute.from_now) }
+    refute_equal old, sample.list_item_title_cache_key_prefix
+
   end
 
 end

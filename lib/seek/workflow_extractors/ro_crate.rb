@@ -4,8 +4,6 @@ require 'ro_crate'
 module Seek
   module WorkflowExtractors
     class ROCrate < Base
-      available_diagram_formats(png: 'image/png', svg: 'image/svg+xml', jpg: 'image/jpeg', default: :svg)
-
       def initialize(io, main_workflow_class: nil)
         @io = io
         @main_workflow_class = main_workflow_class
@@ -23,17 +21,15 @@ module Seek
         end
       end
 
-      def diagram(format = nil)
+      def generate_diagram
         open_crate do |crate|
-          format ||= default_diagram_format
-
           return crate.main_workflow_diagram&.source&.read if crate.main_workflow_diagram
 
           extractor = main_workflow_extractor(crate)
-          return extractor.diagram(format) if extractor&.can_render_diagram?
+          return extractor.generate_diagram if extractor&.can_render_diagram?
 
           extractor = abstract_cwl_extractor(crate)
-          return extractor.diagram(format) if extractor&.can_render_diagram?
+          return extractor.generate_diagram if extractor&.can_render_diagram?
 
           return nil
         end
@@ -43,9 +39,21 @@ module Seek
         open_crate do |crate|
           # Use CWL description
           m = if crate.main_workflow_cwl
-                abstract_cwl_extractor(crate).metadata
+                begin
+                  abstract_cwl_extractor(crate).metadata
+                rescue StandardError => e
+                  Rails.logger.error('Error extracting abstract CWL:')
+                  Rails.logger.error(e)
+                  { errors: ["Couldn't parse abstract CWL"] }
+                end
               else
-                main_workflow_extractor(crate).metadata
+                begin
+                  main_workflow_extractor(crate).metadata
+                rescue StandardError => e
+                  Rails.logger.error('Error extracting workflow:')
+                  Rails.logger.error(e)
+                  { errors: ["Couldn't parse main workflow"] }
+                end
               end
           m[:workflow_class_id] ||= main_workflow_class(crate)&.id
 
@@ -57,17 +65,32 @@ module Seek
           m[:title] = crate['name'] if crate['name'].present?
           m[:description] = crate['description'] if crate['description'].present?
           m[:license] = crate['license'] if crate['license'].present?
-          if m[:other_creators].blank? && crate.author.present?
-            a = crate.author
-            a = a.is_a?(Array) ? a : [a]
-            a = a.map do |author|
-              if author.is_a?(::ROCrate::Entity)
-                author.name || author.id
-              else
-                author
+
+          other_creators = []
+          authors = []
+          [crate['author'], crate['creator']].each do |author_category|
+            if author_category.present?
+              author_category = author_category.split(',').map(&:strip) if author_category.is_a?(String)
+              author_category = author_category.is_a?(Array) ? author_category : [author_category]
+              author_category.each_with_index do |author_meta|
+                author_meta = author_meta.dereference if author_meta.respond_to?(:dereference)
+                if author_meta.is_a?(::ROCrate::ContextualEntity) && !author_meta.is_a?(::ROCrate::Person)
+                  other_creators << author_meta['name'] if author_meta['name'].present?
+                else
+                  author = extract_author(author_meta)
+                  authors << author unless author.blank?
+                end
               end
             end
-            m[:other_creators] = a.join(', ')
+          end
+
+          m[:other_creators] = other_creators.join(', ') if other_creators.any?
+          authors.uniq!
+          if authors.any?
+            m[:assets_creators_attributes] ||= {}
+            authors.each_with_index do |author, i|
+              m[:assets_creators_attributes][i.to_s] = author.merge(pos: i)
+            end
           end
 
           source_url = crate['isBasedOn'] || crate['url'] || crate.main_workflow['url']
@@ -98,20 +121,26 @@ module Seek
         end
 
         v = Dir.mktmpdir('ro-crate') do |dir|
-          @opened_crate = ::ROCrate::WorkflowCrateReader.read_zip(@io.is_a?(ContentBlob) ? @io.data_io_object : @io, target_dir: dir)
+          if @io.respond_to?(:in_dir)
+            @io.in_dir(dir)
+            @opened_crate = ::ROCrate::WorkflowCrateReader.read(dir)
+          else
+            @opened_crate = ::ROCrate::WorkflowCrateReader.read_zip(@io.is_a?(ContentBlob) ? @io.data_io_object : @io, target_dir: dir)
+          end
           yield @opened_crate
         end
 
         @opened_crate = nil
 
         v
+      rescue RuntimeError
+        raise ::ROCrate::ReadException.new("Couldn't read RO-Crate metadata.")
       end
 
-      def default_diagram_format
+      def diagram_extension
         open_crate do |crate|
           if crate&.main_workflow&.diagram
-            ext = crate&.main_workflow&.diagram.id.split('.').last
-            return ext if self.class.diagram_formats.key?(ext)
+            return crate&.main_workflow&.diagram.id.split('.').last
           end
 
           super

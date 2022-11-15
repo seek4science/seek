@@ -1,0 +1,25 @@
+{
+  "data": {
+    "type": "assays",
+    "attributes": {
+      "title": "A Minimal Assay",
+      "assay_class": {
+        "key": "EXP"
+      },
+      "assay_type": {
+        "uri": "http://jermontology.org/ontology/JERMOntology#Transcriptomics"
+      },
+      "technology_type": {
+        "uri": "http://jermontology.org/ontology/JERMOntology#RNA-Seq"
+      }
+    },
+    "relationships": {
+      "study": {
+        "data": {
+          "id": "<%= @study.id %>",
+          "type": "studies"
+        }
+      }
+    }
+  }
+}

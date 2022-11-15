@@ -45,41 +45,25 @@ module ProjectsHelper
     html.html_safe
   end
 
-  def project_mailing_list(project)
-    html = if project.people.empty?
-             "<span class='none_text'>No people in this #{t('project')}</span>"
-           else
-             '<span>' + mailing_list_links(project).join(';<br/>') + '</span>'
-           end
-    html.html_safe
-  end
-
-  def mailing_list_links(project)
-    people = project.people.sort_by(&:last_name).select(&:can_view?)
-    people.map do |p|
-      link_to(h(p.name), p) + ' (' + p.email + ')'
-    end
-  end
-
   # whether you have permission to create a project without being approved
   def can_create_projects?
     Project.can_create?
   end
 
   def project_administrators_input_box(project)
-    project_role_input_box project, Seek::Roles::PROJECT_ADMINISTRATOR
+    project_role_input_box project, :project_administrator
   end
 
   def project_asset_gatekeepers_input_box(project)
-    project_role_input_box project, Seek::Roles::ASSET_GATEKEEPER
+    project_role_input_box project, :asset_gatekeeper
   end
 
   def project_asset_housekeepers_input_box(project)
-    project_role_input_box project, Seek::Roles::ASSET_HOUSEKEEPER
+    project_role_input_box project, :asset_housekeeper
   end
 
   def project_pals_input_box(project)
-    project_role_input_box project, Seek::Roles::PAL
+    project_role_input_box project, :pal
   end
 
   def project_role_input_box(project, role)
@@ -115,7 +99,7 @@ module ProjectsHelper
 
   def projects_grouped_by_programme(selected = nil)
     if Seek::Config.programmes_enabled
-      array = Project.order(:title).to_a.group_by { |p| p.programme.try(:title) || "Independent #{I18n.t('project').downcase.pluralize}" }.each_value do |projects|
+      array = Project.order(:title).to_a.group_by { |p| p.programme.try(:title) || "#{I18n.t('project').pluralize} without a #{t('programme')}" }.each_value do |projects|
         projects.map! { |p| [p.title, p.id] }
       end.to_a
 

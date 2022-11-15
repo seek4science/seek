@@ -1,0 +1,52 @@
+<% return unless data_file.can_manage? %>
+<% task =  data_file.sample_persistence_task %>
+<% return unless task&.persisted? %>
+
+<% job_status ||= task.status %>
+<% previous_status ||= params[:previous_status] %>
+<% in_progress = task.in_progress? %>
+<% just_failed = task.failed? && Task.status_in_progress?(previous_status) %>
+<% just_finished = task.completed? && task.success? && Task.status_in_progress?(previous_status) %>
+
+<%
+  alert_style = 'alert-info'
+  alert_style = 'alert-warning' if just_failed
+  alert_style = 'alert-success' if just_finished
+%>
+
+<div id="sample-persistence-status">
+  <% if (in_progress || just_finished || just_failed) %>
+    <div class="alert <%= alert_style %>" role="alert">
+      <strong>Creating extracted samples:</strong>
+      <% if in_progress %>
+        <%= job_status.to_s.humanize %>
+        <%= image 'spinner' %>
+        <script>
+            setTimeout(function () {
+                $j.ajax('<%= persistence_status_data_file_path(data_file) %>', {
+                        data: { 'previous_status': '<%= job_status -%>' },
+                        success: function (html) {
+                            $j('#sample-persistence-status').replaceWith(html);
+                        }
+                    }
+                );
+            }, 5000);
+        </script>
+      <% end %>
+      <% if just_failed %>
+        Failed. An administrator will have been notified of the problem
+      <% end %>
+      <% if just_finished %>
+        <% if task.success? %>
+          Sample creation complete
+          <p>
+            You can view the new samples by clicking the button below.
+          </p>
+          <%= link_to('View Created Samples', data_file_samples_path(data_file),
+                      class: 'btn btn-primary') %>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+
+</div>

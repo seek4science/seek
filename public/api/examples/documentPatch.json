@@ -1,9 +1,63 @@
 {
-    "data": {
-        "type": "documents",
-        "id": "25",
-        "attributes": {
-            "description": "A report about the thing that happened"
-        }
+  "data": {
+    "type": "documents",
+    "id": "26",
+    "attributes": {
+      "title": "A Maximally Patched Document",
+      "description": "A report about the thing that happened",
+      "tags": [
+        "tag1",
+        "tag2",
+        "tag3"
+      ],
+      "license": "CC-BY-4.0",
+      "other_creators": "John Smith, Jane Smith",
+      "policy": {
+        "access": "no_access",
+        "permissions": [
+          {
+            "resource": {
+              "id": "251",
+              "type": "projects"
+            },
+            "access": "edit"
+          }
+        ]
+      }
+    },
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "236",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "251",
+            "type": "projects"
+          }
+        ]
+      },
+      "assays": {
+        "data": [
+          {
+            "id": "34",
+            "type": "assays"
+          }
+        ]
+      },
+      "workflows": {
+        "data": [
+          {
+            "id": "14",
+            "type": "workflows"
+          }
+        ]
+      }
     }
+  }
 }

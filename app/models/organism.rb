@@ -28,8 +28,8 @@ class Organism < ApplicationRecord
 
   validate do |organism|
     unless organism.bioportal_concept.nil? || organism.bioportal_concept.valid?
-      organism.bioportal_concept.errors.each do |attr, msg|
-        errors.add(attr, msg)
+      organism.bioportal_concept.errors.each do |error|
+        errors.add(error.attribute, error.message)
       end
     end
   end
@@ -40,14 +40,6 @@ class Organism < ApplicationRecord
       text :searchable_terms
       text :ncbi_id
     end
-  end
-
-  # Returns the columns to be shown on the table view for the resource
-  def columns_default
-    super
-  end
-  def columns_allowed
-    columns_default + ['title']
   end
 
   def can_delete?(user = User.current_user)

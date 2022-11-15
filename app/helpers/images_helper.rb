@@ -6,7 +6,6 @@ module ImagesHelper
 
   def image_tag_for_key(key, url = nil, alt = nil, html_options = {}, label = key.humanize, remote = false, size = nil)
     label = 'Delete' if label == 'Destroy'
-
     return nil unless (filename = icon_filename_for_key(key.downcase))
 
     image_options = alt ? { alt: alt } : { alt: key.humanize }
@@ -61,14 +60,6 @@ module ImagesHelper
     else
       ''
     end
-  end
-
-  def model_image_url(model_instance, model_image_id, size = nil)
-    basic_url = model_model_image_path(model_instance, model_image_id)
-
-    basic_url = append_size_parameter(basic_url, size)
-
-    basic_url
   end
 
   def append_size_parameter(url, size)

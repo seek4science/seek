@@ -1,110 +1,221 @@
 {
-    "data": {
-        "id": "1926",
-        "type": "projects",
-        "attributes": {
-            "avatar": null,
-            "title": "Post Project Max",
-            "description": "A Taverna project",
-            "web_page": "http://www.taverna.org.uk",
-            "wiki_page": "http://www.mygrid.org.uk",
-            "default_license": "Other (Open)",
-            "default_policy": {
-                "access": "no_access",
-                "permissions": [
-                    {
-                        "resource": {
-                            "id": "1273",
-                            "type": "people"
-                        },
-                        "access": "manage"
-                    },
-                    {
-                        "resource": {
-                            "id": "1924",
-                            "type": "projects"
-                        },
-                        "access": "download"
-                    },
-                    {
-                        "resource": {
-                            "id": "1297",
-                            "type": "institutions"
-                        },
-                        "access": "view"
-                    }
-                ]
-            }
-        },
-        "relationships": {
-            "organisms": {
-                "data": [
-                    {
-                        "id": "5",
-                        "type": "organisms"
-                    }
-                ]
-            },
-            "people": {
-                "data": []
-            },
-            "institutions": {
-                "data": []
-            },
-            "programmes": {
-                "data": [
-                    {
-                        "id": "27",
-                        "type": "programmes"
-                    }
-                ]
-            },
-            "investigations": {
-                "data": []
-            },
-            "studies": {
-                "data": []
-            },
-            "assays": {
-                "data": []
-            },
-            "data_files": {
-                "data": []
-            },
-            "models": {
-                "data": []
-            },
-            "sops": {
-                "data": []
-            },
-            "publications": {
-                "data": []
-            },
-            "presentations": {
-                "data": []
-            },
-            "events": {
-                "data": []
-            },
-            "documents": {
-                "data": []
-            },
-            "workflows": {
-                "data": []
-            }
-        },
-        "links": {
-            "self": "/projects/1926"
-        },
-        "meta": {
-            "created": "2018-04-27T14:41:00.267Z",
-            "modified": "2018-04-27T14:41:00.267Z",
-            "api_version": "0.1",
-            "uuid": "ed4723e0-2c56-0136-ec2f-08002734982f",
-            "base_url": "http://localhost:3000"
+  "data": {
+    "id": "1022257413",
+    "type": "projects",
+    "attributes": {
+      "discussion_links": [
+        {
+          "id": "98",
+          "label": "Slack",
+          "url": "http://www.slack.com/"
         }
+      ],
+      "avatar": "/projects/1022257413/avatars/49",
+      "title": "A Maximal Project",
+      "description": "A Taverna project",
+      "web_page": "http://www.taverna.org.uk",
+      "wiki_page": "http://www.mygrid.org.uk",
+      "default_license": "Other (Open)",
+      "start_date": "2010-01-01",
+      "end_date": "2014-06-21",
+      "default_policy": {
+        "access": "no_access",
+        "permissions": [
+
+        ]
+      },
+      "members": [
+        {
+          "person_id": "1039992750",
+          "institution_id": "980197311"
+        }
+      ],
+      "use_default_policy": true,
+      "topic_annotations": [
+        {
+          "label": "Biomedical science",
+          "identifier": "http://edamontology.org/topic_3344"
+        },
+        {
+          "label": "Chemistry",
+          "identifier": "http://edamontology.org/topic_3314"
+        }
+      ]
     },
-    "jsonapi": {
-        "version": "1.0"
+    "relationships": {
+      "project_administrators": {
+        "data": [
+
+        ]
+      },
+      "pals": {
+        "data": [
+
+        ]
+      },
+      "asset_housekeepers": {
+        "data": [
+
+        ]
+      },
+      "asset_gatekeepers": {
+        "data": [
+
+        ]
+      },
+      "organisms": {
+        "data": [
+
+        ]
+      },
+      "human_diseases": {
+        "data": [
+
+        ]
+      },
+      "people": {
+        "data": [
+          {
+            "id": "1039992750",
+            "type": "people"
+          }
+        ]
+      },
+      "institutions": {
+        "data": [
+          {
+            "id": "980197311",
+            "type": "institutions"
+          }
+        ]
+      },
+      "programmes": {
+        "data": [
+          {
+            "id": "155",
+            "type": "programmes"
+          }
+        ]
+      },
+      "investigations": {
+        "data": [
+          {
+            "id": "973655503",
+            "type": "investigations"
+          }
+        ]
+      },
+      "studies": {
+        "data": [
+          {
+            "id": "1060385511",
+            "type": "studies"
+          }
+        ]
+      },
+      "assays": {
+        "data": [
+          {
+            "id": "1035387226",
+            "type": "assays"
+          }
+        ]
+      },
+      "data_files": {
+        "data": [
+          {
+            "id": "883654714",
+            "type": "data_files"
+          }
+        ]
+      },
+      "file_templates": {
+        "data": [
+
+        ]
+      },
+      "placeholders": {
+        "data": [
+
+        ]
+      },
+      "models": {
+        "data": [
+          {
+            "id": "1004285824",
+            "type": "models"
+          }
+        ]
+      },
+      "sops": {
+        "data": [
+          {
+            "id": "1055250753",
+            "type": "sops"
+          }
+        ]
+      },
+      "publications": {
+        "data": [
+          {
+            "id": "231",
+            "type": "publications"
+          }
+        ]
+      },
+      "presentations": {
+        "data": [
+          {
+            "id": "109",
+            "type": "presentations"
+          }
+        ]
+      },
+      "events": {
+        "data": [
+          {
+            "id": "1025618799",
+            "type": "events"
+          }
+        ]
+      },
+      "documents": {
+        "data": [
+          {
+            "id": "219",
+            "type": "documents"
+          }
+        ]
+      },
+      "workflows": {
+        "data": [
+          {
+            "id": "222",
+            "type": "workflows"
+          }
+        ]
+      },
+      "collections": {
+        "data": [
+          {
+            "id": "33",
+            "type": "collections"
+          }
+        ]
+      }
+    },
+    "links": {
+      "self": "/projects/1022257413"
+    },
+    "meta": {
+      "created": "2022-10-26T11:45:28.000Z",
+      "modified": "2022-10-26T11:45:28.000Z",
+      "api_version": "0.3",
+      "base_url": "http://localhost:3000",
+      "uuid": "9c750880-3751-013b-356e-000c29a94011"
     }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
 }

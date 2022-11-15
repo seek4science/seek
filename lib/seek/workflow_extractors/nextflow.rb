@@ -1,13 +1,26 @@
 module Seek
   module WorkflowExtractors
     class Nextflow < Base
+      def self.file_extensions
+        ['nf']
+      end
+
       def metadata
         metadata = super
 
         mani = manifest
         metadata[:title] = mani['name'] if mani.has_key?('name')
         metadata[:description] = mani['description'] if mani.has_key?('description')
-        metadata[:other_creators] = mani['author'] if mani.has_key?('author')
+        if mani['author'].present?
+          mani['author'].split(',').each_with_index do |author_name, i|
+            author = extract_author(author_name)
+            unless author.blank?
+              metadata[:assets_creators_attributes] ||= {}
+              metadata[:assets_creators_attributes][i.to_s] = author.merge(pos: i)
+            end
+          end
+        end
+
         #metadata[:url] = manifest['homePage'] if manifest.has_key?('homePage')
 
         metadata

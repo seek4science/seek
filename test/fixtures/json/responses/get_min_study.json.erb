@@ -1,0 +1,86 @@
+{
+  "data": {
+    "id": "<%= res.id %>",
+    "type": "studies",
+    "attributes": {
+      "snapshots": [],
+      "policy": {
+        "access": "no_access",
+        "permissions": []
+      },
+      "title": "A Minimal Study",
+      "description": null,
+      "experimentalists": null,
+      "other_creators": null,
+      "creators": [],
+      "position": null,
+      "discussion_links": []
+    },
+    "relationships": {
+      "creators": {
+        "data": []
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "<%= current_person.id %>",
+            "type": "people"
+          }
+        ]
+      },
+      "people": {
+        "data": [
+          {
+            "id": "<%= current_person.id %>",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "<%= res.project_ids.first %>",
+            "type": "projects"
+          }
+        ]
+      },
+      "investigation": {
+        "data": {
+          "id": "<%= res.investigation.id %>",
+          "type": "investigations"
+        }
+      },
+      "assays": {
+        "data": []
+      },
+      "data_files": {
+        "data": []
+      },
+      "models": {
+        "data": []
+      },
+      "sops": {
+        "data": []
+      },
+      "publications": {
+        "data": []
+      },
+      "documents": {
+        "data": []
+      }
+    },
+    "links": {
+      "self": "/studies/<%= res.id %>"
+    },
+    "meta": {
+      "created": "<%= res.created_at.as_json %>",
+      "modified": "<%= res.updated_at.as_json %>",
+      "uuid": "<%= res.uuid %>",
+      "base_url": "http://localhost:3000",
+      "api_version": "0.3"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}
