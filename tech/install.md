@@ -58,6 +58,7 @@ Distributions](other-distributions.html) notes.
 
 First add a repo which contains python versions that may not be available in the default repositories
 
+    sudo apt install software-properties-common
     sudo add-apt-repository ppa:deadsnakes/ppa
 
 Then ensure everything is up-to-date
