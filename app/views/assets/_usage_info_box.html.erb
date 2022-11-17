@@ -22,7 +22,7 @@
       <p>
         <strong>Last updated</strong>: <%= date_as_string(resource.updated_at, true) -%>
       </p>
-      <% unless resource.updated_last_by.nil? || !current_user&.person&.member_of?(resource.projects)-%>
+      <% if resource.updated_last_by && current_user&.person&.member_of?(resource.projects)-%>
         <p>
           <strong>Last updated by</strong>: <span class="updated_last_by"><%= link_to resource.updated_last_by.name, resource.updated_last_by -%></span>
         </p>
