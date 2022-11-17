@@ -121,10 +121,14 @@ class RenderersTest < ActiveSupport::TestCase
     fish soup
     http://www.slideshare.net/if-we-build-it-will-they-come-13652794
     https://youtu.fi/abcd1234_-z?list=ABC123XYZQQQ
+    http://fishyoutu.be/XOiKXxDmDDQ
+    https://wwwyoutube.com/v/XOiKXxDmDDQ
     http://www.boutube.com/watch?v=abcd1234_-z&feature=youtu.be
     http://elixir.be/abcd1234_-z&feature=channel
     http://www.youtube.biz/embed/abcd1234_-z?rel=0
     http://youtube.com/c/abcd1234_-z
+    http://youtube.com.example.com/?vi=XOiKXxDmDDQ&feature=channel
+    httpbla://youtube.com/?vi=XOiKXxDmDDQ&feature=channel
     ftp://youtube.com/?v=abcd1234_-z).freeze
 
     valid_youtube_urls.each do |url|

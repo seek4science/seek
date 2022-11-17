@@ -12,7 +12,8 @@ module Seek
 
       def is_youtube_url?(url)
         parsed_url = URI.parse(url)
-        parsed_url.host.end_with?('youtube.com', 'youtu.be') && parsed_url.scheme =~ /(http|https)/
+        ['youtube.com', 'youtu.be', 'm.youtube.com', 'www.youtube.com'].include?(parsed_url.host) &&
+          ['http', 'https'].include?(parsed_url.scheme)
       rescue
         false
       end
