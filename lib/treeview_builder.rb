@@ -37,12 +37,10 @@ class TreeviewBuilder
   end
 
   def create_node(obj)
-    resource = obj[:resource].class.name.underscore
-    can_view = if resource == 'sample_type'
-                 obj[:resource].send(:can_view?, User.current_user, nil,
-                                     resource == 'sample_type')
+    can_view = if obj[:resource].is_a?(SampleType)
+                 obj[:resource].can_view?(User.current_user, nil, true)
                else
-                 obj[:resource].send(:can_view?)
+                 obj[:resource].can_view?
                end
     unless can_view
       obj[:text] = 'hidden item'
