@@ -344,7 +344,7 @@ module IsaExporter
 
       st.samples.map do |s|
         {
-          '@id': "#data/#{s.id}",
+          '@id': "#data_file/#{s.id}",
           name: s.get_attribute_value(with_tag_data_file),
           type: with_tag_data_file.title,
           comments: with_tag_data_file_comment.map { |d| { name: d.title, value: s.get_attribute_value(d).to_s } }
