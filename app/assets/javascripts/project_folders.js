@@ -225,7 +225,6 @@ function updateLocationHash(itemType, itemId) {
 function loadFromLocationHash(){
   if(window.location.hash){
     const [type, id] = window.location.hash.slice(1).split("-") 
-    console.log($j(`a[_type='${type}'][_id='${id}']`))
     $j(`a[_type='${type}'][_id='${id}']`).click()
   }
 }
