@@ -457,11 +457,13 @@ function selectAll(e, includeHidden = false) {
   }
 }
 
-function performSelect(dtName, select){
+function performSelect(dtName, select) {
   window[dtName].table.rows(function (idx, data, node) {
     data[0] = select;
     $j(node).find(".row-select").prop("checked", select)
   });
+}
+
 function selectAll(e) {
 	const checked = $j(e).prop("checked");
 	const checkBoxes = $j(e).closest(".dataTables_scroll").find(".row-select");
