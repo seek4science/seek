@@ -6,6 +6,8 @@ class SinglePagesController < ApplicationController
   before_action :set_up_instance_variable
   before_action :project_single_page_enabled?
   before_action :find_authorized_investigation, only: :export_isa
+  before_action :check_user_logged_in,
+                only: %i[batch_sharing_permission_preview batch_change_permission_for_selected_items]
   respond_to :html, :js
 
   def show
@@ -66,4 +68,11 @@ class SinglePagesController < ApplicationController
     investigation = Investigation.find(params[:investigation_id])
     @inv = investigation if investigation.can_edit?
   end
+
+  def check_user_logged_in
+    unless current_user
+      render json: { status: :unprocessable_entity, error: 'You must be logged in to access batch sharing permission.' }
+    end
+  end
+
 end

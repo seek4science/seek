@@ -1,28 +1,23 @@
 class ErrorsController < ApplicationController
   layout 'errors'
-  respond_to :html
 
   def error_404
-    respond_with do |format|
-      format.html
-    end
+    respond_to_error(404)
+  end
+
+  def error_406
+    respond_to_error(406)
   end
 
   def error_500
-    respond_with do |format|
-      format.html
-    end
+    respond_to_error(500)
   end
 
   def error_422
-    respond_with do |format|
-      format.html
-    end
+    respond_to_error(422)
   end
 
   def error_503
-    respond_with do |format|
-      format.html { render template: "errors/error_503", layout: 'layouts/errors', locals: {exception: Exception} }
-    end
+    respond_to_error(503)
   end
 end

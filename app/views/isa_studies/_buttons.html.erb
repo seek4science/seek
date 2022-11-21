@@ -24,8 +24,13 @@ permissions||="loadBatchPermission('sampleDynamicTable',this)"
       url: "<%= batch_sharing_permission_preview_single_pages_path %>",
       data: { sample_ids, single_page: true },
       success: (res) => { 
-        $j('#change-batch-permission-modal').modal('show').focus();
-        $j('#change-batch-permission').html(res)
+        if (res?.status == "unprocessable_entity"){
+          alert(res?.error)
+        } else {
+          $j('#change-batch-permission-modal').modal('show').focus();
+          $j('#change-batch-permission').html(res)
+          loadObjectInputs()
+        }
       },
       error: (e) => { 
         console.log(e);

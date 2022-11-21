@@ -144,6 +144,8 @@ module SamplesHelper
 
   # link for the sample type for the provided sample. Handles a referring_sample_id if required
   def sample_type_link(sample, user=User.current_user)
+    return nil if Seek::Config.project_single_page_advanced_enabled && !sample.sample_type.template_id.nil?
+
     if (sample.sample_type.can_view?(user))
       link_to sample.sample_type.title,sample.sample_type
     else
@@ -182,6 +184,22 @@ module SamplesHelper
       assay_ids: assays.map(&:id).join(','),
       assay_names: assays.map { |a| link_to(a.title, a, target: :_blank) }.join(',').html_safe
     }
+  end
+
+  def show_extract_samples_button?(asset, display_asset)
+    return false unless ( asset.can_manage? && (display_asset.version == asset.version) && asset.sample_template? && asset.extracted_samples.empty? )
+    return ! ( asset.sample_extraction_task&.in_progress? || ( asset.sample_extraction_task&.success? && Seek::Samples::Extractor.new(asset).fetch.present? ) )
+
+    rescue Seek::Samples::FetchException
+      return true # allows to try again
+
+  end
+
+  def show_sample_extraction_status?(data_file)
+    # there is permission and a task
+    return false unless data_file.can_manage? && data_file.sample_extraction_task&.persisted?
+    # persistence isn't currently running or already taken place
+    return !( data_file.sample_persistence_task&.success? || data_file.sample_persistence_task&.in_progress? )
   end
 
   private

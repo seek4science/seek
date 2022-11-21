@@ -10,6 +10,8 @@ class SampleType < ApplicationRecord
 
   include Seek::ActsAsAsset::Searching
   include Seek::Search::BackgroundReindexing
+  include Seek::Stats::ActivityCounts
+
 
   include Seek::ProjectAssociation
 
@@ -36,6 +38,8 @@ class SampleType < ApplicationRecord
 
   has_many :assays
   has_and_belongs_to_many :studies
+
+  scope :without_template, -> { where(template_id: nil) }
 
   validates :title, presence: true
   validates :title, length: { maximum: 255 }
@@ -114,13 +118,24 @@ class SampleType < ApplicationRecord
       end.nil?
   end
 
-  def can_view?(user = User.current_user, referring_sample = nil)
-    project_membership = (user && user.person && (user.person.projects & projects).any?)
+  def can_view?(user = User.current_user, referring_sample = nil, view_in_single_page = false)
+    return false if Seek::Config.project_single_page_advanced_enabled && template_id.present? && !view_in_single_page
+
+    project_membership = user&.person && (user.person.projects & projects).any?
     project_membership || public_samples? || check_referring_sample_permission(user, referring_sample)
   end
 
+
   def editing_constraints
     Seek::Samples::SampleTypeEditingConstraints.new(self)
+  end
+
+  def creators
+    [contributor]
+  end
+
+  def assets_creators
+    []
   end
 
   private

@@ -10,8 +10,11 @@
         <div class="row">
           <div class="col-md-6">
             <p>
-              <label>Sample type:</label>
-              <%= sample_type_link(@sample) %>
+              <% link = sample_type_link(@sample) %>
+              <% if link %>
+                <label>Sample type:</label>
+                <%= sample_type_link(@sample) %>
+              <% end %>
             </p>
             <% if @sample.originating_data_file %>
               <p>

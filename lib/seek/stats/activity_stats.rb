@@ -2,10 +2,10 @@ module Seek
   module Stats
     class ActivityStats
       # the time periods to be tested
-      PERIODS = { 'daily' => 1.day.ago, 'weekly' => 1.week.ago, 'monthly' => 1.month.ago, 'six_monthly' => 6.month.ago, 'yearly' => 1.year.ago }
+      PERIODS = { 'daily' => 1.day.ago, 'weekly' => 1.week.ago, 'monthly' => 1.month.ago, 'six_monthly' => 6.month.ago, 'yearly' => 1.year.ago, 'alltime' => 500.years.ago }
 
       # the item types to include
-      INCLUDED_TYPES = %w(Sop Model Publication DataFile Assay Study Investigation Presentation)
+      INCLUDED_TYPES = %w(Sop Model Publication DataFile Document Assay Study Investigation Presentation Workflow)
 
       def initialize
         create_attributes

@@ -25,33 +25,31 @@
     : "Change permissions of items related to #{link_to(h(current_user.person.name),current_user.person)} in batch".html_safe
 
 %>
-<% if (single_page && !flash[:error] && !flash[:notice]) || !single_page %>
-  <%= show_title title -%>
-<% end %>
+<%= show_title "Change permissions of items related to #{link_to(h(current_user.person.name),current_user.person)} in batch".html_safe -%>
 
-<% if !single_page %>
-  <div class="alert alert-info">
-    <ul>
-      <li>Items are grouped to those included and those not included in the <b>ISA (Investigation-Study-Assay) structure</b>.</li>
-      <li>The item list excludes <b>Project</b>, <b>Institution</b> and <b>Publication</b> since these are always publicly visible</li>
-      <li>You can view current permissions of each item by clicking the item's name.</li>
-      <li>After your confirmation, the newly modified permissions will be highlighted with <span class="sharing_permission_changed"></span>  .</li>
-    </ul>
-  </div>
-<% end %>
+<div class="alert alert-info">
+  <ul>
+    <li>Items are grouped to those included and those not included in the <b>ISA (Investigation-Study-Assay) structure</b>.</li>
+    <li>The item list excludes <b>Project</b>, <b>Institution</b> and <b>Publication</b> since these are always publicly visible</li>
+    <li>You can view current permissions of each item by clicking the item's name.</li>
+    <li>After your confirmation, the newly modified permissions will be highlighted with <span class="sharing_permission_changed"></span>  .</li>
+  </ul>
+</div>
 
 <div id="sharing_items">
-<%= form_tag({:action => :batch_change_permssion_for_selected_items}, :method => :post, id: "change-permission-preview-form") do -%>
+<%= form_tag({:action => :batch_change_permission_for_selected_items}, :method => :post) do -%>
+  <%= folding_panel("Items not in ISA", false, :id => 'not_isa_item', :body_options => {:id => 'items_fold_content'},
+                    :help_text => nil) do %>
 
-  <% if single_page %>
-    <% if !sample_ids.any? %>
-      <div>
-        <p>
-          <% unless flash[:error] || flash[:notice] %>
-            No samples have been selected...
-          <% end %>
-        </p>
-      </div>  
+    <label><%= link_to "Select All", "#", id: "select_all_not_isa" -%></label> |
+    <label><%= link_to "Deselect All", "#", id: "deselect_all_not_isa" -%></label> |
+    <label><%= link_to "Expand All", "#", id: "expand_all_not_isa" -%></label> |
+    <label><%= link_to "Collapse All", "#", id: "collapse_all_not_isa" -%></label>
+
+
+    <% items_not_in_isa.each do |resource_type, resource_items| %>
+      <% asset_node= asset_node_json(resource_type, resource_items) %>
+      <% items_not_in_isa_hash[:children].append(asset_node) %>
     <% end %>
     <% if flash[:error] || flash[:notice] %>
       <div id="notice_flash" class="fade in alert alert-<%= flash[:notice] ? "success" : "error" %> alert-dismissable" role="alert">
@@ -84,19 +82,15 @@
     <% end %>
 
   <% end %>
-
-  <% if !single_page %>
-
-    <% all_related_items_hash.each do |resource_type, resource_items| %>
-      <% if resource_type == "Investigation" %>
-        <%  resource_items[:items].each do |item| %>
-          <% options ||= { depth: 4, parent_depth: nil, sibling_depth: nil, include_self: true } %>
-          <% hash = Seek::IsaGraphGenerator.new(item).generate(**options) %>
-          <% tree = JSON.parse(build_tree_json(hash, item)) %>
-          <% tree = add_permissions_to_tree_json (tree) %>
-          <% investigation_tree =  eval(tree.join) %>
-          <% all_investigations_hash[:children].append (investigation_tree) %>
-        <% end %>
+  <% all_related_items_hash.each do |resource_type, resource_items| %>
+    <% if resource_type == "Investigation" %>
+      <%  resource_items[:items].each do |item| %>
+        <% options ||= { depth: 4, parent_depth: nil, sibling_depth: nil, include_self: true } %>
+        <%  hash = Seek::IsaGraphGenerator.new(item).generate(**options) %>
+        <% tree = JSON.parse(build_tree_json(hash, item)) %>
+        <% tree = add_permissions_to_tree_json (tree) %>
+        <% investigation_tree =  eval(tree.join) %>
+        <% all_investigations_hash[:children].append (investigation_tree) %>
       <% end %>
     <% end %>
 
@@ -113,8 +107,8 @@
     <% end -%>
 
   <% end %>
-
-  <% if (single_page && !flash[:error] && !flash[:notice]) || !single_page %>
+  <%= folding_panel("Items in ISA: ", false, :id => 'isa_item', :body_options => {:id => 'items_fold_content'},
+                    :help_text => nil) do %>
 
     <% resource = (controller_name == 'people') ? current_user.person : @asset %>
     <%= submit_tag "Next", data: {disable_with: 'Next'}, :class => 'btn btn-primary', onclick: "submitBatchPermissionPreviewForm()" -%>
@@ -122,6 +116,11 @@
     <%= cancel_button(resource, { id: "cancel-batch-permission-preview" }) %>
 
   <% end -%>
+  <% resource = (controller_name == 'people') ? current_user.person : @asset %>
+  <%= submit_tag "Next", data: {disable_with: 'Next'}, :class => 'btn btn-primary' -%>
+
+  or
+  <%= cancel_button(resource) %>
 
   <div id="hiddencheckboxs"></div>
 
@@ -330,18 +329,4 @@
         })
 
     });
-
-    function submitBatchPermissionPreviewForm () {
-      <% if single_page %>        
-        $j.ajax({
-          method: "POST",
-          url: '<%= batch_change_permssion_for_selected_items_single_pages_path -%>?single_page=true',
-          data: $j("#change-permission-preview-form").serialize(),
-          success: (res) => { $j('#change-batch-permission').html(res) },
-          error: (e) => { console.log(e) }
-        });
-      <% end %>
-    }
-
 </script>
-
