@@ -20,6 +20,7 @@ function setupFoldersTree(dataJson, container_id, drop_accept_class) {
 					item_dropped_to_folder(ui.draggable, folder_id);
 				}
 			});
+      loadFromLocationHash();
 		})
 		.jstree({
 			core: {
@@ -147,6 +148,7 @@ function folder_clicked(folder_id, project_id) {
 async function item_clicked(type, id, parent) {
 	hideAllViews();
 	updateBreadcrumb(type);
+  updateLocationHash(type, id)
   const tempParent = selectedItem.parent
   selectedItem.id = id;
 	selectedItem.type = type;
@@ -214,6 +216,18 @@ function bounce(item, text) {
 		item.css({ transform: "scale(1)", opacity: "1" });
 		item.text(text);
 	}, 300);
+}
+
+function updateLocationHash(itemType, itemId) {
+  window.location.hash = `${itemType}-${itemId}`
+}
+
+function loadFromLocationHash(){
+  if(window.location.hash){
+    const [type, id] = window.location.hash.slice(1).split("-") 
+    console.log($j(`a[_type='${type}'][_id='${id}']`))
+    $j(`a[_type='${type}'][_id='${id}']`).click()
+  }
 }
 
 $j.jstree.plugins.separate = function (options, parent) {
