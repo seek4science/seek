@@ -147,6 +147,13 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_equal 'show', ActivityLog.last.action
   end
 
+  test 'should show main_content_right' do
+    get :show, params: { id: @sample_type }
+    assert_response :success
+    assert_select 'div#author-box', true, 'Should show author box'
+    assert_select 'p#usage_count', true, 'Should show activity box'
+  end
+
   test 'should get edit' do
     get :edit, params: { id: @sample_type }
     assert_response :success

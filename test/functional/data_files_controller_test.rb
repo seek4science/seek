@@ -2367,19 +2367,91 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_select '.alert-info', text: /Active/
     end
 
+    df.sample_persistence_task.update_attribute(:status, Task::STATUS_FAILED)
+    get :show, params: {id: df.id, previous_status: Task::STATUS_ACTIVE}
+    assert_response :success
+    assert_select '#sample-persistence-status' do
+      assert_select '.alert-warning', text:/Failed/
+    end
+
     df.sample_persistence_task.update_attribute(:status, Task::STATUS_DONE)
     get :show, params: {id: df.id, previous_status: Task::STATUS_ACTIVE}
     assert_response :success
     assert_select '#sample-persistence-status' do
-      assert_select '.alert-info', text:/Sample creation complete/
-      assert_select '.alert-info a[href=?]', data_file_samples_path(df), text: /View Created Samples/
+      assert_select '.alert-success', text:/Sample creation complete/
+      assert_select '.alert-success a[href=?]', data_file_samples_path(df), text: /View Created Samples/
     end
 
     df.sample_persistence_task.update_attribute(:status, Task::STATUS_DONE)
     get :show, params: {id: df.id}
     assert_response :success
+    assert_select '#sample-persistence-status .alert-success', count: 0
     assert_select '#sample-persistence-status .alert-info', count: 0
+    assert_select '#sample-persistence-status .alert-warning', count: 0
 
+    df.sample_persistence_task.update_attribute(:status, Task::STATUS_FAILED)
+    get :show, params: {id: df.id}
+    assert_response :success
+    assert_select '#sample-persistence-status .alert-success', count: 0
+    assert_select '#sample-persistence-status .alert-info', count: 0
+    assert_select '#sample-persistence-status .alert-warning', count: 0
+
+  end
+
+  test 'show extraction task status' do
+
+    person = Factory(:person)
+    other_person = Factory(:person)
+    df = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
+                 policy: Factory(:publicly_viewable_policy), contributor: person
+
+    Factory(:string_sample_attribute_type)
+    sample_type = SampleType.new title: 'from template', project_ids: [person.projects.first.id], contributor: person
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type.build_attributes_from_template
+    disable_authorization_checks{ sample_type.save! }
+
+    SampleDataExtractionJob.new(df, sample_type).queue_job
+    df.reload
+
+    login_as(other_person)
+    get :show, params: {id: df.id}
+    assert_response :success
+    assert_select '#sample-extraction-status .alert-info', count: 0
+
+    login_as(person)
+    get :show, params: {id: df.id}
+    assert_response :success
+    assert_select '#sample-extraction-status' do
+      assert_select '.alert-info', text: /Queued/
+    end
+
+    df.sample_extraction_task.update_attribute(:status, Task::STATUS_ACTIVE)
+    get :show, params: {id: df.id}
+    assert_response :success
+    assert_select '#sample-extraction-status' do
+      assert_select '.alert-info', text: /Active/
+    end
+
+    df.sample_extraction_task.update_attribute(:status, Task::STATUS_FAILED)
+    get :show, params: {id: df.id}
+    assert_response :success
+    assert_select '#sample-extraction-status' do
+      assert_select '.alert-warning', text:/Failed/
+    end
+
+    df.sample_extraction_task.update_attribute(:status, Task::STATUS_DONE)
+    get :show, params: {id: df.id}
+    assert_response :success
+    assert_select '#sample-extraction-status .alert-success', count: 0
+
+    Seek::Samples::Extractor.new(df, sample_type).extract
+    get :show, params: {id: df.id}
+    assert_response :success
+    assert_select '#sample-extraction-status' do
+      assert_select '.alert-success', text:/Review Extracted Samples/
+      assert_select '.alert-success a[href=?]', confirm_extraction_data_file_path(df), text: /Review Extracted Samples/
+    end
   end
 
   test 'extract from data file with multiple matching sample types redirects to selection page' do
