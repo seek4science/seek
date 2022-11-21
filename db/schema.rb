@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_10_21_131037) do
+ActiveRecord::Schema.define(version: 2022_11_04_140342) do
 
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
@@ -24,8 +24,8 @@ ActiveRecord::Schema.define(version: 2022_10_21_131037) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string "http_referer"
-    t.text "user_agent", size: :medium
-    t.text "data", size: :long
+    t.text "user_agent"
+    t.text "data", size: :medium
     t.string "controller_name"
     t.index ["action"], name: "act_logs_action_index"
     t.index ["activity_loggable_type", "activity_loggable_id"], name: "act_logs_act_loggable_index"
@@ -2083,6 +2083,7 @@ ActiveRecord::Schema.define(version: 2022_10_21_131037) do
     t.integer "attempts", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "exception"
     t.index ["resource_type", "resource_id"], name: "index_tasks_on_resource_type_and_resource_id"
   end
 
@@ -2205,7 +2206,7 @@ ActiveRecord::Schema.define(version: 2022_10_21_131037) do
     t.index ["user_id", "can_view"], name: "index_w_auth_lookup_on_user_id_and_can_view"
   end
 
-  create_table "workflow_classes", force: :cascade do |t|
+  create_table "workflow_classes", id: :integer, force: :cascade do |t|
     t.string "title"
     t.text "description"
     t.string "key"

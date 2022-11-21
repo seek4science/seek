@@ -12,16 +12,17 @@ module Seek
 
       def is_youtube_url?(url)
         parsed_url = URI.parse(url)
-        parsed_url.host.end_with?('youtube.com', 'youtu.be') && parsed_url.scheme =~ /(http|https)/
+        ['youtube.com', 'youtu.be', 'm.youtube.com', 'www.youtube.com'].include?(parsed_url.host) &&
+          ['http', 'https'].include?(parsed_url.scheme)
       rescue
         false
       end
 
       def extract_video_code(url)
-        match = url.match(/\?v\=([-a-zA-Z0-9]+)/) ||
-                url.match(/youtu\.be\/([-a-zA-Z0-9]+)/) ||
-                url.match(/\/v\/([-a-zA-Z0-9]+)/) ||
-                url.match(/\/embed\/([-a-zA-Z0-9]+)/)
+        match = url.match(/[\?\&]v[i]?\=([-_a-zA-Z0-9]+)/) ||
+                url.match(/youtu\.be\/([-_a-zA-Z0-9]+)/) ||
+                url.match(/\/v\/([-_a-zA-Z0-9]+)/) ||
+                url.match(/\/embed\/([-_a-zA-Z0-9]+)/)
         match[1] if match
       end
     end
