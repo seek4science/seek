@@ -464,15 +464,6 @@ function performSelect(dtName, select) {
   });
 }
 
-function selectAll(e) {
-	const checked = $j(e).prop("checked");
-	const checkBoxes = $j(e).closest(".dataTables_scroll").find(".row-select");
-	$j.each(checkBoxes, function (i, c) {
-		$j(c).prop("checked", checked);
-		handleSelect($j(c));
-	});
-}
-
 const handleFailure = (table, res) => {
 	const errors = new Set();
 	errors.add("The operation can not be performed for one or some samples. The red cells indicate unacceptable values.");
