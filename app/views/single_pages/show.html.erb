@@ -28,6 +28,7 @@
 
         <div id="right-pane" class="col-md-9" style="padding:0">
             <div id="container" style="position:relative" class="tv">
+                <div id="dt-overlay"><%= image('large_spinner') %></div>
                 <div id="loader"></div>
                 <div id="folder_contents" class="row" style="display:none">
                      <%= render :partial => "folders/contents", :locals => {:folder => default_folder } -%>
@@ -45,6 +46,16 @@
     </div>
 
     <div id="provide-metadata-content"></div>
+
+    <%= modal(id: 'change-batch-permission-modal', size: 'xl') do %>
+      <%= modal_header("Change permission") %>
+      <%= modal_body do %>
+        <div id="change-batch-permission">
+          hello
+        </div>
+      <% end %>
+    <% end %>
+
 </div>
 
 <script type="text/javascript">
@@ -63,6 +74,13 @@
 
 				setSplitters();
 				updateContainerHeight();
+        // Permissions modal:
+        $j('#change-batch-permission').on('click', '[data-dismiss="modal"]', function (e) { e.stopPropagation(); });
+        $j('html').click(function(e) {
+          if($j(e.target).hasClass("modal-backdrop")) {
+            $j('.modal-backdrop').remove();
+          } 
+        });
     });
 
     function toggleItem(e, type){

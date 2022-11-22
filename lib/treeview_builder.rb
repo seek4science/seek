@@ -37,7 +37,12 @@ class TreeviewBuilder
   end
 
   def create_node(obj)
-    unless obj[:resource].can_view?
+    can_view = if obj[:resource].is_a?(SampleType)
+                 obj[:resource].can_view?(User.current_user, nil, true)
+               else
+                 obj[:resource].can_view?
+               end
+    unless can_view
       obj[:text] = 'hidden item'
       obj[:a_attr] = { 'style': 'font-style:italic;font-weight:bold;color:#ccc' }
     end
@@ -72,8 +77,10 @@ class TreeviewBuilder
     if study.sample_types.any?
       elements << create_node({ text: 'Sources table', _type: 'source_table', _id: study.sample_types.first.id,
                                 resource: study.sample_types.first, children: [create_sample_node(study.sample_types.first)] })
-      elements << create_node({ text: 'Protocol', _type: 'study_protocol', _id: study.sops.first.id,
-                                resource: study.sops.first }) if study.sops.present?
+      if study.sops.present?
+        elements << create_node({ text: 'Protocol', _type: 'study_protocol', _id: study.sops.first.id,
+                                  resource: study.sops.first })
+      end
       elements << create_node({ text: 'Samples table', _type: 'study_samples_table', _id: study.sample_types.second.id,
                                 resource: study.sample_types.first, children: [create_sample_node(study.sample_types.second)] })
       elements << create_node({ text: 'Experiment overview', _type: 'study_experiment_overview', _id: study.id,
@@ -88,8 +95,10 @@ class TreeviewBuilder
 
     elements = []
     if assay.sample_type.present?
-      elements << create_node({ text: 'Protocol', _type: 'assay_protocol', _id: assay.sops.first.id,
-                                resource: assay.sops.first }) if assay.sops.any? 
+      if assay.sops.any?
+        elements << create_node({ text: 'Protocol', _type: 'assay_protocol', _id: assay.sops.first.id,
+                                  resource: assay.sops.first })
+      end
       elements << create_node({ text: 'Samples table', _type: 'assay_samples_table', _id: assay.sample_type.id,
                                 resource: assay.sample_type, children: [create_sample_node(assay.sample_type)] })
       elements << create_node({ text: 'Experiment overview', _type: 'assay_experiment_overview', _id: assay.id,
