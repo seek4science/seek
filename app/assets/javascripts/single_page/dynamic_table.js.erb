@@ -68,11 +68,11 @@ const handleSelect = (e) => {
 			// If it's Assay level table keep the first, otherwise hide all of them
 			if (options.level == "assay") multi_link_idx = multi_link_idx.slice(1);
 			this.hiddenColumns = multi_link_idx;
-			if (!options.readonly) columns.unshift(...defaultCols);
+			columns.unshift(...defaultCols);
 			const columnDefs = [
 				{ orderable: false, targets: options.readonly ? [0] : [0, 1, 2] },
 				{
-					targets: options.readonly ? multi_link_idx : [1, 2],
+					targets: options.readonly ? [0, ...multi_link_idx] : [1, 2],
 					visible: false,
 					searchable: false
 				}
