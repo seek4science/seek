@@ -219,7 +219,7 @@ function bounce(item, text) {
 }
 
 function updateLocationHash(itemType, itemId) {
-  window.location.hash = `${itemType}-${itemId}`
+  history.pushState({}, "", `${location.pathname}#${itemType}-${itemId}`)
 }
 
 function loadFromLocationHash(){
