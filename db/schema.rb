@@ -1781,6 +1781,7 @@ ActiveRecord::Schema.define(version: 2022_11_04_140342) do
     t.integer "contributor_id"
     t.string "deleted_contributor"
     t.integer "template_id"
+    t.string "other_creators"
   end
 
   create_table "sample_types_studies", force: :cascade do |t|
