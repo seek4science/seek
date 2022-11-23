@@ -912,6 +912,7 @@ class SampleTypeTest < ActiveSupport::TestCase
   end
 
   test 'adding a creator' do
+    User.current_user = @person.user
     creator = Factory :person
     sample_type = Factory(:simple_sample_type, contributor: @person)
     params = { creator_ids: [creator.id] }
@@ -924,6 +925,7 @@ class SampleTypeTest < ActiveSupport::TestCase
   end
 
   test 'updating a creator' do
+    User.current_user = @person.user
     # Set creator
     creator = Factory :person
     sample_type = Factory(:simple_sample_type, contributor: @person)
@@ -942,6 +944,7 @@ class SampleTypeTest < ActiveSupport::TestCase
   end
 
   test 'removing a creator' do
+    User.current_user = @person.user
     # Set creator
     creator = Factory :person
     sample_type = Factory(:simple_sample_type, contributor: @person)
