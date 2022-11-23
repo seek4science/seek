@@ -913,11 +913,11 @@ class SampleTypeTest < ActiveSupport::TestCase
 
   test 'adding a creator' do
     creator = Factory :person
-    sample_type = Factory(:simple_sample_type, contributor: creator)
+    sample_type = Factory(:simple_sample_type, contributor: @person)
     params = { creator_ids: [creator.id] }
     assert_difference('sample_type.creators.count') do
       assert_difference('AssetsCreator.count') do
-        sample_type.update(params)
+        sample_type.update!(params)
       end
     end
     sample_type.save!
@@ -926,15 +926,15 @@ class SampleTypeTest < ActiveSupport::TestCase
   test 'updating a creator' do
     # Set creator
     creator = Factory :person
-    sample_type = Factory(:simple_sample_type, contributor: creator)
+    sample_type = Factory(:simple_sample_type, contributor: @person)
     params = { creator_ids: [creator.id] }
-    sample_type.update(params)
+    sample_type.update!(params)
     # Update creator
     new_creator = Factory :person
     params = { creator_ids: [new_creator.id] }
     assert_no_difference('AssetsCreator.count') do
       assert_no_difference('sample_type.creators.count') do
-        sample_type.update(params)
+        sample_type.update!(params)
       end
     end
     assert_not_equal sample_type.creators.first, creator
@@ -944,25 +944,23 @@ class SampleTypeTest < ActiveSupport::TestCase
   test 'removing a creator' do
     # Set creator
     creator = Factory :person
-    sample_type = Factory(:simple_sample_type, contributor: creator)
+    sample_type = Factory(:simple_sample_type, contributor: @person)
     params = { creator_ids: [creator.id] }
-    sample_type.update(params)
+    sample_type.update!(params)
     # Remove creator
     params = { creator_ids: [] }
     assert_difference('sample_type.creators.count', -1) do
       assert_difference('AssetsCreator.count', -1) do
-        sample_type.update(params)
+        sample_type.update!(params)
       end
     end
-    sample_type.save!
   end
 
   test 'other creators' do
-    sample_type = Factory(:simple_sample_type)
+    User.current_user = @person.user
+    sample_type = Factory(:simple_sample_type, contributor: @person)
     params = { other_creators: 'Jane Smith, John Smith' }
-    sample_type.update(params)
-    assert_equal 'Jane Smith, John Smith', sample_type.other_creators
-    sample_type.save!
+    sample_type.update!(params)
   end
 
   private
