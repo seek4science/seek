@@ -3,8 +3,6 @@ module Seek
     class Dataset
       include Seek::BioSchema::Support
 
-      CONTENT_LICENSE = 'CC-BY-4.0' # TODO: This needs to be configurable per-instance!
-
       delegate_missing_to :@model
       attr_reader :model
 
@@ -20,9 +18,8 @@ module Seek
         "#{title} in #{Seek::Config.instance_name}."
       end
 
-      # Bioschemas compatibility
       def license
-        CONTENT_LICENSE
+        Seek::Config.metadata_license
       end
 
       def schema_org_supported?
