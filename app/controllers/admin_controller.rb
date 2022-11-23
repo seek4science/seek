@@ -330,6 +330,7 @@ class AdminController < ApplicationController
     Seek::Config.orcid_required = string_to_boolean params[:orcid_required]
 
     Seek::Config.default_license = params[:default_license]
+    Seek::Config.metadata_license = params[:metadata_license]
     Seek::Config.recommended_data_licenses = params[:recommended_data_licenses]
     Seek::Config.recommended_software_licenses = params[:recommended_software_licenses]
     update_flag = (pubmed_email == '' || pubmed_email_valid) && (crossref_email == '' || crossref_email_valid)

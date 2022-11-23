@@ -69,6 +69,11 @@
 	select_tag :recommended_software_licenses, options_for_select(Seek::License.open_definition[:software].map { |l| [l['title'], l['id']]}, Seek::Config.recommended_software_licenses), multiple: true, class: 'form-control'
     end %>
 
+  <%= admin_setting_block('Metadata License', "The license granted on metadata produced by this SEEK instance.") do
+    grouped_license_select(:metadata_license, Seek::Config.metadata_license, id: 'metadata-license-select',
+                           class: 'form-control', source: Seek::License.open_definition[:data])
+  end %>
+
     <%= admin_dropdown_setting(:permissions_popup,
            options_for_select([['Always show', Seek::Config::PERMISSION_POPUP_ALWAYS],
                                ['Show when permissions changed', Seek::Config::PERMISSION_POPUP_ON_CHANGE],

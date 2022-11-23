@@ -243,6 +243,7 @@ def load_seek_config_defaults!
   Seek::Config.default :openbis_check_new_arrivals, true
 
   Seek::Config.default :default_license, 'CC-BY-4.0'
+  Seek::Config.default :metadata_license, 'CC0-1.0'
 
   Seek::Config.default :nels_api_url, 'https://test-fe.cbu.uib.no/nels-api'
   Seek::Config.default :nels_oauth_url, 'https://test-fe.cbu.uib.no/oauth2'
