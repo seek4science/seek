@@ -921,7 +921,8 @@ class SampleTypeTest < ActiveSupport::TestCase
         sample_type.update!(params)
       end
     end
-    sample_type.save!
+    sample_type.reload
+    assert_equal [creator], sample_type.creators
   end
 
   test 'updating a creator' do
@@ -939,8 +940,8 @@ class SampleTypeTest < ActiveSupport::TestCase
         sample_type.update!(params)
       end
     end
-    assert_not_equal sample_type.creators.first, creator
-    assert_equal sample_type.creators.first, new_creator
+    sample_type.reload
+    assert_equal [new_creator], sample_type.creators
   end
 
   test 'removing a creator' do
@@ -957,6 +958,8 @@ class SampleTypeTest < ActiveSupport::TestCase
         sample_type.update!(params)
       end
     end
+    sample_type.reload
+    assert_empty sample_type.creators
   end
 
   test 'other creators' do
@@ -964,6 +967,8 @@ class SampleTypeTest < ActiveSupport::TestCase
     sample_type = Factory(:simple_sample_type, contributor: @person)
     params = { other_creators: 'Jane Smith, John Smith' }
     sample_type.update!(params)
+    sample_type.reload
+    assert_equal 'Jane Smith, John Smith', sample_type.other_creators
   end
 
   private

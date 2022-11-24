@@ -156,7 +156,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     end
     type = assigns(:sample_type)
     assert_equal @person, type.contributor
-    assert_equal creator.id, type.creator_ids.first
+    assert_equal [creator], type.creators
     assert_equal 'John Smith, Jane Smith', type.other_creators
   end
 
