@@ -63,6 +63,7 @@ class Workflow < ApplicationRecord
     end
 
     def test_status= stat
+      @only_test_status_changed = changed.empty?
       resource_attributes['test_status'] = (Workflow::TEST_STATUS_INV[stat&.to_sym])
     end
 
@@ -76,7 +77,7 @@ class Workflow < ApplicationRecord
 
     def should_submit_to_life_monitor?
       Seek::Config.life_monitor_enabled &&
-        (previous_changes.keys - ['updated_at', 'test_status']).any? &&
+        !@only_test_status_changed &&
         extractor.has_tests? &&
         parent.can_download?(nil)
     end
