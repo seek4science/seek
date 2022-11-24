@@ -432,6 +432,28 @@ class WorkflowTest < ActiveSupport::TestCase
     end
   end
 
+  test 'updating test status does not trigger life monitor submission job for git workflow' do
+    workflow = Factory(:local_ro_crate_git_workflow_with_tests, policy: Factory(:public_policy), test_status: nil)
+    assert_nil workflow.reload.test_status
+    assert_nil workflow.latest_version.reload.test_status
+    with_config_value(:life_monitor_enabled, true) do
+      assert_no_enqueued_jobs(only: LifeMonitorSubmissionJob) do
+        disable_authorization_checks { workflow.update_test_status(:all_failing) }
+      end
+    end
+  end
+
+  test 'updating other workflow fields does trigger life monitor submission job for git workflow' do
+    workflow = Factory(:local_ro_crate_git_workflow_with_tests, policy: Factory(:public_policy), test_status: nil)
+    assert_nil workflow.reload.test_status
+    assert_nil workflow.latest_version.reload.test_status
+    with_config_value(:life_monitor_enabled, true) do
+      assert_enqueued_jobs(1, only: LifeMonitorSubmissionJob) do
+        disable_authorization_checks { workflow.update!(title: 'something') }
+      end
+    end
+  end
+
   test 'changing main workflow path refreshes internals structure' do
     workflow = Factory(:local_git_workflow)
     v = workflow.git_version
