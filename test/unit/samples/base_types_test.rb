@@ -24,7 +24,7 @@ class BaseTypeTest < ActiveSupport::TestCase
   test 'valid?' do
     assert Seek::Samples::BaseType.valid?('String')
     refute Seek::Samples::BaseType.valid?('Fish')
-    %w(Integer Float String DateTime Date Text Boolean SeekStrain SeekSample SeekSampleMulti CV).each do |type|
+    %w(Integer Float String DateTime Date Text Boolean SeekStrain SeekSample SeekSampleMulti CV List).each do |type|
       assert Seek::Samples::BaseType.valid?(type)
     end
   end
