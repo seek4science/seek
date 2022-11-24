@@ -14,7 +14,7 @@ module SamplesHelper
         values
       )
       select_tag element_name,
-                 options,                 
+                 options,
                  class: "form-control",
                  include_blank: ""
     else
@@ -28,6 +28,24 @@ module SamplesHelper
                     handlebars_template: 'typeahead/controlled_vocab_term' }, 
                     limit: limit, ontology: is_ontology)
     end
+  end
+
+  def list_select_form_field(attribute,element_name, values)
+
+    sample_controlled_vocab =  attribute.sample_controlled_vocab
+
+    options = options_from_collection_for_select(
+        sample_controlled_vocab.sample_controlled_vocab_terms.sort_by(&:label),
+        :label, :label,
+        values
+      )
+      select_tag element_name,
+                 options,
+                 id: "custom_metadata_attributes_data_#{attribute.title}",
+                 class: "form-control js-states",
+                 include_blank: "",
+                 name: "#{element_name}[]",
+                 multiple: "multiple"
   end
 
   def sample_multi_form_field(attribute, element_name, value)  
@@ -77,6 +95,8 @@ module SamplesHelper
         seek_data_file_attribute_display(value)
       when Seek::Samples::BaseType::CV
         seek_cv_attribute_display(value, attribute)
+      when Seek::Samples::BaseType::LIST
+        value.join(", ")
       else
         default_attribute_display(attribute, options, sample, value)
       end
@@ -241,6 +261,8 @@ module SamplesHelper
       select_tag(element_name, options, include_blank: !attribute.required?, class: "form-control #{element_class}")
     when Seek::Samples::BaseType::CV
       controlled_vocab_form_field attribute.sample_controlled_vocab, element_name, value
+    when Seek::Samples::BaseType::LIST
+      list_select_form_field attribute, element_name, value
     when Seek::Samples::BaseType::SEEK_SAMPLE
       terms = attribute.linked_sample_type.samples.authorized_for('view').to_a
       options = options_from_collection_for_select(terms, :id, :title, value.try(:[], 'id'))

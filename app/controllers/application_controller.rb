@@ -607,7 +607,15 @@ class ApplicationController < ActionController::Base
       metadata_type = CustomMetadataType.find(attribute_params[:custom_metadata_type_id])
       if metadata_type
         keys = [:custom_metadata_type_id]
-        keys = keys + [{data:[metadata_type.custom_metadata_attributes.collect(&:title)]}]
+        cma= []
+        metadata_type.custom_metadata_attributes.each do |attr|
+          if attr.sample_attribute_type.base_type == Seek::Samples::BaseType::LIST
+            cma << {attr.title=>[]}
+          else
+            cma << attr.title.to_s
+          end
+        end
+        keys = keys + [{data:[cma]}]
       end
     end
     keys
