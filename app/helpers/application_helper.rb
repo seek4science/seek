@@ -532,6 +532,16 @@ module ApplicationHelper
       nil
     end
   end
+
+  def format_field_name(field_name)
+    return field_name unless displaying_single_page?
+
+    type = field_name.split('[')[0]
+    rest = '[' + field_name.split('[')[1]
+    # Converts study[other_creators] to isa_study[study][other_creators]
+    "isa_#{type}[#{type}]#{rest}"
+  end
+
 end
 
 class ApplicationFormBuilder < ActionView::Helpers::FormBuilder
