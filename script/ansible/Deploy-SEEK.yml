@@ -120,9 +120,10 @@
       with_items:
         - wget https://www.openssl.org/source/openssl-1.1.1g.tar.gz
         - tar zxvf openssl-1.1.1g.tar.gz
-      when: ansible_distribution_version is version('22.04', '>=')
       args:
         chdir: '{{git_dest}}'
+      run_once: true
+      when: ansible_distribution_version is version('22.04', '>=')
       tags:
         - openssl
         - ruby
@@ -137,9 +138,9 @@
         - make install
         - rm -rf '{{git_dest}}/.openssl/openssl-1.1.1g/certs'
         - ln -s /etc/ssl/certs '{{git_dest}}/.openssl/openssl-1.1.1g/certs'
-        #- cd '{{git_dest}}' && rm -r openssl-1.1.1g openssl-1.1.1g.tar.gz
       args:
         chdir: 'openssl-1.1.1g'
+      run_once: true
       when: ansible_distribution_version is version('22.04', '>=')
       tags:
         - openssl
@@ -148,10 +149,13 @@
     - name: Cleanup openssl for Ruby 2.7.x
       become: true
       become_user: root
-      shell: bash -lc "{{ item }}"
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
       with_items:
-        - rm -rf '{{git_dest}}/openssl-1.1.1g'
-        - rm -f '{{git_dest}}/openssl-1.1.1g.tar.gz'
+        - '{{git_dest}}/openssl-1.1.1g'
+        - '{{git_dest}}/openssl-1.1.1g.tar.gz'
+      run_once: true
       when: ansible_distribution_version is version('22.04', '>=')
       tags:
         - openssl
