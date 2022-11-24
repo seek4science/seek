@@ -13,8 +13,8 @@ class LifeMonitorStatusJobTest < ActiveSupport::TestCase
   test 'perform' do
     VCR.use_cassette('life_monitor/get_token') do
       VCR.use_cassette('life_monitor/list_workflows') do
-        workflow = Factory(:workflow_with_tests, uuid: '1493b330-d44b-013a-df8a-000c29a94011', title: 'sort-and-change-case')
-        all_failing = Factory(:workflow_with_tests, uuid: '86da0a30-d2cd-013a-a07d-000c29a94011', title: 'Concat two files')
+        workflow = Factory(:workflow_with_tests, policy: Factory(:public_policy), uuid: '1493b330-d44b-013a-df8a-000c29a94011', title: 'sort-and-change-case')
+        all_failing = Factory(:workflow_with_tests, policy: Factory(:public_policy), uuid: '86da0a30-d2cd-013a-a07d-000c29a94011', title: 'Concat two files')
         disable_authorization_checks do
           Factory(:ro_crate_with_tests, asset_version: 2, asset: workflow)
           workflow.save_as_new_version
@@ -22,8 +22,10 @@ class LifeMonitorStatusJobTest < ActiveSupport::TestCase
         some_passing = workflow.find_version(1)
         all_passing = workflow.find_version(2)
 
-        assert_difference('Workflow.where(test_status: nil).count', -2) do
-          LifeMonitorStatusJob.perform_now
+        assert_no_enqueued_jobs(only: LifeMonitorSubmissionJob) do
+          assert_difference('Workflow.where(test_status: nil).count', -2) do
+            LifeMonitorStatusJob.perform_now
+          end
         end
 
         assert_equal :some_passing, some_passing.reload.test_status
@@ -37,16 +39,18 @@ class LifeMonitorStatusJobTest < ActiveSupport::TestCase
   test 'perform for git workflow' do
     VCR.use_cassette('life_monitor/get_token') do
       VCR.use_cassette('life_monitor/list_workflows') do
-        workflow = Factory(:local_ro_crate_git_workflow, uuid: '1493b330-d44b-013a-df8a-000c29a94011', title: 'sort-and-change-case')
-        all_failing = Factory(:local_ro_crate_git_workflow, uuid: '86da0a30-d2cd-013a-a07d-000c29a94011', title: 'Concat two files')
+        workflow = Factory(:ro_crate_git_workflow_with_tests, uuid: '1493b330-d44b-013a-df8a-000c29a94011', title: 'sort-and-change-case', policy: Factory(:public_policy))
+        all_failing = Factory(:local_ro_crate_git_workflow, uuid: '86da0a30-d2cd-013a-a07d-000c29a94011', title: 'Concat two files', policy: Factory(:public_policy))
         disable_authorization_checks do
           workflow.save_as_new_git_version
         end
         some_passing = workflow.find_version(1)
         all_passing = workflow.find_version(2)
 
-        assert_difference('Workflow.where(test_status: nil).count', -2) do
-          LifeMonitorStatusJob.perform_now
+        assert_no_enqueued_jobs(only: LifeMonitorSubmissionJob) do
+          assert_difference('Workflow.where(test_status: nil).count', -2) do
+            LifeMonitorStatusJob.perform_now
+          end
         end
 
         assert_equal :some_passing, some_passing.reload.test_status

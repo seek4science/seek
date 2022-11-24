@@ -37,7 +37,7 @@ class Workflow < ApplicationRecord
 
     before_save :refresh_internals, if: -> { main_workflow_path_changed? && !main_workflow_blob.empty? }
     after_save :clear_cached_diagram, if: -> { diagram_path_changed? }
-    after_commit :submit_to_life_monitor, on: [:create, :update]
+    after_commit :submit_to_life_monitor, on: [:create, :update], if: :should_submit_to_life_monitor?
     after_commit :sync_test_status, on: [:create, :update]
 
     def maturity_level
@@ -71,9 +71,14 @@ class Workflow < ApplicationRecord
     end
 
     def submit_to_life_monitor
-      if Seek::Config.life_monitor_enabled && extractor.has_tests? && parent.can_download?(nil)
-        LifeMonitorSubmissionJob.perform_later(self)
-      end
+      LifeMonitorSubmissionJob.perform_later(self)
+    end
+
+    def should_submit_to_life_monitor?
+      Seek::Config.life_monitor_enabled &&
+        (previous_changes.keys - ['updated_at', 'test_status']).any? &&
+        extractor.has_tests? &&
+        parent.can_download?(nil)
     end
 
     # This does two things:
@@ -85,7 +90,7 @@ class Workflow < ApplicationRecord
   end
 
   explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi', 'test_status']) do
-    after_commit :submit_to_life_monitor, on: [:create, :update]
+    after_commit :submit_to_life_monitor, on: [:create, :update], if: :should_submit_to_life_monitor?
     after_commit :sync_test_status, on: [:create, :update]
     acts_as_doi_mintable(proxy: :parent, general_type: 'Workflow')
     acts_as_versioned_resource
@@ -120,10 +125,16 @@ class Workflow < ApplicationRecord
     end
 
     def submit_to_life_monitor
-      return if parent.is_git_versioned?
-      if Seek::Config.life_monitor_enabled && extractor.has_tests? && workflow.can_download?(nil)
-        LifeMonitorSubmissionJob.perform_later(self)
-      end
+      LifeMonitorSubmissionJob.perform_later(self)
+    end
+
+    def should_submit_to_life_monitor?
+      return false if parent.is_git_versioned?
+
+      Seek::Config.life_monitor_enabled &&
+        (previous_changes.keys - ['updated_at', 'test_status']).any? &&
+        extractor.has_tests? &&
+        workflow.can_download?(nil)
     end
 
     # This does two things:
