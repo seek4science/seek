@@ -372,6 +372,26 @@ class WorkflowTest < ActiveSupport::TestCase
     assert_equal :all_passing, v1.test_status
   end
 
+  test 'test_status is preserved when freezing git versions' do
+    workflow = Factory(:local_ro_crate_git_workflow_with_tests)
+
+    disable_authorization_checks { workflow.update_test_status(:all_passing) }
+    v1 = workflow.find_version(1)
+    v1.update_column(:mutable, true)
+    v1.reload
+    assert_equal :all_passing, v1.test_status
+    assert_equal :all_passing, workflow.reload.test_status
+    assert v1.mutable?
+
+    disable_authorization_checks do
+      v1.lock
+    end
+
+    refute v1.mutable?
+    assert_equal :all_passing, v1.test_status
+    assert_equal :all_passing, workflow.reload.test_status
+  end
+
   test 'update test status for git versioned workflows' do
     # Default latest version
     workflow = Factory(:local_ro_crate_git_workflow, test_status: nil)
