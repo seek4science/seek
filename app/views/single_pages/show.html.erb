@@ -120,6 +120,7 @@
       const id = ["study", "assay"].includes(selectedItem.type) ? selectedItem.id : selectedItem.parent.id
       const parent = $j(`a[_type="${type}"][_id="${id}"]`)
       $j(parent).next().find(`a[_type="${item}"]`).addClass("jstree-clicked")
+      updateLocationHash(item, id)
       setTimeout(() => updateContainerHeight(), 1000)
     }
     
