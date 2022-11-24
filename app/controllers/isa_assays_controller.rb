@@ -130,8 +130,11 @@ class IsaAssaysController < ApplicationController
   def find_requested_item
     @isa_assay = IsaAssay.new
     @isa_assay.populate(params[:id])
-    unless requested_item_authorized?(@isa_assay.assay)
+
+    if @isa_assay.sample_type.nil? || !requested_item_authorized?(@isa_assay.assay)
       flash[:error] = "You are not authorized to edit this #{t('isa_assay')}"
+      flash[:error] = 'Resource not found.' if @isa_assay.sample_type.nil?
+
       redirect_to single_page_path(id: @isa_assay.assay.projects.first, item_type: 'assay',
                                    item_id: @isa_assay.assay)
     end
