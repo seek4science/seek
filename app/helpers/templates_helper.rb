@@ -37,7 +37,7 @@ module TemplatesHelper
         unit = attr.unit ? attr.unit.symbol : "<span class='none_text'>-</span>".html_safe
         description = attr.description.present? ? attr.description : "<span class='none_text'>Not specified</span>".html_safe
 
-        type = attribute_type_link(attr)
+        type = template_attribute_type_link(attr)
 
         content_tag :tr do
           concat content_tag :td, (h(attr.title) + req).html_safe
@@ -53,7 +53,7 @@ module TemplatesHelper
 
   private
 
-  def attribute_type_link(template_attribute)
+  def template_attribute_type_link(template_attribute)
     type = template_attribute.sample_attribute_type.title
 
     if template_attribute.sample_attribute_type.controlled_vocab?
