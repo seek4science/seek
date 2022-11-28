@@ -7,6 +7,7 @@ It updates and installs all the dependencies needed for SEEK, including rvm and 
 It also configures mysql with the given user and password, using the default database.
 
 Tested on fresh Ubuntu install version:
+   - 18.04.6
    - 20.04.5
    - 22.04.1
 
