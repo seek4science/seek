@@ -911,6 +911,66 @@ class SampleTypeTest < ActiveSupport::TestCase
     assert_equal updated_at, sample.updated_at
   end
 
+  test 'adding a creator' do
+    User.current_user = @person.user
+    creator = Factory :person
+    sample_type = Factory(:simple_sample_type, contributor: @person)
+    params = { creator_ids: [creator.id] }
+    assert_difference('sample_type.creators.count') do
+      assert_difference('AssetsCreator.count') do
+        sample_type.update!(params)
+      end
+    end
+    sample_type.reload
+    assert_equal [creator], sample_type.creators
+  end
+
+  test 'updating a creator' do
+    User.current_user = @person.user
+    # Set creator
+    creator = Factory :person
+    sample_type = Factory(:simple_sample_type, contributor: @person)
+    params = { creator_ids: [creator.id] }
+    sample_type.update!(params)
+    # Update creator
+    new_creator = Factory :person
+    params = { creator_ids: [new_creator.id] }
+    assert_no_difference('AssetsCreator.count') do
+      assert_no_difference('sample_type.creators.count') do
+        sample_type.update!(params)
+      end
+    end
+    sample_type.reload
+    assert_equal [new_creator], sample_type.creators
+  end
+
+  test 'removing a creator' do
+    User.current_user = @person.user
+    # Set creator
+    creator = Factory :person
+    sample_type = Factory(:simple_sample_type, contributor: @person)
+    params = { creator_ids: [creator.id] }
+    sample_type.update!(params)
+    # Remove creator
+    params = { creator_ids: [] }
+    assert_difference('sample_type.creators.count', -1) do
+      assert_difference('AssetsCreator.count', -1) do
+        sample_type.update!(params)
+      end
+    end
+    sample_type.reload
+    assert_empty sample_type.creators
+  end
+
+  test 'other creators' do
+    User.current_user = @person.user
+    sample_type = Factory(:simple_sample_type, contributor: @person)
+    params = { other_creators: 'Jane Smith, John Smith' }
+    sample_type.update!(params)
+    sample_type.reload
+    assert_equal 'Jane Smith, John Smith', sample_type.other_creators
+  end
+
   private
 
   # sample type with 3 samples
