@@ -29,6 +29,7 @@ namespace :seek do
     remove_orphaned_project_subscriptions
     remove_node_activity_logs
     remove_node_asset_creators
+    set_default_sample_type_creators
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -233,6 +234,24 @@ namespace :seek do
     creators = AssetsCreator.where(asset_type: 'Node')
     puts "Removing #{creators.count} Node related asset creators" if creators.count > 0
     creators.delete_all
+  end
+
+  task(set_default_sample_type_creators: [:environment]) do
+    log_action = 'UPGRADE-set_default_sample_type_creators'
+    if ActivityLog.where(action: log_action).empty?
+      puts "Setting default Sample Type creators"
+      count = 0
+      SampleType.all.each do |sample_type|
+        if sample_type.assets_creators.empty?
+          sample_type.assets_creators.build(creator: sample_type.contributor).save!
+          count += 1
+        end
+      end
+      puts "#{count} Sample Types updated"
+      ActivityLog.create(action: log_action, data:'1.13.0 upgrade task')
+    else
+      puts "Skipping setting default Sample Type creators, as already set"
+    end
   end
 
 end
