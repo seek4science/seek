@@ -33,7 +33,7 @@
 
     <%= render partial: 'custom_metadata/custom_metadata_attribute_input', locals:{f:f,resource:@isa_study.study} %>
 
-    <%= render partial: 'assets/manage_specific_attributes', locals:{f:f} if show_form_manage_specific_attributes? %>
+    <%= render partial: 'assets/manage_specific_attributes', locals: { f: study_fields } if show_form_manage_specific_attributes? %>
 
     <%= study_fields.fancy_multiselect :publications, { other_projects_checkbox: true, name: "isa_study[study][publication_ids]" } %>
 

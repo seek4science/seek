@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_11_22_154144) do
+ActiveRecord::Schema.define(version: 2022_11_28_125902) do
 
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
@@ -2109,7 +2109,7 @@ ActiveRecord::Schema.define(version: 2022_11_22_154144) do
     t.integer "pos"
     t.boolean "is_title", default: false
     t.integer "isa_tag_id"
-    t.string "iri"
+    t.string "pid"
     t.index ["template_id", "title"], name: "index_template_id_asset_id_title"
   end
 
