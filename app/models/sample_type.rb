@@ -28,6 +28,8 @@ class SampleType < ApplicationRecord
 
   has_many :samples, inverse_of: :sample_type
 
+  has_filter :contributor
+
   has_many :sample_attributes, -> { order(:pos) }, inverse_of: :sample_type, dependent: :destroy, after_add: :detect_link_back_to_self
   alias_method :metadata_attributes, :sample_attributes
 
