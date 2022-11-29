@@ -11,7 +11,7 @@ class SampleType < ApplicationRecord
   include Seek::ActsAsAsset::Searching
   include Seek::Search::BackgroundReindexing
   include Seek::Stats::ActivityCounts
-
+  include Seek::Creators
 
   include Seek::ProjectAssociation
 
@@ -123,14 +123,6 @@ class SampleType < ApplicationRecord
 
   def editing_constraints
     Seek::Samples::SampleTypeEditingConstraints.new(self)
-  end
-
-  def creators
-    [contributor]
-  end
-
-  def assets_creators
-    []
   end
 
   private

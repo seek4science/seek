@@ -815,7 +815,7 @@ GEM
       activesupport (>= 5.2)
       sprockets (>= 3.0.0)
     sqlite3 (1.4.2)
-    stringio (3.0.1)
+    stringio (0.1.0)
     sunspot (2.5.0)
       pr_geohash (~> 1.0)
       rsolr (>= 1.1.1, < 3)
@@ -1028,6 +1028,7 @@ DEPENDENCIES
   simplecov
   sprockets-rails
   sqlite3 (~> 1.4)
+  stringio (= 0.1.0)
   sunspot_matchers
   sunspot_rails
   teaspoon
