@@ -20,7 +20,7 @@ namespace :seek do
     db:seed:003_model_formats
     db:seed:004_model_recommended_environments
     remove_orphaned_versions
-    seek:rebuild_workflow_internals
+    refresh_workflow_internals
     remove_scale_annotations
     remove_spreadsheet_annotations
     remove_node_annotations
@@ -236,9 +236,16 @@ namespace :seek do
     creators.delete_all
   end
 
+  task(refresh_workflow_internals: [:environment]) do |task|
+    ran = only_once(task) do
+      Rake::Task['seek:rebuild_workflow_internals'].invoke
+    end
+
+    puts "Skipping workflow internals rebuild, already done" unless ran
+  end
+
   task(set_default_sample_type_creators: [:environment]) do
-    log_action = 'UPGRADE-set_default_sample_type_creators'
-    if ActivityLog.where(action: log_action).empty?
+    ran = only_once('set_default_sample_type_creators') do
       puts "Setting default Sample Type creators"
       count = 0
       SampleType.all.each do |sample_type|
@@ -248,10 +255,25 @@ namespace :seek do
         end
       end
       puts "#{count} Sample Types updated"
-      ActivityLog.create(action: log_action, data:'1.13.0 upgrade task')
-    else
-      puts "Skipping setting default Sample Type creators, as already set"
     end
+
+    puts "Skipping setting default Sample Type creators, as already set" unless ran
   end
 
+  private
+
+  ##
+  # Runs the block for the given task only once.
+  # @param task [Rake::Task, String] The task or task name to remember.
+  # @return [Boolean] Whether the block executed or not.
+  def only_once(task, &block)
+    log_action = "UPGRADE-#{task}" # Will convert Rake::Task to string which is the task name (e.g. seek:some_task_name)
+    if ActivityLog.where(action: log_action).empty?
+      block.call
+      ActivityLog.create!(action: log_action, data: "#{Seek::Version::APP_VERSION} upgrade task")
+      true
+    else
+      false
+    end
+  end
 end
