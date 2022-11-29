@@ -53,10 +53,6 @@ module Seek #:nodoc:
         self.class.authorization_supported?
       end
 
-      def contributor_credited?
-        false
-      end
-
       def title_is_public?
         false
       end

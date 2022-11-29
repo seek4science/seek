@@ -971,6 +971,14 @@ class SampleTypeTest < ActiveSupport::TestCase
     assert_equal 'Jane Smith, John Smith', sample_type.other_creators
   end
 
+  test 'contributor_credited?' do
+    sample_type = Factory(:simple_sample_type, contributor: @person)
+    assert sample_type.contributor_credited?
+
+    sample_type = Factory(:simple_sample_type, contributor: @person, assets_creators:[AssetsCreator.new(creator:Factory(:person))])
+    refute sample_type.contributor_credited?
+  end
+
   private
 
   # sample type with 3 samples
