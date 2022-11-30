@@ -873,6 +873,32 @@ class PeopleControllerTest < ActionController::TestCase
     end
   end
 
+  test 'related sample_types should show where person is creator' do
+    person1 = Factory(:person)
+    person2 = Factory(:person)
+    AssetsCreator.create asset: (st1 = Factory(:simple_sample_type, contributor: person1)), creator: person1
+    AssetsCreator.create asset: (st2 = Factory(:simple_sample_type, contributor: person1)), creator: person2
+    AssetsCreator.create asset: (st3 = Factory(:simple_sample_type, contributor: person2)), creator: person1
+
+    puts "sample type "+st1.id.to_s+":creator and submitter"
+    puts "sample type "+st2.id.to_s+":submitter"
+    puts "sample type "+st3.id.to_s+":creator"
+
+    login_as(person1)
+    get :show, params: { id: person1.id }
+    assert_response :success
+    assert_select 'h2', text: /Related items/i
+    assert_select 'div#sampletypes'
+    assert_select 'div.list_items_container' do
+      assert_select 'div.list_item' do
+        assert_select 'div.list_item_title' do
+          assert_select 'a[href=?]', sample_type_path(st1), text: st1.title
+          assert_select 'a[href=?]', sample_type_path(st2), text: st2.title
+          assert_select 'a[href=?]', sample_type_path(st3), text: st3.title
+        end
+      end
+    end
+  end
 
   test 'redirect after destroy' do
     person1 = Factory(:person)
