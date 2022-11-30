@@ -127,6 +127,14 @@ class SampleType < ApplicationRecord
     Seek::Samples::SampleTypeEditingConstraints.new(self)
   end
 
+  def contributing_user
+    contributor
+  end
+
+  def can_see_hidden_item?(user)
+    can_view?(user)
+  end
+
   private
 
   # whether the referring sample is valid and gives permission to view

@@ -292,9 +292,9 @@ SEEK::Application.routes.draw do
       post :batch_change_permssion_for_selected_items
       post :batch_sharing_permission_changed
     end
-    resources :projects, :programmes, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows, :data_files,
-              :presentations, :publications, :documents, :events, :samples, :specimens, :strains, :file_templates, :placeholders,
-              :collections, :templates, only: [:index]
+    resources :projects, :programmes, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows,
+              :data_files, :presentations, :publications, :documents, :events, :sample_types, :samples, :specimens,
+              :strains, :file_templates, :placeholders, :collections, :templates, only: [:index]
     resources :avatars do
       member do
         post :select
