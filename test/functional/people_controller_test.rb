@@ -876,9 +876,9 @@ class PeopleControllerTest < ActionController::TestCase
   test 'related sample_types should show where person is creator' do
     person1 = Factory(:person)
     person2 = Factory(:person)
-    AssetsCreator.create asset: (st1 = Factory(:simple_sample_type, contributor: person1)), creator: person1
-    AssetsCreator.create asset: (st2 = Factory(:simple_sample_type, contributor: person1)), creator: person2
-    AssetsCreator.create asset: (st3 = Factory(:simple_sample_type, contributor: person2)), creator: person1
+    st1 = Factory(:simple_sample_type, contributor: person1, creators: [person1])
+    st2 = Factory(:simple_sample_type, contributor: person1, creators: [person2])
+    st3 = Factory(:simple_sample_type, contributor: person2, creators: [person1])
 
     login_as(person1)
     assert st1.can_view?
