@@ -144,6 +144,8 @@ module SamplesHelper
 
   # link for the sample type for the provided sample. Handles a referring_sample_id if required
   def sample_type_link(sample, user=User.current_user)
+    return nil if Seek::Config.project_single_page_advanced_enabled && !sample.sample_type.template_id.nil?
+
     if (sample.sample_type.can_view?(user))
       link_to sample.sample_type.title,sample.sample_type
     else

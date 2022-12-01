@@ -1,4 +1,4 @@
-<% sample_type_count = SampleType.where(id: template.id).length -%>
+<% sample_type_count = SampleType.where(template_id: template.id).length -%>
 <div class="row">
 	<div class="col-md-6">
 		<p>
@@ -12,7 +12,7 @@
 		<p>
 			<em>
 				<%= sample_type_count -%> <%= sample_type_count > 1 ? t('sample_type').pluralize() + " are" : t('sample_type') + " is" %>
-				referencing this template
+				referencing this <%=t('template')%>
 			</em>
 		</p>
 	</div>
