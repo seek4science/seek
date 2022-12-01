@@ -60,3 +60,18 @@ jobs:
           sed -i 's/mysqluser/root/g' config/database.yml
           sed -i 's/mysqlpassword//g' config/database.yml
           bash -lc 'bundle exec rake db:setup'
+
+      - name: Runs seek unit tests
+        working-directory: /home/runner/work/SEEK
+        run: |
+          bash -lc 'bundle exec rails test test/unit'
+
+      - name: Runs seek integration tests
+        working-directory: /home/runner/work/SEEK
+        run: |
+          bash -lc 'bundle exec rails test test/integration'
+
+      - name: Runs seek functional tests
+        working-directory: /home/runner/work/SEEK
+        run: |
+          bash -lc 'bundle exec rails test test/functional'
