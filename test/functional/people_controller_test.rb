@@ -885,6 +885,9 @@ class PeopleControllerTest < ActionController::TestCase
     puts "sample type "+st3.id.to_s+":creator"
 
     login_as(person1)
+    assert st1.can_view?
+    assert st2.can_view?
+    assert st3.can_view?
     get :show, params: { id: person1.id }
     assert_response :success
     assert_select 'h2', text: /Related items/i
