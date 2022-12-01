@@ -824,9 +824,9 @@ class PersonTest < ActiveSupport::TestCase
   test 'related sample_type' do
     person1 = Factory(:person)
     person2 = Factory(:person)
-    AssetsCreator.create asset: (st1 = Factory(:simple_sample_type, contributor: person1)), creator: person1
-    AssetsCreator.create asset: (st2 = Factory(:simple_sample_type, contributor: person1)), creator: person2
-    AssetsCreator.create asset: (st3 = Factory(:simple_sample_type, contributor: person2)), creator: person1
+    st1 = Factory(:simple_sample_type, contributor: person1, creators: [person1])
+    st2 = Factory(:simple_sample_type, contributor: person1, creators: [person2])
+    st3 = Factory(:simple_sample_type, contributor: person2, creators: [person1])
     assert_equal [st1, st2, st3].sort, person1.related_sample_types.sort
   end
 
