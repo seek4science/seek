@@ -124,7 +124,8 @@ class SampleType < ApplicationRecord
     return false if Seek::Config.project_single_page_advanced_enabled && template_id.present? && !view_in_single_page
 
     project_membership = user&.person && (user.person.projects & projects).any?
-    project_membership || public_samples? || check_referring_sample_permission(user, referring_sample)
+    is_creator = creators.include?(user&.person)
+    project_membership || public_samples? || is_creator || check_referring_sample_permission(user, referring_sample)
   end
 
 
