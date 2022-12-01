@@ -128,7 +128,6 @@ class SampleType < ApplicationRecord
     project_membership || public_samples? || is_creator || check_referring_sample_permission(user, referring_sample)
   end
 
-
   def editing_constraints
     Seek::Samples::SampleTypeEditingConstraints.new(self)
   end
