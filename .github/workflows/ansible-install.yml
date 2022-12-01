@@ -30,6 +30,9 @@ jobs:
           sed -i 's/git_dest\: \/home\/username/git_dest\: \/home\/runner\/work/' group_vars/vars.yml
           sed -i '/sql_user\: sql_username/a sql_password: mysqlpassword' group_vars/vars.yml
 
+      - name: Prepares system for ansible install
+        run: |
+          sudo apt install acl -y
 
       - name: Install SEEK through ansible
         working-directory: /home/runner/work/seek/seek/script/ansible/
