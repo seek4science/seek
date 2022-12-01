@@ -49,4 +49,14 @@ jobs:
       - name: Install SEEK through ansible
         working-directory: /home/runner/work/seek/seek/script/ansible/
         run: |
-          ansible-playbook Deploy-SEEK.yml
+          ansible-playbook Deploy-SEEK.yml --skip-tags database
+
+      - name: Configures database
+        working-directory: /home/runner/work/SEEK
+        run: |
+          cp config/database.default.yml config/database.yml
+          sed -i '/password\: mysqlpassword/a \ \ port\: 3306' config/database.yml
+          sed -i '/password\: mysqlpassword/a \ \ host\: 127.0.0.1' config/database.yml
+          sed -i 's/mysqluser/root/g' config/database.yml
+          sed -i 's/mysqlpassword//g' config/database.yml
+          bash -lc 'bundle exec rake db:setup'
