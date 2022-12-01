@@ -118,8 +118,8 @@
       become_user: root
       shell: bash -lc "{{ item }}"
       with_items:
-        - wget https://www.openssl.org/source/openssl-1.1.1g.tar.gz
-        - tar zxvf openssl-1.1.1g.tar.gz
+        - wget https://www.openssl.org/source/openssl-1.1.1g.tar.gz -P '{{git_dest}}/'
+        - tar zxvf '{{git_dest}}/openssl-1.1.1g.tar.gz' -C '{{git_dest}}/'
       args:
         chdir: '{{git_dest}}'
       run_once: true
@@ -139,7 +139,7 @@
         - rm -rf '{{git_dest}}/.openssl/openssl-1.1.1g/certs'
         - ln -s /etc/ssl/certs '{{git_dest}}/.openssl/openssl-1.1.1g/certs'
       args:
-        chdir: 'openssl-1.1.1g'
+        chdir: '{{git_dest}}/openssl-1.1.1g'
       run_once: true
       when: ansible_distribution_version is version('22.04', '>=')
       tags:
