@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Configure ansible for local install
-        working-directory: /home/runner/work/SEEK/script/ansible/
+        working-directory: /home/runner/work/seek/seek/script/ansible/
         run: |
           sed -i '/vault_password_file/d' ansible.cfg
           sed -i '/ssh_connection/d' ansible.cfg
@@ -32,6 +32,6 @@ jobs:
 
 
       - name: Install SEEK through ansible
+        working-directory: /home/runner/work/seek/seek/script/ansible/
         run: |
-          cd script/ansible/
           ansible-playbook Deploy-SEEK.yml
