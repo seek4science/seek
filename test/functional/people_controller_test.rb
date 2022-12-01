@@ -880,10 +880,6 @@ class PeopleControllerTest < ActionController::TestCase
     AssetsCreator.create asset: (st2 = Factory(:simple_sample_type, contributor: person1)), creator: person2
     AssetsCreator.create asset: (st3 = Factory(:simple_sample_type, contributor: person2)), creator: person1
 
-    puts "sample type "+st1.id.to_s+":creator and submitter"
-    puts "sample type "+st2.id.to_s+":submitter"
-    puts "sample type "+st3.id.to_s+":creator"
-
     login_as(person1)
     assert st1.can_view?
     assert st2.can_view?
