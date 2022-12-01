@@ -129,7 +129,7 @@ class SampleType < ApplicationRecord
   end
 
   def contributing_user
-    contributor
+    contributor&.user
   end
 
   def can_see_hidden_item?(user)
