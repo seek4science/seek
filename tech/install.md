@@ -68,7 +68,7 @@ Then ensure everything is up-to-date
 
 Now install the packages:
 
-    sudo apt install build-essential cmake git imagemagick libcurl4-gnutls-dev libgmp-dev \
+    sudo apt install build-essential cmake git graphviz imagemagick libcurl4-gnutls-dev libgmp-dev \
         libmagick++-dev libmysqlclient-dev libpq-dev libreadline-dev libreoffice libssl-dev \
         libxml++2.6-dev libxslt1-dev mysql-server nodejs openjdk-11-jdk openssh-server poppler-utils zip \
         python3.7-dev python3.7-distutils python3-pip
