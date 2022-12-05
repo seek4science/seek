@@ -23,7 +23,9 @@ class TreeviewBuilder
     end
 
     # Documents folder
-    @folders.reverse_each.map { |f| investigation_items.unshift(folder_node(f)) } if @folders.respond_to? :each
+    if Seek::Config.project_single_page_folders_enabled
+      @folders.reverse_each.map { |f| investigation_items.unshift(folder_node(f)) } if @folders.respond_to? :each
+    end
     sanitize(JSON[[build_project_item(@project, investigation_items)]])
   end
 
