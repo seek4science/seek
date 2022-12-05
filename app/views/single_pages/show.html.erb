@@ -31,7 +31,7 @@
                 <div id="dt-overlay"><%= image('large_spinner') %></div>
                 <div id="loader"></div>
                 <div id="folder_contents" class="row" style="display:none">
-                     <%= render :partial => "folders/contents", :locals => {:folder => default_folder } -%>
+                     <%= render :partial => "folders/contents", :locals => {:folder => default_folder } if default_folder -%>
                 </div>
                 <div id="sample_contents" class="row" style="display:none">
                     <div class="simpleForm">
