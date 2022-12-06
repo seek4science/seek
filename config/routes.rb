@@ -292,9 +292,9 @@ SEEK::Application.routes.draw do
       post :batch_change_permssion_for_selected_items
       post :batch_sharing_permission_changed
     end
-    resources :projects, :programmes, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows, :data_files,
-              :presentations, :publications, :documents, :events, :samples, :specimens, :strains, :file_templates, :placeholders,
-              :collections, :templates, only: [:index]
+    resources :projects, :programmes, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows,
+              :data_files, :presentations, :publications, :documents, :events, :sample_types, :samples, :specimens,
+              :strains, :file_templates, :placeholders, :collections, :templates, only: [:index]
     resources :avatars do
       member do
         post :select
@@ -331,7 +331,7 @@ SEEK::Application.routes.draw do
       get :guided_join
     end
     resources :programmes, :people, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows, :data_files, :presentations,
-              :publications, :events, :samples, :specimens, :strains, :search, :organisms, :human_diseases, :documents, :file_templates, :placeholders, :collections, :templates, only: [:index]
+              :publications, :events, :sample_types, :samples, :specimens, :strains, :search, :organisms, :human_diseases, :documents, :file_templates, :placeholders, :collections, :templates, only: [:index]
 
     resources :openbis_endpoints do
       collection do
@@ -440,12 +440,12 @@ SEEK::Application.routes.draw do
       get :order_assays
       patch :manage_update
     end
-    resources :people, :programmes, :projects, :assays, :investigations, :models, :sops, :workflows, :data_files, :publications, :documents, only: [:index]
+    resources :people, :programmes, :projects, :sample_types, :assays, :investigations, :models, :sops, :workflows, :data_files, :publications, :documents, only: [:index]
   end
 
   resources :assays, concerns: [:publishable, :has_snapshots, :isa] do
     resources :nels, only: [:index]
-    resources :people, :programmes, :projects, :investigations, :samples, :studies, :models, :sops, :workflows, :data_files, :publications, :documents, :strains, :organisms, :human_diseases, :placeholders, only: [:index]
+    resources :people, :programmes, :projects, :investigations, :sample_types, :samples, :studies, :models, :sops, :workflows, :data_files, :publications, :documents, :strains, :organisms, :human_diseases, :placeholders, only: [:index]
   end
 
   resources :nels do
@@ -463,8 +463,9 @@ SEEK::Application.routes.draw do
       post :upload_file
       get :download_file
       get :fetch_file
-    end
+    end  
   end
+
   # to be removed as STI does not work in too many places
   # resources :openbis_assays, controller: 'assays', type: 'OpenbisAssay'
 
@@ -686,7 +687,7 @@ SEEK::Application.routes.draw do
       post :query
     end
     resources :people, :programmes, :projects, :assays, :studies, :investigations, :data_files, :publications, :samples,
-              :strains, :organisms, :collections, only: [:index]
+              :sample_types, :strains, :organisms, :collections, only: [:index]
   end
 
   ### SAMPLE TYPES ###
@@ -767,7 +768,7 @@ SEEK::Application.routes.draw do
       post :populate_template
     end
     resources :samples
-    resources :projects, :people, :programmes, :investigations, :studies, :assays, :publications, :collections,  only: [:index]
+    resources :projects, :people, :programmes, :investigations, :studies, :sample_types, :assays, :publications, :collections,  only: [:index]
   end
 
   ### SINGLE PAGE
