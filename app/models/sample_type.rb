@@ -10,6 +10,8 @@ class SampleType < ApplicationRecord
 
   include Seek::ActsAsAsset::Searching
   include Seek::Search::BackgroundReindexing
+  include Seek::Stats::ActivityCounts
+  include Seek::Creators
 
   include Seek::ProjectAssociation
 
@@ -25,6 +27,8 @@ class SampleType < ApplicationRecord
   acts_as_favouritable
 
   has_many :samples, inverse_of: :sample_type
+
+  has_filter :contributor
 
   has_many :sample_attributes, -> { order(:pos) }, inverse_of: :sample_type, dependent: :destroy, after_add: :detect_link_back_to_self
   alias_method :metadata_attributes, :sample_attributes
@@ -115,12 +119,21 @@ class SampleType < ApplicationRecord
   end
 
   def can_view?(user = User.current_user, referring_sample = nil)
-    project_membership = (user && user.person && (user.person.projects & projects).any?)
-    project_membership || public_samples? || check_referring_sample_permission(user, referring_sample)
+    project_membership = (user && user.person && (user.person.projects & projects).any?) 
+    is_creator = creators.include?(user&.person)
+    project_membership || public_samples? || is_creator || check_referring_sample_permission(user, referring_sample)
   end
 
   def editing_constraints
     Seek::Samples::SampleTypeEditingConstraints.new(self)
+  end
+
+  def contributing_user
+    contributor&.user
+  end
+
+  def can_see_hidden_item?(user)
+    can_view?(user)
   end
 
   private

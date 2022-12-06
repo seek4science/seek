@@ -3,8 +3,9 @@ module Seek
     extend ActiveSupport::Concern
 
     RELATABLE_TYPES = ['Person', 'Programme', 'Project', 'Institution', 'Investigation', 'Study', 'Assay', 'DataFile',
-                       'Document', 'Model', 'Sop', 'Publication', 'Presentation', 'Event', 'Organism', 'Strain', 'Sample',
-                       'Workflow', 'Collection', 'HumanDisease', 'FileTemplate', 'Placeholder', 'Template'].freeze
+                       'Document', 'Model', 'Sop', 'Publication', 'Presentation', 'Event', 'Organism', 'Strain',
+                       'SampleType', 'Sample', 'Workflow', 'Collection', 'HumanDisease', 'FileTemplate', 'Placeholder',
+                       'Template'].freeze
 
     # special cases of associations to be skipped { self: relatable_type  }
     RELATABLE_TYPES_BLACKLIST = {
