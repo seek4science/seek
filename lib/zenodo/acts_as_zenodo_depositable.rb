@@ -43,6 +43,7 @@ module Zenodo
         metadata.merge!(extra_metadata.to_h.deep_symbolize_keys)
 
         #FIXME: this is a quick hack
+        metadata[:title] = 'not set' if metadata[:title].blank?
         metadata[:description] = 'not set' if metadata[:description].blank?
 
         client = Zenodo::Client.new(access_token, Seek::Config.zenodo_api_url)

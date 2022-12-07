@@ -5,7 +5,7 @@
 <%= render :partial => "general/item_title", :locals => {:item=>@snapshot, :title=>snapshot_display_name(@snapshot), :buttons_partial => 'snapshots/buttons'} %>
 <div class="row">
   <div class="col-md-9 col-sm-8">
-    <%= item_description @snapshot.snapshot_description -%>
+    <%= item_description @snapshot.description -%>
 
     <% if Seek::Config.doi_minting_enabled %>
         <p>
@@ -34,8 +34,8 @@
     <p><strong>Created at:</strong> <%= date_as_string(@snapshot.created_at, true) %></p>
 
     <%= panel('Resource') do %>
-      <%= render :partial => "general/item_title", :locals => {:item=>@resource} %>
-      <%= item_description @snapshot.description -%>
+      <%= render :partial => "general/item_title", :locals => {:item=>@resource, :title=>@snapshot.m_title} %>
+      <%= item_description @snapshot.m_description -%>
     <% end %>
 
     <%= panel('Contents') do %>
