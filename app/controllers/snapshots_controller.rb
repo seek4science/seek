@@ -126,6 +126,6 @@ class SnapshotsController < ApplicationController
   end
 
   def snapshot_params
-    params.require(:snapshot).permit(:snapshot_title, :snapshot_description)
+    params.require(:snapshot).permit(:title, :description)
   end
 end

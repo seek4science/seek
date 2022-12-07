@@ -1930,8 +1930,8 @@ ActiveRecord::Schema.define(version: 2024_10_15_093333) do
     t.datetime "updated_at", null: false
     t.integer "zenodo_deposition_id"
     t.string "zenodo_record_url"
-    t.string "snapshot_title"
-    t.text "snapshot_description"
+    t.string "title"
+    t.text "description"
   end
 
   create_table "sop_auth_lookup", force: :cascade do |t|

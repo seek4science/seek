@@ -118,11 +118,11 @@ class SnapshotsControllerTest < ActionController::TestCase
     investigation = Factory(:investigation, policy: Factory(:publicly_viewable_policy), contributor: user.person)
     login_as(user)
     assert_difference('Snapshot.count') do
-      post :create, params: { investigation_id: investigation,
-                              snapshot: { snapshot_title: 'MyTitle', snapshot_description: 'Some info' } }
+      post :create, params: { investigation_id: investigation, 
+                              snapshot: { title: 'MyTitle', description: 'Some info' } }
     end
-    assert_equal 'MyTitle', investigation.snapshots.last.snapshot_title
-    assert_equal 'Some info', investigation.snapshots.last.snapshot_description
+    assert_equal 'MyTitle', investigation.snapshots.last.title
+    assert_equal 'Some info', investigation.snapshots.last.description
   end
 
   test 'snapshot title and description correctly displayed' do
@@ -131,9 +131,9 @@ class SnapshotsControllerTest < ActionController::TestCase
                             description: 'Not a snapshot', title: 'My Investigation')
     login_as(user)
     post :create, params: { investigation_id: investigation,
-                            snapshot: { snapshot_title: 'My first snapshot', snapshot_description: 'Some info' } }
+                            snapshot: { title: 'My first snapshot', description: 'Some info' } }
     post :create, params: { investigation_id: investigation,
-                            snapshot: { snapshot_title: 'My second snapshot', snapshot_description: 'Other info' } }
+                            snapshot: { title: 'My second snapshot', description: 'Other info' } }
     post :create, params: { investigation_id: investigation, snapshot: empty_snapshot }
 
     get :show, params: { investigation_id: investigation, id: 1 }
@@ -145,6 +145,24 @@ class SnapshotsControllerTest < ActionController::TestCase
       assert_select 'a[href=?]', investigation_snapshot_path(investigation, 2), text: 'My second snapshot'
       assert_select 'a[data-tooltip=?]', 'Other info'
       assert_select 'a[href=?]', investigation_snapshot_path(investigation, 3), text: 'Snapshot 3'
+    end
+  end
+
+  test 'snapshot shows captured state' do
+    user = Factory(:user)
+    investigation = Factory(:investigation, policy: Factory(:publicly_viewable_policy), contributor: user.person,
+                            title: 'Old Title', description: 'Old description')
+    login_as(user)
+    post :create, params: { investigation_id: investigation,
+                            snapshot: { title: 'My snapshot', description: 'Snapshot info' } }
+    investigation.update(title: 'New title', description: 'New description')
+    get :show, params: { investigation_id: investigation, id: 1 }
+    assert_response :success
+    assert_select 'h1', 'My snapshot'
+    assert_select 'div#description', 'Snapshot info'
+    assert_select 'div.panel-body' do
+      assert_select 'h1', 'Old Title'
+      assert_select 'div#description', 'Old description'
     end
   end
 
@@ -627,7 +645,7 @@ class SnapshotsControllerTest < ActionController::TestCase
   private
 
   def empty_snapshot
-    { snapshot_title: '', snapshot_description: '' }
+    { title: '', description: '' }
   end
 
   def create_investigation_snapshot
