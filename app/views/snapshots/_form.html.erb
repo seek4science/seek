@@ -1,0 +1,10 @@
+<%= error_messages_for :snapshot %>
+
+<div class="form-group">
+  <label class="required">Title</label>
+  <%= f.text_field :snapshot_title,:class=>"form-control"%>
+</div>
+<div class="form-group">
+  <%= f.label :snapshot_description -%><br/>
+  <%= f.text_area :snapshot_description, rows: 3, :class=>"form-control"-%>
+</div>

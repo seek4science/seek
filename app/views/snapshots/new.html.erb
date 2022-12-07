@@ -38,10 +38,14 @@
       </div>
   <% end %>
 </div>
+<div class="asset_form">
+  <%= form_for [@parent_resource, @parent_resource.snapshots.build] do |f| -%>
+    <%= render :partial => "form", :locals => { :f => f, :action=>:new } -%>
 
-<%= link_to('Create Snapshot', polymorphic_path([@parent_resource, :snapshots]),
-            :method => :post, :class => 'btn btn-primary') %>
+    <%= f.submit(:class => 'btn btn-primary') %>
 
-<%= image_tag_for_key('publish', polymorphic_path(@parent_resource, :action => :check_related_items), nil, {:method=>:post,:class => 'btn btn-default'}, "Publish full #{t(@parent_resource.class.name.downcase)}") if excluded_items.any? %>
+    <%= image_tag_for_key('publish', polymorphic_path(@parent_resource, :action => :check_related_items), nil, {:method=>:post,:class => 'btn btn-default'}, "Publish full #{t(@parent_resource.class.name.downcase)}") if excluded_items.any? %>
 
-or <%= cancel_button polymorphic_path(@parent_resource) -%>
+    or <%= cancel_button polymorphic_path(@parent_resource) -%>
+  <% end -%>
+</div>

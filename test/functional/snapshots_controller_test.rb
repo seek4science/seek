@@ -62,7 +62,7 @@ class SnapshotsControllerTest < ActionController::TestCase
     login_as(user)
 
     assert_difference('Snapshot.count') do
-      post :create, params: { investigation_id: investigation }
+      post :create, params: { investigation_id: investigation, snapshot: empty_snapshot }
     end
 
     assert investigation.can_manage?(user)
@@ -76,7 +76,7 @@ class SnapshotsControllerTest < ActionController::TestCase
     login_as(user)
 
     assert_difference('Snapshot.count') do
-      post :create, params: { study_id: study }
+      post :create, params: { study_id: study, snapshot: empty_snapshot }
     end
 
     assert study.can_manage?(user)
@@ -90,7 +90,7 @@ class SnapshotsControllerTest < ActionController::TestCase
     login_as(user)
 
     assert_difference('Snapshot.count') do
-      post :create, params: { assay_id: assay }
+      post :create, params: { assay_id: assay, snapshot: empty_snapshot }
     end
 
     assert assay.can_manage?(user)
@@ -110,6 +110,41 @@ class SnapshotsControllerTest < ActionController::TestCase
 
       assert assay.can_manage?(user)
       assert_redirected_to assay_snapshot_path(assay, assigns(:snapshot).snapshot_number)
+    end
+  end
+
+  test 'snapshot title saved correctly' do
+    user = Factory(:user)
+    investigation = Factory(:investigation, policy: Factory(:publicly_viewable_policy), contributor: user.person)
+    login_as(user)
+    assert_difference('Snapshot.count') do
+      post :create, params: { investigation_id: investigation,
+                              snapshot: { snapshot_title: 'MyTitle', snapshot_description: 'Some info' } }
+    end
+    assert_equal 'MyTitle', investigation.snapshots.last.snapshot_title
+    assert_equal 'Some info', investigation.snapshots.last.snapshot_description
+  end
+
+  test 'snapshot title and description correctly displayed' do
+    user = Factory(:user)
+    investigation = Factory(:investigation, policy: Factory(:publicly_viewable_policy), contributor: user.person,
+                            description: 'Not a snapshot', title: 'My Investigation')
+    login_as(user)
+    post :create, params: { investigation_id: investigation,
+                            snapshot: { snapshot_title: 'My first snapshot', snapshot_description: 'Some info' } }
+    post :create, params: { investigation_id: investigation,
+                            snapshot: { snapshot_title: 'My second snapshot', snapshot_description: 'Other info' } }
+    post :create, params: { investigation_id: investigation, snapshot: empty_snapshot }
+
+    get :show, params: { investigation_id: investigation, id: 1 }
+    assert_response :success
+    assert_select 'h1', 'My first snapshot'
+    assert_select 'div#description', 'Some info'
+    assert_select 'div#snapshots' do
+      assert_select 'strong', 'My first snapshot'
+      assert_select 'a[href=?]', investigation_snapshot_path(investigation, 2), text: 'My second snapshot'
+      assert_select 'a[data-tooltip=?]', 'Other info'
+      assert_select 'a[href=?]', investigation_snapshot_path(investigation, 3), text: 'Snapshot 3'
     end
   end
 
@@ -590,6 +625,10 @@ class SnapshotsControllerTest < ActionController::TestCase
   end
 
   private
+
+  def empty_snapshot
+    { snapshot_title: '', snapshot_description: '' }
+  end
 
   def create_investigation_snapshot
     @user = FactoryBot.create(:user)
