@@ -37,6 +37,14 @@ class SnapshotTest < ActiveSupport::TestCase
     assert_equal 2, s2.snapshot_number
   end
 
+  test 'snapshot title and description correctly set' do
+    s1 = @investigation.create_snapshot
+    s1.update_attribute(:snapshot_title, 'My snapshot title')
+    s1.update_attribute(:snapshot_description, 'My description')
+    assert_equal 'My snapshot title', s1.snapshot_title
+    assert_equal 'My description', s1.snapshot_description
+  end
+
   test 'sha1 and md5 checksum' do
     s1 = @investigation.create_snapshot
     refute_nil s1.md5sum

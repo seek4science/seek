@@ -16,6 +16,7 @@ class SnapshotsController < ApplicationController
   def create
     @snapshot = @resource.create_snapshot
     if @snapshot
+      @snapshot.update(snapshot_params)
       flash[:notice] = "Snapshot created"
       redirect_to polymorphic_path([@resource, @snapshot])
     else
@@ -127,5 +128,9 @@ class SnapshotsController < ApplicationController
 
   def metadata_params
     params.require(:metadata).permit(:access_right, :license, :embargo_date, :access_conditions, creators: [:name]).delete_if { |k,v| v.blank? }
+  end
+
+  def snapshot_params
+    params.require(:snapshot).permit(:snapshot_title, :snapshot_description)
   end
 end
