@@ -46,6 +46,7 @@ namespace :seek do
     puts '... migrating database ...'
     Rake::Task['db:migrate'].invoke
     Rake::Task['tmp:clear'].invoke
+    Rails.cache.clear
 
     solr = Seek::Config.solr_enabled
     Seek::Config.solr_enabled = false
