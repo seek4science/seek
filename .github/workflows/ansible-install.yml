@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - ansible
+      - full-test-suite
   workflow_dispatch:
 
 jobs:
