@@ -67,7 +67,6 @@ class ContentBlobsController < ApplicationController
   end
 
   def download
-    @asset.just_used if @asset.respond_to?(:just_used)
 
     if @asset.respond_to?(:openbis?) && @asset.openbis?
       respond_to do |format|

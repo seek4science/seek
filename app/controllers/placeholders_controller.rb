@@ -17,11 +17,6 @@ class PlaceholdersController < ApplicationController
   end
   
   def show
-    @last_used_before_now = @placeholder.last_used_at
-
-    # update timestamp in the current record
-    # (this will also trigger timestamp update in the corresponding Asset)
-    @placeholder.just_used
     respond_to do |format|
         format.html
         format.rdf { render template: 'rdf/show' }
