@@ -6,7 +6,7 @@ module Seek
       NUMRESULTS = 25
       def perform_search(query)
         
-        json = Rails.cache.fetch("biomodels_search_json_#{CGI.escape(query)}", expires_in: 1.day) do
+        json = Rails.cache.fetch("biomodels/search/#{Digest::SHA256.hexdigest(query)}", expires_in: 1.day) do
           RestClient.get("https://www.ebi.ac.uk/biomodels/search?query=#{CGI.escape(query)}&numResults=#{NUMRESULTS}", accept: 'application/json').body
         end
 
