@@ -7,6 +7,10 @@
   samples = Sample.joins(:projects).where(projects: { id: current_user.person.projects.map(&:id) }).limit(100).order('updated_at DESC')
   authorized_samples = samples.authorized_for('view')
 
+  if Seek::Config.project_single_page_advanced_enabled
+    authorized_samples = authorized_samples.select { |s| s.sample_type.template_id.nil? }
+  end
+
   data_files = DataFile.with_extracted_samples.authorized_for('view').select { |d| d.extracted_samples.any? }.first(20)
 
   field_name = "#{resource.class.name.underscore}[samples_attributes]"

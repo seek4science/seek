@@ -39,7 +39,8 @@ module Seek
       end
 
       def self.is_galaxy_workflow_url?(uri)
-        uri.hostname.include?('galaxy') && (uri.path.include?('/workflow/') || uri.path.include?('/workflows/')) && CGI.parse(uri.query).key?('id')
+        uri.hostname.include?('galaxy') && (uri.path.include?('/workflow/') || uri.path.include?('/workflows/')) &&
+          uri.query.present? && CGI.parse(uri.query)&.key?('id')
       end
     end
   end

@@ -138,6 +138,47 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_equal sample_type, sample_type.sample_attributes.last.linked_sample_type
   end
 
+  test 'create with creators' do
+    creator = Factory(:person)
+    assert_difference('SampleType.count') do
+      post :create, params: { sample_type: { title: 'Hello!',
+                                             project_ids: @project_ids,
+                                             description: 'The description!!',
+                                             contributor: @person,
+                                             creator_ids: [creator.id],
+                                             other_creators: 'John Smith, Jane Smith',
+                                             sample_attributes_attributes: {
+                                               '0' => {
+                                                 pos: '1', title: 'a string', required: '1', is_title: '1',
+                                                 sample_attribute_type_id: @string_type.id, _destroy: '0'
+                                               }
+                                             } } }
+    end
+    type = assigns(:sample_type)
+    assert_equal @person, type.contributor
+    assert_equal [creator], type.creators
+    assert_equal 'John Smith, Jane Smith', type.other_creators
+  end
+
+  test 'create with no creators' do
+    assert_difference('SampleType.count') do
+      post :create, params: { sample_type: { title: 'Hello!',
+                                             project_ids: @project_ids,
+                                             description: 'The description!!',
+                                             creator_ids: [],
+                                             other_creators: '',
+                                             sample_attributes_attributes: {
+                                               '0' => {
+                                                 pos: '1', title: 'a string', required: '1', is_title: '1',
+                                                 sample_attribute_type_id: @string_type.id, _destroy: '0'
+                                               }
+                                             } } }
+    end
+    type = assigns(:sample_type)
+    assert_empty type.creators
+    assert_empty type.other_creators
+  end
+
   test 'should show sample_type' do
     assert_difference('ActivityLog.count', 1) do
       get :show, params: { id: @sample_type }
@@ -145,6 +186,13 @@ class SampleTypesControllerTest < ActionController::TestCase
     end
     assert_equal @sample_type, ActivityLog.last.activity_loggable
     assert_equal 'show', ActivityLog.last.action
+  end
+
+  test 'should show main_content_right' do
+    get :show, params: { id: @sample_type }
+    assert_response :success
+    assert_select 'div#author-box', true, 'Should show author box'
+    assert_select 'p#usage_count', true, 'Should show activity box'
   end
 
   test 'should get edit' do
@@ -637,6 +685,19 @@ class SampleTypesControllerTest < ActionController::TestCase
       assert_select 'a[href=?]', template_path(template2), text: template2.title, count: 0
     end
   end
+
+  test 'filter sample types with template when advanced single page is enabled' do
+    project = Factory(:project)
+    Factory(:simple_sample_type, template_id: 1, projects: [project])
+    params = { projects: [project.id]}
+    get :filter_for_select, params: params
+    assert_equal assigns(:sample_types).length, 1
+    with_config_value(:project_single_page_advanced_enabled, true) do
+      get :filter_for_select, params: params
+      assert_equal assigns(:sample_types).length, 0
+    end
+  end
+
 
   private
 

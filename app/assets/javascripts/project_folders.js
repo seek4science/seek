@@ -20,6 +20,7 @@ function setupFoldersTree(dataJson, container_id, drop_accept_class) {
 					item_dropped_to_folder(ui.draggable, folder_id);
 				}
 			});
+      loadFromLocationHash();
 		})
 		.jstree({
 			core: {
@@ -147,7 +148,9 @@ function folder_clicked(folder_id, project_id) {
 async function item_clicked(type, id, parent) {
 	hideAllViews();
 	updateBreadcrumb(type);
-	selectedItem.id = id;
+  updateLocationHash(type, id)
+  const tempParent = selectedItem.parent
+  selectedItem.id = id;
 	selectedItem.type = type;
 	selectedItem.parent = parent;
 	$j("#item_contents").show();
@@ -156,8 +159,8 @@ async function item_clicked(type, id, parent) {
 		else loadItemDetails(`/assays/${parent.id}/samples`, { view: "default" });
 	} else if ([...isa_study_element, ...isa_assay_element].includes(type)) {
     const item_type = isa_study_element.includes(type) ? "study" : "assay"
-     // check if the Assay page is loaded
-		if ($j(`a[data-target^="#${item_type}_design"]`).toArray().length == 0) {
+     // ignore reloading the page if it's already loaded
+		if ($j(`a[data-target^="#${item_type}_design"]`).toArray().length == 0 || parent.id != tempParent?.id) {
 			await loadItemDetails(`/${pluralize(item_type)}/${parent.id}`, { view: "default" });
 		}
 		$j(`a[data-target^="#${item_type}_design"]`).first().click();
@@ -215,6 +218,17 @@ function bounce(item, text) {
 	}, 300);
 }
 
+function updateLocationHash(itemType, itemId) {
+  history.pushState({}, "", `${location.pathname}#${itemType}-${itemId}`)
+}
+
+function loadFromLocationHash(){
+  if(window.location.hash){
+    const [type, id] = window.location.hash.slice(1).split("-") 
+    $j(`a[_type='${type}'][_id='${id}']`).click()
+  }
+}
+
 $j.jstree.plugins.separate = function (options, parent) {
 	this.redraw_node = function (obj) {
 		obj = parent.redraw_node.apply(this, arguments);
@@ -229,7 +243,7 @@ $j.jstree.plugins.separate = function (options, parent) {
 			if (n.state.separate) {
 				var p = d.createElement("p");
 				p.innerHTML = "<span>" + n.state.separate.label + "</span>";
-				p.className = "separator";
+				p.className = "isa-separator";
 				if (n.state.separate.action) {
 					var a = d.createElement("a");
 					a.href = n.state.separate.action;

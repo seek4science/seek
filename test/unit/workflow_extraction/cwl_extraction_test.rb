@@ -30,7 +30,25 @@ class CWLExtractionTest < ActiveSupport::TestCase
     assert_equal 'RetroPath2.0 IBISBA workflow node', metadata[:title]
     assert_equal "RetroPath2.0 builds a reaction network from a set of source compounds to a set of sink compounds. When applied in a retrosynthetic fashion, the source is composed of the target compounds and the sink is composed of the available reactants (for instance in the context of metabolic engineering the sink is the set of native metabolites of a chassis strain). From amongst all the chemical reactions generated using RetroPath2.0 (in the retrosynthetic way), only a subset may effectively link a source to a subset of sink compounds. This sub-network is considered as a scope and is output in dedicated files.", metadata[:description]
     assert_equal ['workflow', 'knime', 'CWL', 'reaction'].sort, metadata[:tags].sort
-    assert_equal 'Thomas Duigou, Stefan Helfrich', metadata[:other_creators]
+
+    author_meta = metadata[:assets_creators_attributes].values
+    assert_equal 2, author_meta.length
+
+    first = author_meta.detect { |a| a[:given_name] == 'Thomas' }
+    assert first
+    assert_equal 'Duigou', first[:family_name]
+    assert_nil first[:affiliation]
+    assert_nil first[:orcid]
+    assert_equal 0, first[:pos]
+
+    second = author_meta.detect { |a| a[:given_name] == 'Stefan' }
+    assert second
+    assert_equal 'Helfrich', second[:family_name]
+    assert_nil second[:affiliation]
+    assert_equal 'https://orcid.org/0000-0003-3549-8649', second[:orcid]
+    assert_equal 1, second[:pos]
+
+    assert_nil metadata[:other_creators]
   end
 
   test 'structure test' do

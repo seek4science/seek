@@ -1,28 +1,30 @@
-<% if sop %>
-    <div style="padding: 20px;">
-        <div class="row">
-            <div class="col-12">
-                <%= render :partial => "general/item_title",:locals => {:item => sop, :version => sop.version} -%>
-                <%= item_description sop.description -%>
-                <p>
-                  <%= persistent_resource_id(sop) %>
-                </p>
-                <p>
-                    <b>Link:</b>
-                    <%
-                        link_text = sop.content_blob.url
-                        link_text = truncate(link_text,:length=>550) if sop.content_blob.asset.respond_to?(:content_blobs)
-                    %>
-                    <%= link_to link_text, sop.content_blob.url, :target=>"_blank" -%>
-                </p>
-                <%= render :partial => 'assets/fileinfo',:object=>sop.content_blob -%>
+<% if sops.present? %>
+  <% sops.each do |sop| %>
+        <div style="padding: 20px;">
+            <div class="row">
+                <div class="col-12">
+                    <%= render :partial => "general/item_title",:locals => {:item => sop, :version => sop.version} -%>
+                    <%= item_description sop.description -%>
+                    <p>
+                      <%= persistent_resource_id(sop) %>
+                    </p>
+                    <p>
+                        <b>Link:</b>
+                        <%
+                            link_text = sop.content_blob.url
+                            link_text = truncate(link_text,:length=>550) if sop.content_blob.asset.respond_to?(:content_blobs)
+                        %>
+                        <%= link_to link_text, sop.content_blob.url, :target=>"_blank" -%>
+                    </p>
+                    <%= render :partial => 'assets/fileinfo',:object=>sop.content_blob -%>
+                </div>
             </div>
         </div>
-    </div>
+  <% end %>
 <% else %>
-	<p>
-		<em>
-			Warning: A Protocol is missing. Associate a Protocol before exporting ISA.
-		</em>
-	</p>
+  <p>
+    <em>
+      Warning: A Protocol is missing. Associate a Protocol before exporting ISA.
+    </em>
+  </p>
 <% end %>

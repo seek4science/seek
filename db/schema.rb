@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_09_01_133247) do
+ActiveRecord::Schema.define(version: 2022_11_28_125902) do
 
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
@@ -255,6 +255,16 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.index ["owner_type", "owner_id"], name: "index_avatars_on_owner_type_and_owner_id"
+  end
+
+  create_table "bio_tools_links", force: :cascade do |t|
+    t.string "resource_type"
+    t.bigint "resource_id"
+    t.string "bio_tools_id"
+    t.string "name"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["resource_type", "resource_id"], name: "index_bio_tools_links_on_resource"
   end
 
   create_table "bioportal_concepts", id: :integer, force: :cascade do |t|
@@ -598,6 +608,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.string "first_letter", limit: 1
     t.string "uuid"
     t.string "deleted_contributor"
+    t.string "time_zone"
   end
 
   create_table "events_presentations", id: false, force: :cascade do |t|
@@ -1770,6 +1781,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.integer "contributor_id"
     t.string "deleted_contributor"
     t.integer "template_id"
+    t.text "other_creators"
   end
 
   create_table "sample_types_studies", force: :cascade do |t|
@@ -1908,6 +1920,13 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["contributor_id"], name: "index_sops_on_contributor"
   end
 
+  create_table "sops_studies", force: :cascade do |t|
+    t.bigint "sop_id"
+    t.bigint "study_id"
+    t.index ["sop_id"], name: "index_sops_studies_on_sop_id"
+    t.index ["study_id"], name: "index_sops_studies_on_study_id"
+  end
+
   create_table "sops_workflows", id: false, force: :cascade do |t|
     t.integer "workflow_id", null: false
     t.integer "sop_id", null: false
@@ -1996,7 +2015,6 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.text "other_creators"
     t.string "deleted_contributor"
     t.integer "position"
-    t.integer "sop_id"
   end
 
   create_table "study_auth_lookup", force: :cascade do |t|
@@ -2072,6 +2090,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.integer "attempts", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "exception"
     t.index ["resource_type", "resource_id"], name: "index_tasks_on_resource_type_and_resource_id"
   end
 
@@ -2090,7 +2109,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.integer "pos"
     t.boolean "is_title", default: false
     t.integer "isa_tag_id"
-    t.string "iri"
+    t.string "pid"
     t.index ["template_id", "title"], name: "index_template_id_asset_id_title"
   end
 

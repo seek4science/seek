@@ -18,7 +18,7 @@ module Seek
       def contributor_activity(start_date, end_date)
         Rails.cache.fetch("#{cache_key_base}_contributor_activity_#{start_date}_#{end_date}", expires_in: 12.hours) do
           scoped_activities
-            .where(action: %w[update create])
+            .where(action: :create)
             .where('created_at > ? AND created_at < ?', start_date, end_date)
             .group(:culprit_type, :culprit_id).count.to_a
             .map { |(type, id), count| [type.constantize.find_by_id(id).try(:person), count] }

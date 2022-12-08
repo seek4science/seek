@@ -77,7 +77,7 @@ class IsaStudiesControllerTest < ActionController::TestCase
                                                                          linked_sample_type: source_type)
 
     study = Factory(:study, investigation: investigation,
-                            sop_id: Factory(:sop, policy: Factory(:public_policy)).id,
+                            sops: [Factory(:sop, policy: Factory(:public_policy))],
                             sample_types: [source_type, sample_collection_type])
 
     put :update, params: { id: study, isa_study: { study: { title: 'study title' },

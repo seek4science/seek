@@ -9,9 +9,6 @@ namespace :seek do
   task upgrade_version_tasks: %i[
     environment
     db:seed:007_sample_attribute_types
-    db:seed:010_workflow_classes
-    db:seed:013_workflow_data_file_relationships
-    rename_branding_settings
     update_missing_openbis_istest
     update_missing_publication_versions
     update_edam_controlled_vocab_keys
@@ -20,16 +17,19 @@ namespace :seek do
     db:seed:013_formats_controlled_vocab
     db:seed:014_data_controlled_vocab
     db:seed:015_isa_tags
+    db:seed:003_model_formats
+    db:seed:004_model_recommended_environments
     remove_orphaned_versions
-    create_seek_sample_multi
-    rename_seek_sample_attribute_types
-    seek:rebuild_workflow_internals
-    update_thesis_related_publication_types
+    refresh_workflow_internals
     remove_scale_annotations
     remove_spreadsheet_annotations
-    strip_site_base_host_path
+    remove_node_annotations
     convert_roles
     update_edam_annotation_attributes
+    remove_orphaned_project_subscriptions
+    remove_node_activity_logs
+    remove_node_asset_creators
+    set_default_sample_type_creators
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -46,6 +46,7 @@ namespace :seek do
     puts '... migrating database ...'
     Rake::Task['db:migrate'].invoke
     Rake::Task['tmp:clear'].invoke
+    Rails.cache.clear
 
     solr = Seek::Config.solr_enabled
     Seek::Config.solr_enabled = false
@@ -63,16 +64,6 @@ namespace :seek do
     ensure
       Seek::Config.solr_enabled = solr
     end
-  end
-
-  task(rename_branding_settings: [:environment]) do
-    Seek::Config.transfer_value :project_link, :instance_link
-    Seek::Config.transfer_value :project_name, :instance_name
-    Seek::Config.transfer_value :project_description, :instance_description
-    Seek::Config.transfer_value :project_keywords, :instance_keywords
-
-    Seek::Config.transfer_value :dm_project_name, :instance_admins_name
-    Seek::Config.transfer_value :dm_project_link, :instance_admins_link
   end
 
   task(update_missing_openbis_istest: :environment) do
@@ -121,101 +112,12 @@ namespace :seek do
              Sop::Version, Workflow::Version]
     disable_authorization_checks do
       types.each do |type|
-        found = type.all.select { |v| v.parent.nil? }
+        found = type.where.missing(:parent)
         count += found.length
         found.each(&:destroy)
       end
     end
     puts "... finished removing #{count} orphaned versions"
-  end
-
-  task(create_seek_sample_multi: [:environment]) do
-    if SampleAttributeType.where(base_type: Seek::Samples::BaseType::SEEK_SAMPLE_MULTI).empty?
-      seek_sample_multi_type = SampleAttributeType.find_or_initialize_by(title:'Registered Sample (multiple)')
-      seek_sample_multi_type.update(base_type: Seek::Samples::BaseType::SEEK_SAMPLE_MULTI)
-    end
-  end
-
-  task(rename_seek_sample_attribute_types: [:environment]) do
-    type = SampleAttributeType.where(base_type: Seek::Samples::BaseType::SEEK_SAMPLE).first
-    type&.update_column(:title, 'Registered Sample')
-
-    type = SampleAttributeType.where(base_type: Seek::Samples::BaseType::SEEK_SAMPLE_MULTI).first
-    type&.update_column(:title, 'Registered Sample (multiple)')
-
-    type = SampleAttributeType.where(base_type: Seek::Samples::BaseType::SEEK_STRAIN).first
-    type&.update_column(:title, 'Registered Strain')
-
-    type = SampleAttributeType.where(base_type: Seek::Samples::BaseType::SEEK_DATA_FILE).first
-    type&.update_column(:title, 'Registered Data file')
-  end
-
-  task(convert_mysql_charset: [:environment]) do
-    if ActiveRecord::Base.connection.instance_values["config"][:adapter] == 'mysql2'
-      puts "Attempting MySQL database conversion"
-      # Get charset from database.yml, then find appropriate collation from mysql
-      db = ActiveRecord::Base.connection.current_database
-      charset = ActiveRecord::Base.connection.instance_values["config"][:encoding] || 'utf8mb4'
-      collation = "#{charset}_unicode_ci" # Prefer e.g. utf8_unicode_ci over utf8_general_ci
-      collation = ActiveRecord::Base.connection.execute("SHOW COLLATION WHERE Charset = '#{charset}' AND Collation = '#{collation}';").first&.first
-      unless collation
-        # Pick default collation for given charset if above collation not available
-        collation = ActiveRecord::Base.connection.execute("SHOW COLLATION WHERE Charset = '#{charset}' `Default` = 'Yes';").first&.first
-        unless collation
-          puts "Could not find collation for charset: #{charset}, aborting"
-          return
-        end
-      end
-
-      puts "Converting database: #{db} to character set: #{charset}, collation: #{collation}"
-
-      # Set database defaults
-      puts "Setting default charset and collation"
-      ActiveRecord::Base.connection.execute("ALTER DATABASE #{db} DEFAULT CHARACTER SET #{charset} DEFAULT COLLATE #{collation};")
-
-      # Set/convert each table
-      tables = ActiveRecord::Base.connection.exec_query("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES where TABLE_SCHEMA='#{db}' AND TABLE_COLLATION != '#{collation}';").rows.flatten
-      puts "#{tables.count} tables to convert"
-      tables.each do |table|
-        puts "  Converting #{table}"
-        ActiveRecord::Base.connection.execute("ALTER TABLE #{table} CONVERT TO CHARACTER SET #{charset} COLLATE #{collation};")
-      end
-      puts "Done"
-    else
-      puts "Database adapter is: #{ActiveRecord::Base.connection.instance_values["config"][:adapter]}, doing nothing"
-    end
-  end
-
-  task(update_thesis_related_publication_types: [:environment]) do
-    puts 'Updating publication types ...'
-
-    unless PublicationType.find_by(title:"Masters Thesis").nil?
-      PublicationType.find_by(key:"mastersthesis").update(title:"Master's Thesis")
-      puts 'Changing Masters Thesis to '+PublicationType.find_by(key:"mastersthesis").title
-    end
-
-    unless PublicationType.find_by(title:"Bachelors Thesis").nil?
-      PublicationType.find_by(key:"bachelorsthesis").update(title:"Bachelor's Thesis")
-      puts 'Changing Bachelors Thesis to '+PublicationType.find_by(key:"bachelorsthesis").title
-    end
-
-    unless PublicationType.find_by(title:"Phd Thesis").nil?
-      PublicationType.find_by(key:"phdthesis").update(title:"Doctoral Thesis")
-      puts 'Changing Phd Thesis to '+PublicationType.find_by(key:"phdthesis").title
-    end
-
-    if PublicationType.find_by(key:"diplomthesis").nil?
-      PublicationType.find_or_initialize_by(key: "diplomthesis").update(title:"Diplom Thesis", key: "diplomthesis")
-      puts 'Add new type '+PublicationType.find_by(key:"diplomthesis").title
-    end
-  end
-
-  task(strip_site_base_host_path: [:environment]) do
-    if Seek::Config.site_base_host
-      u = URI.parse(Seek::Config.site_base_host)
-      u.path = ''
-      Seek::Config.site_base_host = u.to_s
-    end
   end
 
   task(remove_scale_annotations: [:environment]) do
@@ -234,6 +136,15 @@ namespace :seek do
     annotations.destroy_all
     AnnotationAttribute.where(name:'annotation').destroy_all
     puts "Removed #{count} spreadsheet related annotations" if count > 0
+  end
+
+  task(remove_node_annotations: [:environment]) do
+    annotations = Annotation.where(annotatable_type: 'Node')
+    count = annotations.count
+    values = TextValue.joins(:annotations).where(annotations: { annotatable_type: 'Node' })
+    values.select{|v| v.annotations.count == 1}.each(&:destroy)
+    annotations.destroy_all
+    puts "Removed #{count} Node related annotations" if count > 0
   end
 
   task(convert_roles: [:environment]) do
@@ -308,4 +219,62 @@ namespace :seek do
     end
   end
 
+  task(remove_orphaned_project_subscriptions: [:environment]) do
+    disable_authorization_checks do
+      ProjectSubscription.where.missing(:project).destroy_all
+    end
+  end
+
+  task(remove_node_activity_logs: [:environment]) do
+    logs = ActivityLog.where(activity_loggable_type: 'Node')
+    puts "Removing #{logs.count} Node related activity logs" if logs.count > 0
+    logs.delete_all
+  end
+
+  task(remove_node_asset_creators: [:environment]) do
+    creators = AssetsCreator.where(asset_type: 'Node')
+    puts "Removing #{creators.count} Node related asset creators" if creators.count > 0
+    creators.delete_all
+  end
+
+  task(refresh_workflow_internals: [:environment]) do |task|
+    ran = only_once(task) do
+      Rake::Task['seek:rebuild_workflow_internals'].invoke
+    end
+
+    puts "Skipping workflow internals rebuild, already done" unless ran
+  end
+
+  task(set_default_sample_type_creators: [:environment]) do
+    ran = only_once('set_default_sample_type_creators') do
+      puts "Setting default Sample Type creators"
+      count = 0
+      SampleType.all.each do |sample_type|
+        if sample_type.assets_creators.empty?
+          sample_type.assets_creators.build(creator: sample_type.contributor).save!
+          count += 1
+        end
+      end
+      puts "#{count} Sample Types updated"
+    end
+
+    puts "Skipping setting default Sample Type creators, as already set" unless ran
+  end
+
+  private
+
+  ##
+  # Runs the block for the given task only once.
+  # @param task [Rake::Task, String] The task or task name to remember.
+  # @return [Boolean] Whether the block executed or not.
+  def only_once(task, &block)
+    log_action = "UPGRADE-#{task}" # Will convert Rake::Task to string which is the task name (e.g. seek:some_task_name)
+    if ActivityLog.where(action: log_action).empty?
+      block.call
+      ActivityLog.create!(action: log_action, data: "#{Seek::Version::APP_VERSION} upgrade task")
+      true
+    else
+      false
+    end
+  end
 end

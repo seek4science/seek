@@ -109,12 +109,16 @@ class IsaAssaysControllerTest < ActionController::TestCase
                                                  linked_sample_type: sample_collection_type)
 
     study = Factory(:study, investigation: investigation, contributor: person,
-                            sop_id: Factory(:sop, policy: Factory(:public_policy)).id,
+                            sops: [Factory(:sop, policy: Factory(:public_policy))],
                             sample_types: [source_type, sample_collection_type])
 
-    assay = Factory(:assay, study: study, sample_type: assay_type, contributor: person)
+    assay = Factory(:assay, study: study, contributor: person)
+    put :update, params: { id: assay, isa_assay: { assay: { title: 'assay title' } } }
+    assert_redirected_to single_page_path(id: project, item_type: 'assay', item_id: assay.id)
+    assert flash[:error].include?('Resource not found.')
 
-    put :update, params: { id: assay, isa_assay: { assay: { title: 'assay title',  sop_ids: [Factory(:sop, policy: Factory(:public_policy)).id] },
+    assay = Factory(:assay, study: study, sample_type: assay_type, contributor: person)
+    put :update, params: { id: assay, isa_assay: { assay: { title: 'assay title', sop_ids: [Factory(:sop, policy: Factory(:public_policy)).id] },
                                                    sample_type: { title: 'sample type title' } } }
 
     isa_assay = assigns(:isa_assay)

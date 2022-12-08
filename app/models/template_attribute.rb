@@ -8,13 +8,12 @@ class TemplateAttribute < ApplicationRecord
   before_save :default_pos
 
   def controlled_vocab?
-    self.sample_attribute_type.base_type == Seek::Samples::BaseType::CV
+    sample_attribute_type.base_type == Seek::Samples::BaseType::CV
   end
 
-  private 
+  private
 
   def default_pos
     self.pos ||= (self.class.where(template_id: template_id).maximum(:pos) || 0) + 1
   end
-
 end

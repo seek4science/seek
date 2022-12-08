@@ -14,6 +14,6 @@
   <%= render partial: 'admin/admin_selection' %>
 <% end %>
 
-<%= render partial: 'admin/restart_buttons' unless using_docker? %>
+<%= render partial: 'admin/restart_buttons' %>
 
 <small><%= git_link_tag %></small>

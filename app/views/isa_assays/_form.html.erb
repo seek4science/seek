@@ -2,11 +2,12 @@
 <% study = Study.find(params[:study_id] || assay[:study_id]) %>
 <%
 input_sample_type_id = params[:isa_assay][:input_sample_type_id] if params.dig(:isa_assay, :input_sample_type_id)
+source_assay = Assay.find(params[:source_assay_id]) if params[:source_assay_id]
 input_sample_type_id ||= 
   if params[:is_source]
     study.sample_types.second.id
   else
-    Assay.find(params[:source_assay_id]).sample_type.id if params[:source_assay_id]
+    source_assay.sample_type.id if params[:source_assay_id]
   end
 %>
 
@@ -33,14 +34,14 @@ input_sample_type_id ||=
   </div>
 
   <div class="hidden">
-    <%= assay_fields.number_field :position, value: study.assays.length -%>
+    <%= assay_fields.number_field :position, value: source_assay&.position || study.assays.length -%>
   </div>
 
   <%= assay_fields.hidden_field :assay_class_id -%>
 
   <% if User.current_user -%>
-    <%= render partial: 'assets/manage_specific_attributes', locals:{f:f} if show_form_manage_specific_attributes? %>
-    <%= assay_fields.fancy_multiselect(:sops, other_projects_checkbox: true, name: "isa_assay[assay][sop_ids]") unless action == :edit %>
+    <%= render partial: 'assets/manage_specific_attributes', locals:{f:assay_fields} if show_form_manage_specific_attributes? %>
+    <%= assay_fields.fancy_multiselect(:sops, other_projects_checkbox: true, name: "isa_assay[assay][sop_ids]")%>
     <%= assay_fields.fancy_multiselect :publications, { other_projects_checkbox: true, name: "isa_assay[assay][publication_ids]" } %>
     <%= assay_fields.fancy_multiselect :documents, { other_projects_checkbox: true, name: "isa_assay[assay][document_ids]" } %>
   <% end -%>

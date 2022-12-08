@@ -3,7 +3,7 @@
 <% id = template_attribute ? template_attribute.id : '' %>
 <% title = template_attribute ? template_attribute.title : '' %>
 <% description = template_attribute ? template_attribute.description : '' %>
-<% iri = template_attribute ? template_attribute.iri : '' %>
+<% pid = template_attribute ? template_attribute.pid : '' %>
 <% pos = template_attribute ? template_attribute.pos : '' %>
 <% required = template_attribute ? template_attribute.required : false %>
 <% allow_attribute_removal = !required  %>
@@ -79,8 +79,8 @@
                     placeholder: 'Description', data: {attr: "description"} %>
   </td>
   <td>
-    <%= text_field_tag "#{field_name_prefix}[iri]", iri, class: 'form-control',
-                    placeholder: 'IRI', data: {attr: "iri"} %>
+    <%= text_field_tag "#{field_name_prefix}[pid]", pid, class: 'form-control',
+                    placeholder: 'PID', data: {attr: "pid"} %>
   </td>
 
   <td>

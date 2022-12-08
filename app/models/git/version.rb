@@ -78,7 +78,6 @@ module Git
         return false
       end
 
-      self.set_resource_attributes(resource.attributes)
       self.mutable = false
       self.ref = git_base.tags.create(unique_git_tag, commit).canonical_name
       save!

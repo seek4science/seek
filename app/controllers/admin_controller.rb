@@ -136,6 +136,7 @@ class AdminController < ApplicationController
     Seek::Config.copasi_enabled = string_to_boolean(params[:copasi_enabled])
     Seek::Config.project_single_page_enabled = string_to_boolean(params[:project_single_page_enabled])
     Seek::Config.project_single_page_advanced_enabled = string_to_boolean(params[:project_single_page_advanced_enabled])
+    Seek::Config.project_single_page_folders_enabled= string_to_boolean(params[:project_single_page_folders_enabled])
     Seek::Config.sample_type_template_enabled = string_to_boolean(params[:sample_type_template_enabled])
 
     Seek::Config.nels_enabled = string_to_boolean(params[:nels_enabled])
@@ -149,6 +150,8 @@ class AdminController < ApplicationController
     Seek::Config.life_monitor_url = params[:life_monitor_url]&.strip&.chomp('/')
     Seek::Config.life_monitor_client_id = params[:life_monitor_client_id]&.strip
     Seek::Config.life_monitor_client_secret = params[:life_monitor_client_secret]&.strip
+
+    Seek::Config.bio_tools_enabled = string_to_boolean(params[:bio_tools_enabled])
 
     time_lock_doi_for = params[:time_lock_doi_for]
     time_lock_is_integer = only_integer time_lock_doi_for, 'time lock doi for'
@@ -337,6 +340,14 @@ class AdminController < ApplicationController
     end
 
     redirect_with_status(error, 'background tasks')
+  end
+
+  def clear_cache
+    Rails.cache.clear
+    flash[:notice] = "Cache cleared"
+    respond_to do |format|
+      format.html { render :index}
+    end
   end
 
   # give it up to 5 seconds to start up, otherwise the page reloads too quickly and says it is not running
