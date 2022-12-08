@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_11_22_154144) do
+ActiveRecord::Schema.define(version: 2022_12_08_134253) do
 
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
@@ -222,7 +222,6 @@ ActiveRecord::Schema.define(version: 2022_11_22_154144) do
     t.integer "policy_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.datetime "last_used_at"
   end
 
   create_table "assets_creators", id: :integer, force: :cascade do |t|
@@ -308,7 +307,6 @@ ActiveRecord::Schema.define(version: 2022_11_22_154144) do
     t.bigint "policy_id"
     t.string "doi"
     t.string "license"
-    t.datetime "last_used_at"
     t.text "other_creators"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -415,7 +413,6 @@ ActiveRecord::Schema.define(version: 2022_11_22_154144) do
     t.string "title"
     t.text "description"
     t.integer "template_id"
-    t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string "first_letter", limit: 1
@@ -441,7 +438,6 @@ ActiveRecord::Schema.define(version: 2022_11_22_154144) do
     t.string "title"
     t.text "description"
     t.integer "template_id"
-    t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer "version", default: 1
@@ -524,7 +520,6 @@ ActiveRecord::Schema.define(version: 2022_11_22_154144) do
     t.integer "policy_id"
     t.string "doi"
     t.string "license"
-    t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.text "other_creators"
@@ -551,7 +546,6 @@ ActiveRecord::Schema.define(version: 2022_11_22_154144) do
     t.integer "policy_id"
     t.string "doi"
     t.string "license"
-    t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.text "other_creators"
@@ -718,7 +712,6 @@ ActiveRecord::Schema.define(version: 2022_11_22_154144) do
     t.bigint "policy_id"
     t.string "doi"
     t.string "license"
-    t.datetime "last_used_at"
     t.text "other_creators"
     t.integer "visibility"
     t.datetime "created_at"
@@ -746,7 +739,6 @@ ActiveRecord::Schema.define(version: 2022_11_22_154144) do
     t.bigint "policy_id"
     t.string "doi"
     t.string "license"
-    t.datetime "last_used_at"
     t.text "other_creators"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -1036,7 +1028,6 @@ ActiveRecord::Schema.define(version: 2022_11_22_154144) do
     t.string "title"
     t.text "description"
     t.integer "recommended_environment_id"
-    t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer "organism_id"
@@ -1068,7 +1059,6 @@ ActiveRecord::Schema.define(version: 2022_11_22_154144) do
     t.string "title"
     t.text "description"
     t.integer "recommended_environment_id"
-    t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer "organism_id"
@@ -1316,7 +1306,6 @@ ActiveRecord::Schema.define(version: 2022_11_22_154144) do
     t.string "uuid"
     t.bigint "policy_id"
     t.string "license"
-    t.datetime "last_used_at"
     t.text "other_creators"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -1368,7 +1357,6 @@ ActiveRecord::Schema.define(version: 2022_11_22_154144) do
     t.text "description"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.datetime "last_used_at"
     t.string "first_letter", limit: 1
     t.text "other_creators"
     t.string "uuid"
@@ -1389,7 +1377,6 @@ ActiveRecord::Schema.define(version: 2022_11_22_154144) do
     t.text "description"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.datetime "last_used_at"
     t.integer "version", default: 1
     t.string "first_letter", limit: 1
     t.text "other_creators"
@@ -1580,7 +1567,6 @@ ActiveRecord::Schema.define(version: 2022_11_22_154144) do
     t.integer "contributor_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.datetime "last_used_at"
     t.string "doi"
     t.string "uuid"
     t.integer "policy_id"
@@ -1607,7 +1593,6 @@ ActiveRecord::Schema.define(version: 2022_11_22_154144) do
     t.integer "contributor_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.datetime "last_used_at"
     t.string "doi"
     t.string "uuid"
     t.integer "policy_id"
@@ -1889,7 +1874,6 @@ ActiveRecord::Schema.define(version: 2022_11_22_154144) do
     t.text "description"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.datetime "last_used_at"
     t.string "first_letter", limit: 1
     t.text "other_creators"
     t.string "uuid"
@@ -1908,7 +1892,6 @@ ActiveRecord::Schema.define(version: 2022_11_22_154144) do
     t.text "description"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.datetime "last_used_at"
     t.integer "version", default: 1
     t.string "first_letter", limit: 1
     t.text "other_creators"
@@ -2245,7 +2228,6 @@ ActiveRecord::Schema.define(version: 2022_11_22_154144) do
     t.text "description"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.datetime "last_used_at"
     t.string "first_letter", limit: 1
     t.text "other_creators"
     t.string "uuid"
@@ -2268,7 +2250,6 @@ ActiveRecord::Schema.define(version: 2022_11_22_154144) do
     t.text "description"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.datetime "last_used_at"
     t.integer "version", default: 1
     t.string "first_letter", limit: 1
     t.text "other_creators"
