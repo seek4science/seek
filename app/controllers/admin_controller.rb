@@ -342,6 +342,14 @@ class AdminController < ApplicationController
     redirect_with_status(error, 'background tasks')
   end
 
+  def clear_cache
+    Rails.cache.clear
+    flash[:notice] = "Cache cleared"
+    respond_to do |format|
+      format.html { render :index}
+    end
+  end
+
   # give it up to 5 seconds to start up, otherwise the page reloads too quickly and says it is not running
   def wait_for_delayed_job_to_start
     sleep(0.5)

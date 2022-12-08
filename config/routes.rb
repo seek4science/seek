@@ -165,6 +165,7 @@ SEEK::Application.routes.draw do
       post :edit_tag
       post :update_imprint_setting
       post :clear_failed_jobs
+      post :clear_cache
     end
     concerns :has_dashboard, controller: :stats
   end
