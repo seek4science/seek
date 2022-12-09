@@ -82,8 +82,8 @@ class SnapshotTest < ActiveSupport::TestCase
 
     assert_equal 'New title', @investigation.title
     assert_equal 'New description', @investigation.description
-    assert_equal old_title, snapshot.m_title
-    assert_equal old_description, snapshot.m_description
+    assert_equal old_title, snapshot.metadata['title']
+    assert_equal old_description, snapshot.metadata['description']
   end
 
   test 'generates sensible DOI' do

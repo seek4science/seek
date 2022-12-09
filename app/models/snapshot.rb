@@ -49,14 +49,6 @@ class Snapshot < ApplicationRecord
     end
   end
 
-  def m_title
-    metadata['title']
-  end
-
-  def m_description
-    metadata['description']
-  end
-
   def contributor
     Person.find(metadata['contributor']['uri'].match(/people\/([1-9][0-9]*)/)[1])
   end
