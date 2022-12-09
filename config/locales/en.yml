@@ -308,3 +308,20 @@ you can choose to have a %{project} linked to a site managed %{programme} instea
     template: "Templates are blueprints that can be reused and applied to Study and Assay for describing Samples. Templates must be associated with one or more Projects."
     organism: "An Organism is identified by an entry in the NCBI ontology. An Organism must be associated with one or more Projects in order to be registered in SEEK."
     file_template: "A File Template describes conforming DataFiles.For example, a File Template that is a Word document may describe conformant PNG images."
+
+  cookies:
+    notice: Seek makes use of some necessary cookies to provide its core functionality.
+    google_analytics: Additionally, we make use of Google Analytics to discover how people are using Seek in order to help us improve the service. To opt out of this, choose the "Allow necessary cookies" or "Embedded and Necessary only" option.
+    matomo_analytics: Additionally, we make use of Matomo to discover how people are using Seek in order to help us improve the service. To opt out of this, choose the "Allow necessary cookies" or "Embedded and Necessary only" option.
+    necessary_cookies_btn: Only allow necessary cookies
+    all_cookies_btn: Allow all cookies
+    no_consent: No cookie consent provided
+    options:
+      tracking: "Cookies required for %{analytics}, to help Seek improve its service."
+      embedding: Allow embedded content, such as video or slides, which are hosted externally.
+      necessary: Cookies necessary for Seek to function, for example to provide user-authentication and forgery protection.
+    buttons:
+      revoke: Revoke cookie consent
+      all: Allow all cookies
+      embedding: Allow necessary cookies and embedded content.
+      necessary: Allow only necessary cookies

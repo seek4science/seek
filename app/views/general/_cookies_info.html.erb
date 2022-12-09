@@ -1,0 +1,11 @@
+<p>
+  <%= t('cookies.notice') %>
+  <%= t('cookies.google_analytics') if Seek::Config.google_analytics_enabled %>
+  <%= t('cookies.matomo_analytics') if Seek::Config.piwik_analytics_enabled %>
+</p>
+<p>
+ <% if Seek::Config.privacy_enabled %>
+    See our <%= link_to 'Privacy Policy', privacy_home_path %> for more information.
+  <% end %>
+  
+</p>
