@@ -6,6 +6,8 @@
         <% if @snapshot.can_mint_doi? %>
             <%= button_link_to("Generate a DOI", 'doi',  polymorphic_path([@parent_resource, @snapshot], action: 'mint_doi_confirm')) %>
         <% end %>
+        <%= button_link_to("Edit",'edit', polymorphic_path([@parent_resource, @snapshot], action: 'edit'),
+                           'data-tooltip' => 'Modify the title and/or description of your snapshot') %>
         <%= button_link_to("Delete", 'destroy',  polymorphic_path([@parent_resource, @snapshot]),
                            { confirm: "Are you sure you wish to delete this snapshot?", method: :delete }) %>
     <% end %>

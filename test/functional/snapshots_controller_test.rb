@@ -264,6 +264,85 @@ class SnapshotsControllerTest < ActionController::TestCase
     assert flash[:error].include?('exist')
   end
 
+  test 'edit button is shown for authorized users' do
+    create_investigation_snapshot
+    login_as(@user)
+    get :show, params: { investigation_id: @investigation, id: @snapshot.snapshot_number }
+    assert_select 'a', text: 'Edit'
+  end
+
+  test 'edit button not shown for unauthorized users' do
+    create_investigation_snapshot
+    login_as(Factory(:user))
+    get :show, params: { investigation_id: @investigation, id: @snapshot.snapshot_number }
+    assert_select 'a', text: 'Edit', count: 0
+  end
+
+  test 'edit button not shown for snapshots with DOI' do
+    create_investigation_snapshot
+    login_as(@user)
+    @snapshot.doi = '10.5072/123'
+    @snapshot.save
+    get :show, params: { investigation_id: @investigation, id: @snapshot.snapshot_number }
+    assert_select 'a', text: 'Edit', count: 0
+  end
+
+  test 'authorized users can edit snapshot title and description' do
+    create_investigation_snapshot
+    login_as(@user)
+    get :edit, params: { investigation_id: @investigation, id: @snapshot.snapshot_number }
+    assert_response :success
+  end
+
+  test "unauthorized user can't edit snapshot" do
+    create_investigation_snapshot
+    login_as(Factory(:user))
+    get :edit, params: { investigation_id: @investigation, id: @snapshot.snapshot_number }
+    assert_redirected_to investigation_path(@investigation)
+    assert flash[:error]
+  end
+
+  test "can't edit snapshot with DOI" do
+    create_investigation_snapshot
+    login_as(@user)
+    @snapshot.doi = '10.5072/123'
+    @snapshot.save
+    get :edit, params: { investigation_id: @investigation, id: @snapshot.snapshot_number }
+    assert_redirected_to investigation_snapshot_path(@investigation, @snapshot)
+    assert flash[:error].include?('DOI')
+  end
+
+  test 'authorized users can update snapshot' do
+    create_investigation_snapshot
+    login_as(@user)
+    put :update, params: { investigation_id: @investigation, id: @snapshot.snapshot_number,
+                           snapshot: { title: 'My mod snapshot', description: 'Snapshot mod info' } }
+    assert_redirected_to investigation_snapshot_path(@investigation, @snapshot)
+    @snapshot.reload
+    assert_equal 'My mod snapshot', @snapshot.title
+    assert_equal 'Snapshot mod info', @snapshot.description
+  end
+
+  test "unauthorized users can't update snapshot" do
+    create_investigation_snapshot
+    login_as(Factory(:user))
+    put :update, params: { investigation_id: @investigation, id: @snapshot.snapshot_number,
+                           snapshot: { title: 'My mod snapshot', description: 'Snapshot mod info' } }
+    assert_redirected_to investigation_path(@investigation)
+    assert flash[:error]
+  end
+
+  test "can't update snapshot with doi" do
+    create_investigation_snapshot
+    login_as(@user)
+    @snapshot.doi = '10.5072/123'
+    @snapshot.save
+    put :update, params: { investigation_id: @investigation, id: @snapshot.snapshot_number,
+                           snapshot: { title: 'My mod snapshot', description: 'Snapshot mod info' } }
+    assert_redirected_to investigation_snapshot_path(@investigation, @snapshot)
+    assert flash[:error].include?('DOI')
+  end
+
   test 'can get confirmation when minting DOI for snapshot' do
     datacite_mock
     create_investigation_snapshot

@@ -3,9 +3,10 @@ require 'zenodo-client'
 
 class SnapshotsController < ApplicationController
   before_action :get_parent_resource
-  before_action :auth_resource, only: [:mint_doi_confirm, :mint_doi, :new, :create, :export_preview, :export_submit, :destroy]
+  before_action :find_resource
+  before_action :auth_resource, only: [:mint_doi_confirm, :mint_doi, :new, :create, :edit, :update, :export_preview, :export_submit, :destroy]
   before_action :check_resource_permitted_for_ro, only: [:new, :create]
-  before_action :find_snapshot, only: [:show, :mint_doi_confirm, :mint_doi, :download, :export_preview, :export_submit, :destroy]
+  before_action :find_snapshot, only: [:show, :edit, :update, :mint_doi_confirm, :mint_doi, :download, :export_preview, :export_submit, :destroy]
   before_action :doi_minting_enabled?, only: [:mint_doi_confirm, :mint_doi]
   before_action :zenodo_oauth_client
   before_action :zenodo_oauth_session, only: [:export_submit]
@@ -38,6 +39,23 @@ class SnapshotsController < ApplicationController
   end
 
   def new
+  end
+
+  def edit
+    if @snapshot.has_doi?
+      flash[:error] = "You cannot modify a snapshot that has a DOI."
+      redirect_to polymorphic_path([@resource, @snapshot])
+    end
+  end
+
+  def update
+    if @snapshot.has_doi?
+      flash[:error] = "You cannot modify a snapshot that has a DOI."
+    else
+      @snapshot.update(snapshot_params)
+      flash[:notice] = "Snapshot updated"
+    end
+    redirect_to polymorphic_path([@resource, @snapshot])
   end
 
   def download
