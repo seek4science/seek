@@ -271,7 +271,7 @@ class ProjectsControllerTest < ActionController::TestCase
       delete :destroy, params: { id: project }
     end
     refute_nil flash[:error]
-    assert_redirected_to project_path(project)
+    assert_redirected_to :root
   end
 
   test 'can destroy project if it contains people' do
@@ -845,11 +845,11 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_select 'a', text: /Project administration/, count: 0
 
     get :edit, params: { id: a_project }
-    assert_redirected_to project_path(a_project)
+    assert_redirected_to :root
     assert_not_nil flash[:error]
 
     put :update, params: { id: a_project, project: { title: 'banana' } }
-    assert_redirected_to project_path(a_project)
+    assert_redirected_to :root
     assert_not_nil flash[:error]
     assert_not_equal 'banana', a_project.reload.title
   end
@@ -1509,7 +1509,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
     login_as(person)
     get :storage_report, params: { id: project.id }
-    assert_redirected_to project_path(project)
+    assert_redirected_to :root
     refute_nil flash[:error]
   end
 
