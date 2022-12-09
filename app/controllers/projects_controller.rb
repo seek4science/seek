@@ -14,7 +14,8 @@ class ProjectsController < ApplicationController
                                         :administer_create_project_request, :respond_create_project_request,
                                         :project_join_requests, :project_creation_requests, :typeahead]
 
-  before_action :find_requested_item, only: %i[show admin edit update destroy asset_report admin_members
+  before_action :find_requested_item, only: %i[asset_report]
+  before_action :find_and_authorize_requested_item, only: %i[show admin edit update destroy admin_members
                                                populate populate_from_spreadsheet
                                                admin_member_roles update_members storage_report
                                                overview administer_join_request respond_join_request]
@@ -23,7 +24,6 @@ class ProjectsController < ApplicationController
 
   before_action :find_assets, only: [:index]
   before_action :auth_to_create, only: %i[new create,:administer_create_project_request, :respond_create_project_request]
-  before_action :is_user_admin_auth, only: %i[destroy]
   before_action :editable_by_user, only: %i[edit update]
   before_action :check_investigations_are_for_this_project, only: %i[update]
   before_action :administerable_by_user, only: %i[admin admin_members admin_member_roles update_members storage_report administer_join_request respond_join_request populate populate_from_spreadsheet]
