@@ -157,7 +157,7 @@ class InvestigationTest < ActiveSupport::TestCase
     end
 
     assert_equal 1, investigation.snapshots.count
-    assert_equal investigation.title, snapshot.m_title
+    assert_equal investigation.title, snapshot.metadata['title']
   end
 
   test 'clone with associations' do
