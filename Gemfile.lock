@@ -690,7 +690,7 @@ GEM
       json (~> 2.3.0)
       ucf (~> 2.0.2)
       uuid (~> 2.3)
-    ro-crate (0.4.17)
+    ro-crate (0.5.1)
       addressable (>= 2.7, < 2.9)
       rubyzip (~> 2.0.0)
     rsolr (2.4.0)
@@ -1006,7 +1006,7 @@ DEPENDENCIES
   rfc-822
   rmagick (= 2.15.2)
   ro-bundle (~> 0.3.0)
-  ro-crate (~> 0.4.17)
+  ro-crate (~> 0.5.1)
   rspec-rails (~> 5.1)
   rubocop
   ruby-prof
