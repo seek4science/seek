@@ -1485,4 +1485,68 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_equal 1, assigns(:workflows).length
     assert_includes assigns(:workflows), w3
   end
+
+  test 'should show workflow class logo for core type' do
+    workflow_class = Factory(:cwl_workflow_class)
+    workflow = Factory(:public_workflow, workflow_class: workflow_class)
+
+    get :show, params: { id: workflow }
+
+    assert_response :success
+    assert_select '.contribution-header .favouritable img[src=?]', '/assets/avatars/workflow_types/avatar-cwl.svg'
+  end
+
+  test 'should show default logo for user-added type without logo' do
+    workflow_class = Factory(:user_added_workflow_class)
+    workflow = Factory(:public_workflow, workflow_class: workflow_class)
+
+    get :show, params: { id: workflow }
+
+    assert_response :success
+    assert_select '.contribution-header .favouritable img[src=?]', '/assets/avatars/avatar-workflow.png'
+  end
+
+  test 'should show logo for user-added type with logo' do
+    workflow_class = Factory(:user_added_workflow_class_with_logo)
+    logo = workflow_class.avatar
+    workflow = Factory(:public_workflow, workflow_class: workflow_class)
+
+    get :show, params: { id: workflow }
+
+    assert_response :success
+    assert_select '.contribution-header .favouritable img[src=?]', workflow_class_avatar_path(workflow_class, logo, size: '120x120')
+  end
+
+  test 'should show logo for user-added type with logo for git workflow' do
+    workflow_class = Factory(:user_added_workflow_class_with_logo)
+    logo = workflow_class.avatar
+    workflow = Factory(:local_git_workflow, workflow_class: workflow_class, policy: Factory(:public_policy))
+
+    get :show, params: { id: workflow }
+
+    assert_response :success
+    assert_select '.contribution-header .favouritable img[src=?]', workflow_class_avatar_path(workflow_class, logo, size: '120x120')
+  end
+
+  test 'should show logos in list item titles on index page' do
+    core_type = Factory(:galaxy_workflow_class)
+    core_type_wf = Factory(:public_workflow, workflow_class: core_type)
+    core_type_git_wf = Factory(:local_git_workflow, workflow_class: core_type, policy: Factory(:public_policy))
+
+    user_type = Factory(:user_added_workflow_class)
+    user_type_wf = Factory(:public_workflow, workflow_class: user_type)
+    user_type_git_wf = Factory(:local_git_workflow, workflow_class: user_type, policy: Factory(:public_policy))
+
+    logo_type = Factory(:user_added_workflow_class_with_logo)
+    logo = logo_type.avatar
+    logo_wf = Factory(:public_workflow, workflow_class: logo_type)
+    logo_git_wf = Factory(:local_git_workflow, workflow_class: logo_type, policy: Factory(:public_policy))
+
+    get :index
+
+    assert_select '.list_item_title .favouritable img[src=?]', '/assets/avatars/workflow_types/avatar-galaxy.png', count: 2
+    assert_select '.list_item_title .favouritable img[src=?]', '/assets/avatars/avatar-workflow.png', count: 2
+    assert_select '.list_item_title .favouritable img[src=?]',
+                  workflow_class_avatar_path(logo_type, logo, size: '24x24'), count: 2
+  end
 end

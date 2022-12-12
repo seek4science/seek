@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_12_08_134253) do
+ActiveRecord::Schema.define(version: 2022_12_12_143407) do
 
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
@@ -2201,6 +2201,7 @@ ActiveRecord::Schema.define(version: 2022_12_08_134253) do
     t.string "alternate_name"
     t.text "identifier"
     t.text "url"
+    t.integer "avatar_id"
     t.index ["contributor_id"], name: "index_workflow_classes_on_contributor_id"
   end
 

@@ -147,6 +147,8 @@ gem 'json-schema'
 
 gem 'cff', '~> 0.9.0'
 
+gem 'remotipart', '~> 1.4.4' # Allows file upload in AJAX forms
+
 group :production do
   gem 'passenger'
 end
