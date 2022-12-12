@@ -38,7 +38,7 @@ module IsaExporter
       @investigation.studies.each { |s| studies << convert_study(s) }
       isa_investigation[:studies] = studies
       
-      @OBJECT_MAP[:investigation] = isa_investigation
+      @OBJECT_MAP = @OBJECT_MAP.merge(isa_investigation)
 
       isa_investigation
     end
