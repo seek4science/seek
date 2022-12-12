@@ -670,6 +670,7 @@ GEM
     recaptcha (4.1.0)
       json
     regexp_parser (2.2.0)
+    remotipart (1.4.4)
     request-log-analyzer (1.13.4)
     request_store (1.5.1)
       rack (>= 1.4)
@@ -999,6 +1000,7 @@ DEPENDENCIES
   rdf-virtuoso (>= 0.2.0)
   rdoc
   recaptcha (~> 4.1.0)
+  remotipart (~> 1.4.4)
   request-log-analyzer
   request_store
   responders
@@ -1042,4 +1044,4 @@ DEPENDENCIES
   zenodo-client!
 
 BUNDLED WITH
-   2.3.22
+   2.3.26
