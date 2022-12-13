@@ -32,7 +32,7 @@
         </div>
         <div class="pull-right">
           <% if (Seek::Config.google_analytics_enabled || Seek::Config.piwik_analytics_enabled) %>
-            <%= link_to t('cookies.buttons.embedding'), cookies_consent_path(allow: 'embedding'),
+            <%= link_to t('cookies.buttons.embedding'), cookies_consent_path(allow: 'necessary,embedding'),
                       method: :post, class: 'btn btn-default' %>
             <%= link_to t('cookies.buttons.all'), cookies_consent_path(allow: CookieConsent::OPTIONS.join(',')),
                       method: :post, class: 'btn btn-default' if (Seek::Config.google_analytics_enabled || Seek::Config.piwik_analytics_enabled) %>
