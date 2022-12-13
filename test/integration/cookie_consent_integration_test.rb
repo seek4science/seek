@@ -130,7 +130,7 @@ class CookieConsentIntegrationTest < ActionDispatch::IntegrationTest
         get root_path
 
         assert_equal ['necessary'], CookieConsent.new(cookies).options
-        assert_select '#ga-script', count: 0
+        assert_select '#piwik-script', count: 0
       end
     end
   end
@@ -143,7 +143,7 @@ class CookieConsentIntegrationTest < ActionDispatch::IntegrationTest
         get root_path
 
         assert_equal ['necessary', 'embedding'], CookieConsent.new(cookies).options
-        assert_select '#ga-script', count: 0
+        assert_select '#piwik-script', count: 0
       end
     end
   end
