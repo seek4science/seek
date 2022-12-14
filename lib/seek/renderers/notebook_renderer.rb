@@ -5,6 +5,10 @@ module Seek
         blob.is_jupyter_notebook?
       end
 
+      def is_remote?
+        false
+      end
+
       def display_format
         'notebook'
       end

@@ -11,8 +11,11 @@ module RawDisplay
       renderer = Seek::Renderers::RendererFactory.instance.renderer(blob, url_options: url_options)
     end
     if renderer.can_render?
-      response.set_header('Content-Security-Policy', renderer.content_security_policy)
-      render renderer.format => renderer.render_standalone.html_safe, layout: renderer.layout
+      # check if allowed by cookies
+      unless renderer.is_remote? && cookie_consent.options != ['necessary']
+        response.set_header('Content-Security-Policy', renderer.content_security_policy)
+        render renderer.format => renderer.render_standalone.html_safe, layout: renderer.layout
+      end
     else
       raise ActionController::UnknownFormat
     end

@@ -6,6 +6,10 @@ module Seek
         true
       end
 
+      def is_remote?
+        false
+      end
+
       def render
         ''
       end

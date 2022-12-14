@@ -157,25 +157,26 @@ class RenderersTest < ActiveSupport::TestCase
                         'http://www.youtube.com/ytscreeningroom?v=7-N6Ij_5zpE']
     }
 
-    url_sets.each do |code, urls|
-      urls.each do |url|
-        stub_request(:head, url).to_timeout
-        cb = Factory(:content_blob, url: url)
-        assert_equal "<iframe width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/#{code}\" frameborder=\"0\" allowfullscreen></iframe>",
-                     Seek::Renderers::YoutubeRenderer.new(cb).render
+    with_config_value( :require_cookie_consent, false) do
+      url_sets.each do |code, urls|
+        urls.each do |url|
+         stub_request(:head, url).to_timeout
+          cb = Factory(:content_blob, url: url)
+          assert_equal "<iframe width=\"560\" height=\"315\" src=\"https://www.youtube-nocookie.com/embed/#{code}\" frameborder=\"0\" allowfullscreen></iframe>",
+                       Seek::Renderers::YoutubeRenderer.new(cb).render
+        end
       end
+
+      @html = Nokogiri::HTML.parse(renderer.render)
+      assert_select 'iframe'
+
+      @git.add_remote_file('video.html', 'https://youtu.be/1234abcd')
+      gb = @git.get_blob('video.html')
+      renderer = Seek::Renderers::YoutubeRenderer.new(gb)
+      assert renderer.can_render?
+      @html = Nokogiri::HTML.parse(renderer.render)
+      assert_select 'iframe'
     end
-
-    @html = Nokogiri::HTML.parse(renderer.render)
-    assert_select 'iframe'
-
-    @git.add_remote_file('video.html', 'https://youtu.be/1234abcd')
-    gb = @git.get_blob('video.html')
-    renderer = Seek::Renderers::YoutubeRenderer.new(gb)
-    assert renderer.can_render?
-    @html = Nokogiri::HTML.parse(renderer.render)
-    assert_select 'iframe'
-
 
     renderer = Seek::Renderers::YoutubeRenderer.new(nil)
     assert_equal '', renderer.render

@@ -3,8 +3,15 @@ module Seek
     class RendererFactory
       include Singleton
 
+      @@renderCache = ActiveSupport::Cache::MemoryStore.new(size: 4.megabytes)
+
       def renderer(blob, url_options: {})
-        detect_renderer(blob).new(blob, url_options: url_options)
+        rendererContent = @@renderCache.read(blob.cache_key)
+        if rendererContent.nil?
+          rendererContent = detect_renderer(blob).new(blob, url_options: url_options)
+          @@renderCache.write(blob.cache_key, rendererContent)
+        end
+        rendererContent
       end
 
       private

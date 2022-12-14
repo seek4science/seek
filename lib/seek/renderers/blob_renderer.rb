@@ -26,6 +26,10 @@ module Seek
         fail 'needs to be implemented'
       end
 
+      def is_remote?
+        fail 'needs to be implemented'
+      end
+
       # Render an entire HTML page
       def render_standalone
         render_template('content_blobs/view_content_frame',

@@ -5,6 +5,10 @@ module Seek
         blob.is_image?
       end
 
+      def is_remote?
+        false
+      end
+
       def render_content
         path = blob.content_path
         link_to(image_tag(path, class: 'git-image-preview'), path, title: 'Click for full')
