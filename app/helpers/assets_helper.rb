@@ -40,7 +40,7 @@ module AssetsHelper
     return '' unless asset.can_download?
 
     ourRenderer = Seek::Renderers::RendererFactory.instance.renderer(asset.content_blob)
-    if ourRenderer.is_remote? && cookie_consent.options == ['necessary']
+    if ourRenderer.is_remote? && !cookie_consent.allow_embedding?
       # If embedding external content is not allowed, then server a link instead
       content = "This embedded content is blocked due to your cookie settings"
     else

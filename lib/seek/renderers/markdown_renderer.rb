@@ -5,10 +5,6 @@ module Seek
         blob.is_markdown?
       end
 
-      def is_remote?
-        false
-      end
-
       def display_format
         'markdown'
       end

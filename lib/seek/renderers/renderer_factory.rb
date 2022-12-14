@@ -3,18 +3,17 @@ module Seek
     class RendererFactory
       include Singleton
 
-      @@renderCache = ActiveSupport::Cache::MemoryStore.new(size: 4.megabytes)
-
       def renderer(blob, url_options: {})
-        rendererContent = @@renderCache.read(blob.cache_key)
-        if rendererContent.nil?
-          rendererContent = detect_renderer(blob).new(blob, url_options: url_options)
-          @@renderCache.write(blob.cache_key, rendererContent)
-        end
-        rendererContent
+        renderer_class = cache.fetch(blob.cache_key) { detect_renderer(blob).name }.constantize
+
+        renderer_class.new(blob, url_options: url_options)
       end
 
       private
+
+      def cache
+        @cache ||= ActiveSupport::Cache::MemoryStore.new(size: 1.megabytes)
+      end
 
       def detect_renderer(blob)
         renderer_instances.detect do |type|

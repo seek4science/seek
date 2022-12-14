@@ -6,10 +6,6 @@ module Seek
           blob.is_pdf_viewable? && Seek::Config.pdf_conversion_enabled
       end
 
-      def is_remote?
-        false
-      end
-
       def render_standalone
         render_template('content_blobs/view_pdf_content',
                         { content_blob: blob,

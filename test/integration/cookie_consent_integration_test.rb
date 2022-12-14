@@ -277,6 +277,157 @@ class CookieConsentIntegrationTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test 'remote presentation content should not be shown if not allowed' do
+    with_config_value( :require_cookie_consent, true) do
+      post cookies_consent_path, params: { allow: 'necessary' }
+          
+      presentation = Factory :presentation, license: 'CC-BY-4.0', policy: Factory(:public_policy)
+      presentationv = Factory :presentation_version_with_remote_content, presentation: presentation
+
+
+      get presentation_path( presentation )
+      assert_response :success
+
+      assert_select 'iframe', count: 0
+    end
+  end
+
+  test 'remote presentation content should be shown if only embedded allowed' do
+    with_config_value( :require_cookie_consent, true) do
+      post cookies_consent_path, params: { allow: 'necessary,embedding' }
+          
+      presentation = Factory :presentation, license: 'CC-BY-4.0', policy: Factory(:public_policy)
+      presentationv = Factory :presentation_version_with_remote_content, presentation: presentation
+
+
+      get presentation_path( presentation )
+      assert_response :success
+
+      assert_select 'iframe', count: 1
+    end
+  end
+
+  test 'remote presentation content should be shown if all allowed' do
+    with_config_value( :require_cookie_consent, true) do
+      post cookies_consent_path, params: { allow: all_options }
+          
+      presentation = Factory :presentation, license: 'CC-BY-4.0', policy: Factory(:public_policy)
+      presentationv = Factory :presentation_version_with_remote_content, presentation: presentation
+
+
+      get presentation_path( presentation )
+      assert_response :success
+
+      assert_select 'iframe', count: 1
+    end
+  end
+
+  test 'remote presentation content should be shown if consent not required' do
+    with_config_value( :require_cookie_consent, false) do
+      post cookies_consent_path, params: { allow: 'necessary' }
+          
+      presentation = Factory :presentation, license: 'CC-BY-4.0', policy: Factory(:public_policy)
+      presentationv = Factory :presentation_version_with_remote_content, presentation: presentation
+
+
+      get presentation_path( presentation )
+      assert_response :success
+
+      assert_select 'iframe', count: 1
+    end
+  end
+
+  test 'local presentation content should be shown even if not allowed' do
+    with_config_value( :require_cookie_consent, true) do
+      post cookies_consent_path, params: { allow: 'necessary' }
+          
+      presentation = Factory :presentation, license: 'CC-BY-4.0', policy: Factory(:public_policy)
+      presentationv = Factory :presentation_version_with_blob, presentation: presentation
+
+
+      get presentation_path( presentation )
+      assert_response :success
+
+      assert_select 'iframe', count: 1
+    end
+  end
+  
+  test 'should show workflow embedded youtube video if consent not required' do
+    with_config_value( :require_cookie_consent, false) do
+      post cookies_consent_path, params: { allow: 'necessary' }
+
+      @user = Factory(:user, login: 'test')
+      login_as(@user)
+
+      workflow = Factory(:local_git_workflow, contributor: @user.person)
+      version = workflow.latest_git_version
+
+      version.add_remote_file('video.html', 'https://youtu.be/1234abcd')
+      disable_authorization_checks { version.save! }
+
+      get workflow_git_blob_path(workflow.id, version.version, 'video.html')
+
+      assert_select 'iframe[src=?]', 'https://www.youtube-nocookie.com/embed/1234abcd'
+    end
+  end
+
+  test 'should show workflow embedded youtube video if embedded consent given' do
+    with_config_value( :require_cookie_consent, true) do
+      post cookies_consent_path, params: { allow: 'necessary,embedding' }
+
+      @user = Factory(:user, login: 'test')
+      login_as(@user)
+
+      workflow = Factory(:local_git_workflow, contributor: @user.person)
+      version = workflow.latest_git_version
+
+      version.add_remote_file('video.html', 'https://youtu.be/1234abcd')
+      disable_authorization_checks { version.save! }
+
+      get workflow_git_blob_path(workflow.id, version.version, 'video.html')
+
+      assert_select 'iframe[src=?]', 'https://www.youtube-nocookie.com/embed/1234abcd'
+    end
+  end
+
+  test 'should show workflow embedded youtube video if consent given for all ' do
+    with_config_value( :require_cookie_consent, false) do
+      post cookies_consent_path, params: { allow: all_options }
+
+      @user = Factory(:user, login: 'test')
+      login_as(@user)
+
+      workflow = Factory(:local_git_workflow, contributor: @user.person)
+      version = workflow.latest_git_version
+
+      version.add_remote_file('video.html', 'https://youtu.be/1234abcd')
+      disable_authorization_checks { version.save! }
+
+      get workflow_git_blob_path(workflow.id, version.version, 'video.html')
+
+      assert_select 'iframe[src=?]', 'https://www.youtube-nocookie.com/embed/1234abcd'
+    end
+  end
+
+  test 'should not show workflow embedded youtube video if consent given for only for necessary ' do
+    with_config_value( :require_cookie_consent, false) do
+      post cookies_consent_path, params: { allow: 'necessary' }
+
+      @user = Factory(:user, login: 'test')
+      login_as(@user)
+
+      workflow = Factory(:local_git_workflow, contributor: @user.person)
+      version = workflow.latest_git_version
+
+      version.add_remote_file('video.html', 'https://youtu.be/1234abcd')
+      disable_authorization_checks { version.save! }
+
+      get workflow_git_blob_path(workflow.id, version.version, 'video.html')
+
+      assert_select 'iframe[src=?]', 'https://www.youtube-nocookie.com/embed/1234abcd'
+    end
+  end
+
   private
 
   def all_options

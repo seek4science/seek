@@ -27,7 +27,7 @@ module Seek
       end
 
       def is_remote?
-        fail 'needs to be implemented'
+        false
       end
 
       # Render an entire HTML page

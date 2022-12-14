@@ -5,10 +5,6 @@ module Seek
         blob.is_text?
       end
 
-      def is_remote?
-        false
-      end
-
       def render_content
         "<pre>#{blob.read}</pre>"
       end
