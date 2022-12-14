@@ -15,6 +15,7 @@ class RenderersTest < ActiveSupport::TestCase
     render = Seek::Renderers::RendererFactory.instance.renderer(cb)
     assert_equal Seek::Renderers::BlankRenderer, render.class
 
+    cb = Factory(:content_blob)
     cb.url = 'http://www.slideshare.net/mygrid/if-we-build-it-will-they-come-13652794'
     render = Seek::Renderers::RendererFactory.instance.renderer(cb)
     assert_equal Seek::Renderers::SlideshareRenderer, render.class
