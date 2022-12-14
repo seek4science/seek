@@ -131,7 +131,7 @@ gem 'request_store'
 
 gem 'bundler', '>= 1.8.4'
 
-gem 'ro-crate', '~> 0.4.17'
+gem 'ro-crate', '~> 0.5.1'
 
 gem 'rugged'
 gem 'i18n-js'
@@ -146,6 +146,8 @@ gem 'addressable'
 gem 'json-schema'
 
 gem 'cff', '~> 0.9.0'
+
+gem 'remotipart', '~> 1.4.4' # Allows file upload in AJAX forms
 
 group :production do
   gem 'passenger'

@@ -47,6 +47,17 @@ Factory.define(:jupyter_workflow_class, class: WorkflowClass) do |f|
   f.description 'Jupyter Notebook'
 end
 
+Factory.define(:user_added_workflow_class, class: WorkflowClass) do |f|
+  f.sequence(:title) { |n| "User-added Type #{n}" }
+  f.contributor { Factory(:person) }
+end
+
+Factory.define(:user_added_workflow_class_with_logo, class: WorkflowClass) do |f|
+  f.sequence(:title) { |n| "User-added Type with Logo #{n}" }
+  f.avatar
+  f.contributor { Factory(:person) }
+end
+
 # Workflow
 Factory.define(:workflow) do |f|
   f.title 'This Workflow'

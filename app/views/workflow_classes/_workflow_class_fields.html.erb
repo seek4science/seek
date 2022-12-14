@@ -20,3 +20,12 @@
   <%= f.text_field :url, class: 'form-control' %>
   <p class="help-block">An optional URL to the official web page of this <%= WorkflowClass.model_name.human %>.</p>
 </div>
+
+<div class="form-group">
+  <label>Logo</label><br/>
+  <%= avatar(f.object, 64, true) if f.object&.avatar %>
+  <%= f.file_field :logo_image %>
+  <% if f.object&.avatar %>
+    <p class="help-block">Leave blank to keep current logo</p>
+  <% end %>
+</div>

@@ -395,7 +395,7 @@ GEM
       activesupport (>= 4)
       railties (>= 4)
       request_store (~> 1.0)
-    loofah (2.19.0)
+    loofah (2.19.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
     macaddr (1.7.2)
@@ -670,6 +670,7 @@ GEM
     recaptcha (4.1.0)
       json
     regexp_parser (2.2.0)
+    remotipart (1.4.4)
     request-log-analyzer (1.13.4)
     request_store (1.5.1)
       rack (>= 1.4)
@@ -690,7 +691,7 @@ GEM
       json (~> 2.3.0)
       ucf (~> 2.0.2)
       uuid (~> 2.3)
-    ro-crate (0.4.17)
+    ro-crate (0.5.1)
       addressable (>= 2.7, < 2.9)
       rubyzip (~> 2.0.0)
     rsolr (2.4.0)
@@ -999,6 +1000,7 @@ DEPENDENCIES
   rdf-virtuoso (>= 0.2.0)
   rdoc
   recaptcha (~> 4.1.0)
+  remotipart (~> 1.4.4)
   request-log-analyzer
   request_store
   responders
@@ -1006,7 +1008,7 @@ DEPENDENCIES
   rfc-822
   rmagick (= 2.15.2)
   ro-bundle (~> 0.3.0)
-  ro-crate (~> 0.4.17)
+  ro-crate (~> 0.5.1)
   rspec-rails (~> 5.1)
   rubocop
   ruby-prof
@@ -1042,4 +1044,4 @@ DEPENDENCIES
   zenodo-client!
 
 BUNDLED WITH
-   2.3.22
+   2.3.26

@@ -34,11 +34,19 @@ class Snapshot < ApplicationRecord
   end
 
   def title
-    metadata['title']
+    if content_blob.present?
+      metadata['title']
+    else
+      'incomplete snapshot'
+    end
   end
 
   def description
-    metadata['description']
+    if content_blob.present?
+      metadata['description']
+    else
+      'The snapshot currently has no content, and could still be being generated.'
+    end
   end
 
   def contributor
