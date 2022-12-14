@@ -3,7 +3,6 @@ teusink_v1:
   title: Teusink
   description: Teusink from JWS Online
   recommended_environment: jws
-  last_used_at: 2009-04-03 11:09:18
   model: teusink
   version: 1
   projects: [sysmo_project]
@@ -15,7 +14,6 @@ teusink_v2:
   title: Teusink
   description: Teusink from JWS Online
   recommended_environment: jws
-  last_used_at: 2009-04-03 11:09:18
   model: teusink
   version: 2
   projects: [sysmo_project]
@@ -27,7 +25,6 @@ teusink_with_space_v1:
   title: Teusink with space
   description: Teusink from JWS Online
   recommended_environment: jws
-  last_used_at: 2009-04-03 11:09:18
   version: 1
   projects: [sysmo_project]
   model: teusink_with_space
@@ -39,7 +36,6 @@ jws_model_v1:
   title: Model in JWS Dat format
   description: Model in JWS Dat format
   recommended_environment: jws
-  last_used_at: 2009-04-03 11:09:18
   model: jws_model
   version: 1  
   projects: [sysmo_project]
@@ -51,7 +47,6 @@ francos_model_v1:
   title: Francos model
   description: Problematic BioModels model that Franco gave as a test
   recommended_environment: jws
-  last_used_at: 2009-04-03 11:09:18
   model: francos_model
   version: 1  
   projects: [sysmo_project]
@@ -63,7 +58,6 @@ model_with_format_and_type_v1:
   title: Model with format and type
   description: Teusink from JWS Online
   recommended_environment: jws
-  last_used_at: 2009-04-03 11:09:18
   model_type: SBML
   model_format: BioPAX
   model: model_with_format_and_type
@@ -77,7 +71,6 @@ model_with_links_in_description_v1:
   title: Links in my desc
   description: Visit my site http://www.google.com
   recommended_environment: jws
-  last_used_at: 2009-04-03 11:09:18
   model: model_with_links_in_description
   version: 1
   projects: [sysmo_project]
@@ -89,7 +82,6 @@ model_with_different_owner_v1:
   title: Model with different Owner
   description: Visit my site http://www.google.com
   recommended_environment: jws
-  last_used_at: 2009-04-03 11:09:18
   model: model_with_different_owner
   version: 1  
   projects: [other_project] # not linked to any project for now
@@ -100,7 +92,6 @@ model_with_no_contributor_v1:
   title: Model with no contributor
   description: Visit my site http://www.google.com
   recommended_environment: jws
-  last_used_at: 2009-04-03 11:09:18
   model: model_with_no_contributor
   version: 1
   projects: [sysmo_project]
@@ -112,7 +103,6 @@ model_jws_incompatible_v1:
   description: It is actually a picture
   model: model_jws_incompatible
   recommended_environment: jws
-  last_used_at: 2009-04-03 11:09:18
   version: 1
   projects: [sysmo_project]
   policy: sysmo_member_edit
@@ -123,7 +113,6 @@ non_sbml_xml_v1:
   description: An XML file that is not SBML
   model: non_sbml_xml
   recommended_environment: jws
-  last_used_at: 2009-04-03 11:09:18
   version: 1  
   projects: [other_project]
   policy: policy_for_test_with_projects_institutions
@@ -135,7 +124,6 @@ invalid_sbml_xml_v1:
   description: An XML file that is not SBML
   model: invalid_sbml_xml
   recommended_environment: jws
-  last_used_at: 2009-04-02 11:09:18
   version: 1  
   projects: [other_project]
   policy: policy_for_test_with_projects_institutions
@@ -146,7 +134,6 @@ non_jws_dat_v1:
   description: An Dat file that is not JWS Online format
   model: non_jws_dat  
   recommended_environment: jws
-  last_used_at: 2009-04-03 11:09:18
   version: 1  
   projects: [other_project]
   policy: policy_for_test_with_projects_institutions
@@ -157,7 +144,6 @@ private_model_vi1:
   description: It is a private model
   model: private_model
   recommended_environment: jws
-  last_used_at: 2009-04-03 11:09:18
   version: 1
   projects: [sysmo_project]
   policy: private_policy

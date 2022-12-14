@@ -6,8 +6,6 @@ module Seek
       asset_version = instance_variable_get("@display_#{name}")
       @asset_version = asset_version
 
-      asset.just_used
-
       if asset.respond_to?(:openbis?) && asset.openbis?
         handle_openbis_download(asset, params[:perm_id])
       else
