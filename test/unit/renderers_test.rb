@@ -10,12 +10,12 @@ class RenderersTest < ActiveSupport::TestCase
   end
 
   test 'factory' do
-    cb = Factory(:url_content_blob)
+    cb = Factory(:content_blob)
     cb.url = 'http://bbc.co.uk'
     render = Seek::Renderers::RendererFactory.instance.renderer(cb)
     assert_equal Seek::Renderers::BlankRenderer, render.class
 
-    cb = Factory(:url_content_blob)
+    cb = Factory(:content_blob)
     cb.url = 'http://www.slideshare.net/mygrid/if-we-build-it-will-they-come-13652794'
     render = Seek::Renderers::RendererFactory.instance.renderer(cb)
     assert_equal Seek::Renderers::SlideshareRenderer, render.class
@@ -31,6 +31,26 @@ class RenderersTest < ActiveSupport::TestCase
   end
 
   test 'factory cache' do
+    cb = Factory(:content_blob)
+    cb.url = 'http://bbc.co.uk'
+    render = Seek::Renderers::RendererFactory.instance.renderer(cb)
+    assert_equal Seek::Renderers::BlankRenderer, render.class
+
+    cb.url = 'http://www.slideshare.net/mygrid/if-we-build-it-will-they-come-13652794'
+    render = Seek::Renderers::RendererFactory.instance.renderer(cb)
+    assert_equal Seek::Renderers::SlideshareRenderer, render.class
+   
+    cb.url = 'http://bbc.co.uk'
+    cb.save!
+    render = Seek::Renderers::RendererFactory.instance.renderer(cb)
+    assert_equal Seek::Renderers::BlankRenderer, render.class
+   
+    cb.url = 'http://www.slideshare.net/mygrid/if-we-build-it-will-they-come-13652794'
+    cb.save!
+    render = Seek::Renderers::RendererFactory.instance.renderer(cb)
+    assert_equal Seek::Renderers::SlideshareRenderer, render.class
+    
+    # Tests with content blob having no content (cache key is different currently)
     cb = Factory(:url_content_blob)
     cb.url = 'http://bbc.co.uk'
     render = Seek::Renderers::RendererFactory.instance.renderer(cb)
