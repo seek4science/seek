@@ -42,7 +42,7 @@ module SamplesHelper
       select_tag element_name,
                  options,
                  id: "custom_metadata_attributes_data_#{attribute.title}",
-                 class: "form-control js-states",
+                 class: "form-control",
                  include_blank: "",
                  name: "#{element_name}[]",
                  multiple: "multiple"
