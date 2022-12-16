@@ -1019,7 +1019,7 @@ DEPENDENCIES
   sass-rails (>= 6)
   savon (= 1.1.0)
   seedbank
-  simple-spreadsheet-extractor (~> 0.17)
+  simple-spreadsheet-extractor (~> 0.17.0)
   simplecov
   sprockets-rails
   sqlite3 (~> 1.4)
