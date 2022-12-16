@@ -39,13 +39,13 @@ module AssetsHelper
   def rendered_asset_view(asset)
     return '' unless asset.can_download?
 
-    ourRenderer = Seek::Renderers::RendererFactory.instance.renderer(asset.content_blob)
-    if ourRenderer.is_remote? && !cookie_consent.allow_embedding?
+    our_renderer = Seek::Renderers::RendererFactory.instance.renderer(asset.content_blob)
+    if our_renderer.external_embed? && !cookie_consent.allow_embedding?
       # If embedding external content is not allowed, then server a link instead
       content = "This embedded content is blocked due to your cookie settings"
     else
       content = Rails.cache.fetch("#{asset.cache_key}/#{asset.content_blob.cache_key}") do
-        ourRenderer.render
+        our_renderer.render
       end
     end
     if content.blank?

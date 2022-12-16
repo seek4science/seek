@@ -5,7 +5,7 @@ module Seek
         blob.url && is_youtube_url?(blob.url) && extract_video_code(blob.url)
       end
 
-      def is_remote?
+      def external_embed?
         true
       end
 

@@ -5,7 +5,7 @@ module Seek
         blob.url && is_slideshare_url?(blob.url)
       end
 
-      def is_remote?
+      def external_embed?
         true
       end
 

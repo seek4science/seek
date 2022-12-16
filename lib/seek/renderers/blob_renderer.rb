@@ -26,7 +26,7 @@ module Seek
         fail 'needs to be implemented'
       end
 
-      def is_remote?
+      def external_embed?
         false
       end
 

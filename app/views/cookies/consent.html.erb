@@ -4,10 +4,10 @@
 
     <%= render partial: 'general/cookies_info' %>
 
-    <% analytics_txt = "Google Analytics" if (Seek::Config.google_analytics_enabled && !Seek::Config.google_analytics_enabled) %>
-    <% analytics_txt = "Matomo" if (Seek::Config.piwik_analytics_enabled && !Seek::Config.google_analytics_enabled) %>
-    <% analytics_txt = "Google Analytics and Matomo" if (Seek::Config.piwik_analytics_enabled && Seek::Config.google_analytics_enabled) %>
-    <% analytics_txt = "Google Analytics" if (Seek::Config.google_analytics_enabled) %>
+    <% analytics = [] %>
+    <% analytics << "Google Analytics" if Seek::Config.google_analytics_enabled %>
+    <% analytics << "Matomo" if Seek::Config.piwik_analytics_enabled %>
+    <% analytics_txt =  analytics.join(' and ')%>
 
     <div class="panel panel-default">
       <div class="panel-heading">Cookie Preferences</div>
@@ -15,8 +15,12 @@
         <h4>You currently allow</h4>
         <% if @cookie_consent.given? %>
           <ul id="cookie-consent-level">
-            <% @cookie_consent.options.each do |opt| %>
-              <li><%= t("cookies.options.#{opt}", analytics: analytics_txt) %></li>
+            <li><%= t("cookies.options.necessary") %></li>
+            <% if @cookie_consent.options.include?('embedding') %>
+              <li><%= t("cookies.options.embedding") %></li>
+            <% end %>
+            <% if @cookie_consent.options.include?('tracking') & (Seek::Config.google_analytics_enabled || Seek::Config.piwik_analytics_enabled) %>
+              <li><%= t("cookies.options.tracking", analytics: analytics_txt) %></li>
             <% end %>
           </ul>
         <% else %>
@@ -31,15 +35,10 @@
                       method: :post, class: 'btn btn-default' %>
         </div>
         <div class="pull-right">
-          <% if (Seek::Config.google_analytics_enabled || Seek::Config.piwik_analytics_enabled) %>
-            <%= link_to t('cookies.buttons.embedding'), cookies_consent_path(allow: 'necessary,embedding'),
-                      method: :post, class: 'btn btn-default' %>
-            <%= link_to t('cookies.buttons.all'), cookies_consent_path(allow: CookieConsent::OPTIONS.join(',')),
-                      method: :post, class: 'btn btn-default' if (Seek::Config.google_analytics_enabled || Seek::Config.piwik_analytics_enabled) %>
-          <% else %>
-            <%= link_to t('cookies.buttons.all'), cookies_consent_path(allow: CookieConsent::OPTIONS.join(',')),
-                      method: :post, class: 'btn btn-default' if (Seek::Config.google_analytics_enabled || Seek::Config.piwik_analytics_enabled) %>
-          <% end %>       
+          <%= link_to t('cookies.buttons.embedding'), cookies_consent_path(allow: 'necessary,embedding'),
+                    method: :post, class: 'btn btn-default' %>
+          <%= link_to t('cookies.buttons.all'), cookies_consent_path(allow: CookieConsent::OPTIONS.join(',')),
+                    method: :post, class: 'btn btn-default' if (Seek::Config.google_analytics_enabled || Seek::Config.piwik_analytics_enabled) %> 
         </div>
       </div>
     </div>

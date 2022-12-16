@@ -317,7 +317,7 @@ you can choose to have a %{project} linked to a site managed %{programme} instea
     all_cookies_btn: Allow all cookies
     no_consent: No cookie consent provided
     options:
-      tracking: "Cookies required for %{analytics}, to help Seek improve its service."
+      tracking: "Cookies required for %{analytics}, to help SEEK improve its service."
       embedding: Allow embedded content, such as video or slides, which are hosted externally.
       necessary: Cookies necessary for Seek to function, for example to provide user-authentication and forgery protection.
     buttons:
