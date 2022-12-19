@@ -44,5 +44,9 @@
 <% if renderer.is_a?(Seek::Renderers::BlankRenderer) %>
   <span class="subtle">Binary content not displayed</span>
 <% else %>
-  <%= renderer.render.html_safe %>
+  <% if renderer.external_embed? && !cookie_consent.allow_embedding? %>
+      This embedded content is blocked due to your cookie settings
+  <% else %>
+    <%= renderer.render.html_safe %>
+  <%end %>
 <% end %>
