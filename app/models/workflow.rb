@@ -145,6 +145,10 @@ class Workflow < ApplicationRecord
       return if parent.is_git_versioned?
       parent.update_column(:test_status, Workflow::TEST_STATUS_INV[test_status]) if latest_version?
     end
+
+    def avatar_owner
+      workflow_class
+    end
   end
 
   attr_reader :extracted_metadata
@@ -168,8 +172,21 @@ class Workflow < ApplicationRecord
     end
   end
 
+  def defines_own_avatar?
+    workflow_class ? workflow_class.defines_own_avatar? : super
+  end
+
+  def avatar_owner
+    workflow_class
+  end
+
   def avatar_key
-    workflow_class&.extractor&.present? ? "#{workflow_class.key.downcase}_workflow" : 'workflow'
+    workflow_class ? workflow_class.avatar_key : 'workflow'
+  end
+
+  # Expire list item titles when class is updated (in case logo has changed)
+  def list_item_title_cache_key_prefix
+    (workflow_class ? "#{workflow_class.list_item_title_cache_key_prefix}/#{cache_key}" : super)
   end
 
   def contributor_credited?

@@ -104,7 +104,7 @@ module Seek
       end
 
       def queue_rdf_generation(force = false, refresh_dependents = true)
-        unless !force && (saved_changes.keys - %w[updated_at last_used_at]).empty?
+        unless !force && (saved_changes.keys - ['updated_at']).empty?
           RdfGenerationQueue.enqueue(self, refresh_dependents: refresh_dependents)
         end
       end

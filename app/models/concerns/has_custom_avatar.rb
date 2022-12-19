@@ -16,4 +16,8 @@ module HasCustomAvatar
   def defines_own_avatar?
     true
   end
+
+  def avatar_owner
+    self
+  end
 end

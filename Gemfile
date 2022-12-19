@@ -15,7 +15,8 @@ gem 'hpricot', '~>0.8.2'
 gem 'libxml-ruby', '~>2.9.0', require: 'libxml'
 gem 'uuid', '~>2.3'
 gem 'RedCloth', '>=4.3.0'
-gem 'simple-spreadsheet-extractor', '~>0.16.0'
+gem 'simple-spreadsheet-extractor', '~> 0.17.0'
+gem 'open4'
 gem 'sample-template-generator', '~>0.5'
 gem 'rmagick', '2.15.2'
 gem 'rest-client', '~>2.0'
@@ -131,7 +132,7 @@ gem 'request_store'
 
 gem 'bundler', '>= 1.8.4'
 
-gem 'ro-crate', '~> 0.4.17'
+gem 'ro-crate', '~> 0.5.1'
 
 gem 'rugged'
 gem 'i18n-js'
@@ -146,6 +147,8 @@ gem 'addressable'
 gem 'json-schema'
 
 gem 'cff', '~> 0.9.0'
+
+gem 'remotipart', '~> 1.4.4' # Allows file upload in AJAX forms
 
 group :production do
   gem 'passenger'
