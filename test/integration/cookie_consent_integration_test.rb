@@ -2,7 +2,7 @@ require 'test_helper'
 
 class CookieConsentIntegrationTest < ActionDispatch::IntegrationTest
   test 'cookie consent banner shown' do
-    with_config_value( :require_cookie_consent, true ) do
+    with_config_value(:require_cookie_consent, true) do
       get root_path
 
       cookie_consent = CookieConsent.new(cookies)
@@ -17,8 +17,8 @@ class CookieConsentIntegrationTest < ActionDispatch::IntegrationTest
   end
 
   test 'cookie consent banner shown with tracking option if google analytics enabled' do
-    with_config_value( :require_cookie_consent, true) do
-      with_config_value( :google_analytics_enabled, true) do
+    with_config_value(:require_cookie_consent, true) do
+      with_config_value(:google_analytics_enabled, true) do
         get root_path
 
         assert_select '#cookie-banner' do
@@ -31,8 +31,8 @@ class CookieConsentIntegrationTest < ActionDispatch::IntegrationTest
   end
 
   test 'cookie consent banner shown with tracking option if matomo analytics enabled' do
-    with_config_value( :require_cookie_consent, true ) do
-      with_config_value( :piwik_analytics_enabled, true ) do
+    with_config_value(:require_cookie_consent, true) do
+      with_config_value(:piwik_analytics_enabled, true) do
         get root_path
 
         assert_select '#cookie-banner' do
@@ -45,7 +45,7 @@ class CookieConsentIntegrationTest < ActionDispatch::IntegrationTest
   end
 
   test 'cookie consent banner not shown if not required' do
-    with_config_value( :require_cookie_consent, false ) do
+    with_config_value(:require_cookie_consent, false) do
       get root_path
 
       cookie_consent = CookieConsent.new(cookies)
@@ -56,7 +56,7 @@ class CookieConsentIntegrationTest < ActionDispatch::IntegrationTest
   end
 
   test 'cookie consent banner not shown if already consented' do
-    with_config_value( :require_cookie_consent, true) do
+    with_config_value(:require_cookie_consent, true) do
       post cookies_consent_path, params: { allow: all_options }
 
       get root_path
@@ -69,8 +69,8 @@ class CookieConsentIntegrationTest < ActionDispatch::IntegrationTest
   end
 
   test 'google analytics code not present if only necessary cookies allowed' do
-    with_config_value( :require_cookie_consent, true) do
-      with_config_value( :google_analytics_enabled, true) do
+    with_config_value(:require_cookie_consent, true) do
+      with_config_value(:google_analytics_enabled, true) do
         post cookies_consent_path, params: { allow: 'necessary' }
 
         get root_path
@@ -82,8 +82,8 @@ class CookieConsentIntegrationTest < ActionDispatch::IntegrationTest
   end
 
   test 'google analytics code not present if necessary and embedded cookies allowed' do
-    with_config_value( :require_cookie_consent, true) do
-      with_config_value( :google_analytics_enabled, true) do
+    with_config_value(:require_cookie_consent, true) do
+      with_config_value(:google_analytics_enabled, true) do
         post cookies_consent_path, params: { allow: 'necessary,embedding' }
 
         get root_path
@@ -95,8 +95,8 @@ class CookieConsentIntegrationTest < ActionDispatch::IntegrationTest
   end
 
   test 'google analytics code present if only all cookies allowed' do
-    with_config_value( :require_cookie_consent, true) do
-      with_config_value( :google_analytics_enabled, true) do
+    with_config_value(:require_cookie_consent, true) do
+      with_config_value(:google_analytics_enabled, true) do
         post cookies_consent_path, params: { allow: all_options }
 
         get root_path
@@ -108,8 +108,8 @@ class CookieConsentIntegrationTest < ActionDispatch::IntegrationTest
   end
 
   test 'google analytics code present if cookie consent not required' do
-    with_config_value( :require_cookie_consent, false) do
-      with_config_value( :google_analytics_enabled, true) do
+    with_config_value(:require_cookie_consent, false) do
+      with_config_value(:google_analytics_enabled, true) do
         post cookies_consent_path, params: { allow: 'necessary' }
 
         get root_path
@@ -123,8 +123,8 @@ class CookieConsentIntegrationTest < ActionDispatch::IntegrationTest
   end
 
   test 'matomo analytics code not present if only necessary cookies allowed' do
-    with_config_value( :require_cookie_consent, true) do
-      with_config_value( :piwik_analytics_enabled, true) do
+    with_config_value(:require_cookie_consent, true) do
+      with_config_value(:piwik_analytics_enabled, true) do
         post cookies_consent_path, params: { allow: 'necessary' }
 
         get root_path
@@ -136,8 +136,8 @@ class CookieConsentIntegrationTest < ActionDispatch::IntegrationTest
   end
 
   test 'matomo analytics code not present if necessary and embedded cookies allowed' do
-    with_config_value( :require_cookie_consent, true) do
-      with_config_value( :piwik_analytics_enabled, true) do
+    with_config_value(:require_cookie_consent, true) do
+      with_config_value(:piwik_analytics_enabled, true) do
         post cookies_consent_path, params: { allow: 'necessary,embedding' }
 
         get root_path
@@ -149,8 +149,8 @@ class CookieConsentIntegrationTest < ActionDispatch::IntegrationTest
   end
 
   test 'matomo analytics code present if only all cookies allowed' do
-    with_config_value( :require_cookie_consent, true) do
-      with_config_value( :piwik_analytics_enabled, true) do
+    with_config_value(:require_cookie_consent, true) do
+      with_config_value(:piwik_analytics_enabled, true) do
         post cookies_consent_path, params: { allow: all_options }
 
         get root_path
@@ -162,8 +162,8 @@ class CookieConsentIntegrationTest < ActionDispatch::IntegrationTest
   end
 
   test 'matomo analytics code present if cookie consent not required' do
-    with_config_value( :require_cookie_consent, false) do
-      with_config_value( :piwik_analytics_enabled, true) do
+    with_config_value(:require_cookie_consent, false) do
+      with_config_value(:piwik_analytics_enabled, true) do
         post cookies_consent_path, params: { allow: 'necessary' }
 
         get root_path
@@ -177,8 +177,8 @@ class CookieConsentIntegrationTest < ActionDispatch::IntegrationTest
   end
 
   test 'can access and use cookie consent page as anonymous user' do
-    with_config_value( :require_cookie_consent, true) do
-      with_config_value( :google_analytics_enabled, true) do
+    with_config_value(:require_cookie_consent, true) do
+      with_config_value(:google_analytics_enabled, true) do
         get cookies_consent_path
 
         #pp response.page.body
@@ -217,8 +217,8 @@ class CookieConsentIntegrationTest < ActionDispatch::IntegrationTest
     @user = Factory(:user, login: 'test')
     login_as(@user)
 
-    with_config_value( :require_cookie_consent, true) do
-      with_config_value( :google_analytics_enabled, true) do
+    with_config_value(:require_cookie_consent, true) do
+      with_config_value(:google_analytics_enabled, true) do
         get cookies_consent_path
 
         assert_response :success
@@ -238,7 +238,7 @@ class CookieConsentIntegrationTest < ActionDispatch::IntegrationTest
   end
 
   test 'setting invalid cookie preferences shows an error' do
-    with_config_value( :require_cookie_consent, true ) do
+    with_config_value(:require_cookie_consent, true) do
       post cookies_consent_path, params: { allow: 'banana sandwich' }
 
       follow_redirect!
@@ -248,8 +248,8 @@ class CookieConsentIntegrationTest < ActionDispatch::IntegrationTest
   end
 
   test 'revoke consent' do
-    with_config_value( :require_cookie_consent, true) do
-      with_config_value( :google_analytics_enabled, true) do
+    with_config_value(:require_cookie_consent, true) do
+      with_config_value(:google_analytics_enabled, true) do
         post cookies_consent_path, params: { allow: 'necessary' }
         follow_redirect!
         assert_select '#error_flash .alert-danger', count: 0
@@ -278,14 +278,13 @@ class CookieConsentIntegrationTest < ActionDispatch::IntegrationTest
   end
 
   test 'remote presentation content should not be shown if not allowed' do
-    with_config_value( :require_cookie_consent, true) do
+    with_config_value(:require_cookie_consent, true) do
       post cookies_consent_path, params: { allow: 'necessary' }
-          
+
       presentation = Factory :presentation, license: 'CC-BY-4.0', policy: Factory(:public_policy)
       presentationv = Factory :presentation_version_with_remote_content, presentation: presentation
 
-
-      get presentation_path( presentation )
+      get presentation_path(presentation)
       assert_response :success
 
       assert_select 'iframe', count: 0
@@ -293,14 +292,13 @@ class CookieConsentIntegrationTest < ActionDispatch::IntegrationTest
   end
 
   test 'remote presentation content should be shown if only embedded allowed' do
-    with_config_value( :require_cookie_consent, true) do
+    with_config_value(:require_cookie_consent, true) do
       post cookies_consent_path, params: { allow: 'necessary,embedding' }
-          
+
       presentation = Factory :presentation, license: 'CC-BY-4.0', policy: Factory(:public_policy)
       presentationv = Factory :presentation_version_with_remote_content, presentation: presentation
 
-
-      get presentation_path( presentation )
+      get presentation_path(presentation)
       assert_response :success
 
       assert_select 'iframe', count: 1
@@ -308,14 +306,13 @@ class CookieConsentIntegrationTest < ActionDispatch::IntegrationTest
   end
 
   test 'remote presentation content should be shown if all allowed' do
-    with_config_value( :require_cookie_consent, true) do
+    with_config_value(:require_cookie_consent, true) do
       post cookies_consent_path, params: { allow: all_options }
-          
+
       presentation = Factory :presentation, license: 'CC-BY-4.0', policy: Factory(:public_policy)
       presentationv = Factory :presentation_version_with_remote_content, presentation: presentation
 
-
-      get presentation_path( presentation )
+      get presentation_path(presentation)
       assert_response :success
 
       assert_select 'iframe', count: 1
@@ -323,14 +320,13 @@ class CookieConsentIntegrationTest < ActionDispatch::IntegrationTest
   end
 
   test 'remote presentation content should be shown if consent not required' do
-    with_config_value( :require_cookie_consent, false) do
+    with_config_value(:require_cookie_consent, false) do
       post cookies_consent_path, params: { allow: 'necessary' }
-          
+
       presentation = Factory :presentation, license: 'CC-BY-4.0', policy: Factory(:public_policy)
       presentationv = Factory :presentation_version_with_remote_content, presentation: presentation
 
-
-      get presentation_path( presentation )
+      get presentation_path(presentation)
       assert_response :success
 
       assert_select 'iframe', count: 1
@@ -338,22 +334,21 @@ class CookieConsentIntegrationTest < ActionDispatch::IntegrationTest
   end
 
   test 'local presentation content should be shown even if not allowed' do
-    with_config_value( :require_cookie_consent, true) do
+    with_config_value(:require_cookie_consent, true) do
       post cookies_consent_path, params: { allow: 'necessary' }
-          
+
       presentation = Factory :presentation, license: 'CC-BY-4.0', policy: Factory(:public_policy)
       presentationv = Factory :presentation_version_with_blob, presentation: presentation
 
-
-      get presentation_path( presentation )
+      get presentation_path(presentation)
       assert_response :success
 
       assert_select 'iframe', count: 1
     end
   end
-  
+
   test 'should show workflow embedded youtube video if consent not required' do
-    with_config_value( :require_cookie_consent, false) do
+    with_config_value(:require_cookie_consent, false) do
       post cookies_consent_path, params: { allow: 'necessary' }
 
       @user = Factory(:user, login: 'test')
@@ -372,7 +367,7 @@ class CookieConsentIntegrationTest < ActionDispatch::IntegrationTest
   end
 
   test 'should show workflow embedded youtube video if embedded consent given' do
-    with_config_value( :require_cookie_consent, true) do
+    with_config_value(:require_cookie_consent, true) do
       post cookies_consent_path, params: { allow: 'necessary,embedding' }
 
       @user = Factory(:user, login: 'test')
@@ -391,7 +386,7 @@ class CookieConsentIntegrationTest < ActionDispatch::IntegrationTest
   end
 
   test 'should show workflow embedded youtube video if consent given for all ' do
-    with_config_value( :require_cookie_consent, false) do
+    with_config_value(:require_cookie_consent, false) do
       post cookies_consent_path, params: { allow: all_options }
 
       @user = Factory(:user, login: 'test')
@@ -410,7 +405,7 @@ class CookieConsentIntegrationTest < ActionDispatch::IntegrationTest
   end
 
   test 'should not show workflow embedded youtube video if consent given for only for necessary ' do
-    with_config_value( :require_cookie_consent, false) do
+    with_config_value(:require_cookie_consent, false) do
       post cookies_consent_path, params: { allow: 'necessary' }
 
       @user = Factory(:user, login: 'test')
@@ -425,6 +420,41 @@ class CookieConsentIntegrationTest < ActionDispatch::IntegrationTest
       get workflow_git_blob_path(workflow.id, version.version, 'video.html')
 
       assert_select 'iframe[src=?]', 'https://www.youtube-nocookie.com/embed/1234abcd'
+    end
+  end
+
+  test 'analytics consent text changes depending on which analytics enabled' do
+    with_config_value(:require_cookie_consent, true) do
+      post cookies_consent_path, params: { allow: all_options }
+
+      with_config_value(:google_analytics_enabled, true) do
+        with_config_value(:piwik_analytics_enabled, true) do
+          get cookies_consent_path
+
+          assert_select '#content p', text: /Additionally, we make use of Google Analytics and Matomo to/
+          assert_select '#cookie-consent-level li', text: /Cookies required for Google Analytics and Matomo, to/
+        end
+        with_config_value(:piwik_analytics_enabled, false) do
+          get cookies_consent_path
+
+          assert_select '#content p', text: /Additionally, we make use of Google Analytics to/
+          assert_select '#cookie-consent-level li', text: /Cookies required for Google Analytics, to/
+        end
+      end
+      with_config_value(:google_analytics_enabled, false) do
+        with_config_value(:piwik_analytics_enabled, true) do
+          get cookies_consent_path
+
+          assert_select '#content p', text: /Additionally, we make use of Matomo to/
+          assert_select '#cookie-consent-level li', text: /Cookies required for Matomo, to/
+        end
+        with_config_value(:piwik_analytics_enabled, false) do
+          get cookies_consent_path
+
+          assert_select '#content p', text: /Additionally, we make use of/, count: 0
+          assert_select '#cookie-consent-level li', text: /Cookies required for/, count: 0
+        end
+      end
     end
   end
 
