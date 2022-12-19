@@ -45,7 +45,7 @@ You change the port, and image in the docker-compose.yml by editing
         ports:
               - "3000:3000"
               
-## Proxy through NGINX              
+## Proxy through NGINX or Apache             
               
 An alternative to changing the port (particularly if running several instances on
 same machine), you can proxy through Apache or Nginx. E.g. for Nginx you would configure a virtual host
@@ -63,6 +63,15 @@ like the following:
             proxy_pass         http://127.0.0.1:3000;
         }
     }
+
+for Apache the virtual host would include:
+
+    UseCanonicalName on
+    ProxyPreserveHost on
+    <Location />
+         ProxyPass   http://127.0.0.1:3000/ Keepalive=On
+         ProxyPassReverse http://127.0.0.1:3000/
+    </Location>
     
 You would also want to configure for HTTPS (port 443), and would strongly recommend using [Lets Encrypt](https://letsencrypt.org/) for free SSL certificates. 
     
