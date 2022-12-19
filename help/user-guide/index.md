@@ -46,6 +46,8 @@ layout: page
      - [Creators](general-attributes.html#creators)
      - [SOPs](general-attributes.html#sops)
      - [Data Files](general-attributes.html#data-files)
+     - [Placeholders](general-attributes.html#placeholders)
+     - [File Templates](general-attributes.html#file_templates)
      - [Publications](general-attributes.html#publications)
      - [Experimental assays and Modelling analysis](general-attributes.html#experimental-assays-and-modelling-analysis)
      - [Events](general-attributes.html#events)

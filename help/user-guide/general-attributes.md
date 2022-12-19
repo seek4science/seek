@@ -93,6 +93,13 @@ SOPs are standard operating procedures which describe the protocol required to r
 [Assay specific]
 Data files can be any file containing data relevant to the assay (raw data, processed data, calibration information etc). They can be in any format (word files, e-lab notebooks, code, annotated spreadsheets etc). Relevant data files can be linked directly to the assay via the dropdown menu.
 
+## Placeholders
+[Assay specific]
+A Placeholder indicates data that will be consumed, used or produced when a Project is enacted. Placeholders are used when the structure of a Project is defined, but, because the Project has not yet been fully enacted, the data may not yet be known. When the data is known, the Data File may be associated with the Placeholder it satisfies. Placeholders may be used anywhere a DataFile can be.
+
+## File Templates
+A File Template describes conforming DataFiles. It may be annotated with information about the format and type of data in the DataFiles. Annotations are *not* about the File Template itself. For example, a File Template that is a Word document may describe conformant PNG images.
+
 ## Publications
 If your asset is directly related to a publication you can link the two together in SEEK. You can select publications within your project form the drop-down menu. If the publication is in another project you need to check the box that says associate publications from other projects.
 
