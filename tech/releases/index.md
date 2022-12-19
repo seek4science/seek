@@ -11,6 +11,60 @@ Please see [Getting FAIRDOM-SEEK](/get-seek.html) for details about installing S
 
 If you have any comments or feedback about a release, then please [Contact Us](/contacting-us.html)
 
+## Version 1.13.0
+
+Release date: _Xth January 2023_
+
+A major release with broad number of changes, including many small changes and bug fixes not listed here.
+The high level changes include:
+
+* **Maintenance period** - code tidying, removing old unused features, refactoring.
+* **Rails 6.1 upgrade**.
+* **Workflow support improvements**:
+  * **Git** repository support:
+      * Import from git repository,
+      * Add and modify files dynamically,
+      * Preview and download individual files,
+      * Versioning via Git.
+  * **Bio.tools** integration for workflow steps,
+  * **Citation CFF** support,
+  * **Jupyter** notebook rendering,
+  * **RO-Crate** parsing and creation fixes,
+  * Improved workflow **diagram** generation,
+  * Workflow **maturity flag** and filter,
+  * **LifeMonitor** integration - filter by test status.
+* **Sample enhancements**:
+    * Extraction **performance** improvements,
+    * **Improved error handling** and reporting during sample extraction,
+    * Sample types have **contributor** shown, and now supports **creators**,
+    * **Filtering and search view** now available for samples and sample types.
+    * JSON **API** improvements.
+* Integrated **[TeSS](https://tess.elixir-europe.org/) search** for Events.
+* **Timezone information** provided for Event start and end dates.
+* **Search improvements**:
+  * Fix to the order of search results,
+  * Improvements to indexing.
+  * Harmonization between general search and searching and filtering.
+* **Show the last person** that updated an item (shown only to project members).
+* **Improvements to the table view** of items, adding more columns and making more consistent.
+* **Tagging projects from the EDAM** ontology, and made easier to extend with **other ontologies** in the future.
+* Improvements to **API testing and documentation** generation.
+* Fixes and improvements to **Project creation and join requests**.
+* **Descriptive help text** for each creatable entry, show in the Create or Browse pages that link off to documentation where available.
+* **IBISBA enhancements**:
+  * **Populator** - to populate a Project and ISA information from a spreadsheet template,
+  * **File templates** and **Placeholders**.
+* **Publication improvements**:
+  * Option to support the **upload of full text PDF or link**,
+  * Any number of related links,
+  * Option to allow **editing imported publications**.
+* **Settings caching** - giving a page load speed improvement
+* **Cookie consent banner** improved to give more control over which cookies are set, and when content from other sites can be embedded.
+
+For a full list, see [closed issues for 1.13.0](https://github.com/seek4science/seek/milestone/10?closed=1)
+
+
+
 ## Version 1.12.3
 
 Release date: _5th August 2022_
