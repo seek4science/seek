@@ -835,4 +835,8 @@ SEEK::Application.routes.draw do
   get '/home/isa_colours' => 'homes#isa_colours'
 
   post '/previews/markdown' => 'previews#markdown'
+
+  # cookie consent
+  get 'cookies/consent' => 'cookies#consent'
+  post 'cookies/consent' => 'cookies#set_consent'
 end

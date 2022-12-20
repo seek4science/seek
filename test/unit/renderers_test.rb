@@ -15,6 +15,7 @@ class RenderersTest < ActiveSupport::TestCase
     render = Seek::Renderers::RendererFactory.instance.renderer(cb)
     assert_equal Seek::Renderers::BlankRenderer, render.class
 
+    cb = Factory(:content_blob)
     cb.url = 'http://www.slideshare.net/mygrid/if-we-build-it-will-they-come-13652794'
     render = Seek::Renderers::RendererFactory.instance.renderer(cb)
     assert_equal Seek::Renderers::SlideshareRenderer, render.class
@@ -27,6 +28,47 @@ class RenderersTest < ActiveSupport::TestCase
     assert_equal Seek::Renderers::TextRenderer, factory.renderer(Factory(:txt_content_blob)).class
     assert_equal Seek::Renderers::ImageRenderer, factory.renderer(Factory(:image_content_blob)).class
     assert_equal Seek::Renderers::BlankRenderer, factory.renderer(Factory(:binary_content_blob)).class
+  end
+
+  test 'factory cache' do
+    cb = Factory(:content_blob)
+    cb.url = 'http://bbc.co.uk'
+    render = Seek::Renderers::RendererFactory.instance.renderer(cb)
+    assert_equal Seek::Renderers::BlankRenderer, render.class
+
+    cb.url = 'http://www.slideshare.net/mygrid/if-we-build-it-will-they-come-13652794'
+    render = Seek::Renderers::RendererFactory.instance.renderer(cb)
+    assert_equal Seek::Renderers::SlideshareRenderer, render.class
+   
+    cb.url = 'http://bbc.co.uk'
+    cb.save!
+    render = Seek::Renderers::RendererFactory.instance.renderer(cb)
+    assert_equal Seek::Renderers::BlankRenderer, render.class
+   
+    cb.url = 'http://www.slideshare.net/mygrid/if-we-build-it-will-they-come-13652794'
+    cb.save!
+    render = Seek::Renderers::RendererFactory.instance.renderer(cb)
+    assert_equal Seek::Renderers::SlideshareRenderer, render.class
+    
+    # Tests with content blob having no content (cache key is different currently)
+    cb = Factory(:url_content_blob)
+    cb.url = 'http://bbc.co.uk'
+    render = Seek::Renderers::RendererFactory.instance.renderer(cb)
+    assert_equal Seek::Renderers::BlankRenderer, render.class
+
+    cb.url = 'http://www.slideshare.net/mygrid/if-we-build-it-will-they-come-13652794'
+    render = Seek::Renderers::RendererFactory.instance.renderer(cb)
+    assert_equal Seek::Renderers::SlideshareRenderer, render.class
+   
+    cb.url = 'http://bbc.co.uk'
+    cb.save!
+    render = Seek::Renderers::RendererFactory.instance.renderer(cb)
+    assert_equal Seek::Renderers::BlankRenderer, render.class
+   
+    cb.url = 'http://www.slideshare.net/mygrid/if-we-build-it-will-they-come-13652794'
+    cb.save!
+    render = Seek::Renderers::RendererFactory.instance.renderer(cb)
+    assert_equal Seek::Renderers::SlideshareRenderer, render.class
   end
 
   test 'blank renderer' do
@@ -161,7 +203,7 @@ class RenderersTest < ActiveSupport::TestCase
       urls.each do |url|
         stub_request(:head, url).to_timeout
         cb = Factory(:content_blob, url: url)
-        assert_equal "<iframe width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/#{code}\" frameborder=\"0\" allowfullscreen></iframe>",
+        assert_equal "<iframe width=\"560\" height=\"315\" src=\"https://www.youtube-nocookie.com/embed/#{code}\" frameborder=\"0\" allowfullscreen></iframe>",
                      Seek::Renderers::YoutubeRenderer.new(cb).render
       end
     end

@@ -26,6 +26,10 @@ module Seek
         fail 'needs to be implemented'
       end
 
+      def external_embed?
+        false
+      end
+
       # Render an entire HTML page
       def render_standalone
         render_template('content_blobs/view_content_frame',

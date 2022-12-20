@@ -72,11 +72,15 @@
 <%# Note: This seems to break if a page is generated from a POST request and the params contain non-ASCII characters -FB %>
 <%= debug(params.except(:utf8)) if Rails.env.development? %>
 
-<%= render partial: 'layouts/piwik' if Seek::Config.piwik_analytics_enabled %>
-<%= analytics_init if Seek::Config.google_analytics_enabled %>
-<% if (Seek::Config.google_analytics_enabled && Seek::Config.google_analytics_tracking_notice) ||
-  (Seek::Config.piwik_analytics_enabled && Seek::Config.piwik_analytics_tracking_notice) %>
-  <%= render partial: 'layouts/tracking_notice'%>
+<% if cookie_consent.allow_tracking? %>
+  <%= render partial: 'layouts/piwik' if Seek::Config.piwik_analytics_enabled  %>
+  <% if Seek::Config.google_analytics_enabled %>
+    <script id="ga-script"/> <!-- so we can check if the ga-script is here -->
+    <%= analytics_init  %>
+  <% end %>
+<% end %>
+<% if !cookie_consent.given?%>
+  <%= render partial: 'layouts/cookies_banner'%>
 <% end %>
 </body>
 </html>
