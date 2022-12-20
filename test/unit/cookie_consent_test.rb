@@ -1,9 +1,17 @@
 require 'test_helper'
 
 class CookieConsentTest < ActiveSupport::TestCase
+
+  test 'permanent cookies' do
+    store = Rack::Test::CookieJar.new
+    refute store.permanent_called
+    CookieConsent.new(store)
+    assert store.permanent_called
+  end
+
   test 'should check if consent required?' do
     with_config_value(:require_cookie_consent, false) do
-      cookie_consent = CookieConsent.new({})
+      cookie_consent = CookieConsent.new(Rack::Test::CookieJar.new)
       refute cookie_consent.required?
       assert cookie_consent.given?
       assert cookie_consent.allow_embedding?
@@ -12,35 +20,39 @@ class CookieConsentTest < ActiveSupport::TestCase
     end
 
     with_config_value(:require_cookie_consent, true) do
-      cookie_consent = CookieConsent.new({})
+      cookie_consent = CookieConsent.new(Rack::Test::CookieJar.new)
       assert cookie_consent.required?
       refute cookie_consent.given?
       refute cookie_consent.allow_embedding?
       refute cookie_consent.allow_tracking?
       refute cookie_consent.allow_necessary?
 
-      cookie_consent = CookieConsent.new({ cookie_consent: 'embedding,tracking,necessary' })
+      cookie_consent = CookieConsent.new(Rack::Test::CookieJar.new)
+      cookie_consent.options = 'embedding,tracking,necessary'
       assert cookie_consent.required?
       assert cookie_consent.given?
       assert cookie_consent.allow_embedding?
       assert cookie_consent.allow_tracking?
       assert cookie_consent.allow_necessary?
 
-      cookie_consent = CookieConsent.new({ cookie_consent: 'embedding' })
+      cookie_consent = CookieConsent.new(Rack::Test::CookieJar.new)
+      cookie_consent.options = 'embedding'
       assert cookie_consent.required?
       assert cookie_consent.given?
       assert cookie_consent.allow_embedding?
       refute cookie_consent.allow_tracking?
       refute cookie_consent.allow_necessary?
 
-      cookie_consent = CookieConsent.new({ cookie_consent: 'banana,necessary' })
+      cookie_consent = CookieConsent.new(Rack::Test::CookieJar.new)
+      cookie_consent.options = 'banana,necessary'
       assert cookie_consent.required?
       assert cookie_consent.given?
       refute cookie_consent.allow_embedding?
       refute cookie_consent.allow_tracking?
       assert cookie_consent.allow_necessary?
 
-      cookie_consent = CookieConsent.new({ cookie_consent: 'banana,golf' })
+      cookie_consent = CookieConsent.new(Rack::Test::CookieJar.new)
+      cookie_consent.options = 'banana,golf'
       assert cookie_consent.required?
       refute cookie_consent.given?
       refute cookie_consent.allow_embedding?
@@ -51,8 +63,7 @@ class CookieConsentTest < ActiveSupport::TestCase
 
   test 'should get and set consent level, and validate level' do
     with_config_value(:require_cookie_consent, true) do
-      store = Rack::Test::CookieJar.new
-      cookie_consent = CookieConsent.new(store)
+      cookie_consent = CookieConsent.new(Rack::Test::CookieJar.new)
 
       assert_empty cookie_consent.options
       refute cookie_consent.given?
