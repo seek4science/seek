@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class CookieConsentIntegrationTest < ActionDispatch::IntegrationTest
+
   test 'cookie consent banner shown' do
     with_config_value(:require_cookie_consent, true) do
       get root_path
@@ -60,6 +61,8 @@ class CookieConsentIntegrationTest < ActionDispatch::IntegrationTest
       post cookies_consent_path, params: { allow: all_options }
 
       get root_path
+
+      assert cookies.get_cookie('cookie_consent').expires > 5.years.from_now
 
       cookie_consent = CookieConsent.new(cookies)
       assert_equal ['tracking', 'embedding', 'necessary'], cookie_consent.options

@@ -2,10 +2,10 @@ class CookieConsent
   OPTIONS = %w(tracking embedding necessary).freeze
 
   def initialize(store)
-    @store = store
+    @store = store.permanent
   end
 
-  def options= opts
+  def options=(opts)
     @store[:cookie_consent] = opts.split(',').select { |opt| OPTIONS.include?(opt) }.join(',')
   end
 
