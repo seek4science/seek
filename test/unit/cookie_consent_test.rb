@@ -5,7 +5,8 @@ class CookieConsentTest < ActiveSupport::TestCase
   test 'permanent cookies' do
     store = Rack::Test::CookieJar.new
     refute store.permanent_called
-    CookieConsent.new(store)
+    cookie_consent = CookieConsent.new(store)
+    cookie_consent.options = 'embedding,tracking,necessary'
     assert store.permanent_called
   end
 
