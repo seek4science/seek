@@ -92,6 +92,11 @@ Factory.define(:controlled_vocab_attribute_type, class: SampleAttributeType) do 
   f.base_type 'CV'
 end
 
+Factory.define(:list_attribute_type, class: SampleAttributeType) do |f|
+  f.sequence(:title) { |n| "List attribute type #{n}" }
+  f.base_type 'List'
+end
+
 # SampleControlledVocabTerm
 Factory.define(:sample_controlled_vocab_term) do |_f|
 end
