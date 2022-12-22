@@ -62,6 +62,22 @@ class CustomMetadataAttributeTest < ActiveSupport::TestCase
     refute attribute.validate_value?(1)
     refute attribute.validate_value?(1.2)
     refute attribute.validate_value?('30 Feb 2015')
+
+    attribute = CustomMetadataAttribute.new(title: 'apple', sample_attribute_type: Factory(:list_attribute_type),
+                                            sample_controlled_vocab: Factory(:apples_sample_controlled_vocab), description: "apple samples", label: "apple samples")
+
+    assert attribute.validate_value?(nil)
+    assert attribute.validate_value?('')
+    assert attribute.validate_value?([])
+    assert attribute.validate_value?(['Granny Smith'])
+
+    assert_raises(Seek::Samples::AttributeTypeHandlers::ListAttributeTypeHandler::NotArrayException) do
+      assert attribute.validate_value?('Granny Smith')
+    end
+
+    assert_raises(Seek::Samples::AttributeTypeHandlers::ListAttributeTypeHandler::InvalidControlledVocabularyException) do
+      assert attribute.validate_value?(['Peter','Granny Smith'])
+    end
   end
 
   test 'validate value with required' do
@@ -84,6 +100,14 @@ class CustomMetadataAttributeTest < ActiveSupport::TestCase
     assert attribute.validate_value?('9 Feb 2015')
     refute attribute.validate_value?(nil)
     refute attribute.validate_value?('')
+
+    attribute = CustomMetadataAttribute.new(title: 'apple', required:true,
+                                            sample_attribute_type: Factory(:list_attribute_type), sample_controlled_vocab: Factory(:apples_sample_controlled_vocab), description: "apple samples", label: "apple samples")
+    refute attribute.validate_value?(nil)
+    refute attribute.validate_value?('')
+    refute attribute.validate_value?([])
+    assert attribute.validate_value?(['Granny Smith'])
+
   end
 
   test 'accessor name' do
