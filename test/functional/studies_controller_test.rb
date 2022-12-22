@@ -829,6 +829,38 @@ class StudiesControllerTest < ActionController::TestCase
     assert_equal 'name(name)',cm.get_attribute_value('name(name)')
   end
 
+  test 'create a study with custom metadata cv type' do
+    cmt = Factory(:study_custom_metadata_type_with_cv_and_list_type)
+    login_as(Factory(:person))
+
+    assert_difference('Study.count') do
+      investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+      study_attributes = { title: 'test', investigation_id: investigation.id }
+      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id,
+                                                   data:{
+                                                     "apple name":"Newton's Apple",
+                                                     "apple list":['Granny Smith','Bramley'],
+                                                     "apple controlled vocab": 'Granny Smith'}}}
+
+      put :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
+    end
+
+    assert study=assigns(:study)
+
+    assert cm = study.custom_metadata
+
+    assert_equal cmt, cm.custom_metadata_type
+    assert_equal "Newton's Apple",cm.get_attribute_value('apple name')
+    assert_equal 'Granny Smith',cm.get_attribute_value('apple controlled vocab')
+    assert_equal ['Granny Smith','Bramley'],cm.get_attribute_value('apple list')
+
+    pp get :show, params:{id:study}
+    get :show, params:{id:study}
+    assert_response :success
+
+    assert_select 'p',text:/Granny Smith/, count:2
+  end
+
   test 'experimentalists only shown if set' do
     person = Factory(:person)
     login_as(person)
