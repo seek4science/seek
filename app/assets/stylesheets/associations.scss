@@ -30,3 +30,15 @@ a.remove-association {
   }
 }
 
+#cookie-banner {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  padding-top: 10px;
+  background-color: #eee;
+  z-index: 2;
+  
+  .btn {
+    margin-bottom: 5px;
+  }
+}

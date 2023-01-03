@@ -1,5 +1,8 @@
 module Seek
   module Samples
+
+    class FetchException < StandardError; end
+
     # Class to handle the extraction and temporary storage of samples from a data file
     class Extractor
       def initialize(data_file, sample_type = nil)
@@ -51,6 +54,8 @@ module Seek
       # Return the temporarily-stored samples if they exist (nil if not)
       def fetch
         self.class.decode(cache)
+      rescue ArgumentError=>exception
+        raise FetchException.new(exception.message)
       end
 
       private
@@ -67,8 +72,8 @@ module Seek
         if File.exist?(cache_path)
           Marshal.load(File.binread(cache_path))
         elsif block_given?
+          v = block.call
           File.open(cache_path, 'wb') do |f|
-            v = block.call
             f.write(Marshal.dump(v))
             v
           end

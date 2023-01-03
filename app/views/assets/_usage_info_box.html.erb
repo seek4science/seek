@@ -22,13 +22,13 @@
       <p>
         <strong>Last updated</strong>: <%= date_as_string(resource.updated_at, true) -%>
       </p>
+      <% if resource.updated_last_by && current_user&.person&.member_of?(resource.projects)-%>
+        <p>
+          <strong>Last updated by</strong>: <span class="updated_last_by"><%= link_to resource.updated_last_by.name, resource.updated_last_by -%></span>
+        </p>
+      <% end -%>
     <% end -%>
 
-    <% unless @last_used_before_now.blank? -%>
-      <p>
-        <strong>Last used</strong>: <%= date_as_string(@last_used_before_now, true) -%>
-      </p>
-    <% end -%>
   </div>
 
   <%# for items created before we started collecting logs %>

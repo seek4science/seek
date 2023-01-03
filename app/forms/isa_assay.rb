@@ -44,14 +44,15 @@ class IsaAssay
   def populate(id)
     @assay = Assay.find(id)
     @sample_type = @assay.sample_type
-    @input_sample_type_id = @sample_type.sample_attributes.detect(&:seek_sample_multi?).linked_sample_type_id
+    if @sample_type
+      @input_sample_type_id = @sample_type.sample_attributes.detect(&:seek_sample_multi?).linked_sample_type_id
+    end
   end
 
   private
 
   def validate_objects
     @assay.errors.each { |e| errors[:base] << "[Assay]: #{e.full_message}" } unless @assay.valid?
-    errors[:base] << '[SOP]: SOP is required' if @assay.sop_ids.blank?
 
     @sample_type.errors.full_messages.each { |e| errors[:base] << "[Sample type]: #{e}" } unless @sample_type.valid?
 

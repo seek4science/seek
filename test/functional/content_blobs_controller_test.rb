@@ -119,6 +119,25 @@ class ContentBlobsControllerTest < ActionController::TestCase
     suite.call('https://galaxy-instance.biz/banana/workflow/display_by_id?id=123')
   end
 
+  test 'examine url does not crash when examining galaxy-like URL' do
+    url = "https://training.galaxyproject.org/training-material/topics/metagenomics/tutorials/plasmid-metagenomics-nanopore/workflows/Workflow-plasmid-metagenomics-nanopore.ga"
+    stub_request(:any, url).to_return(
+      body: File.new("#{Rails.root}/test/fixtures/files/workflows/1-PreProcessing.ga"),
+      status: 200,
+      headers: { 'Content-Length' => 40296,
+                 'Content-Type' => 'text/plain',
+                 'Content-Disposition' => "attachment; filename=\"1-PreProcessing.ga\"; filename*=UTF-8''1-PreProcessing.ga"})
+
+    get :examine_url, xhr: true, params: { data_url: url }
+    assert_response :success
+    assert @response.body.include?('Remote File')
+    assert_equal 200, assigns(:info)[:code]
+    assert_equal 'file', assigns(:type)
+    assert_equal 'text/plain', assigns(:info)[:content_type]
+    assert_equal 40296, assigns(:info)[:file_size]
+    assert_equal '1-PreProcessing.ga', assigns(:info)[:file_name]
+  end
+
   test 'examine url forbidden' do
     # forbidden
     stub_request(:head, 'http://unauth.com/file.pdf').to_return(status: 403, headers: { 'Content-Type' => 'application/pdf' })

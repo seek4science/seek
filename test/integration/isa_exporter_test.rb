@@ -44,7 +44,7 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
 
   # 3
   test 'ISA-JSON content MUST validate against the ISA-JSON schemas' do
-    investigation = @@json['investigation']
+    investigation = @@json
     valid_isa_json?(JSON.generate(investigation))
   end
 
@@ -56,7 +56,7 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
   # 5
   test 'Dates SHOULD be supplied in the ISO8601 format “YYYY-MM-DD”' do
     # gather all date key-value pairs
-    investigation = @@json['investigation']
+    investigation = @@json
     values = nested_hash_value(investigation, 'submissionDate')
     values += nested_hash_value(investigation, 'publicReleaseDate')
     values += nested_hash_value(investigation, 'date')
@@ -65,7 +65,7 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
 
   # 8
   test 'Characteristic Categories declared should be referenced by at least one Characteristic' do
-    studies = @@json['investigation']['studies']
+    studies = @@json['studies']
     characteristics = nested_hash_value(studies, 'characteristics').flatten
     categories = nested_hash_value(studies, 'characteristicCategories').flatten
 
@@ -90,7 +90,7 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
 
   # 12
   test 'All Sources and Samples must be declared in the Study-level materials section' do
-    studies = @@json['investigation']['studies']
+    studies = @@json['studies']
     materials = studies.map { |s| s['materials']['sources'] + s['materials']['samples'] }
     materials = materials.flatten.map { |so| so['@id'] }
 
@@ -102,7 +102,7 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
 
   # 13
   test 'All other materials and DataFiles must be declared in the Assay-level material and data sections respectively' do
-    studies = @@json['investigation']['studies']
+    studies = @@json['studies']
     other_materials = []
     studies.each do |s|
       s['assays'].each do |a|
@@ -124,7 +124,7 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
   test 'Each Process in a Process Sequence MUST link with other Processes forwards or backwards, unless it is a starting or terminating Process' do
     # study > processSequence > previousProcess/nextProcess is always empty, since there is one process always
     # assay > processSequence >
-    studies = @@json['investigation']['studies']
+    studies = @@json['studies']
     studies.each do |s|
       assays_count = s['assays'].length
       s['assays'].each_with_index do |a, i|
@@ -139,7 +139,7 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
   # 15
   test 'Protocols declared SHOULD be referenced by at least one Protocol REF' do
     # Protocol REF is appeared in study > processSequence and study > assya > processSequence
-    studies = @@json['investigation']['studies']
+    studies = @@json['studies']
     protocols, protocol_refs = [], []
     studies.each do |s|
       protocols =
@@ -179,7 +179,7 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
   # 22
   test 'Sources and Samples declared SHOULD be referenced by at least one Process at the Study-level' do
     # sources and samples should be referenced in study > processSequence > inputs/outputs
-    studies = @@json['investigation']['studies']
+    studies = @@json['studies']
     materials, processes = [], []
     studies.each do |s|
       materials += s['materials']['sources'] + s['materials']['samples']
@@ -192,7 +192,7 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
 
   # 23
   test 'Samples, other materials, and DataFiles declared SHOULD be used in at least one Process at the Assay-level.' do
-    studies = @@json['investigation']['studies']
+    studies = @@json['studies']
     studies.each do |s|
       s['assays'].each do |a|
         other_materials = a['materials']['samples'] + a['materials']['otherMaterials'] + a['dataFiles']
@@ -207,7 +207,7 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
 
   # 24
   test 'Study and Assay filenames SHOULD be present' do
-    studies = @@json['investigation']['studies']
+    studies = @@json['studies']
     studies.each do |s|
       assert s['filename'].present?
       s['assays'].each { |a| assert a['filename'].present? }
@@ -216,7 +216,7 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
 
   # 25
   test 'Ontology Source References declared SHOULD be referenced by at least one Ontology Annotation' do
-    investigation = @@json['investigation']
+    investigation = @@json
     ontology_refs = investigation['ontologySourceReferences']
 
     ontologies = nested_hash_value(investigation, 'termSource')
@@ -319,7 +319,7 @@ def create_basic_isa_project
       :study,
       investigation: @investigation,
       sample_types: [source, sample_collection],
-      sop: Factory(:sop, policy: Factory(:public_policy))
+      sops: [Factory(:sop, policy: Factory(:public_policy))]
     )
 
   Factory(

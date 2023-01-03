@@ -94,6 +94,10 @@ module Seek
     def configure_exception_notification
       if exception_notification_enabled && Rails.env.production?
         SEEK::Application.config.middleware.use ExceptionNotification::Rack,
+                                                ignore_exceptions: ['ActionDispatch::Http::Parameters::ParseError',
+                                                                    'ActionController::InvalidAuthenticityToken',
+                                                                    'ActionController::UnknownHttpMethod',
+                                                                    'ActionController::BadRequest'] + ExceptionNotifier.ignored_exceptions,
                                                 email: {
                                                   sender_address: [noreply_sender],
                                                   email_prefix: "[ #{instance_name} ERROR ] ",

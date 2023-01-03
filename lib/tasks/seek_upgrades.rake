@@ -17,12 +17,19 @@ namespace :seek do
     db:seed:013_formats_controlled_vocab
     db:seed:014_data_controlled_vocab
     db:seed:015_isa_tags
+    db:seed:003_model_formats
+    db:seed:004_model_recommended_environments
     remove_orphaned_versions
-    seek:rebuild_workflow_internals
+    refresh_workflow_internals
     remove_scale_annotations
     remove_spreadsheet_annotations
+    remove_node_annotations
     convert_roles
     update_edam_annotation_attributes
+    remove_orphaned_project_subscriptions
+    remove_node_activity_logs
+    remove_node_asset_creators
+    set_default_sample_type_creators
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -39,6 +46,7 @@ namespace :seek do
     puts '... migrating database ...'
     Rake::Task['db:migrate'].invoke
     Rake::Task['tmp:clear'].invoke
+    Rails.cache.clear
 
     solr = Seek::Config.solr_enabled
     Seek::Config.solr_enabled = false
@@ -104,48 +112,12 @@ namespace :seek do
              Sop::Version, Workflow::Version]
     disable_authorization_checks do
       types.each do |type|
-        found = type.all.select { |v| v.parent.nil? }
+        found = type.where.missing(:parent)
         count += found.length
         found.each(&:destroy)
       end
     end
     puts "... finished removing #{count} orphaned versions"
-  end
-
-  task(convert_mysql_charset: [:environment]) do
-    if ActiveRecord::Base.connection.instance_values["config"][:adapter] == 'mysql2'
-      puts "Attempting MySQL database conversion"
-      # Get charset from database.yml, then find appropriate collation from mysql
-      db = ActiveRecord::Base.connection.current_database
-      charset = ActiveRecord::Base.connection.instance_values["config"][:encoding] || 'utf8mb4'
-      collation = "#{charset}_unicode_ci" # Prefer e.g. utf8_unicode_ci over utf8_general_ci
-      collation = ActiveRecord::Base.connection.execute("SHOW COLLATION WHERE Charset = '#{charset}' AND Collation = '#{collation}';").first&.first
-      unless collation
-        # Pick default collation for given charset if above collation not available
-        collation = ActiveRecord::Base.connection.execute("SHOW COLLATION WHERE Charset = '#{charset}' `Default` = 'Yes';").first&.first
-        unless collation
-          puts "Could not find collation for charset: #{charset}, aborting"
-          return
-        end
-      end
-
-      puts "Converting database: #{db} to character set: #{charset}, collation: #{collation}"
-
-      # Set database defaults
-      puts "Setting default charset and collation"
-      ActiveRecord::Base.connection.execute("ALTER DATABASE #{db} DEFAULT CHARACTER SET #{charset} DEFAULT COLLATE #{collation};")
-
-      # Set/convert each table
-      tables = ActiveRecord::Base.connection.exec_query("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES where TABLE_SCHEMA='#{db}' AND TABLE_COLLATION != '#{collation}';").rows.flatten
-      puts "#{tables.count} tables to convert"
-      tables.each do |table|
-        puts "  Converting #{table}"
-        ActiveRecord::Base.connection.execute("ALTER TABLE #{table} CONVERT TO CHARACTER SET #{charset} COLLATE #{collation};")
-      end
-      puts "Done"
-    else
-      puts "Database adapter is: #{ActiveRecord::Base.connection.instance_values["config"][:adapter]}, doing nothing"
-    end
   end
 
   task(remove_scale_annotations: [:environment]) do
@@ -164,6 +136,15 @@ namespace :seek do
     annotations.destroy_all
     AnnotationAttribute.where(name:'annotation').destroy_all
     puts "Removed #{count} spreadsheet related annotations" if count > 0
+  end
+
+  task(remove_node_annotations: [:environment]) do
+    annotations = Annotation.where(annotatable_type: 'Node')
+    count = annotations.count
+    values = TextValue.joins(:annotations).where(annotations: { annotatable_type: 'Node' })
+    values.select{|v| v.annotations.count == 1}.each(&:destroy)
+    annotations.destroy_all
+    puts "Removed #{count} Node related annotations" if count > 0
   end
 
   task(convert_roles: [:environment]) do
@@ -238,4 +219,62 @@ namespace :seek do
     end
   end
 
+  task(remove_orphaned_project_subscriptions: [:environment]) do
+    disable_authorization_checks do
+      ProjectSubscription.where.missing(:project).destroy_all
+    end
+  end
+
+  task(remove_node_activity_logs: [:environment]) do
+    logs = ActivityLog.where(activity_loggable_type: 'Node')
+    puts "Removing #{logs.count} Node related activity logs" if logs.count > 0
+    logs.delete_all
+  end
+
+  task(remove_node_asset_creators: [:environment]) do
+    creators = AssetsCreator.where(asset_type: 'Node')
+    puts "Removing #{creators.count} Node related asset creators" if creators.count > 0
+    creators.delete_all
+  end
+
+  task(refresh_workflow_internals: [:environment]) do |task|
+    ran = only_once(task) do
+      Rake::Task['seek:rebuild_workflow_internals'].invoke
+    end
+
+    puts "Skipping workflow internals rebuild, already done" unless ran
+  end
+
+  task(set_default_sample_type_creators: [:environment]) do
+    ran = only_once('set_default_sample_type_creators') do
+      puts "Setting default Sample Type creators"
+      count = 0
+      SampleType.all.each do |sample_type|
+        if sample_type.assets_creators.empty?
+          sample_type.assets_creators.build(creator: sample_type.contributor).save!
+          count += 1
+        end
+      end
+      puts "#{count} Sample Types updated"
+    end
+
+    puts "Skipping setting default Sample Type creators, as already set" unless ran
+  end
+
+  private
+
+  ##
+  # Runs the block for the given task only once.
+  # @param task [Rake::Task, String] The task or task name to remember.
+  # @return [Boolean] Whether the block executed or not.
+  def only_once(task, &block)
+    log_action = "UPGRADE-#{task}" # Will convert Rake::Task to string which is the task name (e.g. seek:some_task_name)
+    if ActivityLog.where(action: log_action).empty?
+      block.call
+      ActivityLog.create!(action: log_action, data: "#{Seek::Version::APP_VERSION} upgrade task")
+      true
+    else
+      false
+    end
+  end
 end

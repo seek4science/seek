@@ -9,25 +9,26 @@ en:
     ldap: 'LDAP'
     github: 'GitHub'
 
-  investigation: "Investigation"
-  study: "Study"
-  assay: "Assay"
+  investigation: &investigation "Investigation"
+  study: &study "Study"
+  assay: &assay "Assay"
   assays:
     assay: "Assay"
     experimental_assay: "Experimental assay"
     modelling_analysis:  "Modelling analysis"
-
+  
   isa_study: "ISA Study"  
   study_design: "Study Design"
   isa_assay: "ISA Assay"
 
-  data_file: "Data file"
+  data_file: &data_file "Data file"
   discipline: "Discipline"
-  document: "Document"
-  model: "Model"
-  sop: "SOP"
-  workflow: "Workflow"
+  document: &document "Document"
+  model: &model "Model"
+  sop: &sop "SOP"
+  workflow: &workflow "Workflow"
   workflow_class: "Workflow Type"
+  tool: "Tool"
   workflows:
     workflow: "Workflow"
     cwl_workflow: "CWL workflow"
@@ -38,27 +39,26 @@ en:
       files: 'Upload/Import Files'
       git: 'Import Git Repository'
       ro_crate: 'Upload/Import Workflow RO-Crate'
-  publication: "Publication"
-  presentation: "Presentation"
-  event: "Event"
-  file_template: "File Template"
+  publication: &publication "Publication"
+  
+  presentation: &presentation "Presentation"
+  event: &event "Event"
+  file_template: &file_template "File Template"
   placeholder: "Placeholder"
-  collection: "Collection"
-  collections:
-    info_text: "A collection is a group of items that are conceptually related to each other."
+  collection: &collection "Collection"
 
-  sample: "Sample"
-  sample_type: "Sample type"
-  template: "Template"
-  strain: "Strain"
+  sample: &sample "Sample"
+  sample_type: &sample_type "Sample type"
+  template: &template "Template"
+  strain: &strain "Strain"
   scale: "Scale"
-  organism: "Organism"
+  organism: &organism "Organism"
   human_disease: "Human Disease"
 
-  person: "Person"
-  project: "Project"
-  institution: "Institution"
-  programme: "Programme"
+  person: &person "Person"
+  project: &project "Project"
+  institution: &institution "Institution"
+  programme: &programme "Programme"
   avatar: "Avatar"
   private_asset: 'Hidden item'
 
@@ -147,6 +147,52 @@ en:
     topic_annotation_values: 'Topic annotations'
     operation_annotation_values: 'Operation annotations'
     contributor: 'Submitter'
+    # Mostly for associations in other models (has_one or has_many)
+    programme: *programme
+    project: *project
+    institution: *institution
+    person: *person
+    investigation: *investigation
+    study: *study
+    assay: *assay
+    data_file: *data_file
+    model: *model
+    sop: *sop
+    workflow: *workflow
+    publication: *publication
+    document: *document
+    file_template: *file_template
+    collection: *collection
+    presentation: *presentation
+    event: *event
+    sample: *sample
+    template: *template
+    sample_type: *sample_type
+    strain: *strain
+    organism: *organism
+
+    programmes: 'Programmes'
+    projects: 'Projects'
+    institutions: 'Institutions'
+    persons: 'Persons'
+    investigations: 'Investigations'
+    studys: 'Studies'
+    assays: 'Assays'
+    data_files: 'Data files'
+    models: 'Models'
+    sops: 'Sops'
+    workflows: 'Workflows'
+    publications: 'Publications'
+    documents: 'Documents'
+    file_templates: 'Files templates'
+    collections: 'Collections'
+    presentations: 'Presentations'
+    events: 'Events'
+    samples: 'Samples'
+    templates: 'Templates'
+    sample_types: 'Samples types'
+    strains: 'Strains'
+    organisms: 'Organisms'
 
   activerecord:
     errors:
@@ -158,6 +204,28 @@ en:
         body: "There were problems with the following fields:"
     models:
       workflow_class: Workflow Type
+      programme: *programme
+      project: *project
+      institution: *institution
+      person: *person
+      investigation: *investigation
+      study: *study
+      assay: *assay
+      data_file: *data_file
+      model: *model
+      sop: *sop
+      workflow: *workflow
+      publication: *publication
+      document: *document
+      file_template: *file_template
+      collection: *collection
+      presentation: *presentation
+      event: *event
+      sample: *sample
+      template: *template
+      sample_type: *sample_type
+      strain: *strain
+      organism: *organism
     attributes:
       person:
         title: "Full name"
@@ -217,3 +285,43 @@ you can choose to have a %{project} linked to a site managed %{programme} instea
 
   controlled_vocabs:
     add_new_term_disabled_reason: "You are unable to add new terms when linked to an Ontology"
+
+  info_text:
+    institution: "An Institution in SEEK is where someone is employed or works or a person's affiliation."
+    #person: "A Person (People) in SEEK is a registered user or a Profile of a person that has not registered with SEEK. A Person is someone who participates directly or indirectly in the scientific research described within SEEK."
+    programme: "A Programme is an umbrella to group one or more Projects."
+    project: "A Project represents research activities conducted by a group of one or more people."
+    investigation: "Investigation is a high level description of the research carried out within a particular Project."
+    study: "A Study is a particular hypothesis, which you are planning to test, using various techniques. A Study must belong to one Investigation and it can contain one or more Assays."
+    assay: "An Assay is in general the application of a process (SOP) that converts an input material or data (incoming samples) into a new material or data (outgoing samples). An Assay must belong to one Study."
+    model: "A Model is a file containing a computer model of a biological or biochemical network or process. A Model file must be associated with one or more Projects."
+    sop: "SOP stands for Standard Operating Procedure and it describes a process. A SOP file must be associated with one or more Projects. If associated with an Assay, the SOP describes the process to reproduce that Assay."
+    data_file: "Data files can be any file containing data in any format. A Data file must be associated with one or more Projects."
+    publication: "Existing publications can be registered in SEEK. A Publication must be associated with one or more Projects."
+    workflow: "A Computational Workflow describes the complex multi-step methods that lead to new outputs. A Workflow must be associated with one or more Projects."
+    document: "A Document contains information related to Projects. A Document must be associated with one or more Projects."
+    collection: "A Collection is a group of items registered in SEEK. A Collection must be associated with one or more Projects."
+    presentation: "Presentations associated with one or more Projects can be registered in SEEK."
+    event: "Events associated with one or more Projects, happening on specified dates and at a specific location, actual or virtual can be registered in SEEK."
+    sample: "​A Sample is an entity (material or data) that can be converted into a new item (material or data) via a process (SOP), physical or computational. Samples must be associated with one or more Projects."
+    sample_type: "A Sample Type is a form with samples' attributes needed to describe and create Samples in SEEK. A Sample type must be associated with one or more Projects."
+    template: "Templates are blueprints that can be reused and applied to Study and Assay for describing Samples. Templates must be associated with one or more Projects."
+    organism: "An Organism is identified by an entry in the NCBI ontology. An Organism must be associated with one or more Projects in order to be registered in SEEK."
+    file_template: "A File Template describes conforming DataFiles.For example, a File Template that is a Word document may describe conformant PNG images."
+
+  cookies:
+    notice: "%{instance_name} makes use of some necessary cookies to provide its core functionality."
+    analytics: Additionally, we make use of %{analytics} to discover how people are using %{instance_name} in order to help us improve the service.
+      To opt out of this, choose the "Allow only necessary cookies" or "Allow necessary cookies and embedded content" option.
+    necessary_cookies_btn: Only allow necessary cookies
+    all_cookies_btn: Allow all cookies
+    no_consent: No cookie consent provided
+    options:
+      tracking: "Cookies required for %{analytics}, to help %{instance_name} improve its service."
+      embedding: Allow embedded content from external websites, such as videos or slides.
+      necessary: Cookies necessary for %{instance_name} to function, for example to provide user-authentication and forgery protection.
+    buttons:
+      revoke: Revoke cookie consent
+      all: Allow all cookies
+      embedding: Allow necessary cookies and embedded content
+      necessary: Allow only necessary cookies

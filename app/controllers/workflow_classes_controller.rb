@@ -59,6 +59,6 @@ class WorkflowClassesController < ApplicationController
   end
 
   def workflow_class_params
-    params.require(:workflow_class).permit(:title, :alternate_name, :identifier, :url)
+    params.require(:workflow_class).permit(:title, :alternate_name, :identifier, :url, :logo_image)
   end
 end

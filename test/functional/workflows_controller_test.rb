@@ -1351,4 +1351,202 @@ class WorkflowsControllerTest < ActionController::TestCase
     json = JSON.parse(response.body)
     assert_equal Seek::BioSchema::Serializer.new(workflow.latest_version).json_representation, json
   end
+
+  test 'license should be overwritable by project default if not present' do
+    post :create_from_ro_crate, params: {
+      ro_crate: { data: fixture_file_upload('workflows/1-PreProcessing.crate.zip', 'application/zip') }
+    }
+
+    assert_response :success
+    assert_nil assigns(:workflow).license
+    assert_select '#license-select[data-can-overwrite="true"]', count: 1
+  end
+
+  test 'license should not be overwritable by project default if extracted from ro-crate metadata' do
+    post :create_from_ro_crate, params: {
+      ro_crate: { data: fixture_file_upload('workflows/author_test.crate.zip', 'application/zip') }
+    }
+
+    assert_response :success
+    assert_equal 'MIT', assigns(:workflow).license
+    assert_select '#license-select[data-can-overwrite="false"]', count: 1
+  end
+
+  test 'should display bio.tools links' do
+    workflow = Factory(:public_workflow, tools_attributes: [
+        { bio_tools_id: 'thing-doer', name: 'ThingDoer'},
+        { bio_tools_id: 'database-accessor', name: 'DatabaseAccessor'},
+        { bio_tools_id: 'ruby', name: 'Ruby'}
+      ])
+
+    with_config_value(:bio_tools_enabled, true) do
+      get :show, params: { id: workflow.id }
+    end
+
+    assert_select '#bio-tools-box', count: 1
+    assert_select '.bio-tools-link', count: 3
+    assert_select '.bio-tools-link a[href=?]', 'https://bio.tools/thing-doer'
+    assert_select '.bio-tools-link a[href=?]', 'https://bio.tools/database-accessor'
+    assert_select '.bio-tools-link a[href=?]', 'https://bio.tools/ruby'
+  end
+
+  test 'should not display tools box if no tools' do
+    workflow = Factory(:public_workflow)
+
+    with_config_value(:bio_tools_enabled, true) do
+      get :show, params: { id: workflow.id }
+    end
+
+    assert_select '#bio-tools-box', count: 0
+  end
+
+  test 'should not display tools box if feature disabled' do
+    workflow = Factory(:public_workflow, tools_attributes: [{ bio_tools_id: 'thing-doer', name: 'ThingDoer' }])
+
+    with_config_value(:bio_tools_enabled, false) do
+      get :show, params: { id: workflow.id }
+    end
+
+    assert_select '#bio-tools-box', count: 0
+  end
+
+  test 'should display bio.tools form if feature enabled' do
+    workflow = Factory(:public_workflow, tools_attributes: [{ bio_tools_id: 'thing-doer', name: 'ThingDoer' }])
+
+    login_as(workflow.contributor)
+
+    with_config_value(:bio_tools_enabled, true) do
+      get :edit, params: { id: workflow.id }
+    end
+
+    assert_response :success
+    assert_select '#associate-tools-panel', count: 1
+  end
+
+  test 'should not display bio.tools form if feature disabled' do
+    workflow = Factory(:public_workflow, tools_attributes: [{ bio_tools_id: 'thing-doer', name: 'ThingDoer' }])
+
+    login_as(workflow.contributor)
+
+    with_config_value(:bio_tools_enabled, false) do
+      get :edit, params: { id: workflow.id }
+    end
+
+    assert_response :success
+    assert_select '#associate-tools-panel', count: 0
+  end
+
+  test 'filter by tool' do
+    w1 = Factory(:public_workflow, tools_attributes: [
+      { bio_tools_id: 'thing-doer', name: 'ThingDoer'},
+      { bio_tools_id: 'database-accessor', name: 'DatabaseAccessor'},
+      { bio_tools_id: 'ruby', name: 'Ruby'} ])
+
+    w2 = Factory(:public_workflow, tools_attributes: [
+      { bio_tools_id: 'thing-doer', name: 'ThingDoer'},
+      { bio_tools_id: 'ruby', name: 'Ruby'} ])
+
+    w3 = Factory(:public_workflow, tools_attributes: [
+      { bio_tools_id: 'python', name: 'DatabaseAccessor'},
+      { bio_tools_id: 'ruby', name: 'Ruby'} ])
+
+
+    get :index, params: { filter: { tool: 'thing-doer' } }
+    assert_response :success
+    assert_equal 2, assigns(:workflows).length
+    assert_includes assigns(:workflows), w1
+    assert_includes assigns(:workflows), w2
+
+    get :index, params: { filter: { tool: ['thing-doer', 'ruby'] } }
+    assert_response :success
+    assert_equal 3, assigns(:workflows).length
+    assert_includes assigns(:workflows), w1
+    assert_includes assigns(:workflows), w2
+    assert_includes assigns(:workflows), w3
+
+    get :index, params: { filter: { tool: 'ruby' } }
+    assert_response :success
+    assert_equal 3, assigns(:workflows).length
+    assert_includes assigns(:workflows), w1
+    assert_includes assigns(:workflows), w2
+    assert_includes assigns(:workflows), w3
+
+    get :index, params: { filter: { tool: 'bananas' } }
+    assert_response :success
+    assert_equal 0, assigns(:workflows).length
+
+    get :index, params: { filter: { tool: ['bananas', 'database-accessor'] } }
+    assert_response :success
+    assert_equal 1, assigns(:workflows).length
+    assert_includes assigns(:workflows), w1
+
+    get :index, params: { filter: { tool: 'python' } }
+    assert_response :success
+    assert_equal 1, assigns(:workflows).length
+    assert_includes assigns(:workflows), w3
+  end
+
+  test 'should show workflow class logo for core type' do
+    workflow_class = Factory(:cwl_workflow_class)
+    workflow = Factory(:public_workflow, workflow_class: workflow_class)
+
+    get :show, params: { id: workflow }
+
+    assert_response :success
+    assert_select '.contribution-header .favouritable img[src=?]', '/assets/avatars/workflow_types/avatar-cwl.svg'
+  end
+
+  test 'should show default logo for user-added type without logo' do
+    workflow_class = Factory(:user_added_workflow_class)
+    workflow = Factory(:public_workflow, workflow_class: workflow_class)
+
+    get :show, params: { id: workflow }
+
+    assert_response :success
+    assert_select '.contribution-header .favouritable img[src=?]', '/assets/avatars/avatar-workflow.png'
+  end
+
+  test 'should show logo for user-added type with logo' do
+    workflow_class = Factory(:user_added_workflow_class_with_logo)
+    logo = workflow_class.avatar
+    workflow = Factory(:public_workflow, workflow_class: workflow_class)
+
+    get :show, params: { id: workflow }
+
+    assert_response :success
+    assert_select '.contribution-header .favouritable img[src=?]', workflow_class_avatar_path(workflow_class, logo, size: '120x120')
+  end
+
+  test 'should show logo for user-added type with logo for git workflow' do
+    workflow_class = Factory(:user_added_workflow_class_with_logo)
+    logo = workflow_class.avatar
+    workflow = Factory(:local_git_workflow, workflow_class: workflow_class, policy: Factory(:public_policy))
+
+    get :show, params: { id: workflow }
+
+    assert_response :success
+    assert_select '.contribution-header .favouritable img[src=?]', workflow_class_avatar_path(workflow_class, logo, size: '120x120')
+  end
+
+  test 'should show logos in list item titles on index page' do
+    core_type = Factory(:galaxy_workflow_class)
+    core_type_wf = Factory(:public_workflow, workflow_class: core_type)
+    core_type_git_wf = Factory(:local_git_workflow, workflow_class: core_type, policy: Factory(:public_policy))
+
+    user_type = Factory(:user_added_workflow_class)
+    user_type_wf = Factory(:public_workflow, workflow_class: user_type)
+    user_type_git_wf = Factory(:local_git_workflow, workflow_class: user_type, policy: Factory(:public_policy))
+
+    logo_type = Factory(:user_added_workflow_class_with_logo)
+    logo = logo_type.avatar
+    logo_wf = Factory(:public_workflow, workflow_class: logo_type)
+    logo_git_wf = Factory(:local_git_workflow, workflow_class: logo_type, policy: Factory(:public_policy))
+
+    get :index
+
+    assert_select '.list_item_title .favouritable img[src=?]', '/assets/avatars/workflow_types/avatar-galaxy.png', count: 2
+    assert_select '.list_item_title .favouritable img[src=?]', '/assets/avatars/avatar-workflow.png', count: 2
+    assert_select '.list_item_title .favouritable img[src=?]',
+                  workflow_class_avatar_path(logo_type, logo, size: '24x24'), count: 2
+  end
 end

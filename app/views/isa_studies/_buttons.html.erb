@@ -1,0 +1,42 @@
+
+<%
+add_row||="SampleAddNewRow()"
+paste_cb||="SamplePasteFromClipboard()"
+delete||="SampleSetAsDeleted()"
+save||="SampleSave()"
+permissions||="loadBatchPermission('sampleDynamicTable',this)"
+%>
+
+<div class="btn-group">
+  <input class="btn btn-default" type="button" value="Add row" onClick=<%=add_row%> />
+  <input class="btn btn-default" type="button" value="Paste From Clipboard" onClick=<%=paste_cb%> />
+  <input class="btn btn-default" type="button" value="Delete selected" onClick=<%=delete%> />
+  <input class="btn btn-default btn_set_permission" type="button" value="Batch sharing permissions" onClick=<%=permissions%> />
+  <button class="btn btn-primary dt-action" id="btn_save_assay_sample" onClick=<%=save%>>Save</button>
+</div>
+
+<script>
+  function loadBatchPermission(dtName, e){
+    const sample_ids = window[dtName].selectedSampleIds()
+
+    $j.ajax({
+      method: "GET",
+      url: "<%= batch_sharing_permission_preview_single_pages_path %>",
+      data: { sample_ids, single_page: true },
+      success: (res) => { 
+        if (res?.status == "unprocessable_entity"){
+          alert(res?.error)
+        } else {
+          $j('#change-batch-permission-modal').modal('show').focus();
+          $j('#change-batch-permission').html(res)
+          loadObjectInputs()
+        }
+      },
+      error: (e) => { 
+        console.log(e);
+        alert("An error occurred while fetching data from the server.")
+      }
+    });
+  
+  }
+</script>

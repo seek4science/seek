@@ -5,23 +5,29 @@ module Seek
         blob.url && is_youtube_url?(blob.url) && extract_video_code(blob.url)
       end
 
+      def external_embed?
+        true
+      end
+
       def render_content
         code = extract_video_code(blob.url)
-        "<iframe width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/#{code}\" frameborder=\"0\" allowfullscreen></iframe>"
+          
+        "<iframe width=\"560\" height=\"315\" src=\"https://www.youtube-nocookie.com/embed/#{code}\" frameborder=\"0\" allowfullscreen></iframe>"
       end
 
       def is_youtube_url?(url)
         parsed_url = URI.parse(url)
-        parsed_url.host.end_with?('youtube.com', 'youtu.be') && parsed_url.scheme =~ /(http|https)/
+        ['youtube.com', 'youtu.be', 'm.youtube.com', 'www.youtube.com'].include?(parsed_url.host) &&
+          ['http', 'https'].include?(parsed_url.scheme)
       rescue
         false
       end
 
       def extract_video_code(url)
-        match = url.match(/\?v\=([-a-zA-Z0-9]+)/) ||
-                url.match(/youtu\.be\/([-a-zA-Z0-9]+)/) ||
-                url.match(/\/v\/([-a-zA-Z0-9]+)/) ||
-                url.match(/\/embed\/([-a-zA-Z0-9]+)/)
+        match = url.match(/[\?\&]v[i]?\=([-_a-zA-Z0-9]+)/) ||
+                url.match(/youtu\.be\/([-_a-zA-Z0-9]+)/) ||
+                url.match(/\/v\/([-_a-zA-Z0-9]+)/) ||
+                url.match(/\/embed\/([-_a-zA-Z0-9]+)/)
         match[1] if match
       end
     end

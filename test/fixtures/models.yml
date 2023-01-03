@@ -5,7 +5,6 @@ teusink:
   title: Teusink
   description: Teusink from JWS Online
   recommended_environment: jws
-  last_used_at: 2009-04-03 11:09:18
   version: 2  
   projects: [sysmo_project]
   policy: policy_for_test_with_projects_institutions
@@ -15,7 +14,6 @@ teusink_with_project_without_gatekeeper:
   title: Teusink
   description: Teusink from JWS Online
   recommended_environment: jws
-  last_used_at: 2009-04-03 11:09:18
   version: 2
   projects: [moses_project]
   policy: sysmo_member_edit
@@ -25,7 +23,6 @@ teusink_with_space:
   title: Teusink with space
   description: Teusink from JWS Online
   recommended_environment: jws
-  last_used_at: 2009-04-03 11:09:18
   version: 1
   projects: [sysmo_project]
   policy: policy_for_test_with_projects_institutions
@@ -35,7 +32,6 @@ jws_model:
   title: Model in JWS Dat format
   description: Model in JWS Dat format
   recommended_environment: jws
-  last_used_at: 2009-04-03 11:09:18
   version: 1  
   projects: [sysmo_project]
   policy: fully_public_policy
@@ -45,7 +41,6 @@ francos_model:
   title: Francos model
   description: Problematic BioModels model that Franco gave as a test
   recommended_environment: jws
-  last_used_at: 2009-04-03 11:09:18
   version: 1  
   projects: [sysmo_project]
   policy: policy_for_test_with_projects_institutions  
@@ -55,7 +50,6 @@ non_sbml_xml:
   title: Non SBML XML
   description: An XML file that is not SBML
   recommended_environment: jws
-  last_used_at: 2009-04-02 11:09:18
   version: 1  
   projects: [other_project]
   policy: policy_for_test_with_projects_institutions   
@@ -65,7 +59,6 @@ invalid_sbml_xml:
   title: Invalid SBML XML
   description: An XML file that is not SBML
   recommended_environment: jws
-  last_used_at: 2009-04-02 11:09:18
   version: 1  
   projects: [other_project]
   policy: policy_for_test_with_projects_institutions   
@@ -75,7 +68,6 @@ non_jws_dat:
   title: Non JWS Online Dat file
   description: An Dat file that is not JWS Online format
   recommended_environment: jws
-  last_used_at: 2009-04-02 11:09:18
   version: 1  
   projects: [other_project]
   policy: policy_for_test_with_projects_institutions   
@@ -85,7 +77,6 @@ model_with_format_and_type:
   title: Model with format and type
   description: Teusink from JWS Online
   recommended_environment: jws
-  last_used_at: 2009-04-03 11:09:18
   model_type: SBML
   model_format: BioPAX
   version: 1
@@ -98,7 +89,6 @@ model_with_links_in_description:
   title: Links in my desc
   description: Visit my site http://www.google.com
   recommended_environment: jws
-  last_used_at: 2009-04-03 11:09:18
   version: 1
   projects: [sysmo_project]
   policy: sysmo_member_edit
@@ -108,7 +98,6 @@ model_with_different_owner:
   title: Model with different Owner
   description: Visit my site http://www.google.com
   recommended_environment: jws
-  last_used_at: 2009-04-03 11:09:18
   version: 1
   projects: [other_project] # not linked to any project for now
   policy: fully_public_policy
@@ -117,7 +106,6 @@ model_with_no_contributor:
   title: Model with no contributor
   description: Visit my site http://www.google.com
   recommended_environment: jws
-  last_used_at: 2009-04-03 11:09:18
   version: 1
   projects: [sysmo_project]
   policy: sysmo_member_edit
@@ -126,7 +114,6 @@ model_jws_incompatible:
   title: A model that is neither JWS Dat or SBML
   description: It is actually a picture
   recommended_environment: jws
-  last_used_at: 2009-04-03 11:09:18
   version: 1
   projects: [sysmo_project]
   policy: sysmo_member_edit
@@ -135,7 +122,6 @@ private_model:
   title: Private model
   description: It is a private model
   recommended_environment: jws
-  last_used_at: 2009-04-03 11:09:18
   version: 1
   projects: [sysmo_project]
   policy: private_policy

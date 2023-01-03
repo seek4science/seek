@@ -196,6 +196,29 @@ class WorkflowTest < ActiveSupport::TestCase
     end
   end
 
+  test 'creates life monitor submission job on create if tests present for git workflow' do
+    workflow = nil
+    with_config_value(:life_monitor_enabled, true) do
+      assert_enqueued_with(job: LifeMonitorSubmissionJob) do
+        workflow = Factory(:ro_crate_git_workflow_with_tests, uuid: '86da0a30-d2cd-013a-a07d-000c29a94011',
+                           policy: Factory(:public_policy))
+        assert workflow.latest_git_version.has_tests?
+        assert workflow.can_download?(nil)
+      end
+
+      VCR.use_cassette('life_monitor/get_token') do
+        VCR.use_cassette('life_monitor/non_existing_workflow_get') do
+          VCR.use_cassette('life_monitor/submit_workflow') do
+            assert_nothing_raised do
+              User.current_user = workflow.contributor.user
+              LifeMonitorSubmissionJob.perform_now(workflow.latest_version)
+            end
+          end
+        end
+      end
+    end
+  end
+
   test 'does not create life monitor submission job if life monitor disabled' do
     with_config_value(:life_monitor_enabled, false) do
       assert_no_enqueued_jobs(only: LifeMonitorSubmissionJob) do
@@ -210,6 +233,16 @@ class WorkflowTest < ActiveSupport::TestCase
     with_config_value(:life_monitor_enabled, true) do
       assert_no_enqueued_jobs(only: LifeMonitorSubmissionJob) do
         workflow = Factory(:generated_galaxy_no_diagram_ro_crate_workflow, policy: Factory(:public_policy))
+        refute workflow.latest_version.has_tests?
+        assert workflow.can_download?(nil)
+      end
+    end
+  end
+
+  test 'does not create life monitor submission job if no tests in git workflow' do
+    with_config_value(:life_monitor_enabled, true) do
+      assert_no_enqueued_jobs(only: LifeMonitorSubmissionJob) do
+        workflow = Factory(:ro_crate_git_workflow, policy: Factory(:public_policy))
         refute workflow.latest_version.has_tests?
         assert workflow.can_download?(nil)
       end
@@ -339,6 +372,26 @@ class WorkflowTest < ActiveSupport::TestCase
     assert_equal :all_passing, v1.test_status
   end
 
+  test 'test_status is preserved when freezing git versions' do
+    workflow = Factory(:local_ro_crate_git_workflow_with_tests)
+
+    disable_authorization_checks { workflow.update_test_status(:all_passing) }
+    v1 = workflow.find_version(1)
+    v1.update_column(:mutable, true)
+    v1.reload
+    assert_equal :all_passing, v1.test_status
+    assert_equal :all_passing, workflow.reload.test_status
+    assert v1.mutable?
+
+    disable_authorization_checks do
+      v1.lock
+    end
+
+    refute v1.mutable?
+    assert_equal :all_passing, v1.test_status
+    assert_equal :all_passing, workflow.reload.test_status
+  end
+
   test 'update test status for git versioned workflows' do
     # Default latest version
     workflow = Factory(:local_ro_crate_git_workflow, test_status: nil)
@@ -375,6 +428,50 @@ class WorkflowTest < ActiveSupport::TestCase
     assert_nil workflow.reload.test_status
     assert_equal :all_failing, v1.reload.test_status
     assert_nil v2.reload.test_status
+  end
+
+  test 'updating test status does not trigger life monitor submission job' do
+    workflow = Factory(:workflow_with_tests, policy: Factory(:public_policy), test_status: nil)
+    assert_nil workflow.reload.test_status
+    assert_nil workflow.latest_version.reload.test_status
+    with_config_value(:life_monitor_enabled, true) do
+      assert_no_enqueued_jobs(only: LifeMonitorSubmissionJob) do
+        disable_authorization_checks { workflow.update_test_status(:all_failing) }
+      end
+    end
+  end
+
+  test 'updating other workflow fields does trigger life monitor submission job' do
+    workflow = Factory(:workflow_with_tests, policy: Factory(:public_policy), test_status: nil)
+    assert_nil workflow.reload.test_status
+    assert_nil workflow.latest_version.reload.test_status
+    with_config_value(:life_monitor_enabled, true) do
+      assert_enqueued_jobs(1, only: LifeMonitorSubmissionJob) do
+        disable_authorization_checks { workflow.update!(title: 'something') }
+      end
+    end
+  end
+
+  test 'updating test status does not trigger life monitor submission job for git workflow' do
+    workflow = Factory(:local_ro_crate_git_workflow_with_tests, policy: Factory(:public_policy), test_status: nil)
+    assert_nil workflow.reload.test_status
+    assert_nil workflow.latest_version.reload.test_status
+    with_config_value(:life_monitor_enabled, true) do
+      assert_no_enqueued_jobs(only: LifeMonitorSubmissionJob) do
+        disable_authorization_checks { workflow.update_test_status(:all_failing) }
+      end
+    end
+  end
+
+  test 'updating other workflow fields does trigger life monitor submission job for git workflow' do
+    workflow = Factory(:local_ro_crate_git_workflow_with_tests, policy: Factory(:public_policy), test_status: nil)
+    assert_nil workflow.reload.test_status
+    assert_nil workflow.latest_version.reload.test_status
+    with_config_value(:life_monitor_enabled, true) do
+      assert_enqueued_jobs(1, only: LifeMonitorSubmissionJob) do
+        disable_authorization_checks { workflow.update!(title: 'something') }
+      end
+    end
   end
 
   test 'changing main workflow path refreshes internals structure' do
@@ -611,5 +708,50 @@ class WorkflowTest < ActiveSupport::TestCase
     assert wf.respond_to?(:operation_annotations)
     refute wf.respond_to?(:data_format_annotations)
     refute wf.respond_to?(:data_type_annotations)
+  end
+
+  test 'associate tools with workflow' do
+    wf = Factory(:workflow)
+
+    assert_difference('BioToolsLink.count', 3) do
+      wf.tools_attributes = [
+        { bio_tools_id: 'thing-doer', name: 'ThingDoer'},
+        { bio_tools_id: 'database-accessor', name: 'DatabaseAccessor'},
+        { bio_tools_id: 'ruby', name: 'Ruby'}
+      ]
+
+      disable_authorization_checks { wf.save! }
+      assert_equal %w[database-accessor ruby thing-doer],
+                   wf.bio_tools_links.pluck(:bio_tools_id).sort
+    end
+  end
+
+  test 'associating tools with workflow does not create duplicate annotation records' do
+    wf = Factory(:workflow)
+    disable_authorization_checks do
+      wf.tools_attributes = [
+        { bio_tools_id: 'thing-doer', name: 'ThingDoer'},
+        { bio_tools_id: 'database-accessor', name: 'DatabaseAccessor'},
+        { bio_tools_id: 'python', name: 'Python'},
+        { bio_tools_id: 'ruby', name: 'Ruby'}
+      ]
+      wf.save!
+    end
+    thing_doer = wf.bio_tools_links.where(bio_tools_id: 'thing-doer').first
+    orig_id = thing_doer.id
+
+    assert_difference('BioToolsLink.count', -1, 'should have removed redundant annotation') do
+      wf.tools_attributes = [
+        { bio_tools_id: 'thing-doer', name: 'ThingDoer!!!'},
+        { bio_tools_id: 'database-accessor', name: 'DatabaseAccessor'},
+        { bio_tools_id: 'javascript', name: 'JavaScript'}
+      ]
+
+      disable_authorization_checks { wf.save! }
+      assert_includes wf.bio_tools_link_ids, orig_id
+      assert_equal 'ThingDoer!!!', thing_doer.reload.name, 'Should update name of tool'
+      assert_equal %w[database-accessor javascript thing-doer],
+                   wf.bio_tools_links.pluck(:bio_tools_id).sort
+    end
   end
 end

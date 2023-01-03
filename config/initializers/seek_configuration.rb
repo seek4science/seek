@@ -45,6 +45,7 @@ def load_seek_config_defaults!
   Seek::Config.default :external_search_enabled, true
   Seek::Config.default :project_single_page_enabled, false
   Seek::Config.default :project_single_page_advanced_enabled, false
+  Seek::Config.default :project_single_page_folders_enabled, false
   Seek::Config.default :sample_type_template_enabled, false
   Seek::Config.default :project_browser_enabled,false
   Seek::Config.default :experimental_features_enabled,false
@@ -251,7 +252,9 @@ def load_seek_config_defaults!
   Seek::Config.default :sorting, {}
 
   Seek::Config.default :life_monitor_enabled, false
+  Seek::Config.default :life_monitor_url, 'https://api.lifemonitor.eu/'
   Seek::Config.default :git_support_enabled, false
+  Seek::Config.default :bio_tools_enabled, false
 
   load_seek_testing_defaults! if Rails.env.test?
 end

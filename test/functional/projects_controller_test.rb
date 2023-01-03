@@ -260,9 +260,10 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_redirected_to projects_path
   end
 
-  def test_non_admin_should_not_destroy_project
+  test 'cannot destroy if not admin or project admin' do
     login_as(:aaron)
     project = projects(:four)
+    refute project.can_delete?
     get :show, params: { id: project.id }
     assert_select 'span.icon', text: /Delete #{I18n.t('project')}/, count: 0
     assert_select 'span.disabled_icon', text: /Delete #{I18n.t('project')}/, count: 0
@@ -270,6 +271,7 @@ class ProjectsControllerTest < ActionController::TestCase
       delete :destroy, params: { id: project }
     end
     refute_nil flash[:error]
+    assert_redirected_to :root
   end
 
   test 'can destroy project if it contains people' do
@@ -283,6 +285,9 @@ class ProjectsControllerTest < ActionController::TestCase
 
     assert project.can_delete?
 
+    get :show, params: { id: project }
+    assert_select '#buttons a', text: /Delete #{I18n.t('project')}/i, count: 1
+
     assert_difference('Project.count', -1) do
       assert_difference('GroupMembership.count', -1) do
         assert_no_difference('Person.count') do
@@ -292,7 +297,32 @@ class ProjectsControllerTest < ActionController::TestCase
         end
       end
     end
+    assert_nil flash[:error]
+    assert_redirected_to projects_path
+  end
 
+  test 'can destroy project as project administrator' do
+    person = Factory(:project_administrator)
+    project = person.projects.first
+
+    login_as(person)
+
+    assert project.can_delete?
+
+    get :show, params: { id: project }
+    assert_select '#buttons a', text: /Delete #{I18n.t('project')}/i, count: 1
+
+    assert_difference('Project.count', -1) do
+      assert_difference('GroupMembership.count', -1) do
+        assert_no_difference('Person.count') do
+          assert_difference('WorkGroup.count',-1) do
+            delete :destroy, params: { id: project }
+          end
+        end
+      end
+    end
+    assert_nil flash[:error]
+    assert_redirected_to projects_path
   end
 
   test 'asset report with stuff in it can be accessed' do
@@ -1758,7 +1788,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
   test 'guided create with administered programmes as admin' do
     person = Factory(:programme_administrator)
-    managed_prog = Factory(:programme, title:'THE MANAGED ONE')
+    managed_prog = Factory(:programme, title: 'THE MANAGED ONE')
     person_prog = person.programmes.first
     another_prog = Factory(:programme)
     admin = Factory(:admin)
@@ -1770,13 +1800,40 @@ class ProjectsControllerTest < ActionController::TestCase
       get :guided_create
     end
     assert_response :success
-    assert_select 'input#managed_programme', count:0
+    assert_select 'input#managed_programme', count: 0
     assert_select 'select#programme_id' do
-      assert_select 'option',count:2
-      assert_select 'option',value:managed_prog.id,text:managed_prog.title
-      assert_select 'option',value:admin_prog.id,text:admin_prog.title
-      assert_select 'option',value:person_prog.id,text:person_prog.title, count:0
-      assert_select 'option',value:another_prog.id,text:another_prog.title, count:0
+      assert_select 'option', count: 2
+      assert_select 'option', value: managed_prog.id, text: managed_prog.title
+      assert_select 'option', value: admin_prog.id, text: admin_prog.title
+      assert_select 'option', value: person_prog.id, text: person_prog.title, count: 0
+      assert_select 'option', value: another_prog.id, text: another_prog.title, count: 0
+    end
+  end
+
+  test 'guided create with programmes that allow user projects' do
+    person = Factory(:person)
+    closed_programme = Factory(:programme)
+    open_programme = Factory(:programme, open_for_projects:true)
+    login_as(person)
+    assert Seek::Config.programme_user_creation_enabled # config allows creation of Programmes
+
+    # don't show if disabled
+    with_config_value(:programmes_open_for_projects_enabled, false) do
+      get :guided_create
+      assert_response :success
+      assert_select 'select#programme_id', count: 0
+      assert_select 'input#programme_title', count: 1
+    end
+
+    with_config_value(:programmes_open_for_projects_enabled, true) do
+      get :guided_create
+      assert_response :success
+      assert_select 'select#programme_id' do
+        assert_select 'option', count: 1
+        assert_select 'option', value: open_programme.id, text: open_programme.title
+        assert_select 'option', value: closed_programme.id, text: closed_programme.title, count: 0
+      end
+      assert_select 'input#programme_title', count: 1
     end
   end
 
@@ -1954,6 +2011,36 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'request create project as admin but no programme' do
+    person = Factory(:admin)
+
+    institution = Factory(:institution)
+    login_as(person)
+    with_config_value(:managed_programme_id, nil) do
+      params = {
+        project: { title: 'The Project',description:'description',web_page:'web_page'},
+        institution: {id: institution.id}
+      }
+      assert_enqueued_emails(0) do
+        assert_difference('ProjectCreationMessageLog.count',1) do
+          with_config_value(:programmes_enabled, false) do
+            post :request_create, params: params
+          end
+        end
+      end
+      log = ProjectCreationMessageLog.last
+      assert_redirected_to administer_create_project_request_projects_path(message_log_id:log.id)
+
+      details = log.parsed_details
+      assert_equal institution.title, details.institution.title
+      assert_equal institution.id, details.institution.id
+      assert_equal institution.country, details.institution.country
+
+      assert_equal 'description', details.project.description
+      assert_equal 'The Project', details.project.title
+    end
+  end
+
   test 'request create project with new programme and institution' do
     Factory(:admin)
     person = Factory(:person_not_in_project)
@@ -2045,6 +2132,18 @@ class ProjectsControllerTest < ActionController::TestCase
     log = ProjectMembershipMessageLog.log_request(sender:Factory(:person), project:project, institution:institution, comments: 'some comments')
     get :administer_join_request, params:{id:project.id,message_log_id:log.id}
     assert_response :success
+  end
+
+  test 'administer join request, message deleted' do
+    person = Factory(:project_administrator)
+    project = person.projects.first
+    login_as(person)
+
+    id = (MessageLog.last&.id || 0) + 1
+    get :administer_join_request, params:{id:project.id,message_log_id: id}
+    assert_redirected_to :root
+    refute_nil flash[:error]
+    assert_match /deleted/i, flash[:error]
   end
 
   test 'administer join request with new institution that was since created' do
@@ -2326,6 +2425,16 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test 'administer create project request, message log deleted' do
+    person = Factory(:admin)
+    login_as(person)
+    id = (MessageLog.last&.id || 0) + 1
+    get :administer_create_project_request, params:{message_log_id:id}
+    assert_redirected_to :root
+    refute_nil flash[:error]
+    assert_match /deleted/i, flash[:error]
+  end
+
   test 'administer create request project with institution already created' do
     # when a new institution when requested, but it has then been created before the request is handled
     person = Factory(:admin)
@@ -2496,6 +2605,114 @@ class ProjectsControllerTest < ActionController::TestCase
           assert_no_difference('Institution.count') do
             assert_no_difference('GroupMembership.count') do
               post :respond_create_project_request, params:params
+            end
+          end
+        end
+      end
+    end
+
+    assert_redirected_to :root
+    refute_nil flash[:error]
+
+    log.reload
+    refute log.responded?
+  end
+
+  test 'respond create project request - programme open for projects (enabled)' do
+    person = Factory(:person)
+    login_as(person)
+    project = Project.new(title:'new project',web_page:'my new project')
+    programme = Factory(:programme, open_for_projects: true)
+    institution = Institution.new({title:'institution', country:'DE'})
+    log = ProjectCreationMessageLog.log_request(sender: person, programme:programme, project:project, institution:institution)
+    params = {
+      message_log_id:log.id,
+      accept_request: '1',
+      project:{
+        title:'new project',
+        web_page:'http://proj.org'
+      },
+      programme:{
+        id: programme.id
+      },
+      institution:{
+        title:'new institution',
+        city:'Paris',
+        country:'FR'
+      }
+    }
+
+    assert_no_enqueued_emails do
+      assert_no_difference('Programme.count') do
+        assert_difference('Project.count') do
+          assert_difference('Institution.count') do
+            assert_difference('GroupMembership.count') do
+              assert_difference('WorkGroup.count') do
+                with_config_value(:programmes_open_for_projects_enabled, true) do
+                  post :respond_create_project_request, params:params
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+
+    project = Project.last
+    institution = Institution.last
+    programme.reload
+
+    assert_equal 'new project', project.title
+    assert_equal 'new institution', institution.title
+
+    assert_includes programme.projects,project
+    assert_includes project.people, person
+    assert_includes project.institutions, institution
+    refute_includes programme.programme_administrators, person
+    assert_includes project.project_administrators, person
+
+    assert_equal WorkGroup.last, person.work_groups.last
+    assert_equal institution, person.work_groups.last.institution
+    assert_equal project, person.work_groups.last.project
+
+    assert_redirected_to(project_path(project))
+
+  end
+
+  test 'respond create project request - programme open for projects (disabled)' do
+    person = Factory(:person)
+    login_as(person)
+    project = Project.new(title:'new project',web_page:'my new project')
+    programme = Factory(:programme, open_for_projects: true)
+    institution = Institution.new({title:'institution', country:'DE'})
+    log = ProjectCreationMessageLog.log_request(sender: person, programme:programme, project:project, institution:institution)
+    params = {
+      message_log_id:log.id,
+      accept_request: '1',
+      project:{
+        title:'new project',
+        web_page:'http://proj.org'
+      },
+      programme:{
+        id: programme.id
+      },
+      institution:{
+        title:'new institution',
+        city:'Paris',
+        country:'FR'
+      }
+    }
+
+    assert_no_enqueued_emails do
+      assert_no_difference('Programme.count') do
+        assert_no_difference('Project.count') do
+          assert_no_difference('Institution.count') do
+            assert_no_difference('GroupMembership.count') do
+              assert_no_difference('WorkGroup.count') do
+                with_config_value(:programmes_open_for_projects_enabled, false) do
+                  post :respond_create_project_request, params:params
+                end
+              end
             end
           end
         end
@@ -2920,6 +3137,68 @@ class ProjectsControllerTest < ActionController::TestCase
 
   end
 
+  test 'respond create project request - programmes disabled' do
+    person = Factory(:admin)
+    login_as(person)
+    project = Project.new(title:'new project',web_page:'my new project')
+    institution = Institution.new({title:'institution', country:'DE'})
+    requester = Factory(:person)
+    log = ProjectCreationMessageLog.log_request(sender:requester, project:project, institution:institution)
+    params = {
+      message_log_id:log.id,
+      accept_request: '1',
+      project:{
+        title:'new project updated',
+        web_page:'http://proj.org'
+      },
+      institution:{
+        title:'new institution updated',
+        city:'Paris',
+        country:'FR'
+      }
+    }
+
+    assert_enqueued_emails(2) do
+      assert_no_difference('Programme.count') do
+        assert_difference('Project.count') do
+          assert_difference('Institution.count') do
+            assert_difference('GroupMembership.count') do
+              assert_difference('WorkGroup.count') do
+                with_config_value(:programmes_enabled, false) do
+                  post :respond_create_project_request, params:params
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+
+    project = Project.last
+    institution = Institution.last
+    requester.reload
+
+    assert_redirected_to(project_path(project))
+    assert_equal "Request accepted and #{log.sender.name} added to Project and notified",flash[:notice]
+
+    assert_equal 'new project updated', project.title
+    assert_nil project.programme
+    assert_equal 'new institution updated', institution.title
+
+    assert_includes project.people, requester
+    assert_includes project.institutions, institution
+    assert_includes project.project_administrators, requester
+
+    assert_equal WorkGroup.last, requester.work_groups.last
+    assert_equal institution, requester.work_groups.last.institution
+    assert_equal project, requester.work_groups.last.project
+
+    log.reload
+    assert log.responded?
+    assert_equal 'Accepted',log.response
+
+  end
+
   test 'project join request' do
     person1 = Factory(:project_administrator)
     person2 = Factory(:project_administrator)
@@ -3270,6 +3549,44 @@ class ProjectsControllerTest < ActionController::TestCase
                   order_investigations_project_path(project), count: 1
   end
 
+  test 'ordering menu item hidden if isa disabled' do
+
+    person = Factory(:admin)
+    login_as(person)
+    project_with_invs = Factory(:project)
+    project_with_invs.investigations += [Factory(:investigation, contributor:person)]
+    project_with_invs.investigations += [Factory(:investigation, contributor:person)]
+
+    project_without_invs = Factory(:project)
+    person.add_to_project_and_institution(project_without_invs, person.institutions.first)
+    person.save!
+    person.reload
+
+    with_config_value(:isa_enabled, true) do
+      get :show, params: { id: project_with_invs.id }
+      assert_response :success
+      assert_select 'a[href=?]',
+                    order_investigations_project_path(project_with_invs), count: 1
+
+      #shown but disabled
+      get :show, params: { id: project_without_invs.id }
+      assert_response :success
+      assert_select 'ul#item-admin-menu li span.disabled', text:/order investigations/i, count: 1
+    end
+
+    with_config_value(:isa_enabled, false) do
+      get :show, params: { id: project_with_invs.id }
+      assert_response :success
+      assert_select 'a[href=?]',
+                    order_investigations_project_path(project_with_invs), count: 0
+
+      get :show, params: { id: project_without_invs.id }
+      assert_response :success
+      assert_select 'ul#item-admin-menu li span.disabled', text:/order investigations/i, count: 0
+    end
+
+  end
+
   test 'ordering only by editor' do
     person = Factory(:admin)
     login_as(person)
@@ -3330,6 +3647,18 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_select 'div.panel div.panel-heading',text:/Annotated Properties/i, count:1
     assert_select 'div.panel div.panel-body div strong',text:/#{I18n.t('attributes.topic_annotation_values')}/, count:1
     assert_select 'div.panel div.panel-body a[href=?]','https://edamontology.github.io/edam-browser/#topic_3314',text:/Chemistry/, count:1
+  end
+
+  test 'request membership button disabled if membership already requested' do
+    person = Factory(:person)
+    project = Factory(:project)
+    ProjectMembershipMessageLog.log_request(sender: person, project: project, institution: Factory(:institution))
+
+    login_as(person)
+
+    get :show, params: { id: project.id }
+
+    assert_select 'a.btn[disabled=disabled]', text: 'Request membership', count: 1
   end
 
   private

@@ -327,6 +327,19 @@ class MessageLogTest < ActiveSupport::TestCase
     assert log.can_respond_project_creation_request?(admin)
     refute log.can_respond_project_creation_request?(prog_admin)
     refute log.can_respond_project_creation_request?(person)
+
+    # programme open to projects
+    programme = Factory(:programme, open_for_projects: true)
+    log = ProjectCreationMessageLog.log_request(sender: person, programme: programme,
+                                                project: project, institution: institution)
+    with_config_value(:programmes_open_for_projects_enabled, true) do
+      assert log.can_respond_project_creation_request?(person)
+    end
+
+    with_config_value(:programmes_open_for_projects_enabled, false) do
+      refute log.can_respond_project_creation_request?(person)
+    end
+
   end
 
   test 'handles legacy serialized fields' do

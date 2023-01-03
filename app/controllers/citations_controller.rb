@@ -1,5 +1,6 @@
 class CitationsController < ApplicationController
   before_action :set_citation_style
+  skip_forgery_protection only:[:fetch]
 
   def fetch
     respond_to do |format|

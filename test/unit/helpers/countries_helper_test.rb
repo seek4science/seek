@@ -20,6 +20,10 @@ class CountriesHelperTest < ActionView::TestCase
     assert_match /<a href="\/countries\/DE">Germany<\/a>/,text
     assert_match /famfamfam_flags\/de.png/, text
 
+    text = country_text_or_not_specified('Russian Federation')
+    assert_match /<a href="\/countries\/RU">Russian Federation<\/a>/,text
+    assert_match /famfamfam_flags\/ru.png/, text
+
     text = country_text_or_not_specified(nil)
     assert_match />Not specified<\/span>/,text
 

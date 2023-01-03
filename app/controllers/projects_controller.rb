@@ -14,8 +14,8 @@ class ProjectsController < ApplicationController
                                         :administer_create_project_request, :respond_create_project_request,
                                         :project_join_requests, :project_creation_requests, :typeahead]
 
-  before_action :find_requested_item, only: %i[show admin edit update destroy asset_report admin_members
-                                               populate populate_from_spreadsheet
+  before_action :find_requested_item, only: %i[show admin edit update destroy admin_members
+                                               asset_report populate populate_from_spreadsheet
                                                admin_member_roles update_members storage_report
                                                overview administer_join_request respond_join_request]
 
@@ -23,10 +23,9 @@ class ProjectsController < ApplicationController
 
   before_action :find_assets, only: [:index]
   before_action :auth_to_create, only: %i[new create,:administer_create_project_request, :respond_create_project_request]
-  before_action :is_user_admin_auth, only: %i[destroy]
   before_action :editable_by_user, only: %i[edit update]
   before_action :check_investigations_are_for_this_project, only: %i[update]
-  before_action :administerable_by_user, only: %i[admin admin_members admin_member_roles update_members storage_report administer_join_request respond_join_request populate populate_from_spreadsheet]
+  before_action :administerable_by_user, only: %i[admin admin_members admin_member_roles destroy update_members storage_report administer_join_request respond_join_request populate populate_from_spreadsheet]
 
   before_action :member_of_this_project, only: [:asset_report], unless: :admin_logged_in?
 
@@ -187,7 +186,7 @@ class ProjectsController < ApplicationController
 
       @programme = Programme.find(params[:programme_id])
       raise "no #{t('programme')} can be found" if @programme.nil?
-      if @programme.can_manage?
+      if @programme.can_associate_projects?
         log = ProjectCreationMessageLog.log_request(sender:current_person, programme:@programme, project:@project, institution:@institution)
       elsif @programme.site_managed?
         log = ProjectCreationMessageLog.log_request(sender:current_person, programme:@programme, project:@project, institution:@institution)
@@ -217,7 +216,7 @@ class ProjectsController < ApplicationController
       flash.now[:notice]="Thank you, your request for a new #{t('project')} has been sent"
     end
 
-    if (@programme && @programme.can_manage?) || User.admin_logged_in?
+    if (@programme.nil? && admin_logged_in?) || @programme&.can_associate_projects?
       redirect_to administer_create_project_request_projects_path(message_log_id: log.id)
     else
       respond_to do |format|
@@ -570,7 +569,7 @@ class ProjectsController < ApplicationController
         validate_error_msg << "The #{t('institution')} is invalid, #{@institution.errors.full_messages.join(', ')}"
       end
 
-      unless Institution.can_create?
+      unless @programme&.allows_user_projects? || Institution.can_create?
         validate_error_msg << "The #{t('institution')} cannot be created, as you do not have access rights"
       end
 
@@ -582,7 +581,10 @@ class ProjectsController < ApplicationController
 
       if validate_error_msg.blank?
         @project.save!
-        @institution.save!
+
+        # they are soon to become a project administrator, with permission to create
+        disable_authorization_checks { @institution.save! }
+
         requester.add_to_project_and_institution(@project, @institution)
         requester.is_project_administrator = true,@project
         requester.is_programme_administrator = true, @programme if make_programme_admin
@@ -682,7 +684,7 @@ class ProjectsController < ApplicationController
 
     if params[:project][:programme_id].present?
       prog = Programme.find_by_id(params[:project][:programme_id])
-      if prog&.can_manage? || prog&.allows_user_projects?
+      if prog&.can_associate_projects?
         permitted_params += [:programme_id]
       end
     end
@@ -782,10 +784,13 @@ class ProjectsController < ApplicationController
   def validate_message_log_for_join
     @message_log = ProjectMembershipMessageLog.find_by_id(params[:message_log_id])
 
-    error_msg ||= "message log not found" unless @message_log
-    error_msg ||= ("message log doesn't match #{t('project')}" if @message_log.subject != @project)
-    error_msg ||= ("incorrect type of message log" unless @message_log.project_membership_request?)
-    error_msg ||= ("message has already been responded to" if @message_log.responded?)
+    if @message_log
+      error_msg ||= ("message log doesn't match #{t('project')}" if @message_log.subject != @project)
+      error_msg ||= ("incorrect type of message log" unless @message_log.project_membership_request?)
+      error_msg ||= ("message has already been responded to" if @message_log.responded?)
+    else
+      error_msg = "message cannot be found, it is possible it has been deleted by another administrator"
+    end
 
     if error_msg
       error(error_msg, error_msg)
@@ -795,10 +800,13 @@ class ProjectsController < ApplicationController
 
   def validate_message_log_for_create
     @message_log = ProjectCreationMessageLog.find_by_id(params[:message_log_id])
-    error_msg ||= "you do not have permission to respond to this request" unless @message_log.can_respond_project_creation_request?(current_user)
-    error_msg ||= "message log not found" unless @message_log
-    error_msg ||= ("incorrect type of message log" unless @message_log.project_creation_request?)
-    error_msg ||= ("message has already been responded to" if @message_log.responded?)
+    if @message_log
+      error_msg ||= "you do not have permission to respond to this request" unless @message_log.can_respond_project_creation_request?(current_user)
+      error_msg ||= ("incorrect type of message log" unless @message_log.project_creation_request?)
+      error_msg ||= ("message has already been responded to" if @message_log.responded?)
+    else
+      error_msg = "message cannot be found, it is possible it has been deleted by another administrator"
+    end
 
     if error_msg
       error(error_msg, error_msg)
@@ -836,7 +844,7 @@ class ProjectsController < ApplicationController
     if @programme.new_record?
       error_msg = "You need to be an administrator" unless User.admin_logged_in?
     else
-      error_msg = "No rights to administer #{t('programme')}" unless @programme.can_manage?
+      error_msg = "No rights to administer #{t('programme')}" unless @programme.can_associate_projects?
     end
 
     if error_msg

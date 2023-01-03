@@ -41,10 +41,6 @@ end
 
 puts "Seeded organisms"
 
-ActiveRecord::FixtureSet.create_fixtures(File.join(Rails.root, "config/default_data"), "recommended_model_environments")
-
-puts "Seeded recommended model environments"
-
 ActiveRecord::FixtureSet.create_fixtures(File.join(Rails.root, "config/default_data"), "assay_classes")
 
 puts "Seeded assay classes"

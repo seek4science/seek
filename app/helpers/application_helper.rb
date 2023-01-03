@@ -52,7 +52,7 @@ module ApplicationHelper
     js.empty? ? '' : javascript_include_tag(*js)
   end
 
-  def date_as_string(date, show_time_of_day = false, year_only_1st_jan = false)
+  def date_as_string(date, show_time_of_day = false, year_only_1st_jan = false, time_zone = nil)
     # for publications, if it is the first of jan, then it can be assumed it is just the year (unlikely have a publication on New Years Day)
 
     if date.to_s == nil
@@ -66,6 +66,12 @@ module ApplicationHelper
       else
         str = date.localtime.strftime("#{date.day.ordinalize} %b %Y")
         str = date.localtime.strftime("#{str} at %H:%M") if show_time_of_day
+        if time_zone.present?
+          date_in_tz = date.in_time_zone(time_zone)
+          tz_str = date_in_tz.strftime("#{date_in_tz.day.ordinalize} %b %Y")
+          tz_str = date_in_tz.strftime("#{tz_str} at %H:%M") if show_time_of_day
+          str += "\t(#{tz_str} (#{time_zone}))"
+        end
       end
     end
 
@@ -231,7 +237,7 @@ module ApplicationHelper
       res = mail_to(res) if options[:email]
       res = link_to(res, res, popup: true, target: :_blank) if options[:external_link]
       res = res + '&nbsp;' + flag_icon(text) if options[:flag]
-      res = '&nbsp;' + flag_icon(text) + link_to(res, country_path(CountryCodes.code(text))) if options[:link_as_country]
+
     end
     res.html_safe
   end
@@ -291,12 +297,12 @@ module ApplicationHelper
     resource = resource_for_controller
     if resource && resource.respond_to?(:title) && resource.title
       h(resource.title)
-    elsif PAGE_TITLES[controller_name]
+    elsif (page_title = get_page_title).present?
       title = ''
       if @parent_resource
         title << "#{h(@parent_resource.title)} - "
       end
-      t = PAGE_TITLES[controller_name]
+      t = page_title
       if t.is_a?(Hash)
         t = t[action_name] || t['*']
       end
@@ -506,18 +512,36 @@ module ApplicationHelper
     html
   end
 
-  PAGE_TITLES = { 'home' => 'Home', 'projects' => I18n.t('project').pluralize, 'institutions' => I18n.t('institution').pluralize,
-                  'people' => 'People', 'sessions' => 'Login', 'users' => { 'new' => 'Signup', '*' => 'Account' }, 'search' => 'Search',
-                  'assays' => I18n.t('assays.assay').pluralize.capitalize, 'sops' => I18n.t('sop').pluralize, 'models' => I18n.t('model').pluralize, 'data_files' => I18n.t('data_file').pluralize, 'documents' => 'Documents',
-                  'publications' => 'Publications', 'investigations' => I18n.t('investigation').pluralize, 'studies' => I18n.t('study').pluralize,
-                  'samples' => 'Samples', 'strains' => 'Strains', 'organisms' => 'Organisms', 'human_disease' => 'Human Diseases', 'biosamples' => 'Biosamples', 'sample_types' => 'Sample Types','templates' => 'Templates',
-                  'presentations' => I18n.t('presentation').pluralize, 'programmes' => I18n.t('programme').pluralize, 'events' => I18n.t('event').pluralize, 'help_documents' => 'Help' }.freeze
+  PAGE_TITLES = { 'home' => 'Home', 'sessions' => 'Login', 'users' => { 'new' => 'Signup', '*' => 'Account' },
+                  'search' => 'Search', 'biosamples' => 'Biosamples', 'help_documents' => 'Help' }.freeze
 
   def show_page_tab
     return 'overview' unless params.key?(:tab)
 
     params[:tab]
   end
+
+  def get_page_title
+    class_name = controller_name.classify
+
+    if PAGE_TITLES.key?(controller_name)
+      PAGE_TITLES[controller_name]
+    elsif Seek::Util.searchable_types.any? { |t| t.name == class_name }
+      I18n.t(class_name.underscore).pluralize
+    else
+      nil
+    end
+  end
+
+  def format_field_name(field_name)
+    return field_name unless displaying_single_page?
+
+    type = field_name.split('[')[0]
+    rest = '[' + field_name.split('[')[1]
+    # Converts study[other_creators] to isa_study[study][other_creators]
+    "isa_#{type}[#{type}]#{rest}"
+  end
+
 end
 
 class ApplicationFormBuilder < ActionView::Helpers::FormBuilder
@@ -527,3 +551,7 @@ class ApplicationFormBuilder < ActionView::Helpers::FormBuilder
 end
 
 ActionView::Base.default_form_builder = ApplicationFormBuilder
+
+def cookie_consent
+  CookieConsent.new(cookies)
+end

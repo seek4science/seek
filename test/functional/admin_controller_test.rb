@@ -520,4 +520,26 @@ class AdminControllerTest < ActionController::TestCase
     end
   end
 
+  test 'clear cache' do
+    Rails.cache.write('test-key', 'hello')
+    assert_equal 'hello', Rails.cache.fetch('test-key')
+
+    admin = Factory(:admin)
+    person = Factory(:project_administrator)
+
+    login_as(person)
+    post :clear_cache
+    assert_redirected_to :root
+    refute_nil flash[:error]
+    assert_nil flash[:notice]
+    assert_equal 'hello', Rails.cache.fetch('test-key')
+
+    login_as(admin)
+    post :clear_cache
+    assert_response :success
+    refute_nil flash[:notice]
+    assert_nil flash[:error]
+    assert_nil Rails.cache.fetch('test-key')
+  end
+
 end
