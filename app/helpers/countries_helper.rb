@@ -2,10 +2,8 @@ module CountriesHelper
   include ApplicationHelper
 
   def country_code(country)
-    if country.downcase == 'great britain'
+    if country.downcase == 'great britain' || %w(england wales scotland).include?(country.downcase)
       code = 'gb'
-    elsif %w(england wales scotland).include?(country.downcase)
-      code = country
     elsif country.length > 2
       code = CountryCodes.code(country)
     else
@@ -25,7 +23,12 @@ module CountriesHelper
           country = CountryCodes.country(CountryCodes.code(country))
         end
       end
-      text_or_not_specified(country,link_as_country:true)
+      code = country_code(country) unless country.nil?
+      text = text_or_not_specified(country)
+      if code.present? && CountryCodes.valid_code?(code)
+        text = '&nbsp;' + flag_icon(country) + link_to(text, country_path(code))
+      end
+      text.html_safe
     end
   end
 end

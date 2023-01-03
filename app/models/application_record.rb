@@ -142,6 +142,11 @@ class ApplicationRecord < ActiveRecord::Base
     false
   end
 
+  def contributor_credited?
+    return false unless respond_to?(:contributor) && respond_to?(:creators)
+    creators.empty?
+  end
+
   def cache_key_fragment
     base = "#{self.class.name.underscore}-#{id}"
     base << "-#{version}" if versioned?

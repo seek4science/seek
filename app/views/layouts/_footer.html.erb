@@ -41,7 +41,9 @@
             <% if !Seek::Config.contact_link.blank? %>
               | <%= link_to "Contact us", Seek::Config.contact_link, :target => '_blank' -%>
             <% end %>
-
+            <% if cookie_consent.required? %>
+              | <%= link_to 'Cookie preferences', cookies_consent_path %>
+            <% end %>
           </div>
           <div class="ft-info">
             Copyright &copy; 2008 - 2022

@@ -12,12 +12,7 @@ module Seek
 
     def show
       asset = resource_for_controller
-      # store timestamp of the previous last usage
-      @last_used_before_now = asset.last_used_at
 
-      # update timestamp in the current record
-      # (this will also trigger timestamp update in the corresponding Asset)
-      asset.just_used
       asset_version = find_display_asset asset
       respond_to do |format|
         format.html { render(params[:only_content] ? { layout: false } : {})}

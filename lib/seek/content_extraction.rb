@@ -79,7 +79,7 @@ module Seek
     def to_csv(sheet = 1, trim = false)
       return '' unless is_excel?
       begin
-        spreadsheet_to_csv(File.open(filepath), sheet, trim, Seek::Config.jvm_memory_allocation)
+        spreadsheet_to_csv(filepath, sheet, trim, Seek::Config.jvm_memory_allocation)
       rescue SysMODB::SpreadsheetExtractionException
         to_csv(sheet, trim) if double_check_mime_type
       end
@@ -91,7 +91,7 @@ module Seek
 
     def to_spreadsheet_xml
       begin
-        spreadsheet_to_xml(File.open(filepath), Seek::Config.jvm_memory_allocation)
+        spreadsheet_to_xml(filepath, Seek::Config.jvm_memory_allocation)
       rescue SysMODB::SpreadsheetExtractionException=>e
         if double_check_mime_type
           to_spreadsheet_xml

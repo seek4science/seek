@@ -37,7 +37,7 @@ class Workflow < ApplicationRecord
 
     before_save :refresh_internals, if: -> { main_workflow_path_changed? && !main_workflow_blob.empty? }
     after_save :clear_cached_diagram, if: -> { diagram_path_changed? }
-    after_commit :submit_to_life_monitor, on: [:create, :update]
+    after_commit :submit_to_life_monitor, on: [:create, :update], if: :should_submit_to_life_monitor?
     after_commit :sync_test_status, on: [:create, :update]
 
     def maturity_level
@@ -63,6 +63,7 @@ class Workflow < ApplicationRecord
     end
 
     def test_status= stat
+      @only_test_status_changed = changed.empty?
       resource_attributes['test_status'] = (Workflow::TEST_STATUS_INV[stat&.to_sym])
     end
 
@@ -71,9 +72,14 @@ class Workflow < ApplicationRecord
     end
 
     def submit_to_life_monitor
-      if Seek::Config.life_monitor_enabled && extractor.has_tests? && parent.can_download?(nil)
-        LifeMonitorSubmissionJob.perform_later(self)
-      end
+      LifeMonitorSubmissionJob.perform_later(self)
+    end
+
+    def should_submit_to_life_monitor?
+      Seek::Config.life_monitor_enabled &&
+        !@only_test_status_changed &&
+        extractor.has_tests? &&
+        parent.can_download?(nil)
     end
 
     # This does two things:
@@ -85,7 +91,7 @@ class Workflow < ApplicationRecord
   end
 
   explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi', 'test_status']) do
-    after_commit :submit_to_life_monitor, on: [:create, :update]
+    after_commit :submit_to_life_monitor, on: [:create, :update], if: :should_submit_to_life_monitor?
     after_commit :sync_test_status, on: [:create, :update]
     acts_as_doi_mintable(proxy: :parent, general_type: 'Workflow')
     acts_as_versioned_resource
@@ -120,10 +126,16 @@ class Workflow < ApplicationRecord
     end
 
     def submit_to_life_monitor
-      return if parent.is_git_versioned?
-      if Seek::Config.life_monitor_enabled && extractor.has_tests? && workflow.can_download?(nil)
-        LifeMonitorSubmissionJob.perform_later(self)
-      end
+      LifeMonitorSubmissionJob.perform_later(self)
+    end
+
+    def should_submit_to_life_monitor?
+      return false if parent.is_git_versioned?
+
+      Seek::Config.life_monitor_enabled &&
+        (previous_changes.keys - ['updated_at', 'test_status']).any? &&
+        extractor.has_tests? &&
+        workflow.can_download?(nil)
     end
 
     # This does two things:
@@ -132,6 +144,10 @@ class Workflow < ApplicationRecord
     def sync_test_status
       return if parent.is_git_versioned?
       parent.update_column(:test_status, Workflow::TEST_STATUS_INV[test_status]) if latest_version?
+    end
+
+    def avatar_owner
+      workflow_class
     end
   end
 
@@ -156,8 +172,21 @@ class Workflow < ApplicationRecord
     end
   end
 
+  def defines_own_avatar?
+    workflow_class ? workflow_class.defines_own_avatar? : super
+  end
+
+  def avatar_owner
+    workflow_class
+  end
+
   def avatar_key
-    workflow_class&.extractor&.present? ? "#{workflow_class.key.downcase}_workflow" : 'workflow'
+    workflow_class ? workflow_class.avatar_key : 'workflow'
+  end
+
+  # Expire list item titles when class is updated (in case logo has changed)
+  def list_item_title_cache_key_prefix
+    (workflow_class ? "#{workflow_class.list_item_title_cache_key_prefix}/#{cache_key}" : super)
   end
 
   def contributor_credited?

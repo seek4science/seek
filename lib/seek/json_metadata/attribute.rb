@@ -72,8 +72,10 @@ module Seek
         if sample_attribute_type && linked_sample_type && !seek_sample? && !seek_sample_multi?
           errors.add(:sample_attribute_type, 'Attribute type must be SeekSample if linked sample type set')
         end
-        if (seek_sample? || seek_sample_multi?) && linked_sample_type.nil?
-          errors.add(:sample_controlled_vocab, 'Linked Sample Type must be set if attribute type is SeekSample')
+        if seek_sample? && linked_sample_type.nil?
+          errors.add(:seek_sample, 'Linked Sample Type must be set if attribute type is Registered Sample')
+        elsif seek_sample_multi? && linked_sample_type.nil? 
+          errors.add(:seek_sample_multi, 'Linked Sample Type must be set if attribute type is Registered Sample (multiple)')
         end
       end
     end

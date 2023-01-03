@@ -9,10 +9,9 @@ class SamplesController < ApplicationController
   before_action :find_index_assets, only: :index
   before_action :find_and_authorize_requested_item, except: [:index, :new, :create, :preview]
   before_action :templates_enabled?, only: [:query, :query_form]
-  
-  before_action :auth_to_create, only: [:new, :create]
 
-  
+  before_action :auth_to_create, only: %i[new create batch_create]
+
   include Seek::IsaGraphExtensions
 
   def index
@@ -43,7 +42,7 @@ class SamplesController < ApplicationController
       @sample = Sample.new(sample_type_id: params[:sample_type_id])
       respond_with(@sample)
     else
-      redirect_to select_sample_types_path
+      redirect_to select_sample_types_path(act: :create)
     end
   end
 
@@ -166,6 +165,7 @@ class SamplesController < ApplicationController
         begin
           converted_params = param_converter.convert(par)
           sample = Sample.find(par[:id])
+          raise 'shouldnt get this far without manage rights' unless sample.can_manage?
           sample = update_sample_with_params(converted_params, sample)
           saved = sample.save
           errors.push({ ex_id: par[:ex_id], error: sample.errors.messages }) unless saved

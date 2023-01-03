@@ -60,6 +60,7 @@ class InternationalizationTest < ActionController::TestCase
     login_as(Factory(:admin))
 
     p = Assay.create()
+    Factory(:experimental_assay_class)
     p.assay_class = AssayClass.experimental
     p.title = "An assay without study"
 

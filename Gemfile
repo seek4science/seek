@@ -15,7 +15,8 @@ gem 'hpricot', '~>0.8.2'
 gem 'libxml-ruby', '~>2.9.0', require: 'libxml'
 gem 'uuid', '~>2.3'
 gem 'RedCloth', '>=4.3.0'
-gem 'simple-spreadsheet-extractor', '~>0.16.0'
+gem 'simple-spreadsheet-extractor', '~> 0.17.0'
+gem 'open4'
 gem 'sample-template-generator', '~>0.5'
 gem 'rmagick', '2.15.2'
 gem 'rest-client', '~>2.0'
@@ -50,7 +51,7 @@ gem 'will_paginate', '~> 3.1'
 gem 'yaml_db'
 gem 'rails_autolink'
 gem 'rfc-822'
-gem 'nokogiri', '~> 1.13.9'
+gem 'nokogiri', '~> 1.13.10'
 #necessary for newer hashie dependency, original api_smith is no longer active
 gem 'api_smith', git: 'https://github.com/youroute/api_smith.git', ref: '1fb428cebc17b9afab25ac9f809bde87b0ec315b'
 gem 'rdf-virtuoso', '>= 0.2.0'
@@ -131,7 +132,7 @@ gem 'request_store'
 
 gem 'bundler', '>= 1.8.4'
 
-gem 'ro-crate', '~> 0.4.17'
+gem 'ro-crate', '~> 0.5.1'
 
 gem 'rugged'
 gem 'i18n-js'
@@ -146,6 +147,8 @@ gem 'addressable'
 gem 'json-schema'
 
 gem 'cff', '~> 0.9.0'
+
+gem 'remotipart', '~> 1.4.4' # Allows file upload in AJAX forms
 
 group :production do
   gem 'passenger'

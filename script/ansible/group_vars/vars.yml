@@ -1,0 +1,3 @@
+user_var: username
+git_dest: /home/username
+sql_user: sql_username

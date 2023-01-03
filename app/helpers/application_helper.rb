@@ -237,7 +237,7 @@ module ApplicationHelper
       res = mail_to(res) if options[:email]
       res = link_to(res, res, popup: true, target: :_blank) if options[:external_link]
       res = res + '&nbsp;' + flag_icon(text) if options[:flag]
-      res = '&nbsp;' + flag_icon(text) + link_to(res, country_path(CountryCodes.code(text))) if options[:link_as_country]
+
     end
     res.html_safe
   end
@@ -532,6 +532,16 @@ module ApplicationHelper
       nil
     end
   end
+
+  def format_field_name(field_name)
+    return field_name unless displaying_single_page?
+
+    type = field_name.split('[')[0]
+    rest = '[' + field_name.split('[')[1]
+    # Converts study[other_creators] to isa_study[study][other_creators]
+    "isa_#{type}[#{type}]#{rest}"
+  end
+
 end
 
 class ApplicationFormBuilder < ActionView::Helpers::FormBuilder
@@ -541,3 +551,7 @@ class ApplicationFormBuilder < ActionView::Helpers::FormBuilder
 end
 
 ActionView::Base.default_form_builder = ApplicationFormBuilder
+
+def cookie_consent
+  CookieConsent.new(cookies)
+end

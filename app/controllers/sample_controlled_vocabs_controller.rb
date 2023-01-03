@@ -96,6 +96,7 @@ class SampleControlledVocabsController < ApplicationController
       client = Ebi::OlsClient.new
       terms = client.all_descendants(source_ontology, root_uri)
       terms.reject! { |t| t[:iri] == root_uri } unless params[:include_root_term] == '1'
+      error_msg = "There are no descendant terms to populate the list." unless terms.present?
     rescue StandardError => e
       error_msg = e.message
     end

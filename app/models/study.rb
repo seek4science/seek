@@ -24,7 +24,8 @@ class Study < ApplicationRecord
   has_many :sop_versions, through: :assays
 
   has_one :external_asset, as: :seek_entity, dependent: :destroy
-  belongs_to :sop
+  
+  has_and_belongs_to_many :sops
 
   has_and_belongs_to_many :sample_types
 
@@ -70,13 +71,13 @@ class Study < ApplicationRecord
   end
 
   def related_sop_ids
-    Array(sop_id) | assay_sop_ids
+    sop_ids | assay_sop_ids
   end
 
   def positioned_assays
     assays.order(position: :asc)
   end
-  
+
   def self.user_creatable?
     Seek::Config.studies_enabled
 
