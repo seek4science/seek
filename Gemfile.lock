@@ -572,6 +572,8 @@ GEM
     rails-observers (0.1.5)
       activemodel (>= 4.0)
     rails-perftest (0.0.7)
+    rails-static-router (1.0.6)
+      railties (>= 5.0, < 7.1)
     rails_autolink (1.1.6)
       rails (> 3.1)
     rails_best_practices (1.23.0)
@@ -995,6 +997,7 @@ DEPENDENCIES
   rails-html-sanitizer
   rails-observers
   rails-perftest
+  rails-static-router
   rails_autolink
   rails_best_practices
   ransack
