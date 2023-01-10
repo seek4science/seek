@@ -41,7 +41,23 @@ When upgrading between patch versions, it should only be necessary to run
     bundle install
     bundle exec rake seek:upgrade 
 
-## Steps to upgrade from 1.11.x to 1.12.x
+## Steps to upgrade from 1.12.x to 1.13.x
+
+### Dependencies
+
+Graphviz, and Python 3.7 are new required dependencies
+
+First add a repo which contains python versions that may not be available in the default repositories
+
+    sudo apt update
+    sudo apt install software-properties-common
+    sudo add-apt-repository ppa:deadsnakes/ppa
+    sudo apt update
+
+and now install the packages:
+
+    sudo apt install graphviz python3.7-dev python3.7-distutils python3-pip
+
 
 **Note** the requirement to setup Apache Solr, which is no longer bundled together with FAIRDOM-SEEK.
 
@@ -63,17 +79,17 @@ If you have an existing installation linked to our GitHub, you can fetch the
 files with:
 
     git pull
-    git checkout v1.12.3
+    git checkout v1.13.0
 
 ### Updating using the tarball
 
 You can download the file from
-<https://github.com/seek4science/seek/archive/v1.12.3.tar.gz> You can
+<https://github.com/seek4science/seek/archive/v1.13.0.tar.gz> You can
 unpack this file using:
 
-    tar zxvf seek-1.12.3.tar.gz
+    tar zxvf seek-1.13.0.tar.gz
     mv seek seek-previous
-    mv seek-1.12.3 seek
+    mv seek-1.13.0 seek
     cd seek/
 
 and then copy across your existing filestore and database configuration file
@@ -81,9 +97,19 @@ from your previous installation and continue with the upgrade steps. The
 database configuration file you would need to copy is _config/database.yml_,
 and the filestore is simply _filestore/_
 
+### Install Python dependencies
+
+First, a specific version of `setuptools` needs to be installed to avoid an issue when installing dependencies
+
+    python3.7 -m pip install setuptools==58
+
+Then the other dependencies can be installed
+
+    python3.7 -m pip install -r requirements.txt
+
 ### Upgrading Ruby
 
-You are recommended to upgrade to Ruby 2.7. If you are using [RVM](https://rvm.io/) (according to the [Installation Guide](install.html) )you should be prompted to install during the standard installation steps that follow.
+You are recommended to upgrade to Ruby 2.7.7 If you are using [RVM](https://rvm.io/) (according to the [Installation Guide](install.html) )you should be prompted to install during the standard installation steps that follow.
 If you are not prompted you can install with the command:
 
     rvm install $(cat .ruby-version)
@@ -100,7 +126,7 @@ content.
     gem install bundler
     bundle install --deployment --without development test
     bundle exec rake seek:upgrade
-    bundle exec rake assets:precompile # this task will take a while       
+    bundle exec rake assets:precompile # this task will take a while
 
 ### Update Cron Services
 
@@ -108,22 +134,10 @@ SEEK requires some cron jobs for periodic background jobs to run. To update thes
 
     bundle exec whenever --update-crontab
 
-### Setting up Apache Solr
-
-The [Apache Solr Search Engine](https://solr.apache.org/) now needs to be set up separately. 
-It is relatively straightforward and there are instructions on how to do this in [Setting Up Solr](setting-up-solr).
-
-
 ### Restarting background job services
 
-    bundle exec rake seek:workers:start    
-
-## Stopping soffice
-
-From version 1.12.0 it is no longer necessary to run soffice as a service. If you had previously set up the _/etc/init.d/soffice_ service, 
-you now stop and remove this (the soffice executable from LibreOffice is still required though). 
-
-           
+    bundle exec rake seek:workers:start
+ 
 ---
     
 ## Earlier upgrade notes
