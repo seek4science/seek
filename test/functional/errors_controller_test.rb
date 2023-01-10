@@ -19,5 +19,12 @@ class ErrorsControllerTest < ActionController::TestCase
       assert_response code
       assert_empty response.body
     end
+
+    test "should get error_#{code} as javascript" do
+      get "error_#{code}".to_sym, format: :js
+      assert_response code
+      assert_empty response.body
+    end
+
   end
 end

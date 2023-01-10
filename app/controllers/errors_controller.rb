@@ -1,6 +1,8 @@
 class ErrorsController < ApplicationController
   layout 'errors'
 
+  skip_forgery_protection
+
   def error_404
     respond_to_error(404)
   end
