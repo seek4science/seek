@@ -98,7 +98,7 @@
       ansible.builtin.git:
         repo: 'https://github.com/seek4science/seek.git'
         dest: '{{git_dest}}/SEEK'
-        version: 'master'
+        version: '{{git_version}}'
         force: yes
       tags:
         - seek
