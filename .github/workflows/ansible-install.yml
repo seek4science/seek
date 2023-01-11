@@ -40,6 +40,7 @@ jobs:
           sed -i '/\- hosts\: localhost/a \ \ connection\: local' Deploy-SEEK.yml
           sed -i 's/user_var\: username/user_var\: runner/' group_vars/vars.yml
           sed -i 's/git_dest\: \/home\/username/git_dest\: \/home\/runner\/work/' group_vars/vars.yml
+          sed -i 's|git_version: master|git_version: '"${GITHUB_REF##*/}"'|' group_vars/vars.yml
           sed -i '/sql_user\: sql_username/a sql_password: mysqlpassword' group_vars/vars.yml
 
       - name: Prepares system for ansible install
