@@ -58,11 +58,7 @@ and now install the packages:
 
     sudo apt install graphviz python3.7-dev python3.7-distutils python3-pip
 
-
-**Note** the requirement to setup Apache Solr, which is no longer bundled together with FAIRDOM-SEEK.
-
 ### Set RAILS_ENV
-              
 
 **If upgrading a production instance of SEEK, remember to set the RAILS_ENV first**
 
