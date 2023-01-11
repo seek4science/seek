@@ -34,12 +34,12 @@ The high level changes include:
   * Workflow **maturity flag** and filter,
   * **LifeMonitor** integration - filter by test status.
 * **Sample enhancements**:
-    * Extraction **performance** improvements,
-    * **Improved error handling** and reporting during sample extraction,
-    * Sample types have **contributor** shown, and now supports **creators**,
-    * **Filtering and search view** now available for samples and sample types.
-    * JSON **API** improvements.
-* Integrated **[TeSS](https://tess.elixir-europe.org/) search** for Events.
+    * Extraction performance improvements,
+    * Improved error handling and reporting during sample extraction,
+    * Sample types have contributor shown, and now supports creators,
+    * Filtering and search view now available for samples and sample types.
+    * JSON API improvements.
+* **Integrated [TeSS](https://tess.elixir-europe.org/) search** for Events.
 * **Timezone information** provided for Event start and end dates.
 * **Search improvements**:
   * Fix to the order of search results,
@@ -47,17 +47,19 @@ The high level changes include:
   * Harmonization between general search and searching and filtering.
 * **Show the last person** that updated an item (shown only to project members).
 * **Improvements to the table view** of items, adding more columns and making more consistent.
-* **Tagging projects from the EDAM** ontology, and made easier to extend with **other ontologies** in the future.
-* Improvements to **API testing and documentation** generation.
-* Fixes and improvements to **Project creation and join requests**.
+* **Tagging projects from the EDAM** ontology, and made easier to extend with other ontologies in the future.
+* **API testing and documentation** improvements.
+* **Project creation and join requests** fixes and improvements, including:
+    * Other administrators are notified when a request is responded to.
+    * Ability to delete a request without responding, for handling spam or duplicates.
 * **Descriptive help text** for each creatable entry, show in the Create or Browse pages that link off to documentation where available.
 * **IBISBA enhancements**:
-  * **Populator** - to populate a Project and ISA information from a spreadsheet template,
-  * **File templates** and **Placeholders**.
+  * iPOP - to populate a Project and ISA information from a spreadsheet template,
+  * File templates and Placeholders.
 * **Publication improvements**:
-  * Option to support the **upload of full text PDF or link**,
+  * Option to support the upload of full text PDF or link,
   * Any number of related links,
-  * Option to allow **editing imported publications**.
+  * Option to allow editing imported publications.
 * **Settings caching** - giving a page load speed improvement
 * **Cookie consent banner** improved to give more control over which cookies are set, and when content from other sites can be embedded.
 
