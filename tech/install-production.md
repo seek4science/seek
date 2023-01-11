@@ -57,16 +57,14 @@ first setup RVM and ruby-1.9.3 as a user with sudo access, and repeat the
 steps as the `seek` user. This means the required packages should then be
 installed. At the time of writing this guide this shouldn't be necessary.
 
-## Set up an RVM alias
+## Bundler Configuration
 
-To make switching Ruby versions easier in the future, you should create an "alias" using RVM.
+When installing gems with Bundler, first configure with
 
-Create one with the current supported Ruby version for SEEK (2.7.5 at time of writing).
+    bundle config set deployment 'true'
+    bundle config set without 'development test'
 
-    rvm alias create seek ruby-2.7.5
-
-In the future, you can re-run this command with a different Ruby version to switch the version used by SEEK, without
-having to change any configuration files.
+this will prevent gems being accidentally changed, and also avoid unnecessary gems being installed.
 
 ## After you have installed SEEK
 

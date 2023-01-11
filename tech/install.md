@@ -136,9 +136,9 @@ First install bundler, which is used to manage gem versions
 
     gem install bundler
 
-Next install the ruby gems SEEK needs:
+Next install the ruby gems SEEK needs ( for production see [Bundler Configuration](install-production.html#bundler-configuration) )
 
-    bundle install --deployment --without development test
+    bundle install
 
 ## Install Python dependencies
 
