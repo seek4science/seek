@@ -87,6 +87,10 @@ module AdminHelper
         "Git revision: #{link} (branch: #{branch})".html_safe
       rescue
       end
+    elsif Seek::Version.git_version_record_present?
+      version = Seek::Version.git_version
+      link = link_to(version[0...7], "https://github.com/seek4science/seek/commit/#{version}", target: '_blank', title: version).html_safe
+      "Git revision: #{link}".html_safe
     end
   end
 

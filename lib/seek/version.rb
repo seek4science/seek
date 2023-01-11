@@ -21,8 +21,13 @@ module Seek
 
     # returns the current version hash from git
     def self.git_version
-      return '' unless git_present?
+      if git_present?
       `git rev-parse HEAD`.chomp
+      elsif git_version_record_present?
+        File.read(Rails.root.join('config','.git-revision'))
+      else
+        ''
+      end
     end
 
     # returns the current git branch
@@ -34,6 +39,10 @@ module Seek
     # is git currently present to allow access to git information
     def self.git_present?
       File.exist?(Rails.root.join('.git'))
+    end
+
+    def self.git_version_record_present?
+      File.exist?(Rails.root.join('config','.git-revision'))
     end
 
     # equality check, based on the version string
