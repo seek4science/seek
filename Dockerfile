@@ -29,7 +29,9 @@ WORKDIR $APP_DIR
 # Bundle install throw errors if Gemfile has been modified since Gemfile.lock
 COPY Gemfile* ./
 RUN bundle config --local frozen 1 && \
-    bundle install --deployment --without development test
+    bundle config set deployment 'true' && \
+    bundle config set without 'development test' && \
+    bundle install
 
 # App code
 COPY . .
