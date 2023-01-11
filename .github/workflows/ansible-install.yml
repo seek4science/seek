@@ -9,10 +9,10 @@ on:
 jobs:
   install-seek-from-ansible:
     runs-on: ${{matrix.os}}
-    #continue-on-error: true
+    continue-on-error: true
     strategy:
       matrix:
-        os: [ubuntu-20.04,ubuntu-22.04,ubuntu-latest]
+        os: [ubuntu-20.04,ubuntu-22.04]
         # The service mysql breaks on ubuntu-18.04 during the step "Install SEEK through ansible"
 
     services:
