@@ -44,7 +44,8 @@ the data (see [Persistent Storage](#persistent-storage) for how to avoid this)
    
 The above example used the image name _fairdom/seek:{{ site.current_docker_tag }}_. The number following the : is the tag, and corresponds to the SEEK minor version _{{ site.current_docker_tag }}_ . 
 From SEEK 1.1 onwards tags are available for each stable version of SEEK. 
-Note that the patch version (i.e. the x in 1.1.x is omitted, the image is always up to date with the latest patch and fixes).
+Tags are available with or without the patch version - i.e _fairdom/seek:1.13.0_ and _fairdom/seek:1.13_. 
+The image without the patch is always up to date with the latest version, whereas the image with the patch version is locked to that specific version and gives some more control over updates.
 
 Our images are automatically built, and you can see the full list on the [FAIRDOM Docker Hub](https://hub.docker.com/r/fairdom/seek/tags/)
     
