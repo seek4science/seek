@@ -12,8 +12,7 @@ jobs:
     continue-on-error: true
     strategy:
       matrix:
-        os: [ubuntu-20.04,ubuntu-22.04]
-        # The service mysql breaks on ubuntu-18.04 during the step "Install SEEK through ansible"
+        os: [ubuntu-18.04,ubuntu-20.04,ubuntu-22.04]
 
     services:
       mysql:
@@ -24,7 +23,7 @@ jobs:
               MYSQL_DATABASE: test
           ports:
             - 3306:3306
-          options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+          options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3 --restart=always
 
     steps:
       - name: Checkout
