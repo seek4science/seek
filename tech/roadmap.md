@@ -14,28 +14,23 @@ They are expected to be added to FAIRDOM-SEEK in roughly the order they are pres
 
 | Feature | Milestone date |
 | --- | --- |
-| Search configuration improvements, with UI improvements for Search filtering | Q3 2022 |
-| Extended integration with the Norwegian e-Infrastructure for Life Sciences (NeLS) system | Q3 2022 |
-| UI for creating Custom Metadata Extensions | Q3 2022 |
-| Describing Observed Variables within MIAPPE | Q3 2022 |
-| Enhancements to Sample support | Q4 2022 |
-| Backend storage changes with better versioning support | Q4 2022 |
-| Better support for GitHub | Q4 2022 |
-| Support for Datasets containing multiple files organised into folders | Q4 2022 |
-| API support for creating new versions | Q4 2022 |
-| Project folders, to help organise files outside of the ISA structure | 2022 |
-| ISA improvements, with a single page for creating and managing them | 2022 |
-| Deposition to repositories, such as ENA | 2022 |
-| Integration with UNLOCK | 2022 |
-| Integration with other file storage systems, e.g. Dropbox, Google Drive, Nextcloud | 2022 |
-| License improvements, using SPDX | 2022 |
-| Better and easier definition of institutions, integrating the Research Organization Registry (ROR) | 2022 |
+| Additional Search configuration improvements, with UI improvements for Search filtering | Q1 2023 |
+| Extended integration with the Norwegian e-Infrastructure for Life Sciences (NeLS) system | Q1 2023 |
+| UI for creating Custom Metadata Extensions | Q2 2023 |
+| Enhancements to Sample support | Q2 2023 |
+| API support for creating new versions | 2023 |
+| Project folders, to help organise files outside of the ISA structure | 2023 |
+| ISA improvements, with a single page for creating and managing them | 2023 |
+| Deposition to repositories, such as ENA | 2023 |
+| Integration with UNLOCK | 2023 |
+| Integration with other file storage systems, e.g. Dropbox, Google Drive, Nextcloud | 2023 |
+| License improvements, using SPDX | 2023 |
+| Better and easier definition of institutions, integrating the Research Organization Registry (ROR) | 2023 |
 
 <br/>
 
 Please also see the [Workflow Hub Roadmap](https://about.workflowhub.eu/roadmap/), 
 which is being built on and in conjunction with FAIRDOM-SEEK.
-
 
 
 ---
@@ -50,6 +45,9 @@ You can find more details about each release in our [Change Logs](/tech/releases
 
 | Feature | SEEK version |
 | --- | --- | 
+| Backend storage changes with better versioning support | 1.13.0 |
+| Better support for GitHub | 1.13.0 |
+| Search configuration improvements, with UI improvements for Search filtering | 1.13.0 |
 | Collections - grouping assets together under a topic or theme | 1.12.0 |
 | A new customizable front page | 1.12.0 |
 | Improvements to defining authors and creators, and their order | 1.12.0 |
