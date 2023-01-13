@@ -40,7 +40,7 @@ input_sample_type_id ||=
   <%= assay_fields.hidden_field :assay_class_id -%>
 
   <% if User.current_user -%>
-    <%= render partial: 'assets/manage_specific_attributes', locals:{f:f} if show_form_manage_specific_attributes? %>
+    <%= render partial: 'assets/manage_specific_attributes', locals:{f:assay_fields} if show_form_manage_specific_attributes? %>
     <%= assay_fields.fancy_multiselect(:sops, other_projects_checkbox: true, name: "isa_assay[assay][sop_ids]")%>
     <%= assay_fields.fancy_multiselect :publications, { other_projects_checkbox: true, name: "isa_assay[assay][publication_ids]" } %>
     <%= assay_fields.fancy_multiselect :documents, { other_projects_checkbox: true, name: "isa_assay[assay][document_ids]" } %>

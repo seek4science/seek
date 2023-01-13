@@ -11,5 +11,9 @@
 </div>
 
 <div class="text-center">
-  <iframe src="https://docs.google.com/spreadsheet/embeddedform?formkey=dE9FY1dPSEUwa3VuZWZ0bUFndGRYcWc6MQ" width="100%" height="1024" frameborder="0" marginheight="0" marginwidth="0">Loading...</iframe>
+  <% if cookie_consent.options != ['necessary'] %>
+    <iframe src="https://docs.google.com/spreadsheet/embeddedform?formkey=dE9FY1dPSEUwa3VuZWZ0bUFndGRYcWc6MQ" width="100%" height="1024" frameborder="0" marginheight="0" marginwidth="0">Loading...</iframe>
+  <% else %>
+    <a href="https://docs.google.com/spreadsheet/embeddedform?formkey=dE9FY1dPSEUwa3VuZWZ0bUFndGRYcWc6MQ"> Link to the registration form</a>
+  <% end %>
 </div>

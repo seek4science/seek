@@ -43,7 +43,7 @@ Templates.init = function (elem) {
       },
       width: "7%"
     },
-    { title: "IRI", width: "10%" },
+    { title: "PID", width: "10%" },
     { title: "pos" },
     { title: "isa_tag_id" },
     {
@@ -118,7 +118,7 @@ Templates.mapData = (data) =>
     item.unit_id,
     item.data_type,
     item.is_title,
-    item.iri,
+    item.pid,
     item.pos,
     item.isa_tag_id
   ]);

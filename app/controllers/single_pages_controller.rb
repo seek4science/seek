@@ -22,6 +22,7 @@ class SinglePagesController < ApplicationController
   def index; end
 
   def project_folders
+    return if !Seek::Config.project_single_page_folders_enabled
     project_folders = ProjectFolder.root_folders(@project)
     if project_folders.empty?
       project_folders = ProjectFolder.initialize_default_folders(@project)

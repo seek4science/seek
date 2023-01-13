@@ -38,7 +38,7 @@ module IsaExporter
       @investigation.studies.each { |s| studies << convert_study(s) }
       isa_investigation[:studies] = studies
       
-      @OBJECT_MAP[:investigation] = isa_investigation
+      @OBJECT_MAP = @OBJECT_MAP.merge(isa_investigation)
 
       isa_investigation
     end
@@ -343,7 +343,7 @@ module IsaExporter
 
       st.samples.map do |s|
         {
-          '@id': "#data/#{s.id}",
+          '@id': "#data_file/#{s.id}",
           name: s.get_attribute_value(with_tag_data_file),
           type: with_tag_data_file.title,
           comments: with_tag_data_file_comment.map { |d| { name: d.title, value: s.get_attribute_value(d).to_s } }
@@ -537,7 +537,7 @@ module IsaExporter
     end
 
     def normalize_id(str)
-      str.tr!(' ', '_')
+      str.tr!(' ', '_') || str
     end
 
     def get_unit

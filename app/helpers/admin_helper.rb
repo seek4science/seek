@@ -65,6 +65,7 @@ module AdminHelper
   def admin_checkbox_setting(name, value, checked, title, description = nil, options = {})
     content_tag(:div, class: 'checkbox') do
       content_tag(:label, class: 'admin-checkbox') do
+        hidden_field_tag(name, 0) +
         check_box_tag(name, value, checked, options) + title.html_safe
       end +
         (description ? content_tag(:p, description.html_safe, class: 'help-block') : ''.html_safe)

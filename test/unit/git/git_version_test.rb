@@ -23,8 +23,9 @@ class GitVersionTest < ActiveSupport::TestCase
     repo = Factory(:local_repository)
     workflow = repo.resource
 
-    v = disable_authorization_checks { workflow.git_versions.create!(name: 'version 1.0.0', ref: 'refs/heads/master', mutable: true) }
-    assert_empty v.resource_attributes
+    v = disable_authorization_checks do
+      workflow.save_as_new_git_version(name: 'version 1.0.0', ref: 'refs/heads/master', mutable: true)
+    end
     assert_equal 'This Workflow', v.title
     refute v.git_base.tags['version-1.0.0']
     assert v.mutable?

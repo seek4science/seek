@@ -260,9 +260,10 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_redirected_to projects_path
   end
 
-  def test_non_admin_should_not_destroy_project
+  test 'cannot destroy if not admin or project admin' do
     login_as(:aaron)
     project = projects(:four)
+    refute project.can_delete?
     get :show, params: { id: project.id }
     assert_select 'span.icon', text: /Delete #{I18n.t('project')}/, count: 0
     assert_select 'span.disabled_icon', text: /Delete #{I18n.t('project')}/, count: 0
@@ -270,6 +271,7 @@ class ProjectsControllerTest < ActionController::TestCase
       delete :destroy, params: { id: project }
     end
     refute_nil flash[:error]
+    assert_redirected_to :root
   end
 
   test 'can destroy project if it contains people' do
@@ -283,6 +285,9 @@ class ProjectsControllerTest < ActionController::TestCase
 
     assert project.can_delete?
 
+    get :show, params: { id: project }
+    assert_select '#buttons a', text: /Delete #{I18n.t('project')}/i, count: 1
+
     assert_difference('Project.count', -1) do
       assert_difference('GroupMembership.count', -1) do
         assert_no_difference('Person.count') do
@@ -292,7 +297,32 @@ class ProjectsControllerTest < ActionController::TestCase
         end
       end
     end
+    assert_nil flash[:error]
+    assert_redirected_to projects_path
+  end
 
+  test 'can destroy project as project administrator' do
+    person = Factory(:project_administrator)
+    project = person.projects.first
+
+    login_as(person)
+
+    assert project.can_delete?
+
+    get :show, params: { id: project }
+    assert_select '#buttons a', text: /Delete #{I18n.t('project')}/i, count: 1
+
+    assert_difference('Project.count', -1) do
+      assert_difference('GroupMembership.count', -1) do
+        assert_no_difference('Person.count') do
+          assert_difference('WorkGroup.count',-1) do
+            delete :destroy, params: { id: project }
+          end
+        end
+      end
+    end
+    assert_nil flash[:error]
+    assert_redirected_to projects_path
   end
 
   test 'asset report with stuff in it can be accessed' do

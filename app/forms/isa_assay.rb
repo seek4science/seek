@@ -44,7 +44,9 @@ class IsaAssay
   def populate(id)
     @assay = Assay.find(id)
     @sample_type = @assay.sample_type
-    @input_sample_type_id = @sample_type.sample_attributes.detect(&:seek_sample_multi?).linked_sample_type_id
+    if @sample_type
+      @input_sample_type_id = @sample_type.sample_attributes.detect(&:seek_sample_multi?).linked_sample_type_id
+    end
   end
 
   private

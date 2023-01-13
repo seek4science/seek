@@ -110,6 +110,8 @@ class AdminController < ApplicationController
     Seek::Config.sops_enabled = string_to_boolean params[:sops_enabled]
     Seek::Config.workflows_enabled = string_to_boolean params[:workflows_enabled]
 
+    Seek::Config.require_cookie_consent = string_to_boolean params[:require_cookie_consent]
+
     Seek::Config.google_analytics_tracker_id = params[:google_analytics_tracker_id]
     Seek::Config.google_analytics_enabled = string_to_boolean params[:google_analytics_enabled]
     Seek::Config.google_analytics_tracking_notice = params[:google_analytics_tracking_notice]
@@ -136,6 +138,7 @@ class AdminController < ApplicationController
     Seek::Config.copasi_enabled = string_to_boolean(params[:copasi_enabled])
     Seek::Config.project_single_page_enabled = string_to_boolean(params[:project_single_page_enabled])
     Seek::Config.project_single_page_advanced_enabled = string_to_boolean(params[:project_single_page_advanced_enabled])
+    Seek::Config.project_single_page_folders_enabled= string_to_boolean(params[:project_single_page_folders_enabled])
     Seek::Config.sample_type_template_enabled = string_to_boolean(params[:sample_type_template_enabled])
 
     Seek::Config.nels_enabled = string_to_boolean(params[:nels_enabled])
@@ -339,6 +342,14 @@ class AdminController < ApplicationController
     end
 
     redirect_with_status(error, 'background tasks')
+  end
+
+  def clear_cache
+    Rails.cache.clear
+    flash[:notice] = "Cache cleared"
+    respond_to do |format|
+      format.html { render :index}
+    end
   end
 
   # give it up to 5 seconds to start up, otherwise the page reloads too quickly and says it is not running

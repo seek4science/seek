@@ -109,7 +109,9 @@
                              "Single page enabled", "The single page UI for #{t(:project).pluralize}", :onchange=>toggle_appear_javascript('single_page_advanced')) %>
   <div id="single_page_advanced" class="additional_settings" style="<%= show_or_hide_block Seek::Config.project_single_page_enabled -%>">
     <%= admin_checkbox_setting(:project_single_page_advanced_enabled, 1, Seek::Config.project_single_page_advanced_enabled,
-                               "Advanced features enabled","If set, the advance features of the single page is enabled.") %>
+                             "Advanced features enabled","If set, the advance features of the single page is enabled.") %>
+    <%= admin_checkbox_setting(:project_single_page_folders_enabled, 1, Seek::Config.project_single_page_folders_enabled,
+                             "Project folders enabled","If set, the folders of the projects will be shown in the tree view.") %>
   </div>
 
   <%= admin_checkbox_setting(:sample_type_template_enabled, 1, Seek::Config.sample_type_template_enabled,
@@ -117,7 +119,12 @@
   <div id="add_default_templates" class="additional_settings" style="<%= show_or_hide_block Seek::Config.sample_type_template_enabled -%>">
 		<%= link_to("Add default #{t(:template).pluralize}", default_templates_templates_path, class: 'btn btn-default', id: 'add_default_templates_btn', disabled: !Seek::Config.sample_type_template_enabled) %>
 	</div>
-                             
+
+  <%= admin_checkbox_setting(:require_cookie_consent, 1, Seek::Config.require_cookie_consent,
+                             "Add a cookie consent banner and a cookie setting page", "Show a banner asking for consent for the use of cookies. SEEK uses an essential cookie for session handling, and optional cookies for tracking if set below. 
+                             Some cookies might be also set by embedded content. This banner will offer 3 choices: Only necessary, Embedded content, All.
+                             Setting up this option will also add a cookie setting page accessible from the footer.") %>
+
   <%= admin_checkbox_setting(:google_analytics_enabled, 1, Seek::Config.google_analytics_enabled,
                              "Google analytics enabled", "Allows you to keep track of site traffic using Google Analytics. You need to register with Google Analytics and get a tracker ID.",
                              :onchange=>toggle_appear_javascript('google_anaylitics_block')) %>

@@ -93,7 +93,7 @@ module Seek
                                                                             required: attribute['required'],
                                                                             description: attribute['description'],
                                                                             sample_controlled_vocab_id: scv&.id,
-                                                                            iri: attribute['iri'],
+                                                                            pid: attribute['pid'],
                                                                             sample_attribute_type_id: get_sample_attribute_type(attribute['dataType'])
                                                                           }))
               end

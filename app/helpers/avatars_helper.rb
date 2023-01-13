@@ -26,7 +26,7 @@ module AvatarsHelper
 
   def avatar_image_tag_for_item(item, alternative, size, alt, css_class = 'framed')
     if item.defines_own_avatar?
-      avatar_according_to_user_upload(alternative, item, size, css_class)
+      avatar_according_to_user_upload(alternative, item.avatar_owner, size, css_class)
     else
       resource_avatar(item, alt: alt, class: css_class)
     end
@@ -65,7 +65,7 @@ module AvatarsHelper
   end
 
   def default_avatar(object_class_name, size = 200, alt = 'Anonymous', onclick_options = '', css_class = 'framed')
-    avatar_filename = icon_filename_for_key("#{object_class_name.downcase}_avatar")
+    avatar_filename = icon_filename_for_key("#{object_class_name.underscore}_avatar")
 
     image_tag avatar_filename,
               alt: alt,

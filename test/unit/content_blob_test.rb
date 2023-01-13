@@ -108,6 +108,29 @@ class ContentBlobTest < ActiveSupport::TestCase
     assert_equal "content_blobs/#{blob.id}-ffd634ac7564083ab7b66bc3eb2053cbc3d608f5", blob.cache_key
   end
 
+  def test_cache_url
+    blob = Factory :url_content_blob
+    assert_equal "content_blobs/#{blob.id}--5891ceaaba77a89b06e4afb5d914fe716840765e", blob.cache_key
+  end
+
+  def test_cache_key_does_change
+    blob = Factory :rightfield_content_blob
+    assert_equal "content_blobs/#{blob.id}-ffd634ac7564083ab7b66bc3eb2053cbc3d608f5", blob.cache_key
+    blob2 = Factory :rightfield_content_blob
+    assert_equal "content_blobs/#{blob2.id}-ffd634ac7564083ab7b66bc3eb2053cbc3d608f5", blob2.cache_key
+    blob3 =  Factory :teusink_model_content_blob
+    assert_not_equal "content_blobs/#{blob3.id}-ffd634ac7564083ab7b66bc3eb2053cbc3d608f5", blob2.cache_key
+  end
+
+  def test_cache_key_url_does_change
+    blob = Factory :url_content_blob
+    assert_equal "content_blobs/#{blob.id}--5891ceaaba77a89b06e4afb5d914fe716840765e", blob.cache_key
+    blob.url = "http://bbc.co.uk"
+    assert_not_equal "content_blobs/#{blob.id}--5891ceaaba77a89b06e4afb5d914fe716840765e", blob.cache_key
+    blob2 =  Factory :url_content_blob
+    assert_not_equal "content_blobs/#{blob.id}--5891ceaaba77a89b06e4afb5d914fe716840765e", blob2.cache_key
+  end
+
   def test_uuid_doesnt_change
     blob = content_blobs(:picture_blob)
     blob.uuid = 'zzz'

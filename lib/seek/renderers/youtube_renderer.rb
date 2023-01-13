@@ -5,9 +5,14 @@ module Seek
         blob.url && is_youtube_url?(blob.url) && extract_video_code(blob.url)
       end
 
+      def external_embed?
+        true
+      end
+
       def render_content
         code = extract_video_code(blob.url)
-        "<iframe width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/#{code}\" frameborder=\"0\" allowfullscreen></iframe>"
+          
+        "<iframe width=\"560\" height=\"315\" src=\"https://www.youtube-nocookie.com/embed/#{code}\" frameborder=\"0\" allowfullscreen></iframe>"
       end
 
       def is_youtube_url?(url)

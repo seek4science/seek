@@ -48,16 +48,6 @@ class AssetTest < ActiveSupport::TestCase
     assert d.versions[1].latest_version?
   end
 
-  test 'just used' do
-    model = Factory :model
-    t = 1.day.ago
-    assert_not_equal t.to_i, model.last_used_at.to_i
-    travel_to(t) do
-      model.just_used
-    end
-    assert_equal t.to_i, model.last_used_at.to_i
-  end
-
   test 'assay type titles' do
     df = Factory :data_file
     assay = Factory :experimental_assay

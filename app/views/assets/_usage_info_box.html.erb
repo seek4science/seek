@@ -29,11 +29,6 @@
       <% end -%>
     <% end -%>
 
-    <% unless @last_used_before_now.blank? -%>
-      <p>
-        <strong>Last used</strong>: <%= date_as_string(@last_used_before_now, true) -%>
-      </p>
-    <% end -%>
   </div>
 
   <%# for items created before we started collecting logs %>

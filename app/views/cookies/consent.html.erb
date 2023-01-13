@@ -1,0 +1,45 @@
+<div class="row">
+  <div class="col-md-8">
+    <h1>Cookie Consent</h1>
+
+    <%= render partial: 'general/cookies_info' %>
+
+    <% analytics = [] %>
+    <% analytics << 'Google Analytics' if Seek::Config.google_analytics_enabled %>
+    <% analytics << 'Matomo' if Seek::Config.piwik_analytics_enabled %>
+
+    <div class="panel panel-default">
+      <div class="panel-heading">Cookie Preferences</div>
+      <div class="panel-body">
+        <h4>You currently allow</h4>
+        <% if @cookie_consent.given? %>
+          <ul id="cookie-consent-level">
+            <li><%= t("cookies.options.necessary", instance_name: Seek::Config.instance_name) %></li>
+            <% if @cookie_consent.options.include?('embedding') %>
+              <li><%= t("cookies.options.embedding") %></li>
+            <% end %>
+            <% if @cookie_consent.options.include?('tracking') && analytics.any? %>
+              <li><%= t("cookies.options.tracking", analytics: analytics.join(' and '), instance_name: Seek::Config.instance_name) %></li>
+            <% end %>
+          </ul>
+        <% else %>
+          <p>
+            <span id="cookie-consent-level" class="muted"><%= t("cookies.no_consent") %></span>
+          </p>
+        <% end %>
+      </div>
+      <div class="panel-footer clearfix">
+        <div class="pull-left">
+            <%= link_to t('cookies.buttons.necessary'), cookies_consent_path(allow: 'necessary'),
+                      method: :post, class: 'btn btn-default' %>
+        </div>
+        <div class="pull-right">
+          <%= link_to t('cookies.buttons.embedding'), cookies_consent_path(allow: 'necessary,embedding'),
+                    method: :post, class: 'btn btn-default' %>
+          <%= link_to t('cookies.buttons.all'), cookies_consent_path(allow: CookieConsent::OPTIONS.join(',')),
+                    method: :post, class: 'btn btn-default' if (Seek::Config.google_analytics_enabled || Seek::Config.piwik_analytics_enabled) %> 
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

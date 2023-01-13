@@ -1,9 +1,12 @@
 class WorkflowClass < ApplicationRecord
+  include HasCustomAvatar
+
   has_many :workflows, inverse_of: :workflow_class
   has_many :workflow_versions, class_name: 'Workflow::Version', inverse_of: :workflow_class
   belongs_to :contributor, class_name: 'Person', optional: true
 
   before_validation :assign_and_format_key, on: [:create]
+  after_update :remove_old_avatars
 
   validates :title, uniqueness: true
   validates :key, uniqueness: true
@@ -84,6 +87,18 @@ class WorkflowClass < ApplicationRecord
     can_manage?
   end
 
+  def defines_own_avatar?
+    avatar_id.present?
+  end
+
+  def avatar_key
+    extractor&.present? ? "#{key.downcase}_workflow" : 'workflow'
+  end
+
+  def logo_image=(image_file)
+    self.avatar = avatars.build(image_file: image_file)
+  end
+
   private
 
   def assign_and_format_key
@@ -107,6 +122,12 @@ class WorkflowClass < ApplicationRecord
       self.class.const_get("Seek::WorkflowExtractors::#{extractor}")
     rescue NameError
       errors.add(:extractor, "was not a valid format")
+    end
+  end
+
+  def remove_old_avatars
+    avatars.each do |a|
+      a.destroy unless a == avatar # don't remove the selected avatar
     end
   end
 end

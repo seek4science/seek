@@ -40,7 +40,6 @@ module Seek
         title_trimmer
 
         attr_writer :original_filename, :content_type
-        does_not_require_can_edit :last_used_at
 
         validates :title, presence: true
         validates :title, length: { maximum: 255 }, unless: -> { is_a?(Publication) }
@@ -101,11 +100,6 @@ module Seek
       include Seek::ActsAsAsset::Relationships::InstanceMethods
       include Seek::ActsAsAsset::Folders::InstanceMethods
       include Seek::ResearchObjects::Packaging
-
-      # sets the last_used_at time to the current time
-      def just_used
-        update_column(:last_used_at, Time.now)
-      end
 
       # whether a new version is allowed for this asset.
       # for example if it has come from openbis or has extracted samples then it is not allowed
