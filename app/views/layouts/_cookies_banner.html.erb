@@ -1,0 +1,22 @@
+<div id="cookie-banner">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-md-7">
+        <%= render partial: 'general/cookies_info' %>
+        <p>
+          You can modify your cookie preferences at any time <%= link_to 'here', cookies_consent_path %>,
+          or from the link in the footer.
+        </p>
+      </div>
+
+      <div class="col-lg-4 col-md-5 text-right">
+        <%= link_to t('cookies.buttons.necessary'), cookies_consent_path(allow: 'necessary'),
+                    method: :post, class: 'btn btn-default' %>
+        <%= link_to t('cookies.buttons.embedding'), cookies_consent_path(allow: 'necessary,embedding'),
+                    method: :post, class: 'btn btn-default' %>
+        <%= link_to t('cookies.buttons.all'), cookies_consent_path(allow: CookieConsent::OPTIONS.join(',')),
+                    method: :post, class: 'btn btn-primary' if (Seek::Config.google_analytics_enabled || Seek::Config.piwik_analytics_enabled) %>
+      </div>
+    </div>
+  </div>
+</div>

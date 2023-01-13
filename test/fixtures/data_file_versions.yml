@@ -2,7 +2,6 @@ picture_v1:
   contributor: person_for_datafile_owner
   title: Picture
   description: A picture
-  last_used_at: 2009-04-03 11:09:18
   data_file: picture
   version: 1
   projects: [sysmo_project]
@@ -13,7 +12,6 @@ private_data_file_v1:
   contributor: person_for_datafile_owner
   title: Private Picture
   description: A picture
-  last_used_at: 2009-04-03 11:09:18
   data_file: private_data_file
   version: 1
   projects: [myexperiment_project]
@@ -24,7 +22,6 @@ downloadable_data_file_v1:
   contributor: person_for_datafile_owner
   title: Download Only
   description: A picture
-  last_used_at: 2009-04-03 11:09:18
   data_file: downloadable_data_file
   version: 1
   projects: [other_project] # not linked to any project for now
@@ -36,7 +33,6 @@ url_based_data_file_v1:
   data_file: url_based_data_file
   title: Data file from URL
   description: Uses a URL to the sysmo logo
-  last_used_at: 2009-04-03 11:09:18
   version: 1
   projects: [other_project] # not linked to any project for now
   policy: download_for_all_sysmo_users_policy
@@ -47,7 +43,6 @@ url_no_host_data_file_v1:
   data_file: url_no_host_data_file
   title: Data file No Host URL
   description: Uses a URL to the sysmo logo
-  last_used_at: 2009-04-03 11:09:18
   version: 1
   projects: [other_project] # not linked to any project for now
   policy: download_for_all_sysmo_users_policy
@@ -58,7 +53,6 @@ url_not_found_data_file_v1:
   data_file: url_not_found_data_file
   title: Data file Not found URL
   description: Uses a URL to the sysmo logo
-  last_used_at: 2009-04-03 11:09:18
   version: 1
   projects: [other_project] # not linked to any project for now
   policy: download_for_all_sysmo_users_policy
@@ -68,7 +62,6 @@ editable_data_file_v1:
   contributor: person_for_datafile_owner
   title: Editable Data File
   description: A picture
-  last_used_at: 2009-04-03 11:09:18
   data_file: editable_data_file
   version: 1
   projects: [other_project] # not linked to any project for now
@@ -79,7 +72,6 @@ sysmo_data_file_v1:
   contributor: person_for_model_owner
   title: Sysmo Data File
   description: A picture
-  last_used_at: 2009-04-03 11:09:18
   data_file: sysmo_data_file
   version: 1
   projects: [sysmo_project]
@@ -90,7 +82,6 @@ myexperiment_data_file_v1:
   contributor: person_for_datafile_owner
   title: Myexperiment Data File
   description: A picture
-  last_used_at: 2009-04-03 11:09:18
   data_file: myexperiment_data_file
   version: 1
   projects: [myexperiment_project]
@@ -101,7 +92,6 @@ data_file_with_links_in_description_v1:
   contributor: person_for_datafile_owner
   title: I Have Links
   description: "Visit my site http://www.sysmo-db.org"
-  last_used_at: 2009-04-03 11:09:18
   data_file: data_file_with_links_in_description
   version: 1
   projects: [sysmo_project]
@@ -111,7 +101,6 @@ data_file_with_links_in_description_v1:
 data_file_with_no_contributor_v1:
   title: Picture
   description: A picture
-  last_used_at: 2009-04-03 11:09:18
   data_file: data_file_with_no_contributor  
   version: 1
   projects: [sysmo_project]
@@ -122,7 +111,6 @@ viewable_data_file_v1:
   contributor: person_for_datafile_owner
   title: Can Only Be Viewed
   description: Viewing only!
-  last_used_at: 2009-04-03 11:09:18
   data_file: viewable_data_file
   version: 1
   projects: [sysmo_project]
@@ -133,7 +121,6 @@ downloadable_spreadsheet_data_file_v1:
   contributor: person_for_datafile_owner
   title: Downloadable Spreadsheet Data
   description: A spreadsheet
-  last_used_at: 2009-04-03 11:09:18
   data_file: downloadable_spreadsheet_data_file
   version: 1
   projects: [other_project] # not linked to any project for now
@@ -144,7 +131,6 @@ downloadable_spreadsheet_data_file_v2:
   contributor: person_for_datafile_owner
   title: Downloadable Spreadsheet Data
   description: A spreadsheet
-  last_used_at: 2009-04-03 11:09:18
   data_file: downloadable_spreadsheet_data_file
   version: 2
   projects: [other_project] # not linked to any project for now

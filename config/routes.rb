@@ -135,6 +135,14 @@ SEEK::Application.routes.draw do
     end
   end
 
+  concern :has_avatar do
+    resources :avatars do
+      member do
+        post :select
+      end
+    end
+  end
+
   ### GENERAL PAGES ###
 
   root to: 'homes#index'
@@ -271,7 +279,7 @@ SEEK::Application.routes.draw do
 
   ### YELLOW PAGES ###
 
-  resources :people, concerns: [:publishable] do
+  resources :people, concerns: [:publishable, :has_avatar] do
     collection do
       get :typeahead
       get :register
@@ -296,14 +304,9 @@ SEEK::Application.routes.draw do
     resources :projects, :programmes, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows,
               :data_files, :presentations, :publications, :documents, :events, :sample_types, :samples, :specimens,
               :strains, :file_templates, :placeholders, :collections, :templates, only: [:index]
-    resources :avatars do
-      member do
-        post :select
-      end
-    end
   end
 
-  resources :projects do
+  resources :projects, concerns: [:has_avatar] do
     collection do
       get :request_institutions
       get :guided_join
@@ -339,11 +342,6 @@ SEEK::Application.routes.draw do
         get :test_endpoint
         get :fetch_spaces
         get :browse
-      end
-    end
-    resources :avatars do
-      member do
-        post :select
       end
     end
     resources :folders do
@@ -385,18 +383,13 @@ SEEK::Application.routes.draw do
     end
   end
 
-  resources :institutions do
+  resources :institutions, concerns: [:has_avatar] do
     collection do
       get :request_all
       get :request_all_sharing_form
       get  :typeahead
     end
     resources :people, :programmes, :projects, :specimens, only: [:index]
-    resources :avatars do
-      member do
-        post :select
-      end
-    end
   end
 
   ### ISA ###
@@ -487,7 +480,6 @@ SEEK::Application.routes.draw do
       post :create_metadata
     end
     member do
-      get :plot
       get :explore
       get :samples_table
       get :select_sample_type
@@ -549,7 +541,7 @@ SEEK::Application.routes.draw do
     resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :sops, :collections, :presentations, :documents, :data_files, only: [:index]
   end
 
-  resources :workflow_classes, except: [:show]
+  resources :workflow_classes, except: [:show], concerns: [:has_avatar]
 
   resources :file_templates, concerns: [:has_content_blobs, :has_versions, :has_doi, :publishable, :asset] do
     collection do
@@ -582,12 +574,7 @@ SEEK::Application.routes.draw do
       post :examine_url
     end
   end
-  resources :programmes do
-    resources :avatars do
-      member do
-        post :select
-      end
-    end
+  resources :programmes, concerns: [:has_avatar] do
     collection do
       get :awaiting_activation
     end
@@ -731,14 +718,9 @@ SEEK::Application.routes.draw do
     resources :people, :programmes, :projects, :programmes, :investigations, :assays, :studies, :publications, :events, :collections, :workflows, only: [:index]
   end
 
-  resources :collections, concerns: [:publishable, :has_doi, :asset] do
+  resources :collections, concerns: [:publishable, :has_doi, :asset, :has_avatar] do
     resources :items, controller: :collection_items
     resources :people, :programmes, :projects, :programmes, :investigations, :assays, :studies, :publications, :events, :collections, only: [:index]
-    resources :avatars do
-      member do
-        post :select
-      end
-    end
   end
 
   resources :git_repositories, only: [] do
@@ -859,4 +841,11 @@ SEEK::Application.routes.draw do
   get '/home/isa_colours' => 'homes#isa_colours'
 
   post '/previews/markdown' => 'previews#markdown'
+
+  # cookie consent
+  get 'cookies/consent' => 'cookies#consent'
+  post 'cookies/consent' => 'cookies#set_consent'
+
+  # for the api docs under production, avoids special rewrite rules
+  get 'api', to: static("api/index.html") if Rails.env.production?
 end

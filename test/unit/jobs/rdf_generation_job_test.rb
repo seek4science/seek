@@ -20,10 +20,9 @@ class RdfGenerationJobTest < ActiveSupport::TestCase
       end
     end
 
-    # check a new job isn't created when nothing (except the last used timestamp) has changed
+    # check a new job isn't created when nothing has changed
     item = Factory :model
     disable_authorization_checks { item.save! }
-    item.last_used_at = Time.now
     assert_no_enqueued_jobs(only: RdfGenerationJob) do
       assert_no_difference('RdfGenerationQueue.count') do
         disable_authorization_checks { item.save! }

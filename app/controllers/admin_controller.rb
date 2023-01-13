@@ -110,6 +110,8 @@ class AdminController < ApplicationController
     Seek::Config.sops_enabled = string_to_boolean params[:sops_enabled]
     Seek::Config.workflows_enabled = string_to_boolean params[:workflows_enabled]
 
+    Seek::Config.require_cookie_consent = string_to_boolean params[:require_cookie_consent]
+
     Seek::Config.google_analytics_tracker_id = params[:google_analytics_tracker_id]
     Seek::Config.google_analytics_enabled = string_to_boolean params[:google_analytics_enabled]
     Seek::Config.google_analytics_tracking_notice = params[:google_analytics_tracking_notice]

@@ -113,7 +113,12 @@ class ContentBlob < ApplicationRecord
 
   def cache_key
     base = new_record? ? "#{model_name.cache_key}/new" : "#{model_name.cache_key}/#{id}"
-    "#{base}-#{sha1sum}"
+
+    unless url.nil?
+      "#{base}-#{sha1sum}-#{Digest::SHA1.hexdigest(url)}"
+    else
+      "#{base}-#{sha1sum}"
+    end
   end
 
   # returns an IO Object to the data content, or nil if the data file doesn't exist.

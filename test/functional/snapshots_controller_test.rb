@@ -26,6 +26,8 @@ class SnapshotsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+
+
   test "can't get snapshot preview if no manage permissions" do
     user = Factory(:user)
     investigation = Factory(:investigation, policy: Factory(:publicly_viewable_policy))
@@ -126,6 +128,27 @@ class SnapshotsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test 'fail gracefully for snapshot with no blob' do
+    create_investigation_snapshot
+    assert @snapshot.content_blob.destroy
+    @snapshot.reload
+
+    assert_nil @snapshot.content_blob
+    login_as(@user)
+
+    get :show, params: { investigation_id: @investigation, id: @snapshot.snapshot_number }
+    assert_response :success
+    assert_select 'div.alert-warning' do
+      assert_select 'p', text:/cannot currently be displayed as it is incomplete/
+      assert_select 'a[href=?]', investigation_path(@investigation), text:@investigation.title
+    end
+
+    get :show, params: { investigation_id: @investigation, id: @snapshot.snapshot_number, format: :json }
+    assert_response :unprocessable_entity
+    expected = { errors: [{ title: 'Incomplete snapshot', details: 'Snapshot has no content. It may still be being generated' }] }.with_indifferent_access
+    assert_equal expected , JSON.parse(@response.body)
+  end
+
   test 'fails gracefully when missing snapshot' do
     create_investigation_snapshot
     login_as(@user)
@@ -135,6 +158,8 @@ class SnapshotsControllerTest < ActionController::TestCase
     assert_response :redirect
     assert flash[:error].include?('exist')
   end
+
+
 
   test 'can get confirmation when minting DOI for snapshot' do
     datacite_mock
