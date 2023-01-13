@@ -36,7 +36,7 @@ Set the ***host ip address*** in the *hosts* file.
 
 Set the username (***user_var***) in the *group_vars/vars.yml* file.
 
-Adjust the destination (***git_dest***) for the SEEK folder that will be generated in the *group_vars/vars.yml* file.
+Adjust the version to pull (***git_version***) and the destination (***git_dest***) for the SEEK folder that will be generated in the *group_vars/vars.yml* file.
 
 Set the ***local_vm_become_password*** variable in the *group_vars/sensitive_vars.yml* file, preferably encrypted (see [Ansible vault](https://docs.ansible.com/ansible/2.8/user_guide/vault.html#variable-level-encryption)). In summary:
 
