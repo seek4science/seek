@@ -75,3 +75,17 @@ jobs:
         working-directory: /home/runner/work/SEEK
         run: |
           bash -lc 'bundle exec rails test test/functional'
+
+
+  fail-on-any-os:
+    # Without this step workflow remains "green" regardles of fails above.
+    name: Workflow Status
+    needs:
+      - install-seek-from-ansible
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - uses: technote-space/workflow-conclusion-action@v3.0.3
+      - name: Check Job Status status and fail if they are red
+        if: env.WORKFLOW_CONCLUSION == 'failure'
+        run: exit 1
