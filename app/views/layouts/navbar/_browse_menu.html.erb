@@ -6,30 +6,34 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li role="presentation" class="dropdown-header visible-md">Browse</li>
-    <%= render_menu_group(t('menu.yellow_pages'), [
-        [t('programme').pluralize, programmes_path, Seek::Config.programmes_enabled],
-        [t('project').pluralize, projects_path, true],
-        [t('institution').pluralize, institutions_path, true],
-        [t('person').pluralize, people_path, true]
-    ]) %>
-
-    <%= render_menu_group(t('menu.isa'), [
-        [t('investigation').pluralize, investigations_path, Seek::Config.investigations_enabled],
-        [t('study').pluralize, studies_path, Seek::Config.studies_enabled],
-        [t('assay').pluralize, assays_path, Seek::Config.assays_enabled],
+    <%= render_menu_group(t('menu.main'), [
+      [t('workflow').pluralize, workflows_path, Seek::Config.workflows_enabled],
+      [t('collection').pluralize, collections_path, Seek::Config.collections_enabled]
     ]) %>
 
     <%= render_menu_group(t('menu.assets'), [
+        [t('publication').pluralize, publications_path, Seek::Config.publications_enabled],
+        [t('document').pluralize, documents_path, Seek::Config.documents_enabled],
         [t('data_file').pluralize, data_files_path, Seek::Config.data_files_enabled],
         [t('model').pluralize, models_path, Seek::Config.models_enabled],
         [t('sop').pluralize, sops_path, Seek::Config.sops_enabled],
-        [t('workflow').pluralize, workflows_path, Seek::Config.workflows_enabled],
-        [t('publication').pluralize, publications_path, Seek::Config.publications_enabled],
-        [t('document').pluralize, documents_path, Seek::Config.documents_enabled],
         [t('file_template').pluralize, file_templates_path, Seek::Config.file_templates_enabled],
-        [t('placeholder').pluralize, placeholders_path, Seek::Config.placeholders_enabled],
-        [t('collection').pluralize, collections_path, Seek::Config.collections_enabled]
+        [t('placeholder').pluralize, placeholders_path, Seek::Config.placeholders_enabled]
     ]) %>
+
+    <%= render_menu_group(t('menu.yellow_pages'), [
+      [t('programme').pluralize, programmes_path, Seek::Config.programmes_enabled],
+      [t('project').pluralize, projects_path, true],
+      [t('institution').pluralize, institutions_path, true],
+      [t('person').pluralize, people_path, true]
+    ]) %>
+
+    <%= render_menu_group(t('menu.isa'), [
+      [t('investigation').pluralize, investigations_path, Seek::Config.investigations_enabled],
+      [t('study').pluralize, studies_path, Seek::Config.studies_enabled],
+      [t('assay').pluralize, assays_path, Seek::Config.assays_enabled],
+    ]) %>
+
     <%= render_menu_group(t('menu.activities'), [
       [t('presentation').pluralize, presentations_path, Seek::Config.presentations_enabled],
       [t('event').pluralize, events_path, Seek::Config.events_enabled],

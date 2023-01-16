@@ -46,4 +46,5 @@
 *= require select2.min
 *= require select2.bootstrap.min
 *= require linked_custom_metadata
+*= require workflowhub
 */

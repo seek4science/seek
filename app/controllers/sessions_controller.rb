@@ -91,7 +91,7 @@ class SessionsController < ApplicationController
   def successful_login(notice = nil)
     self.current_user = @user
 
-    flash[:notice] = notice || "You have successfully logged in, #{@user.display_name}."
+    flash[:notice] = notice || "You have successfully logged in, #{@user.display_name}.<br/><br/>To register a Workflow select Workflow from the Create menu".html_safe
     if params[:remember_me] == 'on'
       @user.remember_me unless @user.remember_token?
       cookies[:auth_token] = { value: @user.remember_token, expires: @user.remember_token_expires_at }
