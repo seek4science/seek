@@ -1,0 +1,17 @@
+en:
+  programme: &programme Space
+  project: &project Team
+  institution: &institution Organization
+  project_administrator: Team Administrator
+  programme_administrator: Space Administrator
+  attributes:
+    programme: *programme
+    project: *project
+    institution: *institution
+    programmes: Spaces
+    projects: Teams
+    institutions: Organizations
+  activerecord:
+    programme: *programme
+    project: *project
+    institution: *institution

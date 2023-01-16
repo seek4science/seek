@@ -1,0 +1,22 @@
+<div class="row seek-homepage-button-container">
+  <div class="col-sm-4">
+    <%= frontpage_button(workflows_path, nil, class: 'btn btn-default btn-lg workflowhub-homepage-button') do %>
+      <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+      Discover
+    <% end %>
+  </div>
+  <div class="col-sm-4">
+    <%= frontpage_button(current_user ? new_workflow_path : login_path(return_to: new_workflow_path), nil,
+                         class: 'btn btn-default btn-lg workflowhub-homepage-button') do %>
+      <span class="glyphicon glyphicon-upload" aria-hidden="true"></span>
+      Contribute
+    <% end %>
+  </div>
+  <div class="col-sm-4">
+    <%= frontpage_button('https://about.workflowhub.eu', nil, target: :_blank,
+                         class: 'btn btn-default btn-lg workflowhub-homepage-button') do %>
+      <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+      About
+    <% end %>
+  </div>
+</div>
