@@ -188,18 +188,19 @@ div.index-filters {
   .filter-category-title {
     background: $panel-default-heading-bg;
     padding: 5px;
-    border-bottom: 1px solid $pagination-border;
+    border-bottom: 1px solid $panel-default-border;
   }
-  border-top: 1px solid $pagination-border;
-  border-left: 1px solid $pagination-border;
-  border-right: 1px solid $pagination-border;
+  border-top: 1px solid $panel-default-border;
+  border-left: 1px solid $panel-default-border;
+  border-right: 1px solid $panel-default-border;
   &:last-child {
-    border-bottom: 1px solid $pagination-border;
+    border-bottom: 1px solid $panel-default-border;
   }
 
   .filter-option {
     display: flex;
     padding: 5px;
+    background: $panel-bg;
     .filter-option-label {
       flex-grow: 1;
       white-space: nowrap;
@@ -315,7 +316,7 @@ div.index-filters {
 
 .filter-option-dropdown {
   border: none;
-  background: transparent;
+  background: $pagination-bg;
   width: 100%;
   border-radius: 0;
   height: 34px;
