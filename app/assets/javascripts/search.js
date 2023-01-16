@@ -10,7 +10,7 @@ var Search = {
     },
 
     toggleAdvanced: function () {
-        $j('#advanced-search').slideToggle();
+        $j('#advanced-search').toggle();
         // Ensure form elements are all enabled. User might have clicked back button
         Search.disableBlankElements(false);
     }
