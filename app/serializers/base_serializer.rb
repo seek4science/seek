@@ -121,6 +121,12 @@ class BaseSerializer < SimpleBaseSerializer
     end
   end
 
+  attribute :custom_metadata_attributes, if: -> { object.respond_to?(:custom_metadata) && !object.custom_metadata.blank? } do
+    { custom_metadata_type_id: object.custom_metadata.custom_metadata_type_id.to_s,
+      attribute_map: object.custom_metadata.data.to_hash }
+  end
+
+
   def show_policy?
     return false unless object.respond_to?('can_manage?')
     return false unless object.respond_to?('policy')
