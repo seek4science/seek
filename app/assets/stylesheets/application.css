@@ -43,4 +43,5 @@
 *= require ror-widget
 *= require DataTables-2.3.1/datatables.min
 *= require sparql
+*= require workflowhub
 */
