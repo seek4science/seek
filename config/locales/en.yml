@@ -83,9 +83,10 @@ en:
     create_button: "CREATE"
 
   menu:
-    yellow_pages: "Yellow pages"
+    yellow_pages: "Directory"
     isa:  "Experiments"
-    assets: "Assets"
+    main: "Core Resources"
+    assets: "Other Resources"
     activities: "Activities"
     samples: "Samples"
     documentation: "Help"

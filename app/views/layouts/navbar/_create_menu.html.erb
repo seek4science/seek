@@ -6,6 +6,20 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li role="presentation" class="dropdown-header visible-md">Create</li>
+    <%= render_menu_group(t('menu.main'), [
+      [t('workflow'), new_workflow_path, Seek::Config.workflows_enabled],
+      [t('collection'), new_collection_path, Seek::Config.collections_enabled]
+    ]) %>
+
+    <%= render_menu_group(t('menu.assets'), [
+      [t('publication'), new_publication_path, Seek::Config.publications_enabled],
+      [t('document'), new_document_path, Seek::Config.documents_enabled],
+      [t('data_file'), new_data_file_path, Seek::Config.data_files_enabled],
+      [t('model'), new_model_path, Seek::Config.models_enabled],
+      [t('sop'), new_sop_path, Seek::Config.sops_enabled],
+      [t('file_template'), new_file_template_path, Seek::Config.file_templates_enabled],
+      [t('placeholder'), new_placeholder_path, Seek::Config.placeholders_enabled]
+    ]) %>
 
     <%= render_menu_group(t('menu.yellow_pages'), [
         [t('programme'), new_programme_path, can_create_programmes?],
@@ -20,18 +34,6 @@
           [t('study'), new_study_path, Seek::Config.studies_enabled],
           [t('assay'), new_assay_path, Seek::Config.assays_enabled],
           [t('template'), new_template_path, Seek::Config.isa_json_compliance_enabled],
-      ]) %>
-
-      <%= render_menu_group(t('menu.assets'), [
-          [t('data_file'), new_data_file_path, Seek::Config.data_files_enabled],
-          [t('model'), new_model_path, Seek::Config.models_enabled],
-          [t('sop'), new_sop_path, Seek::Config.sops_enabled],
-          [t('workflow'), new_workflow_path, Seek::Config.workflows_enabled],
-          [t('publication'), new_publication_path, Seek::Config.publications_enabled],
-          [t('document'), new_document_path, Seek::Config.documents_enabled],
-          [t('file_template'), new_file_template_path, Seek::Config.file_templates_enabled],
-          [t('placeholder'), new_placeholder_path, Seek::Config.placeholders_enabled],
-          [t('collection'), new_collection_path, Seek::Config.collections_enabled]
       ]) %>
 
       <%= render_menu_group(t('menu.activities'), [
