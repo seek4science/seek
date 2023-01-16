@@ -6,7 +6,7 @@
 
 <% if !logged_in_and_registered? %>
   <% if Seek::Config.home_show_features%>
-      <%= render :partial=>"home_features" -%>
+    <%= render partial: 'workflowhub_features' -%>
   <% end %>
 <% end %>
 
@@ -15,11 +15,12 @@
     <% if Seek::Config.home_description_position == 'middle' && home_description_text.present? %>
       <%= render partial: 'gadgets/home_description_gadget' %>
     <% end %>
+    <%= render partial: 'home_workflowhub_buttons' if logged_in_and_registered? %>
     <% if logged_in_and_registered? && Seek::Config.home_show_my_items%>
       <%= render :partial=>"home_my_items" -%>
     <% end %>
     <% if Seek::Config.home_explore_projects %>
-      <%= render :partial=>"home_explore_projects" -%>
+      <%= render :partial=>"workflowhub_explore_content" -%>
     <% end %>
     <% if !logged_in_and_registered? && Seek::Config.home_show_who_uses %>
       <%= render :partial=>"home_who_uses" -%>
@@ -31,6 +32,8 @@
 
   <!-- right sidebar -->
   <div class="col-md-3">
+    <%= render partial: 'workflowhub_shortcuts' -%>
+
     <% if logged_in_and_registered?  && Seek::Config.home_show_quickstart %>
       <%= render :partial=>"home_quick_start" -%>
     <% end %>

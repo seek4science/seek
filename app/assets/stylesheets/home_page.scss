@@ -15,8 +15,7 @@ div#home-my-items #my-projects {
 }
 
 .seek-homepage-button-container {
-  margin-bottom: 1em;
-  margin-top: 1em;
+
 }
 
 .seek-homepage-button-container img.feature-icon {
@@ -42,7 +41,7 @@ a.seek-homepage-button {
   background-color: #f7f7f7;
   border-radius: 4px;
   padding: 20px;
-  margin: 5px;
+  margin-bottom: 1em;
   text-decoration: none;
 
   &:hover {
@@ -58,10 +57,9 @@ a.seek-homepage-button {
   color: #666;
 }
 
-@media (min-width: $screen-sm-min) {
+@media (max-width: $screen-sm-max) {
   .seek-homepage-button-container {
-    margin-bottom: 3em;
-    margin-top: 3em;
+
   }
 
   a.seek-homepage-button {
@@ -74,6 +72,11 @@ a.seek-homepage-button {
     height: 200px;
     display: block;
     margin: 5px auto;
+  }
+
+  .seek-homepage-button span.glyphicon  {
+    font-size: 40px;
+    line-height: 60px;
   }
 }
 
@@ -151,7 +154,7 @@ ul.feed {
 
 ul.feed li {
   list-style: none;
-  border-top: 1px solid #ccc;
+  border-top: 1px solid $panel-inner-border;
   padding: 0.5em 0;
 }
 

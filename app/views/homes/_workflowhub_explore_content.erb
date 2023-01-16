@@ -1,0 +1,85 @@
+<div id="home-explore-projects">
+  <div class="row">
+    <div class="col-md-6" id="recently_added_col">
+      <%= render :partial=>"home_activity_recent_additions" -%>
+    </div>
+    <div class="col-md-6">
+      <%= panel('Find content', body_options: { id: 'find_content', class: ''}) do %>
+        <div class="row">
+          <% if Seek::Config.workflows_enabled %>
+            <div class="col-md-6">
+              <div style="text-align: center;">
+                <a class="btn btn-default btn-lg browse-button" href="<%= workflows_path %>" role="button">
+                  <p>Browse <%= t('workflow').pluralize %></p>
+                  <%= image('workflow') %>
+                </a>
+              </div>
+              <br>
+            </div>
+          <% end %>
+          <% if Seek::Config.workflows_enabled %>
+            <div class="col-md-6">
+              <div style="text-align: center;">
+                <a class="btn btn-default btn-lg browse-button" href="<%= collections_path %>" role="button">
+                  <p>Browse <%= t('collection').pluralize %></p>
+                  <%= image('collection_avatar') %>
+                </a>
+              </div>
+              <br>
+            </div>
+          <% end %>
+        </div>
+        <div class="row">
+          <% if Seek::Config.programmes_enabled %>
+            <div class="col-md-6">
+              <div style="text-align: center;">
+                <a class="btn btn-default btn-lg browse-button" href="<%= programmes_path %>" role="button">
+                  <p>Browse <%= t('programme').pluralize %></p>
+                  <%= image('programme_avatar') %>
+                </a>
+              </div>
+              <br>
+            </div>
+          <% end %>
+          <div class="<%= Seek::Config.programmes_enabled ? 'col-md-6' : 'col-md-6' %>">
+            <div style="text-align: center;">
+              <a class="btn btn-default btn-lg browse-button" href="<%= projects_path %>" role="button">
+                <p>Browse <%= t('project').pluralize %></p>
+                <%= image('project_avatar') %>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <% if Seek::Config.tagging_enabled %>
+            <div id="home_explore_projects_tag_cloud">
+              <%= render :partial => "home_tag_cloud" %>
+
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<script>
+  $j(document).ready(function () {
+    /**
+     * Sets the #recently_added panel to the same height as #find_content, so they are consistent
+     * in 2 column view. #recently_added_col is necessary to compute the width value with respect
+     * to the row
+     */
+    function setLatestAdditionsHeight () {
+      // Hackish way to determine if bootstrap is displaying a single column
+      var parent_col_width = ( 100 * parseFloat($j('#recently_added_col').css('width')) / parseFloat($j('#recently_added_col').parent().css('width')));
+      if (parent_col_width !=100){
+        $j('#recently_added').css({'height': $j('#find_content').outerHeight(),"max-height":"none"})
+      }else{
+        $j('#recently_added').css({'height': '',"max-height":""})
+      }
+    };
+    setLatestAdditionsHeight();
+    $j(window).resize(function() {setLatestAdditionsHeight();});
+  });
+</script>
