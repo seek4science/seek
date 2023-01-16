@@ -1,0 +1,351 @@
+@import 'variables';
+
+#home-features .fair-principle {
+  color: $eosc-yellow;
+  font-weight: bold;
+}
+
+#home-features .jumbotron {
+  background: #072727;
+  color: white;
+  border-radius: 0;
+  margin-left: calc(50% - 50vw);
+  width: 100vw;
+  margin-top: -20px;
+  margin-bottom: 0;
+
+  p a:hover {
+    color: lighten($link-color, 10%);
+    text-decoration: none;
+  }
+}
+
+/* Flat, material style */
+
+#home-features .container-fluid {
+  max-width: 1600px;
+}
+
+#content > .container-fluid, #navbar > .container-fluid, #ft > .container-fluid {
+  max-width: 1600px;
+}
+
+.home-main-panel .panel-heading {
+  text-align: left;
+  font-size: inherit;
+}
+
+@mixin material-button-size-variant($color, $background, $shadow, $depth, $border) {
+  color: $color;
+  background-color: $background;
+  border-color: $border $border transparent $border;
+  box-shadow: 0 $depth 0 $shadow;
+
+  &:focus,
+  &.focus {
+    color: $color;
+    background-color: darken($background, 10%);
+    box-shadow: 0 $depth 0 darken($shadow, 25%);
+    border-color: darken($border, 25%) darken($border, 25%) transparent darken($border, 25%);
+  }
+  &:hover {
+    color: $color;
+    background-color: darken($background, 10%);
+    box-shadow: 0 $depth 0 darken($shadow, 12%);
+    border-color: darken($border, 12%) darken($border, 12%) transparent darken($border, 12%);
+  }
+  &:active,
+  &.active,
+  .open > &.dropdown-toggle {
+    color: $color;
+    background-color: darken($background, 10%);
+    background-image: none;
+    box-shadow: none !important;
+    transform: translateY($depth);
+    border-color: darken($border, 12%) !important;
+
+    &:hover,
+    &:focus,
+    &.focus {
+      color: $color;
+      background-color: darken($background, 17%);
+      box-shadow: 0 $depth 0 darken($shadow, 25%);
+      border-color: darken($border, 25%) darken($border, 25%) transparent darken($border, 25%);
+    }
+  }
+  &.disabled,
+  &[disabled],
+  fieldset[disabled] & {
+    box-shadow: 0 $depth 0 $shadow !important;
+    &:hover,
+    &:focus,
+    &.focus {
+      background-color: $background;
+      border-color: $border $border transparent $border;
+    }
+  }
+
+  .badge {
+    color: $background;
+    background-color: $color;
+  }
+}
+
+@mixin material-button($color, $background, $shadow, $border) {
+  @include material-button-size-variant($color, $background, $shadow, 2px, $border);
+
+  &.btn-lg {
+    @include material-button-size-variant($color, $background, $shadow, 5px, $border);
+  }
+  &.btn-sm, &.btn-xs {
+    @include material-button-size-variant($color, $background, $shadow, 1px, $border);
+  }
+}
+
+.btn-default {
+  @include material-button($btn-default-color, $btn-default-bg, $btn-default-border, $btn-default-border);
+}
+.btn-primary {
+  @include material-button($btn-primary-color, $btn-primary-bg, $btn-primary-border, transparent);
+}
+.btn-success {
+  @include material-button($btn-success-color, $btn-success-bg, $btn-success-border, transparent);
+}
+.btn-info {
+  @include material-button($btn-info-color, $btn-info-bg, $btn-info-border, transparent);
+}
+.btn-warning {
+  @include material-button($btn-warning-color, $btn-warning-bg, $btn-warning-border, transparent);
+}
+.btn-danger {
+  @include material-button($btn-danger-color, $btn-danger-bg, $btn-danger-border, transparent);
+}
+
+.panel, .CodeMirror, .editor-toolbar {
+  border: none;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1)
+}
+
+//.btn:hover {
+//  border-width: 0 0 2px 0
+//}
+
+.box_editing_inner {
+  border: none;
+  border-radius: 0;
+  padding: 1em;
+}
+
+.bootstrap-tagsinput {
+  background-color: $input-bg;
+  border-radius: $border-radius-base;
+  transition: border-color ease-in-out 0.15s;
+}
+
+.form-control, .bootstrap-tagsinput {
+  border: 1px solid transparent;
+  border-bottom: 1px solid #ccc;
+  box-shadow: none;
+}
+
+.form-control:focus, .bootstrap-tagsinput.focus {
+  border-color: transparent transparent $brand-primary;
+  box-shadow: none;
+}
+
+.alert {
+  border-width: 0;
+}
+
+.filter-option-field-group .filter-option-field-button {
+  border: none;
+}
+
+a.workflowhub-homepage-button {
+  display: block;
+  font-size: 200%;
+  padding: 20px;
+  margin-bottom: 1em;
+}
+
+.workflowhub-homepage-button img, .workflowhub-homepage-button span.glyphicon  {
+  display: block;
+  font-size: 80px;
+  margin: auto;
+  line-height: 120px;
+  color: $brand-primary;
+}
+
+@media (max-width: $screen-sm-max) {
+  a.workflowhub-homepage-button {
+    display: block;
+    text-align: center;
+  }
+
+  .workflowhub-homepage-button img {
+    width: 200px;
+    height: 200px;
+    display: block;
+    margin: 5px auto;
+  }
+
+  .workflowhub-homepage-button span.glyphicon  {
+    font-size: 40px;
+    line-height: 60px;
+  }
+}
+
+
+#search_box {
+  #q {
+    background: #eee;
+    border-color: transparent;
+    border-radius: 15px;
+  }
+
+  .input-group-btn {
+    padding-left: 10px;
+    .btn {
+      border: 0;
+      box-shadow: none !important;
+      &:active, &.active {
+        transform: none !important;
+      }
+    }
+    .btn:first-child {
+      border-radius: 15px 0 0 15px;
+    }
+    .btn:last-child {
+      padding-left: 0;
+      padding-right: 5px;
+      border-radius: 0 15px 15px 0;
+    }
+  }
+}
+
+.seek-description {
+  border: none;
+  box-shadow: none;
+  background: #fff;
+  padding: 20px;
+}
+
+.CodeMirror,
+.CodeMirror-scroll {
+  max-height: 30em;
+}
+
+.editor-toolbar, .CodeMirror {
+  border-radius: $border-radius-base !important;
+  border-color: $panel-default-border;
+}
+
+.editor-toolbar {
+  background: $panel-default-heading-bg;
+}
+
+.panel .nav-tabs li.active a {
+  background: $panel-bg;
+}
+
+
+.index-filters {
+  width: 280px !important;
+
+  .filter-category {
+    border-width: 0 0 2px 0;
+    border-style: solid;
+    border-color: #ddd;
+    padding-bottom: 10px;
+    background: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+    .filter-category-title {
+      color: #777;
+      padding: 15px 10px;
+    }
+
+    .filter-option {
+      padding: 6px 10px 6px 20px;
+    }
+
+    .filter-option-dropdown {
+      padding-left: 20px;
+    }
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &[data-filter-category="query"] {
+      margin: 15px 0;
+      background: transparent;
+      border: none !important;
+      box-shadow: none;
+
+      .filter-category-title {
+        display: none;
+      }
+      #filter-search-field {
+        border-radius: 16px;
+        padding: 5px 15px;
+        background-color: #ddd;
+      }
+      #filter-search-button {
+        border-radius: 16px;
+        background-color: $brand-primary;
+        color: #fff;
+        margin-left: 10px;
+      }
+    }
+
+  }
+
+  .expand-filter-category-link {
+    background: #fff;
+    padding-left: 20px;
+  }
+}
+
+.nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
+  border-width: 0 0 3px 0;
+  border-color: $brand-primary;
+  margin-bottom: -3px;
+  color: $brand-primary;
+}
+
+.nav-tabs {
+  border-bottom: 1px solid #ccc;
+  a {
+    color: #333;
+  }
+}
+
+#ft {
+  background: #fff;
+}
+
+.panel-heading {
+  border-bottom: 2px solid $brand-primary !important;
+}
+
+.table {
+  background: #fff;
+}
+
+#files.tab-pane {
+  background: #fff;
+  min-width: 50%;
+  width: min-content;
+  padding: 20px;
+  border-radius: 4px;
+}
+
+#footer-logos {
+  display: flex;
+  gap: 3em;
+  justify-content: center;
+  a {
+    display: block;
+  }
+}
