@@ -75,15 +75,15 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="1920"
-     inkscape:window-height="924"
+     inkscape:window-width="2560"
+     inkscape:window-height="1247"
      id="namedview3408"
      showgrid="false"
      inkscape:snap-intersection-paths="false"
      inkscape:object-paths="false"
      inkscape:zoom="1.1233333"
-     inkscape:cx="567.8935"
-     inkscape:cy="30.967205"
+     inkscape:cx="518.66417"
+     inkscape:cy="-18.517009"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
@@ -127,7 +127,7 @@
      transform="translate(-3.4144231,53.548875)">
     <g
        aria-label="WorkflowHub"
-       transform="matrix(1.0157131,0,0,0.98452998,-251.44658,-61.784305)"
+       transform="matrix(1.0157131,0,0,0.98452998,-251.44658,-75.784305)"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:135.42840576px;line-height:0%;font-family:'Roboto Slab';-inkscape-font-specification:'Roboto Slab, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;display:inline;opacity:1;fill:#1f8787;fill-opacity:1;stroke:none;stroke-width:1.0157131px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        id="text4161-0">
       <path
@@ -185,27 +185,27 @@
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:135.42840576px;line-height:0%;font-family:'Roboto Slab';-inkscape-font-specification:'Roboto Slab, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;opacity:0;fill:#1f8787;fill-opacity:1;stroke:none;stroke-width:1.0157131px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="268.4678"
-       y="163.87637"
+       y="149.65634"
        id="text4161"
        transform="scale(1.0157131,0.98452998)"><tspan
          sodipodi:role="line"
          id="tspan4163"
          x="268.4678"
-         y="163.87637"
+         y="149.65634"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:135.42840576px;line-height:1.25;font-family:'Roboto Slab';-inkscape-font-specification:'Roboto Slab, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:1.0157131px">WorkflowHub</tspan></text>
     <path
        style="display:inline;opacity:1;fill:#1f8787;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 94.67742,67.930454 a 28.096702,28.518926 0 0 0 -13.38476,3.81383 28.096702,28.518926 0 0 0 -14.04867,24.69738 v 9.045046 H 56.413723 a 29.194542,27.982157 0 0 0 -25.283549,13.99063 29.194542,27.982157 0 0 0 0,27.98304 29.194542,27.982157 0 0 0 25.283549,13.99064 H 123.43679 V 96.441664 a 28.096702,28.518926 0 0 0 -14.04867,-24.69738 28.096702,28.518926 0 0 0 -14.7107,-3.81383 z"
+       d="m 94.67742,53.930454 a 28.096702,28.518926 0 0 0 -13.38476,3.81383 28.096702,28.518926 0 0 0 -14.04867,24.69738 V 91.48671 H 56.413723 a 29.194542,27.982157 0 0 0 -25.283549,13.99063 29.194542,27.982157 0 0 0 0,27.98304 29.194542,27.982157 0 0 0 25.283549,13.99064 H 123.43679 V 82.441664 a 28.096702,28.518926 0 0 0 -14.04867,-24.69738 28.096702,28.518926 0 0 0 -14.7107,-3.81383 z"
        id="path3416"
        inkscape:connector-curvature="0" />
     <path
        inkscape:connector-curvature="0"
        style="display:inline;opacity:1;fill:#f9b233;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="M 278.21274,118.69199 A 43.206872,41.773753 0 0 0 272.43469,98.791735 43.206872,41.773753 0 0 0 235.01755,77.904414 H 221.3141 v -16.10231 a 42.393656,43.406003 0 0 0 -21.19616,-37.591191 42.393656,43.406003 0 0 0 -42.39501,0 42.393656,43.406003 0 0 0 -21.19614,37.591191 v 99.648906 h 98.49076 a 43.206872,41.773753 0 0 0 37.41714,-20.88732 43.206872,41.773753 0 0 0 5.77805,-21.8717 z"
+       d="M 278.21274,104.69199 A 43.206872,41.773753 0 0 0 272.43469,84.791735 43.206872,41.773753 0 0 0 235.01755,63.904414 H 221.3141 v -16.10231 a 42.393656,43.406003 0 0 0 -21.19616,-37.591191 42.393656,43.406003 0 0 0 -42.39501,0 42.393656,43.406003 0 0 0 -21.19614,37.591191 v 99.648906 h 98.49076 a 43.206872,41.773753 0 0 0 37.41714,-20.88732 43.206872,41.773753 0 0 0 5.77805,-21.8717 z"
        id="path3416-7" />
     <path
        style="display:inline;opacity:0.67000002;fill:#7f5304;fill-opacity:1;stroke:none"
-       d="m 196.99529,79.345874 -5.74054,14.52475 a 42.88241,42.88241 0 0 0 -9.51119,3.928101 l -14.31704,-6.204561 -8.17779,8.177831 6.21293,14.335445 a 42.88241,42.88241 0 0 0 -3.97502,9.50783 l -14.4862,5.72548 v 11.56652 l 14.52473,5.74055 a 42.88241,42.88241 0 0 0 3.9281,9.51118 l -6.20454,14.31534 8.17779,8.17949 14.33379,-6.21292 a 42.88241,42.88241 0 0 0 9.50952,3.97501 l 5.72546,14.4862 h 11.56652 l 5.73888,-14.52307 a 42.88241,42.88241 0 0 0 9.51117,-3.92976 l 14.31704,6.20456 8.17949,-8.17949 -6.21293,-14.33377 a 42.88241,42.88241 0 0 0 3.97501,-9.50784 l 14.48452,-5.72547 v -11.56653 l -14.52305,-5.74056 a 42.88241,42.88241 0 0 0 -3.9281,-9.50949 l 6.20455,-14.318705 -8.17949,-8.177831 -14.33378,6.212941 a 42.88241,42.88241 0 0 0 -9.50951,-3.975011 l -5.7238,-14.48622 z m 4.8427,30.066296 a 25.729446,25.729446 0 0 1 18.1798,6.61158 25.729446,25.729446 0 0 1 1.86103,36.33948 25.729446,25.729446 0 0 1 -36.33951,1.86105 25.729446,25.729446 0 0 1 -1.86101,-36.33949 25.729446,25.729446 0 0 1 18.15969,-8.47262 z"
+       d="m 196.99529,65.345874 -5.74054,14.52475 a 42.88241,42.88241 0 0 0 -9.51119,3.928101 l -14.31704,-6.204561 -8.17779,8.177831 6.21293,14.335445 a 42.88241,42.88241 0 0 0 -3.97502,9.50783 l -14.4862,5.72548 v 11.56652 l 14.52473,5.74055 a 42.88241,42.88241 0 0 0 3.9281,9.51118 l -6.20454,14.31534 8.17779,8.17949 14.33379,-6.21292 a 42.88241,42.88241 0 0 0 9.50952,3.97501 l 5.72546,14.4862 h 11.56652 l 5.73888,-14.52307 a 42.88241,42.88241 0 0 0 9.51117,-3.92976 l 14.31704,6.20456 8.17949,-8.17949 -6.21293,-14.33377 a 42.88241,42.88241 0 0 0 3.97501,-9.50784 l 14.48452,-5.72547 v -11.56653 l -14.52305,-5.74056 a 42.88241,42.88241 0 0 0 -3.9281,-9.50949 l 6.20455,-14.318705 -8.17949,-8.177831 -14.33378,6.212941 a 42.88241,42.88241 0 0 0 -9.50951,-3.975011 l -5.7238,-14.48622 z m 4.8427,30.066296 a 25.729446,25.729446 0 0 1 18.1798,6.61158 25.729446,25.729446 0 0 1 1.86103,36.33948 25.729446,25.729446 0 0 1 -36.33951,1.86105 25.729446,25.729446 0 0 1 -1.86101,-36.33949 25.729446,25.729446 0 0 1 18.15969,-8.47262 z"
        id="path4405"
        inkscape:connector-curvature="0" />
   </g>

@@ -1,0 +1,12 @@
+<%= panel("Shortcuts", id: 'workflowhub-shortcuts', body_options: { class: 'front-page-panel' }) do %>
+  <%= link_to(workflows_path('filter[tag]' => 'covid-19'), class: 'btn btn-default btn-block clearfix',
+              style: 'margin-bottom: 15px; white-space: normal') do %>
+    <%= image_tag 'cov.png', style: 'width: 3em; height: 3em; margin-right: 10px; float: left' %>
+    Discover workflows relating to <strong>SARS-CoV-2 / COVID-19</strong>
+  <% end %>
+
+  <%= link_to 'https://wfcommons.org/', class: 'btn btn-default btn-block', target: '_blank', rel: 'noopener' do %>
+    <%= image_tag 'logos/wfcommons-horizontal.png', style: 'height: 2.5em' %><br/>
+    Looking for WfCommons? Click here
+  <% end %>
+<% end %>

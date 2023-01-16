@@ -1,0 +1,71 @@
+<div id="home-features">
+  <div class="jumbotron">
+    <div class="container-fluid">
+      <%= image_tag('logos/workflowhub.svg', style: 'max-height: 10em; max-width: 100%') %>
+      <h2>
+        A registry for describing, sharing and publishing <strong>scientific computational workflows</strong>
+      </h2>
+
+      <br/>
+      <p>
+        <%= Seek::Config.instance_name %> aims to <strong>facilitate discovery and re-use</strong> of workflows in an accessible and interoperable way.
+        This is achieved through extensive use of <strong>open standards</strong> and tools, including <%= link_to 'CWL', 'https://www.commonwl.org/', target: '_blank', rel: 'noopener' %>,
+        <%= link_to 'RO-Crate', 'https://www.researchobject.org/ro-crate/', target: '_blank', rel: 'noopener' %>,
+        <%= link_to 'Bioschemas', 'https://bioschemas.org/', target: '_blank', rel: 'noopener' %> and
+        <%= link_to "GA4GH's TRS API", 'https://about.workflowhub.eu/developer/trs/', target: '_blank', rel: 'noopener' %>, in accordance with the <strong>FAIR principles</strong>.
+      </p>
+
+      <p>
+        <%= Seek::Config.instance_name %> <strong>supports workflows of <em>any</em> type</strong> in its native repository.
+      </p>
+
+      <div class="row">
+        <div class="col-sm-6">
+          <a class="btn btn-primary btn-lg" target="_blank" href="https://about.workflowhub.eu" role="button" aria-label="Left Align" style="white-space: normal;"> Learn more </a>
+        </div>
+        <div class="text-right">
+          <a class="btn btn-primary btn-lg" href=<%= signup_path %> role="button" aria-label="Left Align" style="white-space: normal;"> Register </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <% if false %>
+    <div class="row seek-homepage-button-container" style="padding-top:10px">
+      <div class="col-sm-3 text-center">
+        <%# image('search', alt: 'Search & Discover',class:'feature-icon') %>
+        <h3>Search & Discover</h3>
+        <p>Search and filter for workflows from Galaxy, CWL, Nextflow <%= link_to 'and any other format', workflow_classes_path %>. Browse workflow collections curated by domain experts.</p>
+      </div>
+
+      <div class="col-sm-3 text-center">
+        <%# image_tag('logos/doi_logo.svg', alt:'Publish & Share',class:'feature-icon') %>
+        <h3>Publish & Share</h3>
+        <p>
+          Publish your workflows on <%= Seek::Config.instance_name %> to make them <span class="fair-principle">findable</span> and <span class="fair-principle">accessible</span>.
+          Mint DOIs to make your workflows easily citeable in publications.</p>
+      </div>
+
+      <div class="col-sm-3 text-center">
+        <%# image('front_page_feature_standardise', alt: 'Open Standards',class:'feature-icon') %>
+        <h3>Open Standards</h3>
+        <p><%= Seek::Config.instance_name %> makes use of standard metadata formats and APIs such as
+          <%= link_to 'CWL', 'https://www.commonwl.org/', target: '_blank', rel: 'noopener' %>,
+          <%= link_to 'RO-Crate', 'https://www.researchobject.org/ro-crate/', target: '_blank', rel: 'noopener' %>,
+          <%= link_to 'Bioschemas', 'https://bioschemas.org/', target: '_blank', rel: 'noopener' %>,
+          <%= link_to "GA4GH's TRS API", 'https://about.workflowhub.eu/developer/trs/', target: '_blank', rel: 'noopener' %>
+          and many others to facilitate the <span class="fair-principle">interoperability</span> of workflows.
+        </p>
+      </div>
+
+      <div class="col-sm-3 text-center">
+        <%# image('front_page_feature_organise', alt:'Describe & Organise', class:'feature-icon') %>
+        <h3>Describe & Organise</h3>
+        <p>
+          Supplement your workflows' metadata on <%= Seek::Config.instance_name %>, link to supporting documentation and examples,
+          and organise them into collections to make them <span class="fair-principle">reusable</span> by others.
+        </p>
+      </div>
+    </div>
+  <% end %>
+</div>
