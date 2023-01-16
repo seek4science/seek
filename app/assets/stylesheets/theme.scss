@@ -1,0 +1,45 @@
+$eosc-green: #1f8787;
+$eosc-yellow: #f9b233;
+
+$body-bg: #f3f3f3;
+
+$link-color: $eosc-green;
+$brand-primary: $eosc-green;
+
+$border-radius-base: 0;
+$border-radius-large: 0;
+$border-radius-small: 0;
+
+$navbar-default-bg: #fff;
+$navbar-default-border: transparent;
+$navbar-default-link-active-bg: darken($navbar-default-bg, 6.5%);
+$navbar-default-link-color: $eosc-green;
+$navbar-default-link-active-color: darken($navbar-default-link-color, 10%);
+$navbar-default-link-hover-color: darken($navbar-default-link-color, 15%);
+$navbar-default-border: transparent;
+
+$pagination-border: transparent;
+
+$panel-default-border: transparent;
+$panel-success-border: transparent;
+$panel-info-border:  transparent;
+$panel-warning-border: transparent;
+$panel-danger-border: transparent;
+$panel-inner-border: transparent;
+$panel-default-heading-bg: #fff;
+$panel-footer-bg: #fafafa;
+
+//$btn-default-bg: #fafafa;
+$btn-default-border: #dfdfdf;
+
+$input-bg: #fcfcfc;
+$input-border: transparent;
+$input-group-addon-bg: #ddd;
+
+$list-group-border: transparent;
+
+$pagination-border: transparent;
+$pagination-hover-border: transparent;
+$pagination-disabled-border:  transparent;
+$pagination-disabled-bg: #ddd;
+$pagination-disabled-color: #333;
