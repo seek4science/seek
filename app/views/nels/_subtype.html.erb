@@ -125,7 +125,7 @@ table, th, td {
           var index = $j(this).data('index');
           var json = JSON.parse($j('#file-items-json').html());
           json = json[index];
-          var element = $j(this)
+          var element = $j(this);
           element.spinner('add');
           $j.ajax({
               url: '<%= download_file_nels_path() %>',
@@ -137,7 +137,6 @@ table, th, td {
                   filename: json['filename']
               },
               success: function (data) {
-
                   let download_url = `<%= fetch_file_nels_path %>`;
                   download_url = download_url + '?' + $j.param(data)
                   const a = document.createElement('a');
@@ -147,8 +146,13 @@ table, th, td {
                   document.body.appendChild(a);
                   a.click();
                   document.body.removeChild(a);
+              },
+              error: function(request, status, error) {
+                  let exception = request.responseJSON['exception'];
+                  alert('Something went wrong interacting with NeLS, please try again later. ('+exception+')');
+              },
+              complete: function(data) {
                   element.spinner('remove');
-
               }
           });
       });
