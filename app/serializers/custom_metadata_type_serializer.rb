@@ -15,15 +15,14 @@ class CustomMetadataTypeSerializer < BaseSerializer
       "label": attribute.label,
       "description":attribute.description,
       "label":attribute.label,
-      "custom_metadata_attribute_type": get_custom_metadata_attribute_type(attribute),
+      "sample_attribute_type": get_sample_attribute_type(attribute),
       "required": attribute.required,
       "pos": attribute.pos,
-      "controlled_vocab_id": attribute.sample_controlled_vocab_id.nil? ? nil : attribute.sample_controlled_vocab_id.to_s,
-
+      "sample_controlled_vocab_id": attribute.sample_controlled_vocab_id.nil? ? nil : attribute.sample_controlled_vocab_id.to_s
     }
   end
 
-  def get_custom_metadata_attribute_type(attribute)
+  def get_sample_attribute_type(attribute)
     SampleAttributeTypeSerializer.new(attribute.sample_attribute_type).to_h
   end
 end
