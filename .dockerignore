@@ -1,6 +1,7 @@
 .git/
 Dockerfile
 filestore*
+hooks/
 coverage/
 docker/solr/
 db/*.sqlite3

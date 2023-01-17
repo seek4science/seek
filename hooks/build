@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# docker hub build hook, to pass along the source commit hash
+docker build --build-arg SOURCE_COMMIT=$SOURCE_COMMIT -f $DOCKERFILE_PATH -t $IMAGE_NAME .
