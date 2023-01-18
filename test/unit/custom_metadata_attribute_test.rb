@@ -102,7 +102,7 @@ class CustomMetadataAttributeTest < ActiveSupport::TestCase
     refute attribute.validate_value?('')
 
     attribute = CustomMetadataAttribute.new(title: 'apple', required:true,
-                                            sample_attribute_type: Factory(:list_attribute_type), sample_controlled_vocab: Factory(:apples_sample_controlled_vocab), description: "apple samples", label: "apple samples")
+                                            sample_attribute_type: Factory(:cv_list_attribute_type), sample_controlled_vocab: Factory(:apples_sample_controlled_vocab), description: "apple samples", label: "apple samples")
     refute attribute.validate_value?(nil)
     refute attribute.validate_value?('')
     refute attribute.validate_value?([])

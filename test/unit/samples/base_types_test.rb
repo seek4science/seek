@@ -19,7 +19,7 @@ class BaseTypeTest < ActiveSupport::TestCase
     assert_equal 'SeekSampleMulti', Seek::Samples::BaseType::SEEK_SAMPLE_MULTI
     assert_equal 'CV', Seek::Samples::BaseType::CV
     assert_equal 'SeekDataFile',Seek::Samples::BaseType::SEEK_DATA_FILE
-    assert_equal 'List',Seek::Samples::BaseType::CV_LIST
+    assert_equal 'CVList',Seek::Samples::BaseType::CV_LIST
   end
 
   test 'valid?' do
