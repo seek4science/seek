@@ -1,7 +1,7 @@
 module Seek
   module Samples
     module AttributeTypeHandlers
-      class ListAttributeTypeHandler < BaseAttributeHandler
+      class CVListAttributeTypeHandler < BaseAttributeHandler
         class MissingControlledVocabularyException < AttributeHandlerException; end
         class NotArrayException < AttributeHandlerException; end
         class InvalidControlledVocabularyException < AttributeHandlerException; end
