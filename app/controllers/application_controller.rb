@@ -609,7 +609,7 @@ class ApplicationController < ActionController::Base
         keys = [:custom_metadata_type_id]
         cma= []
         metadata_type.custom_metadata_attributes.each do |attr|
-          if attr.sample_attribute_type.base_type == Seek::Samples::BaseType::LIST
+          if attr.sample_attribute_type.base_type == Seek::Samples::BaseType::CVList
             cma << {attr.title=>[]}
           else
             cma << attr.title.to_s
