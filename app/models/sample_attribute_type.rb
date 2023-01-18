@@ -78,7 +78,7 @@ class SampleAttributeType < ApplicationRecord
   end
 
   def seek_cv_list?
-    base_type == Seek::Samples::BaseType::CVList
+    base_type == Seek::Samples::BaseType::CV_LIST
   end
 
   def seek_resource?
