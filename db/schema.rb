@@ -274,17 +274,6 @@ ActiveRecord::Schema.define(version: 2022_12_12_143407) do
     t.string "conceptable_type"
   end
 
-  create_table "cell_ranges", id: :integer, force: :cascade do |t|
-    t.integer "cell_range_id"
-    t.integer "worksheet_id"
-    t.integer "start_row"
-    t.integer "start_column"
-    t.integer "end_row"
-    t.integer "end_column"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
   create_table "collection_auth_lookup", force: :cascade do |t|
     t.integer "user_id"
     t.integer "asset_id"
@@ -838,11 +827,6 @@ ActiveRecord::Schema.define(version: 2022_12_12_143407) do
     t.index ["work_group_id"], name: "index_group_memberships_on_work_group_id"
   end
 
-  create_table "group_memberships_project_positions", id: :integer, force: :cascade do |t|
-    t.integer "group_membership_id"
-    t.integer "project_position_id"
-  end
-
   create_table "help_attachments", id: :integer, force: :cascade do |t|
     t.integer "help_document_id"
     t.string "title"
@@ -1115,68 +1099,6 @@ ActiveRecord::Schema.define(version: 2022_12_12_143407) do
     t.string "position"
     t.datetime "created_at"
     t.datetime "updated_at"
-  end
-
-  create_table "node_auth_lookup", force: :cascade do |t|
-    t.integer "user_id"
-    t.integer "asset_id"
-    t.boolean "can_view", default: false
-    t.boolean "can_manage", default: false
-    t.boolean "can_edit", default: false
-    t.boolean "can_download", default: false
-    t.boolean "can_delete", default: false
-    t.index ["user_id", "asset_id", "can_view"], name: "index_n_auth_lookup_on_user_id_and_asset_id_and_can_view"
-    t.index ["user_id", "can_view"], name: "index_n_auth_lookup_on_user_id_and_can_view"
-  end
-
-  create_table "node_versions", id: :integer, force: :cascade do |t|
-    t.integer "node_id"
-    t.integer "version"
-    t.text "revision_comments"
-    t.integer "contributor_id"
-    t.string "title"
-    t.text "description"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.datetime "last_used_at"
-    t.string "first_letter", limit: 1
-    t.text "other_creators"
-    t.string "uuid"
-    t.integer "policy_id"
-    t.string "doi"
-    t.string "license"
-    t.string "deleted_contributor"
-    t.integer "visibility"
-    t.index ["contributor_id"], name: "index_node_versions_on_contributor"
-    t.index ["node_id"], name: "index_node_versions_on_node_id"
-  end
-
-  create_table "node_versions_projects", id: false, force: :cascade do |t|
-    t.integer "project_id"
-    t.integer "version_id"
-  end
-
-  create_table "nodes", id: :integer, force: :cascade do |t|
-    t.integer "contributor_id"
-    t.string "title"
-    t.text "description"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.datetime "last_used_at"
-    t.integer "version", default: 1
-    t.string "first_letter", limit: 1
-    t.text "other_creators"
-    t.string "uuid"
-    t.integer "policy_id"
-    t.string "doi"
-    t.string "license"
-    t.string "deleted_contributor"
-    t.index ["contributor_id"], name: "index_nodes_on_contributor"
-  end
-
-  create_table "nodes_projects", id: false, force: :cascade do |t|
-    t.integer "project_id"
-    t.integer "node_id"
   end
 
   create_table "notifiee_infos", id: :integer, force: :cascade do |t|
@@ -1493,11 +1415,6 @@ ActiveRecord::Schema.define(version: 2022_12_12_143407) do
     t.boolean "open_for_projects", default: false
   end
 
-  create_table "project_descendants", id: false, force: :cascade do |t|
-    t.integer "ancestor_id"
-    t.integer "descendant_id"
-  end
-
   create_table "project_folder_assets", id: :integer, force: :cascade do |t|
     t.integer "asset_id"
     t.string "asset_type"
@@ -1516,12 +1433,6 @@ ActiveRecord::Schema.define(version: 2022_12_12_143407) do
     t.datetime "updated_at"
     t.boolean "incoming", default: false
     t.boolean "deletable", default: true
-  end
-
-  create_table "project_positions", id: :integer, force: :cascade do |t|
-    t.string "name"
-    t.datetime "created_at"
-    t.datetime "updated_at"
   end
 
   create_table "project_subscriptions", id: :integer, force: :cascade do |t|
@@ -1742,15 +1653,6 @@ ActiveRecord::Schema.define(version: 2022_12_12_143407) do
     t.datetime "updated_at"
   end
 
-  create_table "repository_standards", id: :integer, force: :cascade do |t|
-    t.string "title"
-    t.string "url"
-    t.string "group_tag"
-    t.string "repo_type"
-    t.text "description"
-    t.index ["title", "group_tag"], name: "index_repository_standards_title_group_tag"
-  end
-
   create_table "resource_publish_logs", id: :integer, force: :cascade do |t|
     t.string "resource_type"
     t.integer "resource_id"
@@ -1896,24 +1798,6 @@ ActiveRecord::Schema.define(version: 2022_12_12_143407) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean "include_external_search", default: false
-  end
-
-  create_table "scales", id: :integer, force: :cascade do |t|
-    t.string "title"
-    t.string "key"
-    t.integer "pos", default: 1
-    t.string "image_name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
-  create_table "scalings", id: :integer, force: :cascade do |t|
-    t.integer "scale_id"
-    t.integer "scalable_id"
-    t.integer "person_id"
-    t.string "scalable_type"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
   end
 
   create_table "sessions", id: :integer, force: :cascade do |t|
