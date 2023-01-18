@@ -95,7 +95,7 @@ module SamplesHelper
         seek_data_file_attribute_display(value)
       when Seek::Samples::BaseType::CV
         seek_cv_attribute_display(value, attribute)
-      when Seek::Samples::BaseType::LIST
+      when Seek::Samples::BaseType::CVList
         value.join(", ")
       else
         default_attribute_display(attribute, options, sample, value)
@@ -263,7 +263,7 @@ module SamplesHelper
       select_tag(element_name, options, include_blank: !attribute.required?, class: "form-control #{element_class}")
     when Seek::Samples::BaseType::CV
       controlled_vocab_form_field attribute.sample_controlled_vocab, element_name, value
-    when Seek::Samples::BaseType::LIST
+    when Seek::Samples::BaseType::CVList
       list_select_form_field attribute, element_name, value
     when Seek::Samples::BaseType::SEEK_SAMPLE
       terms = attribute.linked_sample_type.samples.authorized_for('view').to_a

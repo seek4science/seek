@@ -92,9 +92,9 @@ Factory.define(:controlled_vocab_attribute_type, class: SampleAttributeType) do 
   f.base_type 'CV'
 end
 
-Factory.define(:list_attribute_type, class: SampleAttributeType) do |f|
-  f.sequence(:title) { |n| "List attribute type #{n}" }
-  f.base_type 'List'
+Factory.define(:cv_list_attribute_type, class: SampleAttributeType) do |f|
+  f.sequence(:title) { |n| "CV List attribute type #{n}" }
+  f.base_type 'CVList'
 end
 
 # SampleControlledVocabTerm

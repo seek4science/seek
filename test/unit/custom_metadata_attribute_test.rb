@@ -63,7 +63,7 @@ class CustomMetadataAttributeTest < ActiveSupport::TestCase
     refute attribute.validate_value?(1.2)
     refute attribute.validate_value?('30 Feb 2015')
 
-    attribute = CustomMetadataAttribute.new(title: 'apple', sample_attribute_type: Factory(:list_attribute_type),
+    attribute = CustomMetadataAttribute.new(title: 'apple', sample_attribute_type: Factory(:cv_list_attribute_type),
                                             sample_controlled_vocab: Factory(:apples_sample_controlled_vocab), description: "apple samples", label: "apple samples")
 
     assert attribute.validate_value?(nil)
@@ -71,11 +71,11 @@ class CustomMetadataAttributeTest < ActiveSupport::TestCase
     assert attribute.validate_value?([])
     assert attribute.validate_value?(['Granny Smith'])
 
-    assert_raises(Seek::Samples::AttributeTypeHandlers::ListAttributeTypeHandler::NotArrayException) do
+    assert_raises(Seek::Samples::AttributeTypeHandlers::CVListAttributeTypeHandler::NotArrayException) do
       assert attribute.validate_value?('Granny Smith')
     end
 
-    assert_raises(Seek::Samples::AttributeTypeHandlers::ListAttributeTypeHandler::InvalidControlledVocabularyException) do
+    assert_raises(Seek::Samples::AttributeTypeHandlers::CVListAttributeTypeHandler::InvalidControlledVocabularyException) do
       assert attribute.validate_value?(['Peter','Granny Smith'])
     end
   end

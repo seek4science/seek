@@ -16,7 +16,7 @@ module Seek
         # validates that the attribute type is SeekSample if linked_sample_type is set, and vice-versa
         validate :linked_sample_type_and_attribute_type_consistency
 
-        delegate :controlled_vocab?, :seek_list?, :seek_sample?, :seek_sample_multi?, :seek_strain?, :seek_resource?, to: :sample_attribute_type, allow_nil: true
+        delegate :controlled_vocab?, :seek_cv_list?, :seek_sample?, :seek_sample_multi?, :seek_strain?, :seek_resource?, to: :sample_attribute_type, allow_nil: true
       end
 
       # checks whether the value is blank against the attribute type and base type
@@ -53,7 +53,7 @@ module Seek
       def sample_controlled_vocab_and_attribute_type_consistency
 
         if sample_attribute_type && sample_controlled_vocab
-          unless controlled_vocab? || seek_list?
+          unless controlled_vocab? || seek_cv_list?
             errors.add(:sample_attribute_type, 'Attribute type must be CV if controlled vocabulary set')
           end
         end
@@ -62,7 +62,7 @@ module Seek
           errors.add(:sample_controlled_vocab, 'Controlled vocabulary must be set if attribute type is CV')
         end
 
-        if seek_list? && sample_controlled_vocab.nil?
+        if seek_cv_list? && sample_controlled_vocab.nil?
           errors.add(:sample_controlled_vocab, 'Controlled vocabulary must be set if attribute type is LIST')
         end
 

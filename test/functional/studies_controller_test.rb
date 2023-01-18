@@ -830,7 +830,7 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test 'create a study with custom metadata cv type' do
-    cmt = Factory(:study_custom_metadata_type_with_cv_and_list_type)
+    cmt = Factory(:study_custom_metadata_type_with_cv_and_cv_list_type)
     login_as(Factory(:person))
 
     assert_difference('Study.count') do

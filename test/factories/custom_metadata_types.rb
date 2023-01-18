@@ -20,8 +20,8 @@ Factory.define(:datetime_custom_metadata_attribute,class:CustomMetadataAttribute
   f.association :sample_attribute_type, factory: :datetime_sample_attribute_type
 end
 
-Factory.define(:list_custom_metadata_attribute,class:CustomMetadataAttribute) do |f|
-  f.title 'list'
+Factory.define(:cv_list_custom_metadata_attribute,class:CustomMetadataAttribute) do |f|
+  f.title 'CVList'
   f.association :sample_attribute_type, factory: :datetime_sample_attribute_type
 end
 
@@ -65,14 +65,14 @@ Factory.define(:study_custom_metadata_type_with_spaces, class: CustomMetadataTyp
 end
 
 
-Factory.define(:study_custom_metadata_type_with_cv_and_list_type, class: CustomMetadataType) do |f|
+Factory.define(:study_custom_metadata_type_with_cv_and_cv_list_type, class: CustomMetadataType) do |f|
   f.title 'study custom metadata type with and list attributes'
   f.supported_type 'Study'
   f.after_build do |a|
     a.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, title:'apple name')
-    list_attribute = CustomMetadataAttribute.new(title: 'apple list', sample_attribute_type: Factory(:list_attribute_type),
+    cv_list_attribute = CustomMetadataAttribute.new(title: 'apple list', sample_attribute_type: Factory(:cv_list_attribute_type),
                                                  sample_controlled_vocab: Factory(:apples_sample_controlled_vocab), description: "apple samples list", label: "apple samples list")
-    a.custom_metadata_attributes << list_attribute
+    a.custom_metadata_attributes << cv_list_attribute
     cv_attribute = CustomMetadataAttribute.new(title: 'apple controlled vocab', sample_attribute_type: Factory(:controlled_vocab_attribute_type),
                                                  sample_controlled_vocab: Factory(:apples_sample_controlled_vocab), description: "apple samples controlled vocab", label: "apple samples controlled vocab")
     a.custom_metadata_attributes << cv_attribute
