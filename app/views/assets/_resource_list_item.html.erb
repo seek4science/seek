@@ -48,7 +48,12 @@
   </div>
   <% unless [Person, Project, Institution, Programme, Organism, HumanDisease].include?(resource.class)  %>
       <div class="panel-footer hidden-xs small">
-        <%= list_item_timestamp resource %>
+        <div class="col-sm">
+          <%= list_item_timestamp resource %>
+        </div>
+        <div class="col-sm text-right">
+        <%= list_item_usage resource %>
+        </div>
       </div>
   <% end %>
 </div>
