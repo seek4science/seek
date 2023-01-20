@@ -45,6 +45,31 @@ module Seek
                          # The things below are attempts at getting this working, but it doe not work yet.
                          # It has currently hardcoded DataFile as the sorting objective, for simplicity.
 
+                         #### Using Active Record
+                         # This section **modifies** "items" relation so that it *includes a new column "downloads"
+                         items._select!('*', 'd.downloads')
+                         alog=ActivityLog.all.where(action: 'download',activity_loggable_type: 'DataFile')
+                         downloads=alog.select('activity_loggable_id AS data_files_id, COUNT(activity_loggable_id) AS downloads').group(:activity_loggable_id)
+                         items.joins!("LEFT OUTER JOIN (#{downloads.to_sql}) d ON data_files.id = d.data_files_id")
+                         # The call to items.arel_table is problematic, as it basically un-does all the modifications
+                         # above, and gets the original items db, where downloads does not exist.
+                         arel_field = items.arel_table[:downloads].desc
+                         arel_field
+
+                         # Play in the console with:
+                         # items=DataFile.all
+                         # items.object_id
+                         # items._select!(:id,:title,'d.downloads')
+                         # alog=ActivityLog.all.where(action: 'download',activity_loggable_type: 'DataFile')
+                         # downloads=alog.select('activity_loggable_id AS data_files_id, COUNT(activity_loggable_id) AS downloads').group(:activity_loggable_id)
+                         # items.joins!("LEFT OUTER JOIN (#{downloads.to_sql}) d ON data_files.id = d.data_files_id")
+                         # items.object_id
+                         # itclone=items.clone
+                         # puts ActiveRecord::Base.connection.exec_query itclone.to_sql
+                         #
+                         # Note: if you call "puts ActiveRecord::Base.connection.exec_query items.to_sql" to be able to
+                         # look at "items", it makes the relation inmutable, so clone it first instead, i.e. call
+                         # "itclone=items.clone" and then "puts ActiveRecord::Base.connection.exec_query itclone.to_sql"
 
                          #### Using Arel
                          # This section joins a new column "downloads" to the arel_table, but does not modify items
