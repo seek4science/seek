@@ -46,6 +46,41 @@ module Seek
                          # It has currently hardcoded DataFile as the sorting objective, for simplicity.
 
 
+                         #### Using Arel
+                         # This section joins a new column "downloads" to the arel_table, but does not modify items
+                         # itemsarel=items.arel_table
+                         # alog=ActivityLog.arel_table
+                         # downloads=alog.project(alog[:activity_loggable_id].as("log_id"), alog[:activity_loggable_id].count.as("downloads")).where(alog[:action].eq('download').and(alog[:activity_loggable_type].eq('DataFile'))).group(:activity_loggable_id).as('downloads')
+                         # joined=itemsarel.project(itemsarel[Arel.star], downloads[:downloads]).outer_join(downloads).on(itemsarel[:id].eq(downloads[:log_id])).as('joined')
+                         # items=joined
+                         # arel_field = joined[:downloads].desc
+                         # arel_field
+
+                         ## Reproduce the arel_table section in ruby console with:
+                         # items=DataFile.all
+                         # itemsarel=items.arel_table
+                         # alog=ActivityLog.arel_table
+                         # files=itemsarel.project(itemsarel[:id], itemsarel[:title])
+                         # puts ActiveRecord::Base.connection.exec_query files.to_sql
+                         # downloads=alog.project(alog[:activity_loggable_id].as("log_id"), alog[:activity_loggable_id].count.as("downloads")).where(alog[:action].eq('download').and(alog[:activity_loggable_type].eq('DataFile'))).group(:activity_loggable_id)
+                         # puts ActiveRecord::Base.connection.exec_query downloads.to_sql
+                         # d=downloads.as('d')
+                         # joined=itemsarel.project(itemsarel[:id], itemsarel[:title], d[:downloads]).outer_join(d).on(itemsarel[:id].eq(d[:log_id]))
+                         # puts ActiveRecord::Base.connection.exec_query joined.to_sql
+                         # j=joined.as('j')
+                         # arel_field = j[:downloads].desc
+                         # arel_field
+
+                         ## This works but goes around a bit
+                         # downloads=alog.project(alog[:activity_loggable_id].as("log_id"), alog[:activity_loggable_id].count.as("downloads")).where(alog[:action].eq('download').and(alog[:activity_loggable_type].eq('DataFile'))).group(:activity_loggable_id).as('d')
+                         # files=itemsarel.project(itemsarel[:id], itemsarel[:title]).as('f')
+                         # joined=itemsarel.project(:id,:title,:downloads).from(files).join(downloads).on(files[:id].eq(downloads[:log_id]))
+                         # puts ActiveRecord::Base.connection.exec_query joined.to_sql
+
+                         ## A very ugly single liner that dones work
+                         # joined=itemsarel.project(itemsarel[:id], itemsarel[:title], alog[:activity_loggable_id].count.as("downloads")).join(alog).on(itemsarel[:id].eq(alog[:activity_loggable_id])).where(alog[:action].eq('download').and(alog[:activity_loggable_type].eq('DataFile'))).group(:activity_loggable_id)
+                         # puts ActiveRecord::Base.connection.exec_query joined.to_sql
+
                          ## Reproduce what sorting by :title does in the ruby console with:
                          # items=DataFile.all
                          # arel_field = items.arel_table[:title].desc
