@@ -56,6 +56,17 @@ module Seek
                          arel_field = items.arel_table[:downloads].desc
                          arel_field
 
+                         # Alternative query construction:
+                         # alog = ActivityLog.all.arel_table
+                         # joined=items.joins(
+                         #     Arel::Nodes::OuterJoin.new(alog, alog.create_on(
+                         #       alog[:activity_loggable_id].eq(items.arel_table[:id])
+                         #         .and(alog[:action].eq('download'))
+                         #         .and(alog[:activity_loggable_type].eq('DataFile'))
+                         #     )))
+                         #   .select(:id, :title, alog[:activity_loggable_id].count.as('downloads'))
+                         #   .group(:id,:title)
+
                          # Play in the console with:
                          # items=DataFile.all
                          # items.object_id
