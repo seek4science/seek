@@ -17,7 +17,8 @@ module Seek
           options: [:published_at_asc, :published_at_desc, :created_at_asc, :created_at_desc, :title_asc, :title_desc] },
       'Other' => {
           defaults: { index: :updated_at_desc, related: :updated_at_desc },
-          options: [:updated_at_asc, :updated_at_desc, :created_at_asc, :created_at_desc, :title_asc, :title_desc] },
+          options: [:updated_at_asc, :updated_at_desc, :created_at_asc, :created_at_desc, :title_asc, :title_desc,
+                    :downloads_desc] },
       'Assay' => {
           defaults: { related: :position_asc }
       }
@@ -38,6 +39,19 @@ module Seek
       created_at_desc: { title: 'Creation date (Descending)', order: 'created_at DESC' },
       position_asc: { title: 'Position (Ascending)', order: 'position' },
       position_desc: { title: 'Position (Descending)', order: 'position DESC' },
+      downloads_desc: { title: 'Downloads (Descending)', order: '--downloads_desc DESC',
+                       relation_proc: -> (items) { # Sorts by number of downloads, descending
+                         # ______ DOES NOT WORK! ______
+                         # The things below are attempts at getting this working, but it doe not work yet.
+                         # It has currently hardcoded DataFile as the sorting objective, for simplicity.
+
+
+                         ## Reproduce what sorting by :title does in the ruby console with:
+                         # items=DataFile.all
+                         # arel_field = items.arel_table[:title].desc
+                         # arel_field
+                       }
+      },
       relevance: { title: 'Relevance', order: '--relevance',
                    relation_proc: -> (items) {
                      ids = items.solr_cache(items.last_solr_query)
