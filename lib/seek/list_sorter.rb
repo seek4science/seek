@@ -100,10 +100,31 @@ module Seek
     def self.sort_by_order(items, order = nil)
       order ||= order_for_view(items.first.class.name, :index)
       if items.is_a?(ActiveRecord::Relation)
+        pp 'items before call oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo'
+        pp items.object_id
+        itemsprod=items.clone
+        pp itemsprod.object_id
+        pp items.object_id
+        puts ActiveRecord::Base.connection.exec_query itemsprod.to_sql
+        pp 'oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo'
         orderings = strategy_for_relation(order, items)
+        pp 'items after call o0ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo'
+        pp items.object_id
+        itemsprod=items.clone
+        pp itemsprod.object_id
+        pp items.object_id
+        puts ActiveRecord::Base.connection.exec_query itemsprod.to_sql
+        pp 'oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo'
         # Postgres requires any columns being ORDERed to be explicitly SELECTed (only when using DISTINCT?).
         columns = [items.arel_table[Arel.star]]
+        pp 'look here below! xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+        pp 'Columns:'
+        pp columns
+        pp 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
         orderings.each do |ordering|
+          pp 'ordering~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
+          pp ordering
+          pp '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
           if ordering.is_a?(Arel::Nodes::Ordering)
             expr = ordering.expr
             # Don't need to SELECT columns that are already covered by "*" and MySQL will error if you try!
@@ -114,6 +135,14 @@ module Seek
             columns << ordering
           end
         end
+        pp 'look here below! xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+        pp 'Columns:'
+        pp columns
+        pp 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+        pp 'Orderings:'
+        pp orderings
+        pp items.select(columns).order(orderings)
+        pp 'look here above! xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
         items.select(columns).order(orderings)
       else
         items.sort(&strategy_for_enum(order, items))
@@ -170,6 +199,9 @@ module Seek
       fields_and_directions = order.split(',').flat_map do |f|
         field, order = f.strip.split(' ', 2)
         if field.start_with?('--')
+          # pp 'look here below! yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy'
+          # pp ORDER_OPTIONS[field.sub('--', '').to_sym][:relation_proc].call(relation)
+          # pp 'look here above! yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy'
           ORDER_OPTIONS[field.sub('--', '').to_sym][:relation_proc].call(relation)
         else
           m = field.match(/LOWER\((.+)\)/)
