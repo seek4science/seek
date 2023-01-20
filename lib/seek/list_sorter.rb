@@ -187,7 +187,10 @@ module Seek
         puts ActiveRecord::Base.connection.exec_query itemsprod.to_sql
         pp 'oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo'
         # Postgres requires any columns being ORDERed to be explicitly SELECTed (only when using DISTINCT?).
-        columns = [items.arel_table[Arel.star]]
+        # columns = [items.arel_table[Arel.star]]
+        # Below is an attempt to use the modified items relation to create an arel table, so that it can be used with
+        # the addition of the downloads column, but it does not quite create a table, it is a table alias.
+        columns = [items.arel.as('items')[Arel.star]]
         pp 'look here below! xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
         pp 'Columns:'
         pp columns
