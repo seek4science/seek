@@ -259,7 +259,18 @@ class SamplesController < ApplicationController
   private
 
   def sample_params(sample_type = nil, parameters = params)
-    sample_type_param_keys = sample_type ? sample_type.sample_attributes.map(&:title).collect(&:to_sym) : []
+
+    sample_type_param_keys = []
+
+    if sample_type
+      sample_type.sample_attributes.each do |attr|
+        if attr.sample_attribute_type.base_type == Seek::Samples::BaseType::CV_LIST
+          sample_type_param_keys << { attr.title=>[]}
+          else
+            sample_type_param_keys << attr.title.to_sym
+        end
+      end
+    end
     parameters.require(:sample).permit(:sample_type_id, *creator_related_params,
                               { project_ids: [] }, { data: sample_type_param_keys },
                               { assay_assets_attributes: [:assay_id] },
