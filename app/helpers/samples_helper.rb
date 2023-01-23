@@ -41,8 +41,7 @@ module SamplesHelper
       )
       select_tag element_name,
                  options,
-                 id: "custom_metadata_attributes_data_#{attribute.title}",
-                 class: "form-control",
+                 class: "form-control cv_list_attribute",
                  include_blank: "",
                  name: "#{element_name}[]",
                  multiple: "multiple"

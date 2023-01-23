@@ -63,7 +63,7 @@
 
 <% end -%>
 
-<table id=<%=new_attribute_id%> style="display: none">
+<table id=<%=new_attribute_id%> style="display:none">
   <tbody>
     <%= render :partial => 'sample_types/sample_attribute_form', :locals=> {sample_type:sample_type, prefix: "isa_#{isa_element}[#{main_field_name}]"} %>
   </tbody>

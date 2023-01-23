@@ -157,7 +157,7 @@ class SampleType < ApplicationRecord
   # rather than clearing the selected vocab each time
   def resolve_controlled_vocabs_inconsistencies
     sample_attributes.each do |attribute|
-      attribute.sample_controlled_vocab = nil unless attribute.controlled_vocab?
+      attribute.sample_controlled_vocab = nil unless attribute.controlled_vocab? || attribute.seek_cv_list?
     end
   end
 

@@ -8,13 +8,8 @@
   </div>
   <script>
       $j(document).ready(function() {
-              $j('#custom_metadata_attributes_data_<%= attribute.title %>').select2(
-                  {
-                      placeholder: 'Search ...',
-                      theme: "bootstrap"
-                  }
-              );
-          }
+          SampleAttributeType.initCVList();
+      }
       );
   </script>
 <% end %>
