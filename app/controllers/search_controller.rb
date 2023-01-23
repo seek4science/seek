@@ -79,10 +79,10 @@ class SearchController < ApplicationController
   def respond_with_search_results
     matches = @results.values.sum(&:count) + @external_results.count
     if matches.zero?
-      flash.now[:notice] = "No matches found for '<b>#{@search_query}</b>'.".html_safe
+      flash.now[:notice] = "No matches found for '<b>#{h(@search_query)}</b>'.".html_safe
     else
       flash.now[:notice] =
-        "#{matches} #{matches == 1 ? 'item' : 'items'} matched '<b>#{@search_query}</b>' within their title or content.".html_safe
+        "#{matches} #{matches == 1 ? 'item' : 'items'} matched '<b>#{h(@search_query)}</b>' within their title or content.".html_safe
     end
 
     respond_to do |format|
