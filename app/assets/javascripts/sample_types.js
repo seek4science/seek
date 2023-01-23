@@ -71,10 +71,10 @@ var SampleTypes = {
 
     attributeTypeChanged: function (e, resetSelection=true) {
         //check if it is a controlled vocab, and change the state of the controlled vocab selector if need be
-        var is_cv = $j(this).find(':selected').data('is-cv');
+        var use_cv = $j(this).find(':selected').data('use-cv');
 				var is_ontology = $j(this).find(':selected').data('is-ontology');
         var cv_element = $j(this).siblings('.controlled-vocab-block');
-        if (is_cv) {
+        if (use_cv) {
 					var cv_selection = cv_element.find('.controlled-vocab-selection')
 					cv_selection.find('option').show()
 					cv_selection.find(`option[data-is-ontology="${!is_ontology}"]`).hide()
