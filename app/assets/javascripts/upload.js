@@ -155,7 +155,7 @@ $j(document).ready(function () {
 
         //triggered after url check
         checker.on('urlChecked', function (event, info) {
-            var field = checker.parents('[data-role="seek-upload-field"]');
+            var field = $j(this).parents('[data-role="seek-upload-field"]');
             var originalFilename = $j('[data-role="seek-upload-field-filename"]', field);
             if (originalFilename) {
                 originalFilename.val(info.file_name);
