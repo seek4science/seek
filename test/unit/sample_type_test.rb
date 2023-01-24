@@ -318,6 +318,28 @@ class SampleTypeTest < ActiveSupport::TestCase
     refute type.validate_value?('apples', nil)
   end
 
+
+  test 'list controlled vocab sample type validate_value' do
+    vocab = Factory(:apples_sample_controlled_vocab)
+    type = Factory(:apples_list_controlled_vocab_sample_type)
+
+    type.sample_attributes.first.sample_controlled_vocab = vocab
+    type.sample_attributes.first.save!
+    assert type.valid?
+    assert_equal 4, type.sample_attributes.first.sample_controlled_vocab.sample_controlled_vocab_terms.count
+    puts type.sample_attributes.first.inspect
+
+    assert type.validate_value?('apples', ['Granny Smith'])
+
+    assert_raises(Seek::Samples::AttributeTypeHandlers::CVListAttributeTypeHandler::NotArrayException) do
+      assert type.validate_value?('apples','Granny Smith')
+    end
+
+    assert_raises(Seek::Samples::AttributeTypeHandlers::CVListAttributeTypeHandler::InvalidControlledVocabularyException) do
+      assert type.validate_value?('apples',['Peter','Granny Smith'])
+    end
+  end
+
   test 'must have one title attribute' do
     sample_type = SampleType.new title: 'No title', project_ids: @project_ids, contributor: @person
     sample_type.sample_attributes << Factory(:sample_attribute, title: 'full name', sample_attribute_type: Factory(:full_name_sample_attribute_type), required: true, is_title: false, sample_type: sample_type)

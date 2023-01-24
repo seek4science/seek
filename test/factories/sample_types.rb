@@ -56,6 +56,13 @@ Factory.define(:apples_controlled_vocab_sample_type, parent: :sample_type) do |f
   end
 end
 
+Factory.define(:apples_list_controlled_vocab_sample_type, parent: :sample_type) do |f|
+  f.sequence(:title) { |n| "apples list controlled vocab sample type #{n}" }
+  f.after_build do |type|
+    type.sample_attributes << Factory.build(:apples_list_controlled_vocab_attribute, title: 'apples', is_title: true, required: true, sample_type: type)
+  end
+end
+
 Factory.define(:linked_sample_type, parent: :sample_type) do |f|
   f.sequence(:title) { |n| "linked sample type #{n}" }
   f.after_build do |type|
