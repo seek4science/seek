@@ -45,14 +45,19 @@ $j(document).ready(function () {
         var addRemoteFile = function () {
             var urlInput = $j('[data-role="seek-url-checker"] input', field);
             var filenameInput = $j('[data-role="seek-upload-field-filename"]', field);
-            var makeLocalCopyCheckbox = $j('[data-role="seek-upload-field-make-copy"]', field)[0];
+            var makeLocalCopyCheckbox = $j('[data-role="seek-upload-field-make-copy"]', field);
 
             var remoteFile = {
                 dataURL: urlInput.val(),
-                makeALocalCopy: (makeLocalCopyCheckbox && makeLocalCopyCheckbox.checked) ? "1" : "0",
+                makeALocalCopy: (makeLocalCopyCheckbox && makeLocalCopyCheckbox.is(":checked")) ? "1" : "0",
                 originalFilename: filenameInput.val()
             };
             remoteFile.text = remoteFile.originalFilename.trim() ? remoteFile.originalFilename : remoteFile.dataURL;
+
+            // reset
+            if (makeLocalCopyCheckbox) {
+                makeLocalCopyCheckbox.prop("checked", false);
+            }
 
             var parsed = parseUri(remoteFile.dataURL);
             if (!parsed.host || parsed.host === "null") {
