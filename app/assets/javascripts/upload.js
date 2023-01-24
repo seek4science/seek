@@ -110,7 +110,6 @@ $j(document).ready(function () {
                 if (json.length) {
                     var info = JSON.parse($j('script', result).html());
                     checker.trigger('urlChecked', [info]);
-                    originalFilename.val(info.file_name);
                     if (info.allow_copy) {
                         copyDialog.show();
                     } else {
@@ -153,6 +152,15 @@ $j(document).ready(function () {
             debounceTimeout = setTimeout(function() {
                 submitUrl();
             }, 700);
+        });
+
+        //triggered after url check
+        checker.on('urlChecked', function (event, info) {
+            var field = checker.parents('[data-role="seek-upload-field"]');
+            var originalFilename = $j('[data-role="seek-upload-field-filename"]', field);
+            if (originalFilename) {
+                originalFilename.val(info.file_name);
+            }
         });
     });
 });
