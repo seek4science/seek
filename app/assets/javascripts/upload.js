@@ -92,7 +92,6 @@ $j(document).ready(function () {
         var result = field.find('[data-role="seek-url-checker-result"]');
         var copyDialog = $j('[data-role="seek-url-checker-msg-success"]', field);
         var tooBig = $j('[data-role="seek-url-checker-msg-too-big"]', field);
-        var originalFilename = $j('[data-role="seek-upload-field-filename"]', field);
 
         var submitUrl = function () {
             result.html('').spinner('add');
