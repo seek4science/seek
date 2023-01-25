@@ -38,6 +38,9 @@ google_analytics_tracker_id:
 piwik_analytics_url:
 exception_notification_enabled:
 exception_notification_recipients:
+error_grouping_enabled:
+error_grouping_timeout:
+error_grouping_log_base:
 sycamore_enabled:
 project_news_enabled:
 project_news_feed_urls:
