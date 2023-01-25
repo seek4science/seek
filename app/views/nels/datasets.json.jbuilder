@@ -6,6 +6,7 @@ json.array! @datasets do |dataset|
   json.data do
     json.id dataset['id']
     json.project_id params[:id]
+    json.is_dataset true
   end
 end
 
@@ -21,6 +22,7 @@ end
       json.dataset_id dataset['id']
       json.dataset_name dataset['name']
       json.text subtype
+      json.is_subtype true
     end
   end
 end

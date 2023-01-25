@@ -91,7 +91,7 @@ Logged in as <%= @rest_client.user_info['name'] %><br/><br/>
           }
         })
       .on('activate_node.jstree', function (e, data) {
-        if (data.node.data.dataset_id) {// subtype selected
+        if (data.node.data.is_subtype) {// subtype selected
           $j('#nels-dataset').html('').spinner('add').show();
           $j('#nels-content').hide();
 
@@ -115,7 +115,7 @@ Logged in as <%= @rest_client.user_info['name'] %><br/><br/>
               $j('#nels-dataset').html(data).spinner('remove');
             }
           });
-        } else if (data.node.data.project_id) {// dataset selected
+        } else if (data.node.data.is_dataset) {// dataset selected
           $j('#nels-dataset').html('').spinner('add').show();
           $j('#nels-content').hide();
 
@@ -155,6 +155,20 @@ Logged in as <%= @rest_client.user_info['name'] %><br/><br/>
           $j('#nels-content').show();
         }
       }
+    }).on('select_node.jstree', function (e, data) {
+        if (data.node.data.is_dataset) {// dataset selected
+            // open this node and collapse siblings
+            data.instance.open_node(data.node);
+            let siblings = data.instance.get_node(data.node.parent).children;
+            $j(siblings).each( function(index, node) {
+                if (node != data.node.id) {
+                    data.instance.close_node(node);
+                }
+            });
+        }
+        else {
+            data.instance.toggle_node(data.node);
+        }
     });
   });
 </script>
