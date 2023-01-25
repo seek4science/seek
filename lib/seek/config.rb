@@ -102,6 +102,13 @@ module Seek
                                                   sender_address: [noreply_sender],
                                                   email_prefix: "[ #{instance_name} ERROR ] ",
                                                   exception_recipients: exception_notification_recipients.nil? ? [] : exception_notification_recipients.split(/[, ]/)
+                                                },
+                                                error_grouping: error_grouping_enabled,
+                                                error_grouping_period: error_grouping_timeout,
+                                                notification_trigger: ->(exception, count) {
+                                                  # Send notifications at count = x^0, x^1, x^3, x^4... where
+                                                  # x = error_grouping_log_base
+                                                  ((Math.log2(count)/Math.log2(error_grouping_log_base)) % 1).zero?
                                                 }
       else
         SEEK::Application.config.middleware.delete ExceptionNotifier
