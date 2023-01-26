@@ -11,7 +11,7 @@
 <ul class="list-group">
   <% @dataset['subtypes'].each do |subtype| %>
       <li class="list-group-item">
-        <%= subtype['type'] %> <span class="subtle">(<%= number_to_human_size(subtype['size']) %>)</span>
+        <%= link_to(subtype['type'], '#', {'data-role':'nels-subtype-link', 'data-subtype-node-id':"#{subtype['type']}#{@dataset['id']}"}) %> <span class="subtle">(<%= number_to_human_size(subtype['size']) %>)</span>
         <%= button_link_to('Add metadata', 'add', nil, { id: "add_metadata_"+params[:project_id]+"_"+params[:dataset_id]+"_"+subtype['type'], class:"add_metadata"} ) %>
 
         <% if subtype["metadata"] %>
@@ -59,6 +59,11 @@
       $j('#upload-file form').append(`<input type="hidden" name="subtype_name" value="${button_id.split("_")[4]}" />`);
 
       return false;
+    });
+
+    $j('[data-role="nels-subtype-link"]').on('click', function () {
+        let nodeId = $j(this).data('subtype-node-id');
+        $j('#'+nodeId+' a').click();
     });
   });
 </script>
