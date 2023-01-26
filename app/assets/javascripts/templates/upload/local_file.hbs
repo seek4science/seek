@@ -2,4 +2,8 @@
     <span class="generic_file_icon"></span>
     {{text}}
     <a href="#" class="remove-file"><span class="remove_icon"></span></a>
+
+    {{!-- keeps in sync with remote file parameters and avoids the content blob array getting mangled when submitted --}}
+    <input type="hidden" name="content_blobs[][data_url]" />
+    <input type="hidden" name="content_blobs[][make_local_copy]" value="0" />
 </li>
