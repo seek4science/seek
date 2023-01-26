@@ -66,8 +66,8 @@ class AdminController < ApplicationController
     eg_timeout = params[:error_grouping_timeout]
     eg_log_base = params[:error_grouping_log_base]
     Seek::Config.error_grouping_enabled = string_to_boolean params[:error_grouping_enabled] if params.key?(:error_grouping_enabled)
-    Seek::Config.error_grouping_timeout = string_to_seconds eg_timeout if string_is_duration eg_timeout, 'error grouping timeout'
-    Seek::Config.error_grouping_log_base = eg_log_base.to_i if only_positive_integer eg_log_base, 'error grouping log base'
+    Seek::Config.error_grouping_timeout = string_to_seconds eg_timeout if string_is_duration(eg_timeout, 'error grouping timeout')
+    Seek::Config.error_grouping_log_base = eg_log_base.to_i if only_positive_integer(eg_log_base, 'error grouping log base')
 
     Seek::Config.omniauth_enabled = string_to_boolean params[:omniauth_enabled]
     Seek::Config.omniauth_user_create = string_to_boolean params[:omniauth_user_create]
