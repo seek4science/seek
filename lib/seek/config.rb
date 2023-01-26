@@ -76,6 +76,18 @@ module Seek
       configure_exception_notification
     end
 
+    def error_grouping_enabled_propagate
+      configure_exception_notification
+    end
+
+    def error_grouping_timeout_propagate
+      configure_exception_notification
+    end
+
+    def error_grouping_log_base_propagate
+      configure_exception_notification
+    end
+
     def recaptcha_private_key_propagate
       configure_recaptcha_keys
     end
@@ -92,6 +104,7 @@ module Seek
     end
 
     def configure_exception_notification
+      SEEK::Application.config.middleware.delete ExceptionNotifier
       if exception_notification_enabled && Rails.env.production?
         SEEK::Application.config.middleware.use ExceptionNotification::Rack,
                                                 ignore_exceptions: ['ActionDispatch::Http::Parameters::ParseError',
@@ -110,8 +123,6 @@ module Seek
                                                   # x = error_grouping_log_base
                                                   (Math.log(count,error_grouping_log_base) % 1).zero?
                                                 }
-      else
-        SEEK::Application.config.middleware.delete ExceptionNotifier
       end
     rescue RuntimeError => e
       Rails.logger.warn('Cannot update middleware with exception notification changes, server needs restarting')
