@@ -40,87 +40,23 @@ module Seek
       position_asc: { title: 'Position (Ascending)', order: 'position' },
       position_desc: { title: 'Position (Descending)', order: 'position DESC' },
       downloads_desc: { title: 'Downloads (Descending)', order: '--downloads_desc DESC',
-                       relation_proc: -> (items) { # Sorts by number of downloads, descending
-                         # ______ DOES NOT WORK! ______
-                         # The things below are attempts at getting this working, but it doe not work yet.
-                         # It has currently hardcoded DataFile as the sorting objective, for simplicity.
-
+                        relation_proc: -> (items) { # Sorts by number of downloads, descending
                          #### Using Active Record
-                         # This section **modifies** "items" relation so that it *includes a new column "downloads"
-                         items._select!('*', 'd.downloads')
-                         alog=ActivityLog.all.where(action: 'download',activity_loggable_type: 'DataFile')
-                         downloads=alog.select('activity_loggable_id AS data_files_id, COUNT(activity_loggable_id) AS downloads').group(:activity_loggable_id)
-                         items.joins!("LEFT OUTER JOIN (#{downloads.to_sql}) d ON data_files.id = d.data_files_id")
-                         # The call to items.arel_table is problematic, as it basically un-does all the modifications
-                         # above, and gets the original items db, where downloads does not exist.
-                         arel_field = items.arel_table[:downloads].desc
-                         arel_field
-
-                         # Alternative query construction:
-                         # alog = ActivityLog.all.arel_table
-                         # joined=items.joins(
-                         #     Arel::Nodes::OuterJoin.new(alog, alog.create_on(
-                         #       alog[:activity_loggable_id].eq(items.arel_table[:id])
-                         #         .and(alog[:action].eq('download'))
-                         #         .and(alog[:activity_loggable_type].eq('DataFile'))
-                         #     )))
-                         #   .select(:id, :title, alog[:activity_loggable_id].count.as('downloads'))
-                         #   .group(:id,:title)
-
-                         # Play in the console with:
-                         # items=DataFile.all
-                         # items.object_id
-                         # items._select!(:id,:title,'d.downloads')
-                         # alog=ActivityLog.all.where(action: 'download',activity_loggable_type: 'DataFile')
-                         # downloads=alog.select('activity_loggable_id AS data_files_id, COUNT(activity_loggable_id) AS downloads').group(:activity_loggable_id)
-                         # items.joins!("LEFT OUTER JOIN (#{downloads.to_sql}) d ON data_files.id = d.data_files_id")
-                         # items.object_id
-                         # itclone=items.clone
-                         # puts ActiveRecord::Base.connection.exec_query itclone.to_sql
-                         #
-                         # Note: if you call "puts ActiveRecord::Base.connection.exec_query items.to_sql" to be able to
-                         # look at "items", it makes the relation inmutable, so clone it first instead, i.e. call
-                         # "itclone=items.clone" and then "puts ActiveRecord::Base.connection.exec_query itclone.to_sql"
+                         # This section **modifies** "items" relation so that it includes a new column "downloads"
+                         alog=ActivityLog.all.where(action: 'download',activity_loggable_type: items.first.class.name)
+                         downloads=alog.select("activity_loggable_id AS #{items.table.name}_id, COUNT(activity_loggable_id) AS downloads").group(:activity_loggable_id)
+                         items._select!('*', 'd.downloads').joins!("LEFT OUTER JOIN (#{downloads.to_sql}) d ON #{items.table.name}.id = d.#{items.table.name}_id")
 
                          #### Using Arel
-                         # This section joins a new column "downloads" to the arel_table, but does not modify items
-                         # itemsarel=items.arel_table
-                         # alog=ActivityLog.arel_table
-                         # downloads=alog.project(alog[:activity_loggable_id].as("log_id"), alog[:activity_loggable_id].count.as("downloads")).where(alog[:action].eq('download').and(alog[:activity_loggable_type].eq('DataFile'))).group(:activity_loggable_id).as('downloads')
-                         # joined=itemsarel.project(itemsarel[Arel.star], downloads[:downloads]).outer_join(downloads).on(itemsarel[:id].eq(downloads[:log_id])).as('joined')
-                         # items=joined
-                         # arel_field = joined[:downloads].desc
-                         # arel_field
-
-                         ## Reproduce the arel_table section in ruby console with:
-                         # items=DataFile.all
-                         # itemsarel=items.arel_table
-                         # alog=ActivityLog.arel_table
-                         # files=itemsarel.project(itemsarel[:id], itemsarel[:title])
-                         # puts ActiveRecord::Base.connection.exec_query files.to_sql
-                         # downloads=alog.project(alog[:activity_loggable_id].as("log_id"), alog[:activity_loggable_id].count.as("downloads")).where(alog[:action].eq('download').and(alog[:activity_loggable_type].eq('DataFile'))).group(:activity_loggable_id)
-                         # puts ActiveRecord::Base.connection.exec_query downloads.to_sql
-                         # d=downloads.as('d')
-                         # joined=itemsarel.project(itemsarel[:id], itemsarel[:title], d[:downloads]).outer_join(d).on(itemsarel[:id].eq(d[:log_id]))
-                         # puts ActiveRecord::Base.connection.exec_query joined.to_sql
-                         # j=joined.as('j')
-                         # arel_field = j[:downloads].desc
-                         # arel_field
-
-                         ## This works but goes around a bit
-                         # downloads=alog.project(alog[:activity_loggable_id].as("log_id"), alog[:activity_loggable_id].count.as("downloads")).where(alog[:action].eq('download').and(alog[:activity_loggable_type].eq('DataFile'))).group(:activity_loggable_id).as('d')
-                         # files=itemsarel.project(itemsarel[:id], itemsarel[:title]).as('f')
-                         # joined=itemsarel.project(:id,:title,:downloads).from(files).join(downloads).on(files[:id].eq(downloads[:log_id]))
-                         # puts ActiveRecord::Base.connection.exec_query joined.to_sql
-
-                         ## A very ugly single liner that dones work
-                         # joined=itemsarel.project(itemsarel[:id], itemsarel[:title], alog[:activity_loggable_id].count.as("downloads")).join(alog).on(itemsarel[:id].eq(alog[:activity_loggable_id])).where(alog[:action].eq('download').and(alog[:activity_loggable_type].eq('DataFile'))).group(:activity_loggable_id)
-                         # puts ActiveRecord::Base.connection.exec_query joined.to_sql
-
-                         ## Reproduce what sorting by :title does in the ruby console with:
-                         # items=DataFile.all
-                         # arel_field = items.arel_table[:title].desc
-                         # arel_field
+                         # This section builds the equivalent arel_table to provide the corresponding arel_field
+                         items_a=items.arel_table
+                         alog_a=ActivityLog.arel_table
+                         downloads=alog_a.project(alog_a[:activity_loggable_id].as("log_id"), alog_a[:activity_loggable_id].count.as("downloads"))
+                                       .where(alog_a[:action].eq('download').and(alog_a[:activity_loggable_type].eq(items.first.class.name)))
+                                       .group(:activity_loggable_id).as('downloads')
+                         joined=items_a.project(items_a[Arel.star], downloads[:downloads]).outer_join(downloads).on(items_a[:id].eq(downloads[:log_id])).as('d')
+                         arel_field = joined[:downloads].desc
+                         arel_field
                        }
       },
       relevance: { title: 'Relevance', order: '--relevance',
@@ -171,34 +107,10 @@ module Seek
     def self.sort_by_order(items, order = nil)
       order ||= order_for_view(items.first.class.name, :index)
       if items.is_a?(ActiveRecord::Relation)
-        pp 'items before call oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo'
-        pp items.object_id
-        itemsprod=items.clone
-        pp itemsprod.object_id
-        pp items.object_id
-        puts ActiveRecord::Base.connection.exec_query itemsprod.to_sql
-        pp 'oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo'
         orderings = strategy_for_relation(order, items)
-        pp 'items after call o0ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo'
-        pp items.object_id
-        itemsprod=items.clone
-        pp itemsprod.object_id
-        pp items.object_id
-        puts ActiveRecord::Base.connection.exec_query itemsprod.to_sql
-        pp 'oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo'
         # Postgres requires any columns being ORDERed to be explicitly SELECTed (only when using DISTINCT?).
-        # columns = [items.arel_table[Arel.star]]
-        # Below is an attempt to use the modified items relation to create an arel table, so that it can be used with
-        # the addition of the downloads column, but it does not quite create a table, it is a table alias.
-        columns = [items.arel.as('items')[Arel.star]]
-        pp 'look here below! xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
-        pp 'Columns:'
-        pp columns
-        pp 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+        columns = [items.arel.as(items.table.name)[Arel.star]]
         orderings.each do |ordering|
-          pp 'ordering~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
-          pp ordering
-          pp '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
           if ordering.is_a?(Arel::Nodes::Ordering)
             expr = ordering.expr
             # Don't need to SELECT columns that are already covered by "*" and MySQL will error if you try!
@@ -209,14 +121,6 @@ module Seek
             columns << ordering
           end
         end
-        pp 'look here below! xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
-        pp 'Columns:'
-        pp columns
-        pp 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
-        pp 'Orderings:'
-        pp orderings
-        pp items.select(columns).order(orderings)
-        pp 'look here above! xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
         items.select(columns).order(orderings)
       else
         items.sort(&strategy_for_enum(order, items))
@@ -273,9 +177,6 @@ module Seek
       fields_and_directions = order.split(',').flat_map do |f|
         field, order = f.strip.split(' ', 2)
         if field.start_with?('--')
-          # pp 'look here below! yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy'
-          # pp ORDER_OPTIONS[field.sub('--', '').to_sym][:relation_proc].call(relation)
-          # pp 'look here above! yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy'
           ORDER_OPTIONS[field.sub('--', '').to_sym][:relation_proc].call(relation)
         else
           m = field.match(/LOWER\((.+)\)/)
