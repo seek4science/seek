@@ -152,11 +152,15 @@ module ResourceListItemHelper
   end
 
   def list_item_usage(resource)
-    html = 'Views: ' + resource.view_count.to_s
-    if resource.is_downloadable?
-      html << ', Downloads: ' + resource.download_count.to_s
+    if resource.view_count
+      html = 'Views: ' + resource.view_count.to_s
+      if resource.is_downloadable?
+        html << ', Downloads: ' + resource.download_count.to_s
+      end
+      html.html_safe
     end
-    html.html_safe
+  rescue
+    nil
   end
 
   def list_profile_registered_timestamp(resource)
