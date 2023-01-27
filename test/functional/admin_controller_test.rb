@@ -260,7 +260,10 @@ class AdminControllerTest < ActionController::TestCase
   end
 
   test 'update_redirect_to for update_features_enabled' do
-    post :update_features_enabled, params: { time_lock_doi_for: '1', port: '25' }
+    post :update_features_enabled, params: { time_lock_doi_for: '1',
+                                             port: '25',
+                                             error_grouping_log_base: 2,
+                                             error_grouping_timeout: 1.minute }
     assert_redirected_to admin_path
     assert_nil flash[:error]
 
