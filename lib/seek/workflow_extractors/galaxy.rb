@@ -57,7 +57,9 @@ module Seek
         metadata[:internals][:steps] = []
         galaxy['steps'].each do |num, step|
           unless ['data_input', 'data_collection_input', 'parameter_input'].include?(step['type'])
-            metadata[:internals][:steps] << { id: step['id'].to_s, name: step['label'] || step['name'], description: (step['annotation'] || '') + "\n " + (step['tool_id'] || '') }
+            metadata[:internals][:steps] << { id: step['id'].to_s,
+                                              name: step['label'] || step['name'],
+                                              description: [step['annotation'], step['tool_id']].reject(&:blank?).map(&:to_s).join("\n") }
           end
         end
 
