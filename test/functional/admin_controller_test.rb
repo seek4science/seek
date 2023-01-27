@@ -272,6 +272,39 @@ class AdminControllerTest < ActionController::TestCase
     refute_nil flash[:error]
   end
 
+  test 'update error_grouping_enabled' do
+    with_config_value(:error_grouping_enabled, false) do
+      post :update_features_enabled, params: { error_grouping_enabled: '1' }
+      assert Seek::Config.error_grouping_enabled
+      post :update_features_enabled, params: { error_grouping_enabled: '0' }
+      assert_equal false, Seek::Config.error_grouping_enabled
+    end
+  end
+
+  test 'update error_grouping_timeout' do
+    with_config_value(:error_grouping_timeout, 1.minute) do
+      post :update_features_enabled, params: { error_grouping_timeout: '1' }
+      assert_equal 1.seconds, Seek::Config.error_grouping_timeout
+      post :update_features_enabled, params: { error_grouping_timeout: '10 sec' }
+      assert_equal 10.seconds, Seek::Config.error_grouping_timeout
+      post :update_features_enabled, params: { error_grouping_timeout: '2 min' }
+      assert_equal 120.seconds, Seek::Config.error_grouping_timeout
+    end
+  end
+
+  test 'update error_grouping_log_base' do
+    with_config_value(:error_grouping_log_base, 2) do
+      post :update_features_enabled, params: { error_grouping_log_base: '3' }
+      assert_equal 3, Seek::Config.error_grouping_log_base
+      post :update_features_enabled, params: { error_grouping_log_base: '3.4' }
+      refute_nil flash[:error]
+      assert_equal 3, Seek::Config.error_grouping_log_base
+      post :update_features_enabled, params: { error_grouping_log_base: '-1' }
+      refute_nil flash[:error]
+      assert_equal 3, Seek::Config.error_grouping_log_base
+    end
+  end
+
   test 'update_redirect_to for update_home_setting' do
     post :update_home_settings, params: { news_number_of_entries: '10', tag_threshold: '1', max_visible_tags: '20' }
     assert_redirected_to admin_path
