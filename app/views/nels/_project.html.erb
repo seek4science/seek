@@ -9,3 +9,25 @@
 <br/>
 
 <%= button_link_to('Create NeLS dataset', 'add', new_dataset_nels_path(:project_id => @project['id'], :project_name => @project['name'])) %>
+
+<h4>Datasets</h4>
+<ul>
+<% @datasets.each do |dataset| %>
+
+  <li>
+    <%= link_to(dataset['name'], '#', {'data-role':'nels-dataset-link', 'data-nels-dataset-link':"dataset#{dataset['id']}"}) %>
+    - <%= dataset['description'] %>
+  </li>
+
+<% end %>
+</ul>
+
+<script>
+    $j(document).ready(function () {
+
+        $j('[data-role="nels-dataset-link"]').on('click', function () {
+            let nodeId = $j(this).data('nels-dataset-link');
+            $j('#'+nodeId+' a').click();
+        });
+    });
+</script>

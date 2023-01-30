@@ -125,6 +125,7 @@ class NelsController < ApplicationController
 
   def project
     @project = params[:project]
+    @datasets = @rest_client.datasets(@project[:id])
     respond_to do |format|
       format.html { render partial: 'nels/project' }
     end
