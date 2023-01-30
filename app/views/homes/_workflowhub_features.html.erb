@@ -20,13 +20,9 @@
         <%= Seek::Config.instance_name %> <strong>supports workflows of <em>any</em> type</strong> in its native repository.
       </p>
 
-      <div class="row">
-        <div class="col-sm-6">
-          <a class="btn btn-primary btn-lg" target="_blank" href="https://about.workflowhub.eu" role="button" aria-label="Left Align" style="white-space: normal;"> Learn more </a>
-        </div>
-        <div class="text-right">
-          <a class="btn btn-primary btn-lg" href=<%= signup_path %> role="button" aria-label="Left Align" style="white-space: normal;"> Register </a>
-        </div>
+      <div class="clearfix">
+        <%= link_to 'Learn more', Seek::Config.instance_link, target: '_blank', rel: 'noopener', class: 'btn btn-primary btn-lg pull-left' %>
+        <%= link_to 'Register', signup_path, class: 'btn btn-primary btn-lg pull-right' %>
       </div>
     </div>
   </div>
