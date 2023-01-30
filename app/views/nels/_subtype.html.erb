@@ -17,6 +17,14 @@
   <% end %>
 </p>
 
+<p>
+  <label>Associated NeLS Project:</label>
+  <%= link_to(@project['name'], '#', {'data-role':'nels-tree-node-link', 'data-tree-node-id':"project#{@project['id']}"}) %>
+</p>
+<p>
+  <label>Associated Dataset:</label>
+  <%= link_to(@dataset['name'], '#', {'data-role':'nels-tree-node-link', 'data-tree-node-id':"dataset#{@dataset['id']}"}) %>
+</p>
 
 <style>
 table, th, td {
@@ -151,5 +159,8 @@ table, th, td {
               }
           });
       });
+
+      bindNelsTreeNodeLinks();
+
   });
 </script>

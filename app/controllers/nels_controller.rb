@@ -141,6 +141,7 @@ class NelsController < ApplicationController
   def dataset
     @dataset = @rest_client.dataset(params[:project_id].to_i, params[:dataset_id].to_i)
     @register_mode = params[:register_mode]
+    @project = @rest_client.project(params[:project_id])
 
     # Populates the "metadata" field for each subtype, indicating if there is associated metadata with it
     @dataset['subtypes'].each_with_index do |subtype, index|
@@ -157,6 +158,7 @@ class NelsController < ApplicationController
     @project_id = params[:project_id].to_i
     @dataset_id = params[:dataset_id].to_i
     @dataset = @rest_client.dataset(@project_id, params[:dataset_id].to_i)
+    @project = @rest_client.project(@project_id)
     @path = params[:path]
     @subtype = params[:subtype]
 

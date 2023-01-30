@@ -19,7 +19,14 @@ Logged in as <%= @rest_client.user_info['name'] %><br/><br/>
 <script type="text/javascript">
 
     function selectNelsTreeNode(nodeId) {
-        $j('#'+nodeId+' a').click();
+        $j('#'+nodeId+' > a').click();
+    }
+
+    function bindNelsTreeNodeLinks() {
+        $j('[data-role="nels-tree-node-link"]').on('click', function () {
+            let nodeId = $j(this).data('tree-node-id');
+            selectNelsTreeNode(nodeId);
+        });
     }
 
   $j(document).ready(function () {

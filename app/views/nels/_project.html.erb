@@ -27,8 +27,11 @@
 <% @datasets.each do |dataset| %>
 
   <li>
-    <%= link_to(dataset['name'], '#', {'data-role':'nels-dataset-link', 'data-nels-dataset-link':"dataset#{dataset['id']}"}) %>
-    - <%= dataset['description'] %>
+    <%= link_to(dataset['name'], '#', {'data-role':'nels-tree-node-link', 'data-tree-node-id':"dataset#{dataset['id']}"}) %>
+    <ul>
+      <li><label>Description:</label><%= dataset['description'] %></li>
+      <li><label>Type:</label><%= dataset['type'] %></li>
+    </ul>
   </li>
 
 <% end %>
@@ -37,9 +40,6 @@
 <script>
     $j(document).ready(function () {
 
-        $j('[data-role="nels-dataset-link"]').on('click', function () {
-            let nodeId = $j(this).data('nels-dataset-link');
-            selectNelsTreeNode(nodeId);
-        });
+        bindNelsTreeNodeLinks();
     });
 </script>
