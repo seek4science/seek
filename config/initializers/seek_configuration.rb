@@ -20,7 +20,7 @@ def load_seek_config_defaults!
   Seek::Config.default :exception_notification_enabled,false
   Seek::Config.default :exception_notification_recipients,""
   Seek::Config.default :error_grouping_enabled,true
-  Seek::Config.default :error_grouping_timeout,1.minute
+  Seek::Config.default :error_grouping_timeout,2.minutes
   Seek::Config.default :error_grouping_log_base,2
   Seek::Config.default :hide_details_enabled,false
   Seek::Config.default :registration_disabled,false
