@@ -341,6 +341,7 @@ a.workflowhub-homepage-button {
 
 #footer-logos {
   display: flex;
+  flex-wrap: wrap;
   gap: 3em;
   justify-content: center;
   a {
