@@ -13,4 +13,16 @@ module NelsHelper
     end
   end
 
+  def nels_project_glyph
+    'glyphicon glyphicon-book'
+  end
+
+  def nels_dataset_glyph
+    'glyphicon glyphicon-tags'
+  end
+
+  def nels_subtype_glyph
+    'glyphicon glyphicon-tag'
+  end
+
 end

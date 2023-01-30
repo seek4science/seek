@@ -1,10 +1,22 @@
-<h2><%= @dataset['name'] -%> <small><%= @dataset['type'] -%></small></h2>
-<p><%= @dataset['description'] %></p>
+
+<h2>
+  <span class="<%= nels_dataset_glyph %>"/>
+  &nbsp;
+  Dataset: <%= @dataset['name'] -%><br/>
+  <small><%= @dataset['type'] -%></small>
+</h2>
+
+<%= item_description @dataset['description'] -%>
+
 <% if @dataset['owner_name'].present? %>
-    <strong>Owner:</strong> <%= @dataset['owner_name'] %><br/>
+  <p>
+    <label>Owner:</label> <%= @dataset['owner_name'] %>
+  </p>
 <% end %>
 <% if (time = Time.parse(@dataset['creation_date']) rescue nil).present? %>
-    <strong>Created:</strong> <%= time %> <span class="subtle">(<%= time_ago_in_words(time) %> ago)</span><br/>
+  <p>
+    <label>Created:</label> <%= time %> <span class="subtle">(<%= time_ago_in_words(time) %> ago)</span>
+  </p>
 <% end %>
 <br/>
 <h4>Subtypes</h4>
@@ -63,7 +75,7 @@
 
     $j('[data-role="nels-subtype-link"]').on('click', function () {
         let nodeId = $j(this).data('subtype-node-id');
-        $j('#'+nodeId+' a').click();
+        selectNelsTreeNode(nodeId);
     });
   });
 </script>

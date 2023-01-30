@@ -1,5 +1,9 @@
-<p><% @file_list -%></p>
-<h2>You are at:</h2>
+
+<h2>
+  <span class="<%= nels_subtype_glyph %>"/>
+  &nbsp;
+  Subtype: <%= @subtype -%><br/>
+</h2>
 
 <%# Use @path to create a series of folder links as breadcrumb %>
 <%# Remove the first "Storebioinfo/" item and only make elements beyond project clickable%>
@@ -13,15 +17,6 @@
   <% end %>
 </p>
 
-
-
-<% if @dataset['owner_name'].present? %>
-    <strong>Owner:</strong> <%= @dataset['owner_name'] %><br/>
-<% end %>
-<% if (time = Time.parse(@dataset['creation_date']) rescue nil).present? %>
-    <strong>Created:</strong> <%= time %> <span class="subtle">(<%= time_ago_in_words(time) %> ago)</span><br/>
-<% end %>
-<br/>
 
 <style>
 table, th, td {

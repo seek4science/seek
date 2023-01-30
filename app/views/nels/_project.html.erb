@@ -1,16 +1,28 @@
-<h2><%= @project['name'] -%> </h2>
-<p><%= @project['description'] %></p>
+<h2>
+  <span class="<%= nels_project_glyph %>"/>
+  &nbsp;
+  NeLS Project: <%= @project['name'] -%>
+</h2>
+
+<%= item_description @project['description'] -%>
+
 <% if @project['contact_person'].present? %>
-    <strong>Contact person:</strong> <%= @project['contact_person'] %><br/>
+  <p>
+    <label>Contact person:</label> <%= @project['contact_person'] %>
+  </p>
 <% end %>
+
 <% if (time = Time.parse(@project['created_at']) rescue nil).present? %>
-    <strong>Created:</strong> <%= time %> <span class="subtle">(<%= time_ago_in_words(time) %> ago)</span><br/>
+  <p>
+    <label>Created:</label> <%= time %> <span class="subtle">(<%= time_ago_in_words(time) %> ago)</span>
+  </p>
 <% end %>
 <br/>
 
-<%= button_link_to('Create NeLS dataset', 'add', new_dataset_nels_path(:project_id => @project['id'], :project_name => @project['name'])) %>
-
 <h4>Datasets</h4>
+<p>
+  <%= button_link_to('Create a new NeLS dataset', 'add', new_dataset_nels_path(:project_id => @project['id'], :project_name => @project['name'])) %>
+</p>
 <ul>
 <% @datasets.each do |dataset| %>
 
@@ -27,7 +39,7 @@
 
         $j('[data-role="nels-dataset-link"]').on('click', function () {
             let nodeId = $j(this).data('nels-dataset-link');
-            $j('#'+nodeId+' a').click();
+            selectNelsTreeNode(nodeId);
         });
     });
 </script>

@@ -17,6 +17,11 @@ Logged in as <%= @rest_client.user_info['name'] %><br/><br/>
 </div>
 
 <script type="text/javascript">
+
+    function selectNelsTreeNode(nodeId) {
+        $j('#'+nodeId+' a').click();
+    }
+
   $j(document).ready(function () {
 
     // Waits till the given element is loaded
@@ -38,7 +43,7 @@ Logged in as <%= @rest_client.user_info['name'] %><br/><br/>
           subtree: true
         });
       });
-    }
+    };
 
     // Reopen the tree at previous existing location
     if (sessionStorage.getItem("nels_tree_state")){
