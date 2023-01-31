@@ -1,10 +1,16 @@
 <h1>NeLS Browser</h1>
 
-Logged in as <%= @rest_client.user_info['name'] %><br/><br/>
+<p class='subtle'>
+  Logged in as <%= @rest_client.user_info['name'] %>
+</p>
+
+<%= render partial:'browser-overview' %>
 
 <div class="row">
       <%= button_link_to('Open in NeLS', 'git_repository_search', 'https://test-fe.cbu.uib.no/nels-web/#/sbi-storage',options = {target:'blank'}) %>
 </div>
+
+
 
 <div class="row">
   <div class="col-sm-3">
