@@ -25,4 +25,18 @@ module NelsHelper
     'glyphicon glyphicon-tag'
   end
 
+  def show_nels_button_for_assay?(assay)
+    Seek::Config.nels_enabled &&
+      current_user && current_user.person && assay.can_edit? &&
+      current_user.person.projects.any?(&:nels_enabled) &&
+      assay.projects.any?(&:nels_enabled)
+  end
+
+  def show_nels_button_for_project?(project)
+    current_user &&
+      Seek::Config.nels_enabled &&
+      project.nels_enabled &&
+      project.has_member?(current_user)
+  end
+
 end
