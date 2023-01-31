@@ -107,7 +107,7 @@ def load_seek_config_defaults!
   Seek::Config.default :home_feeds_cache_timeout,30
 # Branding
   Seek::Config.default :instance_name,'FAIRDOM-SEEK'
-  Seek::Config.default :instance_link,'http://www.fair-dom.org'
+  Seek::Config.default :instance_link,'https://fairdomseek.org'
 
   Seek::Config.default :instance_admins_name,"FAIRDOM"
   Seek::Config.default :instance_admins_link,"http://www.fair-dom.org"
