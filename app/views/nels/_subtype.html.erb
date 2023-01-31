@@ -5,18 +5,6 @@
   Subtype: <%= @subtype -%><br/>
 </h2>
 
-<%# Use @path to create a series of folder links as breadcrumb %>
-<%# Remove the first "Storebioinfo/" item and only make elements beyond project clickable%>
-<% full_path="Storebioinfo" %>
-<p>
-  <% @path.split('/')[1..].each_with_index do |path_item, index | %>
-    <% full_path += "/"+ path_item %>
-    /<span <% if index>1 %> class="nels-folder" style="cursor: pointer;color:blue;"<% end %> path=<%= full_path%>>
-      <%= path_item %>
-    </span>
-  <% end %>
-</p>
-
 <p>
   <label>Associated NeLS Project:</label>
   <%= link_to(@project['name'], '#', {'data-role':'nels-tree-node-link', 'data-tree-node-id':"project#{@project['id']}"}) %>
