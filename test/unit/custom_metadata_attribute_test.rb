@@ -71,13 +71,9 @@ class CustomMetadataAttributeTest < ActiveSupport::TestCase
     assert attribute.validate_value?([])
     assert attribute.validate_value?(['Granny Smith'])
 
-    assert_raises(Seek::Samples::AttributeTypeHandlers::CVListAttributeTypeHandler::NotArrayException) do
-      assert attribute.validate_value?('Granny Smith')
-    end
+    refute attribute.validate_value?('Granny Smith')
+    refute attribute.validate_value?(['Peter','Granny Smith'])
 
-    assert_raises(Seek::Samples::AttributeTypeHandlers::CVListAttributeTypeHandler::InvalidControlledVocabularyException) do
-      assert attribute.validate_value?(['Peter','Granny Smith'])
-    end
   end
 
   test 'validate value with required' do
