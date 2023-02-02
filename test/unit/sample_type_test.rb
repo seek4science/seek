@@ -327,17 +327,10 @@ class SampleTypeTest < ActiveSupport::TestCase
     type.sample_attributes.first.save!
     assert type.valid?
     assert_equal 4, type.sample_attributes.first.sample_controlled_vocab.sample_controlled_vocab_terms.count
-    puts type.sample_attributes.first.inspect
 
     assert type.validate_value?('apples', ['Granny Smith'])
-
-    assert_raises(Seek::Samples::AttributeTypeHandlers::CVListAttributeTypeHandler::NotArrayException) do
-      assert type.validate_value?('apples','Granny Smith')
-    end
-
-    assert_raises(Seek::Samples::AttributeTypeHandlers::CVListAttributeTypeHandler::InvalidControlledVocabularyException) do
-      assert type.validate_value?('apples',['Peter','Granny Smith'])
-    end
+    refute type.validate_value?('apples','Granny Smith')
+    refute type.validate_value?('apples',['Peter','Granny Smith'])
   end
 
   test 'must have one title attribute' do
