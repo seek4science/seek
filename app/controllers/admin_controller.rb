@@ -63,6 +63,12 @@ class AdminController < ApplicationController
     Seek::Config.exception_notification_recipients = params[:exception_notification_recipients] if params.key?(:exception_notification_recipients)
     Seek::Config.exception_notification_enabled = string_to_boolean params[:exception_notification_enabled] if params.key?(:exception_notification_enabled)
 
+    eg_timeout = params[:error_grouping_timeout]
+    eg_log_base = params[:error_grouping_log_base]
+    Seek::Config.error_grouping_enabled = string_to_boolean params[:error_grouping_enabled] if params.key?(:error_grouping_enabled)
+    Seek::Config.error_grouping_timeout = string_to_seconds eg_timeout if string_is_duration(eg_timeout, 'error grouping timeout')
+    Seek::Config.error_grouping_log_base = eg_log_base.to_i if only_positive_integer(eg_log_base, 'error grouping log base')
+
     Seek::Config.omniauth_enabled = string_to_boolean params[:omniauth_enabled]
     Seek::Config.omniauth_user_create = string_to_boolean params[:omniauth_user_create]
     Seek::Config.omniauth_user_activate = string_to_boolean params[:omniauth_user_activate]
@@ -643,6 +649,25 @@ class AdminController < ApplicationController
     else
       false
     end
+  end
+
+  def is_int(input)
+    true if Integer(input) > 0
+  rescue
+    false
+  end
+
+  def string_to_seconds(string)
+    string.replace(string + ' sec') if is_int(string)
+    now = Time.now
+    (Chronic.parse("#{string} from now", now: now) - now).to_i.seconds
+  end
+  def string_is_duration(string, field)
+    string_to_seconds(string)
+    true
+  rescue
+    flash[:error] = "Please enter a valid time for the #{field}."
+    false
   end
 
   def update_redirect_to(flag, action)

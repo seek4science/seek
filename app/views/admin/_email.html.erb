@@ -25,6 +25,18 @@
       <div id="exception_notification_block" class="additional_settings" style="<%= show_or_hide_block(Seek::Config.exception_notification_enabled) -%>;">
         <%= admin_text_setting(:exception_notification_recipients,  Seek::Config.exception_notification_recipients,
                                'Exception notification recipients', 'A comma or space seperated list of email address for those that will receive exception notifications.') %>
+
+        <%= admin_checkbox_setting(:error_grouping_enabled, 1, Seek::Config.error_grouping_enabled,
+                                   "Error grouping enabled", "Groups notifications of errors of the same type, decreasing the number of emails sent. A server restart is required when changing these settings",
+                                   :onchange=>toggle_appear_javascript('error_grouping_block')) %>
+
+        <div id="error_grouping_block" class="additional_settings" style="<%= show_or_hide_block(Seek::Config.error_grouping_enabled) -%>;">
+          <%= admin_text_setting(:error_grouping_timeout,  Seek::Config.error_grouping_timeout,
+                                 'Error grouping timeout', 'Maximum time period allowed between error triggers to be considered part of the same group. (Defaults to seconds unless units are specified).') %>
+          <%= admin_text_setting(:error_grouping_log_base,  Seek::Config.error_grouping_log_base,
+                                 'Error grouping log base', 'Notifications will be sent when the error count is x^0, x^1, x^3, x^4... where x is the value specified here.') %>
+        </div>
+
       </div>
 
       <%= admin_text_setting(:noreply_sender, Seek::Config.noreply_sender,
