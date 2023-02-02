@@ -41,23 +41,23 @@ module Seek
       position_desc: { title: 'Position (Descending)', order: 'position DESC' },
       downloads_desc: { title: 'Downloads (Descending)', order: '--downloads_desc DESC',
                         relation_proc: -> (items) { # Sorts by number of downloads, descending
-                         #### Using Active Record
-                         # This section **modifies** "items" relation so that it includes a new column "downloads"
-                         alog=ActivityLog.all.where(action: 'download',activity_loggable_type: items.first.class.name)
-                         downloads=alog.select("activity_loggable_id AS #{items.table.name}_id, COUNT(activity_loggable_id) AS downloads").group(:activity_loggable_id)
-                         items._select!('*', 'd.downloads').joins!("LEFT OUTER JOIN (#{downloads.to_sql}) d ON #{items.table.name}.id = d.#{items.table.name}_id")
+                          #### Using Active Record
+                          # This section **modifies** "items" relation so that it includes a new column "downloads"
+                          alog=ActivityLog.all.where(action: 'download',activity_loggable_type: items.first.class.name)
+                          downloads=alog.select("activity_loggable_id AS #{items.table.name}_id, COUNT(activity_loggable_id) AS downloads").group(:activity_loggable_id)
+                          items._select!('*', 'd.downloads').joins!("LEFT OUTER JOIN (#{downloads.to_sql}) d ON #{items.table.name}.id = d.#{items.table.name}_id")
 
-                         #### Using Arel
-                         # This section builds the equivalent arel_table to provide the corresponding arel_field
-                         items_a=items.arel_table
-                         alog_a=ActivityLog.arel_table
-                         downloads=alog_a.project(alog_a[:activity_loggable_id].as("log_id"), alog_a[:activity_loggable_id].count.as("downloads"))
-                                       .where(alog_a[:action].eq('download').and(alog_a[:activity_loggable_type].eq(items.first.class.name)))
-                                       .group(:activity_loggable_id).as('downloads')
-                         joined=items_a.project(items_a[Arel.star], downloads[:downloads]).outer_join(downloads).on(items_a[:id].eq(downloads[:log_id])).as('d')
-                         arel_field = joined[:downloads].desc
-                         arel_field
-                       }
+                          #### Using Arel
+                          # This section builds the equivalent arel_table to provide the corresponding arel_field
+                          items_a=items.arel_table
+                          alog_a=ActivityLog.arel_table
+                          downloads=alog_a.project(alog_a[:activity_loggable_id].as("log_id"), alog_a[:activity_loggable_id].count.as("downloads"))
+                                        .where(alog_a[:action].eq('download').and(alog_a[:activity_loggable_type].eq(items.first.class.name)))
+                                        .group(:activity_loggable_id).as('downloads')
+                          joined=items_a.project(items_a[Arel.star], downloads[:downloads]).outer_join(downloads).on(items_a[:id].eq(downloads[:log_id])).as('d')
+                          arel_field = joined[:downloads].desc
+                          arel_field
+                        }
       },
       relevance: { title: 'Relevance', order: '--relevance',
                    relation_proc: -> (items) {
