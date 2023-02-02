@@ -39,7 +39,7 @@ module Seek
       created_at_desc: { title: 'Creation date (Descending)', order: 'created_at DESC' },
       position_asc: { title: 'Position (Ascending)', order: 'position' },
       position_desc: { title: 'Position (Descending)', order: 'position DESC' },
-      downloads_desc: { title: 'Downloads (Descending)', order: '--downloads_desc DESC',
+      downloads_desc: { title: 'Downloads (Descending)', order: '--downloads_desc',
                         relation_proc: -> (items) { # Sorts by number of downloads, descending
                           #### Using Active Record
                           # This section **modifies** "items" relation so that it includes a new column "downloads"
@@ -57,12 +57,11 @@ module Seek
                           joined=items_a.project(items_a[Arel.star], downloads[:downloads]).outer_join(downloads).on(items_a[:id].eq(downloads[:log_id])).as('d')
 
                           case ActiveRecord::Base.connection.instance_values["config"][:adapter]
-                          when 'mysql2'
-                            arel_field = joined[:downloads].desc
                           when 'postgresql'
-                            arel_field = joined[:downloads].desc.nulls_last
+                            joined[:downloads].desc.nulls_last
+                          else
+                            joined[:downloads].desc
                           end
-                          arel_field
                         },
                         enum_proc: -> (items) {
                           return nil if items.empty? || !items.first.is_downloadable?
