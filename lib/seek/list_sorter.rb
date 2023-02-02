@@ -55,7 +55,13 @@ module Seek
                                         .where(alog_a[:action].eq('download').and(alog_a[:activity_loggable_type].eq(items.first.class.name)))
                                         .group(:activity_loggable_id).as('downloads')
                           joined=items_a.project(items_a[Arel.star], downloads[:downloads]).outer_join(downloads).on(items_a[:id].eq(downloads[:log_id])).as('d')
-                          arel_field = joined[:downloads].desc
+
+                          case ActiveRecord::Base.connection.instance_values["config"][:adapter]
+                          when 'mysql2'
+                            arel_field = joined[:downloads].desc
+                          when 'postgresql'
+                            arel_field = joined[:downloads].desc.nulls_last
+                          end
                           arel_field
                         },
                         enum_proc: -> (items) {
