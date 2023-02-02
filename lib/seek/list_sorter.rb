@@ -57,6 +57,19 @@ module Seek
                           joined=items_a.project(items_a[Arel.star], downloads[:downloads]).outer_join(downloads).on(items_a[:id].eq(downloads[:log_id])).as('d')
                           arel_field = joined[:downloads].desc
                           arel_field
+                        },
+                        enum_proc: -> (items) {
+                          return nil if items.empty? || !items.first.is_downloadable?
+                          alog=ActivityLog.all.where(action: 'download',activity_loggable_type: items.first.class.name)
+                          downloads = alog.select("activity_loggable_id AS #{items.first.class.table_name}_id, COUNT(activity_loggable_id) AS downloads").group(:activity_loggable_id)
+                          joined = items.first.class.all.select('*', 'd.downloads').joins("LEFT OUTER JOIN (#{downloads.to_sql}) d ON #{items.first.class.table_name}.id = d.#{items.first.class.table_name}_id")
+                          ids = joined.pluck("#{items.first.class.table_name}.id")
+                          dls = joined.pluck('downloads')
+                          -> (a, b) {
+                            x = dls[ids.index(a.id)] || 0
+                            y = dls[ids.index(b.id)] || 0
+                            y <=> x
+                          }
                         }
       },
       relevance: { title: 'Relevance', order: '--relevance',
