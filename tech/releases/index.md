@@ -19,7 +19,7 @@ A small bugfix patch release ...
 
 * Fix to forcing a copy when registering data via a URL, using the Upload a copy checkbox.
 * Group together notification emails, to prevent many emails for the same error being sent in quick succession.
-  The are now sent in groups of increasing time, within a configurable time period.
+  The are now sent in groups of increasing size, within a configurable time period.
 * Fix to prevent links being displayed, when displaying the text that was used for a search.
 
 For a full list, see [closed issues for 1.13.1](https://github.com/seek4science/seek/milestone/12?closed=1)
