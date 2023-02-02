@@ -11,9 +11,22 @@ Please see [Getting FAIRDOM-SEEK](/get-seek.html) for details about installing S
 
 If you have any comments or feedback about a release, then please [Contact Us](/contacting-us.html)
 
+## Version 1.13.1
+
+Release date: _2nd February 2023_
+
+A small bugfix patch release ...
+
+* Fix to forcing a copy when registering data via a URL, using the Upload a copy checkbox.
+* Group together notification emails, to prevent many emails for the same error being sent in quick succession.
+  The are now sent in groups of increasing time, within a configurable time period.
+* Fix to prevent links being displayed, when displaying the text that was used for a search.
+
+For a full list, see [closed issues for 1.13.1](https://github.com/seek4science/seek/milestone/12?closed=1)
+
 ## Version 1.13.0
 
-Release date: _12th January 2023_
+Release date: _12th January 2023_ 
 
 A major release with broad number of changes, including many small changes and bug fixes not listed here.
 The high level changes include:
