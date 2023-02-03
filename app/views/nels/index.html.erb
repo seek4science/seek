@@ -35,6 +35,18 @@
         });
     }
 
+    function saveLastSelectedNode(projectId, datasetId = null, subtypeId = null) {
+        let val = `project${projectId}`;
+        if (datasetId) {
+            val = val + `,dataset${datasetId}`;
+        }
+        if (subtypeId) {
+            val = val + `,${subtypeId}`;
+        }
+
+        sessionStorage.setItem('nels_tree_state',val);
+    }
+
   $j(document).ready(function () {
 
     // Waits till the given element is loaded
@@ -60,16 +72,16 @@
 
     // Reopen the tree at previous existing location
     if (sessionStorage.getItem("nels_tree_state")){
-      path = sessionStorage.getItem("nels_tree_state").split(',')
-      // Open all nodes except the last one
+      let path = sessionStorage.getItem("nels_tree_state").split(',')
+        console.log(path);
+      // // Open all nodes except the last one
       path.slice(0,path.length-1).forEach(element => {
         waitForElm(`#${element}`).then((elm) => $j("#nels-tree").jstree("open_node", element))
       });
-      // Then select and click the last node in the path
+      // // Then select and click the last node in the path
       waitForElm(`#${path[path.length-1]}`).then((elm) => {
-          $j("#nels-tree").jstree("select_node", path[path.length-1]);
-          $j(`#${path[path.length-1]} a`).click()
-        });
+          selectNelsTreeNode(path[path.length-1]);
+      });
     }
 
     $j('#nels-tree')
@@ -118,7 +130,8 @@
           project_name = $j('#nels-tree').jstree().get_node(data.node.parents[1]).text
 
           // Save current state
-          sessionStorage.setItem('nels_tree_state',`project${data.node.data.project_id},dataset${data.node.data.dataset_id},${data.node.data.id}`);
+            saveLastSelectedNode(data.node.data.project_id, data.node.data.dataset_id, data.node.data.id );
+
 
           folder_path = `Storebioinfo/${project_name}/${data.node.data.dataset_name}/${data.node.data.text}/`;
 
@@ -138,7 +151,8 @@
           $j('#nels-content').hide();
 
           // Save current state
-          sessionStorage.setItem('nels_tree_state',`project${data.node.data.project_id},dataset${data.node.data.id}`)
+            saveLastSelectedNode(data.node.data.project_id, data.node.data.id );
+
 
           $j.ajax({ url: '<%= dataset_nels_path(:assay_id=>params[:assay_id]) -%>',
             data: {
@@ -152,6 +166,10 @@
         } else {// Project selected
           $j('#nels-dataset').hide();
           $j('#nels-content').show();
+
+            // Save current state
+            saveLastSelectedNode(data.node.data.id);
+
           $j.ajax({ url: '<%= project_nels_path() -%>',
             data: {
               project: data.node.data,
