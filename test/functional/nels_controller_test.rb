@@ -117,7 +117,9 @@ class NelsControllerTest < ActionController::TestCase
   test 'can load dataset' do
     VCR.use_cassette('nels/get_dataset') do
       VCR.use_cassette('nels/check_metadata_exists') do
-        get :dataset, params: { assay_id: @assay.id, project_id: @project_id, dataset_id: @dataset_id }
+        VCR.use_cassette('nels/get_project') do
+          get :dataset, params: { assay_id: @assay.id, project_id: @project_id, dataset_id: @dataset_id }
+        end
       end
     end
 

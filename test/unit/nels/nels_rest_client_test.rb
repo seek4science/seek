@@ -28,6 +28,17 @@ class NelsRestClientTest < ActiveSupport::TestCase
     end
   end
 
+  test 'get project' do
+    VCR.use_cassette('nels/get_project') do
+      res = @rest_client.project(@project_id)
+
+      assert_equal 21, res.count
+      assert_equal @project_id, res['id']
+      assert_equal 'seek_pilot1', res['name']
+    end
+
+  end
+
   test 'can get datasets' do
     VCR.use_cassette('nels/get_datasets') do
       res = @rest_client.datasets(@project_id)
