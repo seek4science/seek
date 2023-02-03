@@ -235,6 +235,14 @@ class SampleAttributeTest < ActiveSupport::TestCase
     refute attribute.valid?
   end
 
+  test 'list controlled vocab attribute factory' do
+    attribute = Factory(:apples_list_controlled_vocab_attribute, is_title: true, sample_type: Factory(:simple_sample_type))
+    assert attribute.valid?
+    refute_nil attribute.sample_controlled_vocab
+    assert_equal 'CVList', attribute.sample_attribute_type.base_type
+    assert attribute.sample_attribute_type.seek_cv_list?
+  end
+
   test 'sample attribute factory' do
     attribute = Factory(:sample_sample_attribute, is_title: true, sample_type: Factory(:simple_sample_type))
     assert attribute.valid?
