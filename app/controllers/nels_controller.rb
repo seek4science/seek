@@ -55,27 +55,34 @@ class NelsController < ApplicationController
   end
 
   def create_dataset
-    @rest_client.create_dataset(params['project'], params['datasettype'], params['title'], params['description'])
+    begin
+      @rest_client.create_dataset(params['project'], params['datasettype'], params['title'], params['description'])
+    rescue RuntimeError => e
+      flash[:error] = "Something went wrong interacting with NeLS, please try again later (#{e.class.name})"
+    end
     render :index
   end
 
   def get_metadata
-    file_name, file_path = @rest_client.get_metadata(params[:project_id].to_i, params[:dataset_id].to_i,
-                                                     params[:subtype_name])
-    send_file file_path, filename: file_name, disposition: 'attachment'
+    begin
+      file_name, file_path = @rest_client.get_metadata(params[:project_id].to_i, params[:dataset_id].to_i,
+                                                       params[:subtype_name])
+      send_file file_path, filename: file_name, disposition: 'attachment'
+    rescue RuntimeError => e
+      flash[:error] = "Something went wrong interacting with NeLS, please try again later (#{e.class.name})"
+      redirect_to nels_path
+    end
   end
 
   def add_metadata
-    # TODO: Finish validating metadata sample. How exactly are the sample_types retrieved?
-    # @possible_sample_types = @data_file.possible_sample_types
-    # raise error
-    # @data_file.content_blob = IO.read(file_path)
+    begin
+      @rest_client.upload_metadata(params[:project_id].to_i, params[:dataset_id].to_i, params[:subtype_name],
+                                   params['content_blobs'][0]['data'].path)
+    rescue RuntimeError => e
+      flash[:error] = "Something went wrong interacting with NeLS, please try again later (#{e.class.name})"
+    end
 
-    # SampleType.sample_types_matching_content_blob(IO.read(params["content_blobs"][0]["data"].path))
-
-    @rest_client.upload_metadata(params[:project_id].to_i, params[:dataset_id].to_i, params[:subtype_name],
-                                 params['content_blobs'][0]['data'].path)
-    redirect_to action: 'index'
+    redirect_to nels_path
   end
 
   def upload_file
