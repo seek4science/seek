@@ -2,7 +2,7 @@
   <%= form_tag({:action => :upload_file}, id: 'upload-file-form', multipart: true) do %>
     <%= modal_header('Upload file') %>
     <%= modal_body do %>
-      <%= render :partial=>"assets/upload_box",:locals=>{:action_text=>"upload"} -%>
+      <%= render :partial=>"assets/upload_box",:locals=>{:action_text=>"upload", hide_remote: true} -%>
     <% end %>
     <%= modal_footer do %>
       <%= create_button id:"upload-file-submit-button", button_text:'Add',
