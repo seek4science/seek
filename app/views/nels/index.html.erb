@@ -73,7 +73,7 @@
     // Reopen the tree at previous existing location
     if (sessionStorage.getItem("nels_tree_state")){
       let path = sessionStorage.getItem("nels_tree_state").split(',')
-        console.log(path);
+
       // // Open all nodes except the last one
       path.slice(0,path.length-1).forEach(element => {
         waitForElm(`#${element}`).then((elm) => $j("#nels-tree").jstree("open_node", element))
