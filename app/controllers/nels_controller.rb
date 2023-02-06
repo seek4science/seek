@@ -92,6 +92,7 @@ class NelsController < ApplicationController
       data_path = params['content_blobs'][0]['data'].path
       @rest_client.upload_file(params[:project_id].to_i, params[:dataset_id].to_i, params[:subtype_name], '', filename,
                                data_path)
+
       respond_to do |format|
         format.all { render json:{success: true} }
       end

@@ -1,0 +1,72 @@
+<%= modal(id: 'upload-file', size: 'm', class: 'text-left') do %>
+  <%= form_tag({:action => :upload_file}, id: 'upload-file-form', multipart: true) do %>
+    <%= modal_header('Upload file') %>
+    <%= modal_body do %>
+      <%= render :partial=>"assets/upload_box",:locals=>{:action_text=>"upload"} -%>
+    <% end %>
+    <%= modal_footer do %>
+      <%= create_button id:"upload-file-submit-button", button_text:'Add',
+                        type: 'button',
+                        class:'btn btn-primary' %>
+      <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+    <% end %>
+  <% end %>
+<% end %>
+
+<%= modal(id: 'upload-spinner', size: 'm', class: 'text-center') do %>
+  <%= modal_body do %>
+    <h1>Uploading ...</h1>
+    <div class='large_spinner'></div>
+  <% end %>
+<% end %>
+
+<script>
+  $j(document).ready(function () {
+
+      $j('#upload-file-submit-button').on('click', function(){
+          let valid = validateResourceFields('data','upload-file');
+          if (valid) {
+              $j('#upload-file').modal('hide');
+              $j('#upload-spinner').modal('show');
+              let data = new FormData($j('#upload-file-form')[0]);
+              $j.ajax({
+                  url: '<%= upload_file_nels_path() %>',
+                  data: data,
+                  cache: false,
+                  contentType: false,
+                  processData: false,
+                  method: 'POST',
+                  success: function (result) {
+                      let nodeId=`${data.get('subtype_name')}${data.get('dataset_id')}`;
+                      $j('#upload-spinner').modal('hide');
+                      selectNelsTreeNode(nodeId);
+                  },
+                  error: function (request, status, error) {
+                      $j('#upload-spinner').modal('hide');
+                      let exception = request.responseJSON['exception'];
+                      alert('Something went wrong interacting with NeLS, please try again later. (' + exception + ')');
+                  },
+                  complete: function (data) {
+                      $j('#upload-spinner').modal('hide');
+                  }
+              });
+          }
+
+          return false;
+
+      });
+
+      $j('#<%= button_id %>').on('click', function () {
+          // Show upload file form and populate the params as hidden fields
+          $j('#upload-file').modal('show');
+          button_id = $j(this).attr('id')
+
+          $j('#upload-file form').append(`<input type="hidden" name="project_id" value="<%= @project_id %>" />`);
+          $j('#upload-file form').append(`<input type="hidden" name="dataset_id" value="<%= @dataset_id %>" />`);
+          $j('#upload-file form').append(`<input type="hidden" name="subtype_name" value="<%= @subtype_name %>" />`);
+          $j('#upload-file form').append(`<input type="hidden" name="file_path" value="<%= @path %>" />`);
+          return false;
+      });
+
+  });
+</script>

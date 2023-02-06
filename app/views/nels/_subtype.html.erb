@@ -22,7 +22,7 @@ table, th, td {
 </style>
 
 <p>
-  <%= button_link_to('Upload', 'arrow_up', nil, { id: :upload_file, class: :upload_file}) %>
+  <%= button_link_to('Upload a file', 'arrow_up', nil, { id: :upload_file, class: :upload_file}) %>
   <%= button_link_to('Add metadata', 'add', nil, { id: "add_metadata_#{@project_id}_#{@dataset_id}_#{@subtype_name}", class:"add_metadata"} ) %>
   <% if @subtype_metadata %>
     <%= button_link_to('Download metadata', 'download', {action: :get_metadata,
@@ -60,20 +60,7 @@ table, th, td {
   </tbody>
 </table>
 
-<%= modal(id: 'upload-file', size: 'm', class: 'text-left') do %>
-  <%= form_tag({:action => :upload_file}, id: 'upload-file-form', multipart: true) do %>
-    <%= modal_header('Upload file') %>
-    <%= modal_body do %>
-      <%= render :partial=>"assets/upload_box",:locals=>{:action_text=>"upload"} -%>
-    <% end %>
-    <%= modal_footer do %>
-      <%= create_button id:"upload-file-submit-button", button_text:'Add',
-                        type: 'button',
-                        class:'btn btn-primary' %>
-      <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-    <% end %>
-  <% end %>
-<% end %>
+<%= render partial: 'upload_file_dialog', locals:{button_id:'upload_file'} %>
 
 <%= content_tag(:script, nels_file_details_json(@file_list, @subtype_name).to_json.html_safe, type: 'application/json', id: 'file-items-json') %>
 
@@ -108,18 +95,6 @@ table, th, td {
 
     $j('.nels-folder').click(function() {
       updateFolderList($j(this).attr('path'));
-    });
-
-    $j('#upload_file').on('click', function () {
-      // Show upload file form and populate the params as hidden fields
-      $j('#upload-file').modal('show');
-      button_id = $j(this).attr('id')
-
-      $j('#upload-file form').append(`<input type="hidden" name="project_id" value="<%= @project_id %>" />`);
-      $j('#upload-file form').append(`<input type="hidden" name="dataset_id" value="<%= @dataset_id %>" />`);
-      $j('#upload-file form').append(`<input type="hidden" name="subtype_name" value="<%= @subtype_name %>" />`);
-      $j('#upload-file form').append(`<input type="hidden" name="file_path" value="<%= @path %>" />`);
-      return false;
     });
 
       $j('.nels-download-link').on('click', function () {
@@ -158,40 +133,6 @@ table, th, td {
           });
       });
 
-      $j('#upload-file-submit-button').on('click', function(){
-          let valid = validateResourceFields('data','upload-file');
-          if (valid) {
-              let element = $j(this);
-              element.spinner('add');
-              let data = new FormData($j('#upload-file-form')[0]);
-              $j.ajax({
-                  url: '<%= upload_file_nels_path() %>',
-                  data: data,
-                  cache: false,
-                  contentType: false,
-                  processData: false,
-                  method: 'POST',
-                  success: function (result) {
-                      let nodeId=`${data.get('subtype_name')}${data.get('dataset_id')}`;
-                      $j('#upload-file').modal('hide');
-                      selectNelsTreeNode(nodeId);
-                  },
-                  error: function (request, status, error) {
-                      $j('#upload-file').modal('hide');
-                      let exception = request.responseJSON['exception'];
-                      alert('Something went wrong interacting with NeLS, please try again later. (' + exception + ')');
-                  },
-                  complete: function (data) {
-                      element.spinner('remove');
-                  }
-              });
-          }
-
-          return false;
-
-      });
-
       bindNelsTreeNodeLinks();
-
   });
 </script>
