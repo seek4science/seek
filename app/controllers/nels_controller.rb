@@ -76,6 +76,7 @@ class NelsController < ApplicationController
 
   def add_metadata
     begin
+      #raise 'add metadata currently broken'
       @rest_client.upload_metadata(params[:project_id].to_i, params[:dataset_id].to_i, params[:subtype_name],
                                    params['content_blobs'][0]['data'].path)
     rescue RuntimeError => e
@@ -167,7 +168,8 @@ class NelsController < ApplicationController
     @dataset = @rest_client.dataset(@project_id, params[:dataset_id].to_i)
     @project = @rest_client.project(@project_id)
     @path = params[:path]
-    @subtype = params[:subtype]
+    @subtype_name = params[:subtype]
+    @subtype_metadata = @rest_client.check_metadata_exists(@project_id, @dataset_id, @subtype_name)
 
     @file_list = @rest_client.sbi_storage_list(params[:project_id].to_i, params[:dataset_id].to_i, params[:path])
 

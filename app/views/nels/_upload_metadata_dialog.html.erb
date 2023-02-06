@@ -1,0 +1,30 @@
+<%= modal(id: 'upload-metadata-file', size: 'm', class: 'text-left') do %>
+  <%= form_tag({:action => :add_metadata}, :multipart => true) do %>
+    <%= modal_header('Add metadata') %>
+    <%= modal_body do %>
+      <%= render :partial=>"assets/upload_box",:locals=>{:action_text=>"upload"} -%>
+    <% end %>
+    <%= modal_footer do %>
+      <%= create_button id:"data_file_submit_btn", button_text:'Add',
+                        onclick:"return validateResourceFields('data_file_xlsx','upload-metadata-file');",
+                        class:'btn btn-primary' %>
+      <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+    <% end %>
+  <% end %>
+<% end %>
+
+<script>
+    $j(document).ready(function () {
+        $j('.add_metadata').on('click', function () {
+            // Show upload file form and populate the params as hidden fields
+            $j('#upload-metadata-file').modal('show');
+            button_id = $j(this).attr('id')
+
+            $j('#upload-metadata-file form').append(`<input type="hidden" name="project_id" value="${button_id.split("_")[2]}" />`);
+            $j('#upload-metadata-file form').append(`<input type="hidden" name="dataset_id" value="${button_id.split("_")[3]}" />`);
+            $j('#upload-metadata-file form').append(`<input type="hidden" name="subtype_name" value="${button_id.split("_")[4]}" />`);
+
+            return false;
+        });
+    });
+</script>

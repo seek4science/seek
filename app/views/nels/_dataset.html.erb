@@ -29,7 +29,7 @@
   <% @dataset['subtypes'].each do |subtype| %>
       <li class="list-group-item">
         <%= link_to(subtype['type'], '#', {'data-role':'nels-tree-node-link', 'data-tree-node-id':"#{subtype['type']}#{@dataset['id']}"}) %> <span class="subtle">(<%= number_to_human_size(subtype['size']) %>)</span>
-        <%= button_link_to('Add metadata', 'add', nil, { id: "add_metadata_"+params[:project_id]+"_"+params[:dataset_id]+"_"+subtype['type'], class:"add_metadata"} ) %>
+        <%= button_link_to('Add metadata', 'add', nil, { id: "add_metadata_#{params[:project_id]}_#{params[:dataset_id]}_#{subtype['type']}", class:"add_metadata"} ) %>
 
         <% if subtype["metadata"] %>
           <%= button_link_to('Download metadata', 'download', {:action => :get_metadata,
@@ -48,36 +48,11 @@
   <% end %>
 </ul>
 
-<%# TODO: Check app\assets\javascripts\validation.js as it doesn't interrupt flow if invalid%>
-<%= modal(id: 'upload-file', size: 'm', class: 'text-left') do %>
-  <%= form_tag({:action => :add_metadata}, :multipart => true) do %>
-    <%= modal_header('Add metadata') %>
-    <%= modal_body do %>
-      <%= render :partial=>"assets/upload_box",:locals=>{:resource=>@data_file, :action_text=>"upload"} -%>
-    <% end %>
-    <%= modal_footer do %>
-      <%= create_button id:"data_file_submit_btn", button_text:'Add',
-                          onclick:"return validateResourceFields('data_file_xlsx');",
-                          class:'btn btn-primary' %>
-      <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-    <% end %>
-  <% end %>
-<% end %>
+<%= render partial: 'upload_metadata_dialog' %>
+
 
 <script>
   $j(document).ready(function () {
-    $j('.add_metadata').on('click', function () {
-      // Show upload file form and populate the params as hidden fields
-      $j('#upload-file').modal('show');
-      button_id = $j(this).attr('id')
-
-      $j('#upload-file form').append(`<input type="hidden" name="project_id" value="${button_id.split("_")[2]}" />`);
-      $j('#upload-file form').append(`<input type="hidden" name="dataset_id" value="${button_id.split("_")[3]}" />`);
-      $j('#upload-file form').append(`<input type="hidden" name="subtype_name" value="${button_id.split("_")[4]}" />`);
-
-      return false;
-    });
-
     bindNelsTreeNodeLinks();
   });
 </script>

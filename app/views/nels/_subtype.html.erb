@@ -2,7 +2,7 @@
 <h2>
   <span class="<%= nels_subtype_glyph %>"/>
   &nbsp;
-  Subtype: <%= @subtype -%><br/>
+  Subtype: <%= @subtype_name -%><br/>
 </h2>
 
 <p>
@@ -23,7 +23,17 @@ table, th, td {
 
 <p>
   <%= button_link_to('Upload', 'arrow_up', nil, { id: :upload_file, class: :upload_file}) %>
+  <%= button_link_to('Add metadata', 'add', nil, { id: "add_metadata_#{@project_id}_#{@dataset_id}_#{@subtype_name}", class:"add_metadata"} ) %>
+  <% if @subtype_metadata %>
+    <%= button_link_to('Download metadata', 'download', {action: :get_metadata,
+                                                         project_id: @project_id,
+                                                         dataset_id: @dataset_id,
+                                                         subtype_name: @subtype_name},
+                       method: :get) %>
+  <% end %>
 </p>
+
+<%= render partial: 'upload_metadata_dialog' %>
 
 <table class="table table-hover table-bordered">
   <thead>
@@ -58,14 +68,14 @@ table, th, td {
     <% end %>
     <%= modal_footer do %>
       <%= create_button id:"file_submit_btn", button_text:'Add',
-                          onclick:"return validateResourceFields('data');",
+                          onclick:"return validateResourceFields('data','upload-file');",
                           class:'btn btn-primary' %>
       <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
     <% end %>
   <% end %>
 <% end %>
 
-<%= content_tag(:script, nels_file_details_json(@file_list, @subtype).to_json.html_safe, type: 'application/json', id: 'file-items-json') %>
+<%= content_tag(:script, nels_file_details_json(@file_list, @subtype_name).to_json.html_safe, type: 'application/json', id: 'file-items-json') %>
 
 <script type="text/javascript">
 
@@ -75,7 +85,7 @@ table, th, td {
           data: {
               project_id: '<%= @project_id -%>',
               dataset_id: '<%= @dataset['id'] -%>',
-              subtype: '<%= @subtype -%>',
+              subtype: '<%= @subtype_name -%>',
               path: path,
           },
           success: function (data) {
@@ -107,7 +117,7 @@ table, th, td {
 
       $j('#upload-file form').append(`<input type="hidden" name="project_id" value="<%= @project_id %>" />`);
       $j('#upload-file form').append(`<input type="hidden" name="dataset_id" value="<%= @dataset_id %>" />`);
-      $j('#upload-file form').append(`<input type="hidden" name="subtype_name" value="<%= @subtype %>" />`);
+      $j('#upload-file form').append(`<input type="hidden" name="subtype_name" value="<%= @subtype_name %>" />`);
       $j('#upload-file form').append(`<input type="hidden" name="file_path" value="<%= @path %>" />`);
       return false;
     });
