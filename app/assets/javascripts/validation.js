@@ -53,11 +53,11 @@ function validateUploadFormFields(resourceName=null, parentId=null) {
         }
     }
 
-    if (!valid) {
-        var uploadForm = $j('#upload_type_selection').parents('.panel');
-        uploadForm[0].scrollIntoView();
-        uploadForm.highlight();
-    }
+    // if (!valid) {
+    //     var uploadForm = $j('#upload_type_selection').parents('.panel');
+    //     uploadForm[0].scrollIntoView();
+    //     uploadForm.highlight();
+    // }
 
     return valid;
 }

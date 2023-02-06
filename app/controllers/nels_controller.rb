@@ -87,16 +87,20 @@ class NelsController < ApplicationController
   end
 
   def upload_file
-    filename = params['content_blobs'][0]['data'].original_filename
-    data_path = params['content_blobs'][0]['data'].path
     begin
+      filename = params['content_blobs'][0]['data'].original_filename
+      data_path = params['content_blobs'][0]['data'].path
       @rest_client.upload_file(params[:project_id].to_i, params[:dataset_id].to_i, params[:subtype_name], '', filename,
                                data_path)
+      respond_to do |format|
+        format.all { render json:{success: true} }
+      end
     rescue RuntimeError => e
-      flash[:error] = "Something went wrong interacting with NeLS, please try again later (#{e.class.name})"
+      respond_to do |format|
+        format.json { render json:{error: e.message, exception: e.class.name }, status: :internal_server_error }
+      end
     end
 
-    redirect_to nels_path
   end
 
   def download_file

@@ -61,15 +61,15 @@ table, th, td {
 </table>
 
 <%= modal(id: 'upload-file', size: 'm', class: 'text-left') do %>
-  <%= form_tag({:action => :upload_file}, :multipart => true) do %>
+  <%= form_tag({:action => :upload_file}, id: 'upload-file-form', multipart: true) do %>
     <%= modal_header('Upload file') %>
     <%= modal_body do %>
       <%= render :partial=>"assets/upload_box",:locals=>{:action_text=>"upload"} -%>
     <% end %>
     <%= modal_footer do %>
-      <%= create_button id:"file_submit_btn", button_text:'Add',
-                          onclick:"return validateResourceFields('data','upload-file');",
-                          class:'btn btn-primary' %>
+      <%= create_button id:"upload-file-submit-button", button_text:'Add',
+                        type: 'button',
+                        class:'btn btn-primary' %>
       <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
     <% end %>
   <% end %>
@@ -156,6 +156,39 @@ table, th, td {
                   element.spinner('remove');
               }
           });
+      });
+
+      $j('#upload-file-submit-button').on('click', function(){
+          let valid = validateResourceFields('data','upload-file');
+          if (valid) {
+              let element = $j(this);
+              element.spinner('add');
+              let data = new FormData($j('#upload-file-form')[0]);
+              $j.ajax({
+                  url: '<%= upload_file_nels_path() %>',
+                  data: data,
+                  cache: false,
+                  contentType: false,
+                  processData: false,
+                  method: 'POST',
+                  success: function (result) {
+                      let nodeId=`${data.get('subtype_name')}${data.get('dataset_id')}`;
+                      $j('#upload-file').modal('hide');
+                      selectNelsTreeNode(nodeId);
+                  },
+                  error: function (request, status, error) {
+                      $j('#upload-file').modal('hide');
+                      let exception = request.responseJSON['exception'];
+                      alert('Something went wrong interacting with NeLS, please try again later. (' + exception + ')');
+                  },
+                  complete: function (data) {
+                      element.spinner('remove');
+                  }
+              });
+          }
+
+          return false;
+
       });
 
       bindNelsTreeNodeLinks();
