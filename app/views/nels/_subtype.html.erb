@@ -84,14 +84,6 @@ table, th, td {
   $j(document).ready(function () {
 
     sessionStorage.setItem('nels_folder_state','Folder 1/Folder 2')
-    // Update breadcrumb
-    pathHTML='';
-    path=''
-    sessionStorage.getItem('nels_folder_state').split("/").forEach(element => {
-      path=path.concat(`/${element}`);
-      pathHTML=pathHTML.concat(`/<a href="" onclick="return false;" path="${path}">${element}</a>`);
-    });
-    $j('#nels_breadcrumb').html(pathHTML)
 
     $j('.nels-folder').click(function() {
       updateFolderList($j(this).attr('path'));
