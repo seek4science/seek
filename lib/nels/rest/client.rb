@@ -130,7 +130,16 @@ module Nels
 
         Rails.logger.info("Job ID: #{job_id} ; Upload URL: #{upload_url}")
 
-        response = RestClient.post(upload_url, { file: File.new(file_path, 'r'), multipart: true }, { Accept: '*/*' })
+        # curl =  "curl -X POST #{upload_url} -H  'Accept: */*' -H  'Content-Type: multipart/form-data' -F 'file=@#{file_path}'"
+        # pp curl
+
+
+        response = RestClient.post(upload_url, {file: File.new(file_path, 'rb')}, {accept: '*/*'})
+        # response = RestClient::Request.execute method: :post,
+        #                                        url: upload_url,
+        #                                        payload: { file: File.new(file_path, 'rb')},
+        #                                        headers: { accept: '*/*', 'Content-Type':'multipart/form-data'}
+
         unless response.code == 200
           raise UploadError, "There was an error uploading the file #{file_path}, response was #{response.code}"
         end

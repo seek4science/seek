@@ -97,6 +97,7 @@ class NelsController < ApplicationController
         format.all { render json:{success: true} }
       end
     rescue RuntimeError => e
+      Rails.logger.error("Error uploading file  #{e.message} - #{e.backtrace.join($/)}")
       respond_to do |format|
         format.json { render json:{error: e.message, exception: e.class.name }, status: :internal_server_error }
       end
