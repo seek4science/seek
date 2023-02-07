@@ -178,8 +178,9 @@ class NelsControllerTest < ActionController::TestCase
     VCR.use_cassette('nels/upload_file') do
       post :upload_file,
            params: { dataset_id: dataset_id, project_id: project_id, subtype_name: subtype,
-                     content_blobs: [{ data: file_data }] }
-      assert_redirected_to nels_path
+                     content_blobs: [{ data: file_data }] }, format: :json
+      assert_response :success
+      assert_equal true, JSON.parse(response.body)["success"]
     end
   end
 
