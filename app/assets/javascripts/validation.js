@@ -16,6 +16,7 @@ function validateResourceFields(resourceName, parentId=null) {
     if (title.length && !title.val()) {
         alert("Please specify the title!");
         title.focus();
+        title.highlight();
         return false;
     }
 
@@ -53,11 +54,13 @@ function validateUploadFormFields(resourceName=null, parentId=null) {
         }
     }
 
-    // if (!valid) {
-    //     var uploadForm = $j('#upload_type_selection').parents('.panel');
-    //     uploadForm[0].scrollIntoView();
-    //     uploadForm.highlight();
-    // }
+    if (!valid) {
+        let uploadPanel = $j('#upload-panel');
+        if (uploadPanel.length) {
+            uploadPanel[0].scrollIntoView();
+            uploadPanel.highlight();
+        }
+    }
 
     return valid;
 }
