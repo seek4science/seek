@@ -995,6 +995,11 @@ class DocumentsControllerTest < ActionController::TestCase
 
     downloads_ordered = [d2, d3, d6, d5, d1, d4]
 
+    get :index
+    assert_select '#index_sort_order' do
+      assert_select 'option', 'Downloads (Descending)'
+    end
+
     get :index, params: { order: 'downloads_desc' }
     assert_response :success
     assert_equal downloads_ordered, assigns(:documents).to_a
@@ -1017,6 +1022,11 @@ class DocumentsControllerTest < ActionController::TestCase
     Factory(:activity_log, action: 'show', activity_loggable: d5, created_at: 3.minutes.ago)
 
     views_ordered = [d4, d3, d6, d5, d1, d2]
+
+    get :index
+    assert_select '#index_sort_order' do
+      assert_select 'option', 'Views (Descending)'
+    end
 
     get :index, params: { order: 'views_desc' }
     assert_response :success
