@@ -41,12 +41,6 @@ function validateUploadFormFields() {
         }
     }
 
-    if (!valid) {
-        var uploadForm = $j('#upload_type_selection').parents('.panel');
-        uploadForm[0].scrollIntoView();
-        uploadForm.highlight();
-    }
-
     return valid;
 }
 
