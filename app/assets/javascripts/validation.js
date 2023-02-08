@@ -16,6 +16,7 @@ function validateResourceFields(resourceName) {
     if (title.length && !title.val()) {
         alert("Please specify the title!");
         title.focus();
+        title.highlight();
         return false;
     }
 
@@ -38,6 +39,14 @@ function validateUploadFormFields() {
         if (!hasFiles && !$j('input[name="content_blobs[][data_url]"]').val()) {
             alert("Please specify a file to upload or provide a URL.");
             valid = false;
+        }
+    }
+
+    if (!valid) {
+        let uploadPanel = $j('#upload-panel');
+        if (uploadPanel.length) {
+            uploadPanel[0].scrollIntoView();
+            uploadPanel.highlight();
         }
     }
 
