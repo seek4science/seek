@@ -291,6 +291,20 @@ class PeopleControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test 'sort by downloads not available' do
+    get :index
+    assert_select '#index_sort_order' do
+      assert_select 'option', { text: 'Downloads (Descending)', count: 0 }
+    end
+  end
+
+  test 'sort by views not available' do
+    get :index
+    assert_select '#index_sort_order' do
+      assert_select 'option', { text: 'Views (Descending)', count: 0 }
+    end
+  end
+
   test 'admin can manage person' do
     login_as(:quentin)
     person = people(:aaron_person)
