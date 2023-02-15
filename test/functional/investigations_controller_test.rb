@@ -760,5 +760,80 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert_select 'a[href=?]',
                   order_studies_investigation_path(investigation), count: 0
   end
+
+  test 'new should include tags element' do
+    get :new
+    assert_response :success
+    assert_select 'div.panel-heading', text: /Tags/, count: 1
+    assert_select 'input#tag_list', count: 1
+  end
+
+  test 'new should not include tags element when tags disabled' do
+    with_config_value :tagging_enabled, false do
+      get :new
+      assert_response :success
+      assert_select 'div.panel-heading', text: /Tags/, count: 0
+      assert_select 'input#tag_list', count: 0
+    end
+  end
+
+  test 'edit should include tags element' do
+    inv = Factory(:investigation, policy: Factory(:public_policy))
+    get :edit, params: { id: inv.id }
+    assert_response :success
+
+    assert_select 'div.panel-heading', text: /Tags/, count: 1
+    assert_select 'input#tag_list', count: 1
+  end
+
+  test 'edit should not include tags element when tags disabled' do
+    with_config_value :tagging_enabled, false do
+      inv = Factory(:investigation, policy: Factory(:public_policy))
+      get :edit, params: { id: inv.id }
+      assert_response :success
+
+      assert_select 'div.panel-heading', text: /Tags/, count: 0
+      assert_select 'input#tag_list', count: 0
+    end
+  end
+
+  test 'show should include tags box' do
+    inv = Factory(:investigation, policy: Factory(:public_policy))
+    get :show, params: { id: inv.id }
+    assert_response :success
+
+    assert_select 'div.panel-heading', text: /Tags/, count: 1
+    assert_select 'input#tag_list', count: 1
+  end
+
+  test 'show should not include tags box when tags disabled' do
+    with_config_value :tagging_enabled, false do
+      inv = Factory(:investigation, policy: Factory(:public_policy))
+      get :show, params: { id: inv.id }
+      assert_response :success
+
+      assert_select 'div.panel-heading', text: /Tags/, count: 0
+      assert_select 'input#tag_list', count: 0
+    end
+  end
+
+  test 'should add tag on creation' do
+    person = Factory(:person)
+    project = person.person.projects.first
+    login_as(person)
+    assert_difference('Investigation.count') do
+      put :create, params: { investigation: Factory.attributes_for(:investigation, project_ids: [project.id]),
+                             tag_list: 'my_tag' }
+    end
+    assert_equal 'my_tag', assigns(:investigation).tags_as_text_array.first
+  end
+
+  test 'should add tag on edit' do
+    person = Factory(:person)
+    inv = Factory(:investigation, creator_ids: [person.id])
+    login_as(person)
+    put :update, params: { id: inv.id, investigation: { title: 'test' }, tag_list: 'my_tag' }
+    assert_equal 'my_tag', assigns(:investigation).tags_as_text_array.first
+  end
  
 end
