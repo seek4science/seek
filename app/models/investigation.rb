@@ -1,6 +1,4 @@
 class Investigation < ApplicationRecord
-  include Seek::Rdf::RdfGeneration
-  include Seek::Taggable
 
   acts_as_isa
   acts_as_snapshottable
