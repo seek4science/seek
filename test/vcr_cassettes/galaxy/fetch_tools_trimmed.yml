@@ -1,0 +1,91 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://usegalaxy.org.au/api/tools
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - application/json
+      User-Agent:
+      - rest-client/2.1.0 (linux x86_64) ruby/2.7.7p221
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - usegalaxy.org.au
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - nginx/1.18.0 (Ubuntu)
+      Date:
+      - Tue, 14 Feb 2023 14:55:17 GMT
+      Content-Type:
+      - application/json; charset=UTF-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Vary:
+      - Accept-Encoding
+      X-Frame-Options:
+      - SAMEORIGIN
+      Cache-Control:
+      - max-age=0,no-cache,no-store
+      X-Request-Id:
+      - b3249ef9e08b4cd6a2abd466012444a1
+      X-Clacks-Overhead:
+      - GNU James Taylor (@jxtx) Simon Gladman (@slugger70)
+    body:
+      encoding: ASCII-8BIT
+      string: '[{"model_class":"ToolSection","id":"fastq_quality_control","name":"FASTQ Quality Control","version":"","description":null,"links":null,"elems":[{"model_class":"Tool","id":"toolshed.g2.bx.psu.edu/repos/iuc/multiqc/multiqc/1.11+galaxy1","name":"MultiQC","version":"1.11+galaxy1","description":"aggregate results     from bioinformatics analyses into a single report","labels":[],"edam_operations":[],"edam_topics":[],"hidden":"","is_workflow_compatible":true,"xrefs":[{"value":"multiqc","reftype":"bio.tools"}],"tool_shed_repository":{"name":"multiqc","owner":"iuc","changeset_revision":"abfd8a6544d7","tool_shed":"toolshed.g2.bx.psu.edu"},"link":"/tool_runner?tool_id=toolshed.g2.bx.psu.edu%2Frepos%2Fiuc%2Fmultiqc%2Fmultiqc%2F1.11%2Bgalaxy1","min_width":-1,"target":"galaxy_main","panel_section_id":"fastq_quality_control","panel_section_name":"FASTQ Quality Control","form_style":"regular"}]},{"model_class":"ToolSection","id":"vcfbcf","name":"VCF/BCF","version":"","description":null,"links":null,"elems":[{"model_class":"Tool","id":"toolshed.g2.bx.psu.edu/repos/iuc/bcftools_plugin_fill_tags/bcftools_plugin_fill_tags/1.15.1+galaxy3","name":"bcftools fill-tags","version":"1.15.1+galaxy3","description":"plugin Set INFO tags AF, AN, AC, AC_Hom, AC_Het, AC_Hemi","labels":[],"edam_operations":[],"edam_topics":[],"hidden":"","is_workflow_compatible":true,"xrefs":[{"value":"bcftools","reftype":"bio.tools"}],"tool_shed_repository":{"name":"bcftools_plugin_fill_tags","owner":"iuc","changeset_revision":"c01be0ab9806","tool_shed":"toolshed.g2.bx.psu.edu"},"link":"/tool_runner?tool_id=toolshed.g2.bx.psu.edu%2Frepos%2Fiuc%2Fbcftools_plugin_fill_tags%2Fbcftools_plugin_fill_tags%2F1.15.1%2Bgalaxy3","min_width":-1,"target":"galaxy_main","panel_section_id":"vcfbcf","panel_section_name":"VCF/BCF","form_style":"regular"}]}]'
+    http_version:
+  recorded_at: Tue, 14 Feb 2023 14:55:17 GMT
+- request:
+    method: get
+    uri: https://usegalaxy.eu/api/tools
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+        - application/json
+      User-Agent:
+        - rest-client/2.1.0 (linux x86_64) ruby/2.7.7p221
+      Accept-Encoding:
+        - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+        - usegalaxy.eu
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+        - nginx/1.14.1
+      Date:
+        - Tue, 14 Feb 2023 13:35:24 GMT
+      Content-Type:
+        - application/json; charset=UTF-8
+      Transfer-Encoding:
+        - chunked
+      Connection:
+        - keep-alive
+      Vary:
+        - Accept-Encoding
+      Cache-Control:
+        - max-age=0,no-cache,no-store
+      X-Request-Id:
+        - 1eaaf0c79ad94617b717a5df0930c7be
+      X-Clacks-Overhead:
+        - GNU James Taylor (@jxtx) Simon Gladman (@slugger70)
+    body:
+      encoding: ASCII-8BIT
+      string: '[{"model_class":"ToolSection","id":"get_data","name":"Get Data","version":"","description":null,"links":null,"elems":[{"model_class":"Tool","id":"toolshed.g2.bx.psu.edu/repos/iuc/enasearch_search_data/enasearch_search_data/0.1.1.0","name":"Search ENA data","version":"0.1.1.0","description":"given a query","labels":[],"edam_operations":[],"edam_topics":[],"hidden":"","is_workflow_compatible":true,"xrefs":[{"value":"ena","reftype":"bio.tools"}],"tool_shed_repository":{"name":"enasearch_search_data","owner":"iuc","changeset_revision":"6e692d5a5599","tool_shed":"toolshed.g2.bx.psu.edu"},"link":"/tool_runner?tool_id=toolshed.g2.bx.psu.edu%2Frepos%2Fiuc%2Fenasearch_search_data%2Fenasearch_search_data%2F0.1.1.0","min_width":-1,"target":"galaxy_main","panel_section_id":"get_data","panel_section_name":"Get Data","form_style":"regular"}]},{"model_class":"ToolSection","id":"quality_control","name":"Quality Control","version":"","description":null,"links":null,"elems":[{"model_class":"Tool","id":"toolshed.g2.bx.psu.edu/repos/iuc/multiqc/multiqc/1.11+galaxy1","name":"MultiQC","version":"1.11+galaxy1","description":"aggregate results from bioinformatics analyses into a single report","labels":[],"edam_operations":[],"edam_topics":[],"hidden":"","is_workflow_compatible":true,"xrefs":[{"value":"multiqc","reftype":"bio.tools"}],"tool_shed_repository":{"name":"multiqc","owner":"iuc","changeset_revision":"abfd8a6544d7","tool_shed":"toolshed.g2.bx.psu.edu"},"link":"/tool_runner?tool_id=toolshed.g2.bx.psu.edu%2Frepos%2Fiuc%2Fmultiqc%2Fmultiqc%2F1.11%2Bgalaxy1","min_width":-1,"target":"galaxy_main","panel_section_id":"quality_control","panel_section_name":"Quality Control","form_style":"regular"}]}]'
+    http_version:
+  recorded_at: Tue, 14 Feb 2023 13:35:24 GMT
+recorded_with: VCR 2.9.3
