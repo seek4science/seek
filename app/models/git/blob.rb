@@ -1,4 +1,4 @@
-# A class to represent a file with a git version. Holds refernces to the version, the git blob object from Rugged, and the path
+# A class to represent a file with a git version. Holds references to the version, the git blob object from Rugged, and the path
 # where the blob exists in the repository.
 module Git
   class Blob
@@ -7,7 +7,7 @@ module Git
 
     delegate_missing_to :@blob
     delegate :git_repository, :version, :git_base, to: :git_version
-    delegate :read, to: :file
+    delegate :read, :rewind, to: :file
 
     attr_reader :git_version, :path
     alias_method :original_filename, :path
