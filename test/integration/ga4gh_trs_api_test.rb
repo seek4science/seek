@@ -22,6 +22,15 @@ class Ga4ghTrsApiTest < ActionDispatch::IntegrationTest
     assert @response.body.start_with?("\x89PNG\r\n")
   end
 
+  test 'should get nested descriptor file via relative path using PLAIN_ type prefix as plain text' do
+    workflow = Factory(:nf_core_ro_crate_workflow, policy: Factory(:public_policy))
+
+    get "/ga4gh/trs/v2/tools/#{workflow.id}/versions/1/PLAIN_NFL/descriptor/main.nf"
+    assert_response :success
+    assert_equal 'text/plain; charset=utf-8', @response.headers['Content-Type']
+    assert @response.body.start_with?("#!/usr/bin/env nextflow")
+  end
+
   test 'should get containerfile if Dockerfile present' do
     workflow = Factory(:nf_core_ro_crate_workflow, policy: Factory(:public_policy))
 
