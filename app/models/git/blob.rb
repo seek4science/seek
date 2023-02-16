@@ -70,11 +70,19 @@ module Git
     end
 
     def to_crate_entity(crate, type: ::ROCrate::File, properties: {})
-      type.new(crate, self, path).tap do |entity|
+      type.new(crate, to_tempfile, path).tap do |entity|
         entity['url'] = url if url.present?
         entity['contentSize'] = size
         entity.properties = entity.raw_properties.merge(properties)
       end
+    end
+
+    def to_tempfile
+      f = Tempfile.new(path)
+      f.binmode if binary?
+      f << file_contents(as_text: !binary?)
+      f.rewind
+      f
     end
 
     def text_contents_for_search
