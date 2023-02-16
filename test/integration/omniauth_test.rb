@@ -42,6 +42,17 @@ class OmniauthTest < ActionDispatch::IntegrationTest
             'email' => 'new_github_user@example.com'
         }
     })
+
+    @ldap_long_nickname_mock_auth = OmniAuth::AuthHash.new({
+      provider: 'ldap',
+      uid: 'new_ldap_user_long',
+      info: {
+          'nickname' => 'new_ldap_user_too_long_for_username_more_than_40',
+          'first_name' => 'new',
+          'last_name' => 'ldap_user_long',
+          'email' => 'new_ldap_user@example.com'
+      }
+  })
   end
 
   # This test is to support the legacy LDAP integration that matched users having the same SEEK and LDAP usernames
@@ -199,6 +210,32 @@ class OmniauthTest < ActionDispatch::IntegrationTest
         assert_select "#user_email[value=?]", profile.email
       end
     end
+  end
+
+  test 'should create and activate new LDAP user even when nickname is too long' do
+    OmniAuth.config.mock_auth[:ldap] = @ldap_long_nickname_mock_auth
+
+    assert_difference('User.count', 1) do
+      assert_difference('Identity.count', 1) do
+        post omniauth_callback_path(:ldap) # With LDAP we post directly to the callback, since the form is in SEEK
+        assert_redirected_to(/#{register_people_path}/)
+
+        follow_redirect! # New profile
+      end
+    end
+
+    assert_equal 'ldap_user_long', assigns(:person).last_name
+    assert_equal 'new', assigns(:person).first_name
+    assert_equal 'new_ldap_user@example.com', assigns(:person).email
+    assert session[:user_id]
+    user = User.find_by_id(session[:user_id])
+    assert_equal 'new_ldap_user_too_long_for_username_more_than_40'.truncate(30), user.login
+    assert user.active?
+    assert_equal 1, user.identities.count
+    identity = user.identities.first
+    assert_equal 'ldap', identity.provider
+    assert_equal 'new_ldap_user_long', identity.uid
+    assert_match(/You have successfully registered your account, but you need to create a profile/, flash[:notice])
   end
 
   test 'should create and activate new LS AAI user' do
