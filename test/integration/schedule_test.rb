@@ -44,6 +44,11 @@ class ScheduleTest < ActionDispatch::IntegrationTest
     assert app_status
     assert_equal [1.minute], app_status[:every]
 
+    # Galaxy::ToolMap.refresh
+    tool_map_refresh = pop_task(runners, "Galaxy::ToolMap.refresh")
+    assert tool_map_refresh
+    assert_equal [1.day], tool_map_refresh[:every]
+
     assert_empty runners, "Found untested runner(s) in schedule"
   end
 
