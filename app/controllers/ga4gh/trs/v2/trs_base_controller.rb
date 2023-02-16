@@ -10,6 +10,8 @@ module Ga4gh
 
         rescue_from StandardError do |e|
           Rails.logger.error("TRS Error: #{e.message} - #{e.backtrace.join($/)}")
+          raise e unless Rails.env.production?
+          exception_notification(500, e) unless Rails.application.config.consider_all_requests_local
           trs_error(500, "An unexpected error occurred.")
         end
 
