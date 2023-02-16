@@ -12,7 +12,8 @@ module Seek
         disable_authorization_checks do
           client = Ebi::OlsClient.new
           project = Project.find_or_create_by(title: 'Default Project')
-          Dir.foreach(File.join(Rails.root, 'config/default_data/source_types/')) do |filename|
+          directory = Rails.root.join('config', 'default_data', 'source_types')
+          Dir.exist?(directory) ? Dir.foreach(directory) : [].each do |filename|
             puts filename
             next if File.extname(filename) != '.json'
 
