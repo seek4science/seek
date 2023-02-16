@@ -14,7 +14,8 @@ module Galaxy
       @cache = cache
     end
 
-    def lookup(tool_id)
+    def lookup(tool_id, strip_version: false)
+      tool_id = strip_version(tool_id) if strip_version
       @cache.read(cache_key(tool_id))
     end
 
@@ -24,6 +25,10 @@ module Galaxy
 
     def cache_key(tool_id)
       "galaxy-bio-tools-map/#{tool_id}"
+    end
+
+    def strip_version(tool_id)
+      tool_id.sub(/\/[^\/]+\Z/, '') # Remove version (final / component)
     end
 
     def populate(*galaxy_instances)
@@ -54,13 +59,15 @@ module Galaxy
       tools.each do |tool|
         (tool['elems'] || []).each do |elem|
           (elem['xrefs'] || []).each do |xref|
-            tool_id = elem['id'].sub(/\/[^\/]+\Z/, '') # Remove version (final / component)
+            tool_id = strip_version(elem['id']) # Remove version (final / component)
             if xref['reftype'] == 'bio.tools'
               biotools_id = xref['value']
               unless tool_cache.key?(biotools_id)
                 begin
                   tool_cache[biotools_id] = biotools_client.tool(biotools_id)['name']
-                rescue RestClient::ExceptionWithResponse => e
+                rescue RestClient::NotFound
+                  tool_cache[biotools_id] = nil
+                rescue StandardError => e
                   Rails.logger.error("Error fetching bio.tools info for #{biotools_id} - #{e.class.name}:#{e.message}")
                 end
               end
