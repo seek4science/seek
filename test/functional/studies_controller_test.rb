@@ -854,8 +854,7 @@ class StudiesControllerTest < ActionController::TestCase
     assert_equal 'Granny Smith',cm.get_attribute_value('apple controlled vocab')
     assert_equal ['Granny Smith','Bramley'],cm.get_attribute_value('apple list')
 
-    pp get :show, params:{id:study}
-    get :show, params:{id:study}
+    get :show, params: { id: study }
     assert_response :success
 
     assert_select 'p',text:/Granny Smith/, count:2
