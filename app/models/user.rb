@@ -294,7 +294,11 @@ class User < ApplicationRecord
 
   def self.from_omniauth(auth)
     User.new.tap do |user|
-      user.login = unique_login(auth['info']['nickname'] || 'user')
+      username_from_oauth = (auth['info']['nickname'] || 'user').truncate(30)
+      # username are limited to 40, so we truncate it, with some extra-space as
+      # unique_login might add 4 numbers to avoid clashes
+
+      user.login = unique_login(username_from_oauth)
       user.password = random_password
       user.password_confirmation = user.password
     end
