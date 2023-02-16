@@ -341,6 +341,7 @@ class RenderersTest < ActiveSupport::TestCase
     @html = Nokogiri::HTML.parse(renderer.render)
     assert_select 'pre', text: /This is a txt format/
 
+    git_blob.rewind
     assert_equal "This is a txt format\n", renderer.render_standalone
 
     blob = Factory(:csv_content_blob, asset: @asset)
