@@ -7,6 +7,7 @@ module Git
 
     delegate_missing_to :@blob
     delegate :git_repository, :version, :git_base, to: :git_version
+    delegate :read, to: :file
 
     attr_reader :git_version, :path
     alias_method :original_filename, :path
@@ -25,8 +26,8 @@ module Git
       git_version.remote_sources[path]
     end
 
-    def read
-      file_contents(as_text: true)
+    def file
+      @file ||= to_tempfile
     end
 
     def binread
@@ -70,19 +71,11 @@ module Git
     end
 
     def to_crate_entity(crate, type: ::ROCrate::File, properties: {})
-      type.new(crate, to_tempfile, path).tap do |entity|
+      type.new(crate, self, path).tap do |entity|
         entity['url'] = url if url.present?
         entity['contentSize'] = size
         entity.properties = entity.raw_properties.merge(properties)
       end
-    end
-
-    def to_tempfile
-      f = Tempfile.new(path)
-      f.binmode if binary?
-      f << file_contents(as_text: !binary?)
-      f.rewind
-      f
     end
 
     def text_contents_for_search
@@ -137,6 +130,16 @@ module Git
 
     def is_text?
       !binary?
+    end
+
+    private
+
+    def to_tempfile
+      f = Tempfile.new(path)
+      f.binmode if binary?
+      f << file_contents(as_text: !binary?)
+      f.rewind
+      f
     end
   end
 end
