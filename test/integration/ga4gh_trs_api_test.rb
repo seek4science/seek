@@ -97,6 +97,7 @@ class Ga4ghTrsApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'should throw spec-compliant JSON error if unexpected error occurs' do
+    Thread.current[:ignore_trs_errors] = true
     workflow = Factory(:generated_galaxy_ro_crate_workflow, policy: Factory(:public_policy))
     Workflow.stub(:find_by_id, -> (_) { raise 'oh no!' }) do
       get "/ga4gh/trs/v2/tools/#{workflow.id}/versions/1/containerfile"
@@ -105,6 +106,8 @@ class Ga4ghTrsApiTest < ActionDispatch::IntegrationTest
     assert_response :internal_server_error
     r = JSON.parse(@response.body)
     assert r['message'].include?('An unexpected error')
+  ensure
+    Thread.current[:ignore_trs_errors] = nil
   end
 
   test 'should filter workflows through extended GA4GH endpoint' do
