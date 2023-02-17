@@ -3,7 +3,7 @@ module Galaxy
     CACHE_KEY = 'galaxy-bio-tools-map'.freeze
 
     def self.instance
-      @instance ||= new(Rails.cache.read(CACHE_KEY) || {})
+      RequestStore.store[CACHE_KEY] ||= new(Rails.cache.read(CACHE_KEY) || {})
     end
 
     def self.refresh
@@ -13,11 +13,12 @@ module Galaxy
       Rails.cache.write(CACHE_KEY, instance.map)
     end
 
-    def self.lookup(*args)
-      instance.lookup(*args)
+    def self.lookup(*args, **kwargs)
+      instance.lookup(*args, **kwargs)
     end
 
     def self.clear
+      RequestStore.delete(CACHE_KEY)
       Rails.cache.delete(CACHE_KEY)
     end
 
