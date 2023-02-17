@@ -17,6 +17,10 @@ module Galaxy
       instance.lookup(*args)
     end
 
+    def self.clear
+      Rails.cache.delete(CACHE_KEY)
+    end
+
     attr_reader :map
 
     def initialize(map = {})

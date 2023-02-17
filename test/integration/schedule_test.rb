@@ -57,7 +57,11 @@ class ScheduleTest < ActionDispatch::IntegrationTest
     with_config_value(:email_enabled, true) do
       with_config_value(:openbis_enabled, true) do
         assert_nothing_raised do
-          @schedule.jobs[:runner].each { |job| instance_eval job[:task] }
+          VCR.use_cassette('galaxy/fetch_tools_trimmed') do
+            VCR.use_cassette('bio_tools/fetch_galaxy_tool_names') do
+              @schedule.jobs[:runner].each { |job| instance_eval job[:task] }
+            end
+          end
         end
       end
     end
@@ -69,7 +73,11 @@ class ScheduleTest < ActionDispatch::IntegrationTest
       with_config_value(:openbis_enabled, true) do
         perform_enqueued_jobs do
           assert_nothing_raised do
-            @schedule.jobs[:runner].each { |job| instance_eval job[:task] }
+            VCR.use_cassette('galaxy/fetch_tools_trimmed') do
+              VCR.use_cassette('bio_tools/fetch_galaxy_tool_names') do
+                @schedule.jobs[:runner].each { |job| instance_eval job[:task] }
+              end
+            end
           end
         end
       end
