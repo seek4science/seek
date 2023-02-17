@@ -8,7 +8,7 @@ class GalaxyToolMapTest < ActiveSupport::TestCase
   GALAXY_AUS = 'https://usegalaxy.org.au/api'
 
   setup do
-    @map = Galaxy::ToolMap.new(ActiveSupport::Cache::MemoryStore.new(size: 128.kilobytes))
+    @map = Galaxy::ToolMap.new
   end
 
   test 'can fetch galaxy tools' do
@@ -84,6 +84,7 @@ class GalaxyToolMapTest < ActiveSupport::TestCase
         assert_nil map.lookup(COMMON_TOOL)
         assert_nil map.lookup(AU_TOOL)
         assert_nil map.lookup(EU_TOOL)
+        assert_nil Rails.cache.read(Galaxy::ToolMap::CACHE_KEY)
 
         with_config_value(:galaxy_tool_sources, [GALAXY_EU]) do
           Galaxy::ToolMap.refresh
@@ -91,7 +92,8 @@ class GalaxyToolMapTest < ActiveSupport::TestCase
 
         assert_equal({ bio_tools_id: 'multiqc', name: 'MultiQC' }, map.lookup(COMMON_TOOL))
         assert_nil map.lookup(AU_TOOL)
-        assert_equal({ bio_tools_id: 'ena', name: 'European Nucleotide Archive (ENA)' }, map.lookup(EU_TOOL))
+        assert_equal({ bio_tools_id: 'ena', name: 'European Nucleotide Archive (ENA)' }, Galaxy::ToolMap.lookup(EU_TOOL))
+        assert Rails.cache.read(Galaxy::ToolMap::CACHE_KEY)[COMMON_TOOL]
       end
     end
   end
