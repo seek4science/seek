@@ -241,7 +241,7 @@ class GitWorkflowCreationTest < ActionDispatch::IntegrationTest
     repo = assigns(:workflow).git_version.git_repository
     assert_select 'input[name="workflow[title]"]', count: 1
     a = assigns(:workflow).git_version.remote_source_annotations
-    assert_equal 1, length
+    assert_equal 1, a.length
     assert_equal 'http://workflow.com/rp2.cwl', a.first.value
     assert_equal  'rp2.cwl', a.first.path
 

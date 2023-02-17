@@ -8,7 +8,7 @@ module Git
     belongs_to :contributor, class_name: 'Person'
     belongs_to :git_repository, class_name: 'Git::Repository'
     has_many :git_annotations, inverse_of: :git_version, dependent: :destroy, class_name: 'Git::Annotation', foreign_key: :git_version_id
-    has_many :remote_source_annotations, -> { where(key: 'remote_source') },
+    has_many :remote_source_annotations, -> { where(key: 'remote_source') }, autosave: true,
              inverse_of: :git_version, dependent: :destroy, class_name: 'Git::Annotation', foreign_key: :git_version_id
 
     before_create :set_version
