@@ -34,7 +34,7 @@ class User < ApplicationRecord
   validates     :password_confirmation, presence: true, if: :password_required?
   validates_length_of       :password, minimum: MIN_PASSWORD_LENGTH, if: :password_required?
   validates_confirmation_of :password, if: :password_required?
-  validates_length_of       :login, within: 3..40
+  validates_length_of       :login, within: 3..120
   validates_uniqueness_of   :login, case_sensitive: false
 
   validates :email, format: { with: RFC822::EMAIL }, if: -> { email }
