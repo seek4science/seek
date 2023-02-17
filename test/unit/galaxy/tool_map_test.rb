@@ -79,6 +79,8 @@ class GalaxyToolMapTest < ActiveSupport::TestCase
   test 'can refresh using configured tool sources' do
     VCR.use_cassette('galaxy/fetch_tools_trimmed') do
       VCR.use_cassette('bio_tools/fetch_galaxy_tool_names') do
+        Galaxy::ToolMap.clear
+
         map = Galaxy::ToolMap.instance
 
         assert_nil map.lookup(COMMON_TOOL)
