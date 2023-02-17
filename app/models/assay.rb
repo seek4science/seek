@@ -1,8 +1,6 @@
 class Assay < ApplicationRecord
 
-  include Seek::Rdf::RdfGeneration
   include Seek::Ontologies::AssayOntologyTypes
-  include Seek::Taggable
 
   enum status: [:planned, :running, :completed, :cancelled, :failed]
   belongs_to :assignee, class_name: 'Person'
