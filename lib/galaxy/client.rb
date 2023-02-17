@@ -2,10 +2,7 @@ require 'rest-client'
 
 module Galaxy
   class Client
-    ENDPOINT = 'https://usegalaxy.eu/api'.freeze
-
-    def initialize(endpoint = nil)
-      endpoint ||= ENDPOINT
+    def initialize(endpoint)
       @endpoint = RestClient::Resource.new(endpoint)
     end
 
