@@ -1,30 +1,31 @@
 module Galaxy
   class ToolMap
+    CACHE_KEY = 'galaxy-bio-tools-map'.freeze
+
     def self.instance
-      @instance ||= new(Rails.cache)
+      @instance ||= new(Rails.cache.read(CACHE_KEY) || {})
     end
 
     def self.refresh
       galaxy_instances = Seek::Config.galaxy_tool_sources
       return if galaxy_instances.blank?
       instance.populate(*galaxy_instances)
+      Rails.cache.write(CACHE_KEY, instance.map)
     end
 
-    def initialize(cache)
-      @cache = cache
+    def self.lookup(*args)
+      instance.lookup(*args)
+    end
+
+    attr_reader :map
+
+    def initialize(map = {})
+      @map = map
     end
 
     def lookup(tool_id, strip_version: false)
       tool_id = strip_version(tool_id) if strip_version
-      @cache.read(cache_key(tool_id))
-    end
-
-    def store(tool_id, tool_data)
-      @cache.write(cache_key(tool_id), tool_data)
-    end
-
-    def cache_key(tool_id)
-      "galaxy-bio-tools-map/#{tool_id}"
+      @map[tool_id]
     end
 
     def strip_version(tool_id)
@@ -32,17 +33,13 @@ module Galaxy
     end
 
     def populate(*galaxy_instances)
-      map = {}
-
       tool_cache = {}
       galaxy_instances.each do |galaxy_instance|
         sub_map = fetch_galaxy_tools(galaxy_instance, tool_cache)
-        map.merge!(sub_map)
+        @map.merge!(sub_map)
       end
 
-      map.each { |tool_id, tool_data| store(tool_id, tool_data) }
-
-      map
+      @map
     end
 
     def fetch_galaxy_tools(galaxy_instance, tool_cache = {})
