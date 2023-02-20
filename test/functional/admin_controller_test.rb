@@ -282,26 +282,42 @@ class AdminControllerTest < ActionController::TestCase
   end
 
   test 'update error_grouping_timeout' do
-    with_config_value(:error_grouping_timeout, 1.minute) do
-      post :update_features_enabled, params: { error_grouping_timeout: '1' }
-      assert_equal 1.seconds, Seek::Config.error_grouping_timeout
-      post :update_features_enabled, params: { error_grouping_timeout: '10 sec' }
-      assert_equal 10.seconds, Seek::Config.error_grouping_timeout
-      post :update_features_enabled, params: { error_grouping_timeout: '2 min' }
-      assert_equal 120.seconds, Seek::Config.error_grouping_timeout
+    with_config_value(:error_grouping_enabled, true) do
+      with_config_value(:error_grouping_timeout, 1.minute) do
+        post :update_features_enabled, params: { error_grouping_timeout: '1' }
+        assert_equal 1.seconds, Seek::Config.error_grouping_timeout
+        post :update_features_enabled, params: { error_grouping_timeout: '10 sec' }
+        assert_equal 10.seconds, Seek::Config.error_grouping_timeout
+        post :update_features_enabled, params: { error_grouping_timeout: '2 min' }
+        assert_equal 120.seconds, Seek::Config.error_grouping_timeout
+      end
+    end
+    with_config_value(:error_grouping_enabled, false) do
+      with_config_value(:error_grouping_timeout, 1.minute) do
+        post :update_features_enabled, params: { error_grouping_timeout: '3' }
+        assert_equal 1.minute, Seek::Config.error_grouping_timeout
+      end
     end
   end
 
   test 'update error_grouping_log_base' do
-    with_config_value(:error_grouping_log_base, 2) do
-      post :update_features_enabled, params: { error_grouping_log_base: '3' }
-      assert_equal 3, Seek::Config.error_grouping_log_base
-      post :update_features_enabled, params: { error_grouping_log_base: '3.4' }
-      refute_nil flash[:error]
-      assert_equal 3, Seek::Config.error_grouping_log_base
-      post :update_features_enabled, params: { error_grouping_log_base: '-1' }
-      refute_nil flash[:error]
-      assert_equal 3, Seek::Config.error_grouping_log_base
+    with_config_value(:error_grouping_enabled, true) do
+      with_config_value(:error_grouping_log_base, 2) do
+        post :update_features_enabled, params: { error_grouping_log_base: '3' }
+        assert_equal 3, Seek::Config.error_grouping_log_base
+        post :update_features_enabled, params: { error_grouping_log_base: '3.4' }
+        refute_nil flash[:error]
+        assert_equal 3, Seek::Config.error_grouping_log_base
+        post :update_features_enabled, params: { error_grouping_log_base: '-1' }
+        refute_nil flash[:error]
+        assert_equal 3, Seek::Config.error_grouping_log_base
+      end
+    end
+    with_config_value(:error_grouping_enabled, false) do
+      with_config_value(:error_grouping_log_base, 2) do
+        post :update_features_enabled, params: { error_grouping_log_base: '3' }
+        assert_equal 2, Seek::Config.error_grouping_log_base
+      end
     end
   end
 

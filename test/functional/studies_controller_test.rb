@@ -854,7 +854,6 @@ class StudiesControllerTest < ActionController::TestCase
     assert_equal 'Granny Smith',cm.get_attribute_value('apple controlled vocab')
     assert_equal ['Granny Smith','Bramley'],cm.get_attribute_value('apple list')
 
-    pp get :show, params:{id:study}
     get :show, params:{id:study}
     assert_response :success
 
@@ -1045,4 +1044,81 @@ class StudiesControllerTest < ActionController::TestCase
 
     assert_select 'a.btn[href=?]', new_investigation_path, count: 0
   end
+
+  test 'new should include tags element' do
+    get :new
+    assert_response :success
+    assert_select 'div.panel-heading', text: /Tags/, count: 1
+    assert_select 'input#tag_list', count: 1
+  end
+
+  test 'new should not include tags element when tags disabled' do
+    with_config_value :tagging_enabled, false do
+      get :new
+      assert_response :success
+      assert_select 'div.panel-heading', text: /Tags/, count: 0
+      assert_select 'input#tag_list', count: 0
+    end
+  end
+
+  test 'edit should include tags element' do
+    study = Factory(:study, policy: Factory(:public_policy))
+    get :edit, params: { id: study.id }
+    assert_response :success
+
+    assert_select 'div.panel-heading', text: /Tags/, count: 1
+    assert_select 'input#tag_list', count: 1
+  end
+
+  test 'edit should not include tags element when tags disabled' do
+    with_config_value :tagging_enabled, false do
+      study = Factory(:study, policy: Factory(:public_policy))
+      get :edit, params: { id: study.id }
+      assert_response :success
+
+      assert_select 'div.panel-heading', text: /Tags/, count: 0
+      assert_select 'input#tag_list', count: 0
+    end
+  end
+
+  test 'show should include tags box' do
+    study = Factory(:study, policy: Factory(:public_policy))
+    get :show, params: { id: study.id }
+    assert_response :success
+
+    assert_select 'div.panel-heading', text: /Tags/, count: 1
+    assert_select 'input#tag_list', count: 1
+  end
+
+  test 'show should not include tags box when tags disabled' do
+    with_config_value :tagging_enabled, false do
+      study = Factory(:study, policy: Factory(:public_policy))
+      get :show, params: { id: study.id }
+      assert_response :success
+
+      assert_select 'div.panel-heading', text: /Tags/, count: 0
+      assert_select 'input#tag_list', count: 0
+    end
+  end
+
+  test 'should add tag on creation' do
+    person = Factory(:person)
+    projects = person.person.projects
+    investigation = Factory(:investigation, projects: projects, contributor: person)
+    login_as(person)
+    assert_difference('Study.count') do
+      put :create, params: { study: { title: 'Study', investigation_id: investigation.id },
+                             tag_list: 'my_tag' }
+    end
+    assert_equal 'my_tag', assigns(:study).tags_as_text_array.first
+  end
+
+  test 'should add tag on edit' do
+    person = Factory(:person)
+    study = Factory(:study, creator_ids: [person.id])
+    login_as(person)
+    put :update, params: { id: study.id, study: { title: 'test' }, tag_list: 'my_tag' }
+    assert_equal 'my_tag', assigns(:study).tags_as_text_array.first
+  end
+
 end

@@ -8,6 +8,8 @@ module Git
     belongs_to :contributor, class_name: 'Person'
     belongs_to :git_repository, class_name: 'Git::Repository'
     has_many :git_annotations, inverse_of: :git_version, dependent: :destroy, class_name: 'Git::Annotation', foreign_key: :git_version_id
+    has_many :remote_source_annotations, -> { where(key: 'remote_source') }, autosave: true,
+             inverse_of: :git_version, dependent: :destroy, class_name: 'Git::Annotation', foreign_key: :git_version_id
 
     before_create :set_version
     before_validation :set_git_info, on: :create
@@ -198,23 +200,20 @@ module Git
 
     def remote_sources= hash
       to_keep = []
-      to_update = []
-      existing = find_git_annotations('remote_source').to_a
+      existing = remote_source_annotations.to_a
 
       hash.each do |path, url|
         annotation = existing.detect { |a| a.path == path }
         if annotation.nil? || annotation.value != url
-          annotation ||= git_annotations.build(key: 'remote_source', path: path)
+          annotation ||= remote_source_annotations.build(path: path)
           annotation.value = url
-          to_update << annotation
         end
 
         to_keep << annotation
       end
 
       to_destroy = existing - to_keep
-      to_destroy.each(&:destroy)
-      to_update.each(&:save)
+      to_destroy.each(&:mark_for_destruction)
 
       hash
     end
@@ -222,7 +221,7 @@ module Git
     def remote_sources
       h = {}
 
-      find_git_annotations('remote_source').each do |ann|
+      remote_source_annotations.each do |ann|
         h[ann.path] = ann.value
       end
 

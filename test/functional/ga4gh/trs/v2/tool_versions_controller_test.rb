@@ -411,6 +411,25 @@ module Ga4gh
 
           assert_response :not_found
         end
+
+        test 'should serialize JSON for file with non-ASCII characters' do
+          workflow = Factory(:nfcore_git_workflow, policy: Factory(:public_policy))
+          gv = workflow.git_version
+          gv.update_column(:mutable, true)
+          gv.add_file('non-ascii.cwl', StringIO.new("# Non-ASCII stuff ↳ 🐈"))
+          # Needed because "special" files in repo are serialized differently in RO-Crate/TRS response
+          gv.abstract_cwl_path = 'non-ascii.cwl'
+          disable_authorization_checks { gv.save! }
+
+          assert_nothing_raised do
+            get :descriptor, params: { id: workflow.id, version_id: 1, type: 'NFL', relative_path: 'non-ascii.cwl' },
+                format: :json
+          end
+
+          assert_response :success
+          assert_equal 'application/json; charset=utf-8', @response.headers['Content-Type']
+          assert @response.body.include?("# Non-ASCII stuff ↳ 🐈")
+        end
       end
     end
   end
