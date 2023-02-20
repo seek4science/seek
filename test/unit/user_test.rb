@@ -73,6 +73,8 @@ class UserTest < ActiveSupport::TestCase
     refute u.valid?
     u.login = 'aa'
     refute u.valid?
+    u.login = 'aaa'
+    assert u.valid?
     u.login = 'z' * 120
     assert u.valid?
     u.login = 'z' * 121
