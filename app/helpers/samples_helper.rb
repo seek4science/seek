@@ -91,7 +91,7 @@ module SamplesHelper
       when Seek::Samples::BaseType::CV
         seek_cv_attribute_display(value, attribute)
       when Seek::Samples::BaseType::CV_LIST
-        value.join(", ")
+        value.each{|v| seek_cv_attribute_display(v, attribute) }.join(', ')
       else
         default_attribute_display(attribute, options, sample, value)
       end
