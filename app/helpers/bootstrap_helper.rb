@@ -127,7 +127,6 @@ module BootstrapHelper
   def tags_input2(element_name, existing_tags = [], options = {})
     options['data-role'] = 'seek-tagsinput2'
     options['data-tags-limit'] = options.delete(:limit) if options[:limit]
-    options[:class]='form-control'
     options[:include_blank]=''
     options[:multiple]=true
     options[:name]="#{element_name}[]"

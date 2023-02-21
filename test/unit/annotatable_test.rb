@@ -114,6 +114,16 @@ class AnnotatableTest < ActiveSupport::TestCase
     end
 
     assert_equal [], p.expertise
+
+    #blanks handled and ignored
+    assert_no_difference('Annotation.count', -2) do
+      assert_no_difference('TextValue.count') do
+        p.add_annotations ['',nil], 'expertise'
+        p.save!
+      end
+    end
+
+    assert_equal [], p.expertise
   end
 
   test 'annotate_with changed response' do
