@@ -7,6 +7,10 @@ $j(document).ready(function () {
             tags: true
         };
 
+        if ($j(this).data('tags-limit')) {
+            opts.maximumSelectionLength = $j(this).data('tags-limit');
+        }
+
         if ($j(this).data('typeahead-query-url')) {
             opts.ajax={
                 url: $j(this).data('typeahead-query-url'),
