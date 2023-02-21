@@ -129,27 +129,20 @@ module BootstrapHelper
     options['data-tags-limit'] = options.delete(:limit) if options[:limit]
     options[:class]='form-control'
     options[:include_blank]=''
-    options[:multiple]='multiple'
+    options[:multiple]=true
     options[:name]="#{element_name}[]"
     options.merge!(tags_input_typeahead_options(options.delete(:typeahead))) if options[:typeahead]
 
-
-    # attribute = AnnotationAttribute.where(name: 'expertise').first
-    # tags = TextValue.joins("LEFT OUTER JOIN annotations ON annotations.value_id = text_values.id AND annotations.value_type = 'TextValue'" \
-    #               'LEFT OUTER JOIN annotation_value_seeds ON annotation_value_seeds.value_id = text_values.id')
-    #                 .where('annotations.attribute_id = :attribute_id OR annotation_value_seeds.attribute_id = :attribute_id', attribute_id: attribute.try(:id)).distinct
-    tags = existing_tags
-
     select_options = options_from_collection_for_select(
-      tags,
+      existing_tags,
       :to_s, :to_s,
       existing_tags
     )
 
-
-    select_tag element_name,
+    hidden_field_tag(element_name, '', name: "#{element_name}[]")+
+    select_tag(element_name,
                select_options,
-               options
+               options)
 
   end
 

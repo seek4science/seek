@@ -248,8 +248,8 @@ class PeopleController < ApplicationController
   end
 
   def set_tools_and_expertise(person, params)
-    exp_changed = person.add_annotations(params[:expertise_list], 'expertise') if params[:expertise_list]
-    tools_changed = person.add_annotations(params[:tool_list], 'tool') if params[:tool_list]
+    exp_changed = person.add_annotations(params[:expertise_list].compact_blank, 'expertise') if params[:expertise_list]
+    tools_changed = person.add_annotations(params[:tool_list].compact_blank, 'tool') if params[:tool_list]
     if immediately_clear_tag_cloud?
       expire_annotation_fragments('expertise') if exp_changed
       expire_annotation_fragments('tool') if tools_changed

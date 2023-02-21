@@ -93,6 +93,29 @@ class AnnotatableTest < ActiveSupport::TestCase
     assert_equal %w(golf fishing).sort, p.expertise.sort
   end
 
+  test 'add_annotations as array' do
+    p = Factory :person
+    User.current_user = p.user
+    assert_equal 0, p.expertise.size
+    assert_difference('Annotation.count', 2) do
+      assert_difference('TextValue.count', 2) do
+        p.add_annotations ['golf','fishing'], 'expertise'
+        p.save!
+      end
+    end
+
+    assert_equal %w(golf fishing).sort, p.expertise.sort
+
+    assert_difference('Annotation.count', -2) do
+      assert_no_difference('TextValue.count') do
+        p.add_annotations [], 'expertise'
+        p.save!
+      end
+    end
+
+    assert_equal [], p.expertise
+  end
+
   test 'annotate_with changed response' do
     p = Factory :person
     User.current_user = p.user
