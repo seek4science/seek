@@ -22,6 +22,7 @@
 //= require bootstrap-tagsinput
 //= require bootstrap-multiselect
 //= require tags_input
+//= require tags_input2
 //= require objects_input
 //= require handlebars.runtime
 //= require handlebars_helpers

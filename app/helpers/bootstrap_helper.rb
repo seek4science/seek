@@ -123,6 +123,35 @@ module BootstrapHelper
     end
   end
 
+
+  def tags_input2(element_name, existing_tags = [], options = {})
+    options['data-role'] = 'seek-tagsinput2'
+    options['data-tags-limit'] = options.delete(:limit) if options[:limit]
+    options.merge!(tags_input_typeahead_options(options.delete(:typeahead))) if options[:typeahead]
+    options[:class]='form-control'
+    options[:include_blank]=''
+    options[:multiple]='multiple'
+    options[:name]="#{element_name}[]"
+
+
+    attribute = AnnotationAttribute.where(name: 'expertise').first
+    tags = TextValue.joins("LEFT OUTER JOIN annotations ON annotations.value_id = text_values.id AND annotations.value_type = 'TextValue'" \
+                  'LEFT OUTER JOIN annotation_value_seeds ON annotation_value_seeds.value_id = text_values.id')
+                    .where('annotations.attribute_id = :attribute_id OR annotation_value_seeds.attribute_id = :attribute_id', attribute_id: attribute.try(:id)).distinct
+
+    select_options = options_from_collection_for_select(
+      tags,
+      :text, :text,
+      existing_tags
+    )
+
+
+    select_tag element_name,
+               select_options,
+               options
+
+  end
+
   def tags_input(name, existing_tags = [], options = {})
     options['data-role'] = 'seek-tagsinput'
     options['data-tags-limit'] = options.delete(:limit) if options[:limit]
