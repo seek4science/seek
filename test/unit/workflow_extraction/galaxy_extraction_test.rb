@@ -63,7 +63,7 @@ class GalaxyExtractionTest < ActiveSupport::TestCase
     VCR.use_cassette('galaxy/fetch_tools_trimmed') do
       VCR.use_cassette('bio_tools/fetch_galaxy_tool_names') do
         with_config_value(:galaxy_tool_sources, ['https://usegalaxy.eu/api', 'https://usegalaxy.org.au/api']) do
-          Galaxy::ToolMap.refresh
+          Galaxy::ToolMap.instance.refresh
         end
       end
     end

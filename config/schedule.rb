@@ -56,7 +56,7 @@ every 1.minute do
 end
 
 every 1.day do
-  runner 'Galaxy::ToolMap.refresh'
+  runner 'Galaxy::ToolMap.instance.refresh'
 end
 
 # not safe to automatically add in a non containerised environment
