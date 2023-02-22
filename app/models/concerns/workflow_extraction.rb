@@ -133,7 +133,6 @@ module WorkflowExtraction
     others = other_creators&.split(',')&.collect(&:strip)&.compact || []
     authors += others.map.with_index { |name, i| crate.add_person("creator-#{i + 1}", name: name) }
     crate.author = authors
-    crate['provider'] = projects.map { |project| crate.add_organization(nil, project.ro_crate_metadata).reference }
     crate.license = license
     crate.identifier = ro_crate_identifier
     crate.url = ro_crate_url('ro_crate')

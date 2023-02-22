@@ -253,3 +253,4 @@ observed_variable_sets_enabled:
 fair_signposting_enabled:
 bio_tools_enabled:
 require_cookie_consent:
+galaxy_tool_sources:
