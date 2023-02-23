@@ -28,21 +28,21 @@
           Published
         </span>
     <% elsif item.can_publish? %>
-      <div class="publish-checkbox">
-        <div class="checkbox">
-          <label><%= check_box_tag publishing_item_param(item), 1, checked,
+      <div class="btn-group" >
+        <button type="button" class="btn publish-checkbox" style="height:35px;">
+          <label style="font-weight:normal;">
+            <%= check_box_tag publishing_item_param(item), 1, checked,
                                    {:class=>"#{item.class.name}_#{item.id}",
                                     :onclick=>"checkRepeatedItems(this)"} -%>
             Publish?
           </label>
-        </div>
-      </div>
-      <% if children.any? %>
-        <div class="btn-group" style="height: 40px; ">
-          <div type="button" class="btn dropdown-toggle btn-default" data-toggle="dropdown" aria-expanded="false"
-               style="background-color: #5cb85c; border-color: #5cb85c; padding: 8px 5px">
-            <span class="caret" style="color: #fff"></span>
-          </div>
+        </button>
+        <% if children.any? %>
+          <button type="button" class="btn publish-checkbox dropdown-toggle" data-toggle="dropdown"
+                  aria-haspopup="true" aria-expanded="false" style="height:35px">
+            <span class="caret"></span>
+            <span class="sr-only">Toggle Dropdown</span>
+          </button>
           <ul class="dropdown-menu text-left" role="menu" style="width: 350px;" role="menu">
             <li><a href="#" onclick="selectChildren(this); return false;">
               <%= image('checkbox_select_all', options = {height: 35}) %>
@@ -51,8 +51,8 @@
               <%= image('checkbox_deselect_all', options = {height: 35}) %>
               Deselect this item and all of its sub-items. </a></li>
           </ul>
-        </div>
-      <% end %>
+        <% end %>
+      </div>
     <% else %>
         <span class="label label-warning" data-tooltip="<%= tooltip('You do not have permission to pubish this item.') %>">
           <span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span>
