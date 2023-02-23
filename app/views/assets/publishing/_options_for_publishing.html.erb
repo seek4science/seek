@@ -38,14 +38,20 @@
         </div>
       </div>
       <% if children.any? %>
-        <%= dropdown_button('', 'export', options = {height: 40}) do %>
-          <div onclick="selectChildren(this);">
-            <%= image('checkbox_select_all', options = {height: 40}) %>
-            Select this item and all of its sub-items. </div>
-          <div onclick="deselectChildren(this);">
-            <%= image('checkbox_deselect_all', options = {height: 40}) %>
-            Deselect this item and all of its sub-items. </div>
-        <% end %>
+        <div class="btn-group" style="height: 40px; ">
+          <div type="button" class="btn dropdown-toggle btn-default" data-toggle="dropdown" aria-expanded="false"
+               style="background-color: #5cb85c; border-color: #5cb85c; padding: 8px 5px">
+            <span class="caret" style="color: #fff"></span>
+          </div>
+          <ul class="dropdown-menu text-left" role="menu" style="width: 350px;" role="menu">
+            <li><a href="#" onclick="selectChildren(this); return false;">
+              <%= image('checkbox_select_all', options = {height: 35}) %>
+              Select this item and all of its sub-items. </a></li>
+            <li><a href="#" onclick="deselectChildren(this); return false;">
+              <%= image('checkbox_deselect_all', options = {height: 35}) %>
+              Deselect this item and all of its sub-items. </a></li>
+          </ul>
+        </div>
       <% end %>
     <% else %>
         <span class="label label-warning" data-tooltip="<%= tooltip('You do not have permission to pubish this item.') %>">
