@@ -38,12 +38,14 @@
         </div>
       </div>
       <% if children.any? %>
-        <%= link_to image('checkbox_select_all', options = {height: 40}), href='#',
-                    onclick: "selectChildren(this); return false;",
-                    title: 'Select this item and all of its sub-items.' -%>
-        <%= link_to image('checkbox_deselect_all', options = {height: 40}), href='#',
-                    onclick: "deselectChildren(this); return false;",
-                    title: 'Deselect this item and all of its sub-items.' -%>
+        <%= dropdown_button('', 'export', options = {height: 40}) do %>
+          <div onclick="selectChildren(this);">
+            <%= image('checkbox_select_all', options = {height: 40}) %>
+            Select this item and all of its sub-items. </div>
+          <div onclick="deselectChildren(this);">
+            <%= image('checkbox_deselect_all', options = {height: 40}) %>
+            Deselect this item and all of its sub-items. </div>
+        <% end %>
       <% end %>
     <% else %>
         <span class="label label-warning" data-tooltip="<%= tooltip('You do not have permission to pubish this item.') %>">
