@@ -7,7 +7,7 @@
    tree_class = 'already-published' if item.is_published?
 
 -%>
-<div class="isa-tree <%= html_classes -%> <%= tree_class %>">
+<div class="isa-tree <%= html_classes -%> <%= tree_class %> <%= item.id %>">
   <% if item.can_view? %>
       <h5 class="type_and_title">
         <strong><%= text_for_resource item -%>:</strong> <%= link_to item.title, item, :target => "_blank" -%>
@@ -28,15 +28,23 @@
           Published
         </span>
     <% elsif item.can_publish? %>
-        <div class="publish-checkbox">
-          <div class="checkbox">
-            <label><%= check_box_tag publishing_item_param(item), 1, checked,
-                                {:class=>"#{item.class.name}_#{item.id}",
-                                 :onclick=>"checkRepeatedItems(this)"} -%>
-              Publish?
-            </label>
-          </div>
+      <div class="publish-checkbox">
+        <div class="checkbox">
+          <label><%= check_box_tag publishing_item_param(item), 1, checked,
+                                   {:class=>"#{item.class.name}_#{item.id}",
+                                    :onclick=>"checkRepeatedItems(this)"} -%>
+            Publish?
+          </label>
         </div>
+      </div>
+      <% if children.any? %>
+        <%= link_to image('checkbox_select_all', options = {height: 40}), href='#',
+                    onclick: "selectChildren(this); return false;",
+                    title: 'Select this item and all of its sub-items.' -%>
+        <%= link_to image('checkbox_deselect_all', options = {height: 40}), href='#',
+                    onclick: "deselectChildren(this); return false;",
+                    title: 'Deselect this item and all of its sub-items.' -%>
+      <% end %>
     <% else %>
         <span class="label label-warning" data-tooltip="<%= tooltip('You do not have permission to pubish this item.') %>">
           <span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span>

@@ -12,19 +12,21 @@
        children = []
    end
 -%>
+<div>
+  <%= render :partial => "assets/publishing/options_for_publishing",
+             :object => item,
+             :locals => { :html_classes => "publishing_options",
+                          :children => children,
+                          :checked => (item == preselected) } -%>
 
-<%= render :partial => "assets/publishing/options_for_publishing",
-           :object => item,
-           :locals => { :html_classes => "publishing_options",
-                        :checked => (item == preselected) } -%>
-
-<% if children.any? %>
-    <div style="margin-left: 3em">
-      <% children.each do |child| %>
-          <%= render :partial => "assets/publishing/isa_publishing_preview",
-                     :object => child,
-                     :locals => { :preselected => preselected,
-                                  :html_classes => "publishing_options"} -%>
-      <% end %>
-    </div>
-<% end %>
+  <% if children.any? %>
+      <div style="margin-left: 3em">
+        <% children.each do |child| %>
+            <%= render :partial => "assets/publishing/isa_publishing_preview",
+                       :object => child,
+                       :locals => { :preselected => preselected,
+                                    :html_classes => "publishing_options"} -%>
+        <% end %>
+      </div>
+  <% end %>
+</div>
