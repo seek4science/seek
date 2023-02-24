@@ -730,7 +730,7 @@ class StudiesControllerTest < ActionController::TestCase
     assert_equal 'new title', new_study.title
     assert_equal 'max', new_study.custom_metadata.get_attribute_value('name')
     assert_equal '20', new_study.custom_metadata.get_attribute_value('age')
-    assert_equal old_id, study.custom_metadata.id
+    assert_equal old_id, new_study.custom_metadata.id
 
   end
 
