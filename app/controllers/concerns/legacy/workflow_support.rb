@@ -3,7 +3,7 @@ module Legacy
     extend ActiveSupport::Concern
 
     included do
-      before_action :login_required, only: [:create_content_blob, :create_ro_crate]
+      before_action :legacy_login_required, only: [:create_content_blob, :create_ro_crate]
       before_action :legacy_set_workflow, only: [:create_content_blob, :create_ro_crate]
     end
 
@@ -57,6 +57,12 @@ module Legacy
       else
         @workflow = Workflow.new(workflow_class_id: params[:workflow_class_id])
       end
+    end
+
+    # This is deliberately named differently from `login_required`, or it will overwrite the
+    # `before_action :login_required, only: [...]` in WorkflowsController.
+    def legacy_login_required
+      login_required
     end
 
     def legacy_handle_ro_crate_post(new_version = false)
