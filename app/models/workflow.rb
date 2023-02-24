@@ -152,9 +152,14 @@ class Workflow < ApplicationRecord
   end
 
   attr_reader :extracted_metadata
+  attr_reader :extraction_warnings
+  attr_reader :extraction_errors
+
   def provide_metadata(metadata)
+    @extraction_warnings = metadata.delete(:warnings)
+    @extraction_errors = metadata.delete(:errors)
     @extracted_metadata = metadata
-    assign_attributes(metadata)
+    assign_attributes(@extracted_metadata)
   end
 
   def workflow_data_files_attributes=(attributes)
