@@ -103,9 +103,7 @@ module Legacy
         # unlink any existing content_blob, which breaks things when creating a new version:
         extractor = Workflow.new(content_blob: content_blob, workflow_class: @workflow.workflow_class).extractor
         @metadata = extractor.metadata
-        @warnings ||= @metadata.delete(:warnings) || []
-        @errors ||= @metadata.delete(:errors) || []
-        @workflow.assign_attributes(@metadata)
+        @workflow.provide_metadata(@metadata)
       rescue StandardError => e
         raise e unless Rails.env.production?
         Seek::Errors::ExceptionForwarder.send_notification(e, data: {
