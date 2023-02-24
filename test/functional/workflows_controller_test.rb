@@ -1577,4 +1577,26 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_select '.list_item_title .favouritable img[src=?]',
                   workflow_class_avatar_path(logo_type, logo, size: '24x24'), count: 2
   end
+
+  test 'cannot create from files if not authenticated' do
+    logout
+    cwl = WorkflowClass.find_by_key('cwl') || Factory(:cwl_workflow_class)
+
+    assert_enqueued_jobs(0) do
+      assert_no_difference('Git::Repository.count') do
+        assert_no_difference('Task.count') do
+          post :create_from_files, params: {
+            ro_crate: {
+              main_workflow: { data: fixture_file_upload('workflows/rp2-to-rp2path-packed.cwl', 'text/plain') },
+              diagram: { data: fixture_file_upload('file_picture.png', 'image/png') }
+            },
+            workflow_class_id: cwl.id
+          }
+        end
+      end
+    end
+
+    assert_redirected_to login_path
+    assert flash[:error].include?('need to be logged in')
+  end
 end
