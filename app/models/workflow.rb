@@ -30,6 +30,12 @@ class Workflow < ApplicationRecord
 
   accepts_nested_attributes_for :workflow_data_files
 
+  def initialize(*args)
+    @extraction_errors = []
+    @extraction_warnings = []
+    super(*args)
+  end
+
   git_versioning(sync_ignore_columns: ['test_status']) do
     include WorkflowExtraction
 
@@ -156,8 +162,8 @@ class Workflow < ApplicationRecord
   attr_reader :extraction_errors
 
   def provide_metadata(metadata)
-    @extraction_warnings = metadata.delete(:warnings)
-    @extraction_errors = metadata.delete(:errors)
+    @extraction_warnings = metadata.delete(:warnings) || []
+    @extraction_errors = metadata.delete(:errors) || []
     @extracted_metadata = metadata
     assign_attributes(@extracted_metadata)
   end
