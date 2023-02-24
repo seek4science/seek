@@ -688,11 +688,12 @@ class StudiesControllerTest < ActionController::TestCase
 
   end
 
-  test 'create a study with custom metadata' do
+  test 'create and update a study with custom metadata' do
     cmt = Factory(:simple_study_custom_metadata_type)
 
     login_as(Factory(:person))
 
+    #test create
     assert_difference('Study.count') do
       investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
       study_attributes = { title: 'test', investigation_id: investigation.id }
@@ -705,13 +706,32 @@ class StudiesControllerTest < ActionController::TestCase
     end
 
     assert study=assigns(:study)
-
     assert cm = study.custom_metadata
-
     assert_equal cmt, cm.custom_metadata_type
     assert_equal 'fred',cm.get_attribute_value('name')
     assert_equal '22',cm.get_attribute_value('age')
     assert_nil cm.get_attribute_value('date')
+
+    # test update
+    old_id = cm.id
+    assert_no_difference('Study.count') do
+      assert_no_difference('CustomMetadata.count') do
+        put :update, params: { id: study.id, study: { title: "new title",
+          custom_metadata_attributes: { custom_metadata_type_id: cmt.id, id: cm.id,
+                                        data: {
+                                          "name": 'max',
+                                          "age": 20 } }
+        }
+        }
+      end
+    end
+
+    assert new_study = assigns(:study)
+    assert_equal 'new title', new_study.title
+    assert_equal 'max', new_study.custom_metadata.get_attribute_value('name')
+    assert_equal '20', new_study.custom_metadata.get_attribute_value('age')
+    assert_equal old_id, study.custom_metadata.id
+
   end
 
   test 'create a study with custom metadata validated' do
