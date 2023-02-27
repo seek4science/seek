@@ -153,6 +153,27 @@ module BootstrapHelper
     text_field_tag(name, existing_tags.join(','), options)
   end
 
+  def objects_input2(element_name, existing_objects = [], options = {})
+    options['data-role'] = 'seek-objectsinput2'
+    options['data-tags-limit'] = options.delete(:limit) if options[:limit]
+    options[:include_blank]=''
+    options[:multiple]=true
+    options[:name]="#{element_name}[]"
+    options.merge!(tags_input_typeahead_options(options.delete(:typeahead))) if options[:typeahead]
+
+    select_options = options_from_collection_for_select(
+      existing_objects,
+      :id, :title,
+      existing_objects.collect(&:id)
+    )
+
+    hidden_field_tag(element_name, '', name: "#{element_name}[]") +
+      select_tag(element_name,
+                 select_options,
+                 options)
+
+  end
+
   def objects_input(name, existing_objects = [], options = {})
     options['data-role'] = 'seek-objectsinput'
     options['data-tags-limit'] = options.delete(:limit) if options[:limit]

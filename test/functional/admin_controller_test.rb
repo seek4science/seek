@@ -167,15 +167,14 @@ class AdminControllerTest < ActionController::TestCase
     aaron = people(:aaron_person)
 
     assert quentin.is_admin?
-    assert !aaron.is_admin?
+    refute aaron.is_admin?
 
-    post :update_admins, params: { admins: "#{aaron.id}" }
+    post :update_admins, params: { admins: ['', aaron.id.to_s] }
 
     quentin.reload
     aaron.reload
 
-    assert !quentin.is_admin?
-    assert aaron.is_admin?
+    refute quentin.is_admin?
     assert aaron.is_admin?
     assert User.current_user.person.is_admin?
   end

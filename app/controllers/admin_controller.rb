@@ -16,7 +16,7 @@ class AdminController < ApplicationController
   end  
 
   def update_admins
-    admin_ids = params[:admins].split(',') || []
+    admin_ids = params[:admins].compact_blank
     # Don't let admin remove themselves or they won't be able to manage roles
     current_admins = Person.admins.where.not(id: current_person)
     admins = admin_ids.map { |id| Person.find(id) }
