@@ -138,7 +138,7 @@ module BootstrapHelper
       existing_tags
     )
 
-    hidden_field_tag(element_name, '', name: "#{element_name}[]")+
+    hidden_field_tag(element_name, '', name: "#{element_name}[]") +
     select_tag(element_name,
                select_options,
                options)

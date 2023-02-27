@@ -381,7 +381,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     with_config_value(:email_enabled, true) do
       assert_difference('Programme.count') do
         assert_enqueued_emails(1) do # activation email
-          post :create, params: { programme: { title: 'A programme', funding_codes: 'aaa,bbb', web_page: '', description: '', funding_details: '' } }
+          post :create, params: { programme: { title: 'A programme', funding_codes: ['','aaa','bbb'], web_page: '', description: '', funding_details: '' } }
         end
       end
     end
@@ -734,7 +734,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     prog = Factory(:programme)
 
     assert_difference('Annotation.count', 2) do
-      put :update, params: { id: prog, programme: { funding_codes: '1234,abcd' } }
+      put :update, params: { id: prog, programme: { funding_codes: ['1234','abcd'] } }
     end
 
     assert_redirected_to prog
@@ -744,7 +744,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_includes assigns(:programme).funding_codes, 'abcd'
 
     assert_difference('Annotation.count', -2) do
-      put :update, params: { id: prog, programme: { funding_codes: '' } }
+      put :update, params: { id: prog, programme: { funding_codes: [''] } }
     end
 
     assert_redirected_to prog

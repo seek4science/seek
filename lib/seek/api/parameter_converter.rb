@@ -78,13 +78,6 @@ module Seek
           data_format_annotations: proc {|value|
             value.collect{|v| v[:identifier]}.join(', ')
           },
-          funding_codes: proc { |value|
-            if value
-              value.join(', ')
-            else
-              ''
-            end
-          },
 
           programme_ids: proc { |value|
             value.try(:first)
