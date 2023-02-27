@@ -20,8 +20,9 @@ module SamplesHelper
     else
       scv_id = sample_controlled_vocab.id
       is_ontology = sample_controlled_vocab.source_ontology.present?
+      object_struct = Struct.new(:id, :name)
       existing_objects = Array(values).collect do |value|
-        Struct.new(:id, :name).new(value, value)
+        object_struct.new(value, value)
       end
       objects_input(element_name, existing_objects,
                     typeahead: { query_url: typeahead_sample_controlled_vocabs_path + "?query=%QUERY&scv_id=#{scv_id}", 
@@ -34,8 +35,9 @@ module SamplesHelper
 
     scv_id = sample_controlled_vocab.id
     is_ontology = sample_controlled_vocab.source_ontology.present?
+    object_struct = Struct.new(:id, :name)
     existing_objects = Array(values).collect do |value|
-      Struct.new(:id, :name).new(value, value)
+      object_struct.new(value, value)
     end
     objects_input(element_name, existing_objects,
                   typeahead: { query_url: typeahead_sample_controlled_vocabs_path + "?query=%QUERY&scv_id=#{scv_id}",
