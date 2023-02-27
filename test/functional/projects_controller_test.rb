@@ -105,7 +105,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
     assert_difference('Project.count') do
       post :create, params: { project: { title: 'proj with dates', start_date:'2018-11-01', end_date:'2018-11-18',
-                                         funding_codes: 'aaa,bbb' } }
+                                         funding_codes: ['aaa','bbb'] } }
     end
 
     project = assigns(:project)
@@ -122,7 +122,7 @@ class ProjectsControllerTest < ActionController::TestCase
     project = Factory(:project)
 
     assert_difference('Annotation.count', 2) do
-      put :update, params: { id: project, project: { funding_codes: '1234,abcd' } }
+      put :update, params: { id: project, project: { funding_codes: ['1234','abcd'] } }
     end
 
     assert_redirected_to project
@@ -132,7 +132,7 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_includes assigns(:project).funding_codes, 'abcd'
 
     assert_difference('Annotation.count', -2) do
-      put :update, params: { id: project, project: { funding_codes: '' } }
+      put :update, params: { id: project, project: { funding_codes: [''] } }
     end
 
     assert_redirected_to project
