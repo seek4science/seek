@@ -606,17 +606,17 @@ class ApplicationController < ActionController::Base
     if attribute_params && attribute_params[:custom_metadata_type_id].present?
       metadata_type = CustomMetadataType.find(attribute_params[:custom_metadata_type_id])
       if metadata_type
-        keys = [:custom_metadata_type_id]
+        keys = [:custom_metadata_type_id,:id]
         cma= []
-        metadata_type.custom_metadata_attributes.each do |attr|
-          if attr.sample_attribute_type.base_type == Seek::Samples::BaseType::CV_LIST
+        metadata_type.custom_metadata_attributes.reject{|m| m.seek_custom_metadata?}.each do |attr|
+          if attr.seek_cv_list?
             cma << {attr.title=>[]}
             cma << attr.title.to_s
           else
             cma << attr.title.to_s
           end
         end
-        keys = keys + [{data:[cma]}]
+        keys = keys + [{data:cma}]
       end
     end
     keys

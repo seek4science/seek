@@ -7,11 +7,12 @@ module CustomMetadataHelper
 
     attribute_form_element(attribute, resource.custom_metadata, element_name, element_class)
   end
-end
 
-def custom_metadata_attribute_description(description)
-  html = '<p class="help-block">'
-  html += '<small>'+description+'</small>'
-  html += '</p>'
-  html.html_safe
+  def custom_metadata_attribute_description(description)
+    html = '<p class="help-block">'
+    html += '<small>'+description+'</small>'
+    html += '</p>'
+    html.html_safe
+  end
+
 end

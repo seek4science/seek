@@ -32,7 +32,6 @@ module SamplesHelper
   end
 
   def controlled_vocab_list_form_field(sample_controlled_vocab, element_name, values)
-
     scv_id = sample_controlled_vocab.id
     is_ontology = sample_controlled_vocab.source_ontology.present?
     object_struct = Struct.new(:id, :name)
@@ -44,6 +43,23 @@ module SamplesHelper
                                handlebars_template: 'typeahead/controlled_vocab_term' }, ontology: is_ontology
     )
   end
+
+
+
+def linked_custom_metadata_type_form_field(attribute,resource,value,element_name, element_class)
+
+  html = ''
+  html +=  hidden_field_tag "#{element_name}[id]", value
+  html +=  hidden_field_tag "#{element_name}[custom_metadata_type_id]", attribute.linked_custom_metadata_type.id
+  resource = CustomMetadata.find(value) unless value.blank?
+  attribute.linked_custom_metadata_type.custom_metadata_attributes.each do |attr|
+    attr_element_name = "#{element_name}][data][#{attr.title}]"
+    html += '<div class="form-group"><label>'+attr.label+'</label>'
+    html +=  attribute_form_element(attr, resource, attr_element_name, element_class)
+    html += '</div>'
+  end
+  html.html_safe
+end
 
   def sample_multi_form_field(attribute, element_name, value)  
     existing_objects = []
@@ -73,6 +89,11 @@ module SamplesHelper
   end
 
   def display_attribute(sample, attribute, options = {})
+    # puts "*****************************"
+    # puts "attribute=>"+attribute.inspect
+    # puts "sample=>"+sample.inspect
+    # puts "attribute.sample_attribute_type.base_type=>"+attribute.sample_attribute_type.base_type.inspect
+    # puts "*****************************"
     value = sample.get_attribute_value(attribute)
     if value.blank?
       text_or_not_specified(value)
@@ -94,6 +115,8 @@ module SamplesHelper
         seek_cv_attribute_display(value, attribute)
       when Seek::Samples::BaseType::CV_LIST
         value.each{|v| seek_cv_attribute_display(v, attribute) }.join(', ')
+      when Seek::Samples::BaseType::SEEK_CUSTOM_METADATA
+        CustomMetadata.find(value).json_metadata
       else
         default_attribute_display(attribute, options, sample, value)
       end
@@ -219,7 +242,7 @@ module SamplesHelper
 
   private
 
-  def attribute_form_element(attribute, resource, element_name, element_class )
+  def attribute_form_element(attribute, resource, element_name, element_class)
     value = resource.get_attribute_value(attribute.title)
     placeholder = "e.g. #{attribute.sample_attribute_type.placeholder}" unless attribute.sample_attribute_type.placeholder.blank?
 
@@ -267,6 +290,8 @@ module SamplesHelper
                  include_blank: !attribute.required?, class: "form-control #{element_class}"
     when Seek::Samples::BaseType::SEEK_SAMPLE_MULTI
       sample_multi_form_field attribute, element_name, value
+    when Seek::Samples::BaseType::SEEK_CUSTOM_METADATA
+      linked_custom_metadata_type_form_field attribute, resource, value, element_name, element_class
     else
       text_field_tag element_name, value, class: "form-control #{element_class}", placeholder: placeholder
     end

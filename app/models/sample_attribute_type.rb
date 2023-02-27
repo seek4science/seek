@@ -85,6 +85,10 @@ class SampleAttributeType < ApplicationRecord
     base_type_handler.is_a?(Seek::Samples::AttributeTypeHandlers::SeekResourceAttributeTypeHandler)
   end
 
+  def seek_custom_metadata?
+    base_type == Seek::Samples::BaseType::SEEK_CUSTOM_METADATA
+  end
+
   def seek_sample?
     base_type == Seek::Samples::BaseType::SEEK_SAMPLE
   end
