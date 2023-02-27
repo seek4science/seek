@@ -381,7 +381,7 @@ class AdminController < ApplicationController
           format.html { render status: :not_acceptable }
         end
       else
-        params[:tag_list].split(',').each do |item|
+        params[:tag_list].compact_blank.each do |item|
           item.strip!
           tag = TextValue.find_by_text(item)
           tag = TextValue.create(text: item) if tag.nil? || tag.text != item # case sensitivity check
