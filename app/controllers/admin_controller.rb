@@ -375,13 +375,15 @@ class AdminController < ApplicationController
     if request.post?
       replacement_tags = []
 
-      if params[:tag_list].blank?
+      tag_list = params[:tag_list].compact_blank
+
+      if tag_list.empty?
         flash[:error] = 'Not tags provided, use Delete to delete a tag. Make sure you register the replacement tag by pressing comma'
         respond_to do |format|
           format.html { render status: :not_acceptable }
         end
       else
-        params[:tag_list].compact_blank.each do |item|
+        tag_list.each do |item|
           item.strip!
           tag = TextValue.find_by_text(item)
           tag = TextValue.create(text: item) if tag.nil? || tag.text != item # case sensitivity check
