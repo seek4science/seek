@@ -62,7 +62,7 @@
 <script type='application/javascript'>
 
   function checkSubmitButtonEnabled() {
-    var enabled = $j('#institution_id').val()
+    var enabled = $j('select#institution_id').val()
       && $j('input#projects').val()      
     $j('#submit-button').prop('disabled',!enabled);    
   }

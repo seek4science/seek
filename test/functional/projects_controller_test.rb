@@ -1845,7 +1845,7 @@ class ProjectsControllerTest < ActionController::TestCase
     params = {
         projects: project.id.to_s,
         institution:{
-            id:institution.id
+            id: [institution.id]
         },
         comments: 'some comments'
     }
@@ -1871,6 +1871,7 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as(person)
 
     institution_params = {
+        id: ['fish'],
         title:'fish',
         city:'Sheffield',
         country:'GB',
@@ -1907,6 +1908,7 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as(person)
 
     institution_params = {
+      id: ['fish'],
       title:'fish',
       city:'Sheffield',
       country:'GB',
@@ -1958,7 +1960,7 @@ class ProjectsControllerTest < ActionController::TestCase
       params = {
           programme_id: programme.id,
           project: { title: 'The Project', description: 'description', web_page: 'web_page'},
-          institution: { id: institution.id }
+          institution: { id: [institution.id] }
       }
       assert_enqueued_emails(1) do
         assert_difference('ProjectCreationMessageLog.count') do
@@ -1989,7 +1991,7 @@ class ProjectsControllerTest < ActionController::TestCase
       params = {
         programme_id: programme.id,
         project: { title: 'The Project',description:'description',web_page:'web_page'},
-        institution: {id: institution.id}
+        institution: {id: [institution.id]}
       }
       assert_enqueued_emails(0) do
         assert_difference('ProjectCreationMessageLog.count',1) do
@@ -2019,7 +2021,7 @@ class ProjectsControllerTest < ActionController::TestCase
     with_config_value(:managed_programme_id, nil) do
       params = {
         project: { title: 'The Project',description:'description',web_page:'web_page'},
-        institution: {id: institution.id}
+        institution: {id: [institution.id]}
       }
       assert_enqueued_emails(0) do
         assert_difference('ProjectCreationMessageLog.count',1) do
@@ -2050,7 +2052,7 @@ class ProjectsControllerTest < ActionController::TestCase
     with_config_value(:managed_programme_id, programme.id) do
       params = {
           project: { title: 'The Project', description:'description', web_page:'web_page'},
-          institution: {title: 'the inst', web_page: 'the page', city: 'London', country: 'GB'},
+          institution: {id: ['the inst'], title: 'the inst', web_page: 'the page', city: 'London', country: 'GB'},
           programme_id: '',
           programme: {title: 'the prog'}
       }
@@ -2093,7 +2095,7 @@ class ProjectsControllerTest < ActionController::TestCase
     with_config_value(:programmes_enabled, false) do
       params = {
         project: { title: 'The Project',description:'description',web_page:'web_page'},
-        institution: {title:'the inst',web_page:'the page',city:'London',country:'GB'}
+        institution: {id: ['the inst'], title:'the inst',web_page:'the page',city:'London',country:'GB'}
       }
       assert_enqueued_emails(1) do
         assert_difference('ProjectCreationMessageLog.count') do

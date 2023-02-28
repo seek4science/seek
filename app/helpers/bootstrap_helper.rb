@@ -156,6 +156,7 @@ module BootstrapHelper
   def objects_input2(element_name, existing_objects = [], options = {})
     options['data-role'] = 'seek-objectsinput2'
     options['data-tags-limit'] = options.delete(:limit) if options[:limit]
+    options['data-allow-new-items'] = options.delete(:allow_new) if options[:allow_new]
     options[:include_blank]=''
     options[:multiple]=true
     options[:name]="#{element_name}[]"

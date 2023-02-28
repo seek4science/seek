@@ -3,8 +3,7 @@ $j(document).ready(function () {
 
         var opts = {
             placeholder: 'Search ...',
-            theme: "bootstrap",
-            tags: true
+            theme: "bootstrap"
         };
 
 
@@ -12,7 +11,12 @@ $j(document).ready(function () {
             opts.maximumSelectionLength = $j(this).data('tags-limit');
         }
 
+        if ($j(this).data('allow-new-items')) {
+            opts.tags = $j(this).data('allow-new-items')
+        }
+
         var template = $j(this).data('typeahead-template') || 'typeahead/hint';
+        template = 'typeahead/institution'
         opts.templateResult = HandlebarsTemplates[template];
         opts.escapeMarkup = function (m) {
             return m;
