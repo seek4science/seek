@@ -1054,38 +1054,38 @@ class PeopleControllerTest < ActionController::TestCase
     end
   end
 
-  test 'autocomplete' do
+  test 'typeahead autocomplete' do
     Factory(:brand_new_person, first_name: 'Xavier', last_name: 'Johnson')
     Factory(:brand_new_person, first_name: 'Xavier', last_name: 'Bohnson')
     Factory(:brand_new_person, first_name: 'Charles', last_name: 'Bohnson')
     Factory(:brand_new_person, first_name: 'Jon Bon', last_name: 'Jovi')
     Factory(:brand_new_person, first_name: 'Jon', last_name: 'Bon Jovi')
 
-    get :typeahead, params: { format: :json, query: 'xav' }
+    get :typeahead, params: { format: :json, q: 'xav' }
     assert_response :success
-    res = JSON.parse(response.body)
+    res = JSON.parse(response.body)['results']
     assert_equal 2, res.length
-    assert_includes res.map { |r| r['name'] }, 'Xavier Johnson'
-    assert_includes res.map { |r| r['name'] }, 'Xavier Bohnson'
+    assert_includes res.map { |r| r['text'] }, 'Xavier Johnson'
+    assert_includes res.map { |r| r['text'] }, 'Xavier Bohnson'
 
-    get :typeahead, params: { format: :json, query: 'bohn' }
+    get :typeahead, params: { format: :json, q: 'bohn' }
     assert_response :success
-    res = JSON.parse(response.body)
+    res = JSON.parse(response.body)['results']
     assert_equal 2, res.length
-    assert_includes res.map { |r| r['name'] }, 'Charles Bohnson'
-    assert_includes res.map { |r| r['name'] }, 'Xavier Bohnson'
+    assert_includes res.map { |r| r['text'] }, 'Charles Bohnson'
+    assert_includes res.map { |r| r['text'] }, 'Xavier Bohnson'
 
-    get :typeahead, params: { format: :json, query: 'xavier bohn' }
+    get :typeahead, params: { format: :json, q: 'xavier bohn' }
     assert_response :success
-    res = JSON.parse(response.body)
+    res = JSON.parse(response.body)['results']
     assert_equal 1, res.length
-    assert_includes res.map { |r| r['name'] }, 'Xavier Bohnson'
+    assert_includes res.map { |r| r['text'] }, 'Xavier Bohnson'
 
-    get :typeahead, params: { format: :json, query: 'jon bon' }
+    get :typeahead, params: { format: :json, q: 'jon bon' }
     assert_response :success
-    res = JSON.parse(response.body)
+    res = JSON.parse(response.body)['results']
     assert_equal 2, res.length
-    assert_equal res.map { |r| r['name'] }.uniq, ['Jon Bon Jovi']
+    assert_equal res.map { |r| r['text'] }.uniq, ['Jon Bon Jovi']
   end
 
   test 'related samples are checked for authorization' do
