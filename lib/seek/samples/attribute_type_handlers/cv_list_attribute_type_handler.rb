@@ -11,8 +11,8 @@ module Seek
 
 
         def convert(value)
-          return value if value.is_a?(Array)
-          value.split(',').collect{|v| v.strip}
+          return value.split(',').collect{|v| v.strip} if value.is_a?(String)
+          value.compact_blank
         end
 
       end

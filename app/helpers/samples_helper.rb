@@ -7,42 +7,36 @@ module SamplesHelper
   end
 
   def controlled_vocab_form_field(sample_controlled_vocab, element_name, values, limit=1)
-    if sample_controlled_vocab.sample_controlled_vocab_terms.count < Seek::Config.cv_dropdown_limit && sample_controlled_vocab.source_ontology.blank?
-      options = options_from_collection_for_select(
-        sample_controlled_vocab.sample_controlled_vocab_terms.sort_by(&:label),
-        :label, :label,
-        values
-      )
-      select_tag element_name,
-                 options,
-                 class: "form-control",
-                 include_blank: ""
-    else
       scv_id = sample_controlled_vocab.id
       is_ontology = sample_controlled_vocab.source_ontology.present?
-      object_struct = Struct.new(:id, :name)
+      object_struct = Struct.new(:id, :title)
       existing_objects = Array(values).collect do |value|
+        #term = sample_controlled_vocab.sample_controlled_vocab_terms.find_by_label(value)
         object_struct.new(value, value)
       end
-      objects_input(element_name, existing_objects,
-                    typeahead: { query_url: typeahead_sample_controlled_vocabs_path + "?query=%QUERY&scv_id=#{scv_id}", 
-                    handlebars_template: 'typeahead/controlled_vocab_term' }, 
-                    limit: limit, ontology: is_ontology)
-    end
+
+      typeahead = { handlebars_template: 'typeahead/controlled_vocab_term' }
+
+      if sample_controlled_vocab.sample_controlled_vocab_terms.count < Seek::Config.cv_dropdown_limit
+        values = sample_controlled_vocab.sample_controlled_vocab_terms.collect do |term|
+          {
+            id: term.label,
+            text: term.label,
+            iri: term.iri
+          }
+        end
+        typeahead[:values] = values
+      else
+        typeahead[:query_url] = typeahead_sample_controlled_vocabs_path + "?scv_id=#{scv_id}"
+      end
+
+      objects_input2(element_name, existing_objects,
+                    typeahead: typeahead,
+                    limit: limit, ontology: is_ontology, class: 'form-control')
   end
 
   def controlled_vocab_list_form_field(sample_controlled_vocab, element_name, values)
-
-    scv_id = sample_controlled_vocab.id
-    is_ontology = sample_controlled_vocab.source_ontology.present?
-    object_struct = Struct.new(:id, :name)
-    existing_objects = Array(values).collect do |value|
-      object_struct.new(value, value)
-    end
-    objects_input(element_name, existing_objects,
-                  typeahead: { query_url: typeahead_sample_controlled_vocabs_path + "?query=%QUERY&scv_id=#{scv_id}",
-                               handlebars_template: 'typeahead/controlled_vocab_term' }, ontology: is_ontology
-    )
+    controlled_vocab_form_field(sample_controlled_vocab, element_name, values, nil)
   end
 
   def sample_multi_form_field(attribute, element_name, value)  
@@ -103,7 +97,7 @@ module SamplesHelper
   def seek_cv_attribute_display(value, attribute)
     term = attribute.sample_controlled_vocab.sample_controlled_vocab_terms.where(label:value).last
     content = value
-    if term && term.iri
+    if term && term.iri.present?
       content << " (#{term.iri}) "
     end
     content

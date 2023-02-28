@@ -8,6 +8,11 @@ module Seek
           fail "'#{value}' is not included in the controlled vocabulary" unless controlled_vocab.includes_term?(value) || controlled_vocab.custom_input
         end
 
+        def convert(value)
+          return value if value.is_a?(String)
+          value.compact_blank.first
+        end
+
         private
 
         def controlled_vocab

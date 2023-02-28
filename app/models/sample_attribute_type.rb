@@ -74,7 +74,7 @@ class SampleAttributeType < ApplicationRecord
   end
 
   def controlled_vocab?
-    base_type == Seek::Samples::BaseType::CV
+    [Seek::Samples::BaseType::CV, Seek::Samples::BaseType::CV_LIST].include?(base_type)
   end
 
   def seek_cv_list?
