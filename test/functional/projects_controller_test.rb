@@ -1843,9 +1843,9 @@ class ProjectsControllerTest < ActionController::TestCase
     institution = Factory(:institution)
     login_as(person)
     params = {
-        projects: project.id.to_s,
+      project_ids: ['', project.id],
         institution:{
-            id: [institution.id]
+            id: ['', institution.id]
         },
         comments: 'some comments'
     }
@@ -1878,7 +1878,7 @@ class ProjectsControllerTest < ActionController::TestCase
         web_page:'http://google.com'
     }
     params = {
-        projects: project.id.to_s,
+        project_ids: [project.id],
         institution: institution_params,
         comments: 'some comments'
     }
@@ -1915,7 +1915,7 @@ class ProjectsControllerTest < ActionController::TestCase
       web_page:'http://google.com'
     }
     params = {
-      projects: "#{project1.id},#{project2.id}",
+      project_ids: ['', project1.id, project2.id],
       institution: institution_params,
       comments: 'some comments'
     }

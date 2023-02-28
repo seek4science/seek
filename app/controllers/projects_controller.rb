@@ -150,7 +150,7 @@ class ProjectsController < ApplicationController
   end
 
   def request_join
-    @projects = params[:projects].split(',').collect{|id| Project.find(id)}
+    @projects = params[:project_ids].collect{|id| Project.find_by_id(id)}.compact
     raise 'no projects defined' if @projects.empty?
     @institution = Institution.find_by_id(params[:institution][:id])
     if @institution.nil?
@@ -636,17 +636,18 @@ class ProjectsController < ApplicationController
   end
 
   def typeahead
+    query = params[:q] || ''
     results = Project.where("LOWER(title) LIKE :query
                                     OR LOWER(description) LIKE :query",
-                            query: "%#{params[:query].downcase}%").limit(params[:limit] || 10)
+                            query: "%#{query.downcase}%").limit(params[:limit] || 10)
     items = results.map do |project|
       { id: project.id,
-        name: project.title,
+        text: project.title,
         hint: project.description&.truncate(90, omission: '...') }
     end
 
     respond_to do |format|
-      format.json { render json: items.to_json }
+      format.json { render json: {results: items}.to_json }
     end
   end
 

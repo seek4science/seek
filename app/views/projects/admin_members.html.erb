@@ -15,7 +15,7 @@
           <%#= select_tag :institution_ids, options_from_collection_for_select(Institution.order(:title), "id", "title"),
                          :include_blank => true,
                          :class => 'form-control' %>
-          <%= objects_input2('institution_id', [], typeahead:  {query_url: typeahead_institutions_path,handlebars_template:'typeahead/institution'}, limit:1, class: 'form-control') -%>
+          <%= objects_input2('institution_id', [], typeahead:  {query_url: typeahead_institutions_path, handlebars_template:'typeahead/institution'}, limit:1, class: 'form-control') -%>
         </div>
 
         <%= button_link_to('Add', 'new', 'javascript:Projects.actions.add();') -%>
