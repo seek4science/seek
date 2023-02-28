@@ -15,8 +15,12 @@ $j(document).ready(function () {
             opts.tags = $j(this).data('allow-new-items')
         }
 
+        if ($j(this).data('typeahead-local-values')) {
+            console.log($j(this).data('typeahead-local-values'));
+            opts.data = $j(this).data('typeahead-local-values');
+        }
+
         var template = $j(this).data('typeahead-template') || 'typeahead/hint';
-        template = 'typeahead/institution'
         opts.templateResult = HandlebarsTemplates[template];
         opts.escapeMarkup = function (m) {
             return m;

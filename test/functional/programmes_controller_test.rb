@@ -147,7 +147,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute person.is_programme_administrator_of_any_programme?
     assert_difference('Role.count', 3) do # Should include creator
       assert_difference('Programme.count', 1) do
-        post :create, params: { programme: { programme_administrator_ids: "#{person.id},#{person2.id}", title: 'programme xxxyxxx2' } }
+        post :create, params: { programme: { programme_administrator_ids: [person.id, person2.id], title: 'programme xxxyxxx2' } }
       end
     end
 
@@ -169,7 +169,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute admin.is_programme_administrator_of_any_programme?
     assert_difference('Programme.count', 1) do
       assert_difference('Role.count', 1) do
-        post :create, params: { programme: { programme_administrator_ids: "#{admin.id}", title: 'programme xxxyxxx1' } }
+        post :create, params: { programme: { programme_administrator_ids: [admin.id], title: 'programme xxxyxxx1' } }
       end
     end
 
@@ -194,7 +194,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute p2.is_programme_administrator?(prog)
     refute p3.is_programme_administrator?(prog)
 
-    ids = [p1.id, p2.id].join(',')
+    ids = [p1.id, p2.id]
     put :update, params: { id: prog, programme: { programme_administrator_ids: ids } }
 
     assert_redirected_to prog
@@ -228,7 +228,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute p2.is_programme_administrator?(prog)
     refute p3.is_programme_administrator?(prog)
 
-    ids = [p1.id, p2.id].join(',')
+    ids = [p1.id, p2.id]
     put :update, params: { id: prog, programme: { programme_administrator_ids: ids } }
 
     assert_redirected_to prog
