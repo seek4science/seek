@@ -1311,7 +1311,7 @@ class ProjectsControllerTest < ActionController::TestCase
     refute person2.is_project_administrator?(project)
     refute person2.is_pal?(project)
 
-    ids = "#{person.id},#{person2.id}"
+    ids = [person.id, person2.id]
 
     assert_difference('Role.count', 4 * 2) do
       post :update_members, params: { id: project, project: { project_administrator_ids: ids,

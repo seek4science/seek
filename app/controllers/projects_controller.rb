@@ -655,11 +655,7 @@ class ProjectsController < ApplicationController
   def project_role_params
     permitted_roles = [:project_administrator_ids, :asset_gatekeeper_ids, :asset_housekeeper_ids, :pal_ids]
     permitted_roles.each do |k|
-      if params[:project][k].present?
-        if params[:project][k].is_a?(String)
-          params[:project][k] = params[:project][k].split(',')
-        end
-      else
+      unless params[:project][k].present?
         params[:project][k] = []
       end
     end
