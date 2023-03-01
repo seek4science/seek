@@ -58,7 +58,7 @@
 
       <div class="form-group">
         <%= f.label :country -%><br/>
-        <%= f.country_select :country, nil, { :include_blank => 'Please select...' }, :class=>"form-control" -%>
+        <%= f.country_select :country, { include_blank: 'Please select...' }, class: 'form-control' -%>
       </div>
 
       <% if show_form_manage_specific_attributes? && @event.can_manage? %>
