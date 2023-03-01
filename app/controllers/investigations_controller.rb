@@ -65,6 +65,7 @@ class InvestigationsController < ApplicationController
   def create
     @investigation = Investigation.new(investigation_params)
     update_sharing_policies @investigation
+    update_annotations(params[:tag_list], @investigation)
     update_relationships(@investigation, params)
 
     if @investigation.save
@@ -116,6 +117,7 @@ class InvestigationsController < ApplicationController
     else
       @investigation.update(investigation_params)
       update_sharing_policies @investigation
+      update_annotations(params[:tag_list], @investigation)
       update_relationships(@investigation, params)
 
       respond_to do |format|

@@ -10,6 +10,8 @@ module Ga4gh
 
         rescue_from StandardError do |e|
           Rails.logger.error("TRS Error: #{e.message} - #{e.backtrace.join($/)}")
+          raise e unless Rails.env.production? || Thread.current[:ignore_trs_errors]
+          exception_notification(500, e) unless Rails.application.config.consider_all_requests_local
           trs_error(500, "An unexpected error occurred.")
         end
 
@@ -30,7 +32,7 @@ module Ga4gh
 
         def set_content_type
           # Needed because otherwise it wrongly gets the JSON-API MIME type
-          self.content_type = "application/json" if request.format.json?
+          self.content_type = "application/json" if content_type.start_with?('application/vnd.api+json')
         end
 
         def check_trs_enabled

@@ -356,6 +356,7 @@ class GitVersionTest < ActiveSupport::TestCase
     assert_difference('Git::Annotation.count', 1) do
       assert_enqueued_jobs(1, only: RemoteGitContentFetchingJob) do
         v.add_remote_file('blah.txt', 'http://internet.internet/file')
+        disable_authorization_checks { v.save! }
       end
     end
 
@@ -388,6 +389,7 @@ class GitVersionTest < ActiveSupport::TestCase
     assert_difference('Git::Annotation.count', 1) do
       assert_no_enqueued_jobs(only: RemoteGitContentFetchingJob) do
         v.add_remote_file('blah.txt', 'http://internet.internet/file', fetch: false)
+        disable_authorization_checks { v.save! }
       end
     end
 
