@@ -18,7 +18,7 @@ module Seek
 
         def convert(value)
           value = value.split(',') if value.is_a?(String)
-          value.uniq.map { |v| super(v) }
+          value.uniq.compact_blank.map { |v| super(v) }
         end
 
         private

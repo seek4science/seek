@@ -41,12 +41,12 @@ module SamplesHelper
 
   def sample_multi_form_field(attribute, element_name, value)  
     existing_objects = []
-    str = Struct.new(:id, :name)
+    str = Struct.new(:id, :title)
     value.each {|v| existing_objects << str.new(v[:id], v[:title]) if v} if value
-    objects_input(element_name, existing_objects,
-                  typeahead: { query_url: typeahead_samples_path + "?query=%QUERY&linked_sample_type_id=#{attribute.linked_sample_type.id}", 
+    objects_input2(element_name, existing_objects,
+                  typeahead: { query_url: typeahead_samples_path + "?linked_sample_type_id=#{attribute.linked_sample_type.id}",
                   handlebars_template: 'typeahead/controlled_vocab_term' }, 
-                  limit: 5)
+                  limit: 5, class: 'form-control')
   end
 
   def authorised_samples(projects = nil)
