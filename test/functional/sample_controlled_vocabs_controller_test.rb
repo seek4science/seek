@@ -323,11 +323,11 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
     login_as(person)
     scv = Factory(:topics_controlled_vocab)
     with_config_value(:samples_enabled, false) do
-      get :typeahead, params: { format: :json, query: 'sam', scv_id:scv.id }
+      get :typeahead, params: { format: :json, q: 'sam', scv_id:scv.id }
       assert_response :success
-      res = JSON.parse(response.body)
+      res = JSON.parse(response.body)['results']
       assert_equal 1, res.length
-      assert_equal 'Sample collections', res.first['name']
+      assert_equal 'Sample collections', res.first['text']
     end
   end
 end
