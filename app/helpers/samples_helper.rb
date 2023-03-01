@@ -45,8 +45,7 @@ module SamplesHelper
     value.each {|v| existing_objects << str.new(v[:id], v[:title]) if v} if value
     objects_input2(element_name, existing_objects,
                   typeahead: { query_url: typeahead_samples_path + "?linked_sample_type_id=#{attribute.linked_sample_type.id}",
-                  handlebars_template: 'typeahead/controlled_vocab_term' }, 
-                  limit: 5, class: 'form-control')
+                  handlebars_template: 'typeahead/controlled_vocab_term' }, class: 'form-control')
   end
 
   def authorised_samples(projects = nil)
