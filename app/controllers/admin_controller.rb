@@ -166,9 +166,12 @@ class AdminController < ApplicationController
 
     Seek::Config.bio_tools_enabled = string_to_boolean(params[:bio_tools_enabled])
 
-    time_lock_doi_for = params[:time_lock_doi_for]
-    time_lock_is_integer = only_integer time_lock_doi_for, 'time lock doi for'
-    Seek::Config.time_lock_doi_for = time_lock_doi_for.to_i if time_lock_is_integer
+    time_lock_is_integer = true
+    if params.key?(:time_lock_doi_for)
+      time_lock_doi_for = params[:time_lock_doi_for]
+      time_lock_is_integer = only_integer time_lock_doi_for, 'time lock doi for'
+      Seek::Config.time_lock_doi_for = time_lock_doi_for.to_i if time_lock_is_integer
+    end
 
     Seek::Util.clear_cached
 
