@@ -268,21 +268,11 @@ module BootstrapHelper
 
     original_opts = typeahead_opts.is_a?(TrueClass) ? {} : typeahead_opts
 
-    unless options.key?('data-typeahead-local-values')
-      unless options.key?('data-typeahead-prefetch-url')
-        options['data-typeahead-prefetch-url'] = if original_opts[:type]
-          latest_tags_path(type: original_opts[:type])
-        else
-          latest_tags_path
-        end
-      end
-
-      unless options.key?('data-typeahead-query-url')
-        options['data-typeahead-query-url'] = if original_opts[:type]
-          query_tags_path(type: original_opts[:type])
-        else
-          query_tags_path
-        end
+    unless options.key?('data-typeahead-query-url')
+      options['data-typeahead-query-url'] = if original_opts[:type]
+        query_tags_path(type: original_opts[:type])
+      else
+        query_tags_path
       end
     end
 
@@ -294,12 +284,9 @@ module BootstrapHelper
     options = {}
     options['data-typeahead'] = true
     options[:placeholder] ||= ' ' * 20
-    if typeahead_opts[:values]
-      options['data-typeahead-local-values'] = typeahead_opts[:values].to_json
-    else
-      options['data-typeahead-prefetch-url'] = typeahead_opts[:prefetch_url] if typeahead_opts[:prefetch_url]
-      options['data-typeahead-query-url'] = typeahead_opts[:query_url] if typeahead_opts[:query_url]
-    end
+
+    options['data-typeahead-local-values'] = typeahead_opts[:values].to_json if typeahead_opts[:values]
+    options['data-typeahead-query-url'] = typeahead_opts[:query_url] if typeahead_opts[:query_url]
 
     if typeahead_opts[:handlebars_template]
       options['data-typeahead-template'] = typeahead_opts[:handlebars_template]
