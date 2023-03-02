@@ -35,11 +35,22 @@ module Seek
       def metadata
         # Use CWL description
         m = if @git_version.path_for_key(:abstract_cwl).present?
-              abstract_cwl_extractor.metadata
+              begin
+                abstract_cwl_extractor.metadata
+              rescue StandardError => e
+                Rails.logger.error('Error extracting abstract CWL:')
+                Rails.logger.error(e)
+                { errors: ["Couldn't parse abstract CWL"] }
+              end
             else
-              main_workflow_extractor.metadata
+              begin
+                main_workflow_extractor.metadata
+              rescue StandardError => e
+                Rails.logger.error('Error extracting workflow:')
+                Rails.logger.error(e)
+                { errors: ["Couldn't parse main workflow"] }
+              end
             end
-
 
         if @git_version.file_exists?('README.md')
           m[:description] ||= @git_version.file_contents('README.md').force_encoding('utf-8')

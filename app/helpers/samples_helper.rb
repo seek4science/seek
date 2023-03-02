@@ -20,8 +20,9 @@ module SamplesHelper
     else
       scv_id = sample_controlled_vocab.id
       is_ontology = sample_controlled_vocab.source_ontology.present?
+      object_struct = Struct.new(:id, :name)
       existing_objects = Array(values).collect do |value|
-        Struct.new(:id, :name).new(value, value)
+        object_struct.new(value, value)
       end
       objects_input(element_name, existing_objects,
                     typeahead: { query_url: typeahead_sample_controlled_vocabs_path + "?query=%QUERY&scv_id=#{scv_id}", 
@@ -30,21 +31,18 @@ module SamplesHelper
     end
   end
 
-  def list_select_form_field(attribute,element_name, values)
+  def controlled_vocab_list_form_field(sample_controlled_vocab, element_name, values)
 
-    sample_controlled_vocab =  attribute.sample_controlled_vocab
-
-    options = options_from_collection_for_select(
-        sample_controlled_vocab.sample_controlled_vocab_terms.sort_by(&:label),
-        :label, :label,
-        values
-      )
-      select_tag element_name,
-                 options,
-                 class: "form-control cv_list_attribute",
-                 include_blank: "",
-                 name: "#{element_name}[]",
-                 multiple: "multiple"
+    scv_id = sample_controlled_vocab.id
+    is_ontology = sample_controlled_vocab.source_ontology.present?
+    object_struct = Struct.new(:id, :name)
+    existing_objects = Array(values).collect do |value|
+      object_struct.new(value, value)
+    end
+    objects_input(element_name, existing_objects,
+                  typeahead: { query_url: typeahead_sample_controlled_vocabs_path + "?query=%QUERY&scv_id=#{scv_id}",
+                               handlebars_template: 'typeahead/controlled_vocab_term' }, ontology: is_ontology
+    )
   end
 
   def sample_multi_form_field(attribute, element_name, value)  
@@ -95,7 +93,7 @@ module SamplesHelper
       when Seek::Samples::BaseType::CV
         seek_cv_attribute_display(value, attribute)
       when Seek::Samples::BaseType::CV_LIST
-        value.join(", ")
+        value.each{|v| seek_cv_attribute_display(v, attribute) }.join(', ')
       else
         default_attribute_display(attribute, options, sample, value)
       end
@@ -263,7 +261,7 @@ module SamplesHelper
     when Seek::Samples::BaseType::CV
       controlled_vocab_form_field attribute.sample_controlled_vocab, element_name, value
     when Seek::Samples::BaseType::CV_LIST
-      list_select_form_field attribute, element_name, value
+      controlled_vocab_list_form_field attribute.sample_controlled_vocab, element_name, value
     when Seek::Samples::BaseType::SEEK_SAMPLE
       terms = attribute.linked_sample_type.samples.authorized_for('view').to_a
       options = options_from_collection_for_select(terms, :id, :title, value.try(:[], 'id'))

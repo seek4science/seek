@@ -9,6 +9,12 @@ module Seek
             end
         end
 
+
+        def convert(value)
+          return value if value.is_a?(Array)
+          value.split(',').collect{|v| v.strip}
+        end
+
       end
     end
   end

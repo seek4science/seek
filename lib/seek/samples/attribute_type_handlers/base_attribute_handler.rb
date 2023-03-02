@@ -29,10 +29,6 @@ module Seek
 
         private
 
-        def convert_value(value)
-          value
-        end
-
         attr_accessor :additional_options
       end
     end
