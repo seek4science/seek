@@ -159,7 +159,7 @@ module BootstrapHelper
     options['data-allow-new-items'] = options.delete(:allow_new) if options[:allow_new]
     options[:include_blank]=''
     options[:multiple]=true
-    options[:name]="#{element_name}[]"
+    options[:name] ||="#{element_name}[]"
     options.merge!(tags_input_typeahead_options(options.delete(:typeahead))) if options[:typeahead]
 
     select_options = options_from_collection_for_select(
