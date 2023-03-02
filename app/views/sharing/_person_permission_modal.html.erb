@@ -33,8 +33,8 @@
 
     // Add a person permission to the table
     $j('#permission-people-confirm').click(function () {
-        var people = $j('select#permission-people-ids').select2('data');
-        //
+        let people = $j('select#permission-people-ids').select2('data');
+
         people.forEach(function (person, index) {
             Sharing.addPermission(
                 {
@@ -46,6 +46,7 @@
         });
 
         // Reset form
-        $j('select#permission-people-ids').val([]).trigger('change');
+        $j('select#permission-people-ids').val([]).change();
+        $j('#permission-people-access-type').val('<%= Policy::ACCESSIBLE %>').change();
     });
 </script>
