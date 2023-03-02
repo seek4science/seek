@@ -168,7 +168,7 @@ module BootstrapHelper
       existing_objects.collect(&:id)
     )
 
-    hidden_field_tag(element_name, '', name: "#{element_name}[]") +
+    hidden_field_tag(element_name, '', name: options[:name]) +
       select_tag(element_name,
                  select_options,
                  options)
