@@ -26,7 +26,7 @@
         Select resources that you want to attribute to.
       </p>
       <p>
-        <%= objects_input2('attribution-typeahead', [], typeahead: {query_url: polymorphic_path(resource_class, action: :typeahead)}, limit:1, style:"width:100%") -%>
+        <%= objects_input('attribution-typeahead', [], typeahead: {query_url: polymorphic_path(resource_class, action: :typeahead)}, limit:1, style:"width:100%") -%>
         <%= hidden_field_tag "attributions", "" -%> <%# this hidden input will submit all permission data with the form -%>
       </p>
     </div>

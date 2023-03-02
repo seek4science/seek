@@ -22,9 +22,7 @@
 //= require bootstrap-tagsinput
 //= require bootstrap-multiselect
 //= require tags_input
-//= require tags_input2
 //= require objects_input
-//= require objects_input2
 //= require handlebars.runtime
 //= require handlebars_helpers
 //= require zenodo_form

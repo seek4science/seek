@@ -12,7 +12,7 @@
    existing_tags ||= item_tags.map {|t| t.text}
 %>
 
-<%= tags_input2(input_name, existing_tags, :typeahead => {:type => type}, class: 'form-control') %>
+<%= tags_input(input_name, existing_tags, :typeahead => {:type => type}, class: 'form-control') %>
 
 <% cache "suggestions_for_#{name}", skip_digest: true do %>
     <%

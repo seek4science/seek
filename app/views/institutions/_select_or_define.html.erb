@@ -17,7 +17,7 @@
   </div>
 
   <label class="control-label">Type the name of the <%= t('institution') %> </label><span class="required">*</span>
-  <%= objects_input2('institution[id]', [], typeahead:  {query_url: typeahead_institutions_path, handlebars_template:'typeahead/institution'}, limit:1, allow_new: true, class:'form-control') -%>
+  <%= objects_input('institution[id]', [], typeahead:  {query_url: typeahead_institutions_path, handlebars_template:'typeahead/institution'}, limit:1, allow_new: true, class:'form-control') -%>
 </div>
 
 <%= hidden_field_tag 'institution[title]' %>

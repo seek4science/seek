@@ -30,7 +30,7 @@ module SamplesHelper
         typeahead[:query_url] = typeahead_sample_controlled_vocabs_path + "?scv_id=#{scv_id}"
       end
 
-      objects_input2(element_name, existing_objects,
+      objects_input(element_name, existing_objects,
                     typeahead: typeahead,
                     limit: limit, ontology: is_ontology, class: 'form-control')
   end
@@ -43,7 +43,7 @@ module SamplesHelper
     existing_objects = []
     str = Struct.new(:id, :title)
     value.each {|v| existing_objects << str.new(v[:id], v[:title]) if v} if value
-    objects_input2(element_name, existing_objects,
+    objects_input(element_name, existing_objects,
                   typeahead: { query_url: typeahead_samples_path + "?linked_sample_type_id=#{attribute.linked_sample_type.id}",
                   handlebars_template: 'typeahead/controlled_vocab_term' }, class: 'form-control')
   end

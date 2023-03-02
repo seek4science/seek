@@ -124,8 +124,8 @@ module BootstrapHelper
   end
 
 
-  def tags_input2(element_name, existing_tags = [], options = {})
-    options['data-role'] = 'seek-tagsinput2'
+  def tags_input(element_name, existing_tags = [], options = {})
+    options['data-role'] = 'seek-tagsinput'
     options['data-tags-limit'] = options.delete(:limit) if options[:limit]
     options[:include_blank]=''
     options[:multiple]=true
@@ -153,8 +153,8 @@ module BootstrapHelper
   #   text_field_tag(name, existing_tags.join(','), options)
   # end
 
-  def objects_input2(element_name, existing_objects = [], options = {})
-    options['data-role'] = 'seek-objectsinput2'
+  def objects_input(element_name, existing_objects = [], options = {})
+    options['data-role'] = 'seek-objectsinput'
     options['data-tags-limit'] = options.delete(:limit) if options[:limit]
     options['data-allow-new-items'] = options.delete(:allow_new) if options[:allow_new]
     options[:include_blank]=''

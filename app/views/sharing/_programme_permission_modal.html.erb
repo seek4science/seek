@@ -5,7 +5,7 @@
     <%= modal_body do %>
         <div class="form-group">
           <label>The following <%= t('programme').pluralize -%>...</label>
-          <%= objects_input2('permission-programmes-ids', [], typeahead: { values: Programme.all.map { |p| { id: p.id, text: p.title } } }, name: nil) -%>
+          <%= objects_input('permission-programmes-ids', [], typeahead: { values: Programme.all.map { |p| { id: p.id, text: p.title } } }, name: nil) -%>
           <p class="help-block">Start typing a <%= t('programme') -%>'s title and select from the list that appears. You can select multiple <%= t('programme').pluralize -%>.</p>
         </div>
         <div class="form-group">
