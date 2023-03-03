@@ -225,16 +225,16 @@ module BootstrapHelper
   # sets the default options for tags, including the query_url according to type unless already specified
   def update_tags_input_options(options)
     options[:allow_new] = true unless options.key?(:allow_new)
-    options[:typeahead] ||= {}
-    if typeahead = options[:typeahead]
-      unless typeahead[:query_url]
-        typeahead[:query_url] = if typeahead[:type]
-                                  query_tags_path(type: typeahead.delete(:type))
-                                else
-                                  query_tags_path
-                                end
-      end
+    typeahead = options[:typeahead] ||= {}
+
+    unless typeahead[:query_url]
+      typeahead[:query_url] = if typeahead[:type]
+                                query_tags_path(type: typeahead.delete(:type))
+                              else
+                                query_tags_path
+                              end
     end
+
 
     options
   end
