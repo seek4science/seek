@@ -21,7 +21,7 @@ class TagsController < ApplicationController
 
   def query
     q = params[:q] || ''
-    @tags = get_tags.where('text LIKE ?', "#{q}%").limit(20).map(&:text)
+    @tags = get_tags.where('text LIKE ?', "%#{q}%").limit(100).map(&:text)
     results = {
       results: @tags.collect do |tag|
        { id: tag, text: tag}

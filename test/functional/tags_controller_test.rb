@@ -117,6 +117,11 @@ class TagsControllerTest < ActionController::TestCase
     assert_response :success
     expected = { results: [{ id: 'twinkle', text: 'twinkle' }] }.with_indifferent_access
     assert_equal expected, JSON.parse(@response.body)
+
+    get :query, params: { format: 'json', q: 'wink' }
+    assert_response :success
+    expected = { results: [{ id: 'twinkle', text: 'twinkle' }] }.with_indifferent_access
+    assert_equal expected, JSON.parse(@response.body)
   end
 
   test 'can handle empty response from query' do
