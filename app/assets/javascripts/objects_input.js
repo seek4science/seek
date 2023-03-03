@@ -35,8 +35,16 @@ $j(document).ready(function () {
         $j(this).select2(
             opts
         );
+    });
 
-
-
+    $j('[data-role="seek-suggested-tags"]').on('click', function () {
+        let selectName = $j(this).data('tag-input');
+        let text = $j(this).text();
+        let selector = $j('select#'+selectName);
+        let vals = selector.val() || [];
+        vals.push(text);
+        selector.val(vals);
+        selector.change();
+        return false;
     });
 });

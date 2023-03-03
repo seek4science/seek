@@ -125,7 +125,7 @@ module BootstrapHelper
 
 
   def tags_input(element_name, existing_tags = [], options = {})
-    options[:allow_new] = true unless options.key?(:allow_new)
+    options = update_tags_input_options(options)
     objects_input(element_name, existing_tags, options, :to_s, :to_s)
   end
 
@@ -136,7 +136,7 @@ module BootstrapHelper
     options[:include_blank]=''
     options[:multiple]=true
     options[:name] ="#{element_name}[]" unless options.key?(:name)
-    options.merge!(tags_input_typeahead_options(options.delete(:typeahead))) if options[:typeahead]
+    options.merge!(typeahead_options(options.delete(:typeahead))) if options[:typeahead]
 
     select_options = options_from_collection_for_select(
       existing_objects,
@@ -222,16 +222,17 @@ module BootstrapHelper
 
   private
 
-  def tags_input_typeahead_options(typeahead_opts)
-    options = typeahead_options(typeahead_opts)
-
-    original_opts = typeahead_opts.is_a?(TrueClass) ? {} : typeahead_opts
-
-    unless options.key?('data-typeahead-query-url')
-      options['data-typeahead-query-url'] = if original_opts[:type]
-        query_tags_path(type: original_opts[:type])
-      else
-        query_tags_path
+  # sets the default options for tags, including the query_url according to type unless already specified
+  def update_tags_input_options(options)
+    options[:allow_new] = true unless options.key?(:allow_new)
+    options[:typeahead] ||= {}
+    if typeahead = options[:typeahead]
+      unless typeahead[:query_url]
+        typeahead[:query_url] = if typeahead[:type]
+                                  query_tags_path(type: typeahead.delete(:type))
+                                else
+                                  query_tags_path
+                                end
       end
     end
 
