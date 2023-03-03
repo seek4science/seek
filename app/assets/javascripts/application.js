@@ -21,7 +21,6 @@
 //= require typeahead.js.js
 //= require bootstrap-tagsinput
 //= require bootstrap-multiselect
-//= require tags_input
 //= require objects_input
 //= require handlebars.runtime
 //= require handlebars_helpers

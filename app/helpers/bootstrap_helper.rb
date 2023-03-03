@@ -125,35 +125,11 @@ module BootstrapHelper
 
 
   def tags_input(element_name, existing_tags = [], options = {})
-    options['data-role'] = 'seek-tagsinput'
-    options['data-tags-limit'] = options.delete(:limit) if options[:limit]
-    options[:include_blank]=''
-    options[:multiple]=true
-    options[:name]="#{element_name}[]"
-    options.merge!(tags_input_typeahead_options(options.delete(:typeahead))) if options[:typeahead]
-
-    select_options = options_from_collection_for_select(
-      existing_tags,
-      :to_s, :to_s,
-      existing_tags
-    )
-
-    hidden_field_tag(element_name, '', name: "#{element_name}[]") +
-    select_tag(element_name,
-               select_options,
-               options)
-
+    options[:allow_new] = true unless options.key?(:allow_new)
+    objects_input(element_name, existing_tags, options, :to_s, :to_s)
   end
 
-  # def tags_input(name, existing_tags = [], options = {})
-  #   options['data-role'] = 'seek-tagsinput'
-  #   options['data-tags-limit'] = options.delete(:limit) if options[:limit]
-  #   options.merge!(tags_input_typeahead_options(options.delete(:typeahead))) if options[:typeahead]
-  #
-  #   text_field_tag(name, existing_tags.join(','), options)
-  # end
-
-  def objects_input(element_name, existing_objects = [], options = {})
+  def objects_input(element_name, existing_objects = [], options = {}, value_method = :id, text_method = :title)
     options['data-role'] = 'seek-objectsinput'
     options['data-tags-limit'] = options.delete(:limit) if options[:limit]
     options['data-allow-new-items'] = options.delete(:allow_new) if options[:allow_new]
@@ -164,8 +140,8 @@ module BootstrapHelper
 
     select_options = options_from_collection_for_select(
       existing_objects,
-      :id, :title,
-      existing_objects.collect(&:id)
+      value_method, text_method,
+      existing_objects.collect{|obj| obj.send(value_method)}
     )
 
     hidden_field_tag(element_name, '', name: options[:name]) +
@@ -174,23 +150,6 @@ module BootstrapHelper
                  options)
 
   end
-
-  # def objects_input(name, existing_objects = [], options = {})
-  #   options['data-role'] = 'seek-objectsinput'
-  #   options['data-tags-limit'] = options.delete(:limit) if options[:limit]
-  #   options['data-ontology'] = options.delete(:ontology) if options[:ontology]
-  #   options.merge!(typeahead_options(options.delete(:typeahead))) if options[:typeahead]
-  #
-  #   unless existing_objects.empty?
-  #     if existing_objects.is_a?(String)
-  #       options['data-existing-objects'] = existing_objects
-  #     else
-  #       options['data-existing-objects'] = existing_objects.map { |object| { id: object.id, name: object.try(:name) || object.try(:title) } }.to_json
-  #     end
-  #   end
-  #
-  #   text_field_tag(name, nil, options)
-  # end
 
   def modal(options = {})
     opts = merge_options({ class: 'modal', role: 'dialog', tabindex: -1 }, options)
