@@ -6,10 +6,10 @@ module BootstrapHelper
     icon = icon_tag(icon_key, options.delete(:icon_options) || {})
     disabled_reason = options.delete(:disabled_reason)
     options[:class] = "#{options[:class]} disabled".strip if disabled_reason
-    inner = unless url
-              content_tag(:a, (icon + text).html_safe, options)
-            else
+    inner = if url
               link_to((icon + text).html_safe, url, options)
+            else
+              content_tag(:a, (icon + text).html_safe, options)
             end
 
     if disabled_reason
@@ -28,11 +28,12 @@ module BootstrapHelper
   end
 
   # A collapsible panel
-  def folding_panel(title = nil, collapsed = false, options = {})
+  def folding_panel(title = nil, collapsed = false, options = {}, &block)
     title += " <span class=\"#{collapsed ? 'caret' : 'caret-up'}\"></span>".html_safe
 
     options[:collapsible] = true
-    options[:heading_options] = merge_options({ :class => 'clickable collapsible', 'data-toggle' => 'collapse-next' }, options[:heading_options])
+    options[:heading_options] =
+      merge_options({ :class => 'clickable collapsible', 'data-toggle' => 'collapse-next' }, options[:heading_options])
     options[:collapse_options] = { :class => 'panel-collapse collapse', 'aria-expanded' => true }
     if collapsed
       options[:heading_options][:class] += ' collapsed'
@@ -41,21 +42,17 @@ module BootstrapHelper
       options[:collapse_options][:class] += ' in'
     end
 
-    panel(title, options) do
-      yield
-    end
+    panel(title, options, &block)
   end
 
   # A panel with a heading section and body
-  def panel(title = nil, options = {})
+  def panel(title = nil, options = {}, &block)
     heading_options = merge_options({ class: 'panel-heading' }, options.delete(:heading_options))
     body_options = merge_options({ class: 'panel-body' }, options.delete(:body_options))
     options = merge_options({ class: "panel #{options[:type] || 'panel-default'}" }, options)
 
     # The body of the panel
-    body = content_tag(:div, body_options) do
-      yield
-    end
+    body = content_tag(:div, body_options, &block)
 
     content_tag(:div, options) do # The panel wrapper
       if title
@@ -75,7 +72,7 @@ module BootstrapHelper
     content_tag(:div, heading_options) do # The panel title
       title_html = ''
       if (help_text = options.delete(:help_text))
-        title_html << help_icon(help_text) + ' '
+        title_html << "#{help_icon(help_text)} "
       end
       title_html << title
       title_html.html_safe
@@ -95,26 +92,22 @@ module BootstrapHelper
   end
 
   # A button that displays a dropdown menu when clicked
-  def dropdown_button(text, icon_key = nil, options = {})
-
+  def dropdown_button(text, icon_key = nil, options = {}, &block)
     content_tag(:div, class: 'btn-group') do
       content_tag(:div, :type => 'button', :class => "btn dropdown-toggle #{options[:type] || 'btn-default'}".strip,
-                        'data-toggle' => 'dropdown', 'aria-expanded' => 'false','data-tooltip'=>options[:tooltip]) do
+                        'data-toggle' => 'dropdown', 'aria-expanded' => 'false', 'data-tooltip' => options[:tooltip]) do
         ((icon_key ? icon_tag(icon_key, options.delete(:icon_options) || {}) : '') +
             text + ' <span class="caret"></span>'.html_safe)
       end +
-        content_tag(:ul, merge_options({ class: 'dropdown-menu text-left', role: 'menu' }, options.delete(:menu_options))) do
-          yield
-        end
+        content_tag(:ul,
+                    merge_options({ class: 'dropdown-menu text-left', role: 'menu' }, options.delete(:menu_options)), &block)
     end
   end
 
   # A dropdown menu for admin commands. Will not display if the content is blank.
   # (Saves having to check privileges twice)
-  def item_actions_dropdown(text = t('actions_button'), icon = 'actions')
-    opts = capture do
-      yield
-    end
+  def item_actions_dropdown(text = t('actions_button'), icon = 'actions', &block)
+    opts = capture(&block)
 
     unless opts.blank?
       dropdown_button(text, icon, menu_options: { class: 'pull-right', id: 'item-admin-menu' }) do
@@ -122,7 +115,6 @@ module BootstrapHelper
       end
     end
   end
-
 
   def tags_input(element_name, existing_tags = [], options = {})
     options = update_tags_input_options(options)
@@ -133,25 +125,24 @@ module BootstrapHelper
     options['data-role'] = 'seek-objectsinput'
     options['data-tags-limit'] = options.delete(:limit) if options[:limit]
     options['data-allow-new-items'] = options.delete(:allow_new) if options[:allow_new]
-    options[:include_blank]=''
-    options[:multiple]=true
-    options[:name] ="#{element_name}[]" unless options.key?(:name)
+    options[:include_blank] = ''
+    options[:multiple] = true
+    options[:name] = "#{element_name}[]" unless options.key?(:name)
     options.merge!(typeahead_options(options.delete(:typeahead))) if options[:typeahead]
 
     select_options = options_from_collection_for_select(
       existing_objects,
       value_method, text_method,
-      existing_objects.collect{|obj| obj.send(value_method)}
+      existing_objects.collect { |obj| obj.send(value_method) }
     )
 
     hidden_field_tag(element_name, '', name: options[:name]) +
       select_tag(element_name,
                  select_options,
                  options)
-
   end
 
-  def modal(options = {})
+  def modal(options = {}, &block)
     opts = merge_options({ class: 'modal', role: 'dialog', tabindex: -1 }, options)
 
     dialog_class = 'modal-dialog'
@@ -161,16 +152,14 @@ module BootstrapHelper
 
     content_tag(:div, opts) do
       content_tag(:div, class: dialog_class) do
-        content_tag(:div, class: 'modal-content') do
-          yield
-        end
+        content_tag(:div, class: 'modal-content', &block)
       end
     end
   end
 
   def modal_header(title, _options = {})
     content_tag(:div, class: 'modal-header') do
-      content_tag(:button, class:'close', 'data-dismiss' => 'modal', 'aria-label' => 'Close') do
+      content_tag(:button, class: 'close', 'data-dismiss' => 'modal', 'aria-label' => 'Close') do
         content_tag(:span, '&times;'.html_safe, 'aria-hidden' => 'true')
       end +
         content_tag(:h4, title, class: 'modal-title')
@@ -191,7 +180,7 @@ module BootstrapHelper
     end
   end
 
-  def tab(*args)
+  def tab(*args, &block)
     if block_given?
       tab_id, selected = *args
       title = nil
@@ -203,21 +192,17 @@ module BootstrapHelper
 
     content_tag(:li, class: selected ? 'active' : '') do
       if block_given?
-        content_tag(:a, data: { target: "##{tab_id}", toggle: 'tab' }, aria: { controls: tab_id }, role: 'tab') do
-          yield
-        end
+        content_tag(:a, data: { target: "##{tab_id}", toggle: 'tab' }, aria: { controls: tab_id }, role: 'tab', &block)
       else
         content_tag(:a, title, data: { target: "##{tab_id}", toggle: 'tab' }, aria: { controls: tab_id }, role: 'tab')
       end
     end
   end
 
-  def tab_pane(tab_id, selected = nil)
+  def tab_pane(tab_id, selected = nil, &block)
     selected = show_page_tab == tab_id if selected.nil?
 
-    content_tag(:div, id: tab_id, class: selected ? 'tab-pane fade in active' : 'tab-pane fade') do
-      yield
-    end
+    content_tag(:div, id: tab_id, class: selected ? 'tab-pane fade in active' : 'tab-pane fade', &block)
   end
 
   private
@@ -235,7 +220,6 @@ module BootstrapHelper
                               end
     end
 
-
     options
   end
 
@@ -248,9 +232,7 @@ module BootstrapHelper
     options['data-typeahead-local-values'] = typeahead_opts[:values].to_json if typeahead_opts[:values]
     options['data-typeahead-query-url'] = typeahead_opts[:query_url] if typeahead_opts[:query_url]
 
-    if typeahead_opts[:handlebars_template]
-      options['data-typeahead-template'] = typeahead_opts[:handlebars_template]
-    end
+    options['data-typeahead-template'] = typeahead_opts[:handlebars_template] if typeahead_opts[:handlebars_template]
 
     options
   end
