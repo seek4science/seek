@@ -13,7 +13,6 @@
   @policy_params = params[:policy_attributes]
 
 %>
-
 <%= show_title "Change permissions of items related to #{link_to(h(current_user.person.name),current_user.person)} in batch".html_safe -%>
 
 <div class="alert alert-info">
@@ -26,8 +25,7 @@
 </div>
 
 <div id="sharing_items">
-<%= form_tag({:action => :batch_change_permssion_for_selected_items}, :method => :post) do -%>
-
+<%= form_tag({:action => :batch_change_permission_for_selected_items}, :method => :post) do -%>
   <%= folding_panel("Items not in ISA", false, :id => 'not_isa_item', :body_options => {:id => 'items_fold_content'},
                     :help_text => nil) do %>
 
@@ -45,8 +43,6 @@
     <div id="jstree_not_isa"></div>
 
   <% end %>
-
-
   <% all_related_items_hash.each do |resource_type, resource_items| %>
     <% if resource_type == "Investigation" %>
       <%  resource_items[:items].each do |item| %>
@@ -59,7 +55,6 @@
       <% end %>
     <% end %>
   <% end %>
-
   <%= folding_panel("Items in ISA: ", false, :id => 'isa_item', :body_options => {:id => 'items_fold_content'},
                     :help_text => nil) do %>
 
@@ -71,9 +66,7 @@
     <div id="jstree"></div>
 
   <% end -%>
-
   <% resource = (controller_name == 'people') ? current_user.person : @asset %>
-
   <%= submit_tag "Next", data: {disable_with: 'Next'}, :class => 'btn btn-primary' -%>
 
   or
@@ -274,4 +267,3 @@
 
     });
 </script>
-

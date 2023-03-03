@@ -686,6 +686,19 @@ class SampleTypesControllerTest < ActionController::TestCase
     end
   end
 
+  test 'filter sample types with template when advanced single page is enabled' do
+    project = Factory(:project)
+    Factory(:simple_sample_type, template_id: 1, projects: [project])
+    params = { projects: [project.id]}
+    get :filter_for_select, params: params
+    assert_equal assigns(:sample_types).length, 1
+    with_config_value(:project_single_page_advanced_enabled, true) do
+      get :filter_for_select, params: params
+      assert_equal assigns(:sample_types).length, 0
+    end
+  end
+
+
   private
 
   def template_for_upload

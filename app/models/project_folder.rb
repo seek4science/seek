@@ -29,10 +29,10 @@ class ProjectFolder < ApplicationRecord
   def authorized_hanging_assets
     assets.select do |a|
       is_sample = a.instance_of?(Sample)
-      linked_to_assays = a.assays.present?
-      linked_to_studies = a.studies.present? || (a.study.present? if a.respond_to?(:study))
+      linked_to_assays = a&.assays.present?
+      linked_to_studies = a&.studies.present? || (a&.study.present? if a&.respond_to?(:study))
 
-      !is_sample && !linked_to_assays && !linked_to_studies && a.can_view?
+      !is_sample && !linked_to_assays && !linked_to_studies && a&.can_view?
     end
   end
 

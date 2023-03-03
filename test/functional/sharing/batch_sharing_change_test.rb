@@ -54,7 +54,7 @@ class BatchSharingChangeTest < ActionController::TestCase
 
     params = { share_not_isa: {}, share_isa: {}}
     params= params.merge(id: @person.id)
-    post :batch_change_permssion_for_selected_items, params: params
+    post :batch_change_permission_for_selected_items, params: params
     assert_response :redirect
     assert_equal flash[:error], 'Please choose at least one item!'
 
@@ -65,7 +65,7 @@ class BatchSharingChangeTest < ActionController::TestCase
     params[:share_not_isa][event.class.name]||= {}
     params[:share_not_isa][event.class.name][event.id.to_s] = '1'
 
-    post :batch_change_permssion_for_selected_items, params: params.merge(id: @person.id)
+    post :batch_change_permission_for_selected_items, params: params.merge(id: @person.id)
     assert_select '.highlight-colour', count: 0
     assert_select '.type_and_title', count: 1 do
       assert_select 'a[href=?]', event_path(event), text:/#{event.title}/
@@ -80,7 +80,7 @@ class BatchSharingChangeTest < ActionController::TestCase
     df = data_with_isa
     params[:share_isa][df.class.name]||= {}
     params[:share_isa][df.class.name][df.id.to_s] = '1'
-    post :batch_change_permssion_for_selected_items, params: params.merge(id: @person.id)
+    post :batch_change_permission_for_selected_items, params: params.merge(id: @person.id)
 
     assert_select '.type_and_title', count: 2 do
       assert_select 'a[href=?]', data_file_path(df), text:/#{df.title}/

@@ -4,17 +4,12 @@
 <div style="padding:0 20px 20px 20px;">
     <div class="row">
         <div class="col-12">
-            <table class="table table-striped table-bordered display nowrap" id="study-samples-table" style="width:100%;"></table>
+            <table data-dtname="sampleDynamicTable" class="table table-striped table-bordered display nowrap" id="study-samples-table" style="width:100%;"></table>
         </div>
     </div>
 </div>
 
-<div class="btn-group">
-    <input class="btn btn-default" type="button" value="Add row" onClick="SampleAddNewRow()" />
-    <input class="btn btn-default" type="button" value="Paste From Clipboard" onClick="SamplePasteFromClipboard()" />
-    <input class="btn btn-default" type="button" value="Delete selected" onClick="SampleSetAsDeleted()" />
-    <button class="btn btn-primary dt-action" id="btn_save_sample" onClick="SampleSave()">Save</button>
-</div>
+<%= render partial: 'isa_studies/buttons' %> 
 
 <% if sample_type %>
     <script>
@@ -38,12 +33,14 @@
                 },
                 callback: () => studyDynamicTable.table.ajax.reload(),
                 enableLoading: () => {
-                    elem.append("<span class='loader' style='margin:2px 0 2px 5px'></span>")
-                    $j(".dt-action").addClass("disabled")
+                  $j("#dt-overlay").css("display", "flex")
+                  elem.append("<span class='loader' style='margin:2px 0 2px 5px'></span>")
+                  $j(".dt-action").addClass("disabled")
                 },
                 disableLoading: () => {
-                    elem.find(".loader").remove();
-                    $j(".dt-action").removeClass("disabled")
+                  $j("#dt-overlay").css("display", "none")
+                  elem.find(".loader").remove();
+                  $j(".dt-action").removeClass("disabled")
                 }
             }
             sampleDynamicTable.init(dt.rows, dt.columns, options)

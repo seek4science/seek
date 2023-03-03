@@ -1,0 +1,2 @@
+[servers]
+192.168.0.xx ansible_connection=ssh ansible_ssh_user='{{ user_var }}' ansible_ssh_pass='{{ local_vm_become_password }}' ansible_become_pass='{{ local_vm_become_password }}'

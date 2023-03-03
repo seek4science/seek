@@ -33,7 +33,7 @@
 
     <%= render partial: 'custom_metadata/custom_metadata_attribute_input', locals:{f:f,resource:@isa_study.study} %>
 
-    <%= render partial: 'assets/manage_specific_attributes', locals:{f:f} if show_form_manage_specific_attributes? %>
+    <%= render partial: 'assets/manage_specific_attributes', locals: { f: study_fields } if show_form_manage_specific_attributes? %>
 
     <%= study_fields.fancy_multiselect :publications, { other_projects_checkbox: true, name: "isa_study[study][publication_ids]" } %>
 
@@ -47,12 +47,11 @@
       <%= render partial: 'sample_types_form', locals: {f: f, sample_type: @isa_study.source, id_suffix: "_source_sample_type", action: action } if @isa_study.source %>
     <% end %>
 
-		<%= folding_panel("SOP") do %>
-			<p class="help-block">The following SOP is associated with this study:</p>
-			<%= study_fields.collection_select(:sop, authorised_assets(Sop, current_user.person.projects, "view"),
-															:id, :title,
-															{prompt:'Select'},
-															{class:"form-control", id:'isa_study_sop_selector', name: "isa_study[study][sop_id]"}) %>
+		<%= folding_panel(t(:sop).pluralize) do %>
+			<p class="help-block">The following <%= t(:sop).pluralize %> are associated with this <%= t(:study) %>:</p>
+			
+      <%= study_fields.fancy_multiselect :sops, { other_projects_checkbox: true, name: "isa_study[study][sop_ids]" } %>
+     
 		<% end %>
 
     <%= folding_panel("Define #{t(:sample_type)} for Sample") do %>

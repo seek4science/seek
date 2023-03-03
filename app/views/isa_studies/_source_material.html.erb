@@ -4,17 +4,13 @@
 <div style="padding:0 20px 20px 20px;">
     <div class="row">
         <div class="col-12">
-            <table class="table table-striped table-bordered display nowrap" id="source-material-table" style="width:100%;"></table>
+            <table data-dtname="sourceDynamicTable" class="table table-striped table-bordered display nowrap" id="source-material-table" style="width:100%;"></table>
         </div>
     </div>
 </div>
 
-<div class="btn-group">
-    <input class="btn btn-default dt-action" type="button" value="Add row" onClick="SourceAddNewRow()" />
-    <input class="btn btn-default dt-action" type="button" value="Paste From Clipboard" onClick="SourcePasteFromClipboard()" />
-    <input class="btn btn-default dt-action" type="button" value="Delete selected" onClick="SourceSetAsDeleted()" />
-    <button class="btn btn-primary dt-action" id="btn_save_source" onClick="SourceSave()">Save</button>
-</div>
+<%= render partial: 'isa_studies/buttons', locals:{ add_row: "SourceAddNewRow()", paste_cb:
+"SourcePasteFromClipboard()", delete: "SourceSetAsDeleted()", save: "SourceSave()", permissions: "loadBatchPermission('sourceDynamicTable',this)" } %> 
 
 <% if sample_type %>
     <script>
@@ -42,12 +38,14 @@
                 },
                 callback: () => studyDynamicTable.table.ajax.reload(),
                 enableLoading: () => {
-                    elem.append("<span class='loader' style='margin:2px 0 2px 5px'></span>")
-                    $j(".dt-action").addClass("disabled")
+                  $j("#dt-overlay").css("display", "flex")
+                  elem.append("<span class='loader' style='margin:2px 0 2px 5px'></span>")
+                  $j(".dt-action").addClass("disabled")
                 },
                 disableLoading: () => {
-                    elem.find(".loader").remove();
-                    $j(".dt-action").removeClass("disabled")
+                  $j("#dt-overlay").css("display", "none")
+                  elem.find(".loader").remove();
+                  $j(".dt-action").removeClass("disabled")
                 }
             }
             sourceDynamicTable.init(dt.rows, dt.columns, options)

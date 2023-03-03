@@ -1903,6 +1903,13 @@ ActiveRecord::Schema.define(version: 2022_12_12_143407) do
     t.index ["contributor_id"], name: "index_sops_on_contributor"
   end
 
+  create_table "sops_studies", force: :cascade do |t|
+    t.bigint "sop_id"
+    t.bigint "study_id"
+    t.index ["sop_id"], name: "index_sops_studies_on_sop_id"
+    t.index ["study_id"], name: "index_sops_studies_on_study_id"
+  end
+
   create_table "sops_workflows", id: false, force: :cascade do |t|
     t.integer "workflow_id", null: false
     t.integer "sop_id", null: false
@@ -1991,7 +1998,6 @@ ActiveRecord::Schema.define(version: 2022_12_12_143407) do
     t.text "other_creators"
     t.string "deleted_contributor"
     t.integer "position"
-    t.integer "sop_id"
   end
 
   create_table "study_auth_lookup", force: :cascade do |t|
@@ -2086,7 +2092,7 @@ ActiveRecord::Schema.define(version: 2022_12_12_143407) do
     t.integer "pos"
     t.boolean "is_title", default: false
     t.integer "isa_tag_id"
-    t.string "iri"
+    t.string "pid"
     t.index ["template_id", "title"], name: "index_template_id_asset_id_title"
   end
 

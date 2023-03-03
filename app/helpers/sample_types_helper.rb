@@ -61,7 +61,7 @@ module SampleTypesHelper
   end
 
   def sample_type_grouped_options
-    sample_types = SampleType.all
+    sample_types = Seek::Config.project_single_page_advanced_enabled && !displaying_single_page? ? SampleType.without_template : SampleType.all
     projects = current_user.person.projects
     person_sample_types = sample_types.select { |type| (type.projects & projects).any? }
     other_sample_types = sample_types - person_sample_types

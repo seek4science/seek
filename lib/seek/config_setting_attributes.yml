@@ -68,6 +68,7 @@ publish_button_enabled:
 project_browser_enabled:
 project_single_page_enabled:
 project_single_page_advanced_enabled:
+project_single_page_folders_enabled:
 sample_type_template_enabled:
 experimental_features_enabled:
 pdf_conversion_enabled:

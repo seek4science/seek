@@ -118,7 +118,8 @@ class SampleTypesController < ApplicationController
 
   # used for ajax call to get the filtered sample types for selection
   def filter_for_select
-    @sample_types = SampleType.joins(:projects).where('projects.id' => params[:projects]).distinct.to_a
+    scope = Seek::Config.project_single_page_advanced_enabled ? SampleType.without_template : SampleType
+    @sample_types = scope.joins(:projects).where('projects.id' => params[:projects]).distinct.to_a
     unless params[:tags].blank?
       @sample_types.select! do |sample_type|
         if params[:exclusive_tags] == '1'
@@ -180,7 +181,8 @@ class SampleTypesController < ApplicationController
   private
 
   def find_sample_type
-    @sample_type = SampleType.find(params[:id])
+    scope = Seek::Config.project_single_page_advanced_enabled ? SampleType.without_template : SampleType
+    @sample_type = scope.find(params[:id])
   end
 
   #intercepts the standard 'find_and_authorize_requested_item' for additional special check for a referring_sample_id

@@ -3,17 +3,25 @@ module Seek
     module SharingCommon
 
       def self.included(base)
-        base.before_action :sharing_auth, only: [:batch_sharing_permission_preview, :batch_change_permssion_for_selected_items, :batch_sharing_permission_changed]
+        base.before_action :sharing_auth, only: [:batch_sharing_permission_preview, :batch_change_permission_for_selected_items, :batch_sharing_permission_changed]
       end
 
-      def batch_change_permssion_for_selected_items
+      def batch_change_permission_for_selected_items
         @items_for_sharing = resolve_sharing_params(params)
         if @items_for_sharing.empty?
           flash[:error] = "Please choose at least one item!"
-          redirect_to batch_sharing_permission_preview_person_url(current_user.person)
+          if params[:single_page]
+            redirect_to batch_sharing_permission_preview_person_url(current_user.person, { single_page: true })
+          else
+            redirect_to batch_sharing_permission_preview_person_url(current_user.person)
+          end
         else
           respond_to do |format|
-            format.html { render template: 'assets/sharing/sharing_bulk_change_preview' }
+            if params[:single_page]
+              format.html { render 'single_pages/sample_sharing_bulk_change_preview', { layout: false } }
+            else
+              format.html { render 'assets/sharing/sharing_bulk_change_preview' }
+            end
           end
         end
       end
@@ -22,7 +30,11 @@ module Seek
         @batch_sharing_permission_changed = false
         flash[:notice] = nil
         respond_to do |format|
-          format.html { render template: 'assets/sharing/batch_sharing_permission_preview' }
+          if params[:single_page]
+            format.html { render 'single_pages/sample_batch_sharing_permission_preview', { layout: false } }
+          else
+            format.html { render 'assets/sharing/batch_sharing_permission_preview' }
+          end
         end
       end
 
@@ -49,7 +61,11 @@ module Seek
               flash.now[:notice] = notice_count==0 ? nil: (flash[:notice]+"</ul>").html_safe
               flash.now[:error] = error_count==0 ? nil: (flash[:error]+"</ul>").html_safe
           respond_to do |format|
-            format.html { render template: 'assets/sharing/batch_sharing_permission_preview' }
+            if params[:single_page]
+              format.html { render 'single_pages/sample_batch_sharing_permission_preview', { layout: false } }
+            else
+              format.html { render 'assets/sharing/batch_sharing_permission_preview' }
+            end
           end
       end
 

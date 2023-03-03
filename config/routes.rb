@@ -298,7 +298,7 @@ SEEK::Application.routes.draw do
       get :select
       get :items
       get :batch_sharing_permission_preview
-      post :batch_change_permssion_for_selected_items
+      post :batch_change_permission_for_selected_items
       post :batch_sharing_permission_changed
     end
     resources :projects, :programmes, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows,
@@ -748,6 +748,11 @@ SEEK::Application.routes.draw do
     member do
       get :dynamic_table_data
       get :export_isa, action: :export_isa
+    end
+    collection do
+      get :batch_sharing_permission_preview
+      post :batch_change_permission_for_selected_items
+      post :batch_sharing_permission_changed
     end
   end
 

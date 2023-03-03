@@ -289,6 +289,30 @@ class GitWorkflowCreationTest < ActionDispatch::IntegrationTest
     assert_equal annotation_count + 4, Git::Annotation.count
   end
 
+  test 'reports extraction errors' do
+    login_as(Factory(:user))
+    galaxy = WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class)
+
+    assert_enqueued_jobs(0) do
+      assert_difference('Git::Repository.count', 1) do
+        assert_no_difference('Task.count') do
+          post create_from_files_workflows_path, params: {
+            ro_crate: {
+              # This should cause extraction to fail, as it is a Galaxy workflow
+              main_workflow: { data: fixture_file_upload('workflows/rp2-to-rp2path-packed.cwl', 'text/plain') },
+              diagram: { data: fixture_file_upload('file_picture.png', 'image/png') }
+            },
+            workflow_class_id: galaxy.id
+          }
+        end
+      end
+    end
+
+    assert assigns(:workflow).title.blank?
+    assert assigns(:workflow).extraction_errors.any?
+    assert_select '#extraction-errors ul li', text: /Couldn't parse main workflow/
+  end
+
   private
 
   def login_as(user)

@@ -73,9 +73,9 @@ module Seek
           errors.add(:sample_attribute_type, 'Attribute type must be SeekSample if linked sample type set')
         end
         if seek_sample? && linked_sample_type.nil?
-          errors.add(:seek_sample, 'Linked Sample Type must be set if attribute type is SeekSample')
+          errors.add(:seek_sample, 'Linked Sample Type must be set if attribute type is Registered Sample')
         elsif seek_sample_multi? && linked_sample_type.nil? 
-          errors.add(:seek_sample_multi, 'Linked Sample Type must be set if attribute type is SeekSampleMulti')
+          errors.add(:seek_sample_multi, 'Linked Sample Type must be set if attribute type is Registered Sample (multiple)')
         end
       end
     end

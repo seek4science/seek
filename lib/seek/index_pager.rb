@@ -36,6 +36,10 @@ module Seek
       if @parent_resource
         @parent_resource.get_related(controller_name.classify)
       else
+        if controller_model == SampleType && Seek::Config.project_single_page_advanced_enabled
+          return SampleType.without_template
+        end
+
         controller_model
       end
     end

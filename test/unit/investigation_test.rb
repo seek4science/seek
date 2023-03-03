@@ -223,11 +223,11 @@ class InvestigationTest < ActiveSupport::TestCase
   
   test 'related sop ids' do
     investigation = Factory(:investigation)
-    study = Factory(:study, investigation: investigation)
+    study_sop = Factory(:sop)
+    study = Factory(:study, investigation: investigation, sops: [study_sop])
     assay = Factory(:assay, study: study)
     assay_sop = Factory(:sop, assays: [assay])
-    study_sop = Factory(:sop, study: study)
-    assert_equal investigation.related_sop_ids.sort, [assay_sop.id, study_sop.id].sort
+    assert_equal investigation.related_sop_ids.sort, (study.sop_ids << assay_sop.id).sort
   end
 
 end

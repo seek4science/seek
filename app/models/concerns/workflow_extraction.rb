@@ -210,13 +210,17 @@ module WorkflowExtraction
   end
 
   def ro_crate_zip
-    ro_crate do |crate|
-      path = ro_crate_path
-      File.delete(path) if File.exist?(path)
-      ROCrate::Writer.new(crate).write_zip(path)
-    end
+    begin
+      ro_crate do |crate|
+        path = ro_crate_path
+        File.delete(path) if File.exist?(path)
+        ROCrate::Writer.new(crate).write_zip(path)
+      end
 
-    ro_crate_path
+      ro_crate_path
+    rescue StandardError => e
+      raise ::ROCrate::WriteException.new("Couldn't generate RO-Crate metadata.", e)
+    end
   end
 
   def ro_crate_identifier

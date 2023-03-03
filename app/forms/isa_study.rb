@@ -68,7 +68,6 @@ class IsaStudy
 
   def validate_objects
     @study.errors.each { |e| errors[:base] << "[Study]: #{e.full_message}" } unless @study.valid?
-    errors[:base] << '[SOP]: SOP is required' unless @study.sop_id
 
     unless @source_sample_type.valid?
       @source_sample_type.errors.full_messages.each { |e| errors[:base] << "[Source sample type]: #{e}" }

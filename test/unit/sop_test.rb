@@ -343,24 +343,4 @@ class SopTest < ActiveSupport::TestCase
     refute v3.can_change_visibility?
   end
 
-  test 'should not destroy if sop has associated studies with single page enabled' do
-    person = Factory(:person)
-    with_config_value(:project_single_page_advanced_enabled, true) do
-      sop = Factory(:sop, contributor: person)
-      assert_equal true, sop.can_delete?(person)
-      study = Factory(:study, sop: sop)
-      disable_authorization_checks do
-        sop.study = study
-        sop.save!
-      end
-      assert_equal false, sop.can_delete?(person)
-    end
-    sop = Factory(:sop, contributor: person)
-    study = Factory(:study, sop: sop)
-    disable_authorization_checks do
-      sop.study = study
-      sop.save!
-    end
-    assert_equal true, sop.can_delete?(person)
-  end
 end

@@ -3,7 +3,7 @@ module Legacy
     extend ActiveSupport::Concern
 
     included do
-      before_action :login_required, only: [:create_content_blob, :create_ro_crate]
+      before_action :legacy_login_required, only: [:create_content_blob, :create_ro_crate]
       before_action :legacy_set_workflow, only: [:create_content_blob, :create_ro_crate]
     end
 
@@ -59,6 +59,12 @@ module Legacy
       end
     end
 
+    # This is deliberately named differently from `login_required`, or it will overwrite the
+    # `before_action :login_required, only: [...]` in WorkflowsController.
+    def legacy_login_required
+      login_required
+    end
+
     def legacy_handle_ro_crate_post(new_version = false)
       @workflow = Workflow.new unless new_version
       extractor = Seek::WorkflowExtractors::ROCrate.new(params[:ro_crate])
@@ -97,9 +103,7 @@ module Legacy
         # unlink any existing content_blob, which breaks things when creating a new version:
         extractor = Workflow.new(content_blob: content_blob, workflow_class: @workflow.workflow_class).extractor
         @metadata = extractor.metadata
-        @warnings ||= @metadata.delete(:warnings) || []
-        @errors ||= @metadata.delete(:errors) || []
-        @workflow.assign_attributes(@metadata)
+        @workflow.provide_metadata(@metadata)
       rescue StandardError => e
         raise e unless Rails.env.production?
         Seek::Errors::ExceptionForwarder.send_notification(e, data: {

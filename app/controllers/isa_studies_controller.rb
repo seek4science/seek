@@ -77,7 +77,7 @@ class IsaStudiesController < ApplicationController
   end
 
   def study_params
-    [:title, :description, :experimentalists, :investigation_id, :sop_id,
+    [:title, :description, :experimentalists, :investigation_id, { sop_ids: [] },
      *creator_related_params, :position, { scales: [] }, { publication_ids: [] },
      { discussion_links_attributes: %i[id url label _destroy] },
      { custom_metadata_attributes: determine_custom_metadata_keys }]
