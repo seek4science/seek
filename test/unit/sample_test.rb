@@ -1127,15 +1127,13 @@ class SampleTest < ActiveSupport::TestCase
 
     sample = Sample.new(sample_type: multi_linked_sample_type, project_ids: [Factory(:project).id])
     sample.set_attribute_value(:title, 'blah')
-    sample.set_attribute_value(:patient, "")
+    sample.set_attribute_value(:patient, [''])
     refute sample.valid?
     sample.set_attribute_value(:patient, [])
     refute sample.valid?
     sample.set_attribute_value(:patient, [patient.id])
     assert sample.valid?
     sample.set_attribute_value(:patient, [patient.id, patient2.id])
-    assert sample.valid?
-    sample.set_attribute_value(:patient, "#{patient.id}, #{patient2.id}")
     assert sample.valid?
     sample.save!
     assert sample.get_attribute_value("patient").kind_of?(Array)

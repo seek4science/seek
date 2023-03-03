@@ -860,7 +860,7 @@ class StudiesControllerTest < ActionController::TestCase
                                                    data:{
                                                      "apple name":"Newton's Apple",
                                                      "apple list":['Granny Smith','Bramley'],
-                                                     "apple controlled vocab": 'Granny Smith'}}}
+                                                     "apple controlled vocab": ['Granny Smith']}}}
 
       put :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
     end
