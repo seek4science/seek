@@ -107,26 +107,6 @@ class TagsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'latest with no attributes defined' do
-    AnnotationAttribute.destroy_all
-    assert_empty AnnotationAttribute.all
-
-    get :latest, format: 'json'
-    assert_response :success
-    assert_empty JSON.parse(@response.body)
-  end
-
-  test 'latest' do
-    p = Factory :person
-
-    df = Factory :data_file, contributor: p
-    tag = Factory :tag, value: 'twinkle', source: p.user, annotatable: df
-
-    get :latest, format: 'json'
-    assert_response :success
-    assert_includes JSON.parse(@response.body), 'twinkle'
-  end
-
   test 'can query' do
     p = Factory :person
 
