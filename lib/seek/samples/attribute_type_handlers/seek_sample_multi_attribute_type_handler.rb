@@ -17,7 +17,6 @@ module Seek
         end
 
         def convert(value)
-          value = value.split(',').collect(&:strip) if value.is_a?(String)
           value.uniq.compact_blank.map { |v| super(v) }
         end
 
