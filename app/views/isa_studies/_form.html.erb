@@ -71,6 +71,7 @@
     const initTemplateModal = function(field_name) {
       Templates.context.description_elem = `#isa_study_${field_name}_description`
       Templates.context.suffix = "_" + field_name
+      Templates.context.field_name = field_name
       showTemplateModal()
     }
 
