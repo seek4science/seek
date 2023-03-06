@@ -15,3 +15,7 @@ en:
     programme: *programme
     project: *project
     institution: *institution
+  info_text:
+    institution: "An Organization in WorkflowHub is any kind of entity through which people are affiliated. It can be an academic institution, company, department, club etc."
+    programme: "A Space is an umbrella to group one or more Team."
+    project: "A Team represents a group of one or more people collaborating together on a particular activity. All resources in WorkflowHub are owned by one or more Teams."
