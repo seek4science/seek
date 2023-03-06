@@ -1030,7 +1030,9 @@ sampleAttributeBaseType:
     - SeekStrain
     - SeekSample
     - CV
+    - CVList
     - SeekDataFile
+    - SeekSampleMulti
 sampleAttributeTypeType:
   type: string
   minLength: 1
@@ -2622,9 +2624,9 @@ sampleTypeSampleAttributePost:
     is_title:
       type: boolean
     sample_controlled_vocab_id:
-      $ref: "#/components/schemas/nullableInteger"
+      $ref: "#/components/schemas/nullableNonEmptyString"
     linked_sample_type_id:
-      $ref: "#/components/schemas/nullableInteger"
+      $ref: "#/components/schemas/nullableNonEmptyString"
   required:
     - title
     - sample_attribute_type
@@ -2661,9 +2663,9 @@ sampleTypeSampleAttributePatch:
     is_title:
       type: boolean
     sample_controlled_vocab_id:
-      $ref: "#/components/schemas/nullableInteger"
+      $ref: "#/components/schemas/nullableNonEmptyString"
     linked_sample_type_id:
-      $ref: "#/components/schemas/nullableInteger"
+      $ref: "#/components/schemas/nullableNonEmptyString"
     _destroy:
       type: boolean
   required: []
@@ -4582,9 +4584,9 @@ sampleTypeSampleAttributeResponse:
     is_title:
       type: boolean
     sample_controlled_vocab_id:
-      $ref: "#/components/schemas/nullableInteger"
+      $ref: "#/components/schemas/nullableNonEmptyString"
     linked_sample_type_id:
-      $ref: "#/components/schemas/nullableInteger"
+      $ref: "#/components/schemas/nullableNonEmptyString"
   required:
     - title
     - sample_attribute_type
