@@ -82,7 +82,7 @@ class FileTemplatesControllerTest < ActionController::TestCase
       assert_difference('FileTemplate.count') do
         assert_difference('FileTemplate::Version.count') do
           assert_difference('ContentBlob.count') do
-            post :create, params: { file_template: { title: 'File Template', project_ids: [person.projects.first.id], data_format_annotations:'JSON', data_type_annotations:'Sequence features metadata'}, content_blobs: [valid_content_blob], policy_attributes: valid_sharing }
+            post :create, params: { file_template: { title: 'File Template', project_ids: [person.projects.first.id], data_format_annotations:['JSON'], data_type_annotations:['Sequence features metadata'] }, content_blobs: [valid_content_blob], policy_attributes: valid_sharing }
           end
         end
       end
@@ -124,7 +124,7 @@ class FileTemplatesControllerTest < ActionController::TestCase
     login_as(person)
 
     assert_difference('ActivityLog.count') do
-      put :update, params: { id: ft.id, file_template: { title: 'Different title', project_ids: [person.projects.first.id], data_format_annotations:'JSON', data_type_annotations:'Sequence features metadata'} }
+      put :update, params: { id: ft.id, file_template: { title: 'Different title', project_ids: [person.projects.first.id], data_format_annotations: ['JSON'], data_type_annotations: ['Sequence features metadata']} }
     end
 
     template = assigns(:file_template)

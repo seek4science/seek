@@ -3501,6 +3501,45 @@ class DataFilesControllerTest < ActionController::TestCase
     refute_includes df.assay_assets.collect(&:assay),assay3
   end
 
+  test 'create with data type and format annotations' do
+    Factory(:data_types_controlled_vocab) unless SampleControlledVocab::SystemVocabs.data_types_controlled_vocab
+    Factory(:data_formats_controlled_vocab) unless SampleControlledVocab::SystemVocabs.data_formats_controlled_vocab
+    person = Factory(:person)
+    login_as(person)
+
+    data_file, blob = valid_data_file
+
+    data_file[:data_format_annotations] = ['', 'JSON']
+    data_file[:data_type_annotations] = ['', 'Sequence features metadata', 'Data']
+
+    assert_difference('DataFile.count') do
+      post :create, params: { data_file: data_file, content_blobs: [blob], policy_attributes: valid_sharing }
+    end
+
+    data_file = assigns(:data_file)
+    assert_redirected_to data_file_path(data_file)
+
+
+    assert_equal ['http://edamontology.org/data_2914', 'http://edamontology.org/data_0006'], data_file.data_type_annotations
+    assert_equal ['http://edamontology.org/format_3464'], data_file.data_format_annotations
+  end
+
+  test 'update with data type and format annotations' do
+    Factory(:data_types_controlled_vocab) unless SampleControlledVocab::SystemVocabs.data_types_controlled_vocab
+    Factory(:data_formats_controlled_vocab) unless SampleControlledVocab::SystemVocabs.data_formats_controlled_vocab
+    data_file = Factory(:data_file)
+    login_as(data_file.contributor)
+
+    put :update, params: { id: data_file, data_file: { data_format_annotations: ['', 'JSON'], data_type_annotations: ['', 'Sequence features metadata', 'Data'] }}
+
+    data_file = assigns(:data_file)
+    assert_redirected_to data_file_path(data_file)
+
+
+    assert_equal ['http://edamontology.org/data_2914', 'http://edamontology.org/data_0006'], data_file.data_type_annotations
+    assert_equal ['http://edamontology.org/format_3464'], data_file.data_format_annotations
+  end
+
   private
 
   def data_file_with_extracted_samples(contributor = User.current_user.person)
