@@ -16,19 +16,11 @@ class SampleApiTest < ActionDispatch::IntegrationTest
   def setup
     user_login
 
-    @sample = Factory(:sample, contributor: current_person, policy: Factory(:public_policy))
-
-    @project = Factory(:min_project)
-    @project.title = 'testProject'
-
-    institution = Factory(:institution)
-    current_person.add_to_project_and_institution(@project, institution)
-    @sample_type = SampleType.new(title: "vahidSampleType", project_ids: [@project.id], contributor: current_person)
-    @sample_type.sample_attributes << Factory(:sample_attribute, title: 'the_title', is_title: true, required: true, sample_attribute_type: Factory(:string_sample_attribute_type), sample_type: Factory(:simple_sample_type))
-    @sample_type.sample_attributes << Factory(:sample_attribute, title: 'a_real_number', sample_attribute_type: Factory(:float_sample_attribute_type), required: false, sample_type: @sample_type)
-    @sample_type.save!
-
+    @sample = Factory(:max_sample, contributor: current_person, policy: Factory(:public_policy))
+    @sample_type = @sample.sample_type
+    @project = @sample.projects.first
     @assay = Factory(:assay, contributor: current_person)
+
   end
 
   test 'patching a couple of attributes retains others' do
@@ -130,6 +122,59 @@ class SampleApiTest < ActionDispatch::IntegrationTest
     assert_equal "Jack Frost", sample.get_attribute_value("full name")
     assert_equal 12.4, sample.get_attribute_value("weight")
     assert_equal 12, sample.get_attribute_value("age")
+  end
+
+  test 'create with multi sample and cv list' do
+    user_login
+    max_sample_type = Factory(:max_sample_type)
+    patients = [Factory(:patient_sample), Factory(:patient_sample)]
+
+    params = {
+      "data": {
+        "type": "samples",
+        "attributes": {
+          "attribute_map": {
+            "full_name": "Fred Bloggs",
+            "apple": "Bramley",
+            "apples": "Golden Delicious, Granny Smith",
+            "patients": "#{patients.collect(&:id).join(', ')}"
+
+          },
+        },
+        "relationships": {
+          "projects": {
+            "data":
+              [
+                {
+                  "type": "projects",
+                  "id": "#{current_person.projects.first.id}"
+                }
+              ]
+          },
+          "sample_type": {
+            "data": {
+              "id": "#{max_sample_type.id}",
+              "type": "sample_types"
+            }
+          }
+        }
+      }
+    }
+
+    assert_difference('Sample.count') do
+      post samples_path(format: :json), params: params, as: :json
+    end
+    assert_response :success
+
+    sample = Sample.last
+    assert_equal 'Fred Bloggs', sample.title
+    assert_equal 'Fred Bloggs', sample.get_attribute_value(:full_name)
+    assert_equal 'Bramley', sample.get_attribute_value(:apple)
+    assert_equal ['Golden Delicious', 'Granny Smith'], sample.get_attribute_value(:apples)
+    assert_equal patients, sample.linked_samples
+    assert_equal patients.collect(&:id), sample.get_attribute_value(:patients).collect{|p| p['id']}
+
+
   end
 
   test 'batch create' do 

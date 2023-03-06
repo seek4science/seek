@@ -11,6 +11,7 @@ module Seek
         end
 
         def convert(value)
+          value = value.split(',').collect(&:strip) if value.is_a?(String)
           value.compact_blank
         end
       end

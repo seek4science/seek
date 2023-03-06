@@ -814,7 +814,10 @@ projectMembersList:
 sampleAttributeMap:
   type: object
   additionalProperties:
-    type: string
+    anyOf:
+      - type: string
+      - type: array
+      - type: 'null'
 # --- Types ---
 anyType:
   type: string

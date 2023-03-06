@@ -5,7 +5,7 @@
     "attributes": {
       "discussion_links": [],
       "title": "Fred Bloggs",
-      "tags": [],
+      "tags": ["tag1","tag2"],
       "created_at": "<%= res.created_at.as_json %>",
       "updated_at": "<%= res.updated_at.as_json %>",
       "other_creators": null,
@@ -14,7 +14,21 @@
         "full_name": "Fred Bloggs",
         "address": "HD",
         "postcode": "M13 9PL",
-        "CAPITAL key": "key must remain capitalised"
+        "CAPITAL key": "key must remain capitalised",
+        "apple": "Bramley",
+        "apples": ["Granny Smith", "Golden Delicious"],
+        "patients": [
+          {
+            "type": "Sample",
+            "title": "Fred Bloggs",
+            "id": <%= res.get_attribute_value(:patients)[0]['id'] %>
+          },
+          {
+            "type": "Sample",
+            "title": "Fred Bloggs",
+            "id": <%= res.get_attribute_value(:patients)[1]['id'] %>
+          }
+        ]
       },
       "policy": {
         "access": "no_access",
