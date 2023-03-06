@@ -608,7 +608,8 @@ class ApplicationController < ActionController::Base
       if metadata_type
         keys = [:custom_metadata_type_id,:id]
         cma= []
-        metadata_type.custom_metadata_attributes.reject{|m| m.seek_custom_metadata?}.each do |attr|
+        # metadata_type.custom_metadata_attributes.reject{|m| m.seek_custom_metadata?}.each do |attr|
+        metadata_type.custom_metadata_attributes.each do |attr|
           if attr.seek_cv_list?
             cma << {attr.title=>[]}
             cma << attr.title.to_s

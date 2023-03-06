@@ -9,6 +9,7 @@ class CustomMetadata < ApplicationRecord
   has_many :linked_custom_metadatas, through: :custom_metadata_resource_links, source: :resource, source_type: 'CustomMetadata', dependent: :destroy
 
   validates_with CustomMetadataValidator
+  validates_associated :linked_custom_metadatas
 
   delegate :custom_metadata_attributes, to: :custom_metadata_type
 
@@ -44,8 +45,8 @@ class CustomMetadata < ApplicationRecord
   end
 
 
-  def set_linked_custom_metadatas(cma, cm_params, new_record)
-      if new_record
+  def set_linked_custom_metadatas(cma, cm_params)
+      if item.new_record?
         self.linked_custom_metadatas.build(custom_metadata_type: cma.linked_custom_metadata_type,
                                            data: cm_params[:data][cma.linked_custom_metadata_type.title.to_sym][:data])
       else

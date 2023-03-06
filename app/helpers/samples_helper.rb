@@ -46,18 +46,32 @@ module SamplesHelper
 
 
 
-def linked_custom_metadata_type_form_field(attribute,resource,value,element_name, element_class)
+def seek_custom_metadata_form_field(attribute,resource,value,element_name, element_class)
 
   html = ''
+
+  # html += '<div class="form-group" style="padding-left: 150px;"></div>'
   html +=  hidden_field_tag "#{element_name}[id]", value
   html +=  hidden_field_tag "#{element_name}[custom_metadata_type_id]", attribute.linked_custom_metadata_type.id
-  resource = CustomMetadata.find(value) unless value.blank?
+
+  linked_resource = value.nil? ? CustomMetadata.new(custom_metadata_type: attribute.linked_custom_metadata_type) : CustomMetadata.find(value)
+
+  root_key = controller_name.singularize.to_sym
+
+  unless params[root_key].nil?
+    # attribute_params = params[controller_name.singularize.to_sym][:custom_metadata_attributes]
+    linked_data = params[root_key][:custom_metadata_attributes][:data][attribute.title.to_sym][:data].permit!.to_hash
+    linked_resource.data.mass_assign(linked_data)
+  end
+
   attribute.linked_custom_metadata_type.custom_metadata_attributes.each do |attr|
     attr_element_name = "#{element_name}][data][#{attr.title}]"
     html += '<div class="form-group"><label>'+attr.label+'</label>'
-    html +=  attribute_form_element(attr, resource, attr_element_name, element_class)
+    html +=  required_span if attr.required?
+    html +=  attribute_form_element(attr, linked_resource, attr_element_name, element_class)
     html += '</div>'
   end
+  # html += '</div>'
   html.html_safe
 end
 
@@ -291,7 +305,7 @@ end
     when Seek::Samples::BaseType::SEEK_SAMPLE_MULTI
       sample_multi_form_field attribute, element_name, value
     when Seek::Samples::BaseType::SEEK_CUSTOM_METADATA
-      linked_custom_metadata_type_form_field attribute, resource, value, element_name, element_class
+      seek_custom_metadata_form_field attribute, resource, value, element_name, element_class
     else
       text_field_tag element_name, value, class: "form-control #{element_class}", placeholder: placeholder
     end

@@ -140,7 +140,7 @@ module Seek
       return if seek_cm_attrs.blank?
 
       seek_cm_attrs.each  do |cma|
-          item.custom_metadata.set_linked_custom_metadatas(cma, cm_attr_params, item.new_record?)
+          item.custom_metadata.set_linked_custom_metadatas(cma, cm_attr_params)
         end
       end
 
