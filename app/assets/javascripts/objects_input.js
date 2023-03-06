@@ -3,7 +3,8 @@ $j(document).ready(function () {
 
         var opts = {
             placeholder: 'Search ...',
-            theme: "bootstrap"
+            theme: "bootstrap",
+            width: '100%'
         };
 
         if ($j(this).data('tags-limit')) {
