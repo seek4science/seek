@@ -355,7 +355,7 @@ class WorkflowsController < ApplicationController
                                      { publication_ids: [] }, { presentation_ids: [] }, { document_ids: [] }, { data_file_ids: [] }, { sop_ids: [] },
                                      { workflow_data_files_attributes:[:id, :data_file_id, :workflow_data_file_relationship_id, :_destroy] },
                                      :internals, :maturity_level, :source_link_url,
-                                     { topic_annotations: [] }, :topic_annotations, { operation_annotations: [] }, :operation_annotations,
+                                     { topic_annotations: [] }, { operation_annotations: [] },
                                      { discussion_links_attributes: [:id, :url, :label, :_destroy] },
                                      { git_version_attributes: [:name, :comment, :ref, :commit, :root_path,
                                                                 :git_repository_id, :main_workflow_path,
