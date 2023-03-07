@@ -538,22 +538,58 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
         'url' => { '@id' => 'https://www.commonwl.org/' }
       },
       'isPartOf' => [],
-      'input' => %w[#main/max-steps #main/reverse #main/rulesfile #main/sinkfile #main/sourcefile].map do |i|
+      'input' => [
         {
           '@type' => 'FormalParameter',
-          '@id' => "\##{expected_wf_prefix}-inputs-#{i}",
-          'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-          'name' => i
-        }
-      end,
-      'output' => %w[#main/compounds #main/reactions #main/sinks].map do |o|
+          '@id' => '#this_workflow-inputs-%23main/max-steps',
+          'name' => '#main/max-steps',
+          'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE
+        },
         {
           '@type' => 'FormalParameter',
-          '@id' => "\##{expected_wf_prefix}-outputs-#{o}",
+          '@id' => '#this_workflow-inputs-%23main/reverse',
+          'name' => '#main/reverse',
+          'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE
+        },
+        {
+          '@type' => 'FormalParameter',
+          '@id' => '#this_workflow-inputs-%23main/rulesfile',
           'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-          'name' => o
+          'name' => '#main/rulesfile'
+        },
+        {
+          '@type' => 'FormalParameter',
+          '@id' => '#this_workflow-inputs-%23main/sinkfile',
+          'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
+          'name' => '#main/sinkfile'
+        },
+        {
+          '@type' => 'FormalParameter',
+          '@id' => '#this_workflow-inputs-%23main/sourcefile',
+          'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
+          'name' => '#main/sourcefile'
         }
-      end
+      ],
+      'output' => [
+        {
+          '@type' => 'FormalParameter',
+          '@id' => '#this_workflow-outputs-%23main/compounds',
+          'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
+          'name' => '#main/compounds'
+        },
+        {
+          '@type' => 'FormalParameter',
+          '@id' => '#this_workflow-outputs-%23main/reactions',
+          'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
+          'name' => '#main/reactions'
+        },
+        {
+          '@type' => 'FormalParameter',
+          '@id' => '#this_workflow-outputs-%23main/sinks',
+          'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
+          'name' => '#main/sinks'
+        }
+      ]
     }
 
     json = JSON.parse(workflow.to_schema_ld)
