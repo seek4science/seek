@@ -7,6 +7,10 @@ $j(document).ready(function () {
             width: '100%'
         };
 
+        if ($j(this).data('placeholder')) {
+            opts.placeholder = $j(this).data('placeholder');
+        }
+
         if ($j(this).data('tags-limit')) {
             opts.maximumSelectionLength = $j(this).data('tags-limit');
         }

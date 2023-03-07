@@ -125,6 +125,7 @@ module BootstrapHelper
     options['data-role'] = 'seek-objectsinput'
     options['data-tags-limit'] = options.delete(:limit) if options[:limit]
     options['data-allow-new-items'] = options.delete(:allow_new) if options[:allow_new]
+    options['data-placeholder'] = options.delete(:placeholder) if options[:placeholder]
     options[:include_blank] = ''
     options[:multiple] = true
     options[:name] = "#{element_name}[]" unless options.key?(:name)
@@ -231,7 +232,6 @@ module BootstrapHelper
 
   def typeahead_options(typeahead_opts)
     options = {}
-    options[:placeholder] ||= ' ' * 20
 
     options['data-typeahead-local-values'] = typeahead_opts[:values].to_json if typeahead_opts[:values]
     options['data-typeahead-query-url'] = typeahead_opts[:query_url] if typeahead_opts[:query_url]
