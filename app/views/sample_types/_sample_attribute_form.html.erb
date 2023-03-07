@@ -58,7 +58,7 @@
     <div class='controlled-vocab-block' style="<%= 'display:none;' unless sample_attribute.try(:controlled_vocab?) || sample_attribute.try(:seek_cv_list?) %>">
       <br/>
       <%= select_tag "#{field_name_prefix}[sample_controlled_vocab_id]",
-                     options_for_select(SampleControlledVocab.all.map { |t| [t.title, t.id, {'data-editable'=>t.can_edit?, 'data-is-ontology'=>t.custom_input}] },
+                     options_for_select(SampleControlledVocab.all.map { |scv| [scv.title, scv.id, {'data-editable'=>scv.can_edit?, 'data-is-ontology'=>scv.custom_input?}] },
                                         sample_controlled_vocab_id),
                      include_blank: true,
                      class: 'form-control controlled-vocab-selection',

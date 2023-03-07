@@ -8,10 +8,8 @@ module SamplesHelper
 
   def controlled_vocab_form_field(sample_controlled_vocab, element_name, values, limit=1)
       scv_id = sample_controlled_vocab.id
-      is_ontology = sample_controlled_vocab.source_ontology.present?
       object_struct = Struct.new(:id, :title)
       existing_objects = Array(values).collect do |value|
-        #term = sample_controlled_vocab.sample_controlled_vocab_terms.find_by_label(value)
         object_struct.new(value, value)
       end
 
@@ -32,7 +30,9 @@ module SamplesHelper
 
       objects_input(element_name, existing_objects,
                     typeahead: typeahead,
-                    limit: limit, ontology: is_ontology, class: 'form-control')
+                    limit: limit,
+                    allow_new: sample_controlled_vocab.custom_input?,
+                    class: 'form-control')
   end
 
   def controlled_vocab_list_form_field(sample_controlled_vocab, element_name, values)
