@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "44",
+    "id": "1",
     "type": "data_files",
     "attributes": {
       "policy": {
@@ -8,7 +8,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "165",
+              "id": "2",
               "type": "projects"
             },
             "access": "edit"
@@ -31,14 +31,14 @@
         {
           "version": 1,
           "revision_comments": null,
-          "url": "http://localhost:3000/data_files/44?version=1",
+          "url": "http://localhost:3000/data_files/1?version=1",
           "doi": null
         }
       ],
       "version": 1,
       "revision_comments": null,
-      "created_at": "2022-07-22T12:42:12.000Z",
-      "updated_at": "2022-07-22T12:42:12.000Z",
+      "created_at": "2023-03-07T10:50:32.823Z",
+      "updated_at": "2023-03-07T10:50:33.024Z",
       "doi": null,
       "content_blobs": [
         {
@@ -47,26 +47,38 @@
           "md5sum": "565ae8a7a743c3bfd9f15c69647f5b8b",
           "sha1sum": "b9d2148740050b7f37975edd0fb97faa508ff767",
           "content_type": "application/pdf",
-          "link": "http://localhost:3000/data_files/44/content_blobs/80",
+          "link": "http://localhost:3000/data_files/1/content_blobs/1",
           "size": 8827
         }
       ],
       "creators": [
         {
-          "profile": "/people/218",
+          "profile": "/people/3",
           "family_name": "Last",
           "given_name": "Person185",
           "affiliation": "An Institution: 218",
           "orcid": null
         }
       ],
-      "other_creators": "John Smith, Jane Smith"
+      "other_creators": "John Smith, Jane Smith",
+      "data_type_annotations": [
+        {
+          "label": "Sequence features metadata",
+          "identifier": "http://edamontology.org/data_2914"
+        }
+      ],
+      "data_format_annotations": [
+        {
+          "label": "JSON",
+          "identifier": "http://edamontology.org/format_3464"
+        }
+      ]
     },
     "relationships": {
       "creators": {
         "data": [
           {
-            "id": "218",
+            "id": "3",
             "type": "people"
           }
         ]
@@ -74,7 +86,7 @@
       "submitter": {
         "data": [
           {
-            "id": "217",
+            "id": "2",
             "type": "people"
           }
         ]
@@ -82,11 +94,11 @@
       "people": {
         "data": [
           {
-            "id": "217",
+            "id": "2",
             "type": "people"
           },
           {
-            "id": "218",
+            "id": "3",
             "type": "people"
           }
         ]
@@ -94,7 +106,7 @@
       "projects": {
         "data": [
           {
-            "id": "165",
+            "id": "2",
             "type": "projects"
           }
         ]
@@ -102,7 +114,7 @@
       "investigations": {
         "data": [
           {
-            "id": "33",
+            "id": "1",
             "type": "investigations"
           }
         ]
@@ -110,7 +122,7 @@
       "studies": {
         "data": [
           {
-            "id": "33",
+            "id": "1",
             "type": "studies"
           }
         ]
@@ -118,7 +130,7 @@
       "assays": {
         "data": [
           {
-            "id": "33",
+            "id": "1",
             "type": "assays"
           }
         ]
@@ -126,7 +138,7 @@
       "publications": {
         "data": [
           {
-            "id": "33",
+            "id": "1",
             "type": "publications"
           }
         ]
@@ -134,7 +146,7 @@
       "events": {
         "data": [
           {
-            "id": "33",
+            "id": "1",
             "type": "events"
           }
         ]
@@ -142,7 +154,7 @@
       "workflows": {
         "data": [
           {
-            "id": "33",
+            "id": "1",
             "type": "workflows"
           }
         ]
@@ -155,14 +167,14 @@
       }
     },
     "links": {
-      "self": "/data_files/44?version=1"
+      "self": "/data_files/1?version=1"
     },
     "meta": {
-      "created": "2022-07-22T12:42:12.000Z",
-      "modified": "2022-07-22T12:42:12.000Z",
+      "created": "2023-03-07T10:50:32.812Z",
+      "modified": "2023-03-07T10:50:33.002Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "a1dde640-ebe9-013a-1162-0a81884ed284"
+      "uuid": "cebc2810-9f03-013b-15cf-0a81884ed284"
     }
   },
   "jsonapi": {

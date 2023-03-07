@@ -40,7 +40,11 @@ Factory.define(:max_data_file, class: DataFile) do |f|
     if data_file.content_blob.blank?
       data_file.content_blob = Factory.create(:pdf_content_blob, asset: data_file, asset_version: data_file.version)
     end
-    data_file.annotate_with(['DataFile-tag1', 'DataFile-tag2', 'DataFile-tag3', 'DataFile-tag4', 'DataFile-tag5'], 'tag', data_file.contributor)
+    User.with_current_user(data_file.contributor.user) do
+      data_file.tags = ['DataFile-tag1', 'DataFile-tag2', 'DataFile-tag3', 'DataFile-tag4', 'DataFile-tag5']
+      data_file.data_type_annotations = 'Sequence features metadata'
+      data_file.data_format_annotations = 'JSON'
+    end
     data_file.save!
   end
   f.other_creators 'Blogs, Joe'
