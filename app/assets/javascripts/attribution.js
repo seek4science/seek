@@ -60,6 +60,6 @@ $j(function() {
             alert('The following entity was not added (already in the list of attributions):\n\n' +
             attributable.type + ': ' + attributable.text);
         }
-        $j('select#attribution-typeahead').val([]).trigger('change'); // clear the input
+        $j('select#attribution-typeahead').val([]).change(); // clear the input
     });
 });

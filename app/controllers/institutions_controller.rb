@@ -97,10 +97,6 @@ class InstitutionsController < ApplicationController
         hint: institution.typeahead_hint }
     end
 
-    if params[:include_new]
-      items.unshift({id:-1, text: params[:q], web_page: '', country: '', country_name: '', city: '', hint:"new item", new: true })
-    end
-
     respond_to do |format|
       format.json { render json: {results: items}.to_json }
     end

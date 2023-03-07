@@ -38,8 +38,8 @@ var Projects = {
                     }
                 });
 
-               $j('select#institution_id').val([]).trigger('change');
-               $j('select#people_ids').val([]).trigger('change');
+               $j('select#institution_id').val([]).change();
+               $j('select#people_ids').val([]).change();
             }
 
             if(errors.length > 0)

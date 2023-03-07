@@ -150,7 +150,7 @@ class ProjectsController < ApplicationController
   end
 
   def request_join
-    @projects = params[:project_ids].collect{|id| Project.find_by_id(id)}.compact
+    @projects = Project.find(params[:project_ids].compact_blank)
     raise 'no projects defined' if @projects.empty?
     @institution = Institution.find_by_id(params[:institution][:id])
     if @institution.nil?

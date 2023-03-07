@@ -611,6 +611,7 @@ class ApplicationController < ActionController::Base
         metadata_type.custom_metadata_attributes.each do |attr|
           if attr.sample_attribute_type.controlled_vocab? || attr.sample_attribute_type.seek_sample_multi?
             cma << {attr.title=>[]}
+            cma << attr.title.to_s
           else
             cma << attr.title.to_s
           end
