@@ -208,25 +208,29 @@ module BootstrapHelper
   private
 
   # sets the default options for tags, including the query_url according to type unless already specified
+  # if typeahead is set to false, there will be no autocomplete or querying
   def update_tags_input_options(options)
     options[:allow_new] = true unless options.key?(:allow_new)
-    typeahead = options[:typeahead] ||= {}
 
-    unless typeahead[:query_url]
-      typeahead[:query_url] = if typeahead[:type]
-                                query_tags_path(type: typeahead.delete(:type))
-                              else
-                                query_tags_path
-                              end
+    if options[:typeahead] == false
+      options.delete(:typeahead)
+    else
+      typeahead = options[:typeahead] ||= {}
+
+      unless typeahead[:query_url]
+        typeahead[:query_url] = if typeahead[:type]
+                                  query_tags_path(type: typeahead.delete(:type))
+                                else
+                                  query_tags_path
+                                end
+      end
     end
 
     options
   end
 
   def typeahead_options(typeahead_opts)
-    typeahead_opts = {} if typeahead_opts.is_a?(TrueClass)
     options = {}
-    options['data-typeahead'] = true
     options[:placeholder] ||= ' ' * 20
 
     options['data-typeahead-local-values'] = typeahead_opts[:values].to_json if typeahead_opts[:values]
