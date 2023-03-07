@@ -6,8 +6,8 @@ class DataFileApiTest < ActionDispatch::IntegrationTest
 
   def setup
     user_login
-    Factory(:data_types_controlled_vocab)
-    Factory(:data_formats_controlled_vocab)
+    Factory(:data_types_controlled_vocab) unless SampleControlledVocab::SystemVocabs.data_types_controlled_vocab
+    Factory(:data_formats_controlled_vocab) unless SampleControlledVocab::SystemVocabs.data_formats_controlled_vocab
     @project = @current_user.person.projects.first
     investigation = Factory(:investigation, projects: [@project], contributor: current_person)
     study = Factory(:study, investigation: investigation, contributor: current_person)

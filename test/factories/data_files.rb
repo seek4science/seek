@@ -40,6 +40,11 @@ Factory.define(:max_data_file, class: DataFile) do |f|
     if data_file.content_blob.blank?
       data_file.content_blob = Factory.create(:pdf_content_blob, asset: data_file, asset_version: data_file.version)
     end
+
+    # required for annotations
+    Factory(:data_types_controlled_vocab) unless SampleControlledVocab::SystemVocabs.data_types_controlled_vocab
+    Factory(:data_formats_controlled_vocab) unless SampleControlledVocab::SystemVocabs.data_formats_controlled_vocab
+
     User.with_current_user(data_file.contributor.user) do
       data_file.tags = ['DataFile-tag1', 'DataFile-tag2', 'DataFile-tag3', 'DataFile-tag4', 'DataFile-tag5']
       data_file.data_type_annotations = 'Sequence features metadata'

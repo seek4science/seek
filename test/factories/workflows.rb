@@ -100,8 +100,13 @@ Factory.define(:max_workflow, class: Workflow) do |f|
   f.discussion_links { [Factory.build(:discussion_link, label:'Slack')] }
   f.after_create do |workflow|
     workflow.content_blob = Factory.create(:cwl_content_blob, asset: workflow, asset_version: workflow.version)
-    workflow.annotate_with(['Workflow-tag1', 'Workflow-tag2', 'Workflow-tag3', 'Workflow-tag4', 'Workflow-tag5'], 'tag', workflow.contributor)
+
+    # required for annotations
+    Factory(:operations_controlled_vocab) unless SampleControlledVocab::SystemVocabs.operations_controlled_vocab
+    Factory(:topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.topics_controlled_vocab
+
     User.with_current_user(workflow.contributor.user) do
+      workflow.tags = ['Workflow-tag1', 'Workflow-tag2', 'Workflow-tag3', 'Workflow-tag4', 'Workflow-tag5']
       workflow.operation_annotations = 'Clustering'
       workflow.topic_annotations = 'Chemistry'
     end

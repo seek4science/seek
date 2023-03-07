@@ -47,6 +47,11 @@ Factory.define(:max_file_template, class: FileTemplate) do |f|
   f.after_create do |ft|
     ft.content_blob = Factory.create(:min_content_blob, content_type: 'application/pdf', asset: ft, asset_version: ft.version)
     ft.annotate_with(['FileTemplate-tag1', 'FileTemplate-tag2', 'FileTemplate-tag3', 'FileTemplate-tag4', 'FileTemplate-tag5'], 'tag', ft.contributor)
+
+    # required for annotations
+    Factory(:data_types_controlled_vocab) unless SampleControlledVocab::SystemVocabs.data_types_controlled_vocab
+    Factory(:data_formats_controlled_vocab) unless SampleControlledVocab::SystemVocabs.data_formats_controlled_vocab
+
     User.with_current_user(ft.contributor.user) do
       ft.data_type_annotations = 'Sequence features metadata'
       ft.data_format_annotations = 'JSON'
