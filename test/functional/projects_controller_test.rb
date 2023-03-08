@@ -3621,7 +3621,7 @@ class ProjectsControllerTest < ActionController::TestCase
     project = project_admin.projects.first
     login_as(project_admin)
 
-    put :update, params: { id: project.id, project: { topic_annotations: 'Chemistry, Sample collections' } }
+    put :update, params: { id: project.id, project: { topic_annotations: ['Chemistry', 'Sample collections'] } }
 
     assert_equal ['http://edamontology.org/topic_3314','http://edamontology.org/topic_3277'], assigns(:project).topic_annotations
 
