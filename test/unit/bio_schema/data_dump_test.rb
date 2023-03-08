@@ -86,7 +86,7 @@ class DataDumpTest < ActiveSupport::TestCase
     dump = create_workflow_dump
     dump.write
 
-    assert_equal 'workflows-bioschemas-dump.json', dump.file_name
+    assert_equal 'workflows-bioschemas-dump.jsonld', dump.file_name
     assert dump.exists?
     assert_in_delta 3800, dump.size, 500
     assert_in_delta Time.now, dump.date_modified, 60
@@ -95,7 +95,7 @@ class DataDumpTest < ActiveSupport::TestCase
   test 'can read dump metadata even if file does not yet exist' do
     dump = create_workflow_dump
 
-    assert_equal 'workflows-bioschemas-dump.json', dump.file_name
+    assert_equal 'workflows-bioschemas-dump.jsonld', dump.file_name
     refute dump.exists?
     assert_nil dump.size
     assert_nil dump.date_modified
