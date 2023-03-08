@@ -64,11 +64,15 @@ class AdminController < ApplicationController
     Seek::Config.exception_notification_enabled = string_to_boolean params[:exception_notification_enabled] if params.key?(:exception_notification_enabled)
 
     Seek::Config.error_grouping_enabled = string_to_boolean params[:error_grouping_enabled] if params.key?(:error_grouping_enabled)
-    if Seek::Config.error_grouping_enabled
+    if params.key?(:error_grouping_timeout)
       eg_timeout = params[:error_grouping_timeout]
-      eg_log_base = params[:error_grouping_log_base]
       Seek::Config.error_grouping_timeout = string_to_seconds eg_timeout if string_is_duration(eg_timeout, 'error grouping timeout')
-      Seek::Config.error_grouping_log_base = eg_log_base.to_i if only_positive_integer(eg_log_base, 'error grouping log base')
+    end
+    eg_log_base_is_pos_int = true
+    if params.key?(:error_grouping_log_base)
+      eg_log_base = params[:error_grouping_log_base]
+      eg_log_base_is_pos_int = only_positive_integer(eg_log_base, 'error grouping log base')
+      Seek::Config.error_grouping_log_base = eg_log_base.to_i if eg_log_base_is_pos_int
     end
 
     Seek::Config.omniauth_enabled = string_to_boolean params[:omniauth_enabled]
@@ -163,13 +167,16 @@ class AdminController < ApplicationController
 
     Seek::Config.bio_tools_enabled = string_to_boolean(params[:bio_tools_enabled])
 
-    time_lock_doi_for = params[:time_lock_doi_for]
-    time_lock_is_integer = only_integer time_lock_doi_for, 'time lock doi for'
-    Seek::Config.time_lock_doi_for = time_lock_doi_for.to_i if time_lock_is_integer
+    time_lock_is_integer = true
+    if params.key?(:time_lock_doi_for)
+      time_lock_doi_for = params[:time_lock_doi_for]
+      time_lock_is_integer = only_integer time_lock_doi_for, 'time lock doi for'
+      Seek::Config.time_lock_doi_for = time_lock_doi_for.to_i if time_lock_is_integer
+    end
 
     Seek::Util.clear_cached
 
-    validation_flag = time_lock_is_integer && port_is_integer
+    validation_flag = time_lock_is_integer && port_is_integer && eg_log_base_is_pos_int
     update_redirect_to validation_flag, 'features_enabled'
   end
 
