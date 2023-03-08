@@ -28,33 +28,15 @@
           Published
         </span>
     <% elsif item.can_publish? %>
-      <div class="btn-group" >
-        <button type="button" class="btn publish-checkbox" style="height:35px;">
-          <label style="font-weight:normal;">
-            <%= check_box_tag publishing_item_param(item), 1, checked,
-                                   {:class=>"#{item.class.name}_#{item.id}",
-                                    :onclick=>"checkRepeatedItems(this)"} -%>
-            Publish?
-          </label>
-        </button>
-        <% if children.any? %>
-          <button type="button" class="btn publish-checkbox dropdown-toggle" data-toggle="dropdown"
-                  aria-haspopup="true" aria-expanded="false" style="height:35px">
-            <span class="caret"></span>
-            <span class="sr-only">Toggle Dropdown</span>
-          </button>
-          <ul class="dropdown-menu text-left" role="menu" style="width: 350px;" role="menu">
-            <li><a href="#" onclick="selectChildren(this); return false;">
-              <%= image('checkbox_select_all', options = {height: 35}) %>
-              Select this item and all of its sub-items. </a></li>
-            <li><a href="#" onclick="deselectChildren(this); return false;">
-              <%= image('checkbox_deselect_all', options = {height: 35}) %>
-              Deselect this item and all of its sub-items. </a></li>
-          </ul>
-        <% end %>
-      </div>
+      <%= render :partial => 'general/split_button_checkbox',
+                locals: { checkbox_id: publishing_item_param(item),
+                          checkbox_class: "#{item.class.name}_#{item.id}",
+                          checkbox_text: "Publish?",
+                          checked: checked,
+                          toggle: children.any?,
+                          extra_nesting: 1 } -%>
     <% else %>
-        <span class="label label-warning" data-tooltip="<%= tooltip('You do not have permission to pubish this item.') %>">
+        <span class="label label-warning" data-tooltip="<%= tooltip('You do not have permission to publish this item.') %>">
           <span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span>
           Can't publish
         </span>
