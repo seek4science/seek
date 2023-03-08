@@ -42,7 +42,7 @@ module Seek
       end
 
       def file_name
-        "#{@name}-bioschemas-dump.json"
+        "#{@name}-bioschemas-dump.jsonld"
       end
 
       def exists?

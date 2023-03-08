@@ -899,7 +899,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                           'contentSize' => size,
                           'contentUrl' => 'http://localhost:3000/workflows.jsonld?dump=true',
                           'encodingFormat' => 'application/ld+json',
-                          'name' => 'workflows-bioschemas-dump.json',
+                          'name' => 'workflows-bioschemas-dump.jsonld',
                           'description' => 'A collection of public Workflows in Sysmo SEEK, serialized as an array of JSON-LD objects conforming to Bioschemas profiles.',
                           'dateModified' => time.iso8601 },
       'includedInDataCatalog' => { '@id' => 'http://localhost:3000' }
