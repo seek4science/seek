@@ -283,8 +283,8 @@ class AdminControllerTest < ActionController::TestCase
 
   test 'update error_grouping_timeout' do
     # Checks for warnings when not setting error_grouping_timeout
-    with_config_value(:filtering_enabled, 'True') do
-      post :update_features_enabled, params: { filtering_enabled: 'False' }
+    with_config_value(:filtering_enabled, true) do
+      post :update_features_enabled, params: { filtering_enabled: '0' }
       assert_nil flash[:error]
     end
     # Checks setting error_grouping_timeout
@@ -305,8 +305,8 @@ class AdminControllerTest < ActionController::TestCase
 
   test 'update error_grouping_log_base' do
     # Checks for warnings when not setting error_grouping_log_base
-    with_config_value(:filtering_enabled, 'True') do
-      post :update_features_enabled, params: { filtering_enabled: 'False' }
+    with_config_value(:filtering_enabled, true) do
+      post :update_features_enabled, params: { filtering_enabled: '0' }
       assert_nil flash[:error]
     end
     # Checks setting error_grouping_log_base
