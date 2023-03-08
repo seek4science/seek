@@ -174,6 +174,57 @@ class SampleApiTest < ActionDispatch::IntegrationTest
     assert_equal patients, sample.linked_samples
     assert_equal patients.collect(&:id), sample.get_attribute_value(:patients).collect{|p| p['id']}
 
+  end
+
+  test 'create with multi sample and cv list - as array' do
+    user_login
+    max_sample_type = Factory(:max_sample_type)
+    patients = [Factory(:patient_sample), Factory(:patient_sample)]
+
+    params = {
+      "data": {
+        "type": "samples",
+        "attributes": {
+          "attribute_map": {
+            "full_name": "Fred Bloggs",
+            "apple": "Bramley",
+            "apples": ["Golden Delicious", "Granny Smith"],
+            "patients": patients.collect(&:id)
+
+          },
+        },
+        "relationships": {
+          "projects": {
+            "data":
+              [
+                {
+                  "type": "projects",
+                  "id": "#{current_person.projects.first.id}"
+                }
+              ]
+          },
+          "sample_type": {
+            "data": {
+              "id": "#{max_sample_type.id}",
+              "type": "sample_types"
+            }
+          }
+        }
+      }
+    }
+
+    assert_difference('Sample.count') do
+      post samples_path(format: :json), params: params, as: :json
+    end
+    assert_response :success
+
+    sample = Sample.last
+    assert_equal 'Fred Bloggs', sample.title
+    assert_equal 'Fred Bloggs', sample.get_attribute_value(:full_name)
+    assert_equal 'Bramley', sample.get_attribute_value(:apple)
+    assert_equal ['Golden Delicious', 'Granny Smith'], sample.get_attribute_value(:apples)
+    assert_equal patients, sample.linked_samples
+    assert_equal patients.collect(&:id), sample.get_attribute_value(:patients).collect{|p| p['id']}
 
   end
 
