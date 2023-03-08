@@ -20,7 +20,6 @@ $j(document).ready(function () {
         }
 
         if ($j(this).data('typeahead-local-values')) {
-            console.log($j(this).data('typeahead-local-values'));
             opts.data = $j(this).data('typeahead-local-values');
         }
 

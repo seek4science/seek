@@ -50,7 +50,6 @@
 
         $j('select#institution_id').on('select2:select', function(event) {
             var data = event.params.data;
-            console.log(data);
             if (data.id==data.text) { //new record
                 toggleUserInput(false);
             }
