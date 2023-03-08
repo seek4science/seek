@@ -2,7 +2,7 @@ require 'test_helper'
 
 class BaseTypeTest < ActiveSupport::TestCase
   test 'all types' do
-    assert_equal %w(Integer Float String DateTime Date Text Boolean SeekStrain SeekSample SeekSampleMulti CV SeekDataFile CVList).sort,
+    assert_equal %w(Integer Float String DateTime Date Text Boolean SeekStrain SeekSample SeekSampleMulti CV SeekDataFile CVList SeekCustomMetadata).sort,
                  Seek::Samples::BaseType::ALL_TYPES.sort
   end
 
