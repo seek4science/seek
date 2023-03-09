@@ -28,7 +28,7 @@
           <%= error_messages_for :workflow -%>
           <%= error_messages_for :crate_builder, header_message: "Could not build Workflow RO-Crate" -%>
 
-          <%= panel do %>
+          <%= panel(nil, id: 'main-workflow-panel') do %>
             <div class="form-group">
               <label class="required">Workflow</label>
               <p class="help-block">The main executable workflow.</p>
@@ -43,8 +43,8 @@
             <script>
                 // Auto-select workflow class based on file extension.
                 $j(document).ready(function () {
-                    $j('#ro_crate_main_workflow_data').change(function () {
-                        var parts = $j(this).val().split('.');
+                    var selectWorkflowClass = function (filename) {
+                        var parts = filename.split('.');
                         var ext = parts[parts.length - 1];
                         $j('#workflow_class_id option').each(function () {
                             var o = $j(this);
@@ -52,6 +52,14 @@
                                 $j('#workflow_class_id').val(o.val());
                             }
                         });
+                    }
+                    $j('#main-workflow-panel [data-role="seek-url-checker"]').on('urlChecked', function () {
+                        setTimeout(function () {
+                            selectWorkflowClass($j('#ro_crate_main_workflow_original_filename').val());
+                        }, 100);
+                    });
+                    $j('#ro_crate_main_workflow_data').change(function () {
+                        selectWorkflowClass($j(this).val());
                     });
                 });
             </script>
