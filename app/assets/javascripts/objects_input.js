@@ -1,5 +1,5 @@
 function loadObjectInputs(elem) {
-    (elem.item || $j('[data-role="seek-objectsinput"]')).each(function () {
+    (elem?.item || $j('[data-role="seek-objectsinput"]')).each(function () {
         var options = { tagClass: 'label label-default',
             itemValue: 'id',
             itemText: 'name'
