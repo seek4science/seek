@@ -122,3 +122,50 @@ Factory.define(:study_custom_metadata_type_for_MIAPPE, class: CustomMetadataType
     a.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, title:'cultural_practices')
   end
 end
+
+# for testing linked custom metadata
+Factory.define(:first_name_custom_metadata_attribute,class:CustomMetadataAttribute) do |f|
+  f.title 'first_name'
+  f.association :sample_attribute_type, factory: :string_sample_attribute_type
+end
+
+Factory.define(:last_name_custom_metadata_attribute,class:CustomMetadataAttribute) do |f|
+  f.title 'last_name'
+  f.association :sample_attribute_type, factory: :string_sample_attribute_type
+end
+
+Factory.define(:role_email_custom_metadata_attribute,class:CustomMetadataAttribute) do |f|
+  f.title 'role_email'
+  f.association :sample_attribute_type, factory: :string_sample_attribute_type
+end
+
+Factory.define(:role_phone_custom_metadata_attribute,class:CustomMetadataAttribute) do |f|
+  f.title 'role_phone'
+  f.association :sample_attribute_type, factory: :string_sample_attribute_type
+end
+
+
+Factory.define(:role_name_custom_metadata_type,class:CustomMetadataType) do |f|
+  f.title 'role_name'
+  f.supported_type 'Study'
+  f.after_build do |a|
+    a.custom_metadata_attributes << Factory(:first_name_custom_metadata_attribute,required: true)
+    a.custom_metadata_attributes << Factory(:last_name_custom_metadata_attribute, required: true)
+  end
+end
+
+Factory.define(:role_name_linked_custom_metadata_attribute,class:CustomMetadataAttribute) do |f|
+  f.title 'role_name'
+  f.association :sample_attribute_type, factory: :custom_metadata_sample_attribute_type
+  f.association :linked_custom_metadata_type, factory: :role_name_custom_metadata_type
+end
+
+Factory.define(:role_custom_metadata_type,class:CustomMetadataType) do |f|
+  f.title 'role'
+  f.supported_type 'Study'
+  f.after_build do |a|
+    a.custom_metadata_attributes << Factory(:role_email_custom_metadata_attribute,required: true)
+    a.custom_metadata_attributes << Factory(:role_phone_custom_metadata_attribute,required: true)
+    a.custom_metadata_attributes << Factory(:role_name_linked_custom_metadata_attribute)
+  end
+end

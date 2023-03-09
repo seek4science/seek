@@ -130,9 +130,10 @@ module Seek
 
       root_key = controller_name.singularize.to_sym
       cm_attr_params = parameters[root_key][:custom_metadata_attributes]
-      cmt_id = cm_attr_params[:custom_metadata_type_id]
 
-      # return when no custom metadata type is selected.
+      # return no custom metdata type is selected
+      return if cm_attr_params.blank?
+      cmt_id = cm_attr_params[:custom_metadata_type_id]
       return if cmt_id.blank?
 
       # return no custom metdata is filled
