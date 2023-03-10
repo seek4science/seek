@@ -19,6 +19,10 @@ class DataDumpTest < ActiveSupport::TestCase
       assert_equal "http://localhost:3000/workflows/#{workflow.id}", bioschemas['@id']
       assert_equal workflow.title, bioschemas['name']
     end
+    @private_workflows.each do |workflow|
+      bioschemas = json.detect { |w| w['url'] == "http://localhost:3000/workflows/#{workflow.id}"}
+      refute bioschemas, 'Should not include private resources'
+    end
   end
 
   test 'can overwrite existing dump' do
@@ -67,6 +71,10 @@ class DataDumpTest < ActiveSupport::TestCase
       assert_equal "http://localhost:3000/workflows/#{workflow.id}", bioschemas['@id']
       assert_equal workflow.title, bioschemas['name']
     end
+    @private_workflows.each do |workflow|
+      bioschemas = array.detect { |w| w['url'] == "http://localhost:3000/workflows/#{workflow.id}"}
+      refute bioschemas, 'Should not include private resources'
+    end
   end
 
   test 'can iterate bioschemas from dump' do
@@ -107,6 +115,12 @@ class DataDumpTest < ActiveSupport::TestCase
     assert types.length > 3
     types.each do |type|
       refute Seek::BioSchema::DataDump.new(type).exists?
+      if type.method_defined?(:policy=)
+        public_resource = Factory(type.name.underscore.to_sym, policy: Factory(:public_policy))
+        private_resource = Factory(type.name.underscore.to_sym, policy: Factory(:private_policy))
+      else
+        resource = Factory(type.name.underscore.to_sym)
+      end
     end
 
     dumps = Seek::BioSchema::DataDump.generate_dumps
@@ -116,6 +130,15 @@ class DataDumpTest < ActiveSupport::TestCase
       dump = dumps.detect { |d| d.name == type.model_name.plural }
       assert dump.exists?
       assert dump.size > 1
+      json = JSON.parse(dump.file.read)
+      assert json.any?
+      json.each do |i|
+        id = i['url'].split('/').last
+        item = type.find_by_id(id)
+        assert item, "#{type.name} #{id} included in dump but does not exist!"
+        assert !item.respond_to?(:public?) || item.public?, "#{type.name} #{id} included in dump even though it is not public!"
+      end
+
     end
   end
 
@@ -134,6 +157,9 @@ class DataDumpTest < ActiveSupport::TestCase
   def create_workflow_dump
     Workflow.delete_all
     @workflows = FactoryGirl.create_list(:public_workflow, 3)
+    @private_workflows = [Factory(:workflow, policy: Factory(:private_policy)),
+                          Factory(:workflow, policy: Factory(:all_sysmo_viewable_policy))]
+
     Seek::BioSchema::DataDump.new(Workflow)
   end
 end
