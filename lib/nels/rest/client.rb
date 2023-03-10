@@ -80,9 +80,9 @@ module Nels
       end
 
       def upload_metadata(project_id, dataset_id, subtype_name, file_path)
-        perform("seek/sbi/projects/#{project_id}/datasets/#{dataset_id}/#{subtype_name}/metadata", :post,
-                body: IO.read(file_path),
-                content_type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        upload_url = "#{base}/v2/seek/sbi/projects/#{project_id}/datasets/#{dataset_id}/#{subtype_name}/metadata"
+        RestClient.post(upload_url, {file: File.new(file_path, 'rb')}, {accept: '*/*'})
+
       end
 
       def delete_metadata(project_id, dataset_id, subtype_name, _file_path)
