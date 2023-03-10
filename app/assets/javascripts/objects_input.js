@@ -8,7 +8,7 @@ var ObjectsInput = {
                 return true;
             }
 
-            let opts = {
+            const opts = {
                 placeholder: 'Search ...',
                 theme: "bootstrap",
                 width: '100%'
