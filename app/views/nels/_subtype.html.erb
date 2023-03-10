@@ -30,6 +30,14 @@ table, th, td {
                                                          dataset_id: @dataset_id,
                                                          subtype_name: @subtype_name},
                        method: :get) %>
+    <% if @assay && params[:assay_id]%>
+      <%= button_link_to('Register metadata', 'add', nil, class: 'btn btn-primary', id: 'register-nels-metadata-button') %>
+      <%= form_tag(register_nels_path(:assay_id=>params[:assay_id]), method: :post, id: 'register-nels-metadata') do %>
+        <%= hidden_field_tag('project_id', @project_id) %>
+        <%= hidden_field_tag('dataset_id', @dataset_id) %>
+        <%= hidden_field_tag('subtype_name', @subtype_name) %>
+      <% end %>
+    <% end %>
   <% end %>
 </p>
 
@@ -84,6 +92,10 @@ table, th, td {
   $j(document).ready(function () {
 
     sessionStorage.setItem('nels_folder_state','Folder 1/Folder 2')
+
+    $j('#register-nels-metadata-button').click(function() {
+        $j('#register-nels-metadata').submit();
+    })
 
     $j('.nels-folder').click(function() {
       updateFolderList($j(this).attr('path'));

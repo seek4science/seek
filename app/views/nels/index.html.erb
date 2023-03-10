@@ -135,7 +135,7 @@
 
           folder_path = `Storebioinfo/${project_name}/${data.node.data.dataset_name}/${data.node.data.text}/`;
 
-          $j.ajax({ url: '<%= subtype_nels_path() -%>',
+          $j.ajax({ url: '<%= subtype_nels_path(:assay_id=>params[:assay_id]) -%>',
             data: {
               project_id: data.node.data.project_id,
               dataset_id: data.node.data.dataset_id,
