@@ -868,8 +868,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     resource = Seek::BioSchema::Dataset.new(Workflow)
     dump = Workflow.public_schema_ld_dump
     refute dump.exists?
-    json = JSON.parse(resource.to_schema_ld)
-    assert_equal expected, json
+    with_config_value(:metadata_license, 'CC0-1.0') do
+      json = JSON.parse(resource.to_schema_ld)
+      assert_equal expected, json
+    end
   end
 
   test 'dataset with data dump' do
@@ -890,7 +892,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'name' => 'Workflows',
       'url' => 'http://localhost:3000/workflows',
       'keywords' => [],
-      'license' => 'https://creativecommons.org/publicdomain/zero/1.0/',
+      'license' => 'https://creativecommons.org/licenses/by/4.0/',
       'creator' => [{ '@type' => 'Organization',
                       '@id' => 'http://www.sysmo-db.org',
                       'name' => 'SysMO-DB',
