@@ -8,7 +8,7 @@ var ObjectsInput = {
                 return true;
             }
 
-            var opts = {
+            let opts = {
                 placeholder: 'Search ...',
                 theme: "bootstrap",
                 width: '100%'
@@ -30,7 +30,7 @@ var ObjectsInput = {
                 opts.data = $j(this).data('typeahead-local-values');
             }
 
-            var template = $j(this).data('typeahead-template') || 'typeahead/hint';
+            const template = $j(this).data('typeahead-template') || 'typeahead/hint';
             opts.templateResult = HandlebarsTemplates[template];
             opts.escapeMarkup = function (m) {
                 return m;
@@ -54,10 +54,10 @@ $j(document).ready(function () {
     ObjectsInput.init();
 
     $j('[data-role="seek-suggested-tags"]').on('click', function () {
-        let selectName = $j(this).data('tag-input');
-        let text = $j(this).text();
-        let selector = $j('select#'+selectName);
-        let vals = selector.val() || [];
+        const selectName = $j(this).data('tag-input');
+        const text = $j(this).text();
+        const selector = $j('select#'+selectName);
+        const vals = selector.val() || [];
         vals.push(text);
         selector.val(vals);
         selector.change();
