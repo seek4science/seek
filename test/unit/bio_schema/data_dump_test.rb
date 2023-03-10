@@ -1,6 +1,8 @@
 require 'test_helper'
 
 class DataDumpTest < ActiveSupport::TestCase
+  fixtures :all
+
   test 'can write dump and access via file object' do
     dump = create_workflow_dump
     assert_raises(Errno::ENOENT) do
@@ -14,13 +16,13 @@ class DataDumpTest < ActiveSupport::TestCase
     json = JSON.parse(dump.file.read)
     assert_equal @workflows.length, json.length
     @workflows.each do |workflow|
-      bioschemas = json.detect { |w| w['url'] == "http://localhost:3000/workflows/#{workflow.id}"}
+      bioschemas = json.detect { |w| w['@id'] == "http://localhost:3000/workflows/#{workflow.id}"}
       assert bioschemas
       assert_equal "http://localhost:3000/workflows/#{workflow.id}", bioschemas['@id']
       assert_equal workflow.title, bioschemas['name']
     end
     @private_workflows.each do |workflow|
-      bioschemas = json.detect { |w| w['url'] == "http://localhost:3000/workflows/#{workflow.id}"}
+      bioschemas = json.detect { |w| w['@id'] == "http://localhost:3000/workflows/#{workflow.id}"}
       refute bioschemas, 'Should not include private resources'
     end
   end
@@ -46,7 +48,7 @@ class DataDumpTest < ActiveSupport::TestCase
     assert_equal old_length + 1, json.length
     @workflows.each do |workflow|
       # Remove the original workflows from the JSON
-      i = json.index { |w| w['url'] == "http://localhost:3000/workflows/#{workflow.id}"}
+      i = json.index { |w| w['@id'] == "http://localhost:3000/workflows/#{workflow.id}"}
       bioschemas = json.delete_at(i)
       assert bioschemas
       assert_equal "http://localhost:3000/workflows/#{workflow.id}", bioschemas['@id']
@@ -133,7 +135,7 @@ class DataDumpTest < ActiveSupport::TestCase
       json = JSON.parse(dump.file.read)
       assert json.any?
       json.each do |i|
-        id = i['url'].split('/').last
+        id = i['@id'].split('/').last
         item = type.find_by_id(id)
         assert item, "#{type.name} #{id} included in dump but does not exist!"
         assert !item.respond_to?(:public?) || item.public?, "#{type.name} #{id} included in dump even though it is not public!"
