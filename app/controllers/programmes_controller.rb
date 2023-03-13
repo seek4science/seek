@@ -149,14 +149,17 @@ class ProgrammesController < ApplicationController
     handle_administrators if params[:programme][:programme_administrator_ids] && !(params[:programme][:programme_administrator_ids].is_a? Array)
     if action_name == 'create' && !User.admin_logged_in?
       params[:programme][:programme_administrator_ids] ||= []
+      params[:programme][:person_ids] ||= []
       params[:programme][:programme_administrator_ids] << current_person.id.to_s
     end
     params[:programme][:programme_administrator_ids].uniq! if params[:programme][:programme_administrator_ids]
+    params[:programme][:person_ids] = params[:programme][:programme_administrator_ids].map(&:to_i) if params[:programme][:programme_administrator_ids].is_a? Array
 
     params.require(:programme).permit(:avatar_id, :description, :first_letter, :title, :uuid, :web_page,
                                       { project_ids: [] }, :funding_details, { programme_administrator_ids: [] },
                                       :activation_rejection_reason, :funding_codes,
                                       :open_for_projects,
+                                      { person_ids: [] },
                                       discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
 
