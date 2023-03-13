@@ -17,7 +17,7 @@ class Programme < ApplicationRecord
   has_many :projects, dependent: :nullify
   has_many :work_groups, through: :projects
   has_many :group_memberships, through: :work_groups
-  has_many :people, -> { distinct }, through: :group_memberships
+  has_and_belongs_to_many :people, -> { distinct }
   has_many :institutions, -> { distinct }, through: :work_groups
   has_many :dependent_permissions, class_name: 'Permission', as: :contributor, dependent: :destroy
   has_many :organisms, -> { distinct }, through: :projects
