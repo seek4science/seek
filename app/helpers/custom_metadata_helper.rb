@@ -5,7 +5,7 @@ module CustomMetadataHelper
     element_class = "custom_metadata_attribute_#{attribute.sample_attribute_type.base_type.downcase}"
     element_name = "#{resource.class.name.underscore}[custom_metadata_attributes][data][#{attribute.title}]"
 
-    if attribute.seek_custom_metadata?
+    if attribute.linked_custom_metadata?
       content_tag(:span, class: 'linked_custom_metdata') do
         folding_panel(attribute.label, false, id:attribute.title) do
             attribute_form_element(attribute, resource.custom_metadata, element_name, element_class)

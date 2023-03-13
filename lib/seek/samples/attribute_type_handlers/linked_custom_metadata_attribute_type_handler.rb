@@ -1,7 +1,7 @@
 module Seek
   module Samples
     module AttributeTypeHandlers
-      class SeekCustomMetadataAttributeTypeHandler < BaseAttributeHandler
+      class LinkedCustomMetadataAttributeTypeHandler < BaseAttributeHandler
 
         def test_value(array_value)
 

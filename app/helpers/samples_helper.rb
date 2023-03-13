@@ -46,7 +46,7 @@ module SamplesHelper
 
 
 
-def seek_custom_metadata_form_field(attribute,resource,value,element_name, element_class)
+def linked_custom_metadata_form_field(attribute,resource,value,element_name, element_class)
 
   html = ''
   html +=  hidden_field_tag "#{element_name}[id]", value
@@ -128,8 +128,8 @@ end
         seek_cv_attribute_display(value, attribute)
       when Seek::Samples::BaseType::CV_LIST
         value.each{|v| seek_cv_attribute_display(v, attribute) }.join(', ')
-      when Seek::Samples::BaseType::SEEK_CUSTOM_METADATA
-        seek_linked_custom_metadata_attribute_display(value, attribute)
+      when Seek::Samples::BaseType::LINKED_CUSTOM_METADATA
+        linked_custom_metadata_attribute_display(value, attribute)
       else
         default_attribute_display(attribute, options, sample, value)
       end
@@ -145,7 +145,7 @@ end
     content
   end
 
-  def seek_linked_custom_metadata_attribute_display(value, attribute)
+  def linked_custom_metadata_attribute_display(value, attribute)
     html = ''
      data = CustomMetadata.find(value).data
     html += '<ul>'
@@ -316,8 +316,8 @@ end
                  include_blank: !attribute.required?, class: "form-control #{element_class}"
     when Seek::Samples::BaseType::SEEK_SAMPLE_MULTI
       sample_multi_form_field attribute, element_name, value
-    when Seek::Samples::BaseType::SEEK_CUSTOM_METADATA
-      seek_custom_metadata_form_field attribute, resource, value, element_name, element_class
+    when Seek::Samples::BaseType::LINKED_CUSTOM_METADATA
+      linked_custom_metadata_form_field attribute, resource, value, element_name, element_class
     else
       text_field_tag element_name, value, class: "form-control #{element_class}", placeholder: placeholder
     end

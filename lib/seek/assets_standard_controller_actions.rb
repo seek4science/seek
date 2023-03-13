@@ -137,7 +137,7 @@ module Seek
       return if cmt_id.blank?
 
       # return no custom metdata is filled
-      seek_cm_attrs = CustomMetadataType.find(cmt_id).custom_metadata_attributes.select(&:seek_custom_metadata?)
+      seek_cm_attrs = CustomMetadataType.find(cmt_id).custom_metadata_attributes.select(&:linked_custom_metadata?)
       return if seek_cm_attrs.blank?
 
       seek_cm_attrs.each  do |cma|

@@ -50,7 +50,7 @@ end
 
 Factory.define(:custom_metadata_sample_attribute_type, class: SampleAttributeType) do |f|
   f.sequence(:title) { |n| "Linked Custom Metadata attribute type #{n}" }
-  f.base_type Seek::Samples::BaseType::SEEK_CUSTOM_METADATA
+  f.base_type Seek::Samples::BaseType::LINKED_CUSTOM_METADATA
 end
 
 Factory.define(:data_file_sample_attribute_type, class: SampleAttributeType) do |f|
