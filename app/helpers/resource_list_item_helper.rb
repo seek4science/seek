@@ -151,6 +151,18 @@ module ResourceListItemHelper
     html.html_safe
   end
 
+  def list_item_usage(resource)
+    if resource.view_count
+      html = 'Views: ' + resource.view_count.to_s
+      if resource.is_downloadable?
+        html << ', Downloads: ' + resource.download_count.to_s
+      end
+      html.html_safe
+    end
+  rescue
+    nil
+  end
+
   def list_profile_registered_timestamp(resource)
     html = '<p class="list_item_attribute none_text" style="text-align:center;"><b>Registered:</b> <label>'
     html << (resource.try(:user).try(:created_at).nil? ? 'Not yet registered' : date_as_string(resource.try(:user).try(:created_at)))

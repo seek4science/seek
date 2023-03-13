@@ -176,7 +176,7 @@ class WorkflowVersioningTest < ActionDispatch::IntegrationTest
     metadata[:internals] = metadata[:internals].to_json
 
     assert_response :success
-    assert_empty assigns(:errors)
+    assert_empty assigns(:workflow).extraction_errors
     assert_equal 'galaxy', assigns(:workflow).workflow_class.key
     assert_select 'form[action=?]', create_version_metadata_workflow_path(workflow_id)
     assert_select '#workflow_submit_btn[value=?]', 'Update'

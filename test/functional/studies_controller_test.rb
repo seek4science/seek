@@ -706,9 +706,7 @@ class StudiesControllerTest < ActionController::TestCase
     end
 
     assert study=assigns(:study)
-
     assert cm = study.custom_metadata
-
     assert_equal cmt, cm.custom_metadata_type
     assert_equal 'fred',cm.get_attribute_value('name')
     assert_equal '22',cm.get_attribute_value('age')
@@ -719,10 +717,10 @@ class StudiesControllerTest < ActionController::TestCase
     assert_no_difference('Study.count') do
       assert_no_difference('CustomMetadata.count') do
         put :update, params: { id: study.id, study: { title: "new title",
-                                                      custom_metadata_attributes: { custom_metadata_type_id: cmt.id, id: cm.id,
-                                                                                    data: {
-                                                                                      "name": 'max',
-                                                                                      "age": 20 } }
+          custom_metadata_attributes: { custom_metadata_type_id: cmt.id, id: cm.id,
+                                        data: {
+                                          "name": 'max',
+                                          "age": 20 } }
         }
         }
       end
