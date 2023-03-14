@@ -131,6 +131,7 @@ module Seek
           filepath = @content_blob.filepath
           # added for the benefit of the tests after rails3 upgrade - but doubt it is required
           headers['Content-Length'] = @content_blob.file_size.to_s
+          headers['Content-MD5'] = @content_blob.md5sum if @content_blob.md5sum
         end
         send_file filepath, filename: @content_blob.original_filename, type: @content_blob.content_type || 'application/octet-stream', disposition: disposition
       elsif @content_blob.url.present?

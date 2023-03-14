@@ -568,6 +568,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert_equal "attachment; filename=\"small-test-spreadsheet.xls\"; filename*=UTF-8''small-test-spreadsheet.xls", @response.header['Content-Disposition']
     assert_equal 'application/vnd.ms-excel', @response.header['Content-Type']
     assert_equal '7168', @response.header['Content-Length']
+    assert_equal '86f7a87eb0b1c30b172037d69628f279', @response.header['Content-MD5']
   end
 
   test 'download should provide the content length if file exists but has a url' do
@@ -579,6 +580,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert_equal "attachment; filename=\"small-test-spreadsheet.xls\"; filename*=UTF-8''small-test-spreadsheet.xls", @response.header['Content-Disposition']
     assert_equal 'application/vnd.ms-excel', @response.header['Content-Type']
     assert_equal '7168', @response.header['Content-Length']
+    assert_equal '86f7a87eb0b1c30b172037d69628f279', @response.header['Content-MD5']
   end
 
   test 'download via streaming should provide the content length' do
