@@ -601,6 +601,7 @@ class ApplicationController < ActionController::Base
 
   def determine_custom_metadata_keys
     keys = []
+
     root_key = controller_name.singularize.to_sym
     attribute_params = params[root_key][:custom_metadata_attributes]
     if attribute_params && attribute_params[:custom_metadata_type_id].present?
@@ -611,10 +612,11 @@ class ApplicationController < ActionController::Base
         metadata_type.custom_metadata_attributes.each do |attr|
           if attr.seek_cv_list?
             cma << {attr.title=>[]}
-            cma << attr.title.to_s
-          else
-            cma << attr.title.to_s
+          elsif  attr.linked_custom_metadata?
+            linked_cma = attr.linked_custom_metadata_type.custom_metadata_attributes.map(&:title)
+            keys = keys + [{linked_custom_metadatas_attributes:[:custom_metadata_type_id,:id, {data:linked_cma}]}]
           end
+          cma << attr.title.to_s
         end
         keys = keys + [{data:cma}]
       end

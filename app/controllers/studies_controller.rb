@@ -73,7 +73,6 @@ class StudiesController < ApplicationController
       update_sharing_policies @study
       update_annotations(params[:tag_list], @study)
       update_relationships(@study, params)
-      update_linked_custom_metadatas @study
 
       respond_to do |format|
         if @study.save
@@ -103,7 +102,6 @@ class StudiesController < ApplicationController
     update_sharing_policies @study
     update_annotations(params[:tag_list], @study)
     update_relationships(@study, params)
-    update_linked_custom_metadatas @study
 
     ### TO DO: what about validation of person responsible? is it already included (for json?)
     if @study.save
@@ -340,9 +338,7 @@ class StudiesController < ApplicationController
         AssayAsset.where(assay_id: assay.id).delete_all
       end
       assays.delete_all
-
     end
-
   end
 
   private

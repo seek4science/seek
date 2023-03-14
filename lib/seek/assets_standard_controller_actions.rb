@@ -124,27 +124,6 @@ module Seek
       item.policy.set_attributes_with_sharing(policy_params(parameters)) if policy_params(parameters).present?
     end
 
-
-
-    def update_linked_custom_metadatas(item, parameters = params)
-
-      root_key = controller_name.singularize.to_sym
-      cm_attr_params = parameters[root_key][:custom_metadata_attributes]
-
-      # return no custom metdata type is selected
-      return if cm_attr_params.blank?
-      cmt_id = cm_attr_params[:custom_metadata_type_id]
-      return if cmt_id.blank?
-
-      # return no custom metdata is filled
-      seek_cm_attrs = CustomMetadataType.find(cmt_id).custom_metadata_attributes.select(&:linked_custom_metadata?)
-      return if seek_cm_attrs.blank?
-
-      seek_cm_attrs.each  do |cma|
-          item.custom_metadata.set_linked_custom_metadatas(cma, cm_attr_params)
-        end
-      end
-
     def initialize_asset
       item = class_for_controller_name.new(asset_params)
       set_shared_item_variable(item)

@@ -7,6 +7,7 @@ class CustomMetadata < ApplicationRecord
 
   has_many :custom_metadata_resource_links, inverse_of: :custom_metadata, dependent: :destroy
   has_many :linked_custom_metadatas, through: :custom_metadata_resource_links, source: :resource, source_type: 'CustomMetadata', dependent: :destroy
+  accepts_nested_attributes_for :linked_custom_metadatas
 
   validates_with CustomMetadataValidator
   validates_associated :linked_custom_metadatas
@@ -20,7 +21,6 @@ class CustomMetadata < ApplicationRecord
     linked_custom_metadatas.each do |cm|
       attr_name = cm.custom_metadata_type.title
       data.mass_assign(data.to_hash.update({attr_name => cm.id}), pre_process: false)
-       puts "data:=>"+data.inspect
       update_column(:json_metadata, data.to_json)
     end
   end
@@ -42,18 +42,6 @@ class CustomMetadata < ApplicationRecord
 
   def attribute_class
     CustomMetadataAttribute
-  end
-
-
-  def set_linked_custom_metadatas(cma, cm_params)
-      if item.new_record?
-        self.linked_custom_metadatas.build(custom_metadata_type: cma.linked_custom_metadata_type,
-                                           data: cm_params[:data][cma.linked_custom_metadata_type.title.to_sym][:data])
-      else
-        linked_cm = CustomMetadata.find(self.data[cma.title])
-        permitted = cm_params[:data][cma.linked_custom_metadata_type.title.to_sym].require(:data).permit!.to_hash.to_json
-        linked_cm.update_attribute(:json_metadata, permitted)
-      end
   end
 
 end

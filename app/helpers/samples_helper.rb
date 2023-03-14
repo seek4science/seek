@@ -48,6 +48,7 @@ module SamplesHelper
 
 def linked_custom_metadata_form_field(attribute,resource,value,element_name, element_class)
 
+  element_name = element_name.gsub("[data][#{attribute.title}]","[linked_custom_metadatas_attributes]")
   html = ''
   html +=  hidden_field_tag "#{element_name}[id]", value
   html +=  hidden_field_tag "#{element_name}[custom_metadata_type_id]", attribute.linked_custom_metadata_type.id
@@ -56,7 +57,7 @@ def linked_custom_metadata_form_field(attribute,resource,value,element_name, ele
   root_key = controller_name.singularize.to_sym
 
   unless params[root_key].nil?
-    linked_data = params[root_key][:custom_metadata_attributes][:data][attribute.title.to_sym][:data].permit!.to_hash
+    linked_data = params[root_key][:custom_metadata_attributes][:linked_custom_metadatas_attributes][:data]
     linked_resource.data.mass_assign(linked_data)
   end
 
@@ -65,6 +66,7 @@ def linked_custom_metadata_form_field(attribute,resource,value,element_name, ele
     html += '<div class="form-group"><label>'+attr.label+'</label>'
     html +=  required_span if attr.required?
     html +=  attribute_form_element(attr, linked_resource, attr_element_name, element_class)
+
     unless attr.description.nil?
       html += custom_metadata_attribute_description(attr.description)
     end

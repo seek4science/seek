@@ -697,7 +697,7 @@ class StudiesControllerTest < ActionController::TestCase
     assert_difference('Study.count') do
       investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
       study_attributes = { title: 'test', investigation_id: investigation.id }
-      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id,
+      cm_attributes = {custom_metadata_attributes:{ custom_metadata_type_id: cmt.id,
                                                    data:{
                                                    "name":'fred',
                                                    "age":22}}}
@@ -883,23 +883,24 @@ class StudiesControllerTest < ActionController::TestCase
 
     cmt = Factory(:role_custom_metadata_type)
     login_as(Factory(:person))
+    linked_cmt = Factory(:role_name_custom_metadata_type)
 
     # test create
     assert_difference('Study.count') do
       assert_difference('CustomMetadata.count',2) do
         investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
         study_attributes = { title: 'Alice in Wonderland', investigation_id: investigation.id }
-        cm_attributes = { custom_metadata_attributes:{custom_metadata_type_id: cmt.id,
-                                                      data:{
-                                                        "role_email":"alice@email.com",
-                                                        "role_phone":"0012345",
-                                                        "role_name": {
-                                                          data:{
-                                                            "first_name":"alice",
-                                                            "last_name": "liddell"
-                                                          }
-                                                        }
-                                                      }
+        cm_attributes = { custom_metadata_attributes: {
+          custom_metadata_type_id: cmt.id, data: { "role_email":"alice@email.com", "role_phone":"0012345", "role_name": "" },
+          linked_custom_metadatas_attributes: [
+            {
+              custom_metadata_type_id: linked_cmt.id,
+              data:{
+                "first_name":"alice",
+                "last_name": "liddell"
+              }
+            }
+          ]
         }
         }
 
@@ -920,18 +921,28 @@ class StudiesControllerTest < ActionController::TestCase
     get :show, params:{ id:study}
     assert_response :success
 
+
     # test update
     assert_no_difference('Study.count') do
       assert_no_difference('CustomMetadata.count') do
         put :update, params: { id: study.id, study: { title: "Alice Through the Looking Glass",
-                                                      custom_metadata_attributes: { custom_metadata_type_id: cmt.id, id: cm.id,
-                                                                                    data: {
-                                                                                      "role_email": 'rabbit@email.com',
-                                                                                      "role_name": { data: { "first_name":"rabbit" } }} }
+                                                      custom_metadata_attributes: {
+                                                        custom_metadata_type_id: cmt.id, id:cm.id, data: {"role_email":"rabbit@email.com"},
+                                                        linked_custom_metadatas_attributes: [
+                                                          {
+                                                            custom_metadata_type_id: linked_cmt.id,
+                                                            id: cm.linked_custom_metadatas.first.id,
+                                                            data:{
+                                                              "first_name":"rabbit"
+                                                            }
+                                                          }
+                                                        ]
+                                                      }
         }
         }
       end
     end
+
 
     assert new_study = assigns(:study)
     assert_equal 'Alice Through the Looking Glass', new_study.title
