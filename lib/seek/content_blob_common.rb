@@ -122,22 +122,18 @@ module Seek
     end
 
     def handle_download(disposition = 'attachment', image_size = nil)
-      if @content_blob.url.blank?
-        if @content_blob.file_exists?
-          if image_size && @content_blob.is_image_convertable?
-            @content_blob.resize_image(image_size)
-            filepath = @content_blob.full_cache_path(image_size)
-            headers['Content-Length'] = File.size(filepath).to_s
-          else
-            filepath = @content_blob.filepath
-            # added for the benefit of the tests after rails3 upgrade - but doubt it is required
-            headers['Content-Length'] = @content_blob.file_size.to_s
-          end
-          send_file filepath, filename: @content_blob.original_filename, type: @content_blob.content_type || 'application/octet-stream', disposition: disposition
+      if @content_blob.file_exists?
+        if image_size && @content_blob.is_image_convertable?
+          @content_blob.resize_image(image_size)
+          filepath = @content_blob.full_cache_path(image_size)
+          headers['Content-Length'] = File.size(filepath).to_s
         else
-          redirect_on_error @asset_version, "Unable to find a copy of the file for download, or an alternative location. Please contact an administrator of #{Seek::Config.instance_name}."
+          filepath = @content_blob.filepath
+          # added for the benefit of the tests after rails3 upgrade - but doubt it is required
+          headers['Content-Length'] = @content_blob.file_size.to_s
         end
-      else
+        send_file filepath, filename: @content_blob.original_filename, type: @content_blob.content_type || 'application/octet-stream', disposition: disposition
+      elsif @content_blob.url.present?
         begin
           if @asset_version.contributor.nil? # A jerm generated resource
             download_jerm_asset
@@ -148,14 +144,14 @@ module Seek
             else
               stream_from_http_url
             end
-
           end
         rescue Seek::DownloadException => de
           redirect_on_error @asset_version, 'There was an error accessing the remote resource, and a local copy was not available. Please try again later when the remote resource may be available again.'
         rescue Jerm::JermException => de
           redirect_on_error @asset_version, de.message
         end
-
+      else
+        redirect_on_error @asset_version, "Unable to find a copy of the file for download, or an alternative location. Please contact an administrator of #{Seek::Config.instance_name}."
       end
     end
 

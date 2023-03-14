@@ -568,6 +568,18 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert_equal '7168', @response.header['Content-Length']
   end
 
+  test 'download should provide the content length if file exists but has a url' do
+    df = Factory :small_test_spreadsheet_datafile, policy: Factory(:public_policy), contributor: User.current_user.person
+    blob = df.content_blob
+    blob.update_column(:url, 'http://website.com/somefile.txt')
+    get :download, params: { data_file_id: df, id: df.content_blob }
+    assert_response :success
+    assert_equal "attachment; filename=\"small-test-spreadsheet.xls\"; filename*=UTF-8''small-test-spreadsheet.xls", @response.header['Content-Disposition']
+    assert_equal 'application/vnd.ms-excel', @response.header['Content-Type']
+    assert_equal '7168', @response.header['Content-Length']
+  end
+
+
   test 'should not log download for inline view intent' do
     df = Factory :small_test_spreadsheet_datafile, policy: Factory(:public_policy), contributor: User.current_user.person
     assert_no_difference('ActivityLog.count') do
