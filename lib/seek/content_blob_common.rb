@@ -182,7 +182,7 @@ module Seek
       info = Seek::DownloadHandling::HTTPHandler.new(@content_blob.url).info
       case info[:code]
       when 200
-        stream_with(Seek::DownloadHandling::HTTPStreamer.new(@content_blob.url))
+        stream_with(Seek::DownloadHandling::HTTPStreamer.new(@content_blob.url), info)
       when 401, 403
         # Try redirecting the user to the URL if SEEK cannot access it
         redirect_to @content_blob.url
@@ -201,8 +201,9 @@ module Seek
       stream_with(Seek::DownloadHandling::FTPStreamer.new(@content_blob.url))
     end
 
-    def stream_with(streamer)
+    def stream_with(streamer, info={})
       response.headers['Content-Type'] = @content_blob.content_type
+      response.headers['Content-Length'] = info[:file_size].to_s if info[:file_size]
       response.headers['Content-Disposition'] = "attachment; filename=#{@content_blob.original_filename}"
       response.headers['Last-Modified'] = Time.now.ctime.to_s
 
