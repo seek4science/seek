@@ -122,7 +122,8 @@ module Seek
     end
 
     def handle_download(disposition = 'attachment', image_size = nil)
-      if @content_blob.file_exists?
+      jerm_generated = @asset_version && @asset_version.contributor.nil?
+      if @content_blob.file_exists? && !jerm_generated # JERM will try to download first
         if image_size && @content_blob.is_image_convertable?
           @content_blob.resize_image(image_size)
           filepath = @content_blob.full_cache_path(image_size)
@@ -136,7 +137,7 @@ module Seek
         send_file filepath, filename: @content_blob.original_filename, type: @content_blob.content_type || 'application/octet-stream', disposition: disposition
       elsif @content_blob.url.present?
         begin
-          if @asset_version.contributor.nil? # A jerm generated resource
+          if jerm_generated
             download_jerm_asset
           else
             case URI(@content_blob.url).scheme
