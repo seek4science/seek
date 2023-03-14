@@ -17,49 +17,39 @@
    content_grid_size += 2 if actions_partial.blank?
 
    title_options = {}
+   collapse_id = "collapse_#{dom_id(resource)}"
 %>
 
 <div class="panel panel-default <%= access_based_css_class %>">
   <div class="panel-heading rli-head">
-    <div class="container" style="margin:0">
-      <div class="row flex-center">
-        <div class="col-sm-3">
-					<a href="#"
-					data-toggle="collapse"
-					data-target="#collapse_<%= resource.id %>"
-					aria-hidden="true"
-					style="margin-right:10px;text-decoration:none"
-					aria-expanded="false">
-				      <span class="caret" style="border-width: 10px 8px 10px 8px;"> </span>
-			 		</a>
-          <%= list_item_title resource, title_options %>     
-        </div>
-        <%= resource_list_condensed_row(resource) %>
-      </div>
+    <div class="rli-condensed-title">
+      <a class="caret clickable" data-toggle="collapse" data-target="#<%= collapse_id %>" aria-hidden="true" aria-expanded="false"></a>
+      <%= list_item_title resource, title_options %>
     </div>
+    <%= resource_list_condensed_row(resource) %>
   </div>
-    <div id="collapse_<%= resource.id %>" class="collapse">
-      <div class="panel-body">
-        <div class="row">
-          <% unless avatar_content.blank? %>
-            <div class="col-md-1 col-sm-2 col-xs-3 <%= 'hidden-xs' unless resource.is_a?(Person) -%> text-center list_item_avatar">
-              <%= avatar_content %>
-            </div>
-          <% end %>
-          <div class="col-md-<%= content_grid_size -%> col-sm-<%= content_grid_size - 1 -%> <%= 'col-xs-9' if resource.is_a?(Person) -%> list_item_content">
-            <%= render :partial => content_partial, :locals => { :resource => resource } %>
+  <div id="<%= collapse_id %>" class="collapse">
+    <div class="panel-body">
+      <div class="row">
+        <% unless avatar_content.blank? %>
+          <div class="col-md-1 col-sm-2 col-xs-3 <%= 'hidden-xs' unless resource.is_a?(Person) -%> text-center list_item_avatar">
+            <%= avatar_content %>
           </div>
-          <% unless actions_partial.blank? %>
-            <div class="col-sm-2 text-right list_item_actions">
-              <%= render :partial => actions_partial, :locals => { :resource => resource } %>
-            </div>
-          <% end %>
+        <% end %>
+        <div class="col-md-<%= content_grid_size -%> col-sm-<%= content_grid_size - 1 -%> <%= 'col-xs-9' if resource.is_a?(Person) -%> list_item_content">
+          <%= render :partial => content_partial, :locals => { :resource => resource } %>
         </div>
+        <% unless actions_partial.blank? %>
+          <div class="col-sm-2 text-right list_item_actions">
+            <%= render :partial => actions_partial, :locals => { :resource => resource } %>
+          </div>
+        <% end %>
       </div>
-      <% unless [Person, Project, Institution, Programme, Organism, HumanDisease].include?(resource.class) %>
-        <div class="panel-footer hidden-xs small">
-          <%= list_item_timestamp resource %>
-        </div>
-      <% end %>
     </div>
+    <% unless [Person, Project, Institution, Programme, Organism, HumanDisease].include?(resource.class) %>
+      <div class="panel-footer hidden-xs small">
+        <%= list_item_timestamp resource %>
+      </div>
+    <% end %>
   </div>
+</div>

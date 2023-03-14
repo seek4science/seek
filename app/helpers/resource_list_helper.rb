@@ -16,9 +16,8 @@ module ResourceListHelper
   end
 
   def resource_list_condensed_row(resource)
-    div_class = "col-sm-#{resource.default_table_columns.length < 3 ? '4' : '3'}"
     resource.default_table_columns.first(3).collect do |column|
-      content_tag :div, class: div_class do
+      content_tag :div, class: 'rli-condensed-attribute' do
         "<b>#{resource.class.human_attribute_name(column)}: </b>#{resource_list_column_display_value(resource,
                                                                                                      column)}".html_safe
       end

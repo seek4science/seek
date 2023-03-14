@@ -1616,8 +1616,8 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_response :success
     assert_select '#resource-condensed-view .list_item', count: 1
     assert_select '#resource-condensed-view .list_item .rli-head' do
-      assert_select '.col-sm-3', text: 'Creators: Jill One, Julia Two, Jessica Three, Jane Four, Joy Five'
-      assert_select '.col-sm-3' do
+      assert_select '.rli-condensed-attribute', text: 'Creators: Jill One, Julia Two, Jessica Three, Jane Four, Joy Five'
+      assert_select '.rli-condensed-attribute' do
         assert_select ':nth-child(2)', text: 'Jill One'
 
         assert_select ':nth-child(3)', text: 'Julia Two'
