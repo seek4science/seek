@@ -107,25 +107,18 @@
             $j("#jstree_not_isa").find('[id^="Permission-"]').addClass('hide_permission')
 
         });
-
         $j('#select_all_isa').click(function (event) {
-            $j('input[name^="share_isa"]').prop("checked", true);
-            $j("#jstree").jstree().check_all(true);
             event.preventDefault();
-
+            $j("#jstree").trigger("sb_select_all")
         });
-
         $j('#deselect_all_isa').click(function (event) {
-            $j('input[name^="share_isa"]').prop("checked", false);
-            $j("#jstree").jstree().uncheck_all(true);
             event.preventDefault();
-
+            $j("#jstree").trigger("sb_deselect_all")
         });
         $j('#expand_all_isa').click(function (event) {
             event.preventDefault();
             $j("#jstree").jstree("open_all");
             $j('#jstree').find(('[id^="Permission-"]')).removeClass('hide_permission')
-
         });
         $j('#collapse_all_isa').click(function (event) {
             event.preventDefault();
@@ -244,8 +237,14 @@
                       e.stopImmediatePropagation();
                       this.settings.split_btn_checkbox.call(this, this.get_node(e.target));
                   }.bind(this))
-                  .on("close_node.jstree", function (e){
+                  .on("close_node.jstree", function (){
                       this.asset_key = update_asset_key(this.asset_key)
+                  }.bind(this))
+                  .on("sb_select_all", function (){
+                      this.asset_key = change_all(this.asset_key,true)
+                  }.bind(this))
+                  .on("sb_deselect_all", function (e){
+                      this.asset_key = change_all(this.asset_key,false)
                   }.bind(this));
             };
             this.teardown = function () {
@@ -313,6 +312,13 @@
         asset_key.forEach(function (asset, i) {
             let status=document.getElementById(asset.data_node_id).checked
             asset_key[i].checkbox_status=status
+        })
+        return asset_key
+    }
+    function change_all(asset_key,status){
+        asset_key.forEach(function (asset, i) {
+            asset_key[i].checkbox_status=status
+            document.getElementById(asset.data_node_id).checked=status
         })
         return asset_key
     }
