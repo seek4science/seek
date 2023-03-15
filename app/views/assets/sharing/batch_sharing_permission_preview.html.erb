@@ -248,7 +248,8 @@
                     "whole_node" : false,  // to avoid checking the box just clicking the node
                     "tie_selection" : false // for checking without selecting and selecting without checking
                 },
-                "plugins" : [ "checkbox" ,"changed","json_data"]
+                "split_btn_checkbox" : {'data':  <%= all_investigations_hash.to_json.html_safe -%>},
+                "plugins" : [ "split_btn_checkbox","checkbox" ,"changed","json_data"]
             }).on("check_node.jstree uncheck_node.jstree", function(e, data) {
 
             var asset = data.node.id.split('-')
@@ -273,5 +274,91 @@
         });
 
     });
-</script>
 
+    // split button checkbox on asset nodes (outside of anchor)
+    (function ($, undefined) {
+        "use strict";
+        $.jstree.defaults.split_btn_checkbox = $.noop;
+        $.jstree.plugins.split_btn_checkbox = function (options, parent) {
+            this.assets=options.data.children;
+            this.asset_key=get_asset_key(this.assets)
+            this.bind = function () {
+                parent.bind.call(this);
+                this.element
+                  .on("click.jstree", ".jstree-split_btn_checkbox", function (e) {
+                      e.stopImmediatePropagation();
+                      this.settings.split_btn_checkbox.call(this, this.get_node(e.target));
+                  }.bind(this))
+                  .on("close_node.jstree", function (e){
+                      this.asset_key = update_asset_key(this.asset_key)
+                  }.bind(this));
+            };
+            this.teardown = function () {
+                if(this.settings.split_btn_checkbox) {
+                    this.element.find(".jstree-split_btn_checkbox").remove();
+                }
+                parent.teardown.call(this);
+            };
+            this.redraw_node = function(obj, deep, callback, force_draw) {
+                obj = parent.redraw_node.call(this, obj, deep, callback, force_draw);
+                if(obj.classList.contains('asset-node-row')) {
+                    let sbtn_checkbox = document.createElement("span",)
+                    let asset_id=obj.getAttribute("data-node-id")
+                    let sbc_html = ""
+                    if(this.asset_key.find(o => o.data_node_id === asset_id).has_children){
+                        sbc_html = "<%= escape_javascript( render :partial => 'general/split_button_checkbox',
+                                                                    :locals => { checkbox_id: "_asset_id_",
+                                                                                 checkbox_class: "_asset_id_",
+                                                                                 checked: "true" ,
+                                                                                 toggle: "true",
+                                                                                 extra_nesting: 0 } ) %>"
+                    } else {
+                        sbc_html = "<%= escape_javascript( render :partial => 'general/split_button_checkbox',
+                                                                    :locals => { checkbox_id: "_asset_id_",
+                                                                                 checkbox_class: "_asset_id_",
+                                                                                 checked: "true" ,
+                                                                                 toggle: "false",
+                                                                                 extra_nesting: 0 } ) %>"
+                    }
+                    sbc_html = sbc_html.replaceAll("_asset_id_", asset_id)
+                    if(!(this.asset_key.find(o => o.data_node_id === asset_id).checkbox_status)) {
+                        sbc_html = sbc_html.replaceAll("checked=\"checked\"", "")
+                    }
+                    sbtn_checkbox.innerHTML=sbc_html
+                    let tmp = sbtn_checkbox.cloneNode(true);
+                    obj.insertBefore(tmp, obj.childNodes[1]);
+                }
+                return obj;
+            };
+        };
+    })(jQuery);
+    function get_asset_key(data){
+        let asset_key=[]
+        for(let asset of data){
+            let data_node_id=asset.li_attr["data-node-id"]
+            let has_children=false
+            let n_perm=0
+            for(let child of asset.children){
+                if(!(child.id.includes('Permission'))){
+                    has_children=true
+                    break
+                }
+                n_perm=n_perm+1
+            }
+            asset_key.push({data_node_id:data_node_id,has_children:has_children,checkbox_status:false})
+            let grandchildren=[]
+            if(has_children) {
+                grandchildren=get_asset_key(asset.children.slice(n_perm))
+            }
+            asset_key=asset_key.concat(grandchildren)
+        }
+        return asset_key
+    }
+    function update_asset_key(asset_key) {
+        asset_key.forEach(function (asset, i) {
+            let status=document.getElementById(asset.data_node_id).checked
+            asset_key[i].checkbox_status=status
+        })
+        return asset_key
+    }
+</script>

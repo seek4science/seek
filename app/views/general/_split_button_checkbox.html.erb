@@ -11,7 +11,9 @@
   checkbox_id ||= checkbox_class
   checkbox_text ||= ""
   checked ||= false
+  checked = !(['false',0,'0','no'].include? checked)
   toggle ||= false
+  toggle = !(['false',0,'0','no'].include? toggle)
   extra_nesting ||= 0
   nesting_level = 4 + extra_nesting
 -%>
