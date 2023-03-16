@@ -113,24 +113,6 @@ class SinglePublishingTest < ActionController::TestCase
       assert_select "input[type='checkbox'][id=?]", "publish_Investigation_#{investigation.id}"
     end
 
-    # split-button dropdown menu shown for tree leafs
-    assert_select "._#{investigation.id}", count: 1 do
-      assert_select '.parent-btn-dropdown', count: 1
-      assert_select '.dropdown-menu', count: 1 do
-        assert_select 'li', count: 2 do
-          assert_select 'a[onclick=?]', 'selectChildren(this,5); return false;',
-                        text: /Select this item and all of its sub-items./, count: 1 do
-            assert_select 'img[src=?]', '/assets/checkbox_select_all.svg'
-          end
-
-          assert_select 'a[onclick=?]', 'deselectChildren(this,5); return false;',
-                        text: /Deselect this item and all of its sub-items./, count: 1 do
-            assert_select 'img[src=?]', '/assets/checkbox_deselect_all.svg'
-          end
-        end
-      end
-    end
-
     assert_select '.type_and_title', text: /Study/, count: 1 do
       assert_select 'a[href=?]', study_path(study), text: /#{study.title}/
     end
@@ -156,13 +138,54 @@ class SinglePublishingTest < ActionController::TestCase
       assert_select "input[type='checkbox'][id=?]", "publish_DataFile_#{request_publishing_df.id}"
     end
 
-    # split-button dropdown menu not shown for tree leafs
-    assert_select "._#{publishing_df.id}", count: 1 do
-      assert_select '.parent-btn-dropdown', count: 0
-      assert_select '.dropdown-menu', count: 0
-    end
-
     assert_select 'span.label-warning', text: "Can't publish", count: 1
+  end
+
+  test 'split-button recursive selection' do
+    datafile111 = data_with_isa
+    assay11 = datafile111.assays.first
+    study1 = assay11.study
+    investigation = study1.investigation
+    person = users(:datafile_owner).person
+
+    datafile112 = Factory(:data_file, assays: [assay11], contributor: person)
+    assay12 = Factory(:assay, investigation: investigation, study: study1, contributor: person)
+    datafile121 = Factory(:data_file, assays: [assay12], contributor: person)
+    study2 = Factory(:study, investigation: investigation, contributor: person)
+    assay21 = Factory(:assay, investigation: investigation, study: study2, contributor: person)
+
+    should_have_dropdown = [investigation, study1, assay11, assay12, study1, study2]
+    should_not_have_dropdown = [datafile111, datafile112, datafile121, assay21]
+
+    get :publish_related_items, params: { id: datafile111.id }
+    assert_response :success
+
+    # split-button dropdown menu shown for tree branches
+    should_have_dropdown.each do |asset|
+      assert_select "._#{asset.id}", count: 1 do
+        assert_select '.parent-btn-dropdown', count: 1
+        assert_select '.dropdown-menu', count: 1 do
+          assert_select 'li', count: 2 do
+            assert_select 'a[onclick=?]', 'selectChildren(this,5); return false;',
+                          text: /Select this item and all of its sub-items./, count: 1 do
+              assert_select 'img[src=?]', '/assets/checkbox_select_all.svg'
+            end
+
+            assert_select 'a[onclick=?]', 'deselectChildren(this,5); return false;',
+                          text: /Deselect this item and all of its sub-items./, count: 1 do
+              assert_select 'img[src=?]', '/assets/checkbox_deselect_all.svg'
+            end
+          end
+        end
+      end
+    end
+    # split-button dropdown menu not shown for tree leafs
+    should_not_have_dropdown.each do |asset|
+      assert_select "._#{asset.id}", count: 1 do
+        assert_select '.parent-btn-dropdown', count: 0
+        assert_select '.dropdown-menu', count: 0
+      end
+    end
   end
 
   test 'get check_gatekeeper_required' do
