@@ -109,21 +109,39 @@ class SinglePublishingTest < ActionController::TestCase
     assert_select '.type_and_title', text: /Investigation/, count: 1 do
       assert_select 'a[href=?]', investigation_path(investigation), text: /#{investigation.title}/
     end
-    assert_select '.checkbox', text: /Publish/ do
+    assert_select '.parent-btn-checkbox', text: /Publish/ do
       assert_select "input[type='checkbox'][id=?]", "publish_Investigation_#{investigation.id}"
+    end
+
+    # split-button dropdown menu shown for tree leafs
+    assert_select "._#{investigation.id}", count: 1 do
+      assert_select '.parent-btn-dropdown', count: 1
+      assert_select '.dropdown-menu', count: 1 do
+        assert_select 'li', count: 2 do
+          assert_select 'a[onclick=?]', 'selectChildren(this,5); return false;',
+                        text: /Select this item and all of its sub-items./, count: 1 do
+            assert_select 'img[src=?]', '/assets/checkbox_select_all.svg'
+          end
+
+          assert_select 'a[onclick=?]', 'deselectChildren(this,5); return false;',
+                        text: /Deselect this item and all of its sub-items./, count: 1 do
+            assert_select 'img[src=?]', '/assets/checkbox_deselect_all.svg'
+          end
+        end
+      end
     end
 
     assert_select '.type_and_title', text: /Study/, count: 1 do
       assert_select 'a[href=?]', study_path(study), text: /#{study.title}/
     end
-    assert_select '.checkbox', text: /Publish/ do
+    assert_select '.parent-btn-checkbox', text: /Publish/ do
       assert_select "input[type='checkbox'][id=?]", "publish_Study_#{study.id}"
     end
 
     assert_select '.type_and_title', text: /Assay/, count: 1 do
       assert_select 'a[href=?]', assay_path(assay), text: /#{assay.title}/
     end
-    assert_select '.checkbox', text: /Publish/ do
+    assert_select '.parent-btn-checkbox', text: /Publish/ do
       assert_select "input[type='checkbox'][id=?]", "publish_Assay_#{assay.id}"
     end
 
@@ -133,10 +151,17 @@ class SinglePublishingTest < ActionController::TestCase
       assert_select 'a[href=?]', data_file_path(request_publishing_df), text: /#{request_publishing_df.title}/
       assert_select 'a[href=?]', data_file_path(notifying_df), text: /#{notifying_df.title}/
     end
-    assert_select '.checkbox', text: /Publish/ do
+    assert_select '.parent-btn-checkbox', text: /Publish/ do
       assert_select "input[type='checkbox'][id=?]", "publish_DataFile_#{publishing_df.id}"
       assert_select "input[type='checkbox'][id=?]", "publish_DataFile_#{request_publishing_df.id}"
     end
+
+    # split-button dropdown menu not shown for tree leafs
+    assert_select "._#{publishing_df.id}", count: 1 do
+      assert_select '.parent-btn-dropdown', count: 0
+      assert_select '.dropdown-menu', count: 0
+    end
+
     assert_select 'span.label-warning', text: "Can't publish", count: 1
   end
 
