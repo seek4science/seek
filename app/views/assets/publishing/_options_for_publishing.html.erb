@@ -7,7 +7,7 @@
    tree_class = 'already-published' if item.is_published?
 
 -%>
-<div class="isa-tree <%= html_classes -%> <%= tree_class %> <%= item.id %>">
+<div class="isa-tree <%= html_classes -%> <%= tree_class %> _<%= item.id %>">
   <% if item.can_view? %>
       <h5 class="type_and_title">
         <strong><%= text_for_resource item -%>:</strong> <%= link_to item.title, item, :target => "_blank" -%>
