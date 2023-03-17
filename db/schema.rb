@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_03_13_162115) do
+ActiveRecord::Schema.define(version: 2022_12_12_143407) do
 
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
@@ -1266,14 +1266,6 @@ ActiveRecord::Schema.define(version: 2023_03_13_162115) do
     t.string "uuid"
     t.integer "roles_mask", default: 0
     t.string "orcid"
-    t.integer "programme_id"
-  end
-
-  create_table "people_programmes", id: false, force: :cascade do |t|
-    t.bigint "person_id"
-    t.bigint "programme_id"
-    t.index ["person_id"], name: "index_people_programmes_on_person_id"
-    t.index ["programme_id"], name: "index_people_programmes_on_programme_id"
   end
 
   create_table "permissions", id: :integer, force: :cascade do |t|
@@ -1421,7 +1413,6 @@ ActiveRecord::Schema.define(version: 2023_03_13_162115) do
     t.boolean "is_activated", default: false
     t.text "activation_rejection_reason"
     t.boolean "open_for_projects", default: false
-    t.integer "person_id"
   end
 
   create_table "project_folder_assets", id: :integer, force: :cascade do |t|
@@ -2184,8 +2175,6 @@ ActiveRecord::Schema.define(version: 2023_03_13_162115) do
     t.integer "project_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.bigint "programme_id"
-    t.index ["programme_id"], name: "index_work_groups_on_programme_id"
     t.index ["project_id"], name: "index_work_groups_on_project_id"
   end
 
