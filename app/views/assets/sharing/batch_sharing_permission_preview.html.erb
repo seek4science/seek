@@ -74,7 +74,7 @@
 
   <% resource = (controller_name == 'people') ? current_user.person : @asset %>
 
-  <%= submit_tag "Next", data: {disable_with: 'Next'}, :class => 'btn btn-primary' -%>
+  <%= submit_tag "Next", data: {disable_with: 'Next'}, :class => 'btn btn-primary', :onclick => 'show_all_checkboxes()' -%>
 
   or
   <%= cancel_button(resource) %>
@@ -281,15 +281,25 @@
     }
     function update_asset_key(asset_key) {
         asset_key.forEach(function (asset, i) {
-            asset_key[i].checkbox_status=document.getElementById(asset.data_node_id).checked
+            try{
+                asset_key[i].checkbox_status=document.getElementById(asset.data_node_id).checked
+            }
+            catch(e){}
         })
         return asset_key
     }
     function change_all(asset_key,status){
         asset_key.forEach(function (asset, i) {
             asset_key[i].checkbox_status=status
-            document.getElementById(asset.data_node_id).checked=status
+            try{
+                document.getElementById(asset.data_node_id).checked=status
+            }
+            catch(err) {}
         })
         return asset_key
+    }
+    function show_all_checkboxes(){
+        $j("#jstree_not_isa").jstree("open_all");
+        $j("#jstree").jstree("open_all");
     }
 </script>
