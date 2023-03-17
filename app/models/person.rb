@@ -39,13 +39,13 @@ class Person < ApplicationRecord
            class_name: 'GroupMembership', dependent: :destroy
   has_many :current_work_groups, class_name: 'WorkGroup', through: :current_group_memberships,
                                  source: :work_group
-
+  
 
   has_many :projects, -> { distinct }, through: :group_memberships, inverse_of: :people
   has_many :current_projects,  -> { distinct }, through: :current_work_groups, source: :project
   has_many :former_projects,  -> { distinct }, through: :former_work_groups, source: :project
 
-  has_and_belongs_to_many :programmes, -> { distinct }
+  has_many :programmes, -> { distinct }, through: :projects
   has_many :institutions, -> { distinct }, through: :work_groups
   has_filter location: Seek::Filtering::Filter.new(
       value_field: 'institutions.country',
@@ -223,7 +223,7 @@ class Person < ApplicationRecord
   def self.is_discussable?
     return false
   end
-
+  
   def self.userless_people
     Person.includes(:user).select { |p| p.user.nil? }
   end
