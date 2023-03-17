@@ -1,11 +1,11 @@
 {
   "data": {
-    "id": "2216",
+    "id": "226",
     "type": "programmes",
     "attributes": {
       "discussion_links": [
         {
-          "id": "1481",
+          "id": "296",
           "label": "Slack",
           "url": "http://www.slack.com/"
         }
@@ -23,20 +23,23 @@
       "administrators": {
         "data": [
           {
-            "id": "1040009390",
+            "id": "1039995953",
             "type": "people"
           }
         ]
       },
       "people": {
         "data": [
-
+          {
+            "id": "1039995952",
+            "type": "people"
+          }
         ]
       },
       "projects": {
         "data": [
           {
-            "id": "1022271899",
+            "id": "1022260823",
             "type": "projects"
           }
         ]
@@ -44,7 +47,7 @@
       "institutions": {
         "data": [
           {
-            "id": "980209048",
+            "id": "980200600",
             "type": "institutions"
           }
         ]
@@ -52,7 +55,7 @@
       "investigations": {
         "data": [
           {
-            "id": "973657527",
+            "id": "973656185",
             "type": "investigations"
           }
         ]
@@ -60,7 +63,7 @@
       "studies": {
         "data": [
           {
-            "id": "1060387241",
+            "id": "1060386098",
             "type": "studies"
           }
         ]
@@ -68,7 +71,7 @@
       "assays": {
         "data": [
           {
-            "id": "1035388642",
+            "id": "1035387711",
             "type": "assays"
           }
         ]
@@ -76,7 +79,7 @@
       "data_files": {
         "data": [
           {
-            "id": "883655091",
+            "id": "883654903",
             "type": "data_files"
           }
         ]
@@ -84,7 +87,7 @@
       "models": {
         "data": [
           {
-            "id": "1004287423",
+            "id": "1004286178",
             "type": "models"
           }
         ]
@@ -92,7 +95,7 @@
       "sops": {
         "data": [
           {
-            "id": "1055251195",
+            "id": "1055250943",
             "type": "sops"
           }
         ]
@@ -100,7 +103,7 @@
       "publications": {
         "data": [
           {
-            "id": "1433",
+            "id": "498",
             "type": "publications"
           }
         ]
@@ -108,7 +111,7 @@
       "presentations": {
         "data": [
           {
-            "id": "593",
+            "id": "210",
             "type": "presentations"
           }
         ]
@@ -116,7 +119,7 @@
       "events": {
         "data": [
           {
-            "id": "1025619150",
+            "id": "1025618899",
             "type": "events"
           }
         ]
@@ -124,7 +127,7 @@
       "documents": {
         "data": [
           {
-            "id": "1514",
+            "id": "452",
             "type": "documents"
           }
         ]
@@ -132,7 +135,7 @@
       "workflows": {
         "data": [
           {
-            "id": "1024",
+            "id": "386",
             "type": "workflows"
           }
         ]
@@ -144,14 +147,14 @@
       }
     },
     "links": {
-      "self": "/programmes/2216"
+      "self": "/programmes/226"
     },
     "meta": {
-      "created": "2023-03-14T12:45:08.000Z",
-      "modified": "2023-03-14T12:45:08.000Z",
+      "created": "2022-10-26T11:51:44.000Z",
+      "modified": "2022-10-26T11:51:44.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "fa128a70-a493-013b-b230-2c91a17e7bb9"
+      "uuid": "7d002660-3752-013b-356e-000c29a94011"
     }
   },
   "jsonapi": {
