@@ -18,6 +18,11 @@
 </div>
 <br/>
 
+<label><%= link_to "Select all your items", "#", id: "select_all",
+                   onclick: "selectChildren(this,1); return false;" -%></label> |
+<label><%= link_to "Deselect all your items", "#", id: "deselect_all",
+                   onclick: "deselectChildren(this,1); return false;" -%></label>
+
 <%= form_tag({:action => :check_related_items},:method=>:post)  do -%>
   <% if @assets.empty? %>
     <span class="no_unpublished_asset">All your assets are published or you have no assets in <%= Seek::Config.instance_name %></span>
@@ -26,7 +31,14 @@
     <%= link_to "Back to profile", person_path(params[:id].to_i) -%>
   <% else %>
     <% @assets.sort_by { |k, v| v.first.class.name }.each do |type, items| %>
+      <div id="<%= items.first.class.table_name %>s">
       <h2><%= text_for_resource items.first %>(s)</h2>
+      <label><%= link_to "Select all #{(text_for_resource items.first).downcase}s", "#",
+                         id: "select_all_#{items.first.class.table_name}",
+                         onclick: "selectChildren(this,1); return false;" -%></label> |
+      <label><%= link_to "Deselect all #{(text_for_resource items.first).downcase}s", "#",
+                         id: "deselect_all_#{items.first.class.table_name}",
+                         onclick: "deselectChildren(this,1); return false;" -%></label>
       <% items.each do |item| %>
         <%
           case item
@@ -46,6 +58,7 @@
                                 :children => children } -%>
         <br/>
       <% end %>
+      </div>
     <% end %>
     <br/>
 
