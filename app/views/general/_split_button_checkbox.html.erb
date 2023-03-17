@@ -2,6 +2,7 @@
   #<%= render :partial => 'general/split_button_checkbox',
   #locals: { checkbox_id: publishing_item_param(item),
   #          checkbox_class: "#{item.class.name}_#{item.id}",
+  #          published: true,
   #          checkbox_text: "Publish?",
   #          checked: checked,
   #          toggle: children.any?,
@@ -9,6 +10,7 @@
 
   checkbox_class ||= "no_name"   # <- Needed!
   checkbox_id ||= checkbox_class
+  published ||= false
   checkbox_text ||= ""
   checked ||= false
   checked = !([false,'false',0,'0','no'].include? checked)
@@ -19,12 +21,19 @@
 -%>
 <div class="btn-group" >
   <button type="button" class="btn parent-btn-checkbox">
-    <label style="font-weight:normal;">
-      <%= check_box_tag checkbox_id, 1, checked,
-                        {:class=>checkbox_class,
-                         :onclick=>"checkRepeatedItems(this)"} -%>
-      <%= checkbox_text -%>
-    </label>
+    <% if published %>
+      <span class="label label-default" data-tooltip="<%= tooltip('This item has already been published.') %>">
+          <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+          Published
+      </span>
+    <% else %>
+      <label style="font-weight:normal;">
+        <%= check_box_tag checkbox_id, 1, checked,
+                          {:class=>checkbox_class,
+                           :onclick=>"checkRepeatedItems(this)"} -%>
+        <%= checkbox_text -%>
+      </label>
+    <% end %>
   </button>
   <% if toggle %>
     <button type="button" class="btn dropdown-toggle parent-btn-dropdown"

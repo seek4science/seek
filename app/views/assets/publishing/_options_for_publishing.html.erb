@@ -23,10 +23,12 @@
 
   <div>
     <% if item.is_published? %>
-        <span class="label label-default" data-tooltip="<%= tooltip('This item has already been published.') %>">
-          <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
-          Published
-        </span>
+      <%= render :partial => 'general/split_button_checkbox',
+                 locals: { checkbox_id: publishing_item_param(item),
+                           checkbox_class: "#{item.class.name}_#{item.id}",
+                           published: true,
+                           toggle: children.any?,
+                           extra_nesting: 1 } -%>
     <% elsif item.can_publish? %>
       <%= render :partial => 'general/split_button_checkbox',
                 locals: { checkbox_id: publishing_item_param(item),
