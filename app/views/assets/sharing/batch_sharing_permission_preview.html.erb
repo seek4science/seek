@@ -77,7 +77,7 @@
   <%= submit_tag "Next", data: {disable_with: 'Next'}, :class => 'btn btn-primary', :onclick => 'show_all_checkboxes()' -%>
 
   or
-  <%= cancel_button(resource) %>
+  <%= cancel_button(resource, button_text: "Back to profile") %>
 
 <% end -%>
 </div>
