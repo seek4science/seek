@@ -129,6 +129,27 @@ class Person < ApplicationRecord
     self
   end
 
+  # method called from the related_items.rb
+  # Gets all the programmes related to this person object.
+  def related_programmes
+    Programme.where(id: related_programme_ids)
+  end
+
+  # Concatenates both lists and filters out the duplicated ids.
+  def related_programme_ids
+    administrator_programme_ids.concat(programme_ids_related_to_projects).uniq
+  end
+
+  # Returns the ids of the programmes related to this person's projects.
+  def programme_ids_related_to_projects
+    Project.includes(:people).where(people: {id: self.id}).map(& :programme_id)
+  end
+
+  # Gets all programme id's who has an programme administrator id equal to this id.
+  def administrator_programme_ids
+    Programme.includes(:programme_administrators).where(programme_administrators: {id: self.id}).map(& :id)
+  end
+
   # not registered profiles that match this email
   def self.not_registered_with_matching_email(email)
     not_registered.where('UPPER(email) = ?', email.upcase)
