@@ -201,9 +201,6 @@ GEM
     daemons (1.1.9)
     database_cleaner (1.7.0)
     date (3.3.3)
-    debug (1.7.1)
-      irb (>= 1.5.0)
-      reline (>= 0.3.1)
     debug_inspector (1.1.0)
     delayed_job (4.1.10)
       activesupport (>= 3.0, < 8.0)
@@ -318,9 +315,6 @@ GEM
       i18n (>= 0.6.6)
     indefinite_article (0.2.4)
       activesupport
-    io-console (0.6.0)
-    irb (1.6.3)
-      reline (>= 0.3.0)
     jbuilder (2.11.5)
       actionview (>= 5.0.0)
       activesupport (>= 5.0.0)
@@ -691,8 +685,6 @@ GEM
     recaptcha (4.1.0)
       json
     regexp_parser (2.2.0)
-    reline (0.3.2)
-      io-console (~> 0.5)
     remotipart (1.4.4)
     request-log-analyzer (1.13.4)
     request_store (1.5.1)
@@ -956,7 +948,6 @@ DEPENDENCIES
   csl-styles (~> 2.0.0)
   daemons (= 1.1.9)
   database_cleaner (~> 1.7.0)
-  debug (>= 1.0.0)
   delayed_job_active_record
   docsplit
   doi_query_tool!

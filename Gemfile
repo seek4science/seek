@@ -189,7 +189,6 @@ group :test do
 end
 
 group :test, :development do
-  gem 'debug', ">=1.0.0"
   gem 'magic_lamp'
   gem 'webmock'
   gem 'teaspoon'
