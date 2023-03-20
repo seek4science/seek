@@ -67,6 +67,7 @@ div.list_item_avatar img {
 .list_item {
   .rli-head {
     display: flex;
+    align-items: center;
   }
 
   .list_item_title {
@@ -76,6 +77,26 @@ div.list_item_avatar img {
     img {
       max-height: 34px;
     }
+  }
+
+  .rli-condensed-title {
+    flex: 2;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+
+    .caret, .caret-up {
+      margin-right: 10px;
+      border-width: 10px 8px 10px 8px;
+    }
+
+    .list_item_title {
+      flex: 1;
+    }
+  }
+
+  .rli-condensed-attribute {
+    flex: 1;
   }
 
   .rli-project-list {
