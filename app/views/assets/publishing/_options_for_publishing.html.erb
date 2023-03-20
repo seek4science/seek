@@ -6,6 +6,8 @@
    tree_class = 'publishable' if item.can_publish?
    tree_class = 'already-published' if item.is_published?
 
+   toggle ||=false
+
 -%>
 <div class="isa-tree <%= html_classes -%> <%= tree_class %> _<%= item.id %>">
   <% if item.can_view? %>
@@ -27,7 +29,7 @@
                  locals: { checkbox_id: publishing_item_param(item),
                            checkbox_class: "#{item.class.name}_#{item.id}",
                            published: true,
-                           toggle: children.any?,
+                           toggle: toggle,
                            extra_nesting: 1 } -%>
     <% elsif item.can_publish? %>
       <%= render :partial => 'general/split_button_checkbox',
@@ -35,7 +37,7 @@
                           checkbox_class: "#{item.class.name}_#{item.id}",
                           checkbox_text: "Publish?",
                           checked: checked,
-                          toggle: children.any?,
+                          toggle: toggle,
                           extra_nesting: 1 } -%>
     <% else %>
         <span class="label label-warning" data-tooltip="<%= tooltip('You do not have permission to publish this item.') %>">

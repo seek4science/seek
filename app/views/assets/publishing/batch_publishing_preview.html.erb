@@ -33,29 +33,16 @@
     <% @assets.sort_by { |k, v| v.first.class.name }.each do |type, items| %>
       <div id="<%= items.first.class.table_name %>s">
       <h2><%= text_for_resource items.first %>(s)</h2>
-      <label><%= link_to "Select all #{(text_for_resource items.first).downcase}s", "#",
+      <label><%= link_to "Select all #{(text_for_resource items.first).downcase.pluralize}", "#",
                          id: "select_all_#{items.first.class.table_name}",
                          onclick: "selectChildren(this,1); return false;" -%></label> |
-      <label><%= link_to "Deselect all #{(text_for_resource items.first).downcase}s", "#",
+      <label><%= link_to "Deselect all #{(text_for_resource items.first).downcase.pluralize}", "#",
                          id: "deselect_all_#{items.first.class.table_name}",
                          onclick: "deselectChildren(this,1); return false;" -%></label>
       <% items.each do |item| %>
-        <%
-          case item
-          when Investigation
-            children = item.studies
-          when Study
-            children = item.assays
-          when Assay
-            children = item.assets
-          else
-            children = []
-          end
-        -%>
         <%= render :partial => "assets/publishing/options_for_publishing",
                    :object => item,
-                   :locals => { :html_classes => "publishing_options",
-                                :children => children } -%>
+                   :locals => { :html_classes => "publishing_options" } -%>
         <br/>
       <% end %>
       </div>

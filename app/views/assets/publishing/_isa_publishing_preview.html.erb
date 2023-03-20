@@ -16,7 +16,7 @@
   <%= render :partial => "assets/publishing/options_for_publishing",
              :object => item,
              :locals => { :html_classes => "publishing_options",
-                          :children => children,
+                          :toggle => children.any?,
                           :checked => (item == preselected) } -%>
 
   <% if children.any? %>
