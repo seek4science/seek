@@ -45,36 +45,32 @@ module SamplesHelper
   end
 
 
+  def linked_custom_metadata_form_field(attribute,resource,element_name, element_class)
 
-def linked_custom_metadata_form_field(attribute,resource,value,element_name, element_class)
+    id = resource.linked_custom_metadatas.blank? ? nil : resource.linked_custom_metadatas.select{|cm| cm.custom_metadata_type.id == attribute.linked_custom_metadata_type.id }.first.id
 
-  element_name = element_name.gsub("[data][#{attribute.title}]","[linked_custom_metadatas_attributes]")
-  html = ''
-  html +=  hidden_field_tag "#{element_name}[id]", value
-  html +=  hidden_field_tag "#{element_name}[custom_metadata_type_id]", attribute.linked_custom_metadata_type.id
+    html = ''
+    html +=  hidden_field_tag "#{element_name}[id]",id
+    html +=  hidden_field_tag "#{element_name}[custom_metadata_type_id]", attribute.linked_custom_metadata_type.id
 
-  linked_resource = value.nil? ? CustomMetadata.new(custom_metadata_type: attribute.linked_custom_metadata_type) : CustomMetadata.find(value)
-  root_key = controller_name.singularize.to_sym
+    attribute.linked_custom_metadata_type.custom_metadata_attributes.each do |attr|
+      linked_cm = resource.linked_custom_metadatas.select{|cm| cm.custom_metadata_type_id == attr.custom_metadata_type_id}.first
+      linked_cm ||= CustomMetadata.new(:custom_metadata_type_id => attr.custom_metadata_type_id)
+      puts "linked_cm=>"+ linked_cm.inspect
 
-  unless params[root_key].nil?
-    linked_data = params[root_key][:custom_metadata_attributes][:linked_custom_metadatas_attributes][:data]
-    linked_resource.data.mass_assign(linked_data)
-  end
+      attr_element_name = "#{element_name}][data][#{attr.title}]"
+      html += '<div class="form-group"><label>'+attr.label+'</label>'
+      html +=  required_span if attr.required?
+      html +=  attribute_form_element(attr, linked_cm, attr_element_name, element_class)
 
-  attribute.linked_custom_metadata_type.custom_metadata_attributes.each do |attr|
-    attr_element_name = "#{element_name}][data][#{attr.title}]"
-    html += '<div class="form-group"><label>'+attr.label+'</label>'
-    html +=  required_span if attr.required?
-    html +=  attribute_form_element(attr, linked_resource, attr_element_name, element_class)
-
-    unless attr.description.nil?
-      html += custom_metadata_attribute_description(attr.description)
+      unless attr.description.nil?
+        html += custom_metadata_attribute_description(attr.description)
+      end
+      html += '</div>'
     end
-    html += '</div>'
-  end
 
-  html.html_safe
-end
+    html.html_safe
+  end
 
   def sample_multi_form_field(attribute, element_name, value)  
     existing_objects = []
@@ -104,11 +100,6 @@ end
   end
 
   def display_attribute(sample, attribute, options = {})
-    # puts "*****************************"
-    # puts "attribute=>"+attribute.inspect
-    # puts "sample=>"+sample.inspect
-    # puts "attribute.sample_attribute_type.base_type=>"+attribute.sample_attribute_type.base_type.inspect
-    # puts "*****************************"
     value = sample.get_attribute_value(attribute)
     if value.blank?
       text_or_not_specified(value)
@@ -131,7 +122,7 @@ end
       when Seek::Samples::BaseType::CV_LIST
         value.each{|v| seek_cv_attribute_display(v, attribute) }.join(', ')
       when Seek::Samples::BaseType::LINKED_CUSTOM_METADATA
-        linked_custom_metadata_attribute_display(value, attribute)
+        linked_custom_metadata_attribute_display(value)
       else
         default_attribute_display(attribute, options, sample, value)
       end
@@ -147,11 +138,11 @@ end
     content
   end
 
-  def linked_custom_metadata_attribute_display(value, attribute)
+  def linked_custom_metadata_attribute_display(value)
     html = ''
-     data = CustomMetadata.find(value).data
+     data = CustomMetadata.find(value.id).data
     html += '<ul>'
-      CustomMetadata.find(value).custom_metadata_attributes.each do |attr|
+       CustomMetadata.find(value.id).custom_metadata_attributes.each do |attr|
        html += '<li>'
        html += attr.label+': '+ data[attr.title]+' '
        html += '</li>'
@@ -319,7 +310,7 @@ end
     when Seek::Samples::BaseType::SEEK_SAMPLE_MULTI
       sample_multi_form_field attribute, element_name, value
     when Seek::Samples::BaseType::LINKED_CUSTOM_METADATA
-      linked_custom_metadata_form_field attribute, resource, value, element_name, element_class
+      linked_custom_metadata_form_field attribute, resource, element_name, element_class
     else
       text_field_tag element_name, value, class: "form-control #{element_class}", placeholder: placeholder
     end

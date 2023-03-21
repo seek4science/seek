@@ -15,15 +15,15 @@ class CustomMetadata < ApplicationRecord
   delegate :custom_metadata_attributes, to: :custom_metadata_type
 
 
-  after_create :update_linked_custom_metadata_id, if: :has_linked_custom_metadatas?
+  # after_create :update_linked_custom_metadata_id, if: :has_linked_custom_metadatas?
 
-  def update_linked_custom_metadata_id
-    linked_custom_metadatas.each do |cm|
-      attr_name = cm.custom_metadata_type.title
-      data.mass_assign(data.to_hash.update({attr_name => cm.id}), pre_process: false)
-      update_column(:json_metadata, data.to_json)
-    end
-  end
+  # def update_linked_custom_metadata_id
+  #   linked_custom_metadatas.each do |cm|
+  #     attr_name = cm.custom_metadata_type.title
+  #     data.mass_assign(data.to_hash.update({attr_name => cm.id}), pre_process: false)
+  #     update_column(:json_metadata, data.to_json)
+  #   end
+  # end
 
   def has_linked_custom_metadatas?
     !linked_custom_metadatas.blank?
@@ -42,6 +42,17 @@ class CustomMetadata < ApplicationRecord
 
   def attribute_class
     CustomMetadataAttribute
+  end
+
+
+  def set_linked_custom_metadatas(cma, cm_params)
+
+      if item.new_record?
+        self.linked_custom_metadatas.build(custom_metadata_type: cma.linked_custom_metadata_type, data: cm_params[:data])
+      else
+        linked_cm = self.linked_custom_metadatas.select{|cm| cm.custom_metadata_type_id.to_s == cm_params[:custom_metadata_type_id]}.first
+        linked_cm.update(cm_params.permit!)
+      end
   end
 
 end

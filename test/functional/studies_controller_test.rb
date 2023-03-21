@@ -883,7 +883,7 @@ class StudiesControllerTest < ActionController::TestCase
 
     cmt = Factory(:role_custom_metadata_type)
     login_as(Factory(:person))
-    linked_cmt = Factory(:role_name_custom_metadata_type)
+    linked_cmt = cmt.attributes_with_linked_custom_metadata_type.first.linked_custom_metadata_type
 
     # test create
     assert_difference('Study.count') do
@@ -891,16 +891,17 @@ class StudiesControllerTest < ActionController::TestCase
         investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
         study_attributes = { title: 'Alice in Wonderland', investigation_id: investigation.id }
         cm_attributes = { custom_metadata_attributes: {
-          custom_metadata_type_id: cmt.id, data: { "role_email":"alice@email.com", "role_phone":"0012345", "role_name": "" },
-          linked_custom_metadatas_attributes: [
-            {
-              custom_metadata_type_id: linked_cmt.id,
+          custom_metadata_type_id: cmt.id, data: {
+            "role_email":"alice@email.com",
+            "role_phone":"0012345",
+            "role_name": {
+              custom_metadata_type_id:linked_cmt.id,
               data:{
                 "first_name":"alice",
                 "last_name": "liddell"
               }
             }
-          ]
+          }
         }
         }
 
@@ -913,7 +914,6 @@ class StudiesControllerTest < ActionController::TestCase
     assert_equal cmt, cm.custom_metadata_type
     assert_equal "alice@email.com",cm.get_attribute_value('role_email')
     assert_equal '0012345',cm.get_attribute_value('role_phone')
-    assert_equal cm.linked_custom_metadatas.first.id, cm.get_attribute_value('role_name')
     assert_equal 'alice', cm.linked_custom_metadatas.first.get_attribute_value('first_name')
     assert_equal 'liddell', cm.linked_custom_metadatas.first.get_attribute_value('last_name')
 
@@ -927,16 +927,16 @@ class StudiesControllerTest < ActionController::TestCase
       assert_no_difference('CustomMetadata.count') do
         put :update, params: { id: study.id, study: { title: "Alice Through the Looking Glass",
                                                       custom_metadata_attributes: {
-                                                        custom_metadata_type_id: cmt.id, id:cm.id, data: {"role_email":"rabbit@email.com"},
-                                                        linked_custom_metadatas_attributes: [
-                                                          {
+                                                        custom_metadata_type_id: cmt.id, id:cm.id, data: {
+                                                          "role_email":"rabbit@email.com",
+                                                          "role_name":{
                                                             custom_metadata_type_id: linked_cmt.id,
                                                             id: cm.linked_custom_metadatas.first.id,
                                                             data:{
                                                               "first_name":"rabbit"
                                                             }
                                                           }
-                                                        ]
+                                                        }
                                                       }
         }
         }
@@ -952,6 +952,86 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
 
+  test 'should create and update study with multiple linked custom metadata types' do
+    cmt = Factory(:role_multiple_custom_metadata_type)
+    login_as(Factory(:person))
+    linked_name_cmt = cmt.attributes_with_linked_custom_metadata_type.first.linked_custom_metadata_type
+    linked_addr_cmt = cmt.attributes_with_linked_custom_metadata_type.last.linked_custom_metadata_type
+    # test create
+    assert_difference('Study.count') do
+      assert_difference('CustomMetadata.count',3) do
+        investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+        study_attributes = { title: 'Alice in Wonderland', investigation_id: investigation.id }
+        cm_attributes = { custom_metadata_attributes: {
+          custom_metadata_type_id: cmt.id, data: {
+            "role_email":"alice@email.com",
+            "role_phone":"0012345",
+            "role_name": {
+              custom_metadata_type_id:linked_name_cmt.id,
+              data:{
+                "first_name":"alice",
+                "last_name": "liddell"
+              }
+            },
+            "role_address": {
+              custom_metadata_type_id:linked_addr_cmt.id,
+              data:{
+                "street":"wonder",
+                "city": "land"
+              }
+            }
+          }
+        }
+        }
+        post :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
+      end
+    end
+
+    assert study = assigns(:study)
+    assert cm = study.custom_metadata
+    assert_equal cmt, cm.custom_metadata_type
+    assert_equal "alice@email.com",cm.get_attribute_value('role_email')
+    assert_equal '0012345',cm.get_attribute_value('role_phone')
+    assert_equal 'alice', cm.linked_custom_metadatas.first.get_attribute_value('first_name')
+    assert_equal 'liddell', cm.linked_custom_metadatas.first.get_attribute_value('last_name')
+    assert_equal 'wonder', cm.linked_custom_metadatas.last.get_attribute_value('street')
+    assert_equal 'land', cm.linked_custom_metadatas.last.get_attribute_value('city')
+
+    # test show
+    get :show, params:{ id:study}
+    assert_response :success
+
+
+    # test update
+    assert_no_difference('Study.count') do
+      assert_no_difference('CustomMetadata.count') do
+        put :update, params: { id: study.id, study: { title: "Alice Through the Looking Glass",
+                                                      custom_metadata_attributes: {
+                                                        custom_metadata_type_id: cmt.id, id:cm.id, data: {
+                                                          "role_email":"rabbit@email.com",
+                                                          "role_name":{
+                                                            custom_metadata_type_id: linked_name_cmt.id,
+                                                            id: cm.linked_custom_metadatas.first.id,
+                                                            data:{
+                                                              "first_name":"rabbit"
+                                                            }
+                                                          }
+                                                        }
+                                                      }
+        }
+        }
+      end
+    end
+
+
+    assert new_study = assigns(:study)
+    assert_equal 'Alice Through the Looking Glass', new_study.title
+    assert_equal 'rabbit@email.com', new_study.custom_metadata.get_attribute_value('role_email')
+    assert_equal 'rabbit', new_study.custom_metadata.linked_custom_metadatas.first.get_attribute_value('first_name')
+
+
+
+  end
 
 
   test 'experimentalists only shown if set' do

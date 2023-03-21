@@ -1,6 +1,5 @@
 class CustomMetadataType < ApplicationRecord
   has_many :custom_metadata_attributes, inverse_of: :custom_metadata_type, dependent: :destroy
-  has_many :linked_custom_metadata_attributes, class_name: 'CustomMetadataAttribute', foreign_key: 'linked_custom_metadata_type_id'
 
   validates :title, presence: true
   validates :custom_metadata_attributes, presence: true
@@ -16,6 +15,10 @@ class CustomMetadataType < ApplicationRecord
 
   def attribute_by_method_name(method_name)
     custom_metadata_attributes.detect { |attr| attr.method_name == method_name }
+  end
+
+  def attributes_with_linked_custom_metadata_type
+    custom_metadata_attributes.reject {|attr| attr.linked_custom_metadata_type.nil?}
   end
 
   def supported_type_must_be_valid_type

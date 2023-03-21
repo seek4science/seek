@@ -134,6 +134,16 @@ Factory.define(:last_name_custom_metadata_attribute,class:CustomMetadataAttribut
   f.association :sample_attribute_type, factory: :string_sample_attribute_type
 end
 
+Factory.define(:street_custom_metadata_attribute,class:CustomMetadataAttribute) do |f|
+  f.title 'street'
+  f.association :sample_attribute_type, factory: :string_sample_attribute_type
+end
+
+Factory.define(:city_custom_metadata_attribute,class:CustomMetadataAttribute) do |f|
+  f.title 'city'
+  f.association :sample_attribute_type, factory: :string_sample_attribute_type
+end
+
 Factory.define(:role_email_custom_metadata_attribute,class:CustomMetadataAttribute) do |f|
   f.title 'role_email'
   f.association :sample_attribute_type, factory: :string_sample_attribute_type
@@ -154,10 +164,25 @@ Factory.define(:role_name_custom_metadata_type,class:CustomMetadataType) do |f|
   end
 end
 
+Factory.define(:role_address_custom_metadata_type,class:CustomMetadataType) do |f|
+  f.title 'role_address'
+  f.supported_type 'Study'
+  f.after_build do |a|
+    a.custom_metadata_attributes << Factory(:street_custom_metadata_attribute,required: true)
+    a.custom_metadata_attributes << Factory(:city_custom_metadata_attribute, required: true)
+  end
+end
+
 Factory.define(:role_name_linked_custom_metadata_attribute,class:CustomMetadataAttribute) do |f|
   f.title 'role_name'
   f.association :sample_attribute_type, factory: :custom_metadata_sample_attribute_type
   f.association :linked_custom_metadata_type, factory: :role_name_custom_metadata_type
+  end
+
+Factory.define(:role_address_linked_custom_metadata_attribute,class:CustomMetadataAttribute) do |f|
+  f.title 'role_address'
+  f.association :sample_attribute_type, factory: :custom_metadata_sample_attribute_type
+  f.association :linked_custom_metadata_type, factory: :role_address_custom_metadata_type
 end
 
 Factory.define(:role_custom_metadata_type,class:CustomMetadataType) do |f|
@@ -168,4 +193,16 @@ Factory.define(:role_custom_metadata_type,class:CustomMetadataType) do |f|
     a.custom_metadata_attributes << Factory(:role_phone_custom_metadata_attribute,required: true)
     a.custom_metadata_attributes << Factory(:role_name_linked_custom_metadata_attribute)
   end
+
+  Factory.define(:role_multiple_custom_metadata_type,class:CustomMetadataType) do |f|
+    f.title 'role'
+    f.supported_type 'Study'
+    f.after_build do |a|
+      a.custom_metadata_attributes << Factory(:role_email_custom_metadata_attribute,required: true)
+      a.custom_metadata_attributes << Factory(:role_phone_custom_metadata_attribute,required: true)
+      a.custom_metadata_attributes << Factory(:role_name_linked_custom_metadata_attribute)
+      a.custom_metadata_attributes << Factory(:role_address_linked_custom_metadata_attribute)
+    end
+  end
+
 end
