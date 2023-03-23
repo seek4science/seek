@@ -12,6 +12,8 @@ class IsaStudiesController < ApplicationController
   def create
     @isa_study = IsaStudy.new(isa_study_params)
     update_sharing_policies @isa_study.study
+    @isa_study.study.creators = get_creator_ids(params).collect{ |creator_id| Person.find(creator_id) }
+    @isa_study.study.other_creators = params[:study][:other_creators]
     @isa_study.source.contributor = User.current_user.person
     @isa_study.sample_collection.contributor = User.current_user.person
     @isa_study.study.sample_types = [@isa_study.source, @isa_study.sample_collection]
@@ -74,6 +76,15 @@ class IsaStudiesController < ApplicationController
   end
 
   private
+
+  def get_creator_ids(params = {})
+    creator_ids = []
+    creator_keys = params[:study][:assets_creators_attributes].keys
+    creator_keys.each do |key|
+      creator_ids.append(params[:study][:assets_creators_attributes][key][:creator_id])
+    end
+    creator_ids.map(&:to_i)
+  end
 
   def isa_study_params
     # TODO: get the params from a shared module
