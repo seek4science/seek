@@ -13,7 +13,7 @@ class IsaStudiesController < ApplicationController
     @isa_study = IsaStudy.new(isa_study_params)
     update_sharing_policies @isa_study.study
     @isa_study.study.creators = get_creator_ids_for_isa_studies(params).collect{ |creator_id| Person.find(creator_id) }
-    @isa_study.study.other_creators = params[:study][:other_creators]
+    @isa_study.study.other_creators = params[:study][:other_creators] if params[:study].respond_to? :other_creators
     @isa_study.source.contributor = User.current_user.person
     @isa_study.sample_collection.contributor = User.current_user.person
     @isa_study.study.sample_types = [@isa_study.source, @isa_study.sample_collection]
