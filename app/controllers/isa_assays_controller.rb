@@ -59,13 +59,8 @@ class IsaAssaysController < ApplicationController
   private
 
   def get_creator_ids_for_isa_assays(params = {})
-    creator_ids = []
-    creator_keys = params[:assay][:assets_creators_attributes].keys
-    creator_keys.each do |key|
-      creator_ids.append(params[:assay][:assets_creators_attributes][key][:creator_id])
-    end
-    creator_ids.map(&:to_i)
-end
+    get_creator_ids_for_isa(params[:assay])
+  end
 
   def isa_assay_params
     # TODO: get the params from a shared module

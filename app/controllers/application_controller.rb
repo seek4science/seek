@@ -663,4 +663,14 @@ class ApplicationController < ActionController::Base
     ]
   end
 
+  def get_creator_ids_for_isa(params)
+    creator_ids = []
+    creator_keys = params[:assets_creators_attributes].keys
+
+    creator_keys.each do |key|
+      creator_ids.append(params[:assets_creators_attributes][key][:creator_id])
+    end
+    creator_ids.map(&:to_i)
+  end
+
 end
