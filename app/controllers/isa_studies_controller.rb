@@ -78,12 +78,7 @@ class IsaStudiesController < ApplicationController
   private
 
   def get_creator_ids_for_isa_studies(params = {})
-    creator_ids = []
-    creator_keys = params[:study][:assets_creators_attributes].keys
-    creator_keys.each do |key|
-      creator_ids.append(params[:study][:assets_creators_attributes][key][:creator_id])
-    end
-    creator_ids.map(&:to_i)
+    get_creator_ids_for_isa(params[:study])
   end
 
   def isa_study_params
