@@ -45,7 +45,7 @@ module SamplesHelper
   end
 
 
-  def linked_custom_metadata_form_field(attribute,resource,element_name, element_class)
+  def linked_custom_metadata_form_field(attribute,resource,element_name, element_class,depth)
 
     id = resource.linked_custom_metadatas.blank? ? nil : resource.linked_custom_metadatas.select{|cm| cm.custom_metadata_type.id == attribute.linked_custom_metadata_type.id }.first.id
 
@@ -56,12 +56,17 @@ module SamplesHelper
     attribute.linked_custom_metadata_type.custom_metadata_attributes.each do |attr|
       linked_cm = resource.linked_custom_metadatas.select{|cm| cm.custom_metadata_type_id == attr.custom_metadata_type_id}.first
       linked_cm ||= CustomMetadata.new(:custom_metadata_type_id => attr.custom_metadata_type_id)
-      puts "linked_cm=>"+ linked_cm.inspect
 
       attr_element_name = "#{element_name}][data][#{attr.title}]"
       html += '<div class="form-group"><label>'+attr.label+'</label>'
       html +=  required_span if attr.required?
-      html +=  attribute_form_element(attr, linked_cm, attr_element_name, element_class)
+      if attr.linked_custom_metadata?
+        html += '<div class="form-group linked_custom_metdata_'+(depth.even? ? 'even' : 'odd')+'">'
+        html +=  attribute_form_element(attr, linked_cm, attr_element_name, element_class,depth+1)
+        html += '</div>'
+      else
+        html +=  attribute_form_element(attr, linked_cm, attr_element_name, element_class)
+      end
 
       unless attr.description.nil?
         html += custom_metadata_attribute_description(attr.description)
@@ -144,7 +149,12 @@ module SamplesHelper
     html += '<ul>'
        CustomMetadata.find(value.id).custom_metadata_attributes.each do |attr|
        html += '<li>'
-       html += attr.label+': '+ data[attr.title]+' '
+       if data[attr.title].nil?
+         html += '<label>'+attr.title+'</label>'
+         html += display_attribute(value,attr)
+       else
+         html += attr.label+': '+ data[attr.title]+' '
+       end
        html += '</li>'
       end
     html += '</ul>'
@@ -261,7 +271,7 @@ module SamplesHelper
 
   private
 
-  def attribute_form_element(attribute, resource, element_name, element_class)
+  def attribute_form_element(attribute, resource, element_name, element_class, depth=1)
     value = resource.get_attribute_value(attribute.title)
     placeholder = "e.g. #{attribute.sample_attribute_type.placeholder}" unless attribute.sample_attribute_type.placeholder.blank?
 
@@ -310,7 +320,7 @@ module SamplesHelper
     when Seek::Samples::BaseType::SEEK_SAMPLE_MULTI
       sample_multi_form_field attribute, element_name, value
     when Seek::Samples::BaseType::LINKED_CUSTOM_METADATA
-      linked_custom_metadata_form_field attribute, resource, element_name, element_class
+      linked_custom_metadata_form_field attribute, resource, element_name, element_class,depth
     else
       text_field_tag element_name, value, class: "form-control #{element_class}", placeholder: placeholder
     end

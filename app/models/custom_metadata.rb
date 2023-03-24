@@ -44,13 +44,33 @@ class CustomMetadata < ApplicationRecord
     CustomMetadataAttribute
   end
 
+  def update_linked_custom_metadata(parameters)
+    cmt_id = parameters[:custom_metadata_type_id]
+
+    # return no custom metdata is filled
+    seek_cm_attrs = CustomMetadataType.find(cmt_id).custom_metadata_attributes.select(&:linked_custom_metadata?)
+    return if seek_cm_attrs.blank?
+
+    seek_cm_attrs.each  do |cma|
+      cma_params = parameters[:data][cma.title.to_sym]
+      self.set_linked_custom_metadatas(cma, cma_params) unless cma_params.nil?
+
+      cma_linked_cmt =  cma.linked_custom_metadata_type.attributes_with_linked_custom_metadata_type
+
+      unless cma_linked_cmt.blank?
+        cm = self.linked_custom_metadatas.select{|cm| cm.custom_metadata_type.id == cma[:linked_custom_metadata_type_id]}.first
+        cm.update_linked_custom_metadata(cma_params)
+      end
+
+    end
+  end
 
   def set_linked_custom_metadatas(cma, cm_params)
 
-      if item.new_record?
+      if self.new_record?
         self.linked_custom_metadatas.build(custom_metadata_type: cma.linked_custom_metadata_type, data: cm_params[:data])
       else
-        linked_cm = self.linked_custom_metadatas.select{|cm| cm.custom_metadata_type_id.to_s == cm_params[:custom_metadata_type_id]}.first
+        linked_cm = self.linked_custom_metadatas.select{|cm| cm.custom_metadata_type.id.to_s == cm_params[:custom_metadata_type_id]}.first
         linked_cm.update(cm_params.permit!)
       end
   end
