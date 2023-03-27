@@ -706,7 +706,7 @@ class PeopleControllerTest < ActionController::TestCase
         assert_select '.pagination-container li.active', text: '1'
         assert_select '.list_items_container .collapse', count: 3
 
-        
+
         get :index, params: { view: 'table' }
         assert_response :success
         assert_equal 3, assigns(:per_page)
@@ -819,6 +819,25 @@ class PeopleControllerTest < ActionController::TestCase
         assert_select 'div.list_item_title' do
           assert_select 'a[href=?]', project_path(project), text: project.title
           assert_select 'a[href=?]', institution_path(inst), text: inst.title
+        end
+      end
+    end
+  end
+
+  test 'should show empty programme as related item if programme administrator' do
+    person1 = Factory(:programme_administrator_not_in_project)
+    prog1 = Factory(:min_programme, programme_administrators: [person1])
+
+    assert person1.projects.empty?
+
+    get :show, params: { id: person1.id }
+    assert_response :success
+
+    assert_select 'h2', text: /Related items/i
+    assert_select 'div.list_items_container' do
+      assert_select 'div.list_item' do
+        assert_select 'div.list_item_title' do
+          assert_select 'a[href=?]', programme_path(prog1), text: prog1.title
         end
       end
     end
