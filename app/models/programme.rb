@@ -57,7 +57,7 @@ class Programme < ApplicationRecord
   )
 
   def related_people
-    people | Person.where(id: programme_administrator_ids)
+    people | programme_administrators
   end
 
   def self.site_managed_programme
