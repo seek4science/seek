@@ -2287,6 +2287,8 @@ programmePatch:
           properties:
             administrators:
               $ref: "#/components/schemas/multipleReferences"
+            people:
+              $ref: "#/components/schemas/multipleReferences"
             projects:
               $ref: "#/components/schemas/multipleReferences"
           additionalProperties: false
