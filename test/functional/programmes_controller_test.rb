@@ -837,4 +837,24 @@ class ProgrammesControllerTest < ActionController::TestCase
     end
   end
 
+  test 'Empty programmes should show programme administrators as related people' do
+    person1 = Factory(:programme_administrator_not_in_project)
+    person2 = Factory(:programme_administrator_not_in_project)
+    prog1 = Factory(:min_programme, programme_administrators: [person1, person2])
+
+    assert person1.projects.empty?
+
+    get :show, params: { id: prog1.id }
+    assert_response :success
+
+    assert_select 'h2', text: /Related items/i
+    assert_select 'div.list_items_container' do
+      assert_select 'div.list_item' do
+        assert_select 'div.list_item_title' do
+          assert_select 'a[href=?]', person_path(person1), text: person1.title
+          assert_select 'a[href=?]', person_path(person2), text: person2.title
+        end
+      end
+    end
+  end
 end

@@ -129,6 +129,12 @@ class Person < ApplicationRecord
     self
   end
 
+  # method called from the related_items.rb
+  # Gets all the programmes related to this person object.
+  def related_programmes
+    programmes | programmes_for_role(:programme_administrator)
+  end
+
   # not registered profiles that match this email
   def self.not_registered_with_matching_email(email)
     not_registered.where('UPPER(email) = ?', email.upcase)

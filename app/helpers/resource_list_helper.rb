@@ -16,9 +16,8 @@ module ResourceListHelper
   end
 
   def resource_list_condensed_row(resource)
-    div_class = "col-sm-#{resource.default_table_columns.length < 3 ? '4' : '3'}"
     resource.default_table_columns.first(3).collect do |column|
-      content_tag :div, class: div_class do
+      content_tag :div, class: 'rli-condensed-attribute' do
         "<b>#{resource.class.human_attribute_name(column)}: </b>#{resource_list_column_display_value(resource,
                                                                                                      column)}".html_safe
       end
@@ -33,7 +32,7 @@ module ResourceListHelper
     when 'title'
       list_item_title resource
     when 'creators'
-      table_item_person_list column_value
+      list_item_person_list_inner resource.assets_creators, (resource.other_creators if resource.respond_to? 'other_creators')
     when 'assay_type_uri'
       link_to_assay_type(resource)
     when 'technology_type_uri'
@@ -57,31 +56,5 @@ module ResourceListHelper
         end.join(', ').html_safe
       end
     end
-  end
-
-  def table_item_person_list(contributors, other_contributors = nil, key = t('creator').capitalize)
-    contributor_count = contributors.count
-    contributor_count += 1 unless other_contributors.blank?
-    html = ''
-    other_html = ''
-    html << if key == 'Author'
-              contributors.map do |author|
-                if author.person
-                  link_to author.full_name, show_resource_path(author.person)
-                else
-                  author.full_name
-                end
-              end.join(', ')
-            else
-              contributors.map do |c|
-                link_to truncate(c.title, length: 75), show_resource_path(c), title: get_object_title(c)
-              end.join(', ')
-            end
-    unless other_contributors.blank?
-      other_html << ', ' unless contributors.empty?
-      other_html << other_contributors
-    end
-    other_html << 'None' if contributor_count.zero?
-    html.html_safe + other_html
   end
 end
