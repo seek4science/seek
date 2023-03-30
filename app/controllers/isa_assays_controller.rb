@@ -14,8 +14,8 @@ class IsaAssaysController < ApplicationController
     update_sharing_policies @isa_assay.assay
     @isa_assay.assay.contributor = current_person
     @isa_assay.sample_type.contributor = User.current_user.person
-    @isa_assay.assay.creators = get_creator_ids_for_isa_assays(params).collect{ |creator_id| Person.find(creator_id) }
-    @isa_assay.assay.other_creators = params[:assay][:other_creators] if params[:assay].respond_to? :other_creators
+    # @isa_assay.assay.creators = get_creator_ids_for_isa_assays(params).collect{ |creator_id| Person.find(creator_id) }
+    # @isa_assay.assay.other_creators = params[:assay][:other_creators] if params[:assay].respond_to? :other_creators
     if @isa_assay.save
       redirect_to single_page_path(id: @isa_assay.assay.projects.first, item_type: 'assay',
                                    item_id: @isa_assay.assay, notice: 'The ISA assay was created successfully!')
