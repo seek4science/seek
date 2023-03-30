@@ -12,13 +12,23 @@ class IsaStudiesController < ApplicationController
   def create
     @isa_study = IsaStudy.new(isa_study_params)
     update_sharing_policies @isa_study.study
+    @isa_study.study.creators = get_creator_ids_for_isa_studies(params).collect{ |creator_id| Person.find(creator_id) }
+    @isa_study.study.other_creators = params[:study][:other_creators] if params[:study].respond_to? :other_creators
     @isa_study.source.contributor = User.current_user.person
     @isa_study.sample_collection.contributor = User.current_user.person
     @isa_study.study.sample_types = [@isa_study.source, @isa_study.sample_collection]
 
     if @isa_study.save
-      redirect_to single_page_path(id: @isa_study.study.projects.first, item_type: 'study',
-                                   item_id: @isa_study.study)
+      flash[:notice] = "The #{t('isa_study')} was succesfully created.<br/>".html_safe
+
+      respond_to do |format|
+        format.html do
+          redirect_to single_page_path(id: @isa_study.study.projects.first, item_type: 'study',
+                                       item_id: @isa_study.study)
+        end
+        format.json { render json: @isa_study, include: [params[:include]] }
+      end
+
     else
       respond_to do |format|
         format.html { render action: 'new' }
@@ -66,6 +76,10 @@ class IsaStudiesController < ApplicationController
   end
 
   private
+
+  def get_creator_ids_for_isa_studies(params = {})
+    get_creator_ids_for_isa(params[:study])
+  end
 
   def isa_study_params
     # TODO: get the params from a shared module
