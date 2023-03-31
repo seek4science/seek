@@ -73,6 +73,13 @@ class IsaAssaysControllerTest < ActionController::TestCase
     assert_equal "Input (#{title})", sample_multi.title
   end
 
+  test 'author form partial uses correct nested param attributes' do
+    get :new, params: { study_id: Factory(:study, contributor: User.current_user.person) }
+    assert_response :success
+    assert_select '#author-list[data-field-name=?]','isa_assay[assay][assets_creators_attributes]'
+    assert_select '#isa_assay_assay_other_creators'
+  end
+
   test 'should show new when parameters are incomplete' do
     projects = User.current_user.person.projects
     inv = Factory(:investigation, projects: projects, contributor: User.current_user.person)
