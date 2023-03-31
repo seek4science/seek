@@ -22,7 +22,8 @@ class SinglePagesController < ApplicationController
   def index; end
 
   def project_folders
-    return if !Seek::Config.project_single_page_folders_enabled
+    return unless Seek::Config.project_single_page_enabled
+
     project_folders = ProjectFolder.root_folders(@project)
     if project_folders.empty?
       project_folders = ProjectFolder.initialize_default_folders(@project)
@@ -75,5 +76,4 @@ class SinglePagesController < ApplicationController
       render json: { status: :unprocessable_entity, error: 'You must be logged in to access batch sharing permission.' }
     end
   end
-
 end
