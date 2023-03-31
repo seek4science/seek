@@ -411,6 +411,20 @@ class DataFileTest < ActiveSupport::TestCase
     end
   end
 
+  test 'extract_samples without confirm shouldnt trigger gatekeeper check' do
+    gate_keeper = Factory(:asset_gatekeeper)
+
+    Factory(:string_sample_attribute_type)
+    sample_type = SampleType.new title: 'from template', project_ids: [gate_keeper.projects.first.id],
+                                 content_blob: Factory(:sample_type_template_content_blob), contributor: Factory(:person)
+    sample_type.build_attributes_from_template
+    disable_authorization_checks { sample_type.save! }
+
+    data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
+                        policy: Factory(:public_policy), contributor: gate_keeper
+    refute_empty data_file.extract_samples(sample_type, false, false)
+  end
+
   test 'can copy assay associations for selected assays' do
     person = Factory(:person)
     User.with_current_user(person.user) do

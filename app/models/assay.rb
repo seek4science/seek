@@ -1,8 +1,6 @@
 class Assay < ApplicationRecord
 
-  include Seek::Rdf::RdfGeneration
   include Seek::Ontologies::AssayOntologyTypes
-  include Seek::Taggable
 
   enum status: [:planned, :running, :completed, :cancelled, :failed]
   belongs_to :assignee, class_name: 'Person'
@@ -59,7 +57,7 @@ class Assay < ApplicationRecord
   validates_with TechnologyTypeUriValidator
   validates_presence_of :contributor
   validates_presence_of :assay_class
-  validates :study, presence: { message: ' must be selected and valid' }, projects: true
+  validates :study, presence: { message: 'must be selected and valid' }, projects: true
 
   before_validation :default_assay_and_technology_type
 

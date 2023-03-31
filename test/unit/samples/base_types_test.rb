@@ -2,7 +2,7 @@ require 'test_helper'
 
 class BaseTypeTest < ActiveSupport::TestCase
   test 'all types' do
-    assert_equal %w(Integer Float String DateTime Date Text Boolean SeekStrain SeekSample SeekSampleMulti CV SeekDataFile).sort,
+    assert_equal %w(Integer Float String DateTime Date Text Boolean SeekStrain SeekSample SeekSampleMulti CV SeekDataFile CVList).sort,
                  Seek::Samples::BaseType::ALL_TYPES.sort
   end
 
@@ -19,12 +19,13 @@ class BaseTypeTest < ActiveSupport::TestCase
     assert_equal 'SeekSampleMulti', Seek::Samples::BaseType::SEEK_SAMPLE_MULTI
     assert_equal 'CV', Seek::Samples::BaseType::CV
     assert_equal 'SeekDataFile',Seek::Samples::BaseType::SEEK_DATA_FILE
+    assert_equal 'CVList',Seek::Samples::BaseType::CV_LIST
   end
 
   test 'valid?' do
     assert Seek::Samples::BaseType.valid?('String')
     refute Seek::Samples::BaseType.valid?('Fish')
-    %w(Integer Float String DateTime Date Text Boolean SeekStrain SeekSample SeekSampleMulti CV).each do |type|
+    %w(Integer Float String DateTime Date Text Boolean SeekStrain SeekSample SeekSampleMulti CV CVList).each do |type|
       assert Seek::Samples::BaseType.valid?(type)
     end
   end

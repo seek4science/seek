@@ -1,6 +1,11 @@
 require 'test_helper'
 
 class VersionTest < ActiveSupport::TestCase
+
+  def teardown
+    File.delete(Seek::Version::GIT_VERSION_RECORD_FILE_PATH) if File.exist?(Seek::Version::GIT_VERSION_RECORD_FILE_PATH)
+  end
+
   test 'default path' do
     str = Seek::Version.read.to_s
 
@@ -26,5 +31,18 @@ class VersionTest < ActiveSupport::TestCase
 
   test 'APP_VERSION' do
     assert_equal Seek::Version::APP_VERSION, Seek::Version.read
+  end
+
+  test 'git_version_record_present?' do
+    refute Seek::Version.git_version_record_present?
+    File.write(Seek::Version::GIT_VERSION_RECORD_FILE_PATH, 'wibble')
+    assert Seek::Version.git_version_record_present?
+  end
+
+  test 'git version' do
+    real_git = `git rev-parse HEAD`.chomp
+    assert_equal real_git, Seek::Version.git_version
+    File.write(Seek::Version::GIT_VERSION_RECORD_FILE_PATH, 'abcdefghi')
+    assert_equal 'abcdefghi', Seek::Version.git_version
   end
 end

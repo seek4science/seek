@@ -22,10 +22,7 @@ module Seek
         logger.error "ERROR - #{exception.class.name} (#{exception.message})"
         status = error_response_code(exception)
         exception_notification(status, exception)
-        respond_to do |format|
-          format.html { render template: "errors/error_#{status}", layout: 'layouts/errors', status: status, locals: {exception: exception} }
-          format.all { head status }
-        end
+        respond_to_error(status, exception: exception)
       end
 
       def error_response_code(exception)
@@ -38,6 +35,13 @@ module Seek
         end
       end
 
+      def respond_to_error(status, exception: nil)
+        respond_to do |format|
+          format.html { render template: "errors/error_#{status}", layout: 'layouts/errors', status: status,
+                               locals: { exception: exception } }
+          format.all { head status }
+        end
+      end
     end
   end
 end

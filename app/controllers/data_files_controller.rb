@@ -32,14 +32,6 @@ class DataFilesController < ApplicationController
 
   api_actions :index, :show, :create, :update, :destroy
 
-  def plot
-    sheet = params[:sheet] || 2
-    @csv_data = spreadsheet_to_csv(open(@data_file.content_blob.filepath), sheet, true)
-    respond_to do |format|
-      format.html
-    end
-  end
-
   def destroy
     if @data_file.extracted_samples.any? && !params[:destroy_extracted_samples]
       redirect_to destroy_samples_confirm_data_file_path(@data_file)

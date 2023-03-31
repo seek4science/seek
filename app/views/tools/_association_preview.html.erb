@@ -1,0 +1,9 @@
+<%= link_to '#', class: 'list-group-item selectable',
+            'data-role' => 'seek-association-candidate',
+            'data-association-id' => association_preview['biotoolsID'],
+            'data-association-title' => association_preview['name'] do %>
+  <strong><%= association_preview['biotoolsID'] %></strong>
+  <span class="pull-right subtle">ID: <%= association_preview['name'] -%></span>
+
+  <p><%= truncate(association_preview['description'], length: 50, omission: '...') %></p>
+<% end %>

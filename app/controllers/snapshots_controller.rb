@@ -21,8 +21,13 @@ class SnapshotsController < ApplicationController
 
   def show
     respond_to do |format|
-      format.html # show.html.erb
-      format.json { render json: @snapshot, include: [params[:include]] }
+      if @snapshot.content_blob.present?
+        format.html
+        format.json { render json: @snapshot, include: [params[:include]] }
+      else
+        format.html {  render "show_no_content_blob" }
+        format.json { render json: { errors: [{ title: 'Incomplete snapshot', details: 'Snapshot has no content. It may still be being generated' }] }, status: :unprocessable_entity }
+      end
     end
   end
 

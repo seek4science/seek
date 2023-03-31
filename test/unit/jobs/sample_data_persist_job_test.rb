@@ -67,4 +67,24 @@ class SampleDataPersistJobTest < ActiveSupport::TestCase
       assert_equal assay_asset1.direction, sample.assay_assets.first.direction
     end
   end
+
+  test 'records exception' do
+    class FailingSampleDataPersistJob < SampleDataPersistJob
+      def perform(data_file, sample_type, assay_ids: nil)
+        raise 'critical error'
+      end
+    end
+
+    FailingSampleDataPersistJob.perform_now(@data_file, @sample_type)
+
+    task = @data_file.sample_persistence_task
+    assert task.failed?
+    refute_nil task.exception
+
+    # contains message and backtrace
+    assert_match /critical error/, task.exception
+    assert_match /block in perform_now/, task.exception
+    assert_match /activejob/, task.exception
+
+  end
 end

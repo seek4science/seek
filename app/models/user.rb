@@ -2,6 +2,8 @@ require 'digest/sha1'
 
 class User < ApplicationRecord
   MIN_PASSWORD_LENGTH = 10
+  MAX_LOGIN_LENGTH = 120
+  MIN_LOGIN_LENGTH = 3
 
   acts_as_annotation_source
 
@@ -34,7 +36,7 @@ class User < ApplicationRecord
   validates     :password_confirmation, presence: true, if: :password_required?
   validates_length_of       :password, minimum: MIN_PASSWORD_LENGTH, if: :password_required?
   validates_confirmation_of :password, if: :password_required?
-  validates_length_of       :login, within: 3..40
+  validates_length_of       :login, within: MIN_LOGIN_LENGTH..MAX_LOGIN_LENGTH
   validates_uniqueness_of   :login, case_sensitive: false
 
   validates :email, format: { with: RFC822::EMAIL }, if: -> { email }

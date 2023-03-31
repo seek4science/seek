@@ -29,6 +29,7 @@ Factory.define(:max_project, class: Project) do |f|
   f.events {[Factory(:event, policy: Factory(:public_policy))]}
   f.documents {[Factory(:document, policy: Factory(:public_policy))]}
   f.workflows {[Factory(:workflow, policy: Factory(:public_policy))]}
+  f.collections {[Factory(:collection, policy: Factory(:public_policy))]}
   f.after_create do |p|
     member = Factory(:person, project: p)
     p.reload

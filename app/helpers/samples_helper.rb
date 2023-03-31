@@ -9,25 +9,40 @@ module SamplesHelper
   def controlled_vocab_form_field(sample_controlled_vocab, element_name, values, limit=1)
     if sample_controlled_vocab.sample_controlled_vocab_terms.count < Seek::Config.cv_dropdown_limit && sample_controlled_vocab.source_ontology.blank?
       options = options_from_collection_for_select(
-        sample_controlled_vocab.sample_controlled_vocab_terms.sort_by(&:label),
+        sample_controlled_vocab.sample_controlled_vocab_terms,
         :label, :label,
         values
       )
       select_tag element_name,
-                 options,                 
+                 options,
                  class: "form-control",
                  include_blank: ""
     else
       scv_id = sample_controlled_vocab.id
       is_ontology = sample_controlled_vocab.source_ontology.present?
+      object_struct = Struct.new(:id, :name)
       existing_objects = Array(values).collect do |value|
-        Struct.new(:id, :name).new(value, value)
+        object_struct.new(value, value)
       end
       objects_input(element_name, existing_objects,
                     typeahead: { query_url: typeahead_sample_controlled_vocabs_path + "?query=%QUERY&scv_id=#{scv_id}", 
                     handlebars_template: 'typeahead/controlled_vocab_term' }, 
                     limit: limit, ontology: is_ontology)
     end
+  end
+
+  def controlled_vocab_list_form_field(sample_controlled_vocab, element_name, values)
+
+    scv_id = sample_controlled_vocab.id
+    is_ontology = sample_controlled_vocab.source_ontology.present?
+    object_struct = Struct.new(:id, :name)
+    existing_objects = Array(values).collect do |value|
+      object_struct.new(value, value)
+    end
+    objects_input(element_name, existing_objects,
+                  typeahead: { query_url: typeahead_sample_controlled_vocabs_path + "?query=%QUERY&scv_id=#{scv_id}",
+                               handlebars_template: 'typeahead/controlled_vocab_term' }, ontology: is_ontology
+    )
   end
 
   def sample_multi_form_field(attribute, element_name, value)  
@@ -77,6 +92,8 @@ module SamplesHelper
         seek_data_file_attribute_display(value)
       when Seek::Samples::BaseType::CV
         seek_cv_attribute_display(value, attribute)
+      when Seek::Samples::BaseType::CV_LIST
+        value.each{|v| seek_cv_attribute_display(v, attribute) }.join(', ')
       else
         default_attribute_display(attribute, options, sample, value)
       end
@@ -184,6 +201,22 @@ module SamplesHelper
     }
   end
 
+  def show_extract_samples_button?(asset, display_asset)
+    return false unless ( asset.can_manage? && (display_asset.version == asset.version) && asset.sample_template? && asset.extracted_samples.empty? )
+    return ! ( asset.sample_extraction_task&.in_progress? || ( asset.sample_extraction_task&.success? && Seek::Samples::Extractor.new(asset).fetch.present? ) )
+
+    rescue Seek::Samples::FetchException
+      return true # allows to try again
+
+  end
+
+  def show_sample_extraction_status?(data_file)
+    # there is permission and a task
+    return false unless data_file.can_manage? && data_file.sample_extraction_task&.persisted?
+    # persistence isn't currently running or already taken place
+    return !( data_file.sample_persistence_task&.success? || data_file.sample_persistence_task&.in_progress? )
+  end
+
   private
 
   def attribute_form_element(attribute, resource, element_name, element_class )
@@ -225,6 +258,8 @@ module SamplesHelper
       select_tag(element_name, options, include_blank: !attribute.required?, class: "form-control #{element_class}")
     when Seek::Samples::BaseType::CV
       controlled_vocab_form_field attribute.sample_controlled_vocab, element_name, value
+    when Seek::Samples::BaseType::CV_LIST
+      controlled_vocab_list_form_field attribute.sample_controlled_vocab, element_name, value
     when Seek::Samples::BaseType::SEEK_SAMPLE
       terms = attribute.linked_sample_type.samples.authorized_for('view').to_a
       options = options_from_collection_for_select(terms, :id, :title, value.try(:[], 'id'))

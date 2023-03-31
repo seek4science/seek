@@ -12,7 +12,25 @@ class NextflowExtractionTest < ActiveSupport::TestCase
 
     assert_equal 'nf-core/ampliseq', metadata[:title]
     assert_equal '16S rRNA amplicon sequencing analysis workflow using QIIME2', metadata[:description]
-    assert_equal 'Daniel Straub, Alexander Peltzer', metadata[:other_creators]
+
+    author_meta = metadata[:assets_creators_attributes].values
+    assert_equal 2, author_meta.length
+
+    first = author_meta.detect { |a| a[:given_name] == 'Daniel' }
+    assert first
+    assert_equal 'Straub', first[:family_name]
+    assert_nil first[:affiliation]
+    assert_nil first[:orcid]
+    assert_equal 0, first[:pos]
+
+    second = author_meta.detect { |a| a[:given_name] == 'Alexander' }
+    assert second
+    assert_equal 'Peltzer', second[:family_name]
+    assert_nil second[:affiliation]
+    assert_nil second[:orcid]
+    assert_equal 1, second[:pos]
+
+    assert_nil metadata[:other_creators]
   end
 
   test 'extracts metadata from nextflow workflow RO-Crate' do
@@ -22,6 +40,24 @@ class NextflowExtractionTest < ActiveSupport::TestCase
 
     assert_equal 'nf-core/ampliseq', metadata[:title]
     assert_equal '16S rRNA amplicon sequencing analysis workflow using QIIME2', metadata[:description]
-    assert_equal 'Daniel Straub, Alexander Peltzer', metadata[:other_creators]
+
+    author_meta = metadata[:assets_creators_attributes].values
+    assert_equal 2, author_meta.length
+
+    first = author_meta.detect { |a| a[:given_name] == 'Daniel' }
+    assert first
+    assert_equal 'Straub', first[:family_name]
+    assert_nil first[:affiliation]
+    assert_nil first[:orcid]
+    assert_equal 0, first[:pos]
+
+    second = author_meta.detect { |a| a[:given_name] == 'Alexander' }
+    assert second
+    assert_equal 'Peltzer', second[:family_name]
+    assert_nil second[:affiliation]
+    assert_nil second[:orcid]
+    assert_equal 1, second[:pos]
+
+    assert_nil metadata[:other_creators]
   end
 end

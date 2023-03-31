@@ -1,3 +1,3 @@
 module ROCrate
-  class ReadException < RuntimeError; end
+  class ReadException < ROCrate::Exception; end
 end

@@ -1860,4 +1860,65 @@ class AssaysControllerTest < ActionController::TestCase
     end
   end
 
+  test 'last updated by - content' do
+    person1 = Factory(:person)
+    person2 = Factory(:person)
+    a = Factory :assay, policy: Factory(:public_policy), created_at: 15.minute.ago, contributor: person1
+    Factory :activity_log, activity_loggable: a, action: 'create', created_at: 15.minute.ago, culprit: person1
+    login_as(person1)
+    get :show, params: { id: a.id }
+    assert_response :success
+    assert_select 'span.updated_last_by a', false, 'Last editor should not be shown just after creation'
+    Factory :activity_log, activity_loggable: a, action: 'update', created_at: 10.minute.ago, culprit: person1
+    get :show, params: { id: a.id }
+    assert_response :success
+    assert_select 'span.updated_last_by a', person1.name
+    assert_select 'span.updated_last_by a[href=?]', person_path(person1)
+    Factory :activity_log, activity_loggable: a, action: 'update', created_at: 5.minute.ago, culprit: person1.user
+    get :show, params: { id: a.id }
+    assert_response :success
+    assert_select 'span.updated_last_by a', person1.name
+    assert_select 'span.updated_last_by a[href=?]', person_path(person1)
+    Factory :activity_log, activity_loggable: a, action: 'update', created_at: 1.minute.ago, culprit: person2
+    get :show, params: { id: a.id }
+    assert_response :success
+    assert_select 'span.updated_last_by a', person2.name, 'Correct last editor is being shown'
+    assert_select 'span.updated_last_by a[href=?]', person_path(person2)
+  end
+
+  test 'last updated by - only shown to members' do
+    person1 = Factory(:person)
+    person2 = Factory(:person)
+    a = Factory :assay, policy: Factory(:public_policy), created_at: 15.minute.ago, contributor: person1
+    Factory :activity_log, activity_loggable: a, action: 'create', created_at: 15.minute.ago, culprit: person1
+    Factory :activity_log, activity_loggable: a, action: 'update', created_at: 10.minute.ago, culprit: person1
+    login_as(person1)
+    get :show, params: { id: a.id }
+    assert_response :success
+    assert_select 'span.updated_last_by a', person1.name, 'Last editor should be visible to member'
+    login_as(person2)
+    get :show, params: { id: a.id }
+    assert_response :success, 'Should render ok with non-member user'
+    assert_select 'span.updated_last_by a', false, 'Last editor should not be visible to non-member user'
+    logout
+    get :show, params: { id: a.id }
+    assert_response :success, 'Should render ok without user'
+    assert_select 'span.updated_last_by a', false, 'Last editor should not be visible to public'
+    login_as(person1)
+  end
+
+  test 'last updated by - deleted user' do
+    person1 = Factory(:person)
+    person2 = Factory(:person)
+    a = Factory :assay, policy: Factory(:public_policy), created_at: 15.minute.ago, contributor: person1
+    Factory :activity_log, activity_loggable: a, action: 'create', created_at: 15.minute.ago, culprit: person1
+    Factory :activity_log, activity_loggable: a, action: 'update', created_at: 10.minute.ago, culprit: person1
+    Factory :activity_log, activity_loggable: a, action: 'update', created_at: 1.minute.ago, culprit: person2
+    login_as(person1)
+    person2.delete
+    get :show, params: { id: a.id }
+    assert_response :success
+    assert_select 'span.updated_last_by a', false, 'Last editor should not be shown if editor user has been deleted'
+  end
+
 end

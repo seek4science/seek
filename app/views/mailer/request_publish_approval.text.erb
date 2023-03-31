@@ -3,7 +3,7 @@ Hi <%= @gatekeeper.name -%>,
     The <%= Seek::Config.instance_name %> user <%= @publisher.name -%>, <%= person_url(@publisher) -%>, has requested your approval to publish the following item(s):
     <% @resources.each do |resource|%>
         <% controller=resource.class.name.underscore.pluralize -%>
-        <%= resource.class.name.humanize -%>: <%= resource.title -%> - <%= url_for(:action=>:show,:controller=>controller,:id=>resource, :only_path => false) -%>
+        <%= resource.model_name.human -%>: <%= resource.title -%> - <%= url_for(:action=>:show,:controller=>controller,:id=>resource, :only_path => false) -%>
 
     <% end %>
 

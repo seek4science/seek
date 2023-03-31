@@ -23,7 +23,7 @@
           <% if @event.start_date.nil? %>
             <%= text_or_not_specified nil %>
           <% else %>
-            <%= date_as_string(@event.start_date, !(@event.start_date.hour == 0 and @event.start_date.min == 0 and @event.start_date.sec == 0)) %>
+            <%= date_as_string(@event.start_date, !(@event.start_date.hour == 0 and @event.start_date.min == 0 and @event.start_date.sec == 0), false, @event.time_zone) %>
           <% end %>
         </p>
         <p>
@@ -31,7 +31,7 @@
           <% if @event.end_date.nil? %>
             <%= text_or_not_specified nil %>
           <% else %>
-            <%= date_as_string(@event.end_date,!(@event.end_date.hour == 0 and @event.end_date.min == 0 and @event.end_date.sec == 0)) -%>
+            <%= date_as_string(@event.end_date, !(@event.end_date.hour == 0 and @event.end_date.min == 0 and @event.end_date.sec == 0), false, @event.time_zone) -%>
           <% end %>
         </p>
       </div>

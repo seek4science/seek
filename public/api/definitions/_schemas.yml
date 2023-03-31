@@ -2614,6 +2614,8 @@ programmePatch:
           properties:
             administrators:
               $ref: "#/components/schemas/multipleReferences"
+            people:
+              $ref: "#/components/schemas/multipleReferences"
             projects:
               $ref: "#/components/schemas/multipleReferences"
           additionalProperties: false
@@ -3755,6 +3757,8 @@ dataFileResponse:
             - assays
             - publications
             - events
+            - file_template
+            - placeholder
             - workflows
           additionalProperties: false
         links:
@@ -4334,6 +4338,18 @@ personResponse:
           required:
             - projects
             - institutions
+            - investigations
+            - studies
+            - assays
+            - data_files
+            - documents
+            - models
+            - sops
+            - publications
+            - presentations
+            - events
+            - collections
+            - workflows
           additionalProperties: false
         links:
           $ref: "#/components/schemas/links"
@@ -4658,8 +4674,25 @@ projectResponse:
             services:
               $ref: "#/components/schemas/multipleReferences"
           required:
+            - organisms
             - people
             - institutions
+            - investigations
+            - studies
+            - assays
+            - data_files
+            - documents
+            - models
+            - sops
+            - publications
+            - presentations
+            - events
+            - programmes
+            - workflows
+            - collections
+            - file_templates
+            - placeholders
+            - human_diseases
             - project_administrators
             - pals
             - asset_housekeepers

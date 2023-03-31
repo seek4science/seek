@@ -4,6 +4,7 @@
   <thead>
   <tr>
     <th></th>
+    <th>All time</th>
     <th>1 year</th>
     <th>6 months</th>
     <th>1 month</th>
@@ -13,6 +14,7 @@
   </thead>
   <tr>
     <td>Unique Users</td>
+    <td><%= stats.alltime_users -%></td>
     <td><%= stats.yearly_users -%></td>
     <td><%= stats.six_monthly_users -%></td>
     <td><%= stats.monthly_users -%></td>
@@ -21,7 +23,8 @@
   </tr>
 
   <tr>
-    <td><%= t('sop').pluralize %> uploaded</td>
+    <td><%= t('sop').pluralize %> registered</td>
+    <td><%= stats.alltime_sops_created -%></td>
     <td><%= stats.yearly_sops_created -%></td>
     <td><%= stats.six_monthly_sops_created -%></td>
     <td><%= stats.monthly_sops_created -%></td>
@@ -30,7 +33,8 @@
   </tr>
 
   <tr>
-    <td><%= t('data_file').pluralize %> uploaded</td>
+    <td><%= t('data_file').pluralize %> registered</td>
+    <td><%= stats.alltime_datafiles_created -%></td>
     <td><%= stats.yearly_datafiles_created -%></td>
     <td><%= stats.six_monthly_datafiles_created -%></td>
     <td><%= stats.monthly_datafiles_created -%></td>
@@ -39,7 +43,18 @@
   </tr>
 
   <tr>
-    <td><%= t('model').pluralize %> uploaded</td>
+    <td><%= t('document').pluralize %> registered</td>
+    <td><%= stats.alltime_documents_created -%></td>
+    <td><%= stats.yearly_documents_created -%></td>
+    <td><%= stats.six_monthly_documents_created -%></td>
+    <td><%= stats.monthly_documents_created -%></td>
+    <td><%= stats.weekly_documents_created -%></td>
+    <td><%= stats.daily_documents_created -%></td>
+  </tr>
+
+  <tr>
+    <td><%= t('model').pluralize %> registered</td>
+    <td><%= stats.alltime_models_created -%></td>
     <td><%= stats.yearly_models_created -%></td>
     <td><%= stats.six_monthly_models_created -%></td>
     <td><%= stats.monthly_models_created -%></td>
@@ -48,7 +63,8 @@
   </tr>
 
   <tr>
-    <td><%= t('presentation').pluralize %> uploaded</td>
+    <td><%= t('presentation').pluralize %> registered</td>
+    <td><%= stats.alltime_presentations_created -%></td>
     <td><%= stats.yearly_presentations_created -%></td>
     <td><%= stats.six_monthly_presentations_created -%></td>
     <td><%= stats.monthly_presentations_created -%></td>
@@ -58,6 +74,7 @@
 
   <tr>
     <td>Publications registered</td>
+    <td><%= stats.alltime_publications_created -%></td>
     <td><%= stats.yearly_publications_created -%></td>
     <td><%= stats.six_monthly_publications_created -%></td>
     <td><%= stats.monthly_publications_created -%></td>
@@ -65,10 +82,21 @@
     <td><%= stats.daily_publications_created -%></td>
   </tr>
 
+  <tr>
+    <td><%= t('workflow').pluralize %> registered</td>
+    <td><%= stats.alltime_workflows_created -%></td>
+    <td><%= stats.yearly_workflows_created -%></td>
+    <td><%= stats.six_monthly_workflows_created -%></td>
+    <td><%= stats.monthly_workflows_created -%></td>
+    <td><%= stats.weekly_workflows_created -%></td>
+    <td><%= stats.daily_workflows_created -%></td>
+  </tr>
+
 
 
   <tr>
     <td><%= t('sop').pluralize %> downloaded</td>
+    <td><%= stats.alltime_sops_downloaded -%></td>
     <td><%= stats.yearly_sops_downloaded -%></td>
     <td><%= stats.six_monthly_sops_downloaded -%></td>
     <td><%= stats.monthly_sops_downloaded -%></td>
@@ -78,6 +106,7 @@
 
   <tr>
     <td><%= t('data_file').pluralize %> downloaded</td>
+    <td><%= stats.alltime_datafiles_downloaded -%></td>
     <td><%= stats.yearly_datafiles_downloaded -%></td>
     <td><%= stats.six_monthly_datafiles_downloaded -%></td>
     <td><%= stats.monthly_datafiles_downloaded -%></td>
@@ -86,7 +115,18 @@
   </tr>
 
   <tr>
+    <td><%= t('document').pluralize %> downloaded</td>
+    <td><%= stats.alltime_documents_downloaded -%></td>
+    <td><%= stats.yearly_documents_downloaded -%></td>
+    <td><%= stats.six_monthly_documents_downloaded -%></td>
+    <td><%= stats.monthly_documents_downloaded -%></td>
+    <td><%= stats.weekly_documents_downloaded -%></td>
+    <td><%= stats.daily_documents_downloaded -%></td>
+  </tr>
+
+  <tr>
     <td><%= t('model').pluralize %> downloaded</td>
+    <td><%= stats.alltime_models_downloaded -%></td>
     <td><%= stats.yearly_models_downloaded -%></td>
     <td><%= stats.six_monthly_models_downloaded -%></td>
     <td><%= stats.monthly_models_downloaded -%></td>
@@ -96,6 +136,7 @@
 
   <tr>
     <td><%= t('presentation').pluralize %> downloaded</td>
+    <td><%= stats.alltime_presentations_downloaded -%></td>
     <td><%= stats.yearly_presentations_downloaded -%></td>
     <td><%= stats.six_monthly_presentations_downloaded -%></td>
     <td><%= stats.monthly_presentations_downloaded -%></td>
@@ -104,7 +145,18 @@
   </tr>
 
   <tr>
+    <td><%= t('workflow').pluralize %> downloaded</td>
+    <td><%= stats.alltime_workflows_downloaded -%></td>
+    <td><%= stats.yearly_workflows_downloaded -%></td>
+    <td><%= stats.six_monthly_workflows_downloaded -%></td>
+    <td><%= stats.monthly_workflows_downloaded -%></td>
+    <td><%= stats.weekly_workflows_downloaded -%></td>
+    <td><%= stats.daily_workflows_downloaded -%></td>
+  </tr>
+
+  <tr>
     <td><%= t('assays.assay') %> created</td>
+    <td><%= stats.alltime_assays_created -%></td>
     <td><%= stats.yearly_assays_created -%></td>
     <td><%= stats.six_monthly_assays_created -%></td>
     <td><%= stats.monthly_assays_created -%></td>
@@ -114,6 +166,7 @@
 
   <tr>
     <td><%= t('study').pluralize %> created</td>
+    <td><%= stats.alltime_studies_created -%></td>
     <td><%= stats.yearly_studies_created -%></td>
     <td><%= stats.six_monthly_studies_created -%></td>
     <td><%= stats.monthly_studies_created -%></td>
@@ -123,6 +176,7 @@
 
   <tr>
     <td><%= t('investigation').pluralize %> created</td>
+    <td><%= stats.alltime_investigations_created -%></td>
     <td><%= stats.yearly_investigations_created -%></td>
     <td><%= stats.six_monthly_investigations_created -%></td>
     <td><%= stats.monthly_investigations_created -%></td>

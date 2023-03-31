@@ -13,6 +13,7 @@
   <% workflow_classes.each do |wc| %>
     <tr>
       <td>
+        <%= avatar(wc, 32, true, nil, nil, false, 'workflow-class-logo-sm') %>
         <%= wc.title -%>
         <% if wc.alternate_name.present? %>
           <span class="subtle">(<%= wc.alternate_name -%>)</span>

@@ -22,12 +22,10 @@
     <%= button_link_to("View samples", 'view_samples', data_file_samples_path(asset)) %>
   <% end %>
 
-  <% if asset.can_manage? && (display_asset.version == asset.version) && asset.sample_template? && asset.extracted_samples.empty? %>
-    <%# the job isn't in progress or waiting for confirmation of results %>
-    <% unless asset.sample_extraction_task&.in_progress? || Seek::Samples::Extractor.new(asset).fetch %>
+  <% if show_extract_samples_button?(asset, display_asset) %>
       <%= button_link_to('Extract samples', 'extract_samples', extract_samples_data_file_path(@data_file), method: :post) %>
-    <% end %>
   <% end %>
+
 <% end %>
 
 <% if asset.is_downloadable? -%>

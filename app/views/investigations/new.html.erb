@@ -1,5 +1,7 @@
 <h1>New <%= t('investigation') %></h1>
 
+<%= index_and_new_help_icon controller_name %>
+
 <%= form_for @investigation do |f| %>
     <%= render :partial => "form", :locals => { :f => f, :action=>:new } -%>
 <% end -%>

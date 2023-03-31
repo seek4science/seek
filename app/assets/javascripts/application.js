@@ -1,6 +1,7 @@
 // ...
 //= require jquery
 //= require jquery_ujs
+//= require jquery.remotipart
 //= require jquery_no_conflict
 //= require jquery-ui
 //= require bootstrap

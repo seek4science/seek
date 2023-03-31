@@ -76,6 +76,18 @@ module Seek
       configure_exception_notification
     end
 
+    def error_grouping_enabled_propagate
+      configure_exception_notification
+    end
+
+    def error_grouping_timeout_propagate
+      configure_exception_notification
+    end
+
+    def error_grouping_log_base_propagate
+      configure_exception_notification
+    end
+
     def recaptcha_private_key_propagate
       configure_recaptcha_keys
     end
@@ -94,10 +106,21 @@ module Seek
     def configure_exception_notification
       if exception_notification_enabled && Rails.env.production?
         SEEK::Application.config.middleware.use ExceptionNotification::Rack,
+                                                ignore_exceptions: ['ActionDispatch::Http::Parameters::ParseError',
+                                                                    'ActionController::InvalidAuthenticityToken',
+                                                                    'ActionController::UnknownHttpMethod',
+                                                                    'ActionController::BadRequest'] + ExceptionNotifier.ignored_exceptions,
                                                 email: {
                                                   sender_address: [noreply_sender],
                                                   email_prefix: "[ #{instance_name} ERROR ] ",
                                                   exception_recipients: exception_notification_recipients.nil? ? [] : exception_notification_recipients.split(/[, ]/)
+                                                },
+                                                error_grouping: error_grouping_enabled,
+                                                error_grouping_period: error_grouping_timeout,
+                                                notification_trigger: ->(exception, count) {
+                                                  # Send notifications at count = x^0, x^1, x^3, x^4... where
+                                                  # x = error_grouping_log_base
+                                                  (Math.log(count,error_grouping_log_base) % 1).zero?
                                                 }
       else
         SEEK::Application.config.middleware.delete ExceptionNotifier

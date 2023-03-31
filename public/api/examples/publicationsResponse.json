@@ -7,27 +7,27 @@
         "title": "A Maximal Publication"
       },
       "links": {
-        "self": "/publications/68"
+        "self": "/publications/74"
       }
     },
     {
-      "id": "66",
+      "id": "72",
       "type": "publications",
       "attributes": {
         "title": "A Minimal Publication"
       },
       "links": {
-        "self": "/publications/66"
+        "self": "/publications/72"
       }
     },
     {
-      "id": "67",
+      "id": "73",
       "type": "publications",
       "attributes": {
-        "title": "A Publication 64"
+        "title": "A Publication 72"
       },
       "links": {
-        "self": "/publications/67"
+        "self": "/publications/73"
       }
     }
   ],

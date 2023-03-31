@@ -28,7 +28,7 @@
       "projects": {
         "data": [
           {
-            "id": "1022251389",
+            "id": "121",
             "type": "projects"
           }
         ]
@@ -36,7 +36,7 @@
       "institutions": {
         "data": [
           {
-            "id": "980191702",
+            "id": "116",
             "type": "institutions"
           }
         ]
@@ -44,7 +44,7 @@
       "investigations": {
         "data": [
           {
-            "id": "973655000",
+            "id": "12",
             "type": "investigations"
           }
         ]
@@ -52,7 +52,7 @@
       "studies": {
         "data": [
           {
-            "id": "1060385043",
+            "id": "12",
             "type": "studies"
           }
         ]
@@ -60,7 +60,7 @@
       "assays": {
         "data": [
           {
-            "id": "1035386817",
+            "id": "12",
             "type": "assays"
           }
         ]
@@ -68,7 +68,7 @@
       "data_files": {
         "data": [
           {
-            "id": "883654306",
+            "id": "8",
             "type": "data_files"
           }
         ]
@@ -84,7 +84,7 @@
       "models": {
         "data": [
           {
-            "id": "1004285567",
+            "id": "10",
             "type": "models"
           }
         ]
@@ -92,7 +92,7 @@
       "sops": {
         "data": [
           {
-            "id": "1055250484",
+            "id": "4",
             "type": "sops"
           }
         ]
@@ -100,7 +100,7 @@
       "publications": {
         "data": [
           {
-            "id": "44",
+            "id": "4",
             "type": "publications"
           }
         ]
@@ -108,7 +108,7 @@
       "presentations": {
         "data": [
           {
-            "id": "18",
+            "id": "2",
             "type": "presentations"
           }
         ]
@@ -116,19 +116,25 @@
       "events": {
         "data": [
           {
-            "id": "1025618675",
+            "id": "2",
             "type": "events"
           }
         ]
-      },
+      },      
       "workflows": {
         "data": [
-
+          {
+            "id": "218",
+            "type": "workflows"
+          }
         ]
       },
       "collections": {
         "data": [
-
+          {
+            "id": "29",
+            "type": "collections"
+          }
         ]
       },
       "file_templates": {
@@ -143,14 +149,14 @@
       }
     },
     "links": {
-      "self": "/people/1039987194"
+      "self": "/people/115"
     },
     "meta": {
-      "created": "2022-08-20T17:53:37.000Z",
-      "modified": "2022-08-20T17:53:37.000Z",
+      "created": "2022-10-26T11:44:30.000Z",
+      "modified": "2022-10-26T11:44:30.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "f0b26db0-02de-013b-a52a-000c29ced288"
+      "uuid": "cf443e30-c899-013a-0f7e-0a81884ed284"
     }
   },
   "jsonapi": {

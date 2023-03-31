@@ -48,7 +48,7 @@ class TagsController < ApplicationController
 
   def find_tagged_objects
     types = tag_types_for_selection
-    @tagged_objects = @tag.annotations.with_attribute_name(types).collect(&:annotatable).uniq.select(&:can_view?)
+    @tagged_objects = @tag.annotations.with_attribute_name(types).collect(&:annotatable).uniq.compact.select(&:can_view?)
   end
 
   def tag_types_for_selection

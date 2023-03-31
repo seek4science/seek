@@ -26,6 +26,8 @@
           <%= tags_input('sample_type[tags]', @sample_type.tags, :typeahead => {:type => 'sample_type_tags'}) %>
         </div>
 
+        <%= render :partial => "assets/author_form", :locals => { :form => f } -%>
+
         <h3>Attributes</h3>
         <p class="help-block">Re-arrange attributes by clicking and dragging the button on the left-hand side of each row.</p>
         <table class="table" id="attribute-table">

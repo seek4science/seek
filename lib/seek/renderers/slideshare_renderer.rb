@@ -5,6 +5,10 @@ module Seek
         blob.url && is_slideshare_url?(blob.url)
       end
 
+      def external_embed?
+        true
+      end
+
       def render_content
         api_url = "http://www.slideshare.net/api/oembed/2?url=#{blob.url}&format=json"
         json = JSON.parse(RestClient.get(api_url))

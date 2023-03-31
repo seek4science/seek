@@ -18,7 +18,7 @@ module Seek
       private
 
       def dictionary_definition
-        dictionary_filepath = File.join(File.dirname(File.expand_path(__FILE__)), 'help_links.yml')
+        dictionary_filepath = File.join(Rails.root, 'config', 'help_links.yml')
         YAML.load(File.read(dictionary_filepath))
       end
     end

@@ -8,6 +8,7 @@ on:
       - workflowhub
       - seek-1.11
       - seek-1.12
+      - seek-1.13
       - master-ibisba-demonstrator
   pull_request:
 

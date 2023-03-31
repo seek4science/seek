@@ -53,7 +53,9 @@
       <li><%= image_tag_for_key('edit', edit_project_path(item), "Edit #{t('project')} Details", nil, "Edit #{t('project')} Details") -%></li>
     <% end -%>
 
-    <%= order_icon(item,current_user, order_investigations_project_path(item), item.investigations, 'investigation') %>
+    <% if Seek::Config.isa_enabled %>
+      <%= order_icon(item,current_user, order_investigations_project_path(item), item.investigations, 'investigation') %>
+    <% end %>
 
     <% if admin_logged_in? || item.can_manage? -%>
       <%= delete_icon(item,current_user,"Any members will also be removed from the #{t('project')}, are you sure?") %>

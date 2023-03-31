@@ -19,6 +19,9 @@ def load_seek_config_defaults!
   Seek::Config.default :external_help_url,"https://docs.seek4science.org/help"
   Seek::Config.default :exception_notification_enabled,false
   Seek::Config.default :exception_notification_recipients,""
+  Seek::Config.default :error_grouping_enabled,true
+  Seek::Config.default :error_grouping_timeout,2.minutes
+  Seek::Config.default :error_grouping_log_base,2
   Seek::Config.default :hide_details_enabled,false
   Seek::Config.default :registration_disabled,false
   Seek::Config.default :registration_disabled_description,'Registration is not available, please contact your administrator'
@@ -85,7 +88,7 @@ def load_seek_config_defaults!
   Seek::Config.default :sops_enabled, true
   Seek::Config.default :workflows_enabled, false
   Seek::Config.default :collections_enabled, true
-  Seek::Config.default :file_templates_enabled, true
+  Seek::Config.default :file_templates_enabled, false
   Seek::Config.default :placeholders_enabled, false
 
   #Observered variables
@@ -104,7 +107,7 @@ def load_seek_config_defaults!
   Seek::Config.default :home_feeds_cache_timeout,30
 # Branding
   Seek::Config.default :instance_name,'FAIRDOM-SEEK'
-  Seek::Config.default :instance_link,'http://www.fair-dom.org'
+  Seek::Config.default :instance_link,'https://fairdomseek.org'
 
   Seek::Config.default :instance_admins_name,"FAIRDOM"
   Seek::Config.default :instance_admins_link,"http://www.fair-dom.org"
@@ -251,7 +254,9 @@ def load_seek_config_defaults!
   Seek::Config.default :sorting, {}
 
   Seek::Config.default :life_monitor_enabled, false
+  Seek::Config.default :life_monitor_url, 'https://api.lifemonitor.eu/'
   Seek::Config.default :git_support_enabled, false
+  Seek::Config.default :bio_tools_enabled, false
 
   load_seek_testing_defaults! if Rails.env.test?
 end

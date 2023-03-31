@@ -59,7 +59,6 @@ Factory.define(:max_publication, class: Publication) do |f|
   f.data_files {[Factory.build(:public_data_file)]}
   f.models {[Factory.build(:public_model)]}
   f.presentations {[Factory.build(:public_presentation)]}
-  f.relationships {[Factory(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: Factory(:publication))]}
   f.association :publication_type, factory: :journal
   f.after_create do |publication|
     publication.content_blob = Factory.create(:min_content_blob, content_type: 'application/pdf', asset: publication, asset_version: 1)

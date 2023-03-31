@@ -96,6 +96,14 @@ class BaseSerializer < SimpleBaseSerializer
     associated('Placeholder')
   end
 
+  def workflows
+    associated('Workflow')
+  end
+
+  def collections
+    associated('Collection')
+  end
+
   link(:self) { polymorphic_path(object) }
 
   # avoid dash-erizing attribute names
@@ -121,6 +129,12 @@ class BaseSerializer < SimpleBaseSerializer
       { resource: resource, access: (PolicyHelper::access_type_key(p.access_type)) }
     end
   end
+
+  attribute :extended_attributes, if: -> { object.respond_to?(:custom_metadata) && !object.custom_metadata.blank? } do
+    { extended_metadata_type_id: object.custom_metadata.custom_metadata_type_id.to_s,
+      attribute_map: object.custom_metadata.data.to_hash }
+  end
+
 
   def show_policy?
     return false unless object.respond_to?('can_manage?')

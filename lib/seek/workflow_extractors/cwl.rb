@@ -65,10 +65,12 @@ module Seek
         end
 
         packed_cwl_string = ''
-        status = Open4.popen4("cwltool --skip-schemas --quiet --enable-dev --non-strict --pack #{path}") do |_pid, _stdin, stdout, stderr|
+        err = ''
+        status = Open4.popen4(Seek::Util.python_exec("-m cwltool --skip-schemas --quiet --enable-dev --non-strict --pack #{path}")) do |_pid, _stdin, stdout, stderr|
           while (line = stdout.gets) != nil
             packed_cwl_string << line
           end
+          err = stderr.read.strip
           stdout.close
           stderr.close
         end
@@ -77,7 +79,7 @@ module Seek
           cwl_string = packed_cwl_string
         else
           cwl_string ||= @io.read
-          Rails.logger.error('CWL packing failed, using given CWL instead.')
+          Rails.logger.error("CWL packing failed, using given CWL instead. Error was: #{err}")
         end
 
         parse_metadata(meta, cwl_string)

@@ -71,6 +71,7 @@ class StudiesController < ApplicationController
     else
       @study.attributes = study_params
       update_sharing_policies @study
+      update_annotations(params[:tag_list], @study)
       update_relationships(@study, params)
 
       respond_to do |format|
@@ -99,6 +100,7 @@ class StudiesController < ApplicationController
   def create
     @study = Study.new(study_params)
     update_sharing_policies @study
+    update_annotations(params[:tag_list], @study)
     update_relationships(@study, params)
     ### TO DO: what about validation of person responsible? is it already included (for json?)
     if @study.save

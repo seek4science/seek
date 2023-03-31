@@ -75,4 +75,8 @@ module WorkflowsHelper
 
     options_for_select(opts, selected)
   end
+
+  def bio_tools_url(tool)
+    BioTools::Client.tool_url(tool.bio_tools_id)
+  end
 end

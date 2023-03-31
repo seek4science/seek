@@ -12,7 +12,7 @@ class ResourceListHelperTest < ActionView::TestCase
     event = Factory(:event)
     assert event.default_table_columns.count >= 3
     html = resource_list_condensed_row(event)
-    assert_equal 3, html.scan(/div class=\"col-sm-3\"/).count
+    assert_equal 3, html.scan(/div class=\"rli-condensed-attribute\"/).count
   end
 
   test 'resource_list_column_display_value' do

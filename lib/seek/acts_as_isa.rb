@@ -34,6 +34,8 @@ module Seek
         include Seek::Stats::ActivityCounts
         include Seek::Search::CommonFields, Seek::Search::BackgroundReindexing
         include Seek::Subscribable
+        include Seek::Rdf::RdfGeneration
+        include Seek::Taggable
         include Seek::ResearchObjects::Packaging
         has_many :programmes, ->{ distinct }, through: :projects
 

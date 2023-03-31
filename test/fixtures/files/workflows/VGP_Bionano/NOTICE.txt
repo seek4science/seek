@@ -1,0 +1,4 @@
+From: https://github.com/Delphine-L/iwc/tree/VGP/workflows/VGP-assembly-v2/VGP-Bionano
+
+
+(specifically this revision: https://raw.githubusercontent.com/Delphine-L/iwc/022765f/workflows/VGP-assembly-v2/VGP-Bionano/Galaxy-Workflow-VGP_Bionano.ga)

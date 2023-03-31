@@ -7,6 +7,7 @@ module Seek
       def show_programme_box?
         Seek::Config.programmes_enabled && (
           programme_administrator_logged_in? ||
+            Programme.any_programmes_open_for_projects? ||
             Programme.site_managed_programme.present? ||
             Programme.can_create?
         )
@@ -14,7 +15,7 @@ module Seek
 
       # whether the programmes should be selected from a drop down box
       def programme_dropdown?
-        show_programme_box? && programme_administrator_logged_in?
+        show_programme_box? && (programme_administrator_logged_in? || Programme.any_programmes_open_for_projects?)
       end
 
       # whether there should be a checkbox to select a managed programme

@@ -33,6 +33,7 @@ def load_seek_testing_defaults!
       Settings.defaults[:collections_enabled] = true
       Settings.defaults[:documents_enabled] = true
       Settings.defaults[:events_enabled] = true
+      Settings.defaults[:file_templates_enabled] = true
       Settings.defaults[:human_diseases_enabled] = true
       Settings.defaults[:isa_enabled] = true
       Settings.defaults[:models_enabled] = true
@@ -41,6 +42,9 @@ def load_seek_testing_defaults!
       Settings.defaults[:publications_enabled] = true
       Settings.defaults[:samples_enabled] = true
       Settings.defaults[:workflows_enabled] = true
+      Settings.defaults[:sample_type_template_enabled] = true
+      Settings.defaults[:placeholders_enabled] = true
+      Settings.defaults[:file_templates_enabled] = true
 
       Settings.defaults[:instance_link] = 'http://www.sysmo.net'
       Settings.defaults[:application_name] = 'FAIRDOM-SEEK'
@@ -136,5 +140,6 @@ def load_seek_testing_defaults!
       Settings.defaults[:life_monitor_client_secret] = 'Ne1kK6NljWRayqzDfgMWBfVplkRGZto6MCjdfhK1jY7r8RVp'
       Settings.defaults[:git_support_enabled] = true
       Settings.defaults[:fair_signposting_enabled] = true
+      Settings.defaults[:bio_tools_enabled] = true
     end
 end

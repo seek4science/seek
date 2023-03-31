@@ -1,10 +1,10 @@
 var Templates = {
   table: null,
-  context: { description_elem: null, suffix: null }
+  context: { description_elem: null, suffix: null, field_name: null }
 };
 
 Templates.clearContext = function () {
-  Templates.context = { description_elem: null, suffix: null };
+  Templates.context = { description_elem: null, suffix: null, field_name: null };
 };
 
 Templates.init = function (elem) {
@@ -69,7 +69,6 @@ Templates.init = function (elem) {
   loadFilterSelectors(templates);
   loadTemplates(templates);
   setTemplate();
-	setDefaultLevel()
 };
 
 const remove = (e) =>{
@@ -126,11 +125,25 @@ Templates.mapData = (data) =>
 function loadFilterSelectors(data) {
   $j.each($j("select[id^='templates_']"), (i, elem) => {
     const key = elem.getAttribute("data-key");
-    const dt = [...new Set(data.map((item) => item[key]))];
-    $j(elem).find("option").not(":first").remove();
-    $j.each(dt, (i, item) => $j(elem).append(`<option value="${item}">${item}</option>`));
+    
+    // Gets the set of values to choose from per data-key
+    let dt = [...new Set(data.map((item) => item[key]))];
+    // If the key == level => options should be filtered out, depending on the 'field_name' context.
+    // If field_name == null, the button was clicked from the new Template form and all options should be present.
+    if (key === "level") {
+      if(Templates.context.field_name === 'sample_collection_sample_type'){
+        dt = dt.filter(lvl => lvl === "study sample")
+      } else if(Templates.context.field_name === 'source_sample_type'){
+        dt = dt.filter(lvl => lvl === "study source")
+      } else if(Templates.context.field_name === 'sample_type') {
+        dt = dt.filter(lvl => lvl === "assay")
+      }
+    }
+
+    $j(elem).find("option").not(":first").remove(); // Removes all options, except the first one
+    $j.each(dt, (i, item) => $j(elem).append(`<option value="${item}">${item}</option>`)); // Adds teh options to the select items
     $j(elem).on("change", function () {
-      const filters = $j("[data-key]")
+      const filters =  $j("[data-key]")
         .map((i, elem) => ({ key: elem.getAttribute("data-key"), value: elem.value }))
         .toArray()
         .filter((f) => f.value != "not selected");
@@ -208,20 +221,26 @@ const applyTemplate = () => {
 	$j(".sample-type-attribute-type").trigger("change", [false]);
 };
 
+// Shows the modal form
 const showTemplateModal = () => {
+  loadFilterSelectors(templates);
+  updateTypeSelect(Templates.context.field_name);
   $j("#existing_templates").modal("show");
 };
 
-const setDefaultLevel = () => {
-	const href = window.location.href;
-	if (href.includes("isa_studies")) {
-		$j("#templates_type_select").val("study").change();
-		$j("#templates_type_select option[value='assay']").attr("disabled","disabled")
-	} else if (href.includes("isa_assays")) {
-		$j("#templates_type_select").val("assay").change();
-		$j("#templates_type_select option[value='study']").attr("disabled","disabled")
-	}
+// Selects the right option, depending on the 'field_name' that was passed from the form.
+const updateTypeSelect = function(field_name) {
+  if(field_name === 'sample_collection_sample_type'){
+		$j("#templates_type_select").val("study sample").change();
+  } else if (field_name === 'source_sample_type') {
+		$j("#templates_type_select").val("study source").change();
+  } else if(field_name === 'sample_type') {
+    $j("#templates_type_select").val("assay").change();
+  } else {
+    $j("#templates_type_select option").first().change();
+  }
 };
+
 const initSelect2 = (elem, parentElem)=>{
 	elem.select2({
 		theme: "bootstrap",

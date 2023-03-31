@@ -1,0 +1,29 @@
+<%
+  resource_text ||= text_for_resource(resource)
+  field_name = "#{resource.class.name.underscore}[tools_attributes]"
+
+  collapse_panel = resource.bio_tools_links.empty?
+  associated_tools_json = resource.bio_tools_links.map { |t| { title: t.name, id: t.bio_tools_id } }.to_json
+-%>
+
+<%= folding_panel(t('tool').pluralize, collapse_panel, body_options: { id: 'associate-tools-panel' },
+                  help_text: "Here you associate tools from bio.tools to this #{resource_text}.") do %>
+
+  <p>The following <%= t('tool').pluralize %> are associated with this <%= resource_text -%>:</p>
+
+
+  <%= associations_list('tools-list', 'associations/bio_tool', associated_tools_json,
+                        'data-field-name' => field_name,
+                        empty_text: "No #{t('tool').pluralize}") %>
+
+  <%= association_selector('tools-list', "Associate", "Associate #{t('tool').pluralize}", size: 'md') do %>
+    <label>Select <%= t('tool') %></label>
+
+    <div class="form-group" data-role="seek-association-filter-group" data-filter-url="<%= filter_tools_path -%>">
+      <%= association_select_filter %>
+
+      <%= association_select_results(multiple: true) %>
+    </div>
+
+  <% end %>
+<% end %>

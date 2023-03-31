@@ -154,19 +154,16 @@
             }
 
             var $tree = $j(this);
-            $j($tree.jstree().get_json($tree, {
+            $j($tree.jstree(true).get_json('#', {
                 flat: true
-            }))
-                .each(function(index, value) {
+            })).each(function(index, value) {
+                var asset = this.id.split('-')[0]
+                var asset_id = this.id.split('-')[1]
+                if ( index != 0 && asset != "Permission" && asset_id != "not_isa"){
+                    addCheckboxToAssetNode(asset,asset_id,'share_not_isa');
+                }
+            });
 
-                    var node = $j("#jstree").jstree().get_node(this.id);
-                    var asset = this.id.split('-')[0]
-                    var asset_id = this.id.split('-')[1]
-                    if ((index!= 0) && (asset!= "Permission") && (asset_id)!= "not_isa"){
-                        addCheckboxToAssetNode(asset,asset_id,'share_not_isa');
-                    }
-
-                });
         })
             .jstree({
                 'core': {
@@ -221,18 +218,17 @@
             }
 
             var $tree = $j(this);
-            $j($tree.jstree().get_json($tree, {
+            $j($tree.jstree(true).get_json('#', {
                 flat: true
-            }))
-                .each(function(index, value) {
-                    var node = $j("#jstree").jstree().get_node(this.id);
-                    var asset = this.id.split('-')[0]
-                    var asset_id = this.id.split('-')[1]
+            })).each(function(index, value) {
+                var asset = this.id.split('-')[0]
+                var asset_id = this.id.split('-')[1]
 
-                    if ((index!= 0) && (asset!= "Permission")) {
-                        addCheckboxToAssetNode(asset,asset_id,'share_isa');
-                    }
-                });
+                if (index!= 0 && asset!= "Permission") {
+                    addCheckboxToAssetNode(asset,asset_id,'share_isa');
+                }
+            });
+
 
         })
             .jstree({

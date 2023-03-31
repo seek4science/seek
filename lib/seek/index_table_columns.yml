@@ -17,7 +17,7 @@ columns:
   general:
     required: [ title ]
     default: [ creators, projects, version, license ]
-    additional_allowed: [ contributor, creators, projects, version, description, created_at, updated_at, last_used_at, other_creators, doi, license, tags ]
+    additional_allowed: [ contributor, creators, projects, version, description, created_at, updated_at, other_creators, doi, license, tags ]
 
   assay:
     required: [ ]

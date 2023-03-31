@@ -32,4 +32,15 @@ class MessageLog < ApplicationRecord
   def sent_by_self?
     sender == User.current_user&.person
   end
+
+  # how many hours remaining since the message was created, and the RECENT_PERIOD has elapsed
+  def hours_until_next_allowed
+    ((created_at - RECENT_PERIOD.ago) / 3600).to_i
+  end
+
+  # hours_until_next_allowed as a string, with hours pluralized correctly - e.g '2 hours', or '1 hour'
+  def hours_until_next_allowed_str
+    number_hours = hours_until_next_allowed
+    "#{number_hours} #{'hour'.pluralize(number_hours)}"
+  end
 end

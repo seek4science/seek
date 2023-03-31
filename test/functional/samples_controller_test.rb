@@ -24,7 +24,10 @@ class SamplesControllerTest < ActionController::TestCase
     Factory(:sample, policy: Factory(:public_policy))
     get :index
     assert_response :success
-    assert_select '#samples-table table', count: 0
+    assert_select 'div.index-filters'
+    assert_select 'div.index-content' do
+      assert_select 'div.list_item', count: 1
+    end
   end
 
   test 'new without sample type id' do
@@ -185,6 +188,57 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal 'ttt', sample.get_attribute_value(:the_title)
     assert !sample.get_attribute_value(:bool)
   end
+
+  test 'create and update with cv list' do
+    person = Factory(:person)
+    login_as(person)
+
+    type = Factory(:apples_list_controlled_vocab_sample_type)
+    assert_difference('Sample.count') do
+      post :create, params: { sample: { sample_type_id: type.id,
+                                        data: { apples: ['Granny Smith', 'Bramley'] },
+                                        project_ids: [person.projects.first.id] } }
+    end
+    assert_not_nil sample = assigns(:sample)
+    assert_equal ['Granny Smith', 'Bramley'], sample.get_attribute_value(:apples)
+
+    # cv list type data must be an array
+    assert_no_difference('Sample.count') do
+      put :update, params: { id: sample.id, sample: { data: { apples: 'Granny Smith' } } }
+    end
+
+    # the required attribute must be filled in
+    assert_no_difference('Sample.count') do
+      put :update, params: { id: sample.id, sample: { data: { apples: nil } } }
+    end
+
+  end
+
+  test 'create and update with cv list comma seperated' do
+    person = Factory(:person)
+    login_as(person)
+
+    type = Factory(:apples_list_controlled_vocab_sample_type)
+    assert_difference('Sample.count') do
+      post :create, params: { sample: { sample_type_id: type.id,
+                                        data: { apples: 'Granny Smith, Bramley' },
+                                        project_ids: [person.projects.first.id] } }
+    end
+    assert_not_nil sample = assigns(:sample)
+    assert_equal ['Granny Smith', 'Bramley'], sample.get_attribute_value(:apples)
+
+    # cv list type data must be an array
+    assert_no_difference('Sample.count') do
+      put :update, params: { id: sample.id, sample: { data: { apples: 'Granny Smith' } } }
+    end
+
+    # the required attribute must be filled in
+    assert_no_difference('Sample.count') do
+      put :update, params: { id: sample.id, sample: { data: { apples: nil } } }
+    end
+
+  end
+
 
   test 'show sample with boolean' do
     person = Factory(:person)

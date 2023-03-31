@@ -1,17 +1,5 @@
-ODE:
-  title: Ordinary differential equations (ODE)
-
-PDE:
-  title: Partial differential equations (PDE)
-
-boolean:
-  title: Boolean network
-
-Petri:
-  title: Petri net
-
-linear equations:
-  title: Linear equations
+agent based modelling:
+  title: Agent based modelling
 
 algebraic equations:
   title: Algebraic equations
@@ -19,14 +7,30 @@ algebraic equations:
 bayesian:
   title: Bayesian network
 
+boolean:
+  title: Boolean network
+
 graphical:
   title: Graphical model
+
+linear equations:
+  title: Linear equations
+
+metabolic_network:
+  title: Metabolic network
+
+ODE:
+  title: Ordinary differential equations (ODE)
+
+PDE:
+  title: Partial differential equations (PDE)
+
+Petri:
+  title: Petri net
 
 stoichiometric:
   title: Stoichiometric model
 
-agent based modelling:
-  title: Agent based modelling
 
-metabolic_network:
-  title: Metabolic network
+
+

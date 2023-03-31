@@ -93,7 +93,12 @@
 
         ]
       },
-      "workflows": {
+      "documents": {      
+        "data": [
+
+        ]
+      },
+      "workflows": {	
         "data": [
 
         ]
@@ -115,14 +120,14 @@
       }
     },
     "links": {
-      "self": "/people/1039987197"
+      "self": "/people/1039992249"
     },
     "meta": {
-      "created": "2022-08-20T17:53:38.000Z",
-      "modified": "2022-08-20T17:53:39.000Z",
+      "created": "2022-10-26T11:44:31.000Z",
+      "modified": "2022-10-26T11:44:31.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "f1d4c0d0-02de-013b-a52a-000c29ced288"
+      "uuid": "7acec590-3751-013b-356e-000c29a94011"
     }
   },
   "jsonapi": {

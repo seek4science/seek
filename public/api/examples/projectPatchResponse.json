@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "1022251921",
+    "id": "389",
     "type": "projects",
     "attributes": {
       "discussion_links": [
@@ -19,21 +19,21 @@
         "permissions": [
           {
             "resource": {
-              "id": "1039987685",
+              "id": "320",
               "type": "people"
             },
             "access": "manage"
           },
           {
             "resource": {
-              "id": "1022251921",
+              "id": "389",
               "type": "projects"
             },
             "access": "download"
           },
           {
             "resource": {
-              "id": "980192198",
+              "id": "347",
               "type": "institutions"
             },
             "access": "view"
@@ -84,14 +84,32 @@
       "programmes": {
         "data": [
           {
-            "id": "23",
-            "type": "programmes"
+            "id": "29",
+            "type": "organisms"
           }
+        ]
+      },
+      "human_diseases": {
+        "data": [
+
+        ]
+      },
+      "people": {
+        "data": [
+
         ]
       },
       "institutions": {
         "data": [
 
+        ]
+      },
+      "programmes": {
+        "data": [
+          {
+            "id": "29",
+            "type": "programmes"
+          }
         ]
       },
       "investigations": {
@@ -114,7 +132,12 @@
 
         ]
       },
-      "documents": {
+      "file_templates": {
+        "data": [
+
+        ]
+      },
+      "placeholders": {
         "data": [
 
         ]
@@ -124,7 +147,15 @@
 
         ]
       },
-      "sops": {
+      "organisms": {
+        "data": [
+          {
+            "id": "627234338",
+            "type": "organisms"
+          }
+        ]
+      },
+      "workflows": {
         "data": [
 
         ]
@@ -144,12 +175,9 @@
 
         ]
       },
-      "organisms": {
+      "documents": {
         "data": [
-          {
-            "id": "627234338",
-            "type": "organisms"
-          }
+
         ]
       },
       "workflows": {
@@ -161,37 +189,17 @@
         "data": [
 
         ]
-      },
-      "human_diseases": {
-        "data": [
-
-        ]
-      },
-      "file_templates": {
-        "data": [
-
-        ]
-      },
-      "placeholders": {
-        "data": [
-
-        ]
-      },
-      "services": {
-        "data": [
-
-        ]
       }
     },
     "links": {
-      "self": "/projects/1022251921"
+      "self": "/projects/389"
     },
     "meta": {
-      "created": "2022-08-20T17:55:50.000Z",
-      "modified": "2022-08-20T17:55:51.000Z",
+      "created": "2022-10-26T11:45:28.000Z",
+      "modified": "2022-10-26T11:45:28.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "40799be0-02df-013b-a52a-000c29ced288"
+      "uuid": "4dd08e20-e8a6-013a-1113-0a81884ed284"
     }
   },
   "jsonapi": {

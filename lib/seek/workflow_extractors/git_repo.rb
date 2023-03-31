@@ -35,24 +35,38 @@ module Seek
       def metadata
         # Use CWL description
         m = if @git_version.path_for_key(:abstract_cwl).present?
-              abstract_cwl_extractor.metadata
+              begin
+                abstract_cwl_extractor.metadata
+              rescue StandardError => e
+                Rails.logger.error('Error extracting abstract CWL:')
+                Rails.logger.error(e)
+                { errors: ["Couldn't parse abstract CWL"] }
+              end
             else
-              main_workflow_extractor.metadata
+              begin
+                main_workflow_extractor.metadata
+              rescue StandardError => e
+                Rails.logger.error('Error extracting workflow:')
+                Rails.logger.error(e)
+                { errors: ["Couldn't parse main workflow"] }
+              end
             end
-
-        m[:source_link_url] = @git_version.git_repository&.remote
 
         if @git_version.file_exists?('README.md')
           m[:description] ||= @git_version.file_contents('README.md').force_encoding('utf-8')
         end
 
-        return m
+        m.reverse_merge!(cff_extractor.metadata) if cff_extractor
+
+        m[:source_link_url] ||= @git_version.git_repository&.remote
+
+        m
       end
 
       private
 
       def main_workflow_extractor
-        return @main_workflow_extractor if @main_workflow_extractor
+        return @main_workflow_extractor if defined?(@main_workflow_extractor)
 
         workflow_class = @main_workflow_class
         extractor_class = workflow_class&.extractor_class || Seek::WorkflowExtractors::Base
@@ -61,10 +75,18 @@ module Seek
       end
 
       def abstract_cwl_extractor
-        return @abstract_cwl_extractor if @abstract_cwl_extractor
+        return @abstract_cwl_extractor if defined?(@abstract_cwl_extractor)
 
         abstract_cwl_path = @git_version.path_for_key(:abstract_cwl)
         @abstract_cwl_extractor = abstract_cwl_path ? Seek::WorkflowExtractors::CWL.new(@git_version.file_contents(abstract_cwl_path, fetch_remote: true)) : nil
+      end
+
+      def cff_extractor
+        return @cff_extractor if defined?(@cff_extractor)
+
+        cff = @git_version.get_blob(Seek::WorkflowExtractors::CFF::FILENAME)
+
+        @cff_extractor = cff ? Seek::WorkflowExtractors::CFF.new(cff) : nil
       end
     end
   end
