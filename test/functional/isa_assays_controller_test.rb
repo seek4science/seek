@@ -25,6 +25,8 @@ class IsaAssaysControllerTest < ActionController::TestCase
     projects = User.current_user.person.projects
     inv = Factory(:investigation, projects: projects, contributor: User.current_user.person)
     study = Factory(:study, investigation_id: inv.id, contributor: User.current_user.person)
+    other_creator = Factory(:person)
+    this_person = User.current_user.person
 
     source_sample_type = Factory(:simple_sample_type, title: 'source sample_type')
 
@@ -41,6 +43,8 @@ class IsaAssaysControllerTest < ActionController::TestCase
       assert_difference('SampleType.count', 1) do
         post :create, params: { isa_assay: { assay: { title: 'test', study_id: study.id,
                                                       sop_ids: [Factory(:sop, policy: Factory(:public_policy)).id],
+                                                      creator_ids: [this_person.id, other_creator.id],
+                                                      other_creators: 'other collaborators',
                                                       position: 0, assay_class_id: 1, policy_attributes: policy_attributes },
                                              input_sample_type_id: sample_collection_sample_type.id,
                                              sample_type: { title: 'assay sample_type', project_ids: [projects.first.id], template_id: 1,
@@ -61,8 +65,8 @@ class IsaAssaysControllerTest < ActionController::TestCase
                                                             } } } }
       end
     end
-    i = assigns(:isa_assay)
-    assert_redirected_to controller: 'single_pages', action: 'show', id: i.assay.projects.first.id,
+    isa_assay = assigns(:isa_assay)
+    assert_redirected_to controller: 'single_pages', action: 'show', id: isa_assay.assay.projects.first.id,
                          params: { notice: 'The ISA assay was created successfully!',
                                    item_type: 'assay', item_id: Assay.last.id }
 
@@ -71,6 +75,9 @@ class IsaAssaysControllerTest < ActionController::TestCase
     sample_multi = sample_types[1].sample_attributes.detect(&:seek_sample_multi?)
 
     assert_equal "Input (#{title})", sample_multi.title
+
+    assert_equal [this_person, other_creator], isa_assay.assay.creators
+    assert_equal 'other collaborators', isa_assay.assay.other_creators
   end
 
   test 'author form partial uses correct nested param attributes' do
@@ -104,10 +111,12 @@ class IsaAssaysControllerTest < ActionController::TestCase
     assert_template :new
   end
 
-  test 'should edit isa assay' do
+  test 'should update isa assay' do
     person = User.current_user.person
     project = person.projects.first
     investigation = Factory(:investigation, projects: [project])
+    other_creator = Factory(:person)
+
 
     source_type = Factory(:isa_source_sample_type, contributor: person, projects: [project])
     sample_collection_type = Factory(:isa_sample_collection_sample_type, contributor: person, projects: [project],
@@ -121,12 +130,16 @@ class IsaAssaysControllerTest < ActionController::TestCase
 
     assay = Factory(:assay, study: study, sample_type: assay_type, contributor: person)
 
-    put :update, params: { id: assay, isa_assay: { assay: { title: 'assay title',  sop_ids: [Factory(:sop, policy: Factory(:public_policy)).id] },
+    put :update, params: { id: assay, isa_assay: { assay: { title: 'assay title',  sop_ids: [Factory(:sop, policy: Factory(:public_policy)).id],
+                                                            creator_ids: [person.id, other_creator.id], other_creators: 'other collaborators' },
                                                    sample_type: { title: 'sample type title' } } }
 
     isa_assay = assigns(:isa_assay)
     assert_equal 'assay title', isa_assay.assay.title
     assert_equal 'sample type title', isa_assay.sample_type.title
     assert_redirected_to single_page_path(id: project, item_type: 'assay', item_id: assay.id)
+
+    assert_equal [person, other_creator], isa_assay.assay.creators
+    assert_equal 'other collaborators', isa_assay.assay.other_creators
   end
 end
