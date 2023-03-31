@@ -56,6 +56,10 @@ class Programme < ApplicationRecord
       joins: [:funding_codes_as_text]
   )
 
+  def related_people
+    people | programme_administrators
+  end
+
   def self.site_managed_programme
     Programme.find_by_id(Seek::Config.managed_programme_id)
   end
