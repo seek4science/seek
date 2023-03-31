@@ -255,3 +255,5 @@ bio_tools_enabled:
 require_cookie_consent:
 galaxy_tool_sources:
 metadata_license:
+regular_job_offset:
+  convert: :to_i
