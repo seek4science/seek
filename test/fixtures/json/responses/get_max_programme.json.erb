@@ -31,7 +31,8 @@
       },
       "people": {
         "data":
-        <%= res.people.map { |p| { id: p.id.to_s, type: 'people' } }.to_json %>
+          <% people = res.people.map { |p| { id: p.id.to_s, type: 'people' } } %>
+          <%= people.append({ id: res.programme_administrator_ids.first.to_s, type: 'people' }).to_json %>
       },
       "projects": {
         "data": [

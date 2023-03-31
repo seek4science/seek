@@ -1599,4 +1599,60 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_redirected_to login_path
     assert flash[:error].include?('need to be logged in')
   end
+
+  test 'lists creators in index in condensed and table views' do
+    Workflow.delete_all
+
+    person = Factory(:person, first_name: 'Jessica', last_name: 'Three')
+    workflow = Factory(:public_workflow, other_creators: 'Joy Five')
+    disable_authorization_checks do
+      workflow.assets_creators.create!(given_name: 'Julia', family_name: 'Two', pos: 2, affiliation: 'University of Sheffield', orcid: 'https://orcid.org/0000-0001-8172-8981')
+      workflow.assets_creators.create!(creator: person, pos: 3)
+      workflow.assets_creators.create!(given_name: 'Jill', family_name: 'One', pos: 1)
+      workflow.assets_creators.create!(given_name: 'Jane', family_name: 'Four', pos: 4, affiliation: 'University of Edinburgh')
+    end
+
+    get :index, params: { view: 'condensed' }
+    assert_response :success
+    assert_select '#resource-condensed-view .list_item', count: 1
+    assert_select '#resource-condensed-view .list_item .rli-head' do
+      assert_select '.rli-condensed-attribute', text: 'Creators: Jill One, Julia Two, Jessica Three, Jane Four, Joy Five'
+      assert_select '.rli-condensed-attribute' do
+        assert_select ':nth-child(2)', text: 'Jill One'
+
+        assert_select ':nth-child(3)', text: 'Julia Two'
+        assert_select ':nth-child(3)[title=?]', 'Julia Two, University of Sheffield'
+        assert_select ':nth-child(3)[href=?]', 'https://orcid.org/0000-0001-8172-8981'
+
+        assert_select ':nth-child(4)', text: 'Jessica Three'
+        assert_select ':nth-child(4)[href=?]', person_path(person)
+
+        assert_select ':nth-child(5)', text: 'Jane Four'
+        assert_select ':nth-child(5)[title=?]', 'Jane Four, University of Edinburgh'
+      end
+    end
+
+    get :index, params: { view: 'table' }
+    assert_response :success
+    assert_select '.list_items_container tbody tr', count: 1
+    assert_select '.list_items_container tbody tr' do
+      assert_select 'td', text: 'Jill One, Julia Two, Jessica Three, Jane Four, Joy Five'
+      assert_select 'td' do
+        assert_select ':nth-child(1)', text: 'Jill One'
+
+        assert_select ':nth-child(2)', text: 'Julia Two'
+        assert_select ':nth-child(2)[title=?]', 'Julia Two, University of Sheffield'
+        assert_select ':nth-child(2)[href=?]', 'https://orcid.org/0000-0001-8172-8981'
+
+        assert_select ':nth-child(3)', text: 'Jessica Three'
+        assert_select ':nth-child(3)[href=?]', person_path(person)
+
+        assert_select ':nth-child(4)', text: 'Jane Four'
+        assert_select ':nth-child(4)[title=?]', 'Jane Four, University of Edinburgh'
+      end
+    end
+
+    # Reset the view parameter
+    session.delete(:view)
+  end
 end

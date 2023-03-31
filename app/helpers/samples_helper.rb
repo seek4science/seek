@@ -9,7 +9,7 @@ module SamplesHelper
   def controlled_vocab_form_field(sample_controlled_vocab, element_name, values, limit=1)
     if sample_controlled_vocab.sample_controlled_vocab_terms.count < Seek::Config.cv_dropdown_limit && sample_controlled_vocab.source_ontology.blank?
       options = options_from_collection_for_select(
-        sample_controlled_vocab.sample_controlled_vocab_terms.sort_by(&:label),
+        sample_controlled_vocab.sample_controlled_vocab_terms,
         :label, :label,
         values
       )
