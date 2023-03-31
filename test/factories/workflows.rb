@@ -100,8 +100,13 @@ Factory.define(:max_workflow, class: Workflow) do |f|
   f.discussion_links { [Factory.build(:discussion_link, label:'Slack')] }
   f.after_create do |workflow|
     workflow.content_blob = Factory.create(:cwl_content_blob, asset: workflow, asset_version: workflow.version)
-    workflow.annotate_with(['Workflow-tag1', 'Workflow-tag2', 'Workflow-tag3', 'Workflow-tag4', 'Workflow-tag5'], 'tag', workflow.contributor)
+
+    # required for annotations
+    Factory(:operations_controlled_vocab) unless SampleControlledVocab::SystemVocabs.operations_controlled_vocab
+    Factory(:topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.topics_controlled_vocab
+
     User.with_current_user(workflow.contributor.user) do
+      workflow.tags = ['Workflow-tag1', 'Workflow-tag2', 'Workflow-tag3', 'Workflow-tag4', 'Workflow-tag5']
       workflow.operation_annotations = 'Clustering'
       workflow.topic_annotations = 'Chemistry'
     end
@@ -286,14 +291,14 @@ Factory.define(:local_ro_crate_git_workflow_with_tests, class: Workflow) do |f|
 end
 
 Factory.define(:nfcore_git_workflow, class: Workflow) do |f|
-  f.title 'nf-core/ampliseq'
+  f.title 'nf-core/rnaseq'
   f.with_project_contributor
   f.workflow_class { WorkflowClass.find_by_key('nextflow') || Factory(:nextflow_workflow_class) }
   f.git_version_attributes do
     repo = Factory(:nfcore_local_rocrate_repository)
     { git_repository_id: repo.id,
       ref: 'refs/heads/master',
-      commit: 'fda2a6add4b4c2a9ec02b40485adbce690cf4429',
+      commit: '3643a94411b65f42bce5357c5015603099556ad9',
       main_workflow_path: 'main.nf',
       mutable: true
     }

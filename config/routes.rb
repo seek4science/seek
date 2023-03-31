@@ -783,7 +783,6 @@ SEEK::Application.routes.draw do
   get '/search/save' => 'search#save', as: :save_search
   get '/search/delete' => 'search#delete', as: :delete_search
   get 'svg/:id.:format' => 'svg#show', as: :svg
-  get '/tags/latest' => 'tags#latest', as: :latest_tags
   get '/tags/query' => 'tags#query', as: :query_tags
   get '/tags' => 'tags#index', as: :all_tags
   get '/tags/:id' => 'tags#show', as: :show_tag
@@ -839,4 +838,7 @@ SEEK::Application.routes.draw do
   # cookie consent
   get 'cookies/consent' => 'cookies#consent'
   post 'cookies/consent' => 'cookies#set_consent'
+
+  # for the api docs under production, avoids special rewrite rules
+  get 'api', to: static("api/index.html") if Rails.env.production?
 end

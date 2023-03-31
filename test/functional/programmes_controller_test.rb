@@ -147,7 +147,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute person.is_programme_administrator_of_any_programme?
     assert_difference('Role.count', 3) do # Should include creator
       assert_difference('Programme.count', 1) do
-        post :create, params: { programme: { programme_administrator_ids: "#{person.id},#{person2.id}", title: 'programme xxxyxxx2' } }
+        post :create, params: { programme: { programme_administrator_ids: [person.id, person2.id], title: 'programme xxxyxxx2' } }
       end
     end
 
@@ -169,7 +169,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute admin.is_programme_administrator_of_any_programme?
     assert_difference('Programme.count', 1) do
       assert_difference('Role.count', 1) do
-        post :create, params: { programme: { programme_administrator_ids: "#{admin.id}", title: 'programme xxxyxxx1' } }
+        post :create, params: { programme: { programme_administrator_ids: [admin.id], title: 'programme xxxyxxx1' } }
       end
     end
 
@@ -194,7 +194,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute p2.is_programme_administrator?(prog)
     refute p3.is_programme_administrator?(prog)
 
-    ids = [p1.id, p2.id].join(',')
+    ids = [p1.id, p2.id]
     put :update, params: { id: prog, programme: { programme_administrator_ids: ids } }
 
     assert_redirected_to prog
@@ -228,7 +228,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute p2.is_programme_administrator?(prog)
     refute p3.is_programme_administrator?(prog)
 
-    ids = [p1.id, p2.id].join(',')
+    ids = [p1.id, p2.id]
     put :update, params: { id: prog, programme: { programme_administrator_ids: ids } }
 
     assert_redirected_to prog
@@ -381,7 +381,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     with_config_value(:email_enabled, true) do
       assert_difference('Programme.count') do
         assert_enqueued_emails(1) do # activation email
-          post :create, params: { programme: { title: 'A programme', funding_codes: 'aaa,bbb', web_page: '', description: '', funding_details: '' } }
+          post :create, params: { programme: { title: 'A programme', funding_codes: ['','aaa','bbb'], web_page: '', description: '', funding_details: '' } }
         end
       end
     end
@@ -734,7 +734,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     prog = Factory(:programme)
 
     assert_difference('Annotation.count', 2) do
-      put :update, params: { id: prog, programme: { funding_codes: '1234,abcd' } }
+      put :update, params: { id: prog, programme: { funding_codes: ['1234','abcd'] } }
     end
 
     assert_redirected_to prog
@@ -744,7 +744,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_includes assigns(:programme).funding_codes, 'abcd'
 
     assert_difference('Annotation.count', -2) do
-      put :update, params: { id: prog, programme: { funding_codes: '' } }
+      put :update, params: { id: prog, programme: { funding_codes: [''] } }
     end
 
     assert_redirected_to prog
@@ -837,4 +837,24 @@ class ProgrammesControllerTest < ActionController::TestCase
     end
   end
 
+  test 'Empty programmes should show programme administrators as related people' do
+    person1 = Factory(:programme_administrator_not_in_project)
+    person2 = Factory(:programme_administrator_not_in_project)
+    prog1 = Factory(:min_programme, programme_administrators: [person1, person2])
+
+    assert person1.projects.empty?
+
+    get :show, params: { id: prog1.id }
+    assert_response :success
+
+    assert_select 'h2', text: /Related items/i
+    assert_select 'div.list_items_container' do
+      assert_select 'div.list_item' do
+        assert_select 'div.list_item_title' do
+          assert_select 'a[href=?]', person_path(person1), text: person1.title
+          assert_select 'a[href=?]', person_path(person2), text: person2.title
+        end
+      end
+    end
+  end
 end

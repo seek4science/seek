@@ -19,6 +19,9 @@ def load_seek_config_defaults!
   Seek::Config.default :external_help_url,"https://docs.seek4science.org/help"
   Seek::Config.default :exception_notification_enabled,false
   Seek::Config.default :exception_notification_recipients,""
+  Seek::Config.default :error_grouping_enabled,true
+  Seek::Config.default :error_grouping_timeout,2.minutes
+  Seek::Config.default :error_grouping_log_base,2
   Seek::Config.default :hide_details_enabled,false
   Seek::Config.default :registration_disabled,false
   Seek::Config.default :registration_disabled_description,'Registration is not available, please contact your administrator'
@@ -105,7 +108,7 @@ def load_seek_config_defaults!
   Seek::Config.default :home_feeds_cache_timeout,30
 # Branding
   Seek::Config.default :instance_name,'FAIRDOM-SEEK'
-  Seek::Config.default :instance_link,'http://www.fair-dom.org'
+  Seek::Config.default :instance_link,'https://fairdomseek.org'
 
   Seek::Config.default :instance_admins_name,"FAIRDOM"
   Seek::Config.default :instance_admins_link,"http://www.fair-dom.org"
@@ -240,6 +243,7 @@ def load_seek_config_defaults!
   Seek::Config.default :openbis_check_new_arrivals, true
 
   Seek::Config.default :default_license, 'CC-BY-4.0'
+  Seek::Config.default :metadata_license, 'CC-BY-4.0'
 
   Seek::Config.default :nels_api_url, 'https://test-fe.cbu.uib.no/nels-api'
   Seek::Config.default :nels_oauth_url, 'https://test-fe.cbu.uib.no/oauth2'

@@ -77,6 +77,60 @@
           "is_title": false,
           "sample_controlled_vocab_id": null,
           "linked_sample_type_id": null
+        },
+        {
+          "id": "<%= res.sample_attributes[4].id %>",
+          "title": "apple",
+          "description": null,
+          "pid": null,
+          "sample_attribute_type": {
+            "id": "<%= res.sample_attributes[4].sample_attribute_type_id %>",
+            "title": "<%= res.sample_attributes[4].sample_attribute_type.title %>",
+            "base_type": "CV",
+            "regexp": ".*"
+          },
+          "required": false,
+          "pos": 5,
+          "unit": null,
+          "is_title": false,
+          "sample_controlled_vocab_id": "<%= res.sample_attributes[4].sample_controlled_vocab_id %>",
+          "linked_sample_type_id": null
+        },
+        {
+          "id": "<%= res.sample_attributes[5].id %>",
+          "title": "apples",
+          "description": null,
+          "pid": null,
+          "sample_attribute_type": {
+            "id": "<%= res.sample_attributes[5].sample_attribute_type_id %>",
+            "title": "<%= res.sample_attributes[5].sample_attribute_type.title %>",
+            "base_type": "CVList",
+            "regexp": ".*"
+          },
+          "required": false,
+          "pos": 6,
+          "unit": null,
+          "is_title": false,
+          "sample_controlled_vocab_id": "<%= res.sample_attributes[5].sample_controlled_vocab_id %>",
+          "linked_sample_type_id": null
+        },
+        {
+          "id": "<%= res.sample_attributes[6].id %>",
+          "title": "patients",
+          "description": null,
+          "pid": null,
+          "sample_attribute_type": {
+            "id": "<%= res.sample_attributes[6].sample_attribute_type_id %>",
+            "title": "<%= res.sample_attributes[6].sample_attribute_type.title %>",
+            "base_type": "SeekSampleMulti",
+            "regexp": ".*"
+          },
+          "required": false,
+          "pos": 7,
+          "unit": null,
+          "is_title": false,
+          "sample_controlled_vocab_id": null,
+          "linked_sample_type_id": "<%= res.sample_attributes[6].linked_sample_type_id %>"
         }
       ],
       "tags": [

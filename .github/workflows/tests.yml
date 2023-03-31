@@ -10,7 +10,7 @@ jobs:
       TERM: dumb-color
     services:
       postgres:
-        image: postgres:11
+        image: postgres:14
         env:
           POSTGRES_USER: seek
           POSTGRES_DB: seek_test

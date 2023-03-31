@@ -133,7 +133,6 @@ module WorkflowExtraction
     others = other_creators&.split(',')&.collect(&:strip)&.compact || []
     authors += others.map.with_index { |name, i| crate.add_person("creator-#{i + 1}", name: name) }
     crate.author = authors
-    crate['provider'] = projects.map { |project| crate.add_organization(nil, project.ro_crate_metadata).reference }
     crate.license = license
     crate.identifier = ro_crate_identifier
     crate.url = ro_crate_url('ro_crate')
@@ -211,13 +210,17 @@ module WorkflowExtraction
   end
 
   def ro_crate_zip
-    ro_crate do |crate|
-      path = ro_crate_path
-      File.delete(path) if File.exist?(path)
-      ROCrate::Writer.new(crate).write_zip(path)
-    end
+    begin
+      ro_crate do |crate|
+        path = ro_crate_path
+        File.delete(path) if File.exist?(path)
+        ROCrate::Writer.new(crate).write_zip(path)
+      end
 
-    ro_crate_path
+      ro_crate_path
+    rescue StandardError => e
+      raise ::ROCrate::WriteException.new("Couldn't generate RO-Crate metadata.", e)
+    end
   end
 
   def ro_crate_identifier

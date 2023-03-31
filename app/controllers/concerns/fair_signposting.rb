@@ -3,6 +3,12 @@ module FairSignposting
   # registered in https://www.iana.org/assignments/profile-uris/profile-uris.xhtml
   RO_CRATE_PROFILE='https://w3id.org/ro/crate'
 
+  included do
+    after_action :generate_fair_signposting_header, if: -> { @fair_signposting_links&.any? }
+  end
+
+  private
+
   def fair_signposting
     parent_asset = resource_for_controller
     display_asset = versioned_resource_for_controller || parent_asset
@@ -27,16 +33,18 @@ module FairSignposting
       links << [polymorphic_url([:download, parent_asset], **url_opts), { rel: :item, type: display_asset.content_blob.content_type }]
     end
 
-    if links.any?
-      h = links.map do |url, props|
-        s = "<#{url}>"
-        props.each do |k, v|
-          v = Mime::Type.lookup_by_extension(v).to_str if k == :type && v.is_a?(Symbol)
-          s << " ; #{k}=\"#{v}\""
-        end
-        s
-      end.join(', ')
-      response.set_header('Link', h)
-    end
+    @fair_signposting_links = links
+  end
+
+  def generate_fair_signposting_header
+    h = @fair_signposting_links.map do |url, props|
+      s = "<#{url}>"
+      props.each do |k, v|
+        v = Mime::Type.lookup_by_extension(v).to_str if k == :type && v.is_a?(Symbol)
+        s << " ; #{k}=\"#{v}\""
+      end
+      s
+    end.join(', ')
+    response.set_header('Link', h)
   end
 end

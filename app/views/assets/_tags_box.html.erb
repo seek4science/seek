@@ -25,8 +25,8 @@
                                    :complete => "$j('#create_a_tag').hide();",
                                    :remote => true}) do
       %>
-        <small>Either select a suggested tag whilst typing, or type a comma to end and define a new tag.</small>
-        <%= tags_input(:tag_list, existing_tags, :typeahead => true) %>
+        <small>Either select a suggested tag whilst typing, or continue typing and select to create a new tag.</small>
+        <%= tags_input(:tag_list, existing_tags) %>
         <%= submit_tag "Update", :class => 'btn btn-default' -%>
         <%= image_tag("ajax-loader.gif", :id => 'tags_spinner', :style => 'display: none') -%>
       <% end -%>

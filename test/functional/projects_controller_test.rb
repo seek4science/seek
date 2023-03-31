@@ -105,7 +105,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
     assert_difference('Project.count') do
       post :create, params: { project: { title: 'proj with dates', start_date:'2018-11-01', end_date:'2018-11-18',
-                                         funding_codes: 'aaa,bbb' } }
+                                         funding_codes: ['aaa','bbb'] } }
     end
 
     project = assigns(:project)
@@ -122,7 +122,7 @@ class ProjectsControllerTest < ActionController::TestCase
     project = Factory(:project)
 
     assert_difference('Annotation.count', 2) do
-      put :update, params: { id: project, project: { funding_codes: '1234,abcd' } }
+      put :update, params: { id: project, project: { funding_codes: ['1234','abcd'] } }
     end
 
     assert_redirected_to project
@@ -132,7 +132,7 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_includes assigns(:project).funding_codes, 'abcd'
 
     assert_difference('Annotation.count', -2) do
-      put :update, params: { id: project, project: { funding_codes: '' } }
+      put :update, params: { id: project, project: { funding_codes: [''] } }
     end
 
     assert_redirected_to project
@@ -1311,7 +1311,7 @@ class ProjectsControllerTest < ActionController::TestCase
     refute person2.is_project_administrator?(project)
     refute person2.is_pal?(project)
 
-    ids = "#{person.id},#{person2.id}"
+    ids = [person.id, person2.id]
 
     assert_difference('Role.count', 4 * 2) do
       post :update_members, params: { id: project, project: { project_administrator_ids: ids,
@@ -1843,9 +1843,9 @@ class ProjectsControllerTest < ActionController::TestCase
     institution = Factory(:institution)
     login_as(person)
     params = {
-        projects: project.id.to_s,
+      project_ids: ['', project.id],
         institution:{
-            id:institution.id
+            id: ['', institution.id]
         },
         comments: 'some comments'
     }
@@ -1871,13 +1871,14 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as(person)
 
     institution_params = {
+        id: ['fish'],
         title:'fish',
         city:'Sheffield',
         country:'GB',
         web_page:'http://google.com'
     }
     params = {
-        projects: project.id.to_s,
+        project_ids: [project.id],
         institution: institution_params,
         comments: 'some comments'
     }
@@ -1907,13 +1908,14 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as(person)
 
     institution_params = {
+      id: ['fish'],
       title:'fish',
       city:'Sheffield',
       country:'GB',
       web_page:'http://google.com'
     }
     params = {
-      projects: "#{project1.id},#{project2.id}",
+      project_ids: ['', project1.id, project2.id],
       institution: institution_params,
       comments: 'some comments'
     }
@@ -1958,7 +1960,7 @@ class ProjectsControllerTest < ActionController::TestCase
       params = {
           programme_id: programme.id,
           project: { title: 'The Project', description: 'description', web_page: 'web_page'},
-          institution: { id: institution.id }
+          institution: { id: [institution.id] }
       }
       assert_enqueued_emails(1) do
         assert_difference('ProjectCreationMessageLog.count') do
@@ -1989,7 +1991,7 @@ class ProjectsControllerTest < ActionController::TestCase
       params = {
         programme_id: programme.id,
         project: { title: 'The Project',description:'description',web_page:'web_page'},
-        institution: {id: institution.id}
+        institution: {id: [institution.id]}
       }
       assert_enqueued_emails(0) do
         assert_difference('ProjectCreationMessageLog.count',1) do
@@ -2019,7 +2021,7 @@ class ProjectsControllerTest < ActionController::TestCase
     with_config_value(:managed_programme_id, nil) do
       params = {
         project: { title: 'The Project',description:'description',web_page:'web_page'},
-        institution: {id: institution.id}
+        institution: {id: [institution.id]}
       }
       assert_enqueued_emails(0) do
         assert_difference('ProjectCreationMessageLog.count',1) do
@@ -2050,7 +2052,7 @@ class ProjectsControllerTest < ActionController::TestCase
     with_config_value(:managed_programme_id, programme.id) do
       params = {
           project: { title: 'The Project', description:'description', web_page:'web_page'},
-          institution: {title: 'the inst', web_page: 'the page', city: 'London', country: 'GB'},
+          institution: {id: ['the inst'], title: 'the inst', web_page: 'the page', city: 'London', country: 'GB'},
           programme_id: '',
           programme: {title: 'the prog'}
       }
@@ -2093,7 +2095,7 @@ class ProjectsControllerTest < ActionController::TestCase
     with_config_value(:programmes_enabled, false) do
       params = {
         project: { title: 'The Project',description:'description',web_page:'web_page'},
-        institution: {title:'the inst',web_page:'the page',city:'London',country:'GB'}
+        institution: {id: ['the inst'], title:'the inst',web_page:'the page',city:'London',country:'GB'}
       }
       assert_enqueued_emails(1) do
         assert_difference('ProjectCreationMessageLog.count') do
@@ -3619,7 +3621,7 @@ class ProjectsControllerTest < ActionController::TestCase
     project = project_admin.projects.first
     login_as(project_admin)
 
-    put :update, params: { id: project.id, project: { topic_annotations: 'Chemistry, Sample collections' } }
+    put :update, params: { id: project.id, project: { topic_annotations: ['Chemistry', 'Sample collections'] } }
 
     assert_equal ['http://edamontology.org/topic_3314','http://edamontology.org/topic_3277'], assigns(:project).topic_annotations
 

@@ -572,6 +572,15 @@ class ProgrammeTest < ActiveSupport::TestCase
         assert closed_programme.can_associate_projects?
       end
     end
+  end
 
+  test 'get related people of empty programmes' do
+    person1 = Factory(:programme_administrator_not_in_project)
+    person2 = Factory(:programme_administrator_not_in_project)
+    prog = Factory(:min_programme, programme_administrators: [person1, person2])
+
+    [person1, person2].each do |p|
+      assert_includes prog.related_people, p
+    end
   end
 end

@@ -23,7 +23,7 @@
       <div role="tabpanel" class="tab-pane<%= ' active'.html_safe if tab == 'manual' -%>" id="manual">
         <div class="form-group">
           <%= f.label :tags -%>
-          <%= tags_input('sample_type[tags]', @sample_type.tags, :typeahead => {:type => 'sample_type_tags'}) %>
+          <%= tags_input('sample_type[tags]', @sample_type.tags, :typeahead => {:type => 'sample_type_tag'}, class:'form-control') %>
         </div>
 
         <%= render :partial => "assets/author_form", :locals => { :form => f } -%>

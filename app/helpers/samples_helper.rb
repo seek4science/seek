@@ -7,37 +7,45 @@ module SamplesHelper
   end
 
   def controlled_vocab_form_field(sample_controlled_vocab, element_name, values, limit=1)
-    if sample_controlled_vocab.sample_controlled_vocab_terms.count < Seek::Config.cv_dropdown_limit && sample_controlled_vocab.source_ontology.blank?
-      options = options_from_collection_for_select(
-        sample_controlled_vocab.sample_controlled_vocab_terms.sort_by(&:label),
-        :label, :label,
-        values
-      )
-      select_tag element_name,
-                 options,                 
-                 class: "form-control",
-                 include_blank: ""
-    else
       scv_id = sample_controlled_vocab.id
-      is_ontology = sample_controlled_vocab.source_ontology.present?
+      object_struct = Struct.new(:id, :title)
       existing_objects = Array(values).collect do |value|
-        Struct.new(:id, :name).new(value, value)
+        object_struct.new(value, value)
       end
+
+      typeahead = { handlebars_template: 'typeahead/controlled_vocab_term' }
+
+      if sample_controlled_vocab.sample_controlled_vocab_terms.count < Seek::Config.cv_dropdown_limit
+        values = sample_controlled_vocab.sample_controlled_vocab_terms.collect do |term|
+          {
+            id: term.label,
+            text: term.label,
+            iri: term.iri
+          }
+        end
+        typeahead[:values] = values
+      else
+        typeahead[:query_url] = typeahead_sample_controlled_vocabs_path + "?scv_id=#{scv_id}"
+      end
+
       objects_input(element_name, existing_objects,
-                    typeahead: { query_url: typeahead_sample_controlled_vocabs_path + "?query=%QUERY&scv_id=#{scv_id}", 
-                    handlebars_template: 'typeahead/controlled_vocab_term' }, 
-                    limit: limit, ontology: is_ontology)
-    end
+                    typeahead: typeahead,
+                    limit: limit,
+                    allow_new: sample_controlled_vocab.custom_input?,
+                    class: 'form-control')
+  end
+
+  def controlled_vocab_list_form_field(sample_controlled_vocab, element_name, values)
+    controlled_vocab_form_field(sample_controlled_vocab, element_name, values, nil)
   end
 
   def sample_multi_form_field(attribute, element_name, value)  
     existing_objects = []
-    str = Struct.new(:id, :name)
+    str = Struct.new(:id, :title)
     value.each {|v| existing_objects << str.new(v[:id], v[:title]) if v} if value
     objects_input(element_name, existing_objects,
-                  typeahead: { query_url: typeahead_samples_path + "?query=%QUERY&linked_sample_type_id=#{attribute.linked_sample_type.id}", 
-                  handlebars_template: 'typeahead/controlled_vocab_term' }, 
-                  limit: 5)
+                  typeahead: { query_url: typeahead_samples_path + "?linked_sample_type_id=#{attribute.linked_sample_type.id}",
+                  handlebars_template: 'typeahead/controlled_vocab_term' }, class: 'form-control')
   end
 
   def authorised_samples(projects = nil)
@@ -77,6 +85,8 @@ module SamplesHelper
         seek_data_file_attribute_display(value)
       when Seek::Samples::BaseType::CV
         seek_cv_attribute_display(value, attribute)
+      when Seek::Samples::BaseType::CV_LIST
+        value.each{|v| seek_cv_attribute_display(v, attribute) }.join(', ')
       else
         default_attribute_display(attribute, options, sample, value)
       end
@@ -86,7 +96,7 @@ module SamplesHelper
   def seek_cv_attribute_display(value, attribute)
     term = attribute.sample_controlled_vocab.sample_controlled_vocab_terms.where(label:value).last
     content = value
-    if term && term.iri
+    if term && term.iri.present?
       content << " (#{term.iri}) "
     end
     content
@@ -243,6 +253,8 @@ module SamplesHelper
       select_tag(element_name, options, include_blank: !attribute.required?, class: "form-control #{element_class}")
     when Seek::Samples::BaseType::CV
       controlled_vocab_form_field attribute.sample_controlled_vocab, element_name, value
+    when Seek::Samples::BaseType::CV_LIST
+      controlled_vocab_list_form_field attribute.sample_controlled_vocab, element_name, value
     when Seek::Samples::BaseType::SEEK_SAMPLE
       terms = attribute.linked_sample_type.samples.authorized_for('view').to_a
       options = options_from_collection_for_select(terms, :id, :title, value.try(:[], 'id'))

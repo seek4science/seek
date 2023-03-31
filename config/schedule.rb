@@ -29,17 +29,25 @@ require File.expand_path(File.dirname(__FILE__) + "/../config/environment") unle
 
 set :output, "#{path}/log/schedule.log"
 
+MIDNIGHT = Time.now.midnight
+# Apply a static offset, plus an optional configured offset, to run times of periodic jobs.
+# This is to avoid them all occurring at the same time and overloading the server.
+def offset(off_hours)
+  off_minutes = Seek::Config.regular_job_offset || 0
+  (MIDNIGHT + off_hours.hours + off_minutes.minutes).strftime("%-l:%M%P")
+end
+
 PeriodicSubscriptionEmailJob::DELAYS.each do |frequency, period|
-  every period do
+  every period, at: offset(0) do
     runner "PeriodicSubscriptionEmailJob.new('#{frequency}').queue_job"
   end
 end
 
-every RegularMaintenanceJob::RUN_PERIOD do
+every RegularMaintenanceJob::RUN_PERIOD, at: offset(1) do
   runner "RegularMaintenanceJob.perform_later"
 end
 
-every LifeMonitorStatusJob::PERIOD do
+every LifeMonitorStatusJob::PERIOD, at: offset(2) do
   runner "LifeMonitorStatusJob.perform_later"
 end
 
@@ -53,6 +61,14 @@ end
 
 every 1.minute do
   runner 'ApplicationStatus.instance.refresh'
+end
+
+every 1.day, at: offset(3) do
+  runner 'Galaxy::ToolMap.instance.refresh'
+end
+
+every 1.day, at: '12:10 am' do
+  runner "Seek::BioSchema::DataDump.generate_dumps"
 end
 
 # not safe to automatically add in a non containerised environment

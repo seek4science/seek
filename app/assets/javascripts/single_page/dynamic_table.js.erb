@@ -394,7 +394,7 @@ function getSampleLinking(arr) {
 function setTagsInput(item) {
 	// There's a new input after the table is rendered
 	const newInput = item.find("input").first();
-	loadObjectInputs({ item: newInput });
+	ObjectsInput.init({ item: newInput });
 	newInput.on("itemAdded itemRemoved", function (event) {
 		const items = $j(this).tagsinput("items");
 		const values = items.map(({ id, name }) => ({

@@ -53,7 +53,7 @@ class SampleTypesControllerTest < ActionController::TestCase
 
                                                        }
                                                      },
-                                                     tags: 'fish,golf' } }
+                                                     tags: ['fish','golf'] } }
             end
           end
         end
@@ -231,7 +231,7 @@ class SampleTypesControllerTest < ActionController::TestCase
           assert_difference('SampleAttribute.count', -1) do
             put :update, params: { id: sample_type, sample_type: { title: 'Hello!',
                                                                    sample_attributes_attributes: sample_attributes_fields,
-                                                                   tags: "fish,#{golf.value.text}" } }
+                                                                   tags: ['fish',golf.value.text] } }
 
             assert sample_type.template_generation_task.reload.pending?
           end

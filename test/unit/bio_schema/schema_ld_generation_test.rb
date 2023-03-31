@@ -16,9 +16,25 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     expected = {
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => 'DataCatalog',
+      '@id' => 'http://fairyhub.org',
       'dct:conformsTo' => 'https://bioschemas.org/profiles/DataCatalog/0.3-RELEASE-2019_07_01/',
       'name' => 'Sysmo SEEK',
       'url' => 'http://fairyhub.org',
+      'dataset' => [
+        { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/collections', 'name' => 'Collections' },
+        { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/data_files', 'name' => 'Data files' },
+        { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/documents', 'name' => 'Documents' },
+        { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/events', 'name' => 'Events' },
+        { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/human_diseases', 'name' => 'Human diseases' },
+        { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/institutions', 'name' => 'Institutions' },
+        { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/organisms', 'name' => 'Organisms' },
+        { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/people', 'name' => 'People' },
+        { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/presentations', 'name' => 'Presentations' },
+        { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/programmes', 'name' => 'Programmes' },
+        { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/projects', 'name' => 'Projects' },
+        { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/samples', 'name' => 'Samples' },
+        { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/workflows', 'name' => 'Workflows' }
+      ],
       'description' => 'a lovely project',
       'keywords' => 'a, b, c, d',
       'provider' => {
@@ -39,6 +55,56 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
         end
       end
     end
+  end
+
+  test 'data catalogue only contains enabled types' do
+    ActivityLog.destroy_all
+    travel_to(@current_time) do
+      Factory :activity_log, activity_loggable: Factory(:person), action: 'create', controller_name: 'people'
+    end
+
+    expected = {
+      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@type' => 'DataCatalog',
+      '@id' => 'http://fairyhub.org',
+      'dct:conformsTo' => 'https://bioschemas.org/profiles/DataCatalog/0.3-RELEASE-2019_07_01/',
+      'name' => 'Sysmo SEEK',
+      'url' => 'http://fairyhub.org',
+      'dataset' => [
+        { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/institutions', 'name' => 'Institutions' },
+        { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/people', 'name' => 'People' },
+        { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/projects', 'name' => 'Projects' },
+        { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/workflows', 'name' => 'Workflows' }
+      ],
+      'description' => 'a lovely project',
+      'keywords' => 'a, b, c, d',
+      'provider' => {
+        '@type' => 'Organization',
+        'name' => 'SysMO-DB',
+        'url' => 'http://www.sysmo-db.org',
+        '@id' => 'http://www.sysmo-db.org'
+      },
+      'dateCreated' => @current_time.iso8601,
+      'dateModified' => @current_time.iso8601
+    }
+
+    Seek::Util.clear_cached
+    with_config_values(collections_enabled: false,
+                       data_files_enabled: false,
+                       documents_enabled: false,
+                       events_enabled: false,
+                       human_diseases_enabled: false,
+                       organisms_enabled: false,
+                       presentations_enabled: false,
+                       programmes_enabled: false,
+                       samples_enabled: false,
+                       instance_description: 'a lovely project',
+                       instance_keywords: 'a,  b, ,,c,d',
+                       site_base_host: 'http://fairyhub.org') do
+      json = JSON.parse(Seek::BioSchema::DataCatalogMockModel.new.to_schema_ld)
+      assert_equal expected, json
+    end
+    Seek::Util.clear_cached
   end
 
   test 'person' do
@@ -71,7 +137,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     assert_equal expected, json
   end
 
-  test 'dataset' do
+  test 'data file' do
     df = travel_to(@current_time) do
       df = Factory(:max_data_file, description: 'short desc', contributor: @person, projects: [@project],
                                    policy: Factory(:public_policy), doi: '10.10.10.10/test.1')
@@ -126,7 +192,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     check_version(df.latest_version, expected)
   end
 
-  test 'dataset without content blob' do
+  test 'data file without content blob' do
     df = travel_to(@current_time) do
       df = Factory(:max_data_file, contributor: @person, projects: [@project], policy: Factory(:public_policy),
                                    doi: '10.10.10.10/test.1')
@@ -472,22 +538,58 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
         'url' => { '@id' => 'https://www.commonwl.org/' }
       },
       'isPartOf' => [],
-      'input' => %w[#main/max-steps #main/reverse #main/rulesfile #main/sinkfile #main/sourcefile].map do |i|
+      'input' => [
         {
           '@type' => 'FormalParameter',
-          '@id' => "\##{expected_wf_prefix}-inputs-#{i}",
-          'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-          'name' => i
-        }
-      end,
-      'output' => %w[#main/compounds #main/reactions #main/sinks].map do |o|
+          '@id' => '#this_workflow-inputs-%23main/max-steps',
+          'name' => '#main/max-steps',
+          'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE
+        },
         {
           '@type' => 'FormalParameter',
-          '@id' => "\##{expected_wf_prefix}-outputs-#{o}",
+          '@id' => '#this_workflow-inputs-%23main/reverse',
+          'name' => '#main/reverse',
+          'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE
+        },
+        {
+          '@type' => 'FormalParameter',
+          '@id' => '#this_workflow-inputs-%23main/rulesfile',
           'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-          'name' => o
+          'name' => '#main/rulesfile'
+        },
+        {
+          '@type' => 'FormalParameter',
+          '@id' => '#this_workflow-inputs-%23main/sinkfile',
+          'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
+          'name' => '#main/sinkfile'
+        },
+        {
+          '@type' => 'FormalParameter',
+          '@id' => '#this_workflow-inputs-%23main/sourcefile',
+          'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
+          'name' => '#main/sourcefile'
         }
-      end
+      ],
+      'output' => [
+        {
+          '@type' => 'FormalParameter',
+          '@id' => '#this_workflow-outputs-%23main/compounds',
+          'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
+          'name' => '#main/compounds'
+        },
+        {
+          '@type' => 'FormalParameter',
+          '@id' => '#this_workflow-outputs-%23main/reactions',
+          'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
+          'name' => '#main/reactions'
+        },
+        {
+          '@type' => 'FormalParameter',
+          '@id' => '#this_workflow-outputs-%23main/sinks',
+          'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
+          'name' => '#main/sinks'
+        }
+      ]
     }
 
     json = JSON.parse(workflow.to_schema_ld)
@@ -644,7 +746,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     assert_equal expected, json
   end
 
-  test 'version of dataset' do
+  test 'version of data file' do
     df = travel_to(@current_time) do
       df = Factory(:max_data_file, description: 'version 1 description', title: 'version 1 title',
                                    contributor: @person, projects: [@project], policy: Factory(:public_policy), doi: '10.10.10.10/test.1')
@@ -743,6 +845,72 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     assert_equal v1_expected, json
     json = JSON.parse(df.find_version(2).to_schema_ld)
     assert_equal v2_expected, json
+  end
+
+  test 'dataset without data dump' do
+    expected = {
+      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@type' => 'Dataset',
+      'dct:conformsTo' => 'https://bioschemas.org/profiles/Dataset/0.3-RELEASE-2019_06_14/',
+      '@id' => 'http://localhost:3000/workflows',
+      'description' => 'Workflows in Sysmo SEEK.',
+      'name' => 'Workflows',
+      'url' => 'http://localhost:3000/workflows',
+      'keywords' => [],
+      'license' => 'https://creativecommons.org/publicdomain/zero/1.0/',
+      'creator' => [{'@type' => 'Organization',
+                     '@id' => 'http://www.sysmo-db.org',
+                     'name' => 'SysMO-DB',
+                     'url' => 'http://www.sysmo-db.org'}],
+      'includedInDataCatalog' => {'@id' => 'http://localhost:3000'}
+    }
+
+    resource = Seek::BioSchema::Dataset.new(Workflow)
+    dump = Workflow.public_schema_ld_dump
+    refute dump.exists?
+    with_config_value(:metadata_license, 'CC0-1.0') do
+      json = JSON.parse(resource.to_schema_ld)
+      assert_equal expected, json
+    end
+  end
+
+  test 'dataset with data dump' do
+    Workflow.delete_all
+    Factory(:public_workflow)
+    Factory(:workflow)
+    dump = Workflow.public_schema_ld_dump
+    dump.write
+    time = Time.now
+    size = ActiveSupport::NumberHelper::NumberToHumanSizeConverter.new(dump.size, {}).convert
+
+    expected = {
+      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@type' => 'Dataset',
+      'dct:conformsTo' => 'https://bioschemas.org/profiles/Dataset/0.3-RELEASE-2019_06_14/',
+      '@id' => 'http://localhost:3000/workflows',
+      'description' => 'Workflows in Sysmo SEEK.',
+      'name' => 'Workflows',
+      'url' => 'http://localhost:3000/workflows',
+      'keywords' => [],
+      'license' => 'https://creativecommons.org/licenses/by/4.0/',
+      'creator' => [{ '@type' => 'Organization',
+                      '@id' => 'http://www.sysmo-db.org',
+                      'name' => 'SysMO-DB',
+                      'url' => 'http://www.sysmo-db.org' }],
+      'distribution' => { '@type' => 'DataDownload',
+                          'contentSize' => size,
+                          'contentUrl' => 'http://localhost:3000/workflows.jsonld?dump=true',
+                          'encodingFormat' => 'application/ld+json',
+                          'name' => 'workflows-bioschemas-dump.jsonld',
+                          'description' => 'A collection of public Workflows in Sysmo SEEK, serialized as an array of JSON-LD objects conforming to Bioschemas profiles.',
+                          'dateModified' => time.iso8601 },
+      'includedInDataCatalog' => { '@id' => 'http://localhost:3000' }
+    }
+
+    resource = Seek::BioSchema::Dataset.new(Workflow)
+    assert dump.exists?
+    json = JSON.parse(resource.to_schema_ld)
+    assert_equal expected, json
   end
 
   private

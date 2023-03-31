@@ -10,11 +10,10 @@ on:
 jobs:
   install-seek-from-ansible:
     runs-on: ${{matrix.os}}
-    #continue-on-error: true
+    continue-on-error: true
     strategy:
       matrix:
-        os: [ubuntu-20.04,ubuntu-22.04,ubuntu-latest]
-        # The service mysql breaks on ubuntu-18.04 during the step "Install SEEK through ansible"
+        os: [ubuntu-18.04,ubuntu-20.04,ubuntu-22.04]
 
     services:
       mysql:
@@ -25,7 +24,7 @@ jobs:
               MYSQL_DATABASE: test
           ports:
             - 3306:3306
-          options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+          options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3 --restart=always
 
     steps:
       - name: Checkout
@@ -41,6 +40,7 @@ jobs:
           sed -i '/\- hosts\: localhost/a \ \ connection\: local' Deploy-SEEK.yml
           sed -i 's/user_var\: username/user_var\: runner/' group_vars/vars.yml
           sed -i 's/git_dest\: \/home\/username/git_dest\: \/home\/runner\/work/' group_vars/vars.yml
+          sed -i 's|git_version: master|git_version: '"${GITHUB_REF##*/}"'|' group_vars/vars.yml
           sed -i '/sql_user\: sql_username/a sql_password: mysqlpassword' group_vars/vars.yml
 
       - name: Prepares system for ansible install
@@ -76,3 +76,17 @@ jobs:
         working-directory: /home/runner/work/SEEK
         run: |
           bash -lc 'bundle exec rails test test/functional'
+
+
+  fail-on-any-os:
+    # Without this step workflow remains "green" regardles of fails above.
+    name: Workflow Status
+    needs:
+      - install-seek-from-ansible
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - uses: technote-space/workflow-conclusion-action@v3.0.3
+      - name: Check Job Status status and fail if they are red
+        if: env.WORKFLOW_CONCLUSION == 'failure'
+        run: exit 1

@@ -96,7 +96,7 @@ module SampleTypesHelper
       type += ' - ' + link_to(sample_type_attribute.linked_sample_type.title, sample_type_attribute.linked_sample_type)
     end
 
-    if sample_type_attribute.controlled_vocab?
+    if sample_type_attribute.controlled_vocab? || sample_type_attribute.seek_cv_list?
       type += ' - ' + link_to(sample_type_attribute.sample_controlled_vocab.title, sample_type_attribute.sample_controlled_vocab)
     end
     type

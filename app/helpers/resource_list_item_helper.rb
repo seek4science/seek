@@ -151,6 +151,18 @@ module ResourceListItemHelper
     html.html_safe
   end
 
+  def list_item_usage(resource)
+    if resource.view_count
+      html = 'Views: ' + resource.view_count.to_s
+      if resource.is_downloadable?
+        html << ', Downloads: ' + resource.download_count.to_s
+      end
+      html.html_safe
+    end
+  rescue
+    nil
+  end
+
   def list_profile_registered_timestamp(resource)
     html = '<p class="list_item_attribute none_text" style="text-align:center;"><b>Registered:</b> <label>'
     html << (resource.try(:user).try(:created_at).nil? ? 'Not yet registered' : date_as_string(resource.try(:user).try(:created_at)))
@@ -241,29 +253,10 @@ module ResourceListItemHelper
   def list_item_person_list(contributors, other_contributors = nil, key = t('creator').capitalize)
     contributor_count = contributors.count
     contributor_count += 1 unless other_contributors.blank?
-    html = ''
-    other_html = ''
+
     content_tag(:p, class: 'list_item_attribute rli-person-list') do
-      html << content_tag(:b, "#{key.pluralize(contributor_count)}: ")
-      html << contributors.map do |author|
-        title = author.name
-        if author.is_a?(AssetsCreator)
-          title += ", #{author.affiliation}" if author.affiliation.present?
-        end
-        if author.person
-          link_to author.name, show_resource_path(author.person), title: title
-        elsif author.respond_to?(:orcid) && author.orcid.present?
-          link_to author.name, author.orcid, title: title
-        else
-          content_tag(:span, author.name, title: title)
-        end
-      end.join(', ')
-      unless other_contributors.blank?
-        other_html << ', ' unless contributors.empty?
-        other_html << other_contributors
-      end
-      other_html << 'None' if contributor_count == 0
-      html.html_safe + other_html
+      content_tag(:b, "#{key.pluralize(contributor_count)}: ") +
+        list_item_person_list_inner(contributors, other_contributors).html_safe
     end
   end
 
@@ -282,6 +275,35 @@ module ResourceListItemHelper
 
   def list_item_orcid(person)
     orcid_identifier(person) if person.orcid.present?
+  end
+
+  def list_item_person_list_inner(contributors, other_contributors = nil)
+    contributor_count = contributors.count
+    contributor_count += 1 unless other_contributors.blank?
+
+    html = ''
+    html << contributors.map do |author|
+      title = author.name
+      if author.is_a?(AssetsCreator)
+        title += ", #{author.affiliation}" if author.affiliation.present?
+      end
+      if author.person
+        link_to author.name, show_resource_path(author.person), title: title
+      elsif author.respond_to?(:orcid) && author.orcid.present?
+        link_to author.name, author.orcid, title: title
+      else
+        content_tag(:span, author.name, title: title)
+      end
+    end.join(', ')
+
+    other_html = ''
+    unless other_contributors.blank?
+      other_html << ', ' unless contributors.empty?
+      other_html << other_contributors
+    end
+    other_html << 'None' if contributor_count == 0
+
+    html.html_safe + other_html
   end
 
   private

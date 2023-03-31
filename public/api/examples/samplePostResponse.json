@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "2",
+    "id": "4",
     "type": "samples",
     "attributes": {
       "policy": {
@@ -12,32 +12,41 @@
       "discussion_links": [
 
       ],
-      "title": "Hello",
+      "title": "Fred Bloggs",
       "tags": [
-
+        "tag1",
+        "tag2"
       ],
-      "created_at": "2022-06-07T14:12:26.000Z",
-      "updated_at": "2022-06-07T14:12:26.000Z",
+      "created_at": "2023-03-06T15:24:11.241Z",
+      "updated_at": "2023-03-06T15:24:11.220Z",
       "creators": [
         {
-          "profile": "/people/37",
+          "profile": "/people/2",
           "family_name": "Last",
-          "given_name": "Person30",
-          "affiliation": "An Institution: 37, An Institution: 39",
+          "given_name": "Person284",
+          "affiliation": "An Institution: 309",
           "orcid": null
         }
       ],
       "other_creators": null,
       "attribute_map": {
-        "the_title": "Hello",
-        "a_real_number": "2.6"
+        "full_name": "Fred Bloggs",
+        "address": "HD",
+        "postcode": "M13 9PL",
+        "CAPITAL key": "key must remain capitalised",
+        "apple": "Bramley",
+        "apples": [
+          "Golden Delicious",
+          "Granny Smith"
+        ],
+        "patients": null
       }
     },
     "relationships": {
       "creators": {
         "data": [
           {
-            "id": "37",
+            "id": "2",
             "type": "people"
           }
         ]
@@ -45,21 +54,21 @@
       "submitter": {
         "data": [
           {
-            "id": "37",
+            "id": "2",
             "type": "people"
           }
         ]
       },
       "sample_type": {
         "data": {
-          "id": "3",
+          "id": "2",
           "type": "sample_types"
         }
       },
       "projects": {
         "data": [
           {
-            "id": "41",
+            "id": "2",
             "type": "projects"
           }
         ]
@@ -72,7 +81,7 @@
       "investigations": {
         "data": [
           {
-            "id": "1",
+            "id": "2",
             "type": "investigations"
           }
         ]
@@ -80,7 +89,7 @@
       "studies": {
         "data": [
           {
-            "id": "1",
+            "id": "2",
             "type": "studies"
           }
         ]
@@ -88,7 +97,7 @@
       "assays": {
         "data": [
           {
-            "id": "1",
+            "id": "2",
             "type": "assays"
           }
         ]
@@ -96,21 +105,21 @@
       "people": {
         "data": [
           {
-            "id": "37",
+            "id": "2",
             "type": "people"
           }
         ]
       }
     },
     "links": {
-      "self": "/samples/2"
+      "self": "/samples/4"
     },
     "meta": {
-      "created": "2022-06-07T14:12:26.000Z",
-      "modified": "2022-06-07T14:12:26.000Z",
+      "created": "2023-03-06T15:24:11.241Z",
+      "modified": "2023-03-06T15:24:11.220Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "c86eb7a0-c899-013a-0f7e-0a81884ed284"
+      "uuid": "de769a80-9e60-013b-15a0-0a81884ed284"
     }
   },
   "jsonapi": {

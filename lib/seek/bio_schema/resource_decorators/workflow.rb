@@ -61,7 +61,7 @@ module Seek
           properties.collect do |property|
             {
               "@type": 'FormalParameter',
-              "@id": "##{wf_name}-#{group_name}-#{property.id}",
+              "@id": ROCrate::ContextualEntity.format_local_id("#{wf_name}-#{group_name}-#{property.id}"),
               name: property.name || property.id,
               "dct:conformsTo": FORMALPARAMETER_PROFILE
             }

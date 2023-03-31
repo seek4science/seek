@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class TagsControllerTest < ActionController::TestCase
-
   include AuthenticatedTestHelper
 
   fixtures :all
@@ -17,7 +16,6 @@ class TagsControllerTest < ActionController::TestCase
     assert_not_nil flash[:error]
     assert_redirected_to all_anns_path
   end
-
 
   test 'show for sample_type_tag' do
     st = Factory(:simple_sample_type, contributor: User.current_user.person, tags: 'fish, peas')
@@ -109,35 +107,21 @@ class TagsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'latest with no attributes defined' do
-    AnnotationAttribute.destroy_all
-    assert_empty AnnotationAttribute.all
-
-    get :latest, format: 'json'
-    assert_response :success
-    assert_empty JSON.parse(@response.body)
-  end
-
-  test 'latest' do
-    p = Factory :person
-
-    df = Factory :data_file, contributor: p
-    tag = Factory :tag, value: 'twinkle', source: p.user, annotatable: df
-
-    get :latest, format: 'json'
-    assert_response :success
-    assert_includes JSON.parse(@response.body), 'twinkle'
-  end
-
   test 'can query' do
     p = Factory :person
 
     df = Factory :data_file, contributor: p
     tag = Factory :tag, value: 'twinkle', source: p.user, annotatable: df
 
-    get :query, params: { format: 'json', query: 'twi' }
+    get :query, params: { format: 'json', q: 'twi' }
     assert_response :success
-    assert_includes JSON.parse(@response.body), 'twinkle'
+    expected = { results: [{ id: 'twinkle', text: 'twinkle' }] }.with_indifferent_access
+    assert_equal expected, JSON.parse(@response.body)
+
+    get :query, params: { format: 'json', q: 'wink' }
+    assert_response :success
+    expected = { results: [{ id: 'twinkle', text: 'twinkle' }] }.with_indifferent_access
+    assert_equal expected, JSON.parse(@response.body)
   end
 
   test 'can handle empty response from query' do
@@ -146,8 +130,8 @@ class TagsControllerTest < ActionController::TestCase
     df = Factory :data_file, contributor: p
     tag = Factory :tag, value: 'twinkle', source: p.user, annotatable: df
 
-    get :query, params: { format: 'json', query: 'zzzxxxyyyqqq' }
+    get :query, params: { format: 'json', q: 'zzzxxxyyyqqq' }
     assert_response :success
-    assert_empty JSON.parse(@response.body)
+    assert_empty JSON.parse(@response.body)['results']
   end
 end

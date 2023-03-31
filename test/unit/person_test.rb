@@ -75,6 +75,25 @@ class PersonTest < ActiveSupport::TestCase
     refute_includes person1.programmes, prog2
   end
 
+  test 'show related empty programmes' do
+    person1 = Factory(:programme_administrator_not_in_project)
+    person2 = Factory(:programme_administrator_not_in_project)
+    person3 = Factory(:programme_administrator_not_in_project) # Programme administrator not in empty_programme1
+    empty_programme1 = Factory(:min_programme, programme_administrators: [person1, person2])
+
+    [person1, person2].each do |p|
+      assert_includes p.related_programmes, empty_programme1
+    end
+    refute_includes person3.related_programmes, empty_programme1
+
+    person4 = Factory(:person_in_project) # Member of a project in prog 2, not a programme administrator
+    prog2 = Factory(:programme, projects: person4.projects, programme_administrators: [person1, person3])
+
+    [person1, person3, person4].each do |p|
+      assert_includes p.related_programmes, prog2
+    end
+  end
+
   test 'can be administered by' do
     admin = Factory(:admin)
     admin2 = Factory(:admin)

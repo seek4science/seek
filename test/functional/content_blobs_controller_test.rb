@@ -368,6 +368,8 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert File.exist?(doc_sop.content_blob.filepath('pdf')), 'the generated PDF file should remain'
   end
 
+
+
   test 'should gracefully handle view_pdf for non existing asset' do
     stub_request(:head, 'http://somewhere.com/piccy.doc').to_return(status: 404)
     sop = Factory(:sop,
@@ -566,7 +568,38 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert_equal "attachment; filename=\"small-test-spreadsheet.xls\"; filename*=UTF-8''small-test-spreadsheet.xls", @response.header['Content-Disposition']
     assert_equal 'application/vnd.ms-excel', @response.header['Content-Type']
     assert_equal '7168', @response.header['Content-Length']
+    assert_equal '86f7a87eb0b1c30b172037d69628f279', @response.header['Content-MD5']
   end
+
+  test 'download should provide the content length if file exists but has a url' do
+    df = Factory :small_test_spreadsheet_datafile, policy: Factory(:public_policy), contributor: User.current_user.person
+    blob = df.content_blob
+    blob.update_column(:url, 'http://website.com/somefile.txt')
+    get :download, params: { data_file_id: df, id: df.content_blob }
+    assert_response :success
+    assert_equal "attachment; filename=\"small-test-spreadsheet.xls\"; filename*=UTF-8''small-test-spreadsheet.xls", @response.header['Content-Disposition']
+    assert_equal 'application/vnd.ms-excel', @response.header['Content-Type']
+    assert_equal '7168', @response.header['Content-Length']
+    assert_equal '86f7a87eb0b1c30b172037d69628f279', @response.header['Content-MD5']
+  end
+
+  test 'download via streaming should provide the content length' do
+    mock_remote_file "#{Rails.root}/test/fixtures/files/ms_word_test.doc",
+                     'http://somewhere.com/piccy.doc',
+                     'Content-Length':'500'
+    doc_sop = Factory(:sop,
+                      policy: Factory(:public_policy),
+                      contributor: User.current_user.person,
+                      content_blob: Factory(:doc_content_blob,
+                                            data: nil,
+                                            url: 'http://somewhere.com/piccy.doc',
+                                            uuid: UUID.generate))
+    get :download, params: { sop_id: doc_sop, id: doc_sop.content_blob }
+    assert_response :success
+
+    assert_equal '500', @response.header['Content-Length']
+  end
+
 
   test 'should not log download for inline view intent' do
     df = Factory :small_test_spreadsheet_datafile, policy: Factory(:public_policy), contributor: User.current_user.person

@@ -291,6 +291,20 @@ class PeopleControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test 'sort by downloads not available' do
+    get :index
+    assert_select '#index_sort_order' do
+      assert_select 'option', { text: 'Downloads (Descending)', count: 0 }
+    end
+  end
+
+  test 'sort by views not available' do
+    get :index
+    assert_select '#index_sort_order' do
+      assert_select 'option', { text: 'Views (Descending)', count: 0 }
+    end
+  end
+
   test 'admin can manage person' do
     login_as(:quentin)
     person = people(:aaron_person)
@@ -692,7 +706,7 @@ class PeopleControllerTest < ActionController::TestCase
         assert_select '.pagination-container li.active', text: '1'
         assert_select '.list_items_container .collapse', count: 3
 
-        
+
         get :index, params: { view: 'table' }
         assert_response :success
         assert_equal 3, assigns(:per_page)
@@ -805,6 +819,25 @@ class PeopleControllerTest < ActionController::TestCase
         assert_select 'div.list_item_title' do
           assert_select 'a[href=?]', project_path(project), text: project.title
           assert_select 'a[href=?]', institution_path(inst), text: inst.title
+        end
+      end
+    end
+  end
+
+  test 'should show empty programme as related item if programme administrator' do
+    person1 = Factory(:programme_administrator_not_in_project)
+    prog1 = Factory(:min_programme, programme_administrators: [person1])
+
+    assert person1.projects.empty?
+
+    get :show, params: { id: person1.id }
+    assert_response :success
+
+    assert_select 'h2', text: /Related items/i
+    assert_select 'div.list_items_container' do
+      assert_select 'div.list_item' do
+        assert_select 'div.list_item_title' do
+          assert_select 'a[href=?]', programme_path(prog1), text: prog1.title
         end
       end
     end
@@ -1054,38 +1087,38 @@ class PeopleControllerTest < ActionController::TestCase
     end
   end
 
-  test 'autocomplete' do
+  test 'typeahead autocomplete' do
     Factory(:brand_new_person, first_name: 'Xavier', last_name: 'Johnson')
     Factory(:brand_new_person, first_name: 'Xavier', last_name: 'Bohnson')
     Factory(:brand_new_person, first_name: 'Charles', last_name: 'Bohnson')
     Factory(:brand_new_person, first_name: 'Jon Bon', last_name: 'Jovi')
     Factory(:brand_new_person, first_name: 'Jon', last_name: 'Bon Jovi')
 
-    get :typeahead, params: { format: :json, query: 'xav' }
+    get :typeahead, params: { format: :json, q: 'xav' }
     assert_response :success
-    res = JSON.parse(response.body)
+    res = JSON.parse(response.body)['results']
     assert_equal 2, res.length
-    assert_includes res.map { |r| r['name'] }, 'Xavier Johnson'
-    assert_includes res.map { |r| r['name'] }, 'Xavier Bohnson'
+    assert_includes res.map { |r| r['text'] }, 'Xavier Johnson'
+    assert_includes res.map { |r| r['text'] }, 'Xavier Bohnson'
 
-    get :typeahead, params: { format: :json, query: 'bohn' }
+    get :typeahead, params: { format: :json, q: 'bohn' }
     assert_response :success
-    res = JSON.parse(response.body)
+    res = JSON.parse(response.body)['results']
     assert_equal 2, res.length
-    assert_includes res.map { |r| r['name'] }, 'Charles Bohnson'
-    assert_includes res.map { |r| r['name'] }, 'Xavier Bohnson'
+    assert_includes res.map { |r| r['text'] }, 'Charles Bohnson'
+    assert_includes res.map { |r| r['text'] }, 'Xavier Bohnson'
 
-    get :typeahead, params: { format: :json, query: 'xavier bohn' }
+    get :typeahead, params: { format: :json, q: 'xavier bohn' }
     assert_response :success
-    res = JSON.parse(response.body)
+    res = JSON.parse(response.body)['results']
     assert_equal 1, res.length
-    assert_includes res.map { |r| r['name'] }, 'Xavier Bohnson'
+    assert_includes res.map { |r| r['text'] }, 'Xavier Bohnson'
 
-    get :typeahead, params: { format: :json, query: 'jon bon' }
+    get :typeahead, params: { format: :json, q: 'jon bon' }
     assert_response :success
-    res = JSON.parse(response.body)
+    res = JSON.parse(response.body)['results']
     assert_equal 2, res.length
-    assert_equal res.map { |r| r['name'] }.uniq, ['Jon Bon Jovi']
+    assert_equal res.map { |r| r['text'] }.uniq, ['Jon Bon Jovi']
   end
 
   test 'related samples are checked for authorization' do

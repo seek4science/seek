@@ -4,6 +4,8 @@ module Seek
   class Version
     attr_reader :major, :minor, :patch
 
+    GIT_VERSION_RECORD_FILE_PATH = Rails.root.join('config', '.git-revision')
+
     def initialize(path)
       yml = YAML.safe_load(File.open(path))
       @major = yml['major']
@@ -19,21 +21,32 @@ module Seek
     # a stored copy of the version, which can be used to avoid repeated calls to read, and YAML loading
     APP_VERSION = read.freeze
 
-    # returns the current version hash from git
+    # returns the current version hash from git, or the file containing the record
     def self.git_version
-      return '' unless git_present?
-      `git rev-parse HEAD`.chomp
+      if git_version_record_present?
+        File.read(GIT_VERSION_RECORD_FILE_PATH)
+      elsif git_present?
+        `git rev-parse HEAD`.chomp
+      else
+        ''
+      end
     end
 
     # returns the current git branch
     def self.git_branch
       return '' unless git_present?
+
       `git rev-parse --abbrev-ref HEAD`.chomp
     end
 
     # is git currently present to allow access to git information
     def self.git_present?
       File.exist?(Rails.root.join('.git'))
+    end
+
+    # is there a config/.git-revision file that contains the revision hash
+    def self.git_version_record_present?
+      File.exist?(GIT_VERSION_RECORD_FILE_PATH)
     end
 
     # equality check, based on the version string

@@ -50,9 +50,13 @@ Factory.define(:max_sample, parent: :sample) do |f|
   f.association :sample_type, factory: :max_sample_type
   f.association :contributor, factory: :person
   f.after_build do |sample|
+    sample.annotate_with(['tag1', 'tag2'], 'tag', sample.contributor)
     sample.set_attribute_value(:full_name, 'Fred Bloggs')
     sample.set_attribute_value(:address, "HD")
     sample.set_attribute_value(:postcode, "M13 9PL")
     sample.set_attribute_value('CAPITAL key', 'key must remain capitalised')
+    sample.set_attribute_value(:apple,['Bramley'])
+    sample.set_attribute_value(:apples, ['Granny Smith','Golden Delicious'])
+    sample.set_attribute_value(:patients, [Factory(:patient_sample).id.to_s, Factory(:patient_sample).id.to_s])
   end
 end

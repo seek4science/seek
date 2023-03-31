@@ -167,15 +167,14 @@ class AdminControllerTest < ActionController::TestCase
     aaron = people(:aaron_person)
 
     assert quentin.is_admin?
-    assert !aaron.is_admin?
+    refute aaron.is_admin?
 
-    post :update_admins, params: { admins: "#{aaron.id}" }
+    post :update_admins, params: { admins: ['', aaron.id.to_s] }
 
     quentin.reload
     aaron.reload
 
-    assert !quentin.is_admin?
-    assert aaron.is_admin?
+    refute quentin.is_admin?
     assert aaron.is_admin?
     assert User.current_user.person.is_admin?
   end
@@ -260,13 +259,67 @@ class AdminControllerTest < ActionController::TestCase
   end
 
   test 'update_redirect_to for update_features_enabled' do
-    post :update_features_enabled, params: { time_lock_doi_for: '1', port: '25' }
+    post :update_features_enabled, params: { time_lock_doi_for: '1',
+                                             port: '25',
+                                             error_grouping_log_base: 2,
+                                             error_grouping_timeout: 1.minute }
     assert_redirected_to admin_path
     assert_nil flash[:error]
 
     post :update_features_enabled, params: { time_lock_doi_for: '' }
     assert_redirected_to features_enabled_admin_path
     refute_nil flash[:error]
+  end
+
+  test 'update error_grouping_enabled' do
+    with_config_value(:error_grouping_enabled, false) do
+      post :update_features_enabled, params: { error_grouping_enabled: '1' }
+      assert Seek::Config.error_grouping_enabled
+      post :update_features_enabled, params: { error_grouping_enabled: '0' }
+      assert_equal false, Seek::Config.error_grouping_enabled
+    end
+  end
+
+  test 'update error_grouping_timeout' do
+    # Checks for warnings when not setting error_grouping_timeout
+    with_config_value(:filtering_enabled, true) do
+      post :update_features_enabled, params: { filtering_enabled: '0' }
+      assert_nil flash[:error]
+    end
+    # Checks setting error_grouping_timeout
+    with_config_value(:error_grouping_timeout, 1.minute) do
+      post :update_features_enabled, params: { error_grouping_timeout: '1' }
+      assert_nil flash[:error]
+      assert_equal 1.seconds, Seek::Config.error_grouping_timeout
+      post :update_features_enabled, params: { error_grouping_timeout: '10 sec' }
+      assert_nil flash[:error]
+      assert_equal 10.seconds, Seek::Config.error_grouping_timeout
+      post :update_features_enabled, params: { error_grouping_timeout: '2 min' }
+      assert_nil flash[:error]
+      assert_equal 120.seconds, Seek::Config.error_grouping_timeout
+      post :update_features_enabled, params: { error_grouping_timeout: 'x' }
+      assert_equal 'Please enter a valid time for the error grouping timeout.', flash[:error]
+    end
+  end
+
+  test 'update error_grouping_log_base' do
+    # Checks for warnings when not setting error_grouping_log_base
+    with_config_value(:filtering_enabled, true) do
+      post :update_features_enabled, params: { filtering_enabled: '0' }
+      assert_nil flash[:error]
+    end
+    # Checks setting error_grouping_log_base
+    with_config_value(:error_grouping_log_base, 2) do
+      post :update_features_enabled, params: { error_grouping_log_base: '3' }
+      assert_nil flash[:error]
+      assert_equal 3, Seek::Config.error_grouping_log_base
+      post :update_features_enabled, params: { error_grouping_log_base: '3.4' }
+      assert_equal 'Please enter a valid positive number for the error grouping log base', flash[:error]
+      assert_equal 3, Seek::Config.error_grouping_log_base
+      post :update_features_enabled, params: { error_grouping_log_base: '-1' }
+      assert_equal 'Please enter a valid positive number for the error grouping log base', flash[:error]
+      assert_equal 3, Seek::Config.error_grouping_log_base
+    end
   end
 
   test 'update_redirect_to for update_home_setting' do

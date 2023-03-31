@@ -26,12 +26,4 @@ module RdfHelper
       end
     end
   end
-
-  def determine_resource_for_schema_ld
-    if controller_name == 'homes' && action_name == 'index'
-      Seek::BioSchema::DataCatalogMockModel.new
-    elsif action_name == 'show'
-      versioned_resource_for_controller || resource_for_controller
-    end
-  end
 end

@@ -189,6 +189,31 @@ class SamplesControllerTest < ActionController::TestCase
     assert !sample.get_attribute_value(:bool)
   end
 
+  test 'create and update with cv list' do
+    person = Factory(:person)
+    login_as(person)
+
+    type = Factory(:apples_list_controlled_vocab_sample_type)
+    assert_difference('Sample.count') do
+      post :create, params: { sample: { sample_type_id: type.id,
+                                        data: { apples: ['Granny Smith', 'Bramley'] },
+                                        project_ids: [person.projects.first.id] } }
+    end
+    assert_not_nil sample = assigns(:sample)
+    assert_equal ['Granny Smith', 'Bramley'], sample.get_attribute_value(:apples)
+
+    # cv list type data must be an array
+    assert_no_difference('Sample.count') do
+      put :update, params: { id: sample.id, sample: { data: { apples: 'Granny Smith' } } }
+    end
+
+    # the required attribute must be filled in
+    assert_no_difference('Sample.count') do
+      put :update, params: { id: sample.id, sample: { data: { apples: nil } } }
+    end
+
+  end
+
   test 'show sample with boolean' do
     person = Factory(:person)
     login_as(person)
@@ -1125,6 +1150,32 @@ class SamplesControllerTest < ActionController::TestCase
       assert result = assigns(:result)
       assert_equal 2, result.length
     end
+  end
+
+  test 'create multi linked sample' do
+    person = Factory(:person)
+    login_as(person)
+    patient = Factory(:patient_sample, contributor: person)
+    patient2 = Factory(:patient_sample, sample_type:patient.sample_type, contributor: person )
+    multi_linked_sample_type = Factory(:multi_linked_sample_type, project_ids: [person.projects.first.id])
+    multi_linked_sample_type.sample_attributes.last.linked_sample_type = patient.sample_type
+    multi_linked_sample_type.save!
+
+    assert_difference('Sample.count') do
+      post :create, params: { sample: { sample_type_id: multi_linked_sample_type.id,
+                                        data:{
+                                          "title": 'Multiple Samples',
+                                          "patient": ['',patient.id.to_s, patient2.id.to_s]
+                                        },
+                                        project_ids: [person.projects.first.id]} }
+    end
+    assert assigns(:sample)
+    sample = assigns(:sample)
+    assert_equal 'Multiple Samples', sample.title
+
+    assert_equal [patient, patient2], sample.linked_samples
+    assert_equal [patient.id, patient2.id], sample.get_attribute_value(:patient).collect{|v| v['id']}
+
   end
 
   test 'should return max query result' do

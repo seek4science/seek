@@ -215,9 +215,9 @@
         success: (res) => { 
           $j('#change-batch-permission').html(res);
           // Handling 'remaining backdrop' issue when multiple modals
-          $j('#add-person-permission-modal').data("backdrop", "")
-          $j('#add-project-permission-modal').data("backdrop", "")
-          loadObjectInputs() 
+          $j('#add-person-permission-modal').data("backdrop", "");
+          $j('#add-project-permission-modal').data("backdrop", "");
+          ObjectsInput.init();
         },
         error: (e) => { console.log(e) }
       });

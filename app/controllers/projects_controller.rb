@@ -150,7 +150,7 @@ class ProjectsController < ApplicationController
   end
 
   def request_join
-    @projects = params[:projects].split(',').collect{|id| Project.find(id)}
+    @projects = Project.find(params[:project_ids].compact_blank)
     raise 'no projects defined' if @projects.empty?
     @institution = Institution.find_by_id(params[:institution][:id])
     if @institution.nil?
@@ -636,17 +636,18 @@ class ProjectsController < ApplicationController
   end
 
   def typeahead
+    query = params[:q] || ''
     results = Project.where("LOWER(title) LIKE :query
                                     OR LOWER(description) LIKE :query",
-                            query: "%#{params[:query].downcase}%").limit(params[:limit] || 10)
+                            query: "%#{query.downcase}%").limit(params[:limit] || 10)
     items = results.map do |project|
       { id: project.id,
-        name: project.title,
+        text: project.title,
         hint: project.description&.truncate(90, omission: '...') }
     end
 
     respond_to do |format|
-      format.json { render json: items.to_json }
+      format.json { render json: {results: items}.to_json }
     end
   end
 
@@ -655,11 +656,7 @@ class ProjectsController < ApplicationController
   def project_role_params
     permitted_roles = [:project_administrator_ids, :asset_gatekeeper_ids, :asset_housekeeper_ids, :pal_ids]
     permitted_roles.each do |k|
-      if params[:project][k].present?
-        if params[:project][k].is_a?(String)
-          params[:project][k] = params[:project][k].split(',')
-        end
-      else
+      unless params[:project][k].present?
         params[:project][k] = []
       end
     end
@@ -670,7 +667,7 @@ class ProjectsController < ApplicationController
   def project_params
     permitted_params = [:title, :web_page, :wiki_page, :description, { organism_ids: [] }, :parent_id, :start_date,
                         :end_date,
-                        :funding_codes, { human_disease_ids: [] }, :topic_annotations,
+                        { funding_codes: [] }, { human_disease_ids: [] }, topic_annotations: [],
                         discussion_links_attributes:[:id, :url, :label, :_destroy]]
 
     if User.admin_logged_in?

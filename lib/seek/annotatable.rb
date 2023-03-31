@@ -7,6 +7,7 @@ module Seek
     end
 
     def add_annotations(annotations, attr = 'tag', owner = User.current_user, owned_tags_only = false)
+      annotations = annotations.compact_blank if annotations.is_a?(Array)
       annotate_with(annotations, attr, owner, owned_tags_only)
     end
 

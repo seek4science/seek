@@ -27,7 +27,7 @@
                         script.text = scripts[i].innerHTML;
                         $j('body').append(script);
                     }
-                    loadObjectInputs();
+                    ObjectsInput.init();
                     $j('#projects-selector-select').val(pid).change();
                 }
             })

@@ -606,8 +606,17 @@ class ApplicationController < ActionController::Base
     if attribute_params && attribute_params[:custom_metadata_type_id].present?
       metadata_type = CustomMetadataType.find(attribute_params[:custom_metadata_type_id])
       if metadata_type
-        keys = [:custom_metadata_type_id]
-        keys = keys + [{data:[metadata_type.custom_metadata_attributes.collect(&:title)]}]
+        keys = [:custom_metadata_type_id,:id]
+        cma= []
+        metadata_type.custom_metadata_attributes.each do |attr|
+          if attr.sample_attribute_type.controlled_vocab? || attr.sample_attribute_type.seek_sample_multi?
+            cma << {attr.title=>[]}
+            cma << attr.title.to_s
+          else
+            cma << attr.title.to_s
+          end
+        end
+        keys = keys + [{data:[cma]}]
       end
     end
     keys
@@ -653,5 +662,6 @@ class ApplicationController < ActionController::Base
                                     :orcid, :pos, :_destroy] }
     ]
   end
+
 
 end

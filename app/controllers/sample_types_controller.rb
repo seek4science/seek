@@ -159,7 +159,7 @@ class SampleTypesController < ApplicationController
       params[:sample_type][:assay_ids] = params[:sample_type][:assay_assets_attributes].map { |x| x[:assay_id] }
     end
 
-    params.require(:sample_type).permit(:title, :description, :tags, :template_id, *creator_related_params,
+    params.require(:sample_type).permit(:title, :description, {tags: []}, :template_id, *creator_related_params,
                                         { project_ids: [],
                                           sample_attributes_attributes: [:id, :title, :pos, :required, :is_title,
                                                                          :description, :pid, :sample_attribute_type_id,

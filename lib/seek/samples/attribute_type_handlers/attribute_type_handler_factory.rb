@@ -13,11 +13,11 @@ module Seek
         def for_base_type(base_type, additional_options = {})
           "Seek::Samples::AttributeTypeHandlers::#{base_type}AttributeTypeHandler".constantize.new(additional_options)
         rescue NameError
-          raise UnrecognisedAttributeHandlerType.new("unrecognised attribute base type '#{base_type}'")
+          raise UnrecognisedAttributeHandlerType, "unrecognised attribute base type '#{base_type}'"
         end
       end
 
-      class UnrecognisedAttributeHandlerType < Exception; end
+      class UnrecognisedAttributeHandlerType < RuntimeError; end
     end
   end
 end

@@ -72,7 +72,21 @@ Kernel.class_eval do
     oldval = Seek::Config.send(config)
     Seek::Config.send("#{config}=", value)
     yield
+  ensure
     Seek::Config.send("#{config}=", oldval)
+  end
+
+  def with_config_values(settings)
+    oldvals = {}
+    settings.each do |config, value|
+      oldvals[config] = Seek::Config.send(config)
+      Seek::Config.send("#{config}=", value)
+    end
+    yield
+  ensure
+    oldvals.each do |config, oldval|
+      Seek::Config.send("#{config}=", oldval)
+    end
   end
 
   def with_relative_root(root)
@@ -251,4 +265,16 @@ WebMock.disable_net_connect!(allow_localhost: true) # Need to comment this line 
 # Clear testing filestore before test run (but check its under tmp for safety)
 if File.expand_path(Seek::Config.filestore_path).start_with?(File.expand_path(File.join(Rails.root, 'tmp')))
   FileUtils.rm_r(Seek::Config.filestore_path)
+end
+
+class ActionController::TestCase
+  def self._get_base_host
+    # Cache host_with_port in a variable to avoid adding lots of overhead to each test
+    @host_with_port ||= Seek::Config.host_with_port
+  end
+
+  # Ensure the Host in requests is the configured host from the settings instead of the default "test.host"
+  setup do
+    request.host = self.class._get_base_host
+  end
 end

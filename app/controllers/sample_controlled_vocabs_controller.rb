@@ -111,17 +111,18 @@ class SampleControlledVocabsController < ApplicationController
   end
 
   def typeahead
+    query = params[:q] || ''
     scv = SampleControlledVocab.find(params[:scv_id])
     results = scv.sample_controlled_vocab_terms.where('LOWER(label) like :query',
-                                                      query: "%#{params[:query].downcase}%").limit(params[:limit] || 100)
+                                                      query: "%#{query}%").limit(params[:limit] || 100)
     items = results.map do |term|
       { id: term.label,
-        name: term.label,
+        text: term.label,
         iri: term.iri }
     end
 
     respond_to do |format|
-      format.json { render json: items.to_json }
+      format.json { render json: { results: items}.to_json }
     end
   end
 

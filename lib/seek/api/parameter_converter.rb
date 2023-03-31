@@ -67,23 +67,16 @@ module Seek
           },
 
           operation_annotations: proc {|value|
-            value.collect{|v| v[:identifier]}.join(', ')
+            value.collect{|v| v[:identifier]}
           },
           topic_annotations: proc {|value|
-            value.collect{|v| v[:identifier]}.join(', ')
+            value.collect{|v| v[:identifier]}
           },
           data_type_annotations: proc {|value|
-            value.collect{|v| v[:identifier]}.join(', ')
+            value.collect{|v| v[:identifier]}
           },
           data_format_annotations: proc {|value|
-            value.collect{|v| v[:identifier]}.join(', ')
-          },
-          funding_codes: proc { |value|
-            if value
-              value.join(', ')
-            else
-              ''
-            end
+            value.collect{|v| v[:identifier]}
           },
 
           programme_ids: proc { |value|

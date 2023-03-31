@@ -197,16 +197,17 @@ class SamplesController < ApplicationController
   end
 
   def typeahead
+    query = params[:q] || ''
     sample_type = SampleType.find(params[:linked_sample_type_id])
     results = sample_type.samples.where("LOWER(title) like :query",
-              query: "%#{params[:query].downcase}%").limit(params[:limit] || 100)
+              query: "%#{query.downcase}%").limit(params[:limit] || 100)
     items = results.map do |sa|
       { id: sa.id,
-        name: sa.title }
+        text: sa.title }
     end
 
     respond_to do |format|
-      format.json { render json: items.to_json }
+      format.json { render json: { results: items}.to_json }
     end
   end
 
@@ -259,7 +260,19 @@ class SamplesController < ApplicationController
   private
 
   def sample_params(sample_type = nil, parameters = params)
-    sample_type_param_keys = sample_type ? sample_type.sample_attributes.map(&:title).collect(&:to_sym) : []
+
+    sample_type_param_keys = []
+
+    if sample_type
+      sample_type.sample_attributes.each do |attr|
+        if attr.sample_attribute_type.controlled_vocab? || attr.sample_attribute_type.seek_sample_multi?
+          sample_type_param_keys << { attr.title => [] }
+          sample_type_param_keys << attr.title.to_sym
+        else
+          sample_type_param_keys << attr.title.to_sym
+        end
+      end
+    end
     parameters.require(:sample).permit(:sample_type_id, *creator_related_params,
                               { project_ids: [] }, { data: sample_type_param_keys },
                               { assay_assets_attributes: [:assay_id] },

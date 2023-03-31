@@ -212,6 +212,8 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
   test 'is_controlled_vocab?' do
     type = Factory(:controlled_vocab_attribute_type)
     assert type.controlled_vocab?
+    type = Factory(:cv_list_attribute_type)
+    assert type.controlled_vocab?
     type = Factory(:text_sample_attribute_type)
     refute type.controlled_vocab?
     type = Factory(:boolean_sample_attribute_type)

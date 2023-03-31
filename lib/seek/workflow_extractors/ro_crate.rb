@@ -13,12 +13,16 @@ module Seek
         open_crate do |crate|
           crate.test_suites.any?
         end
+      rescue ::ROCrate::ReadException => e
+        false
       end
 
       def can_render_diagram?
         open_crate do |crate|
           crate.main_workflow_diagram.present? || main_workflow_extractor(crate)&.can_render_diagram? || abstract_cwl_extractor(crate)&.can_render_diagram?
         end
+      rescue ::ROCrate::ReadException => e
+        false
       end
 
       def generate_diagram
@@ -33,6 +37,8 @@ module Seek
 
           return nil
         end
+      rescue ::ROCrate::ReadException => e
+        nil
       end
 
       def metadata
@@ -133,8 +139,8 @@ module Seek
         @opened_crate = nil
 
         v
-      rescue RuntimeError
-        raise ::ROCrate::ReadException.new("Couldn't read RO-Crate metadata.")
+      rescue StandardError => e
+        raise ::ROCrate::ReadException.new("Couldn't read RO-Crate metadata.", e)
       end
 
       def diagram_extension

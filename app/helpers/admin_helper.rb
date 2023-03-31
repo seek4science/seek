@@ -79,14 +79,18 @@ module AdminHelper
   end
 
   def git_link_tag
-    if Seek::Version.git_present?
-      begin
+    begin
+      if Seek::Version.git_version_record_present?
+        version = Seek::Version.git_version
+        link = link_to(version[0...7], "https://github.com/seek4science/seek/commit/#{version}", target: '_blank', title: version).html_safe
+        "Git revision: #{link}".html_safe
+      elsif Seek::Version.git_present?
         version = Seek::Version.git_version
         branch = Seek::Version.git_branch
         link = link_to(version[0...7], "https://github.com/seek4science/seek/commit/#{version}", target: '_blank', title: version).html_safe
         "Git revision: #{link} (branch: #{branch})".html_safe
-      rescue
       end
+    rescue
     end
   end
 

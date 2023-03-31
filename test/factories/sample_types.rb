@@ -56,6 +56,13 @@ Factory.define(:apples_controlled_vocab_sample_type, parent: :sample_type) do |f
   end
 end
 
+Factory.define(:apples_list_controlled_vocab_sample_type, parent: :sample_type) do |f|
+  f.sequence(:title) { |n| "apples list controlled vocab sample type #{n}" }
+  f.after_build do |type|
+    type.sample_attributes << Factory.build(:apples_list_controlled_vocab_attribute, title: 'apples', is_title: true, required: true, sample_type: type)
+  end
+end
+
 Factory.define(:linked_sample_type, parent: :sample_type) do |f|
   f.sequence(:title) { |n| "linked sample type #{n}" }
   f.after_build do |type|
@@ -113,6 +120,9 @@ Factory.define(:max_sample_type, parent: :sample_type) do |f|
     type.sample_attributes << Factory.build(:sample_attribute, title: 'address', sample_attribute_type: Factory(:address_sample_attribute_type), required: false, sample_type: type)
     type.sample_attributes << Factory.build(:sample_attribute, title: 'postcode', pid: 'dc:postcode', sample_attribute_type: Factory(:postcode_sample_attribute_type), required: false, sample_type: type)
     type.sample_attributes << Factory.build(:sample_attribute, title: 'CAPITAL key', sample_attribute_type: Factory(:string_sample_attribute_type, title:'String'), required: false, sample_type: type)
+    type.sample_attributes << Factory.build(:sample_attribute, title: 'apple', sample_attribute_type: Factory(:controlled_vocab_attribute_type), required: false, sample_controlled_vocab: Factory(:apples_sample_controlled_vocab), sample_type: type)
+    type.sample_attributes << Factory.build(:sample_attribute, title: 'apples', sample_attribute_type: Factory(:cv_list_attribute_type), required: false, sample_controlled_vocab: Factory(:apples_sample_controlled_vocab), sample_type: type)
+    type.sample_attributes << Factory.build(:sample_multi_sample_attribute, title: 'patients', linked_sample_type: Factory(:patient_sample_type), required: false, sample_type: type)
   end
   f.after_create do |type|
     type.annotate_with(['tag1', 'tag2'], 'sample_type_tag', type.contributor)

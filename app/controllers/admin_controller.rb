@@ -16,10 +16,9 @@ class AdminController < ApplicationController
   end  
 
   def update_admins
-    admin_ids = params[:admins].split(',') || []
     # Don't let admin remove themselves or they won't be able to manage roles
     current_admins = Person.admins.where.not(id: current_person)
-    admins = admin_ids.map { |id| Person.find(id) }
+    admins = Person.find(params[:admins].compact_blank)
     current_admins.each { |ca| ca.is_admin = false }
     admins.each { |admin| admin.is_admin = true }
     (admins | current_admins).each(&:save!)
@@ -62,6 +61,18 @@ class AdminController < ApplicationController
     Seek::Config.noreply_sender = params[:noreply_sender] if params.key?(:noreply_sender)
     Seek::Config.exception_notification_recipients = params[:exception_notification_recipients] if params.key?(:exception_notification_recipients)
     Seek::Config.exception_notification_enabled = string_to_boolean params[:exception_notification_enabled] if params.key?(:exception_notification_enabled)
+
+    Seek::Config.error_grouping_enabled = string_to_boolean params[:error_grouping_enabled] if params.key?(:error_grouping_enabled)
+    if params.key?(:error_grouping_timeout)
+      eg_timeout = params[:error_grouping_timeout]
+      Seek::Config.error_grouping_timeout = string_to_seconds eg_timeout if string_is_duration(eg_timeout, 'error grouping timeout')
+    end
+    eg_log_base_is_pos_int = true
+    if params.key?(:error_grouping_log_base)
+      eg_log_base = params[:error_grouping_log_base]
+      eg_log_base_is_pos_int = only_positive_integer(eg_log_base, 'error grouping log base')
+      Seek::Config.error_grouping_log_base = eg_log_base.to_i if eg_log_base_is_pos_int
+    end
 
     Seek::Config.omniauth_enabled = string_to_boolean params[:omniauth_enabled]
     Seek::Config.omniauth_user_create = string_to_boolean params[:omniauth_user_create]
@@ -155,13 +166,16 @@ class AdminController < ApplicationController
 
     Seek::Config.bio_tools_enabled = string_to_boolean(params[:bio_tools_enabled])
 
-    time_lock_doi_for = params[:time_lock_doi_for]
-    time_lock_is_integer = only_integer time_lock_doi_for, 'time lock doi for'
-    Seek::Config.time_lock_doi_for = time_lock_doi_for.to_i if time_lock_is_integer
+    time_lock_is_integer = true
+    if params.key?(:time_lock_doi_for)
+      time_lock_doi_for = params[:time_lock_doi_for]
+      time_lock_is_integer = only_integer time_lock_doi_for, 'time lock doi for'
+      Seek::Config.time_lock_doi_for = time_lock_doi_for.to_i if time_lock_is_integer
+    end
 
     Seek::Util.clear_cached
 
-    validation_flag = time_lock_is_integer && port_is_integer
+    validation_flag = time_lock_is_integer && port_is_integer && eg_log_base_is_pos_int
     update_redirect_to validation_flag, 'features_enabled'
   end
 
@@ -316,6 +330,7 @@ class AdminController < ApplicationController
     Seek::Config.orcid_required = string_to_boolean params[:orcid_required]
 
     Seek::Config.default_license = params[:default_license]
+    Seek::Config.metadata_license = params[:metadata_license]
     Seek::Config.recommended_data_licenses = params[:recommended_data_licenses]
     Seek::Config.recommended_software_licenses = params[:recommended_software_licenses]
     update_flag = (pubmed_email == '' || pubmed_email_valid) && (crossref_email == '' || crossref_email_valid)
@@ -368,13 +383,15 @@ class AdminController < ApplicationController
     if request.post?
       replacement_tags = []
 
-      if params[:tag_list].blank?
+      tag_list = params[:tag_list].compact_blank
+
+      if tag_list.empty?
         flash[:error] = 'Not tags provided, use Delete to delete a tag. Make sure you register the replacement tag by pressing comma'
         respond_to do |format|
           format.html { render status: :not_acceptable }
         end
       else
-        params[:tag_list].split(',').each do |item|
+        tag_list.each do |item|
           item.strip!
           tag = TextValue.find_by_text(item)
           tag = TextValue.create(text: item) if tag.nil? || tag.text != item # case sensitivity check
@@ -643,6 +660,25 @@ class AdminController < ApplicationController
     else
       false
     end
+  end
+
+  def is_int(input)
+    true if Integer(input) > 0
+  rescue
+    false
+  end
+
+  def string_to_seconds(string)
+    string.replace(string + ' sec') if is_int(string)
+    now = Time.now
+    (Chronic.parse("#{string} from now", now: now) - now).to_i.seconds
+  end
+  def string_is_duration(string, field)
+    string_to_seconds(string)
+    true
+  rescue
+    flash[:error] = "Please enter a valid time for the #{field}."
+    false
   end
 
   def update_redirect_to(flag, action)
