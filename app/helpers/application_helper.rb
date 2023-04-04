@@ -541,3 +541,7 @@ class ApplicationFormBuilder < ActionView::Helpers::FormBuilder
 end
 
 ActionView::Base.default_form_builder = ApplicationFormBuilder
+
+def cookie_consent
+  CookieConsent.new(cookies)
+end
