@@ -4673,6 +4673,8 @@ projectResponse:
               $ref: "#/components/schemas/multipleReferences"
             services:
               $ref: "#/components/schemas/multipleReferences"
+            sample_types:
+              $ref: "#/components/schemas/multipleReferences"
           required:
             - organisms
             - people

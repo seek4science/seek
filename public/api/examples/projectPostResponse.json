@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "306",
+    "id": "1022250632",
     "type": "projects",
     "attributes": {
       "discussion_links": [
@@ -19,21 +19,21 @@
         "permissions": [
           {
             "resource": {
-              "id": "249",
+              "id": "1039986471",
               "type": "people"
             },
             "access": "manage"
           },
           {
             "resource": {
-              "id": "304",
+              "id": "1022250630",
               "type": "projects"
             },
             "access": "download"
           },
           {
             "resource": {
-              "id": "273",
+              "id": "980190966",
               "type": "institutions"
             },
             "access": "view"
@@ -84,32 +84,14 @@
       "programmes": {
         "data": [
           {
-            "id": "24",
-            "type": "organisms"
+            "id": "1",
+            "type": "programmes"
           }
-        ]
-      },
-      "human_diseases": {
-        "data": [
-
-        ]
-      },
-      "people": {
-        "data": [
-
         ]
       },
       "institutions": {
         "data": [
 
-        ]
-      },
-      "programmes": {
-        "data": [
-          {
-            "id": "24",
-            "type": "programmes"
-          }
         ]
       },
       "investigations": {
@@ -132,12 +114,7 @@
 
         ]
       },
-      "file_templates": {
-        "data": [
-
-        ]
-      },
-      "placeholders": {
+      "documents": {
         "data": [
 
         ]
@@ -147,14 +124,11 @@
 
         ]
       },
-      "organisms": {
+      "sops": {
         "data": [
-          {
-            "id": "627234333",
-            "type": "organisms"
-          }
+
         ]
-      },      
+      },
       "publications": {
         "data": [
 
@@ -170,7 +144,15 @@
 
         ]
       },
-      "documents": {
+      "organisms": {
+        "data": [
+          {
+            "id": "627234296",
+            "type": "organisms"
+          }
+        ]
+      },
+      "sample_types": {
         "data": [
 
         ]
@@ -184,17 +166,37 @@
         "data": [
 
         ]
+      },
+      "human_diseases": {
+        "data": [
+
+        ]
+      },
+      "file_templates": {
+        "data": [
+
+        ]
+      },
+      "placeholders": {
+        "data": [
+
+        ]
+      },
+      "services": {
+        "data": [
+
+        ]
       }
     },
     "links": {
-      "self": "/projects/306"
+      "self": "/projects/1022250632"
     },
     "meta": {
-      "created": "2022-10-26T11:45:20.000Z",
-      "modified": "2022-10-26T11:45:20.000Z",
+      "created": "2023-04-04T13:11:17.921Z",
+      "modified": "2023-04-04T13:11:17.921Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "468ab490-e8a6-013a-1113-0a81884ed284"
+      "uuid": "1bf99470-b518-013b-1648-0a81884ed284"
     }
   },
   "jsonapi": {

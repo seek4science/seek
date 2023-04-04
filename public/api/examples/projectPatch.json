@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "1022251921",
+    "id": "1022250630",
     "type": "projects",
     "attributes": {
       "avatar": null,
@@ -14,21 +14,21 @@
         "permissions": [
           {
             "resource": {
-              "id": "1039987685",
+              "id": "1039986471",
               "type": "people"
             },
             "access": "manage"
           },
           {
             "resource": {
-              "id": "1022251921",
+              "id": "1022250630",
               "type": "projects"
             },
             "access": "download"
           },
           {
             "resource": {
-              "id": "980192198",
+              "id": "980190966",
               "type": "institutions"
             },
             "access": "view"
@@ -50,7 +50,7 @@
       "programmes": {
         "data": [
           {
-            "id": "23",
+            "id": "1",
             "type": "programmes"
           }
         ]
@@ -58,7 +58,7 @@
       "organisms": {
         "data": [
           {
-            "id": "627234338",
+            "id": "627234296",
             "type": "organisms"
           }
         ]
