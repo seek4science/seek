@@ -594,7 +594,7 @@ SEEK::Application.routes.draw do
       get :storage_report
     end
     resources :people, :projects, :institutions, :investigations, :studies, :assays, :samples,
-              :data_files, :models, :sops, :workflows, :presentations, :documents, :events, :publications, :organisms, :human_diseases, :collections, only: [:index]
+              :data_files, :models, :sops, :workflows, :presentations, :documents, :events, :publications, :organisms, :human_diseases, :collections, :file_templates, :placeholders, only: [:index]
     concerns :has_dashboard, controller: :programme_stats
   end
 
