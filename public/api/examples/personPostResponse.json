@@ -1,15 +1,15 @@
 {
   "data": {
-    "id": "1039987183",
+    "id": "4",
     "type": "people",
     "attributes": {
       "avatar": null,
-      "title": "Post Person1039987183",
+      "title": "Post Person4",
       "description": "A person with all possible details",
       "first_name": "Post",
-      "last_name": "Person1039987183",
+      "last_name": "Person4",
       "orcid": "https://orcid.org/0000-0001-9842-9718",
-      "mbox_sha1sum": "8691f10576db4417b2b8f146398ef4d23b8c3ad8",
+      "mbox_sha1sum": "75696c3e44d8203f403ca22854de4a0c4feb388b",
       "expertise": [
         "modeling",
         "programming"
@@ -87,7 +87,7 @@
 
         ]
       },
-      "documents": {
+      "sample_types": {
         "data": [
 
         ]
@@ -114,14 +114,14 @@
       }
     },
     "links": {
-      "self": "/people/1039992235"
+      "self": "/people/4"
     },
     "meta": {
-      "created": "2022-10-26T11:44:29.000Z",
-      "modified": "2022-10-26T11:44:29.000Z",
+      "created": "2023-04-04T14:51:23.664Z",
+      "modified": "2023-04-04T14:51:23.664Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "792fedf0-3751-013b-356e-000c29a94011"
+      "uuid": "17adbcd0-b526-013b-165d-0a81884ed284"
     }
   },
   "jsonapi": {

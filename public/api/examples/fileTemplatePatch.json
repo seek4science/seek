@@ -1,7 +1,7 @@
 {
   "data": {
     "type": "file_templates",
-    "id": "41",
+    "id": "1",
     "attributes": {
       "title": "A Maximal FileTemplate",
       "description": "This is the description",
@@ -28,7 +28,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "278",
+              "id": "2",
               "type": "projects"
             },
             "access": "edit"
@@ -40,7 +40,7 @@
       "creators": {
         "data": [
           {
-            "id": "333",
+            "id": "3",
             "type": "people"
           }
         ]
@@ -48,7 +48,7 @@
       "projects": {
         "data": [
           {
-            "id": "278",
+            "id": "2",
             "type": "projects"
           }
         ]

@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "43",
+    "id": "2",
     "type": "data_files",
     "attributes": {
       "policy": {
@@ -11,7 +11,7 @@
       },
       "discussion_links": [
         {
-          "id": "4",
+          "id": "1",
           "label": "Slack",
           "url": "http://www.slack.com/"
         }
@@ -31,14 +31,14 @@
         {
           "version": 1,
           "revision_comments": null,
-          "url": "http://localhost:3000/data_files/43?version=1",
+          "url": "http://localhost:3000/data_files/2?version=1",
           "doi": null
         }
       ],
       "version": 1,
       "revision_comments": null,
-      "created_at": "2022-07-22T12:42:11.000Z",
-      "updated_at": "2022-07-22T12:42:11.000Z",
+      "created_at": "2023-04-04T14:53:41.210Z",
+      "updated_at": "2023-04-04T14:53:41.210Z",
       "doi": null,
       "content_blobs": [
         {
@@ -47,13 +47,13 @@
           "md5sum": "565ae8a7a743c3bfd9f15c69647f5b8b",
           "sha1sum": "b9d2148740050b7f37975edd0fb97faa508ff767",
           "content_type": "application/pdf",
-          "link": "http://localhost:3000/data_files/43/content_blobs/79",
+          "link": "http://localhost:3000/data_files/2/content_blobs/6",
           "size": 8827
         }
       ],
       "creators": [
         {
-          "profile": "/people/214",
+          "profile": "/people/17",
           "family_name": "One",
           "given_name": "Some",
           "affiliation": "University of Somewhere",
@@ -66,7 +66,7 @@
       "creators": {
         "data": [
           {
-            "id": "214",
+            "id": "17",
             "type": "people"
           }
         ]
@@ -74,7 +74,7 @@
       "submitter": {
         "data": [
           {
-            "id": "215",
+            "id": "18",
             "type": "people"
           }
         ]
@@ -82,11 +82,11 @@
       "people": {
         "data": [
           {
-            "id": "214",
+            "id": "17",
             "type": "people"
           },
           {
-            "id": "215",
+            "id": "18",
             "type": "people"
           }
         ]
@@ -94,7 +94,7 @@
       "projects": {
         "data": [
           {
-            "id": "163",
+            "id": "16",
             "type": "projects"
           }
         ]
@@ -102,7 +102,7 @@
       "investigations": {
         "data": [
           {
-            "id": "32",
+            "id": "2",
             "type": "investigations"
           }
         ]
@@ -110,7 +110,7 @@
       "studies": {
         "data": [
           {
-            "id": "32",
+            "id": "2",
             "type": "studies"
           }
         ]
@@ -118,7 +118,7 @@
       "assays": {
         "data": [
           {
-            "id": "32",
+            "id": "2",
             "type": "assays"
           }
         ]
@@ -126,7 +126,7 @@
       "publications": {
         "data": [
           {
-            "id": "32",
+            "id": "2",
             "type": "publications"
           }
         ]
@@ -134,7 +134,7 @@
       "events": {
         "data": [
           {
-            "id": "32",
+            "id": "2",
             "type": "events"
           }
         ]
@@ -142,27 +142,33 @@
       "workflows": {
         "data": [
           {
-            "id": "32",
+            "id": "2",
             "type": "workflows"
           }
         ]
       },
       "placeholder": {
-        "data": null
+        "data": {
+          "id": "2",
+          "type": "placeholders"
+        }
       },
       "file_template": {
-        "data": null
+        "data": {
+          "id": "2",
+          "type": "file_templates"
+        }
       }
     },
     "links": {
-      "self": "/data_files/43?version=1"
+      "self": "/data_files/2?version=1"
     },
     "meta": {
-      "created": "2022-07-22T12:42:11.000Z",
-      "modified": "2022-07-22T12:42:11.000Z",
+      "created": "2023-04-04T14:53:41.177Z",
+      "modified": "2023-04-04T14:53:41.210Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "a1522b90-ebe9-013a-1162-0a81884ed284"
+      "uuid": "69a44860-b526-013b-165d-0a81884ed284"
     }
   },
   "jsonapi": {

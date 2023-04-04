@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "1022250666",
+    "id": "40",
     "type": "projects",
     "attributes": {
       "discussion_links": [
@@ -10,7 +10,7 @@
           "url": "http://www.slack.com/"
         }
       ],
-      "avatar": "/projects/1022250666/avatars/1",
+      "avatar": "/projects/40/avatars/1",
       "title": "A Maximal Project",
       "description": "A Taverna project",
       "web_page": "http://www.taverna.org.uk",
@@ -26,8 +26,8 @@
       },
       "members": [
         {
-          "person_id": "1039986503",
-          "institution_id": "980190998"
+          "person_id": "35",
+          "institution_id": "36"
         }
       ],
       "use_default_policy": true,
@@ -66,7 +66,7 @@
       "people": {
         "data": [
           {
-            "id": "1039986503",
+            "id": "35",
             "type": "people"
           }
         ]
@@ -82,7 +82,7 @@
       "institutions": {
         "data": [
           {
-            "id": "980190998",
+            "id": "36",
             "type": "institutions"
           }
         ]
@@ -90,7 +90,7 @@
       "investigations": {
         "data": [
           {
-            "id": "973654811",
+            "id": "8",
             "type": "investigations"
           }
         ]
@@ -98,7 +98,7 @@
       "studies": {
         "data": [
           {
-            "id": "1060384868",
+            "id": "7",
             "type": "studies"
           }
         ]
@@ -106,7 +106,7 @@
       "assays": {
         "data": [
           {
-            "id": "1035386655",
+            "id": "6",
             "type": "assays"
           }
         ]
@@ -114,7 +114,7 @@
       "data_files": {
         "data": [
           {
-            "id": "883654267",
+            "id": "2",
             "type": "data_files"
           }
         ]
@@ -130,7 +130,7 @@
       "models": {
         "data": [
           {
-            "id": "1004285488",
+            "id": "7",
             "type": "models"
           }
         ]
@@ -138,7 +138,7 @@
       "sops": {
         "data": [
           {
-            "id": "1055250441",
+            "id": "2",
             "type": "sops"
           }
         ]
@@ -162,7 +162,7 @@
       "events": {
         "data": [
           {
-            "id": "1025618654",
+            "id": "1",
             "type": "events"
           }
         ]
@@ -215,14 +215,14 @@
       }
     },
     "links": {
-      "self": "/projects/1022250666"
+      "self": "/projects/40"
     },
     "meta": {
-      "created": "2023-04-04T13:11:24.976Z",
-      "modified": "2023-04-04T13:11:25.100Z",
+      "created": "2023-04-04T14:46:45.735Z",
+      "modified": "2023-04-04T14:46:45.860Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "202e6470-b518-013b-1648-0a81884ed284"
+      "uuid": "7204f190-b525-013b-165d-0a81884ed284"
     }
   },
   "jsonapi": {

@@ -20,7 +20,7 @@
       "creators": {
         "data": [
           {
-            "id": "1039986737",
+            "id": "2",
             "type": "people"
           }
         ]
@@ -28,7 +28,7 @@
       "projects": {
         "data": [
           {
-            "id": "1022250906",
+            "id": "4",
             "type": "projects"
           }
         ]
@@ -36,7 +36,7 @@
       "assays": {
         "data": [
           {
-            "id": "1035386742",
+            "id": "1",
             "type": "assays"
           }
         ]

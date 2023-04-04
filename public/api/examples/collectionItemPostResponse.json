@@ -15,7 +15,7 @@
       },
       "asset": {
         "data": {
-          "id": "1055250464",
+          "id": "1",
           "type": "sops"
         },
         "meta": {
@@ -27,8 +27,8 @@
       "self": "/collections/1/items/2"
     },
     "meta": {
-      "created": "2022-08-20T17:52:29.000Z",
-      "modified": "2022-08-20T17:52:29.000Z",
+      "created": "2023-04-04T14:49:03.857Z",
+      "modified": "2023-04-04T14:49:03.857Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000"
     }

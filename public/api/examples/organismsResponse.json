@@ -1,23 +1,23 @@
 {
   "data": [
     {
-      "id": "627234311",
-      "type": "organisms",
-      "attributes": {
-        "title": "A Minimal Organism"
-      },
-      "links": {
-        "self": "/organisms/627234311"
-      }
-    },
-    {
-      "id": "627234312",
+      "id": "3",
       "type": "organisms",
       "attributes": {
         "title": "A Maximal Organism"
       },
       "links": {
-        "self": "/organisms/627234312"
+        "self": "/organisms/3"
+      }
+    },
+    {
+      "id": "2",
+      "type": "organisms",
+      "attributes": {
+        "title": "A Minimal Organism"
+      },
+      "links": {
+        "self": "/organisms/2"
       }
     }
   ],

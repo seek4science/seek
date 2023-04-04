@@ -13,21 +13,21 @@
         "permissions": [
           {
             "resource": {
-              "id": "1039986471",
+              "id": "3",
               "type": "people"
             },
             "access": "manage"
           },
           {
             "resource": {
-              "id": "1022250630",
+              "id": "4",
               "type": "projects"
             },
             "access": "download"
           },
           {
             "resource": {
-              "id": "980190966",
+              "id": "4",
               "type": "institutions"
             },
             "access": "view"
@@ -57,7 +57,7 @@
       "organisms": {
         "data": [
           {
-            "id": "627234296",
+            "id": "1",
             "type": "organisms"
           }
         ]

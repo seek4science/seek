@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "7",
+    "id": "2",
     "type": "samples",
     "attributes": {
       "policy": {
@@ -16,8 +16,8 @@
       "tags": [
 
       ],
-      "created_at": "2022-08-20T17:51:30.000Z",
-      "updated_at": "2022-08-20T17:51:30.000Z",
+      "created_at": "2023-04-04T14:51:45.171Z",
+      "updated_at": "2023-04-04T14:51:45.171Z",
       "creators": [
 
       ],
@@ -38,21 +38,21 @@
       "submitter": {
         "data": [
           {
-            "id": "1039986759",
+            "id": "9",
             "type": "people"
           }
         ]
       },
       "sample_type": {
         "data": {
-          "id": "12",
+          "id": "4",
           "type": "sample_types"
         }
       },
       "projects": {
         "data": [
           {
-            "id": "1022250929",
+            "id": "10",
             "type": "projects"
           }
         ]
@@ -80,21 +80,21 @@
       "people": {
         "data": [
           {
-            "id": "1039986759",
+            "id": "9",
             "type": "people"
           }
         ]
       }
     },
     "links": {
-      "self": "/samples/7"
+      "self": "/samples/2"
     },
     "meta": {
-      "created": "2022-08-20T17:51:30.000Z",
-      "modified": "2022-08-20T17:51:30.000Z",
+      "created": "2023-04-04T14:51:45.171Z",
+      "modified": "2023-04-04T14:51:45.171Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "a56f0d70-02de-013b-a52a-000c29ced288"
+      "uuid": "247f81f0-b526-013b-165d-0a81884ed284"
     }
   },
   "jsonapi": {

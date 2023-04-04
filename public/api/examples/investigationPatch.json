@@ -1,7 +1,7 @@
 {
   "data": {
     "type": "investigations",
-    "id": "973654962",
+    "id": "9",
     "attributes": {
       "title": "A Maximal Investigation",
       "policy": {
@@ -10,14 +10,14 @@
           {
             "resource": {
               "type": "projects",
-              "id": "1022251097"
+              "id": "3"
             },
             "access": "manage"
           },
           {
             "resource": {
               "type": "projects",
-              "id": "1022251131"
+              "id": "38"
             },
             "access": "manage"
           }
@@ -31,18 +31,18 @@
         "data": [
           {
             "type": "projects",
-            "id": "1022251097"
+            "id": "3"
           },
           {
             "type": "projects",
-            "id": "1022251131"
+            "id": "38"
           }
         ]
       },
       "publications": {
         "data": [
           {
-            "id": "22",
+            "id": "3",
             "type": "publications"
           }
         ]
@@ -50,7 +50,7 @@
       "creators": {
         "data": [
           {
-            "id": "1039986908",
+            "id": "2",
             "type": "people"
           }
         ]

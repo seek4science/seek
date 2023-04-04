@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "8",
+    "id": "1",
     "type": "collection_items",
     "attributes": {
       "comment": "A fine addition to the collection indeed!!!",
@@ -9,13 +9,13 @@
     "relationships": {
       "collection": {
         "data": {
-          "id": "7",
+          "id": "1",
           "type": "collections"
         }
       },
       "asset": {
         "data": {
-          "id": "1055250467",
+          "id": "1",
           "type": "sops"
         },
         "meta": {
@@ -24,11 +24,11 @@
       }
     },
     "links": {
-      "self": "/collections/7/items/8"
+      "self": "/collections/1/items/1"
     },
     "meta": {
-      "created": "2022-08-20T17:52:33.000Z",
-      "modified": "2022-08-20T17:52:33.000Z",
+      "created": "2023-04-04T14:49:05.546Z",
+      "modified": "2023-04-04T14:49:05.563Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000"
     }
