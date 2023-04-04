@@ -4335,6 +4335,8 @@ personResponse:
               $ref: "#/components/schemas/multipleReferences"
             human_diseases:
               $ref: "#/components/schemas/multipleReferences"
+            sample_types:
+              $ref: "#/components/schemas/multipleReferences"
           required:
             - projects
             - institutions
@@ -4350,6 +4352,7 @@ personResponse:
             - events
             - collections
             - workflows
+            - sample_types
           additionalProperties: false
         links:
           $ref: "#/components/schemas/links"
