@@ -441,6 +441,7 @@ GEM
       nokogiri (~> 1)
       rake
     mini_mime (1.1.2)
+    mini_portile2 (2.8.1)
     minitest (5.18.0)
     minitest-reporters (1.5.0)
       ansi
@@ -474,7 +475,8 @@ GEM
       net-protocol
     netrc (0.11.0)
     nio4r (2.5.8)
-    nokogiri (1.13.10-x86_64-linux)
+    nokogiri (1.13.10)
+      mini_portile2 (~> 2.8.0)
       racc (~> 1.4)
     nori (1.1.5)
     oauth2 (2.0.9)
@@ -923,7 +925,7 @@ GEM
       rubyzip (~> 2.0.0)
 
 PLATFORMS
-  x86_64-linux
+  ruby
 
 DEPENDENCIES
   RedCloth (>= 4.3.0)
