@@ -155,7 +155,7 @@ gem 'rails-static-router'
 # to avoid warnings after rails 6.1.7.2 update - see https://github.com/ruby/net-imap/issues/16
 gem "net-http"
 gem "net-ftp"
-gem "uri", "0.10.0"
+gem "uri", "0.10.0.2"
 
 group :production do
   gem 'passenger'
