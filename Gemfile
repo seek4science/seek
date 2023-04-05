@@ -152,6 +152,11 @@ gem 'remotipart', '~> 1.4.4' # Allows file upload in AJAX forms
 
 gem 'rails-static-router'
 
+# to avoid warnings after rails 6.1.7.2 update - see https://github.com/ruby/net-imap/issues/16
+gem "net-http"
+gem "net-ftp"
+gem "uri", "0.10.0"
+
 group :production do
   gem 'passenger'
 end
