@@ -441,7 +441,6 @@ GEM
       nokogiri (~> 1)
       rake
     mini_mime (1.1.2)
-    mini_portile2 (2.8.1)
     minitest (5.18.0)
     minitest-reporters (1.5.0)
       ansi
@@ -455,6 +454,11 @@ GEM
     mysql2 (0.5.3)
     namae (1.1.1)
     nesty (1.0.2)
+    net-ftp (0.2.0)
+      net-protocol
+      time
+    net-http (0.3.2)
+      uri
     net-http-digest_auth (1.4.1)
     net-http-persistent (4.0.1)
       connection_pool (~> 2.2)
@@ -470,8 +474,7 @@ GEM
       net-protocol
     netrc (0.11.0)
     nio4r (2.5.8)
-    nokogiri (1.13.10)
-      mini_portile2 (~> 2.8.0)
+    nokogiri (1.13.10-x86_64-linux)
       racc (~> 1.4)
     nori (1.1.5)
     oauth2 (2.0.9)
@@ -851,6 +854,8 @@ GEM
     test-prof (1.0.7)
     thor (1.2.1)
     tilt (2.0.10)
+    time (0.2.2)
+      date
     timeout (0.3.2)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
@@ -868,6 +873,7 @@ GEM
     unicorn-rails (2.2.1)
       rack
       unicorn
+    uri (0.10.0)
     uuid (2.3.9)
       macaddr (~> 1.0)
     validate_email (0.1.6)
@@ -917,7 +923,7 @@ GEM
       rubyzip (~> 2.0.0)
 
 PLATFORMS
-  ruby
+  x86_64-linux
 
 DEPENDENCIES
   RedCloth (>= 4.3.0)
@@ -985,6 +991,8 @@ DEPENDENCIES
   minitest-reporters
   my_responds_to_parent!
   mysql2
+  net-ftp
+  net-http
   nokogiri (~> 1.13.10)
   omniauth (~> 2.1.0)
   omniauth-github
@@ -1049,6 +1057,7 @@ DEPENDENCIES
   terser (~> 1.1, >= 1.1.1)
   test-prof
   unicorn-rails
+  uri (= 0.10.0)
   uuid (~> 2.3)
   validate_url
   vcr (~> 2.9)
@@ -1062,4 +1071,4 @@ DEPENDENCIES
   zenodo-client!
 
 BUNDLED WITH
-   2.3.26
+   2.4.9
