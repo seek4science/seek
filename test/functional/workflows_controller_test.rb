@@ -637,6 +637,34 @@ class WorkflowsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'downloads RO-Crate for git-versioned workflow' do
+    workflow = Factory(:remote_git_workflow, policy: Factory(:public_policy))
+
+    get :ro_crate, params: { id: workflow.id }
+
+    assert_response :success
+    assert @response.header['Content-Length'].present?
+    assert @response.header['Content-Length'].to_i > 5000 # Length is variable because the crate contains variable data
+    Dir.mktmpdir do |dir|
+      crate = ROCrate::WorkflowCrateReader.read_zip(response.stream.to_path, target_dir: dir)
+      assert crate.main_workflow
+    end
+  end
+
+  test 'handles error when generating RO-Crate' do
+    workflow = Factory(:local_git_workflow, policy: Factory(:public_policy))
+    gv = workflow.latest_git_version
+    disable_authorization_checks do
+      gv.add_file('ro-crate-metadata.json', StringIO.new('{}'))
+      gv.save!
+    end
+
+    get :ro_crate, params: { id: workflow.id }
+
+    assert_redirected_to workflow
+    assert flash[:error].include?("Couldn't generate RO-Crate")
+  end
+
   test 'create RO-Crate even with with duplicated filenames' do
     cwl = Factory(:cwl_workflow_class)
     person = Factory(:person)
@@ -1548,5 +1576,83 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_select '.list_item_title .favouritable img[src=?]', '/assets/avatars/avatar-workflow.png', count: 2
     assert_select '.list_item_title .favouritable img[src=?]',
                   workflow_class_avatar_path(logo_type, logo, size: '24x24'), count: 2
+  end
+
+  test 'cannot create from files if not authenticated' do
+    logout
+    cwl = WorkflowClass.find_by_key('cwl') || Factory(:cwl_workflow_class)
+
+    assert_enqueued_jobs(0) do
+      assert_no_difference('Git::Repository.count') do
+        assert_no_difference('Task.count') do
+          post :create_from_files, params: {
+            ro_crate: {
+              main_workflow: { data: fixture_file_upload('workflows/rp2-to-rp2path-packed.cwl', 'text/plain') },
+              diagram: { data: fixture_file_upload('file_picture.png', 'image/png') }
+            },
+            workflow_class_id: cwl.id
+          }
+        end
+      end
+    end
+
+    assert_redirected_to login_path
+    assert flash[:error].include?('need to be logged in')
+  end
+
+  test 'lists creators in index in condensed and table views' do
+    Workflow.delete_all
+
+    person = Factory(:person, first_name: 'Jessica', last_name: 'Three')
+    workflow = Factory(:public_workflow, other_creators: 'Joy Five')
+    disable_authorization_checks do
+      workflow.assets_creators.create!(given_name: 'Julia', family_name: 'Two', pos: 2, affiliation: 'University of Sheffield', orcid: 'https://orcid.org/0000-0001-8172-8981')
+      workflow.assets_creators.create!(creator: person, pos: 3)
+      workflow.assets_creators.create!(given_name: 'Jill', family_name: 'One', pos: 1)
+      workflow.assets_creators.create!(given_name: 'Jane', family_name: 'Four', pos: 4, affiliation: 'University of Edinburgh')
+    end
+
+    get :index, params: { view: 'condensed' }
+    assert_response :success
+    assert_select '#resource-condensed-view .list_item', count: 1
+    assert_select '#resource-condensed-view .list_item .rli-head' do
+      assert_select '.rli-condensed-attribute', text: 'Creators: Jill One, Julia Two, Jessica Three, Jane Four, Joy Five'
+      assert_select '.rli-condensed-attribute' do
+        assert_select ':nth-child(2)', text: 'Jill One'
+
+        assert_select ':nth-child(3)', text: 'Julia Two'
+        assert_select ':nth-child(3)[title=?]', 'Julia Two, University of Sheffield'
+        assert_select ':nth-child(3)[href=?]', 'https://orcid.org/0000-0001-8172-8981'
+
+        assert_select ':nth-child(4)', text: 'Jessica Three'
+        assert_select ':nth-child(4)[href=?]', person_path(person)
+
+        assert_select ':nth-child(5)', text: 'Jane Four'
+        assert_select ':nth-child(5)[title=?]', 'Jane Four, University of Edinburgh'
+      end
+    end
+
+    get :index, params: { view: 'table' }
+    assert_response :success
+    assert_select '.list_items_container tbody tr', count: 1
+    assert_select '.list_items_container tbody tr' do
+      assert_select 'td', text: 'Jill One, Julia Two, Jessica Three, Jane Four, Joy Five'
+      assert_select 'td' do
+        assert_select ':nth-child(1)', text: 'Jill One'
+
+        assert_select ':nth-child(2)', text: 'Julia Two'
+        assert_select ':nth-child(2)[title=?]', 'Julia Two, University of Sheffield'
+        assert_select ':nth-child(2)[href=?]', 'https://orcid.org/0000-0001-8172-8981'
+
+        assert_select ':nth-child(3)', text: 'Jessica Three'
+        assert_select ':nth-child(3)[href=?]', person_path(person)
+
+        assert_select ':nth-child(4)', text: 'Jane Four'
+        assert_select ':nth-child(4)[title=?]', 'Jane Four, University of Edinburgh'
+      end
+    end
+
+    # Reset the view parameter
+    session.delete(:view)
   end
 end

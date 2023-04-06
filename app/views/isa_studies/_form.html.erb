@@ -24,7 +24,7 @@
 
     <div id="investigation_collection" class="hidden">
       <%= render :partial=>"studies/investigation_list",:locals=>{study:@isa_study.study, :investigations=>Investigation.all.select {|i|current_user.person.member_of? i.projects}} -%>
-    </div>    
+    </div>
 
     <div class="form-group">
       <%= study_fields.label "Study position" -%><br/>
@@ -33,7 +33,7 @@
 
     <%= render partial: 'custom_metadata/custom_metadata_attribute_input', locals:{f:f,resource:@isa_study.study} %>
 
-    <%= render partial: 'assets/manage_specific_attributes', locals:{f:f} if show_form_manage_specific_attributes? %>
+    <%= render partial: 'assets/manage_specific_attributes', locals:{f:study_fields} if show_form_manage_specific_attributes? %>
 
     <%= study_fields.fancy_multiselect :publications, { other_projects_checkbox: true, name: "isa_study[study][publication_ids]" } %>
 
@@ -42,7 +42,7 @@
     <%= render partial: 'projects/implicit_project_selector', locals: { action: action,
                                                                           select_id: '#study_investigation_id',
                                                                           parents: Investigation.authorized_for('edit') } %>
-    
+
     <%= folding_panel("Define #{t(:sample_type)} for Source") do %>
       <%= render partial: 'sample_types_form', locals: {f: f, sample_type: @isa_study.source, id_suffix: "_source_sample_type", action: action } if @isa_study.source %>
     <% end %>
@@ -59,11 +59,11 @@
       <%= render partial: 'sample_types_form', locals: {f: f, sample_type: @isa_study.sample_collection, id_suffix: "_sample_collection_sample_type", action: action  } if @isa_study.sample_collection %>
     <% end %>
 
-<% end -%> 
+<% end -%>
 
 
 
- 
+
 <%= form_submit_buttons(@isa_study.study) %>
 
 <script>
@@ -71,19 +71,20 @@
     const initTemplateModal = function(field_name) {
       Templates.context.description_elem = `#isa_study_${field_name}_description`
       Templates.context.suffix = "_" + field_name
+      Templates.context.field_name = field_name
       showTemplateModal()
     }
 
-    $j(document).ready(function () {   
+    $j(document).ready(function () {
       const urlSearchParams = new URLSearchParams(window.location.search);
       const params = Object.fromEntries(urlSearchParams.entries());
       const investigation_id = params["investigation_id"]
       // Prevent setting the hidden field on redirect (query string parameters are missing)
       if(investigation_id) {
-          $j("#isa_study_study_investigation_id").val(investigation_id); 
+          $j("#isa_study_study_investigation_id").val(investigation_id);
           $j("#study_investigation_id").val(investigation_id).change();
-      } 
+      }
 
-      Templates.init($j('#template-attributes'));   
-    }); 
+      Templates.init($j('#template-attributes'));
+    });
 </script>

@@ -30,6 +30,10 @@
 
 <%= render partial: 'assets/manage_specific_attributes', locals:{f:f, :object => object} if show_form_manage_specific_attributes? %>
 
+<% if @investigation.is_taggable? %>
+  <%= render :partial=>"assets/select_tags" %>
+<% end %>
+
 <%= f.fancy_multiselect :publications, { other_projects_checkbox: true } %>
 
 <%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @investigation} -%>

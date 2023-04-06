@@ -122,4 +122,16 @@ class GitBlobTest < ActiveSupport::TestCase
     refute_equal blob1.object_id, blob2.object_id
     assert_equal blob1, blob2
   end
+
+  test 'delegate read to file' do
+    blob = @git_version.get_blob('sort-and-change-case.ga')
+    one = blob.read(1)
+    assert_equal "{", one
+    sixteen = blob.read(16)
+    assert_equal 16, sixteen.length
+    eof = blob.read
+    refute eof.start_with?('{')
+    assert_includes eof, 'sort-and-change-case'
+    assert_equal ((blob.size - 16) - 1), eof.length
+  end
 end

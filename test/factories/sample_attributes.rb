@@ -40,6 +40,14 @@ Factory.define(:apples_controlled_vocab_attribute, parent: :sample_attribute) do
   end
 end
 
+Factory.define(:apples_list_controlled_vocab_attribute, parent: :sample_attribute) do |f|
+  f.sequence(:title) { |n| "apples list controlled vocab attribute #{n}" }
+  f.after_build do |type|
+    type.sample_controlled_vocab = Factory.build(:apples_sample_controlled_vocab)
+    type.sample_attribute_type = Factory(:cv_list_attribute_type)
+  end
+end
+
 Factory.define(:string_sample_attribute_with_description_and_pid, parent: :sample_attribute) do |f|
   f.sample_attribute_type factory: :string_sample_attribute_type
   f.description "sample_attribute_description"

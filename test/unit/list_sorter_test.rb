@@ -125,6 +125,57 @@ class ListSorterTest < ActiveSupport::TestCase
     end
   end
 
+  test 'sort by downloads' do
+    person = Factory(:person)
+    d1 = Factory(:document, title: 'document a',policy: Factory(:publicly_viewable_policy))
+    d2 = Factory(:document, title: 'document b',policy: Factory(:publicly_viewable_policy))
+    d3 = Factory(:document, title: 'document c',policy: Factory(:publicly_viewable_policy))
+    d4 = Factory(:document, title: 'document d',policy: Factory(:publicly_viewable_policy))
+    d5 = Factory(:document, title: 'document e',policy: Factory(:publicly_viewable_policy))
+    d6 = Factory(:document, title: 'document e',policy: Factory(:publicly_viewable_policy))
+    Factory(:activity_log, action: 'download', activity_loggable: d2, created_at: 10.minutes.ago, culprit: person.user)
+    Factory(:activity_log, action: 'download', activity_loggable: d2, created_at: 9.minutes.ago, culprit: person.user)
+    Factory(:activity_log, action: 'download', activity_loggable: d2, created_at: 8.minutes.ago, culprit: person.user)
+    Factory(:activity_log, action: 'download', activity_loggable: d3, created_at: 7.minutes.ago, culprit: person.user)
+    Factory(:activity_log, action: 'download', activity_loggable: d3, created_at: 6.minutes.ago, culprit: person.user)
+    Factory(:activity_log, action: 'download', activity_loggable: d6, created_at: 5.minutes.ago, culprit: person.user)
+    Factory(:activity_log, action: 'download', activity_loggable: d6, created_at: 4.minutes.ago, culprit: person.user)
+    Factory(:activity_log, action: 'download', activity_loggable: d5, created_at: 3.minutes.ago, culprit: person.user)
+
+    downloads_ordered = [d2, d3, d6, d5, d1, d4]
+    # Tests enum strategy
+    docs = [d1, d2, d3, d4, d5, d6]
+    assert_equal downloads_ordered, Seek::ListSorter.sort_by_order(docs, '--downloads_desc')
+    # Tests relation strategy
+    docs = Document.all
+    assert_equal downloads_ordered, Seek::ListSorter.sort_by_order(docs, '--downloads_desc')
+  end
+
+  test 'sort by views' do
+    d1 = Factory(:document, title: 'document a', policy: Factory(:publicly_viewable_policy))
+    d2 = Factory(:document, title: 'document b', policy: Factory(:publicly_viewable_policy))
+    d3 = Factory(:document, title: 'document c', policy: Factory(:publicly_viewable_policy))
+    d4 = Factory(:document, title: 'document d', policy: Factory(:publicly_viewable_policy))
+    d5 = Factory(:document, title: 'document e', policy: Factory(:publicly_viewable_policy))
+    d6 = Factory(:document, title: 'document f', policy: Factory(:publicly_viewable_policy))
+    Factory(:activity_log, action: 'show', activity_loggable: d4, created_at: 10.minutes.ago)
+    Factory(:activity_log, action: 'show', activity_loggable: d4, created_at: 9.minutes.ago)
+    Factory(:activity_log, action: 'show', activity_loggable: d4, created_at: 8.minutes.ago)
+    Factory(:activity_log, action: 'show', activity_loggable: d3, created_at: 7.minutes.ago)
+    Factory(:activity_log, action: 'show', activity_loggable: d3, created_at: 6.minutes.ago)
+    Factory(:activity_log, action: 'show', activity_loggable: d6, created_at: 5.minutes.ago)
+    Factory(:activity_log, action: 'show', activity_loggable: d6, created_at: 4.minutes.ago)
+    Factory(:activity_log, action: 'show', activity_loggable: d5, created_at: 3.minutes.ago)
+
+    views_ordered = [d4, d3, d6, d5, d1, d2]
+    # Tests enum strategy
+    docs = [d1, d2, d3, d4, d5, d6]
+    assert_equal views_ordered, Seek::ListSorter.sort_by_order(docs, '--views_desc')
+    # Tests relation strategy
+    docs = Document.all
+    assert_equal views_ordered, Seek::ListSorter.sort_by_order(docs, '--views_desc')
+  end
+
   test 'complex sorting' do
     Address = Struct.new(:country, :city)
     brisbane = Address.new('Australia', 'Brisbane')

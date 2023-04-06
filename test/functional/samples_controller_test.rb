@@ -189,6 +189,57 @@ class SamplesControllerTest < ActionController::TestCase
     assert !sample.get_attribute_value(:bool)
   end
 
+  test 'create and update with cv list' do
+    person = Factory(:person)
+    login_as(person)
+
+    type = Factory(:apples_list_controlled_vocab_sample_type)
+    assert_difference('Sample.count') do
+      post :create, params: { sample: { sample_type_id: type.id,
+                                        data: { apples: ['Granny Smith', 'Bramley'] },
+                                        project_ids: [person.projects.first.id] } }
+    end
+    assert_not_nil sample = assigns(:sample)
+    assert_equal ['Granny Smith', 'Bramley'], sample.get_attribute_value(:apples)
+
+    # cv list type data must be an array
+    assert_no_difference('Sample.count') do
+      put :update, params: { id: sample.id, sample: { data: { apples: 'Granny Smith' } } }
+    end
+
+    # the required attribute must be filled in
+    assert_no_difference('Sample.count') do
+      put :update, params: { id: sample.id, sample: { data: { apples: nil } } }
+    end
+
+  end
+
+  test 'create and update with cv list comma seperated' do
+    person = Factory(:person)
+    login_as(person)
+
+    type = Factory(:apples_list_controlled_vocab_sample_type)
+    assert_difference('Sample.count') do
+      post :create, params: { sample: { sample_type_id: type.id,
+                                        data: { apples: 'Granny Smith, Bramley' },
+                                        project_ids: [person.projects.first.id] } }
+    end
+    assert_not_nil sample = assigns(:sample)
+    assert_equal ['Granny Smith', 'Bramley'], sample.get_attribute_value(:apples)
+
+    # cv list type data must be an array
+    assert_no_difference('Sample.count') do
+      put :update, params: { id: sample.id, sample: { data: { apples: 'Granny Smith' } } }
+    end
+
+    # the required attribute must be filled in
+    assert_no_difference('Sample.count') do
+      put :update, params: { id: sample.id, sample: { data: { apples: nil } } }
+    end
+
+  end
+
+
   test 'show sample with boolean' do
     person = Factory(:person)
     login_as(person)

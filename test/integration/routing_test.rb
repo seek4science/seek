@@ -1,7 +1,7 @@
 require 'test_helper'
 
 # tests related to general routes, that are not tied to a particular controller
-class ScheduleTest < ActionDispatch::IntegrationTest
+class RoutingTest < ActionDispatch::IntegrationTest
 
   test 'related items routes' do
     # searchable_types covers all creatable types, plus some others that can be displayed and my have related items

@@ -57,4 +57,21 @@ class GalaxyExtractionTest < ActiveSupport::TestCase
     assert_equal 'Plot gfastats output', input[:name]
     assert_equal '177600', input[:description]
   end
+
+  test 'extracts bio.tools IDs from galaxy workflow' do
+    # Prime cache
+    VCR.use_cassette('galaxy/fetch_tools_trimmed') do
+      VCR.use_cassette('bio_tools/fetch_galaxy_tool_names') do
+        with_config_value(:galaxy_tool_sources, ['https://usegalaxy.eu/api', 'https://usegalaxy.org.au/api']) do
+          Galaxy::ToolMap.instance.refresh
+        end
+      end
+    end
+
+    wf = open_fixture_file('workflows/1-PreProcessing.ga')
+    extractor = Seek::WorkflowExtractors::Galaxy.new(wf)
+    metadata = extractor.metadata
+
+    assert_equal [{ bio_tools_id: 'multiqc', name: 'MultiQC' }], metadata[:tools_attributes]
+  end
 end

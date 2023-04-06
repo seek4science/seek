@@ -41,6 +41,7 @@ class WorkflowRoCrateTest < ActionDispatch::IntegrationTest
       assert_enqueued_jobs(1, only: RemoteGitContentFetchingJob) do
         v.add_remote_file('blah.txt', 'http://internet.internet/file')
         v.add_remote_file('blah2.txt', 'http://internet.internet/another_file', fetch: false)
+        disable_authorization_checks { v.save! }
       end
     end
 
