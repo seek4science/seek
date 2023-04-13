@@ -6,7 +6,7 @@
   #          checkbox_text: "Publish?",
   #          checked: checked,
   #          toggle: children.any?,
-  #          extra_nesting: 1 } - % >
+  #          cb_parent_selector: "div\##{checkbox_class}.split_button_parent" } - % >
 
   checkbox_class ||= "no_name"   # <- Needed!
   checkbox_id ||= checkbox_class
@@ -16,8 +16,7 @@
   checked = !([false,'false',0,'0','no'].include? checked)
   toggle ||= false
   toggle = !([false,'false',0,'0','no'].include? toggle)
-  extra_nesting ||= 0
-  nesting_level = 4 + extra_nesting
+  cb_parent_selector ||= "div\##{checkbox_class}.split_button_parent"
 -%>
 <div class="btn-group" >
   <button type="button" class="btn parent-btn-checkbox">
@@ -42,10 +41,10 @@
       <span class="sr-only">Toggle Dropdown</span>
     </button>
     <ul class="dropdown-menu text-left" role="menu" style="width: auto;" >
-      <li><a href="#" onclick="selectChildren(this,<%= nesting_level %>); return false;">
+      <li><a href="#" onclick="selectChildren(this,'<%= cb_parent_selector %>'); return false;">
         <%= image('checkbox_select_all', options = {height: 30}) %>
         Select this item and all of its sub-items. </a></li>
-      <li><a href="#" onclick="deselectChildren(this,<%= nesting_level %>); return false;">
+      <li><a href="#" onclick="deselectChildren(this,'<%= cb_parent_selector %>'); return false;">
         <%= image('checkbox_deselect_all', options = {height: 30}) %>
         Deselect this item and all of its sub-items. </a></li>
     </ul>

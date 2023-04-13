@@ -12,11 +12,12 @@
        children = []
    end
 -%>
-<div>
+<div class="split_button_parent" id="<%= "#{item.class.name}_#{item.id}" %>">
   <%= render :partial => "assets/publishing/options_for_publishing",
              :object => item,
              :locals => { :html_classes => "publishing_options",
                           :toggle => children.any?,
+                          :cb_parent_selector => "div\##{item.class.name}_#{item.id}.split_button_parent",
                           :checked => (item == preselected) } -%>
 
   <% if children.any? %>
