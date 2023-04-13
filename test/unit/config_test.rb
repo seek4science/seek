@@ -358,6 +358,14 @@ class ConfigTest < ActiveSupport::TestCase
     refute setting[:encrypted_value].include?(password)
   end
 
+  test 'set enable_starttls_auto to false' do
+    Seek::Config.set_smtp_settings 'enable_starttls_auto', false
+
+    # must be false and not nil
+    refute_nil ActionMailer::Base.smtp_settings[:enable_starttls_auto]
+    refute ActionMailer::Base.smtp_settings[:enable_starttls_auto]
+  end
+
   test 'doi_prefix, doi_suffix' do
     assert_equal '10.5072', Seek::Config.doi_prefix
     assert_equal 'Sysmo.SEEK', Seek::Config.doi_suffix

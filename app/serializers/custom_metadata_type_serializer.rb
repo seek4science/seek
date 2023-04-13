@@ -14,7 +14,6 @@ class CustomMetadataTypeSerializer < BaseSerializer
       "title": attribute.title,
       "label": attribute.label,
       "description":attribute.description,
-      "label":attribute.label,
       "sample_attribute_type": get_sample_attribute_type(attribute),
       "required": attribute.required,
       "pos": attribute.pos,
