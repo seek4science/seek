@@ -166,13 +166,11 @@ class SinglePublishingTest < ActionController::TestCase
         assert_select '.parent-btn-dropdown', count: 1
         assert_select '.dropdown-menu', count: 1 do
           assert_select 'li', count: 2 do
-            assert_select 'a[onclick=?]', 'selectChildren(this,5); return false;',
-                          text: /Select this item and all of its sub-items./, count: 1 do
+            assert_select 'a.selectChildren', text: /Select this item and all of its sub-items./, count: 1 do
               assert_select 'img[src=?]', '/assets/checkbox_select_all.svg'
             end
 
-            assert_select 'a[onclick=?]', 'deselectChildren(this,5); return false;',
-                          text: /Deselect this item and all of its sub-items./, count: 1 do
+            assert_select 'a.deselectChildren', text: /Deselect this item and all of its sub-items./, count: 1 do
               assert_select 'img[src=?]', '/assets/checkbox_deselect_all.svg'
             end
           end

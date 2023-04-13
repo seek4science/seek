@@ -41,10 +41,10 @@
       <span class="sr-only">Toggle Dropdown</span>
     </button>
     <ul class="dropdown-menu text-left" role="menu" style="width: auto;" >
-      <li><a href="#" onclick="selectChildren(this,'<%= cb_parent_selector %>'); return false;">
+      <li><a class="selectChildren" id="<%= checkbox_class %>" data-cb_parent_selector='<%= cb_parent_selector %>' href="#" >
         <%= image('checkbox_select_all', options = {height: 30}) %>
         Select this item and all of its sub-items. </a></li>
-      <li><a href="#" onclick="deselectChildren(this,'<%= cb_parent_selector %>'); return false;">
+      <li><a class="deselectChildren" id="<%= checkbox_class %>" data-cb_parent_selector='<%= cb_parent_selector %>' href="#" >
         <%= image('checkbox_deselect_all', options = {height: 30}) %>
         Deselect this item and all of its sub-items. </a></li>
     </ul>

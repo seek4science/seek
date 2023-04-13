@@ -18,10 +18,10 @@
 </div>
 <br/>
 
-<label><%= link_to "Select all your items", "#", id: "select_all",
-                   onclick: "selectChildren(this,1); return false;" -%></label> |
-<label><%= link_to "Deselect all your items", "#", id: "deselect_all",
-                   onclick: "deselectChildren(this,1); return false;" -%></label>
+<label><a class="selectChildren" id="select_all" data-cb_parent_selector='body' href="#" >
+  Select all your items </a></label> |
+<label><a class="deselectChildren" id="deselect_all" data-cb_parent_selector='body' href="#" >
+  Deselect all your items </a></label>
 
 <%= form_tag({:action => :check_related_items},:method=>:post)  do -%>
   <% if @assets.empty? %>
@@ -31,14 +31,14 @@
     <%= link_to "Back to profile", person_path(params[:id].to_i) -%>
   <% else %>
     <% @assets.sort_by { |k, v| v.first.class.name }.each do |type, items| %>
-      <div id="<%= items.first.class.table_name %>s">
+      <div id="<%= items.first.class.table_name %>">
       <h2><%= text_for_resource items.first %>(s)</h2>
-      <label><%= link_to "Select all #{(text_for_resource items.first).downcase.pluralize}", "#",
-                         id: "select_all_#{items.first.class.table_name}",
-                         onclick: "selectChildren(this,1); return false;" -%></label> |
-      <label><%= link_to "Deselect all #{(text_for_resource items.first).downcase.pluralize}", "#",
-                         id: "deselect_all_#{items.first.class.table_name}",
-                         onclick: "deselectChildren(this,1); return false;" -%></label>
+      <label><a class="selectChildren" id="<%="select_all_#{items.first.class.table_name}"%>"
+                data-cb_parent_selector='div#<%= items.first.class.table_name %>' href="#" >
+        Select all <%= "#{(text_for_resource items.first).downcase.pluralize}" %> </a></label> |
+      <label><a class="deselectChildren" id="<%="deselect_all_#{items.first.class.table_name}"%>"
+                  data-cb_parent_selector='div#<%= items.first.class.table_name %>' href="#" >
+          Deselect all <%= "#{(text_for_resource items.first).downcase.pluralize}" %> </a></label>
       <% items.each do |item| %>
         <%= render :partial => "assets/publishing/options_for_publishing",
                    :object => item,
