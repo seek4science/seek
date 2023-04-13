@@ -13,9 +13,7 @@
   published ||= false
   checkbox_text ||= ""
   checked ||= false
-  checked = !([false,'false',0,'0','no'].include? checked)
   toggle ||= false
-  toggle = !([false,'false',0,'0','no'].include? toggle)
   cb_parent_selector ||= "div\##{checkbox_class}.split_button_parent"
 -%>
 <div class="btn-group" >
