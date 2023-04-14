@@ -228,26 +228,26 @@
                         sbc_html = "<%= escape_javascript( render :partial => 'general/split_button_checkbox',
                                                                     :locals => { checkbox_id: "_asset_id_",
                                                                                  checkbox_class: "_asset_id_",
-                                                                                 checked: true,
+                                                                                 checked: false,
                                                                                  toggle: true,
                                                                                  cb_parent_selector: '[data-node-id="_asset_id_"]' } ) %>"
                     } else {
                         sbc_html = "<%= escape_javascript( render :partial => 'general/split_button_checkbox',
                                                                     :locals => { checkbox_id: "_asset_id_",
                                                                                  checkbox_class: "_asset_id_",
-                                                                                 checked: true,
+                                                                                 checked: false,
                                                                                  toggle: false,
                                                                                  cb_parent_selector: '[data-node-id="_asset_id_"]' } ) %>"
                     }
                     sbc_html = sbc_html.replaceAll("name=\"_asset_id_\"",
                                     "name=\""+this.share+"["+asset_id.split("-")[0]+"]["+asset_id.split("-")[1]+"]\"")
                     sbc_html = sbc_html.replaceAll("_asset_id_", asset_id)
-                    if(!(this.asset_key.find(o => o.data_node_id === asset_id).checkbox_status)) {
-                        sbc_html = sbc_html.replaceAll("checked=\"checked\"", "")
-                    }
                     sbtn_checkbox.innerHTML=sbc_html
                     let tmp = sbtn_checkbox.cloneNode(true);
                     obj.insertBefore(tmp, obj.childNodes[1]);
+                    if(this.asset_key.find(o => o.data_node_id === asset_id).checkbox_status) {
+                        obj.childNodes[1].querySelector('input').checked=true
+                    }
                 }
                 return obj;
             };
