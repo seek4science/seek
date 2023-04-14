@@ -13,7 +13,7 @@ If you have any comments or feedback about a release, then please [Contact Us](/
 
 ## Version 1.13.2
 
-Release date: _13th April 2023_
+Release date: _14th April 2023_
 
 A small patch release that contains several bug fixes and small improvements, including
 
