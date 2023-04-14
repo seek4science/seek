@@ -20,9 +20,9 @@ A small patch release that contains several bug fixes and small improvements, in
 * Ability to tag Investigations and Studies, providing better overall consistency
 * Fix duplicate projects appearing in Workflow RO-Crates
 * Sort items by view or download counts in the filtered search index views
-* A new Sample attribute type that supports multiple terms selected from a Controlled Vocabulary as an array
+* A new Sample attribute type, _Controlled Vocabulary List_, that supports multiple terms selected from a Controlled Vocabulary as an array
 * Fix to correctly provide the content length in HTTP headers for downloads that was missing in some cases, and also added the Content-MD5 header to include the md5 checksum
-* Included Programmes listed in MyItems, and related items generally, if the user is the Programme Administrator but not directly a member of a related Project
+* Programmes are now listed in MyItems, and related items generally, if the user is the Programme Administrator but not directly a member of a related Project
 * Space out daily background jobs so that they don't all run at once, avoiding potential memory issues  
 * Upgrade of Rails to the 6.1.7.2 version, and also Ruby to the 2.7.8 version
 
