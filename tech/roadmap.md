@@ -13,19 +13,19 @@ It is an overview of the main priorities, and milestones. FAIRDOM-SEEK is develo
 They are expected to be added to FAIRDOM-SEEK in roughly the order they are presented here.
 
 | Feature | Milestone date |
-| --- | --- |
-| Additional Search configuration improvements, with UI improvements for Search filtering | Q1 2023 |
-| Extended integration with the Norwegian e-Infrastructure for Life Sciences (NeLS) system | Q1 2023 |
-| UI for creating Custom Metadata Extensions | Q2 2023 |
-| Enhancements to Sample support | Q2 2023 |
-| API support for creating new versions | 2023 |
-| Project folders, to help organise files outside of the ISA structure | 2023 |
-| ISA improvements, with a single page for creating and managing them | 2023 |
-| Deposition to repositories, such as ENA | 2023 |
-| Integration with UNLOCK | 2023 |
-| Integration with other file storage systems, e.g. Dropbox, Google Drive, Nextcloud | 2023 |
-| License improvements, using SPDX | 2023 |
-| Better and easier definition of institutions, integrating the Research Organization Registry (ROR) | 2023 |
+| --- |----------------|
+| Extended integration with the Norwegian e-Infrastructure for Life Sciences (NeLS) system | Q2 2023        |
+| Enhancements to Sample support | Q2 2023        |
+| UI for creating Custom Metadata Extensions | Q3 2023        |
+| Additional Search configuration improvements, with UI improvements for Search filtering | Q3 2023        |
+| API support for creating new versions | 2023           |
+| Project folders, to help organise files outside of the ISA structure | 2023           |
+| ISA improvements, with a single page for creating and managing them | 2023           |
+| Deposition to repositories, such as ENA | 2023           |
+| Integration with UNLOCK | 2023           |
+| Integration with other file storage systems, e.g. Dropbox, Google Drive, Nextcloud | 2023           |
+| License improvements, using SPDX | 2023           |
+| Better and easier definition of institutions, integrating the Research Organization Registry (ROR) | 2023           |
 
 <br/>
 
@@ -44,7 +44,7 @@ You can find more details about each release in our [Change Logs](/tech/releases
 
 
 | Feature | SEEK version |
-| --- | --- | 
+| --- | --- |
 | Backend storage changes with better versioning support | 1.13.0 |
 | Better support for GitHub | 1.13.0 |
 | Search configuration improvements, with UI improvements for Search filtering | 1.13.0 |
