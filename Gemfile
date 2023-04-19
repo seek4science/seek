@@ -152,6 +152,9 @@ gem 'remotipart', '~> 1.4.4' # Allows file upload in AJAX forms
 
 gem 'rails-static-router'
 
+gem 'caxlsx', '>= 3.0' # Write content to an xlsx file
+gem 'axlsx_rails', '~> 0.6.1'
+
 group :production do
   gem 'passenger'
 end
