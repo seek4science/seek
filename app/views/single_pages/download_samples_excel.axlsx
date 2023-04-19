@@ -1,0 +1,125 @@
+require 'caxlsx'
+
+workbook = xlsx_package.workbook
+# Prevents formula injections
+# TODO: Find out why this doesn't work
+# Axlsx.escape_formulas = true
+
+# Get Sample data
+sample_data = samples.map do |sample|
+  { 'id': sample.id }.merge({ 'uuid': sample.uuid }, JSON.parse(sample[:json_metadata]))
+end
+
+# Colors
+datahub_blue = '486273'
+datahub_yellow = 'F2b035'
+
+# Cell Styles
+unlocked = workbook.styles.add_style locked: false
+locked = workbook.styles.add_style locked: true
+title_style = workbook.styles.add_style(bg_color: datahub_yellow,
+                                        fg_color: datahub_blue,
+                                        b: true,
+                                        u: true,
+                                        sz: 18)
+
+workbook.add_worksheet(name: 'Metadata') do |sheet|
+  sheet.add_row ['Study:'], style: title_style
+  sheet.add_row ['Fairdom ID:', study.id]
+  sheet.add_row ['UUID:', study.uuid]
+
+  sheet.add_row ['Sample Type:'], style: title_style
+  sheet.add_row ['Fairdom ID:', sampletype.id]
+  sheet.add_row ['UUID:', sampletype.uuid]
+
+  sheet.sheet_protection.password = 'florakevinrafael'
+end
+
+# CV / Ontologies sheet
+## Function to get a fixed size matrix
+def transposed_filled_arrays(arrays)
+  raise 'Input is no array' unless arrays.is_a?(Array)
+
+  size = 0
+  arrays.map { |array| size = array.size if array.size > size }
+
+  filled_arrays = []
+  arrays.map { |array| filled_arrays.push(Array.new(size) { |i| array[i] }) }
+
+  filled_arrays.transpose
+end
+
+## Populate and protect CV / Ontologies sheet
+workbook.add_worksheet(name: 'cv_ontology') do |sheet|
+  rows = []
+  cv_list.map do |cv|
+    row = [cv['name']]
+
+    if cv['has_cv']
+      cv['data']&.map do |val|
+        row.push val
+      end
+    end
+    rows.push(row)
+  end
+  tfs_rows = transposed_filled_arrays(rows)
+  tfs_rows.map do |tfs_row|
+    sheet.add_row tfs_row
+  end
+  sheet.sheet_protection.password = 'florakevinrafael'
+end
+
+# Sample sheet
+workbook.add_worksheet(name: 'Samples') do |sheet|
+  sheet.add_row sample_data[0].keys
+  sample_data.each do |item|
+    row = item.collect { |_key, val| val }
+    sheet.add_row row, style: unlocked
+  end
+  ## styling
+  sheet.col_style(0, locked)
+  sheet.row_style(0, title_style)
+
+  ## filtering
+  sheet.auto_filter = "#{sheet.cells.first.r}:#{sheet.cells.last.r}"
+
+  ## Data Validation
+  # https://github.com/caxlsx/caxlsx/blob/master/examples/list_validation_example.md
+  # Example
+  # sheet.add_data_validation('B1:B1',
+  #                           type: :list,
+  #                           formula1: '"small, medium, large"',
+  #                           showErrorMessage: true,
+  #                           errorTitle: '',
+  #                           error: 'Allowed values: small, medium, large',
+  #                           errorStyle: 'information', # options here are: 'information', 'stop', 'warning'
+  #                           showInputMessage: true,
+  #                           promptTitle: '',
+  #                           prompt: 'Choose a size:')
+  sample_size = sample_data.size
+  attribute_size = sample_data[0].keys.size
+  (3..attribute_size).map do |col_nr|
+    col_ref = Axlsx.cell_r(col_nr, 1).gsub(/\d+/, '')
+    dv_range = "#{col_ref}2:#{col_ref}1000000"
+    sheet.add_data_validation(dv_range,
+                              type: :list,
+                              formula1: "'cv_ontology'!$#{col_ref}$2:$#{col_ref}$1000000",
+                              showErrorMessage: true,
+                              errorTitle: 'STOP!!!!',
+                              error: 'Please select one of the available options',
+                              errorStyle: :information, # options here are: 'information', 'stop', 'warning'
+                              showInputMessage: true,
+                              promptTitle: '',
+                              prompt: 'Choose a size:')
+  end
+
+  ## Password protections Samples sheet
+  sheet.sheet_protection.password = 'florakevinrafael'
+  sheet.sheet_protection.format_cells = false
+  sheet.sheet_protection.format_columns = false
+  sheet.sheet_protection.format_rows = false
+  sheet.sheet_protection.auto_filter = false
+  sheet.sheet_protection.insert_rows = false
+  sheet.sheet_protection.delete_rows = false
+  sheet.sheet_protection.sort = false
+end
