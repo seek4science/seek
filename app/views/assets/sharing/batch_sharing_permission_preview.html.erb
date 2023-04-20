@@ -202,14 +202,14 @@
                       e.stopImmediatePropagation();
                       this.settings.split_btn_checkbox.call(this, this.get_node(e.target));
                   }.bind(this))
-                  .on("close_node.jstree", function (){
-                      this.asset_key = update_asset_key(this.asset_key)
+                  .on("change.input",function(e){
+                      this.get_node(e.target.id).data['checkbox_status']=e.target.checked
                   }.bind(this))
                   .on("sb_select_all", function (){
-                      this.asset_key = change_all(this.asset_key,true)
+                      change_all(this,true)
                   }.bind(this))
                   .on("sb_deselect_all", function (){
-                      this.asset_key = change_all(this.asset_key,false)
+                      change_all(this,false)
                   }.bind(this));
             };
             this.teardown = function () {
@@ -223,8 +223,13 @@
                 if(obj.classList.contains('asset-node-row')) {
                     let sbtn_checkbox = document.createElement("span",)
                     let asset_id=obj.getAttribute("data-node-id")
+                    let node = this.get_node(obj.id)
+                    if(node.data['checkbox_status']===undefined){
+                        node.data['checkbox_status']=false
+                        node.data['has_children']=this.asset_key.find(o => o.data_node_id === asset_id).has_children
+                    }
                     let sbc_html = ""
-                    if(this.asset_key.find(o => o.data_node_id === asset_id).has_children){
+                    if(node.data['has_children']){
                         sbc_html = "<%= escape_javascript( render :partial => 'general/split_button_checkbox',
                                                                     :locals => { checkbox_id: "_asset_id_",
                                                                                  checkbox_class: "_asset_id_",
@@ -245,7 +250,7 @@
                     sbtn_checkbox.innerHTML=sbc_html
                     let tmp = sbtn_checkbox.cloneNode(true);
                     obj.insertBefore(tmp, obj.childNodes[1]);
-                    if(this.asset_key.find(o => o.data_node_id === asset_id).checkbox_status) {
+                    if(node.data['checkbox_status']) {
                         obj.childNodes[1].querySelector('input').checked=true
                     }
                 }
@@ -268,8 +273,8 @@
             }
             if(data_node_id){
                 asset_key.push({data_node_id:data_node_id,
-                                has_children:has_children,
-                                checkbox_status:false})
+                                node_id:asset.id,
+                                has_children:has_children})
             }
             let grandchildren=[]
             if(has_children) {
@@ -279,24 +284,14 @@
         }
         return asset_key
     }
-    function update_asset_key(asset_key) {
-        asset_key.forEach(function (asset, i) {
-            try{
-                asset_key[i].checkbox_status=document.getElementById(asset.data_node_id).checked
-            }
-            catch(e){}
-        })
-        return asset_key
-    }
-    function change_all(asset_key,status){
-        asset_key.forEach(function (asset, i) {
-            asset_key[i].checkbox_status=status
+    function change_all(tree,status){
+        for(let asset of tree.asset_key) {
+            tree.get_node(asset.node_id).data['checkbox_status']=status
             try{
                 document.getElementById(asset.data_node_id).checked=status
             }
             catch(err) {}
-        })
-        return asset_key
+        }
     }
     function show_all_checkboxes(){
         $j("#jstree_not_isa").jstree("open_all");
