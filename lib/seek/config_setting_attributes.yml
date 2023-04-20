@@ -253,3 +253,5 @@ fair_signposting_enabled:
 bio_tools_enabled:
 require_cookie_consent:
 galaxy_tool_sources:
+regular_job_offset:
+  convert: :to_i

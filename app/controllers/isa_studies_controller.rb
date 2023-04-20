@@ -17,8 +17,16 @@ class IsaStudiesController < ApplicationController
     @isa_study.study.sample_types = [@isa_study.source, @isa_study.sample_collection]
 
     if @isa_study.save
-      redirect_to single_page_path(id: @isa_study.study.projects.first, item_type: 'study',
-                                   item_id: @isa_study.study)
+      flash[:notice] = "The #{t('isa_study')} was succesfully created.<br/>".html_safe
+
+      respond_to do |format|
+        format.html do
+          redirect_to single_page_path(id: @isa_study.study.projects.first, item_type: 'study',
+                                       item_id: @isa_study.study)
+        end
+        format.json { render json: @isa_study, include: [params[:include]] }
+      end
+
     else
       respond_to do |format|
         format.html { render action: 'new' }

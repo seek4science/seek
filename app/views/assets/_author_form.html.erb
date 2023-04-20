@@ -5,11 +5,10 @@
 
 <%
   resource = form.object
-  resource_type = resource.class.name.underscore
   resource_type_text = text_for_resource(resource)
   collapsed = (resource.assets_creators.empty? && resource.other_creators.blank?) if collapsed.nil?
   assoc_text ||= resource.class.human_attribute_name('creators', default: t('creator').pluralize).downcase
-  field_name ||= "#{resource_type}[assets_creators_attributes]"
+  field_name ||= "#{form.object_name}[assets_creators_attributes]"
 
   resource.assets_creators.build(creator: current_user.person) if resource.try(:creators).blank? && ['new','provide_metadata'].include?(action_name)
 
@@ -72,7 +71,7 @@
 
   <div class="form-group">
     <label><%= resource.class.human_attribute_name('other_creators') -%></label>
-    <%= text_field_tag "#{resource_type}[other_creators]", resource.other_creators, class: 'form-control' %>
+    <%= form.text_field :other_creators, class: 'form-control' %>
     <p class="help-block">A free-text field to specify additional credit for the creation of this <%= resource_type_text %>.</p>
   </div>
 <% end %>
