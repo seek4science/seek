@@ -111,22 +111,46 @@ Once completed click update. Your Sample Type can now be used to generate Sample
 
 ## Sample Type Visibility
 
-Initially, a Sample Type is only visible and accessible to members of the Project it is associated with.
-
-However, once a Sample Type has instances of Samples associated with them, and those Samples are shared publically (i.e. to logged out members), the Sample Type
-also becomes visible.
-
-When a Sample is shared outside of a Project, but is still not accessible publicly, then the Sample Type will adopt the visibility of the referring Sample
-when accessed via a link. For example if a Sample is shared with another Project, a member of that other Project may view the Sample Type when clicking the link
-the link from the Sample description. However, in this case, the Sample Type won't appear in lists or search results.
+Sample Type visibilty and accessibility to users can be defined by registered users with managing rights over the Sample Type via the [sharing permission](general-attributes.html#sharing).
 
 ## Editing Sample Types
 
-The Sample Type may be edited by the original creator, or somebody that can administer the related projects.
+A Sample Type can only be edited by registered users that have the permission to edit a specific Sample Type. See [sharing](general-attributes.html#sharing) and [bulk changing of sharing permission](bulk-change-sharing-permission.html) for more information about how to manage sharing permission.
 
-If no samples have yet been created, you can freely edit the Sample Type and its attributes. Once Samples have been created for a Sample Type, it is no longer possible to modify the attributes - however other details about the Sample Type can be changed.
- 
+Select the Sample Type, then select the "Actions" button and click on "Edit Sample Type".
 
-For details on how to create a Sample please go to [Creating a Sample](create-sample.html) 
+### Adding optional attributes
+
+Optional attributes can be added to a Sample Type.
+
+You can define your own attributes for the Sample Type. See "Creating a Sample Type manually using a Form" paragraph above.
+All attributes must have a Name, and a selected Type. See the "Defining Attributes" paragraph above.
+
+If existing samples have been previosly created using the Sample Type you want to add attributes to, those samples will also show the newly added optional attributes with empty values by default.
+
+Users with editing rights over those samples should decide whether to assign values to the added optional attributes for the existing samples or not. <!--See editing samples: info missing-->
+
+### Editing existing attributes without causing technical conflicts with samples' values
+
+You can edit existing attributes of a Sample Type in the following ways, without causing technical conflicts that would trigger validation errors in the system.
+* Change a mandatory attributes to optional
+* Edit the Name
+* Edit what attribute is a Title
+* Edit the Description
+* Edit the link to the PID
+* Edit the Unit
+
+Although it is possible to apply such changes, it's important to ensure that any modifications do not create semantic inconsistencies with the data that has already been collected for the existing samples. For instance, if you change the name or description of an attribute, this could cause confusion or difficulty in interpreting data that has already been collected for that attribute. Therefore, it's important to carefully consider the potential impact of any changes to existing attributes of a Sample Type, and to make sure that these changes are made in a way that does not create semantic inconsistencies or confusion with the values of existing samples.
+
+### Changing an existing optional attribute to mandatory
+
+Optional attributes in a Sample Type can be made mandatory via the following steps:
+1. Add the new attribute to the Sample Type as optional (do not select "Required?") and Save the change by clicking "Update" button.
+2. Make sure that all samples previously created using the Sample Type you are editing get values for the newly added optional attribute. If you don't have the permission to edit all the samples, make sure to contact the creator(s) and/or the submitter of those samples, and ask them to add values for the new optional attribute. 
+
+Note that all samples created using the Sample Type you are editing must have a value assigned for the newly added optional attribute in order to make that attribute mandatory. If not all samples have a value for the newly added optional attribute, it cannot be made mandatory.
+
+3. Ensure that all previously created samples have values for the new optional attribute by browsing and selecting the Sample Type of interest, and by clicking on the "View samples" button.
+4. Select the Sample Type, then select the "Actions" button and click on "Edit Sample Type" from the dropdown menu. Locate the attribute you want to make required and select the checkbox next to "Required?" to make it a mandatory field. Save the changes to the Sample Type by clicking the "Update" button.
 
 
