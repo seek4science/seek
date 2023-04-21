@@ -177,7 +177,6 @@ async function batchCreateSample(sampleTypes, projectDefaultPolicy) {
     });
 
     if (data.length == 0) {
-      console.log("No samples to create");
       return;
     }
     return ajaxCall("<%= batch_create_samples_path %>", "POST", { data: JSON.stringify({ data }) });
@@ -196,7 +195,6 @@ async function batchDeleteSample(sampleTypes) {
     });
 
     if (data.length == 0) {
-      console.log("No samples to delete.");
       return;
     }
     return ajaxCall("<%= batch_delete_samples_path %>", "DELETE", { data: JSON.stringify({ data }) });
@@ -215,7 +213,6 @@ async function batchUpdateSample(sampleTypes) {
     });
 
     if (data.length == 0) {
-      console.log("No samples to update");
       return;
     }
     return ajaxCall("<%= batch_update_samples_path %>", "PUT", { data: JSON.stringify({ data }) });
