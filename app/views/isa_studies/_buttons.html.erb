@@ -14,6 +14,9 @@ permissions||="loadBatchPermission('sampleDynamicTable',this)"
   <input class="btn btn-default btn_set_permission" type="button" value="Batch sharing permissions" onClick=<%=permissions%> />
   <button class="btn btn-primary dt-action" id="btn_save_assay_sample" onClick=<%=save%>>Save</button>
 </div>
+<div id="excel-export">
+  <a class="btn btn-success" id="btn_export_excel" onClick="exportToExcel()">Export as Excel</a>
+</div>
 
 <script>
   function loadBatchPermission(dtName, e){
