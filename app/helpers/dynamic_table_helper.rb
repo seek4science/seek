@@ -30,7 +30,7 @@ module DynamicTableHelper
 
   def dt_rows(sample_type)
     sample_type.samples.map do |s|
-      ['', s.id] +
+      ['', s.id, s.uuid] +
         if s.can_view?
           JSON(s.json_metadata).values
         else
@@ -52,7 +52,7 @@ module DynamicTableHelper
   end
 
   def dt_default_cols(name)
-    [{ title: 'status', name: name, status: true }, { title: 'id', name: name }]
+    [{ title: 'status', name: name, status: true }, { title: 'id', name: name }, { title: 'uuid', name: name }]
   end
 
   def dt_cumulative_rows(sample_types, col_count)
