@@ -149,7 +149,7 @@ const setSource = (elem, data) => {
     classes: {
       "ui-autocomplete": "highlight"
     },
-    source: data.map(x => x.name),
+    source: data.results.map(x => x.text),
     minLength: 0,
     mustMatch: true
   });
