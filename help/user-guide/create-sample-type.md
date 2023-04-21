@@ -119,7 +119,7 @@ A Sample Type can only be edited by registered users that have the permission to
 
 Select the Sample Type, then select the "Actions" button and click on "Edit Sample Type".
 
-### Adding optional attributes
+### Adding a new attribute as optional
 
 Optional attributes can be added to a Sample Type.
 
@@ -130,27 +130,66 @@ If existing samples have been previosly created using the Sample Type you want t
 
 Users with editing rights over those samples should decide whether to assign values to the added optional attributes for the existing samples or not. <!--See editing samples: info missing-->
 
+
+### Adding a new attribute as mandatory
+
+A new mandatory attribute can be added to a Sample Type via the following steps:
+1. Add the new attribute to the Sample Type as optional (do not select "Required?") and Save the change by clicking "Update" button.
+2. Select the Sample Type and then click on the "View samples" button.
+3. Locate the newly added attribute you want to make required and ensure that all samples have values in it. 
+* If you have permission to edit those samples,[edit the samples]() by assigning values for the attribute of interest.
+* If you don't have the permission to edit all the samples, make sure to contact the creator(s) and/or the submitter of those samples, and ask them to add values for the new optional attribute. 
+
+Note that all samples, including the ones that might not be visible to you, must have values for the attribute of interest, otherwise the intended change cannot be made.
+
+3. Select the Sample Type, then select the "Actions" button and click on "Edit Sample Type" from the dropdown menu. Locate the attribute you want to make required and select the checkbox next to "Required?" to make it a mandatory field. Save the changes to the Sample Type by clicking the "Update" button.
+
+
+### Making an optional attribute mandatory
+
+Optional attributes in a Sample Type can be made mandatory via the following steps:
+1. Select the Sample Type and then click on the "View samples" button.
+2. Locate the attribute you want to make required and ensure that all samples have values in it. 
+* If you have permission to edit those samples,[edit the samples]() by assigning values for the attribute of interest.
+* If you don't have the permission to edit all the samples, make sure to contact the creator(s) and/or the submitter of those samples, and ask them to add values for the new optional attribute. 
+
+Note that all samples, including the ones that might not be visible to you, must have values for the attribute of interest, otherwise the intended change cannot be made.
+
+3. Select the Sample Type, then select the "Actions" button and click on "Edit Sample Type" from the dropdown menu. Locate the attribute you want to make required and select the checkbox next to "Required?" to make it a mandatory field. Save the changes to the Sample Type by clicking the "Update" button.
+
+
 ### Editing existing attributes without causing technical conflicts with samples' values
 
-You can edit existing attributes of a Sample Type in the following ways, without causing technical conflicts that would trigger validation errors in the system.
-* Change a mandatory attributes to optional
+You can edit existing attributes of a Sample Type in the following ways, without causing technical conflicts that would trigger validation errors for samples' values in the system.
+* Change a mandatory attributes to optional: deselect the checkbox "Required?"
 * Edit the Name
-* Edit what attribute is a Title
+* Edit what attribute is a Title: tick the checkbox "Title?" for a different attribute
 * Edit the Description
 * Edit the link to the PID
 * Edit the Unit
 
 Although it is possible to apply such changes, it's important to ensure that any modifications do not create semantic inconsistencies with the data that has already been collected for the existing samples. For instance, if you change the name or description of an attribute, this could cause confusion or difficulty in interpreting data that has already been collected for that attribute. Therefore, it's important to carefully consider the potential impact of any changes to existing attributes of a Sample Type, and to make sure that these changes are made in a way that does not create semantic inconsistencies or confusion with the values of existing samples.
 
-### Changing an existing optional attribute to mandatory
 
-Optional attributes in a Sample Type can be made mandatory via the following steps:
-1. Add the new attribute to the Sample Type as optional (do not select "Required?") and Save the change by clicking "Update" button.
-2. Make sure that all samples previously created using the Sample Type you are editing get values for the newly added optional attribute. If you don't have the permission to edit all the samples, make sure to contact the creator(s) and/or the submitter of those samples, and ask them to add values for the new optional attribute. 
+### Editing an existing attribute in a way that may create technical conflict with samples' values
+Work in progress. It will include editing and deleting of:
+* attributes
+* attribute types
+* controlled vocabulary and ontologies
 
-Note that all samples created using the Sample Type you are editing must have a value assigned for the newly added optional attribute in order to make that attribute mandatory. If not all samples have a value for the newly added optional attribute, it cannot be made mandatory.
+<!-- pseudocode
+1. Edit sample type with linked samples
+2. Make attribute mandatory or edit existing (type, CV, mandatory)
+3. Hit save
+4. SEEK checks all samples for conflict
+  a. No conflicts: saved
+  b. Conflicts: meaningful error message
+    i. Explain what is the change that causes conflicts, when multiple changes are made at the same time
+    ii. Issues in showing samples?
+Give the user option to define a default value or PLACEHOLDER for non compliant samples (ALL of them)
 
-3. Ensure that all previously created samples have values for the new optional attribute by browsing and selecting the Sample Type of interest, and by clicking on the "View samples" button.
-4. Select the Sample Type, then select the "Actions" button and click on "Edit Sample Type" from the dropdown menu. Locate the attribute you want to make required and select the checkbox next to "Required?" to make it a mandatory field. Save the changes to the Sample Type by clicking the "Update" button.
+Delete 
+First check: has the user the permission to edit the linked samples?
+How adding and deleting attribute affect samples originated from data file (spreadsheet template)? It doesn't because spreadsheet template/datafile will not be so tightly linked to extracted samples anymore.
 
-
+-->
