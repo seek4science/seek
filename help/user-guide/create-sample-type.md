@@ -79,7 +79,7 @@ Other attributes can be also be marked as required if need be.
 
 Once completed click update. Your Sample Type can now be used to generate Samples.
 
-## Creating a Sample Type from a template
+## Creating a Sample Type from a spreadsheet template
 
 A sample type can also be generated from your own Excel template. The sample type will be based upon the first sheet with a
 name containing _sample_, and the attributes will be based on the column heading in the first row.
@@ -190,6 +190,6 @@ Give the user option to define a default value or PLACEHOLDER for non compliant 
 
 Delete 
 First check: has the user the permission to edit the linked samples?
-How adding and deleting attribute affect samples originated from data file (spreadsheet template)? It doesn't because spreadsheet template/datafile will not be so tightly linked to extracted samples anymore.
+How adding and deleting attribute affect samples originated from data file (spreadsheet template)? It doesn't because spreadsheet template/datafile will not be so tightly linked to extracted samples anymore. Decouple sharing permissions of datafile from the sharing permission of the extracted samples.
 
 -->
