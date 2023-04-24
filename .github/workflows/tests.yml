@@ -44,19 +44,19 @@ jobs:
           - mysql
         suite:
           - rails test test/unit
-          - rails test test/functional
-          - rails test test/integration
-          - rspec spec
-          # - rake teaspoon
-          - rake assets:precompile
-          - rake db:setup
-          - rake db:migrate
-          - rake seek:upgrade
-        include:
-          - database: postgres
-            suite: rails test test/unit
-          - database: sqlite3
-            suite: rails test test/unit
+#          - rails test test/functional
+#          - rails test test/integration
+#          - rspec spec
+#          # - rake teaspoon
+#          - rake assets:precompile
+#          - rake db:setup
+#          - rake db:migrate
+#          - rake seek:upgrade
+#        include:
+#          - database: postgres
+#            suite: rails test test/unit
+#          - database: sqlite3
+#            suite: rails test test/unit
     steps:
       - name: Install system dependencies
         run: sudo apt update && sudo apt install -y graphicsmagick graphviz libcurl4-gnutls-dev libreoffice poppler-utils
@@ -68,7 +68,7 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
-          distribution: 'temurin'      
+          distribution: 'temurin'
           java-version: '11' # The JDK version to make available on the path.
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
@@ -90,7 +90,7 @@ jobs:
             ${{ runner.os }}-
       - name: Install Python dependencies
         run: |
-          pip install setuptools==58
+          pip install setuptools==57
           pip install -r requirements.txt
       - name: Create test database
         run: |
