@@ -82,7 +82,8 @@ jobs:
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          python -m pip install setuptools==58
+          python -m pip install -r requirements.txt
       - name: Create test database
         run: |
           cp test/config/database.github.${{ matrix.database }}.yml config/database.yml
