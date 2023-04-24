@@ -81,7 +81,7 @@ jobs:
           cache: 'pip' # caching pip dependencies
       - name: Install Python dependencies
         run: |
-          pip install "setuptools<58.0.0"
+          pip install --upgrade pip "setuptools<58.0"
           pip install -r requirements.txt
       - name: Create test database
         run: |
