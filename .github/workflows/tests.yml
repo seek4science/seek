@@ -81,7 +81,8 @@ jobs:
           cache: 'pip' # caching pip dependencies
       - name: Install Python dependencies
         run: |
-          pip install --upgrade pip && pip install setuptools==57 && pip install -r requirements.txt
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
       - name: Create test database
         run: |
           cp test/config/database.github.${{ matrix.database }}.yml config/database.yml
