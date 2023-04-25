@@ -30,7 +30,7 @@ WORKDIR $APP_DIR
 COPY Gemfile* ./
 RUN bundle config --local frozen 1 && \
     bundle config set deployment 'true' && \
-    bundle config set without 'development test' && \
+    # bundle config set without 'development test' && \
     bundle install
 
 # App code
