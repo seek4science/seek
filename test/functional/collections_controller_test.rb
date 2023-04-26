@@ -21,7 +21,7 @@ class CollectionsControllerTest < ActionController::TestCase
   end
 
   test 'should get index' do
-    FactoryGirl.create_list(:public_collection, 3)
+    FactoryBot.create_list(:public_collection, 3)
 
     get :index
 
@@ -306,7 +306,7 @@ class CollectionsControllerTest < ActionController::TestCase
   end
 
   test 'numeric pagination' do
-    FactoryGirl.create_list(:public_collection, 20)
+    FactoryBot.create_list(:public_collection, 20)
 
     with_config_value(:results_per_page_default, 5) do
       get :index
@@ -330,7 +330,7 @@ class CollectionsControllerTest < ActionController::TestCase
   end
 
   test 'user can change results per page' do
-    FactoryGirl.create_list(:public_collection, 15)
+    FactoryBot.create_list(:public_collection, 15)
 
     with_config_value(:results_per_page_default, 5) do
       get :index, params: { per_page: 15 }

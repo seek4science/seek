@@ -4,7 +4,7 @@ require 'ruby-prof'
 class AuthorizationPerformanceTest < ActiveSupport::TestCase
   test 'profile authorizing data file' do
     user = Factory(:user)
-    data_files = FactoryGirl.create_list(:data_file, 10)
+    data_files = FactoryBot.create_list(:data_file, 10)
 
     result = RubyProf.profile do
       data_files.each do |data_file|

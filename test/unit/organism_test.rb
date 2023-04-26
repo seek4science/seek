@@ -199,7 +199,7 @@ class OrganismTest < ActiveSupport::TestCase
     assert org.valid?
     assert org.errors.none?
 
-    org2 = FactoryGirl.build(:organism, concept_uri: 'http://purl.bioontology.org/ontology/NCBITAXON/562')
+    org2 = FactoryBot.build(:organism, concept_uri: 'http://purl.bioontology.org/ontology/NCBITAXON/562')
 
     refute org2.valid?
     refute org2.save

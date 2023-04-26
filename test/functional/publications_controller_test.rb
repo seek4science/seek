@@ -490,7 +490,7 @@ class PublicationsControllerTest < ActionController::TestCase
   test 'should filter publications by projects_id for export' do
     p1 = Factory(:project, title: 'OneProject')
     p2 = Factory(:project, title: 'AnotherProject')
-    list_of_publ = FactoryGirl.create_list(:publication_with_author, 6)
+    list_of_publ = FactoryBot.create_list(:publication_with_author, 6)
     Factory( :max_publication, projects: [p1])
     Factory( :min_publication, projects: [p1])
     Factory( :publication, projects: [p2, p1])
@@ -508,7 +508,7 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   test 'should filter publications sort by published date for export' do
-    FactoryGirl.create_list(:publication_with_date, 6)
+    FactoryBot.create_list(:publication_with_date, 6)
 
     # sort by published_date asc
     get :export, params: { query: { s: [{ name: :published_date, dir: :asc }] } }
@@ -526,7 +526,7 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   test 'should filter publications by title contains for export' do
-    FactoryGirl.create_list(:publication, 6)
+    FactoryBot.create_list(:publication, 6)
     Factory(:min_publication)
 
     get :export, params: { query: { title_cont: 'A Minimal Publication' } }
@@ -536,7 +536,7 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   test 'should filter publications by author name contains for export' do
-    FactoryGirl.create_list(:publication_with_author, 6)
+    FactoryBot.create_list(:publication_with_author, 6)
     Factory(:max_publication)
 
     # sort by published_date asc
@@ -1010,7 +1010,7 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   test 'query single authors for typeahead' do
-    FactoryGirl.create_list(:publication_with_author, 6)
+    FactoryBot.create_list(:publication_with_author, 6)
     query = 'Last'
     get :query_authors_typeahead, params: { format: :json, full_name: query }
     assert_response :success
@@ -1035,7 +1035,7 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   test 'query authors for initialization' do
-    FactoryGirl.create_list(:publication_with_author, 5)
+    FactoryBot.create_list(:publication_with_author, 5)
     Factory.create(:publication_with_author, publication_authors:[Factory(:publication_author, first_name:'Existing', last_name:'Author')])
     query_authors = {
       '0' => { full_name: 'Existing Author' }, # Existing author-> should return 1

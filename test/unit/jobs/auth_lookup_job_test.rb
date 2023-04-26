@@ -64,7 +64,7 @@ class AuthLookupJobTest < ActiveSupport::TestCase
 
   test 'takes items from queue according to batch size configuration' do
     # Creating SOPs will automatically enqueue them in the AuthLookupUpdateQueue on save
-    FactoryGirl.create_list(:sop, 10)
+    FactoryBot.create_list(:sop, 10)
 
     with_config_value(:auth_lookup_update_batch_size, 3) do
       assert_difference('AuthLookupUpdateQueue.count', -3) do

@@ -81,7 +81,7 @@ class AssetTest < ActiveSupport::TestCase
     assert !df.contains_downloadable_items?
     assert !df.latest_version.contains_downloadable_items?
 
-    Factory.define(:model_with_urls, parent: :model) do |f|
+    FactoryBot.define(:model_with_urls, parent: :model) do |f|
       f.after_create do |model|
         model.content_blobs = [
           Factory.create(:content_blob, url: 'http://webpage.com', asset: model, asset_version: model.version, external_link: true),
@@ -98,7 +98,7 @@ class AssetTest < ActiveSupport::TestCase
     assert model.contains_downloadable_items?
     assert model.latest_version.contains_downloadable_items?
 
-    Factory.define(:model_with_urls_and_files, parent: :model) do |f|
+    FactoryBot.define(:model_with_urls_and_files, parent: :model) do |f|
       f.after_create do |model|
         model.content_blobs = [
           Factory.create(:content_blob, url: 'http://webpage.com', asset: model, asset_version: model.version, external_link: true),

@@ -7,7 +7,7 @@ require 'rails/test_help'
 require 'sharing_form_test_helper'
 require 'general_authorization_test_cases'
 require 'ruby-prof'
-require 'factory_girl'
+require 'factory_bot'
 require 'webmock/minitest'
 require 'action_view/test_case'
 require 'tmpdir'
@@ -41,7 +41,7 @@ module ActionView
   end
 end
 
-FactoryGirl.find_definitions # It looks like requiring factory_girl _should_ do this automatically, but it doesn't seem to work
+FactoryBot.find_definitions # It looks like requiring factory_bot _should_ do this automatically, but it doesn't seem to work
 
 Kernel.class_eval do
 
@@ -249,7 +249,7 @@ class ActiveSupport::TestCase
 end
 
 # Load seed data
-# load "#{Rails.root}/db/seeds.rb" if File.exists?("#{Rails.root}/db/seeds.rb")
+# load "#{Rails.root}/db/seeds.rb" if File.exist?("#{Rails.root}/db/seeds.rb")
 
 VCR.configure do |config|
   config.cassette_library_dir = 'test/vcr_cassettes'

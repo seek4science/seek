@@ -18,8 +18,8 @@ class StudiesExtractorTest < ActiveSupport::TestCase
 
     assert_same 3, data_files.count
     assert_same 1, studies.count
-    assert_same true, File.exists?("#{Rails.root}/tmp/#{user_uuid}_studies_upload/#{data_files.first.name}")
-    assert_same true, File.exists?("#{Rails.root}/tmp/#{user_uuid}_studies_upload/#{studies.first.name}")
+    assert_same true, File.exist?("#{Rails.root}/tmp/#{user_uuid}_studies_upload/#{data_files.first.name}")
+    assert_same true, File.exist?("#{Rails.root}/tmp/#{user_uuid}_studies_upload/#{studies.first.name}")
 
     FileUtils.rm_r("#{Rails.root}/tmp/#{user_uuid}_studies_upload/")
   end

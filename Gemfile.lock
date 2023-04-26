@@ -234,8 +234,8 @@ GEM
       actionmailer (>= 5.2, < 8)
       activesupport (>= 5.2, < 8)
     execjs (2.8.1)
-    factory_girl (2.6.4)
-      activesupport (>= 2.3.9)
+    factory_bot (6.2.1)
+      activesupport (>= 5.0.0)
     faraday (1.10.2)
       faraday-em_http (~> 1.0)
       faraday-em_synchrony (~> 1.0)
@@ -963,7 +963,7 @@ DEPENDENCIES
   dotenv-rails (~> 2.7.6)
   equivalent-xml
   exception_notification
-  factory_girl (= 2.6.4)
+  factory_bot (~> 6.2.1)
   feedjira (~> 1)
   fleximage!
   fssm

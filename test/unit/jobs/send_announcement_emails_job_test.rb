@@ -14,7 +14,7 @@ class SendAnnouncementEmailsJobTest < ActiveSupport::TestCase
     Person.destroy_all
 
     # Create <BATCHSIZE> + 1 people, so at least 2 batches of emails will need to be sent
-    FactoryGirl.create_list(:person, SendAnnouncementEmailsJob::BATCHSIZE)
+    FactoryBot.create_list(:person, SendAnnouncementEmailsJob::BATCHSIZE)
     assert_equal SendAnnouncementEmailsJob::BATCHSIZE + 1, NotifieeInfo.count
 
     site_announcement = nil

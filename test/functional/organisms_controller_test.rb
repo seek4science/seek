@@ -291,7 +291,7 @@ class OrganismsControllerTest < ActionController::TestCase
   test 'strains cleaned up when organism deleted' do
     login_as(:quentin)
     organism = Factory(:organism)
-    strains = FactoryGirl.create_list(:strain, 3, organism: organism, contributor: nil)
+    strains = FactoryBot.create_list(:strain, 3, organism: organism, contributor: nil)
 
     assert_difference('Organism.count', -1) do
       assert_difference('Strain.count', -3) do

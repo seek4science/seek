@@ -5,7 +5,7 @@ class SearchControllerTest < ActionController::TestCase
   include RelatedItemsHelper
 
   test 'can render search results' do
-    docs = FactoryGirl.create_list(:public_document, 3)
+    docs = FactoryBot.create_list(:public_document, 3)
 
     Document.stub(:solr_cache, -> (q) { Document.pluck(:id).last(3) }) do
       get :index, params: { q: 'test' }
@@ -21,7 +21,7 @@ class SearchControllerTest < ActionController::TestCase
   end
 
   test 'search result order retained' do
-    FactoryGirl.create_list(:public_document, 3)
+    FactoryBot.create_list(:public_document, 3)
     order = [Document.last, Document.third_to_last, Document.second_to_last]
     Document.stub(:solr_cache, -> (q) { order.collect { |d| d.id.to_s } }) do
       get :index, params: { q: 'test' }
@@ -35,7 +35,7 @@ class SearchControllerTest < ActionController::TestCase
   end
 
   test 'can limit rendered search results' do
-    FactoryGirl.create_list(:public_document, 3)
+    FactoryBot.create_list(:public_document, 3)
 
     with_config_value(:search_results_limit, 1) do
       Document.stub(:solr_cache, -> (q) { Document.pluck(:id).last(3) }) do
@@ -48,7 +48,7 @@ class SearchControllerTest < ActionController::TestCase
   end
 
   test 'advanced search and filtering link' do
-    FactoryGirl.create_list(:public_document, 3)
+    FactoryBot.create_list(:public_document, 3)
 
     Document.stub(:solr_cache, -> (q) { Document.pluck(:id).last(3) }) do
       get :index, params: { q: 'test' }
@@ -58,7 +58,7 @@ class SearchControllerTest < ActionController::TestCase
   end
 
   test 'can render external search results' do
-    FactoryGirl.create_list(:model, 3, policy: Factory(:public_policy))
+    FactoryBot.create_list(:model, 3, policy: Factory(:public_policy))
 
     VCR.use_cassette('biomodels/search') do
       with_config_value(:external_search_enabled, true) do
@@ -77,8 +77,8 @@ class SearchControllerTest < ActionController::TestCase
   end
 
   test 'can render search results as valid JSON-API collection' do
-    sops = FactoryGirl.create_list(:public_sop, 2)
-    docs = FactoryGirl.create_list(:public_document, 3)
+    sops = FactoryBot.create_list(:public_sop, 2)
+    docs = FactoryBot.create_list(:public_document, 3)
 
     Document.stub(:solr_cache, -> (q) { docs.map(&:id) }) do
       Sop.stub(:solr_cache, -> (q) { sops.map(&:id) }) do
@@ -99,7 +99,7 @@ class SearchControllerTest < ActionController::TestCase
   end
 
   test 'limit does not apply to JSON search response' do
-    sops = FactoryGirl.create_list(:public_sop, 10)
+    sops = FactoryBot.create_list(:public_sop, 10)
 
     with_config_value(:search_results_limit, 1) do
       Sop.stub(:solr_cache, -> (q) { sops.map(&:id) }) do
@@ -126,7 +126,7 @@ class SearchControllerTest < ActionController::TestCase
   end
 
   test 'HTML in search term is escaped' do
-    FactoryGirl.create_list(:public_document, 1)
+    FactoryBot.create_list(:public_document, 1)
 
     Document.stub(:solr_cache, -> (q) { Document.pluck(:id).last(1) }) do
       get :index, params: { q: '<a id="xss123" href="#test-123">test</a>' }

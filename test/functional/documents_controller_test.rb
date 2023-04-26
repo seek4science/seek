@@ -21,7 +21,7 @@ class DocumentsControllerTest < ActionController::TestCase
   end
 
   test 'should get index' do
-    FactoryGirl.create_list(:public_document, 3)
+    FactoryBot.create_list(:public_document, 3)
 
     get :index
 
@@ -490,7 +490,7 @@ class DocumentsControllerTest < ActionController::TestCase
   end
 
   test 'numeric pagination' do
-    FactoryGirl.create_list(:public_document, 20)
+    FactoryBot.create_list(:public_document, 20)
 
     with_config_value(:results_per_page_default, 5) do
       get :index
@@ -514,7 +514,7 @@ class DocumentsControllerTest < ActionController::TestCase
   end
 
   test 'user can change results per page' do
-    FactoryGirl.create_list(:public_document, 15)
+    FactoryBot.create_list(:public_document, 15)
 
     with_config_value(:results_per_page_default, 5) do
       get :index, params: { per_page: 15 }
@@ -555,7 +555,7 @@ class DocumentsControllerTest < ActionController::TestCase
     old_project_doc = Factory(:public_document, created_at: 10.years.ago, projects: [project])
     other_project = Factory(:project)
     other_project_doc = Factory(:public_document, created_at: 3.days.ago, projects: [other_project])
-    FactoryGirl.create_list(:public_document, 5, projects: [project])
+    FactoryBot.create_list(:public_document, 5, projects: [project])
 
     get :index
 
@@ -616,7 +616,7 @@ class DocumentsControllerTest < ActionController::TestCase
     old_project_doc = Factory(:public_document, created_at: 10.years.ago, projects: [project])
     other_project = Factory(:project, programme: programme)
     other_project_doc = Factory(:public_document, created_at: 3.days.ago, projects: [other_project])
-    FactoryGirl.create_list(:public_document, 5, projects: [project])
+    FactoryBot.create_list(:public_document, 5, projects: [project])
 
     get :index, params: { filter: { programme: programme.id, project: other_project.id } }
 
@@ -682,7 +682,7 @@ class DocumentsControllerTest < ActionController::TestCase
   test 'filtering system obeys authorization and does not leak info on private resources' do
     programme = Factory(:programme)
     project = Factory(:project, programme: programme)
-    FactoryGirl.create_list(:public_document, 3, projects: [project])
+    FactoryBot.create_list(:public_document, 3, projects: [project])
     private_document = Factory(:private_document, created_at: 2.years.ago, projects: [project])
     private_document.annotate_with('awkward&id=1unsafe[]tag !', 'tag', private_document.contributor)
     disable_authorization_checks { private_document.save! }
@@ -739,7 +739,7 @@ class DocumentsControllerTest < ActionController::TestCase
   test 'filtering with search terms' do
     programme = Factory(:programme)
     project = Factory(:project, programme: programme)
-    FactoryGirl.create_list(:public_document, 3, projects: [project])
+    FactoryBot.create_list(:public_document, 3, projects: [project])
 
     get :index, params: { filter: { programme: programme.id, query: 'hello' } }
 
@@ -772,12 +772,12 @@ class DocumentsControllerTest < ActionController::TestCase
   test 'filtering by creation date' do
     programme = Factory(:programme)
     project = Factory(:project, programme: programme)
-    FactoryGirl.create_list(:public_document, 1, projects: [project], created_at: 1.hour.ago)
-    FactoryGirl.create_list(:public_document, 2, projects: [project], created_at: 2.days.ago) # 3
-    FactoryGirl.create_list(:public_document, 3, projects: [project], created_at: 2.weeks.ago) # 6
-    FactoryGirl.create_list(:public_document, 4, projects: [project], created_at: 2.months.ago) # 10
-    FactoryGirl.create_list(:public_document, 5, projects: [project], created_at: 2.years.ago) # 15
-    FactoryGirl.create_list(:public_document, 6, projects: [project], created_at: 10.years.ago) # 21
+    FactoryBot.create_list(:public_document, 1, projects: [project], created_at: 1.hour.ago)
+    FactoryBot.create_list(:public_document, 2, projects: [project], created_at: 2.days.ago) # 3
+    FactoryBot.create_list(:public_document, 3, projects: [project], created_at: 2.weeks.ago) # 6
+    FactoryBot.create_list(:public_document, 4, projects: [project], created_at: 2.months.ago) # 10
+    FactoryBot.create_list(:public_document, 5, projects: [project], created_at: 2.years.ago) # 15
+    FactoryBot.create_list(:public_document, 6, projects: [project], created_at: 10.years.ago) # 21
 
     # No creation date filter
     get :index, params: { filter: { programme: programme.id } }

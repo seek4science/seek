@@ -561,7 +561,7 @@ class ProjectTest < ActiveSupport::TestCase
     assert_empty project.people
     assert project.can_delete?(user)
     Factory(:investigation, projects:[project])
-    project.work_groups.clear # FactoryGirl - with_project_contributor automatically adds the contributor to the project
+    project.work_groups.clear # FactoryBot - with_project_contributor automatically adds the contributor to the project
     project.reload
     assert_empty project.people
     refute_empty project.investigations

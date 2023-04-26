@@ -347,7 +347,7 @@ class SampleTypesControllerTest < ActionController::TestCase
   end
 
   test 'should not destroy sample_type if has existing samples' do
-    FactoryGirl.create_list(:sample, 3, sample_type: @sample_type)
+    FactoryBot.create_list(:sample, 3, sample_type: @sample_type)
 
     refute @sample_type.can_delete?
 

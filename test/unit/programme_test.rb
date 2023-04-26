@@ -423,7 +423,7 @@ class ProgrammeTest < ActiveSupport::TestCase
   end
 
   test 'related items' do
-    projects = FactoryGirl.create_list(:project, 3)
+    projects = FactoryBot.create_list(:project, 3)
     programme = Factory(:programme, projects: projects)
 
 

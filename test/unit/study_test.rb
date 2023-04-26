@@ -21,7 +21,7 @@ class StudyTest < ActiveSupport::TestCase
 
   test 'to_rdf' do
     object = Factory(:study, description: 'My famous study')
-    FactoryGirl.create_list(:assay, 2, contributor: object.contributor, study: object)
+    FactoryBot.create_list(:assay, 2, contributor: object.contributor, study: object)
     rdf = object.to_rdf
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count > 1

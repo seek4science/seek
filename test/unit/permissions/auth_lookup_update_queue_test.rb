@@ -312,7 +312,7 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
       assert_equal [df3, df, user, df2], items, "should be ordered by priority, type, then ID"
     end
 
-    FactoryGirl.create_list(:document, 10)
+    FactoryBot.create_list(:document, 10)
     with_config_value(:auth_lookup_update_batch_size, 6) do
       assert_equal 6, Seek::Config.auth_lookup_update_batch_size
       assert_difference('AuthLookupUpdateQueue.count', -Seek::Config.auth_lookup_update_batch_size,

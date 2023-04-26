@@ -158,7 +158,7 @@ class DataDumpTest < ActiveSupport::TestCase
 
   def create_workflow_dump
     Workflow.delete_all
-    @workflows = FactoryGirl.create_list(:public_workflow, 3)
+    @workflows = FactoryBot.create_list(:public_workflow, 3)
     @private_workflows = [Factory(:workflow, policy: Factory(:private_policy)),
                           Factory(:workflow, policy: Factory(:all_sysmo_viewable_policy))]
 
