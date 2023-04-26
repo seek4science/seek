@@ -118,6 +118,26 @@ namespace :seek_dev do
     end.results
     puts "#{r.size} results - #{r.collect(&:title).join(', ')}"
 
+    puts "all samples where title contains test for project 1 and sample 1"
+    r = Sample.search do
+      fulltext 'test', fields: :title
+      all_of do
+        with(:project_ids, 1)
+        with(:sample_type_id, 1)
+      end
+    end.results
+    puts "#{r.size} results - #{r.collect(&:title).join(', ')}"
+
+    puts "all samples where title contains test for project 1 or sample 1"
+    r = Sample.search do
+      fulltext 'test', fields: :title
+      any_of do
+        with(:project_ids, 1)
+        with(:sample_type_id, 1)
+      end
+    end.results
+    puts "#{r.size} results - #{r.collect(&:title).join(', ')}"
+
 
   end
 
