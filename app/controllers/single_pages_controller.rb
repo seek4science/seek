@@ -13,7 +13,6 @@ class SinglePagesController < ApplicationController
   def show
     @project = Project.find(params[:id])
     @folders = project_folders
-
     respond_to do |format|
       format.html
     end
@@ -58,6 +57,40 @@ class SinglePagesController < ApplicationController
       flash[:error] = e.message
       format.html { redirect_to single_page_path(Project.find(params[:id])) }
     end
+  end
+
+  def download_samples_excel
+    render xlsx: 'download_samples_excel', filename: 'samples_table.xlsx', disposition: 'inline',
+           locals: { samples: @@samples, study: @@study, sample_type: @@sample_type, cv_list: @@sa_cv_terms, template: @@template }
+  end
+
+  def export_to_excel
+    @@samples = Sample.where(id: JSON.parse(params[:source_sample_data]).map { |sample| sample['FAIRDOM-SEEK id'] })
+    @@sample_type = SampleType.find(JSON.parse(params[:sample_type_id]))
+    sample_attributes = @@sample_type.sample_attributes.map do |sa|
+      if (sa.sample_controlled_vocab_id.nil?)
+        { sa.title => nil }
+      else
+        { sa.title => sa.sample_controlled_vocab_id }
+      end
+    end
+
+    @@sa_cv_terms =[{"name" => "id", "has_cv" => false, "data" => nil}, {"name" => "uuid", "has_cv" => false, "data" => nil}]
+
+    sample_attributes.map do |sa_cv|
+      sa_cv.map do |title, id|
+        if id.nil?
+          @@sa_cv_terms.push({ "name" => title, "has_cv" => false, "data" => nil})
+        else
+          sa_terms = SampleControlledVocabTerm.where(sample_controlled_vocab_id: id).map { |sa_cv_term| sa_cv_term.label }
+          @@sa_cv_terms.push({ "name" => title, "has_cv" => true, "data" => sa_terms})
+        end
+      end
+
+    end
+    @@template = Template.find(@@sample_type.template_id)
+    @@study = Study.find(JSON.parse(params[:study_id]))
+
   end
 
   private

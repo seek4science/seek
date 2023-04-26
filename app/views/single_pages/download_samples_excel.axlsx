@@ -1,4 +1,15 @@
 require 'caxlsx'
+require 'uuid'
+
+#####################################
+debug = false
+#####################################
+
+if debug
+    secret_pwd = 'florakevinrafael'
+else
+    secret_pwd = UUID.new.generate
+end
 
 workbook = xlsx_package.workbook
 # Prevents formula injections
@@ -11,6 +22,8 @@ sample_data = samples.map do |sample|
 end
 
 # Colors
+# TODO: Make the colors depend on the type of branding instead of hard-coded colors
+# REQUIREMENT: branding configuration in seek
 datahub_blue = '486273'
 datahub_yellow = 'F2b035'
 
@@ -29,10 +42,14 @@ workbook.add_worksheet(name: 'Metadata') do |sheet|
   sheet.add_row ['UUID:', study.uuid]
 
   sheet.add_row ['Sample Type:'], style: title_style
-  sheet.add_row ['Fairdom ID:', sampletype.id]
-  sheet.add_row ['UUID:', sampletype.uuid]
+  sheet.add_row ['Fairdom ID:', sample_type.id]
+  sheet.add_row ['UUID:', sample_type.uuid]
 
-  sheet.sheet_protection.password = 'florakevinrafael'
+  sheet.add_row ['Template:'], style: title_style
+  sheet.add_row ['Fairdom ID:', template.id]
+  sheet.add_row ['UUID:', template.uuid]
+
+  sheet.sheet_protection.password = secret_pwd
 end
 
 # CV / Ontologies sheet
@@ -50,7 +67,7 @@ def transposed_filled_arrays(arrays)
 end
 
 ## Populate and protect CV / Ontologies sheet
-workbook.add_worksheet(name: 'cv_ontology') do |sheet|
+workbook.add_worksheet name: 'cv_ontology', state: :hidden do |sheet|
   rows = []
   cv_list.map do |cv|
     row = [cv['name']]
@@ -66,18 +83,27 @@ workbook.add_worksheet(name: 'cv_ontology') do |sheet|
   tfs_rows.map do |tfs_row|
     sheet.add_row tfs_row
   end
-  sheet.sheet_protection.password = 'florakevinrafael'
+  sheet.sheet_protection.password = secret_pwd
 end
 
 # Sample sheet
 workbook.add_worksheet(name: 'Samples') do |sheet|
+  ## Adding the header cells
   sheet.add_row sample_data[0].keys
+
+  ## populating the sheet with the data
   sample_data.each do |item|
     row = item.collect { |_key, val| val }
     sheet.add_row row, style: unlocked
   end
+
+  ## Adding extra empty rows so new samples can be added to the table
+  1000.times do
+    sheet.add_row Array::new(sample_data[0].keys.length), style: unlocked
+  end
+
   ## styling
-  sheet.col_style(0, locked)
+  [0,1].each {|col_index| sheet.col_style(col_index, locked)}
   sheet.row_style(0, title_style)
 
   ## filtering
@@ -85,17 +111,6 @@ workbook.add_worksheet(name: 'Samples') do |sheet|
 
   ## Data Validation
   # https://github.com/caxlsx/caxlsx/blob/master/examples/list_validation_example.md
-  # Example
-  # sheet.add_data_validation('B1:B1',
-  #                           type: :list,
-  #                           formula1: '"small, medium, large"',
-  #                           showErrorMessage: true,
-  #                           errorTitle: '',
-  #                           error: 'Allowed values: small, medium, large',
-  #                           errorStyle: 'information', # options here are: 'information', 'stop', 'warning'
-  #                           showInputMessage: true,
-  #                           promptTitle: '',
-  #                           prompt: 'Choose a size:')
   sample_size = sample_data.size
   attribute_size = sample_data[0].keys.size
   (3..attribute_size).map do |col_nr|
@@ -105,7 +120,7 @@ workbook.add_worksheet(name: 'Samples') do |sheet|
                               type: :list,
                               formula1: "'cv_ontology'!$#{col_ref}$2:$#{col_ref}$1000000",
                               showErrorMessage: true,
-                              errorTitle: 'STOP!!!!',
+                              errorTitle: 'Input Error!',
                               error: 'Please select one of the available options',
                               errorStyle: :information, # options here are: 'information', 'stop', 'warning'
                               showInputMessage: true,
@@ -114,7 +129,7 @@ workbook.add_worksheet(name: 'Samples') do |sheet|
   end
 
   ## Password protections Samples sheet
-  sheet.sheet_protection.password = 'florakevinrafael'
+  sheet.sheet_protection.password = secret_pwd
   sheet.sheet_protection.format_cells = false
   sheet.sheet_protection.format_columns = false
   sheet.sheet_protection.format_rows = false
@@ -123,3 +138,6 @@ workbook.add_worksheet(name: 'Samples') do |sheet|
   sheet.sheet_protection.delete_rows = false
   sheet.sheet_protection.sort = false
 end
+
+# TODO: Extra 'very hidden' sheet with identification attributes
+# This is necessary to ensure that the user uploads the same spreadsheet back to the UI and not a altered copy.

@@ -10,12 +10,12 @@
 </div>
 
 <%= render partial: 'isa_studies/buttons', locals:{ add_row: "SourceAddNewRow()", paste_cb:
-"SourcePasteFromClipboard()", delete: "SourceSetAsDeleted()", save: "SourceSave()", permissions: "loadBatchPermission('sourceDynamicTable',this)" } %> 
+"SourcePasteFromClipboard()", delete: "SourceSetAsDeleted()", save: "SourceSave()", permissions: "loadBatchPermission('sourceDynamicTable',this)" } %>
 
 <% if sample_type %>
     <script>
     // TODO: Load data in a separeta script tag and remove it after DT is loaded
-        var sourceDynamicTable 
+        var sourceDynamicTable
         let initialLoad = true;
         $j(document).ready(function () {
             $j('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
@@ -26,8 +26,8 @@
             const elem = $j("#btn_save_source")
             const options = {
                ajax:{
-									  url: dynamicTableDataPath,
-                    data: function(d) { 
+                    url: dynamicTableDataPath,
+                    data: function(d) {
                         if (initialLoad) {
                             initialLoad = false;
                             return;
@@ -69,6 +69,53 @@
         function SourceAddNewRow(){
             sourceDynamicTable.newRow()
         }
-																														
+
+        // This function is called when 'excel-export' btn is clicked.
+        // Posts the content of the dynamic table to the single_pages_controller,
+        // which generates an excel workbook based on a template.
+        function exportToExcel(){
+            const headerRow = $j("#source-material-table thead tr")[0];
+
+            // Cells from the table body => Each row = array
+            // For some reason they contain null values, which should be filtered out
+            let bodyCells = $j("#source-material-table").DataTable().data().toArray().map(subarray => subarray.filter(function(el){return el != null}));
+
+            // Return array of table header cells from headerRow
+            let headerCells = [];
+            $j.each(headerRow.cells, function (i, v) {
+                headerCells.push(v.innerText);
+            });
+
+            // Construct the 'struct' of the table data
+            let data = [];
+            for (let i = 0; i < bodyCells.length; i++) {
+                const row = bodyCells[i];
+                let obj = {};
+                for (let j = 0; j < headerCells.length; j++) {
+                    const attr = headerCells[j];
+                    if (attr === "") continue;
+                    obj[attr] = row[j];
+                }
+                data.push(obj);
+            }
+
+            // Use ajax for POST request with table data in the body
+            // If succes => Redirect to download path for retrieving excel file
+            $j.ajax({
+                type: 'POST',
+                url: '<%= export_to_excel_single_page_path() %>',
+                data: { source_sample_data: JSON.stringify(data),
+                        sample_type_id: JSON.stringify('<%=sample_type.id%>'),
+                        study_id: JSON.stringify('<%=sample_type.id%>'),
+                      },
+                success: function(response) {
+                    window.location.href = "<%= download_samples_excel_single_page_path() %>";
+                },
+                error: function(response) {
+                    alert(`Failed to export through excel!\nStatus: ${response.status}\nError: ${JSON.stringify(response.error().statusText)}`);
+                }
+            });
+
+        }
     </script>
 <% end %>
