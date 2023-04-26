@@ -23,8 +23,11 @@ class Sample < ApplicationRecord
         data.values
       end
 
+
+
       integer :linked_sample_ids, multiple: true
       integer :linking_sample_ids, multiple: true
+      integer :project_ids, multiple: true
 
       dynamic_string :data do
         h = {}
