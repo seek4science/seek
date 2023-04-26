@@ -1,19 +1,19 @@
 FactoryBot.define do
   # Person
   factory(:min_person, class: Person) do
-    email "minimal_person@email.com"
-    last_name "Minimal"
+    email { "minimal_person@email.com" }
+    last_name { "Minimal" }
   end
   
   factory(:max_person, class: Person) do
-    first_name "Maximilian"
-    last_name "Maxi-Mum"
-    description "A person with all possible details"
-    web_page "http://www.website.com"
-    orcid "https://orcid.org/0000-0001-9842-9718"
-    email "maximal_person@email.com"
-    phone "34-167-552266"
-    skype_name "myskypename"
+    first_name { "Maximilian" }
+    last_name { "Maxi-Mum" }
+    description { "A person with all possible details" }
+    web_page { "http://www.website.com" }
+    orcid { "https://orcid.org/0000-0001-9842-9718" }
+    email { "maximal_person@email.com" }
+    phone { "34-167-552266" }
+    skype_name { "myskypename" }
     association :user, factory: :activated_user, login: 'max_person_user'
     group_memberships { [Factory.build(:group_membership)] }
     avatar
@@ -38,7 +38,7 @@ FactoryBot.define do
   factory(:brand_new_person, class: Person) do
     sequence(:email) { |n| "test#{n}@test.com" }
     sequence(:first_name) { |n| "Person#{n}" }
-    last_name 'Last'
+    last_name { 'Last' }
   end
   
   factory(:person_in_project, parent: :brand_new_person) do
@@ -73,7 +73,7 @@ FactoryBot.define do
   end
   
   factory(:admin, parent: :person) do
-    is_admin true
+    is_admin { true }
   end
   
   factory(:pal, parent: :person) do
@@ -133,8 +133,8 @@ FactoryBot.define do
   end
   
   factory(:avatar) do
-    original_filename "#{Rails.root}/test/fixtures/files/file_picture.png"
-    image_file File.new("#{Rails.root}/test/fixtures/files/file_picture.png", 'rb')
+    original_filename { "#{Rails.root}/test/fixtures/files/file_picture.png" }
+    image_file { File.new("#{Rails.root}/test/fixtures/files/file_picture.png", 'rb') }
     association :owner, factory: :person
   end
 end

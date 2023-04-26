@@ -16,7 +16,7 @@ FactoryBot.define do
   end
   
   factory(:unfetched_remote_repository, class: Git::Repository) do
-    remote "https://github.com/seek4science/workflow-test-fixture.git"
+    remote { "https://github.com/seek4science/workflow-test-fixture.git" }
   end
   
   factory(:remote_repository, parent: :unfetched_remote_repository) do
@@ -35,7 +35,7 @@ FactoryBot.define do
     after_create do |r|
       FileUtils.cp_r(File.join(Rails.root, 'test', 'fixtures', 'git', 'galaxy-sort-change-case-remote', '_git', '.'), File.join(r.local_path, '.git'))
     end
-    remote "https://somewhere.internets/repo.git"
+    remote { "https://somewhere.internets/repo.git" }
   end
   
   factory(:nfcore_local_rocrate_repository, class: Git::Repository) do
@@ -48,9 +48,9 @@ FactoryBot.define do
   factory(:git_version, class: Git::Version) do
     git_repository { Factory(:local_repository) }
     resource { selgit_repository.resource }
-    name 'version 1.0.0'
-    ref 'refs/heads/master'
-    mutable true
+    name { 'version 1.0.0' }
+    ref { 'refs/heads/master' }
+    mutable { true }
     after_build do |v|
       v.contributor ||= v.resource.contributor
     end
@@ -62,10 +62,10 @@ FactoryBot.define do
   factory(:remote_git_version, parent: :git_version) do
     git_repository { Factory(:remote_repository) }
     resource { Factory(:workflow) }
-    name 'v0.01'
-    ref 'refs/tags/v0.01'
-    commit '3f2c23e92da3ccbc89d7893b4af6039e66bdaaaf'
-    mutable false
+    name { 'v0.01' }
+    ref { 'refs/tags/v0.01' }
+    commit { '3f2c23e92da3ccbc89d7893b4af6039e66bdaaaf' }
+    mutable { false }
   end
   
 end

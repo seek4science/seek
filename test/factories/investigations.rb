@@ -15,14 +15,14 @@ FactoryBot.define do
   
   factory(:min_investigation, class: Investigation) do
     with_project_contributor
-    title "A Minimal Investigation"
+    title { "A Minimal Investigation" }
   end
   
   factory(:max_investigation, parent: :min_investigation) do
     with_project_contributor
-    title "A Maximal Investigation"
-    other_creators "Max Blumenthal, Ed Snowden"
-    description "Investigation of the Human Genome"
+    title { "A Maximal Investigation" }
+    other_creators { "Max Blumenthal, Ed Snowden" }
+    description { "Investigation of the Human Genome" }
     discussion_links { [Factory.build(:discussion_link, label:'Slack')] }
     after_build do |i|
       i.studies = [Factory(:max_study, contributor: i.contributor, policy: Factory(:public_policy))]

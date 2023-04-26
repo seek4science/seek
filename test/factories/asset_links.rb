@@ -5,10 +5,10 @@ FactoryBot.define do
   end
 
   factory(:discussion_link, parent: :asset_link) do
-    link_type AssetLink::DISCUSSION
+    link_type { AssetLink::DISCUSSION }
   end
 
   factory(:misc_link, parent: :asset_link) do
-    link_type AssetLink::MISC_LINKS
+    link_type { AssetLink::MISC_LINKS }
   end
 end

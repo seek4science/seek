@@ -21,7 +21,7 @@ FactoryBot.define do
   
   factory(:min_data_file, class: DataFile) do
     with_project_contributor
-    title 'A Minimal DataFile'
+    title { 'A Minimal DataFile' }
     projects { [Factory(:min_project)] }
     after_create do |data_file|
       data_file.content_blob = Factory.create(:pdf_content_blob, asset: data_file, asset_version: data_file.version)
@@ -30,8 +30,8 @@ FactoryBot.define do
   
   factory(:max_data_file, class: DataFile) do
     with_project_contributor
-    title 'A Maximal DataFile'
-    description 'Results - Sampling conformations of ATP-Mg inside the binding pocket'
+    title { 'A Maximal DataFile' }
+    description { 'Results - Sampling conformations of ATP-Mg inside the binding pocket' }
     discussion_links { [Factory.build(:discussion_link, label:'Slack')] }
     assays { [Factory(:public_assay)] }
     events {[Factory.build(:event, policy: Factory(:public_policy))]}
@@ -53,7 +53,7 @@ FactoryBot.define do
       end
       data_file.save!
     end
-    other_creators 'Blogs, Joe'
+    other_creators { 'Blogs, Joe' }
     assets_creators { [AssetsCreator.new(affiliation: 'University of Somewhere', creator: Factory(:person, first_name: 'Some', last_name: 'One'))] }
   end
   

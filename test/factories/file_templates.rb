@@ -1,7 +1,7 @@
 FactoryBot.define do
   # File template
   factory(:file_template) do
-    title 'This FileTemplate'
+    title { 'This FileTemplate' }
     association :contributor, factory: :person
   
     after_build do |file_template|
@@ -30,7 +30,7 @@ FactoryBot.define do
   
   factory(:min_file_template, class: FileTemplate) do
     with_project_contributor
-    title 'A Minimal FileTemplate'
+    title { 'A Minimal FileTemplate' }
     policy { Factory(:downloadable_public_policy) }
     after_create do |ft|
       ft.content_blob = Factory.create(:min_content_blob, content_type: 'application/pdf',
@@ -40,8 +40,8 @@ FactoryBot.define do
   
   factory(:max_file_template, class: FileTemplate) do
     with_project_contributor
-    title 'A Maximal FileTemplate'
-    description 'The important report we did for ~important-milestone~'
+    title { 'A Maximal FileTemplate' }
+    description { 'The important report we did for ~important-milestone~' }
     discussion_links { [Factory.build(:discussion_link, label:'Slack')] }
     policy { Factory(:downloadable_public_policy) }
     assays { [Factory(:public_assay)] }
@@ -59,7 +59,7 @@ FactoryBot.define do
       end
       ft.save!
     end
-    other_creators 'Blogs, Joe'
+    other_creators { 'Blogs, Joe' }
     assets_creators { [AssetsCreator.new(affiliation: 'University of Somewhere', creator: Factory(:person, first_name: 'Some', last_name: 'One'))] }
   end
   

@@ -1,7 +1,7 @@
 FactoryBot.define do
   # Document
   factory(:document) do
-    title 'This Document'
+    title { 'This Document' }
     association :contributor, factory: :person
   
     after_build do |document|
@@ -30,7 +30,7 @@ FactoryBot.define do
   
   factory(:min_document, class: Document) do
     with_project_contributor
-    title 'A Minimal Document'
+    title { 'A Minimal Document' }
     policy { Factory(:downloadable_public_policy) }
     after_create do |document|
       document.content_blob = Factory.create(:min_content_blob, content_type: 'application/pdf',
@@ -40,8 +40,8 @@ FactoryBot.define do
   
   factory(:max_document, class: Document) do
     with_project_contributor
-    title 'A Maximal Document'
-    description 'The important report we did for ~important-milestone~'
+    title { 'A Maximal Document' }
+    description { 'The important report we did for ~important-milestone~' }
     discussion_links { [Factory.build(:discussion_link, label:'Slack')] }
     policy { Factory(:downloadable_public_policy) }
     assays { [Factory(:public_assay)] }
@@ -52,7 +52,7 @@ FactoryBot.define do
       document.annotate_with(['Document-tag1', 'Document-tag2', 'Document-tag3', 'Document-tag4', 'Document-tag5'], 'tag', document.contributor)
       document.save!
     end
-    other_creators 'Blogs, Joe'
+    other_creators { 'Blogs, Joe' }
     assets_creators { [AssetsCreator.new(affiliation: 'University of Somewhere', creator: Factory(:person, first_name: 'Some', last_name: 'One'))] }
   end
   

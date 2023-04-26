@@ -20,7 +20,7 @@ FactoryBot.define do
   
   factory(:min_model, class: Model) do
     with_project_contributor
-    title 'A Minimal Model'
+    title { 'A Minimal Model' }
     projects { [Factory(:min_project)] }
     after_create do |model|
       model.content_blobs = [Factory.create(:non_sbml_xml_content_blob, asset: model, asset_version: model.version)]
@@ -29,8 +29,8 @@ FactoryBot.define do
   
   factory(:max_model, class: Model) do
     with_project_contributor
-    title 'A Maximal Model'
-    description 'Hidden Markov Model'
+    title { 'A Maximal Model' }
+    description { 'Hidden Markov Model' }
     discussion_links { [Factory.build(:discussion_link, label:'Slack')] }
     assays { [Factory(:public_assay)] }
     relationships {[Factory(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: Factory(:publication))]}
@@ -46,7 +46,7 @@ FactoryBot.define do
       model.annotate_with(['Model-tag1', 'Model-tag2', 'Model-tag3', 'Model-tag4', 'Model-tag5'], 'tag', model.contributor)
       model.save!
     end
-    other_creators 'Blogs, Joe'
+    other_creators { 'Blogs, Joe' }
     assets_creators { [AssetsCreator.new(affiliation: 'University of Somewhere', creator: Factory(:person, first_name: 'Some', last_name: 'One'))] }
   end
   
@@ -77,15 +77,15 @@ FactoryBot.define do
   end
   
   factory(:model_image) do
-    original_filename 'file_picture.png'
-    image_file fixture_file_upload('file_picture.png', 'image/png')
-    content_type 'image/png'
+    original_filename { 'file_picture.png' }
+    image_file { fixture_file_upload('file_picture.png', 'image/png') }
+    content_type { 'image/png' }
   end
   
   factory(:cronwright_model, parent: :model) do
-    content_type 'text/xml'
+    content_type { 'text/xml' }
     association :content_blob, factory: :cronwright_model_content_blob
-    original_filename 'cronwright.xml'
+    original_filename { 'cronwright.xml' }
   end
   
   factory(:teusink_model, parent: :model) do

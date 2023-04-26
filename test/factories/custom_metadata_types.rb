@@ -1,34 +1,34 @@
 FactoryBot.define do
   factory(:age_custom_metadata_attribute,class:CustomMetadataAttribute) do
-    title 'age'
+    title { 'age' }
     association :sample_attribute_type, factory: :integer_sample_attribute_type
   end
   
   factory(:age_custom_metadata_attribute_with_description_and_label,class:CustomMetadataAttribute) do
-    title 'age'
+    title { 'age' }
     association :sample_attribute_type, factory: :integer_sample_attribute_type
-    description 'You need to enter age.'
-    label 'Biological age'
+    description { 'You need to enter age.' }
+    label { 'Biological age' }
   end
   
   factory(:name_custom_metadata_attribute,class:CustomMetadataAttribute) do
-    title 'name'
+    title { 'name' }
     association :sample_attribute_type, factory: :string_sample_attribute_type
   end
   
   factory(:datetime_custom_metadata_attribute,class:CustomMetadataAttribute) do
-    title 'date'
+    title { 'date' }
     association :sample_attribute_type, factory: :datetime_sample_attribute_type
   end
   
   factory(:cv_list_custom_metadata_attribute,class:CustomMetadataAttribute) do
-    title 'CVList'
+    title { 'CVList' }
     association :sample_attribute_type, factory: :datetime_sample_attribute_type
   end
   
   factory(:simple_investigation_custom_metadata_type,class: CustomMetadataType) do
-    title 'simple investigation custom metadata type'
-    supported_type 'Investigation'
+    title { 'simple investigation custom metadata type' }
+    supported_type { 'Investigation' }
     after_build do |a|
       a.custom_metadata_attributes << Factory(:age_custom_metadata_attribute)
       a.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, required: true)
@@ -37,8 +37,8 @@ FactoryBot.define do
   end
   
   factory(:simple_investigation_custom_metadata_type_with_description_and_label,class: CustomMetadataType) do
-    title 'simple investigation custom metadata type'
-    supported_type 'Investigation'
+    title { 'simple investigation custom metadata type' }
+    supported_type { 'Investigation' }
     after_build do |a|
       a.custom_metadata_attributes << Factory(:age_custom_metadata_attribute_with_description_and_label)
       a.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, required: true)
@@ -47,18 +47,18 @@ FactoryBot.define do
   end
   
   factory(:simple_study_custom_metadata_type, parent: :simple_investigation_custom_metadata_type) do
-    title 'simple study custom metadata type'
-    supported_type 'Study'
+    title { 'simple study custom metadata type' }
+    supported_type { 'Study' }
   end
   
   factory(:simple_assay_custom_metadata_type, parent: :simple_investigation_custom_metadata_type) do
-    title 'simple study custom metadata type'
-    supported_type 'Assay'
+    title { 'simple study custom metadata type' }
+    supported_type { 'Assay' }
   end
   
   factory(:study_custom_metadata_type_with_spaces, class: CustomMetadataType) do
-    title 'study custom metadata type with spaces'
-    supported_type 'Study'
+    title { 'study custom metadata type with spaces' }
+    supported_type { 'Study' }
     after_build do |a|
       a.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, title:'full name')
       a.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, title:'full address')
@@ -67,8 +67,8 @@ FactoryBot.define do
   
   
   factory(:study_custom_metadata_type_with_cv_and_cv_list_type, class: CustomMetadataType) do
-    title 'study custom metadata type with and list attributes'
-    supported_type 'Study'
+    title { 'study custom metadata type with and list attributes' }
+    supported_type { 'Study' }
     after_build do |a|
       a.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, title:'apple name')
       cv_list_attribute = CustomMetadataAttribute.new(title: 'apple list', sample_attribute_type: Factory(:cv_list_attribute_type),
@@ -81,8 +81,8 @@ FactoryBot.define do
   end
   
   factory(:study_custom_metadata_type_with_clashes, class: CustomMetadataType) do
-    title 'study custom metadata type with clashes'
-    supported_type 'Study'
+    title { 'study custom metadata type with clashes' }
+    supported_type { 'Study' }
     after_build do |a|
       a.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, title:'Full name')
       a.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, title:'full name')
@@ -91,8 +91,8 @@ FactoryBot.define do
   end
   
   factory(:study_custom_metadata_type_with_symbols, class: CustomMetadataType) do
-    title 'study custom metadata type with symbols'
-    supported_type 'Study'
+    title { 'study custom metadata type with symbols' }
+    supported_type { 'Study' }
     after_build do |a|
       a.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, title:'+name')
       a.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, title:'-name')
@@ -102,8 +102,8 @@ FactoryBot.define do
   end
   
   factory(:study_custom_metadata_type_for_MIAPPE, class: CustomMetadataType) do
-    title 'MIAPPE metadata'
-    supported_type 'Study'
+    title { 'MIAPPE metadata' }
+    supported_type { 'Study' }
     after_build do |a|
       a.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, title:'id')
       a.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, title:'study_start_date')
