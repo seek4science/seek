@@ -22,7 +22,7 @@ const objectInput =
 	"data-typeahead-query-url=%URL% /></td>";
 const typeaheadUrl = "<%= typeahead_samples_path %>" + "?query=%QUERY&linked_sample_type_id=%LINKED%";
 
-const handleSelect = (e) => { 
+const handleSelect = (e) => {
   $j(e).parents("table").DataTable().row(e.closest("tr")).data()[0] = e.is(":checked")
   if (!e.is(":checked")){
     // Hide DT Select all button
@@ -62,6 +62,7 @@ const handleSelect = (e) => {
 					if (c.multi_link) setTagsInput($j(td));
 					if (cellData == "#HIDDEN") $j(td).addClass("disabled");
 				};
+				// Changes the id header to an instance id
 				if (c.title == "id") c.title = instanceName + " id";
 			});
 			let multi_link_idx = columns.reduce((t, c, i) => (c.multi_link ? [...t, i + 1] : t), []);
@@ -72,7 +73,7 @@ const handleSelect = (e) => {
 			const columnDefs = [
 				{ orderable: false, targets: options.readonly ? [0] : [0, 1, 2] },
 				{
-					targets: options.readonly ? [0, ...multi_link_idx] : [1, 2],
+					targets: options.readonly ? [0, ...multi_link_idx] : [1],
 					visible: false,
 					searchable: false
 				}
@@ -92,25 +93,19 @@ const handleSelect = (e) => {
 				buttons: [
 					{
 						extend: "csvHtml5",
-						text: "Export table",
+						text: "csv",
 						exportOptions: {
 							// exclude checkbox column
 							columns: options.readonly ? [":visible:not(.text-center)"] : [2, ":visible:not(.text-center)"],
-              format: {
-								body: function (data) {
-									// Get data from tags-input
-									if (data.toString().includes("td")) {
-										data = JSON.parse($j(data).find("input").attr("data-existing-objects"))
-											.map((x) => x.name)
-											.join(",");
-									} else if (data.toString().includes("span")) {
-										data = data.replace('> <', '>,<').replace(/<[^>]+>/g, '')
-									}
-
-									return data;
-								}
-              }
 						}
+					},
+					{
+						extend: "copy",
+						text: "Copy to Clipboard",
+						exportOptions: {
+							// exclude checkbox column
+							columns: options.readonly ? [":visible:not(.text-center)"] : [2, ":visible:not(.text-center)"],
+						},
 					},
 					"colvis"
 				],
@@ -121,7 +116,10 @@ const handleSelect = (e) => {
 				const table = this.table;
 				const context = this;
 				this.table.on("click", "tbody td:not(:has(input))", function () {
-					editor($j(this), table, context);
+					// Makes all cells editable, except column 2 & 3 => Fairdom-seek ID + UUID
+					if (![2,3].includes(this._DT_CellIndex.column)) {
+						editor($j(this), table, context);
+					}
 				});
 			}
 			if (options.assayId) this.assayId = options.assayId;
@@ -342,7 +340,7 @@ const handleSelect = (e) => {
       $j(permissionBtn).prop("disabled", false)
       const indexes = getStatusIndexes(this.table.settings()[0].aoColumns);
 			this.table.rows(function (idx, data, node) {
-				if (data[0]) 
+				if (data[0])
 					indexes.forEach((x) => {
 						if (data[x] == rowStatus.new) {
               $j(permissionBtn).prop("disabled", true);
