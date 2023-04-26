@@ -36,6 +36,63 @@ namespace :seek_dev do
     puts output.read
   end
 
+  task(sample_queries: :environment) do
+    puts "all samples with chebi CHEBI:1324"
+    r = Sample.search do
+      dynamic :data do
+        with('chebi').equal_to('CHEBI:1324')
+      end
+    end.results
+    puts "#{r.size} results"
+
+    puts "all samples with chebi CHEBI:1324, sample_id 1"
+    r = Sample.search do
+      dynamic :data do
+        with('chebi').equal_to('CHEBI:1324')
+      end
+      with(:sample_type_id, 1)
+    end.results
+    puts "#{r.size} results - #{r.collect(&:title).join(', ')}"
+
+    puts "all samples with chebi CHEBI:1324, sample_id 2"
+    r = Sample.search do
+      dynamic :data do
+        with('chebi').equal_to('CHEBI:1324')
+      end
+      with(:sample_type_id, 2)
+    end.results
+    puts "#{r.size} results - #{r.collect(&:title).join(', ')}"
+
+    puts "all samples with name test1, sample_id 2"
+    r = Sample.search do
+      dynamic :data do
+        with('name').equal_to('test1')
+      end
+      with(:sample_type_id, 2)
+    end.results
+    puts "#{r.size} results - #{r.collect(&:title).join(', ')}"
+
+    puts "all samples linked to sample 1"
+    r = Sample.search do
+      with(:linked_sample_ids, 1)
+    end.results
+    puts "#{r.size} results - #{r.collect(&:title).join(', ')}"
+
+    puts "all samples that sample 2 link to"
+    r = Sample.search do
+      with(:linking_sample_ids, 2)
+    end.results
+    puts "#{r.size} results - #{r.collect(&:title).join(', ')}"
+
+    puts "all samples where title contains test"
+    r = Sample.search do
+      fulltext 'test', fields: :title
+    end.results
+    puts "#{r.size} results - #{r.collect(&:title).join(', ')}"
+
+
+  end
+
   task(:dump_controlled_vocab, [:id] => :environment) do |_t, args|
     vocab = SampleControlledVocab.find(args.id)
     json = { title: vocab.title, description: vocab.description, ols_root_term_uri: vocab.ols_root_term_uri,

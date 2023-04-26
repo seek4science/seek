@@ -3,18 +3,49 @@ class Sample < ApplicationRecord
   include Seek::BioSchema::Support
   include Seek::JSONMetadata::Serialization
 
+  BBB = [:uri, :chebi]
+
   if Seek::Config.solr_enabled
     searchable(auto_index: false) do
-      text :attribute_values do
-        attribute_values_for_search
-      end
+      # text :attribute_values do
+      #   attribute_values_for_search
+      # end
       text :sample_type do
         sample_type.title
       end
+      integer :sample_type_id
+
+      text :attribute_names do
+        data.keys
+      end
+
+      text :attribute_values do
+        data.values
+      end
+
+      integer :linked_sample_ids, multiple: true
+      integer :linking_sample_ids, multiple: true
+
+      dynamic_string :data do
+        h = {}
+        sample_type.sample_attributes.each do |attr|
+          h[attr.title.to_sym] = get_attribute_value(attr)
+        end
+        h
+      end
+
     end
   end
 
   acts_as_asset
+
+  def uri
+    get_attribute_value('uri')
+  end
+
+  def chebi
+    get_attribute_value('uri')
+  end
 
   validates :projects, presence: true, projects: { self: true }
 
