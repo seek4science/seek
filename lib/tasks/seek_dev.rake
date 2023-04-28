@@ -37,13 +37,16 @@ namespace :seek_dev do
   end
 
   task(sample_queries: :environment) do
+    puts "reindexing"
+    Sample.solr_reindex
+
     puts "all samples with chebi CHEBI:1324"
     r = Sample.search do
       dynamic :data do
         with('chebi').equal_to('CHEBI:1324')
       end
     end.results
-    puts "#{r.size} results"
+    puts "#{r.size} results - #{r.collect(&:title).join(', ')}"
 
     puts "all samples with chebi CHEBI:1324, sample_id 1"
     r = Sample.search do
@@ -134,6 +137,14 @@ namespace :seek_dev do
       any_of do
         with(:project_ids, 1)
         with(:sample_type_id, 1)
+      end
+    end.results
+    puts "#{r.size} results - #{r.collect(&:title).join(', ')}"
+
+    puts "all samples where edam topics contains Drug development"
+    r = Sample.search do
+      dynamic :data do
+        with('edam topics').equal_to('Drug development')
       end
     end.results
     puts "#{r.size} results - #{r.collect(&:title).join(', ')}"

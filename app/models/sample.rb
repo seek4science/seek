@@ -29,9 +29,10 @@ class Sample < ApplicationRecord
       integer :linking_sample_ids, multiple: true
       integer :project_ids, multiple: true
 
-      dynamic_string :data do
+      dynamic_string :data, multiple:true  do
         h = {}
         sample_type.sample_attributes.each do |attr|
+          next if attr.sample_attribute_type.seek_sample_multi?
           h[attr.title.to_sym] = get_attribute_value(attr)
         end
         h
