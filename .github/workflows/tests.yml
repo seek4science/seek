@@ -44,19 +44,19 @@ jobs:
           - mysql
         suite:
           - rails test test/unit
-#          - rails test test/functional
-#          - rails test test/integration
-#          - rspec spec
-#          # - rake teaspoon
-#          - rake assets:precompile
-#          - rake db:setup
-#          - rake db:migrate
-#          - rake seek:upgrade
-#        include:
-#          - database: postgres
-#            suite: rails test test/unit
-#          - database: sqlite3
-#            suite: rails test test/unit
+          - rails test test/functional
+          - rails test test/integration
+          - rspec spec
+          # - rake teaspoon
+          - rake assets:precompile
+          - rake db:setup
+          - rake db:migrate
+          - rake seek:upgrade
+        include:
+          - database: postgres
+            suite: rails test test/unit
+          - database: sqlite3
+            suite: rails test test/unit
     steps:
       - name: Install system dependencies
         run: |
