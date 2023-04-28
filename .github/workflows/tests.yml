@@ -64,7 +64,7 @@ jobs:
           sudo add-apt-repository ppa:deadsnakes/ppa
           sudo apt update
           sudo apt install -y graphicsmagick graphviz libcurl4-gnutls-dev libreoffice poppler-utils build-essential \
-            git imagemagick libgmp-dev
+            git imagemagick libgmp-dev python3.7-dev python3.7-distutils python3-pip
       - name: Checkout code
         uses: actions/checkout@v3
       - name: Setup Java
