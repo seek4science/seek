@@ -46,15 +46,17 @@ module SamplesHelper
 
 
   def linked_custom_metadata_form_field(attribute,resource,element_name, element_class,depth)
+    linked_cms = resource.linked_custom_metadatas.select{|cm|cm.custom_metadata_attribute==attribute}
 
-    id = resource.linked_custom_metadatas.blank? ? nil : resource.linked_custom_metadatas.select{|cm| cm.custom_metadata_type.id == attribute.linked_custom_metadata_type.id }.first.id
+    id = linked_cms.blank? ? nil : linked_cms.select{|cm| cm.custom_metadata_type.id == attribute.linked_custom_metadata_type.id}.first.id
 
     html = ''
     html +=  hidden_field_tag "#{element_name}[id]",id
     html +=  hidden_field_tag "#{element_name}[custom_metadata_type_id]", attribute.linked_custom_metadata_type.id
+    html +=  hidden_field_tag "#{element_name}[custom_metadata_attribute_id]", attribute.id
 
     attribute.linked_custom_metadata_type.custom_metadata_attributes.each do |attr|
-      linked_cm = resource.linked_custom_metadatas.select{|cm| cm.custom_metadata_type_id == attr.custom_metadata_type_id}.first
+      linked_cm = linked_cms.select{|cm| cm.custom_metadata_type_id == attr.custom_metadata_type_id}.first
       linked_cm ||= CustomMetadata.new(:custom_metadata_type_id => attr.custom_metadata_type_id)
 
       attr_element_name = "#{element_name}][data][#{attr.title}]"
@@ -149,7 +151,7 @@ module SamplesHelper
     html += '<ul>'
        CustomMetadata.find(value.id).custom_metadata_attributes.each do |attr|
        html += '<li>'
-       if data[attr.title].nil?
+       if attr.linked_custom_metadata?
          html += '<label>'+attr.title+'</label>'
          html += display_attribute(value,attr)
        else

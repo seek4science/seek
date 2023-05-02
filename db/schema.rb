@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_02_06_214438) do
+ActiveRecord::Schema.define(version: 2023_03_30_131838) do
 
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
@@ -369,6 +369,7 @@ ActiveRecord::Schema.define(version: 2023_02_06_214438) do
     t.string "item_type"
     t.bigint "item_id"
     t.bigint "custom_metadata_type_id"
+    t.integer "custom_metadata_attribute_id"
     t.index ["custom_metadata_type_id"], name: "index_custom_metadata_on_custom_metadata_type_id"
     t.index ["item_type", "item_id"], name: "index_custom_metadata_on_item_type_and_item_id"
   end

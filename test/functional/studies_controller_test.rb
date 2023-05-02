@@ -896,6 +896,7 @@ class StudiesControllerTest < ActionController::TestCase
             "role_phone":"0012345",
             "role_name": {
               custom_metadata_type_id:linked_cmt.id,
+              custom_metadata_attribute_id:cmt.attributes_with_linked_custom_metadata_type.first.id,
               data:{
                 "first_name":"alice",
                 "last_name": "liddell"
@@ -931,6 +932,7 @@ class StudiesControllerTest < ActionController::TestCase
                                                           "role_email":"rabbit@email.com",
                                                           "role_name":{
                                                             custom_metadata_type_id: linked_cmt.id,
+                                                            custom_metadata_attribute_id:cmt.attributes_with_linked_custom_metadata_type.first.id,
                                                             id: cm.linked_custom_metadatas.first.id,
                                                             data:{
                                                               "first_name":"rabbit"
@@ -948,9 +950,103 @@ class StudiesControllerTest < ActionController::TestCase
     assert_equal 'Alice Through the Looking Glass', new_study.title
     assert_equal 'rabbit@email.com', new_study.custom_metadata.get_attribute_value('role_email')
     assert_equal 'rabbit', new_study.custom_metadata.linked_custom_metadatas.first.get_attribute_value('first_name')
-
   end
 
+  test 'should create and update study which has multiple custom metadata attributes, which link to the same custom metadata type' do
+    cmt = Factory(:family_custom_metadata_type)
+    login_as(Factory(:person))
+    linked_cmts = cmt.attributes_with_linked_custom_metadata_type
+    assert_difference('Study.count') do
+      assert_difference('CustomMetadata.count',4) do
+        investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+        study_attributes = { title: 'Family', investigation_id: investigation.id }
+        cm_attributes = { custom_metadata_attributes: {
+          custom_metadata_type_id: cmt.id, data: {
+            "dad": {
+              custom_metadata_type_id:linked_cmts[0].linked_custom_metadata_type.id,
+              custom_metadata_attribute_id:linked_cmts[0].id,
+              data:{
+                "first_name":"john",
+                "last_name": "liddell"
+              }
+            },
+            "mom": {
+              custom_metadata_type_id:linked_cmts[1].linked_custom_metadata_type.id,
+              custom_metadata_attribute_id:linked_cmts[1].id,
+              data:{
+                "first_name":"lily",
+                "last_name": "liddell"
+              }
+            },
+            "child": {
+              custom_metadata_type_id:linked_cmts[2].linked_custom_metadata_type.id,
+              custom_metadata_attribute_id:linked_cmts[2].id,
+              data:{
+                "first_name":"alice",
+                "last_name": "liddell"
+              }
+            }
+          }
+        }
+        }
+        post :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
+      end
+    end
+
+    assert study = assigns(:study)
+    assert cm = study.custom_metadata
+    assert_equal cmt, cm.custom_metadata_type
+
+    assert_equal "john",cm.linked_custom_metadatas[0].get_attribute_value('first_name')
+    assert_equal "liddell",cm.linked_custom_metadatas[0].get_attribute_value('last_name')
+    assert_equal "lily",cm.linked_custom_metadatas[1].get_attribute_value('first_name')
+    assert_equal "alice",cm.linked_custom_metadatas[2].get_attribute_value('first_name')
+
+    # test show
+    get :show, params:{ id:study}
+    assert_response :success
+
+    # test update
+    assert_no_difference('Study.count') do
+      assert_no_difference('CustomMetadata.count') do
+        put :update, params: { id: study.id, study: { title: "Alice Through the Looking Glass",
+                                                      custom_metadata_attributes: {
+                                                        custom_metadata_type_id: cmt.id, id:cm.id, data: {
+                                                          "dad": {
+                                                            custom_metadata_type_id:linked_cmts[0].linked_custom_metadata_type.id,
+                                                            custom_metadata_attribute_id:linked_cmts[0].id,
+                                                            data:{
+                                                              "first_name":"tom",
+                                                              "last_name": "liddell"
+                                                            }
+                                                          },
+                                                          "child": {
+                                                            custom_metadata_type_id:linked_cmts[2].linked_custom_metadata_type.id,
+                                                            custom_metadata_attribute_id:linked_cmts[2].id,
+                                                            data:{
+                                                              "first_name":"rabbit",
+                                                              "last_name": "wonderland"
+                                                            }
+                                                          }
+                                                        }
+                                                      }
+        }
+        }
+      end
+    end
+    assert new_study = assigns(:study)
+    cm = new_study.custom_metadata
+
+    assert_equal "tom",cm.linked_custom_metadatas[0].get_attribute_value('first_name')
+    assert_equal "liddell",cm.linked_custom_metadatas[0].get_attribute_value('last_name')
+    assert_equal "lily",cm.linked_custom_metadatas[1].get_attribute_value('first_name')
+    assert_equal "liddell",cm.linked_custom_metadatas[1].get_attribute_value('last_name')
+    assert_equal "rabbit",cm.linked_custom_metadatas[2].get_attribute_value('first_name')
+    assert_equal "wonderland",cm.linked_custom_metadatas[2].get_attribute_value('last_name')
+
+
+
+  end
 
   test 'should create and update study with multiple linked custom metadata types' do
     cmt = Factory(:role_multiple_custom_metadata_type)
@@ -968,6 +1064,7 @@ class StudiesControllerTest < ActionController::TestCase
             "role_phone":"0012345",
             "role_name": {
               custom_metadata_type_id:linked_name_cmt.id,
+              custom_metadata_attribute_id:cmt.attributes_with_linked_custom_metadata_type.first.id,
               data:{
                 "first_name":"alice",
                 "last_name": "liddell"
@@ -975,6 +1072,7 @@ class StudiesControllerTest < ActionController::TestCase
             },
             "role_address": {
               custom_metadata_type_id:linked_addr_cmt.id,
+              custom_metadata_attribute_id:cmt.attributes_with_linked_custom_metadata_type.last.id,
               data:{
                 "street":"wonder",
                 "city": "land"
@@ -1011,6 +1109,7 @@ class StudiesControllerTest < ActionController::TestCase
                                                           "role_email":"rabbit@email.com",
                                                           "role_name":{
                                                             custom_metadata_type_id: linked_name_cmt.id,
+                                                            custom_metadata_attribute_id:cmt.attributes_with_linked_custom_metadata_type.first.id,
                                                             id: cm.linked_custom_metadatas.first.id,
                                                             data:{
                                                               "first_name":"rabbit"

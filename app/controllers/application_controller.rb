@@ -614,7 +614,7 @@ class ApplicationController < ActionController::Base
     if attribute_params && attribute_params[:custom_metadata_type_id].present?
       metadata_type = CustomMetadataType.find(attribute_params[:custom_metadata_type_id])
       if metadata_type
-        keys = [:custom_metadata_type_id,:id]
+        keys = [:custom_metadata_type_id,:id,:custom_metadata_attribute_id]
         cma= []
         metadata_type.custom_metadata_attributes.each do |attr|
           if attr.seek_cv_list?
