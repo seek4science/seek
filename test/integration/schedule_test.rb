@@ -13,21 +13,21 @@ class ScheduleTest < ActionDispatch::IntegrationTest
     weekly = pop_task(runners, "PeriodicSubscriptionEmailJob.new('weekly').queue_job")
     monthly = pop_task(runners, "PeriodicSubscriptionEmailJob.new('monthly').queue_job")
     assert daily
-    assert_equal [1.day], daily[:every]
+    assert_equal [1.day, { at: '12:00am' }], daily[:every]
     assert weekly
-    assert_equal [1.week], weekly[:every]
+    assert_equal [1.week, { at: '12:00am' }], weekly[:every]
     assert monthly
-    assert_equal [1.month], monthly[:every]
+    assert_equal [1.month, { at: '12:00am' }], monthly[:every]
 
-    # ContentBlob cleaner
-    cleaner = pop_task(runners, "RegularMaintenanceJob.perform_later")
-    assert cleaner
-    assert_equal [RegularMaintenanceJob::RUN_PERIOD], cleaner[:every]
+    # RegularMaintenanceJob
+    regular = pop_task(runners, "RegularMaintenanceJob.perform_later")
+    assert regular
+    assert_equal [RegularMaintenanceJob::RUN_PERIOD, { at: '1:00am' }], regular[:every]
 
     # LifeMonitor status
     lm_status = pop_task(runners, "LifeMonitorStatusJob.perform_later")
     assert lm_status
-    assert_equal [LifeMonitorStatusJob::PERIOD], lm_status[:every]
+    assert_equal [LifeMonitorStatusJob::PERIOD, { at: '2:00am' }], lm_status[:every]
 
     # Newsfeed refresh
     news_refresh = pop_task(runners, "NewsFeedRefreshJob.set(priority: 3).perform_later")
@@ -47,7 +47,7 @@ class ScheduleTest < ActionDispatch::IntegrationTest
     # Galaxy::ToolMap.instance.refresh
     tool_map_refresh = pop_task(runners, "Galaxy::ToolMap.instance.refresh")
     assert tool_map_refresh
-    assert_equal [1.day], tool_map_refresh[:every]
+    assert_equal [1.day, { at: '3:00am' }], tool_map_refresh[:every]
 
     assert_empty runners, "Found untested runner(s) in schedule"
   end
@@ -90,6 +90,36 @@ class ScheduleTest < ActionDispatch::IntegrationTest
       assert_equal [Seek::Config.home_feeds_cache_timeout.minutes], news_refresh[:every]
       assert_equal [731.minutes], news_refresh[:every]
     end
+  end
+
+  test 'should offset daily job runtime by configured amount' do
+    plus_43_schedule = nil
+    with_config_value(:regular_job_offset, 43) do
+      plus_43_schedule = Whenever::Test::Schedule.new(file: 'config/schedule.rb')
+    end
+    plus_43_runners = plus_43_schedule.jobs[:runner]
+
+    minus_237_schedule = nil
+    with_config_value(:regular_job_offset, -237) do
+      minus_237_schedule = Whenever::Test::Schedule.new(file: 'config/schedule.rb')
+    end
+    minus_237_runners = minus_237_schedule.jobs[:runner]
+
+    # For jobs that are not run daily, such as this one, which is run every 4 hours, only the minute offsets are applied.
+    assert_equal [RegularMaintenanceJob::RUN_PERIOD, { at: '1:43am' }],
+                 pop_task(plus_43_runners, "RegularMaintenanceJob.perform_later")[:every]
+    assert_equal [RegularMaintenanceJob::RUN_PERIOD, { at: '9:03pm' }],
+                 pop_task(minus_237_runners, "RegularMaintenanceJob.perform_later")[:every]
+
+    assert_equal [LifeMonitorStatusJob::PERIOD, { at: '2:43am' }],
+                 pop_task(plus_43_runners, "LifeMonitorStatusJob.perform_later")[:every]
+    assert_equal [LifeMonitorStatusJob::PERIOD, { at: '10:03pm' }],
+                 pop_task(minus_237_runners, "LifeMonitorStatusJob.perform_later")[:every]
+
+    assert_equal [1.day, { at: '3:43am' }],
+                 pop_task(plus_43_runners, "Galaxy::ToolMap.instance.refresh")[:every]
+    assert_equal [1.day, { at: '11:03pm' }],
+                 pop_task(minus_237_runners, "Galaxy::ToolMap.instance.refresh")[:every]
   end
 
   private
