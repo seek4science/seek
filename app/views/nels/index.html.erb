@@ -1,4 +1,7 @@
-<h1>NeLS Browser</h1>
+<h1>
+  <%= icon_tag('nels_logo') %>
+  NeLS Browser
+</h1>
 
 <p class='subtle'>
   Logged in as <%= @rest_client.user_info['name'] %>
@@ -7,7 +10,7 @@
 <%= render partial:'browser-overview' %>
 
 <div class="row">
-      <%= button_link_to('Open in NeLS', 'git_repository_search', 'https://test-fe.cbu.uib.no/nels-web/#/sbi-storage',options = {target:'blank'}) %>
+      <%= button_link_to('Open in NeLS', 'nels_logo_small', 'https://test-fe.cbu.uib.no/nels-web/#/sbi-storage',options = {target:'blank'}) %>
 </div>
 
 
