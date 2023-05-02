@@ -18,7 +18,7 @@ FactoryBot.define do
   end
   
   factory(:min_study, class: Study) do
-    title "A Minimal Study"
+    title { "A Minimal Study" }
     association :contributor, factory: :person
     after_build do |s|
       s.investigation ||= Factory(:min_investigation, contributor: s.contributor, policy: s.policy.try(:deep_copy))
@@ -26,11 +26,11 @@ FactoryBot.define do
   end
   
   factory(:max_study, parent: :min_study) do
-    title "A Maximal Study"
-    description "The Study of many things"
+    title { "A Maximal Study" }
+    description { "The Study of many things" }
     discussion_links { [Factory.build(:discussion_link, label:'Slack')] }
-    experimentalists "Wet lab people"
-    other_creators "Marie Curie"
+    experimentalists { "Wet lab people" }
+    other_creators { "Marie Curie" }
     after_build do |s|
       s.assays = [Factory(:max_assay, contributor: s.contributor, policy: Factory(:public_policy))]
     end

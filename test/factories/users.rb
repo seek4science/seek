@@ -3,8 +3,8 @@ FactoryBot.define do
   factory(:brand_new_user, class: User) do
     sequence(:login) { |n| "user#{n}" }
     test_password = generate_user_password
-    password test_password
-    password_confirmation test_password
+    password { test_password }
+    password_confirmation { test_password }
   end
   
   # activated_user mainly exists for :person to use in its association
@@ -26,10 +26,10 @@ FactoryBot.define do
   # OauthSession
   factory(:oauth_session) do
     association :user, factory: :user
-    provider 'Zenodo'
-    access_token '123'
-    refresh_token 'ref'
-    expires_at (Time.now + 1.hour)
+    provider { 'Zenodo' }
+    access_token { '123' }
+    refresh_token { 'ref' }
+    expires_at { (Time.now + 1.hour) }
   end
   
   factory(:sha1_pass_user, parent: :brand_new_user) do
@@ -42,13 +42,13 @@ FactoryBot.define do
   # Identity
   factory(:identity) do
     association :user, factory: :user
-    provider 'ldap'
+    provider { 'ldap' }
     sequence(:uid) { |n| "ldap-user-#{n}" }
   end
   
   # ApiToken
   factory(:api_token) do
-    title 'Test API token'
+    title { 'Test API token' }
     association :user, factory: :user
   end
 end

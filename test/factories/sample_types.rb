@@ -7,7 +7,7 @@ FactoryBot.define do
   end
   
   factory(:patient_sample_type, parent: :sample_type) do
-    title 'Patient data'
+    title { 'Patient data' }
     after_build do |type|
       # Not sure why i have to explicitly add the sample_type association
       type.sample_attributes << Factory.build(:sample_attribute, title: 'full name', sample_attribute_type: Factory(:full_name_sample_attribute_type), required: true, is_title: true, sample_type: type)
@@ -27,9 +27,9 @@ FactoryBot.define do
   end
   
   factory(:strain_sample_type, parent: :sample_type) do
-    title 'Strain type'
+    title { 'Strain type' }
     association :content_blob, factory: :strain_sample_data_content_blob
-    uploaded_template true
+    uploaded_template { true }
     after_build do |type|
       type.sample_attributes << Factory.build(:sample_attribute, template_column_index: 1, title: 'name', sample_attribute_type: Factory(:string_sample_attribute_type), required: true, is_title: true, sample_type: type)
       type.sample_attributes << Factory.build(:sample_attribute, template_column_index: 2, title: 'seekstrain', sample_attribute_type: Factory(:strain_sample_attribute_type), required: true, sample_type: type)
@@ -37,7 +37,7 @@ FactoryBot.define do
   end
   
   factory(:data_file_sample_type, parent: :sample_type) do
-    title 'DataFile type'
+    title { 'DataFile type' }
     after_build do |type|
       type.sample_attributes << Factory.build(:data_file_sample_attribute, title:'data file', is_title: true, sample_type:type)
     end
@@ -81,7 +81,7 @@ FactoryBot.define do
   end
   
   factory(:source_sample_type, parent: :sample_type) do
-    title 'Library'
+    title { 'Library' }
     after_build do |type|
       type.sample_attributes << Factory.build(:sample_attribute, title: 'title', sample_attribute_type: Factory(:string_sample_attribute_type), required: true, is_title: true, sample_type: type)
       type.sample_attributes << Factory.build(:sample_attribute, title: 'info', sample_attribute_type: Factory(:string_sample_attribute_type), required: false, sample_type: type)
@@ -105,15 +105,15 @@ FactoryBot.define do
   end
   
   factory(:min_sample_type, parent: :sample_type) do
-    title 'A Minimal SampleType'
+    title { 'A Minimal SampleType' }
     after_build do |type|
       type.sample_attributes << Factory.build(:sample_attribute, title: 'full_name', sample_attribute_type: Factory(:full_name_sample_attribute_type), required: true, is_title: true, sample_type: type)
     end
   end
   
   factory(:max_sample_type, parent: :sample_type) do
-    title 'A Maximal SampleType'
-    description 'A very new research'
+    title { 'A Maximal SampleType' }
+    description { 'A very new research' }
     assays { [Factory(:public_assay)] }
     after_build do |type|
       # Not sure why i have to explicitly add the sample_type association

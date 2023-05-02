@@ -21,7 +21,7 @@ FactoryBot.define do
   
   factory(:min_presentation, class: Presentation) do
     with_project_contributor
-    title 'A Minimal Presentation'
+    title { 'A Minimal Presentation' }
     after_create do |presentation|
       presentation.content_blob = Factory.create(:min_content_blob, original_filename: 'test.pdf', content_type: 'application/pdf', asset: presentation, asset_version: presentation.version)
     end
@@ -29,8 +29,8 @@ FactoryBot.define do
   
   factory(:max_presentation, class: Presentation) do
     with_project_contributor
-    title 'A Maximal Presentation'
-    description 'Non-equilibrium Free Energy Calculations and their caveats'
+    title { 'A Maximal Presentation' }
+    description { 'Non-equilibrium Free Energy Calculations and their caveats' }
     discussion_links { [Factory.build(:discussion_link, label:'Slack')] }
     assays { [Factory(:public_assay)] }
     events {[Factory.build(:event, policy: Factory(:public_policy))]}
@@ -41,7 +41,7 @@ FactoryBot.define do
       presentation.annotate_with(['Presentation-tag1', 'Presentation-tag2', 'Presentation-tag3', 'Presentation-tag4', 'Presentation-tag5'], 'tag', presentation.contributor)
       presentation.save!
     end
-    other_creators 'Blogs, Joe'
+    other_creators { 'Blogs, Joe' }
     assets_creators { [AssetsCreator.new(affiliation: 'University of Somewhere', creator: Factory(:person, first_name: 'Some', last_name: 'One'))] }
   end
   
@@ -88,7 +88,7 @@ FactoryBot.define do
   factory(:presentation_with_specified_project, class: Presentation) do
     projects { [Factory(:project, title: 'Specified Project')] }
     with_project_contributor
-    title 'Pres With Specified Project'
+    title { 'Pres With Specified Project' }
   end
   
   factory(:public_presentation, parent: :presentation) do

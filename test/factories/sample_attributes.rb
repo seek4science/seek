@@ -8,17 +8,17 @@ FactoryBot.define do
   # a string that must contain 'xxx'
   factory(:simple_string_sample_attribute, parent: :sample_attribute) do
     sample_attribute_type factory: :xxx_string_sample_attribute_type
-    required true
+    required { true }
   end
   
   factory(:any_string_sample_attribute, parent: :sample_attribute) do
     sample_attribute_type factory: :string_sample_attribute_type
-    required true
+    required { true }
   end
   
   factory(:data_file_sample_attribute, parent: :sample_attribute) do
     sample_attribute_type factory: :data_file_sample_attribute_type
-    required true
+    required { true }
   end
   
   factory(:sample_sample_attribute, parent: :sample_attribute) do
@@ -51,8 +51,8 @@ FactoryBot.define do
   
   factory(:string_sample_attribute_with_description_and_pid, parent: :sample_attribute) do
     sample_attribute_type factory: :string_sample_attribute_type
-    description "sample_attribute_description"
-    pid "sample_attribute:pid"
-    required true
+    description { "sample_attribute_description" }
+    pid { "sample_attribute:pid" }
+    required { true }
   end
 end

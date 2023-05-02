@@ -8,7 +8,7 @@ FactoryBot.define do
   end
   
   factory(:min_strain, class: Strain) do
-    title 'A Minimal Strain'
+    title { 'A Minimal Strain' }
     association :organism, factory: :min_organism
     projects { [Factory(:min_project)] }
   end

@@ -7,25 +7,25 @@ FactoryBot.define do
   
   
   factory(:min_template, parent: :template) do
-    title 'A Minimal Template'
+    title { 'A Minimal Template' }
     after_build do |template|
       template.template_attributes << Factory.build(:template_attribute, title: 'full_name', sample_attribute_type: Factory(:full_name_sample_attribute_type), required: true, template: template)
     end
   end
   
   factory(:max_template, parent: :template) do
-    title 'A Maximal Template'
-    description 'A very new research'
-    group 'arrayexpress'
-    group_order 4
-    temporary_name '4_arrayexpress_library_construction'
-    version '1.2.0'
-    isa_config 'genome_seq_default_v2015-07-02'
-    isa_measurement_type 'transcription profiling'
-    isa_technology_type 'transcription profiling'
-    repo_schema_id 'transcription profiling'
-    organism 'any'
-    level 'assay'
+    title { 'A Maximal Template' }
+    description { 'A very new research' }
+    group { 'arrayexpress' }
+    group_order { 4 }
+    temporary_name { '4_arrayexpress_library_construction' }
+    version { '1.2.0' }
+    isa_config { 'genome_seq_default_v2015-07-02' }
+    isa_measurement_type { 'transcription profiling' }
+    isa_technology_type { 'transcription profiling' }
+    repo_schema_id { 'transcription profiling' }
+    organism { 'any' }
+    level { 'assay' }
   
     after_build do |template|
       template.template_attributes << Factory.build(:template_attribute, title: 'full_name', sample_attribute_type: Factory(:full_name_sample_attribute_type),
@@ -47,7 +47,7 @@ FactoryBot.define do
   end
   
   factory(:isa_source_template, parent: :template) do
-    title 'An ISA Source Template'
+    title { 'An ISA Source Template' }
     after_build do |template|
       template.template_attributes << Factory.build(:template_attribute, title: 'Source Name', sample_attribute_type: Factory(:string_sample_attribute_type), required: true, is_title: true)
       template.template_attributes << Factory.build(:template_attribute, title: 'Source Characteristic 1', sample_attribute_type: Factory(:string_sample_attribute_type), required: true)
@@ -57,7 +57,7 @@ FactoryBot.define do
   end
   
   factory(:isa_sample_collection_template, parent: :template) do
-    title 'An ISA Sample Collection Template'
+    title { 'An ISA Sample Collection Template' }
     after_build do |template|
       template.template_attributes << Factory.build(:template_attribute, title: 'Input', sample_attribute_type: Factory(:sample_multi_sample_attribute_type), required: true)
       template.template_attributes << Factory.build(:template_attribute, title: 'sample collection', sample_attribute_type: Factory(:string_sample_attribute_type), required: true)

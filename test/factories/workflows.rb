@@ -1,51 +1,51 @@
 FactoryBot.define do
   # Workflow Class
   factory(:cwl_workflow_class, class: WorkflowClass) do
-    title 'Common Workflow Language'
-    key 'cwl'
-    extractor 'CWL'
-    description 'Common Workflow Language'
-    alternate_name 'CWL'
-    identifier 'https://w3id.org/cwl/v1.0/'
-    url 'https://www.commonwl.org/'
+    title { 'Common Workflow Language' }
+    key { 'cwl' }
+    extractor { 'CWL' }
+    description { 'Common Workflow Language' }
+    alternate_name { 'CWL' }
+    identifier { 'https://w3id.org/cwl/v1.0/' }
+    url { 'https://www.commonwl.org/' }
   end
   
   factory(:galaxy_workflow_class, class: WorkflowClass) do
-    title 'Galaxy'
-    key 'galaxy'
-    extractor 'Galaxy'
-    description 'Galaxy'
-    identifier 'https://galaxyproject.org/'
-    url 'https://galaxyproject.org/'
+    title { 'Galaxy' }
+    key { 'galaxy' }
+    extractor { 'Galaxy' }
+    description { 'Galaxy' }
+    identifier { 'https://galaxyproject.org/' }
+    url { 'https://galaxyproject.org/' }
   end
   
   factory(:nextflow_workflow_class, class: WorkflowClass) do
-    title 'Nextflow'
-    key 'nextflow'
-    extractor 'Nextflow'
-    description 'Nextflow'
-    identifier 'https://www.nextflow.io/'
-    url 'https://www.nextflow.io/'
+    title { 'Nextflow' }
+    key { 'nextflow' }
+    extractor { 'Nextflow' }
+    description { 'Nextflow' }
+    identifier { 'https://www.nextflow.io/' }
+    url { 'https://www.nextflow.io/' }
   end
   
   factory(:knime_workflow_class, class: WorkflowClass) do
-    title 'KNIME'
-    key 'knime'
-    extractor 'KNIME'
-    description 'KNIME'
-    identifier 'https://www.knime.com/'
-    url 'https://www.knime.com/'
+    title { 'KNIME' }
+    key { 'knime' }
+    extractor { 'KNIME' }
+    description { 'KNIME' }
+    identifier { 'https://www.knime.com/' }
+    url { 'https://www.knime.com/' }
   end
   
   factory(:unextractable_workflow_class, class: WorkflowClass) do
-    title 'Mystery'
-    key 'Mystery'
-    description 'Mysterious'
+    title { 'Mystery' }
+    key { 'Mystery' }
+    description { 'Mysterious' }
   end
   
   factory(:jupyter_workflow_class, class: WorkflowClass) do
-    title 'Jupyter Notebook'
-    description 'Jupyter Notebook'
+    title { 'Jupyter Notebook' }
+    description { 'Jupyter Notebook' }
   end
   
   factory(:user_added_workflow_class, class: WorkflowClass) do
@@ -61,7 +61,7 @@ FactoryBot.define do
   
   # Workflow
   factory(:workflow) do
-    title 'This Workflow'
+    title { 'This Workflow' }
     with_project_contributor
     workflow_class { WorkflowClass.find_by_key('cwl') || Factory(:cwl_workflow_class) }
   
@@ -83,7 +83,7 @@ FactoryBot.define do
   
   factory(:min_workflow, class: Workflow) do
     with_project_contributor
-    title 'A Minimal Workflow'
+    title { 'A Minimal Workflow' }
     workflow_class { WorkflowClass.find_by_key('cwl') || Factory(:cwl_workflow_class) }
     projects { [Factory.build(:min_project)] }
     after_create do |workflow|
@@ -93,8 +93,8 @@ FactoryBot.define do
   
   factory(:max_workflow, class: Workflow) do
     with_project_contributor
-    title 'A Maximal Workflow'
-    description 'How to run a simulation in GROMACS'
+    title { 'A Maximal Workflow' }
+    description { 'How to run a simulation in GROMACS' }
     workflow_class { WorkflowClass.find_by_key('cwl') || Factory(:cwl_workflow_class) }
     assays { [Factory(:public_assay)] }
     relationships {[Factory(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: Factory(:publication))]}
@@ -113,7 +113,7 @@ FactoryBot.define do
       end
       workflow.save!
     end
-    other_creators 'Blogs, Joe'
+    other_creators { 'Blogs, Joe' }
     assets_creators { [AssetsCreator.new(affiliation: 'University of Somewhere', creator: Factory(:person, first_name: 'Some', last_name: 'One'))] }
   end
   
@@ -202,7 +202,7 @@ FactoryBot.define do
   end
   
   factory(:remote_git_workflow, class: Workflow) do
-    title 'Concat two files'
+    title { 'Concat two files' }
     with_project_contributor
     workflow_class { WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class) }
     git_version_attributes {
@@ -217,7 +217,7 @@ FactoryBot.define do
   end
   
   factory(:annotationless_local_git_workflow, class: Workflow) do
-    title 'Concat two files'
+    title { 'Concat two files' }
     with_project_contributor
     workflow_class { WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class) }
     git_version_attributes do
@@ -231,7 +231,7 @@ FactoryBot.define do
   end
   
   factory(:local_git_workflow, class: Workflow) do
-    title 'Concat two files'
+    title { 'Concat two files' }
     with_project_contributor
     workflow_class { WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class) }
     git_version_attributes do
@@ -247,7 +247,7 @@ FactoryBot.define do
   end
   
   factory(:ro_crate_git_workflow, class: Workflow) do
-    title 'Sort and change case'
+    title { 'Sort and change case' }
     with_project_contributor
     workflow_class { WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class) }
     git_version_attributes do
@@ -262,7 +262,7 @@ FactoryBot.define do
   end
   
   factory(:local_ro_crate_git_workflow, class: Workflow) do
-    title 'Sort and change case'
+    title { 'Sort and change case' }
     with_project_contributor
     workflow_class { WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class) }
     git_version_attributes do
@@ -277,7 +277,7 @@ FactoryBot.define do
   end
   
   factory(:local_ro_crate_git_workflow_with_tests, class: Workflow) do
-    title 'Sort and change case'
+    title { 'Sort and change case' }
     with_project_contributor
     workflow_class { WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class) }
     git_version_attributes do
@@ -292,7 +292,7 @@ FactoryBot.define do
   end
   
   factory(:nfcore_git_workflow, class: Workflow) do
-    title 'nf-core/rnaseq'
+    title { 'nf-core/rnaseq' }
     with_project_contributor
     workflow_class { WorkflowClass.find_by_key('nextflow') || Factory(:nextflow_workflow_class) }
     git_version_attributes do
@@ -307,7 +307,7 @@ FactoryBot.define do
   end
   
   factory(:empty_git_workflow, class: Workflow) do
-    title 'Empty Workflow'
+    title { 'Empty Workflow' }
     with_project_contributor
     git_version_attributes do
       repo = Factory(:blank_repository)
@@ -316,12 +316,12 @@ FactoryBot.define do
   end
   
   factory(:test_data_workflow_data_file_relationship, class: WorkflowDataFileRelationship) do
-    title 'Test data'
-    key 'test'
+    title { 'Test data' }
+    key { 'test' }
   end
   
   factory(:ro_crate_git_workflow_with_tests, class: Workflow) do
-    title 'Sort and change case'
+    title { 'Sort and change case' }
     with_project_contributor
     workflow_class { WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class) }
     git_version_attributes do

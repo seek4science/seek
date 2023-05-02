@@ -1,7 +1,7 @@
 FactoryBot.define do
   # Sop
   factory(:sop) do
-    title 'This Sop'
+    title { 'This Sop' }
     with_project_contributor
   
     after_create do |sop|
@@ -22,7 +22,7 @@ FactoryBot.define do
   
   factory(:min_sop, class: Sop) do
     with_project_contributor
-    title 'A Minimal Sop'
+    title { 'A Minimal Sop' }
     projects { [Factory(:min_project)] }
     after_create do |sop|
       sop.content_blob = Factory.create(:min_content_blob, content_type: 'application/pdf', asset: sop, asset_version: sop.version)
@@ -31,8 +31,8 @@ FactoryBot.define do
   
   factory(:max_sop, class: Sop) do
     with_project_contributor
-    title 'A Maximal Sop'
-    description 'How to run a simulation in GROMACS'
+    title { 'A Maximal Sop' }
+    description { 'How to run a simulation in GROMACS' }
     discussion_links { [Factory.build(:discussion_link, label:'Slack')] }
     projects { [Factory(:max_project)] }
     assays { [Factory(:public_assay)] }
@@ -43,7 +43,7 @@ FactoryBot.define do
       sop.annotate_with(['Sop-tag1', 'Sop-tag2', 'Sop-tag3', 'Sop-tag4', 'Sop-tag5'], 'tag', sop.contributor)
       sop.save!
     end
-    other_creators 'Blogs, Joe'
+    other_creators { 'Blogs, Joe' }
     assets_creators { [AssetsCreator.new(affiliation: 'University of Somewhere', creator: Factory(:person, first_name: 'Some', last_name: 'One'))] }
   end
   

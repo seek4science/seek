@@ -5,19 +5,19 @@ FactoryBot.define do
   end
   
   factory(:min_project, class: Project) do
-    title "A Minimal Project"
+    title { "A Minimal Project" }
   end
   
   factory(:max_project, class: Project) do
-    title "A Maximal Project"
-    description "A Taverna project"
+    title { "A Maximal Project" }
+    description { "A Taverna project" }
     discussion_links { [Factory.build(:discussion_link, label:'Slack')] }
-    web_page "http://www.taverna.org.uk"
-    wiki_page "http://www.mygrid.org.uk"
-    default_license "Other (Open)"
-    start_date "2010-01-01"
-    end_date "2014-06-21"
-    use_default_policy "true"
+    web_page { "http://www.taverna.org.uk" }
+    wiki_page { "http://www.mygrid.org.uk" }
+    default_license { "Other (Open)" }
+    start_date { "2010-01-01" }
+    end_date { "2014-06-21" }
+    use_default_policy { "true" }
     avatar
     programme
   
