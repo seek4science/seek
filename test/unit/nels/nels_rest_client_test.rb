@@ -44,9 +44,12 @@ class NelsRestClientTest < ActiveSupport::TestCase
       res = @rest_client.datasets(@project_id)
 
       assert_equal 2, res.count
+      refute res[0]['isLocked']
+      assert res[1]['isLocked']
       dataset = res.detect { |d| d['id'] == @dataset_id }
       assert_equal 'Illumina-sequencing-dataset', dataset['name']
       assert_equal 'Illumina_seq_data', dataset['type']
+
     end
   end
 
@@ -56,6 +59,7 @@ class NelsRestClientTest < ActiveSupport::TestCase
 
       assert_equal @dataset_id, res['id']
       assert_equal 2, res['subtypes'].count
+      assert res['isLocked']
       subtype = res['subtypes'].detect { |s| s['type'] == @subtype }
       assert_equal 0, subtype['size']
     end
