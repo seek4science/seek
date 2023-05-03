@@ -1,4 +1,5 @@
 require 'test_helper'
+
 class SinglePagesControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
 
@@ -18,11 +19,11 @@ class SinglePagesControllerTest < ActionController::TestCase
   test 'should hide inaccessible items in treeview' do
     project = Factory(:project)
     Factory(:investigation, contributor: @member.person, policy: Factory(:private_policy),
-                            projects: [project])
+            projects: [project])
 
     login_as(Factory(:user))
     inv_two = Factory(:investigation, contributor: User.current_user.person, policy: Factory(:private_policy),
-                                      projects: [project])
+                      projects: [project])
 
     controller = TreeviewBuilder.new project, nil
     result = controller.send(:build_tree_data)
@@ -40,6 +41,61 @@ class SinglePagesControllerTest < ActionController::TestCase
       get :export_isa, params: { id: project.id, investigation_id: investigation.id }
       assert_equal flash[:error], "The investigation cannot be found!"
       assert_redirected_to action: :show
+    end
+  end
+
+  test "genertates a valid export of source samples in single page" do
+    with_config_value(:project_single_page_enabled, true) do
+      # Generate the excel data
+      person = Factory(:person)
+      project = Factory(:project)
+      study = Factory(:study)
+      source_sample_type = Factory(:isa_source_sample_type,
+                                   contributor: person,
+                                   project_ids: [project.id],
+                                   isa_template: Template.find_by_title('ISA Source'),
+                                   studies: [study])
+
+      source_samples = (1..5).map do |n|
+        Factory(
+          :sample,
+          title: "sample_#{n}",
+          sample_type: source_sample_type,
+          project_ids: [project.id],
+          data: {
+            'Source Name': 'Source Name',
+            'Source Characteristic 1': 'Source Characteristic 1',
+            'Source Characteristic 2':
+              source_sample_type
+                .sample_attributes
+                .find_by_title('Source Characteristic 2')
+                .sample_controlled_vocab
+                .sample_controlled_vocab_terms
+                .first
+                .label
+          }
+        )
+      end
+
+      sample_ids = source_samples.map { |ss| { 'FAIRDOM-SEEK id' => ss.id } }
+      sample_type_id = source_sample_type.id
+      study_id = study.id
+
+      post_params = { :source_sample_data => sample_ids.to_json,
+                      :sample_type_id => sample_type_id.to_json,
+                      :study_id => study_id.to_json }
+
+      post :export_to_excel, params: post_params, xhr: true
+
+      assert_response :ok
+
+      response_body = JSON.parse(response.body)
+      assert response_body.key?("uuid"), msg="Response body is expected to have a 'uuid' key"
+      cache_uuid = response_body["uuid"]
+
+      get :download_samples_excel, params: { uuid: cache_uuid }
+      assert_response :ok
+
     end
   end
 end
