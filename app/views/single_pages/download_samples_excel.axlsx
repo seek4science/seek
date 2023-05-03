@@ -17,7 +17,7 @@ workbook = xlsx_package.workbook
 # Axlsx.escape_formulas = true
 
 # Get Sample data
-sample_data = samples.map do |sample|
+sample_data = @samples.map do |sample|
   { 'id': sample.id }.merge({ 'uuid': sample.uuid }, JSON.parse(sample[:json_metadata]))
 end
 
@@ -38,16 +38,16 @@ title_style = workbook.styles.add_style(bg_color: datahub_yellow,
 
 workbook.add_worksheet(name: 'Metadata') do |sheet|
   sheet.add_row ['Study:'], style: title_style
-  sheet.add_row ['Fairdom ID:', study.id]
-  sheet.add_row ['UUID:', study.uuid]
+  sheet.add_row ['Fairdom ID:', @study.id]
+  sheet.add_row ['UUID:', @study.uuid]
 
   sheet.add_row ['Sample Type:'], style: title_style
-  sheet.add_row ['Fairdom ID:', sample_type.id]
-  sheet.add_row ['UUID:', sample_type.uuid]
+  sheet.add_row ['Fairdom ID:', @sample_type.id]
+  sheet.add_row ['UUID:', @sample_type.uuid]
 
   sheet.add_row ['Template:'], style: title_style
-  sheet.add_row ['Fairdom ID:', template.id]
-  sheet.add_row ['UUID:', template.uuid]
+  sheet.add_row ['Fairdom ID:', @template.id]
+  sheet.add_row ['UUID:', @template.uuid]
 
   sheet.sheet_protection.password = secret_pwd
 end
@@ -69,7 +69,7 @@ end
 ## Populate and protect CV / Ontologies sheet
 workbook.add_worksheet name: 'cv_ontology', state: :hidden do |sheet|
   rows = []
-  cv_list.map do |cv|
+  @sa_cv_terms.map do |cv|
     row = [cv['name']]
 
     if cv['has_cv']
@@ -111,9 +111,12 @@ workbook.add_worksheet(name: 'Samples') do |sheet|
 
   ## Data Validation
   # https://github.com/caxlsx/caxlsx/blob/master/examples/list_validation_example.md
-  sample_size = sample_data.size
-  attribute_size = sample_data[0].keys.size
-  (3..attribute_size).map do |col_nr|
+  attribute_size = @sa_cv_terms.size - 1
+  (0..attribute_size).map do |col_nr|
+
+    # If the has_cv field is false, it should skip this iteration and not apply the data validation
+    next if @sa_cv_terms[col_nr]["has_cv"] == false
+
     col_ref = Axlsx.cell_r(col_nr, 1).gsub(/\d+/, '')
     dv_range = "#{col_ref}2:#{col_ref}1000000"
     sheet.add_data_validation(dv_range,
@@ -124,8 +127,8 @@ workbook.add_worksheet(name: 'Samples') do |sheet|
                               error: 'Please select one of the available options',
                               errorStyle: :information, # options here are: 'information', 'stop', 'warning'
                               showInputMessage: true,
-                              promptTitle: '',
-                              prompt: 'Choose a size:')
+                              promptTitle: @sa_cv_terms[col_nr]["name"],
+                              prompt: 'Choose a valid option:')
   end
 
   ## Password protections Samples sheet
