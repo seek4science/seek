@@ -1,4 +1,5 @@
 require 'isatab_converter'
+
 class SinglePagesController < ApplicationController
   include Seek::AssetsCommon
   include Seek::Sharing::SharingCommon
@@ -60,14 +61,18 @@ class SinglePagesController < ApplicationController
   end
 
   def download_samples_excel
-    render xlsx: 'download_samples_excel', filename: 'samples_table.xlsx', disposition: 'inline',
-           locals: { samples: @@samples, study: @@study, sample_type: @@sample_type, cv_list: @@sa_cv_terms, template: @@template }
-  end
 
-  def export_to_excel
-    @@samples = Sample.where(id: JSON.parse(params[:source_sample_data]).map { |sample| sample['FAIRDOM-SEEK id'] })
-    @@sample_type = SampleType.find(JSON.parse(params[:sample_type_id]))
-    sample_attributes = @@sample_type.sample_attributes.map do |sa|
+    sample_ids, sample_type_id, study_id = Rails.cache.read(params[:uuid]).values_at(:sample_ids, :sample_type_id,
+                                                                                     :study_id)
+
+    @study = Study.find(study_id)
+    @project = @study.projects.first
+    if sample_ids.nil? || sample_ids == [] || sample_type_id.nil?
+      raise "Nothing to export to Excel."
+    end
+    @samples = Sample.where(id: sample_ids)
+    @sample_type = SampleType.find(sample_type_id)
+    sample_attributes = @sample_type.sample_attributes.map do |sa|
       if (sa.sample_controlled_vocab_id.nil?)
         { sa.title => nil }
       else
@@ -75,22 +80,42 @@ class SinglePagesController < ApplicationController
       end
     end
 
-    @@sa_cv_terms =[{"name" => "id", "has_cv" => false, "data" => nil}, {"name" => "uuid", "has_cv" => false, "data" => nil}]
+    @sa_cv_terms = [{ "name" => "id", "has_cv" => false, "data" => nil },
+                    { "name" => "uuid", "has_cv" => false, "data" => nil }]
 
     sample_attributes.map do |sa_cv|
       sa_cv.map do |title, id|
         if id.nil?
-          @@sa_cv_terms.push({ "name" => title, "has_cv" => false, "data" => nil})
+          @sa_cv_terms.push({ "name" => title, "has_cv" => false, "data" => nil })
         else
-          sa_terms = SampleControlledVocabTerm.where(sample_controlled_vocab_id: id).map { |sa_cv_term| sa_cv_term.label }
-          @@sa_cv_terms.push({ "name" => title, "has_cv" => true, "data" => sa_terms})
+          sa_terms = SampleControlledVocabTerm.where(sample_controlled_vocab_id: id).map(&:label)
+          @sa_cv_terms.push({ "name" => title, "has_cv" => true, "data" => sa_terms })
         end
       end
-
     end
-    @@template = Template.find(@@sample_type.template_id)
-    @@study = Study.find(JSON.parse(params[:study_id]))
+    @template = Template.find(@sample_type.template_id)
 
+    render xlsx: 'download_samples_excel', filename: 'samples_table.xlsx', disposition: 'inline'
+  rescue StandardError => e
+    respond_to do |format|
+      flash[:error] = e.message
+      format.html { redirect_to single_page_path(@project.id) }
+    end
+  end
+
+  def export_to_excel
+    cache_uuid = UUID.new.generate
+
+    sample_ids = JSON.parse(params[:source_sample_data]).map { |sample| sample['FAIRDOM-SEEK id'] }
+    sample_type_id = JSON.parse(params[:sample_type_id])
+    study_id = JSON.parse(params[:study_id])
+
+    Rails.cache.write(cache_uuid, { "sample_ids": sample_ids, "sample_type_id": sample_type_id, "study_id": study_id },
+                      expires_in: 1.minute)
+
+    respond_to do |format|
+      format.json { render json: { uuid: cache_uuid } }
+    end
   end
 
   private
