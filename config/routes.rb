@@ -748,13 +748,13 @@ SEEK::Application.routes.draw do
     member do
       get :dynamic_table_data
       get :export_isa, action: :export_isa
-      post :export_to_excel, action: :export_to_excel
-      get :download_samples_excel, action: :download_samples_excel
     end
     collection do
       get :batch_sharing_permission_preview
       post :batch_change_permission_for_selected_items
       post :batch_sharing_permission_changed
+      post :export_to_excel, action: :export_to_excel
+      get :download_samples_excel, action: :download_samples_excel
     end
   end
 
