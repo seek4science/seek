@@ -25,6 +25,14 @@ module NelsHelper
     'glyphicon glyphicon-tag'
   end
 
+  def nels_locked_glyph
+    'glyphicon glyphicon-lock'
+  end
+
+  def nels_dataset_locked_icon
+    content_tag(:span, '', class: nels_locked_glyph).html_safe
+  end
+
   def show_nels_button_for_assay?(assay)
     Seek::Config.nels_enabled &&
       current_user && current_user.person && assay.can_edit? &&
