@@ -43,7 +43,7 @@ class WorkflowRepositoryBuilder
 
       gv.add_files(files)
       files.each do |path, _, url|
-        gv.git_annotations.build(path: path, key: 'remote_source', value: url) if url
+        gv.remote_source_annotations.build(path: path, value: url) if url
       end
 
       extractor = @workflow.extractor

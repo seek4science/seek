@@ -1,4 +1,4 @@
-# A class to represent a file with a git version. Holds refernces to the version, the git blob object from Rugged, and the path
+# A class to represent a file with a git version. Holds references to the version, the git blob object from Rugged, and the path
 # where the blob exists in the repository.
 module Git
   class Blob
@@ -7,6 +7,7 @@ module Git
 
     delegate_missing_to :@blob
     delegate :git_repository, :version, :git_base, to: :git_version
+    delegate :read, :rewind, to: :file
 
     attr_reader :git_version, :path
     alias_method :original_filename, :path
@@ -25,8 +26,8 @@ module Git
       git_version.remote_sources[path]
     end
 
-    def read
-      file_contents(as_text: true)
+    def file
+      @file ||= to_tempfile
     end
 
     def binread
@@ -70,7 +71,7 @@ module Git
     end
 
     def to_crate_entity(crate, type: ::ROCrate::File, properties: {})
-      type.new(crate, StringIO.new(file_contents), path).tap do |entity|
+      type.new(crate, self, path).tap do |entity|
         entity['url'] = url if url.present?
         entity['contentSize'] = size
         entity.properties = entity.raw_properties.merge(properties)
@@ -129,6 +130,16 @@ module Git
 
     def is_text?
       !binary?
+    end
+
+    private
+
+    def to_tempfile
+      f = Tempfile.new(path)
+      f.binmode if binary?
+      f << file_contents(as_text: !binary?)
+      f.rewind
+      f
     end
   end
 end

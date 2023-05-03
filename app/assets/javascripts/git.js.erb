@@ -143,8 +143,13 @@ $j(document).ready(function () {
         var modal = $j(this).parents('.modal');
         var input = modal.data('targetInput');
         var jstree = $j('.jstree', modal).jstree(true);
-        var node = jstree.get_node(jstree.get_selected());
-        input.val(node.data.path);
+        var selected = jstree.get_selected();
+        if (selected.length) {
+            var node = jstree.get_node(selected);
+            input.val(node.data.path);
+        } else {
+            input.val('');
+        }
         input.change();
         modal.modal('hide');
 

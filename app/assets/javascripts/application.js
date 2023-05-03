@@ -33,7 +33,6 @@
 //= require search
 //= require tooltips
 //= require sample_types
-//= require sample_attribute_type
 //= require controlled_vocabs
 //= require wizard_step
 //= require DataTables-1.11.3/jquery.dataTables

@@ -38,6 +38,8 @@ module Seek
       password =  smtp_settings 'password'
       smtp_hash['password'] = password
 
+      smtp_hash['enable_starttls_auto'] = false if smtp_hash['enable_starttls_auto'].nil?
+
       new_hash = {}
       smtp_hash.keys.each do |key|
         new_hash[key.to_sym] = smtp_hash[key]

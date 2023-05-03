@@ -73,8 +73,12 @@ class UserTest < ActiveSupport::TestCase
     refute u.valid?
     u.login = 'aa'
     refute u.valid?
-    u.login = 'zhsdfkhsdksdfh11'
+    u.login = 'aaa'
     assert u.valid?
+    u.login = 'z' * 120
+    assert u.valid?
+    u.login = 'z' * 121
+    refute u.valid?
   end
 
   def test_without_profile

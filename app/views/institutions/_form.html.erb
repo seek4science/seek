@@ -22,7 +22,7 @@
 
 <div class="form-group">
   <%= f.label :country -%>
-  <%= f.country_select :country, nil, { :include_blank => 'Please select...' }, :class=>"form-control" -%>
+  <%= f.country_select :country, { include_blank: 'Please select...' }, class: 'form-control' -%>
 </div>
 
 <%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @institution} -%>
