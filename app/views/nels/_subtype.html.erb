@@ -45,30 +45,7 @@ table, th, td {
 
 <%= render partial: 'upload_metadata_dialog' %>
 
-<table class="table table-hover table-bordered">
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Size</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @file_list.each_with_index do |file_item, index| %>
-      <% next if file_item['isFolder'] %>
-      <tr>
-        <td>
-            <%= file_type_icon_for_filename(file_item["name"]) %>
-            <%= file_item["name"] %>
-          </span>
-          <span style="float: right;">
-            <%= icon_link_to('', 'download','#',{ class:'nels-download-link','data-index':index }) %>
-          </span>
-        </td>
-        <td><%= number_to_human_size(file_item["size"]) %></td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
+<%= render partial: 'subtype_file_listing' %>
 
 <%= render partial: 'upload_file_dialog', locals:{button_id:'upload_file'} %>
 
@@ -76,22 +53,9 @@ table, th, td {
 
 <script type="text/javascript">
 
-  function updateFolderList(path){
-      $j('#nels-dataset').html('').spinner('add').show();
-      $j.ajax({ url: '<%= subtype_nels_path(:assay_id=>params[:assay_id]) -%>',
-          data: {
-              project_id: '<%= @project_id -%>',
-              dataset_id: '<%= @dataset['id'] -%>',
-              subtype: '<%= @subtype_name -%>',
-              path: path,
-          },
-          success: function (data) {
-              $j('#nels-dataset').html(data).spinner('remove');
-          }
-      });
-  }
-
   $j(document).ready(function () {
+
+
 
     sessionStorage.setItem('nels_folder_state','Folder 1/Folder 2')
 
@@ -99,11 +63,29 @@ table, th, td {
         $j('#register-nels-metadata').submit();
     })
 
-    $j('.nels-folder').click(function() {
-      updateFolderList($j(this).attr('path'));
-    });
+      $j('.nels-folder').click(function() {
+          const folder_path = $j(this).data('path');
+          const projectId = $j(this).data('project-id');
+          const datasetId = $j(this).data('dataset-id');
+          const subtype = $j(this).data('subtype');
+          $j('#nels-dataset').html('').spinner('add').show();
+          $j('#nels-content').hide();
 
-      $j('.nels-download-link').on('click', function () {
+          $j.ajax({ url: '<%= subtype_nels_path -%>',
+              data: {
+                  project_id: projectId,
+                  dataset_id: datasetId,
+                  subtype: subtype,
+                  path: folder_path,
+              },
+              success: function (data) {
+                  $j('#nels-dataset').html(data).spinner('remove');
+              }
+          });
+      });
+
+
+    $j('.nels-download-link').on('click', function () {
           var index = $j(this).data('index');
           var json = JSON.parse($j('#file-items-json').html());
           json = json[index];

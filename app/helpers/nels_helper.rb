@@ -33,6 +33,12 @@ module NelsHelper
     content_tag(:span, '', class: nels_locked_dataset_glyph).html_safe
   end
 
+
+
+  def nels_folder_icon
+    icon_tag('folder_avatar', size:48)
+  end
+
   def show_nels_button_for_assay?(assay)
     Seek::Config.nels_enabled &&
       current_user && current_user.person && assay.can_edit? &&
