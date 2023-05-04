@@ -20,9 +20,9 @@ const objectInput =
 	"<td><input data-role='seek-objectsinput' data-tags-limit='100' " +
 	"data-existing-objects='%EXISTING%' data-typeahead='true' " +
 	"data-typeahead-query-url=%URL% /></td>";
-const typeaheadUrl = "<%= typeahead_samples_path %>" + "?query=%QUERY&linked_sample_type_id=%LINKED%";
+const typeaheadUrl = "<%= typeahead_samples_path %>" + "?q=%QUERY&linked_sample_type_id=%LINKED%";
 
-const handleSelect = (e) => { 
+const handleSelect = (e) => {
   $j(e).parents("table").DataTable().row(e.closest("tr")).data()[0] = e.is(":checked")
   if (!e.is(":checked")){
     // Hide DT Select all button
