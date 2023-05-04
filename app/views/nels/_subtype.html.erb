@@ -12,7 +12,7 @@
 <p>
   <label>Associated Dataset:</label>
   <%= link_to(@dataset['name'], '#', {'data-role':'nels-tree-node-link', 'data-tree-node-id':"dataset#{@dataset['id']}"}) %>
-  <%= nels_dataset_locked_icon if @dataset['isLocked'] %>
+  <%= nels_locked_dataset_icon if @dataset['isLocked'] %>
 </p>
 
 <style>

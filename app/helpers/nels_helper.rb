@@ -25,12 +25,12 @@ module NelsHelper
     'glyphicon glyphicon-tag'
   end
 
-  def nels_locked_glyph
+  def nels_locked_dataset_glyph
     'glyphicon glyphicon-lock'
   end
 
-  def nels_dataset_locked_icon
-    content_tag(:span, '', class: nels_locked_glyph).html_safe
+  def nels_locked_dataset_icon
+    content_tag(:span, '', class: nels_locked_dataset_glyph).html_safe
   end
 
   def show_nels_button_for_assay?(assay)

@@ -34,15 +34,11 @@ module Nels
       end
 
       def datasets(project_id)
-        dss = perform("sbi/projects/#{project_id}/datasets", :get)
-        # dss[0]['isLocked'] = true
-        # dss
+        perform("sbi/projects/#{project_id}/datasets", :get)
       end
 
       def dataset(project_id, dataset_id)
-        ds = perform("sbi/projects/#{project_id}/datasets/#{dataset_id}", :get)
-        # ds['isLocked'] = true
-        # ds
+        perform("sbi/projects/#{project_id}/datasets/#{dataset_id}", :get)
       end
 
       def persistent_url(project_id, dataset_id, subtype)

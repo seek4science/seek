@@ -3,7 +3,7 @@
   <span class="<%= nels_dataset_glyph %>"/>
   &nbsp;
   Dataset: <%= @dataset['name'] -%>
-  <%= nels_dataset_locked_icon if @dataset['isLocked'] %>
+  <%= nels_locked_dataset_icon if @dataset['isLocked'] %>
   <br/>
   <small><%= @dataset['type'] -%></small>
 </h2>
@@ -31,7 +31,8 @@
   <% @dataset['subtypes'].each do |subtype| %>
       <li class="list-group-item">
         <%= link_to(subtype['type'], '#', {'data-role':'nels-tree-node-link', 'data-tree-node-id':"#{subtype['type']}#{@dataset['id']}"}) %> <span class="subtle">(<%= number_to_human_size(subtype['size']) %>)</span>
-        <%= button_link_to('Add metadata', 'add', nil, { id: "add_metadata_#{params[:project_id]}_#{params[:dataset_id]}_#{subtype['type']}", class:"add_metadata"} ) %>
+        <% disabled_reason = 'The Dataset is locked' if @dataset['isLocked'] %>
+        <%= button_link_to('Add metadata', 'add', nil, id: "add_metadata_#{params[:project_id]}_#{params[:dataset_id]}_#{subtype['type']}", class:"add_metadata", disabled_reason: disabled_reason ) %>
 
         <% if subtype["metadata"] %>
           <%= button_link_to('Download metadata', 'download', {:action => :get_metadata,
