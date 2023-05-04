@@ -115,7 +115,7 @@
                 url: '<%= export_to_excel_single_pages_path() %>',
                 data: { source_sample_data: JSON.stringify(data),
                         sample_type_id: JSON.stringify('<%=sample_type.id%>'),
-                        study_id: JSON.stringify('<%=sample_type.id%>'),
+                        study_id: JSON.stringify('<%=study.id%>'),
                       },
                 success: function(response) {
                     downloadUrl = `<%= download_samples_excel_single_pages_path() %>?uuid=${response.uuid}`;
