@@ -107,12 +107,14 @@ class NelsController < ApplicationController
 
   def download_file
     begin
+      root_path = "Storebioinfo/#{params[:project_name]}/#{params[:dataset_name]}/#{params[:subtype_name]}/"
+      path_in_subtype = params[:path].gsub(root_path,"").gsub(params[:filename],"")
       filename, path = @rest_client.download_file(params[:project_id].to_i, params[:dataset_id].to_i,
-                                                  params[:subtype_name], '', params[:filename])
+                                                  params[:subtype_name], path_in_subtype, params[:filename])
       respond_to do |format|
         format.json { render json:{filename: filename, file_path: path} }
       end
-    rescue RuntimeError => e
+    rescue RuntimeError, StandardError => e
       respond_to do |format|
         format.json { render json:{error: e.message, exception: e.class.name }, status: :internal_server_error }
       end

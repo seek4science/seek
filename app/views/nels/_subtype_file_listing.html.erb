@@ -6,7 +6,7 @@
   </tr>
   </thead>
   <tbody>
-  <% @file_list.sort_by{|f| f['isFolder'].class.name}.reverse.each_with_index do |file_item, index| %>
+  <% @file_list.each_with_index do |file_item, index| %>
     <%  if file_item['isFolder'] %>
       <tr>
         <td>

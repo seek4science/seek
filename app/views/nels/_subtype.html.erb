@@ -49,7 +49,7 @@ table, th, td {
 
 <%= render partial: 'upload_file_dialog', locals:{button_id:'upload_file'} %>
 
-<%= content_tag(:script, nels_file_details_json(@file_list, @subtype_name).to_json.html_safe, type: 'application/json', id: 'file-items-json') %>
+<%= content_tag(:script, nels_file_details_json(@file_list, @project['name'], @dataset['name'], @subtype_name).to_json.html_safe, type: 'application/json', id: 'file-items-json') %>
 
 <script type="text/javascript">
 
@@ -96,6 +96,8 @@ table, th, td {
               data: {
                   project_id: json['project_id'],
                   dataset_id: json['dataset_id'],
+                  dataset_name: json['dataset_name'],
+                  project_name: json['project_name'],
                   subtype_name: json['subtype_name'],
                   path: json['path'],
                   filename: json['filename']

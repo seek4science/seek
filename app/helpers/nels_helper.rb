@@ -1,6 +1,6 @@
 module NelsHelper
 
-  def nels_file_details_json(items_hash, subtype_name)
+  def nels_file_details_json(items_hash, project_name, dataset_name, subtype_name)
     # download_file,project_id: @project_id, dataset_id: @dataset_id, subtype_name: , path: file_item["path"], filename: file_item['name']
     items_hash.collect do |item|
       {
@@ -8,6 +8,8 @@ module NelsHelper
         filename: item['name'],
         project_id: item['project_id'],
         dataset_id: item['dataset_id'],
+        project_name: project_name,
+        dataset_name: dataset_name,
         subtype_name: subtype_name
       }
     end
