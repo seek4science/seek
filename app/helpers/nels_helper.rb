@@ -35,7 +35,15 @@ module NelsHelper
     content_tag(:span, '', class: nels_locked_dataset_glyph).html_safe
   end
 
-
+  def subtype_path_breadcrumbs(subtype_path, full_path, project_id, dataset_id, subtype_name)
+    current_path = full_path.chomp(subtype_path).chomp('/')
+    root_link = link_to('<root>', '#', class:'nels-folder', 'data-path':current_path, 'data-project-id':project_id, 'data-dataset-id':dataset_id, 'data-subtype':subtype_name)
+    sub_links = subtype_path.split('/').collect do |fragment|
+      current_path = "#{current_path}/#{fragment}"
+      link_to(fragment, '#', class:'nels-folder', 'data-path':current_path, 'data-project-id':project_id, 'data-dataset-id':dataset_id, 'data-subtype':subtype_name)
+    end
+    ([root_link]+sub_links).join(' / ').html_safe
+  end
 
   def nels_folder_icon
     icon_tag('folder_avatar', size:48)

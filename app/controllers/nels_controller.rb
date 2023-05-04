@@ -90,7 +90,8 @@ class NelsController < ApplicationController
     begin
       filename = params['content_blobs'][0]['data'].original_filename
       data_path = params['content_blobs'][0]['data'].path
-      @rest_client.upload_file(params[:project_id].to_i, params[:dataset_id].to_i, params[:subtype_name], '', filename,
+      subtype_path = params[:subtype_path] || ''
+      @rest_client.upload_file(params[:project_id].to_i, params[:dataset_id].to_i, params[:subtype_name], subtype_path, filename,
                                data_path)
 
       respond_to do |format|
@@ -107,8 +108,7 @@ class NelsController < ApplicationController
 
   def download_file
     begin
-      root_path = "Storebioinfo/#{params[:project_name]}/#{params[:dataset_name]}/#{params[:subtype_name]}/"
-      path_in_subtype = params[:path].gsub(root_path,"").gsub(params[:filename],"")
+      path_in_subtype = extract_subtype_path(params[:path],params[:project_name], params[:dataset_name], params[:subtype_name], params[:filename])
       filename, path = @rest_client.download_file(params[:project_id].to_i, params[:dataset_id].to_i,
                                                   params[:subtype_name], path_in_subtype, params[:filename])
       respond_to do |format|
@@ -177,12 +177,12 @@ class NelsController < ApplicationController
     @project = @rest_client.project(@project_id)
     @path = params[:path]
     @subtype_name = params[:subtype]
+    @subtype_path = extract_subtype_path(@path, @project['name'], @dataset['name'], @subtype_name)
     @subtype_metadata = @rest_client.check_metadata_exists(@project_id, @dataset_id, @subtype_name)
 
     @file_list = @rest_client.sbi_storage_list(params[:project_id].to_i, params[:dataset_id].to_i, params[:path])
 
-    #folders first
-    @file_list.sort_by!{|f| f['isFolder'] ? 0 : 1 }
+
 
     respond_to do |format|
       format.html { render partial: 'nels/subtype' }
@@ -214,6 +214,11 @@ class NelsController < ApplicationController
     elsif current_user.person.projects.any?(&:nels_enabled)
       true
     end
+  end
+
+  def extract_subtype_path(full_path, project_name, dataset_name, subtype_name, file_name='')
+    root_path = ['Storebioinfo',project_name, dataset_name, subtype_name].join('/')
+    full_path.gsub(root_path,"").chomp(file_name).gsub(/^\//,'')
   end
 
   def find_and_authorize_assay
