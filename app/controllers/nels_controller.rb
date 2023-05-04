@@ -181,6 +181,9 @@ class NelsController < ApplicationController
 
     @file_list = @rest_client.sbi_storage_list(params[:project_id].to_i, params[:dataset_id].to_i, params[:path])
 
+    #folders first
+    @file_list.sort_by!{|f| f['isFolder'] ? 0 : 1 }
+
     respond_to do |format|
       format.html { render partial: 'nels/subtype' }
     end
