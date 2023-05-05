@@ -155,6 +155,10 @@ gem 'rails-static-router'
 
 gem 'net-ftp'
 
+# Reading excel spreadsheets
+gem "roo", "~> 2.10.0"
+gem 'roo-xls', '~> 1.1'
+
 group :production do
   gem 'passenger'
 end
