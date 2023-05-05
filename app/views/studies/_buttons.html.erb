@@ -1,26 +1,28 @@
-<%= render :partial => "subscriptions/subscribe", :locals => {:object => item} %>
+<%= render :partial => "subscriptions/subscribe", :locals => { :object => item } %>
 
 <% if logged_in_and_member? %>
-    <%= button_link_to("New #{t('study')} based on this one", 'new', new_object_based_on_existing_one_study_path(item,:controller_name=>"studies")) %>
+  <% unless displaying_single_page?%>
+		<%= button_link_to("New #{t('study')} based on this one", 'new', new_object_based_on_existing_one_study_path(item, :controller_name => "studies")) %>
+  <% end %>
 <% end %>
 
 <% if item.can_edit? -%>
   <% if displaying_single_page? %>
-		<% if item&.sample_types.present? %>
-    	<%= button_link_to("Design #{t('assay')}", 'new', new_isa_assay_path(study_id: item.id, single_page: params[:single_page], is_source: true)) %>
-		<% end -%>
-	<% else -%>
-    <%= add_new_item_to_dropdown(item) %> 
+    <% if item&.sample_types.present? %>
+      <%= button_link_to("Design #{t('assay')}", 'new', new_isa_assay_path(study_id: item.id, single_page: params[:single_page], is_source: true)) %>
+    <% end -%>
+  <% else -%>
+    <%= add_new_item_to_dropdown(item) %>
   <% end -%>
 <% end -%>
 
 <%= item_actions_dropdown do %>
   <% if item.can_edit? %>
-		<% if displaying_single_page? %>
-			<li><%= image_tag_for_key('edit', edit_isa_study_path(item, single_page: params[:single_page]), "Edit #{t('isa_study')}", nil, "Edit #{t('isa_study')}") -%></li>
-		<% else %>
-			<li><%= image_tag_for_key('edit', edit_study_path(item), "Edit #{t('study')}", nil, "Edit #{t('study')}") -%></li>
-		<% end %>
+    <% if displaying_single_page? %>
+      <li><%= image_tag_for_key('edit', edit_isa_study_path(item, single_page: params[:single_page]), "Edit #{t('isa_study')}", nil, "Edit #{t('isa_study')}") -%></li>
+    <% else %>
+      <li><%= image_tag_for_key('edit', edit_study_path(item), "Edit #{t('study')}", nil, "Edit #{t('study')}") -%></li>
+    <% end %>
   <% end %>
 
   <% if item.can_manage? -%>
@@ -28,7 +30,7 @@
     <%= render :partial => 'snapshots/new_snapshot_link', :locals => { :item => item } %>
   <% end -%>
 
-    <%= order_icon(item,current_user, order_assays_study_path(item), item.assays, 'assay') -%>
- 
-  <%= delete_icon item,current_user -%>
+  <%= order_icon(item, current_user, order_assays_study_path(item), item.assays, 'assay') -%>
+
+  <%= delete_icon item, current_user -%>
 <% end -%>
