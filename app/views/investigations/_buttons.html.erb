@@ -1,35 +1,37 @@
-<%= render :partial => "subscriptions/subscribe", :locals => {:object => item} %>
+<%= render :partial => "subscriptions/subscribe", :locals => { :object => item } %>
 <% if logged_in_and_member? %>
-    <%= button_link_to("New #{t('investigation')} based on this one", 'new', new_object_based_on_existing_one_investigation_path(item,:controller_name=>"investigations")) %>
-<!--    <%= button_link_to("Export ISATab JSON", 'publish', export_isatab_json_investigation_path(item)) %> -->
+  <% unless displaying_single_page? %>
+		<%= button_link_to("New #{t('investigation')} based on this one", 'new', new_object_based_on_existing_one_investigation_path(item, :controller_name => "investigations")) %>
+  <% end %>
+  <!--    <%= button_link_to("Export ISATab JSON", 'publish', export_isatab_json_investigation_path(item)) %> -->
 <% end %>
 
 <% if item.can_edit? -%>
   <% if displaying_single_page? %>
     <%= button_link_to("Design #{t('study')}", 'new', new_isa_study_path(investigation_id: item, single_page: params[:single_page])) %>
     <% if Seek::Config.project_single_page_advanced_enabled %>
-			<%= button_link_to("Export ISA", 'download', export_isa_single_page_path(id: params[:single_page] , investigation_id: item)) %>
-		<% end -%>
-	<% else -%>
-    <%= add_new_item_to_dropdown(item) %> 
+      <%= button_link_to("Export ISA", 'download', export_isa_single_page_path(id: params[:single_page], investigation_id: item)) %>
+    <% end -%>
+  <% else -%>
+    <%= add_new_item_to_dropdown(item) %>
   <% end -%>
 <% end -%>
 
 <%= item_actions_dropdown do %>
-    <% if item.can_edit? %>
-      <li><%= image_tag_for_key('edit', edit_investigation_path(item), "Edit #{t('investigation')}", nil, "Edit #{t('investigation')}") -%></li>
-    <% end %>
+  <% if item.can_edit? %>
+    <li><%= image_tag_for_key('edit', edit_investigation_path(item), "Edit #{t('investigation')}", nil, "Edit #{t('investigation')}") -%></li>
+  <% end %>
 
-    <% if item.can_manage? -%>
-        <li><%= image_tag_for_key('manage', manage_investigation_path(item), "Manage #{t('investigation')}", nil, "Manage #{t('investigation')}") -%></li>
-        <%= render :partial => 'snapshots/new_snapshot_link', :locals => { :item => item } %>
-    <% end -%>
+  <% if item.can_manage? -%>
+    <li><%= image_tag_for_key('manage', manage_investigation_path(item), "Manage #{t('investigation')}", nil, "Manage #{t('investigation')}") -%></li>
+    <%= render :partial => 'snapshots/new_snapshot_link', :locals => { :item => item } %>
+  <% end -%>
 
-    <% if (item.can_publish? || item.contains_publishable_items?) && item.can_manage? -%>
-        <li><%= image_tag_for_key('publish', polymorphic_path(item, :action => :check_related_items), nil, {:method=>:post}, "Publish full #{t('investigation')}") -%></li>
-    <% end -%>
+  <% if (item.can_publish? || item.contains_publishable_items?) && item.can_manage? -%>
+    <li><%= image_tag_for_key('publish', polymorphic_path(item, :action => :check_related_items), nil, { :method => :post }, "Publish full #{t('investigation')}") -%></li>
+  <% end -%>
 
-    <%= order_icon(item,current_user, order_studies_investigation_path(item), item.studies, 'study') -%>
+  <%= order_icon(item, current_user, order_studies_investigation_path(item), item.studies, 'study') -%>
 
-    <%= delete_icon item,current_user -%>
+  <%= delete_icon item, current_user -%>
 <% end -%>
