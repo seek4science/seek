@@ -3,7 +3,7 @@
     <%= modal_header('Upload file') %>
     <%= modal_body do %>
       <%= render :partial=>"assets/upload_box",:locals=>{:action_text=>"upload", hide_remote: true} -%>
-      <label>Path:</label><%= text_field_tag(:subtype_path, '', class:'form-control') %>
+      <label>Path:</label><%= text_field_tag(:subtype_path, '/'+subtype_path, class:'form-control') %>
     <% end %>
     <%= modal_footer do %>
       <%= create_button id:"upload-file-submit-button", button_text:'Add',
