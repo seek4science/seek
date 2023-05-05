@@ -58,7 +58,7 @@ table, th, td {
 
 
 
-    sessionStorage.setItem('nels_folder_state','Folder 1/Folder 2')
+    sessionStorage.setItem('nels_folder_state','<%= @path %>')
 
     $j('#register-nels-metadata-button').click(function() {
         $j('#register-nels-metadata').submit();
@@ -69,22 +69,8 @@ table, th, td {
           const projectId = $j(this).data('project-id');
           const datasetId = $j(this).data('dataset-id');
           const subtype = $j(this).data('subtype');
-          $j('#nels-dataset').html('').spinner('add').show();
-          $j('#nels-content').hide();
-
-          $j.ajax({ url: '<%= subtype_nels_path -%>',
-              data: {
-                  project_id: projectId,
-                  dataset_id: datasetId,
-                  subtype: subtype,
-                  path: folder_path,
-              },
-              success: function (data) {
-                  $j('#nels-dataset').html(data).spinner('remove');
-              }
-          });
+          showSubtype(projectId, datasetId, subtype, folder_path,'<%= params[:assay_id] %>');
       });
-
 
     $j('.nels-download-link').on('click', function () {
           var index = $j(this).data('index');

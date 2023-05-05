@@ -180,9 +180,7 @@ class NelsController < ApplicationController
     @subtype_path = extract_subtype_path(@path, @project['name'], @dataset['name'], @subtype_name)
     @subtype_metadata = @rest_client.check_metadata_exists(@project_id, @dataset_id, @subtype_name)
 
-    @file_list = @rest_client.sbi_storage_list(params[:project_id].to_i, params[:dataset_id].to_i, params[:path])
-
-
+    @file_list = @rest_client.sbi_storage_list(@project_id, @dataset_id, @path)
 
     respond_to do |format|
       format.html { render partial: 'nels/subtype' }

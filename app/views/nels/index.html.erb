@@ -38,6 +38,25 @@
         });
     }
 
+    function showSubtype(projectId, datasetId, subtype, folder_path, assay_id = null) {
+        $j('#nels-dataset').html('').spinner('add').show();
+        $j('#nels-content').hide();
+
+
+        $j.ajax({ url: '<%= subtype_nels_path -%>',
+            data: {
+                project_id: projectId,
+                dataset_id: datasetId,
+                subtype: subtype,
+                path: folder_path,
+                assay_id: assay_id
+            },
+            success: function (data) {
+                $j('#nels-dataset').html(data).spinner('remove');
+            }
+        });
+    }
+
     function saveLastSelectedNode(projectId, datasetId = null, subtypeId = null) {
         let val = `project${projectId}`;
         if (datasetId) {
@@ -133,22 +152,14 @@
           project_name = $j('#nels-tree').jstree().get_node(data.node.parents[1]).text
 
           // Save current state
-            saveLastSelectedNode(data.node.data.project_id, data.node.data.dataset_id, data.node.data.id );
+          saveLastSelectedNode(data.node.data.project_id, data.node.data.dataset_id, data.node.data.id );
 
 
+          //folder_path = sessionStorage.getItem('nels_folder_state');
           folder_path = `Storebioinfo/${project_name}/${data.node.data.dataset_name}/${data.node.data.text}/`;
 
-          $j.ajax({ url: '<%= subtype_nels_path(:assay_id=>params[:assay_id]) -%>',
-            data: {
-              project_id: data.node.data.project_id,
-              dataset_id: data.node.data.dataset_id,
-              subtype: data.node.data.text,
-              path: folder_path,
-            },
-            success: function (data) {
-              $j('#nels-dataset').html(data).spinner('remove');
-            }
-          });
+          showSubtype(data.node.data.project_id, data.node.data.dataset_id, data.node.data.text, folder_path, '<%= params[:assay_id] %>');
+
         } else if (data.node.data.is_dataset) {// dataset selected
           $j('#nels-dataset').html('').spinner('add').show();
           $j('#nels-content').hide();

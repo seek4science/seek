@@ -38,9 +38,12 @@
                   processData: false,
                   method: 'POST',
                   success: function (result) {
-                      let nodeId=`${data.get('subtype_name')}${data.get('dataset_id')}`;
+                      const projectId = data.get('project_id');
+                      const datasetId = data.get('dataset_id');
+                      const subtype = data.get('subtype_name');
+                      const folder_path = data.get('file_path');
                       $j('#upload-spinner').modal('hide');
-                      selectNelsTreeNode(nodeId);
+                      showSubtype(projectId, datasetId, subtype, folder_path, '<%= params[:assay_id] %>');
                   },
                   error: function (request, status, error) {
                       $j('#upload-spinner').modal('hide');
