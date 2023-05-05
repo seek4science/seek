@@ -157,6 +157,10 @@ gem "net-http"
 gem "net-ftp"
 gem "uri", "0.10.0.2"
 
+# Reading excel spreadsheets
+gem "roo", "~> 2.10.0"
+gem 'roo-xls', '~> 1.1'
+
 group :production do
   gem 'passenger'
 end
