@@ -750,6 +750,7 @@ SEEK::Application.routes.draw do
     member do
       get :dynamic_table_data
       get :export_isa, action: :export_isa
+      post :upload_samples, action: :upload_samples
     end
     collection do
       get :batch_sharing_permission_preview

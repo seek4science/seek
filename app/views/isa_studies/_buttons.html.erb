@@ -15,6 +15,13 @@ permissions||="loadBatchPermission('sampleDynamicTable',this)"
   <button class="btn btn-primary dt-action" id="btn_save_assay_sample" onClick=<%=save%>>Save</button>
 </div>
 
+<div>
+  <%= form_with url: upload_samples_single_page_url() , multipart: true do |form| %>
+    <%= form.file_field :file %>
+    <%= form.submit 'Upload' %>
+  <% end %>
+</div>
+
 <script>
   function loadBatchPermission(dtName, e){
     const sample_ids = window[dtName].selectedSampleIds()
