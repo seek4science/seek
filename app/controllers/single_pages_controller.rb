@@ -1,4 +1,7 @@
 require 'isatab_converter'
+require 'roo'
+require 'roo-xls'
+
 class SinglePagesController < ApplicationController
   include Seek::AssetsCommon
   include Seek::Sharing::SharingCommon
@@ -57,6 +60,45 @@ class SinglePagesController < ApplicationController
       flash[:error] = e.message
       format.html { redirect_to single_page_path(Project.find(params[:id])) }
     end
+  end
+
+  def upload_samples
+    wb = Roo::Excelx.new(params[:file].path)
+    puts params
+    # Extract Samples metadata
+    puts wb.cell(2, 2, sheet = 'Metadata').to_i
+    puts wb.cell(5, 2, sheet = 'Metadata').to_i
+    puts wb.cell(8, 2, sheet = 'Metadata').to_i
+
+    @study = Study.find(wb.cell(2, 2, sheet = 'Metadata').to_i)
+    @sample_type = SampleType.find(wb.cell(5, 2, sheet = 'Metadata').to_i)
+    @template = Template.find(wb.cell(8, 2, sheet = 'Metadata').to_i)
+
+    sample_fields = wb.row(1, sheet = 'Samples')
+    samples_data = (2..wb.last_row(sheet = 'Samples')).map { |i| wb.row(i, sheet = 'Samples') }
+
+    @excel_samples = samples_data.map do |excel_sample|
+      obj = {}
+      (0..sample_fields.size - 1).map do |i|
+        obj.merge!(sample_fields[i] => excel_sample[i])
+      end
+      obj
+    end
+
+    @existing_excel_samples = @excel_samples.map { |sample| sample unless sample['id'].nil? }.compact
+    @new_excel_samples = @excel_samples.map { |sample| sample if sample['id'].nil? }.compact
+
+    @db_samples = @existing_excel_samples.map { |sample| JSON.parse(Sample.find(sample['id'])[:json_metadata]) }
+
+    [@study, @sample_type, @template, @excel_samples, @existing_excel_samples, @new_excel_samples, @db_samples].each do |var|
+      puts '#' * 100
+      puts var.inspect
+    end
+    puts '#' * 100
+
+    # respond_to do |format|
+    #   format.html { redirect_to single_page_path(@study.projects.first) }
+    # end
   end
 
   private
