@@ -59,25 +59,23 @@ jobs:
             suite: rails test test/unit
     steps:
       - name: Install system dependencies
-        run: sudo apt update && sudo apt install -y graphicsmagick graphviz libcurl4-gnutls-dev libreoffice poppler-utils
-        # build-essential git imagemagick libgmp-dev \
-        #    libmagick++-dev libmysqlclient-dev libpq-dev libreadline-dev libreoffice libssl-dev \
-        #    libxml++2.6-dev libxslt1-dev nodejs openjdk-8-jdk openssh-server poppler-utils zip
+        run: |
+          sudo apt install -y software-properties-common
+          sudo add-apt-repository ppa:deadsnakes/ppa
+          sudo apt update
+          sudo apt install -y graphicsmagick graphviz libcurl4-gnutls-dev libreoffice poppler-utils build-essential \
+            git imagemagick libgmp-dev python3.7-dev python3.7-distutils python3-pip
       - name: Checkout code
         uses: actions/checkout@v3
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
-          distribution: 'temurin'      
+          distribution: 'temurin'
           java-version: '11' # The JDK version to make available on the path.
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.7'
       - name: Cache pip
         uses: actions/cache@v3
         with:
@@ -89,7 +87,9 @@ jobs:
             ${{ runner.os }}-pip-
             ${{ runner.os }}-
       - name: Install Python dependencies
-        run: pip install -r requirements.txt
+        run: |
+          python3.7 -m pip install setuptools==58
+          python3.7 -m pip install -r requirements.txt
       - name: Create test database
         run: |
           cp test/config/database.github.${{ matrix.database }}.yml config/database.yml
