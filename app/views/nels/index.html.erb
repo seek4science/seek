@@ -42,15 +42,18 @@
         $j('#nels-dataset').html('').spinner('add').show();
         $j('#nels-content').hide();
 
+        let data = {
+            project_id: projectId,
+            dataset_id: datasetId,
+            subtype: subtype,
+            path: folder_path
+        }
+        if (assay_id) {
+            data.assay_id = assay_id
+        }
 
         $j.ajax({ url: '<%= subtype_nels_path -%>',
-            data: {
-                project_id: projectId,
-                dataset_id: datasetId,
-                subtype: subtype,
-                path: folder_path,
-                assay_id: assay_id
-            },
+            data: data,
             success: function (data) {
                 $j('#nels-dataset').html(data).spinner('remove');
             }
