@@ -1,11 +1,14 @@
+Seek::IsaGraphGenerator # Needed for autoloading some inner classes
+
 module Seek
   class SampleGraphGenerator
     def initialize(sample)
       @sample = sample
     end
 
-    def generate(max_distance = nil)
-      hash = gather(@sample, max_distance)
+    def generate(depth: 2, auth: true)
+      @auth = auth
+      hash = gather(@sample, depth)
       hash[:edges].uniq!
       hash[:nodes].uniq!
 
@@ -15,31 +18,27 @@ module Seek
     private
 
     def gather(object, max_distance = nil, distance = 0)
-      @visited = [] if distance == 0
+      @visited = Set.new if distance == 0
       @visited << object
 
-      hash = { nodes: [object], edges: [] }
-      is_assay = object.is_a?(Assay)
+      node = Seek::IsaGraphNode.new(object)
+      node.can_view = object.can_view? if @auth
+
+      hash = { nodes: [node], edges: [] }
 
       if max_distance.nil? || (distance < max_distance)
-        object.assay_assets.where(asset_type: 'Sample').each do |assay_asset|
-          assay_or_sample = is_assay ? assay_asset.asset : assay_asset.assay
-          unless @visited.include?(assay_or_sample)
-            next_hash = gather(assay_or_sample, max_distance, distance + 1)
-            hash[:nodes] += next_hash[:nodes]
-            hash[:edges] += next_hash[:edges]
-          end
-
-          if assay_asset.incoming_direction?
-            edge = [object, assay_or_sample]
-          elsif assay_asset.outgoing_direction?
-            edge = [assay_or_sample, object]
-          else
-            edge = nil
-          end
-
-          if edge
-            edge.reverse! if is_assay
+        [
+          [object.linked_samples, false],
+          [object.linking_samples, true]
+        ].each do |samples, reverse|
+          samples.each do |sample|
+            unless @visited.include?(sample)
+              next_hash = gather(sample, max_distance, distance + 1)
+              hash[:nodes] += next_hash[:nodes]
+              hash[:edges] += next_hash[:edges]
+            end
+            edge = [sample, object]
+            edge.reverse! if reverse
             hash[:edges] << edge
           end
         end

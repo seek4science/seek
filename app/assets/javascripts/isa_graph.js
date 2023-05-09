@@ -210,11 +210,13 @@ var ISA = {
 
     selectNode: function (node) {
         var jsTree = $j('#jstree').jstree(true);
-        jsTree.deselect_all();
-        ISA.expandNodeByDataNodeId(node.data('id'));
-        $j('li[data-node-id=' + node.data('id') + ']').each(function () {
-            jsTree.select_node(this.id);
-        });
+        if (jsTree) {
+            jsTree.deselect_all();
+            ISA.expandNodeByDataNodeId(node.data('id'));
+            $j('li[data-node-id=' + node.data('id') + ']').each(function () {
+                jsTree.select_node(this.id);
+            });
+        }
 
         ISA.highlightNode(node);
 

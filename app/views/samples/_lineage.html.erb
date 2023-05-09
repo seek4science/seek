@@ -1,0 +1,168 @@
+<%
+  options ||= { depth: 4, parent_depth: nil, sibling_depth: nil, include_self: true }
+  hash = Seek::SampleGraphGenerator.new(root_item).generate(**options)
+  elements = cytoscape_elements(hash)
+  is_full_screen = params.key?(:fullscreen).present?
+%>
+
+<style>
+    #cy {
+        flex: 0 0 auto;
+        /* only manually resize */
+
+    }
+
+    .splitter {
+        flex: 0 0 auto;
+        cursor: col-resize;
+    }
+
+    #jstree {
+        flex: 1 1 auto;
+
+    }
+</style>
+
+<div style="float:right"><%= help_link :isa_overview, include_icon: true, link_text:'Help' %></div>
+<div class="row">
+  <div class="col-sm-12 hidden-xs">
+    <div id="isa-graph" class="panel panel-default">
+      <div id="node_info"></div>
+      <div class="isa-controls">
+        <button class="btn btn-default btn-xs" id="toggle-fullscreen-btn"  data-tooltip="Toggle between fullscreen and normal size">
+          <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
+          Fullscreen
+        </button>
+        <button class="btn btn-default btn-xs" id="show-all-nodes-btn"  data-tooltip="Toggle between expanding all nodes in the graph, or showing just the nearest neighbours">
+          <%= image('graph_nodes') %>
+          All nodes
+        </button>
+        <button class="btn btn-default btn-xs" id="reset-nodes-btn"  data-tooltip="Resets the graph to its original state, reverting any changes to zoom or moved nodes.">
+          <%= image('undo') %>
+          Reset
+        </button>
+      </div>
+      <div class="isa-wrapper">
+        <div id="cy"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%= modal_isa_png %>
+
+<script type="text/javascript">
+    var isaGraph = $j('#isa-graph')[0];
+    var elements = <%= elements.to_json.html_safe %>;
+
+    if (elements.error === 'error') {
+        isaGraph.innerHTML = "<div class='none_text'>Currently unable to display the graph for this item</div>";
+        isaGraph.style['text-align'] = 'center';
+    } else if (!isCanvasSupportBrowser() || !isIEVersionSupported(5)) {
+        isaGraph.innerHTML = "<div class='none_text'>Unable to display the graph for this browser version. Please upgrade your browser.</div>";
+        isaGraph.style['text-align'] = 'center';
+    } else {
+        drawInitialState();
+    }
+
+    function drawInitialState() {
+        ISA.decodeHTMLForElements(elements);
+        ISA.drawGraph(elements, '<%= node_id(root_item) -%>');
+    }
+    ISA.view = {
+        graph: function () {
+            $j('#isa-graph-view-btn').button('toggle');
+            $j('#cy').show();
+            $j('#jstree').hide();
+            $j('#show-all-nodes-btn').show();
+            $j('#export-png-btn').show();
+            $j('#reset-nodes-btn').show();
+            $j('#cy').css('width', '100%');
+            ISA.resizableGraphElement(false);
+            cy.fit(ISA.defaults.padding);
+            cy.resize();
+            ISA.view.current = 'graph';
+            return false;
+        },
+        default: 'graph',
+        current: 'graph'
+    };
+
+    $j(document).ready(function () {
+        ISA.view[ISA.view.default]();
+
+        // Fullscreen
+        $j('#toggle-fullscreen-btn').click(function () {
+            $j('#toggle-fullscreen-btn').button('toggle');
+            ISA.fullscreen();
+            return false;
+        });
+
+        // Expand all graph nodes
+        $j('#show-all-nodes-btn').click(function () {
+            $j('#show-all-nodes-btn').button('toggle');
+            if (ISA.isShowGraphNodesActive()) {
+                cy.$('node.resource').addClass('selected');
+            }
+            else {
+                cy.$('node.resource').removeClass('selected');
+                if (ISA.currentSelectedNode) {
+                    ISA.selectNode(ISA.currentSelectedNode);
+                }
+
+            }
+
+            return false;
+        });
+
+        $j('#reset-nodes-btn').click(function() {
+            $j('#cy').resizable('destroy');
+            drawInitialState();
+            if (ISA.view.current == 'split') {
+                ISA.resizableGraphElement(true);
+            }
+
+            //stop the all nodes button being out of sync if selected
+            if (ISA.isShowGraphNodesActive()) {
+                $j('#show-all-nodes-btn').button('toggle');
+            }
+        });
+
+        // display the PNG when the modal box appears
+        $j('#modal-exported-png').on('show.bs.modal', function (event) {
+            var scale = 3;
+            if (!ISA.isFullscreen()) {
+                scale *= 2;
+            }
+            var png = cy.png({bg:'white',scale:scale});
+            $j('#exported-png').attr('src', png);
+        });
+
+        $j('#save-exported-png').click(function() {
+            var src =  $j('#exported-png').attr('src');
+            var a  = document.createElement('a');
+            a.href = src;
+            a.download = 'isa-graph.png';
+            a.click();
+
+        });
+
+        //click the full screen button if fullscreen param present. calling ISA.fullscreen causes the button to be out of sync.
+        if (<%= is_full_screen %>) {
+            $j('#toggle-fullscreen-btn').click();
+        }
+
+
+        $j(document).keyup(function (e) {
+            if (e.keyCode == 27) { // Escape key
+                ISA.fullscreen(false);
+            }
+        });
+
+
+
+
+
+
+    });
+</script>

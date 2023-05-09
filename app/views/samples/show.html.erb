@@ -6,7 +6,6 @@
   <%= tab_pane('overview') do %>
     <div class="row">
       <div class="col-md-9 col-sm-8 box_about_actor">
-
         <div class="row">
           <div class="col-md-6">
             <p>
@@ -23,6 +22,14 @@
               </p>
             <% end %>
             <%= render :partial => "attribute_values", :locals => { :sample => @sample } %>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-12">
+            <% if @sample.linked_samples.any? || @sample.linking_samples.any? %>
+              <%= render partial: 'lineage', locals: { root_item: @sample, options: { depth: 4 } } %>
+            <% end %>
           </div>
         </div>
       </div>
