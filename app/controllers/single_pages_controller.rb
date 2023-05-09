@@ -68,7 +68,6 @@ class SinglePagesController < ApplicationController
     @study = Study.find(study_id)
     @project = @study.projects.first
     raise "Nothing to export to Excel." if sample_ids.nil? || sample_ids == [] || sample_type_id.nil?
-
     @samples = sample_ids.map { |sample_id| Sample.find(sample_id) if Sample.find(sample_id).can_view? }
     @sample_type = SampleType.find(sample_type_id)
 
@@ -97,17 +96,16 @@ class SinglePagesController < ApplicationController
 
     render xlsx: 'download_samples_excel', filename: 'samples_table.xlsx', disposition: 'inline'
   rescue StandardError => e
+    flash[:error] = e.message
     respond_to do |format|
-      flash[:error] = e.message
       format.html { redirect_to single_page_path(@project.id) }
+      format.json { render json: { parameters: { sample_ids: sample_ids, sample_type_id: sample_type_id, study_id: study_id } } }
     end
   end
 
   def export_to_excel
     cache_uuid = UUID.new.generate
-
     sample_ids = JSON.parse(params[:source_sample_data]).map { |sample| sample['FAIRDOM-SEEK id'] if sample['FAIRDOM-SEEK id'] != '#HIDDEN' }
-
     sample_type_id = JSON.parse(params[:sample_type_id])
     study_id = JSON.parse(params[:study_id])
 

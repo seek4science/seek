@@ -47,7 +47,7 @@ class SinglePagesControllerTest < ActionController::TestCase
   test "genertates a valid export of source samples in single page" do
     with_config_value(:project_single_page_enabled, true) do
       # Generate the excel data
-      person = Factory(:person)
+      person = User.current_user.person
       project = Factory(:project)
       study = Factory(:study)
       source_sample_type = Factory(:isa_source_sample_type,
@@ -62,6 +62,7 @@ class SinglePagesControllerTest < ActionController::TestCase
           title: "sample_#{n}",
           sample_type: source_sample_type,
           project_ids: [project.id],
+          contributor: person,
           data: {
             'Source Name': 'Source Name',
             'Source Characteristic 1': 'Source Characteristic 1',
@@ -81,20 +82,20 @@ class SinglePagesControllerTest < ActionController::TestCase
       sample_type_id = source_sample_type.id
       study_id = study.id
 
-      post_params = { :source_sample_data => sample_ids.to_json,
-                      :sample_type_id => sample_type_id.to_json,
-                      :study_id => study_id.to_json }
+      post_params = { source_sample_data: sample_ids.to_json,
+                      sample_type_id: sample_type_id.to_json,
+                      study_id: study_id.to_json }
 
       post :export_to_excel, params: post_params, xhr: true
 
-      assert_response :ok
+      assert_response :ok, msg = "Couldn't reach the server"
 
       response_body = JSON.parse(response.body)
-      assert response_body.key?("uuid"), msg="Response body is expected to have a 'uuid' key"
+      assert response_body.key?("uuid"), msg = "Response body is expected to have a 'uuid' key"
       cache_uuid = response_body["uuid"]
 
       get :download_samples_excel, params: { uuid: cache_uuid }
-      assert_response :ok
+      assert_response :ok, msg = "Unable to generate the excel"
 
     end
   end
