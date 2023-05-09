@@ -71,7 +71,7 @@ const handleSelect = (e) => {
 			this.hiddenColumns = multi_link_idx;
 			columns.unshift(...defaultCols);
 			const columnDefs = [
-				{ orderable: false, targets: options.readonly ? [0] : [0, 1, 2] },
+				{ orderable: false, targets: options.readonly ? [0] : [0, 1] },
 				{
 					targets: options.readonly ? [0, ...multi_link_idx] : [1],
 					visible: false,
