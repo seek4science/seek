@@ -67,11 +67,11 @@ class SinglePagesController < ApplicationController
 
     @study = Study.find(study_id)
     @project = @study.projects.first
-    if sample_ids.nil? || sample_ids == [] || sample_type_id.nil?
-      raise "Nothing to export to Excel."
-    end
-    @samples = Sample.where(id: sample_ids)
+    raise "Nothing to export to Excel." if sample_ids.nil? || sample_ids == [] || sample_type_id.nil?
+
+    @samples = sample_ids.map { |sample_id| Sample.find(sample_id) if Sample.find(sample_id).can_view? }
     @sample_type = SampleType.find(sample_type_id)
+
     sample_attributes = @sample_type.sample_attributes.map do |sa|
       if (sa.sample_controlled_vocab_id.nil?)
         { sa.title => nil }
@@ -106,7 +106,8 @@ class SinglePagesController < ApplicationController
   def export_to_excel
     cache_uuid = UUID.new.generate
 
-    sample_ids = JSON.parse(params[:source_sample_data]).map { |sample| sample['FAIRDOM-SEEK id'] }
+    sample_ids = JSON.parse(params[:source_sample_data]).map { |sample| sample['FAIRDOM-SEEK id'] if sample['FAIRDOM-SEEK id'] != '#HIDDEN' }.compact!
+
     sample_type_id = JSON.parse(params[:sample_type_id])
     study_id = JSON.parse(params[:study_id])
 
