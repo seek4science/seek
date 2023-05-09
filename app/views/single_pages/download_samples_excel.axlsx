@@ -6,9 +6,9 @@ debug = false
 #####################################
 
 if debug
-    secret_pwd = 'florakevinrafael'
+  secret_pwd = 'florakevinrafael'
 else
-    secret_pwd = UUID.new.generate
+  secret_pwd = UUID.new.generate
 end
 
 workbook = xlsx_package.workbook
@@ -103,7 +103,7 @@ workbook.add_worksheet(name: 'Samples') do |sheet|
   end
 
   ## styling
-  [0,1].each {|col_index| sheet.col_style(col_index, locked)}
+  [0, 1].each { |col_index| sheet.col_style(col_index, locked) }
   sheet.row_style(0, title_style)
 
   ## filtering
@@ -117,11 +117,14 @@ workbook.add_worksheet(name: 'Samples') do |sheet|
     # If the has_cv field is false, it should skip this iteration and not apply the data validation
     next if @sa_cv_terms[col_nr]["has_cv"] == false
 
+    # Get sa_cv_terms_length
+    sa_cv_terms_size = @sa_cv_terms[col_nr]["data"].size
+
     col_ref = Axlsx.cell_r(col_nr, 1).gsub(/\d+/, '')
     dv_range = "#{col_ref}2:#{col_ref}1000000"
     sheet.add_data_validation(dv_range,
                               type: :list,
-                              formula1: "'cv_ontology'!$#{col_ref}$2:$#{col_ref}$1000000",
+                              formula1: "'cv_ontology'!$#{col_ref}$2:$#{col_ref}$#{sa_cv_terms_size + 1}",
                               showErrorMessage: true,
                               errorTitle: 'Input Error!',
                               error: 'Please select one of the available options',

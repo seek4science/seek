@@ -106,12 +106,12 @@ class SinglePagesController < ApplicationController
   def export_to_excel
     cache_uuid = UUID.new.generate
 
-    sample_ids = JSON.parse(params[:source_sample_data]).map { |sample| sample['FAIRDOM-SEEK id'] if sample['FAIRDOM-SEEK id'] != '#HIDDEN' }.compact!
+    sample_ids = JSON.parse(params[:source_sample_data]).map { |sample| sample['FAIRDOM-SEEK id'] if sample['FAIRDOM-SEEK id'] != '#HIDDEN' }
 
     sample_type_id = JSON.parse(params[:sample_type_id])
     study_id = JSON.parse(params[:study_id])
 
-    Rails.cache.write(cache_uuid, { "sample_ids": sample_ids, "sample_type_id": sample_type_id, "study_id": study_id },
+    Rails.cache.write(cache_uuid, { "sample_ids": sample_ids.compact, "sample_type_id": sample_type_id, "study_id": study_id },
                       expires_in: 1.minute)
 
     respond_to do |format|
