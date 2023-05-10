@@ -178,10 +178,28 @@ class NelsControllerTest < ActionController::TestCase
     VCR.use_cassette('nels/upload_file') do
       post :upload_file,
            params: { dataset_id: dataset_id, project_id: project_id, subtype_name: subtype,
-                     content_blobs: [{ data: file_data }] }, format: :json
+                     subtype_path:'', content_blobs: [{ data: file_data }] }, format: :json
       assert_response :success
       assert_equal true, JSON.parse(response.body)["success"]
     end
+  end
+
+  test 'upload file with space in name fails fails' do
+    project_id = '1125299'
+    dataset_id = '1124840'
+    subtype = 'analysis'
+
+    file_path = File.join(Rails.root, 'test', 'fixtures', 'files', 'file with spaces in name.txt')
+    assert File.exist?(file_path)
+
+    file_data = fixture_file_upload('file with spaces in name.txt', 'text/plain')
+
+
+    post :upload_file,
+         params: { dataset_id: dataset_id, project_id: project_id, subtype_name: subtype,
+                   subtype_path: '', content_blobs: [{ data: file_data }] }, format: :json
+    assert_response :not_acceptable
+    assert_equal 'Filenames containing spaces are not allowed', JSON.parse(response.body)["error"]
   end
 
   test 'raises error on NeLS callback if no code provided' do

@@ -89,13 +89,18 @@ class NelsController < ApplicationController
   def upload_file
     begin
       filename = params['content_blobs'][0]['data'].original_filename
-      data_path = params['content_blobs'][0]['data'].path
-      subtype_path = params[:subtype_path] || ''
-      @rest_client.upload_file(params[:project_id].to_i, params[:dataset_id].to_i, params[:subtype_name], subtype_path, filename,
-                               data_path)
-
-      respond_to do |format|
-        format.all { render json:{success: true} }
+      if filename.include?(' ')
+        respond_to do |format|
+          format.json { render json:{error: 'Filenames containing spaces are not allowed' }, status: :not_acceptable }
+        end
+      else
+        data_path = params['content_blobs'][0]['data'].path
+        subtype_path = params[:subtype_path] || ''
+        @rest_client.upload_file(params[:project_id].to_i, params[:dataset_id].to_i, params[:subtype_name],
+                                 subtype_path, filename, data_path)
+        respond_to do |format|
+          format.all { render json:{success: true} }
+        end
       end
     rescue RuntimeError => e
       Rails.logger.error("Error uploading file  #{e.message} - #{e.backtrace.join($/)}")

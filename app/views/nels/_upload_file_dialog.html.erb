@@ -47,8 +47,15 @@
                   },
                   error: function (request, status, error) {
                       $j('#upload-spinner').modal('hide');
-                      let exception = request.responseJSON['exception'];
-                      alert('Something went wrong interacting with NeLS, please try again later. (' + exception + ')');
+                      // not acceptable
+                      if (request.status == 406) {
+                          const msg = request.responseJSON['error'];
+                          alert(msg);
+                      }
+                      else {
+                          const exception = request.responseJSON['exception'];
+                          alert('Something went wrong interacting with NeLS, please try again later. (' + exception + ')');
+                      }
                   },
                   complete: function (data) {
                       $j('#upload-spinner').modal('hide');
