@@ -67,10 +67,10 @@ class SinglePagesController < ApplicationController
 
     @study = Study.find(study_id)
     @project = @study.projects.first
+    @samples = Sample.where(id: sample_ids)&.authorized_for(:view).sort_by(&:id)
 
-    raise "Nothing to export to Excel." if sample_ids.nil? || sample_ids == [] || sample_type_id.nil?
+    raise "Nothing to export to Excel." if @samples.nil? || @samples == [] || sample_type_id.nil?
 
-    @samples = sample_ids.map { |sample_id| Sample.find(sample_id) if Sample.find(sample_id).can_view? }
     @sample_type = SampleType.find(sample_type_id)
 
     sample_attributes = @sample_type.sample_attributes.map do |sa|
@@ -81,17 +81,17 @@ class SinglePagesController < ApplicationController
       end
     end
 
-    @sa_cv_terms = [{ "name" => "id", "has_cv" => false, "data" => nil, "is_ontology" => nil },
-                    { "name" => "uuid", "has_cv" => false, "data" => nil, "is_ontology" => nil }]
+    @sa_cv_terms = [{ "name" => "id", "has_cv" => false, "data" => nil, "allows_custom_input" => nil },
+                    { "name" => "uuid", "has_cv" => false, "data" => nil, "allows_custom_input" => nil }]
 
     sample_attributes.map do |sa_cv|
       sa_cv.map do |title, id|
         if id.nil?
-          @sa_cv_terms.push({ "name" => title, "has_cv" => false, "data" => nil, "is_ontology" => nil })
+          @sa_cv_terms.push({ "name" => title, "has_cv" => false, "data" => nil, "allows_custom_input" => nil })
         else
-          sa_cv_has_custom_input = SampleControlledVocab.find(id)&.custom_input
+          allows_custom_input = SampleControlledVocab.find(id)&.custom_input
           sa_terms = SampleControlledVocabTerm.where(sample_controlled_vocab_id: id).map(&:label)
-          @sa_cv_terms.push({ "name" => title, "has_cv" => true, "data" => sa_terms, "is_ontology" => sa_cv_has_custom_input })
+          @sa_cv_terms.push({ "name" => title, "has_cv" => true, "data" => sa_terms, "allows_custom_input" => allows_custom_input })
         end
       end
     end
