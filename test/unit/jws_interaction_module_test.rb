@@ -13,7 +13,7 @@ class JwsInteractionModuleTest < ActiveSupport::TestCase
   end
 
   test 'upload model blob' do
-    model = Factory(:teusink_model)
+    model = FactoryBot.create(:teusink_model)
     blob = model.content_blobs.first
     slug = upload_model_blob(blob,false)
     refute_nil slug
@@ -21,7 +21,7 @@ class JwsInteractionModuleTest < ActiveSupport::TestCase
   end
 
   test 'upload model blob constraint based' do
-    model = Factory(:teusink_model)
+    model = FactoryBot.create(:teusink_model)
     blob = model.content_blobs.first
     slug = upload_model_blob(blob,true)
     refute_nil slug
@@ -30,7 +30,7 @@ class JwsInteractionModuleTest < ActiveSupport::TestCase
 
   test 'upload model blob using https' do
     with_config_value :jws_online_root, "https://#{URI.parse(Seek::Config.jws_online_root).host}" do
-      model = Factory(:teusink_model)
+      model = FactoryBot.create(:teusink_model)
       blob = model.content_blobs.first
       slug = upload_model_blob(blob,false)
       refute_nil slug

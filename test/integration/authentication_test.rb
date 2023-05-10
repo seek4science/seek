@@ -2,7 +2,7 @@ require 'test_helper'
 
 class AuthenticationTest < ActionDispatch::IntegrationTest
   def setup
-    @user = Factory(:user,
+    @user = FactoryBot.create(:user,
                     login: 'my-user',
                     password: 'my-password',
                     password_confirmation: 'my-password')
@@ -10,7 +10,7 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
     @token = api_token.token
     @user.person.update_column(:email, 'my-user@example.com')
 
-    @document = Factory(:private_document, contributor: @user.person)
+    @document = FactoryBot.create(:private_document, contributor: @user.person)
   end
 
   test 'authenticate using HTTP basic' do
@@ -64,7 +64,7 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
   end
 
   test 'authenticate using doorkeeper with token in query params' do
-    oauth_access_token = Factory(:oauth_access_token, resource_owner_id: @user.id)
+    oauth_access_token = FactoryBot.create(:oauth_access_token, resource_owner_id: @user.id)
 
     get document_path(@document), params: { access_token: oauth_access_token.token }
 
@@ -73,7 +73,7 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
   end
 
   test 'do not authenticate using doorkeeper with expired token' do
-    oauth_access_token = Factory(:oauth_access_token, resource_owner_id: @user.id, created_at: 3.years.ago)
+    oauth_access_token = FactoryBot.create(:oauth_access_token, resource_owner_id: @user.id, created_at: 3.years.ago)
 
     get document_path(@document), headers: { 'Authorization' => bearer_auth(oauth_access_token.token) }
 

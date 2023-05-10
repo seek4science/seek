@@ -35,7 +35,7 @@ module ReadApiTestSuite
 
   ['min', 'max'].each do |m|
     test "can get #{m} resource" do
-      res = Factory.create("#{m}_#{singular_name}".to_sym)
+      res = FactoryBot.create("#{m}_#{singular_name}".to_sym)
       res.reload
       user_login(res.contributor) if res.respond_to?(:contributor)
       template = load_get_template("get_#{m}_#{singular_name}.json.erb", res)
@@ -45,8 +45,8 @@ module ReadApiTestSuite
 
   test 'can get index' do
     skip if skip_index_test?
-    Factory.create("min_#{singular_name}".to_sym)
-    Factory.create("max_#{singular_name}".to_sym)
+    FactoryBot.create("min_#{singular_name}".to_sym)
+    FactoryBot.create("max_#{singular_name}".to_sym)
     get collection_url, as: :json
 
     if model == Sample
@@ -61,7 +61,7 @@ module ReadApiTestSuite
     skip unless model.respond_to?(:authorization_supported?) && model.authorization_supported?
     res = private_resource
 
-    user_login(Factory(:person))
+    user_login(FactoryBot.create(:person))
     get member_url(res), as: :json
     assert_response :forbidden
     validate_json response.body, '#/components/schemas/forbiddenResponse'
@@ -76,7 +76,7 @@ module ReadApiTestSuite
   test 'write show example' do
     skip unless write_examples?
 
-    res = Factory.create("max_#{singular_name}".to_sym)
+    res = FactoryBot.create("max_#{singular_name}".to_sym)
     user_login(res.contributor) if res.respond_to?(:contributor)
     get member_url(res), as: :json
     assert_response :success
@@ -88,8 +88,8 @@ module ReadApiTestSuite
     skip unless write_examples? && !skip_index_test?
 
     model.delete_all unless model == Person
-    Factory.create("min_#{singular_name}".to_sym)
-    Factory.create("max_#{singular_name}".to_sym)
+    FactoryBot.create("min_#{singular_name}".to_sym)
+    FactoryBot.create("max_#{singular_name}".to_sym)
 
     get collection_url, as: :json
 

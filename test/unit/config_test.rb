@@ -60,7 +60,7 @@ class ConfigTest < ActiveSupport::TestCase
   end
 
   test 'filestore_location' do
-    cb = Factory :content_blob
+    cb = FactoryBot.create :content_blob
 
     assert_equal 'tmp/testing-filestore', Seek::Config.filestore_path
     assert_equal "#{Rails.root}/tmp/testing-filestore/assets", Seek::Config.asset_filestore_path
@@ -481,8 +481,8 @@ class ConfigTest < ActiveSupport::TestCase
   end
 
   test 'project-specific setting' do
-    many_bananas_project = Factory(:project)
-    no_bananas_project = Factory(:project)
+    many_bananas_project = FactoryBot.create(:project)
+    no_bananas_project = FactoryBot.create(:project)
     many_bananas_project.settings.set('banana_count', 10)
     no_bananas_project.settings.set('banana_count', 0)
 
@@ -491,7 +491,7 @@ class ConfigTest < ActiveSupport::TestCase
   end
 
   test 'project-specific settings can be accessed in various ways' do
-    many_bananas_project = Factory(:project)
+    many_bananas_project = FactoryBot.create(:project)
     many_bananas_project.settings.set('banana_count', 10)
 
     assert_equal 10, many_bananas_project.settings.get('banana_count')
@@ -499,8 +499,8 @@ class ConfigTest < ActiveSupport::TestCase
   end
 
   test 'project-specific settings do no conflict with global settings' do
-    many_bananas_project = Factory(:project)
-    no_bananas_project = Factory(:project)
+    many_bananas_project = FactoryBot.create(:project)
+    no_bananas_project = FactoryBot.create(:project)
     many_bananas_project.settings.set('banana_count', 10)
     Settings.global.set('banana_count', 5)
     no_bananas_project.settings.set('banana_count', 0)

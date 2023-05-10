@@ -4,9 +4,9 @@ FactoryBot.define do
     with_project_contributor
     sequence(:title) { |n| "A Data File_#{n}" }
   
-    after_create do |data_file|
+    after(:create) do |data_file|
       if data_file.content_blob.blank?
-        data_file.content_blob = Factory.create(:pdf_content_blob, asset: data_file, asset_version: data_file.version)
+        data_file.content_blob = FactoryBot.create(:pdf_content_blob, asset: data_file, asset_version: data_file.version)
       else
         data_file.content_blob.asset = data_file
         data_file.content_blob.asset_version = data_file.version
@@ -16,15 +16,15 @@ FactoryBot.define do
   end
   
   factory(:public_data_file, parent: :data_file) do
-    policy { Factory(:downloadable_public_policy) }
+    policy { FactoryBot.create(:downloadable_public_policy) }
   end
   
   factory(:min_data_file, class: DataFile) do
     with_project_contributor
     title { 'A Minimal DataFile' }
-    projects { [Factory(:min_project)] }
-    after_create do |data_file|
-      data_file.content_blob = Factory.create(:pdf_content_blob, asset: data_file, asset_version: data_file.version)
+    projects { [FactoryBot.create(:min_project)] }
+    after(:create) do |data_file|
+      data_file.content_blob = FactoryBot.create(:pdf_content_blob, asset: data_file, asset_version: data_file.version)
     end
   end
   
@@ -32,19 +32,19 @@ FactoryBot.define do
     with_project_contributor
     title { 'A Maximal DataFile' }
     description { 'Results - Sampling conformations of ATP-Mg inside the binding pocket' }
-    discussion_links { [Factory.build(:discussion_link, label:'Slack')] }
-    assays { [Factory(:public_assay)] }
-    events {[Factory.build(:event, policy: Factory(:public_policy))]}
-    workflows {[Factory.build(:workflow, policy: Factory(:public_policy))]}
-    relationships {[Factory(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: Factory(:publication))]}
-    after_create do |data_file|
+    discussion_links { [FactoryBot.build(:discussion_link, label:'Slack')] }
+    assays { [FactoryBot.create(:public_assay)] }
+    events {[FactoryBot.build(:event, policy: FactoryBot.create(:public_policy))]}
+    workflows {[FactoryBot.build(:workflow, policy: FactoryBot.create(:public_policy))]}
+    relationships {[FactoryBot.create(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: FactoryBot.create(:publication))]}
+    after(:create) do |data_file|
       if data_file.content_blob.blank?
-        data_file.content_blob = Factory.create(:pdf_content_blob, asset: data_file, asset_version: data_file.version)
+        data_file.content_blob = FactoryBot.create(:pdf_content_blob, asset: data_file, asset_version: data_file.version)
       end
   
       # required for annotations
-      Factory(:data_types_controlled_vocab) unless SampleControlledVocab::SystemVocabs.data_types_controlled_vocab
-      Factory(:data_formats_controlled_vocab) unless SampleControlledVocab::SystemVocabs.data_formats_controlled_vocab
+      FactoryBot.create(:data_types_controlled_vocab) unless SampleControlledVocab::SystemVocabs.data_types_controlled_vocab
+      FactoryBot.create(:data_formats_controlled_vocab) unless SampleControlledVocab::SystemVocabs.data_formats_controlled_vocab
   
       User.with_current_user(data_file.contributor.user) do
         data_file.tags = ['DataFile-tag1', 'DataFile-tag2', 'DataFile-tag3', 'DataFile-tag4', 'DataFile-tag5']
@@ -54,7 +54,7 @@ FactoryBot.define do
       data_file.save!
     end
     other_creators { 'Blogs, Joe' }
-    assets_creators { [AssetsCreator.new(affiliation: 'University of Somewhere', creator: Factory(:person, first_name: 'Some', last_name: 'One'))] }
+    assets_creators { [AssetsCreator.new(affiliation: 'University of Somewhere', creator: FactoryBot.create(:person, first_name: 'Some', last_name: 'One'))] }
   end
   
   factory(:rightfield_datafile, parent: :data_file) do
@@ -129,12 +129,12 @@ FactoryBot.define do
   factory(:jerm_data_file, class: DataFile) do
     sequence(:title) { |n| "A Data File_#{n}" }
     contributor nil
-    projects { [Factory(:project)] }
+    projects { [FactoryBot.create(:project)] }
     association :content_blob, factory: :url_content_blob
   
-    after_create do |data_file|
+    after(:create) do |data_file|
       if data_file.content_blob.blank?
-        data_file.content_blob = Factory.create(:pdf_content_blob, asset: data_file, asset_version: data_file.version)
+        data_file.content_blob = FactoryBot.create(:pdf_content_blob, asset: data_file, asset_version: data_file.version)
       else
         data_file.content_blob.asset = data_file
         data_file.content_blob.asset_version = data_file.version
@@ -149,7 +149,7 @@ FactoryBot.define do
   factory(:data_file_version, class: DataFile::Version) do
     association :data_file
     projects { data_file.projects }
-    after_create do |data_file_version|
+    after(:create) do |data_file_version|
       data_file_version.data_file.version += 1
       data_file_version.data_file.save
       data_file_version.version = data_file_version.data_file.version
@@ -159,9 +159,9 @@ FactoryBot.define do
   end
   
   factory(:data_file_version_with_blob, parent: :data_file_version) do
-    after_create do |data_file_version|
+    after(:create) do |data_file_version|
       if data_file_version.content_blob.blank?
-        Factory.create(:pdf_content_blob,
+        FactoryBot.create(:pdf_content_blob,
                        asset: data_file_version.data_file,
                        asset_version: data_file_version.version)
       else

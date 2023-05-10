@@ -5,12 +5,12 @@ include FactoriesHelper
 FactoryBot.define do
   trait :with_project_contributor do
     contributor { nil }
-    after_build do |resource|
+    after(:build) do |resource|
       if resource.contributor.nil?
         if resource.projects.none?
-          resource.projects = [Factory(:project)]
+          resource.projects = [FactoryBot.create(:project)]
         end
-        resource.contributor = Factory(:person, project: resource.projects.first)
+        resource.contributor = FactoryBot.create(:person, project: resource.projects.first)
       elsif resource.projects.none?
         resource.projects = [resource.contributor.projects.first]
       end
@@ -80,7 +80,7 @@ FactoryBot.define do
 '
     )
 
-    initialize_with { Seek::Openbis::Zample.new(Factory(:openbis_endpoint)).populate_from_json(json) }
+    initialize_with { Seek::Openbis::Zample.new(FactoryBot.create(:openbis_endpoint)).populate_from_json(json) }
     # skipping save as not implemented
     to_create { |instance| instance }
   end

@@ -4,7 +4,7 @@ class AvatarTest < ActiveSupport::TestCase
   test 'requires owner' do
     avatar = Avatar.new(image_file: File.open("#{Rails.root}/test/fixtures/files/file_picture.png", 'rb'))
     refute avatar.valid?
-    avatar.owner = Factory :project
+    avatar.owner = FactoryBot.create :project
     assert avatar.valid?
   end
 

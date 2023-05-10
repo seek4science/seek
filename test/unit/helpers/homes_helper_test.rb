@@ -9,20 +9,20 @@ class HomesHelperTest < ActionView::TestCase
 
   test 'should retrieve recently added/downloaded items in the chronological order' do
     n = 5
-    user = Factory :user
-    item = Factory(:data_file, policy: Factory(:public_policy), contributor: user.person)
+    user = FactoryBot.create :user
+    item = FactoryBot.create(:data_file, policy: FactoryBot.create(:public_policy), contributor: user.person)
 
     create_logs = []
 
-    private = Factory(:data_file, title: 'A private data file', policy: Factory(:private_policy))
+    private = FactoryBot.create(:data_file, title: 'A private data file', policy: FactoryBot.create(:private_policy))
     assert !private.can_view?(user)
-    create_logs << Factory(:activity_log, action: :create, activity_loggable: private, created_at: 9.day.ago, culprit: user)
+    create_logs << FactoryBot.create(:activity_log, action: :create, activity_loggable: private, created_at: 9.day.ago, culprit: user)
     download_logs = []
     (0...n).to_a.each do |i|
-      item2 = Factory(:data_file, policy: Factory(:public_policy), contributor: user.person)
-      create_logs << Factory(:activity_log, action: 'create', activity_loggable: item2, created_at: i.day.ago, culprit: user)
-      download_logs << Factory(:activity_log, action: 'download', activity_loggable: item2, created_at: i.day.ago, culprit: user)
-      download_logs << Factory(:activity_log, action: 'download', activity_loggable: item, created_at: i.hour.ago, culprit: user)
+      item2 = FactoryBot.create(:data_file, policy: FactoryBot.create(:public_policy), contributor: user.person)
+      create_logs << FactoryBot.create(:activity_log, action: 'create', activity_loggable: item2, created_at: i.day.ago, culprit: user)
+      download_logs << FactoryBot.create(:activity_log, action: 'download', activity_loggable: item2, created_at: i.day.ago, culprit: user)
+      download_logs << FactoryBot.create(:activity_log, action: 'download', activity_loggable: item, created_at: i.hour.ago, culprit: user)
     end
 
     recently_added_item_logs = recently_added_item_logs_hash(1.year.ago, n)
@@ -59,11 +59,11 @@ class HomesHelperTest < ActionView::TestCase
   end
 
   test 'should handle snapshots for download and recently added' do
-    person = Factory(:person)
-    snapshot1 = Factory(:investigation, policy: Factory(:publicly_viewable_policy), contributor: person).create_snapshot
-    snapshot2 = Factory(:assay, policy: Factory(:publicly_viewable_policy), contributor: person).create_snapshot
-    Factory(:activity_log, action: 'create', activity_loggable: snapshot1, created_at: 1.day.ago, culprit: person.user)
-    Factory(:activity_log, action: 'download', activity_loggable: snapshot2, created_at: 1.day.ago, culprit: person.user)
+    person = FactoryBot.create(:person)
+    snapshot1 = FactoryBot.create(:investigation, policy: FactoryBot.create(:publicly_viewable_policy), contributor: person).create_snapshot
+    snapshot2 = FactoryBot.create(:assay, policy: FactoryBot.create(:publicly_viewable_policy), contributor: person).create_snapshot
+    FactoryBot.create(:activity_log, action: 'create', activity_loggable: snapshot1, created_at: 1.day.ago, culprit: person.user)
+    FactoryBot.create(:activity_log, action: 'download', activity_loggable: snapshot2, created_at: 1.day.ago, culprit: person.user)
 
     added_hash = recently_added_item_logs_hash(1.year.ago)
     downloaded_hash = recently_downloaded_item_logs_hash(1.year.ago)

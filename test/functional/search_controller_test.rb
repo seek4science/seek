@@ -58,7 +58,7 @@ class SearchControllerTest < ActionController::TestCase
   end
 
   test 'can render external search results' do
-    FactoryBot.create_list(:model, 3, policy: Factory(:public_policy))
+    FactoryBot.create_list(:model, 3, policy: FactoryBot.create(:public_policy))
 
     VCR.use_cassette('biomodels/search') do
       with_config_value(:external_search_enabled, true) do

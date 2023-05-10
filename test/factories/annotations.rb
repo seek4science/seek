@@ -34,7 +34,7 @@ FactoryBot.define do
 
   # Worksheet
   factory :worksheet do
-    content_blob { Factory.build(:spreadsheet_content_blob, asset: Factory(:data_file)) }
+    content_blob { FactoryBot.build(:spreadsheet_content_blob, asset: FactoryBot.create(:data_file)) }
     last_row { 10 }
     last_column { 10 }
   end

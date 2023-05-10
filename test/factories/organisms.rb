@@ -12,9 +12,9 @@ FactoryBot.define do
     title { 'A Maximal Organism' }
     concept_uri { 'http://purl.bioontology.org/ontology/NCBITAXON/9606' }
     ontology_id { "23" }
-    assays { [Factory(:public_assay)] }
-    models {[Factory.build(:model, policy: Factory(:public_policy))]}
-    projects {[Factory.build(:project)]}
+    assays { [FactoryBot.create(:public_assay)] }
+    models {[FactoryBot.build(:model, policy: FactoryBot.create(:public_policy))]}
+    projects {[FactoryBot.build(:project)]}
   end
   
   # AssayOrganism

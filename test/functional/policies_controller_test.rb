@@ -6,7 +6,7 @@ class PoliciesControllerTest < ActionController::TestCase
   include SharingFormTestHelper
 
   def setup
-    login_as(Factory(:person).user)
+    login_as(FactoryBot.create(:person).user)
   end
 
   test 'should show the preview permission when choosing public scope' do
@@ -24,12 +24,12 @@ class PoliciesControllerTest < ActionController::TestCase
   end
 
   test 'should show the preview permission when custom the permissions for Person, Project and FavouriteGroup' do
-    user = Factory(:user)
+    user = FactoryBot.create(:user)
     login_as(user)
 
-    person = Factory(:person_in_project)
-    favorite_group = Factory(:favourite_group, user: user)
-    project = Factory(:project)
+    person = FactoryBot.create(:person_in_project)
+    favorite_group = FactoryBot.create(:favourite_group, user: user)
+    project = FactoryBot.create(:project)
 
     post :preview_permissions, params: { policy_attributes: {
       access_type: Policy::NO_ACCESS,
@@ -51,7 +51,7 @@ class PoliciesControllerTest < ActionController::TestCase
   end
 
   test 'should show the correct manager(contributor) when updating a study' do
-    study = Factory(:study)
+    study = FactoryBot.create(:study)
     contributor = study.contributor
     post :preview_permissions, params: { policy_attributes: { access_type: Policy::VISIBLE }, resource_id: study.id, resource_name: 'study' }
 
@@ -59,8 +59,8 @@ class PoliciesControllerTest < ActionController::TestCase
   end
 
   test 'should show notice message when an item is requested to be published' do
-    gatekeeper = Factory(:asset_gatekeeper)
-    sop = Factory(:sop, project_ids: gatekeeper.projects.map(&:id))
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    sop = FactoryBot.create(:sop, project_ids: gatekeeper.projects.map(&:id))
     login_as(sop.contributor)
     post :preview_permissions, params: { policy_attributes: projects_policy(Policy::VISIBLE, [gatekeeper.projects.first], Policy::ACCESSIBLE), resource_name: 'sop', resource_id: sop.id, project_ids: gatekeeper.projects.first.id.to_s }
 
@@ -68,8 +68,8 @@ class PoliciesControllerTest < ActionController::TestCase
   end
 
   test 'should show notice message when an item is requested to be published and the request was alread sent by this user' do
-    gatekeeper = Factory(:asset_gatekeeper)
-    sop = Factory(:sop, project_ids: gatekeeper.projects.map(&:id))
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    sop = FactoryBot.create(:sop, project_ids: gatekeeper.projects.map(&:id))
     login_as(sop.contributor)
     ResourcePublishLog.add_log ResourcePublishLog::WAITING_FOR_APPROVAL, sop
     post :preview_permissions, params: { policy_attributes: { access_type: Policy::VISIBLE }, resource_name: 'sop', resource_id: sop.id, project_ids: gatekeeper.projects.first.id.to_s }
@@ -78,14 +78,14 @@ class PoliciesControllerTest < ActionController::TestCase
   end
 
   test 'should not show notice message when an item can be published right away' do
-    post :preview_permissions, params: { policy_attributes: { access_type: Policy::VISIBLE }, resource_name: 'sop', project_ids: Factory(:project).id.to_s }
+    post :preview_permissions, params: { policy_attributes: { access_type: Policy::VISIBLE }, resource_name: 'sop', project_ids: FactoryBot.create(:project).id.to_s }
 
     assert_select '#preview_permissions div.alert', text: "An email will be sent to the #{I18n.t('asset_gatekeeper').pluralize.downcase} of the  #{I18n.t('project').pluralize} associated with this #{I18n.t('sop')} to ask for publishing approval. This #{I18n.t('sop')} will not be published until one of the #{I18n.t('asset_gatekeeper').pluralize.downcase } has granted approval.", count: 0
   end
 
   test 'when creating an item, can not publish the item if associate to it the project which has gatekeeper' do
-    gatekeeper = Factory(:asset_gatekeeper)
-    a_person = Factory(:person)
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    a_person = FactoryBot.create(:person)
     sop = Sop.new
 
     login_as(a_person.user)
@@ -96,21 +96,21 @@ class PoliciesControllerTest < ActionController::TestCase
   end
 
   test 'when creating an item, can publish the item if associate to it the project which has no gatekeeper' do
-    a_person = Factory(:person)
+    a_person = FactoryBot.create(:person)
     sop = Sop.new
 
     login_as(a_person.user)
     assert sop.can_manage?
 
-    updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(sop, Factory(:project))
+    updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(sop, FactoryBot.create(:project))
     assert updated_can_publish_immediately
   end
 
   test 'when updating an item, can not publish the item if associate to it the project which has gatekeeper' do
-    gatekeeper = Factory(:asset_gatekeeper)
-    a_person = Factory(:person)
-    item = Factory(:sop, policy: Factory(:policy))
-    Factory(:permission, contributor: a_person, access_type: Policy::MANAGING, policy: item.policy)
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    a_person = FactoryBot.create(:person)
+    item = FactoryBot.create(:sop, policy: FactoryBot.create(:policy))
+    FactoryBot.create(:permission, contributor: a_person, access_type: Policy::MANAGING, policy: item.policy)
     item.reload
 
     login_as(a_person.user)
@@ -121,21 +121,21 @@ class PoliciesControllerTest < ActionController::TestCase
   end
 
   test 'when updating an item, can publish the item if dissociate to it the project which has gatekeeper' do
-    gatekeeper = Factory(:asset_gatekeeper)
-    a_person = Factory(:person)
-    item = Factory(:sop, policy: Factory(:policy), project_ids: gatekeeper.projects.collect(&:id))
-    Factory(:permission, contributor: a_person, access_type: Policy::MANAGING, policy: item.policy)
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    a_person = FactoryBot.create(:person)
+    item = FactoryBot.create(:sop, policy: FactoryBot.create(:policy), project_ids: gatekeeper.projects.collect(&:id))
+    FactoryBot.create(:permission, contributor: a_person, access_type: Policy::MANAGING, policy: item.policy)
     item.reload
 
     login_as(a_person.user)
     assert item.can_manage?
 
-    updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(item, Factory(:project))
+    updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(item, FactoryBot.create(:project))
     assert updated_can_publish_immediately
   end
 
   test 'can publish assay without study' do
-    a_person = Factory(:person)
+    a_person = FactoryBot.create(:person)
     assay = Assay.new
 
     login_as(a_person.user)
@@ -146,11 +146,11 @@ class PoliciesControllerTest < ActionController::TestCase
   end
 
   test 'can not publish assay having project with gatekeeper' do
-    gatekeeper = Factory(:asset_gatekeeper)
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
     refute_empty gatekeeper.projects
-    a_person = Factory(:person, project: gatekeeper.projects.first)
-    inv = Factory(:investigation, contributor: gatekeeper)
-    study = Factory(:study, investigation: inv, contributor: gatekeeper)
+    a_person = FactoryBot.create(:person, project: gatekeeper.projects.first)
+    inv = FactoryBot.create(:investigation, contributor: gatekeeper)
+    study = FactoryBot.create(:study, investigation: inv, contributor: gatekeeper)
     assay = Assay.new
     assay.study = study
 
@@ -164,11 +164,11 @@ class PoliciesControllerTest < ActionController::TestCase
   end
 
   test 'always can publish for the published item' do
-    gatekeeper = Factory(:asset_gatekeeper)
-    a_person = Factory(:person)
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    a_person = FactoryBot.create(:person)
     login_as(gatekeeper.user)
-    item = Factory(:sop, contributor: gatekeeper, policy: Factory(:public_policy), project_ids: gatekeeper.projects.collect(&:id))
-    Factory(:permission, contributor: a_person, access_type: Policy::MANAGING, policy: item.policy)
+    item = FactoryBot.create(:sop, contributor: gatekeeper, policy: FactoryBot.create(:public_policy), project_ids: gatekeeper.projects.collect(&:id))
+    FactoryBot.create(:permission, contributor: a_person, access_type: Policy::MANAGING, policy: item.policy)
     item.reload
 
     login_as(a_person.user)
@@ -194,21 +194,21 @@ class PoliciesControllerTest < ActionController::TestCase
     post :preview_permissions, params: { policy_attributes: { access_type: Policy::NO_ACCESS }, resource_name: 'assay' }
 
     # with additional text for permissions
-    project = Factory(:project)
+    project = FactoryBot.create(:project)
     post :preview_permissions, params: { policy_attributes: projects_policy(Policy::VISIBLE, [project.id], Policy::ACCESSIBLE), resource_name: 'data_file', project_ids: project.id }
 
     # with additional text for privileged people
-    asset_manager = Factory(:asset_housekeeper)
+    asset_manager = FactoryBot.create(:asset_housekeeper)
     post :preview_permissions, params: { policy_attributes: projects_policy(Policy::NO_ACCESS, [asset_manager.projects.first], Policy::ACCESSIBLE), resource_name: 'data_file', project_ids: asset_manager.projects.first.id }
 
     # with additional text for both permissions and privileged people
-    asset_manager = Factory(:asset_housekeeper)
+    asset_manager = FactoryBot.create(:asset_housekeeper)
     post :preview_permissions, params: { policy_attributes: projects_policy(Policy::VISIBLE, [asset_manager.projects.first], Policy::ACCESSIBLE), resource_name: 'data_file', project_ids: asset_manager.projects.first.id }
   end
 
   test 'should display download permissions as view for non-downloadable resource in permission preview' do
-    person = Factory(:person_in_project)
-    project = Factory(:project)
+    person = FactoryBot.create(:person_in_project)
+    project = FactoryBot.create(:project)
 
     post :preview_permissions, params: { policy_attributes: {
         access_type: Policy::NO_ACCESS,

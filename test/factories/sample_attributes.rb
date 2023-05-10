@@ -35,17 +35,17 @@ FactoryBot.define do
   
   factory(:apples_controlled_vocab_attribute, parent: :sample_attribute) do
     sequence(:title) { |n| "apples controlled vocab attribute #{n}" }
-    after_build do |type|
-      type.sample_controlled_vocab = Factory.build(:apples_sample_controlled_vocab)
-      type.sample_attribute_type = Factory(:controlled_vocab_attribute_type)
+    after(:build) do |type|
+      type.sample_controlled_vocab = FactoryBot.build(:apples_sample_controlled_vocab)
+      type.sample_attribute_type = FactoryBot.create(:controlled_vocab_attribute_type)
     end
   end
   
   factory(:apples_list_controlled_vocab_attribute, parent: :sample_attribute) do
     sequence(:title) { |n| "apples list controlled vocab attribute #{n}" }
-    after_build do |type|
-      type.sample_controlled_vocab = Factory.build(:apples_sample_controlled_vocab)
-      type.sample_attribute_type = Factory(:cv_list_attribute_type)
+    after(:build) do |type|
+      type.sample_controlled_vocab = FactoryBot.build(:apples_sample_controlled_vocab)
+      type.sample_attribute_type = FactoryBot.create(:cv_list_attribute_type)
     end
   end
   

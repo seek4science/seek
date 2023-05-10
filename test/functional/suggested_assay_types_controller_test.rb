@@ -4,7 +4,7 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
 
   def setup
-    login_as Factory(:person)
+    login_as FactoryBot.create(:person)
   end
 
   test 'should not show manage page for normal user, but show for admins' do
@@ -12,27 +12,27 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
     assert_redirected_to root_url
 
     logout
-    login_as Factory(:user, person_id: Factory(:admin).id)
+    login_as FactoryBot.create(:user, person_id: FactoryBot.create(:admin).id)
     get :index
     assert_response :success
   end
 
   test 'should new' do
-    suggested = Factory(:suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics')
-    suggested2 = Factory(:suggested_assay_type, parent_id: suggested.id)
+    suggested = FactoryBot.create(:suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics')
+    suggested2 = FactoryBot.create(:suggested_assay_type, parent_id: suggested.id)
     get :new
     assert_response :success
   end
 
   test 'should show edit own assay types' do
-    get :edit, params: { id: Factory(:suggested_assay_type, contributor_id: User.current_user.person.try(:id)).id }
+    get :edit, params: { id: FactoryBot.create(:suggested_assay_type, contributor_id: User.current_user.person.try(:id)).id }
     assert_response :success
     assert_not_nil assigns(:suggested_assay_type)
   end
 
   test 'should create with suggested parent' do
-    login_as Factory(:admin)
-    suggested = Factory(:suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics')
+    login_as FactoryBot.create(:admin)
+    suggested = FactoryBot.create(:suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics')
     assert suggested.children.empty?
     assert_difference('SuggestedAssayType.count') do
       post :create, params: { suggested_assay_type: { label: 'test assay type', parent_uri: "suggested_assay_type:#{suggested.id}" } }
@@ -44,7 +44,7 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
   end
 
   test 'should create with ontology parent' do
-    login_as Factory(:admin)
+    login_as FactoryBot.create(:admin)
 
     assert_difference('SuggestedAssayType.count') do
       post :create, params: { suggested_assay_type: { label: 'test assay type', parent_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics' } }
@@ -56,8 +56,8 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
   end
 
   test 'should update label' do
-    login_as Factory(:admin)
-    suggested_assay_type = Factory(:suggested_assay_type, label: 'old label', contributor_id: User.current_user.person.try(:id))
+    login_as FactoryBot.create(:admin)
+    suggested_assay_type = FactoryBot.create(:suggested_assay_type, label: 'old label', contributor_id: User.current_user.person.try(:id))
     put :update, params: { id: suggested_assay_type.id, suggested_assay_type: { label: 'new label' } }
     assert_redirected_to action: :index
     get :index
@@ -65,13 +65,13 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
   end
 
   test 'should update parent' do
-    login_as Factory(:admin)
+    login_as FactoryBot.create(:admin)
 
-    suggested_parent1 = Factory(:suggested_assay_type)
-    suggested_parent2 = Factory(:suggested_assay_type)
+    suggested_parent1 = FactoryBot.create(:suggested_assay_type)
+    suggested_parent2 = FactoryBot.create(:suggested_assay_type)
     ontology_parent_uri = 'http://jermontology.org/ontology/JERMOntology#Fluxomics'
 
-    suggested_assay_type = Factory(:suggested_assay_type, contributor_id: User.current_user.person.try(:id), parent_id: suggested_parent1.id)
+    suggested_assay_type = FactoryBot.create(:suggested_assay_type, contributor_id: User.current_user.person.try(:id), parent_id: suggested_parent1.id)
     assert_equal 1, suggested_assay_type.parents.size
     assert_equal suggested_parent1, suggested_assay_type.parents.first
     assert_equal suggested_parent1.uri, suggested_assay_type.parent.uri.to_s
@@ -92,7 +92,7 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
 
   test 'should delete assay' do
     # even owner cannot delete own type
-    suggested_assay_type = Factory(:suggested_assay_type, label: 'delete_me', contributor_id: User.current_user.person.try(:id))
+    suggested_assay_type = FactoryBot.create(:suggested_assay_type, label: 'delete_me', contributor_id: User.current_user.person.try(:id))
     assert_no_difference('SuggestedAssayType.count') do
       delete :destroy, params: { id: suggested_assay_type.id }
     end
@@ -100,7 +100,7 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
     clear_flash(:error)
     logout
     # log in as another user, who is not the owner of the suggested assay type
-    login_as Factory(:user)
+    login_as FactoryBot.create(:user)
     assert_no_difference('SuggestedAssayType.count') do
       delete :destroy, params: { id: suggested_assay_type.id }
     end
@@ -110,7 +110,7 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
     logout
 
     # log in as admin
-    login_as Factory(:user, person_id: Factory(:admin).id)
+    login_as FactoryBot.create(:user, person_id: FactoryBot.create(:admin).id)
     assert_difference('SuggestedAssayType.count', -1) do
       delete :destroy, params: { id: suggested_assay_type.id }
     end
@@ -119,10 +119,10 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
   end
 
   test 'should not delete assay_type with child' do
-    login_as Factory(:user, person_id: Factory(:admin).id)
+    login_as FactoryBot.create(:user, person_id: FactoryBot.create(:admin).id)
 
-    parent = Factory :suggested_assay_type
-    child = Factory :suggested_assay_type, parent_id: parent.id
+    parent = FactoryBot.create :suggested_assay_type
+    child = FactoryBot.create :suggested_assay_type, parent_id: parent.id
 
     assert_no_difference('SuggestedAssayType.count') do
       delete :destroy, params: { id: parent.id }
@@ -132,10 +132,10 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
   end
 
   test 'should not delete assay_type with assays' do
-    login_as Factory(:user, person_id: Factory(:admin).id)
+    login_as FactoryBot.create(:user, person_id: FactoryBot.create(:admin).id)
 
-    suggested_at = Factory :suggested_assay_type
-    Factory(:experimental_assay, suggested_assay_type: suggested_at)
+    suggested_at = FactoryBot.create :suggested_assay_type
+    FactoryBot.create(:experimental_assay, suggested_assay_type: suggested_at)
     assert_no_difference('SuggestedAssayType.count') do
       delete :destroy, params: { id: suggested_at.id }
     end

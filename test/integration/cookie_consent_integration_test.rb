@@ -217,7 +217,7 @@ class CookieConsentIntegrationTest < ActionDispatch::IntegrationTest
   end
 
   test 'can access cookie consent page as authenticated user' do
-    @user = Factory(:user, login: 'test')
+    @user = FactoryBot.create(:user, login: 'test')
     login_as(@user)
 
     with_config_value(:require_cookie_consent, true) do
@@ -284,8 +284,8 @@ class CookieConsentIntegrationTest < ActionDispatch::IntegrationTest
     with_config_value(:require_cookie_consent, true) do
       post cookies_consent_path, params: { allow: 'necessary' }
 
-      presentation = Factory :presentation, license: 'CC-BY-4.0', policy: Factory(:public_policy)
-      presentationv = Factory :presentation_version_with_remote_content, presentation: presentation
+      presentation = FactoryBot.create :presentation, license: 'CC-BY-4.0', policy: FactoryBot.create(:public_policy)
+      presentationv = FactoryBot.create :presentation_version_with_remote_content, presentation: presentation
 
       get presentation_path(presentation)
       assert_response :success
@@ -298,8 +298,8 @@ class CookieConsentIntegrationTest < ActionDispatch::IntegrationTest
     with_config_value(:require_cookie_consent, true) do
       post cookies_consent_path, params: { allow: 'necessary,embedding' }
 
-      presentation = Factory :presentation, license: 'CC-BY-4.0', policy: Factory(:public_policy)
-      presentationv = Factory :presentation_version_with_remote_content, presentation: presentation
+      presentation = FactoryBot.create :presentation, license: 'CC-BY-4.0', policy: FactoryBot.create(:public_policy)
+      presentationv = FactoryBot.create :presentation_version_with_remote_content, presentation: presentation
 
       get presentation_path(presentation)
       assert_response :success
@@ -312,8 +312,8 @@ class CookieConsentIntegrationTest < ActionDispatch::IntegrationTest
     with_config_value(:require_cookie_consent, true) do
       post cookies_consent_path, params: { allow: all_options }
 
-      presentation = Factory :presentation, license: 'CC-BY-4.0', policy: Factory(:public_policy)
-      presentationv = Factory :presentation_version_with_remote_content, presentation: presentation
+      presentation = FactoryBot.create :presentation, license: 'CC-BY-4.0', policy: FactoryBot.create(:public_policy)
+      presentationv = FactoryBot.create :presentation_version_with_remote_content, presentation: presentation
 
       get presentation_path(presentation)
       assert_response :success
@@ -326,8 +326,8 @@ class CookieConsentIntegrationTest < ActionDispatch::IntegrationTest
     with_config_value(:require_cookie_consent, false) do
       post cookies_consent_path, params: { allow: 'necessary' }
 
-      presentation = Factory :presentation, license: 'CC-BY-4.0', policy: Factory(:public_policy)
-      presentationv = Factory :presentation_version_with_remote_content, presentation: presentation
+      presentation = FactoryBot.create :presentation, license: 'CC-BY-4.0', policy: FactoryBot.create(:public_policy)
+      presentationv = FactoryBot.create :presentation_version_with_remote_content, presentation: presentation
 
       get presentation_path(presentation)
       assert_response :success
@@ -340,8 +340,8 @@ class CookieConsentIntegrationTest < ActionDispatch::IntegrationTest
     with_config_value(:require_cookie_consent, true) do
       post cookies_consent_path, params: { allow: 'necessary' }
 
-      presentation = Factory :presentation, license: 'CC-BY-4.0', policy: Factory(:public_policy)
-      presentationv = Factory :presentation_version_with_blob, presentation: presentation
+      presentation = FactoryBot.create :presentation, license: 'CC-BY-4.0', policy: FactoryBot.create(:public_policy)
+      presentationv = FactoryBot.create :presentation_version_with_blob, presentation: presentation
 
       get presentation_path(presentation)
       assert_response :success
@@ -354,10 +354,10 @@ class CookieConsentIntegrationTest < ActionDispatch::IntegrationTest
     with_config_value(:require_cookie_consent, false) do
       post cookies_consent_path, params: { allow: 'necessary' }
 
-      @user = Factory(:user, login: 'test')
+      @user = FactoryBot.create(:user, login: 'test')
       login_as(@user)
 
-      workflow = Factory(:local_git_workflow, contributor: @user.person)
+      workflow = FactoryBot.create(:local_git_workflow, contributor: @user.person)
       version = workflow.latest_git_version
 
       version.add_remote_file('video.html', 'https://youtu.be/1234abcd')
@@ -373,10 +373,10 @@ class CookieConsentIntegrationTest < ActionDispatch::IntegrationTest
     with_config_value(:require_cookie_consent, true) do
       post cookies_consent_path, params: { allow: 'necessary,embedding' }
 
-      @user = Factory(:user, login: 'test')
+      @user = FactoryBot.create(:user, login: 'test')
       login_as(@user)
 
-      workflow = Factory(:local_git_workflow, contributor: @user.person)
+      workflow = FactoryBot.create(:local_git_workflow, contributor: @user.person)
       version = workflow.latest_git_version
 
       version.add_remote_file('video.html', 'https://youtu.be/1234abcd')
@@ -392,10 +392,10 @@ class CookieConsentIntegrationTest < ActionDispatch::IntegrationTest
     with_config_value(:require_cookie_consent, false) do
       post cookies_consent_path, params: { allow: all_options }
 
-      @user = Factory(:user, login: 'test')
+      @user = FactoryBot.create(:user, login: 'test')
       login_as(@user)
 
-      workflow = Factory(:local_git_workflow, contributor: @user.person)
+      workflow = FactoryBot.create(:local_git_workflow, contributor: @user.person)
       version = workflow.latest_git_version
 
       version.add_remote_file('video.html', 'https://youtu.be/1234abcd')
@@ -411,10 +411,10 @@ class CookieConsentIntegrationTest < ActionDispatch::IntegrationTest
     with_config_value(:require_cookie_consent, false) do
       post cookies_consent_path, params: { allow: 'necessary' }
 
-      @user = Factory(:user, login: 'test')
+      @user = FactoryBot.create(:user, login: 'test')
       login_as(@user)
 
-      workflow = Factory(:local_git_workflow, contributor: @user.person)
+      workflow = FactoryBot.create(:local_git_workflow, contributor: @user.person)
       version = workflow.latest_git_version
 
       version.add_remote_file('video.html', 'https://youtu.be/1234abcd')

@@ -52,13 +52,13 @@ module RdfTestCases
   end
 
   def rdf_test_object
-    object = Factory(model_name.underscore)
+    object = FactoryBot.create(model_name.underscore)
     login_as(object.contributor) if object.respond_to?(:contributor)
     object
   end
 
   def private_rdf_test_object
-    Factory(model_name.underscore, policy: Factory(:private_policy))
+    FactoryBot.create(model_name.underscore, policy: FactoryBot.create(:private_policy))
   end
 
   def invoke_rdf_get(object)

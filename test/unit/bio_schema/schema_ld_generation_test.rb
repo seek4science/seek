@@ -2,7 +2,7 @@ require 'test_helper'
 
 class SchemaLdGenerationTest < ActiveSupport::TestCase
   def setup
-    @person = Factory(:max_person, description: 'a lovely person')
+    @person = FactoryBot.create(:max_person, description: 'a lovely person')
     @project = @person.projects.first
     @current_time = Time.now.utc
   end
@@ -10,7 +10,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
   test 'data catalogue' do
     ActivityLog.destroy_all
     travel_to(@current_time) do
-      Factory :activity_log, activity_loggable: Factory(:person), action: 'create', controller_name: 'people'
+      FactoryBot.create :activity_log, activity_loggable: FactoryBot.create(:person), action: 'create', controller_name: 'people'
     end
 
     expected = {
@@ -60,7 +60,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
   test 'data catalogue only contains enabled types' do
     ActivityLog.destroy_all
     travel_to(@current_time) do
-      Factory :activity_log, activity_loggable: Factory(:person), action: 'create', controller_name: 'people'
+      FactoryBot.create :activity_log, activity_loggable: FactoryBot.create(:person), action: 'create', controller_name: 'people'
     end
 
     expected = {
@@ -108,7 +108,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
   end
 
   test 'person' do
-    @person.avatar = Factory(:avatar)
+    @person.avatar = FactoryBot.create(:avatar)
     disable_authorization_checks { @person.save! }
     institution = @person.institutions.first
     expected = {
@@ -139,8 +139,8 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
   test 'data file' do
     df = travel_to(@current_time) do
-      df = Factory(:max_data_file, description: 'short desc', contributor: @person, projects: [@project],
-                                   policy: Factory(:public_policy), doi: '10.10.10.10/test.1')
+      df = FactoryBot.create(:max_data_file, description: 'short desc', contributor: @person, projects: [@project],
+                                   policy: FactoryBot.create(:public_policy), doi: '10.10.10.10/test.1')
       df.add_annotations('keyword', 'tag', User.first)
       disable_authorization_checks { df.save! }
       df
@@ -194,7 +194,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
   test 'data file without content blob' do
     df = travel_to(@current_time) do
-      df = Factory(:max_data_file, contributor: @person, projects: [@project], policy: Factory(:public_policy),
+      df = FactoryBot.create(:max_data_file, contributor: @person, projects: [@project], policy: FactoryBot.create(:public_policy),
                                    doi: '10.10.10.10/test.1')
       df.add_annotations('keyword', 'tag', User.first)
       disable_authorization_checks do
@@ -244,9 +244,9 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
   test 'dataset with weblink' do
     df = travel_to(@current_time) do
-      df = Factory(:max_data_file, content_blob: Factory(:website_content_blob),
+      df = FactoryBot.create(:max_data_file, content_blob: FactoryBot.create(:website_content_blob),
                                    contributor: @person, projects: [@project],
-                                   policy: Factory(:public_policy), doi: '10.10.10.10/test.1')
+                                   policy: FactoryBot.create(:public_policy), doi: '10.10.10.10/test.1')
       df.add_annotations('keyword', 'tag', User.first)
       disable_authorization_checks { df.save! }
       df
@@ -292,7 +292,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
   end
 
   test 'taxon' do
-    organism = Factory(:organism, bioportal_concept: Factory(:bioportal_concept))
+    organism = FactoryBot.create(:organism, bioportal_concept: FactoryBot.create(:bioportal_concept))
 
     expected = {
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
@@ -310,7 +310,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
   end
 
   test 'project' do
-    @project.avatar = Factory(:avatar)
+    @project.avatar = FactoryBot.create(:avatar)
     @project.web_page = 'http://testing.com'
     @project.description = 'a lovely project'
     disable_authorization_checks { @project.save! }
@@ -342,7 +342,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
   end
 
   test 'sample' do
-    sample = Factory(:patient_sample, contributor: @person)
+    sample = FactoryBot.create(:patient_sample, contributor: @person)
     sample.add_annotations('keyword', 'tag', User.first)
     sample.set_attribute_value('postcode', 'M13 4PP')
     sample.set_attribute_value('weight', '88700.2')
@@ -371,7 +371,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
   end
 
   test 'event' do
-    event = Factory(:max_event, contributor: @person)
+    event = FactoryBot.create(:max_event, contributor: @person)
     data_file = event.data_files.first
     presentation = event.presentations.first
     expected = {
@@ -409,7 +409,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
   test 'document' do
     document = travel_to(@current_time) do
-      document = Factory(:document, contributor: @person)
+      document = FactoryBot.create(:document, contributor: @person)
       document.add_annotations('wibble', 'tag', User.first)
       disable_authorization_checks { document.save! }
       document
@@ -442,7 +442,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
   test 'presentation' do
     presentation = travel_to(@current_time) do
-      presentation = Factory(:presentation, title: 'This presentation', contributor: @person)
+      presentation = FactoryBot.create(:presentation, title: 'This presentation', contributor: @person)
       presentation.add_annotations('wibble', 'tag', User.first)
       disable_authorization_checks { presentation.save! }
       presentation
@@ -474,9 +474,9 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
   end
 
   test 'workflow' do
-    creator2 = Factory(:person)
+    creator2 = FactoryBot.create(:person)
     workflow = travel_to(@current_time) do
-      workflow = Factory(:cwl_packed_workflow,
+      workflow = FactoryBot.create(:cwl_packed_workflow,
                          title: 'This workflow',
                          description: 'This is a test workflow for bioschema generation',
                          contributor: @person,
@@ -600,7 +600,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
   test 'collection' do
     collection = travel_to(@current_time) do
-      collection = Factory(:max_collection)
+      collection = FactoryBot.create(:max_collection)
       disable_authorization_checks { collection.save! }
       collection
     end
@@ -658,7 +658,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
   test 'human_disease' do
     human_disease = travel_to(@current_time) do
-      human_disease = Factory(:max_human_disease)
+      human_disease = FactoryBot.create(:max_human_disease)
       disable_authorization_checks { human_disease.save! }
       human_disease
     end
@@ -680,7 +680,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
   test 'institution' do
     institution = travel_to(@current_time) do
-      institution = Factory(:max_institution)
+      institution = FactoryBot.create(:max_institution)
       disable_authorization_checks { institution.save! }
       institution
     end
@@ -705,7 +705,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
   test 'organism' do
     organism = travel_to(@current_time) do
-      organism = Factory(:max_organism)
+      organism = FactoryBot.create(:max_organism)
       disable_authorization_checks { organism.save! }
       organism
     end
@@ -727,7 +727,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
   test 'programme' do
     programme = travel_to(@current_time) do
-      programme = Factory(:max_programme)
+      programme = FactoryBot.create(:max_programme)
       disable_authorization_checks { programme.save! }
       programme
     end
@@ -748,14 +748,14 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
   test 'version of data file' do
     df = travel_to(@current_time) do
-      df = Factory(:max_data_file, description: 'version 1 description', title: 'version 1 title',
-                                   contributor: @person, projects: [@project], policy: Factory(:public_policy), doi: '10.10.10.10/test.1')
+      df = FactoryBot.create(:max_data_file, description: 'version 1 description', title: 'version 1 title',
+                                   contributor: @person, projects: [@project], policy: FactoryBot.create(:public_policy), doi: '10.10.10.10/test.1')
       df.add_annotations('keyword', 'tag', User.first)
       disable_authorization_checks do
         df.save!
         df.save_as_new_version
         df.update(description: 'version 2 description', title: 'version 2 title')
-        Factory.create(:image_content_blob, asset: df, asset_version: 2)
+        FactoryBot.create(:image_content_blob, asset: df, asset_version: 2)
         df.latest_version.update_column(:doi, '10.10.10.10/test.2')
       end
       df
@@ -876,8 +876,8 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
   test 'dataset with data dump' do
     Workflow.delete_all
-    Factory(:public_workflow)
-    Factory(:workflow)
+    FactoryBot.create(:public_workflow)
+    FactoryBot.create(:workflow)
     dump = Workflow.public_schema_ld_dump
     dump.write
     time = Time.now

@@ -6,10 +6,10 @@ class LogPublishingTest < ActionController::TestCase
   include AuthenticatedTestHelper
 
   def setup
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     @gatekeeper_project = person.projects.first
-    @gatekeeper = Factory(:asset_gatekeeper, project: @gatekeeper_project)
-    @another_project = Factory(:project)
+    @gatekeeper = FactoryBot.create(:asset_gatekeeper, project: @gatekeeper_project)
+    @another_project = FactoryBot.create(:project)
     person.add_to_project_and_institution(@another_project, person.institutions.first)
 
     login_as(person.user)
@@ -50,10 +50,10 @@ class LogPublishingTest < ActionController::TestCase
   end
 
   test 'log when updating an item from non-public to public' do
-    owner = Factory(:person)
+    owner = FactoryBot.create(:person)
     login_as(owner.user)
 
-    sop = Factory(:sop, contributor: owner)
+    sop = FactoryBot.create(:sop, contributor: owner)
     assert_equal Policy::NO_ACCESS, sop.policy.access_type
     assert sop.can_publish?
 
@@ -68,10 +68,10 @@ class LogPublishingTest < ActionController::TestCase
   end
 
   test 'log when sending the publish request approval during updating a non-public item' do
-    owner = Factory(:person, project: @gatekeeper_project)
+    owner = FactoryBot.create(:person, project: @gatekeeper_project)
     login_as(owner.user)
 
-    sop = Factory(:sop, project_ids: [@gatekeeper.projects.first.id], contributor: owner)
+    sop = FactoryBot.create(:sop, project_ids: [@gatekeeper.projects.first.id], contributor: owner)
     assert_equal Policy::NO_ACCESS, sop.policy.access_type
     assert sop.can_publish?
 
@@ -86,9 +86,9 @@ class LogPublishingTest < ActionController::TestCase
   end
 
   test 'dont log when updating an item with the not-related public sharing' do
-    owner = Factory(:person)
+    owner = FactoryBot.create(:person)
     login_as(owner.user)
-    sop = Factory(:sop, contributor: owner)
+    sop = FactoryBot.create(:sop, contributor: owner)
     assert_equal Policy::NO_ACCESS, sop.policy.access_type
 
     assert_no_difference ('ResourcePublishLog.count') do
@@ -97,10 +97,10 @@ class LogPublishingTest < ActionController::TestCase
   end
 
   test 'log when un-publishing an item' do
-    owner = Factory(:person)
+    owner = FactoryBot.create(:person)
     login_as(owner.user)
 
-    sop = Factory(:sop, contributor: owner, policy: Factory(:public_policy))
+    sop = FactoryBot.create(:sop, contributor: owner, policy: FactoryBot.create(:public_policy))
     assert_not_equal Policy::NO_ACCESS, sop.policy.access_type
 
     # create a published log for the published sop
@@ -118,7 +118,7 @@ class LogPublishingTest < ActionController::TestCase
 
   test 'log when approving publishing an item' do
     @controller = DataFilesController.new
-    df = Factory(:data_file, project_ids: @gatekeeper.projects.collect(&:id))
+    df = FactoryBot.create(:data_file, project_ids: @gatekeeper.projects.collect(&:id))
 
     login_as(df.contributor)
     put :update, params: { id: df.id, data_file: { title: df.title }, policy_attributes: { access_type: Policy::ACCESSIBLE } }
@@ -149,8 +149,8 @@ class LogPublishingTest < ActionController::TestCase
 
   test 'gatekeeper cannot approve an item from another project' do
     @controller = DataFilesController.new
-    gatekeeper2 = Factory(:asset_gatekeeper)
-    df = Factory(:data_file, project_ids: gatekeeper2.projects.collect(&:id))
+    gatekeeper2 = FactoryBot.create(:asset_gatekeeper)
+    df = FactoryBot.create(:data_file, project_ids: gatekeeper2.projects.collect(&:id))
 
     login_as(df.contributor)
     put :update, params: { id: df.id, data_file: { title: df.title }, policy_attributes: { access_type: Policy::ACCESSIBLE } }
@@ -179,15 +179,15 @@ class LogPublishingTest < ActionController::TestCase
     @controller = DataFilesController.new
     person = User.current_user.person
 
-    df = Factory :data_file,
+    df = FactoryBot.create :data_file,
                  contributor: person,
                  projects: [@another_project],
-                 assays: [Factory(:assay, contributor: person)]
+                 assays: [FactoryBot.create(:assay, contributor: person)]
 
     assay = df.assays.first
 
     # can be be published, but in a project with a gatekeeper
-    request_publishing_df = Factory(:data_file,
+    request_publishing_df = FactoryBot.create(:data_file,
                                     projects: [@gatekeeper_project],
                                     contributor: person,
                                     assays: [assay])

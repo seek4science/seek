@@ -11,7 +11,7 @@ FactoryBot.define do
     sequence(:uuid) { UUID.generate }
     data { 'Min Data' }
     original_filename { 'min file' }
-    asset { Factory(:pdf_sop, policy: Factory(:downloadable_public_policy)) }
+    asset { FactoryBot.create(:pdf_sop, policy: FactoryBot.create(:downloadable_public_policy)) }
   end
   
   factory(:max_content_blob, parent: :min_content_blob) do

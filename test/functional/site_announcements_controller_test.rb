@@ -21,14 +21,14 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
   end
 
   test 'should show' do
-    announcement = Factory(:feed_announcement)
+    announcement = FactoryBot.create(:feed_announcement)
     assert_not_nil announcement.announcer
     get :show, params: { id: announcement }
     assert_response :success
   end
 
   test 'should get edit' do
-    announcement = Factory(:feed_announcement)
+    announcement = FactoryBot.create(:feed_announcement)
     assert_not_nil announcement.announcer
     get :edit, params: { id: announcement }
     assert_response :success
@@ -42,7 +42,7 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
   end
 
   test 'should destroy' do
-    ann = Factory(:site_announcement)
+    ann = FactoryBot.create(:site_announcement)
     assert_difference('SiteAnnouncement.count', -1) do
       delete :destroy, params: { id: ann.id }
     end
@@ -52,7 +52,7 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
     NotifieeInfo.delete_all
     people = []
     (0...5).to_a.each do
-      people << Factory(:person)
+      people << FactoryBot.create(:person)
     end
 
     assert_equal 5, people.size
@@ -83,8 +83,8 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
   end
 
   test 'should not destroy' do
-    ann = Factory(:feed_announcement)
-    login_as(Factory(:person))
+    ann = FactoryBot.create(:feed_announcement)
+    login_as(FactoryBot.create(:person))
     assert_no_difference('SiteAnnouncement.count') do
       delete :destroy, params: { id: ann.id }
     end
@@ -93,14 +93,14 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
   end
 
   test 'should update' do
-    ann = Factory(:feed_announcement)
+    ann = FactoryBot.create(:feed_announcement)
     put :update, params: { id: ann, site_announcement: { title: 'bob' } }
     ann = SiteAnnouncement.find(ann.id)
     assert_equal 'bob', ann.title
   end
 
   test 'should not get new' do
-    login_as(Factory(:person))
+    login_as(FactoryBot.create(:person))
     get :new
     assert_response :redirect
     assert_redirected_to(root_url)
@@ -108,8 +108,8 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
   end
 
   test 'should not get edit' do
-    login_as(Factory(:person))
-    announcement = Factory(:feed_announcement)
+    login_as(FactoryBot.create(:person))
+    announcement = FactoryBot.create(:feed_announcement)
     assert_not_nil announcement.announcer
     get :edit, params: { id: announcement }
     assert_response :redirect
@@ -118,7 +118,7 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
   end
 
   test 'should not create' do
-    login_as(Factory(:person))
+    login_as(FactoryBot.create(:person))
     assert_no_difference('SiteAnnouncement.count') do
       post :create, params: { site_announcement: { title: 'fred' } }
     end
@@ -129,7 +129,7 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
 
   test 'should not update' do
     login_as(:aaron)
-    ann = Factory(:feed_announcement)
+    ann = FactoryBot.create(:feed_announcement)
     put :update, params: { id: ann, site_announcement: { title: 'bob' } }
 
     assert_response :redirect
@@ -141,14 +141,14 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
   end
 
   test 'feed with empty announcements' do
-    login_as(Factory(:person))
+    login_as(FactoryBot.create(:person))
     SiteAnnouncement.delete_all
     get :feed, format: 'atom'
     assert_response :success
   end
 
   test 'should get the headline announcements on the index page' do
-    Factory :headline_announcement
+    FactoryBot.create :headline_announcement
     assert !SiteAnnouncement.all.select(&:is_headline).empty?
     get :index
     assert_response :success
@@ -156,8 +156,8 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
   end
 
   test 'should only show feeds when feed_only passed' do
-    Factory :headline_announcement, show_in_feed: false, title: 'a headline announcement'
-    Factory :headline_announcement, show_in_feed: true, title: 'a headline announcement also in feed'
+    FactoryBot.create :headline_announcement, show_in_feed: false, title: 'a headline announcement'
+    FactoryBot.create :headline_announcement, show_in_feed: true, title: 'a headline announcement also in feed'
     get :index, params: { feed_only: true }
     assert_response :success
     assert_select 'div.announcement_list div.announcement span.announcement_title', text: 'a headline announcement', count: 0
@@ -166,7 +166,7 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
 
   test 'handle notification_settings' do
     # valid key
-    key = Factory(:notifiee_info).unique_key
+    key = FactoryBot.create(:notifiee_info).unique_key
     get :notification_settings, params: { key: key }
     assert_response :success
     assert_nil flash[:error]

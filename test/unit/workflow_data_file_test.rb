@@ -3,14 +3,14 @@ require 'test_helper'
 class WorkflowDataFileTest < ActiveSupport::TestCase
 
   test 'dependant destroy' do
-    @person = Factory(:person)
+    @person = FactoryBot.create(:person)
 
-    rel = Factory(:test_data_workflow_data_file_relationship)
-    df = Factory(:data_file, contributor: @person)
+    rel = FactoryBot.create(:test_data_workflow_data_file_relationship)
+    df = FactoryBot.create(:data_file, contributor: @person)
     wf = nil
 
     assert_difference('WorkflowDataFile.count') do
-      wf = Factory(:workflow, contributor: @person, workflow_data_files: [WorkflowDataFile.new(data_file:df, workflow_data_file_relationship: rel)] )
+      wf = FactoryBot.create(:workflow, contributor: @person, workflow_data_files: [WorkflowDataFile.new(data_file:df, workflow_data_file_relationship: rel)] )
     end
 
     User.with_current_user(@person.user) do
@@ -22,7 +22,7 @@ class WorkflowDataFileTest < ActiveSupport::TestCase
     end
 
     assert_difference('WorkflowDataFile.count') do
-      wf = Factory(:workflow, contributor: @person, workflow_data_files: [WorkflowDataFile.new(data_file:df, workflow_data_file_relationship: rel)] )
+      wf = FactoryBot.create(:workflow, contributor: @person, workflow_data_files: [WorkflowDataFile.new(data_file:df, workflow_data_file_relationship: rel)] )
     end
 
     User.with_current_user(@person.user) do
@@ -35,8 +35,8 @@ class WorkflowDataFileTest < ActiveSupport::TestCase
   end
 
   test 'validation' do
-    wf = Factory(:workflow)
-    df = Factory(:data_file)
+    wf = FactoryBot.create(:workflow)
+    df = FactoryBot.create(:data_file)
     wfdf = WorkflowDataFile.new(data_file: df, workflow:wf, workflow_data_file_relationship:nil)
 
     assert wfdf.valid?
@@ -49,7 +49,7 @@ class WorkflowDataFileTest < ActiveSupport::TestCase
     refute wfdf.valid?
 
     wfdf.workflow = wf
-    wfdf.workflow_data_file_relationship = Factory(:test_data_workflow_data_file_relationship)
+    wfdf.workflow_data_file_relationship = FactoryBot.create(:test_data_workflow_data_file_relationship)
     assert wfdf.valid?
 
   end

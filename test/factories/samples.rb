@@ -5,17 +5,17 @@ FactoryBot.define do
     association :sample_type, factory: :simple_sample_type
     association :contributor, factory: :person
   
-    after_build do |sample|
+    after(:build) do |sample|
       sample.projects = [sample.contributor.projects.first] if sample.projects.empty?
     end
-    after_build do |sample|
+    after(:build) do |sample|
       sample.set_attribute_value(:the_title, sample.title) if sample.data.key?(:the_title)
     end
   end
   
   factory(:patient_sample, parent: :sample) do
     association :sample_type, factory: :patient_sample_type
-    after_build do |sample|
+    after(:build) do |sample|
       sample.set_attribute_value('full name', 'Fred Bloggs')
       sample.set_attribute_value(:age, 44)
       sample.set_attribute_value(:weight, 88.7)
@@ -26,13 +26,13 @@ FactoryBot.define do
     sequence(:title) { |n| "Sample #{n}" }
     association :sample_type, factory: :strain_sample_type
   
-    after_build do |sample|
+    after(:build) do |sample|
       sample.set_attribute_value(:name, sample.title) if sample.data.key?(:name)
       sample.set_attribute_value(:seekstrain, '1234')
     end
   
-    after_build do |sample|
-      sample.originating_data_file = Factory(:strain_sample_data_file, projects:sample.projects, contributor:sample.contributor) if sample.originating_data_file.nil?
+    after(:build) do |sample|
+      sample.originating_data_file = FactoryBot.create(:strain_sample_data_file, projects:sample.projects, contributor:sample.contributor) if sample.originating_data_file.nil?
     end
   
   end
@@ -41,7 +41,7 @@ FactoryBot.define do
   factory(:min_sample, parent: :sample) do
     association :sample_type, factory: :min_sample_type
     association :contributor, factory: :person
-    after_build do |sample|
+    after(:build) do |sample|
       sample.set_attribute_value(:full_name, 'Fred Bloggs')
     end
   end
@@ -50,7 +50,7 @@ FactoryBot.define do
   factory(:max_sample, parent: :sample) do
     association :sample_type, factory: :max_sample_type
     association :contributor, factory: :person
-    after_build do |sample|
+    after(:build) do |sample|
       sample.annotate_with(['tag1', 'tag2'], 'tag', sample.contributor)
       sample.set_attribute_value(:full_name, 'Fred Bloggs')
       sample.set_attribute_value(:address, "HD")
@@ -58,7 +58,7 @@ FactoryBot.define do
       sample.set_attribute_value('CAPITAL key', 'key must remain capitalised')
       sample.set_attribute_value(:apple,['Bramley'])
       sample.set_attribute_value(:apples, ['Granny Smith','Golden Delicious'])
-      sample.set_attribute_value(:patients, [Factory(:patient_sample).id.to_s, Factory(:patient_sample).id.to_s])
+      sample.set_attribute_value(:patients, [FactoryBot.create(:patient_sample).id.to_s, FactoryBot.create(:patient_sample).id.to_s])
     end
   end
 end

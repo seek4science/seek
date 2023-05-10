@@ -5,7 +5,7 @@ class ProgrammeStatsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
 
   test 'clear cache' do
-    person = Factory(:programme_administrator)
+    person = FactoryBot.create(:programme_administrator)
     programme = person.administered_programmes.first
     login_as(person)
     key = "Programme_#{programme.id}_dashboard_stats_activity"
@@ -23,8 +23,8 @@ class ProgrammeStatsControllerTest < ActionController::TestCase
   end
 
   test 'regular programme member cannot clear cache' do
-    programme = Factory(:programme)
-    person = Factory(:person, project: programme.projects.first)
+    programme = FactoryBot.create(:programme)
+    person = FactoryBot.create(:person, project: programme.projects.first)
 
     login_as(person)
     key = "Programme_#{programme.id}_dashboard_stats_activity"
@@ -41,8 +41,8 @@ class ProgrammeStatsControllerTest < ActionController::TestCase
   end
 
   test 'non-programme member cannot clear cache' do
-    person = Factory(:person)
-    programme = Factory(:programme)
+    person = FactoryBot.create(:person)
+    programme = FactoryBot.create(:programme)
     login_as(person)
     key = "Programme_#{programme.id}_dashboard_stats_activity"
     refute Rails.cache.exist?(key)

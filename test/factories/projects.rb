@@ -11,7 +11,7 @@ FactoryBot.define do
   factory(:max_project, class: Project) do
     title { "A Maximal Project" }
     description { "A Taverna project" }
-    discussion_links { [Factory.build(:discussion_link, label:'Slack')] }
+    discussion_links { [FactoryBot.build(:discussion_link, label:'Slack')] }
     web_page { "http://www.taverna.org.uk" }
     wiki_page { "http://www.mygrid.org.uk" }
     default_license { "Other (Open)" }
@@ -21,20 +21,20 @@ FactoryBot.define do
     avatar
     programme
   
-    investigations {[Factory(:max_investigation, policy: Factory(:public_policy))]}
-    data_files {[Factory(:data_file, policy: Factory(:public_policy))]}
-    sops {[Factory(:sop, policy: Factory(:public_policy))]}
-    models {[Factory(:model, policy: Factory(:public_policy))]}
-    presentations {[Factory(:presentation, policy: Factory(:public_policy))]}
-    publications {[Factory(:publication, policy: Factory(:public_policy))]}
-    events {[Factory(:event, policy: Factory(:public_policy))]}
-    documents {[Factory(:document, policy: Factory(:public_policy))]}
-    workflows {[Factory(:workflow, policy: Factory(:public_policy))]}
-    collections {[Factory(:collection, policy: Factory(:public_policy))]}
-    after_create do |p|
-      member = Factory(:person, project: p)
+    investigations {[FactoryBot.create(:max_investigation, policy: FactoryBot.create(:public_policy))]}
+    data_files {[FactoryBot.create(:data_file, policy: FactoryBot.create(:public_policy))]}
+    sops {[FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy))]}
+    models {[FactoryBot.create(:model, policy: FactoryBot.create(:public_policy))]}
+    presentations {[FactoryBot.create(:presentation, policy: FactoryBot.create(:public_policy))]}
+    publications {[FactoryBot.create(:publication, policy: FactoryBot.create(:public_policy))]}
+    events {[FactoryBot.create(:event, policy: FactoryBot.create(:public_policy))]}
+    documents {[FactoryBot.create(:document, policy: FactoryBot.create(:public_policy))]}
+    workflows {[FactoryBot.create(:workflow, policy: FactoryBot.create(:public_policy))]}
+    collections {[FactoryBot.create(:collection, policy: FactoryBot.create(:public_policy))]}
+    after(:create) do |p|
+      member = FactoryBot.create(:person, project: p)
       p.reload
-      p.default_policy = Factory(:private_policy)
+      p.default_policy = FactoryBot.create(:private_policy)
   
       User.with_current_user member.user do
         p.topic_annotations = ['Biomedical science','Chemistry']

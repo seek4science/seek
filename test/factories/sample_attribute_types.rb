@@ -105,11 +105,11 @@ FactoryBot.define do
   # SampleControlledVocab
   factory(:apples_sample_controlled_vocab, class: SampleControlledVocab) do
     sequence(:title) { |n| "apples controlled vocab #{n}" }
-    after_build do |vocab|
-      vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Granny Smith')
-      vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Golden Delicious')
-      vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Bramley')
-      vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: "Cox's Orange Pippin")
+    after(:build) do |vocab|
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'Granny Smith')
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'Golden Delicious')
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'Bramley')
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: "Cox's Orange Pippin")
     end
   end
   
@@ -120,10 +120,10 @@ FactoryBot.define do
   factory(:ontology_sample_controlled_vocab, parent: :sample_controlled_vocab) do
     source_ontology { 'http://ontology.org' }
     ols_root_term_uri { 'http://ontology.org/#parent' }
-    after_build do |vocab|
-      vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Parent',iri:'http://ontology.org/#parent',parent_iri:'')
-      vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Mother',iri:'http://ontology.org/#mother',parent_iri:'http://ontology.org/#parent')
-      vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Father',iri:'http://ontology.org/#father',parent_iri:'http://ontology.org/#parent')
+    after(:build) do |vocab|
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'Parent',iri:'http://ontology.org/#parent',parent_iri:'')
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'Mother',iri:'http://ontology.org/#mother',parent_iri:'http://ontology.org/#parent')
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'Father',iri:'http://ontology.org/#father',parent_iri:'http://ontology.org/#parent')
     end
   end
   
@@ -132,11 +132,11 @@ FactoryBot.define do
     ols_root_term_uri { 'http://edamontology.org/topic_0003' }
     key { SampleControlledVocab::SystemVocabs.database_key_for_property(:topics) }
     source_ontology { 'edam' }
-    after_build do |vocab|
-      vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Topic',iri:'http://edamontology.org/topic_0003',parent_iri:'')
-      vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Biomedical science',iri:'http://edamontology.org/topic_3344',parent_iri:'http://edamontology.org/topic_0003')
-      vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Chemistry',iri:'http://edamontology.org/topic_3314',parent_iri:'http://edamontology.org/topic_0003')
-      vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Sample collections',iri:'http://edamontology.org/topic_3277',parent_iri:'http://edamontology.org/topic_3344')
+    after(:build) do |vocab|
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'Topic',iri:'http://edamontology.org/topic_0003',parent_iri:'')
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'Biomedical science',iri:'http://edamontology.org/topic_3344',parent_iri:'http://edamontology.org/topic_0003')
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'Chemistry',iri:'http://edamontology.org/topic_3314',parent_iri:'http://edamontology.org/topic_0003')
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'Sample collections',iri:'http://edamontology.org/topic_3277',parent_iri:'http://edamontology.org/topic_3344')
     end
   end
   
@@ -145,11 +145,11 @@ FactoryBot.define do
     ols_root_term_uri { 'http://edamontology.org/operation_0004' }
     key { SampleControlledVocab::SystemVocabs.database_key_for_property(:operations) }
     source_ontology { 'edam' }
-    after_build do |vocab|
-      vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Operation',iri:'http://edamontology.org/operation_0004',parent_iri:'')
-      vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Correlation',iri:'http://edamontology.org/operation_3465',parent_iri:'http://edamontology.org/operation_0004')
-      vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Clustering',iri:'http://edamontology.org/operation_3432',parent_iri:'http://edamontology.org/operation_0004')
-      vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Expression correlation analysis',iri:'http://edamontology.org/operation_3463',parent_iri:'http://edamontology.org/operation_3465')
+    after(:build) do |vocab|
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'Operation',iri:'http://edamontology.org/operation_0004',parent_iri:'')
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'Correlation',iri:'http://edamontology.org/operation_3465',parent_iri:'http://edamontology.org/operation_0004')
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'Clustering',iri:'http://edamontology.org/operation_3432',parent_iri:'http://edamontology.org/operation_0004')
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'Expression correlation analysis',iri:'http://edamontology.org/operation_3463',parent_iri:'http://edamontology.org/operation_3465')
     end
   end
   
@@ -158,9 +158,9 @@ FactoryBot.define do
     ols_root_term_uri { 'http://edamontology.org/data_0006' }
     key { SampleControlledVocab::SystemVocabs.database_key_for_property(:data_types) }
     source_ontology { 'edam' }
-    after_build do |vocab|
-      vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Data',iri:'http://edamontology.org/data_0006',parent_iri:'')
-      vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Sequence features metadata',iri: 'http://edamontology.org/data_2914', parent_iri:'http://edamontology.org/data_0006')
+    after(:build) do |vocab|
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'Data',iri:'http://edamontology.org/data_0006',parent_iri:'')
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'Sequence features metadata',iri: 'http://edamontology.org/data_2914', parent_iri:'http://edamontology.org/data_0006')
     end
   end
   
@@ -169,9 +169,9 @@ FactoryBot.define do
     ols_root_term_uri { 'http://edamontology.org/format_1915' }
     key { SampleControlledVocab::SystemVocabs.database_key_for_property(:data_formats) }
     source_ontology { 'edam' }
-    after_build do |vocab|
-      vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Format',iri:'http://edamontology.org/format_1915',parent_iri:'')
-      vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'JSON',iri: 'http://edamontology.org/format_3464', parent_iri:'http://edamontology.org/format_1915')
+    after(:build) do |vocab|
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'Format',iri:'http://edamontology.org/format_1915',parent_iri:'')
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'JSON',iri: 'http://edamontology.org/format_3464', parent_iri:'http://edamontology.org/format_1915')
     end
   end
   
@@ -179,10 +179,10 @@ FactoryBot.define do
     sequence(:title) { |n| "EFO ontology #{n}" }
     source_ontology { 'EFO' }
     ols_root_term_uri { 'http://www.ebi.ac.uk/efo/EFO_0000635' }
-    after_build do |vocab|
-      vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'anatomical entity')
-      vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'retroperitoneal space')
-      vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'abdominal cavity')
+    after(:build) do |vocab|
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'anatomical entity')
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'retroperitoneal space')
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'abdominal cavity')
     end
   end
   
@@ -190,12 +190,12 @@ FactoryBot.define do
     sequence(:title) { |n| "OBI ontology #{n}" }
     source_ontology { 'OBI' }
     ols_root_term_uri { 'http://purl.obolibrary.org/obo/OBI_0000094' }
-    after_build do |vocab|
-      vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'dissection')
-      vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'enzymatic cleavage')
-      vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'non specific enzymatic cleavage')
-      vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'protease cleavage')
-      vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'DNA restriction enzyme digestion')
+    after(:build) do |vocab|
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'dissection')
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'enzymatic cleavage')
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'non specific enzymatic cleavage')
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'protease cleavage')
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'DNA restriction enzyme digestion')
     end
   end
 end

@@ -10,11 +10,11 @@ FactoryBot.define do
   
   factory(:max_human_disease, class: HumanDisease) do
     title { 'A Maximal Human Disease' }
-    projects { [ Factory(:project) ] }
+    projects { [ FactoryBot.create(:project) ] }
     concept_uri { 'http://purl.bioontology.org/obo/DOID_1909' }
     ontology_id { '23' }
-    assays { [ Factory.build(:assay, policy: Factory(:public_policy)) ] }
-    models { [ Factory.build(:model, policy: Factory(:public_policy)) ] }
+    assays { [ FactoryBot.build(:assay, policy: FactoryBot.create(:public_policy)) ] }
+    models { [ FactoryBot.build(:model, policy: FactoryBot.create(:public_policy)) ] }
   end
   
   # AssayHumanDisease

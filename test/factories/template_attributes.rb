@@ -7,9 +7,9 @@ FactoryBot.define do
   
   factory(:apples_controlled_vocab_template_attribute, parent: :template_attribute) do
     sequence(:title) { |n| "apples controlled vocab template attribute #{n}" }
-    after_build do |type|
-      type.sample_controlled_vocab = Factory.build(:apples_sample_controlled_vocab)
-      type.sample_attribute_type = Factory(:controlled_vocab_attribute_type)
+    after(:build) do |type|
+      type.sample_controlled_vocab = FactoryBot.build(:apples_sample_controlled_vocab)
+      type.sample_attribute_type = FactoryBot.create(:controlled_vocab_attribute_type)
     end
   end
 end

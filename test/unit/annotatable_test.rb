@@ -20,7 +20,7 @@ class AnnotatableTest < ActiveSupport::TestCase
   end
 
   test 'annotate_with' do
-    p = Factory :person
+    p = FactoryBot.create :person
     User.current_user = p.user
     assert_equal 0, p.expertise.size
     assert_difference('Annotation.count', 2) do
@@ -33,11 +33,11 @@ class AnnotatableTest < ActiveSupport::TestCase
   end
 
   test 'annotate_with on new object' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     User.current_user = person.user
     TextValue.create!(text: 'Fishing')
 
-    new_sop = Factory.build(:sop, contributor: person)
+    new_sop = FactoryBot.build(:sop, contributor: person)
     assert_equal 0, new_sop.annotations_with_attribute('tag').size
     assert_no_difference('Annotation.count') do
       assert_no_difference('TextValue.count') do
@@ -57,10 +57,10 @@ class AnnotatableTest < ActiveSupport::TestCase
   end
 
   test 'annotate_with on existing object' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     User.current_user = person.user
 
-    existing_sop = Factory(:sop, contributor: person)
+    existing_sop = FactoryBot.create(:sop, contributor: person)
     existing_sop.annotate_with %w(golf fishing)
     existing_sop.save!
     assert_equal 2, existing_sop.annotations_with_attribute('tag').size
@@ -79,7 +79,7 @@ class AnnotatableTest < ActiveSupport::TestCase
   end
 
   test 'add_annotations' do
-    p = Factory :person
+    p = FactoryBot.create :person
     User.current_user = p.user
     assert_equal 0, p.expertise.size
     assert_difference('Annotation.count', 2) do
@@ -94,7 +94,7 @@ class AnnotatableTest < ActiveSupport::TestCase
   end
 
   test 'add_annotations as array' do
-    p = Factory :person
+    p = FactoryBot.create :person
     User.current_user = p.user
     assert_equal 0, p.expertise.size
     assert_difference('Annotation.count', 2) do
@@ -127,7 +127,7 @@ class AnnotatableTest < ActiveSupport::TestCase
   end
 
   test 'annotate_with changed response' do
-    p = Factory :person
+    p = FactoryBot.create :person
     User.current_user = p.user
     p.save!
     attr = 'expertise'
@@ -143,7 +143,7 @@ class AnnotatableTest < ActiveSupport::TestCase
   end
 
   test 'no duplication tags' do
-    p = Factory :person
+    p = FactoryBot.create :person
     User.current_user = p.user
     attr = 'expertise'
 
@@ -154,7 +154,7 @@ class AnnotatableTest < ActiveSupport::TestCase
   end
 
   test 'ignore case sensitive' do
-    p = Factory :person
+    p = FactoryBot.create :person
     User.current_user = p.user
     attr = 'expertise'
 

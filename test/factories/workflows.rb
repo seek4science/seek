@@ -50,24 +50,24 @@ FactoryBot.define do
   
   factory(:user_added_workflow_class, class: WorkflowClass) do
     sequence(:title) { |n| "User-added Type #{n}" }
-    contributor { Factory(:person) }
+    contributor { FactoryBot.create(:person) }
   end
   
   factory(:user_added_workflow_class_with_logo, class: WorkflowClass) do
     sequence(:title) { |n| "User-added Type with Logo #{n}" }
     avatar
-    contributor { Factory(:person) }
+    contributor { FactoryBot.create(:person) }
   end
   
   # Workflow
   factory(:workflow) do
     title { 'This Workflow' }
     with_project_contributor
-    workflow_class { WorkflowClass.find_by_key('cwl') || Factory(:cwl_workflow_class) }
+    workflow_class { WorkflowClass.find_by_key('cwl') || FactoryBot.create(:cwl_workflow_class) }
   
-    after_create do |workflow|
+    after(:create) do |workflow|
       if workflow.content_blob.blank?
-        workflow.content_blob = Factory.create(:cwl_content_blob, original_filename: 'workflow.cwl',
+        workflow.content_blob = FactoryBot.create(:cwl_content_blob, original_filename: 'workflow.cwl',
                                           asset: workflow, asset_version: workflow.version)
       else
         workflow.content_blob.asset = workflow
@@ -78,16 +78,16 @@ FactoryBot.define do
   end
   
   factory(:public_workflow, parent: :workflow) do
-    policy { Factory(:downloadable_public_policy) }
+    policy { FactoryBot.create(:downloadable_public_policy) }
   end
   
   factory(:min_workflow, class: Workflow) do
     with_project_contributor
     title { 'A Minimal Workflow' }
-    workflow_class { WorkflowClass.find_by_key('cwl') || Factory(:cwl_workflow_class) }
-    projects { [Factory.build(:min_project)] }
-    after_create do |workflow|
-      workflow.content_blob = Factory.create(:cwl_content_blob, asset: workflow, asset_version: workflow.version)
+    workflow_class { WorkflowClass.find_by_key('cwl') || FactoryBot.create(:cwl_workflow_class) }
+    projects { [FactoryBot.build(:min_project)] }
+    after(:create) do |workflow|
+      workflow.content_blob = FactoryBot.create(:cwl_content_blob, asset: workflow, asset_version: workflow.version)
     end
   end
   
@@ -95,16 +95,16 @@ FactoryBot.define do
     with_project_contributor
     title { 'A Maximal Workflow' }
     description { 'How to run a simulation in GROMACS' }
-    workflow_class { WorkflowClass.find_by_key('cwl') || Factory(:cwl_workflow_class) }
-    assays { [Factory(:public_assay)] }
-    relationships {[Factory(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: Factory(:publication))]}
-    discussion_links { [Factory.build(:discussion_link, label:'Slack')] }
-    after_create do |workflow|
-      workflow.content_blob = Factory.create(:cwl_content_blob, asset: workflow, asset_version: workflow.version)
+    workflow_class { WorkflowClass.find_by_key('cwl') || FactoryBot.create(:cwl_workflow_class) }
+    assays { [FactoryBot.create(:public_assay)] }
+    relationships {[FactoryBot.create(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: FactoryBot.create(:publication))]}
+    discussion_links { [FactoryBot.build(:discussion_link, label:'Slack')] }
+    after(:create) do |workflow|
+      workflow.content_blob = FactoryBot.create(:cwl_content_blob, asset: workflow, asset_version: workflow.version)
   
       # required for annotations
-      Factory(:operations_controlled_vocab) unless SampleControlledVocab::SystemVocabs.operations_controlled_vocab
-      Factory(:topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.topics_controlled_vocab
+      FactoryBot.create(:operations_controlled_vocab) unless SampleControlledVocab::SystemVocabs.operations_controlled_vocab
+      FactoryBot.create(:topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.topics_controlled_vocab
   
       User.with_current_user(workflow.contributor.user) do
         workflow.tags = ['Workflow-tag1', 'Workflow-tag2', 'Workflow-tag3', 'Workflow-tag4', 'Workflow-tag5']
@@ -114,7 +114,7 @@ FactoryBot.define do
       workflow.save!
     end
     other_creators { 'Blogs, Joe' }
-    assets_creators { [AssetsCreator.new(affiliation: 'University of Somewhere', creator: Factory(:person, first_name: 'Some', last_name: 'One'))] }
+    assets_creators { [AssetsCreator.new(affiliation: 'University of Somewhere', creator: FactoryBot.create(:person, first_name: 'Some', last_name: 'One'))] }
   end
   
   factory(:cwl_workflow, parent: :workflow) do
@@ -134,7 +134,7 @@ FactoryBot.define do
   factory(:workflow_version, class: Workflow::Version) do
     association :workflow
     projects { workflow.projects }
-    after_create do |workflow_version|
+    after(:create) do |workflow_version|
       workflow_version.workflow.version += 1
       workflow_version.workflow.save
       workflow_version.version = workflow_version.workflow.version
@@ -144,9 +144,9 @@ FactoryBot.define do
   end
   
   factory(:workflow_version_with_blob, parent: :workflow_version) do
-    after_create do |workflow_version|
+    after(:create) do |workflow_version|
       if workflow_version.content_blob.blank?
-        workflow_version.content_blob = Factory.create(:cwl_content_blob,
+        workflow_version.content_blob = FactoryBot.create(:cwl_content_blob,
                                                   asset: workflow_version.workflow,
                                                   asset_version: workflow_version.version)
       else
@@ -164,23 +164,23 @@ FactoryBot.define do
   # A pre-made RO-Crate
   factory(:existing_galaxy_ro_crate_workflow, parent: :workflow) do
     association :content_blob, factory: :existing_galaxy_ro_crate
-    workflow_class { WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class) }
+    workflow_class { WorkflowClass.find_by_key('galaxy') || FactoryBot.create(:galaxy_workflow_class) }
   end
   
   # An RO-Crate generated by SEEK through the form on the workflow page
   factory(:generated_galaxy_ro_crate_workflow, parent: :workflow) do
     association :content_blob, factory: :generated_galaxy_ro_crate
-    workflow_class { WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class) }
+    workflow_class { WorkflowClass.find_by_key('galaxy') || FactoryBot.create(:galaxy_workflow_class) }
   end
   
   factory(:generated_galaxy_no_diagram_ro_crate_workflow, parent: :workflow) do
     association :content_blob, factory: :generated_galaxy_no_diagram_ro_crate
-    workflow_class { WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class) }
+    workflow_class { WorkflowClass.find_by_key('galaxy') || FactoryBot.create(:galaxy_workflow_class) }
   end
   
   factory(:nf_core_ro_crate_workflow, parent: :workflow) do
     association :content_blob, factory: :nf_core_ro_crate
-    workflow_class { WorkflowClass.find_by_key('nextflow') || Factory(:nextflow_workflow_class) }
+    workflow_class { WorkflowClass.find_by_key('nextflow') || FactoryBot.create(:nextflow_workflow_class) }
   end
   
   factory(:just_cwl_ro_crate_workflow, parent: :workflow) do
@@ -193,20 +193,20 @@ FactoryBot.define do
   
   factory(:spaces_ro_crate_workflow, parent: :workflow) do
     association :content_blob, factory: :spaces_ro_crate
-    workflow_class { WorkflowClass.find_by_title('Jupyter Notebook') || Factory(:jupyter_workflow_class) }
+    workflow_class { WorkflowClass.find_by_title('Jupyter Notebook') || FactoryBot.create(:jupyter_workflow_class) }
   end
   
   factory(:dots_ro_crate_workflow, parent: :workflow) do
     association :content_blob, factory: :dots_ro_crate
-    workflow_class { WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class) }
+    workflow_class { WorkflowClass.find_by_key('galaxy') || FactoryBot.create(:galaxy_workflow_class) }
   end
   
   factory(:remote_git_workflow, class: Workflow) do
     title { 'Concat two files' }
     with_project_contributor
-    workflow_class { WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class) }
+    workflow_class { WorkflowClass.find_by_key('galaxy') || FactoryBot.create(:galaxy_workflow_class) }
     git_version_attributes {
-      repo = Factory(:remote_repository)
+      repo = FactoryBot.create(:remote_repository)
       { git_repository_id: repo.id,
         ref: 'refs/heads/main',
         commit: 'b6312caabe582d156dd351fab98ce78356c4b74c',
@@ -219,9 +219,9 @@ FactoryBot.define do
   factory(:annotationless_local_git_workflow, class: Workflow) do
     title { 'Concat two files' }
     with_project_contributor
-    workflow_class { WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class) }
+    workflow_class { WorkflowClass.find_by_key('galaxy') || FactoryBot.create(:galaxy_workflow_class) }
     git_version_attributes do
-      repo = Factory(:unlinked_local_repository)
+      repo = FactoryBot.create(:unlinked_local_repository)
       { git_repository_id: repo.id,
         ref: 'refs/heads/master',
         commit: '96aee188b2f9c145860f21dc182608fec5084a8a',
@@ -233,9 +233,9 @@ FactoryBot.define do
   factory(:local_git_workflow, class: Workflow) do
     title { 'Concat two files' }
     with_project_contributor
-    workflow_class { WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class) }
+    workflow_class { WorkflowClass.find_by_key('galaxy') || FactoryBot.create(:galaxy_workflow_class) }
     git_version_attributes do
-      repo = Factory(:unlinked_local_repository)
+      repo = FactoryBot.create(:unlinked_local_repository)
       { git_repository_id: repo.id,
         ref: 'refs/heads/master',
         commit: '96aee188b2f9c145860f21dc182608fec5084a8a',
@@ -249,9 +249,9 @@ FactoryBot.define do
   factory(:ro_crate_git_workflow, class: Workflow) do
     title { 'Sort and change case' }
     with_project_contributor
-    workflow_class { WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class) }
+    workflow_class { WorkflowClass.find_by_key('galaxy') || FactoryBot.create(:galaxy_workflow_class) }
     git_version_attributes do
-      repo = Factory(:remote_workflow_ro_crate_repository)
+      repo = FactoryBot.create(:remote_workflow_ro_crate_repository)
       { git_repository_id: repo.id,
         ref: 'refs/remotes/origin/master',
         commit: 'a321b6e',
@@ -264,9 +264,9 @@ FactoryBot.define do
   factory(:local_ro_crate_git_workflow, class: Workflow) do
     title { 'Sort and change case' }
     with_project_contributor
-    workflow_class { WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class) }
+    workflow_class { WorkflowClass.find_by_key('galaxy') || FactoryBot.create(:galaxy_workflow_class) }
     git_version_attributes do
-      repo = Factory(:workflow_ro_crate_repository)
+      repo = FactoryBot.create(:workflow_ro_crate_repository)
       { git_repository_id: repo.id,
         ref: 'refs/heads/master',
         commit: 'a321b6e',
@@ -279,9 +279,9 @@ FactoryBot.define do
   factory(:local_ro_crate_git_workflow_with_tests, class: Workflow) do
     title { 'Sort and change case' }
     with_project_contributor
-    workflow_class { WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class) }
+    workflow_class { WorkflowClass.find_by_key('galaxy') || FactoryBot.create(:galaxy_workflow_class) }
     git_version_attributes do
-      repo = Factory(:workflow_ro_crate_repository)
+      repo = FactoryBot.create(:workflow_ro_crate_repository)
       { git_repository_id: repo.id,
         ref: 'refs/heads/tests',
         commit: '612f7f7',
@@ -294,9 +294,9 @@ FactoryBot.define do
   factory(:nfcore_git_workflow, class: Workflow) do
     title { 'nf-core/rnaseq' }
     with_project_contributor
-    workflow_class { WorkflowClass.find_by_key('nextflow') || Factory(:nextflow_workflow_class) }
+    workflow_class { WorkflowClass.find_by_key('nextflow') || FactoryBot.create(:nextflow_workflow_class) }
     git_version_attributes do
-      repo = Factory(:nfcore_local_rocrate_repository)
+      repo = FactoryBot.create(:nfcore_local_rocrate_repository)
       { git_repository_id: repo.id,
         ref: 'refs/heads/master',
         commit: '3643a94411b65f42bce5357c5015603099556ad9',
@@ -310,7 +310,7 @@ FactoryBot.define do
     title { 'Empty Workflow' }
     with_project_contributor
     git_version_attributes do
-      repo = Factory(:blank_repository)
+      repo = FactoryBot.create(:blank_repository)
       { git_repository_id: repo.id, mutable: true }
     end
   end
@@ -323,9 +323,9 @@ FactoryBot.define do
   factory(:ro_crate_git_workflow_with_tests, class: Workflow) do
     title { 'Sort and change case' }
     with_project_contributor
-    workflow_class { WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class) }
+    workflow_class { WorkflowClass.find_by_key('galaxy') || FactoryBot.create(:galaxy_workflow_class) }
     git_version_attributes do
-      repo = Factory(:remote_workflow_ro_crate_repository)
+      repo = FactoryBot.create(:remote_workflow_ro_crate_repository)
       { git_repository_id: repo.id,
         ref: 'refs/remotes/origin/tests',
         commit: '612f7f7',

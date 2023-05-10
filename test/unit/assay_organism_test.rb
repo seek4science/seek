@@ -2,14 +2,14 @@ require 'test_helper'
 
 class AssayOrganismTest < ActiveSupport::TestCase
   test 'exists_for?' do
-    strain = Factory :strain
+    strain = FactoryBot.create :strain
     organism = strain.organism
-    assay = Factory :assay
-    cult = Factory :culture_growth_type
-    cell_type = Factory(:tissue_and_cell_type)
-    cell_type2 = Factory(:tissue_and_cell_type)
+    assay = FactoryBot.create :assay
+    cult = FactoryBot.create :culture_growth_type
+    cell_type = FactoryBot.create(:tissue_and_cell_type)
+    cell_type2 = FactoryBot.create(:tissue_and_cell_type)
 
-    Factory(:assay_organism)
+    FactoryBot.create(:assay_organism)
     refute AssayOrganism.exists_for?(assay, organism, strain, cult)
 
     AssayOrganism.create!(strain: strain, organism: organism, assay: assay, culture_growth_type: cult)

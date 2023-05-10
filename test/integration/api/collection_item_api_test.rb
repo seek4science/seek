@@ -7,10 +7,10 @@ class CollectionItemApiTest < ActionDispatch::IntegrationTest
   def setup
     user_login
     @project = @current_user.person.projects.first
-    @collection = Factory(:collection, contributor: current_person)
-    @document = Factory(:public_document, contributor: current_person)
-    @sop = Factory(:sop, contributor: current_person, policy: Factory(:publicly_viewable_policy))
-    @collection_item = Factory(:collection_item, collection: @collection)
+    @collection = FactoryBot.create(:collection, contributor: current_person)
+    @document = FactoryBot.create(:public_document, contributor: current_person)
+    @sop = FactoryBot.create(:sop, contributor: current_person, policy: FactoryBot.create(:publicly_viewable_policy))
+    @collection_item = FactoryBot.create(:collection_item, collection: @collection)
   end
 
   def index_response_fragment

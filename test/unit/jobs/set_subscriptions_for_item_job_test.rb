@@ -4,16 +4,16 @@ class SetSubscriptionsForItemJobTest < ActiveSupport::TestCase
   fixtures :all
 
   def setup
-    User.current_user = Factory(:user)
+    User.current_user = FactoryBot.create(:user)
   end
 
   test 'perform for datafile' do
-    person1 = Factory(:person)
-    person2 = Factory(:person)
+    person1 = FactoryBot.create(:person)
+    person2 = FactoryBot.create(:person)
     subscribable = nil
     # when subscribable is created, SetSubscriptionsForItemJob is also created
     assert_enqueued_with(job: SetSubscriptionsForItemJob) do
-      subscribable = Factory(:data_file, policy: Factory(:public_policy))
+      subscribable = FactoryBot.create(:data_file, policy: FactoryBot.create(:public_policy))
     end
     assert_equal 1, subscribable.projects.count
     project_subscription1 = person1.project_subscriptions.create project: subscribable.projects.first, frequency: 'weekly'
@@ -30,12 +30,12 @@ class SetSubscriptionsForItemJobTest < ActiveSupport::TestCase
   end
 
   test 'perform for assay' do
-    person1 = Factory(:person)
-    person2 = Factory(:person)
+    person1 = FactoryBot.create(:person)
+    person2 = FactoryBot.create(:person)
     subscribable = nil
     # when subscribable is created, SetSubscriptionsForItemJob is also created
     assert_enqueued_with(job: SetSubscriptionsForItemJob) do
-      subscribable = Factory(:assay, policy: Factory(:public_policy))
+      subscribable = FactoryBot.create(:assay, policy: FactoryBot.create(:public_policy))
     end
     assert_equal 1, subscribable.projects.count
     project_subscription1 = person1.project_subscriptions.create project: subscribable.projects.first, frequency: 'weekly'
@@ -52,12 +52,12 @@ class SetSubscriptionsForItemJobTest < ActiveSupport::TestCase
   end
 
   test 'perform for study' do
-    person1 = Factory(:person)
-    person2 = Factory(:person)
+    person1 = FactoryBot.create(:person)
+    person2 = FactoryBot.create(:person)
     subscribable = nil
     # when subscribable is created, SetSubscriptionsForItemJob is also created
     assert_enqueued_with(job: SetSubscriptionsForItemJob) do
-      subscribable = Factory(:study, policy: Factory(:public_policy))
+      subscribable = FactoryBot.create(:study, policy: FactoryBot.create(:public_policy))
     end
     assert_equal 1, subscribable.projects.count
     project_subscription1 = person1.project_subscriptions.create project: subscribable.projects.first, frequency: 'weekly'

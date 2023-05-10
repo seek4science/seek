@@ -16,6 +16,6 @@ FactoryBot.define do
     city { "Manchester" }
     address { "Manchester Centre for Integrative Systems Biology, MIB/CEAS, The University of Manchester Faraday Building, Sackville Street, Manchester M60 1QD United Kingdom" }
     web_page { "http://www.mib.ac.uk/" }
-    discussion_links { [Factory.build(:discussion_link, label:'Slack')] }
+    discussion_links { [FactoryBot.build(:discussion_link, label:'Slack')] }
   end
 end

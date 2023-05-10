@@ -9,7 +9,7 @@ FactoryBot.define do
   
   # activated_user mainly exists for :person to use in its association
   factory(:activated_user, parent: :brand_new_user) do
-    after_create do |u|
+    after(:create) do |u|
       u.update_column(:activated_at,Time.now.utc)
       u.update_column(:activation_code, nil)
     end
@@ -34,7 +34,7 @@ FactoryBot.define do
   
   factory(:sha1_pass_user, parent: :brand_new_user) do
     test_password = generate_user_password
-    after_create do |user|
+    after(:create) do |user|
       user.update_column(:crypted_password, user.sha1_encrypt(test_password))
     end
   end

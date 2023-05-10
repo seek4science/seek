@@ -5,14 +5,14 @@ class AssaysHelperTest < ActionView::TestCase
   include AssetsHelper
 
   test 'authorised_assays' do
-    project = Factory(:project)
-    other_project = Factory(:project)
-    p1 = Factory :person, project: project
-    p2 = Factory :person, project: project
+    project = FactoryBot.create(:project)
+    other_project = FactoryBot.create(:project)
+    p1 = FactoryBot.create :person, project: project
+    p2 = FactoryBot.create :person, project: project
 
     # 2 assays of the same project, but different contributors
-    a1 = Factory :assay, contributor: p1, policy: Factory(:downloadable_public_policy)
-    a2 = Factory :assay, study: a1.study, contributor: p2, policy: Factory(:downloadable_public_policy)
+    a1 = FactoryBot.create :assay, contributor: p1, policy: FactoryBot.create(:downloadable_public_policy)
+    a2 = FactoryBot.create :assay, study: a1.study, contributor: p2, policy: FactoryBot.create(:downloadable_public_policy)
 
     assert_equal a1.projects, a2.projects
 

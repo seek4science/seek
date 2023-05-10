@@ -3,14 +3,14 @@ FactoryBot.define do
   factory(:strain) do
     sequence(:title) { |n| "Strain#{n}" }
     association :organism
-    projects { [Factory(:project)] }
+    projects { [FactoryBot.create(:project)] }
     association :contributor, factory: :person
   end
   
   factory(:min_strain, class: Strain) do
     title { 'A Minimal Strain' }
     association :organism, factory: :min_organism
-    projects { [Factory(:min_project)] }
+    projects { [FactoryBot.create(:min_project)] }
   end
   
   # Phenotype

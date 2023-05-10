@@ -5,8 +5,8 @@ FactoryBot.define do
   
   factory(:programme) do
     sequence(:title) { |n| "A Programme: #{n}" }
-    projects { [Factory(:project)] }
-    after_create do |p|
+    projects { [FactoryBot.create(:project)] }
+    after(:create) do |p|
       p.is_activated = true
       p.save
     end
@@ -19,12 +19,12 @@ FactoryBot.define do
   factory(:max_programme, class: Programme) do
     title { "A Maximal Programme" }
     description { "A very exciting programme" }
-    discussion_links { [Factory.build(:discussion_link, label:'Slack')] }
+    discussion_links { [FactoryBot.build(:discussion_link, label:'Slack')] }
     web_page { "http://www.synbiochem.co.uk" }
     funding_details { "Someone is funding this for me" }
-    projects { [Factory(:max_project)] }
-    programme_administrators { [Factory(:person)] }
-    after_create do |p|
+    projects { [FactoryBot.create(:max_project)] }
+    programme_administrators { [FactoryBot.create(:person)] }
+    after(:create) do |p|
       p.annotate_with(['DFG'], 'funding_code', p.programme_administrators.first)
       p.save!
     end

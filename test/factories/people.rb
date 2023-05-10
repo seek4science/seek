@@ -15,19 +15,19 @@ FactoryBot.define do
     phone { "34-167-552266" }
     skype_name { "myskypename" }
     association :user, factory: :activated_user, login: 'max_person_user'
-    group_memberships { [Factory.build(:group_membership)] }
+    group_memberships { [FactoryBot.build(:group_membership)] }
     avatar
-    after_create do |p|
-      p.contributed_assays = [Factory(:min_assay, contributor: p, policy: Factory(:public_policy))]
-      p.created_sops = [Factory(:sop, contributor: p, policy: Factory(:public_policy))]
-      p.created_models = [Factory(:model, contributor: p, policy: Factory(:public_policy))]
-      p.created_presentations = [Factory(:presentation, contributor: p, policy: Factory(:public_policy))]
-      p.created_data_files = [Factory(:data_file, contributor: p, policy: Factory(:public_policy))]
-      p.created_publications = [Factory(:publication, contributor: p)]
-      p.created_documents = [Factory(:public_document, contributor: p)]
-      p.created_events = [Factory(:event, contributor: p, policy: Factory(:public_policy))]
-      p.created_collections = [Factory(:collection, contributor: p, policy: Factory(:public_policy))]
-      p.created_workflows = [Factory(:workflow, contributor: p, policy: Factory(:public_policy))]
+    after(:create) do |p|
+      p.contributed_assays = [FactoryBot.create(:min_assay, contributor: p, policy: FactoryBot.create(:public_policy))]
+      p.created_sops = [FactoryBot.create(:sop, contributor: p, policy: FactoryBot.create(:public_policy))]
+      p.created_models = [FactoryBot.create(:model, contributor: p, policy: FactoryBot.create(:public_policy))]
+      p.created_presentations = [FactoryBot.create(:presentation, contributor: p, policy: FactoryBot.create(:public_policy))]
+      p.created_data_files = [FactoryBot.create(:data_file, contributor: p, policy: FactoryBot.create(:public_policy))]
+      p.created_publications = [FactoryBot.create(:publication, contributor: p)]
+      p.created_documents = [FactoryBot.create(:public_document, contributor: p)]
+      p.created_events = [FactoryBot.create(:event, contributor: p, policy: FactoryBot.create(:public_policy))]
+      p.created_collections = [FactoryBot.create(:collection, contributor: p, policy: FactoryBot.create(:public_policy))]
+      p.created_workflows = [FactoryBot.create(:workflow, contributor: p, policy: FactoryBot.create(:public_policy))]
       p.annotate_with(['golf', 'fishing'], 'expertise', p)
       p.annotate_with(['fishing rod'], 'tool', p)
       p.save!
@@ -42,12 +42,12 @@ FactoryBot.define do
   end
   
   factory(:person_in_project, parent: :brand_new_person) do
-    ignore do
-      project { Factory(:project) }
-      institution { Factory(:institution) }
+    transient do
+      project { FactoryBot.create(:project) }
+      institution { FactoryBot.create(:institution) }
     end
-    group_memberships { [Factory.build(:group_membership, work_group: Factory(:work_group, project: project, institution: institution))] }
-    after_create do |p|
+    group_memberships { [FactoryBot.build(:group_membership, work_group: FactoryBot.create(:work_group, project: project, institution: institution))] }
+    after(:create) do |p|
       p.reload
     end
   end
@@ -62,8 +62,8 @@ FactoryBot.define do
   
   factory(:person_in_multiple_projects, parent: :brand_new_person) do
     association :user, factory: :activated_user
-    group_memberships { [Factory.build(:group_membership), Factory.build(:group_membership), Factory.build(:group_membership)] }
-    after_create do |p|
+    group_memberships { [FactoryBot.build(:group_membership), FactoryBot.build(:group_membership), FactoryBot.build(:group_membership)] }
+    after(:create) do |p|
       p.reload
     end
   end
@@ -77,51 +77,51 @@ FactoryBot.define do
   end
   
   factory(:pal, parent: :person) do
-    after_create do |p|
+    after(:create) do |p|
       p.is_pal = true, p.group_memberships.first.project
     end
   end
   
   factory(:asset_housekeeper, parent: :person) do
-    after_create do |p|
+    after(:create) do |p|
       p.is_asset_housekeeper = true, p.group_memberships.first.project
     end
   end
   
   factory(:project_administrator, parent: :person) do
-    after_create do |p|
+    after(:create) do |p|
       p.is_project_administrator = true, p.group_memberships.first.project
     end
   end
   
   factory(:programme_administrator_not_in_project, parent: :person_not_in_project) do
-    after_create do |p|
-      programme = Factory(:programme)
+    after(:create) do |p|
+      programme = FactoryBot.create(:programme)
       p.is_programme_administrator = true, programme
     end
   end
   
   factory(:programme_administrator, parent: :person) do
-    after_create do |p|
-      programme = Factory(:programme, projects: [p.group_memberships.first.project])
+    after(:create) do |p|
+      programme = FactoryBot.create(:programme, projects: [p.group_memberships.first.project])
       p.is_programme_administrator = true, programme
     end
   end
   
   factory(:asset_gatekeeper, parent: :person) do
-    after_create do |p|
+    after(:create) do |p|
       p.is_asset_gatekeeper = true, p.group_memberships.first.project
     end
   end
   
   factory(:former_project_person, parent: :person) do
-    after_build do |p|
+    after(:build) do |p|
       p.group_memberships.first.time_left_at = 1.day.ago
     end
   end
   
   factory(:future_former_project_person, parent: :person) do
-    after_build do |p|
+    after(:build) do |p|
       p.group_memberships.first.time_left_at = 1.week.from_now
     end
   end

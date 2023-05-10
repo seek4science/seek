@@ -8,7 +8,7 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
   end
 
   test 'validation' do
-    project = Factory(:project)
+    project = FactoryBot.create(:project)
     endpoint = OpenbisEndpoint.new project: project, username: 'fred', password: '12345',
                                    web_endpoint: 'http://my-openbis.org/openbis',
                                    as_endpoint: 'http://my-openbis.org/openbis',
@@ -64,7 +64,7 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
 
     endpoint.project = nil
     refute endpoint.valid?
-    endpoint.project = Factory(:project)
+    endpoint.project = FactoryBot.create(:project)
     assert endpoint.valid?
 
     endpoint.policy = nil
@@ -76,9 +76,9 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
   end
 
   test 'validates uniqueness' do
-    endpoint = Factory(:openbis_endpoint)
+    endpoint = FactoryBot.create(:openbis_endpoint)
 
-    endpoint2 = OpenbisEndpoint.new project: Factory(:project),
+    endpoint2 = OpenbisEndpoint.new project: FactoryBot.create(:project),
                                     username: endpoint.username,
                                     password: endpoint.password,
                                     web_endpoint: endpoint.web_endpoint,
@@ -116,7 +116,7 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
   end
 
   test 'link to project' do
-    pa = Factory(:project_administrator)
+    pa = FactoryBot.create(:project_administrator)
     project = pa.projects.first
     User.with_current_user(pa.user) do
       with_config_value :openbis_enabled, true do
@@ -131,7 +131,7 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
   end
 
   test 'can_create' do
-    User.with_current_user(Factory(:project_administrator).user) do
+    User.with_current_user(FactoryBot.create(:project_administrator).user) do
       with_config_value :openbis_enabled, true do
         assert OpenbisEndpoint.can_create?
       end
@@ -141,7 +141,7 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
       end
     end
 
-    User.with_current_user(Factory(:person).user) do
+    User.with_current_user(FactoryBot.create(:person).user) do
       with_config_value :openbis_enabled, true do
         refute OpenbisEndpoint.can_create?
       end
@@ -163,21 +163,21 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
   end
 
   test 'can_delete?' do
-    person = Factory(:person)
-    ep = Factory(:openbis_endpoint, project: person.projects.first)
+    person = FactoryBot.create(:person)
+    ep = FactoryBot.create(:openbis_endpoint, project: person.projects.first)
     refute ep.can_delete?(person.user)
     User.with_current_user(person.user) do
       refute ep.can_delete?
     end
 
-    pa = Factory(:project_administrator)
-    ep = Factory(:openbis_endpoint, project: pa.projects.first)
+    pa = FactoryBot.create(:project_administrator)
+    ep = FactoryBot.create(:openbis_endpoint, project: pa.projects.first)
     assert ep.can_delete?(pa.user)
     User.with_current_user(pa.user) do
       assert ep.can_delete?
     end
 
-    another_pa = Factory(:project_administrator)
+    another_pa = FactoryBot.create(:project_administrator)
     refute ep.can_delete?(another_pa.user)
     User.with_current_user(another_pa.user) do
       refute ep.can_delete?
@@ -195,21 +195,21 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
   end
 
   test 'available spaces' do
-    endpoint = Factory(:openbis_endpoint)
+    endpoint = FactoryBot.create(:openbis_endpoint)
     spaces = endpoint.available_spaces
     assert_equal 2, spaces.count
   end
 
   test 'space' do
-    endpoint = Factory(:openbis_endpoint)
+    endpoint = FactoryBot.create(:openbis_endpoint)
     space = endpoint.do_authentication.space
     refute_nil space
     assert_equal 'API-SPACE', space.perm_id
   end
 
   test 'can edit?' do
-    pa = Factory(:project_administrator).user
-    user = Factory(:person).user
+    pa = FactoryBot.create(:project_administrator).user
+    user = FactoryBot.create(:person).user
     endpoint = OpenbisEndpoint.create project: pa.person.projects.first, username: 'fred', password: '12345', as_endpoint: 'http://my-openbis.org/openbis', dss_endpoint: 'http://my-openbis.org/openbis', space_perm_id: 'aaa'
     User.with_current_user(pa) do
       with_config_value :openbis_enabled, true do
@@ -247,20 +247,20 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
       refute endpoint.can_edit?(nil)
 
       # cannot edit if another project admin
-      pa2 = Factory(:project_administrator).user
+      pa2 = FactoryBot.create(:project_administrator).user
       refute endpoint.can_edit?(pa2)
     end
   end
 
   test 'session token' do
-    endpoint = Factory(:openbis_endpoint)
+    endpoint = FactoryBot.create(:openbis_endpoint)
 
     refute_nil endpoint.session_token
   end
 
   test 'destroy' do
-    pa = Factory(:project_administrator)
-    endpoint = Factory(:openbis_endpoint, project: pa.projects.first)
+    pa = FactoryBot.create(:project_administrator)
+    endpoint = FactoryBot.create(:openbis_endpoint, project: pa.projects.first)
     metadata_store = endpoint.metadata_store
     key = endpoint.do_authentication.space.cache_key(endpoint.space_perm_id)
     assert metadata_store.exist?(key)
@@ -273,7 +273,7 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
   end
 
   test 'clear metadata store' do
-    endpoint = Factory(:openbis_endpoint)
+    endpoint = FactoryBot.create(:openbis_endpoint)
     key = endpoint.do_authentication.space.cache_key(endpoint.space_perm_id)
     assert endpoint.metadata_store.exist?(key)
     endpoint.clear_metadata_store
@@ -281,7 +281,7 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
   end
 
   test 'clears metadata store on details update' do
-    endpoint = Factory(:openbis_endpoint)
+    endpoint = FactoryBot.create(:openbis_endpoint)
     key = endpoint.do_authentication.space.cache_key(endpoint.space_perm_id)
     assert endpoint.metadata_store.exist?(key)
 
@@ -299,7 +299,7 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     endpoint = nil
 
     assert_no_enqueued_jobs(only: OpenbisEndpointCacheRefreshJob) do
-      endpoint = Factory(:openbis_endpoint)
+      endpoint = FactoryBot.create(:openbis_endpoint)
     end
 
     assert_enqueued_with(job: OpenbisEndpointCacheRefreshJob) do
@@ -311,7 +311,7 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     endpoint = nil
 
     assert_no_enqueued_jobs(only: OpenbisSyncJob) do
-      endpoint = Factory(:openbis_endpoint)
+      endpoint = FactoryBot.create(:openbis_endpoint)
     end
 
     assert_enqueued_with(job: OpenbisSyncJob) do
@@ -321,13 +321,13 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
 
   test 'does not create jobs on creation' do
     assert_no_enqueued_jobs(only: [OpenbisSyncJob, OpenbisEndpointCacheRefreshJob]) do
-      Factory(:openbis_endpoint)
+      FactoryBot.create(:openbis_endpoint)
     end
   end
 
   test 'jobs do not error for destroyed endpoint' do
-    pa = Factory(:project_administrator)
-    endpoint = Factory(:openbis_endpoint, project: pa.projects.first)
+    pa = FactoryBot.create(:project_administrator)
+    endpoint = FactoryBot.create(:openbis_endpoint, project: pa.projects.first)
     User.with_current_user(pa.user) do
       endpoint.destroy
     end
@@ -339,7 +339,7 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
   end
 
   test 'encrypted password' do
-    endpoint = OpenbisEndpoint.new project: Factory(:project), username: 'fred', password: 'frog',
+    endpoint = OpenbisEndpoint.new project: FactoryBot.create(:project), username: 'fred', password: 'frog',
                                    web_endpoint: 'http://my-openbis.org/openbis',
                                    as_endpoint: 'http://my-openbis.org/openbis',
                                    dss_endpoint: 'http://my-openbis.org/openbis',
@@ -360,7 +360,7 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
   end
 
   test 'follows external_assets' do
-    endpoint = Factory(:openbis_endpoint)
+    endpoint = FactoryBot.create(:openbis_endpoint)
 
     zample = Seek::Openbis::Zample.new(endpoint, '20171002172111346-37')
     options = { tomek: false }
@@ -370,7 +370,7 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     dataset = Seek::Openbis::Dataset.new(endpoint, '20160210130454955-23')
     asset2 = OpenbisExternalAsset.build(dataset, options)
 
-    endpoint2 = Factory(:openbis_endpoint, refresh_period_mins: 60, web_endpoint: 'https://openbis-api.fair-dom.org/openbis2', space_perm_id: 'API-SPACE2')
+    endpoint2 = FactoryBot.create(:openbis_endpoint, refresh_period_mins: 60, web_endpoint: 'https://openbis-api.fair-dom.org/openbis2', space_perm_id: 'API-SPACE2')
 
     zample2 = Seek::Openbis::Zample.new(endpoint2, '20171002172111346-37')
     asset3 = OpenbisExternalAsset.build(zample2, options)
@@ -393,14 +393,14 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
   end
 
   test 'registered_datafiles finds only own datafiles' do
-    endpoint1 = OpenbisEndpoint.new project: Factory(:project), username: 'fred', password: 'frog',
+    endpoint1 = OpenbisEndpoint.new project: FactoryBot.create(:project), username: 'fred', password: 'frog',
                                     web_endpoint: 'http://my-openbis.org/doesnotmatter',
                                     as_endpoint: 'http://my-openbis.org/doesnotmatter',
                                     dss_endpoint: 'http://my-openbis.org/doesnotmatter',
                                     space_perm_id: 'space1',
                                     refresh_period_mins: 60
 
-    endpoint2 = OpenbisEndpoint.new project: Factory(:project), username: 'fred', password: 'frog',
+    endpoint2 = OpenbisEndpoint.new project: FactoryBot.create(:project), username: 'fred', password: 'frog',
                                     web_endpoint: 'http://my-openbis.org/doesnotmatter',
                                     as_endpoint: 'http://my-openbis.org/doesnotmatter',
                                     dss_endpoint: 'http://my-openbis.org/doesnotmatter',
@@ -429,9 +429,9 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
   end
 
   test 'registered_datasets gives only own datafiles' do
-    endpoint1 = Factory :openbis_endpoint
+    endpoint1 = FactoryBot.create :openbis_endpoint
 
-    endpoint2 = Factory :openbis_endpoint
+    endpoint2 = FactoryBot.create :openbis_endpoint
 
     disable_authorization_checks do
       assert endpoint1.save
@@ -440,19 +440,19 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
 
     set1 = Seek::Openbis::Dataset.new(endpoint1, '20160210130454955-23')
     asset1 = OpenbisExternalAsset.build(set1)
-    df1 = Factory :data_file
+    df1 = FactoryBot.create :data_file
     asset1.seek_entity = df1
     assert asset1.save
 
     set2 = Seek::Openbis::Dataset.new(endpoint1, '20160215111736723-31')
     asset2 = OpenbisExternalAsset.build(set2)
-    df2 = Factory :data_file
+    df2 = FactoryBot.create :data_file
     asset2.seek_entity = df2
     assert asset2.save
 
     set3 = Seek::Openbis::Dataset.new(endpoint2, '20160210130454955-23')
     asset3 = OpenbisExternalAsset.build(set3)
-    df3 = Factory :data_file
+    df3 = FactoryBot.create :data_file
     asset3.seek_entity = df3
     assert asset3.save
 
@@ -468,7 +468,7 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
   end
 
   test 'registered_assays gives own zamples registered in seek as assays' do
-    endpoint1 = Factory :openbis_endpoint
+    endpoint1 = FactoryBot.create :openbis_endpoint
 
     zample1 = zample_for_id('12', endpoint1)
 
@@ -477,13 +477,13 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     zample3 = zample_for_id('13', endpoint1)
 
     asset1 = OpenbisExternalAsset.build(zample1)
-    asset1.seek_entity = Factory :assay
+    asset1.seek_entity = FactoryBot.create :assay
 
     asset2 = OpenbisExternalAsset.build(zample2)
-    asset2.seek_entity = Factory :assay
+    asset2.seek_entity = FactoryBot.create :assay
 
     asset3 = OpenbisExternalAsset.build(zample3)
-    asset3.seek_entity = Factory :assay
+    asset3.seek_entity = FactoryBot.create :assay
 
     assert asset1.save
     assert asset2.save
@@ -501,9 +501,9 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
   end
 
   test 'registered_studies gives own entries registered in seek as studies' do
-    endpoint1 = Factory :openbis_endpoint
+    endpoint1 = FactoryBot.create :openbis_endpoint
 
-    endpoint2 = Factory :openbis_endpoint
+    endpoint2 = FactoryBot.create :openbis_endpoint
 
     disable_authorization_checks do
       assert endpoint1.save
@@ -512,19 +512,19 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
 
     e1 = Seek::Openbis::Experiment.new(endpoint1, '20171121152132641-51')
     asset1 = OpenbisExternalAsset.build(e1)
-    st1 = Factory :study
+    st1 = FactoryBot.create :study
     asset1.seek_entity = st1
     assert asset1.save
 
     e2 = Seek::Openbis::Experiment.new(endpoint2, '20171121152132641-51')
     asset2 = OpenbisExternalAsset.build(e2)
-    st2 = Factory :study
+    st2 = FactoryBot.create :study
     asset2.seek_entity = st2
     assert asset2.save
 
     e3 = Seek::Openbis::Experiment.new(endpoint1, '20171121153715264-58')
     asset3 = OpenbisExternalAsset.build(e3)
-    st3 = Factory :study
+    st3 = FactoryBot.create :study
     asset3.seek_entity = st3
     assert asset3.save
 
@@ -540,7 +540,7 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
   end
 
   def zample_for_id(permId = nil, endpoint = nil)
-    endpoint ||= Factory :openbis_endpoint
+    endpoint ||= FactoryBot.create :openbis_endpoint
 
     json = JSON.parse(
       '
@@ -555,7 +555,7 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
   end
 
   # test 'reindex_entities queues new indexing job' do
-  #  endpoint = Factory(:openbis_endpoint)
+  #  endpoint = FactoryBot.create(:openbis_endpoint)
   #  datafile1 = Seek::Openbis::Dataset.new(endpoint, '20160210130454955-23').create_seek_datafile
   #  assert datafile1.save
   #  # don't know how to test that it was really reindexing job with correct content
@@ -568,7 +568,7 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
   # it should actually test for synchronization but I don't know how to achieve it
   # needs OpenBIS mock that can be set to return particular values
   test 'refresh_metadata cleanups store, marks for refresh and adds sync job' do
-    endpoint = Factory(:openbis_endpoint)
+    endpoint = FactoryBot.create(:openbis_endpoint)
 
     dataset = Seek::Openbis::Dataset.new(endpoint, '20160210130454955-23')
     asset = OpenbisExternalAsset.build(dataset)
@@ -600,7 +600,7 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
   end
 
   test 'force_refresh_metadata clears store, marks all for refresh' do
-    endpoint = Factory(:openbis_endpoint)
+    endpoint = FactoryBot.create(:openbis_endpoint)
 
     dataset = Seek::Openbis::Dataset.new(endpoint, '20160210130454955-23')
     asset = OpenbisExternalAsset.build(dataset)
@@ -627,7 +627,7 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
   end
 
   test 'due_to_refresh gives synchronized assets with elapsed synchronization time' do
-    endpoint = Factory(:openbis_endpoint)
+    endpoint = FactoryBot.create(:openbis_endpoint)
     endpoint.refresh_period_mins = 80
     disable_authorization_checks do
       assert endpoint.save!
@@ -663,7 +663,7 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
   end
 
   test 'mark_for_refresh sets sync status for all due to refresh' do
-    endpoint = Factory(:openbis_endpoint)
+    endpoint = FactoryBot.create(:openbis_endpoint)
     endpoint.refresh_period_mins = 80
     disable_authorization_checks do
       assert endpoint.save!
@@ -698,7 +698,7 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
   end
 
   test 'mark_all_for_refresh sets sync status for all synchronized to refresh' do
-    endpoint = Factory(:openbis_endpoint)
+    endpoint = FactoryBot.create(:openbis_endpoint)
     endpoint.refresh_period_mins = 80
     disable_authorization_checks do
       assert endpoint.save!
@@ -756,7 +756,7 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
   end
 
   test 'add_meta_config sets default config for new entry' do
-    project = Factory(:project)
+    project = FactoryBot.create(:project)
     endpoint = OpenbisEndpoint.new project: project, username: 'fred', password: '12345',
                                    web_endpoint: 'http://my-openbis.org/openbis',
                                    as_endpoint: 'http://my-openbis.org/openbis',
@@ -789,7 +789,7 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
   end
 
   test 'meta_config is serialized to json before saving' do
-    endpoint = Factory(:openbis_endpoint)
+    endpoint = FactoryBot.create(:openbis_endpoint)
     endpoint.study_types = ['ST1']
     endpoint.assay_types = []
 
@@ -808,12 +808,12 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
   end
 
   test 'study_types gives default for new record configured' do
-    endpoint = Factory(:openbis_endpoint)
+    endpoint = FactoryBot.create(:openbis_endpoint)
     assert_equal ['DEFAULT_EXPERIMENT'], endpoint.study_types
   end
 
   test 'study_types can be set as string' do
-    endpoint = Factory(:openbis_endpoint)
+    endpoint = FactoryBot.create(:openbis_endpoint)
     exp = %w[S1 S2]
     endpoint.study_types = ' S1 S2'
 
@@ -828,7 +828,7 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
   end
 
   test 'study_types can be set as array' do
-    endpoint = Factory(:openbis_endpoint)
+    endpoint = FactoryBot.create(:openbis_endpoint)
     exp = %w[S1 S2]
     endpoint.study_types = exp
 
@@ -843,7 +843,7 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
   end
 
   test 'study_types are read from meta_config' do
-    endpoint = OpenbisEndpoint.new project: Factory(:project), username: 'fred', password: '12345',
+    endpoint = OpenbisEndpoint.new project: FactoryBot.create(:project), username: 'fred', password: '12345',
                                    web_endpoint: 'http://my-openbis.org/openbis1',
                                    as_endpoint: 'http://my-openbis.org/openbis1',
                                    dss_endpoint: 'http://my-openbis.org/openbis1',
@@ -855,12 +855,12 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
   end
 
   test 'assay_types gives default if not configured' do
-    endpoint = Factory(:openbis_endpoint)
+    endpoint = FactoryBot.create(:openbis_endpoint)
     assert_equal ['EXPERIMENTAL_STEP'], endpoint.assay_types
   end
 
   test 'assay_types can be set as string' do
-    endpoint = Factory(:openbis_endpoint)
+    endpoint = FactoryBot.create(:openbis_endpoint)
     exp = %w[A1 A2]
     endpoint.assay_types = ' A1, A2'
 
@@ -875,7 +875,7 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
   end
 
   test 'assay_types can be set as array' do
-    endpoint = Factory(:openbis_endpoint)
+    endpoint = FactoryBot.create(:openbis_endpoint)
     exp = %w[A1 A2]
     endpoint.assay_types = exp
 
@@ -890,7 +890,7 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
   end
 
   test 'assay_types are read from meta_config' do
-    endpoint = OpenbisEndpoint.new project: Factory(:project), username: 'fred', password: '12345',
+    endpoint = OpenbisEndpoint.new project: FactoryBot.create(:project), username: 'fred', password: '12345',
                                    web_endpoint: 'http://my-openbis.org/openbis1',
                                    as_endpoint: 'http://my-openbis.org/openbis1',
                                    dss_endpoint: 'http://my-openbis.org/openbis1',
@@ -902,7 +902,7 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
   end
 
   test 'parses string with code names using , and white spaces as separators' do
-    endpoint = Factory(:openbis_endpoint)
+    endpoint = FactoryBot.create(:openbis_endpoint)
 
     input = nil
     names = endpoint.parse_code_names(input)
@@ -925,14 +925,14 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
   end
 
   test 'due for sync?' do
-    assert Factory(:openbis_endpoint, refresh_period_mins: 60).due_sync?
-    assert Factory(:openbis_endpoint, refresh_period_mins: 60, last_sync: 2.years.ago).due_sync?
-    refute Factory(:openbis_endpoint, refresh_period_mins: 60, last_sync: 2.seconds.ago).due_sync?
+    assert FactoryBot.create(:openbis_endpoint, refresh_period_mins: 60).due_sync?
+    assert FactoryBot.create(:openbis_endpoint, refresh_period_mins: 60, last_sync: 2.years.ago).due_sync?
+    refute FactoryBot.create(:openbis_endpoint, refresh_period_mins: 60, last_sync: 2.seconds.ago).due_sync?
   end
 
   test 'due for cache refresh?' do
-    assert Factory(:openbis_endpoint, refresh_period_mins: 60).due_cache_refresh?
-    assert Factory(:openbis_endpoint, refresh_period_mins: 60, last_cache_refresh: 2.hours.ago).due_cache_refresh?
-    refute Factory(:openbis_endpoint, refresh_period_mins: 60, last_cache_refresh: 30.minutes.ago).due_cache_refresh?
+    assert FactoryBot.create(:openbis_endpoint, refresh_period_mins: 60).due_cache_refresh?
+    assert FactoryBot.create(:openbis_endpoint, refresh_period_mins: 60, last_cache_refresh: 2.hours.ago).due_cache_refresh?
+    refute FactoryBot.create(:openbis_endpoint, refresh_period_mins: 60, last_cache_refresh: 30.minutes.ago).due_cache_refresh?
   end
 end

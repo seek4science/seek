@@ -4,7 +4,7 @@ class FairSignpostingTest < ActionDispatch::IntegrationTest
   include MockHelper
 
   test 'fair signposting for data file' do
-    df = Factory(:data_file)
+    df = FactoryBot.create(:data_file)
     login_as(df.contributor.user)
 
     get data_file_path(df)
@@ -20,8 +20,8 @@ class FairSignpostingTest < ActionDispatch::IntegrationTest
 
   test 'fair signposting for data file with doi' do
     doi_citation_mock
-    df = Factory(:data_file)
-    dfv = Factory(:data_file_version_with_blob, content_blob: Factory(:image_content_blob), data_file: df, doi: '10.5075/abcd')
+    df = FactoryBot.create(:data_file)
+    dfv = FactoryBot.create(:data_file_version_with_blob, content_blob: FactoryBot.create(:image_content_blob), data_file: df, doi: '10.5075/abcd')
     login_as(df.contributor.user)
 
     get data_file_path(df, version: 2)
@@ -37,7 +37,7 @@ class FairSignpostingTest < ActionDispatch::IntegrationTest
   end
 
   test 'fair signposting for workflow' do
-    wf = Factory(:workflow)
+    wf = FactoryBot.create(:workflow)
     login_as(wf.contributor.user)
 
     get workflow_path(wf)
@@ -52,7 +52,7 @@ class FairSignpostingTest < ActionDispatch::IntegrationTest
 
   test 'fair signposting for publication' do
     doi_citation_mock
-    pub = Factory(:min_publication)
+    pub = FactoryBot.create(:min_publication)
 
     get publication_path(pub)
 
@@ -65,7 +65,7 @@ class FairSignpostingTest < ActionDispatch::IntegrationTest
 
   test 'fair signposting for model' do
     doi_citation_mock
-    mod = Factory(:model_2_files)
+    mod = FactoryBot.create(:model_2_files)
     login_as(mod.contributor.user)
 
     get model_path(mod)
@@ -79,7 +79,7 @@ class FairSignpostingTest < ActionDispatch::IntegrationTest
   end
 
   test 'fair signposting for sop' do
-    sop = Factory(:sop)
+    sop = FactoryBot.create(:sop)
     login_as(sop.contributor.user)
 
     get sop_path(sop)
@@ -94,7 +94,7 @@ class FairSignpostingTest < ActionDispatch::IntegrationTest
 
   test 'fair signposting for assay' do
     doi_citation_mock
-    a = Factory(:assay)
+    a = FactoryBot.create(:assay)
     login_as(a.contributor.user)
 
     get assay_path(a)

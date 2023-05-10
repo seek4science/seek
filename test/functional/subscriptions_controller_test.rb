@@ -4,8 +4,8 @@ class SubscriptionsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
 
   test 'can subscribe to an asset' do
-    person = Factory(:person)
-    data_file = Factory(:subscribable)
+    person = FactoryBot.create(:person)
+    data_file = FactoryBot.create(:subscribable)
     login_as(person)
 
     assert_empty person.subscriptions.where(subscribable_id: data_file.id, subscribable_type: 'DataFile')
@@ -20,9 +20,9 @@ class SubscriptionsControllerTest < ActionController::TestCase
   end
 
   test 'cannot subscribe someone else to an asset' do
-    person = Factory(:person)
-    someone_else = Factory(:person)
-    data_file = Factory(:subscribable)
+    person = FactoryBot.create(:person)
+    someone_else = FactoryBot.create(:person)
+    data_file = FactoryBot.create(:subscribable)
     login_as(person)
 
     assert_empty person.subscriptions.where(subscribable_id: data_file.id, subscribable_type: 'DataFile', person_id: someone_else.id)
@@ -39,7 +39,7 @@ class SubscriptionsControllerTest < ActionController::TestCase
   end
 
   test 'can unsubscribe from an asset' do
-    subscription = Factory(:subscription)
+    subscription = FactoryBot.create(:subscription)
     person = subscription.person
     login_as(person)
 
@@ -51,8 +51,8 @@ class SubscriptionsControllerTest < ActionController::TestCase
   end
 
   test 'cannot unsubscribe someone else from an asset' do
-    person = Factory(:person)
-    subscription = Factory(:subscription)
+    person = FactoryBot.create(:person)
+    subscription = FactoryBot.create(:subscription)
     someone_else = subscription.person
     login_as(person)
 

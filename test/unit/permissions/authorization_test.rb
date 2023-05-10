@@ -8,10 +8,10 @@ class AuthorizationTest < ActiveSupport::TestCase
   # ************************************************************************
 
   def test_auth_on_asset_version
-    user1 = Factory :user
-    user2 = Factory :user
-    sop = Factory :sop, contributor: user1.person, policy: Factory(:private_policy)
-    sop.policy.permissions << Factory(:permission, policy: sop.policy, contributor: user2.person, access_type: Policy::VISIBLE)
+    user1 = FactoryBot.create :user
+    user2 = FactoryBot.create :user
+    sop = FactoryBot.create :sop, contributor: user1.person, policy: FactoryBot.create(:private_policy)
+    sop.policy.permissions << FactoryBot.create(:permission, policy: sop.policy, contributor: user2.person, access_type: Policy::VISIBLE)
     assert_equal 1, sop.versions.count
     sop_v = sop.versions.first
 
@@ -462,7 +462,7 @@ class AuthorizationTest < ActiveSupport::TestCase
   end
 
   def test_contributor_can_do_anything
-    item = Factory :sop, policy: Factory(:private_policy)
+    item = FactoryBot.create :sop, policy: FactoryBot.create(:private_policy)
     User.current_user = item.contributor
     actions.each { |a| assert item.can_perform? a }
     assert item.can_edit?
@@ -473,8 +473,8 @@ class AuthorizationTest < ActiveSupport::TestCase
   end
 
   def test_private_item_does_not_allow_anything
-    item = Factory :sop, policy: Factory(:private_policy)
-    User.current_user = Factory :user
+    item = FactoryBot.create :sop, policy: FactoryBot.create(:private_policy)
+    User.current_user = FactoryBot.create :user
     actions.each { |a| assert !item.can_perform?(a) }
     assert !item.can_edit?
     assert !item.can_view?
@@ -484,16 +484,16 @@ class AuthorizationTest < ActiveSupport::TestCase
   end
 
   def test_permissions
-    User.current_user = Factory :user
+    User.current_user = FactoryBot.create :user
     access_levels = { Policy::MANAGING => actions,
                       Policy::NO_ACCESS => [],
                       Policy::VISIBLE => [:view],
                       Policy::ACCESSIBLE => [:view, :download],
                       Policy::EDITING => [:view, :download, :edit] }
     access_levels.each do |access, allowed|
-      policy = Factory :private_policy
-      policy.permissions << Factory(:permission, contributor: User.current_user.person, access_type: access, policy: policy)
-      item = Factory :sop, policy: policy
+      policy = FactoryBot.create :private_policy
+      policy.permissions << FactoryBot.create(:permission, contributor: User.current_user.person, access_type: access, policy: policy)
+      item = FactoryBot.create :sop, policy: policy
       actions.each { |action| assert_equal allowed.include?(action), item.can_perform?(action), "User should #{allowed.include?(action) ? nil : 'not '}be allowed to #{action}" }
       assert_equal item.can_view?, allowed.include?(:view)
       assert_equal item.can_edit?, allowed.include?(:edit)
@@ -504,9 +504,9 @@ class AuthorizationTest < ActiveSupport::TestCase
   end
 
   test 'creator should edit the asset, but can not manage' do
-    item = Factory :sop, policy: Factory(:private_policy)
-    person = Factory :person
-    Factory :assets_creator, asset: item, creator: person
+    item = FactoryBot.create :sop, policy: FactoryBot.create(:private_policy)
+    person = FactoryBot.create :person
+    FactoryBot.create :assets_creator, asset: item, creator: person
 
     User.current_user = person.user
 
@@ -518,18 +518,18 @@ class AuthorizationTest < ActiveSupport::TestCase
   end
 
   test "asset housekeeper can't manage the items inside their projects of members who have not left" do
-    asset_manager = Factory(:asset_housekeeper)
+    asset_manager = FactoryBot.create(:asset_housekeeper)
     work_group = asset_manager.work_groups.first
-    project_member = Factory(:person, group_memberships: [Factory(:group_membership, work_group: work_group)])
-    leaving_project_member = Factory(:person, group_memberships: [Factory(:group_membership,
+    project_member = FactoryBot.create(:person, group_memberships: [FactoryBot.create(:group_membership, work_group: work_group)])
+    leaving_project_member = FactoryBot.create(:person, group_memberships: [FactoryBot.create(:group_membership,
                                                                           time_left_at: 10.day.from_now,
                                                                           work_group: work_group)])
-    datafile1 = Factory(:data_file, contributor: project_member,
-                                    projects: asset_manager.projects, policy: Factory(:publicly_viewable_policy))
-    datafile2 = Factory(:data_file, contributor: project_member,
-                                    projects: asset_manager.projects, policy: Factory(:private_policy))
-    datafile3 = Factory(:data_file, contributor: leaving_project_member,
-                                    projects: asset_manager.projects, policy: Factory(:private_policy))
+    datafile1 = FactoryBot.create(:data_file, contributor: project_member,
+                                    projects: asset_manager.projects, policy: FactoryBot.create(:publicly_viewable_policy))
+    datafile2 = FactoryBot.create(:data_file, contributor: project_member,
+                                    projects: asset_manager.projects, policy: FactoryBot.create(:private_policy))
+    datafile3 = FactoryBot.create(:data_file, contributor: leaving_project_member,
+                                    projects: asset_manager.projects, policy: FactoryBot.create(:private_policy))
 
     refute Seek::Permissions::Authorization.authorized_by_role?('manage', datafile1, asset_manager)
     refute Seek::Permissions::Authorization.authorized_by_role?('manage', datafile2, asset_manager)
@@ -543,16 +543,16 @@ class AuthorizationTest < ActiveSupport::TestCase
   end
 
   test 'asset housekeeper can manage the items inside their projects, even the entirely private items of former members' do
-    asset_manager = Factory(:asset_housekeeper)
+    asset_manager = FactoryBot.create(:asset_housekeeper)
     work_group = asset_manager.work_groups.first
-    former_project_member = Factory(:person, group_memberships: [Factory(:group_membership, has_left: true, work_group: work_group)])
+    former_project_member = FactoryBot.create(:person, group_memberships: [FactoryBot.create(:group_membership, has_left: true, work_group: work_group)])
     datafile1 = nil
     datafile2 = nil
     disable_authorization_checks do
-      datafile1 = Factory(:data_file, contributor: former_project_member,
-                                      projects: asset_manager.projects, policy: Factory(:publicly_viewable_policy))
-      datafile2 = Factory(:data_file, contributor: former_project_member,
-                                      projects: asset_manager.projects, policy: Factory(:private_policy))
+      datafile1 = FactoryBot.create(:data_file, contributor: former_project_member,
+                                      projects: asset_manager.projects, policy: FactoryBot.create(:publicly_viewable_policy))
+      datafile2 = FactoryBot.create(:data_file, contributor: former_project_member,
+                                      projects: asset_manager.projects, policy: FactoryBot.create(:private_policy))
     end
 
     assert Seek::Permissions::Authorization.authorized_by_role?('manage', datafile1, asset_manager)
@@ -565,8 +565,8 @@ class AuthorizationTest < ActiveSupport::TestCase
   end
 
   test 'asset housekeeper can not manage the items outside their projects' do
-    asset_manager = Factory(:asset_housekeeper)
-    datafile = Factory(:data_file)
+    asset_manager = FactoryBot.create(:asset_housekeeper)
+    datafile = FactoryBot.create(:data_file)
     assert (asset_manager.projects & datafile.projects).empty?
 
     refute Seek::Permissions::Authorization.authorized_by_role?('manage', datafile, asset_manager)
@@ -577,11 +577,11 @@ class AuthorizationTest < ActiveSupport::TestCase
   end
 
   test 'asset housekeeper can not manage items for projects he is a member of but not manager of' do
-    asset_manager = Factory(:person_in_multiple_projects)
+    asset_manager = FactoryBot.create(:person_in_multiple_projects)
     project = asset_manager.projects.first
     other_project = asset_manager.projects.last
     asset_manager.is_asset_housekeeper = true, project
-    datafile = Factory(:data_file, projects: [other_project], contributor:Factory(:person, project:other_project))
+    datafile = FactoryBot.create(:data_file, projects: [other_project], contributor:FactoryBot.create(:person, project:other_project))
     refute (asset_manager.projects & datafile.projects).empty?
 
     refute Seek::Permissions::Authorization.authorized_by_role?('manage', datafile, asset_manager)
@@ -592,8 +592,8 @@ class AuthorizationTest < ActiveSupport::TestCase
   end
 
   test 'asset housekeeper can manage jerm harvested items' do
-    asset_manager = Factory(:asset_housekeeper)
-    datafile1 = Factory(:jerm_data_file, projects: asset_manager.projects, policy: Factory(:publicly_viewable_policy))
+    asset_manager = FactoryBot.create(:asset_housekeeper)
+    datafile1 = FactoryBot.create(:jerm_data_file, projects: asset_manager.projects, policy: FactoryBot.create(:publicly_viewable_policy))
 
     assert Seek::Permissions::Authorization.authorized_by_role?('manage', datafile1, asset_manager)
 
@@ -603,8 +603,8 @@ class AuthorizationTest < ActiveSupport::TestCase
   end
 
   test 'gatekeeper should not be able to manage the item' do
-    gatekeeper = Factory(:asset_gatekeeper)
-    datafile = Factory(:data_file, projects: gatekeeper.projects, policy: Factory(:all_sysmo_viewable_policy), contributor:Factory(:person,project:gatekeeper.projects.first))
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    datafile = FactoryBot.create(:data_file, projects: gatekeeper.projects, policy: FactoryBot.create(:all_sysmo_viewable_policy), contributor:FactoryBot.create(:person,project:gatekeeper.projects.first))
 
     User.with_current_user gatekeeper.user do
       assert !datafile.can_manage?
@@ -616,14 +616,14 @@ class AuthorizationTest < ActiveSupport::TestCase
   end
 
   test 'should handle different types of contributor of resource (Person, User)' do
-    asset_manager = Factory(:asset_housekeeper)
+    asset_manager = FactoryBot.create(:asset_housekeeper)
     work_group = asset_manager.work_groups.first
-    former_project_member = Factory(:person, group_memberships: [Factory(:group_membership, has_left: true, work_group: work_group)])
+    former_project_member = FactoryBot.create(:person, group_memberships: [FactoryBot.create(:group_membership, has_left: true, work_group: work_group)])
 
-    policy = Factory(:private_policy)
-    policy2 = Factory(:private_policy)
-    permission = Factory(:permission, contributor: former_project_member, access_type: 1)
-    permission2 = Factory(:permission, contributor: former_project_member, access_type: 1)
+    policy = FactoryBot.create(:private_policy)
+    policy2 = FactoryBot.create(:private_policy)
+    permission = FactoryBot.create(:permission, contributor: former_project_member, access_type: 1)
+    permission2 = FactoryBot.create(:permission, contributor: former_project_member, access_type: 1)
     policy.permissions = [permission]
     policy2.permissions = [permission2]
 
@@ -631,8 +631,8 @@ class AuthorizationTest < ActiveSupport::TestCase
     datafile = nil
     investigation = nil
     disable_authorization_checks do
-      datafile = Factory(:data_file, contributor: former_project_member, projects: asset_manager.projects, policy: policy)
-      investigation = Factory(:investigation, contributor: former_project_member, projects: asset_manager.projects, policy: policy)
+      datafile = FactoryBot.create(:data_file, contributor: former_project_member, projects: asset_manager.projects, policy: policy)
+      investigation = FactoryBot.create(:investigation, contributor: former_project_member, projects: asset_manager.projects, policy: policy)
     end
 
     User.with_current_user asset_manager.user do
@@ -642,7 +642,7 @@ class AuthorizationTest < ActiveSupport::TestCase
   end
 
   test 'unauthorized_change_to_autosave?' do
-    df = Factory(:data_file)
+    df = FactoryBot.create(:data_file)
     assert_equal Policy::NO_ACCESS, df.policy.access_type
     df.policy.access_type = Policy::ACCESSIBLE
     assert !df.save
@@ -660,8 +660,8 @@ class AuthorizationTest < ActiveSupport::TestCase
   end
 
   test 'can not delete for the asset which doi is minted' do
-    User.current_user = Factory :user
-    df = Factory :data_file, contributor: User.current_user.person
+    User.current_user = FactoryBot.create :user
+    df = FactoryBot.create :data_file, contributor: User.current_user.person
     assert df.can_delete?(User.current_user)
 
     version = df.latest_version
@@ -672,8 +672,8 @@ class AuthorizationTest < ActiveSupport::TestCase
   end
 
   test 'old all registered users sharing policy honoured' do
-    df = Factory(:data_file,policy:Factory(:policy,sharing_scope:Policy::ALL_USERS,access_type:Policy::ACCESSIBLE))
-    user = Factory(:person).user
+    df = FactoryBot.create(:data_file,policy:FactoryBot.create(:policy,sharing_scope:Policy::ALL_USERS,access_type:Policy::ACCESSIBLE))
+    user = FactoryBot.create(:person).user
 
     refute Seek::Permissions::Authorization.is_authorized?("edit",df,user)
     assert Seek::Permissions::Authorization.is_authorized?("download",df,user)
@@ -687,24 +687,24 @@ class AuthorizationTest < ActiveSupport::TestCase
   end
 
   test 'all users scope overrides more restrictive permissions' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
 
     user = person.user
 
-    sop = Factory(:sop, policy: Factory(:public_policy, permissions: [
-        Factory(:permission, contributor: person, access_type: Policy::NO_ACCESS)
+    sop = FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy, permissions: [
+        FactoryBot.create(:permission, contributor: person, access_type: Policy::NO_ACCESS)
     ]))
     assert sop.can_view?(nil)
     assert sop.can_download?(nil)
     assert sop.can_view?(user)
     assert sop.can_download?(user)
 
-    person2 = Factory(:person)
+    person2 = FactoryBot.create(:person)
     user2 = person2.user
 
-    sop = Factory(:sop, policy: Factory(:publicly_viewable_policy, permissions: [
-        Factory(:permission, contributor: person, access_type: Policy::NO_ACCESS),
-        Factory(:permission, contributor: person2, access_type: Policy::ACCESSIBLE)
+    sop = FactoryBot.create(:sop, policy: FactoryBot.create(:publicly_viewable_policy, permissions: [
+        FactoryBot.create(:permission, contributor: person, access_type: Policy::NO_ACCESS),
+        FactoryBot.create(:permission, contributor: person2, access_type: Policy::ACCESSIBLE)
     ]))
 
     assert sop.can_view?(nil)
@@ -717,10 +717,10 @@ class AuthorizationTest < ActiveSupport::TestCase
   end
 
   test 'permissions can only add more privileges, not remove them' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     user = person.user
-    public_item = Factory(:sop, policy: Factory(:all_sysmo_viewable_policy))
-    private_item = Factory(:sop, policy: Factory(:private_policy))
+    public_item = FactoryBot.create(:sop, policy: FactoryBot.create(:all_sysmo_viewable_policy))
+    private_item = FactoryBot.create(:sop, policy: FactoryBot.create(:private_policy))
 
     User.with_current_user(user) do
       assert public_item.can_view?
@@ -734,7 +734,7 @@ class AuthorizationTest < ActiveSupport::TestCase
 
     # Add 'edit' permission to private item
     User.with_current_user(private_item.contributor) do
-      Factory(:permission, contributor: person, access_type: Policy::EDITING, policy: private_item.policy)
+      FactoryBot.create(:permission, contributor: person, access_type: Policy::EDITING, policy: private_item.policy)
       private_item.reload
     end
     # Can edit?
@@ -745,7 +745,7 @@ class AuthorizationTest < ActiveSupport::TestCase
 
     # Add 'no access' permission to public item
     User.with_current_user(public_item.contributor) do
-      Factory(:permission, contributor: person, access_type: Policy::NO_ACCESS, policy: public_item.policy)
+      FactoryBot.create(:permission, contributor: person, access_type: Policy::NO_ACCESS, policy: public_item.policy)
       public_item.reload
     end
     # Can still view?
@@ -756,8 +756,8 @@ class AuthorizationTest < ActiveSupport::TestCase
   end
 
   test 'user with no project can still view ALL_USERS-scoped resources' do
-    public_item = Factory(:sop, policy: Factory(:all_sysmo_viewable_policy))
-    person = Factory(:person_not_in_project)
+    public_item = FactoryBot.create(:sop, policy: FactoryBot.create(:all_sysmo_viewable_policy))
+    person = FactoryBot.create(:person_not_in_project)
 
     User.with_current_user(nil) do
       refute public_item.can_view?
@@ -769,17 +769,17 @@ class AuthorizationTest < ActiveSupport::TestCase
   end
 
   test 'programme permissions' do
-    programme = Factory(:programme)
+    programme = FactoryBot.create(:programme)
 
-    project1 = Factory(:project, programme: programme)
-    project2 = Factory(:project, programme: programme)
-    project3 = Factory(:project)
+    project1 = FactoryBot.create(:project, programme: programme)
+    project2 = FactoryBot.create(:project, programme: programme)
+    project3 = FactoryBot.create(:project)
 
-    person1 = Factory(:person, project: project1)
-    person2 = Factory(:person, project: project2)
-    person3 = Factory(:person, project: project3)
+    person1 = FactoryBot.create(:person, project: project1)
+    person2 = FactoryBot.create(:person, project: project2)
+    person3 = FactoryBot.create(:person, project: project3)
 
-    sop = Factory(:sop, contributor: person1, policy: Factory(:private_policy))
+    sop = FactoryBot.create(:sop, contributor: person1, policy: FactoryBot.create(:private_policy))
     sop.reload
 
     assert sop.can_view?(person1.user)
@@ -800,17 +800,17 @@ class AuthorizationTest < ActiveSupport::TestCase
   end
 
   test 'programme permissions precedence' do
-    programme = Factory(:programme)
+    programme = FactoryBot.create(:programme)
 
-    project1 = Factory(:project, programme: programme)
-    project2 = Factory(:project, programme: programme)
-    project3 = Factory(:project)
+    project1 = FactoryBot.create(:project, programme: programme)
+    project2 = FactoryBot.create(:project, programme: programme)
+    project3 = FactoryBot.create(:project)
 
-    person1 = Factory(:person, project: project1)
-    person2 = Factory(:person, project: project2)
-    person3 = Factory(:person, project: project3)
+    person1 = FactoryBot.create(:person, project: project1)
+    person2 = FactoryBot.create(:person, project: project2)
+    person3 = FactoryBot.create(:person, project: project3)
 
-    sop = Factory(:sop, contributor: person1, policy: Factory(:private_policy))
+    sop = FactoryBot.create(:sop, contributor: person1, policy: FactoryBot.create(:private_policy))
     sop.policy.permissions.create!(contributor: programme, access_type: Policy::VISIBLE)
     sop.reload
 
@@ -834,10 +834,10 @@ class AuthorizationTest < ActiveSupport::TestCase
 
 
   test 'cannot add content to former project' do
-    work_group = Factory(:work_group)
-    former_project_member = Factory(:person, group_memberships: [Factory(:group_membership, has_left: true, work_group: work_group)])
-    datafile = Factory.build(:data_file, contributor: former_project_member,
-                             projects: [work_group.project], policy: Factory(:publicly_viewable_policy))
+    work_group = FactoryBot.create(:work_group)
+    former_project_member = FactoryBot.create(:person, group_memberships: [FactoryBot.create(:group_membership, has_left: true, work_group: work_group)])
+    datafile = FactoryBot.build(:data_file, contributor: former_project_member,
+                             projects: [work_group.project], policy: FactoryBot.create(:publicly_viewable_policy))
 
     refute datafile.save
     assert datafile.errors[:base].any? { |e| e.include?('active member') }
