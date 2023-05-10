@@ -136,6 +136,24 @@ FactoryBot.define do
                              FactoryBot.create(:blank_xml_content_blob, asset: model, asset_version: model.version)]
     end
   end
+
+  factory(:model_with_urls, parent: :model) do |f|
+    after(:create) do |model|
+      model.content_blobs = [
+        FactoryBot.create(:content_blob, url: 'http://webpage.com', asset: model, asset_version: model.version, external_link: true),
+        FactoryBot.create(:content_blob, url: 'http://webpage2.com', asset: model, asset_version: model.version, external_link: true)
+      ]
+    end
+  end
+
+  factory(:model_with_urls_and_files, parent: :model) do |f|
+    after(:create) do |model|
+      model.content_blobs = [
+        FactoryBot.create(:content_blob, url: 'http://webpage.com', asset: model, asset_version: model.version, external_link: true),
+        FactoryBot.create(:cronwright_model_content_blob, asset: model, asset_version: model.version)
+      ]
+    end
+  end
   
   # Model::Version
   factory(:model_version, class: Model::Version) do

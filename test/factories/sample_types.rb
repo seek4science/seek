@@ -151,7 +151,7 @@ FactoryBot.define do
   
   factory(:isa_sample_collection_sample_type, parent: :sample_type) do
     transient do
-      linked_sample_type nil
+      linked_sample_type { nil }
     end
     sequence(:title) { |n| "ISA sample collection #{n}" }
     after(:build) do |type, eval|
@@ -169,7 +169,7 @@ FactoryBot.define do
   
   factory(:isa_assay_sample_type, parent: :sample_type) do
     transient do
-      linked_sample_type nil
+      linked_sample_type { nil }
     end
     sequence(:title) { |n| "ISA Assay #{n}" }
     after(:build) do |type, eval|

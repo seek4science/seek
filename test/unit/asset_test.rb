@@ -81,15 +81,6 @@ class AssetTest < ActiveSupport::TestCase
     assert !df.contains_downloadable_items?
     assert !df.latest_version.contains_downloadable_items?
 
-    FactoryBot.define(:model_with_urls, parent: :model) do |f|
-      f.after_create do |model|
-        model.content_blobs = [
-          FactoryBot.create(:content_blob, url: 'http://webpage.com', asset: model, asset_version: model.version, external_link: true),
-          FactoryBot.create(:content_blob, url: 'http://webpage2.com', asset: model, asset_version: model.version, external_link: true)
-        ]
-      end
-    end
-
     model = FactoryBot.create :model_with_urls
     assert !model.contains_downloadable_items?
     assert !model.latest_version.contains_downloadable_items?
@@ -97,15 +88,6 @@ class AssetTest < ActiveSupport::TestCase
     model = FactoryBot.create :teusink_model
     assert model.contains_downloadable_items?
     assert model.latest_version.contains_downloadable_items?
-
-    FactoryBot.define(:model_with_urls_and_files, parent: :model) do |f|
-      f.after_create do |model|
-        model.content_blobs = [
-          FactoryBot.create(:content_blob, url: 'http://webpage.com', asset: model, asset_version: model.version, external_link: true),
-          FactoryBot.create(:cronwright_model_content_blob, asset: model, asset_version: model.version)
-        ]
-      end
-    end
 
     model = FactoryBot.create :model_with_urls_and_files
     assert model.contains_downloadable_items?
