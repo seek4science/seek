@@ -125,10 +125,10 @@ workbook.add_worksheet(name: 'Samples') do |sheet|
     sheet.add_data_validation(dv_range,
                               type: :list,
                               formula1: "'cv_ontology'!$#{col_ref}$2:$#{col_ref}$#{sa_cv_terms_size + 1}",
-                              showErrorMessage: true,
+                              showErrorMessage: !@sa_cv_terms[col_nr]["is_ontology"],
                               errorTitle: 'Input Error!',
                               error: 'Please select one of the available options',
-                              errorStyle: :information, # options here are: 'information', 'stop', 'warning'
+                              errorStyle: :stop, # options here are: 'information', 'stop', 'warning'
                               showInputMessage: true,
                               promptTitle: @sa_cv_terms[col_nr]["name"],
                               prompt: 'Choose a valid option:')
