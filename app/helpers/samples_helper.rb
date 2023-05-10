@@ -147,16 +147,11 @@ module SamplesHelper
 
   def linked_custom_metadata_attribute_display(value)
     html = ''
-     data = CustomMetadata.find(value.id).data
     html += '<ul>'
        CustomMetadata.find(value.id).custom_metadata_attributes.each do |attr|
        html += '<li>'
-       if attr.linked_custom_metadata?
-         html += '<label>'+attr.title+'</label>'
+         html += '<label>'+attr.title+'</label>'+' : '
          html += display_attribute(value,attr)
-       else
-         html += attr.label+': '+ data[attr.title]+' '
-       end
        html += '</li>'
       end
     html += '</ul>'

@@ -3,14 +3,9 @@ module Seek
     module AttributeTypeHandlers
       class LinkedCustomMetadataAttributeTypeHandler < BaseAttributeHandler
 
-        def test_value(array_value)
-
+        def test_value(value)
+          fail 'Not a custom metadata' unless value.is_a?(CustomMetadata)
         end
-
-        def convert(value)
-
-        end
-
       end
     end
   end

@@ -26,7 +26,7 @@ class CustomMetadata < ApplicationRecord
   end
 
   def has_linked_custom_metadatas?
-    !linked_custom_metadatas.blank?
+    linked_custom_metadatas.any?
   end
 
 
