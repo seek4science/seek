@@ -178,9 +178,8 @@ class AssociationPermissionsTest < ActiveSupport::TestCase
       end
     end
 
-    assert_empty good_results,"#{good_results.join(', ')} failed so save with a valid project"
+    assert_empty good_results,"#{good_results.join(', ')} failed to save with a valid project"
     assert_empty bad_results,"#{bad_results.join(', ')} successfully saved with a project the user isn't a member of"
-
   end
 
   test 'must be in project when creating an investigation' do

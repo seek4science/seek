@@ -2,7 +2,6 @@ FactoryBot.define do
   # Document
   factory(:document) do
     title { 'This Document' }
-    association :contributor, factory: :person
     with_project_contributor
   
     after(:create) do |document|

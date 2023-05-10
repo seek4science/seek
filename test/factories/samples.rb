@@ -2,7 +2,7 @@ FactoryBot.define do
   # Sample
   factory(:sample) do
     sequence(:title) { |n| "Sample #{n}" }
-    association :sample_type, factory: :simple_sample_type
+    association :sample_type, factory: :simple_sample_type, strategy: :create
     with_project_contributor
 
     after(:build) do |sample|
@@ -11,7 +11,7 @@ FactoryBot.define do
   end
   
   factory(:patient_sample, parent: :sample) do
-    association :sample_type, factory: :patient_sample_type
+    association :sample_type, factory: :patient_sample_type, strategy: :create
     after(:build) do |sample|
       sample.set_attribute_value('full name', 'Fred Bloggs')
       sample.set_attribute_value(:age, 44)
@@ -21,7 +21,7 @@ FactoryBot.define do
   
   factory(:sample_from_file, parent: :sample) do
     sequence(:title) { |n| "Sample #{n}" }
-    association :sample_type, factory: :strain_sample_type
+    association :sample_type, factory: :strain_sample_type, strategy: :create
   
     after(:build) do |sample|
       sample.set_attribute_value(:name, sample.title) if sample.data.key?(:name)
@@ -31,21 +31,18 @@ FactoryBot.define do
     after(:build) do |sample|
       sample.originating_data_file = FactoryBot.create(:strain_sample_data_file, projects:sample.projects, contributor:sample.contributor) if sample.originating_data_file.nil?
     end
-  
   end
   
-  
   factory(:min_sample, parent: :sample) do
-    association :sample_type, factory: :min_sample_type
+    association :sample_type, factory: :min_sample_type, strategy: :create
     association :contributor, factory: :person
     after(:build) do |sample|
       sample.set_attribute_value(:full_name, 'Fred Bloggs')
     end
   end
-  
-  
+
   factory(:max_sample, parent: :sample) do
-    association :sample_type, factory: :max_sample_type
+    association :sample_type, factory: :max_sample_type, strategy: :create
     association :contributor, factory: :person
     after(:build) do |sample|
       sample.annotate_with(['tag1', 'tag2'], 'tag', sample.contributor)

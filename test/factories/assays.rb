@@ -48,8 +48,9 @@ FactoryBot.define do
   end
 
   factory(:modelling_assay_with_organism, parent: :modelling_assay) do
-    after(:create) { | ma | FactoryBot.build(:organism, assay: ma ) }
+    after(:create) { |ma| FactoryBot.create(:organism, assay: ma ) }
   end
+
   factory(:experimental_assay, parent: :assay_base) do
     association :assay_class, factory: :experimental_assay_class
     assay_type_uri { 'http://jermontology.org/ontology/JERMOntology#Experimental_assay_type' }
