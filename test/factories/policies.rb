@@ -1,19 +1,19 @@
 FactoryBot.define do
   # Permission
   factory(:permission, class: Permission) do
-    association :contributor, factory: :person
+    association :contributor, factory: :person, strategy: :create
     association :policy
     access_type { Policy::NO_ACCESS }
   end
   
   factory(:edit_permission, class: Permission) do
-    association :contributor, factory: :person
+    association :contributor, factory: :person, strategy: :create
     association :policy
     access_type { Policy::EDITING }
   end
   
   factory(:manage_permission, class: Permission) do
-    association :contributor, factory: :person
+    association :contributor, factory: :person, strategy: :create
     association :policy
     access_type { Policy::MANAGING }
   end

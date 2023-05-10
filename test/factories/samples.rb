@@ -35,7 +35,7 @@ FactoryBot.define do
   
   factory(:min_sample, parent: :sample) do
     association :sample_type, factory: :min_sample_type, strategy: :create
-    association :contributor, factory: :person
+    association :contributor, factory: :person, strategy: :create
     after(:build) do |sample|
       sample.set_attribute_value(:full_name, 'Fred Bloggs')
     end
@@ -43,7 +43,7 @@ FactoryBot.define do
 
   factory(:max_sample, parent: :sample) do
     association :sample_type, factory: :max_sample_type, strategy: :create
-    association :contributor, factory: :person
+    association :contributor, factory: :person, strategy: :create
     after(:build) do |sample|
       sample.annotate_with(['tag1', 'tag2'], 'tag', sample.contributor)
       sample.set_attribute_value(:full_name, 'Fred Bloggs')

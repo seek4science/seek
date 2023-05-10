@@ -4,7 +4,7 @@ FactoryBot.define do
     sequence(:title) { |n| "Strain#{n}" }
     association :organism
     projects { [FactoryBot.create(:project)] }
-    association :contributor, factory: :person
+    association :contributor, factory: :person, strategy: :create
   end
   
   factory(:min_strain, class: Strain) do

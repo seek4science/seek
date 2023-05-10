@@ -2,7 +2,7 @@ FactoryBot.define do
   # Study
   factory(:study) do
     sequence(:title) { |n| "Study#{n}" }
-    association :contributor, factory: :person
+    association :contributor, factory: :person, strategy: :create
     after(:build) do |s|
       s.investigation ||= FactoryBot.create(:investigation, contributor: s.contributor, policy: s.policy.try(:deep_copy))
     end
@@ -19,7 +19,7 @@ FactoryBot.define do
   
   factory(:min_study, class: Study) do
     title { "A Minimal Study" }
-    association :contributor, factory: :person
+    association :contributor, factory: :person, strategy: :create
     after(:build) do |s|
       s.investigation ||= FactoryBot.create(:min_investigation, contributor: s.contributor, policy: s.policy.try(:deep_copy))
     end

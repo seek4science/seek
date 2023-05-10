@@ -36,7 +36,7 @@ FactoryBot.define do
   factory(:assay_base, class: Assay) do
     sequence(:title) { | n | "An Assay #{n}" }
     sequence(:description) { | n | "Assay description #{n}" }
-    association :contributor, factory: :person
+    association :contributor, factory: :person, strategy: :create
     after(:build) do |a|
       a.study ||= FactoryBot.create(:study, contributor: a.contributor)
     end
@@ -67,7 +67,7 @@ FactoryBot.define do
   factory(:min_assay, class: Assay) do
     title { "A Minimal Assay" }
     association :assay_class, factory: :experimental_assay_class
-    association :contributor, factory: :person
+    association :contributor, factory: :person, strategy: :create
     after(:build) do |a|
       a.study ||= FactoryBot.create(:min_study, contributor: a.contributor, policy: a.policy.try(:deep_copy))
     end

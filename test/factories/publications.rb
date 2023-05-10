@@ -23,7 +23,7 @@ FactoryBot.define do
     sequence(:title) { |n| "A Publication #{n}" }
     sequence(:pubmed_id) { |n| n }
     projects { [FactoryBot.create(:project)] }
-    association :contributor, factory: :person
+    association :contributor, factory: :person, strategy: :create
     association :publication_type, factory: :journal
   end
   
@@ -98,7 +98,7 @@ FactoryBot.define do
     sequence( :published_date) { |n| "2017-10-#{n}" }
     sequence(:pubmed_id) { |n| n }
     projects { [FactoryBot.create(:project)] } # max_project does not use sequence in the title so cannot be reused.
-    association :contributor, factory: :person
+    association :contributor, factory: :person, strategy: :create
     association :publication_type, factory: :journal
   end
   
