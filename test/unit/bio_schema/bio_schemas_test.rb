@@ -114,11 +114,11 @@ class BioSchemaTest < ActiveSupport::TestCase
   end
 
   test 'resource wrapper factory' do
-    wrapper = Seek::BioSchema::ResourceDecorators::FactoryBot.instance.get(FactoryBot.create(:person))
+    wrapper = Seek::BioSchema::ResourceDecorators::Factory.instance.get(FactoryBot.create(:person))
     assert wrapper.is_a?(Seek::BioSchema::ResourceDecorators::Person)
 
     assert_raise Seek::BioSchema::UnsupportedTypeException do
-      Seek::BioSchema::ResourceDecorators::FactoryBot.instance.get(unsupported_type)
+      Seek::BioSchema::ResourceDecorators::Factory.instance.get(unsupported_type)
     end
   end
 
