@@ -9,19 +9,19 @@
 
 <%= render partial:'browser-overview' %>
 
-<div class="row">
-      <%= button_link_to('Open in NeLS', 'nels_logo_small', 'https://test-fe.cbu.uib.no/nels-web/#/sbi-storage',options = {target:'blank'}) %>
-</div>
-
-
-
-<div class="row">
-  <div class="col-sm-3">
-    <div id="nels-tree" style="min-height: 300px; border-right: 1px solid #ddd"></div>
+<div id="nels-browser">
+  <div class="row">
+        <%= button_link_to('Open in NeLS', 'nels_logo_small', 'https://test-fe.cbu.uib.no/nels-web/#/sbi-storage',options = {target:'blank'}) %>
   </div>
-  <div class="col-sm-9">
-    <div id="nels-dataset" style="display: none"></div>
-    <div id="nels-content" style="display: none"></div>
+
+  <div class="row">
+    <div class="col-sm-3">
+      <div id="nels-tree" style="min-height: 300px; border-right: 1px solid #ddd"></div>
+    </div>
+    <div class="col-sm-9">
+      <div id="nels-dataset" style="display: none"></div>
+      <div id="nels-content" style="display: none"></div>
+    </div>
   </div>
 </div>
 
