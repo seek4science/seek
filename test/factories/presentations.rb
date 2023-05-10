@@ -2,11 +2,7 @@ FactoryBot.define do
   # Presentation
   factory(:presentation) do
     sequence(:title) { |n| "A Presentation #{n}" }
-    association :contributor, factory: :person
-  
-    after(:build) do |presentation|
-      presentation.projects = [presentation.contributor.projects.first] if presentation.projects.empty?
-    end
+    with_project_contributor
   
     after(:create) do |presentation|
       if presentation.content_blob.blank?

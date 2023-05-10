@@ -3,11 +3,8 @@ FactoryBot.define do
   factory(:sample) do
     sequence(:title) { |n| "Sample #{n}" }
     association :sample_type, factory: :simple_sample_type
-    association :contributor, factory: :person
-  
-    after(:build) do |sample|
-      sample.projects = [sample.contributor.projects.first] if sample.projects.empty?
-    end
+    with_project_contributor
+
     after(:build) do |sample|
       sample.set_attribute_value(:the_title, sample.title) if sample.data.key?(:the_title)
     end

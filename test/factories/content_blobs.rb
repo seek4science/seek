@@ -15,13 +15,13 @@ FactoryBot.define do
   end
   
   factory(:max_content_blob, parent: :min_content_blob) do
-    url { ' http://example.com/remote.txt' }
+    url { 'http://example.com/remote.txt' }
     file_size { 8 }
     content_type { 'text/plain' }
   end
   
   factory(:url_content_blob, parent: :content_blob) do
-    url {  'http://www.abc.com' }
+    url { 'http://www.abc.com' }
     data { nil }
   end
   
@@ -310,7 +310,7 @@ FactoryBot.define do
   
   factory(:blank_content_blob, class: ContentBlob) do
     url { nil }
-    data nil
+    data { nil }
   end
   
   factory(:blank_pdf_content_blob, parent: :blank_content_blob) do
@@ -343,7 +343,7 @@ FactoryBot.define do
   factory(:url_cwl_content_blob, parent: :content_blob) do
     original_filename { 'rp2-to-rp2path.cwl' }
     url { 'https://www.abc.com/workflow.cwl' }
-    data nil
+    data { nil }
   end
   
   factory(:blank_cwl_content_blob, parent: :blank_content_blob) do

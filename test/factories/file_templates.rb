@@ -2,11 +2,7 @@ FactoryBot.define do
   # File template
   factory(:file_template) do
     title { 'This FileTemplate' }
-    association :contributor, factory: :person
-  
-    after(:build) do |file_template|
-      file_template.projects = [file_template.contributor.projects.first] if file_template.projects.empty?
-    end
+    with_project_contributor
   
     after(:create) do |file_template|
       if file_template.content_blob.blank?

@@ -128,7 +128,7 @@ FactoryBot.define do
   
   factory(:jerm_data_file, class: DataFile) do
     sequence(:title) { |n| "A Data File_#{n}" }
-    contributor nil
+    contributor { nil }
     projects { [FactoryBot.create(:project)] }
     association :content_blob, factory: :url_content_blob
   
