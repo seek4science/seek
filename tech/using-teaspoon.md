@@ -23,5 +23,5 @@ We integrate [Chai](http://chaijs.com/api/assert/) as the assertion library, and
 
 To write javascript test in SEEK, add your *_spec.js file under spec/javascripts folder.
 
-You can find an example here: [upload_selection_spec.js](https://github.com/seek4science/seek/blob/master/spec/javascripts/upload_selection_spec.js)
+You can find an example here: [upload_selection_spec.js](https://github.com/seek4science/seek/blob/main/spec/javascripts/upload_selection_spec.js)
 

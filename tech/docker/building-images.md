@@ -11,7 +11,7 @@ If you are doing your own development, or you want to tweak the Docker image, it
 
 You need first of course, to have the SEEK code which you can get from [GitHub](https://github.com/seek4science/seek), see [Getting SEEK](../install.html#getting-seek)
 
-The Docker image is determined by the [Dockerfile](https://github.com/seek4science/seek/blob/master/Dockerfile), 
+The Docker image is determined by the [Dockerfile](https://github.com/seek4science/seek/blob/main/Dockerfile), 
 and in most cases you shouldn't need to change this.
 
 To build your own image, simply run the following from the root of the source folder

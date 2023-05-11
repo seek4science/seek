@@ -11,14 +11,14 @@ import jsonschema
 import os
 import zipfile, io
 
-master_definitions_url = 'https://raw.githubusercontent.com/seek4science/seek/master/public/2010/json/rest/definitions.json'
+main_definitions_url = 'https://raw.githubusercontent.com/seek4science/seek/main/public/2010/json/rest/definitions.json'
 
 headers = {"Accept-Charset": "ISO-8859-1"}
 
 session = requests.Session()
 session.headers.update(headers)
 
-r = session.get(master_definitions_url)
+r = session.get(main_definitions_url)
 r.raise_for_status()
 definitions_json = r.text.replace('\r', '')
 

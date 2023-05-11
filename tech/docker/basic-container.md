@@ -49,7 +49,7 @@ The image without the patch is always up to date with the latest version, wherea
 
 Our images are automatically built, and you can see the full list on the [FAIRDOM Docker Hub](https://hub.docker.com/r/fairdom/seek/tags/)
     
-Note that there is also a _master_ tag. This is the latest development build of SEEK. 
+Note that there is also a _main_ tag. This is the latest development build of SEEK. 
 It is useful for testing and trying out new cutting edge features, 
 but is not suitable for a production deployment of SEEK.    
 
