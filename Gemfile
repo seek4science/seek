@@ -39,7 +39,8 @@ gem 'active_model_serializers', '~> 0.10.13'
 gem 'rubyzip'
 
 gem 'equivalent-xml'
-gem 'docsplit'
+# FIXME: Change back to "official" docsplit if this PR is ever merged: https://github.com/documentcloud/docsplit/pull/159
+gem 'docsplit', git: 'https://github.com/tuttiq/docsplit.git', ref: '6127e3912b8db94ed84dca6be5622d3d5ec0d879'
 gem 'pothoven-attachment_fu'
 gem 'exception_notification'
 gem 'fssm'
@@ -70,7 +71,7 @@ gem 'bives', "~> 2.0"
 gem 'my_responds_to_parent', git: 'https://github.com/SysMO-DB/my_responds_to_parent.git'
 gem 'bioportal', '>=3.0', git: 'https://github.com/SysMO-DB/bioportal.git'
 gem 'doi_query_tool', git: 'https://github.com/seek4science/DOI-query-tool.git'
-gem 'fleximage', git: 'https://github.com/SysMO-DB/fleximage.git', ref: 'bb1182f2716a9bf1b5d85e186d8bb7eec436797b'
+gem 'fleximage', git: 'https://github.com/SysMO-DB/fleximage.git', ref: 'de03bf816a911dc4f69573fd300d4ff90225cca7'
 
 gem 'jquery-rails', '~> 4.2.2'
 gem 'jquery-ui-rails'

@@ -6,8 +6,8 @@ GIT
 
 GIT
   remote: https://github.com/SysMO-DB/fleximage.git
-  revision: bb1182f2716a9bf1b5d85e186d8bb7eec436797b
-  ref: bb1182f2716a9bf1b5d85e186d8bb7eec436797b
+  revision: de03bf816a911dc4f69573fd300d4ff90225cca7
+  ref: de03bf816a911dc4f69573fd300d4ff90225cca7
   specs:
     fleximage (0.1)
 
@@ -30,6 +30,13 @@ GIT
   specs:
     zenodo-client (0.3.0)
       rest-client (~> 2.0)
+
+GIT
+  remote: https://github.com/tuttiq/docsplit.git
+  revision: 6127e3912b8db94ed84dca6be5622d3d5ec0d879
+  ref: 6127e3912b8db94ed84dca6be5622d3d5ec0d879
+  specs:
+    docsplit (0.7.6)
 
 GIT
   remote: https://github.com/youroute/api_smith.git
@@ -209,7 +216,6 @@ GEM
       delayed_job (>= 3.0, < 5)
     diff-lcs (1.5.0)
     docile (1.4.0)
-    docsplit (0.7.6)
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
     doorkeeper (5.5.4)
@@ -957,7 +963,7 @@ DEPENDENCIES
   daemons (= 1.1.9)
   database_cleaner (~> 1.7.0)
   delayed_job_active_record
-  docsplit
+  docsplit!
   doi_query_tool!
   doorkeeper (>= 5.2.5)
   dotenv-rails (~> 2.7.6)
