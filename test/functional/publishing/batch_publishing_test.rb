@@ -59,7 +59,7 @@ class BatchPublishingTest < ActionController::TestCase
       assert_select '.type_and_title img[src*=?][title=?]', 'lock.png', 'Private', count: total_asset_count
     end
 
-    assert_select '.checkbox', text: /Publish/, count: total_asset_count do
+    assert_select '.parent-btn-checkbox', text: /Publish/, count: total_asset_count do
       publish_immediately_assets.each do |a|
         assert_select "input[type='checkbox'][id=?]", "publish_#{a.class.name}_#{a.id}"
       end
