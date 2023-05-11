@@ -44,6 +44,7 @@ module SamplesHelper
                     limit: limit,
                     allow_new: sample_controlled_vocab.custom_input?,
                     class: 'form-control')
+    end
   end
 
   def controlled_vocab_list_form_field(sample_controlled_vocab, element_name, values)
@@ -330,3 +331,5 @@ module SamplesHelper
   end
 
 end
+
+
