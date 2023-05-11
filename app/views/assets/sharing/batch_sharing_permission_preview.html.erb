@@ -26,7 +26,7 @@
 </div>
 
 <div id="sharing_items">
-<%= form_tag({:action => :batch_change_permssion_for_selected_items}, :method => :post) do -%>
+<%= form_tag({:action => :batch_change_permission_for_selected_items}, :method => :post) do -%>
 
   <%= folding_panel("Items not in ISA", false, :id => 'not_isa_item', :body_options => {:id => 'items_fold_content'},
                     :help_text => nil) do %>
