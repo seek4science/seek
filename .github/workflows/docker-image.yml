@@ -3,7 +3,7 @@ name: Test Docker Image Build
 on:
   push:
     branches:
-      - master
+      - main
       - workflow
       - workflowhub
       - seek-1.11
