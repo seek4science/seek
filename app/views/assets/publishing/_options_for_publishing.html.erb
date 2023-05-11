@@ -6,8 +6,11 @@
    tree_class = 'publishable' if item.can_publish?
    tree_class = 'already-published' if item.is_published?
 
+   toggle ||=false
+   cb_parent_selector ||="div\##{item.class.name}_#{item.id}.split_button_parent"
+
 -%>
-<div class="isa-tree <%= html_classes -%> <%= tree_class %>">
+<div class="isa-tree <%= html_classes -%> <%= tree_class %> _<%= item.id %>">
   <% if item.can_view? %>
       <h5 class="type_and_title">
         <strong><%= text_for_resource item -%>:</strong> <%= link_to item.title, item, :target => "_blank" -%>
@@ -23,22 +26,22 @@
 
   <div>
     <% if item.is_published? %>
-        <span class="label label-default" data-tooltip="<%= tooltip('This item has already been published.') %>">
-          <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
-          Published
-        </span>
+      <%= render :partial => 'general/split_button_checkbox',
+                 locals: { checkbox_id: publishing_item_param(item),
+                           checkbox_class: "#{item.class.name}_#{item.id}",
+                           published: true,
+                           toggle: toggle,
+                           cb_parent_selector: cb_parent_selector} -%>
     <% elsif item.can_publish? %>
-        <div class="publish-checkbox">
-          <div class="checkbox">
-            <label><%= check_box_tag publishing_item_param(item), 1, checked,
-                                {:class=>"#{item.class.name}_#{item.id}",
-                                 :onclick=>"checkRepeatedItems(this)"} -%>
-              Publish?
-            </label>
-          </div>
-        </div>
+      <%= render :partial => 'general/split_button_checkbox',
+                locals: { checkbox_id: publishing_item_param(item),
+                          checkbox_class: "#{item.class.name}_#{item.id}",
+                          checkbox_text: "Publish?",
+                          checked: checked,
+                          toggle: toggle,
+                          cb_parent_selector: cb_parent_selector} -%>
     <% else %>
-        <span class="label label-warning" data-tooltip="<%= tooltip('You do not have permission to pubish this item.') %>">
+        <span class="label label-warning" data-tooltip="<%= tooltip('You do not have permission to publish this item.') %>">
           <span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span>
           Can't publish
         </span>

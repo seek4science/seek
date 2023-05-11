@@ -56,7 +56,7 @@
 //= require calendar
 //= require inplace
 //= require strain
-//= require publishing
+//= require checkbox
 //= require cytoscape.js-2.5.0/cytoscape
 //= require cytoscape_isa_graph
 //= require bives

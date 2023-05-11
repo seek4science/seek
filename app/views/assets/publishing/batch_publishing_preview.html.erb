@@ -18,6 +18,11 @@
 </div>
 <br/>
 
+<label><a class="selectChildren" id="select_all" data-cb_parent_selector='body' href="#" >
+  Select all your items </a></label> |
+<label><a class="deselectChildren" id="deselect_all" data-cb_parent_selector='body' href="#" >
+  Deselect all your items </a></label>
+
 <%= form_tag({:action => :check_related_items},:method=>:post)  do -%>
   <% if @assets.empty? %>
     <span class="no_unpublished_asset">All your assets are published or you have no assets in <%= Seek::Config.instance_name %></span>
@@ -26,11 +31,21 @@
     <%= link_to "Back to profile", person_path(params[:id].to_i) -%>
   <% else %>
     <% @assets.sort_by { |k, v| v.first.class.name }.each do |type, items| %>
+      <div id="<%= items.first.class.table_name %>">
       <h2><%= text_for_resource items.first %>(s)</h2>
+      <label><a class="selectChildren" id="<%="select_all_#{items.first.class.table_name}"%>"
+                data-cb_parent_selector='div#<%= items.first.class.table_name %>' href="#" >
+        Select all <%= "#{(text_for_resource items.first).downcase.pluralize}" %> </a></label> |
+      <label><a class="deselectChildren" id="<%="deselect_all_#{items.first.class.table_name}"%>"
+                  data-cb_parent_selector='div#<%= items.first.class.table_name %>' href="#" >
+          Deselect all <%= "#{(text_for_resource items.first).downcase.pluralize}" %> </a></label>
       <% items.each do |item| %>
-        <%= render :partial => "assets/publishing/options_for_publishing", :object => item, :locals => {:html_classes => "publishing_options"} -%>
+        <%= render :partial => "assets/publishing/options_for_publishing",
+                   :object => item,
+                   :locals => { :html_classes => "publishing_options" } -%>
         <br/>
       <% end %>
+      </div>
     <% end %>
     <br/>
 
