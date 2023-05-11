@@ -152,15 +152,20 @@ class NelsControllerTest < ActionController::TestCase
   test 'download file' do
     project_id = '1125299'
     dataset_id = '1124840'
+    dataset_name = 'Illumina-sequencing-dataset'
+    project_name = 'seek_pilot1'
     subtype = 'analysis'
+    path = 'Storebioinfo/seek_pilot1/Illumina-sequencing-dataset/anaylsis'
 
     VCR.use_cassette('nels/download_file') do
       get :download_file,
-          params: { dataset_id: dataset_id, project_id: project_id, subtype_name: subtype, filename: 'pegion.png' },
+          params: { dataset_id: dataset_id, project_id: project_id,
+                    subtype_name: subtype, dataset_name: dataset_name, project_name: project_name,
+                    path: path, filename: 'pegion.png' },
           format: :json
       assert_response :success
       json = JSON.parse(@response.body)
-      assert_equal 'pegion.png',json['filename']
+      assert_equal 'pegion.png', json['filename']
       assert json['file_path'].start_with?('/tmp/nels-download-')
     end
   end
