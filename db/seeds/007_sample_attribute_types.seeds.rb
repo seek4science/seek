@@ -85,6 +85,9 @@ ontology_type.update(base_type: Seek::Samples::BaseType::CV)
 cv_list_type = SampleAttributeType.find_or_initialize_by(title:'Controlled Vocabulary List')
 cv_list_type.update(base_type: Seek::Samples::BaseType::CV_LIST)
 
+linked_custom_metadata_type = SampleAttributeType.find_or_initialize_by(title:'Linked Custom Metadata')
+linked_custom_metadata_type.update(base_type: Seek::Samples::BaseType::LINKED_CUSTOM_METADATA)
+
 puts "Seeded #{SampleAttributeType.count - count} sample attribute types"
 
 # Sample types
