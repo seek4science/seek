@@ -75,17 +75,17 @@ If you have an existing installation linked to our GitHub, you can fetch the
 files with:
 
     git pull
-    git checkout v1.13.1
+    git checkout v1.13.2
 
 ### Updating using the tarball
 
 You can download the file from
-<https://github.com/seek4science/seek/archive/v1.13.1.tar.gz> You can
+<https://github.com/seek4science/seek/archive/v1.13.2.tar.gz> You can
 unpack this file using:
 
-    tar zxvf seek-1.13.1.tar.gz
+    tar zxvf seek-1.13.2.tar.gz
     mv seek seek-previous
-    mv seek-1.13.1 seek
+    mv seek-1.13.2 seek
     cd seek/
 
 and then copy across your existing filestore and database configuration file
@@ -105,7 +105,7 @@ Then the other dependencies can be installed
 
 ### Upgrading Ruby
 
-You are recommended to upgrade to Ruby 2.7.7 If you are using [RVM](https://rvm.io/) (according to the [Installation Guide](install.html) )you should be prompted to install during the standard installation steps that follow.
+You are recommended to upgrade to Ruby 2.7.8 If you are using [RVM](https://rvm.io/) (according to the [Installation Guide](install.html) )you should be prompted to install during the standard installation steps that follow.
 If you are not prompted you can install with the command:
 
     rvm install $(cat .ruby-version)

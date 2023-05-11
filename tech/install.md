@@ -32,7 +32,7 @@ Note that we don't currently support Ubuntu 22.04 due to a problem installing Ru
 This is something we are looking into and hoping to address soon.
 </div>
 
-SEEK is built upon the 5.2 version of Rails, and requires Ruby 2.7.
+SEEK is built upon Rails, and requires Ruby 2.7.
 
 We recommend that you run SEEK on a Linux system. This guide is based on an
 [Ubuntu (20.04 LTS)](http://releases.ubuntu.com/20.04/) system. However, running on other Linux distributions the
