@@ -53,9 +53,8 @@
         <% options ||= { depth: 4, parent_depth: nil, sibling_depth: nil, include_self: true } %>
         <%  hash = Seek::IsaGraphGenerator.new(item).generate(**options) %>
         <% tree = JSON.parse(build_tree_json(hash, item)) %>
-        <% tree = add_permissions_to_tree_json (tree) %>
-        <% investigation_tree =  eval(tree.join) %>
-        <% all_investigations_hash[:children].append (investigation_tree) %>
+        <% tree = add_permissions_to_tree_json(tree) %>
+        <% all_investigations_hash[:children].append(tree.first) %>
       <% end %>
     <% end %>
   <% end %>
