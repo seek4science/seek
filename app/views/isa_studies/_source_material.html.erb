@@ -99,13 +99,21 @@
             let data = [];
             for (let i = 0; i < bodyCells.length; i++) {
                 const row = bodyCells[i];
+                // If a row has been checked / unchecked,
+                // the datatable body gets one extra hidden cell at index 1,
+                // compared to the table header. This has to be removed.
+                if (row.length !== headerCells.length)row.splice(1,1);
                 let obj = {};
                 for (let j = 0; j < headerCells.length; j++) {
                     const attr = headerCells[j];
-                    if (attr === "") continue;
-                    obj[attr] = row[j];
+                    const val = row[j];
+                    if(j === 0){
+                        obj["selected"] = (val === "") ? false : val;
+                    } else{
+                        obj[attr] = val;
+                    }
                 }
-                data.push(obj);
+                if(obj.selected) data.push(obj);
             }
 
             // Use ajax for POST request with table data in the body

@@ -89,7 +89,10 @@ end
 # Sample sheet
 workbook.add_worksheet(name: 'Samples') do |sheet|
   ## Adding the header cells
-  sheet.add_row sample_data[0].keys
+  header_row = @sa_cv_terms.map do |sa_cv_term|
+    sa_cv_term['required'] ? "#{sa_cv_term['name']} *" : sa_cv_term['name']
+  end
+  sheet.add_row header_row
 
   ## populating the sheet with the data
   sample_data.each do |item|
@@ -115,23 +118,25 @@ workbook.add_worksheet(name: 'Samples') do |sheet|
   (0..attribute_size).map do |col_nr|
 
     # If the has_cv field is false, it should skip this iteration and not apply the data validation
-    next if @sa_cv_terms[col_nr]["has_cv"] == false
+    next if @sa_cv_terms[col_nr]['has_cv'] == false
 
     # Get sa_cv_terms_length
-    sa_cv_terms_size = @sa_cv_terms[col_nr]["data"].size
+    sa_cv_terms_size = @sa_cv_terms[col_nr]['data'].size
+
+    prompt_text = "Choose a valid option. #{(@sa_cv_terms[col_nr]['required'] ? 'This value is MANDATORY!' : 'This value is optional.')}"
 
     col_ref = Axlsx.cell_r(col_nr, 1).gsub(/\d+/, '')
     dv_range = "#{col_ref}2:#{col_ref}1000000"
     sheet.add_data_validation(dv_range,
                               type: :list,
                               formula1: "'cv_ontology'!$#{col_ref}$2:$#{col_ref}$#{sa_cv_terms_size + 1}",
-                              showErrorMessage: !@sa_cv_terms[col_nr]["allows_custom_input"],
+                              showErrorMessage: !@sa_cv_terms[col_nr]['allows_custom_input'],
                               errorTitle: 'Input Error!',
                               error: 'Please select one of the available options',
                               errorStyle: :stop, # options here are: 'information', 'stop', 'warning'
                               showInputMessage: true,
-                              promptTitle: @sa_cv_terms[col_nr]["name"],
-                              prompt: 'Choose a valid option:')
+                              promptTitle: @sa_cv_terms[col_nr]['name'],
+                              prompt: prompt_text)
   end
 
   ## Password protections Samples sheet
