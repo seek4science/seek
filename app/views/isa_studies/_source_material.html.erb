@@ -83,16 +83,16 @@
                 alert("Table not recognized. Please contact the administrator.");
                 return;
             }
-            const headerRow = $j(`#${tableName} thead tr`)[0];
+            const headerRow = $j(`table[id=${tableName}] thead tr`)["0"];
 
             // Cells from the table body => Each row = array
             // For some reason they contain null values, which should be filtered out
-            let bodyCells = $j(`#${tableName}`).DataTable().data().toArray().map(subarray => subarray.filter(function(el){return el != null}));
+            let bodyCells = $j(`table[id=${tableName}]`).DataTable().data().toArray().map(subarray => subarray.filter(function(el){return el != null}));
 
             // Return array of table header cells from headerRow
             let headerCells = [];
             $j.each(headerRow.cells, function (i, v) {
-                headerCells.push(v.innerText);
+                headerCells.push(v.textContent);
             });
 
             // Construct the 'struct' of the table data
