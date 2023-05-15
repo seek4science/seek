@@ -123,7 +123,7 @@ workbook.add_worksheet(name: 'Samples') do |sheet|
     # Get sa_cv_terms_length
     sa_cv_terms_size = @sa_cv_terms[col_nr]['data'].size
 
-    prompt_text = "Choose a valid option. #{(@sa_cv_terms[col_nr]['required'] ? 'This value is MANDATORY!' : 'This value is optional.')}"
+    prompt_text = "Choose a valid option. #{(@sa_cv_terms[col_nr]['required'] ? 'This value is REQUIRED!' : 'This value is optional.')}"
 
     col_ref = Axlsx.cell_r(col_nr, 1).gsub(/\d+/, '')
     dv_range = "#{col_ref}2:#{col_ref}1000000"
