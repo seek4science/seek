@@ -17,7 +17,7 @@ echo "${GREEN}bundle install${NC}"
 bundle install --deployment --without development test
 
 echo "${GREEN}pip install${NC}"
-python3.7 -m pip install -r requirements.txt
+python3.9 -m pip install -r requirements.txt
 
 bundle exec rake seek:workers:stop
 
