@@ -146,7 +146,7 @@ module Seek
     end
 
     def self.python_exec(cmd)
-      "python3.7 #{cmd}"
+      "python3.9 #{cmd}"
     end
 
     private

@@ -993,7 +993,17 @@ class DocumentsControllerTest < ActionController::TestCase
     Factory(:activity_log, action: 'download', activity_loggable: d6, created_at: 4.minutes.ago, culprit: person.user)
     Factory(:activity_log, action: 'download', activity_loggable: d5, created_at: 3.minutes.ago, culprit: person.user)
 
+    d3.annotate_with('tag1', 'tag', d3.contributor)
+    d4.annotate_with('tag1', 'tag', d4.contributor)
+    d5.annotate_with('tag1', 'tag', d5.contributor)
+    disable_authorization_checks do
+      d3.save!
+      d4.save!
+      d5.save!
+    end
+
     downloads_ordered = [d2, d3, d6, d5, d1, d4]
+    downloads_ordered_tag1 = [d3, d5, d4]
 
     get :index
     assert_select '#index_sort_order' do
@@ -1003,6 +1013,10 @@ class DocumentsControllerTest < ActionController::TestCase
     get :index, params: { order: 'downloads_desc' }
     assert_response :success
     assert_equal downloads_ordered, assigns(:documents).to_a
+
+    get :index, params: { filter: { tag: 'tag1' }, order: 'downloads_desc' }
+    assert_response :success
+    assert_equal downloads_ordered_tag1, assigns(:documents).to_a
   end
 
   test 'sort by views' do
@@ -1021,7 +1035,17 @@ class DocumentsControllerTest < ActionController::TestCase
     Factory(:activity_log, action: 'show', activity_loggable: d6, created_at: 4.minutes.ago)
     Factory(:activity_log, action: 'show', activity_loggable: d5, created_at: 3.minutes.ago)
 
+    d1.annotate_with('tag1', 'tag', d1.contributor)
+    d3.annotate_with('tag1', 'tag', d3.contributor)
+    d6.annotate_with('tag1', 'tag', d6.contributor)
+    disable_authorization_checks do
+      d1.save!
+      d3.save!
+      d6.save!
+    end
+
     views_ordered = [d4, d3, d6, d5, d1, d2]
+    views_ordered_tag1 = [d3, d6, d1]
 
     get :index
     assert_select '#index_sort_order' do
@@ -1031,6 +1055,10 @@ class DocumentsControllerTest < ActionController::TestCase
     get :index, params: { order: 'views_desc' }
     assert_response :success
     assert_equal views_ordered, assigns(:documents).to_a
+
+    get :index, params: { filter: { tag: 'tag1' }, order: 'views_desc' }
+    assert_response :success
+    assert_equal views_ordered_tag1, assigns(:documents).to_a
   end
 
   test 'filtering a scoped collection' do

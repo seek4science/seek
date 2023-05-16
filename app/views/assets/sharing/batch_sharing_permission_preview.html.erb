@@ -13,6 +13,7 @@
   @policy_params = params[:policy_attributes]
 
 %>
+
 <%= show_title "Change permissions of items related to #{link_to(h(current_user.person.name),current_user.person)} in batch".html_safe -%>
 
 <div class="alert alert-info">
@@ -26,6 +27,7 @@
 
 <div id="sharing_items">
 <%= form_tag({:action => :batch_change_permission_for_selected_items}, :method => :post) do -%>
+
   <%= folding_panel("Items not in ISA", false, :id => 'not_isa_item', :body_options => {:id => 'items_fold_content'},
                     :help_text => nil) do %>
 
@@ -43,18 +45,20 @@
     <div id="jstree_not_isa"></div>
 
   <% end %>
+
+
   <% all_related_items_hash.each do |resource_type, resource_items| %>
     <% if resource_type == "Investigation" %>
       <%  resource_items[:items].each do |item| %>
         <% options ||= { depth: 4, parent_depth: nil, sibling_depth: nil, include_self: true } %>
         <%  hash = Seek::IsaGraphGenerator.new(item).generate(**options) %>
         <% tree = JSON.parse(build_tree_json(hash, item)) %>
-        <% tree = add_permissions_to_tree_json (tree) %>
-        <% investigation_tree =  eval(tree.join) %>
-        <% all_investigations_hash[:children].append (investigation_tree) %>
+        <% tree = add_permissions_to_tree_json(tree) %>
+        <% all_investigations_hash[:children].append(tree.first) %>
       <% end %>
     <% end %>
   <% end %>
+
   <%= folding_panel("Items in ISA: ", false, :id => 'isa_item', :body_options => {:id => 'items_fold_content'},
                     :help_text => nil) do %>
 
@@ -66,13 +70,13 @@
     <div id="jstree"></div>
 
   <% end -%>
+
   <% resource = (controller_name == 'people') ? current_user.person : @asset %>
-  <%= submit_tag "Next", data: {disable_with: 'Next'}, :class => 'btn btn-primary' -%>
+
+  <%= submit_tag "Next", data: {disable_with: 'Next'}, :class => 'btn btn-primary', :onclick => 'show_all_checkboxes()' -%>
 
   or
-  <%= cancel_button(resource) %>
-
-  <div id="hiddencheckboxs"></div>
+  <%= cancel_button(resource, button_text: "Back to profile") %>
 
 <% end -%>
 </div>
@@ -90,14 +94,12 @@
 
         $j('#select_all_not_isa').click(function (event) {
             event.preventDefault();
-            $j('input[name^="share_not_isa"]').prop("checked", true);
-            $j("#jstree_not_isa").jstree().check_all(true);
+            $j("#jstree_not_isa").trigger("sb_select_all")
         });
 
         $j('#deselect_all_not_isa').click(function (event) {
             event.preventDefault();
-            $j('input[name^="share_not_isa"]').prop("checked", false);
-            $j("#jstree_not_isa").jstree().uncheck_all(true);
+            $j("#jstree_not_isa").trigger("sb_deselect_all")
         });
         $j('#expand_all_not_isa').click(function (event) {
             event.preventDefault();
@@ -115,14 +117,14 @@
             $j('input[name^="share_isa"]').prop("checked", true);
             $j("#jstree").jstree().check_all(true);
             event.preventDefault();
-
+            $j("#jstree").trigger("sb_select_all")
         });
 
         $j('#deselect_all_isa').click(function (event) {
             $j('input[name^="share_isa"]').prop("checked", false);
             $j("#jstree").jstree().uncheck_all(true);
             event.preventDefault();
-
+            $j("#jstree").trigger("sb_deselect_all")
         });
         $j('#expand_all_isa').click(function (event) {
             event.preventDefault();
@@ -145,48 +147,20 @@
             if (<%= @batch_sharing_permission_changed %>){
                 $j('#jstree_not_isa').find(('[id^="Permission-"]')).removeClass('hide_permission')
             }
-
-            var $tree = $j(this);
-            $j($tree.jstree(true).get_json('#', {
-                flat: true
-            })).each(function(index, value) {
-                var asset = this.id.split('-')[0]
-                var asset_id = this.id.split('-')[1]
-                if ( index != 0 && asset != "Permission" && asset_id != "not_isa"){
-                    addCheckboxToAssetNode(asset,asset_id,'share_not_isa');
-                }
-            });
-
         })
-            .jstree({
-                'core': {
-                    'multiple' : true,
-                    "check_callback": true,
-                    "themes": {
-                        "variant": "large",
-                        "dots": false
-                    },
-
-                    'data':  <%= items_not_in_isa_hash.to_json.html_safe -%>
-
+        .jstree({
+            'core': {
+                'multiple' : true,
+                "check_callback": true,
+                "themes": {
+                    "variant": "large",
+                    "dots": false
                 },
-                "checkbox" : {
-                    "three_state" : false,
-                    "whole_node" : false,
-                    "tie_selection" : false
-                },
-                "plugins" : [ "checkbox" ,"changed","json_data"]
-            }).on("check_node.jstree uncheck_node.jstree", function(e, data) {
-
-            var asset = data.node.id.split('-')
-            var asset_id = 'share_not_isa_'+asset[0]+'_'+asset[1]
-
-            if  ($j('input[id="'+asset_id+'"]').prop('checked') ){
-                $j('input[id="'+asset_id+'"]').prop("checked", false);
-            } else {
-                $j('input[id="'+asset_id+'"]').prop("checked", true);
-            }
-
+                'data':  <%= items_not_in_isa_hash.to_json.html_safe -%>
+            },
+            "split_btn_checkbox" : {'share_type':"not_isa",
+                                    'data':  <%= items_not_in_isa_hash.to_json.html_safe -%>},
+            "plugins" : [ "split_btn_checkbox" ,"changed","json_data"]
         }).on("select_node.jstree", function (e, data) {
             var asset = data.node.id.split('-')
             var Permission_id = 'Permission-'+asset[0]+'-'+asset[1]
@@ -197,64 +171,31 @@
                 selector.addClass('hide_permission')
             }
         });
-
     });
 
     $j(document).ready(function () {
-
         $j('#jstree').on('loaded.jstree', function (event, data) {
             // expand all nodes
             $j("#jstree").jstree("open_all");
-
             if (<%= @batch_sharing_permission_changed %>){
                 $j('#jstree').find(('[id^="Permission-"]')).removeClass('hide_permission')
             }
-
-            var $tree = $j(this);
-            $j($tree.jstree(true).get_json('#', {
-                flat: true
-            })).each(function(index, value) {
-                var asset = this.id.split('-')[0]
-                var asset_id = this.id.split('-')[1]
-
-                if (index!= 0 && asset!= "Permission") {
-                    addCheckboxToAssetNode(asset,asset_id,'share_isa');
-                }
-            });
-
-
         })
-            .jstree({
-                'core': {
-                    'multiple' : true,
-                    "check_callback": true,
-                    "themes": {
-                        "variant": "large",
-                        "dots": false
-                    },
-
-                    'data':  <%= all_investigations_hash.to_json.html_safe -%>
-
+        .jstree({
+            'core': {
+                'multiple' : true,
+                "check_callback": true,
+                "themes": {
+                    "variant": "large",
+                    "dots": false
                 },
-                "checkbox" : {
-                    "three_state" : false, // to avoid that fact that checking a node also check others
-                    "whole_node" : false,  // to avoid checking the box just clicking the node
-                    "tie_selection" : false // for checking without selecting and selecting without checking
-                },
-                "plugins" : [ "checkbox" ,"changed","json_data"]
-            }).on("check_node.jstree uncheck_node.jstree", function(e, data) {
-
-            var asset = data.node.id.split('-')
-            var asset_id = 'share_isa_'+asset[0]+'_'+asset[1]
-
-            if  ($j('input[id="'+asset_id+'"]').prop('checked') ){
-                $j('input[id="'+asset_id+'"]').prop("checked", false);
-            } else {
-                $j('input[id="'+asset_id+'"]').prop("checked", true);
-            }
-
-        }).on("select_node.jstree", function (e, data) {
-
+                'data':  <%= all_investigations_hash.to_json.html_safe -%>
+            },
+            "split_btn_checkbox" : {'share_type':"isa",
+                                    'data':  <%= all_investigations_hash.to_json.html_safe -%>},
+            "plugins" : [ "split_btn_checkbox","changed","json_data"]
+        })
+        .on("select_node.jstree", function (e, data) {
             var asset = data.node.id.split('-')
             var Permission_id = 'Permission-'+asset[0]+'-'+asset[1]
             var selector = $j('[id^='+Permission_id+']')
@@ -264,6 +205,117 @@
                 selector.addClass('hide_permission')
             }
         });
-
     });
+
+    // split button checkbox on asset nodes (outside of anchor)
+    (function ($, undefined) {
+        "use strict";
+        $.jstree.defaults.split_btn_checkbox = $.noop;
+        $.jstree.plugins.split_btn_checkbox = function (options, parent) {
+            this.share="share_"+options.share_type;
+            this.assets=options.data.children;
+            this.asset_key=get_asset_key(this.assets)
+            this.bind = function () {
+                parent.bind.call(this);
+                this.element
+                  .on("click.jstree", ".jstree-split_btn_checkbox", function (e) {
+                      e.stopImmediatePropagation();
+                      this.settings.split_btn_checkbox.call(this, this.get_node(e.target));
+                  }.bind(this))
+                  .on("change.input",function(e){
+                      this.get_node(e.target.id).data['checkbox_status']=e.target.checked
+                  }.bind(this))
+                  .on("sb_select_all", function (){
+                      change_all(this,true)
+                  }.bind(this))
+                  .on("sb_deselect_all", function (){
+                      change_all(this,false)
+                  }.bind(this));
+            };
+            this.teardown = function () {
+                if(this.settings.split_btn_checkbox) {
+                    this.element.find(".jstree-split_btn_checkbox").remove();
+                }
+                parent.teardown.call(this);
+            };
+            this.redraw_node = function(obj, deep, callback, force_draw) {
+                obj = parent.redraw_node.call(this, obj, deep, callback, force_draw);
+                if(obj.classList.contains('asset-node-row')) {
+                    let sbtn_checkbox = document.createElement("span",)
+                    let asset_id=obj.getAttribute("data-node-id")
+                    let node = this.get_node(obj.id)
+                    if(node.data['checkbox_status']===undefined){
+                        node.data['checkbox_status']=false
+                        node.data['has_children']=this.asset_key.find(o => o.data_node_id === asset_id).has_children
+                    }
+                    let sbc_html = ""
+                    if(node.data['has_children']){
+                        sbc_html = "<%= escape_javascript( render :partial => 'general/split_button_checkbox',
+                                                                    :locals => { checkbox_id: "_asset_id_",
+                                                                                 checkbox_class: "_asset_id_",
+                                                                                 checked: false,
+                                                                                 toggle: true,
+                                                                                 cb_parent_selector: '[data-node-id="_asset_id_"]' } ) %>"
+                    } else {
+                        sbc_html = "<%= escape_javascript( render :partial => 'general/split_button_checkbox',
+                                                                    :locals => { checkbox_id: "_asset_id_",
+                                                                                 checkbox_class: "_asset_id_",
+                                                                                 checked: false,
+                                                                                 toggle: false,
+                                                                                 cb_parent_selector: '[data-node-id="_asset_id_"]' } ) %>"
+                    }
+                    sbc_html = sbc_html.replaceAll("name=\"_asset_id_\"",
+                                    "name=\""+this.share+"["+asset_id.split("-")[0]+"]["+asset_id.split("-")[1]+"]\"")
+                    sbc_html = sbc_html.replaceAll("_asset_id_", asset_id)
+                    sbtn_checkbox.innerHTML=sbc_html
+                    let tmp = sbtn_checkbox.cloneNode(true);
+                    obj.insertBefore(tmp, obj.childNodes[1]);
+                    if(node.data['checkbox_status']) {
+                        obj.childNodes[1].querySelector('input').checked=true
+                    }
+                }
+                return obj;
+            };
+        };
+    })(jQuery);
+    function get_asset_key(data){
+        let asset_key=[]
+        for(let asset of data){
+            let data_node_id=asset.li_attr["data-node-id"]
+            let has_children=false
+            let n_perm=0
+            for(let child of asset.children){
+                if(!(child.id.includes('Permission'))){
+                    has_children=true
+                    break
+                }
+                n_perm=n_perm+1
+            }
+            if(data_node_id){
+                asset_key.push({data_node_id:data_node_id,
+                                node_id:asset.id,
+                                has_children:has_children})
+            }
+            let grandchildren=[]
+            if(has_children) {
+                grandchildren=get_asset_key(asset.children.slice(n_perm))
+            }
+            asset_key=asset_key.concat(grandchildren)
+        }
+        return asset_key
+    }
+    function change_all(tree,status){
+        for(let asset of tree.asset_key) {
+            tree.get_node(asset.node_id).data['checkbox_status']=status
+            try{
+                document.getElementById(asset.data_node_id).checked=status
+            }
+            catch(err) {}
+        }
+    }
+    function show_all_checkboxes(){
+        $j("#jstree_not_isa").jstree("open_all");
+        $j("#jstree").jstree("open_all");
+    }
 </script>
+

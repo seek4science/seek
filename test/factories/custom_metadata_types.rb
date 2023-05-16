@@ -71,10 +71,10 @@ Factory.define(:study_custom_metadata_type_with_cv_and_cv_list_type, class: Cust
   f.after_build do |a|
     a.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, title:'apple name')
     cv_list_attribute = CustomMetadataAttribute.new(title: 'apple list', sample_attribute_type: Factory(:cv_list_attribute_type),
-                                                 sample_controlled_vocab: Factory(:apples_sample_controlled_vocab), description: "apple samples list", label: "apple samples list")
+                                                    sample_controlled_vocab: Factory(:apples_sample_controlled_vocab), description: "apple samples list", label: "apple samples list")
     a.custom_metadata_attributes << cv_list_attribute
     cv_attribute = CustomMetadataAttribute.new(title: 'apple controlled vocab', sample_attribute_type: Factory(:controlled_vocab_attribute_type),
-                                                 sample_controlled_vocab: Factory(:apples_sample_controlled_vocab), description: "apple samples controlled vocab", label: "apple samples controlled vocab")
+                                               sample_controlled_vocab: Factory(:apples_sample_controlled_vocab), description: "apple samples controlled vocab", label: "apple samples controlled vocab")
     a.custom_metadata_attributes << cv_attribute
   end
 end
@@ -120,5 +120,116 @@ Factory.define(:study_custom_metadata_type_for_MIAPPE, class: CustomMetadataType
     a.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, title:'description_of_growth_facility')
     a.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, title:'type_of_growth_facility')
     a.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, title:'cultural_practices')
+  end
+end
+
+# for testing linked custom metadata
+Factory.define(:first_name_custom_metadata_attribute,class:CustomMetadataAttribute) do |f|
+  f.title 'first_name'
+  f.association :sample_attribute_type, factory: :string_sample_attribute_type
+end
+
+Factory.define(:last_name_custom_metadata_attribute,class:CustomMetadataAttribute) do |f|
+  f.title 'last_name'
+  f.association :sample_attribute_type, factory: :string_sample_attribute_type
+end
+
+Factory.define(:street_custom_metadata_attribute,class:CustomMetadataAttribute) do |f|
+  f.title 'street'
+  f.association :sample_attribute_type, factory: :string_sample_attribute_type
+end
+
+Factory.define(:city_custom_metadata_attribute,class:CustomMetadataAttribute) do |f|
+  f.title 'city'
+  f.association :sample_attribute_type, factory: :string_sample_attribute_type
+end
+
+Factory.define(:role_email_custom_metadata_attribute,class:CustomMetadataAttribute) do |f|
+  f.title 'role_email'
+  f.association :sample_attribute_type, factory: :string_sample_attribute_type
+end
+
+Factory.define(:role_phone_custom_metadata_attribute,class:CustomMetadataAttribute) do |f|
+  f.title 'role_phone'
+  f.association :sample_attribute_type, factory: :string_sample_attribute_type
+end
+
+
+Factory.define(:role_name_custom_metadata_type,class:CustomMetadataType) do |f|
+  f.title 'role_name'
+  f.supported_type 'Study'
+  f.after_build do |a|
+    a.custom_metadata_attributes << Factory(:first_name_custom_metadata_attribute,required: true)
+    a.custom_metadata_attributes << Factory(:last_name_custom_metadata_attribute, required: true)
+  end
+end
+
+Factory.define(:role_address_custom_metadata_type,class:CustomMetadataType) do |f|
+  f.title 'role_address'
+  f.supported_type 'Study'
+  f.after_build do |a|
+    a.custom_metadata_attributes << Factory(:street_custom_metadata_attribute,required: true)
+    a.custom_metadata_attributes << Factory(:city_custom_metadata_attribute, required: true)
+  end
+end
+
+Factory.define(:role_name_linked_custom_metadata_attribute,class:CustomMetadataAttribute) do |f|
+  f.title 'role_name'
+  f.association :sample_attribute_type, factory: :custom_metadata_sample_attribute_type
+  f.association :linked_custom_metadata_type, factory: :role_name_custom_metadata_type
+end
+
+Factory.define(:role_address_linked_custom_metadata_attribute,class:CustomMetadataAttribute) do |f|
+  f.title 'role_address'
+  f.association :sample_attribute_type, factory: :custom_metadata_sample_attribute_type
+  f.association :linked_custom_metadata_type, factory: :role_address_custom_metadata_type
+end
+
+Factory.define(:role_custom_metadata_type,class:CustomMetadataType) do |f|
+  f.title 'role'
+  f.supported_type 'Study'
+  f.after_build do |a|
+    a.custom_metadata_attributes << Factory(:role_email_custom_metadata_attribute,required: true)
+    a.custom_metadata_attributes << Factory(:role_phone_custom_metadata_attribute,required: true)
+    a.custom_metadata_attributes << Factory(:role_name_linked_custom_metadata_attribute)
+  end
+end
+
+Factory.define(:role_multiple_custom_metadata_type,class:CustomMetadataType) do |f|
+  f.title 'role'
+  f.supported_type 'Study'
+  f.after_build do |a|
+    a.custom_metadata_attributes << Factory(:role_email_custom_metadata_attribute,required: true)
+    a.custom_metadata_attributes << Factory(:role_phone_custom_metadata_attribute,required: true)
+    a.custom_metadata_attributes << Factory(:role_name_linked_custom_metadata_attribute)
+    a.custom_metadata_attributes << Factory(:role_address_linked_custom_metadata_attribute)
+  end
+end
+
+Factory.define(:dad_linked_custom_metadata_attribute,class:CustomMetadataAttribute) do |f|
+  f.title 'dad'
+  f.association :sample_attribute_type, factory: :custom_metadata_sample_attribute_type
+  f.association :linked_custom_metadata_type, factory: :role_name_custom_metadata_type
+end
+
+Factory.define(:mom_linked_custom_metadata_attribute,class:CustomMetadataAttribute) do |f|
+  f.title 'mom'
+  f.association :sample_attribute_type, factory: :custom_metadata_sample_attribute_type
+  f.association :linked_custom_metadata_type, factory: :role_name_custom_metadata_type
+end
+
+Factory.define(:child_name_linked_custom_metadata_attribute,class:CustomMetadataAttribute) do |f|
+  f.title 'child'
+  f.association :sample_attribute_type, factory: :custom_metadata_sample_attribute_type
+  f.association :linked_custom_metadata_type, factory: :role_name_custom_metadata_type
+end
+
+Factory.define(:family_custom_metadata_type,class:CustomMetadataType) do |f|
+  f.title 'family'
+  f.supported_type 'Study'
+  f.after_build do |a|
+    a.custom_metadata_attributes << Factory(:dad_linked_custom_metadata_attribute,required: true)
+    a.custom_metadata_attributes << Factory(:mom_linked_custom_metadata_attribute,required: true)
+    a.custom_metadata_attributes << Factory(:child_name_linked_custom_metadata_attribute)
   end
 end

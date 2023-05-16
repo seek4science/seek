@@ -1,14 +1,19 @@
 require 'concurrent-ruby'
-# Change to match your CPU core count
-workers Concurrent.processor_count
+# Match your CPU core count unless specified by PUMA_WORKERS_NUM
+workers ENV.fetch('PUMA_WORKERS_NUM') { Concurrent.processor_count }
 
 worker_timeout 120
+
+# This directive tells Puma to first boot the application and load code
+# before forking the application. This takes advantage of Copy On Write
+# process behavior so workers use less memory.
+preload_app!
 
 # Min and Max threads per worker
 threads 1, 1
 
 # Default to development
-rails_env = ENV['RAILS_ENV'] || "development"
+rails_env = ENV.fetch('RAILS_ENV') { "development" }
 environment rails_env
 
 stdout_redirect 'log/puma.out', 'log/puma.err'

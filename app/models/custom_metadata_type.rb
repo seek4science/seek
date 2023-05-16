@@ -17,6 +17,10 @@ class CustomMetadataType < ApplicationRecord
     custom_metadata_attributes.detect { |attr| attr.method_name == method_name }
   end
 
+  def attributes_with_linked_custom_metadata_type
+    custom_metadata_attributes.reject {|attr| attr.linked_custom_metadata_type.nil?}
+  end
+
   def supported_type_must_be_valid_type
     return if supported_type.blank? # already convered by presence validation
     valid = true
