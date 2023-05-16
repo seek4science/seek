@@ -110,7 +110,7 @@ public_download_with_no_custom_sharing:
   updated_at: <%= 2.days.ago.to_s :db %>
 
 
-whitelist_blacklist_and_custom_sharing:  
+allowlist_denylist_and_custom_sharing:
   name: "auto"
   access_type: <%= Policy::VISIBLE %>
   use_whitelist: true

@@ -119,7 +119,7 @@ class PolicyTest < ActiveSupport::TestCase
     end
   end
 
-  test 'should add people who are in the whitelist' do
+  test 'should add people who are in the allowlist' do
     # create bundle of people
     people_with_access_type = []
     i = 0
@@ -127,18 +127,18 @@ class PolicyTest < ActiveSupport::TestCase
       people_with_access_type.push [i, 'name' + i.to_s, rand(4) + 1]
       i += 1
     end
-    # create a whitelist
-    whitelist = []
+    # create an allowlist
+    allowlist = []
     i = 0
     while i < 5
       random_id = rand(15)
-      whitelist.push [random_id, 'name' + random_id.to_s, 2]
+      allowlist.push [random_id, 'name' + random_id.to_s, 2]
       i += 1
     end
-    whitelist = Policy.new.remove_duplicate(whitelist)
-    whitelist_added = whitelist.select { |person| person[0] > 9 }
-    filtered_people = Policy.new.add_people_in_whitelist(people_with_access_type, whitelist)
-    assert_equal (people_with_access_type.count + whitelist_added.count), filtered_people.count
+    allowlist = Policy.new.remove_duplicate(allowlist)
+    allowlist_added = allowlist.select { |person| person[0] > 9 }
+    filtered_people = Policy.new.add_people_in_allowlist(people_with_access_type, allowlist)
+    assert_equal (people_with_access_type.count + allowlist_added.count), filtered_people.count
   end
 
   test 'should have asset housekeepers in the summarize_permissions if the asset is entirely private' do

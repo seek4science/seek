@@ -37,7 +37,7 @@ class FavouriteGroupsController < ApplicationController
         end
 
         # ..also while results of this are being sent back, send the updated favourite group list for current user
-        users_favourite_groups = FavouriteGroup.get_all_without_blacklists_and_whitelists(current_user.id)
+        users_favourite_groups = FavouriteGroup.get_all_without_denylists_and_allowlists(current_user.id)
       end
     end
 
@@ -114,7 +114,7 @@ class FavouriteGroupsController < ApplicationController
       @f_group.save if changes_made
 
       # ..also while results of this are being sent back, send the updated favourite group list for current user
-      users_favourite_groups = FavouriteGroup.get_all_without_blacklists_and_whitelists(current_user.id)
+      users_favourite_groups = FavouriteGroup.get_all_without_denylists_and_allowlists(current_user.id)
     end
 
     respond_to do |format|
@@ -136,7 +136,7 @@ class FavouriteGroupsController < ApplicationController
     @f_group.destroy
 
     # ..also while results of this are being sent back, send the updated favourite group list for current user
-    users_favourite_groups = FavouriteGroup.get_all_without_blacklists_and_whitelists(current_user.id)
+    users_favourite_groups = FavouriteGroup.get_all_without_denylists_and_allowlists(current_user.id)
 
     respond_to do |format|
       format.json do

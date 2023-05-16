@@ -61,7 +61,7 @@ class Policy < ApplicationRecord
   EVERYONE = 4
 
   # access_type
-  DETERMINED_BY_GROUP = -1  # used for whitelist/blacklist (meaning that it doesn't matter what value this field has)
+  DETERMINED_BY_GROUP = -1  # used for allowlist/denylist (meaning that it doesn't matter what value this field has)
   NO_ACCESS = 0             # i.e. only for anyone; only owner has access
   VISIBLE = 1               # visible only
   ACCESSIBLE = 2            # accessible and visible
@@ -263,7 +263,7 @@ class Policy < ApplicationRecord
       # some of the contributor types will have special additional parameters
       case p.contributor_type
       when 'FavouriteGroup'
-        params_hash['whitelist_or_blacklist'] = [FavouriteGroup::WHITELIST_NAME, FavouriteGroup::BLACKLIST_NAME].include?(p.contributor.name)
+        params_hash['whitelist_or_blacklist'] = [FavouriteGroup::ALLOWLIST_NAME, FavouriteGroup::DENYLIST_NAME].include?(p.contributor.name)
       end
 
       p_settings << [p.id, params_hash]
@@ -326,17 +326,17 @@ class Policy < ApplicationRecord
     filtered_people = precedence(filtered_people, people_in_group['FavouriteGroup'])
     filtered_people = precedence(filtered_people, people_in_group['Person'])
 
-    # add people in white list
-    filtered_people = add_people_in_whitelist(filtered_people, people_in_group['WhiteList'])
-    # add people in blacklist
+    # add people in allowlist
+    filtered_people = add_people_in_allowlist(filtered_people, people_in_group['WhiteList'])
+    # add people in denylist
     filtered_people = precedence(filtered_people, people_in_group['BlackList'])
 
     # add creators and assign them the Policy::EDITING right
     creator_array = creators.collect { |c| [c.id, c.name.to_s, Policy::EDITING] unless c.blank? }
-    filtered_people = add_people_in_whitelist(filtered_people, creator_array)
+    filtered_people = add_people_in_allowlist(filtered_people, creator_array)
 
     # add contributor
-    filtered_people = add_people_in_whitelist(filtered_people, [[contributor.id, contributor.name.to_s, Policy::MANAGING]]) unless contributor.blank?
+    filtered_people = add_people_in_allowlist(filtered_people, [[contributor.id, contributor.name.to_s, Policy::MANAGING]]) unless contributor.blank?
 
     # sort people by name
     filtered_people = filtered_people.sort { |a, b| a[1] <=> b[1] }
@@ -441,11 +441,11 @@ class Policy < ApplicationRecord
     result
   end
 
-  # add people which are in whitelist to the people list
-  def add_people_in_whitelist(people_list, whitelist)
+  # add people which are in allowlist to the people list
+  def add_people_in_allowlist(people_list, allowlist)
     result = []
     result |= people_list
-    result |= whitelist
+    result |= allowlist
     remove_duplicate(result)
   end
 
