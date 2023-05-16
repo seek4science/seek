@@ -1783,15 +1783,20 @@ class WorkflowsControllerTest < ActionController::TestCase
 
     assert workflow.can_run?
     assert_equal 'https://usegalaxy.eu', Seek::Config.galaxy_instance_default
-    assert_select 'a.btn[href=?]', "https://usegalaxy.eu/trs_import?trs_server=testseek.test&run_form=true&trs_id=#{workflow.id}&trs_version=1", { text: 'Run on Galaxy' }
+    trs_url = URI.encode_www_form_component("http://localhost:3000/ga4gh/trs/v2/tools/#{workflow.id}/versions/1")
+    assert_select 'a.btn[href=?]', "https://usegalaxy.eu/trs_import?trs_url=#{trs_url}&run_form=true",
+                  { text: 'Run on Galaxy' }
   end
 
   test 'shows run button for galaxy workflows using specified galaxy endpoint' do
-    workflow = Factory(:existing_galaxy_ro_crate_workflow, policy: Factory(:public_policy), execution_instance_url: 'https://galaxygalaxy.org/')
+    workflow = Factory(:existing_galaxy_ro_crate_workflow, policy: Factory(:public_policy),
+                       execution_instance_url: 'https://galaxygalaxy.org/mygalaxy/')
 
     get :show, params: { id: workflow.id }
 
     assert workflow.can_run?
-    assert_select 'a.btn[href=?]', "https://galaxygalaxy.org/trs_import?trs_server=testseek.test&run_form=true&trs_id=#{workflow.id}&trs_version=1", { text: 'Run on Galaxy' }
+    trs_url = URI.encode_www_form_component("http://localhost:3000/ga4gh/trs/v2/tools/#{workflow.id}/versions/1")
+    assert_select 'a.btn[href=?]', "https://galaxygalaxy.org/mygalaxy/trs_import?trs_url=#{trs_url}&run_form=true",
+                  { text: 'Run on Galaxy' }
   end
 end

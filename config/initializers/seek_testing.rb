@@ -140,6 +140,5 @@ def load_seek_testing_defaults!
       Settings.defaults[:fair_signposting_enabled] = true
       Settings.defaults[:bio_tools_enabled] = true
       Settings.defaults[:galaxy_instance_default] = 'https://usegalaxy.eu'
-      Settings.defaults[:galaxy_instance_trs_server] = 'testseek.test'
     end
 end

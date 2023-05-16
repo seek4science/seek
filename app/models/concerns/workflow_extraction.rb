@@ -58,7 +58,7 @@ module WorkflowExtraction
   delegate :inputs, :outputs, :steps, to: :structure
 
   def can_run?
-    can_download?(nil) && workflow_class&.key == 'galaxy' && run_url.present?
+    can_download?(nil) && workflow_class&.executable? && run_url.present?
   end
 
   def run_url
@@ -70,10 +70,8 @@ module WorkflowExtraction
       url = URI(base)
       url.path = '/trs_import'
       params = {
-        trs_server: Seek::Config.galaxy_instance_trs_server,
-        run_form: true,
-        trs_id: parent_id,
-        trs_version: version
+        trs_url: Seek::Util.routes.ga4gh_trs_v2_tool_version_url(parent_id, version_id: version),
+        run_form: true
       }
       url.query = URI.encode_www_form(params)
       url.to_s
