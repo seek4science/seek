@@ -41,6 +41,20 @@ When upgrading between patch versions, it should only be necessary to run
     bundle install
     bundle exec rake seek:upgrade 
 
+## Steps to upgrade from 1.13.x to 1.14.x
+
+### Dependencies
+
+You will need to update Python to version 3.9
+
+    sudo apt install python3.9-dev python3.9-distutils
+
+you may remove 3.7 unless it is used for other applications. If unsure there is no harm leaving it installed
+
+    sudo apt remove python3.7-dev python3.7-distutils
+
+---
+
 ## Steps to upgrade from 1.12.x to 1.13.x
 
 ### Dependencies

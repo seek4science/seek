@@ -71,7 +71,7 @@ Now install the packages:
     sudo apt install build-essential cmake git graphviz imagemagick libcurl4-gnutls-dev libgmp-dev \
         libmagick++-dev libmysqlclient-dev libpq-dev libreadline-dev libreoffice libssl-dev \
         libxml++2.6-dev libxslt1-dev mysql-server nodejs openjdk-11-jdk openssh-server poppler-utils zip \
-        python3.7-dev python3.7-distutils python3-pip
+        python3.9-dev python3.9-distutils python3-pip
 
 Installing these packages now will make installing Ruby easier later on:
 
@@ -144,11 +144,11 @@ Next install the ruby gems SEEK needs ( for production see [Bundler Configuratio
 
 First, a specific version of `setuptools` needs to be installed to avoid an issue when installing dependencies
 
-    python3.7 -m pip install setuptools==58
+    python3.9 -m pip install setuptools==58
 
 Then the other dependencies can be installed
 
-    python3.7 -m pip install -r requirements.txt
+    python3.9 -m pip install -r requirements.txt
     
 
 ## Setting up the Database
