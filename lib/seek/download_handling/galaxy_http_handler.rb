@@ -38,6 +38,10 @@ module Seek
         URI.join(galaxy_host, "workflows/run?id=#{workflow_id}").to_s
       end
 
+      def execution_instance_url
+        galaxy_host.to_s
+      end
+
       def self.is_galaxy_workflow_url?(uri)
         uri.hostname.include?('galaxy') && (uri.path.include?('/workflow/') || uri.path.include?('/workflows/')) &&
           uri.query.present? && CGI.parse(uri.query)&.key?('id')

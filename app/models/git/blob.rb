@@ -92,11 +92,15 @@ module Git
 
     def remote_content
       return unless remote?
-      handler = ContentBlob.remote_content_handler_for(url)
+      handler = remote_content_handler
       return unless handler
       io = handler.fetch
       io.rewind
       io
+    end
+
+    def remote_content_handler
+      ContentBlob.remote_content_handler_for(url)
     end
 
     def cache_key

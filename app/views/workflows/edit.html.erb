@@ -21,8 +21,8 @@
     <% if @workflow.workflow_class&.executable? %>
       <div class="form-group">
         <label>Galaxy Instance</label>
-        <%= f.text_field :execution_instance, placeholder: 'https://usegalaxy.eu', class: 'form-control' -%>
-        <p class="help-block">The URL to the Galaxy instance where this workflow originated from.</p>
+        <%= f.text_field :execution_instance_url, placeholder: 'https://usegalaxy.eu/', class: 'form-control' -%>
+        <p class="help-block">The root URL of the Galaxy instance where this workflow originated from.</p>
       </div>
     <% end %>
 
