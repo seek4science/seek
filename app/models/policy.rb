@@ -263,7 +263,7 @@ class Policy < ApplicationRecord
       # some of the contributor types will have special additional parameters
       case p.contributor_type
       when 'FavouriteGroup'
-        params_hash['whitelist_or_blacklist'] = [FavouriteGroup::ALLOWLIST_NAME, FavouriteGroup::DENYLIST_NAME].include?(p.contributor.name)
+        params_hash['allowlist_or_denylist'] = [FavouriteGroup::ALLOWLIST_NAME, FavouriteGroup::DENYLIST_NAME].include?(p.contributor.name)
       end
 
       p_settings << [p.id, params_hash]
@@ -299,8 +299,8 @@ class Policy < ApplicationRecord
                         'Project' => [],
                         'Programme' => [],
                         'Institution' => [],
-                        'WhiteList' => [],
-                        'BlackList' => [],
+                        'AllowList' => [],
+                        'DenyList' => [],
                         'Network' => [],
                         'Public' => 0 }
     # the result return: a hash contain the access_type as key, and array of people as value
@@ -327,9 +327,9 @@ class Policy < ApplicationRecord
     filtered_people = precedence(filtered_people, people_in_group['Person'])
 
     # add people in allowlist
-    filtered_people = add_people_in_allowlist(filtered_people, people_in_group['WhiteList'])
+    filtered_people = add_people_in_allowlist(filtered_people, people_in_group['AllowList'])
     # add people in denylist
-    filtered_people = precedence(filtered_people, people_in_group['BlackList'])
+    filtered_people = precedence(filtered_people, people_in_group['DenyList'])
 
     # add creators and assign them the Policy::EDITING right
     creator_array = creators.collect { |c| [c.id, c.name.to_s, Policy::EDITING] unless c.blank? }
