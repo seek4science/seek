@@ -11,6 +11,21 @@ Please see [Getting FAIRDOM-SEEK](/get-seek.html) for details about installing S
 
 If you have any comments or feedback about a release, then please [Contact Us](/contacting-us.html)
 
+## Version 1.13.3
+
+Release date: _16th May 2023_
+
+A small patch release that contains bug fixes and small improvements:
+
+* Ability to recursively select items in the tree when batch changing permissions
+  * ( for 1.14 this will be further improved and combined with batch publishing which is a very similar action)
+* When running with Docker, a new PUMA_WORKERS_NUM environment variable can be used to control the number of puma
+  workers, overriding the default that is set to the number of available processor cores
+* Fix for when combing filtering with ordering by views or downloads
+* Fix for publications incorrectly showing a license that cannot be set
+
+For a full list, see [closed issues for 1.13.3](https://github.com/seek4science/seek/milestone/17?closed=1)
+
 ## Version 1.13.2
 
 Release date: _14th April 2023_
