@@ -187,15 +187,15 @@ class Policy < ApplicationRecord
   def self.private_policy
     Policy.new(name: 'default private',
                access_type: NO_ACCESS,
-               use_whitelist: false,
-               use_blacklist: false)
+               use_allowlist: false,
+               use_denylist: false)
   end
 
   def self.registered_users_accessible_policy
     Policy.new(name: 'default accessible',
                access_type: ACCESSIBLE,
-               use_whitelist: false,
-               use_blacklist: false)
+               use_allowlist: false,
+               use_denylist: false)
   end
 
   def self.public_policy
@@ -242,8 +242,8 @@ class Policy < ApplicationRecord
   def get_settings
     settings = {}
     settings['access_type'] = access_type
-    settings['use_whitelist'] = use_whitelist
-    settings['use_blacklist'] = use_blacklist
+    settings['use_allowlist'] = use_allowlist
+    settings['use_denylist'] = use_denylist
     settings
   end
 

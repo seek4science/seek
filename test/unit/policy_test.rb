@@ -27,8 +27,8 @@ class PolicyTest < ActiveSupport::TestCase
   test 'private policy' do
     pol = Policy.private_policy
     assert_equal Policy::NO_ACCESS, pol.access_type
-    assert !pol.use_whitelist
-    assert !pol.use_blacklist
+    assert !pol.use_allowlist
+    assert !pol.use_denylist
     assert pol.permissions.empty?
   end
 
@@ -36,8 +36,8 @@ class PolicyTest < ActiveSupport::TestCase
     with_config_value 'default_all_visitors_access_type', Policy::NO_ACCESS do
       pol = Policy.default
       assert_equal Policy::NO_ACCESS, pol.access_type
-      assert !pol.use_whitelist
-      assert !pol.use_blacklist
+      assert !pol.use_allowlist
+      assert !pol.use_denylist
       assert pol.permissions.empty?
     end
   end
@@ -46,8 +46,8 @@ class PolicyTest < ActiveSupport::TestCase
     with_config_value 'default_all_visitors_access_type', Policy::ACCESSIBLE do
       pol = Policy.default
       assert_equal Policy::ACCESSIBLE, pol.access_type
-      assert !pol.use_whitelist
-      assert !pol.use_blacklist
+      assert !pol.use_allowlist
+      assert !pol.use_denylist
       assert pol.permissions.empty?
     end
   end

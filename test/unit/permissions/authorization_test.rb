@@ -187,10 +187,10 @@ class AuthorizationTest < ActiveSupport::TestCase
 
   # someone with individual permission and in favourite group (more access than in individual permission) - permission in favourite group should never be used in such case
   def test_fav_group_permissions_dont_get_used_if_individual_permissions_exist
-    temp = sops(:sop_with_download_for_all_sysmo_users_policy).policy.use_whitelist
+    temp = sops(:sop_with_download_for_all_sysmo_users_policy).policy.use_allowlist
     assert !temp, "policy for test SOP shouldn't use allowlist"
 
-    temp = sops(:sop_with_download_for_all_sysmo_users_policy).policy.use_blacklist
+    temp = sops(:sop_with_download_for_all_sysmo_users_policy).policy.use_denylist
     assert !temp, "policy for test SOP shouldn't use denylist"
 
     # download is allowed for all sysmo users..
@@ -223,10 +223,10 @@ class AuthorizationTest < ActiveSupport::TestCase
 
   # someone with no individual permissions - hence the actual permission from being a member in a favourite group is used
   def test_fav_groups_permissions
-    temp = sops(:sop_with_download_for_all_sysmo_users_policy).policy.use_whitelist
+    temp = sops(:sop_with_download_for_all_sysmo_users_policy).policy.use_allowlist
     assert !temp, "policy for test SOP shouldn't use allowlist"
 
-    temp = sops(:sop_with_download_for_all_sysmo_users_policy).policy.use_blacklist
+    temp = sops(:sop_with_download_for_all_sysmo_users_policy).policy.use_denylist
     assert !temp, "policy for test SOP shouldn't use denylist"
 
     # editing is not allowed by policy (only download is)
@@ -252,11 +252,11 @@ class AuthorizationTest < ActiveSupport::TestCase
 
   def test_general_policy_settings_action_allowed
     # check that no permissions will be used..
-    temp = sops(:sop_with_fully_public_policy).policy.use_whitelist
-    assert !temp, "'use_whitelist' flag should be set to 'false' for this test"
+    temp = sops(:sop_with_fully_public_policy).policy.use_allowlist
+    assert !temp, "'use_allowlist' flag should be set to 'false' for this test"
 
-    temp = sops(:sop_with_fully_public_policy).policy.use_blacklist
-    assert !temp, "'use_blacklist' flag should be set to 'false' for this test"
+    temp = sops(:sop_with_fully_public_policy).policy.use_denylist
+    assert !temp, "'use_denylist' flag should be set to 'false' for this test"
 
     group_permissions = temp_get_group_permissions(sops(:sop_with_fully_public_policy).policy)
     assert group_permissions.empty?, 'there should be no group permissions for this policy'
@@ -271,11 +271,11 @@ class AuthorizationTest < ActiveSupport::TestCase
 
   def test_general_policy_settings_action_not_authorized
     # check that no permissions will be used..
-    temp = sops(:sop_with_public_download_and_no_custom_sharing).policy.use_whitelist
-    assert !temp, "'use_whitelist' flag should be set to 'false' for this test"
+    temp = sops(:sop_with_public_download_and_no_custom_sharing).policy.use_allowlist
+    assert !temp, "'use_allowlist' flag should be set to 'false' for this test"
 
-    temp = sops(:sop_with_public_download_and_no_custom_sharing).policy.use_blacklist
-    assert !temp, "'use_blacklist' flag should be set to 'false' for this test"
+    temp = sops(:sop_with_public_download_and_no_custom_sharing).policy.use_denylist
+    assert !temp, "'use_denylist' flag should be set to 'false' for this test"
 
     group_permissions = temp_get_group_permissions(sops(:sop_with_public_download_and_no_custom_sharing).policy)
     assert group_permissions.empty?, 'there should be no group permissions for this policy'
@@ -296,11 +296,11 @@ class AuthorizationTest < ActiveSupport::TestCase
   # no specific permissions; action not allowed by policy; allowed by a group permission for 'WorkGroup';
   def test_group_permissions_will_allow_action
     # check that policy flags are set correctly
-    temp = sops(:sop_for_test_with_workgroups).policy.use_whitelist
-    assert !temp, "'use_whitelist' flag should be set to 'false' for this test"
+    temp = sops(:sop_for_test_with_workgroups).policy.use_allowlist
+    assert !temp, "'use_allowlist' flag should be set to 'false' for this test"
 
-    temp = sops(:sop_for_test_with_workgroups).policy.use_blacklist
-    assert !temp, "'use_blacklist' flag should be set to 'false' for this test"
+    temp = sops(:sop_for_test_with_workgroups).policy.use_denylist
+    assert !temp, "'use_denylist' flag should be set to 'false' for this test"
 
     # verify that action wouldn't be allowed by policy
     temp = temp_authorized_by_policy?(sops(:sop_for_test_with_workgroups).policy, sops(:sop_for_test_with_workgroups), 'download',
@@ -321,11 +321,11 @@ class AuthorizationTest < ActiveSupport::TestCase
   # no specific permissions; action not allowed by policy; allowed by a group permission for 'Project'
   def test_group_permissions_shared_with_project
     # check that policy flags are set correctly
-    temp = sops(:sop_for_test_with_projects_institutions).policy.use_whitelist
-    assert !temp, "'use_whitelist' flag should be set to 'false' for this test"
+    temp = sops(:sop_for_test_with_projects_institutions).policy.use_allowlist
+    assert !temp, "'use_allowlist' flag should be set to 'false' for this test"
 
-    temp = sops(:sop_for_test_with_projects_institutions).policy.use_blacklist
-    assert !temp, "'use_blacklist' flag should be set to 'false' for this test"
+    temp = sops(:sop_for_test_with_projects_institutions).policy.use_denylist
+    assert !temp, "'use_denylist' flag should be set to 'false' for this test"
 
     # verify that action wouldn't be allowed by policy
     temp = temp_authorized_by_policy?(sops(:sop_for_test_with_projects_institutions).policy, sops(:sop_for_test_with_projects_institutions), 'edit',
@@ -353,11 +353,11 @@ class AuthorizationTest < ActiveSupport::TestCase
   # no specific permissions; action not allowed by policy; allowed by a group permission for 'Institution'
   def test_group_permissions_shared_with_institution
     # check that policy flags are set correctly
-    temp = sops(:sop_for_test_with_projects_institutions).policy.use_whitelist
-    assert !temp, "'use_whitelist' flag should be set to 'false' for this test"
+    temp = sops(:sop_for_test_with_projects_institutions).policy.use_allowlist
+    assert !temp, "'use_allowlist' flag should be set to 'false' for this test"
 
-    temp = sops(:sop_for_test_with_projects_institutions).policy.use_blacklist
-    assert !temp, "'use_blacklist' flag should be set to 'false' for this test"
+    temp = sops(:sop_for_test_with_projects_institutions).policy.use_denylist
+    assert !temp, "'use_denylist' flag should be set to 'false' for this test"
 
     # verify that action wouldn't be allowed by policy
     temp = temp_authorized_by_policy?(sops(:sop_for_test_with_projects_institutions).policy, sops(:sop_for_test_with_projects_institutions), 'download',

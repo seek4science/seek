@@ -71,7 +71,7 @@ class AnonymousAuthorizationTest < ActiveSupport::TestCase
     # it doesn't matter for this test case if any permissions exist for the policy -
     # these can't affect anonymous user; hence can only check the final result of authorization
 
-    public_download_and_no_custom_sharing_policy =  Factory :policy, access_type: Policy::NO_ACCESS, use_whitelist: false, use_blacklist: false
+    public_download_and_no_custom_sharing_policy =  Factory :policy, access_type: Policy::NO_ACCESS, use_allowlist: false, use_denylist: false
     sop_with_public_download_and_no_custom_sharing = Factory :sop, policy: public_download_and_no_custom_sharing_policy
 
     res = Seek::Permissions::Authorization.is_authorized?('view', sop_with_public_download_and_no_custom_sharing, nil)

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_03_30_131838) do
+ActiveRecord::Schema.define(version: 2023_05_16_122806) do
 
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
@@ -1340,8 +1340,8 @@ ActiveRecord::Schema.define(version: 2023_03_30_131838) do
     t.string "name"
     t.integer "sharing_scope", limit: 1
     t.integer "access_type", limit: 1
-    t.boolean "use_whitelist"
-    t.boolean "use_blacklist"
+    t.boolean "use_allowlist"
+    t.boolean "use_denylist"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
