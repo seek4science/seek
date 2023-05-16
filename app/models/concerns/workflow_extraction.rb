@@ -67,8 +67,7 @@ module WorkflowExtraction
       return if base.nil?
 
       parent_id = is_a_version? ? parent.id : id
-      url = URI(base)
-      url.path = '/trs_import'
+      url = URI(base) + 'workflows/trs_import'
       params = {
         trs_url: Seek::Util.routes.ga4gh_trs_v2_tool_version_url(parent_id, version_id: version),
         run_form: true

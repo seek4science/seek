@@ -1784,7 +1784,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert workflow.can_run?
     assert_equal 'https://usegalaxy.eu', Seek::Config.galaxy_instance_default
     trs_url = URI.encode_www_form_component("http://localhost:3000/ga4gh/trs/v2/tools/#{workflow.id}/versions/1")
-    assert_select 'a.btn[href=?]', "https://usegalaxy.eu/trs_import?trs_url=#{trs_url}&run_form=true",
+    assert_select 'a.btn[href=?]', "https://usegalaxy.eu/workflows/trs_import?trs_url=#{trs_url}&run_form=true",
                   { text: 'Run on Galaxy' }
   end
 
@@ -1796,7 +1796,7 @@ class WorkflowsControllerTest < ActionController::TestCase
 
     assert workflow.can_run?
     trs_url = URI.encode_www_form_component("http://localhost:3000/ga4gh/trs/v2/tools/#{workflow.id}/versions/1")
-    assert_select 'a.btn[href=?]', "https://galaxygalaxy.org/mygalaxy/trs_import?trs_url=#{trs_url}&run_form=true",
+    assert_select 'a.btn[href=?]', "https://galaxygalaxy.org/mygalaxy/workflows/trs_import?trs_url=#{trs_url}&run_form=true",
                   { text: 'Run on Galaxy' }
   end
 end
