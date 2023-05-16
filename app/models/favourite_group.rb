@@ -17,14 +17,13 @@ class FavouriteGroup < ApplicationRecord
   # these groups are to be stored per user within favourite_groups table -
   # and the names should be chosen in such a way that the users would not
   # want to pick such names themself 
-  DENYLIST_NAME = "__blacklist__"
-  ALLOWLIST_NAME = "__whitelist__"
+  DENYLIST_NAME = "__denylist__"
+  ALLOWLIST_NAME = "__allowlist__"
   
   # defaults for access types in DENYLIST and ALLOWLIST groups
   DENYLIST_ACCESS_TYPE = Policy::NO_ACCESS
   ALLOWLIST_ACCESS_TYPE = Policy::ACCESSIBLE
-  
-  
+
   # check if current favourite group is a denylist or allowlist
   def is_allowlist_or_denylist?
     return [FavouriteGroup::DENYLIST_NAME, FavouriteGroup::ALLOWLIST_NAME].include?(self.name)

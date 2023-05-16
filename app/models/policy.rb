@@ -385,9 +385,9 @@ class Policy < ApplicationRecord
   # REVIEW: people in black list, white list and normal workgroup
   def get_people_in_FG(contributor, fg_id = nil, is_white_list = nil, is_black_list = nil)
     f_group = if is_white_list
-                FavouriteGroup.where(['name = ? AND user_id = ?', '__whitelist__', contributor.user.id]).first
+                FavouriteGroup.where(['name = ? AND user_id = ?', FavouriteGroup::ALLOWLIST_NAME, contributor.user.id]).first
               elsif is_black_list
-                FavouriteGroup.where(['name = ? AND user_id = ?', '__blacklist__', contributor.user.id]).first
+                FavouriteGroup.where(['name = ? AND user_id = ?', FavouriteGroup::DENYLIST_NAME, contributor.user.id]).first
               else
                 FavouriteGroup.find_by_id(fg_id)
               end
