@@ -14,9 +14,6 @@ permissions||="loadBatchPermission('sampleDynamicTable',this)"
   <input class="btn btn-default btn_set_permission" type="button" value="Batch sharing permissions" onClick=<%=permissions%> />
   <button class="btn btn-primary dt-action" id="btn_save_assay_sample" onClick=<%=save%>>Save</button>
 </div>
-<div id="excel-export">
-  <a class="btn btn-success" id="btn_export_excel" onClick="exportToExcel()">Export as Excel</a>
-</div>
 
 <script>
   function loadBatchPermission(dtName, e){
@@ -26,7 +23,7 @@ permissions||="loadBatchPermission('sampleDynamicTable',this)"
       method: "GET",
       url: "<%= batch_sharing_permission_preview_single_pages_path %>",
       data: { sample_ids, single_page: true },
-      success: (res) => { 
+      success: (res) => {
         if (res?.status == "unprocessable_entity"){
           alert(res?.error)
         } else {
@@ -35,11 +32,11 @@ permissions||="loadBatchPermission('sampleDynamicTable',this)"
           ObjectsInput.init();
         }
       },
-      error: (e) => { 
+      error: (e) => {
         console.log(e);
         alert("An error occurred while fetching data from the server.")
       }
     });
-  
+
   }
 </script>
