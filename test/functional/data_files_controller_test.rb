@@ -392,6 +392,8 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_select 'p > b', text: /Size:/
       assert_select 'p', text: /9 KB/
     end
+
+    assert_select '.panel-heading', text: 'License'
   end
 
   test 'should add link to a webpage' do

@@ -370,6 +370,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     get :show, params: { id: publication.id }
     assert_response :success
+    assert_select '.panel-heading', text: 'License', count: 0
   end
 
   test 'should export publication as endnote' do
