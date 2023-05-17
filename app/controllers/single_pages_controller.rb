@@ -22,7 +22,8 @@ class SinglePagesController < ApplicationController
   def index; end
 
   def project_folders
-    return if !Seek::Config.project_single_page_folders_enabled
+    return unless Seek::Config.project_single_page_folders_enabled
+
     project_folders = ProjectFolder.root_folders(@project)
     if project_folders.empty?
       project_folders = ProjectFolder.initialize_default_folders(@project)
@@ -59,6 +60,27 @@ class SinglePagesController < ApplicationController
     end
   end
 
+  def sp_object_input
+    element_name = params[:element_name].nil? ? '' : params[:element_name]
+    existing_objects = if params[:existing_objects].nil?
+                         []
+                       else
+                         JSON.parse(params[:existing_objects]).map do |eo|
+                           Sample.find(eo['id'])
+                         end
+                       end
+    query_url = params[:query_url].nil? ? '' : params[:query_url]
+
+    respond_to do |format|
+      format.html do
+        render partial: 'single_pages/single_page_object_input',
+               locals: { element_name: element_name,
+                         existing_objects: existing_objects,
+                         query_url: query_url }
+      end
+    end
+  end
+
   private
 
   def set_up_instance_variable
@@ -75,5 +97,4 @@ class SinglePagesController < ApplicationController
       render json: { status: :unprocessable_entity, error: 'You must be logged in to access batch sharing permission.' }
     end
   end
-
 end

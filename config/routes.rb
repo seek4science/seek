@@ -753,6 +753,7 @@ SEEK::Application.routes.draw do
       get :batch_sharing_permission_preview
       post :batch_change_permission_for_selected_items
       post :batch_sharing_permission_changed
+      get :sp_object_input
     end
   end
 

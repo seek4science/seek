@@ -16,11 +16,13 @@ const defaultCols = [
 	}
 ];
 
-const objectInput =
-	"<td><input data-role='seek-objectsinput' data-tags-limit='100' " +
-	"data-existing-objects='%EXISTING%' data-typeahead='true' " +
-	"data-typeahead-query-url=%URL% /></td>";
-const typeaheadUrl = "<%= typeahead_samples_path %>" + "?q=%QUERY&linked_sample_type_id=%LINKED%";
+//const objectInput =
+//	"<td><input data-role='seek-objectsinput' data-tags-limit='100' " +
+//	"data-existing-objects='%EXISTING%' data-typeahead='true' " +
+//	"data-typeahead-query-url=%URL% /></td>";
+let objectInput = '';
+//const typeaheadUrl = "<%= typeahead_samples_path %>" + "?q=%QUERY&linked_sample_type_id=%LINKED%";
+const typeaheadUrl = "<%= typeahead_samples_path %>" + "?linked_sample_type_id=%LINKED%";
 
 const handleSelect = (e) => {
   $j(e).parents("table").DataTable().row(e.closest("tr")).data()[0] = e.is(":checked")
@@ -54,7 +56,28 @@ const handleSelect = (e) => {
 						if (options.readonly) {
 							return existingObjectsJSON.map((e) => `<span class="badge">${e.name}</span>`).join(" ");
 						} else {
-							return objectInput.replace("%EXISTING%", existingObjects).replace("%URL%", url);
+							console.log(`existingObjectsJSON:\n${existingObjects}`);
+							// Retrieving the ObjectsInput Html through an Ajax call
+							$j.ajax({
+								url: '<%= sp_object_input_single_pages_path %>',
+								type: 'GET',
+								data: {
+									element_name: 'input-source-name',
+									existing_objects: existingObjects,
+									query_url: url
+								},
+								dataType: 'html'})
+								.done(function(response){
+//									console.log(`Ajax call response:\n${response}`);
+									objectInput= response;
+									ObjectsInput.init();
+								})
+								.error(function(){
+									objectInput="<td>Cannot fetch existing samples</td>";
+								})
+							console.log(`objectInput:\n${objectInput}`);
+							return objectInput;
+//							return objectInput.replace("%EXISTING%", existingObjects).replace("%URL%", url);
 						}
 					} else return data == "#HIDDEN" ? "<em><small>Hidden</small></em>" : data;
 				};
@@ -342,7 +365,7 @@ const handleSelect = (e) => {
       $j(permissionBtn).prop("disabled", false)
       const indexes = getStatusIndexes(this.table.settings()[0].aoColumns);
 			this.table.rows(function (idx, data, node) {
-				if (data[0]) 
+				if (data[0])
 					indexes.forEach((x) => {
 						if (data[x] == rowStatus.new) {
               $j(permissionBtn).prop("disabled", true);
