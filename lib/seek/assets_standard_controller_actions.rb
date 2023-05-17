@@ -124,6 +124,17 @@ module Seek
       item.policy.set_attributes_with_sharing(policy_params(parameters)) if policy_params(parameters).present?
     end
 
+    def update_linked_custom_metadatas(item, parameters = params)
+
+      root_key = controller_name.singularize.to_sym
+
+      # return no custom metdata is selected
+      return unless params[root_key][:custom_metadata_attributes].present?
+      return unless params[root_key][:custom_metadata_attributes][:custom_metadata_type_id].present?
+      item.custom_metadata.update_linked_custom_metadata(parameters[root_key][:custom_metadata_attributes])
+
+    end
+
     def initialize_asset
       item = class_for_controller_name.new(asset_params)
       set_shared_item_variable(item)

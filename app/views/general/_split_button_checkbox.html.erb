@@ -1,0 +1,50 @@
+<%
+  #<%= render :partial => 'general/split_button_checkbox',
+  #locals: { checkbox_id: publishing_item_param(item),
+  #          checkbox_class: "#{item.class.name}_#{item.id}",
+  #          published: true,
+  #          checkbox_text: "Publish?",
+  #          checked: checked,
+  #          toggle: children.any?,
+  #          cb_parent_selector: "div\##{checkbox_class}.split_button_parent" } - % >
+
+  checkbox_class ||= "no_name"   # <- Needed!
+  checkbox_id ||= checkbox_class
+  published ||= false
+  checkbox_text ||= ""
+  checked ||= false
+  toggle ||= false
+  cb_parent_selector ||= "div\##{checkbox_class}.split_button_parent"
+-%>
+<div class="btn-group" >
+  <button type="button" class="btn parent-btn-checkbox">
+    <% if published %>
+      <span class="label label-default" data-tooltip="<%= tooltip('This item has already been published.') %>">
+          <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+          Published
+      </span>
+    <% else %>
+      <label style="font-weight:normal;">
+        <%= check_box_tag checkbox_id, 1, checked,
+                          {:class=>checkbox_class,
+                           :onclick=>"checkRepeatedItems(this)"} -%>
+        <%= checkbox_text -%>
+      </label>
+    <% end %>
+  </button>
+  <% if toggle %>
+    <button type="button" class="btn dropdown-toggle parent-btn-dropdown"
+            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <span class="caret"></span>
+      <span class="sr-only">Toggle Dropdown</span>
+    </button>
+    <ul class="dropdown-menu text-left" role="menu" style="width: auto;" >
+      <li><a class="selectChildren" id="<%= checkbox_class %>" data-cb_parent_selector='<%= cb_parent_selector %>' href="#" >
+        <%= image('checkbox_select_all', options = {height: 30}) %>
+        Select this item and all of its sub-items. </a></li>
+      <li><a class="deselectChildren" id="<%= checkbox_class %>" data-cb_parent_selector='<%= cb_parent_selector %>' href="#" >
+        <%= image('checkbox_deselect_all', options = {height: 30}) %>
+        Deselect this item and all of its sub-items. </a></li>
+    </ul>
+  <% end %>
+</div>

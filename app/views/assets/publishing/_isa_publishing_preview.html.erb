@@ -12,19 +12,22 @@
        children = []
    end
 -%>
+<div class="split_button_parent" id="<%= "#{item.class.name}_#{item.id}" %>">
+  <%= render :partial => "assets/publishing/options_for_publishing",
+             :object => item,
+             :locals => { :html_classes => "publishing_options",
+                          :toggle => children.any?,
+                          :cb_parent_selector => "div\##{item.class.name}_#{item.id}.split_button_parent",
+                          :checked => (item == preselected) } -%>
 
-<%= render :partial => "assets/publishing/options_for_publishing",
-           :object => item,
-           :locals => { :html_classes => "publishing_options",
-                        :checked => (item == preselected) } -%>
-
-<% if children.any? %>
-    <div style="margin-left: 3em">
-      <% children.each do |child| %>
-          <%= render :partial => "assets/publishing/isa_publishing_preview",
-                     :object => child,
-                     :locals => { :preselected => preselected,
-                                  :html_classes => "publishing_options"} -%>
-      <% end %>
-    </div>
-<% end %>
+  <% if children.any? %>
+      <div style="margin-left: 3em">
+        <% children.each do |child| %>
+            <%= render :partial => "assets/publishing/isa_publishing_preview",
+                       :object => child,
+                       :locals => { :preselected => preselected,
+                                    :html_classes => "publishing_options"} -%>
+        <% end %>
+      </div>
+  <% end %>
+</div>

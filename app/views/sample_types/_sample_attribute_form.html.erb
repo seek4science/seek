@@ -52,7 +52,7 @@
   </td>
   <td>
     <%= select_tag "#{field_name_prefix}[sample_attribute_type_id]",
-                   options_for_select(SampleAttributeType.all.sort_by(&:title).sort_by { |t| t.default? ? 0 : 1 }.map { |t| [t.title, t.id,{'data-use-cv'=>t.controlled_vocab? || t.seek_cv_list?,'data-is-ontology'=>t.ontology?, 'data-is-seek-sample'=>t.seek_sample? || t.seek_sample_multi? }] }, attribute_type_id),
+                   options_for_select(displayed_sample_attribute_types.sort_by(&:title).sort_by { |t| t.default? ? 0 : 1 }.map { |t| [t.title, t.id,{'data-use-cv'=>t.controlled_vocab? || t.seek_cv_list?,'data-is-ontology'=>t.ontology?, 'data-is-seek-sample'=>t.seek_sample? || t.seek_sample_multi? }] }, attribute_type_id),
                    class: 'form-control sample-type-attribute-type',
                    disabled: !allow_type_change, data: { attr: "type" } %>
     <div class='controlled-vocab-block' style="<%= 'display:none;' unless sample_attribute.try(:controlled_vocab?) || sample_attribute.try(:seek_cv_list?) %>">

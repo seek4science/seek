@@ -110,7 +110,7 @@ class BatchSharingChangeTest < ActionController::TestCase
     params[:share_not_isa][model.class.name][model.id.to_s] = '1'
     params[:share_isa][df.class.name]||= {}
     params[:share_isa][df.class.name][df.id.to_s] = '1'
-
+    params[:share_isa]['Banana'] = { '123' => '1' } # Should be ignored
 
     # batch change sharing policy and grant other_people manage right
     params[:policy_attributes] = {access_type: Policy::NO_ACCESS, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}}
