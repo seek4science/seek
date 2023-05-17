@@ -881,14 +881,14 @@ class StudiesControllerTest < ActionController::TestCase
 
   test 'should create and update study with linked custom metadata type' do
 
-    cmt = Factory(:role_custom_metadata_type)
-    login_as(Factory(:person))
+    cmt = FactoryBot.create(:role_custom_metadata_type)
+    login_as(FactoryBot.create(:person))
     linked_cmt = cmt.attributes_with_linked_custom_metadata_type.first.linked_custom_metadata_type
 
     # test create
     assert_difference('Study.count') do
       assert_difference('CustomMetadata.count',2) do
-        investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+        investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
         study_attributes = { title: 'Alice in Wonderland', investigation_id: investigation.id }
         cm_attributes = { custom_metadata_attributes: {
           custom_metadata_type_id: cmt.id, data: {
@@ -953,12 +953,12 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test 'should create and update study which has multiple custom metadata attributes, which link to the same custom metadata type' do
-    cmt = Factory(:family_custom_metadata_type)
-    login_as(Factory(:person))
+    cmt = FactoryBot.create(:family_custom_metadata_type)
+    login_as(FactoryBot.create(:person))
     linked_cmts = cmt.attributes_with_linked_custom_metadata_type
     assert_difference('Study.count') do
       assert_difference('CustomMetadata.count',4) do
-        investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+        investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
         study_attributes = { title: 'Family', investigation_id: investigation.id }
         cm_attributes = { custom_metadata_attributes: {
           custom_metadata_type_id: cmt.id, data: {
@@ -1049,14 +1049,14 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test 'should create and update study with multiple linked custom metadata types' do
-    cmt = Factory(:role_multiple_custom_metadata_type)
-    login_as(Factory(:person))
+    cmt = FactoryBot.create(:role_multiple_custom_metadata_type)
+    login_as(FactoryBot.create(:person))
     linked_name_cmt = cmt.attributes_with_linked_custom_metadata_type.first.linked_custom_metadata_type
     linked_addr_cmt = cmt.attributes_with_linked_custom_metadata_type.last.linked_custom_metadata_type
     # test create
     assert_difference('Study.count') do
       assert_difference('CustomMetadata.count',3) do
-        investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+        investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
         study_attributes = { title: 'Alice in Wonderland', investigation_id: investigation.id }
         cm_attributes = { custom_metadata_attributes: {
           custom_metadata_type_id: cmt.id, data: {

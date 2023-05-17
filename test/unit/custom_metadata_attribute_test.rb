@@ -75,8 +75,8 @@ class CustomMetadataAttributeTest < ActiveSupport::TestCase
     refute attribute.validate_value?(['Peter','Granny Smith'])
 
 
-    attribute = CustomMetadataAttribute.new(title: 'role', sample_attribute_type: Factory(:custom_metadata_sample_attribute_type),
-                                            linked_custom_metadata_type: Factory(:role_name_custom_metadata_type))
+    attribute = CustomMetadataAttribute.new(title: 'role', sample_attribute_type: FactoryBot.create(:custom_metadata_sample_attribute_type),
+                                            linked_custom_metadata_type: FactoryBot.create(:role_name_custom_metadata_type))
     assert attribute.linked_custom_metadata_type.custom_metadata_attributes.first.validate_value?('first name')
     refute attribute.linked_custom_metadata_type.custom_metadata_attributes.first.validate_value?(nil)
   end

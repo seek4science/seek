@@ -48,6 +48,11 @@ FactoryBot.define do
     sequence(:title) { |n| "Sample multi attribute type #{n}" }
     base_type { Seek::Samples::BaseType::SEEK_SAMPLE_MULTI }
   end
+
+  factory(:custom_metadata_sample_attribute_type, class: SampleAttributeType) do
+    sequence(:title) { |n| "Linked Custom Metadata attribute type #{n}" }
+    base_type { Seek::Samples::BaseType::LINKED_CUSTOM_METADATA }
+  end
   
   factory(:data_file_sample_attribute_type, class: SampleAttributeType) do
     sequence(:title) { |n| "Data file attribute type #{n}" }
@@ -198,4 +203,115 @@ FactoryBot.define do
       vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'DNA restriction enzyme digestion')
     end
   end
+
+  # for testing linked custom metadata
+  factory(:first_name_custom_metadata_attribute,class:CustomMetadataAttribute) do
+    title { 'first_name' }
+    association :sample_attribute_type, factory: :string_sample_attribute_type
+  end
+
+  factory(:last_name_custom_metadata_attribute,class:CustomMetadataAttribute) do
+    title { 'last_name' }
+    association :sample_attribute_type, factory: :string_sample_attribute_type
+  end
+
+  factory(:street_custom_metadata_attribute,class:CustomMetadataAttribute) do
+    title { 'street' }
+    association :sample_attribute_type, factory: :string_sample_attribute_type
+  end
+
+  factory(:city_custom_metadata_attribute,class:CustomMetadataAttribute) do
+    title { 'city' }
+    association :sample_attribute_type, factory: :string_sample_attribute_type
+  end
+
+  factory(:role_email_custom_metadata_attribute,class:CustomMetadataAttribute) do
+    title { 'role_email' }
+    association :sample_attribute_type, factory: :string_sample_attribute_type
+  end
+
+  factory(:role_phone_custom_metadata_attribute,class:CustomMetadataAttribute) do
+    title { 'role_phone' }
+    association :sample_attribute_type, factory: :string_sample_attribute_type
+  end
+
+  factory(:role_name_custom_metadata_type,class:CustomMetadataType) do
+    title { 'role_name' }
+    supported_type { 'Study' }
+    after(:build) do |a|
+      a.custom_metadata_attributes << FactoryBot.create(:first_name_custom_metadata_attribute,required: true)
+      a.custom_metadata_attributes << FactoryBot.create(:last_name_custom_metadata_attribute, required: true)
+    end
+  end
+
+  factory(:role_address_custom_metadata_type,class:CustomMetadataType) do
+    title { 'role_address' }
+    supported_type { 'Study' }
+    after(:build) do |a|
+      a.custom_metadata_attributes << FactoryBot.create(:street_custom_metadata_attribute,required: true)
+      a.custom_metadata_attributes << FactoryBot.create(:city_custom_metadata_attribute, required: true)
+    end
+  end
+
+  factory(:role_name_linked_custom_metadata_attribute,class:CustomMetadataAttribute) do
+    title { 'role_name' }
+    association :sample_attribute_type, factory: :custom_metadata_sample_attribute_type
+    association :linked_custom_metadata_type, factory: :role_name_custom_metadata_type
+  end
+
+  factory(:role_address_linked_custom_metadata_attribute,class:CustomMetadataAttribute) do
+    title { 'role_address' }
+    association :sample_attribute_type, factory: :custom_metadata_sample_attribute_type
+    association :linked_custom_metadata_type, factory: :role_address_custom_metadata_type
+  end
+
+  factory(:role_custom_metadata_type,class:CustomMetadataType) do
+    title { 'role' }
+    supported_type { 'Study' }
+    after(:build) do |a|
+      a.custom_metadata_attributes << FactoryBot.create(:role_email_custom_metadata_attribute,required: true)
+      a.custom_metadata_attributes << FactoryBot.create(:role_phone_custom_metadata_attribute,required: true)
+      a.custom_metadata_attributes << FactoryBot.create(:role_name_linked_custom_metadata_attribute)
+    end
+  end
+
+  factory(:role_multiple_custom_metadata_type,class:CustomMetadataType) do
+    title { 'role' }
+    supported_type { 'Study' }
+    after(:build) do |a|
+      a.custom_metadata_attributes << FactoryBot.create(:role_email_custom_metadata_attribute,required: true)
+      a.custom_metadata_attributes << FactoryBot.create(:role_phone_custom_metadata_attribute,required: true)
+      a.custom_metadata_attributes << FactoryBot.create(:role_name_linked_custom_metadata_attribute)
+      a.custom_metadata_attributes << FactoryBot.create(:role_address_linked_custom_metadata_attribute)
+    end
+  end
+
+  factory(:dad_linked_custom_metadata_attribute,class:CustomMetadataAttribute) do
+    title { 'dad' }
+    association :sample_attribute_type, factory: :custom_metadata_sample_attribute_type
+    association :linked_custom_metadata_type, factory: :role_name_custom_metadata_type
+  end
+
+  factory(:mom_linked_custom_metadata_attribute,class:CustomMetadataAttribute) do
+    title { 'mom' }
+    association :sample_attribute_type, factory: :custom_metadata_sample_attribute_type
+    association :linked_custom_metadata_type, factory: :role_name_custom_metadata_type
+  end
+
+  factory(:child_name_linked_custom_metadata_attribute,class:CustomMetadataAttribute) do
+    title { 'child' }
+    association :sample_attribute_type, factory: :custom_metadata_sample_attribute_type
+    association :linked_custom_metadata_type, factory: :role_name_custom_metadata_type
+  end
+
+  factory(:family_custom_metadata_type,class:CustomMetadataType) do
+    title { 'family' }
+    supported_type { 'Study' }
+    after(:build) do |a|
+      a.custom_metadata_attributes << FactoryBot.create(:dad_linked_custom_metadata_attribute,required: true)
+      a.custom_metadata_attributes << FactoryBot.create(:mom_linked_custom_metadata_attribute,required: true)
+      a.custom_metadata_attributes << FactoryBot.create(:child_name_linked_custom_metadata_attribute)
+    end
+  end
+
 end
