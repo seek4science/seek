@@ -21,18 +21,18 @@ FactoryBot.define do
     association :sample_attribute_type, factory: :datetime_sample_attribute_type
   end
 
-
-  factory(:study_custom_metadata_type_with_cv_and_cv_list_type, class: CustomMetadataType) do |f|
-	  title { 'study custom metadata type with and list attributes' }
-	  supported_type { 'Study' }
-	  after(:build) do |a|
-	    a.custom_metadata_attributes << FactoryBot.create(:name_custom_metadata_attribute, title:'apple name')
-	    cv_list_attribute = CustomMetadataAttribute.new(title: 'apple list', sample_attribute_type: Factory(:cv_list_attribute_type),
-			                                 sample_controlled_vocab: Factory(:apples_sample_controlled_vocab), description: "apple samples list", label: "apple samples list")
-	    a.custom_metadata_attributes << cv_list_attribute
-	    cv_attribute = CustomMetadataAttribute.new(title: 'apple controlled vocab', sample_attribute_type: Factory(:controlled_vocab_attribute_type),
-			                                 sample_controlled_vocab: Factory(:apples_sample_controlled_vocab), description: "apple samples controlled vocab", label: "apple samples controlled vocab")
-	    a.custom_metadata_attributes << cv_attribute
+  factory(:study_custom_metadata_type_with_cv_and_cv_list_type, class: CustomMetadataType) do
+    title { 'study custom metadata type with and list attributes' }
+    supported_type { 'Study' }
+    after(:build) do |a|
+      a.custom_metadata_attributes << FactoryBot.create(:name_custom_metadata_attribute, title:'apple name')
+      cv_list_attribute = CustomMetadataAttribute.new(title: 'apple list', sample_attribute_type: FactoryBot.create(:cv_list_attribute_type),
+                                                      sample_controlled_vocab: FactoryBot.create(:apples_sample_controlled_vocab), description: "apple samples list", label: "apple samples list")
+      a.custom_metadata_attributes << cv_list_attribute
+      cv_attribute = CustomMetadataAttribute.new(title: 'apple controlled vocab', sample_attribute_type: FactoryBot.create(:controlled_vocab_attribute_type),
+                                                 sample_controlled_vocab: FactoryBot.create(:apples_sample_controlled_vocab), description: "apple samples controlled vocab", label: "apple samples controlled vocab")
+      a.custom_metadata_attributes << cv_attribute
+    end
   end
   
   factory(:cv_list_custom_metadata_attribute,class:CustomMetadataAttribute) do
@@ -78,21 +78,7 @@ FactoryBot.define do
       a.custom_metadata_attributes << FactoryBot.create(:name_custom_metadata_attribute, title:'full address')
     end
   end
-  
-  
-  factory(:study_custom_metadata_type_with_cv_and_cv_list_type, class: CustomMetadataType) do
-    title { 'study custom metadata type with and list attributes' }
-    supported_type { 'Study' }
-    after(:build) do |a|
-      a.custom_metadata_attributes << FactoryBot.create(:name_custom_metadata_attribute, title:'apple name')
-      cv_list_attribute = CustomMetadataAttribute.new(title: 'apple list', sample_attribute_type: FactoryBot.create(:cv_list_attribute_type),
-                                                   sample_controlled_vocab: FactoryBot.create(:apples_sample_controlled_vocab), description: "apple samples list", label: "apple samples list")
-      a.custom_metadata_attributes << cv_list_attribute
-      cv_attribute = CustomMetadataAttribute.new(title: 'apple controlled vocab', sample_attribute_type: FactoryBot.create(:controlled_vocab_attribute_type),
-                                                   sample_controlled_vocab: FactoryBot.create(:apples_sample_controlled_vocab), description: "apple samples controlled vocab", label: "apple samples controlled vocab")
-      a.custom_metadata_attributes << cv_attribute
-    end
-  end
+
   
   factory(:study_custom_metadata_type_with_clashes, class: CustomMetadataType) do
     title { 'study custom metadata type with clashes' }
