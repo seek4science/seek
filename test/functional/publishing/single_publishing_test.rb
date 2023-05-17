@@ -148,11 +148,11 @@ class SinglePublishingTest < ActionController::TestCase
     investigation = study1.investigation
     person = users(:datafile_owner).person
 
-    datafile112 = Factory(:data_file, assays: [assay11], contributor: person)
-    assay12 = Factory(:assay, investigation: investigation, study: study1, contributor: person)
-    datafile121 = Factory(:data_file, assays: [assay12], contributor: person)
-    study2 = Factory(:study, investigation: investigation, contributor: person)
-    assay21 = Factory(:assay, investigation: investigation, study: study2, contributor: person)
+    datafile112 = FactoryBot.create(:data_file, assays: [assay11], contributor: person)
+    assay12 = FactoryBot.create(:assay, investigation: investigation, study: study1, contributor: person)
+    datafile121 = FactoryBot.create(:data_file, assays: [assay12], contributor: person)
+    study2 = FactoryBot.create(:study, investigation: investigation, contributor: person)
+    assay21 = FactoryBot.create(:assay, investigation: investigation, study: study2, contributor: person)
 
     should_have_dropdown = [investigation, study1, assay11, assay12, study1, study2]
     should_not_have_dropdown = [datafile111, datafile112, datafile121, assay21]
