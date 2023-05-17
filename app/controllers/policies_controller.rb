@@ -2,9 +2,9 @@ class PoliciesController < ApplicationController
   before_action :login_required
   
   def send_policy_data
-    request_type = white_list(params[:policy_type])
-    entity_type = white_list(params[:entity_type])
-    entity_id = white_list(params[:entity_id])
+    request_type = sanitized_text(params[:policy_type])
+    entity_type = sanitized_text(params[:entity_type])
+    entity_id = sanitized_text(params[:entity_id])
     
     # NB! default policies now are only suppoted by Projects (but not Institutions / WorkGroups) -
     # so supplying any other type apart from Project will cause the return error message
