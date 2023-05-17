@@ -8,14 +8,14 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
 
   def setup
-    Factory :experimental_assay_class
+    FactoryBot.create :experimental_assay_class
     mock_openbis_calls
-    @project_administrator = Factory(:project_administrator)
+    @project_administrator = FactoryBot.create(:project_administrator)
     @project = @project_administrator.projects.first
-    @user = Factory(:person)
+    @user = FactoryBot.create(:person)
     @user.add_to_project_and_institution(@project, @user.institutions.first)
     assert @user.save
-    @endpoint = Factory(:openbis_endpoint, project: @project)
+    @endpoint = FactoryBot.create(:openbis_endpoint, project: @project)
     @endpoint.assay_types = %w[TZ_FAIR_ASSAY EXPERIMENTAL_STEP]
     @endpoint.save!
     @zample = Seek::Openbis::Zample.new(@endpoint, '20171002172111346-37')
@@ -107,7 +107,7 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     asset = OpenbisExternalAsset.build(@zample)
     asset.content = fake
     asset.synchronized_at = old
-    as = Factory :assay
+    as = FactoryBot.create :assay
     asset.seek_entity = as
     assert asset.save
 
@@ -130,7 +130,7 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
 
   test 'register registers new Assay with linked datasets' do
     login_as(@user)
-    study = Factory :study, contributor: @user
+    study = FactoryBot.create :study, contributor: @user
     refute @zample.dataset_ids.empty?
 
     sync_options = { 'link_datasets' => '1' }
@@ -155,7 +155,7 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
 
   test 'register registers new Assay with selected datasets' do
     login_as(@user)
-    study = Factory :study, contributor: @user
+    study = FactoryBot.create :study, contributor: @user
     assert @zample.dataset_ids.size > 2
 
     to_link = @zample.dataset_ids[0..1]
@@ -197,8 +197,8 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
 
   test 'register does not create assay if zample already registered but redirects to it' do
     login_as(@user)
-    study = Factory :study
-    existing = Factory :assay
+    study = FactoryBot.create :study
+    existing = FactoryBot.create :assay
 
     external = OpenbisExternalAsset.build(@zample)
     assert external.save
@@ -216,7 +216,7 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
 
   test 'batch registers multiple Assays' do
     login_as(@user)
-    study = Factory :study, contributor: @user
+    study = FactoryBot.create :study, contributor: @user
 
     sync_options = { link_dependent: 'false' }
     batch_ids = ['20171002172111346-37', '20171002172639055-39']
@@ -239,7 +239,7 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
 
   test 'batch registers multiple Assays and follows datasets' do
     login_as(@user)
-    study = Factory :study, contributor: @user
+    study = FactoryBot.create :study, contributor: @user
 
     sync_options = { link_dependent: '1' }
     batch_ids = ['20171002172111346-37', '20171002172639055-39']
@@ -262,7 +262,7 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
 
   test 'batch register independently names them' do
     login_as(@user)
-    study = Factory :study, contributor: @user
+    study = FactoryBot.create :study, contributor: @user
 
     sync_options = { link_dependent: 'false' }
     batch_ids = ['20171002172111346-37', '20171002172639055-39']
@@ -283,7 +283,7 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
   test 'update updates sync options and follows dependencies' do
     login_as(@user)
 
-    exassay = Factory :assay, contributor: @user
+    exassay = FactoryBot.create :assay, contributor: @user
     asset = OpenbisExternalAsset.build(@zample)
     asset.synchronized_at = 2.days.ago
     asset.created_at = 2.days.ago
@@ -326,7 +326,7 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
   test 'update updates sync options and adds selected datasets' do
     login_as(@user)
 
-    exassay = Factory :assay, contributor: @user
+    exassay = FactoryBot.create :assay, contributor: @user
     asset = OpenbisExternalAsset.build(@zample)
     exassay.external_asset = asset
     assert asset.save
@@ -364,7 +364,7 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     get :edit, params: { openbis_endpoint_id: @endpoint.id, id: '20171002172111346-37' }
     assert_response :redirect
 
-    study = Factory :study, contributor: @user
+    study = FactoryBot.create :study, contributor: @user
     sync_options = {}
     batch_ids = ['20171002172111346-37', '20171002172639055-39']
 
@@ -406,7 +406,7 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     asset = OpenbisExternalAsset.find_or_create_by_entity(@zample)
     refute asset.seek_entity
 
-    study = Factory :study, contributor: @user
+    study = FactoryBot.create :study, contributor: @user
     assay_params = { study_id: study.id }
 
     sync_options = {}
@@ -423,13 +423,13 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
   test 'do_entity_registration sets issues on errors if not recovable' do
     controller = OpenbisZamplesController.new
 
-    exassay = Factory :assay
+    exassay = FactoryBot.create :assay
 
     asset = OpenbisExternalAsset.build(@zample)
     asset.seek_entity = exassay
     assert asset.save
 
-    study = Factory :study
+    study = FactoryBot.create :study
     assay_params = { study_id: study.id }
 
     sync_options = {}
@@ -452,7 +452,7 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     asset = OpenbisExternalAsset.find_or_create_by_entity(@zample)
     refute asset.seek_entity
 
-    study = Factory :study, contributor: @user
+    study = FactoryBot.create :study, contributor: @user
     assay_params = { study_id: study.id }
 
     sync_options = { link_datasets: '1' }
@@ -475,7 +475,7 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     asset = OpenbisExternalAsset.find_or_create_by_entity(@zample)
     refute asset.seek_entity
 
-    study = Factory :study, contributor: @user
+    study = FactoryBot.create :study, contributor: @user
     assay_params = { study_id: study.id }
 
     sync_options = { link_datasets: '0', linked_datasets: @zample.dataset_ids[0..1] }

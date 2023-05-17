@@ -4,7 +4,7 @@ class StatisticsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
 
   test 'admin can view statistics' do
-    user = Factory :admin
+    user = FactoryBot.create :admin
     login_as user
     get :index
     assert_response :success
@@ -13,7 +13,7 @@ class StatisticsControllerTest < ActionController::TestCase
   end
 
   test 'normal user cannot view statistics' do
-    user = Factory :user
+    user = FactoryBot.create :user
     login_as user
     get :index
     assert_response :redirect

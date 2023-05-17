@@ -2,15 +2,15 @@ require_relative './factories_helper.rb'
 
 include FactoriesHelper
 
-FactoryGirl.define do
+FactoryBot.define do
   trait :with_project_contributor do
     contributor { nil }
-    after_build do |resource|
+    after(:build) do |resource|
       if resource.contributor.nil?
         if resource.projects.none?
-          resource.projects = [Factory(:project)]
+          resource.projects = [FactoryBot.create(:project)]
         end
-        resource.contributor = Factory(:person, project: resource.projects.first)
+        resource.contributor = FactoryBot.create(:person, project: resource.projects.first)
       elsif resource.projects.none?
         resource.projects = [resource.contributor.projects.first]
       end
@@ -18,7 +18,7 @@ FactoryGirl.define do
   end
 end
 
-FactoryGirl.class_eval do
+FactoryBot.class_eval do
   def self.create *args
     disable_authorization_checks { super(*args) }
   end
@@ -31,43 +31,43 @@ end
 # These are misc factories that didn't warrant having their own file. For multiple factories of the same type, look in
 #  the factories directory.
 
-Factory.define(:saved_search) do |f|
-  f.search_query 'cheese'
-  f.search_type 'All'
-  f.user factory: :user
-  f.include_external_search false
-end
+FactoryBot.define do
+  factory(:saved_search) do
+    search_query { 'cheese' }
+    search_type { 'All' }
+    user { build(:user) }
+    include_external_search { false }
+  end
 
-Factory.define(:activity_log) do |f|
-  f.action 'create'
-  f.association :activity_loggable, factory: :data_file
-  f.controller_name 'data_files'
-  f.association :culprit, factory: :user
-end
+  factory(:activity_log) do
+    action { 'create' }
+    association :activity_loggable, factory: :data_file
+    controller_name { 'data_files' }
+    association :culprit, factory: :user
+  end
 
-Factory.define(:unit) do |f|
-  f.symbol 'g'
-  f.sequence(:order) { |n| n }
-end
+  factory(:unit) do
+    symbol { 'g' }
+    sequence(:order) { |n| n }
+  end
 
-Factory.define :project_folder do |f|
-  f.association :project, factory: :project
-  f.sequence(:title) { |n| "project folder #{n}" }
-end
+  factory(:project_folder) do
+    association :project, factory: :project
+    sequence(:title) { |n| "project folder #{n}" }
+  end
 
-Factory.define(:openbis_endpoint) do |f|
-  f.sequence(:as_endpoint) { |nr| "https://openbis-api.fair-dom.org/openbis/openbis#{nr}" }
-  f.sequence(:dss_endpoint) { |nr| "https://openbis-api.fair-dom.org/datastore_server#{nr}" }
-  f.sequence(:web_endpoint) { |nr| "https://openbis-api.fair-dom.org/openbis#{nr}" }
-  f.username 'apiuser'
-  f.password 'apiuser'
-  f.is_test false
-  # f.sequence(:space_perm_id) { |nr| "API-SPACE#{nr}" }
-  f.sequence(:space_perm_id) { |_nr| 'API-SPACE' }
-  f.association :project, factory: :project
-end
+  factory(:openbis_endpoint) do
+    sequence(:as_endpoint) { |nr| "https://openbis-api.fair-dom.org/openbis/openbis#{nr}" }
+    sequence(:dss_endpoint) { |nr| "https://openbis-api.fair-dom.org/datastore_server#{nr}" }
+    sequence(:web_endpoint) { |nr| "https://openbis-api.fair-dom.org/openbis#{nr}" }
+    username { 'apiuser' }
+    password { 'apiuser' }
+    is_test { false }
+    # sequence(:space_perm_id) { |nr| "API-SPACE#{nr}" }
+    sequence(:space_perm_id) { |_nr| 'API-SPACE' }
+    association :project, factory: :project
+  end
 
-FactoryGirl.define do
   factory :openbis_zample,  class: Seek::Openbis::Zample do
     json = JSON.parse(
       '
@@ -80,7 +80,7 @@ FactoryGirl.define do
 '
     )
 
-    initialize_with { Seek::Openbis::Zample.new(Factory(:openbis_endpoint)).populate_from_json(json) }
+    initialize_with { Seek::Openbis::Zample.new(FactoryBot.create(:openbis_endpoint)).populate_from_json(json) }
     # skipping save as not implemented
     to_create { |instance| instance }
   end

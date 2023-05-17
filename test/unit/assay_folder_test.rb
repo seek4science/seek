@@ -2,17 +2,17 @@ require 'test_helper'
 
 class AssayFolderTest < ActiveSupport::TestCase
   def setup
-    @user = Factory :user
+    @user = FactoryBot.create :user
     User.current_user = @user
     @project = @user.person.projects.first
   end
 
   test 'assay folders' do
-    someone_else = Factory(:person, project: @project)
-    public_assay = Factory(:experimental_assay, contributor: someone_else, policy: Factory(:public_policy))
-    viewable_assay = Factory(:experimental_assay, contributor: someone_else, policy: Factory(:publicly_viewable_policy))
-    private_assay  = Factory(:experimental_assay, contributor: someone_else, policy: Factory(:private_policy))
-    my_private_assay = Factory(:experimental_assay, contributor: @user.person, policy: Factory(:private_policy))
+    someone_else = FactoryBot.create(:person, project: @project)
+    public_assay = FactoryBot.create(:experimental_assay, contributor: someone_else, policy: FactoryBot.create(:public_policy))
+    viewable_assay = FactoryBot.create(:experimental_assay, contributor: someone_else, policy: FactoryBot.create(:publicly_viewable_policy))
+    private_assay  = FactoryBot.create(:experimental_assay, contributor: someone_else, policy: FactoryBot.create(:private_policy))
+    my_private_assay = FactoryBot.create(:experimental_assay, contributor: @user.person, policy: FactoryBot.create(:private_policy))
 
     disable_authorization_checks do
       [public_assay, viewable_assay, private_assay, my_private_assay].each do |a|
@@ -30,10 +30,10 @@ class AssayFolderTest < ActiveSupport::TestCase
   end
 
   test 'authorized assets' do
-    assay = Factory(:experimental_assay, contributor: @user.person, policy: Factory(:public_policy))
-    sop = Factory :sop, policy: Factory(:public_policy)
-    publication = Factory :publication, contributor: @user.person
-    private_sop = Factory :sop, policy: Factory(:private_policy)
+    assay = FactoryBot.create(:experimental_assay, contributor: @user.person, policy: FactoryBot.create(:public_policy))
+    sop = FactoryBot.create :sop, policy: FactoryBot.create(:public_policy)
+    publication = FactoryBot.create :publication, contributor: @user.person
+    private_sop = FactoryBot.create :sop, policy: FactoryBot.create(:private_policy)
     project = assay.projects.first
     assay.associate(sop)
     assay.associate(private_sop)
@@ -45,11 +45,11 @@ class AssayFolderTest < ActiveSupport::TestCase
   end
 
   test 'initialise assay folder' do
-    contributor = Factory(:person)
-    inv = Factory(:investigation, projects:contributor.projects,contributor:contributor)
-    study = Factory(:study, investigation:inv, contributor:contributor)
-    assay = Factory(:experimental_assay, policy: Factory(:public_policy), study:study, contributor:contributor)
-    sop = Factory :sop, projects: [assay.projects.first], policy: Factory(:public_policy), contributor:contributor
+    contributor = FactoryBot.create(:person)
+    inv = FactoryBot.create(:investigation, projects:contributor.projects,contributor:contributor)
+    study = FactoryBot.create(:study, investigation:inv, contributor:contributor)
+    assay = FactoryBot.create(:experimental_assay, policy: FactoryBot.create(:public_policy), study:study, contributor:contributor)
+    sop = FactoryBot.create :sop, projects: [assay.projects.first], policy: FactoryBot.create(:public_policy), contributor:contributor
     assay.associate(sop)
     folder = Seek::AssayFolder.new assay, assay.projects.first
 
@@ -67,20 +67,20 @@ class AssayFolderTest < ActiveSupport::TestCase
   end
 
   test 'invalid project' do
-    assay = Factory(:experimental_assay, policy: Factory(:public_policy))
+    assay = FactoryBot.create(:experimental_assay, policy: FactoryBot.create(:public_policy))
     assert_raise Exception do
-      folder = Seek::AssayFolder.new assay, Factory(:project)
+      folder = Seek::AssayFolder.new assay, FactoryBot.create(:project)
     end
   end
 
   test 'move assets' do
-    contributor = Factory(:person)
-    inv = Factory(:investigation, projects:contributor.projects,contributor:contributor)
-    study = Factory(:study, investigation:inv, contributor:contributor)
-    assay = Factory(:experimental_assay, study:study, policy: Factory(:public_policy), contributor:contributor)
-    sop = Factory :sop, projects: [assay.projects.first], policy: Factory(:public_policy), contributor:contributor
+    contributor = FactoryBot.create(:person)
+    inv = FactoryBot.create(:investigation, projects:contributor.projects,contributor:contributor)
+    study = FactoryBot.create(:study, investigation:inv, contributor:contributor)
+    assay = FactoryBot.create(:experimental_assay, study:study, policy: FactoryBot.create(:public_policy), contributor:contributor)
+    sop = FactoryBot.create :sop, projects: [assay.projects.first], policy: FactoryBot.create(:public_policy), contributor:contributor
     folder = Seek::AssayFolder.new assay, assay.projects.first
-    src_folder = Factory :project_folder, project: assay.projects.first
+    src_folder = FactoryBot.create :project_folder, project: assay.projects.first
     assert_difference('AssayAsset.count') do
       folder.move_assets sop, src_folder
     end
@@ -90,10 +90,10 @@ class AssayFolderTest < ActiveSupport::TestCase
   end
 
   test 'move publication' do
-    assay = Factory(:experimental_assay, policy: Factory(:public_policy))
-    pub = Factory :publication, projects: [assay.projects.first], policy: Factory(:public_policy), pubmed_id: 100_000
+    assay = FactoryBot.create(:experimental_assay, policy: FactoryBot.create(:public_policy))
+    pub = FactoryBot.create :publication, projects: [assay.projects.first], policy: FactoryBot.create(:public_policy), pubmed_id: 100_000
     folder = Seek::AssayFolder.new assay, assay.projects.first
-    src_folder = Factory :project_folder, project: assay.projects.first
+    src_folder = FactoryBot.create :project_folder, project: assay.projects.first
     assert_difference('Relationship.count') do
       folder.move_assets pub, src_folder
     end
@@ -103,11 +103,11 @@ class AssayFolderTest < ActiveSupport::TestCase
   end
 
   test 'remove assets' do
-    contributor = Factory(:person)
-    inv = Factory(:investigation, projects:contributor.projects,contributor:contributor)
-    study = Factory(:study, investigation:inv, contributor:contributor)
-    assay = Factory(:experimental_assay, study:study, policy: Factory(:public_policy), contributor:contributor)
-    sop = Factory :sop, projects: [assay.projects.first], policy: Factory(:public_policy), contributor:contributor
+    contributor = FactoryBot.create(:person)
+    inv = FactoryBot.create(:investigation, projects:contributor.projects,contributor:contributor)
+    study = FactoryBot.create(:study, investigation:inv, contributor:contributor)
+    assay = FactoryBot.create(:experimental_assay, study:study, policy: FactoryBot.create(:public_policy), contributor:contributor)
+    sop = FactoryBot.create :sop, projects: [assay.projects.first], policy: FactoryBot.create(:public_policy), contributor:contributor
     assay.associate(sop)
     assay.reload
     folder = Seek::AssayFolder.new assay, assay.projects.first
@@ -122,8 +122,8 @@ class AssayFolderTest < ActiveSupport::TestCase
   end
 
   test 'remove publication asset' do
-    assay = Factory(:experimental_assay, policy: Factory(:public_policy))
-    publication = Factory :publication, contributor: @user.person, pubmed_id: 100_000
+    assay = FactoryBot.create(:experimental_assay, policy: FactoryBot.create(:public_policy))
+    publication = FactoryBot.create :publication, contributor: @user.person, pubmed_id: 100_000
     Relationship.create subject: assay, other_object: publication, predicate: Relationship::RELATED_TO_PUBLICATION
     assert_equal [publication], assay.publications
     assay.reload

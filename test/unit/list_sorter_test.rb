@@ -15,23 +15,23 @@ class ListSorterTest < ActiveSupport::TestCase
   end
 
   test 'related_items' do
-    p1 = Factory(:person, last_name: 'jones')
-    p2 = Factory(:person, last_name: 'davis')
-    p3 = Factory(:person, last_name: 'smith')
-    p4 = Factory(:person, last_name: nil)
+    p1 = FactoryBot.create(:person, last_name: 'jones')
+    p2 = FactoryBot.create(:person, last_name: 'davis')
+    p3 = FactoryBot.create(:person, last_name: 'smith')
+    p4 = FactoryBot.create(:person, last_name: nil)
 
-    i1 = Factory(:institution, title: 'Nottingham Uni')
-    i2 = Factory(:institution, title: 'Bradford Uni')
-    i3 = Factory(:institution, title: 'Yorkshire Uni')
-    i4 = Factory(:institution, title: 'Manchester Uni')
+    i1 = FactoryBot.create(:institution, title: 'Nottingham Uni')
+    i2 = FactoryBot.create(:institution, title: 'Bradford Uni')
+    i3 = FactoryBot.create(:institution, title: 'Yorkshire Uni')
+    i4 = FactoryBot.create(:institution, title: 'Manchester Uni')
 
-    e1 = Factory(:event, start_date: 3.days.ago)
-    e2 = Factory(:event, start_date: 1.day.ago)
-    e3 = Factory(:event, start_date: 5.days.ago)
+    e1 = FactoryBot.create(:event, start_date: 3.days.ago)
+    e2 = FactoryBot.create(:event, start_date: 1.day.ago)
+    e3 = FactoryBot.create(:event, start_date: 5.days.ago)
 
-    s1 = Factory(:sop, title: 'sop1')
-    s2 = Factory(:sop, title: 'sop2')
-    s3 = Factory(:sop, title: 'sop3')
+    s1 = FactoryBot.create(:sop, title: 'sop1')
+    s2 = FactoryBot.create(:sop, title: 'sop2')
+    s3 = FactoryBot.create(:sop, title: 'sop3')
 
     s1.update_attribute(:updated_at, 6.days.ago)
     s2.update_attribute(:updated_at, 1.days.ago)
@@ -53,12 +53,12 @@ class ListSorterTest < ActiveSupport::TestCase
   end
 
   test 'sort by order' do
-    p1 = Factory(:person, last_name: 'jones', first_name: nil)
-    p2 = Factory(:person, last_name: 'davis', first_name: nil)
-    p3 = Factory(:person, last_name: 'smith', first_name: 'dave')
-    p4 = Factory(:person, last_name: nil, first_name: 'bob')
-    p5 = Factory(:person, last_name: 'smith', first_name: 'john')
-    p6 = Factory(:person, last_name: 'davis', first_name: 'tom')
+    p1 = FactoryBot.create(:person, last_name: 'jones', first_name: nil)
+    p2 = FactoryBot.create(:person, last_name: 'davis', first_name: nil)
+    p3 = FactoryBot.create(:person, last_name: 'smith', first_name: 'dave')
+    p4 = FactoryBot.create(:person, last_name: nil, first_name: 'bob')
+    p5 = FactoryBot.create(:person, last_name: 'smith', first_name: 'john')
+    p6 = FactoryBot.create(:person, last_name: 'davis', first_name: 'tom')
     p1.update_attribute(:updated_at, 6.days.ago)
     p2.update_attribute(:updated_at, 3.days.ago)
     p3.update_attribute(:updated_at, 1.days.ago)
@@ -67,27 +67,27 @@ class ListSorterTest < ActiveSupport::TestCase
     p6.update_attribute(:updated_at, 7.days.ago)
     people = [p1, p2, p3, p4, p5, p6]
 
-    i1 = Factory(:institution, title: 'Nottingham Uni')
-    i2 = Factory(:institution, title: 'Bradford Uni')
-    i3 = Factory(:institution, title: 'Yorkshire Uni')
-    i4 = Factory(:institution, title: 'Manchester Uni')
+    i1 = FactoryBot.create(:institution, title: 'Nottingham Uni')
+    i2 = FactoryBot.create(:institution, title: 'Bradford Uni')
+    i3 = FactoryBot.create(:institution, title: 'Yorkshire Uni')
+    i4 = FactoryBot.create(:institution, title: 'Manchester Uni')
     i1.update_attribute(:updated_at, 6.days.ago)
     i2.update_attribute(:updated_at, 1.days.ago)
     i3.update_attribute(:updated_at, 3.days.ago)
     i4.update_attribute(:updated_at, 2.days.ago)
     institutions = [i1, i2, i3, i4]
 
-    e1 = Factory(:event, start_date: 3.days.ago)
-    e2 = Factory(:event, start_date: 1.day.ago)
-    e3 = Factory(:event, start_date: 5.days.ago)
+    e1 = FactoryBot.create(:event, start_date: 3.days.ago)
+    e2 = FactoryBot.create(:event, start_date: 1.day.ago)
+    e3 = FactoryBot.create(:event, start_date: 5.days.ago)
     e1.update_attribute(:updated_at, 1.days.ago)
     e2.update_attribute(:updated_at, 2.days.ago)
     e3.update_attribute(:updated_at, 3.days.ago)
     events = [e1, e2, e3]
 
-    s1 = Factory(:sop, title: 'sop a')
-    s2 = Factory(:sop, title: 'sop c')
-    s3 = Factory(:sop, title: 'sop b')
+    s1 = FactoryBot.create(:sop, title: 'sop a')
+    s2 = FactoryBot.create(:sop, title: 'sop c')
+    s3 = FactoryBot.create(:sop, title: 'sop b')
     s1.update_attribute(:updated_at, 3.days.ago)
     s2.update_attribute(:updated_at, 2.days.ago)
     s3.update_attribute(:updated_at, 1.days.ago)
@@ -105,11 +105,11 @@ class ListSorterTest < ActiveSupport::TestCase
     assert_equal [s1, s3, s2], Seek::ListSorter.sort_by_order(sops, 'LOWER(title)')
     assert_equal [s3, s2, s1], Seek::ListSorter.sort_by_order(sops)
 
-    d1 = Factory(:document, title: 'document a')
-    d2 = Factory(:document, title: 'document b')
-    d3 = Factory(:document, title: 'document c')
-    d4 = Factory(:document, title: 'document d')
-    d5 = Factory(:document, title: 'document e')
+    d1 = FactoryBot.create(:document, title: 'document a')
+    d2 = FactoryBot.create(:document, title: 'document b')
+    d3 = FactoryBot.create(:document, title: 'document c')
+    d4 = FactoryBot.create(:document, title: 'document d')
+    d5 = FactoryBot.create(:document, title: 'document e')
     d1.update_attribute(:updated_at, 5.days.ago)
     d2.update_attribute(:updated_at, 4.days.ago)
     d3.update_attribute(:updated_at, 3.days.ago)
@@ -126,21 +126,21 @@ class ListSorterTest < ActiveSupport::TestCase
   end
 
   test 'sort by downloads' do
-    person = Factory(:person)
-    d1 = Factory(:document, title: 'document a',policy: Factory(:publicly_viewable_policy))
-    d2 = Factory(:document, title: 'document b',policy: Factory(:publicly_viewable_policy))
-    d3 = Factory(:document, title: 'document c',policy: Factory(:publicly_viewable_policy))
-    d4 = Factory(:document, title: 'document d',policy: Factory(:publicly_viewable_policy))
-    d5 = Factory(:document, title: 'document e',policy: Factory(:publicly_viewable_policy))
-    d6 = Factory(:document, title: 'document e',policy: Factory(:publicly_viewable_policy))
-    Factory(:activity_log, action: 'download', activity_loggable: d2, created_at: 10.minutes.ago, culprit: person.user)
-    Factory(:activity_log, action: 'download', activity_loggable: d2, created_at: 9.minutes.ago, culprit: person.user)
-    Factory(:activity_log, action: 'download', activity_loggable: d2, created_at: 8.minutes.ago, culprit: person.user)
-    Factory(:activity_log, action: 'download', activity_loggable: d3, created_at: 7.minutes.ago, culprit: person.user)
-    Factory(:activity_log, action: 'download', activity_loggable: d3, created_at: 6.minutes.ago, culprit: person.user)
-    Factory(:activity_log, action: 'download', activity_loggable: d6, created_at: 5.minutes.ago, culprit: person.user)
-    Factory(:activity_log, action: 'download', activity_loggable: d6, created_at: 4.minutes.ago, culprit: person.user)
-    Factory(:activity_log, action: 'download', activity_loggable: d5, created_at: 3.minutes.ago, culprit: person.user)
+    person = FactoryBot.create(:person)
+    d1 = FactoryBot.create(:document, title: 'document a',policy: FactoryBot.create(:publicly_viewable_policy))
+    d2 = FactoryBot.create(:document, title: 'document b',policy: FactoryBot.create(:publicly_viewable_policy))
+    d3 = FactoryBot.create(:document, title: 'document c',policy: FactoryBot.create(:publicly_viewable_policy))
+    d4 = FactoryBot.create(:document, title: 'document d',policy: FactoryBot.create(:publicly_viewable_policy))
+    d5 = FactoryBot.create(:document, title: 'document e',policy: FactoryBot.create(:publicly_viewable_policy))
+    d6 = FactoryBot.create(:document, title: 'document e',policy: FactoryBot.create(:publicly_viewable_policy))
+    FactoryBot.create(:activity_log, action: 'download', activity_loggable: d2, created_at: 10.minutes.ago, culprit: person.user)
+    FactoryBot.create(:activity_log, action: 'download', activity_loggable: d2, created_at: 9.minutes.ago, culprit: person.user)
+    FactoryBot.create(:activity_log, action: 'download', activity_loggable: d2, created_at: 8.minutes.ago, culprit: person.user)
+    FactoryBot.create(:activity_log, action: 'download', activity_loggable: d3, created_at: 7.minutes.ago, culprit: person.user)
+    FactoryBot.create(:activity_log, action: 'download', activity_loggable: d3, created_at: 6.minutes.ago, culprit: person.user)
+    FactoryBot.create(:activity_log, action: 'download', activity_loggable: d6, created_at: 5.minutes.ago, culprit: person.user)
+    FactoryBot.create(:activity_log, action: 'download', activity_loggable: d6, created_at: 4.minutes.ago, culprit: person.user)
+    FactoryBot.create(:activity_log, action: 'download', activity_loggable: d5, created_at: 3.minutes.ago, culprit: person.user)
 
     downloads_ordered = [d2, d3, d6, d5, d1, d4]
     # Tests enum strategy
@@ -152,20 +152,20 @@ class ListSorterTest < ActiveSupport::TestCase
   end
 
   test 'sort by views' do
-    d1 = Factory(:document, title: 'document a', policy: Factory(:publicly_viewable_policy))
-    d2 = Factory(:document, title: 'document b', policy: Factory(:publicly_viewable_policy))
-    d3 = Factory(:document, title: 'document c', policy: Factory(:publicly_viewable_policy))
-    d4 = Factory(:document, title: 'document d', policy: Factory(:publicly_viewable_policy))
-    d5 = Factory(:document, title: 'document e', policy: Factory(:publicly_viewable_policy))
-    d6 = Factory(:document, title: 'document f', policy: Factory(:publicly_viewable_policy))
-    Factory(:activity_log, action: 'show', activity_loggable: d4, created_at: 10.minutes.ago)
-    Factory(:activity_log, action: 'show', activity_loggable: d4, created_at: 9.minutes.ago)
-    Factory(:activity_log, action: 'show', activity_loggable: d4, created_at: 8.minutes.ago)
-    Factory(:activity_log, action: 'show', activity_loggable: d3, created_at: 7.minutes.ago)
-    Factory(:activity_log, action: 'show', activity_loggable: d3, created_at: 6.minutes.ago)
-    Factory(:activity_log, action: 'show', activity_loggable: d6, created_at: 5.minutes.ago)
-    Factory(:activity_log, action: 'show', activity_loggable: d6, created_at: 4.minutes.ago)
-    Factory(:activity_log, action: 'show', activity_loggable: d5, created_at: 3.minutes.ago)
+    d1 = FactoryBot.create(:document, title: 'document a', policy: FactoryBot.create(:publicly_viewable_policy))
+    d2 = FactoryBot.create(:document, title: 'document b', policy: FactoryBot.create(:publicly_viewable_policy))
+    d3 = FactoryBot.create(:document, title: 'document c', policy: FactoryBot.create(:publicly_viewable_policy))
+    d4 = FactoryBot.create(:document, title: 'document d', policy: FactoryBot.create(:publicly_viewable_policy))
+    d5 = FactoryBot.create(:document, title: 'document e', policy: FactoryBot.create(:publicly_viewable_policy))
+    d6 = FactoryBot.create(:document, title: 'document f', policy: FactoryBot.create(:publicly_viewable_policy))
+    FactoryBot.create(:activity_log, action: 'show', activity_loggable: d4, created_at: 10.minutes.ago)
+    FactoryBot.create(:activity_log, action: 'show', activity_loggable: d4, created_at: 9.minutes.ago)
+    FactoryBot.create(:activity_log, action: 'show', activity_loggable: d4, created_at: 8.minutes.ago)
+    FactoryBot.create(:activity_log, action: 'show', activity_loggable: d3, created_at: 7.minutes.ago)
+    FactoryBot.create(:activity_log, action: 'show', activity_loggable: d3, created_at: 6.minutes.ago)
+    FactoryBot.create(:activity_log, action: 'show', activity_loggable: d6, created_at: 5.minutes.ago)
+    FactoryBot.create(:activity_log, action: 'show', activity_loggable: d6, created_at: 4.minutes.ago)
+    FactoryBot.create(:activity_log, action: 'show', activity_loggable: d5, created_at: 3.minutes.ago)
 
     views_ordered = [d4, d3, d6, d5, d1, d2]
     # Tests enum strategy
@@ -225,11 +225,11 @@ class ListSorterTest < ActiveSupport::TestCase
 
   test 'sort arrays and relations the same way' do
     Document.destroy_all
-    Factory(:document, title: 'document a', updated_at: 3.days.ago, created_at: 1.days.ago)
-    Factory(:document, title: 'document c', updated_at: 2.days.ago, created_at: 4.days.ago)
-    Factory(:document, title: 'document b', updated_at: 1.days.ago, created_at: 3.days.ago)
-    Factory(:document, title: 'document e', updated_at: 1.year.ago, created_at: 2.days.ago)
-    Factory(:document, title: 'document d', updated_at: 1.days.from_now, created_at: 2.years.ago)
+    FactoryBot.create(:document, title: 'document a', updated_at: 3.days.ago, created_at: 1.days.ago)
+    FactoryBot.create(:document, title: 'document c', updated_at: 2.days.ago, created_at: 4.days.ago)
+    FactoryBot.create(:document, title: 'document b', updated_at: 1.days.ago, created_at: 3.days.ago)
+    FactoryBot.create(:document, title: 'document e', updated_at: 1.year.ago, created_at: 2.days.ago)
+    FactoryBot.create(:document, title: 'document d', updated_at: 1.days.from_now, created_at: 2.years.ago)
 
     [:updated_at_asc, :updated_at_desc, :title_desc, :created_at_desc, :created_at_asc, :title_asc].each do |order|
       sort_order = Seek::ListSorter.order_from_keys(order)

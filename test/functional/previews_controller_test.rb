@@ -4,7 +4,7 @@ class PreviewsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
 
   test 'can generate a preview' do
-    login_as(Factory(:person))
+    login_as(FactoryBot.create(:person))
     post :markdown, params: { content: '# Heading' }
 
     assert_response :success
@@ -19,7 +19,7 @@ class PreviewsControllerTest < ActionController::TestCase
   end
 
   test 'should add nofollow to markdown links' do
-    login_as(Factory(:person))
+    login_as(FactoryBot.create(:person))
     post :markdown, params: { content: "[Link1](https://example.com) https://example.com [Link3](https://example.com \"Blablabla\")" }
 
     assert_response :success
@@ -27,7 +27,7 @@ class PreviewsControllerTest < ActionController::TestCase
   end
 
   test 'HTML tag filtering' do
-    login_as(Factory(:person))
+    login_as(FactoryBot.create(:person))
 
     desc = 'This is <b>Bold</b> - this is <em>emphasised</em> - this is super<sup>script</sup> - '
     desc << 'this is link to google: http://google.com - '

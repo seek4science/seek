@@ -4,54 +4,54 @@ class PolicyBasedAuthTest < ActiveSupport::TestCase
   fixtures :all
 
   test 'has advanced permissions' do
-    user = Factory(:user)
+    user = FactoryBot.create(:user)
     User.current_user = user
     proj1 = user.person.projects.first
-    proj2 = Factory(:project)
-    user.person.add_to_project_and_institution(proj2, Factory(:institution))
-    person1 = Factory :person
-    person2 = Factory :person
-    df = Factory :data_file, policy: Factory(:private_policy), contributor: user.person, projects: [proj1]
+    proj2 = FactoryBot.create(:project)
+    user.person.add_to_project_and_institution(proj2, FactoryBot.create(:institution))
+    person1 = FactoryBot.create :person
+    person2 = FactoryBot.create :person
+    df = FactoryBot.create :data_file, policy: FactoryBot.create(:private_policy), contributor: user.person, projects: [proj1]
 
     assert !df.has_advanced_permissions?
-    Factory(:permission, contributor: person1, access_type: Policy::EDITING, policy: df.policy)
+    FactoryBot.create(:permission, contributor: person1, access_type: Policy::EDITING, policy: df.policy)
     assert df.reload.has_advanced_permissions?
 
-    model = Factory :model, policy: Factory(:public_policy), contributor: user.person, projects: [proj1, proj2]
+    model = FactoryBot.create :model, policy: FactoryBot.create(:public_policy), contributor: user.person, projects: [proj1, proj2]
     assert !model.reload.has_advanced_permissions?
-    Factory(:permission, contributor: Factory(:institution), access_type: Policy::ACCESSIBLE, policy: model.policy)
+    FactoryBot.create(:permission, contributor: FactoryBot.create(:institution), access_type: Policy::ACCESSIBLE, policy: model.policy)
     assert model.reload.has_advanced_permissions?
 
     # when having a sharing_scope policy of Policy::ALL_USERS it is considered to have advanced permissions if any of the permissions do not relate to the projects associated with the resource (ISA or Asset))
     # this is a temporary work-around for the loss of the custom_permissions flag when defining a pre-canned permission of shared with sysmo, but editable/downloadable within my project
-    assay = Factory :experimental_assay, policy: Factory(:all_sysmo_viewable_policy), contributor: user.person,
-                                         study: Factory(:study, contributor: user.person,
-                                                                investigation: Factory(:investigation, contributor: user.person, projects: [proj1, proj2]))
-    assay.policy.permissions << Factory(:permission, contributor: proj1, access_type: Policy::EDITING)
-    assay.policy.permissions << Factory(:permission, contributor: proj2, access_type: Policy::EDITING)
+    assay = FactoryBot.create :experimental_assay, policy: FactoryBot.create(:all_sysmo_viewable_policy), contributor: user.person,
+                                         study: FactoryBot.create(:study, contributor: user.person,
+                                                                investigation: FactoryBot.create(:investigation, contributor: user.person, projects: [proj1, proj2]))
+    assay.policy.permissions << FactoryBot.create(:permission, contributor: proj1, access_type: Policy::EDITING)
+    assay.policy.permissions << FactoryBot.create(:permission, contributor: proj2, access_type: Policy::EDITING)
     assay.save!
     assert !assay.reload.has_advanced_permissions?
-    proj_permission = Factory(:permission, contributor: Factory(:project), access_type: Policy::EDITING)
+    proj_permission = FactoryBot.create(:permission, contributor: FactoryBot.create(:project), access_type: Policy::EDITING)
     assay.policy.permissions << proj_permission
     assert assay.reload.has_advanced_permissions?
     assay.policy.permissions.delete(proj_permission)
     assay.save!
     assert !assay.reload.has_advanced_permissions?
-    assay.policy.permissions << Factory(:permission, contributor: Factory(:project), access_type: Policy::VISIBLE)
+    assay.policy.permissions << FactoryBot.create(:permission, contributor: FactoryBot.create(:project), access_type: Policy::VISIBLE)
     assert assay.reload.has_advanced_permissions?
   end
 
   test 'people within the same project can_see_hidden_item' do
-    test_user = Factory(:user)
-    person = Factory(:person, project: test_user.person.projects.first)
-    datafile = Factory(:data_file, projects: person.projects, policy: Factory(:private_policy), contributor: person)
+    test_user = FactoryBot.create(:user)
+    person = FactoryBot.create(:person, project: test_user.person.projects.first)
+    datafile = FactoryBot.create(:data_file, projects: person.projects, policy: FactoryBot.create(:private_policy), contributor: person)
     refute datafile.can_view?(test_user)
     assert datafile.can_see_hidden_item? test_user.person
   end
 
   test 'people in different project can_not_see_hidden_item' do
-    test_user = Factory(:user)
-    datafile = Factory(:data_file, policy: Factory(:private_policy))
+    test_user = FactoryBot.create(:user)
+    datafile = FactoryBot.create(:data_file, policy: FactoryBot.create(:private_policy))
     refute datafile.can_view?(test_user)
     refute datafile.can_see_hidden_item?(test_user.person)
   end
@@ -60,9 +60,9 @@ class PolicyBasedAuthTest < ActiveSupport::TestCase
     [true, false].each do |lookup_enabled|
       with_config_value :auth_lookup_enabled, lookup_enabled do
         Sop.delete_all
-        user = Factory(:person).user
-        other_user = Factory :user
-        sop = Factory :sop, contributor: user.person, policy: Factory(:editing_public_policy)
+        user = FactoryBot.create(:person).user
+        other_user = FactoryBot.create :user
+        sop = FactoryBot.create :sop, contributor: user.person, policy: FactoryBot.create(:editing_public_policy)
         Sop.clear_lookup_table
 
         sop.update_lookup_table(user) if lookup_enabled
@@ -83,9 +83,9 @@ class PolicyBasedAuthTest < ActiveSupport::TestCase
         refute permissions.can_delete
 
         Investigation.delete_all
-        user = Factory(:person).user
-        other_user = Factory :user
-        study = Factory(:study, contributor: user.person, policy: Factory(:editing_public_policy))
+        user = FactoryBot.create(:person).user
+        other_user = FactoryBot.create :user
+        study = FactoryBot.create(:study, contributor: user.person, policy: FactoryBot.create(:editing_public_policy))
         inv = study.investigation
         Investigation.clear_lookup_table
 
@@ -111,9 +111,9 @@ class PolicyBasedAuthTest < ActiveSupport::TestCase
 
   test 'update lookup table' do
     with_config_value :auth_lookup_enabled, true do
-      user = Factory :user
-      other_user = Factory :user
-      sop = Factory :sop, contributor: user.person, policy: Factory(:editing_public_policy)
+      user = FactoryBot.create :user
+      other_user = FactoryBot.create :user
+      sop = FactoryBot.create :sop, contributor: user.person, policy: FactoryBot.create(:editing_public_policy)
       Sop.clear_lookup_table
       # check using the standard
       assert sop.authorized_for_view?(user)
@@ -157,7 +157,7 @@ class PolicyBasedAuthTest < ActiveSupport::TestCase
       refute sop.lookup_for('delete', other_user.id)
 
       # change permissions
-      sop.policy = Factory(:private_policy)
+      sop.policy = FactoryBot.create(:private_policy)
       disable_authorization_checks do
         sop.save!
       end
@@ -195,11 +195,11 @@ class PolicyBasedAuthTest < ActiveSupport::TestCase
   test 'lookup table counts' do
     with_config_value :auth_lookup_enabled, true do
       User.current_user = nil
-      user = Factory :user
+      user = FactoryBot.create :user
       disable_authorization_checks do
         Sop.clear_lookup_table
         assert_equal 0, Sop.lookup_count_for_user(user.id)
-        sop = Factory :sop
+        sop = FactoryBot.create :sop
         assert_equal 0, Sop.lookup_count_for_user(user.id)
         sop.update_lookup_table(user)
         assert_equal 1, Sop.lookup_count_for_user(user.id)
@@ -212,10 +212,10 @@ class PolicyBasedAuthTest < ActiveSupport::TestCase
   test 'remove_invalid_auth_lookup_entries' do
     with_config_value :auth_lookup_enabled, true do
       User.current_user = nil
-      user = Factory :user
+      user = FactoryBot.create :user
       disable_authorization_checks do
         Sop.clear_lookup_table
-        sop = Factory :sop
+        sop = FactoryBot.create :sop
         sop.update_lookup_table(user)
         assert_equal 1, Sop.lookup_count_for_user(user.id)
         assert_equal 2, Sop.connection.select_one('select count(*) from sop_auth_lookup;').values[0].to_i
@@ -246,9 +246,9 @@ class PolicyBasedAuthTest < ActiveSupport::TestCase
 
   test 'items_missing_from_authlookup' do
     with_config_value :auth_lookup_enabled, true do
-      user = Factory(:user)
-      user2 = Factory(:user)
-      doc = Factory(:document)
+      user = FactoryBot.create(:user)
+      user2 = FactoryBot.create(:user)
+      doc = FactoryBot.create(:document)
       doc.update_lookup_table(user2)
 
       assert_equal [doc],Document.items_missing_from_authlookup(user)
@@ -266,9 +266,9 @@ class PolicyBasedAuthTest < ActiveSupport::TestCase
   end
 
   test 'people flagged as having left a project cannot see project-shared items' do
-    person = Factory(:former_project_person)
+    person = FactoryBot.create(:former_project_person)
     project = person.projects.first
-    active_person = Factory(:person, project: project)
+    active_person = FactoryBot.create(:person, project: project)
 
     assert person.current_projects.empty?
     assert_includes person.former_projects, project
@@ -276,8 +276,8 @@ class PolicyBasedAuthTest < ActiveSupport::TestCase
     assert_includes project.former_people, person
     assert_includes project.current_people, active_person
 
-    data = Factory(:data_file, policy: Factory(:private_policy,
-                                               permissions: [Factory(:edit_permission, contributor: project)]))
+    data = FactoryBot.create(:data_file, policy: FactoryBot.create(:private_policy,
+                                               permissions: [FactoryBot.create(:edit_permission, contributor: project)]))
 
     assert data.can_view?(active_person)
     assert data.can_edit?(active_person)
@@ -286,9 +286,9 @@ class PolicyBasedAuthTest < ActiveSupport::TestCase
   end
 
   test 'people flagged as leaving a project in the future can still see project-shared items' do
-    person = Factory(:future_former_project_person)
+    person = FactoryBot.create(:future_former_project_person)
     project = person.projects.first
-    active_person = Factory(:person, project: project)
+    active_person = FactoryBot.create(:person, project: project)
 
     assert_includes person.current_projects, project
     assert_empty person.former_projects
@@ -296,8 +296,8 @@ class PolicyBasedAuthTest < ActiveSupport::TestCase
     assert_includes project.current_people, person
     assert_includes project.current_people, active_person
 
-    data = Factory(:data_file, policy: Factory(:private_policy,
-                                               permissions: [Factory(:edit_permission, contributor: project)]))
+    data = FactoryBot.create(:data_file, policy: FactoryBot.create(:private_policy,
+                                               permissions: [FactoryBot.create(:edit_permission, contributor: project)]))
 
     assert data.can_view?(active_person)
     assert data.can_edit?(active_person)

@@ -7,15 +7,15 @@ class PresentationApiTest < ActionDispatch::IntegrationTest
   def setup
     user_login
     @project = @current_user.person.projects.first
-    @creator = Factory(:person)
-    @publication = Factory(:publication, projects: [@project])
-    @event = Factory(:event, projects: [@project], policy: Factory(:public_policy))
-    @presentation = Factory(:presentation, policy: Factory(:public_policy), contributor: current_person, creators: [@creator])
-    @workflow = Factory(:workflow, projects: [@project], policy: Factory(:public_policy))
+    @creator = FactoryBot.create(:person)
+    @publication = FactoryBot.create(:publication, projects: [@project])
+    @event = FactoryBot.create(:event, projects: [@project], policy: FactoryBot.create(:public_policy))
+    @presentation = FactoryBot.create(:presentation, policy: FactoryBot.create(:public_policy), contributor: current_person, creators: [@creator])
+    @workflow = FactoryBot.create(:workflow, projects: [@project], policy: FactoryBot.create(:public_policy))
   end
 
   test 'can add content to API-created presentation' do
-    pres = Factory(:api_pdf_presentation, contributor: current_person)
+    pres = FactoryBot.create(:api_pdf_presentation, contributor: current_person)
 
     assert pres.content_blob.no_content?
     assert pres.can_download?(@current_user)
@@ -32,7 +32,7 @@ class PresentationApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'cannot add content to API-created presentation without permission' do
-    pres = Factory(:api_pdf_presentation, policy: Factory(:public_download_and_no_custom_sharing)) # Created by someone who is not currently logged in
+    pres = FactoryBot.create(:api_pdf_presentation, policy: FactoryBot.create(:public_download_and_no_custom_sharing)) # Created by someone who is not currently logged in
 
     assert pres.content_blob.no_content?
     assert pres.can_download?(@current_user)
@@ -48,7 +48,7 @@ class PresentationApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'cannot add content to API-created presentation that already has content' do
-    pres = Factory(:presentation, contributor: current_person)
+    pres = FactoryBot.create(:presentation, contributor: current_person)
 
     refute pres.content_blob.no_content?
     assert pres.can_download?(@current_user)

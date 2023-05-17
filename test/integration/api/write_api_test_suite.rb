@@ -40,7 +40,7 @@ module WriteApiTestSuite
 
   test 'unauthorized user cannot update resource' do
     res = private_resource
-    user_login(Factory(:person))
+    user_login(FactoryBot.create(:person))
     body = api_max_post_body
     body["data"]["id"] = id.to_s
     body["data"]["attributes"]["title"] = "updated by an unauthorized"
@@ -53,7 +53,7 @@ module WriteApiTestSuite
 
   test 'unauthorized user cannot delete resource' do
     res = private_resource
-    user_login(Factory(:person))
+    user_login(FactoryBot.create(:person))
     assert_no_difference(-> { model.count }) do
       delete member_url(res)
 

@@ -27,8 +27,8 @@ class StrainsControllerTest < ActionController::TestCase
   test 'should create' do
     assert_difference('Strain.count') do
       post :create, params: { strain: { title: 'strain 1',
-                              organism_id: Factory(:organism).id,
-                              project_ids: [Factory(:project).id] } }
+                              organism_id: FactoryBot.create(:organism).id,
+                              project_ids: [FactoryBot.create(:project).id] } }
     end
     s = assigns(:strain)
     assert_redirected_to strain_path(s)
@@ -36,7 +36,7 @@ class StrainsControllerTest < ActionController::TestCase
   end
 
   test 'should get show' do
-    get :show, params: { id: Factory(:strain,
+    get :show, params: { id: FactoryBot.create(:strain,
                            title: 'strain 1',
                            policy: policies(:editing_for_all_sysmo_users_policy)) }
     assert_response :success
@@ -44,14 +44,14 @@ class StrainsControllerTest < ActionController::TestCase
   end
 
   test 'should get edit' do
-    get :edit, params: { id: Factory(:strain, policy: policies(:editing_for_all_sysmo_users_policy)) }
+    get :edit, params: { id: FactoryBot.create(:strain, policy: policies(:editing_for_all_sysmo_users_policy)) }
     assert_response :success
     assert_not_nil assigns(:strain)
   end
 
   test 'should update' do
-    strain = Factory(:strain, title: 'strain 1', policy: policies(:editing_for_all_sysmo_users_policy))
-    project = Factory(:project)
+    strain = FactoryBot.create(:strain, title: 'strain 1', policy: policies(:editing_for_all_sysmo_users_policy))
+    project = FactoryBot.create(:project)
     assert_not_equal 'test', strain.title
     assert !strain.projects.include?(project)
     put :update, params: { id: strain.id, strain: { title: 'test', project_ids: [project.id] } }
@@ -62,28 +62,28 @@ class StrainsControllerTest < ActionController::TestCase
   end
 
   test 'should destroy' do
-    s = Factory :strain, contributor: User.current_user.person
+    s = FactoryBot.create :strain, contributor: User.current_user.person
     assert_difference('Strain.count', -1, 'A strain should be deleted') do
       delete :destroy, params: { id: s.id }
     end
   end
 
   test 'unauthorized users cannot add new strain' do
-    login_as Factory(:user, person: Factory(:brand_new_person))
+    login_as FactoryBot.create(:user, person: FactoryBot.create(:brand_new_person))
     get :new
     assert_response :redirect
   end
 
   test 'unauthorized user cannot edit strain' do
-    login_as Factory(:user, person: Factory(:brand_new_person))
-    s = Factory :strain, policy: Factory(:private_policy)
+    login_as FactoryBot.create(:user, person: FactoryBot.create(:brand_new_person))
+    s = FactoryBot.create :strain, policy: FactoryBot.create(:private_policy)
     get :edit, params: { id: s.id }
     assert_redirected_to strain_path(s)
     assert flash[:error]
   end
   test 'unauthorized user cannot update strain' do
-    login_as Factory(:user, person: Factory(:brand_new_person))
-    s = Factory :strain, policy: Factory(:private_policy)
+    login_as FactoryBot.create(:user, person: FactoryBot.create(:brand_new_person))
+    s = FactoryBot.create :strain, policy: FactoryBot.create(:private_policy)
 
     put :update, params: { id: s.id, strain: { title: 'test' } }
     assert_redirected_to strain_path(s)
@@ -91,8 +91,8 @@ class StrainsControllerTest < ActionController::TestCase
   end
 
   test 'unauthorized user cannot delete strain' do
-    login_as Factory(:user, person: Factory(:brand_new_person))
-    s = Factory :strain, policy: Factory(:private_policy)
+    login_as FactoryBot.create(:user, person: FactoryBot.create(:brand_new_person))
+    s = FactoryBot.create :strain, policy: FactoryBot.create(:private_policy)
     assert_no_difference('Strain.count') do
       delete :destroy, params: { id: s.id }
     end
@@ -101,12 +101,12 @@ class StrainsControllerTest < ActionController::TestCase
   end
 
   test 'contributor can delete strain' do
-    s = Factory :strain, contributor: User.current_user.person
+    s = FactoryBot.create :strain, contributor: User.current_user.person
     assert_difference('Strain.count', -1, 'A strain should be deleted') do
       delete :destroy, params: { id: s.id }
     end
 
-    s = Factory :strain, policy: Factory(:publicly_viewable_policy)
+    s = FactoryBot.create :strain, policy: FactoryBot.create(:publicly_viewable_policy)
     assert_no_difference('Strain.count') do
       delete :destroy, params: { id: s.id }
     end
@@ -115,12 +115,12 @@ class StrainsControllerTest < ActionController::TestCase
   end
 
   test 'should update genotypes and phenotypes' do
-    strain = Factory(:strain)
-    genotype1 = Factory(:genotype, strain: strain)
-    genotype2 = Factory(:genotype, strain: strain)
+    strain = FactoryBot.create(:strain)
+    genotype1 = FactoryBot.create(:genotype, strain: strain)
+    genotype2 = FactoryBot.create(:genotype, strain: strain)
 
-    phenotype1 = Factory(:phenotype, strain: strain)
-    phenotype2 = Factory(:phenotype, strain: strain)
+    phenotype1 = FactoryBot.create(:phenotype, strain: strain)
+    phenotype2 = FactoryBot.create(:phenotype, strain: strain)
 
     new_gene_title = 'new gene'
     new_modification_title = 'new modification'
@@ -148,8 +148,8 @@ class StrainsControllerTest < ActionController::TestCase
   end
 
   test 'should not be able to update the policy of the strain when having no manage rights' do
-    strain = Factory(:strain, policy: Factory(:policy, access_type: Policy::EDITING))
-    user = Factory(:user)
+    strain = FactoryBot.create(:strain, policy: FactoryBot.create(:policy, access_type: Policy::EDITING))
+    user = FactoryBot.create(:user)
     assert strain.can_edit? user
     assert !strain.can_manage?(user)
 
@@ -162,8 +162,8 @@ class StrainsControllerTest < ActionController::TestCase
   end
 
   test 'should not be able to update the permissions of the strain when having no manage rights' do
-    strain = Factory(:strain, policy: Factory(:policy, access_type: Policy::EDITING))
-    user = Factory(:user)
+    strain = FactoryBot.create(:strain, policy: FactoryBot.create(:policy, access_type: Policy::EDITING))
+    user = FactoryBot.create(:user)
     assert strain.can_edit? user
     assert !strain.can_manage?(user)
 
@@ -180,8 +180,8 @@ class StrainsControllerTest < ActionController::TestCase
 
   test 'strains filtered by assay through nested route' do
     assert_routing 'assays/5/strains', controller: 'strains', action: 'index', assay_id: '5'
-    ao1 = Factory(:assay_organism, strain: Factory(:strain, policy: Factory(:public_policy)))
-    ao2 = Factory(:assay_organism, strain: Factory(:strain, policy: Factory(:public_policy)))
+    ao1 = FactoryBot.create(:assay_organism, strain: FactoryBot.create(:strain, policy: FactoryBot.create(:public_policy)))
+    ao2 = FactoryBot.create(:assay_organism, strain: FactoryBot.create(:strain, policy: FactoryBot.create(:public_policy)))
     strain1 = ao1.strain
     strain2 = ao2.strain
     assay1 = ao1.assay
@@ -214,8 +214,8 @@ class StrainsControllerTest < ActionController::TestCase
 
   test 'strains filtered by project through nested route' do
     assert_routing 'projects/5/strains', controller: 'strains', action: 'index', project_id: '5'
-    strain1 = Factory(:strain, policy: Factory(:public_policy))
-    strain2 = Factory(:strain, policy: Factory(:public_policy))
+    strain1 = FactoryBot.create(:strain, policy: FactoryBot.create(:public_policy))
+    strain2 = FactoryBot.create(:strain, policy: FactoryBot.create(:public_policy))
 
     refute_empty strain1.projects
     refute_empty strain2.projects
@@ -232,10 +232,10 @@ class StrainsControllerTest < ActionController::TestCase
 
   test 'strains filtered by person through nested route' do
     assert_routing 'people/5/strains', controller: 'strains', action: 'index', person_id: '5'
-    person1 = Factory(:person)
-    person2 = Factory(:person)
-    strain1 = Factory(:strain, policy: Factory(:public_policy),contributor:person1)
-    strain2 = Factory(:strain, policy: Factory(:public_policy),contributor:person2)
+    person1 = FactoryBot.create(:person)
+    person2 = FactoryBot.create(:person)
+    strain1 = FactoryBot.create(:strain, policy: FactoryBot.create(:public_policy),contributor:person1)
+    strain2 = FactoryBot.create(:strain, policy: FactoryBot.create(:public_policy),contributor:person2)
 
 
     get :index, params: { person_id: person1.id }
@@ -248,7 +248,7 @@ class StrainsControllerTest < ActionController::TestCase
   end
 
   test 'should create log and send email to gatekeeper when request to publish a strain' do
-    strain_in_gatekept_project = { title: 'Test', project_ids: [Factory(:asset_gatekeeper).projects.first.id], organism_id: Factory(:organism).id }
+    strain_in_gatekept_project = { title: 'Test', project_ids: [FactoryBot.create(:asset_gatekeeper).projects.first.id], organism_id: FactoryBot.create(:organism).id }
     assert_difference ('ResourcePublishLog.count') do
       assert_enqueued_emails 1 do
         post :create, params: { strain: strain_in_gatekept_project, policy_attributes: { access_type: Policy::VISIBLE } }
@@ -262,9 +262,9 @@ class StrainsControllerTest < ActionController::TestCase
   end
 
   test 'should fill in the based-on strain if chosen' do
-    strain = Factory(:strain,
-                     genotypes: [Factory(:genotype)],
-                     phenotypes: [Factory(:phenotype)])
+    strain = FactoryBot.create(:strain,
+                     genotypes: [FactoryBot.create(:genotype)],
+                     phenotypes: [FactoryBot.create(:phenotype)])
 
     get :new, params: { parent_id: strain.id }
     assert_response :success
@@ -290,8 +290,8 @@ class StrainsControllerTest < ActionController::TestCase
   end
 
   test 'authorization for based-on strain' do
-    unauthorized_parent_strain = Factory(:strain,
-                                         policy: Factory(:private_policy))
+    unauthorized_parent_strain = FactoryBot.create(:strain,
+                                         policy: FactoryBot.create(:private_policy))
     assert !unauthorized_parent_strain.can_view?
 
     get :new, params: { parent_id: unauthorized_parent_strain.id }
@@ -299,7 +299,7 @@ class StrainsControllerTest < ActionController::TestCase
 
     assert_select 'input[id=?][value=?]', 'strain_title', unauthorized_parent_strain.title, count: 0
 
-    authorized_parent_strain = Factory(:strain)
+    authorized_parent_strain = FactoryBot.create(:strain)
     assert authorized_parent_strain.can_view?
 
     get :new, params: { parent_id: authorized_parent_strain.id }
@@ -309,10 +309,10 @@ class StrainsControllerTest < ActionController::TestCase
   end
 
   test 'shows related samples on show page' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person.user)
-    sample_type = Factory(:strain_sample_type)
-    strain = Factory(:strain)
+    sample_type = FactoryBot.create(:strain_sample_type)
+    strain = FactoryBot.create(:strain)
 
     samples = 3.times.map do |i|
       sample = Sample.new(sample_type: sample_type, contributor: person, project_ids: [person.projects.first.id])
@@ -337,8 +337,8 @@ class StrainsControllerTest < ActionController::TestCase
   end
 
   test 'can access manage page with manage rights' do
-    person = Factory(:person)
-    strain = Factory(:strain, contributor:person)
+    person = FactoryBot.create(:person)
+    strain = FactoryBot.create(:strain, contributor:person)
     login_as(person)
     assert strain.can_manage?
     get :manage, params: {id: strain}
@@ -357,8 +357,8 @@ class StrainsControllerTest < ActionController::TestCase
   end
 
   test 'cannot access manage page with edit rights' do
-    person = Factory(:person)
-    strain = Factory(:strain, policy:Factory(:private_policy, permissions:[Factory(:permission, contributor:person, access_type:Policy::EDITING)]))
+    person = FactoryBot.create(:person)
+    strain = FactoryBot.create(:strain, policy:FactoryBot.create(:private_policy, permissions:[FactoryBot.create(:permission, contributor:person, access_type:Policy::EDITING)]))
     login_as(person)
     assert strain.can_edit?
     refute strain.can_manage?
@@ -368,14 +368,14 @@ class StrainsControllerTest < ActionController::TestCase
   end
 
   test 'manage_update' do
-    proj1=Factory(:project)
-    proj2=Factory(:project)
-    person = Factory(:person,project:proj1)
-    other_person = Factory(:person)
+    proj1=FactoryBot.create(:project)
+    proj2=FactoryBot.create(:project)
+    person = FactoryBot.create(:person,project:proj1)
+    other_person = FactoryBot.create(:person)
     person.add_to_project_and_institution(proj2,person.institutions.first)
     person.save!
 
-    strain = Factory(:strain, contributor:person, projects:[proj1], policy:Factory(:private_policy))
+    strain = FactoryBot.create(:strain, contributor:person, projects:[proj1], policy:FactoryBot.create(:private_policy))
 
     login_as(person)
     assert strain.can_manage?
@@ -399,17 +399,17 @@ class StrainsControllerTest < ActionController::TestCase
   end
 
   test 'manage_update fails without manage rights' do
-    proj1=Factory(:project)
-    proj2=Factory(:project)
-    person = Factory(:person, project:proj1)
+    proj1=FactoryBot.create(:project)
+    proj2=FactoryBot.create(:project)
+    person = FactoryBot.create(:person, project:proj1)
     person.add_to_project_and_institution(proj2,person.institutions.first)
     person.save!
 
-    other_person = Factory(:person)
+    other_person = FactoryBot.create(:person)
 
 
-    strain = Factory(:strain, projects:[proj1], policy:Factory(:private_policy,
-                                                               permissions:[Factory(:permission,contributor:person, access_type:Policy::EDITING)]))
+    strain = FactoryBot.create(:strain, projects:[proj1], policy:FactoryBot.create(:private_policy,
+                                                               permissions:[FactoryBot.create(:permission,contributor:person, access_type:Policy::EDITING)]))
 
     login_as(person)
     refute strain.can_manage?

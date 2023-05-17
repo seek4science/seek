@@ -18,12 +18,12 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
 
   def before_all
     self.class.store do
-      @project = Factory(:project)
-      User.current_user = Factory(:user, login: 'test')
+      @project = FactoryBot.create(:project)
+      User.current_user = FactoryBot.create(:user, login: 'test')
       post '/session', params: { login: 'test', password: generate_user_password }
       @current_user = User.current_user
       @current_user.person.add_to_project_and_institution(@project, @current_user.person.institutions.first)
-      @investigation = Factory(:investigation, projects: [@project], contributor: @current_user.person)
+      @investigation = FactoryBot.create(:investigation, projects: [@project], contributor: @current_user.person)
       isa_project_vars = create_basic_isa_project
       with_config_value(:project_single_page_enabled, true) do
         get export_isa_single_page_path(@project.id, investigation_id: @investigation.id)
@@ -295,17 +295,17 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
   end
 
   def create_basic_isa_project
-    person = Factory(:person, project: @project)
+    person = FactoryBot.create(:person, project: @project)
 
     source =
-      Factory(
+      FactoryBot.create(
         :isa_source_sample_type,
         contributor: person,
         project_ids: [@project.id],
         isa_template: Template.find_by_title('ISA Source')
       )
     sample_collection =
-      Factory(
+      FactoryBot.create(
         :isa_sample_collection_sample_type,
         contributor: person,
         project_ids: [@project.id],
@@ -313,7 +313,7 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
         linked_sample_type: source
       )
     assay_sample_type =
-      Factory(
+      FactoryBot.create(
         :isa_assay_sample_type,
         contributor: person,
         project_ids: [@project.id],
@@ -322,25 +322,25 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
       )
 
     study =
-      Factory(
+      FactoryBot.create(
         :study,
         investigation: @investigation,
         sample_types: [source, sample_collection],
-        sops: [Factory(:sop, policy: Factory(:public_policy))]
+        sops: [FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy))]
       )
 
-    Factory(
+    FactoryBot.create(
       :assay,
       study: study,
       sample_type: assay_sample_type,
-      sop_ids: [Factory(:sop, policy: Factory(:public_policy)).id],
+      sop_ids: [FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy)).id],
       contributor: @current_user.person,
       position: 0
     )
 
     # Create samples
     sample_1 =
-      Factory :sample,
+      FactoryBot.create :sample,
               title: 'sample_1',
               sample_type: source,
               project_ids: [@project.id],
@@ -358,7 +358,7 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
               }
 
     sample_2 =
-      Factory :sample,
+      FactoryBot.create :sample,
               title: 'sample_2',
               sample_type: sample_collection,
               project_ids: [@project.id],
@@ -370,7 +370,7 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
                 'sample characteristic 1': 'sample characteristic 1'
               }
 
-    Factory :sample,
+    FactoryBot.create :sample,
             title: 'sample_2',
             sample_type: assay_sample_type,
             project_ids: [@project.id],

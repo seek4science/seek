@@ -12,7 +12,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'should resolve to json' do
-    sop = Factory(:pdf_sop, policy: Factory(:all_sysmo_downloadable_policy))
+    sop = FactoryBot.create(:pdf_sop, policy: FactoryBot.create(:all_sysmo_downloadable_policy))
     blob = sop.content_blob
 
     get :show, params: { id: blob.id, sop_id: sop.id, format: 'json' }
@@ -21,7 +21,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'html and rdf not acceptable' do
-    sop = Factory(:pdf_sop, policy: Factory(:all_sysmo_downloadable_policy))
+    sop = FactoryBot.create(:pdf_sop, policy: FactoryBot.create(:all_sysmo_downloadable_policy))
     blob = sop.content_blob
 
     get :show, params: { id: blob.id, sop_id: sop.id }
@@ -32,7 +32,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'should fail for unauthorized json' do
-    sop = Factory(:pdf_sop, policy: Factory(:private_policy))
+    sop = FactoryBot.create(:pdf_sop, policy: FactoryBot.create(:private_policy))
     blob = sop.content_blob
 
     get :show, params: { id: blob.id, sop_id: sop.id, format: 'json' }
@@ -40,12 +40,12 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'should find_and_auth_asset for get_pdf' do
-    sop1 = Factory(:pdf_sop, policy: Factory(:all_sysmo_downloadable_policy))
+    sop1 = FactoryBot.create(:pdf_sop, policy: FactoryBot.create(:all_sysmo_downloadable_policy))
 
     get :get_pdf, params: { sop_id: sop1.id, id: sop1.content_blob.id }
     assert_response :success
 
-    sop2 = Factory(:pdf_sop, policy: Factory(:private_policy))
+    sop2 = FactoryBot.create(:pdf_sop, policy: FactoryBot.create(:private_policy))
     get :get_pdf, params: { sop_id: sop2.id, id: sop2.content_blob.id }
     assert_redirected_to sop2
     assert_not_nil flash[:error]
@@ -249,20 +249,20 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'should find_and_auth_asset for download' do
-    sop1 = Factory(:pdf_sop, policy: Factory(:all_sysmo_downloadable_policy))
+    sop1 = FactoryBot.create(:pdf_sop, policy: FactoryBot.create(:all_sysmo_downloadable_policy))
 
     get :download, params: { sop_id: sop1.id, id: sop1.content_blob.id }
     assert_response :success
 
-    sop2 = Factory(:pdf_sop, policy: Factory(:private_policy))
+    sop2 = FactoryBot.create(:pdf_sop, policy: FactoryBot.create(:private_policy))
     get :download, params: { sop_id: sop2.id, id: sop2.content_blob.id }
     assert_redirected_to sop2
     assert_not_nil flash[:error]
   end
 
   test 'should find_and_auth_content_blob for get_pdf' do
-    sop1 = Factory(:pdf_sop, policy: Factory(:all_sysmo_downloadable_policy))
-    sop2 = Factory(:pdf_sop, policy: Factory(:private_policy))
+    sop1 = FactoryBot.create(:pdf_sop, policy: FactoryBot.create(:all_sysmo_downloadable_policy))
+    sop2 = FactoryBot.create(:pdf_sop, policy: FactoryBot.create(:private_policy))
 
     get :get_pdf, params: { sop_id: sop1.id, id: sop1.content_blob.id }
     assert_response :success
@@ -274,8 +274,8 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'should find_and_auth_content_blob for download' do
-    sop1 = Factory(:pdf_sop, policy: Factory(:all_sysmo_downloadable_policy))
-    sop2 = Factory(:pdf_sop, policy: Factory(:private_policy))
+    sop1 = FactoryBot.create(:pdf_sop, policy: FactoryBot.create(:all_sysmo_downloadable_policy))
+    sop2 = FactoryBot.create(:pdf_sop, policy: FactoryBot.create(:private_policy))
 
     get :download, params: { sop_id: sop1.id, id: sop1.content_blob.id }
     assert_response :success
@@ -287,7 +287,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'should download without type information' do
-    model = Factory :typeless_model, policy: Factory(:public_policy)
+    model = FactoryBot.create :typeless_model, policy: FactoryBot.create(:public_policy)
 
     assert_difference('ActivityLog.count') do
       get :download, params: { model_id: model.id, id: model.content_blobs.first.id }
@@ -299,7 +299,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'get_pdf' do
-    ms_word_sop = Factory(:doc_sop, policy: Factory(:all_sysmo_downloadable_policy))
+    ms_word_sop = FactoryBot.create(:doc_sop, policy: FactoryBot.create(:all_sysmo_downloadable_policy))
     pdf_path = ms_word_sop.content_blob.filepath('pdf')
     FileUtils.rm pdf_path if File.exist?(pdf_path)
     assert !File.exist?(pdf_path)
@@ -322,9 +322,9 @@ class ContentBlobsControllerTest < ActionController::TestCase
                      'http://somewhere.com/piccy.pdf',
                      'Content-Type' => 'application/pdf',
                      'Content-Length' => 500
-    pdf_sop = Factory(:sop,
-                      policy: Factory(:all_sysmo_downloadable_policy),
-                      content_blob: Factory(:pdf_content_blob,
+    pdf_sop = FactoryBot.create(:sop,
+                      policy: FactoryBot.create(:all_sysmo_downloadable_policy),
+                      content_blob: FactoryBot.create(:pdf_content_blob,
                                             data: nil,
                                             url: 'http://somewhere.com/piccy.pdf',
                                             uuid: UUID.generate))
@@ -350,9 +350,9 @@ class ContentBlobsControllerTest < ActionController::TestCase
                      'http://somewhere.com/piccy.doc',
                      'Content-Type' => 'application/pdf',
                      'Content-Length' => 500
-    doc_sop = Factory(:sop,
-                      policy: Factory(:all_sysmo_downloadable_policy),
-                      content_blob: Factory(:doc_content_blob,
+    doc_sop = FactoryBot.create(:sop,
+                      policy: FactoryBot.create(:all_sysmo_downloadable_policy),
+                      content_blob: FactoryBot.create(:doc_content_blob,
                                             data: nil,
                                             url: 'http://somewhere.com/piccy.doc',
                                             uuid: UUID.generate))
@@ -372,9 +372,9 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
   test 'should gracefully handle view_pdf for non existing asset' do
     stub_request(:head, 'http://somewhere.com/piccy.doc').to_return(status: 404)
-    sop = Factory(:sop,
-                  policy: Factory(:all_sysmo_downloadable_policy),
-                  content_blob: Factory(:doc_content_blob,
+    sop = FactoryBot.create(:sop,
+                  policy: FactoryBot.create(:all_sysmo_downloadable_policy),
+                  content_blob: FactoryBot.create(:doc_content_blob,
                                         data: nil,
                                         url: 'http://somewhere.com/piccy.doc',
                                         uuid: UUID.generate))
@@ -385,7 +385,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'report error when file unavailable for download' do
-    df = Factory :data_file, policy: Factory(:public_policy)
+    df = FactoryBot.create :data_file, policy: FactoryBot.create(:public_policy)
     df.content_blob.dump_data_to_file
     assert df.content_blob.file_exists?
     FileUtils.rm df.content_blob.filepath
@@ -398,7 +398,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'get view content' do
-    sop = Factory(:pdf_sop, policy: Factory(:all_sysmo_downloadable_policy))
+    sop = FactoryBot.create(:pdf_sop, policy: FactoryBot.create(:all_sysmo_downloadable_policy))
 
     assert_difference('ActivityLog.count') do
       get :view_content, params: { sop_id: sop.id, id: sop.content_blob.id }
@@ -418,7 +418,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'log inline_view for viewing pdf and image' do
-    sop = Factory(:pdf_sop, policy: Factory(:all_sysmo_downloadable_policy))
+    sop = FactoryBot.create(:pdf_sop, policy: FactoryBot.create(:all_sysmo_downloadable_policy))
     assert_difference('ActivityLog.count') do
       get :view_content, params: { sop_id: sop.id, id: sop.content_blob.id }
     end
@@ -426,8 +426,8 @@ class ContentBlobsControllerTest < ActionController::TestCase
     al = ActivityLog.last
     assert_equal 'inline_view', al.action
 
-    df = Factory(:data_file, policy: Factory(:all_sysmo_downloadable_policy),
-                             content_blob: Factory(:image_content_blob,
+    df = FactoryBot.create(:data_file, policy: FactoryBot.create(:all_sysmo_downloadable_policy),
+                             content_blob: FactoryBot.create(:image_content_blob,
                                                    original_filename: 'test.png',
                                                    content_type: 'image/png'))
     assert_difference('ActivityLog.count') do
@@ -439,20 +439,20 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'should view content as correct format for type' do
-    df = Factory(:data_file, content_blob: Factory(:csv_content_blob), policy: Factory(:all_sysmo_downloadable_policy))
+    df = FactoryBot.create(:data_file, content_blob: FactoryBot.create(:csv_content_blob), policy: FactoryBot.create(:all_sysmo_downloadable_policy))
     get :view_content, params: { data_file_id: df.id, id: df.content_blob.id }
     assert_response :success
     assert @response.body.include?('1,2,3,4,5')
     assert_equal 'text/plain', @response.media_type
 
-    df = Factory(:data_file, content_blob: Factory(:doc_content_blob), policy: Factory(:all_sysmo_downloadable_policy))
+    df = FactoryBot.create(:data_file, content_blob: FactoryBot.create(:doc_content_blob), policy: FactoryBot.create(:all_sysmo_downloadable_policy))
     get :view_content, params: { data_file_id: df.id, id: df.content_blob.id }
     assert_response :success
     assert_equal 'text/html', @response.media_type
   end
 
   test 'can fetch csv content blob as csv' do
-    df = Factory(:data_file, content_blob: Factory(:csv_content_blob), policy: Factory(:all_sysmo_downloadable_policy))
+    df = FactoryBot.create(:data_file, content_blob: FactoryBot.create(:csv_content_blob), policy: FactoryBot.create(:all_sysmo_downloadable_policy))
     get :show, params: { data_file_id: df.id, id: df.content_blob.id, format: 'csv' }
     assert_response :success
 
@@ -464,7 +464,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'can fetch excel content blob as csv' do
-    df = Factory(:data_file, content_blob: Factory(:sample_type_populated_template_content_blob), policy: Factory(:all_sysmo_downloadable_policy))
+    df = FactoryBot.create(:data_file, content_blob: FactoryBot.create(:sample_type_populated_template_content_blob), policy: FactoryBot.create(:all_sysmo_downloadable_policy))
     get :show, params: { data_file_id: df.id, id: df.content_blob.id, format: 'csv' }
     assert_response :success
 
@@ -476,7 +476,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'cannot fetch binary content blob as csv' do
-    df = Factory(:data_file, content_blob: Factory(:binary_content_blob), policy: Factory(:all_sysmo_downloadable_policy))
+    df = FactoryBot.create(:data_file, content_blob: FactoryBot.create(:binary_content_blob), policy: FactoryBot.create(:all_sysmo_downloadable_policy))
     get :show, params: { data_file_id: df.id, id: df.content_blob.id, format: 'csv' }
     assert_response :not_acceptable
 
@@ -488,7 +488,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'cannot fetch empty content blob as csv' do
-    df = Factory(:data_file, content_blob: Factory(:blank_pdf_content_blob), policy: Factory(:all_sysmo_downloadable_policy))
+    df = FactoryBot.create(:data_file, content_blob: FactoryBot.create(:blank_pdf_content_blob), policy: FactoryBot.create(:all_sysmo_downloadable_policy))
     get :show, params: { data_file_id: df.id, id: df.content_blob.id, format: 'csv' }
     assert_response :not_found
 
@@ -500,8 +500,8 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'can view content of an image file' do
-    df = Factory(:data_file, policy: Factory(:all_sysmo_downloadable_policy),
-                             content_blob: Factory(:image_content_blob))
+    df = FactoryBot.create(:data_file, policy: FactoryBot.create(:all_sysmo_downloadable_policy),
+                             content_blob: FactoryBot.create(:image_content_blob))
 
     get :download, params: { data_file_id: df.id, id: df.content_blob.id, disposition: 'inline', image_size: '900' }
 
@@ -510,8 +510,8 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'can view content of an image file and resize to given param' do
-    df = Factory(:data_file, policy: Factory(:all_sysmo_downloadable_policy),
-                             content_blob: Factory(:image_content_blob))
+    df = FactoryBot.create(:data_file, policy: FactoryBot.create(:all_sysmo_downloadable_policy),
+                             content_blob: FactoryBot.create(:image_content_blob))
 
     get :download, params: { data_file_id: df.id, id: df.content_blob.id, disposition: 'inline', image_size: '10' }
 
@@ -521,8 +521,8 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'can view content of an SVG image file without converting' do
-    df = Factory(:data_file, policy: Factory(:all_sysmo_downloadable_policy),
-                             content_blob: Factory(:svg_content_blob))
+    df = FactoryBot.create(:data_file, policy: FactoryBot.create(:all_sysmo_downloadable_policy),
+                             content_blob: FactoryBot.create(:svg_content_blob))
 
     get :download, params: { data_file_id: df.id, id: df.content_blob.id, disposition: 'inline', image_size: '900' }
 
@@ -534,9 +534,9 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
   test 'should transparently redirect on download for 302 url' do
     mock_http
-    df = Factory :data_file,
-                 policy: Factory(:all_sysmo_downloadable_policy),
-                 content_blob: Factory(:url_content_blob,
+    df = FactoryBot.create :data_file,
+                 policy: FactoryBot.create(:all_sysmo_downloadable_policy),
+                 content_blob: FactoryBot.create(:url_content_blob,
                                        url: 'http://mocked302.com',
                                        uuid: UUID.generate)
     assert !df.content_blob.file_exists?
@@ -547,9 +547,9 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
   test 'should redirect on download for 401 url' do
     mock_http
-    df = Factory :data_file,
-                 policy: Factory(:all_sysmo_downloadable_policy),
-                 content_blob: Factory(:url_content_blob,
+    df = FactoryBot.create :data_file,
+                 policy: FactoryBot.create(:all_sysmo_downloadable_policy),
+                 content_blob: FactoryBot.create(:url_content_blob,
                                        url: 'http://mocked401.com',
                                        uuid: UUID.generate)
     assert !df.content_blob.file_exists?
@@ -560,7 +560,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'should download' do
-    df = Factory :small_test_spreadsheet_datafile, policy: Factory(:public_policy), contributor: User.current_user.person
+    df = FactoryBot.create :small_test_spreadsheet_datafile, policy: FactoryBot.create(:public_policy), contributor: User.current_user.person
     assert_difference('ActivityLog.count') do
       get :download, params: { data_file_id: df, id: df.content_blob }
     end
@@ -572,7 +572,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'download should provide the content length if file exists but has a url' do
-    df = Factory :small_test_spreadsheet_datafile, policy: Factory(:public_policy), contributor: User.current_user.person
+    df = FactoryBot.create :small_test_spreadsheet_datafile, policy: FactoryBot.create(:public_policy), contributor: User.current_user.person
     blob = df.content_blob
     blob.update_column(:url, 'http://website.com/somefile.txt')
     get :download, params: { data_file_id: df, id: df.content_blob }
@@ -587,10 +587,10 @@ class ContentBlobsControllerTest < ActionController::TestCase
     mock_remote_file "#{Rails.root}/test/fixtures/files/ms_word_test.doc",
                      'http://somewhere.com/piccy.doc',
                      'Content-Length':'500'
-    doc_sop = Factory(:sop,
-                      policy: Factory(:public_policy),
+    doc_sop = FactoryBot.create(:sop,
+                      policy: FactoryBot.create(:public_policy),
                       contributor: User.current_user.person,
-                      content_blob: Factory(:doc_content_blob,
+                      content_blob: FactoryBot.create(:doc_content_blob,
                                             data: nil,
                                             url: 'http://somewhere.com/piccy.doc',
                                             uuid: UUID.generate))
@@ -602,7 +602,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
 
   test 'should not log download for inline view intent' do
-    df = Factory :small_test_spreadsheet_datafile, policy: Factory(:public_policy), contributor: User.current_user.person
+    df = FactoryBot.create :small_test_spreadsheet_datafile, policy: FactoryBot.create(:public_policy), contributor: User.current_user.person
     assert_no_difference('ActivityLog.count') do
       get :download, params: { data_file_id: df, id: df.content_blob, intent: :inline_view }
     end
@@ -611,9 +611,9 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
   test 'should download from url' do
     mock_http
-    df = Factory :data_file,
-                 policy: Factory(:all_sysmo_downloadable_policy),
-                 content_blob: Factory(:url_content_blob,
+    df = FactoryBot.create :data_file,
+                 policy: FactoryBot.create(:all_sysmo_downloadable_policy),
+                 content_blob: FactoryBot.create(:url_content_blob,
                                        url: 'http://mockedlocation.com/a-piccy.png',
                                        uuid: UUID.generate)
     assert_difference('ActivityLog.count') do
@@ -624,9 +624,9 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
   test 'should gracefully handle when downloading a unknown host url' do
     mock_http
-    df = Factory :data_file,
-                 policy: Factory(:all_sysmo_downloadable_policy),
-                 content_blob: Factory(:url_content_blob,
+    df = FactoryBot.create :data_file,
+                 policy: FactoryBot.create(:all_sysmo_downloadable_policy),
+                 content_blob: FactoryBot.create(:url_content_blob,
                                        url: 'http://unknownhost.com/pic.png',
                                        uuid: UUID.generate)
 
@@ -638,9 +638,9 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
   test 'should gracefully handle when downloading a url resulting in 404' do
     mock_http
-    df = Factory :data_file,
-                 policy: Factory(:all_sysmo_downloadable_policy),
-                 content_blob: Factory(:url_content_blob,
+    df = FactoryBot.create :data_file,
+                 policy: FactoryBot.create(:all_sysmo_downloadable_policy),
+                 content_blob: FactoryBot.create(:url_content_blob,
                                        url: 'http://mocked404.com',
                                        uuid: UUID.generate)
 
@@ -651,9 +651,9 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
   test 'should gracefully handle other error codes' do
     mock_http
-    df = Factory :data_file,
-                 policy: Factory(:all_sysmo_downloadable_policy),
-                 content_blob: Factory(:url_content_blob,
+    df = FactoryBot.create :data_file,
+                 policy: FactoryBot.create(:all_sysmo_downloadable_policy),
+                 content_blob: FactoryBot.create(:url_content_blob,
                                        url: 'http://mocked500.com',
                                        uuid: UUID.generate)
 
@@ -665,9 +665,9 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
   test 'should handle inline download when specify the inline disposition' do
     data = File.new("#{Rails.root}/test/fixtures/files/file_picture.png", 'rb').read
-    df = Factory :data_file,
-                 content_blob: Factory(:content_blob, data: data, content_type: 'images/png'),
-                 policy: Factory(:downloadable_public_policy)
+    df = FactoryBot.create :data_file,
+                 content_blob: FactoryBot.create(:content_blob, data: data, content_type: 'images/png'),
+                 policy: FactoryBot.create(:downloadable_public_policy)
 
     get :download, params: { data_file_id: df, id: df.content_blob, disposition: 'inline' }
     assert_response :success
@@ -678,9 +678,9 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
   test 'should handle normal attachment download' do
     data = File.new("#{Rails.root}/test/fixtures/files/file_picture.png", 'rb').read
-    df = Factory :data_file,
-                 content_blob: Factory(:content_blob, data: data, content_type: 'images/png'),
-                 policy: Factory(:downloadable_public_policy)
+    df = FactoryBot.create :data_file,
+                 content_blob: FactoryBot.create(:content_blob, data: data, content_type: 'images/png'),
+                 policy: FactoryBot.create(:downloadable_public_policy)
 
     get :download, params: { data_file_id: df, id: df.content_blob }
     assert_response :success
@@ -688,7 +688,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'activity correctly logged' do
-    model = Factory :model_2_files, policy: Factory(:public_policy), contributor: User.current_user.person
+    model = FactoryBot.create :model_2_files, policy: FactoryBot.create(:public_policy), contributor: User.current_user.person
     first_content_blob = model.content_blobs.first
     assert_difference('ActivityLog.count') do
       get :download, params: { model_id: model.id, id: first_content_blob.id }
@@ -703,7 +703,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'should download identical file from file list' do
-    model = Factory :model_2_files, policy: Factory(:public_policy), contributor: User.current_user.person
+    model = FactoryBot.create :model_2_files, policy: FactoryBot.create(:public_policy), contributor: User.current_user.person
     first_content_blob = model.content_blobs.first
     assert_difference('ActivityLog.count') do
       get :download, params: { model_id: model.id, id: first_content_blob.id }
@@ -716,10 +716,10 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
   test 'should not download private data if url manipulated' do
     id = [Sop.last.id, DataFile.last.id].max + 1
-    sop = Factory(:sop, id: id, policy: Factory(:public_policy),
-                        content_blob: Factory(:txt_content_blob, data: 'public'))
-    data_file = Factory(:data_file, id: id, policy: Factory(:private_policy),
-                                    content_blob: Factory(:txt_content_blob, data: 'secret'))
+    sop = FactoryBot.create(:sop, id: id, policy: FactoryBot.create(:public_policy),
+                        content_blob: FactoryBot.create(:txt_content_blob, data: 'public'))
+    data_file = FactoryBot.create(:data_file, id: id, policy: FactoryBot.create(:private_policy),
+                                    content_blob: FactoryBot.create(:txt_content_blob, data: 'secret'))
 
     assert_equal sop.id, data_file.id
     assert sop.can_download?
@@ -735,7 +735,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
   test 'download sample type template blob' do
     person = User.current_user.person
-    sample_type = Factory(:strain_sample_type, contributor:person)
+    sample_type = FactoryBot.create(:strain_sample_type, contributor:person)
     refute_nil sample_type.template
     assert sample_type.can_view?
     assert sample_type.can_download?
@@ -751,8 +751,8 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'cannot download sample type template you cannot view' do
-    login_as(Factory(:person))
-    sample_type = Factory(:strain_sample_type, contributor:Factory(:person))
+    login_as(FactoryBot.create(:person))
+    sample_type = FactoryBot.create(:strain_sample_type, contributor:FactoryBot.create(:person))
     refute_nil sample_type.template
     refute sample_type.can_view?
     refute sample_type.can_download?
@@ -764,8 +764,8 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'should view content for pdf blob' do
-    sop = Factory(:public_sop)
-    blob = Factory(:pdf_content_blob, asset: sop)
+    sop = FactoryBot.create(:public_sop)
+    blob = FactoryBot.create(:pdf_content_blob, asset: sop)
 
     get :view_content, params: { sop_id: sop.id, id: blob.id }
 
@@ -777,8 +777,8 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'should view content for markdown blob' do
-    sop = Factory(:public_sop)
-    blob = Factory(:markdown_content_blob, asset: sop)
+    sop = FactoryBot.create(:public_sop)
+    blob = FactoryBot.create(:markdown_content_blob, asset: sop)
 
     get :view_content, params: { sop_id: sop.id, id: blob.id }
 
@@ -791,8 +791,8 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'should view content for jupyter blob renderer' do
-    sop = Factory(:public_sop)
-    blob = Factory(:jupyter_notebook_content_blob, asset: sop)
+    sop = FactoryBot.create(:public_sop)
+    blob = FactoryBot.create(:jupyter_notebook_content_blob, asset: sop)
 
     get :view_content, params: { sop_id: sop.id, id: blob.id }
 
@@ -806,8 +806,8 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'should view content for text blob' do
-    sop = Factory(:public_sop)
-    blob = Factory(:txt_content_blob, asset: sop)
+    sop = FactoryBot.create(:public_sop)
+    blob = FactoryBot.create(:txt_content_blob, asset: sop)
 
     get :view_content, params: { sop_id: sop.id, id: blob.id }
 
@@ -818,8 +818,8 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'should view content for image blob' do
-    sop = Factory(:public_sop)
-    blob = Factory(:image_content_blob, asset: sop)
+    sop = FactoryBot.create(:public_sop)
+    blob = FactoryBot.create(:image_content_blob, asset: sop)
 
     get :view_content, params: { sop_id: sop.id, id: blob.id }
 
@@ -830,8 +830,8 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'should view content for jupyter blob as text if requested' do
-    sop = Factory(:public_sop)
-    blob = Factory(:jupyter_notebook_content_blob, asset: sop)
+    sop = FactoryBot.create(:public_sop)
+    blob = FactoryBot.create(:jupyter_notebook_content_blob, asset: sop)
 
     get :view_content, params: { sop_id: sop.id, id: blob.id, display: 'text' }
 
@@ -842,8 +842,8 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'should through 406 if trying to view content for pdf blob as text' do
-    sop = Factory(:public_sop)
-    blob = Factory(:pdf_content_blob, asset: sop)
+    sop = FactoryBot.create(:public_sop)
+    blob = FactoryBot.create(:pdf_content_blob, asset: sop)
 
     assert_raises(ActionController::UnknownFormat) do
       get :view_content, params: { sop_id: sop.id, id: blob.id, display: 'text' }

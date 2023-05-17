@@ -32,14 +32,14 @@ class MessageLogTest < ActiveSupport::TestCase
     # subject must be a project for project membership request
     log = valid_log
     assert log.project_membership_request?
-    log.subject = Factory(:data_file)
+    log.subject = FactoryBot.create(:data_file)
     refute log.valid?
   end
 
   test 'project_membership_scope' do
     MessageLog.destroy_all
-    subject = Factory(:project)
-    sender = Factory(:person)
+    subject = FactoryBot.create(:project)
+    sender = FactoryBot.create(:person)
     log1 = ProjectMembershipMessageLog.create(subject: subject, sender: sender, details: 'blah blah')
     log2 = ProjectMembershipMessageLog.create(subject: subject, sender: sender, details: 'blah blah')
     log3 = ProjectMembershipMessageLog.create(subject: subject, sender: sender, details: 'blah blah', message_type: 2)
@@ -71,10 +71,10 @@ class MessageLogTest < ActiveSupport::TestCase
     log = valid_log
     log.save!
     log2 = valid_log
-    log2.sender = Factory(:person)
+    log2.sender = FactoryBot.create(:person)
     log2.save!
     log3 = valid_log
-    log3.subject = Factory(:project)
+    log3.subject = FactoryBot.create(:project)
     log3.save!
     log4 = nil
     travel_to(Time.now - 18.hours) do
@@ -89,8 +89,8 @@ class MessageLogTest < ActiveSupport::TestCase
   end
 
   test 'log project membership request' do
-    proj = Factory(:project)
-    sender = Factory(:person)
+    proj = FactoryBot.create(:project)
+    sender = FactoryBot.create(:person)
     institution = Institution.new(title: 'new inst', country: 'DE')
     assert_difference('ProjectMembershipMessageLog.count') do
       ProjectMembershipMessageLog.log_request(sender: sender, project: proj, institution: institution,
@@ -109,8 +109,8 @@ class MessageLogTest < ActiveSupport::TestCase
   end
 
   test 'log project creation request' do
-    requester = Factory(:person)
-    programme = Factory(:programme)
+    requester = FactoryBot.create(:person)
+    programme = FactoryBot.create(:programme)
     project = Project.new(title: 'a project', web_page: 'http://page')
     institution = Institution.new(title: 'an inst', country: 'FR')
     assert_difference('ProjectCreationMessageLog.count') do
@@ -163,13 +163,13 @@ class MessageLogTest < ActiveSupport::TestCase
   test 'project creation request scope' do
     project = Project.new(title: 'my project')
     project2 = Project.new(title: 'my project 2')
-    person = Factory(:person)
-    admin = Factory(:admin)
-    institution = Factory(:institution)
+    person = FactoryBot.create(:person)
+    admin = FactoryBot.create(:admin)
+    institution = FactoryBot.create(:institution)
 
-    log1 = ProjectCreationMessageLog.log_request(sender: person, programme: Factory(:programme), project: project,
+    log1 = ProjectCreationMessageLog.log_request(sender: person, programme: FactoryBot.create(:programme), project: project,
                                                  institution: institution)
-    log2 = ProjectCreationMessageLog.log_request(sender: person, programme: Factory(:programme), project: project2,
+    log2 = ProjectCreationMessageLog.log_request(sender: person, programme: FactoryBot.create(:programme), project: project2,
                                                  institution: institution)
 
     assert_equal [log1, log2], ProjectCreationMessageLog.all.sort_by(&:id)
@@ -181,18 +181,18 @@ class MessageLogTest < ActiveSupport::TestCase
   end
 
   test 'pending project join requests' do
-    person1 = Factory(:project_administrator)
-    person2 = Factory(:project_administrator)
+    person1 = FactoryBot.create(:project_administrator)
+    person2 = FactoryBot.create(:project_administrator)
     project1 = person1.projects.first
     project2 = person2.projects.first
-    project3 = Factory(:project)
+    project3 = FactoryBot.create(:project)
 
-    log1a = ProjectMembershipMessageLog.log_request(sender: Factory(:person), project: project1,
-                                                    institution: Factory(:institution))
-    log1b = ProjectMembershipMessageLog.log_request(sender: Factory(:person), project: project1,
-                                                    institution: Factory(:institution))
-    log2 = ProjectMembershipMessageLog.log_request(sender: Factory(:person), project: project2,
-                                                   institution: Factory(:institution))
+    log1a = ProjectMembershipMessageLog.log_request(sender: FactoryBot.create(:person), project: project1,
+                                                    institution: FactoryBot.create(:institution))
+    log1b = ProjectMembershipMessageLog.log_request(sender: FactoryBot.create(:person), project: project1,
+                                                    institution: FactoryBot.create(:institution))
+    log2 = ProjectMembershipMessageLog.log_request(sender: FactoryBot.create(:person), project: project2,
+                                                   institution: FactoryBot.create(:institution))
 
     assert_equal [log1a, log1b], ProjectMembershipMessageLog.pending_requests([project1]).sort_by(&:id)
     assert_equal [log1a, log1b, log2], ProjectMembershipMessageLog.pending_requests([project1, project2]).sort_by(&:id)
@@ -213,20 +213,20 @@ class MessageLogTest < ActiveSupport::TestCase
   test 'destroy when person is' do
     MessageLog.destroy_all
 
-    person1 = Factory(:person)
-    person2 = Factory(:person)
+    person1 = FactoryBot.create(:person)
+    person2 = FactoryBot.create(:person)
 
     project = Project.new(title: 'my project')
-    institution = Factory(:institution)
+    institution = FactoryBot.create(:institution)
 
-    ProjectCreationMessageLog.log_request(sender: person1, programme: Factory(:programme), project: project,
+    ProjectCreationMessageLog.log_request(sender: person1, programme: FactoryBot.create(:programme), project: project,
                                           institution: institution)
-    ProjectCreationMessageLog.log_request(sender: person2, programme: Factory(:programme), project: project,
+    ProjectCreationMessageLog.log_request(sender: person2, programme: FactoryBot.create(:programme), project: project,
                                           institution: institution)
 
-    project = Factory(:project)
-    ProjectMembershipMessageLog.log_request(sender: person1, project: project, institution: Factory(:institution))
-    ProjectMembershipMessageLog.log_request(sender: person2, project: project, institution: Factory(:institution))
+    project = FactoryBot.create(:project)
+    ProjectMembershipMessageLog.log_request(sender: person1, project: project, institution: FactoryBot.create(:institution))
+    ProjectMembershipMessageLog.log_request(sender: person2, project: project, institution: FactoryBot.create(:institution))
 
     assert_difference('ProjectCreationMessageLog.count', -1) do
       assert_difference('ProjectMembershipMessageLog.count', -1) do
@@ -244,13 +244,13 @@ class MessageLogTest < ActiveSupport::TestCase
   end
 
   test 'sent by self' do
-    person = Factory(:person)
-    log = ProjectCreationMessageLog.log_request(sender: person, programme: Factory(:programme),
-                                                project: Factory(:project), institution: Factory(:institution))
+    person = FactoryBot.create(:person)
+    log = ProjectCreationMessageLog.log_request(sender: person, programme: FactoryBot.create(:programme),
+                                                project: FactoryBot.create(:project), institution: FactoryBot.create(:institution))
     User.with_current_user(person.user) do
       assert log.sent_by_self?
     end
-    User.with_current_user(Factory(:user)) do
+    User.with_current_user(FactoryBot.create(:user)) do
       refute log.sent_by_self?
     end
     User.with_current_user(nil) do
@@ -259,7 +259,7 @@ class MessageLogTest < ActiveSupport::TestCase
   end
 
   test 'log activation email sent' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     log = assert_difference('ActivationEmailMessageLog.count') do
       ActivationEmailMessageLog.log_activation_email(person)
     end
@@ -270,8 +270,8 @@ class MessageLogTest < ActiveSupport::TestCase
 
   test 'activation email logs' do
     log1, log2, log3, lo4 = nil
-    person = Factory(:person)
-    other_person = Factory(:person)
+    person = FactoryBot.create(:person)
+    other_person = FactoryBot.create(:person)
 
     travel_to(2.days.ago) do
       log2 = ActivationEmailMessageLog.log_activation_email(person)
@@ -291,11 +291,11 @@ class MessageLogTest < ActiveSupport::TestCase
   end
 
   test 'can respond project creation request' do
-    admin = Factory(:admin)
-    prog_admin = Factory(:programme_administrator)
+    admin = FactoryBot.create(:admin)
+    prog_admin = FactoryBot.create(:programme_administrator)
     programme = prog_admin.programmes.first
-    person = Factory(:person)
-    institution = Factory(:institution)
+    person = FactoryBot.create(:person)
+    institution = FactoryBot.create(:institution)
     project = Project.new(title: 'new project')
 
     # no programme
@@ -329,7 +329,7 @@ class MessageLogTest < ActiveSupport::TestCase
     refute log.can_respond_project_creation_request?(person)
 
     # programme open to projects
-    programme = Factory(:programme, open_for_projects: true)
+    programme = FactoryBot.create(:programme, open_for_projects: true)
     log = ProjectCreationMessageLog.log_request(sender: person, programme: programme,
                                                 project: project, institution: institution)
     with_config_value(:programmes_open_for_projects_enabled, true) do
@@ -343,10 +343,10 @@ class MessageLogTest < ActiveSupport::TestCase
   end
 
   test 'handles legacy serialized fields' do
-    sender = Factory(:person)
-    project = Factory(:project)
-    programme = Factory(:programme)
-    institution = Factory(:institution)
+    sender = FactoryBot.create(:person)
+    project = FactoryBot.create(:project)
+    programme = FactoryBot.create(:programme)
+    institution = FactoryBot.create(:institution)
 
     details = {
       institution: {id: institution.id, title: institution.title, country: institution.country, legacy_field:'old'},
@@ -363,10 +363,10 @@ class MessageLogTest < ActiveSupport::TestCase
   end
 
   test 'only writes needed fields to details' do
-    sender = Factory(:person)
-    programme = Factory(:programme)
+    sender = FactoryBot.create(:person)
+    programme = FactoryBot.create(:programme)
     project = Project.new(title:'new project', description: 'blah', web_page: 'https://webpage.com', programme: programme)
-    institution = Factory(:institution)
+    institution = FactoryBot.create(:institution)
 
     log = ProjectCreationMessageLog.log_request(sender: sender, programme: programme,
                                           project: project, institution: institution)
@@ -383,8 +383,8 @@ class MessageLogTest < ActiveSupport::TestCase
   private
 
   def valid_log
-    subject = Factory(:project)
-    sender = Factory(:person)
+    subject = FactoryBot.create(:project)
+    sender = FactoryBot.create(:person)
     ProjectMembershipMessageLog.new(subject: subject, sender: sender, details: 'blah blah')
   end
 end

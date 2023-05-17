@@ -2,7 +2,7 @@ require 'test_helper'
 
 class WorkGroupTest < ActiveSupport::TestCase
   def setup
-    @person = Factory(:person)
+    @person = FactoryBot.create(:person)
     @wg = @person.projects.first.work_groups.first
   end
 

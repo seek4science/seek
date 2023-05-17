@@ -2,14 +2,14 @@ require 'test_helper'
 
 class ProjectSubscriptionJobTest < ActiveSupport::TestCase
   test 'perform' do
-    User.current_user = Factory(:user)
-    proj = Factory(:project)
-    person = Factory(:person,project:proj)
-    person.add_to_project_and_institution(Factory(:project), Factory(:institution))
-    s1 = Factory(:subscribable, projects: person.projects, policy: Factory(:public_policy), contributor:person)
-    s2 = Factory(:subscribable, projects: person.projects, policy: Factory(:public_policy), contributor:person)
+    User.current_user = FactoryBot.create(:user)
+    proj = FactoryBot.create(:project)
+    person = FactoryBot.create(:person,project:proj)
+    person.add_to_project_and_institution(FactoryBot.create(:project), FactoryBot.create(:institution))
+    s1 = FactoryBot.create(:subscribable, projects: person.projects, policy: FactoryBot.create(:public_policy), contributor:person)
+    s2 = FactoryBot.create(:subscribable, projects: person.projects, policy: FactoryBot.create(:public_policy), contributor:person)
 
-    a_person = Factory(:person)
+    a_person = FactoryBot.create(:person)
     assert !s1.subscribed?(a_person)
     assert !s2.subscribed?(a_person)
 

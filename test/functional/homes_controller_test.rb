@@ -110,7 +110,7 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test 'SOP upload option should be capitalized' do
-    login_as(Factory(:person))
+    login_as(FactoryBot.create(:person))
     get :index
     assert_select 'li#create-menu ul.dropdown-menu', count: 1 do
       assert_select 'li>a', text: I18n.t('sop').to_s, count: 1
@@ -118,7 +118,7 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test 'hidden items do not appear in recent items' do
-    model = Factory :model, policy: Factory(:private_policy), title: 'A title'
+    model = FactoryBot.create :model, policy: FactoryBot.create(:private_policy), title: 'A title'
 
     login_as(:quentin)
     get :index
@@ -132,7 +132,7 @@ class HomesControllerTest < ActionController::TestCase
     get :index
     assert_redirected_to signup_path
 
-    Factory(:user)
+    FactoryBot.create(:user)
     get :index
     assert_response :success
   end
@@ -187,10 +187,10 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test 'project default icon shown in recent contributions' do
-    project = Factory(:project)
+    project = FactoryBot.create(:project)
 
     assert_difference 'ActivityLog.count' do
-      Factory :activity_log, activity_loggable: project, controller_name: 'projects', culprit: Factory(:user)
+      FactoryBot.create :activity_log, activity_loggable: project, controller_name: 'projects', culprit: FactoryBot.create(:user)
     end
 
     get :index
@@ -225,11 +225,11 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test 'recently added should include data_file' do
-    person = Factory(:person_in_project)
+    person = FactoryBot.create(:person_in_project)
 
-    df = Factory :data_file, title: 'A new data file', contributor: person, policy: Factory(:public_policy)
+    df = FactoryBot.create :data_file, title: 'A new data file', contributor: person, policy: FactoryBot.create(:public_policy)
     assert_difference 'ActivityLog.count' do
-      Factory :activity_log, activity_loggable: df, controller_name: 'data_files', culprit: person.user
+      FactoryBot.create :activity_log, activity_loggable: df, controller_name: 'data_files', culprit: person.user
     end
 
     get :index
@@ -238,10 +238,10 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test 'recently added should include presentations' do
-    person = Factory(:person_in_project)
+    person = FactoryBot.create(:person_in_project)
 
-    presentation = Factory :presentation, title: 'A new presentation', contributor: person, policy: Factory(:public_policy)
-    Factory :activity_log, activity_loggable: presentation, controller_name: 'presentations', culprit: person.user
+    presentation = FactoryBot.create :presentation, title: 'A new presentation', contributor: person, policy: FactoryBot.create(:public_policy)
+    FactoryBot.create :activity_log, activity_loggable: presentation, controller_name: 'presentations', culprit: person.user
 
     get :index
     assert_response :success
@@ -249,12 +249,12 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test 'recently added and download should include snapshot' do
-    person = Factory(:person)
-    snapshot1 = Factory(:investigation, policy: Factory(:publicly_viewable_policy), title: 'inv with snap', contributor: person).create_snapshot
-    snapshot2 = Factory(:assay, policy: Factory(:publicly_viewable_policy), title: 'assay with snap', contributor: person).create_snapshot
+    person = FactoryBot.create(:person)
+    snapshot1 = FactoryBot.create(:investigation, policy: FactoryBot.create(:publicly_viewable_policy), title: 'inv with snap', contributor: person).create_snapshot
+    snapshot2 = FactoryBot.create(:assay, policy: FactoryBot.create(:publicly_viewable_policy), title: 'assay with snap', contributor: person).create_snapshot
     assert_difference 'ActivityLog.count', 2 do
-      Factory(:activity_log, action: 'create', activity_loggable: snapshot1, created_at: 1.day.ago, culprit: person.user)
-      Factory(:activity_log, action: 'download', activity_loggable: snapshot2, created_at: 1.day.ago, culprit: person.user)
+      FactoryBot.create(:activity_log, action: 'create', activity_loggable: snapshot1, created_at: 1.day.ago, culprit: person.user)
+      FactoryBot.create(:activity_log, action: 'download', activity_loggable: snapshot2, created_at: 1.day.ago, culprit: person.user)
     end
 
     get :index
@@ -265,7 +265,7 @@ class HomesControllerTest < ActionController::TestCase
   test 'should show headline announcement' do
     SiteAnnouncement.destroy_all
     login_as :aaron
-    ann = Factory :headline_announcement
+    ann = FactoryBot.create :headline_announcement
 
     get :index
     assert_response :success
@@ -290,7 +290,7 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test 'should show external search when logged in' do
-    login_as Factory(:user)
+    login_as FactoryBot.create(:user)
     with_config_value :solr_enabled, true do
       with_config_value :external_search_enabled, true do
         get :index
@@ -301,7 +301,7 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test 'should not show external search when disabled' do
-    login_as Factory(:user)
+    login_as FactoryBot.create(:user)
     with_config_value :solr_enabled, true do
       with_config_value :external_search_enabled, false do
         get :index
@@ -321,7 +321,7 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test 'should show tag cloud according to config when logged in' do
-    login_as(Factory(:person))
+    login_as(FactoryBot.create(:person))
     get :index
     assert_select 'div#sidebar_tag_cloud', count: 1
     with_config_value :tagging_enabled, false do
@@ -331,9 +331,9 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test 'should display feed announcements when logged in' do
-    login_as(Factory(:person))
-    headline = Factory :headline_announcement, show_in_feed: false, title: 'a headline announcement'
-    feed = Factory :feed_announcement, show_in_feed: true, title: 'a feed announcement'
+    login_as(FactoryBot.create(:person))
+    headline = FactoryBot.create :headline_announcement, show_in_feed: false, title: 'a headline announcement'
+    feed = FactoryBot.create :feed_announcement, show_in_feed: true, title: 'a feed announcement'
     get :index
     assert_select 'div#announcement_gadget' do
       assert_select 'div.panel-body' do
@@ -360,18 +360,18 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test 'my recent contributions section works correctly' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
 
-    df = Factory :data_file, title: 'A new data file', contributor: person, policy: Factory(:public_policy)
-    sop = Factory :sop, title: 'A new sop', contributor: person, policy: Factory(:public_policy)
-    assay = Factory :assay, title: 'A new assay', contributor: person, policy: Factory(:public_policy)
+    df = FactoryBot.create :data_file, title: 'A new data file', contributor: person, policy: FactoryBot.create(:public_policy)
+    sop = FactoryBot.create :sop, title: 'A new sop', contributor: person, policy: FactoryBot.create(:public_policy)
+    assay = FactoryBot.create :assay, title: 'A new assay', contributor: person, policy: FactoryBot.create(:public_policy)
     snapshot = assay.create_snapshot
 
-    Factory :activity_log, activity_loggable: df, controller_name: 'data_files', culprit: person.user
-    Factory :activity_log, activity_loggable: sop, controller_name: 'sops', culprit: person.user
-    Factory :activity_log, activity_loggable: assay, controller_name: 'assays', culprit: person.user
-    Factory :activity_log, activity_loggable: snapshot, controller_name: 'snapshots', culprit: person.user
+    FactoryBot.create :activity_log, activity_loggable: df, controller_name: 'data_files', culprit: person.user
+    FactoryBot.create :activity_log, activity_loggable: sop, controller_name: 'sops', culprit: person.user
+    FactoryBot.create :activity_log, activity_loggable: assay, controller_name: 'assays', culprit: person.user
+    FactoryBot.create :activity_log, activity_loggable: snapshot, controller_name: 'snapshots', culprit: person.user
 
     get :index
     assert_response :success
@@ -383,7 +383,7 @@ class HomesControllerTest < ActionController::TestCase
     assert_select 'div#my-recent-contributions ul li a[href=?]', assay_snapshot_path(assay, snapshot), text: /A new assay/
 
     sop.update(title: 'An old sop')
-    Factory :activity_log, activity_loggable: sop, controller_name: 'assays', culprit: person.user, action: 'update'
+    FactoryBot.create :activity_log, activity_loggable: sop, controller_name: 'assays', culprit: person.user, action: 'update'
 
     get :index
     assert_response :success
@@ -461,10 +461,10 @@ class HomesControllerTest < ActionController::TestCase
 
   test "alert for pending project creation" do
     project = Project.new(title: "my project")
-    person = Factory(:person)
-    prog_admin = Factory(:programme_administrator)
+    person = FactoryBot.create(:person)
+    prog_admin = FactoryBot.create(:programme_administrator)
     programme = prog_admin.programmes.first
-    institution = Factory(:institution)
+    institution = FactoryBot.create(:institution)
 
     MessageLog.destroy_all
 
@@ -478,7 +478,7 @@ class HomesControllerTest < ActionController::TestCase
     get :index
     assert_select "div#pending-project-creation-warning", text: /There are pending/, count: 1
 
-    login_as(Factory(:person))
+    login_as(FactoryBot.create(:person))
 
     get :index
     assert_select "div#pending-project-creation-warning", text: /There are pending/, count: 0
@@ -503,9 +503,9 @@ class HomesControllerTest < ActionController::TestCase
 
   test 'can show workflow class list' do
     WorkflowClass.delete_all
-    Factory(:galaxy_workflow_class)
-    Factory(:cwl_workflow_class)
-    p = Factory(:person)
+    FactoryBot.create(:galaxy_workflow_class)
+    FactoryBot.create(:cwl_workflow_class)
+    p = FactoryBot.create(:person)
     disable_authorization_checks do
       WorkflowClass.create!(title: 'bla', contributor: p)
       WorkflowClass.create!(title: 'bla2', contributor: p)

@@ -6,26 +6,26 @@ class LicenseHelperTest < ActionView::TestCase
 
   test 'prompt for license' do
 
-    person = Factory(:person)
-    someone_else = Factory(:person)
+    person = FactoryBot.create(:person)
+    someone_else = FactoryBot.create(:person)
 
     User.with_current_user(person.user) do
-      sop = Factory(:sop, license: 'Apache-2.0', contributor: person)
+      sop = FactoryBot.create(:sop, license: 'Apache-2.0', contributor: person)
       assert_nil prompt_for_license(sop, sop.latest_version)
 
-      sop = Factory(:sop, license: nil, contributor: person)
+      sop = FactoryBot.create(:sop, license: nil, contributor: person)
       refute_nil text = prompt_for_license(sop, sop.latest_version)
       assert text =~ /Click here to choose a license/i
 
-      sop = Factory(:sop, license: 'notspecified', contributor: person)
+      sop = FactoryBot.create(:sop, license: 'notspecified', contributor: person)
       refute_nil text = prompt_for_license(sop, sop.latest_version)
       assert text =~ /Click here to choose a license/i
 
       # not the owner
-      sop = Factory(:sop, license: nil, contributor: someone_else)
+      sop = FactoryBot.create(:sop, license: nil, contributor: someone_else)
       assert_nil prompt_for_license(sop, sop.latest_version)
 
-      sop = Factory(:sop, license: 'notspecified', contributor: someone_else)
+      sop = FactoryBot.create(:sop, license: 'notspecified', contributor: someone_else)
       assert_nil prompt_for_license(sop, sop.latest_version)
     end
 

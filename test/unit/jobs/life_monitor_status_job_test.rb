@@ -13,10 +13,10 @@ class LifeMonitorStatusJobTest < ActiveSupport::TestCase
   test 'perform' do
     VCR.use_cassette('life_monitor/get_token') do
       VCR.use_cassette('life_monitor/list_workflows') do
-        workflow = Factory(:workflow_with_tests, policy: Factory(:public_policy), uuid: '1493b330-d44b-013a-df8a-000c29a94011', title: 'sort-and-change-case')
-        all_failing = Factory(:workflow_with_tests, policy: Factory(:public_policy), uuid: '86da0a30-d2cd-013a-a07d-000c29a94011', title: 'Concat two files')
+        workflow = FactoryBot.create(:workflow_with_tests, policy: FactoryBot.create(:public_policy), uuid: '1493b330-d44b-013a-df8a-000c29a94011', title: 'sort-and-change-case')
+        all_failing = FactoryBot.create(:workflow_with_tests, policy: FactoryBot.create(:public_policy), uuid: '86da0a30-d2cd-013a-a07d-000c29a94011', title: 'Concat two files')
         disable_authorization_checks do
-          Factory(:ro_crate_with_tests, asset_version: 2, asset: workflow)
+          FactoryBot.create(:ro_crate_with_tests, asset_version: 2, asset: workflow)
           workflow.save_as_new_version
         end
         some_passing = workflow.find_version(1)
@@ -39,8 +39,8 @@ class LifeMonitorStatusJobTest < ActiveSupport::TestCase
   test 'perform for git workflow' do
     VCR.use_cassette('life_monitor/get_token') do
       VCR.use_cassette('life_monitor/list_workflows') do
-        workflow = Factory(:ro_crate_git_workflow_with_tests, uuid: '1493b330-d44b-013a-df8a-000c29a94011', title: 'sort-and-change-case', policy: Factory(:public_policy))
-        all_failing = Factory(:local_ro_crate_git_workflow_with_tests, uuid: '86da0a30-d2cd-013a-a07d-000c29a94011', title: 'Concat two files', policy: Factory(:public_policy))
+        workflow = FactoryBot.create(:ro_crate_git_workflow_with_tests, uuid: '1493b330-d44b-013a-df8a-000c29a94011', title: 'sort-and-change-case', policy: FactoryBot.create(:public_policy))
+        all_failing = FactoryBot.create(:local_ro_crate_git_workflow_with_tests, uuid: '86da0a30-d2cd-013a-a07d-000c29a94011', title: 'Concat two files', policy: FactoryBot.create(:public_policy))
         disable_authorization_checks do
           workflow.save_as_new_git_version
         end

@@ -2,7 +2,7 @@ require 'test_helper'
 
 class BioSchemaTest < ActiveSupport::TestCase
   test 'supported?' do
-    p = Factory(:person)
+    p = FactoryBot.create(:person)
     not_supported = unsupported_type
 
     assert Seek::BioSchema::Serializer.supported?(p)
@@ -17,7 +17,7 @@ class BioSchemaTest < ActiveSupport::TestCase
   end
 
   test 'person wrapper test' do
-    p = Factory(:person, first_name: 'Bob', last_name: 'Monkhouse', description: 'I am a person', avatar: Factory(:avatar))
+    p = FactoryBot.create(:person, first_name: 'Bob', last_name: 'Monkhouse', description: 'I am a person', avatar: FactoryBot.create(:avatar))
     refute_nil p.avatar
     wrapper = Seek::BioSchema::ResourceDecorators::Person.new(p)
     assert_equal p.id, wrapper.id
@@ -29,8 +29,8 @@ class BioSchemaTest < ActiveSupport::TestCase
   end
 
   test 'person json_ld' do
-    p = Factory(:person, first_name: 'Bob', last_name: 'Monkhouse',
-                         description: 'I am a person', avatar: Factory(:avatar),
+    p = FactoryBot.create(:person, first_name: 'Bob', last_name: 'Monkhouse',
+                         description: 'I am a person', avatar: FactoryBot.create(:avatar),
                          web_page: 'http://me.com')
     project = p.projects.first
     refute_nil project
@@ -58,8 +58,8 @@ class BioSchemaTest < ActiveSupport::TestCase
   end
 
   test 'sanitize values' do
-    p = Factory(:person, first_name: 'Mr <script>bob</script>', last_name: "Monk'house",
-                         description: 'I am a <script>person</script>', avatar: Factory(:avatar),
+    p = FactoryBot.create(:person, first_name: 'Mr <script>bob</script>', last_name: "Monk'house",
+                         description: 'I am a <script>person</script>', avatar: FactoryBot.create(:avatar),
                          web_page: 'http://me.com?q=fish')
     p.projects.first.update_attribute(:title, 'The <script>sane</script> project')
     json = Seek::BioSchema::Serializer.new(p).json_ld
@@ -79,12 +79,12 @@ class BioSchemaTest < ActiveSupport::TestCase
   end
 
   test 'project json ld' do
-    project = Factory(:project, title: 'my project', description: 'i am a project', avatar: Factory(:avatar), web_page: 'http://project.com')
-    member = Factory(:person)
-    member.add_to_project_and_institution(project, Factory(:institution))
+    project = FactoryBot.create(:project, title: 'my project', description: 'i am a project', avatar: FactoryBot.create(:avatar), web_page: 'http://project.com')
+    member = FactoryBot.create(:person)
+    member.add_to_project_and_institution(project, FactoryBot.create(:institution))
 
-    member2 = Factory(:person)
-    member2.add_to_project_and_institution(project, Factory(:institution))
+    member2 = FactoryBot.create(:person)
+    member2.add_to_project_and_institution(project, FactoryBot.create(:institution))
 
     refute_nil project.avatar
     json = Seek::BioSchema::Serializer.new(project).json_ld
@@ -107,14 +107,14 @@ class BioSchemaTest < ActiveSupport::TestCase
     assert_equal expected, member_json[1]
 
     # project with no webpage, just to check the default url
-    project = Factory(:project)
+    project = FactoryBot.create(:project)
     json = Seek::BioSchema::Serializer.new(project).json_ld
     json = JSON.parse(json)
     assert_equal "http://localhost:3000/projects/#{project.id}", json['url']
   end
 
   test 'resource wrapper factory' do
-    wrapper = Seek::BioSchema::ResourceDecorators::Factory.instance.get(Factory(:person))
+    wrapper = Seek::BioSchema::ResourceDecorators::Factory.instance.get(FactoryBot.create(:person))
     assert wrapper.is_a?(Seek::BioSchema::ResourceDecorators::Person)
 
     assert_raise Seek::BioSchema::UnsupportedTypeException do
@@ -123,7 +123,7 @@ class BioSchemaTest < ActiveSupport::TestCase
   end
 
   test 'collection json_ld' do
-    p = Factory(:max_collection)
+    p = FactoryBot.create(:max_collection)
     json = Seek::BioSchema::Serializer.new(p).json_ld
     json = JSON.parse(json)
     assert_equal "http://localhost:3000/collections/#{p.id}", json['@id']
@@ -134,6 +134,6 @@ class BioSchemaTest < ActiveSupport::TestCase
 
   # an instance of a model that doesn't support bio_schema / schema
   def unsupported_type
-    Factory(:investigation)
+    FactoryBot.create(:investigation)
   end
 end

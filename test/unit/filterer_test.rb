@@ -62,11 +62,11 @@ class FiltererTest < ActiveSupport::TestCase
 
   test 'get available filters' do
     assert_equal 0, Document.count
-    project = Factory(:project)
-    project_doc = Factory(:document, created_at: 3.days.ago, projects: [project])
-    old_project_doc = Factory(:document, created_at: 10.years.ago, projects: [project])
-    other_project = Factory(:project)
-    other_project_doc = Factory(:document, created_at: 3.days.ago, projects: [other_project])
+    project = FactoryBot.create(:project)
+    project_doc = FactoryBot.create(:document, created_at: 3.days.ago, projects: [project])
+    old_project_doc = FactoryBot.create(:document, created_at: 10.years.ago, projects: [project])
+    other_project = FactoryBot.create(:project)
+    other_project_doc = FactoryBot.create(:document, created_at: 3.days.ago, projects: [other_project])
 
     document_filterer = Seek::Filterer.new(Document)
 
@@ -114,11 +114,11 @@ class FiltererTest < ActiveSupport::TestCase
 
   test 'perform filtering' do
     assert_equal 0, Document.count
-    project = Factory(:project)
-    project_doc = Factory(:private_document, created_at: 3.days.ago, projects: [project])
-    old_project_doc = Factory(:public_document, created_at: 10.years.ago, projects: [project])
-    other_project = Factory(:project)
-    other_project_doc = Factory(:public_document, created_at: 3.days.ago, projects: [other_project])
+    project = FactoryBot.create(:project)
+    project_doc = FactoryBot.create(:private_document, created_at: 3.days.ago, projects: [project])
+    old_project_doc = FactoryBot.create(:public_document, created_at: 10.years.ago, projects: [project])
+    other_project = FactoryBot.create(:project)
+    other_project_doc = FactoryBot.create(:public_document, created_at: 3.days.ago, projects: [other_project])
 
     document_filterer = Seek::Filterer.new(Document)
 

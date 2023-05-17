@@ -3,12 +3,12 @@ require 'test_helper'
 class GitRepositoryTest < ActiveSupport::TestCase
 
   test 'init local repo' do
-    repo = Factory(:local_repository)
+    repo = FactoryBot.create(:local_repository)
     assert File.exist?(File.join(repo.local_path, '.git', 'config'))
   end
 
   test 'fetch remote' do
-    repo = Factory(:remote_repository)
+    repo = FactoryBot.create(:remote_repository)
     RemoteGitFetchJob.perform_now(repo)
     remote = repo.git_base.remotes.first
 
@@ -20,7 +20,7 @@ class GitRepositoryTest < ActiveSupport::TestCase
   end
 
   test "don't fetch if recently fetched" do
-    repo = Factory(:remote_repository, last_fetch: 5.minutes.ago)
+    repo = FactoryBot.create(:remote_repository, last_fetch: 5.minutes.ago)
     assert_no_difference('Task.count') do
       assert_no_enqueued_jobs(only: RemoteGitFetchJob) do
         repo.queue_fetch
@@ -29,7 +29,7 @@ class GitRepositoryTest < ActiveSupport::TestCase
   end
 
   test "fetch even if recently fetched with force option set" do
-    repo = Factory(:remote_repository, last_fetch: 5.minutes.ago)
+    repo = FactoryBot.create(:remote_repository, last_fetch: 5.minutes.ago)
     assert_difference('Task.count', 1) do
       assert_enqueued_jobs(1, only: RemoteGitFetchJob) do
         repo.queue_fetch(true)
@@ -38,7 +38,7 @@ class GitRepositoryTest < ActiveSupport::TestCase
   end
 
   test "fetch if not recently fetched" do
-    repo = Factory(:remote_repository, last_fetch: 30.minutes.ago)
+    repo = FactoryBot.create(:remote_repository, last_fetch: 30.minutes.ago)
     assert_difference('Task.count', 1) do
       assert_enqueued_jobs(1, only: RemoteGitFetchJob) do
         repo.queue_fetch
@@ -48,7 +48,7 @@ class GitRepositoryTest < ActiveSupport::TestCase
 
   test 'redundant repositories' do
     redundant = Git::Repository.create!
-    not_redundant = Factory(:git_version).git_repository
+    not_redundant = FactoryBot.create(:git_version).git_repository
 
     repositories = Git::Repository.redundant.to_a
 

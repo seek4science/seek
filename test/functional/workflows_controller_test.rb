@@ -7,12 +7,12 @@ class WorkflowsControllerTest < ActionController::TestCase
   include GeneralAuthorizationTestCases
 
   def setup
-    login_as Factory(:user)
+    login_as FactoryBot.create(:user)
     @project = User.current_user.person.projects.first
   end
 
   test 'should return 406 when requesting RDF' do
-    wf = Factory :workflow, contributor: User.current_user.person
+    wf = FactoryBot.create :workflow, contributor: User.current_user.person
     assert wf.can_view?
 
     get :show, params: { id: wf, format: :rdf }
@@ -21,9 +21,9 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'index' do
-    Factory(:public_workflow, test_status: :all_passing)
-    Factory(:public_workflow, test_status: :all_failing)
-    Factory(:public_workflow, test_status: :some_passing)
+    FactoryBot.create(:public_workflow, test_status: :all_passing)
+    FactoryBot.create(:public_workflow, test_status: :all_failing)
+    FactoryBot.create(:public_workflow, test_status: :some_passing)
     get :index
     assert_response :success
     assert_not_nil assigns(:workflows)
@@ -31,7 +31,7 @@ class WorkflowsControllerTest < ActionController::TestCase
 
   test 'can create with valid url' do
     mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png", 'http://somewhere.com/piccy.png'
-    workflow_attrs = Factory.attributes_for(:workflow, project_ids: [@project.id])
+    workflow_attrs = FactoryBot.attributes_for(:workflow, project_ids: [@project.id])
 
     assert_difference 'Workflow.count' do
       post :create, params: { workflow: workflow_attrs, content_blobs: [{ data_url: 'http://somewhere.com/piccy.png', data: nil }], sharing: valid_sharing }
@@ -39,7 +39,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'can create with local file' do
-    workflow_attrs = Factory.attributes_for(:workflow,
+    workflow_attrs = FactoryBot.attributes_for(:workflow,
                                             contributor: User.current_user.person,
                                             project_ids: [@project.id])
 
@@ -51,21 +51,21 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'can edit' do
-    workflow = Factory :workflow, contributor: User.current_user.person
+    workflow = FactoryBot.create :workflow, contributor: User.current_user.person
 
     get :edit, params: { id: workflow }
     assert_response :success
   end
 
   test 'can update' do
-    workflow = Factory :workflow, contributor: User.current_user.person
+    workflow = FactoryBot.create :workflow, contributor: User.current_user.person
     post :update, params: { id: workflow, workflow: { title: 'updated' } }
     assert_redirected_to workflow_path(workflow)
   end
 
   test 'can upload new version with valid url' do
     mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png", 'http://somewhere.com/piccy.png'
-    workflow = Factory :workflow, contributor: User.current_user.person
+    workflow = FactoryBot.create :workflow, contributor: User.current_user.person
 
     assert_difference 'workflow.version' do
       post :create_version, params: { id: workflow, workflow: {}, content_blobs: [{ data_url: 'http://somewhere.com/piccy.png' }] }
@@ -76,8 +76,8 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'can upload new version with valid filepath' do
-    # by default, valid data_url is provided by content_blob in Factory
-    workflow = Factory :workflow, contributor: User.current_user.person
+    # by default, valid data_url is provided by content_blob in FactoryBot
+    workflow = FactoryBot.create :workflow, contributor: User.current_user.person
     workflow.content_blob.url = nil
     workflow.content_blob.data = file_for_upload
     workflow.reload
@@ -93,7 +93,7 @@ class WorkflowsControllerTest < ActionController::TestCase
 
   test 'cannot upload file with invalid url' do
     stub_request(:head, 'http://www.blah.de/images/logo.png').to_raise(SocketError)
-    workflow_attrs = Factory.build(:workflow, contributor: User.current_user.person).attributes # .symbolize_keys(turn string key to symbol)
+    workflow_attrs = FactoryBot.build(:workflow, contributor: User.current_user.person).attributes # .symbolize_keys(turn string key to symbol)
 
     assert_no_difference 'Workflow.count' do
       post :create, params: { workflow: workflow_attrs, content_blobs: [{ data_url: 'http://www.blah.de/images/logo.png' }] }
@@ -103,7 +103,7 @@ class WorkflowsControllerTest < ActionController::TestCase
 
   test 'cannot upload new version with invalid url' do
     stub_request(:any, 'http://www.blah.de/images/liver-illustration.png').to_raise(SocketError)
-    workflow = Factory :workflow, contributor: User.current_user.person
+    workflow = FactoryBot.create :workflow, contributor: User.current_user.person
     new_data_url = 'http://www.blah.de/images/liver-illustration.png'
     assert_no_difference 'workflow.version' do
       post :create_version, params: { id: workflow, workflow: {}, content_blobs: [{ data_url: new_data_url }] }
@@ -114,7 +114,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'can destroy' do
-    workflow = Factory :workflow, contributor: User.current_user.person
+    workflow = FactoryBot.create :workflow, contributor: User.current_user.person
     content_blob_id = workflow.content_blob.id
     assert_difference('Workflow.count', -1) do
       delete :destroy, params: { id: workflow }
@@ -126,7 +126,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'can subscribe' do
-    workflow = Factory :workflow, contributor: User.current_user.person
+    workflow = FactoryBot.create :workflow, contributor: User.current_user.person
     assert_difference 'workflow.subscriptions.count' do
       workflow.subscribed = true
       workflow.save
@@ -134,17 +134,17 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'update tags with ajax' do
-    p = Factory :person
+    p = FactoryBot.create :person
 
     login_as p.user
 
-    p2 = Factory :person
-    workflow = Factory :workflow, contributor: p
+    p2 = FactoryBot.create :person
+    workflow = FactoryBot.create :workflow, contributor: p
 
     assert workflow.annotations.empty?, 'this workflow should have no tags for the test'
 
-    golf = Factory :tag, annotatable: workflow, source: p2.user, value: 'golf'
-    Factory :tag, annotatable: workflow, source: p2.user, value: 'sparrow'
+    golf = FactoryBot.create :tag, annotatable: workflow, source: p2.user, value: 'golf'
+    FactoryBot.create :tag, annotatable: workflow, source: p2.user, value: 'sparrow'
 
     workflow.reload
 
@@ -162,8 +162,8 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'should set the other creators ' do
-    user = Factory(:user)
-    workflow = Factory(:workflow, contributor: user.person)
+    user = FactoryBot.create(:user)
+    workflow = FactoryBot.create(:workflow, contributor: user.person)
     login_as(user)
     assert workflow.can_manage?, 'The workflow must be manageable for this test to succeed'
     put :update, params: { id: workflow, workflow: { other_creators: 'marry queen' } }
@@ -172,13 +172,13 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'should show the other creators on the workflow index' do
-    Factory(:workflow, policy: Factory(:public_policy), other_creators: 'another creator')
+    FactoryBot.create(:workflow, policy: FactoryBot.create(:public_policy), other_creators: 'another creator')
     get :index
     assert_select 'p.list_item_attribute', text: /: another creator/, count: 1
   end
 
   test 'should show the other creators in -uploader and creators- box' do
-    workflow = Factory(:workflow, policy: Factory(:public_policy), other_creators: 'another creator')
+    workflow = FactoryBot.create(:workflow, policy: FactoryBot.create(:public_policy), other_creators: 'another creator')
     get :show, params: { id: workflow }
     assert_select '#author-box .additional-credit', text: 'another creator', count: 1
   end
@@ -186,14 +186,14 @@ class WorkflowsControllerTest < ActionController::TestCase
   test 'filter by people, including creators, using nested routes' do
     assert_routing 'people/7/workflows', controller: 'workflows', action: 'index', person_id: '7'
 
-    person1 = Factory(:person)
-    person2 = Factory(:person)
+    person1 = FactoryBot.create(:person)
+    person2 = FactoryBot.create(:person)
 
-    pres1 = Factory(:workflow, contributor: person1, policy: Factory(:public_policy))
-    pres2 = Factory(:workflow, contributor: person2, policy: Factory(:public_policy))
+    pres1 = FactoryBot.create(:workflow, contributor: person1, policy: FactoryBot.create(:public_policy))
+    pres2 = FactoryBot.create(:workflow, contributor: person2, policy: FactoryBot.create(:public_policy))
 
-    pres3 = Factory(:workflow, contributor: Factory(:person), creators: [person1], policy: Factory(:public_policy))
-    pres4 = Factory(:workflow, contributor: Factory(:person), creators: [person2], policy: Factory(:public_policy))
+    pres3 = FactoryBot.create(:workflow, contributor: FactoryBot.create(:person), creators: [person1], policy: FactoryBot.create(:public_policy))
+    pres4 = FactoryBot.create(:workflow, contributor: FactoryBot.create(:person), creators: [person2], policy: FactoryBot.create(:public_policy))
 
     get :index, params: { person_id: person1.id }
     assert_response :success
@@ -208,7 +208,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'should display null license text' do
-    workflow = Factory :workflow, policy: Factory(:public_policy)
+    workflow = FactoryBot.create :workflow, policy: FactoryBot.create(:public_policy)
 
     get :show, params: { id: workflow }
 
@@ -216,7 +216,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'should display license' do
-    workflow = Factory :workflow, license: 'CC-BY-4.0', policy: Factory(:public_policy)
+    workflow = FactoryBot.create :workflow, license: 'CC-BY-4.0', policy: FactoryBot.create(:public_policy)
 
     get :show, params: { id: workflow }
 
@@ -224,8 +224,8 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'should display license for current version' do
-    workflow = Factory :workflow, license: 'CC-BY-4.0', policy: Factory(:public_policy)
-    workflowv = Factory :workflow_version_with_blob, workflow: workflow
+    workflow = FactoryBot.create :workflow, license: 'CC-BY-4.0', policy: FactoryBot.create(:public_policy)
+    workflowv = FactoryBot.create :workflow_version_with_blob, workflow: workflow
 
     workflow.update license: 'CC0-1.0'
 
@@ -239,9 +239,9 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'should update license' do
-    user = Factory(:person).user
+    user = FactoryBot.create(:person).user
     login_as(user)
-    workflow = Factory :workflow, policy: Factory(:public_policy), contributor: user.person
+    workflow = FactoryBot.create :workflow, policy: FactoryBot.create(:public_policy), contributor: user.person
 
     assert_nil workflow.license
 
@@ -256,10 +256,10 @@ class WorkflowsControllerTest < ActionController::TestCase
 
   test 'programme workflows through nested routing' do
     assert_routing 'programmes/2/workflows', controller: 'workflows', action: 'index', programme_id: '2'
-    programme = Factory(:programme, projects: [@project])
+    programme = FactoryBot.create(:programme, projects: [@project])
     assert_equal [@project], programme.projects
-    workflow = Factory(:workflow, policy: Factory(:public_policy), contributor:User.current_user.person)
-    workflow2 = Factory(:workflow, policy: Factory(:public_policy))
+    workflow = FactoryBot.create(:workflow, policy: FactoryBot.create(:public_policy), contributor:User.current_user.person)
+    workflow2 = FactoryBot.create(:workflow, policy: FactoryBot.create(:public_policy))
 
     get :index, params: { programme_id: programme.id }
 
@@ -275,8 +275,8 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'can access manage page with manage rights' do
-    person = Factory(:person)
-    workflow = Factory(:workflow, contributor:person)
+    person = FactoryBot.create(:person)
+    workflow = FactoryBot.create(:workflow, contributor:person)
     login_as(person)
     assert workflow.can_manage?
     get :manage, params: {id: workflow}
@@ -295,8 +295,8 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'cannot access manage page with edit rights' do
-    person = Factory(:person)
-    workflow = Factory(:workflow, policy:Factory(:private_policy, permissions:[Factory(:permission, contributor:person, access_type:Policy::EDITING)]))
+    person = FactoryBot.create(:person)
+    workflow = FactoryBot.create(:workflow, policy:FactoryBot.create(:private_policy, permissions:[FactoryBot.create(:permission, contributor:person, access_type:Policy::EDITING)]))
     login_as(person)
     assert workflow.can_edit?
     refute workflow.can_manage?
@@ -306,17 +306,17 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'manage_update' do
-    proj1=Factory(:project)
-    proj2=Factory(:project)
-    person = Factory(:person,project:proj1)
-    other_person = Factory(:person)
+    proj1=FactoryBot.create(:project)
+    proj2=FactoryBot.create(:project)
+    person = FactoryBot.create(:person,project:proj1)
+    other_person = FactoryBot.create(:person)
     person.add_to_project_and_institution(proj2,person.institutions.first)
     person.save!
-    other_creator = Factory(:person,project:proj1)
+    other_creator = FactoryBot.create(:person,project:proj1)
     other_creator.add_to_project_and_institution(proj2,other_creator.institutions.first)
     other_creator.save!
 
-    workflow = Factory(:workflow, contributor:person, projects:[proj1], policy:Factory(:private_policy))
+    workflow = FactoryBot.create(:workflow, contributor:person, projects:[proj1], policy:FactoryBot.create(:private_policy))
 
     login_as(person)
     assert workflow.can_manage?
@@ -342,20 +342,20 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'manage_update fails without manage rights' do
-    proj1=Factory(:project)
-    proj2=Factory(:project)
-    person = Factory(:person, project:proj1)
+    proj1=FactoryBot.create(:project)
+    proj2=FactoryBot.create(:project)
+    person = FactoryBot.create(:person, project:proj1)
     person.add_to_project_and_institution(proj2,person.institutions.first)
     person.save!
 
-    other_person = Factory(:person)
+    other_person = FactoryBot.create(:person)
 
-    other_creator = Factory(:person,project:proj1)
+    other_creator = FactoryBot.create(:person,project:proj1)
     other_creator.add_to_project_and_institution(proj2,other_creator.institutions.first)
     other_creator.save!
 
-    workflow = Factory(:workflow, projects:[proj1], policy:Factory(:private_policy,
-                                                                   permissions:[Factory(:permission,contributor:person, access_type:Policy::EDITING)]))
+    workflow = FactoryBot.create(:workflow, projects:[proj1], policy:FactoryBot.create(:private_policy,
+                                                                   permissions:[FactoryBot.create(:permission,contributor:person, access_type:Policy::EDITING)]))
 
     login_as(person)
     refute workflow.can_manage?
@@ -384,8 +384,8 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'create content blob' do
-    cwl = Factory(:cwl_workflow_class)
-    person = Factory(:person)
+    cwl = FactoryBot.create(:cwl_workflow_class)
+    person = FactoryBot.create(:person)
     login_as(person)
     assert_difference('ContentBlob.count') do
       post :create_content_blob, params: {
@@ -398,7 +398,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'create content blob requires login' do
-    cwl = Factory(:cwl_workflow_class)
+    cwl = FactoryBot.create(:cwl_workflow_class)
 
     logout
     assert_no_difference('ContentBlob.count') do
@@ -410,8 +410,8 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'create RO-Crate with local content' do
-    cwl = Factory(:cwl_workflow_class)
-    person = Factory(:person)
+    cwl = FactoryBot.create(:cwl_workflow_class)
+    person = FactoryBot.create(:person)
     login_as(person)
     assert_difference('ContentBlob.count') do
       post :create_ro_crate, params: {
@@ -429,7 +429,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'extract metadata' do
-    cwl = Factory(:cwl_workflow_class)
+    cwl = FactoryBot.create(:cwl_workflow_class)
     post :create_content_blob, params: { content_blobs: [{ data: fixture_file_upload('workflows/rp2-to-rp2path-packed.cwl', 'text/plain') }], workflow_class_id: cwl.id }
     assert_response :success
     assert_equal 5, assigns[:metadata][:internals][:inputs].length
@@ -437,7 +437,7 @@ class WorkflowsControllerTest < ActionController::TestCase
 
   test 'extract metadata from remote should perform inline and cancel remote content fetch job' do
     mock_remote_file "#{Rails.root}/test/fixtures/files/workflows/rp2-to-rp2path-packed.cwl", 'https://www.abc.com/workflow.cwl'
-    cwl = Factory(:cwl_workflow_class)
+    cwl = FactoryBot.create(:cwl_workflow_class)
     post :create_content_blob, params: { content_blobs: [{ data_url: 'https://www.abc.com/workflow.cwl' }], workflow_class_id: cwl.id }
     assert assigns(:content_blob).reload.remote_content_fetch_task.cancelled?
     assert_response :success
@@ -445,7 +445,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'cannot see diagram of private workflow' do
-    wf = Factory(:cwl_workflow)
+    wf = FactoryBot.create(:cwl_workflow)
     refute wf.can_view?
 
     get :diagram, params: { id: wf.id }
@@ -454,7 +454,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'generates diagram' do
-    wf = Factory(:cwl_workflow)
+    wf = FactoryBot.create(:cwl_workflow)
     login_as(wf.contributor)
     refute wf.diagram_exists?
     assert wf.can_render_diagram?
@@ -467,7 +467,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'picks diagram from RO-Crate' do
-    wf = Factory(:existing_galaxy_ro_crate_workflow)
+    wf = FactoryBot.create(:existing_galaxy_ro_crate_workflow)
     login_as(wf.contributor)
     refute wf.diagram_exists?
     assert wf.can_render_diagram?
@@ -480,7 +480,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'generates diagram from CWL workflow in RO-Crate' do
-    wf = Factory(:just_cwl_ro_crate_workflow)
+    wf = FactoryBot.create(:just_cwl_ro_crate_workflow)
     login_as(wf.contributor)
     refute wf.diagram_exists?
     assert_nil wf.ro_crate.main_workflow_diagram
@@ -494,7 +494,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'generates diagram from abstract CWL in RO-Crate' do
-    wf = Factory(:generated_galaxy_no_diagram_ro_crate_workflow)
+    wf = FactoryBot.create(:generated_galaxy_no_diagram_ro_crate_workflow)
     login_as(wf.contributor)
     refute wf.diagram_exists?
     assert wf.can_render_diagram?
@@ -513,7 +513,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     end
 
     Seek::WorkflowExtractors::CwlDotGenerator.stub :new, bad_generator do
-      wf = Factory(:generated_galaxy_no_diagram_ro_crate_workflow)
+      wf = FactoryBot.create(:generated_galaxy_no_diagram_ro_crate_workflow)
       login_as(wf.contributor)
       refute wf.diagram_exists?
 
@@ -525,7 +525,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'does not render diagram if not in RO-Crate' do
-    wf = Factory(:nf_core_ro_crate_workflow)
+    wf = FactoryBot.create(:nf_core_ro_crate_workflow)
     login_as(wf.contributor)
     refute wf.diagram_exists?
     refute wf.can_render_diagram?
@@ -537,8 +537,8 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'should be able to handle spaces in filenames' do
-    cwl = Factory(:cwl_workflow_class)
-    person = Factory(:person)
+    cwl = FactoryBot.create(:cwl_workflow_class)
+    person = FactoryBot.create(:person)
     login_as(person)
     assert_difference('ContentBlob.count') do
       post :create_ro_crate, params: {
@@ -558,7 +558,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'downloads valid generated RO-Crate' do
-    workflow = Factory(:generated_galaxy_ro_crate_workflow, policy: Factory(:public_policy))
+    workflow = FactoryBot.create(:generated_galaxy_ro_crate_workflow, policy: FactoryBot.create(:public_policy))
 
     get :ro_crate, params: { id: workflow.id }
 
@@ -572,7 +572,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'downloads valid existing RO-Crate' do
-    workflow = Factory(:existing_galaxy_ro_crate_workflow, policy: Factory(:public_policy))
+    workflow = FactoryBot.create(:existing_galaxy_ro_crate_workflow, policy: FactoryBot.create(:public_policy))
 
     get :ro_crate, params: { id: workflow.id }
 
@@ -586,7 +586,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'downloads valid RO-Crate for single workflow file' do
-    workflow = Factory(:cwl_packed_workflow, policy: Factory(:public_policy))
+    workflow = FactoryBot.create(:cwl_packed_workflow, policy: FactoryBot.create(:public_policy))
 
     get :ro_crate, params: { id: workflow.id }
 
@@ -600,12 +600,12 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'downloads RO-Crate with metadata for correct version' do
-    workflow = Factory(:cwl_workflow, title: 'V1 title', description: 'V1 description',
-                       license: 'MIT', other_creators: 'Jane Smith, John Smith', policy: Factory(:public_policy))
+    workflow = FactoryBot.create(:cwl_workflow, title: 'V1 title', description: 'V1 description',
+                       license: 'MIT', other_creators: 'Jane Smith, John Smith', policy: FactoryBot.create(:public_policy))
     disable_authorization_checks do
       workflow.save_as_new_version
-      workflow.update(title: 'V2 title', description: 'V2 description', workflow_class_id: Factory(:galaxy_workflow_class).id)
-      Factory(:generated_galaxy_ro_crate, asset: workflow, asset_version: 2)
+      workflow.update(title: 'V2 title', description: 'V2 description', workflow_class_id: FactoryBot.create(:galaxy_workflow_class).id)
+      FactoryBot.create(:generated_galaxy_ro_crate, asset: workflow, asset_version: 2)
     end
 
     get :ro_crate, params: { id: workflow.id, version: 1 }
@@ -638,7 +638,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'downloads RO-Crate for git-versioned workflow' do
-    workflow = Factory(:remote_git_workflow, policy: Factory(:public_policy))
+    workflow = FactoryBot.create(:remote_git_workflow, policy: FactoryBot.create(:public_policy))
 
     get :ro_crate, params: { id: workflow.id }
 
@@ -652,7 +652,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'handles error when generating RO-Crate' do
-    workflow = Factory(:local_git_workflow, policy: Factory(:public_policy))
+    workflow = FactoryBot.create(:local_git_workflow, policy: FactoryBot.create(:public_policy))
     gv = workflow.latest_git_version
     disable_authorization_checks do
       gv.add_file('ro-crate-metadata.json', StringIO.new('{}'))
@@ -666,8 +666,8 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'create RO-Crate even with with duplicated filenames' do
-    cwl = Factory(:cwl_workflow_class)
-    person = Factory(:person)
+    cwl = FactoryBot.create(:cwl_workflow_class)
+    person = FactoryBot.create(:person)
     login_as(person)
     assert_difference('ContentBlob.count') do
       post :create_ro_crate, params: {
@@ -687,9 +687,9 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'should create with discussion link' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
-    blob = Factory(:content_blob)
+    blob = FactoryBot.create(:content_blob)
     session[:uploaded_content_blob_id] = blob.id
     workflow =  {title: 'workflow', project_ids: [person.projects.first.id], discussion_links_attributes:[{url: "http://www.slack.com/", label:'our slack'}]}
     assert_difference('AssetLink.discussion.count') do
@@ -704,8 +704,8 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'should show discussion link without label' do
-    asset_link = Factory(:discussion_link)
-    workflow = Factory(:workflow, discussion_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    asset_link = FactoryBot.create(:discussion_link)
+    workflow = FactoryBot.create(:workflow, discussion_links: [asset_link], policy: FactoryBot.create(:public_policy, access_type: Policy::VISIBLE))
     assert_equal [asset_link],workflow.discussion_links
     get :show, params: { id: workflow }
     assert_response :success
@@ -728,8 +728,8 @@ class WorkflowsControllerTest < ActionController::TestCase
 
 
   test 'should show discussion link with label' do
-    asset_link = Factory(:discussion_link, label:'discuss-label')
-    workflow = Factory(:workflow, discussion_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    asset_link = FactoryBot.create(:discussion_link, label:'discuss-label')
+    workflow = FactoryBot.create(:workflow, discussion_links: [asset_link], policy: FactoryBot.create(:public_policy, access_type: Policy::VISIBLE))
     get :show, params: { id: workflow }
     assert_response :success
     assert_select 'div.panel-heading', text: /Discussion Channel/, count: 1
@@ -739,8 +739,8 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'should update workflow with new discussion link' do
-    person = Factory(:person)
-    workflow = Factory(:workflow, contributor: person)
+    person = FactoryBot.create(:person)
+    workflow = FactoryBot.create(:workflow, contributor: person)
     login_as(person)
     assert_nil workflow.discussion_links.first
     assert_difference('AssetLink.discussion.count') do
@@ -754,8 +754,8 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'should update workflow with edited discussion link' do
-    person = Factory(:person)
-    workflow = Factory(:workflow, contributor: person, discussion_links:[Factory(:discussion_link)])
+    person = FactoryBot.create(:person)
+    workflow = FactoryBot.create(:workflow, contributor: person, discussion_links:[FactoryBot.create(:discussion_link)])
     login_as(person)
     assert_equal 1,workflow.discussion_links.count
     assert_no_difference('AssetLink.discussion.count') do
@@ -770,10 +770,10 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'should destroy related assetlink when the discussion link is removed ' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
-    asset_link = Factory(:discussion_link)
-    workflow = Factory(:workflow, discussion_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE), contributor: person)
+    asset_link = FactoryBot.create(:discussion_link)
+    workflow = FactoryBot.create(:workflow, discussion_links: [asset_link], policy: FactoryBot.create(:public_policy, access_type: Policy::VISIBLE), contributor: person)
     refute_empty workflow.discussion_links
     assert_difference('AssetLink.discussion.count', -1) do
       put :update, params: { id: workflow.id, workflow: { discussion_links_attributes:[{id:asset_link.id, _destroy:'1'}] } }
@@ -787,8 +787,8 @@ class WorkflowsControllerTest < ActionController::TestCase
     mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png", 'https://raw.githubusercontent.com/bob/workflow/master/diagram.png'
     mock_remote_file "#{Rails.root}/test/fixtures/files/workflows/rp2-to-rp2path-packed.cwl", 'https://raw.githubusercontent.com/bob/workflow/master/abstract.cwl'
 
-    cwl = Factory(:cwl_workflow_class)
-    person = Factory(:person)
+    cwl = FactoryBot.create(:cwl_workflow_class)
+    person = FactoryBot.create(:person)
     login_as(person)
     assert_difference('ContentBlob.count') do
       post :create_ro_crate, params: {
@@ -808,10 +808,10 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'create new version of a workflow' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
-    workflow = Factory(:workflow, contributor: person)
-    blob = Factory(:nf_core_ro_crate)
+    workflow = FactoryBot.create(:workflow, contributor: person)
+    blob = FactoryBot.create(:nf_core_ro_crate)
     session[:uploaded_content_blob_id] = blob.id
     workflow_params =  { title: 'workflow', project_ids: [person.projects.first.id] }
     assert_equal 1, workflow.version
@@ -834,7 +834,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png", 'https://raw.githubusercontent.com/bob/workflow/master/diagram.png'
     mock_remote_file "#{Rails.root}/test/fixtures/files/workflows/rp2-to-rp2path-packed.cwl", 'https://raw.githubusercontent.com/bob/workflow/master/abstract.cwl'
 
-    galaxy = Factory(:galaxy_workflow_class)
+    galaxy = FactoryBot.create(:galaxy_workflow_class)
     post :create_content_blob, params: { content_blobs: [{ data: fixture_file_upload('workflows/all_remote.crate.zip', 'application/zip') }], workflow_class_id: galaxy.id }
     assert_response :success
     assert_equal 5, assigns[:metadata][:internals][:inputs].length
@@ -843,13 +843,13 @@ class WorkflowsControllerTest < ActionController::TestCase
   test 'filter by test status' do
     w1, w2, w3 = nil
     disable_authorization_checks do
-      w1 = Factory(:public_workflow)
+      w1 = FactoryBot.create(:public_workflow)
       w1.save_as_new_version
       w1.update_test_status(:all_failing, 1)
       w1.update_test_status(:all_passing, 2)
-      w2 = Factory(:public_workflow)
+      w2 = FactoryBot.create(:public_workflow)
       w2.update_test_status(:all_failing)
-      w3 = Factory(:public_workflow)
+      w3 = FactoryBot.create(:public_workflow)
       w3.update_test_status(:some_passing)
     end
 
@@ -867,9 +867,9 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'should update workflow class ' do
-    g = Factory(:galaxy_workflow_class)
-    user = Factory(:user)
-    workflow = Factory(:cwl_workflow, contributor: user.person)
+    g = FactoryBot.create(:galaxy_workflow_class)
+    user = FactoryBot.create(:user)
+    workflow = FactoryBot.create(:cwl_workflow, contributor: user.person)
     login_as(user)
     assert workflow.can_manage?
 
@@ -892,7 +892,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'can get edit paths page' do
-    workflow = Factory(:git_version).resource
+    workflow = FactoryBot.create(:git_version).resource
     login_as(workflow.contributor)
 
     get :edit_paths, params: { id: workflow.id }
@@ -902,7 +902,7 @@ class WorkflowsControllerTest < ActionController::TestCase
 
   test 'cannot get edit paths page if not authorized' do
     logout
-    workflow = Factory(:git_version).resource
+    workflow = FactoryBot.create(:git_version).resource
 
     get :edit_paths, params: { id: workflow.id }
 
@@ -910,7 +910,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'can update paths' do
-    workflow = Factory(:git_version).resource
+    workflow = FactoryBot.create(:git_version).resource
     login_as(workflow.contributor)
 
     assert_equal 'Common Workflow Language', workflow.workflow_class.title
@@ -921,7 +921,7 @@ class WorkflowsControllerTest < ActionController::TestCase
       patch :update_paths, params: { id: workflow.id,
                                      git_version: { diagram_path: 'diagram.png',
                                                     main_workflow_path: 'concat_two_files.ga' },
-                                     workflow: { workflow_class_id: Factory(:galaxy_workflow_class).id } }
+                                     workflow: { workflow_class_id: FactoryBot.create(:galaxy_workflow_class).id } }
 
       assert_redirected_to workflow_path(workflow)
       workflow.reload
@@ -933,14 +933,14 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'cannot update paths if not authorized' do
-    workflow = Factory(:git_version).resource
+    workflow = FactoryBot.create(:git_version).resource
     logout
 
     assert_no_difference('Git::Annotation.count') do
       patch :update_paths, params: { id: workflow.id,
                                      git_version: { diagram_path: 'diagram.png',
                                                     main_workflow_path: 'concat_two_files.ga' },
-                                     workflow: { workflow_class_id: Factory(:galaxy_workflow_class).id } }
+                                     workflow: { workflow_class_id: FactoryBot.create(:galaxy_workflow_class).id } }
 
       assert_redirected_to workflow_path(workflow)
       assert flash[:error].include?('authorized')
@@ -948,7 +948,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'cannot update path to non-existent path' do
-    workflow = Factory(:git_version).resource
+    workflow = FactoryBot.create(:git_version).resource
     login_as(workflow.contributor)
 
     assert_equal 'Common Workflow Language', workflow.workflow_class.title
@@ -959,7 +959,7 @@ class WorkflowsControllerTest < ActionController::TestCase
       patch :update_paths, params: { id: workflow.id,
                                      git_version: { diagram_path: 'banananananana.png',
                                                     main_workflow_path: 'concat_two_files.ga' },
-                                     workflow: { workflow_class_id: Factory(:galaxy_workflow_class).id } }
+                                     workflow: { workflow_class_id: FactoryBot.create(:galaxy_workflow_class).id } }
 
       assert_response :unprocessable_entity
       assert assigns(:display_workflow).errors.added?(:"git_annotations.path", 'not found in repository')
@@ -970,7 +970,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'can update paths and extract metadata' do
-    workflow = Factory(:git_version).resource
+    workflow = FactoryBot.create(:git_version).resource
     login_as(workflow.contributor)
 
     assert_not_equal 'Concat two files', workflow.title
@@ -979,7 +979,7 @@ class WorkflowsControllerTest < ActionController::TestCase
       patch :update_paths, params: { id: workflow.id,
                                      git_version: { diagram_path: 'diagram.png',
                                                     main_workflow_path: 'concat_two_files.ga' },
-                                     workflow: { workflow_class_id: Factory(:galaxy_workflow_class).id },
+                                     workflow: { workflow_class_id: FactoryBot.create(:galaxy_workflow_class).id },
                                      extract_metadata: '1' }
 
       assert_response :success
@@ -990,9 +990,9 @@ class WorkflowsControllerTest < ActionController::TestCase
 
   test 'can update paths and extract metadata for remote, unfetched workflow' do
     mock_remote_file "#{Rails.root}/test/fixtures/files/workflows/rp2-to-rp2path-packed.cwl", 'https://www.abc.com/workflow.cwl'
-    cwl = Factory(:cwl_workflow_class)
+    cwl = FactoryBot.create(:cwl_workflow_class)
 
-    workflow = Factory(:git_version).resource
+    workflow = FactoryBot.create(:git_version).resource
     gv = workflow.git_version
     login_as(workflow.contributor)
 
@@ -1020,7 +1020,7 @@ class WorkflowsControllerTest < ActionController::TestCase
 
   test 'new version form for git-versioned workflow redirect to new_git_version' do
     with_config_value(:git_support_enabled, false) do
-      workflow = Factory(:git_version).resource
+      workflow = FactoryBot.create(:git_version).resource
       login_as(workflow.contributor)
 
       assert workflow.is_git_versioned?
@@ -1032,7 +1032,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'get new version form for non-git-versioned workflow' do
-    workflow = Factory(:workflow)
+    workflow = FactoryBot.create(:workflow)
     login_as(workflow.contributor)
 
     refute workflow.is_git_versioned?
@@ -1065,7 +1065,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'get new git version page for remote git repo' do
-    workflow = Factory(:remote_git_version).resource
+    workflow = FactoryBot.create(:remote_git_version).resource
     login_as(workflow.contributor)
 
     assert workflow.is_git_versioned?
@@ -1083,7 +1083,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'get new git version page for local git repo' do
-    workflow = Factory(:git_version).resource
+    workflow = FactoryBot.create(:git_version).resource
     login_as(workflow.contributor)
 
     assert workflow.is_git_versioned?
@@ -1100,7 +1100,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'should list files for git workflow' do
-    workflow = Factory(:local_git_workflow)
+    workflow = FactoryBot.create(:local_git_workflow)
     login_as(workflow.contributor)
     assert workflow.git_version.mutable?
 
@@ -1112,7 +1112,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'should disable Add File button if git version is immutable' do
-    workflow = Factory(:remote_git_workflow)
+    workflow = FactoryBot.create(:remote_git_workflow)
     login_as(workflow.contributor)
     refute workflow.git_version.mutable?
 
@@ -1135,8 +1135,8 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'json response code for missing version' do
-    user = Factory(:user)
-    workflow = Factory(:cwl_workflow, contributor: user.person)
+    user = FactoryBot.create(:user)
+    workflow = FactoryBot.create(:cwl_workflow, contributor: user.person)
     login_as(user)
 
     version = 999
@@ -1148,7 +1148,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     get :ro_crate, params: {id: workflow.id, version: version}, format: :json
     assert_response :not_found
 
-    workflow = Factory(:cwl_workflow, contributor: Factory(:person))
+    workflow = FactoryBot.create(:cwl_workflow, contributor: FactoryBot.create(:person))
     refute workflow.can_view?
 
     get :show, params: {id: workflow.id, version: version}, format: :json
@@ -1160,11 +1160,11 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'should update workflow annotations ' do
-    Factory(:topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.topics_controlled_vocab
-    Factory(:operations_controlled_vocab) unless SampleControlledVocab::SystemVocabs.operations_controlled_vocab
+    FactoryBot.create(:topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.topics_controlled_vocab
+    FactoryBot.create(:operations_controlled_vocab) unless SampleControlledVocab::SystemVocabs.operations_controlled_vocab
 
-    user = Factory(:user)
-    workflow = Factory(:cwl_workflow, contributor: user.person)
+    user = FactoryBot.create(:user)
+    workflow = FactoryBot.create(:cwl_workflow, contributor: user.person)
     login_as(user)
     assert workflow.can_manage?
 
@@ -1178,11 +1178,11 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'show annotations if set' do
-    Factory(:topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.topics_controlled_vocab
-    Factory(:operations_controlled_vocab) unless SampleControlledVocab::SystemVocabs.operations_controlled_vocab
+    FactoryBot.create(:topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.topics_controlled_vocab
+    FactoryBot.create(:operations_controlled_vocab) unless SampleControlledVocab::SystemVocabs.operations_controlled_vocab
 
-    user = Factory(:user)
-    workflow = Factory(:cwl_workflow, contributor: user.person)
+    user = FactoryBot.create(:user)
+    workflow = FactoryBot.create(:cwl_workflow, contributor: user.person)
     login_as(user)
 
     get :show, params: {id: workflow.id}
@@ -1203,11 +1203,11 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'should create with presentation and document links' do
-    person = Factory(:person)
-    presentation = Factory(:presentation, contributor: person)
-    document = Factory(:document, contributor:person)
+    person = FactoryBot.create(:person)
+    presentation = FactoryBot.create(:presentation, contributor: person)
+    document = FactoryBot.create(:document, contributor:person)
     login_as(person)
-    blob = Factory(:content_blob)
+    blob = FactoryBot.create(:content_blob)
     session[:uploaded_content_blob_id] = blob.id
     workflow =  {title: 'workflow', project_ids: [person.projects.first.id], presentation_ids:[presentation.id], document_ids:[document.id]}
 
@@ -1222,10 +1222,10 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'should update workflow with presentation and document link' do
-    person = Factory(:person)
-    workflow = Factory(:workflow, contributor: person)
-    presentation = Factory(:presentation, contributor: person)
-    document = Factory(:document, contributor:person)
+    person = FactoryBot.create(:person)
+    workflow = FactoryBot.create(:workflow, contributor: person)
+    presentation = FactoryBot.create(:presentation, contributor: person)
+    document = FactoryBot.create(:document, contributor:person)
     login_as(person)
     assert_empty workflow.presentations
     assert_empty workflow.documents
@@ -1240,11 +1240,11 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'should create with data file links' do
-    person = Factory(:person)
-    presentation = Factory(:presentation, contributor: person)
-    data_file = Factory(:data_file, contributor:person)
+    person = FactoryBot.create(:person)
+    presentation = FactoryBot.create(:presentation, contributor: person)
+    data_file = FactoryBot.create(:data_file, contributor:person)
     login_as(person)
-    blob = Factory(:content_blob)
+    blob = FactoryBot.create(:content_blob)
     session[:uploaded_content_blob_id] = blob.id
     workflow = {
       title: 'workflow',
@@ -1262,10 +1262,10 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'should update workflow with data file link' do
-    person = Factory(:person)
-    workflow = Factory(:workflow, contributor: person)
-    data_file = Factory(:data_file, contributor:person)
-    relationship = Factory(:test_data_workflow_data_file_relationship)
+    person = FactoryBot.create(:person)
+    workflow = FactoryBot.create(:workflow, contributor: person)
+    data_file = FactoryBot.create(:data_file, contributor:person)
+    relationship = FactoryBot.create(:test_data_workflow_data_file_relationship)
     login_as(person)
     assert_empty workflow.data_files
 
@@ -1311,9 +1311,9 @@ class WorkflowsControllerTest < ActionController::TestCase
 
   test 'presentation workflows through nested routing' do
     assert_routing 'presentations/2/workflows', controller: 'workflows', action: 'index', presentation_id: '2'
-    presentation = Factory(:presentation, contributor: User.current_user.person)
-    workflow = Factory(:workflow, policy: Factory(:public_policy), presentations:[presentation], contributor:User.current_user.person)
-    workflow2 = Factory(:workflow, policy: Factory(:public_policy), contributor:User.current_user.person)
+    presentation = FactoryBot.create(:presentation, contributor: User.current_user.person)
+    workflow = FactoryBot.create(:workflow, policy: FactoryBot.create(:public_policy), presentations:[presentation], contributor:User.current_user.person)
+    workflow2 = FactoryBot.create(:workflow, policy: FactoryBot.create(:public_policy), contributor:User.current_user.person)
 
     get :index, params: { presentation_id: presentation.id }
 
@@ -1326,9 +1326,9 @@ class WorkflowsControllerTest < ActionController::TestCase
 
   test 'document workflows through nested routing' do
     assert_routing 'documents/2/workflows', controller: 'workflows', action: 'index', document_id: '2'
-    document = Factory(:document, contributor: User.current_user.person)
-    workflow = Factory(:workflow, policy: Factory(:public_policy), documents:[document], contributor:User.current_user.person)
-    workflow2 = Factory(:workflow, policy: Factory(:public_policy), contributor:User.current_user.person)
+    document = FactoryBot.create(:document, contributor: User.current_user.person)
+    workflow = FactoryBot.create(:workflow, policy: FactoryBot.create(:public_policy), documents:[document], contributor:User.current_user.person)
+    workflow2 = FactoryBot.create(:workflow, policy: FactoryBot.create(:public_policy), contributor:User.current_user.person)
 
     get :index, params: { document_id: document.id }
 
@@ -1341,9 +1341,9 @@ class WorkflowsControllerTest < ActionController::TestCase
 
   test 'data_file workflows through nested routing' do
     assert_routing 'data_files/2/workflows', controller: 'workflows', action: 'index', data_file_id: '2'
-    data_file = Factory(:data_file, contributor: User.current_user.person)
-    workflow = Factory(:workflow, policy: Factory(:public_policy), data_files:[data_file], contributor: User.current_user.person)
-    workflow2 = Factory(:workflow, policy: Factory(:public_policy), contributor: User.current_user.person)
+    data_file = FactoryBot.create(:data_file, contributor: User.current_user.person)
+    workflow = FactoryBot.create(:workflow, policy: FactoryBot.create(:public_policy), data_files:[data_file], contributor: User.current_user.person)
+    workflow2 = FactoryBot.create(:workflow, policy: FactoryBot.create(:public_policy), contributor: User.current_user.person)
 
     get :index, params: { data_file_id: data_file.id }
 
@@ -1355,12 +1355,12 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'get workflow as json-ld' do
-    person = Factory(:max_person, description: 'a lovely person')
+    person = FactoryBot.create(:max_person, description: 'a lovely person')
     login_as(person)
-    creator2 = Factory(:person)
+    creator2 = FactoryBot.create(:person)
     current_time = Time.now.utc
     workflow = travel_to(current_time) do
-      workflow = Factory(:cwl_packed_workflow,
+      workflow = FactoryBot.create(:cwl_packed_workflow,
                          title: 'This workflow',
                          description: 'This is a test workflow for bioschema generation',
                          creators: [person, creator2],
@@ -1401,7 +1401,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'should display bio.tools links' do
-    workflow = Factory(:public_workflow, tools_attributes: [
+    workflow = FactoryBot.create(:public_workflow, tools_attributes: [
         { bio_tools_id: 'thing-doer', name: 'ThingDoer'},
         { bio_tools_id: 'database-accessor', name: 'DatabaseAccessor'},
         { bio_tools_id: 'ruby', name: 'Ruby'}
@@ -1419,7 +1419,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'should not display tools box if no tools' do
-    workflow = Factory(:public_workflow)
+    workflow = FactoryBot.create(:public_workflow)
 
     with_config_value(:bio_tools_enabled, true) do
       get :show, params: { id: workflow.id }
@@ -1429,7 +1429,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'should not display tools box if feature disabled' do
-    workflow = Factory(:public_workflow, tools_attributes: [{ bio_tools_id: 'thing-doer', name: 'ThingDoer' }])
+    workflow = FactoryBot.create(:public_workflow, tools_attributes: [{ bio_tools_id: 'thing-doer', name: 'ThingDoer' }])
 
     with_config_value(:bio_tools_enabled, false) do
       get :show, params: { id: workflow.id }
@@ -1439,7 +1439,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'should display bio.tools form if feature enabled' do
-    workflow = Factory(:public_workflow, tools_attributes: [{ bio_tools_id: 'thing-doer', name: 'ThingDoer' }])
+    workflow = FactoryBot.create(:public_workflow, tools_attributes: [{ bio_tools_id: 'thing-doer', name: 'ThingDoer' }])
 
     login_as(workflow.contributor)
 
@@ -1452,7 +1452,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'should not display bio.tools form if feature disabled' do
-    workflow = Factory(:public_workflow, tools_attributes: [{ bio_tools_id: 'thing-doer', name: 'ThingDoer' }])
+    workflow = FactoryBot.create(:public_workflow, tools_attributes: [{ bio_tools_id: 'thing-doer', name: 'ThingDoer' }])
 
     login_as(workflow.contributor)
 
@@ -1465,16 +1465,16 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'filter by tool' do
-    w1 = Factory(:public_workflow, tools_attributes: [
+    w1 = FactoryBot.create(:public_workflow, tools_attributes: [
       { bio_tools_id: 'thing-doer', name: 'ThingDoer'},
       { bio_tools_id: 'database-accessor', name: 'DatabaseAccessor'},
       { bio_tools_id: 'ruby', name: 'Ruby'} ])
 
-    w2 = Factory(:public_workflow, tools_attributes: [
+    w2 = FactoryBot.create(:public_workflow, tools_attributes: [
       { bio_tools_id: 'thing-doer', name: 'ThingDoer'},
       { bio_tools_id: 'ruby', name: 'Ruby'} ])
 
-    w3 = Factory(:public_workflow, tools_attributes: [
+    w3 = FactoryBot.create(:public_workflow, tools_attributes: [
       { bio_tools_id: 'python', name: 'DatabaseAccessor'},
       { bio_tools_id: 'ruby', name: 'Ruby'} ])
 
@@ -1515,8 +1515,8 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'should show workflow class logo for core type' do
-    workflow_class = Factory(:cwl_workflow_class)
-    workflow = Factory(:public_workflow, workflow_class: workflow_class)
+    workflow_class = FactoryBot.create(:cwl_workflow_class)
+    workflow = FactoryBot.create(:public_workflow, workflow_class: workflow_class)
 
     get :show, params: { id: workflow }
 
@@ -1525,8 +1525,8 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'should show default logo for user-added type without logo' do
-    workflow_class = Factory(:user_added_workflow_class)
-    workflow = Factory(:public_workflow, workflow_class: workflow_class)
+    workflow_class = FactoryBot.create(:user_added_workflow_class)
+    workflow = FactoryBot.create(:public_workflow, workflow_class: workflow_class)
 
     get :show, params: { id: workflow }
 
@@ -1535,9 +1535,9 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'should show logo for user-added type with logo' do
-    workflow_class = Factory(:user_added_workflow_class_with_logo)
+    workflow_class = FactoryBot.create(:user_added_workflow_class_with_logo)
     logo = workflow_class.avatar
-    workflow = Factory(:public_workflow, workflow_class: workflow_class)
+    workflow = FactoryBot.create(:public_workflow, workflow_class: workflow_class)
 
     get :show, params: { id: workflow }
 
@@ -1546,9 +1546,9 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'should show logo for user-added type with logo for git workflow' do
-    workflow_class = Factory(:user_added_workflow_class_with_logo)
+    workflow_class = FactoryBot.create(:user_added_workflow_class_with_logo)
     logo = workflow_class.avatar
-    workflow = Factory(:local_git_workflow, workflow_class: workflow_class, policy: Factory(:public_policy))
+    workflow = FactoryBot.create(:local_git_workflow, workflow_class: workflow_class, policy: FactoryBot.create(:public_policy))
 
     get :show, params: { id: workflow }
 
@@ -1557,18 +1557,18 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'should show logos in list item titles on index page' do
-    core_type = Factory(:galaxy_workflow_class)
-    core_type_wf = Factory(:public_workflow, workflow_class: core_type)
-    core_type_git_wf = Factory(:local_git_workflow, workflow_class: core_type, policy: Factory(:public_policy))
+    core_type = FactoryBot.create(:galaxy_workflow_class)
+    core_type_wf = FactoryBot.create(:public_workflow, workflow_class: core_type)
+    core_type_git_wf = FactoryBot.create(:local_git_workflow, workflow_class: core_type, policy: FactoryBot.create(:public_policy))
 
-    user_type = Factory(:user_added_workflow_class)
-    user_type_wf = Factory(:public_workflow, workflow_class: user_type)
-    user_type_git_wf = Factory(:local_git_workflow, workflow_class: user_type, policy: Factory(:public_policy))
+    user_type = FactoryBot.create(:user_added_workflow_class)
+    user_type_wf = FactoryBot.create(:public_workflow, workflow_class: user_type)
+    user_type_git_wf = FactoryBot.create(:local_git_workflow, workflow_class: user_type, policy: FactoryBot.create(:public_policy))
 
-    logo_type = Factory(:user_added_workflow_class_with_logo)
+    logo_type = FactoryBot.create(:user_added_workflow_class_with_logo)
     logo = logo_type.avatar
-    logo_wf = Factory(:public_workflow, workflow_class: logo_type)
-    logo_git_wf = Factory(:local_git_workflow, workflow_class: logo_type, policy: Factory(:public_policy))
+    logo_wf = FactoryBot.create(:public_workflow, workflow_class: logo_type)
+    logo_git_wf = FactoryBot.create(:local_git_workflow, workflow_class: logo_type, policy: FactoryBot.create(:public_policy))
 
     get :index
 
@@ -1580,7 +1580,7 @@ class WorkflowsControllerTest < ActionController::TestCase
 
   test 'cannot create from files if not authenticated' do
     logout
-    cwl = WorkflowClass.find_by_key('cwl') || Factory(:cwl_workflow_class)
+    cwl = WorkflowClass.find_by_key('cwl') || FactoryBot.create(:cwl_workflow_class)
 
     assert_enqueued_jobs(0) do
       assert_no_difference('Git::Repository.count') do
@@ -1603,8 +1603,8 @@ class WorkflowsControllerTest < ActionController::TestCase
   test 'lists creators in index in condensed and table views' do
     Workflow.delete_all
 
-    person = Factory(:person, first_name: 'Jessica', last_name: 'Three')
-    workflow = Factory(:public_workflow, other_creators: 'Joy Five')
+    person = FactoryBot.create(:person, first_name: 'Jessica', last_name: 'Three')
+    workflow = FactoryBot.create(:public_workflow, other_creators: 'Joy Five')
     disable_authorization_checks do
       workflow.assets_creators.create!(given_name: 'Julia', family_name: 'Two', pos: 2, affiliation: 'University of Sheffield', orcid: 'https://orcid.org/0000-0001-8172-8981')
       workflow.assets_creators.create!(creator: person, pos: 3)
@@ -1666,7 +1666,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'get bioschemas dump' do
-    workflow = Factory(:public_workflow, title: 'Analysis of bananas')
+    workflow = FactoryBot.create(:public_workflow, title: 'Analysis of bananas')
     dump = Workflow.public_schema_ld_dump
     dump.write
     assert dump.exists?

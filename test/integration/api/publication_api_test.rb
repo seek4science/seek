@@ -5,6 +5,6 @@ class PublicationApiTest < ActionDispatch::IntegrationTest
 
   def setup
     user_login
-    @publication = Factory(:publication)
+    @publication = FactoryBot.create(:publication)
   end
 end

@@ -11,9 +11,9 @@ class AttributionsTest < ActionController::TestCase
   def setup
     login_as(:owner_of_my_first_sop)
 
-    @sop1 = Factory(:sop)
-    @sop2 = Factory(:sop)
-    @sop3 = Factory(:sop)
+    @sop1 = FactoryBot.create(:sop)
+    @sop2 = FactoryBot.create(:sop)
+    @sop3 = FactoryBot.create(:sop)
   end
 
   def test_should_create_attribution_when_creating_new_sop
@@ -132,11 +132,11 @@ class AttributionsTest < ActionController::TestCase
   end
 
   test 'should display attributions' do
-    p = Factory :person
+    p = FactoryBot.create :person
     login_as(p.user)
-    sop1 = Factory :sop, policy: (Factory :public_policy), contributor: p
-    sop2 = Factory :sop, policy: (Factory :public_policy), contributor: p
-    sop3 = Factory :sop, policy: (Factory :public_policy), contributor: p
+    sop1 = FactoryBot.create :sop, policy: (FactoryBot.create :public_policy), contributor: p
+    sop2 = FactoryBot.create :sop, policy: (FactoryBot.create :public_policy), contributor: p
+    sop3 = FactoryBot.create :sop, policy: (FactoryBot.create :public_policy), contributor: p
     Relationship.create subject: sop1, other_object: sop2, predicate: Relationship::ATTRIBUTED_TO
     sop1.reload
     sop2.reload

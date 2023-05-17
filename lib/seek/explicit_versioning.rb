@@ -44,7 +44,7 @@ module Seek
         class_eval do
           order_opts = version_association_options.delete(:order) || ''
           condition_ops = version_association_options.delete(:conditions) || ''
-          has_many :versions, -> { order(order_opts).where(condition_ops) }, version_association_options
+          has_many :versions, -> { order(order_opts).where(condition_ops) }, **version_association_options
 
           before_create :set_new_version
           after_create :save_version_on_create

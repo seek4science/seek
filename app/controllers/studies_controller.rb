@@ -189,7 +189,7 @@ class StudiesController < ApplicationController
 
   def batch_create
     # create method will be called for each study
-    # e.g: Study.new(title: 'title', investigation: investigations(:metabolomics_investigation), policy: Factory(:private_policy))
+    # e.g: Study.new(title: 'title', investigation: investigations(:metabolomics_investigation), policy: FactoryBot.create(:private_policy))
     # study.policy = Policy.create(name: 'default policy', access_type: 1)
     # render plain: params[:studies].inspect
     metadata_types = CustomMetadataType.where(title: 'MIAPPE metadata', supported_type: 'Study').last
