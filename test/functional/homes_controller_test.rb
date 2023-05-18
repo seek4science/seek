@@ -168,10 +168,12 @@ class HomesControllerTest < ActionController::TestCase
 
   test 'feed reader should handle missing feed title' do
     Seek::Config.news_enabled = true
-    Seek::Config.news_feed_urls = uri_to_feed('simple_feed_with_subtitle.xml')
+    Seek::Config.news_feed_urls = 'http://simple-feed-with-subtitle.com/rss'
     Seek::Config.news_number_of_entries = '5'
 
-    get :index
+    VCR.use_cassette('feedjira/get_simple_feed_with_subtitle') do
+      get :index
+    end
 
     assert_response :success
 
@@ -204,21 +206,28 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test 'should show the content of project news and community news with the configurable number of entries' do
-    sbml = uri_to_sbml_feed
-    bbc = uri_to_bbc_feed
 
     Seek::Config.news_enabled = true
-    Seek::Config.news_feed_urls = "#{bbc}, #{sbml}"
+    Seek::Config.news_feed_urls = "#{fairdom_news_feed_url}, #{reddit_feed_url}"
     Seek::Config.news_number_of_entries = '5'
 
     login_as(:aaron)
-    get :index
+    VCR.use_cassette('feedjira/get_reddit_feed') do
+      VCR.use_cassette('feedjira/get_fairdom_feed') do
+        get :index
+      end
+    end
+
     assert_response :success
 
     assert_select 'div#news-feed ul>li', 5
 
     logout
-    get :index
+    VCR.use_cassette('feedjira/get_reddit_feed') do
+      VCR.use_cassette('feedjira/get_fairdom_feed') do
+        get :index
+      end
+    end
     assert_response :success
 
     assert_select 'div#news-feed ul>li', 5
@@ -683,25 +692,12 @@ class HomesControllerTest < ActionController::TestCase
     assert_equal 'http://localhost:3000', res['@id']
   end
 
-  def uri_to_guardian_feedtest
-    uri_to_feed 'guardian_atom.xml'
+  def fairdom_news_feed_url
+    'https://fair-dom.org/news.xml'
   end
 
-  def uri_to_sbml_feed
-    uri_to_feed 'sbml_atom.xml'
-  end
-
-  def uri_to_bbc_feed
-    uri_to_feed('bbc_atom.xml')
-  end
-
-  def uri_to_bad_feed
-    uri_to_feed('bad_atom.xml')
-  end
-
-  def uri_to_feed(filename)
-    path = File.join(Rails.root, 'test', 'fixtures', 'files', 'mocking', filename)
-    URI.join('file:///', path).to_s
+  def reddit_feed_url
+    'https://www.reddit.com/r/ruby.rss'
   end
 
   test 'Should render the right url for Samples' do
