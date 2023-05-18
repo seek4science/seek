@@ -204,7 +204,6 @@ GEM
       rexml
     csl-styles (2.0.0)
       csl (~> 2.0)
-    curb (0.9.11)
     daemons (1.1.9)
     database_cleaner (1.7.0)
     date (3.3.3)
@@ -275,10 +274,9 @@ GEM
     faraday_middleware (1.2.0)
       faraday (~> 1.0)
     fastimage (2.2.6)
-    feedjira (1.6.0)
-      curb (~> 0.8)
-      loofah (~> 2.0)
-      sax-machine (~> 1.0)
+    feedjira (3.2.2)
+      loofah (>= 2.3.1)
+      sax-machine (>= 1.0)
     ffi (1.15.5)
     fssm (0.2.10)
     gem-licenses (0.2.2)
@@ -402,9 +400,9 @@ GEM
       activesupport (>= 4)
       railties (>= 4)
       request_store (~> 1.0)
-    loofah (2.19.1)
+    loofah (2.21.3)
       crass (~> 1.0.2)
-      nokogiri (>= 1.5.9)
+      nokogiri (>= 1.12.0)
     macaddr (1.7.2)
       systemu (~> 2.6.5)
     magic_lamp (1.9.0)
@@ -447,7 +445,7 @@ GEM
       nokogiri (~> 1)
       rake
     mini_mime (1.1.2)
-    mini_portile2 (2.8.1)
+    mini_portile2 (2.8.2)
     minitest (5.18.0)
     minitest-reporters (1.5.0)
       ansi
@@ -970,7 +968,7 @@ DEPENDENCIES
   equivalent-xml
   exception_notification
   factory_bot (~> 6.2.1)
-  feedjira (~> 1)
+  feedjira
   fleximage!
   fssm
   gem-licenses
