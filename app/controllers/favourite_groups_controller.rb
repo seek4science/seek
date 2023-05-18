@@ -16,7 +16,7 @@ class FavouriteGroupsController < ApplicationController
   end
 
   def create
-    group_name = white_list(params[:favourite_group_name])
+    group_name = sanitized_text(params[:favourite_group_name])
     already_exists = FavouriteGroup.where(name: group_name, user_id: current_user.id).first
 
     if already_exists
@@ -29,7 +29,7 @@ class FavouriteGroupsController < ApplicationController
 
       if created
         # ..and add all members to it
-        group_members = ActiveSupport::JSON.decode(white_list(params[:favourite_group_members]))
+        group_members = ActiveSupport::JSON.decode(sanitized_text(params[:favourite_group_members]))
         group_members.each do |memb|
           person_id = memb[0].to_i
           person_access_type = memb[1]
@@ -37,7 +37,7 @@ class FavouriteGroupsController < ApplicationController
         end
 
         # ..also while results of this are being sent back, send the updated favourite group list for current user
-        users_favourite_groups = FavouriteGroup.get_all_without_blacklists_and_whitelists(current_user.id)
+        users_favourite_groups = FavouriteGroup.get_all_without_denylists_and_allowlists(current_user.id)
       end
     end
 
@@ -61,7 +61,7 @@ class FavouriteGroupsController < ApplicationController
   end
 
   def update
-    group_name = white_list(params[:favourite_group_name])
+    group_name = sanitized_text(params[:favourite_group_name])
     found = FavouriteGroup.where(name: group_name, user_id: current_user.id).first
 
     # if the found group with the same is the current one - that's fine; otherwise - can't rename a group with such new name
@@ -74,7 +74,7 @@ class FavouriteGroupsController < ApplicationController
     unless already_exists
       # SYNCHRONIZE GROUP MEMBERS
       changes_made = false
-      group_members = ActiveSupport::JSON.decode(white_list(params[:favourite_group_members]))
+      group_members = ActiveSupport::JSON.decode(sanitized_text(params[:favourite_group_members]))
 
       # first delete any old memberships that are no longer valid
       @f_group.favourite_group_memberships.each do |memb|
@@ -114,7 +114,7 @@ class FavouriteGroupsController < ApplicationController
       @f_group.save if changes_made
 
       # ..also while results of this are being sent back, send the updated favourite group list for current user
-      users_favourite_groups = FavouriteGroup.get_all_without_blacklists_and_whitelists(current_user.id)
+      users_favourite_groups = FavouriteGroup.get_all_without_denylists_and_allowlists(current_user.id)
     end
 
     respond_to do |format|
@@ -136,7 +136,7 @@ class FavouriteGroupsController < ApplicationController
     @f_group.destroy
 
     # ..also while results of this are being sent back, send the updated favourite group list for current user
-    users_favourite_groups = FavouriteGroup.get_all_without_blacklists_and_whitelists(current_user.id)
+    users_favourite_groups = FavouriteGroup.get_all_without_denylists_and_allowlists(current_user.id)
 
     respond_to do |format|
       format.json do
