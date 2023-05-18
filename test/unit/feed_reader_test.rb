@@ -36,26 +36,26 @@ class FeedReaderTest < ActiveSupport::TestCase
     assert !Rails.cache.exist?(key), 'cache should have been cleared'
   end
 
-  test 'check blacklisting' do
-    assert_nil Seek::Config.blacklisted_feeds
+  test 'check denylisting' do
+    assert_nil Seek::Config.denylisted_feeds
     url = 'http://dodgyfeed.atom'
     stub_request(:get, url).to_return(status: 500, body: '')
     Seek::Config.project_news_feed_urls = url
     assert_equal [url], Seek::FeedReader.determine_feed_urls(:project_news)
     entries = Seek::FeedReader.fetch_entries_for :project_news
     assert_empty entries
-    blacklisted = Seek::Config.blacklisted_feeds
-    refute_nil blacklisted[url]
-    assert blacklisted[url].is_a?(Time)
+    denied = Seek::Config.denylisted_feeds
+    refute_nil denied[url]
+    assert denied[url].is_a?(Time)
     assert_empty Seek::FeedReader.determine_feed_urls(:project_news)
 
-    travel_to(Time.now + Seek::FeedReader::BLACKLIST_TIME + 1.minute) do
+    travel_to(Time.now + Seek::FeedReader::DENYLIST_TIME + 1.minute) do
       assert_equal [url], Seek::FeedReader.determine_feed_urls(:project_news)
-      blacklisted = Seek::Config.blacklisted_feeds
-      assert_nil blacklisted[url]
+      denied = Seek::Config.denylisted_feeds
+      assert_nil denied[url]
     end
 
-    Seek::Config.blacklisted_feeds = nil
+    Seek::Config.denylisted_feeds = nil
   end
 
   test 'handles error and ignores bad feed' do

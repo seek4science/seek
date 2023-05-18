@@ -223,14 +223,14 @@ class User < ApplicationRecord
     Hash[*person.projects.collect { |p|; [p.id, p.name]; }.flatten]
   end
 
-  # returns a 'whitelist' favourite group for the user (or 'nil' if not found)
-  def get_whitelist
-    FavouriteGroup.where(user_id: id, name: FavouriteGroup::WHITELIST_NAME).first
+  # returns a 'allowlist' favourite group for the user (or 'nil' if not found)
+  def get_allowlist
+    FavouriteGroup.where(user_id: id, name: FavouriteGroup::ALLOWLIST_NAME).first
   end
 
-  # returns a 'blacklist' favourite group for the user (or 'nil' if not found)
-  def get_blacklist
-    FavouriteGroup.where(user_id: id, name: FavouriteGroup::BLACKLIST_NAME).first
+  # returns a 'denylist' favourite group for the user (or 'nil' if not found)
+  def get_denylist
+    FavouriteGroup.where(user_id: id, name: FavouriteGroup::DENYLIST_NAME).first
   end
 
   def currently_online

@@ -9,8 +9,8 @@ download_of_sop_with_private_policy_and_custom_sharing_for_person_not_associated
   access_type: <%= Policy::ACCESSIBLE %>
 
 
-no_access_to_sop_with_download_for_all_sysmo_users_policy_for_person_for_sysmo_user_in_blacklist:
-  contributor: person_for_sysmo_user_in_blacklist (Person)
+no_access_to_sop_with_download_for_all_sysmo_users_policy_for_person_for_sysmo_user_in_denylist:
+  contributor: person_for_sysmo_user_in_denylist (Person)
   policy: download_for_all_sysmo_users_policy
   access_type: <%= Policy::NO_ACCESS %>
 
@@ -52,15 +52,15 @@ sharing_sop_with_best_fav_group_for_owner_of_editing_for_all_sysmo_users_policy:
   access_type: <%= Policy::DETERMINED_BY_GROUP %>
 
 
-editing_sop_that_uses_whitelist_blacklist_and_custom_sharing_for_person_for_owner_of_private_policy_using_custom_sharing:
+editing_sop_that_uses_allowlist_denylist_and_custom_sharing_for_person_for_owner_of_private_policy_using_custom_sharing:
   contributor: person_for_owner_of_private_policy_using_custom_sharing (Person)
-  policy: whitelist_blacklist_and_custom_sharing
+  policy: allowlist_denylist_and_custom_sharing
   access_type: <%= Policy::EDITING %>
 
 
-downloading_sop_that_uses_whitelist_blacklist_and_custom_sharing_for_person_not_associated_with_any_projects:
+downloading_sop_that_uses_allowlist_denylist_and_custom_sharing_for_person_not_associated_with_any_projects:
   contributor: person_not_associated_with_any_projects (Person)
-  policy: whitelist_blacklist_and_custom_sharing
+  policy: allowlist_denylist_and_custom_sharing
   access_type: <%= Policy::ACCESSIBLE %>
 
 
