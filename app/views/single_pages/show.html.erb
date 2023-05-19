@@ -125,3 +125,8 @@
     }
     
 </script>
+<div style="display: none" id="objects-input-template">
+  <%= objects_input('_NAME_', [], { typeahead: { query_url: '_URL_' } }, limit: 100, class: 'form-control').
+      sub('seek-objectsinput', 'seek-*bjectsinput').html_safe %>
+  <%# ^ Hack to stop this "template" being initialized as a real objectsinput %>
+</div>

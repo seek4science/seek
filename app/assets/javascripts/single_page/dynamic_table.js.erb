@@ -16,13 +16,7 @@ const defaultCols = [
 	}
 ];
 
-//const objectInput =
-//	"<td><input data-role='seek-objectsinput' data-tags-limit='100' " +
-//	"data-existing-objects='%EXISTING%' data-typeahead='true' " +
-//	"data-typeahead-query-url=%URL% /></td>";
-let objectInput = '';
-//const typeaheadUrl = "<%= typeahead_samples_path %>" + "?q=%QUERY&linked_sample_type_id=%LINKED%";
-const typeaheadUrl = "<%= typeahead_samples_path %>" + "?linked_sample_type_id=%LINKED%";
+const typeaheadUrl = "<%= typeahead_samples_path(linked_sample_type_id: '_LINKED_') %>";
 
 const handleSelect = (e) => {
   $j(e).parents("table").DataTable().row(e.closest("tr")).data()[0] = e.is(":checked")
@@ -51,38 +45,31 @@ const handleSelect = (e) => {
 							id: id,
 							name: title
 						}));
-						const existingObjects = JSON.stringify(existingObjectsJSON);
-						const url = typeaheadUrl.replace("%LINKED%", c.linked_sample_type);
-						if (options.readonly) {
-							return existingObjectsJSON.map((e) => `<span class="badge">${e.name}</span>`).join(" ");
-						} else {
-							console.log(`existingObjectsJSON:\n${existingObjects}`);
-							// Retrieving the ObjectsInput Html through an Ajax call
-							$j.ajax({
-								url: '<%= sp_object_input_single_pages_path %>',
-								type: 'GET',
-								data: {
-									element_name: 'input-source-name',
-									existing_objects: existingObjects,
-									query_url: url
-								},
-								dataType: 'html'})
-								.done(function(response){
-//									console.log(`Ajax call response:\n${response}`);
-									objectInput= response;
-									ObjectsInput.init();
-								})
-								.error(function(){
-									objectInput="<td>Cannot fetch existing samples</td>";
-								})
-							console.log(`objectInput:\n${objectInput}`);
-							return objectInput;
-//							return objectInput.replace("%EXISTING%", existingObjects).replace("%URL%", url);
-						}
-					} else return data == "#HIDDEN" ? "<em><small>Hidden</small></em>" : data;
+            return existingObjectsJSON.map((e) => `<span class="badge">${e.name}</span>`).join(" ");
+					} else if (data === "#HIDDEN") {
+              return "<em><small>Hidden</small></em>";
+          } else {
+              return data;
+          }
 				};
 				c["createdCell"] = function (td, cellData, rowData, row, col) {
-					if (c.multi_link) setTagsInput($j(td));
+          if (c.multi_link && !options.readonly) {
+            const url = typeaheadUrl.replace("_LINKED_", c.linked_sample_type);
+            const el = $j(td);
+            const objectInput = $j('#objects-input-template').clone().html().replace('seek-*bjectsinput', 'seek-objectsinput');
+            // Change the name to something more sensible
+            const output = objectInput.replace(/_NAME_/g, 'input-' + row + '-' + col).replace("_URL_", url);
+            el.html($j(output));
+            const input = $j(td).find('[data-role="seek-objectsinput"]');
+            cellData = cellData && Array.isArray(cellData) ? cellData : [cellData];
+            cellData = cellData[0]?.id ? cellData : [];
+            cellData.forEach(({ id, title }) => {
+                input.append(new Option(title, id, false, true));
+            });
+            console.log('before', el);
+            ObjectsInput.init({ item: input });
+            console.log('after', el);
+          }
 					if (cellData == "#HIDDEN") $j(td).addClass("disabled");
 				};
 				if (c.title == "id") c.title = instanceName + " id";
