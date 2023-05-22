@@ -801,7 +801,7 @@ GEM
       rdf-xsd (~> 3.2)
       sparql (~> 3.2)
       sxp (~> 1.2)
-    simple-spreadsheet-extractor (0.17.0)
+    simple-spreadsheet-extractor (0.18.0)
       libxml-ruby (~> 2.9)
       terrapin (~> 0.6)
     simplecov (0.21.2)
@@ -1052,7 +1052,7 @@ DEPENDENCIES
   sass-rails (>= 6)
   savon (= 1.1.0)
   seedbank
-  simple-spreadsheet-extractor (~> 0.17.0)
+  simple-spreadsheet-extractor (~> 0.18.0)
   simplecov
   sprockets-rails
   sqlite3 (~> 1.4)
