@@ -543,7 +543,7 @@ GEM
     pry-remote (0.1.8)
       pry (~> 0.9)
       slop (~> 3.0)
-    psych (4.0.3)
+    psych (5.1.0)
       stringio
     public_suffix (5.0.0)
     puma (5.6.4)
@@ -689,7 +689,7 @@ GEM
     rdf-xsd (3.2.1)
       rdf (~> 3.2)
       rexml (~> 3.2)
-    rdoc (6.4.0)
+    rdoc (6.5.0)
       psych (>= 4.0.0)
     recaptcha (4.1.0)
       json
@@ -755,7 +755,7 @@ GEM
     rubyntlm (0.6.3)
     rubyzip (2.0.0)
     rugged (1.1.0)
-    sample-template-generator (0.6.0)
+    sample-template-generator (0.7.0)
       rdoc (~> 6.0)
       terrapin (~> 0.6)
     sass-rails (6.0.0)
@@ -1046,7 +1046,7 @@ DEPENDENCIES
   ruby-prof
   rubyzip
   rugged
-  sample-template-generator (~> 0.5)
+  sample-template-generator (~> 0.7)
   sass-rails (>= 6)
   savon (= 1.1.0)
   seedbank
