@@ -70,7 +70,8 @@ module Seek
       unless feed_url.blank?
         # trim the url element
         feed_url.strip!
-        feed = Feedjira::Feed.fetch_and_parse(feed_url)
+        xml = HTTParty.get(feed_url).body
+        feed = Feedjira.parse(xml)
         fail "Error reading feed for #{feed_url} error #{feed}" if feed.is_a?(Numeric)
         feed
       end
