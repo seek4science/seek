@@ -24,23 +24,12 @@ module Seek
       end
 
       def state_allows_publish?(user = User.current_user)
-        if new_record?
-          return true unless gatekeeper_required?
-          !is_waiting_approval?(user)
-        else
-          return false if is_published?
-          return true unless gatekeeper_required?
-          return true if user.person.is_asset_gatekeeper_of?(self)
-          return false if is_waiting_approval?(user)
-           if is_rejected?
-             if is_updated_since_be_rejected?
-               return true
-             else
-               return false
-             end
-           end
-          return true
-        end
+        return false if is_published?
+        return true unless gatekeeper_required?
+        return true if user.person.is_asset_gatekeeper_of?(self)
+        return false if is_waiting_approval?
+        return true unless is_rejected?
+        return is_updated_since_be_rejected?
       end
 
       def publish!(comment = nil, force = false)
