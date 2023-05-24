@@ -78,7 +78,9 @@ module Seek
       end
 
       def waiting_approval_assets
-        @waiting_approval_assets = ResourcePublishLog.waiting_approval_assets_for(current_user)
+        @requested_approval_assets = ResourcePublishLog.requested_approval_assets_for_user(current_user)
+        @waiting_approval_assets = ResourcePublishLog.waiting_approval_assets(@requested_approval_assets)
+        @rejected_assets = ResourcePublishLog.rejected_assets(@requested_approval_assets)
         respond_to do |format|
           format.html { render template: 'assets/publishing/waiting_approval_assets' }
         end

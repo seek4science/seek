@@ -715,7 +715,7 @@ class SopsControllerTest < ActionController::TestCase
       put :update, params: { sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::ACCESSIBLE } }
     end
 
-    assert_empty ResourcePublishLog.requested_approval_assets_for(gatekeeper)
+    assert_empty ResourcePublishLog.requested_approval_assets_for_gatekeeper(gatekeeper)
   end
 
   test 'dont send publish approval request if item is only being made visible' do
@@ -729,7 +729,7 @@ class SopsControllerTest < ActionController::TestCase
       put :update, params: { sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::VISIBLE } }
     end
 
-    assert_empty ResourcePublishLog.requested_approval_assets_for(gatekeeper)
+    assert_empty ResourcePublishLog.requested_approval_assets_for_gatekeeper(gatekeeper)
   end
 
   test 'send publish approval request if elevating permissions from VISIBLE -> ACCESSIBLE' do
@@ -749,7 +749,7 @@ class SopsControllerTest < ActionController::TestCase
     assert sop.can_view?(nil)
     refute sop.can_download?(nil)
 
-    assert_includes ResourcePublishLog.requested_approval_assets_for(gatekeeper), sop
+    assert_includes ResourcePublishLog.requested_approval_assets_for_gatekeeper(gatekeeper), sop
   end
 
   test 'should not loose permissions when managing a sop' do
