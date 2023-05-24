@@ -73,7 +73,7 @@ gem 'bioportal', '>=3.0', git: 'https://github.com/SysMO-DB/bioportal.git'
 gem 'doi_query_tool', git: 'https://github.com/seek4science/DOI-query-tool.git'
 gem 'fleximage', git: 'https://github.com/SysMO-DB/fleximage.git', ref: 'de03bf816a911dc4f69573fd300d4ff90225cca7'
 
-gem 'jquery-rails', '~> 4.2.2'
+gem 'jquery-rails', '~> 4.4.0'
 gem 'jquery-ui-rails'
 gem 'recaptcha', '~> 4.1.0'
 gem 'metainspector'
