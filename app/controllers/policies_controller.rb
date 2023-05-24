@@ -64,10 +64,12 @@ class PoliciesController < ApplicationController
     resource = nil
     resource = resource_class.find_by_id(params[:resource_id]) if params[:resource_id]
     resource ||= resource_class.new
+    projects = Project.where(id: (params[:project_ids] || '').split(','))
+    ucpi = updated_can_publish_immediately(resource, projects)
     policy = resource.policy.set_attributes_with_sharing(policy_params)
+    trying_to_publish = resource.is_published?
     contributor_person = resource.new_record? ? current_person : resource.contributor.try(:person)
     creators = Person.find((params[:creators] || '').split(',').compact.uniq)
-    projects = Project.where(id: (params[:project_ids] || '').split(','))
 
     privileged_people = {}
     #exclude the current_person from the privileged people
@@ -80,7 +82,7 @@ class PoliciesController < ApplicationController
     respond_to do |format|
       format.html { render partial: 'permissions/preview_permissions',
                            locals: { resource: resource, policy: policy, privileged_people: privileged_people,
-                                     updated_can_publish_immediately: updated_can_publish_immediately(resource, projects),
+                                     updated_can_publish_immediately: ucpi || !resource.policy.access_type_changed? || !trying_to_publish,
                                      send_request_publish_approval: !resource.is_waiting_approval?(current_user)}}
     end
   end

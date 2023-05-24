@@ -540,7 +540,7 @@ class SopsControllerTest < ActionController::TestCase
   test 'should set the policy to projects_policy if the item is requested to be published, when creating new sop' do
     gatekeeper = Factory(:asset_gatekeeper)
     @user.person.add_to_project_and_institution(gatekeeper.projects.first, Factory(:institution))
-    post :create, params: { sop: { title: 'test', project_ids: gatekeeper.projects.collect(&:id) }, content_blobs: [{ data: picture_file }], policy_attributes: { access_type: Policy::VISIBLE } }
+    post :create, params: { sop: { title: 'test', project_ids: gatekeeper.projects.collect(&:id) }, content_blobs: [{ data: picture_file }], policy_attributes: { access_type: Policy::ACCESSIBLE } }
     sop = assigns(:sop)
     assert_redirected_to (sop)
     policy = sop.policy
@@ -550,7 +550,29 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal Policy::ACCESSIBLE, policy.permissions.first.access_type
   end
 
-  test 'should not change the policy if the item is requested to be published, when managing sop' do
+  test 'should allow to set the policy to visible when creating new sop' do
+    gatekeeper = Factory(:asset_gatekeeper)
+    @user.person.add_to_project_and_institution(gatekeeper.projects.first, Factory(:institution))
+    post :create, params: { sop: { title: 'test', project_ids: gatekeeper.projects.collect(&:id) }, content_blobs: [{ data: picture_file }], policy_attributes: { access_type: Policy::VISIBLE } }
+    sop = assigns(:sop)
+    assert_redirected_to (sop)
+    policy = sop.policy
+    assert_equal Policy::VISIBLE, policy.access_type
+  end
+
+  test 'should not allow to change the policy to published when managing sop' do
+    gatekeeper = Factory(:asset_gatekeeper)
+    policy = Factory(:policy, access_type: Policy::NO_ACCESS, permissions: [Factory(:permission)])
+    sop = Factory(:sop, project_ids: gatekeeper.projects.collect(&:id), policy: policy)
+    login_as(sop.contributor)
+    assert sop.can_manage?
+    put :update, params: { id: sop.id, sop: { title: sop.title }, policy_attributes: { access_type: Policy::ACCESSIBLE } }
+    sop = assigns(:sop)
+    assert_redirected_to(sop)
+    assert_equal Policy::NO_ACCESS, sop.policy.access_type
+  end
+
+  test 'should allow to change the policy to visible' do
     gatekeeper = Factory(:asset_gatekeeper)
     policy = Factory(:policy, access_type: Policy::NO_ACCESS, permissions: [Factory(:permission)])
     sop = Factory(:sop, project_ids: gatekeeper.projects.collect(&:id), policy: policy)
@@ -559,9 +581,7 @@ class SopsControllerTest < ActionController::TestCase
     put :update, params: { id: sop.id, sop: { title: sop.title }, policy_attributes: { access_type: Policy::VISIBLE } }
     sop = assigns(:sop)
     assert_redirected_to(sop)
-    updated_policy = sop.policy
-    assert_equal policy, updated_policy
-    assert_equal policy.permissions, updated_policy.permissions
+    assert_equal Policy::VISIBLE, sop.policy.access_type
   end
 
   test 'should be able to view pdf content' do

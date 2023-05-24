@@ -123,7 +123,7 @@ module Seek
       def temporary_policy_while_waiting_for_publishing_approval
         return true unless authorization_checks_enabled
         return true if User.current_user.blank?
-        if policy.public? && !is_a?(Publication) && gatekeeper_required? && !User.current_user.person.is_asset_gatekeeper_of?(self)
+        if is_published? && !is_a?(Publication) && gatekeeper_required? && !User.current_user.person.is_asset_gatekeeper_of?(self)
           self.policy = if new_record?
                           Policy.projects_policy(projects)
                         else
