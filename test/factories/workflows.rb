@@ -99,6 +99,14 @@ FactoryBot.define do
     assays { [FactoryBot.create(:public_assay)] }
     relationships {[FactoryBot.create(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: FactoryBot.create(:publication))]}
     discussion_links { [FactoryBot.build(:discussion_link, label:'Slack')] }
+    tools_attributes {
+      [
+        { bio_tools_id: 'thing-doer', name: 'ThingDoer'},
+        { bio_tools_id: 'database-accessor', name: 'DatabaseAccessor'},
+        { bio_tools_id: 'ruby', name: 'Ruby'}
+      ]
+    }
+
     after(:create) do |workflow|
       workflow.content_blob = FactoryBot.create(:cwl_content_blob, asset: workflow, asset_version: workflow.version)
   

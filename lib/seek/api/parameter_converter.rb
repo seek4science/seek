@@ -4,7 +4,7 @@ module Seek
     # A class to convert JSON-API-structured parameters into a form that SEEK's controllers understand.
     # Four stages of conversion:
     # 1. De-serialize - The JSON-API parameters are converted into a Rails-esque form: params['data_file'] = { ... }
-    # 1. Convert - Certain parameter values are converted according to the block passed to each `convert` declaration.
+    # 2. Convert - Certain parameter values are converted according to the block passed to each `convert` declaration.
     # 3. Rename - Keys are renamed if a `convert` declaration has a `rename` key.
     # 4. Elevate - Parameters are moved up out of e.g. `params['data_file']` into the top-level `params`
     #              if the `elevate` option is set to `true`.
@@ -159,6 +159,23 @@ module Seek
           profile = attrs.delete(:profile)
           attrs[:creator_id] = profile.split('/')&.last&.to_i if profile
           attrs
+        end
+      end
+
+      convert :tools, rename: :tools_attributes do |value|
+        biotools_client = BioTools::Client.new
+        value.map do |t|
+          biotools_id = t[:id]
+          name = t[:name]
+          if name.blank?
+            begin
+              name = biotools_client.tool(biotools_id)['name']
+            rescue StandardError => e
+              Rails.logger.error("Error fetching bio.tools info for #{biotools_id}")
+            end
+          end
+
+          { bio_tools_id: biotools_id, name: name }
         end
       end
 
