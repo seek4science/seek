@@ -292,4 +292,8 @@ class PeopleController < ApplicationController
       false
     end
   end
+
+  def param_converter_options
+    { skip: [:tools] }
+  end
 end
