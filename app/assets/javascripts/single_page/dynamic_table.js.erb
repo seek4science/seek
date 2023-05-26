@@ -1,4 +1,4 @@
-<% environment.context_class.instance_eval { include Seek::Util.routes } %>
+<% environment.context_class.instance_eval { include Seek:: Util.routes } %>
 const instanceName = "<%= Seek::Config.instance_name %>";
 
 const rowStatus = { new: "new", delete: "delete", update: "update", empty: "empty", noAction: "" };
@@ -16,18 +16,23 @@ const defaultCols = [
 	}
 ];
 
+const objectInputTemp = '<input type="hidden" name="_NAME_[]" id="_NAME_" value="" autocomplete="off" />'+
+						'<select name="_NAME_[]" id="_NAME_" class="form-control" data-role="seek-objectsinput" '+
+						'data-tags-limit="100" multiple="multiple" '+
+						'data-typeahead-query-url="_URL_"><option value=""></option></select>';
+
 const typeaheadUrl = "<%= typeahead_samples_path(linked_sample_type_id: '_LINKED_') %>";
 
 const handleSelect = (e) => {
-  $j(e).parents("table").DataTable().row(e.closest("tr")).data()[0] = e.is(":checked")
-  if (!e.is(":checked")){
-    // Hide DT Select all button
-    const dtSelectAll = $j(e).parents(".dataTables_wrapper").find(".dt_select_all");
-    dtSelectAll.html("Select all rows")
-    dtSelectAll.css("display", "none")
-  }
-  const dtName = $j(e).parents("table").data("dtname")
-  window[dtName].setPermissionBTNActivity()
+	$j(e).parents("table").DataTable().row(e.closest("tr")).data()[0] = e.is(":checked")
+	if (!e.is(":checked")) {
+		// Hide DT Select all button
+		const dtSelectAll = $j(e).parents(".dataTables_wrapper").find(".dt_select_all");
+		dtSelectAll.html("Select all rows")
+		dtSelectAll.css("display", "none")
+	}
+	const dtName = $j(e).parents("table").data("dtname")
+	window[dtName].setPermissionBTNActivity()
 }
 
 (function ($j) {
@@ -43,33 +48,36 @@ const handleSelect = (e) => {
 						data = data[0]?.id ? data : [];
 						const existingObjectsJSON = data.map(({ id, title }) => ({
 							id: id,
-							name: title
+							title: title
 						}));
-            return existingObjectsJSON.map((e) => `<span class="badge">${e.name}</span>`).join(" ");
+						const existingOptions = existingObjectsJSON.map((e) => `<option selected="selected" value=${e.id}>${e.title}</option>`).join("");
+						if (options.readOnly) {
+							return existingObjectsJSON.map((e) => `<span class="badge">${e.title}</span>`).join(" ");
+
+						} else {
+							const url = typeaheadUrl.replace("_LINKED_", c.linked_sample_type);
+							const objectInputName = 'objectInput[' + existingObjectsJSON.map((e) => e.id).join('-') + ']';
+							const objectInput = objectInputTemp.replace(/_NAME_/g, objectInputName).replace("_URL_", url).replace('seek-*bjectsinput', 'seek-objectsinput').replace('<option value=""></option>', existingOptions);
+							ObjectsInput.init(objectInput);
+							return objectInput;
+
+						}
+
 					} else if (data === "#HIDDEN") {
-              return "<em><small>Hidden</small></em>";
-          } else {
-              return data;
-          }
+						return "<em><small>Hidden</small></em>";
+					} else {
+						return data;
+					}
 				};
 				c["createdCell"] = function (td, cellData, rowData, row, col) {
-          if (c.multi_link && !options.readonly) {
-            const url = typeaheadUrl.replace("_LINKED_", c.linked_sample_type);
-            const el = $j(td);
-            const objectInput = $j('#objects-input-template').clone().html().replace('seek-*bjectsinput', 'seek-objectsinput');
-            // Change the name to something more sensible
-            const output = objectInput.replace(/_NAME_/g, 'input-' + row + '-' + col).replace("_URL_", url);
-            el.html($j(output));
-            const input = $j(td).find('[data-role="seek-objectsinput"]');
-            cellData = cellData && Array.isArray(cellData) ? cellData : [cellData];
-            cellData = cellData[0]?.id ? cellData : [];
-            cellData.forEach(({ id, title }) => {
-                input.append(new Option(title, id, false, true));
-            });
-            console.log('before', el);
-            ObjectsInput.init({ item: input });
-            console.log('after', el);
-          }
+					if (c.multi_link && !options.readonly) {
+
+						// Initial initiation of the ObjectsInput
+						const input = $j(td).find('[data-role="seek-objectsinput"]');
+						setSelect2($j(td));
+						ObjectsInput.init({ item: input });
+
+					}
 					if (cellData == "#HIDDEN") $j(td).addClass("disabled");
 				};
 				if (c.title == "id") c.title = instanceName + " id";
@@ -106,7 +114,7 @@ const handleSelect = (e) => {
 						exportOptions: {
 							// exclude checkbox column
 							columns: options.readonly ? [":visible:not(.text-center)"] : [2, ":visible:not(.text-center)"],
-              format: {
+							format: {
 								body: function (data) {
 									// Get data from tags-input
 									if (data.toString().includes("td")) {
@@ -119,7 +127,7 @@ const handleSelect = (e) => {
 
 									return data;
 								}
-              }
+							}
 						}
 					},
 					"colvis"
@@ -138,7 +146,7 @@ const handleSelect = (e) => {
 			this.options = options;
 			this.initHeader(columns);
 
-      $j('div.toolbar').html("<span class='dt_select_all' style='display:none' onClick='selectAll(this, true)'>Select all rows</span>").addClass("dt-select-all");
+			$j('div.toolbar').html("<span class='dt_select_all' style='display:none' onClick='selectAll(this, true)'>Select all rows</span>").addClass("dt-select-all");
 		},
 		initHeader: function (columns) {
 			const requiredCols = columns.map((c, i) => c.required && i).filter((c) => c);
@@ -206,8 +214,8 @@ const handleSelect = (e) => {
 				if (sampleLinksTitles.length)
 					alert(
 						"No value is pasted for the following column(s): \n" +
-							sampleLinksTitles.map((x) => `"${x}"`).join(", ") +
-							"\nYou need to manually input them."
+						sampleLinksTitles.map((x) => `"${x}"`).join(", ") +
+						"\nYou need to manually input them."
 					);
 			});
 		},
@@ -346,32 +354,32 @@ const handleSelect = (e) => {
 			});
 			this.table.columns(toBeShown).visible(true);
 		},
-    setPermissionBTNActivity: function () {
-      const tbl = $j(this.table.table().container())
-      const permissionBtn = tbl.closest('.tab-pane').find('.btn_set_permission')
-      $j(permissionBtn).prop("disabled", false)
-      const indexes = getStatusIndexes(this.table.settings()[0].aoColumns);
+		setPermissionBTNActivity: function () {
+			const tbl = $j(this.table.table().container())
+			const permissionBtn = tbl.closest('.tab-pane').find('.btn_set_permission')
+			$j(permissionBtn).prop("disabled", false)
+			const indexes = getStatusIndexes(this.table.settings()[0].aoColumns);
 			this.table.rows(function (idx, data, node) {
 				if (data[0])
 					indexes.forEach((x) => {
 						if (data[x] == rowStatus.new) {
-              $j(permissionBtn).prop("disabled", true);
-              return
-            }
+							$j(permissionBtn).prop("disabled", true);
+							return
+						}
 					});
 			});
-    },
-    selectedSampleIds: function () {
-      const sampleIds = []
-      const indexes = getStatusIndexes(this.table.settings()[0].aoColumns);
-      this.table.rows(function (idx, data, node) {
+		},
+		selectedSampleIds: function () {
+			const sampleIds = []
+			const indexes = getStatusIndexes(this.table.settings()[0].aoColumns);
+			this.table.rows(function (idx, data, node) {
 				if (data[0])
 					indexes.forEach((x) => {
 						if (data[x + 1]) sampleIds.push(data[x + 1])
 					})
 			});
-      return sampleIds;
-    }
+			return sampleIds;
+		}
 	};
 })(jQuery);
 
@@ -401,22 +409,23 @@ function getSampleLinking(arr) {
 	return arr.filter((x) => x.linked_sample_type).map(({ idx, title }) => ({ idx, title }));
 }
 
-function setTagsInput(item) {
-	// There's a new input after the table is rendered
-	const newInput = item.find("input").first();
-	ObjectsInput.init({ item: newInput });
-	newInput.on("itemAdded itemRemoved", function (event) {
-		const items = $j(this).tagsinput("items");
-		const values = items.map(({ id, name }) => ({
-			id,
-			title: name
-		}));
+function setSelect2(item) {
+	// const select = item;
+	$j(item).on("select2:select select2:unselect", function (e) {
 		const table = $j(this).parents("table").DataTable();
-		const elem = $j(this).parent();
-		const td = $j(this).closest("td");
-		table.cell(elem).data(values);
-		handleCellUpdate(table, elem);
-		setTagsInput($j(td));
+		const td = $j(this).closest('td');
+
+		const values = item.find("option").map((_index, opt) => {
+			if (opt.value != "") return { id: opt.value, title: opt.innerText };
+		}).toArray();
+
+		const updatedValues = e.params.data.selected ? values : values.filter(({ id, title }) => {
+			if (id !== e.params.data.id) return { id, title };
+		});
+
+		table.cell(td).data(updatedValues);
+		handleCellUpdate(table, td);
+		setSelect2($j(td));
 		table.columns.adjust();
 	});
 }
@@ -443,35 +452,35 @@ function handleResponse(table, sampleTypes) {
 }
 
 function selectAll(e, includeHidden = false) {
-  const dtTbl = $j(e).parents(".dataTables_wrapper").find("table")[1]
-  const dtName = $j(dtTbl).data("dtname")
-  const count = window[dtName].table.rows().count()
-  if (includeHidden){
-    // This will select all rows containing hidden rows
-    performSelect(dtName, true)
-    window[dtName].setPermissionBTNActivity()
-    $j(e).html(`All ${count} items are selected`)
-  }
-  else {
-    const checked = $j(e).prop("checked");
-    const checkBoxes = $j(e).closest(".dataTables_scroll").find(".row-select");
-    const dtSelectAll = $j(e).parents(".dataTables_wrapper").find(".dt_select_all");
-    dtSelectAll.css("display", checked && count > 0 ? "block" : "none")
+	const dtTbl = $j(e).parents(".dataTables_wrapper").find("table")[1]
+	const dtName = $j(dtTbl).data("dtname")
+	const count = window[dtName].table.rows().count()
+	if (includeHidden) {
+		// This will select all rows containing hidden rows
+		performSelect(dtName, true)
+		window[dtName].setPermissionBTNActivity()
+		$j(e).html(`All ${count} items are selected`)
+	}
+	else {
+		const checked = $j(e).prop("checked");
+		const checkBoxes = $j(e).closest(".dataTables_scroll").find(".row-select");
+		const dtSelectAll = $j(e).parents(".dataTables_wrapper").find(".dt_select_all");
+		dtSelectAll.css("display", checked && count > 0 ? "block" : "none")
 
-    if (!checked) performSelect(dtName, false)
+		if (!checked) performSelect(dtName, false)
 
-    $j.each(checkBoxes, function (i, c) {
-      $j(c).prop("checked", checked);
-      handleSelect($j(c));
-    });
-  }
+		$j.each(checkBoxes, function (i, c) {
+			$j(c).prop("checked", checked);
+			handleSelect($j(c));
+		});
+	}
 }
 
 function performSelect(dtName, select) {
-  window[dtName].table.rows(function (idx, data, node) {
-    data[0] = select;
-    $j(node).find(".row-select").prop("checked", select)
-  });
+	window[dtName].table.rows(function (idx, data, node) {
+		data[0] = select;
+		$j(node).find(".row-select").prop("checked", select)
+	});
 }
 
 const handleFailure = (table, res) => {
