@@ -568,8 +568,54 @@ class SopsControllerTest < ActionController::TestCase
     assert sop.can_manage?
     put :update, params: { id: sop.id, sop: { title: sop.title }, policy_attributes: { access_type: Policy::ACCESSIBLE } }
     sop = assigns(:sop)
-    assert_redirected_to(sop)
+    # Does not update policy
     assert_equal Policy::NO_ACCESS, sop.policy.access_type
+    assert_redirected_to(sop)
+    # Gatekeeper knows - Logs adequately
+    assert_enqueued_emails 1
+    assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL, sop.last_publishing_log.publish_state
+  end
+
+  test 'manage_update with gatekeeper - should not allow to publish' do
+    gatekeeper = Factory(:asset_gatekeeper)
+    policy = Factory(:policy, access_type: Policy::NO_ACCESS, permissions: [Factory(:permission)])
+    sop = Factory(:sop, project_ids: gatekeeper.projects.collect(&:id), policy: policy)
+    login_as(sop.contributor)
+    assert sop.can_manage?
+    patch :manage_update, params: { id: sop,
+                                           sop: { creator_ids: [sop.contributor.id],
+                                                  project_ids: [gatekeeper.projects.collect(&:id)] },
+                                           policy_attributes: { access_type: Policy::ACCESSIBLE } }
+    sop.reload
+    # Does not update policy
+    assert_equal Policy::NO_ACCESS, sop.policy.access_type
+    assert_redirected_to sop
+    # User knows - Flash indicates to user that it is in gatekeeper's hands
+    assert_includes flash[:notice],("gatekeeper's approval list.")
+    # Gatekeeper knows - Logs adequately
+    assert_enqueued_emails 1
+    assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL, sop.last_publishing_log.publish_state
+  end
+
+  test 'manage_update with gatekeeper - should allow to make visible' do
+    gatekeeper = Factory(:asset_gatekeeper)
+    policy = Factory(:policy, access_type: Policy::NO_ACCESS, permissions: [Factory(:permission)])
+    sop = Factory(:sop, project_ids: gatekeeper.projects.collect(&:id), policy: policy)
+    login_as(sop.contributor)
+    assert sop.can_manage?
+    patch :manage_update, params: { id: sop,
+                                    sop: { creator_ids: [sop.contributor.id],
+                                           project_ids: [gatekeeper.projects.collect(&:id)] },
+                                    policy_attributes: { access_type: Policy::VISIBLE } }
+    sop.reload
+    # Does update policy
+    assert_equal Policy::VISIBLE, sop.policy.access_type
+    assert_redirected_to sop
+    # User knows - Flash indicates success
+    assert_equal 'SOP was successfully updated.', flash[:notice]
+    # Gatekeeper does not need to know
+    assert_enqueued_emails 0
+    assert_nil sop.last_publishing_log
   end
 
   test 'should allow to change the policy to visible' do
@@ -580,8 +626,14 @@ class SopsControllerTest < ActionController::TestCase
     assert sop.can_manage?
     put :update, params: { id: sop.id, sop: { title: sop.title }, policy_attributes: { access_type: Policy::VISIBLE } }
     sop = assigns(:sop)
-    assert_redirected_to(sop)
+    # Does update policy
     assert_equal Policy::VISIBLE, sop.policy.access_type
+    assert_redirected_to(sop)
+    # User knows - Flash indicates success
+    assert_equal "SOP metadata was successfully updated.",flash[:notice]
+    # Gatekeeper does not need to know
+    assert_enqueued_emails 0
+    assert_nil sop.last_publishing_log
   end
 
   test 'should be able to view pdf content' do
