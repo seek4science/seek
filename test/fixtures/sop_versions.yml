@@ -107,7 +107,7 @@ sop_with_complex_permissions_v1:
 sop_with_private_policy_and_custom_sharing_v1:
   contributor: person_for_owner_of_my_first_sop
   title: "SOP with private policy and custom sharing"
-  description: "This is a SOP that has a policy with use_whitelist/use_blacklist set to 'false'; all settings are private and 'use_custom_sharing' as 'true'."
+  description: "This is a SOP that has a policy with use_allowlist/use_denylist set to 'false'; all settings are private and 'use_custom_sharing' as 'true'."
   #original_filename: "little_file.txt"
   #content_type: "text/plain"
   #content_blob: #content_blob_with_little_file
@@ -122,7 +122,7 @@ sop_with_private_policy_and_custom_sharing_v1:
 sop_with_public_download_and_no_custom_sharing_v1:
   contributor: person_for_owner_of_my_first_sop
   title: "SOP with public download and no custom sharing"
-  description: "This is a SOP that has a policy with use_whitelist/use_blacklist set to 'false'; public download available, but no custom permissions - 'use_custom_sharing' is 'false'."
+  description: "This is a SOP that has a policy with use_allowlist/use_denylist set to 'false'; public download available, but no custom permissions - 'use_custom_sharing' is 'false'."
   #original_filename: "little_file.txt"
   #content_type: "text/plain"
   #content_blob: #content_blob_with_little_file
@@ -134,25 +134,25 @@ sop_with_public_download_and_no_custom_sharing_v1:
   policy: public_download_with_no_custom_sharing
   visibility: 2
 
-sop_that_uses_whitelist_blacklist_and_custom_sharing_v1:
+sop_that_uses_allowlist_denylist_and_custom_sharing_v1:
   contributor: person_for_owner_of_my_first_sop
-  title: "SOP that uses whitelist, blacklist and custom sharing"
-  description: "This is a SOP that has a policy with use_whitelist/use_blacklist set to 'true' and 'use_custom_sharing' set to 'true' as well."
+  title: "SOP that uses allowlist, denylist and custom sharing"
+  description: "This is a SOP that has a policy with use_allowlist/use_denylist set to 'true' and 'use_custom_sharing' set to 'true' as well."
   #original_filename: "little_file.txt"
   #content_type: "text/plain"
   #content_blob: #content_blob_with_little_file
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
-  sop: sop_that_uses_whitelist_blacklist_and_custom_sharing
+  sop: sop_that_uses_allowlist_denylist_and_custom_sharing
   version: 1
   projects: [other_project] # not linked to any project for now
-  policy: whitelist_blacklist_and_custom_sharing
+  policy: allowlist_denylist_and_custom_sharing
   visibility: 2
 
 sop_for_test_with_workgroups_v1:
   contributor: person_for_owner_of_my_first_sop
   title: "SOP that is to be used only for tests with workgroups"
-  description: "This is a SOP that has a policy with use_whitelist/use_blacklist set to 'false' and 'use_custom_sharing' set to 'true'."
+  description: "This is a SOP that has a policy with use_allowlist/use_denylist set to 'false' and 'use_custom_sharing' set to 'true'."
   #original_filename: "little_file.txt"
   #content_type: "text/plain"
   #content_blob: #content_blob_with_little_file
@@ -167,7 +167,7 @@ sop_for_test_with_workgroups_v1:
 sop_for_test_with_workgroups_no_custom_sharing_v1:
   contributor: person_for_owner_of_my_first_sop
   title: "SOP that is to be used only for tests with workgroups - no custom sharing"
-  description: "This is a SOP that has a policy with use_whitelist/use_blacklist set to 'false' and 'use_custom_sharing' set to 'false'."
+  description: "This is a SOP that has a policy with use_allowlist/use_denylist set to 'false' and 'use_custom_sharing' set to 'false'."
   #original_filename: "little_file.txt"
   #content_type: "text/plain"
   #content_blob: #content_blob_with_little_file
@@ -182,7 +182,7 @@ sop_for_test_with_workgroups_no_custom_sharing_v1:
 sop_for_test_with_projects_institutions_v1:
   contributor: person_for_owner_of_my_first_sop
   title: "SOP that is to be used only for tests with projects / institutions."
-  description: "This is a SOP that has a policy with use_whitelist/use_blacklist set to 'false' and 'use_custom_sharing' set to 'true'."
+  description: "This is a SOP that has a policy with use_allowlist/use_denylist set to 'false' and 'use_custom_sharing' set to 'true'."
   #original_filename: "little_file.txt"
   #content_type: "text/plain"
   #content_blob: #content_blob_with_little_file
@@ -197,7 +197,7 @@ sop_for_test_with_projects_institutions_v1:
 downloadable_sop_v1:
   contributor: person_for_owner_of_my_first_sop
   title: "SOP that is downloadable."
-  description: "This is a SOP that has a policy with use_whitelist/use_blacklist set to 'false' and 'use_custom_sharing' set to 'true'."
+  description: "This is a SOP that has a policy with use_allowlist/use_denylist set to 'false' and 'use_custom_sharing' set to 'true'."
   #original_filename: "little_file.txt"
   #content_type: "text/plain"
   #content_blob: #content_blob_with_little_file
@@ -212,7 +212,7 @@ downloadable_sop_v1:
 downloadable_sop_v2:
   contributor: person_for_owner_of_my_first_sop
   title: "SOP that is downloadable."
-  description: "This is a SOP that has a policy with use_whitelist/use_blacklist set to 'false' and 'use_custom_sharing' set to 'true'."
+  description: "This is a SOP that has a policy with use_allowlist/use_denylist set to 'false' and 'use_custom_sharing' set to 'true'."
   #original_filename: "little_file.txt"
   #content_type: "text/plain"
   #content_blob: #content_blob_with_little_file2
@@ -227,7 +227,7 @@ downloadable_sop_v2:
 editable_sop_v1:
   contributor: person_for_owner_of_my_first_sop
   title: "SOP that is editable."
-  description: "This is a SOP that has a policy with use_whitelist/use_blacklist set to 'false' and 'use_custom_sharing' set to 'true'."
+  description: "This is a SOP that has a policy with use_allowlist/use_denylist set to 'false' and 'use_custom_sharing' set to 'true'."
   #original_filename: "little_file.txt"
   #content_type: "text/plain"
   #content_blob: content_blob_with_little_file

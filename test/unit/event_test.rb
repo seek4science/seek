@@ -19,7 +19,7 @@ class EventTest < ActiveSupport::TestCase
 
   test 'publication association' do
     assert @event.publications.empty?
-    publication = Factory(:publication)
+    publication = FactoryBot.create(:publication)
     @event.publications << publication
     assert @event.valid?
     assert @event.save
@@ -90,17 +90,17 @@ class EventTest < ActiveSupport::TestCase
   end
 
   test 'presentations association' do
-    event = Factory :event
+    event = FactoryBot.create :event
     assert event.presentations.empty?
 
     User.current_user = event.contributor
     assert_difference 'event.presentations.count' do
-      event.presentations << [Factory(:presentation, policy: Factory(:public_policy))]
+      event.presentations << [FactoryBot.create(:presentation, policy: FactoryBot.create(:public_policy))]
     end
   end
 
   test 'contributors method non non-versioned asset' do
-    event = Factory(:event)
+    event = FactoryBot.create(:event)
 
     refute event.respond_to?(:versions)
     assert_equal 1, event.contributors.length
@@ -108,27 +108,27 @@ class EventTest < ActiveSupport::TestCase
   end
 
   test 'link to documents' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     User.with_current_user(person.user) do
-      event = Factory(:event, contributor:person)
+      event = FactoryBot.create(:event, contributor:person)
       assert_empty event.documents
-      doc = Factory(:document, contributor:person)
-      event = Factory(:event,documents:[doc])
+      doc = FactoryBot.create(:document, contributor:person)
+      event = FactoryBot.create(:event,documents:[doc])
       refute_empty event.documents
       assert_equal [doc],event.documents
     end
   end
 
   test 'fails to link to none visible document' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     User.with_current_user(person.user) do
-      doc = Factory(:document)
+      doc = FactoryBot.create(:document)
       refute doc.can_view?
-      event = Factory.build(:event,documents:[doc], contributor:person)
+      event = FactoryBot.build(:event,documents:[doc], contributor:person)
 
       refute event.save
 
-      event = Factory(:event,contributor:person)
+      event = FactoryBot.create(:event,contributor:person)
       assert event.valid?
 
       assert_raise(ActiveRecord::RecordNotSaved) do
@@ -141,7 +141,7 @@ class EventTest < ActiveSupport::TestCase
 
   test 'country conversion and validation' do
 
-    event = Factory.build(:event)
+    event = FactoryBot.build(:event)
     assert event.valid?
     assert event.country.nil?
 
@@ -173,7 +173,7 @@ class EventTest < ActiveSupport::TestCase
     assert_equal 'Land of Oz', event.country
 
     # check the conversion gets saved
-    event = Factory.build(:event)
+    event = FactoryBot.build(:event)
     event.country = "Germany"
     disable_authorization_checks {
       assert event.save!
@@ -184,14 +184,14 @@ class EventTest < ActiveSupport::TestCase
   end
 
   test 'time zone validation' do
-    event = Factory.build(:event)
+    event = FactoryBot.build(:event)
     assert event.valid?
     event.time_zone = 'invalid/time_zone'
     refute event.valid?
   end
 
   test 'time should change according to the time zone' do
-    event = Factory(:event, start_date: '2022-02-25 14:11:00', end_date: '2022-12-25 2:58:00',
+    event = FactoryBot.create(:event, start_date: '2022-02-25 14:11:00', end_date: '2022-12-25 2:58:00',
                             time_zone: 'Europe/Paris')
 
     start_date = event.start_date
@@ -208,7 +208,7 @@ class EventTest < ActiveSupport::TestCase
   end
 
   test 'should not shift times on subsequent saves' do
-    event = Factory(:event, time_zone: 'Europe/Paris')
+    event = FactoryBot.create(:event, time_zone: 'Europe/Paris')
 
     start_date = event.start_date
     end_date = event.end_date
@@ -228,7 +228,7 @@ class EventTest < ActiveSupport::TestCase
   end
 
   test 'should update date time on time zone change' do
-    event = Factory(:event, time_zone: 'Europe/Paris')
+    event = FactoryBot.create(:event, time_zone: 'Europe/Paris')
     start_date = event.start_date
     end_date = event.end_date
 

@@ -21,7 +21,7 @@ module Seek
         send :include, Seek::ExplicitVersioning::ActMethods
 
         cattr_accessor :versioned_class_name, :versioned_foreign_key, :versioned_table_name, :versioned_inheritance_column,
-                       :version_column, :version_sequence_name, :file_columns, :white_list_columns, :revision_comments_column,
+                       :version_column, :version_sequence_name, :file_columns, :allowed_list_columns, :revision_comments_column,
                        :version_association_options, :timestamp_columns, :sync_ignore_columns
 
         self.versioned_class_name         = options[:class_name]  || 'Version'
@@ -30,7 +30,7 @@ module Seek
         self.versioned_inheritance_column = options[:inheritance_column] || "versioned_#{inheritance_column}"
         self.version_column               = options[:version_column]     || 'version'
         self.file_columns                 = options[:file_columns] || []
-        self.white_list_columns           = options[:white_list_columns] || []
+        self.allowed_list_columns           = options[:allowed_list_columns] || []
         self.revision_comments_column     = options[:revision_comments_column] || 'revision_comments'
         self.version_association_options  = {
             class_name: "#{self}::#{versioned_class_name}",
@@ -44,7 +44,7 @@ module Seek
         class_eval do
           order_opts = version_association_options.delete(:order) || ''
           condition_ops = version_association_options.delete(:conditions) || ''
-          has_many :versions, -> { order(order_opts).where(condition_ops) }, version_association_options
+          has_many :versions, -> { order(order_opts).where(condition_ops) }, **version_association_options
 
           before_create :set_new_version
           after_create :save_version_on_create
@@ -334,7 +334,7 @@ module Seek
         versioned_attributes.each do |key|
           # Make sure to ignore file columns, white list columns, timestamp columns and any other ignore columns
           unless file_columns.include?(key) ||
-              white_list_columns.include?(key) ||
+              allowed_list_columns.include?(key) ||
               timestamp_columns.include?(key) ||
               sync_ignore_columns.include?(key)
             next unless orig_model.respond_to?(key)
@@ -366,7 +366,7 @@ module Seek
 
         # Now set white list columns
         begin
-          white_list_columns.each do |key|
+          allowed_list_columns.each do |key|
             if orig_model.has_attribute?(key)
               if orig_model.send(key).nil?
                 new_model.send("#{key}=", nil)

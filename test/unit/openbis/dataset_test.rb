@@ -4,7 +4,7 @@ require 'openbis_test_helper'
 class DatasetTest < ActiveSupport::TestCase
   def setup
     mock_openbis_calls
-    @openbis_endpoint = Factory(:openbis_endpoint)
+    @openbis_endpoint = FactoryBot.create(:openbis_endpoint)
   end
 
   test 'find by perm ids' do
@@ -123,7 +123,7 @@ class DatasetTest < ActiveSupport::TestCase
 
   # Test for original Stuart's code, I left to in case it has to be compared with new one
   #   test 'create datafile' do
-  #     User.current_user = Factory(:person).user
+  #     User.current_user = FactoryBot.create(:person).user
   #     @openbis_endpoint.project.update(default_license: 'wibble')
   #
   #     dataset = Seek::Openbis::Dataset.new(@openbis_endpoint, '20160210130454955-23')
@@ -142,7 +142,7 @@ class DatasetTest < ActiveSupport::TestCase
   #     assert_equal "openbis:#{@openbis_endpoint.id}:dataset:20160210130454955-23", datafile.content_blob.url
   #     assert_equal 'wibble', datafile.license
   #
-  #     normal = Factory(:data_file)
+  #     normal = FactoryBot.create(:data_file)
   #     refute normal.openbis?
   #     refute normal.content_blob.openbis?
   #     refute normal.content_blob.custom_integration?

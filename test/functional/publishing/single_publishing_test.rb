@@ -13,7 +13,7 @@ class SinglePublishingTest < ActionController::TestCase
 
   test 'should be able to do publish when publishable' do
     df = data_with_isa
-    gatekeeper = Factory(:asset_gatekeeper)
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
     df.projects << gatekeeper.projects.first
     assert df.can_publish?, 'The data file must be manageable for this test to succeed'
 
@@ -39,7 +39,7 @@ class SinglePublishingTest < ActionController::TestCase
   end
 
   test 'should not be able to do publish when not publishable' do
-    df = Factory(:data_file, policy: Factory(:all_sysmo_viewable_policy))
+    df = FactoryBot.create(:data_file, policy: FactoryBot.create(:all_sysmo_viewable_policy))
     assert df.can_view?, 'The datafile must be viewable for this test to be meaningful'
     assert !df.can_publish?, 'The datafile must not be manageable for this test to succeed'
 
@@ -84,16 +84,16 @@ class SinglePublishingTest < ActionController::TestCase
     investigation = study.investigation
 
     notifying_df = assay.data_files.reject { |d| d == df }.first
-    gatekeeper = Factory(:asset_gatekeeper)
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
     person = users(:datafile_owner).person
     gatekept_project = gatekeeper.projects.first
     non_gatekept_project = person.projects.first
-    person.add_to_project_and_institution(gatekept_project, Factory(:institution))
-    request_publishing_df = Factory(:data_file,
+    person.add_to_project_and_institution(gatekept_project, FactoryBot.create(:institution))
+    request_publishing_df = FactoryBot.create(:data_file,
                                     projects: [gatekept_project],
                                     contributor: person,
                                     assays: [assay])
-    publishing_df = Factory(:data_file,
+    publishing_df = FactoryBot.create(:data_file,
                             projects: [non_gatekept_project],
                             contributor: person,
                             assays: [assay])
@@ -109,21 +109,21 @@ class SinglePublishingTest < ActionController::TestCase
     assert_select '.type_and_title', text: /Investigation/, count: 1 do
       assert_select 'a[href=?]', investigation_path(investigation), text: /#{investigation.title}/
     end
-    assert_select '.checkbox', text: /Publish/ do
+    assert_select '.parent-btn-checkbox', text: /Publish/ do
       assert_select "input[type='checkbox'][id=?]", "publish_Investigation_#{investigation.id}"
     end
 
     assert_select '.type_and_title', text: /Study/, count: 1 do
       assert_select 'a[href=?]', study_path(study), text: /#{study.title}/
     end
-    assert_select '.checkbox', text: /Publish/ do
+    assert_select '.parent-btn-checkbox', text: /Publish/ do
       assert_select "input[type='checkbox'][id=?]", "publish_Study_#{study.id}"
     end
 
     assert_select '.type_and_title', text: /Assay/, count: 1 do
       assert_select 'a[href=?]', assay_path(assay), text: /#{assay.title}/
     end
-    assert_select '.checkbox', text: /Publish/ do
+    assert_select '.parent-btn-checkbox', text: /Publish/ do
       assert_select "input[type='checkbox'][id=?]", "publish_Assay_#{assay.id}"
     end
 
@@ -133,23 +133,69 @@ class SinglePublishingTest < ActionController::TestCase
       assert_select 'a[href=?]', data_file_path(request_publishing_df), text: /#{request_publishing_df.title}/
       assert_select 'a[href=?]', data_file_path(notifying_df), text: /#{notifying_df.title}/
     end
-    assert_select '.checkbox', text: /Publish/ do
+    assert_select '.parent-btn-checkbox', text: /Publish/ do
       assert_select "input[type='checkbox'][id=?]", "publish_DataFile_#{publishing_df.id}"
       assert_select "input[type='checkbox'][id=?]", "publish_DataFile_#{request_publishing_df.id}"
     end
+
     assert_select 'span.label-warning', text: "Can't publish", count: 1
   end
 
+  test 'split-button recursive selection' do
+    datafile111 = data_with_isa
+    assay11 = datafile111.assays.first
+    study1 = assay11.study
+    investigation = study1.investigation
+    person = users(:datafile_owner).person
+
+    datafile112 = FactoryBot.create(:data_file, assays: [assay11], contributor: person)
+    assay12 = FactoryBot.create(:assay, investigation: investigation, study: study1, contributor: person)
+    datafile121 = FactoryBot.create(:data_file, assays: [assay12], contributor: person)
+    study2 = FactoryBot.create(:study, investigation: investigation, contributor: person)
+    assay21 = FactoryBot.create(:assay, investigation: investigation, study: study2, contributor: person)
+
+    should_have_dropdown = [investigation, study1, assay11, assay12, study1, study2]
+    should_not_have_dropdown = [datafile111, datafile112, datafile121, assay21]
+
+    get :publish_related_items, params: { id: datafile111.id }
+    assert_response :success
+
+    # split-button dropdown menu shown for tree branches
+    should_have_dropdown.each do |asset|
+      assert_select "._#{asset.id}", count: 1 do
+        assert_select '.parent-btn-dropdown', count: 1
+        assert_select '.dropdown-menu', count: 1 do
+          assert_select 'li', count: 2 do
+            assert_select 'a.selectChildren', text: /Select this item and all of its sub-items./, count: 1 do
+              assert_select 'img[src=?]', '/assets/checkbox_select_all.svg'
+            end
+
+            assert_select 'a.deselectChildren', text: /Deselect this item and all of its sub-items./, count: 1 do
+              assert_select 'img[src=?]', '/assets/checkbox_deselect_all.svg'
+            end
+          end
+        end
+      end
+    end
+    # split-button dropdown menu not shown for tree leafs
+    should_not_have_dropdown.each do |asset|
+      assert_select "._#{asset.id}", count: 1 do
+        assert_select '.parent-btn-dropdown', count: 0
+        assert_select '.dropdown-menu', count: 0
+      end
+    end
+  end
+
   test 'get check_gatekeeper_required' do
-    gatekeeper = Factory(:asset_gatekeeper)
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
     person = User.current_user.person
     gatekept_project = gatekeeper.projects.first
     non_gatekept_project = person.projects.first
-    person.add_to_project_and_institution(gatekept_project, Factory(:institution))
+    person.add_to_project_and_institution(gatekept_project, FactoryBot.create(:institution))
 
-    df = Factory(:data_file, projects: [gatekept_project], contributor: person)
-    model = Factory(:model, projects: [gatekept_project], contributor: person)
-    sop = Factory(:sop, projects: [non_gatekept_project], contributor: person)
+    df = FactoryBot.create(:data_file, projects: [gatekept_project], contributor: person)
+    model = FactoryBot.create(:model, projects: [gatekept_project], contributor: person)
+    sop = FactoryBot.create(:sop, projects: [non_gatekept_project], contributor: person)
     assert df.gatekeeper_required?, "This datafile must require gatekeeper's approval for the test to succeed"
     assert model.gatekeeper_required?, "This model must require gatekeeper's approval for the test to succeed"
     assert !sop.gatekeeper_required?, "This sop must not require gatekeeper's approval for the test to succeed"
@@ -179,7 +225,7 @@ class SinglePublishingTest < ActionController::TestCase
 
   test 'if the asset has no related items, proceed directly to check_gatekeeper_required' do
     df = data_file_for_publishing
-    gatekeeper = Factory(:asset_gatekeeper)
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
     df.projects << gatekeeper.projects.first
     assert df.can_publish?, 'The data file must be manageable for this test to succeed'
 
@@ -229,12 +275,12 @@ class SinglePublishingTest < ActionController::TestCase
   end
 
   test "sending publishing request when doing publish for asset that need gatekeeper's approval" do
-    gatekeeper = Factory(:asset_gatekeeper)
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
     person = User.current_user.person
     gatekept_project = gatekeeper.projects.first
-    person.add_to_project_and_institution(gatekept_project, Factory(:institution))
+    person.add_to_project_and_institution(gatekept_project, FactoryBot.create(:institution))
 
-    df = Factory(:data_file, contributor: person, projects: [gatekept_project])
+    df = FactoryBot.create(:data_file, contributor: person, projects: [gatekept_project])
     assert df.can_publish?, 'The data file must be publishable for this test to succeed'
     assert df.gatekeeper_required?, "This datafile must need gatekeeper's approval for the test to succeed'"
     assert !df.is_waiting_approval?(User.current_user), 'The publishing request for this data file must not be sent for this test to succeed'
@@ -356,10 +402,10 @@ class SinglePublishingTest < ActionController::TestCase
   test 'get published' do
     df = data_file_for_publishing
     published_items = ["#{df.class.name},#{df.id}"]
-    df1 = Factory(:data_file)
+    df1 = FactoryBot.create(:data_file)
     published_items << "#{df1.class.name},#{df1.id}"
 
-    df2 = Factory(:data_file, contributor: User.current_user.person)
+    df2 = FactoryBot.create(:data_file, contributor: User.current_user.person)
     waiting_for_publish_items = ["#{df2.class.name},#{df2.id}"]
 
     assert df.can_view?, 'This datafile must be viewable for the test to succeed'
@@ -384,16 +430,16 @@ class SinglePublishingTest < ActionController::TestCase
   private
 
   def data_file_for_publishing(owner = users(:datafile_owner))
-    Factory(:data_file, contributor: owner.person)
+    FactoryBot.create(:data_file, contributor: owner.person)
   end
 
   def data_with_isa
     df = data_file_for_publishing
     other_user = users(:quentin)
-    assay = Factory :experimental_assay, contributor: df.contributor,
-                                         study: Factory(:study, contributor: df.contributor,
-                                                                investigation: Factory(:investigation, contributor: df.contributor))
-    other_persons_data_file = Factory(:data_file, contributor: other_user.person, policy: Factory(:policy, access_type: Policy::VISIBLE))
+    assay = FactoryBot.create :experimental_assay, contributor: df.contributor,
+                                         study: FactoryBot.create(:study, contributor: df.contributor,
+                                                                investigation: FactoryBot.create(:investigation, contributor: df.contributor))
+    other_persons_data_file = FactoryBot.create(:data_file, contributor: other_user.person, policy: FactoryBot.create(:policy, access_type: Policy::VISIBLE))
     assay.associate(df)
     assay.associate(other_persons_data_file)
     assert !other_persons_data_file.can_manage?

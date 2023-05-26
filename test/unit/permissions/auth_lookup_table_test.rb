@@ -21,10 +21,10 @@ class AuthLookupTableTest < ActiveSupport::TestCase
       DataFile.destroy_all
     end
 
-    u = Factory(:user)
-    u2 = Factory(:user)
-    a = Factory(:assay, contributor: u2.person)
-    d = Factory(:data_file, contributor: u2.person)
+    u = FactoryBot.create(:user)
+    u2 = FactoryBot.create(:user)
+    a = FactoryBot.create(:assay, contributor: u2.person)
+    d = FactoryBot.create(:data_file, contributor: u2.person)
     a.update_lookup_table_for_all_users
     d.update_lookup_table_for_all_users
 
@@ -48,10 +48,10 @@ class AuthLookupTableTest < ActiveSupport::TestCase
   end
 
   test 'Updates auth lookup for all users' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     User.current_user = person.user
     [:assay, :document, :data_file, :sample].each do |type|
-      item = Factory(type, contributor: person, policy: Factory(:private_policy))
+      item = FactoryBot.create(type, contributor: person, policy: FactoryBot.create(:private_policy))
 
       assert_equal 2, item.auth_lookup.count, "Should have 1 entry each for logged in user and anonymous user (nil)"
       auth = item.auth_lookup.to_a
@@ -86,9 +86,9 @@ class AuthLookupTableTest < ActiveSupport::TestCase
   end
 
   test 'Initializes auth lookup for item with existing entries' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     User.current_user = person.user
-    doc = Factory(:document, contributor: person, policy: Factory(:public_policy))
+    doc = FactoryBot.create(:document, contributor: person, policy: FactoryBot.create(:public_policy))
     doc.update_lookup_table_for_all_users
 
     assert_no_difference(-> { doc.auth_lookup.count }) do
@@ -99,9 +99,9 @@ class AuthLookupTableTest < ActiveSupport::TestCase
   end
 
   test 'Initializes auth lookup for item with no entries' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     User.current_user = person.user
-    doc = Factory(:document, contributor: person, policy: Factory(:public_policy))
+    doc = FactoryBot.create(:document, contributor: person, policy: FactoryBot.create(:public_policy))
     doc.auth_lookup.delete_all
 
     assert_equal 0, doc.auth_lookup.count
@@ -121,13 +121,13 @@ class AuthLookupTableTest < ActiveSupport::TestCase
       Sop.destroy_all
     end
 
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     project = person.projects.first
-    project_buddy = Factory(:person, project: project)
-    another_person = Factory(:person)
+    project_buddy = FactoryBot.create(:person, project: project)
+    another_person = FactoryBot.create(:person)
     User.current_user = person.user
 
-    sop = Factory(:sop, contributor: person, policy: Factory(:publicly_viewable_policy,
+    sop = FactoryBot.create(:sop, contributor: person, policy: FactoryBot.create(:publicly_viewable_policy,
                                                              permissions: [Permission.new(contributor: project, access_type: Policy::EDITING)]))
 
     cont = person.user.id
@@ -190,11 +190,11 @@ class AuthLookupTableTest < ActiveSupport::TestCase
     User.destroy_all
     Sop.destroy_all
 
-    person = Factory(:person)
-    Factory(:person)
+    person = FactoryBot.create(:person)
+    FactoryBot.create(:person)
 
-    sop=Factory(:sop, contributor:person)
-    sop2=Factory(:sop, contributor:person)
+    sop=FactoryBot.create(:sop, contributor:person)
+    sop2=FactoryBot.create(:sop, contributor:person)
 
     sop.update_lookup_table_for_all_users
     sop2.update_lookup_table_for_all_users

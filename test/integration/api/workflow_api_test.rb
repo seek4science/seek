@@ -6,24 +6,24 @@ class WorkflowApiTest < ActionDispatch::IntegrationTest
 
   def setup
     user_login
-    Factory(:cwl_workflow_class) # Make sure the CWL class is present
+    FactoryBot.create(:cwl_workflow_class) # Make sure the CWL class is present
     @project = @current_user.person.projects.first
-    investigation = Factory(:investigation, projects: [@project], contributor: current_person)
-    study = Factory(:study, investigation: investigation, contributor: current_person)
-    Factory(:operations_controlled_vocab) unless SampleControlledVocab::SystemVocabs.operations_controlled_vocab
-    Factory(:topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.topics_controlled_vocab
-    @assay = Factory(:assay, study: study, contributor: current_person)
-    @creator = Factory(:person)
-    @publication = Factory(:publication, projects: [@project])
-    @presentation = Factory(:presentation, projects: [@project], contributor: current_person)
-    @data_file = Factory(:data_file, projects: [@project], contributor: current_person)
-    @document = Factory(:document, projects: [@project], contributor: current_person)
-    @sop = Factory(:sop, projects: [@project], contributor: current_person)
-    @workflow = Factory(:workflow, policy: Factory(:public_policy), contributor: current_person, creators: [@creator])
+    investigation = FactoryBot.create(:investigation, projects: [@project], contributor: current_person)
+    study = FactoryBot.create(:study, investigation: investigation, contributor: current_person)
+    FactoryBot.create(:operations_controlled_vocab) unless SampleControlledVocab::SystemVocabs.operations_controlled_vocab
+    FactoryBot.create(:topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.topics_controlled_vocab
+    @assay = FactoryBot.create(:assay, study: study, contributor: current_person)
+    @creator = FactoryBot.create(:person)
+    @publication = FactoryBot.create(:publication, projects: [@project])
+    @presentation = FactoryBot.create(:presentation, projects: [@project], contributor: current_person)
+    @data_file = FactoryBot.create(:data_file, projects: [@project], contributor: current_person)
+    @document = FactoryBot.create(:document, projects: [@project], contributor: current_person)
+    @sop = FactoryBot.create(:sop, projects: [@project], contributor: current_person)
+    @workflow = FactoryBot.create(:workflow, policy: FactoryBot.create(:public_policy), contributor: current_person, creators: [@creator])
   end
 
   test 'can add content to API-created workflow' do
-    wf = Factory(:api_cwl_workflow, contributor: current_person)
+    wf = FactoryBot.create(:api_cwl_workflow, contributor: current_person)
 
     assert wf.content_blob.no_content?
     assert wf.can_download?(@current_user)

@@ -5,13 +5,13 @@ class InstitutionTest < ActiveSupport::TestCase
   # Replace this with your real tests.
 
   def test_delete_inst_deletes_workgroup
-    i = Factory(:person).institutions.first
+    i = FactoryBot.create(:person).institutions.first
 
     assert_equal 1, i.work_groups.size
 
     wg = i.work_groups.first
     wg.people = []
-    User.with_current_user(Factory(:admin).user) do
+    User.with_current_user(FactoryBot.create(:admin).user) do
       i.destroy
     end
 
@@ -20,15 +20,15 @@ class InstitutionTest < ActiveSupport::TestCase
   end
 
   test 'programmes' do
-    proj1 = Factory(:work_group).project
-    proj2 = Factory(:work_group).project
-    proj3 = Factory(:work_group).project
+    proj1 = FactoryBot.create(:work_group).project
+    proj2 = FactoryBot.create(:work_group).project
+    proj3 = FactoryBot.create(:work_group).project
 
     refute_empty proj1.institutions
     refute_empty proj2.institutions
     refute_empty proj3.institutions
 
-    prog1 = Factory(:programme, projects: [proj1, proj2])
+    prog1 = FactoryBot.create(:programme, projects: [proj1, proj2])
     assert_includes proj1.institutions.first.programmes, prog1
     assert_includes proj2.institutions.first.programmes, prog1
     refute_includes proj3.institutions.first.programmes, prog1
@@ -41,36 +41,36 @@ class InstitutionTest < ActiveSupport::TestCase
   end
 
   def test_title_trimmed
-    i = Factory(:institution, title: ' an institution', country: 'LY')
+    i = FactoryBot.create(:institution, title: ' an institution', country: 'LY')
     assert_equal('an institution', i.title)
   end
 
   def test_update_first_letter
-    i = Factory(:institution, title: 'an institution', country: 'NL')
+    i = FactoryBot.create(:institution, title: 'an institution', country: 'NL')
     assert_equal 'A', i.first_letter
   end
 
   def test_can_be_edited_by
-    prog_admin = Factory(:programme_administrator)
-    pm = Factory(:project_administrator)
+    prog_admin = FactoryBot.create(:programme_administrator)
+    pm = FactoryBot.create(:project_administrator)
     i = pm.institutions.first
-    i2 = Factory(:institution)
+    i2 = FactoryBot.create(:institution)
     assert i.can_edit?(pm.user), 'This institution should be editable as this user is project administrator of a project this institution is linked to'
     assert i2.can_edit?(pm.user), 'This institution should be editable as this user is project administrator, even if not of a project this institution is linked to'
     assert i.can_edit?(prog_admin.user), 'This institution should be editable as this user is programme administrator'
 
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     refute i.can_edit?(person), 'The institution should not be editable by a normal person'
     i = person.institutions.first
     refute i.can_edit?(person), 'The institution should not be editable by a normal person even if a member'
 
-    i = Factory(:institution)
-    u = Factory(:admin).user
+    i = FactoryBot.create(:institution)
+    u = FactoryBot.create(:admin).user
     assert i.can_edit?(u), "Institution :one should be editable by this user, as he's an admin"
   end
 
   test 'validation' do
-    i = Factory(:institution)
+    i = FactoryBot.create(:institution)
     assert i.valid?
 
     i.title = nil
@@ -128,20 +128,20 @@ class InstitutionTest < ActiveSupport::TestCase
   end
 
   test 'can_delete?' do
-    institution = Factory(:institution)
+    institution = FactoryBot.create(:institution)
 
     # none-admin can not delete
-    user = Factory(:user)
+    user = FactoryBot.create(:user)
     assert !user.is_admin?
     assert institution.work_groups.collect(&:people).flatten.empty?
     assert !institution.can_delete?(user)
 
     # can not delete if workgroups contain people
-    user = Factory(:admin).user
+    user = FactoryBot.create(:admin).user
     assert user.is_admin?
-    institution = Factory(:project)
-    work_group = Factory(:work_group, project: institution)
-    a_person = Factory(:person, group_memberships: [Factory(:group_membership, work_group: work_group)])
+    institution = FactoryBot.create(:project)
+    work_group = FactoryBot.create(:work_group, project: institution)
+    a_person = FactoryBot.create(:person, group_memberships: [FactoryBot.create(:group_membership, work_group: work_group)])
     # assert !institution.work_groups.collect(&:people).flatten.empty?
     # assert !institution.can_delete?(user)
 
@@ -153,7 +153,7 @@ class InstitutionTest < ActiveSupport::TestCase
   end
 
   test 'get all institution listing' do
-    inst = Factory(:institution, title: 'Inst X')
+    inst = FactoryBot.create(:institution, title: 'Inst X')
     array = Institution.get_all_institutions_listing
     assert_includes array, ['Inst X', inst.id]
   end
@@ -162,23 +162,23 @@ class InstitutionTest < ActiveSupport::TestCase
     User.current_user = nil
     refute Institution.can_create?
 
-    User.current_user = Factory(:person).user
+    User.current_user = FactoryBot.create(:person).user
     refute Institution.can_create?
 
-    User.current_user = Factory(:admin).user
+    User.current_user = FactoryBot.create(:admin).user
     assert Institution.can_create?
 
-    User.current_user = Factory(:project_administrator).user
+    User.current_user = FactoryBot.create(:project_administrator).user
     assert Institution.can_create?
 
-    person = Factory(:programme_administrator)
+    person = FactoryBot.create(:programme_administrator)
     User.current_user = person.user
     programme = person.administered_programmes.first
     assert programme.is_activated?
     assert Institution.can_create?
 
     # only if the programme is activated
-    person = Factory(:programme_administrator)
+    person = FactoryBot.create(:programme_administrator)
     programme = person.administered_programmes.first
     programme.is_activated = false
     disable_authorization_checks { programme.save! }
@@ -187,15 +187,15 @@ class InstitutionTest < ActiveSupport::TestCase
   end
 
   test "can list people even if they don't have a last name" do
-    work_group = Factory(:work_group)
-    person = Factory(:person, last_name: nil, group_memberships: [Factory(:group_membership, work_group: work_group)])
-    person2 = Factory(:person, group_memberships: [Factory(:group_membership, work_group: work_group)])
+    work_group = FactoryBot.create(:work_group)
+    person = FactoryBot.create(:person, last_name: nil, group_memberships: [FactoryBot.create(:group_membership, work_group: work_group)])
+    person2 = FactoryBot.create(:person, group_memberships: [FactoryBot.create(:group_membership, work_group: work_group)])
 
     assert_includes work_group.institution.people, person
   end
 
   test 'country conversion and validation' do
-    institution = Factory.build(:institution, country: nil)
+    institution = FactoryBot.build(:institution, country: nil)
     assert institution.valid?
     assert institution.country.nil?
 
@@ -227,7 +227,7 @@ class InstitutionTest < ActiveSupport::TestCase
     assert_equal 'Land of Oz', institution.country
 
     # check the conversion gets saved
-    institution = Factory.build(:institution)
+    institution = FactoryBot.build(:institution)
     institution.country = "Germany"
     disable_authorization_checks {
       assert institution.save!

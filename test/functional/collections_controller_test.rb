@@ -11,8 +11,8 @@ class CollectionsControllerTest < ActionController::TestCase
   include GeneralAuthorizationTestCases
 
   test 'should return 406 when requesting RDF' do
-    login_as(Factory(:user))
-    doc = Factory :collection, contributor: User.current_user.person
+    login_as(FactoryBot.create(:user))
+    doc = FactoryBot.create :collection, contributor: User.current_user.person
     assert doc.can_view?
 
     get :show, params: { id: doc, format: :rdf }
@@ -21,7 +21,7 @@ class CollectionsControllerTest < ActionController::TestCase
   end
 
   test 'should get index' do
-    FactoryGirl.create_list(:public_collection, 3)
+    FactoryBot.create_list(:public_collection, 3)
 
     get :index
 
@@ -30,9 +30,9 @@ class CollectionsControllerTest < ActionController::TestCase
   end
 
   test 'should not duplicate maintainer' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person.user)
-    collection = Factory(:public_collection, title: 'my collection',contributor:person, creators:[person, Factory(:person)])
+    collection = FactoryBot.create(:public_collection, title: 'my collection',contributor:person, creators:[person, FactoryBot.create(:person)])
 
     get :index
     assert_response :success
@@ -45,8 +45,8 @@ class CollectionsControllerTest < ActionController::TestCase
   end
 
   test "shouldn't show hidden items in index" do
-    visible_collection = Factory(:public_collection)
-    hidden_collection = Factory(:private_collection)
+    visible_collection = FactoryBot.create(:public_collection)
+    hidden_collection = FactoryBot.create(:private_collection)
 
     get :index, params: { page: 'all' }
 
@@ -56,7 +56,7 @@ class CollectionsControllerTest < ActionController::TestCase
   end
 
   test 'should show' do
-    visible_collection = Factory(:public_collection)
+    visible_collection = FactoryBot.create(:public_collection)
 
     get :show, params: { id: visible_collection }
 
@@ -64,7 +64,7 @@ class CollectionsControllerTest < ActionController::TestCase
   end
 
   test 'should show all item types without error' do
-    all_types_collection = Factory(:collection_with_all_types)
+    all_types_collection = FactoryBot.create(:collection_with_all_types)
     items = all_types_collection.collection_items
 
     get :show, params: { id: all_types_collection }
@@ -76,7 +76,7 @@ class CollectionsControllerTest < ActionController::TestCase
   end
 
   test 'should not show hidden collection' do
-    hidden_collection = Factory(:private_collection)
+    hidden_collection = FactoryBot.create(:private_collection)
 
     get :show, params: { id: hidden_collection }
 
@@ -84,7 +84,7 @@ class CollectionsControllerTest < ActionController::TestCase
   end
 
   test 'should get new' do
-    login_as(Factory(:person))
+    login_as(FactoryBot.create(:person))
 
     get :new
     assert_response :success
@@ -92,7 +92,7 @@ class CollectionsControllerTest < ActionController::TestCase
   end
 
   test 'should get edit' do
-    login_as(Factory(:person))
+    login_as(FactoryBot.create(:person))
 
     get :new
     assert_response :success
@@ -100,7 +100,7 @@ class CollectionsControllerTest < ActionController::TestCase
   end
 
   test 'should create collection' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
 
     assert_difference('ActivityLog.count') do
@@ -113,8 +113,8 @@ class CollectionsControllerTest < ActionController::TestCase
   end
 
   test 'should update collection' do
-    person = Factory(:person)
-    collection = Factory(:collection, contributor: person)
+    person = FactoryBot.create(:person)
+    collection = FactoryBot.create(:collection, contributor: person)
     login_as(person)
 
     assert collection.assays.empty?
@@ -128,8 +128,8 @@ class CollectionsControllerTest < ActionController::TestCase
   end
 
   test 'should destroy collection' do
-    person = Factory(:person)
-    collection = Factory(:populated_collection, contributor: person)
+    person = FactoryBot.create(:person)
+    collection = FactoryBot.create(:populated_collection, contributor: person)
     login_as(person)
 
     assert_difference('Collection.count', -1) do
@@ -143,10 +143,10 @@ class CollectionsControllerTest < ActionController::TestCase
 
   test "asset collections through nested routing" do
     assert_routing 'documents/2/collections', controller: 'collections', action: 'index', document_id: '2'
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
-    collection = Factory(:populated_collection, contributor: person)
-    collection2 = Factory(:populated_collection, contributor: person)
+    collection = FactoryBot.create(:populated_collection, contributor: person)
+    collection2 = FactoryBot.create(:populated_collection, contributor: person)
     document = collection.assets.first
 
     get :index, params: { document_id: document.id }
@@ -160,11 +160,11 @@ class CollectionsControllerTest < ActionController::TestCase
 
   test "people collections through nested routing" do
     assert_routing 'people/2/collections', controller: 'collections', action: 'index', person_id: '2'
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
-    assay = Factory(:assay, contributor:person)
-    collection = Factory(:collection,assays:[assay],contributor:person)
-    collection2 = Factory(:collection,policy: Factory(:public_policy),contributor:Factory(:person))
+    assay = FactoryBot.create(:assay, contributor:person)
+    collection = FactoryBot.create(:collection,assays:[assay],contributor:person)
+    collection2 = FactoryBot.create(:collection,policy: FactoryBot.create(:public_policy),contributor:FactoryBot.create(:person))
 
 
     get :index, params: { person_id: person.id }
@@ -178,10 +178,10 @@ class CollectionsControllerTest < ActionController::TestCase
 
   test "project collections through nested routing" do
     assert_routing 'projects/2/collections', controller: 'collections', action: 'index', project_id: '2'
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
-    collection = Factory(:collection, contributor:person)
-    collection2 = Factory(:collection,policy: Factory(:public_policy), contributor:Factory(:person))
+    collection = FactoryBot.create(:collection, contributor:person)
+    collection2 = FactoryBot.create(:collection,policy: FactoryBot.create(:public_policy), contributor:FactoryBot.create(:person))
 
     get :index, params: { project_id: person.projects.first.id }
 
@@ -197,8 +197,8 @@ class CollectionsControllerTest < ActionController::TestCase
   end
 
   test 'can access manage page with manage rights' do
-    person = Factory(:person)
-    collection = Factory(:collection, contributor:person)
+    person = FactoryBot.create(:person)
+    collection = FactoryBot.create(:collection, contributor:person)
     login_as(person)
     assert collection.can_manage?
     get :manage, params: {id: collection}
@@ -217,8 +217,8 @@ class CollectionsControllerTest < ActionController::TestCase
   end
 
   test 'cannot access manage page with edit rights' do
-    person = Factory(:person)
-    collection = Factory(:collection, policy:Factory(:private_policy, permissions:[Factory(:permission, contributor:person, access_type:Policy::EDITING)]))
+    person = FactoryBot.create(:person)
+    collection = FactoryBot.create(:collection, policy:FactoryBot.create(:private_policy, permissions:[FactoryBot.create(:permission, contributor:person, access_type:Policy::EDITING)]))
     login_as(person)
     assert collection.can_edit?
     refute collection.can_manage?
@@ -228,17 +228,17 @@ class CollectionsControllerTest < ActionController::TestCase
   end
 
   test 'manage_update' do
-    proj1=Factory(:project)
-    proj2=Factory(:project)
-    person = Factory(:person,project:proj1)
-    other_person = Factory(:person)
+    proj1=FactoryBot.create(:project)
+    proj2=FactoryBot.create(:project)
+    person = FactoryBot.create(:person,project:proj1)
+    other_person = FactoryBot.create(:person)
     person.add_to_project_and_institution(proj2,person.institutions.first)
     person.save!
-    other_creator = Factory(:person,project:proj1)
+    other_creator = FactoryBot.create(:person,project:proj1)
     other_creator.add_to_project_and_institution(proj2,other_creator.institutions.first)
     other_creator.save!
 
-    collection = Factory(:collection, contributor:person, projects:[proj1], policy:Factory(:private_policy))
+    collection = FactoryBot.create(:collection, contributor:person, projects:[proj1], policy:FactoryBot.create(:private_policy))
 
     login_as(person)
     assert collection.can_manage?
@@ -264,20 +264,20 @@ class CollectionsControllerTest < ActionController::TestCase
   end
 
   test 'manage_update fails without manage rights' do
-    proj1=Factory(:project)
-    proj2=Factory(:project)
-    person = Factory(:person, project:proj1)
+    proj1=FactoryBot.create(:project)
+    proj2=FactoryBot.create(:project)
+    person = FactoryBot.create(:person, project:proj1)
     person.add_to_project_and_institution(proj2,person.institutions.first)
     person.save!
 
-    other_person = Factory(:person)
+    other_person = FactoryBot.create(:person)
 
-    other_creator = Factory(:person,project:proj1)
+    other_creator = FactoryBot.create(:person,project:proj1)
     other_creator.add_to_project_and_institution(proj2,other_creator.institutions.first)
     other_creator.save!
 
-    collection = Factory(:collection, projects:[proj1], policy:Factory(:private_policy,
-                                                         permissions:[Factory(:permission,contributor:person, access_type:Policy::EDITING)]))
+    collection = FactoryBot.create(:collection, projects:[proj1], policy:FactoryBot.create(:private_policy,
+                                                         permissions:[FactoryBot.create(:permission,contributor:person, access_type:Policy::EDITING)]))
 
     login_as(person)
     refute collection.can_manage?
@@ -306,7 +306,7 @@ class CollectionsControllerTest < ActionController::TestCase
   end
 
   test 'numeric pagination' do
-    FactoryGirl.create_list(:public_collection, 20)
+    FactoryBot.create_list(:public_collection, 20)
 
     with_config_value(:results_per_page_default, 5) do
       get :index
@@ -330,7 +330,7 @@ class CollectionsControllerTest < ActionController::TestCase
   end
 
   test 'user can change results per page' do
-    FactoryGirl.create_list(:public_collection, 15)
+    FactoryBot.create_list(:public_collection, 15)
 
     with_config_value(:results_per_page_default, 5) do
       get :index, params: { per_page: 15 }
@@ -348,14 +348,14 @@ class CollectionsControllerTest < ActionController::TestCase
   end
 
   test 'show filters on index' do
-    Factory(:public_collection)
+    FactoryBot.create(:public_collection)
 
     get :index
     assert_select '.index-filters', count: 1
   end
 
   test 'do not show filters on index if disabled' do
-    Factory(:public_collection)
+    FactoryBot.create(:public_collection)
 
     with_config_value(:filtering_enabled, false) do
       get :index
@@ -364,11 +364,11 @@ class CollectionsControllerTest < ActionController::TestCase
   end
 
   test 'should update collection items' do
-    person = Factory(:person)
-    collection = Factory(:collection, contributor: person)
-    item1 = collection.items.create(asset: Factory(:public_document), order: 1, comment: 'First doc')
-    item2 = collection.items.create(asset: Factory(:public_document), order: 2, comment: 'Second doc')
-    item3 = collection.items.create(asset: Factory(:public_document), order: 3, comment: 'Third doc')
+    person = FactoryBot.create(:person)
+    collection = FactoryBot.create(:collection, contributor: person)
+    item1 = collection.items.create(asset: FactoryBot.create(:public_document), order: 1, comment: 'First doc')
+    item2 = collection.items.create(asset: FactoryBot.create(:public_document), order: 2, comment: 'Second doc')
+    item3 = collection.items.create(asset: FactoryBot.create(:public_document), order: 3, comment: 'Third doc')
     login_as(person)
 
     assert_difference('ActivityLog.count') do
@@ -389,10 +389,10 @@ class CollectionsControllerTest < ActionController::TestCase
   end
 
   test 'should not show items linked to private assets' do
-    person = Factory(:person)
-    collection = Factory(:collection, contributor: person)
-    public = collection.items.create(asset: Factory(:public_document), order: 1, comment: 'This doc is public')
-    private = collection.items.create(asset: Factory(:private_document), order: 2, comment: 'This doc is not')
+    person = FactoryBot.create(:person)
+    collection = FactoryBot.create(:collection, contributor: person)
+    public = collection.items.create(asset: FactoryBot.create(:public_document), order: 1, comment: 'This doc is public')
+    private = collection.items.create(asset: FactoryBot.create(:private_document), order: 2, comment: 'This doc is not')
     assert collection.can_view?
     assert public.asset.can_view?
     refute private.asset.can_view?
@@ -405,10 +405,10 @@ class CollectionsControllerTest < ActionController::TestCase
   end
 
   test 'should not show items linked to private assets even in edit form' do
-    person = Factory(:person)
-    collection = Factory(:collection, contributor: person)
-    public = collection.items.create(asset: Factory(:public_document), order: 1, comment: 'This doc is public')
-    private = collection.items.create(asset: Factory(:private_document), order: 2, comment: 'This doc is not')
+    person = FactoryBot.create(:person)
+    collection = FactoryBot.create(:collection, contributor: person)
+    public = collection.items.create(asset: FactoryBot.create(:public_document), order: 1, comment: 'This doc is public')
+    private = collection.items.create(asset: FactoryBot.create(:private_document), order: 2, comment: 'This doc is not')
     assert collection.can_view?
     assert public.asset.can_view?
     refute private.asset.can_view?
@@ -423,9 +423,9 @@ class CollectionsControllerTest < ActionController::TestCase
   end
 
   test 'should cope with an asset in the collection being deleted' do
-    person = Factory(:person)
-    collection = Factory(:collection, contributor: person)
-    document = Factory(:public_document)
+    person = FactoryBot.create(:person)
+    collection = FactoryBot.create(:collection, contributor: person)
+    document = FactoryBot.create(:public_document)
     item = collection.items.create(asset: document)
     disable_authorization_checks { document.destroy! }
 

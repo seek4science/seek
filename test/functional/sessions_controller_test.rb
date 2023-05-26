@@ -106,7 +106,7 @@ class SessionsControllerTest < ActionController::TestCase
   end
 
   test 'non_activated_user_should_redirect_to_new_with_message' do
-    user = Factory(:brand_new_user, person: Factory(:person))
+    user = FactoryBot.create(:brand_new_user, person: FactoryBot.create(:person))
     post :create, params: { login: user.login, password: user.password }
     assert !session[:user_id]
     assert_redirected_to login_path
@@ -115,7 +115,7 @@ class SessionsControllerTest < ActionController::TestCase
   end
 
   test 'partly_registed_user_should_redirect_to_select_person' do
-    user = Factory(:brand_new_user)
+    user = FactoryBot.create(:brand_new_user)
     post :create, params: { login: user.login, password: user.password }
     assert session[:user_id]
     assert_equal user.id, session[:user_id]
@@ -211,7 +211,7 @@ class SessionsControllerTest < ActionController::TestCase
   end
 
   test 'should authenticate user with legacy encryption and update password' do
-    sha1_user = Factory(:sha1_pass_user)
+    sha1_user = FactoryBot.create(:sha1_pass_user)
     test_password = generate_user_password
 
     assert_equal User.sha1_encrypt(test_password, sha1_user.salt), sha1_user.crypted_password

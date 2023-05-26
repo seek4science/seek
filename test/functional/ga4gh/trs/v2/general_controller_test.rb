@@ -40,9 +40,9 @@ module Ga4gh
 
         test 'should get organizations' do
           Project.delete_all
-          Factory(:project, title: 'Project A')
-          Factory(:project, title: 'Project B')
-          Factory(:project, title: 'Project C')
+          FactoryBot.create(:project, title: 'Project A')
+          FactoryBot.create(:project, title: 'Project B')
+          FactoryBot.create(:project, title: 'Project C')
           get :organizations
 
           assert_response :success

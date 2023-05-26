@@ -12,7 +12,7 @@ class EntityTypeTest < ActiveSupport::TestCase
   end
 
   def setup
-    @openbis_endpoint = OpenbisEndpoint.new project: Factory(:project), username: 'seek', password: 'seek',
+    @openbis_endpoint = OpenbisEndpoint.new project: FactoryBot.create(:project), username: 'seek', password: 'seek',
                                             web_endpoint: 'https://127.0.0.1:8443/openbis/openbis',
                                             as_endpoint: 'https://127.0.0.1:8443/openbis/openbis',
                                             dss_endpoint: 'https://127.0.0.1:8443/doesnotmatter',

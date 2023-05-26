@@ -45,7 +45,7 @@ module Seek
                           # This section **modifies** "items" relation so that it includes a new column "downloads"
                           alog=ActivityLog.all.where(action: 'download',activity_loggable_type: items.first.class.name)
                           downloads=alog.select("activity_loggable_id AS #{items.table.name}_id, COUNT(activity_loggable_id) AS downloads").group(:activity_loggable_id)
-                          items._select!('*', 'd.downloads').joins!("LEFT OUTER JOIN (#{downloads.to_sql}) d ON #{items.table.name}.id = d.#{items.table.name}_id")
+                          items._select!("#{items.table.name}.*", 'd.downloads').joins!("LEFT OUTER JOIN (#{downloads.to_sql}) d ON #{items.table.name}.id = d.#{items.table.name}_id")
 
                           #### Using Arel
                           # This section builds the equivalent arel_table to provide the corresponding arel_field
@@ -83,7 +83,7 @@ module Seek
                       # This section **modifies** "items" relation so that it includes a new column "views"
                       alog=ActivityLog.all.where(action: 'show',activity_loggable_type: items.first.class.name)
                       views=alog.select("activity_loggable_id AS #{items.table.name}_id, COUNT(activity_loggable_id) AS views").group(:activity_loggable_id)
-                      items._select!('*', 'v.views').joins!("LEFT OUTER JOIN (#{views.to_sql}) v ON #{items.table.name}.id = v.#{items.table.name}_id")
+                      items._select!("#{items.table.name}.*", 'v.views').joins!("LEFT OUTER JOIN (#{views.to_sql}) v ON #{items.table.name}.id = v.#{items.table.name}_id")
 
                       #### Using Arel
                       # This section builds the equivalent arel_table to provide the corresponding arel_field
@@ -165,16 +165,20 @@ module Seek
       if items.is_a?(ActiveRecord::Relation)
         orderings = strategy_for_relation(order, items)
         # Postgres requires any columns being ORDERed to be explicitly SELECTed (only when using DISTINCT?).
-        columns = [items.arel.as(items.table.name)[Arel.star]]
-        orderings.each do |ordering|
-          if ordering.is_a?(Arel::Nodes::Ordering)
-            expr = ordering.expr
-            # Don't need to SELECT columns that are already covered by "*" and MySQL will error if you try!
-            unless expr.respond_to?(:relation) && expr.relation == items.arel_table
-              columns << expr
+        if ["--views_desc","--downloads_desc"].include? order
+          columns = []
+        else
+          columns = [items.arel.as(items.table.name)[Arel.star]]
+          orderings.each do |ordering|
+            if ordering.is_a?(Arel::Nodes::Ordering)
+              expr = ordering.expr
+              # Don't need to SELECT columns that are already covered by "*" and MySQL will error if you try!
+              unless expr.respond_to?(:relation) && expr.relation == items.arel_table
+                columns << expr
+              end
+            else
+              columns << ordering
             end
-          else
-            columns << ordering
           end
         end
         items.select(columns).order(orderings)

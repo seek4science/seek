@@ -7,7 +7,7 @@ class GithubScraperTest < ActionDispatch::IntegrationTest
     bot = Scrapers::Util.bot_account
     scraper = Scrapers::GithubScraper.new('test-123', project, bot, main_branch: 'master', output: StringIO.new)
 
-    repos = [Factory(:remote_workflow_ro_crate_repository, remote: 'https://not.real.url/repo.git')]
+    repos = [FactoryBot.create(:remote_workflow_ro_crate_repository, remote: 'https://not.real.url/repo.git')]
 
     scraper.stub(:list_repositories, -> () { repos.map { |r| { 'clone_url' => r.remote } } }) do
       scraper.stub(:clone_repositories, -> (_) { repos }) do
@@ -37,9 +37,9 @@ class GithubScraperTest < ActionDispatch::IntegrationTest
     bot = Scrapers::Util.bot_account
     scraper = Scrapers::GithubScraper.new('test-123', project, bot, main_branch: 'master', output: StringIO.new)
 
-    repos = [Factory(:remote_workflow_ro_crate_repository, remote: 'https://not.real.url/repo.git')]
+    repos = [FactoryBot.create(:remote_workflow_ro_crate_repository, remote: 'https://not.real.url/repo.git')]
 
-    existing = Factory(:ro_crate_git_workflow,
+    existing = FactoryBot.create(:ro_crate_git_workflow,
                        contributor: bot,
                        projects: [project],
                        source_link_url: 'https://not.real.url/repo',
@@ -80,9 +80,9 @@ class GithubScraperTest < ActionDispatch::IntegrationTest
     bot = Scrapers::Util.bot_account
     scraper = Scrapers::GithubScraper.new('test-123', project, bot, main_branch: 'master', output: StringIO.new)
 
-    repos = [Factory(:remote_workflow_ro_crate_repository, remote: 'https://not.real.url/repo.git')]
+    repos = [FactoryBot.create(:remote_workflow_ro_crate_repository, remote: 'https://not.real.url/repo.git')]
 
-    existing = Factory(:ro_crate_git_workflow,
+    existing = FactoryBot.create(:ro_crate_git_workflow,
                        contributor: bot,
                        projects: [project],
                        source_link_url: 'https://not.real.url/repo',

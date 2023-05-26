@@ -6,14 +6,14 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
 
   def setup
-    Factory :experimental_assay_class
+    FactoryBot.create :experimental_assay_class
     mock_openbis_calls
-    @project_administrator = Factory(:project_administrator)
+    @project_administrator = FactoryBot.create(:project_administrator)
     @project = @project_administrator.projects.first
-    @person = Factory(:person)
+    @person = FactoryBot.create(:person)
     @person.add_to_project_and_institution(@project, @person.institutions.first)
     assert @person.save
-    @endpoint = Factory(:openbis_endpoint, project: @project)
+    @endpoint = FactoryBot.create(:openbis_endpoint, project: @project)
     @dataset = Seek::Openbis::Dataset.new(@endpoint, '20160210130454955-23')
   end
 
@@ -78,7 +78,7 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
     asset = OpenbisExternalAsset.build(@dataset)
     asset.content = fake
     asset.synchronized_at = old
-    df = Factory :data_file
+    df = FactoryBot.create :data_file
     asset.seek_entity = df
     assert asset.save
 
@@ -123,7 +123,7 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
   test 'register registers new DataFile under Assay if passed' do
     login_as(@person)
 
-    assay = Factory :assay, contributor: @person
+    assay = FactoryBot.create :assay, contributor: @person
 
     post :register, params: { openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id, data_file: { assay_ids: assay.id } }
 
@@ -141,7 +141,7 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
 
   test 'register does not create datafile if dataset already registered but redirects to it' do
     login_as(@person)
-    existing = Factory :data_file, contributor:@person
+    existing = FactoryBot.create :data_file, contributor:@person
 
     external = OpenbisExternalAsset.build(@dataset)
     assert external.save
@@ -159,7 +159,7 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
   test 'update updates content and redirects' do
     login_as(@person)
 
-    exdatafile = Factory :data_file, contributor:@person
+    exdatafile = FactoryBot.create :data_file, contributor:@person
     asset = OpenbisExternalAsset.build(@dataset)
     asset.synchronized_at = 2.days.ago
     asset.created_at = 2.days.ago
@@ -197,7 +197,7 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
 
   test 'batch register multiple DataSets' do
     login_as(@person)
-    assay = Factory :assay, contributor: @person
+    assay = FactoryBot.create :assay, contributor: @person
 
     sync_options = {}
     batch_ids = ['20160210130454955-23', '20160215111736723-31']
@@ -219,7 +219,7 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
   # there was a bug and all were named same, lets have test for it
   test 'batch register independently names them' do
     login_as(@person)
-    assay = Factory :assay, contributor: @person
+    assay = FactoryBot.create :assay, contributor: @person
 
     sync_options = {}
     batch_ids = ['20160210130454955-23', '20160215111736723-31']
@@ -245,7 +245,7 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
     get :edit, params: { openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id }
     assert_response :redirect
 
-    assay = Factory :assay
+    assay = FactoryBot.create :assay
     sync_options = {}
     batch_ids = ['20160210130454955-23', '20160215111736723-31']
 
@@ -286,7 +286,7 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
 
     logout
 
-    another_person = Factory(:person)
+    another_person = FactoryBot.create(:person)
     login_as(another_person)
     get :show_dataset_files, params: { openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id }
     assert_response :redirect

@@ -222,7 +222,7 @@
 
     ########## Install python tools
 
-    - name: Add repository to install python3.7
+    - name: Add repository to install python3.9
       become: true
       become_user: root
       ansible.builtin.apt_repository:
@@ -238,8 +238,8 @@
       become_user: root
       ansible.builtin.apt:
         pkg:
-        - python3.7-dev
-        - python3.7-distutils
+        - python3.9-dev
+        - python3.9-distutils
         - python3-pip
         - python3-pymysql
       tags:
@@ -249,8 +249,8 @@
     - name: Install filelock and wheel (Ubuntu < 20.04)
       shell: bash -lc "{{ item }}"
       with_items:
-        - python3.7 -m pip install filelock
-        - python3.7 -m pip install wheel
+        - python3.9 -m pip install filelock
+        - python3.9 -m pip install wheel
       args:
         chdir: '{{git_dest}}/SEEK'
       when: ansible_distribution_version is version('20.04', '<')
@@ -259,8 +259,8 @@
     - name: Install SEEK's python requirements
       shell: bash -lc "{{ item }}"
       with_items:
-        - python3.7 -m pip install setuptools==58
-        - python3.7 -m pip install -r requirements.txt
+        - python3.9 -m pip install setuptools==58
+        - python3.9 -m pip install -r requirements.txt
       args:
         chdir: '{{git_dest}}/SEEK'
       tags:

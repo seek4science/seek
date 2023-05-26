@@ -13,8 +13,8 @@ class AuthLookupJobTest < ActiveSupport::TestCase
   end
 
   test 'add items to queue' do
-    sop = Factory :sop
-    data = Factory :data_file
+    sop = FactoryBot.create :sop
+    data = FactoryBot.create :data_file
 
     # need to clear the queue for items added through callbacks in the creation of the test items
     AuthLookupUpdateQueue.destroy_all
@@ -44,9 +44,9 @@ class AuthLookupJobTest < ActiveSupport::TestCase
 
   test 'perform' do
     Sop.delete_all
-    user = Factory :user
-    other_user = Factory :user
-    sop = Factory :sop, contributor: user.person, policy: Factory(:editing_public_policy)
+    user = FactoryBot.create :user
+    other_user = FactoryBot.create :user
+    sop = FactoryBot.create :sop, contributor: user.person, policy: FactoryBot.create(:editing_public_policy)
     AuthLookupUpdateQueue.destroy_all
     AuthLookupUpdateQueue.enqueue(sop)
     Sop.clear_lookup_table
@@ -64,7 +64,7 @@ class AuthLookupJobTest < ActiveSupport::TestCase
 
   test 'takes items from queue according to batch size configuration' do
     # Creating SOPs will automatically enqueue them in the AuthLookupUpdateQueue on save
-    FactoryGirl.create_list(:sop, 10)
+    FactoryBot.create_list(:sop, 10)
 
     with_config_value(:auth_lookup_update_batch_size, 3) do
       assert_difference('AuthLookupUpdateQueue.count', -3) do
@@ -81,7 +81,7 @@ class AuthLookupJobTest < ActiveSupport::TestCase
 
   test 'spawns a new user auth job for each type' do
     expected = Seek::Util.authorized_types.count
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     AuthLookupUpdateQueue.delete_all
     AuthLookupUpdateQueue.enqueue(person)
 
@@ -92,8 +92,8 @@ class AuthLookupJobTest < ActiveSupport::TestCase
 
   test 'user auth lookup job perform' do
     with_config_value :auth_lookup_enabled, true do
-      user = Factory :user
-      sop = Factory :sop, contributor: user.person, policy: Factory(:editing_public_policy)
+      user = FactoryBot.create :user
+      sop = FactoryBot.create :sop, contributor: user.person, policy: FactoryBot.create(:editing_public_policy)
       Sop.clear_lookup_table
 
       assert_nil sop.lookup_for('view', user.id)
@@ -114,9 +114,9 @@ class AuthLookupJobTest < ActiveSupport::TestCase
 
   test 'exception handling' do
     Sop.delete_all
-    user = Factory :user
-    other_user = Factory :user
-    sop = Factory :sop, contributor: user.person, policy: Factory(:editing_public_policy)
+    user = FactoryBot.create :user
+    other_user = FactoryBot.create :user
+    sop = FactoryBot.create :sop, contributor: user.person, policy: FactoryBot.create(:editing_public_policy)
     AuthLookupUpdateQueue.destroy_all
     AuthLookupUpdateQueue.enqueue(sop)
     Sop.clear_lookup_table

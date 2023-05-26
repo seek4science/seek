@@ -2,7 +2,7 @@ require 'test_helper'
 
 class GitWorkflowVersioningTest < ActionDispatch::IntegrationTest
   test 'can register a new version for a remote git workflow' do
-    workflow = Factory(:remote_git_workflow)
+    workflow = FactoryBot.create(:remote_git_workflow)
     repo = workflow.latest_git_version.git_repository
     person = workflow.contributor
 
@@ -88,7 +88,7 @@ class GitWorkflowVersioningTest < ActionDispatch::IntegrationTest
   end
 
   test 'can freeze and register a new development version for a local git workflow' do
-    workflow = Factory(:local_git_workflow)
+    workflow = FactoryBot.create(:local_git_workflow)
     person = workflow.contributor
     version = workflow.latest_git_version.version
 
@@ -167,7 +167,7 @@ class GitWorkflowVersioningTest < ActionDispatch::IntegrationTest
 
 
   test 'can convert a local git workflow to a remote one' do
-    workflow = Factory(:local_git_workflow)
+    workflow = FactoryBot.create(:local_git_workflow)
     person = workflow.contributor
     version = workflow.latest_git_version.version
 

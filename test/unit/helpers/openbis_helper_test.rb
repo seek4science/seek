@@ -2,8 +2,8 @@ require 'test_helper'
 
 class OpenbisHelperTest < ActionView::TestCase
   test 'external_asset_details shows warnings on empty or unknown' do
-    p1 = Factory :person
-    a1 = Factory :assay, contributor: p1, policy: Factory(:downloadable_public_policy)
+    p1 = FactoryBot.create :person
+    a1 = FactoryBot.create :assay, contributor: p1, policy: FactoryBot.create(:downloadable_public_policy)
 
     res = external_asset_details(a1)
     assert_match /No external asset/, res
@@ -18,7 +18,7 @@ class OpenbisHelperTest < ActionView::TestCase
   test 'external_asset_details renders partial for openbis' do
     a1 = Assay.new # new so it the external wont be saved to file
 
-    zample = Factory :openbis_zample
+    zample = FactoryBot.create :openbis_zample
 
     external = OpenbisExternalAsset.build(zample)
     a1.external_asset = external

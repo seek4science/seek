@@ -7,15 +7,15 @@ class StudyApiTest < ActionDispatch::IntegrationTest
   def setup
     user_login
 
-    @investigation = Factory(:investigation, title: 'Fred', contributor: current_person, projects: [current_person.projects.first])
+    @investigation = FactoryBot.create(:investigation, title: 'Fred', contributor: current_person, projects: [current_person.projects.first])
     @project = @investigation.projects.first
-    @publication = Factory(:publication)
+    @publication = FactoryBot.create(:publication)
 
-    @study = Factory(:study, policy: Factory(:public_policy), contributor: current_person)
+    @study = FactoryBot.create(:study, policy: FactoryBot.create(:public_policy), contributor: current_person)
   end
 
   test 'should not delete a study with assays' do
-    study = Factory(:max_study, policy: Factory(:public_policy))
+    study = FactoryBot.create(:max_study, policy: FactoryBot.create(:public_policy))
     assert_no_difference('Study.count') do
       delete "/#{plural_name}/#{study.id}.json"
       assert_response :forbidden
@@ -24,10 +24,10 @@ class StudyApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'can delete a study with subscriptions' do
-    study = Factory(:study, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
-    p = Factory(:person)
-    Factory(:subscription, person: study.contributor, subscribable: study)
-    Factory(:subscription, person: p, subscribable: study)
+    study = FactoryBot.create(:study, policy: FactoryBot.create(:public_policy, access_type: Policy::VISIBLE))
+    p = FactoryBot.create(:person)
+    FactoryBot.create(:subscription, person: study.contributor, subscribable: study)
+    FactoryBot.create(:subscription, person: p, subscribable: study)
 
     user_login(study.contributor)
 
@@ -40,14 +40,14 @@ class StudyApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'project member can delete' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     user_login(person)
     proj = person.projects.first
-    study = Factory(:study,
+    study = FactoryBot.create(:study,
                     contributor: person,
-                    policy: Factory(:policy,
+                    policy: FactoryBot.create(:policy,
                                     access_type: Policy::NO_ACCESS,
-                                    permissions: [Factory(:permission, contributor: proj, access_type: Policy::MANAGING)]))
+                                    permissions: [FactoryBot.create(:permission, contributor: proj, access_type: Policy::MANAGING)]))
 
     assert_difference('Study.count', -1) do
       delete "/#{plural_name}/#{study.id}.json"

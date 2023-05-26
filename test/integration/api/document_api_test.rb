@@ -7,16 +7,16 @@ class DocumentApiTest < ActionDispatch::IntegrationTest
   def setup
     user_login
     @project = @current_user.person.projects.first
-    investigation = Factory(:investigation, projects: [@project], contributor: current_person)
-    study = Factory(:study, investigation: investigation, contributor: current_person)
-    @assay = Factory(:assay, study: study, contributor: current_person)
-    @workflow = Factory(:workflow, projects: [@project], contributor: current_person)
-    @creator = Factory(:person)
-    @document = Factory(:document, policy: Factory(:public_policy), contributor: current_person, creators: [@creator])
+    investigation = FactoryBot.create(:investigation, projects: [@project], contributor: current_person)
+    study = FactoryBot.create(:study, investigation: investigation, contributor: current_person)
+    @assay = FactoryBot.create(:assay, study: study, contributor: current_person)
+    @workflow = FactoryBot.create(:workflow, projects: [@project], contributor: current_person)
+    @creator = FactoryBot.create(:person)
+    @document = FactoryBot.create(:document, policy: FactoryBot.create(:public_policy), contributor: current_person, creators: [@creator])
   end
 
   test 'can add content to API-created document' do
-    doc = Factory(:api_pdf_document, contributor: current_person)
+    doc = FactoryBot.create(:api_pdf_document, contributor: current_person)
 
     assert doc.content_blob.no_content?
     assert doc.can_download?(@current_user)
@@ -33,7 +33,7 @@ class DocumentApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'cannot add content to API-created document without permission' do
-    doc = Factory(:api_pdf_document, policy: Factory(:public_download_and_no_custom_sharing)) # Created by someone who is not currently logged in
+    doc = FactoryBot.create(:api_pdf_document, policy: FactoryBot.create(:public_download_and_no_custom_sharing)) # Created by someone who is not currently logged in
 
     assert doc.content_blob.no_content?
     assert doc.can_download?(@current_user)
@@ -48,7 +48,7 @@ class DocumentApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'cannot add content to API-created document that already has content' do
-    doc = Factory(:document, contributor: current_person)
+    doc = FactoryBot.create(:document, contributor: current_person)
 
     refute doc.content_blob.no_content?
     assert doc.can_download?(@current_user)

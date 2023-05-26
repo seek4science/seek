@@ -4,7 +4,7 @@ require 'openbis_test_helper'
 class SpaceTest < ActiveSupport::TestCase
   def setup
     mock_openbis_calls
-    @openbis_endpoint = Factory(:openbis_endpoint)
+    @openbis_endpoint = FactoryBot.create(:openbis_endpoint)
   end
 
   test 'all' do

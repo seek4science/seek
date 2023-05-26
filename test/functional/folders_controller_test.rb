@@ -4,7 +4,7 @@ class FoldersControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
 
   def setup
-    @member = Factory :user
+    @member = FactoryBot.create :user
     @project = @member.person.projects.first
     login_as @member
   end
@@ -20,12 +20,12 @@ class FoldersControllerTest < ActionController::TestCase
   end
 
   test 'delete' do
-    sop = Factory :sop, project_ids: [@project.id], policy: Factory(:public_policy)
-    folder = Factory :project_folder, project_id: @project.id
+    sop = FactoryBot.create :sop, project_ids: [@project.id], policy: FactoryBot.create(:public_policy)
+    folder = FactoryBot.create :project_folder, project_id: @project.id
     folder.add_assets(sop)
     child = folder.add_child('fred')
     child.save!
-    unsorted_folder = Factory :project_folder, project_id: @project.id, incoming: true
+    unsorted_folder = FactoryBot.create :project_folder, project_id: @project.id, incoming: true
 
     assert_difference('ProjectFolder.count', -2) do
       delete :destroy, params: { id: folder.id, project_id: @project.id }
@@ -39,12 +39,12 @@ class FoldersControllerTest < ActionController::TestCase
   end
 
   test 'cannot delete if not deletable' do
-    sop = Factory :sop, project_ids: [@project.id], policy: Factory(:public_policy)
-    folder = Factory :project_folder, project_id: @project.id, deletable: false
+    sop = FactoryBot.create :sop, project_ids: [@project.id], policy: FactoryBot.create(:public_policy)
+    folder = FactoryBot.create :project_folder, project_id: @project.id, deletable: false
     folder.add_assets(sop)
     child = folder.add_child('fred')
     child.save!
-    unsorted_folder = Factory :project_folder, project_id: @project.id, incoming: true
+    unsorted_folder = FactoryBot.create :project_folder, project_id: @project.id, incoming: true
 
     assert_no_difference('ProjectFolder.count') do
       delete :destroy, params: { id: folder.id, project_id: @project.id }
@@ -61,13 +61,13 @@ class FoldersControllerTest < ActionController::TestCase
   end
 
   test 'cannot delete other project' do
-    project = Factory :project
-    sop = Factory :sop, project_ids: [project.id], policy: Factory(:public_policy)
-    folder = Factory :project_folder, project_id: project.id
+    project = FactoryBot.create :project
+    sop = FactoryBot.create :sop, project_ids: [project.id], policy: FactoryBot.create(:public_policy)
+    folder = FactoryBot.create :project_folder, project_id: project.id
     folder.add_assets(sop)
     child = folder.add_child('fred')
     child.save!
-    unsorted_folder = Factory :project_folder, project_id: project.id, incoming: true
+    unsorted_folder = FactoryBot.create :project_folder, project_id: project.id, incoming: true
 
     assert_no_difference('ProjectFolder.count') do
       delete :destroy, params: { id: folder, project_id: project.id }
@@ -82,9 +82,9 @@ class FoldersControllerTest < ActionController::TestCase
   end
 
   test 'defaults created and old items assigned' do
-    sop = Factory :sop, project_ids: [@project.id], policy: Factory(:public_policy)
-    private_sop = Factory :sop, project_ids: [@project.id], policy: Factory(:private_policy)
-    sop2 = Factory :sop, project_ids: [Factory(:project).id], policy: Factory(:public_policy)
+    sop = FactoryBot.create :sop, project_ids: [@project.id], policy: FactoryBot.create(:public_policy)
+    private_sop = FactoryBot.create :sop, project_ids: [@project.id], policy: FactoryBot.create(:private_policy)
+    sop2 = FactoryBot.create :sop, project_ids: [FactoryBot.create(:project).id], policy: FactoryBot.create(:public_policy)
     assert ProjectFolder.root_folders(@project).empty?
 
     assert_difference('ProjectFolderAsset.count', 2) do
@@ -100,7 +100,7 @@ class FoldersControllerTest < ActionController::TestCase
   end
 
   test 'defaults not created if exist' do
-    folder = Factory :project_folder, project: @project
+    folder = FactoryBot.create :project_folder, project: @project
     assert_equal 1, ProjectFolder.root_folders(@project).count
     assert_no_difference('ProjectFolder.count') do
       get :index, params: { project_id: @project.id }
@@ -110,7 +110,7 @@ class FoldersControllerTest < ActionController::TestCase
   end
 
   test 'blocked access as non member' do
-    login_as(Factory(:user))
+    login_as(FactoryBot.create(:user))
     get :index, params: { project_id: @project.id }
     assert_redirected_to root_path
     assert_not_nil flash[:error]
@@ -123,8 +123,8 @@ class FoldersControllerTest < ActionController::TestCase
   end
 
   test 'ajax request for folder contents' do
-    sop = Factory :sop, project_ids: [@project.id], policy: Factory(:public_policy), description: 'Ryz9z3Z9h70wzJ243we6k8RO5xI5f3UF'
-    folder = Factory :project_folder, project_id: @project.id
+    sop = FactoryBot.create :sop, project_ids: [@project.id], policy: FactoryBot.create(:public_policy), description: 'Ryz9z3Z9h70wzJ243we6k8RO5xI5f3UF'
+    folder = FactoryBot.create :project_folder, project_id: @project.id
     folder.add_assets(sop)
     folder.save!
 
@@ -136,7 +136,7 @@ class FoldersControllerTest < ActionController::TestCase
   end
 
   test 'ajax request for assay folder contents' do
-    assay = Factory :experimental_assay, contributor: @member.person, policy: Factory(:public_policy), title: 'Yp50U6BjlacF0r7HY5WXHEOP8E2UqXcv', description: '5Kx0432X6IbuzBi25BIi0OdY1xo4FRG3'
+    assay = FactoryBot.create :experimental_assay, contributor: @member.person, policy: FactoryBot.create(:public_policy), title: 'Yp50U6BjlacF0r7HY5WXHEOP8E2UqXcv', description: '5Kx0432X6IbuzBi25BIi0OdY1xo4FRG3'
     assay.study.investigation.projects = [@project]
     assay.study.investigation.save!
     assert assay.can_view?
@@ -147,10 +147,10 @@ class FoldersControllerTest < ActionController::TestCase
   end
 
   test 'ajax request for hidden assay folder contents fails' do
-    person = Factory(:person)
-    inv = Factory(:investigation, contributor: person)
-    study = Factory(:study, investigation: inv, contributor: person)
-    assay = Factory(:experimental_assay, policy: Factory(:private_policy),
+    person = FactoryBot.create(:person)
+    inv = FactoryBot.create(:investigation, contributor: person)
+    study = FactoryBot.create(:study, investigation: inv, contributor: person)
+    assay = FactoryBot.create(:experimental_assay, policy: FactoryBot.create(:private_policy),
                                          title: 'Yp50U6BjlacF0r7HY5WXHEOP8E2UqXcv', description: '5Kx0432X6IbuzBi25BIi0OdY1xo4FRG3',
                                          study: study, contributor: person)
 
@@ -162,9 +162,9 @@ class FoldersControllerTest < ActionController::TestCase
   end
 
   test 'ajax request for folder contents rejected from non project member' do
-    login_as Factory(:user)
-    sop = Factory :sop, project_ids: [@project.id], policy: Factory(:public_policy), description: 'Ryz9z3Z9h70wzJ243we6k8RO5xI5f3UF'
-    folder = Factory :project_folder, project_id: @project.id
+    login_as FactoryBot.create(:user)
+    sop = FactoryBot.create :sop, project_ids: [@project.id], policy: FactoryBot.create(:public_policy), description: 'Ryz9z3Z9h70wzJ243we6k8RO5xI5f3UF'
+    folder = FactoryBot.create :project_folder, project_id: @project.id
     folder.add_assets(sop)
     folder.save!
 
@@ -174,9 +174,9 @@ class FoldersControllerTest < ActionController::TestCase
   end
 
   test 'move between folders' do
-    sop = Factory :sop, project_ids: [@project.id], policy: Factory(:public_policy), description: 'Ryz9z3Z9h70wzJ243we6k8RO5xI5f3UF'
-    folder = Factory :project_folder, project_id: @project.id
-    other_folder = Factory :project_folder, project_id: @project.id
+    sop = FactoryBot.create :sop, project_ids: [@project.id], policy: FactoryBot.create(:public_policy), description: 'Ryz9z3Z9h70wzJ243we6k8RO5xI5f3UF'
+    folder = FactoryBot.create :project_folder, project_id: @project.id
+    other_folder = FactoryBot.create :project_folder, project_id: @project.id
     folder.add_assets(sop)
     folder.save!
     post :move_asset_to, xhr: true, params: { asset_id: sop.id, asset_type: 'Sop', id: folder.id, dest_folder_id: other_folder.id, project_id: folder.project.id }
@@ -190,11 +190,11 @@ class FoldersControllerTest < ActionController::TestCase
   end
 
   test 'move asset to assay' do
-    assay = Factory :experimental_assay, contributor: @member.person, policy: Factory(:public_policy)
+    assay = FactoryBot.create :experimental_assay, contributor: @member.person, policy: FactoryBot.create(:public_policy)
     assay.study.investigation.projects = [@project]
     assay.study.investigation.save!
-    sop = Factory :sop, project_ids: [@project.id], policy: Factory(:public_policy)
-    folder = Factory :project_folder, project_id: @project.id
+    sop = FactoryBot.create :sop, project_ids: [@project.id], policy: FactoryBot.create(:public_policy)
+    folder = FactoryBot.create :project_folder, project_id: @project.id
     folder.add_assets(sop)
     folder.save!
 
@@ -214,10 +214,10 @@ class FoldersControllerTest < ActionController::TestCase
   end
 
   test 'remove asset from assay' do
-    assay = Factory :experimental_assay, contributor: @member.person, policy: Factory(:public_policy)
+    assay = FactoryBot.create :experimental_assay, contributor: @member.person, policy: FactoryBot.create(:public_policy)
     assay.study.investigation.projects = [@project]
     assay.study.investigation.save!
-    sop = Factory :sop, project_ids: [@project.id], policy: Factory(:public_policy)
+    sop = FactoryBot.create :sop, project_ids: [@project.id], policy: FactoryBot.create(:public_policy)
     assay.associate(sop)
     folder = Seek::AssayFolder.new assay, @project
     assert_difference('AssayAsset.count', -1) do
@@ -230,9 +230,9 @@ class FoldersControllerTest < ActionController::TestCase
   end
 
   test 'cannot move to other project folder' do
-    sop = Factory :sop, project_ids: [@project.id], policy: Factory(:public_policy), description: 'Ryz9z3Z9h70wzJ243we6k8RO5xI5f3UF'
-    folder = Factory :project_folder, project_id: @project.id
-    other_folder = Factory :project_folder, project_id: Factory(:project).id
+    sop = FactoryBot.create :sop, project_ids: [@project.id], policy: FactoryBot.create(:public_policy), description: 'Ryz9z3Z9h70wzJ243we6k8RO5xI5f3UF'
+    folder = FactoryBot.create :project_folder, project_id: @project.id
+    other_folder = FactoryBot.create :project_folder, project_id: FactoryBot.create(:project).id
     folder.add_assets(sop)
     folder.save!
     post :move_asset_to, xhr: true, params: { asset_id: sop.id, asset_type: 'Sop', id: folder.id, dest_folder_id: other_folder.id, project_id: folder.project.id }
@@ -246,7 +246,7 @@ class FoldersControllerTest < ActionController::TestCase
   end
 
   test 'create a new child folder' do
-    folder = Factory :project_folder, project: @project
+    folder = FactoryBot.create :project_folder, project: @project
     assert_difference('ProjectFolder.count') do
       post :create_folder, xhr: true, params: { project_id: @project.id, id: folder.id, title: 'fred' }
     end
@@ -254,9 +254,9 @@ class FoldersControllerTest < ActionController::TestCase
   end
 
   test 'authorization on assets' do
-    sop = Factory :sop, project_ids: [@project.id], policy: Factory(:public_policy), description: 'Ryz9z3Z9h70wzJ243we6k8RO5xI5f3UF'
-    hidden_sop = Factory :sop, project_ids: [@project.id], policy: Factory(:private_policy), description: 'viu2q6ng3iZ0ppS5X679pPo11LfF62pS'
-    folder = Factory :project_folder, project_id: @project.id
+    sop = FactoryBot.create :sop, project_ids: [@project.id], policy: FactoryBot.create(:public_policy), description: 'Ryz9z3Z9h70wzJ243we6k8RO5xI5f3UF'
+    hidden_sop = FactoryBot.create :sop, project_ids: [@project.id], policy: FactoryBot.create(:private_policy), description: 'viu2q6ng3iZ0ppS5X679pPo11LfF62pS'
+    folder = FactoryBot.create :project_folder, project_id: @project.id
 
     disable_authorization_checks do
       folder.add_assets([sop, hidden_sop])
@@ -271,7 +271,7 @@ class FoldersControllerTest < ActionController::TestCase
   end
 
   test 'display with assays' do
-    assay = Factory :experimental_assay, contributor: @member.person, policy: Factory(:public_policy)
+    assay = FactoryBot.create :experimental_assay, contributor: @member.person, policy: FactoryBot.create(:public_policy)
     assay.study.investigation.projects = [@project]
     assay.study.investigation.save!
     get :index, params: { project_id: @project.id }

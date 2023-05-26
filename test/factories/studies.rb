@@ -1,37 +1,39 @@
-# Study
-Factory.define(:study) do |f|
-  f.sequence(:title) { |n| "Study#{n}" }
-  f.association :contributor, factory: :person
-  f.after_build do |s|
-    s.investigation ||= Factory(:investigation, contributor: s.contributor, policy: s.policy.try(:deep_copy))
+FactoryBot.define do
+  # Study
+  factory(:study) do
+    sequence(:title) { |n| "Study#{n}" }
+    association :contributor, factory: :person, strategy: :create
+    after(:build) do |s|
+      s.investigation ||= FactoryBot.create(:investigation, contributor: s.contributor, policy: s.policy.try(:deep_copy))
+    end
   end
-end
-
-Factory.define(:public_study, parent: :study) do |f|
-  f.policy { Factory(:public_policy) }
-  f.investigation { Factory(:public_investigation) }
-end
-
-Factory.define(:study_with_assay, parent: :study) do |f|
-  f.assays { [Factory(:assay)] }
-end
-
-Factory.define(:min_study, class: Study) do |f|
-  f.title "A Minimal Study"
-  f.association :contributor, factory: :person
-  f.after_build do |s|
-    s.investigation ||= Factory(:min_investigation, contributor: s.contributor, policy: s.policy.try(:deep_copy))
+  
+  factory(:public_study, parent: :study) do
+    policy { FactoryBot.create(:public_policy) }
+    investigation { FactoryBot.create(:public_investigation) }
   end
-end
-
-Factory.define(:max_study, parent: :min_study) do |f|
-  f.title "A Maximal Study"
-  f.description "The Study of many things"
-  f.discussion_links { [Factory.build(:discussion_link, label:'Slack')] }
-  f.experimentalists "Wet lab people"
-  f.other_creators "Marie Curie"
-  f.after_build do |s|
-    s.assays = [Factory(:max_assay, contributor: s.contributor, policy: Factory(:public_policy))]
+  
+  factory(:study_with_assay, parent: :study) do
+    assays { [FactoryBot.create(:assay)] }
   end
-  f.assets_creators { [AssetsCreator.new(affiliation: 'University of Somewhere', creator: Factory(:person, first_name: 'Some', last_name: 'One'))] }
+  
+  factory(:min_study, class: Study) do
+    title { "A Minimal Study" }
+    association :contributor, factory: :person, strategy: :create
+    after(:build) do |s|
+      s.investigation ||= FactoryBot.create(:min_investigation, contributor: s.contributor, policy: s.policy.try(:deep_copy))
+    end
+  end
+  
+  factory(:max_study, parent: :min_study) do
+    title { "A Maximal Study" }
+    description { "The Study of many things" }
+    discussion_links { [FactoryBot.build(:discussion_link, label:'Slack')] }
+    experimentalists { "Wet lab people" }
+    other_creators { "Marie Curie" }
+    after(:build) do |s|
+      s.assays = [FactoryBot.create(:max_assay, contributor: s.contributor, policy: FactoryBot.create(:public_policy))]
+    end
+    assets_creators { [AssetsCreator.new(affiliation: 'University of Somewhere', creator: FactoryBot.create(:person, first_name: 'Some', last_name: 'One'))] }
+  end
 end

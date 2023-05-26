@@ -6,7 +6,7 @@ class AssetButtonsTest < ActionDispatch::IntegrationTest
 
   ASSETS = %w(investigations studies assays data_files models sops strains presentations events)
   def setup
-    User.current_user = Factory(:user, login: 'test')
+    User.current_user = FactoryBot.create(:user, login: 'test')
     @current_user = User.current_user
     post '/session', params: { login: 'test', password: generate_user_password }
     stub_request(:head, 'http://somewhere.com/piccy.pdf').to_return(status: 404)
@@ -24,8 +24,8 @@ class AssetButtonsTest < ActionDispatch::IntegrationTest
 
       contributor = @current_user.person
 
-      item = Factory(type_name.singularize.to_sym, contributor: contributor,
-                     policy: Factory(:all_sysmo_viewable_policy))
+      item = FactoryBot.create(type_name.singularize.to_sym, contributor: contributor,
+                     policy: FactoryBot.create(:all_sysmo_viewable_policy))
       assert item.can_delete?, 'This item is deletable for the test to pass'
 
       get "/#{type_name}/#{item.id}"
@@ -51,28 +51,28 @@ class AssetButtonsTest < ActionDispatch::IntegrationTest
 
       with_config_value :show_as_external_link_enabled, true do
         if Seek::Util.is_multi_file_asset_type? klass
-          remote_with_local = Factory(underscored_type_name.to_sym, policy: Factory(:all_sysmo_downloadable_policy),
-                                      content_blobs: [Factory(:content_blob, pdf_blob_with_local_copy_attrs)])
-          remote_without_local = Factory(underscored_type_name.to_sym, policy: Factory(:all_sysmo_downloadable_policy),
-                                         content_blobs: [Factory(:content_blob, pdf_blob_without_local_copy_attrs)])
-          mixed = Factory(underscored_type_name.to_sym, policy: Factory(:all_sysmo_downloadable_policy),
-                          content_blobs: [Factory(:content_blob, pdf_blob_with_local_copy_attrs),
-                                          Factory(:content_blob, pdf_blob_without_local_copy_attrs)])
-          pdf_and_html_remote = Factory(underscored_type_name.to_sym, policy: Factory(:all_sysmo_downloadable_policy),
-                                        content_blobs: [Factory(:content_blob, html_blob_attrs),
-                                                        Factory(:content_blob, pdf_blob_without_local_copy_attrs)])
+          remote_with_local = FactoryBot.create(underscored_type_name.to_sym, policy: FactoryBot.create(:all_sysmo_downloadable_policy),
+                                      content_blobs: [FactoryBot.create(:content_blob, pdf_blob_with_local_copy_attrs)])
+          remote_without_local = FactoryBot.create(underscored_type_name.to_sym, policy: FactoryBot.create(:all_sysmo_downloadable_policy),
+                                         content_blobs: [FactoryBot.create(:content_blob, pdf_blob_without_local_copy_attrs)])
+          mixed = FactoryBot.create(underscored_type_name.to_sym, policy: FactoryBot.create(:all_sysmo_downloadable_policy),
+                          content_blobs: [FactoryBot.create(:content_blob, pdf_blob_with_local_copy_attrs),
+                                          FactoryBot.create(:content_blob, pdf_blob_without_local_copy_attrs)])
+          pdf_and_html_remote = FactoryBot.create(underscored_type_name.to_sym, policy: FactoryBot.create(:all_sysmo_downloadable_policy),
+                                        content_blobs: [FactoryBot.create(:content_blob, html_blob_attrs),
+                                                        FactoryBot.create(:content_blob, pdf_blob_without_local_copy_attrs)])
 
           assert_download_button remote_with_local
           assert_link_button remote_without_local
           assert_download_button mixed
           assert_neither_download_nor_link_button pdf_and_html_remote
         else
-          remote_with_local = Factory(underscored_type_name.to_sym, policy: Factory(:all_sysmo_downloadable_policy),
-                                      content_blob: Factory(:content_blob, pdf_blob_with_local_copy_attrs))
-          html_remote = Factory(underscored_type_name.to_sym, policy: Factory(:all_sysmo_downloadable_policy),
-                                content_blob: Factory(:content_blob, html_blob_attrs))
-          remote_without_local = Factory(underscored_type_name.to_sym, policy: Factory(:all_sysmo_downloadable_policy),
-                                         content_blob: Factory(:content_blob, pdf_blob_without_local_copy_attrs))
+          remote_with_local = FactoryBot.create(underscored_type_name.to_sym, policy: FactoryBot.create(:all_sysmo_downloadable_policy),
+                                      content_blob: FactoryBot.create(:content_blob, pdf_blob_with_local_copy_attrs))
+          html_remote = FactoryBot.create(underscored_type_name.to_sym, policy: FactoryBot.create(:all_sysmo_downloadable_policy),
+                                content_blob: FactoryBot.create(:content_blob, html_blob_attrs))
+          remote_without_local = FactoryBot.create(underscored_type_name.to_sym, policy: FactoryBot.create(:all_sysmo_downloadable_policy),
+                                         content_blob: FactoryBot.create(:content_blob, pdf_blob_without_local_copy_attrs))
 
           assert_download_button remote_with_local
           assert_link_button html_remote
@@ -83,8 +83,8 @@ class AssetButtonsTest < ActionDispatch::IntegrationTest
   end
 
   test 'show add to collection button if collection available as owner' do
-    collection = Factory(:collection, contributor: @current_user.person)
-    document = Factory(:public_document)
+    collection = FactoryBot.create(:collection, contributor: @current_user.person)
+    document = FactoryBot.create(:public_document)
 
     get "/documents/#{document.id}"
 
@@ -99,8 +99,8 @@ class AssetButtonsTest < ActionDispatch::IntegrationTest
   end
 
   test 'show add to collection button if collection available as creator' do
-    collection = Factory(:collection, creators: [@current_user.person])
-    document = Factory(:public_document)
+    collection = FactoryBot.create(:collection, creators: [@current_user.person])
+    document = FactoryBot.create(:public_document)
     refute_equal @current_user.person, collection.contributor
 
     get "/documents/#{document.id}"
@@ -116,8 +116,8 @@ class AssetButtonsTest < ActionDispatch::IntegrationTest
   end
 
   test 'do not show add to collection button if item already in collection' do
-    collection = Factory(:collection, contributor: @current_user.person)
-    document = Factory(:public_document)
+    collection = FactoryBot.create(:collection, contributor: @current_user.person)
+    document = FactoryBot.create(:public_document)
     collection.items.create!(asset: document)
 
     get "/documents/#{document.id}"
@@ -130,7 +130,7 @@ class AssetButtonsTest < ActionDispatch::IntegrationTest
   end
 
   test 'do not show add to collection button on collection itself' do
-    collection = Factory(:collection, contributor: @current_user.person)
+    collection = FactoryBot.create(:collection, contributor: @current_user.person)
 
     get "/collections/#{collection.id}"
 

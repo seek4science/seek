@@ -108,28 +108,28 @@ person_to_associate_with_sops_owning_users:
   last_name: "Place_holder"
   email: "person_place_holder@email.com"
 
-person_for_test_user_only_in_whitelist:
+person_for_test_user_only_in_allowlist:
   first_name: "TestAccessor"
-  last_name: "OnlyInWhitelist"
-  email: "testaccessor_onlyinwhitelist@email.com"
+  last_name: "OnlyInAllowlist"
+  email: "testaccessor_onlyinallowlist@email.com"
 
 
-person_for_test_user_only_in_blacklist:
+person_for_test_user_only_in_denylist:
   first_name: "TestAccessor"
-  last_name: "OnlyInBlacklist"
-  email: "testaccessor_onlyinblacklist@email.com"
+  last_name: "OnlyInDenylist"
+  email: "testaccessor_onlyindenylist@email.com"
 
 
-person_for_sysmo_user_in_blacklist:
+person_for_sysmo_user_in_denylist:
   first_name: "SysMO-User"
-  last_name: "InBlacklist"
-  email: "sysmo-user_inblacklist@email.com"
+  last_name: "InDenylist"
+  email: "sysmo-user_indenylist@email.com"
 
 
-person_for_sysmo_user_both_in_blacklist_and_whitelist:
+person_for_sysmo_user_both_in_denylist_and_allowlist:
   first_name: "SysMO-User"
-  last_name: "InWhitelistAndBlacklist"
-  email: "sysmo-userinwhitelistandblacklist@email.com"
+  last_name: "InAllowlistAndDenylist"
+  email: "sysmo-userinallowlistanddenylist@email.com"
 
 
 person_for_sysmo_user_who_wants_to_access_different_things:

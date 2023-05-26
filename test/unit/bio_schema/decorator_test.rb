@@ -2,7 +2,7 @@ require 'test_helper'
 
 class DecoratorTest < ActiveSupport::TestCase
   test 'Thing' do
-    data_file = Factory(:data_file)
+    data_file = FactoryBot.create(:data_file)
     data_file.add_annotations('red, green, blue', 'tag', User.first)
     disable_authorization_checks { data_file.save! }
 
@@ -18,8 +18,8 @@ class DecoratorTest < ActiveSupport::TestCase
   end
 
   test 'CreativeWork' do
-    event = Factory(:event, policy: Factory(:public_policy))
-    document = Factory(:document, events: [event], license: 'CC-BY-4.0', creators: [Factory(:person)])
+    event = FactoryBot.create(:event, policy: FactoryBot.create(:public_policy))
+    document = FactoryBot.create(:document, events: [event], license: 'CC-BY-4.0', creators: [FactoryBot.create(:person)])
     document.add_annotations('yellow, lorry', 'tag', User.first)
     disable_authorization_checks { document.save! }
 
@@ -40,13 +40,13 @@ class DecoratorTest < ActiveSupport::TestCase
   end
 
   test 'Dataset pads or truncates description' do
-    df = Factory(:data_file, description:'')
+    df = FactoryBot.create(:data_file, description:'')
     assert_equal 'Description not specified.........................', Seek::BioSchema::ResourceDecorators::DataFile.new(df).description
-    df = Factory(:data_file, description:'fish')
+    df = FactoryBot.create(:data_file, description:'fish')
     assert_equal 'fish..............................................', Seek::BioSchema::ResourceDecorators::DataFile.new(df).description
-    df = Factory(:data_file, description:'m'*100)
+    df = FactoryBot.create(:data_file, description:'m'*100)
     assert_equal 'm'*100, Seek::BioSchema::ResourceDecorators::DataFile.new(df).description
-    df = Factory(:data_file, description:'m'*10000)
+    df = FactoryBot.create(:data_file, description:'m'*10000)
     assert_equal 4999, Seek::BioSchema::ResourceDecorators::DataFile.new(df).description.length
     assert_equal 'm'*4996 + '...', Seek::BioSchema::ResourceDecorators::DataFile.new(df).description
   end
