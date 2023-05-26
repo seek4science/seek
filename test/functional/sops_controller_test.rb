@@ -545,6 +545,8 @@ class SopsControllerTest < ActionController::TestCase
     assert_redirected_to (sop)
     policy = sop.policy
     assert_equal Policy::NO_ACCESS, policy.access_type
+    assert_enqueued_emails 1
+    assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL, sop.last_publishing_log.publish_state
     assert_equal 1, policy.permissions.count
     assert_equal gatekeeper.projects.first, policy.permissions.first.contributor
     assert_equal Policy::ACCESSIBLE, policy.permissions.first.access_type

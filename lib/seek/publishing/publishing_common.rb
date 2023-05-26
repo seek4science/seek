@@ -8,7 +8,7 @@ module Seek
         base.before_action :set_items_for_potential_publishing, only: [:check_related_items, :publish_related_items]
         base.before_action :publish_auth, only: [:batch_publishing_preview, :check_related_items, :publish_related_items, :check_gatekeeper_required, :publish, :waiting_approval_assets]
         # need to put request_publish_approval after log_publishing, so request_publish_approval will get run first.
-        base.after_action :log_publishing, :request_publish_approval, only: [:create, :update, :manage_update]
+        base.after_action :log_publishing, :request_publish_approval, if: -> { @policy_updated }
       end
 
       def batch_publishing_preview
@@ -44,6 +44,11 @@ module Seek
         else
           publish_final_confirmation
         end
+      end
+
+      def update_sharing_policies(*args)
+        @policy_updated = true
+        super
       end
 
       def publish_final_confirmation
