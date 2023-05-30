@@ -410,7 +410,6 @@ function getSampleLinking(arr) {
 }
 
 function setSelect2(item) {
-	// const select = item;
 	$j(item).on("select2:select select2:unselect", function (e) {
 		const table = $j(this).parents("table").DataTable();
 		const td = $j(this).closest('td');
@@ -425,7 +424,6 @@ function setSelect2(item) {
 
 		table.cell(td).data(updatedValues);
 		handleCellUpdate(table, td);
-		setSelect2($j(td));
 		table.columns.adjust();
 	});
 }

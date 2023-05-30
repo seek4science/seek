@@ -43,7 +43,7 @@ class SinglePagesController < ApplicationController
       data = helpers.dt_aggregated(study, assay)[:rows]
     end
     data = data.map { |row| row.unshift('') } if params[:rows_pad]
-    render json: { data: data }
+    render json: { data: }
   rescue Exception => e
     render json: { status: :unprocessable_entity, error: e.message }
   end
@@ -57,27 +57,6 @@ class SinglePagesController < ApplicationController
     respond_to do |format|
       flash[:error] = e.message
       format.html { redirect_to single_page_path(Project.find(params[:id])) }
-    end
-  end
-
-  def sp_object_input
-    element_name = params[:element_name].nil? ? '' : params[:element_name]
-    existing_objects = if params[:existing_objects].nil?
-                         []
-                       else
-                         JSON.parse(params[:existing_objects]).map do |eo|
-                           Sample.find(eo['id'])
-                         end
-                       end
-    query_url = params[:query_url].nil? ? '' : params[:query_url]
-
-    respond_to do |format|
-      format.html do
-        render partial: 'single_pages/single_page_object_input',
-               locals: { element_name: element_name,
-                         existing_objects: existing_objects,
-                         query_url: query_url }
-      end
     end
   end
 
