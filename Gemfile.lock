@@ -709,7 +709,7 @@ GEM
       netrc (~> 0.8)
     rexml (3.2.5)
     rfc-822 (0.4.1)
-    rmagick (2.15.2)
+    rmagick (4.2.5)
     ro-bundle (0.3.0)
       addressable (~> 2.8.0)
       json (~> 2.3.0)
@@ -1038,7 +1038,7 @@ DEPENDENCIES
   responders
   rest-client (~> 2.0)
   rfc-822
-  rmagick (= 2.15.2)
+  rmagick (= 4.2.5)
   ro-bundle (~> 0.3.0)
   ro-crate (~> 0.5.1)
   rspec-rails (~> 5.1)
