@@ -152,7 +152,7 @@ module Seek
 
     def edit_version
       item = class_for_controller_name.find(params[:id])
-      version = item.versions.find_by(version: params[:version])
+      version = item.standard_versions.find_by(version: params[:version])
 
       if version&.update(edit_version_params(version))
         flash[:notice] = "Version #{params[:version]} was successfully updated."

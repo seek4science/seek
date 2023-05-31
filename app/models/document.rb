@@ -7,7 +7,7 @@ class Document < ApplicationRecord
 
   validates :projects, presence: true, projects: { self: true }
 
-  acts_as_doi_parent(child_accessor: :versions)
+  acts_as_doi_parent
 
   #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
   has_one :content_blob, -> (r) { where('content_blobs.asset_version = ?', r.version) }, :as => :asset, :foreign_key => :asset_id

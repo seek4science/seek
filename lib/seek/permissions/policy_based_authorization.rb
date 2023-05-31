@@ -339,7 +339,7 @@ module Seek
 
       def contributor_ids
         ids = [contributor_id]
-        ids += versions.pluck(:contributor_id) if self.respond_to?(:versions)
+        ids += versions.pluck(:contributor_id) if respond_to?(:versions)
         ids.uniq
       end
 

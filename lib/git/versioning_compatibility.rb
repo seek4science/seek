@@ -14,15 +14,15 @@ module Git
     end
 
     def describe_version(version_number)
-      vs = all_versions
+      vs = versions
 
       return '(earliest)' if version_number == vs.first.version
       return '(latest)' if version_number == vs.last.version
       ''
     end
 
-    def all_versions
-      is_git_versioned? ? git_versions : versions
+    def versions
+      is_git_versioned? ? git_versions : standard_versions
     end
   end
 end
