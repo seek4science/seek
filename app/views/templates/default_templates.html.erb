@@ -15,12 +15,12 @@
 			<div class="tab-content">
 				<div role="tabpanel" class="tab-pane active" data-role="seek-upload-field-tab-pane" data-tab-id="local-file">
 					<div class="form-group">
-						<%= file_field_tag "template_json_file" -%>
+						<%= file_field_tag "template_json_file", :accept => 'application/json' -%>
 					</div>
 				</div>
 			</div>
 		</div>
-		
+
 	<% end %>
 
 
