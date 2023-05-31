@@ -8,7 +8,7 @@ class PublicationTest < ActiveSupport::TestCase
   test 'title validation allows long titles' do
     long_title = ('a' * 65536).freeze
     ok_title = ('a' * 65535).freeze
-    p = Factory(:publication)
+    p = FactoryBot.create(:publication)
     assert p.valid?
     p.title = long_title
     refute p.valid?
@@ -21,12 +21,12 @@ class PublicationTest < ActiveSupport::TestCase
   test 'publication type validation' do
 
     # new publication must have a publication type
-    project = Factory(:project)
+    project = FactoryBot.create(:project)
     p1 = Publication.new(title: 'test1', projects: [project], doi: '10.5072/abc',publication_type_id:nil)
     assert !p1.valid?
 
     # allow old publications without publication type
-    p2 = Factory(:publication)
+    p2 = FactoryBot.create(:publication)
     p2.publication_type_id = nil
     disable_authorization_checks { p2.save! }
     assert p2.valid?
@@ -117,7 +117,7 @@ class PublicationTest < ActiveSupport::TestCase
   end
 
   test 'event association' do
-    publication = Factory :publication
+    publication = FactoryBot.create :publication
     assert publication.events.empty?
     event = events(:event_with_no_files)
     User.with_current_user(publication.contributor) do
@@ -130,8 +130,8 @@ class PublicationTest < ActiveSupport::TestCase
   end
 
   test 'to_rdf' do
-    object = Factory :publication
-    Factory :relationship, subject: Factory(:assay), other_object: object, predicate: Relationship::RELATED_TO_PUBLICATION
+    object = FactoryBot.create :publication
+    FactoryBot.create :relationship, subject: FactoryBot.create(:assay), other_object: object, predicate: Relationship::RELATED_TO_PUBLICATION
     object.reload
 
     rdf = object.to_rdf
@@ -143,15 +143,15 @@ class PublicationTest < ActiveSupport::TestCase
   end
 
   test 'content blob search terms' do
-    p = Factory :publication
+    p = FactoryBot.create :publication
     assert_equal [], p.content_blob_search_terms
   end
 
   test 'associate' do
-    publication = Factory(:publication)
-    assay = Factory(:assay)
-    data_file = Factory(:data_file)
-    model = Factory(:model)
+    publication = FactoryBot.create(:publication)
+    assay = FactoryBot.create(:assay)
+    data_file = FactoryBot.create(:data_file)
+    model = FactoryBot.create(:model)
 
     publication.associate(assay)
     publication.associate(data_file)
@@ -165,13 +165,13 @@ class PublicationTest < ActiveSupport::TestCase
   end
 
   test 'related organisms' do
-    organism1 = Factory(:organism)
-    organism2 = Factory(:organism)
-    publication = Factory(:publication)
-    model1 = Factory(:model, organism: organism1)
-    assay1 = Factory(:assay, organisms: [organism1])
-    model2 = Factory(:model, organism: organism2)
-    assay2 = Factory(:assay, organisms: [organism2])
+    organism1 = FactoryBot.create(:organism)
+    organism2 = FactoryBot.create(:organism)
+    publication = FactoryBot.create(:publication)
+    model1 = FactoryBot.create(:model, organism: organism1)
+    assay1 = FactoryBot.create(:assay, organisms: [organism1])
+    model2 = FactoryBot.create(:model, organism: organism2)
+    assay2 = FactoryBot.create(:assay, organisms: [organism2])
     publication.associate(model1)
     publication.associate(model2)
     publication.associate(assay1)
@@ -184,8 +184,8 @@ class PublicationTest < ActiveSupport::TestCase
   end
 
   test 'assay association' do
-    publication = Factory(:publication)
-    assay = Factory (:assay)
+    publication = FactoryBot.create(:publication)
+    assay = FactoryBot.create(:assay)
 
     assert_not_includes publication.assays, assay
 
@@ -271,10 +271,10 @@ class PublicationTest < ActiveSupport::TestCase
   end
 
   test 'model and datafile association' do
-    publication = Factory(:publication)
+    publication = FactoryBot.create(:publication)
 
-    model = Factory(:model)
-    datafile = Factory(:data_file)
+    model = FactoryBot.create(:model)
+    datafile = FactoryBot.create(:data_file)
 
     assert_not_includes publication.models, model
     assert_not_includes publication.data_files, datafile
@@ -289,7 +289,7 @@ class PublicationTest < ActiveSupport::TestCase
   end
 
   test 'test uuid generated' do
-    publ = Factory( :publication )
+    publ = FactoryBot.create( :publication )
     publ.uuid = nil
     assert_nil publ.attributes['uuid']
     #publ.save(validate: false)
@@ -299,42 +299,42 @@ class PublicationTest < ActiveSupport::TestCase
   end
 
   test 'title trimmed' do
-    x = Factory :publication, title: ' a pub'
+    x = FactoryBot.create :publication, title: ' a pub'
     assert_equal('a pub', x.title)
   end
 
   test 'validation' do
-    project = Factory :project
-    asset = Publication.new title: 'fred', projects: [project], doi: '10.1371/journal.pcbi.1002352', publication_type: Factory(:journal)
+    project = FactoryBot.create :project
+    asset = Publication.new title: 'fred', projects: [project], doi: '10.1371/journal.pcbi.1002352', publication_type: FactoryBot.create(:journal)
     assert asset.valid?
 
-    asset = Publication.new title: 'fred', projects: [project], pubmed_id: '111', publication_type: Factory(:journal)
+    asset = Publication.new title: 'fred', projects: [project], pubmed_id: '111', publication_type: FactoryBot.create(:journal)
     assert asset.valid?
 
-    asset = Publication.new title: 'fred', projects: [project], publication_type: Factory(:journal)
+    asset = Publication.new title: 'fred', projects: [project], publication_type: FactoryBot.create(:journal)
     assert asset.valid?
 
-    asset = Publication.new projects: [project], doi: '10.1371/journal.pcbi.1002352',publication_type: Factory(:journal)
+    asset = Publication.new projects: [project], doi: '10.1371/journal.pcbi.1002352',publication_type: FactoryBot.create(:journal)
     refute asset.valid?
 
     # invalid DOI
-    asset = Publication.new title: 'fred', doi: '10.1371', projects: [project],publication_type: Factory(:journal)
+    asset = Publication.new title: 'fred', doi: '10.1371', projects: [project],publication_type: FactoryBot.create(:journal)
     assert !asset.valid?
-    asset = Publication.new title: 'fred', doi: 'bogus', projects: [project],publication_type: Factory(:journal)
+    asset = Publication.new title: 'fred', doi: 'bogus', projects: [project],publication_type: FactoryBot.create(:journal)
     assert !asset.valid?
 
     # invalid pubmed
-    asset = Publication.new title: 'fred', pubmed_id: 0, projects: [project],publication_type: Factory(:journal)
+    asset = Publication.new title: 'fred', pubmed_id: 0, projects: [project],publication_type: FactoryBot.create(:journal)
     assert !asset.valid?
 
-    asset = Publication.new title: 'fred2', pubmed_id: 1234, projects: [project], publication_type: Factory(:journal)
+    asset = Publication.new title: 'fred2', pubmed_id: 1234, projects: [project], publication_type: FactoryBot.create(:journal)
     assert asset.valid?
 
-    asset = Publication.new title: 'fred', pubmed_id: 'bogus', projects: [project],publication_type: Factory(:journal)
+    asset = Publication.new title: 'fred', pubmed_id: 'bogus', projects: [project],publication_type: FactoryBot.create(:journal)
     assert !asset.valid?
 
     # can have both a pubmed and doi
-    asset = Publication.new title: 'bob', doi: '10.1371/journal.pcbi.1002352', projects: [project], publication_type: Factory(:journal)
+    asset = Publication.new title: 'bob', doi: '10.1371/journal.pcbi.1002352', projects: [project], publication_type: FactoryBot.create(:journal)
     assert asset.valid?
     asset.pubmed_id = '999'
     assert asset.valid?
@@ -343,13 +343,13 @@ class PublicationTest < ActiveSupport::TestCase
   end
 
   test 'creators order is returned in the order they were added' do
-    p = Factory :publication
+    p = FactoryBot.create :publication
     assert_equal 0, p.creators.size
 
-    p1 = Factory(:person)
-    p2 = Factory(:person)
-    p3 = Factory(:person)
-    p4 = Factory(:person)
+    p1 = FactoryBot.create(:person)
+    p2 = FactoryBot.create(:person)
+    p3 = FactoryBot.create(:person)
+    p4 = FactoryBot.create(:person)
 
     User.with_current_user(p.contributor) do
       [p1, p2, p3, p4].each_with_index do |author, index|
@@ -362,7 +362,7 @@ class PublicationTest < ActiveSupport::TestCase
   end
 
   test "uuid doesn't change" do
-    publ = Factory ( :publication )
+    publ = FactoryBot.create(:publication)
     publ.save
     uuid = publ.attributes['uuid']
     publ.save
@@ -370,8 +370,8 @@ class PublicationTest < ActiveSupport::TestCase
   end
 
   test 'validate uniqueness of pubmed_id and doi' do
-    project1 = Factory :project
-    journal = Factory :journal
+    project1 = FactoryBot.create :project
+    journal = FactoryBot.create :journal
     pub = Publication.new(title: 'test1', pubmed_id: '1234', projects: [project1],publication_type_id: journal.id)
     assert pub.valid?
     assert pub.save
@@ -386,7 +386,7 @@ class PublicationTest < ActiveSupport::TestCase
 
     # should be allowed for another project, but only that project on its own
 
-    project2 = Factory :project
+    project2 = FactoryBot.create :project
     pub = Publication.new(title: 'test5', pubmed_id: '1234', projects: [project2],publication_type_id: journal.id)
     assert pub.valid?
     pub = Publication.new(title: 'test5', pubmed_id: '1234', projects: [project1, project2],publication_type_id: journal.id)
@@ -398,7 +398,7 @@ class PublicationTest < ActiveSupport::TestCase
     assert !pub.valid?
 
     # make sure you can edit yourself!
-    p = Factory :publication
+    p = FactoryBot.create :publication
     User.with_current_user p.contributor do
       p.save!
       p.abstract = 'an abstract'
@@ -408,22 +408,22 @@ class PublicationTest < ActiveSupport::TestCase
   end
 
   test 'validate uniqueness of title' do
-    project1 = Factory :project
-    journal = Factory :journal
+    project1 = FactoryBot.create :project
+    journal = FactoryBot.create :journal
     pub = Publication.new(title: 'test1', pubmed_id: '1234', projects: [project1],publication_type_id: journal.id)
     assert pub.valid?
     assert pub.save
     pub = Publication.new(title: 'test1', pubmed_id: '33343', projects: [project1],publication_type_id: journal.id)
     assert !pub.valid?
 
-    project2 = Factory :project
+    project2 = FactoryBot.create :project
     pub = Publication.new(title: 'test1', pubmed_id: '234', projects: [project2],publication_type_id: journal.id)
 
     assert pub.valid?
 
 
     # make sure you can edit yourself!
-    p = Factory :publication
+    p = FactoryBot.create :publication
     User.with_current_user p.contributor do
       p.save!
       p.abstract = 'an abstract'
@@ -433,8 +433,8 @@ class PublicationTest < ActiveSupport::TestCase
   end
 
   test 'strips domain from DOI if an URL is given' do
-    project = Factory(:project)
-    journal = Factory :journal
+    project = FactoryBot.create(:project)
+    journal = FactoryBot.create :journal
     pub = Publication.new(title: 'test1', projects: [project], doi: '10.5072/abc',publication_type_id: journal.id)
     assert pub.valid?
     assert_equal '10.5072/abc', pub.doi
@@ -464,9 +464,9 @@ class PublicationTest < ActiveSupport::TestCase
   end
 
   test 'has deleted contributor?' do
-    item = Factory(:publication,deleted_contributor:'Person:99')
+    item = FactoryBot.create(:publication,deleted_contributor:'Person:99')
     item.update_column(:contributor_id,nil)
-    item2 = Factory(:publication)
+    item2 = FactoryBot.create(:publication)
     item2.update_column(:contributor_id,nil)
 
     assert_nil item.contributor
@@ -479,9 +479,9 @@ class PublicationTest < ActiveSupport::TestCase
   end
 
   test 'has jerm contributor?' do
-    item = Factory(:publication,deleted_contributor:'Person:99')
+    item = FactoryBot.create(:publication,deleted_contributor:'Person:99')
     item.update_column(:contributor_id,nil)
-    item2 = Factory(:publication)
+    item2 = FactoryBot.create(:publication)
     item2.update_column(:contributor_id,nil)
 
     assert_nil item.contributor
@@ -494,20 +494,20 @@ class PublicationTest < ActiveSupport::TestCase
   end
 
   test 'related data files also includes those from assays' do
-    assay = Factory(:assay)
-    assay_data_file = Factory(:data_file, assays: [assay])
-    data_file = Factory(:data_file)
-    publication = Factory(:publication, assays: [assay], data_files: [data_file])
+    assay = FactoryBot.create(:assay)
+    assay_data_file = FactoryBot.create(:data_file, assays: [assay])
+    data_file = FactoryBot.create(:data_file)
+    publication = FactoryBot.create(:publication, assays: [assay], data_files: [data_file])
 
     assert_includes publication.related_data_files, assay_data_file
     assert_includes publication.related_data_files, data_file
   end
 
   test 'related models also includes those from assays' do
-    assay = Factory(:assay)
-    assay_model = Factory(:model, assays: [assay])
-    model = Factory(:model)
-    publication = Factory(:publication, assays: [assay], models: [model])
+    assay = FactoryBot.create(:assay)
+    assay_model = FactoryBot.create(:model, assays: [assay])
+    model = FactoryBot.create(:model)
+    publication = FactoryBot.create(:publication, assays: [assay], models: [model])
 
     assert_includes publication.related_models, assay_model
     assert_includes publication.related_models, model

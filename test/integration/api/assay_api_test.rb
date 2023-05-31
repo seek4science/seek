@@ -7,26 +7,26 @@ class AssayApiTest < ActionDispatch::IntegrationTest
   def setup
     user_login
 
-    @study = Factory(:study, contributor: current_person)
+    @study = FactoryBot.create(:study, contributor: current_person)
     @study.title = 'Fred'
 
     # Populate the assay classes
-    Factory(:modelling_assay_class)
-    Factory(:experimental_assay_class)
-    @assay = Factory(:experimental_assay, contributor: current_person, policy: Factory(:public_policy))
+    FactoryBot.create(:modelling_assay_class)
+    FactoryBot.create(:experimental_assay_class)
+    @assay = FactoryBot.create(:experimental_assay, contributor: current_person, policy: FactoryBot.create(:public_policy))
     @study = @assay.study
     @project = @assay.projects.first
-    @publication = Factory(:publication)
-    @organism = Factory(:organism)
-    @sop = Factory(:sop, policy: Factory(:public_policy))
-    @data_file = Factory(:data_file, policy: Factory(:public_policy))
-    @document = Factory(:document, policy: Factory(:public_policy))
-    @sample = Factory(:sample, policy: Factory(:public_policy))
+    @publication = FactoryBot.create(:publication)
+    @organism = FactoryBot.create(:organism)
+    @sop = FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy))
+    @data_file = FactoryBot.create(:data_file, policy: FactoryBot.create(:public_policy))
+    @document = FactoryBot.create(:document, policy: FactoryBot.create(:public_policy))
+    @sample = FactoryBot.create(:sample, policy: FactoryBot.create(:public_policy))
   end
 
   test 'should not delete assay when not project member' do
-    a = Factory(:max_assay)
-    person = Factory(:person)
+    a = FactoryBot.create(:max_assay)
+    person = FactoryBot.create(:person)
     user_login(person)
     assert_no_difference('ActivityLog.count') do
       assert_no_difference('Assay.count') do
@@ -38,14 +38,14 @@ class AssayApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'project member can delete' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     user_login(person)
     proj = person.projects.first
-    assay = Factory(:experimental_assay,
+    assay = FactoryBot.create(:experimental_assay,
                     contributor: person,
-                    policy: Factory(:policy,
+                    policy: FactoryBot.create(:policy,
                                     access_type: Policy::NO_ACCESS,
-                                    permissions: [Factory(:permission, contributor: proj, access_type: Policy::MANAGING)]))
+                                    permissions: [FactoryBot.create(:permission, contributor: proj, access_type: Policy::MANAGING)]))
 
     assert_difference('Assay.count', -1) do
       delete "/#{plural_name}/#{assay.id}.json"
@@ -54,10 +54,10 @@ class AssayApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'can delete an assay with subscriptions' do
-    assay = Factory(:assay, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
-    p = Factory(:person)
-    Factory(:subscription, person: assay.contributor, subscribable: assay)
-    Factory(:subscription, person: p, subscribable: assay)
+    assay = FactoryBot.create(:assay, policy: FactoryBot.create(:public_policy, access_type: Policy::VISIBLE))
+    p = FactoryBot.create(:person)
+    FactoryBot.create(:subscription, person: assay.contributor, subscribable: assay)
+    FactoryBot.create(:subscription, person: p, subscribable: assay)
 
     user_login(assay.contributor)
 

@@ -25,7 +25,7 @@ class FavouriteGroupsControllerTest < ActionController::TestCase
   test 'update duplicate fails' do
     login_as(:owner_of_a_sop_with_complex_permissions)
     fav = favourite_groups(:my_collaborators_group_for_owner_of_a_sop_with_complex_permissions)
-    other_fav = favourite_groups(:whitelist_for_owner_of_a_sop_with_complex_permissions)
+    other_fav = favourite_groups(:allowlist_for_owner_of_a_sop_with_complex_permissions)
     user = fav.user
 
     # check that the user is the expected one for the test to be valid

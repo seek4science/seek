@@ -3,7 +3,7 @@ require 'test_helper'
 class ExceptionForwarderTest < ActiveSupport::TestCase
 
   test 'default data' do
-    p = Factory(:person)
+    p = FactoryBot.create(:person)
 
     with_config_value(:site_base_host, 'http://fish.com') do
       data = Seek::Errors::ExceptionForwarder.default_data(p.user)

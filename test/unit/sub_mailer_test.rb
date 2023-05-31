@@ -3,15 +3,15 @@ require 'test_helper'
 class SubMailerTest < ActionMailer::TestCase
 
   test 'send digest' do
-    p = Factory :person
-    p2 = Factory :person
-    df = Factory :data_file, projects: p.projects, contributor:p
-    model = Factory :model, projects: p.projects, contributor: p
+    p = FactoryBot.create :person
+    p2 = FactoryBot.create :person
+    df = FactoryBot.create :data_file, projects: p.projects, contributor:p
+    model = FactoryBot.create :model, projects: p.projects, contributor: p
 
-    log = Factory :activity_log, activity_loggable: df, action: 'create', controller_name: 'data_files', created_at: 2.hour.ago, culprit: p2.user
+    log = FactoryBot.create :activity_log, activity_loggable: df, action: 'create', controller_name: 'data_files', created_at: 2.hour.ago, culprit: p2.user
 
     dateForPastLog = DateTime.new(2012, 12, 25, 13, 15, 0)
-    log2 = Factory :activity_log, activity_loggable: model, action: 'update', controller_name: 'data_files', created_at: dateForPastLog, culprit: p2.user
+    log2 = FactoryBot.create :activity_log, activity_loggable: model, action: 'update', controller_name: 'data_files', created_at: dateForPastLog, culprit: p2.user
     email = nil
 
     now = Time.now.in_time_zone('UTC')
@@ -41,10 +41,10 @@ class SubMailerTest < ActionMailer::TestCase
   end
 
   test 'send immediate email' do
-    p = Factory :person
-    p2 = Factory :person
-    df = Factory :data_file, projects: p.projects, contributor:p
-    log = Factory :activity_log, activity_loggable: df, action: 'create', controller_name: 'data_files', created_at: 2.hour.ago, culprit: p2.user
+    p = FactoryBot.create :person
+    p2 = FactoryBot.create :person
+    df = FactoryBot.create :data_file, projects: p.projects, contributor:p
+    log = FactoryBot.create :activity_log, activity_loggable: df, action: 'create', controller_name: 'data_files', created_at: 2.hour.ago, culprit: p2.user
 
     email = nil
 

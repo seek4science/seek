@@ -4,7 +4,7 @@ class DataFileContentBlobTest < ActionDispatch::IntegrationTest
   include ApiTestHelper
 
   def setup
-    @person = Factory(:person)
+    @person = FactoryBot.create(:person)
     @project = @person.projects.first
     @token = @person.user.api_tokens.create(title: 'test').token
     @current_user = @person.user

@@ -2,12 +2,12 @@ require 'test_helper'
 
 class GitVersionTest < ActiveSupport::TestCase
   test 'git version default name' do
-    workflow = Factory(:local_git_workflow)
+    workflow = FactoryBot.create(:local_git_workflow)
     assert_equal 'Version 1', workflow.git_version.name
   end
 
   test 'create new git version' do
-    workflow = Factory(:local_git_workflow)
+    workflow = FactoryBot.create(:local_git_workflow)
     assert_equal 1, workflow.version
     assert_equal 1, workflow.latest_git_version.version
     assert_equal 1, workflow.git_versions.count
@@ -20,7 +20,7 @@ class GitVersionTest < ActiveSupport::TestCase
   end
 
   test 'lock version' do
-    repo = Factory(:local_repository)
+    repo = FactoryBot.create(:local_repository)
     workflow = repo.resource
 
     v = disable_authorization_checks do
@@ -32,7 +32,7 @@ class GitVersionTest < ActiveSupport::TestCase
 
     disable_authorization_checks { v.lock }
     workflow.update_column(:title, 'Something else')
-    new_class = WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class)
+    new_class = WorkflowClass.find_by_key('galaxy') || FactoryBot.create(:galaxy_workflow_class)
     workflow.update_column(:workflow_class_id, new_class.id)
 
     assert_equal 'refs/tags/version-1.0.0', v.ref
@@ -46,8 +46,8 @@ class GitVersionTest < ActiveSupport::TestCase
   end
 
   test 'add files' do
-    workflow = Factory(:workflow)
-    repo = Factory(:blank_repository, resource: workflow)
+    workflow = FactoryBot.create(:workflow)
+    repo = FactoryBot.create(:blank_repository, resource: workflow)
 
     v = disable_authorization_checks { workflow.git_versions.create!(mutable: true) }
     assert_equal 'This Workflow', v.title
@@ -66,8 +66,8 @@ class GitVersionTest < ActiveSupport::TestCase
   end
 
   test 'change git author' do
-    workflow = Factory(:workflow)
-    repo = Factory(:blank_repository, resource: workflow)
+    workflow = FactoryBot.create(:workflow)
+    repo = FactoryBot.create(:blank_repository, resource: workflow)
 
     v = disable_authorization_checks { workflow.git_versions.create!(mutable: true) }
     assert_equal 'This Workflow', v.title
@@ -96,7 +96,7 @@ class GitVersionTest < ActiveSupport::TestCase
   end
 
   test 'cannot add file to immutable version' do
-    repo = Factory(:local_repository)
+    repo = FactoryBot.create(:local_repository)
     workflow = repo.resource
 
     v = disable_authorization_checks { workflow.git_versions.create!(mutable: false) }
@@ -114,7 +114,7 @@ class GitVersionTest < ActiveSupport::TestCase
   end
 
   test 'automatically init local git repo' do
-    w = Factory(:workflow)
+    w = FactoryBot.create(:workflow)
     disable_authorization_checks do
       v = w.git_versions.create
       assert v.git_repository
@@ -124,8 +124,8 @@ class GitVersionTest < ActiveSupport::TestCase
   end
 
   test 'automatically link existing remote git repos' do
-    w = Factory(:workflow, git_version_attributes: { remote: 'https://git.git/git.git' })
-    w2 = Factory(:workflow, git_version_attributes: { remote: 'https://git.git/git.git' })
+    w = FactoryBot.create(:workflow, git_version_attributes: { remote: 'https://git.git/git.git' })
+    w2 = FactoryBot.create(:workflow, git_version_attributes: { remote: 'https://git.git/git.git' })
 
     assert_nil w.local_git_repository
     assert_nil w2.local_git_repository
@@ -134,11 +134,11 @@ class GitVersionTest < ActiveSupport::TestCase
 
   test 'create git version on create' do
     # Make sure remote repo exists
-    Factory(:workflow, git_version_attributes: { remote: 'https://git.git/git.git' })
+    FactoryBot.create(:workflow, git_version_attributes: { remote: 'https://git.git/git.git' })
 
     assert_difference('Git::Version.count', 1) do
       assert_no_difference('Git::Repository.count') do
-        w = Factory(:workflow, title: 'Test', description: 'Testy', git_version_attributes: {
+        w = FactoryBot.create(:workflow, title: 'Test', description: 'Testy', git_version_attributes: {
             ref: 'refs/heads/master',
             remote: 'https://git.git/git.git'
         })
@@ -157,7 +157,7 @@ class GitVersionTest < ActiveSupport::TestCase
     skip "Not doing this for now"
     assert_difference('Git::Version.count', 1) do
       assert_difference('Git::Repository.count', 1) do
-        w = Factory(:workflow, title: 'Test', description: 'Testy')
+        w = FactoryBot.create(:workflow, title: 'Test', description: 'Testy')
         assert_equal 1, w.git_versions.count
 
         v = w.git_versions.last
@@ -171,8 +171,8 @@ class GitVersionTest < ActiveSupport::TestCase
   end
 
   test 'resolve refs' do
-    remote = Factory(:remote_repository)
-    workflow = Factory(:workflow, git_version_attributes: { git_repository_id: remote.id })
+    remote = FactoryBot.create(:remote_repository)
+    workflow = FactoryBot.create(:workflow, git_version_attributes: { git_repository_id: remote.id })
 
     v = disable_authorization_checks { workflow.git_versions.create!(remote: remote.remote, ref: 'refs/remotes/origin/main') }
     assert_equal '94ae9926a824ebe809a9e9103cbdb1d5c5f98608', v.commit
@@ -183,7 +183,7 @@ class GitVersionTest < ActiveSupport::TestCase
   end
 
   test 'remove file' do
-    workflow = Factory(:local_git_workflow)
+    workflow = FactoryBot.create(:local_git_workflow)
     v = workflow.latest_git_version
 
     old_commit = v.commit
@@ -198,7 +198,7 @@ class GitVersionTest < ActiveSupport::TestCase
   end
 
   test 'rename file' do
-    workflow = Factory(:local_git_workflow)
+    workflow = FactoryBot.create(:local_git_workflow)
 
     v = workflow.latest_git_version
     old_commit = v.commit
@@ -213,8 +213,8 @@ class GitVersionTest < ActiveSupport::TestCase
   end
 
   test 'sync attributes' do
-    repo = Factory(:unlinked_local_repository)
-    workflow = Factory(:workflow, description: 'Test ABC', git_version_attributes: { git_repository_id: repo.id })
+    repo = FactoryBot.create(:unlinked_local_repository)
+    workflow = FactoryBot.create(:workflow, description: 'Test ABC', git_version_attributes: { git_repository_id: repo.id })
     v = workflow.latest_git_version
 
     assert_equal 'Test ABC', workflow.description
@@ -227,14 +227,14 @@ class GitVersionTest < ActiveSupport::TestCase
   end
 
   test 'cannot link to existing local repository' do
-    repo = Factory(:local_repository)
-    gv = Factory.build(:git_version, git_repository_id: repo.id)
+    repo = FactoryBot.create(:local_repository)
+    gv = FactoryBot.build(:git_version, git_repository_id: repo.id)
     refute gv.save
     assert gv.errors.added?(:git_repository, 'already linked to another resource')
   end
 
   test 'authorization' do
-    gv = Factory(:git_version)
+    gv = FactoryBot.create(:git_version)
 
     refute gv.can_view?
     refute gv.resource.can_view?
@@ -247,7 +247,7 @@ class GitVersionTest < ActiveSupport::TestCase
     refute gv.can_delete?
     refute gv.resource.can_delete?
 
-    disable_authorization_checks { gv.resource.policy = Factory(:public_policy); gv.resource.save! }
+    disable_authorization_checks { gv.resource.policy = FactoryBot.create(:public_policy); gv.resource.save! }
 
     assert gv.can_view?
     assert gv.resource.can_view?
@@ -262,7 +262,7 @@ class GitVersionTest < ActiveSupport::TestCase
   end
 
   test 'attributes synced for factory' do
-    gv = Factory(:git_version)
+    gv = FactoryBot.create(:git_version)
     r = gv.resource
     keys = r.attributes.keys.map(&:to_sym) - [:id, :created_at, :updated_at, :contributor_id]
     keys.each do |k|
@@ -275,7 +275,7 @@ class GitVersionTest < ActiveSupport::TestCase
   end
 
   test 'can initialize next version of an immutable git_version' do
-    gv = Factory(:git_version)
+    gv = FactoryBot.create(:git_version)
     disable_authorization_checks { gv.lock }
 
     next_ver = gv.next_version
@@ -291,8 +291,8 @@ class GitVersionTest < ActiveSupport::TestCase
   end
 
   test 'can handle unusual paths' do
-    workflow = Factory(:workflow)
-    repo = Factory(:blank_repository, resource: workflow)
+    workflow = FactoryBot.create(:workflow)
+    repo = FactoryBot.create(:blank_repository, resource: workflow)
 
     v = disable_authorization_checks { workflow.git_versions.create!(mutable: true) }
     assert_equal 'This Workflow', v.title
@@ -324,8 +324,8 @@ class GitVersionTest < ActiveSupport::TestCase
   end
 
   test 'valid paths are rejected when committed with invalid paths' do
-    workflow = Factory(:workflow)
-    repo = Factory(:blank_repository, resource: workflow)
+    workflow = FactoryBot.create(:workflow)
+    repo = FactoryBot.create(:blank_repository, resource: workflow)
 
     v = disable_authorization_checks { workflow.git_versions.create!(mutable: true) }
     assert_equal 'This Workflow', v.title
@@ -343,8 +343,8 @@ class GitVersionTest < ActiveSupport::TestCase
   end
 
   test 'add remote file' do
-    workflow = Factory(:workflow)
-    repo = Factory(:blank_repository, resource: workflow)
+    workflow = FactoryBot.create(:workflow)
+    repo = FactoryBot.create(:blank_repository, resource: workflow)
 
     v = disable_authorization_checks { workflow.git_versions.create!(mutable: true) }
     assert_equal 'This Workflow', v.title
@@ -376,8 +376,8 @@ class GitVersionTest < ActiveSupport::TestCase
   end
 
   test 'add remote file without fetch job' do
-    workflow = Factory(:workflow)
-    repo = Factory(:blank_repository, resource: workflow)
+    workflow = FactoryBot.create(:workflow)
+    repo = FactoryBot.create(:blank_repository, resource: workflow)
 
     v = disable_authorization_checks { workflow.git_versions.create!(mutable: true) }
     assert_equal 'This Workflow', v.title
@@ -401,8 +401,8 @@ class GitVersionTest < ActiveSupport::TestCase
   end
 
   test 'do not add remote file with inaccessible URL' do
-    workflow = Factory(:workflow)
-    repo = Factory(:blank_repository, resource: workflow)
+    workflow = FactoryBot.create(:workflow)
+    repo = FactoryBot.create(:blank_repository, resource: workflow)
 
     v = disable_authorization_checks { workflow.git_versions.create!(mutable: true) }
     assert_equal 'This Workflow', v.title
@@ -425,7 +425,7 @@ class GitVersionTest < ActiveSupport::TestCase
   end
 
   test 'empty?' do
-    workflow = Factory(:empty_git_workflow)
+    workflow = FactoryBot.create(:empty_git_workflow)
     assert workflow.git_version.empty?
 
     workflow.git_version.add_file('folder/blah.txt', StringIO.new('blah'))
@@ -433,7 +433,7 @@ class GitVersionTest < ActiveSupport::TestCase
   end
 
   test 'get blob' do
-    gv = Factory(:ro_crate_git_workflow).git_version
+    gv = FactoryBot.create(:ro_crate_git_workflow).git_version
 
     blob = gv.get_blob('sort-and-change-case.ga')
     assert blob
@@ -447,7 +447,7 @@ class GitVersionTest < ActiveSupport::TestCase
   end
 
   test 'get tree' do
-    gv = Factory(:ro_crate_git_workflow).git_version
+    gv = FactoryBot.create(:ro_crate_git_workflow).git_version
 
     root = gv.tree
     assert_equal '/', root.path

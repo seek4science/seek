@@ -3,21 +3,21 @@ require 'test_helper'
 class SampleDataPersistJobTest < ActiveSupport::TestCase
   def setup
     create_sample_attribute_type
-    @person = Factory(:project_administrator)
+    @person = FactoryBot.create(:project_administrator)
     User.current_user = @person.user
 
-    @data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
-                                     policy: Factory(:private_policy), contributor: @person
+    @data_file = FactoryBot.create :data_file, content_blob: FactoryBot.create(:sample_type_populated_template_content_blob),
+                                     policy: FactoryBot.create(:private_policy), contributor: @person
     refute @data_file.sample_template?
     assert_empty @data_file.possible_sample_types
 
     @sample_type = SampleType.new title: 'from template', uploaded_template: true,
                                   project_ids: [@person.projects.first.id], contributor: @person
-    @sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    @sample_type.content_blob = FactoryBot.create(:sample_type_template_content_blob)
     @sample_type.build_attributes_from_template
     # this is to force the full name to be 2 words, so that one row fails
-    @sample_type.sample_attributes.first.sample_attribute_type = Factory(:full_name_sample_attribute_type)
-    @sample_type.sample_attributes[1].sample_attribute_type = Factory(:datetime_sample_attribute_type)
+    @sample_type.sample_attributes.first.sample_attribute_type = FactoryBot.create(:full_name_sample_attribute_type)
+    @sample_type.sample_attributes[1].sample_attribute_type = FactoryBot.create(:datetime_sample_attribute_type)
     @sample_type.save!
   end
 
@@ -50,10 +50,10 @@ class SampleDataPersistJobTest < ActiveSupport::TestCase
   end
 
   test 'persists samples and associate with assay' do
-    assay_asset1 = Factory(:assay_asset, asset: @data_file, direction: AssayAsset::Direction::INCOMING,
-                                         assay: Factory(:assay, contributor: @person))
-    assay_asset2 = Factory(:assay_asset, asset: @data_file, direction: AssayAsset::Direction::OUTGOING,
-                                         assay: Factory(:assay, contributor: @person))
+    assay_asset1 = FactoryBot.create(:assay_asset, asset: @data_file, direction: AssayAsset::Direction::INCOMING,
+                                         assay: FactoryBot.create(:assay, contributor: @person))
+    assay_asset2 = FactoryBot.create(:assay_asset, asset: @data_file, direction: AssayAsset::Direction::OUTGOING,
+                                         assay: FactoryBot.create(:assay, contributor: @person))
 
     assert_difference('AssayAsset.count', 3) do
       assert_difference('Sample.count', 3) do

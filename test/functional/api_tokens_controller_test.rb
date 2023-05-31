@@ -4,7 +4,7 @@ class ApiTokensControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
 
   test 'should get empty API token lists' do
-    user = Factory(:user)
+    user = FactoryBot.create(:user)
     login_as(user)
 
     get :index, params: { user_id: user.id }
@@ -13,8 +13,8 @@ class ApiTokensControllerTest < ActionController::TestCase
   end
 
   test "shouldn't get API token list for other user" do
-    user = Factory(:user)
-    other_user = Factory(:user)
+    user = FactoryBot.create(:user)
+    other_user = FactoryBot.create(:user)
     login_as(other_user)
 
     get :index, params: { user_id: user.id }
@@ -24,7 +24,7 @@ class ApiTokensControllerTest < ActionController::TestCase
   end
 
   test 'should list API tokens' do
-    api_token = Factory(:api_token)
+    api_token = FactoryBot.create(:api_token)
     login_as(api_token.user)
 
     get :index, params: { user_id: api_token.user.id }
@@ -35,7 +35,7 @@ class ApiTokensControllerTest < ActionController::TestCase
   end
 
   test 'should create API token' do
-    user = Factory(:user)
+    user = FactoryBot.create(:user)
     login_as(user)
 
     assert_difference('ApiToken.count', 1) do
@@ -51,8 +51,8 @@ class ApiTokensControllerTest < ActionController::TestCase
   end
 
   test 'should not create API token for other user' do
-    user = Factory(:user)
-    other_user = Factory(:user)
+    user = FactoryBot.create(:user)
+    other_user = FactoryBot.create(:user)
     login_as(user)
 
     assert_no_difference('ApiToken.count') do
@@ -64,7 +64,7 @@ class ApiTokensControllerTest < ActionController::TestCase
   end
 
   test 'should delete API token' do
-    api_token = Factory(:api_token)
+    api_token = FactoryBot.create(:api_token)
     user = api_token.user
     login_as(user)
 
@@ -76,8 +76,8 @@ class ApiTokensControllerTest < ActionController::TestCase
   end
 
   test "shouldn't delete other users' API token" do
-    api_token = Factory(:api_token)
-    other_user = Factory(:user)
+    api_token = FactoryBot.create(:api_token)
+    other_user = FactoryBot.create(:user)
     login_as(other_user)
 
     assert_no_difference('ApiToken.count') do

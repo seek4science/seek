@@ -7,10 +7,10 @@ class CollectionApiTest < ActionDispatch::IntegrationTest
   def setup
     user_login
     @project = @current_user.person.projects.first
-    @document1 = Factory(:public_document, contributor: current_person)
-    @document2 = Factory(:public_document, contributor: current_person)
-    @creator = Factory(:person)
-    @collection = Factory(:collection, policy: Factory(:public_policy), contributor: current_person, creators: [@creator])
+    @document1 = FactoryBot.create(:public_document, contributor: current_person)
+    @document2 = FactoryBot.create(:public_document, contributor: current_person)
+    @creator = FactoryBot.create(:person)
+    @collection = FactoryBot.create(:collection, policy: FactoryBot.create(:public_policy), contributor: current_person, creators: [@creator])
   end
 
   test 'returns sensible error objects' do

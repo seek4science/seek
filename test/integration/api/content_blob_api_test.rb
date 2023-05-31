@@ -4,7 +4,7 @@ class ContentBlobApiTest < ActionDispatch::IntegrationTest
   include ReadApiTestSuite
 
   def private_resource
-    @p ||= Factory(:min_content_blob, asset: Factory(:private_document))
+    @p ||= FactoryBot.create(:min_content_blob, asset: FactoryBot.create(:private_document))
   end
 
   def skip_index_test?
@@ -13,7 +13,7 @@ class ContentBlobApiTest < ActionDispatch::IntegrationTest
 
   def setup
     user_login
-    @content_blob = Factory(:min_content_blob)
+    @content_blob = FactoryBot.create(:min_content_blob)
     @sop = @content_blob.asset
   end
 

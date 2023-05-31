@@ -4,13 +4,13 @@ require 'openbis_test_helper'
 class SeekUtilTest < ActiveSupport::TestCase
 
   def setup
-    Factory :experimental_assay_class
+    FactoryBot.create :experimental_assay_class
     mock_openbis_calls
-    @endpoint = Factory(:openbis_endpoint)
+    @endpoint = FactoryBot.create(:openbis_endpoint)
     @endpoint.assay_types = ['TZ_FAIR_ASSAY'] # EXPERIMENTAL_STEP
     @util = Seek::Openbis::SeekUtil.new
-    @creator = Factory(:person, project: @endpoint.project)
-    @study = Factory :study, contributor: @creator
+    @creator = FactoryBot.create(:person, project: @endpoint.project)
+    @study = FactoryBot.create :study, contributor: @creator
     @zample = Seek::Openbis::Zample.new(@endpoint, '20171002172111346-37')
     @experiment = Seek::Openbis::Experiment.new(@endpoint, '20171121152132641-51')
     User.current_user = @creator.user
@@ -29,7 +29,7 @@ class SeekUtilTest < ActiveSupport::TestCase
   end
 
   test 'creates valid study with external_asset that can be saved' do
-    investigation = Factory(:investigation, contributor: @creator)
+    investigation = FactoryBot.create(:investigation, contributor: @creator)
     assert investigation.save
 
     params = {investigation_id: investigation.id}
@@ -186,7 +186,7 @@ class SeekUtilTest < ActiveSupport::TestCase
 
     refute @util.should_follow_dependent(asset)
 
-    asset.seek_entity = Factory :data_file
+    asset.seek_entity = FactoryBot.create :data_file
     assert asset.seek_entity
 
     refute @util.should_follow_dependent(asset)
@@ -198,18 +198,18 @@ class SeekUtilTest < ActiveSupport::TestCase
 
     refute @util.should_follow_dependent(asset)
 
-    asset.seek_entity = Factory :assay
+    asset.seek_entity = FactoryBot.create :assay
     assert @util.should_follow_dependent(asset)
 
     asset = OpenbisExternalAsset.build(@experiment, sync_options)
-    asset.seek_entity = Factory :study
+    asset.seek_entity = FactoryBot.create :study
     assert @util.should_follow_dependent(asset)
   end
 
   test 'should_follow gives false if new_arrivals not set or config_disabled' do
     sync_options = {new_arrivals: '1', link_datasets: '1'}
     asset = OpenbisExternalAsset.build(@zample, sync_options)
-    asset.seek_entity = Factory :assay
+    asset.seek_entity = FactoryBot.create :assay
 
     assert @util.should_follow_dependent(asset)
 
@@ -244,7 +244,7 @@ class SeekUtilTest < ActiveSupport::TestCase
     asset = OpenbisExternalAsset.build(dataset1)
     asset.synchronized_at = DateTime.now - 1.days
     asset.external_id = dataset2.perm_id
-    asset.seek_entity = Factory :data_file
+    asset.seek_entity = FactoryBot.create :data_file
 
     assert_not_equal dataset2.perm_id, asset.content.perm_id
 
@@ -265,7 +265,7 @@ class SeekUtilTest < ActiveSupport::TestCase
     asset = OpenbisExternalAsset.build(@zample)
     asset.synchronized_at = DateTime.now - 1.days
     asset.external_id = '20171002172639055-39'
-    asset.seek_entity = Factory :assay
+    asset.seek_entity = FactoryBot.create :assay
 
     assert_not_equal '20171002172639055-39', asset.content.perm_id
 
@@ -289,7 +289,7 @@ class SeekUtilTest < ActiveSupport::TestCase
     asset.synchronized_at = DateTime.now - 1.days
     d = asset.synchronized_at
     asset.external_id = 'missing_id'
-    asset.seek_entity = Factory :data_file
+    asset.seek_entity = FactoryBot.create :data_file
 
     asset.sync_state = :refresh
     asset.failures = 1
@@ -312,7 +312,7 @@ class SeekUtilTest < ActiveSupport::TestCase
     dataset1 = Seek::Openbis::Dataset.new(@endpoint, '20160210130454955-23')
     dataset2 = Seek::Openbis::Dataset.new(@endpoint, '20160215111736723-31')
 
-    data_file = Factory :data_file
+    data_file = FactoryBot.create :data_file
     asset = OpenbisExternalAsset.build(dataset1)
     asset.synchronized_at = DateTime.now - 1.days
     asset.external_id = dataset2.perm_id
@@ -345,7 +345,7 @@ class SeekUtilTest < ActiveSupport::TestCase
     asset = OpenbisExternalAsset.build(dataset1)
     asset.synchronized_at = DateTime.now - 1.days
     asset.external_id = dataset2.perm_id
-    asset.seek_entity = Factory :data_file
+    asset.seek_entity = FactoryBot.create :data_file
 
     assert_not_equal dataset2.perm_id, asset.content.perm_id
 
@@ -367,7 +367,7 @@ class SeekUtilTest < ActiveSupport::TestCase
     dataset1 = Seek::Openbis::Dataset.new(@endpoint, '20160210130454955-23')
     dataset2 = Seek::Openbis::Dataset.new(@endpoint, '20160215111736723-31')
 
-    data_file = Factory :data_file
+    data_file = FactoryBot.create :data_file
     asset = OpenbisExternalAsset.build(dataset1)
     asset.synchronized_at = DateTime.now - 1.days
     asset.external_id = dataset2.perm_id
@@ -396,7 +396,7 @@ class SeekUtilTest < ActiveSupport::TestCase
   test 'sync_external_asset links datasets to assay if follow links' do
     refute @zample.dataset_ids.empty?
 
-    assay = Factory :assay, contributor: @creator
+    assay = FactoryBot.create :assay, contributor: @creator
 
     assert assay.data_files.empty?
 
@@ -417,7 +417,7 @@ class SeekUtilTest < ActiveSupport::TestCase
   test 'sync_external_asset does not link datasets to assay if sync_options not set' do
     refute @zample.dataset_ids.empty?
 
-    assay = Factory :assay
+    assay = FactoryBot.create :assay
 
     assert assay.data_files.empty?
 
@@ -438,7 +438,7 @@ class SeekUtilTest < ActiveSupport::TestCase
     refute @experiment.dataset_ids.empty?
     refute @experiment.sample_ids.empty?
 
-    study = Factory :study
+    study = FactoryBot.create :study
 
     assert study.assays.empty?
     assert study.related_data_files.empty?
@@ -461,7 +461,7 @@ class SeekUtilTest < ActiveSupport::TestCase
     refute @experiment.dataset_ids.empty?
     refute @experiment.sample_ids.empty?
 
-    study = Factory :study, contributor: @creator
+    study = FactoryBot.create :study, contributor: @creator
 
     assert study.assays.empty?
     assert study.related_data_files.empty?
@@ -491,12 +491,12 @@ class SeekUtilTest < ActiveSupport::TestCase
     refute @experiment.dataset_ids.empty?
     refute @experiment.sample_ids.empty?
 
-    policy = Factory(:public_policy)
+    policy = FactoryBot.create(:public_policy)
     policy.permissions.build(contributor: @endpoint.project, access_type: Policy::EDITING)
 
-    study = Factory :study, contributor: @creator, policy: policy
+    study = FactoryBot.create :study, contributor: @creator, policy: policy
 
-    user = Factory(:person, project: @endpoint.project)
+    user = FactoryBot.create(:person, project: @endpoint.project)
     assert_not_equal user, @creator
 
     assert study.assays.empty?
@@ -528,13 +528,13 @@ class SeekUtilTest < ActiveSupport::TestCase
     refute @experiment.dataset_ids.empty?
     refute @experiment.sample_ids.empty?
 
-    # policy = Factory(:public_policy)
+    # policy = FactoryBot.create(:public_policy)
     # policy.permissions.build(contributor: @endpoint.project, access_type: Policy::EDITING)
-    # study = Factory :study, contributor: @creator, policy: policy
+    # study = FactoryBot.create :study, contributor: @creator, policy: policy
 
-    study = Factory :study, contributor: @creator
+    study = FactoryBot.create :study, contributor: @creator
 
-    user = Factory(:person, project: @endpoint.project)
+    user = FactoryBot.create(:person, project: @endpoint.project)
     assert_not_equal user, @creator
 
     asset = OpenbisExternalAsset.build(@experiment)
@@ -562,7 +562,7 @@ class SeekUtilTest < ActiveSupport::TestCase
     refute @experiment.dataset_ids.empty?
     refute @experiment.sample_ids.empty?
 
-    study = Factory :study
+    study = FactoryBot.create :study
 
     assert study.assays.empty?
     assert study.related_data_files.empty?
@@ -592,7 +592,7 @@ class SeekUtilTest < ActiveSupport::TestCase
   test 'follow_dependent links datasets to assay' do
     refute @zample.dataset_ids.empty?
 
-    assay = Factory :assay, contributor: @creator
+    assay = FactoryBot.create :assay, contributor: @creator
 
     assert assay.data_files.empty?
 
@@ -612,9 +612,9 @@ class SeekUtilTest < ActiveSupport::TestCase
   ## --------- linking datasets to assay ---------- ##
 
   test 'associate_data_sets links datasets with assay creating new datafiles if necessary' do
-    assay = Factory :assay, contributor: @creator
+    assay = FactoryBot.create :assay, contributor: @creator
 
-    df0 = Factory :data_file, contributor: @creator
+    df0 = FactoryBot.create :data_file, contributor: @creator
     assay.associate(df0)
     assert df0.persisted?
     assert_equal 1, assay.data_files.length
@@ -643,9 +643,9 @@ class SeekUtilTest < ActiveSupport::TestCase
   end
 
   test 'associate_data_sets_ids links datasets with assay creating new datafiles if necessary' do
-    assay = Factory :assay, contributor: @creator
+    assay = FactoryBot.create :assay, contributor: @creator
 
-    df0 = Factory :data_file, contributor: @creator
+    df0 = FactoryBot.create :data_file, contributor: @creator
     assay.associate(df0)
     assert df0.persisted?
     assert_equal 1, assay.data_files.length
@@ -672,7 +672,7 @@ class SeekUtilTest < ActiveSupport::TestCase
 
   ## --------- linking assays to study ---------- ##
   test 'associate_zamples_as_assays links zamples as new assays with study' do
-    study = Factory :study, contributor: @creator
+    study = FactoryBot.create :study, contributor: @creator
 
     assert study.assays.empty?
 
@@ -699,7 +699,7 @@ class SeekUtilTest < ActiveSupport::TestCase
   end
 
   test 'associate_zamples_as_assays links datafiles to assays under the study if selected so' do
-    study = Factory :study, contributor: @creator
+    study = FactoryBot.create :study, contributor: @creator
 
     assert study.assays.empty?
 
@@ -733,14 +733,14 @@ class SeekUtilTest < ActiveSupport::TestCase
   end
 
   test 'associate_zamples_as_assays reports issues if zample already registered but not as assay' do
-    study = Factory :study, contributor: @creator
+    study = FactoryBot.create :study, contributor: @creator
 
     assert study.assays.empty?
 
     zamples = Seek::Openbis::Zample.new(@endpoint).find_by_perm_ids(['20171002172111346-37', '20171002172639055-39'])
     assert_equal 2, zamples.length
 
-    df = Factory :data_file, contributor: @creator
+    df = FactoryBot.create :data_file, contributor: @creator
     ea = OpenbisExternalAsset.find_or_create_by_entity(zamples[0])
     df.external_asset = ea
 
@@ -769,15 +769,15 @@ class SeekUtilTest < ActiveSupport::TestCase
   end
 
   test 'associate_zamples_as_assays reports issues if zample already registered under different study' do
-    study = Factory :study, contributor: @creator
+    study = FactoryBot.create :study, contributor: @creator
 
     assert study.assays.empty?
 
     zamples = Seek::Openbis::Zample.new(@endpoint).find_by_perm_ids(['20171002172111346-37', '20171002172639055-39'])
     assert_equal 2, zamples.length
 
-    study2 = Factory :study, contributor: @creator
-    assay2 = Factory :assay, contributor: @creator
+    study2 = FactoryBot.create :study, contributor: @creator
+    assay2 = FactoryBot.create :assay, contributor: @creator
     assay2.study = study2
 
     ea = OpenbisExternalAsset.find_or_create_by_entity(zamples[0])
@@ -816,14 +816,14 @@ class SeekUtilTest < ActiveSupport::TestCase
   end
 
   test 'associate_zamples_as_assays sets sync_options for new assays and leaves existing untouched' do
-    study = Factory :study, contributor: @creator
+    study = FactoryBot.create :study, contributor: @creator
 
     assert study.assays.empty?
 
     zamples = Seek::Openbis::Zample.new(@endpoint).find_by_perm_ids(['20171002172111346-37', '20171002172639055-39'])
     assert_equal 2, zamples.length
 
-    assay2 = Factory :assay, contributor: @creator
+    assay2 = FactoryBot.create :assay, contributor: @creator
     assay2.study = study
 
     ea = OpenbisExternalAsset.find_or_create_by_entity(zamples[0])
@@ -857,7 +857,7 @@ class SeekUtilTest < ActiveSupport::TestCase
   ## --------- follow_study_dependent_assays ---------- ##
 
   test 'follow_study_dependent_assays registers assays if set so' do
-    study = Factory :study, contributor: @creator
+    study = FactoryBot.create :study, contributor: @creator
     assert study.assays.empty?
     refute @experiment.sample_ids.empty?
 
@@ -884,7 +884,7 @@ class SeekUtilTest < ActiveSupport::TestCase
   end
 
   test 'follow_study_dependent_assays registers selected assays if set so' do
-    study = Factory :study, contributor: @creator
+    study = FactoryBot.create :study, contributor: @creator
     assert study.assays.empty?
     assert(@experiment.sample_ids.length > 1)
 
@@ -900,7 +900,7 @@ class SeekUtilTest < ActiveSupport::TestCase
   end
 
   test 'follow_study_dependent_assays registers assays with unique titles' do
-    study = Factory :study, contributor: @creator
+    study = FactoryBot.create :study, contributor: @creator
     assert study.assays.empty?
     assert @experiment.sample_ids.size > 1
 
@@ -921,7 +921,7 @@ class SeekUtilTest < ActiveSupport::TestCase
   ## --------- follow_study_dependent_datafiles ---------- ##
 
   test 'follow_study_dependent_datafiles registers datafiles under fake assay if said so' do
-    study = Factory :study, contributor: @creator
+    study = FactoryBot.create :study, contributor: @creator
     assert study.assays.empty?
     assert study.related_data_files.empty?
     refute @experiment.dataset_ids.empty?
@@ -951,7 +951,7 @@ class SeekUtilTest < ActiveSupport::TestCase
   end
 
   test 'follow_study_dependent_datafiles registers selected datafiles under fake assay if said so' do
-    study = Factory :study, contributor: @creator
+    study = FactoryBot.create :study, contributor: @creator
     assert study.assays.empty?
     assert study.related_data_files.empty?
     refute @experiment.dataset_ids.empty?
@@ -968,7 +968,7 @@ class SeekUtilTest < ActiveSupport::TestCase
   end
 
   test 'follow_study_dependent_datafiles registers datafiles with unique names' do
-    study = Factory :study, contributor: @creator
+    study = FactoryBot.create :study, contributor: @creator
     assert study.assays.empty?
     assert study.related_data_files.empty?
     assert @experiment.dataset_ids.size > 1
@@ -992,7 +992,7 @@ class SeekUtilTest < ActiveSupport::TestCase
   test 'follow assay registers all dependent datasets if set so' do
     # puts @zample.dataset_ids
 
-    assay = Factory :assay, contributor: @creator
+    assay = FactoryBot.create :assay, contributor: @creator
     es = OpenbisExternalAsset.find_or_create_by_entity(@zample)
     es.sync_options = {link_datasets: '1'}
     assay.external_asset = es
@@ -1011,7 +1011,7 @@ class SeekUtilTest < ActiveSupport::TestCase
   test 'follow assay registers selected detasets' do
     # puts @zample.dataset_ids
 
-    assay = Factory :assay, contributor: @creator
+    assay = FactoryBot.create :assay, contributor: @creator
     es = OpenbisExternalAsset.find_or_create_by_entity(@zample)
     es.sync_options = {linked_datasets: [@zample.dataset_ids[1]]}
     assay.external_asset = es
@@ -1027,7 +1027,7 @@ class SeekUtilTest < ActiveSupport::TestCase
   end
 
   test 'follow assay registers dependent datasets with unique names' do
-    assay = Factory :assay, contributor: @creator
+    assay = FactoryBot.create :assay, contributor: @creator
     es = OpenbisExternalAsset.find_or_create_by_entity(@zample)
     es.sync_options = {link_datasets: '1'}
     assay.external_asset = es
@@ -1152,13 +1152,13 @@ class SeekUtilTest < ActiveSupport::TestCase
 
   test 'fake_file_assay gives first assay of the openbis name' do
     disable_authorization_checks do
-      study = Factory :study, contributor: @creator
-      assay1 = Factory :assay, contributor: @creator
+      study = FactoryBot.create :study, contributor: @creator
+      assay1 = FactoryBot.create :assay, contributor: @creator
       assay1.title = 'Cos'
       assay1.study = study
       assert assay1.save
 
-      assay2 = Factory :assay, contributor: @creator
+      assay2 = FactoryBot.create :assay, contributor: @creator
       assay2.title = 'OpenBIS FILES'
       assay2.study = study
       assert assay2.save
@@ -1168,7 +1168,7 @@ class SeekUtilTest < ActiveSupport::TestCase
   end
 
   test 'fake_file_assay creates assay of the openbis name if missing' do
-    study = Factory :study, contributor: @creator
+    study = FactoryBot.create :study, contributor: @creator
     assert study.assays.empty?
     assay = @util.fake_file_assay(study)
 
@@ -1250,9 +1250,9 @@ class SeekUtilTest < ActiveSupport::TestCase
   end
 
   test 'validate_expected_seek_type issues warnings if mismatch' do
-    df1 = Factory :data_file
-    df2 = Factory :data_file
-    assay = Factory :assay
+    df1 = FactoryBot.create :data_file
+    df2 = FactoryBot.create :data_file
+    assay = FactoryBot.create :assay
 
     a1 = OpenbisExternalAsset.new
     a1.seek_entity = df1
@@ -1290,22 +1290,22 @@ class SeekUtilTest < ActiveSupport::TestCase
   end
 
   test 'validate_study_relationship issues warnings if mismatch' do
-    study1 = Factory :study
-    study2 = Factory :study
+    study1 = FactoryBot.create :study
+    study2 = FactoryBot.create :study
 
-    as1 = Factory(:assay)
+    as1 = FactoryBot.create(:assay)
     as1.study = study1
     a1 = OpenbisExternalAsset.new(external_service: 1, external_id: 1)
     a1.seek_entity = as1
     as1.external_asset = a1
 
-    as2 = Factory(:assay)
+    as2 = FactoryBot.create(:assay)
     as2.study = study1
     a2 = OpenbisExternalAsset.new(external_service: 1, external_id: 2)
     a2.seek_entity = as2
     as2.external_asset = a2
 
-    as3 = Factory(:assay)
+    as3 = FactoryBot.create(:assay)
     as3.study = study2
     a3 = OpenbisExternalAsset.new(external_service: 1, external_id: 3)
     a3.seek_entity = as3

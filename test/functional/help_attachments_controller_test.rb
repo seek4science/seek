@@ -24,7 +24,7 @@ class HelpAttachmentsControllerTest < ActionController::TestCase
 
   test 'should delete attachment' do
     with_config_value :internal_help_enabled, true do
-      attachment = help_documents(:one).attachments.create!(content_blob: Factory(:pdf_content_blob))
+      attachment = help_documents(:one).attachments.create!(content_blob: FactoryBot.create(:pdf_content_blob))
       assert_difference('HelpAttachment.count', -1) do
         delete :destroy, xhr: true, params: { id: attachment.id }
         assert_response :success
@@ -34,7 +34,7 @@ class HelpAttachmentsControllerTest < ActionController::TestCase
 
   test 'should download attachment' do
     with_config_value :internal_help_enabled, true do
-      attachment = help_documents(:one).attachments.create!(content_blob: Factory(:pdf_content_blob))
+      attachment = help_documents(:one).attachments.create!(content_blob: FactoryBot.create(:pdf_content_blob))
       get :download, params: { id: attachment.id }
       assert_response :success
     end

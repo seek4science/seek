@@ -3,7 +3,7 @@ require 'test_helper'
 class CVListAttributeTypeHandlerTest < ActiveSupport::TestCase
   test 'test value' do
     handler = Seek::Samples::AttributeTypeHandlers::CVListAttributeTypeHandler.new
-    vocab = Factory(:apples_sample_controlled_vocab)
+    vocab = FactoryBot.create(:apples_sample_controlled_vocab)
     handler.send('additional_options=', controlled_vocab: vocab)
     assert handler.test_value(['Granny Smith'])
     assert handler.test_value(['Granny Smith','Bramley'])
@@ -11,7 +11,7 @@ class CVListAttributeTypeHandlerTest < ActiveSupport::TestCase
   end
 
   test 'validate value' do
-    vocab = Factory(:apples_sample_controlled_vocab)
+    vocab = FactoryBot.create(:apples_sample_controlled_vocab)
     handler = Seek::Samples::AttributeTypeHandlers::CVListAttributeTypeHandler.new(controlled_vocab: vocab)
     assert handler.validate_value?(['Granny Smith','Bramley'])
     refute handler.validate_value?(['Peter'])

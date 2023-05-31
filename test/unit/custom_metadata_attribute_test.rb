@@ -3,19 +3,19 @@ require 'test_helper'
 class CustomMetadataAttributeTest < ActiveSupport::TestCase
 
   test 'initialize' do
-    attribute = CustomMetadataAttribute.new title: 'fish', sample_attribute_type: Factory(:integer_sample_attribute_type)
+    attribute = CustomMetadataAttribute.new title: 'fish', sample_attribute_type: FactoryBot.create(:integer_sample_attribute_type)
     assert_equal 'fish', attribute.title
     assert_equal 'Integer', attribute.sample_attribute_type.base_type
     refute attribute.required?
 
-    attribute = CustomMetadataAttribute.new title: 'fish', required: true, sample_attribute_type: Factory(:string_sample_attribute_type)
+    attribute = CustomMetadataAttribute.new title: 'fish', required: true, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type)
     assert_equal 'fish', attribute.title
     assert_equal 'String', attribute.sample_attribute_type.base_type
     assert attribute.required?
   end
 
   test 'validate value - without required' do
-    attribute = CustomMetadataAttribute.new title: 'fish', sample_attribute_type: Factory(:integer_sample_attribute_type)
+    attribute = CustomMetadataAttribute.new title: 'fish', sample_attribute_type: FactoryBot.create(:integer_sample_attribute_type)
     assert attribute.validate_value?(1)
     assert attribute.validate_value?('1')
     refute attribute.validate_value?('frog')
@@ -24,14 +24,14 @@ class CustomMetadataAttributeTest < ActiveSupport::TestCase
     assert attribute.validate_value?(nil)
     assert attribute.validate_value?('')
 
-    attribute = CustomMetadataAttribute.new title: 'fish', sample_attribute_type: Factory(:string_sample_attribute_type)
+    attribute = CustomMetadataAttribute.new title: 'fish', sample_attribute_type: FactoryBot.create(:string_sample_attribute_type)
     assert attribute.validate_value?('funky fish 123')
     assert attribute.validate_value?(nil)
     assert attribute.validate_value?('')
 
     refute attribute.validate_value?(1)
 
-    attribute = CustomMetadataAttribute.new title: 'fish', sample_attribute_type: Factory(:string_sample_attribute_type, regexp: 'yyy')
+    attribute = CustomMetadataAttribute.new title: 'fish', sample_attribute_type: FactoryBot.create(:string_sample_attribute_type, regexp: 'yyy')
     assert attribute.validate_value?('yyy')
     assert attribute.validate_value?('')
     assert attribute.validate_value?(nil)
@@ -39,7 +39,7 @@ class CustomMetadataAttributeTest < ActiveSupport::TestCase
     refute attribute.validate_value?(1)
     refute attribute.validate_value?('xxx')
 
-    attribute = CustomMetadataAttribute.new title: 'fish', sample_attribute_type: Factory(:float_sample_attribute_type)
+    attribute = CustomMetadataAttribute.new title: 'fish', sample_attribute_type: FactoryBot.create(:float_sample_attribute_type)
     assert attribute.validate_value?(1.0)
     assert attribute.validate_value?(1.2)
     assert attribute.validate_value?(0.78)
@@ -53,7 +53,7 @@ class CustomMetadataAttributeTest < ActiveSupport::TestCase
     assert attribute.validate_value?(1)
     assert attribute.validate_value?('1')
 
-    attribute = CustomMetadataAttribute.new title: 'fish', sample_attribute_type: Factory(:datetime_sample_attribute_type)
+    attribute = CustomMetadataAttribute.new title: 'fish', sample_attribute_type: FactoryBot.create(:datetime_sample_attribute_type)
     assert attribute.validate_value?('2 Feb 2015')
     assert attribute.validate_value?('Thu, 11 Feb 2016 15:39:55 +0000')
     assert attribute.validate_value?('2016-02-11T15:40:14+00:00')
@@ -63,8 +63,8 @@ class CustomMetadataAttributeTest < ActiveSupport::TestCase
     refute attribute.validate_value?(1.2)
     refute attribute.validate_value?('30 Feb 2015')
 
-    attribute = CustomMetadataAttribute.new(title: 'apple', sample_attribute_type: Factory(:cv_list_attribute_type),
-                                            sample_controlled_vocab: Factory(:apples_sample_controlled_vocab), description: "apple samples", label: "apple samples")
+    attribute = CustomMetadataAttribute.new(title: 'apple', sample_attribute_type: FactoryBot.create(:cv_list_attribute_type),
+                                            sample_controlled_vocab: FactoryBot.create(:apples_sample_controlled_vocab), description: "apple samples", label: "apple samples")
 
     assert attribute.validate_value?(nil)
     assert attribute.validate_value?('')
@@ -75,35 +75,35 @@ class CustomMetadataAttributeTest < ActiveSupport::TestCase
     refute attribute.validate_value?(['Peter','Granny Smith'])
 
 
-    attribute = CustomMetadataAttribute.new(title: 'role', sample_attribute_type: Factory(:custom_metadata_sample_attribute_type),
-                                            linked_custom_metadata_type: Factory(:role_name_custom_metadata_type))
+    attribute = CustomMetadataAttribute.new(title: 'role', sample_attribute_type: FactoryBot.create(:custom_metadata_sample_attribute_type),
+                                            linked_custom_metadata_type: FactoryBot.create(:role_name_custom_metadata_type))
     assert attribute.linked_custom_metadata_type.custom_metadata_attributes.first.validate_value?('first name')
     refute attribute.linked_custom_metadata_type.custom_metadata_attributes.first.validate_value?(nil)
   end
 
   test 'validate value with required' do
-    attribute = CustomMetadataAttribute.new title: 'fish', sample_attribute_type: Factory(:integer_sample_attribute_type), required: true
+    attribute = CustomMetadataAttribute.new title: 'fish', sample_attribute_type: FactoryBot.create(:integer_sample_attribute_type), required: true
     assert attribute.validate_value?(1)
     refute attribute.validate_value?(nil)
     refute attribute.validate_value?('')
 
-    attribute = CustomMetadataAttribute.new title: 'fish', sample_attribute_type: Factory(:string_sample_attribute_type), required: true
+    attribute = CustomMetadataAttribute.new title: 'fish', sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), required: true
     assert attribute.validate_value?('string')
     refute attribute.validate_value?(nil)
     refute attribute.validate_value?('')
 
-    attribute = CustomMetadataAttribute.new title: 'fish', sample_attribute_type: Factory(:float_sample_attribute_type), required: true
+    attribute = CustomMetadataAttribute.new title: 'fish', sample_attribute_type: FactoryBot.create(:float_sample_attribute_type), required: true
     assert attribute.validate_value?(1.2)
     refute attribute.validate_value?(nil)
     refute attribute.validate_value?('')
 
-    attribute = CustomMetadataAttribute.new title: 'fish', sample_attribute_type: Factory(:datetime_sample_attribute_type), required: true
+    attribute = CustomMetadataAttribute.new title: 'fish', sample_attribute_type: FactoryBot.create(:datetime_sample_attribute_type), required: true
     assert attribute.validate_value?('9 Feb 2015')
     refute attribute.validate_value?(nil)
     refute attribute.validate_value?('')
 
     attribute = CustomMetadataAttribute.new(title: 'apple', required:true,
-                                            sample_attribute_type: Factory(:cv_list_attribute_type), sample_controlled_vocab: Factory(:apples_sample_controlled_vocab), description: "apple samples", label: "apple samples")
+                                            sample_attribute_type: FactoryBot.create(:cv_list_attribute_type), sample_controlled_vocab: FactoryBot.create(:apples_sample_controlled_vocab), description: "apple samples", label: "apple samples")
     refute attribute.validate_value?(nil)
     refute attribute.validate_value?('')
     refute attribute.validate_value?([])
@@ -112,15 +112,15 @@ class CustomMetadataAttributeTest < ActiveSupport::TestCase
   end
 
   test 'accessor name' do
-    attribute = CustomMetadataAttribute.new title: 'fish', sample_attribute_type: Factory(:datetime_sample_attribute_type)
+    attribute = CustomMetadataAttribute.new title: 'fish', sample_attribute_type: FactoryBot.create(:datetime_sample_attribute_type)
     assert_equal 'fish', attribute.accessor_name
 
-    attribute = CustomMetadataAttribute.new title: 'fish pie', sample_attribute_type: Factory(:datetime_sample_attribute_type)
+    attribute = CustomMetadataAttribute.new title: 'fish pie', sample_attribute_type: FactoryBot.create(:datetime_sample_attribute_type)
     assert_equal 'fish pie', attribute.accessor_name
   end
 
   test 'label defaults to humanized title' do
-    attribute = CustomMetadataAttribute.new title: 'fish_soup', sample_attribute_type: Factory(:datetime_sample_attribute_type)
+    attribute = CustomMetadataAttribute.new title: 'fish_soup', sample_attribute_type: FactoryBot.create(:datetime_sample_attribute_type)
     assert_nil attribute[:label]
     assert_equal 'Fish soup',attribute.label
     attribute.label = "Apple pie"

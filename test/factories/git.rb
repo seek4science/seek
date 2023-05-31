@@ -1,69 +1,71 @@
-Factory.define(:blank_repository, class: Git::Repository) do |f|
-  f.after_create do |r|
-    FileUtils.cp_r(File.join(Rails.root, 'test', 'fixtures', 'git', 'blank-repository', '_git', '.'), File.join(r.local_path, '.git'))
+FactoryBot.define do
+  factory(:blank_repository, class: Git::Repository) do
+    after(:create) do |r|
+      FileUtils.cp_r(File.join(Rails.root, 'test', 'fixtures', 'git', 'blank-repository', '_git', '.'), File.join(r.local_path, '.git'))
+    end
   end
-end
-
-Factory.define(:unlinked_local_repository, class: Git::Repository) do |f|
-  f.after_create do |r|
-    FileUtils.cp_r(File.join(Rails.root, 'test', 'fixtures', 'git', 'local-fixture-workflow', '_git', '.'), File.join(r.local_path, '.git'))
+  
+  factory(:unlinked_local_repository, class: Git::Repository) do
+    after(:create) do |r|
+      FileUtils.cp_r(File.join(Rails.root, 'test', 'fixtures', 'git', 'local-fixture-workflow', '_git', '.'), File.join(r.local_path, '.git'))
+    end
   end
-end
-
-Factory.define(:local_repository, parent: :unlinked_local_repository) do |f|
-  f.resource { Factory(:workflow) }
-end
-
-Factory.define(:unfetched_remote_repository, class: Git::Repository) do |f|
-  f.remote "https://github.com/seek4science/workflow-test-fixture.git"
-end
-
-Factory.define(:remote_repository, parent: :unfetched_remote_repository) do |f|
-  f.after_create do |r|
-    FileUtils.cp_r(File.join(Rails.root, 'test', 'fixtures', 'git', 'fixture-workflow', '_git', '.'), File.join(r.local_path, '.git'))
+  
+  factory(:local_repository, parent: :unlinked_local_repository) do
+    resource { FactoryBot.create(:workflow) }
   end
-end
-
-Factory.define(:workflow_ro_crate_repository, class: Git::Repository) do |f|
-  f.after_create do |r|
-    FileUtils.cp_r(File.join(Rails.root, 'test', 'fixtures', 'git', 'galaxy-sort-change-case', '_git', '.'), File.join(r.local_path, '.git'))
+  
+  factory(:unfetched_remote_repository, class: Git::Repository) do
+    remote { "https://github.com/seek4science/workflow-test-fixture.git" }
   end
-end
-
-Factory.define(:remote_workflow_ro_crate_repository, class: Git::Repository) do |f|
-  f.after_create do |r|
-    FileUtils.cp_r(File.join(Rails.root, 'test', 'fixtures', 'git', 'galaxy-sort-change-case-remote', '_git', '.'), File.join(r.local_path, '.git'))
+  
+  factory(:remote_repository, parent: :unfetched_remote_repository) do
+    after(:create) do |r|
+      FileUtils.cp_r(File.join(Rails.root, 'test', 'fixtures', 'git', 'fixture-workflow', '_git', '.'), File.join(r.local_path, '.git'))
+    end
   end
-  f.remote "https://somewhere.internets/repo.git"
-end
-
-Factory.define(:nfcore_local_rocrate_repository, class: Git::Repository) do |f|
-  f.after_create do |r|
-    FileUtils.cp_r(File.join(Rails.root, 'test', 'fixtures', 'git', 'nf-core-rnaseq', '_git', '.'), File.join(r.local_path, '.git'))
+  
+  factory(:workflow_ro_crate_repository, class: Git::Repository) do
+    after(:create) do |r|
+      FileUtils.cp_r(File.join(Rails.root, 'test', 'fixtures', 'git', 'galaxy-sort-change-case', '_git', '.'), File.join(r.local_path, '.git'))
+    end
   end
-end
-
-# GitVersions
-Factory.define(:git_version, class: Git::Version) do |f|
-  f.git_repository { Factory(:local_repository) }
-  f.resource { self.git_repository.resource }
-  f.name 'version 1.0.0'
-  f.ref 'refs/heads/master'
-  f.mutable true
-  f.after_build do |v|
-    v.contributor ||= v.resource.contributor
+  
+  factory(:remote_workflow_ro_crate_repository, class: Git::Repository) do
+    after(:create) do |r|
+      FileUtils.cp_r(File.join(Rails.root, 'test', 'fixtures', 'git', 'galaxy-sort-change-case-remote', '_git', '.'), File.join(r.local_path, '.git'))
+    end
+    remote { "https://somewhere.internets/repo.git" }
   end
-  f.after_create do |v|
-    v.sync_resource_attributes
+  
+  factory(:nfcore_local_rocrate_repository, class: Git::Repository) do
+    after(:create) do |r|
+      FileUtils.cp_r(File.join(Rails.root, 'test', 'fixtures', 'git', 'nf-core-rnaseq', '_git', '.'), File.join(r.local_path, '.git'))
+    end
   end
+  
+  # GitVersions
+  factory(:git_version, class: Git::Version) do
+    git_repository { FactoryBot.create(:local_repository) }
+    resource { self.git_repository.resource }
+    name { 'version 1.0.0' }
+    ref { 'refs/heads/master' }
+    mutable { true }
+    after(:build) do |v|
+      v.contributor ||= v.resource.contributor
+    end
+    after(:create) do |v|
+      v.sync_resource_attributes
+    end
+  end
+  
+  factory(:remote_git_version, parent: :git_version) do
+    git_repository { FactoryBot.create(:remote_repository) }
+    resource { FactoryBot.create(:workflow) }
+    name { 'v0.01' }
+    ref { 'refs/tags/v0.01' }
+    commit { '3f2c23e92da3ccbc89d7893b4af6039e66bdaaaf' }
+    mutable { false }
+  end
+  
 end
-
-Factory.define(:remote_git_version, parent: :git_version) do |f|
-  f.git_repository { Factory(:remote_repository) }
-  f.resource { Factory(:workflow) }
-  f.name 'v0.01'
-  f.ref 'refs/tags/v0.01'
-  f.commit '3f2c23e92da3ccbc89d7893b4af6039e66bdaaaf'
-  f.mutable false
-end
-

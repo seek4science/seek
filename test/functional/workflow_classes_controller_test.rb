@@ -4,10 +4,10 @@ class WorkflowClassesControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
 
   test 'get index' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     core_type, user_added_1, user_added_2, user_added_3 = nil
     disable_authorization_checks do
-      core_type = Factory(:cwl_workflow_class)
+      core_type = FactoryBot.create(:cwl_workflow_class)
       user_added_1 = WorkflowClass.create!(title: 'My Class', key: 'mine', contributor: person)
       user_added_2 = WorkflowClass.create!(title: 'Another Class', key: 'class1')
       user_added_3 = WorkflowClass.create!(title: 'Class with Logo', key: 'has-logo',
@@ -33,15 +33,15 @@ class WorkflowClassesControllerTest < ActionController::TestCase
   end
 
   test 'admin can edit any workflow class' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     core_type, c1, c2 = nil
     disable_authorization_checks do
-      core_type = Factory(:cwl_workflow_class)
+      core_type = FactoryBot.create(:cwl_workflow_class)
       c1 = WorkflowClass.create!(title: 'My Class', key: 'mine', contributor: person)
       c2 = WorkflowClass.create!(title: 'Another Class', key: 'class1')
     end
 
-    login_as(Factory(:admin))
+    login_as(FactoryBot.create(:admin))
 
     get :index
 
@@ -52,7 +52,7 @@ class WorkflowClassesControllerTest < ActionController::TestCase
   end
 
   test 'get new' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
 
     get :new
@@ -61,7 +61,7 @@ class WorkflowClassesControllerTest < ActionController::TestCase
   end
 
   test 'get edit' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     c1 = nil
     disable_authorization_checks do
       c1 = WorkflowClass.create!(title: 'My Class', key: 'mine', contributor: person)
@@ -74,7 +74,7 @@ class WorkflowClassesControllerTest < ActionController::TestCase
   end
 
   test 'create workflow class' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
     p = { title: 'New Class',
           alternate_name: 'nc',
@@ -94,7 +94,7 @@ class WorkflowClassesControllerTest < ActionController::TestCase
   end
 
   test 'update workflow class' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     c1 = nil
     disable_authorization_checks do
       c1 = WorkflowClass.create!(title: 'My Class', key: 'mine', contributor: person)
@@ -108,12 +108,12 @@ class WorkflowClassesControllerTest < ActionController::TestCase
   end
 
   test 'update workflow class as admin' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     c1 = nil
     disable_authorization_checks do
       c1 = WorkflowClass.create!(title: 'My Class', key: 'mine', contributor: person)
     end
-    login_as(Factory(:admin))
+    login_as(FactoryBot.create(:admin))
 
     put :update, params: { id: c1.id, workflow_class: { title: 'Wut' } }
 
@@ -122,7 +122,7 @@ class WorkflowClassesControllerTest < ActionController::TestCase
   end
 
   test 'destroy workflow class' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     c1 = nil
     disable_authorization_checks do
       c1 = WorkflowClass.create!(title: 'My Class', key: 'mine', contributor: person)
@@ -137,7 +137,7 @@ class WorkflowClassesControllerTest < ActionController::TestCase
   end
 
   test 'cannot create workflow class if not registered' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     logout
     p = { title: 'New Class',
           alternate_name: 'nc',
@@ -153,12 +153,12 @@ class WorkflowClassesControllerTest < ActionController::TestCase
   end
 
   test 'cannot update workflow class if not contributor/admin' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     c1 = nil
     disable_authorization_checks do
       c1 = WorkflowClass.create!(title: 'My Class', key: 'mine', contributor: person)
     end
-    login_as(Factory(:person))
+    login_as(FactoryBot.create(:person))
 
     put :update, params: { id: c1.id, workflow_class: { title: 'Wut' } }
 
@@ -168,12 +168,12 @@ class WorkflowClassesControllerTest < ActionController::TestCase
   end
 
   test 'cannot destroy workflow class if not contributor/admin' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     c1 = nil
     disable_authorization_checks do
       c1 = WorkflowClass.create!(title: 'My Class', key: 'mine', contributor: person)
     end
-    login_as(Factory(:person))
+    login_as(FactoryBot.create(:person))
 
     assert_no_difference('WorkflowClass.count') do
       delete :destroy, params: { id: c1.id }
@@ -184,7 +184,7 @@ class WorkflowClassesControllerTest < ActionController::TestCase
   end
 
   test 'create workflow class with an avatar' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
     p = { title: 'New Class',
           alternate_name: 'nc',
@@ -206,7 +206,7 @@ class WorkflowClassesControllerTest < ActionController::TestCase
   end
 
   test 'update workflow class with an logo' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     c1 = nil
     disable_authorization_checks do
       c1 = WorkflowClass.create!(title: 'My Class', key: 'mine', contributor: person)
@@ -233,7 +233,7 @@ class WorkflowClassesControllerTest < ActionController::TestCase
   end
 
   test 'updating workflow class does not remove logo' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     c1 = nil
     disable_authorization_checks do
       c1 = WorkflowClass.create!(title: 'My Class', key: 'mine', contributor: person,
@@ -260,10 +260,10 @@ class WorkflowClassesControllerTest < ActionController::TestCase
   end
 
   test 'updating workflow class logo removes the old one' do
-    Factory(:user_added_workflow_class_with_logo)
-    Factory(:user_added_workflow_class_with_logo)
+    FactoryBot.create(:user_added_workflow_class_with_logo)
+    FactoryBot.create(:user_added_workflow_class_with_logo)
 
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     c1 = nil
     disable_authorization_checks do
       c1 = WorkflowClass.create!(title: 'My Class', key: 'mine', contributor: person,

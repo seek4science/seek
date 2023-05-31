@@ -10,6 +10,7 @@ on:
       - seek-1.12
       - seek-1.13
       - master-ibisba-demonstrator
+      - ruby-3
   pull_request:
 
 jobs:

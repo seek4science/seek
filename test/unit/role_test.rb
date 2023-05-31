@@ -2,13 +2,13 @@ require 'test_helper'
 
 class RoleTest < ActiveSupport::TestCase
   def setup
-    User.current_user = Factory(:admin).user
+    User.current_user = FactoryBot.create(:admin).user
   end
 
   test 'cannot add a role with a project the person is not a member of' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     project1 = person.projects.first
-    project2 = Factory(:project)
+    project2 = FactoryBot.create(:project)
 
     refute person.is_asset_gatekeeper?(project1)
     refute person.is_asset_gatekeeper?(project2)
@@ -24,8 +24,8 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'removing a person from a project removes that role' do
-    Factory(:admin) # prevents this following person also becoming an admin due to being first
-    person = Factory(:project_administrator)
+    FactoryBot.create(:admin) # prevents this following person also becoming an admin due to being first
+    person = FactoryBot.create(:project_administrator)
     project = person.projects.first
 
     assert person.is_project_administrator?(project)
@@ -45,7 +45,7 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'unassign_role' do
-    person = Factory(:programme_administrator)
+    person = FactoryBot.create(:programme_administrator)
     project = person.projects.first
     person.is_asset_gatekeeper = true, project
     person.is_project_administrator = true, project
@@ -101,7 +101,7 @@ class RoleTest < ActiveSupport::TestCase
     refute person.is_pal?(project)
     refute person.is_admin?
 
-    person = Factory(:programme_administrator)
+    person = FactoryBot.create(:programme_administrator)
     project = person.projects.first
     person.is_pal = true, project
     person.save!
@@ -126,9 +126,9 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'repeatedly removing role' do
-    person = Factory(:programme_administrator)
+    person = FactoryBot.create(:programme_administrator)
     programme1 = person.programmes.first
-    programme2 = Factory(:programme)
+    programme2 = FactoryBot.create(:programme)
 
     person.is_programme_administrator = true, programme2
     person.is_asset_gatekeeper = true, person.projects.first
@@ -163,8 +163,8 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'destroying a person destroys the project role details' do
-    person = Factory(:asset_housekeeper)
-    User.with_current_user(Factory(:admin).user) do
+    person = FactoryBot.create(:asset_housekeeper)
+    User.with_current_user(FactoryBot.create(:admin).user) do
       person.is_pal = true, person.projects.first
       person.save!
     end
@@ -175,16 +175,16 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'roles' do
-    person = Factory(:admin)
+    person = FactoryBot.create(:admin)
     assert_equal ['admin'], person.role_names
 
-    person = Factory(:asset_gatekeeper)
+    person = FactoryBot.create(:asset_gatekeeper)
     assert_equal ['asset_gatekeeper'], person.role_names
-    person = Factory(:asset_housekeeper)
+    person = FactoryBot.create(:asset_housekeeper)
     assert_equal ['asset_housekeeper'], person.role_names
-    person = Factory(:project_administrator)
+    person = FactoryBot.create(:project_administrator)
     assert_equal ['project_administrator'], person.role_names
-    person = Factory(:pal)
+    person = FactoryBot.create(:pal)
     assert_equal ['pal'], person.role_names
 
     project = person.projects.first
@@ -202,8 +202,8 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test "setting empty array doesn't set role" do
-    User.with_current_user Factory(:admin).user do
-      person = Factory(:person)
+    User.with_current_user FactoryBot.create(:admin).user do
+      person = FactoryBot.create(:person)
       person.is_project_administrator = true, []
       refute person.is_project_administrator_of_any_project?
       refute_includes person.role_names, 'project_administrator'
@@ -219,8 +219,8 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'assign asset_housekeeper role for a person' do
-    User.with_current_user Factory(:admin).user do
-      person = Factory(:person_in_multiple_projects)
+    User.with_current_user FactoryBot.create(:admin).user do
+      person = FactoryBot.create(:person_in_multiple_projects)
       assert person.projects.count > 1
 
       projects = person.projects[1..3]
@@ -248,8 +248,8 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'add roles for a person' do
-    User.with_current_user Factory(:admin).user do
-      person = Factory(:admin)
+    User.with_current_user FactoryBot.create(:admin).user do
+      person = FactoryBot.create(:admin)
       assert_equal 1, person.projects.count
       project = person.projects.first
       assert_equal ['admin'], person.role_names
@@ -265,8 +265,8 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'updating roles with assignment' do
-    User.with_current_user Factory(:admin).user do
-      person = Factory(:person_in_multiple_projects)
+    User.with_current_user FactoryBot.create(:admin).user do
+      person = FactoryBot.create(:person_in_multiple_projects)
       project = person.projects.first
 
       person.is_admin = true
@@ -307,8 +307,8 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'non-admin can not change the roles of a person' do
-    Factory(:admin) # needed to avoid the next person becoming an admin due to being the first person
-    person = Factory(:person)
+    FactoryBot.create(:admin) # needed to avoid the next person becoming an admin due to being the first person
+    person = FactoryBot.create(:person)
     project = person.projects.first
     assert_equal [], person.scoped_roles(project).map(&:key)
     User.with_current_user person.user do
@@ -325,11 +325,11 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'projects for role' do
-    person = Factory :person_in_multiple_projects
+    person = FactoryBot.create :person_in_multiple_projects
     p1 = person.projects[0]
     p2 = person.projects[1]
 
-    User.with_current_user(Factory(:admin).user) do
+    User.with_current_user(FactoryBot.create(:admin).user) do
       person.is_asset_gatekeeper = true, [p1, p2]
       person.is_pal = true, p1
       person.is_admin = true
@@ -341,8 +341,8 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'is_admin?' do
-    User.with_current_user Factory(:admin).user do
-      person = Factory(:person)
+    User.with_current_user FactoryBot.create(:admin).user do
+      person = FactoryBot.create(:person)
 
       person.is_admin = true
       person.save!
@@ -358,10 +358,10 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'is_pal?' do
-    User.with_current_user Factory(:admin).user do
-      person = Factory(:person)
+    User.with_current_user FactoryBot.create(:admin).user do
+      person = FactoryBot.create(:person)
       project = person.projects.first
-      other_project = Factory(:project)
+      other_project = FactoryBot.create(:project)
       person.is_pal = true, project
       person.save!
 
@@ -376,10 +376,10 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'is_project_administrator?' do
-    User.with_current_user Factory(:admin).user do
-      person = Factory(:person)
+    User.with_current_user FactoryBot.create(:admin).user do
+      person = FactoryBot.create(:person)
       project = person.projects.first
-      other_project = Factory(:project)
+      other_project = FactoryBot.create(:project)
       person.is_project_administrator = true, project
       person.save!
 
@@ -394,8 +394,8 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'project administrator of multiple projects' do
-    person = Factory(:person_in_multiple_projects)
-    other_project = Factory(:project)
+    person = FactoryBot.create(:person_in_multiple_projects)
+    other_project = FactoryBot.create(:project)
     projects = person.projects
     assert projects.count > 1
     refute person.is_project_administrator_of_any_project?
@@ -413,9 +413,9 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'is project administrator regardless of project' do
-    admin = Factory(:admin)
-    project_admin = Factory(:project_administrator)
-    normal = Factory(:person)
+    admin = FactoryBot.create(:admin)
+    project_admin = FactoryBot.create(:project_administrator)
+    normal = FactoryBot.create(:person)
 
     refute normal.has_role?('project_administrator')
     refute normal.is_project_administrator_of_any_project?
@@ -428,10 +428,10 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'is_gatekeeper?' do
-    User.with_current_user Factory(:admin).user do
-      person = Factory(:person)
+    User.with_current_user FactoryBot.create(:admin).user do
+      person = FactoryBot.create(:person)
       project = person.projects.first
-      other_project = Factory(:project)
+      other_project = FactoryBot.create(:project)
       person.is_asset_gatekeeper = true, project
       person.save!
 
@@ -446,10 +446,10 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'is_asset_housekeeper?' do
-    User.with_current_user Factory(:admin).user do
-      person = Factory(:person)
+    User.with_current_user FactoryBot.create(:admin).user do
+      person = FactoryBot.create(:person)
       project = person.projects.first
-      other_project = Factory(:project)
+      other_project = FactoryBot.create(:project)
       person.is_asset_housekeeper = true, project
       person.save!
 
@@ -464,8 +464,8 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'is_asset_housekeeper_of?' do
-    asset_housekeeper = Factory(:asset_housekeeper)
-    sop = Factory(:sop)
+    asset_housekeeper = FactoryBot.create(:asset_housekeeper)
+    sop = FactoryBot.create(:sop)
     refute asset_housekeeper.is_asset_housekeeper_of?(sop)
 
     disable_authorization_checks { sop.projects = asset_housekeeper.projects }
@@ -474,8 +474,8 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'is_gatekeeper_of?' do
-    gatekeeper = Factory(:asset_gatekeeper)
-    sop = Factory(:sop)
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    sop = FactoryBot.create(:sop)
     refute gatekeeper.is_asset_gatekeeper_of?(sop)
 
     disable_authorization_checks { sop.projects = gatekeeper.projects }
@@ -492,33 +492,33 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'factories for roles' do
-    User.with_current_user Factory(:admin).user do
-      admin = Factory(:admin)
+    User.with_current_user FactoryBot.create(:admin).user do
+      admin = FactoryBot.create(:admin)
       assert admin.is_admin?
       assert admin.save
 
-      pal = Factory(:pal)
+      pal = FactoryBot.create(:pal)
       pal.reload
       refute pal.projects.empty?
       assert pal.is_pal?(pal.projects.first)
       assert pal.save
 
-      gatekeeper = Factory(:asset_gatekeeper)
+      gatekeeper = FactoryBot.create(:asset_gatekeeper)
       refute gatekeeper.projects.empty?
       assert gatekeeper.is_asset_gatekeeper?(gatekeeper.projects.first)
       assert gatekeeper.save
 
-      asset_housekeeper = Factory(:asset_housekeeper)
+      asset_housekeeper = FactoryBot.create(:asset_housekeeper)
       refute asset_housekeeper.projects.empty?
       assert asset_housekeeper.is_asset_housekeeper?(asset_housekeeper.projects.first)
       assert asset_housekeeper.save
 
-      project_administrator = Factory(:project_administrator)
+      project_administrator = FactoryBot.create(:project_administrator)
       refute project_administrator.projects.empty?
       assert project_administrator.is_project_administrator?(project_administrator.projects.first)
       assert project_administrator.save
 
-      programme_administrator = Factory(:programme_administrator)
+      programme_administrator = FactoryBot.create(:programme_administrator)
       refute programme_administrator.projects.empty?
       refute programme_administrator.programmes.empty?
       assert programme_administrator.is_programme_administrator_of_any_programme?
@@ -526,18 +526,18 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'programmes for role' do
-    person = Factory(:programme_administrator)
-    normal = Factory(:person)
+    person = FactoryBot.create(:programme_administrator)
+    normal = FactoryBot.create(:person)
 
     assert_equal person.programmes, person.programmes_for_role('programme_administrator')
     assert_empty normal.programmes_for_role('programme_administrator')
   end
 
   test 'Person.pals' do
-    admin = Factory(:admin)
-    normal = Factory(:person)
-    pal = Factory(:pal)
-    pal2 = Factory(:project_administrator)
+    admin = FactoryBot.create(:admin)
+    normal = FactoryBot.create(:person)
+    pal = FactoryBot.create(:pal)
+    pal2 = FactoryBot.create(:project_administrator)
     pal2.is_pal = true, pal2.projects.first
     pal2.save!
 
@@ -549,11 +549,11 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'Person.admins' do
-    admin = Factory(:admin)
-    admin2 = Factory(:project_administrator)
+    admin = FactoryBot.create(:admin)
+    admin2 = FactoryBot.create(:project_administrator)
     admin2.is_admin = true
     admin2.save!
-    normal = Factory(:person)
+    normal = FactoryBot.create(:person)
 
     admins = Person.admins
     assert admins.include?(admin)
@@ -562,9 +562,9 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'Person.gatekeepers' do
-    normal = Factory(:person)
-    gatekeeper = Factory(:asset_gatekeeper)
-    gatekeeper2 = Factory(:project_administrator)
+    normal = FactoryBot.create(:person)
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    gatekeeper2 = FactoryBot.create(:project_administrator)
     gatekeeper2.is_asset_gatekeeper = true, gatekeeper2.projects.first
     gatekeeper2.save!
 
@@ -575,9 +575,9 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'Person.asset_housekeeper' do
-    normal = Factory(:person)
-    asset_housekeeper = Factory(:asset_housekeeper)
-    asset_housekeeper2 = Factory(:project_administrator)
+    normal = FactoryBot.create(:person)
+    asset_housekeeper = FactoryBot.create(:asset_housekeeper)
+    asset_housekeeper2 = FactoryBot.create(:project_administrator)
     asset_housekeeper2.is_asset_housekeeper = true, asset_housekeeper2.projects.first
     asset_housekeeper2.save!
 
@@ -587,9 +587,9 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'Person.project_administrators' do
-    normal = Factory(:person)
-    project_administrator = Factory(:project_administrator)
-    project_administrator2 = Factory(:asset_gatekeeper)
+    normal = FactoryBot.create(:person)
+    project_administrator = FactoryBot.create(:project_administrator)
+    project_administrator2 = FactoryBot.create(:asset_gatekeeper)
     project_administrator2.is_project_administrator = true, project_administrator2.projects.first
     project_administrator2.save!
 
@@ -600,20 +600,20 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'is_in_any_gatekept_projects?' do
-    normal = Factory(:person)
-    gatekeeper = Factory(:asset_gatekeeper)
+    normal = FactoryBot.create(:person)
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
     refute normal.is_in_any_gatekept_projects?
 
-    another_normal = Factory :person,
-                             group_memberships: [Factory(:group_membership,
+    another_normal = FactoryBot.create :person,
+                             group_memberships: [FactoryBot.create(:group_membership,
                                                          work_group: gatekeeper.group_memberships.first.work_group)]
     assert another_normal.is_in_any_gatekept_projects?
   end
 
   test 'Person.programme_administrators' do
-    programme_admin = Factory(:person)
-    normal = Factory(:person)
-    programme = Factory(:programme)
+    programme_admin = FactoryBot.create(:person)
+    normal = FactoryBot.create(:person)
+    programme = FactoryBot.create(:programme)
     programme_admin.is_programme_administrator = true, programme
     programme_admin.save!
 
@@ -624,9 +624,9 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'programme administrator' do
-    person = Factory(:person)
-    programme = Factory(:programme)
-    other_programme = Factory(:programme)
+    person = FactoryBot.create(:person)
+    programme = FactoryBot.create(:programme)
+    other_programme = FactoryBot.create(:programme)
     refute person.is_programme_administrator_of_any_programme?
     refute person.is_programme_administrator?(programme)
     refute person.is_programme_administrator?(other_programme)
@@ -638,9 +638,9 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'programme administrator multiple programmes' do
-    person = Factory(:person)
-    programmes = [Factory(:programme), Factory(:programme)]
-    other_programme = Factory(:programme)
+    person = FactoryBot.create(:person)
+    programmes = [FactoryBot.create(:programme), FactoryBot.create(:programme)]
+    other_programme = FactoryBot.create(:programme)
     refute person.is_programme_administrator_of_any_programme?
 
     person.is_programme_administrator = true, programmes
@@ -665,7 +665,7 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'items_for_person_and_role' do
-    person = Factory(:programme_administrator)
+    person = FactoryBot.create(:programme_administrator)
     programmes = person.programmes
     result = person.programmes_for_role('programme_administrator')
     assert_equal programmes.sort, result.sort
@@ -675,18 +675,18 @@ class RoleTest < ActiveSupport::TestCase
     assert_kind_of ActiveRecord::Relation, person.administered_programmes
 
     # no roles but should not just return an empty array
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     result = person.programmes_for_role('programme_administrator')
     assert_kind_of ActiveRecord::Relation, result
     assert_kind_of ActiveRecord::Relation, person.administered_programmes
 
     # also for admin
-    person = Factory(:admin)
+    person = FactoryBot.create(:admin)
     assert_kind_of ActiveRecord::Relation, person.administered_programmes
   end
 
   test 'fire update auth table job when project role created' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     with_config_value :auth_lookup_enabled, true do
       assert_enqueued_with(job: AuthLookupUpdateJob) do
         assert_difference('AuthLookupUpdateQueue.count', 1) do
@@ -697,7 +697,7 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'fire update auth table job when project role destroyed' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     role = Role.create!(person: person, scope: person.projects.first, role_type: RoleType.find_by_key(:project_administrator))
     with_config_value :auth_lookup_enabled, true do
       assert_enqueued_with(job: AuthLookupUpdateJob) do
@@ -709,7 +709,7 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'validate person must exist when creating project role' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     role = Role.new(scope: person.projects.first, role_type: RoleType.find_by_key(:project_administrator))
     refute role.valid?
     role.person = person
@@ -717,7 +717,7 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'validate project must exist when creating project role' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     role = Role.new(person: person, role_type: RoleType.find_by_key(:project_administrator))
     refute role.valid?
     role.scope = person.projects.first
@@ -725,8 +725,8 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'validate project must belong to person when creating project role' do
-    person = Factory(:person)
-    project = Factory(:project)
+    person = FactoryBot.create(:person)
+    project = FactoryBot.create(:project)
     role = Role.new(person: person, scope: project, role_type: RoleType.find_by_key(:project_administrator))
     refute role.valid?
     role.scope = person.projects.first
@@ -735,8 +735,8 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'fire update auth table job when programme role created' do
-    person = Factory(:person)
-    programme = Factory(:programme)
+    person = FactoryBot.create(:person)
+    programme = FactoryBot.create(:programme)
     with_config_value :auth_lookup_enabled, true do
       assert_enqueued_with(job: AuthLookupUpdateJob) do
         assert_difference('AuthLookupUpdateQueue.count', 1) do
@@ -747,8 +747,8 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'fire update auth table job when programme role destroyed' do
-    person = Factory(:person)
-    programme = Factory(:programme, projects: person.projects)
+    person = FactoryBot.create(:person)
+    programme = FactoryBot.create(:programme, projects: person.projects)
     role = Role.create!(person: person, scope: programme, role_type: RoleType.find_by_key(:programme_administrator))
     with_config_value :auth_lookup_enabled, true do
       assert_enqueued_with(job: AuthLookupUpdateJob) do
@@ -760,8 +760,8 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'validate person must exist when creating programme role' do
-    person = Factory(:person)
-    programme = Factory(:programme, projects: person.projects)
+    person = FactoryBot.create(:person)
+    programme = FactoryBot.create(:programme, projects: person.projects)
     role = Role.new(scope: programme, role_type: RoleType.find_by_key(:programme_administrator))
     refute role.valid?
     role.person = person
@@ -769,8 +769,8 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'validate programme must exist when creating programme role' do
-    person = Factory(:person)
-    programme = Factory(:programme, projects: person.projects)
+    person = FactoryBot.create(:person)
+    programme = FactoryBot.create(:programme, projects: person.projects)
     role = Role.new(person: person, role_type: RoleType.find_by_key(:programme_administrator))
     refute role.valid?
     role.scope = programme
@@ -779,8 +779,8 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'admins can grant admin roles' do
-    person = Factory(:person)
-    role_granter = Factory(:admin)
+    person = FactoryBot.create(:person)
+    role_granter = FactoryBot.create(:admin)
     User.with_current_user(role_granter.user) do
       assert_difference('Role.count', 1) do
         person.is_admin = true
@@ -789,8 +789,8 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'non-admins cannot grant admin roles' do
-    person = Factory(:person)
-    role_granter = Factory(:person)
+    person = FactoryBot.create(:person)
+    role_granter = FactoryBot.create(:person)
     User.with_current_user(role_granter.user) do
       assert_no_difference('Role.count') do
         person.is_admin = true
@@ -800,8 +800,8 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'project admins can grant project roles' do
-    person = Factory(:person)
-    role_granter = Factory(:project_administrator, project: person.projects.first)
+    person = FactoryBot.create(:person)
+    role_granter = FactoryBot.create(:project_administrator, project: person.projects.first)
     User.with_current_user(role_granter.user) do
       assert_difference('Role.count', 1) do
         person.is_project_administrator = true, role_granter.projects.first
@@ -810,8 +810,8 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'project admins cannot grant project roles to people not in the project' do
-    person = Factory(:person)
-    role_granter = Factory(:project_administrator)
+    person = FactoryBot.create(:person)
+    role_granter = FactoryBot.create(:project_administrator)
     User.with_current_user(role_granter.user) do
       assert_no_difference('Role.count') do
         person.is_project_administrator = true, role_granter.projects.first
@@ -821,8 +821,8 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'system admins cannot grant project roles to people not in the project' do
-    person = Factory(:person)
-    role_granter = Factory(:admin)
+    person = FactoryBot.create(:person)
+    role_granter = FactoryBot.create(:admin)
     User.with_current_user(role_granter.user) do
       assert_no_difference('Role.count') do
         person.is_project_administrator = true, role_granter.projects.first
@@ -832,8 +832,8 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'project admins cannot grant non-project roles' do
-    person = Factory(:person)
-    role_granter = Factory(:project_administrator, project: person.projects.first)
+    person = FactoryBot.create(:person)
+    role_granter = FactoryBot.create(:project_administrator, project: person.projects.first)
     User.with_current_user(role_granter.user) do
       assert_no_difference('Role.count') do
         person.is_admin = true
@@ -843,8 +843,8 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'non-project admins cannot grant project roles' do
-    person = Factory(:person)
-    role_granter = Factory(:person, project: person.projects.first)
+    person = FactoryBot.create(:person)
+    role_granter = FactoryBot.create(:person, project: person.projects.first)
     User.with_current_user(role_granter.user) do
       assert_no_difference('Role.count') do
         person.is_project_administrator = true, role_granter.projects.first
@@ -854,21 +854,21 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'project admins cannot grant project roles to projects they are not a member of' do
-    person = Factory(:person)
-    role_granter = Factory(:project_administrator, project: person.projects.first)
+    person = FactoryBot.create(:person)
+    role_granter = FactoryBot.create(:project_administrator, project: person.projects.first)
     User.with_current_user(role_granter.user) do
       assert_no_difference('Role.count') do
-        person.is_project_administrator = true, Factory(:project)
+        person.is_project_administrator = true, FactoryBot.create(:project)
       end
       assert person.roles.last.errors.added?(:base, 'You are not authorized to grant roles in this Project')
     end
   end
 
   test 'programme admins can grant programme roles' do
-    programme = Factory(:programme)
-    project = Factory(:project, programme: programme)
-    person = Factory(:person, project: project)
-    role_granter = Factory(:programme_administrator, project: project)
+    programme = FactoryBot.create(:programme)
+    project = FactoryBot.create(:project, programme: programme)
+    person = FactoryBot.create(:person, project: project)
+    role_granter = FactoryBot.create(:programme_administrator, project: project)
     User.with_current_user(role_granter.user) do
       assert_difference('Role.count', 1) do
         person.is_programme_administrator = true, role_granter.programmes.first
@@ -877,10 +877,10 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'programme admins CAN grant programme roles to people not in the programme' do
-    programme = Factory(:programme)
-    project = Factory(:project, programme: programme)
-    person = Factory(:person)
-    role_granter = Factory(:programme_administrator, project: project)
+    programme = FactoryBot.create(:programme)
+    project = FactoryBot.create(:project, programme: programme)
+    person = FactoryBot.create(:person)
+    role_granter = FactoryBot.create(:programme_administrator, project: project)
     refute_includes programme.people, person
     User.with_current_user(role_granter.user) do
       assert_difference('Role.count', 1) do
@@ -890,10 +890,10 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'programme admins cannot grant non-programme roles' do
-    programme = Factory(:programme)
-    project = Factory(:project, programme: programme)
-    person = Factory(:person, project: project)
-    role_granter = Factory(:programme_administrator, project: project)
+    programme = FactoryBot.create(:programme)
+    project = FactoryBot.create(:project, programme: programme)
+    person = FactoryBot.create(:person, project: project)
+    role_granter = FactoryBot.create(:programme_administrator, project: project)
     User.with_current_user(role_granter.user) do
       assert_no_difference('Role.count') do
         person.is_admin = true
@@ -903,10 +903,10 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'non-programme admins cannot grant programme roles' do
-    programme = Factory(:programme)
-    project = Factory(:project, programme: programme)
-    person = Factory(:person, project: project)
-    role_granter = Factory(:person, project: project)
+    programme = FactoryBot.create(:programme)
+    project = FactoryBot.create(:project, programme: programme)
+    person = FactoryBot.create(:person, project: project)
+    role_granter = FactoryBot.create(:person, project: project)
     User.with_current_user(role_granter.user) do
       assert_no_difference('Role.count') do
         person.is_programme_administrator = true, role_granter.programmes.first
@@ -916,13 +916,13 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   test 'programme admins cannot grant programme roles to programmes they are not a member of' do
-    programme = Factory(:programme)
-    project = Factory(:project, programme: programme)
-    person = Factory(:person, project: project)
-    role_granter = Factory(:programme_administrator, project: project)
+    programme = FactoryBot.create(:programme)
+    project = FactoryBot.create(:project, programme: programme)
+    person = FactoryBot.create(:person, project: project)
+    role_granter = FactoryBot.create(:programme_administrator, project: project)
     User.with_current_user(role_granter.user) do
       assert_no_difference('Role.count') do
-        person.is_programme_administrator = true, Factory(:programme)
+        person.is_programme_administrator = true, FactoryBot.create(:programme)
       end
       assert person.roles.last.errors.added?(:base, 'You are not authorized to grant roles in this Programme')
     end

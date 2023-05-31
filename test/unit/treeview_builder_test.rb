@@ -5,8 +5,8 @@ class TreeviewBuilderTest < ActionController::TestCase
   include ActionView::Helpers::SanitizeHelper
 
   test 'create node' do
-    p = Factory(:project)
-    f = Factory :project_folder, project_id: p.id
+    p = FactoryBot.create(:project)
+    f = FactoryBot.create :project_folder, project_id: p.id
     node_text = 'test node text'
     node_type = 'prj'
     node_count = '7'
@@ -25,8 +25,8 @@ class TreeviewBuilderTest < ActionController::TestCase
   end
 
   test 'remove empty keys when create node' do
-    p = Factory(:project)
-    f = Factory :project_folder, project_id: p.id
+    p = FactoryBot.create(:project)
+    f = FactoryBot.create :project_folder, project_id: p.id
 
     node_text = 'test node text'
     node_type = 'prj'
@@ -37,26 +37,26 @@ class TreeviewBuilderTest < ActionController::TestCase
   end
 
   test 'build tree data with default root folder' do
-    p = Factory(:project)
-    f = Factory :project_folder, project_id: p.id
-    i = Factory(:investigation, projects: [p])
-    s = Factory(:study, investigation: i)
-    Factory(:assay, study: s)
+    p = FactoryBot.create(:project)
+    f = FactoryBot.create :project_folder, project_id: p.id
+    i = FactoryBot.create(:investigation, projects: [p])
+    s = FactoryBot.create(:study, investigation: i)
+    FactoryBot.create(:assay, study: s)
     controller = TreeviewBuilder.new p, [f]
     result = controller.send(:build_tree_data)
     assert_instance_of Array, JSON.parse(result)
   end
 
   test 'build tree data with folders' do
-    p = Factory(:project)
-    f = Factory :project_folder, project_id: p.id
-    sop = Factory :sop, project_ids: [p.id], policy: Factory(:public_policy)
+    p = FactoryBot.create(:project)
+    f = FactoryBot.create :project_folder, project_id: p.id
+    sop = FactoryBot.create :sop, project_ids: [p.id], policy: FactoryBot.create(:public_policy)
     f.add_assets(sop)
     f.save!
 
-    i = Factory(:investigation, projects: [p])
-    s = Factory(:study, investigation: i)
-    Factory(:assay, study: s)
+    i = FactoryBot.create(:investigation, projects: [p])
+    s = FactoryBot.create(:study, investigation: i)
+    FactoryBot.create(:assay, study: s)
 
     controller = TreeviewBuilder.new p, [f]
     with_config_value(:project_single_page_folders_enabled, true) do
@@ -69,8 +69,8 @@ class TreeviewBuilderTest < ActionController::TestCase
   end
 
   test 'should sanitize the titles' do
-    project = Factory(:project)
-    Factory(:investigation, policy: Factory(:publicly_viewable_policy),
+    project = FactoryBot.create(:project)
+    FactoryBot.create(:investigation, policy: FactoryBot.create(:publicly_viewable_policy),
                             title: '<style><script></style>alert("XSS");<style><</style>/</style><style>script></style>',
                             projects: [project])
 

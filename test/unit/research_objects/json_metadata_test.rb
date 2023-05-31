@@ -2,8 +2,8 @@ require 'test_helper'
 
 class JsonMetaTest < ActiveSupport::TestCase
   test 'metadata contents' do
-    contributor = Factory(:person, orcid: '0000-0002-1694-233X')
-    item = Factory(:model_with_image, description: 'model with an image', policy: Factory(:public_policy), contributor: contributor)
+    contributor = FactoryBot.create(:person, orcid: '0000-0002-1694-233X')
+    item = FactoryBot.create(:model_with_image, description: 'model with an image', policy: FactoryBot.create(:public_policy), contributor: contributor)
     json = Seek::ResearchObjects::JSONMetadata.instance.metadata_content(item)
     json = JSON.parse(json)
 
@@ -20,8 +20,8 @@ class JsonMetaTest < ActiveSupport::TestCase
   end
 
   test 'metadata contents for assay' do
-    contributor = Factory(:person, orcid: '0000-0002-1694-233X')
-    item = Factory(:experimental_assay, description: 'my ro assay', policy: Factory(:public_policy), contributor: contributor)
+    contributor = FactoryBot.create(:person, orcid: '0000-0002-1694-233X')
+    item = FactoryBot.create(:experimental_assay, description: 'my ro assay', policy: FactoryBot.create(:public_policy), contributor: contributor)
     json = Seek::ResearchObjects::JSONMetadata.instance.metadata_content(item)
     json = JSON.parse(json)
 
@@ -39,7 +39,7 @@ class JsonMetaTest < ActiveSupport::TestCase
   end
 
   test 'metadata contents for publication' do
-    item = Factory :publication, doi: '10.1111/ecog.01552', pubmed_id: nil
+    item = FactoryBot.create :publication, doi: '10.1111/ecog.01552', pubmed_id: nil
     json = Seek::ResearchObjects::JSONMetadata.instance.metadata_content(item)
     json = JSON.parse(json)
 
@@ -52,7 +52,7 @@ class JsonMetaTest < ActiveSupport::TestCase
     assert_nil json['pubmed_id']
     assert_nil json['pubmed_uri']
 
-    item = Factory :publication, doi: nil, pubmed_id: '4'
+    item = FactoryBot.create :publication, doi: nil, pubmed_id: '4'
     json = Seek::ResearchObjects::JSONMetadata.instance.metadata_content(item)
     json = JSON.parse(json)
 
@@ -66,7 +66,7 @@ class JsonMetaTest < ActiveSupport::TestCase
   end
 
   test 'should not encode filename in encodes block if it has a space' do
-    item = Factory :data_file, content_blob: Factory(:content_blob, original_filename: 'file with space.xls'), policy: Factory(:public_policy)
+    item = FactoryBot.create :data_file, content_blob: FactoryBot.create(:content_blob, original_filename: 'file with space.xls'), policy: FactoryBot.create(:public_policy)
     json = Seek::ResearchObjects::JSONMetadata.instance.metadata_content(item)
     json = JSON.parse(json)
     filename = json['contains'].first

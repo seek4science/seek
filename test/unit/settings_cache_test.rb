@@ -36,7 +36,7 @@ class SettingsCacheTest < ActiveSupport::TestCase
   end
 
   test 'setting project settings does not expire settings cache' do
-    project = Factory(:project)
+    project = FactoryBot.create(:project)
 
     Seek::Config.stub(:clear_cache, -> () { raise 'oh no!' }) do
       assert_nothing_raised do

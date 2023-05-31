@@ -2,7 +2,7 @@ require 'test_helper'
 
 class GitRepoExtractionTest < ActiveSupport::TestCase
   test 'extracts metadata from CFF' do
-    workflow = Factory(:remote_git_workflow)
+    workflow = FactoryBot.create(:remote_git_workflow)
 
     gv = disable_authorization_checks do
       x = workflow.latest_git_version.next_version(name: 'cff', ref: 'refs/remotes/origin/cff',

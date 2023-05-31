@@ -6,7 +6,7 @@ module GeneralAuthorizationTestCases
   test 'private item not accessible publicly' do
     itemname = @controller.controller_name.singularize.underscore
 
-    item = Factory itemname.to_sym, policy: Factory(:private_policy)
+    item = FactoryBot.create itemname.to_sym, policy: FactoryBot.create(:private_policy)
 
     logout
 
@@ -21,9 +21,9 @@ module GeneralAuthorizationTestCases
 
   test 'private item not accessible by another user' do
     itemname = @controller.controller_name.singularize.underscore
-    another_user = Factory :user
+    another_user = FactoryBot.create :user
 
-    item = Factory itemname.to_sym, policy: Factory(:private_policy)
+    item = FactoryBot.create itemname.to_sym, policy: FactoryBot.create(:private_policy)
 
     login_as(another_user)
 
@@ -39,7 +39,7 @@ module GeneralAuthorizationTestCases
   test 'private item accessible by owner' do
     itemname = @controller.controller_name.singularize.underscore
 
-    item = Factory itemname.to_sym, policy: Factory(:private_policy)
+    item = FactoryBot.create itemname.to_sym, policy: FactoryBot.create(:private_policy)
 
     contributor = item.contributor
 
@@ -56,10 +56,10 @@ module GeneralAuthorizationTestCases
   end
 
   def check_manage_edit_menu_for_type(type)
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
-    editable = Factory(type.to_sym, policy: Factory(:private_policy, permissions: [Factory(:permission, contributor: person, access_type: Policy::EDITING)]))
-    manageable = Factory(type.to_sym, contributor: person, policy: Factory(:private_policy))
+    editable = FactoryBot.create(type.to_sym, policy: FactoryBot.create(:private_policy, permissions: [FactoryBot.create(:permission, contributor: person, access_type: Policy::EDITING)]))
+    manageable = FactoryBot.create(type.to_sym, contributor: person, policy: FactoryBot.create(:private_policy))
 
     assert editable.can_edit?
     refute editable.can_manage?
