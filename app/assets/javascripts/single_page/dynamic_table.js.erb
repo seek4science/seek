@@ -1,4 +1,4 @@
-<% environment.context_class.instance_eval { include Seek:: Util.routes } %>
+<% environment.context_class.instance_eval { include Seek::Util.routes } %>
 const instanceName = "<%= Seek::Config.instance_name %>";
 
 const rowStatus = { new: "new", delete: "delete", update: "update", empty: "empty", noAction: "" };
@@ -56,9 +56,9 @@ const handleSelect = (e) => {
 
 						} else {
 							const url = typeaheadUrl.replace("_LINKED_", c.linked_sample_type);
-							const objectInputName = 'objectInput[' + existingObjectsJSON.map((e) => e.id).join('-') + ']';
-							const objectInput = objectInputTemp.replace(/_NAME_/g, objectInputName).replace("_URL_", url).replace('seek-*bjectsinput', 'seek-objectsinput').replace('<option value=""></option>', existingOptions);
-							ObjectsInput.init(objectInput);
+							const objectInputName = 'objectInput[' + existingObjectsJSON.map((e) => e.id).join('-') + ']' + '-' + crypto.randomUUID();
+							const objectInput = objectInputTemp.replace(/_NAME_/g, objectInputName).replace("_URL_", url).replace('<option value=""></option>', existingOptions);
+              ObjectsInput.init();
 							return objectInput;
 
 						}
@@ -70,14 +70,7 @@ const handleSelect = (e) => {
 					}
 				};
 				c["createdCell"] = function (td, cellData, rowData, row, col) {
-					if (c.multi_link && !options.readonly) {
-
-						// Initial initiation of the ObjectsInput
-						const input = $j(td).find('[data-role="seek-objectsinput"]');
-						setSelect2($j(td));
-						ObjectsInput.init({ item: input });
-
-					}
+					if (c.multi_link && !options.readonly) setSelect2($j(td));
 					if (cellData == "#HIDDEN") $j(td).addClass("disabled");
 				};
 				if (c.title == "id") c.title = instanceName + " id";
@@ -409,12 +402,11 @@ function getSampleLinking(arr) {
 	return arr.filter((x) => x.linked_sample_type).map(({ idx, title }) => ({ idx, title }));
 }
 
-function setSelect2(item) {
-	$j(item).on("select2:select select2:unselect", function (e) {
+function setSelect2(td) {
+	$j(td).on("select2:select select2:unselect", function (e) {
 		const table = $j(this).parents("table").DataTable();
-		const td = $j(this).closest('td');
 
-		const values = item.find("option").map((_index, opt) => {
+		const values = td.find("option").map((_index, opt) => {
 			if (opt.value != "") return { id: opt.value, title: opt.innerText };
 		}).toArray();
 
