@@ -22,9 +22,8 @@ module Ga4gh
           projects.map(&:title).sort.join(', ')
         end
 
-        alias_method :orig_versions, :versions
         def versions
-          orig_versions.map { |v| ToolVersion.new(self, v) }
+          @workflow.versions.map { |v| ToolVersion.new(self, v) }
         end
 
         def toolclass
