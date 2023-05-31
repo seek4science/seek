@@ -14,7 +14,7 @@ module Seek
           project = Project.find_or_create_by(title: 'Default Project')
           directory = Rails.root.join('config', 'default_data', 'source_types')
           directory_files = Dir.exist?(directory) ? Dir.glob("#{directory}/*.json") : []
-          raise '<li>Make sure to upload files that have the ".json" extension.<ul><li> Please take a look at the <a href="https://github.com/seek4science/seek/tree/d0de7bb6c258730347e8a4cc231236595c81ad0f/lib/seek/isa_templates" target="_blank">schema</a> for making an ISA-compliant template.</li><li>You can find an example <a href="https://github.com/ELIXIR-Belgium/ISA-merger/blob/021553c0d2e691211b64dd9b49dff4646dcfba6b/templates/isa%20test/isa_test_aggregated_v1.1.0.json" target="_blank">here</a>.</li></ul></li>' if directory_files == []
+          raise '<ul><li>Make sure to upload files that have the ".json" extension.</li></ul>' if directory_files == []
 
           directory_files.each do |filename|
             puts filename
