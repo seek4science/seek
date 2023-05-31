@@ -512,7 +512,7 @@ class ApplicationController < ActionController::Base
   end
 
   def convert_json_params
-    Seek::Api::ParameterConverter.new(controller_name, param_converter_options).convert(params)
+    Seek::Api::ParameterConverter.new(controller_name).convert(params)
   end
 
   def json_api_request?
@@ -547,10 +547,6 @@ class ApplicationController < ActionController::Base
     end
 
     hash
-  end
-
-  def param_converter_options
-    {}
   end
 
   def check_doorkeeper_scopes

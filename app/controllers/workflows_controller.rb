@@ -380,8 +380,4 @@ class WorkflowsController < ApplicationController
   def git_version_path_params
     params.require(:git_version).permit(:main_workflow_path, :abstract_cwl_path, :diagram_path)
   end
-
-  def param_converter_options
-    { skip: [:data_file_ids] }
-  end
 end
