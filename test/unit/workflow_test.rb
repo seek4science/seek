@@ -754,4 +754,32 @@ class WorkflowTest < ActiveSupport::TestCase
                    wf.bio_tools_links.pluck(:bio_tools_id).sort
     end
   end
+
+  test 'cannot delete workflow with doi' do
+    workflow = FactoryBot.create(:workflow)
+    v = workflow.latest_version
+    User.with_current_user(workflow.contributor.user) do
+      assert workflow.state_allows_delete?
+      assert workflow.can_delete?
+
+      assert v.update(doi: '10.81082/dev-workflowhub.workflow.136.1')
+
+      refute workflow.state_allows_delete?
+      refute workflow.can_delete?
+    end
+  end
+
+  test 'cannot delete git workflow with doi' do
+    workflow = FactoryBot.create(:local_git_workflow)
+    v = workflow.git_version
+    User.with_current_user(workflow.contributor.user) do
+      assert workflow.state_allows_delete?
+      assert workflow.can_delete?
+
+      assert v.update(doi: '10.81082/dev-workflowhub.workflow.136.1')
+
+      refute workflow.state_allows_delete?
+      refute workflow.can_delete?
+    end
+  end
 end
