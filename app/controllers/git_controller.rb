@@ -4,7 +4,7 @@ class GitController < ApplicationController
 
   before_action :fetch_parent
   before_action :authorize_parent
-  before_action :authorized_to_edit, only: [:add_file, :remove_file, :move_file, :freeze]
+  before_action :authorized_to_edit, only: [:add_file, :remove_file, :move_file, :freeze, :update]
   before_action :fetch_git_version
   before_action :get_tree, only: [:tree]
   before_action :get_blob, only: [:blob, :download, :raw, :notebook]
@@ -104,6 +104,16 @@ class GitController < ApplicationController
     redirect_to polymorphic_path(@parent_resource)
   end
 
+  def update
+    if @git_version.update(git_version_params)
+      flash[:notice] = "#{@git_version.name} was successfully updated."
+    else
+      flash[:error] = "Could not update #{@git_version.name_was} - #{@git_version.errors.full_messages.join(', ')}"
+    end
+
+    redirect_to polymorphic_path(@parent_resource)
+  end
+
   private
 
   def operation_response(notice = nil, status: 200)
@@ -194,7 +204,9 @@ class GitController < ApplicationController
   end
 
   def git_version_params
-    params.require(:git_version).permit(:name, :comment)
+    p = [:name, :comment]
+    p << :visibility if @git_version.can_change_visibility?
+    params.require(:git_version).permit(*p)
   end
 
   def add_local_file

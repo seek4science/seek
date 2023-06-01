@@ -4,7 +4,7 @@ class GitControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
 
   def setup
-    @git_version = FactoryBot.create(:git_version)
+    @git_version = FactoryBot.create(:git_version).becomes(Workflow::Git::Version)
     @workflow = @git_version.resource
     @person = @workflow.contributor
     login_as @person
@@ -693,5 +693,57 @@ class GitControllerTest < ActionController::TestCase
     assert_raises(ActionController::UnknownFormat) do
       get :raw, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'file.png', display: 'text' }
     end
+  end
+
+  test 'can edit version name and comment' do
+    assert_not_equal 'modified', @git_version.name
+    assert_not_equal 'modified', @git_version.name
+
+    patch :update, params: { workflow_id: @workflow.id, version: @git_version.version,
+                                   git_version: { name: 'modified', comment: 'modified' } }
+
+    assert_redirected_to @workflow
+    assert_equal 'modified', @git_version.reload.name
+  end
+
+  test 'can edit version visibility' do
+    disable_authorization_checks { @workflow.save_as_new_git_version }
+
+    assert_equal 2, @workflow.reload.version
+
+    assert_not_equal :registered_users, @workflow.find_version(1).visibility
+    refute @workflow.find_version(1).latest_git_version?
+
+    patch :update, params: { workflow_id: @workflow.id, version: 1,
+                                   git_version: { visibility: 'registered_users' } }
+
+    assert_redirected_to @workflow
+    assert_equal :registered_users, @workflow.find_version(1).reload.visibility
+  end
+
+  test 'cannot edit version visibility if doi minted' do
+    disable_authorization_checks do
+      @workflow.save_as_new_git_version
+      @workflow.find_version(1).update_column(:doi, '10.5072/wtf')
+    end
+
+    assert_equal :public, @workflow.find_version(1).visibility
+
+    patch :update, params: { workflow_id: @workflow.id, version: 1,
+                                   git_version: { visibility: 'registered_users' } }
+
+    assert_redirected_to @workflow
+    assert_equal :public, @workflow.find_version(1).reload.visibility, 'Should not have changed visibility - DOI present'
+  end
+
+  test 'cannot edit version visibility if latest version' do
+    assert @git_version.latest_git_version?
+    assert_equal :public, @workflow.find_version(1).visibility
+
+    patch :update, params: { workflow_id: @workflow.id, version: 1,
+                                   git_version: { visibility: 'private' } }
+
+    assert_redirected_to @workflow
+    assert_equal :public, @workflow.find_version(1).reload.visibility,'Should not have changed visibility - latest version'
   end
 end
