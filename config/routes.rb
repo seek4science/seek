@@ -131,6 +131,8 @@ SEEK::Application.routes.draw do
         patch 'blob/*path' => 'git#move_file', as: :git_move_file
         get 'freeze' => 'git#freeze_preview', as: :git_freeze_preview
         post 'freeze' => 'git#freeze', as: :git_freeze
+        patch '' => 'git#update', as: :git_update_version
+        #delete '' => 'git#destroy', as: :git_destroy_version
       end
     end
   end
