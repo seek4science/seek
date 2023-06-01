@@ -39,7 +39,7 @@ end
 
 Factory.define(:nfcore_local_rocrate_repository, class: Git::Repository) do |f|
   f.after_create do |r|
-    FileUtils.cp_r(File.join(Rails.root, 'test', 'fixtures', 'git', 'nf-core-ampliseq', '_git', '.'), File.join(r.local_path, '.git'))
+    FileUtils.cp_r(File.join(Rails.root, 'test', 'fixtures', 'git', 'nf-core-rnaseq', '_git', '.'), File.join(r.local_path, '.git'))
   end
 end
 

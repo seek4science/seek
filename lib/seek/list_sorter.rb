@@ -17,7 +17,8 @@ module Seek
           options: [:published_at_asc, :published_at_desc, :created_at_asc, :created_at_desc, :title_asc, :title_desc] },
       'Other' => {
           defaults: { index: :updated_at_desc, related: :updated_at_desc },
-          options: [:updated_at_asc, :updated_at_desc, :created_at_asc, :created_at_desc, :title_asc, :title_desc] },
+          options: [:updated_at_asc, :updated_at_desc, :created_at_asc, :created_at_desc, :title_asc, :title_desc,
+                    :downloads_desc, :views_desc] },
       'Assay' => {
           defaults: { related: :position_asc }
       }
@@ -38,6 +39,82 @@ module Seek
       created_at_desc: { title: 'Creation date (Descending)', order: 'created_at DESC' },
       position_asc: { title: 'Position (Ascending)', order: 'position' },
       position_desc: { title: 'Position (Descending)', order: 'position DESC' },
+      downloads_desc: { title: 'Downloads (Descending)', order: '--downloads_desc',
+                        relation_proc: -> (items) { # Sorts by number of downloads, descending
+                          #### Using Active Record
+                          # This section **modifies** "items" relation so that it includes a new column "downloads"
+                          alog=ActivityLog.all.where(action: 'download',activity_loggable_type: items.first.class.name)
+                          downloads=alog.select("activity_loggable_id AS #{items.table.name}_id, COUNT(activity_loggable_id) AS downloads").group(:activity_loggable_id)
+                          items._select!("#{items.table.name}.*", 'd.downloads').joins!("LEFT OUTER JOIN (#{downloads.to_sql}) d ON #{items.table.name}.id = d.#{items.table.name}_id")
+
+                          #### Using Arel
+                          # This section builds the equivalent arel_table to provide the corresponding arel_field
+                          items_a=items.arel_table
+                          alog_a=ActivityLog.arel_table
+                          downloads=alog_a.project(alog_a[:activity_loggable_id].as("log_id"), alog_a[:activity_loggable_id].count.as("downloads"))
+                                        .where(alog_a[:action].eq('download').and(alog_a[:activity_loggable_type].eq(items.first.class.name)))
+                                        .group(:activity_loggable_id).as('downloads')
+                          joined=items_a.project(items_a[Arel.star], downloads[:downloads]).outer_join(downloads).on(items_a[:id].eq(downloads[:log_id])).as('d')
+
+                          case ActiveRecord::Base.connection.instance_values["config"][:adapter]
+                          when 'postgresql'
+                            joined[:downloads].desc.nulls_last
+                          else
+                            joined[:downloads].desc
+                          end
+                        },
+                        enum_proc: -> (items) {
+                          return nil if items.empty? || !items.first.is_downloadable?
+                          alog=ActivityLog.all.where(action: 'download',activity_loggable_type: items.first.class.name)
+                          downloads = alog.select("activity_loggable_id AS #{items.first.class.table_name}_id, COUNT(activity_loggable_id) AS downloads").group(:activity_loggable_id)
+                          joined = items.first.class.all.select('*', 'd.downloads').joins("LEFT OUTER JOIN (#{downloads.to_sql}) d ON #{items.first.class.table_name}.id = d.#{items.first.class.table_name}_id")
+                          ids = joined.pluck("#{items.first.class.table_name}.id")
+                          dls = joined.pluck('downloads')
+                          -> (a, b) {
+                            x = dls[ids.index(a.id)] || 0
+                            y = dls[ids.index(b.id)] || 0
+                            y <=> x
+                          }
+                        }
+      },
+      views_desc: { title: 'Views (Descending)', order: '--views_desc',
+                    relation_proc: -> (items) { # Sorts by number of views, descending
+                      #### Using Active Record
+                      # This section **modifies** "items" relation so that it includes a new column "views"
+                      alog=ActivityLog.all.where(action: 'show',activity_loggable_type: items.first.class.name)
+                      views=alog.select("activity_loggable_id AS #{items.table.name}_id, COUNT(activity_loggable_id) AS views").group(:activity_loggable_id)
+                      items._select!("#{items.table.name}.*", 'v.views').joins!("LEFT OUTER JOIN (#{views.to_sql}) v ON #{items.table.name}.id = v.#{items.table.name}_id")
+
+                      #### Using Arel
+                      # This section builds the equivalent arel_table to provide the corresponding arel_field
+                      items_a=items.arel_table
+                      alog_a=ActivityLog.arel_table
+                      views=alog_a.project(alog_a[:activity_loggable_id].as("log_id"), alog_a[:activity_loggable_id].count.as("views"))
+                                  .where(alog_a[:action].eq('show').and(alog_a[:activity_loggable_type].eq(items.first.class.name)))
+                                  .group(:activity_loggable_id).as('views')
+                      joined=items_a.project(items_a[Arel.star], views[:views]).outer_join(views).on(items_a[:id].eq(views[:log_id])).as('v')
+
+                      case ActiveRecord::Base.connection.instance_values["config"][:adapter]
+                      when 'postgresql'
+                        joined[:views].desc.nulls_last
+                      else
+                        joined[:views].desc
+                      end
+                    },
+                    enum_proc: -> (items) {
+                      return nil if items.empty? || [Person, Project, Institution, Programme, Organism, HumanDisease].include?(items.first.class)
+                      alog=ActivityLog.all.where(action: 'show',activity_loggable_type: items.first.class.name)
+                      views = alog.select("activity_loggable_id AS #{items.first.class.table_name}_id, COUNT(activity_loggable_id) AS views").group(:activity_loggable_id)
+                      joined = items.first.class.all.select('*', 'v.views').joins("LEFT OUTER JOIN (#{views.to_sql}) v ON #{items.first.class.table_name}.id = v.#{items.first.class.table_name}_id")
+                      ids = joined.pluck("#{items.first.class.table_name}.id")
+                      dls = joined.pluck('views')
+                      -> (a, b) {
+                        x = dls[ids.index(a.id)] || 0
+                        y = dls[ids.index(b.id)] || 0
+                        y <=> x
+                      }
+                    }
+      },
       relevance: { title: 'Relevance', order: '--relevance',
                    relation_proc: -> (items) {
                      ids = items.solr_cache(items.last_solr_query)
@@ -88,16 +165,20 @@ module Seek
       if items.is_a?(ActiveRecord::Relation)
         orderings = strategy_for_relation(order, items)
         # Postgres requires any columns being ORDERed to be explicitly SELECTed (only when using DISTINCT?).
-        columns = [items.arel_table[Arel.star]]
-        orderings.each do |ordering|
-          if ordering.is_a?(Arel::Nodes::Ordering)
-            expr = ordering.expr
-            # Don't need to SELECT columns that are already covered by "*" and MySQL will error if you try!
-            unless expr.respond_to?(:relation) && expr.relation == items.arel_table
-              columns << expr
+        if ["--views_desc","--downloads_desc"].include? order
+          columns = []
+        else
+          columns = [items.arel.as(items.table.name)[Arel.star]]
+          orderings.each do |ordering|
+            if ordering.is_a?(Arel::Nodes::Ordering)
+              expr = ordering.expr
+              # Don't need to SELECT columns that are already covered by "*" and MySQL will error if you try!
+              unless expr.respond_to?(:relation) && expr.relation == items.arel_table
+                columns << expr
+              end
+            else
+              columns << ordering
             end
-          else
-            columns << ordering
           end
         end
         items.select(columns).order(orderings)

@@ -12,7 +12,7 @@
 
 <%= panel(title, id: 'author-box',
           help_text: "These are the people that created the item, along with the person who submitted it. Sometimes the submitter may have uploaded the item on behalf of its contributors, but was not involved in creating it.") do %>
-  <% unless resource.class.name.underscore == "publication" %>
+  <% unless resource.is_a?(Publication) %>
     <h5 class="author-list-title"><%= t('creator').capitalize.pluralize(assets_creators.count) -%></h5>
 
     <% if assets_creators.none? %>

@@ -75,6 +75,25 @@ class PersonTest < ActiveSupport::TestCase
     refute_includes person1.programmes, prog2
   end
 
+  test 'show related empty programmes' do
+    person1 = Factory(:programme_administrator_not_in_project)
+    person2 = Factory(:programme_administrator_not_in_project)
+    person3 = Factory(:programme_administrator_not_in_project) # Programme administrator not in empty_programme1
+    empty_programme1 = Factory(:min_programme, programme_administrators: [person1, person2])
+
+    [person1, person2].each do |p|
+      assert_includes p.related_programmes, empty_programme1
+    end
+    refute_includes person3.related_programmes, empty_programme1
+
+    person4 = Factory(:person_in_project) # Member of a project in prog 2, not a programme administrator
+    prog2 = Factory(:programme, projects: person4.projects, programme_administrators: [person1, person3])
+
+    [person1, person3, person4].each do |p|
+      assert_includes p.related_programmes, prog2
+    end
+  end
+
   test 'can be administered by' do
     admin = Factory(:admin)
     admin2 = Factory(:admin)
@@ -819,6 +838,15 @@ class PersonTest < ActiveSupport::TestCase
     AssetsCreator.create asset: (assay1 = Factory(:assay)), creator: person
     assay2 = Factory(:assay, contributor: person)
     assert_equal [assay1, assay2].sort, person.related_assays.sort
+  end
+
+  test 'related sample_type' do
+    person1 = Factory(:person)
+    person2 = Factory(:person)
+    st1 = Factory(:simple_sample_type, contributor: person1, creators: [person1])
+    st2 = Factory(:simple_sample_type, contributor: person1, creators: [person2])
+    st3 = Factory(:simple_sample_type, contributor: person2, creators: [person1])
+    assert_equal [st1, st2, st3].sort, person1.related_sample_types.sort
   end
 
   test 'get the correct investigations and studies' do

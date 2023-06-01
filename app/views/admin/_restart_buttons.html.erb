@@ -1,4 +1,18 @@
 <%= panel do %>
+  <div class="row">
+    <div class="col-sm-8">
+      <p>
+        SEEK uses a cache to store dynamically generated content, for the benefit of improving overall performance or
+        avoid excessive requests to an external service.
+        Although the cache is automatically updated when data changes, occasionally is may be necessary to force the cache
+        to be cleared entirely.
+        <%= button_to('Clear cache', clear_cache_admin_path,
+                      class: 'btn btn-danger', id: 'clear-cache',
+                      data: { confirm: 'Are you sure you want to clear the cache?', disable_with: 'Clearing...' }) %>
+      </p>
+    </div>
+  </div>
+  <% unless using_docker? %>
     <div class="row">
       <div class="col-sm-8">
         <p>
@@ -47,4 +61,5 @@
         <% end %>
       </div>
     </div>
+  <% end %>
 <% end %>

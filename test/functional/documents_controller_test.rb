@@ -976,6 +976,91 @@ class DocumentsControllerTest < ActionController::TestCase
     assert_equal [project_doc, old_project_doc], assigns(:documents).to_a
   end
 
+  test 'sort by downloads' do
+    person = Factory(:person)
+    d1 = Factory(:document, title: 'document a', policy: Factory(:publicly_viewable_policy))
+    d2 = Factory(:document, title: 'document b', policy: Factory(:publicly_viewable_policy))
+    d3 = Factory(:document, title: 'document c', policy: Factory(:publicly_viewable_policy))
+    d4 = Factory(:document, title: 'document d', policy: Factory(:publicly_viewable_policy))
+    d5 = Factory(:document, title: 'document e', policy: Factory(:publicly_viewable_policy))
+    d6 = Factory(:document, title: 'document f', policy: Factory(:publicly_viewable_policy))
+    Factory(:activity_log, action: 'download', activity_loggable: d2, created_at: 10.minutes.ago, culprit: person.user)
+    Factory(:activity_log, action: 'download', activity_loggable: d2, created_at: 9.minutes.ago, culprit: person.user)
+    Factory(:activity_log, action: 'download', activity_loggable: d2, created_at: 8.minutes.ago, culprit: person.user)
+    Factory(:activity_log, action: 'download', activity_loggable: d3, created_at: 7.minutes.ago, culprit: person.user)
+    Factory(:activity_log, action: 'download', activity_loggable: d3, created_at: 6.minutes.ago, culprit: person.user)
+    Factory(:activity_log, action: 'download', activity_loggable: d6, created_at: 5.minutes.ago, culprit: person.user)
+    Factory(:activity_log, action: 'download', activity_loggable: d6, created_at: 4.minutes.ago, culprit: person.user)
+    Factory(:activity_log, action: 'download', activity_loggable: d5, created_at: 3.minutes.ago, culprit: person.user)
+
+    d3.annotate_with('tag1', 'tag', d3.contributor)
+    d4.annotate_with('tag1', 'tag', d4.contributor)
+    d5.annotate_with('tag1', 'tag', d5.contributor)
+    disable_authorization_checks do
+      d3.save!
+      d4.save!
+      d5.save!
+    end
+
+    downloads_ordered = [d2, d3, d6, d5, d1, d4]
+    downloads_ordered_tag1 = [d3, d5, d4]
+
+    get :index
+    assert_select '#index_sort_order' do
+      assert_select 'option', 'Downloads (Descending)'
+    end
+
+    get :index, params: { order: 'downloads_desc' }
+    assert_response :success
+    assert_equal downloads_ordered, assigns(:documents).to_a
+
+    get :index, params: { filter: { tag: 'tag1' }, order: 'downloads_desc' }
+    assert_response :success
+    assert_equal downloads_ordered_tag1, assigns(:documents).to_a
+  end
+
+  test 'sort by views' do
+    d1 = Factory(:document, title: 'document a', policy: Factory(:publicly_viewable_policy))
+    d2 = Factory(:document, title: 'document b', policy: Factory(:publicly_viewable_policy))
+    d3 = Factory(:document, title: 'document c', policy: Factory(:publicly_viewable_policy))
+    d4 = Factory(:document, title: 'document d', policy: Factory(:publicly_viewable_policy))
+    d5 = Factory(:document, title: 'document e', policy: Factory(:publicly_viewable_policy))
+    d6 = Factory(:document, title: 'document f', policy: Factory(:publicly_viewable_policy))
+    Factory(:activity_log, action: 'show', activity_loggable: d4, created_at: 10.minutes.ago)
+    Factory(:activity_log, action: 'show', activity_loggable: d4, created_at: 9.minutes.ago)
+    Factory(:activity_log, action: 'show', activity_loggable: d4, created_at: 8.minutes.ago)
+    Factory(:activity_log, action: 'show', activity_loggable: d3, created_at: 7.minutes.ago)
+    Factory(:activity_log, action: 'show', activity_loggable: d3, created_at: 6.minutes.ago)
+    Factory(:activity_log, action: 'show', activity_loggable: d6, created_at: 5.minutes.ago)
+    Factory(:activity_log, action: 'show', activity_loggable: d6, created_at: 4.minutes.ago)
+    Factory(:activity_log, action: 'show', activity_loggable: d5, created_at: 3.minutes.ago)
+
+    d1.annotate_with('tag1', 'tag', d1.contributor)
+    d3.annotate_with('tag1', 'tag', d3.contributor)
+    d6.annotate_with('tag1', 'tag', d6.contributor)
+    disable_authorization_checks do
+      d1.save!
+      d3.save!
+      d6.save!
+    end
+
+    views_ordered = [d4, d3, d6, d5, d1, d2]
+    views_ordered_tag1 = [d3, d6, d1]
+
+    get :index
+    assert_select '#index_sort_order' do
+      assert_select 'option', 'Views (Descending)'
+    end
+
+    get :index, params: { order: 'views_desc' }
+    assert_response :success
+    assert_equal views_ordered, assigns(:documents).to_a
+
+    get :index, params: { filter: { tag: 'tag1' }, order: 'views_desc' }
+    assert_response :success
+    assert_equal views_ordered_tag1, assigns(:documents).to_a
+  end
+
   test 'filtering a scoped collection' do
     programme = Factory(:programme)
     project1 = Factory(:project, programme: programme)

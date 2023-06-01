@@ -291,6 +291,20 @@ class PeopleControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test 'sort by downloads not available' do
+    get :index
+    assert_select '#index_sort_order' do
+      assert_select 'option', { text: 'Downloads (Descending)', count: 0 }
+    end
+  end
+
+  test 'sort by views not available' do
+    get :index
+    assert_select '#index_sort_order' do
+      assert_select 'option', { text: 'Views (Descending)', count: 0 }
+    end
+  end
+
   test 'admin can manage person' do
     login_as(:quentin)
     person = people(:aaron_person)
@@ -692,7 +706,7 @@ class PeopleControllerTest < ActionController::TestCase
         assert_select '.pagination-container li.active', text: '1'
         assert_select '.list_items_container .collapse', count: 3
 
-        
+
         get :index, params: { view: 'table' }
         assert_response :success
         assert_equal 3, assigns(:per_page)
@@ -810,6 +824,25 @@ class PeopleControllerTest < ActionController::TestCase
     end
   end
 
+  test 'should show empty programme as related item if programme administrator' do
+    person1 = Factory(:programme_administrator_not_in_project)
+    prog1 = Factory(:min_programme, programme_administrators: [person1])
+
+    assert person1.projects.empty?
+
+    get :show, params: { id: person1.id }
+    assert_response :success
+
+    assert_select 'h2', text: /Related items/i
+    assert_select 'div.list_items_container' do
+      assert_select 'div.list_item' do
+        assert_select 'div.list_item_title' do
+          assert_select 'a[href=?]', programme_path(prog1), text: prog1.title
+        end
+      end
+    end
+  end
+
   test 'related investigations should show where person is creator' do
     person = Factory(:person)
     inv1 = Factory(:investigation, contributor: Factory(:person), policy: Factory(:public_policy))
@@ -873,6 +906,31 @@ class PeopleControllerTest < ActionController::TestCase
     end
   end
 
+  test 'related sample_types should show where person is creator' do
+    person1 = Factory(:person)
+    person2 = Factory(:person)
+    st1 = Factory(:simple_sample_type, contributor: person1, creators: [person1])
+    st2 = Factory(:simple_sample_type, contributor: person1, creators: [person2])
+    st3 = Factory(:simple_sample_type, contributor: person2, creators: [person1])
+
+    login_as(person1)
+    assert st1.can_view?
+    assert st2.can_view?
+    assert st3.can_view?
+    get :show, params: { id: person1.id }
+    assert_response :success
+    assert_select 'h2', text: /Related items/i
+    assert_select 'div#sampletypes'
+    assert_select 'div.list_items_container' do
+      assert_select 'div.list_item' do
+        assert_select 'div.list_item_title' do
+          assert_select 'a[href=?]', sample_type_path(st1), text: st1.title
+          assert_select 'a[href=?]', sample_type_path(st2), text: st2.title
+          assert_select 'a[href=?]', sample_type_path(st3), text: st3.title
+        end
+      end
+    end
+  end
 
   test 'redirect after destroy' do
     person1 = Factory(:person)
@@ -1185,38 +1243,6 @@ class PeopleControllerTest < ActionController::TestCase
     end
     # Reset the view parameter
     session.delete(:view)
-  end
-
-  test 'tracking notice shown' do
-    with_config_value(:google_analytics_enabled, false) do
-      with_config_value(:piwik_analytics_enabled, false) do
-        get :index
-        assert_response :success
-        assert_select '#tracking-banner', count: 0
-      end
-      with_config_value(:piwik_analytics_enabled, true) do
-        get :index
-        assert_response :success
-        assert_select '#tracking-banner', count: 1
-        with_config_value(:piwik_analytics_tracking_notice, false) do
-          get :index
-          assert_response :success
-          assert_select '#tracking-banner', count: 0
-        end
-      end
-    end
-    with_config_value(:google_analytics_enabled, true) do
-      with_config_value(:piwik_analytics_enabled, false) do
-        get :index
-        assert_response :success
-        assert_select '#tracking-banner', count: 1
-        with_config_value(:google_analytics_tracking_notice, false) do
-          get :index
-          assert_response :success
-          assert_select '#tracking-banner', count: 0
-        end
-      end
-    end
   end
 
   test 'admin can see user login through API' do

@@ -115,4 +115,24 @@ class SearchControllerTest < ActionController::TestCase
       assert data.detect { |h| h['id'] == sop.id.to_s && h['type'] == 'sops' }
     end
   end
+
+  test 'HTML in search term with no results is escaped' do
+    Document.stub(:solr_cache, -> (q) { [] }) do
+      get :index, params: { q: '<a href="#test-123">test</a>' }
+    end
+
+    assert_equal "No matches found for '<b>&lt;a href=&quot;#test-123&quot;&gt;test&lt;/a&gt;</b>'.", flash[:notice]
+    assert_select 'a[href="#test-123"]', count: 0
+  end
+
+  test 'HTML in search term is escaped' do
+    FactoryGirl.create_list(:public_document, 1)
+
+    Document.stub(:solr_cache, -> (q) { Document.pluck(:id).last(1) }) do
+      get :index, params: { q: '<a id="xss123" href="#test-123">test</a>' }
+    end
+
+    assert_equal "1 item matched '<b>&lt;a href=&quot;#test-123&quot;&gt;test&lt;/a&gt;</b>' within their title or content.", flash[:notice]
+    assert_select 'a[href="#test-123"]', count: 0
+  end
 end

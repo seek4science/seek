@@ -35,7 +35,7 @@ module Seek
           rescue RestClient::UnsupportedMediaType => e
             accept_header = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
             response = RestClient.head(url, accept: accept_header)
-            content_type = response.headers[:content_tyspe]
+            content_type = response.headers[:content_type]
             content_length = response.headers[:content_length]
             code = response.code
           rescue RestClient::Exception => e # Try a GET if HEAD isn't allowed, but don't download anything

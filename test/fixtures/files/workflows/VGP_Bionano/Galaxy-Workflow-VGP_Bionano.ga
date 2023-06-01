@@ -1,0 +1,1140 @@
+{
+    "a_galaxy_workflow": "true",
+    "annotation": "Performs scaffolding using Bionano Data. Part of VGP assembly pipeline. ",
+    "creator": [
+        {
+            "class": "Organization",
+            "name": "Galaxy"
+        },
+        {
+            "class": "Organization",
+            "name": "VGP",
+            "url": "https://vertebrategenomeproject.org"
+        }
+    ],
+    "format-version": "0.1",
+    "license": "CC-BY-4.0",
+    "name": "VGP Bionano",
+    "steps": {
+        "0": {
+            "annotation": "The assembly from \"VGP-Hifiasm\" workflow.",
+            "content_id": null,
+            "errors": null,
+            "id": 0,
+            "input_connections": {},
+            "inputs": [
+                {
+                    "description": "The assembly from \"VGP-Hifiasm\" workflow.",
+                    "name": "Hifiasm Purged Assembly (fasta)"
+                }
+            ],
+            "label": "Hifiasm Purged Assembly (fasta)",
+            "name": "Input dataset",
+            "outputs": [],
+            "position": {
+                "left": 0.0,
+                "top": 0.0
+            },
+            "tool_id": null,
+            "tool_state": "{\"optional\": false, \"tag\": \"\"}",
+            "tool_version": null,
+            "type": "data_input",
+            "uuid": "9e8f5588-b53f-4415-8446-17d947937936",
+            "workflow_outputs": []
+        },
+        "1": {
+            "annotation": "Bionano data in Cmap format.",
+            "content_id": null,
+            "errors": null,
+            "id": 1,
+            "input_connections": {},
+            "inputs": [
+                {
+                    "description": "Bionano data in Cmap format.",
+                    "name": "Bionano Data"
+                }
+            ],
+            "label": "Bionano Data",
+            "name": "Input dataset",
+            "outputs": [],
+            "position": {
+                "left": 80.6392822265625,
+                "top": 113.05397033691406
+            },
+            "tool_id": null,
+            "tool_state": "{\"optional\": false, \"format\": [\"cmap\"], \"tag\": null}",
+            "tool_version": null,
+            "type": "data_input",
+            "uuid": "d620279b-9ba3-4758-9701-6d04b3f24137",
+            "workflow_outputs": []
+        },
+        "2": {
+            "annotation": "Parameter file generated in the VGP Hifiasm workflow. Estimated reference genome size (in bp) for computing NGx statistics",
+            "content_id": null,
+            "errors": null,
+            "id": 2,
+            "input_connections": {},
+            "inputs": [
+                {
+                    "description": "Parameter file generated in the VGP Hifiasm workflow. Estimated reference genome size (in bp) for computing NGx statistics",
+                    "name": "Estimated genome size - Parameter File"
+                }
+            ],
+            "label": "Estimated genome size - Parameter File",
+            "name": "Input dataset",
+            "outputs": [],
+            "position": {
+                "left": 193.48016357421875,
+                "top": 252.03123474121094
+            },
+            "tool_id": null,
+            "tool_state": "{\"optional\": false, \"tag\": null}",
+            "tool_version": null,
+            "type": "data_input",
+            "uuid": "08b9c6d8-f93a-4f57-8f1c-f26842a6e57c",
+            "workflow_outputs": []
+        },
+        "3": {
+            "annotation": "",
+            "content_id": null,
+            "errors": null,
+            "id": 3,
+            "input_connections": {},
+            "inputs": [
+                {
+                    "description": "",
+                    "name": "Hifiasm Assembly (gfa1)"
+                }
+            ],
+            "label": "Hifiasm Assembly (gfa1)",
+            "name": "Input dataset",
+            "outputs": [],
+            "position": {
+                "left": 333.87786865234375,
+                "top": 430.4829559326172
+            },
+            "tool_id": null,
+            "tool_state": "{\"optional\": false, \"format\": [\"gfa1\"], \"tag\": \"\"}",
+            "tool_version": null,
+            "type": "data_input",
+            "uuid": "4f728394-0652-4f67-919e-cb7ec3950534",
+            "workflow_outputs": []
+        },
+        "4": {
+            "annotation": "Input a conflict resolution file indicating which NGS and BioNano conflicting contigs to be cut [optional] (-M)\n",
+            "content_id": null,
+            "errors": null,
+            "id": 4,
+            "input_connections": {},
+            "inputs": [
+                {
+                    "description": "Input a conflict resolution file indicating which NGS and BioNano conflicting contigs to be cut [optional] (-M)\n",
+                    "name": "Conflict resolution files "
+                }
+            ],
+            "label": "Conflict resolution files ",
+            "name": "Input dataset",
+            "outputs": [],
+            "position": {
+                "left": 509.8011474609375,
+                "top": 609.1193084716797
+            },
+            "tool_id": null,
+            "tool_state": "{\"optional\": true, \"tag\": null}",
+            "tool_version": null,
+            "type": "data_input",
+            "uuid": "404dfe4f-8590-486e-b632-a0564010e213",
+            "workflow_outputs": []
+        },
+        "5": {
+            "annotation": "",
+            "content_id": "param_value_from_file",
+            "errors": null,
+            "id": 5,
+            "input_connections": {
+                "input1": {
+                    "id": 2,
+                    "output_name": "output"
+                }
+            },
+            "inputs": [],
+            "label": null,
+            "name": "Parse parameter value",
+            "outputs": [
+                {
+                    "name": "integer_param",
+                    "type": "expression.json"
+                }
+            ],
+            "position": {
+                "left": 1163.5085334777832,
+                "top": 372.0880584716797
+            },
+            "post_job_actions": {
+                "HideDatasetActioninteger_param": {
+                    "action_arguments": {},
+                    "action_type": "HideDatasetAction",
+                    "output_name": "integer_param"
+                }
+            },
+            "tool_id": "param_value_from_file",
+            "tool_state": "{\"input1\": {\"__class__\": \"ConnectedValue\"}, \"param_type\": \"integer\", \"remove_newlines\": \"true\", \"__page__\": null, \"__rerun_remap_job_id__\": null}",
+            "tool_version": null,
+            "type": "tool",
+            "uuid": "2bd22c8a-3266-43ee-93a3-14aaa0ece0b0",
+            "workflow_outputs": []
+        },
+        "6": {
+            "annotation": "",
+            "content_id": "toolshed.g2.bx.psu.edu/repos/bgruening/bionano_scaffold/bionano_scaffold/3.7.0+galaxy0",
+            "errors": null,
+            "id": 6,
+            "input_connections": {
+                "bionano_cmap": {
+                    "id": 1,
+                    "output_name": "output"
+                },
+                "conflict_resolution": {
+                    "id": 4,
+                    "output_name": "output"
+                },
+                "ngs_fasta": {
+                    "id": 0,
+                    "output_name": "output"
+                }
+            },
+            "inputs": [],
+            "label": null,
+            "name": "Bionano Hybrid Scaffold",
+            "outputs": [
+                {
+                    "name": "ngs_contigs_scaffold_trimmed",
+                    "type": "fasta"
+                },
+                {
+                    "name": "ngs_contigs_not_scaffolded_trimmed",
+                    "type": "fasta"
+                },
+                {
+                    "name": "report",
+                    "type": "txt"
+                },
+                {
+                    "name": "conflicts",
+                    "type": "txt"
+                },
+                {
+                    "name": "results",
+                    "type": "zip"
+                },
+                {
+                    "name": "ngs_contigs_scaffold_agp",
+                    "type": "agp"
+                }
+            ],
+            "position": {
+                "left": 772.571044921875,
+                "top": 26.03692626953125
+            },
+            "post_job_actions": {
+                "RenameDatasetActionngs_contigs_scaffold_trimmed": {
+                    "action_arguments": {
+                        "newname": "Bionano Hybrid Scaffold s1"
+                    },
+                    "action_type": "RenameDatasetAction",
+                    "output_name": "ngs_contigs_scaffold_trimmed"
+                },
+                "TagDatasetActionconflicts": {
+                    "action_arguments": {
+                        "tags": "s1_conflicts"
+                    },
+                    "action_type": "TagDatasetAction",
+                    "output_name": "conflicts"
+                },
+                "TagDatasetActionngs_contigs_not_scaffolded_trimmed": {
+                    "action_arguments": {
+                        "tags": "non_hybridscaffolds_s1"
+                    },
+                    "action_type": "TagDatasetAction",
+                    "output_name": "ngs_contigs_not_scaffolded_trimmed"
+                },
+                "TagDatasetActionngs_contigs_scaffold_agp": {
+                    "action_arguments": {
+                        "tags": "s1_agp"
+                    },
+                    "action_type": "TagDatasetAction",
+                    "output_name": "ngs_contigs_scaffold_agp"
+                },
+                "TagDatasetActionngs_contigs_scaffold_trimmed": {
+                    "action_arguments": {
+                        "tags": "hybridscaffolds_s1"
+                    },
+                    "action_type": "TagDatasetAction",
+                    "output_name": "ngs_contigs_scaffold_trimmed"
+                },
+                "TagDatasetActionreport": {
+                    "action_arguments": {
+                        "tags": "s1_report"
+                    },
+                    "action_type": "TagDatasetAction",
+                    "output_name": "report"
+                },
+                "TagDatasetActionresults": {
+                    "action_arguments": {
+                        "tags": "s1_zip"
+                    },
+                    "action_type": "TagDatasetAction",
+                    "output_name": "results"
+                }
+            },
+            "tool_id": "toolshed.g2.bx.psu.edu/repos/bgruening/bionano_scaffold/bionano_scaffold/3.7.0+galaxy0",
+            "tool_shed_repository": {
+                "changeset_revision": "5258e18bbe23",
+                "name": "bionano_scaffold",
+                "owner": "bgruening",
+                "tool_shed": "toolshed.g2.bx.psu.edu"
+            },
+            "tool_state": "{\"bionano_cmap\": {\"__class__\": \"ConnectedValue\"}, \"configuration_options\": {\"configuration\": \"vgp\", \"__current_case__\": 0, \"enzyme\": \"CTTAAG\"}, \"conflict_filter_genome\": \"3\", \"conflict_filter_sequence\": \"3\", \"conflict_resolution\": {\"__class__\": \"ConnectedValue\"}, \"ngs_fasta\": {\"__class__\": \"ConnectedValue\"}, \"trim_cut_sites\": \"true\", \"zip_file\": \"true\", \"__page__\": null, \"__rerun_remap_job_id__\": null}",
+            "tool_version": null,
+            "type": "tool",
+            "uuid": "acbf9c02-c273-42a9-a809-d515f724b180",
+            "workflow_outputs": [
+                {
+                    "label": "Bionano Hybrid Scaffold on input dataset(s): NGScontigs not scaffolded trimmed",
+                    "output_name": "ngs_contigs_not_scaffolded_trimmed",
+                    "uuid": "1ca07b58-d473-4cce-922c-9eb8fce4b893"
+                },
+                {
+                    "label": "Bionano Hybrid Scaffold",
+                    "output_name": "ngs_contigs_scaffold_trimmed",
+                    "uuid": "cf0e49b4-d8c3-43ae-ab25-9600cf76395e"
+                },
+                {
+                    "label": null,
+                    "output_name": "ngs_contigs_scaffold_agp",
+                    "uuid": "86fcb600-b00c-4be0-87f6-9618c3fad0c8"
+                },
+                {
+                    "label": "Bionano Hybrid Scaffold : report",
+                    "output_name": "report",
+                    "uuid": "f2ff96a7-b034-45d3-bf01-965a349cc793"
+                },
+                {
+                    "label": null,
+                    "output_name": "results",
+                    "uuid": "0d666026-67a9-4763-a974-b7d93ad8e93c"
+                },
+                {
+                    "label": "Bionano Hybrid Scaffold : conflicts",
+                    "output_name": "conflicts",
+                    "uuid": "0900928e-d742-43de-99b9-e6db0e156208"
+                }
+            ]
+        },
+        "7": {
+            "annotation": "",
+            "content_id": "toolshed.g2.bx.psu.edu/repos/bgruening/gfastats/gfastats/1.3.5+galaxy2",
+            "errors": null,
+            "id": 7,
+            "input_connections": {
+                "input_file": {
+                    "id": 3,
+                    "output_name": "output"
+                },
+                "mode_condition|agp_to_path": {
+                    "id": 6,
+                    "output_name": "ngs_contigs_scaffold_agp"
+                }
+            },
+            "inputs": [],
+            "label": null,
+            "name": "gfastats",
+            "outputs": [
+                {
+                    "name": "output",
+                    "type": "fastq"
+                }
+            ],
+            "position": {
+                "left": 1152.9119424819946,
+                "top": 36.51988220214844
+            },
+            "post_job_actions": {
+                "RenameDatasetActionoutput": {
+                    "action_arguments": {
+                        "newname": "Bionano scaffolds reconciliated (GFA)"
+                    },
+                    "action_type": "RenameDatasetAction",
+                    "output_name": "output"
+                },
+                "TagDatasetActionoutput": {
+                    "action_arguments": {
+                        "tags": "complete_s1"
+                    },
+                    "action_type": "TagDatasetAction",
+                    "output_name": "output"
+                }
+            },
+            "tool_id": "toolshed.g2.bx.psu.edu/repos/bgruening/gfastats/gfastats/1.3.5+galaxy2",
+            "tool_shed_repository": {
+                "changeset_revision": "690c2caa367e",
+                "name": "gfastats",
+                "owner": "bgruening",
+                "tool_shed": "toolshed.g2.bx.psu.edu"
+            },
+            "tool_state": "{\"input_file\": {\"__class__\": \"ConnectedValue\"}, \"mode_condition\": {\"selector\": \"scaffolding\", \"__current_case__\": 2, \"agp_to_path\": {\"__class__\": \"ConnectedValue\"}, \"discover_paths\": \"true\"}, \"target_condition\": {\"target_option\": \"false\", \"__current_case__\": 0}, \"__page__\": null, \"__rerun_remap_job_id__\": null}",
+            "tool_version": null,
+            "type": "tool",
+            "uuid": "d29608e2-9748-4e5a-b0b5-8690dac6fb2e",
+            "workflow_outputs": [
+                {
+                    "label": "Bionano scaffolds reconciliated",
+                    "output_name": "output",
+                    "uuid": "a62d4bb3-20ee-4b1a-9336-1aae620ca1ca"
+                }
+            ]
+        },
+        "8": {
+            "annotation": "",
+            "content_id": "toolshed.g2.bx.psu.edu/repos/bgruening/gfastats/gfastats/1.3.5+galaxy2",
+            "errors": null,
+            "id": 8,
+            "input_connections": {
+                "input_file": {
+                    "id": 7,
+                    "output_name": "output"
+                },
+                "mode_condition|statistics_condition|expected_genomesize": {
+                    "id": 5,
+                    "output_name": "integer_param"
+                }
+            },
+            "inputs": [],
+            "label": null,
+            "name": "gfastats",
+            "outputs": [
+                {
+                    "name": "stats",
+                    "type": "tabular"
+                }
+            ],
+            "position": {
+                "left": 1692.1306762695312,
+                "top": 117.55680847167969
+            },
+            "post_job_actions": {
+                "TagDatasetActionstats": {
+                    "action_arguments": {
+                        "tags": "gfastats_asm_s1, #s1"
+                    },
+                    "action_type": "TagDatasetAction",
+                    "output_name": "stats"
+                }
+            },
+            "tool_id": "toolshed.g2.bx.psu.edu/repos/bgruening/gfastats/gfastats/1.3.5+galaxy2",
+            "tool_shed_repository": {
+                "changeset_revision": "690c2caa367e",
+                "name": "gfastats",
+                "owner": "bgruening",
+                "tool_shed": "toolshed.g2.bx.psu.edu"
+            },
+            "tool_state": "{\"input_file\": {\"__class__\": \"ConnectedValue\"}, \"mode_condition\": {\"selector\": \"statistics\", \"__current_case__\": 1, \"statistics_condition\": {\"selector\": \"assembly\", \"__current_case__\": 2, \"expected_genomesize\": {\"__class__\": \"ConnectedValue\"}}, \"tabular\": \"true\", \"discover_paths\": \"true\"}, \"target_condition\": {\"target_option\": \"false\", \"__current_case__\": 0}, \"__page__\": null, \"__rerun_remap_job_id__\": null}",
+            "tool_version": null,
+            "type": "tool",
+            "uuid": "15b0e368-9cb2-4be5-9a7e-ac445454356e",
+            "workflow_outputs": [
+                {
+                    "label": "Assembly Statistics for s1",
+                    "output_name": "stats",
+                    "uuid": "c539e6a6-3eba-4ec7-a678-879cfd01a838"
+                }
+            ]
+        },
+        "9": {
+            "annotation": "",
+            "content_id": "toolshed.g2.bx.psu.edu/repos/bgruening/gfastats/gfastats/1.3.5+galaxy2",
+            "errors": null,
+            "id": 9,
+            "input_connections": {
+                "input_file": {
+                    "id": 7,
+                    "output_name": "output"
+                }
+            },
+            "inputs": [],
+            "label": null,
+            "name": "gfastats",
+            "outputs": [
+                {
+                    "name": "stats",
+                    "type": "tabular"
+                }
+            ],
+            "position": {
+                "left": 1694.0625,
+                "top": 404.5454559326172
+            },
+            "post_job_actions": {},
+            "tool_id": "toolshed.g2.bx.psu.edu/repos/bgruening/gfastats/gfastats/1.3.5+galaxy2",
+            "tool_shed_repository": {
+                "changeset_revision": "690c2caa367e",
+                "name": "gfastats",
+                "owner": "bgruening",
+                "tool_shed": "toolshed.g2.bx.psu.edu"
+            },
+            "tool_state": "{\"input_file\": {\"__class__\": \"ConnectedValue\"}, \"mode_condition\": {\"selector\": \"statistics\", \"__current_case__\": 1, \"statistics_condition\": {\"selector\": \"size\", \"__current_case__\": 0, \"out_size\": \"s\"}, \"tabular\": \"true\", \"discover_paths\": \"true\"}, \"target_condition\": {\"target_option\": \"false\", \"__current_case__\": 0}, \"__page__\": null, \"__rerun_remap_job_id__\": null}",
+            "tool_version": null,
+            "type": "tool",
+            "uuid": "4f4625b9-e967-48e1-baf7-382de5cc949a",
+            "workflow_outputs": [
+                {
+                    "label": "Scaffold sizes for s1",
+                    "output_name": "stats",
+                    "uuid": "d03c2ebf-110c-4e8f-96fc-a31c9429c718"
+                }
+            ]
+        },
+        "10": {
+            "annotation": "",
+            "id": 10,
+            "input_connections": {
+                "gfastats output": {
+                    "id": 9,
+                    "input_subworkflow_step_id": 0,
+                    "output_name": "stats"
+                }
+            },
+            "inputs": [],
+            "label": null,
+            "name": "Plot gfastats output",
+            "outputs": [],
+            "position": {
+                "left": 2017.4857788085938,
+                "top": 174.9857940673828
+            },
+            "subworkflow": {
+                "a_galaxy_workflow": "true",
+                "annotation": "",
+                "format-version": "0.1",
+                "name": "Plot gfastats output",
+                "steps": {
+                    "0": {
+                        "annotation": "",
+                        "content_id": null,
+                        "errors": null,
+                        "id": 0,
+                        "input_connections": {},
+                        "inputs": [
+                            {
+                                "description": "",
+                                "name": "gfastats output"
+                            }
+                        ],
+                        "label": "gfastats output",
+                        "name": "Input dataset",
+                        "outputs": [],
+                        "position": {
+                            "left": 0.0,
+                            "top": 329.70169830322266
+                        },
+                        "tool_id": null,
+                        "tool_state": "{\"optional\": false, \"format\": [\"tabular\"], \"tag\": \"\"}",
+                        "tool_version": null,
+                        "type": "data_input",
+                        "uuid": "ca609462-125d-4beb-b309-a0c877040d4d",
+                        "workflow_outputs": []
+                    },
+                    "1": {
+                        "annotation": "",
+                        "content_id": "sort1",
+                        "errors": null,
+                        "id": 1,
+                        "input_connections": {
+                            "input": {
+                                "id": 0,
+                                "output_name": "output"
+                            }
+                        },
+                        "inputs": [],
+                        "label": null,
+                        "name": "Sort",
+                        "outputs": [
+                            {
+                                "name": "out_file1",
+                                "type": "input"
+                            }
+                        ],
+                        "position": {
+                            "left": 258.6363525390625,
+                            "top": 225.35511016845703
+                        },
+                        "post_job_actions": {
+                            "HideDatasetActionout_file1": {
+                                "action_arguments": {},
+                                "action_type": "HideDatasetAction",
+                                "output_name": "out_file1"
+                            }
+                        },
+                        "tool_id": "sort1",
+                        "tool_state": "{\"column\": \"2\", \"column_set\": [], \"header_lines\": \"0\", \"input\": {\"__class__\": \"ConnectedValue\"}, \"order\": \"DESC\", \"style\": \"num\", \"__page__\": null, \"__rerun_remap_job_id__\": null}",
+                        "tool_version": null,
+                        "type": "tool",
+                        "uuid": "a5c74256-22a8-41b9-a31d-05a5d85f98d4",
+                        "workflow_outputs": []
+                    },
+                    "2": {
+                        "annotation": "",
+                        "content_id": "addValue",
+                        "errors": null,
+                        "id": 2,
+                        "input_connections": {
+                            "input": {
+                                "id": 1,
+                                "output_name": "out_file1"
+                            }
+                        },
+                        "inputs": [],
+                        "label": null,
+                        "name": "Add column",
+                        "outputs": [
+                            {
+                                "name": "out_file1",
+                                "type": "input"
+                            }
+                        ],
+                        "position": {
+                            "left": 558.6078491210938,
+                            "top": 401.7045364379883
+                        },
+                        "post_job_actions": {
+                            "HideDatasetActionout_file1": {
+                                "action_arguments": {},
+                                "action_type": "HideDatasetAction",
+                                "output_name": "out_file1"
+                            }
+                        },
+                        "tool_id": "addValue",
+                        "tool_state": "{\"exp\": \"0\", \"input\": {\"__class__\": \"ConnectedValue\"}, \"iterate\": \"no\", \"__page__\": null, \"__rerun_remap_job_id__\": null}",
+                        "tool_version": null,
+                        "type": "tool",
+                        "uuid": "4ba0c5b5-904a-42eb-9c56-b4a2aeb4d6f7",
+                        "workflow_outputs": []
+                    },
+                    "3": {
+                        "annotation": "",
+                        "content_id": "toolshed.g2.bx.psu.edu/repos/bgruening/text_processing/tp_awk_tool/1.1.2",
+                        "errors": null,
+                        "id": 3,
+                        "input_connections": {
+                            "infile": {
+                                "id": 2,
+                                "output_name": "out_file1"
+                            }
+                        },
+                        "inputs": [],
+                        "label": null,
+                        "name": "Text reformatting",
+                        "outputs": [
+                            {
+                                "name": "outfile",
+                                "type": "input"
+                            }
+                        ],
+                        "position": {
+                            "left": 806.5908203125,
+                            "top": 215.04261016845703
+                        },
+                        "post_job_actions": {
+                            "HideDatasetActionoutfile": {
+                                "action_arguments": {},
+                                "action_type": "HideDatasetAction",
+                                "output_name": "outfile"
+                            }
+                        },
+                        "tool_id": "toolshed.g2.bx.psu.edu/repos/bgruening/text_processing/tp_awk_tool/1.1.2",
+                        "tool_shed_repository": {
+                            "changeset_revision": "f46f0e4f75c4",
+                            "name": "text_processing",
+                            "owner": "bgruening",
+                            "tool_shed": "toolshed.g2.bx.psu.edu"
+                        },
+                        "tool_state": "{\"code\": \"{total += $2; $3 = total}1\\n\", \"infile\": {\"__class__\": \"ConnectedValue\"}, \"__page__\": null, \"__rerun_remap_job_id__\": null}",
+                        "tool_version": null,
+                        "type": "tool",
+                        "uuid": "fedfaeec-99cf-4339-9252-7bfe20a9fed4",
+                        "workflow_outputs": []
+                    },
+                    "4": {
+                        "annotation": "",
+                        "content_id": "toolshed.g2.bx.psu.edu/repos/bgruening/text_processing/tp_tail_tool/1.1.0",
+                        "errors": null,
+                        "id": 4,
+                        "input_connections": {
+                            "infile": {
+                                "id": 3,
+                                "output_name": "outfile"
+                            }
+                        },
+                        "inputs": [],
+                        "label": null,
+                        "name": "Select last",
+                        "outputs": [
+                            {
+                                "name": "outfile",
+                                "type": "input"
+                            }
+                        ],
+                        "position": {
+                            "left": 1065.2839965820312,
+                            "top": 119.00568389892578
+                        },
+                        "post_job_actions": {
+                            "HideDatasetActionoutfile": {
+                                "action_arguments": {},
+                                "action_type": "HideDatasetAction",
+                                "output_name": "outfile"
+                            }
+                        },
+                        "tool_id": "toolshed.g2.bx.psu.edu/repos/bgruening/text_processing/tp_tail_tool/1.1.0",
+                        "tool_shed_repository": {
+                            "changeset_revision": "f46f0e4f75c4",
+                            "name": "text_processing",
+                            "owner": "bgruening",
+                            "tool_shed": "toolshed.g2.bx.psu.edu"
+                        },
+                        "tool_state": "{\"complement\": \"\", \"infile\": {\"__class__\": \"ConnectedValue\"}, \"num_lines\": \"1\", \"__page__\": null, \"__rerun_remap_job_id__\": null}",
+                        "tool_version": null,
+                        "type": "tool",
+                        "uuid": "18390451-c17f-4e44-8022-161e87d7f67d",
+                        "workflow_outputs": []
+                    },
+                    "5": {
+                        "annotation": "",
+                        "content_id": "addValue",
+                        "errors": null,
+                        "id": 5,
+                        "input_connections": {
+                            "input": {
+                                "id": 3,
+                                "output_name": "outfile"
+                            }
+                        },
+                        "inputs": [],
+                        "label": null,
+                        "name": "Add column",
+                        "outputs": [
+                            {
+                                "name": "out_file1",
+                                "type": "input"
+                            }
+                        ],
+                        "position": {
+                            "left": 1239.957275390625,
+                            "top": 336.3636245727539
+                        },
+                        "post_job_actions": {
+                            "HideDatasetActionout_file1": {
+                                "action_arguments": {},
+                                "action_type": "HideDatasetAction",
+                                "output_name": "out_file1"
+                            }
+                        },
+                        "tool_id": "addValue",
+                        "tool_state": "{\"exp\": \"1\", \"input\": {\"__class__\": \"ConnectedValue\"}, \"iterate\": \"yes\", \"__page__\": null, \"__rerun_remap_job_id__\": null}",
+                        "tool_version": null,
+                        "type": "tool",
+                        "uuid": "ab2c4c08-681d-4833-b9c4-7eb77cd9a244",
+                        "workflow_outputs": []
+                    },
+                    "6": {
+                        "annotation": "",
+                        "content_id": "Cut1",
+                        "errors": null,
+                        "id": 6,
+                        "input_connections": {
+                            "input": {
+                                "id": 4,
+                                "output_name": "outfile"
+                            }
+                        },
+                        "inputs": [],
+                        "label": null,
+                        "name": "Cut",
+                        "outputs": [
+                            {
+                                "name": "out_file1",
+                                "type": "tabular"
+                            }
+                        ],
+                        "position": {
+                            "left": 1301.7754669189453,
+                            "top": 17.30113983154297
+                        },
+                        "post_job_actions": {
+                            "HideDatasetActionout_file1": {
+                                "action_arguments": {},
+                                "action_type": "HideDatasetAction",
+                                "output_name": "out_file1"
+                            }
+                        },
+                        "tool_id": "Cut1",
+                        "tool_state": "{\"columnList\": \"c3\", \"delimiter\": \"T\", \"input\": {\"__class__\": \"ConnectedValue\"}, \"__page__\": null, \"__rerun_remap_job_id__\": null}",
+                        "tool_version": null,
+                        "type": "tool",
+                        "uuid": "43b2b235-a768-44de-8262-3c23a759e44f",
+                        "workflow_outputs": []
+                    },
+                    "7": {
+                        "annotation": "",
+                        "content_id": "param_value_from_file",
+                        "errors": null,
+                        "id": 7,
+                        "input_connections": {
+                            "input1": {
+                                "id": 6,
+                                "output_name": "out_file1"
+                            }
+                        },
+                        "inputs": [],
+                        "label": null,
+                        "name": "Parse parameter value",
+                        "outputs": [
+                            {
+                                "name": "text_param",
+                                "type": "expression.json"
+                            }
+                        ],
+                        "position": {
+                            "left": 1560.454433441162,
+                            "top": 0.0
+                        },
+                        "post_job_actions": {
+                            "HideDatasetActiontext_param": {
+                                "action_arguments": {},
+                                "action_type": "HideDatasetAction",
+                                "output_name": "text_param"
+                            }
+                        },
+                        "tool_id": "param_value_from_file",
+                        "tool_state": "{\"input1\": {\"__class__\": \"ConnectedValue\"}, \"param_type\": \"text\", \"remove_newlines\": \"true\", \"__page__\": null, \"__rerun_remap_job_id__\": null}",
+                        "tool_version": null,
+                        "type": "tool",
+                        "uuid": "bee6dc9f-17bb-4ed7-87af-e6842a7e7c95",
+                        "workflow_outputs": []
+                    },
+                    "8": {
+                        "annotation": "",
+                        "content_id": "addValue",
+                        "errors": null,
+                        "id": 8,
+                        "input_connections": {
+                            "exp": {
+                                "id": 7,
+                                "output_name": "text_param"
+                            },
+                            "input": {
+                                "id": 5,
+                                "output_name": "out_file1"
+                            }
+                        },
+                        "inputs": [],
+                        "label": null,
+                        "name": "Add column",
+                        "outputs": [
+                            {
+                                "name": "out_file1",
+                                "type": "input"
+                            }
+                        ],
+                        "position": {
+                            "left": 1671.9317016601562,
+                            "top": 423.01136016845703
+                        },
+                        "post_job_actions": {
+                            "HideDatasetActionout_file1": {
+                                "action_arguments": {},
+                                "action_type": "HideDatasetAction",
+                                "output_name": "out_file1"
+                            }
+                        },
+                        "tool_id": "addValue",
+                        "tool_state": "{\"exp\": {\"__class__\": \"ConnectedValue\"}, \"input\": {\"__class__\": \"ConnectedValue\"}, \"iterate\": \"no\", \"__page__\": null, \"__rerun_remap_job_id__\": null}",
+                        "tool_version": null,
+                        "type": "tool",
+                        "uuid": "89730b10-4e3e-46d8-81ce-b610dbb77299",
+                        "workflow_outputs": []
+                    },
+                    "9": {
+                        "annotation": "",
+                        "content_id": "toolshed.g2.bx.psu.edu/repos/devteam/column_maker/Add_a_column1/1.6",
+                        "errors": null,
+                        "id": 9,
+                        "input_connections": {
+                            "input": {
+                                "id": 8,
+                                "output_name": "out_file1"
+                            }
+                        },
+                        "inputs": [],
+                        "label": null,
+                        "name": "Compute",
+                        "outputs": [
+                            {
+                                "name": "out_file1",
+                                "type": "input"
+                            }
+                        ],
+                        "position": {
+                            "left": 1858.6504516601562,
+                            "top": 163.9772720336914
+                        },
+                        "post_job_actions": {
+                            "HideDatasetActionout_file1": {
+                                "action_arguments": {},
+                                "action_type": "HideDatasetAction",
+                                "output_name": "out_file1"
+                            }
+                        },
+                        "tool_id": "toolshed.g2.bx.psu.edu/repos/devteam/column_maker/Add_a_column1/1.6",
+                        "tool_shed_repository": {
+                            "changeset_revision": "02026300aa45",
+                            "name": "column_maker",
+                            "owner": "devteam",
+                            "tool_shed": "toolshed.g2.bx.psu.edu"
+                        },
+                        "tool_state": "{\"avoid_scientific_notation\": \"false\", \"cond\": \"c3/c5\", \"header_lines_conditional\": {\"header_lines_select\": \"no\", \"__current_case__\": 0}, \"input\": {\"__class__\": \"ConnectedValue\"}, \"round\": \"false\", \"__page__\": null, \"__rerun_remap_job_id__\": null}",
+                        "tool_version": null,
+                        "type": "tool",
+                        "uuid": "dd87097d-c004-4a4b-a735-cf8999a8116a",
+                        "workflow_outputs": []
+                    },
+                    "10": {
+                        "annotation": "",
+                        "content_id": "toolshed.g2.bx.psu.edu/repos/devteam/column_maker/Add_a_column1/1.6",
+                        "errors": null,
+                        "id": 10,
+                        "input_connections": {
+                            "input": {
+                                "id": 9,
+                                "output_name": "out_file1"
+                            }
+                        },
+                        "inputs": [],
+                        "label": null,
+                        "name": "Compute",
+                        "outputs": [
+                            {
+                                "name": "out_file1",
+                                "type": "input"
+                            }
+                        ],
+                        "position": {
+                            "left": 1965.3265686035156,
+                            "top": 505.68180084228516
+                        },
+                        "post_job_actions": {
+                            "HideDatasetActionout_file1": {
+                                "action_arguments": {},
+                                "action_type": "HideDatasetAction",
+                                "output_name": "out_file1"
+                            }
+                        },
+                        "tool_id": "toolshed.g2.bx.psu.edu/repos/devteam/column_maker/Add_a_column1/1.6",
+                        "tool_shed_repository": {
+                            "changeset_revision": "02026300aa45",
+                            "name": "column_maker",
+                            "owner": "devteam",
+                            "tool_shed": "toolshed.g2.bx.psu.edu"
+                        },
+                        "tool_state": "{\"avoid_scientific_notation\": \"false\", \"cond\": \"c2/1000000\", \"header_lines_conditional\": {\"header_lines_select\": \"no\", \"__current_case__\": 0}, \"input\": {\"__class__\": \"ConnectedValue\"}, \"round\": \"false\", \"__page__\": null, \"__rerun_remap_job_id__\": null}",
+                        "tool_version": null,
+                        "type": "tool",
+                        "uuid": "0e7194a7-1d92-4741-a607-59831af03f7d",
+                        "workflow_outputs": []
+                    },
+                    "11": {
+                        "annotation": "",
+                        "content_id": "toolshed.g2.bx.psu.edu/repos/devteam/column_maker/Add_a_column1/1.6",
+                        "errors": null,
+                        "id": 11,
+                        "input_connections": {
+                            "input": {
+                                "id": 10,
+                                "output_name": "out_file1"
+                            }
+                        },
+                        "inputs": [],
+                        "label": null,
+                        "name": "Compute",
+                        "outputs": [
+                            {
+                                "name": "out_file1",
+                                "type": "input"
+                            }
+                        ],
+                        "position": {
+                            "left": 2138.6788330078125,
+                            "top": 208.3522720336914
+                        },
+                        "post_job_actions": {
+                            "HideDatasetActionout_file1": {
+                                "action_arguments": {},
+                                "action_type": "HideDatasetAction",
+                                "output_name": "out_file1"
+                            }
+                        },
+                        "tool_id": "toolshed.g2.bx.psu.edu/repos/devteam/column_maker/Add_a_column1/1.6",
+                        "tool_shed_repository": {
+                            "changeset_revision": "02026300aa45",
+                            "name": "column_maker",
+                            "owner": "devteam",
+                            "tool_shed": "toolshed.g2.bx.psu.edu"
+                        },
+                        "tool_state": "{\"avoid_scientific_notation\": \"false\", \"cond\": \"c3/1000000\", \"header_lines_conditional\": {\"header_lines_select\": \"no\", \"__current_case__\": 0}, \"input\": {\"__class__\": \"ConnectedValue\"}, \"round\": \"false\", \"__page__\": null, \"__rerun_remap_job_id__\": null}",
+                        "tool_version": null,
+                        "type": "tool",
+                        "uuid": "4b0138d0-7b9a-471c-b26f-ea146c8385a8",
+                        "workflow_outputs": []
+                    },
+                    "12": {
+                        "annotation": "",
+                        "content_id": "toolshed.g2.bx.psu.edu/repos/iuc/ggplot2_point/ggplot2_point/3.4.0+galaxy0",
+                        "errors": null,
+                        "id": 12,
+                        "input_connections": {
+                            "input1": {
+                                "id": 11,
+                                "output_name": "out_file1"
+                            }
+                        },
+                        "inputs": [
+                            {
+                                "description": "runtime parameter for tool Scatterplot with ggplot2",
+                                "name": "input1"
+                            }
+                        ],
+                        "label": "Plotting Nx",
+                        "name": "Scatterplot with ggplot2",
+                        "outputs": [
+                            {
+                                "name": "output1",
+                                "type": "png"
+                            }
+                        ],
+                        "position": {
+                            "left": 2779.4600830078125,
+                            "top": 302.0170364379883
+                        },
+                        "post_job_actions": {
+                            "RenameDatasetActionoutput1": {
+                                "action_arguments": {
+                                    "newname": "Nx Plot"
+                                },
+                                "action_type": "RenameDatasetAction",
+                                "output_name": "output1"
+                            },
+                            "TagDatasetActionoutput1": {
+                                "action_arguments": {
+                                    "tags": "#Nx_plot"
+                                },
+                                "action_type": "TagDatasetAction",
+                                "output_name": "output1"
+                            }
+                        },
+                        "tool_id": "toolshed.g2.bx.psu.edu/repos/iuc/ggplot2_point/ggplot2_point/3.4.0+galaxy0",
+                        "tool_shed_repository": {
+                            "changeset_revision": "5fe1dc76176e",
+                            "name": "ggplot2_point",
+                            "owner": "iuc",
+                            "tool_shed": "toolshed.g2.bx.psu.edu"
+                        },
+                        "tool_state": "{\"adv\": {\"type_conditional\": {\"type_options\": \"lines\", \"__current_case__\": 2}, \"factor\": {\"factoring\": \"Default\", \"__current_case__\": 0}, \"axis_title_customization\": {\"axis_customization\": \"default\", \"__current_case__\": 0}, \"axis_text_customization\": {\"axis_customization\": \"default\", \"__current_case__\": 0}, \"plot_title_customization\": {\"axis_customization\": \"default\", \"__current_case__\": 0}, \"gridlinecust\": \"default\", \"transform\": \"none\", \"scaling\": {\"plot_scaling\": \"Automatic\", \"__current_case__\": 0}, \"theme\": \"bw\", \"legend\": \"yes\"}, \"input1\": {\"__class__\": \"RuntimeValue\"}, \"out\": {\"unit_output_dim\": \"in\", \"width_output_dim\": \"6.0\", \"height_output_dim\": \"4.0\", \"dpi_output_dim\": \"300.0\", \"additional_output_format\": \"none\"}, \"title\": \"Nx\", \"xlab\": \"x\", \"xplot\": \"6\", \"ylab\": \"Nx (Mb)\", \"yplot\": \"7\", \"__page__\": null, \"__rerun_remap_job_id__\": null}",
+                        "tool_version": null,
+                        "type": "tool",
+                        "uuid": "11a9ef0c-4170-4f52-b148-c673ac26117c",
+                        "workflow_outputs": [
+                            {
+                                "label": "Nx Plot",
+                                "output_name": "output1",
+                                "uuid": "524a8a30-d52b-4500-ade5-4a6e7d84d18a"
+                            }
+                        ]
+                    },
+                    "13": {
+                        "annotation": "",
+                        "content_id": "toolshed.g2.bx.psu.edu/repos/iuc/ggplot2_point/ggplot2_point/3.4.0+galaxy0",
+                        "errors": null,
+                        "id": 13,
+                        "input_connections": {
+                            "input1": {
+                                "id": 11,
+                                "output_name": "out_file1"
+                            }
+                        },
+                        "inputs": [
+                            {
+                                "description": "runtime parameter for tool Scatterplot with ggplot2",
+                                "name": "input1"
+                            }
+                        ],
+                        "label": "Plotting contig/scaffold size",
+                        "name": "Scatterplot with ggplot2",
+                        "outputs": [
+                            {
+                                "name": "output1",
+                                "type": "png"
+                            }
+                        ],
+                        "position": {
+                            "left": 2785.4686279296875,
+                            "top": 562.0028457641602
+                        },
+                        "post_job_actions": {
+                            "RenameDatasetActionoutput1": {
+                                "action_arguments": {
+                                    "newname": "Size Plot"
+                                },
+                                "action_type": "RenameDatasetAction",
+                                "output_name": "output1"
+                            },
+                            "TagDatasetActionoutput1": {
+                                "action_arguments": {
+                                    "tags": "#Size_plot"
+                                },
+                                "action_type": "TagDatasetAction",
+                                "output_name": "output1"
+                            }
+                        },
+                        "tool_id": "toolshed.g2.bx.psu.edu/repos/iuc/ggplot2_point/ggplot2_point/3.4.0+galaxy0",
+                        "tool_shed_repository": {
+                            "changeset_revision": "5fe1dc76176e",
+                            "name": "ggplot2_point",
+                            "owner": "iuc",
+                            "tool_shed": "toolshed.g2.bx.psu.edu"
+                        },
+                        "tool_state": "{\"adv\": {\"type_conditional\": {\"type_options\": \"lines\", \"__current_case__\": 2}, \"factor\": {\"factoring\": \"Default\", \"__current_case__\": 0}, \"axis_title_customization\": {\"axis_customization\": \"default\", \"__current_case__\": 0}, \"axis_text_customization\": {\"axis_customization\": \"default\", \"__current_case__\": 0}, \"plot_title_customization\": {\"axis_customization\": \"default\", \"__current_case__\": 0}, \"gridlinecust\": \"default\", \"transform\": \"none\", \"scaling\": {\"plot_scaling\": \"Automatic\", \"__current_case__\": 0}, \"theme\": \"bw\", \"legend\": \"yes\"}, \"input1\": {\"__class__\": \"RuntimeValue\"}, \"out\": {\"unit_output_dim\": \"in\", \"width_output_dim\": \"6.0\", \"height_output_dim\": \"4.0\", \"dpi_output_dim\": \"300.0\", \"additional_output_format\": \"none\"}, \"title\": \"Cumulative Length\", \"xlab\": \"Number\", \"xplot\": \"4\", \"ylab\": \"Cumulative length (Mb)\", \"yplot\": \"8\", \"__page__\": null, \"__rerun_remap_job_id__\": null}",
+                        "tool_version": null,
+                        "type": "tool",
+                        "uuid": "946ded4b-ac1c-4b41-92e5-e807f64b18e9",
+                        "workflow_outputs": [
+                            {
+                                "label": "Size Plot",
+                                "output_name": "output1",
+                                "uuid": "40f987a3-9aae-4271-83b4-24ed2bf1c477"
+                            }
+                        ]
+                    }
+                },
+                "tags": "",
+                "uuid": "9cdeb772-3848-4b2a-8ce6-de9cb550237d"
+            },
+            "tool_id": 177600,
+            "type": "subworkflow",
+            "uuid": "74370a78-81e8-445c-9ae4-d5c4194f17a7",
+            "workflow_outputs": []
+        }
+    },
+    "tags": [],
+    "uuid": "bc4efc55-2396-499e-b587-acce04471c4f",
+    "version": 7
+}

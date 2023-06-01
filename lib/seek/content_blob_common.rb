@@ -6,8 +6,6 @@ module Seek
       asset_version = instance_variable_get("@display_#{name}")
       @asset_version = asset_version
 
-      asset.just_used
-
       if asset.respond_to?(:openbis?) && asset.openbis?
         handle_openbis_download(asset, params[:perm_id])
       else
@@ -124,24 +122,22 @@ module Seek
     end
 
     def handle_download(disposition = 'attachment', image_size = nil)
-      if @content_blob.url.blank?
-        if @content_blob.file_exists?
-          if image_size && @content_blob.is_image_convertable?
-            @content_blob.resize_image(image_size)
-            filepath = @content_blob.full_cache_path(image_size)
-            headers['Content-Length'] = File.size(filepath).to_s
-          else
-            filepath = @content_blob.filepath
-            # added for the benefit of the tests after rails3 upgrade - but doubt it is required
-            headers['Content-Length'] = @content_blob.file_size.to_s
-          end
-          send_file filepath, filename: @content_blob.original_filename, type: @content_blob.content_type || 'application/octet-stream', disposition: disposition
+      jerm_generated = @asset_version && @asset_version.contributor.nil?
+      if @content_blob.file_exists? && !jerm_generated # JERM will try to download first
+        if image_size && @content_blob.is_image_convertable?
+          @content_blob.resize_image(image_size)
+          filepath = @content_blob.full_cache_path(image_size)
+          headers['Content-Length'] = File.size(filepath).to_s
         else
-          redirect_on_error @asset_version, "Unable to find a copy of the file for download, or an alternative location. Please contact an administrator of #{Seek::Config.instance_name}."
+          filepath = @content_blob.filepath
+          # added for the benefit of the tests after rails3 upgrade - but doubt it is required
+          headers['Content-Length'] = @content_blob.file_size.to_s
+          headers['Content-MD5'] = @content_blob.md5sum if @content_blob.md5sum
         end
-      else
+        send_file filepath, filename: @content_blob.original_filename, type: @content_blob.content_type || 'application/octet-stream', disposition: disposition
+      elsif @content_blob.url.present?
         begin
-          if @asset_version.contributor.nil? # A jerm generated resource
+          if jerm_generated
             download_jerm_asset
           else
             case URI(@content_blob.url).scheme
@@ -150,14 +146,14 @@ module Seek
             else
               stream_from_http_url
             end
-
           end
         rescue Seek::DownloadException => de
           redirect_on_error @asset_version, 'There was an error accessing the remote resource, and a local copy was not available. Please try again later when the remote resource may be available again.'
         rescue Jerm::JermException => de
           redirect_on_error @asset_version, de.message
         end
-
+      else
+        redirect_on_error @asset_version, "Unable to find a copy of the file for download, or an alternative location. Please contact an administrator of #{Seek::Config.instance_name}."
       end
     end
 
@@ -188,7 +184,7 @@ module Seek
       info = Seek::DownloadHandling::HTTPHandler.new(@content_blob.url).info
       case info[:code]
       when 200
-        stream_with(Seek::DownloadHandling::HTTPStreamer.new(@content_blob.url))
+        stream_with(Seek::DownloadHandling::HTTPStreamer.new(@content_blob.url), info)
       when 401, 403
         # Try redirecting the user to the URL if SEEK cannot access it
         redirect_to @content_blob.url
@@ -207,8 +203,9 @@ module Seek
       stream_with(Seek::DownloadHandling::FTPStreamer.new(@content_blob.url))
     end
 
-    def stream_with(streamer)
+    def stream_with(streamer, info={})
       response.headers['Content-Type'] = @content_blob.content_type
+      response.headers['Content-Length'] = info[:file_size].to_s if info[:file_size]
       response.headers['Content-Disposition'] = "attachment; filename=#{@content_blob.original_filename}"
       response.headers['Last-Modified'] = Time.now.ctime.to_s
 

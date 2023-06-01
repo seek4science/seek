@@ -541,7 +541,7 @@ end
   # http://bioruby.org/rdoc/Bio/Reference.html
   # @export_type a registered mime_type that is a valid key to EXPORT_TYPES
   def export(export_type)
-    bio_reference.format(EXPORT_TYPES[export_type][:format])
+    bio_reference.format(EXPORT_TYPES[export_type][:format])&.force_encoding('utf-8')
   end
 
   def publication_author_names

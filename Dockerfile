@@ -1,7 +1,7 @@
 FROM ruby:2.7-buster
 
 LABEL maintainer="Stuart Owen <orcid.org/0000-0003-2130-0865>, Finn Bacall"
-
+ARG SOURCE_COMMIT
 ENV APP_DIR /seek
 ENV RAILS_ENV=production
 
@@ -29,7 +29,9 @@ WORKDIR $APP_DIR
 # Bundle install throw errors if Gemfile has been modified since Gemfile.lock
 COPY Gemfile* ./
 RUN bundle config --local frozen 1 && \
-    bundle install --deployment --without development test
+    bundle config set deployment 'true' && \
+    bundle config set without 'development test' && \
+    bundle install
 
 # App code
 COPY . .
@@ -37,6 +39,7 @@ RUN mkdir log tmp
 COPY docker/virtuoso_settings.docker.yml config/virtuoso_settings.yml
 
 USER root
+RUN if [ -n "$SOURCE_COMMIT" ] ; then echo $SOURCE_COMMIT > config/.git-revision ; fi
 RUN chown -R www-data solr config docker public /var/www db/schema.rb
 USER www-data
 RUN touch config/using-docker #allows us to see within SEEK we are running in a container

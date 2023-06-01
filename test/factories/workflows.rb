@@ -47,6 +47,17 @@ Factory.define(:jupyter_workflow_class, class: WorkflowClass) do |f|
   f.description 'Jupyter Notebook'
 end
 
+Factory.define(:user_added_workflow_class, class: WorkflowClass) do |f|
+  f.sequence(:title) { |n| "User-added Type #{n}" }
+  f.contributor { Factory(:person) }
+end
+
+Factory.define(:user_added_workflow_class_with_logo, class: WorkflowClass) do |f|
+  f.sequence(:title) { |n| "User-added Type with Logo #{n}" }
+  f.avatar
+  f.contributor { Factory(:person) }
+end
+
 # Workflow
 Factory.define(:workflow) do |f|
   f.title 'This Workflow'
@@ -259,15 +270,30 @@ Factory.define(:local_ro_crate_git_workflow, class: Workflow) do |f|
   end
 end
 
+Factory.define(:local_ro_crate_git_workflow_with_tests, class: Workflow) do |f|
+  f.title 'Sort and change case'
+  f.with_project_contributor
+  f.workflow_class { WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class) }
+  f.git_version_attributes do
+    repo = Factory(:workflow_ro_crate_repository)
+    { git_repository_id: repo.id,
+      ref: 'refs/heads/tests',
+      commit: '612f7f7',
+      main_workflow_path: 'sort-and-change-case.ga',
+      mutable: false
+    }
+  end
+end
+
 Factory.define(:nfcore_git_workflow, class: Workflow) do |f|
-  f.title 'nf-core/ampliseq'
+  f.title 'nf-core/rnaseq'
   f.with_project_contributor
   f.workflow_class { WorkflowClass.find_by_key('nextflow') || Factory(:nextflow_workflow_class) }
   f.git_version_attributes do
     repo = Factory(:nfcore_local_rocrate_repository)
     { git_repository_id: repo.id,
       ref: 'refs/heads/master',
-      commit: 'fda2a6add4b4c2a9ec02b40485adbce690cf4429',
+      commit: '3643a94411b65f42bce5357c5015603099556ad9',
       main_workflow_path: 'main.nf',
       mutable: true
     }

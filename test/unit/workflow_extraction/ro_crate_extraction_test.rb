@@ -75,4 +75,12 @@ class RoCrateExtractionTest < ActiveSupport::TestCase
     assert_nil fourth[:orcid]
     assert_equal 3, fourth[:pos]
   end
+
+  test 'handles RO-Crate with remote directories' do
+    assert_nothing_raised do
+      wf = open_fixture_file('workflows/COMPSs_RO-Crate.crate.zip')
+      extractor = Seek::WorkflowExtractors::ROCrate.new(wf)
+      extractor.metadata
+    end
+  end
 end

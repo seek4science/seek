@@ -142,6 +142,11 @@ class ApplicationRecord < ActiveRecord::Base
     false
   end
 
+  def contributor_credited?
+    return false unless respond_to?(:contributor) && respond_to?(:creators)
+    creators.empty?
+  end
+
   def cache_key_fragment
     base = "#{self.class.name.underscore}-#{id}"
     base << "-#{version}" if versioned?
@@ -175,4 +180,7 @@ class ApplicationRecord < ActiveRecord::Base
     "rli_title_#{cache_key}"
   end
 
+  def updated_last_by
+    ActivityLog.where(activity_loggable:self, action:'update').last&.culprit&.person
+  end
 end

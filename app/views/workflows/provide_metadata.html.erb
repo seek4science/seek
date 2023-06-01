@@ -7,22 +7,22 @@
   <%= hidden_field_tag 'revision_comments', params[:revision_comments] %>
 
   <div class="asset_form">
-    <% if @errors && @errors.any? %>
-      <div class="alert alert-danger">
+    <% if @workflow.extraction_errors.present? %>
+      <div class="alert alert-danger" id="extraction-errors">
         <strong>Extraction errors:</strong>
         <ul>
-          <% @errors.each do |error| %>
+          <% @workflow.extraction_errors.each do |error| %>
             <li><%= error %></li>
           <% end %>
         </ul>
       </div>
     <% end %>
 
-    <% if @warnings && @warnings.any? %>
-      <div class="alert alert-warning">
+    <% if @workflow.extraction_warnings.present? %>
+      <div class="alert alert-warning" id="extraction-warnings">
         <strong>Extraction warnings:</strong>
         <ul>
-          <% @warnings.each do |warning| %>
+          <% @workflow.extraction_warnings.each do |warning| %>
             <li><%= warning %></li>
           <% end %>
         </ul>

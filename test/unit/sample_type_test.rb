@@ -318,6 +318,21 @@ class SampleTypeTest < ActiveSupport::TestCase
     refute type.validate_value?('apples', nil)
   end
 
+
+  test 'list controlled vocab sample type validate_value' do
+    vocab = Factory(:apples_sample_controlled_vocab)
+    type = Factory(:apples_list_controlled_vocab_sample_type)
+
+    type.sample_attributes.first.sample_controlled_vocab = vocab
+    type.sample_attributes.first.save!
+    assert type.valid?
+    assert_equal 4, type.sample_attributes.first.sample_controlled_vocab.sample_controlled_vocab_terms.count
+
+    assert type.validate_value?('apples', ['Granny Smith'])
+    refute type.validate_value?('apples','Granny Smith')
+    refute type.validate_value?('apples',['Peter','Granny Smith'])
+  end
+
   test 'must have one title attribute' do
     sample_type = SampleType.new title: 'No title', project_ids: @project_ids, contributor: @person
     sample_type.sample_attributes << Factory(:sample_attribute, title: 'full name', sample_attribute_type: Factory(:full_name_sample_attribute_type), required: true, is_title: false, sample_type: sample_type)
@@ -909,6 +924,74 @@ class SampleTypeTest < ActiveSupport::TestCase
     assert_equal 'M12 9LL', sample.title
     # timestamps shouldn't change
     assert_equal updated_at, sample.updated_at
+  end
+
+  test 'adding a creator' do
+    User.current_user = @person.user
+    creator = Factory :person
+    sample_type = Factory(:simple_sample_type, contributor: @person)
+    params = { creator_ids: [creator.id] }
+    assert_difference('sample_type.creators.count') do
+      assert_difference('AssetsCreator.count') do
+        sample_type.update!(params)
+      end
+    end
+    sample_type.reload
+    assert_equal [creator], sample_type.creators
+  end
+
+  test 'updating a creator' do
+    User.current_user = @person.user
+    # Set creator
+    creator = Factory :person
+    sample_type = Factory(:simple_sample_type, contributor: @person)
+    params = { creator_ids: [creator.id] }
+    sample_type.update!(params)
+    # Update creator
+    new_creator = Factory :person
+    params = { creator_ids: [new_creator.id] }
+    assert_no_difference('AssetsCreator.count') do
+      assert_no_difference('sample_type.creators.count') do
+        sample_type.update!(params)
+      end
+    end
+    sample_type.reload
+    assert_equal [new_creator], sample_type.creators
+  end
+
+  test 'removing a creator' do
+    User.current_user = @person.user
+    # Set creator
+    creator = Factory :person
+    sample_type = Factory(:simple_sample_type, contributor: @person)
+    params = { creator_ids: [creator.id] }
+    sample_type.update!(params)
+    # Remove creator
+    params = { creator_ids: [] }
+    assert_difference('sample_type.creators.count', -1) do
+      assert_difference('AssetsCreator.count', -1) do
+        sample_type.update!(params)
+      end
+    end
+    sample_type.reload
+    assert_empty sample_type.creators
+  end
+
+  test 'other creators' do
+    User.current_user = @person.user
+    sample_type = Factory(:simple_sample_type, contributor: @person)
+    params = { other_creators: 'Jane Smith, John Smith' }
+    sample_type.update!(params)
+    sample_type.reload
+    assert_equal 'Jane Smith, John Smith', sample_type.other_creators
+  end
+
+  test 'contributor_credited?' do
+    sample_type = Factory(:simple_sample_type, contributor: @person)
+    assert sample_type.contributor_credited?
+
+    sample_type = Factory(:simple_sample_type, contributor: @person, assets_creators:[AssetsCreator.new(creator:Factory(:person))])
+    refute sample_type.contributor_credited?
   end
 
   private

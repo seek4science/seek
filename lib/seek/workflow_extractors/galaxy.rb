@@ -55,9 +55,17 @@ module Seek
 
         metadata[:internals] ||= {}
         metadata[:internals][:steps] = []
+        tool_ids = []
         galaxy['steps'].each do |num, step|
+          tool_id = step['tool_id']
+          if tool_id.present?
+            tool_id = tool_id.to_s
+            tool_ids << tool_id
+          end
           unless ['data_input', 'data_collection_input', 'parameter_input'].include?(step['type'])
-            metadata[:internals][:steps] << { id: step['id'].to_s, name: step['label'] || step['name'], description: (step['annotation'] || '') + "\n " + (step['tool_id'] || '') }
+            metadata[:internals][:steps] << { id: step['id'].to_s,
+                                              name: step['label'] || step['name'],
+                                              description: [step['annotation'], tool_id].reject(&:blank?).map(&:to_s).join("\n") }
           end
         end
 
@@ -78,6 +86,9 @@ module Seek
         end
 
         metadata[:tags] = galaxy['tags']
+
+        tools = tool_ids.uniq.map { |i| ::Galaxy::ToolMap.instance.lookup(i, strip_version: true) }.compact.uniq
+        metadata[:tools_attributes] = tools if tools.any?
 
         metadata
       end

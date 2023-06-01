@@ -837,4 +837,75 @@ class ProgrammesControllerTest < ActionController::TestCase
     end
   end
 
+  test 'people programmes through nested routing' do
+    assert_routing 'people/2/programmes', controller: 'programmes', action: 'index', person_id: '2'
+    admin = Factory(:admin)
+    person = Factory(:programme_administrator)
+    programme = person.programmes.first
+    project = Factory(:project)
+    person.add_to_project_and_institution(project, Factory(:institution))
+    programme2 = Factory(:programme, projects: [project])
+    programme3 = Factory(:programme)
+    person.save!
+    person.reload
+    assert_equal [programme, programme2], person.related_programmes
+
+    get :index, params: { person_id: person.id }
+    assert_response :success
+    assert_select 'div.list_item_title' do
+      assert_select 'a[href=?]', programme_path(programme), text: programme.title
+      assert_select 'a[href=?]', programme_path(programme2), text: programme2.title
+      assert_select 'a[href=?]', programme_path(programme3), text: programme3.title, count: 0
+    end
+
+    # inactive should be hidden from non admins
+    programme.update_column(:is_activated, false)
+
+    get :index, params: { person_id: person.id }
+    assert_response :success
+    assert_select 'div.list_item_title' do
+      assert_select 'a[href=?]', programme_path(programme), text: programme.title, count: 0
+      assert_select 'a[href=?]', programme_path(programme2), text: programme2.title
+      assert_select 'a[href=?]', programme_path(programme3), text: programme3.title, count: 0
+    end
+
+    login_as(person)
+    get :index, params: { person_id: person.id }
+    assert_response :success
+    assert_select 'div.list_item_title' do
+      assert_select 'a[href=?]', programme_path(programme), text: programme.title
+      assert_select 'a[href=?]', programme_path(programme2), text: programme2.title
+      assert_select 'a[href=?]', programme_path(programme3), text: programme3.title, count: 0
+    end
+
+    login_as(admin)
+    get :index, params: { person_id: person.id }
+    assert_response :success
+    assert_select 'div.list_item_title' do
+      assert_select 'a[href=?]', programme_path(programme), text: programme.title
+      assert_select 'a[href=?]', programme_path(programme2), text: programme2.title
+      assert_select 'a[href=?]', programme_path(programme3), text: programme3.title, count: 0
+    end
+  end
+
+  test 'Empty programmes should show programme administrators as related people' do
+    person1 = Factory(:programme_administrator_not_in_project)
+    person2 = Factory(:programme_administrator_not_in_project)
+    prog1 = Factory(:min_programme, programme_administrators: [person1, person2])
+
+    assert person1.projects.empty?
+
+    get :show, params: { id: prog1.id }
+    assert_response :success
+
+    assert_select 'h2', text: /Related items/i
+    assert_select 'div.list_items_container' do
+      assert_select 'div.list_item' do
+        assert_select 'div.list_item_title' do
+          assert_select 'a[href=?]', person_path(person1), text: person1.title
+          assert_select 'a[href=?]', person_path(person2), text: person2.title
+        end
+      end
+    end
+  end
 end

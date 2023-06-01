@@ -93,3 +93,17 @@ end
 Factory.define(:public_presentation, parent: :presentation) do |f|
   f.policy { Factory(:downloadable_public_policy) }
 end
+
+Factory.define(:presentation_version_with_remote_content, parent: :presentation_version) do |f|
+  f.after_create do |presentation_version|
+    if presentation_version.content_blob.blank?
+      presentation_version.content_blob = Factory.create(:content_blob, url: "https://www.youtube.com/watch?v=Ffbl_6p_MRQ",
+                                                         asset: presentation_version.presentation,
+                                                         asset_version: presentation_version)
+    else
+      presentation_version.content_blob.asset = presentation_version.presentation
+      presentation_version.content_blob.asset_version = presentation_version.version
+      presentation_version.content_blob.save
+    end
+  end
+end

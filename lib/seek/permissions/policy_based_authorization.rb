@@ -261,10 +261,6 @@ module Seek
         auth_lookup.where(user_id: 0).batch_update([false, false, false, false, false]) if policy.sharing_scope == Policy::ALL_USERS
       end
 
-      def contributor_credited?
-        !respond_to?(:creators) || creators.empty?
-      end
-
       # item is accessible to members of the projects passed. Ignores additional restrictions, such as additional permissions to block particular members.
       # if items is a downloadable it needs to be ACCESSIBLE, otherwise just VISIBLE
       def projects_accessible?(projects)

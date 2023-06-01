@@ -48,16 +48,6 @@ class AssetTest < ActiveSupport::TestCase
     assert d.versions[1].latest_version?
   end
 
-  test 'just used' do
-    model = Factory :model
-    t = 1.day.ago
-    assert_not_equal t.to_i, model.last_used_at.to_i
-    travel_to(t) do
-      model.just_used
-    end
-    assert_equal t.to_i, model.last_used_at.to_i
-  end
-
   test 'assay type titles' do
     df = Factory :data_file
     assay = Factory :experimental_assay
@@ -499,4 +489,24 @@ class AssetTest < ActiveSupport::TestCase
     refute ActiveRecord::Base.cache_versioning
   end
 
+  test 'last updated by' do
+    assets = %i[data_file sop model presentation document event assay investigation study]
+    assets.each do |asset_key|
+      person1 = Factory(:person)
+      person2 = Factory(:person)
+      User.with_current_user(person1.user) do
+        asset = Factory(asset_key, contributor: person1)
+        Factory :activity_log, activity_loggable: asset, action: 'create', created_at: 15.minute.ago, culprit: person1
+        assert_nil asset.updated_last_by
+        Factory :activity_log, activity_loggable: asset, action: 'update', created_at: 10.minute.ago, culprit: person1
+        assert_equal person1, asset.updated_last_by
+        Factory :activity_log, activity_loggable: asset, action: 'update', created_at: 5.minute.ago, culprit: person1.user
+        assert_equal person1, asset.updated_last_by
+        Factory :activity_log, activity_loggable: asset, action: 'update', created_at: 1.minute.ago, culprit: person2
+        assert_equal person2, asset.updated_last_by
+        person2.delete
+        assert_nil asset.updated_last_by
+      end
+    end
+  end
 end

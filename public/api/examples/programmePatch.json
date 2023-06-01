@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "12",
+    "id": "1296",
     "type": "programmes",
     "attributes": {
       "title": "Changed title",
@@ -15,7 +15,7 @@
       "projects": {
         "data": [
           {
-            "id": "433",
+            "id": "7653",
             "type": "projects"
           }
         ]
@@ -23,7 +23,15 @@
       "administrators": {
         "data": [
           {
-            "id": "404",
+            "id": "5588",
+            "type": "people"
+          }
+        ]
+      },
+      "people": {
+        "data": [
+          {
+            "id": "5588",
             "type": "people"
           }
         ]

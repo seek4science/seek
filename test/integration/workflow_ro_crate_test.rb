@@ -41,6 +41,7 @@ class WorkflowRoCrateTest < ActionDispatch::IntegrationTest
       assert_enqueued_jobs(1, only: RemoteGitContentFetchingJob) do
         v.add_remote_file('blah.txt', 'http://internet.internet/file')
         v.add_remote_file('blah2.txt', 'http://internet.internet/another_file', fetch: false)
+        disable_authorization_checks { v.save! }
       end
     end
 
@@ -71,6 +72,9 @@ class WorkflowRoCrateTest < ActionDispatch::IntegrationTest
         assert zipfile.find_entry('images/workflow-diagram.png').symlink?
         refute zipfile.find_entry('diagram.png').symlink?
       end
+
+      # clean up the ro-crate file
+      File.delete(Workflow::Git::Version.find(git_version.id).send(:ro_crate_path))
     end
   end
 
@@ -89,6 +93,9 @@ class WorkflowRoCrateTest < ActionDispatch::IntegrationTest
         assert zipfile.find_entry('ro-crate-metadata.json')
         assert zipfile.find_entry('ro-crate-preview.html')
       end
+
+      # clean up the ro-crate file
+      File.delete(git_version.send(:ro_crate_path))
     end
   end
 
@@ -111,6 +118,9 @@ class WorkflowRoCrateTest < ActionDispatch::IntegrationTest
         assert zipfile.find_entry('ro-crate-metadata.json')
         assert zipfile.find_entry('ro-crate-preview.html')
       end
+
+      # clean up the ro-crate file
+      File.delete(git_version.send(:ro_crate_path))
     end
   end
 end

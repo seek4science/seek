@@ -38,6 +38,9 @@ google_analytics_tracker_id:
 piwik_analytics_url:
 exception_notification_enabled:
 exception_notification_recipients:
+error_grouping_enabled:
+error_grouping_timeout:
+error_grouping_log_base:
 sycamore_enabled:
 project_news_enabled:
 project_news_feed_urls:
@@ -248,3 +251,7 @@ observed_variables_enabled:
 observed_variable_sets_enabled:
 fair_signposting_enabled:
 bio_tools_enabled:
+require_cookie_consent:
+galaxy_tool_sources:
+regular_job_offset:
+  convert: :to_i

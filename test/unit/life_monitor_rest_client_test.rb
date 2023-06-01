@@ -57,4 +57,21 @@ class LifeMonitorRestClientTest < ActiveSupport::TestCase
       refute @client.exists?(@workflow.latest_version)
     end
   end
+
+  test 'list workflows' do
+    VCR.use_cassette('life_monitor/list_workflows') do
+      response = @client.list_workflows
+      assert_equal 2, response['items'].count
+
+      name = 'Concat two files'
+      wf = response['items'].detect { |i| i['name'] == name }
+      assert wf, "Couldn't find '#{name}' workflow in response"
+      assert_equal 'all_failing', wf.dig('status', 'aggregate_test_status')
+
+      name = 'sort-and-change-case'
+      wf = response['items'].detect { |i| i['name'] == name }
+      assert wf, "Couldn't find '#{name}' workflow in response"
+      assert_equal 'all_passing', wf.dig('status', 'aggregate_test_status')
+    end
+  end
 end
