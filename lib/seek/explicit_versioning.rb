@@ -63,11 +63,11 @@ module Seek
           end
 
           def latest_version
-            parent.latest_version
+            parent.latest_standard_version
           end
 
           def previous_version
-            parent.previous_version(self.version)
+            parent.previous_standard_version(self.version)
           end
 
           def versions
@@ -75,7 +75,7 @@ module Seek
           end
 
           def latest_version?
-            parent.latest_version == self
+            parent.latest_standard_version == self
           end
 
           def is_a_version?
@@ -155,25 +155,25 @@ module Seek
       end
 
       # Finds a specific version of this model.
-      def find_version(version)
+      def find_standard_version(version)
         return version if version.is_a?(self.class.versioned_class)
         return nil if version.is_a?(ActiveRecord::Base)
-        find_versions(conditions: ['version = ?', version], limit: 1).first
+        find_standard_versions(conditions: ['version = ?', version], limit: 1).first
       end
 
       # Returns the most recent version
-      def latest_version
-        versions.last
+      def latest_standard_version
+        standard_versions.last
       end
 
       # Returns the previous version
-      def previous_version(base = self.version)
-        versions.where('version < ?', base).last
+      def previous_standard_version(base = latest_standard_version.version)
+        standard_versions.where('version < ?', base).last
       end
 
       # Finds versions of this model.  Takes an options hash like <tt>find</tt>
-      def find_versions(options = {})
-        relation = versions
+      def find_standard_versions(options = {})
+        relation = standard_versions
         relation = relation.where(options[:conditions]) if options[:conditions]
         relation = relation.joins(options[:joins]) if options[:joins]
         relation = relation.limit(options[:limit]) if options[:limit]
@@ -195,7 +195,7 @@ module Seek
       def update_version(version_number_to_update, attributes)
         return false if version_number_to_update.nil? || version_number_to_update.to_i < 1
         return false if attributes.nil? || attributes.empty?
-        return false unless (ver = find_version(version_number_to_update))
+        return false unless (ver = find_standard_version(version_number_to_update))
 
         rtn = ver.update(attributes)
 
@@ -212,14 +212,14 @@ module Seek
       end
 
       def destroy_version(version_number)
-        if (ver = find_version(version_number))
+        if (ver = find_standard_version(version_number))
           without_update_callbacks do
             # For fault tolerance (ie: to prevent data loss through premature deletion), first...
             # Check to see if the current (aka latest) version has to be deleted,
             # and if so update the main table with the data from the version that will become the latest
             if version_number.to_i == send(self.class.version_column)
-              if versions.count > 1
-                to_be_latest_version = versions[versions.count - 2].version
+              if standard_versions.count > 1
+                to_be_latest_version = standard_versions[standard_versions.count - 2].version
               else
                 return false
               end
@@ -236,25 +236,18 @@ module Seek
         end
       end
 
-      def describe_version(version_number)
-        return '' if versions.count < 2
-        return '(earliest)' if version_number == versions.first.version
-        return '(latest)' if version_number == versions.last.version
-        ''
-      end
-
       def without_update_callbacks(&block)
         self.class.without_update_callbacks(&block)
       end
 
       def empty_callback() end #:nodoc:
 
-      def visible_versions(user = User.current_user)
+      def visible_standard_versions(user = User.current_user)
         scopes = [ExplicitVersioning::VISIBILITY_INV[:public]]
         scopes << ExplicitVersioning::VISIBILITY_INV[:registered_users] if user&.person&.member?
         scopes << ExplicitVersioning::VISIBILITY_INV[:private] if can_manage?(user)
 
-        versions.where(visibility: scopes)
+        standard_versions.where(visibility: scopes)
       end
 
       protected
@@ -303,7 +296,7 @@ module Seek
       # This method updates the latest version entry in the versioned table with the data
       # from the main table (since those two entries should always have the same data).
       def sync_latest_version
-        ver = versions.last
+        ver = standard_versions.last
         if ver.nil?
           save_as_new_version
         else
@@ -316,7 +309,7 @@ module Seek
       # and also updates the corresponding version column in the main table to reflect this.
       # Note: this method on its own should not be used to revert to previous versions as it doesn't actualy delete any versions.
       def update_main_to_version(version_number, process_file_columns = true)
-        if (ver = find_version(version_number))
+        if (ver = find_standard_version(version_number))
           clone_versioned_model(ver, self, process_file_columns)
           send("#{self.class.version_column}=", version_number)
 
@@ -390,8 +383,8 @@ module Seek
 
       # Gets the next available version for the current record, or 1 for a new record
       def next_version
-        return 1 if new_record? || versions.empty?
-        (versions.maximum(:version) || 0) + 1
+        return 1 if new_record? || standard_versions.empty?
+        (standard_versions.maximum(:version) || 0) + 1
       end
 
       # Returns an array of attribute keys that are versioned.  See non_versioned_columns
