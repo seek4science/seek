@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - ansible
+      - ansible-3.1
+      - full-test-suite
   workflow_dispatch:
 
 jobs:
