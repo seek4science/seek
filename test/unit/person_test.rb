@@ -185,8 +185,7 @@ class PersonTest < ActiveSupport::TestCase
     strain = FactoryBot.create(:strain,contributor:person)
     sample = FactoryBot.create(:sample,contributor:person)
 
-
-    items = person.contributed_items
+    items = person.reload.contributed_items
 
     assert_equal 6, items.count
     assert_includes items, df
@@ -199,14 +198,14 @@ class PersonTest < ActiveSupport::TestCase
     person = FactoryBot.create(:person_in_project)
     assert_nil person.user
 
-    assert_empty person.contributed_items
+    assert_empty person.reload.contributed_items
 
     df = FactoryBot.create(:data_file, contributor: person)
     inv = FactoryBot.create(:investigation, contributor:person)
     study = FactoryBot.create(:study, contributor: person,investigation:inv)
     as = FactoryBot.create(:assay, contributor: person,study:study)
 
-    items = person.contributed_items
+    items = person.reload.contributed_items
 
     assert_equal 4, items.count
     assert_includes items, df
