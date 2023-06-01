@@ -786,7 +786,7 @@ class WorkflowTest < ActiveSupport::TestCase
   test 'sets deleted_contributor after contributor deleted' do
     workflow = FactoryBot.create(:local_git_workflow)
     assert_nil workflow.deleted_contributor
-    refute item.has_deleted_contributor?
+    refute workflow.has_deleted_contributor?
 
     disable_authorization_checks do
       workflow.contributor.destroy!
@@ -794,6 +794,6 @@ class WorkflowTest < ActiveSupport::TestCase
 
     workflow.reload
     assert workflow.deleted_contributor
-    assert item.has_deleted_contributor?
+    assert workflow.has_deleted_contributor?
   end
 end
