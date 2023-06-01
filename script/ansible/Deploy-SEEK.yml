@@ -120,70 +120,15 @@
 
     ########## Install ruby
 
-    - name: Download openssl for Ruby 2.7.x
-      become: true
-      become_user: root
-      shell: bash -lc "{{ item }}"
-      with_items:
-        - wget https://www.openssl.org/source/openssl-1.1.1g.tar.gz -P '{{git_dest}}/'
-        - tar zxvf '{{git_dest}}/openssl-1.1.1g.tar.gz' -C '{{git_dest}}/'
-      args:
-        chdir: '{{git_dest}}'
-      run_once: true
-      when: ansible_distribution_version is version('22.04', '>=')
-      tags:
-        - openssl
-        - ruby
-
-    - name: Install openssl for Ruby 2.7.x
-      become: true
-      become_user: root
-      shell: bash -lc "{{ item }}"
-      with_items:
-        - ./config --prefix='{{git_dest}}/.openssl/openssl-1.1.1g' --openssldir='{{git_dest}}/.openssl/openssl-1.1.1g'
-        - make
-        - make install
-        - rm -rf '{{git_dest}}/.openssl/openssl-1.1.1g/certs'
-        - ln -s /etc/ssl/certs '{{git_dest}}/.openssl/openssl-1.1.1g/certs'
-      args:
-        chdir: '{{git_dest}}/openssl-1.1.1g'
-      run_once: true
-      when: ansible_distribution_version is version('22.04', '>=')
-      tags:
-        - openssl
-        - ruby
-
-    - name: Cleanup openssl for Ruby 2.7.x
-      become: true
-      become_user: root
-      ansible.builtin.file:
-        path: "{{ item }}"
-        state: absent
-      with_items:
-        - '{{git_dest}}/openssl-1.1.1g'
-        - '{{git_dest}}/openssl-1.1.1g.tar.gz'
-      run_once: true
-      when: ansible_distribution_version is version('22.04', '>=')
-      tags:
-        - openssl
-        - ruby
-
     - name: Reset connection  #To allow user changes to affect 'current login user'
       meta: reset_connection
       tags: ruby
 
-    - name:  Install Ruby (Ubuntu >= 22.04)
-      shell: bash -lc "{{ item }}"    #The bash -lc "{{ item }}" wrapper around the shell commands (items) makes sure rvm environment variables are available.
-      with_items:
-        - rvm install $(cat '{{git_dest}}/SEEK/.ruby-version') --with-openssl-dir='{{git_dest}}/.openssl/openssl-1.1.1g'
-      when: ansible_distribution_version is version('22.04', '>=')
-      tags: ruby
 
-    - name:  Install Ruby (Ubuntu < 22.04)
+    - name:  Install Ruby
       shell: bash -lc "{{ item }}"
       with_items:
         - rvm install $(cat '{{git_dest}}/SEEK/.ruby-version')
-      when: ansible_distribution_version is version('22.04', '<')
       tags: ruby
 
     - name: Set default Ruby
