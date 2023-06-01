@@ -23,7 +23,7 @@ module Git
           after_update :sync_resource_attributes
 
           def is_git_versioned?
-            git_versions.any? || !@git_version_attributes.blank?
+            git_versions.any? || @git_version_attributes.present?
           end
 
           def is_git_versioned=(truth)
@@ -45,6 +45,10 @@ module Git
 
           def latest_git_version
             git_versions.last
+          end
+
+          def previous_git_version(base = latest_git_version.version)
+            git_versions.where('version < ?', base).last
           end
 
           def save_git_version_on_create
