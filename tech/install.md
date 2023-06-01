@@ -118,7 +118,16 @@ Ruby and RubyGems version. Although you can use the version that comes with
 your linux distribution, it is more difficult to control the version you use
 and keep up to date.
 
-To install RVM on Ubuntu there is package available described at <https://github.com/rvm/ubuntu_rvm>, otherwise follow the steps at <https://rvm.io/rvm/install> .
+To install RVM on Ubuntu there is package available described at <https://github.com/rvm/ubuntu_rvm>, the steps being
+
+    sudo apt-add-repository -y ppa:rael-gc/rvm
+    sudo apt-get update
+    sudo apt-get install rvm
+    sudo usermod -a -G rvm $USER
+
+... the guide recommends rebooting here, but logging in and out again usually works.
+
+Other ways to install RVM can be found at <https://rvm.io/rvm/install> .
 
 now install the appropriate version of Ruby
 
