@@ -5,6 +5,7 @@ on:
     branches:
       - ansible
       - full-test-suite
+      - ansible-3.1
   workflow_dispatch:
 
 jobs:
