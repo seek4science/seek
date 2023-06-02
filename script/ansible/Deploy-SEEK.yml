@@ -91,6 +91,10 @@
         usermod -a -G rvm '{{user_var}}'
       tags: rvm
 
+    - name: Reset connection  #To allow user changes to take affect with new login shell
+        meta: reset_connection
+        tags: ruby
+
 
     ########## Clone SEEK
 
@@ -119,11 +123,6 @@
 
 
     ########## Install ruby
-
-    - name: Reset connection  #To allow user changes to affect 'current login user'
-      meta: reset_connection
-      tags: ruby
-
 
     - name:  Install Ruby
       shell: bash -lc "{{ item }}"
