@@ -83,7 +83,8 @@ class PoliciesController < ApplicationController
       format.html { render partial: 'permissions/preview_permissions',
                            locals: { resource: resource, policy: policy, privileged_people: privileged_people,
                                      updated_can_publish_immediately: ucpi || !resource.policy.access_type_changed? || !trying_to_publish,
-                                     send_request_publish_approval: !resource.is_waiting_approval?(current_user)}}
+                                     send_request_publish_approval: !resource.is_waiting_approval?(current_user),
+                                     publish_approval_rejected: resource.is_rejected?}}
     end
   end
 
@@ -95,6 +96,8 @@ class PoliciesController < ApplicationController
       #FIXME: need to use User.current_user here because of the way the function tests in PolicyControllerTest work, without correctly creating the session and @request etc
     elsif projects.any? { |p| p.asset_gatekeepers.any? } && !projects.any? { |p| User.current_user.person.is_asset_gatekeeper?(p) }
       false
+    elsif !projects.any?
+      !resource.gatekeeper_required?
     else
       true
     end

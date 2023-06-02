@@ -5,6 +5,7 @@
   effective_permissions = permissions.reject { |p| p.access_type <= policy.access_type }
   sorted_permissions = effective_permissions.sort_by { |p| Permission::PRECEDENCE.index(p.contributor_type) }
   grouped_contributors = group_by_access_type(sorted_permissions, privileged_people, downloadable)
+  publish_approval_rejected = publish_approval_rejected || false
 %>
 
 <div class="modal fade" id="preview_permissions" tabindex="-1" role="dialog" aria-labelledby="preview_permissions_title" aria-hidden="true">
@@ -21,6 +22,11 @@
         <% else %>
             <p class='public'>All visitors can <strong><%= Policy.get_access_type_wording(policy.access_type, downloadable).downcase -%></strong>.</p>
             <% unless updated_can_publish_immediately %>
+                <% if publish_approval_rejected %>
+                  <div class='gatekeeper_notice alert alert-warning'>
+                    You requested the publishing approval from one of the <%= t('asset_gatekeeper').downcase.pluralize %> of the <%= t('project').pluralize -%> associated with this <%= t(resource_name) -%>, and <span style="font-weight: bold;">it was rejected</span>.<br>Make sure you have resolved the gatekeeper's comments before requesting publishing again.
+                  </div>
+                <% end %>
                 <div class='gatekeeper_notice alert alert-warning'>
                   <% if send_request_publish_approval %>
                       An email will be sent to the <%= t('asset_gatekeeper').downcase.pluralize %> of the <%= t('project').pluralize -%> associated with this <%= t(resource_name) -%> to ask for publishing approval. This <%= t(resource_name) -%> will not be published until one of the <%= t('asset_gatekeeper').downcase.pluralize %> has granted approval.
