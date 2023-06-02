@@ -92,9 +92,8 @@
       tags: rvm
 
     - name: Reset connection  #To allow user changes to take affect with new login shell
-        meta: reset_connection
-        tags: ruby
-
+      meta: reset_connection
+      tags: ruby
 
     ########## Clone SEEK
 
