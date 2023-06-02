@@ -2,7 +2,7 @@
   <div class="row">
     <div class="col-sm-8">
       <h4 class="list-group-item-heading">
-        <%= link_to "#{version.name} #{resource.describe_version(version.version)}", {:version => version.version} %>
+        <%= link_to "#{version.name} #{resource.describe_version(version.version)}", { version: version.version } %>
         <small>
           Created <%= date_as_string(version.created_at,true) %>
           by <%= contributor version.contributor %>
@@ -34,11 +34,6 @@
       <% if resource.can_manage? %>
         <%= button_link_to('Edit', 'edit', '#', onclick:"$j('#edit_git_version_form_#{version.version}').fadeToggle(); return false;") -%>
       <%end %>
-      <% if Seek::Config.delete_asset_version_enabled && resource.can_edit?(User.current_user) && visible_versions.length > 1 %>
-        <% path = polymorphic_path(resource, :version => version.version, :action => :destroy_version) %>
-        <%= button_link_to("Delete", 'destroy', path,
-                           { data: { confirm: "This deletes version #{version.version.to_s} of the #{text_for_resource resource}. Are you sure?" }, :method => :delete}) -%>
-      <% end -%>
     </div>
   </div>
 </div>
