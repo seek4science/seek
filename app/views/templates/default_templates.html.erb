@@ -1,5 +1,19 @@
 <h1>Add default <%=t('template').pluralize()%></h1>
 
+<div>
+	<ul>
+		<li>
+			Please make sure the upload file has the '.json' extension.
+		</li>
+		<li>
+			Feel free to take a look at the <a href="https://github.com/seek4science/seek/tree/d0de7bb6c258730347e8a4cc231236595c81ad0f/lib/seek/isa_templates" target="_blank">schema</a> for making your own ISA-compliant template.
+		</li>
+		<li>
+			An example can be found <a href="https://github.com/ELIXIR-Belgium/ISA-merger/blob/021553c0d2e691211b64dd9b49dff4646dcfba6b/templates/isa%20test/isa_test_aggregated_v1.1.0.json" target="_blank">here</a>.
+		</li>
+	</ul>
+</div>
+
 <%= render :partial => "result" %>
 
 <%= form_tag populate_template_templates_path, method: "post", id: "template_upload_from", multipart: true do -%>
@@ -15,12 +29,12 @@
 			<div class="tab-content">
 				<div role="tabpanel" class="tab-pane active" data-role="seek-upload-field-tab-pane" data-tab-id="local-file">
 					<div class="form-group">
-						<%= file_field_tag "template_json_file" -%>
+						<%= file_field_tag "template_json_file", :accept => 'application/json' -%>
 					</div>
 				</div>
 			</div>
 		</div>
-		
+
 	<% end %>
 
 
