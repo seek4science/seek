@@ -16,10 +16,10 @@ const defaultCols = [
 	}
 ];
 
-const objectInputTemp = '<input type="hidden" name="_NAME_[]" id="_NAME_" value="" autocomplete="off" />'+
+const objectInputTemp = '<input type="hidden" name="_NAME_[]" id="h_NAME_" value="" autocomplete="off" />'+
 						'<select name="_NAME_[]" id="_NAME_" class="form-control" data-role="seek-objectsinput" '+
 						'data-tags-limit="100" multiple="multiple" '+
-						'data-typeahead-query-url="_URL_"><option value=""></option></select>';
+						'data-typeahead-query-url="_URL_">_OPTIONS_</select>';
 
 const typeaheadUrl = "<%= typeahead_samples_path(linked_sample_type_id: '_LINKED_') %>";
 
@@ -42,35 +42,29 @@ const handleSelect = (e) => {
 	$j.dynamicTable.prototype = {
 		init: function (rows, columns, options = {}) {
 			columns.forEach((c) => {
-				c["mRender"] = function (data, type, full) {
+				c["render"] = function (data, type, full, meta) {
 					if (c.multi_link) {
 						data = data && Array.isArray(data) ? data : [data];
 						data = data[0]?.id ? data : [];
-						const existingObjectsJSON = data.map(({ id, title }) => ({
-							id: id,
-							title: title
-						}));
-						const existingOptions = existingObjectsJSON.map((e) => `<option selected="selected" value=${e.id}>${e.title}</option>`).join("");
+						const existingOptions = data.map((e) => `<option selected="selected" value="${e.id}">${e.title}</option>`).join("");
 						if (options.readOnly) {
-							return existingObjectsJSON.map((e) => `<span class="badge">${e.title}</span>`).join(" ");
-
+							return data.map((e) => `<span class="badge">${e.title}</span>`).join(" ");
 						} else {
 							const url = typeaheadUrl.replace("_LINKED_", c.linked_sample_type);
-							const objectInputName = 'objectInput[' + existingObjectsJSON.map((e) => e.id).join('-') + ']' + '-' + crypto.randomUUID();
-							const objectInput = objectInputTemp.replace(/_NAME_/g, objectInputName).replace("_URL_", url).replace('<option value=""></option>', existingOptions);
-              ObjectsInput.init();
-							return objectInput;
-
+							const objectInputName = 'objectInput-' + data.map((e) => e.id).join('-') + '-' + crypto.randomUUID();
+              setTimeout(ObjectsInput.init);
+							return objectInputTemp
+                  .replace(/_NAME_/g, objectInputName)
+                  .replace('_URL_', url)
+                  .replace('_OPTIONS_', existingOptions);
 						}
-
 					} else if (data === "#HIDDEN") {
 						return "<em><small>Hidden</small></em>";
 					} else {
 						return data;
 					}
 				};
-				c["createdCell"] = function (td, cellData, rowData, row, col) {
-					if (c.multi_link && !options.readonly) setSelect2($j(td));
+        c["createdCell"] = function (td, cellData, rowData, row, col) {
 					if (cellData == "#HIDDEN") $j(td).addClass("disabled");
 				};
 				if (c.title == "id") c.title = instanceName + " id";
@@ -138,6 +132,7 @@ const handleSelect = (e) => {
 			if (options.assayId) this.assayId = options.assayId;
 			this.options = options;
 			this.initHeader(columns);
+      this.setSelect2();
 
 			$j('div.toolbar').html("<span class='dt_select_all' style='display:none' onClick='selectAll(this, true)'>Select all rows</span>").addClass("dt-select-all");
 		},
@@ -372,7 +367,25 @@ const handleSelect = (e) => {
 					})
 			});
 			return sampleIds;
-		}
+		},
+    setSelect2: function () {
+      $j(this.table.table().container()).on("select2:select select2:unselect", 'td', function (e) {
+        const td = $j(this);
+        const table = td.parents("table").DataTable();
+
+        const values = td.find("option").map((_index, opt) => {
+            if (opt.value != "") return { id: opt.value, title: opt.innerText };
+        }).toArray();
+
+        const updatedValues = e.params.data.selected ? values : values.filter(({ id, title }) => {
+            if (id !== e.params.data.id) return { id, title };
+        });
+
+        table.cell(td).data(updatedValues);
+        handleCellUpdate(table, td);
+        table.columns.adjust();
+      });
+    }
 	};
 })(jQuery);
 
@@ -400,24 +413,6 @@ function getStatusIndexes(arr) {
 
 function getSampleLinking(arr) {
 	return arr.filter((x) => x.linked_sample_type).map(({ idx, title }) => ({ idx, title }));
-}
-
-function setSelect2(td) {
-	$j(td).on("select2:select select2:unselect", function (e) {
-		const table = $j(this).parents("table").DataTable();
-
-		const values = td.find("option").map((_index, opt) => {
-			if (opt.value != "") return { id: opt.value, title: opt.innerText };
-		}).toArray();
-
-		const updatedValues = e.params.data.selected ? values : values.filter(({ id, title }) => {
-			if (id !== e.params.data.id) return { id, title };
-		});
-
-		table.cell(td).data(updatedValues);
-		handleCellUpdate(table, td);
-		table.columns.adjust();
-	});
 }
 
 function handleCellUpdate(table, cell) {
