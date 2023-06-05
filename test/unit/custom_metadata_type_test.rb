@@ -4,7 +4,7 @@ class CustomMetadataTypeTest < ActiveSupport::TestCase
   test 'validation' do
     cmt = CustomMetadataType.new(title: 'test metadata', supported_type: 'Investigation')
     refute cmt.valid?
-    cmt.custom_metadata_attributes << Factory(:age_custom_metadata_attribute)
+    cmt.custom_metadata_attributes << FactoryBot.create(:age_custom_metadata_attribute)
     assert cmt.valid?
 
     cmt.title = ''
@@ -28,9 +28,9 @@ class CustomMetadataTypeTest < ActiveSupport::TestCase
 
   test 'validates attribute titles are unique' do
     cmt = CustomMetadataType.new(title: 'test unique attributes', supported_type: 'Investigation')
-    cmt.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, title: 'name')
+    cmt.custom_metadata_attributes << FactoryBot.create(:name_custom_metadata_attribute, title: 'name')
     assert cmt.valid?
-    cmt.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, title: 'name2')
+    cmt.custom_metadata_attributes << FactoryBot.create(:name_custom_metadata_attribute, title: 'name2')
     assert cmt.valid?
     cmt.custom_metadata_attributes.last.title = 'name'
     refute cmt.valid?
@@ -38,26 +38,26 @@ class CustomMetadataTypeTest < ActiveSupport::TestCase
 
     # check scope
     cmt2 = CustomMetadataType.new(title: 'test unique attributes', supported_type: 'Investigation')
-    cmt2.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, title: 'name')
+    cmt2.custom_metadata_attributes << FactoryBot.create(:name_custom_metadata_attribute, title: 'name')
     assert cmt2.valid?
   end
 
   test 'attribute by title' do
-    cmt = Factory(:simple_investigation_custom_metadata_type)
+    cmt = FactoryBot.create(:simple_investigation_custom_metadata_type)
 
     refute_nil (attr = cmt.attribute_by_title('name'))
     assert_equal 'name', attr.title
 
     assert_nil cmt.attribute_by_title('sdfkjsdhf')
 
-    cmt = Factory(:study_custom_metadata_type_with_spaces)
+    cmt = FactoryBot.create(:study_custom_metadata_type_with_spaces)
 
     refute_nil (attr = cmt.attribute_by_title('full name'))
     assert_equal 'full name', attr.title
   end
   
   test 'destroy' do
-    cmt = Factory(:simple_investigation_custom_metadata_type)
+    cmt = FactoryBot.create(:simple_investigation_custom_metadata_type)
     attributes = cmt.custom_metadata_attributes
     assert_equal [], attributes.select(&:destroyed?)
     assert_equal 3, attributes.count

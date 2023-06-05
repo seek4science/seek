@@ -27,8 +27,8 @@ class PolicyTest < ActiveSupport::TestCase
   test 'private policy' do
     pol = Policy.private_policy
     assert_equal Policy::NO_ACCESS, pol.access_type
-    assert !pol.use_whitelist
-    assert !pol.use_blacklist
+    assert !pol.use_allowlist
+    assert !pol.use_denylist
     assert pol.permissions.empty?
   end
 
@@ -36,8 +36,8 @@ class PolicyTest < ActiveSupport::TestCase
     with_config_value 'default_all_visitors_access_type', Policy::NO_ACCESS do
       pol = Policy.default
       assert_equal Policy::NO_ACCESS, pol.access_type
-      assert !pol.use_whitelist
-      assert !pol.use_blacklist
+      assert !pol.use_allowlist
+      assert !pol.use_denylist
       assert pol.permissions.empty?
     end
   end
@@ -46,8 +46,8 @@ class PolicyTest < ActiveSupport::TestCase
     with_config_value 'default_all_visitors_access_type', Policy::ACCESSIBLE do
       pol = Policy.default
       assert_equal Policy::ACCESSIBLE, pol.access_type
-      assert !pol.use_whitelist
-      assert !pol.use_blacklist
+      assert !pol.use_allowlist
+      assert !pol.use_denylist
       assert pol.permissions.empty?
     end
   end
@@ -119,7 +119,7 @@ class PolicyTest < ActiveSupport::TestCase
     end
   end
 
-  test 'should add people who are in the whitelist' do
+  test 'should add people who are in the allowlist' do
     # create bundle of people
     people_with_access_type = []
     i = 0
@@ -127,41 +127,41 @@ class PolicyTest < ActiveSupport::TestCase
       people_with_access_type.push [i, 'name' + i.to_s, rand(4) + 1]
       i += 1
     end
-    # create a whitelist
-    whitelist = []
+    # create an allowlist
+    allowlist = []
     i = 0
     while i < 5
       random_id = rand(15)
-      whitelist.push [random_id, 'name' + random_id.to_s, 2]
+      allowlist.push [random_id, 'name' + random_id.to_s, 2]
       i += 1
     end
-    whitelist = Policy.new.remove_duplicate(whitelist)
-    whitelist_added = whitelist.select { |person| person[0] > 9 }
-    filtered_people = Policy.new.add_people_in_whitelist(people_with_access_type, whitelist)
-    assert_equal (people_with_access_type.count + whitelist_added.count), filtered_people.count
+    allowlist = Policy.new.remove_duplicate(allowlist)
+    allowlist_added = allowlist.select { |person| person[0] > 9 }
+    filtered_people = Policy.new.add_people_in_allowlist(people_with_access_type, allowlist)
+    assert_equal (people_with_access_type.count + allowlist_added.count), filtered_people.count
   end
 
   test 'should have asset housekeepers in the summarize_permissions if the asset is entirely private' do
-    asset_housekeeper = Factory(:asset_housekeeper)
-    policy = Factory(:private_policy)
-    User.with_current_user Factory(:user) do
+    asset_housekeeper = FactoryBot.create(:asset_housekeeper)
+    policy = FactoryBot.create(:private_policy)
+    User.with_current_user FactoryBot.create(:user) do
       people_in_group = policy.summarize_permissions [], [asset_housekeeper]
       assert people_in_group[Policy::MANAGING].include?([asset_housekeeper.id, asset_housekeeper.name + ' (asset housekeeper)', Policy::MANAGING])
     end
   end
 
   test 'should have asset housekeepers in the summarize_permissions if the asset is not entirely private' do
-    asset_housekeeper = Factory(:asset_housekeeper)
+    asset_housekeeper = FactoryBot.create(:asset_housekeeper)
 
     # private policy but with permissions
-    policy1 = Factory(:private_policy)
-    permission = Factory(:permission, contributor: Factory(:person), access_type: Policy::VISIBLE, policy: policy1)
+    policy1 = FactoryBot.create(:private_policy)
+    permission = FactoryBot.create(:permission, contributor: FactoryBot.create(:person), access_type: Policy::VISIBLE, policy: policy1)
     assert !policy1.permissions.empty?
 
     # share within network
-    policy2 = Factory(:all_sysmo_viewable_policy)
+    policy2 = FactoryBot.create(:all_sysmo_viewable_policy)
 
-    User.with_current_user Factory(:user) do
+    User.with_current_user FactoryBot.create(:user) do
       people_in_group = policy1.summarize_permissions [], [asset_housekeeper]
       assert people_in_group[Policy::MANAGING].include?([asset_housekeeper.id, asset_housekeeper.name + ' (asset housekeeper)', Policy::MANAGING])
 
@@ -171,10 +171,10 @@ class PolicyTest < ActiveSupport::TestCase
   end
 
   test 'should concat the roles of a person after name' do
-    asset_manager = Factory(:asset_housekeeper)
-    creator = Factory(:person)
-    policy = Factory(:public_policy)
-    User.with_current_user Factory(:user) do
+    asset_manager = FactoryBot.create(:asset_housekeeper)
+    creator = FactoryBot.create(:person)
+    policy = FactoryBot.create(:public_policy)
+    User.with_current_user FactoryBot.create(:user) do
       people_in_group = policy.summarize_permissions [creator], [asset_manager]
       # creator
       people_in_group[Policy::EDITING].each do |person|
@@ -195,9 +195,9 @@ class PolicyTest < ActiveSupport::TestCase
   end
 
   test 'policy not destroyed if still referenced by assets' do
-    policy = Factory(:public_policy)
-    sample_type = Factory(:strain_sample_type)
-    data_file = Factory(:strain_sample_data_file, policy: policy)
+    policy = FactoryBot.create(:public_policy)
+    sample_type = FactoryBot.create(:strain_sample_type)
+    data_file = FactoryBot.create(:strain_sample_data_file, policy: policy)
     samples = data_file.extract_samples(sample_type, true).select(&:persisted?)
     sample = samples.first
 
@@ -212,9 +212,9 @@ class PolicyTest < ActiveSupport::TestCase
   end
 
   test 'policy destroyed when no longer referenced' do
-    policy = Factory(:public_policy)
-    sample_type = Factory(:strain_sample_type)
-    data_file = Factory(:strain_sample_data_file, policy: policy)
+    policy = FactoryBot.create(:public_policy)
+    sample_type = FactoryBot.create(:strain_sample_type)
+    data_file = FactoryBot.create(:strain_sample_data_file, policy: policy)
     samples = data_file.extract_samples(sample_type, true).select(&:persisted?)
 
     disable_authorization_checks { data_file.destroy }
@@ -227,7 +227,7 @@ class PolicyTest < ActiveSupport::TestCase
   end
 
   test 'public? false if sharing scope ALL::USERS' do
-    policy = Factory(:public_policy,sharing_scope:Policy::ALL_USERS, access_type:Policy::ACCESSIBLE)
+    policy = FactoryBot.create(:public_policy,sharing_scope:Policy::ALL_USERS, access_type:Policy::ACCESSIBLE)
     refute policy.public?
     policy.update_attribute(:sharing_scope,Policy::PRIVATE) # is ignored unless ALL_USERS
     assert policy.public?
@@ -235,21 +235,21 @@ class PolicyTest < ActiveSupport::TestCase
 
   test 'private?' do
     [Policy::VISIBLE, Policy::ACCESSIBLE, Policy::EDITING, Policy::MANAGING].each do |type|
-      policy = Factory(:private_policy, access_type: type)
+      policy = FactoryBot.create(:private_policy, access_type: type)
       assert policy.permissions.empty?
       refute policy.private?
     end
 
     # policy and all permissions are set to No Access
-    policy = Factory(:private_policy)
+    policy = FactoryBot.create(:private_policy)
     assert_equal Policy::NO_ACCESS, policy.access_type
     assert policy.private?
 
-    policy.permissions.create(contributor: Factory(:project), access_type: Policy::NO_ACCESS)
+    policy.permissions.create(contributor: FactoryBot.create(:project), access_type: Policy::NO_ACCESS)
 
     assert policy.private?
 
-    perm = policy.permissions.create(contributor: Factory(:project), access_type: Policy::VISIBLE)
+    perm = policy.permissions.create(contributor: FactoryBot.create(:project), access_type: Policy::VISIBLE)
 
     refute policy.private?
 
@@ -258,22 +258,22 @@ class PolicyTest < ActiveSupport::TestCase
 
     assert policy.private?
 
-    policy.permissions.create(contributor: Factory(:person), access_type: Policy::ACCESSIBLE)
+    policy.permissions.create(contributor: FactoryBot.create(:person), access_type: Policy::ACCESSIBLE)
 
     refute policy.private?
 
   end
 
   test 'projects_accessible?' do
-    project1 = Factory(:project)
-    project2 = Factory(:project)
+    project1 = FactoryBot.create(:project)
+    project2 = FactoryBot.create(:project)
 
     #fully published
-    policy = Factory(:public_policy)
+    policy = FactoryBot.create(:public_policy)
     assert policy.projects_accessible?([project1],false)
 
     #fully private
-    policy = Factory(:private_policy)
+    policy = FactoryBot.create(:private_policy)
     refute policy.projects_accessible?([project1],false)
 
     # visible permission added, true if not downloadable item and all projects
@@ -282,7 +282,7 @@ class PolicyTest < ActiveSupport::TestCase
     refute policy.projects_accessible?([project1],true)
 
     # accessible policy, true in both cases
-    policy = Factory(:private_policy)
+    policy = FactoryBot.create(:private_policy)
     policy.permissions.create(contributor:project1, access_type:Policy::ACCESSIBLE)
     assert policy.projects_accessible?([project1],true)
     assert policy.projects_accessible?([project1],true)
@@ -295,12 +295,12 @@ class PolicyTest < ActiveSupport::TestCase
     refute policy.projects_accessible?([project1, project2],true)
 
     # other project permissions don't matter
-    policy.permissions.create(contributor:Factory(:project), access_type:Policy::NO_ACCESS)
+    policy.permissions.create(contributor:FactoryBot.create(:project), access_type:Policy::NO_ACCESS)
     assert policy.projects_accessible?([project1, project2],false)
     refute policy.projects_accessible?([project1, project2],true)
 
     # check higher permissions
-    policy = Factory(:private_policy)
+    policy = FactoryBot.create(:private_policy)
     policy.permissions.create(contributor:project1, access_type:Policy::MANAGING)
     policy.permissions.create(contributor:project2, access_type:Policy::EDITING)
     assert policy.projects_accessible?([project1, project2],false)
@@ -308,27 +308,27 @@ class PolicyTest < ActiveSupport::TestCase
   end
 
   test 'associated items' do
-    df = Factory(:data_file)
+    df = FactoryBot.create(:data_file)
     policy = df.policy
 
     assert_equal [df],policy.associated_items
 
-    model = Factory(:model,policy:policy)
-    sample = Factory(:sample,policy:policy)
-    event = Factory(:event,policy:policy)
+    model = FactoryBot.create(:model,policy:policy)
+    sample = FactoryBot.create(:sample,policy:policy)
+    event = FactoryBot.create(:event,policy:policy)
 
     assert_equal [df,event,model,sample],policy.associated_items.sort_by{|i| i.class.name}
 
-    policy = Factory(:public_policy,sharing_scope:Policy::ALL_USERS, access_type:Policy::ACCESSIBLE)
+    policy = FactoryBot.create(:public_policy,sharing_scope:Policy::ALL_USERS, access_type:Policy::ACCESSIBLE)
     assert_empty policy.associated_items
 
-    project = Factory(:project,default_policy:Factory(:public_policy))
+    project = FactoryBot.create(:project,default_policy:FactoryBot.create(:public_policy))
     policy = project.default_policy
     refute_nil policy
     assert_equal [project],policy.associated_items
 
 
-    endpoint = Factory(:openbis_endpoint,policy:policy)
+    endpoint = FactoryBot.create(:openbis_endpoint,policy:policy)
     assert_equal [endpoint,project],policy.associated_items.sort_by{|i| i.class.name}
   end
 

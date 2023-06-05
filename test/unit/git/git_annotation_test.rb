@@ -2,11 +2,11 @@ require 'test_helper'
 
 class GitAnnotationTest < ActiveSupport::TestCase
   setup do
-    @galaxy_class = WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class)
+    @galaxy_class = WorkflowClass.find_by_key('galaxy') || FactoryBot.create(:galaxy_workflow_class)
   end
 
   test 'get and set git annotation' do
-    workflow = Factory(:annotationless_local_git_workflow)
+    workflow = FactoryBot.create(:annotationless_local_git_workflow)
     wgv = workflow.git_version
 
     assert wgv.is_a?(Workflow::Git::Version)
@@ -24,7 +24,7 @@ class GitAnnotationTest < ActiveSupport::TestCase
 
     assert_no_difference('Git::Annotation.count') do
       wgv.main_workflow_path = 'Concat_two_files.cwl'
-      wgv.workflow_class_id = (WorkflowClass.find_by_key('cwl') || Factory(:cwl_workflow_class)).id
+      wgv.workflow_class_id = (WorkflowClass.find_by_key('cwl') || FactoryBot.create(:cwl_workflow_class)).id
       disable_authorization_checks { assert wgv.save }
     end
 
@@ -34,7 +34,7 @@ class GitAnnotationTest < ActiveSupport::TestCase
   end
 
   test 'cannot set git annotation to non-existent path' do
-    workflow = Factory(:git_version).resource
+    workflow = FactoryBot.create(:git_version).resource
     wgv = workflow.git_version
 
     assert wgv.is_a?(Workflow::Git::Version)
@@ -50,7 +50,7 @@ class GitAnnotationTest < ActiveSupport::TestCase
   end
 
   test 'destroy annotation' do
-    workflow = Factory(:git_version).resource
+    workflow = FactoryBot.create(:git_version).resource
     wgv = workflow.git_version
 
     assert wgv.is_a?(Workflow::Git::Version)
@@ -73,7 +73,7 @@ class GitAnnotationTest < ActiveSupport::TestCase
   end
 
   test 'annotations are removed if file is deleted' do
-    workflow = Factory(:git_version).resource
+    workflow = FactoryBot.create(:git_version).resource
     wgv = workflow.git_version
     assert_difference('Git::Annotation.count', 1) do
       disable_authorization_checks { workflow.update!(workflow_class_id: @galaxy_class.id) }
@@ -90,7 +90,7 @@ class GitAnnotationTest < ActiveSupport::TestCase
   end
 
   test 'annotations are deleted if git version is deleted' do
-    workflow = Factory(:git_version).resource
+    workflow = FactoryBot.create(:git_version).resource
     wgv = workflow.git_version
     assert_difference('Git::Annotation.count', 1) do
       disable_authorization_checks { workflow.update!(workflow_class_id: @galaxy_class.id) }
@@ -106,7 +106,7 @@ class GitAnnotationTest < ActiveSupport::TestCase
   end
 
   test 'annotations are not removed if option set' do
-    workflow = Factory(:git_version).resource
+    workflow = FactoryBot.create(:git_version).resource
     wgv = workflow.git_version
     assert_difference('Git::Annotation.count', 1) do
       disable_authorization_checks { workflow.update!(workflow_class_id: @galaxy_class.id) }
@@ -123,7 +123,7 @@ class GitAnnotationTest < ActiveSupport::TestCase
   end
 
   test 'annotations are moved if file is renamed' do
-    workflow = Factory(:git_version).resource
+    workflow = FactoryBot.create(:git_version).resource
     wgv = workflow.git_version
     assert_difference('Git::Annotation.count', 1) do
       disable_authorization_checks { workflow.update!(workflow_class_id: @galaxy_class.id) }
@@ -142,7 +142,7 @@ class GitAnnotationTest < ActiveSupport::TestCase
   end
 
   test 'annotations are not moved if option set' do
-    workflow = Factory(:git_version).resource
+    workflow = FactoryBot.create(:git_version).resource
     wgv = workflow.git_version
     assert_difference('Git::Annotation.count', 1) do
       disable_authorization_checks { workflow.update!(workflow_class_id: @galaxy_class.id) }
@@ -161,7 +161,7 @@ class GitAnnotationTest < ActiveSupport::TestCase
   end
 
   test 'get and set remote source annotations' do
-    workflow = Factory(:annotationless_local_git_workflow)
+    workflow = FactoryBot.create(:annotationless_local_git_workflow)
     wgv = workflow.git_version
 
     assert wgv.is_a?(Workflow::Git::Version)
@@ -182,7 +182,7 @@ class GitAnnotationTest < ActiveSupport::TestCase
 
     assert_no_difference('Git::Annotation.count') do
       wgv.main_workflow_path = 'Concat_two_files.cwl'
-      wgv.workflow_class_id = (WorkflowClass.find_by_key('cwl') || Factory(:cwl_workflow_class)).id
+      wgv.workflow_class_id = (WorkflowClass.find_by_key('cwl') || FactoryBot.create(:cwl_workflow_class)).id
       wgv.remote_sources = { 'Concat_two_files.cwl' => 'https://workflows.example.com/concat_two_files.cwl' }
       disable_authorization_checks { assert wgv.save }
     end

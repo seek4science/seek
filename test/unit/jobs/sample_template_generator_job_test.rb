@@ -2,7 +2,7 @@ require 'test_helper'
 
 class SampleTemplateGeneratorJobTest < ActiveSupport::TestCase
   def setup
-    @sample_type = Factory(:simple_sample_type)
+    @sample_type = FactoryBot.create(:simple_sample_type)
   end
 
   test 'perform' do

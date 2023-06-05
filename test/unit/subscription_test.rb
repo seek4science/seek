@@ -4,7 +4,7 @@ class SubscriptionTest < ActiveSupport::TestCase
   fixtures :all
 
   def setup
-    User.current_user = Factory(:user)
+    User.current_user = FactoryBot.create(:user)
     @val = Seek::Config.email_enabled
     Seek::Config.email_enabled = true
   end
@@ -15,16 +15,16 @@ class SubscriptionTest < ActiveSupport::TestCase
 
   test 'for_susbscribable' do
     p = User.current_user.person
-    p2 = Factory :person
-    sop = Factory :sop
-    sop2 = Factory :sop
-    assay = Factory :assay
-    assay2 = Factory :assay
-    Factory :subscription, person: p, subscribable: sop
-    Factory :subscription, person: p2, subscribable: sop
-    Factory :subscription, person: p, subscribable: sop2
-    Factory :subscription, person: p, subscribable: assay
-    Factory :subscription, person: p, subscribable: assay2
+    p2 = FactoryBot.create :person
+    sop = FactoryBot.create :sop
+    sop2 = FactoryBot.create :sop
+    assay = FactoryBot.create :assay
+    assay2 = FactoryBot.create :assay
+    FactoryBot.create :subscription, person: p, subscribable: sop
+    FactoryBot.create :subscription, person: p2, subscribable: sop
+    FactoryBot.create :subscription, person: p, subscribable: sop2
+    FactoryBot.create :subscription, person: p, subscribable: assay
+    FactoryBot.create :subscription, person: p, subscribable: assay2
 
     assert_equal 2, Subscription.for_subscribable(sop).count
     assert_equal [sop, sop], Subscription.for_subscribable(sop).collect(&:subscribable)
@@ -33,7 +33,7 @@ class SubscriptionTest < ActiveSupport::TestCase
   end
 
   test 'subscribing and unsubscribing toggle subscribed?' do
-    s = Factory(:subscribable)
+    s = FactoryBot.create(:subscribable)
 
     refute s.subscribed?
     disable_authorization_checks { s.subscribe }
@@ -44,7 +44,7 @@ class SubscriptionTest < ActiveSupport::TestCase
     s.reload
     refute s.subscribed?
 
-    another_person = Factory(:person)
+    another_person = FactoryBot.create(:person)
     refute s.subscribed?(another_person)
     disable_authorization_checks { s.subscribe(another_person) }
     s.reload
@@ -56,9 +56,9 @@ class SubscriptionTest < ActiveSupport::TestCase
 
   test 'can subscribe to someone elses subscribable' do
 
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     User.with_current_user(person.user) do
-      s = Factory(:subscribable, contributor: person)
+      s = FactoryBot.create(:subscribable, contributor: person)
       refute s.subscribed?
       disable_authorization_checks { s.subscribe }
       assert s.save
@@ -68,10 +68,10 @@ class SubscriptionTest < ActiveSupport::TestCase
   end
 
   test 'subscribers with a frequency of immediate are sent emails when activity is logged' do
-    proj = Factory(:project)
-    person = Factory(:person,project:proj)
-    person.add_to_project_and_institution(Factory(:project),Factory(:institution))
-    s = Factory(:subscribable, projects: person.projects, policy: Factory(:public_policy), contributor:person)
+    proj = FactoryBot.create(:project)
+    person = FactoryBot.create(:person,project:proj)
+    person.add_to_project_and_institution(FactoryBot.create(:project),FactoryBot.create(:institution))
+    s = FactoryBot.create(:subscribable, projects: person.projects, policy: FactoryBot.create(:public_policy), contributor:person)
 
     disable_authorization_checks do
       current_person.project_subscriptions.create project: proj, frequency: 'immediately'
@@ -79,11 +79,11 @@ class SubscriptionTest < ActiveSupport::TestCase
     end
 
     assert_enqueued_emails(1) do
-      al = Factory(:activity_log, activity_loggable: s, action: 'update')
+      al = FactoryBot.create(:activity_log, activity_loggable: s, action: 'update')
       ImmediateSubscriptionEmailJob.perform_now(al)
     end
 
-    other_guy = Factory(:person)
+    other_guy = FactoryBot.create(:person)
     disable_authorization_checks do
       other_guy.project_subscriptions.create project: proj, frequency: 'immediately'
       s.reload
@@ -91,32 +91,32 @@ class SubscriptionTest < ActiveSupport::TestCase
     end
 
     assert_enqueued_emails(2) do
-      al = Factory(:activity_log, activity_loggable: s, action: 'update')
+      al = FactoryBot.create(:activity_log, activity_loggable: s, action: 'update')
       ImmediateSubscriptionEmailJob.perform_now(al)
     end
   end
 
   test 'subscribers without a frequency of immediate are not sent emails when activity is logged' do
-    proj = Factory(:project)
-    person = Factory(:person,project:proj)
+    proj = FactoryBot.create(:project)
+    person = FactoryBot.create(:person,project:proj)
     current_person.project_subscriptions.create project: proj, frequency: 'weekly'
-    s = Factory(:subscribable, projects: [proj], policy: Factory(:public_policy),contributor:person)
+    s = FactoryBot.create(:subscribable, projects: [proj], policy: FactoryBot.create(:public_policy),contributor:person)
     disable_authorization_checks { s.subscribe }
 
     assert_no_emails do
-      Factory(:activity_log, activity_loggable: s, action: 'update')
+      FactoryBot.create(:activity_log, activity_loggable: s, action: 'update')
     end
   end
 
   test 'subscribers are not sent emails for items they cannot view' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     proj = person.projects.first
     current_person.project_subscriptions.create project: proj, frequency: 'immediately'
-    s = Factory(:subscribable, policy: Factory(:private_policy), contributor: person, projects: [proj])
+    s = FactoryBot.create(:subscribable, policy: FactoryBot.create(:private_policy), contributor: person, projects: [proj])
 
     assert_no_emails do
       User.with_current_user(person) do
-        al = Factory(:activity_log, activity_loggable: s, action: 'update')
+        al = FactoryBot.create(:activity_log, activity_loggable: s, action: 'update')
         ImmediateSubscriptionEmailJob.perform_now(al)
       end
     end
@@ -130,23 +130,23 @@ class SubscriptionTest < ActiveSupport::TestCase
 
     refute current_person.receive_notifications?
 
-    proj = Factory(:project)
-    person = Factory(:person,project:proj)
+    proj = FactoryBot.create(:project)
+    person = FactoryBot.create(:person,project:proj)
     current_person.project_subscriptions.create project: proj, frequency: 'immediately'
-    s = Factory(:subscribable, projects: [proj], policy: Factory(:public_policy),contributor:person)
+    s = FactoryBot.create(:subscribable, projects: [proj], policy: FactoryBot.create(:public_policy),contributor:person)
     disable_authorization_checks { s.subscribe }
 
     assert_no_emails do
-      al = Factory(:activity_log, activity_loggable: s, action: 'update')
+      al = FactoryBot.create(:activity_log, activity_loggable: s, action: 'update')
       ImmediateSubscriptionEmailJob.perform_now(al)
     end
   end
 
   test 'subscribers who are not registered dont receive emails' do
-    person = Factory(:person_in_project)
-    proj = Factory(:project)
-    other_person = Factory(:person,project:proj)
-    s = Factory(:subscribable, projects: [proj], policy: Factory(:public_policy),contributor:other_person)
+    person = FactoryBot.create(:person_in_project)
+    proj = FactoryBot.create(:project)
+    other_person = FactoryBot.create(:person,project:proj)
+    s = FactoryBot.create(:subscribable, projects: [proj], policy: FactoryBot.create(:public_policy),contributor:other_person)
 
     disable_authorization_checks do
       person.project_subscriptions.create project: proj, frequency: 'immediately'
@@ -154,7 +154,7 @@ class SubscriptionTest < ActiveSupport::TestCase
     end
 
     assert_no_emails do
-      al = Factory(:activity_log, activity_loggable: s, action: 'update')
+      al = FactoryBot.create(:activity_log, activity_loggable: s, action: 'update')
       ImmediateSubscriptionEmailJob.perform_now(al)
     end
   end
@@ -166,7 +166,7 @@ class SubscriptionTest < ActiveSupport::TestCase
 
     s = nil
     assert_enqueued_with(job: SetSubscriptionsForItemJob) do
-      s = Factory(:subscribable, projects: [proj], policy: Factory(:public_policy),contributor:current_person)
+      s = FactoryBot.create(:subscribable, projects: [proj], policy: FactoryBot.create(:public_policy),contributor:current_person)
     end
     SetSubscriptionsForItemJob.perform_now(s, s.projects)
 
@@ -176,7 +176,7 @@ class SubscriptionTest < ActiveSupport::TestCase
   end
 
   test 'set_default_subscriptions when a study is created' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     proj = person.projects.first
     current_person.project_subscriptions.create project: proj, frequency: 'weekly'
     assert Subscription.all.empty?
@@ -184,8 +184,8 @@ class SubscriptionTest < ActiveSupport::TestCase
     investigation = nil
     study = nil
     assert_enqueued_jobs(2, only: SetSubscriptionsForItemJob) do
-      investigation = Factory(:investigation, contributor: person, projects: [proj])
-      study = Factory(:study, contributor: person, investigation: investigation, policy: Factory(:public_policy))
+      investigation = FactoryBot.create(:investigation, contributor: person, projects: [proj])
+      study = FactoryBot.create(:study, contributor: person, investigation: investigation, policy: FactoryBot.create(:public_policy))
     end
 
     SetSubscriptionsForItemJob.perform_now(study, study.projects)
@@ -197,10 +197,10 @@ class SubscriptionTest < ActiveSupport::TestCase
   end
 
   test 'update subscriptions when changing a study associated to an assay' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     proj = person.projects.first
-    project2 = Factory(:project)
-    person.add_to_project_and_institution(project2, Factory(:institution))
+    project2 = FactoryBot.create(:project)
+    person.add_to_project_and_institution(project2, FactoryBot.create(:institution))
     current_person.project_subscriptions.create project: proj, frequency: 'weekly'
     assert Subscription.all.empty?
 
@@ -208,7 +208,7 @@ class SubscriptionTest < ActiveSupport::TestCase
     study = nil
     assay = nil
     assert_enqueued_jobs(3, only: SetSubscriptionsForItemJob) do
-      assay = Factory(:assay, contributor: person, policy: Factory(:public_policy))
+      assay = FactoryBot.create(:assay, contributor: person, policy: FactoryBot.create(:public_policy))
       study = assay.study
       investigation = assay.investigation
     end
@@ -224,7 +224,7 @@ class SubscriptionTest < ActiveSupport::TestCase
 
     # changing study
     assert_enqueued_with(job: RemoveSubscriptionsForItemJob, args: [assay, [proj]]) do
-      assay.study = Factory(:study, contributor: person, investigation: Factory(:investigation, contributor: person, projects: [project2]))
+      assay.study = FactoryBot.create(:study, contributor: person, investigation: FactoryBot.create(:investigation, contributor: person, projects: [project2]))
       disable_authorization_checks { assay.save }
     end
     RemoveSubscriptionsForItemJob.perform_now(assay, [proj])
@@ -236,10 +236,10 @@ class SubscriptionTest < ActiveSupport::TestCase
   end
 
   test 'subscribe to all the items in a project when subscribing to that project' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     proj = person.projects.first
-    s1 = Factory(:subscribable, projects: [proj], policy: Factory(:public_policy),contributor:person)
-    s2 = Factory(:subscribable, projects: [proj], policy: Factory(:public_policy),contributor:person)
+    s1 = FactoryBot.create(:subscribable, projects: [proj], policy: FactoryBot.create(:public_policy),contributor:person)
+    s2 = FactoryBot.create(:subscribable, projects: [proj], policy: FactoryBot.create(:public_policy),contributor:person)
 
     refute s1.subscribed?(current_person)
     refute s2.subscribed?(current_person)
@@ -262,7 +262,7 @@ class SubscriptionTest < ActiveSupport::TestCase
     projects = [proj]
     s = nil
     assert_enqueued_jobs(1, only: SetSubscriptionsForItemJob) do
-      s = Factory(:subscribable, projects: projects, policy: Factory(:public_policy), contributor:current_person)
+      s = FactoryBot.create(:subscribable, projects: projects, policy: FactoryBot.create(:public_policy), contributor:current_person)
     end
 
     SetSubscriptionsForItemJob.perform_now(s, s.projects)
@@ -272,8 +272,8 @@ class SubscriptionTest < ActiveSupport::TestCase
     assert_equal proj, current_person.subscriptions.first.project_subscription.project
 
     # changing projects associated with the item
-    updated_project = Factory(:project)
-    current_person.add_to_project_and_institution(updated_project,Factory(:institution))
+    updated_project = FactoryBot.create(:project)
+    current_person.add_to_project_and_institution(updated_project,FactoryBot.create(:institution))
 
     assert_enqueued_with(job: RemoveSubscriptionsForItemJob, args: [s, [projects.first]]) do
       assert_enqueued_with(job: SetSubscriptionsForItemJob, args: [s, [updated_project]]) do
@@ -298,7 +298,7 @@ class SubscriptionTest < ActiveSupport::TestCase
   test 'should update subscription when associating the project to the item and a person subscribed to this project' do
     s = nil
     assert_enqueued_with(job: SetSubscriptionsForItemJob) do
-      s = Factory(:subscribable, policy: Factory(:public_policy))
+      s = FactoryBot.create(:subscribable, policy: FactoryBot.create(:public_policy))
     end
     project = s.projects.first
 
@@ -307,7 +307,7 @@ class SubscriptionTest < ActiveSupport::TestCase
     refute s.subscribed?(current_person)
 
     # changing projects associated with the item
-    proj = Factory(:project)
+    proj = FactoryBot.create(:project)
     current_person.project_subscriptions.create project: proj, frequency: 'weekly'
 
     assert_enqueued_with(job: SetSubscriptionsForItemJob, args: [s, [proj]]) do
@@ -331,8 +331,8 @@ class SubscriptionTest < ActiveSupport::TestCase
     refute s.subscribed?(current_person)
 
     # changing projects associated with the item
-    proj1 = Factory(:project)
-    proj2 = Factory(:project)
+    proj1 = FactoryBot.create(:project)
+    proj2 = FactoryBot.create(:project)
     current_person.project_subscriptions.create project: proj1, frequency: 'weekly'
     current_person.project_subscriptions.create project: proj2, frequency: 'weekly'
 
@@ -355,17 +355,17 @@ class SubscriptionTest < ActiveSupport::TestCase
   end
 
   test 'should remove subscriptions when updating the projects associating to an investigation' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     proj = person.projects.first
-    project2 = Factory(:project)
-    person.add_to_project_and_institution(project2, Factory(:institution))
+    project2 = FactoryBot.create(:project)
+    person.add_to_project_and_institution(project2, FactoryBot.create(:institution))
 
     current_person.project_subscriptions.create project: proj, frequency: 'weekly'
     assert Subscription.all.empty?
 
     assay = nil
     assert_enqueued_jobs(3, only: SetSubscriptionsForItemJob) do
-      assay = Factory(:assay, contributor: person, policy: Factory(:public_policy))
+      assay = FactoryBot.create(:assay, contributor: person, policy: FactoryBot.create(:public_policy))
     end
     study = assay.study
     investigation = assay.investigation
@@ -402,10 +402,10 @@ class SubscriptionTest < ActiveSupport::TestCase
   end
 
   test 'should add subscriptions when updating the projects associating to an investigation' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     proj = person.projects.first
-    project2 = Factory(:project)
-    person.add_to_project_and_institution(project2, Factory(:institution))
+    project2 = FactoryBot.create(:project)
+    person.add_to_project_and_institution(project2, FactoryBot.create(:institution))
 
     current_person.project_subscriptions.create project: proj, frequency: 'weekly'
     assert Subscription.all.empty?
@@ -413,9 +413,9 @@ class SubscriptionTest < ActiveSupport::TestCase
     study = nil
     assay = nil
     assert_enqueued_jobs(3, only: SetSubscriptionsForItemJob) do
-      investigation = Factory(:investigation, contributor: person, projects: [project2])
-      study = Factory(:study, contributor: person, investigation: investigation)
-      assay = Factory(:assay, contributor: person, study: study, policy: Factory(:public_policy))
+      investigation = FactoryBot.create(:investigation, contributor: person, projects: [project2])
+      study = FactoryBot.create(:study, contributor: person, investigation: investigation)
+      assay = FactoryBot.create(:assay, contributor: person, study: study, policy: FactoryBot.create(:public_policy))
     end
     SetSubscriptionsForItemJob.perform_now(assay, assay.projects)
     SetSubscriptionsForItemJob.perform_now(study, study.projects)
@@ -445,10 +445,10 @@ class SubscriptionTest < ActiveSupport::TestCase
   end
 
   test 'should remove subscriptions for a study and an assay associated with this study when updating the investigation associating with this study' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     proj = person.projects.first
-    project2 = Factory(:project)
-    person.add_to_project_and_institution(project2, Factory(:institution))
+    project2 = FactoryBot.create(:project)
+    person.add_to_project_and_institution(project2, FactoryBot.create(:institution))
 
     current_person.project_subscriptions.create project: proj, frequency: 'weekly'
     assert Subscription.all.empty?
@@ -457,7 +457,7 @@ class SubscriptionTest < ActiveSupport::TestCase
     study = nil
     assay = nil
     assert_enqueued_jobs(3, only: SetSubscriptionsForItemJob) do
-      assay = Factory(:assay, contributor: person, policy: Factory(:public_policy))
+      assay = FactoryBot.create(:assay, contributor: person, policy: FactoryBot.create(:public_policy))
       study = assay.study
       investigation = assay.investigation
     end
@@ -475,7 +475,7 @@ class SubscriptionTest < ActiveSupport::TestCase
     assert_enqueued_jobs(2, only: RemoveSubscriptionsForItemJob) do
       assert_enqueued_with(job: RemoveSubscriptionsForItemJob, args: [assay, [proj]]) do
         assert_enqueued_with(job: RemoveSubscriptionsForItemJob, args: [study, [proj]]) do
-          new_investigation = Factory(:investigation, contributor: person, projects: [project2])
+          new_investigation = FactoryBot.create(:investigation, contributor: person, projects: [project2])
           disable_authorization_checks do
             study.investigation = new_investigation
             study.save
@@ -496,10 +496,10 @@ class SubscriptionTest < ActiveSupport::TestCase
   end
 
   test 'should add subscriptions for a study and an assay associated with this study when updating the investigation associating with this study' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     proj = person.projects.first
-    project2 = Factory(:project)
-    person.add_to_project_and_institution(project2, Factory(:institution))
+    project2 = FactoryBot.create(:project)
+    person.add_to_project_and_institution(project2, FactoryBot.create(:institution))
 
     current_person.project_subscriptions.create project: proj, frequency: 'weekly'
     assert Subscription.all.empty?
@@ -508,9 +508,9 @@ class SubscriptionTest < ActiveSupport::TestCase
     study = nil
     assay = nil
     assert_enqueued_jobs(4, only: SetSubscriptionsForItemJob) do # 2 investigations, 1 study, 1 assay
-      investigation = Factory(:investigation, contributor: person, projects: [proj])
-      study = Factory(:study, contributor: person, investigation: Factory(:investigation, contributor: person, projects: [project2]))
-      assay = Factory(:assay, contributor: person, study: study, policy: Factory(:public_policy))
+      investigation = FactoryBot.create(:investigation, contributor: person, projects: [proj])
+      study = FactoryBot.create(:study, contributor: person, investigation: FactoryBot.create(:investigation, contributor: person, projects: [project2]))
+      assay = FactoryBot.create(:assay, contributor: person, study: study, policy: FactoryBot.create(:public_policy))
     end
 
     SetSubscriptionsForItemJob.perform_now(assay, assay.projects)

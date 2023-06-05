@@ -4,18 +4,18 @@ class PermissionTest < ActiveSupport::TestCase
   fixtures :all
 
   setup do
-    @programme = Factory(:programme)
-    @project = Factory(:project, programme: @programme)
-    @project2 = Factory(:project, programme: @programme)
-    @institution = Factory(:institution)
-    @person = Factory(:person, project: @project)
+    @programme = FactoryBot.create(:programme)
+    @project = FactoryBot.create(:project, programme: @programme)
+    @project2 = FactoryBot.create(:project, programme: @programme)
+    @institution = FactoryBot.create(:institution)
+    @person = FactoryBot.create(:person, project: @project)
     @person.add_to_project_and_institution(@project2, @institution)
-    @person2 = Factory(:person, project: @project)
+    @person2 = FactoryBot.create(:person, project: @project)
     @project2_work_group = @project2.work_groups.first
-    @favourite_group = Factory(:favourite_group, user: @person.user)
+    @favourite_group = FactoryBot.create(:favourite_group, user: @person.user)
     @favourite_group.favourite_group_memberships.create!(person: @person2, access_type: Policy::MANAGING)
 
-    @data_file = Factory(:data_file, projects: [@project], contributor: @person)
+    @data_file = FactoryBot.create(:data_file, projects: [@project], contributor: @person)
 
     # 1 of each type of permission
     @data_file.policy.permissions.create!(contributor: @institution, access_type: Policy::MANAGING)
@@ -88,7 +88,7 @@ class PermissionTest < ActiveSupport::TestCase
       assert @data_file.policy.permissions.create(contributor: @project2_work_group, access_type: Policy::EDITING)
       assert @data_file.policy.permissions.create(contributor: @favourite_group, access_type: Policy::EDITING)
 
-      p = @data_file.policy.permissions.build(contributor: Factory(:sop), access_type: Policy::EDITING)
+      p = @data_file.policy.permissions.build(contributor: FactoryBot.create(:sop), access_type: Policy::EDITING)
       refute p.save
       assert p.errors[:contributor_type].any?
     end

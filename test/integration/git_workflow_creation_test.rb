@@ -8,8 +8,8 @@ class GitWorkflowCreationTest < ActionDispatch::IntegrationTest
     version_count = Git::Version.count
     annotation_count = Git::Annotation.count
 
-    person = Factory(:person)
-    galaxy = WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class)
+    person = FactoryBot.create(:person)
+    galaxy = WorkflowClass.find_by_key('galaxy') || FactoryBot.create(:galaxy_workflow_class)
     login_as(person.user)
 
     get new_workflow_path
@@ -92,8 +92,8 @@ class GitWorkflowCreationTest < ActionDispatch::IntegrationTest
     version_count = Git::Version.count
     annotation_count = Git::Annotation.count
 
-    person = Factory(:person)
-    cwl = WorkflowClass.find_by_key('cwl') || Factory(:cwl_workflow_class)
+    person = FactoryBot.create(:person)
+    cwl = WorkflowClass.find_by_key('cwl') || FactoryBot.create(:cwl_workflow_class)
     login_as(person.user)
 
     get new_workflow_path
@@ -156,8 +156,8 @@ class GitWorkflowCreationTest < ActionDispatch::IntegrationTest
     version_count = Git::Version.count
     annotation_count = Git::Annotation.count
 
-    person = Factory(:person)
-    nextflow = WorkflowClass.find_by_key('nextflow') || Factory(:nextflow_workflow_class)
+    person = FactoryBot.create(:person)
+    nextflow = WorkflowClass.find_by_key('nextflow') || FactoryBot.create(:nextflow_workflow_class)
     login_as(person.user)
 
     get new_workflow_path
@@ -217,8 +217,8 @@ class GitWorkflowCreationTest < ActionDispatch::IntegrationTest
     version_count = Git::Version.count
     annotation_count = Git::Annotation.count
 
-    person = Factory(:person)
-    cwl = WorkflowClass.find_by_key('cwl') || Factory(:cwl_workflow_class)
+    person = FactoryBot.create(:person)
+    cwl = WorkflowClass.find_by_key('cwl') || FactoryBot.create(:cwl_workflow_class)
     login_as(person.user)
 
     get new_workflow_path
@@ -290,8 +290,8 @@ class GitWorkflowCreationTest < ActionDispatch::IntegrationTest
   end
 
   test 'reports extraction errors' do
-    login_as(Factory(:user))
-    galaxy = WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class)
+    login_as(FactoryBot.create(:user))
+    galaxy = WorkflowClass.find_by_key('galaxy') || FactoryBot.create(:galaxy_workflow_class)
 
     assert_enqueued_jobs(0) do
       assert_difference('Git::Repository.count', 1) do

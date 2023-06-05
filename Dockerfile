@@ -1,4 +1,4 @@
-FROM ruby:2.7-buster
+FROM ruby:3.1-slim-bullseye
 
 LABEL maintainer="Stuart Owen <orcid.org/0000-0003-2130-0865>, Finn Bacall"
 ARG SOURCE_COMMIT
@@ -9,11 +9,11 @@ ENV RAILS_ENV=production
 ENV LANG="en_US.UTF-8" LANGUAGE="en_US:UTF-8" LC_ALL="C.UTF-8"
 
 RUN apt-get update -qq && \
-    apt-get install -y --no-install-recommends build-essential cmake gettext graphviz git \
-		libcurl4-gnutls-dev libmagick++-dev libpq-dev libreadline-dev \
+    apt-get install -y --no-install-recommends build-essential cmake curl default-mysql-client gettext graphviz git \
+		libcurl4-gnutls-dev libmagick++-dev libmariadb-dev libpq-dev libreadline-dev \
 		libreoffice libsqlite3-dev libssl-dev libxml++2.6-dev \
-		libxslt1-dev locales default-mysql-client nginx nodejs openjdk-11-jdk-headless \
-		python3.7-dev python3.7-distutils python3-pip \
+		libxslt1-dev locales nginx nodejs openjdk-11-jdk-headless \
+		python3.9-dev python3.9-distutils python3-pip \
 		poppler-utils postgresql-client shared-mime-info sqlite3 links telnet vim-tiny zip && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
@@ -46,8 +46,8 @@ RUN touch config/using-docker #allows us to see within SEEK we are running in a 
 
 # Python dependencies from requirements.txt
 ENV PATH="/var/www/.local/bin:$PATH"
-RUN python3.7 -m pip install setuptools==58
-RUN python3.7 -m pip install -r requirements.txt
+RUN python3.9 -m pip install setuptools==58
+RUN python3.9 -m pip install -r requirements.txt
 
 # SQLite Database (for asset compilation)
 RUN mkdir sqlite3-db && \

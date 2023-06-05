@@ -7,8 +7,8 @@ class CollectionItemsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
 
   test 'should create collection item' do
-    collection = Factory(:collection)
-    doc = Factory(:public_document)
+    collection = FactoryBot.create(:collection)
+    doc = FactoryBot.create(:public_document)
     login_as(collection.contributor)
 
     assert_difference('CollectionItem.count', 1) do
@@ -24,9 +24,9 @@ class CollectionItemsControllerTest < ActionController::TestCase
   end
 
   test 'should not create collection item if no edit rights' do
-    collection = Factory(:collection, policy: Factory(:private_policy))
-    doc = Factory(:public_document)
-    login_as(Factory(:person))
+    collection = FactoryBot.create(:collection, policy: FactoryBot.create(:private_policy))
+    doc = FactoryBot.create(:public_document)
+    login_as(FactoryBot.create(:person))
 
     refute collection.can_edit?
 
@@ -39,8 +39,8 @@ class CollectionItemsControllerTest < ActionController::TestCase
   end
 
   test 'should not reveal private asset in JSON' do
-    private_asset = Factory(:private_document)
-    item = Factory(:collection_item, asset: private_asset)
+    private_asset = FactoryBot.create(:private_document)
+    item = FactoryBot.create(:collection_item, asset: private_asset)
     get :show, format: 'json', params: { collection_id: item.collection_id, id: item.id }
 
     assert_response :success

@@ -3,35 +3,35 @@ require 'test_helper'
 class StrainTest < ActiveSupport::TestCase
   fixtures :all
   def setup
-    User.current_user = Factory(:user)
+    User.current_user = FactoryBot.create(:user)
   end
 
   def setup
-    User.current_user = Factory(:user)
+    User.current_user = FactoryBot.create(:user)
   end
 
   test 'info' do
-    strain = Factory(:strain, title: 'CCTV')
+    strain = FactoryBot.create(:strain, title: 'CCTV')
     assert_equal 'CCTV (wild-type / wild-type)', strain.info
 
-    genotype = Factory(:genotype, gene: Factory(:gene, title: 'fff'), modification: Factory(:modification, title: 'del'))
+    genotype = FactoryBot.create(:genotype, gene: FactoryBot.create(:gene, title: 'fff'), modification: FactoryBot.create(:modification, title: 'del'))
     strain.genotypes << genotype
 
     assert_equal 'CCTV (del fff / wild-type)', strain.info
 
-    genotype = Factory(:genotype, gene: Factory(:gene, title: 'ggg'), modification: Factory(:modification, title: 'ins'))
+    genotype = FactoryBot.create(:genotype, gene: FactoryBot.create(:gene, title: 'ggg'), modification: FactoryBot.create(:modification, title: 'ins'))
     strain.genotypes << genotype
 
     assert_equal 'CCTV (del fff;ins ggg / wild-type)', strain.info
 
-    strain.phenotypes << Factory(:phenotype, description: 'yellow beard')
+    strain.phenotypes << FactoryBot.create(:phenotype, description: 'yellow beard')
 
     assert_equal 'CCTV (del fff;ins ggg / yellow beard)', strain.info
   end
 
   test 'to_rdf' do
-    object = Factory(:strain, organism: Factory(:organism, bioportal_concept: Factory(:bioportal_concept)), provider_id: 'Dxxu1')
-    Factory :assay_organism, strain: object, organism: object.organism
+    object = FactoryBot.create(:strain, organism: FactoryBot.create(:organism, bioportal_concept: FactoryBot.create(:bioportal_concept)), provider_id: 'Dxxu1')
+    FactoryBot.create :assay_organism, strain: object, organism: object.organism
 
     rdf = object.to_rdf
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
@@ -41,24 +41,24 @@ class StrainTest < ActiveSupport::TestCase
   end
 
   test 'assays' do
-    ao = Factory(:assay_organism)
+    ao = FactoryBot.create(:assay_organism)
     strain = ao.strain
     assert_equal [ao.assay], strain.assays
   end
 
   test 'ncbi uri' do
-    strain = Factory(:strain, organism: Factory(:organism, bioportal_concept: Factory(:bioportal_concept)))
+    strain = FactoryBot.create(:strain, organism: FactoryBot.create(:organism, bioportal_concept: FactoryBot.create(:bioportal_concept)))
     assert_equal 'http://purl.bioontology.org/ontology/NCBITAXON/2287', strain.ncbi_uri
 
-    strain = Factory(:organism)
+    strain = FactoryBot.create(:organism)
 
     assert_nil strain.ncbi_uri
   end
 
   test 'without default' do
     Strain.destroy_all
-    org = Factory :organism
-    Strain.create title: 'fred', is_dummy: false, organism: org, projects: [Factory(:project)]
+    org = FactoryBot.create :organism
+    Strain.create title: 'fred', is_dummy: false, organism: org, projects: [FactoryBot.create(:project)]
     Strain.create title: 'default', is_dummy: true, organism: org
     strains = org.strains.without_default
     assert_equal 1, strains.count
@@ -67,7 +67,7 @@ class StrainTest < ActiveSupport::TestCase
 
   test 'default strain for organism' do
     Strain.destroy_all
-    org = Factory :organism
+    org = FactoryBot.create :organism
     strain = nil
     assert_difference('Strain.count') do
       strain = Strain.default_strain_for_organism(org)
@@ -87,7 +87,7 @@ class StrainTest < ActiveSupport::TestCase
 
   test 'default strain for organism_id' do
     Strain.destroy_all
-    org = Factory :organism
+    org = FactoryBot.create :organism
     strain = nil
     assert_difference('Strain.count') do
       strain = Strain.default_strain_for_organism(org.id)
@@ -125,9 +125,9 @@ class StrainTest < ActiveSupport::TestCase
   end
 
   test 'destroy strain' do
-    genotype = Factory(:genotype, strain: nil)
-    phenotype = Factory(:phenotype, strain: nil)
-    strain = Factory(:strain, genotypes: [genotype], phenotypes: [phenotype])
+    genotype = FactoryBot.create(:genotype, strain: nil)
+    phenotype = FactoryBot.create(:phenotype, strain: nil)
+    strain = FactoryBot.create(:strain, genotypes: [genotype], phenotypes: [phenotype])
     disable_authorization_checks { strain.destroy }
     assert_nil Strain.find_by_id(strain.id)
     assert_nil Genotype.find_by_id(genotype.id)

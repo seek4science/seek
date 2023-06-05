@@ -9,7 +9,7 @@ class TaskTest < ActiveSupport::TestCase
     stub_request(:get, 'http://www.abc.com').to_return(body: 'abcdefghij' * 10,
                                                        headers: { content_type: 'text/plain' }, status: 200)
 
-    @content_blob = Factory(:url_content_blob)
+    @content_blob = FactoryBot.create(:url_content_blob)
   end
 
   test 'initialize task' do

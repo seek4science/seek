@@ -18,13 +18,13 @@ class ContentBlobTest < ActiveSupport::TestCase
     refute_includes blob.search_terms, 'http'
     refute_includes blob.search_terms, 'com'
 
-    blob = Factory(:txt_content_blob)
+    blob = FactoryBot.create(:txt_content_blob)
     assert_includes blob.search_terms, 'txt_test.txt'
     assert_includes blob.search_terms, 'txt'
   end
 
   test 'max indexable text size' do
-    blob = Factory :large_txt_content_blob
+    blob = FactoryBot.create :large_txt_content_blob
     size = blob.file_size
     assert size > 1.megabyte
     assert size < 2.megabyte
@@ -45,13 +45,13 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'md5sum_on_demand' do
-    blob = Factory :rightfield_content_blob
+    blob = FactoryBot.create :rightfield_content_blob
     assert_not_nil blob.md5sum
     assert_equal '01788bca93265d80e8127ca0039bb69b', blob.md5sum
   end
 
   test 'sha1 sum on demand' do
-    blob = Factory :rightfield_content_blob
+    blob = FactoryBot.create :rightfield_content_blob
     assert_not_nil blob.sha1sum
     assert_equal 'ffd634ac7564083ab7b66bc3eb2053cbc3d608f5', blob.sha1sum
   end
@@ -104,30 +104,30 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   def test_cache_key
-    blob = Factory :rightfield_content_blob
+    blob = FactoryBot.create :rightfield_content_blob
     assert_equal "content_blobs/#{blob.id}-ffd634ac7564083ab7b66bc3eb2053cbc3d608f5", blob.cache_key
   end
 
   def test_cache_url
-    blob = Factory :url_content_blob
+    blob = FactoryBot.create :url_content_blob
     assert_equal "content_blobs/#{blob.id}--5891ceaaba77a89b06e4afb5d914fe716840765e", blob.cache_key
   end
 
   def test_cache_key_does_change
-    blob = Factory :rightfield_content_blob
+    blob = FactoryBot.create :rightfield_content_blob
     assert_equal "content_blobs/#{blob.id}-ffd634ac7564083ab7b66bc3eb2053cbc3d608f5", blob.cache_key
-    blob2 = Factory :rightfield_content_blob
+    blob2 = FactoryBot.create :rightfield_content_blob
     assert_equal "content_blobs/#{blob2.id}-ffd634ac7564083ab7b66bc3eb2053cbc3d608f5", blob2.cache_key
-    blob3 =  Factory :teusink_model_content_blob
+    blob3 =  FactoryBot.create :teusink_model_content_blob
     assert_not_equal "content_blobs/#{blob3.id}-ffd634ac7564083ab7b66bc3eb2053cbc3d608f5", blob2.cache_key
   end
 
   def test_cache_key_url_does_change
-    blob = Factory :url_content_blob
+    blob = FactoryBot.create :url_content_blob
     assert_equal "content_blobs/#{blob.id}--5891ceaaba77a89b06e4afb5d914fe716840765e", blob.cache_key
     blob.url = "http://bbc.co.uk"
     assert_not_equal "content_blobs/#{blob.id}--5891ceaaba77a89b06e4afb5d914fe716840765e", blob.cache_key
-    blob2 =  Factory :url_content_blob
+    blob2 =  FactoryBot.create :url_content_blob
     assert_not_equal "content_blobs/#{blob.id}--5891ceaaba77a89b06e4afb5d914fe716840765e", blob2.cache_key
   end
 
@@ -187,7 +187,7 @@ class ContentBlobTest < ActiveSupport::TestCase
 
   # simply checks that get and set data returns the same thing
   def test_data_assignment2
-    pic = Factory(:content_blob, data: data_for_test('file_picture.png'))
+    pic = FactoryBot.create(:content_blob, data: data_for_test('file_picture.png'))
     pic.data = data_for_test('little_file.txt')
     pic.save!
     assert_equal data_for_test('little_file.txt'), pic.data_io_object.read
@@ -199,7 +199,7 @@ class ContentBlobTest < ActiveSupport::TestCase
 
   #
   def test_will_overwrite_if_data_changes
-    pic = Factory(:content_blob, data: data_for_test('file_picture.png'))
+    pic = FactoryBot.create(:content_blob, data: data_for_test('file_picture.png'))
     pic.save!
     assert_equal data_for_test('file_picture.png'), File.open(pic.filepath, 'rb').read
     pic.data = data_for_test('little_file.txt')
@@ -208,7 +208,7 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   def test_uuid
-    blob = Factory(:content_blob)
+    blob = FactoryBot.create(:content_blob)
     blob.save!
     assert_not_nil blob.uuid
     assert_equal blob.uuid, ContentBlob.find(blob.id).uuid
@@ -300,11 +300,11 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   def test_filesize
-    cb = Factory :content_blob, data: 'z'
+    cb = FactoryBot.create :content_blob, data: 'z'
     assert_equal 1, cb.file_size
     File.delete(cb.filepath)
     assert_equal 1, cb.file_size
-    cb = Factory :rightfield_content_blob
+    cb = FactoryBot.create :rightfield_content_blob
     assert_not_nil cb.file_size
     assert_equal 9216, cb.file_size
   end
@@ -318,7 +318,7 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'storage_directory and filepath' do
-    content_blob = Factory(:content_blob)
+    content_blob = FactoryBot.create(:content_blob)
     storage_directory = content_blob.data_storage_directory
     converted_storage_directory = content_blob.converted_storage_directory
     assert_equal "#{Rails.root}/tmp/testing-filestore/assets", storage_directory
@@ -330,69 +330,69 @@ class ContentBlobTest < ActiveSupport::TestCase
 
   test 'file_exists?' do
     # specify uuid here to avoid repeating uuid of other content_blob when running the whole test file
-    content_blob = Factory(:content_blob, uuid: '1111')
+    content_blob = FactoryBot.create(:content_blob, uuid: '1111')
     assert content_blob.file_exists?
-    content_blob = Factory(:content_blob, uuid: '2222', data: nil)
+    content_blob = FactoryBot.create(:content_blob, uuid: '2222', data: nil)
     refute content_blob.file_exists?
   end
 
   test 'human content type' do
-    content_blob = Factory(:docx_content_blob)
+    content_blob = FactoryBot.create(:docx_content_blob)
     assert_equal 'Word document', content_blob.human_content_type
 
-    content_blob = Factory(:content_blob, content_type: 'application/msexcel')
+    content_blob = FactoryBot.create(:content_blob, content_type: 'application/msexcel')
     assert_equal 'Spreadsheet', content_blob.human_content_type
 
-    content_blob = Factory(:xlsm_content_blob)
+    content_blob = FactoryBot.create(:xlsm_content_blob)
     assert_equal 'Spreadsheet (macro enabled)', content_blob.human_content_type
 
-    content_blob = Factory.create(:pdf_content_blob, content_type: 'application/pdf')
+    content_blob = FactoryBot.create(:pdf_content_blob, content_type: 'application/pdf')
     assert_equal 'PDF document', content_blob.human_content_type
 
-    content_blob = Factory(:content_blob, content_type: 'text/html')
+    content_blob = FactoryBot.create(:content_blob, content_type: 'text/html')
     assert_equal 'HTML document', content_blob.human_content_type
 
-    content_blob = Factory(:content_blob, content_type: 'application/x-download')
+    content_blob = FactoryBot.create(:content_blob, content_type: 'application/x-download')
     assert_equal 'Unknown file type', content_blob.human_content_type
 
-    content_blob = Factory(:content_blob, content_type: '')
+    content_blob = FactoryBot.create(:content_blob, content_type: '')
     assert_equal 'Unknown file type', content_blob.human_content_type
 
-    content_blob = Factory(:content_blob)
+    content_blob = FactoryBot.create(:content_blob)
     assert_equal 'Unknown file type', content_blob.human_content_type
 
-    content_blob = Factory(:tiff_content_blob)
+    content_blob = FactoryBot.create(:tiff_content_blob)
     assert_equal 'TIFF image', content_blob.human_content_type
   end
 
   test 'override mimetype presented, with detected type' do
-    blob = Factory.build(:csv_content_blob, content_type:'application/vnd.excel')
+    blob = FactoryBot.build(:csv_content_blob, content_type:'application/vnd.excel')
     assert_equal 'application/vnd.excel',blob.content_type
     blob.save!
     assert_equal 'text/csv',blob.content_type
 
-    blob = Factory.build(:xlsm_content_blob,content_type:'text/csv')
+    blob = FactoryBot.build(:xlsm_content_blob,content_type:'text/csv')
     assert_equal 'text/csv',blob.content_type
     blob.save!
     assert_equal 'application/vnd.ms-excel.sheet.macroEnabled.12',blob.content_type
   end
 
   test 'mimemagic updates content type on creation if binary' do
-    tmp_blob = Factory(:pdf_content_blob) # to get the filepath
+    tmp_blob = FactoryBot.create(:pdf_content_blob) # to get the filepath
     content_blob = ContentBlob.create data: File.new(tmp_blob.filepath, 'rb').read, original_filename: 'blob', content_type: 'application/octet-stream'
     assert_equal 'application/pdf', content_blob.content_type
     assert content_blob.is_pdf?
   end
 
   test 'is_binary?' do
-    content_blob = Factory(:pdf_content_blob)
+    content_blob = FactoryBot.create(:pdf_content_blob)
     refute content_blob.is_binary?
-    content_blob = Factory(:binary_content_blob)
+    content_blob = FactoryBot.create(:binary_content_blob)
     assert content_blob.is_binary?
   end
 
   test 'covert_office should doc to pdf and then docslit convert pdf to txt' do
-    content_blob = Factory(:doc_content_blob, uuid: 'doc_1')
+    content_blob = FactoryBot.create(:doc_content_blob, uuid: 'doc_1')
     assert File.exist? content_blob.filepath
     pdf_path = content_blob.filepath('pdf')
     FileUtils.rm pdf_path if File.exist? pdf_path
@@ -411,7 +411,7 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'convert_office should convert docx to pdf and then docsplit convert pdf to txt' do
-    content_blob = Factory(:docx_content_blob, uuid: 'docx_1')
+    content_blob = FactoryBot.create(:docx_content_blob, uuid: 'docx_1')
     assert File.exist? content_blob.filepath
     FileUtils.rm content_blob.filepath('pdf') if File.exist? content_blob.filepath('pdf')
     refute File.exist?(content_blob.filepath('pdf'))
@@ -429,7 +429,7 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'convert_office should convert odt to pdf and then docsplit converts pdf to txt' do
-    content_blob = Factory(:odt_content_blob, uuid: 'odt_1')
+    content_blob = FactoryBot.create(:odt_content_blob, uuid: 'odt_1')
     assert File.exist? content_blob.filepath
     FileUtils.rm content_blob.filepath('pdf') if File.exist? content_blob.filepath('pdf')
     refute File.exist?(content_blob.filepath('pdf'))
@@ -447,7 +447,7 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'convert_office should convert ppt to pdf and then docsplit converts pdf to txt' do
-    content_blob = Factory(:ppt_content_blob, uuid: 'ppt_1')
+    content_blob = FactoryBot.create(:ppt_content_blob, uuid: 'ppt_1')
     assert File.exist? content_blob.filepath
     FileUtils.rm content_blob.filepath('pdf') if File.exist? content_blob.filepath('pdf')
     refute File.exist?(content_blob.filepath('pdf'))
@@ -465,7 +465,7 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'convert_office should convert pptx to pdf and then docsplit converts pdf to txt' do
-    content_blob = Factory(:pptx_content_blob, uuid: 'pptx_1')
+    content_blob = FactoryBot.create(:pptx_content_blob, uuid: 'pptx_1')
     assert File.exist? content_blob.filepath
     FileUtils.rm content_blob.filepath('pdf') if File.exist? content_blob.filepath('pdf')
     refute File.exist?(content_blob.filepath('pdf'))
@@ -483,7 +483,7 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'convert_office should convert odp to pdf and then docsplit converts pdf to txt' do
-    content_blob = Factory(:odp_content_blob, uuid: 'odp_1')
+    content_blob = FactoryBot.create(:odp_content_blob, uuid: 'odp_1')
     assert File.exist? content_blob.filepath
     FileUtils.rm content_blob.filepath('pdf') if File.exist? content_blob.filepath('pdf')
     refute File.exist?(content_blob.filepath('pdf'))
@@ -501,7 +501,7 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'convert_office should convert rtf to pdf and then docsplit converts pdf to txt' do
-    content_blob = Factory(:rtf_content_blob, uuid: 'rtf_1')
+    content_blob = FactoryBot.create(:rtf_content_blob, uuid: 'rtf_1')
     assert File.exist? content_blob.filepath
     FileUtils.rm content_blob.filepath('pdf') if File.exist? content_blob.filepath('pdf')
     refute File.exist?(content_blob.filepath('pdf'))
@@ -520,7 +520,7 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'convert_office should convert txt to pdf' do
-    content_blob = Factory(:txt_content_blob, uuid: 'txt_1')
+    content_blob = FactoryBot.create(:txt_content_blob, uuid: 'txt_1')
     assert File.exist? content_blob.filepath
     FileUtils.rm content_blob.filepath('pdf') if File.exist? content_blob.filepath('pdf')
     refute File.exist?(content_blob.filepath('pdf'))
@@ -542,20 +542,20 @@ class ContentBlobTest < ActiveSupport::TestCase
       viewable_formats << 'application/rtf'
 
       viewable_formats.each do |viewable_format|
-        cb_with_content_viewable_format = Factory(:content_blob, content_type: viewable_format, asset: Factory(:sop), data: File.new("#{Rails.root}/test/fixtures/files/a_pdf_file.pdf", 'rb').read)
+        cb_with_content_viewable_format = FactoryBot.create(:content_blob, content_type: viewable_format, asset: FactoryBot.create(:sop), data: File.new("#{Rails.root}/test/fixtures/files/a_pdf_file.pdf", 'rb').read)
         User.with_current_user cb_with_content_viewable_format.asset.contributor do
           assert cb_with_content_viewable_format.is_viewable_format?
           assert cb_with_content_viewable_format.is_content_viewable?
         end
       end
-      cb_with_no_viewable_format = Factory(:content_blob, content_type: 'application/excel', asset: Factory(:sop), data: File.new("#{Rails.root}/test/fixtures/files/spreadsheet.xls", 'rb').read)
+      cb_with_no_viewable_format = FactoryBot.create(:content_blob, content_type: 'application/excel', asset: FactoryBot.create(:sop), data: File.new("#{Rails.root}/test/fixtures/files/spreadsheet.xls", 'rb').read)
       User.with_current_user cb_with_no_viewable_format.asset.contributor do
         refute cb_with_no_viewable_format.is_viewable_format?
         refute cb_with_no_viewable_format.is_content_viewable?
       end
 
       #correct format but file doesn't exist
-      blob = Factory(:content_blob, content_type: 'application/msword', asset: Factory(:sop))
+      blob = FactoryBot.create(:content_blob, content_type: 'application/msword', asset: FactoryBot.create(:sop))
       FileUtils.rm blob.filepath
 
       assert blob.is_viewable_format?
@@ -573,7 +573,7 @@ class ContentBlobTest < ActiveSupport::TestCase
       viewable_formats << 'odp_content_blob'
 
       viewable_formats.each do |format|
-        cb = Factory(format.to_s, asset:Factory(:sop))
+        cb = FactoryBot.create(format.to_s, asset:FactoryBot.create(:sop))
         User.with_current_user cb.asset.contributor do
           refute cb.is_content_viewable?
         end
@@ -582,13 +582,13 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'content not needing conversion should be viewable when pdf_conversion is disabled' do
-    pdf_content_blob = Factory(:content_blob, content_type: 'application/pdf', asset: Factory(:sop), data: File.new("#{Rails.root}/test/fixtures/files/a_pdf_file.pdf", 'rb').read)
+    pdf_content_blob = FactoryBot.create(:content_blob, content_type: 'application/pdf', asset: FactoryBot.create(:sop), data: File.new("#{Rails.root}/test/fixtures/files/a_pdf_file.pdf", 'rb').read)
 
     with_config_value :pdf_conversion_enabled, false do
       viewable_formats = %w[txt_content_blob csv_content_blob tsv_content_blob pdf_content_blob]
 
       viewable_formats.each do |format|
-        cb = Factory(format.to_s,asset:Factory(:sop))
+        cb = FactoryBot.create(format.to_s,asset:FactoryBot.create(:sop))
         User.with_current_user cb.asset.contributor do
           assert cb.is_content_viewable?
         end
@@ -598,7 +598,7 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'filter_text_content' do
-    ms_word_sop_cb = Factory(:doc_content_blob)
+    ms_word_sop_cb = FactoryBot.create(:doc_content_blob)
     content = "test \n content \f only"
     filtered_content = ms_word_sop_cb.send(:filter_text_content, content)
     refute filtered_content.include?('\n')
@@ -606,26 +606,26 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'pdf_contents_for_search for a doc file' do
-    ms_word_sop_content_blob = Factory(:doc_content_blob)
+    ms_word_sop_content_blob = FactoryBot.create(:doc_content_blob)
     assert ms_word_sop_content_blob.is_pdf_convertable?
     content = ms_word_sop_content_blob.pdf_contents_for_search
     assert_equal ['This is a ms word doc format'], content
   end
 
   test 'pdf_contents_for_search for a pdf file' do
-    pdf_content_blob = Factory(:pdf_content_blob)
+    pdf_content_blob = FactoryBot.create(:pdf_content_blob)
     assert pdf_content_blob.is_pdf?
     content = pdf_content_blob.pdf_contents_for_search
     assert_equal ['This is a pdf format'], content
   end
 
   test 'calculates file size' do
-    blob = Factory(:pdf_content_blob)
+    blob = FactoryBot.create(:pdf_content_blob)
     assert_equal 8827, blob.file_size
   end
 
   test 'updates file size' do
-    blob = Factory(:pdf_content_blob)
+    blob = FactoryBot.create(:pdf_content_blob)
     blob.data = '123456'
     blob.save
     assert_equal 6, blob.file_size
@@ -633,7 +633,7 @@ class ContentBlobTest < ActiveSupport::TestCase
 
   test 'calculates file size for remote content' do
     stub_request(:head, 'http://www.abc.com').to_return(headers: { content_length: 500, content_type: 'text/plain' }, status: 200)
-    blob = Factory(:url_content_blob)
+    blob = FactoryBot.create(:url_content_blob)
     assert_equal 500, blob.file_size
   end
 
@@ -645,7 +645,7 @@ class ContentBlobTest < ActiveSupport::TestCase
         body: File.new("#{Rails.root}/test/fixtures/files/checksums.txt"),
         headers: { content_type: 'text/plain' }, status: 200)
 
-    blob = Factory(:url_content_blob)
+    blob = FactoryBot.create(:url_content_blob)
     blob.save
     blob.reload
     refute blob.file_exists?
@@ -666,7 +666,7 @@ class ContentBlobTest < ActiveSupport::TestCase
     stub_request(:get, 'http://www.abc.com').to_return(body: 'abcdefghij' * 500,
                                                        headers: { content_type: 'text/plain' }, status: 200)
 
-    blob = Factory(:url_content_blob)
+    blob = FactoryBot.create(:url_content_blob)
     refute blob.file_exists?
     assert_nil blob.file_size
 
@@ -684,7 +684,7 @@ class ContentBlobTest < ActiveSupport::TestCase
     stub_request(:get, 'http://www.abc.com').to_return(body: 'abcdefghij' * 600,
                                                        headers: { content_type: 'text/plain' }, status: 200)
 
-    blob = Factory(:url_content_blob)
+    blob = FactoryBot.create(:url_content_blob)
     refute blob.file_exists?
     assert_equal 500, blob.file_size
 
@@ -703,7 +703,7 @@ class ContentBlobTest < ActiveSupport::TestCase
     # Infinitely redirects
     stub_request(:get, 'http://www.abc.com').to_return(headers: { location: 'http://www.abc.com' }, status: 302)
 
-    blob = Factory(:url_content_blob)
+    blob = FactoryBot.create(:url_content_blob)
     refute blob.file_exists?
     assert_equal 500, blob.file_size
 
@@ -719,7 +719,7 @@ class ContentBlobTest < ActiveSupport::TestCase
     )
     stub_request(:get, 'http://www.abc.com').to_return(status: 404)
 
-    blob = Factory(:url_content_blob)
+    blob = FactoryBot.create(:url_content_blob)
     refute blob.file_exists?
     assert_equal 500, blob.file_size
 
@@ -738,7 +738,7 @@ class ContentBlobTest < ActiveSupport::TestCase
     stub_request(:get, 'http://www.abc.com/xyz').to_return(body: 'abcdefghij' * 500,
                                                            headers: { content_type: 'text/plain' }, status: 200)
 
-    blob = Factory(:url_content_blob)
+    blob = FactoryBot.create(:url_content_blob)
     refute blob.file_exists?
     assert_nil blob.file_size
 
@@ -756,7 +756,7 @@ class ContentBlobTest < ActiveSupport::TestCase
     stub_request(:get, 'http://www.abc.com/xyz').to_return(body: 'abcdefghij' * 500,
                                                            headers: { content_type: 'text/plain' }, status: 200)
 
-    blob = Factory(:url_content_blob)
+    blob = FactoryBot.create(:url_content_blob)
     refute blob.file_exists?
     assert_nil blob.file_size
 
@@ -776,7 +776,7 @@ class ContentBlobTest < ActiveSupport::TestCase
     stub_request(:get, 'http://www.xyz.com/xyz').to_return(body: 'abcdefghij' * 500,
                                                            headers: { content_type: 'text/plain' }, status: 200)
 
-    blob = Factory(:url_content_blob)
+    blob = FactoryBot.create(:url_content_blob)
     refute blob.file_exists?
     assert_nil blob.file_size
 
@@ -792,7 +792,7 @@ class ContentBlobTest < ActiveSupport::TestCase
       VCR.turned_off do
         assert PrivateAddressCheck.resolves_to_private_address?('localhost')
 
-        blob = Factory(:url_content_blob, url: 'http://localhost/secrets')
+        blob = FactoryBot.create(:url_content_blob, url: 'http://localhost/secrets')
         refute blob.file_exists?
 
         assert_raise PrivateAddressCheck::PrivateConnectionAttemptedError do
@@ -807,14 +807,14 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'is_text?' do
-    assert Factory(:txt_content_blob).is_text?
-    assert Factory(:csv_content_blob).is_text?
-    assert Factory(:tsv_content_blob).is_text?
-    assert Factory(:teusink_model_content_blob).is_text?
-    assert Factory(:json_content_blob).is_text?
+    assert FactoryBot.create(:txt_content_blob).is_text?
+    assert FactoryBot.create(:csv_content_blob).is_text?
+    assert FactoryBot.create(:tsv_content_blob).is_text?
+    assert FactoryBot.create(:teusink_model_content_blob).is_text?
+    assert FactoryBot.create(:json_content_blob).is_text?
 
-    refute Factory(:ppt_content_blob).is_text?
-    refute Factory(:binary_content_blob).is_text?
+    refute FactoryBot.create(:ppt_content_blob).is_text?
+    refute FactoryBot.create(:binary_content_blob).is_text?
   end
 
   test 'can retrieve from NeLS' do
@@ -847,7 +847,7 @@ class ContentBlobTest < ActiveSupport::TestCase
     t1 = 1.day.ago
     blob = nil
     travel_to(t1) do
-      blob = Factory(:content_blob)
+      blob = FactoryBot.create(:content_blob)
       assert_equal t1.to_s, blob.created_at.to_s
       assert_equal t1.to_s, blob.updated_at.to_s
     end
@@ -861,7 +861,7 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'deletes image files after destroy' do
-    blob = Factory(:image_content_blob)
+    blob = FactoryBot.create(:image_content_blob)
     filepath = blob.file_path
     refute_nil filepath
     assert File.exist?(filepath)
@@ -872,7 +872,7 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'deletes files after destroy' do
-    blob = Factory(:spreadsheet_content_blob)
+    blob = FactoryBot.create(:spreadsheet_content_blob)
     filepath = blob.file_path
     refute_nil filepath
     assert File.exist?(filepath)
@@ -883,7 +883,7 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'deletes converted files after destroy' do
-    blob = Factory(:doc_content_blob)
+    blob = FactoryBot.create(:doc_content_blob)
     pdf_path = blob.filepath('pdf')
     txt_path = blob.filepath('txt')
 
@@ -901,7 +901,7 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'fix mime type after failed csv extraction' do
-    blob = Factory(:image_content_blob, content_type:'application/excel', original_filename:'image.xls')
+    blob = FactoryBot.create(:image_content_blob, content_type:'application/excel', original_filename:'image.xls')
     assert blob.is_excel?
 
     text = blob.to_csv
@@ -915,7 +915,7 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'fix mime type after failed pdf contents for search' do
-    blob = Factory(:image_content_blob, content_type: 'application/msword', original_filename: 'image.doc')
+    blob = FactoryBot.create(:image_content_blob, content_type: 'application/msword', original_filename: 'image.doc')
     assert blob.is_pdf_convertable?
 
     assert_empty blob.pdf_contents_for_search
@@ -926,7 +926,7 @@ class ContentBlobTest < ActiveSupport::TestCase
     assert_equal 'image/png', blob.content_type
 
     # incorrectly described as pdf
-    blob = Factory(:image_content_blob, content_type: 'application/pdf', original_filename: 'image.pdf')
+    blob = FactoryBot.create(:image_content_blob, content_type: 'application/pdf', original_filename: 'image.pdf')
 
     assert_empty blob.pdf_contents_for_search
 
@@ -936,13 +936,13 @@ class ContentBlobTest < ActiveSupport::TestCase
     assert_equal 'image/png', blob.content_type
 
     # handles when the file is actually broken, rather than failing due to the mime type
-    blob = Factory(:broken_pdf_content_blob)
+    blob = FactoryBot.create(:broken_pdf_content_blob)
     assert_empty blob.pdf_contents_for_search
     assert_equal 'application/pdf', blob.content_type
   end
 
   test 'fix mime type after spreadsheet xml fail' do
-    blob = Factory(:image_content_blob, content_type:'application/msexcel', original_filename:'image.xls')
+    blob = FactoryBot.create(:image_content_blob, content_type:'application/msexcel', original_filename:'image.xls')
     assert blob.is_extractable_spreadsheet?
 
     assert_raises(SysMODB::SpreadsheetExtractionException) do
@@ -960,12 +960,12 @@ class ContentBlobTest < ActiveSupport::TestCase
     file.write('test test test')
     file.close
 
-    assert File.exists?(file.path)
+    assert File.exist?(file.path)
     tmp_object = File.open(file.path)
     blob = ContentBlob.create(original_filename:'testing-content-blob.txt', tmp_io_object: tmp_object)
     assert blob.file_exists?
     assert_equal 14,blob.file_size
-    refute File.exists?(file.path)
+    refute File.exist?(file.path)
   end
 
   test 'tmp_io_object not in tmp are not deleted' do
@@ -978,12 +978,12 @@ class ContentBlobTest < ActiveSupport::TestCase
     blob = ContentBlob.create(original_filename:'testing-content-blob.txt', tmp_io_object: tmp_object)
     assert blob.file_exists?
     assert_equal 14,blob.file_size
-    assert File.exists?(path)
+    assert File.exist?(path)
     File.delete(path)
   end
 
   test 'enqueues remote content fetching job' do
-    content_blob = Factory.build(:url_content_blob, make_local_copy: true)
+    content_blob = FactoryBot.build(:url_content_blob, make_local_copy: true)
     refute content_blob.remote_content_fetch_task.pending?
     assert_difference('Task.count', 1) do
       assert_enqueued_with(job: RemoteContentFetchingJob, args: [content_blob]) do
@@ -994,7 +994,7 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'does not enqueue remote content fetching job for local content blob' do
-    content_blob = Factory.build(:content_blob)
+    content_blob = FactoryBot.build(:content_blob)
     assert_no_difference('Task.count') do
       assert_no_enqueued_jobs(only: RemoteContentFetchingJob) do
         content_blob.save!
@@ -1010,8 +1010,8 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'is_image_convertable?' do
-    assert Factory(:image_content_blob).is_image_convertable?
-    refute Factory(:svg_content_blob).is_image_convertable?
-    refute Factory(:pdf_content_blob).is_image_convertable?
+    assert FactoryBot.create(:image_content_blob).is_image_convertable?
+    refute FactoryBot.create(:svg_content_blob).is_image_convertable?
+    refute FactoryBot.create(:pdf_content_blob).is_image_convertable?
   end
 end

@@ -13,7 +13,7 @@ module ApiTestHelper
 
   def private_resource
     res = resource
-    res.update_column(:policy_id, Factory(:private_policy).id) if res.respond_to?(:policy)
+    res.update_column(:policy_id, FactoryBot.create(:private_policy).id) if res.respond_to?(:policy)
     res
   end
 
@@ -166,13 +166,13 @@ module ApiTestHelper
   end
 
   def admin_login
-    admin = Factory.create(:admin)
+    admin = FactoryBot.create(:admin)
     @current_user = admin.user
     # log in
     post '/session', params: { login: @current_user.login, password: generate_user_password }
   end
 
-  def user_login(person = Factory(:person))
+  def user_login(person = FactoryBot.create(:person))
     @current_user = person.user
     post '/session', params: { login: person.user.login, password: ('0' * User::MIN_PASSWORD_LENGTH) }
   end

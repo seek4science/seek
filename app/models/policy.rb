@@ -61,7 +61,7 @@ class Policy < ApplicationRecord
   EVERYONE = 4
 
   # access_type
-  DETERMINED_BY_GROUP = -1  # used for whitelist/blacklist (meaning that it doesn't matter what value this field has)
+  DETERMINED_BY_GROUP = -1  # used for allowlist/denylist (meaning that it doesn't matter what value this field has)
   NO_ACCESS = 0             # i.e. only for anyone; only owner has access
   VISIBLE = 1               # visible only
   ACCESSIBLE = 2            # accessible and visible
@@ -187,15 +187,15 @@ class Policy < ApplicationRecord
   def self.private_policy
     Policy.new(name: 'default private',
                access_type: NO_ACCESS,
-               use_whitelist: false,
-               use_blacklist: false)
+               use_allowlist: false,
+               use_denylist: false)
   end
 
   def self.registered_users_accessible_policy
     Policy.new(name: 'default accessible',
                access_type: ACCESSIBLE,
-               use_whitelist: false,
-               use_blacklist: false)
+               use_allowlist: false,
+               use_denylist: false)
   end
 
   def self.public_policy
@@ -242,8 +242,8 @@ class Policy < ApplicationRecord
   def get_settings
     settings = {}
     settings['access_type'] = access_type
-    settings['use_whitelist'] = use_whitelist
-    settings['use_blacklist'] = use_blacklist
+    settings['use_allowlist'] = use_allowlist
+    settings['use_denylist'] = use_denylist
     settings
   end
 
@@ -263,7 +263,7 @@ class Policy < ApplicationRecord
       # some of the contributor types will have special additional parameters
       case p.contributor_type
       when 'FavouriteGroup'
-        params_hash['whitelist_or_blacklist'] = [FavouriteGroup::WHITELIST_NAME, FavouriteGroup::BLACKLIST_NAME].include?(p.contributor.name)
+        params_hash['allowlist_or_denylist'] = [FavouriteGroup::ALLOWLIST_NAME, FavouriteGroup::DENYLIST_NAME].include?(p.contributor.name)
       end
 
       p_settings << [p.id, params_hash]
@@ -299,8 +299,8 @@ class Policy < ApplicationRecord
                         'Project' => [],
                         'Programme' => [],
                         'Institution' => [],
-                        'WhiteList' => [],
-                        'BlackList' => [],
+                        'AllowList' => [],
+                        'DenyList' => [],
                         'Network' => [],
                         'Public' => 0 }
     # the result return: a hash contain the access_type as key, and array of people as value
@@ -326,17 +326,17 @@ class Policy < ApplicationRecord
     filtered_people = precedence(filtered_people, people_in_group['FavouriteGroup'])
     filtered_people = precedence(filtered_people, people_in_group['Person'])
 
-    # add people in white list
-    filtered_people = add_people_in_whitelist(filtered_people, people_in_group['WhiteList'])
-    # add people in blacklist
-    filtered_people = precedence(filtered_people, people_in_group['BlackList'])
+    # add people in allowlist
+    filtered_people = add_people_in_allowlist(filtered_people, people_in_group['AllowList'])
+    # add people in denylist
+    filtered_people = precedence(filtered_people, people_in_group['DenyList'])
 
     # add creators and assign them the Policy::EDITING right
     creator_array = creators.collect { |c| [c.id, c.name.to_s, Policy::EDITING] unless c.blank? }
-    filtered_people = add_people_in_whitelist(filtered_people, creator_array)
+    filtered_people = add_people_in_allowlist(filtered_people, creator_array)
 
     # add contributor
-    filtered_people = add_people_in_whitelist(filtered_people, [[contributor.id, contributor.name.to_s, Policy::MANAGING]]) unless contributor.blank?
+    filtered_people = add_people_in_allowlist(filtered_people, [[contributor.id, contributor.name.to_s, Policy::MANAGING]]) unless contributor.blank?
 
     # sort people by name
     filtered_people = filtered_people.sort { |a, b| a[1] <=> b[1] }
@@ -382,12 +382,12 @@ class Policy < ApplicationRecord
     people_in_group
   end
 
-  # REVIEW: people in black list, white list and normal workgroup
-  def get_people_in_FG(contributor, fg_id = nil, is_white_list = nil, is_black_list = nil)
-    f_group = if is_white_list
-                FavouriteGroup.where(['name = ? AND user_id = ?', '__whitelist__', contributor.user.id]).first
-              elsif is_black_list
-                FavouriteGroup.where(['name = ? AND user_id = ?', '__blacklist__', contributor.user.id]).first
+  # REVIEW: people in denylist, allowlist and normal workgroup
+  def get_people_in_FG(contributor, fg_id = nil, is_allowed_list = nil, is_denied_list = nil)
+    f_group = if is_allowed_list
+                FavouriteGroup.where(['name = ? AND user_id = ?', FavouriteGroup::ALLOWLIST_NAME, contributor.user.id]).first
+              elsif is_denied_list
+                FavouriteGroup.where(['name = ? AND user_id = ?', FavouriteGroup::DENYLIST_NAME, contributor.user.id]).first
               else
                 FavouriteGroup.find_by_id(fg_id)
               end
@@ -441,11 +441,11 @@ class Policy < ApplicationRecord
     result
   end
 
-  # add people which are in whitelist to the people list
-  def add_people_in_whitelist(people_list, whitelist)
+  # add people which are in allowlist to the people list
+  def add_people_in_allowlist(people_list, allowlist)
     result = []
     result |= people_list
-    result |= whitelist
+    result |= allowlist
     remove_duplicate(result)
   end
 

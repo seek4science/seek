@@ -28,7 +28,7 @@ class GitWorkflowWizardTest < ActiveSupport::TestCase
   end
 
   test 'do not create duplicate repo for same remote' do
-    Factory(:remote_repository)
+    FactoryBot.create(:remote_repository)
     repo = Git::Repository.find_by_remote('https://github.com/seek4science/workflow-test-fixture.git')
     refute_nil repo
 
@@ -56,7 +56,7 @@ class GitWorkflowWizardTest < ActiveSupport::TestCase
   end
 
   test 'direct to select_ref if ref missing' do
-    repo = Factory(:remote_repository)
+    repo = FactoryBot.create(:remote_repository)
     params = {
       workflow: {
         git_version_attributes: {
@@ -72,7 +72,7 @@ class GitWorkflowWizardTest < ActiveSupport::TestCase
   end
 
   test 'direct to select_paths if main workflow path missing and cannot be inferred from ro-crate-metadata' do
-    repo = Factory(:remote_repository)
+    repo = FactoryBot.create(:remote_repository)
     params = {
       workflow: {
         git_version_attributes: {
@@ -90,7 +90,7 @@ class GitWorkflowWizardTest < ActiveSupport::TestCase
   end
 
   test 'skip select_paths if main workflow path can be inferred from ro-crate-metadata.json' do
-    repo = Factory(:workflow_ro_crate_repository)
+    repo = FactoryBot.create(:workflow_ro_crate_repository)
     params = {
       workflow: {
         git_version_attributes: {
@@ -110,7 +110,7 @@ class GitWorkflowWizardTest < ActiveSupport::TestCase
   end
 
   test 'direct to provide_metadata if repo, ref and main workflow path are present' do
-    repo = Factory(:remote_repository)
+    repo = FactoryBot.create(:remote_repository)
     params = {
       workflow: {
         git_version_attributes: {
@@ -147,7 +147,7 @@ class GitWorkflowWizardTest < ActiveSupport::TestCase
   end
 
   test 'copies git annotations when creating new workflow version' do
-    workflow = Factory(:ro_crate_git_workflow)
+    workflow = FactoryBot.create(:ro_crate_git_workflow)
     params = {
       workflow: {
         git_version_attributes: {
@@ -167,7 +167,7 @@ class GitWorkflowWizardTest < ActiveSupport::TestCase
   end
 
   test 'does not copy git annotations when creating new workflow version if path no longer exists' do
-    workflow = Factory(:remote_git_workflow)
+    workflow = FactoryBot.create(:remote_git_workflow)
     refute_nil workflow.git_version.main_workflow_path
     refute_nil workflow.git_version.diagram_path
 

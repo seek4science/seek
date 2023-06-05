@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - ansible
+      - full-test-suite
   workflow_dispatch:
 
 jobs:
@@ -12,7 +13,7 @@ jobs:
     continue-on-error: true
     strategy:
       matrix:
-        os: [ubuntu-18.04,ubuntu-20.04,ubuntu-22.04]
+        os: [ubuntu-20.04,ubuntu-22.04]
 
     services:
       mysql:
@@ -39,7 +40,7 @@ jobs:
           sed -i '/\- hosts\: localhost/a \ \ connection\: local' Deploy-SEEK.yml
           sed -i 's/user_var\: username/user_var\: runner/' group_vars/vars.yml
           sed -i 's/git_dest\: \/home\/username/git_dest\: \/home\/runner\/work/' group_vars/vars.yml
-          sed -i 's|git_version: main|git_version: '"${GITHUB_REF##*/}"'|' group_vars/vars.yml
+          sed -i 's|git_version: main|git_version: '"${GITHUB_REF_NAME}"'|' group_vars/vars.yml
           sed -i '/sql_user\: sql_username/a sql_password: mysqlpassword' group_vars/vars.yml
 
       - name: Prepares system for ansible install

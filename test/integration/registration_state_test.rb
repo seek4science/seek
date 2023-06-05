@@ -5,7 +5,7 @@ class RegistrationStateTest < ActionDispatch::IntegrationTest
   fixtures :all
 
   test 'partially registered user always redirects to select person' do
-    User.current_user = Factory(:user, login: 'partial', person: nil)
+    User.current_user = FactoryBot.create(:user, login: 'partial', person: nil)
     post '/session', params: { login: 'partial', password: generate_user_password }
     assert_redirected_to register_people_path
 
@@ -26,7 +26,7 @@ class RegistrationStateTest < ActionDispatch::IntegrationTest
     get root_path
     assert_redirected_to register_people_path
 
-    get sop_path(Factory :sop)
+    get sop_path(FactoryBot.create :sop)
     assert_redirected_to register_people_path
   end
 end

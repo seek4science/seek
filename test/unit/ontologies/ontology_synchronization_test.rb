@@ -4,10 +4,10 @@ class OntologySynchronizationTest < ActiveSupport::TestCase
 
   def setup
     unless AssayClass.for_type('modelling')
-      Factory(:modelling_assay_class)
+      FactoryBot.create(:modelling_assay_class)
     end
     unless AssayClass.for_type('experimental')
-      Factory(:experimental_assay_class)
+      FactoryBot.create(:experimental_assay_class)
     end
   end
 
@@ -19,11 +19,11 @@ class OntologySynchronizationTest < ActiveSupport::TestCase
   end
 
   test 'suggested assay types found' do
-    top = Factory :suggested_assay_type, label: 'top_at', ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics'
-    child1 = Factory :suggested_assay_type, label: 'child1_at', parent: top, ontology_uri: nil
-    child2 = Factory :suggested_assay_type, label: 'child2_at', parent: child1, ontology_uri: nil
+    top = FactoryBot.create :suggested_assay_type, label: 'top_at', ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics'
+    child1 = FactoryBot.create :suggested_assay_type, label: 'child1_at', parent: top, ontology_uri: nil
+    child2 = FactoryBot.create :suggested_assay_type, label: 'child2_at', parent: child1, ontology_uri: nil
 
-    assay = Factory(:experimental_assay, suggested_assay_type: child1, assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics')
+    assay = FactoryBot.create(:experimental_assay, suggested_assay_type: child1, assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics')
     assay.save!
     assay.reload
 
@@ -51,11 +51,11 @@ class OntologySynchronizationTest < ActiveSupport::TestCase
   end
 
   test 'suggested technology types found' do
-    top = Factory :suggested_technology_type, label: 'top_at', ontology_uri: 'http://jermontology.org/ontology/JERMOntology#FRAP'
-    child1 = Factory :suggested_technology_type, label: 'child1_tech', parent: top, ontology_uri: nil
-    child2 = Factory :suggested_technology_type, label: 'child2_tech', parent: child1, ontology_uri: nil
+    top = FactoryBot.create :suggested_technology_type, label: 'top_at', ontology_uri: 'http://jermontology.org/ontology/JERMOntology#FRAP'
+    child1 = FactoryBot.create :suggested_technology_type, label: 'child1_tech', parent: top, ontology_uri: nil
+    child2 = FactoryBot.create :suggested_technology_type, label: 'child2_tech', parent: child1, ontology_uri: nil
 
-    assay = Factory(:experimental_assay, suggested_technology_type: child1, technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#FRAP')
+    assay = FactoryBot.create(:experimental_assay, suggested_technology_type: child1, technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#FRAP')
     assay.save!
     assay.reload
 
@@ -83,7 +83,7 @@ class OntologySynchronizationTest < ActiveSupport::TestCase
   end
 
   test 'reverts to default uri if removed' do
-    assay = Factory(:experimental_assay, assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Cell_size', technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#HPLC')
+    assay = FactoryBot.create(:experimental_assay, assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Cell_size', technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#HPLC')
 
     with_config_value :technology_type_ontology_file, "file:#{Rails.root}/test/fixtures/files/JERM-sync-test.rdf" do
       with_config_value :assay_type_ontology_file, "file:#{Rails.root}/test/fixtures/files/JERM-sync-test.rdf" do
@@ -103,8 +103,8 @@ class OntologySynchronizationTest < ActiveSupport::TestCase
   test 'ontology uri for matching suggested type changes assay class so suggested type remains with label updated' do
     # this is to handle the case that a suggested label appears in the ontology but as a different class of assay (experimental <-> modelling)
     # instead the suggested type label is updated and assay remains unaffected. a warning is printed out
-    suggested = Factory :suggested_assay_type, label: 'experimental_to_modelling', ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics'
-    assay = Factory(:experimental_assay, suggested_assay_type: suggested, assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics', technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#HPLC')
+    suggested = FactoryBot.create :suggested_assay_type, label: 'experimental_to_modelling', ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics'
+    assay = FactoryBot.create(:experimental_assay, suggested_assay_type: suggested, assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics', technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#HPLC')
     refute assay.is_modelling?
     with_config_value :assay_type_ontology_file, "file:#{Rails.root}/test/fixtures/files/JERM-sync-test.rdf" do
       with_config_value :modelling_analysis_type_ontology_file, "file:#{Rails.root}/test/fixtures/files/JERM-sync-test.rdf" do
@@ -127,8 +127,8 @@ class OntologySynchronizationTest < ActiveSupport::TestCase
     Seek::Ontologies::AssayTypeReader.instance.reset
     Seek::Ontologies::ModellingAnalysisTypeReader.instance.reset
 
-    suggested = Factory(:suggested_assay_type, label: 'modelling_to_experimental', ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Translation')
-    assay = Factory(:modelling_assay, suggested_assay_type: suggested, assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Translation')
+    suggested = FactoryBot.create(:suggested_assay_type, label: 'modelling_to_experimental', ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Translation')
+    assay = FactoryBot.create(:modelling_assay, suggested_assay_type: suggested, assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Translation')
     assert assay.is_modelling?
     with_config_value :assay_type_ontology_file, "file:#{Rails.root}/test/fixtures/files/JERM-sync-test.rdf" do
       with_config_value :modelling_analysis_type_ontology_file, "file:#{Rails.root}/test/fixtures/files/JERM-sync-test.rdf" do

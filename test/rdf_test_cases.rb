@@ -4,7 +4,7 @@ module RdfTestCases
   test 'get rdf' do
     object = rdf_test_object
 
-    # this strange bit of code forces the model to be reloaded from the database after being created by FactoryGirl.
+    # this strange bit of code forces the model to be reloaded from the database after being created by FactoryBot.
     # this is to (possibly) avoid a variation in the updated_at timestamps. It means the comparison is always against what
     # in the in the database, rather than between that created in memory and that in the database.
     object = object.class.find(object.id)
@@ -52,13 +52,13 @@ module RdfTestCases
   end
 
   def rdf_test_object
-    object = Factory(model_name.underscore)
+    object = FactoryBot.create(model_name.underscore)
     login_as(object.contributor) if object.respond_to?(:contributor)
     object
   end
 
   def private_rdf_test_object
-    Factory(model_name.underscore, policy: Factory(:private_policy))
+    FactoryBot.create(model_name.underscore, policy: FactoryBot.create(:private_policy))
   end
 
   def invoke_rdf_get(object)

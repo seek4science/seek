@@ -3,7 +3,7 @@ require 'openbis_test_helper'
 
 class OpenbisMetadataStoreTest < ActiveSupport::TestCase
   def setup
-    @openbis_endpoint = Factory(:openbis_endpoint)
+    @openbis_endpoint = FactoryBot.create(:openbis_endpoint)
     @store = @openbis_endpoint.metadata_store
   end
 
@@ -52,7 +52,7 @@ class OpenbisMetadataStoreTest < ActiveSupport::TestCase
 
   test 'cleanup cleans only expired' do
     # making fresh so it wont have content
-    openbis_endpoint = Factory(:openbis_endpoint)
+    openbis_endpoint = FactoryBot.create(:openbis_endpoint)
     assert 122 > openbis_endpoint.refresh_period_mins
     store = openbis_endpoint.metadata_store
 
@@ -76,7 +76,7 @@ class OpenbisMetadataStoreTest < ActiveSupport::TestCase
 
   test 'automaticaly expires entries' do
     # making fresh so it wont have content
-    openbis_endpoint = Factory(:openbis_endpoint)
+    openbis_endpoint = FactoryBot.create(:openbis_endpoint)
     assert 122 > openbis_endpoint.refresh_period_mins
     store = openbis_endpoint.metadata_store
 

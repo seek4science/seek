@@ -2,7 +2,7 @@ require 'test_helper'
 
 class CitationStyleTest < ActionDispatch::IntegrationTest
   def setup
-    @model = Factory(:model, policy: Factory(:public_policy))
+    @model = FactoryBot.create(:model, policy: FactoryBot.create(:public_policy))
     @doi = '10.1.1.1/xxx'
     @model.latest_version.update_attribute(:doi, @doi)
     @current_user = @model.contributor.user

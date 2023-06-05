@@ -7,7 +7,7 @@ class FavouritesControllerTest < ActionController::TestCase
   fixtures :users, :favourites, :projects, :people, :institutions, :saved_searches
 
   def setup
-    @person = Factory(:person)
+    @person = FactoryBot.create(:person)
     login_as(@person)
   end
 
@@ -69,7 +69,7 @@ class FavouritesControllerTest < ActionController::TestCase
   end
 
   test "can't add duplicate favourite search query" do
-    ss = Factory :saved_search
+    ss = FactoryBot.create :saved_search
     login_as(ss.user)
     assert_no_difference('Favourite.count') do
       assert_no_difference('SavedSearch.count') do
@@ -80,7 +80,7 @@ class FavouritesControllerTest < ActionController::TestCase
   end
 
   test 'can add duplicate favourite search query with different type' do
-    ss = Factory :saved_search
+    ss = FactoryBot.create :saved_search
     login_as(ss.user)
     assert_difference('Favourite.count', 1) do
       assert_difference('SavedSearch.count', 1) do
@@ -91,7 +91,7 @@ class FavouritesControllerTest < ActionController::TestCase
   end
 
   test 'can add duplicate favourite search query with different external flag' do
-    ss = Factory :saved_search
+    ss = FactoryBot.create :saved_search
     login_as(ss.user)
     assert_difference('Favourite.count', 1) do
       assert_difference('SavedSearch.count', 1) do
@@ -104,7 +104,7 @@ class FavouritesControllerTest < ActionController::TestCase
   test 'can delete saved search' do
     Favourite.destroy_all
     SavedSearch.destroy_all
-    ss = Factory :saved_search
+    ss = FactoryBot.create :saved_search
     login_as(ss.user)
 
     f = Favourite.create(resource: ss, user: ss.user)

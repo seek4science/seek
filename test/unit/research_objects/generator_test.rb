@@ -26,11 +26,11 @@ class GeneratorTest < ActiveSupport::TestCase
 
   test 'generate for investigation with duplicate files' do
     inv = investigation
-    model = Factory(:model, policy: Factory(:public_policy))
+    model = FactoryBot.create(:model, policy: FactoryBot.create(:public_policy))
     disable_authorization_checks do
-      model.content_blobs << Factory(:doc_content_blob, original_filename: 'xxx.txt')
-      model.content_blobs << Factory(:doc_content_blob, original_filename: 'xxx.txt')
-      model.content_blobs << Factory(:doc_content_blob, original_filename: 'xxx.txt')
+      model.content_blobs << FactoryBot.create(:doc_content_blob, original_filename: 'xxx.txt')
+      model.content_blobs << FactoryBot.create(:doc_content_blob, original_filename: 'xxx.txt')
+      model.content_blobs << FactoryBot.create(:doc_content_blob, original_filename: 'xxx.txt')
       model.save!
       inv.assays.last.associate(model)
     end
@@ -45,8 +45,8 @@ class GeneratorTest < ActiveSupport::TestCase
   end
 
   test 'generate assay with a sample' do
-    assay = Factory(:assay,policy:Factory(:public_policy))
-    sample = Factory(:sample,policy:Factory(:public_policy))
+    assay = FactoryBot.create(:assay,policy:FactoryBot.create(:public_policy))
+    sample = FactoryBot.create(:sample,policy:FactoryBot.create(:public_policy))
     AssayAsset.create assay: assay, asset: sample, direction: AssayAsset::Direction::INCOMING
     assay.reload
     assert_equal [sample],assay.samples
@@ -91,31 +91,31 @@ class GeneratorTest < ActiveSupport::TestCase
   def investigation
     stub_request(:head, 'http://www.abc.com/').to_return(status: 200, headers: { 'Content-Type' => 'text/html' })
 
-    assay_asset1 = Factory(:assay_asset, asset: Factory(:data_file, policy: Factory(:public_policy)))
-    assay_asset2 = Factory(:assay_asset, asset: Factory(:sop, policy: Factory(:public_policy)))
-    assay_asset3 = Factory(:assay_asset, asset: Factory(:model, policy: Factory(:public_policy)))
-    assay_asset4 = Factory(:assay_asset, asset: Factory(:url_sop, policy: Factory(:public_policy)))
-    @assay_asset5 = Factory(:assay_asset, asset: Factory(:model_with_image, policy: Factory(:public_policy)))
-    @assay_asset6 = Factory(:assay_asset, asset: Factory(:model_2_files, policy: Factory(:public_policy)))
+    assay_asset1 = FactoryBot.create(:assay_asset, asset: FactoryBot.create(:data_file, policy: FactoryBot.create(:public_policy)))
+    assay_asset2 = FactoryBot.create(:assay_asset, asset: FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy)))
+    assay_asset3 = FactoryBot.create(:assay_asset, asset: FactoryBot.create(:model, policy: FactoryBot.create(:public_policy)))
+    assay_asset4 = FactoryBot.create(:assay_asset, asset: FactoryBot.create(:url_sop, policy: FactoryBot.create(:public_policy)))
+    @assay_asset5 = FactoryBot.create(:assay_asset, asset: FactoryBot.create(:model_with_image, policy: FactoryBot.create(:public_policy)))
+    @assay_asset6 = FactoryBot.create(:assay_asset, asset: FactoryBot.create(:model_2_files, policy: FactoryBot.create(:public_policy)))
 
     @assay_asset5.asset.save! # this seems to be required to save the model_image and record its association.
 
-    contributor = Factory(:person)
+    contributor = FactoryBot.create(:person)
 
-    inv = Factory(:investigation, policy: Factory(:public_policy),contributor:contributor)
-    study = Factory(:study, policy: Factory(:public_policy), investigation: inv, contributor:contributor)
+    inv = FactoryBot.create(:investigation, policy: FactoryBot.create(:public_policy),contributor:contributor)
+    study = FactoryBot.create(:study, policy: FactoryBot.create(:public_policy), investigation: inv, contributor:contributor)
 
-    expassay = Factory(:modelling_assay,
+    expassay = FactoryBot.create(:modelling_assay,
                        assay_assets: [assay_asset1, assay_asset2, assay_asset3, assay_asset4],
-                       policy: Factory(:public_policy),
+                       policy: FactoryBot.create(:public_policy),
                        study: study,
                        contributor:contributor)
 
-    Factory :relationship, subject: expassay, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: Factory(:publication)
+    FactoryBot.create :relationship, subject: expassay, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: FactoryBot.create(:publication)
 
-    Factory(:modelling_assay,
+    FactoryBot.create(:modelling_assay,
             assay_assets: [@assay_asset5, @assay_asset6],
-            policy: Factory(:public_policy),
+            policy: FactoryBot.create(:public_policy),
             study: study,
             contributor:contributor)
     inv

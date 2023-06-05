@@ -2,7 +2,7 @@ require 'test_helper'
 
 class ApiTokenTest < ActiveSupport::TestCase
   test 'plain text token available after create' do
-    user = Factory(:user)
+    user = FactoryBot.create(:user)
 
     api_token = user.api_tokens.build(title: 'Test')
 
@@ -12,7 +12,7 @@ class ApiTokenTest < ActiveSupport::TestCase
   end
 
   test 'plain text token not available at any other time' do
-    api_token = Factory(:api_token)
+    api_token = FactoryBot.create(:api_token)
     api_token = ApiToken.find(api_token.id) # Have to reload it...
 
     assert_nil api_token.token

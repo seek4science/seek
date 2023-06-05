@@ -2,7 +2,7 @@ require 'test_helper'
 
 class ScraperTest < ActiveSupport::TestCase
   def setup
-    @person = Factory(:person)
+    @person = FactoryBot.create(:person)
     @project = @person.projects.first
     @project_ids = [@project.id]
   end

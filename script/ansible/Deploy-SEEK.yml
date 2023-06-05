@@ -91,6 +91,9 @@
         usermod -a -G rvm '{{user_var}}'
       tags: rvm
 
+    - name: Reset connection  #To allow user changes to take affect with new login shell
+      meta: reset_connection
+      tags: ruby
 
     ########## Clone SEEK
 
@@ -120,70 +123,10 @@
 
     ########## Install ruby
 
-    - name: Download openssl for Ruby 2.7.x
-      become: true
-      become_user: root
-      shell: bash -lc "{{ item }}"
-      with_items:
-        - wget https://www.openssl.org/source/openssl-1.1.1g.tar.gz -P '{{git_dest}}/'
-        - tar zxvf '{{git_dest}}/openssl-1.1.1g.tar.gz' -C '{{git_dest}}/'
-      args:
-        chdir: '{{git_dest}}'
-      run_once: true
-      when: ansible_distribution_version is version('22.04', '>=')
-      tags:
-        - openssl
-        - ruby
-
-    - name: Install openssl for Ruby 2.7.x
-      become: true
-      become_user: root
-      shell: bash -lc "{{ item }}"
-      with_items:
-        - ./config --prefix='{{git_dest}}/.openssl/openssl-1.1.1g' --openssldir='{{git_dest}}/.openssl/openssl-1.1.1g'
-        - make
-        - make install
-        - rm -rf '{{git_dest}}/.openssl/openssl-1.1.1g/certs'
-        - ln -s /etc/ssl/certs '{{git_dest}}/.openssl/openssl-1.1.1g/certs'
-      args:
-        chdir: '{{git_dest}}/openssl-1.1.1g'
-      run_once: true
-      when: ansible_distribution_version is version('22.04', '>=')
-      tags:
-        - openssl
-        - ruby
-
-    - name: Cleanup openssl for Ruby 2.7.x
-      become: true
-      become_user: root
-      ansible.builtin.file:
-        path: "{{ item }}"
-        state: absent
-      with_items:
-        - '{{git_dest}}/openssl-1.1.1g'
-        - '{{git_dest}}/openssl-1.1.1g.tar.gz'
-      run_once: true
-      when: ansible_distribution_version is version('22.04', '>=')
-      tags:
-        - openssl
-        - ruby
-
-    - name: Reset connection  #To allow user changes to affect 'current login user'
-      meta: reset_connection
-      tags: ruby
-
-    - name:  Install Ruby (Ubuntu >= 22.04)
-      shell: bash -lc "{{ item }}"    #The bash -lc "{{ item }}" wrapper around the shell commands (items) makes sure rvm environment variables are available.
-      with_items:
-        - rvm install $(cat '{{git_dest}}/SEEK/.ruby-version') --with-openssl-dir='{{git_dest}}/.openssl/openssl-1.1.1g'
-      when: ansible_distribution_version is version('22.04', '>=')
-      tags: ruby
-
-    - name:  Install Ruby (Ubuntu < 22.04)
+    - name:  Install Ruby
       shell: bash -lc "{{ item }}"
       with_items:
         - rvm install $(cat '{{git_dest}}/SEEK/.ruby-version')
-      when: ansible_distribution_version is version('22.04', '<')
       tags: ruby
 
     - name: Set default Ruby
@@ -222,7 +165,7 @@
 
     ########## Install python tools
 
-    - name: Add repository to install python3.7
+    - name: Add repository to install python3.9
       become: true
       become_user: root
       ansible.builtin.apt_repository:
@@ -238,29 +181,19 @@
       become_user: root
       ansible.builtin.apt:
         pkg:
-        - python3.7-dev
-        - python3.7-distutils
+        - python3.9-dev
+        - python3.9-distutils
         - python3-pip
         - python3-pymysql
       tags:
         - python
         - packages
 
-    - name: Install filelock and wheel (Ubuntu < 20.04)
-      shell: bash -lc "{{ item }}"
-      with_items:
-        - python3.7 -m pip install filelock
-        - python3.7 -m pip install wheel
-      args:
-        chdir: '{{git_dest}}/SEEK'
-      when: ansible_distribution_version is version('20.04', '<')
-      tags: python
-
     - name: Install SEEK's python requirements
       shell: bash -lc "{{ item }}"
       with_items:
-        - python3.7 -m pip install setuptools==58
-        - python3.7 -m pip install -r requirements.txt
+        - python3.9 -m pip install setuptools==58
+        - python3.9 -m pip install -r requirements.txt
       args:
         chdir: '{{git_dest}}/SEEK'
       tags:

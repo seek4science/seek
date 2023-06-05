@@ -5,7 +5,7 @@ class HumanDiseaseApiTest < ActionDispatch::IntegrationTest
 
   def setup
     user_login
-    @human_disease = Factory(:human_disease)
+    @human_disease = FactoryBot.create(:human_disease)
   end
 
   def skip_index_test?

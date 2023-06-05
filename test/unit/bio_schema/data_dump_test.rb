@@ -35,7 +35,7 @@ class DataDumpTest < ActiveSupport::TestCase
     old_length = dump.bioschemas.length
     file_path = dump.file.path
 
-    new_workflow = Factory(:public_workflow, title: 'New workflow!')
+    new_workflow = FactoryBot.create(:public_workflow, title: 'New workflow!')
     updated_dump = Seek::BioSchema::DataDump.new(Workflow)
     updated_dump.write
 
@@ -118,10 +118,10 @@ class DataDumpTest < ActiveSupport::TestCase
     types.each do |type|
       refute Seek::BioSchema::DataDump.new(type).exists?
       if type.method_defined?(:policy=)
-        public_resource = Factory(type.name.underscore.to_sym, policy: Factory(:public_policy))
-        private_resource = Factory(type.name.underscore.to_sym, policy: Factory(:private_policy))
+        public_resource = FactoryBot.create(type.name.underscore.to_sym, policy: FactoryBot.create(:public_policy))
+        private_resource = FactoryBot.create(type.name.underscore.to_sym, policy: FactoryBot.create(:private_policy))
       else
-        resource = Factory(type.name.underscore.to_sym)
+        resource = FactoryBot.create(type.name.underscore.to_sym)
       end
     end
 
@@ -158,9 +158,9 @@ class DataDumpTest < ActiveSupport::TestCase
 
   def create_workflow_dump
     Workflow.delete_all
-    @workflows = FactoryGirl.create_list(:public_workflow, 3)
-    @private_workflows = [Factory(:workflow, policy: Factory(:private_policy)),
-                          Factory(:workflow, policy: Factory(:all_sysmo_viewable_policy))]
+    @workflows = FactoryBot.create_list(:public_workflow, 3)
+    @private_workflows = [FactoryBot.create(:workflow, policy: FactoryBot.create(:private_policy)),
+                          FactoryBot.create(:workflow, policy: FactoryBot.create(:all_sysmo_viewable_policy))]
 
     Seek::BioSchema::DataDump.new(Workflow)
   end
