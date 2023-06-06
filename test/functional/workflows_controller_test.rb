@@ -1687,4 +1687,21 @@ class WorkflowsControllerTest < ActionController::TestCase
     get :index, params: { dump: true }, format: :jsonld
     assert_response :not_found
   end
+
+  test 'disables files tab if no download permission' do
+    workflow = FactoryBot.create(:local_git_workflow, policy: FactoryBot.create(:publicly_viewable_policy))
+    refute workflow.can_download?
+
+    get :show, params: { id: workflow.id }
+
+    assert_select 'li.disabled', text: 'Files'
+
+    login_as(workflow.contributor)
+
+    assert workflow.can_download?
+
+    get :show, params: { id: workflow.id }
+
+    assert_select 'li.disabled', text: 'Files', count: 0
+  end
 end

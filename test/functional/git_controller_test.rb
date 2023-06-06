@@ -233,22 +233,22 @@ class GitControllerTest < ActionController::TestCase
   end
 
   test 'getting blob with no permissions throws error' do
-    logout
-    get :blob, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'diagram.png' }, format: :html
+    workflow = FactoryBot.create(:local_git_workflow, policy: FactoryBot.create(:publicly_viewable_policy))
+    get :blob, params: { workflow_id: workflow.id, version: 1, path: 'diagram.png' }, format: :html
 
     assert flash[:error].include?('authorized')
   end
 
   test 'getting raw with no permissions throws error' do
-    logout
-    get :raw, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'diagram.png' }, format: :html
+    workflow = FactoryBot.create(:local_git_workflow, policy: FactoryBot.create(:publicly_viewable_policy))
+    get :raw, params: { workflow_id: workflow.id, version: 1, path: 'diagram.png' }, format: :html
 
     assert flash[:error].include?('authorized')
   end
 
   test 'download with no permissions throws error' do
-    logout
-    get :download, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'diagram.png' }, format: :html
+    workflow = FactoryBot.create(:local_git_workflow, policy: FactoryBot.create(:publicly_viewable_policy))
+    get :download, params: { workflow_id: workflow.id, version: 1, path: 'diagram.png' }, format: :html
 
     assert flash[:error].include?('authorized')
   end
@@ -330,8 +330,8 @@ class GitControllerTest < ActionController::TestCase
   end
 
   test 'cannot browse tree with no permissions' do
-    logout
-    get :tree, params: { workflow_id: @workflow.id, version: @git_version.version }
+    workflow = FactoryBot.create(:local_git_workflow, policy: FactoryBot.create(:publicly_viewable_policy))
+    get :tree, params: { workflow_id: workflow.id, version: 1 }
 
     assert flash[:error].include?('authorized')
   end

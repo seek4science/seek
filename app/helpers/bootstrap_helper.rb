@@ -181,7 +181,7 @@ module BootstrapHelper
     end
   end
 
-  def tab(*args, &block)
+  def tab(*args, disabled_reason: nil, &block)
     if block_given?
       tab_id, selected = *args
       title = nil
@@ -191,11 +191,28 @@ module BootstrapHelper
 
     selected = show_page_tab == tab_id if selected.nil?
 
-    content_tag(:li, class: selected ? 'active' : '') do
+    tab_options = {}
+    link_options = {
+      data: { target: "##{tab_id}",
+              toggle: 'tab' },
+      aria: { controls: tab_id },
+      role: 'tab'
+    }
+
+    if disabled_reason
+      tab_options[:class] = 'disabled'
+      tab_options['data-tooltip'] = disabled_reason
+      tab_options[:onclick] = "alert('#{disabled_reason}');";
+      link_options = {}
+    elsif selected
+      tab_options[:class] = 'active'
+    end
+
+    content_tag(:li, **tab_options) do
       if block_given?
-        content_tag(:a, data: { target: "##{tab_id}", toggle: 'tab' }, aria: { controls: tab_id }, role: 'tab', &block)
+        content_tag(:a, **link_options, &block)
       else
-        content_tag(:a, title, data: { target: "##{tab_id}", toggle: 'tab' }, aria: { controls: tab_id }, role: 'tab')
+        content_tag(:a, title, **a_options, role: 'tab')
       end
     end
   end
