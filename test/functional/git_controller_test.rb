@@ -746,4 +746,30 @@ class GitControllerTest < ActionController::TestCase
     assert_redirected_to @workflow
     assert_equal :public, @workflow.find_version(1).reload.visibility,'Should not have changed visibility - latest version'
   end
+
+  test 'actions are logged' do
+    @git_version.add_file('file.md', FactoryBot.create(:markdown_content_blob))
+    disable_authorization_checks { @git_version.save! }
+
+    assert_difference('@workflow.download_count') do
+      get :raw, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'concat_two_files.ga' }
+    end
+
+    assert_response :success
+    log = @workflow.activity_logs.last
+    assert_equal 'download', log.action
+    assert_equal 'concat_two_files.ga', log.data[:path]
+
+    assert_no_difference('@workflow.download_count') do
+      assert_difference('@workflow.reload.activity_logs.count') do
+        get :raw, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'file.md', display: 'markdown' }
+      end
+    end
+
+    assert_response :success
+    log = @workflow.activity_logs.last
+    assert_equal 'inline_view', log.action
+    assert_equal 'file.md', log.data[:path]
+    assert_equal 'markdown', log.data[:display]
+  end
 end

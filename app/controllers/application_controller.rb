@@ -381,9 +381,10 @@ class ApplicationController < ActionController::Base
         action = 'create' if action == 'create_metadata' || action == 'create_from_template'
         action = 'update' if action == 'create_version'
         action = 'inline_view' if action == 'explore'
+        action = 'download' if action == 'ro_crate'
         if %w(show create update destroy download inline_view).include?(action)
           check_log_exists(action, controller_name, object)
-            ActivityLog.create(action: action,
+          ActivityLog.create(action: action,
                              culprit: current_user,
                              referenced: object.projects.first,
                              controller_name: controller_name,

@@ -1704,4 +1704,16 @@ class WorkflowsControllerTest < ActionController::TestCase
 
     assert_select 'li.disabled', text: 'Files', count: 0
   end
+
+  test 'RO-Crate downloads are logged' do
+    workflow = FactoryBot.create(:generated_galaxy_ro_crate_workflow, policy: FactoryBot.create(:public_policy))
+
+    assert_difference('workflow.download_count') do
+      get :ro_crate, params: { id: workflow.id }
+    end
+
+    assert_response :success
+    log = workflow.activity_logs.last
+    assert_equal 'download', log.action
+  end
 end
