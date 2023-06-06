@@ -236,6 +236,7 @@ class GitControllerTest < ActionController::TestCase
     workflow = FactoryBot.create(:local_git_workflow, policy: FactoryBot.create(:publicly_viewable_policy))
     get :blob, params: { workflow_id: workflow.id, version: 1, path: 'diagram.png' }, format: :html
 
+    assert_redirected_to workflow
     assert flash[:error].include?('authorized')
   end
 
@@ -243,6 +244,7 @@ class GitControllerTest < ActionController::TestCase
     workflow = FactoryBot.create(:local_git_workflow, policy: FactoryBot.create(:publicly_viewable_policy))
     get :raw, params: { workflow_id: workflow.id, version: 1, path: 'diagram.png' }, format: :html
 
+    assert_redirected_to workflow
     assert flash[:error].include?('authorized')
   end
 
@@ -250,6 +252,7 @@ class GitControllerTest < ActionController::TestCase
     workflow = FactoryBot.create(:local_git_workflow, policy: FactoryBot.create(:publicly_viewable_policy))
     get :download, params: { workflow_id: workflow.id, version: 1, path: 'diagram.png' }, format: :html
 
+    assert_redirected_to workflow
     assert flash[:error].include?('authorized')
   end
 
@@ -333,6 +336,15 @@ class GitControllerTest < ActionController::TestCase
     workflow = FactoryBot.create(:local_git_workflow, policy: FactoryBot.create(:publicly_viewable_policy))
     get :tree, params: { workflow_id: workflow.id, version: 1 }
 
+    assert_redirected_to workflow
+    assert flash[:error].include?('authorized')
+  end
+
+  test 'redirects to root if no permission to view' do
+    workflow = FactoryBot.create(:local_git_workflow, policy: FactoryBot.create(:private_policy))
+    get :tree, params: { workflow_id: workflow.id, version: 1 }
+
+    assert_redirected_to root_path
     assert flash[:error].include?('authorized')
   end
 
