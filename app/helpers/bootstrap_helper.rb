@@ -212,7 +212,7 @@ module BootstrapHelper
       if block_given?
         content_tag(:a, **link_options, &block)
       else
-        content_tag(:a, title, **a_options, role: 'tab')
+        content_tag(:a, title, **link_options, role: 'tab')
       end
     end
   end
