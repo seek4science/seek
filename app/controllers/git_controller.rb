@@ -7,7 +7,7 @@ class GitController < ApplicationController
   before_action :authorized_to_edit, only: [:add_file, :remove_file, :move_file, :freeze, :update]
   before_action :fetch_git_version
   before_action :get_tree, only: [:tree]
-  before_action :get_blob, only: [:blob, :download, :raw, :notebook]
+  before_action :get_blob, only: [:blob, :download, :raw]
   before_action :coerce_format
 
   user_content_actions :raw
@@ -236,6 +236,29 @@ class GitController < ApplicationController
 
   def file_content
     file_params.key?(:content) ? StringIO.new(Base64.decode64(file_params[:content])) : file_params[:data]
+  end
+
+  def log_event
+    action = action_name.downcase
+    data = { path: path_param }
+    if action == 'raw'
+      if render_display?
+        action = 'inline_view'
+        data[:display] = params[:display]
+      else
+        action = 'download'
+      end
+    end
+
+    if %w(download inline_view).include?(action)
+      ActivityLog.create(action: action,
+                         culprit: current_user,
+                         referenced: @git_version,
+                         controller_name: controller_name,
+                         activity_loggable: @parent_resource,
+                         user_agent: request.env['HTTP_USER_AGENT'],
+                         data: data)
+    end
   end
 
   # # Rugged does not allow streaming blobs
