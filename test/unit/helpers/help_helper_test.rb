@@ -57,8 +57,8 @@ class HelpHelperTest < ActionView::TestCase
     assert_equal 'What is an Assay?', tag.children[1].content
   end
 
-  test 'help icon with text' do
-    link = help_icon_with_link 'Collection', 'chicken soup'
+  test 'what is help icon with text' do
+    link = what_is_help_icon_with_link 'Collection', 'chicken soup'
     tag = Nokogiri::HTML::DocumentFragment.parse(link).children.first
 
     assert_equal 'https://docs.seek4science.org/help/user-guide/collections.html', tag['href']
