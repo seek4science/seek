@@ -445,7 +445,6 @@ GEM
       nokogiri (~> 1)
       rake
     mini_mime (1.1.2)
-    mini_portile2 (2.8.2)
     minitest (5.18.0)
     minitest-reporters (1.5.0)
       ansi
@@ -459,6 +458,9 @@ GEM
     mysql2 (0.5.3)
     namae (1.1.1)
     nesty (1.0.2)
+    net-ftp (0.2.0)
+      net-protocol
+      time
     net-http-digest_auth (1.4.1)
     net-http-persistent (4.0.1)
       connection_pool (~> 2.2)
@@ -474,8 +476,7 @@ GEM
       net-protocol
     netrc (0.11.0)
     nio4r (2.5.9)
-    nokogiri (1.14.5)
-      mini_portile2 (~> 2.8.0)
+    nokogiri (1.14.5-x86_64-linux)
       racc (~> 1.4)
     nori (1.1.5)
     oauth2 (2.0.9)
@@ -855,6 +856,8 @@ GEM
     test-prof (1.0.7)
     thor (1.2.2)
     tilt (2.0.10)
+    time (0.2.2)
+      date
     timeout (0.3.2)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
@@ -921,7 +924,7 @@ GEM
       rubyzip (~> 2.0.0)
 
 PLATFORMS
-  ruby
+  x86_64-linux
 
 DEPENDENCIES
   RedCloth (>= 4.3.0)
@@ -989,6 +992,7 @@ DEPENDENCIES
   minitest-reporters
   my_responds_to_parent!
   mysql2
+  net-ftp
   nokogiri (~> 1.14.3)
   omniauth (~> 2.1.0)
   omniauth-github

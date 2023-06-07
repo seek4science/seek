@@ -153,6 +153,8 @@ gem 'remotipart', '~> 1.4.4' # Allows file upload in AJAX forms
 
 gem 'rails-static-router'
 
+gem 'net-ftp'
+
 group :production do
   gem 'passenger'
 end
