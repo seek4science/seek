@@ -376,8 +376,7 @@ module ApplicationHelper
     if resource_type == 'Assay'
       result = t('assays.assay')
     else
-      translated_resource_type = translate_resource_type(resource_type)
-      result = translated_resource_type.include?('translation missing') ? resource_type : translated_resource_type
+      result = translate_resource_type(resource_type) || resource_type
     end
     pluralize ? result.pluralize : result
   end
@@ -389,14 +388,15 @@ module ApplicationHelper
     elsif resource_type == 'TavernaPlayer::Run'
       result = 'Run'
     else
-      translated_resource_type = translate_resource_type(resource_type)
-      result = translated_resource_type.include?('translation missing') ? resource_type : translated_resource_type
+      result = translate_resource_type(resource_type) || resource_type
     end
     pluralize ? result.pluralize : result
   end
 
   def translate_resource_type(resource_type)
-    I18n.t(resource_type.underscore.to_s)
+    key = resource_type.underscore.to_s
+    return nil unless I18n.exists?(key)
+    I18n.t(key)
   end
 
   def no_deletion_explanation_message(clz)
