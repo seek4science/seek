@@ -118,13 +118,62 @@ class NelsControllerTest < ActionController::TestCase
     VCR.use_cassette('nels/get_dataset') do
       VCR.use_cassette('nels/check_metadata_exists') do
         VCR.use_cassette('nels/get_project') do
-          get :dataset, params: { assay_id: @assay.id, project_id: @project_id, dataset_id: @dataset_id }
+          get :dataset, params: { project_id: @project_id, dataset_id: @dataset_id }
         end
       end
     end
 
     assert_response :success
     assert_select 'li.list-group-item', count: 2
+  end
+
+  test 'locked dataset doesnt disable add metadata' do
+    VCR.use_cassette('nels/get_locked_dataset') do
+      VCR.use_cassette('nels/check_metadata_exists') do
+        VCR.use_cassette('nels/get_project') do
+          get :dataset, params: { project_id: @project_id, dataset_id: @dataset_id }
+        end
+      end
+    end
+
+    assert_response :success
+    assert_select 'a.add_metadata', count: 2
+    assert_select 'a.add_metadata.disabled', count: 0
+  end
+
+  test 'sutype in locked dataset disables upload but not add metadata' do
+    VCR.use_cassette('nels/get_locked_dataset') do
+      VCR.use_cassette('nels/check_metadata_exists') do
+        VCR.use_cassette('nels/get_project') do
+          VCR.use_cassette('nels/sbi_storage_list') do
+            get :subtype, params: { project_id: @project_id, dataset_id: @dataset_id, subtype:'reads', path:'Storebioinfo/seek_pilot3/Demo Dataset/reads/' }
+          end
+        end
+      end
+    end
+
+    assert_response :success
+    assert_select 'a.upload_file.disabled'
+    assert_select 'a.add_metadata'
+    assert_select 'a.add_metadata.disabled', count: 0
+  end
+
+  test 'subtype in non locked dataset doesnt disable upload' do
+    VCR.use_cassette('nels/get_dataset') do
+      VCR.use_cassette('nels/check_metadata_exists') do
+        VCR.use_cassette('nels/get_project') do
+          VCR.use_cassette('nels/sbi_storage_list') do
+            get :subtype, params: { project_id: @project_id, dataset_id: @dataset_id, subtype:'reads', path:'Storebioinfo/seek_pilot3/Demo Dataset/reads/' }
+          end
+        end
+      end
+    end
+
+    assert_response :success
+    assert_select 'a.upload_file'
+    assert_select 'a.upload_file.disabled', count: 0
+    assert_select 'a.add_metadata'
+    assert_select 'a.add_metadata.disabled', count: 0
   end
 
   test 'can register data' do

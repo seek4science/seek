@@ -26,7 +26,7 @@ table, th, td {
 <p>
   <% disabled_reason = 'The Dataset is locked' if @dataset['isLocked'] %>
   <%= button_link_to('Upload a file', 'arrow_up', nil, { id: :upload_file, class: :upload_file, disabled_reason:disabled_reason }) %>
-  <%= button_link_to('Add metadata', 'add', nil, { id: "add_metadata_#{@project_id}_#{@dataset_id}_#{@subtype_name}", class:"add_metadata", disabled_reason:disabled_reason} ) %>
+  <%= button_link_to('Add metadata', 'add', nil, { id: "add_metadata_#{@project_id}_#{@dataset_id}_#{@subtype_name}", class:"add_metadata"} ) %>
   <% if @subtype_metadata %>
     <%= button_link_to('Download metadata', 'download', {action: :get_metadata,
                                                          project_id: @project_id,

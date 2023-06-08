@@ -59,9 +59,17 @@ class NelsRestClientTest < ActiveSupport::TestCase
 
       assert_equal @dataset_id, res['id']
       assert_equal 2, res['subtypes'].count
-      assert res['isLocked']
+      refute res['isLocked']
       subtype = res['subtypes'].detect { |s| s['type'] == @subtype }
       assert_equal 0, subtype['size']
+    end
+  end
+
+  test 'get locked dataset' do
+    VCR.use_cassette('nels/get_locked_dataset') do
+      res = @rest_client.dataset(@project_id, @dataset_id)
+      assert_equal @dataset_id, res['id']
+      assert res['isLocked']
     end
   end
 
@@ -82,6 +90,16 @@ class NelsRestClientTest < ActiveSupport::TestCase
     VCR.use_cassette('nels/check_metadata_exists') do
       refute @rest_client.check_metadata_exists(@project_id, @dataset_id, @subtype)
       assert @rest_client.check_metadata_exists(@project_id, @dataset_id + 1, @subtype)
+    end
+  end
+
+  test 'get sbi_storage_list' do
+    VCR.use_cassette('nels/sbi_storage_list') do
+      json = @rest_client.sbi_storage_list(@project_id, @dataset_id, 'Storebioinfo/seek_pilot3/Demo Dataset/Analysis/')
+      assert_equal 7, json.length
+      assert_equal 5, json.select{|x| x['isFolder']}.length
+      last = {"name"=>"test5", "size"=>0, "path"=>"Storebioinfo/seek_pilot3/Demo Dataset/Analysis/test5", "project_id"=>91123122, "dataset_id"=>91123528, "refid"=>"8cd8932b-805e-4f1b-8f60-2e8103d9700c", "description"=>"", "islocked"=>false, "membership_type"=>2, "isFolder"=>true}
+      assert_equal last, json.last
     end
   end
 
