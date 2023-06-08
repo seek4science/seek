@@ -1,4 +1,4 @@
-<% environment.context_class.instance_eval { include Seek::Util.routes } %>
+<% environment.context_class.instance_eval { include Seek:: Util.routes } %>
 const instanceName = "<%= Seek::Config.instance_name %>";
 
 const rowStatus = { new: "new", delete: "delete", update: "update", empty: "empty", noAction: "" };
@@ -16,10 +16,10 @@ const defaultCols = [
 	}
 ];
 
-const objectInputTemp = '<input type="hidden" name="_NAME_[]" id="h_NAME_" value="" autocomplete="off" />'+
-						'<select name="_NAME_[]" id="_NAME_" class="form-control" data-role="seek-objectsinput" '+
-						'data-tags-limit="100" multiple="multiple" '+
-						'data-typeahead-query-url="_URL_">_OPTIONS_</select>';
+const objectInputTemp = '<input type="hidden" name="_NAME_[]" id="h_NAME_" value="" autocomplete="off" />' +
+	'<select name="_NAME_[]" id="_NAME_" class="form-control" data-role="seek-objectsinput" ' +
+	'data-tags-limit="100" multiple="multiple" ' +
+	'data-typeahead-query-url="_URL_">_OPTIONS_</select>';
 
 const typeaheadUrl = "<%= typeahead_samples_path(linked_sample_type_id: '_LINKED_') %>";
 
@@ -52,11 +52,11 @@ const handleSelect = (e) => {
 						} else {
 							const url = typeaheadUrl.replace("_LINKED_", c.linked_sample_type);
 							const objectInputName = 'objectInput-' + data.map((e) => e.id).join('-') + '-' + crypto.randomUUID();
-              setTimeout(ObjectsInput.init);
+							setTimeout(ObjectsInput.init);
 							return objectInputTemp
-                  .replace(/_NAME_/g, objectInputName)
-                  .replace('_URL_', url)
-                  .replace('_OPTIONS_', existingOptions);
+								.replace(/_NAME_/g, objectInputName)
+								.replace('_URL_', url)
+								.replace('_OPTIONS_', existingOptions);
 						}
 					} else if (data === "#HIDDEN") {
 						return "<em><small>Hidden</small></em>";
@@ -64,7 +64,7 @@ const handleSelect = (e) => {
 						return data;
 					}
 				};
-        c["createdCell"] = function (td, cellData, rowData, row, col) {
+				c["createdCell"] = function (td, cellData, rowData, row, col) {
 					if (cellData == "#HIDDEN") $j(td).addClass("disabled");
 				};
 				if (c.title == "id") c.title = instanceName + " id";
@@ -132,7 +132,7 @@ const handleSelect = (e) => {
 			if (options.assayId) this.assayId = options.assayId;
 			this.options = options;
 			this.initHeader(columns);
-      this.setSelect2();
+			this.setSelect2();
 
 			$j('div.toolbar').html("<span class='dt_select_all' style='display:none' onClick='selectAll(this, true)'>Select all rows</span>").addClass("dt-select-all");
 		},
@@ -368,24 +368,24 @@ const handleSelect = (e) => {
 			});
 			return sampleIds;
 		},
-    setSelect2: function () {
-      $j(this.table.table().container()).on("select2:select select2:unselect", 'td', function (e) {
-        const td = $j(this);
-        const table = td.parents("table").DataTable();
+		setSelect2: function () {
+			$j(this.table.table().container()).on("select2:select select2:unselect", 'td', function (e) {
+				const td = $j(this);
+				const table = td.parents("table").DataTable();
 
-        const values = td.find("option").map((_index, opt) => {
-            if (opt.value != "") return { id: opt.value, title: opt.innerText };
-        }).toArray();
+				const values = td.find("option").map((_index, opt) => {
+					if (opt.value != "") return { id: opt.value, title: opt.innerText };
+				}).toArray();
 
-        const updatedValues = e.params.data.selected ? values : values.filter(({ id, title }) => {
-            if (id !== e.params.data.id) return { id, title };
-        });
+				const updatedValues = e.params.data.selected ? values : values.filter(({ id, title }) => {
+					if (id !== e.params.data.id) return { id, title };
+				});
 
-        table.cell(td).data(updatedValues);
-        handleCellUpdate(table, td);
-        table.columns.adjust();
-      });
-    }
+				table.cell(td).data(updatedValues);
+				handleCellUpdate(table, td);
+				table.columns.adjust();
+			});
+		}
 	};
 })(jQuery);
 
