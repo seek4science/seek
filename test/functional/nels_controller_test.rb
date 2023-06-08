@@ -141,7 +141,7 @@ class NelsControllerTest < ActionController::TestCase
     assert_select 'a.add_metadata.disabled', count: 0
   end
 
-  test 'sutype in locked dataset disables upload but not add metadata' do
+  test 'get subtype in locked dataset' do
     VCR.use_cassette('nels/get_locked_dataset') do
       VCR.use_cassette('nels/check_metadata_exists') do
         VCR.use_cassette('nels/get_project') do
@@ -156,9 +156,12 @@ class NelsControllerTest < ActionController::TestCase
     assert_select 'a.upload_file.disabled'
     assert_select 'a.add_metadata'
     assert_select 'a.add_metadata.disabled', count: 0
+
+    # locked icon next to the dataset name
+    assert_select 'a[data-tree-node-id=dataset91123528] ~ span.glyphicon-lock'
   end
 
-  test 'subtype in non locked dataset doesnt disable upload' do
+  test 'get subtype' do
     VCR.use_cassette('nels/get_dataset') do
       VCR.use_cassette('nels/check_metadata_exists') do
         VCR.use_cassette('nels/get_project') do
@@ -174,6 +177,12 @@ class NelsControllerTest < ActionController::TestCase
     assert_select 'a.upload_file.disabled', count: 0
     assert_select 'a.add_metadata'
     assert_select 'a.add_metadata.disabled', count: 0
+
+    assert_select 'table tr td span.nels-folder', count: 5
+    assert_select 'table tr td a.nels-download-link', count:2
+
+    # locked icon next to the dataset name shouldn't be present
+    assert_select 'a[data-tree-node-id=dataset91123528] ~ span.glyphicon-lock', count: 0
   end
 
   test 'can register data' do
