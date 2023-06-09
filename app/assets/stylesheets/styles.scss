@@ -777,3 +777,7 @@ div#super_tag_cloud {
 .workflow-class-logo-sm {
   max-width: 36px;
 }
+
+.disabled[data-tooltip] {
+  pointer-events: inherit;
+}

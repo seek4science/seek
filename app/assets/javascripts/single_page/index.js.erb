@@ -149,7 +149,7 @@ const setSource = (elem, data) => {
     classes: {
       "ui-autocomplete": "highlight"
     },
-    source: data.map(x => x.name),
+    source: data.results.map(x => x.text),
     minLength: 0,
     mustMatch: true
   });
@@ -157,7 +157,7 @@ const setSource = (elem, data) => {
 
 async function fetchTerms(elem, cvId) {
   if (!elem.find(".loader").length) elem.append("<span class='loader'></span>");
-	const url = '<%= typeahead_sample_controlled_vocabs_path %>' + `?query=${elem.text()}&scv_id=${cvId}`
+	const url = '<%= typeahead_sample_controlled_vocabs_path %>' + `?q=${elem.text()}&scv_id=${cvId}`
   const res = await ajaxCall(url, "GET", { dataType: "json" });
 	setSource(elem, res);
 	elem.focus().autocomplete("search");

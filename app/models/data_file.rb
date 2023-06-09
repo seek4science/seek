@@ -7,7 +7,7 @@ class DataFile < ApplicationRecord
 
   acts_as_asset
 
-  acts_as_doi_parent(child_accessor: :versions)
+  acts_as_doi_parent
 
   has_controlled_vocab_annotations :data_types, :data_formats
 

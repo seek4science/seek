@@ -6,7 +6,7 @@ class Sop < ApplicationRecord
 
   acts_as_asset
 
-  acts_as_doi_parent(child_accessor: :versions)
+  acts_as_doi_parent
 
   validates :projects, presence: true, projects: { self: true }
 
