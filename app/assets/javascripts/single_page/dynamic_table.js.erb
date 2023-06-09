@@ -1,6 +1,4 @@
-< % environment.context_class.instance_eval {
-    include Seek::Util.routes
-  } % >
+<% environment.context_class.instance_eval { include Seek::Util.routes } %>
   const instanceName = "<%= Seek::Config.instance_name %>";
 
 const rowStatus = {
