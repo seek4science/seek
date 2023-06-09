@@ -15,25 +15,35 @@ module Seek
       def initialize(url, options = {})
         @url = url
         @size_limit = options[:size_limit]
+        @redirect_limit = options[:redirect_limit] || REDIRECT_LIMIT
       end
 
       # yields a chunk of data to the given block
       def stream(&block)
-        get_uri(URI(@url), 0, block)
+        get_uri(URI(@url), &block)
+      end
+
+      # Does a GET (following redirects according to @redirect_limit) without downloading any of the response body.
+      def peek
+        get_uri(URI(@url))
       end
 
       private
 
-      def get_uri(uri, redirect_count, block)
+      def get_uri(uri, redirect_count = 0, &block)
         p = proc do
           Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == 'https') do |http|
             http.request(Net::HTTP::Get.new(uri)) do |response|
               if response.code == '200'
-                begin_stream(response, block)
+                if block_given?
+                  begin_stream(response, &block)
+                else
+                  return response
+                end
               elsif response.code == '301' || response.code == '302'
-                follow_redirect(uri, response, redirect_count, block)
+                follow_redirect(uri, response, redirect_count, &block)
               else
-                raise BadResponseCodeException.new(code: response.code), response.message
+                raise BadResponseCodeException.new(code: response.code.to_i), response.message
               end
             end
           end
@@ -44,9 +54,11 @@ module Seek
         else
           PrivateAddressCheck.only_public_connections { p.call }
         end
+
+        nil
       end
 
-      def begin_stream(response, block)
+      def begin_stream(response, &block)
         total_size = 0
 
         response.read_body do |chunk|
@@ -58,14 +70,14 @@ module Seek
         total_size
       end
 
-      def follow_redirect(uri, response, redirect_count, block)
-        if redirect_count >= REDIRECT_LIMIT
+      def follow_redirect(uri, response, redirect_count, &block)
+        if redirect_count >= @redirect_limit
           raise RedirectLimitExceededException, redirect_count
         else
           new_uri = URI(response.header['location'])
           new_uri = URI(uri) + new_uri if new_uri.relative?
 
-          get_uri(new_uri, redirect_count + 1, block)
+          get_uri(new_uri, redirect_count + 1, &block)
         end
       end
     end
