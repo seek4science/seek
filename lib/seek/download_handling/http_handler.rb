@@ -76,7 +76,7 @@ module Seek
 
         {
           code: code&.to_i,
-          file_size: content_length&.to_i,
+          file_size: content_length.present? ? content_length.to_i : nil,
           content_type: content_type,
           file_name: file_name
         }
