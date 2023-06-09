@@ -103,6 +103,19 @@ module Nels
                 })['elements']
       end
 
+      def create_folder(dataset_id, current_path, new_folder)
+
+        perform('/user/sbi-storage/do', :post,
+                body: {
+                  "method": 'add',
+                  "payload": {
+                    "sbi_current_path": current_path,
+                    "dataset_id": dataset_id,
+                    "new": new_folder
+                  }
+                })
+      end
+
       # UPLOAD FILE FLOW
       # 1. upload_get_reflink: get upload-reference-uri
       # 2. Use upload-reference-uri to upload file

@@ -130,4 +130,10 @@ class NelsRestClientTest < ActiveSupport::TestCase
     end
   end
 
+  test 'create folder' do
+    VCR.use_cassette('nels/create_folder') do
+      @rest_client.create_folder(1125253, 'Storebioinfo/seek_pilot3/sdfsdfsdf/Analysis', 'test_create')
+    end
+  end
+
 end
