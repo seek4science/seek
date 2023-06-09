@@ -75,8 +75,6 @@ module Seek
           stderr.close
         end
 
-        # Remove length check when: https://github.com/common-workflow-language/cwltool/issues/1855
-        # is merged.
         if status.success? && packed_cwl_string.length.positive?
           cwl_string = packed_cwl_string
         else
