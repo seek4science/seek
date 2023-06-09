@@ -66,7 +66,7 @@ module Seek
 
         packed_cwl_string = ''
         err = ''
-        status = Open4.popen4("cwltool --skip-schemas --quiet --enable-dev --non-strict --pack #{path}") do |_pid, _stdin, stdout, stderr|
+        status = Open4.popen4(Seek::Util.python_exec("-m cwltool --skip-schemas --quiet --enable-dev --non-strict --pack #{path}")) do |_pid, _stdin, stdout, stderr|
           while (line = stdout.gets) != nil
             packed_cwl_string << line
           end
@@ -75,7 +75,9 @@ module Seek
           stderr.close
         end
 
-        if status.success?
+        # Remove length check when: https://github.com/common-workflow-language/cwltool/issues/1855
+        # is merged.
+        if status.success? && packed_cwl_string.length.positive?
           cwl_string = packed_cwl_string
         else
           cwl_string ||= @io.read
