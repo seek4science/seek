@@ -25,8 +25,10 @@ table, th, td {
 
 <p>
   <% disabled_reason = 'The Dataset is locked' if @dataset['isLocked'] %>
-  <%= button_link_to('Upload a file', 'arrow_up', nil, { id: :upload_file, class: :upload_file, disabled_reason:disabled_reason }) %>
-  <%= button_link_to('Add metadata', 'add', nil, { id: "add_metadata_#{@project_id}_#{@dataset_id}_#{@subtype_name}", class:"add_metadata"} ) %>
+  <%= button_link_to('Upload a file', 'arrow_up', nil, { id: :upload_file, class: :upload_file, disabled_reason:disabled_reason } ) %>
+  <%= button_link_to('Create a folder', 'add', nil, { id: :create_folder, class: :create_folder, disabled_reason:disabled_reason } ) %>
+  <%= button_link_to('Add metadata', 'add', nil, { id: "add_metadata_#{@project_id}_#{@dataset_id}_#{@subtype_name}", class: :add_metadata } ) %>
+
   <% if @subtype_metadata %>
     <%= button_link_to('Download metadata', 'download', {action: :get_metadata,
                                                          project_id: @project_id,
@@ -45,10 +47,10 @@ table, th, td {
 </p>
 
 <%= render partial: 'upload_metadata_dialog' %>
+<%= render partial: 'upload_file_dialog', locals:{subtype_path: @subtype_path, path: @path, project_id: @project_id, dataset_id: @dataset_id, subtype_name: @subtype_name} %>
+<%= render partial: 'create_folder_dialog', locals:{path: @path, dataset_id: @dataset_id } %>
 
 <%= render partial: 'subtype_file_listing' %>
-
-<%= render partial: 'upload_file_dialog', locals:{button_id:'upload_file', subtype_path: @subtype_path} %>
 
 <%= content_tag(:script, nels_file_details_json(@file_list, @project['name'], @dataset['name'], @subtype_name).to_json.html_safe, type: 'application/json', id: 'file-items-json') %>
 

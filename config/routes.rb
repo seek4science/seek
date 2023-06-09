@@ -449,14 +449,15 @@ SEEK::Application.routes.draw do
       get :datasets
       get :dataset
       get :subtype
-      post :register
+      get :download_file
+      get :fetch_file
       get :new_dataset
       get :get_metadata
+      post :register
       post :create_dataset
       post :add_metadata
       post :upload_file
-      get :download_file
-      get :fetch_file
+      post :create_folder
     end  
   end
 
