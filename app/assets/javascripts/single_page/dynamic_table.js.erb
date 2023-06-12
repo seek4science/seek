@@ -101,13 +101,6 @@ const handleSelect = (e) => {
 					"<'row'<'col-sm-5'i><'col-sm-7'p>>",
 				buttons: [
 					{
-						text: 'Export to Excel',
-						action: function (e, dt, node, config) {
-							// alert( 'Button activated' );
-							exportToExcel();
-						}
-					},
-					{
 						extend: "csvHtml5",
 						text: "Export to CSV",
 						exportOptions: {

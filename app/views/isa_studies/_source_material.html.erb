@@ -10,7 +10,8 @@
 </div>
 
 <%= render partial: 'isa_studies/buttons', locals:{ add_row: "SourceAddNewRow()", paste_cb:
-"SourcePasteFromClipboard()", delete: "SourceSetAsDeleted()", save: "SourceSave()", permissions: "loadBatchPermission('sourceDynamicTable',this)" } %>
+"SourcePasteFromClipboard()", delete: "SourceSetAsDeleted()", save: "SourceSave()",
+permissions: "loadBatchPermission('sourceDynamicTable',this)", exportToExcel: "sourceExportExcel()" } %>
 
 <% if sample_type %>
     <script>
@@ -70,70 +71,9 @@
             sourceDynamicTable.newRow()
         }
 
-        // This function is called when 'excel-export' btn is clicked.
-        // Posts the content of the dynamic table to the single_pages_controller,
-        // which generates an excel workbook based on a template.
-        function exportToExcel(){
-            current_url = window.location.href;
-            if (current_url.includes("source_table")){
-                tableName = "source-material-table"
-            } else if(current_url.includes("study_samples_table")){
-                tableName = "study_samples_table"
-            } else {
-                alert("Table not recognized. Please contact the administrator.");
-                return;
-            }
-            const headerRow = $j(`table[id=${tableName}] thead tr`)["0"];
-
-            // Cells from the table body => Each row = array
-            // For some reason they contain null values, which should be filtered out
-            let bodyCells = $j(`table[id=${tableName}]`).DataTable().data().toArray().map(subarray => subarray.filter(function(el){return el != null}));
-
-            // Return array of table header cells from headerRow
-            let headerCells = [];
-            $j.each(headerRow.cells, function (i, v) {
-                headerCells.push(v.textContent);
-            });
-
-            // Construct the 'struct' of the table data
-            let data = [];
-            for (let i = 0; i < bodyCells.length; i++) {
-                const row = bodyCells[i];
-                // If a row has been checked / unchecked,
-                // the datatable body gets one extra hidden cell at index 1,
-                // compared to the table header. This has to be removed.
-                if (row.length !== headerCells.length)row.splice(1,1);
-                let obj = {};
-                for (let j = 0; j < headerCells.length; j++) {
-                    const attr = headerCells[j];
-                    const val = row[j];
-                    if(j === 0){
-                        obj["selected"] = (val === "") ? false : val;
-                    } else{
-                        obj[attr] = val;
-                    }
-                }
-                if(obj.selected) data.push(obj);
-            }
-
-            // Use ajax for POST request with table data in the body
-            // If succes => Redirect to download path for retrieving excel file
-            $j.ajax({
-                type: 'POST',
-                url: '<%= export_to_excel_single_pages_path() %>',
-                data: { source_sample_data: JSON.stringify(data),
-                        sample_type_id: JSON.stringify('<%=sample_type.id%>'),
-                        study_id: JSON.stringify('<%=study.id%>'),
-                      },
-                success: function(response) {
-                    downloadUrl = `<%= download_samples_excel_single_pages_path() %>?uuid=${response.uuid}`;
-                    window.location.href = downloadUrl;
-                },
-                error: function(response) {
-                    alert(`Failed to export through excel!\nStatus: ${response.status}\nError: ${JSON.stringify(response.error().statusText)}`);
-                }
-            });
-
+        function sourceExportExcel() {
+            exportToExcel("source-material-table", '<%=study.id%>', '<%=sample_type.id%>');
         }
+
     </script>
 <% end %>
