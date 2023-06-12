@@ -4,9 +4,9 @@ class HasControlledVocabularyAnnotationsTest < ActiveSupport::TestCase
   include AuthenticatedTestHelper
 
   def setup
-    @person = Factory(:person)
+    @person = FactoryBot.create(:person)
     User.current_user = @person.user
-    @workflow = Factory(:workflow, contributor: @person)
+    @workflow = FactoryBot.create(:workflow, contributor: @person)
   end
 
   def teardown
@@ -15,12 +15,12 @@ class HasControlledVocabularyAnnotationsTest < ActiveSupport::TestCase
 
   test 'supports controlled vocab annotations' do
     assert @workflow.supports_controlled_vocab_annotations?
-    refute Factory(:institution).supports_controlled_vocab_annotations?
+    refute FactoryBot.create(:institution).supports_controlled_vocab_annotations?
   end
 
   test 'annotate with label' do
-    Factory(:topics_controlled_vocab)
-    Factory(:operations_controlled_vocab)
+    FactoryBot.create(:topics_controlled_vocab)
+    FactoryBot.create(:operations_controlled_vocab)
 
     refute @workflow.controlled_vocab_annotations?
 
@@ -43,8 +43,8 @@ class HasControlledVocabularyAnnotationsTest < ActiveSupport::TestCase
   end
 
   test 'annotate with iri' do
-    Factory(:topics_controlled_vocab)
-    Factory(:operations_controlled_vocab)
+    FactoryBot.create(:topics_controlled_vocab)
+    FactoryBot.create(:operations_controlled_vocab)
 
     refute @workflow.controlled_vocab_annotations?
 
@@ -69,8 +69,8 @@ class HasControlledVocabularyAnnotationsTest < ActiveSupport::TestCase
     refute @workflow.annotation_controlled_vocab(:topics)
     refute @workflow.annotation_controlled_vocab(:operations)
 
-    topics_vocab = Factory(:topics_controlled_vocab)
-    operations_vocab = Factory(:operations_controlled_vocab)
+    topics_vocab = FactoryBot.create(:topics_controlled_vocab)
+    operations_vocab = FactoryBot.create(:operations_controlled_vocab)
 
     assert_equal topics_vocab, @workflow.annotation_controlled_vocab(:topics)
     assert_equal operations_vocab, @workflow.annotation_controlled_vocab(:operations)

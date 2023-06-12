@@ -16,16 +16,16 @@ class SampleApiTest < ActionDispatch::IntegrationTest
   def setup
     user_login
 
-    @sample = Factory(:max_sample, contributor: current_person, policy: Factory(:public_policy))
+    @sample = FactoryBot.create(:max_sample, contributor: current_person, policy: FactoryBot.create(:public_policy))
     @sample_type = @sample.sample_type
     @project = @sample.projects.first
-    @assay = Factory(:assay, contributor: current_person)
+    @assay = FactoryBot.create(:assay, contributor: current_person)
 
   end
 
   test 'patching a couple of attributes retains others' do
     user_login
-    sample = Factory(:patient_sample, contributor: current_person, policy: Factory(:public_policy))
+    sample = FactoryBot.create(:patient_sample, contributor: current_person, policy: FactoryBot.create(:public_policy))
     params = {
       "data": {
         "type": "samples",
@@ -54,7 +54,7 @@ class SampleApiTest < ActionDispatch::IntegrationTest
   test 'patching a couple of attributes retains others including capitals' do
     user_login
     User.current_user = @current_user
-    sample = Factory(:max_sample, contributor: current_person, policy: Factory(:public_policy))
+    sample = FactoryBot.create(:max_sample, contributor: current_person, policy: FactoryBot.create(:public_policy))
     params = {
       "data": {
         "type": "samples",
@@ -82,7 +82,7 @@ class SampleApiTest < ActionDispatch::IntegrationTest
 
   test 'set sample_type and attributes in post' do
     user_login
-    patient_sample_type = Factory(:patient_sample_type)
+    patient_sample_type = FactoryBot.create(:patient_sample_type)
     params = {
       "data": {
         "type": "samples",
@@ -126,8 +126,8 @@ class SampleApiTest < ActionDispatch::IntegrationTest
 
   test 'create with multi sample and cv list' do
     user_login
-    max_sample_type = Factory(:max_sample_type)
-    patients = [Factory(:patient_sample), Factory(:patient_sample)]
+    max_sample_type = FactoryBot.create(:max_sample_type)
+    patients = [FactoryBot.create(:patient_sample), FactoryBot.create(:patient_sample)]
 
     params = {
       "data": {
@@ -178,8 +178,8 @@ class SampleApiTest < ActionDispatch::IntegrationTest
 
   test 'create with multi sample and cv list - as array' do
     user_login
-    max_sample_type = Factory(:max_sample_type)
-    patients = [Factory(:patient_sample), Factory(:patient_sample)]
+    max_sample_type = FactoryBot.create(:max_sample_type)
+    patients = [FactoryBot.create(:patient_sample), FactoryBot.create(:patient_sample)]
 
     params = {
       "data": {
@@ -229,17 +229,17 @@ class SampleApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'batch create' do 
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     user_login(person)
-    project = Factory(:project)
-    institution = Factory(:institution)
+    project = FactoryBot.create(:project)
+    institution = FactoryBot.create(:institution)
     person.add_to_project_and_institution(project, institution)
-    investigation = Factory(:investigation, contributor: person)
-    study = Factory(:study, contributor: person)
-    type = Factory(:patient_sample_type, contributor: person)
-    assay = Factory(:assay, contributor: person, sample_type: type)
+    investigation = FactoryBot.create(:investigation, contributor: person)
+    study = FactoryBot.create(:study, contributor: person)
+    type = FactoryBot.create(:patient_sample_type, contributor: person)
+    assay = FactoryBot.create(:assay, contributor: person, sample_type: type)
 
-    other_person = Factory(:person)
+    other_person = FactoryBot.create(:person)
     user_login(other_person)
     other_person.add_to_project_and_institution(project, institution)
     params = {

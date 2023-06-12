@@ -10,7 +10,7 @@ class TechnologyTypesControllerTest < ActionController::TestCase
   end
 
   test 'should show assay types to public' do
-    assay = Factory :experimental_assay, technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Imaging', policy: Factory(:public_policy)
+    assay = FactoryBot.create :experimental_assay, technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Imaging', policy: FactoryBot.create(:public_policy)
     logout
     get :show, params: { uri: assay.technology_type_uri }
     assert_response :success
@@ -22,7 +22,7 @@ class TechnologyTypesControllerTest < ActionController::TestCase
   end
 
   test 'hierarchy' do
-    assay = Factory :experimental_assay, technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Microscopy', policy: Factory(:public_policy)
+    assay = FactoryBot.create :experimental_assay, technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Microscopy', policy: FactoryBot.create(:public_policy)
 
     logout
     get :show, params: { uri: 'http://jermontology.org/ontology/JERMOntology#Technology_type' }
@@ -35,7 +35,7 @@ class TechnologyTypesControllerTest < ActionController::TestCase
   end
 
   test 'default page' do
-    assay = Factory :experimental_assay, policy: Factory(:public_policy)
+    assay = FactoryBot.create :experimental_assay, policy: FactoryBot.create(:public_policy)
     get :show
     assert_response :success
     assert_select 'h1', text: /Technology type 'Technology type'/
@@ -45,8 +45,8 @@ class TechnologyTypesControllerTest < ActionController::TestCase
   end
 
   test 'should show only related authorized assays' do
-    pub_assay = Factory :experimental_assay, technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Imaging', policy: Factory(:public_policy)
-    priv_assay = Factory :experimental_assay, technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Imaging', policy: Factory(:private_policy)
+    pub_assay = FactoryBot.create :experimental_assay, technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Imaging', policy: FactoryBot.create(:public_policy)
+    priv_assay = FactoryBot.create :experimental_assay, technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Imaging', policy: FactoryBot.create(:private_policy)
     logout
     get :show, params: { uri: 'http://jermontology.org/ontology/JERMOntology#Technology_type' }
     assert_response :success
@@ -59,7 +59,7 @@ class TechnologyTypesControllerTest < ActionController::TestCase
   end
 
   test 'unmatched label passed render term suggestion page with ontology label' do
-    assay = Factory :experimental_assay, policy: Factory(:public_policy)
+    assay = FactoryBot.create :experimental_assay, policy: FactoryBot.create(:public_policy)
     # with unmatched label
     get :show, params: { uri: assay.technology_type_uri, label: 'frog' }
     # undefined label with uri in ontology will go to suggestion page pointing to term with ontology label
@@ -70,7 +70,7 @@ class TechnologyTypesControllerTest < ActionController::TestCase
 
   test 'correct label passed with ontology uri should render correctly' do
     # assay with ontology types
-    assay = Factory :experimental_assay, policy: Factory(:public_policy)
+    assay = FactoryBot.create :experimental_assay, policy: FactoryBot.create(:public_policy)
     # with correct label
     get :show, params: { uri: assay.technology_type_uri, label: assay.technology_type_label }
     assert_select 'h1', text: /Technology type '#{assay.technology_type_label}'/
@@ -79,7 +79,7 @@ class TechnologyTypesControllerTest < ActionController::TestCase
     end
   end
   test 'no label passed render the same page as long as the same ontolgoy uri is passed' do
-    assay = Factory :experimental_assay, policy: Factory(:public_policy)
+    assay = FactoryBot.create :experimental_assay, policy: FactoryBot.create(:public_policy)
     # without label
     get :show, params: { uri: assay.technology_type_uri }
     assert_select 'h1', text: /Technology type '#{assay.technology_type_label}'/
@@ -90,8 +90,8 @@ class TechnologyTypesControllerTest < ActionController::TestCase
 
   test 'correct label passed with suggested technology type uri should render correctly' do
     # assay with suggested types
-    suggested_technology_type = Factory(:suggested_technology_type, label: 'this is a techno type')
-    assay = Factory :experimental_assay, suggested_technology_type: suggested_technology_type, policy: Factory(:public_policy)
+    suggested_technology_type = FactoryBot.create(:suggested_technology_type, label: 'this is a techno type')
+    assay = FactoryBot.create :experimental_assay, suggested_technology_type: suggested_technology_type, policy: FactoryBot.create(:public_policy)
 
     # with correct label
     get :show, params: { uri: suggested_technology_type.uri, label: 'this is a techno type' }
@@ -102,8 +102,8 @@ class TechnologyTypesControllerTest < ActionController::TestCase
   end
 
   test 'unmatched label passed render term suggestion page with suggested_technology_type_label' do
-    suggested_technology_type = Factory(:suggested_technology_type)
-    assay = Factory :experimental_assay, suggested_technology_type: suggested_technology_type, policy: Factory(:public_policy)
+    suggested_technology_type = FactoryBot.create(:suggested_technology_type)
+    assay = FactoryBot.create :experimental_assay, suggested_technology_type: suggested_technology_type, policy: FactoryBot.create(:public_policy)
     get :show, params: { uri: assay.technology_type_uri, label: 'frog' }
     assert_not_nil flash[:notice]
     assert_select 'h1', text: /Technology type 'frog'/

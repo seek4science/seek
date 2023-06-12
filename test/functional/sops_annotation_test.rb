@@ -10,17 +10,17 @@ class SopsAnnotationTest < ActionController::TestCase
   tests SopsController
 
   test 'update tags with ajax only applied when viewable' do
-    p = Factory :person
-    p2 = Factory :person
-    viewable_sop = Factory :sop, contributor: p2, policy: Factory(:publicly_viewable_policy)
-    dummy_sop = Factory :sop
+    p = FactoryBot.create :person
+    p2 = FactoryBot.create :person
+    viewable_sop = FactoryBot.create :sop, contributor: p2, policy: FactoryBot.create(:publicly_viewable_policy)
+    dummy_sop = FactoryBot.create :sop
 
     login_as p.user
 
     assert viewable_sop.can_view?(p.user)
     assert !viewable_sop.can_edit?(p.user)
 
-    golf = Factory :tag, annotatable: dummy_sop, source: p2, value: 'golf'
+    golf = FactoryBot.create :tag, annotatable: dummy_sop, source: p2, value: 'golf'
 
     post :update_annotations_ajax, xhr: true, params: { id: viewable_sop, tag_list: golf.value.text }
 
@@ -28,7 +28,7 @@ class SopsAnnotationTest < ActionController::TestCase
 
     assert_equal ['golf'], viewable_sop.annotations.collect { |a| a.value.text }
 
-    private_sop = Factory :sop, contributor: p2, policy: Factory(:private_policy)
+    private_sop = FactoryBot.create :sop, contributor: p2, policy: FactoryBot.create(:private_policy)
 
     assert !private_sop.can_view?(p.user)
     assert !private_sop.can_edit?(p.user)
@@ -40,17 +40,17 @@ class SopsAnnotationTest < ActionController::TestCase
   end
 
   test 'update tags with ajax' do
-    p = Factory :person
+    p = FactoryBot.create :person
 
     login_as p.user
 
-    p2 = Factory :person
-    sop = Factory :sop, contributor: p
+    p2 = FactoryBot.create :person
+    sop = FactoryBot.create :sop, contributor: p
 
     assert sop.annotations.empty?, 'this sop should have no tags for the test'
 
-    golf = Factory :tag, annotatable: sop, source: p2.user, value: 'golf'
-    Factory :tag, annotatable: sop, source: p2.user, value: 'sparrow'
+    golf = FactoryBot.create :tag, annotatable: sop, source: p2.user, value: 'golf'
+    FactoryBot.create :tag, annotatable: sop, source: p2.user, value: 'sparrow'
 
     sop.reload
 
@@ -68,15 +68,15 @@ class SopsAnnotationTest < ActionController::TestCase
   end
 
   test 'should update sop tags' do
-    p = Factory :person
-    sop = Factory :sop, contributor: p
-    dummy_sop = Factory :sop
+    p = FactoryBot.create :person
+    sop = FactoryBot.create :sop, contributor: p
+    dummy_sop = FactoryBot.create :sop
 
     login_as p.user
     assert sop.annotations.empty?, 'Should have no annotations'
-    Factory :tag, source: p.user, annotatable: sop, value: 'fish'
-    Factory :tag, source: p.user, annotatable: sop, value: 'apple'
-    golf = Factory :tag, source: p.user, annotatable: dummy_sop, value: 'golf'
+    FactoryBot.create :tag, source: p.user, annotatable: sop, value: 'fish'
+    FactoryBot.create :tag, source: p.user, annotatable: sop, value: 'apple'
+    golf = FactoryBot.create :tag, source: p.user, annotatable: dummy_sop, value: 'golf'
 
     sop.reload
     assert_equal %w(apple fish), sop.annotations.collect { |a| a.value.text }.sort
@@ -88,20 +88,20 @@ class SopsAnnotationTest < ActionController::TestCase
   end
 
   test 'should update sop tags with correct ownership' do
-    p1 = Factory :person
-    p2 = Factory :person
-    p3 = Factory :person
+    p1 = FactoryBot.create :person
+    p2 = FactoryBot.create :person
+    p3 = FactoryBot.create :person
 
-    sop = Factory :sop, contributor: p1
+    sop = FactoryBot.create :sop, contributor: p1
 
     assert sop.annotations.empty?, 'This sop should have no tags'
 
     login_as p1.user
 
-    Factory :tag, source: p1.user, annotatable: sop, value: 'fish'
-    Factory :tag, source: p2.user, annotatable: sop, value: 'fish'
-    golf = Factory :tag, source: p2.user, annotatable: sop, value: 'golf'
-    Factory :tag, source: p3.user, annotatable: sop, value: 'apple'
+    FactoryBot.create :tag, source: p1.user, annotatable: sop, value: 'fish'
+    FactoryBot.create :tag, source: p2.user, annotatable: sop, value: 'fish'
+    golf = FactoryBot.create :tag, source: p2.user, annotatable: sop, value: 'golf'
+    FactoryBot.create :tag, source: p3.user, annotatable: sop, value: 'apple'
 
     sop.reload
 
@@ -123,19 +123,19 @@ class SopsAnnotationTest < ActionController::TestCase
     # a specific case where a tag to keep was added by both the owner and another user.
     # Test checks that the correct tag ownership is preserved.
 
-    p1 = Factory :person
-    p2 = Factory :person
+    p1 = FactoryBot.create :person
+    p2 = FactoryBot.create :person
 
-    sop = Factory :sop, contributor: p1
+    sop = FactoryBot.create :sop, contributor: p1
 
     assert sop.annotations.empty?, 'This sop should have no tags'
 
     login_as p1.user
 
-    Factory :tag, source: p1.user, annotatable: sop, value: 'fish'
-    golf = Factory :tag, source: p1.user, annotatable: sop, value: 'golf'
-    Factory :tag, source: p2.user, annotatable: sop, value: 'apple'
-    Factory :tag, source: p2.user, annotatable: sop, value: 'golf'
+    FactoryBot.create :tag, source: p1.user, annotatable: sop, value: 'fish'
+    golf = FactoryBot.create :tag, source: p1.user, annotatable: sop, value: 'golf'
+    FactoryBot.create :tag, source: p2.user, annotatable: sop, value: 'apple'
+    FactoryBot.create :tag, source: p2.user, annotatable: sop, value: 'golf'
 
     sop.reload
 
@@ -153,19 +153,19 @@ class SopsAnnotationTest < ActionController::TestCase
     # checks that when a known tag is incorrectly passed as a new tag, it is correctly handled
     # this can happen when a tag is typed in full, rather than relying on autocomplete, and can affect the correct preservation of ownership
 
-    p1 = Factory :person
-    p2 = Factory :person
+    p1 = FactoryBot.create :person
+    p2 = FactoryBot.create :person
 
-    sop = Factory :sop, contributor: p1
+    sop = FactoryBot.create :sop, contributor: p1
 
     assert sop.annotations.empty?, 'This sop should have no tags'
 
     login_as p1.user
 
-    fish = Factory :tag, source: p1.user, annotatable: sop, value: 'fish'
-    golf = Factory :tag, source: p1.user, annotatable: sop, value: 'golf'
-    Factory :tag, source: p2.user, annotatable: sop, value: 'fish'
-    Factory :tag, source: p2.user, annotatable: sop, value: 'soup'
+    fish = FactoryBot.create :tag, source: p1.user, annotatable: sop, value: 'fish'
+    golf = FactoryBot.create :tag, source: p1.user, annotatable: sop, value: 'golf'
+    FactoryBot.create :tag, source: p2.user, annotatable: sop, value: 'fish'
+    FactoryBot.create :tag, source: p2.user, annotatable: sop, value: 'soup'
 
     sop.reload
 
@@ -181,11 +181,11 @@ class SopsAnnotationTest < ActionController::TestCase
   end
 
   test 'create sop with tags' do
-    p = Factory :person
+    p = FactoryBot.create :person
     login_as p.user
 
-    another_sop = Factory :sop, contributor: p
-    golf = Factory :tag, source: p.user, annotatable: another_sop, value: 'golf'
+    another_sop = FactoryBot.create :sop, contributor: p
+    golf = FactoryBot.create :tag, source: p.user, annotatable: another_sop, value: 'golf'
 
     sop = { title: 'Test', project_ids: [p.projects.first.id] }
     blob = { data: file_for_upload }
@@ -200,9 +200,9 @@ class SopsAnnotationTest < ActionController::TestCase
   end
 
   test 'tag cloud shown on show page' do
-    p = Factory :person
+    p = FactoryBot.create :person
     login_as p.user
-    sop = Factory :sop, contributor: p
+    sop = FactoryBot.create :sop, contributor: p
 
     get :show, params: { id: sop }
     assert_response :success
@@ -235,13 +235,13 @@ class SopsAnnotationTest < ActionController::TestCase
   end
 
   test "asset tag cloud shouldn't duplicate tags for different owners" do
-    p = Factory :person
-    p2 = Factory :person
+    p = FactoryBot.create :person
+    p2 = FactoryBot.create :person
     login_as p.user
-    sop = Factory :sop, contributor: p
+    sop = FactoryBot.create :sop, contributor: p
 
-    coffee = Factory :tag, source: p.user, annotatable: sop, value: 'coffee'
-    Factory :tag, source: p2.user, annotatable: sop, value: coffee.value
+    coffee = FactoryBot.create :tag, source: p.user, annotatable: sop, value: 'coffee'
+    FactoryBot.create :tag, source: p2.user, annotatable: sop, value: coffee.value
 
     get :show, params: { id: sop }
     assert_response :success
@@ -252,13 +252,13 @@ class SopsAnnotationTest < ActionController::TestCase
   end
 
   test 'form includes tag section' do
-    p = Factory :person
+    p = FactoryBot.create :person
     login_as p.user
     get :new
     assert_response :success
     assert_select 'input#tag_list'
 
-    sop = Factory :sop, contributor: p
+    sop = FactoryBot.create :sop, contributor: p
     get :edit, params: { id: sop }
     assert_response :success
     assert_select 'input#tag_list'

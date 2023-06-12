@@ -2,9 +2,9 @@ require 'test_helper'
 
 class ProgrammeTest < ActiveSupport::TestCase
   test 'has_member?' do
-    programme_administrator = Factory(:programme_administrator)
+    programme_administrator = FactoryBot.create(:programme_administrator)
     programme1 = programme_administrator.programmes.first
-    programme2 = Factory(:programme)
+    programme2 = FactoryBot.create(:programme)
 
     assert programme1.has_member?(programme_administrator)
     assert programme1.has_member?(programme_administrator.user)
@@ -65,7 +65,7 @@ class ProgrammeTest < ActiveSupport::TestCase
     ok_desc = ('a' * 65535).freeze
     long_title = ('a' * 256).freeze
     ok_title = ('a' * 255).freeze
-    p = Factory(:programme)
+    p = FactoryBot.create(:programme)
     assert p.valid?
     p.title = long_title
     refute p.valid?
@@ -79,20 +79,20 @@ class ProgrammeTest < ActiveSupport::TestCase
   end
 
   test 'factory' do
-    p = Factory :programme
+    p = FactoryBot.create :programme
     refute_nil p.title
     refute_nil p.uuid
     refute_empty p.projects
   end
 
   test 'people via projects' do
-    person1 = Factory :person
-    person2 = Factory :person
-    person3 = Factory :person
+    person1 = FactoryBot.create :person
+    person2 = FactoryBot.create :person
+    person3 = FactoryBot.create :person
     assert_equal 1, person1.projects.size
     assert_equal 1, person2.projects.size
     projects = person1.projects | person2.projects
-    prog = Factory :programme, projects: projects
+    prog = FactoryBot.create :programme, projects: projects
     assert_equal 2, prog.projects.size
     peeps = prog.people
     assert_equal 2, peeps.size
@@ -102,12 +102,12 @@ class ProgrammeTest < ActiveSupport::TestCase
   end
 
   test 'institutions via projects' do
-    person1 = Factory :person
-    person2 = Factory :person
-    person3 = Factory :person
+    person1 = FactoryBot.create :person
+    person2 = FactoryBot.create :person
+    person3 = FactoryBot.create :person
 
     projects = person1.projects | person2.projects
-    prog = Factory :programme, projects: projects
+    prog = FactoryBot.create :programme, projects: projects
     assert_equal 2, prog.projects.size
     inst = prog.institutions
     assert_equal 2, inst.size
@@ -117,10 +117,10 @@ class ProgrammeTest < ActiveSupport::TestCase
   end
 
   test 'can delete' do
-    admin = Factory(:admin)
-    person = Factory(:person)
+    admin = FactoryBot.create(:admin)
+    person = FactoryBot.create(:person)
 
-    programme_administrator = Factory(:programme_administrator)
+    programme_administrator = FactoryBot.create(:programme_administrator)
     programme = programme_administrator.programmes.first
 
     refute_empty programme.projects
@@ -140,10 +140,10 @@ class ProgrammeTest < ActiveSupport::TestCase
 
 
   test 'can be edited by' do
-    admin = Factory(:admin)
-    person = Factory(:person)
+    admin = FactoryBot.create(:admin)
+    person = FactoryBot.create(:person)
 
-    programme_administrator = Factory(:programme_administrator)
+    programme_administrator = FactoryBot.create(:programme_administrator)
     programme = programme_administrator.programmes.first
 
     assert programme.can_edit?(admin)
@@ -153,8 +153,8 @@ class ProgrammeTest < ActiveSupport::TestCase
   end
 
   test 'programme_administrators' do
-    person = Factory(:person)
-    programme = Factory(:programme)
+    person = FactoryBot.create(:person)
+    programme = FactoryBot.create(:programme)
     refute person.is_programme_administrator?(programme)
     assert_empty programme.programme_administrators
     person.is_programme_administrator = true, programme
@@ -167,9 +167,9 @@ class ProgrammeTest < ActiveSupport::TestCase
 
   test 'assign adminstrator ids' do
     disable_authorization_checks do
-      programme = Factory(:programme)
-      person = Factory(:person)
-      person2 = Factory(:person)
+      programme = FactoryBot.create(:programme)
+      person = FactoryBot.create(:person)
+      person2 = FactoryBot.create(:person)
 
       programme.update(programme_administrator_ids: [person.id.to_s])
       person.reload
@@ -205,13 +205,13 @@ class ProgrammeTest < ActiveSupport::TestCase
       User.current_user = nil
       refute Programme.can_create?
 
-      User.current_user = Factory(:brand_new_person).user
+      User.current_user = FactoryBot.create(:brand_new_person).user
       refute Programme.can_create?
 
-      User.current_user = Factory(:person).user
+      User.current_user = FactoryBot.create(:person).user
       assert Programme.can_create?
 
-      User.current_user = Factory(:admin).user
+      User.current_user = FactoryBot.create(:admin).user
       assert Programme.can_create?
     end
 
@@ -219,13 +219,13 @@ class ProgrammeTest < ActiveSupport::TestCase
       User.current_user = nil
       refute Programme.can_create?
 
-      User.current_user = Factory(:brand_new_person).user
+      User.current_user = FactoryBot.create(:brand_new_person).user
       refute Programme.can_create?
 
-      User.current_user = Factory(:person).user
+      User.current_user = FactoryBot.create(:person).user
       refute Programme.can_create?
 
-      User.current_user = Factory(:admin).user
+      User.current_user = FactoryBot.create(:admin).user
       assert Programme.can_create?
     end
 
@@ -233,19 +233,19 @@ class ProgrammeTest < ActiveSupport::TestCase
       User.current_user = nil
       refute Programme.can_create?
 
-      User.current_user = Factory(:brand_new_person).user
+      User.current_user = FactoryBot.create(:brand_new_person).user
       refute Programme.can_create?
 
-      User.current_user = Factory(:person).user
+      User.current_user = FactoryBot.create(:person).user
       refute Programme.can_create?
 
-      User.current_user = Factory(:admin).user
+      User.current_user = FactoryBot.create(:admin).user
       refute Programme.can_create?
     end
   end
 
   test 'programme activated automatically when created by an admin' do
-    User.with_current_user Factory(:admin).user do
+    User.with_current_user FactoryBot.create(:admin).user do
       prog = Programme.create(title: 'my prog')
       prog.save!
       assert prog.is_activated?
@@ -261,8 +261,8 @@ class ProgrammeTest < ActiveSupport::TestCase
   end
 
   test 'programme not activated automatically when created by a normal user' do
-    Factory(:admin) # to avoid 1st person being an admin
-    User.with_current_user Factory(:person).user do
+    FactoryBot.create(:admin) # to avoid 1st person being an admin
+    User.with_current_user FactoryBot.create(:person).user do
       prog = Programme.create(title: 'my prog')
       prog.save!
       refute prog.is_activated?
@@ -270,8 +270,8 @@ class ProgrammeTest < ActiveSupport::TestCase
   end
 
   test 'update programme administrators after destroy' do
-    User.current_user = Factory(:admin)
-    pa = Factory(:programme_administrator)
+    User.current_user = FactoryBot.create(:admin)
+    pa = FactoryBot.create(:programme_administrator)
     prog = pa.programmes.first
     prog.projects = []
     prog.save!
@@ -293,11 +293,11 @@ class ProgrammeTest < ActiveSupport::TestCase
     refute pa.has_role?('programme_administrator')
 
     # administrator of multiple programmes
-    pa = Factory(:programme_administrator)
+    pa = FactoryBot.create(:programme_administrator)
     prog = pa.programmes.first
     prog.projects=[]
     prog.save!
-    prog2 = Factory(:programme)
+    prog2 = FactoryBot.create(:programme)
     disable_authorization_checks do
       pa.is_programme_administrator = true, prog2
       pa.save!
@@ -321,10 +321,10 @@ class ProgrammeTest < ActiveSupport::TestCase
   end
 
   test "doesn't change activation flag on later save" do
-    Factory(:admin) # to avoid 1st person being an admin
-    prog = Factory(:programme)
+    FactoryBot.create(:admin) # to avoid 1st person being an admin
+    prog = FactoryBot.create(:programme)
     assert prog.is_activated?
-    User.with_current_user Factory(:person).user do
+    User.with_current_user FactoryBot.create(:person).user do
       prog.title = 'fish'
       disable_authorization_checks { prog.save! }
       assert prog.is_activated?
@@ -332,8 +332,8 @@ class ProgrammeTest < ActiveSupport::TestCase
   end
 
   test 'activated scope' do
-    activated_prog = Factory(:programme)
-    not_activated_prog = Factory(:programme)
+    activated_prog = FactoryBot.create(:programme)
+    not_activated_prog = FactoryBot.create(:programme)
     not_activated_prog.is_activated = false
     disable_authorization_checks { not_activated_prog.save! }
 
@@ -342,7 +342,7 @@ class ProgrammeTest < ActiveSupport::TestCase
   end
 
   test 'activate' do
-    prog = Factory(:programme)
+    prog = FactoryBot.create(:programme)
     prog.is_activated = false
     disable_authorization_checks { prog.save! }
 
@@ -351,17 +351,17 @@ class ProgrammeTest < ActiveSupport::TestCase
     refute prog.is_activated?
 
     # normal user
-    User.current_user = Factory(:person).user
+    User.current_user = FactoryBot.create(:person).user
     prog.activate
     refute prog.is_activated?
 
     # admin
-    User.current_user = Factory(:admin).user
+    User.current_user = FactoryBot.create(:admin).user
     prog.activate
     assert prog.is_activated?
 
     # reason is wiped
-    prog = Factory(:programme, activation_rejection_reason: 'it is rubbish')
+    prog = FactoryBot.create(:programme, activation_rejection_reason: 'it is rubbish')
     prog.is_activated = false
     disable_authorization_checks { prog.save! }
     refute_nil prog.activation_rejection_reason
@@ -371,7 +371,7 @@ class ProgrammeTest < ActiveSupport::TestCase
   end
 
   test 'rejected?' do
-    prog = Factory(:programme)
+    prog = FactoryBot.create(:programme)
     prog.is_activated = false
     disable_authorization_checks { prog.save! }
 
@@ -392,22 +392,22 @@ class ProgrammeTest < ActiveSupport::TestCase
 
   test 'rejected scope' do
     Programme.destroy_all
-    prog_no_1 = Factory(:programme)
+    prog_no_1 = FactoryBot.create(:programme)
     prog_no_1.activation_rejection_reason = ''
     prog_no_1.is_activated = true
     disable_authorization_checks { prog_no_1.save! }
 
-    prog_no_2 = Factory(:programme)
+    prog_no_2 = FactoryBot.create(:programme)
     prog_no_2.activation_rejection_reason = nil
     prog_no_2.is_activated = true
     disable_authorization_checks { prog_no_2.save! }
 
-    prog_yes_1 = Factory(:programme)
+    prog_yes_1 = FactoryBot.create(:programme)
     prog_yes_1.activation_rejection_reason = ''
     prog_yes_1.is_activated = false
     disable_authorization_checks { prog_yes_1.save! }
 
-    prog_yes_2 = Factory(:programme)
+    prog_yes_2 = FactoryBot.create(:programme)
     prog_yes_2.activation_rejection_reason = 'xxx'
     prog_yes_2.is_activated = false
     disable_authorization_checks { prog_yes_2.save! }
@@ -423,15 +423,15 @@ class ProgrammeTest < ActiveSupport::TestCase
   end
 
   test 'related items' do
-    projects = FactoryGirl.create_list(:project, 3)
-    programme = Factory(:programme, projects: projects)
+    projects = FactoryBot.create_list(:project, 3)
+    programme = FactoryBot.create(:programme, projects: projects)
 
 
     projects.each do |project|
-      contributor = Factory(:person,project:project)
-      i = Factory(:investigation, projects: [project], contributor:contributor)
-      s = Factory(:study, investigation: i, contributor:contributor)
-      a = Factory(:assay, study: s, contributor:contributor)
+      contributor = FactoryBot.create(:person,project:project)
+      i = FactoryBot.create(:investigation, projects: [project], contributor:contributor)
+      s = FactoryBot.create(:study, investigation: i, contributor:contributor)
+      a = FactoryBot.create(:assay, study: s, contributor:contributor)
       project.reload # Can't find investigations of second project if this isn't here!
       assert_includes project.investigations, i
       assert_includes project.studies, s
@@ -440,7 +440,7 @@ class ProgrammeTest < ActiveSupport::TestCase
       assert_includes programme.studies, s
       assert_includes programme.assays, a
       [:data_files, :models, :sops, :presentations, :events, :publications].each do |type|
-        item = Factory(type.to_s.singularize.to_sym, projects: [project], contributor:contributor)
+        item = FactoryBot.create(type.to_s.singularize.to_sym, projects: [project], contributor:contributor)
         assert_includes project.send(type), item, "Project related #{type} didn't include item"
         assert_includes programme.send(type), item, "Programme related #{type} didn't include item"
       end
@@ -456,9 +456,9 @@ class ProgrammeTest < ActiveSupport::TestCase
   end
 
   test 'funding code' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     User.with_current_user person.user do
-      prog = Factory(:programme)
+      prog = FactoryBot.create(:programme)
       prog.funding_codes='fish'
       assert_equal ['fish'],prog.funding_codes.sort
       prog.save!
@@ -477,8 +477,8 @@ class ProgrammeTest < ActiveSupport::TestCase
   end
 
   test 'managed programme' do
-    prog1 = Factory(:programme)
-    prog2 = Factory(:programme)
+    prog1 = FactoryBot.create(:programme)
+    prog2 = FactoryBot.create(:programme)
     with_config_value(:managed_programme_id,prog1.id) do
       assert_equal prog1,Programme.site_managed_programme
       assert prog1.site_managed?
@@ -497,8 +497,8 @@ class ProgrammeTest < ActiveSupport::TestCase
   end
 
   test 'allows_user_projects?' do
-    prog = Factory(:programme, open_for_projects:true)
-    prog2 = Factory(:programme, open_for_projects:false)
+    prog = FactoryBot.create(:programme, open_for_projects:true)
+    prog2 = FactoryBot.create(:programme, open_for_projects:false)
     with_config_value(:programmes_open_for_projects_enabled, true) do
       assert prog.allows_user_projects?
       refute prog2.allows_user_projects?
@@ -510,9 +510,9 @@ class ProgrammeTest < ActiveSupport::TestCase
   end
 
   test 'open for projects scope' do
-    prog = Factory(:programme, open_for_projects: true)
-    prog2 = Factory(:programme, open_for_projects: false)
-    prog3 = Factory(:programme, open_for_projects: true)
+    prog = FactoryBot.create(:programme, open_for_projects: true)
+    prog2 = FactoryBot.create(:programme, open_for_projects: false)
+    prog3 = FactoryBot.create(:programme, open_for_projects: true)
 
     assert_equal [prog, prog3].sort, Programme.open_for_projects.sort
   end
@@ -524,8 +524,8 @@ class ProgrammeTest < ActiveSupport::TestCase
       refute Programme.any_programmes_open_for_projects?
     end
 
-    Factory(:programme, open_for_projects: true)
-    Factory(:programme, open_for_projects: false)
+    FactoryBot.create(:programme, open_for_projects: true)
+    FactoryBot.create(:programme, open_for_projects: false)
 
     with_config_value(:programmes_open_for_projects_enabled, true) do
       assert Programme.any_programmes_open_for_projects?
@@ -537,10 +537,10 @@ class ProgrammeTest < ActiveSupport::TestCase
   end
 
   test 'can_associate_project' do
-    person = Factory(:person)
-    programme_admin = Factory(:person)
-    open_programme = Factory(:programme, open_for_projects: true)
-    closed_programme = Factory(:programme, open_for_projects: false)
+    person = FactoryBot.create(:person)
+    programme_admin = FactoryBot.create(:person)
+    open_programme = FactoryBot.create(:programme, open_for_projects: true)
+    closed_programme = FactoryBot.create(:programme, open_for_projects: false)
 
     disable_authorization_checks {
       open_programme.programme_administrators = [programme_admin]
@@ -575,9 +575,9 @@ class ProgrammeTest < ActiveSupport::TestCase
   end
 
   test 'get related people of empty programmes' do
-    person1 = Factory(:programme_administrator_not_in_project)
-    person2 = Factory(:programme_administrator_not_in_project)
-    prog = Factory(:min_programme, programme_administrators: [person1, person2])
+    person1 = FactoryBot.create(:programme_administrator_not_in_project)
+    person2 = FactoryBot.create(:programme_administrator_not_in_project)
+    prog = FactoryBot.create(:min_programme, programme_administrators: [person1, person2])
 
     [person1, person2].each do |p|
       assert_includes prog.related_people, p

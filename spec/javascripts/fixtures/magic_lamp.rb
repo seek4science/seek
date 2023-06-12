@@ -1,9 +1,9 @@
 # # Broken fixture
 # MagicLamp.register_fixture(controller: SopsController, name: 'sops/with_associations') do
-#   assay = Factory(:assay, :policy => Factory(:public_policy))
-#   @sop = Factory(:sop,
+#   assay = FactoryBot.create(:assay, :policy => FactoryBot.create(:public_policy))
+#   @sop = FactoryBot.create(:sop,
 #                  :assays => [assay],
-#                  :policy => Factory(:public_policy))
+#                  :policy => FactoryBot.create(:public_policy))
 #   @sop.valid?
 #   @display_sop = @sop.latest_version
 #   render :show
@@ -13,7 +13,7 @@ MagicLamp.register_fixture(controller: SopsController, name: 'sops/new') do
   @controller_name = 'sops'
   @sop = Sop.new
   # Set the current_user
-  User.current_user = Factory(:user)
+  User.current_user = FactoryBot.create(:user)
   session[:user_id] = User.current_user.id.to_s
   # Some URL helpers in the template don't work without this:
   request.env["action_dispatch.request.path_parameters"] = {
@@ -24,7 +24,7 @@ MagicLamp.register_fixture(controller: SopsController, name: 'sops/new') do
 end
 
 MagicLamp.register_fixture(controller: SopsController, name: 'sops/manage') do
-  @sop = Factory(:sop, policy: Factory(:public_policy))
+  @sop = FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy))
   @sop.valid?
   @display_sop = @sop.latest_version
   User.current_user = @sop.contributor.user
@@ -38,7 +38,7 @@ MagicLamp.register_fixture(controller: SopsController, name: 'sops/manage') do
 end
 
 MagicLamp.register_fixture(name: 'sharing/form') do
-  @sop = Factory(:sop, policy: Factory(:public_policy))
+  @sop = FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy))
   @sop.valid?
   @display_sop = @sop.latest_version
   User.current_user = @sop.contributor.user
@@ -53,7 +53,7 @@ end
 
 
 MagicLamp.register_fixture(name: 'projects-selector') do
-  @sop = Factory(:sop, policy: Factory(:public_policy))
+  @sop = FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy))
   @sop.valid?
   @display_sop = @sop.latest_version
   User.current_user = @sop.contributor.user
@@ -67,7 +67,7 @@ MagicLamp.register_fixture(name: 'projects-selector') do
 end
 
 MagicLamp.register_fixture(name: 'project/markdown') do
-  User.current_user = Factory(:user)
+  User.current_user = FactoryBot.create(:user)
   session[:user_id] = User.current_user.id.to_s
 
   @project = Project.create(title: 'markdown test',

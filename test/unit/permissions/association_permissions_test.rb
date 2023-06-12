@@ -5,21 +5,21 @@ require 'test_helper'
 # ... for example it shouldn't be possible to link an Assay to a Study if the Study isn't visible and in the same project
 class AssociationPermissionsTest < ActiveSupport::TestCase
   def setup
-    @person = Factory(:person)
+    @person = FactoryBot.create(:person)
     @user = @person.user
     @project = @person.projects.first
-    @another_person = Factory(:person_not_in_project)
+    @another_person = FactoryBot.create(:person_not_in_project)
     @another_person.add_to_project_and_institution(@project, @person.institutions.first)
   end
 
   # Assay->Study - study must be viewable and belong to the same project as the current user
   test 'assay linked to study' do
     User.with_current_user(@user) do
-      investigation = Factory(:investigation, contributor: @person, projects:[@project])
-      good_study = Factory(:study, contributor: @person, investigation: investigation)
-      assay = Factory(:assay, contributor: @person, study: good_study)
-      not_visible_study = Factory(:study, contributor: @another_person, investigation: investigation)
-      not_in_project_study = Factory(:study, contributor: Factory(:person), policy: Factory(:public_policy))
+      investigation = FactoryBot.create(:investigation, contributor: @person, projects:[@project])
+      good_study = FactoryBot.create(:study, contributor: @person, investigation: investigation)
+      assay = FactoryBot.create(:assay, contributor: @person, study: good_study)
+      not_visible_study = FactoryBot.create(:study, contributor: @another_person, investigation: investigation)
+      not_in_project_study = FactoryBot.create(:study, contributor: FactoryBot.create(:person), policy: FactoryBot.create(:public_policy))
 
       assert good_study.can_view?
       assert good_study.projects.include?(@project)
@@ -40,7 +40,7 @@ class AssociationPermissionsTest < ActiveSupport::TestCase
       assert assay.save
 
       # check it saves with the study already linked
-      assay = Factory(:assay, study: not_visible_study, contributor: @person, policy: Factory(:public_policy))
+      assay = FactoryBot.create(:assay, study: not_visible_study, contributor: @person, policy: FactoryBot.create(:public_policy))
       assay.title='fish'
       assert assay.save
     end
@@ -49,10 +49,10 @@ class AssociationPermissionsTest < ActiveSupport::TestCase
   # Study->Investigation investigation must be viewable and belong to the same project as the current user
   test 'study linked to investigation' do
     User.with_current_user(@user) do
-      study = Factory(:study,contributor:@person)
-      good_inv = Factory(:investigation, contributor:@person,projects:[@project])
-      not_visible_inv = Factory(:investigation, contributor: @another_person, projects:[@project])
-      not_in_project_inv = Factory(:investigation, contributor: Factory(:person),policy:Factory(:public_policy))
+      study = FactoryBot.create(:study,contributor:@person)
+      good_inv = FactoryBot.create(:investigation, contributor:@person,projects:[@project])
+      not_visible_inv = FactoryBot.create(:investigation, contributor: @another_person, projects:[@project])
+      not_in_project_inv = FactoryBot.create(:investigation, contributor: FactoryBot.create(:person),policy:FactoryBot.create(:public_policy))
 
       assert good_inv.can_view?
       assert good_inv.projects.include?(@project)
@@ -74,7 +74,7 @@ class AssociationPermissionsTest < ActiveSupport::TestCase
       refute study.save
 
       # check it saves with the study already linked
-      study = Factory(:study,contributor:@person, investigation: not_visible_inv)
+      study = FactoryBot.create(:study,contributor:@person, investigation: not_visible_inv)
       study.title='fish'
       assert study.save
     end
@@ -84,14 +84,14 @@ class AssociationPermissionsTest < ActiveSupport::TestCase
   test 'assets linked to assay' do
     User.with_current_user(@user) do
       %i[data_file model sop sample document].each do |asset_type|
-        good_assay = Factory(:assay,contributor:@person)
-        not_editable_assay = Factory(:assay,policy:Factory(:publicly_viewable_policy))
+        good_assay = FactoryBot.create(:assay,contributor:@person)
+        not_editable_assay = FactoryBot.create(:assay,policy:FactoryBot.create(:publicly_viewable_policy))
 
         assert good_assay.can_edit?
         refute not_editable_assay.can_edit?
         assert not_editable_assay.can_view? #check is can actually be viewed
 
-        asset = Factory(asset_type, contributor: @person)
+        asset = FactoryBot.create(asset_type, contributor: @person)
         assert asset.can_edit?
         assert_empty asset.assays
 
@@ -100,7 +100,7 @@ class AssociationPermissionsTest < ActiveSupport::TestCase
         asset.reload
         assert_equal [good_assay], asset.assays
 
-        asset = Factory(asset_type, contributor: @person)
+        asset = FactoryBot.create(asset_type, contributor: @person)
         assert asset.can_edit?
         assert_empty asset.assays
 
@@ -111,7 +111,7 @@ class AssociationPermissionsTest < ActiveSupport::TestCase
 
         # check it only checks new links
         disable_authorization_checks do
-          asset = Factory(asset_type, contributor: @person)
+          asset = FactoryBot.create(asset_type, contributor: @person)
           asset.assay_assets.create(assay: not_editable_assay)
           assert asset.save
         end
@@ -129,13 +129,13 @@ class AssociationPermissionsTest < ActiveSupport::TestCase
   test 'assays linked to assets' do
     User.with_current_user(@user) do
       %i[data_file model sop sample document].each do |asset_type|
-        good_asset = Factory(asset_type, policy: Factory(:publicly_viewable_policy), contributor: Factory(:person))
-        bad_asset = Factory(asset_type, policy: Factory(:private_policy), contributor: Factory(:person))
+        good_asset = FactoryBot.create(asset_type, policy: FactoryBot.create(:publicly_viewable_policy), contributor: FactoryBot.create(:person))
+        bad_asset = FactoryBot.create(asset_type, policy: FactoryBot.create(:private_policy), contributor: FactoryBot.create(:person))
 
         assert good_asset.can_view?
         refute bad_asset.can_view?
 
-        assay = Factory(:assay, contributor: @person)
+        assay = FactoryBot.create(:assay, contributor: @person)
         assert assay.can_edit?
 
         assay.assay_assets.create(asset: good_asset)
@@ -150,7 +150,7 @@ class AssociationPermissionsTest < ActiveSupport::TestCase
 
         # check it only checks new links
         disable_authorization_checks do
-          assay = Factory(:assay, contributor: @person)
+          assay = FactoryBot.create(:assay, contributor: @person)
           assay.assay_assets.create(asset: bad_asset)
           assert assay.save
         end
@@ -168,27 +168,26 @@ class AssociationPermissionsTest < ActiveSupport::TestCase
     bad_results = []
     types = %i[investigation data_file model sop presentation sample document]
     User.with_current_user(@user) do
-      other_project = Factory(:project)
+      other_project = FactoryBot.create(:project)
       types.each do |asset_type|
-        good_asset = Factory.build(asset_type, contributor: User.current_user.person, projects: [@project])
-        bad_asset = Factory.build(asset_type, contributor: User.current_user.person, projects: [other_project])
+        good_asset = FactoryBot.build(asset_type, contributor: User.current_user.person, projects: [@project])
+        bad_asset = FactoryBot.build(asset_type, contributor: User.current_user.person, projects: [other_project])
 
         good_results << asset_type unless good_asset.save
         bad_results << asset_type if bad_asset.save
       end
     end
 
-    assert_empty good_results,"#{good_results.join(', ')} failed so save with a valid project"
+    assert_empty good_results,"#{good_results.join(', ')} failed to save with a valid project"
     assert_empty bad_results,"#{bad_results.join(', ')} successfully saved with a project the user isn't a member of"
-
   end
 
   test 'must be in project when creating an investigation' do
     User.with_current_user(@user) do
-      other_project = Factory(:project)
+      other_project = FactoryBot.create(:project)
 
-      good_inv = Factory.build(:investigation, contributor: User.current_user.person, projects: [@project])
-      bad_inv = Factory.build(:investigation, contributor: User.current_user.person, projects: [other_project])
+      good_inv = FactoryBot.build(:investigation, contributor: User.current_user.person, projects: [@project])
+      bad_inv = FactoryBot.build(:investigation, contributor: User.current_user.person, projects: [other_project])
 
       assert good_inv.save
       refute bad_inv.save

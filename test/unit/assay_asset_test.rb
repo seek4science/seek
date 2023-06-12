@@ -2,7 +2,7 @@ require 'test_helper'
 
 class AssayAssetTest < ActiveSupport::TestCase
   def setup
-    User.current_user = Factory :user
+    User.current_user = FactoryBot.create :user
   end
 
   def teardown
@@ -10,9 +10,9 @@ class AssayAssetTest < ActiveSupport::TestCase
   end
 
   test 'links to latest version' do
-    sop = Factory :sop, contributor: User.current_user.person
+    sop = FactoryBot.create :sop, contributor: User.current_user.person
     sop.save_as_new_version
-    assay = Factory :assay, contributor: User.current_user.person
+    assay = FactoryBot.create :assay, contributor: User.current_user.person
 
     version_number = sop.version
 
@@ -32,7 +32,7 @@ class AssayAssetTest < ActiveSupport::TestCase
   end
 
   test 'direction' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
 
     assert_equal 1, AssayAsset::Direction::INCOMING
     assert_equal 2, AssayAsset::Direction::OUTGOING
@@ -40,8 +40,8 @@ class AssayAssetTest < ActiveSupport::TestCase
 
     User.with_current_user(person.user) do
       a = AssayAsset.new
-      a.assay = Factory(:assay, contributor:person)
-      a.asset = Factory(:sop, contributor:person)
+      a.assay = FactoryBot.create(:assay, contributor:person)
+      a.asset = FactoryBot.create(:sop, contributor:person)
       a.save!
       a.reload
       assert_equal 0, a.direction
@@ -65,11 +65,11 @@ class AssayAssetTest < ActiveSupport::TestCase
   end
 
   test 'sample as asset' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
 
     User.with_current_user(person.user) do
-      sample = Factory(:sample, contributor:person)
-      assay = Factory(:assay, contributor:person)
+      sample = FactoryBot.create(:sample, contributor:person)
+      assay = FactoryBot.create(:assay, contributor:person)
       a = AssayAsset.new asset: sample, assay: assay, direction: AssayAsset::Direction::OUTGOING
       assert a.valid?
       a.save!
@@ -81,11 +81,11 @@ class AssayAssetTest < ActiveSupport::TestCase
   end
 
   test 'validate with model requires modelling assay' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     User.with_current_user(person.user) do
-      asset = Factory(:model, contributor:person)
-      assay1 = Factory(:modelling_assay, contributor:person)
-      assay2 = Factory(:experimental_assay, contributor:person)
+      asset = FactoryBot.create(:model, contributor:person)
+      assay1 = FactoryBot.create(:modelling_assay, contributor:person)
+      assay2 = FactoryBot.create(:experimental_assay, contributor:person)
 
       assert assay1.can_edit?
       assert assay2.can_edit?
@@ -102,11 +102,11 @@ class AssayAssetTest < ActiveSupport::TestCase
   end
 
   test 'validate with data file requires any assay' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     User.with_current_user(person.user) do
-      asset = Factory(:data_file, contributor:person)
-      assay1 = Factory(:modelling_assay, contributor:person)
-      assay2 = Factory(:experimental_assay, contributor:person)
+      asset = FactoryBot.create(:data_file, contributor:person)
+      assay1 = FactoryBot.create(:modelling_assay, contributor:person)
+      assay2 = FactoryBot.create(:experimental_assay, contributor:person)
 
       assert assay1.can_edit?
       assert assay2.can_edit?

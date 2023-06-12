@@ -61,7 +61,7 @@ class BatchSharingChangeTest < ActionController::TestCase
 
     #selected items don't include downloadable items
     params[:share_not_isa] = {}
-    event = Factory(:event, contributor: @person)
+    event = FactoryBot.create(:event, contributor: @person)
     params[:share_not_isa][event.class.name]||= {}
     params[:share_not_isa][event.class.name][event.id.to_s] = '1'
 
@@ -73,7 +73,7 @@ class BatchSharingChangeTest < ActionController::TestCase
 
     #selected items include downloadable items
     params[:share_not_isa] = {}
-    model = Factory(:model, contributor: @person, projects: [@person.projects.first])
+    model = FactoryBot.create(:model, contributor: @person, projects: [@person.projects.first])
     params[:share_not_isa][model.class.name] ||= {}
     params[:share_not_isa][model.class.name][model.id.to_s] = '1'
 
@@ -93,8 +93,8 @@ class BatchSharingChangeTest < ActionController::TestCase
 
   test 'should bulk change sharing permissions of selected items' do
 
-    model = Factory(:model, contributor: @person, projects: [@person.projects.first], policy: Factory(:private_policy))
-    df = Factory(:data_file, contributor: @person, policy: Factory(:private_policy))
+    model = FactoryBot.create(:model, contributor: @person, projects: [@person.projects.first], policy: FactoryBot.create(:private_policy))
+    df = FactoryBot.create(:data_file, contributor: @person, policy: FactoryBot.create(:private_policy))
 
     other_person = people(:quentin_person)
 
@@ -110,7 +110,7 @@ class BatchSharingChangeTest < ActionController::TestCase
     params[:share_not_isa][model.class.name][model.id.to_s] = '1'
     params[:share_isa][df.class.name]||= {}
     params[:share_isa][df.class.name][df.id.to_s] = '1'
-
+    params[:share_isa]['Banana'] = { '123' => '1' } # Should be ignored
 
     # batch change sharing policy and grant other_people manage right
     params[:policy_attributes] = {access_type: Policy::NO_ACCESS, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}}
@@ -138,21 +138,21 @@ class BatchSharingChangeTest < ActionController::TestCase
   def bulk_create_sharing_assets
     authorized_types = Seek::Util.authorized_types
     authorized_types.collect do |klass|
-      Factory(klass.name.underscore.to_sym, contributor: User.current_user.person)
+      FactoryBot.create(klass.name.underscore.to_sym, contributor: User.current_user.person)
     end
   end
 
   def data_file_for_sharing(owner = users(:datafile_owner))
-    Factory(:data_file, contributor: owner.person)
+    FactoryBot.create(:data_file, contributor: owner.person)
   end
 
   def data_with_isa
     df = data_file_for_sharing
     other_user = users(:quentin)
-    assay = Factory :experimental_assay, contributor: df.contributor,
-                    study: Factory(:study, contributor: df.contributor,
-                                   investigation: Factory(:investigation, contributor: df.contributor))
-    other_persons_data_file = Factory(:data_file, contributor: other_user.person, policy: Factory(:policy, access_type: Policy::VISIBLE))
+    assay = FactoryBot.create :experimental_assay, contributor: df.contributor,
+                    study: FactoryBot.create(:study, contributor: df.contributor,
+                                   investigation: FactoryBot.create(:investigation, contributor: df.contributor))
+    other_persons_data_file = FactoryBot.create(:data_file, contributor: other_user.person, policy: FactoryBot.create(:policy, access_type: Policy::VISIBLE))
     assay.associate(df)
     assay.associate(other_persons_data_file)
     assert !other_persons_data_file.can_manage?

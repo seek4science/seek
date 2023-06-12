@@ -7,6 +7,17 @@ module SamplesHelper
   end
 
   def controlled_vocab_form_field(sample_controlled_vocab, element_name, values, limit=1)
+    if sample_controlled_vocab.sample_controlled_vocab_terms.count < Seek::Config.cv_dropdown_limit && sample_controlled_vocab.source_ontology.blank?
+      options = options_from_collection_for_select(
+        sample_controlled_vocab.sample_controlled_vocab_terms,
+        :label, :label,
+        values
+      )
+      select_tag element_name,
+                 options,
+                 class: "form-control",
+                 include_blank: ""
+    else
       scv_id = sample_controlled_vocab.id
       object_struct = Struct.new(:id, :title)
       existing_objects = Array(values).collect do |value|
@@ -33,10 +44,45 @@ module SamplesHelper
                     limit: limit,
                     allow_new: sample_controlled_vocab.custom_input?,
                     class: 'form-control')
+    end
   end
 
   def controlled_vocab_list_form_field(sample_controlled_vocab, element_name, values)
     controlled_vocab_form_field(sample_controlled_vocab, element_name, values, nil)
+  end
+
+  def linked_custom_metadata_form_field(attribute,resource,element_name, element_class,depth)
+    linked_cms = resource.linked_custom_metadatas.select{|cm|cm.custom_metadata_attribute==attribute}
+
+    id = linked_cms.blank? ? nil : linked_cms.select{|cm| cm.custom_metadata_type.id == attribute.linked_custom_metadata_type.id}.first.id
+
+    html = ''
+    html +=  hidden_field_tag "#{element_name}[id]",id
+    html +=  hidden_field_tag "#{element_name}[custom_metadata_type_id]", attribute.linked_custom_metadata_type.id
+    html +=  hidden_field_tag "#{element_name}[custom_metadata_attribute_id]", attribute.id
+
+    attribute.linked_custom_metadata_type.custom_metadata_attributes.each do |attr|
+      linked_cm = linked_cms.select{|cm| cm.custom_metadata_type_id == attr.custom_metadata_type_id}.first
+      linked_cm ||= CustomMetadata.new(:custom_metadata_type_id => attr.custom_metadata_type_id)
+
+      attr_element_name = "#{element_name}][data][#{attr.title}]"
+      html += '<div class="form-group"><label>'+attr.label+'</label>'
+      html +=  required_span if attr.required?
+      if attr.linked_custom_metadata?
+        html += '<div class="form-group linked_custom_metdata_'+(depth.even? ? 'even' : 'odd')+'">'
+        html +=  attribute_form_element(attr, linked_cm, attr_element_name, element_class,depth+1)
+        html += '</div>'
+      else
+        html +=  attribute_form_element(attr, linked_cm, attr_element_name, element_class)
+      end
+
+      unless attr.description.nil?
+        html += custom_metadata_attribute_description(attr.description)
+      end
+      html += '</div>'
+    end
+
+    html.html_safe
   end
 
   def sample_multi_form_field(attribute, element_name, value)  
@@ -87,6 +133,8 @@ module SamplesHelper
         seek_cv_attribute_display(value, attribute)
       when Seek::Samples::BaseType::CV_LIST
         value.each{|v| seek_cv_attribute_display(v, attribute) }.join(', ')
+      when Seek::Samples::BaseType::LINKED_CUSTOM_METADATA
+        linked_custom_metadata_attribute_display(value)
       else
         default_attribute_display(attribute, options, sample, value)
       end
@@ -100,6 +148,19 @@ module SamplesHelper
       content << " (#{term.iri}) "
     end
     content
+  end
+
+  def linked_custom_metadata_attribute_display(value)
+    html = ''
+    html += '<ul>'
+       CustomMetadata.find(value.id).custom_metadata_attributes.each do |attr|
+       html += '<li>'
+         html += '<label>'+attr.title+'</label>'+' : '
+         html += display_attribute(value,attr)
+       html += '</li>'
+      end
+    html += '</ul>'
+    html.html_safe
   end
 
   def seek_sample_attribute_display(value)
@@ -214,7 +275,7 @@ module SamplesHelper
 
   private
 
-  def attribute_form_element(attribute, resource, element_name, element_class )
+  def attribute_form_element(attribute, resource, element_name, element_class, depth=1)
     value = resource.get_attribute_value(attribute.title)
     placeholder = "e.g. #{attribute.sample_attribute_type.placeholder}" unless attribute.sample_attribute_type.placeholder.blank?
 
@@ -262,9 +323,13 @@ module SamplesHelper
                  include_blank: !attribute.required?, class: "form-control #{element_class}"
     when Seek::Samples::BaseType::SEEK_SAMPLE_MULTI
       sample_multi_form_field attribute, element_name, value
+    when Seek::Samples::BaseType::LINKED_CUSTOM_METADATA
+      linked_custom_metadata_form_field attribute, resource, element_name, element_class,depth
     else
       text_field_tag element_name, value, class: "form-control #{element_class}", placeholder: placeholder
     end
   end
 
 end
+
+

@@ -13,11 +13,14 @@ module Seek
           client = Ebi::OlsClient.new
           project = Project.find_or_create_by(title: 'Default Project')
           directory = Rails.root.join('config', 'default_data', 'source_types')
-          Dir.exist?(directory) ? Dir.foreach(directory) : [].each do |filename|
+          directory_files = Dir.exist?(directory) ? Dir.glob("#{directory}/*.json") : []
+          raise '<ul><li>Make sure to upload files that have the ".json" extension.</li></ul>' if directory_files == []
+
+          directory_files.each do |filename|
             puts filename
             next if File.extname(filename) != '.json'
 
-            file = File.read(File.join(Rails.root, 'config/default_data/source_types/', filename))
+            file = File.read(filename)
             res = check_json_file(file)
             raise res if res.present?
 

@@ -58,7 +58,7 @@ class LicenseTest < ActiveSupport::TestCase
   end
 
   test 'license key is validated' do
-    sop = Factory(:sop, license: 'CC0-1.0')
+    sop = FactoryBot.create(:sop, license: 'CC0-1.0')
     assert sop.valid?
 
     sop.license = 'CCZZ'

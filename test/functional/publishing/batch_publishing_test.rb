@@ -22,7 +22,7 @@ class BatchPublishingTest < ActionController::TestCase
     assert_nil flash[:error]
 
     # not yourself
-    a_person = Factory(:person)
+    a_person = FactoryBot.create(:person)
     get :show, params: { id: a_person }
     assert_response :success
     assert_select 'a', text: /Publish your assets/, count: 0
@@ -59,7 +59,7 @@ class BatchPublishingTest < ActionController::TestCase
       assert_select '.type_and_title img[src*=?][title=?]', 'lock.png', 'Private', count: total_asset_count
     end
 
-    assert_select '.checkbox', text: /Publish/, count: total_asset_count do
+    assert_select '.parent-btn-checkbox', text: /Publish/, count: total_asset_count do
       publish_immediately_assets.each do |a|
         assert_select "input[type='checkbox'][id=?]", "publish_#{a.class.name}_#{a.id}"
       end
@@ -70,9 +70,9 @@ class BatchPublishingTest < ActionController::TestCase
   end
 
   test 'do not have not-publishable items in batch_publishing_preview' do
-    published_item = Factory(:data_file,
+    published_item = FactoryBot.create(:data_file,
                              contributor: User.current_user.person,
-                             policy: Factory(:public_policy))
+                             policy: FactoryBot.create(:public_policy))
     assert !published_item.can_publish?, 'This data file must not be publishable for the test to succeed'
 
     get :batch_publishing_preview, params: { id: User.current_user.person.id }
@@ -83,9 +83,9 @@ class BatchPublishingTest < ActionController::TestCase
   end
 
   test 'do not have not_publishable_type item in batch_publishing_preview' do
-    item = Factory(:publication,
+    item = FactoryBot.create(:publication,
                    contributor: User.current_user.person,
-                   policy: Factory(:public_policy))
+                   policy: FactoryBot.create(:public_policy))
     refute item.can_publish?, 'This item must not be publishable for the test to be meaningful'
 
     get :batch_publishing_preview, params: { id: User.current_user.person.id }
@@ -146,9 +146,9 @@ class BatchPublishingTest < ActionController::TestCase
   # The following tests are for generating your asset list that you requested to make published are still waiting for approval
   test 'should have the -Your assets waiting for approval- button only on your profile' do
     # not yourself
-    gatekeeper = Factory(:asset_gatekeeper)
-    me = Factory(:person, group_memberships: [Factory(:group_membership, work_group: gatekeeper.group_memberships.first.work_group)])
-    another_person = Factory(:person, group_memberships: [Factory(:group_membership, work_group: gatekeeper.group_memberships.first.work_group)])
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    me = FactoryBot.create(:person, group_memberships: [FactoryBot.create(:group_membership, work_group: gatekeeper.group_memberships.first.work_group)])
+    another_person = FactoryBot.create(:person, group_memberships: [FactoryBot.create(:group_membership, work_group: gatekeeper.group_memberships.first.work_group)])
 
     login_as(me)
 
@@ -167,7 +167,7 @@ class BatchPublishingTest < ActionController::TestCase
     assert_response :success
     assert_nil flash[:error]
 
-    a_person = Factory(:person)
+    a_person = FactoryBot.create(:person)
     get :waiting_approval_assets, params: { id: a_person }
     assert_redirected_to :root
     assert_not_nil flash[:error]
@@ -175,7 +175,7 @@ class BatchPublishingTest < ActionController::TestCase
 
   test 'get waiting_approval_assets' do
     df, model, sop = waiting_approval_assets_for User.current_user
-    not_requested_df = Factory(:data_file, contributor: User.current_user.person)
+    not_requested_df = FactoryBot.create(:data_file, contributor: User.current_user.person)
 
     get :waiting_approval_assets, params: { id: User.current_user.person }
 
@@ -197,30 +197,30 @@ class BatchPublishingTest < ActionController::TestCase
   def create_publish_immediately_assets
     publishable_types = Seek::Util.authorized_types.select { |c| c.first.try(:is_in_isa_publishable?) }
     publishable_types.collect do |klass|
-      Factory(klass.name.underscore.to_sym, contributor: User.current_user.person)
+      FactoryBot.create(klass.name.underscore.to_sym, contributor: User.current_user.person)
     end
   end
 
   def create_gatekeeper_required_assets
     publishable_types = Seek::Util.authorized_types.select { |c| c.first.try(:is_in_isa_publishable?) }
     publishable_types.collect do |klass|
-      gatekeeper = Factory(:asset_gatekeeper)
+      gatekeeper = FactoryBot.create(:asset_gatekeeper)
       gatekept_project = gatekeeper.projects.first
-      @user.person.add_to_project_and_institution(gatekept_project, Factory(:institution))
-      Factory(klass.name.underscore.to_sym, contributor: @user.person, projects: [gatekept_project])
+      @user.person.add_to_project_and_institution(gatekept_project, FactoryBot.create(:institution))
+      FactoryBot.create(klass.name.underscore.to_sym, contributor: @user.person, projects: [gatekept_project])
     end
   end
 
   def waiting_approval_assets_for(user)
-    gatekeeper = Factory(:asset_gatekeeper)
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
     gatekept_project = gatekeeper.projects.first
-    user.person.add_to_project_and_institution(gatekept_project, Factory(:institution))
+    user.person.add_to_project_and_institution(gatekept_project, FactoryBot.create(:institution))
 
-    df = Factory(:data_file, contributor: user.person, projects: [gatekept_project])
+    df = FactoryBot.create(:data_file, contributor: user.person, projects: [gatekept_project])
     df.resource_publish_logs.create(publish_state: ResourcePublishLog::WAITING_FOR_APPROVAL, user: user)
-    model = Factory(:model, contributor: user.person, projects: [gatekept_project])
+    model = FactoryBot.create(:model, contributor: user.person, projects: [gatekept_project])
     model.resource_publish_logs.create(publish_state: ResourcePublishLog::WAITING_FOR_APPROVAL, user: user)
-    sop = Factory(:sop, contributor: user.person, projects: [gatekept_project])
+    sop = FactoryBot.create(:sop, contributor: user.person, projects: [gatekept_project])
     sop.resource_publish_logs.create(publish_state: ResourcePublishLog::WAITING_FOR_APPROVAL, user: user)
     [df, model, sop]
   end

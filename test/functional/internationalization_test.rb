@@ -19,7 +19,7 @@ class InternationalizationTest < ActionController::TestCase
   test 'error message helper uses localized model name' do
     @controller = ProjectsController.new
 
-    login_as(Factory(:admin))
+    login_as(FactoryBot.create(:admin))
 
     p = Project.create()
     p.title = nil
@@ -32,7 +32,7 @@ class InternationalizationTest < ActionController::TestCase
   test 'projects need to exist for an Investigation translated' do
     @controller = InvestigationsController.new
 
-    login_as(Factory(:admin))
+    login_as(FactoryBot.create(:admin))
 
     p = Investigation.create()
 
@@ -44,7 +44,7 @@ class InternationalizationTest < ActionController::TestCase
   test 'Investigation need to exist for a Study translated' do
     @controller = StudiesController.new
 
-    login_as(Factory(:admin))
+    login_as(FactoryBot.create(:admin))
 
     p = Study.create()
     p.title = "An study without investigation"
@@ -57,10 +57,10 @@ class InternationalizationTest < ActionController::TestCase
   test 'Study need to exist for an assay translated' do
     @controller = AssaysController.new
 
-    login_as(Factory(:admin))
+    login_as(FactoryBot.create(:admin))
 
     p = Assay.create()
-    Factory(:experimental_assay_class)
+    FactoryBot.create(:experimental_assay_class)
     p.assay_class = AssayClass.experimental
     p.title = "An assay without study"
 
@@ -72,7 +72,7 @@ class InternationalizationTest < ActionController::TestCase
   test 'projects need to exist for a data_file translated' do
     @controller = DataFilesController.new
 
-    login_as(Factory(:admin))
+    login_as(FactoryBot.create(:admin))
 
     p = DataFile.create()
 
@@ -85,7 +85,7 @@ class InternationalizationTest < ActionController::TestCase
   test 'projects need to exist for a model translated' do
     @controller = ModelsController.new
 
-    login_as(Factory(:admin))
+    login_as(FactoryBot.create(:admin))
 
     p = Model.create()
 
@@ -97,7 +97,7 @@ class InternationalizationTest < ActionController::TestCase
   test 'projects need to exist for a SOP translated' do
     @controller = SopsController.new
 
-    login_as(Factory(:admin))
+    login_as(FactoryBot.create(:admin))
 
     p = Sop.create()
 
@@ -109,7 +109,7 @@ class InternationalizationTest < ActionController::TestCase
   test 'projects need to exist for a publication translated' do
     @controller = PublicationsController.new
 
-    login_as(Factory(:admin))
+    login_as(FactoryBot.create(:admin))
 
     p = Publication.create()
 
@@ -121,7 +121,7 @@ class InternationalizationTest < ActionController::TestCase
   test 'projects need to exist for a document translated' do
     @controller = DocumentsController.new
 
-    login_as(Factory(:admin))
+    login_as(FactoryBot.create(:admin))
 
     p = Document.create()
 
@@ -133,7 +133,7 @@ class InternationalizationTest < ActionController::TestCase
   test 'projects need to exist for a file template translated' do
     @controller = FileTemplatesController.new
 
-    login_as(Factory(:admin))
+    login_as(FactoryBot.create(:admin))
 
     p = FileTemplate.create()
 
@@ -145,7 +145,7 @@ class InternationalizationTest < ActionController::TestCase
   test 'projects need to exist for a collection translated' do
     @controller = CollectionsController.new
 
-    login_as(Factory(:admin))
+    login_as(FactoryBot.create(:admin))
 
     p = Collection.create()
 
@@ -157,7 +157,7 @@ class InternationalizationTest < ActionController::TestCase
   test 'projects need to exist for a presentation translated' do
     @controller = PresentationsController.new
 
-    login_as(Factory(:admin))
+    login_as(FactoryBot.create(:admin))
 
     p = Presentation.create()
     p.title = "A presentation without project"
@@ -170,7 +170,7 @@ class InternationalizationTest < ActionController::TestCase
   test 'projects need to exist for an event translated' do
     @controller = EventsController.new
 
-    login_as(Factory(:admin))
+    login_as(FactoryBot.create(:admin))
 
     p = Event.create()
     p.title = "An event without project"
@@ -183,7 +183,7 @@ class InternationalizationTest < ActionController::TestCase
   test 'projects need to exist for a sample translated' do
     @controller = SamplesController.new
 
-    login_as(Factory(:admin))
+    login_as(FactoryBot.create(:admin))
 
     p = Sample.create()
     p.title = "A sample without project"
@@ -196,7 +196,7 @@ class InternationalizationTest < ActionController::TestCase
   test 'projects need to exist for a template translated' do
     @controller = TemplatesController.new
 
-    login_as(Factory(:admin))
+    login_as(FactoryBot.create(:admin))
 
     p = Template.create()
     p.title = "A template without project"
@@ -209,7 +209,7 @@ class InternationalizationTest < ActionController::TestCase
   test 'projects need to exist for a sample type translated' do
     @controller = SampleTypesController.new
 
-    login_as(Factory(:admin))
+    login_as(FactoryBot.create(:admin))
 
     p = SampleType.create()
     p.title = "A sample type without project"
@@ -222,7 +222,7 @@ class InternationalizationTest < ActionController::TestCase
   test 'organism and projects need to exist for a strain translated' do
     @controller = StrainsController.new
 
-    login_as(Factory(:admin))
+    login_as(FactoryBot.create(:admin))
 
     p = Strain.create()
     p.title = "A Strain without project"

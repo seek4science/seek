@@ -84,7 +84,7 @@ class StudyBatchUpload < ApplicationRecord
 
   def self.unzip_batch(file_path, user_uuid)
     unzipped_files = Zip::File.open(file_path)
-    FileUtils.rm_r("#{Rails.root}/tmp/#{user_uuid}_studies_upload") if File.exists?("#{Rails.root}/tmp/#{user_uuid}_studies_upload")
+    FileUtils.rm_r("#{Rails.root}/tmp/#{user_uuid}_studies_upload") if File.exist?("#{Rails.root}/tmp/#{user_uuid}_studies_upload")
     Dir.mkdir("#{Rails.root}/tmp/#{user_uuid}_studies_upload")
     tmp_dir = "#{Rails.root}/tmp/#{user_uuid}_studies_upload/"
     study_data = []
@@ -93,11 +93,11 @@ class StudyBatchUpload < ApplicationRecord
       file_name = File.basename(file.name)
       if file.name.include?('data/') && file.ftype != :directory
         study_data << file
-        Dir.mkdir "#{tmp_dir}/data" unless File.exists? "#{tmp_dir}/data"
-        file.extract("#{tmp_dir}/data/#{file_name}") unless File.exists? "#{tmp_dir}/data/#{file_name}"
+        Dir.mkdir "#{tmp_dir}/data" unless File.exist? "#{tmp_dir}/data"
+        file.extract("#{tmp_dir}/data/#{file_name}") unless File.exist? "#{tmp_dir}/data/#{file_name}"
       elsif file.ftype == :file
         studies << file
-        file.extract("#{tmp_dir}#{file_name}") unless File.exists? "#{tmp_dir}#{file_name}"
+        file.extract("#{tmp_dir}#{file_name}") unless File.exist? "#{tmp_dir}#{file_name}"
       end
     end
     [study_data, studies]

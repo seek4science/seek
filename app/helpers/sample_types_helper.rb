@@ -90,6 +90,10 @@ module SampleTypesHelper
 
   private
 
+  def displayed_sample_attribute_types
+    SampleAttributeType.all.select{|x|!x.linked_custom_metadata?}
+  end
+
   def attribute_type_link(sample_type_attribute)
     type = sample_type_attribute.sample_attribute_type.title
     if sample_type_attribute.seek_sample?

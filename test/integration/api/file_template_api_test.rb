@@ -7,14 +7,14 @@ class FileTemplateApiTest < ActionDispatch::IntegrationTest
   def setup
     user_login
     @project = @current_user.person.projects.first
-    @creator = Factory(:person)
-    Factory(:data_types_controlled_vocab)
-    Factory(:data_formats_controlled_vocab)
-    @file_template = Factory(:file_template, policy: Factory(:public_policy), contributor: current_person, creators: [@creator])
+    @creator = FactoryBot.create(:person)
+    FactoryBot.create(:data_types_controlled_vocab)
+    FactoryBot.create(:data_formats_controlled_vocab)
+    @file_template = FactoryBot.create(:file_template, policy: FactoryBot.create(:public_policy), contributor: current_person, creators: [@creator])
   end
 
   test 'can add content to API-created file template' do
-    ft = Factory(:api_pdf_file_template, contributor: current_person)
+    ft = FactoryBot.create(:api_pdf_file_template, contributor: current_person)
 
     assert ft.content_blob.no_content?
     assert ft.can_download?(@current_user)
@@ -31,7 +31,7 @@ class FileTemplateApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'cannot add content to API-created file template without permission' do
-    ft = Factory(:api_pdf_file_template, policy: Factory(:public_download_and_no_custom_sharing)) # Created by someone who is not currently logged in
+    ft = FactoryBot.create(:api_pdf_file_template, policy: FactoryBot.create(:public_download_and_no_custom_sharing)) # Created by someone who is not currently logged in
 
     assert ft.content_blob.no_content?
     assert ft.can_download?(@current_user)
@@ -46,7 +46,7 @@ class FileTemplateApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'cannot add content to API-created file template that already has content' do
-    ft = Factory(:file_template, contributor: current_person)
+    ft = FactoryBot.create(:file_template, contributor: current_person)
 
     refute ft.content_blob.no_content?
     assert ft.can_download?(@current_user)

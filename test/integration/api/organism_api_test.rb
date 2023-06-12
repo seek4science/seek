@@ -5,6 +5,6 @@ class OrganismApiTest < ActionDispatch::IntegrationTest
 
   def setup
     user_login
-    @organism = Factory(:organism)
+    @organism = FactoryBot.create(:organism)
   end
 end

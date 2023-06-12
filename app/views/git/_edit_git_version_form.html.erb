@@ -1,0 +1,22 @@
+<%= panel('Edit version', id: 'edit_git_version_form_'+"#{version.version}", style: 'margin-top: 1em; display: none') do %>
+  <%= form_for(version, as: :git_version, url: polymorphic_path([resource, :git_update_version], version: version.version), method: :patch) do |f| %>
+    <div class="form-group">
+      <label>Name</label>
+      <%= f.text_field(:name, class: 'form-control') %>
+    </div>
+
+    <div class="form-group">
+      <label>Comment</label>
+      <%= f.text_area(:comment, class: 'form-control') %>
+    </div>
+
+    <% if version.can_change_visibility? %>
+      <div class="form-group">
+        <label>Visibility</label>
+        <%= f.select :visibility, version_visibility_options(version.visibility), {}, class: 'form-control' -%>
+      </div>
+    <% end %>
+
+    <%= submit_tag 'Update', class: 'btn btn-primary'-%>
+  <% end %>
+<% end %>

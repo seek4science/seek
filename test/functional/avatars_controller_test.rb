@@ -4,7 +4,7 @@ class AvatarsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
 
   def setup
-    @admin = Factory(:admin)
+    @admin = FactoryBot.create(:admin)
   end
 
   test 'show new' do
@@ -14,7 +14,7 @@ class AvatarsControllerTest < ActionController::TestCase
   end
 
   test 'non project member can upload avatar' do
-    u = Factory(:user_not_in_project)
+    u = FactoryBot.create(:user_not_in_project)
     login_as(u)
     assert u.person.projects.empty?, 'This person should not be in any projects'
     get :new, params: { person_id: u.person.id }
@@ -22,15 +22,15 @@ class AvatarsControllerTest < ActionController::TestCase
   end
 
   test 'can view avatar' do
-    avatar = Factory(:avatar)
+    avatar = FactoryBot.create(:avatar)
     get :show, params: { person_id: avatar.owner_id, id: avatar.id }
     assert_response :success
   end
 
   test 'can select avatar' do
-    avatar = Factory(:avatar)
+    avatar = FactoryBot.create(:avatar)
     person = avatar.owner
-    avatar2 = Factory(:avatar, owner: person)
+    avatar2 = FactoryBot.create(:avatar, owner: person)
     login_as(person)
     assert_equal avatar, person.avatar
 
@@ -41,10 +41,10 @@ class AvatarsControllerTest < ActionController::TestCase
   end
 
   test 'cannot select avatar if not authorized' do
-    avatar = Factory(:avatar)
+    avatar = FactoryBot.create(:avatar)
     person = avatar.owner
-    avatar2 = Factory(:avatar, owner: person)
-    person2 = Factory(:person)
+    avatar2 = FactoryBot.create(:avatar, owner: person)
+    person2 = FactoryBot.create(:person)
     login_as(person2)
     assert_equal avatar, person.avatar
 
@@ -55,7 +55,7 @@ class AvatarsControllerTest < ActionController::TestCase
   end
 
   test 'can destroy avatar' do
-    avatar = Factory(:avatar)
+    avatar = FactoryBot.create(:avatar)
     login_as(avatar.owner)
     assert_difference('Avatar.count', -1) do
       delete :destroy, params: { person_id: avatar.owner_id, id: avatar.id }
@@ -64,8 +64,8 @@ class AvatarsControllerTest < ActionController::TestCase
   end
 
   test 'cannot destroy avatar if not authorized' do
-    avatar = Factory(:avatar)
-    login_as(Factory(:person))
+    avatar = FactoryBot.create(:avatar)
+    login_as(FactoryBot.create(:person))
     assert_no_difference('Avatar.count') do
       delete :destroy, params: { person_id: avatar.owner_id, id: avatar.id }
     end
@@ -78,7 +78,7 @@ class AvatarsControllerTest < ActionController::TestCase
   end
 
   test 'handles unknown avatar when logged out' do
-    p = Factory :person
+    p = FactoryBot.create :person
     get :show, params: { person_id: p, id: 89_878 }
     assert_response :not_found
   end
@@ -89,68 +89,68 @@ class AvatarsControllerTest < ActionController::TestCase
   end
 
   test 'index for programmes for admin' do
-    programme = Factory(:programme, avatar: Factory(:avatar))
-    Factory(:avatar, owner: programme)
+    programme = FactoryBot.create(:programme, avatar: FactoryBot.create(:avatar))
+    FactoryBot.create(:avatar, owner: programme)
     login_as(@admin)
     get :index, params: { programme_id: programme.id }
     assert_response :success
   end
 
   test 'index for programmes for programme admin' do
-    programme_admin = Factory(:programme_administrator)
+    programme_admin = FactoryBot.create(:programme_administrator)
     programme = programme_admin.programmes.first
-    Factory(:avatar, owner: programme)
+    FactoryBot.create(:avatar, owner: programme)
     login_as(programme_admin)
     get :index, params: { programme_id: programme.id }
     assert_response :success
   end
 
   test 'index for projects for admin' do
-    p = Factory(:project, avatar: Factory(:avatar))
-    Factory(:avatar, owner: p)
+    p = FactoryBot.create(:project, avatar: FactoryBot.create(:avatar))
+    FactoryBot.create(:avatar, owner: p)
     login_as(@admin)
     get :index, params: { project_id: p.id }
     assert_response :success
   end
 
   test 'index for projects for programme admin' do
-    programme_admin = Factory(:programme_administrator)
+    programme_admin = FactoryBot.create(:programme_administrator)
     refute_empty(programme_admin.programmes.first.projects)
     project = programme_admin.programmes.first.projects.first
-    Factory(:avatar, owner: project)
+    FactoryBot.create(:avatar, owner: project)
     login_as(programme_admin)
     get :index, params: { project_id: project.id }
     assert_response :success
   end
 
   test 'index for projects for project admin' do
-    project_admin = Factory(:project_administrator)
+    project_admin = FactoryBot.create(:project_administrator)
     refute_empty(project_admin.projects)
     project = project_admin.projects.first
-    Factory(:avatar, owner: project)
+    FactoryBot.create(:avatar, owner: project)
     login_as(project_admin)
     get :index, params: { project_id: project.id }
     assert_response :success
   end
 
   test 'index for institutions' do
-    i = Factory(:institution, avatar: Factory(:avatar))
-    Factory(:avatar, owner: i)
+    i = FactoryBot.create(:institution, avatar: FactoryBot.create(:avatar))
+    FactoryBot.create(:avatar, owner: i)
     login_as(@admin)
     get :index, params: { institution_id: i.id }
     assert_response :success
   end
 
   test 'new avatar for programme' do
-    programme = Factory(:programme, avatar: Factory(:avatar))
-    Factory(:avatar, owner: programme)
+    programme = FactoryBot.create(:programme, avatar: FactoryBot.create(:avatar))
+    FactoryBot.create(:avatar, owner: programme)
     login_as(@admin)
     get :new, params: { programme_id: programme }
     assert_response :success
   end
 
   test 'create avatar' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
 
     assert_difference('Avatar.count', 1) do
@@ -162,7 +162,7 @@ class AvatarsControllerTest < ActionController::TestCase
   end
 
   test 'create avatar with missing param throws appropriate error' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
 
     assert_no_difference('Avatar.count') do

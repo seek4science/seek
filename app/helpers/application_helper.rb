@@ -224,7 +224,7 @@ module ApplicationHelper
     else
       text.capitalize! if options[:capitalize]
       res = text.html_safe
-      res = white_list(res)
+      res = sanitized_text(res)
       res = truncate_without_splitting_words(res, options[:length]) if options[:length]
       if options[:markdown]
         # Convert `&gt;` etc. back to `>` so markdown blockquotes can be used.
@@ -376,8 +376,7 @@ module ApplicationHelper
     if resource_type == 'Assay'
       result = t('assays.assay')
     else
-      translated_resource_type = translate_resource_type(resource_type)
-      result = translated_resource_type.include?('translation missing') ? resource_type : translated_resource_type
+      result = translate_resource_type(resource_type) || resource_type
     end
     pluralize ? result.pluralize : result
   end
@@ -389,14 +388,15 @@ module ApplicationHelper
     elsif resource_type == 'TavernaPlayer::Run'
       result = 'Run'
     else
-      translated_resource_type = translate_resource_type(resource_type)
-      result = translated_resource_type.include?('translation missing') ? resource_type : translated_resource_type
+      result = translate_resource_type(resource_type) || resource_type
     end
     pluralize ? result.pluralize : result
   end
 
   def translate_resource_type(resource_type)
-    I18n.t(resource_type.underscore.to_s)
+    key = resource_type.underscore.to_s
+    return nil unless I18n.exists?(key)
+    I18n.t(key)
   end
 
   def no_deletion_explanation_message(clz)
@@ -462,8 +462,8 @@ module ApplicationHelper
     Seek::Docker.using_docker?
   end
 
-  def white_list(text)
-    Rails::Html::WhiteListSanitizer.new.sanitize(text)
+  def sanitized_text(text)
+    Rails::Html::SafeListSanitizer.new.sanitize(text)
   end
 
   # whether manage attributes should be shown, dont show if editing (rather than new or managing)

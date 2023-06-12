@@ -2,7 +2,7 @@ require 'feedjira'
 
 module Seek
   class FeedReader
-    BLACKLIST_TIME = 1.day
+    DENYLIST_TIME = 1.day
 
     # Fetches the feed entries - aggregated and ordered, for a particular category
     def self.fetch_entries_for(category)
@@ -20,7 +20,7 @@ module Seek
           end
         rescue => exception
           Rails.logger.error("Problem with feed: #{url} - #{exception.message}")
-          blacklist(url)
+          deny(url)
           nil
         end
       end
@@ -28,18 +28,18 @@ module Seek
       feeds
     end
 
-    def self.blacklist(url)
-      blacklisted = Seek::Config.blacklisted_feeds || {}
-      blacklisted[url] = Time.now
-      Seek::Config.blacklisted_feeds = blacklisted
+    def self.deny(url)
+      denied = Seek::Config.denylisted_feeds || {}
+      denied[url] = Time.now
+      Seek::Config.denylisted_feeds = denied
     end
 
-    def self.is_blacklisted?(url)
-      list = Seek::Config.blacklisted_feeds || {}
+    def self.is_denied?(url)
+      list = Seek::Config.denylisted_feeds || {}
       return false unless list[url]
-      if list[url] < BLACKLIST_TIME.ago
+      if list[url] < DENYLIST_TIME.ago
         list.delete(url)
-        Seek::Config.blacklisted_feeds = list
+        Seek::Config.denylisted_feeds = list
         false
       else
         true
@@ -48,7 +48,7 @@ module Seek
 
     def self.determine_feed_urls(category)
       urls = Seek::Config.send("#{category}_feed_urls")
-      urls.split(',').select { |url| !url.blank? && !is_blacklisted?(url) }
+      urls.split(',').select { |url| !url.blank? && !is_denied?(url) }
     end
 
     # deletes the cache directory, along with any files in it
@@ -70,7 +70,8 @@ module Seek
       unless feed_url.blank?
         # trim the url element
         feed_url.strip!
-        feed = Feedjira::Feed.fetch_and_parse(feed_url)
+        xml = HTTParty.get(feed_url).body
+        feed = Feedjira.parse(xml)
         fail "Error reading feed for #{feed_url} error #{feed}" if feed.is_a?(Numeric)
         feed
       end

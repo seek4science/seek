@@ -7,16 +7,16 @@ class TemplatesControllerTest < ActionController::TestCase
 
   setup do
     Seek::Config.send('sample_type_template_enabled=', true)
-    Factory(:person) # to prevent person being first person and therefore admin
-    @person = Factory(:project_administrator)
+    FactoryBot.create(:person) # to prevent person being first person and therefore admin
+    @person = FactoryBot.create(:project_administrator)
     @project = @person.projects.first
     @project_ids = [@project.id]
     refute_nil @project
     login_as(@person)
-    @template = Factory(:min_template, project_ids: @project_ids, contributor: @person)
-    @string_type = Factory(:string_sample_attribute_type)
-    @int_type = Factory(:integer_sample_attribute_type)
-    @controlled_vocab_type = Factory(:controlled_vocab_attribute_type)
+    @template = FactoryBot.create(:min_template, project_ids: @project_ids, contributor: @person)
+    @string_type = FactoryBot.create(:string_sample_attribute_type)
+    @int_type = FactoryBot.create(:integer_sample_attribute_type)
+    @controlled_vocab_type = FactoryBot.create(:controlled_vocab_attribute_type)
   end
 
   test 'should get new' do
@@ -72,7 +72,7 @@ class TemplatesControllerTest < ActionController::TestCase
 
   test 'should update template' do
     template = nil
-    template = Factory(:min_template, project_ids: @project_ids, contributor: @person, title: 'new_template')
+    template = FactoryBot.create(:min_template, project_ids: @project_ids, contributor: @person, title: 'new_template')
 
     template_attributes_fields = template.template_attributes.map do |attribute|
       { pos: attribute.pos, title: attribute.title,
@@ -97,7 +97,7 @@ class TemplatesControllerTest < ActionController::TestCase
   end
 
   test 'update changing from a CV attribute' do
-    template = Factory(:apples_controlled_vocab_template, project_ids: @project_ids, contributor: @person)
+    template = FactoryBot.create(:apples_controlled_vocab_template, project_ids: @project_ids, contributor: @person)
     assert template.valid?
     assert template.can_edit?
     assert_equal 1, template.template_attributes.count
@@ -132,7 +132,7 @@ class TemplatesControllerTest < ActionController::TestCase
   end
 
   test 'should not destroy template if has existing sample_types' do
-    Factory(:simple_sample_type, isa_template: @template)
+    FactoryBot.create(:simple_sample_type, isa_template: @template)
     refute @template.can_delete?
 
     assert_no_difference('Template.count') do
@@ -144,30 +144,30 @@ class TemplatesControllerTest < ActionController::TestCase
   end
 
   test 'should show private template to the contributor' do
-    p = Factory :person
+    p = FactoryBot.create :person
     login_as p.user
-    template = Factory(:template, policy: Factory(:policy, access_type: Policy::NO_ACCESS), contributor: p)
+    template = FactoryBot.create(:template, policy: FactoryBot.create(:policy, access_type: Policy::NO_ACCESS), contributor: p)
     get :show, params: { id: template }
     assert_response :success
   end
 
   test 'should not show private template to other users' do
-    template = Factory(:template, policy: Factory(:policy, access_type: Policy::NO_ACCESS))
+    template = FactoryBot.create(:template, policy: FactoryBot.create(:policy, access_type: Policy::NO_ACCESS))
     get :show, params: { id: template }
     assert_response :forbidden
   end
 
   test 'should show public template to all users' do
-    template = Factory(:template, policy: Factory(:policy, access_type: Policy::VISIBLE))
-    login_as Factory(:user)
+    template = FactoryBot.create(:template, policy: FactoryBot.create(:policy, access_type: Policy::VISIBLE))
+    login_as FactoryBot.create(:user)
     get :show, params: { id: template }
     assert_response :success
   end
 
   test 'authlookup item queued if creator changed' do
-    template = Factory(:template)
+    template = FactoryBot.create(:template)
     login_as(template.contributor)
-    creator = Factory(:person)
+    creator = FactoryBot.create(:person)
 
     AuthLookupUpdateQueue.destroy_all
 
@@ -206,13 +206,13 @@ class TemplatesControllerTest < ActionController::TestCase
     assert_equal 'Admin rights required', flash[:error]
     assert_response :redirect
 
-    login_as(Factory(:admin))
+    login_as(FactoryBot.create(:admin))
     get :default_templates
     assert_response :success
   end
 
   test 'should get task_status' do
-    login_as(Factory(:admin))
+    login_as(FactoryBot.create(:admin))
     get :task_status
     assert_template partial: 'templates/_result'
   end
@@ -237,9 +237,9 @@ class TemplatesControllerTest < ActionController::TestCase
     assert_routing 'sample_types/2/templates', controller: 'templates', action: 'index', sample_type_id: '2'
 
 
-    template = Factory(:min_template, project_ids: @project_ids, contributor: @person, title:'related template')
-    template2 = Factory(:min_template, project_ids: @project_ids, contributor: @person, title:'unrelated template')
-    sample_type = Factory(:simple_sample_type, isa_template: template, project_ids: @project_ids, contributor: @person)
+    template = FactoryBot.create(:min_template, project_ids: @project_ids, contributor: @person, title:'related template')
+    template2 = FactoryBot.create(:min_template, project_ids: @project_ids, contributor: @person, title:'unrelated template')
+    sample_type = FactoryBot.create(:simple_sample_type, isa_template: template, project_ids: @project_ids, contributor: @person)
 
     assert_equal template, sample_type.isa_template
 

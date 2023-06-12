@@ -4,25 +4,25 @@ class PersonTest < ActiveSupport::TestCase
   fixtures :users, :people, :roles
 
   def test_work_groups
-    p = Factory(:person_in_multiple_projects)
+    p = FactoryBot.create(:person_in_multiple_projects)
     assert_equal 3, p.work_groups.size
   end
 
   test 'to_json_ld' do
-    refute_nil JSON.parse(Factory(:person).to_json_ld)
+    refute_nil JSON.parse(FactoryBot.create(:person).to_json_ld)
   end
 
   test 'to schema ld' do
-    p = Factory(:person)
+    p = FactoryBot.create(:person)
     assert p.schema_org_supported?
   end
 
   test "registered user's profile can be edited by" do
-    admin = Factory(:admin)
-    project_administrator = Factory(:project_administrator)
-    project_administrator2 = Factory(:project_administrator)
-    person = Factory :person, group_memberships: [Factory(:group_membership, work_group: project_administrator.group_memberships.first.work_group)]
-    another_person = Factory :person
+    admin = FactoryBot.create(:admin)
+    project_administrator = FactoryBot.create(:project_administrator)
+    project_administrator2 = FactoryBot.create(:project_administrator)
+    person = FactoryBot.create :person, group_memberships: [FactoryBot.create(:group_membership, work_group: project_administrator.group_memberships.first.work_group)]
+    another_person = FactoryBot.create :person
 
     assert_equal person.projects, project_administrator.projects
     assert_not_equal person.projects, project_administrator2.projects
@@ -38,11 +38,11 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test 'userless profile can be edited by' do
-    admin = Factory(:admin)
-    project_administrator = Factory(:project_administrator)
-    project_administrator2 = Factory(:project_administrator)
-    profile = Factory :brand_new_person, group_memberships: [Factory(:group_membership, work_group: project_administrator.group_memberships.first.work_group)]
-    another_person = Factory :person
+    admin = FactoryBot.create(:admin)
+    project_administrator = FactoryBot.create(:project_administrator)
+    project_administrator2 = FactoryBot.create(:project_administrator)
+    profile = FactoryBot.create :brand_new_person, group_memberships: [FactoryBot.create(:group_membership, work_group: project_administrator.group_memberships.first.work_group)]
+    another_person = FactoryBot.create :person
 
     assert_equal profile.projects, project_administrator.projects
     assert_not_equal profile.projects, project_administrator2.projects
@@ -56,11 +56,11 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test 'me?' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     refute person.me?
     User.current_user = person.user
     assert person.me?
-    person = Factory(:brand_new_person)
+    person = FactoryBot.create(:brand_new_person)
     assert_nil person.user
     refute person.me?
     User.current_user = nil
@@ -68,26 +68,26 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test 'programmes' do
-    person1 = Factory(:person)
-    prog = Factory(:programme, projects: person1.projects)
-    prog2 = Factory(:programme)
+    person1 = FactoryBot.create(:person)
+    prog = FactoryBot.create(:programme, projects: person1.projects)
+    prog2 = FactoryBot.create(:programme)
     assert_includes person1.programmes, prog
     refute_includes person1.programmes, prog2
   end
 
   test 'show related empty programmes' do
-    person1 = Factory(:programme_administrator_not_in_project)
-    person2 = Factory(:programme_administrator_not_in_project)
-    person3 = Factory(:programme_administrator_not_in_project) # Programme administrator not in empty_programme1
-    empty_programme1 = Factory(:min_programme, programme_administrators: [person1, person2])
+    person1 = FactoryBot.create(:programme_administrator_not_in_project)
+    person2 = FactoryBot.create(:programme_administrator_not_in_project)
+    person3 = FactoryBot.create(:programme_administrator_not_in_project) # Programme administrator not in empty_programme1
+    empty_programme1 = FactoryBot.create(:min_programme, programme_administrators: [person1, person2])
 
     [person1, person2].each do |p|
       assert_includes p.related_programmes, empty_programme1
     end
     refute_includes person3.related_programmes, empty_programme1
 
-    person4 = Factory(:person_in_project) # Member of a project in prog 2, not a programme administrator
-    prog2 = Factory(:programme, projects: person4.projects, programme_administrators: [person1, person3])
+    person4 = FactoryBot.create(:person_in_project) # Member of a project in prog 2, not a programme administrator
+    prog2 = FactoryBot.create(:programme, projects: person4.projects, programme_administrators: [person1, person3])
 
     [person1, person3, person4].each do |p|
       assert_includes p.related_programmes, prog2
@@ -95,11 +95,11 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test 'can be administered by' do
-    admin = Factory(:admin)
-    admin2 = Factory(:admin)
-    project_administrator = Factory(:project_administrator)
-    person_in_same_project = Factory :person, group_memberships: [Factory(:group_membership, work_group: project_administrator.group_memberships.first.work_group)]
-    person_in_different_project = Factory :person
+    admin = FactoryBot.create(:admin)
+    admin2 = FactoryBot.create(:admin)
+    project_administrator = FactoryBot.create(:project_administrator)
+    person_in_same_project = FactoryBot.create :person, group_memberships: [FactoryBot.create(:group_membership, work_group: project_administrator.group_memberships.first.work_group)]
+    person_in_different_project = FactoryBot.create :person
 
     assert admin.can_manage?(admin.user), 'admin can administer themself'
     assert admin2.can_manage?(admin.user), 'admin can administer another admin'
@@ -117,13 +117,13 @@ class PersonTest < ActiveSupport::TestCase
     assert person_in_same_project.can_manage?(project_administrator), 'you can also ask by passing a person'
 
     # can be administered by a programme administrator
-    pa = Factory :programme_administrator
-    assert Factory(:person).can_manage?(pa.user)
+    pa = FactoryBot.create :programme_administrator
+    assert FactoryBot.create(:person).can_manage?(pa.user)
   end
 
   test 'project administrator cannot edit an admin within their project' do
-    admin = Factory(:admin)
-    project_administrator = Factory(:project_administrator, group_memberships: [Factory(:group_membership, work_group: admin.group_memberships.first.work_group)])
+    admin = FactoryBot.create(:admin)
+    project_administrator = FactoryBot.create(:project_administrator, group_memberships: [FactoryBot.create(:group_membership, work_group: admin.group_memberships.first.work_group)])
 
     refute (admin.projects & project_administrator.projects).empty?
 
@@ -132,7 +132,7 @@ class PersonTest < ActiveSupport::TestCase
 
   # checks the updated_at doesn't get artificially changed between created and reloading
   def test_updated_at
-    person = Factory(:person, updated_at: 1.week.ago)
+    person = FactoryBot.create(:person, updated_at: 1.week.ago)
 
     updated_at = person.updated_at
     person = Person.find(person.id)
@@ -140,14 +140,14 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test 'to_rdf' do
-    object = Factory :person, skype_name: 'skypee', email: 'sdkfhsd22fkhfsd@sdkfsdkhfkhsdf.com', web_page:'http://google.com'
-    Factory(:study, contributor: object)
-    Factory(:investigation, contributor: object)
-    Factory(:assay, contributor: object)
-    assay = Factory(:assay, contributor: object, creators:[object])
-    presentation = Factory(:assay, contributor:object, creators:[object])
-    doc = Factory(:document, contributor:object, creators:[object])
-    sop = Factory(:sop, creators:[object])
+    object = FactoryBot.create :person, skype_name: 'skypee', email: 'sdkfhsd22fkhfsd@sdkfsdkhfkhsdf.com', web_page:'http://google.com'
+    FactoryBot.create(:study, contributor: object)
+    FactoryBot.create(:investigation, contributor: object)
+    FactoryBot.create(:assay, contributor: object)
+    assay = FactoryBot.create(:assay, contributor: object, creators:[object])
+    presentation = FactoryBot.create(:assay, contributor:object, creators:[object])
+    doc = FactoryBot.create(:document, contributor:object, creators:[object])
+    sop = FactoryBot.create(:sop, creators:[object])
 
     assert_equal [object],assay.creators
     assert_equal [object],presentation.creators
@@ -174,19 +174,18 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test 'contributed items' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     refute_nil person.user
     assert_empty person.contributed_items
 
-    df = Factory(:data_file, contributor: person)
-    inv = Factory(:investigation, contributor:person)
-    study = Factory(:study, contributor: person,investigation:inv)
-    as = Factory(:assay, contributor: person,study:study)
-    strain = Factory(:strain,contributor:person)
-    sample = Factory(:sample,contributor:person)
+    df = FactoryBot.create(:data_file, contributor: person)
+    inv = FactoryBot.create(:investigation, contributor:person)
+    study = FactoryBot.create(:study, contributor: person,investigation:inv)
+    as = FactoryBot.create(:assay, contributor: person,study:study)
+    strain = FactoryBot.create(:strain,contributor:person)
+    sample = FactoryBot.create(:sample,contributor:person)
 
-
-    items = person.contributed_items
+    items = person.reload.contributed_items
 
     assert_equal 6, items.count
     assert_includes items, df
@@ -196,17 +195,17 @@ class PersonTest < ActiveSupport::TestCase
     assert_includes items, strain
     assert_includes items, sample
 
-    person = Factory(:person_in_project)
+    person = FactoryBot.create(:person_in_project)
     assert_nil person.user
 
-    assert_empty person.contributed_items
+    assert_empty person.reload.contributed_items
 
-    df = Factory(:data_file, contributor: person)
-    inv = Factory(:investigation, contributor:person)
-    study = Factory(:study, contributor: person,investigation:inv)
-    as = Factory(:assay, contributor: person,study:study)
+    df = FactoryBot.create(:data_file, contributor: person)
+    inv = FactoryBot.create(:investigation, contributor:person)
+    study = FactoryBot.create(:study, contributor: person,investigation:inv)
+    as = FactoryBot.create(:assay, contributor: person,study:study)
 
-    items = person.contributed_items
+    items = person.reload.contributed_items
 
     assert_equal 4, items.count
     assert_includes items, df
@@ -215,7 +214,7 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test 'orcid id validation' do
-    p = Factory :person
+    p = FactoryBot.create :person
     p.orcid = nil
     assert p.valid?
     p.orcid = 'sdff-1111-1111-1111'
@@ -237,7 +236,7 @@ class PersonTest < ActiveSupport::TestCase
 
   test 'orcid_uri' do
     disable_authorization_checks do
-      p = Factory :person
+      p = FactoryBot.create :person
       p.orcid = 'http://orcid.org/0000-0003-2130-0865'
       assert p.valid?
       p.save!
@@ -268,26 +267,26 @@ class PersonTest < ActiveSupport::TestCase
 
 
   test 'orcid display format' do
-    p = Factory :person, orcid: 'http://orcid.org/0000-0003-2130-0865'
+    p = FactoryBot.create :person, orcid: 'http://orcid.org/0000-0003-2130-0865'
     assert_equal 'https://orcid.org/0000-0003-2130-0865', p.orcid_display_format
 
-    p = Factory :person
+    p = FactoryBot.create :person
     assert_nil p.orcid_display_format
   end
 
   test 'email uri' do
-    p = Factory :person, email: 'sfkh^sd@weoruweoru.com'
+    p = FactoryBot.create :person, email: 'sfkh^sd@weoruweoru.com'
     assert_equal 'mailto:sfkh%5Esd@weoruweoru.com', p.email_uri
   end
 
   test 'mbox_sha1sum' do
-    p = Factory :person, email: 'sfkh^sd@weoruweoru.com'
+    p = FactoryBot.create :person, email: 'sfkh^sd@weoruweoru.com'
     assert_equal '60f787c78d77437f192d8ebce5ee4ece7cbaaca6',p.mbox_sha1sum
   end
 
   test 'only first admin person' do
     Person.delete_all
-    person = Factory :admin
+    person = FactoryBot.create :admin
     assert person.only_first_admin_person?
 
     disable_authorization_checks { person.save! }
@@ -296,22 +295,22 @@ class PersonTest < ActiveSupport::TestCase
     person.is_admin = true
     disable_authorization_checks { person.save! }
     assert person.only_first_admin_person?
-    Factory :person
+    FactoryBot.create :person
     refute person.only_first_admin_person?
   end
 
   def test_active_ordered_by_updated_at_and_avatar_not_null
     Person.delete_all
 
-    avatar = Factory :avatar
+    avatar = FactoryBot.create :avatar
 
     people = []
 
-    people << Factory(:person, avatar: avatar, updated_at: 1.week.ago)
-    people << Factory(:person, avatar: avatar, updated_at: 1.minute.ago)
-    people << Factory(:person, updated_at: 1.day.ago)
-    people << Factory(:person, updated_at: 1.hour.ago)
-    people << Factory(:person, updated_at: 2.minutes.ago)
+    people << FactoryBot.create(:person, avatar: avatar, updated_at: 1.week.ago)
+    people << FactoryBot.create(:person, avatar: avatar, updated_at: 1.minute.ago)
+    people << FactoryBot.create(:person, updated_at: 1.day.ago)
+    people << FactoryBot.create(:person, updated_at: 1.hour.ago)
+    people << FactoryBot.create(:person, updated_at: 2.minutes.ago)
 
     sorted = Person.all.sort do |x, y|
       if x.avatar.nil? == y.avatar.nil?
@@ -335,8 +334,8 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   def test_member_of
-    p = Factory :person
-    proj = Factory :project
+    p = FactoryBot.create :person
+    proj = FactoryBot.create :project
     refute p.projects.empty?
     assert p.member_of?(p.projects.first)
     refute p.member_of?(proj)
@@ -350,24 +349,24 @@ class PersonTest < ActiveSupport::TestCase
 
   def test_first_person_is_admin
     assert Person.count > 0 # should already be people from fixtures
-    p = Factory(:brand_new_person, first_name: 'XXX', email: 'xxx@email.com')
+    p = FactoryBot.create(:brand_new_person, first_name: 'XXX', email: 'xxx@email.com')
     refute p.is_admin?, 'Should not automatically be admin, since people already exist'
 
     Person.delete_all
 
     assert_equal 0, Person.count # no people should exist
-    p = Factory(:brand_new_person, first_name: 'XXX', email: 'xxx@email.com')
+    p = FactoryBot.create(:brand_new_person, first_name: 'XXX', email: 'xxx@email.com')
     p.save
     p.reload
     assert p.is_admin?, 'Should automatically be admin, since it is the first created person'
   end
 
   test 'first person in default project' do
-    Factory(:person) # make sure there is a person, project and institution registered
+    FactoryBot.create(:person) # make sure there is a person, project and institution registered
 
     assert Person.count > 0
     assert Project.count > 0
-    p = Factory(:brand_new_person, first_name: 'XXX', email: 'xxx@email.com')
+    p = FactoryBot.create(:brand_new_person, first_name: 'XXX', email: 'xxx@email.com')
     refute p.is_admin?, 'Should not automatically be admin, since people already exist'
     assert_empty p.projects
     assert_empty p.institutions
@@ -380,7 +379,7 @@ class PersonTest < ActiveSupport::TestCase
     refute_nil institution
 
     assert_equal 0, Person.count # no people should exist
-    p = Factory(:brand_new_person, first_name: 'XXX', email: 'xxx@email.com')
+    p = FactoryBot.create(:brand_new_person, first_name: 'XXX', email: 'xxx@email.com')
     p.reload
     assert_equal [project], p.projects
     assert_equal [institution], p.institutions
@@ -403,8 +402,8 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test 'without group' do
-    no_group = Factory(:brand_new_person)
-    in_group = Factory(:person)
+    no_group = FactoryBot.create(:brand_new_person)
+    in_group = FactoryBot.create(:person)
     assert no_group.projects.empty?
     refute in_group.projects.empty?
     all = Person.without_group
@@ -413,8 +412,8 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test 'with group' do
-    no_group = Factory(:brand_new_person)
-    in_group = Factory(:person)
+    no_group = FactoryBot.create(:brand_new_person)
+    in_group = FactoryBot.create(:person)
     assert no_group.projects.empty?
     refute in_group.projects.empty?
     all = Person.with_group
@@ -423,37 +422,37 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   def test_expertise
-    p = Factory :person
-    Factory :expertise, value: 'golf', annotatable: p
-    Factory :expertise, value: 'fishing', annotatable: p
-    Factory :tool, value: 'sbml', annotatable: p
+    p = FactoryBot.create :person
+    FactoryBot.create :expertise, value: 'golf', annotatable: p
+    FactoryBot.create :expertise, value: 'fishing', annotatable: p
+    FactoryBot.create :tool, value: 'sbml', annotatable: p
 
     assert_equal 2, p.expertise.size
 
-    p = Factory :person
-    Factory :expertise, value: 'golf', annotatable: p
-    Factory :tool, value: 'sbml', annotatable: p
+    p = FactoryBot.create :person
+    FactoryBot.create :expertise, value: 'golf', annotatable: p
+    FactoryBot.create :tool, value: 'sbml', annotatable: p
     assert_equal 1, p.expertise.size
     assert_equal 'golf', p.expertise[0]
   end
 
   def test_tools
-    p = Factory :person
-    Factory :tool, value: 'sbml', annotatable: p
-    Factory :tool, value: 'java', annotatable: p
-    Factory :expertise, value: 'sbml', annotatable: p
+    p = FactoryBot.create :person
+    FactoryBot.create :tool, value: 'sbml', annotatable: p
+    FactoryBot.create :tool, value: 'java', annotatable: p
+    FactoryBot.create :expertise, value: 'sbml', annotatable: p
 
     assert_equal 2, p.tools.size
 
-    p = Factory :person
-    Factory :tool, value: 'sbml', annotatable: p
-    Factory :expertise, value: 'fishing', annotatable: p
+    p = FactoryBot.create :person
+    FactoryBot.create :tool, value: 'sbml', annotatable: p
+    FactoryBot.create :expertise, value: 'fishing', annotatable: p
     assert_equal 1, p.tools.size
     assert_equal 'sbml', p.tools[0]
   end
 
   def test_assign_expertise
-    p = Factory :person
+    p = FactoryBot.create :person
     User.with_current_user p.user do
       assert_equal 0, p.expertise.size
       assert_difference('Annotation.count', 2) do
@@ -477,7 +476,7 @@ class PersonTest < ActiveSupport::TestCase
       assert_equal 1, p.expertise.size
       assert_equal 'golf', p.expertise[0]
 
-      p2 = Factory :person
+      p2 = FactoryBot.create :person
       assert_difference('Annotation.count') do
         assert_no_difference('TextValue.count') do
           p2.expertise = ['golf']
@@ -488,7 +487,7 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   def test_assigns_tools
-    p = Factory :person
+    p = FactoryBot.create :person
     User.with_current_user p.user do
       assert_equal 0, p.tools.size
       assert_difference('Annotation.count', 2) do
@@ -512,7 +511,7 @@ class PersonTest < ActiveSupport::TestCase
       assert_equal 1, p.tools.size
       assert_equal 'golf', p.tools[0]
 
-      p2 = Factory :person
+      p2 = FactoryBot.create :person
       assert_difference('Annotation.count') do
         assert_no_difference('TextValue.count') do
           p2.tools = ['golf']
@@ -523,7 +522,7 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   def test_removes_previously_assigned
-    p = Factory :person
+    p = FactoryBot.create :person
     User.with_current_user p.user do
       p.tools = %w[one two]
       assert_equal 2, p.tools.size
@@ -531,7 +530,7 @@ class PersonTest < ActiveSupport::TestCase
       assert_equal 1, p.tools.size
       assert_equal 'three', p.tools[0]
 
-      p = Factory :person
+      p = FactoryBot.create :person
       p.expertise = %w[aaa bbb]
       assert_equal 2, p.expertise.size
       p.expertise = ['ccc']
@@ -541,7 +540,7 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   def test_expertise_and_tools_with_same_name
-    p = Factory :person
+    p = FactoryBot.create :person
     User.with_current_user p.user do
       assert_difference('Annotation.count', 2) do
         assert_difference('TextValue.count', 2) do
@@ -560,10 +559,10 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   def test_institutions
-    person = Factory(:person_in_multiple_projects)
+    person = FactoryBot.create(:person_in_multiple_projects)
 
     institution = person.group_memberships.first.work_group.institution
-    institution2 = Factory(:institution)
+    institution2 = FactoryBot.create(:institution)
 
     assert_equal 3, person.institutions.count
     assert person.institutions.include?(institution)
@@ -571,7 +570,7 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   def test_projects
-    p = Factory(:person_in_multiple_projects)
+    p = FactoryBot.create(:person_in_multiple_projects)
     assert_equal 3, p.projects.size
   end
 
@@ -671,9 +670,9 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test 'sensible validation error for no name' do
-    assert Factory(:person,first_name:'').valid?
-    assert Factory(:person,last_name:'').valid?
-    p = Factory.build(:person,first_name:'',last_name:'')
+    assert FactoryBot.create(:person,first_name:'').valid?
+    assert FactoryBot.create(:person,last_name:'').valid?
+    p = FactoryBot.build(:person,first_name:'',last_name:'')
     refute p.valid?
     assert_equal 1,p.errors.full_messages.count
     assert_equal "Full name can't be blank",p.errors.full_messages.first
@@ -699,7 +698,7 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   def test_disciplines
-    p = Factory :person, disciplines: [Factory(:discipline, title: 'A'), Factory(:discipline, title: 'B')]
+    p = FactoryBot.create :person, disciplines: [FactoryBot.create(:discipline, title: 'A'), FactoryBot.create(:discipline, title: 'B')]
     p.reload
     assert_equal 2, p.disciplines.size
     assert_equal 'A', p.disciplines[0].title
@@ -707,27 +706,27 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   def test_update_first_letter
-    p = Factory(:brand_new_person, first_name: 'Fred', last_name: 'Monkhouse', email: 'blahblah@email.com')
+    p = FactoryBot.create(:brand_new_person, first_name: 'Fred', last_name: 'Monkhouse', email: 'blahblah@email.com')
     assert p.valid?, 'The new person should be valid'
     assert_equal 'M', p.first_letter
 
-    p = Factory(:brand_new_person, first_name: 'Freddy', last_name: nil, email: 'blahbddlah@email.com')
+    p = FactoryBot.create(:brand_new_person, first_name: 'Freddy', last_name: nil, email: 'blahbddlah@email.com')
     assert p.valid?, 'The new person should be valid'
     assert_equal 'F', p.first_letter
 
-    p = Factory(:brand_new_person, first_name: 'Zebedee', last_name: nil, email: 'zz@email.com')
+    p = FactoryBot.create(:brand_new_person, first_name: 'Zebedee', last_name: nil, email: 'zz@email.com')
     assert p.valid?, 'The new person should be valid'
     assert_equal 'Z', p.first_letter
   end
 
   def test_update_first_letter_blank_last_name
-    p = Factory(:brand_new_person, first_name: 'Zebedee', last_name: '', email: 'zz@email.com')
+    p = FactoryBot.create(:brand_new_person, first_name: 'Zebedee', last_name: '', email: 'zz@email.com')
     assert p.valid?, 'The new person should be valid'
     assert_equal 'Z', p.first_letter
   end
 
   def test_notifiee_info_inserted
-    p = Factory.build(:brand_new_person, first_name: 'Zebedee', last_name: '', email: 'zz@email.com')
+    p = FactoryBot.build(:brand_new_person, first_name: 'Zebedee', last_name: '', email: 'zz@email.com')
     assert_nil p.notifiee_info
     assert_difference('NotifieeInfo.count') do
       disable_authorization_checks { p.save! }
@@ -738,7 +737,7 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   def test_dependent_notifiee_info_is_destroyed_with_person
-    p = Factory(:brand_new_person, first_name: 'Zebedee', last_name: '', email: 'zz@email.com')
+    p = FactoryBot.create(:brand_new_person, first_name: 'Zebedee', last_name: '', email: 'zz@email.com')
     refute_nil p.notifiee_info
     assert_difference('NotifieeInfo.count', -1) do
       disable_authorization_checks { p.destroy }
@@ -787,14 +786,14 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test 'should retrieve the list of people who have the manage right on the item' do
-    user = Factory(:user)
+    user = FactoryBot.create(:user)
     person = user.person
-    data_file = Factory(:data_file, contributor: person)
+    data_file = FactoryBot.create(:data_file, contributor: person)
     people_can_manage = data_file.people_can_manage
     assert_equal 1, people_can_manage.count
     assert_equal person.id, people_can_manage.first[0]
 
-    new_person = Factory(:person_in_project)
+    new_person = FactoryBot.create(:person_in_project)
     policy = data_file.policy
     policy.permissions.build(contributor: new_person, access_type: Policy::MANAGING)
     policy.save
@@ -806,15 +805,15 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test 'related resource' do
-    user = Factory :user
+    user = FactoryBot.create :user
     person = user.person
     User.with_current_user(user) do
-      AssetsCreator.create asset: Factory(:data_file), creator: person
-      AssetsCreator.create asset: Factory(:model), creator: person
-      AssetsCreator.create asset: Factory(:sop), creator: person
-      event = Factory :event, contributor: person
-      AssetsCreator.create asset: Factory(:presentation), creator: person
-      AssetsCreator.create asset: Factory(:publication), creator: person
+      AssetsCreator.create asset: FactoryBot.create(:data_file), creator: person
+      AssetsCreator.create asset: FactoryBot.create(:model), creator: person
+      AssetsCreator.create asset: FactoryBot.create(:sop), creator: person
+      event = FactoryBot.create :event, contributor: person
+      AssetsCreator.create asset: FactoryBot.create(:presentation), creator: person
+      AssetsCreator.create asset: FactoryBot.create(:publication), creator: person
       assert_equal person.created_data_files, person.related_data_files
       assert_equal person.created_models, person.related_models
       assert_equal person.created_sops, person.related_sops
@@ -825,37 +824,37 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test 'related isa' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
 
-    AssetsCreator.create asset: (inv1 = Factory(:investigation)), creator: person
-    inv2 = Factory(:investigation, contributor: person)
+    AssetsCreator.create asset: (inv1 = FactoryBot.create(:investigation)), creator: person
+    inv2 = FactoryBot.create(:investigation, contributor: person)
     assert_equal [inv1, inv2].sort, person.related_investigations.sort
 
-    AssetsCreator.create asset: (study1 = Factory(:study)), creator: person
-    study2 = Factory(:study, contributor: person)
+    AssetsCreator.create asset: (study1 = FactoryBot.create(:study)), creator: person
+    study2 = FactoryBot.create(:study, contributor: person)
     assert_equal [study1, study2].sort, person.related_studies.sort
 
-    AssetsCreator.create asset: (assay1 = Factory(:assay)), creator: person
-    assay2 = Factory(:assay, contributor: person)
+    AssetsCreator.create asset: (assay1 = FactoryBot.create(:assay)), creator: person
+    assay2 = FactoryBot.create(:assay, contributor: person)
     assert_equal [assay1, assay2].sort, person.related_assays.sort
   end
 
   test 'related sample_type' do
-    person1 = Factory(:person)
-    person2 = Factory(:person)
-    st1 = Factory(:simple_sample_type, contributor: person1, creators: [person1])
-    st2 = Factory(:simple_sample_type, contributor: person1, creators: [person2])
-    st3 = Factory(:simple_sample_type, contributor: person2, creators: [person1])
+    person1 = FactoryBot.create(:person)
+    person2 = FactoryBot.create(:person)
+    st1 = FactoryBot.create(:simple_sample_type, contributor: person1, creators: [person1])
+    st2 = FactoryBot.create(:simple_sample_type, contributor: person1, creators: [person2])
+    st3 = FactoryBot.create(:simple_sample_type, contributor: person2, creators: [person1])
     assert_equal [st1, st2, st3].sort, person1.related_sample_types.sort
   end
 
   test 'get the correct investigations and studies' do
-    p = Factory(:person)
+    p = FactoryBot.create(:person)
 
-    inv1 = Factory(:investigation, contributor: p)
+    inv1 = FactoryBot.create(:investigation, contributor: p)
 
-    study1 = Factory(:study, contributor: p, investigation:inv1)
-    study2 = Factory(:study, contributor: p, investigation:inv1)
+    study1 = FactoryBot.create(:study, contributor: p, investigation:inv1)
+    study2 = FactoryBot.create(:study, contributor: p, investigation:inv1)
     p = Person.find(p.id)
 
     assert_equal [study1, study2], p.contributed_studies.sort_by(&:id)
@@ -864,8 +863,8 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test 'should be able to remove the workgroup whose project is not subcribed' do
-    p = Factory :person
-    wg = Factory :work_group
+    p = FactoryBot.create :person
+    wg = FactoryBot.create :work_group
     p.work_groups = [wg]
 
     p.project_subscriptions.delete_all
@@ -877,9 +876,9 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test 'add to project and institution subscribes to project' do
-    person = Factory :brand_new_person
-    inst = Factory(:institution)
-    proj = Factory(:project)
+    person = FactoryBot.create :brand_new_person
+    inst = FactoryBot.create(:institution)
+    proj = FactoryBot.create(:project)
 
     assert_empty person.project_subscriptions
     person.add_to_project_and_institution(proj, inst)
@@ -890,12 +889,12 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test 'shares programme?' do
-    person1 = Factory(:person)
-    person2 = Factory(:person)
-    person3 = Factory(:person)
+    person1 = FactoryBot.create(:person)
+    person2 = FactoryBot.create(:person)
+    person3 = FactoryBot.create(:person)
 
-    prog1 = Factory :programme, projects: (person1.projects | person2.projects)
-    prog2 = Factory :programme, projects: person3.projects
+    prog1 = FactoryBot.create :programme, projects: (person1.projects | person2.projects)
+    prog2 = FactoryBot.create :programme, projects: person3.projects
     assert person1.shares_programme?(person2)
     assert person2.shares_programme?(person1)
     refute person3.shares_programme?(person1)
@@ -909,10 +908,10 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test 'shares project?' do
-    person1 = Factory(:person)
+    person1 = FactoryBot.create(:person)
     project = person1.projects.first
-    person2 = Factory(:person, work_groups: [project.work_groups.first])
-    person3 = Factory(:person)
+    person2 = FactoryBot.create(:person, work_groups: [project.work_groups.first])
+    person3 = FactoryBot.create(:person)
 
     assert person1.shares_project?(person2)
     refute person1.shares_project?(person3)
@@ -921,20 +920,20 @@ class PersonTest < ActiveSupport::TestCase
     refute person1.shares_project?(person3.projects.first)
 
     assert person1.shares_project?([project])
-    assert person1.shares_project?([project, Factory(:project)])
+    assert person1.shares_project?([project, FactoryBot.create(:project)])
     refute person1.shares_project?([person3.projects.first])
-    refute person1.shares_project?([person3.projects.first, Factory(:project)])
+    refute person1.shares_project?([person3.projects.first, FactoryBot.create(:project)])
   end
 
   test 'add to project and institution' do
-    proj1 = Factory :project
-    proj2 = Factory :project
+    proj1 = FactoryBot.create :project
+    proj2 = FactoryBot.create :project
 
-    inst1 = Factory :institution
-    inst2 = Factory :institution
+    inst1 = FactoryBot.create :institution
+    inst2 = FactoryBot.create :institution
 
-    p1 = Factory :brand_new_person
-    p2 = Factory :brand_new_person
+    p1 = FactoryBot.create :brand_new_person
+    p2 = FactoryBot.create :brand_new_person
     assert_difference('WorkGroup.count', 1) do
       assert_difference('GroupMembership.count', 1) do
         p1.add_to_project_and_institution(proj1, inst1)
@@ -985,7 +984,7 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test 'add to project and institution saves new' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     institution = Institution.new(title:'an institution')
     project = Project.new(title: 'a project')
     assert institution.valid?
@@ -1041,61 +1040,61 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test 'cache-key changes with workgroup' do
-    person = Factory :person
+    person = FactoryBot.create :person
     refute_empty person.projects
     cachekey = person.cache_key
-    person.add_to_project_and_institution(Factory(:project), Factory(:institution))
+    person.add_to_project_and_institution(FactoryBot.create(:project), FactoryBot.create(:institution))
     refute_equal cachekey, person.cache_key
   end
 
   test 'can create' do
-    User.current_user = Factory(:project_administrator).user
+    User.current_user = FactoryBot.create(:project_administrator).user
     assert Person.can_create?
 
-    User.current_user = Factory(:admin).user
+    User.current_user = FactoryBot.create(:admin).user
     assert Person.can_create?
 
-    User.current_user = Factory(:brand_new_user)
+    User.current_user = FactoryBot.create(:brand_new_user)
     refute User.current_user.registration_complete?
     assert Person.can_create?
 
     User.current_user = nil
     refute Person.can_create?
 
-    User.current_user = Factory(:person).user
+    User.current_user = FactoryBot.create(:person).user
     refute Person.can_create?
 
-    User.current_user = Factory(:pal).user
+    User.current_user = FactoryBot.create(:pal).user
     refute Person.can_create?
 
-    User.current_user = Factory(:asset_gatekeeper).user
+    User.current_user = FactoryBot.create(:asset_gatekeeper).user
     refute Person.can_create?
 
-    User.current_user = Factory(:asset_housekeeper).user
+    User.current_user = FactoryBot.create(:asset_housekeeper).user
     refute Person.can_create?
 
-    User.current_user = Factory(:programme_administrator).user
+    User.current_user = FactoryBot.create(:programme_administrator).user
     assert Person.can_create?
   end
 
   test 'administered programmes' do
-    pa = Factory(:programme_administrator)
-    admin = Factory(:admin)
-    other_prog = Factory(:programme)
+    pa = FactoryBot.create(:programme_administrator)
+    admin = FactoryBot.create(:admin)
+    other_prog = FactoryBot.create(:programme)
     progs = pa.programmes
     assert_equal progs.sort, pa.administered_programmes.sort
     refute_includes pa.administered_programmes, other_prog
 
-    assert_empty Factory(:person).administered_programmes
+    assert_empty FactoryBot.create(:person).administered_programmes
     assert_equal Programme.all.sort, admin.administered_programmes.sort
   end
 
   test 'not_registered_with_matching_email' do
     3.times do
-      Factory :person
+      FactoryBot.create :person
     end
-    p1 = Factory :brand_new_person, email: 'FISH-sOup@email.com'
-    p2 = Factory :person, email: 'FISH-registered@email.com'
+    p1 = FactoryBot.create :brand_new_person, email: 'FISH-sOup@email.com'
+    p2 = FactoryBot.create :person, email: 'FISH-registered@email.com'
 
     refute p1.registered?
     assert p2.registered?
@@ -1110,18 +1109,18 @@ class PersonTest < ActiveSupport::TestCase
   test 'orcid required for new person' do
     with_config_value(:orcid_required, true) do
       assert_nothing_raised do
-        has_orcid = Factory :brand_new_person, email: 'FISH-sOup1@email.com',
+        has_orcid = FactoryBot.create :brand_new_person, email: 'FISH-sOup1@email.com',
                                                orcid: 'http://orcid.org/0000-0002-0048-3300'
         assert has_orcid.valid?
         assert_empty has_orcid.errors[:orcid]
       end
       assert_raises ActiveRecord::RecordInvalid do
-        no_orcid = Factory :brand_new_person, email: 'FISH-sOup2@email.com'
+        no_orcid = FactoryBot.create :brand_new_person, email: 'FISH-sOup2@email.com'
         refute no_orcid.valid?
         assert_not_empty no_orcid.errors[:orcid]
       end
       assert_raises ActiveRecord::RecordInvalid do
-        bad_orcid = Factory :brand_new_person, email: 'FISH-sOup3@email.com',
+        bad_orcid = FactoryBot.create :brand_new_person, email: 'FISH-sOup3@email.com',
                                                orcid: 'banana'
         refute bad_orcid.valid?
         assert_not_empty bad_orcid.errors[:orcid]
@@ -1130,7 +1129,7 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test 'orcid not required for existing person' do
-    no_orcid = Factory :brand_new_person, email: 'FISH-sOup1@email.com'
+    no_orcid = FactoryBot.create :brand_new_person, email: 'FISH-sOup1@email.com'
 
     with_config_value(:orcid_required, true) do
       assert_nothing_raised do
@@ -1141,7 +1140,7 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test 'orcid must be valid even if not required' do
-    bad_orcid = Factory :brand_new_person, email: 'FISH-sOup1@email.com'
+    bad_orcid = FactoryBot.create :brand_new_person, email: 'FISH-sOup1@email.com'
 
     with_config_value(:orcid_required, true) do
       bad_orcid.update(email: 'FISH-sOup99@email.com', orcid: 'big mac')
@@ -1151,7 +1150,7 @@ class PersonTest < ActiveSupport::TestCase
 
     with_config_value(:orcid_required, false) do
       assert_raises ActiveRecord::RecordInvalid do
-        another_bad_orcid = Factory :brand_new_person, email: 'FISH-sOup1@email.com', orcid: 'こんにちは'
+        another_bad_orcid = FactoryBot.create :brand_new_person, email: 'FISH-sOup1@email.com', orcid: 'こんにちは'
         refute another_bad_orcid.valid?
         assert_not_empty bad_orcid.errors[:orcid]
       end
@@ -1159,12 +1158,12 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test 'ensures full orcid uri is stored' do
-    semi_orcid = Factory :brand_new_person, email: 'FISH-sOup1@email.com',
+    semi_orcid = FactoryBot.create :brand_new_person, email: 'FISH-sOup1@email.com',
                                             orcid: '0000-0002-0048-3300'
-    full_orcid = Factory :brand_new_person, email: 'FISH-sOup2@email.com',
+    full_orcid = FactoryBot.create :brand_new_person, email: 'FISH-sOup2@email.com',
                                             orcid: 'http://orcid.org/0000-0002-0048-3300'
 
-    https_orcid = Factory :brand_new_person, email: 'FISH-sOup3@email.com',
+    https_orcid = FactoryBot.create :brand_new_person, email: 'FISH-sOup3@email.com',
                                              orcid: 'https://orcid.org/0000-0002-0048-3300'
 
     assert_equal 'https://orcid.org/0000-0002-0048-3300', semi_orcid.orcid
@@ -1173,7 +1172,7 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test 'can flag has having left a project' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     project = person.projects.first
 
     assert_not_includes person.former_projects, project
@@ -1192,7 +1191,7 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test 'can flag has leaving a project' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     project = person.projects.first
 
     assert_not_includes person.former_projects, project
@@ -1211,7 +1210,7 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test 'can unflag as left project' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     project = person.projects.first
 
     assert_not_includes person.former_projects, project
@@ -1234,7 +1233,7 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test 'trim spaces from email, first_name, last_name' do
-    person = Factory(:brand_new_person)
+    person = FactoryBot.create(:brand_new_person)
     person.email = ' fish@email.com '
     person.first_name = ' bob '
     person.last_name = ' monkhouse '
@@ -1251,33 +1250,33 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test 'obfuscated_email' do
-    p = Factory(:person, email: 'hello@world.org')
+    p = FactoryBot.create(:person, email: 'hello@world.org')
     assert_equal '....@world.org',p.obfuscated_email
 
-    p = Factory(:person, email: 'hello.every-body@world.org')
+    p = FactoryBot.create(:person, email: 'hello.every-body@world.org')
     assert_equal '....@world.org',p.obfuscated_email
   end
 
   test 'typeahead_hint' do
-    p = Factory(:brand_new_person,email: 'fish@world.com')
+    p = FactoryBot.create(:brand_new_person,email: 'fish@world.com')
     assert p.projects.empty?
     assert_equal '....@world.com',p.typeahead_hint
 
-    p = Factory(:person, project:Factory(:project,title:'wibble'))
+    p = FactoryBot.create(:person, project:FactoryBot.create(:project,title:'wibble'))
     p.save!
     assert_equal 'wibble',p.typeahead_hint
 
-    p.add_to_project_and_institution(Factory(:project,title:'wobble'),p.institutions.first)
+    p.add_to_project_and_institution(FactoryBot.create(:project,title:'wobble'),p.institutions.first)
     p.save!
     p.reload
     assert_equal 'wibble, wobble',p.typeahead_hint
   end
 
   test 'publication authors updated with name when person deleted' do
-    person = Factory(:person, first_name: "Zak", last_name: "Bloggs")
-    pub1 = Factory(:publication, publication_authors:[Factory(:publication_author, person:person, last_name:nil, first_name:nil)])
-    pub2 = Factory(:publication, publication_authors:[Factory(:publication_author)])
-    pub3 = Factory(:publication, publication_authors:[Factory(:publication_author,person:person),Factory(:publication_author,person:Factory(:person))])
+    person = FactoryBot.create(:person, first_name: "Zak", last_name: "Bloggs")
+    pub1 = FactoryBot.create(:publication, publication_authors:[FactoryBot.create(:publication_author, person:person, last_name:nil, first_name:nil)])
+    pub2 = FactoryBot.create(:publication, publication_authors:[FactoryBot.create(:publication_author)])
+    pub3 = FactoryBot.create(:publication, publication_authors:[FactoryBot.create(:publication_author,person:person),FactoryBot.create(:publication_author,person:FactoryBot.create(:person))])
 
     assert_equal 1,pub1.publication_authors.count
     assert_equal 1,pub2.publication_authors.count
@@ -1341,20 +1340,20 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test 'deleted contributor updated when person deleted' do
-    data_file = Factory(:data_file)
+    data_file = FactoryBot.create(:data_file)
     person = data_file.contributor
     person_id = person.id
     things = [data_file]
-    things << Factory(:model, contributor:person)
-    things << Factory(:sop, contributor:person)
-    things << Factory(:presentation, contributor:person)
-    things << Factory(:investigation, contributor:person)
-    things << Factory(:study, contributor:person)
-    things << Factory(:assay, contributor:person)
-    things << Factory(:sample, contributor:person)
-    things << Factory(:strain, contributor:person)
-    things << Factory(:publication, contributor:person)
-    things << Factory(:simple_sample_type, contributor:person)
+    things << FactoryBot.create(:model, contributor:person)
+    things << FactoryBot.create(:sop, contributor:person)
+    things << FactoryBot.create(:presentation, contributor:person)
+    things << FactoryBot.create(:investigation, contributor:person)
+    things << FactoryBot.create(:study, contributor:person)
+    things << FactoryBot.create(:assay, contributor:person)
+    things << FactoryBot.create(:sample, contributor:person)
+    things << FactoryBot.create(:strain, contributor:person)
+    things << FactoryBot.create(:publication, contributor:person)
+    things << FactoryBot.create(:simple_sample_type, contributor:person)
 
 
 
@@ -1368,7 +1367,7 @@ class PersonTest < ActiveSupport::TestCase
       end
     end
 
-    User.with_current_user(Factory(:admin).user) do
+    User.with_current_user(FactoryBot.create(:admin).user) do
       assert_difference('Person.count',-1) do
         assert_difference('User.count',-1) do
           person.destroy
@@ -1390,17 +1389,17 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test 'administered projects' do
-    person = Factory(:project_administrator)
+    person = FactoryBot.create(:project_administrator)
     project = person.projects.first
 
     assert_equal [project],person.administered_projects
 
-    project2 = Factory(:project)
-    person.add_to_project_and_institution(project2,Factory(:institution))
+    project2 = FactoryBot.create(:project)
+    person.add_to_project_and_institution(project2,FactoryBot.create(:institution))
     disable_authorization_checks { person.is_project_administrator = true, project2 }
     assert person.is_project_administrator?(project2)
-    project3 = Factory(:project)
-    person.add_to_project_and_institution(project3,Factory(:institution))
+    project3 = FactoryBot.create(:project)
+    person.add_to_project_and_institution(project3,FactoryBot.create(:institution))
 
     disable_authorization_checks { person.save! }
     person.reload

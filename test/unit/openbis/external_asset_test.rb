@@ -283,7 +283,7 @@ class ExternalAssetTest < ActiveSupport::TestCase
 
   test 'save triggers reindexing if content changed' do
     assert Seek::Config.solr_enabled
-    assay = Factory :assay
+    assay = FactoryBot.create :assay
 
     asset1 = ExternalAsset.new(external_service: 'OpenBIS', external_id: '25')
     assay.external_asset = asset1

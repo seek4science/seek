@@ -4,7 +4,7 @@ require 'openbis_test_helper'
 class EntityTest < ActiveSupport::TestCase
   def setup
     mock_openbis_calls
-    @openbis_endpoint = Factory(:openbis_endpoint)
+    @openbis_endpoint = FactoryBot.create(:openbis_endpoint)
     @entity = Seek::Openbis::Entity.new(@openbis_endpoint)
   end
 

@@ -2,7 +2,7 @@ require 'test_helper'
 
 class PackagingTest < ActiveSupport::TestCase
   test 'research object package path' do
-    inv = Factory(:experimental_assay, assay_assets: [Factory(:assay_asset), Factory(:assay_asset)]).investigation
+    inv = FactoryBot.create(:experimental_assay, assay_assets: [FactoryBot.create(:assay_asset), FactoryBot.create(:assay_asset)]).investigation
     # for inv
     assert_equal '', inv.research_object_package_path
 
@@ -27,7 +27,7 @@ class PackagingTest < ActiveSupport::TestCase
 
   test 'fragment truncated and parameterized' do
     #should be truncated to 50 chars + id
-    assay = Factory(:assay,title:'Lorem ipsum dolor sit amet consectetur adipiscing elit. Curabitur molestie at mauris sit amet amet.')
+    assay = FactoryBot.create(:assay,title:'Lorem ipsum dolor sit amet consectetur adipiscing elit. Curabitur molestie at mauris sit amet amet.')
     fragment = assay.ro_package_path_id_fragment
     assert_equal "#{assay.id}-lorem-ipsum-dolor-sit-amet-consectetur-adipiscing-",fragment
     assert_equal 50,fragment.gsub(assay.id.to_s+'-','').length

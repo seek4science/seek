@@ -6,52 +6,52 @@ owner_of_fully_public_policy_in_my_collaborators_group_for_owner_of_a_sop_with_c
   access_type: <%= Policy::VISIBLE %>
 
 
-owner_of_fully_public_policy_in_whitelist_for_owner_of_a_sop_with_complex_permissions:
+owner_of_fully_public_policy_in_allowlist_for_owner_of_a_sop_with_complex_permissions:
   person: person_for_owner_of_fully_public_policy
-  favourite_group: whitelist_for_owner_of_a_sop_with_complex_permissions
-  access_type: <%= FavouriteGroup::WHITELIST_ACCESS_TYPE %>
+  favourite_group: allowlist_for_owner_of_a_sop_with_complex_permissions
+  access_type: <%= FavouriteGroup::ALLOWLIST_ACCESS_TYPE %>
 
 
-owner_of_my_first_sop_in_blacklist_for_owner_of_a_sop_with_complex_permissions:
+owner_of_my_first_sop_in_denylist_for_owner_of_a_sop_with_complex_permissions:
   person: person_for_owner_of_my_first_sop
-  favourite_group: blacklist_for_owner_of_a_sop_with_complex_permissions
-  access_type: <%= FavouriteGroup::BLACKLIST_ACCESS_TYPE %>
+  favourite_group: denylist_for_owner_of_a_sop_with_complex_permissions
+  access_type: <%= FavouriteGroup::DENYLIST_ACCESS_TYPE %>
 
 
-person_for_test_user_only_in_whitelist_whitelist_for_owner_of_my_first_sop:
-  person: person_for_test_user_only_in_whitelist
-  favourite_group: whitelist_for_owner_of_my_first_sop
-  access_type: <%= FavouriteGroup::WHITELIST_ACCESS_TYPE %>
+person_for_test_user_only_in_allowlist_allowlist_for_owner_of_my_first_sop:
+  person: person_for_test_user_only_in_allowlist
+  favourite_group: allowlist_for_owner_of_my_first_sop
+  access_type: <%= FavouriteGroup::ALLOWLIST_ACCESS_TYPE %>
 
 
-person_for_test_user_only_in_whitelist_whitelist_for_owner_of_private_policy_using_custom_sharing:
-  person: person_for_test_user_only_in_whitelist
-  favourite_group: whitelist_for_owner_of_private_policy_using_custom_sharing
-  access_type: <%= FavouriteGroup::WHITELIST_ACCESS_TYPE %>
+person_for_test_user_only_in_allowlist_allowlist_for_owner_of_private_policy_using_custom_sharing:
+  person: person_for_test_user_only_in_allowlist
+  favourite_group: allowlist_for_owner_of_private_policy_using_custom_sharing
+  access_type: <%= FavouriteGroup::ALLOWLIST_ACCESS_TYPE %>
 
 
-person_for_test_user_only_in_blacklist_blacklist_for_owner_of_private_policy_using_custom_sharing:
-  person: person_for_test_user_only_in_blacklist
-  favourite_group: blacklist_for_owner_of_private_policy_using_custom_sharing
-  access_type: <%= FavouriteGroup::BLACKLIST_ACCESS_TYPE %>
+person_for_test_user_only_in_denylist_denylist_for_owner_of_private_policy_using_custom_sharing:
+  person: person_for_test_user_only_in_denylist
+  favourite_group: denylist_for_owner_of_private_policy_using_custom_sharing
+  access_type: <%= FavouriteGroup::DENYLIST_ACCESS_TYPE %>
 
 
-person_for_sysmo_user_both_in_blacklist_and_whitelist_whitelist_for_owner_of_editing_for_all_sysmo_users_policy:
-  person: person_for_sysmo_user_both_in_blacklist_and_whitelist
-  favourite_group: whitelist_for_owner_of_editing_for_all_sysmo_users_policy
-  access_type: <%= FavouriteGroup::WHITELIST_ACCESS_TYPE %>
+person_for_sysmo_user_both_in_denylist_and_allowlist_allowlist_for_owner_of_editing_for_all_sysmo_users_policy:
+  person: person_for_sysmo_user_both_in_denylist_and_allowlist
+  favourite_group: allowlist_for_owner_of_editing_for_all_sysmo_users_policy
+  access_type: <%= FavouriteGroup::ALLOWLIST_ACCESS_TYPE %>
 
 
-person_for_sysmo_user_both_in_blacklist_and_whitelist_blacklist_for_owner_of_editing_for_all_sysmo_users_policy:
-  person: person_for_sysmo_user_both_in_blacklist_and_whitelist
-  favourite_group: blacklist_for_owner_of_editing_for_all_sysmo_users_policy
-  access_type: <%= FavouriteGroup::BLACKLIST_ACCESS_TYPE %>
+person_for_sysmo_user_both_in_denylist_and_allowlist_denylist_for_owner_of_editing_for_all_sysmo_users_policy:
+  person: person_for_sysmo_user_both_in_denylist_and_allowlist
+  favourite_group: denylist_for_owner_of_editing_for_all_sysmo_users_policy
+  access_type: <%= FavouriteGroup::DENYLIST_ACCESS_TYPE %>
 
 
-person_for_sysmo_user_in_blacklist_in_blacklist_for_owner_of_editing_for_all_sysmo_users_policy:
-  person: person_for_sysmo_user_in_blacklist
-  favourite_group: blacklist_for_owner_of_editing_for_all_sysmo_users_policy
-  access_type: <%= FavouriteGroup::BLACKLIST_ACCESS_TYPE %>
+person_for_sysmo_user_in_denylist_in_denylist_for_owner_of_editing_for_all_sysmo_users_policy:
+  person: person_for_sysmo_user_in_denylist
+  favourite_group: denylist_for_owner_of_editing_for_all_sysmo_users_policy
+  access_type: <%= FavouriteGroup::DENYLIST_ACCESS_TYPE %>
 
 
 person_for_sysmo_user_who_wants_to_access_different_things_in_test_fav_group_for_owner_of_download_for_all_sysmo_users_policy:
@@ -72,13 +72,13 @@ person_for_owner_of_my_first_sop_in_best_fav_group_for_owner_of_editing_for_all_
   access_type: <%= Policy::VISIBLE %>
 
 
-person_for_owner_of_private_policy_using_custom_sharing_in_whitelist_for_owner_of_my_first_sop:
+person_for_owner_of_private_policy_using_custom_sharing_in_allowlist_for_owner_of_my_first_sop:
   person: person_for_owner_of_private_policy_using_custom_sharing
-  favourite_group: whitelist_for_owner_of_my_first_sop
-  access_type: <%= FavouriteGroup::WHITELIST_ACCESS_TYPE %>
+  favourite_group: allowlist_for_owner_of_my_first_sop
+  access_type: <%= FavouriteGroup::ALLOWLIST_ACCESS_TYPE %>
 
 
-person_not_associated_with_any_projects_in_blacklist_for_owner_of_my_first_sop:
+person_not_associated_with_any_projects_in_denylist_for_owner_of_my_first_sop:
   person: person_not_associated_with_any_projects
-  favourite_group: blacklist_for_owner_of_my_first_sop
-  access_type: <%= FavouriteGroup::BLACKLIST_ACCESS_TYPE %>
+  favourite_group: denylist_for_owner_of_my_first_sop
+  access_type: <%= FavouriteGroup::DENYLIST_ACCESS_TYPE %>

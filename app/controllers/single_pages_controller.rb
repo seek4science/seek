@@ -22,7 +22,7 @@ class SinglePagesController < ApplicationController
   def index; end
 
   def project_folders
-    return unless Seek::Config.project_single_page_enabled
+    return unless Seek::Config.project_single_page_folders_enabled
 
     project_folders = ProjectFolder.root_folders(@project)
     if project_folders.empty?
@@ -43,7 +43,7 @@ class SinglePagesController < ApplicationController
       data = helpers.dt_aggregated(study, assay)[:rows]
     end
     data = data.map { |row| row.unshift('') } if params[:rows_pad]
-    render json: { data: data }
+    render json: { data: }
   rescue Exception => e
     render json: { status: :unprocessable_entity, error: e.message }
   end

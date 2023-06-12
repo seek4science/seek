@@ -2,7 +2,7 @@ require 'test_helper'
 
 class GitTreeTest < ActiveSupport::TestCase
   setup do
-    @resource = Factory(:ro_crate_git_workflow)
+    @resource = FactoryBot.create(:ro_crate_git_workflow)
     @git_version = @resource.git_version
   end
 

@@ -5,13 +5,13 @@ class SpecialAuthCodesAccessTest < ActionDispatch::IntegrationTest
 
   ASSETS_WITH_AUTH_CODES.each do |type_name|
     test "form allows creating temporary access links for #{type_name}" do
-      User.with_current_user(Factory(:user, login: 'test')) do
+      User.with_current_user(FactoryBot.create(:user, login: 'test')) do
         post '/session', params: { login: 'test', password: generate_user_password }
 
         get "/#{type_name}/new"
         assert_select 'form div#temporary_links', count: 0
 
-        get "/#{type_name}/#{Factory(type_name.singularize.to_sym, policy: Factory(:public_policy)).id}/manage"
+        get "/#{type_name}/#{FactoryBot.create(type_name.singularize.to_sym, policy: FactoryBot.create(:public_policy)).id}/manage"
         assert_select 'form div#temporary_links'
       end
     end
@@ -19,10 +19,10 @@ class SpecialAuthCodesAccessTest < ActionDispatch::IntegrationTest
 
   ASSETS_WITH_AUTH_CODES.each do |type_name|
     test "anonymous visitors can use access codes to show or download #{type_name}" do
-      item = Factory(type_name.singularize.to_sym, policy: Factory(:private_policy))
+      item = FactoryBot.create(type_name.singularize.to_sym, policy: FactoryBot.create(:private_policy))
       disable_authorization_checks do
         User.with_current_user(item.contributor.user) do
-          item.special_auth_codes << Factory(:special_auth_code, asset: item)
+          item.special_auth_codes << FactoryBot.create(:special_auth_code, asset: item)
         end
       end
 
@@ -38,7 +38,7 @@ class SpecialAuthCodesAccessTest < ActionDispatch::IntegrationTest
 
   ASSETS_WITH_AUTH_CODES.each do |type_name|
     test "anonymous visitors can not see or download #{type_name} without code" do
-      item = Factory(type_name.singularize.to_sym, policy: Factory(:private_policy))
+      item = FactoryBot.create(type_name.singularize.to_sym, policy: FactoryBot.create(:private_policy))
 
       get "/#{type_name}/#{item.id}"
       assert_response :forbidden
@@ -49,10 +49,10 @@ class SpecialAuthCodesAccessTest < ActionDispatch::IntegrationTest
 
   ASSETS_WITH_AUTH_CODES.each do |type_name|
     test "anonymous visitors can see or download #{type_name} with wrong code" do
-      item = Factory(type_name.singularize.to_sym, policy: Factory(:private_policy))
+      item = FactoryBot.create(type_name.singularize.to_sym, policy: FactoryBot.create(:private_policy))
       disable_authorization_checks do
         User.with_current_user(item.contributor.user) do
-          item.special_auth_codes << Factory(:special_auth_code, asset: item)
+          item.special_auth_codes << FactoryBot.create(:special_auth_code, asset: item)
         end
       end
       random_code = CGI.escape(SecureRandom.base64(30))
@@ -67,10 +67,10 @@ class SpecialAuthCodesAccessTest < ActionDispatch::IntegrationTest
 
   ASSETS_WITH_AUTH_CODES.each do |type_name|
     test "auth codes allow access to private #{type_name} until they expire" do
-      item = Factory(type_name.singularize.to_sym, policy: Factory(:private_policy))
+      item = FactoryBot.create(type_name.singularize.to_sym, policy: FactoryBot.create(:private_policy))
 
       auth_code = User.with_current_user(item.contributor.user) do
-        Factory :special_auth_code, expiration_date: (Time.now + 1.days), asset: item
+        FactoryBot.create :special_auth_code, expiration_date: (Time.now + 1.days), asset: item
       end
 
       # test without code instead of can_...? function
@@ -102,9 +102,9 @@ class SpecialAuthCodesAccessTest < ActionDispatch::IntegrationTest
   end
 
   test 'should be able to explore excel datafile with auth code' do
-    item = Factory(:small_test_spreadsheet_datafile, policy: Factory(:private_policy))
+    item = FactoryBot.create(:small_test_spreadsheet_datafile, policy: FactoryBot.create(:private_policy))
     auth_code = User.with_current_user(item.contributor.user) do
-      Factory :special_auth_code, expiration_date: (Time.now + 1.days), asset: item
+      FactoryBot.create :special_auth_code, expiration_date: (Time.now + 1.days), asset: item
     end
 
     get "/data_files/#{item.id}/explore"
@@ -117,9 +117,9 @@ class SpecialAuthCodesAccessTest < ActionDispatch::IntegrationTest
   end
 
   test 'should be able to view content of sop with auth code' do
-    item = Factory(:pdf_sop, policy: Factory(:private_policy))
+    item = FactoryBot.create(:pdf_sop, policy: FactoryBot.create(:private_policy))
     auth_code = User.with_current_user(item.contributor.user) do
-      Factory :special_auth_code, expiration_date: (Time.now + 1.days), asset: item
+      FactoryBot.create :special_auth_code, expiration_date: (Time.now + 1.days), asset: item
     end
 
     get "/sops/#{item.id}/content_blobs/#{item.content_blob.id}/view_content"
@@ -133,11 +133,11 @@ class SpecialAuthCodesAccessTest < ActionDispatch::IntegrationTest
 
   ASSETS_WITH_AUTH_CODES.each do |type_name|
     test "should display unexpired temporary link of #{type_name} for manager" do
-      user = Factory(:user)
+      user = FactoryBot.create(:user)
       User.with_current_user user do
-        item = Factory(type_name.singularize.to_sym, policy: Factory(:private_policy), contributor: user.person)
+        item = FactoryBot.create(type_name.singularize.to_sym, policy: FactoryBot.create(:private_policy), contributor: user.person)
         disable_authorization_checks do
-          item.special_auth_codes << Factory(:special_auth_code, asset: item)
+          item.special_auth_codes << FactoryBot.create(:special_auth_code, asset: item)
         end
 
         post '/session', params: { login: user.login, password: user.password }
@@ -152,11 +152,11 @@ class SpecialAuthCodesAccessTest < ActionDispatch::IntegrationTest
 
   ASSETS_WITH_AUTH_CODES.each do |type_name|
     test "should not display unexpired temporary link of #{type_name} for non-manager" do
-      user = Factory(:user)
+      user = FactoryBot.create(:user)
       User.with_current_user user do
-        item = Factory(type_name.singularize.to_sym, policy: Factory(:publicly_viewable_policy), contributor: user.person)
-        item.special_auth_codes << Factory(:special_auth_code, asset: item)
-        user = Factory(:user)
+        item = FactoryBot.create(type_name.singularize.to_sym, policy: FactoryBot.create(:publicly_viewable_policy), contributor: user.person)
+        item.special_auth_codes << FactoryBot.create(:special_auth_code, asset: item)
+        user = FactoryBot.create(:user)
 
         post '/session', params: { login: user.login, password: user.password }
         get "/#{type_name}/#{item.id}"

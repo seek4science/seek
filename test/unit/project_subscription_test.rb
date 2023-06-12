@@ -2,14 +2,14 @@ require 'test_helper'
 
 class ProjectSubscriptionTest < ActiveSupport::TestCase
   def setup
-    User.current_user = Factory(:user)
-    @proj = Factory(:project)
-    other_projects = [Factory(:project),Factory(:project),Factory(:project)]
-    person = Factory(:person,project:@proj)
+    User.current_user = FactoryBot.create(:user)
+    @proj = FactoryBot.create(:project)
+    other_projects = [FactoryBot.create(:project),FactoryBot.create(:project),FactoryBot.create(:project)]
+    person = FactoryBot.create(:person,project:@proj)
     other_projects.each{|p| person.add_to_project_and_institution(p,person.institutions.first)}
-    @subscribables_in_proj = [Factory(:subscribable, projects: [other_projects[0], @proj],contributor:person),
-                              Factory(:subscribable, projects: [@proj, other_projects[1], other_projects[2]],contributor:person),
-                              Factory(:subscribable, projects: [@proj],contributor:person)]
+    @subscribables_in_proj = [FactoryBot.create(:subscribable, projects: [other_projects[0], @proj],contributor:person),
+                              FactoryBot.create(:subscribable, projects: [@proj, other_projects[1], other_projects[2]],contributor:person),
+                              FactoryBot.create(:subscribable, projects: [@proj],contributor:person)]
   end
 
   test 'subscribing to a project subscribes to subscribable items in the project' do
@@ -20,11 +20,11 @@ class ProjectSubscriptionTest < ActiveSupport::TestCase
 
   test 'new people subscribe to their projects by default when they are activated by admins' do
     # Default projects are NOT subscribed until new person is activated by admin with assigning projects and institutions to him/her
-    new_person = Factory(:brand_new_person)
+    new_person = FactoryBot.create(:brand_new_person)
     assert_equal new_person.project_subscriptions.map(&:project), []
 
     # when joining a project
-    new_person.work_groups.create project: @proj, institution: Factory(:institution)
+    new_person.work_groups.create project: @proj, institution: FactoryBot.create(:institution)
     new_person.save
     assert_equal new_person.projects.sort_by(&:title), new_person.project_subscriptions.map(&:project).sort_by(&:title)
   end
@@ -32,11 +32,11 @@ class ProjectSubscriptionTest < ActiveSupport::TestCase
   test 'subscribers to a project auto subscribe to new items in the project' do
     ps = current_person.project_subscriptions.create project: @proj
     ProjectSubscriptionJob.perform_now(ps)
-    person = Factory(:person,project:@proj)
-    person.add_to_project_and_institution(Factory(:project),person.institutions.first)
+    person = FactoryBot.create(:person,project:@proj)
+    person.add_to_project_and_institution(FactoryBot.create(:project),person.institutions.first)
     s = nil
     assert_enqueued_with(job: SetSubscriptionsForItemJob) do
-      s = Factory(:subscribable, projects: person.projects,contributor:person)
+      s = FactoryBot.create(:subscribable, projects: person.projects,contributor:person)
     end
     SetSubscriptionsForItemJob.perform_now(s, s.projects)
 
@@ -72,7 +72,7 @@ class ProjectSubscriptionTest < ActiveSupport::TestCase
     ProjectSubscriptionJob.perform_now(ps)
     publication = nil
     assert_enqueued_with(job: SetSubscriptionsForItemJob) do
-      publication = Factory(:publication, projects: [Factory(:project), @proj])
+      publication = FactoryBot.create(:publication, projects: [FactoryBot.create(:project), @proj])
     end
     SetSubscriptionsForItemJob.perform_now(publication, publication.projects)
 

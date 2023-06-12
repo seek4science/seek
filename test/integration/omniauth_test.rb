@@ -47,7 +47,7 @@ class OmniauthTest < ActionDispatch::IntegrationTest
   # This test is to support the legacy LDAP integration that matched users having the same SEEK and LDAP usernames
   test 'should authenticate existing LDAP user without identity' do
     OmniAuth.config.mock_auth[:ldap] = @ldap_mock_auth
-    existing_user = Factory(:user, login: 'new_ldap_user')
+    existing_user = FactoryBot.create(:user, login: 'new_ldap_user')
 
     assert_difference('User.count', 0) do
       assert_difference('Identity.count', 1) do
@@ -61,7 +61,7 @@ class OmniauthTest < ActionDispatch::IntegrationTest
 
   test 'should authenticate existing LDAP user with identity' do
     OmniAuth.config.mock_auth[:ldap] = @ldap_mock_auth
-    existing_user = Factory(:user, login: 'new_ldap_user')
+    existing_user = FactoryBot.create(:user, login: 'new_ldap_user')
     existing_user.identities.create!(uid: 'new_ldap_user', provider: 'ldap')
 
     assert_difference('User.count', 0) do
@@ -76,7 +76,7 @@ class OmniauthTest < ActionDispatch::IntegrationTest
 
   test 'should not authenticate LDAP user if omniauth disabled' do
     OmniAuth.config.mock_auth[:ldap] = @ldap_mock_auth
-    existing_user = Factory(:user, login: 'new_ldap_user')
+    existing_user = FactoryBot.create(:user, login: 'new_ldap_user')
     existing_user.identities.create!(uid: 'new_ldap_user', provider: 'ldap')
 
     with_config_value(:omniauth_enabled, false) do
@@ -93,7 +93,7 @@ class OmniauthTest < ActionDispatch::IntegrationTest
 
   test 'should not authenticate LDAP user if LDAP omniauth disabled' do
     OmniAuth.config.mock_auth[:ldap] = @ldap_mock_auth
-    existing_user = Factory(:user, login: 'new_ldap_user')
+    existing_user = FactoryBot.create(:user, login: 'new_ldap_user')
     existing_user.identities.create!(uid: 'new_ldap_user', provider: 'ldap')
 
     with_config_value(:omniauth_enabled, true) do
@@ -113,7 +113,7 @@ class OmniauthTest < ActionDispatch::IntegrationTest
   test 'should authenticate existing LS AAI user if LDAP disabled' do
     OmniAuth.config.mock_auth[:elixir_aai] = @elixir_aai_mock_auth
     OmniAuth.config.mock_auth[:ldap] = @ldap_mock_auth
-    existing_user = Factory(:user, login: 'bob')
+    existing_user = FactoryBot.create(:user, login: 'bob')
     existing_user.identities.create!(uid: 'new_elixir_aai_user', provider: 'elixir_aai')
     existing_user.identities.create!(uid: 'new_ldap_user', provider: 'ldap')
 
@@ -137,7 +137,7 @@ class OmniauthTest < ActionDispatch::IntegrationTest
 
   test 'should link LDAP identity with logged-in user' do
     OmniAuth.config.mock_auth[:ldap] = @ldap_mock_auth
-    existing_user = Factory(:user, login: 'some_user')
+    existing_user = FactoryBot.create(:user, login: 'some_user')
     post '/session', params: { login: existing_user.login, password: generate_user_password }
 
     assert_empty existing_user.identities
@@ -185,7 +185,7 @@ class OmniauthTest < ActionDispatch::IntegrationTest
 
   test 'should create new LDAP user with pre-made profile and show "Is this you?"' do
     OmniAuth.config.mock_auth[:ldap] = @ldap_mock_auth
-    profile = Factory(:brand_new_person, email: 'new_ldap_user@example.com')
+    profile = FactoryBot.create(:brand_new_person, email: 'new_ldap_user@example.com')
 
     assert_difference('User.count', 1) do
       assert_difference('Identity.count', 1) do
@@ -263,7 +263,7 @@ class OmniauthTest < ActionDispatch::IntegrationTest
 
   test 'should authenticate LS AAI user and redirect to path stored in state' do
     OmniAuth.config.mock_auth[:elixir_aai] = @elixir_aai_mock_auth
-    existing_user = Factory(:user, login: 'bob')
+    existing_user = FactoryBot.create(:user, login: 'bob')
     existing_user.identities.create!(uid: 'new_elixir_aai_user', provider: 'elixir_aai')
 
     with_config_value(:omniauth_enabled, true) do
@@ -305,7 +305,7 @@ class OmniauthTest < ActionDispatch::IntegrationTest
   end
 
   test 'should warn new omniauth user about existing account' do
-    Factory(:person, email: 'new_github_user@example.com')
+    FactoryBot.create(:person, email: 'new_github_user@example.com')
 
     OmniAuth.config.mock_auth[:github] = @github_mock_auth
 

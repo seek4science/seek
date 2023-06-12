@@ -8,7 +8,7 @@
   <% end %>
 
   <% if versioned_resource&.is_git_versioned? %>
-    <%= tab('files') do %>
+    <%= tab('files', disabled_reason: versioned_resource.can_download? ? nil : 'You are not authorized to access this content.') do %>
       <span class="glyphicon glyphicon-folder-close"></span> Files
     <% end %>
   <% end %>
@@ -19,7 +19,7 @@
 
 	<% if Seek::Config.project_single_page_advanced_enabled && displaying_single_page? && resource %>
 		<%= tab(resource_name&.downcase + "_design") do %>
-			<span class="glyphicon glyphicon-th-list"></span> <%=resource_name&.camelize%> design
+			<span class="glyphicon glyphicon-th-list"></span> <%= resource.model_name.human %> design
 		<% end %>
 	<% end %>
 </ul>

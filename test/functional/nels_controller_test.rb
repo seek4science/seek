@@ -29,7 +29,7 @@ class NelsControllerTest < ActionController::TestCase
   end
 
   test 'cannot get browser for non-NeLS project assay' do
-    assay = Factory(:assay)
+    assay = FactoryBot.create(:assay)
     person = assay.contributor
     login_as(person)
 
@@ -57,7 +57,7 @@ class NelsControllerTest < ActionController::TestCase
   end
 
   test 'cannot get browser for assay without edit permissions' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
 
     refute @assay.can_edit?(person)
@@ -123,7 +123,7 @@ class NelsControllerTest < ActionController::TestCase
   end
 
   test 'can register data' do
-    @assay.investigation.projects << Factory(:project)
+    @assay.investigation.projects << FactoryBot.create(:project)
     project_ids = @assay.reload.project_ids
 
     assert_no_difference('DataFile.count') do

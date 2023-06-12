@@ -2,11 +2,11 @@ require 'test_helper'
 
 class AssetsCreatorsTest < ActiveSupport::TestCase
   def setup
-    user = Factory :user
+    user = FactoryBot.create :user
     User.current_user = user
-    @resource = Factory :sop, contributor: User.current_user.person, projects: user.person.projects
-    @person = Factory(:person)
-    @sop = Factory(:sop, assets_creators_attributes: {
+    @resource = FactoryBot.create :sop, contributor: User.current_user.person, projects: user.person.projects
+    @person = FactoryBot.create(:person)
+    @sop = FactoryBot.create(:sop, assets_creators_attributes: {
       '1' => {
         creator_id: @person.id
       },
@@ -29,7 +29,7 @@ class AssetsCreatorsTest < ActiveSupport::TestCase
   end
 
   test 'adding a creator' do
-    creator = Factory :person
+    creator = FactoryBot.create :person
     params = { creator_ids: [creator.id] }
 
     assert_difference('@resource.creators.count') do
@@ -41,12 +41,12 @@ class AssetsCreatorsTest < ActiveSupport::TestCase
 
   test 'updating a creator' do
     # Set creator
-    creator = Factory :person
+    creator = FactoryBot.create :person
     params = { creator_ids: [creator.id] }
     @resource.update(params)
 
     # Update creator
-    new_creator = Factory :person
+    new_creator = FactoryBot.create :person
     params = { creator_ids: [new_creator.id] }
 
     assert_no_difference('AssetsCreator.count') do
@@ -61,7 +61,7 @@ class AssetsCreatorsTest < ActiveSupport::TestCase
 
   test 'removing a creator' do
     # Set creator
-    creator = Factory :person
+    creator = FactoryBot.create :person
     params = { creator_ids: [creator.id] }
     @resource.update(params)
 
@@ -77,13 +77,13 @@ class AssetsCreatorsTest < ActiveSupport::TestCase
 
   test 'changing multiple creators' do
     # Set creators
-    creator_to_stay = Factory :person
-    creator_to_remove = Factory :person
+    creator_to_stay = FactoryBot.create :person
+    creator_to_remove = FactoryBot.create :person
     params = { creator_ids: [creator_to_stay.id, creator_to_remove.id] }
     @resource.update(params)
 
     # Change creators
-    new_creator = Factory :person
+    new_creator = FactoryBot.create :person
     params = { creator_ids: [creator_to_stay.id, new_creator.id] }
     @resource.update(params)
 
@@ -157,7 +157,7 @@ class AssetsCreatorsTest < ActiveSupport::TestCase
   end
 
   test 'can add duplicate assets creators on different assets' do
-    other_sop = Factory(:sop)
+    other_sop = FactoryBot.create(:sop)
 
     disable_authorization_checks do
       assert_difference('AssetsCreator.count', 1) do

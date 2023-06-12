@@ -73,26 +73,16 @@ module Seek
 
       # returns an enumeration of assets for bulk sharing change based upon the parameters passed
       def resolve_sharing_params(params)
-        param_not_isa = params[:share_not_isa]
-        param_isa = params[:share_isa]
+        param_not_isa = params[:share_not_isa] || {}
+        param_isa = params[:share_isa] || {}
 
         if param_not_isa.blank? && param_isa.blank?
           [@asset].compact
         else
           assets = []
-          unless param_not_isa.blank?
-            param_not_isa.keys.each do |asset_class|
-              param_not_isa[asset_class].keys.each do |id|
-                assets << eval("#{asset_class}.find_by_id(#{id})")
-              end
-            end
-          end
-          unless param_isa.blank?
-            param_isa.keys.each do |asset_class|
-              param_isa[asset_class].keys.each do |id|
-                assets << eval("#{asset_class}.find_by_id(#{id})")
-              end
-            end
+          Seek::Util.authorized_types.each do |klass|
+            ids = (param_not_isa[klass.name]&.keys || []) | (param_isa[klass.name]&.keys || [])
+            assets += klass.where(id: ids).to_a if ids.any?
           end
           assets.compact.uniq
         end

@@ -16,7 +16,7 @@
                     <li ><a href="#"><span>Assay</span></a></li>
                     </ul>
                     <div class="treeview-toggle">
-                        Toggle: 
+                        Toggle:
                         <button class="active" onClick="toggleItem(this, 'investigation')">Investigations</button>
                         <button class="active" onClick="toggleItem(this, 'study')">Studies</button>
                         <button class="active" onClick="toggleItem(this, 'assay')">Assays</button>
@@ -60,7 +60,7 @@
 
 <script type="text/javascript">
     var selectedItem = {type:"",id:""}, pid, uid, projectDefaultPolicy, dynamicTableDataPath
-		
+
 		$j(document).ready(function() {
 			  $j("#content .container-fluid").removeClass("container-fluid").addClass("container-fluid-single-page")
 
@@ -79,7 +79,7 @@
         $j('html').click(function(e) {
           if($j(e.target).hasClass("modal-backdrop")) {
             $j('.modal-backdrop').remove();
-          } 
+          }
         });
     });
 
@@ -97,7 +97,7 @@
 			const parent = $j(`a[_type="${params.item_type}"][_id="${params.item_id}"]`)
 			$j(parent).addClass("jstree-clicked").click()
 		}
-		
+
 		function setSplitters() {
 			if(!isMobile()) {
 				$j('#widget').width('').height(768).split({
@@ -123,5 +123,5 @@
       updateLocationHash(item, id)
       setTimeout(() => updateContainerHeight(), 1000)
     }
-    
+
 </script>

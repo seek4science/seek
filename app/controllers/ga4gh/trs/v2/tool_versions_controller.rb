@@ -4,6 +4,7 @@ module Ga4gh
       class ToolVersionsController < TrsBaseController
         before_action :get_tool
         before_action :get_version, only: [:show, :descriptor, :tests, :files, :containerfile]
+        before_action :check_downloadable, only: [:descriptor, :tests, :files, :containerfile]
         before_action :check_type, only: [:descriptor, :tests, :files]
         include ::RoCrateHandling
 
@@ -73,6 +74,11 @@ module Ga4gh
         end
 
         private
+
+        def check_downloadable
+          # TRS 2.0.1 spec currently only supports 200 and 404 responses.
+          trs_error(404, "You are not authorized to access this tool's content.") unless @tool.can_download?
+        end
 
         def get_version
           workflow_version = @tool.find_version(params[:version_id])

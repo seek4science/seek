@@ -12,8 +12,8 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
   end
 
   test 'exists' do
-    sop = Factory :sop
-    model = Factory :model
+    sop = FactoryBot.create :sop
+    model = FactoryBot.create :model
     AuthLookupUpdateQueue.destroy_all
     assert !AuthLookupUpdateQueue.exists?(item: sop)
     assert !AuthLookupUpdateQueue.exists?(item: model)
@@ -35,10 +35,10 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
   end
 
   test 'updates to queue for sop' do
-    user = Factory :user
+    user = FactoryBot.create :user
     sop = nil
     assert_difference('AuthLookupUpdateQueue.count', 1) do
-      sop = Factory :sop, contributor: user.person, policy: Factory(:private_policy)
+      sop = FactoryBot.create :sop, contributor: user.person, policy: FactoryBot.create(:private_policy)
     end
     assert_equal sop, AuthLookupUpdateQueue.order(:id).last.item
 
@@ -59,12 +59,12 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
   end
 
   test 'updates to queue for assay' do
-    user = Factory :user
+    user = FactoryBot.create :user
     # otherwise a study and investigation are also created and triggers inserts to queue
-    assay = Factory :assay, contributor: user.person, policy: Factory(:private_policy)
+    assay = FactoryBot.create :assay, contributor: user.person, policy: FactoryBot.create(:private_policy)
     assert_difference('AuthLookupUpdateQueue.count', 1) do
       disable_authorization_checks do
-        assay = Factory :assay, contributor: user.person, policy: Factory(:private_policy), study: assay.study
+        assay = FactoryBot.create :assay, contributor: user.person, policy: FactoryBot.create(:private_policy), study: assay.study
       end
     end
     assert_equal assay, AuthLookupUpdateQueue.order(:id).last.item
@@ -86,11 +86,11 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
   end
 
   test 'updates to queue for study' do
-    user = Factory :user
+    user = FactoryBot.create :user
     # otherwise an investigation is also created and triggers inserts to queue
-    study = Factory :study, contributor: user.person, policy: Factory(:private_policy)
+    study = FactoryBot.create :study, contributor: user.person, policy: FactoryBot.create(:private_policy)
     assert_difference('AuthLookupUpdateQueue.count', 1) do
-      study = Factory :study, contributor: user.person, policy: Factory(:private_policy), investigation: study.investigation
+      study = FactoryBot.create :study, contributor: user.person, policy: FactoryBot.create(:private_policy), investigation: study.investigation
     end
     assert_equal study, AuthLookupUpdateQueue.order(:id).last.item
 
@@ -111,11 +111,11 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
   end
 
   test 'updates to queue for sample' do
-    user = Factory :user
+    user = FactoryBot.create :user
     sample = nil
     assert_difference('AuthLookupUpdateQueue.count', 1) do
-      sample = Factory :sample, contributor: user.person, policy: Factory(:private_policy),
-                       sample_type:Factory(:simple_sample_type,contributor:user.person)
+      sample = FactoryBot.create :sample, contributor: user.person, policy: FactoryBot.create(:private_policy),
+                       sample_type:FactoryBot.create(:simple_sample_type,contributor:user.person)
     end
     assert_equal sample, AuthLookupUpdateQueue.order(:id).last.item
 
@@ -136,12 +136,12 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
   end
 
   test 'updates for remaining authorized assets' do
-    user = Factory :user
+    user = FactoryBot.create :user
     types = Seek::Util.authorized_types - [Sop, Assay, Study, Sample]
     types.each do |type|
       entity = nil
       assert_difference('AuthLookupUpdateQueue.count', 1, "unexpected count for created type #{type.name}") do
-        entity = Factory type.name.underscore.to_sym, contributor: user.person, policy: Factory(:private_policy)
+        entity = FactoryBot.create type.name.underscore.to_sym, contributor: user.person, policy: FactoryBot.create(:private_policy)
       end
       assert_equal entity, AuthLookupUpdateQueue.order(:id).last.item
       AuthLookupUpdateQueue.destroy_all
@@ -163,13 +163,13 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
 
   test 'updates when a user registers' do
     assert_difference('AuthLookupUpdateQueue.count', 1) do
-      user = Factory(:brand_new_user)
+      user = FactoryBot.create(:brand_new_user)
       assert_equal user, AuthLookupUpdateQueue.order(:id).last.item
     end
   end
 
   test "updates when a person's role changes" do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     person.is_admin = false
     disable_authorization_checks { person.save! }
 
@@ -184,7 +184,7 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
   end
 
   test 'does not update when a user changes their password' do
-    user = Factory(:user)
+    user = FactoryBot.create(:user)
 
     assert_no_difference('AuthLookupUpdateQueue.count') do
       disable_authorization_checks do
@@ -194,7 +194,7 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
   end
 
   test 'does not update when a person updates their profile' do
-    person = Factory.create(:brand_new_person, user: Factory(:user))
+    person = FactoryBot.create(:brand_new_person, user: FactoryBot.create(:user))
 
     assert_no_difference('AuthLookupUpdateQueue.count') do
       disable_authorization_checks do
@@ -204,14 +204,14 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
   end
 
   test 'updates for group membership' do
-    User.with_current_user(Factory(:admin)) do
-      person = Factory :person
-      person2 = Factory :person
+    User.with_current_user(FactoryBot.create(:admin)) do
+      person = FactoryBot.create :person
+      person2 = FactoryBot.create :person
 
       project = person.projects.first
       assert_equal [project], person.projects
 
-      wg = Factory :work_group
+      wg = FactoryBot.create :work_group
       AuthLookupUpdateQueue.destroy_all
       assert_difference('AuthLookupUpdateQueue.count', 1) do
         gm = GroupMembership.create person: person, work_group: wg
@@ -231,9 +231,9 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
   end
 
   test 'updates queue when creators added or removed' do
-    creator = Factory(:person)
-    person = Factory(:person)
-    df = Factory(:data_file, contributor:person)
+    creator = FactoryBot.create(:person)
+    person = FactoryBot.create(:person)
+    df = FactoryBot.create(:data_file, contributor:person)
     User.with_current_user(person.user) do
       AuthLookupUpdateQueue.destroy_all
 
@@ -256,10 +256,10 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
   end
 
   test 'enqueue' do
-    df = Factory(:data_file)
-    df2 = Factory(:data_file)
-    sop = Factory(:sop)
-    sop2 = Factory(:sop)
+    df = FactoryBot.create(:data_file)
+    df2 = FactoryBot.create(:data_file)
+    sop = FactoryBot.create(:sop)
+    sop2 = FactoryBot.create(:sop)
 
     AuthLookupUpdateQueue.destroy_all
 
@@ -296,9 +296,9 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
   end
 
   test 'dequeue' do
-    df = Factory(:data_file)
-    df2 = Factory(:data_file)
-    df3 = Factory(:data_file)
+    df = FactoryBot.create(:data_file)
+    df2 = FactoryBot.create(:data_file)
+    df3 = FactoryBot.create(:data_file)
     user = df.contributor.user
 
     AuthLookupUpdateQueue.destroy_all
@@ -312,7 +312,7 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
       assert_equal [df3, df, user, df2], items, "should be ordered by priority, type, then ID"
     end
 
-    FactoryGirl.create_list(:document, 10)
+    FactoryBot.create_list(:document, 10)
     with_config_value(:auth_lookup_update_batch_size, 6) do
       assert_equal 6, Seek::Config.auth_lookup_update_batch_size
       assert_difference('AuthLookupUpdateQueue.count', -Seek::Config.auth_lookup_update_batch_size,
