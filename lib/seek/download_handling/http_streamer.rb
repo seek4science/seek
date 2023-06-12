@@ -38,11 +38,11 @@ module Seek
               out = if response.code == '301' || response.code == '302'
                       follow_redirect(uri, response, redirect_count, &block)
                     elsif block_given?
-                      if response.code == '200'
-                        begin_stream(response, &block)
-                      else
-                        raise BadResponseCodeException.new(code: response.code.to_i), response.message
+                      unless response.code == '200'
+                        raise BadResponseCodeException.new(response.message, code: response.code.to_i)
                       end
+
+                      begin_stream(response, &block)
                     else
                       response
                     end
@@ -65,6 +65,7 @@ module Seek
         response.read_body do |chunk|
           total_size += chunk.size
           raise SizeLimitExceededException, total_size if @size_limit && (total_size > @size_limit)
+
           block.call(chunk)
         end
 
@@ -72,14 +73,12 @@ module Seek
       end
 
       def follow_redirect(uri, response, redirect_count, &block)
-        if redirect_count >= @redirect_limit
-          raise RedirectLimitExceededException, redirect_count
-        else
-          new_uri = URI(response.header['location'])
-          new_uri = URI(uri) + new_uri if new_uri.relative?
+        raise RedirectLimitExceededException, redirect_count if redirect_count >= @redirect_limit
 
-          get_uri(new_uri, redirect_count + 1, &block)
-        end
+        new_uri = URI(response.header['location'])
+        new_uri = URI(uri) + new_uri if new_uri.relative?
+
+        get_uri(new_uri, redirect_count + 1, &block)
       end
     end
   end
