@@ -60,46 +60,10 @@ class PoliciesController < ApplicationController
   end
 
   def preview_permissions
-    resource_class = params[:resource_name].camelize.constantize
-    resource = nil
-    resource = resource_class.find_by_id(params[:resource_id]) if params[:resource_id]
-    resource ||= resource_class.new
-    projects = Project.where(id: (params[:project_ids] || '').split(','))
-    ucpi = updated_can_publish_immediately(resource, projects)
-    policy = resource.policy.set_attributes_with_sharing(policy_params)
-    trying_to_publish = resource.is_published?
-    contributor_person = resource.new_record? ? current_person : resource.contributor.try(:person)
-    creators = Person.find((params[:creators] || '').split(',').compact.uniq)
-
-    privileged_people = {}
-    #exclude the current_person from the privileged people
-    contributor_person = nil if contributor_person == current_person
-    creators.delete(current_person)
-    creators.delete(contributor_person)
-    privileged_people['contributor'] = [contributor_person] if contributor_person
-    privileged_people['creators'] = creators unless creators.empty?
+    preview = PermissionsPreview.new(params, policy_params)
 
     respond_to do |format|
-      format.html { render partial: 'permissions/preview_permissions',
-                           locals: { resource: resource, policy: policy, privileged_people: privileged_people,
-                                     updated_can_publish_immediately: ucpi || !resource.policy.access_type_changed? || !trying_to_publish,
-                                     send_request_publish_approval: !resource.is_waiting_approval?(current_user),
-                                     publish_approval_rejected: resource.is_rejected?}}
-    end
-  end
-
-  #To check whether you can publish immediately or need to go through gatekeeper's approval when changing the projects associated with the resource
-  def updated_can_publish_immediately(resource, projects)
-    projects = [projects] if projects.is_a?(Project)
-    if !resource.new_record? && resource.is_published?
-      true
-      #FIXME: need to use User.current_user here because of the way the function tests in PolicyControllerTest work, without correctly creating the session and @request etc
-    elsif projects.any? { |p| p.asset_gatekeepers.any? } && !projects.any? { |p| User.current_user.person.is_asset_gatekeeper?(p) }
-      false
-    elsif !projects.any?
-      !resource.gatekeeper_required?
-    else
-      true
+      format.html { render partial: 'permissions/preview_permissions', locals: { preview: preview } }
     end
   end
 end

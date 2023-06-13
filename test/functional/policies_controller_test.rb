@@ -145,8 +145,9 @@ end
     login_as(a_person.user)
     assert sop.can_manage?
 
-    updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(sop, gatekeeper.projects.first)
-    assert !updated_can_publish_immediately
+    sop.projects = [gatekeeper.projects.first]
+
+    assert sop.requires_gatekeeper_approval?
   end
 
   test 'when creating an item, can publish the item if associate to it the project which has no gatekeeper' do
@@ -156,8 +157,9 @@ end
     login_as(a_person.user)
     assert sop.can_manage?
 
-    updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(sop, FactoryBot.create(:project))
-    assert updated_can_publish_immediately
+    sop.projects = [FactoryBot.create(:project)]
+
+    refute sop.requires_gatekeeper_approval?
   end
 
   test 'when updating an item, can not publish the item if associate to it the project which has gatekeeper' do
@@ -170,8 +172,9 @@ end
     login_as(a_person.user)
     assert item.can_manage?
 
-    updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(item, gatekeeper.projects.first)
-    assert !updated_can_publish_immediately
+    item.projects = [gatekeeper.projects.first]
+
+    assert item.requires_gatekeeper_approval?
   end
 
   test 'when updating an item, can publish the item if dissociate to it the project which has gatekeeper' do
@@ -183,8 +186,9 @@ end
     login_as(a_person.user)
     assert item.can_manage?
 
-    updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(item, FactoryBot.create(:project))
-    assert updated_can_publish_immediately
+    item.projects = [FactoryBot.create(:project)]
+
+    refute item.requires_gatekeeper_approval?
   end
 
   test 'can publish assay without study' do
@@ -194,8 +198,9 @@ end
     login_as(a_person.user)
     assert assay.can_manage?
 
-    updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(assay, [])
-    assert updated_can_publish_immediately
+    assert_empty assay.projects
+
+    refute assay.requires_gatekeeper_approval?
   end
 
   test 'can not publish assay having project with gatekeeper' do
@@ -211,9 +216,9 @@ end
     login_as(a_person.user)
     assert assay.can_manage?
 
-    # FIXME: can't test controller this way properly as it doesn't setup the @request and session properly
-    updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(assay, assay.study.projects)
-    refute updated_can_publish_immediately
+    assert_equal assay.study.projects, assay.projects
+
+    assert assay.requires_gatekeeper_approval?
   end
 
   test 'always can publish for the published item' do
@@ -227,8 +232,10 @@ end
     login_as(a_person.user)
     assert item.can_manage?
 
-    updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(item, gatekeeper.projects.first)
-    assert updated_can_publish_immediately
+    item.projects = [gatekeeper.projects.first]
+    item.save!
+
+    refute item.reload.requires_gatekeeper_approval?
   end
 
   test 'should show the preview permission for resource without projects' do

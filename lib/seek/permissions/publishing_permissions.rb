@@ -24,9 +24,7 @@ module Seek
       end
 
       def state_allows_publish?(user = User.current_user)
-        return false if is_published?
-        return true unless gatekeeper_required?
-        return true if user.person.is_asset_gatekeeper_of?(self)
+        return false if requires_gatekeeper_approval?(user)
         return false if is_waiting_approval?
         return true unless is_rejected?
         return is_updated_since_be_rejected?
@@ -112,13 +110,19 @@ module Seek
       def temporary_policy_while_waiting_for_publishing_approval
         return true unless authorization_checks_enabled
         return true if User.current_user.blank?
-        if is_published? && !is_a?(Publication) && gatekeeper_required? && !User.current_user.person.is_asset_gatekeeper_of?(self)
+        if requires_gatekeeper_approval?
           self.policy = if new_record?
                           Policy.projects_policy(projects)
                         else
                           Policy.find_by_id(policy.id)
                         end
         end
+      end
+
+      def requires_gatekeeper_approval?(user = User.current_user)
+        return false if !new_record? && is_published?
+        return false if user.person.is_asset_gatekeeper_of?(self)
+        gatekeeper_required?
       end
     end
   end
