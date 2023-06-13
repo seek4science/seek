@@ -103,12 +103,12 @@
 <script>
     function toggleRejected() {
         event.preventDefault();
-        let rejected_items = document.getElementsByClassName("rejected_items");
+        let rejected_items = $j('.rejected_items');
         for(let rejected_element of rejected_items) {
-            if (rejected_element.style.display === "none") {
+            if ($j(rejected_element).is(':hidden')) {
                 rejected_element.style.display = "block";
             } else {
-                rejected_element.style.display = "none";
+                $j(rejected_element).hide();
             }
         }
     }
