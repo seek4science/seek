@@ -48,16 +48,16 @@ class SinglePagesControllerTest < ActionController::TestCase
     with_config_value(:project_single_page_enabled, true) do
       # Generate the excel data
       person = User.current_user.person
-      project = Factory(:project)
-      study = Factory(:study)
-      source_sample_type = Factory(:isa_source_sample_type,
+      project = FactoryBot.create(:project)
+      study = FactoryBot.create(:study)
+      source_sample_type = FactoryBot.create(:isa_source_sample_type,
                                    contributor: person,
                                    project_ids: [project.id],
                                    isa_template: Template.find_by_title('ISA Source'),
                                    studies: [study])
 
       source_samples = (1..5).map do |n|
-        Factory(
+        FactoryBot.create(
           :sample,
           title: "sample_#{n}",
           sample_type: source_sample_type,
