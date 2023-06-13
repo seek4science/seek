@@ -32,21 +32,24 @@ module Seek
 
       def get_uri(uri, redirect_count = 0, &block)
         p = proc do
+          out = nil
           Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == 'https') do |http|
             http.request(Net::HTTP::Get.new(uri)) do |response|
-              if response.code == '200'
-                if block_given?
-                  begin_stream(response, &block)
-                else
-                  return response
-                end
-              elsif response.code == '301' || response.code == '302'
-                follow_redirect(uri, response, redirect_count, &block)
-              else
-                raise BadResponseCodeException.new(code: response.code.to_i), response.message
-              end
+              out = if response.code == '301' || response.code == '302'
+                      follow_redirect(uri, response, redirect_count, &block)
+                    elsif block_given?
+                      unless response.code == '200'
+                        raise BadResponseCodeException.new(response.message, code: response.code.to_i)
+                      end
+
+                      begin_stream(response, &block)
+                    else
+                      response
+                    end
             end
           end
+
+          out
         end
 
         if Seek::Config.allow_private_address_access
@@ -54,8 +57,6 @@ module Seek
         else
           PrivateAddressCheck.only_public_connections { p.call }
         end
-
-        nil
       end
 
       def begin_stream(response, &block)
@@ -64,6 +65,7 @@ module Seek
         response.read_body do |chunk|
           total_size += chunk.size
           raise SizeLimitExceededException, total_size if @size_limit && (total_size > @size_limit)
+
           block.call(chunk)
         end
 
@@ -71,14 +73,12 @@ module Seek
       end
 
       def follow_redirect(uri, response, redirect_count, &block)
-        if redirect_count >= @redirect_limit
-          raise RedirectLimitExceededException, redirect_count
-        else
-          new_uri = URI(response.header['location'])
-          new_uri = URI(uri) + new_uri if new_uri.relative?
+        raise RedirectLimitExceededException, redirect_count if redirect_count >= @redirect_limit
 
-          get_uri(new_uri, redirect_count + 1, &block)
-        end
+        new_uri = URI(response.header['location'])
+        new_uri = URI(uri) + new_uri if new_uri.relative?
+
+        get_uri(new_uri, redirect_count + 1, &block)
       end
     end
   end
