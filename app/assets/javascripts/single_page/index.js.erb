@@ -206,7 +206,7 @@ async function batchDeleteSample(sampleTypes) {
 // This function is called when 'excel-export' btn is clicked.
 // Posts the content of the dynamic table to the single_pages_controller,
 // which generates an excel workbook based on a template.
-async function exportToExcel(tableName, studyId, sampleTypeId) {
+async function exportToExcel(tableName, studyId, assayId, sampleTypeId) {
     const headerRow = $j(`table[id=${tableName}] thead tr`)["0"];
 
     // Cells from the table body => Each row = array
@@ -251,6 +251,7 @@ async function exportToExcel(tableName, studyId, sampleTypeId) {
         data: { source_sample_data: JSON.stringify(data),
           sample_type_id: JSON.stringify(sampleTypeId),
           study_id: JSON.stringify(studyId),
+          assay_id: JSON.stringify(assayId),
         },
         success: function(response) {
           downloadUrl = `<%= download_samples_excel_single_pages_path() %>?uuid=${response.uuid}`;

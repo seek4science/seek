@@ -62,10 +62,11 @@ class SinglePagesController < ApplicationController
 
   def download_samples_excel
 
-    sample_ids, sample_type_id, study_id = Rails.cache.read(params[:uuid]).values_at(:sample_ids, :sample_type_id,
-                                                                                     :study_id)
+    sample_ids, sample_type_id, study_id, assay_id = Rails.cache.read(params[:uuid]).values_at(:sample_ids, :sample_type_id,
+                                                                                     :study_id, :assay_id)
 
     @study = Study.find(study_id)
+    @assay = Assay.find(assay_id) unless assay_id.nil?
     @project = @study.projects.first
     @samples = Sample.where(id: sample_ids)&.authorized_for(:view).sort_by(&:id)
 
@@ -110,8 +111,9 @@ class SinglePagesController < ApplicationController
     sample_ids = JSON.parse(params[:source_sample_data]).map { |sample| sample['FAIRDOM-SEEK id'] if sample['FAIRDOM-SEEK id'] != '#HIDDEN' }
     sample_type_id = JSON.parse(params[:sample_type_id])
     study_id = JSON.parse(params[:study_id])
+    assay_id = JSON.parse(params[:assay_id])
 
-    Rails.cache.write(cache_uuid, { "sample_ids": sample_ids.compact, "sample_type_id": sample_type_id, "study_id": study_id },
+    Rails.cache.write(cache_uuid, { "sample_ids": sample_ids.compact, "sample_type_id": sample_type_id, "study_id": study_id, "assay_id": assay_id },
                       expires_in: 1.minute)
 
     respond_to do |format|

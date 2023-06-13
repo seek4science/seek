@@ -72,7 +72,7 @@ permissions: "loadBatchPermission('sourceDynamicTable',this)", exportToExcel: "s
         }
 
         function sourceExportExcel() {
-            exportToExcel("source-material-table", '<%=study.id%>', '<%=sample_type.id%>');
+            exportToExcel("source-material-table", '<%=study.id%>', null, '<%=sample_type.id%>');
         }
 
     </script>
