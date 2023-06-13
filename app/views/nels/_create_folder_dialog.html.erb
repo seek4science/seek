@@ -3,12 +3,16 @@
     <%= modal_header('Create a folder') %>
     <%= modal_body do %>
       <label>Folder name</label>
-      <%= text_field_tag :folder_name %>
-      <%= hidden_field_tag :path, path %>
+      <p class='small'>Cannot contain spaces</p>
+      <%= text_field_tag :new_folder, '', class:'form-control' %>
+      <%= hidden_field_tag :project_id, project_id %>
       <%= hidden_field_tag :dataset_id, dataset_id %>
+      <%= hidden_field_tag :subtype_name, subtype_name %>
+      <!-- will be replaced with api response -->
+      <%= hidden_field_tag :file_path, path %>
     <% end %>
     <%= modal_footer do %>
-      <%= create_button id:"folder_submit_btn", button_text:'Add',
+      <%= create_button id:"create-folder-submit-button", button_text:'Create',
                         class:'btn btn-primary' %>
       <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
     <% end %>
@@ -22,6 +26,49 @@
             $j('#create-folder-dialog').modal('show');
 
             return false;
+        });
+
+        $j('#create-folder-submit-button').on('click', function(){
+            let valid = true;//validateResourceFields('data','upload-file');
+            if (valid) {
+                $j('#create-folder-dialog').modal('hide');
+                $j('#upload-spinner').modal('show');
+                let data = new FormData($j('#create-folder-form')[0]);
+                $j.ajax({
+                    url: '<%= create_folder_nels_path() %>',
+                    data: data,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    method: 'POST',
+                    success: function (result) {
+                        const projectId = data.get('project_id');
+                        const datasetId = data.get('dataset_id');
+                        const subtype = data.get('subtype_name');
+                        const folder_path = data.get('file_path');
+                        $j('#upload-spinner').modal('hide');
+                        showSubtype(projectId, datasetId, subtype, folder_path, '<%= params[:assay_id] %>');
+                    },
+                    error: function (request, status, error) {
+                        $j('#upload-spinner').modal('hide');
+                        // not acceptable
+                        if (request.status == 406) {
+                            const msg = request.responseJSON['error'];
+                            alert(msg);
+                        }
+                        else {
+                            const exception = request.responseJSON['exception'];
+                            alert('Something went wrong interacting with NeLS, please try again later. (' + exception + ')');
+                        }
+                    },
+                    complete: function (data) {
+                        $j('#upload-spinner').modal('hide');
+                    }
+                });
+            }
+
+            return false;
+
         });
     });
 </script>

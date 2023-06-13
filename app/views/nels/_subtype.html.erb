@@ -48,7 +48,7 @@ table, th, td {
 
 <%= render partial: 'upload_metadata_dialog' %>
 <%= render partial: 'upload_file_dialog', locals:{subtype_path: @subtype_path, path: @path, project_id: @project_id, dataset_id: @dataset_id, subtype_name: @subtype_name} %>
-<%= render partial: 'create_folder_dialog', locals:{path: @path, dataset_id: @dataset_id } %>
+<%= render partial: 'create_folder_dialog', locals:{path: @path, project_id: @project_id, dataset_id: @dataset_id, subtype_name: @subtype_name } %>
 
 <%= render partial: 'subtype_file_listing' %>
 

@@ -86,6 +86,20 @@ class NelsController < ApplicationController
     redirect_to nels_path
   end
 
+  def create_folder
+    begin
+      @rest_client.create_folder(params[:dataset_id], params[:file_path], params[:new_folder])
+      respond_to do |format|
+        format.all { render json:{success: true} }
+      end
+    rescue RuntimeError => e
+      Rails.logger.error("Error creating folder  #{e.message} - #{e.backtrace.join($/)}")
+      respond_to do |format|
+        format.json { render json:{error: e.message, exception: e.class.name }, status: :internal_server_error }
+      end
+    end
+  end
+
   def upload_file
     begin
       filename = params['content_blobs'][0]['data'].original_filename
