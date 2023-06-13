@@ -41,14 +41,14 @@ module Seek
           rescue RestClient::Exception => e # Try a GET if HEAD isn't allowed, but don't download anything
             if fallback_to_get
               begin
-                uri = URI.parse(url)
-                Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == 'https') do |http|
-                  http.request(Net::HTTP::Get.new(uri)) do |res|
-                    content_type = res['content-type']
-                    content_length = res['content-length']
-                    file_name = determine_filename_from_disposition(res['content-disposition'])
-                    code = res.code.try(:to_i)
-                  end
+                res = streamer.peek
+                if res
+                  content_type = res['content-type']
+                  content_length = res['content-length']
+                  file_name = determine_filename_from_disposition(res['content-disposition'])
+                  code = res.code
+                else
+                  code = 404
                 end
               rescue Seek::DownloadHandling::BadResponseCodeException => e2
                 code = e2.code
@@ -75,8 +75,8 @@ module Seek
         content_type ||= content_type_from_filename(file_name)
 
         {
-          code: code,
-          file_size: content_length.present? ? content_length.try(:to_i) : nil,
+          code: code&.to_i,
+          file_size: content_length.present? ? content_length.to_i : nil,
           content_type: content_type,
           file_name: file_name
         }
@@ -86,7 +86,7 @@ module Seek
         file = Tempfile.new('remote-content')
         file.binmode # Strange encoding issues occur if this is not set
 
-        Seek::DownloadHandling::HTTPStreamer.new(url, size_limit: Seek::Config.hard_max_cachable_size).stream do |chunk|
+        streamer.stream do |chunk|
           file << chunk
         end
 
@@ -94,6 +94,10 @@ module Seek
       end
 
       private
+
+      def streamer
+        Seek::DownloadHandling::HTTPStreamer.new(url, size_limit: Seek::Config.hard_max_cachable_size)
+      end
 
       # if it is a slideshare url, which starts with www.slideshare.net, and is made up of 2 parts (params ignored)
       # i.e http://www.slideshare.new/<org>/<slidetitle>
