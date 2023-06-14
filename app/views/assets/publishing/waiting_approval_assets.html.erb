@@ -44,7 +44,7 @@
   </div>
 <% end %>
 <% unless @rejected_assets.empty? %>
-  <div class="alert alert-info">
+  <div class="alert alert-danger">
     <ul style="padding-left:1em;">
       <li>
         The following is a list of the items that have been rejected by an <%= t('asset_gatekeeper').downcase %> in your <%=t('project').downcase -%>.
@@ -53,7 +53,7 @@
       </li>
     </ul>
   </div>
-  <div class="rejected_items red_boxed">
+  <div class="rejected_items">
     <h2 style="margin:8px 0px;">Rejected items:</h2>
     <% isa_order = ['Investigation', 'Study', 'Assay'] %>
     <% @rejected_assets.sort_by { |a| [a.is_isa? ? -1 : 1, isa_order.index(a.class.name), a.class.name] }.each do |asset| %>
