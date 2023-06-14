@@ -39,6 +39,11 @@
         <% gatekeeper_links = asset.asset_gatekeepers.collect { |gatekeeper| link_to(gatekeeper.name, gatekeeper) }.join(' or ').html_safe %>
         <%= gatekeeper_links %>
       </div>
+      <%= button_link_to "Cancel this request", 'destroy',
+                         cancel_publishing_request_person_path(current_user.person,
+                                                               asset_id: asset.id,
+                                                               asset_class: asset.class),
+                         options={class:'cancel_publish_request'} -%>
     </ul>
   <% end %>
   </div>
@@ -74,6 +79,11 @@
           <br/>
           Comments: <%= asset.last_publishing_log.comment %>
         </div>
+        <%= button_link_to "Cancel this request", 'destroy',
+                           cancel_publishing_request_person_path(current_user.person,
+                                                                 asset_id: asset.id,
+                                                                 asset_class: asset.class),
+                           options={class:'cancel_publish_request'} -%>
       </ul>
     <% end %>
   </div>

@@ -192,6 +192,53 @@ class BatchPublishingTest < ActionController::TestCase
     assert_select 'a[href=?]', data_file_path(not_requested_df), count: 0
   end
 
+  test 'authorization for cancel_publishing_request' do
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    gatekept_project = gatekeeper.projects.first
+    a_person = FactoryBot.create(:person)
+    a_person.add_to_project_and_institution(gatekept_project, FactoryBot.create(:institution))
+    df = FactoryBot.create(:data_file, contributor: a_person, projects: [gatekept_project])
+    df.resource_publish_logs.create(publish_state: ResourcePublishLog::WAITING_FOR_APPROVAL, user: a_person.user)
+
+    login_as(gatekeeper)
+    get :cancel_publishing_request, params: { id: a_person,
+                                              asset_id: df.id,
+                                              asset_class: df.class }
+    assert_redirected_to :root
+    assert_not_nil flash[:error]
+
+    login_as(a_person)
+    get :cancel_publishing_request, params: { id: a_person,
+                                              asset_id: df.id,
+                                              asset_class: df.class }
+    assert_redirected_to waiting_approval_assets_person_path(a_person)
+    assert_nil flash[:error]
+    assert_not_nil flash[:notice]
+  end
+
+  test 'cancel_publishing_request' do
+    df, model, sop = waiting_approval_assets_for User.current_user
+    sop.resource_publish_logs.create(publish_state: ResourcePublishLog::REJECTED, user: User.current_user)
+
+    get :waiting_approval_assets, params: { id: User.current_user.person }
+
+    assert_select '.cancel_publish_request', count: 3 do
+      assert_select 'a[href=?]', cancel_publishing_request_person_path(User.current_user.person,asset_id: df.id, asset_class: df.class)
+      assert_select 'a[href=?]', cancel_publishing_request_person_path(User.current_user.person,asset_id: model.id, asset_class: model.class)
+      assert_select 'a[href=?]', cancel_publishing_request_person_path(User.current_user.person,asset_id: sop.id, asset_class: sop.class)
+    end
+
+    get :cancel_publishing_request, params: { id: User.current_user.person,
+                                              asset_id: model.id,
+                                              asset_class: model.class }
+    assert_redirected_to waiting_approval_assets_person_path(User.current_user.person)
+    assert_nil flash[:error]
+    assert_equal "Cancelled request to publish for: #{model.title}", flash[:notice]
+    assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL, df.last_publishing_log.publish_state
+    assert_equal ResourcePublishLog::UNPUBLISHED, model.last_publishing_log.publish_state
+    assert_equal ResourcePublishLog::REJECTED, sop.last_publishing_log.publish_state
+  end
+
   private
 
   def create_publish_immediately_assets

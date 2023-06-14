@@ -6,7 +6,7 @@ module Seek
         base.before_action :set_assets, only: [:batch_publishing_preview]
         base.before_action :set_items_for_publishing, only: [:check_gatekeeper_required, :publish]
         base.before_action :set_items_for_potential_publishing, only: [:check_related_items, :publish_related_items]
-        base.before_action :publish_auth, only: [:batch_publishing_preview, :check_related_items, :publish_related_items, :check_gatekeeper_required, :publish, :waiting_approval_assets]
+        base.before_action :publish_auth, only: [:batch_publishing_preview, :check_related_items, :publish_related_items, :check_gatekeeper_required, :publish, :waiting_approval_assets, :cancel_publishing_request]
         # need to put request_publish_approval after log_publishing, so request_publish_approval will get run first.
         base.after_action :log_publishing, :request_publish_approval, if: -> { @policy_updated }
       end
@@ -89,6 +89,15 @@ module Seek
         respond_to do |format|
           format.html { render template: 'assets/publishing/waiting_approval_assets' }
         end
+      end
+
+      def cancel_publishing_request
+        asset = params[:asset_class].classify.constantize.find(params[:asset_id])
+        if asset.last_publishing_log.publish_state.in?([ResourcePublishLog::WAITING_FOR_APPROVAL, ResourcePublishLog::REJECTED])
+          ResourcePublishLog.add_log(ResourcePublishLog::UNPUBLISHED, asset)
+          flash[:notice] = "Cancelled request to publish for: #{asset.title}"
+        end
+        redirect_to waiting_approval_assets_person_path and return
       end
 
       private
