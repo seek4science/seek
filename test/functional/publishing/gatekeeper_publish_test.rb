@@ -106,7 +106,7 @@ class GatekeeperPublishTest < ActionController::TestCase
     # Rejected assets
     assert_select 'a.rejected_items[style=?]', "display:block;", count: 1
     assert_select 'a.rejected_items[style=?]', "display:none;", count: 1
-    assert_select 'li.rejected_items[style=?]', "display:none;", count: 1 do
+    assert_select 'div.rejected_items[style=?]', "display:none;", count: 1 do
       assert_select '.type_and_title', count: 1 do
         assert_select 'a[href=?]', data_file_path(dfr)
       end

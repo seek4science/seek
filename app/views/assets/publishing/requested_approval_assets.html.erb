@@ -70,9 +70,9 @@
     <% end %>
 <% end %>
   <% unless @rejected_assets.empty? %>
-    <a class="rejected_items" href="#" style="display:block;" onclick="toggleRejected()">Show rejected</a>
-    <a class="rejected_items" href="#" style="display:none;" onclick="toggleRejected()">Hide rejected</a>
-    <li class="rejected_items" style="display:none;">
+    <a class="rejected_items" href="#" style="display:block;" onclick="$j('.rejected_items').toggle();return false;">Show rejected</a>
+    <a class="rejected_items" href="#" style="display:none;" onclick="$j('.rejected_items').toggle();return false;">Hide rejected</a>
+    <div class="rejected_items" style="display:none;">
       <h3 style="margin:8px 0px;">Items with rejected status:</h3>
       <% @rejected_assets.each do |asset| %>
         <ul class="item_waiting_for_approval">
@@ -96,20 +96,6 @@
           </div>
         </ul>
       <% end %>
-    </li>
+    </div>
   <% end %>
 </div>
-
-<script>
-    function toggleRejected() {
-        event.preventDefault();
-        let rejected_items = $j('.rejected_items');
-        for(let rejected_element of rejected_items) {
-            if ($j(rejected_element).is(':hidden')) {
-                rejected_element.style.display = "block";
-            } else {
-                $j(rejected_element).hide();
-            }
-        }
-    }
-</script>
