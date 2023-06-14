@@ -33,8 +33,8 @@
       ],
       "tools": [
         {
-          "name": "Ruby",
-          "id": "ruby"
+          "name": "BioRuby",
+          "id": "https://bio.tools/bioruby"
         }
       ],
       "license": "CC-BY-4.0",
@@ -50,7 +50,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "916",
+              "id": "378",
               "type": "projects"
             },
             "access": "edit"
@@ -62,7 +62,7 @@
       "creators": {
         "data": [
           {
-            "id": "900",
+            "id": "371",
             "type": "people"
           }
         ]
@@ -70,7 +70,7 @@
       "projects": {
         "data": [
           {
-            "id": "916",
+            "id": "378",
             "type": "projects"
           }
         ]
@@ -78,7 +78,7 @@
       "assays": {
         "data": [
           {
-            "id": "199",
+            "id": "80",
             "type": "assays"
           }
         ]
@@ -86,7 +86,7 @@
       "publications": {
         "data": [
           {
-            "id": "199",
+            "id": "80",
             "type": "publications"
           }
         ]
@@ -94,7 +94,7 @@
       "presentations": {
         "data": [
           {
-            "id": "182",
+            "id": "72",
             "type": "presentations"
           }
         ]
@@ -102,7 +102,7 @@
       "data_files": {
         "data": [
           {
-            "id": "182",
+            "id": "72",
             "type": "data_files"
           }
         ]
@@ -110,7 +110,7 @@
       "documents": {
         "data": [
           {
-            "id": "182",
+            "id": "72",
             "type": "documents"
           }
         ]
@@ -118,7 +118,7 @@
       "sops": {
         "data": [
           {
-            "id": "182",
+            "id": "72",
             "type": "sops"
           }
         ]

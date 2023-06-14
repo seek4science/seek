@@ -61,9 +61,10 @@ class WorkflowApiTest < ActionDispatch::IntegrationTest
       res = JSON.parse(response.body)
       tools = res['data']['attributes']['tools']
       assert_equal 3, tools.length
-      assert_equal('MultiQC', tools.detect { |t| t['id'] == 'multiqc' }['name'])
-      assert_equal('European Nucleotide Archive (ENA)', tools.detect { |t| t['id'] == 'ena' }['name'])
-      assert_equal('Ruby!!!', tools.detect { |t| t['id'] == 'ruby' }['name'])
+      assert_equal('MultiQC', tools.detect { |t| t['id'] == 'https://bio.tools/multiqc' }['name'])
+      assert_equal('European Nucleotide Archive (ENA)', tools.detect { |t| t['id'] == 'https://bio.tools/ena' }['name'])
+      assert_equal('Ruby!!!', tools.detect { |t| t['id'] == 'https://bio.tools/bioruby' }['name'])
+      assert_nil tools.detect { |t| t['id'] == 'https://ignore.me/galaxy' }
     end
   end
 end

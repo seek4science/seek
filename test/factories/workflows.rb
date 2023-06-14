@@ -101,9 +101,9 @@ FactoryBot.define do
     discussion_links { [FactoryBot.build(:discussion_link, label:'Slack')] }
     tools_attributes {
       [
-        { bio_tools_id: 'thing-doer', name: 'ThingDoer'},
-        { bio_tools_id: 'database-accessor', name: 'DatabaseAccessor'},
-        { bio_tools_id: 'ruby', name: 'Ruby'}
+        { bio_tools_id: 'workflowhub', name: 'WorkflowHub'},
+        { bio_tools_id: 'bio.tools', name: 'bio.tools'},
+        { bio_tools_id: 'bioruby', name: 'BioRuby'}
       ]
     }
 
