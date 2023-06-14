@@ -91,15 +91,13 @@ class PoliciesController < ApplicationController
   #To check whether you can publish immediately or need to go through gatekeeper's approval when changing the projects associated with the resource
   def updated_can_publish_immediately(resource, projects)
     projects = [projects] if projects.is_a?(Project)
-    if !resource.new_record? && resource.is_published?
-      true
-      #FIXME: need to use User.current_user here because of the way the function tests in PolicyControllerTest work, without correctly creating the session and @request etc
-    elsif projects.any? { |p| p.asset_gatekeepers.any? } && !projects.any? { |p| User.current_user.person.is_asset_gatekeeper?(p) }
-      false
-    elsif !projects.any?
+    if resource.is_published?
+      true unless resource.new_record?
+    elsif projects.empty?
       !resource.gatekeeper_required?
     else
-      true
+      #FIXME: need to use User.current_user here because of the way the function tests in PolicyControllerTest work, without correctly creating the session and @request etc
+      projects.none? { |p| p.asset_gatekeepers.any? } || projects.any? { |p| User.current_user.person.is_asset_gatekeeper?(p) }
     end
   end
 end
