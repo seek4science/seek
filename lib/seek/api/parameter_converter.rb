@@ -162,7 +162,7 @@ module Seek
         end
       end
 
-      convert :tools, rename: :tools_attributes do |value|
+      convert :tools, rename: :tools_attributes, only: :workflows do |value|
         biotools_client = BioTools::Client.new
         value.map do |t|
           biotools_id = BioTools::Client.match_id(t[:id])
