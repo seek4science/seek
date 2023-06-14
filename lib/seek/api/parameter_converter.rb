@@ -165,7 +165,8 @@ module Seek
       convert :tools, rename: :tools_attributes do |value|
         biotools_client = BioTools::Client.new
         value.map do |t|
-          biotools_id = t[:id]
+          biotools_id = BioTools::Client.match_id(t[:id])
+          next unless biotools_id
           name = t[:name]
           if name.blank?
             begin
@@ -176,7 +177,7 @@ module Seek
           end
 
           { bio_tools_id: biotools_id, name: name }
-        end
+        end.compact
       end
 
       convert :administrator_ids, rename: :programme_administrator_ids

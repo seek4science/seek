@@ -2903,7 +2903,7 @@ workflowPost:
             operation_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
             tools:
-              $ref: "#/components/schemas/biotoolsList"
+              $ref: "#/components/schemas/workflowtoolsList"
             title:
               $ref: "#/components/schemas/nonEmptyString"
             description:
@@ -2983,7 +2983,7 @@ workflowPatch:
             operation_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
             tools:
-              $ref: "#/components/schemas/biotoolsList"
+              $ref: "#/components/schemas/workflowtoolsList"
             title:
               $ref: "#/components/schemas/nonEmptyString"
             description:
@@ -4910,7 +4910,7 @@ workflowResponse:
             discussion_links:
               $ref: "#/components/schemas/assetLinkList"
             tools:
-              $ref: "#/components/schemas/biotoolsList"
+              $ref: "#/components/schemas/workflowtoolsList"
           required:
             - title
             - workflow_class
@@ -4989,16 +4989,16 @@ workflowResponse:
     - data
     - jsonapi
   additionalProperties: false
-biotoolsList:
+workflowtoolsList:
   type: array
   minItems: 0
   items:
-    $ref: "#/components/schemas/biotool"
-biotool:
+    $ref: "#/components/schemas/workflowtool"
+workflowtool:
   type: object
   properties:
     id:
-      $ref: "#/components/schemas/nonEmptyString"
+      $ref: "#/components/schemas/uriString"
     name:
       $ref: "#/components/schemas/nullableNonEmptyString"
   required:

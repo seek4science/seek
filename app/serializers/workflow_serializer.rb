@@ -32,7 +32,7 @@ class WorkflowSerializer < ContributedResourceSerializer
     object.bio_tools_links.map do |tool|
       {
         name: tool.name,
-        id: tool.bio_tools_id
+        id: tool.uri
       }
     end
   end
