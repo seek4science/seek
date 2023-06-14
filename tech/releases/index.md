@@ -11,6 +11,20 @@ Please see [Getting FAIRDOM-SEEK](/get-seek.html) for details about installing S
 
 If you have any comments or feedback about a release, then please [Contact Us](/contacting-us.html)
 
+## Version 1.13.4
+
+Release date: _14th June 2023_
+
+A small patch release that contains some small bug fixes:
+
+* Fix for handling redirects correctly when registering an item by URL.
+* Fix to handle items registered as a remote URL - when the URL needs authorization it is always shown as an external link.
+* Fix for a missing python dependency (filelock), which is required for processing CWL workflows. 
+
+We have also provided details about [installing Ruby 2.7 on Ubuntu 22.04](/tech/ruby-2.7-ubuntu-22.04). 
+
+For a full list, see [closed issues for 1.13.4](https://github.com/seek4science/seek/milestone/18?closed=1)
+
 ## Version 1.13.3
 
 Release date: _16th May 2023_
