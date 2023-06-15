@@ -23,15 +23,7 @@ class CustomMetadataType < ApplicationRecord
 
   def supported_type_must_be_valid_type
     return if supported_type.blank? # already convered by presence validation
-    valid = true
-    begin
-      clz = supported_type.constantize
-      # TODO: in the future to check it is a supported active record type
-      valid = clz.ancestors.include?(ActiveRecord::Base)
-    rescue NameError
-      valid = false
-    end
-    unless valid
+    unless Seek::Util.lookup_class(supported_type, raise: false)
       errors.add(:supported_type, 'is not a type that can supported custom metadata')
     end
   end

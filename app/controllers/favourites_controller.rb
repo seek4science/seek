@@ -12,7 +12,7 @@ class FavouritesController < ApplicationController
 
       resource = saved_search if saved_search.save
     else
-      resource = params[:resource_type].constantize.find_by_id(params[:resource_id])
+      resource = safe_class_lookup(params[:resource_type]).find_by_id(params[:resource_id])
     end
 
     favourite = Favourite.new(user: current_user, resource: resource)

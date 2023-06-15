@@ -149,6 +149,12 @@ module Seek
       "python3.9 #{cmd}"
     end
 
+    def self.lookup_class(class_name, raise: true)
+      c = Seek::Util.persistent_classes.detect { |klass| klass.name == class_name }
+      raise NameError "#{class_name} not an appropriate class" if c.nil? && raise
+      c
+    end
+
     private
 
     def self.cache(name, &block)
