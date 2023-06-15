@@ -20,9 +20,9 @@ const defaultCols = [{
   }
 }];
 
-const objectInputTemp = '<input type="hidden" name="_NAME_[]" id="h_NAME_" value="" autocomplete="off" />' +
-  '<select name="_NAME_[]" id="_NAME_" class="form-control" data-role="seek-objectsinput" ' +
-  'data-tags-limit="100" multiple="multiple" ' +
+const objectInputTemp = '<input type="hidden" name="_NAME_[]" id="inpt-_NAME_" value="" autocomplete="off" />' +
+  '<select name="_NAME_[]" id="select-_NAME_" class="form-control" data-role="seek-objectsinput" ' +
+  'data-tags-limit="100" multiple="multiple" data-typeahead-template="typeahead/single_pages_samples"' +
   'data-typeahead-query-url="_URL_">_OPTIONS_</select>';
 
 const typeaheadUrl = "<%= typeahead_samples_path(linked_sample_type_id: '_LINKED_') %>";
@@ -50,12 +50,12 @@ const handleSelect = (e) => {
           if (c.multi_link) {
             data = data && Array.isArray(data) ? data : [data];
             data = data[0]?.id ? data : [];
-            const existingOptions = data.map((e) => `<option selected="selected" value="${e.id}">${e.title}</option>`).join("");
-            if (options.readOnly) {
-              return data.map((e) => `<span class="badge">${e.title}</span>`).join(" ");
+            const existingOptions = data.map((e) => `<option selected="selected" title="ID: ${e.id}" value="${e.id}">${e.title}</option>`).join("");
+            if (options.readonly) {
+              return data.map((e) => `<span title="ID: ${e.id}" class="badge">${e.title}</span>`).join(" ");
             } else {
               const url = typeaheadUrl.replace("_LINKED_", c.linked_sample_type);
-              const objectInputName = 'objectInput-' + data.map((e) => e.id).join('-') + '-' + crypto.randomUUID();
+              const objectInputName = data.map((e) => e.id).join('-') + '-' + crypto.randomUUID();
               setTimeout(ObjectsInput.init);
               return objectInputTemp
                 .replace(/_NAME_/g, objectInputName)
