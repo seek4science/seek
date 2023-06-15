@@ -30,7 +30,7 @@
                     Showing <%= type[:items_count] %> out of a possible <%= pluralize(resource_type_total_visible_count(type),'item') %>
                   <% end %>
 
-                  <% if !type[:is_external] && type[:type].constantize.available_filters.any? %>
+                  <% if !type[:is_external] && safe_class_lookup(type[:type]).available_filters.any? %>
                     <% if query  %>
 
                       <%= link_to "Advanced #{type[:visible_resource_type]} search with filtering ...",

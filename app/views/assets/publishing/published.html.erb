@@ -5,19 +5,19 @@
   if params[:published_items]
     published_items |= params[:published_items].collect do |param|
       item_class,item_id = param.split(',')
-      item_class.constantize.find_by_id(item_id)
+      safe_class_lookup(item_class).find_by_id(item_id)
     end.compact.select(&:can_view?)
   end
   if params[:waiting_for_publish_items]
     waiting_for_publish_items |= params[:waiting_for_publish_items].collect do |param|
       item_class,item_id = param.split(',')
-      item_class.constantize.find_by_id(item_id)
+      safe_class_lookup(item_class).find_by_id(item_id)
     end.compact.select(&:can_view?)
   end
   if params[:notified_items]
     notified_items |= params[:notified_items].collect do |param|
       item_class,item_id = param.split(',')
-      item_class.constantize.find_by_id(item_id)
+      safe_class_lookup(item_class).find_by_id(item_id)
     end.compact.select(&:can_view?)
   end
 

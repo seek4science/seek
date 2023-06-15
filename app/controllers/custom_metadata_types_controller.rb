@@ -11,7 +11,7 @@ class CustomMetadataTypesController < ApplicationController
         format.html { render html: '' }
       else
         cm = CustomMetadataType.find(id)
-        resource = cm.supported_type.constantize.new
+        resource = safe_class_lookup(cm.supported_type).new
         resource.custom_metadata = CustomMetadata.new(custom_metadata_type: cm)
         format.html do
           render partial: 'custom_metadata/custom_metadata_fields',
