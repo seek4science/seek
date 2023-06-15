@@ -30,7 +30,6 @@ gem 'daemons','1.1.9'
 gem 'linkeddata', '~> 3.2.0'
 gem 'indefinite_article'
 
-gem 'openseek-api'
 # for fancy content escaping in openbis integration
 gem 'loofah'
 gem 'jbuilder', '~> 2.7'
@@ -63,9 +62,6 @@ gem 'stringio', '0.1.0' #locked to the default version for ruby 2.7
 gem 'validate_url'
 gem "attr_encrypted", "~> 3.0.0"
 gem 'libreconv'
-
-# gem for BiVeS and BudHat
-gem 'bives', "~> 2.0"
 
 # Linked to SysMO Git repositories
 gem 'my_responds_to_parent', git: 'https://github.com/SysMO-DB/my_responds_to_parent.git'
