@@ -47,7 +47,9 @@ module Seek
       end
 
       def update_sharing_policies(*args)
-        @policy_updated = true
+        param_access_type = params['policy_attributes'] ? params['policy_attributes']['access_type'] : nil
+        current_access_type = args.first.policy.access_type.to_s
+        @policy_updated = true if param_access_type != current_access_type
         super
       end
 
