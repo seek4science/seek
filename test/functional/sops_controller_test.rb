@@ -537,19 +537,23 @@ class SopsControllerTest < ActionController::TestCase
     assert_select 'p.list_item_attribute', text: /#{I18n.t('creator').pluralize.capitalize}: None/, count: no_other_creator_sops.count
   end
 
-  test 'should set the policy to projects_policy if the item is requested to be published, when creating new sop' do
+  test 'should set the policy access_type to No_ACCESS if the item is requested to be published, when creating new sop' do
     gatekeeper = FactoryBot.create(:asset_gatekeeper)
     @user.person.add_to_project_and_institution(gatekeeper.projects.first, FactoryBot.create(:institution))
-    post :create, params: { sop: { title: 'test', project_ids: gatekeeper.projects.collect(&:id) }, content_blobs: [{ data: picture_file }], policy_attributes: { access_type: Policy::ACCESSIBLE } }
+    post :create, params: { sop: { title: 'test', project_ids: gatekeeper.projects.collect(&:id) }, content_blobs: [{ data: picture_file }],
+                            policy_attributes: {access_type: Policy::ACCESSIBLE,
+                                                permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: FactoryBot.create(:person).id, access_type: Policy::VISIBLE},
+                                                                         '2' => {contributor_type: 'Person', contributor_id: FactoryBot.create(:person).id, access_type: Policy::MANAGING}
+                            } } }
     sop = assigns(:sop)
     assert_redirected_to (sop)
     policy = sop.policy
     assert_equal Policy::NO_ACCESS, policy.access_type
     assert_enqueued_emails 1
     assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL, sop.last_publishing_log.publish_state
-    assert_equal 1, policy.permissions.count
-    assert_equal gatekeeper.projects.first, policy.permissions.first.contributor
-    assert_equal Policy::ACCESSIBLE, policy.permissions.first.access_type
+    assert_equal 2, policy.permissions.count
+    assert_equal Policy::VISIBLE, policy.permissions.first.access_type
+    assert_equal Policy::MANAGING, policy.permissions.second.access_type
   end
 
   test 'should allow to set the policy to visible when creating new sop' do
