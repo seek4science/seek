@@ -296,7 +296,7 @@ SEEK::Application.routes.draw do
       post :gatekeeper_decide
       get :gatekeeper_decision_result
       get :waiting_approval_assets
-      get :cancel_publishing_request
+      post :cancel_publishing_request
       get :select
       get :items
       get :batch_sharing_permission_preview

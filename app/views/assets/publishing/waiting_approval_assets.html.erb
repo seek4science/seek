@@ -43,7 +43,7 @@
                          cancel_publishing_request_person_path(current_user.person,
                                                                asset_id: asset.id,
                                                                asset_class: asset.class),
-                         options={class:'cancel_publish_request'} -%>
+                         options={class:'cancel_publish_request', method: :post} -%>
     </ul>
   <% end %>
   </div>
@@ -83,7 +83,7 @@
                            cancel_publishing_request_person_path(current_user.person,
                                                                  asset_id: asset.id,
                                                                  asset_class: asset.class),
-                           options={class:'cancel_publish_request'} -%>
+                           options={class:'cancel_publish_request', method: :post} -%>
       </ul>
     <% end %>
   </div>

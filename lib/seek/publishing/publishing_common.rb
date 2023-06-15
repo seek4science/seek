@@ -95,11 +95,16 @@ module Seek
 
       def cancel_publishing_request
         asset = params[:asset_class].classify.constantize.find(params[:asset_id])
-        if asset.last_publishing_log.publish_state.in?([ResourcePublishLog::WAITING_FOR_APPROVAL, ResourcePublishLog::REJECTED])
-          ResourcePublishLog.add_log(ResourcePublishLog::UNPUBLISHED, asset)
-          flash[:notice] = "Cancelled request to publish for: #{asset.title}"
+        if asset.can_manage?
+          if asset.last_publishing_log.publish_state.in?([ResourcePublishLog::WAITING_FOR_APPROVAL, ResourcePublishLog::REJECTED])
+            ResourcePublishLog.add_log(ResourcePublishLog::UNPUBLISHED, asset)
+            flash[:notice] = "Cancelled request to publish for: #{asset.title}"
+          end
+          redirect_to waiting_approval_assets_person_path and return
+        else
+          error('You are not permitted to perform this action.', 'Not your publish request to cancel.')
+          return false
         end
-        redirect_to waiting_approval_assets_person_path and return
       end
 
       private
