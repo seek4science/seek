@@ -3026,6 +3026,44 @@ class DataFilesControllerTest < ActionController::TestCase
 
   end
 
+  test 'create metadata with gatekeeper - cannot publish' do
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    person = FactoryBot.create(:person)
+    person.person.add_to_project_and_institution(gatekeeper.projects.first, FactoryBot.create(:institution))
+    login_as(person)
+    blob = FactoryBot.create(:content_blob)
+    session[:uploaded_content_blob_id] = blob.id
+    post :create_metadata, params: { data_file: { title: 'Gatekept File', project_ids: gatekeeper.projects.collect(&:id) },
+                                     content_blob_id: blob.id.to_s,
+                                     policy_attributes: { access_type: Policy::ACCESSIBLE },
+                                     assay_ids: [] }
+    assert (df = assigns(:data_file))
+    assert_redirected_to df
+    policy = df.policy
+    assert_equal Policy::NO_ACCESS, policy.access_type
+    assert_enqueued_emails 1
+    assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL, df.last_publishing_log.publish_state
+  end
+
+  test 'create metadata with gatekeeper - can make visible' do
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    person = FactoryBot.create(:person)
+    person.person.add_to_project_and_institution(gatekeeper.projects.first, FactoryBot.create(:institution))
+    login_as(person)
+    blob = FactoryBot.create(:content_blob)
+    session[:uploaded_content_blob_id] = blob.id
+    post :create_metadata, params: { data_file: { title: 'Gatekept File', project_ids: gatekeeper.projects.collect(&:id) },
+                                     content_blob_id: blob.id.to_s,
+                                     policy_attributes: { access_type: Policy::VISIBLE },
+                                     assay_ids: [] }
+    assert (df = assigns(:data_file))
+    assert_redirected_to df
+    policy = df.policy
+    assert_equal Policy::VISIBLE, policy.access_type
+    assert_enqueued_emails 0
+    assert_nil df.last_publishing_log
+  end
+
   test 'create metadata with associated assay' do
     person = FactoryBot.create(:person)
     login_as(person)

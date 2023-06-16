@@ -387,7 +387,7 @@ class InvestigationsControllerTest < ActionController::TestCase
 
     refute investigation.can_view?(nil)
 
-    assert_includes ResourcePublishLog.requested_approval_assets_for(gatekeeper), investigation
+    assert_includes ResourcePublishLog.requested_approval_assets_for_gatekeeper(gatekeeper), investigation
   end
 
   test 'dont send publish approval request if elevating permissions from VISIBLE -> ACCESSIBLE' do # They're the same for ISA things
@@ -403,7 +403,7 @@ class InvestigationsControllerTest < ActionController::TestCase
       put :update, params: { investigation: { title: investigation.title }, id: investigation.id, policy_attributes: { access_type: Policy::ACCESSIBLE } }
     end
 
-    assert_empty ResourcePublishLog.requested_approval_assets_for(gatekeeper)
+    assert_empty ResourcePublishLog.requested_approval_assets_for_gatekeeper(gatekeeper)
   end
 
   test 'can delete an investigation with subscriptions' do
