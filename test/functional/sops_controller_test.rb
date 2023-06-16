@@ -554,6 +554,7 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal 2, policy.permissions.count
     assert_equal Policy::VISIBLE, policy.permissions.first.access_type
     assert_equal Policy::MANAGING, policy.permissions.second.access_type
+    assert_includes flash[:notice],("gatekeeper's approval list.")
   end
 
   test 'should allow to set the policy to visible when creating new sop' do
@@ -564,6 +565,7 @@ class SopsControllerTest < ActionController::TestCase
     assert_redirected_to (sop)
     policy = sop.policy
     assert_equal Policy::VISIBLE, policy.access_type
+    assert_equal 'SOP was successfully uploaded and saved.', flash[:notice]
   end
 
   test 'should not allow to change the policy to published when managing sop' do
