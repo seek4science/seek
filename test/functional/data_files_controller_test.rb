@@ -3773,6 +3773,10 @@ class DataFilesControllerTest < ActionController::TestCase
     check_manage_edit_menu_for_type('data_file')
   end
 
+  test 'download menu item appears according to status and permission' do
+    check_publish_menu_for_type('data_file')
+  end
+
   test 'can access manage page with manage rights' do
     person = FactoryBot.create(:person)
     data_file = FactoryBot.create(:data_file, contributor:person)
