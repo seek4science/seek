@@ -67,15 +67,15 @@ class SinglePagesController < ApplicationController
     wb = Roo::Excelx.new(params[:file].path)
     puts params
     # Extract Samples metadata
-    puts wb.cell(2, 2, sheet = 'Metadata').to_i
-    puts wb.cell(5, 2, sheet = 'Metadata').to_i
-    puts wb.cell(8, 2, sheet = 'Metadata').to_i
+    study_id = wb.cell(2, 2, sheet = 'Metadata').to_i
+    sample_type_id = wb.cell(5, 2, sheet = 'Metadata').to_i
+    template_id = wb.cell(8, 2, sheet = 'Metadata').to_i
 
-    @study = Study.find(wb.cell(2, 2, sheet = 'Metadata').to_i)
-    @sample_type = SampleType.find(wb.cell(5, 2, sheet = 'Metadata').to_i)
-    @template = Template.find(wb.cell(8, 2, sheet = 'Metadata').to_i)
+    @study = Study.find(study_id)
+    @sample_type = SampleType.find(sample_type_id)
+    @template = Template.find(template_id)
 
-    sample_fields = wb.row(1, sheet = 'Samples')
+    sample_fields = wb.row(1, sheet = 'Samples').map { |field| field.sub(' *', '') }
     samples_data = (2..wb.last_row(sheet = 'Samples')).map { |i| wb.row(i, sheet = 'Samples') }
 
     @excel_samples = samples_data.map do |excel_sample|
@@ -89,17 +89,69 @@ class SinglePagesController < ApplicationController
     @existing_excel_samples = @excel_samples.map { |sample| sample unless sample['id'].nil? }.compact
     @new_excel_samples = @excel_samples.map { |sample| sample if sample['id'].nil? }.compact
 
-    @db_samples = @existing_excel_samples.map { |sample| JSON.parse(Sample.find(sample['id'])[:json_metadata]) }
-
-    [@study, @sample_type, @template, @excel_samples, @existing_excel_samples, @new_excel_samples, @db_samples].each do |var|
-      puts '#' * 100
-      puts var.inspect
+    @db_samples = @existing_excel_samples.map do |sample|
+      raw_sample = Sample.find(sample['id'])
+      attributes = JSON.parse(raw_sample[:json_metadata])
+      { 'id' => raw_sample.id,
+        'uuid' => raw_sample.uuid }.merge(attributes)
     end
-    puts '#' * 100
 
-    # respond_to do |format|
-    #   format.html { redirect_to single_page_path(@study.projects.first) }
-    # end
+    # Determine whether samples have been modified or not
+    @update_samples = @existing_excel_samples.map do |ees|
+      db_sample = @db_samples.select { |s| s['id'] == ees['id'] }.first
+      # An exception is raised if the ID of an existing Sample cannot be found in the DB
+      raise "Sample with id '#{ees['id']}' does not exist in the database. Sample upload was aborted!" if db_sample.nil?
+      is_changed = false
+
+      db_sample.map do |k, v|
+        unless ees[k] == v
+          is_changed = true
+          break
+        end
+      end
+
+      ees if is_changed
+    end
+    @update_samples.compact!
+
+    # Determine if the new samples are no duplicates of existing ones,
+    # based on the attribute values
+    @possible_duplicates = []
+    @new_samples = []
+    @new_excel_samples.map do |nes|
+      is_duplicate = true
+
+      @existing_excel_samples.map do |ees|
+        ees.map do |k, v|
+          unless %w[id uuid].include?(k)
+            is_duplicate = (nes[k] == v)
+            break unless is_duplicate
+          end
+        end
+        if is_duplicate
+          @possible_duplicates.append(nes.merge({ 'duplicate' => ees }))
+          break
+        end
+      end
+      @new_samples.append(nes) unless is_duplicate
+    end
+
+    upload_data = { study: @study,
+                    sampleType: @sample_type,
+                    template: @template,
+                    excelSamples: @excel_samples,
+                    existingExcelSamples: @existing_excel_samples,
+                    newExcelSamples: @new_excel_samples,
+                    updateSamples: @update_samples,
+                    newSamples: @new_samples,
+                    possibleDuplicates: @possible_duplicates,
+                    dbSamples: @db_samples }
+
+
+    respond_to do |format|
+      format.json { render json: { uploadData: upload_data } }
+      format.html { render 'single_pages/sample_upload_content', { layout: false } }
+    end
   end
 
   private
