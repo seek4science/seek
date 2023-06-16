@@ -1,0 +1,134 @@
+<div id="upload-summary">
+  <%= folding_panel("General Inforamtion", true, :id => "general-information-panel") do %>
+    <% [@study, @sample_type, @template]. map do | entity | %>
+      <h4> <%= entity.class.to_s.singularize %> </h4>
+      <p><b>ID: </b><span><%= entity.id%></span></p>
+      <p><b>UUID: </b><span><%= entity.uuid %></span></p>
+      <p><b>Title: </b><span><%= entity.title %></span></p>
+      <hr>
+    <% end %>
+  <% end %>
+
+  <% unless @new_samples.nil? or @new_samples.compact == [] %>
+  <%= folding_panel("New Samples <span class='label label-primary'>#{@new_samples.size}</span>", true, :id => "new-samples-panel", :body_options => {:id => "new-samples-panel-content"},
+  :help_text => "These samples have been detected as new samples and will be created.") do %>
+    <div class="table-responsive">
+      <table id="create-sample-table" class="table">
+        <tr>
+          <th></th>
+          <% for key in @new_samples[0].keys %>
+            <th><%= key unless %w[uuid].include?(key) %></th>
+          <% end %>
+        </tr>
+        <% for new_sample in @new_samples %>
+          <% new_sample_id = UUID.generate %>
+          <tr id='<%= "new-sample-#{new_sample_id}" %>'>
+            <td><button id=<%= "remove-#{new_sample_id}" %> class="glyphicon glyphicon-trash danger" style="background-color:#d9534f;color:white;" onclick=<%= "removeSample('new-sample-#{new_sample_id}')" %>></button></td>
+              <% new_sample.map do |key, val| %>
+                <% val = '<new>' if key =='id' %>
+                <td><%= val unless %w[uuid].include?(key) %></td>
+            <% end %>
+          </tr>
+        <% end %>
+      </table>
+    </div>
+  <% end %>
+<% end %>
+
+ <% unless @update_samples.nil? or @update_samples.compact == [] %>
+  <%= folding_panel("Samples to Update <span class='label label-warning'>#{@update_samples.size}</span>", true, :id => "existing-samples-panel", :body_options => {:id => "existing-samples-panel-content"},
+  :help_text => "These samples were detected existing samples and will be updated.") do %>
+    <div class="table-responsive">
+      <table id="update-samples-table" class="table">
+        <tr>
+          <th></th>
+          <% for key in @update_samples[0].keys %>
+            <th><%= key unless key == 'uuid' %></th>
+          <% end %>
+        </tr>
+        <% for update_sample in @update_samples %>
+          <tr id='<%= "update-sample-#{update_sample['id']}-1" %>' >
+            <% db_sample = @db_samples.select { |s| s['id'] == update_sample['id'] }.first %>
+            <td rowspan=2><button id=<%= "remove-#{update_sample['id']}" %> class="glyphicon glyphicon-trash danger" style="background-color:#d9534f;color:white;" onclick=<%= "removeSample('update-sample-#{update_sample['id']}')" %>></button></td>
+            <% update_sample.map do |key, val| %>
+              <td class='<%= (val != db_sample[key]) ? "warning" : "default" %>' >
+                <%= val unless key == 'uuid' %>
+              </td>
+            <% end %>
+          </tr>
+          <tr id='<%= "update-sample-#{update_sample['id']}-2" %>' >
+            <% db_sample.map do |key, val| %>
+              <td>
+                <%= val unless key == 'uuid' %>
+              </td>
+            <% end %>
+          </tr>
+        <% end %>
+      </table>
+    </div>
+  <% end %>
+<% end %>
+
+<% unless @possible_duplicates.nil? or @possible_duplicates.compact == [] %>
+  <%= folding_panel("Possible Duplicates <span class='label label-danger'>#{@possible_duplicates.size}</span>", true, :id => "existing-samples-panel", :body_options => {:id => "existing-samples-panel-content"},
+                  :help_text => "These new samples have been matched to already existing samples.") do %>
+    <div class="table-responsive">
+      <table id="duplicate-samples-table" class="table">
+        <tr>
+          <th></th>
+          <% for key in @possible_duplicates[0].keys %>
+            <th>
+              <%= key unless %w[uuid duplicate].include?(key) %>
+            </th>
+          <% end %>
+        </tr>
+        <% for dupl_sample in @possible_duplicates %>
+          <tr id='<%= "duplicate-sample-#{dupl_sample['duplicate']['id']}-1" %>' >
+            <td rowspan=2>
+              <button id=<%= "remove-#{dupl_sample['duplicate']['id']}" %> class="glyphicon glyphicon-trash danger" style="background-color:#d9534f;color:white;" onclick=<%= "removeSample('duplicate-sample-#{dupl_sample['duplicate']['id']}')" %>></button>
+          </td>
+        <% dupl_sample.map do |key, val| %>
+          <% val = '<new>' if key =='id' %>
+          <td rowspan=1 class="table-danger">
+            <%= val unless %w[uuid duplicate].include?(key) %>
+          </td>
+        <% end %>
+            <tr id='<%= "duplicate-sample-#{dupl_sample['duplicate']['id']}-2" %>' class="danger">
+              <% dupl_sample['duplicate'].map do |key, val| %>
+                <td rowspan=1>
+                  <%= val unless %w[uuid duplicate].include?(key) %>
+                </td>
+              <% end %>
+            </tr>
+          </tr>
+        <% end %>
+      </table>
+    </div>
+  <% end %>
+  <% end %>
+
+
+  <%= submit_tag "Next", data: {disable_with: 'Next'}, :class => 'btn btn-primary', onclick: "" %>
+</div>
+<script type="text/javascript">
+  function removeSample(elementName){
+    console.log("elementName", elementName);
+    $j(`tr[id*='${elementName}']`).remove();
+  }
+
+  function submitUpload(){
+    $j.ajax({
+      method: "POST",
+      url: '<%= batch_change_permission_for_selected_items_single_pages_path -%>?single_page=true',
+      data: $j("#change-permission-preview-form").serialize(),
+      success: (res) => {
+        $j('#change-batch-permission').html(res);
+        // Handling 'remaining backdrop' issue when multiple modals
+        $j('#add-person-permission-modal').data("backdrop", "");
+        $j('#add-project-permission-modal').data("backdrop", "");
+        ObjectsInput.init();
+      },
+      error: (e) => { console.log(e) }
+    });
+  }
+</script>
