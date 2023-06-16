@@ -94,7 +94,7 @@ module Seek
       end
 
       def cancel_publishing_request
-        asset = params[:asset_class].classify.constantize.find(params[:asset_id])
+        asset = safe_class_lookup(params[:asset_class].classify).find(params[:asset_id])
         if asset.can_manage?
           if asset.last_publishing_log.publish_state.in?([ResourcePublishLog::WAITING_FOR_APPROVAL, ResourcePublishLog::REJECTED])
             ResourcePublishLog.add_log(ResourcePublishLog::UNPUBLISHED, asset)
@@ -241,7 +241,7 @@ module Seek
         else
           assets = []
           param.keys.each do |asset_class|
-            klass = asset_class.constantize
+            klass = safe_class_lookup(asset_class)
             param[asset_class].keys.each do |id|
               assets << klass.find_by_id(id)
             end
