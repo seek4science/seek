@@ -165,6 +165,10 @@ module Seek
           log_state = determine_state_for_log(object)
 
           ResourcePublishLog.add_log(log_state, object) if log_state
+
+          if log_state == ResourcePublishLog::WAITING_FOR_APPROVAL
+            flash[:notice] = "#{flash[:notice]}<br/>Your request to publish is in the gatekeeper's approval list.".html_safe
+          end
         end
       end
 
