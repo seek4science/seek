@@ -684,7 +684,6 @@ class AdminController < ApplicationController
   def update_redirect_to(flag, action)
     if flag
       flash[:notice] = RESTART_MSG
-      expire_header_and_footer
       redirect_to action: :show
     else
       redirect_to action: action.to_s
