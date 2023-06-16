@@ -15,11 +15,18 @@ permissions||="loadBatchPermission('sampleDynamicTable',this)"
   <button class="btn btn-primary dt-action" id="btn_save_assay_sample" onClick=<%=save%>>Save</button>
 </div>
 
-<div>
-  <%= form_with url: upload_samples_single_page_url() , multipart: true do |form| %>
-    <%= form.file_field :file %>
-    <%= form.submit 'Upload' %>
-  <% end %>
+<div class="container-sm">
+  <form id="upload_excel_form" action="<%= upload_samples_single_page_url() %>" method="post" enctype="multipart/form-data">
+    <div class="mb-3">
+      <label for="file" class="form-label">Upload excel file:</label>
+    </div>
+    <div class="mb-3">
+      <input id="fileUpload" name="fileUpload" type="file" class="form-control form-control-lg"/>
+    </div>
+    <div class="mb-3">
+      <button class="btn btn-default">Upload</button>
+    </div>
+  </form>
 </div>
 
 <script>
@@ -30,7 +37,7 @@ permissions||="loadBatchPermission('sampleDynamicTable',this)"
       method: "GET",
       url: "<%= batch_sharing_permission_preview_single_pages_path %>",
       data: { sample_ids, single_page: true },
-      success: (res) => { 
+      success: (res) => {
         if (res?.status == "unprocessable_entity"){
           alert(res?.error)
         } else {
@@ -39,11 +46,39 @@ permissions||="loadBatchPermission('sampleDynamicTable',this)"
           ObjectsInput.init();
         }
       },
-      error: (e) => { 
+      error: (e) => {
         console.log(e);
         alert("An error occurred while fetching data from the server.")
       }
     });
-  
+
   }
+
+async function handleUploadSubmit(e){
+  const form = e.target;
+  const url = new URL(form.action);
+  let formData = new FormData();
+  formData.append('file', fileUpload.files[0]);
+
+
+  $j.ajax({
+    type: 'POST',
+    url: url,
+    data: formData,
+    dataType: 'html',
+    processData: false,
+    contentType: false,
+    enctype: 'multipart/form-data',
+    success: function(response){
+      $j('#upload-excel-modal').modal('show').focus();
+      $j('#upload-excel').html(response);
+    },
+    error: function(err){
+      alert(`The following error occurred!\n${err}`);
+    }
+  });
+  e.preventDefault();
+}
+  const uploadExcelForm = document.getElementById("upload_excel_form");
+  uploadExcelForm.addEventListener('submit', handleUploadSubmit);
 </script>
