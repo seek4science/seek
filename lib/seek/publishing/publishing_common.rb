@@ -100,7 +100,7 @@ module Seek
             ResourcePublishLog.add_log(ResourcePublishLog::UNPUBLISHED, asset)
             flash[:notice] = "Cancelled request to publish for: #{asset.title}"
           end
-          redirect_to waiting_approval_assets_person_path and return
+          redirect_to params[:from_asset] ? asset : waiting_approval_assets_person_path and return
         else
           error('You are not permitted to perform this action.', 'Not your publish request to cancel.')
           return false
