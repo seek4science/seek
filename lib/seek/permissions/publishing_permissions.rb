@@ -113,11 +113,11 @@ module Seek
         return true unless authorization_checks_enabled
         return true if User.current_user.blank?
         if is_published? && !is_a?(Publication) && gatekeeper_required? && !User.current_user.person.is_asset_gatekeeper_of?(self)
-          if new_record?
-            policy.access_type=Policy::NO_ACCESS
-          else
-            self.policy = Policy.find_by_id(policy.id)
-          end
+          policy.access_type = if new_record?
+                                 Policy::NO_ACCESS
+                               else
+                                 Policy.find_by_id(policy.id).access_type
+                               end
         end
       end
     end
