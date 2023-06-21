@@ -584,19 +584,56 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL, sop.last_publishing_log.publish_state
   end
 
-  test 'manage_update with gatekeeper - should not allow to publish' do
+  test 'manage_update with gatekeeper - should not allow to publish, but can change permissions' do
     gatekeeper = FactoryBot.create(:asset_gatekeeper)
-    policy = FactoryBot.create(:policy, access_type: Policy::NO_ACCESS, permissions: [FactoryBot.create(:permission)])
+    policy = FactoryBot.create(:policy, access_type: Policy::NO_ACCESS)
     sop = FactoryBot.create(:sop, project_ids: gatekeeper.projects.collect(&:id), policy: policy)
+    other_person = FactoryBot.create(:person)
     login_as(sop.contributor)
     assert sop.can_manage?
     patch :manage_update, params: { id: sop,
                                            sop: { creator_ids: [sop.contributor.id],
                                                   project_ids: [gatekeeper.projects.collect(&:id)] },
-                                           policy_attributes: { access_type: Policy::ACCESSIBLE } }
+                                           policy_attributes: { access_type: Policy::ACCESSIBLE,
+                                                                permissions_attributes: {
+                                                                  '1' => {contributor_type: 'Person', contributor_id: sop.contributor.id, access_type: Policy::MANAGING},
+                                                                  '2' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}
+                                                               } } }
     sop.reload
     # Does not update policy
     assert_equal Policy::NO_ACCESS, sop.policy.access_type
+    # Does add permissions
+    assert_equal other_person.id, policy.permissions.second.contributor_id
+    assert_equal Policy::MANAGING, policy.permissions.second.access_type
+    assert_redirected_to sop
+    # User knows - Flash indicates to user that it is in gatekeeper's hands
+    assert_includes flash[:notice],("gatekeeper's approval list.")
+    # Gatekeeper knows - Logs adequately
+    assert_enqueued_emails 1
+    assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL, sop.last_publishing_log.publish_state
+  end
+
+  test 'manage_update with gatekeeper - should stay visible' do
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    policy = FactoryBot.create(:policy, access_type: Policy::VISIBLE)
+    sop = FactoryBot.create(:sop, project_ids: gatekeeper.projects.collect(&:id), policy: policy)
+    other_person = FactoryBot.create(:person)
+    login_as(sop.contributor)
+    assert sop.can_manage?
+    patch :manage_update, params: { id: sop,
+                                    sop: { creator_ids: [sop.contributor.id],
+                                           project_ids: [gatekeeper.projects.collect(&:id)] },
+                                    policy_attributes: { access_type: Policy::ACCESSIBLE,
+                                                         permissions_attributes: {
+                                                           '1' => {contributor_type: 'Person', contributor_id: sop.contributor.id, access_type: Policy::MANAGING},
+                                                           '2' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}
+                                                         } } }
+    sop.reload
+    # Does not update policy
+    assert_equal Policy::VISIBLE, sop.policy.access_type
+    # Does add permissions
+    assert_equal other_person.id, policy.permissions.second.contributor_id
+    assert_equal Policy::MANAGING, policy.permissions.second.access_type
     assert_redirected_to sop
     # User knows - Flash indicates to user that it is in gatekeeper's hands
     assert_includes flash[:notice],("gatekeeper's approval list.")
