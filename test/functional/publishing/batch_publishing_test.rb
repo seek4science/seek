@@ -207,19 +207,23 @@ class BatchPublishingTest < ActionController::TestCase
 
     # Another person cannot access cancel_publishing_request using someone else's id
     login_as(another_person)
-    post :cancel_publishing_request, params: { id: a_person,
-                                              asset_id: df.id,
-                                              asset_class: df.class }
-    assert_redirected_to :root
-    assert_not_nil flash[:error]
+    assert_enqueued_emails 0 do
+      post :cancel_publishing_request, params: { id: a_person,
+                                                asset_id: df.id,
+                                                asset_class: df.class }
+      assert_redirected_to :root
+      assert_not_nil flash[:error]
+    end
 
     # Another person cannot access cancel_publishing_request without manage rights
     login_as(another_person)
-    post :cancel_publishing_request, params: { id: another_person,
-                                              asset_id: df.id,
-                                              asset_class: df.class }
-    assert_redirected_to :root
-    assert_not_nil flash[:error]
+    assert_enqueued_emails 0 do
+      post :cancel_publishing_request, params: { id: another_person,
+                                                asset_id: df.id,
+                                                asset_class: df.class }
+      assert_redirected_to :root
+      assert_not_nil flash[:error]
+    end
 
     # A person who created publish request can cancel_publishing_request
     login_as(a_person)
@@ -227,22 +231,26 @@ class BatchPublishingTest < ActionController::TestCase
     assert_select '.type_and_title', count: 1 do
       assert_select 'a[href=?]', data_file_path(df)
     end
-    post :cancel_publishing_request, params: { id: a_person,
-                                              asset_id: df.id,
-                                              asset_class: df.class }
-    assert_redirected_to waiting_approval_assets_person_path(a_person)
-    assert_nil flash[:error]
-    assert_not_nil flash[:notice]
+    assert_enqueued_emails 1 do
+      post :cancel_publishing_request, params: { id: a_person,
+                                                asset_id: df.id,
+                                                asset_class: df.class }
+      assert_redirected_to waiting_approval_assets_person_path(a_person)
+      assert_nil flash[:error]
+      assert_not_nil flash[:notice]
+    end
 
     # A person with manage rights can cancel_publishing_request, even if not the one who requested
     get :waiting_approval_assets, params: { id: a_person }
     assert_select '.type_and_title', count: 0
     assert df2.can_manage?
-    post :cancel_publishing_request, params: { id: a_person,
-                                               asset_id: df2.id,
-                                               asset_class: df2.class }
-    assert_nil flash[:error]
-    assert_not_nil flash[:notice]
+    assert_enqueued_emails 1 do
+      post :cancel_publishing_request, params: { id: a_person,
+                                                 asset_id: df2.id,
+                                                 asset_class: df2.class }
+      assert_nil flash[:error]
+      assert_not_nil flash[:notice]
+    end
   end
 
   test 'cancel_publishing_request' do

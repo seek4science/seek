@@ -98,6 +98,7 @@ module Seek
         if asset.can_manage?
           if asset.last_publishing_log.publish_state.in?([ResourcePublishLog::WAITING_FOR_APPROVAL, ResourcePublishLog::REJECTED])
             ResourcePublishLog.add_log(ResourcePublishLog::UNPUBLISHED, asset)
+            notify_gatekeepers_of_approval_request_cancellation [asset]
             flash[:notice] = "Cancelled request to publish for: #{asset.title}"
           end
           redirect_to params[:from_asset] ? asset : waiting_approval_assets_person_path and return
@@ -236,6 +237,10 @@ module Seek
 
       def notify_owner_of_publishing_request(items)
         deliver_publishing_notification_emails :managers, items, :request_publish
+      end
+
+      def notify_gatekeepers_of_approval_request_cancellation(items)
+        deliver_publishing_notification_emails :asset_gatekeepers, items, :publishing_request_cancellation
       end
 
       # returns an enumeration of assets for publishing based upon the parameters passed
