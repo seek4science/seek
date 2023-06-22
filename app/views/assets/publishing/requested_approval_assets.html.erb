@@ -16,23 +16,25 @@
   </p>
 </div>
 
-<% if @requested_approval_assets.empty? %>
+<% if @waiting_approval_assets.empty? %>
     <span class="none_text">There are no items waiting for your approval</span>
-
+    <div>
     <%= button_link_to "Back to your profile", 'back', person_path(params[:id].to_i) -%>
+    </div>
 <% else %>
     <%= form_tag :action => :gatekeeper_decide do %>
-    <h1><%= (@requested_approval_assets.count > 1)? 'The following items have been requested to be published' : 'The following item has been requested to be published' %></h1>
-        <% @requested_approval_assets.each do |asset| %>
-            <div class="item_for_decision row">
-              <div class="col-sm-10">
-                <div class="type_and_title form-group">
+      <div class="waiting_approval_items">
+    <h1 style="margin:8px 0px;">Waiting your approval to be published:</h1>
+        <% @waiting_approval_assets.each do |asset| %>
+            <ul class="item_for_decision row">
+              <div class="col-sm-12">
+                <li class="type_and_title">
                   <b><%= text_for_resource asset -%> : </b>
                     <%= link_to(asset.title, asset,option={target: :_blank}) -%>
                     <%= list_item_visibility(asset) -%>
-                </div>
+                </li>
 
-                <div class="request_info form-group">
+                <div class="request_info">
                   <label>Requested by </label>
                     <% asset.publish_requesters.each do |requester| %>
                         <%= link_to(requester.name, requester, option={target: :_blank}) %>
@@ -41,23 +43,24 @@
                     <% end %>
                 </div>
 
-                <div class="container">
+                <div class="container" style="width:100%">
                   <div class="row">
-                    <div class="col-md-4">
+                    <div>
                       <label class="radio-inline"><input type="radio" name="gatekeeper_decide[<%= asset.class.name %>][<%= asset.id %>][decision]" value="1">Approve</label>
                       <label class="radio-inline"><input type="radio" name="gatekeeper_decide[<%= asset.class.name %>][<%= asset.id %>][decision]" value="0">Reject</label>
-                      <label class="radio-inline"><input type="radio" name="gatekeeper_decide[<%= asset.class.name %>][<%= asset.id %>][decision]" value="-1" checked>Decide later</label></div>
-                    <div class="col-md-6">
+                      <label class="radio-inline"><input type="radio" name="gatekeeper_decide[<%= asset.class.name %>][<%= asset.id %>][decision]" value="-1" checked>Decide later</label>
+                    </div>
+                    <div>
                         <label>Reason or other comments (optional)</label>
                         <%= text_area_tag "gatekeeper_decide[#{asset.class.name}][#{asset.id}][comment]", nil,
                                           :rows => 3, :class => 'form-control' -%>
-
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </ul>
         <% end %>
+      </div>
 
         <p>
           <%= submit_tag "Submit", data: { disable_with: 'Submitting ...' }, :class => 'btn btn-primary' -%>
@@ -66,4 +69,33 @@
         </p>
     <% end %>
 <% end %>
+  <% unless @rejected_assets.empty? %>
+    <a class="rejected_items" href="#" style="display:block;" onclick="$j('.rejected_items').toggle();return false;">Show rejected</a>
+    <a class="rejected_items" href="#" style="display:none;" onclick="$j('.rejected_items').toggle();return false;">Hide rejected</a>
+    <div class="rejected_items" style="display:none;">
+      <h3 style="margin:8px 0px;">Items with rejected status:</h3>
+      <% @rejected_assets.each do |asset| %>
+        <ul class="item_waiting_for_approval">
+          <li class="type_and_title">
+            <b><%= text_for_resource asset -%> : </b>
+            <%= link_to(asset.title, asset,option={target: :_blank}) -%>
+            <%= list_item_visibility(asset) -%>
+          </li>
+          <div class="request_info">
+            Requested by
+            <% asset.publish_requesters.each do |requester| %>
+              <%= link_to(requester.name, requester, option={target: :_blank}) %>
+              on
+              <%= date_as_string(asset.resource_publish_logs.last(2).first.created_at,true) %>
+            <% end %>
+            <br/>
+            Rejected on:&nbsp;
+            <%= date_as_string(asset.last_publishing_log.created_at,true) %>
+
+            Comments: <%= asset.last_publishing_log.comment %>
+          </div>
+        </ul>
+      <% end %>
+    </div>
+  <% end %>
 </div>

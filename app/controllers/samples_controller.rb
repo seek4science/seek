@@ -13,6 +13,7 @@ class SamplesController < ApplicationController
   before_action :auth_to_create, only: %i[new create batch_create]
 
   include Seek::IsaGraphExtensions
+  include Seek::Publishing::PublishingCommon
 
   def index
     # There must be better ways of coding this

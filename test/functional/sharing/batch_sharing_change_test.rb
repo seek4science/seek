@@ -131,6 +131,111 @@ class BatchSharingChangeTest < ActionController::TestCase
 
   end
 
+  test 'should notify gatekeeper and create logs if necessary' do
+
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    refute_empty gatekeeper.projects
+    a_person = FactoryBot.create(:person, project: gatekeeper.projects.first)
+    login_as(a_person.user)
+
+    gk_model = FactoryBot.create(:model, contributor: a_person, title: 'GKModel', projects: [gatekeeper.projects.first], policy: FactoryBot.create(:private_policy))
+    gk_df = FactoryBot.create(:data_file, contributor: a_person, title: 'GKDataFile', projects: [gatekeeper.projects.first], policy: FactoryBot.create(:private_policy))
+    df = FactoryBot.create(:data_file, contributor: a_person, title: 'OpenDataFile', projects: [@person.projects.first], policy: FactoryBot.create(:private_policy))
+
+    assert gk_model.policy.access_type == Policy::NO_ACCESS
+    assert gk_df.policy.access_type == Policy::NO_ACCESS
+    assert df.policy.access_type == Policy::NO_ACCESS
+    assert gk_model.gatekeeper_required?
+    assert gk_df.gatekeeper_required?
+    assert !df.gatekeeper_required?
+
+    # Batch change sharing policy params
+    params = { share_not_isa: {}, share_isa: {}}
+    params[:share_not_isa][gk_model.class.name] ||= {}
+    params[:share_not_isa][gk_model.class.name][gk_model.id.to_s] = '1'
+    params[:share_isa][gk_df.class.name] ||= {}
+    params[:share_isa][gk_df.class.name][gk_df.id.to_s] = '1'
+    params[:share_isa][df.class.name] ||= {}
+    params[:share_isa][df.class.name][df.id.to_s] = '1'
+    params = params.merge(id: a_person.id)
+
+    # Can't make public without involving gatekeeper
+    params[:policy_attributes] = { access_type: Policy::ACCESSIBLE }
+    assert_enqueued_emails(2) do
+      post :batch_sharing_permission_changed, params: params
+      assert_response :success
+      # Flash correctly displayed
+      assert_select 'div#notice_flash', count: 1 do
+        assert_select 'ul#ok', count: 1 do
+          assert_select 'li', text: df.title, count: 1
+        end
+        assert_select 'ul#gk', count: 1 do
+          assert_select 'li', count: 2
+          assert_select 'li', text: gk_df.title
+          assert_select 'li', text: gk_model.title
+        end
+      end
+    end
+    gk_model.reload
+    gk_df.reload
+    df.reload
+    # Policies and publish logs correctly saved
+    assert gk_model.policy.access_type == Policy::NO_ACCESS
+    assert gk_df.policy.access_type == Policy::NO_ACCESS
+    assert df.policy.access_type == Policy::ACCESSIBLE
+    assert gk_model.is_waiting_approval?
+    assert gk_df.is_waiting_approval?
+    assert df.is_published?
+
+    # Can make visible without involving gatekeeper
+    params[:policy_attributes] = { access_type: Policy::VISIBLE }
+    assert_enqueued_emails(0) do
+      post :batch_sharing_permission_changed, params: params
+      assert_response :success
+      # Flash correctly displayed
+      assert_select 'div#notice_flash', count: 1 do
+        assert_select 'ul#ok', count: 1 do
+          assert_select 'li', count: 3
+          assert_select 'li', text: df.title
+          assert_select 'li', text: gk_df.title
+          assert_select 'li', text: gk_model.title
+        end
+        assert_select 'ul#gk', count: 0
+      end
+    end
+    gk_model.reload
+    gk_df.reload
+    df.reload
+    # Policies correctly saved
+    assert gk_model.policy.access_type == Policy::VISIBLE
+    assert gk_df.policy.access_type == Policy::VISIBLE
+    assert df.policy.access_type == Policy::VISIBLE
+
+    # Can hide from public without involving gatekeeper
+    params[:policy_attributes] = { access_type: Policy::NO_ACCESS }
+    assert_enqueued_emails(0) do
+      post :batch_sharing_permission_changed, params: params
+      assert_response :success
+      # Flash correctly displayed
+      assert_select 'div#notice_flash', count: 1 do
+        assert_select 'ul#ok', count: 1 do
+          assert_select 'li', count: 3
+          assert_select 'li', text: df.title
+          assert_select 'li', text: gk_df.title
+          assert_select 'li', text: gk_model.title
+        end
+        assert_select 'ul#gk', count: 0
+      end
+    end
+    gk_model.reload
+    gk_df.reload
+    df.reload
+    # Policies correctly saved
+    assert gk_model.policy.access_type == Policy::NO_ACCESS
+    assert gk_df.policy.access_type == Policy::NO_ACCESS
+    assert df.policy.access_type == Policy::NO_ACCESS
+  end
+
 
 
   private

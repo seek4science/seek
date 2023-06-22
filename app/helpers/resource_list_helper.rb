@@ -41,6 +41,8 @@ module ResourceListHelper
       describe_license(column_value)
     when 'country'
       country_text_or_not_specified(column_value)
+    when 'doi'
+      doi_link(resource.latest_citable_resource.doi) if resource.has_doi?
     else
       if column_value.try(:acts_like_time?)
         date_as_string(column_value, true)

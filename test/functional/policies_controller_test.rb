@@ -58,24 +58,78 @@ class PoliciesControllerTest < ActionController::TestCase
     assert_select 'div.access-type-manage li', text: "#{contributor.name}", count: 1
   end
 
-  test 'should show notice message when an item is requested to be published' do
+  test 'should not show notice message when an item is requested to be visible - sop' do
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    sop = FactoryBot.create(:sop, project_ids: gatekeeper.projects.map(&:id))
+
+    login_as(sop.contributor)
+    post :preview_permissions, params: { policy_attributes: { access_type: Policy::VISIBLE }, resource_name: 'sop', resource_id: sop.id, project_ids: gatekeeper.projects.first.id.to_s }
+
+    assert_select '#preview_permissions div.alert', count: 0
+  end
+
+  test 'should show notice message when an item is requested to be visible - study' do
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    refute_empty gatekeeper.projects
+    a_person = FactoryBot.create(:person, project: gatekeeper.projects.first)
+    inv = FactoryBot.create(:investigation, contributor: gatekeeper)
+    study = FactoryBot.create(:study, investigation: inv, contributor: a_person)
+    assert_equal study.projects, gatekeeper.projects
+    login_as(a_person.user)
+    assert study.can_manage?
+
+    post :preview_permissions, params: { policy_attributes: { access_type: Policy::VISIBLE }, resource_name: 'study', resource_id: study.id}
+
+    assert_select '#preview_permissions div.alert', text: "An email will be sent to the #{I18n.t('asset_gatekeeper').pluralize.downcase} of the #{I18n.t('project').pluralize} associated with this #{I18n.t('study')} to ask for publishing approval. This #{I18n.t('study')} will not be published until one of the #{I18n.t('asset_gatekeeper').pluralize.downcase} has granted approval.", count: 1
+  end
+
+  test 'should show notice message when an item is requested to be accessible' do
     gatekeeper = FactoryBot.create(:asset_gatekeeper)
     sop = FactoryBot.create(:sop, project_ids: gatekeeper.projects.map(&:id))
     login_as(sop.contributor)
-    post :preview_permissions, params: { policy_attributes: projects_policy(Policy::VISIBLE, [gatekeeper.projects.first], Policy::ACCESSIBLE), resource_name: 'sop', resource_id: sop.id, project_ids: gatekeeper.projects.first.id.to_s }
+    post :preview_permissions, params: { policy_attributes: { access_type: Policy::ACCESSIBLE }, resource_name: 'sop', resource_id: sop.id, project_ids: gatekeeper.projects.first.id.to_s }
 
     assert_select '#preview_permissions div.alert', text: "An email will be sent to the #{I18n.t('asset_gatekeeper').pluralize.downcase} of the #{I18n.t('project').pluralize} associated with this #{I18n.t('sop')} to ask for publishing approval. This #{I18n.t('sop')} will not be published until one of the #{I18n.t('asset_gatekeeper').pluralize.downcase} has granted approval.", count: 1
   end
 
-  test 'should show notice message when an item is requested to be published and the request was alread sent by this user' do
+  test 'should show notice message when an item is requested to be published and the request was already sent by this user' do
     gatekeeper = FactoryBot.create(:asset_gatekeeper)
     sop = FactoryBot.create(:sop, project_ids: gatekeeper.projects.map(&:id))
     login_as(sop.contributor)
     ResourcePublishLog.add_log ResourcePublishLog::WAITING_FOR_APPROVAL, sop
-    post :preview_permissions, params: { policy_attributes: { access_type: Policy::VISIBLE }, resource_name: 'sop', resource_id: sop.id, project_ids: gatekeeper.projects.first.id.to_s }
+    post :preview_permissions, params: { policy_attributes: { access_type: Policy::ACCESSIBLE }, resource_name: 'sop', resource_id: sop.id, project_ids: gatekeeper.projects.first.id.to_s }
 
     assert_select '#preview_permissions div.alert', text: "You requested the publishing approval from one of the #{I18n.t('asset_gatekeeper').pluralize.downcase } of the #{I18n.t('project').pluralize} associated with this #{I18n.t('sop')}, and it is waiting for the decision. This #{I18n.t('sop')} will not be published until one of the #{I18n.t('asset_gatekeeper').pluralize.downcase } has granted approval.", count: 1
   end
+
+  test 'should show notice message when an item is requested to be published and the request was already rejected - sop' do
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    sop = FactoryBot.create(:sop, project_ids: gatekeeper.projects.map(&:id))
+    login_as(sop.contributor)
+    ResourcePublishLog.add_log ResourcePublishLog::REJECTED, sop
+    assert sop.is_rejected?
+    post :preview_permissions, params: { policy_attributes: { access_type: Policy::ACCESSIBLE }, resource_name: 'sop', resource_id: sop.id, project_ids: gatekeeper.projects.first.id.to_s }
+
+    assert_select '#preview_permissions div.alert', text: "You requested the publishing approval from one of the #{I18n.t('asset_gatekeeper').pluralize.downcase } of the #{I18n.t('project').pluralize} associated with this #{I18n.t('sop')}, and it was rejected.Make sure you have resolved the gatekeeper's comments before requesting publishing again.", count: 1
+
+  end
+
+  test 'should show notice message when an item is requested to be published and the request was already rejected - study' do
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    refute_empty gatekeeper.projects
+    a_person = FactoryBot.create(:person, project: gatekeeper.projects.first)
+    inv = FactoryBot.create(:investigation, contributor: gatekeeper)
+    study = FactoryBot.create(:study, investigation: inv, contributor: a_person)
+    assert_equal study.projects, gatekeeper.projects
+    login_as(a_person.user)
+    assert study.can_manage?
+    ResourcePublishLog.add_log ResourcePublishLog::REJECTED, study
+    assert study.is_rejected?
+
+    post :preview_permissions, params: { policy_attributes: { access_type: Policy::VISIBLE }, resource_name: 'study', resource_id: study.id }
+
+    assert_select '#preview_permissions div.alert', text: "You requested the publishing approval from one of the #{I18n.t('asset_gatekeeper').pluralize.downcase } of the #{I18n.t('project').pluralize} associated with this #{I18n.t('study')}, and it was rejected.Make sure you have resolved the gatekeeper's comments before requesting publishing again.", count: 1
+end
 
   test 'should not show notice message when an item can be published right away' do
     post :preview_permissions, params: { policy_attributes: { access_type: Policy::VISIBLE }, resource_name: 'sop', project_ids: FactoryBot.create(:project).id.to_s }
@@ -126,7 +180,6 @@ class PoliciesControllerTest < ActionController::TestCase
     item = FactoryBot.create(:sop, policy: FactoryBot.create(:policy), project_ids: gatekeeper.projects.collect(&:id))
     FactoryBot.create(:permission, contributor: a_person, access_type: Policy::MANAGING, policy: item.policy)
     item.reload
-
     login_as(a_person.user)
     assert item.can_manage?
 

@@ -537,20 +537,94 @@ class SopsControllerTest < ActionController::TestCase
     assert_select 'p.list_item_attribute', text: /#{I18n.t('creator').pluralize.capitalize}: None/, count: no_other_creator_sops.count
   end
 
-  test 'should set the policy to projects_policy if the item is requested to be published, when creating new sop' do
+  test 'should set the policy access_type to No_ACCESS if the item is requested to be published, when creating new sop' do
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    @user.person.add_to_project_and_institution(gatekeeper.projects.first, FactoryBot.create(:institution))
+    post :create, params: { sop: { title: 'test', project_ids: gatekeeper.projects.collect(&:id) }, content_blobs: [{ data: picture_file }],
+                            policy_attributes: {access_type: Policy::ACCESSIBLE,
+                                                permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: FactoryBot.create(:person).id, access_type: Policy::VISIBLE},
+                                                                         '2' => {contributor_type: 'Person', contributor_id: FactoryBot.create(:person).id, access_type: Policy::MANAGING}
+                            } } }
+    sop = assigns(:sop)
+    assert_redirected_to (sop)
+    policy = sop.policy
+    assert_equal Policy::NO_ACCESS, policy.access_type
+    assert_enqueued_emails 1
+    assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL, sop.last_publishing_log.publish_state
+    assert_equal 2, policy.permissions.count
+    assert_equal Policy::VISIBLE, policy.permissions.first.access_type
+    assert_equal Policy::MANAGING, policy.permissions.second.access_type
+  end
+
+  test 'should allow to set the policy to visible when creating new sop' do
     gatekeeper = FactoryBot.create(:asset_gatekeeper)
     @user.person.add_to_project_and_institution(gatekeeper.projects.first, FactoryBot.create(:institution))
     post :create, params: { sop: { title: 'test', project_ids: gatekeeper.projects.collect(&:id) }, content_blobs: [{ data: picture_file }], policy_attributes: { access_type: Policy::VISIBLE } }
     sop = assigns(:sop)
     assert_redirected_to (sop)
     policy = sop.policy
-    assert_equal Policy::NO_ACCESS, policy.access_type
-    assert_equal 1, policy.permissions.count
-    assert_equal gatekeeper.projects.first, policy.permissions.first.contributor
-    assert_equal Policy::ACCESSIBLE, policy.permissions.first.access_type
+    assert_equal Policy::VISIBLE, policy.access_type
   end
 
-  test 'should not change the policy if the item is requested to be published, when managing sop' do
+  test 'should not allow to change the policy to published when managing sop' do
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    policy = FactoryBot.create(:policy, access_type: Policy::NO_ACCESS, permissions: [FactoryBot.create(:permission)])
+    sop = FactoryBot.create(:sop, project_ids: gatekeeper.projects.collect(&:id), policy: policy)
+    login_as(sop.contributor)
+    assert sop.can_manage?
+    put :update, params: { id: sop.id, sop: { title: sop.title }, policy_attributes: { access_type: Policy::ACCESSIBLE } }
+    sop = assigns(:sop)
+    # Does not update policy
+    assert_equal Policy::NO_ACCESS, sop.policy.access_type
+    assert_redirected_to(sop)
+    # Gatekeeper knows - Logs adequately
+    assert_enqueued_emails 1
+    assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL, sop.last_publishing_log.publish_state
+  end
+
+  test 'manage_update with gatekeeper - should not allow to publish' do
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    policy = FactoryBot.create(:policy, access_type: Policy::NO_ACCESS, permissions: [FactoryBot.create(:permission)])
+    sop = FactoryBot.create(:sop, project_ids: gatekeeper.projects.collect(&:id), policy: policy)
+    login_as(sop.contributor)
+    assert sop.can_manage?
+    patch :manage_update, params: { id: sop,
+                                           sop: { creator_ids: [sop.contributor.id],
+                                                  project_ids: [gatekeeper.projects.collect(&:id)] },
+                                           policy_attributes: { access_type: Policy::ACCESSIBLE } }
+    sop.reload
+    # Does not update policy
+    assert_equal Policy::NO_ACCESS, sop.policy.access_type
+    assert_redirected_to sop
+    # User knows - Flash indicates to user that it is in gatekeeper's hands
+    assert_includes flash[:notice],("gatekeeper's approval list.")
+    # Gatekeeper knows - Logs adequately
+    assert_enqueued_emails 1
+    assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL, sop.last_publishing_log.publish_state
+  end
+
+  test 'manage_update with gatekeeper - should allow to make visible' do
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    policy = FactoryBot.create(:policy, access_type: Policy::NO_ACCESS, permissions: [FactoryBot.create(:permission)])
+    sop = FactoryBot.create(:sop, project_ids: gatekeeper.projects.collect(&:id), policy: policy)
+    login_as(sop.contributor)
+    assert sop.can_manage?
+    patch :manage_update, params: { id: sop,
+                                    sop: { creator_ids: [sop.contributor.id],
+                                           project_ids: [gatekeeper.projects.collect(&:id)] },
+                                    policy_attributes: { access_type: Policy::VISIBLE } }
+    sop.reload
+    # Does update policy
+    assert_equal Policy::VISIBLE, sop.policy.access_type
+    assert_redirected_to sop
+    # User knows - Flash indicates success
+    assert_equal 'SOP was successfully updated.', flash[:notice]
+    # Gatekeeper does not need to know
+    assert_enqueued_emails 0
+    assert_nil sop.last_publishing_log
+  end
+
+  test 'should allow to change the policy to visible' do
     gatekeeper = FactoryBot.create(:asset_gatekeeper)
     policy = FactoryBot.create(:policy, access_type: Policy::NO_ACCESS, permissions: [FactoryBot.create(:permission)])
     sop = FactoryBot.create(:sop, project_ids: gatekeeper.projects.collect(&:id), policy: policy)
@@ -558,10 +632,14 @@ class SopsControllerTest < ActionController::TestCase
     assert sop.can_manage?
     put :update, params: { id: sop.id, sop: { title: sop.title }, policy_attributes: { access_type: Policy::VISIBLE } }
     sop = assigns(:sop)
+    # Does update policy
+    assert_equal Policy::VISIBLE, sop.policy.access_type
     assert_redirected_to(sop)
-    updated_policy = sop.policy
-    assert_equal policy, updated_policy
-    assert_equal policy.permissions, updated_policy.permissions
+    # User knows - Flash indicates success
+    assert_equal "SOP metadata was successfully updated.",flash[:notice]
+    # Gatekeeper does not need to know
+    assert_enqueued_emails 0
+    assert_nil sop.last_publishing_log
   end
 
   test 'should be able to view pdf content' do
@@ -715,7 +793,7 @@ class SopsControllerTest < ActionController::TestCase
       put :update, params: { sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::ACCESSIBLE } }
     end
 
-    assert_empty ResourcePublishLog.requested_approval_assets_for(gatekeeper)
+    assert_empty ResourcePublishLog.requested_approval_assets_for_gatekeeper(gatekeeper)
   end
 
   test 'dont send publish approval request if item is only being made visible' do
@@ -729,7 +807,7 @@ class SopsControllerTest < ActionController::TestCase
       put :update, params: { sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::VISIBLE } }
     end
 
-    assert_empty ResourcePublishLog.requested_approval_assets_for(gatekeeper)
+    assert_empty ResourcePublishLog.requested_approval_assets_for_gatekeeper(gatekeeper)
   end
 
   test 'send publish approval request if elevating permissions from VISIBLE -> ACCESSIBLE' do
@@ -749,7 +827,7 @@ class SopsControllerTest < ActionController::TestCase
     assert sop.can_view?(nil)
     refute sop.can_download?(nil)
 
-    assert_includes ResourcePublishLog.requested_approval_assets_for(gatekeeper), sop
+    assert_includes ResourcePublishLog.requested_approval_assets_for_gatekeeper(gatekeeper), sop
   end
 
   test 'should not loose permissions when managing a sop' do

@@ -850,6 +850,47 @@ class ContentBlobsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'examine url with redirect' do
+    stub_request(:head, 'http://website.com/file.pdf').to_return(status: 302, headers: { 'Location' => 'https://website.com/file.pdf' })
+    stub_request(:head, 'https://website.com/file.pdf').to_return(status: 200, headers: { 'Content-Type' => 'application/pdf' })
+    stub_request(:get, 'http://website.com/file.pdf').to_return(status: 302, headers: { 'Content-Type' => 'application/pdf' })
+    get :examine_url, xhr: true, params: { data_url: 'http://website.com/file.pdf' }
+    assert_response 200
+    assert_equal 200, assigns(:info)[:code]
+    assert_equal 'application/pdf', assigns(:info)[:content_type]
+    assert_equal 'file.pdf', assigns(:info)[:file_name]
+  end
+
+  test 'examine url with redirect to 403' do
+    stub_request(:head, 'http://unauth.com/file.pdf').to_return(status: 302, headers: { 'Location' => 'https://unauth.com/file.pdf' })
+    stub_request(:head, 'https://unauth.com/file.pdf').to_return(status: 403, headers: { 'Content-Type' => 'application/pdf' })
+    stub_request(:get, 'http://unauth.com/file.pdf').to_return(status: 302, headers: { 'Location' => 'https://unauth.com/file.pdf' })
+    stub_request(:get, 'https://unauth.com/file.pdf').to_return(status: 403, headers: { 'Content-Type' => 'application/pdf' })
+    get :examine_url, xhr: true, params: { data_url: 'http://unauth.com/file.pdf' }
+    assert_response 200
+    assert_equal 403, assigns(:info)[:code]
+    assert_equal 'application/pdf', assigns(:info)[:content_type]
+    assert_equal 'file.pdf', assigns(:info)[:file_name]
+    assert @response.body.include?('Access to this link is unauthorized')
+    assert_equal 'warning', assigns(:type)
+    assert assigns(:warning_msg)
+  end
+
+  test 'examine url with redirect to 403 preserves content type' do
+    stub_request(:head, 'http://unauth.com/some/path').to_return(status: 302, headers: { 'Location' => 'https://unauth.com/some/path' })
+    stub_request(:head, 'https://unauth.com/some/path').to_return(status: 403, headers: { 'Content-Type' => 'text/html' })
+    stub_request(:get, 'http://unauth.com/some/path').to_return(status: 302, headers: { 'Location' => 'https://unauth.com/some/path' })
+    stub_request(:get, 'https://unauth.com/some/path').to_return(status: 403, headers: { 'Content-Type' => 'text/html' })
+    get :examine_url, xhr: true, params: { data_url: 'http://unauth.com/some/path' }
+    assert_response 200
+    assert_equal 403, assigns(:info)[:code]
+    assert_equal 'text/html', assigns(:info)[:content_type]
+    assert_equal 'path', assigns(:info)[:file_name]
+    assert @response.body.include?('Access to this link is unauthorized')
+    assert_equal 'warning', assigns(:type)
+    assert assigns(:warning_msg)
+  end
+
   private
 
   def mock_http

@@ -5,7 +5,7 @@ module Seek
 
       def initialize(message = nil, code: nil)
         super(message)
-        @code = code
+        @code = code&.to_i
       end
     end
   end
