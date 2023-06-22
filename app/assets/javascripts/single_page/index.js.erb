@@ -248,7 +248,7 @@ async function exportToExcel(tableName, studyId, assayId, sampleTypeId) {
       $j.ajax({
         type: 'POST',
         url: '<%= export_to_excel_single_pages_path() %>',
-        data: { source_sample_data: JSON.stringify(data),
+        data: { sample_data: JSON.stringify(data),
           sample_type_id: JSON.stringify(sampleTypeId),
           study_id: JSON.stringify(studyId),
           assay_id: JSON.stringify(assayId),

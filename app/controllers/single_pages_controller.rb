@@ -108,7 +108,8 @@ class SinglePagesController < ApplicationController
 
   def export_to_excel
     cache_uuid = UUID.new.generate
-    sample_ids = JSON.parse(params[:source_sample_data]).map { |sample| sample['FAIRDOM-SEEK id'] if sample['FAIRDOM-SEEK id'] != '#HIDDEN' }
+    id_label = "#{Seek::Config::instance_name} id"
+    sample_ids = JSON.parse(params[:sample_data]).map { |sample| sample[id_label] unless sample[id_label] == '#HIDDEN' }
     sample_type_id = JSON.parse(params[:sample_type_id])
     study_id = JSON.parse(params[:study_id])
     assay_id = JSON.parse(params[:assay_id])
