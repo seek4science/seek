@@ -1716,4 +1716,25 @@ class WorkflowsControllerTest < ActionController::TestCase
     log = workflow.activity_logs.last
     assert_equal 'download', log.action
   end
+
+  test 'lists doi in index in table view' do
+    Workflow.delete_all
+
+    no_doi_workflow = FactoryBot.create(:public_workflow)
+    workflow = FactoryBot.create(:public_workflow)
+    v = workflow.latest_version
+    disable_authorization_checks do
+      assert v.update(doi: '10.81082/dev-workflowhub.workflow.136.1')
+    end
+
+    get :index, params: { view: 'table', table_cols: 'creators,projects,version,license,doi' }
+    assert_response :success
+    assert_select '.list_items_container tbody tr', count: 2
+    assert_select '.list_items_container tbody tr' do
+      assert_select 'td a[href=?]', 'https://doi.org/10.81082/dev-workflowhub.workflow.136.1'
+    end
+
+    # Reset the view parameter
+    session.delete(:view)
+  end
 end

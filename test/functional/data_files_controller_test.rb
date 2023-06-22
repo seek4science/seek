@@ -465,6 +465,32 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal 'text/html', assigns(:data_file).content_blob.content_type
   end
 
+  test 'should add link to a webpage with redirect to 403' do
+    stub_request(:head, 'http://unauth.com/some/path').to_return(status: 302, headers: { 'Location' => 'https://unauth.com/some/path' })
+    stub_request(:head, 'https://unauth.com/some/path').to_return(status: 403, headers: { 'Content-Type' => 'text/html' })
+    stub_request(:get, 'http://unauth.com/some/path').to_return(status: 302, headers: { 'Location' => 'https://unauth.com/some/path' })
+    stub_request(:get, 'https://unauth.com/some/path').to_return(status: 403, headers: { 'Content-Type' => 'text/html' })
+
+    data_file = { title: 'Test HTTP', project_ids: [projects(:sysmo_project).id] }
+    blob = { data_url: 'http://unauth.com/some/path' }
+
+    assert_difference('DataFile.count') do
+      assert_difference('ContentBlob.count') do
+        post :create, params: { data_file: data_file, content_blobs: [blob], policy_attributes: valid_sharing }
+      end
+    end
+
+    assert_redirected_to data_file_path(assigns(:data_file))
+    assert_equal users(:datafile_owner).person, assigns(:data_file).contributor
+    refute assigns(:data_file).content_blob.url.blank?
+    assert assigns(:data_file).content_blob.data_io_object.nil?
+    refute assigns(:data_file).content_blob.file_exists?
+    assert_equal 'path', assigns(:data_file).content_blob.original_filename
+    assert assigns(:data_file).content_blob.is_webpage?
+    assert_equal 'http://unauth.com/some/path', assigns(:data_file).content_blob.url
+    assert_equal 'text/html', assigns(:data_file).content_blob.content_type
+  end
+
   test 'should show webpage as a link' do
     mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html", 'http://webpage.com', 'Content-Type' => 'text/html'
 
@@ -2998,6 +3024,44 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal df, al.activity_loggable
     assert_equal person.user, al.culprit
 
+  end
+
+  test 'create metadata with gatekeeper - cannot publish' do
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    person = FactoryBot.create(:person)
+    person.person.add_to_project_and_institution(gatekeeper.projects.first, FactoryBot.create(:institution))
+    login_as(person)
+    blob = FactoryBot.create(:content_blob)
+    session[:uploaded_content_blob_id] = blob.id
+    post :create_metadata, params: { data_file: { title: 'Gatekept File', project_ids: gatekeeper.projects.collect(&:id) },
+                                     content_blob_id: blob.id.to_s,
+                                     policy_attributes: { access_type: Policy::ACCESSIBLE },
+                                     assay_ids: [] }
+    assert (df = assigns(:data_file))
+    assert_redirected_to df
+    policy = df.policy
+    assert_equal Policy::NO_ACCESS, policy.access_type
+    assert_enqueued_emails 1
+    assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL, df.last_publishing_log.publish_state
+  end
+
+  test 'create metadata with gatekeeper - can make visible' do
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    person = FactoryBot.create(:person)
+    person.person.add_to_project_and_institution(gatekeeper.projects.first, FactoryBot.create(:institution))
+    login_as(person)
+    blob = FactoryBot.create(:content_blob)
+    session[:uploaded_content_blob_id] = blob.id
+    post :create_metadata, params: { data_file: { title: 'Gatekept File', project_ids: gatekeeper.projects.collect(&:id) },
+                                     content_blob_id: blob.id.to_s,
+                                     policy_attributes: { access_type: Policy::VISIBLE },
+                                     assay_ids: [] }
+    assert (df = assigns(:data_file))
+    assert_redirected_to df
+    policy = df.policy
+    assert_equal Policy::VISIBLE, policy.access_type
+    assert_enqueued_emails 0
+    assert_nil df.last_publishing_log
   end
 
   test 'create metadata with associated assay' do
