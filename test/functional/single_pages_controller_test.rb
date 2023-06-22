@@ -3,6 +3,8 @@ require 'test_helper'
 class SinglePagesControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
 
+  fixtures :isa_tags, :templates
+
   def setup
     @member = FactoryBot.create :user
     login_as @member
@@ -84,7 +86,8 @@ class SinglePagesControllerTest < ActionController::TestCase
 
       post_params = { source_sample_data: sample_ids.to_json,
                       sample_type_id: sample_type_id.to_json,
-                      study_id: study_id.to_json }
+                      study_id: study_id.to_json,
+                      assay_id: nil.to_json }
 
       post :export_to_excel, params: post_params, xhr: true
 
@@ -95,8 +98,7 @@ class SinglePagesControllerTest < ActionController::TestCase
       cache_uuid = response_body["uuid"]
 
       get :download_samples_excel, params: { uuid: cache_uuid }
-      assert_response :ok, msg = "Unable to generate the excel"
-
+      assert_response :ok, msg = 'Unable to generate the excel'
     end
   end
 end
