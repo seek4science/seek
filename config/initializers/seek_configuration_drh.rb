@@ -27,7 +27,6 @@ SEEK::Application.configure do
 
   # Enabled/Disabled resource types
   Seek::Config.programmes_enabled = true
-  Seek::Config.file_templates_enabled = true
   Seek::Config.sample_type_template_enabled = true
 
   # Enabled/Disabled integrations
