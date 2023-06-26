@@ -131,8 +131,16 @@ class NelsRestClientTest < ActiveSupport::TestCase
   end
 
   test 'create folder' do
-    VCR.use_cassette('nels/create_folder') do
-      @rest_client.create_folder(1125253, 'Storebioinfo/seek_pilot3/sdfsdfsdf/Analysis', 'test_create')
+    VCR.configure do |c|
+      c.before_http_request do |request|
+        if JSON.parse(request.body)['method'] == 'add'
+          raise RestClient::Exceptions::ReadTimeout.new
+        end
+      end
+    end
+
+    VCR.use_cassette('nels/sbi_storage_list_create_folder') do
+      @rest_client.create_folder(1125299, 1125261, 'Storebioinfo/seek_pilot3/Demo Dataset/Analysis/', 'test')
     end
   end
 

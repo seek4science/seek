@@ -19,6 +19,13 @@
   <% end %>
 <% end %>
 
+<%= modal(id: 'create-folder-spinner', size: 'm', class: 'text-center') do %>
+  <%= modal_body do %>
+    <h1>Creating folder ...</h1>
+    <div class='large_spinner'></div>
+  <% end %>
+<% end %>
+
 <script>
     $j(document).ready(function () {
         $j('#create_folder').on('click', function () {
@@ -32,7 +39,7 @@
             let valid = true;//validateResourceFields('data','upload-file');
             if (valid) {
                 $j('#create-folder-dialog').modal('hide');
-                $j('#upload-spinner').modal('show');
+                $j('#create-folder-spinner').modal('show');
                 let data = new FormData($j('#create-folder-form')[0]);
                 $j.ajax({
                     url: '<%= create_folder_nels_path() %>',
@@ -46,11 +53,11 @@
                         const datasetId = data.get('dataset_id');
                         const subtype = data.get('subtype_name');
                         const folder_path = data.get('file_path');
-                        $j('#upload-spinner').modal('hide');
+                        $j('#create-folder-spinner').modal('hide');
                         showSubtype(projectId, datasetId, subtype, folder_path, '<%= params[:assay_id] %>');
                     },
                     error: function (request, status, error) {
-                        $j('#upload-spinner').modal('hide');
+                        $j('#create-folder-spinner').modal('hide');
                         // not acceptable
                         if (request.status == 406) {
                             const msg = request.responseJSON['error'];
@@ -62,7 +69,7 @@
                         }
                     },
                     complete: function (data) {
-                        $j('#upload-spinner').modal('hide');
+                        $j('#create-folder-spinner').modal('hide');
                     }
                 });
             }

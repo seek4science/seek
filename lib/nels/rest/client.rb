@@ -14,7 +14,7 @@ module Nels
       def initialize(access_token, base = nil)
         base ||= Seek::Config.nels_api_url
         @access_token = access_token
-        @base = RestClient::Resource.new(base, read_timeout: 240, open_timeout: 240)
+        @base = RestClient::Resource.new(base, timeout: 240)
       end
 
       def sanitise_storage_path(file_path)
@@ -103,17 +103,37 @@ module Nels
                 })['elements']
       end
 
-      def create_folder(dataset_id, current_path, new_folder)
+      def create_folder(project_id, dataset_id, current_path, new_folder)
+        current_path = sanitise_storage_path(current_path)
 
-        perform('/user/sbi-storage/do', :post,
-                body: {
-                  "method": 'add',
-                  "payload": {
-                    "sbi_current_path": current_path,
-                    "dataset_id": dataset_id,
-                    "new": new_folder
-                  }
-                })
+        # need to force a short timeout, and then check for the presence of the folder. As the API response never returns (by design)
+        base.options[:timeout] = 10
+
+        begin
+          perform('/user/sbi-storage/do', :post,
+                  body: {
+                    "method": 'add',
+                    "payload": {
+                      "sbi_current_path": current_path,
+                      "data_set_id": dataset_id,
+                      "new": new_folder
+                    }
+                  })
+        rescue RestClient::Exceptions::ReadTimeout
+          new_path = File.join(current_path, new_folder)
+          Timeout.timeout(240) do
+            while true
+              files = sbi_storage_list(project_id, dataset_id, current_path)
+              files = files.collect{|f| f['path']}
+              break if files.include?(new_path)
+              sleep(1)
+            end
+          end
+
+        end
+
+        expected_folder = File.join(current_path, new_folder)
+
       end
 
       # UPLOAD FILE FLOW

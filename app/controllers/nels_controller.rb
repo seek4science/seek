@@ -88,7 +88,7 @@ class NelsController < ApplicationController
 
   def create_folder
     begin
-      @rest_client.create_folder(params[:dataset_id], params[:file_path], params[:new_folder])
+      @rest_client.create_folder(params[:project_id].to_i, params[:dataset_id].to_i, params[:file_path], params[:new_folder])
       respond_to do |format|
         format.all { render json:{success: true} }
       end
