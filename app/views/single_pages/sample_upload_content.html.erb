@@ -110,6 +110,7 @@
 
   <%= submit_tag "Next", data: {disable_with: 'Next'}, :class => 'btn btn-primary', onclick: "" %>
 </div>
+
 <script type="text/javascript">
   function removeSample(elementName){
     console.log("elementName", elementName);
@@ -117,18 +118,131 @@
   }
 
   function submitUpload(){
-    $j.ajax({
-      method: "POST",
-      url: '<%= batch_change_permission_for_selected_items_single_pages_path -%>?single_page=true',
-      data: $j("#change-permission-preview-form").serialize(),
-      success: (res) => {
-        $j('#change-batch-permission').html(res);
-        // Handling 'remaining backdrop' issue when multiple modals
-        $j('#add-person-permission-modal').data("backdrop", "");
-        $j('#add-project-permission-modal').data("backdrop", "");
-        ObjectsInput.init();
-      },
-      error: (e) => { console.log(e) }
-    });
+    const newSamples = { data: getNewSamples() };
+    const updatedSamples= { data: getUpdateSamples() };
+
+    console.log('newSamples', newSamples);
+    console.log('updatedSamples', updatedSamples);
+
+    if(true){
+      uploadAjaxCall("<%= batch_create_samples_path %>", "POST", { data: JSON.stringify(newSamples) });
+      uploadAjaxCall("<%= batch_update_samples_path %>", "PUT", { data: JSON.stringify(updatedSamples) });
+    }
+
+    closeModalForm();
+    location.reload();
   }
+
+  // Retrieves the samples from the create-samples-table and the duplicate-samples-table
+  function getNewSamples(){
+    const newRows = $j('#create-samples-table tr:not(:has(th))').toArray();
+    const duplicatedRows = $j('#duplicate-samples-table tr:not([class="danger"]):not(:has(th))').toArray();
+    let createRows = newRows;
+
+    if (duplicatedRows.length > 0 && confirm("Are you sure you want to add potentially duplicated rows?")) {
+      createRows = createRows.concat(duplicatedRows);
+    }
+    console.log('createRows', createRows);
+    const sampleObjects = createRows.map((cr, index) => createSampleObject(cr, "new", index));
+
+   return sampleObjects
+  }
+
+  function getUpdateSamples(){
+    const updateRows = $j('#update-samples-table [id*="updated"]').toArray();
+
+    const sampleObjects = updateRows.map((ur, index) => createSampleObject(ur, "update", index));
+
+    return sampleObjects
+  }
+
+  function createSampleObject(row, action, index){
+
+    cells = $j(row).find('td:not(:has(".danger"))').toArray();
+    samplesObj = {};
+    cells.map(function(cell){
+      val = cell.textContent;
+      key = cell.id.match(/\[.*\]/)[0].replace('[', "").replace("]", '');
+      samplesObj[key] = val;
+    });
+
+    const {id: objId, ...attrMap} = samplesObj;
+
+    attrMap["status"] = action;
+
+    if (action === "update"){
+      return {
+        id: objId,
+        ex_id: `update-${index}-<%= @sample_type.id %>`,
+        data: {
+          type: "samples",
+          attributes: {
+            attribute_map: attrMap
+          }
+        }
+      };
+    } else {
+        return {
+          ex_id: `new-${index}-<%= @sample_type.id %>`,
+            data:{
+              type: "samples",
+              tags: null,
+              attributes: {
+              policy: {
+                access: getAccess(projectDefaultPolicy),
+                permissions: [
+                  {
+                    resource: { type: "Project", id: <%= @project.id %> },
+                    access: getPermission(projectDefaultPolicy, <%= @project.id %>)
+                  }
+                ]
+              },
+              attribute_map: attrMap
+              },
+              relationships: {
+                projects: {
+                  data: [
+                    {type: "projects", id: <%= @project.id %>}
+                  ]
+                },
+                sample_type: {
+                  data: {
+                    type: "sample_types",
+                    id: <%= @sample_type.id %>
+                  }
+                }
+              }
+            }
+        };
+    }
+  }
+  function closeModalForm(){
+    $j('#upload-excel-modal').modal('hide');
+  }
+
+  const uploadAjaxCall = (url, method, params) => {
+    const { data, cache, dataType } = params;
+    if (!url || !method) throw new Error("Parameter(s) missing");
+    return $j.ajax({
+      method,
+      url,
+      data,
+      dataType,
+      cache: cache || false,
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json"
+      },
+      beforeSend: function () {
+        $j('#check-excel-upload-result').html('<h2>Updating Samples...</h2>');
+      },
+      success: function(res) {
+        console.log("res", res);
+      },
+      error: function(err) {
+        console.log("err", err);
+      }
+    });
+  };
+
 </script>
