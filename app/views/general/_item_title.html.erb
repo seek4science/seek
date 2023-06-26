@@ -9,7 +9,7 @@ title ||= item.title || ""
 title = "#{h(title_prefix) + h(title) + h(title_postfix)}".html_safe
 buttons_partial ||= nil
 col_width = buttons_partial.nil? && !content_for?(:buttons) ? 12 : 6
-gatekeeper_status_bar = item.can_manage? && (item.is_waiting_approval? || item.is_rejected?)
+gatekeeper_status_bar = item.is_asset? && item.can_manage? && (item.is_waiting_approval? || item.is_rejected?)
 %>
 
 <div class="row contribution-header">
