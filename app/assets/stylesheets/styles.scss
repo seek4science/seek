@@ -17,6 +17,9 @@ body {
 }
 
 #navbar {
+
+  padding: 0.75rem 0;
+
   .logo_link {
     margin-right: 1em;
   }
@@ -110,7 +113,7 @@ body {
 		text-align: center;
 		padding-right: 10px;
 		float: left;
-	}	
+	}
 }
 
 a[disabled] {
