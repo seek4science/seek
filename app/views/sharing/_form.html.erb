@@ -23,5 +23,33 @@
       <% end %>
     </div>
 
+    <% if object.is_waiting_approval? || object.is_rejected? %>
+      <div class="alert alert-danger" id="gatekeeper_warning">
+        <div class="row">
+          <div class="col-sm-9" id="warning">
+            <% if object.is_waiting_approval? %>
+            You have submitted a request to publish this <%= resource_type -%>
+            and it is <b>waiting for the gatekeeper's approval</b>.
+            <% else %>
+              You have submitted a request to publish this <%= resource_type -%>
+              and <b>the gatekeeper has rejected it</b>.
+              <br>
+              Remember to address the gatekeeper's comments before requesting to publish again.
+            <% end %>
+            <br>
+            If you do not wish to publish this item anymore, make sure you cancel your request.
+          </div>
+          <div class="col-sm-2" id="cancel_button">
+            <%= button_link_to "Cancel request", 'destroy',
+                               cancel_publishing_request_person_path(current_user.person,
+                                                                     asset_id: object.id,
+                                                                     asset_class: object.class,
+                                                                     from_asset: true),
+                               options={class:'cancel_publish_request', method: :post} -%>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
     <%= render partial: 'sharing/permissions_table', locals: { object: object, policy: policy, projects: projects } %>
 <% end %>
