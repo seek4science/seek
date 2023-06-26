@@ -1,3 +1,4 @@
+<% can_upload = true %>
 <div id="upload-summary">
   <%= folding_panel("General Information", true, :id => "general-information-panel") do %>
     <% [@project, @study, @sample_type, @template]. map do | asset | %>
@@ -11,12 +12,19 @@
           <p><b><%= current_user.person.name %> is member of this project: </b><span class="glyphicon glyphicon-ok-sign" style="color: green;"></span></p>
         <% else %>
           <p><b><%= current_user.person.name %> is member of this project: </b> <span class="glyphicon glyphicon-remove-sign" style="color: red;"></span></p>
+          <% can_upload = false %>
         <% end %>
       <% else %>
         <% if asset.can_manage?%>
           <p><b><%= current_user.person.name %> can manage: </b><span class="glyphicon glyphicon-ok-sign" style="color: green;"></span></p>
         <% else %>
           <p><b><%= current_user.person.name %> can manage: </b> <span class="glyphicon glyphicon-remove-sign" style="color: red;"></span></p>
+ <%
+=begin%>
+ <% can_upload = false %>
+<%
+=end%>
+ <% can_upload = false unless asset_name == "Template" %>
         <% end %>
       <% end %>
       <hr>
@@ -126,8 +134,16 @@
 <% end %>
 
 <div id='check-excel-upload-result'></div>
+<% unless can_upload %>
+  <div class="alert alert-danger alert-dismissible" role="alert">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <h3>Error</h3>
+      <strong>Unable to upload the current set of samples!</strong>
+      <p>Please expand the 'General Information' pane for more information.</p>
+  </div>
+<% end %>
 
-  <%= submit_tag "Next", data: {disable_with: 'Next'}, :class => 'btn btn-primary', onclick: "submitUpload()" %>
+  <%= submit_tag "Next", data: {disable_with: 'Next'}, :class => 'btn btn-primary', onclick: "submitUpload()" if can_upload%>
   <%= submit_tag "Cancel", data: {id: 'cancelModalUploadExcel'}, :class => 'btn btn-secondary', onclick: "closeModalForm()" %>
 </div>
 
