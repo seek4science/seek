@@ -1398,6 +1398,43 @@ class SopsControllerTest < ActionController::TestCase
     assert_select 'div.alert-info', text: /the #{I18n.t('sop')}/
   end
 
+  test 'manage page shows warning if waiting gatekeeper approval' do
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    person = FactoryBot.create(:person, project: gatekeeper.projects.first)
+    sop = FactoryBot.create(:sop, contributor: person)
+    cancel_path = cancel_publishing_request_person_path(person, asset_id: sop.id, asset_class: sop.class, from_asset: true)
+    login_as(person)
+    assert sop.can_manage?
+    assert sop.gatekeeper_required?
+
+    # not shown if not waiting approval or rejected
+    assert_not sop.is_waiting_approval?
+    assert_not sop.is_rejected?
+    get :manage, params: {id: sop}
+    assert_response :success
+    assert_select 'div.alert-danger#gatekeeper_warning', count: 0
+
+    # shown for waiting approval
+    ResourcePublishLog.add_log ResourcePublishLog::WAITING_FOR_APPROVAL, sop
+    assert sop.is_waiting_approval?
+    get :manage, params: {id: sop}
+    assert_response :success
+    assert_select 'div.alert-danger#gatekeeper_warning', count: 1 do
+      assert_select 'div#warning', text: /waiting for the gatekeeper/, count: 1
+      assert_select 'a.cancel_publish_request[href=?]', cancel_path, count: 1
+    end
+
+    # shown for rejected
+    ResourcePublishLog.add_log ResourcePublishLog::REJECTED, sop
+    assert sop.is_rejected?
+    get :manage, params: {id: sop}
+    assert_response :success
+    assert_select 'div.alert-danger#gatekeeper_warning', count: 1 do
+      assert_select 'div#warning', text: /the gatekeeper has rejected it/, count: 1
+      assert_select 'a.cancel_publish_request[href=?]', cancel_path, count: 1
+    end
+  end
+
   test 'cannot access manage page with edit rights' do
     person = FactoryBot.create(:person)
     sop = FactoryBot.create(:sop, policy:FactoryBot.create(:private_policy, permissions:[FactoryBot.create(:permission, contributor:person, access_type:Policy::EDITING)]))
