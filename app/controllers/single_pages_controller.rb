@@ -74,6 +74,7 @@ class SinglePagesController < ApplicationController
     @study = Study.find(study_id)
     @sample_type = SampleType.find(sample_type_id)
     @template = Template.find(template_id)
+    @project = @study.projects.first # In Single Page a study can only belong to one project
 
     sample_fields = wb.row(1, sheet = 'Samples').map { |field| field.sub(' *', '') }
     samples_data = (2..wb.last_row(sheet = 'Samples')).map { |i| wb.row(i, sheet = 'Samples') }
@@ -89,11 +90,10 @@ class SinglePagesController < ApplicationController
     @existing_excel_samples = @excel_samples.map { |sample| sample unless sample['id'].nil? }.compact
     @new_excel_samples = @excel_samples.map { |sample| sample if sample['id'].nil? }.compact
 
-    @db_samples = @existing_excel_samples.map do |sample|
-      raw_sample = Sample.find(sample['id'])
-      attributes = JSON.parse(raw_sample[:json_metadata])
-      { 'id' => raw_sample.id,
-        'uuid' => raw_sample.uuid }.merge(attributes)
+    @db_samples = @sample_type.samples&.authorized_for(:edit)&.map do |sample|
+      attributes = JSON.parse(sample[:json_metadata])
+      { 'id' => sample.id,
+        'uuid' => sample.uuid }.merge(attributes)
     end
 
     # Determine whether samples have been modified or not
@@ -121,15 +121,15 @@ class SinglePagesController < ApplicationController
     @new_excel_samples.map do |nes|
       is_duplicate = true
 
-      @existing_excel_samples.map do |ees|
-        ees.map do |k, v|
+      @db_samples.map do |dbs|
+        dbs.map do |k, v|
           unless %w[id uuid].include?(k)
             is_duplicate = (nes[k] == v)
             break unless is_duplicate
           end
         end
         if is_duplicate
-          @possible_duplicates.append(nes.merge({ 'duplicate' => ees }))
+          @possible_duplicates.append(nes.merge({ 'duplicate' => dbs }))
           break
         end
       end
