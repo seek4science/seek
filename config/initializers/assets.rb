@@ -8,6 +8,9 @@ Rails.application.config.assets.version = '1.0'
 Rails.application.configure do
   config.assets.paths += Dir["#{Rails.root}/vendor/assets/rails-assets/*/*"]
 end
+# add fonts to assets
+Rails.application.config.assets.paths << Rails.root.join('app', 'assets', 'fonts')
+
 Rails.application.config.assets.compile = true
 
 # Precompile additional assets.
@@ -39,4 +42,5 @@ Rails.application.config.assets.precompile += [
     "appended/*.css",
     "publications",
 ]
+
 

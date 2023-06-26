@@ -1,8 +1,14 @@
 @import 'variables';
 @import 'mixins';
 
+@font-face {
+   font-family: 'Lato';
+   src: url('Lato-Regular.ttf');
+}
+
 html, body {
   height: 100%;
+  font-family: 'Lato', Arial;
 }
 
 body {
