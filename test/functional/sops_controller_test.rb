@@ -223,6 +223,49 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal 'Rails Testing', al.user_agent
   end
 
+  test 'should show gatekeeper status bar' do
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    person = FactoryBot.create(:person, project: gatekeeper.projects.first)
+    other_person = FactoryBot.create(:person)
+    sop = FactoryBot.create(:sop, contributor: person, policy: FactoryBot.create(:policy, access_type: Policy::VISIBLE))
+    login_as(person)
+    assert sop.can_manage?
+    assert sop.gatekeeper_required?
+
+    # not shown if not waiting approval or rejected
+    assert_not sop.is_waiting_approval?
+    assert_not sop.is_rejected?
+    get :show, params: { id: sop }
+    assert_response :success
+    assert_select 'div#gatekeeper_status', count: 0
+
+    # shown for waiting approval
+    ResourcePublishLog.add_log ResourcePublishLog::WAITING_FOR_APPROVAL, sop
+    assert sop.is_waiting_approval?
+    get :show, params: { id: sop }
+    assert_response :success
+    assert_select 'div#gatekeeper_status', count: 1 do
+      assert_select 'div.alert-warning#gatekeeper_warning', text: /waiting for the gatekeeper/, count: 1
+    end
+
+    # shown for rejected
+    ResourcePublishLog.add_log ResourcePublishLog::REJECTED, sop
+    assert sop.is_rejected?
+    get :show, params: { id: sop }
+    assert_response :success
+    assert_select 'div#gatekeeper_status', count: 1 do
+      assert_select 'div.alert-danger#gatekeeper_warning', text: /gatekeeper has rejected/, count: 1
+    end
+
+    # not shown if cannot manage
+    login_as(other_person)
+    assert_not sop.can_manage?
+    assert sop.can_view?
+    get :show, params: { id: sop }
+    assert_response :success
+    assert_select 'div#gatekeeper_status', count: 0
+  end
+
   test 'should get edit' do
     login_as(:owner_of_my_first_sop)
     get :edit, params: { id: sops(:my_first_sop) }
