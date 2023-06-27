@@ -1,5 +1,6 @@
 require 'rest-client'
 require 'ro_crate'
+require 'licensee'
 
 module Seek
   module WorkflowExtractors
@@ -57,6 +58,14 @@ module Seek
         end
 
         m.reverse_merge!(cff_extractor.metadata) if cff_extractor
+        begin
+          ::Licensee::License # Reference License class otherwise it cannot find ::Licensee::InvalidLicense
+          license = licensee_project&.license
+          m.reverse_merge!(license: license.spdx_id) if license
+        rescue ::Licensee::InvalidLicense
+        rescue ::Licensee::Projects::GitProject::InvalidRepository => e
+          raise e unless Rails.env.production?
+        end
 
         m[:source_link_url] ||= @git_version.git_repository&.remote
 
@@ -87,6 +96,10 @@ module Seek
         cff = @git_version.get_blob(Seek::WorkflowExtractors::CFF::FILENAME)
 
         @cff_extractor = cff ? Seek::WorkflowExtractors::CFF.new(cff) : nil
+      end
+
+      def licensee_project
+        @licensee_project ||= ::Licensee::Projects::GitVersionProject.new(@git_version)
       end
     end
   end
