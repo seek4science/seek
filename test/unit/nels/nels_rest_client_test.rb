@@ -142,6 +142,11 @@ class NelsRestClientTest < ActiveSupport::TestCase
     VCR.use_cassette('nels/sbi_storage_list_create_folder') do
       @rest_client.create_folder(1125299, 1125261, 'Storebioinfo/seek_pilot3/Demo Dataset/Analysis/', 'test')
     end
+
+  ensure
+    VCR.configure do |c|
+      c.before_http_request.clear
+    end
   end
 
 end
