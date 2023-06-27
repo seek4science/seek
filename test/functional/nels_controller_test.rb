@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class NelsControllerTest < ActionController::TestCase
+
   include AuthenticatedTestHelper
   include NelsTestHelper
 
@@ -263,6 +264,44 @@ class NelsControllerTest < ActionController::TestCase
                    subtype_path: '', content_blobs: [{ data: file_data }] }, format: :json
     assert_response :not_acceptable
     assert_equal 'Filenames containing spaces are not allowed', JSON.parse(response.body)["error"]
+  end
+
+  test 'create folder' do
+    project_id = '1125299'
+    dataset_id = '1125261'
+    current_path = 'Storebioinfo/seek_pilot3/Demo Dataset/Analysis/'
+    new_folder = 'test'
+    VCR.use_cassette('nels/sbi_storage_list_create_folder') do
+      post :create_folder,
+           params: {
+             project_id: project_id,
+             dataset_id: dataset_id,
+             file_path: current_path,
+             new_folder: new_folder
+           },
+           format: :json
+    end
+    assert_response :success
+    assert_equal true, JSON.parse(response.body)["success"]
+  end
+
+  test 'create folder with spaces fails' do
+    project_id = '1125299'
+    dataset_id = '1125261'
+    current_path = 'Storebioinfo/seek_pilot3/Demo Dataset/Analysis/'
+    new_folder = 'test folder'
+    VCR.use_cassette('nels/sbi_storage_list_create_folder') do
+      post :create_folder,
+           params: {
+             project_id: project_id,
+             dataset_id: dataset_id,
+             file_path: current_path,
+             new_folder: new_folder
+           },
+           format: :json
+    end
+    assert_response :not_acceptable
+    assert_equal 'Folder names containing spaces are not allowed', JSON.parse(response.body)["error"]
   end
 
   test 'raises error on NeLS callback if no code provided' do

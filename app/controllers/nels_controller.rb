@@ -88,9 +88,16 @@ class NelsController < ApplicationController
 
   def create_folder
     begin
-      @rest_client.create_folder(params[:project_id].to_i, params[:dataset_id].to_i, params[:file_path], params[:new_folder])
-      respond_to do |format|
-        format.all { render json:{success: true} }
+      folder_name = params[:new_folder]
+      if folder_name.include?(' ')
+        respond_to do |format|
+          format.json { render json:{error: 'Folder names containing spaces are not allowed' }, status: :not_acceptable }
+        end
+      else
+        @rest_client.create_folder(params[:project_id].to_i, params[:dataset_id].to_i, params[:file_path], folder_name)
+        respond_to do |format|
+          format.all { render json:{success: true} }
+        end
       end
     rescue RuntimeError => e
       Rails.logger.error("Error creating folder  #{e.message} - #{e.backtrace.join($/)}")
