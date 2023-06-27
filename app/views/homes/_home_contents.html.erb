@@ -6,7 +6,7 @@
 
 <% if !logged_in_and_registered? %>
   <% if Seek::Config.home_show_features%>
-      <%= render :partial=>"home_features" -%>
+      <%= render partial: 'digital-research-hub_features' -%>
   <% end %>
 <% end %>
 

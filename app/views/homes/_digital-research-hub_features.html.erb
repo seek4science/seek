@@ -1,0 +1,29 @@
+<div id="home-features">
+
+  <div style='text-align: center'>
+    <%= image('scilifelab-drh-logo', alt: 'SciLifeLab Digital Research Hub banner', style: 'max-height: 8em; max-width: 100%') %>
+    <p>
+      <%= Seek::Config.instance_name %> is a comprehensive platform designed to manage research outputs in a consistent, systematic, and standardized manner. It serves as a centralized system for organizing, storing, sharing, annotating, publishing, and linking various types of research outputs, including
+      <%= link_to 'samples', samples_path %>,
+      <%= link_to 'protocols', sops_path %>,
+      <%= link_to 'datasets', data_files_path %> and
+      <%= link_to 'computational models', models_path %>.
+    </p>
+
+    <p>
+      <%= Seek::Config.instance_name %> is based on the
+      <%= link_to 'FAIRDOM-SEEK platform', 'https://www.seek4science.org/', target: '_blank', rel: 'noopener' %>
+      and developed further by
+      <%= link_to 'SciLifeLab Data Centre', 'https://www.scilifelab.se/data/', target: '_blank', rel: 'noopener' %>
+      in collaboration with the
+      <%= link_to 'FAIRDOM consortium', 'https://fair-dom.org/', target: '_blank', rel: 'noopener' %>.
+    </p>
+  </div>
+
+
+
+  <div class="clearfix">
+        <%= link_to 'Learn more', Seek::Config.instance_link, target: '_blank', rel: 'noopener', class: 'btn btn-primary btn-lg pull-left' %>
+        <%= link_to 'Register', signup_path, class: 'btn btn-primary btn-lg pull-right' %>
+  </div>
+</div>
