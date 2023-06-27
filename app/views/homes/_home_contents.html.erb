@@ -19,7 +19,7 @@
       <%= render :partial=>"home_my_items" -%>
     <% end %>
     <% if Seek::Config.home_explore_projects %>
-      <%= render :partial=>"home_explore_projects" -%>
+      <%= render :partial=>"digital-research-hub_explore_content" -%>
     <% end %>
     <% if !logged_in_and_registered? && Seek::Config.home_show_who_uses %>
       <%= render :partial=>"home_who_uses" -%>
