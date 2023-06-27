@@ -1,16 +1,31 @@
 $scilifelab-lime: #a7c947;
+$scilifelab-lime-25: #e9f2d1;
+$scilifelab-lime-50: #d3e4a3;
+$scilifelab-lime-75: #bdd775;
 
 $scilifelab-teal: #045C64;
+$scilifelab-teal-25: #c0d6d8;
+$scilifelab-teal-50: #82aeb2;
 $scilifelab-teal-75: #43858b;
 
 $scilifelab-aqua: #4c979f;
+$scilifelab-aqua-25: #d2e5e7;
+$scilifelab-aqua-50: #a6cbcf;
+$scilifelab-aqua-75: #79b1b7;
+
 $scilifelab-grape: #491f53;
+$scilifelab-grape-25: #d2c7d4;
+$scilifelab-grape-50: #a48fa9;
+$scilifelab-grape-75: #77577e;
 
 $body-bg: #fff;
 
 
-$link-color: $scilifelab-teal;
-$brand-primary: $scilifelab-teal;
+$link-color: $scilifelab-grape;
+$brand-primary: $scilifelab-lime;
+
+$btn-primary-color: #333; //needed for contrast if buttons are in lime
+
 
 $border-radius-base: 0;
 $border-radius-large: 0;
@@ -25,3 +40,6 @@ $navbar-default-link-hover-color: $scilifelab-teal-75;
 $navbar-default-border: transparent;
 
 $panel-default-border: transparent;
+$panel-default-heading-bg: $scilifelab-aqua-50;
+$panel-bg: $scilifelab-aqua-25;
+
