@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class NelsControllerTest < ActionController::TestCase
-
   include AuthenticatedTestHelper
   include NelsTestHelper
 
@@ -147,7 +146,9 @@ class NelsControllerTest < ActionController::TestCase
       VCR.use_cassette('nels/check_metadata_exists') do
         VCR.use_cassette('nels/get_project') do
           VCR.use_cassette('nels/sbi_storage_list') do
-            get :subtype, params: { project_id: @project_id, dataset_id: @dataset_id, subtype:'reads', path:'Storebioinfo/seek_pilot3/Demo Dataset/reads/' }
+            get :subtype,
+                params: { project_id: @project_id, dataset_id: @dataset_id, subtype: 'reads',
+                          path: 'Storebioinfo/seek_pilot3/Demo Dataset/reads/' }
           end
         end
       end
@@ -167,7 +168,9 @@ class NelsControllerTest < ActionController::TestCase
       VCR.use_cassette('nels/check_metadata_exists') do
         VCR.use_cassette('nels/get_project') do
           VCR.use_cassette('nels/sbi_storage_list') do
-            get :subtype, params: { project_id: @project_id, dataset_id: @dataset_id, subtype:'reads', path:'Storebioinfo/seek_pilot3/Demo Dataset/reads/' }
+            get :subtype,
+                params: { project_id: @project_id, dataset_id: @dataset_id, subtype: 'reads',
+                          path: 'Storebioinfo/seek_pilot3/Demo Dataset/reads/' }
           end
         end
       end
@@ -180,7 +183,7 @@ class NelsControllerTest < ActionController::TestCase
     assert_select 'a.add_metadata.disabled', count: 0
 
     assert_select 'table tr td span.nels-folder', count: 5
-    assert_select 'table tr td a.nels-download-link', count:2
+    assert_select 'table tr td a.nels-download-link', count: 2
 
     # locked icon next to the dataset name shouldn't be present
     assert_select 'a[data-tree-node-id=dataset91123528] ~ span.glyphicon-lock', count: 0
@@ -242,9 +245,9 @@ class NelsControllerTest < ActionController::TestCase
     VCR.use_cassette('nels/upload_file') do
       post :upload_file,
            params: { dataset_id: dataset_id, project_id: project_id, subtype_name: subtype,
-                     subtype_path:'', content_blobs: [{ data: file_data }] }, format: :json
+                     subtype_path: '', content_blobs: [{ data: file_data }] }, format: :json
       assert_response :success
-      assert_equal true, JSON.parse(response.body)["success"]
+      assert_equal true, JSON.parse(response.body)['success']
     end
   end
 
@@ -258,12 +261,11 @@ class NelsControllerTest < ActionController::TestCase
 
     file_data = fixture_file_upload('file with spaces in name.txt', 'text/plain')
 
-
     post :upload_file,
          params: { dataset_id: dataset_id, project_id: project_id, subtype_name: subtype,
                    subtype_path: '', content_blobs: [{ data: file_data }] }, format: :json
     assert_response :not_acceptable
-    assert_equal 'Filenames containing spaces are not allowed', JSON.parse(response.body)["error"]
+    assert_equal 'Filenames containing spaces are not allowed', JSON.parse(response.body)['error']
   end
 
   test 'create folder' do
@@ -282,7 +284,7 @@ class NelsControllerTest < ActionController::TestCase
            format: :json
     end
     assert_response :success
-    assert_equal true, JSON.parse(response.body)["success"]
+    assert_equal true, JSON.parse(response.body)['success']
   end
 
   test 'create folder with spaces fails' do
@@ -301,7 +303,7 @@ class NelsControllerTest < ActionController::TestCase
            format: :json
     end
     assert_response :not_acceptable
-    assert_equal 'Folder names containing spaces are not allowed', JSON.parse(response.body)["error"]
+    assert_equal 'Folder names containing spaces are not allowed', JSON.parse(response.body)['error']
   end
 
   test 'raises error on NeLS callback if no code provided' do
@@ -321,16 +323,16 @@ class NelsControllerTest < ActionController::TestCase
   end
 
   test 'create dataset' do
-    project_id='1125299'
-    datasettypeid='225'
+    project_id = '1125299'
+    datasettypeid = '225'
     name = 'test dataset'
     description = 'testing creating a dataset'
 
     VCR.use_cassette('nels/create_dataset') do
       VCR.use_cassette('nels/get_user_info') do
-        post :create_dataset, params: { project: project_id, datasettype: datasettypeid, name: name, description: description}
+        post :create_dataset,
+             params: { project: project_id, datasettype: datasettypeid, name: name, description: description }
       end
     end
-
   end
 end

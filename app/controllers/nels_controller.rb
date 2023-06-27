@@ -1,3 +1,5 @@
+require 'English'
+require 'English'
 class NelsController < ApplicationController
   before_action :nels_enabled?
   before_action :check_user_logged_in, only: :callback
@@ -39,7 +41,7 @@ class NelsController < ApplicationController
 
     @projects = []
     # If project information is already defined
-    @projects = if params.has_key?(:project_id) && params.has_key?(:project_name)
+    @projects = if params.key?(:project_id) && params.key?(:project_name)
                   [
                     {
                       'id' => params[:project_id],
@@ -64,19 +66,17 @@ class NelsController < ApplicationController
   end
 
   def get_metadata
-    begin
-      file_name, file_path = @rest_client.get_metadata(params[:project_id].to_i, params[:dataset_id].to_i,
-                                                       params[:subtype_name])
-      send_file file_path, filename: file_name, disposition: 'attachment'
-    rescue RuntimeError => e
-      flash[:error] = "Something went wrong interacting with NeLS, please try again later (#{e.class.name})"
-      redirect_to nels_path
-    end
+    file_name, file_path = @rest_client.get_metadata(params[:project_id].to_i, params[:dataset_id].to_i,
+                                                     params[:subtype_name])
+    send_file file_path, filename: file_name, disposition: 'attachment'
+  rescue RuntimeError => e
+    flash[:error] = "Something went wrong interacting with NeLS, please try again later (#{e.class.name})"
+    redirect_to nels_path
   end
 
   def add_metadata
     begin
-      #raise 'add metadata currently broken'
+      # raise 'add metadata currently broken'
       @rest_client.upload_metadata(params[:project_id].to_i, params[:dataset_id].to_i, params[:subtype_name],
                                    params['content_blobs'][0]['data'].path)
     rescue RuntimeError => e
@@ -87,73 +87,69 @@ class NelsController < ApplicationController
   end
 
   def create_folder
-    begin
-      folder_name = params[:new_folder]
-      if folder_name.include?(' ')
-        respond_to do |format|
-          format.json { render json:{error: 'Folder names containing spaces are not allowed' }, status: :not_acceptable }
-        end
-      else
-        @rest_client.create_folder(params[:project_id].to_i, params[:dataset_id].to_i, params[:file_path], folder_name)
-        respond_to do |format|
-          format.all { render json:{success: true} }
-        end
-      end
-    rescue RuntimeError => e
-      Rails.logger.error("Error creating folder  #{e.message} - #{e.backtrace.join($/)}")
+    folder_name = params[:new_folder]
+    if folder_name.include?(' ')
       respond_to do |format|
-        format.json { render json:{error: e.message, exception: e.class.name }, status: :internal_server_error }
+        format.json do
+          render json: { error: 'Folder names containing spaces are not allowed' }, status: :not_acceptable
+        end
       end
+    else
+      @rest_client.create_folder(params[:project_id].to_i, params[:dataset_id].to_i, params[:file_path], folder_name)
+      respond_to do |format|
+        format.all { render json: { success: true } }
+      end
+    end
+  rescue RuntimeError => e
+    Rails.logger.error("Error creating folder  #{e.message} - #{e.backtrace.join($INPUT_RECORD_SEPARATOR)}")
+    respond_to do |format|
+      format.json { render json: { error: e.message, exception: e.class.name }, status: :internal_server_error }
     end
   end
 
   def upload_file
-    begin
-      filename = params['content_blobs'][0]['data'].original_filename
-      if filename.include?(' ')
-        respond_to do |format|
-          format.json { render json:{error: 'Filenames containing spaces are not allowed' }, status: :not_acceptable }
-        end
-      else
-        data_path = params['content_blobs'][0]['data'].path
-        subtype_path = params[:subtype_path] || ''
-        @rest_client.upload_file(params[:project_id].to_i, params[:dataset_id].to_i, params[:subtype_name],
-                                 subtype_path, filename, data_path)
-        respond_to do |format|
-          format.all { render json:{success: true} }
-        end
-      end
-    rescue RuntimeError => e
-      Rails.logger.error("Error uploading file  #{e.message} - #{e.backtrace.join($/)}")
+    filename = params['content_blobs'][0]['data'].original_filename
+    if filename.include?(' ')
       respond_to do |format|
-        format.json { render json:{error: e.message, exception: e.class.name }, status: :internal_server_error }
+        format.json { render json: { error: 'Filenames containing spaces are not allowed' }, status: :not_acceptable }
+      end
+    else
+      data_path = params['content_blobs'][0]['data'].path
+      subtype_path = params[:subtype_path] || ''
+      @rest_client.upload_file(params[:project_id].to_i, params[:dataset_id].to_i, params[:subtype_name],
+                               subtype_path, filename, data_path)
+      respond_to do |format|
+        format.all { render json: { success: true } }
       end
     end
-
+  rescue RuntimeError => e
+    Rails.logger.error("Error uploading file  #{e.message} - #{e.backtrace.join($INPUT_RECORD_SEPARATOR)}")
+    respond_to do |format|
+      format.json { render json: { error: e.message, exception: e.class.name }, status: :internal_server_error }
+    end
   end
 
   def download_file
-    begin
-      path_in_subtype = extract_subtype_path(params[:path],params[:project_name], params[:dataset_name], params[:subtype_name], params[:filename])
-      filename, path = @rest_client.download_file(params[:project_id].to_i, params[:dataset_id].to_i,
-                                                  params[:subtype_name], path_in_subtype, params[:filename])
-      respond_to do |format|
-        format.json { render json:{filename: filename, file_path: path} }
-      end
-    rescue RuntimeError, StandardError => e
-      respond_to do |format|
-        format.json { render json:{error: e.message, exception: e.class.name }, status: :internal_server_error }
-      end
+    path_in_subtype = extract_subtype_path(params[:path], params[:project_name], params[:dataset_name],
+                                           params[:subtype_name], params[:filename])
+    filename, path = @rest_client.download_file(params[:project_id].to_i, params[:dataset_id].to_i,
+                                                params[:subtype_name], path_in_subtype, params[:filename])
+    respond_to do |format|
+      format.json { render json: { filename: filename, file_path: path } }
     end
-
+  rescue RuntimeError, StandardError => e
+    respond_to do |format|
+      format.json { render json: { error: e.message, exception: e.class.name }, status: :internal_server_error }
+    end
   end
 
   def fetch_file
     filename = params[:filename]
     path = params[:file_path]
 
-    raise Nels::Rest::Client::FetchFileError.new('invalid location') unless path.start_with?('/tmp/nels-download-')
-    raise Nels::Rest::Client::FetchFileError.new('temp copy of file doesnt exist') unless File.exist?(path)
+    raise Nels::Rest::Client::FetchFileError, 'invalid location' unless path.start_with?('/tmp/nels-download-')
+    raise Nels::Rest::Client::FetchFileError, 'temp copy of file doesnt exist' unless File.exist?(path)
+
     send_file path, filename: filename, disposition: 'attachment'
   end
 
@@ -240,9 +236,9 @@ class NelsController < ApplicationController
     end
   end
 
-  def extract_subtype_path(full_path, project_name, dataset_name, subtype_name, file_name='')
-    root_path = ['Storebioinfo',project_name, dataset_name, subtype_name].join('/')
-    full_path.gsub(root_path,"").chomp(file_name).gsub(/^\//,'')
+  def extract_subtype_path(full_path, project_name, dataset_name, subtype_name, file_name = '')
+    root_path = ['Storebioinfo', project_name, dataset_name, subtype_name].join('/')
+    full_path.gsub(root_path, '').chomp(file_name).gsub(%r{^/}, '')
   end
 
   def find_and_authorize_assay

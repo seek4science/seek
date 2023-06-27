@@ -81,8 +81,7 @@ module Nels
 
       def upload_metadata(project_id, dataset_id, subtype_name, file_path)
         upload_url = "#{base}/v2/seek/sbi/projects/#{project_id}/datasets/#{dataset_id}/#{subtype_name}/metadata"
-        RestClient.post(upload_url, {file: File.new(file_path, 'rb')}, {accept: '*/*'})
-
+        RestClient.post(upload_url, { file: File.new(file_path, 'rb') }, { accept: '*/*' })
       end
 
       def delete_metadata(project_id, dataset_id, subtype_name, _file_path)
@@ -122,18 +121,17 @@ module Nels
         rescue RestClient::Exceptions::ReadTimeout
           new_path = File.join(current_path, new_folder)
           Timeout.timeout(240) do
-            while true
+            loop do
               files = sbi_storage_list(project_id, dataset_id, current_path)
-              files = files.collect{|f| f['path']}
+              files = files.collect { |f| f['path'] }
               break if files.include?(new_path)
+
               sleep(1)
             end
           end
-
         end
 
         expected_folder = File.join(current_path, new_folder)
-
       end
 
       # UPLOAD FILE FLOW
@@ -163,7 +161,7 @@ module Nels
 
         Rails.logger.info("Job ID: #{job_id} ; Upload URL: #{upload_url}")
 
-        response = RestClient.post(upload_url, {file: File.new(file_path, 'rb')}, {accept: '*/*'})
+        response = RestClient.post(upload_url, { file: File.new(file_path, 'rb') }, { accept: '*/*' })
 
         unless response.code == 200
           raise UploadError, "There was an error uploading the file #{file_path}, response was #{response.code}"
@@ -229,6 +227,7 @@ module Nels
 
           Rails.logger.info("Waiting for transfer, Job state: #{job_state}; Completion: #{progress}")
           raise TransferError, 'There was an problem with the transfer before download' if job_state == 102
+
           sleep(0.25)
         end
 

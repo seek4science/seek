@@ -36,7 +36,6 @@ class NelsRestClientTest < ActiveSupport::TestCase
       assert_equal @project_id, res['id']
       assert_equal 'seek_pilot1', res['name']
     end
-
   end
 
   test 'can get datasets' do
@@ -49,7 +48,6 @@ class NelsRestClientTest < ActiveSupport::TestCase
       dataset = res.detect { |d| d['id'] == @dataset_id }
       assert_equal 'Illumina-sequencing-dataset', dataset['name']
       assert_equal 'Illumina_seq_data', dataset['type']
-
     end
   end
 
@@ -97,8 +95,9 @@ class NelsRestClientTest < ActiveSupport::TestCase
     VCR.use_cassette('nels/sbi_storage_list') do
       json = @rest_client.sbi_storage_list(@project_id, @dataset_id, 'Storebioinfo/seek_pilot3/Demo Dataset/Analysis/')
       assert_equal 7, json.length
-      assert_equal 5, json.select{|x| x['isFolder']}.length
-      last = {"name"=>"test5", "size"=>0, "path"=>"Storebioinfo/seek_pilot3/Demo Dataset/Analysis/test5", "project_id"=>91123122, "dataset_id"=>91123528, "refid"=>"8cd8932b-805e-4f1b-8f60-2e8103d9700c", "description"=>"", "islocked"=>false, "membership_type"=>2, "isFolder"=>true}
+      assert_equal 5, json.select { |x| x['isFolder'] }.length
+      last = { 'name' => 'test5', 'size' => 0, 'path' => 'Storebioinfo/seek_pilot3/Demo Dataset/Analysis/test5',
+               'project_id' => 91_123_122, 'dataset_id' => 91_123_528, 'refid' => '8cd8932b-805e-4f1b-8f60-2e8103d9700c', 'description' => '', 'islocked' => false, 'membership_type' => 2, 'isFolder' => true }
       assert_equal last, json.last
     end
   end
@@ -126,21 +125,19 @@ class NelsRestClientTest < ActiveSupport::TestCase
 
   test 'create dataset' do
     VCR.use_cassette('nels/create_dataset') do
-      @rest_client.create_dataset(1125299, 225, 'test dataset', 'testing creating a dataset')
+      @rest_client.create_dataset(1_125_299, 225, 'test dataset', 'testing creating a dataset')
     end
   end
 
   test 'create folder' do
     VCR.configure do |c|
       c.before_http_request do |request|
-        if JSON.parse(request.body)['method'] == 'add'
-          raise RestClient::Exceptions::ReadTimeout.new
-        end
+        raise RestClient::Exceptions::ReadTimeout if JSON.parse(request.body)['method'] == 'add'
       end
     end
 
     VCR.use_cassette('nels/sbi_storage_list_create_folder') do
-      @rest_client.create_folder(1125299, 1125261, 'Storebioinfo/seek_pilot3/Demo Dataset/Analysis/', 'test')
+      @rest_client.create_folder(1_125_299, 1_125_261, 'Storebioinfo/seek_pilot3/Demo Dataset/Analysis/', 'test')
     end
 
   ensure
@@ -148,5 +145,4 @@ class NelsRestClientTest < ActiveSupport::TestCase
       c.before_http_request.clear
     end
   end
-
 end
