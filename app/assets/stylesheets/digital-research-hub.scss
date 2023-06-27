@@ -1,0 +1,38 @@
+@import 'variables';
+
+@font-face {
+   font-family: 'Lato';
+   src: url('Lato-Regular.ttf');
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Lato', Arial;
+}
+
+#search_box {
+  #q {
+    background: #eee;
+    border-color: transparent;
+    border-radius: 15px;
+  }
+
+  .input-group-btn {
+    padding-left: 10px;
+    .btn {
+      border: 0;
+      box-shadow: none !important;
+      &:active, &.active {
+        transform: none !important;
+      }
+    }
+    .btn:first-child {
+      border-radius: 15px 0 0 15px;
+    }
+    .btn:last-child {
+      padding-left: 0;
+      padding-right: 5px;
+      border-radius: 0 15px 15px 0;
+    }
+  }
+}
