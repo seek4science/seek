@@ -60,7 +60,7 @@ module ROCrate
     end
 
     def readme
-      dereference('README.md')
+      find_entry('README.md')
     end
 
     def find_entry(path)

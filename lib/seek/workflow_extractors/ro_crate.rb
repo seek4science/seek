@@ -99,6 +99,11 @@ module Seek
             end
           end
 
+          cff_ex = cff_extractor(crate)
+          m.reverse_merge!(cff_ex.metadata) if cff_ex
+          license = extract_license(licensee_project(crate))
+          m.reverse_merge!(license: license) if license
+
           source_url = crate['isBasedOn'] || crate['url'] || crate.main_workflow['url']
           if source_url
             handler = ContentBlob.remote_content_handler_for(source_url)
@@ -173,6 +178,18 @@ module Seek
 
         abstract_cwl = crate&.main_workflow_cwl&.source
         @abstract_cwl_extractor = abstract_cwl ? Seek::WorkflowExtractors::CWL.new(abstract_cwl) : nil
+      end
+
+      def cff_extractor(crate)
+        return @cff_extractor if defined?(@cff_extractor)
+
+        cff = crate&.find_entry('CITATION.cff')&.source
+
+        @cff_extractor = cff ? Seek::WorkflowExtractors::CFF.new(cff) : nil
+      end
+
+      def licensee_project(crate)
+        @licensee_project ||= ::Licensee::Projects::RoCrateProject.new(crate)
       end
     end
   end
