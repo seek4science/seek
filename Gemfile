@@ -156,7 +156,6 @@ gem 'rails-static-router'
 gem 'caxlsx', '>= 3.0' # Write content to an xlsx file
 gem 'caxlsx_rails', '~> 0.6.2'
 
-# to avoid warnings after rails 6.1.7.2 update - see https://github.com/ruby/net-imap/issues/16
 gem 'net-ftp'
 
 group :production do
