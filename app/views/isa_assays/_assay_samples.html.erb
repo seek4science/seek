@@ -10,11 +10,11 @@
     </div>
 </div>
 
-<%= render partial: 'isa_studies/buttons' %> 
+<%= render partial: 'isa_studies/buttons' %>
 
 <% if valid_assay %>
     <script>
-        let sampleDynamicTable 
+        let sampleDynamicTable
         $j(document).ready(function () {
             $j('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
                 $j.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
@@ -38,7 +38,7 @@
             }
 
             sampleDynamicTable.init(dt.rows, dt.columns, options)
-            
+
             $j(".dataTables_scrollBody").css("min-height", "300px")
         });
 
@@ -57,6 +57,10 @@
         function SampleAddNewRow(){
             sampleDynamicTable.newRow()
         }
-																														
+
+        function sampleExportExcel() {
+            exportToExcel("assay-samples-table", '<%=assay.study_id%>', '<%=assay.id%>', '<%=sample_type.id%>');
+        }
+
     </script>
 <% end %>

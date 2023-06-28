@@ -51,8 +51,8 @@ class DynamicTableHelperTest < ActionView::TestCase
 
       dt = dt_aggregated(study)
       # Each sample types' attributes count + the sample.id
-      columns_count = study.sample_types[0].sample_attributes.length + 1
-      columns_count += study.sample_types[1].sample_attributes.length + 1
+      columns_count = study.sample_types[0].sample_attributes.length + 2
+      columns_count += study.sample_types[1].sample_attributes.length + 2
 
       assert_equal type_a.samples.length, dt[:rows].length
       assert_equal columns_count, dt[:columns].length
@@ -71,7 +71,7 @@ class DynamicTableHelperTest < ActionView::TestCase
 
       dt = dt_aggregated(study, assay)
       # Each sample types' attributes count + the sample.id
-      columns_count = assay.sample_type.sample_attributes.length + 1
+      columns_count = assay.sample_type.sample_attributes.length + 2
 
       assert_equal type_c.samples.length, dt[:rows].length
       assert_equal columns_count, dt[:columns].length

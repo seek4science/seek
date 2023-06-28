@@ -71,19 +71,23 @@ const handleSelect = (e) => {
         c["createdCell"] = function(td, cellData, rowData, row, col) {
           if (cellData == "#HIDDEN") $j(td).addClass("disabled");
         };
+				// Changes the id header to an instance id
         if (c.title == "id") c.title = instanceName + " id";
       });
+      // Retrieve the column index of the multi-input cells (select2 items)
+      // if column has a multi-input cell, it adds the index to the t array (=accumulator)
       let multi_link_idx = columns.reduce((t, c, i) => (c.multi_link ? [...t, i + 1] : t), []);
       // If it's Assay level table keep the first, otherwise hide all of them
       if (options.level == "assay") multi_link_idx = multi_link_idx.slice(1);
       this.hiddenColumns = multi_link_idx;
       columns.unshift(...defaultCols);
+
       const columnDefs = [{
           orderable: false,
-          targets: options.readonly ? [0] : [0, 1, 2]
+          targets: options.readonly ? [0] : [0, 1]
         },
         {
-          targets: options.readonly ? [0, ...multi_link_idx] : [1, 2],
+          targets: options.readonly ? [0, ...multi_link_idx] : [1],
           visible: false,
           searchable: false
         }
@@ -101,29 +105,24 @@ const handleSelect = (e) => {
         dom: "<'row'<'col-sm-3'l <'toolbar'>><'col-sm-9 dt-btn-container'<'dt-btn-item'f><'dt-btn-item-last'B>>>" +
           "<'row'<'col-sm-12'tr>>" +
           "<'row'<'col-sm-5'i><'col-sm-7'p>>",
-        buttons: [{
-            extend: "csvHtml5",
-            text: "Export table",
-            exportOptions: {
-              // exclude checkbox column
-              columns: options.readonly ? [":visible:not(.text-center)"] : [2, ":visible:not(.text-center)"],
-              format: {
-                body: function(data) {
-                  // Get data from tags-input
-                  if (data.toString().includes("td")) {
-                    data = JSON.parse($j(data).find("input").attr("data-existing-objects"))
-                      .map((x) => x.name)
-                      .join(",");
-                  } else if (data.toString().includes("span")) {
-                    data = data.replace('> <', '>,<').replace(/<[^>]+>/g, '')
-                  }
-
-                  return data;
-                }
-              }
-            }
-          },
-          "colvis"
+        buttons: [
+					{
+						extend: "csvHtml5",
+						text: "Export to CSV",
+						exportOptions: {
+							// exclude checkbox column
+							columns: options.readonly ? [":visible:not(.text-center)"] : [2, ":visible:not(.text-center)"],
+						}
+					},
+					{
+						extend: "copy",
+						text: "Copy to Clipboard",
+						exportOptions: {
+							// exclude checkbox column
+							columns: options.readonly ? [":visible:not(.text-center)"] : [2, ":visible:not(.text-center)"],
+						},
+					},
+					"colvis"
         ],
         ajax: options.ajax
       });
@@ -132,7 +131,10 @@ const handleSelect = (e) => {
         const table = this.table;
         const context = this;
         this.table.on("click", "tbody td:not(:has(input))", function() {
-          editor($j(this), table, context);
+					// Makes all cells editable, except column 2 & 3 => Fairdom-seek ID + UUID
+					if (![2, 3].includes(this._DT_CellIndex.column)) {
+						editor($j(this), table, context);
+					}
         });
       }
       if (options.assayId) this.assayId = options.assayId;
