@@ -106,6 +106,10 @@ module Seek
       blob.content_type.try(:split, '/').try(:first) == 'image'
     end
 
+    def is_cff?(blob = self)
+      blob.content_type_file_extensions.include?('cff')
+    end
+
     def is_image_convertable?(blob = self)
       (IMAGE_CONVERTABLE_FORMAT & blob.content_type_file_extensions).any?
     end
