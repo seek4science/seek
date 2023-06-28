@@ -31,6 +31,8 @@
 
   <!-- right sidebar -->
   <div class="col-md-3">
+    <%= render partial: 'digital-research-hub_shortcuts' -%>
+
     <% if logged_in_and_registered?  && Seek::Config.home_show_quickstart %>
       <%= render :partial=>"home_quick_start" -%>
     <% end %>

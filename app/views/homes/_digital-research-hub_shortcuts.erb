@@ -1,0 +1,18 @@
+<%= panel("Other SciLifeLab Resources", id: 'drh-shortcuts', body_options: { class: 'front-page-panel' }) do %>
+  <%= link_to 'https://data.scilifelab.se/', class: 'btn btn-default btn-block', target: '_blank', rel: 'noopener' do %>
+    <%= image_tag 'logos/SciLifeLab_symbol_Green.png', alt: "SciLifeLab green symbol", style: 'height: 3em; margin-right: 5px' %>
+    <strong>Data Platform</strong>
+  <% end %>
+  <%= link_to 'https://figshare.scilifelab.se/', class: 'btn btn-default btn-block', target: '_blank', rel: 'noopener' do %>
+    <%= image_tag 'logos/fig.share_SpiralColour.png', alt: "fig.share spiral colour logo", style: 'height: 3em; margin-right: 5px' %>
+    <strong>Data Repository</strong>
+  <% end %>
+  <%= link_to 'https://data-guidelines.scilifelab.se/', class: 'btn btn-default btn-block', target: '_blank', rel: 'noopener' do %>
+    <%= image_tag 'logos/data_life_cycle.png', alt: "RDMKit data life cycle diagram", style: 'height: 2.5em; margin: 5px; margin-right: 10px' %>
+    <strong>RDM Guidelines</strong>
+  <% end %>
+  <%= link_to 'https://dsw.scilifelab.se/', class: 'btn btn-default btn-block', target: '_blank', rel: 'noopener' do %>
+    <%= image_tag 'logos/dsw-logo-icon-color-transparent.png', alt: "Data Stewardship Wizard logo",  style: 'height: 3em' %>
+    <strong>Data Stewardship Wizard</strong>
+  <% end %>
+<% end %>
