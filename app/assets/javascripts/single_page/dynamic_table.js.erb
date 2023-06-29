@@ -21,8 +21,8 @@ const defaultCols = [{
 }];
 
 const objectInputTemp = '<input type="hidden" name="_NAME_[]" id="inpt-_NAME_" value="" autocomplete="off" />' +
-  '<select name="_NAME_[]" id="select-_NAME_" class="form-control" data-role="seek-objectsinput" ' +
-  'data-tags-limit="100" multiple="multiple" data-typeahead-template="typeahead/single_pages_samples"' +
+  '<select name="_NAME_[]" id="select-_NAME_" class="form-control _EXTRACLASS_" title="_TITLE_" data-role="seek-objectsinput" ' +
+  'data-tags-limit="100" multiple="multiple" style="background-color: coral;" data-typeahead-template="typeahead/single_pages_samples"' +
   'data-typeahead-query-url="_URL_">_OPTIONS_</select>';
 
 const typeaheadUrl = "<%= typeahead_samples_path(linked_sample_type_id: '_LINKED_') %>";
@@ -57,10 +57,26 @@ const handleSelect = (e) => {
               const url = typeaheadUrl.replace("_LINKED_", c.linked_sample_type);
               const objectInputName = data.map((e) => e.id).join('-') + '-' + crypto.randomUUID();
               setTimeout(ObjectsInput.init);
+
+              const linkedSamples = retrieveLinkedSamples(url);
+              const linkedSampleIds = linkedSamples.map((ls) => ls.id);
+              const unLinkedSamples = data.reduce(function(filtered, sample) {
+                if(!linkedSampleIds.includes(parseInt(sample.id))){
+                  filtered.push(sample);
+                }
+                return filtered;
+              }, []);
+              const hasUnlinkedSamples = unLinkedSamples.length > 0 ? true : false;
+
+              const extraClass = hasUnlinkedSamples ? 'select2__error' : '';
+              const titleText = hasUnlinkedSamples ? `Sample(s) '${unLinkedSamples.map(uls => uls.title).join(', ')}' not recognised as sources. Please correct this issue!` : '';
+
               return objectInputTemp
-                .replace(/_NAME_/g, objectInputName)
-                .replace('_URL_', url)
-                .replace('_OPTIONS_', existingOptions);
+              .replace(/_NAME_/g, objectInputName)
+              .replace('_URL_', url)
+              .replace('_OPTIONS_', existingOptions)
+              .replace('_EXTRACLASS_', extraClass)
+              .replace('_TITLE_', titleText);
             }
           } else if (data === "#HIDDEN") {
             return "<em><small>Hidden</small></em>";
