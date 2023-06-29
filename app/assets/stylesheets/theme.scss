@@ -25,11 +25,8 @@ $link-color: $scilifelab-grape;
 $brand-primary: $scilifelab-teal;
 
 //$btn-primary-color: #333; //needed for contrast if buttons are in lime
-
-
-$border-radius-base: 0;
-$border-radius-large: 0;
-$border-radius-small: 0;
+$btn-default-border: transparent;
+$btn-primary-border: transparent;
 
 $navbar-default-bg: #fff;
 $navbar-default-border: transparent;
