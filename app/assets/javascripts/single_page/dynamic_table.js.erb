@@ -499,6 +499,25 @@ function performSelect(dtName, select) {
   });
 }
 
+function retrieveLinkedSamples(url){
+  let linkedSamples;
+  $j.ajax({
+    async: false,
+    url: url,
+    contentType: "application/json",
+    success: function (data) {
+      linkedSamples = data.results;
+      // console.log("data", data.results);
+    },
+    error: function (xhr, status) {
+      linkedSamples = []
+      console.log(status);
+      console.log(xhr.responseText);
+    }
+  });
+  return linkedSamples;
+}
+
 const handleFailure = (table, res) => {
   const errors = new Set();
   errors.add("The operation can not be performed for one or some samples. The red cells indicate unacceptable values.");
