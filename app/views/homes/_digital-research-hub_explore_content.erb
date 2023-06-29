@@ -9,9 +9,9 @@
           <% if Seek::Config.samples_enabled %>
             <div class="col-md-6">
               <div style="text-align: center;">
-                <a class="btn btn-default btn-lg browse-button" href="<%= workflows_path %>" role="button">
+                <a class="btn btn-default btn-lg browse-button" href="<%= samples_path %>" role="button">
                   <p>Browse <%= t('sample').pluralize %></p>
-                  <%= image('samples') %>
+                  <%= image('samples', alt: 'Browse ' + t('sample').pluralize) %>
                 </a>
               </div>
               <br>
@@ -20,9 +20,9 @@
           <% if Seek::Config.sample_type_template_enabled %>
             <div class="col-md-6">
               <div style="text-align: center;">
-                <a class="btn btn-default btn-lg browse-button" href="<%= collections_path %>" role="button">
+                <a class="btn btn-default btn-lg browse-button" href="<%= templates_path %>" role="button">
                   <p>Browse <%= t('template').pluralize %></p>
-                  <%= image('template_avatar') %>
+                  <%= image('template_avatar', alt: 'Browse ' + t('template').pluralize) %>
                 </a>
               </div>
               <br>
@@ -35,7 +35,7 @@
               <div style="text-align: center;">
                 <a class="btn btn-default btn-lg browse-button" href="<%= programmes_path %>" role="button">
                   <p>Browse <%= t('programme').pluralize %></p>
-                  <%= image('programme_avatar') %>
+                  <%= image('programme_avatar', alt: 'Browse ' + t('programme').pluralize) %>
                 </a>
               </div>
               <br>
@@ -45,7 +45,7 @@
             <div style="text-align: center;">
               <a class="btn btn-default btn-lg browse-button" href="<%= projects_path %>" role="button">
                 <p>Browse <%= t('project').pluralize %></p>
-                <%= image('project_avatar') %>
+                <%= image('project_avatar', alt: 'Browse ' +  t('project').pluralize) %>
               </a>
             </div>
           </div>
