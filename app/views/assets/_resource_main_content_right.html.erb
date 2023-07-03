@@ -32,6 +32,8 @@
 <% elsif versioned_resource.respond_to?(:doi) %>
   <% if versioned_resource.doi.present? %>
     <%= render :partial => "assets/citation_box", locals: { doi: versioned_resource.doi } %>
+  <% elsif versioned_resource.is_git_versioned? && versioned_resource.file_exists?(Seek::WorkflowExtractors::CFF::FILENAME) %>
+    <%= render :partial => "assets/citation_box", locals: { blob: versioned_resource.get_blob(Seek::WorkflowExtractors::CFF::FILENAME) } %>
   <% elsif resource.can_manage? && Seek::Config.doi_minting_enabled && resource.supports_doi? %>
     <%= render :partial => "assets/citation_instructions", locals: { resource: resource, versioned_resource: versioned_resource } %>
   <% end %>

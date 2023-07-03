@@ -247,9 +247,9 @@ $j(document).ready(function () {
         var style = $j(this).val();
         var url = $j(this).data('url');
         var target = $j('#citation');
-        var currentStyle = $j('#citation').data('citationStyle');
+        var currentStyle = $j('#citation div').data('citationStyle');
 
-        if (style && style !== currentStyle) {
+        if (style && currentStyle && style !== currentStyle) {
             $j.ajax({
                 url: url,
                 data: { style: style },

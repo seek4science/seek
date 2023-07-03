@@ -659,6 +659,20 @@ class GitControllerTest < ActionController::TestCase
     assert_select '.markdown-body h1', text: 'FAIRDOM-SEEK'
   end
 
+  test 'should display blob as markdown inline' do
+    @git_version.add_file('file.md', FactoryBot.create(:markdown_content_blob))
+    disable_authorization_checks { @git_version.save! }
+
+    get :raw, xhr: true, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'file.md',
+                                   display: 'markdown', disposition: 'inline' }
+
+    assert_response :success
+    assert @response.header['Content-Type'].start_with?('text/html')
+    assert_equal ApplicationController::USER_CONTENT_CSP, @response.header['Content-Security-Policy']
+    assert_select 'body', count: 0
+    assert_select 'iframe'
+  end
+
   test 'should display blob as jupyter' do
     @git_version.add_file('file.ipynb', FactoryBot.create(:jupyter_notebook_content_blob))
     disable_authorization_checks { @git_version.save! }
@@ -783,5 +797,49 @@ class GitControllerTest < ActionController::TestCase
     assert_equal 'inline_view', log.action
     assert_equal 'file.md', log.data[:path]
     assert_equal 'markdown', log.data[:display]
+  end
+
+  test 'should display CFF blob as citation' do
+    @git_version.add_file('CITATION.cff', open_fixture_file('CITATION.cff'))
+    disable_authorization_checks { @git_version.save! }
+
+    get :raw, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'CITATION.cff',
+                        display: 'citation' }
+
+    assert_response :success
+    assert @response.header['Content-Type'].start_with?('text/html')
+    assert_equal ApplicationController::USER_CONTENT_CSP, @response.header['Content-Security-Policy']
+    assert_select 'body'
+    assert_select '#navbar', count: 0
+    assert_select 'div[data-citation-style=?]', 'apa', text: /van der Real Person, O\. T\./
+  end
+
+  test 'should display CFF blob as citation with selected style' do
+    @git_version.add_file('CITATION.cff', open_fixture_file('CITATION.cff'))
+    disable_authorization_checks { @git_version.save! }
+
+    get :raw, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'CITATION.cff',
+                        display: 'citation', style: 'bibtex' }
+
+    assert_response :success
+    assert @response.header['Content-Type'].start_with?('text/html')
+    assert_equal ApplicationController::USER_CONTENT_CSP, @response.header['Content-Security-Policy']
+    assert_select 'body'
+    assert_select '#navbar', count: 0
+    assert_select 'div[data-citation-style=?]', 'bibtex', text: /author=\{Real Person, One Truly van der, IV and/
+  end
+
+  test 'should display CFF blob as citation inline' do
+    @git_version.add_file('CITATION.cff', open_fixture_file('CITATION.cff'))
+    disable_authorization_checks { @git_version.save! }
+
+    get :raw, xhr: true, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'CITATION.cff',
+                                   display: 'citation', disposition: 'inline', style: 'the-lancet' }
+
+    assert_response :success
+    assert @response.header['Content-Type'].start_with?('text/html')
+    assert_equal ApplicationController::USER_CONTENT_CSP, @response.header['Content-Security-Policy']
+    assert_select 'body', count: 0
+    assert_select 'div[data-citation-style=?]', 'the-lancet', text: /Real Person OT van der IV/
   end
 end
