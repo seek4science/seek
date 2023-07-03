@@ -41,7 +41,8 @@ module WorkflowsHelper
                 class: "maturity-level label #{level == :released ? 'label-success' : 'label-warning'}")
   end
 
-  def test_status_badge(status)
+  def test_status_badge(resource)
+    status = resource.test_status
     case status
     when :all_passing
       label_class = 'label-success'
@@ -56,7 +57,13 @@ module WorkflowsHelper
       label_class = 'label-default'
       label = t('test_status.not_available')
     end
-    content_tag(:span, "Tests: #{label}", class: "test-status label #{label_class}")
+    url = LifeMonitor::Rest::Client.status_page_url(resource)
+    link_to(url, class: 'lifemonitor-status btn btn-default', target: '_blank', rel: 'noopener',
+            'data-tooltip' => 'Click to view in LifeMonitor') do
+      image_tag('logos/life_monitor_logo_no_text.png', class: 'icon lifemonitor-logo') +
+        'Tests ' +
+        content_tag(:span, label, class: "test-status label #{label_class}")
+    end
   end
 
   def run_workflow_url(workflow_version)

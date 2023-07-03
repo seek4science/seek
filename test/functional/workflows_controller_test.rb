@@ -1755,4 +1755,15 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_response :success
     assert_select '#citation', text: /van der Real Person, O\. T\./, count: 1
   end
+
+  test 'display test status with link to LifeMonitor on show page' do
+    wf = FactoryBot.create(:public_workflow)
+    disable_authorization_checks do
+      wf.update_test_status(:all_passing, wf.version)
+    end
+
+    get :show, params: { id: wf }
+
+    assert_select 'a.lifemonitor-status[href=?]', "https://localhost:8443/workflow;uuid=#{wf.uuid}"
+  end
 end
