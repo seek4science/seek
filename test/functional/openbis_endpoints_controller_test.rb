@@ -7,15 +7,15 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
 
   def setup
-    Factory :experimental_assay_class
+    FactoryBot.create :experimental_assay_class
     mock_openbis_calls
-    Factory(:person)
-    @project_administrator = Factory(:project_administrator)
+    FactoryBot.create(:person)
+    @project_administrator = FactoryBot.create(:project_administrator)
     @project = @project_administrator.projects.first
   end
 
   test 'show' do
-    ep = Factory(:openbis_endpoint, project: @project)
+    ep = FactoryBot.create(:openbis_endpoint, project: @project)
     login_as(@project_administrator)
 
     get :show, params: { id: ep.id }
@@ -23,7 +23,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
   end
 
   test 'destroy' do
-    ep = Factory(:openbis_endpoint, project: @project)
+    ep = FactoryBot.create(:openbis_endpoint, project: @project)
     login_as(@project_administrator)
     assert ep.can_delete?
 
@@ -32,9 +32,9 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
       assert_redirected_to project_openbis_endpoints_path(@project)
     end
 
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     project = person.projects.first
-    ep = Factory(:openbis_endpoint, project: project)
+    ep = FactoryBot.create(:openbis_endpoint, project: project)
     login_as(person)
     refute ep.can_delete?
 
@@ -147,7 +147,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
 
   test 'update' do
     login_as(@project_administrator)
-    ep = Factory(:openbis_endpoint, project: @project)
+    ep = FactoryBot.create(:openbis_endpoint, project: @project)
     refute_equal Policy::ACCESSIBLE, ep.policy.access_type
     assert_empty ep.policy.permissions
 
@@ -196,8 +196,8 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
   #     disable_authorization_checks do
   #       @project.update(default_license: 'wibble')
   #     end
-  #     endpoint = Factory(:openbis_endpoint, project: @project,
-  # policy: Factory(:private_policy, permissions: [Factory(:permission, contributor: @project)]))
+  #     endpoint = FactoryBot.create(:openbis_endpoint, project: @project,
+  # policy: FactoryBot.create(:private_policy, permissions: [FactoryBot.create(:permission, contributor: @project)]))
   #     perm_id = '20160210130454955-23'
   #     login_as(@project_administrator)
   #     assert_difference('DataFile.count') do
@@ -231,9 +231,9 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
   #     # already tests for project admin in test add dataset
   #
   #     # project member
-  #     person = Factory(:person)
+  #     person = FactoryBot.create(:person)
   #     project = person.projects.first
-  #     endpoint = Factory(:openbis_endpoint, project: project)
+  #     endpoint = FactoryBot.create(:openbis_endpoint, project: project)
   #     perm_id = '20160210130454955-23'
   #     login_as(person)
   #     assert_difference('DataFile.count') do
@@ -244,8 +244,8 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
   #     logout
   #
   #     # none project member
-  #     person = Factory(:person)
-  #     endpoint = Factory(:openbis_endpoint, project: Factory(:project))
+  #     person = FactoryBot.create(:person)
+  #     endpoint = FactoryBot.create(:openbis_endpoint, project: FactoryBot.create(:project))
   #     perm_id = '20160210130454955-23'
   #     login_as(person)
   #     assert_no_difference('DataFile.count') do
@@ -263,7 +263,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
     logout
 
     # project member can browse
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     project = person.projects.first
     login_as(person)
     get :browse, params: { project_id: project.id }
@@ -272,16 +272,16 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
     logout
 
     # non project member cannot browse
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
-    get :browse, params: { project_id: Factory(:project).id }
+    get :browse, params: { project_id: FactoryBot.create(:project).id }
     assert_redirected_to :root
 
     logout
 
     # not enabled
     with_config_value(:openbis_enabled, false) do
-      project_admin = Factory(:project_administrator)
+      project_admin = FactoryBot.create(:project_administrator)
       project = project_admin.projects.first
       login_as(project_admin)
       get :browse, params: { project_id: project.id }
@@ -304,7 +304,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
     logout
 
     # normal project member cannot access
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
 
     login_as(person)
 
@@ -314,7 +314,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
     refute @response.body.include?('API-SPACE')
 
     # none project member cannot
-    project = Factory(:project)
+    project = FactoryBot.create(:project)
     post :fetch_spaces, params: { project_id: project.id, as_endpoint: 'https://openbis-api.fair-dom.org/openbis/openbis', dss_endpoint: 'https://openbis-api.fair-dom.org/datastore_server', web_endpoint: 'https://openbis-api.fair-dom.org/openbis', username: 'wibble', password: 'wobble' }
     assert_response :redirect
     refute @response.body.include?('API-SPACE')
@@ -335,7 +335,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
     logout
 
     # normal project member cannot access
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
 
     login_as(person)
 
@@ -351,7 +351,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
     refute @response.body.include?('true')
 
     # none project member cannot
-    project = Factory(:project)
+    project = FactoryBot.create(:project)
     get :test_endpoint, params: { project_id: project.id, as_endpoint: 'https://openbis-api.fair-dom.org/openbis/openbis', dss_endpoint: 'https://openbis-api.fair-dom.org/datastore_server', web_endpoint: 'https://openbis-api.fair-dom.org/openbis', username: 'wibble', password: 'wobble', format: :json }
     assert_response 400
     refute @response.body.include?('true')
@@ -359,7 +359,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
 
   test 'refresh metadata store' do
     login_as(@project_administrator)
-    endpoint = Factory(:openbis_endpoint, project: @project)
+    endpoint = FactoryBot.create(:openbis_endpoint, project: @project)
     post :refresh, params: { id: endpoint.id }
     assert_redirected_to endpoint
   end
@@ -367,7 +367,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
   test 'reset_fatal clears fatal stamps and marks for refresh' do
     login_as(@project_administrator)
 
-    ep = Factory(:openbis_endpoint, project: @project)
+    ep = FactoryBot.create(:openbis_endpoint, project: @project)
     @zample = Seek::Openbis::Zample.new(ep, '20171002172111346-37')
     asset = OpenbisExternalAsset.build(@zample)
 

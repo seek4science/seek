@@ -4,14 +4,14 @@ class RemoveSubscriptionsForItemJobTest < ActiveSupport::TestCase
   fixtures :all
 
   def setup
-    User.current_user = Factory(:user)
+    User.current_user = FactoryBot.create(:user)
   end
 
   test 'perform' do
     # set subscriptions
-    person1 = Factory(:person)
-    person2 = Factory(:person)
-    subscribable = Factory(:data_file, policy: Factory(:public_policy))
+    person1 = FactoryBot.create(:person)
+    person2 = FactoryBot.create(:person)
+    subscribable = FactoryBot.create(:data_file, policy: FactoryBot.create(:public_policy))
     assert_equal 1, subscribable.projects.count
     project = subscribable.projects.first
     project_subscription1 = person1.project_subscriptions.create project: project, frequency: 'weekly'
@@ -24,7 +24,7 @@ class RemoveSubscriptionsForItemJobTest < ActiveSupport::TestCase
 
     # when subscribable changes the projects, RemoveSubscriptionsForItemJob is also created
 
-    proj = Factory(:project)
+    proj = FactoryBot.create(:project)
     assert_enqueued_with(job: RemoveSubscriptionsForItemJob, args: [subscribable, [project]]) do
       subscribable.projects = [proj]
       subscribable.save

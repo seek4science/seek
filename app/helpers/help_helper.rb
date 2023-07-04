@@ -30,12 +30,13 @@ module HelpHelper
     
     key = "info_text." + key_name.underscore
     if (I18n.exists?(key))
-      help_icon_with_link(key_name, t(key))
+      what_is_help_icon_with_link(key_name, t(key))
     end
   end
 
-  def help_icon_with_link(key, text, _delay = 200, extra_style = '')
+  def what_is_help_icon_with_link(key, text, _delay = 200, extra_style = '')
     name = translate_resource_type(key)
+    raise "no translation found for #{key}" if name.nil?
     link = Seek::Help::HelpDictionary.instance.help_link(key)
     unless link.nil?
       link_to content_tag(:span,'',class:'help_icon') + "What is #{name.indefinite_article} #{name}?", link, "data-tooltip"=> text ,target: :_blank

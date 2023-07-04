@@ -2,7 +2,7 @@ require 'test_helper'
 
 class NextflowExtractionTest < ActiveSupport::TestCase
   setup do
-    @nextflow = WorkflowClass.find_by_key('nextflow') || Factory(:nextflow_workflow_class)
+    @nextflow = WorkflowClass.find_by_key('nextflow') || FactoryBot.create(:nextflow_workflow_class)
   end
 
   test 'extracts metadata from nextflow config file' do

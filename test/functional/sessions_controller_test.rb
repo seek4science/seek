@@ -106,7 +106,7 @@ class SessionsControllerTest < ActionController::TestCase
   end
 
   test 'non_activated_user_should_redirect_to_new_with_message' do
-    user = Factory(:brand_new_user, person: Factory(:person))
+    user = FactoryBot.create(:brand_new_user, person: FactoryBot.create(:person))
     post :create, params: { login: user.login, password: user.password }
     assert !session[:user_id]
     assert_redirected_to login_path
@@ -115,7 +115,7 @@ class SessionsControllerTest < ActionController::TestCase
   end
 
   test 'partly_registed_user_should_redirect_to_select_person' do
-    user = Factory(:brand_new_user)
+    user = FactoryBot.create(:brand_new_user)
     post :create, params: { login: user.login, password: user.password }
     assert session[:user_id]
     assert_equal user.id, session[:user_id]
@@ -125,28 +125,28 @@ class SessionsControllerTest < ActionController::TestCase
 
   test 'should redirect to root after logging out from the search result page' do
     login_as :quentin
-    @request.env['HTTP_REFERER'] = 'http://test.host/search/'
+    @request.env['HTTP_REFERER'] = search_url
     get :destroy
     assert_redirected_to :root
   end
 
   test 'should redirect to back after logging out from the page excepting search result page' do
     login_as :quentin
-    @request.env['HTTP_REFERER'] = 'http://test.host/data_files/'
+    @request.env['HTTP_REFERER'] = data_files_url
     get :destroy
-    assert_redirected_to 'http://test.host/data_files/'
+    assert_redirected_to data_files_url
   end
 
   test 'should redirect to root after logging in from the search result page' do
-    @request.env['HTTP_REFERER'] = 'http://test.host/search'
+    @request.env['HTTP_REFERER'] = search_url
     post :create, params: { login: 'quentin', password: 'test' }
     assert_redirected_to :root
   end
 
   test 'should redirect to back after logging in from the page excepting search result page' do
-    @request.env['HTTP_REFERER'] = 'http://test.host/data_files/'
+    @request.env['HTTP_REFERER'] = data_files_url
     post :create, params: { login: 'quentin', password: 'test' }
-    assert_redirected_to 'http://test.host/data_files/'
+    assert_redirected_to data_files_url
   end
 
   test 'should redirect to given path' do
@@ -161,7 +161,7 @@ class SessionsControllerTest < ActionController::TestCase
     assert session[:user_id]
 
     assert_not_includes @response.location, 'not.our.domain'
-    assert_includes @response.location, 'test.host'
+    assert_includes @response.location, Seek::Config.site_base_host
   end
 
   test 'should have only seek login' do
@@ -211,7 +211,7 @@ class SessionsControllerTest < ActionController::TestCase
   end
 
   test 'should authenticate user with legacy encryption and update password' do
-    sha1_user = Factory(:sha1_pass_user)
+    sha1_user = FactoryBot.create(:sha1_pass_user)
     test_password = generate_user_password
 
     assert_equal User.sha1_encrypt(test_password, sha1_user.salt), sha1_user.crypted_password

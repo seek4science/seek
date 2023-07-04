@@ -6,14 +6,14 @@ class ProgrammeApiTest < ActionDispatch::IntegrationTest
 
   def setup
     admin_login
-    @programme_administrator = Factory(:person)
-    @project = Factory(:project)
-    @programme = Factory(:programme)
+    @programme_administrator = FactoryBot.create(:person)
+    @project = FactoryBot.create(:project)
+    @programme = FactoryBot.create(:programme)
   end
 
   #normal user without admin rights
   test 'user can create programme' do
-    a_person = Factory(:person)
+    a_person = FactoryBot.create(:person)
     user_login(a_person)
     body = api_max_post_body
     assert_difference('Programme.count') do
@@ -24,9 +24,9 @@ class ProgrammeApiTest < ActionDispatch::IntegrationTest
 
   #programme_admin role access
   test 'programme admin can update' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     user_login(person)
-    prog = Factory(:programme)
+    prog = FactoryBot.create(:programme)
     person.is_programme_administrator = true, prog
     disable_authorization_checks { person.save! }
     body = api_max_post_body
@@ -39,9 +39,9 @@ class ProgrammeApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'programme admin can delete when no projects' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     user_login(person)
-    prog = Factory(:programme)
+    prog = FactoryBot.create(:programme)
     person.is_programme_administrator = true, prog
     disable_authorization_checks { person.save! }
 

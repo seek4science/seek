@@ -2,10 +2,10 @@ require 'test_helper'
 
 class LegacyWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
   setup do
-    admin = Factory.create(:admin)
+    admin = FactoryBot.create(:admin)
     login_as(admin.user)
-    Factory(:cwl_workflow_class) # Make sure the CWL class is present
-    Factory(:nextflow_workflow_class)
+    FactoryBot.create(:cwl_workflow_class) # Make sure the CWL class is present
+    FactoryBot.create(:nextflow_workflow_class)
     @project = admin.person.projects.first
     @git_support = Seek::Config.git_support_enabled
     Seek::Config.git_support_enabled = false
@@ -33,7 +33,7 @@ class LegacyWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'can post RO crate as new version' do
-    workflow = Factory(:workflow, policy: Factory(:public_policy), contributor: @current_person)
+    workflow = FactoryBot.create(:workflow, policy: FactoryBot.create(:public_policy), contributor: @current_person)
 
     assert_no_difference('Workflow.count') do
       assert_difference('Workflow::Version.count', 1) do

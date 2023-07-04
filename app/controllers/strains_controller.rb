@@ -28,7 +28,7 @@ class StrainsController < ApplicationController
 
   def create
     @strain = new_strain(strain_params)
-    @strain.policy.set_attributes_with_sharing(policy_params)
+    update_sharing_policies(@strain)
     update_annotations(params[:tag_list], @strain)
 
     if @strain.save

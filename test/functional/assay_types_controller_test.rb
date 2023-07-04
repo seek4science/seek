@@ -6,11 +6,11 @@ class AssayTypesControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
 
   def setup
-    login_as(Factory(:admin))
+    login_as(FactoryBot.create(:admin))
   end
 
   test 'should show assay types to public' do
-    assay = Factory :experimental_assay, assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics', policy: Factory(:public_policy)
+    assay = FactoryBot.create :experimental_assay, assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics', policy: FactoryBot.create(:public_policy)
     logout
     get :show, params: { uri: assay.assay_type_uri }
     assert_response :success
@@ -22,7 +22,7 @@ class AssayTypesControllerTest < ActionController::TestCase
   end
 
   test 'hierarchy' do
-    assay = Factory :experimental_assay, title: 'flux balance assay', assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Flux_balance_analysis', policy: Factory(:public_policy)
+    assay = FactoryBot.create :experimental_assay, title: 'flux balance assay', assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Flux_balance_analysis', policy: FactoryBot.create(:public_policy)
     logout
     get :show, params: { uri: 'http://jermontology.org/ontology/JERMOntology#Experimental_assay_type' }
     assert_response :success
@@ -35,7 +35,7 @@ class AssayTypesControllerTest < ActionController::TestCase
   end
 
   test 'default page' do
-    assay = Factory :experimental_assay, policy: Factory(:public_policy)
+    assay = FactoryBot.create :experimental_assay, policy: FactoryBot.create(:public_policy)
     get :show
     assert_response :success
     assert_select 'h1', text: /Assay type 'Experimental assay type'/
@@ -45,8 +45,8 @@ class AssayTypesControllerTest < ActionController::TestCase
   end
 
   test 'should show only related authorized assays' do
-    pub_assay = Factory :experimental_assay, assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics', policy: Factory(:public_policy)
-    priv_assay = Factory :experimental_assay, assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics', policy: Factory(:private_policy)
+    pub_assay = FactoryBot.create :experimental_assay, assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics', policy: FactoryBot.create(:public_policy)
+    priv_assay = FactoryBot.create :experimental_assay, assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics', policy: FactoryBot.create(:private_policy)
     logout
     get :show, params: { uri: 'http://jermontology.org/ontology/JERMOntology#Experimental_assay_type' }
     assert_response :success
@@ -59,14 +59,14 @@ class AssayTypesControllerTest < ActionController::TestCase
   end
 
   test 'modelling analysis' do
-    assay = Factory :modelling_assay
+    assay = FactoryBot.create :modelling_assay
     get :show, params: { uri: assay.assay_type_uri }
     assert_response :success
     assert_select 'h1', text: /Biological problem addressed 'Model analysis type'/
   end
 
   test 'unmatched label passed render term suggestion page with ontology label' do
-    assay = Factory :experimental_assay, policy: Factory(:public_policy)
+    assay = FactoryBot.create :experimental_assay, policy: FactoryBot.create(:public_policy)
     # with unmatched label
     get :show, params: { uri: assay.assay_type_uri, label: 'frog' }
     # undefined label with uri in ontology will go to suggestion page pointing to term with ontology label
@@ -76,9 +76,9 @@ class AssayTypesControllerTest < ActionController::TestCase
   end
 
   test 'correct label passed with ontology uri should render correctly' do
-    assay = Factory :experimental_assay, policy: Factory(:public_policy)
+    assay = FactoryBot.create :experimental_assay, policy: FactoryBot.create(:public_policy)
     # assay with ontology types
-    assay = Factory :experimental_assay, policy: Factory(:public_policy)
+    assay = FactoryBot.create :experimental_assay, policy: FactoryBot.create(:public_policy)
     # with correct label
     get :show, params: { uri: assay.assay_type_uri, label: assay.assay_type_label }
     assert_select 'h1', text: /Assay type '#{assay.assay_type_label}'/
@@ -88,7 +88,7 @@ class AssayTypesControllerTest < ActionController::TestCase
   end
 
   test 'no label passed render the same page as long as the same ontolgoy uri is passed' do
-    assay = Factory :experimental_assay, policy: Factory(:public_policy)
+    assay = FactoryBot.create :experimental_assay, policy: FactoryBot.create(:public_policy)
     # without label
     get :show, params: { uri: assay.assay_type_uri }
     assert_select 'h1', text: /Assay type '#{assay.assay_type_label}'/i
@@ -99,8 +99,8 @@ class AssayTypesControllerTest < ActionController::TestCase
 
   test 'correct label passed with suggested assay type should render correctly' do
     # assay with suggested types
-    suggested_assay_type = Factory(:suggested_assay_type, label: 'this is an assay type')
-    assay = Factory :experimental_assay, suggested_assay_type: suggested_assay_type, policy: Factory(:public_policy)
+    suggested_assay_type = FactoryBot.create(:suggested_assay_type, label: 'this is an assay type')
+    assay = FactoryBot.create :experimental_assay, suggested_assay_type: suggested_assay_type, policy: FactoryBot.create(:public_policy)
 
     # with correct label
     get :show, params: { uri: suggested_assay_type.uri, label: 'this is an assay type' }
@@ -111,8 +111,8 @@ class AssayTypesControllerTest < ActionController::TestCase
   end
 
   test 'unmatched label passed render term suggestion page with suggested_assay_type_label' do
-    suggested_assay_type = Factory(:suggested_assay_type)
-    assay = Factory :experimental_assay, suggested_assay_type: suggested_assay_type, policy: Factory(:public_policy)
+    suggested_assay_type = FactoryBot.create(:suggested_assay_type)
+    assay = FactoryBot.create :experimental_assay, suggested_assay_type: suggested_assay_type, policy: FactoryBot.create(:public_policy)
     get :show, params: { uri: assay.assay_type_uri, label: 'frog' }
     assert_not_nil flash[:notice]
     assert_select 'h1', text: /Assay type 'frog'/

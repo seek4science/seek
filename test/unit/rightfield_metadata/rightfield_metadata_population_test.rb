@@ -3,18 +3,18 @@ require 'test_helper'
 # tests related to populating data file from rightfield metadata template
 class RightfieldMetadataPopulationTest < ActiveSupport::TestCase
   def setup
-    @user = Factory(:user)
+    @user = FactoryBot.create(:user)
     @person = @user.person
   end
 
   test 'basic metadata population' do
     User.with_current_user(@user) do
-      project = Factory(:project, id: 9999)
+      project = FactoryBot.create(:project, id: 9999)
       assert_equal 9999, project.id
-      @person.add_to_project_and_institution(project, Factory(:institution))
+      @person.add_to_project_and_institution(project, FactoryBot.create(:institution))
       @person.save!
 
-      blob = Factory(:rightfield_master_template)
+      blob = FactoryBot.create(:rightfield_master_template)
       data_file = DataFile.new(content_blob: blob)
       assert data_file.contains_extractable_spreadsheet?
 
@@ -31,12 +31,12 @@ class RightfieldMetadataPopulationTest < ActiveSupport::TestCase
 
   test 'rdf successful for template based data file' do
     User.with_current_user(@user) do
-      project = Factory(:project, id: 9999)
+      project = FactoryBot.create(:project, id: 9999)
       assert_equal 9999, project.id
-      @person.add_to_project_and_institution(project, Factory(:institution))
+      @person.add_to_project_and_institution(project, FactoryBot.create(:institution))
       @person.save!
 
-      blob = Factory(:rightfield_master_template)
+      blob = FactoryBot.create(:rightfield_master_template)
       data_file = DataFile.new(content_blob: blob)
 
       data_file.populate_metadata_from_template
@@ -51,7 +51,7 @@ class RightfieldMetadataPopulationTest < ActiveSupport::TestCase
 
   test 'handles none excel blob' do
     User.with_current_user(@user) do
-      blob = Factory(:txt_content_blob)
+      blob = FactoryBot.create(:txt_content_blob)
       data_file = DataFile.new(content_blob: blob)
       refute data_file.contains_extractable_spreadsheet?
 
@@ -66,7 +66,7 @@ class RightfieldMetadataPopulationTest < ActiveSupport::TestCase
 
   test 'handles none rightfield blob' do
     User.with_current_user(@user) do
-      blob = Factory(:small_test_spreadsheet_content_blob)
+      blob = FactoryBot.create(:small_test_spreadsheet_content_blob)
       data_file = DataFile.new(content_blob: blob)
       assert data_file.contains_extractable_spreadsheet?
 
@@ -80,15 +80,15 @@ class RightfieldMetadataPopulationTest < ActiveSupport::TestCase
 
   test 'template with link to assay' do
     User.with_current_user(@user) do
-      blob = Factory(:rightfield_master_template_with_assay_link)
+      blob = FactoryBot.create(:rightfield_master_template_with_assay_link)
       data_file = DataFile.new(content_blob: blob)
 
-      assay = Factory(:assay, id: 9999, contributor: @person)
+      assay = FactoryBot.create(:assay, id: 9999, contributor: @person)
       assert_equal 9999, assay.id
 
-      project = Factory(:project, id: 9999)
+      project = FactoryBot.create(:project, id: 9999)
       assert_equal 9999, project.id
-      @person.add_to_project_and_institution(project, Factory(:institution))
+      @person.add_to_project_and_institution(project, FactoryBot.create(:institution))
       @person.save!
 
       warnings = data_file.populate_metadata_from_template
@@ -104,7 +104,7 @@ class RightfieldMetadataPopulationTest < ActiveSupport::TestCase
 
   test 'initialise assay as blank when missing' do
     User.with_current_user(@user) do
-      blob = Factory(:small_test_spreadsheet_content_blob)
+      blob = FactoryBot.create(:small_test_spreadsheet_content_blob)
       data_file = DataFile.new(content_blob: blob)
       assay, warnings = data_file.initialise_assay_from_template
       refute_nil assay
@@ -116,7 +116,7 @@ class RightfieldMetadataPopulationTest < ActiveSupport::TestCase
 
       assert_empty warnings
 
-      blob = Factory(:rightfield_master_template)
+      blob = FactoryBot.create(:rightfield_master_template)
       data_file = DataFile.new(content_blob: blob)
       assay, warnings = data_file.initialise_assay_from_template
 
@@ -133,15 +133,15 @@ class RightfieldMetadataPopulationTest < ActiveSupport::TestCase
 
   test 'initialise assay from template' do
     User.with_current_user(@user) do
-      blob = Factory(:rightfield_master_template_with_assay)
+      blob = FactoryBot.create(:rightfield_master_template_with_assay)
       data_file = DataFile.new(content_blob: blob)
 
-      study = Factory(:study, id: 9999, contributor: @person)
+      study = FactoryBot.create(:study, id: 9999, contributor: @person)
       assert_equal 9999, study.id
 
-      project = Factory(:project, id: 9999)
+      project = FactoryBot.create(:project, id: 9999)
       assert_equal 9999, project.id
-      @person.add_to_project_and_institution(project, Factory(:institution))
+      @person.add_to_project_and_institution(project, FactoryBot.create(:institution))
       @person.save!
 
       warnings = data_file.populate_metadata_from_template
@@ -167,18 +167,18 @@ class RightfieldMetadataPopulationTest < ActiveSupport::TestCase
 
   test 'initialise assay from template with sop' do
     User.with_current_user(@user) do
-      blob = Factory(:rightfield_master_template_with_assay_with_sop)
+      blob = FactoryBot.create(:rightfield_master_template_with_assay_with_sop)
       data_file = DataFile.new(content_blob: blob)
 
-      study = Factory(:study, id: 9999, contributor: @person)
+      study = FactoryBot.create(:study, id: 9999, contributor: @person)
       assert_equal 9999, study.id
 
-      project = Factory(:project, id: 9999)
+      project = FactoryBot.create(:project, id: 9999)
       assert_equal 9999, project.id
-      @person.add_to_project_and_institution(project, Factory(:institution))
+      @person.add_to_project_and_institution(project, FactoryBot.create(:institution))
       @person.save!
 
-      sop = Factory(:sop, id: 9999, contributor: @person)
+      sop = FactoryBot.create(:sop, id: 9999, contributor: @person)
       assert_equal 9999, sop.id
 
       warnings = data_file.populate_metadata_from_template
@@ -202,17 +202,17 @@ class RightfieldMetadataPopulationTest < ActiveSupport::TestCase
 
   test 'detect attempt to create duplicate assay' do
     User.with_current_user(@user) do
-      blob = Factory(:rightfield_master_template_with_assay)
+      blob = FactoryBot.create(:rightfield_master_template_with_assay)
       data_file = DataFile.new(content_blob: blob)
 
-      study = Factory(:study, id: 9999, contributor: @person)
+      study = FactoryBot.create(:study, id: 9999, contributor: @person)
       assert_equal 9999, study.id
 
-      duplicate_assay = Factory(:assay, title: 'My Assay Title', study: study, contributor: @person)
+      duplicate_assay = FactoryBot.create(:assay, title: 'My Assay Title', study: study, contributor: @person)
 
-      project = Factory(:project, id: 9999)
+      project = FactoryBot.create(:project, id: 9999)
       assert_equal 9999, project.id
-      @person.add_to_project_and_institution(project, Factory(:institution))
+      @person.add_to_project_and_institution(project, FactoryBot.create(:institution))
       @person.save!
 
       warnings = data_file.populate_metadata_from_template
@@ -236,12 +236,12 @@ class RightfieldMetadataPopulationTest < ActiveSupport::TestCase
 
   test 'assay from template without study' do
     User.with_current_user(@user) do
-      blob = Factory(:rightfield_master_template_with_assay_no_study)
+      blob = FactoryBot.create(:rightfield_master_template_with_assay_no_study)
       data_file = DataFile.new(content_blob: blob)
 
-      project = Factory(:project, id: 9999)
+      project = FactoryBot.create(:project, id: 9999)
       assert_equal 9999, project.id
-      @person.add_to_project_and_institution(project, Factory(:institution))
+      @person.add_to_project_and_institution(project, FactoryBot.create(:institution))
       @person.save!
 
       assay, warnings = data_file.initialise_assay_from_template
@@ -263,7 +263,7 @@ class RightfieldMetadataPopulationTest < ActiveSupport::TestCase
     User.with_current_user(@user) do
       # all assay metadata should be left empty. template is ignored if assay has no title
 
-      blob = Factory(:rightfield_master_template_with_assay_no_assay_title)
+      blob = FactoryBot.create(:rightfield_master_template_with_assay_no_assay_title)
       data_file = DataFile.new(content_blob: blob)
 
       assay, warnings = data_file.initialise_assay_from_template
@@ -280,15 +280,15 @@ class RightfieldMetadataPopulationTest < ActiveSupport::TestCase
 
   test 'assay from template with no df title or description' do
     User.with_current_user(@user) do
-      blob = Factory(:rightfield_master_template_with_assay_no_df_metadata)
+      blob = FactoryBot.create(:rightfield_master_template_with_assay_no_df_metadata)
       data_file = DataFile.new(content_blob: blob)
 
-      study = Factory(:study, id: 9999, contributor: @person)
+      study = FactoryBot.create(:study, id: 9999, contributor: @person)
       assert_equal 9999, study.id
 
-      project = Factory(:project, id: 9999)
+      project = FactoryBot.create(:project, id: 9999)
       assert_equal 9999, project.id
-      @person.add_to_project_and_institution(project, Factory(:institution))
+      @person.add_to_project_and_institution(project, FactoryBot.create(:institution))
       @person.save!
 
       warnings = data_file.populate_metadata_from_template
@@ -314,15 +314,15 @@ class RightfieldMetadataPopulationTest < ActiveSupport::TestCase
   test 'seekid identifier hosts dont match base_host' do
     with_config_value :site_base_host, 'http://myseek.com/' do
       User.with_current_user(@user) do
-        blob = Factory(:rightfield_master_template)
+        blob = FactoryBot.create(:rightfield_master_template)
         data_file = DataFile.new(content_blob: blob)
 
-        study = Factory(:study, id: 9999, contributor: @person)
+        study = FactoryBot.create(:study, id: 9999, contributor: @person)
         assert_equal 9999, study.id
 
-        project = Factory(:project, id: 9999)
+        project = FactoryBot.create(:project, id: 9999)
         assert_equal 9999, project.id
-        @person.add_to_project_and_institution(project, Factory(:institution))
+        @person.add_to_project_and_institution(project, FactoryBot.create(:institution))
         @person.save!
 
         warnings = data_file.populate_metadata_from_template
@@ -344,10 +344,10 @@ class RightfieldMetadataPopulationTest < ActiveSupport::TestCase
 
   test 'not a project member' do
     User.with_current_user(@user) do
-      project = Factory(:project, id: 9999)
+      project = FactoryBot.create(:project, id: 9999)
       assert_equal 9999, project.id
 
-      blob = Factory(:rightfield_master_template)
+      blob = FactoryBot.create(:rightfield_master_template)
       data_file = DataFile.new(content_blob: blob)
 
       warnings = data_file.populate_metadata_from_template
@@ -364,12 +364,12 @@ class RightfieldMetadataPopulationTest < ActiveSupport::TestCase
 
   test 'cant be found in database' do
     User.with_current_user(@user) do
-      blob = Factory(:rightfield_master_template_with_assay_link)
+      blob = FactoryBot.create(:rightfield_master_template_with_assay_link)
       data_file = DataFile.new(content_blob: blob)
 
-      project = Factory(:project, id: 9999)
+      project = FactoryBot.create(:project, id: 9999)
       assert_equal 9999, project.id
-      @person.add_to_project_and_institution(project, Factory(:institution))
+      @person.add_to_project_and_institution(project, FactoryBot.create(:institution))
       @person.save!
 
       warnings = data_file.populate_metadata_from_template
@@ -387,16 +387,16 @@ class RightfieldMetadataPopulationTest < ActiveSupport::TestCase
 
   test 'no permission' do
     User.with_current_user(@user) do
-      blob = Factory(:rightfield_master_template_with_assay_link)
+      blob = FactoryBot.create(:rightfield_master_template_with_assay_link)
       data_file = DataFile.new(content_blob: blob)
 
-      assay = Factory(:assay, id: 9999)
+      assay = FactoryBot.create(:assay, id: 9999)
       assert_equal 9999, assay.id
       refute assay.can_edit?(@user)
 
-      project = Factory(:project, id: 9999)
+      project = FactoryBot.create(:project, id: 9999)
       assert_equal 9999, project.id
-      @person.add_to_project_and_institution(project, Factory(:institution))
+      @person.add_to_project_and_institution(project, FactoryBot.create(:institution))
       @person.save!
 
       warnings = data_file.populate_metadata_from_template
@@ -414,18 +414,18 @@ class RightfieldMetadataPopulationTest < ActiveSupport::TestCase
 
   test 'no permission for sop' do
     User.with_current_user(@user) do
-      blob = Factory(:rightfield_master_template_with_assay_with_sop)
+      blob = FactoryBot.create(:rightfield_master_template_with_assay_with_sop)
       data_file = DataFile.new(content_blob: blob)
 
-      study = Factory(:study, id: 9999, contributor: @person)
+      study = FactoryBot.create(:study, id: 9999, contributor: @person)
       assert_equal 9999, study.id
 
-      project = Factory(:project, id: 9999)
+      project = FactoryBot.create(:project, id: 9999)
       assert_equal 9999, project.id
-      @person.add_to_project_and_institution(project, Factory(:institution))
+      @person.add_to_project_and_institution(project, FactoryBot.create(:institution))
       @person.save!
 
-      sop = Factory(:sop, id: 9999)
+      sop = FactoryBot.create(:sop, id: 9999)
       assert_equal 9999, sop.id
       refute sop.can_view?(@user)
 

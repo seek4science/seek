@@ -39,8 +39,8 @@ class InstitutionsControllerTest < ActionController::TestCase
   end
 
   def test_should_get_edit
-    i = Factory(:institution)
-    Factory(:avatar, owner: i)
+    i = FactoryBot.create(:institution)
+    FactoryBot.create(:avatar, owner: i)
     get :edit, params: { id: i }
 
     assert_response :success
@@ -77,8 +77,8 @@ class InstitutionsControllerTest < ActionController::TestCase
 
   test 'can not destroy institution if it contains people' do
     institution = institutions(:four)
-    work_group = Factory(:work_group, institution: institution)
-    a_person = Factory(:person, group_memberships: [Factory(:group_membership, work_group: work_group)])
+    work_group = FactoryBot.create(:work_group, institution: institution)
+    a_person = FactoryBot.create(:person, group_memberships: [FactoryBot.create(:group_membership, work_group: work_group)])
     institution.reload
     assert_includes institution.people, a_person
     get :show, params: { id: institution }
@@ -90,7 +90,7 @@ class InstitutionsControllerTest < ActionController::TestCase
   end
 
   def test_project_administrator_can_edit
-    project_admin = Factory(:project_administrator)
+    project_admin = FactoryBot.create(:project_administrator)
     institution = project_admin.institutions.first
     login_as(project_admin.user)
     get :show, params: { id: institution }
@@ -105,7 +105,7 @@ class InstitutionsControllerTest < ActionController::TestCase
   end
 
   def test_user_cant_edit_project
-    login_as(Factory(:user))
+    login_as(FactoryBot.create(:user))
     get :show, params: { id: institutions(:two) }
     assert_select 'a', text: /Edit Institution/, count: 0
 
@@ -127,7 +127,7 @@ class InstitutionsControllerTest < ActionController::TestCase
   end
 
   test 'project administrator can create institution' do
-    login_as(Factory(:project_administrator).user)
+    login_as(FactoryBot.create(:project_administrator).user)
     get :new
     assert_response :success
 
@@ -138,10 +138,10 @@ class InstitutionsControllerTest < ActionController::TestCase
 
   test 'filtered by programme via nested route' do
     assert_routing 'programmes/4/institutions', controller: 'institutions', action: 'index', programme_id: '4'
-    person1 = Factory(:person)
-    person2 = Factory(:person)
-    prog1 = Factory(:programme, projects: [person1.projects.first])
-    prog2 = Factory(:programme, projects: [person2.projects.first])
+    person1 = FactoryBot.create(:person)
+    person2 = FactoryBot.create(:person)
+    prog1 = FactoryBot.create(:programme, projects: [person1.projects.first])
+    prog2 = FactoryBot.create(:programme, projects: [person2.projects.first])
 
     get :index, params: { programme_id: prog1.id }
     assert_response :success
@@ -153,10 +153,10 @@ class InstitutionsControllerTest < ActionController::TestCase
   end
 
   test 'project administrator can edit institution, which belongs to project they are project administrator, not necessary the institution they are in' do
-    project_admin = Factory(:project_administrator)
+    project_admin = FactoryBot.create(:project_administrator)
     assert_equal 1, project_admin.projects.count
     project = project_admin.projects.first
-    institution = Factory(:institution)
+    institution = FactoryBot.create(:institution)
     project.institutions << institution
 
     assert project.institutions.include? institution
@@ -173,7 +173,7 @@ class InstitutionsControllerTest < ActionController::TestCase
   end
 
   test "project administrator has a 'New Institution' link in the institution index" do
-    login_as(Factory(:project_administrator).user)
+    login_as(FactoryBot.create(:project_administrator).user)
     get :index
     assert_select 'div#content a[href=?]', new_institution_path, count: 1
   end
@@ -184,7 +184,7 @@ class InstitutionsControllerTest < ActionController::TestCase
   end
 
   test 'activity logging' do
-    person = Factory(:project_administrator)
+    person = FactoryBot.create(:project_administrator)
     institution = person.institutions.first
     login_as(person)
 
@@ -208,7 +208,7 @@ class InstitutionsControllerTest < ActionController::TestCase
   end
 
   test 'should create with discussion link' do
-    person = Factory(:admin)
+    person = FactoryBot.create(:admin)
     login_as(person)
     assert_difference('AssetLink.discussion.count') do
       assert_difference('Institution.count') do
@@ -223,8 +223,8 @@ class InstitutionsControllerTest < ActionController::TestCase
   end
 
   test 'should show discussion link' do
-    disc_link = Factory(:discussion_link)
-    institution = Factory(:institution)
+    disc_link = FactoryBot.create(:discussion_link)
+    institution = FactoryBot.create(:institution)
     institution.discussion_links = [disc_link]
     get :show, params: { id: institution }
     assert_response :success
@@ -232,8 +232,8 @@ class InstitutionsControllerTest < ActionController::TestCase
   end
 
   test 'should update node with discussion link' do
-    person = Factory(:admin)
-    institution = Factory(:institution)
+    person = FactoryBot.create(:admin)
+    institution = FactoryBot.create(:institution)
     login_as(person)
     assert_nil institution.discussion_links.first
     assert_difference('AssetLink.discussion.count') do
@@ -246,10 +246,10 @@ class InstitutionsControllerTest < ActionController::TestCase
   end
 
   test 'should destroy related assetlink when the discussion link is removed ' do
-    person = Factory(:admin)
+    person = FactoryBot.create(:admin)
     login_as(person)
-    asset_link = Factory(:discussion_link)
-    institution = Factory(:institution)
+    asset_link = FactoryBot.create(:discussion_link)
+    institution = FactoryBot.create(:institution)
     institution.discussion_links = [asset_link]
     assert_difference('AssetLink.discussion.count', -1) do
       put :update, params: { id: institution.id, institution: { discussion_links_attributes:[{id:asset_link.id, _destroy:'1'}] } }
@@ -260,7 +260,7 @@ class InstitutionsControllerTest < ActionController::TestCase
 
   test 'request all sharing form' do
     Institution.delete_all
-    institutions = [Factory(:institution),Factory(:institution),Factory(:institution)]
+    institutions = [FactoryBot.create(:institution),FactoryBot.create(:institution),FactoryBot.create(:institution)]
     get :request_all_sharing_form, format: :json
     assert_response :success
     expected = institutions.collect{|i| [i.title, i.id]}

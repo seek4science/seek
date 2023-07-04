@@ -131,6 +131,7 @@ SEEK::Application.routes.draw do
         patch 'blob/*path' => 'git#move_file', as: :git_move_file
         get 'freeze' => 'git#freeze_preview', as: :git_freeze_preview
         post 'freeze' => 'git#freeze', as: :git_freeze
+        patch '' => 'git#update', as: :git_update_version
       end
     end
   end
@@ -295,10 +296,11 @@ SEEK::Application.routes.draw do
       post :gatekeeper_decide
       get :gatekeeper_decision_result
       get :waiting_approval_assets
+      post :cancel_publishing_request
       get :select
       get :items
       get :batch_sharing_permission_preview
-      post :batch_change_permssion_for_selected_items
+      post :batch_change_permission_for_selected_items
       post :batch_sharing_permission_changed
     end
     resources :projects, :programmes, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows,
@@ -761,6 +763,13 @@ SEEK::Application.routes.draw do
       get :dynamic_table_data
       get :export_isa, action: :export_isa
     end
+    collection do
+      get :batch_sharing_permission_preview
+      post :batch_change_permission_for_selected_items
+      post :batch_sharing_permission_changed
+      post :export_to_excel, action: :export_to_excel
+      get :download_samples_excel, action: :download_samples_excel
+    end
   end
 
   ### ISA STUDY
@@ -790,7 +799,6 @@ SEEK::Application.routes.draw do
   get '/search/save' => 'search#save', as: :save_search
   get '/search/delete' => 'search#delete', as: :delete_search
   get 'svg/:id.:format' => 'svg#show', as: :svg
-  get '/tags/latest' => 'tags#latest', as: :latest_tags
   get '/tags/query' => 'tags#query', as: :query_tags
   get '/tags' => 'tags#index', as: :all_tags
   get '/tags/:id' => 'tags#show', as: :show_tag

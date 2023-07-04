@@ -8,9 +8,9 @@ class GatekeeperPublishTest < ActionController::TestCase
   include AuthenticatedTestHelper
 
   def setup
-    login_as(Factory(:user))
+    login_as(FactoryBot.create(:user))
     @current_person = User.current_user.person
-    @gatekeeper = Factory(:asset_gatekeeper)
+    @gatekeeper = FactoryBot.create(:asset_gatekeeper)
   end
 
   test 'only gatekeeper can see -Waiting approval assets- button on their profile' do
@@ -59,31 +59,36 @@ class GatekeeperPublishTest < ActionController::TestCase
   test 'requested_approval_assets' do
     login_as(@gatekeeper.user)
 
-    assert ResourcePublishLog.requested_approval_assets_for(@gatekeeper).empty?
+    assert ResourcePublishLog.requested_approval_assets_for_gatekeeper(@gatekeeper).empty?
     get :requested_approval_assets, params: { id: @gatekeeper }
     assert_select 'span[class=?]', 'none_text', text: 'There are no items waiting for your approval'
 
-    user = Factory(:user)
-    df = Factory(:data_file, projects: @gatekeeper.projects)
-    model = Factory(:model, projects: @gatekeeper.projects)
-    sop = Factory(:sop, projects: @gatekeeper.projects)
+    user = FactoryBot.create(:user)
+    df = FactoryBot.create(:data_file, projects: @gatekeeper.projects)
+    model = FactoryBot.create(:model, projects: @gatekeeper.projects)
+    sop = FactoryBot.create(:sop, projects: @gatekeeper.projects)
+    dfr = FactoryBot.create(:data_file, projects: @gatekeeper.projects)
     ResourcePublishLog.add_log(ResourcePublishLog::WAITING_FOR_APPROVAL, df, nil, user)
     ResourcePublishLog.add_log(ResourcePublishLog::WAITING_FOR_APPROVAL, model, nil, user)
     ResourcePublishLog.add_log(ResourcePublishLog::WAITING_FOR_APPROVAL, sop, nil, user)
+    ResourcePublishLog.add_log(ResourcePublishLog::WAITING_FOR_APPROVAL, dfr, nil, user)
+    ResourcePublishLog.add_log(ResourcePublishLog::REJECTED, dfr, "Because I say so", @gatekeeper.user)
 
-    requested_approval_assets = ResourcePublishLog.requested_approval_assets_for(@gatekeeper)
-    assert_equal 3, requested_approval_assets.count
+    requested_approval_assets = ResourcePublishLog.requested_approval_assets_for_gatekeeper(@gatekeeper)
+    assert_equal 4, requested_approval_assets.count
 
     get :requested_approval_assets, params: { id: @gatekeeper }
 
-    assert_select '.type_and_title', count: 3 do
-      assert_select 'a[href=?]', data_file_path(df)
-      assert_select 'a[href=?]', model_path(model)
-      assert_select 'a[href=?]', sop_path(sop)
-    end
-
-    assert_select '.request_info', count: 3 do
-      assert_select 'a[href=?]', person_path(user.person), count: 3
+    #- Assets waiting for approval
+    assert_select 'div.waiting_approval_items', count: 1 do
+      assert_select '.type_and_title', count: 3 do
+        assert_select 'a[href=?]', data_file_path(df)
+        assert_select 'a[href=?]', model_path(model)
+        assert_select 'a[href=?]', sop_path(sop)
+      end
+      assert_select '.request_info', count: 3 do
+        assert_select 'a[href=?]', person_path(user.person), count: 3
+      end
     end
 
     assert_select '.radio-inline', count: 9 do
@@ -96,6 +101,18 @@ class GatekeeperPublishTest < ActionController::TestCase
 
     [df, model, sop].each do |asset|
       assert_select 'textarea[name=?]', "gatekeeper_decide[#{asset.class.name}][#{asset.id}][comment]"
+    end
+
+    # Rejected assets
+    assert_select 'a.rejected_items[style=?]', "display:block;", count: 1
+    assert_select 'a.rejected_items[style=?]', "display:none;", count: 1
+    assert_select 'div.rejected_items[style=?]', "display:none;", count: 1 do
+      assert_select '.type_and_title', count: 1 do
+        assert_select 'a[href=?]', data_file_path(dfr)
+      end
+      assert_select '.request_info', { count: 1, text: /Rejected on:.*Comments: Because I say so/m} do
+        assert_select 'a[href=?]', person_path(user.person), count: 1
+      end
     end
   end
 
@@ -194,8 +211,8 @@ class GatekeeperPublishTest < ActionController::TestCase
 
   test 'only allow gatekeeper_decide the authorized items' do
     params = { gatekeeper_decide: {} }
-    unauthorized_df = Factory(:data_file)
-    unauthorized_model = Factory(:model)
+    unauthorized_df = FactoryBot.create(:data_file)
+    unauthorized_model = FactoryBot.create(:model)
     params[:gatekeeper_decide][unauthorized_df.class.name] ||= {}
     params[:gatekeeper_decide][unauthorized_df.class.name][unauthorized_df.id.to_s] ||= {}
     params[:gatekeeper_decide][unauthorized_df.class.name][unauthorized_df.id.to_s]['decision'] = 1
@@ -246,11 +263,11 @@ class GatekeeperPublishTest < ActionController::TestCase
   private
 
   def requested_approval_assets_for(gatekeeper)
-    df = Factory(:data_file, project_ids: gatekeeper.projects.collect(&:id))
+    df = FactoryBot.create(:data_file, project_ids: gatekeeper.projects.collect(&:id))
     df.resource_publish_logs.create(publish_state: ResourcePublishLog::WAITING_FOR_APPROVAL, user: df.contributor.user)
-    model = Factory(:model, project_ids: gatekeeper.projects.collect(&:id))
+    model = FactoryBot.create(:model, project_ids: gatekeeper.projects.collect(&:id))
     model.resource_publish_logs.create(publish_state: ResourcePublishLog::WAITING_FOR_APPROVAL, user: model.contributor.user)
-    sop = Factory(:sop, project_ids: gatekeeper.projects.collect(&:id))
+    sop = FactoryBot.create(:sop, project_ids: gatekeeper.projects.collect(&:id))
     sop.resource_publish_logs.create(publish_state: ResourcePublishLog::WAITING_FOR_APPROVAL, user: sop.contributor.user)
     assert !df.can_download?(nil)
     assert !model.can_download?(nil)

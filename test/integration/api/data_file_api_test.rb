@@ -6,19 +6,21 @@ class DataFileApiTest < ActionDispatch::IntegrationTest
 
   def setup
     user_login
+    FactoryBot.create(:data_types_controlled_vocab) unless SampleControlledVocab::SystemVocabs.data_types_controlled_vocab
+    FactoryBot.create(:data_formats_controlled_vocab) unless SampleControlledVocab::SystemVocabs.data_formats_controlled_vocab
     @project = @current_user.person.projects.first
-    investigation = Factory(:investigation, projects: [@project], contributor: current_person)
-    study = Factory(:study, investigation: investigation, contributor: current_person)
-    @assay = Factory(:assay, study: study, contributor: current_person)
-    @creator = Factory(:person)
-    @publication = Factory(:publication, projects: [@project])
-    @event = Factory(:event, projects: [@project], policy: Factory(:public_policy))
-    @data_file = Factory(:data_file, policy: Factory(:public_policy), contributor: current_person, creators: [@creator])
-    @workflow = Factory(:workflow, projects: [@project], policy: Factory(:public_policy))
+    investigation = FactoryBot.create(:investigation, projects: [@project], contributor: current_person)
+    study = FactoryBot.create(:study, investigation: investigation, contributor: current_person)
+    @assay = FactoryBot.create(:assay, study: study, contributor: current_person)
+    @creator = FactoryBot.create(:person)
+    @publication = FactoryBot.create(:publication, projects: [@project])
+    @event = FactoryBot.create(:event, projects: [@project], policy: FactoryBot.create(:public_policy))
+    @data_file = FactoryBot.create(:data_file, policy: FactoryBot.create(:public_policy), contributor: current_person, creators: [@creator])
+    @workflow = FactoryBot.create(:workflow, projects: [@project], policy: FactoryBot.create(:public_policy))
   end
 
   test 'can add content to API-created data file' do
-    df = Factory(:api_pdf_data_file, contributor: current_person)
+    df = FactoryBot.create(:api_pdf_data_file, contributor: current_person)
 
     assert df.content_blob.no_content?
     assert df.can_download?(@current_user)
@@ -35,7 +37,7 @@ class DataFileApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'can add content to API-created data file using a multipart/form request' do
-    df = Factory(:api_txt_data_file, contributor: current_person)
+    df = FactoryBot.create(:api_txt_data_file, contributor: current_person)
 
     assert df.content_blob.no_content?
     assert df.can_download?(@current_user)
@@ -50,7 +52,7 @@ class DataFileApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'cannot add content to API-created data file without permission' do
-    df = Factory(:api_pdf_data_file, policy: Factory(:public_download_and_no_custom_sharing)) # Created by someone who is not currently logged in
+    df = FactoryBot.create(:api_pdf_data_file, policy: FactoryBot.create(:public_download_and_no_custom_sharing)) # Created by someone who is not currently logged in
 
     assert df.content_blob.no_content?
     assert df.can_download?(@current_user)
@@ -66,7 +68,7 @@ class DataFileApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'cannot add content to API-created data file that already has content' do
-    df = Factory(:data_file, contributor: current_person)
+    df = FactoryBot.create(:data_file, contributor: current_person)
 
     refute df.content_blob.no_content?
     assert df.can_download?(@current_user)

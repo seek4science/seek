@@ -5,12 +5,15 @@ module Seek
       class DataCatalog < Thing
         schema_mappings created_at: :dateCreated,
                         updated_at: :dateModified,
-                        provider: :provider
+                        provider: :provider,
+                        dataset: :dataset
+
+        associated_items dataset: :datasets
 
         DATACATALOG_PROFILE = 'https://bioschemas.org/profiles/DataCatalog/0.3-RELEASE-2019_07_01/'.freeze
 
         def rdf_resource
-          nil
+          RDF::Resource.new(url)
         end
 
         def schema_type

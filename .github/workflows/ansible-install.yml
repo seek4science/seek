@@ -1,0 +1,92 @@
+name: ansible-install
+run-name: "Testing Ansible install after commit \"${{ github.event.head_commit.message }}\""
+on:
+  push:
+    branches:
+      - ansible
+      - full-test-suite
+  workflow_dispatch:
+
+jobs:
+  install-seek-from-ansible:
+    runs-on: ${{matrix.os}}
+    continue-on-error: true
+    strategy:
+      matrix:
+        os: [ubuntu-20.04,ubuntu-22.04]
+
+    services:
+      mysql:
+          image: mysql:8.0.21
+          env:
+              MYSQL_ALLOW_EMPTY_PASSWORD: yes
+              MYSQL_ROOT_PASSWORD: ''
+              MYSQL_DATABASE: test
+          ports:
+            - 3306:3306
+          options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3 --restart=always
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Configure ansible for local install
+        working-directory: /home/runner/work/seek/seek/script/ansible/
+        run: |
+          sed -i '/vault_password_file/d' ansible.cfg
+          sed -i '/ssh_connection/d' ansible.cfg
+          sed -i '/pipelining/d' ansible.cfg
+          sed -i 's/\- hosts\: \[servers\]/\- hosts\: localhost/g' Deploy-SEEK.yml
+          sed -i '/\- hosts\: localhost/a \ \ connection\: local' Deploy-SEEK.yml
+          sed -i 's/user_var\: username/user_var\: runner/' group_vars/vars.yml
+          sed -i 's/git_dest\: \/home\/username/git_dest\: \/home\/runner\/work/' group_vars/vars.yml
+          sed -i 's|git_version: main|git_version: '"${GITHUB_REF_NAME}"'|' group_vars/vars.yml
+          sed -i '/sql_user\: sql_username/a sql_password: mysqlpassword' group_vars/vars.yml
+
+      - name: Prepares system for ansible install
+        run: |
+          sudo apt install acl -y
+
+      - name: Install SEEK through ansible
+        working-directory: /home/runner/work/seek/seek/script/ansible/
+        run: |
+          ansible-playbook Deploy-SEEK.yml --skip-tags database
+
+      - name: Configures database
+        working-directory: /home/runner/work/SEEK
+        run: |
+          cp config/database.default.yml config/database.yml
+          sed -i '/password\: mysqlpassword/a \ \ port\: 3306' config/database.yml
+          sed -i '/password\: mysqlpassword/a \ \ host\: 127.0.0.1' config/database.yml
+          sed -i 's/mysqluser/root/g' config/database.yml
+          sed -i 's/mysqlpassword//g' config/database.yml
+          bash -lc 'bundle exec rake db:setup'
+
+      - name: Runs seek unit tests
+        working-directory: /home/runner/work/SEEK
+        run: |
+          bash -lc 'bundle exec rails test test/unit'
+
+      - name: Runs seek integration tests
+        working-directory: /home/runner/work/SEEK
+        run: |
+          bash -lc 'bundle exec rails test test/integration'
+
+      - name: Runs seek functional tests
+        working-directory: /home/runner/work/SEEK
+        run: |
+          bash -lc 'bundle exec rails test test/functional'
+
+
+  fail-on-any-os:
+    # Without this step workflow remains "green" regardles of fails above.
+    name: Workflow Status
+    needs:
+      - install-seek-from-ansible
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - uses: technote-space/workflow-conclusion-action@v3.0.3
+      - name: Check Job Status status and fail if they are red
+        if: env.WORKFLOW_CONCLUSION == 'failure'
+        run: exit 1

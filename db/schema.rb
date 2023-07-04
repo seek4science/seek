@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_12_12_143407) do
+ActiveRecord::Schema.define(version: 2023_06_06_102509) do
 
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
@@ -369,6 +369,7 @@ ActiveRecord::Schema.define(version: 2022_12_12_143407) do
     t.string "item_type"
     t.bigint "item_id"
     t.bigint "custom_metadata_type_id"
+    t.integer "custom_metadata_attribute_id"
     t.index ["custom_metadata_type_id"], name: "index_custom_metadata_on_custom_metadata_type_id"
     t.index ["item_type", "item_id"], name: "index_custom_metadata_on_item_type_and_item_id"
   end
@@ -382,9 +383,18 @@ ActiveRecord::Schema.define(version: 2022_12_12_143407) do
     t.bigint "sample_controlled_vocab_id"
     t.text "description"
     t.string "label"
+    t.integer "linked_custom_metadata_type_id"
     t.index ["custom_metadata_type_id"], name: "index_custom_metadata_attributes_on_custom_metadata_type_id"
     t.index ["sample_attribute_type_id"], name: "index_custom_metadata_attributes_on_sample_attribute_type_id"
     t.index ["sample_controlled_vocab_id"], name: "index_custom_metadata_attributes_on_sample_controlled_vocab_id"
+  end
+
+  create_table "custom_metadata_resource_links", force: :cascade do |t|
+    t.bigint "custom_metadata_id"
+    t.string "resource_type"
+    t.bigint "resource_id"
+    t.index ["custom_metadata_id"], name: "index_custom_metadata_resource_links_on_custom_metadata_id"
+    t.index ["resource_type", "resource_id"], name: "index_custom_metadata_resource_links_on_resource"
   end
 
   create_table "custom_metadata_types", force: :cascade do |t|
@@ -805,7 +815,7 @@ ActiveRecord::Schema.define(version: 2022_12_12_143407) do
     t.text "root_path"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.text "resource_attributes"
+    t.text "resource_attributes", size: :medium
     t.bigint "git_repository_id"
     t.integer "visibility"
     t.string "doi"
@@ -1330,8 +1340,8 @@ ActiveRecord::Schema.define(version: 2022_12_12_143407) do
     t.string "name"
     t.integer "sharing_scope", limit: 1
     t.integer "access_type", limit: 1
-    t.boolean "use_whitelist"
-    t.boolean "use_blacklist"
+    t.boolean "use_allowlist"
+    t.boolean "use_denylist"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -1903,6 +1913,13 @@ ActiveRecord::Schema.define(version: 2022_12_12_143407) do
     t.index ["contributor_id"], name: "index_sops_on_contributor"
   end
 
+  create_table "sops_studies", force: :cascade do |t|
+    t.bigint "sop_id"
+    t.bigint "study_id"
+    t.index ["sop_id"], name: "index_sops_studies_on_sop_id"
+    t.index ["study_id"], name: "index_sops_studies_on_study_id"
+  end
+
   create_table "sops_workflows", id: false, force: :cascade do |t|
     t.integer "workflow_id", null: false
     t.integer "sop_id", null: false
@@ -1991,7 +2008,6 @@ ActiveRecord::Schema.define(version: 2022_12_12_143407) do
     t.text "other_creators"
     t.string "deleted_contributor"
     t.integer "position"
-    t.integer "sop_id"
   end
 
   create_table "study_auth_lookup", force: :cascade do |t|
@@ -2086,7 +2102,7 @@ ActiveRecord::Schema.define(version: 2022_12_12_143407) do
     t.integer "pos"
     t.boolean "is_title", default: false
     t.integer "isa_tag_id"
-    t.string "iri"
+    t.string "pid"
     t.index ["template_id", "title"], name: "index_template_id_asset_id_title"
   end
 

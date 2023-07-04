@@ -4,7 +4,7 @@ require 'test_helper'
 class GroupedPaginationTest < ActiveSupport::TestCase
 
   test 'first_letter' do
-    p = Factory :person, last_name: 'Aardvark', first_name: 'Fred'
+    p = FactoryBot.create :person, last_name: 'Aardvark', first_name: 'Fred'
     assert_not_nil p.first_letter
     assert_equal 'A', p.first_letter
   end
@@ -16,7 +16,7 @@ class GroupedPaginationTest < ActiveSupport::TestCase
   end
 
   test 'first_letter_ignore_space' do
-    inv = Factory :investigation, title: ' Inv'
+    inv = FactoryBot.create :investigation, title: ' Inv'
     assert_equal 'I', inv.first_letter
   end
 
@@ -27,7 +27,7 @@ class GroupedPaginationTest < ActiveSupport::TestCase
   end
 
   test 'paginate_no_options' do
-    Factory :person, last_name: 'Aardvark', first_name: 'Fred'
+    FactoryBot.create :person, last_name: 'Aardvark', first_name: 'Fred'
     @people = Person.grouped_paginate default_page: 'first'
     assert_equal(('A'..'Z').to_a, @people.pages)
     assert @people.size > 0
@@ -41,8 +41,8 @@ class GroupedPaginationTest < ActiveSupport::TestCase
   end
 
   test 'paginate_by_page' do
-    Factory :person, last_name: 'Bobbins', first_name: 'Fred'
-    Factory :person, last_name: 'Brown', first_name: 'Fred'
+    FactoryBot.create :person, last_name: 'Bobbins', first_name: 'Fred'
+    FactoryBot.create :person, last_name: 'Brown', first_name: 'Fred'
     @people = Person.grouped_paginate page: 'B'
     assert_equal(('A'..'Z').to_a, @people.pages)
     assert @people.size > 0
@@ -61,22 +61,22 @@ class GroupedPaginationTest < ActiveSupport::TestCase
   end
 
   test 'handle_oslash' do
-    p = Factory(:brand_new_person, last_name: 'Øyvind', email: 'sdfkjhsdfkjhsdf@email.com')
+    p = FactoryBot.create(:brand_new_person, last_name: 'Øyvind', email: 'sdfkjhsdfkjhsdf@email.com')
     assert_equal 'O', p.first_letter
   end
 
   test 'handle_umlaut' do
-    p = Factory(:brand_new_person, last_name: 'Ümlaut', email: 'sdfkjhsdfkjhsdf@email.com')
+    p = FactoryBot.create(:brand_new_person, last_name: 'Ümlaut', email: 'sdfkjhsdfkjhsdf@email.com')
     assert_equal 'U', p.first_letter
   end
 
   test 'handle_accent' do
-    p = Factory(:brand_new_person, last_name: 'Ýiggle', email: 'sdfkjhsdfkjhsdf@email.com')
+    p = FactoryBot.create(:brand_new_person, last_name: 'Ýiggle', email: 'sdfkjhsdfkjhsdf@email.com')
     assert_equal 'Y', p.first_letter
   end
 
   test 'extra_conditions_as_array' do
-    Factory :person, last_name: 'Aardvark', first_name: 'Fred'
+    FactoryBot.create :person, last_name: 'Aardvark', first_name: 'Fred'
     @people = Person.grouped_paginate page: 'A', conditions: ['last_name = ?', 'Aardvark']
     assert_equal 1, @people.size
     assert(@people.page_totals.select do |k, v|
@@ -90,8 +90,8 @@ class GroupedPaginationTest < ActiveSupport::TestCase
 
   # should jump to the first page that has content if :page=> isn't defined. Will use first page if no content is available
   test 'jump_to_first_page_with_content' do
-    Factory :person, last_name: 'Bobbins', first_name: 'Fred'
-    Factory :person, last_name: 'Davis', first_name: 'Fred'
+    FactoryBot.create :person, last_name: 'Bobbins', first_name: 'Fred'
+    FactoryBot.create :person, last_name: 'Davis', first_name: 'Fred'
     # delete those with A
     Person.where(['first_letter = ?', 'A']).each(&:delete)
     @people = Person.grouped_paginate default_page: 'first'
@@ -110,7 +110,7 @@ class GroupedPaginationTest < ActiveSupport::TestCase
   end
 
   test 'extra_condition_as_array_direct' do
-    Factory :person, last_name: 'Aardvark', first_name: 'Fred'
+    FactoryBot.create :person, last_name: 'Aardvark', first_name: 'Fred'
     @people = Person.grouped_paginate page: 'A', conditions: ["last_name = 'Aardvark'"]
     assert_equal 1, @people.size
     assert(@people.page_totals.select do |k, v|
@@ -123,7 +123,7 @@ class GroupedPaginationTest < ActiveSupport::TestCase
   end
 
   test 'extra_condition_as_string' do
-    Factory :person, last_name: 'Aardvark', first_name: 'Fred'
+    FactoryBot.create :person, last_name: 'Aardvark', first_name: 'Fred'
     @people = Person.grouped_paginate page: 'A', conditions: "last_name = 'Aardvark'"
     assert_equal 1, @people.size
     assert(@people.page_totals.select do |k, v|
@@ -136,7 +136,7 @@ class GroupedPaginationTest < ActiveSupport::TestCase
   end
 
   test 'condition_as_hash' do
-    Factory :person, last_name: 'Aardvark', first_name: 'Fred'
+    FactoryBot.create :person, last_name: 'Aardvark', first_name: 'Fred'
     @people = Person.grouped_paginate page: 'A', conditions: { last_name: 'Aardvark' }
     assert_equal 1, @people.size
     assert(@people.page_totals.select do |k, v|
@@ -149,8 +149,8 @@ class GroupedPaginationTest < ActiveSupport::TestCase
   end
 
   test 'order_by is preserved during pagination' do
-    p1 = Factory :person, last_name: 'Aardvark', first_name: 'Fred'
-    p2 = Factory :person, last_name: 'Azbo', first_name: 'John'
+    p1 = FactoryBot.create :person, last_name: 'Aardvark', first_name: 'Fred'
+    p2 = FactoryBot.create :person, last_name: 'Azbo', first_name: 'John'
     @people = Person.order('last_name ASC').grouped_paginate(page: 'A')
     assert @people.size > 0
     assert_equal 'A', @people.page
@@ -163,16 +163,16 @@ class GroupedPaginationTest < ActiveSupport::TestCase
   end
 
   test 'show_all' do
-    Factory :person, last_name: 'Aardvark', first_name: 'Fred'
-    Factory :person, last_name: 'Jones', first_name: 'Fred'
+    FactoryBot.create :person, last_name: 'Aardvark', first_name: 'Fred'
+    FactoryBot.create :person, last_name: 'Jones', first_name: 'Fred'
     @people = Person.grouped_paginate page: 'all'
     assert_equal Person.all.size, @people.size
   end
 
   test 'post_fetch_pagination' do
-    user = Factory :user
-    Factory :sop, contributor: user.person
-    Factory :sop, contributor: user.person
+    user = FactoryBot.create :user
+    FactoryBot.create :sop, contributor: user.person
+    FactoryBot.create :sop, contributor: user.person
     sops = Sop.all
     assert !sops.empty?
     sops.each { |s| User.current_user = s.contributor; s.save if s.valid? } # Set first letters
@@ -180,9 +180,9 @@ class GroupedPaginationTest < ActiveSupport::TestCase
   end
 
   test 'maintains page totals after paging' do
-    item1 = Factory(:sop, title: 'AAA', updated_at: 2.days.ago)
-    item2 = Factory(:sop, title: 'BBB', updated_at: 1.days.ago)
-    item3 = Factory(:sop, title: 'BBC', updated_at: 1.days.ago)
+    item1 = FactoryBot.create(:sop, title: 'AAA', updated_at: 2.days.ago)
+    item2 = FactoryBot.create(:sop, title: 'BBB', updated_at: 1.days.ago)
+    item3 = FactoryBot.create(:sop, title: 'BBC', updated_at: 1.days.ago)
     collection = [item1, item2, item3]
 
     paged_collection = Sop.paginate_after_fetch(collection, page: 'A')

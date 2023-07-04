@@ -4,10 +4,10 @@ require 'test_helper'
 
 class IsaGraphGeneratorTest < ActiveSupport::TestCase
   test 'investigation with studies and assays' do
-    assay = Factory(:assay)
+    assay = FactoryBot.create(:assay)
     study = assay.study
     investigation = assay.investigation
-    assay2 = Factory(:assay, contributor: assay.contributor, study: study)
+    assay2 = FactoryBot.create(:assay, contributor: assay.contributor, study: study)
 
     generator = Seek::IsaGraphGenerator.new(investigation)
 
@@ -41,12 +41,12 @@ class IsaGraphGeneratorTest < ActiveSupport::TestCase
   end
 
   test "does not show sibling's children" do
-    assay = Factory(:assay)
+    assay = FactoryBot.create(:assay)
     study = assay.study
-    sibling_assay = Factory(:assay, title: 'sibling', contributor: assay.contributor, study: study)
-    data_file = Factory(:data_file, title: 'child', policy: Factory(:publicly_viewable_policy))
-    nephew_model = Factory(:model, title: 'nephew', policy: Factory(:publicly_viewable_policy))
-    niece_sop = Factory(:sop, title: 'niece', policy: Factory(:publicly_viewable_policy))
+    sibling_assay = FactoryBot.create(:assay, title: 'sibling', contributor: assay.contributor, study: study)
+    data_file = FactoryBot.create(:data_file, title: 'child', policy: FactoryBot.create(:publicly_viewable_policy))
+    nephew_model = FactoryBot.create(:model, title: 'nephew', policy: FactoryBot.create(:publicly_viewable_policy))
+    niece_sop = FactoryBot.create(:sop, title: 'niece', policy: FactoryBot.create(:publicly_viewable_policy))
 
     User.with_current_user(assay.contributor.user) do
       AssayAsset.create!(assay: assay, asset: data_file)
@@ -68,12 +68,12 @@ class IsaGraphGeneratorTest < ActiveSupport::TestCase
   end
 
   test "can show sibling's children" do
-    assay = Factory(:assay)
+    assay = FactoryBot.create(:assay)
     study = assay.study
-    sibling_assay = Factory(:assay, title: 'sibling', contributor: assay.contributor, study: study)
-    data_file = Factory(:data_file, title: 'child', policy: Factory(:publicly_viewable_policy))
-    nephew_model = Factory(:model, title: 'nephew', policy: Factory(:publicly_viewable_policy))
-    niece_sop = Factory(:sop, title: 'niece', policy: Factory(:publicly_viewable_policy))
+    sibling_assay = FactoryBot.create(:assay, title: 'sibling', contributor: assay.contributor, study: study)
+    data_file = FactoryBot.create(:data_file, title: 'child', policy: FactoryBot.create(:publicly_viewable_policy))
+    nephew_model = FactoryBot.create(:model, title: 'nephew', policy: FactoryBot.create(:publicly_viewable_policy))
+    niece_sop = FactoryBot.create(:sop, title: 'niece', policy: FactoryBot.create(:publicly_viewable_policy))
 
     User.with_current_user(assay.contributor.user) do
       AssayAsset.create!(assay: assay, asset: data_file)
@@ -94,10 +94,10 @@ class IsaGraphGeneratorTest < ActiveSupport::TestCase
   end
 
   test 'maintains child asset count even if the are not included in graph' do
-    assay = Factory(:assay)
+    assay = FactoryBot.create(:assay)
     study = assay.study
     investigation = assay.investigation
-    assay2 = Factory(:assay, contributor: assay.contributor, study: study)
+    assay2 = FactoryBot.create(:assay, contributor: assay.contributor, study: study)
     generator = Seek::IsaGraphGenerator.new(investigation)
     result = generator.generate
 
@@ -109,16 +109,16 @@ class IsaGraphGeneratorTest < ActiveSupport::TestCase
   end
 
   test 'counts child assets of all ancestors' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     project = person.projects.first
-    investigation = Factory(:investigation, contributor: person, projects: [project])
-    investigation2 = Factory(:investigation, contributor: person, projects: [project])
-    investigation3 = Factory(:investigation, contributor: person, projects: [project])
-    study = Factory(:study, contributor: person, investigation: investigation)
-    study2 = Factory(:study, contributor: person, investigation: investigation)
-    study3 = Factory(:study, contributor: person, investigation: investigation)
-    study4 = Factory(:study, contributor: person, investigation: investigation)
-    assay = Factory(:assay, contributor: person, study: study)
+    investigation = FactoryBot.create(:investigation, contributor: person, projects: [project])
+    investigation2 = FactoryBot.create(:investigation, contributor: person, projects: [project])
+    investigation3 = FactoryBot.create(:investigation, contributor: person, projects: [project])
+    study = FactoryBot.create(:study, contributor: person, investigation: investigation)
+    study2 = FactoryBot.create(:study, contributor: person, investigation: investigation)
+    study3 = FactoryBot.create(:study, contributor: person, investigation: investigation)
+    study4 = FactoryBot.create(:study, contributor: person, investigation: investigation)
+    assay = FactoryBot.create(:assay, contributor: person, study: study)
 
     generator = Seek::IsaGraphGenerator.new(assay)
     result = generator.generate(parent_depth: nil)

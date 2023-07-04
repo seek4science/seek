@@ -41,7 +41,7 @@
 
     function checkSubmitButtonEnabled() {
         var progEnabled = <%= Seek::ProjectFormProgrammeOptions.show_programme_box? %>;
-        var enabled = $j('#institution_id').val()
+        var enabled = $j('select#institution_id').val()
             && !progEnabled || ($j('#programme_id').val() || $j('input#programme_title').val())
             && $j('input#project_title').val()
             && $j('input#institution_title').val();
@@ -49,12 +49,7 @@
     }
 
     $j(document).ready(function () {
-        $j('form').on('submit',function() {
-            //clear the id if -1 before submitting
-            if ($j('#institution_id').val()=='-1') {
-                $j('#institution_id').val('');
-            }
-        });
+
 
        <% if Seek::ProjectFormProgrammeOptions.managed_checkbox? %>
          $j('input#managed_programme').on('change', function() {

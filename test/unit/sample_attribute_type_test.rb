@@ -210,39 +210,41 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
   end
 
   test 'is_controlled_vocab?' do
-    type = Factory(:controlled_vocab_attribute_type)
+    type = FactoryBot.create(:controlled_vocab_attribute_type)
     assert type.controlled_vocab?
-    type = Factory(:text_sample_attribute_type)
+    type = FactoryBot.create(:cv_list_attribute_type)
+    assert type.controlled_vocab?
+    type = FactoryBot.create(:text_sample_attribute_type)
     refute type.controlled_vocab?
-    type = Factory(:boolean_sample_attribute_type)
+    type = FactoryBot.create(:boolean_sample_attribute_type)
     refute type.controlled_vocab?
-    type = Factory(:sample_sample_attribute_type)
+    type = FactoryBot.create(:sample_sample_attribute_type)
     refute type.controlled_vocab?
   end
 
   test 'is_seek_sample?' do
-    type = Factory(:sample_sample_attribute_type)
+    type = FactoryBot.create(:sample_sample_attribute_type)
     assert type.seek_sample?
-    type = Factory(:sample_multi_sample_attribute_type)
+    type = FactoryBot.create(:sample_multi_sample_attribute_type)
     refute type.seek_sample?
-    type = Factory(:text_sample_attribute_type)
+    type = FactoryBot.create(:text_sample_attribute_type)
     refute type.seek_sample?
-    type = Factory(:boolean_sample_attribute_type)
+    type = FactoryBot.create(:boolean_sample_attribute_type)
     refute type.seek_sample?
-    type = Factory(:controlled_vocab_attribute_type)
+    type = FactoryBot.create(:controlled_vocab_attribute_type)
     refute type.seek_sample?
   end
 
   test 'is_seek_data_file?' do
-    type = Factory(:data_file_sample_attribute_type)
+    type = FactoryBot.create(:data_file_sample_attribute_type)
     assert type.seek_data_file?
-    type = Factory(:sample_sample_attribute_type)
+    type = FactoryBot.create(:sample_sample_attribute_type)
     refute type.seek_data_file?
-    type = Factory(:text_sample_attribute_type)
+    type = FactoryBot.create(:text_sample_attribute_type)
     refute type.seek_data_file?
-    type = Factory(:boolean_sample_attribute_type)
+    type = FactoryBot.create(:boolean_sample_attribute_type)
     refute type.seek_data_file?
-    type = Factory(:controlled_vocab_attribute_type)
+    type = FactoryBot.create(:controlled_vocab_attribute_type)
     refute type.seek_data_file?
   end
 end

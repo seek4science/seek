@@ -20,8 +20,8 @@ class StudyTest < ActiveSupport::TestCase
   end
 
   test 'to_rdf' do
-    object = Factory(:study, description: 'My famous study')
-    FactoryGirl.create_list(:assay, 2, contributor: object.contributor, study: object)
+    object = FactoryBot.create(:study, description: 'My famous study')
+    FactoryBot.create_list(:assay, 2, contributor: object.contributor, study: object)
     rdf = object.to_rdf
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count > 1
@@ -31,33 +31,33 @@ class StudyTest < ActiveSupport::TestCase
 
   # only authorized people can delete a study, and a study must have no assays
   test 'can delete' do
-    project_member = Factory(:person)
-    another_project_member = Factory(:person, project: project_member.projects.first)
-    study = Factory(:study, contributor: another_project_member)
+    project_member = FactoryBot.create(:person)
+    another_project_member = FactoryBot.create(:person, project: project_member.projects.first)
+    study = FactoryBot.create(:study, contributor: another_project_member)
 
     assert_empty study.assays
-    assert !study.can_delete?(Factory(:user))
+    assert !study.can_delete?(FactoryBot.create(:user))
     assert !study.can_delete?(project_member.user)
     assert study.can_delete?(study.contributor.user)
 
-    study = Factory(:assay).study
+    study = FactoryBot.create(:assay).study
     assert_not_empty study.assays
     assert !study.can_delete?(study.contributor)
   end
 
   test 'publications through assays' do
-    assay1 = Factory(:assay)
+    assay1 = FactoryBot.create(:assay)
     study = assay1.study
-    assay2 = Factory(:assay, contributor: assay1.contributor, study: study)
+    assay2 = FactoryBot.create(:assay, contributor: assay1.contributor, study: study)
 
-    pub1 = Factory :publication, title: 'pub 1'
-    pub2 = Factory :publication, title: 'pub 2'
-    pub3 = Factory :publication, title: 'pub 3'
-    Factory :relationship, subject: assay1, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub1
-    Factory :relationship, subject: assay1, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub2
+    pub1 = FactoryBot.create :publication, title: 'pub 1'
+    pub2 = FactoryBot.create :publication, title: 'pub 2'
+    pub3 = FactoryBot.create :publication, title: 'pub 3'
+    FactoryBot.create :relationship, subject: assay1, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub1
+    FactoryBot.create :relationship, subject: assay1, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub2
 
-    Factory :relationship, subject: assay2, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub2
-    Factory :relationship, subject: assay2, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub3
+    FactoryBot.create :relationship, subject: assay2, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub2
+    FactoryBot.create :relationship, subject: assay2, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub3
 
     assay1.reload
     assay2.reload
@@ -69,10 +69,9 @@ class StudyTest < ActiveSupport::TestCase
     assert_equal [pub1, pub2, pub3], study.related_publications.sort_by(&:id)
   end
 
-  test 'directly associated sop' do
+  test 'directly associated sops' do
     study = studies(:metabolomics_study)
-    sop = Factory(:sop)
-    study.sop = sop
+    study.sop_ids = [FactoryBot.create(:sop).id]
     assert_equal 3, study.related_sops.size
   end
 
@@ -97,12 +96,12 @@ class StudyTest < ActiveSupport::TestCase
   end
 
   test 'title trimmed' do
-    s = Factory(:study, title: ' title')
+    s = FactoryBot.create(:study, title: ' title')
     assert_equal('title', s.title)
   end
 
   test 'validation' do
-    s = Study.new(title: 'title', investigation: investigations(:metabolomics_investigation), policy: Factory(:private_policy))
+    s = Study.new(title: 'title', investigation: investigations(:metabolomics_investigation), policy: FactoryBot.create(:private_policy))
     assert s.valid?
 
     s.title = nil
@@ -136,16 +135,16 @@ class StudyTest < ActiveSupport::TestCase
   end
 
   test 'assets' do
-    assay_assets = [Factory(:assay_asset), Factory(:assay_asset)]
+    assay_assets = [FactoryBot.create(:assay_asset), FactoryBot.create(:assay_asset)]
     data_files = assay_assets.collect(&:asset)
-    study = Factory(:experimental_assay, assay_assets: assay_assets).study
+    study = FactoryBot.create(:experimental_assay, assay_assets: assay_assets).study
     assert_equal data_files.sort, study.assets.sort
   end
 
   test 'clone with associations' do
-    study = Factory(:study, title: '123', description: 'abc', policy: Factory(:publicly_viewable_policy))
+    study = FactoryBot.create(:study, title: '123', description: 'abc', policy: FactoryBot.create(:publicly_viewable_policy))
     person = study.contributor
-    publication = Factory(:publication, contributor: person)
+    publication = FactoryBot.create(:publication, contributor: person)
 
     disable_authorization_checks do
       study.publications << publication
@@ -164,9 +163,9 @@ class StudyTest < ActiveSupport::TestCase
   end
 
   test 'has deleted contributor?' do
-    item = Factory(:study,deleted_contributor:'Person:99')
+    item = FactoryBot.create(:study,deleted_contributor:'Person:99')
     item.update_column(:contributor_id,nil)
-    item2 = Factory(:study)
+    item2 = FactoryBot.create(:study)
     item2.update_column(:contributor_id,nil)
 
     assert_nil item.contributor
@@ -179,9 +178,9 @@ class StudyTest < ActiveSupport::TestCase
   end
 
   test 'has jerm contributor?' do
-    item = Factory(:study,deleted_contributor:'Person:99')
+    item = FactoryBot.create(:study,deleted_contributor:'Person:99')
     item.update_column(:contributor_id,nil)
-    item2 = Factory(:study)
+    item2 = FactoryBot.create(:study)
     item2.update_column(:contributor_id,nil)
 
     assert_nil item.contributor
@@ -194,11 +193,11 @@ class StudyTest < ActiveSupport::TestCase
   end
 
   test 'assay positioning' do
-    study = Factory(:study)
-    assay2 = Factory(:assay, study: study, position: 2)
-    assay3 = Factory(:assay, study: study, position: 3)
-    assay1 = Factory(:assay, study: study, position: 1)
-    assay4 = Factory(:assay, study: study, position: 4)
+    study = FactoryBot.create(:study)
+    assay2 = FactoryBot.create(:assay, study: study, position: 2)
+    assay3 = FactoryBot.create(:assay, study: study, position: 3)
+    assay1 = FactoryBot.create(:assay, study: study, position: 1)
+    assay4 = FactoryBot.create(:assay, study: study, position: 4)
 
     assert_equal [assay1, assay2, assay3, assay4], study.positioned_assays.to_a
 

@@ -107,9 +107,9 @@ registered_user_with_no_projects:
 
 
 
-test_user_only_in_whitelist:
-  person: person_for_test_user_only_in_whitelist
-  login: test_user_only_in_whitelist_login
+test_user_only_in_allowlist:
+  person: person_for_test_user_only_in_allowlist
+  login: test_user_only_in_allowlist_login
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
   created_at: <%= 1.days.ago.to_s :db %>
@@ -117,9 +117,9 @@ test_user_only_in_whitelist:
 
 
 
-test_user_only_in_blacklist:
-  person: person_for_test_user_only_in_blacklist
-  login: test_user_only_in_blacklist_login
+test_user_only_in_denylist:
+  person: person_for_test_user_only_in_denylist
+  login: test_user_only_in_denylist_login
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
   created_at: <%= 1.days.ago.to_s :db %>
@@ -127,9 +127,9 @@ test_user_only_in_blacklist:
 
 
 
-sysmo_user_in_blacklist:
-  person: person_for_sysmo_user_in_blacklist
-  login: sysmo_user_in_blacklist_login
+sysmo_user_in_denylist:
+  person: person_for_sysmo_user_in_denylist
+  login: sysmo_user_in_denylist_login
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
   created_at: <%= 1.days.ago.to_s :db %>
@@ -137,9 +137,9 @@ sysmo_user_in_blacklist:
 
 
 
-sysmo_user_both_in_blacklist_and_whitelist:
-  person: person_for_sysmo_user_both_in_blacklist_and_whitelist
-  login: sysmo_user_both_in_blacklist_and_whitelist_login
+sysmo_user_both_in_denylist_and_allowlist:
+  person: person_for_sysmo_user_both_in_denylist_and_allowlist
+  login: sysmo_user_both_in_denylist_and_allowlist_login
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
   created_at: <%= 1.days.ago.to_s :db %>

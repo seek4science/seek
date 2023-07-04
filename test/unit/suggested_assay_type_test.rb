@@ -2,17 +2,17 @@ require 'test_helper'
 
 class SuggestedAssayTypeTest < ActiveSupport::TestCase
   test 'label is uniq' do
-    at1 = Factory :suggested_assay_type
-    at2 = Factory.build(:suggested_assay_type, label: at1.label)
-    ma = Factory.build(:suggested_modelling_analysis_type, label: at1.label)
+    at1 = FactoryBot.create :suggested_assay_type
+    at2 = FactoryBot.build(:suggested_assay_type, label: at1.label)
+    ma = FactoryBot.build(:suggested_modelling_analysis_type, label: at1.label)
     assert !at2.valid?, 'at2 is invalid ,as it has the same label as at1'
     assert !ma.valid?, 'modelling analysis ma is invalid ,as it has the same label as at1'
   end
 
   test 'label should not be the same as labels in ontology' do
     label_in_ontology = Seek::Ontologies::AssayTypeReader.instance.class_hierarchy.hash_by_label.keys.first
-    suggested_assay_type = Factory.build(:suggested_assay_type, label: label_in_ontology)
-    suggested_modelling_analysis = Factory.build(:suggested_modelling_analysis_type, label: label_in_ontology)
+    suggested_assay_type = FactoryBot.build(:suggested_assay_type, label: label_in_ontology)
+    suggested_modelling_analysis = FactoryBot.build(:suggested_modelling_analysis_type, label: label_in_ontology)
     assert !suggested_assay_type.valid?, "label #{suggested_assay_type.label} already exists"
     assert !suggested_modelling_analysis.valid?, "label #{suggested_modelling_analysis.label} already exists"
   end
@@ -21,19 +21,19 @@ class SuggestedAssayTypeTest < ActiveSupport::TestCase
     # ontology parent
     uri = 'http://jermontology.org/ontology/JERMOntology#Gene_expression_profiling'
     ontology_class = Seek::Ontologies::AssayTypeReader.instance.class_hierarchy.hash_by_uri[uri]
-    at = Factory :suggested_assay_type, ontology_uri: uri
+    at = FactoryBot.create :suggested_assay_type, ontology_uri: uri
     assert_equal 1, at.parents.count
     assert_equal ontology_class, at.parent
     assert ontology_class.children.include?(at)
     # suggested parent
-    at1 = Factory :suggested_assay_type
-    at2 = Factory :suggested_assay_type, parent_id: at1.id
+    at1 = FactoryBot.create :suggested_assay_type
+    at2 = FactoryBot.create :suggested_assay_type, parent_id: at1.id
     assert_equal 1, at2.parents.count
     assert_equal at1, at2.parent
     assert at1.children.include?(at2)
 
     # default parent
-    at = Factory :suggested_assay_type
+    at = FactoryBot.create :suggested_assay_type
     assert_equal at.default_parent_uri, at.ontology_uri
   end
 
@@ -43,7 +43,7 @@ class SuggestedAssayTypeTest < ActiveSupport::TestCase
   end
 
   test 'ontology_parent' do
-    type = Factory(:suggested_assay_type, parent_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics')
+    type = FactoryBot.create(:suggested_assay_type, parent_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics')
     parent = type.ontology_parent
     assert_equal 'http://jermontology.org/ontology/JERMOntology#Fluxomics', parent.uri
     assert_equal 'Fluxomics', parent.label
@@ -51,25 +51,25 @@ class SuggestedAssayTypeTest < ActiveSupport::TestCase
   end
 
   test 'term type' do
-    type = Factory(:suggested_assay_type, parent_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics')
+    type = FactoryBot.create(:suggested_assay_type, parent_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics')
     assert_equal 'assay', type.term_type
   end
 
   test 'link to related assays' do
-    at = Factory :suggested_assay_type
-    assay = Factory :experimental_assay, suggested_assay_type: at
+    at = FactoryBot.create :suggested_assay_type
+    assay = FactoryBot.create :experimental_assay, suggested_assay_type: at
 
     assert_equal assay, at.assays.first
     assert_equal at.label, assay.assay_type_label
   end
 
   test 'assays' do
-    top = Factory :suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics'
-    child1 = Factory :suggested_assay_type, parent: top, ontology_uri: nil
-    child2 = Factory :suggested_assay_type, parent: child1, ontology_uri: nil
+    top = FactoryBot.create :suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics'
+    child1 = FactoryBot.create :suggested_assay_type, parent: top, ontology_uri: nil
+    child2 = FactoryBot.create :suggested_assay_type, parent: child1, ontology_uri: nil
 
-    assay = Factory(:experimental_assay, suggested_assay_type: child2)
-    assay2 = Factory(:experimental_assay, suggested_assay_type: top)
+    assay = FactoryBot.create(:experimental_assay, suggested_assay_type: child2)
+    assay2 = FactoryBot.create(:experimental_assay, suggested_assay_type: top)
 
     assert_includes top.assays, assay
     assert_includes child1.assays, assay
@@ -81,17 +81,17 @@ class SuggestedAssayTypeTest < ActiveSupport::TestCase
   end
 
   test 'parent cannot be self' do
-    child = Factory :suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics'
+    child = FactoryBot.create :suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics'
     assert child.valid?
     child.parent = child
     refute child.valid?
   end
 
   test 'parent cannot be a child' do
-    top = Factory :suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics'
-    child1 = Factory :suggested_assay_type, parent: top
-    child2 = Factory :suggested_assay_type, parent: child1
-    child3 = Factory :suggested_assay_type, parent: child2
+    top = FactoryBot.create :suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics'
+    child1 = FactoryBot.create :suggested_assay_type, parent: top
+    child2 = FactoryBot.create :suggested_assay_type, parent: child1
+    child3 = FactoryBot.create :suggested_assay_type, parent: child2
     top.reload
     assert top.valid?
 
@@ -104,15 +104,15 @@ class SuggestedAssayTypeTest < ActiveSupport::TestCase
     top.parent = child3
     refute top.valid?
 
-    top.parent = Factory :suggested_assay_type
+    top.parent = FactoryBot.create :suggested_assay_type
     assert top.valid?
   end
 
   test 'all children' do
-    top = Factory :suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics'
-    child1 = Factory :suggested_assay_type, parent: top
-    child2 = Factory :suggested_assay_type, parent: child1
-    child3 = Factory :suggested_assay_type, parent: child2
+    top = FactoryBot.create :suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics'
+    child1 = FactoryBot.create :suggested_assay_type, parent: top
+    child2 = FactoryBot.create :suggested_assay_type, parent: child1
+    child3 = FactoryBot.create :suggested_assay_type, parent: child2
     top.reload
 
     assert_includes top.all_children, child1
@@ -121,10 +121,10 @@ class SuggestedAssayTypeTest < ActiveSupport::TestCase
   end
 
   test 'children' do
-    top = Factory :suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics'
-    child1 = Factory :suggested_assay_type, parent: top
-    child2 = Factory :suggested_assay_type, parent: child1
-    child3 = Factory :suggested_assay_type, parent: child2
+    top = FactoryBot.create :suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics'
+    child1 = FactoryBot.create :suggested_assay_type, parent: top
+    child2 = FactoryBot.create :suggested_assay_type, parent: child1
+    child3 = FactoryBot.create :suggested_assay_type, parent: child2
     top.reload
 
     assert_includes top.children, child1
@@ -138,9 +138,9 @@ class SuggestedAssayTypeTest < ActiveSupport::TestCase
   end
 
   test 'traverse hierarchy for parent' do
-    parent = Factory :suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics'
-    child = Factory :suggested_assay_type, parent: parent, ontology_uri: nil
-    child_child = Factory :suggested_assay_type, parent: child, ontology_uri: nil
+    parent = FactoryBot.create :suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics'
+    child = FactoryBot.create :suggested_assay_type, parent: parent, ontology_uri: nil
+    child_child = FactoryBot.create :suggested_assay_type, parent: child, ontology_uri: nil
     ontology_parent = parent.parent
     assert_equal 'http://jermontology.org/ontology/JERMOntology#Fluxomics', parent.ontology_uri
     assert_equal 'http://jermontology.org/ontology/JERMOntology#Fluxomics', child.ontology_uri
@@ -151,11 +151,11 @@ class SuggestedAssayTypeTest < ActiveSupport::TestCase
   end
 
   test 'user can only edit his own assay type but not others, and admins can edit/delete any suggested assay type' do
-    admin = Factory :user, person: Factory(:admin)
-    owner = Factory :user
-    other_user = Factory :user
+    admin = FactoryBot.create :user, person: FactoryBot.create(:admin)
+    owner = FactoryBot.create :user
+    other_user = FactoryBot.create :user
 
-    at = Factory :suggested_assay_type, contributor_id: owner.person.id
+    at = FactoryBot.create :suggested_assay_type, contributor_id: owner.person.id
     User.current_user = owner
     refute owner.is_admin?
 
@@ -175,15 +175,15 @@ class SuggestedAssayTypeTest < ActiveSupport::TestCase
   end
 
   test 'generated uri' do
-    at = Factory :suggested_assay_type
+    at = FactoryBot.create :suggested_assay_type
     assert_equal "suggested_assay_type:#{at.id}", at.uri
   end
 
   test 'join parent and children after destroy' do
-    top = Factory :suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics'
-    child1 = Factory :suggested_assay_type, parent: top
-    child2 = Factory :suggested_assay_type, parent: child1
-    child3 = Factory :suggested_assay_type, parent: child2
+    top = FactoryBot.create :suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics'
+    child1 = FactoryBot.create :suggested_assay_type, parent: top
+    child2 = FactoryBot.create :suggested_assay_type, parent: child1
+    child3 = FactoryBot.create :suggested_assay_type, parent: child2
     top.reload
 
     child1.destroy
@@ -205,9 +205,9 @@ class SuggestedAssayTypeTest < ActiveSupport::TestCase
   end
 
   test 'updates new parent ontology uri when deleting old parent' do
-    top = Factory :suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics'
-    child1 = Factory :suggested_assay_type, parent: top, ontology_uri: nil
-    child2 = Factory :suggested_assay_type, parent: child1, ontology_uri: nil
+    top = FactoryBot.create :suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics'
+    child1 = FactoryBot.create :suggested_assay_type, parent: top, ontology_uri: nil
+    child2 = FactoryBot.create :suggested_assay_type, parent: child1, ontology_uri: nil
     assert_equal 'http://jermontology.org/ontology/JERMOntology#Fluxomics', top.ontology_uri
     assert_nil child1[:ontology_uri]
     assert_nil child2[:ontology_uri]
@@ -219,9 +219,9 @@ class SuggestedAssayTypeTest < ActiveSupport::TestCase
     assert_nil child2[:ontology_uri]
 
     # check it only affects the children when the item being destroyed hangs from an ontology term
-    top = Factory :suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics'
-    child1 = Factory :suggested_assay_type, parent: top, ontology_uri: nil
-    child2 = Factory :suggested_assay_type, parent: child1, ontology_uri: nil
+    top = FactoryBot.create :suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics'
+    child1 = FactoryBot.create :suggested_assay_type, parent: top, ontology_uri: nil
+    child2 = FactoryBot.create :suggested_assay_type, parent: child1, ontology_uri: nil
 
     child1.destroy
     top.reload
@@ -231,9 +231,9 @@ class SuggestedAssayTypeTest < ActiveSupport::TestCase
   end
 
   test 'updating a suggested assay type should update associated assays' do
-    type = Factory :suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics'
-    assay = Factory(:experimental_assay, suggested_assay_type: type)
-    assay2 = Factory(:experimental_assay, suggested_assay_type: type)
+    type = FactoryBot.create :suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics'
+    assay = FactoryBot.create(:experimental_assay, suggested_assay_type: type)
+    assay2 = FactoryBot.create(:experimental_assay, suggested_assay_type: type)
 
     type.reload
     assert_equal [assay, assay2].sort, type.assays.sort
@@ -258,8 +258,8 @@ class SuggestedAssayTypeTest < ActiveSupport::TestCase
   end
 
   test 'assay adopts ontology uri if suggested type destroyed' do
-    type = Factory :suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics'
-    assay = Factory(:experimental_assay, suggested_assay_type: type)
+    type = FactoryBot.create :suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics'
+    assay = FactoryBot.create(:experimental_assay, suggested_assay_type: type)
     type.reload
     assert_equal 'http://jermontology.org/ontology/JERMOntology#Fluxomics', assay.assay_type_uri
 

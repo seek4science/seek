@@ -2,7 +2,7 @@
   <div class="row">
     <div class="col-sm-8">
       <h4 class="list-group-item-heading">
-        <%= link_to "#{version.name} #{resource.describe_version(version.version)}", {:version => version.version} %>
+        <%= link_to "#{version.name} #{resource.describe_version(version.version)}", { version: version.version } %>
         <small>
           Created <%= date_as_string(version.created_at,true) %>
           by <%= contributor version.contributor %>
@@ -18,13 +18,22 @@
       <% unless version.ref.blank? %>
         <code><%= git_target_icon(version.ref) %><%= version.ref.split('/').last %></code>
       <% end %>
-       <code><%= version.commit&.first(7) %></code>
+      <code><%= version.commit&.first(7) %></code>
       <% unless version.visibility == :public %>
-        <div class="subtle">
+        <span class="subtle">
           <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
           <%= VersionHelper::VISIBILITY_LABELS[version.visibility] %>
-        </div>
+        </span>
       <% end %>
+
+      <% if resource.can_manage? %>
+        <%= render partial: 'git/edit_git_version_form', locals: { resource: resource, version: version } %>
+      <% end %>
+    </div>
+    <div class="col-sm-4 text-right">
+      <% if resource.can_manage? %>
+        <%= button_link_to('Edit', 'edit', '#', onclick:"$j('#edit_git_version_form_#{version.version}').fadeToggle(); return false;") -%>
+      <%end %>
     </div>
   </div>
 </div>

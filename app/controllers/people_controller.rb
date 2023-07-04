@@ -211,14 +211,15 @@ class PeopleController < ApplicationController
 
   # For use in autocompleters
   def typeahead
-    results = Person.with_name(params[:query]).limit(params[:limit] || 10)
+    q = params[:q] || ''
+    results = Person.with_name(q).limit(params[:limit] || 10)
 
     items = results.map do |person|
-      { id: person.id, name: person.name, projects: person.projects.collect(&:title).join(', '), hint: person.typeahead_hint }
+      { id: person.id, text: person.title, projects: person.projects.collect(&:title).join(', '), hint: person.typeahead_hint }
     end
 
     respond_to do |format|
-      format.json { render json: items.to_json }
+      format.json { render json: {results: items}.to_json }
     end
   end
 

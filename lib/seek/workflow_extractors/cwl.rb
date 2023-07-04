@@ -75,7 +75,7 @@ module Seek
           stderr.close
         end
 
-        if status.success?
+        if status.success? && packed_cwl_string.length.positive?
           cwl_string = packed_cwl_string
         else
           cwl_string ||= @io.read

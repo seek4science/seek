@@ -8,7 +8,7 @@ module Seek
         end
 
         def test_value(value)
-          fail 'Not a boolean' unless value.is_a?(TrueClass) || value.is_a?(FalseClass)
+          raise 'Not a boolean' unless value.is_a?(TrueClass) || value.is_a?(FalseClass)
         end
 
         def test_blank?(value)
@@ -16,10 +16,8 @@ module Seek
         end
 
         def convert(value)
-          unless value.is_a?(TrueClass) || value.is_a?(FalseClass)
-            if @conversion_map.keys.include?(value&.downcase)
-              value = @conversion_map[value.downcase]
-            end
+          if !(value.is_a?(TrueClass) || value.is_a?(FalseClass)) && @conversion_map.keys.include?(value&.downcase)
+            value = @conversion_map[value.downcase]
           end
           value
         end

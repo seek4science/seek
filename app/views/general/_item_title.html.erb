@@ -9,6 +9,7 @@ title ||= item.title || ""
 title = "#{h(title_prefix) + h(title) + h(title_postfix)}".html_safe
 buttons_partial ||= nil
 col_width = buttons_partial.nil? && !content_for?(:buttons) ? 12 : 6
+gatekeeper_status_bar = item.is_asset? && item.can_manage? && (item.is_waiting_approval? || item.is_rejected?)
 %>
 
 <div class="row contribution-header">
@@ -56,3 +57,19 @@ col_width = buttons_partial.nil? && !content_for?(:buttons) ? 12 : 6
   </div>
   <% end %>
 </div>
+<% if gatekeeper_status_bar %>
+  <div class="row" id=gatekeeper_status>
+    <div class="col-md-7"> </div>
+    <div class="col-md-5 text-right-md" id="gatekeeper-status-col">
+      <% if item.is_waiting_approval? %>
+        <div class="alert alert-warning" id="gatekeeper_warning">
+          This item is <b>waiting for the gatekeeper's approval</b> to be published.
+        </div>
+      <% else %>
+        <div class="alert alert-danger" id="gatekeeper_warning">
+          The gatekeeper has <b>rejected</b> the request to publish this item.
+        </div>
+    <% end %>
+    </div>
+  </div>
+<% end %>

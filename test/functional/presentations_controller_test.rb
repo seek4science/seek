@@ -7,7 +7,7 @@ class PresentationsControllerTest < ActionController::TestCase
   include GeneralAuthorizationTestCases
 
   def setup
-    login_as Factory(:user)
+    login_as FactoryBot.create(:user)
     @project = User.current_user.person.projects.first
   end
 
@@ -19,7 +19,7 @@ class PresentationsControllerTest < ActionController::TestCase
 
   test 'can create with valid url' do
     mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png", 'http://somewhere.com/piccy.png'
-    presentation_attrs = Factory.attributes_for(:presentation,
+    presentation_attrs = FactoryBot.attributes_for(:presentation,
                                                 project_ids: [@project.id]
                                                )
 
@@ -29,7 +29,7 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   test 'can create with local file' do
-    presentation_attrs = Factory.attributes_for(:presentation,
+    presentation_attrs = FactoryBot.attributes_for(:presentation,
                                                 contributor: User.current_user,
                                                 project_ids: [@project.id])
 
@@ -41,20 +41,20 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   test 'can edit' do
-    presentation = Factory :presentation, contributor: User.current_user.person
+    presentation = FactoryBot.create :presentation, contributor: User.current_user.person
 
     get :edit, params: { id: presentation }
     assert_response :success
   end
 
   test 'can update' do
-    presentation = Factory :presentation, contributor: User.current_user.person
+    presentation = FactoryBot.create :presentation, contributor: User.current_user.person
     post :update, params: { id: presentation, presentation: { title: 'updated' } }
     assert_redirected_to presentation_path(presentation)
   end
 
   test 'should show presentation' do
-    presentation = Factory :ppt_presentation, contributor: User.current_user.person
+    presentation = FactoryBot.create :ppt_presentation, contributor: User.current_user.person
     assert_difference 'ActivityLog.count' do
       get :show, params: { id: presentation }
     end
@@ -73,7 +73,7 @@ class PresentationsControllerTest < ActionController::TestCase
 
   test 'can upload new version with valid url' do
     mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png", 'http://somewhere.com/piccy.png'
-    presentation = Factory :presentation, contributor: User.current_user.person
+    presentation = FactoryBot.create :presentation, contributor: User.current_user.person
 
     assert_difference 'presentation.version' do
       post :create_version, params: { id: presentation, presentation: {}, content_blobs: [{ data_url: 'http://somewhere.com/piccy.png' }] }
@@ -84,8 +84,8 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   test 'can upload new version with valid filepath' do
-    # by default, valid data_url is provided by content_blob in Factory
-    presentation = Factory :presentation, contributor: User.current_user.person
+    # by default, valid data_url is provided by content_blob in FactoryBot
+    presentation = FactoryBot.create :presentation, contributor: User.current_user.person
     presentation.content_blob.url = nil
     presentation.content_blob.data = file_for_upload
     presentation.reload
@@ -101,7 +101,7 @@ class PresentationsControllerTest < ActionController::TestCase
 
   test 'cannot upload file with invalid url' do
     stub_request(:head, 'http://www.blah.de/images/logo.png').to_raise(SocketError)
-    presentation_attrs = Factory.build(:presentation, contributor: User.current_user.person).attributes # .symbolize_keys(turn string key to symbol)
+    presentation_attrs = FactoryBot.build(:presentation, contributor: User.current_user.person).attributes # .symbolize_keys(turn string key to symbol)
 
     assert_no_difference 'Presentation.count' do
       post :create, params: { presentation: presentation_attrs, content_blobs: [{ data_url: 'http://www.blah.de/images/logo.png' }] }
@@ -111,7 +111,7 @@ class PresentationsControllerTest < ActionController::TestCase
 
   test 'cannot upload new version with invalid url' do
     stub_request(:any, 'http://www.blah.de/images/liver-illustration.png').to_raise(SocketError)
-    presentation = Factory :presentation, contributor: User.current_user.person
+    presentation = FactoryBot.create :presentation, contributor: User.current_user.person
     new_data_url = 'http://www.blah.de/images/liver-illustration.png'
     assert_no_difference 'presentation.version' do
       post :create_version, params: { id: presentation, presentation: {}, content_blobs: [{ data_url: new_data_url }] }
@@ -122,7 +122,7 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   test 'can destroy' do
-    presentation = Factory :presentation, contributor: User.current_user.person
+    presentation = FactoryBot.create :presentation, contributor: User.current_user.person
     content_blob_id = presentation.content_blob.id
     assert_difference('Presentation.count', -1) do
       delete :destroy, params: { id: presentation }
@@ -134,7 +134,7 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   test 'can subscribe' do
-    presentation = Factory :presentation, contributor: User.current_user.person
+    presentation = FactoryBot.create :presentation, contributor: User.current_user.person
     assert_difference 'presentation.subscriptions.count' do
       presentation.subscribed = true
       presentation.save
@@ -142,17 +142,17 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   test 'update tags with ajax' do
-    p = Factory :person
+    p = FactoryBot.create :person
 
     login_as p.user
 
-    p2 = Factory :person
-    presentation = Factory :presentation, contributor: p
+    p2 = FactoryBot.create :person
+    presentation = FactoryBot.create :presentation, contributor: p
 
     assert presentation.annotations.empty?, 'this presentation should have no tags for the test'
 
-    golf = Factory :tag, annotatable: presentation, source: p2.user, value: 'golf'
-    Factory :tag, annotatable: presentation, source: p2.user, value: 'sparrow'
+    golf = FactoryBot.create :tag, annotatable: presentation, source: p2.user, value: 'golf'
+    FactoryBot.create :tag, annotatable: presentation, source: p2.user, value: 'sparrow'
 
     presentation.reload
 
@@ -170,7 +170,7 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   test 'should download Presentation from standard route' do
-    pres = Factory :ppt_presentation, policy: Factory(:public_policy)
+    pres = FactoryBot.create :ppt_presentation, policy: FactoryBot.create(:public_policy)
     login_as(pres.contributor.user)
     assert_difference('ActivityLog.count') do
       get :download, params: { id: pres.id }
@@ -185,8 +185,8 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   test 'should set the other creators ' do
-    user = Factory(:user)
-    presentation = Factory(:presentation, contributor: user.person)
+    user = FactoryBot.create(:user)
+    presentation = FactoryBot.create(:presentation, contributor: user.person)
     login_as(user)
     assert presentation.can_manage?, 'The presentation must be manageable for this test to succeed'
     put :update, params: { id: presentation, presentation: { other_creators: 'marry queen' } }
@@ -195,27 +195,27 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   test 'should show the other creators on the presentation index' do
-    Factory(:presentation, policy: Factory(:public_policy), other_creators: 'another creator')
+    FactoryBot.create(:presentation, policy: FactoryBot.create(:public_policy), other_creators: 'another creator')
     get :index
     assert_select 'p.list_item_attribute', text: /: another creator/, count: 1
   end
 
   test 'should show the other creators in -uploader and creators- box' do
-    presentation = Factory(:presentation, policy: Factory(:public_policy), other_creators: 'another creator')
+    presentation = FactoryBot.create(:presentation, policy: FactoryBot.create(:public_policy), other_creators: 'another creator')
     get :show, params: { id: presentation }
     assert_select '#author-box .additional-credit', text: 'another creator', count: 1
   end
 
   test 'should be able to view ms/open office ppt content' do
 
-    ms_ppt_presentation = Factory(:ppt_presentation, policy: Factory(:all_sysmo_downloadable_policy))
+    ms_ppt_presentation = FactoryBot.create(:ppt_presentation, policy: FactoryBot.create(:all_sysmo_downloadable_policy))
     assert ms_ppt_presentation.content_blob.is_content_viewable?
     get :show, params: { id: ms_ppt_presentation.id }
     assert_response :success
     assert_select 'a', text: /View content/, count: 1
     assert_select 'a.disabled', text: /View content/, count: 0
 
-    openoffice_ppt_presentation = Factory(:odp_presentation, policy: Factory(:all_sysmo_downloadable_policy))
+    openoffice_ppt_presentation = FactoryBot.create(:odp_presentation, policy: FactoryBot.create(:all_sysmo_downloadable_policy))
     assert openoffice_ppt_presentation.content_blob.is_content_viewable?
     get :show, params: { id: openoffice_ppt_presentation.id }
     assert_response :success
@@ -225,14 +225,14 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   test 'should display the file icon according to version' do
-    ms_ppt_presentation = Factory(:ppt_presentation, policy: Factory(:all_sysmo_downloadable_policy))
+    ms_ppt_presentation = FactoryBot.create(:ppt_presentation, policy: FactoryBot.create(:all_sysmo_downloadable_policy))
     get :show, params: { id: ms_ppt_presentation.id }
     assert_response :success
     assert_select 'img[src=?]', '/assets/file_icons/small/ppt.png'
 
     # new version
-    pdf_presentation = Factory(:presentation_version, presentation: ms_ppt_presentation)
-    content_blob = Factory(:pdf_content_blob, asset: ms_ppt_presentation, asset_version: 2)
+    pdf_presentation = FactoryBot.create(:presentation_version, presentation: ms_ppt_presentation)
+    content_blob = FactoryBot.create(:pdf_content_blob, asset: ms_ppt_presentation, asset_version: 2)
     ms_ppt_presentation.reload
     assert_equal 2, ms_ppt_presentation.versions.count
     assert_not_nil ms_ppt_presentation.find_version(2).content_blob
@@ -245,14 +245,14 @@ class PresentationsControllerTest < ActionController::TestCase
   test 'filter by people, including creators, using nested routes' do
     assert_routing 'people/7/presentations', controller: 'presentations', action: 'index', person_id: '7'
 
-    person1 = Factory(:person)
-    person2 = Factory(:person)
+    person1 = FactoryBot.create(:person)
+    person2 = FactoryBot.create(:person)
 
-    pres1 = Factory(:presentation, contributor: person1, policy: Factory(:public_policy))
-    pres2 = Factory(:presentation, contributor: person2, policy: Factory(:public_policy))
+    pres1 = FactoryBot.create(:presentation, contributor: person1, policy: FactoryBot.create(:public_policy))
+    pres2 = FactoryBot.create(:presentation, contributor: person2, policy: FactoryBot.create(:public_policy))
 
-    pres3 = Factory(:presentation, contributor: Factory(:person), creators: [person1], policy: Factory(:public_policy))
-    pres4 = Factory(:presentation, contributor: Factory(:person), creators: [person2], policy: Factory(:public_policy))
+    pres3 = FactoryBot.create(:presentation, contributor: FactoryBot.create(:person), creators: [person1], policy: FactoryBot.create(:public_policy))
+    pres4 = FactoryBot.create(:presentation, contributor: FactoryBot.create(:person), creators: [person2], policy: FactoryBot.create(:public_policy))
 
     get :index, params: { person_id: person1.id }
     assert_response :success
@@ -269,11 +269,11 @@ class PresentationsControllerTest < ActionController::TestCase
   test 'filter by publications using nested routes' do
     assert_routing 'publications/7/presentations', controller: 'presentations', action: 'index', publication_id: '7'
 
-    pub1 = Factory(:publication)
-    pub2 = Factory(:publication)
+    pub1 = FactoryBot.create(:publication)
+    pub2 = FactoryBot.create(:publication)
 
-    pres1 = Factory(:presentation, policy: Factory(:public_policy), publications:[pub1])
-    pres2 = Factory(:presentation, policy: Factory(:public_policy), publications:[pub2])
+    pres1 = FactoryBot.create(:presentation, policy: FactoryBot.create(:public_policy), publications:[pub1])
+    pres2 = FactoryBot.create(:presentation, policy: FactoryBot.create(:public_policy), publications:[pub2])
 
     get :index, params: { publication_id: pub1.id }
     assert_response :success
@@ -287,10 +287,10 @@ class PresentationsControllerTest < ActionController::TestCase
   test 'filter by workflow using nested routes' do
     assert_routing 'workflows/7/presentations', controller: 'presentations', action: 'index', workflow_id: '7'
 
-    workflow = Factory(:workflow, policy: Factory(:public_policy))
+    workflow = FactoryBot.create(:workflow, policy: FactoryBot.create(:public_policy))
 
-    pres1 = Factory(:presentation, policy: Factory(:public_policy), workflows:[workflow])
-    pres2 = Factory(:presentation, policy: Factory(:public_policy))
+    pres1 = FactoryBot.create(:presentation, policy: FactoryBot.create(:public_policy), workflows:[workflow])
+    pres2 = FactoryBot.create(:presentation, policy: FactoryBot.create(:public_policy))
 
     get :index, params: { workflow_id: workflow.id }
     assert_response :success
@@ -303,7 +303,7 @@ class PresentationsControllerTest < ActionController::TestCase
 
 
   test 'should display null license text' do
-    presentation = Factory :presentation, policy: Factory(:public_policy)
+    presentation = FactoryBot.create :presentation, policy: FactoryBot.create(:public_policy)
 
     get :show, params: { id: presentation }
 
@@ -311,7 +311,7 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   test 'should display license' do
-    presentation = Factory :presentation, license: 'CC-BY-4.0', policy: Factory(:public_policy)
+    presentation = FactoryBot.create :presentation, license: 'CC-BY-4.0', policy: FactoryBot.create(:public_policy)
 
     get :show, params: { id: presentation }
 
@@ -319,8 +319,8 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   test 'should display license for current version' do
-    presentation = Factory :presentation, license: 'CC-BY-4.0', policy: Factory(:public_policy)
-    presentationv = Factory :presentation_version_with_blob, presentation: presentation
+    presentation = FactoryBot.create :presentation, license: 'CC-BY-4.0', policy: FactoryBot.create(:public_policy)
+    presentationv = FactoryBot.create :presentation_version_with_blob, presentation: presentation
 
     presentation.update license: 'CC0-1.0'
 
@@ -334,9 +334,9 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   test 'should update license' do
-    user = Factory(:person).user
+    user = FactoryBot.create(:person).user
     login_as(user)
-    presentation = Factory :presentation, policy: Factory(:public_policy), contributor: user.person
+    presentation = FactoryBot.create :presentation, policy: FactoryBot.create(:public_policy), contributor: user.person
 
     assert_nil presentation.license
 
@@ -350,10 +350,10 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   test 'should update linked workflow' do
-    user = Factory(:person).user
+    user = FactoryBot.create(:person).user
     login_as(user)
-    presentation = Factory :presentation, policy: Factory(:public_policy), contributor: user.person
-    workflow = Factory(:workflow, contributor: user.person)
+    presentation = FactoryBot.create :presentation, policy: FactoryBot.create(:public_policy), contributor: user.person
+    workflow = FactoryBot.create(:workflow, contributor: user.person)
 
     assert_empty presentation.workflows
 
@@ -366,10 +366,10 @@ class PresentationsControllerTest < ActionController::TestCase
 
   test 'programme presentations through nested routing' do
     assert_routing 'programmes/2/presentations', controller: 'presentations', action: 'index', programme_id: '2'
-    programme = Factory(:programme, projects: [@project])
+    programme = FactoryBot.create(:programme, projects: [@project])
     assert_equal [@project], programme.projects
-    presentation = Factory(:presentation, policy: Factory(:public_policy), contributor:User.current_user.person)
-    presentation2 = Factory(:presentation, policy: Factory(:public_policy))
+    presentation = FactoryBot.create(:presentation, policy: FactoryBot.create(:public_policy), contributor:User.current_user.person)
+    presentation2 = FactoryBot.create(:presentation, policy: FactoryBot.create(:public_policy))
 
     get :index, params: { programme_id: programme.id }
 
@@ -381,7 +381,7 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   test 'should return 406 when showing presentation as RDF' do
-    presentation = Factory :ppt_presentation, contributor: User.current_user.person
+    presentation = FactoryBot.create :ppt_presentation, contributor: User.current_user.person
 
     get :show, params: { id: presentation, format: :rdf }
 
@@ -389,13 +389,13 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   test 'events should be ordered by start date' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person.user)
-    event_july = Factory(:event, title:'July event', start_date:DateTime.parse('1 July 2020'), contributor:person)
-    event_jan = Factory(:event, title:'Jan event', start_date:DateTime.parse('1 Jan 2020'), contributor:person)
-    event_sep = Factory(:event, title:'September event', start_date:DateTime.parse('1 September 2020'), contributor:person)
-    event_dec = Factory(:event, title:'December event', start_date:DateTime.parse('1 December 2020'), contributor:person)
-    event_march = Factory(:event, title:'March event', start_date:DateTime.parse('1 March 2020'), contributor:person)
+    event_july = FactoryBot.create(:event, title:'July event', start_date:DateTime.parse('1 July 2020'), contributor:person)
+    event_jan = FactoryBot.create(:event, title:'Jan event', start_date:DateTime.parse('1 Jan 2020'), contributor:person)
+    event_sep = FactoryBot.create(:event, title:'September event', start_date:DateTime.parse('1 September 2020'), contributor:person)
+    event_dec = FactoryBot.create(:event, title:'December event', start_date:DateTime.parse('1 December 2020'), contributor:person)
+    event_march = FactoryBot.create(:event, title:'March event', start_date:DateTime.parse('1 March 2020'), contributor:person)
 
     get :new
 
@@ -412,8 +412,8 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   test 'can access manage page with manage rights' do
-    person = Factory(:person)
-    presentation = Factory(:presentation, contributor:person)
+    person = FactoryBot.create(:person)
+    presentation = FactoryBot.create(:presentation, contributor:person)
     login_as(person)
     assert presentation.can_manage?
     get :manage, params: {id: presentation}
@@ -432,8 +432,8 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   test 'cannot access manage page with edit rights' do
-    person = Factory(:person)
-    presentation = Factory(:presentation, policy:Factory(:private_policy, permissions:[Factory(:permission, contributor:person, access_type:Policy::EDITING)]))
+    person = FactoryBot.create(:person)
+    presentation = FactoryBot.create(:presentation, policy:FactoryBot.create(:private_policy, permissions:[FactoryBot.create(:permission, contributor:person, access_type:Policy::EDITING)]))
     login_as(person)
     assert presentation.can_edit?
     refute presentation.can_manage?
@@ -443,17 +443,17 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   test 'manage_update' do
-    proj1=Factory(:project)
-    proj2=Factory(:project)
-    person = Factory(:person,project:proj1)
-    other_person = Factory(:person)
+    proj1=FactoryBot.create(:project)
+    proj2=FactoryBot.create(:project)
+    person = FactoryBot.create(:person,project:proj1)
+    other_person = FactoryBot.create(:person)
     person.add_to_project_and_institution(proj2,person.institutions.first)
     person.save!
-    other_creator = Factory(:person,project:proj1)
+    other_creator = FactoryBot.create(:person,project:proj1)
     other_creator.add_to_project_and_institution(proj2,other_creator.institutions.first)
     other_creator.save!
 
-    presentation = Factory(:presentation, contributor:person, projects:[proj1], policy:Factory(:private_policy))
+    presentation = FactoryBot.create(:presentation, contributor:person, projects:[proj1], policy:FactoryBot.create(:private_policy))
 
     login_as(person)
     assert presentation.can_manage?
@@ -479,20 +479,20 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   test 'manage_update fails without manage rights' do
-    proj1=Factory(:project)
-    proj2=Factory(:project)
-    person = Factory(:person, project:proj1)
+    proj1=FactoryBot.create(:project)
+    proj2=FactoryBot.create(:project)
+    person = FactoryBot.create(:person, project:proj1)
     person.add_to_project_and_institution(proj2,person.institutions.first)
     person.save!
 
-    other_person = Factory(:person)
+    other_person = FactoryBot.create(:person)
 
-    other_creator = Factory(:person,project:proj1)
+    other_creator = FactoryBot.create(:person,project:proj1)
     other_creator.add_to_project_and_institution(proj2,other_creator.institutions.first)
     other_creator.save!
 
-    presentation = Factory(:presentation, projects:[proj1], policy:Factory(:private_policy,
-                                                                           permissions:[Factory(:permission,contributor:person, access_type:Policy::EDITING)]))
+    presentation = FactoryBot.create(:presentation, projects:[proj1], policy:FactoryBot.create(:private_policy,
+                                                                           permissions:[FactoryBot.create(:permission,contributor:person, access_type:Policy::EDITING)]))
 
     login_as(person)
     refute presentation.can_manage?
@@ -522,7 +522,7 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   test 'should create with discussion link' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
     presentation =  {title: 'Presentation', project_ids: [person.projects.first.id], discussion_links_attributes:[{url: "http://www.slack.com/"}]}
     assert_difference('AssetLink.discussion.count') do
@@ -538,16 +538,16 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   test 'should show discussion link' do
-    asset_link = Factory(:discussion_link)
-    presentation = Factory(:presentation, discussion_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    asset_link = FactoryBot.create(:discussion_link)
+    presentation = FactoryBot.create(:presentation, discussion_links: [asset_link], policy: FactoryBot.create(:public_policy, access_type: Policy::VISIBLE))
     get :show, params: { id: presentation }
     assert_response :success
     assert_select 'div.panel-heading', text: /Discussion Channel/, count: 1
   end
 
   test 'should update presentation with new discussion link' do
-    person = Factory(:person)
-    presentation = Factory(:presentation, contributor: person)
+    person = FactoryBot.create(:person)
+    presentation = FactoryBot.create(:presentation, contributor: person)
     login_as(person)
     assert_nil presentation.discussion_links.first
     assert_difference('AssetLink.discussion.count') do
@@ -560,8 +560,8 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   test 'should update sop with edited discussion link' do
-    person = Factory(:person)
-    presentation = Factory(:presentation, contributor: person, discussion_links:[Factory(:discussion_link)])
+    person = FactoryBot.create(:person)
+    presentation = FactoryBot.create(:presentation, contributor: person, discussion_links:[FactoryBot.create(:discussion_link)])
     login_as(person)
     assert_equal 1,presentation.discussion_links.count
     assert_no_difference('AssetLink.discussion.count') do
@@ -576,10 +576,10 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   test 'should destroy related asset link when the discussion link is removed ' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
-    asset_link = Factory(:discussion_link)
-    presentation = Factory(:presentation , discussion_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE), contributor: person)
+    asset_link = FactoryBot.create(:discussion_link)
+    presentation = FactoryBot.create(:presentation , discussion_links: [asset_link], policy: FactoryBot.create(:public_policy, access_type: Policy::VISIBLE), contributor: person)
     assert_difference('AssetLink.discussion.count', -1) do
       put :update, params: { id: presentation.id, presentation: { discussion_links_attributes:[{id:asset_link.id, _destroy:'1'}] } }
     end

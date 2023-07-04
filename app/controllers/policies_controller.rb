@@ -2,9 +2,9 @@ class PoliciesController < ApplicationController
   before_action :login_required
   
   def send_policy_data
-    request_type = white_list(params[:policy_type])
-    entity_type = white_list(params[:entity_type])
-    entity_id = white_list(params[:entity_id])
+    request_type = sanitized_text(params[:policy_type])
+    entity_type = sanitized_text(params[:entity_type])
+    entity_id = sanitized_text(params[:entity_id])
     
     # NB! default policies now are only suppoted by Projects (but not Institutions / WorkGroups) -
     # so supplying any other type apart from Project will cause the return error message
@@ -64,10 +64,12 @@ class PoliciesController < ApplicationController
     resource = nil
     resource = resource_class.find_by_id(params[:resource_id]) if params[:resource_id]
     resource ||= resource_class.new
+    projects = Project.where(id: (params[:project_ids] || '').split(','))
+    ucpi = updated_can_publish_immediately(resource, projects)
     policy = resource.policy.set_attributes_with_sharing(policy_params)
+    trying_to_publish = resource.is_published?
     contributor_person = resource.new_record? ? current_person : resource.contributor.try(:person)
     creators = Person.find((params[:creators] || '').split(',').compact.uniq)
-    projects = Project.where(id: (params[:project_ids] || '').split(','))
 
     privileged_people = {}
     #exclude the current_person from the privileged people
@@ -80,21 +82,22 @@ class PoliciesController < ApplicationController
     respond_to do |format|
       format.html { render partial: 'permissions/preview_permissions',
                            locals: { resource: resource, policy: policy, privileged_people: privileged_people,
-                                     updated_can_publish_immediately: updated_can_publish_immediately(resource, projects),
-                                     send_request_publish_approval: !resource.is_waiting_approval?(current_user)}}
+                                     updated_can_publish_immediately: ucpi || !resource.policy.access_type_changed? || !trying_to_publish,
+                                     send_request_publish_approval: !resource.is_waiting_approval?(current_user),
+                                     publish_approval_rejected: resource.is_rejected?}}
     end
   end
 
   #To check whether you can publish immediately or need to go through gatekeeper's approval when changing the projects associated with the resource
   def updated_can_publish_immediately(resource, projects)
     projects = [projects] if projects.is_a?(Project)
-    if !resource.new_record? && resource.is_published?
-      true
-      #FIXME: need to use User.current_user here because of the way the function tests in PolicyControllerTest work, without correctly creating the session and @request etc
-    elsif projects.any? { |p| p.asset_gatekeepers.any? } && !projects.any? { |p| User.current_user.person.is_asset_gatekeeper?(p) }
-      false
+    if resource.is_published?
+      true unless resource.new_record?
+    elsif projects.empty?
+      !resource.gatekeeper_required?
     else
-      true
+      #FIXME: need to use User.current_user here because of the way the function tests in PolicyControllerTest work, without correctly creating the session and @request etc
+      projects.none? { |p| p.asset_gatekeepers.any? } || projects.any? { |p| User.current_user.person.is_asset_gatekeeper?(p) }
     end
   end
 end

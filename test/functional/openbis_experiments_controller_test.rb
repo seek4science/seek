@@ -6,14 +6,14 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
 
   def setup
-    Factory :experimental_assay_class
+    FactoryBot.create :experimental_assay_class
     mock_openbis_calls
-    @project_administrator = Factory(:project_administrator)
+    @project_administrator = FactoryBot.create(:project_administrator)
     @project = @project_administrator.projects.first
-    @user = Factory(:person)
+    @user = FactoryBot.create(:person)
     @user.add_to_project_and_institution(@project, @user.institutions.first)
     assert @user.save
-    @endpoint = Factory(:openbis_endpoint, project: @project)
+    @endpoint = FactoryBot.create(:openbis_endpoint, project: @project)
     @endpoint.assay_types = %w[TZ_FAIR_ASSAY EXPERIMENTAL_STEP]
     @endpoint.save!
     @experiment = Seek::Openbis::Experiment.new(@endpoint, '20171121152132641-51')
@@ -105,7 +105,7 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
     asset = OpenbisExternalAsset.build(@experiment)
     asset.content = fake
     asset.synchronized_at = old
-    st = Factory :study
+    st = FactoryBot.create :study
     asset.seek_entity = st
     assert asset.save
 
@@ -128,7 +128,7 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
 
   test 'register registers new Study with linked Assays' do
     login_as(@user)
-    investigation = Factory :investigation, contributor: @user
+    investigation = FactoryBot.create :investigation, contributor: @user
 
     refute @experiment.sample_ids.empty?
 
@@ -154,7 +154,7 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
 
   test 'register registers new Study with selected Assays' do
     login_as(@user)
-    investigation = Factory :investigation, contributor: @user
+    investigation = FactoryBot.create :investigation, contributor: @user
 
     refute @experiment.sample_ids.size < 2
     to_link = [@experiment.sample_ids[0]]
@@ -181,7 +181,7 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
 
   test 'register registers new Study with linked datasets in special assay' do
     login_as(@user)
-    investigation = Factory :investigation, contributor: @user
+    investigation = FactoryBot.create :investigation, contributor: @user
 
     refute @experiment.sample_ids.empty?
 
@@ -208,7 +208,7 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
 
   test 'register registers new Study with selected datasets in special assay' do
     login_as(@user)
-    investigation = Factory :investigation, contributor: @user
+    investigation = FactoryBot.create :investigation, contributor: @user
 
     refute @experiment.sample_ids.empty?
 
@@ -233,7 +233,7 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
 
   test 'register registers new Study with selected datasets in special assay and inside selected assay' do
     login_as(@user)
-    investigation = Factory :investigation, contributor: @user
+    investigation = FactoryBot.create :investigation, contributor: @user
 
     refute @experiment.sample_ids.empty?
 
@@ -267,7 +267,7 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
 
   test 'register creates new entries in Activity log for Study and dependent assays and files' do
     login_as(@user)
-    investigation = Factory :investigation, contributor: @user
+    investigation = FactoryBot.create :investigation, contributor: @user
 
     refute @experiment.sample_ids.empty?
 
@@ -307,8 +307,8 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
 
   test 'register does not create study if experiment already registered but redirects to it' do
     login_as(@user)
-    investigation = Factory :investigation
-    existing = Factory :study
+    investigation = FactoryBot.create :investigation
+    existing = FactoryBot.create :study
 
     external = OpenbisExternalAsset.build(@experiment)
     assert external.save
@@ -328,7 +328,7 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
 
   test 'batch registers multiple Studies' do
     login_as(@user)
-    investigation = Factory :investigation, contributor: @user
+    investigation = FactoryBot.create :investigation, contributor: @user
 
     sync_options = { link_dependent: 'false' }
     batch_ids = ['20171121153715264-58', '20171121152132641-51']
@@ -354,7 +354,7 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
   # test for a bug
   test 'batch register makes independent descriptions' do
     login_as(@user)
-    investigation = Factory :investigation, contributor: @user
+    investigation = FactoryBot.create :investigation, contributor: @user
 
     sync_options = { link_dependent: 'false' }
     batch_ids = ['20171121153715264-58', '20171121152132641-51']
@@ -371,7 +371,7 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
 
   test 'batch registers multiple Studies and follows assays and datasets' do
     login_as(@user)
-    investigation = Factory :investigation, contributor: @user
+    investigation = FactoryBot.create :investigation, contributor: @user
 
     sync_options = { link_dependent: '1' }
     batch_ids = ['20171121153715264-58', '20171121152132641-51']
@@ -404,7 +404,7 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
 
   test 'batch registers creates Activity log for all created seek objects' do
     login_as(@user)
-    investigation = Factory :investigation, contributor: @user
+    investigation = FactoryBot.create :investigation, contributor: @user
 
     sync_options = { link_dependent: '1' }
     batch_ids = ['20171121153715264-58', '20171121152132641-51']
@@ -434,7 +434,7 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
   test 'update updates sync options and follows dependencies' do
     login_as(@user)
 
-    exstudy = Factory :study, contributor: @user
+    exstudy = FactoryBot.create :study, contributor: @user
     asset = OpenbisExternalAsset.build(@experiment)
     asset.synchronized_at = 2.days.ago
     asset.created_at = 2.days.ago
@@ -475,7 +475,7 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
   test 'update updates sync options and adds selected datasets' do
     login_as(@user)
 
-    exstudy = Factory :study, contributor: @user
+    exstudy = FactoryBot.create :study, contributor: @user
     asset = OpenbisExternalAsset.build(@experiment)
     exstudy.external_asset = asset
     assert asset.save
@@ -511,7 +511,7 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
     get :edit, params: { openbis_endpoint_id: @endpoint.id, id: '20171121152132641-51' }
     assert_response :redirect
 
-    investigation = Factory :investigation, contributor: @user
+    investigation = FactoryBot.create :investigation, contributor: @user
     sync_options = {}
     batch_ids = ['20171121153715264-58', '20171121152132641-51']
 
@@ -549,7 +549,7 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
     login_as(@user)
     refute asset.seek_entity
 
-    investigation = Factory :investigation, contributor: @user
+    investigation = FactoryBot.create :investigation, contributor: @user
     study_params = { investigation_id: investigation.id }
 
     sync_options = {}
@@ -565,13 +565,13 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
   end
 
   test 'do_entity_registration sets issues on errors if not recovable' do
-    ex = Factory :study
+    ex = FactoryBot.create :study
 
     asset = OpenbisExternalAsset.build(@experiment)
     asset.seek_entity = ex
     assert asset.save
 
-    investigation = Factory :investigation
+    investigation = FactoryBot.create :investigation
     study_params = { investigation_id: investigation.id }
 
     sync_options = {}
@@ -594,7 +594,7 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
 
     refute asset.seek_entity
 
-    investigation = Factory :investigation, contributor: @user
+    investigation = FactoryBot.create :investigation, contributor: @user
     study_params = { investigation_id: investigation.id }
 
     sync_options = { link_assays: '1' }
@@ -615,7 +615,7 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
     login_as(@user)
     refute asset.seek_entity
 
-    investigation = Factory :investigation, contributor: @user
+    investigation = FactoryBot.create :investigation, contributor: @user
     study_params = { investigation_id: investigation.id }
 
     to_link = [@experiment.sample_ids[0]]

@@ -3,7 +3,7 @@ require 'test_helper'
 class TemplatesHelperTest < ActionView::TestCase
 
     def setup
-        @template = Factory(:max_template, policy: Factory(:policy, access_type: Policy::VISIBLE ))
+        @template = FactoryBot.create(:max_template, policy: FactoryBot.create(:policy, access_type: Policy::VISIBLE ))
     end
     
     test 'should load templates' do
@@ -23,7 +23,7 @@ class TemplatesHelperTest < ActionView::TestCase
 
     test 'should not show private templates' do
         assert_equal Template.all.length, load_templates.length
-        Factory(:template, policy: Factory(:policy, access_type: Policy::NO_ACCESS ))
+        FactoryBot.create(:template, policy: FactoryBot.create(:policy, access_type: Policy::NO_ACCESS ))
         assert_not_equal Template.all.length, load_templates.length
     end
 end

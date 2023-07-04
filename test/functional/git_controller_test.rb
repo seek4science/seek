@@ -4,7 +4,7 @@ class GitControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
 
   def setup
-    @git_version = Factory(:git_version)
+    @git_version = FactoryBot.create(:git_version).becomes(Workflow::Git::Version)
     @workflow = @git_version.resource
     @person = @workflow.contributor
     login_as @person
@@ -233,31 +233,34 @@ class GitControllerTest < ActionController::TestCase
   end
 
   test 'getting blob with no permissions throws error' do
-    logout
-    get :blob, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'diagram.png' }, format: :html
+    workflow = FactoryBot.create(:local_git_workflow, policy: FactoryBot.create(:publicly_viewable_policy))
+    get :blob, params: { workflow_id: workflow.id, version: 1, path: 'diagram.png' }, format: :html
 
+    assert_redirected_to workflow
     assert flash[:error].include?('authorized')
   end
 
   test 'getting raw with no permissions throws error' do
-    logout
-    get :raw, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'diagram.png' }, format: :html
+    workflow = FactoryBot.create(:local_git_workflow, policy: FactoryBot.create(:publicly_viewable_policy))
+    get :raw, params: { workflow_id: workflow.id, version: 1, path: 'diagram.png' }, format: :html
 
+    assert_redirected_to workflow
     assert flash[:error].include?('authorized')
   end
 
   test 'download with no permissions throws error' do
-    logout
-    get :download, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'diagram.png' }, format: :html
+    workflow = FactoryBot.create(:local_git_workflow, policy: FactoryBot.create(:publicly_viewable_policy))
+    get :download, params: { workflow_id: workflow.id, version: 1, path: 'diagram.png' }, format: :html
 
+    assert_redirected_to workflow
     assert flash[:error].include?('authorized')
   end
 
   test 'show appropriate buttons for permissions' do
-    viewer = Factory(:person)
-    downloader = Factory(:person)
-    editor = Factory(:person)
-    manager = Factory(:person)
+    viewer = FactoryBot.create(:person)
+    downloader = FactoryBot.create(:person)
+    editor = FactoryBot.create(:person)
+    manager = FactoryBot.create(:person)
     @workflow.policy.permissions.create!(contributor: viewer, access_type: Policy::VISIBLE)
     @workflow.policy.permissions.create!(contributor: downloader, access_type: Policy::ACCESSIBLE)
     @workflow.policy.permissions.create!(contributor: editor, access_type: Policy::EDITING)
@@ -330,9 +333,18 @@ class GitControllerTest < ActionController::TestCase
   end
 
   test 'cannot browse tree with no permissions' do
-    logout
-    get :tree, params: { workflow_id: @workflow.id, version: @git_version.version }
+    workflow = FactoryBot.create(:local_git_workflow, policy: FactoryBot.create(:publicly_viewable_policy))
+    get :tree, params: { workflow_id: workflow.id, version: 1 }
 
+    assert_redirected_to workflow
+    assert flash[:error].include?('authorized')
+  end
+
+  test 'redirects to root if no permission to view' do
+    workflow = FactoryBot.create(:local_git_workflow, policy: FactoryBot.create(:private_policy))
+    get :tree, params: { workflow_id: workflow.id, version: 1 }
+
+    assert_redirected_to root_path
     assert flash[:error].include?('authorized')
   end
 
@@ -428,7 +440,7 @@ class GitControllerTest < ActionController::TestCase
   end
 
   test 'view a blob as json' do
-    workflow = Factory(:local_git_workflow, policy: Factory(:public_policy))
+    workflow = FactoryBot.create(:local_git_workflow, policy: FactoryBot.create(:public_policy))
     get :blob, params: { workflow_id: workflow, version: 1, path: 'concat_two_files.ga' }, format: :json
 
     assert_response :success
@@ -439,7 +451,7 @@ class GitControllerTest < ActionController::TestCase
   end
 
   test 'view a binary blob as json' do
-    workflow = Factory(:local_git_workflow, policy: Factory(:public_policy))
+    workflow = FactoryBot.create(:local_git_workflow, policy: FactoryBot.create(:public_policy))
     get :blob, params: { workflow_id: workflow, version: 1, path: 'diagram.png' }, format: :json
 
     assert_response :success
@@ -450,7 +462,7 @@ class GitControllerTest < ActionController::TestCase
   end
 
   test 'view missing blob as json' do
-    workflow = Factory(:local_git_workflow, policy: Factory(:public_policy))
+    workflow = FactoryBot.create(:local_git_workflow, policy: FactoryBot.create(:public_policy))
     get :blob, params: { workflow_id: workflow, version: 1, path: 'doesnotexist' }, format: :json
 
     assert_response :not_found
@@ -459,7 +471,7 @@ class GitControllerTest < ActionController::TestCase
   end
 
   test 'cannot view a blob as json if no permission' do
-    workflow = Factory(:local_git_workflow)
+    workflow = FactoryBot.create(:local_git_workflow)
     get :blob, params: { workflow_id: workflow, version: 1, path: 'concat_two_files.ga' }, format: :json
 
     assert_response :forbidden
@@ -468,7 +480,7 @@ class GitControllerTest < ActionController::TestCase
   end
 
   test 'view root tree as json' do
-    workflow = Factory(:ro_crate_git_workflow, policy: Factory(:public_policy))
+    workflow = FactoryBot.create(:ro_crate_git_workflow, policy: FactoryBot.create(:public_policy))
     get :tree, params: { workflow_id: workflow, version: 1 }, format: :json
 
     assert_response :success
@@ -481,7 +493,7 @@ class GitControllerTest < ActionController::TestCase
   end
 
   test 'view a subtree as json' do
-    workflow = Factory(:ro_crate_git_workflow, policy: Factory(:public_policy))
+    workflow = FactoryBot.create(:ro_crate_git_workflow, policy: FactoryBot.create(:public_policy))
     get :tree, params: { workflow_id: workflow, version: 1, path: 'test/test1' }, format: :json
 
     assert_response :success
@@ -492,7 +504,7 @@ class GitControllerTest < ActionController::TestCase
   end
 
   test 'view missing tree as json' do
-    workflow = Factory(:ro_crate_git_workflow, policy: Factory(:public_policy))
+    workflow = FactoryBot.create(:ro_crate_git_workflow, policy: FactoryBot.create(:public_policy))
     get :tree, params: { workflow_id: workflow, version: 1, path: 'test/test47' }, format: :json
 
     assert_response :not_found
@@ -501,7 +513,7 @@ class GitControllerTest < ActionController::TestCase
   end
 
   test 'cannot view a tree as json if no permission' do
-    workflow = Factory(:ro_crate_git_workflow)
+    workflow = FactoryBot.create(:ro_crate_git_workflow)
     get :blob, params: { workflow_id: workflow, version: 1, path: 'test/test1' }, format: :json
 
     assert_response :forbidden
@@ -514,7 +526,7 @@ class GitControllerTest < ActionController::TestCase
   # patch 'blob/*path' => 'git#move_file', as: :git_move_file
 
   test 'add a new file via API' do
-    workflow = Factory(:local_git_workflow, policy: Factory(:public_policy))
+    workflow = FactoryBot.create(:local_git_workflow, policy: FactoryBot.create(:public_policy))
     refute workflow.git_version.file_exists?('new_file.txt')
 
     post :add_file, params: { workflow_id: workflow, version: 1, path: 'new_file.txt', file: { content: Base64.encode64('file contents') } }, format: :json
@@ -524,7 +536,7 @@ class GitControllerTest < ActionController::TestCase
   end
 
   test 'add a new remote file via API' do
-    workflow = Factory(:local_git_workflow, policy: Factory(:public_policy))
+    workflow = FactoryBot.create(:local_git_workflow, policy: FactoryBot.create(:public_policy))
     refute workflow.git_version.file_exists?('new_remote_file.txt')
 
     assert_difference('Git::Annotation.count', 1) do
@@ -537,7 +549,7 @@ class GitControllerTest < ActionController::TestCase
   end
 
   test 'cannot add a new file via API if not authorized' do
-    workflow = Factory(:local_git_workflow)
+    workflow = FactoryBot.create(:local_git_workflow)
     refute workflow.git_version.file_exists?('new_file.txt')
 
     post :add_file, params: { workflow_id: workflow, version: 1, path: 'new_file.txt', file: { content: Base64.encode64('file contents') } }, format: :json
@@ -547,7 +559,7 @@ class GitControllerTest < ActionController::TestCase
   end
 
   test 'update an existing file via API' do
-    workflow = Factory(:local_git_workflow, policy: Factory(:public_policy))
+    workflow = FactoryBot.create(:local_git_workflow, policy: FactoryBot.create(:public_policy))
     refute_equal 'file contents', workflow.git_version.file_contents('concat_two_files.ga')
 
     post :add_file, params: { workflow_id: workflow, version: 1, path: 'concat_two_files.ga', file: { content: Base64.encode64('file contents') } }, format: :json
@@ -557,7 +569,7 @@ class GitControllerTest < ActionController::TestCase
   end
 
   test 'rename a file via API' do
-    workflow = Factory(:local_git_workflow, policy: Factory(:public_policy))
+    workflow = FactoryBot.create(:local_git_workflow, policy: FactoryBot.create(:public_policy))
     refute workflow.git_version.file_exists?('concat_2_files.ga')
     assert_equal 'concat_two_files.ga', workflow.git_version.main_workflow_path
 
@@ -569,7 +581,7 @@ class GitControllerTest < ActionController::TestCase
   end
 
   test 'cannot rename a file via API if not authorized' do
-    workflow = Factory(:local_git_workflow)
+    workflow = FactoryBot.create(:local_git_workflow)
     assert workflow.git_version.file_exists?('concat_two_files.ga')
     assert_equal 'concat_two_files.ga', workflow.git_version.main_workflow_path
 
@@ -581,7 +593,7 @@ class GitControllerTest < ActionController::TestCase
   end
 
   test 'trying to rename a file via API with invalid path throws error' do
-    workflow = Factory(:local_git_workflow, policy: Factory(:public_policy))
+    workflow = FactoryBot.create(:local_git_workflow, policy: FactoryBot.create(:public_policy))
     assert workflow.git_version.file_exists?('concat_two_files.ga')
     assert_equal 'concat_two_files.ga', workflow.git_version.main_workflow_path
 
@@ -593,7 +605,7 @@ class GitControllerTest < ActionController::TestCase
   end
 
   test 'remove a file via API' do
-    workflow = Factory(:local_git_workflow, policy: Factory(:public_policy))
+    workflow = FactoryBot.create(:local_git_workflow, policy: FactoryBot.create(:public_policy))
     assert workflow.git_version.file_exists?('diagram.png')
 
     delete :remove_file, params: { workflow_id: workflow, version: 1, path: 'diagram.png' }, format: :json
@@ -603,7 +615,7 @@ class GitControllerTest < ActionController::TestCase
   end
 
   test 'cannot remove a file via API if not authorized' do
-    workflow = Factory(:local_git_workflow)
+    workflow = FactoryBot.create(:local_git_workflow)
     assert workflow.git_version.file_exists?('diagram.png')
 
     delete :remove_file, params: { workflow_id: workflow, version: 1, path: 'diagram.png' }, format: :json
@@ -613,7 +625,7 @@ class GitControllerTest < ActionController::TestCase
   end
 
   test 'trying to remove a file via API with wrong path throws error' do
-    workflow = Factory(:local_git_workflow, policy: Factory(:public_policy))
+    workflow = FactoryBot.create(:local_git_workflow, policy: FactoryBot.create(:public_policy))
 
     delete :remove_file, params: { workflow_id: workflow, version: 1, path: '../../../../home' }, format: :json
 
@@ -621,7 +633,7 @@ class GitControllerTest < ActionController::TestCase
   end
 
   test 'should display blob as pdf' do
-    @git_version.add_file('file.pdf', Factory(:pdf_content_blob))
+    @git_version.add_file('file.pdf', FactoryBot.create(:pdf_content_blob))
     disable_authorization_checks { @git_version.save! }
 
     get :raw, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'file.pdf', display: 'pdf' }
@@ -634,7 +646,7 @@ class GitControllerTest < ActionController::TestCase
   end
 
   test 'should display blob as markdown' do
-    @git_version.add_file('file.md', Factory(:markdown_content_blob))
+    @git_version.add_file('file.md', FactoryBot.create(:markdown_content_blob))
     disable_authorization_checks { @git_version.save! }
 
     get :raw, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'file.md', display: 'markdown' }
@@ -647,8 +659,22 @@ class GitControllerTest < ActionController::TestCase
     assert_select '.markdown-body h1', text: 'FAIRDOM-SEEK'
   end
 
+  test 'should display blob as markdown inline' do
+    @git_version.add_file('file.md', FactoryBot.create(:markdown_content_blob))
+    disable_authorization_checks { @git_version.save! }
+
+    get :raw, xhr: true, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'file.md',
+                                   display: 'markdown', disposition: 'inline' }
+
+    assert_response :success
+    assert @response.header['Content-Type'].start_with?('text/html')
+    assert_equal ApplicationController::USER_CONTENT_CSP, @response.header['Content-Security-Policy']
+    assert_select 'body', count: 0
+    assert_select 'iframe'
+  end
+
   test 'should display blob as jupyter' do
-    @git_version.add_file('file.ipynb', Factory(:jupyter_notebook_content_blob))
+    @git_version.add_file('file.ipynb', FactoryBot.create(:jupyter_notebook_content_blob))
     disable_authorization_checks { @git_version.save! }
 
     get :raw, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'file.ipynb', display: 'notebook' }
@@ -663,7 +689,7 @@ class GitControllerTest < ActionController::TestCase
   end
 
   test 'should display blob as text' do
-    @git_version.add_file('file.txt', Factory(:txt_content_blob))
+    @git_version.add_file('file.txt', FactoryBot.create(:txt_content_blob))
     disable_authorization_checks { @git_version.save! }
 
     get :raw, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'file.txt', display: 'text' }
@@ -675,7 +701,7 @@ class GitControllerTest < ActionController::TestCase
   end
 
   test 'should display blob as image' do
-    @git_version.add_file('file.png', Factory(:image_content_blob))
+    @git_version.add_file('file.png', FactoryBot.create(:image_content_blob))
     disable_authorization_checks { @git_version.save! }
 
     get :raw, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'file.png', display: 'image' }
@@ -687,11 +713,133 @@ class GitControllerTest < ActionController::TestCase
   end
 
   test 'should throw 406 trying to display image as text' do
-    @git_version.add_file('file.png', Factory(:image_content_blob))
+    @git_version.add_file('file.png', FactoryBot.create(:image_content_blob))
     disable_authorization_checks { @git_version.save! }
 
     assert_raises(ActionController::UnknownFormat) do
       get :raw, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'file.png', display: 'text' }
     end
+  end
+
+  test 'can edit version name and comment' do
+    assert_not_equal 'modified', @git_version.name
+    assert_not_equal 'modified', @git_version.name
+
+    patch :update, params: { workflow_id: @workflow.id, version: @git_version.version,
+                                   git_version: { name: 'modified', comment: 'modified' } }
+
+    assert_redirected_to @workflow
+    assert_equal 'modified', @git_version.reload.name
+  end
+
+  test 'can edit version visibility' do
+    disable_authorization_checks { @workflow.save_as_new_git_version }
+
+    assert_equal 2, @workflow.reload.version
+
+    assert_not_equal :registered_users, @workflow.find_version(1).visibility
+    refute @workflow.find_version(1).latest_git_version?
+
+    patch :update, params: { workflow_id: @workflow.id, version: 1,
+                                   git_version: { visibility: 'registered_users' } }
+
+    assert_redirected_to @workflow
+    assert_equal :registered_users, @workflow.find_version(1).reload.visibility
+  end
+
+  test 'cannot edit version visibility if doi minted' do
+    disable_authorization_checks do
+      @workflow.save_as_new_git_version
+      @workflow.find_version(1).update_column(:doi, '10.5072/wtf')
+    end
+
+    assert_equal :public, @workflow.find_version(1).visibility
+
+    patch :update, params: { workflow_id: @workflow.id, version: 1,
+                                   git_version: { visibility: 'registered_users' } }
+
+    assert_redirected_to @workflow
+    assert_equal :public, @workflow.find_version(1).reload.visibility, 'Should not have changed visibility - DOI present'
+  end
+
+  test 'cannot edit version visibility if latest version' do
+    assert @git_version.latest_git_version?
+    assert_equal :public, @workflow.find_version(1).visibility
+
+    patch :update, params: { workflow_id: @workflow.id, version: 1,
+                                   git_version: { visibility: 'private' } }
+
+    assert_redirected_to @workflow
+    assert_equal :public, @workflow.find_version(1).reload.visibility,'Should not have changed visibility - latest version'
+  end
+
+  test 'actions are logged' do
+    @git_version.add_file('file.md', FactoryBot.create(:markdown_content_blob))
+    disable_authorization_checks { @git_version.save! }
+
+    assert_difference('@workflow.download_count') do
+      get :raw, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'concat_two_files.ga' }
+    end
+
+    assert_response :success
+    log = @workflow.activity_logs.last
+    assert_equal 'download', log.action
+    assert_equal 'concat_two_files.ga', log.data[:path]
+
+    assert_no_difference('@workflow.download_count') do
+      assert_difference('@workflow.reload.activity_logs.count') do
+        get :raw, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'file.md', display: 'markdown' }
+      end
+    end
+
+    assert_response :success
+    log = @workflow.activity_logs.last
+    assert_equal 'inline_view', log.action
+    assert_equal 'file.md', log.data[:path]
+    assert_equal 'markdown', log.data[:display]
+  end
+
+  test 'should display CFF blob as citation' do
+    @git_version.add_file('CITATION.cff', open_fixture_file('CITATION.cff'))
+    disable_authorization_checks { @git_version.save! }
+
+    get :raw, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'CITATION.cff',
+                        display: 'citation' }
+
+    assert_response :success
+    assert @response.header['Content-Type'].start_with?('text/html')
+    assert_equal ApplicationController::USER_CONTENT_CSP, @response.header['Content-Security-Policy']
+    assert_select 'body'
+    assert_select '#navbar', count: 0
+    assert_select 'div[data-citation-style=?]', 'apa', text: /van der Real Person, O\. T\./
+  end
+
+  test 'should display CFF blob as citation with selected style' do
+    @git_version.add_file('CITATION.cff', open_fixture_file('CITATION.cff'))
+    disable_authorization_checks { @git_version.save! }
+
+    get :raw, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'CITATION.cff',
+                        display: 'citation', style: 'bibtex' }
+
+    assert_response :success
+    assert @response.header['Content-Type'].start_with?('text/html')
+    assert_equal ApplicationController::USER_CONTENT_CSP, @response.header['Content-Security-Policy']
+    assert_select 'body'
+    assert_select '#navbar', count: 0
+    assert_select 'div[data-citation-style=?]', 'bibtex', text: /author=\{Real Person, One Truly van der, IV and/
+  end
+
+  test 'should display CFF blob as citation inline' do
+    @git_version.add_file('CITATION.cff', open_fixture_file('CITATION.cff'))
+    disable_authorization_checks { @git_version.save! }
+
+    get :raw, xhr: true, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'CITATION.cff',
+                                   display: 'citation', disposition: 'inline', style: 'the-lancet' }
+
+    assert_response :success
+    assert @response.header['Content-Type'].start_with?('text/html')
+    assert_equal ApplicationController::USER_CONTENT_CSP, @response.header['Content-Security-Policy']
+    assert_select 'body', count: 0
+    assert_select 'div[data-citation-style=?]', 'the-lancet', text: /Real Person OT van der IV/
   end
 end

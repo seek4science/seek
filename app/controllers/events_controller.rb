@@ -57,9 +57,4 @@ class EventsController < ApplicationController
                                   { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                   { data_file_ids: [] },{document_ids: []}, { publication_ids: [] })
   end
-
-  def param_converter_options
-    { skip: [:data_file_ids] }
-  end
-
 end

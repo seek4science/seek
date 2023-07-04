@@ -14,7 +14,7 @@ module Git
       else
         repo = asset.local_git_repository || asset.create_local_git_repository
       end
-      asset.versions.order(:version).each do |version|
+      asset.standard_versions.order(:version).each do |version|
         convert_version(repo, version, unzip: unzip)
       end
 

@@ -17,7 +17,7 @@ class ModelTest < ActiveSupport::TestCase
   end
 
   test 'model contents for search' do
-    model = Factory :teusink_model
+    model = FactoryBot.create :teusink_model
     contents = model.model_contents_for_search
 
     assert contents.include?('KmPYKPEP')
@@ -25,24 +25,24 @@ class ModelTest < ActiveSupport::TestCase
   end
 
   test 'model file format forces SBML format' do
-    model = Factory(:teusink_model, model_format: nil)
+    model = FactoryBot.create(:teusink_model, model_format: nil)
     assert model.contains_sbml?
     assert_equal ModelFormat.sbml.first, model.model_format
-    other_format = Factory(:model_format)
-    model = Factory(:teusink_model, model_format: other_format)
+    other_format = FactoryBot.create(:model_format)
+    model = FactoryBot.create(:teusink_model, model_format: other_format)
     refute_nil model.model_format
     assert_equal other_format, model.model_format
 
-    model = Factory(:teusink_jws_model, model_format: nil)
+    model = FactoryBot.create(:teusink_jws_model, model_format: nil)
     assert_nil model.model_format
   end
 
   test 'to_rdf' do
-    User.with_current_user Factory(:user) do
-      object = Factory :model, assay_ids: [Factory(:assay, contributor:User.current_user.person).id], policy: Factory(:public_policy)
+    User.with_current_user FactoryBot.create(:user) do
+      object = FactoryBot.create :model, assay_ids: [FactoryBot.create(:assay, contributor:User.current_user.person).id], policy: FactoryBot.create(:public_policy)
       assert object.contains_sbml?
-      pub = Factory :publication
-      Factory :relationship, subject: object, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub
+      pub = FactoryBot.create :publication
+      FactoryBot.create :relationship, subject: object, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub
       object.reload
       rdf = object.to_rdf
       RDF::Reader.for(:rdfxml).new(rdf) do |reader|
@@ -53,8 +53,8 @@ class ModelTest < ActiveSupport::TestCase
   end
 
   test 'content blob search terms' do
-    m = Factory :teusink_model
-    m.content_blobs << Factory.create(:doc_content_blob, original_filename: 'word.doc', asset: m, asset_version: m.version)
+    m = FactoryBot.create :teusink_model
+    m.content_blobs << FactoryBot.create(:doc_content_blob, original_filename: 'word.doc', asset: m, asset_version: m.version)
     m.reload
 
     terms = m.content_blob_search_terms
@@ -66,44 +66,44 @@ class ModelTest < ActiveSupport::TestCase
   end
 
   test 'type detection' do
-    model = Factory :teusink_model
+    model = FactoryBot.create :teusink_model
     assert model.contains_sbml?
     assert model.is_jws_supported?
     assert !model.contains_jws_dat?
 
-    model = Factory :teusink_jws_model
+    model = FactoryBot.create :teusink_jws_model
     assert !model.contains_sbml?
     assert model.is_jws_supported?
     assert model.contains_jws_dat?
 
-    model = Factory :non_sbml_xml_model
+    model = FactoryBot.create :non_sbml_xml_model
     assert !model.contains_sbml?
     assert !model.is_jws_supported?
     assert !model.contains_jws_dat?
 
-    model = Factory(:teusink_jws_model).latest_version
+    model = FactoryBot.create(:teusink_jws_model).latest_version
     assert !model.contains_sbml?
     assert model.is_jws_supported?
     assert model.contains_jws_dat?
 
-    model = Factory(:teusink_model).latest_version
+    model = FactoryBot.create(:teusink_model).latest_version
     assert model.contains_sbml?
     assert model.is_jws_supported?
     assert !model.contains_jws_dat?
 
-    model = Factory(:non_sbml_xml_model).latest_version
+    model = FactoryBot.create(:non_sbml_xml_model).latest_version
     assert !model.contains_sbml?
     assert !model.is_jws_supported?
     assert !model.contains_jws_dat?
 
     # should also be able to handle new versions
-    model = Factory(:non_sbml_xml_model)
+    model = FactoryBot.create(:non_sbml_xml_model)
     assert !model.contains_sbml?
     assert !model.is_jws_supported?
 
     disable_authorization_checks {
       assert model.save_as_new_version
-      model.content_blobs = [Factory(:teusink_model_content_blob, asset: model, asset_version: model.version)]
+      model.content_blobs = [FactoryBot.create(:teusink_model_content_blob, asset: model, asset_version: model.version)]
       model.save
     }
     model.reload
@@ -115,10 +115,10 @@ class ModelTest < ActiveSupport::TestCase
   end
 
   test 'assay association' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     User.with_current_user(person.user) do
-      model = Factory(:model, contributor:person)
-      assay = Factory(:assay, contributor:person)
+      model = FactoryBot.create(:model, contributor:person)
+      assay = FactoryBot.create(:assay, contributor:person)
       assay_asset = AssayAsset.new
       assert_not_equal assay_asset.asset, model
       assert_not_equal assay_asset.assay, assay
@@ -134,10 +134,10 @@ class ModelTest < ActiveSupport::TestCase
   end
 
   test 'validation' do
-    asset = Model.new title: 'fred', projects: [projects(:sysmo_project)], policy: Factory(:private_policy)
+    asset = Model.new title: 'fred', projects: [projects(:sysmo_project)], policy: FactoryBot.create(:private_policy)
     assert asset.valid?
 
-    asset = Model.new projects: [projects(:sysmo_project)], policy: Factory(:private_policy)
+    asset = Model.new projects: [projects(:sysmo_project)], policy: FactoryBot.create(:private_policy)
     assert !asset.valid?
 
   end
@@ -170,7 +170,7 @@ class ModelTest < ActiveSupport::TestCase
   test 'cache_remote_content' do
     mock_remote_file "#{Rails.root}/test/fixtures/files/Teusink.xml", 'http://mockedlocation.com/teusink.xml'
 
-    model = Factory.build :model
+    model = FactoryBot.build :model
     model.content_blobs.build(data: nil, url: 'http://mockedlocation.com/teusink.xml',
                               original_filename: 'teusink.xml')
     model.save!
@@ -184,7 +184,7 @@ class ModelTest < ActiveSupport::TestCase
 
   test 'policy defaults to system default' do
     with_config_value 'default_all_visitors_access_type', Policy::NO_ACCESS do
-      model = Factory.build(:model)
+      model = FactoryBot.build(:model)
       refute model.persisted?
       model.save!
       model.reload
@@ -195,9 +195,9 @@ class ModelTest < ActiveSupport::TestCase
   end
 
   test 'creators through asset' do
-    p1 = Factory(:person)
-    p2 = Factory(:person)
-    model = Factory(:teusink_model, creators: [p1, p2])
+    p1 = FactoryBot.create(:person)
+    p2 = FactoryBot.create(:person)
+    model = FactoryBot.create(:teusink_model, creators: [p1, p2])
     assert_not_nil model.creators
     assert_equal 2, model.creators.size
     assert model.creators.include?(p1)
@@ -205,7 +205,7 @@ class ModelTest < ActiveSupport::TestCase
   end
 
   test 'titled trimmed' do
-    model = Factory :model
+    model = FactoryBot.create :model
     User.with_current_user model.contributor do
       model.title = ' space'
       model.save!
@@ -231,7 +231,7 @@ class ModelTest < ActiveSupport::TestCase
   end
 
   test 'make sure content blob is preserved after deletion' do
-    model = Factory :model
+    model = FactoryBot.create :model
     User.with_current_user model.contributor do
       assert_equal 1, model.content_blobs.size, 'Must have an associated content blob for this test to work'
       assert_not_nil model.content_blobs.first, 'Must have an associated content blob for this test to work'

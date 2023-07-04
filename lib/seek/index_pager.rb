@@ -1,5 +1,11 @@
 module Seek
   module IndexPager
+    extend ActiveSupport::Concern
+
+    included do
+      after_action :index_fair_signposting, only: [:index], if: -> { controller_model.schema_org_supported? }
+    end
+
     def index
       respond_to do |format|
         format.html
@@ -11,6 +17,21 @@ module Seek
                      base_url: Seek::Config.site_base_host,
                      api_version: ActiveModel::Serializer.config.api_version
                  }
+        end
+        if controller_model.schema_org_supported?
+          format.jsonld do
+            if params[:dump]
+              dump = controller_model.public_schema_ld_dump
+              if dump.exists?
+                send_file(dump.file, type: :jsonld)
+              else
+                head :not_found
+              end
+            else
+              resource = determine_resource_for_schema_ld
+              render json: Seek::BioSchema::Serializer.new(resource).json_representation, adapter: :attributes
+            end
+          end
         end
       end
     end
@@ -36,6 +57,10 @@ module Seek
       if @parent_resource
         @parent_resource.get_related(controller_name.classify)
       else
+        if controller_model == SampleType && Seek::Config.project_single_page_advanced_enabled
+          return SampleType.without_template
+        end
+
         controller_model
       end
     end
@@ -144,6 +169,10 @@ module Seek
       t = Time.now
       block.call
       Rails.logger.debug("#{message} (#{((Time.now - t) * 1000.0).round(1)}ms)")
+    end
+
+    def index_fair_signposting
+      @fair_signposting_links = [[polymorphic_url(controller_model), { rel: :describedby, type: :jsonld }]]
     end
   end
 end

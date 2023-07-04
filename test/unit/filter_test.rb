@@ -4,10 +4,10 @@ class FilterTest < ActiveSupport::TestCase
   test 'apply filter' do
     tag_filter = Seek::Filterer::FILTERS[:tag]
 
-    abc_doc = Factory(:document)
+    abc_doc = FactoryBot.create(:document)
     abc_doc.annotate_with('abctag', 'tag', abc_doc.contributor)
     disable_authorization_checks { abc_doc.save! }
-    xyz_doc = Factory(:document)
+    xyz_doc = FactoryBot.create(:document)
     xyz_doc.annotate_with('xyztag', 'tag', xyz_doc.contributor)
     disable_authorization_checks { xyz_doc.save! }
 
@@ -21,14 +21,14 @@ class FilterTest < ActiveSupport::TestCase
   test 'apply ontology filter' do
     assay_type_filter = Seek::Filterer::FILTERS[:assay_type]
     tech_type_filter = Seek::Filterer::FILTERS[:technology_type]
-    metab_exp_assay = Factory(:experimental_assay,
+    metab_exp_assay = FactoryBot.create(:experimental_assay,
                               assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Metabolomics',
                               technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Gas_chromatography')
-    gen_model_assay = Factory(:modelling_assay,
+    gen_model_assay = FactoryBot.create(:modelling_assay,
                               assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Genome_scale')
 
-    suggested_type = Factory(:suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Metabolomics', label: 'bla')
-    sug_type_exp_assay = Factory(:experimental_assay,
+    suggested_type = FactoryBot.create(:suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Metabolomics', label: 'bla')
+    sug_type_exp_assay = FactoryBot.create(:experimental_assay,
                                  assay_type_uri: "suggested_assay_type:#{suggested_type.id}",
                                  technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Gas_chromatography')
 
@@ -56,8 +56,8 @@ class FilterTest < ActiveSupport::TestCase
   test 'apply search filter' do
     search_filter = Seek::Filtering::SearchFilter.new
 
-    thing = Factory(:document, title: "Thing One")
-    thing2 = Factory(:document, title: "Thing Two")
+    thing = FactoryBot.create(:document, title: "Thing One")
+    thing2 = FactoryBot.create(:document, title: "Thing Two")
 
     with_config_value(:solr_enabled, false) do
       assert_includes_all search_filter.apply(Document.all, ["Thing"]).to_a, [thing, thing2]
@@ -71,10 +71,10 @@ class FilterTest < ActiveSupport::TestCase
   test 'apply date filter with date' do
     created_at_filter = Seek::Filtering::DateFilter.new(field: :created_at, presets: [24.hours, 1.year])
 
-    new_thing = Factory(:document)
-    last_weeks_thing = Factory(:document, created_at: 1.week.ago)
-    last_months_thing = Factory(:document, created_at: 1.month.ago)
-    old_thing = Factory(:document, created_at: 2.years.ago)
+    new_thing = FactoryBot.create(:document)
+    last_weeks_thing = FactoryBot.create(:document, created_at: 1.week.ago)
+    last_months_thing = FactoryBot.create(:document, created_at: 1.month.ago)
+    old_thing = FactoryBot.create(:document, created_at: 2.years.ago)
 
     assert_includes_all created_at_filter.apply(Document.all, ["#{2.weeks.ago}"]).to_a, [new_thing, last_weeks_thing]
     assert_includes_all created_at_filter.apply(Document.all, ["#{2.months.ago}"]).to_a, [new_thing, last_weeks_thing, last_months_thing]
@@ -85,10 +85,10 @@ class FilterTest < ActiveSupport::TestCase
   test 'apply date filter with date range' do
     created_at_filter = Seek::Filtering::DateFilter.new(field: :created_at, presets: [24.hours, 1.year])
 
-    new_thing = Factory(:document)
-    last_weeks_thing = Factory(:document, created_at: 1.week.ago)
-    last_months_thing = Factory(:document, created_at: 1.month.ago)
-    old_thing = Factory(:document, created_at: 2.years.ago)
+    new_thing = FactoryBot.create(:document)
+    last_weeks_thing = FactoryBot.create(:document, created_at: 1.week.ago)
+    last_months_thing = FactoryBot.create(:document, created_at: 1.month.ago)
+    old_thing = FactoryBot.create(:document, created_at: 2.years.ago)
 
     assert_includes_all created_at_filter.apply(Document.all, ["#{2.weeks.ago}/#{2.weeks.from_now}"]).to_a, [new_thing, last_weeks_thing]
     assert_includes_all created_at_filter.apply(Document.all, ["#{2.months.ago}/#{3.weeks.ago}"]).to_a, [last_months_thing]
@@ -100,10 +100,10 @@ class FilterTest < ActiveSupport::TestCase
   test 'apply date filter with duration' do
     created_at_filter = Seek::Filtering::DateFilter.new(field: :created_at, presets: [24.hours, 1.year])
 
-    new_thing = Factory(:document)
-    last_weeks_thing = Factory(:document, created_at: 1.week.ago)
-    last_months_thing = Factory(:document, created_at: 1.month.ago)
-    old_thing = Factory(:document, created_at: 2.years.ago)
+    new_thing = FactoryBot.create(:document)
+    last_weeks_thing = FactoryBot.create(:document, created_at: 1.week.ago)
+    last_months_thing = FactoryBot.create(:document, created_at: 1.month.ago)
+    old_thing = FactoryBot.create(:document, created_at: 2.years.ago)
 
     assert_includes_all created_at_filter.apply(Document.all, ["PT2H"]).to_a, [new_thing]
     assert_includes_all created_at_filter.apply(Document.all, ["P3W"]).to_a, [new_thing, last_weeks_thing]
@@ -116,10 +116,10 @@ class FilterTest < ActiveSupport::TestCase
   test 'apply date filter with multiple conditions' do
     created_at_filter = Seek::Filtering::DateFilter.new(field: :created_at, presets: [24.hours, 1.year])
 
-    new_thing = Factory(:document)
-    last_weeks_thing = Factory(:document, created_at: 1.week.ago)
-    last_months_thing = Factory(:document, created_at: 1.month.ago)
-    old_thing = Factory(:document, created_at: 2.years.ago)
+    new_thing = FactoryBot.create(:document)
+    last_weeks_thing = FactoryBot.create(:document, created_at: 1.week.ago)
+    last_months_thing = FactoryBot.create(:document, created_at: 1.month.ago)
+    old_thing = FactoryBot.create(:document, created_at: 2.years.ago)
 
     assert_includes_all created_at_filter.apply(Document.all, ["PT2H", "#{2.months.ago}/#{3.weeks.ago}"]).to_a, [new_thing, last_months_thing]
     assert_includes_all created_at_filter.apply(Document.all, ["#{1.day.ago}/#{1.day.from_now}", "#{3.years.ago}/#{1.year.ago}"]).to_a, [new_thing, old_thing]
@@ -133,9 +133,9 @@ class FilterTest < ActiveSupport::TestCase
 
     year_filter = Seek::Filtering::YearFilter.new(field: 'published_date')
 
-    new_pub = Factory(:publication, published_date: '2019-10-14')
-    newish_pub = Factory(:publication, published_date: '2019-01-01')
-    old_pub = Factory(:publication, published_date: '1970-10-10')
+    new_pub = FactoryBot.create(:publication, published_date: '2019-10-14')
+    newish_pub = FactoryBot.create(:publication, published_date: '2019-01-01')
+    old_pub = FactoryBot.create(:publication, published_date: '1970-10-10')
 
     assert_includes_all year_filter.apply(Publication.all, ['2019']).to_a, [new_pub, newish_pub]
     assert_includes_all year_filter.apply(Publication.all, ['1970']).to_a, [old_pub]
@@ -147,10 +147,10 @@ class FilterTest < ActiveSupport::TestCase
   test 'get filter options' do
     tag_filter = Seek::Filterer::FILTERS[:tag]
 
-    abc_doc = Factory(:document)
+    abc_doc = FactoryBot.create(:document)
     abc_doc.annotate_with('abctag', 'tag', abc_doc.contributor)
     disable_authorization_checks { abc_doc.save! }
-    xyz_doc = Factory(:document)
+    xyz_doc = FactoryBot.create(:document)
     xyz_doc.annotate_with('xyztag', 'tag', xyz_doc.contributor)
     disable_authorization_checks { xyz_doc.save! }
 
@@ -191,14 +191,14 @@ class FilterTest < ActiveSupport::TestCase
   test 'get filter options for ontology filters' do
     assay_type_filter = Seek::Filterer::FILTERS[:assay_type]
     tech_type_filter = Seek::Filterer::FILTERS[:technology_type]
-    metab_exp_assay = Factory(:experimental_assay,
+    metab_exp_assay = FactoryBot.create(:experimental_assay,
                               assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Metabolomics',
                               technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Gas_chromatography')
-    gen_model_assay = Factory(:modelling_assay,
+    gen_model_assay = FactoryBot.create(:modelling_assay,
                               assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Genome_scale')
 
-    suggested_type = Factory(:suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Metabolomics', label: 'bla')
-    sug_type_exp_assay = Factory(:experimental_assay,
+    suggested_type = FactoryBot.create(:suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Metabolomics', label: 'bla')
+    sug_type_exp_assay = FactoryBot.create(:experimental_assay,
                                  assay_type_uri: "suggested_assay_type:#{suggested_type.id}",
                                  technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Gas_chromatography')
 
@@ -259,12 +259,12 @@ class FilterTest < ActiveSupport::TestCase
   test 'get filter options for filter with label mapping' do
     contributor_filter = Seek::Filterer::FILTERS[:contributor]
 
-    person1 = Factory(:person, first_name: 'Jane', last_name: 'Doe')
-    person2 = Factory(:person, first_name: 'John', last_name: 'Doe')
+    person1 = FactoryBot.create(:person, first_name: 'Jane', last_name: 'Doe')
+    person2 = FactoryBot.create(:person, first_name: 'John', last_name: 'Doe')
 
-    person1_doc = Factory(:document, contributor: person1)
-    person1_other_doc = Factory(:document, contributor: person1)
-    person2_doc = Factory(:document, contributor: person2)
+    person1_doc = FactoryBot.create(:document, contributor: person1)
+    person1_other_doc = FactoryBot.create(:document, contributor: person1)
+    person2_doc = FactoryBot.create(:document, contributor: person2)
 
     options = contributor_filter.options(Document.all, [])
     assert_equal 2, options.length
@@ -304,8 +304,8 @@ class FilterTest < ActiveSupport::TestCase
   test 'get search filter options' do
     search_filter = Seek::Filtering::SearchFilter.new
 
-    thing = Factory(:document, title: "Thing One")
-    thing2 = Factory(:document, title: "Thing Two")
+    thing = FactoryBot.create(:document, title: "Thing One")
+    thing2 = FactoryBot.create(:document, title: "Thing Two")
 
     with_config_value(:solr_enabled, false) do
       options = search_filter.options(Document.all, ["Thing"])
@@ -326,11 +326,11 @@ class FilterTest < ActiveSupport::TestCase
     presets = [24.hours, 1.year, Date.parse('1990-01-01')..Date.parse('2000-01-01')] # Very unlikely that a range will ever be used as a preset value...
     created_at_filter = Seek::Filtering::DateFilter.new(field: :created_at, presets: presets)
 
-    new_thing = Factory(:document)
-    last_weeks_thing = Factory(:document, created_at: 1.week.ago)
-    last_months_thing = Factory(:document, created_at: 1.month.ago)
-    old_thing = Factory(:document, created_at: 2.years.ago)
-    ancient_thing = Factory(:document, created_at: Time.parse('1995-01-01'))
+    new_thing = FactoryBot.create(:document)
+    last_weeks_thing = FactoryBot.create(:document, created_at: 1.week.ago)
+    last_months_thing = FactoryBot.create(:document, created_at: 1.month.ago)
+    old_thing = FactoryBot.create(:document, created_at: 2.years.ago)
+    ancient_thing = FactoryBot.create(:document, created_at: Time.parse('1995-01-01'))
 
     # No actives
     options = created_at_filter.options(Document.all, [])
@@ -470,9 +470,9 @@ class FilterTest < ActiveSupport::TestCase
 
     year_filter = Seek::Filtering::YearFilter.new(field: 'published_date')
 
-    new_pub = Factory(:publication, published_date: '2019-10-14')
-    newish_pub = Factory(:publication, published_date: '2019-01-01')
-    old_pub = Factory(:publication, published_date: '1970-10-10')
+    new_pub = FactoryBot.create(:publication, published_date: '2019-10-14')
+    newish_pub = FactoryBot.create(:publication, published_date: '2019-01-01')
+    old_pub = FactoryBot.create(:publication, published_date: '1970-10-10')
 
     options = year_filter.options(Publication.all, [])
     assert_equal 2, options.length
@@ -525,13 +525,13 @@ class FilterTest < ActiveSupport::TestCase
   end
 
   test 'filter should not return duplicates' do
-    institution1 = Factory(:institution, country: 'NZ')
-    institution2 = Factory(:institution, country: 'NZ')
-    institution3 = Factory(:institution, country: 'NZ')
-    project1 = Factory(:project)
-    project2 = Factory(:project)
-    person1 = Factory(:person)
-    person2 = Factory(:person)
+    institution1 = FactoryBot.create(:institution, country: 'NZ')
+    institution2 = FactoryBot.create(:institution, country: 'NZ')
+    institution3 = FactoryBot.create(:institution, country: 'NZ')
+    project1 = FactoryBot.create(:project)
+    project2 = FactoryBot.create(:project)
+    person1 = FactoryBot.create(:person)
+    person2 = FactoryBot.create(:person)
     person1.add_to_project_and_institution(project1, institution1)
     person1.add_to_project_and_institution(project2, institution2)
     person1.add_to_project_and_institution(project2, institution3)
@@ -553,13 +553,13 @@ class FilterTest < ActiveSupport::TestCase
   test 'get active filter options even if they matched 0 records' do
     tag_filter = Seek::Filterer::FILTERS[:tag]
 
-    cool_contributor = Factory(:person)
-    cool_blue_doc = Factory(:document, contributor: cool_contributor)
+    cool_contributor = FactoryBot.create(:person)
+    cool_blue_doc = FactoryBot.create(:document, contributor: cool_contributor)
     cool_blue_doc.annotate_with(['cool', 'blue'], 'tag', cool_contributor)
     disable_authorization_checks { cool_blue_doc.save! }
 
-    hot_contributor = Factory(:person)
-    hot_red_doc = Factory(:document, contributor: hot_contributor)
+    hot_contributor = FactoryBot.create(:person)
+    hot_red_doc = FactoryBot.create(:document, contributor: hot_contributor)
     hot_red_doc.annotate_with(['hot', 'red'], 'tag', hot_contributor)
     disable_authorization_checks { hot_red_doc.save! }
 
@@ -599,8 +599,8 @@ class FilterTest < ActiveSupport::TestCase
   test 'get active filter options even if they are invalid' do
     contributor_filter = Seek::Filterer::FILTERS[:contributor]
 
-    contributor = Factory(:person)
-    Factory(:document, contributor: contributor)
+    contributor = FactoryBot.create(:person)
+    FactoryBot.create(:document, contributor: contributor)
 
     options = contributor_filter.options(Document.all, [contributor.id.to_s])
     assert_equal 1, options.length

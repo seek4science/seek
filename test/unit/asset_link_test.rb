@@ -3,7 +3,7 @@ require 'test_helper'
 class AssetLinkTest < ActiveSupport::TestCase
 
   test 'validation' do
-    asset = Factory(:sop)
+    asset = FactoryBot.create(:sop)
     link = AssetLink.new(url:'http://fish.com', asset:asset)
     assert link.valid?
 
@@ -39,7 +39,7 @@ class AssetLinkTest < ActiveSupport::TestCase
   end
 
   test 'validates through asset' do
-    asset = Factory.build(:sop, discussion_links:[Factory.build(:discussion_link, url:'not a url')])
+    asset = FactoryBot.build(:sop, discussion_links:[FactoryBot.build(:discussion_link, url:'not a url')])
     refute_empty asset.discussion_links
     refute asset.valid?
     assert_equal ['Discussion links url is not a valid URL'], asset.errors.full_messages
@@ -55,7 +55,7 @@ class AssetLinkTest < ActiveSupport::TestCase
   end
 
   test 'strip link before validate' do
-    asset = Factory(:sop)
+    asset = FactoryBot.create(:sop)
     link = AssetLink.new(url:'  http://fish.com ', asset:asset)
     assert link.valid?
     assert_equal 'http://fish.com', link.url
@@ -65,8 +65,8 @@ class AssetLinkTest < ActiveSupport::TestCase
     # if this changes, then the database entries need updating
     assert_equal 'discussion', AssetLink::DISCUSSION
 
-    link1 = Factory(:discussion_link)
-    link2 = Factory(:asset_link, url:'http://google.com',link_type:'another')
+    link1 = FactoryBot.create(:discussion_link)
+    link2 = FactoryBot.create(:asset_link, url:'http://google.com',link_type:'another')
 
     assert_equal [link1], AssetLink.discussion
   end

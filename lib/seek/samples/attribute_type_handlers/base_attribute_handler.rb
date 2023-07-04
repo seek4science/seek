@@ -1,7 +1,8 @@
 module Seek
   module Samples
     module AttributeTypeHandlers
-      class AttributeHandlerException < Exception; end
+      class AttributeHandlerException < RuntimeError; end
+
       class BaseAttributeHandler
         def initialize(additional_options = {})
           self.additional_options = additional_options
@@ -21,7 +22,7 @@ module Seek
             test_value(value)
           rescue AttributeHandlerException => e
             raise e
-          rescue
+          rescue StandardError
             return false
           end
           true

@@ -25,10 +25,11 @@
           <span class="required">*</span>
           <div class="row">        
             <div class="col-md-12">    
-              <%= objects_input('projects', [], 
-                  typeahead:  {query_url: typeahead_projects_path + '?query=%QUERY',
+              <%= objects_input('project_ids', [],
+                  typeahead:  {query_url: typeahead_projects_path,
                   handlebars_template:'typeahead/hint'}, 
-                  limit:3) -%>            
+                  limit:3,
+                  class: 'form-control') -%>
             </div>
           </div>                    
         <% end %>
@@ -62,8 +63,8 @@
 <script type='application/javascript'>
 
   function checkSubmitButtonEnabled() {
-    var enabled = $j('#institution_id').val()
-      && $j('input#projects').val()      
+    var enabled = $j('select#institution_id').val()
+      && $j('select#project_ids').val()
     $j('#submit-button').prop('disabled',!enabled);    
   }
   
@@ -76,7 +77,7 @@
       }
     });
     
-    $j('input#projects').on('itemAdded', function(event) {
+    $j('select#project_ids').on('select2:select', function(event) {
       checkSubmitButtonEnabled();        
     });
 

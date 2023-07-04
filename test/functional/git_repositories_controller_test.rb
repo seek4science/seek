@@ -3,7 +3,7 @@ require 'test_helper'
 class GitRepositoriesControllerTest < ActionController::TestCase
 
   test 'get task status' do
-    repo = Factory(:unfetched_remote_repository)
+    repo = FactoryBot.create(:unfetched_remote_repository)
 
     assert_difference('Task.count', 1) do
       repo.queue_fetch
@@ -29,7 +29,7 @@ class GitRepositoriesControllerTest < ActionController::TestCase
   end
 
   test 'get refs' do
-    repo = Factory(:remote_repository)
+    repo = FactoryBot.create(:remote_repository)
 
     get :refs, params: { id: repo.id, format: :json }
 
@@ -62,7 +62,7 @@ class GitRepositoriesControllerTest < ActionController::TestCase
   end
 
   test 'get refs for unfetched repository' do
-    repo = Factory(:unfetched_remote_repository)
+    repo = FactoryBot.create(:unfetched_remote_repository)
 
     get :refs, params: { id: repo.id, format: :json }
 

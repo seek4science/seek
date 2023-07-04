@@ -19,18 +19,16 @@ class TagsController < ApplicationController
     end
   end
 
-  def latest
-    tags = get_tags
-    @tags = tags ? get_tags.limit(params[:limit] || 50).map(&:text) : []
-    respond_to do |format|
-      format.json { render json: @tags.to_json }
-    end
-  end
-
   def query
-    @tags = get_tags.where('text LIKE ?', "#{params[:query]}%").limit(20).map(&:text)
+    q = params[:q] || ''
+    @tags = get_tags.where('text LIKE ?', "%#{q}%").limit(100).map(&:text)
+    results = {
+      results: @tags.collect do |tag|
+       { id: tag, text: tag}
+      end
+    }
     respond_to do |format|
-      format.json { render json: @tags.to_json }
+      format.json { render json: results.to_json }
     end
   end
 
@@ -63,8 +61,7 @@ class TagsController < ApplicationController
   def get_tags
     attribute = AnnotationAttribute.where(name: params[:type] || 'tag').first
     TextValue.select(:text)
-             .joins("LEFT OUTER JOIN annotations ON annotations.value_id = text_values.id AND annotations.value_type = 'TextValue'" \
-                  'LEFT OUTER JOIN annotation_value_seeds ON annotation_value_seeds.value_id = text_values.id')
+             .joins("LEFT OUTER JOIN annotations ON annotations.value_id = text_values.id AND annotations.value_type = 'TextValue'" 'LEFT OUTER JOIN annotation_value_seeds ON annotation_value_seeds.value_id = text_values.id')
              .where('annotations.attribute_id = :attribute_id OR annotation_value_seeds.attribute_id = :attribute_id', attribute_id: attribute.try(:id)).distinct
   end
 end

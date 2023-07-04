@@ -10,13 +10,13 @@ class DataCatalogMockModelTest < ActiveSupport::TestCase
     assert_nil @data_catalogue.created_at
 
     now = 2.days.ago
-    df = Factory(:data_file)
+    df = FactoryBot.create(:data_file)
     travel_to(now) do
-      log = Factory :activity_log, activity_loggable: df, action: 'create', controller_name: 'data_files'
+      log = FactoryBot.create :activity_log, activity_loggable: df, action: 'create', controller_name: 'data_files'
     end
     travel_to(1.day.ago) do
-      Factory :activity_log, activity_loggable: df, action: 'create', controller_name: 'data_files'
-      Factory :activity_log, activity_loggable: df, action: 'create', controller_name: 'data_files'
+      FactoryBot.create :activity_log, activity_loggable: df, action: 'create', controller_name: 'data_files'
+      FactoryBot.create :activity_log, activity_loggable: df, action: 'create', controller_name: 'data_files'
     end
 
     assert_equal now.to_i, @data_catalogue.created_at.to_i

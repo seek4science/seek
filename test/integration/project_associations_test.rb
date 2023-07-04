@@ -3,7 +3,7 @@ require 'test_helper'
 class ProjectAssociationsTest < ActionDispatch::IntegrationTest
   ASSETS_WITH_MULTIPLE_PROJECTS = %w(data_files events investigations models publications sops presentations samples publications)
   def setup
-    User.current_user = Factory(:user, login: 'test')
+    User.current_user = FactoryBot.create(:user, login: 'test')
     post '/session', params: { login: 'test', password: 'blah' }
   end
 
@@ -11,14 +11,14 @@ class ProjectAssociationsTest < ActionDispatch::IntegrationTest
     skip 'This test no longer works with the dynamic project selector'
     ASSETS_WITH_MULTIPLE_PROJECTS.each do |type_name|
       if type_name == 'samples'
-        get "/#{type_name}/new?sample_type_id=#{Factory(:simple_sample_type).id}"
+        get "/#{type_name}/new?sample_type_id=#{FactoryBot.create(:simple_sample_type).id}"
       else
         get "/#{type_name}/new"
       end
 
       assert_select 'form select[name=?]', "#{type_name.singularize}[project_ids][]"
 
-      get "/#{type_name}/#{Factory(type_name.singularize.to_sym, policy: Factory(:public_policy)).id}/edit"
+      get "/#{type_name}/#{FactoryBot.create(type_name.singularize.to_sym, policy: FactoryBot.create(:public_policy)).id}/edit"
       assert_select 'form select[name=?]', "#{type_name.singularize}[project_ids][]"
     end
   end
@@ -27,9 +27,9 @@ class ProjectAssociationsTest < ActionDispatch::IntegrationTest
     skip 'This test no longer works with the dynamic permissions form'
     # publications are skipped, because they don't have a sharing form
     ASSETS_WITH_MULTIPLE_PROJECTS.reject { |t| t == 'publications' }.each do |type_name|
-      item = Factory(type_name.singularize.to_sym, contributor: User.current_user)
+      item = FactoryBot.create(type_name.singularize.to_sym, contributor: User.current_user)
 
-      item.projects = [Factory(:project), Factory(:project)]
+      item.projects = [FactoryBot.create(:project), FactoryBot.create(:project)]
       disable_authorization_checks do
         put "/#{type_name}/#{item.id}", params: { "#{item.class.name.downcase}".to_sym => { id: item.id }, :sharing => { "access_type_#{Policy::ALL_USERS}" => Policy::VISIBLE, :your_proj_access_type => Policy::ACCESSIBLE } }
       end

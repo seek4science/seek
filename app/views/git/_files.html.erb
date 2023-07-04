@@ -23,8 +23,7 @@
 
 <strong>Total size: </strong> <%= number_to_human_size git_version.total_size -%><br/>
 <%= render partial: 'git/jstree', locals: { tree: git_version.tree, annotations: git_version.git_annotations,
-                                            opts: { id: 'git-browser-jstree',
-                                                    class: git_version.can_download? ? 'allow-blob-preview' : '' } } %>
+                                            opts: { id: 'git-browser-jstree', class: 'allow-blob-preview' } } %>
 <% if git_version.empty? %>
   <span class="none_text">Empty</span>
 <% end %>

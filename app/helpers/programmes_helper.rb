@@ -20,7 +20,7 @@ module ProgrammesHelper
          This is to protect against a #{t('programme')} having no administrators"
       end
     end
-    box << objects_input('programme[programme_administrator_ids]', administrators, typeahead: { values: Person.all.map { |p| { id: p.id, name: p.name, hint: p.typeahead_hint } } })
+    box << objects_input('programme[programme_administrator_ids]', administrators, typeahead: { values: Person.all.map { |p| { id: p.id, text: p.name, hint: p.typeahead_hint } } }, class: 'form-control')
     box.html_safe
   end
 

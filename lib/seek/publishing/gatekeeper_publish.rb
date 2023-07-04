@@ -7,7 +7,9 @@ module Seek
       end
 
       def requested_approval_assets
-        @requested_approval_assets = ResourcePublishLog.requested_approval_assets_for(@gatekeeper)
+        @requested_approval_assets = ResourcePublishLog.requested_approval_assets_for_gatekeeper(@gatekeeper)
+        @waiting_approval_assets = ResourcePublishLog.waiting_approval_assets(@requested_approval_assets)
+        @rejected_assets = ResourcePublishLog.rejected_assets(@requested_approval_assets)
         respond_to do |format|
           format.html { render template: 'assets/publishing/requested_approval_assets' }
         end
@@ -107,7 +109,7 @@ module Seek
           end
         end
         # filter only authorized items for making decision
-        requested_approval_assets = ResourcePublishLog.requested_approval_assets_for @gatekeeper
+        requested_approval_assets = ResourcePublishLog.requested_approval_assets_for_gatekeeper @gatekeeper
         @approve_items &= requested_approval_assets
         @reject_items &= requested_approval_assets
         @decide_later_items &= requested_approval_assets

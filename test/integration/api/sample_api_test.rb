@@ -16,24 +16,16 @@ class SampleApiTest < ActionDispatch::IntegrationTest
   def setup
     user_login
 
-    @sample = Factory(:sample, contributor: current_person, policy: Factory(:public_policy))
+    @sample = FactoryBot.create(:max_sample, contributor: current_person, policy: FactoryBot.create(:public_policy))
+    @sample_type = @sample.sample_type
+    @project = @sample.projects.first
+    @assay = FactoryBot.create(:assay, contributor: current_person)
 
-    @project = Factory(:min_project)
-    @project.title = 'testProject'
-
-    institution = Factory(:institution)
-    current_person.add_to_project_and_institution(@project, institution)
-    @sample_type = SampleType.new(title: "vahidSampleType", project_ids: [@project.id], contributor: current_person)
-    @sample_type.sample_attributes << Factory(:sample_attribute, title: 'the_title', is_title: true, required: true, sample_attribute_type: Factory(:string_sample_attribute_type), sample_type: Factory(:simple_sample_type))
-    @sample_type.sample_attributes << Factory(:sample_attribute, title: 'a_real_number', sample_attribute_type: Factory(:float_sample_attribute_type), required: false, sample_type: @sample_type)
-    @sample_type.save!
-
-    @assay = Factory(:assay, contributor: current_person)
   end
 
   test 'patching a couple of attributes retains others' do
     user_login
-    sample = Factory(:patient_sample, contributor: current_person, policy: Factory(:public_policy))
+    sample = FactoryBot.create(:patient_sample, contributor: current_person, policy: FactoryBot.create(:public_policy))
     params = {
       "data": {
         "type": "samples",
@@ -62,7 +54,7 @@ class SampleApiTest < ActionDispatch::IntegrationTest
   test 'patching a couple of attributes retains others including capitals' do
     user_login
     User.current_user = @current_user
-    sample = Factory(:max_sample, contributor: current_person, policy: Factory(:public_policy))
+    sample = FactoryBot.create(:max_sample, contributor: current_person, policy: FactoryBot.create(:public_policy))
     params = {
       "data": {
         "type": "samples",
@@ -90,7 +82,7 @@ class SampleApiTest < ActionDispatch::IntegrationTest
 
   test 'set sample_type and attributes in post' do
     user_login
-    patient_sample_type = Factory(:patient_sample_type)
+    patient_sample_type = FactoryBot.create(:patient_sample_type)
     params = {
       "data": {
         "type": "samples",
@@ -132,18 +124,122 @@ class SampleApiTest < ActionDispatch::IntegrationTest
     assert_equal 12, sample.get_attribute_value("age")
   end
 
-  test 'batch create' do 
-    person = Factory(:person)
-    user_login(person)
-    project = Factory(:project)
-    institution = Factory(:institution)
-    person.add_to_project_and_institution(project, institution)
-    investigation = Factory(:investigation, contributor: person)
-    study = Factory(:study, contributor: person)
-    type = Factory(:patient_sample_type, contributor: person)
-    assay = Factory(:assay, contributor: person, sample_type: type)
+  test 'create with multi sample and cv list' do
+    user_login
+    max_sample_type = FactoryBot.create(:max_sample_type)
+    patients = [FactoryBot.create(:patient_sample), FactoryBot.create(:patient_sample)]
 
-    other_person = Factory(:person)
+    params = {
+      "data": {
+        "type": "samples",
+        "attributes": {
+          "attribute_map": {
+            "full_name": "Fred Bloggs",
+            "apple": "Bramley",
+            "apples": "Golden Delicious, Granny Smith",
+            "patients": "#{patients.collect(&:id).join(', ')}"
+
+          },
+        },
+        "relationships": {
+          "projects": {
+            "data":
+              [
+                {
+                  "type": "projects",
+                  "id": "#{current_person.projects.first.id}"
+                }
+              ]
+          },
+          "sample_type": {
+            "data": {
+              "id": "#{max_sample_type.id}",
+              "type": "sample_types"
+            }
+          }
+        }
+      }
+    }
+
+    assert_difference('Sample.count') do
+      post samples_path(format: :json), params: params, as: :json
+    end
+    assert_response :success
+
+    sample = Sample.last
+    assert_equal 'Fred Bloggs', sample.title
+    assert_equal 'Fred Bloggs', sample.get_attribute_value(:full_name)
+    assert_equal 'Bramley', sample.get_attribute_value(:apple)
+    assert_equal ['Golden Delicious', 'Granny Smith'], sample.get_attribute_value(:apples)
+    assert_equal patients, sample.linked_samples
+    assert_equal patients.collect(&:id), sample.get_attribute_value(:patients).collect{|p| p['id']}
+
+  end
+
+  test 'create with multi sample and cv list - as array' do
+    user_login
+    max_sample_type = FactoryBot.create(:max_sample_type)
+    patients = [FactoryBot.create(:patient_sample), FactoryBot.create(:patient_sample)]
+
+    params = {
+      "data": {
+        "type": "samples",
+        "attributes": {
+          "attribute_map": {
+            "full_name": "Fred Bloggs",
+            "apple": "Bramley",
+            "apples": ["Golden Delicious", "Granny Smith"],
+            "patients": patients.collect(&:id)
+
+          },
+        },
+        "relationships": {
+          "projects": {
+            "data":
+              [
+                {
+                  "type": "projects",
+                  "id": "#{current_person.projects.first.id}"
+                }
+              ]
+          },
+          "sample_type": {
+            "data": {
+              "id": "#{max_sample_type.id}",
+              "type": "sample_types"
+            }
+          }
+        }
+      }
+    }
+
+    assert_difference('Sample.count') do
+      post samples_path(format: :json), params: params, as: :json
+    end
+    assert_response :success
+
+    sample = Sample.last
+    assert_equal 'Fred Bloggs', sample.title
+    assert_equal 'Fred Bloggs', sample.get_attribute_value(:full_name)
+    assert_equal 'Bramley', sample.get_attribute_value(:apple)
+    assert_equal ['Golden Delicious', 'Granny Smith'], sample.get_attribute_value(:apples)
+    assert_equal patients, sample.linked_samples
+    assert_equal patients.collect(&:id), sample.get_attribute_value(:patients).collect{|p| p['id']}
+
+  end
+
+  test 'batch create' do 
+    person = FactoryBot.create(:person)
+    user_login(person)
+    project = FactoryBot.create(:project)
+    institution = FactoryBot.create(:institution)
+    person.add_to_project_and_institution(project, institution)
+    investigation = FactoryBot.create(:investigation, contributor: person)
+    study = FactoryBot.create(:study, contributor: person)
+    type = FactoryBot.create(:patient_sample_type, contributor: person)
+    assay = FactoryBot.create(:assay, contributor: person, sample_type: type)
+
+    other_person = FactoryBot.create(:person)
     user_login(other_person)
     other_person.add_to_project_and_institution(project, institution)
     params = {

@@ -143,7 +143,7 @@ namespace :seek do
     count = 0
     disable_authorization_checks do
       Workflow.includes(:git_versions, :versions).find_each do |workflow|
-        ([workflow] + workflow.versions.to_a + workflow.git_versions.to_a).each do |wf|
+        ([workflow] + workflow.standard_versions.to_a + workflow.git_versions.to_a).each do |wf|
           begin
             wf.refresh_internals
             if wf.save(touch: false)

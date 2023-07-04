@@ -12,36 +12,36 @@ class AdminAnnotationsTest < ActionController::TestCase
     get :tags
     assert_response :success
 
-    p = Factory :person
-    sop = Factory :sop, policy: Factory(:all_sysmo_viewable_policy)
-    fish = Factory :tag, annotatable: sop, source: p, value: 'fish'
+    p = FactoryBot.create :person
+    sop = FactoryBot.create :sop, policy: FactoryBot.create(:all_sysmo_viewable_policy)
+    fish = FactoryBot.create :tag, annotatable: sop, source: p, value: 'fish'
     get :edit_tag, params: { id: fish.value.id }
     assert_response :success
   end
 
   test 'edit tag' do
     login_as(:quentin)
-    p = Factory :person
-    sop = Factory :sop, policy: Factory(:all_sysmo_viewable_policy)
-    fish = Factory :tag, annotatable: sop, source: p, value: 'fish'
+    p = FactoryBot.create :person
+    sop = FactoryBot.create :sop, policy: FactoryBot.create(:all_sysmo_viewable_policy)
+    fish = FactoryBot.create :tag, annotatable: sop, source: p, value: 'fish'
     assert_equal ['fish'], sop.annotations.select { |a| a.source == p }.collect { |a| a.value.text }
 
-    golf = Factory :tag, annotatable: sop, source: p, value: 'golf'
-    post :edit_tag, params: { id: fish.value.id, tag_list: "#{golf.value.text}, microbiology, spanish" }
+    golf = FactoryBot.create :tag, annotatable: sop, source: p, value: 'golf'
+    post :edit_tag, params: { id: fish.value.id, tag_list: [golf.value.text, 'microbiology', 'spanish'] }
     assert_redirected_to action: :tags
 
     sop.reload
-    assert_equal %w(golf microbiology spanish), sop.annotations.collect { |a| a.value.text }.uniq.sort
+    assert_equal %w[golf microbiology spanish], sop.annotations.collect { |a| a.value.text }.uniq.sort
   end
 
   test 'edit tag to itself' do
     login_as(:quentin)
-    p = Factory :person
-    sop = Factory :sop, policy: Factory(:all_sysmo_viewable_policy)
-    fish = Factory :tag, annotatable: sop, source: p, value: Factory(:text_value, text: 'fish')
+    p = FactoryBot.create :person
+    sop = FactoryBot.create :sop, policy: FactoryBot.create(:all_sysmo_viewable_policy)
+    fish = FactoryBot.create :tag, annotatable: sop, source: p, value: FactoryBot.create(:text_value, text: 'fish')
     assert_equal ['fish'], sop.annotations.select { |a| a.source == p }.collect { |a| a.value.text }
 
-    post :edit_tag, params: { id: fish.value.id, tag_list: fish.value.text }
+    post :edit_tag, params: { id: fish.value.id, tag_list: [fish.value.text] }
     assert_redirected_to action: :tags
 
     sop.reload
@@ -54,15 +54,15 @@ class AdminAnnotationsTest < ActionController::TestCase
     assert_redirected_to :root
     assert_not_nil flash[:error]
 
-    p = Factory :person
-    sop = Factory :sop, policy: Factory(:all_sysmo_viewable_policy)
-    fish = Factory :tag, annotatable: sop, source: p, value: 'fish'
+    p = FactoryBot.create :person
+    sop = FactoryBot.create :sop, policy: FactoryBot.create(:all_sysmo_viewable_policy)
+    fish = FactoryBot.create :tag, annotatable: sop, source: p, value: 'fish'
 
     get :edit_tag, params: { id: fish.value.id }
     assert_redirected_to :root
     assert_not_nil flash[:error]
 
-    post :edit_tag, params: { id: fish.value.id, tag_list: 'microbiology, spanish' }
+    post :edit_tag, params: { id: fish.value.id, tag_list: %w[microbiology spanish] }
     assert_redirected_to :root
     assert_not_nil flash[:error]
 
@@ -73,60 +73,61 @@ class AdminAnnotationsTest < ActionController::TestCase
 
   test 'edit tag to multiple' do
     login_as(:quentin)
-    person = Factory :person
-    person.tools = %w(linux ruby fishing)
+    person = FactoryBot.create :person
+    person.tools = %w[linux ruby fishing]
     person.save!
     person.expertise = ['fishing']
     person.save!
 
     updated_at = person.updated_at
 
-    assert_equal %w(fishing linux ruby), person.tools.uniq.sort
+    assert_equal %w[fishing linux ruby], person.tools.uniq.sort
     assert_equal ['fishing'], person.expertise.uniq
 
     sleep(2) # for timestamp test
 
-    golf = Factory(:text_value, text: 'golf')
+    golf = FactoryBot.create(:text_value, text: 'golf')
     fishing = person.annotations_with_attribute('expertise').find { |a| a.value.text == 'fishing' }
-    post :edit_tag, params: { id: fishing.value.id, tag_list: "#{golf.text}, microbiology, spanish" }
+    post :edit_tag, params: { id: fishing.value.id, tag_list: [golf.text, 'microbiology', 'spanish'] }
     assert_redirected_to action: :tags
     assert_nil flash[:error]
 
     person = Person.find(person.id)
-    expected_tools = %w(golf linux microbiology ruby spanish)
-    expected_expertise = %w(golf microbiology spanish)
+    expected_tools = %w[golf linux microbiology ruby spanish]
+    expected_expertise = %w[golf microbiology spanish]
 
     person.reload
     assert_equal expected_tools, person.tools.uniq.sort
     assert_equal expected_expertise, person.expertise.uniq.sort
 
-    assert_equal updated_at.to_s, person.updated_at.to_s, "timestamps were modified for taggable and shouldn't have been"
+    assert_equal updated_at.to_s, person.updated_at.to_s,
+                 "timestamps were modified for taggable and shouldn't have been"
 
     assert person.annotations_with_attribute('expertise').select { |a| a.value.text == 'fishing' }.blank?
   end
 
   test 'edit tag includes orginal' do
     login_as(:quentin)
-    person = Factory :person
-    person.tools = %w(linux ruby fishing)
+    person = FactoryBot.create :person
+    person.tools = %w[linux ruby fishing]
     person.save!
     person.expertise = ['fishing']
     person.save!
 
-    assert_equal %w(fishing linux ruby), person.tools.uniq.sort
+    assert_equal %w[fishing linux ruby], person.tools.uniq.sort
     assert_equal ['fishing'], person.expertise.uniq
 
-    golf = Factory(:tag, annotatable: person, source: User.current_user, value: 'golf')
+    golf = FactoryBot.create(:tag, annotatable: person, source: User.current_user, value: 'golf')
     fishing = person.annotations_with_attribute('expertise').find { |a| a.value.text == 'fishing' }
     assert_not_nil fishing
 
-    post :edit_tag, params: { id: fishing.value.id, tag_list: "#{golf.value.text}, fishing, spanish" }
+    post :edit_tag, params: { id: fishing.value.id, tag_list: [golf.value.text, 'fishing', 'spanish'] }
     assert_redirected_to action: :tags
     assert_nil flash[:error]
 
     person = Person.find(person.id)
-    expected_tools = %w(fishing golf linux ruby spanish)
-    expected_expertise = %w(fishing golf spanish)
+    expected_tools = %w[fishing golf linux ruby spanish]
+    expected_expertise = %w[fishing golf spanish]
 
     person.reload
     assert_equal expected_tools, person.tools.uniq.sort
@@ -137,13 +138,13 @@ class AdminAnnotationsTest < ActionController::TestCase
 
   test 'edit tag to new tag' do
     login_as(:quentin)
-    person = Factory :person
-    person.tools = %w(linux ruby fishing)
+    person = FactoryBot.create :person
+    person.tools = %w[linux ruby fishing]
     person.save!
     person.expertise = ['fishing']
     person.save!
 
-    assert_equal %w(fishing linux ruby), person.tools.uniq.sort
+    assert_equal %w[fishing linux ruby], person.tools.uniq.sort
     assert_equal ['fishing'], person.expertise.uniq
 
     fishing = person.annotations_with_attribute('expertise').find { |a| a.value.text == 'fishing' }
@@ -151,12 +152,12 @@ class AdminAnnotationsTest < ActionController::TestCase
 
     assert person.annotations_with_attribute('expertise').select { |a| a.value.text == 'sparrow' }.blank?
 
-    post :edit_tag, params: { id: fishing.value.id, tag_list: 'sparrow' }
+    post :edit_tag, params: { id: fishing.value.id, tag_list: ['sparrow'] }
     assert_redirected_to action: :tags
     assert_nil flash[:error]
 
     person = Person.find(person.id)
-    expected_tools = %w(linux ruby sparrow)
+    expected_tools = %w[linux ruby sparrow]
     expected_expertise = ['sparrow']
 
     person.reload
@@ -166,24 +167,24 @@ class AdminAnnotationsTest < ActionController::TestCase
 
   test 'edit tag to blank' do
     login_as(:quentin)
-    person = Factory :person
-    person.tools = %w(linux ruby fishing)
+    person = FactoryBot.create :person
+    person.tools = %w[linux ruby fishing]
     person.save!
     person.expertise = ['fishing']
     person.save!
 
-    assert_equal %w(fishing linux ruby), person.tools.uniq.sort
+    assert_equal %w[fishing linux ruby], person.tools.uniq.sort
     assert_equal ['fishing'], person.expertise.uniq
 
     fishing = person.annotations_with_attribute('expertise').find { |a| a.value.text == 'fishing' }
     assert_not_nil fishing
 
-    post :edit_tag, params: { id: fishing.value.id, tag_list: '' }
+    post :edit_tag, params: { id: fishing.value.id, tag_list: [''] }
     assert_response :not_acceptable
     refute_nil flash[:error]
 
     person = Person.find(person.id)
-    expected_tools = %w(fishing linux ruby)
+    expected_tools = %w[fishing linux ruby]
     expected_expertise = ['fishing']
 
     person.reload
@@ -193,25 +194,25 @@ class AdminAnnotationsTest < ActionController::TestCase
 
   test 'edit tag to existing tag' do
     login_as(:quentin)
-    person = Factory :person
-    person.tools = %w(linux ruby fishing)
+    person = FactoryBot.create :person
+    person.tools = %w[linux ruby fishing]
     person.save!
     person.expertise = ['fishing']
     person.save!
 
-    assert_equal %w(fishing linux ruby), person.tools.uniq.sort
+    assert_equal %w[fishing linux ruby], person.tools.uniq.sort
     assert_equal ['fishing'], person.expertise.uniq
 
     fishing = person.annotations_with_attribute('expertise').find { |a| a.value.text == 'fishing' }
     assert_not_nil fishing
 
-    golf = Factory(:tag, annotatable: person, source: users(:quentin), value: 'golf')
-    post :edit_tag, params: { id: fishing.value.id, tag_list: golf.value.text }
+    golf = FactoryBot.create(:tag, annotatable: person, source: users(:quentin), value: 'golf')
+    post :edit_tag, params: { id: fishing.value.id, tag_list: [golf.value.text] }
     assert_redirected_to action: :tags
     assert_nil flash[:error]
 
     person = Person.find(person.id)
-    expected_tools = %w(golf linux ruby)
+    expected_tools = %w[golf linux ruby]
     expected_expertise = ['golf']
 
     person.reload
@@ -222,7 +223,7 @@ class AdminAnnotationsTest < ActionController::TestCase
   test 'delete_tag' do
     login_as(:quentin)
 
-    person = Factory :person
+    person = FactoryBot.create :person
     person.tools = ['fishing']
     person.save!
     person.expertise = ['fishing']
@@ -255,8 +256,8 @@ class AdminAnnotationsTest < ActionController::TestCase
   end
 
   test 'edit tag to different case' do
-    login_as(Factory(:admin))
-    person = Factory :person
+    login_as(FactoryBot.create(:admin))
+    person = FactoryBot.create :person
     person.tools = ['network analysis']
     person.save!
     person.expertise = ['network analysis']
@@ -265,8 +266,8 @@ class AdminAnnotationsTest < ActionController::TestCase
     assert_equal ['network analysis'], person.tools
     assert_equal ['network analysis'], person.expertise
 
-    tag = person.annotations_with_attribute('expertise').find{ |a| a.value.text == 'network analysis' }
-    post :edit_tag, params: { id: tag.value.id, tag_list: 'Network Analysis' }
+    tag = person.annotations_with_attribute('expertise').find { |a| a.value.text == 'network analysis' }
+    post :edit_tag, params: { id: tag.value.id, tag_list: ['Network Analysis'] }
     assert_redirected_to action: :tags
     assert_nil flash[:error]
 

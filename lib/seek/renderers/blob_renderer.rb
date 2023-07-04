@@ -3,11 +3,12 @@ module Seek
     class BlobRenderer
       include ActionView::Helpers
 
-      attr_reader :blob
+      attr_reader :blob, :params
 
-      def initialize(git_blob_or_blob, url_options: {})
+      def initialize(git_blob_or_blob, url_options: {}, params: {})
         @blob = git_blob_or_blob
         @url_options = url_options
+        @params = params
       end
 
       def render
@@ -64,6 +65,13 @@ module Seek
           template: template_path,
           assigns: variables,
           layout: layout
+        )
+      end
+
+      def render_partial(partial_path, variables = {})
+        ApplicationController.renderer.render(
+          partial: partial_path,
+          locals: variables
         )
       end
     end

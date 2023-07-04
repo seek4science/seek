@@ -3,7 +3,7 @@
 <% id = template_attribute ? template_attribute.id : '' %>
 <% title = template_attribute ? template_attribute.title : '' %>
 <% description = template_attribute ? template_attribute.description : '' %>
-<% iri = template_attribute ? template_attribute.iri : '' %>
+<% pid = template_attribute ? template_attribute.pid : '' %>
 <% pos = template_attribute ? template_attribute.pos : '' %>
 <% required = template_attribute ? template_attribute.required : false %>
 <% allow_attribute_removal = !required  %>
@@ -48,7 +48,7 @@
     <div class='controlled-vocab-block' style="<%= 'display:none;' unless template_attribute.try(:controlled_vocab?) %>">
       <br/>
       <%= select_tag "#{field_name_prefix}[sample_controlled_vocab_id]",
-                     options_for_select(SampleControlledVocab.all.map { |t| [t.title, t.id, {'data-editable'=>t.can_edit?, 'data-is-ontology'=>t.custom_input}] },
+                     options_for_select(SampleControlledVocab.all.map { |scv| [scv.title, scv.id, {'data-editable'=>scv.can_edit?, 'data-is-ontology'=>scv.custom_input?}] },
                       sample_controlled_vocab_id),include_blank: true,
                      class: 'form-control controlled-vocab-selection', data: {attr: "cv_id"} %>
 
@@ -79,8 +79,8 @@
                     placeholder: 'Description', data: {attr: "description"} %>
   </td>
   <td>
-    <%= text_field_tag "#{field_name_prefix}[iri]", iri, class: 'form-control',
-                    placeholder: 'IRI', data: {attr: "iri"} %>
+    <%= text_field_tag "#{field_name_prefix}[pid]", pid, class: 'form-control',
+                    placeholder: 'PID', data: {attr: "pid"} %>
   </td>
 
   <td>

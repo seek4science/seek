@@ -25,7 +25,7 @@
 <%= show_title "Publishing complete" -%>
 
 <% unless waiting_for_publish_items.empty? -%>
-  <h2>The <%= t('asset_gatekeeper').downcase %> has been notified of your wish to publish the following items:</h2>
+  <div class="alert alert-danger">The <%= t('asset_gatekeeper').downcase %> has been notified of your wish to publish the following items:</div>
   <ul class="publishing_options" id="publish_requested">
     <% waiting_for_publish_items.each do |item| -%>
       <li class="type_and_title"><%= text_for_resource item -%>: <%= link_to item.title, item -%></li>
@@ -33,7 +33,7 @@
   </ul>
 <% end -%>
 
-<p>The following items were published:
+<div class="alert alert-info">The following items were published:</div>
 <ul class="publishing_options" id="published">
   <% if published_items.empty? -%><li class="none_text">No items</li><% end -%>
   <% published_items.each do |item| -%>

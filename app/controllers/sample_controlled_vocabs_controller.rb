@@ -96,6 +96,7 @@ class SampleControlledVocabsController < ApplicationController
       client = Ebi::OlsClient.new
       terms = client.all_descendants(source_ontology, root_uri)
       terms.reject! { |t| t[:iri] == root_uri } unless params[:include_root_term] == '1'
+      error_msg = "There are no descendant terms to populate the list." unless terms.present?
     rescue StandardError => e
       error_msg = e.message
     end
@@ -110,17 +111,18 @@ class SampleControlledVocabsController < ApplicationController
   end
 
   def typeahead
+    query = params[:q] || ''
     scv = SampleControlledVocab.find(params[:scv_id])
     results = scv.sample_controlled_vocab_terms.where('LOWER(label) like :query',
-                                                      query: "%#{params[:query].downcase}%").limit(params[:limit] || 100)
+                                                      query: "%#{query}%").limit(params[:limit] || 100)
     items = results.map do |term|
       { id: term.label,
-        name: term.label,
+        text: term.label,
         iri: term.iri }
     end
 
     respond_to do |format|
-      format.json { render json: items.to_json }
+      format.json { render json: { results: items}.to_json }
     end
   end
 

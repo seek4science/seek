@@ -12,11 +12,15 @@ module Seek
         disable_authorization_checks do
           client = Ebi::OlsClient.new
           project = Project.find_or_create_by(title: 'Default Project')
-          Dir.foreach(File.join(Rails.root, 'config/default_data/source_types/')) do |filename|
+          directory = Rails.root.join('config', 'default_data', 'source_types')
+          directory_files = Dir.exist?(directory) ? Dir.glob("#{directory}/*.json") : []
+          raise '<ul><li>Make sure to upload files that have the ".json" extension.</li></ul>' if directory_files == []
+
+          directory_files.each do |filename|
             puts filename
             next if File.extname(filename) != '.json'
 
-            file = File.read(File.join(Rails.root, 'config/default_data/source_types/', filename))
+            file = File.read(filename)
             res = check_json_file(file)
             raise res if res.present?
 
@@ -93,7 +97,7 @@ module Seek
                                                                             required: attribute['required'],
                                                                             description: attribute['description'],
                                                                             sample_controlled_vocab_id: scv&.id,
-                                                                            iri: attribute['iri'],
+                                                                            pid: attribute['pid'],
                                                                             sample_attribute_type_id: get_sample_attribute_type(attribute['dataType'])
                                                                           }))
               end
