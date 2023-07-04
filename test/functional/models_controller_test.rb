@@ -1152,6 +1152,10 @@ class ModelsControllerTest < ActionController::TestCase
     check_manage_edit_menu_for_type('model')
   end
 
+  test 'download menu item appears according to status and permission' do
+    check_publish_menu_for_type('model')
+  end
+
   test 'can access manage page with manage rights' do
     person = FactoryBot.create(:person)
     model = FactoryBot.create(:model, contributor:person)

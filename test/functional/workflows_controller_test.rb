@@ -1737,4 +1737,22 @@ class WorkflowsControllerTest < ActionController::TestCase
     # Reset the view parameter
     session.delete(:view)
   end
+
+  test 'can get citation for workflow with CFF' do
+    workflow = FactoryBot.create(:local_git_workflow, policy: FactoryBot.create(:public_policy))
+
+    get :show, params: { id: workflow }
+    assert_response :success
+    assert_select '#citation', text: /van der Real Person, O\. T\./, count: 0
+
+    gv = workflow.latest_git_version
+    disable_authorization_checks do
+      gv.add_file('CITATION.cff', open_fixture_file('CITATION.cff'))
+      disable_authorization_checks { gv.save! }
+    end
+
+    get :show, params: { id: workflow }
+    assert_response :success
+    assert_select '#citation', text: /van der Real Person, O\. T\./, count: 1
+  end
 end

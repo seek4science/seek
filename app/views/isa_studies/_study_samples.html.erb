@@ -9,7 +9,7 @@
     </div>
 </div>
 
-<%= render partial: 'isa_studies/buttons' %> 
+<%= render partial: 'isa_studies/buttons' %>
 
 <% if sample_type %>
     <script>
@@ -21,8 +21,8 @@
             const elem = $j("#btn_save_sample")
             const options = {
                ajax:{
-										url: dynamicTableDataPath,
-                    data: function(d) { 
+                    url: dynamicTableDataPath,
+                    data: function(d) {
                         if (initialLoad) {
                             initialLoad = false;
                             return;
@@ -63,6 +63,10 @@
         function SampleAddNewRow(){
             sampleDynamicTable.newRow()
         }
-																														
+
+        function sampleExportExcel() {
+            exportToExcel("study-samples-table", '<%=study.id%>', null, '<%=sample_type.id%>');
+        }
+
     </script>
 <% end %>

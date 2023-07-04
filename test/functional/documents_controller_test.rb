@@ -344,6 +344,10 @@ class DocumentsControllerTest < ActionController::TestCase
     check_manage_edit_menu_for_type('document')
   end
 
+  test 'download menu item appears according to status and permission' do
+    check_publish_menu_for_type('document')
+  end
+
   test 'can access manage page with manage rights' do
     person = FactoryBot.create(:person)
     document = FactoryBot.create(:document, contributor:person)

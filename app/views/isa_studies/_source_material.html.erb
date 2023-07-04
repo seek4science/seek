@@ -10,12 +10,13 @@
 </div>
 
 <%= render partial: 'isa_studies/buttons', locals:{ add_row: "SourceAddNewRow()", paste_cb:
-"SourcePasteFromClipboard()", delete: "SourceSetAsDeleted()", save: "SourceSave()", permissions: "loadBatchPermission('sourceDynamicTable',this)" } %> 
+"SourcePasteFromClipboard()", delete: "SourceSetAsDeleted()", save: "SourceSave()",
+permissions: "loadBatchPermission('sourceDynamicTable',this)", exportToExcel: "sourceExportExcel()" } %>
 
 <% if sample_type %>
     <script>
     // TODO: Load data in a separeta script tag and remove it after DT is loaded
-        var sourceDynamicTable 
+        var sourceDynamicTable
         let initialLoad = true;
         $j(document).ready(function () {
             $j('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
@@ -26,8 +27,8 @@
             const elem = $j("#btn_save_source")
             const options = {
                ajax:{
-									  url: dynamicTableDataPath,
-                    data: function(d) { 
+                    url: dynamicTableDataPath,
+                    data: function(d) {
                         if (initialLoad) {
                             initialLoad = false;
                             return;
@@ -69,6 +70,10 @@
         function SourceAddNewRow(){
             sourceDynamicTable.newRow()
         }
-																														
+
+        function sourceExportExcel() {
+            exportToExcel("source-material-table", '<%=study.id%>', null, '<%=sample_type.id%>');
+        }
+
     </script>
 <% end %>

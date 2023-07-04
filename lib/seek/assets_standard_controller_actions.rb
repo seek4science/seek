@@ -58,13 +58,9 @@ module Seek
       raise 'shouldnt get this far without manage rights' unless item.can_manage?
       item.update(params_for_controller)
       update_sharing_policies item
-      item_access_type_changed = item.gatekeeper_required? && item.policy.access_type_changed?
       respond_to do |format|
         if item.save
           flash[:notice] = "#{t(item.class.name.underscore)} was successfully updated."
-          if item_access_type_changed && !item.policy.previous_changes["access_type"]
-            flash[:notice] = (flash[:notice] + "<br/>Your request to publish is in the gatekeeper's approval list.").html_safe
-          end
           format.html { redirect_to(item) }
           format.json { render json: item, include: json_api_include_param }
         else
