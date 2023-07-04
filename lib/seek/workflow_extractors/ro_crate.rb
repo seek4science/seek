@@ -136,11 +136,17 @@ module Seek
       end
 
       def file_exists?(path)
-        !!opened_crate.find_entry(path)
+        !!(opened_crate.dereference(path) || opened_crate.find_entry(path))
       end
 
-      def file_contents(path)
-        opened_crate.find_entry(path)&.read
+      # Path could be a path (or URL if remote) of an Entity in the crate, or just a path to a file that may not have an associated Entity.
+      def file(path)
+        file = opened_crate.dereference(path)
+        if file
+          file.source
+        else
+          opened_crate.find_entry(path)
+        end
       end
 
       def licensee_project

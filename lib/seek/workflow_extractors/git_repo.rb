@@ -31,8 +31,8 @@ module Seek
         @obj.file_exists?(path)
       end
 
-      def file_contents(path)
-        @obj.file_contents(path, fetch_remote: true)
+      def file(path)
+        @obj.get_blob(path)&.file(fetch_remote: true)
       end
 
       def licensee_project

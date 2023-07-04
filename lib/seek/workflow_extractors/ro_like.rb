@@ -24,8 +24,8 @@ module Seek
       end
 
       def generate_diagram
-        if diagram_path.present?
-          file_contents(diagram_path)
+        if diagram_path.present? && file_exists?(diagram_path)
+          file(diagram_path).read
         elsif main_workflow_extractor&.can_render_diagram?
           main_workflow_extractor.generate_diagram
         elsif abstract_cwl_extractor&.can_render_diagram?
@@ -56,7 +56,7 @@ module Seek
             end
 
         if file_exists?('README.md')
-          m[:description] ||= file_contents('README.md').force_encoding('utf-8').gsub(/^(---\s*\n.*?\n?)^(---\s*$\n?)/m,'') # Remove "Front matter"
+          m[:description] ||= file('README.md').read.force_encoding('utf-8').gsub(/^(---\s*\n.*?\n?)^(---\s*$\n?)/m,'') # Remove "Front matter"
         end
 
         m[:workflow_class_id] ||= main_workflow_class&.id
@@ -90,7 +90,7 @@ module Seek
         raise NotImplementedError
       end
 
-      def file_contents(path)
+      def file(path)
         raise NotImplementedError
       end
 
@@ -103,19 +103,19 @@ module Seek
 
         workflow_class = main_workflow_class
         extractor_class = workflow_class&.extractor_class || Seek::WorkflowExtractors::Base
-        @main_workflow_extractor = main_workflow_path ? extractor_class.new(file_contents(main_workflow_path)) : nil
+        @main_workflow_extractor = main_workflow_path ? extractor_class.new(file(main_workflow_path)) : nil
       end
 
       def abstract_cwl_extractor
         return @abstract_cwl_extractor if defined?(@abstract_cwl_extractor)
 
-        @abstract_cwl_extractor = abstract_cwl_path ? Seek::WorkflowExtractors::CWL.new(file_contents(abstract_cwl_path)) : nil
+        @abstract_cwl_extractor = abstract_cwl_path ? Seek::WorkflowExtractors::CWL.new(file(abstract_cwl_path)) : nil
       end
 
       def cff_extractor
         return @cff_extractor if defined?(@cff_extractor)
 
-        cff = file_contents(Seek::WorkflowExtractors::CFF::FILENAME)
+        cff = file(Seek::WorkflowExtractors::CFF::FILENAME)
 
         @cff_extractor = cff ? Seek::WorkflowExtractors::CFF.new(cff) : nil
       end
