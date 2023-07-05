@@ -24,6 +24,37 @@ module Seek
       end
     end
 
+    def explore
+      asset = resource_for_controller
+      #drop invalid explore params
+      [:page_rows, :page, :sheet].each do |param|
+        if params[param].present? && (params[param] =~ /\A\d+\Z/).nil?
+          params.delete(param)
+        end
+      end
+      @display_asset = instance_variable_get("@display_#{asset.class.name.underscore}")
+      if @display_asset.contains_extractable_spreadsheet?
+        begin
+          @workbook = Rails.cache.fetch("spreadsheet-workbook-#{@display_asset.content_blob.cache_key}") do
+            @display_asset.spreadsheet
+          end
+          respond_to do |format|
+            format.html
+          end
+        rescue SysMODB::SpreadsheetExtractionException
+          respond_to do |format|
+            flash[:error] = "There was an error when processing the #{t(asset.class.name.underscore)} to explore, perhaps it isn't a valid Excel spreadsheet"
+            format.html { redirect_to polymorphic_path(asset, version: @display_asset.version) }
+          end
+        end
+      else
+        respond_to do |format|
+          flash[:error] = "Unable to explore contents of this #{t(asset.class.name.underscore)}"
+          format.html { redirect_to polymorphic_path(asset, version: @display_asset.version) }
+        end
+      end
+    end
+
     def setup_new_asset
       attr={}
       if params["#{controller_name.singularize}"]
