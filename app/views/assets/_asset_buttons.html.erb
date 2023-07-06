@@ -1,7 +1,7 @@
 <% asset ||= item %>
 <% human_name = text_for_resource(asset) %>
 <% display_asset = version ? asset.find_version(version) : nil %>
-<% data_like = asset.is_a?(DataFile) || asset.is_a?(FileTemplate) %>
+<% data_like = asset.is_a?(DataFile) || asset.is_a?(FileTemplate) || asset.is_a?(Document) || asset.is_a?(Sop) %>
 
 <% show_explore_btn = display_asset && data_like && display_asset.supported_spreadsheet_format? %>
 <% show_view_content_btn = display_asset&.single_content_blob && !display_asset.single_content_blob.show_as_external_link? %>

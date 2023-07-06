@@ -505,6 +505,9 @@ SEEK::Application.routes.draw do
 
   resources :sops, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions, :asset] do
     resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :workflows, :collections, only: [:index]
+    member do
+      get :explore
+    end
   end
 
   resources :workflows, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions, :asset, :git] do
@@ -707,6 +710,9 @@ SEEK::Application.routes.draw do
 
   resources :documents, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions, :asset] do
     resources :people, :programmes, :projects, :programmes, :investigations, :assays, :studies, :publications, :events, :collections, :workflows, only: [:index]
+    member do
+      get :explore
+    end
   end
 
   resources :collections, concerns: [:publishable, :has_doi, :asset, :has_avatar] do
