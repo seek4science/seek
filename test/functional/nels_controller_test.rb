@@ -15,6 +15,7 @@ class NelsControllerTest < ActionController::TestCase
 
     assert_response :success
     assert_select '#nels-tree'
+    assert_select 'p#user-info',text:/Logged in as Finn Bacall/
   end
 
   test 'cannot get browser if nels disabled' do

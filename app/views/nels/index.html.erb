@@ -3,8 +3,8 @@
   NeLS Browser
 </h1>
 
-<p class='subtle'>
-  Logged in as <%= @rest_client.user_info['name'] %>
+<p id='user-info' class='subtle'>
+  Logged in as <%= @user_info %>
 </p>
 
 <%= render partial:'browser-overview' %>

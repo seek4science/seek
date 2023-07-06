@@ -106,7 +106,8 @@ module Nels
         current_path = sanitise_storage_path(current_path)
 
         # need to force a short timeout, and then check for the presence of the folder. As the API response never returns (by design)
-        base.options[:timeout] = 10
+        original_timeout = base.options[:timeout]
+        base.options[:timeout] = 5
 
         begin
           perform('/user/sbi-storage/do', :post,
@@ -119,6 +120,7 @@ module Nels
                     }
                   })
         rescue RestClient::Exceptions::ReadTimeout
+          base.options[:timeout] = original_timeout
           new_path = File.join(current_path, new_folder)
           Timeout.timeout(240) do
             loop do
