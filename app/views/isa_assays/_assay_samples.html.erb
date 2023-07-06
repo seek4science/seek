@@ -10,7 +10,7 @@
     </div>
 </div>
 
-<%= render partial: 'isa_studies/buttons' %>
+<%= render partial: 'isa_studies/buttons', locals: {uploadExcel: "assaySampleUploadExcel()", sample_type_id: sample_type&.id} %>
 
 <% if valid_assay %>
     <script>
@@ -60,6 +60,14 @@
 
         function sampleExportExcel() {
             exportToExcel("assay-samples-table", '<%=assay.study_id%>', '<%=assay.id%>', '<%=sample_type.id%>');
+        }
+
+        function assaySampleUploadExcel(){
+          const file = $j('input[type="file"][id="file-<%=sample_type.id%>"]').toArray()[0].files[0];
+          let formData = new FormData();
+          formData.append('file', file);
+          formData.append('sample_type_id', <%=sample_type.id%>);
+          handleUploadSubmit(formData);
         }
 
     </script>
