@@ -116,30 +116,18 @@ class AssetTest < ActiveSupport::TestCase
   end
 
   test 'supports_spreadsheet_explore?' do
-    df = FactoryBot.create :data_file
-    assert df.supports_spreadsheet_explore?
-    doc = FactoryBot.create :document
-    assert doc.supports_spreadsheet_explore?
-    sop = FactoryBot.create :sop
-    assert sop.supports_spreadsheet_explore?
-    ft = FactoryBot.create :file_template
-    assert ft.supports_spreadsheet_explore?
-    model = FactoryBot.create :model
-    refute model.supports_spreadsheet_explore?
-    pres = FactoryBot.create :model
-    refute pres.supports_spreadsheet_explore?
-    ph = FactoryBot.create :placeholder
-    refute ph.supports_spreadsheet_explore?
-    wf = FactoryBot.create :workflow
-    refute wf.supports_spreadsheet_explore?
-    pub = FactoryBot.create :publication
-    refute pub.supports_spreadsheet_explore?
-    col = FactoryBot.create :collection
-    refute col.supports_spreadsheet_explore?
-    s = FactoryBot.create :sample
-    refute s.supports_spreadsheet_explore?
-    t = FactoryBot.create :template
-    refute t.supports_spreadsheet_explore?
+    assert FactoryBot.create(:data_file).supports_spreadsheet_explore?
+    assert FactoryBot.create(:document).supports_spreadsheet_explore?
+    assert FactoryBot.create(:sop).supports_spreadsheet_explore?
+    assert FactoryBot.create(:file_template).supports_spreadsheet_explore?
+    refute FactoryBot.create(:model).supports_spreadsheet_explore?
+    refute FactoryBot.create(:presentation).supports_spreadsheet_explore?
+    refute FactoryBot.create(:placeholder).supports_spreadsheet_explore?
+    refute FactoryBot.create(:workflow).supports_spreadsheet_explore?
+    refute FactoryBot.create(:publication).supports_spreadsheet_explore?
+    refute FactoryBot.create(:collection).supports_spreadsheet_explore?
+    refute FactoryBot.create(:sample).supports_spreadsheet_explore?
+    refute FactoryBot.create(:template).supports_spreadsheet_explore?
   end
 
   test 'tech type titles' do

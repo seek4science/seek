@@ -36,6 +36,9 @@ class Sop < ApplicationRecord
             :primary_key => :sop_id, :foreign_key => :asset_id
   end
 
+  def supports_spreadsheet_explore?
+    true
+  end
   def organism_title
     organism.nil? ? "" : organism.title
   end

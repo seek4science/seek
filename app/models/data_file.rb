@@ -105,6 +105,10 @@ class DataFile < ApplicationRecord
     true
   end
 
+  def supports_spreadsheet_explore?
+    true
+  end
+
   # FIXME: bad name, its not whether it IS a template, but whether it originates from a template
   def sample_template?
     return false if external_asset.is_a? OpenbisExternalAsset

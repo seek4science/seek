@@ -34,6 +34,10 @@ class FileTemplate < ApplicationRecord
     true
   end
 
+  def supports_spreadsheet_explore?
+    true
+  end
+
   def self.user_creatable?
     Seek::Config.file_templates_enabled
   end
