@@ -1,6 +1,5 @@
 class Sop < ApplicationRecord
 
-  include Seek::Data::SpreadsheetExplorerRepresentation
   include Seek::Rdf::RdfGeneration
 
   has_and_belongs_to_many :direct_studies, class_name: 'Study'
@@ -29,7 +28,6 @@ class Sop < ApplicationRecord
   )
 
   explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi']) do
-    include Seek::Data::SpreadsheetExplorerRepresentation
     acts_as_doi_mintable(proxy: :parent, general_type: 'Text')
     acts_as_versioned_resource
     acts_as_favouritable
