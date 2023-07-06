@@ -1,5 +1,6 @@
 class Document < ApplicationRecord
 
+  include Seek::Data::SpreadsheetExplorerRepresentation
   include Seek::Rdf::RdfGeneration
   include Seek::BioSchema::Support
 
@@ -33,6 +34,7 @@ class Document < ApplicationRecord
   end
 
   explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi']) do
+    include Seek::Data::SpreadsheetExplorerRepresentation
     acts_as_doi_mintable(proxy: :parent, general_type: 'Text')
     acts_as_versioned_resource
     acts_as_favouritable
