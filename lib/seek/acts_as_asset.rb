@@ -23,6 +23,13 @@ module Seek
       is_asset? && is_downloadable?
     end
 
+    def supports_spreadsheet_explore?
+      is_a?(DataFile) ||
+        is_a?(FileTemplate) ||
+        is_a?(Document) ||
+        is_a?(Sop)
+    end
+
     def have_misc_links?
       self.class.have_misc_links?
     end
