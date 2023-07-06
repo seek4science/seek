@@ -1,7 +1,8 @@
 <% can_upload = true %>
 <div id="upload-summary">
   <%= folding_panel("General Information", true, :id => "general-information-panel") do %>
-    <% [@project, @study, @sample_type]. map do | asset | %>
+    <% [@project, @study, @assay, @sample_type]. map do | asset | %>
+      <% next if asset.nil? %>
       <% asset_name = asset.class.to_s.singularize %>
       <h4> <%= asset_name %> </h4>
       <p><b>ID: </b><span><%= asset.id%></span></p>
@@ -26,7 +27,7 @@
     <% end %>
   <% end %>
 
-  <% unless @new_samples.nil? or @new_samples.compact == [] %>
+  <% unless @new_samples.nil? or @new_samples.compact.none? %>
   <%= folding_panel("New Samples <span class='label label-primary'>#{@new_samples.size}</span>", true, :id => "new-samples-panel", :body_options => {:id => "new-samples-panel-content"},
   :help_text => "These samples have been detected as new samples and will be created.") do %>
     <div class="table-responsive">
@@ -56,7 +57,7 @@
   <% end %>
 <% end %>
 
- <% unless @update_samples.nil? or @update_samples.compact == [] %>
+ <% unless @update_samples.nil? or @update_samples.compact.none? %>
   <%= folding_panel("Samples to Update <span class='label label-warning'>#{@update_samples.size}</span>", true, :id => "existing-samples-panel", :body_options => {:id => "existing-samples-panel-content"},
   :help_text => "These samples were detected existing samples and will be updated.") do %>
     <div class="table-responsive">
@@ -92,7 +93,7 @@
   <% end %>
 <% end %>
 
-<% unless @possible_duplicates.nil? or @possible_duplicates.compact == [] %>
+<% unless @possible_duplicates.nil? or @possible_duplicates.compact.none? %>
   <%= folding_panel("Possible Duplicates <span class='label label-danger'>#{@possible_duplicates.size}</span>", true, :id => "existing-samples-panel", :body_options => {:id => "existing-samples-panel-content"},
                   :help_text => "These new samples have been matched to already existing samples.") do %>
     <div class="table-responsive">
@@ -138,22 +139,18 @@
   </div>
 <% end %>
 
-  <%= submit_tag "Next", data: {disable_with: 'Next'}, :class => 'btn btn-primary', onclick: "submitUpload()" if can_upload%>
+  <%= submit_tag "Upload", data: {disable_with: 'Uploading ...'}, :class => 'btn btn-primary', onclick: "submitUpload()" if can_upload%>
   <%= submit_tag "Cancel", data: {id: 'cancelModalUploadExcel'}, :class => 'btn btn-secondary', onclick: "closeModalForm()" %>
 </div>
 
 <script type="text/javascript">
   function removeSample(elementName){
-    console.log("elementName", elementName);
     $j(`tr[id*='${elementName}']`).remove();
   }
 
   function submitUpload(){
     const newSamples = { data: getNewSamples() };
     const updatedSamples= { data: getUpdateSamples() };
-
-    console.log('newSamples', newSamples);
-    console.log('updatedSamples', updatedSamples);
 
     if(true){
       uploadAjaxCall("<%= batch_create_samples_path %>", "POST", { data: JSON.stringify(newSamples) });
@@ -170,13 +167,18 @@
     const duplicatedRows = $j('#duplicate-samples-table tr:not([class="danger"]):not(:has(th))').toArray();
     let createRows = newRows;
 
-    if (duplicatedRows.length > 0 && confirm("Are you sure you want to add potentially duplicated rows?")) {
-      createRows = createRows.concat(duplicatedRows);
+    if (duplicatedRows.length > 0 ) {
+      if (confirm("Are you sure you want to add potentially duplicated rows?")) {
+        createRows = createRows.concat(duplicatedRows);
+      } else {
+        closeModalForm();
+        return;
+      }
     }
-    console.log('createRows', createRows);
+
     const sampleObjects = createRows.map((cr, index) => createSampleObject(cr, "new", index));
 
-   return sampleObjects
+    return sampleObjects;
   }
 
   function getUpdateSamples(){
@@ -255,6 +257,7 @@
     const { data, cache, dataType } = params;
     if (!url || !method) throw new Error("Parameter(s) missing");
     return $j.ajax({
+      async: false,
       method,
       url,
       data,
@@ -263,9 +266,6 @@
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json"
-      },
-      beforeSend: function () {
-        $j('#check-excel-upload-result').html('<h2>Updating Samples...</h2>');
       },
       success: function(res) {
         console.log("res", res);
