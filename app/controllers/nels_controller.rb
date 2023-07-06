@@ -1,5 +1,3 @@
-require 'English'
-require 'English'
 class NelsController < ApplicationController
   before_action :nels_enabled?
   before_action :check_user_logged_in, only: :callback
@@ -67,7 +65,7 @@ class NelsController < ApplicationController
 
   def get_metadata
     file_name, file_path = rest_client.get_metadata(params[:project_id].to_i, params[:dataset_id].to_i,
-                                                     params[:subtype_name])
+                                                    params[:subtype_name])
     send_file file_path, filename: file_name, disposition: 'attachment'
   rescue RuntimeError => e
     flash[:error] = "Something went wrong interacting with NeLS, please try again later (#{e.class.name})"
@@ -77,7 +75,7 @@ class NelsController < ApplicationController
   def add_metadata
     begin
       rest_client.upload_metadata(params[:project_id].to_i, params[:dataset_id].to_i, params[:subtype_name],
-                                   params['content_blobs'][0]['data'].path)
+                                  params['content_blobs'][0]['data'].path)
     rescue RuntimeError => e
       flash[:error] = "Something went wrong interacting with NeLS, please try again later (#{e.class.name})"
     end
@@ -116,7 +114,7 @@ class NelsController < ApplicationController
       data_path = params['content_blobs'][0]['data'].path
       subtype_path = params[:subtype_path] || ''
       rest_client.upload_file(params[:project_id].to_i, params[:dataset_id].to_i, params[:subtype_name],
-                               subtype_path, filename, data_path)
+                              subtype_path, filename, data_path)
       respond_to do |format|
         format.all { render json: { success: true } }
       end
@@ -132,11 +130,11 @@ class NelsController < ApplicationController
     path_in_subtype = extract_subtype_path(params[:path], params[:project_name], params[:dataset_name],
                                            params[:subtype_name], params[:filename])
     filename, path = rest_client.download_file(params[:project_id].to_i, params[:dataset_id].to_i,
-                                                params[:subtype_name], path_in_subtype, params[:filename])
+                                               params[:subtype_name], path_in_subtype, params[:filename])
     respond_to do |format|
       format.json { render json: { filename: filename, file_path: path } }
     end
-  rescue RuntimeError, StandardError => e
+  rescue StandardError => e
     respond_to do |format|
       format.json { render json: { error: e.message, exception: e.class.name }, status: :internal_server_error }
     end
@@ -252,7 +250,7 @@ class NelsController < ApplicationController
     unless @assay.projects.any?(&:nels_enabled)
       flash[:error] = "This assay is not associated with a NeLS-enabled #{t('project').downcase}."
       redirect_to @assay
-      false
+      return false
     end
   end
 
