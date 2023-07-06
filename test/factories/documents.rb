@@ -55,6 +55,16 @@ FactoryBot.define do
   factory(:api_pdf_document, parent: :document) do
     association :content_blob, factory: :blank_pdf_content_blob
   end
+
+  factory(:small_test_spreadsheet_document, parent: :document) do
+    association :content_blob, factory: :small_test_spreadsheet_content_blob
+  end
+  factory(:non_spreadsheet_document, parent: :document) do
+    association :content_blob, factory: :cronwright_model_content_blob
+  end
+  factory(:csv_spreadsheet_document, parent: :document) do
+    association :content_blob, factory: :csv_content_blob
+  end
   
   # FactoryBot::Version
   factory(:document_version, class: Document::Version) do
