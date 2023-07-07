@@ -28,7 +28,7 @@
   <% end %>
 
   <% unless @new_samples.nil? or @new_samples.compact.none? %>
-  <%= folding_panel("New Samples <span class='label label-primary'>#{@new_samples.size}</span>", true, :id => "new-samples-panel", :body_options => {:id => "new-samples-panel-content"},
+  <%= folding_panel("New Samples <span id='new-samples-counter' class='label label-primary'>#{@new_samples.size}</span>", true, :id => "new-samples-panel", :body_options => {:id => "new-samples-panel-content"},
   :help_text => "These samples have been detected as new samples and will be created.") do %>
     <div class="table-responsive">
       <table id="create-samples-table" class="table">
@@ -58,7 +58,7 @@
 <% end %>
 
  <% unless @update_samples.nil? or @update_samples.compact.none? %>
-  <%= folding_panel("Samples to Update <span class='label label-warning'>#{@update_samples.size}</span>", true, :id => "existing-samples-panel", :body_options => {:id => "existing-samples-panel-content"},
+  <%= folding_panel("Samples to Update <span id='update-samples-counter' class='label label-warning'>#{@update_samples.size}</span>", true, :id => "existing-samples-panel", :body_options => {:id => "existing-samples-panel-content"},
   :help_text => "These samples were detected existing samples and will be updated.") do %>
     <div class="table-responsive">
       <table id="update-samples-table" class="table">
@@ -94,7 +94,7 @@
 <% end %>
 
 <% unless @possible_duplicates.nil? or @possible_duplicates.compact.none? %>
-  <%= folding_panel("Possible Duplicates <span class='label label-danger'>#{@possible_duplicates.size}</span>", true, :id => "existing-samples-panel", :body_options => {:id => "existing-samples-panel-content"},
+  <%= folding_panel("Possible Duplicates <span id='duplicate-samples-counter' class='label label-danger'>#{@possible_duplicates.size}</span>", true, :id => "existing-samples-panel", :body_options => {:id => "existing-samples-panel-content"},
                   :help_text => "These new samples have been matched to already existing samples.") do %>
     <div class="table-responsive">
       <table id="duplicate-samples-table" class="table">
@@ -145,7 +145,20 @@
 
 <script type="text/javascript">
   function removeSample(elementName){
+    let counterName = ''
+    if (/duplicate-sample/.test(elementName)){
+      counterName = 'duplicate-samples-counter'
+    } else if (/new-sample/.test(elementName)){
+      counterName = 'new-samples-counter'
+    } else if(/update-sample/.test(elementName)){
+      counterName = 'update-samples-counter'
+    }
+
     $j(`tr[id*='${elementName}']`).remove();
+    debugger;
+    const counter = parseInt($j(`span[id='${counterName}']`)[0].textContent);
+    const newCounter = (counter > 0) ? (counter - 1) : counter;
+    $j(`span[id='${counterName}']`).text(newCounter);
   }
 
   function submitUpload(){
