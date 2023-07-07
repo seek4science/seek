@@ -15,7 +15,7 @@
     <%  if file_item['isFolder'] %>
       <tr>
         <td>
-          <span class='nels-folder' data-path='<%= file_item["path"] %>' data-project-id='<%= @project_id %>' data-dataset-id='<%= @dataset_id %>' data-subtype='<%= @subtype_name %>'>
+          <span class='nels-folder' data-path='<%= file_item["path"] %>' data-project-id='<%= @project_id %>' data-dataset-id='<%= @dataset_id %>' data-subtype='<%= @subtype_name %>' data-assay-id='<%= params[:assay_id] %>'>
             <%= nels_folder_icon %>
             <%= file_item["name"] %>
           </span>

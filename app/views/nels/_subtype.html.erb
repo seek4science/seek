@@ -71,7 +71,8 @@ table, th, td {
           const projectId = $j(this).data('project-id');
           const datasetId = $j(this).data('dataset-id');
           const subtype = $j(this).data('subtype');
-          showSubtype(projectId, datasetId, subtype, folder_path,'<%= params[:assay_id] %>');
+          const assayId = $j(this).data('assay-id');
+          showSubtype(projectId, datasetId, subtype, folder_path, assayId);
       });
 
     $j('.nels-download-link').on('click', function () {

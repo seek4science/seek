@@ -7,6 +7,7 @@
 
       <%= hidden_field_tag :project_id, project_id %>
       <%= hidden_field_tag :dataset_id, dataset_id %>
+      <%= hidden_field_tag :assay_id, params[:assay_id] %>
       <%= hidden_field_tag :subtype_name, subtype_name %>
       <%= hidden_field_tag :file_path, path %>
 
@@ -48,8 +49,9 @@
                       const datasetId = data.get('dataset_id');
                       const subtype = data.get('subtype_name');
                       const folder_path = data.get('file_path');
+                      const assayId = data.get('assay_id');
                       $j('#upload-spinner').modal('hide');
-                      showSubtype(projectId, datasetId, subtype, folder_path, '<%= params[:assay_id] %>');
+                      showSubtype(projectId, datasetId, subtype, folder_path, assayId);
                   },
                   error: function (request, status, error) {
                       $j('#upload-spinner').modal('hide');
