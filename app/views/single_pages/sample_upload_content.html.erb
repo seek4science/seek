@@ -155,7 +155,6 @@
     }
 
     $j(`tr[id*='${elementName}']`).remove();
-    debugger;
     const counter = parseInt($j(`span[id='${counterName}']`)[0].textContent);
     const newCounter = (counter > 0) ? (counter - 1) : counter;
     $j(`span[id='${counterName}']`).text(newCounter);
