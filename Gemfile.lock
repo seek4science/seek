@@ -490,7 +490,7 @@ GEM
       net-protocol
     netrc (0.11.0)
     nio4r (2.5.9)
-    nokogiri (1.14.5-x86_64-linux)
+    nokogiri (1.14.5)
       racc (~> 1.4)
     nori (1.1.5)
     oauth2 (2.0.9)
@@ -947,7 +947,7 @@ GEM
       rubyzip (~> 2.0.0)
 
 PLATFORMS
-  x86_64-linux
+  ruby
 
 DEPENDENCIES
   RedCloth (>= 4.3.0)
