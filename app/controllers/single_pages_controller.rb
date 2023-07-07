@@ -133,33 +133,26 @@ class SinglePagesController < ApplicationController
     @study = Study.find(study_id)
     sample_type_id = wb.cell(5, 2, sheet = 'Metadata').to_i
     @sample_type = SampleType.find(sample_type_id)
+    template_id = wb.cell(8, 2, sheet = 'Metadata').to_i
+    @template = Template.find(template_id)
+    is_assay = @sample_type.assays.any?
+    @assay = @sample_type.assays.first
+    @project = @study.projects.first # In Single Page a study can only belong to one project
 
     # Sample Type validation rules
     unless sample_type_id_ui == @sample_type&.id
       raise "Sample Type #{@sample_type&.id} from spreadsheet doesn't match Sample Type #{sample_type_id_ui} from the table. Please upload in the correct table."
     end
-    unless @study.sample_types.include?(@sample_type)
+    unless @study.sample_types.include?(@sample_type) || is_assay
       raise "Sample Type '#{@sample_type.id}' doesn't belong to Study #{@study.id}. Sample Upload aborted."
     end
+    unless (@assay&.sample_type == @sample_type) || !is_assay
+      raise "Sample Type '#{@sample_type.id}' doesn't belong to Assay #{@assay.id}. Sample Upload aborted."
+    end
 
-    is_assay = @sample_type.assays.any?
-    @assay = @sample_type.assays.first
-
-    multiple_input_fields = @sample_type.sample_attributes.map do |sa_attr|
+    @multiple_input_fields = @sample_type.sample_attributes.map do |sa_attr|
       sa_attr.title if sa_attr.sample_attribute_type.base_type == 'SeekSampleMulti'
     end
-
-    if is_assay
-      assay_id = wb.cell(8, 2, sheet = 'Metadata').to_i
-      template_id = wb.cell(11, 2, sheet = 'Metadata').to_i
-    else
-      template_id = wb.cell(8, 2, sheet = 'Metadata').to_i
-    end
-
-    @assay = Assay.find(assay_id) unless assay_id.nil?
-    @template = Template.find(template_id)
-    @project = @study.projects.first # In Single Page a study can only belong to one project
-
 
     sample_fields = wb.row(1, sheet = 'Samples').map { |field| field.sub(' *', '') }
     samples_data = (2..wb.last_row(sheet = 'Samples')).map { |i| wb.row(i, sheet = 'Samples') }
@@ -176,7 +169,7 @@ class SinglePagesController < ApplicationController
     @excel_samples = samples_data.map do |excel_sample|
       obj = {}
       (0..sample_fields.size - 1).map do |i|
-        if multiple_input_fields.include?(sample_fields[i])
+        if @multiple_input_fields.include?(sample_fields[i])
           parsed_excel_input_samples = JSON.parse(excel_sample[i].gsub('=>', ':')).map do |subsample|
             # Uploader should at least have viewing permissions for the inputs he's using
             unless Sample.find(subsample['id'])&.authorized_for_view?
