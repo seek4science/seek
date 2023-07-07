@@ -78,6 +78,10 @@ uploadExcel: 'sourceUploadExcel()', sample_type_id: sample_type&.id} %>
 
         function sourceUploadExcel(){
           const file = $j('input[type="file"][id="file-<%=sample_type.id%>"]').toArray()[0].files[0];
+          if (!file) {
+            alert("File not found! Please select a file to upload.");
+            return
+          }
           let formData = new FormData();
           formData.append('file', file);
           formData.append('sample_type_id', <%=sample_type.id%>);
