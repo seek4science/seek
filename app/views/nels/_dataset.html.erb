@@ -31,7 +31,7 @@
   <% @dataset['subtypes'].each do |subtype| %>
       <li class="list-group-item">
         <%= link_to(subtype['type'], '#', {'data-role':'nels-tree-node-link', 'data-tree-node-id':"#{subtype['type']}#{@dataset['id']}"}) %> <span class="subtle">(<%= number_to_human_size(subtype['size']) %>)</span>
-        <%= button_link_to('Add metadata', 'add', nil, id: "add_metadata_#{params[:project_id]}_#{params[:dataset_id]}_#{subtype['type']}", class:"add_metadata" ) %>
+        <%= button_link_to('Add metadata', 'add', nil, { id: :add_metadata, 'data-project-id': @project['id'], 'data-dataset-id': @dataset['id'], 'data-subtype-name': subtype['type'], class: :add_metadata }) %>
 
         <% if subtype["metadata"] %>
           <%= button_link_to('Download metadata', 'download', {:action => :get_metadata,

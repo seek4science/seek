@@ -18,11 +18,13 @@
         $j('.add_metadata').on('click', function () {
             // Show upload file form and populate the params as hidden fields
             $j('#upload-metadata-file').modal('show');
-            button_id = $j(this).attr('id')
+            const project_id = $j(this).data('project-id');
+            const dataset_id = $j(this).data('dataset-id');
+            const subtype_name = $j(this).data('subtype-name');
 
-            $j('#upload-metadata-file form').append(`<input type="hidden" name="project_id" value="${button_id.split("_")[2]}" />`);
-            $j('#upload-metadata-file form').append(`<input type="hidden" name="dataset_id" value="${button_id.split("_")[3]}" />`);
-            $j('#upload-metadata-file form').append(`<input type="hidden" name="subtype_name" value="${button_id.split("_")[4]}" />`);
+            $j('#upload-metadata-file form').append(`<input type="hidden" name="project_id" value="${project_id}" />`);
+            $j('#upload-metadata-file form').append(`<input type="hidden" name="dataset_id" value="${dataset_id}" />`);
+            $j('#upload-metadata-file form').append(`<input type="hidden" name="subtype_name" value="${subtype_name}" />`);
 
             return false;
         });
