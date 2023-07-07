@@ -60,7 +60,7 @@ module WorkflowsHelper
     url = LifeMonitor::Rest::Client.status_page_url(resource)
     link_to(url, class: 'lifemonitor-status btn btn-default', target: '_blank', rel: 'noopener',
             'data-tooltip' => 'Click to view in LifeMonitor') do
-      image_tag('logos/life_monitor_logo_no_text.png', class: 'icon lifemonitor-logo') +
+      image('life_monitor_icon', class: 'icon lifemonitor-logo') +
         'Tests ' +
         content_tag(:span, label, class: "test-status label #{label_class}")
     end
