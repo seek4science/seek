@@ -50,7 +50,15 @@
                 <% new_sample.map do |key, val| %>
                   <% val = '<new>' if key =='id' %>
                 <% unless key == 'uuid' %>
-                  <td id='<%= "new-sample-#{new_sample_id}[#{key}]" %>' ><%= val %></td>
+                  <% if @multiple_input_fields.include?(key)%>
+                    <td id='<%= "new-sample-#{new_sample_id}[#{key}]" %>' >
+                      <% val.each do |sub_sample| %>
+                        <span class="badge", title='ID: <%= sub_sample['id'] %>'><%= sub_sample['title'] %></span>
+                      <% end %>
+                    </td>
+                  <% else %>
+                    <td id='<%= "new-sample-#{new_sample_id}[#{key}]" %>' ><%= val %></td>
+                  <% end %>
                 <% end %>
               <% end %>
             </tr>
@@ -80,14 +88,30 @@
               <td rowspan=2><button id=<%= "remove-#{update_sample['id']}" %> class="glyphicon glyphicon-trash danger" style="background-color:#d9534f;color:white;" onclick=<%= "removeSample('update-sample-#{update_sample['id']}')" %>></button></td>
               <% update_sample.map do |key, val| %>
                 <% unless key == 'uuid' %>
-                  <td class='<%= (val != db_sample[key]) ? "warning" : "default" %>' id='<%= "update-sample-#{update_sample['id']}[#{key}]"%>' ><%= val %></td>
+                  <% if @multiple_input_fields.include?(key)%>
+                    <td class='<%= (val != db_sample[key]) ? "warning" : "default" %>' id='<%= "update-sample-#{update_sample['id']}[#{key}]"%>' >
+                      <% val.each do |sub_sample| %>
+                        <span class="badge", title='ID: <%= sub_sample['id'] %>'><%= sub_sample['title'] %></span>
+                      <% end %>
+                    </td>
+                  <% else %>
+                    <td class='<%= (val != db_sample[key]) ? "warning" : "default" %>' id='<%= "update-sample-#{update_sample['id']}[#{key}]"%>' ><%= val %></td>
+                  <% end %>
                 <% end %>
               <% end %>
             </tr>
             <tr id='<%= "update-sample-#{update_sample['id']}-original" %>' >
               <% db_sample.map do |key, val| %>
                 <% unless key == 'uuid' %>
-                  <td><%= val %></td>
+                  <% if @multiple_input_fields.include?(key)%>
+                    <td>
+                      <% val.each do |sub_sample| %>
+                        <span class="badge", title='ID: <%= sub_sample['id'] %>'><%= sub_sample['title'] %></span>
+                      <% end %>
+                    </td>
+                  <% else %>
+                    <td><%= val %></td>
+                  <% end %>
                 <% end %>
               <% end %>
             </tr>
@@ -117,13 +141,29 @@
             <% dupl_sample.map do |key, val| %>
               <% val = '<new>' if key =='id' %>
               <% unless %w[uuid duplicate].include?(key) %>
-                <td id='<%= "#{dupl_sample['duplicate']['id']}[#{key}]" %>' ><%= val %></td>
+                <% if @multiple_input_fields.include?(key)%>
+                  <td>
+                    <% val.each do |sub_sample| %>
+                      <span class="badge", title='ID: <%= sub_sample['id'] %>'><%= sub_sample['title'] %></span>
+                    <% end %>
+                  </td>
+                <% else %>
+                  <td id='<%= "#{dupl_sample['duplicate']['id']}[#{key}]" %>' ><%= val %></td>
+                <% end %>
               <% end %>
             <% end %>
               <tr id='<%= "duplicate-sample-#{dupl_sample['duplicate']['id']}-2" %>' class="danger">
                 <% dupl_sample['duplicate'].map do |key, val| %>
                   <% unless %w[uuid duplicate].include?(key) %>
-                    <td><%= val %></td>
+                    <% if @multiple_input_fields.include?(key)%>
+                      <td>
+                        <% val.each do |sub_sample| %>
+                          <span class="badge", title='ID: <%= sub_sample['id'] %>'><%= sub_sample['title'] %></span>
+                        <% end %>
+                      </td>
+                    <% else %>
+                      <td><%= val%></td>
+                    <% end %>
                   <% end %>
                 <% end %>
               </tr>
@@ -169,10 +209,8 @@
     const newSamples = { data: getNewSamples() };
     const updatedSamples= { data: getUpdateSamples() };
 
-    if(true){
       uploadAjaxCall("<%= batch_create_samples_path %>", "POST", { data: JSON.stringify(newSamples) });
       uploadAjaxCall("<%= batch_update_samples_path %>", "PUT", { data: JSON.stringify(updatedSamples) });
-    }
 
     closeModalForm();
     location.reload();
@@ -194,7 +232,6 @@
     }
 
     const sampleObjects = createRows.map((cr, index) => createSampleObject(cr, "new", index));
-
     return sampleObjects;
   }
 
@@ -202,7 +239,6 @@
     const updateRows = $j('#update-samples-table [id*="updated"]').toArray();
 
     const sampleObjects = updateRows.map((ur, index) => createSampleObject(ur, "update", index));
-
     return sampleObjects
   }
 
@@ -213,7 +249,13 @@
     cells.map(function(cell){
       val = cell.textContent;
       key = cell.id.match(/\[.*\]/)[0].replace('[', "").replace("]", '');
-      samplesObj[key] = val;
+      const multiInputfields = $j(cell).find('span[class*="label"]').toArray();
+      if (multiInputfields.length > 0 ){
+        const inputIds = multiInputfields.map(is => is.title).join(',');
+        samplesObj[key] = inputIds;
+      } else {
+        samplesObj[key] = val;
+      }
     });
 
     const {id: objId, ...attrMap} = samplesObj;
