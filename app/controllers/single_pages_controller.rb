@@ -213,7 +213,10 @@ class SinglePagesController < ApplicationController
       format.json { render json: { uploadData: upload_data } }
       format.html { render 'single_pages/sample_upload_content', { layout: false } }
     end
-  end
+  rescue StandardError => e
+    flash[:error] = e.message
+    redirect_to single_page_path(@study.project_ids.first), status: :bad_request
+end
 
   private
 
