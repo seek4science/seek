@@ -18,9 +18,7 @@
         <% end %>
         <%= link_to 'Funding and Programmes', funding_home_path -%> |
         <% if Seek::Config.funding_link.present? %>
-          <a href="<%=Seek::Config.funding_link%>" target="_blank">
-            <%=Seek::Config.funding_link%>
-          </a> |
+          <%= link_to Seek::Config.funding_link, Seek::Config.funding_link, target: '_blank' %> |
         <% end %>
         <%= link_to 'Credits', Seek::Help::HelpDictionary.instance.help_link(:credits), target: '_blank' -%>
         <% if Seek::Config.terms_enabled %>
