@@ -76,6 +76,19 @@ class SearchControllerTest < ActionController::TestCase
     assert_select '#biomodels-databases .list_item_title', count: 25
   end
 
+  test 'biomodels search can handle unreleased models' do
+    VCR.use_cassette('biomodels/search-unreleased') do
+      with_config_value(:external_search_enabled, true) do
+        get :index, params: { q: '2024', include_external_search: '1', search_type:'models' }
+      end
+    end
+
+    assert_select '.related-items li a', text: 'BioModels Database (6)'
+    assert_equal 6, assigns(:external_results).count
+    assert_equal 3, assigns(:external_results).select{|r| r.unreleased}.count
+    assert_select '.related-items .list_item_attribute b', text: 'Publication date', count: 3
+  end
+
   test 'can render search results as valid JSON-API collection' do
     sops = FactoryGirl.create_list(:public_sop, 2)
     docs = FactoryGirl.create_list(:public_document, 3)

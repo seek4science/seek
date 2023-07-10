@@ -12,16 +12,18 @@
     <div class="row">
       <div class="col-md-10 col-sm-9 list_item_content">
         <%= list_item_description resource.abstract %>
-        <div class="col-sm-6 hidden-xs">
-          <%= list_item_optional_attribute "Publication title", resource.publication_title %>
-          <%= list_item_optional_attribute "Original Authors", resource.authors.join(", ") %>
-          <%= list_item_optional_attribute "URL of original", link_to(biomodel_link, biomodel_link,:target=>'_blank') %>
-        </div>
+        <% unless resource.unreleased %>
+          <div class="col-sm-6 hidden-xs">
+            <%= list_item_optional_attribute "Publication title", resource.publication_title %>
+            <%= list_item_optional_attribute "Original Authors", resource.authors.join(", ") %>
+            <%= list_item_optional_attribute "URL of original", link_to(biomodel_link, biomodel_link,:target=>'_blank') %>
+          </div>
 
-        <div class="col-sm-6 hidden-xs">
-          <%= list_item_optional_attribute "Publication date", date_as_string(resource.published_date) %>
-          <%= list_item_optional_attribute "Last modified", date_as_string(resource.last_modification_date, true) %>
-        </div>
+          <div class="col-sm-6 hidden-xs">
+            <%= list_item_optional_attribute "Publication date", date_as_string(resource.published_date) %>
+            <%= list_item_optional_attribute "Last modified", date_as_string(resource.last_modification_date, true) %>
+          </div>
+        <% end %>
       </div>
 
       <div class="col-sm-2 text-right list_item_actions">

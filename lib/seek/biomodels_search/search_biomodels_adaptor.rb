@@ -17,7 +17,7 @@ module Seek
           biomodels_result.title.blank?
         end
       rescue StandardError => exception
-        raise exception if Rails.env.development?
+        raise exception unless Rails.env.production?
         Seek::Errors::ExceptionForwarder.send_notification(exception, data: { query: query })
         []
       end
@@ -32,7 +32,7 @@ module Seek
       end
     end
 
-    class BiomodelsSearchResult < Struct.new(:authors, :abstract, :title, :published_date, :publication_id, :publication_title, :model_id, :last_modification_date, :main_filename)
+    class BiomodelsSearchResult < Struct.new(:authors, :abstract, :title, :published_date, :publication_id, :publication_title, :model_id, :last_modification_date, :main_filename, :unreleased)
       include Seek::ExternalSearchResult
 
       alias_attribute :id, :model_id
@@ -55,14 +55,21 @@ module Seek
         end
 
         json = JSON.parse(json)
+
         self.title = json['name']
-        self.publication_title = json.dig('publication', 'title')
         self.abstract = json['description']
-        self.authors = (json.dig('publication', 'authors') || []).collect { |author| author['name'] }
-        self.published_date = Time.at(json['firstPublished'] / 1000)
-        latest_version = json['history']['revisions'].sort { |rev| rev['version'] }.first
-        self.last_modification_date = Time.at(latest_version['submitted'] / 1000)
-        self.main_filename = json['files']['main'].first['name']
+        if json['firstPublished']
+          self.publication_title = json.dig('publication', 'title')
+          self.authors = (json.dig('publication', 'authors') || []).collect { |author| author['name'] }
+          self.published_date = Time.at(json['firstPublished'] / 1000)
+          latest_version = json['history']['revisions'].sort { |rev| rev['version'] }.first
+          self.last_modification_date = Time.at(latest_version['submitted'] / 1000)
+          self.main_filename = json['files']['main'].first['name']
+          self.unreleased = false
+        else
+          self.unreleased = true
+        end
+
       end
     end
   end
