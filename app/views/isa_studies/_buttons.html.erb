@@ -23,7 +23,7 @@ uploadExcel||="studySampleUploadExcel()"
     <label for="file-<%= sample_type_id %>" class="form-label">Upload excel file:</label>
   </div>
   <div class="mb-3">
-    <input id="file-<%= sample_type_id %>" name="file-<%= sample_type_id %>" type="file" class="form-control form-control-lg"/>
+    <input id="file-<%= sample_type_id %>" name="file-<%= sample_type_id %>" type="file" accept=".xlsx, .xls" class="form-control form-control-lg"/>
   </div>
   <div class="mb-3">
     <button class="btn btn-default" onClick=<%= uploadExcel %>>Upload</button>

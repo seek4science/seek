@@ -125,8 +125,25 @@ class SinglePagesController < ApplicationController
   end
 
   def upload_samples
-    wb = Roo::Excelx.new(params[:file].path)
+    uploaded_file = params[:file]
+    project_id = params[:project_id]
+    @project = Project.find(project_id)
+
+    # Check file type if is xls or xlsx
+    case uploaded_file.content_type
+    when 'application/vnd.ms-excel'
+      wb = Roo::Spreadsheet.open(uploaded_file.path)
+    when 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      wb = Roo::Excelx.new(uploaded_file.path)
+    else
+      raise "Please upload a valid spreadsheet file with extension '.xls' or '.xlsx"
+    end
+
     sample_type_id_ui = params[:sample_type_id].to_i
+
+    unless is_valid_workbook?(wb)
+      raise "Invalid workbook! Cannot process this spreadsheet. Consider first exporting the table as a spreadsheet for the proper format."
+    end
 
     # Extract Samples metadata from spreadsheet
     study_id = wb.cell(2, 2, sheet = 'Metadata').to_i
@@ -137,7 +154,6 @@ class SinglePagesController < ApplicationController
     @template = Template.find(template_id)
     is_assay = @sample_type.assays.any?
     @assay = @sample_type.assays.first
-    @project = @study.projects.first # In Single Page a study can only belong to one project
 
     # Sample Type validation rules
     unless sample_type_id_ui == @sample_type&.id
@@ -255,10 +271,14 @@ class SinglePagesController < ApplicationController
     end
   rescue StandardError => e
     flash[:error] = e.message
-    redirect_to single_page_path(@study.project_ids.first), status: :bad_request
+    redirect_to single_page_path(@project), status: :bad_request
 end
 
   private
+
+  def is_valid_workbook?(wb)
+    !(wb.sheets.map { |sheet| %w[Metadata Samples cv_ontology].include? sheet }.include? false && wb.sheets.size != 3)
+  end
 
   def set_up_instance_variable
     @single_page = true

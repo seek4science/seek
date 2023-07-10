@@ -1,6 +1,9 @@
-<% assay ||= nil %>
-<% valid_assay = assay&.sample_type.present? %>
-<% sample_type = assay&.sample_type %>
+<%
+  assay ||= nil
+  valid_assay = assay&.sample_type.present?
+  sample_type = assay&.sample_type
+  project = assay&.projects&.first
+%>
 
 <div style="padding:0 20px 20px 20px;">
     <div class="row">
@@ -70,7 +73,8 @@
           }
           let formData = new FormData();
           formData.append('file', file);
-          formData.append('sample_type_id', <%=sample_type.id%>);
+          formData.append('sample_type_id', <%=sample_type&.id%>);
+          formData.append('project_id', <%=project&.id%>);
           handleUploadSubmit(formData);
         }
 
