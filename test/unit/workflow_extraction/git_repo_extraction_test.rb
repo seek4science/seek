@@ -44,4 +44,29 @@ class GitRepoExtractionTest < ActiveSupport::TestCase
     assert third[:orcid].blank?
     assert_equal 2, third[:pos]
   end
+
+  test 'extracts license from LICENSE file' do
+    workflow = FactoryBot.create(:local_git_workflow)
+    git_version = workflow.git_version
+    disable_authorization_checks do
+      git_version.add_file('LICENSE', open_fixture_file('MIT-LICENSE'))
+      git_version.save!
+    end
+
+    extractor = Seek::WorkflowExtractors::GitRepo.new(workflow.git_version)
+    metadata = extractor.metadata
+
+    assert_equal 'MIT', metadata[:license]
+
+    git_version = workflow.git_version
+    disable_authorization_checks do
+      git_version.add_file('LICENSE', open_fixture_file('BSD-LICENSE'))
+      git_version.save!
+    end
+
+    extractor = Seek::WorkflowExtractors::GitRepo.new(workflow.git_version)
+    metadata = extractor.metadata
+
+    assert_equal 'BSD-3-Clause', metadata[:license]
+  end
 end

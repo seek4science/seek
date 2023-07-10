@@ -59,10 +59,6 @@ module ROCrate
       ((mentions || []) | (about || [])).select { |entity| entity.has_type?('TestSuite') }
     end
 
-    def readme
-      dereference('README.md')
-    end
-
     def find_entry(path)
       entries[path]
     end

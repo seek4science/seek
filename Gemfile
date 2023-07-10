@@ -158,6 +158,8 @@ gem 'caxlsx_rails', '~> 0.6.2'
 
 gem 'net-ftp'
 
+gem 'licensee'
+
 group :production do
   gem 'passenger'
 end
