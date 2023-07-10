@@ -136,7 +136,7 @@ class SinglePagesController < ApplicationController
     when 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       wb = Roo::Excelx.new(uploaded_file.path)
     else
-      raise "Please upload a valid spreadsheet file with extension '.xls' or '.xlsx"
+      raise "Please upload a valid spreadsheet file with extension '.xls' or '.xlsx'"
     end
 
     sample_type_id_ui = params[:sample_type_id].to_i

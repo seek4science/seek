@@ -188,4 +188,22 @@ class SinglePagesControllerTest < ActionController::TestCase
       assert_response :ok, msg = 'Unable to generate the excel'
     end
   end
+
+  test 'invalid file extension should raise exception' do
+    with_config_value(:project_single_page_enabled, true) do
+      file_path = Rails.root.join('test/fixtures/files/ods_test_spreadsheet.ods')
+      file = fixture_file_upload(file_path, 'application/vnd.oasis.opendocument.spreadsheet')
+
+      person, project, study, assay, source_sample_type, sample_collection_sample_type, assay_sample_type = setup_file_upload.values_at(
+        :person, :project, :study, :assay, :source_sample_type, :sample_collection_sample_type, :assay_sample_type
+      )
+
+      post :upload_samples, params: { file: file, project_id: project.id,
+                                      sample_type_id: source_sample_type.id }
+
+      assert_response :bad_request
+      assert_equal flash[:error], "Please upload a valid spreadsheet file with extension '.xls' or '.xlsx'"
+    end
+  end
+
 end
