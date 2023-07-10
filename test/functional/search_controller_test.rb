@@ -86,7 +86,10 @@ class SearchControllerTest < ActionController::TestCase
     assert_select '.related-items li a', text: 'BioModels Database (6)'
     assert_equal 6, assigns(:external_results).count
     assert_equal 3, assigns(:external_results).select{|r| r.unreleased}.count
+    assert_select '.related-items .list_item_attribute b', text: 'URL of original', count: 6
     assert_select '.related-items .list_item_attribute b', text: 'Publication date', count: 3
+    assert_select '.related-items .list_item_actions', count: 3
+
   end
 
   test 'can render search results as valid JSON-API collection' do

@@ -12,11 +12,11 @@
     <div class="row">
       <div class="col-md-10 col-sm-9 list_item_content">
         <%= list_item_description resource.abstract %>
+        <%= list_item_optional_attribute "URL of original", link_to(biomodel_link, biomodel_link,:target=>'_blank') %>
         <% unless resource.unreleased %>
           <div class="col-sm-6 hidden-xs">
             <%= list_item_optional_attribute "Publication title", resource.publication_title %>
             <%= list_item_optional_attribute "Original Authors", resource.authors.join(", ") %>
-            <%= list_item_optional_attribute "URL of original", link_to(biomodel_link, biomodel_link,:target=>'_blank') %>
           </div>
 
           <div class="col-sm-6 hidden-xs">
@@ -25,24 +25,25 @@
           </div>
         <% end %>
       </div>
+      <% unless resource.unreleased %>
+        <div class="col-sm-2 text-right list_item_actions">
+          <%
+             biomodel_download_link = resource.download_link
+             description_for_import = resource.abstract
+          -%>
 
-      <div class="col-sm-2 text-right list_item_actions">
-        <%
-           biomodel_download_link = resource.download_link
-           description_for_import = resource.abstract
-        -%>
-
-        <%= image_tag_for_key "download", biomodel_download_link, "download", {}, "Download" %>
-        <% if Model.can_create? %>
-            <%= image_tag_for_key "import",
-                                  {:controller => "models",
-                                   :action => "new",
-                                   :model => {:title => resource.title, :imported_source => resource.tab, :imported_url => biomodel_link, :data_url => biomodel_download_link, :original_filename => "#{resource.model_id}.xml", :model_format_id => ModelFormat.sbml.first.try(:id), :description => description_for_import},
-                                  },
-                                  "import", {},
-                                  "Import" %>
-        <% end %>
-      </div>
+          <%= image_tag_for_key "download", biomodel_download_link, "download", {}, "Download" %>
+          <% if Model.can_create? %>
+              <%= image_tag_for_key "import",
+                                    {:controller => "models",
+                                     :action => "new",
+                                     :model => {:title => resource.title, :imported_source => resource.tab, :imported_url => biomodel_link, :data_url => biomodel_download_link, :original_filename => "#{resource.model_id}.xml", :model_format_id => ModelFormat.sbml.first.try(:id), :description => description_for_import},
+                                    },
+                                    "import", {},
+                                    "Import" %>
+          <% end %>
+        </div>
+      <% end %>
     </div>
   </div>
 </div>
