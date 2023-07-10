@@ -50,16 +50,9 @@ class SinglePagesControllerTest < ActionController::TestCase
   test 'generates a valid export of sources in single page' do
     with_config_value(:project_single_page_enabled, true) do
       # Generate the excel data
-      person = @member.person
-      project = FactoryBot.create(:project)
-      study = FactoryBot.create(:study)
-      id_label = "#{Seek::Config::instance_name} id"
-
-      source_sample_type = FactoryBot.create(:isa_source_sample_type,
-                                             contributor: person,
-                                             project_ids: [project.id],
-                                             isa_template: Template.find_by_title('ISA Source'),
-                                             studies: [study])
+      id_label, person, project, study, source_sample_type = setup_file_upload.values_at(
+        :id_label, :person, :project, :study, :source_sample_type
+      )
 
       sources = (1..5).map do |n|
         FactoryBot.create(
@@ -108,24 +101,9 @@ class SinglePagesControllerTest < ActionController::TestCase
 
   test 'generates a valid export of source samples in single page' do
     with_config_value(:project_single_page_enabled, true) do
-      person = @member.person
-      project = FactoryBot.create(:project)
-      study = FactoryBot.create(:study)
-      assay = FactoryBot.create(:assay)
-      id_label = "#{Seek::Config::instance_name} id"
-
-      source_sample_type = FactoryBot.create(:isa_source_sample_type,
-                                             contributor: person,
-                                             project_ids: [project.id],
-                                             isa_template: Template.find_by_title('ISA Source'),
-                                             studies: [study])
-
-      sample_collection_sample_type = FactoryBot.create(:isa_sample_collection_sample_type,
-                                                        contributor: person,
-                                                        project_ids: [project.id],
-                                                        isa_template: Template.find_by_title('ISA sample collection'),
-                                                        studies: [study],
-                                                        linked_sample_type: source_sample_type)
+      id_label, person, project, study, assay, source_sample_type, sample_collection_sample_type = setup_file_upload.values_at(
+        :id_label, :person, :project, :study, :assay, :source_sample_type, :sample_collection_sample_type
+      )
 
       sources = (1..5).map do |n|
         FactoryBot.create(
@@ -181,8 +159,8 @@ class SinglePagesControllerTest < ActionController::TestCase
       assert_response :ok, msg = "Couldn't reach the server"
 
       response_body = JSON.parse(response.body)
-      assert response_body.key?("uuid"), msg = "Response body is expected to have a 'uuid' key"
-      cache_uuid = response_body["uuid"]
+      assert response_body.key?('uuid'), msg = "Response body is expected to have a 'uuid' key"
+      cache_uuid = response_body['uuid']
 
       get :download_samples_excel, params: { uuid: cache_uuid }
       assert_response :ok, msg = 'Unable to generate the excel'
@@ -194,8 +172,8 @@ class SinglePagesControllerTest < ActionController::TestCase
       file_path = Rails.root.join('test/fixtures/files/ods_test_spreadsheet.ods')
       file = fixture_file_upload(file_path, 'application/vnd.oasis.opendocument.spreadsheet')
 
-      person, project, study, assay, source_sample_type, sample_collection_sample_type, assay_sample_type = setup_file_upload.values_at(
-        :person, :project, :study, :assay, :source_sample_type, :sample_collection_sample_type, :assay_sample_type
+      project, source_sample_type = setup_file_upload.values_at(
+        :project, :source_sample_type
       )
 
       post :upload_samples, params: { file: file, project_id: project.id,
@@ -206,4 +184,33 @@ class SinglePagesControllerTest < ActionController::TestCase
     end
   end
 
+  def setup_file_upload
+    id_label = "#{Seek::Config::instance_name} id"
+    person = @member.person
+    project = FactoryBot.create(:project)
+    study = FactoryBot.create(:study)
+    assay = FactoryBot.create(:assay)
+    source_sample_type = FactoryBot.create(:isa_source_sample_type,
+                                           contributor: person,
+                                           project_ids: [project.id],
+                                           isa_template: Template.find_by_title('ISA Source'),
+                                           studies: [study])
+
+    sample_collection_sample_type = FactoryBot.create(:isa_sample_collection_sample_type,
+                                                      contributor: person,
+                                                      project_ids: [project.id],
+                                                      isa_template: Template.find_by_title('ISA sample collection'),
+                                                      studies: [study],
+                                                      linked_sample_type: source_sample_type)
+
+    assay_sample_type = FactoryBot.create(:isa_assay_sample_type,
+                                          contributor: person,
+                                          projects: [project],
+                                          linked_sample_type: sample_collection_sample_type
+                  )
+
+    { "id_label": id_label, "person": person, "project": project, "study": study, "assay": assay,
+      "source_sample_type": source_sample_type, "sample_collection_sample_type": sample_collection_sample_type,
+      "assay_sample_type": assay_sample_type }
+  end
 end
