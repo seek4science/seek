@@ -61,26 +61,6 @@ class FileTemplatesController < ApplicationController
     end
   end
 
-  def explore
-    #drop invalid explore params
-    [:page_rows, :page, :sheet].each do |param|
-      if params[param].present? && (params[param] =~ /\A\d+\Z/).nil?
-        params.delete(param)
-      end
-    end
-    if @file_template.contains_extractable_spreadsheet?
-      respond_to do |format|
-        format.html
-      end
-    else
-      respond_to do |format|
-        flash[:error] = 'Unable to view contents of this file template'
-        format.html { redirect_to file_template_path(@file_template,
-                                                     version: @file_template.version) }
-      end
-    end
-  end
-
   private
 
   def file_template_params

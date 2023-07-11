@@ -5,7 +5,7 @@ module Seek
         class MissingLinkedSampleTypeException < AttributeHandlerException; end
 
         def type
-          'Sample'
+          Sample
         end
 
         def test_value(value)

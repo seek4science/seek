@@ -58,6 +58,16 @@ FactoryBot.define do
   factory(:pdf_sop, parent: :sop) do
     association :content_blob, factory: :pdf_content_blob
   end
+
+  factory(:small_test_spreadsheet_sop, parent: :sop) do
+    association :content_blob, factory: :small_test_spreadsheet_content_blob
+  end
+  factory(:non_spreadsheet_sop, parent: :sop) do
+    association :content_blob, factory: :cronwright_model_content_blob
+  end
+  factory(:csv_spreadsheet_sop, parent: :sop) do
+    association :content_blob, factory: :csv_content_blob
+  end
   
   # A SOP that has been registered as a URI
   factory(:url_sop, parent: :sop) do

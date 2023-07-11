@@ -22,7 +22,7 @@
             <td><%= snapshots.count %></td>
             <td>
               <%= resources.count %>
-              (<%= ((resources.count / type_name.constantize.count.to_f) * 100).round(4) %>%)
+              (<%= ((resources.count / safe_class_lookup(type_name).count.to_f) * 100).round(4) %>%)
             </td>
           </tr>
       <% end %>

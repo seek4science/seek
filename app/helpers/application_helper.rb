@@ -418,24 +418,6 @@ module ApplicationHelper
     no_deletion_explanation_message(model_item.class).html_safe
   end
 
-  # returns a new instance of the string describing a resource type, or nil if it is not applicable
-  def instance_of_resource_type(resource_type)
-    resource = nil
-    begin
-      resource_class = resource_type.classify.constantize unless resource_type.nil?
-      resource = resource_class.send(:new) if !resource_class.nil? && resource_class.respond_to?(:new)
-    rescue NameError => e
-      logger.error("Unable to find constant for resource type #{resource_type}")
-    end
-    resource
-  end
-
-  # returns the class associated with the controller, e.g. DataFile for data_files
-  #
-  def klass_from_controller(c = controller_name)
-    c.singularize.camelize.constantize
-  end
-
   def cancel_button(path, html_options = {})
     html_options[:class] ||= ''
     html_options[:class] << ' btn btn-default'
@@ -472,7 +454,7 @@ module ApplicationHelper
   end
 
   def pending_project_creation_request?
-    return false unless logged_in_and_registered?   
+    return false unless logged_in_and_registered?
     ProjectCreationMessageLog.pending_requests.collect do |log|
       log.can_respond_project_creation_request?(User.current_user)
     end.any?

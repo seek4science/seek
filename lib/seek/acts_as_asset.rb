@@ -55,6 +55,8 @@ module Seek
 
         include Seek::ActsAsAsset::Searching
 
+        include Seek::Data::SpreadsheetExplorerRepresentation
+
         include Seek::ActsAsAsset::InstanceMethods
         include Seek::Search::BackgroundReindexing
         include Seek::Subscribable

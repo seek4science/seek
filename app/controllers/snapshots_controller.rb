@@ -88,7 +88,7 @@ class SnapshotsController < ApplicationController
 
   def find_resource # This is hacky :(
     resource, id = request.path.split('/')[1, 2]
-    @resource = resource.singularize.classify.constantize.find(id)
+    @resource = safe_class_lookup(resource.singularize.classify).find(id)
   end
 
   def auth_resource
