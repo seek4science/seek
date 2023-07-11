@@ -5,12 +5,6 @@ var NelsTree = {
     selectNelsTreeNode: function (nodeId) {
         $j('#' + nodeId + ' > a').click();
     },
-    bindNelsTreeNodeLinks: function () {
-        $j('[data-role="nels-tree-node-link"]').on('click', function () {
-            let nodeId = $j(this).data('tree-node-id');
-            NelsTree.selectNelsTreeNode(nodeId);
-        });
-    },
     showSubtype: function (projectId, datasetId, subtype, folder_path, assay_id = null) {
         $j('#nels-dataset').html('').spinner('add').show();
         $j('#nels-content').hide();
@@ -79,7 +73,7 @@ var NelsTree = {
             });
         });
     },
-    bind: function () {
+    bindTree: function () {
         $j('#nels-tree')
             .bind('loaded.jstree', function () {
             })
@@ -227,6 +221,12 @@ var NelsBrowser = {
     storeCurrentFileFolder: function (path) {
         sessionStorage.setItem('nels_folder_state', path);
     },
+    bindNelsTreeNodeLinks: function () {
+        $j('[data-role="nels-tree-node-link"]').on('click', function () {
+            let nodeId = $j(this).data('tree-node-id');
+            NelsTree.selectNelsTreeNode(nodeId);
+        });
+    },
     downloadFile: function (element) {
         var index = element.data('index');
         var json = JSON.parse($j('#file-items-json').html());
@@ -266,7 +266,7 @@ var NelsBrowser = {
     bindSubtypeEvents: function () {
 
         $j('.nels-folder').click(function () {
-            NelsBrowserEvents.fileFolderSelected($j(this));
+            NelsBrowser.fileFolderSelected($j(this));
         });
 
         $j('.nels-download-link').on('click', function () {
@@ -274,17 +274,13 @@ var NelsBrowser = {
         });
 
         $j('#create_folder').on('click', function () {
-
             $j('#create-folder-dialog').modal('show');
-
             return false;
         });
 
         $j('#create-folder-submit-button').on('click', function () {
             NelsBrowser.createFolder();
-
             return false;
-
         });
 
         $j('#upload-file-submit-button').on('click', function () {
@@ -294,11 +290,8 @@ var NelsBrowser = {
         $j('#upload_file').on('click', function () {
             // Show upload file form and populate the params as hidden fields
             $j('#upload-file').modal('show');
-
-
             return false;
         });
-
     },
     createFolder: function () {
         $j('#create-folder-dialog').modal('hide');
@@ -376,10 +369,7 @@ var NelsBrowser = {
         }
 
         return false;
-    }
-}
-
-var NelsBrowserEvents = {
+    },
     fileFolderSelected: function (element) {
         const folder_path = element.data('path');
         const projectId = element.data('project-id');
