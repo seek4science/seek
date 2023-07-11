@@ -377,5 +377,18 @@ var NelsBrowser = {
         const subtype = element.data('subtype');
         const assayId = element.data('assay-id');
         NelsTree.showSubtype(projectId, datasetId, subtype, folder_path, assayId);
+    },
+    validateMetadataFile: function () {
+        return validateResourceFields('DataFile', 'upload-metadata-file') && NelsBrowser.validateMetadataFileExtension('xlsx', 'upload-metadata-file');
+    },
+    validateMetadataFileExtension: function (extension, parentId = null) {
+        const files = $j(`#${parentId} input[type="file"][name="content_blobs[][data]"]`);
+        const filepath = files[0].value;
+        if (filepath.split(".").slice(-1) == extension) {
+            return true;
+        } else {
+            alert(`Please select a file of format ${extension}`);
+            return false;
+        }
     }
 }
