@@ -5,6 +5,7 @@ json.array! @datasets do |dataset|
   json.icon dataset['isLocked'] ? nels_locked_dataset_glyph : nels_dataset_glyph
   json.data do
     json.id dataset['id']
+    json.assay_id params[:assay_id]
     json.project_id params[:id]
     json.is_dataset true
   end
@@ -21,6 +22,7 @@ end
       json.project_id params[:id]
       json.dataset_id dataset['id']
       json.dataset_name dataset['name']
+      json.assay_id params[:assay_id]
       json.text subtype
       json.is_subtype true
     end

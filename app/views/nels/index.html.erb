@@ -25,6 +25,8 @@
   </div>
 </div>
 
+<%= hidden_field_tag :assay_id, params[:assay_id] %>
+
 <script type="text/javascript">
 
     function selectNelsTreeNode(nodeId) {
@@ -118,21 +120,21 @@
             'data' : {
               'url': function (node) {
                 if (node.id === '#') {
-                  return '<%= projects_nels_path() -%>';
+                  return '<%= projects_nels_path -%>';
                 } else {
-                  return '<%= datasets_nels_path(:assay_id=>params[:assay_id]) -%>';
+                  return '<%= datasets_nels_path -%>';
                 }
               },
               'data': function (node) {
                 if (node.id === '#') {
                   return { };
                 }
-                var d = { id: node.data.id };
-
-                if (node.data.project_id) {
-                  d.project_id = node.data.project_id
+                let data = { id: node.data.id };
+                if ($j('#assay_id').val()) {
+                    data.assay_id = $j('#assay_id').val()
                 }
-                if (d) return d;
+                return data;
+
               },
               'error': function (error) {
                 $j('#nels-dataset').hide();
@@ -161,7 +163,7 @@
           //folder_path = sessionStorage.getItem('nels_folder_state');
           folder_path = `Storebioinfo/${project_name}/${data.node.data.dataset_name}/${data.node.data.text}/`;
 
-          showSubtype(data.node.data.project_id, data.node.data.dataset_id, data.node.data.text, folder_path, '<%= params[:assay_id] %>');
+          showSubtype(data.node.data.project_id, data.node.data.dataset_id, data.node.data.text, folder_path, data.node.data.assay_id);
 
         } else if (data.node.data.is_dataset) {// dataset selected
           $j('#nels-dataset').html('').spinner('add').show();
@@ -170,12 +172,15 @@
           // Save current state
             saveLastSelectedNode(data.node.data.project_id, data.node.data.id );
 
-
-          $j.ajax({ url: '<%= dataset_nels_path(:assay_id=>params[:assay_id]) -%>',
-            data: {
+          const ajaxData = {
               project_id: data.node.data.project_id,
-              dataset_id: data.node.data.id,
-            },
+              dataset_id: data.node.data.id
+          }
+          if (data.node.data.assay_id) {
+              ajaxData.assay_id = data.node.data.assay_id;
+          }
+          $j.ajax({ url: '<%= dataset_nels_path %>',
+            data: ajaxData,
             success: function (data) {
               $j('#nels-dataset').html(data).spinner('remove');
             }
@@ -187,7 +192,7 @@
             // Save current state
             saveLastSelectedNode(data.node.data.id);
 
-          $j.ajax({ url: '<%= project_nels_path() -%>',
+          $j.ajax({ url: '<%= project_nels_path %>',
             data: {
               project: data.node.data,
             },
