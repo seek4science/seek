@@ -7,7 +7,7 @@
       <%= text_field_tag :new_folder, '', class:'form-control' %>
       <%= hidden_field_tag :project_id, project_id %>
       <%= hidden_field_tag :dataset_id, dataset_id %>
-      <%= hidden_field_tag :assay_id, params[:assay_id] %>
+      <%= hidden_field_tag :assay_id, params[:assay_id] if params[:assay_id] %>
       <%= hidden_field_tag :subtype_name, subtype_name %>
       <!-- will be replaced with api response -->
       <%= hidden_field_tag :file_path, path %>
@@ -27,57 +27,3 @@
   <% end %>
 <% end %>
 
-<script>
-    $j(document).ready(function () {
-        $j('#create_folder').on('click', function () {
-
-            $j('#create-folder-dialog').modal('show');
-
-            return false;
-        });
-
-        $j('#create-folder-submit-button').on('click', function(){
-            let valid = true;//validateResourceFields('data','upload-file');
-            if (valid) {
-                $j('#create-folder-dialog').modal('hide');
-                $j('#create-folder-spinner').modal('show');
-                let data = new FormData($j('#create-folder-form')[0]);
-                $j.ajax({
-                    url: '<%= create_folder_nels_path() %>',
-                    data: data,
-                    cache: false,
-                    contentType: false,
-                    processData: false,
-                    method: 'POST',
-                    success: function (result) {
-                        const projectId = data.get('project_id');
-                        const datasetId = data.get('dataset_id');
-                        const subtype = data.get('subtype_name');
-                        const folder_path = data.get('file_path');
-                        const assayId = data.get('assay_id');
-                        $j('#create-folder-spinner').modal('hide');
-                        showSubtype(projectId, datasetId, subtype, folder_path, assayId);
-                    },
-                    error: function (request, status, error) {
-                        $j('#create-folder-spinner').modal('hide');
-                        // not acceptable
-                        if (request.status == 406) {
-                            const msg = request.responseJSON['error'];
-                            alert(msg);
-                        }
-                        else {
-                            const exception = request.responseJSON['exception'];
-                            alert('Something went wrong interacting with NeLS, please try again later. (' + exception + ')');
-                        }
-                    },
-                    complete: function (data) {
-                        $j('#create-folder-spinner').modal('hide');
-                    }
-                });
-            }
-
-            return false;
-
-        });
-    });
-</script>

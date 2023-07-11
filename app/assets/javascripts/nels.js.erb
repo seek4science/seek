@@ -222,3 +222,170 @@ var NelsTreeEvents = {
         });
     }
 }
+
+var NelsBrowser = {
+    storeCurrentFileFolder: function (path) {
+        sessionStorage.setItem('nels_folder_state', path);
+    },
+    downloadFile: function (element) {
+        var index = element.data('index');
+        var json = JSON.parse($j('#file-items-json').html());
+        json = json[index];
+        element.spinner('add');
+        $j.ajax({
+            url: '<%= download_file_nels_path() %>',
+            data: {
+                project_id: json['project_id'],
+                dataset_id: json['dataset_id'],
+                dataset_name: json['dataset_name'],
+                project_name: json['project_name'],
+                subtype_name: json['subtype_name'],
+                path: json['path'],
+                filename: json['filename']
+            },
+            success: function (data) {
+                let download_url = `<%= fetch_file_nels_path %>`;
+                download_url = download_url + '?' + $j.param(data)
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = download_url;
+                a.download = data['filename'];
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            },
+            error: function (request, status, error) {
+                let exception = request.responseJSON['exception'];
+                alert('Something went wrong interacting with NeLS, please try again later. (' + exception + ')');
+            },
+            complete: function (data) {
+                element.spinner('remove');
+            }
+        });
+    },
+    bindSubtypeEvents: function () {
+
+        $j('.nels-folder').click(function () {
+            NelsBrowserEvents.fileFolderSelected($j(this));
+        });
+
+        $j('.nels-download-link').on('click', function () {
+            NelsBrowser.downloadFile($j(this));
+        });
+
+        $j('#create_folder').on('click', function () {
+
+            $j('#create-folder-dialog').modal('show');
+
+            return false;
+        });
+
+        $j('#create-folder-submit-button').on('click', function () {
+            NelsBrowser.createFolder();
+
+            return false;
+
+        });
+
+        $j('#upload-file-submit-button').on('click', function () {
+            NelsBrowser.uploadFile();
+        });
+
+        $j('#upload_file').on('click', function () {
+            // Show upload file form and populate the params as hidden fields
+            $j('#upload-file').modal('show');
+
+
+            return false;
+        });
+
+    },
+    createFolder: function () {
+        $j('#create-folder-dialog').modal('hide');
+        $j('#create-folder-spinner').modal('show');
+        let data = new FormData($j('#create-folder-form')[0]);
+        $j.ajax({
+            url: '<%= create_folder_nels_path() %>',
+            data: data,
+            cache: false,
+            contentType: false,
+            processData: false,
+            method: 'POST',
+            success: function (result) {
+                const projectId = data.get('project_id');
+                const datasetId = data.get('dataset_id');
+                const subtype = data.get('subtype_name');
+                const folder_path = data.get('file_path');
+                const assayId = data.get('assay_id');
+                $j('#create-folder-spinner').modal('hide');
+                NelsTree.showSubtype(projectId, datasetId, subtype, folder_path, assayId);
+            },
+            error: function (request, status, error) {
+                $j('#create-folder-spinner').modal('hide');
+                // not acceptable
+                if (request.status == 406) {
+                    const msg = request.responseJSON['error'];
+                    alert(msg);
+                } else {
+                    const exception = request.responseJSON['exception'];
+                    alert('Something went wrong interacting with NeLS, please try again later. (' + exception + ')');
+                }
+            },
+            complete: function (data) {
+                $j('#create-folder-spinner').modal('hide');
+            }
+        });
+    },
+    uploadFile: function () {
+        let valid = validateResourceFields('data', 'upload-file');
+        if (valid) {
+            $j('#upload-file').modal('hide');
+            $j('#upload-spinner').modal('show');
+            let data = new FormData($j('#upload-file-form')[0]);
+            $j.ajax({
+                url: '<%= upload_file_nels_path() %>',
+                data: data,
+                cache: false,
+                contentType: false,
+                processData: false,
+                method: 'POST',
+                success: function (result) {
+                    const projectId = data.get('project_id');
+                    const datasetId = data.get('dataset_id');
+                    const subtype = data.get('subtype_name');
+                    const folder_path = data.get('file_path');
+                    const assayId = data.get('assay_id');
+                    $j('#upload-spinner').modal('hide');
+                    NelsTree.showSubtype(projectId, datasetId, subtype, folder_path, assayId);
+                },
+                error: function (request, status, error) {
+                    $j('#upload-spinner').modal('hide');
+                    // not acceptable
+                    if (request.status == 406) {
+                        const msg = request.responseJSON['error'];
+                        alert(msg);
+                    } else {
+                        const exception = request.responseJSON['exception'];
+                        alert('Something went wrong interacting with NeLS, please try again later. (' + exception + ')');
+                    }
+                },
+                complete: function (data) {
+                    $j('#upload-spinner').modal('hide');
+                }
+            });
+        }
+
+        return false;
+    }
+}
+
+var NelsBrowserEvents = {
+    fileFolderSelected: function (element) {
+        const folder_path = element.data('path');
+        const projectId = element.data('project-id');
+        const datasetId = element.data('dataset-id');
+        const subtype = element.data('subtype');
+        const assayId = element.data('assay-id');
+        NelsTree.showSubtype(projectId, datasetId, subtype, folder_path, assayId);
+    }
+}

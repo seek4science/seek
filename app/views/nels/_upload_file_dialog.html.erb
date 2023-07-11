@@ -7,7 +7,7 @@
 
       <%= hidden_field_tag :project_id, project_id %>
       <%= hidden_field_tag :dataset_id, dataset_id %>
-      <%= hidden_field_tag :assay_id, params[:assay_id] %>
+      <%= hidden_field_tag :assay_id, params[:assay_id] if params[:assay_id] %>
       <%= hidden_field_tag :subtype_name, subtype_name %>
       <%= hidden_field_tag :file_path, path %>
 
@@ -30,58 +30,6 @@
 
 <script>
   $j(document).ready(function () {
-
-      $j('#upload-file-submit-button').on('click', function(){
-          let valid = validateResourceFields('data','upload-file');
-          if (valid) {
-              $j('#upload-file').modal('hide');
-              $j('#upload-spinner').modal('show');
-              let data = new FormData($j('#upload-file-form')[0]);
-              $j.ajax({
-                  url: '<%= upload_file_nels_path() %>',
-                  data: data,
-                  cache: false,
-                  contentType: false,
-                  processData: false,
-                  method: 'POST',
-                  success: function (result) {
-                      const projectId = data.get('project_id');
-                      const datasetId = data.get('dataset_id');
-                      const subtype = data.get('subtype_name');
-                      const folder_path = data.get('file_path');
-                      const assayId = data.get('assay_id');
-                      $j('#upload-spinner').modal('hide');
-                      NelsTree.showSubtype(projectId, datasetId, subtype, folder_path, assayId);
-                  },
-                  error: function (request, status, error) {
-                      $j('#upload-spinner').modal('hide');
-                      // not acceptable
-                      if (request.status == 406) {
-                          const msg = request.responseJSON['error'];
-                          alert(msg);
-                      }
-                      else {
-                          const exception = request.responseJSON['exception'];
-                          alert('Something went wrong interacting with NeLS, please try again later. (' + exception + ')');
-                      }
-                  },
-                  complete: function (data) {
-                      $j('#upload-spinner').modal('hide');
-                  }
-              });
-          }
-
-          return false;
-
-      });
-
-      $j('#upload_file').on('click', function () {
-          // Show upload file form and populate the params as hidden fields
-          $j('#upload-file').modal('show');
-
-
-          return false;
-      });
 
   });
 </script>

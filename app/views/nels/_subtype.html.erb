@@ -56,63 +56,19 @@ table, th, td {
 
 <script type="text/javascript">
 
-  $j(document).ready(function () {
+    $j(document).ready(function () {
 
-    bindTooltips('#nels-browser');
+        bindTooltips('#nels-browser');
 
-    sessionStorage.setItem('nels_folder_state','<%= @path %>')
+        NelsBrowser.storeCurrentFileFolder('<%= @path %>');
 
-    $j('#register-nels-metadata-button').click(function() {
-        $j('#register-nels-metadata').submit();
-    })
+        $j('#register-nels-metadata-button').click(function () {
+            $j('#register-nels-metadata').submit();
+        })
 
-      $j('.nels-folder').click(function() {
-          const folder_path = $j(this).data('path');
-          const projectId = $j(this).data('project-id');
-          const datasetId = $j(this).data('dataset-id');
-          const subtype = $j(this).data('subtype');
-          const assayId = $j(this).data('assay-id');
-          NelsTree.showSubtype(projectId, datasetId, subtype, folder_path, assayId);
-      });
+        NelsBrowser.bindSubtypeEvents();
 
-    $j('.nels-download-link').on('click', function () {
-          var index = $j(this).data('index');
-          var json = JSON.parse($j('#file-items-json').html());
-          json = json[index];
-          var element = $j(this);
-          element.spinner('add');
-          $j.ajax({
-              url: '<%= download_file_nels_path() %>',
-              data: {
-                  project_id: json['project_id'],
-                  dataset_id: json['dataset_id'],
-                  dataset_name: json['dataset_name'],
-                  project_name: json['project_name'],
-                  subtype_name: json['subtype_name'],
-                  path: json['path'],
-                  filename: json['filename']
-              },
-              success: function (data) {
-                  let download_url = `<%= fetch_file_nels_path %>`;
-                  download_url = download_url + '?' + $j.param(data)
-                  const a = document.createElement('a');
-                  a.style.display = 'none';
-                  a.href = download_url;
-                  a.download = data['filename'];
-                  document.body.appendChild(a);
-                  a.click();
-                  document.body.removeChild(a);
-              },
-              error: function(request, status, error) {
-                  let exception = request.responseJSON['exception'];
-                  alert('Something went wrong interacting with NeLS, please try again later. ('+exception+')');
-              },
-              complete: function(data) {
-                  element.spinner('remove');
-              }
-          });
-      });
+        NelsTree.bindNelsTreeNodeLinks();
+    });
 
-      NelsTree.bindNelsTreeNodeLinks();
-  });
 </script>
