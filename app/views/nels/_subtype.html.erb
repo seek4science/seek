@@ -72,7 +72,7 @@ table, th, td {
           const datasetId = $j(this).data('dataset-id');
           const subtype = $j(this).data('subtype');
           const assayId = $j(this).data('assay-id');
-          showSubtype(projectId, datasetId, subtype, folder_path, assayId);
+          NelsTree.showSubtype(projectId, datasetId, subtype, folder_path, assayId);
       });
 
     $j('.nels-download-link').on('click', function () {
@@ -113,6 +113,6 @@ table, th, td {
           });
       });
 
-      bindNelsTreeNodeLinks();
+      NelsTree.bindNelsTreeNodeLinks();
   });
 </script>

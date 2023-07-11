@@ -51,7 +51,7 @@
                       const folder_path = data.get('file_path');
                       const assayId = data.get('assay_id');
                       $j('#upload-spinner').modal('hide');
-                      showSubtype(projectId, datasetId, subtype, folder_path, assayId);
+                      NelsTree.showSubtype(projectId, datasetId, subtype, folder_path, assayId);
                   },
                   error: function (request, status, error) {
                       $j('#upload-spinner').modal('hide');
