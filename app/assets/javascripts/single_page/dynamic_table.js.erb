@@ -207,8 +207,8 @@ const handleSelect = (e) => {
           .split(splitter)
           .filter((x) => x)
           .map((r) => {
-            // Preserve row status and id
-            let splitted = [rowStatus.new, ""].concat(r.split(delimeter));
+            // Preserve row status, id and uuid
+            let splitted = [rowStatus.new, "", ""].concat(r.split(delimeter));
             const missingColsCount = colsCount - defaultCols.length - splitted.length;
             splitted = _defaultCols.concat(splitted);
 
