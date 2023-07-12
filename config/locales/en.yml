@@ -243,6 +243,7 @@ en:
   maturity_level:
     released: 'Stable'
     work_in_progress: 'Work-in-progress'
+    deprecated: 'Deprecated'
   test_status:
     all_passing: 'Passing'
     some_passing: 'Some failures'

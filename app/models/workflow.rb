@@ -206,7 +206,8 @@ class Workflow < ApplicationRecord
 
   MATURITY_LEVELS = {
       0 => :work_in_progress,
-      1 => :released
+      1 => :released,
+      2 => :deprecated
   }
   MATURITY_LEVELS_INV = MATURITY_LEVELS.invert
 
