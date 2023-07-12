@@ -35,10 +35,14 @@ $j(document).ready(function () {
                         var groups = {};
                         node.data.childAnnotations.forEach(function(annotation) {
                             if (!groups[annotation.key]) {
+                                // Don't include `count` when only one single annotation.
                                 groups[annotation.key] = { key: annotation.key, label: annotation.label };
-                                groups[annotation.key].count = 0;
+                            } else {
+                                if (!groups[annotation.key].count) {
+                                  groups[annotation.key].count = 1;
+                                }
+                                groups[annotation.key].count++;
                             }
-                            groups[annotation.key].count++;
                         });
                         for (var key in groups) {
                             if (groups.hasOwnProperty(key)) {
