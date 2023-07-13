@@ -1,6 +1,6 @@
 <% environment.context_class.instance_eval { include Seek::Util.routes } %>
 
-var NelsTree = {
+const NelsTree = {
 
     selectNelsTreeNode: function (nodeId) {
         $j('#' + nodeId + ' > a').click();
@@ -9,7 +9,7 @@ var NelsTree = {
         $j('#nels-dataset').html('').spinner('add').show();
         $j('#nels-content').hide();
 
-        let data = {
+        const data = {
             project_id: projectId,
             dataset_id: datasetId,
             subtype: subtype,
@@ -41,7 +41,7 @@ var NelsTree = {
     reopenLastSelectedNode: function () {
         // Reopen the tree at previous existing location
         if (sessionStorage.getItem("nels_tree_state")) {
-            let path = sessionStorage.getItem("nels_tree_state").split(',')
+            const path = sessionStorage.getItem("nels_tree_state").split(',')
 
             // // Open all nodes except the last one
             path.slice(0, path.length - 1).forEach(element => {
@@ -93,7 +93,7 @@ var NelsTree = {
                             if (node.id === '#') {
                                 return {};
                             }
-                            let data = {id: node.data.id};
+                            const data = {id: node.data.id};
                             if ($j('#assay_id').val()) {
                                 data.assay_id = $j('#assay_id').val()
                             }
@@ -123,7 +123,7 @@ var NelsTree = {
 
 }
 
-var NelsTreeEvents = {
+const NelsTreeEvents = {
     nodeActivated: function (data) {
         if (data.node.data.is_subtype) {// subtype selected
             NelsTreeEvents.subTypeSelected(data);
@@ -149,7 +149,7 @@ var NelsTreeEvents = {
         if (data.node.data.is_dataset) {// dataset selected
             // open this node and collapse siblings
             data.instance.open_node(data.node);
-            let siblings = data.instance.get_node(data.node.parent).children;
+            const siblings = data.instance.get_node(data.node.parent).children;
             $j(siblings).each(function (index, node) {
                 if (node != data.node.id) {
                     data.instance.close_node(node);
@@ -217,20 +217,19 @@ var NelsTreeEvents = {
     }
 }
 
-var NelsBrowser = {
+const NelsBrowser = {
     storeCurrentFileFolder: function (path) {
         sessionStorage.setItem('nels_folder_state', path);
     },
     bindNelsTreeNodeLinks: function () {
         $j('[data-role="nels-tree-node-link"]').on('click', function () {
-            let nodeId = $j(this).data('tree-node-id');
+            const nodeId = $j(this).data('tree-node-id');
             NelsTree.selectNelsTreeNode(nodeId);
         });
     },
     downloadFile: function (element) {
-        var index = element.data('index');
-        var json = JSON.parse($j('#file-items-json').html());
-        json = json[index];
+        const index = element.data('index');
+        const json = JSON.parse($j('#file-items-json').html())[index];
         element.spinner('add');
         $j.ajax({
             url: '<%= download_file_nels_path() %>',
@@ -255,7 +254,7 @@ var NelsBrowser = {
                 document.body.removeChild(a);
             },
             error: function (request, status, error) {
-                let exception = request.responseJSON['exception'];
+                const exception = request.responseJSON['exception'];
                 alert('Something went wrong interacting with NeLS, please try again later. (' + exception + ')');
             },
             complete: function (data) {
@@ -296,7 +295,7 @@ var NelsBrowser = {
     createFolder: function () {
         $j('#create-folder-dialog').modal('hide');
         $j('#create-folder-spinner').modal('show');
-        let data = new FormData($j('#create-folder-form')[0]);
+        const data = new FormData($j('#create-folder-form')[0]);
         $j.ajax({
             url: '<%= create_folder_nels_path() %>',
             data: data,
@@ -330,11 +329,11 @@ var NelsBrowser = {
         });
     },
     uploadFile: function () {
-        let valid = validateResourceFields('data', 'upload-file');
+        const valid = validateResourceFields('data', 'upload-file');
         if (valid) {
             $j('#upload-file').modal('hide');
             $j('#upload-spinner').modal('show');
-            let data = new FormData($j('#upload-file-form')[0]);
+            const data = new FormData($j('#upload-file-form')[0]);
             $j.ajax({
                 url: '<%= upload_file_nels_path() %>',
                 data: data,
