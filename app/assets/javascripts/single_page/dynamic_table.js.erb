@@ -235,7 +235,7 @@ const handleSelect = (e) => {
       } catch (error) {
         if (error instanceof TypeError && navigator.userAgent.toLowerCase().includes('firefox')){
           if(confirm('Your Firefox browser might not support clipboard access. By clicking OK, you\'ll be redirected to the official documentation.')){
-            window.open("https://developer.mozilla.org/en-US/docs/Web/API/Clipboard_API", "_blank");
+            window.open("<%= Seek::Help::HelpDictionary.instance.help_link(:clipboard_api_mozilla) %>", "_blank");
           }
         }
         console.log('An error occurred:', error);
