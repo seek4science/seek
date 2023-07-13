@@ -249,12 +249,19 @@ class SinglePagesController < ApplicationController
           break
         end
       end
-      @new_samples.append(nes) unless is_duplicate
+      if @db_samples.none?
+        @new_samples.append(nes)
+      else
+        @new_samples.append(nes) unless is_duplicate
+      end
     end
 
     upload_data = { study: @study,
                     assay: @assay,
                     sampleType: @sample_type,
+                    excel_samples: excel_samples,
+                    existingExcelSamples: existing_excel_samples,
+                    newExcelSamples: new_excel_samples,
                     updateSamples: @update_samples,
                     newSamples: @new_samples,
                     possibleDuplicates: @possible_duplicates,
@@ -267,7 +274,11 @@ class SinglePagesController < ApplicationController
     end
   rescue StandardError => e
     flash[:error] = e.message
-    redirect_to single_page_path(@project), status: :bad_request
+    respond_to do |format|
+      format.html { redirect_to single_page_path(@project), status: :bad_request }
+      format.json { render json: { error: e }, status: :bad_request }
+    end
+
 end
 
   private
