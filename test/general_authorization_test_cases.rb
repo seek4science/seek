@@ -83,6 +83,7 @@ module GeneralAuthorizationTestCases
   end
 
   def check_publish_menu_for_type(type)
+
     gatekeeper = FactoryBot.create(:asset_gatekeeper)
     policy = FactoryBot.create(:policy, access_type: Policy::NO_ACCESS, permissions: [FactoryBot.create(:permission)])
     publishable = FactoryBot.create(type.to_sym, project_ids: gatekeeper.projects.collect(&:id), policy: policy)
@@ -99,7 +100,7 @@ module GeneralAuthorizationTestCases
     get :show, params: { id: published.id }
     assert_response :success
     assert_select 'ul#item-admin-menu' do
-      assert_select 'li > a', text: /ublish/, count: 0
+      assert_select 'li > a', text: /publish/, count: 0
     end
 
     # Publish button not available if cannot manage
@@ -108,7 +109,7 @@ module GeneralAuthorizationTestCases
     get :show, params: { id: published.id }
     assert_response :success
     assert_select 'ul#item-admin-menu' do
-      assert_select 'li > a', text: /ublish/, count: 0
+      assert_select 'li > a', text: /publish/, count: 0
     end
 
     # Publish and cancel publishing request buttons for manageable items
@@ -123,6 +124,18 @@ module GeneralAuthorizationTestCases
       assert_select 'li > a[href=?]', send("check_related_items_#{type}_path", publishable), text: /Publish/, count: 1
     end
 
+    ## Cancel publishing request button not available if neither waiting approval or rejected
+    refute publishable.is_waiting_approval?
+    refute publishable.is_rejected?
+    get :show, params: { id: publishable.id }
+    assert_response :success
+
+    assert_select 'li > a[href=?]', cancel_publishing_request_person_path(person,
+                                         { asset_id: publishable.id, asset_class: publishable.class, from_asset: true }),
+                  text: /Cancel publishing request/, count: 0
+    assert_select 'li > a', text: /publish/, count: 0
+
+
     ## Cancel publishing request button available if waiting approval
     ResourcePublishLog.add_log ResourcePublishLog::WAITING_FOR_APPROVAL, publishable
     publishable.reload
@@ -130,10 +143,10 @@ module GeneralAuthorizationTestCases
     get :show, params: { id: publishable.id }
     assert_response :success
     assert_select 'ul#item-admin-menu' do
-      assert_select 'li > a[href=?]', send('cancel_publishing_request_person_path', person,
+      assert_select 'li > a[href=?]', cancel_publishing_request_person_path(person,
       { asset_id: publishable.id, asset_class: publishable.class, from_asset: true }),
       text: /Cancel publishing request/, count: 1
-      assert_select 'li > a', text: /ublish/, count: 1
+      assert_select 'li > a', text: /publish/, count: 1
     end
 
     ## Cancel publishing request button available if rejected
@@ -143,10 +156,39 @@ module GeneralAuthorizationTestCases
     get :show, params: { id: publishable.id }
     assert_response :success
     assert_select 'ul#item-admin-menu' do
-      assert_select 'li > a[href=?]', send('cancel_publishing_request_person_path', person,
+      assert_select 'li > a[href=?]', cancel_publishing_request_person_path(person,
       { asset_id: publishable.id, asset_class: publishable.class, from_asset: true }),
       text: /Cancel publishing request/, count: 1
-      assert_select 'li > a', text: /ublish/, count: 1
+      assert_select 'li > a', text: /publish/, count: 1
     end
+
+    ## Cancel publishing request not available if cannot manage
+    other_person = FactoryBot.create(:person)
+    publishable.policy.update_column(:access_type, Policy::VISIBLE)
+    login_as(other_person)
+    refute publishable.can_manage?
+    assert publishable.can_view?
+    assert publishable.is_rejected?
+    get :show, params: { id: publishable.id }
+    assert_response :success
+
+    assert_select 'li > a[href=?]', cancel_publishing_request_person_path(person,
+                                         { asset_id: publishable.id, asset_class: publishable.class, from_asset: true }),
+                  text: /Cancel publishing request/, count: 0
+    assert_select 'li > a', text: /publish/, count: 0
+
+
+    ## Cancel publishing request not available if logged out
+    logout
+    refute publishable.can_manage?
+    assert publishable.is_rejected?
+    get :show, params: { id: publishable.id }
+    assert_response :success
+
+    assert_select 'li > a[href=?]', cancel_publishing_request_person_path(person,
+                                         { asset_id: publishable.id, asset_class: publishable.class, from_asset: true }),
+                  text: /Cancel publishing request/, count: 0
+    assert_select 'li > a', text: /publish/, count: 0
+
   end
 end
