@@ -195,7 +195,7 @@ class ApplicationController < ActionController::Base
   # handles finding an asset, and responding when it cannot be found. If it can be found the item instance is set (e.g. @project for projects_controller)
   def find_requested_item
     name = controller_name.singularize
-    object = name.camelize.constantize.find_by_id(params[:id])
+    object = controller_model.find_by_id(params[:id])
     if object.nil?
       respond_to do |format|
         flash[:error] = "The #{name.humanize} does not exist!"
@@ -573,7 +573,7 @@ class ApplicationController < ActionController::Base
     parent_id_param = request.path_parameters.keys.detect { |k| k.to_s.end_with?('_id') }
     if parent_id_param
       parent_type = parent_id_param.to_s.chomp('_id')
-      parent_class = parent_type.camelize.constantize
+      parent_class = safe_class_lookup(parent_type.camelize)
       if parent_class
         @parent_resource = parent_class.find(params[parent_id_param])
       end
@@ -670,5 +670,9 @@ class ApplicationController < ActionController::Base
     ]
   end
 
+  def safe_class_lookup(class_name, raise: true)
+    Seek::Util.lookup_class(class_name, raise: raise)
+  end
 
+  helper_method :safe_class_lookup
 end

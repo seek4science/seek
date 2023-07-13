@@ -28,6 +28,8 @@ module Git
 
     include Git::Operations
     include Seek::UrlValidation
+    acts_as_favouritable
+
 
     alias_method :parent, :resource # ExplicitVersioning compatibility
 

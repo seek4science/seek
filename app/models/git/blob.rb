@@ -26,8 +26,8 @@ module Git
       git_version.remote_sources[path]
     end
 
-    def file
-      @file ||= to_tempfile
+    def file(fetch_remote: false)
+      @file ||= to_tempfile(fetch_remote: fetch_remote)
     end
 
     def binread
@@ -134,10 +134,10 @@ module Git
 
     private
 
-    def to_tempfile
+    def to_tempfile(fetch_remote: false)
       f = Tempfile.new(path)
       f.binmode if binary?
-      f << file_contents(as_text: !binary?)
+      f << file_contents(as_text: !binary?, fetch_remote: fetch_remote)
       f.rewind
       f
     end

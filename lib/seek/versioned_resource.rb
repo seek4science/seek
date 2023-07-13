@@ -27,6 +27,8 @@ module Seek #:nodoc:
         include Seek::VersionedResource::InstanceMethods
         include Seek::Permissions::SpecialContributors
 
+        include Seek::Data::SpreadsheetExplorerRepresentation
+
         delegate :tag_counts, :managers, :attributions, :creators, :assets_creators, :is_asset?,
                  :authorization_supported?, :defines_own_avatar?, :use_mime_type_for_avatar?, :avatar_key,
                  :show_contributor_avatars?, :can_see_hidden_item?, :related_people, to: :parent

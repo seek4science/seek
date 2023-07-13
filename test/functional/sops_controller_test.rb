@@ -768,6 +768,82 @@ class SopsControllerTest < ActionController::TestCase
     Seek::Config.pdf_conversion_enabled = tmp
   end
 
+  test 'show explore button' do
+    sop = FactoryBot.create(:small_test_spreadsheet_sop)
+    login_as(sop.contributor.user)
+    get :show, params: { id: sop }
+    assert_response :success
+    assert_select '#buttons' do
+      assert_select 'a[href=?]', explore_sop_path(sop, version: sop.version), count: 1
+      assert_select 'a.disabled', text: 'Explore', count: 0
+    end
+  end
+
+  test 'not show explore button if spreadsheet not supported' do
+    sop = FactoryBot.create(:non_spreadsheet_sop)
+    login_as(sop.contributor.user)
+    with_config_value(:max_extractable_spreadsheet_size, 0) do
+      get :show, params: { id: sop }
+    end
+    assert_response :success
+    assert_select '#buttons' do
+      assert_select 'a[href=?]', explore_sop_path(sop, version: sop.version), count: 0
+      assert_select 'a', text: 'Explore', count: 0
+    end
+  end
+
+  test 'show disabled explore button if spreadsheet too big' do
+    sop = FactoryBot.create(:small_test_spreadsheet_sop)
+    login_as(sop.contributor.user)
+    with_config_value(:max_extractable_spreadsheet_size, 0) do
+      get :show, params: { id: sop }
+    end
+    assert_response :success
+    assert_select '#buttons' do
+      assert_select 'a[href=?]', explore_sop_path(sop, version: sop.version), count: 0
+      assert_select 'a.disabled', text: 'Explore', count: 1
+    end
+  end
+
+  test 'explore latest version' do
+    data = FactoryBot.create :small_test_spreadsheet_sop, policy: FactoryBot.create(:public_policy)
+    get :explore, params: { id: data }
+    assert_response :success
+  end
+
+  test 'explore earlier version' do
+    sop = FactoryBot.create(:small_test_spreadsheet_sop)
+    login_as(sop.contributor.user)
+    assert sop.save_as_new_version('no comment')
+    FactoryBot.create(:pdf_content_blob, asset_version: sop.version, asset: sop)
+    sop.reload
+    assert_equal 2, sop.versions.count
+    assert sop.find_version(1).content_blob.is_extractable_excel?
+    refute sop.find_version(2).content_blob.is_extractable_excel?
+    get :explore, params: { id: sop, version: 1 }
+    assert_response :success
+  end
+
+  test 'gracefully handles explore with no spreadsheet' do
+    sop = FactoryBot.create(:sop, version: 1)
+    login_as(sop.contributor)
+    get :explore, params: { id: sop, version: 1 }
+    assert_redirected_to sop_path(sop, version: 1)
+    assert flash[:error]
+  end
+
+  test 'gracefully handles explore with invalid mime type' do
+    sop = FactoryBot.create(:csv_spreadsheet_sop, policy: FactoryBot.create(:public_policy))
+    sop.content_blob.update_column(:content_type, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    # incorrectly thinks it's excel
+    assert sop.content_blob.is_excel?
+    # check mime type cannot be resolved, otherwise it will autofix without error
+    assert_nil sop.content_blob.send(:mime_magic_content_type)
+    get :explore, params: { id: sop, version: 1 }
+    assert_redirected_to sop_path(sop, version: 1)
+    assert flash[:error]
+  end
+
   test 'duplicated logs are NOT created by uploading new version' do
     sop, blob = valid_sop
     assert_difference('ActivityLog.count', 1) do

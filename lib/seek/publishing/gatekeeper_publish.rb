@@ -94,7 +94,7 @@ module Seek
         return if param.nil?
 
         param.keys.each do |asset_class|
-          klass = asset_class.constantize
+          klass = safe_class_lookup(asset_class)
           param[asset_class].keys.each do |id|
             asset = klass.find_by_id(id)
             decision = param[asset_class][id]['decision']

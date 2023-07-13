@@ -3360,23 +3360,27 @@ class DataFilesControllerTest < ActionController::TestCase
         end
       end
     end
-
-    assert (df = assigns(:data_file))
+    df = assigns(:data_file)
+    assert df
     assert_equal Policy::PRIVATE, df.policy.access_type
     assert_equal 2, df.policy.permissions.count
-    assert_equal manager, df.policy.permissions[0].contributor
-    assert_equal Policy::MANAGING, df.policy.permissions[0].access_type
-    assert_equal other_project, df.policy.permissions[1].contributor
-    assert_equal Policy::VISIBLE, df.policy.permissions[1].access_type
+    manager_perm = df.policy.permissions.detect { |p| p.contributor == manager }
+    assert manager_perm
+    assert_equal Policy::MANAGING, manager_perm.access_type
+    other_project_perm = df.policy.permissions.detect { |p| p.contributor == other_project }
+    assert other_project_perm
+    assert_equal Policy::VISIBLE, other_project_perm.access_type
 
     assay = df.assays.first
     refute_equal df.policy.id, assay.policy.id
     assert_equal Policy::PRIVATE, assay.policy.access_type
     assert_equal 2, assay.policy.permissions.count
-    assert_equal manager, assay.policy.permissions[0].contributor
-    assert_equal Policy::MANAGING, assay.policy.permissions[0].access_type
-    assert_equal other_project, assay.policy.permissions[1].contributor
-    assert_equal Policy::VISIBLE, assay.policy.permissions[1].access_type
+    manager_perm = assay.policy.permissions.detect { |p| p.contributor == manager }
+    assert manager_perm
+    assert_equal Policy::MANAGING, manager_perm.access_type
+    other_project_perm = assay.policy.permissions.detect { |p| p.contributor == other_project }
+    assert other_project_perm
+    assert_equal Policy::VISIBLE, other_project_perm.access_type
   end
 
   test 'create metadata with new assay fails if study not editable' do

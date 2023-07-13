@@ -67,6 +67,11 @@ SEEK::Application.routes.draw do
     end
   end
 
+  concern :explorable_spreadsheet do
+    member do
+      get :explore
+    end
+  end
   concern :has_versions do
     member do
       post :create_version
@@ -462,7 +467,7 @@ SEEK::Application.routes.draw do
 
   ### ASSETS ###
 
-  resources :data_files, concerns: [:has_content_blobs, :has_versions, :has_doi, :publishable, :asset] do
+  resources :data_files, concerns: [:has_content_blobs, :has_versions, :has_doi, :publishable, :asset, :explorable_spreadsheet] do
     collection do
       get :filter
       get :provide_metadata
@@ -471,7 +476,6 @@ SEEK::Application.routes.draw do
       post :create_metadata
     end
     member do
-      get :explore
       get :samples_table
       get :select_sample_type
       get :confirm_extraction
@@ -503,7 +507,7 @@ SEEK::Application.routes.draw do
     resources :people, :programmes, :projects, :investigations, :assays, :studies, :publications, :events, :collections, :organisms, :human_diseases, only: [:index]
   end
 
-  resources :sops, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions, :asset] do
+  resources :sops, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions, :asset, :explorable_spreadsheet] do
     resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :workflows, :collections, only: [:index]
   end
 
@@ -534,27 +538,23 @@ SEEK::Application.routes.draw do
 
   resources :workflow_classes, except: [:show], concerns: [:has_avatar]
 
-  resources :file_templates, concerns: [:has_content_blobs, :has_versions, :has_doi, :publishable, :asset] do
+  resources :file_templates, concerns: [:has_content_blobs, :has_versions, :has_doi, :publishable, :asset, :explorable_spreadsheet] do
     collection do
       get :filter
       get :provide_metadata
       post :create_content_blob
       post :create_metadata
     end
-    member do
-      get :explore
-    end
     resources :people, :programmes, :projects, :collections, :investigations, :studies, :assays, :data_files, :publications, :placeholders, only: [:index]
   end
 
-  resources :placeholders, concerns: [:asset] do
+  resources :placeholders, concerns: [:asset, :explorable_spreadsheet] do
     collection do
       get :filter
       get :provide_metadata
       post :create_metadata
     end
     member do
-      get :explore
       get :data_file
     end
     resources :people, :programmes, :projects, :collections, :investigations, :studies, :assays, :data_files, :publications, :file_templates, only: [:index]
@@ -705,7 +705,7 @@ SEEK::Application.routes.draw do
 
   ### DOCUMENTS
 
-  resources :documents, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions, :asset] do
+  resources :documents, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions, :asset, :explorable_spreadsheet] do
     resources :people, :programmes, :projects, :programmes, :investigations, :assays, :studies, :publications, :events, :collections, :workflows, only: [:index]
   end
 

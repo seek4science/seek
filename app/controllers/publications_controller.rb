@@ -597,7 +597,7 @@ class PublicationsController < ApplicationController
 
   def create_or_update_associations(asset_ids, asset_type, required_action)
     asset_ids.each do |id|
-      asset = asset_type.constantize.find_by_id(id)
+      asset = safe_class_lookup(asset_type).find_by_id(id)
       if asset && asset.send("can_#{required_action}?")
         @publication.associate(asset)
       end

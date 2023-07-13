@@ -115,6 +115,21 @@ class AssetTest < ActiveSupport::TestCase
     assert !model.find_version(2).contains_downloadable_items?
   end
 
+  test 'supports_spreadsheet_explore?' do
+    assert FactoryBot.create(:data_file).supports_spreadsheet_explore?
+    assert FactoryBot.create(:document).supports_spreadsheet_explore?
+    assert FactoryBot.create(:sop).supports_spreadsheet_explore?
+    assert FactoryBot.create(:file_template).supports_spreadsheet_explore?
+    refute FactoryBot.create(:model).supports_spreadsheet_explore?
+    refute FactoryBot.create(:presentation).supports_spreadsheet_explore?
+    refute FactoryBot.create(:placeholder).supports_spreadsheet_explore?
+    refute FactoryBot.create(:workflow).supports_spreadsheet_explore?
+    refute FactoryBot.create(:publication).supports_spreadsheet_explore?
+    refute FactoryBot.create(:collection).supports_spreadsheet_explore?
+    refute FactoryBot.create(:sample).supports_spreadsheet_explore?
+    refute FactoryBot.create(:template).supports_spreadsheet_explore?
+  end
+
   test 'tech type titles' do
     df = FactoryBot.create :data_file
     assay = FactoryBot.create :experimental_assay, technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Binding'

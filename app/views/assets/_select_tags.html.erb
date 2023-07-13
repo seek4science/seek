@@ -1,11 +1,10 @@
 <%
    entity=controller_name.singularize
    object=instance_variable_get("@#{entity}")
-   model_class=entity.camelize.constantize
    #FIXME: this is required for some cases where the page is rendered from an error, but the @entity doesn't exist. Mainly when rendering from a caught Exception AssetsCommon.handle_data
    #the correct fix is to fix AssetsCommon.handle_data to correctly create an instance of @entity
 
-   object ||= model_class.new
+   object ||= controller_model.new
    type_name = text_for_resource(object)
 
    owned_annotations = current_user.annotations_by.collect{|a| a.value}

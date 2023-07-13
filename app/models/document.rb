@@ -41,6 +41,10 @@ class Document < ApplicationRecord
             primary_key: :document_id, foreign_key: :asset_id
   end
 
+  def supports_spreadsheet_explore?
+    true
+  end
+
   def use_mime_type_for_avatar?
     true
   end

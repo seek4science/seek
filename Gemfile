@@ -162,6 +162,8 @@ gem 'net-ftp'
 gem "roo", "~> 2.10.0"
 gem 'roo-xls', '~> 1.1'
 
+gem 'licensee'
+
 group :production do
   gem 'passenger'
 end
