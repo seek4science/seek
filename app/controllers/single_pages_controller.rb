@@ -151,7 +151,7 @@ class SinglePagesController < ApplicationController
     sample_type_id = wb.cell(5, 2, sheet = 'Metadata').to_i
     @sample_type = SampleType.find(sample_type_id)
     template_id = wb.cell(8, 2, sheet = 'Metadata').to_i
-    @template = Template.find(template_id)
+    template = Template.find(template_id)
     is_assay = @sample_type.assays.any?
     @assay = @sample_type.assays.first
 
@@ -182,7 +182,7 @@ class SinglePagesController < ApplicationController
     end
 
     # Construct Samples objects from Excel data
-    @excel_samples = samples_data.map do |excel_sample|
+    excel_samples = samples_data.map do |excel_sample|
       obj = {}
       (0..sample_fields.size - 1).map do |i|
         if @multiple_input_fields.include?(sample_fields[i])
@@ -202,8 +202,8 @@ class SinglePagesController < ApplicationController
       obj
     end
 
-    @existing_excel_samples = @excel_samples.map { |sample| sample unless sample['id'].nil? }.compact
-    @new_excel_samples = @excel_samples.map { |sample| sample if sample['id'].nil? }.compact
+    existing_excel_samples = excel_samples.map { |sample| sample unless sample['id'].nil? }.compact
+    new_excel_samples = excel_samples.map { |sample| sample if sample['id'].nil? }.compact
 
     @db_samples = @sample_type.samples&.authorized_for(:edit)&.map do |sample|
       attributes = JSON.parse(sample[:json_metadata])
@@ -212,7 +212,7 @@ class SinglePagesController < ApplicationController
     end
 
     # Determine whether samples have been modified or not
-    @update_samples = @existing_excel_samples.map do |ees|
+    @update_samples = existing_excel_samples.map do |ees|
       db_sample = @db_samples.select { |s| s['id'] == ees['id'] }.first
       # An exception is raised if the ID of an existing Sample cannot be found in the DB
       raise "Sample with id '#{ees['id']}' does not exist in the database. Sample upload was aborted!" if db_sample.nil?
@@ -234,7 +234,7 @@ class SinglePagesController < ApplicationController
     # based on the attribute values
     @possible_duplicates = []
     @new_samples = []
-    @new_excel_samples.map do |nes|
+    new_excel_samples.map do |nes|
       is_duplicate = true
 
       @db_samples.map do |dbs|
@@ -255,10 +255,6 @@ class SinglePagesController < ApplicationController
     upload_data = { study: @study,
                     assay: @assay,
                     sampleType: @sample_type,
-                    template: @template,
-                    excelSamples: @excel_samples,
-                    existingExcelSamples: @existing_excel_samples,
-                    newExcelSamples: @new_excel_samples,
                     updateSamples: @update_samples,
                     newSamples: @new_samples,
                     possibleDuplicates: @possible_duplicates,
@@ -277,7 +273,7 @@ end
   private
 
   def is_valid_workbook?(wb)
-    !(wb.sheets.map { |sheet| %w[Metadata Samples cv_ontology].include? sheet }.include? false && wb.sheets.size != 3)
+    !((wb.sheets.map { |sheet| %w[Metadata Samples cv_ontology].include? sheet }.include? false) && (wb.sheets.size != 3))
   end
 
   def set_up_instance_variable
