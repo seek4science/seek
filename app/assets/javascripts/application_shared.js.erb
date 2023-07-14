@@ -243,7 +243,7 @@ $j(document).ready(function () {
         }
     });
 
-    $j('#citation-style-select').change(function () {
+    $j('#citation-style-select').select2({ theme: 'bootstrap' }).on('select2:select', function () {
         var style = $j(this).val();
         var url = $j(this).data('url');
         var target = $j('#citation');
@@ -266,7 +266,7 @@ $j(document).ready(function () {
             });
             target.spinner('add');
         }
-    }).change();
+    });
 
     new Clipboard('.clipboard-btn');
 
