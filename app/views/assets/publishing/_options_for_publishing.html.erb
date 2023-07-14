@@ -8,44 +8,69 @@
 
    toggle ||=false
    cb_parent_selector ||="div\##{item.class.name}_#{item.id}.split_button_parent"
+   show_managers=true
+   managed_by_selector ||="div\##{item.class.name}_#{item.id}.managed_by_toggle"
 
 -%>
 <div class="isa-tree <%= html_classes -%> <%= tree_class %> _<%= item.id %>">
-  <% if item.can_view? %>
-      <h5 class="type_and_title">
-        <strong><%= text_for_resource item -%>:</strong> <%= link_to item.title, item, :target => "_blank" -%>
-        <%=list_item_visibility(item)-%>
-      </h5>
-      <div class="secondary">Manageable by <%= item.managers.empty? ? "<span class='none_text'>None</span>".html_safe : item.managers.collect { |m| link_to(h(m.title), m) }.join(", ").html_safe -%></div>
-  <% else %>
-      <h5 class="type_and_title"><strong><%= text_for_resource item -%>:</strong> This item is hidden to you</h5>
-      <% if current_user.try(:person) && item.can_see_hidden_item?(current_user.person) %>
-          <div class="secondary">Manageable by <%= item.managers.empty? ? "<div class='none_text'>None</div>".html_safe : item.managers.collect { |m| link_to(h(m.title), m) }.join(", ").html_safe -%></div>
-      <% end %>
+  <% if toggle %>
+    <div class="isa-tree-toggle-close"  style="display: inline; margin-right:1em" data-cb_parent_selector='<%= cb_parent_selector %>' >
+      <span class="glyphicon glyphicon-menu-down" aria-hidden="true"></span>
+    </div>
+    <div class="isa-tree-toggle-open"  style="display: inline; margin-right:1em" data-cb_parent_selector='<%= cb_parent_selector %>' >
+      <span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span>
+    </div>
   <% end %>
-
-  <div>
-    <% if item.is_published? %>
-      <%= render :partial => 'general/split_button_checkbox',
-                 locals: { checkbox_id: publishing_item_param(item),
-                           checkbox_class: "#{item.class.name}_#{item.id}",
-                           published: true,
-                           toggle: toggle,
-                           cb_parent_selector: cb_parent_selector} -%>
-    <% elsif item.can_publish? %>
-      <%= render :partial => 'general/split_button_checkbox',
-                locals: { checkbox_id: publishing_item_param(item),
-                          checkbox_class: "#{item.class.name}_#{item.id}",
-                          checkbox_text: "Publish?",
-                          checked: checked,
-                          toggle: toggle,
-                          cb_parent_selector: cb_parent_selector} -%>
-    <% else %>
+  <% if item.can_view? %>
+    <div  style="display: inline; margin-right:1em">
+      <% if item.is_published? %>
+        <%= render :partial => 'general/split_button_checkbox',
+                   locals: { checkbox_id: publishing_item_param(item),
+                             checkbox_class: "#{item.class.name}_#{item.id}",
+                             published: true,
+                             toggle: toggle,
+                             cb_parent_selector: cb_parent_selector} -%>
+      <% elsif item.can_publish? %>
+        <%= render :partial => 'general/split_button_checkbox',
+                   locals: { checkbox_id: publishing_item_param(item),
+                             checkbox_class: "#{item.class.name}_#{item.id}",
+                             checkbox_text: "",
+                             checked: checked,
+                             toggle: toggle,
+                             cb_parent_selector: cb_parent_selector} -%>
+      <% else %>
         <span class="label label-warning" data-tooltip="<%= tooltip('You do not have permission to publish this item.') %>">
           <span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span>
-          Can't publish
         </span>
+      <% end %>
+    </div>
+    <h5 class="type_and_title" style="display: inline">
+      <strong><%= text_for_resource item -%>:</strong> <%= link_to item.title, item, :target => "_blank" -%>
+      <%=list_item_visibility(item)-%>
+    </h5>
+  <% else %>
+    <div  style="display: inline; margin-right:1em">
+      <span class="label label-danger" data-tooltip="<%= tooltip('You do not have permission to view this item.') %>">
+        <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
+      </span>
+    </div>
+    <h5 class="type_and_title" style="display: inline"><strong><%= text_for_resource item -%>:</strong> This item is hidden to you</h5>
+    <% unless current_user.try(:person) && item.can_see_hidden_item?(current_user.person) %>
+      <% show_managers=false%>
     <% end %>
-  </div>
+  <% end %>
+  <% if show_managers %>
+    <div class="secondary" style="display: inline; margin-left:2em" data-tooltip="<%= tooltip('Click to toggle asset\'s manager(s).') %>">
+      <a class="managed_by_toggle" data-managed_by_selector='<%= managed_by_selector %>'><span class="glyphicon glyphicon-user" aria-hidden="true"></span></a>
+      <div class="managed_by_toggle" id=<%="#{item.class.name}_#{item.id}"-%> style="display:none;margin-left:5em">
+        Manageable by <%= item.managers.empty? ? "<span class='none_text'>None</span>".html_safe : item.managers.collect { |m| link_to(h(m.title), m) }.join(", ").html_safe -%>
+      </div>
+    </div>
+  <% end %>
 </div>
 
+<script type="text/javascript">
+    $j(document).ready(function () {
+        $j('.isa-tree-toggle-open').hide()
+    })
+</script>

@@ -109,21 +109,21 @@ class SinglePublishingTest < ActionController::TestCase
     assert_select '.type_and_title', text: /Investigation/, count: 1 do
       assert_select 'a[href=?]', investigation_path(investigation), text: /#{investigation.title}/
     end
-    assert_select '.parent-btn-checkbox', text: /Publish/ do
+    assert_select '.parent-btn-checkbox' do
       assert_select "input[type='checkbox'][id=?]", "publish_Investigation_#{investigation.id}"
     end
 
     assert_select '.type_and_title', text: /Study/, count: 1 do
       assert_select 'a[href=?]', study_path(study), text: /#{study.title}/
     end
-    assert_select '.parent-btn-checkbox', text: /Publish/ do
+    assert_select '.parent-btn-checkbox' do
       assert_select "input[type='checkbox'][id=?]", "publish_Study_#{study.id}"
     end
 
     assert_select '.type_and_title', text: /Assay/, count: 1 do
       assert_select 'a[href=?]', assay_path(assay), text: /#{assay.title}/
     end
-    assert_select '.parent-btn-checkbox', text: /Publish/ do
+    assert_select '.parent-btn-checkbox' do
       assert_select "input[type='checkbox'][id=?]", "publish_Assay_#{assay.id}"
     end
 
@@ -133,12 +133,12 @@ class SinglePublishingTest < ActionController::TestCase
       assert_select 'a[href=?]', data_file_path(request_publishing_df), text: /#{request_publishing_df.title}/
       assert_select 'a[href=?]', data_file_path(notifying_df), text: /#{notifying_df.title}/
     end
-    assert_select '.parent-btn-checkbox', text: /Publish/ do
+    assert_select '.parent-btn-checkbox' do
       assert_select "input[type='checkbox'][id=?]", "publish_DataFile_#{publishing_df.id}"
       assert_select "input[type='checkbox'][id=?]", "publish_DataFile_#{request_publishing_df.id}"
     end
 
-    assert_select 'span.label-warning', text: "Can't publish", count: 1
+    assert_select 'span.label-warning[data-tooltip=?]', 'You do not have permission to publish this item.', count: 1
   end
 
   test 'split-button recursive selection' do
