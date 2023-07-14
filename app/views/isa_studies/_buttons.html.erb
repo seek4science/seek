@@ -18,15 +18,15 @@ uploadExcel||="studySampleUploadExcel()"
   <button class="btn btn-primary dt-action" id="btn_save_assay_sample" onClick=<%=save%>>Save</button>
 </div>
 
-<div class="container-sm">
-  <div class="mb-3">
-    <label for="file-<%= sample_type_id %>" class="form-label">Upload excel file:</label>
-  </div>
-  <div class="mb-3">
-    <input id="file-<%= sample_type_id %>" name="file-<%= sample_type_id %>" type="file" accept=".xlsx, .xls" class="form-control form-control-lg"/>
-  </div>
-  <div class="mb-3">
-    <button class="btn btn-default" onClick=<%= uploadExcel %>>Upload</button>
+<div class="container-sm" style="max-width: 780px; margin-top:25px;">
+  <label for="file-<%= sample_type_id %>" class="form-label">Upload excel spreadsheet:</label>
+  <div class="input-group">
+    <div class="mb-3">
+      <input id="file-<%= sample_type_id %>" name="file-<%= sample_type_id %>" type="file" accept=".xlsx, .xls" class="form-control form-control-lg"/>
+    </div>
+    <div class="input-group-btn">
+      <button class="btn btn-primary" onClick=<%= uploadExcel %>>Upload</button>
+    </div>
   </div>
 </div>
 
