@@ -45,15 +45,15 @@
                   <% end %>
 
                   <% if !type[:is_external] && safe_class_lookup(type[:type]).available_filters.any? %>
-                    <% if query  %>
-
-                      <%= link_to "Advanced #{type[:visible_resource_type]} search with filtering ...",
-                                  more_results_path, class:'pull-right'  %>
-                    <% elsif item %>
-                      <%= link_to "Advanced #{type[:visible_resource_type]} list for this #{internationalized_resource_name(item.model_name.to_s, false)} with search and filtering ...",
-                                  more_results_path, class:'pull-right'  %>
-
-                    <% end %>
+                    <%= if query
+                          more_results_link_text = "Advanced #{type[:visible_resource_type]} search with filtering <span class='glyphicon glyphicon-arrow-right'></span>".html_safe
+                        elsif item
+                          more_results_link_text = "Advanced #{type[:visible_resource_type]} list for this #{internationalized_resource_name(item.model_name.to_s, false)} with search and filtering <span class='glyphicon glyphicon-arrow-right'></span>".html_safe
+                        else
+                          more_results_link_text = nil
+                        end
+                        link_to(more_results_link_text, more_results_path, class: 'pull-right') if more_results_link_text
+                    %>
                   <% end %>
 
                   <% unless type[:items].empty? %>
@@ -69,9 +69,12 @@
                         </div>
                       </div>
                   <% end %>
-                  <%= if type[:extra_count] > 0
-                    link_to("All #{pluralize(resource_type_total_visible_count(type),type[:visible_resource_type])} ...", more_results_path, class:'pull-right')
-                  end %>
+                    <%= if type[:extra_count] > 0
+                          content_tag(:div, id:'more-results', class:'text-center') do
+                            link_text = "View all #{pluralize(resource_type_total_visible_count(type),type[:visible_resource_type])} <span class='glyphicon glyphicon-arrow-right'></span>".html_safe
+                            link_to(link_text, more_results_path)
+                          end
+                    end %>
                 </div>
               <% active = false %>
             <% end -%>
