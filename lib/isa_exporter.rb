@@ -508,7 +508,7 @@ module IsaExporter
       sample_array = []
       while sample_list.any?
         temp = []
-        sample_list.each { |sample| temp += sample.linked_samples if sample.linked_samples.any? }
+        sample_list.each { |sample| temp += sample.linked_samples.order(:id) if sample.linked_samples.any? }
         sample_array << temp.map { |s| s.id }.uniq if !temp.blank?
         sample_list = temp
       end
