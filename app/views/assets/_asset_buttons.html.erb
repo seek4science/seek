@@ -7,7 +7,7 @@
 <% show_view_content_btn = display_asset&.single_content_blob && !display_asset.single_content_blob.show_as_external_link? %>
 <% show_doi_button = display_asset && (asset.supports_doi? && asset.is_published? && asset.can_manage? && display_asset.can_mint_doi?) %>
 <% show_publish_button = asset.is_in_isa_publishable? && asset.can_publish? %>
-<% show_cancel_publishing_request_button = asset.is_waiting_approval? || asset.is_rejected? %>
+<% show_cancel_publishing_request_button = (asset.is_waiting_approval? || asset.is_rejected?) && asset.can_manage? %>
 
 <%= source_link_button(asset.source_link) if asset.respond_to?(:source_link) && asset.source_link %>
 
