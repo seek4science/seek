@@ -729,6 +729,27 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute_nil flash[:error]
   end
 
+  test 'storage usage list limits to first 10' do
+    programme_administrator = FactoryBot.create(:programme_administrator)
+    programme = programme_administrator.programmes.first
+    12.times do
+      project = FactoryBot.create(:project, programme: programme)
+      FactoryBot.create(:data_file, project_ids: [project.id])
+    end
+
+    project_count = programme.projects.count
+    size = programme.projects.last.data_files.first.content_blob.file_size
+    total_size = size * 12
+
+    login_as(programme_administrator)
+    get :storage_report, params: { id: programme.id }
+
+    assert_response :success
+    assert_nil flash[:error]
+    assert_select 'strong', text: number_to_human_size(total_size)
+    assert_select 'ul.collapsed li.hidden-item', count: (project_count - 10)
+  end
+
   test 'admin can add and remove funding codes' do
     login_as(FactoryBot.create(:admin))
     prog = FactoryBot.create(:programme)

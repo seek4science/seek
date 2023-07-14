@@ -524,6 +524,25 @@ module ApplicationHelper
     "isa_#{type}[#{type}]#{rest}"
   end
 
+  def expandable_list(items, limit: 10, none_text: 'None', id: nil, &block)
+    content_tag(:div, 'data-role' => 'seek-expandable-list') do
+      concat(if items.empty?
+               content_tag(:span, none_text, class: 'none_text')
+             else
+               content_tag(:ul, id: id, class: 'list collapsed') do
+                 items.each_with_index do |item, index|
+                   concat content_tag(:li, capture(item, &block), class: index >= limit ? 'hidden-item' : '')
+                 end
+               end
+             end)
+      if items.any? && items.length > limit
+        concat link_to(('More ' + image('expand')).html_safe, '#', class: 'pull-right',
+                       'data-role' => 'seek-expandable-list-expand')
+        concat link_to(('Less ' + image('collapse')).html_safe, '#', class: 'pull-right',
+                       style: 'display: none', 'data-role' => 'seek-expandable-list-collapse')
+      end
+    end
+  end
 end
 
 class ApplicationFormBuilder < ActionView::Helpers::FormBuilder

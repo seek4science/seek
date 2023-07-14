@@ -352,6 +352,24 @@ $j(document).ready(function () {
             div.after(btn);
         }
     });
+
+    $j(document).on('click', '[data-role="seek-expandable-list-expand"]', function () {
+        var wrapper = $j(this).closest('[data-role="seek-expandable-list"]');
+        wrapper.find('ul:first').removeClass('collapsed');
+        wrapper.find('[data-role="seek-expandable-list-expand"]:first').hide();
+        wrapper.find('[data-role="seek-expandable-list-collapse"]:first').show();
+
+        return false;
+    });
+
+    $j(document).on('click', '[data-role="seek-expandable-list-collapse"]', function () {
+        var wrapper = $j(this).closest('[data-role="seek-expandable-list"]');
+        wrapper.find('ul:first').addClass('collapsed');
+        wrapper.find('[data-role="seek-expandable-list-expand"]:first').show();
+        wrapper.find('[data-role="seek-expandable-list-collapse"]:first').hide();
+
+        return false;
+    });
 });
 
 var URL_ROOT = '<%= Rails.application.config.relative_url_root %>';
