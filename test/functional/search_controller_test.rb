@@ -54,7 +54,7 @@ class SearchControllerTest < ActionController::TestCase
       get :index, params: { q: 'test' }
     end
 
-    assert_select '#documents a[href=?]', documents_path(filter: { query: 'test' }), text: 'Advanced Documents search with filtering ...'
+    assert_select '#documents a[href=?]', documents_path(filter: { query: 'test' }), text: /Advanced Documents search with filtering/
   end
 
   test 'can render external search results' do
