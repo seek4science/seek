@@ -1,10 +1,9 @@
 require 'isatab_converter'
-require 'roo'
-require 'roo-xls'
 
 class SinglePagesController < ApplicationController
   include Seek::AssetsCommon
   include Seek::Sharing::SharingCommon
+  include Seek::Data::SpreadsheetExplorerRepresentation
 
   before_action :set_up_instance_variable
   before_action :project_single_page_enabled?
@@ -131,12 +130,13 @@ class SinglePagesController < ApplicationController
 
     # Check file type if is xls or xlsx
     case uploaded_file.content_type
-    when 'application/vnd.ms-excel'
-      wb = Roo::Spreadsheet.open(uploaded_file.path)
     when 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-      wb = Roo::Excelx.new(uploaded_file.path)
+      spreadsheet_xml = spreadsheet_to_xml(uploaded_file.path, Seek::Config.jvm_memory_allocation)
+      wb = parse_spreadsheet_xml(spreadsheet_xml)
+      metadata_sheet = wb.sheet('Metadata')
+      samples_sheet = wb.sheet('Samples')
     else
-      raise "Please upload a valid spreadsheet file with extension '.xls' or '.xlsx'"
+      raise "Please upload a valid spreadsheet file with extension '.xlsx'"
     end
 
     sample_type_id_ui = params[:sample_type_id].to_i
@@ -146,11 +146,11 @@ class SinglePagesController < ApplicationController
     end
 
     # Extract Samples metadata from spreadsheet
-    study_id = wb.cell(2, 2, sheet = 'Metadata').to_i
+    study_id = metadata_sheet.cell(2, 2).value.to_i
     @study = Study.find(study_id)
-    sample_type_id = wb.cell(5, 2, sheet = 'Metadata').to_i
+    sample_type_id = metadata_sheet.cell(5, 2).value.to_i
     @sample_type = SampleType.find(sample_type_id)
-    template_id = wb.cell(8, 2, sheet = 'Metadata').to_i
+    template_id = metadata_sheet.cell(8, 2).value.to_i
     template = Template.find(template_id)
     is_assay = @sample_type.assays.any?
     @assay = @sample_type.assays.first
@@ -170,8 +170,14 @@ class SinglePagesController < ApplicationController
       sa_attr.title if sa_attr.sample_attribute_type.base_type == 'SeekSampleMulti'
     end
 
-    sample_fields = wb.row(1, sheet = 'Samples').map { |field| field.sub(' *', '') }
-    samples_data = (2..wb.last_row(sheet = 'Samples')).map { |i| wb.row(i, sheet = 'Samples') }
+    sample_fields = samples_sheet.row(1).actual_cells.map { |field| field&.value&.sub(' *', '') }
+    samples_data = (2..samples_sheet.actual_rows.size).map do |i|
+      act_cells = samples_sheet.row(i).actual_cells
+      act_cells.map { |cell| cell&.value } unless act_cells.all? { |cell| cell&.value&.empty? }
+    end
+
+    samples_data.compact!
+
 
     # Compare Excel header row to Sample Type Sample Attributes
     # Should raise an error if they don't match
@@ -195,6 +201,12 @@ class SinglePagesController < ApplicationController
             subsample
           end
           obj.merge!(sample_fields[i] => parsed_excel_input_samples)
+        elsif sample_fields[i] == 'id'
+          if excel_sample[i] == ''
+            obj.merge!(sample_fields[i] => nil)
+          else
+            obj.merge!(sample_fields[i] => excel_sample[i]&.to_i)
+          end
         else
           obj.merge!(sample_fields[i] => excel_sample[i])
         end
@@ -284,7 +296,7 @@ end
   private
 
   def is_valid_workbook?(wb)
-    !((wb.sheets.map { |sheet| %w[Metadata Samples cv_ontology].include? sheet }.include? false) && (wb.sheets.size != 3))
+    !((wb.sheet_names.map { |sheet| %w[Metadata Samples cv_ontology].include? sheet }.include? false) && (wb.sheets.size != 3))
   end
 
   def set_up_instance_variable
