@@ -30,7 +30,9 @@
   <%= render partial: 'general/paginate_numerical', locals: { objects: objects } if objects.respond_to?(:current_page) %>
 <% end %>
 
-<%= content_for :pagination %>
+<div class="hidden-xs">
+  <%= content_for :pagination %>
+</div>
 
 <%# If there is no param for view, try to retrieve from session information %>
 <% if !params.has_key?(:view) && session.has_key?(:view) %>

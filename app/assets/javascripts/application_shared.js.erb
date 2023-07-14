@@ -352,6 +352,35 @@ $j(document).ready(function () {
             div.after(btn);
         }
     });
+
+    // Popout filter sidebar on small screens
+    var Sidebar = {
+        close: function () {
+            $j('.sidebar-backdrop').remove();
+            $j('#sidebar').removeClass('open');
+            $j('#sidebar-toggle').button('reset');
+        },
+        open: function () {
+            $j('body').append($j('<div class="sidebar-backdrop modal-backdrop fade in"></div>'));
+            $j('#sidebar').addClass('open');
+        },
+        toggle: function () {
+            var toggleButton = $j('#sidebar-toggle');
+            toggleButton.button('toggle');
+
+            if(toggleButton.hasClass('active')) {
+                Sidebar.open();
+            } else {
+                Sidebar.close();
+            }
+
+            return false;
+        }
+    };
+
+    $j('#sidebar-toggle').click(Sidebar.toggle);
+    $j('#sidebar-close').click(Sidebar.toggle);
+    $j(document).on('click', '.sidebar-backdrop', Sidebar.toggle);
 });
 
 var URL_ROOT = '<%= Rails.application.config.relative_url_root %>';
