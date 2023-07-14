@@ -13,8 +13,9 @@
 
    query = index_params.dig(:filter, :query)
 
-
    any_list_items = resource_hash.any? { |key, res| res[:items_count] > 0 || res[:hidden_count] > 0 }
+
+   right_arrow_glyph = "<span class='glyphicon glyphicon-arrow-right' aria-hidden='true'></span>"
 %>
 
 <% if any_list_items %>
@@ -23,11 +24,15 @@
       <div class="tab-content">
         <% active = true %>
         <% ordered_resource_types.each_with_index do |type, i| -%>
-          <% more_results_path = if query
-                                   polymorphic_path(type[:type].tableize.to_sym, 'filter[query]': query)
-                                 else
-                                   [item, type[:type].tableize.to_sym]
-                                 end
+
+          <%
+            unless type[:is_external]
+              more_results_path = if query
+                                    polymorphic_path(type[:type].tableize.to_sym, 'filter[query]': query)
+                                  else
+                                    [item, type[:type].tableize.to_sym]
+                                  end
+            end
           %>
 
 
@@ -46,7 +51,7 @@
 
                   <% if !type[:is_external] && safe_class_lookup(type[:type]).available_filters.any? %>
                     <%= if query
-                          more_results_link_text = "Advanced #{type[:visible_resource_type]} search with filtering <span class='glyphicon glyphicon-arrow-right'></span>".html_safe
+                          more_results_link_text = "Advanced #{type[:visible_resource_type]} search with filtering #{right_arrow_glyph}".html_safe
                         elsif item
                           more_results_link_text = "Advanced #{type[:visible_resource_type]} list for this #{internationalized_resource_name(item.model_name.to_s, false)} with search and filtering <span class='glyphicon glyphicon-arrow-right'></span>".html_safe
                         else
@@ -71,7 +76,7 @@
                   <% end %>
                     <%= if type[:extra_count] > 0
                           content_tag(:div, id:'more-results', class:'text-center') do
-                            link_text = "View all #{pluralize(resource_type_total_visible_count(type),type[:visible_resource_type])} <span class='glyphicon glyphicon-arrow-right'></span>".html_safe
+                            link_text = "View all #{pluralize(resource_type_total_visible_count(type),type[:visible_resource_type])} #{right_arrow_glyph}".html_safe
                             link_to(link_text, more_results_path)
                           end
                     end %>
