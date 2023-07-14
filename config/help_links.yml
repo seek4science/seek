@@ -21,7 +21,7 @@ Investigation: https://docs.seek4science.org/help/isa-guide.html
 Study: https://docs.seek4science.org/help/isa-guide.html
 Assay: https://docs.seek4science.org/help/isa-guide.html
 DataFile: https://docs.seek4science.org/help/user-guide/general-attributes.html#data-files
-Sop: https://docs.seek4science.org/help/user-guide/general-attributes.html#sops 
+Sop: https://docs.seek4science.org/help/user-guide/general-attributes.html#sops
 Publication: https://docs.seek4science.org/help/user-guide/general-attributes.html#publications
 Sample: https://docs.seek4science.org/help/user-guide/samples.html
 SampleType: https://docs.seek4science.org/help/user-guide/create-sample-type.html
@@ -30,3 +30,4 @@ Model: https://docs.seek4science.org/help/user-guide/adding-assets.html
 Document: https://docs.seek4science.org/help/user-guide/adding-assets.html
 Presentation: https://docs.seek4science.org/help/user-guide/adding-assets.html
 Event: https://docs.seek4science.org/help/user-guide/general-attributes.html#events
+clipboard_api_mozilla: https://developer.mozilla.org/en-US/docs/Web/API/Clipboard_API

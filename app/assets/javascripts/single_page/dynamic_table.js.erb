@@ -192,44 +192,54 @@ const handleSelect = (e) => {
       highlightTitleCol(this.table);
     },
     pasteFromClipboard: function() {
-      navigator.clipboard.readText().then((text) => {
-        const colsCount = this.table.columns().data().length;
-        const splitter = text.includes("\r\n") ? "\r\n" : "\n";
-        const delimeter = "\t";
-        const _defaultCols = defaultCols.map((c) => c.defaultValue || "");
+      try {
+        navigator.clipboard.readText().then((text) => {
+          const colsCount = this.table.columns().data().length;
+          const splitter = text.includes("\r\n") ? "\r\n" : "\n";
+          const delimeter = "\t";
+          const _defaultCols = defaultCols.map((c) => c.defaultValue || "");
 
-        const cols = this.table.settings()[0].aoColumns;
-        const sampleLinks = getSampleLinking(cols);
-        const sampleLinkIndexes = sampleLinks.map((x) => x.idx).sort((a, b) => b - a);
-        const sampleLinksTitles = sampleLinks.map((x) => x.title);
+          const cols = this.table.settings()[0].aoColumns;
+          const sampleLinks = getSampleLinking(cols);
+          const sampleLinkIndexes = sampleLinks.map((x) => x.idx).sort((a, b) => b - a);
+          const sampleLinksTitles = sampleLinks.map((x) => x.title);
 
-        const rows = text
-          .split(splitter)
-          .filter((x) => x)
-          .map((r) => {
-            // Preserve row status and id
-            let splitted = [rowStatus.new, ""].concat(r.split(delimeter));
-            const missingColsCount = colsCount - defaultCols.length - splitted.length;
-            splitted = _defaultCols.concat(splitted);
+          const rows = text
+            .split(splitter)
+            .filter((x) => x)
+            .map((r) => {
+              // Preserve row status, id and uuid
+              let splitted = [rowStatus.new, "", ""].concat(r.split(delimeter));
+              const missingColsCount = colsCount - defaultCols.length - splitted.length;
+              splitted = _defaultCols.concat(splitted);
 
-            // Preserve empty placeholder for columns of type of 'Registered Sample (multiple)'
-            sampleLinkIndexes.forEach((x) => splitted.splice(x, 0, []));
+              // Preserve empty placeholder for columns of type of 'Registered Sample (multiple)'
+              sampleLinkIndexes.forEach((x) => splitted.splice(x, 0, []));
 
-            return missingColsCount < 0 ?
-              splitted.slice(0, colsCount) :
-              splitted.concat(Array(missingColsCount).fill(""));
-          })
-          .filter((x) => x);
+              return missingColsCount < 0 ?
+                splitted.slice(0, colsCount) :
+                splitted.concat(Array(missingColsCount).fill(""));
+            })
+            .filter((x) => x);
 
-        this.table.rows.add(rows).draw();
+          this.table.rows.add(rows).draw();
 
-        if (sampleLinksTitles.length)
-          alert(
-            "No value is pasted for the following column(s): \n" +
-            sampleLinksTitles.map((x) => `"${x}"`).join(", ") +
-            "\nYou need to manually input them."
-          );
-      });
+          if (sampleLinksTitles.length)
+            alert(
+              "No value is pasted for the following column(s): \n" +
+              sampleLinksTitles.map((x) => `"${x}"`).join(", ") +
+              "\nYou need to manually input them."
+            );
+        });
+
+      } catch (error) {
+        if (error instanceof TypeError && navigator.userAgent.toLowerCase().includes('firefox')){
+          if(confirm('Your Firefox browser might not support clipboard access. By clicking OK, you\'ll be redirected to the official documentation.')){
+            window.open("<%= Seek::Help::HelpDictionary.instance.help_link(:clipboard_api_mozilla) %>", "_blank");
+          }
+        }
+        console.log('An error occurred:', error);
+      }
     },
     newRow: function() {
       const colsCount = this.table.columns().data().length;
