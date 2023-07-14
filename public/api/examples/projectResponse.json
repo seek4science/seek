@@ -63,6 +63,9 @@
           "label": "Chemistry",
           "identifier": "http://edamontology.org/topic_3314"
         }
+      ],
+      "funding_codes": [
+        "DFG"
       ]
     },
     "relationships": {
@@ -224,6 +227,16 @@
             "id": "8",
             "type": "collections"
           }
+        ]
+      },
+      "samples": {
+        "data": [
+
+        ]
+      },
+      "sample_types": {
+        "data": [
+
         ]
       }
     },

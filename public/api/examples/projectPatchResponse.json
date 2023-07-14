@@ -35,8 +35,8 @@
       "web_page": "http://www.taverna.org.uk",
       "wiki_page": "http://www.mygrid.org.uk",
       "default_license": "Other (Open)",
-      "start_date": null,
-      "end_date": null,
+      "start_date": "2014-01-01",
+      "end_date": "2015-02-02",
       "default_policy": {
         "access": "no_access",
         "permissions": [
@@ -76,6 +76,9 @@
           "label": "Chemistry",
           "identifier": "http://edamontology.org/topic_3314"
         }
+      ],
+      "funding_codes": [
+        "AVH"
       ]
     },
     "relationships": {
@@ -196,6 +199,16 @@
         ]
       },
       "collections": {
+        "data": [
+
+        ]
+      },
+      "samples": {
+        "data": [
+
+        ]
+      },
+      "sample_types": {
         "data": [
 
         ]

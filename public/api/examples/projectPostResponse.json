@@ -35,8 +35,8 @@
       "web_page": "http://www.taverna.org.uk",
       "wiki_page": "http://www.mygrid.org.uk",
       "default_license": "Other (Open)",
-      "start_date": null,
-      "end_date": null,
+      "start_date": "2013-05-02",
+      "end_date": "2023-12-25",
       "default_policy": {
         "access": "no_access",
         "permissions": [
@@ -66,7 +66,7 @@
       "members": [
 
       ],
-      "use_default_policy": false,
+      "use_default_policy": true,
       "topic_annotations": [
         {
           "label": "Biomedical science",
@@ -76,6 +76,10 @@
           "label": "Chemistry",
           "identifier": "http://edamontology.org/topic_3314"
         }
+      ],
+      "funding_codes": [
+        "BMBF",
+        "DFG"
       ]
     },
     "relationships": {
@@ -196,6 +200,16 @@
         ]
       },
       "collections": {
+        "data": [
+
+        ]
+      },
+      "samples": {
+        "data": [
+
+        ]
+      },
+      "sample_types": {
         "data": [
 
         ]
