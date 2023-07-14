@@ -13,21 +13,21 @@
         "permissions": [
           {
             "resource": {
-              "id": "249",
+              "id": "1202",
               "type": "people"
             },
             "access": "manage"
           },
           {
             "resource": {
-              "id": "304",
+              "id": "1559",
               "type": "projects"
             },
             "access": "download"
           },
           {
             "resource": {
-              "id": "273",
+              "id": "1359",
               "type": "institutions"
             },
             "access": "view"
@@ -43,13 +43,20 @@
           "label": "Chemistry",
           "identifier": "http://edamontology.org/topic_3314"
         }
+      ],
+      "start_date": "2013-05-02",
+      "end_date": "2023-12-25",
+      "use_default_policy": true,
+      "funding_codes": [
+        "BMBF",
+        "DFG"
       ]
     },
     "relationships": {
       "programmes": {
         "data": [
           {
-            "id": "24",
+            "id": "166",
             "type": "programmes"
           }
         ]
@@ -57,7 +64,7 @@
       "organisms": {
         "data": [
           {
-            "id": "24",
+            "id": "165",
             "type": "organisms"
           }
         ]

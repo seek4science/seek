@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "1022257417",
+    "id": "1646",
     "type": "projects",
     "attributes": {
       "discussion_links": [
@@ -12,28 +12,28 @@
       "web_page": "http://www.taverna.org.uk",
       "wiki_page": "http://www.mygrid.org.uk",
       "default_license": "Other (Open)",
-      "start_date": null,
-      "end_date": null,
+      "start_date": "2014-01-01",
+      "end_date": "2015-02-02",
       "default_policy": {
         "access": "no_access",
         "permissions": [
           {
             "resource": {
-              "id": "1039992753",
+              "id": "1275",
               "type": "people"
             },
             "access": "manage"
           },
           {
             "resource": {
-              "id": "1022257417",
+              "id": "1646",
               "type": "projects"
             },
             "access": "download"
           },
           {
             "resource": {
-              "id": "980197315",
+              "id": "1435",
               "type": "institutions"
             },
             "access": "view"
@@ -53,6 +53,9 @@
           "label": "Chemistry",
           "identifier": "http://edamontology.org/topic_3314"
         }
+      ],
+      "funding_codes": [
+        "AVH"
       ]
     },
     "relationships": {
@@ -79,7 +82,7 @@
       "organisms": {
         "data": [
           {
-            "id": "627234431",
+            "id": "170",
             "type": "organisms"
           }
         ]
@@ -102,7 +105,7 @@
       "programmes": {
         "data": [
           {
-            "id": "156",
+            "id": "171",
             "type": "programmes"
           }
         ]
@@ -176,17 +179,27 @@
         "data": [
 
         ]
+      },
+      "samples": {
+        "data": [
+
+        ]
+      },
+      "sample_types": {
+        "data": [
+
+        ]
       }
     },
     "links": {
-      "self": "/projects/1022257417"
+      "self": "/projects/1646"
     },
     "meta": {
-      "created": "2022-10-26T11:45:28.000Z",
-      "modified": "2022-10-26T11:45:28.000Z",
+      "created": "2023-07-14T14:54:09.418Z",
+      "modified": "2023-07-14T14:54:09.516Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "9ca85d90-3751-013b-356e-000c29a94011"
+      "uuid": "363372d0-0484-013c-5aee-000c29a94011"
     }
   },
   "jsonapi": {

@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "1022257332",
+    "id": "1561",
     "type": "projects",
     "attributes": {
       "discussion_links": [
@@ -12,28 +12,28 @@
       "web_page": "http://www.taverna.org.uk",
       "wiki_page": "http://www.mygrid.org.uk",
       "default_license": "Other (Open)",
-      "start_date": null,
-      "end_date": null,
+      "start_date": "2013-05-02",
+      "end_date": "2023-12-25",
       "default_policy": {
         "access": "no_access",
         "permissions": [
           {
             "resource": {
-              "id": "1039992680",
+              "id": "1202",
               "type": "people"
             },
             "access": "manage"
           },
           {
             "resource": {
-              "id": "1022257330",
+              "id": "1559",
               "type": "projects"
             },
             "access": "download"
           },
           {
             "resource": {
-              "id": "980197239",
+              "id": "1359",
               "type": "institutions"
             },
             "access": "view"
@@ -43,7 +43,7 @@
       "members": [
 
       ],
-      "use_default_policy": false,
+      "use_default_policy": true,
       "topic_annotations": [
         {
           "label": "Biomedical science",
@@ -53,6 +53,10 @@
           "label": "Chemistry",
           "identifier": "http://edamontology.org/topic_3314"
         }
+      ],
+      "funding_codes": [
+        "BMBF",
+        "DFG"
       ]
     },
     "relationships": {
@@ -79,7 +83,7 @@
       "organisms": {
         "data": [
           {
-            "id": "627234426",
+            "id": "165",
             "type": "organisms"
           }
         ]
@@ -102,7 +106,7 @@
       "programmes": {
         "data": [
           {
-            "id": "151",
+            "id": "166",
             "type": "programmes"
           }
         ]
@@ -176,17 +180,27 @@
         "data": [
 
         ]
+      },
+      "samples": {
+        "data": [
+
+        ]
+      },
+      "sample_types": {
+        "data": [
+
+        ]
       }
     },
     "links": {
-      "self": "/projects/1022257332"
+      "self": "/projects/1561"
     },
     "meta": {
-      "created": "2022-10-26T11:45:20.000Z",
-      "modified": "2022-10-26T11:45:20.000Z",
+      "created": "2023-07-14T14:53:59.816Z",
+      "modified": "2023-07-14T14:53:59.816Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "97d63130-3751-013b-356e-000c29a94011"
+      "uuid": "30776f90-0484-013c-5aee-000c29a94011"
     }
   },
   "jsonapi": {

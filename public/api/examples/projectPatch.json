@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "389",
+    "id": "1646",
     "type": "projects",
     "attributes": {
       "avatar": null,
@@ -14,21 +14,21 @@
         "permissions": [
           {
             "resource": {
-              "id": "320",
+              "id": "1275",
               "type": "people"
             },
             "access": "manage"
           },
           {
             "resource": {
-              "id": "389",
+              "id": "1646",
               "type": "projects"
             },
             "access": "download"
           },
           {
             "resource": {
-              "id": "347",
+              "id": "1435",
               "type": "institutions"
             },
             "access": "view"
@@ -44,13 +44,19 @@
           "label": "Chemistry",
           "identifier": "http://edamontology.org/topic_3314"
         }
+      ],
+      "start_date": "2014-01-01",
+      "end_date": "2015-02-02",
+      "use_default_policy": false,
+      "funding_codes": [
+        "AVH"
       ]
     },
     "relationships": {
       "programmes": {
         "data": [
           {
-            "id": "29",
+            "id": "171",
             "type": "programmes"
           }
         ]
@@ -58,7 +64,7 @@
       "organisms": {
         "data": [
           {
-            "id": "29",
+            "id": "170",
             "type": "organisms"
           }
         ]

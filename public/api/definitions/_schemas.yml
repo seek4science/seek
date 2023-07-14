@@ -2343,6 +2343,14 @@ projectPost:
               $ref: "#/components/schemas/assetLinkPostList"
             topic_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
+            start_date:
+              $ref: "#/components/schemas/nullableDateString"
+            end_date:
+              $ref: "#/components/schemas/nullableDateString"
+            use_default_policy:
+              type: boolean
+            funding_codes:
+              $ref: "#/components/schemas/tags"
           required:
             - title
           additionalProperties: false
@@ -2394,6 +2402,14 @@ projectPatch:
               $ref: "#/components/schemas/assetLinkPatchList"
             topic_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
+            start_date:
+              $ref: "#/components/schemas/nullableDateString"
+            end_date:
+              $ref: "#/components/schemas/nullableDateString"
+            use_default_policy:
+              type: boolean
+            funding_codes:
+              $ref: "#/components/schemas/tags"
           additionalProperties: false
         relationships:
           type: object
@@ -4226,6 +4242,8 @@ projectResponse:
               $ref: "#/components/schemas/projectMembersList"
             use_default_policy:
               type: boolean
+            funding_codes:
+              $ref: "#/components/schemas/tags"
           required:
             - title
             - description
@@ -4272,6 +4290,10 @@ projectResponse:
             placeholders:
               $ref: "#/components/schemas/multipleReferences"
             human_diseases:
+              $ref: "#/components/schemas/multipleReferences"
+            samples:
+              $ref: "#/components/schemas/multipleReferences"
+            sample_types:
               $ref: "#/components/schemas/multipleReferences"
             project_administrators:
               $ref: "#/components/schemas/multipleReferences"

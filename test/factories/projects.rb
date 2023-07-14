@@ -37,8 +37,9 @@ FactoryBot.define do
       p.default_policy = FactoryBot.create(:private_policy)
   
       User.with_current_user member.user do
-        p.topic_annotations = ['Biomedical science','Chemistry']
-      end if SampleControlledVocab::SystemVocabs.topics_controlled_vocab
+        p.topic_annotations = ['Biomedical science','Chemistry'] if SampleControlledVocab::SystemVocabs.topics_controlled_vocab
+        p.funding_codes = ['DFG']
+      end
   
       p.save!
     end

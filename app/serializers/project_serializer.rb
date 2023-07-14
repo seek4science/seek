@@ -32,6 +32,10 @@ class ProjectSerializer < AvatarObjSerializer
     controlled_vocab_annotations('topic_annotations')
   end
 
+  attribute :funding_codes do
+    serialize_annotations(object, 'funding_code')
+  end
+
   has_many :organisms,  include_data: true
   has_many :human_diseases, include_data: true
 
@@ -52,6 +56,8 @@ class ProjectSerializer < AvatarObjSerializer
   has_many :documents
   has_many :workflows
   has_many :collections
+  has_many :samples
+  has_many :sample_types
 
   def show_default_policy?
     has_default_policy = !object.default_policy.nil?
