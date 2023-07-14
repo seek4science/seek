@@ -13,6 +13,7 @@
 
    query = index_params.dig(:filter, :query)
 
+
    any_list_items = resource_hash.any? { |key, res| res[:items_count] > 0 || res[:hidden_count] > 0 }
 %>
 
@@ -22,12 +23,19 @@
       <div class="tab-content">
         <% active = true %>
         <% ordered_resource_types.each_with_index do |type, i| -%>
+          <% more_results_path = polymorphic_path(type[:type].tableize.to_sym,'filter[query]':query) %>
 
             <% unless type[:items].empty? && (type[:hidden_count] == 0) %>
                 <div id="<%= type[:tab_id] -%>" role="tabpanel" class="tab-pane <%= 'active' if active -%>">
 
                   <% if type[:extra_count] > 0 %>
-                    Showing <%= type[:items_count] %> out of a possible <%= pluralize(resource_type_total_visible_count(type),'item') %>
+                    <span id='resource-shown-count'>
+                      Showing <%= type[:items_count] %> out of a possible
+                      <%=
+                        link_to(pluralize(resource_type_total_visible_count(type),type[:visible_resource_type]),
+                                more_results_path)
+                      %>
+                    </span>
                   <% end %>
 
                   <% if !type[:is_external] && safe_class_lookup(type[:type]).available_filters.any? %>

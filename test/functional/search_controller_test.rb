@@ -151,4 +151,26 @@ class SearchControllerTest < ActionController::TestCase
     assert_equal "1 item matched '<b>&lt;a href=&quot;#test-123&quot;&gt;test&lt;/a&gt;</b>' within their title or content.", flash[:notice]
     assert_select 'a[href="#test-123"]', count: 0
   end
+
+  test 'link for more results' do
+    FactoryBot.create_list(:public_document, 5)
+    with_config_value(:search_results_limit, 2) do
+      Document.stub(:solr_cache, -> (q) { Document.pluck(:id).last(5) }) do
+        get :index, params: { q: 'test' }
+      end
+    end
+
+    assert_select '#resource-shown-count',text:/Showing 2 out of a possible/
+    assert_select '#resource-shown-count a[href=?]',documents_path('filter[query]':'test'), text:'5 Documents'
+
+    # not shown if within limit
+    with_config_value(:search_results_limit, 6) do
+      Document.stub(:solr_cache, -> (q) { Document.pluck(:id).last(5) }) do
+        get :index, params: { q: 'test' }
+      end
+    end
+
+    assert_select '#resource-shown-count', count:0
+
+  end
 end
