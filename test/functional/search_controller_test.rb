@@ -160,8 +160,8 @@ class SearchControllerTest < ActionController::TestCase
       end
     end
 
-    assert_select '#resource-shown-count',text:/Showing 2 out of a possible/
-    assert_select '#resource-shown-count a[href=?]',documents_path('filter[query]':'test'), text:'5 Documents'
+    assert_select '#resources-shown-count',text:/Showing 2 out of a possible/
+    assert_select '#resources-shown-count a[href=?]',documents_path('filter[query]':'test'), text:'5 Documents'
     assert_select '#more-results a[href=?]',documents_path('filter[query]':'test'), text:/View all 5 Documents/
 
     # not shown if within limit
@@ -171,7 +171,7 @@ class SearchControllerTest < ActionController::TestCase
       end
     end
 
-    assert_select '#resource-shown-count', count:0
+    assert_select '#resources-shown-count', count:0
     assert_select '#more-results', count: 0
 
   end

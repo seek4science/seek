@@ -71,13 +71,17 @@ module ResourceListHelper
           more_results_link_text = "Advanced #{list_items_details[:visible_resource_type]} list for this #{internationalized_resource_name(parent_item.model_name.to_s, false)} with search and filtering #{right_arrow_glyph}".html_safe
      end
 
-     link_to(more_results_link_text, resource_list_more_results_path(list_items_details, search_query, parent_item), class: 'pull-right')
+    content_tag(:span, id: 'advanced-search-link') do
+      link_to(more_results_link_text, resource_list_more_results_path(list_items_details, search_query, parent_item), class: 'pull-right')
+    end
+
+
   end
 
   def resource_list_items_shown_text(list_items_details, search_query, parent_item)
     return nil if list_items_details[:is_external] || list_items_details[:extra_count] <= 0
 
-    content_tag(:span, id: 'resource-shown-count') do
+    content_tag(:span, id: 'resources-shown-count') do
       link = link_to(pluralize(resource_type_total_visible_count(list_items_details),list_items_details[:visible_resource_type]), resource_list_more_results_path(list_items_details, search_query, parent_item))
       "Showing #{list_items_details[:items_count]} out of a possible #{link}".html_safe
     end
