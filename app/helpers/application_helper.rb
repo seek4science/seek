@@ -455,9 +455,9 @@ module ApplicationHelper
 
   def pending_project_creation_request?
     return false unless logged_in_and_registered?
-    ProjectCreationMessageLog.pending_requests.collect do |log|
+    ProjectCreationMessageLog.pending_requests.detect do |log|
       log.can_respond_project_creation_request?(User.current_user)
-    end.any?
+    end.present?
   end
 
   def pending_project_join_request?
