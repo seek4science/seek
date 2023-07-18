@@ -19,7 +19,6 @@ class SamplesControllerTest < ActionController::TestCase
     assert_response :not_acceptable
   end
 
-
   test 'index' do
     FactoryBot.create(:sample, policy: FactoryBot.create(:public_policy))
     get :index
