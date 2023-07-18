@@ -33,6 +33,6 @@
       <%= link_to 'Delete',programme_path(@programme), method: :delete, data: { confirm: "You are about to permanently delete this #{t('programme')}. Are you sure?" }, class: 'btn btn-danger' %>
   <% else %>
     <%= link_to 'Reject',reject_activation_confirmation_programme_path(@programme),class: 'btn btn-danger' %>
-    <%= link_to('Delete without response', @programme, data: {confirm: 'Are you sure?'}, method: :delete, class:'btn btn-danger') %>
+    <%= link_to('Delete without response', @programme, data: { confirm: "You are about to permanently delete this #{t('programme')}. Are you sure?" }, method: :delete, class:'btn btn-danger') %>
   <% end %>
 </p>
