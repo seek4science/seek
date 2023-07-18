@@ -29,7 +29,7 @@
                 <td><%= link_to(programme.title, programme) %></td>
                 <td><%= date_as_string(programme.created_at, true)  %></td>
                 <td class="text-center">
-                  <%= link_to('Respond', activation_review_programme_path(programme),class:'btn btn-primary') %>
+                  <%= link_to('Respond', activation_review_programme_path(programme), class:'btn btn-primary') %>
                 </td>
               </tr>
             <% end %>
@@ -72,7 +72,7 @@
             <td><%= date_as_string(programme.created_at, true)  %></td>
             <td><%= programme.activation_rejection_reason %></td>
             <td class="text-center">
-              <%= link_to('Respond', activation_review_programme_path(programme),class:'btn btn-primary') %>
+              <%= link_to('Respond', activation_review_programme_path(programme), class:'btn btn-primary') %>
             </td>
           </tr>
         <% end %>
