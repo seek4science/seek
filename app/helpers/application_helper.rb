@@ -467,6 +467,11 @@ module ApplicationHelper
     return ProjectMembershipMessageLog.pending_requests(projects).any?
   end
 
+  def pending_programme_creation_request?
+    return false unless admin_logged_in?
+    return Programme.not_activated.where('activation_rejection_reason IS NULL').any?
+  end
+
   #whether to show a banner encouraging you to join or create a project
   def join_or_create_project_banner?
     return false unless logged_in_and_registered?

@@ -1,0 +1,32 @@
+<% if current_user && ProjectCreationMessageLog.pending_requests.limit(1).any? %>
+  <% cache [current_user, ProjectCreationMessageLog.pending_requests.last] do %>
+    <% if pending_project_creation_request? %>
+      <div id='pending-project-creation-warning' class="alert alert-danger text-center">
+        There are pending <%= t('project') %> creation requests - <%= link_to('Full List',project_creation_requests_projects_path) %>
+      </div>
+    <% end %>
+  <% end %>
+<% end %>
+
+<% if pending_programme_creation_request? %>
+  <div id='pending-programme-creation-warning' class="alert alert-danger text-center">
+    There are pending <%= t('programme') %> creation requests - <%= link_to('Full List',awaiting_activation_programmes_path) %>
+  </div>
+<% end %>
+
+<% if pending_project_join_request? %>
+  <div id='pending-project-join-warning' class="alert alert-danger text-center">
+    There are pending join requests for <%= t('project').pluralize %> you administer - <%= link_to('Full List',project_join_requests_projects_path) %>
+  </div>
+<% end %>
+
+<% if join_or_create_project_banner? %>
+  <div class="alert alert-warning text-center">
+    As a newly registered user, you are not yet a member of a <%= t('project') %>. Please
+    <%=
+      link_to(
+        button_tag("Join or Create a #{t('project')}", class:'btn btn-success'),
+        create_or_join_project_home_path)
+    %>
+  </div>
+<% end %>
