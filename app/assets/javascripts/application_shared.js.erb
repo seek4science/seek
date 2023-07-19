@@ -378,6 +378,24 @@ $j(document).ready(function () {
         }
     };
 
+    $j(document).on('click', '[data-role="seek-expandable-list-expand"]', function () {
+        var wrapper = $j(this).closest('[data-role="seek-expandable-list"]');
+        wrapper.find('ul:first').removeClass('collapsed');
+        wrapper.find('[data-role="seek-expandable-list-expand"]:first').hide();
+        wrapper.find('[data-role="seek-expandable-list-collapse"]:first').show();
+
+        return false;
+    });
+
+    $j(document).on('click', '[data-role="seek-expandable-list-collapse"]', function () {
+        var wrapper = $j(this).closest('[data-role="seek-expandable-list"]');
+        wrapper.find('ul:first').addClass('collapsed');
+        wrapper.find('[data-role="seek-expandable-list-expand"]:first').show();
+        wrapper.find('[data-role="seek-expandable-list-collapse"]:first').hide();
+
+        return false;
+    });
+
     $j('#sidebar-toggle').click(Sidebar.toggle);
     $j('#sidebar-close').click(Sidebar.toggle);
     $j(document).on('click', '.sidebar-backdrop', Sidebar.toggle);
