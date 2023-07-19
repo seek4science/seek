@@ -455,6 +455,7 @@ module ApplicationHelper
 
   def pending_project_creation_request?
     return false unless admin_logged_in? || programme_administrator_logged_in?
+
     ProjectCreationMessageLog.pending_requests.detect do |log|
       log.can_respond_project_creation_request?(User.current_user)
     end.present?
@@ -462,6 +463,7 @@ module ApplicationHelper
 
   def pending_project_join_request?
     return false unless project_administrator_logged_in?
+    return false if ProjectMembershipMessageLog.pending_requests.count == 0
     person = User.current_user.person
     projects = person.administered_projects
     return ProjectMembershipMessageLog.pending_requests(projects).any?
