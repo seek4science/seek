@@ -454,7 +454,7 @@ module ApplicationHelper
   end
 
   def pending_project_creation_request?
-    return false unless logged_in_and_registered?
+    return false unless admin_logged_in? || programme_administrator_logged_in?
     ProjectCreationMessageLog.pending_requests.detect do |log|
       log.can_respond_project_creation_request?(User.current_user)
     end.present?
