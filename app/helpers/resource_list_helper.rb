@@ -60,22 +60,20 @@ module ResourceListHelper
     end
   end
 
-  def resource_list_advanced_search_link(list_items_details, search_query, parent_item)
+  def resource_list_advanced_search_link(list_items_details, search_query, parent_item = nil)
     return nil if list_items_details[:is_external]
     return nil unless safe_class_lookup(list_items_details[:type]).available_filters.any?
     return nil unless (search_query || parent_item)
     right_arrow_glyph = "<span class='glyphicon glyphicon-arrow-right' aria-hidden='true'></span>"
-     if search_query
-          more_results_link_text = "Advanced #{list_items_details[:visible_resource_type]} search with filtering #{right_arrow_glyph}".html_safe
-     elsif parent_item
-          more_results_link_text = "Advanced #{list_items_details[:visible_resource_type]} list for this #{internationalized_resource_name(parent_item.model_name.to_s, false)} with search and filtering #{right_arrow_glyph}".html_safe
-     end
+    if search_query
+      more_results_link_text = "Advanced #{list_items_details[:visible_resource_type]} search with filtering #{right_arrow_glyph}".html_safe
+    elsif parent_item
+      more_results_link_text = "Advanced #{list_items_details[:visible_resource_type]} list for this #{internationalized_resource_name(parent_item.model_name.to_s, false)} with search and filtering #{right_arrow_glyph}".html_safe
+    end
 
     content_tag(:span, id: 'advanced-search-link') do
       link_to(more_results_link_text, resource_list_more_results_path(list_items_details, search_query, parent_item), class: 'pull-right')
     end
-
-
   end
 
   def resource_list_items_shown_text(list_items_details, search_query, parent_item)
