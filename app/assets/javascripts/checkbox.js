@@ -24,6 +24,22 @@ $j(document).ready(function () {
     $j("div.isa-tree-toggle-close").click(function () {
         isaTreeHide(this,$j(this).data("cb_parent_selector"))
     })
+    $j("a.collapseChildren").click(function (event) {
+        event.preventDefault();
+        collapseRecursively($j(this).data("cb_parent_selector"))
+    })
+    $j("a.expandChildren").click(function (event) {
+        event.preventDefault();
+        expandRecursively($j(this).data("cb_parent_selector"))
+    })
+    $j(".hideBlocked").click(function (event) {
+        event.preventDefault();
+        hideBlocked($j(this).data("cb_parent_selector"),$j(this).data("blocked_selector"))
+    })
+    $j(".showBlocked").click(function (event) {
+        event.preventDefault();
+        showBlocked($j(this).data("cb_parent_selector"),$j(this).data("blocked_selector"))
+    })
 })
 
 function selectChildren(select_all_element,cb_parent_selector){
@@ -56,7 +72,9 @@ function toggleManagers(item,managed_by_selector) {
 
 function isaTreeShow(item,cb_parent_selector) {
     let children_assets = $j('.isa-tree', $j(item).parents(cb_parent_selector))
-    children_assets.splice(0, 1);
+    if(cb_parent_selector.includes('split_button_parent')){
+        children_assets.splice(0, 1);
+    }
     let keep_closed = []
     for (let asset of children_assets) {
         $j(asset).show()
@@ -75,10 +93,40 @@ function isaTreeShow(item,cb_parent_selector) {
 }
 function isaTreeHide(item,cb_parent_selector){
     let children_assets = $j('.isa-tree', $j(item).parents(cb_parent_selector))
-    children_assets.splice(0, 1);
+    if(cb_parent_selector.includes('split_button_parent')){
+        children_assets.splice(0, 1);
+    }
     for (let asset of children_assets) {
         $j(asset).hide()
     }
     $j($j('.isa-tree-toggle-open', $j(item).parents(cb_parent_selector))[0]).show()
     $j($j('.isa-tree-toggle-close', $j(item).parents(cb_parent_selector))[0]).hide()
+}
+
+function collapseRecursively(cb_parent_selector){
+    let children_assets = $j('[class^=isa-tree-toggle]', $j(cb_parent_selector))
+    for (let asset of children_assets) {
+        isaTreeHide(asset,$j(asset).data("cb_parent_selector"))
+    }
+}
+
+function expandRecursively(cb_parent_selector){
+    let children_assets = $j('[class^=isa-tree-toggle]', $j(cb_parent_selector))
+    for (let asset of children_assets) {
+        isaTreeShow(asset,$j(asset).data("cb_parent_selector"))
+    }
+}
+
+function hideBlocked(cb_parent_selector,blocked_selector){
+    let children_assets = $j(blocked_selector, $j(cb_parent_selector))
+    for (let asset of children_assets) {
+        $j($j(asset).parents('div.split_button_parent')[0]).hide()
+    }
+}
+
+function showBlocked(cb_parent_selector,blocked_selector){
+    let children_assets = $j(blocked_selector, $j(cb_parent_selector))
+    for (let asset of children_assets) {
+        $j($j(asset).parents('div.split_button_parent')[0]).show()
+    }
 }

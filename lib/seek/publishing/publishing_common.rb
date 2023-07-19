@@ -3,7 +3,7 @@ module Seek
     module PublishingCommon
       def self.included(base)
         base.before_action :set_asset, only: [:check_related_items, :publish_related_items, :check_gatekeeper_required, :publish, :published]
-        base.before_action :set_assets, only: [:batch_publishing_preview]
+        base.before_action :set_assets, :set_investigations, only: [:batch_publishing_preview]
         base.before_action :set_items_for_publishing, only: [:check_gatekeeper_required, :publish]
         base.before_action :set_items_for_potential_publishing, only: [:check_related_items, :publish_related_items]
         base.before_action :publish_auth, only: [:batch_publishing_preview, :check_related_items, :publish_related_items, :check_gatekeeper_required, :publish, :waiting_approval_assets, :cancel_publishing_request]
@@ -141,6 +141,23 @@ module Seek
           can_manage_assets = can_manage_assets.select(&:can_publish?)
           unless can_manage_assets.empty?
             @assets[klass.name] = can_manage_assets
+          end
+        end
+      end
+
+      def set_investigations
+        @investigations = []
+        @assets_not_in_isa = []
+        @assets.each do |type, klass|
+          klass.each do |asset|
+            if asset.investigations.empty?
+              @assets_not_in_isa.push(asset)
+            else
+              asset.investigations.each do |inv|
+                next if @investigations.include?(inv)
+                @investigations.push(inv)
+              end
+            end
           end
         end
       end
