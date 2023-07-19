@@ -463,7 +463,7 @@ module ApplicationHelper
 
   def pending_project_join_request?
     return false unless project_administrator_logged_in?
-    return false if ProjectMembershipMessageLog.pending_requests.count == 0
+    return false if ProjectMembershipMessageLog.pending.count == 0
     person = User.current_user.person
     projects = person.administered_projects
     return ProjectMembershipMessageLog.pending_requests(projects).any?
