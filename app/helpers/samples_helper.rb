@@ -6,45 +6,35 @@ module SamplesHelper
     attribute_form_element(attribute, resource, element_name, element_class)
   end
 
-  def controlled_vocab_form_field(sample_controlled_vocab, element_name, values, limit=1)
-    if sample_controlled_vocab.sample_controlled_vocab_terms.count < Seek::Config.cv_dropdown_limit && sample_controlled_vocab.source_ontology.blank?
-      options = options_from_collection_for_select(
-        sample_controlled_vocab.sample_controlled_vocab_terms,
-        :label, :label,
-        values
-      )
-      select_tag element_name,
-                 options,
-                 class: "form-control",
-                 include_blank: ""
-    else
-      scv_id = sample_controlled_vocab.id
-      object_struct = Struct.new(:id, :title)
-      existing_objects = Array(values).collect do |value|
-        object_struct.new(value, value)
-      end
+  def controlled_vocab_form_field(sample_controlled_vocab, element_name, values, limit = 1)
 
-      typeahead = { handlebars_template: 'typeahead/controlled_vocab_term' }
-
-      if sample_controlled_vocab.sample_controlled_vocab_terms.count < Seek::Config.cv_dropdown_limit
-        values = sample_controlled_vocab.sample_controlled_vocab_terms.collect do |term|
-          {
-            id: term.label,
-            text: term.label,
-            iri: term.iri
-          }
-        end
-        typeahead[:values] = values
-      else
-        typeahead[:query_url] = typeahead_sample_controlled_vocabs_path + "?scv_id=#{scv_id}"
-      end
-
-      objects_input(element_name, existing_objects,
-                    typeahead: typeahead,
-                    limit: limit,
-                    allow_new: sample_controlled_vocab.custom_input?,
-                    class: 'form-control')
+    scv_id = sample_controlled_vocab.id
+    object_struct = Struct.new(:id, :title)
+    existing_objects = Array(values).collect do |value|
+      object_struct.new(value, value)
     end
+
+    typeahead = { handlebars_template: 'typeahead/controlled_vocab_term' }
+
+    if sample_controlled_vocab.sample_controlled_vocab_terms.count < Seek::Config.cv_dropdown_limit
+      values = sample_controlled_vocab.sample_controlled_vocab_terms.collect do |term|
+        {
+          id: term.label,
+          text: term.label,
+          iri: term.iri
+        }
+      end
+      typeahead[:values] = values
+    else
+      typeahead[:query_url] = typeahead_sample_controlled_vocabs_path + "?scv_id=#{scv_id}"
+    end
+
+    objects_input(element_name, existing_objects,
+                  typeahead: typeahead,
+                  limit: limit,
+                  allow_new: sample_controlled_vocab.custom_input?,
+                  class: 'form-control')
+
   end
 
   def controlled_vocab_list_form_field(sample_controlled_vocab, element_name, values)

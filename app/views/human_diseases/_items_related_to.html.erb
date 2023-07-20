@@ -1,8 +1,8 @@
-<% item = items_related_to %>
+<% parent_item = items_related_to %>
 <% limit ||= Seek::Config.related_items_limit %>
-<% resource_hash = get_transitive_related_resources(item, limit) %>
+<% resource_hash = get_transitive_related_resources(parent_item, limit) %>
 <% title ||= 'Related items' %>
 <h2><%= title %></h2>
 <%= render :partial => "assets/resource_listing_tabbed_by_class", :locals => {:resource_hash => resource_hash,
-                                                                              :item => item,
+                                                                              :parent_item => parent_item,
                                                                               :actions_partial_disable => false} -%>

@@ -130,7 +130,7 @@ function loadFilterSelectors(data) {
     let dt = [...new Set(data.map((item) => item[key]))];
     // If the key == level => options should be filtered out, depending on the 'field_name' context.
     // If field_name == null, the button was clicked from the new Template form and all options should be present.
-    if (key === "level") {
+    if (key === "level" && Templates.context.field_name !== null) {
       if(Templates.context.field_name === 'sample_collection_sample_type'){
         dt = dt.filter(lvl => lvl === "study sample")
       } else if(Templates.context.field_name === 'source_sample_type'){
@@ -138,10 +138,13 @@ function loadFilterSelectors(data) {
       } else if(Templates.context.field_name === 'sample_type') {
         dt = dt.filter(lvl => lvl === "assay")
       }
+      $j(elem).find("option").remove(); // Removes all options, even the first, i.e. "not selected"
+    }
+    else {
+      $j(elem).find("option").not(":first").remove(); // Removes all options, but keeps the first one (="not selected")
     }
 
-    $j(elem).find("option").not(":first").remove(); // Removes all options, except the first one
-    $j.each(dt, (i, item) => $j(elem).append(`<option value="${item}">${item}</option>`)); // Adds teh options to the select items
+    $j.each(dt, (i, item) => $j(elem).append(`<option value="${item}">${item}</option>`)); // Adds the options to the select items
     $j(elem).on("change", function () {
       const filters =  $j("[data-key]")
         .map((i, elem) => ({ key: elem.getAttribute("data-key"), value: elem.value }))

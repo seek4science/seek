@@ -19,7 +19,6 @@ class SamplesControllerTest < ActionController::TestCase
     assert_response :not_acceptable
   end
 
-
   test 'index' do
     FactoryBot.create(:sample, policy: FactoryBot.create(:public_policy))
     get :index
@@ -742,7 +741,9 @@ class SamplesControllerTest < ActionController::TestCase
     end
 
     assert_response :success
-    assert_select 'div.related-items a[href=?]', sample_samples_path(sample), text: "Advanced Samples list for this Sample with search and filtering ..."
+
+    assert_select 'div.related-items #resources-shown-count a[href=?]', sample_samples_path(sample), text: "2 Samples"
+    assert_select 'div.related-items #advanced-search-link a[href=?]', sample_samples_path(sample), text: "Advanced Samples list for this Sample with search and filtering"
   end
 
   test 'related samples index page works correctly' do

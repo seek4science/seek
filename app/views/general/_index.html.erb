@@ -28,9 +28,17 @@
 <div class="index-container">
   <%= render partial: 'assets/resource_filtering' if Seek::Config.filtering_enabled %>
   <div class="index-content">
-    <%= render partial: 'assets/resource_sorting', locals: { items: items } %>
-    <%= render partial: 'assets/resource_counts' %>
-    <%= render partial: 'assets/resource_active_filters' if Seek::Config.filtering_enabled %>
+    <div class="row">
+      <div class="col-sm-6">
+        <%= render partial: 'assets/resource_counts' %>
+      </div>
+      <div class="col-sm-6">
+        <%= render partial: 'assets/resource_sorting', locals: { items: items } %>
+      </div>
+      <div class="col-sm-12">
+        <%= render partial: 'assets/resource_active_filters' if Seek::Config.filtering_enabled %>
+      </div>
+    </div>
 
     <%= render partial: 'general/index_paged', locals: { items: items } %>
   </div>

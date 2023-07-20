@@ -455,9 +455,9 @@ module ApplicationHelper
 
   def pending_project_creation_request?
     return false unless logged_in_and_registered?
-    ProjectCreationMessageLog.pending_requests.collect do |log|
+    ProjectCreationMessageLog.pending_requests.detect do |log|
       log.can_respond_project_creation_request?(User.current_user)
-    end.any?
+    end.present?
   end
 
   def pending_project_join_request?
@@ -465,6 +465,11 @@ module ApplicationHelper
     person = User.current_user.person
     projects = person.administered_projects
     return ProjectMembershipMessageLog.pending_requests(projects).any?
+  end
+
+  def pending_programme_creation_request?
+    return false unless admin_logged_in?
+    return Programme.not_activated.where('activation_rejection_reason IS NULL').any?
   end
 
   #whether to show a banner encouraging you to join or create a project
@@ -524,6 +529,25 @@ module ApplicationHelper
     "isa_#{type}[#{type}]#{rest}"
   end
 
+  def expandable_list(items, limit: 10, none_text: 'None', id: nil, &block)
+    content_tag(:div, 'data-role' => 'seek-expandable-list') do
+      concat(if items.empty?
+               content_tag(:span, none_text, class: 'none_text')
+             else
+               content_tag(:ul, id: id, class: 'list collapsed') do
+                 items.each_with_index do |item, index|
+                   concat content_tag(:li, capture(item, &block), class: index >= limit ? 'hidden-item' : '')
+                 end
+               end
+             end)
+      if items.any? && items.length > limit
+        concat link_to(('More ' + image('expand')).html_safe, '#', class: 'pull-right',
+                       'data-role' => 'seek-expandable-list-expand')
+        concat link_to(('Less ' + image('collapse')).html_safe, '#', class: 'pull-right',
+                       style: 'display: none', 'data-role' => 'seek-expandable-list-collapse')
+      end
+    end
+  end
 end
 
 class ApplicationFormBuilder < ActionView::Helpers::FormBuilder
