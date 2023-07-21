@@ -1,6 +1,7 @@
 <%
    item = options_for_publishing
    checked ||= false
+   block_published ||= false
 
    tree_class = 'not-publishable'
    tree_class = 'publishable' if item.can_publish?
@@ -14,12 +15,7 @@
 -%>
 <div class="isa-tree <%= html_classes -%> <%= tree_class %> _<%= item.id %>">
   <% if toggle %>
-    <div class="isa-tree-toggle-close"  style="display: inline; margin-right:1em" data-cb_parent_selector='<%= cb_parent_selector %>' >
-      <span class="glyphicon glyphicon-menu-down" aria-hidden="true"></span>
-    </div>
-    <div class="isa-tree-toggle-open"  style="display: inline; margin-right:1em" data-cb_parent_selector='<%= cb_parent_selector %>' >
-      <span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span>
-    </div>
+    <%= render :partial => 'assets/isa-tree-toggle', locals: { cb_parent_selector: cb_parent_selector } -%>
   <% end %>
   <% if item.can_view? %>
     <div  style="display: inline; margin-right:1em">
@@ -68,9 +64,3 @@
     </div>
   <% end %>
 </div>
-
-<script type="text/javascript">
-    $j(document).ready(function () {
-        $j('.isa-tree-toggle-open').hide()
-    })
-</script>

@@ -18,10 +18,10 @@
       <% if item.is_asset? %>
         <%= render :partial => "assets/publishing/isa_publishing_preview",
                    :collection => item.assays.map(&:study).map(&:investigation).flatten.uniq,
-                   :locals => { :preselected => item } %>
+                   :locals => { :preselected => item, :publishing => true } %>
       <% else %>
         <%= render :partial => "assets/publishing/isa_publishing_preview", :object => item,
-                   :locals => { :preselected => item } %>
+                     :locals => { :preselected => item, :publishing => true } %>
       <% end %>
     <% else %>
       <%= check_box_tag publishing_item_param(item), 1, true, {:style => 'display:none;'} %>

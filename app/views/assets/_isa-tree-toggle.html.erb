@@ -1,0 +1,16 @@
+<%
+  cb_parent_selector ||=""
+-%>
+
+<div class="isa-tree-toggle-close"  style="display: inline; margin-right:1em; cursor:pointer" data-cb_parent_selector='<%= cb_parent_selector %>' >
+  <span class="glyphicon glyphicon-menu-down" aria-hidden="true"></span>
+</div>
+<div class="isa-tree-toggle-open"  style="display: inline; margin-right:1em; cursor:pointer" data-cb_parent_selector='<%= cb_parent_selector %>' >
+  <span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span>
+</div>
+
+<script type="text/javascript">
+    $j(document).ready(function () {
+        $j('.isa-tree-toggle-open').hide()
+    })
+</script>
