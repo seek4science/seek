@@ -16,11 +16,11 @@
   <% @items_for_publishing.each do |item| %>
     <% if item.contains_publishable_items? %>
       <% if item.is_asset? %>
-        <%= render :partial => "assets/publishing/isa_publishing_preview",
+        <%= render :partial => "assets/isa_tree_preview",
                    :collection => item.assays.map(&:study).map(&:investigation).flatten.uniq,
                    :locals => { :preselected => item, :publishing => true } %>
       <% else %>
-        <%= render :partial => "assets/publishing/isa_publishing_preview", :object => item,
+        <%= render :partial => "assets/isa_tree_preview", :object => item,
                      :locals => { :preselected => item, :publishing => true } %>
       <% end %>
     <% else %>
