@@ -73,6 +73,10 @@ ul.item_for_decision {
     border-left-color: $btn-warning-bg;
   }
 
+  &.not-visible {
+    border-left-color: $btn-danger-bg;
+  }
+
   &.already-published {
     border-left-color: $gray-light;
   }

@@ -120,7 +120,10 @@ function expandRecursively(cb_parent_selector){
 function hideBlocked(cb_parent_selector,blocked_selector){
     let children_assets = $j(blocked_selector, $j(cb_parent_selector))
     for (let asset of children_assets) {
-        $j($j(asset).parents('div.split_button_parent')[0]).hide()
+        // Don't hide "parents" of non-blocked items
+        if(!$j('input[type=checkbox]',$j(asset).parent()).length>0) {
+            $j($j(asset).parents('div.split_button_parent')[0]).hide()
+        }
     }
 }
 

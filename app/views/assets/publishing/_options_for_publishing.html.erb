@@ -6,6 +6,7 @@
    tree_class = 'not-publishable'
    tree_class = 'publishable' if item.can_publish?
    tree_class = 'already-published' if item.is_published?
+   tree_class = 'not-visible' unless item.can_view?
 
    toggle ||=false
    cb_parent_selector ||="div\##{item.class.name}_#{item.id}.split_button_parent"
@@ -19,26 +20,15 @@
   <% end %>
   <% if item.can_view? %>
     <div  style="display: inline; margin-right:1em">
-      <% if item.is_published? %>
-        <%= render :partial => 'general/split_button_checkbox',
-                   locals: { checkbox_id: publishing_item_param(item),
-                             checkbox_class: "#{item.class.name}_#{item.id}",
-                             published: true,
-                             toggle: toggle,
-                             cb_parent_selector: cb_parent_selector} -%>
-      <% elsif item.can_publish? %>
-        <%= render :partial => 'general/split_button_checkbox',
-                   locals: { checkbox_id: publishing_item_param(item),
-                             checkbox_class: "#{item.class.name}_#{item.id}",
-                             checkbox_text: "",
-                             checked: checked,
-                             toggle: toggle,
-                             cb_parent_selector: cb_parent_selector} -%>
-      <% else %>
-        <span class="label label-warning" data-tooltip="<%= tooltip('You do not have permission to publish this item.') %>">
-          <span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span>
-        </span>
-      <% end %>
+      <%= render :partial => 'general/split_button_checkbox',
+                 locals: { checkbox_id: publishing_item_param(item),
+                           checkbox_class: "#{item.class.name}_#{item.id}",
+                           checked: checked,
+                           checkbox_text: "",
+                           published: (item.is_published? && block_published),
+                           cant_manage: !(item.can_manage?),
+                           toggle: toggle,
+                           cb_parent_selector: cb_parent_selector} -%>
     </div>
     <h5 class="type_and_title" style="display: inline">
       <strong><%= text_for_resource item -%>:</strong> <%= link_to item.title, item, :target => "_blank" -%>
@@ -46,9 +36,12 @@
     </h5>
   <% else %>
     <div  style="display: inline; margin-right:1em">
-      <span class="label label-danger" data-tooltip="<%= tooltip('You do not have permission to view this item.') %>">
-        <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
-      </span>
+      <%= render :partial => 'general/split_button_checkbox',
+                 locals: { checkbox_id: publishing_item_param(item),
+                           checkbox_class: "#{item.class.name}_#{item.id}",
+                           not_visible: true,
+                           toggle: toggle,
+                           cb_parent_selector: cb_parent_selector} -%>
     </div>
     <h5 class="type_and_title" style="display: inline"><strong><%= text_for_resource item -%>:</strong> This item is hidden to you</h5>
     <% unless current_user.try(:person) && item.can_see_hidden_item?(current_user.person) %>

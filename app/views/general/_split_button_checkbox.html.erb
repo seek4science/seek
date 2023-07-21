@@ -2,7 +2,9 @@
   #<%= render :partial => 'general/split_button_checkbox',
   #locals: { checkbox_id: publishing_item_param(item),
   #          checkbox_class: "#{item.class.name}_#{item.id}",
-  #          published: true,
+  #          published: false,
+  #          cant_manage: false
+  #          not_visible: false
   #          checkbox_text: "Publish?",
   #          checked: checked,
   #          toggle: children.any?,
@@ -11,27 +13,45 @@
   checkbox_class ||= "no_name"   # <- Needed!
   checkbox_id ||= checkbox_class
   published ||= false
+  cant_manage ||= false
+  not_visible ||= false
   checkbox_text ||= ""
   checked ||= false
   toggle ||= false
   cb_parent_selector ||= "div\##{checkbox_class}.split_button_parent"
 -%>
 <div class="btn-group" >
-  <button type="button" class="btn parent-btn-checkbox">
-    <% if published %>
-      <span class="label label-default" data-tooltip="<%= tooltip('This item has already been published.') %>">
+
+  <% if published %>
+    <button type="button" class="btn parent-btn-checkbox label-default">
+      <span class="label" style="padding: 1px" data-tooltip="<%= tooltip('This item has already been published.') %>">
           <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
           Published
       </span>
-    <% else %>
+    </button>
+  <% elsif cant_manage %>
+    <button type="button" class="btn parent-btn-checkbox label-warning">
+      <span class="label" style="padding: 1px" data-tooltip="<%= tooltip('You do not have permission to manage this item.') %>">
+          <span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span>
+      </span>
+    </button>
+  <% elsif not_visible %>
+    <button type="button" class="btn parent-btn-checkbox label-danger">
+      <span class="label" style="padding: 1px" data-tooltip="<%= tooltip('You do not have permission to view this item.') %>">
+        <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
+      </span>
+    </button>
+  <% else %>
+    <button type="button" class="btn parent-btn-checkbox">
       <label style="font-weight:normal;">
         <%= check_box_tag checkbox_id, 1, checked,
                           {:class=>checkbox_class,
                            :onclick=>"checkRepeatedItems(this)"} -%>
         <%= checkbox_text -%>
       </label>
-    <% end %>
-  </button>
+    </button>
+  <% end %>
+
   <% if toggle %>
     <button type="button" class="btn dropdown-toggle parent-btn-dropdown"
             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
