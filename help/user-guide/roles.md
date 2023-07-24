@@ -56,7 +56,7 @@ The item will not become available until the asset gatekeeper has approved it.
 
 Gatekeepers can access a list of publishing requests by clicking the menu "My profile" and then the button "Assets you are Gatekeeping".
 
-(image)
+![gatekeeper gatekeeping](/images/user-guide/gatekeeper_gatekeeping.png){:.screenshot}
 
 Gatekeepers are granted permission to view the items in question (if they don't already have it),
 so that they can decide whether to approve or reject the request.
@@ -91,7 +91,8 @@ This applies to both items that have been created before and after the gatekeepe
 ### Keeping track of your own publishing requests
 
 You can access a list of the items you have requested to be published by clicking the menu "My profile" and then the button "Assets awaiting approval".
-(image)
+
+![gatekeeper awaiting approval](/images/user-guide/gatekeeper_awaiting_approval.png){:.screenshot}
 
 This allows you to monitor whether the gatekeeper has made a decision on your items or not.
 If an item was rejected, you will be able to see the gatekeeper's comments from this list.
