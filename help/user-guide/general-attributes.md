@@ -54,7 +54,31 @@ You can select an organism from the drop down menu.
 
 
 ## Sharing
-SEEK has fine grained sharing permissions. You can choose to share an asset in SEEK with just you, selected people within and outside of SEEK, your whole project, or publicly.
+
+FAIRDOM-SEEK has fine grained sharing permissions. You can choose to set an item private (no access) or to share it with selected people, institutions, projects or programmes within SEEK, or to share it publicly. 
+
+There are different levels of sharing permissions: 
+* "View" allows to see only the title and description of an item;
+* "Download" gives access to the content;
+* "Edit" allows to change details of attributes of the item;
+* "Manage" gives rights to change project assignments, sharing permissions, creators or to add a temporary sharing link. Only with manage rights an item can be deleted permanently.
+
+An item's sharing permission can be set 
+* by managing the asset individually
+* or via the "Batch permission changes" button in your user profile.
+
+## Publishing
+
+An item is only considered *published* if its **Public** sharing permissions are set to:
+- **View** if the item is not downloadable (Investigations, Studies, Assays...)
+- **Download** if the item is downloadable (SOPs, Documents, Data Files...)
+
+Items can be published 
+* individually through the "Publish" button in the item's actions menu,
+* by managing the asset and changing its **Public** sharing permissions to a published status.
+* in bulk, via the "Publish your items" or "Batch permission changes" buttons in your user profile. The same sharing permission rules for considering an item as published apply.
+
+When you attempt to publish an asset in a project that has gatekeeper(s), you will be shown a notice about the gatekeeper being notified.
 
 ## Tags
 Tags are key words that are relevant in some way to the asset and its properties. They are used so relevant assets can be found more easily by other users using key-word searches. To include a tag you just type it into the box. Suggestions of tags will appear in a drop down menu as you type. You are free to use any free text for tags.
