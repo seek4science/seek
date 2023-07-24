@@ -43,73 +43,73 @@ The Asset Housekeeper has the special ability to manage assets belonging to othe
 To become an Asset housekeeper the user must also be a member of that Project.
 
 ## Asset gatekeeper
-This is an optional role, which allows a specific user or users to have control over whether assets within the project are made public or not.
-It is a way of preventing pre-published items becoming publicly available to soon.
+This is an optional role in project, which allows a specific user or users to have control over whether assets and items is general within the project are made public or not.
+It is a way of preventing not-published items from becoming publicly available to soon.
 
-Whenever a user attempts to *publish* an asset, a request is sent to the Asset Gatekeeper.
-The asset will not become available until the Asset Gatekeeper has approved it.
+To become an asset gatekeeper in a project the user must also be a member of that Project.
 
-To become an Asset gatekeeper the user must also be a member of that Project.
+Whenever a user attempts to *publish* an item in a project with an asset gatekeeper, a request is sent to the asset gatekeeper.
+The item will not become available until the asset gatekeeper has approved it.
 
-___
 
-### When is the gatekeeper involved?
+### Approving or rejecting a request to publish items
+
+Gatekeepers can access a list of publishing requests by clicking the menu "My profile" and then the button "Assets you are Gatekeeping".
+
+(image)
+
+Gatekeepers are granted permission to view the items in question (if they don't already have it),
+so that they can decide whether to approve or reject the request.
+They can also opt to add a comment to the requester, for example to explain why a request was rejected.
+
+If rejected, the item remains unpublished and a notification is sent to the requester,
+along with the gatekeeper's comments.
+
+If approved, the item is immediately made available, and the requester is notified.
+
+
+### Publishing an item in project with Asset gatekeeper
 
 The gatekeepers only control the **Public** access of an item,
 and their approval is only required when *publishing* an item.
 
 An item is only considered *published* if its **Public** sharing permissions are set to:
-- **View** if the item is not downloadable (Investigations, Studies, Assays...).
+- **View** if the item is not downloadable (Investigations, Studies, Assays...)
 - **Download** if the item is downloadable (SOPs, Documents, Data Files...)
 
-Note that this means that *downloadable* items can be set to **View** without involving the gatekeeper.
+Note that this means: 
+* *downloadable* items can be set to **View** without involving the gatekeeper
+* *permissions* can be extended to individuals or groups without involving the gatekeeper
 
-It also means that *permissions* can be extended to individuals or groups without involving the gatekeeper.
 
-### How do I request to publish an asset?
+### Requesting to publish an item for the gatekeeper
 
 Requests are automatically sent to the gatekeeper when an item is attempted to be published.
-This applies both to new and pre-existing assets.
+This applies to both items that have been created before and after the gatekeeper has been assigned to a project.
 
-Assets can be published individually through the "Publish" button in the asset's actions menu,
-or by managing the asset and changing its **Public** sharing permissions to a published status (see above).
 
-They can also be published in bulk, via the "Publish your items" or "Batch permission changes" buttons in your user profile.
-The same sharing permission rules for considering an item as published apply.
+### Keeping track of your own publishing requests
 
-When you attempt to publish an asset, you will be shown a notice about the gatekeeper being notified.
+You can access a list of the items you have requested to be published by clicking the menu "My profile" and then the button "Assets awaiting approval".
+(image)
 
-### How can the gatekeeper approve or reject a request?
-
-Gatekeepers can access a list of publishing requests from their user profile
-(through the "Assets you are Gatekeeping" button).
-Gatekeepers are granted permission to view the asset in question (if they don't already have it),
-so that they can decide whether to approve or reject the request.
-They can also opt to add a comment to the requester, for example to explain why a request was rejected.
-
-If rejected, the asset remains unpublished and a notification is sent to the requester,
-along with the gatekeeper's comments.
-If approved, the asset is immediately made available, and the requester is notified.
-
-### How can I keep track of my publishing request?
-
-You can access a list of the items you have requested to be published from your user profile
-(through the "Assets awaiting approval" button).
 This allows you to monitor whether the gatekeeper has made a decision on your items or not.
 If an item was rejected, you will be able to see the gatekeeper's comments from this list.
 
-While your item is waiting approval from the gatekeeper, or if it has been rejected,
-you will also see a warning that indicates the state on the asset's page.
-The warning will disappear when the request is approved (or if you cancel the request).
+While your item is waiting for approval from the gatekeeper, or if it has been rejected, you will also see a warning that indicates the status on the asset's page.
+The warning will disappear when the request is approved or if you cancel your request.
 
-### Can I cancel a publishing request?
 
-Yes. The list of assets awaiting approval includes a button to do so.
+### Cancelling your own publishing request
 
-Alternatively, you can cancel your request from the asset's actions menu,
-or from the button shown above the sharing permissions table in the asset's manage view.
+You can cancel the publishing request in many ways:
 
-___
+* Via the list of "Assets awaiting approval" under "My profile", which includes the button "Cancel this request".
+
+* Alternatively, you can cancel your request from the item's Actions menu, which will show the "Cancel publishing request" option.
+
+* Or via the "Manage" option under the item's Actions menu, using the "Cancel request" button shown above the sharing permissions table.
+
 
 ## Project administrator
 The Project Administrator gets notified when someone new signs up to the project within SEEK. They also have the ability to:
