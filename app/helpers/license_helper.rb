@@ -3,11 +3,13 @@ require 'seek/license'
 
 module LicenseHelper
   def grouped_license_select(name, selected = nil, opts = {})
+    opts[:data] ||= {}
+    opts[:data]['role'] = 'seek-license-select'
     select_tag(name, grouped_options_for_select(grouped_license_options(opts), selected), opts)
   end
 
-  def describe_license(id, source = nil)
-    license = Seek::License.find(id, source)
+  def describe_license(id)
+    license = Seek::License.find(id)
     content = license_description_content(license)
 
     if !license || license.is_null_license?

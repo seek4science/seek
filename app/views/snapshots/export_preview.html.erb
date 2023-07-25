@@ -89,7 +89,6 @@
                                                                 sort_by { |p| p[:name] }.to_json.html_safe %>;
 
     $j(document).ready(function () {
-        $j('#license-select').change(zenodoExport.setLicenseUrl);
         $j('#access-right-section input:radio').change(zenodoExport.toggleSections);
         $j('#add-creator-button').click(zenodoExport.addCreator);
         $j('#add-creator').keypress(function(e) {
@@ -101,7 +100,6 @@
         });
 
         zenodoExport.toggleSections();
-        zenodoExport.setLicenseUrl();
         zenodoExport.renderCreatorList();
     });
 </script>
