@@ -8,9 +8,9 @@ module LicenseHelper
     recommended = opts.delete(:recommended)
     source = opts.delete(:source) || Seek::License.combined
     if recommended
-      options = grouped_options_for_select(grouped_license_options(source, recommended), selected)
+      options = grouped_options_for_select(grouped_license_options(source.values, recommended), selected)
     else
-      options = options_for_select(license_options(source), selected)
+      options = options_for_select(license_options(source.values), selected)
     end
     select_tag(name, options, opts)
   end
@@ -72,14 +72,20 @@ module LicenseHelper
     end
   end
 
-  def license_options(source)
-    source.values.map do |value|
+  def license_options(licenses)
+    licenses.map do |value|
       [value['title'], value['id'], { 'data-url' => value['url'] }]
-    end.sort_by!(&:first)
+    end.sort_by do |value|
+      if value[1] == Seek::License::NULL_LICENSE # Put null license first
+        '-'
+      else
+        value[0] # Otherwise sort by title
+      end
+    end
   end
 
-  def grouped_license_options(source, recommended)
-    grouped_licenses = source.values.group_by do |l|
+  def grouped_license_options(licenses, recommended)
+    grouped_licenses = licenses.group_by do |l|
       if recommended&.include?(l['id'])
         'recommended'
       else
@@ -87,8 +93,8 @@ module LicenseHelper
       end
     end
 
-    grouped_licenses.transform_values! do |licenses|
-      licenses.map! { |value| [value['title'], value['id'], { 'data-url' => value['url'] }] }.sort_by!(&:first)
+    grouped_licenses.transform_values! do |l|
+      license_options(l)
     end
 
     # Transform into array to ensure recommended licenses come first
