@@ -12,6 +12,7 @@ You should make titles as descriptive as possible.
 ## Description
 The description allows you to further expand important details.
 Descriptions can be formatted using [markdown](https://www.markdownguide.org/basic-syntax/), either via markup or using the various options above the text input (e.g. bold, italics, hyperlinks...).
+
 ![Markdown ribbon UI](/images/user-guide/description_markdown_ribbon.png){:.screenshot}
 
 
@@ -83,7 +84,7 @@ Non-public items can be published
 
 "Publish your assets" button in your user profile allows you to publish Assets in batch.
 
-
+![batch sharing publishing](/images/user-guide/bulk-permission-change/batch_sharing_publishing.png){:.screenshot}
 
 When you attempt to publish an item in a project that has gatekeeper(s), you will be shown a notice about the gatekeeper being notified.
 
