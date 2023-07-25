@@ -10,47 +10,62 @@ module Seek
       json
     end
 
-    private_class_method def self.organize_licenses(licenses)
-      category = {}
+    private_class_method def self.parse_zenodo(licenses)
+                           hash = {}
+                           licenses.each do |l|
+                             hash[l['id']] = l
+                           end
+                           hash
+                         end
 
-      category[:all] = licenses
-                         .sort_by { |l| l['title'] }
-                         .sort_by { |l| l.key?('is_generic') && l['is_generic'] ? 0 : 1 }
+    private_class_method def self.parse_spdx(licenses)
+                           hash = {}
+                           licenses['licenses'].each do |l|
+                             hash[l['licenseId']] = {
+                               'title' => l['name'],
+                               'id' => l['licenseId'],
+                               'url' => (l['seeAlso'] || []).first || l['reference']
+                             }
+                           end
+                           hash
+                         end
 
-      category[:data] = category[:all].select do |l|
-        l['domain_data'] ||
-          l['domain_content'] ||
-          l['id'] == NULL_LICENSE
-      end
+    private_class_method def self.combine(*licenses)
+                           combined = {}
+                           licenses.each do |set|
+                             set.each { |l| combined[l['id']] ||= l }
+                           end
+                           combined
+                         end
 
-      category[:software] = category[:all].select do |l|
-        (l['domain_software'] || l['id'] == NULL_LICENSE)
-      end
-
-      category
-    end
-
-    def self.find(id, source = nil)
+    def self.find(id, source = Seek::License.combined)
       if (license = find_as_hash(id, source))
         new(license)
       end
     end
 
-    def self.find_as_hash(id, source = nil)
-      source ||= Seek::License.open_definition[:all]
-      source.find { |l| l['id'] == id }
+    def self.find_as_hash(id, source = Seek::License.combined)
+      source[id]
     end
 
     def is_null_license?
       id == NULL_LICENSE
     end
 
+    def self.combined
+      @combined ||= open_definition.merge(spdx)
+    end
+
+    def self.spdx
+      @spdx_licenses ||= parse_spdx(JSON.parse(File.read(File.join(Rails.root, 'public', 'spdx_licenses.json'))))
+    end
+
     def self.open_definition
-      @od_licenses ||= organize_licenses(override_json(JSON.parse(File.read(File.join(Rails.root, 'public', 'od_licenses.json')))).values)
+      @od_licenses ||= override_json(JSON.parse(File.read(File.join(Rails.root, 'public', 'od_licenses.json'))))
     end
 
     def self.zenodo
-      @zenodo_licenses ||= organize_licenses(JSON.parse(File.read(File.join(Rails.root, 'public', 'zenodo_licenses.json'))))
+      @zenodo_licenses ||= parse_zenodo(JSON.parse(File.read(File.join(Rails.root, 'public', 'zenodo_licenses.json'))))
     end
   end
 end
