@@ -24,7 +24,7 @@ module Seek
                              hash[l['licenseId']] = {
                                'title' => l['name'],
                                'id' => l['licenseId'],
-                               'url' => (l['seeAlso'] || []).first || l['reference']
+                               'url' => l['reference'].chomp('.html')
                              }
                            end
                            hash

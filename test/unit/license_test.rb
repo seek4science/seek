@@ -40,19 +40,19 @@ class LicenseTest < ActiveSupport::TestCase
     license = Seek::License.find('CC-BY-4.0', @spdx)
     assert license.is_a?(Seek::License)
     assert_equal 'Creative Commons Attribution 4.0 International', license.title
-    assert_equal 'https://creativecommons.org/licenses/by/4.0/legalcode', license.url
+    assert_equal 'https://spdx.org/licenses/CC-BY-4.0', license.url
 
     license = Seek::License.find('Zed', @spdx)
     assert license.is_a?(Seek::License)
     assert_equal 'Zed License', license.title
-    assert_equal 'https://fedoraproject.org/wiki/Licensing/Zed', license.url
+    assert_equal 'https://spdx.org/licenses/Zed', license.url
   end
 
   test 'can find licenses as hash in spdx vocab' do
     license = Seek::License.find_as_hash('Zed', @spdx)
     assert license.is_a?(Hash)
     assert_equal 'Zed License', license['title']
-    assert_equal 'https://fedoraproject.org/wiki/Licensing/Zed', license['url']
+    assert_equal 'https://spdx.org/licenses/Zed', license['url']
   end
 
   test 'can find licenses in combined vocab' do
@@ -69,12 +69,12 @@ class LicenseTest < ActiveSupport::TestCase
     license = Seek::License.find('Zed', @combined)
     assert license.is_a?(Seek::License)
     assert_equal 'Zed License', license.title
-    assert_equal 'https://fedoraproject.org/wiki/Licensing/Zed', license.url
+    assert_equal 'https://spdx.org/licenses/Zed', license.url
 
     license = Seek::License.find('CC-BY-4.0')
     assert license.is_a?(Seek::License)
     assert_equal 'Creative Commons Attribution 4.0 International', license.title
-    assert_equal 'https://creativecommons.org/licenses/by/4.0/legalcode', license.url
+    assert_equal 'https://spdx.org/licenses/CC-BY-4.0', license.url
   end
 
   test 'can find licenses as hash in combined vocab' do
@@ -91,12 +91,12 @@ class LicenseTest < ActiveSupport::TestCase
     license = Seek::License.find_as_hash('Zed', @combined)
     assert license.is_a?(Hash)
     assert_equal 'Zed License', license['title']
-    assert_equal 'https://fedoraproject.org/wiki/Licensing/Zed', license['url']
+    assert_equal 'https://spdx.org/licenses/Zed', license['url']
 
     license = Seek::License.find_as_hash('CC-BY-4.0')
     assert license.is_a?(Hash)
     assert_equal 'Creative Commons Attribution 4.0 International', license['title']
-    assert_equal 'https://creativecommons.org/licenses/by/4.0/legalcode', license['url']
+    assert_equal 'https://spdx.org/licenses/CC-BY-4.0', license['url']
   end
 
   test 'returns nil when cannot find license' do
