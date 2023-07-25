@@ -65,20 +65,22 @@ There are different levels of sharing permissions:
 
 An item's sharing permission can be set 
 * by managing the asset individually
-* or via the "Batch permission changes" button in your user profile.
+* via the "Batch permission changes" button in your user profile.
 
 ## Publishing
 
 An item is only considered *published* if its **Public** sharing permissions are set to:
-- **View** if the item is not downloadable (Investigations, Studies, Assays...)
-- **Download** if the item is downloadable (SOPs, Documents, Data Files...)
+- **View** if the item is not downloadable (Investigations, Studies, Assays...);
+- **Download** if the item is downloadable (SOPs, Documents, Data Files...).
 
-Items can be published 
+Non-public items can be published
 * individually through the "Publish" button in the item's actions menu,
-* by managing the asset and changing its **Public** sharing permissions to a published status.
-* in bulk, via the "Publish your items" or "Batch permission changes" buttons in your user profile. The same sharing permission rules for considering an item as published apply.
+* by managing the item and changing its **Public** sharing permissions to a published status (see definition above),
+* in bulk, via the "Batch permission changes" button in your user profile. The same sharing permission rules for considering an item as published apply.
 
-When you attempt to publish an asset in a project that has gatekeeper(s), you will be shown a notice about the gatekeeper being notified.
+"Publish your assets" button in your user profile allows you to publish Assets in batch.
+
+When you attempt to publish an item in a project that has gatekeeper(s), you will be shown a notice about the gatekeeper being notified.
 
 ## Tags
 Tags are key words that are relevant in some way to the asset and its properties. They are used so relevant assets can be found more easily by other users using key-word searches. To include a tag you just type it into the box. Suggestions of tags will appear in a drop down menu as you type. You are free to use any free text for tags.
