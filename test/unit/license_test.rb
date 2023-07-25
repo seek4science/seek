@@ -124,7 +124,7 @@ class LicenseTest < ActiveSupport::TestCase
     sop.license = 'CCZZ'
     refute sop.valid?
     assert_equal 1,sop.errors.count
-    assert sop.errors.added?(:license, "isn't a valid license ID")
+    assert sop.errors.added?(:license, "isn't a recognized license")
 
     #allow blank
     sop.license=nil
@@ -137,4 +137,26 @@ class LicenseTest < ActiveSupport::TestCase
     assert sop.valid?
   end
 
+  test 'lookup license ID from URI' do
+    assert_equal 'CC-BY-4.0', Seek::License.uri_to_id('https://spdx.org/licenses/CC-BY-4.0.html')
+    assert_equal 'CC-BY-4.0', Seek::License.uri_to_id('https://spdx.org/licenses/CC-BY-4.0')
+    assert_equal 'CC-BY-4.0', Seek::License.uri_to_id('https://creativecommons.org/licenses/by/4.0/')
+    assert_equal 'CC-BY-4.0', Seek::License.uri_to_id('https://creativecommons.org/licenses/by/4.0/legalcode')
+
+    assert_equal 'MIT-open-group', Seek::License.uri_to_id('https://gitlab.freedesktop.org/xorg/app/iceauth/-/blob/master/COPYING')
+
+    assert_nil Seek::License.uri_to_id('https://creativecommons.org/licenses/by/5.0')
+  end
+
+  test 'set license via URI' do
+    sop = FactoryBot.create(:sop, license: 'https://creativecommons.org/licenses/by/4.0/')
+    assert sop.valid?
+    assert_equal 'CC-BY-4.0', sop.license
+
+    sop.license = 'CCZZ'
+    refute sop.valid?
+    assert_equal 1,sop.errors.count
+    assert sop.errors.added?(:license, "isn't a recognized license")
+    assert_equal 'CCZZ', sop.license
+  end
 end

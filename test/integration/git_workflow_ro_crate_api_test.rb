@@ -103,6 +103,20 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test 'can identify license from URI' do
+    assert_difference('Workflow.count', 1) do
+      post workflows_path, params: {
+        ro_crate: fixture_file_upload('workflows/ro-crate-with-uri-license.crate.zip'),
+        workflow: {
+          project_ids: [@project.id]
+        }
+      }
+
+      assert_response :success
+      assert_equal 'MIT', assigns(:workflow).license
+    end
+  end
+
   private
 
   def login_as(user)
