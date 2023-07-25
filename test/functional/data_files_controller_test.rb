@@ -2132,7 +2132,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     get :edit, params: { id: df }
     assert_response :success
-    assert_select '#license-select option[selected=?]', 'selected', text: 'Creative Commons Attribution Share-Alike 4.0'
+    assert_select '#license-select option[selected=?]', 'selected', text: 'Creative Commons Attribution Share Alike 4.0 International'
 
     df2 = FactoryBot.create :data_file, license: nil, policy: FactoryBot.create(:public_policy)
 
@@ -2142,7 +2142,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     register_content_blob
     assert_response :success
-    assert_select '#license-select option[selected=?]', 'selected', text: 'Creative Commons Attribution 4.0'
+    assert_select '#license-select option[selected=?]', 'selected', text: 'Creative Commons Attribution 4.0 International'
   end
 
   test 'can disambiguate sample type' do
