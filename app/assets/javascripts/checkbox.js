@@ -120,9 +120,15 @@ function expandRecursively(cb_parent_selector){
 function hideBlocked(cb_parent_selector,blocked_selector){
     let children_assets = $j(blocked_selector, $j(cb_parent_selector))
     for (let asset of children_assets) {
-        // Don't hide "parents" of non-blocked items
-        if(!$j('input[type=checkbox]',$j(asset).parent()).length>0) {
-            $j($j(asset).parents('div.split_button_parent')[0]).hide()
+        //Items in isa tree
+        if($j($j(asset).parents('div.split_button_parent')).length>0) {
+            // Don't hide "parents" of non-blocked items
+            if (!$j('input[type=checkbox]', $j(asset).parent()).length > 0) {
+                $j($j(asset).parents('div.split_button_parent')[0]).hide()
+            }
+        //Items not in isa tree
+        } else {
+            $j(asset).hide()
         }
     }
 }
@@ -130,6 +136,10 @@ function hideBlocked(cb_parent_selector,blocked_selector){
 function showBlocked(cb_parent_selector,blocked_selector){
     let children_assets = $j(blocked_selector, $j(cb_parent_selector))
     for (let asset of children_assets) {
-        $j($j(asset).parents('div.split_button_parent')[0]).show()
+        if($j($j(asset).parents('div.split_button_parent')).length>0) {
+            $j($j(asset).parents('div.split_button_parent')[0]).show()
+        } else{
+            $j(asset).show()
+        }
     }
 }

@@ -27,6 +27,12 @@
     Collapse all </a></label> |
   <label><a class="expandChildren" id="expand_all" data-cb_parent_selector='body' >
     Expand all </a></label>
+  <% if show_hide_blocked %>
+    | <label><a class="showBlocked" data-cb_parent_selector='div#sorted_by_type,#sorted_by_isa' data-blocked_selector="<%="#{blocked_selector}"%>">
+  Show blocked items </a></label>
+    | <label><a class="hideBlocked" data-cb_parent_selector='div#sorted_by_type,#sorted_by_isa' data-blocked_selector="<%="#{blocked_selector}"%>">
+  Hide blocked items </a></label>
+  <% end %>
 </div>
 
 <div id="sorted_by_type" >
@@ -44,8 +50,8 @@
         <% items.each do |item| %>
           <%= render :partial => "assets/asset_checkbox_row",
                      :object => item,
-                     :block_published => publishing,
-                     :locals => { :html_classes => "publishing_options" } -%>
+                     :locals => { :html_classes => "publishing_options",
+                                  :block_published => publishing } -%>
         <% end %>
       </div>
     </div>
@@ -69,8 +75,8 @@
       <% @assets_not_in_isa.each do |item| %>
         <%= render :partial => "assets/asset_checkbox_row",
                    :object => item,
-                   :block_published => publishing,
-                   :locals => { :html_classes => "publishing_options" } -%>
+                   :locals => { :html_classes => "publishing_options",
+                                :block_published => publishing } -%>
       <% end %>
       <br/>
     </div>
@@ -115,5 +121,8 @@
 <script type="text/javascript">
     $j(document).ready(function () {
         $j('div#sorted_by_isa').hide()
+    })
+    $j(document).ready(function () {
+        hideBlocked(document,"<%="#{blocked_selector}"%>")
     })
 </script>

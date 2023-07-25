@@ -5,7 +5,7 @@
 
   tree_class = 'not-manageable'
   tree_class = 'publishable' if item.can_publish? && item.can_manage?
-  tree_class = 'already-published' if item.is_published? && block_published
+  tree_class = 'already-published' if item.is_published?
   tree_class = 'not-visible' unless item.can_view?
 
   toggle ||=false
