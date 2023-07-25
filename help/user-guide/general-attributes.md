@@ -63,9 +63,12 @@ There are different levels of sharing permissions:
 * "Edit" allows to change details of attributes of the item;
 * "Manage" gives rights to change project assignments, sharing permissions, creators or to add a temporary sharing link. Only with manage rights an item can be deleted permanently.
 
-An item's sharing permission can be set 
+![sharing permissions](/images/user-guide/sharing_permissions.png){:.screenshot}
+
+An item's sharing permissions can be set 
 * by managing the asset individually
 * via the "Batch permission changes" button in your user profile.
+
 
 ## Publishing
 
@@ -79,6 +82,8 @@ Non-public items can be published
 * in bulk, via the "Batch permission changes" button in your user profile. The same sharing permission rules for considering an item as published apply.
 
 "Publish your assets" button in your user profile allows you to publish Assets in batch.
+
+
 
 When you attempt to publish an item in a project that has gatekeeper(s), you will be shown a notice about the gatekeeper being notified.
 
