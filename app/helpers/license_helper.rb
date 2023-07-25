@@ -2,10 +2,17 @@ require 'json'
 require 'seek/license'
 
 module LicenseHelper
-  def grouped_license_select(name, selected = nil, opts = {})
+  def license_select(name, selected = nil, opts = {})
     opts[:data] ||= {}
-    opts[:data]['role'] = 'seek-license-select'
-    select_tag(name, grouped_options_for_select(grouped_license_options(opts), selected), opts)
+    opts[:data]['role'] ||= 'seek-license-select'
+    recommended = opts.delete(:recommended)
+    source = opts.delete(:source) || Seek::License.combined
+    if recommended
+      options = grouped_options_for_select(grouped_license_options(source, recommended), selected)
+    else
+      options = options_for_select(license_options(source), selected)
+    end
+    select_tag(name, options, opts)
   end
 
   def describe_license(id)
@@ -65,9 +72,13 @@ module LicenseHelper
     end
   end
 
-  def grouped_license_options(opts = {})
-    source = opts.delete(:source) || Seek::License.combined
-    recommended = opts.delete(:recommended)
+  def license_options(source)
+    source.values.map do |value|
+      [value['title'], value['id'], { 'data-url' => value['url'] }]
+    end.sort_by!(&:first)
+  end
+
+  def grouped_license_options(source, recommended)
     grouped_licenses = source.values.group_by do |l|
       if recommended&.include?(l['id'])
         'recommended'
