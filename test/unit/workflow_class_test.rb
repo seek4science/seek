@@ -57,8 +57,8 @@ class WorkflowClassTest < ActiveSupport::TestCase
   test 'extractable boolean and finders' do
     WorkflowClass.destroy_all
 
-    ex = Factory(:cwl_workflow_class)
-    un = Factory(:unextractable_workflow_class)
+    ex = FactoryBot.create(:cwl_workflow_class)
+    un = FactoryBot.create(:unextractable_workflow_class)
 
     assert ex.extractable?
     refute un.extractable?
@@ -73,8 +73,8 @@ class WorkflowClassTest < ActiveSupport::TestCase
   test 'RO-Crate metadata' do
     WorkflowClass.destroy_all
 
-    cwl = Factory(:cwl_workflow_class).ro_crate_metadata
-    other = Factory(:unextractable_workflow_class, title: 'My other type', key: nil).ro_crate_metadata
+    cwl = FactoryBot.create(:cwl_workflow_class).ro_crate_metadata
+    other = FactoryBot.create(:unextractable_workflow_class, title: 'My other type', key: nil).ro_crate_metadata
 
     assert_equal({
                      "@id"=>"#cwl",
@@ -96,7 +96,7 @@ class WorkflowClassTest < ActiveSupport::TestCase
                                 identifier: 'https://doi.org/10.1093/nar/gkt328',
                                 url: 'https://taverna.incubator.apache.org/')
 
-    cwl = Factory(:cwl_workflow_class)
+    cwl = FactoryBot.create(:cwl_workflow_class)
 
     # Match on name
     match = WorkflowClass.match_from_metadata(

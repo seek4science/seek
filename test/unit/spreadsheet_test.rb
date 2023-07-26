@@ -4,14 +4,14 @@ class SpreadsheetTest < ActiveSupport::TestCase
   include Seek::Data::SpreadsheetExplorerRepresentation
 
   test 'spreadsheets are spreadsheets' do
-    datafile = Factory :small_test_spreadsheet_datafile
+    datafile = FactoryBot.create :small_test_spreadsheet_datafile
     assert datafile.content_blob.is_excel?
     assert datafile.content_blob.is_extractable_spreadsheet?
     assert datafile.contains_extractable_spreadsheet?
   end
 
   test 'xlsm are spreadsheets' do
-    datafile = Factory :xlsm_spreadsheet_datafile
+    datafile = FactoryBot.create :xlsm_spreadsheet_datafile
     assert datafile.content_blob.is_excel?
     assert datafile.content_blob.is_extractable_spreadsheet?
     assert datafile.contains_extractable_spreadsheet?
@@ -19,7 +19,7 @@ class SpreadsheetTest < ActiveSupport::TestCase
   end
 
   test 'spreadsheet is properly parsed' do
-    datafile = Factory :small_test_spreadsheet_datafile
+    datafile = FactoryBot.create :small_test_spreadsheet_datafile
 
     spreadsheet = datafile.spreadsheet
     min_rows = Seek::Data::SpreadsheetExplorerRepresentation::MIN_ROWS
@@ -38,7 +38,7 @@ class SpreadsheetTest < ActiveSupport::TestCase
   end
 
   test 'spreadsheet xml is cached' do
-    datafile = Factory :small_test_spreadsheet_datafile
+    datafile = FactoryBot.create :small_test_spreadsheet_datafile
     Rails.cache.clear
     assert_nil Rails.cache.fetch("blob_ss_xml-#{datafile.content_blob.cache_key}")
 

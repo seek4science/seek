@@ -31,6 +31,12 @@
           "identifier": "http://edamontology.org/topic_3314"
         }
       ],
+      "tools": [
+        {
+          "name": "BioRuby",
+          "id": "https://bio.tools/bioruby"
+        }
+      ],
       "license": "CC-BY-4.0",
       "other_creators": "John Smith, Jane Smith",
       "content_blobs": [
@@ -44,7 +50,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "662",
+              "id": "378",
               "type": "projects"
             },
             "access": "edit"
@@ -56,7 +62,7 @@
       "creators": {
         "data": [
           {
-            "id": "645",
+            "id": "371",
             "type": "people"
           }
         ]
@@ -64,7 +70,7 @@
       "projects": {
         "data": [
           {
-            "id": "662",
+            "id": "378",
             "type": "projects"
           }
         ]
@@ -72,7 +78,7 @@
       "assays": {
         "data": [
           {
-            "id": "84",
+            "id": "80",
             "type": "assays"
           }
         ]
@@ -80,7 +86,7 @@
       "publications": {
         "data": [
           {
-            "id": "64",
+            "id": "80",
             "type": "publications"
           }
         ]
@@ -88,7 +94,7 @@
       "presentations": {
         "data": [
           {
-            "id": "25",
+            "id": "72",
             "type": "presentations"
           }
         ]
@@ -96,7 +102,7 @@
       "data_files": {
         "data": [
           {
-            "id": "73",
+            "id": "72",
             "type": "data_files"
           }
         ]
@@ -104,7 +110,7 @@
       "documents": {
         "data": [
           {
-            "id": "29",
+            "id": "72",
             "type": "documents"
           }
         ]
@@ -112,7 +118,7 @@
       "sops": {
         "data": [
           {
-            "id": "29",
+            "id": "72",
             "type": "sops"
           }
         ]

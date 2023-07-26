@@ -3,7 +3,7 @@ require 'test_helper'
 class ApplicationHelperTest < ActionView::TestCase
 
   test 'persistent_resource_id' do
-    assay = Factory(:assay)
+    assay = FactoryBot.create(:assay)
     html = persistent_resource_id(assay)
     blocks = Nokogiri::HTML::DocumentFragment.parse(html).children.first.children
     # should be something like
@@ -17,7 +17,7 @@ class ApplicationHelperTest < ActionView::TestCase
     assert_match(/http:\/\/localhost:3000\/assays\/#{assay.id}/, blocks.last['href'])
     assert_match(/http:\/\/localhost:3000\/assays\/#{assay.id}/, blocks.last.children.first.content)
 
-    versioned_sop = Factory(:sop_version)
+    versioned_sop = FactoryBot.create(:sop_version)
     html = persistent_resource_id(versioned_sop)
     blocks = Nokogiri::HTML::DocumentFragment.parse(html).children.first.children
     # should be something like
@@ -82,20 +82,6 @@ class ApplicationHelperTest < ActionView::TestCase
     assert_equal 'a: b: c and d', join_with_and(%w[a b c d], ': ')
   end
 
-  test 'instance of resource_type' do
-    m = instance_of_resource_type('model')
-    assert m.is_a?(Model)
-    assert m.new_record?
-
-    p = instance_of_resource_type('Presentation')
-    assert p.is_a?(Presentation)
-    assert p.new_record?
-
-    assert_nil instance_of_resource_type(nil)
-    assert_nil instance_of_resource_type('mushypeas')
-    assert_nil instance_of_resource_type({})
-  end
-
   test 'force to treat 1 Jan as year only' do
     date = Date.new(2012, 1, 1)
     text = date_as_string(date, false, true)
@@ -150,7 +136,7 @@ class ApplicationHelperTest < ActionView::TestCase
   end
 
   test 'showing local time instead of GMT/UTC for date_as_string' do
-    sop = Factory(:sop)
+    sop = FactoryBot.create(:sop)
     created_at = sop.created_at
 
     assert created_at.utc?
@@ -224,17 +210,17 @@ class ApplicationHelperTest < ActionView::TestCase
   end
 
   test 'pending_project_join_request?' do
-    person1 = Factory(:project_administrator)
+    person1 = FactoryBot.create(:project_administrator)
     project1 = person1.projects.first
 
     # person2 is a project admin, and also a member but not an admin of the project with a log pending
-    person2 = Factory(:project_administrator)
-    person2.add_to_project_and_institution(project1,Factory(:institution))
+    person2 = FactoryBot.create(:project_administrator)
+    person2.add_to_project_and_institution(project1,FactoryBot.create(:institution))
     person2.save!
 
-    person3 = Factory(:person)
+    person3 = FactoryBot.create(:person)
 
-    log = ProjectMembershipMessageLog.log_request(sender:Factory(:person), project:project1, institution:Factory(:institution))
+    log = ProjectMembershipMessageLog.log_request(sender:FactoryBot.create(:person), project:project1, institution:FactoryBot.create(:institution))
 
     User.with_current_user(person3.user) do
       refute pending_project_join_request?
@@ -253,13 +239,13 @@ class ApplicationHelperTest < ActionView::TestCase
   end
 
   test 'pending project creation request?' do
-    admin = Factory(:admin)
-    prog_admin = Factory(:programme_administrator)
+    admin = FactoryBot.create(:admin)
+    prog_admin = FactoryBot.create(:programme_administrator)
     programme = prog_admin.programmes.first
-    person = Factory(:person)
-    unregistered_user = Factory(:brand_new_user)
+    person = FactoryBot.create(:person)
+    unregistered_user = FactoryBot.create(:brand_new_user)
     assert_nil unregistered_user.person
-    institution = Factory(:institution)
+    institution = FactoryBot.create(:institution)
     project = Project.new(title:'new project')
 
     MessageLog.delete_all
@@ -339,6 +325,59 @@ class ApplicationHelperTest < ActionView::TestCase
     end
     User.with_current_user(unregistered_user) do
       refute pending_project_creation_request?
+    end
+  end
+
+  test 'pending_programme_creation_request?' do
+    admin = FactoryBot.create(:admin)
+    prog_admin = FactoryBot.create(:programme_administrator)
+    person = FactoryBot.create(:person)
+
+    programme = FactoryBot.create(:programme)
+    assert programme.is_activated?
+
+    User.with_current_user(admin) do
+      refute pending_programme_creation_request?
+    end
+    User.with_current_user(nil) do
+      refute pending_programme_creation_request?
+    end
+    User.with_current_user(person) do
+      refute pending_programme_creation_request?
+    end
+    User.with_current_user(prog_admin) do
+      refute pending_programme_creation_request?
+    end
+
+    programme2 = FactoryBot.create(:programme)
+    programme2.update_column(:is_activated, false)
+    refute programme2.is_activated?
+    User.with_current_user(admin) do
+      assert pending_programme_creation_request?
+    end
+    User.with_current_user(nil) do
+      refute pending_programme_creation_request?
+    end
+    User.with_current_user(person) do
+      refute pending_programme_creation_request?
+    end
+    User.with_current_user(prog_admin) do
+      refute pending_programme_creation_request?
+    end
+
+    programme2.update_column(:activation_rejection_reason, 'its rubbish')
+    assert programme2.rejected?
+    User.with_current_user(admin) do
+      refute pending_programme_creation_request?
+    end
+    User.with_current_user(nil) do
+      refute pending_programme_creation_request?
+    end
+    User.with_current_user(person) do
+      refute pending_programme_creation_request?
+    end
+    User.with_current_user(prog_admin) do
+      refute pending_programme_creation_request?
     end
   end
 

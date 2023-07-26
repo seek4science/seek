@@ -814,7 +814,10 @@ projectMembersList:
 sampleAttributeMap:
   type: object
   additionalProperties:
-    type: string
+    anyOf:
+      - type: string
+      - type: array
+      - type: 'null'
 # --- Types ---
 anyType:
   type: string
@@ -1027,7 +1030,9 @@ sampleAttributeBaseType:
     - SeekStrain
     - SeekSample
     - CV
+    - CVList
     - SeekDataFile
+    - SeekSampleMulti
 sampleAttributeTypeType:
   type: string
   minLength: 1
@@ -1403,6 +1408,10 @@ dataFilePost:
           properties:
             tags:
               $ref: "#/components/schemas/tags"
+            data_type_annotations:
+              $ref: "#/components/schemas/ontologyTermsList"
+            data_format_annotations:
+              $ref: "#/components/schemas/ontologyTermsList"
             title:
               $ref: "#/components/schemas/nonEmptyString"
             description:
@@ -1466,6 +1475,10 @@ dataFilePatch:
           properties:
             tags:
               $ref: "#/components/schemas/tags"
+            data_type_annotations:
+              $ref: "#/components/schemas/ontologyTermsList"
+            data_format_annotations:
+              $ref: "#/components/schemas/ontologyTermsList"
             title:
               $ref: "#/components/schemas/nonEmptyString"
             description:
@@ -2621,9 +2634,9 @@ sampleTypeSampleAttributePost:
     is_title:
       type: boolean
     sample_controlled_vocab_id:
-      $ref: "#/components/schemas/nullableInteger"
+      $ref: "#/components/schemas/nullableNonEmptyString"
     linked_sample_type_id:
-      $ref: "#/components/schemas/nullableInteger"
+      $ref: "#/components/schemas/nullableNonEmptyString"
   required:
     - title
     - sample_attribute_type
@@ -2660,9 +2673,9 @@ sampleTypeSampleAttributePatch:
     is_title:
       type: boolean
     sample_controlled_vocab_id:
-      $ref: "#/components/schemas/nullableInteger"
+      $ref: "#/components/schemas/nullableNonEmptyString"
     linked_sample_type_id:
-      $ref: "#/components/schemas/nullableInteger"
+      $ref: "#/components/schemas/nullableNonEmptyString"
     _destroy:
       type: boolean
   required: []
@@ -2889,6 +2902,8 @@ workflowPost:
               $ref: "#/components/schemas/ontologyTermsList"
             operation_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
+            tools:
+              $ref: "#/components/schemas/workflowtoolsList"
             title:
               $ref: "#/components/schemas/nonEmptyString"
             description:
@@ -2967,6 +2982,8 @@ workflowPatch:
               $ref: "#/components/schemas/ontologyTermsList"
             operation_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
+            tools:
+              $ref: "#/components/schemas/workflowtoolsList"
             title:
               $ref: "#/components/schemas/nonEmptyString"
             description:
@@ -3390,7 +3407,58 @@ dataFileResponse:
         type:
           $ref: "#/components/schemas/dataFileType"
         attributes:
-          $ref: "#/components/schemas/contributedTypeAttributes"
+          type: object
+          properties:
+            tags:
+              $ref: "#/components/schemas/tags"
+            data_type_annotations:
+              $ref: "#/components/schemas/ontologyTermsList"
+            data_format_annotations:
+              $ref: "#/components/schemas/ontologyTermsList"
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            description:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            license:
+              $ref: "#/components/schemas/nullableLicense"
+            latest_version:
+              type: number
+            versions:
+              type: array
+              minItems: 1
+              uniqueItems: true
+              items:
+                $ref: "#/components/schemas/version"
+            version:
+              type: number
+            revision_comments:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            doi:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            created_at:
+              $ref: "#/components/schemas/dateTimeString"
+            updated_at:
+              $ref: "#/components/schemas/dateTimeString"
+            content_blobs:
+              $ref: "#/components/schemas/contentBlobsList"
+            policy:
+              $ref: "#/components/schemas/policy"
+            other_creators:
+              $ref: "#/components/schemas/nullableOtherCreatorsString"
+            creators:
+              $ref: "#/components/schemas/assetsCreatorsList"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkList"
+          required:
+            - title
+            - license
+            - latest_version
+            - versions
+            - version
+            - created_at
+            - updated_at
+            - content_blobs
+          additionalProperties: false
         relationships:
           type: object
           properties:
@@ -4581,9 +4649,9 @@ sampleTypeSampleAttributeResponse:
     is_title:
       type: boolean
     sample_controlled_vocab_id:
-      $ref: "#/components/schemas/nullableInteger"
+      $ref: "#/components/schemas/nullableNonEmptyString"
     linked_sample_type_id:
-      $ref: "#/components/schemas/nullableInteger"
+      $ref: "#/components/schemas/nullableNonEmptyString"
   required:
     - title
     - sample_attribute_type
@@ -4841,6 +4909,8 @@ workflowResponse:
                     $ref: "#/components/schemas/workflowOutput"
             discussion_links:
               $ref: "#/components/schemas/assetLinkList"
+            tools:
+              $ref: "#/components/schemas/workflowtoolsList"
           required:
             - title
             - workflow_class
@@ -4919,3 +4989,17 @@ workflowResponse:
     - data
     - jsonapi
   additionalProperties: false
+workflowtoolsList:
+  type: array
+  minItems: 0
+  items:
+    $ref: "#/components/schemas/workflowtool"
+workflowtool:
+  type: object
+  properties:
+    id:
+      $ref: "#/components/schemas/uriString"
+    name:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+  required:
+    - id

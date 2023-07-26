@@ -13,11 +13,11 @@ class PersonalTagsTest < ActionController::TestCase
   end
 
   test 'personal tags are shown' do
-    p = Factory :person
-    p2 = Factory :person
-    sop = Factory :sop, contributor: p
-    cricket = Factory :tag, annotatable: sop, source: p.user, value: 'cricket'
-    frog = Factory :tag, annotatable: sop, source: p2.user, value: 'frog'
+    p = FactoryBot.create :person
+    p2 = FactoryBot.create :person
+    sop = FactoryBot.create :sop, contributor: p
+    cricket = FactoryBot.create :tag, annotatable: sop, source: p.user, value: 'cricket'
+    frog = FactoryBot.create :tag, annotatable: sop, source: p2.user, value: 'frog'
 
     get :show, params: { id: p }
     assert :success
@@ -27,11 +27,11 @@ class PersonalTagsTest < ActionController::TestCase
   end
 
   test 'expertise and tools displayed correctly' do
-    p = Factory :person
-    fishing_exp = Factory :expertise, value: 'fishing', source: p, annotatable: p
-    bowling = Factory :expertise, value: 'bowling', source: p, annotatable: p
-    spade = Factory :tool, value: 'spade', source: p, annotatable: p
-    fishing_tool = Factory :tool, value: 'fishing', source: p, annotatable: p
+    p = FactoryBot.create :person
+    fishing_exp = FactoryBot.create :expertise, value: 'fishing', source: p, annotatable: p
+    bowling = FactoryBot.create :expertise, value: 'bowling', source: p, annotatable: p
+    spade = FactoryBot.create :tool, value: 'spade', source: p, annotatable: p
+    fishing_tool = FactoryBot.create :tool, value: 'fishing', source: p, annotatable: p
 
     get :show, params: { id: p.id }
     assert_response :success
@@ -76,12 +76,12 @@ class PersonalTagsTest < ActionController::TestCase
   end
 
   test 'expertise and tools do not appear in personal tag cloud' do
-    p = Factory :person
+    p = FactoryBot.create :person
     login_as p.user
 
-    exp = Factory :expertise, source: p.user, annotatable: p, value: 'an_expertise'
-    tool = Factory :tool, source: p.user, annotatable: p, value: 'a_tool'
-    tag = Factory :tag, source: p.user, annotatable: p, value: 'a_tag'
+    exp = FactoryBot.create :expertise, source: p.user, annotatable: p, value: 'an_expertise'
+    tool = FactoryBot.create :tool, source: p.user, annotatable: p, value: 'a_tool'
+    tag = FactoryBot.create :tag, source: p.user, annotatable: p, value: 'a_tag'
 
     get :show, params: { id: p }
     assert :success

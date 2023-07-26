@@ -13,7 +13,7 @@ class Investigation < ApplicationRecord
   enum status: [:planned, :running, :completed, :cancelled, :failed]
   belongs_to :assignee, class_name: 'Person'
 
-  has_many :study_sops, through: :studies, source: :sop
+  has_many :study_sops, through: :studies, source: :sops
   has_many :assay_sops, through: :assays, source: :sops
   has_many :sop_versions, through: :studies
   

@@ -1,56 +1,56 @@
-# SampleAttribute
-Factory.define(:sample_attribute) do |f|
-  f.sequence(:title) { |n| "Sample attribute #{n}" }
-  f.association :sample_type, factory: :sample_type
-end
-
-# a string that must contain 'xxx'
-Factory.define(:simple_string_sample_attribute, parent: :sample_attribute) do |f|
-  f.sample_attribute_type factory: :xxx_string_sample_attribute_type
-  f.required true
-end
-
-Factory.define(:any_string_sample_attribute, parent: :sample_attribute) do |f|
-  f.sample_attribute_type factory: :string_sample_attribute_type
-  f.required true
-end
-
-Factory.define(:data_file_sample_attribute, parent: :sample_attribute) do |f|
-  f.sample_attribute_type factory: :data_file_sample_attribute_type
-  f.required true
-end
-
-Factory.define(:sample_sample_attribute, parent: :sample_attribute) do |f|
-  f.sequence(:title) { |n| "sample attribute #{n}" }
-  f.linked_sample_type factory: :simple_sample_type
-  f.sample_attribute_type factory: :sample_sample_attribute_type
-end
-
-Factory.define(:sample_multi_sample_attribute, parent: :sample_attribute) do |f|
-  f.sequence(:title) { |n| "sample attribute #{n}" }
-  f.linked_sample_type factory: :simple_sample_type
-  f.sample_attribute_type factory: :sample_multi_sample_attribute_type
-end
-
-Factory.define(:apples_controlled_vocab_attribute, parent: :sample_attribute) do |f|
-  f.sequence(:title) { |n| "apples controlled vocab attribute #{n}" }
-  f.after_build do |type|
-    type.sample_controlled_vocab = Factory.build(:apples_sample_controlled_vocab)
-    type.sample_attribute_type = Factory(:controlled_vocab_attribute_type)
+FactoryBot.define do
+  # SampleAttribute
+  factory(:sample_attribute) do
+    sequence(:title) { |n| "Sample attribute #{n}" }
+    association :sample_type, factory: :sample_type
   end
-end
-
-Factory.define(:apples_list_controlled_vocab_attribute, parent: :sample_attribute) do |f|
-  f.sequence(:title) { |n| "apples list controlled vocab attribute #{n}" }
-  f.after_build do |type|
-    type.sample_controlled_vocab = Factory.build(:apples_sample_controlled_vocab)
-    type.sample_attribute_type = Factory(:cv_list_attribute_type)
+  
+  # a string that must contain 'xxx'
+  factory(:simple_string_sample_attribute, parent: :sample_attribute) do
+    association :sample_attribute_type, factory: :xxx_string_sample_attribute_type
+    required { true }
   end
-end
-
-Factory.define(:string_sample_attribute_with_description_and_pid, parent: :sample_attribute) do |f|
-  f.sample_attribute_type factory: :string_sample_attribute_type
-  f.description "sample_attribute_description"
-  f.pid "sample_attribute:pid"
-  f.required true
+  
+  factory(:any_string_sample_attribute, parent: :sample_attribute) do
+    association :sample_attribute_type, factory: :string_sample_attribute_type
+    required { true }
+  end
+  
+  factory(:data_file_sample_attribute, parent: :sample_attribute) do
+    association :sample_attribute_type, factory: :data_file_sample_attribute_type
+    required { true }
+  end
+  
+  factory(:sample_sample_attribute, parent: :sample_attribute) do
+    sequence(:title) { |n| "sample attribute #{n}" }
+    association :linked_sample_type, factory: :simple_sample_type
+    association :sample_attribute_type, factory: :sample_sample_attribute_type
+  end
+  
+  factory(:sample_multi_sample_attribute, parent: :sample_sample_attribute) do
+    association :sample_attribute_type, factory: :sample_multi_sample_attribute_type
+  end
+  
+  factory(:apples_controlled_vocab_attribute, parent: :sample_attribute) do
+    sequence(:title) { |n| "apples controlled vocab attribute #{n}" }
+    after(:build) do |type|
+      type.sample_controlled_vocab = FactoryBot.build(:apples_sample_controlled_vocab)
+      type.sample_attribute_type = FactoryBot.create(:controlled_vocab_attribute_type)
+    end
+  end
+  
+  factory(:apples_list_controlled_vocab_attribute, parent: :sample_attribute) do
+    sequence(:title) { |n| "apples list controlled vocab attribute #{n}" }
+    after(:build) do |type|
+      type.sample_controlled_vocab = FactoryBot.build(:apples_sample_controlled_vocab)
+      type.sample_attribute_type = FactoryBot.create(:cv_list_attribute_type)
+    end
+  end
+  
+  factory(:string_sample_attribute_with_description_and_pid, parent: :sample_attribute) do
+    association :sample_attribute_type, factory: :string_sample_attribute_type
+    description { "sample_attribute_description" }
+    pid { "sample_attribute:pid" }
+    required { true }
+  end
 end

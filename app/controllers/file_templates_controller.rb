@@ -61,33 +61,13 @@ class FileTemplatesController < ApplicationController
     end
   end
 
-  def explore
-    #drop invalid explore params
-    [:page_rows, :page, :sheet].each do |param|
-      if params[param].present? && (params[param] =~ /\A\d+\Z/).nil?
-        params.delete(param)
-      end
-    end
-    if @file_template.contains_extractable_spreadsheet?
-      respond_to do |format|
-        format.html
-      end
-    else
-      respond_to do |format|
-        flash[:error] = 'Unable to view contents of this file template'
-        format.html { redirect_to file_template_path(@file_template,
-                                                     version: @file_template.version) }
-      end
-    end
-  end
-
   private
 
   def file_template_params
     params.require(:file_template).permit(:title, :description, { project_ids: [] }, :license, :other_creators,
                                 { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                 { creator_ids: [] }, { assay_assets_attributes: [:assay_id] },
-                                :data_format_annotations, :data_type_annotations,
+                                { data_format_annotations: [] }, { data_type_annotations: [] },
                                 { publication_ids: [] }, { event_ids: [] },
                                 discussion_links_attributes:[:id, :url, :label, :_destroy])
   end

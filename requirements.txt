@@ -1,9 +1,8 @@
 psutil==5.9.3
-cwltool==3.1.20210616134059
+cwltool==3.1.20230601100705
 html5lib==1.0.1
 galaxy2cwl==0.1.4
 #isatools==0.11.0
 gxformat2==0.15.0
-nbconvert==6.5.1
+nbconvert==7.4.0
 ipython==7.33.0
-filelock>=3.8.0

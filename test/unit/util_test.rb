@@ -93,26 +93,31 @@ class UtilTest < ActiveSupport::TestCase
               assert Seek::Util.asset_types.include?(Workflow)
               assert Seek::Util.user_creatable_types.include?(Workflow)
               assert Seek::Util.searchable_types.include?(Workflow)
+              assert Seek::Util.lookup_class('Workflow', raise: false)
 
               assert Seek::Util.persistent_classes.include?(Event)
               assert Seek::Util.authorized_types.include?(Event)
               assert Seek::Util.user_creatable_types.include?(Event)
               assert Seek::Util.searchable_types.include?(Event)
+              assert Seek::Util.lookup_class('Event', raise: false)
 
               assert Seek::Util.persistent_classes.include?(Sample)
               assert Seek::Util.authorized_types.include?(Sample)
               assert Seek::Util.asset_types.include?(Sample)
               assert Seek::Util.user_creatable_types.include?(Sample)
               assert Seek::Util.searchable_types.include?(Sample)
+              assert Seek::Util.lookup_class('Sample', raise: false)
 
               assert Seek::Util.persistent_classes.include?(Programme)
               assert Seek::Util.searchable_types.include?(Programme)
+              assert Seek::Util.lookup_class('Programme', raise: false)
 
               assert Seek::Util.persistent_classes.include?(Publication)
               assert Seek::Util.authorized_types.include?(Publication)
               assert Seek::Util.asset_types.include?(Publication)
               assert Seek::Util.user_creatable_types.include?(Publication)
               assert Seek::Util.searchable_types.include?(Publication)
+              assert Seek::Util.lookup_class('Publication', raise: false)
 
               with_config_value :workflows_enabled, false do
                 Seek::Util.clear_cached
@@ -121,6 +126,7 @@ class UtilTest < ActiveSupport::TestCase
                 refute Seek::Util.asset_types.include?(Workflow)
                 refute Seek::Util.user_creatable_types.include?(Workflow)
                 refute Seek::Util.searchable_types.include?(Workflow)
+                assert_nil Seek::Util.lookup_class('Workflow', raise: false)
               end
 
               with_config_value :events_enabled, false do
@@ -129,6 +135,7 @@ class UtilTest < ActiveSupport::TestCase
                 refute Seek::Util.authorized_types.include?(Event)
                 refute Seek::Util.user_creatable_types.include?(Event)
                 refute Seek::Util.searchable_types.include?(Event)
+                assert_nil Seek::Util.lookup_class('Event', raise: false)
               end
 
               with_config_value :samples_enabled, false do
@@ -138,12 +145,14 @@ class UtilTest < ActiveSupport::TestCase
                 refute Seek::Util.asset_types.include?(Sample)
                 refute Seek::Util.user_creatable_types.include?(Sample)
                 refute Seek::Util.searchable_types.include?(Sample)
+                assert_nil Seek::Util.lookup_class('Sample', raise: false)
               end
 
               with_config_value :programmes_enabled, false do
                 Seek::Util.clear_cached
                 refute Seek::Util.persistent_classes.include?(Programme)
                 refute Seek::Util.searchable_types.include?(Programme)
+                assert_nil Seek::Util.lookup_class('Programme', raise: false)
               end
 
               with_config_value :publications_enabled, false do
@@ -153,6 +162,7 @@ class UtilTest < ActiveSupport::TestCase
                 refute Seek::Util.asset_types.include?(Publication)
                 refute Seek::Util.user_creatable_types.include?(Publication)
                 refute Seek::Util.searchable_types.include?(Publication)
+                assert_nil Seek::Util.lookup_class('Publication', raise: false)
               end
 
             end
@@ -160,8 +170,16 @@ class UtilTest < ActiveSupport::TestCase
         end
       end
     end
+  end
 
-
-
+  test 'lookup_class' do
+    assert Seek::Util.lookup_class('Publication', raise: false)
+    assert Seek::Util.lookup_class('Workflow', raise: false)
+    assert_nil Seek::Util.lookup_class('String', raise: false)
+    assert_nil Seek::Util.lookup_class('WorkflowInternals::Structure', raise: false)
+    assert_nil Seek::Util.lookup_class('gdfghdfhdfhdfhdfhdfh', raise: false)
+    assert_raises NameError do
+      Seek::Util.lookup_class('String')
+    end
   end
 end

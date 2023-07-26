@@ -11,8 +11,8 @@ class FileTemplatesControllerTest < ActionController::TestCase
   include GeneralAuthorizationTestCases
 
   test 'should return 406 when requesting RDF' do
-    login_as(Factory(:user))
-    ft = Factory :file_template, contributor: User.current_user.person
+    login_as(FactoryBot.create(:user))
+    ft = FactoryBot.create :file_template, contributor: User.current_user.person
     assert ft.can_view?
 
     get :show, params: { id: ft, format: :rdf }
@@ -21,7 +21,7 @@ class FileTemplatesControllerTest < ActionController::TestCase
   end
 
   test 'should get index' do
-    FactoryGirl.create_list(:public_file_template, 3)
+    FactoryBot.create_list(:public_file_template, 3)
 
     get :index
 
@@ -30,8 +30,8 @@ class FileTemplatesControllerTest < ActionController::TestCase
   end
 
   test "shouldn't show hidden items in index" do
-    visible_ft = Factory(:public_file_template)
-    hidden_ft = Factory(:private_file_template)
+    visible_ft = FactoryBot.create(:public_file_template)
+    hidden_ft = FactoryBot.create(:private_file_template)
 
     get :index, params: { page: 'all' }
 
@@ -41,7 +41,7 @@ class FileTemplatesControllerTest < ActionController::TestCase
   end
 
   test 'should show' do
-    visible_ft = Factory(:public_file_template)
+    visible_ft = FactoryBot.create(:public_file_template)
 
     get :show, params: { id: visible_ft }
 
@@ -49,7 +49,7 @@ class FileTemplatesControllerTest < ActionController::TestCase
   end
 
   test 'should not show hidden file template' do
-    hidden_ft = Factory(:private_file_template)
+    hidden_ft = FactoryBot.create(:private_file_template)
 
     get :show, params: { id: hidden_ft }
 
@@ -57,7 +57,7 @@ class FileTemplatesControllerTest < ActionController::TestCase
   end
 
   test 'should get new' do
-    login_as(Factory(:person))
+    login_as(FactoryBot.create(:person))
 
     get :new
     assert_response :success
@@ -65,7 +65,7 @@ class FileTemplatesControllerTest < ActionController::TestCase
   end
 
   test 'should get edit' do
-    login_as(Factory(:person))
+    login_as(FactoryBot.create(:person))
 
     get :new
     assert_response :success
@@ -73,16 +73,16 @@ class FileTemplatesControllerTest < ActionController::TestCase
   end
 
   test 'should create file template' do
-    Factory(:data_types_controlled_vocab) unless SampleControlledVocab::SystemVocabs.data_types_controlled_vocab
-    Factory(:data_formats_controlled_vocab) unless SampleControlledVocab::SystemVocabs.data_formats_controlled_vocab
-    person = Factory(:person)
+    FactoryBot.create(:data_types_controlled_vocab) unless SampleControlledVocab::SystemVocabs.data_types_controlled_vocab
+    FactoryBot.create(:data_formats_controlled_vocab) unless SampleControlledVocab::SystemVocabs.data_formats_controlled_vocab
+    person = FactoryBot.create(:person)
     login_as(person)
 
     assert_difference('ActivityLog.count') do
       assert_difference('FileTemplate.count') do
         assert_difference('FileTemplate::Version.count') do
           assert_difference('ContentBlob.count') do
-            post :create, params: { file_template: { title: 'File Template', project_ids: [person.projects.first.id], data_format_annotations:'JSON', data_type_annotations:'Sequence features metadata'}, content_blobs: [valid_content_blob], policy_attributes: valid_sharing }
+            post :create, params: { file_template: { title: 'File Template', project_ids: [person.projects.first.id], data_format_annotations:['JSON'], data_type_annotations:['Sequence features metadata'] }, content_blobs: [valid_content_blob], policy_attributes: valid_sharing }
           end
         end
       end
@@ -96,7 +96,7 @@ class FileTemplatesControllerTest < ActionController::TestCase
   end
 
   test 'should create file template version' do
-    ft = Factory(:file_template)
+    ft = FactoryBot.create(:file_template)
     login_as(ft.contributor)
 
     assert_difference('ActivityLog.count') do
@@ -116,15 +116,15 @@ class FileTemplatesControllerTest < ActionController::TestCase
   end
 
   test 'should update file template' do
-    Factory(:data_types_controlled_vocab) unless SampleControlledVocab::SystemVocabs.data_types_controlled_vocab
-    Factory(:data_formats_controlled_vocab) unless SampleControlledVocab::SystemVocabs.data_formats_controlled_vocab
+    FactoryBot.create(:data_types_controlled_vocab) unless SampleControlledVocab::SystemVocabs.data_types_controlled_vocab
+    FactoryBot.create(:data_formats_controlled_vocab) unless SampleControlledVocab::SystemVocabs.data_formats_controlled_vocab
 
-    person = Factory(:person)
-    ft = Factory(:file_template, contributor: person)
+    person = FactoryBot.create(:person)
+    ft = FactoryBot.create(:file_template, contributor: person)
     login_as(person)
 
     assert_difference('ActivityLog.count') do
-      put :update, params: { id: ft.id, file_template: { title: 'Different title', project_ids: [person.projects.first.id], data_format_annotations:'JSON', data_type_annotations:'Sequence features metadata'} }
+      put :update, params: { id: ft.id, file_template: { title: 'Different title', project_ids: [person.projects.first.id], data_format_annotations: ['JSON'], data_type_annotations: ['Sequence features metadata']} }
     end
 
     template = assigns(:file_template)
@@ -136,8 +136,8 @@ class FileTemplatesControllerTest < ActionController::TestCase
   end
 
   test 'should destroy file template' do
-    person = Factory(:person)
-    ft = Factory(:file_template, contributor: person)
+    person = FactoryBot.create(:person)
+    ft = FactoryBot.create(:file_template, contributor: person)
     login_as(person)
 
     assert_difference('FileTemplate.count', -1) do
@@ -150,7 +150,7 @@ class FileTemplatesControllerTest < ActionController::TestCase
   end
 
   test 'should be able to view pdf content' do
-    ft = Factory(:public_file_template)
+    ft = FactoryBot.create(:public_file_template)
     assert ft.content_blob.is_content_viewable?
     get :show, params: { id: ft.id }
     assert_response :success
@@ -159,10 +159,10 @@ class FileTemplatesControllerTest < ActionController::TestCase
 
   test "people file_templates through nested routing" do
     assert_routing 'people/2/file_templates', controller: 'file_templates', action: 'index', person_id: '2'
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
-    ft = Factory(:file_template,contributor:person)
-    ft2 = Factory(:file_template, policy: Factory(:public_policy),contributor:Factory(:person))
+    ft = FactoryBot.create(:file_template,contributor:person)
+    ft2 = FactoryBot.create(:file_template, policy: FactoryBot.create(:public_policy),contributor:FactoryBot.create(:person))
 
 
     get :index, params: { person_id: person.id }
@@ -176,10 +176,10 @@ class FileTemplatesControllerTest < ActionController::TestCase
 
   test "project file templates through nested routing" do
     assert_routing 'projects/2/file_templates', controller: 'file_templates', action: 'index', project_id: '2'
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
-    ft = Factory(:file_template,contributor:person)
-    ft2 = Factory(:file_template,policy: Factory(:public_policy),contributor:Factory(:person))
+    ft = FactoryBot.create(:file_template,contributor:person)
+    ft2 = FactoryBot.create(:file_template,policy: FactoryBot.create(:public_policy),contributor:FactoryBot.create(:person))
 
 
     get :index, params: { project_id: person.projects.first.id }
@@ -196,8 +196,8 @@ class FileTemplatesControllerTest < ActionController::TestCase
   end
 
   test 'can access manage page with manage rights' do
-    person = Factory(:person)
-    ft = Factory(:file_template, contributor:person)
+    person = FactoryBot.create(:person)
+    ft = FactoryBot.create(:file_template, contributor:person)
     login_as(person)
     assert ft.can_manage?
     get :manage, params: {id: ft}
@@ -216,8 +216,8 @@ class FileTemplatesControllerTest < ActionController::TestCase
   end
 
   test 'cannot access manage page with edit rights' do
-    person = Factory(:person)
-    ft = Factory(:file_template, policy:Factory(:private_policy, permissions:[Factory(:permission, contributor:person, access_type:Policy::EDITING)]))
+    person = FactoryBot.create(:person)
+    ft = FactoryBot.create(:file_template, policy:FactoryBot.create(:private_policy, permissions:[FactoryBot.create(:permission, contributor:person, access_type:Policy::EDITING)]))
     login_as(person)
     assert ft.can_edit?
     refute ft.can_manage?
@@ -227,7 +227,7 @@ class FileTemplatesControllerTest < ActionController::TestCase
   end
 
   test 'create with no creators' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
     ft = {title: 'FileTemplate', project_ids: [person.projects.first.id], creator_ids: []}
     assert_difference('FileTemplate.count') do
@@ -239,9 +239,9 @@ class FileTemplatesControllerTest < ActionController::TestCase
   end
 
   test 'update with no creators' do
-    person = Factory(:person)
-    creators = [Factory(:person), Factory(:person)]
-    ft = Factory(:file_template, contributor: person, creators:creators)
+    person = FactoryBot.create(:person)
+    creators = [FactoryBot.create(:person), FactoryBot.create(:person)]
+    ft = FactoryBot.create(:file_template, contributor: person, creators:creators)
 
     assert_equal creators.sort, ft.creators.sort
     login_as(person)
@@ -263,17 +263,17 @@ class FileTemplatesControllerTest < ActionController::TestCase
   end
 
   test 'manage_update' do
-    proj1=Factory(:project)
-    proj2=Factory(:project)
-    person = Factory(:person,project:proj1)
-    other_person = Factory(:person)
+    proj1=FactoryBot.create(:project)
+    proj2=FactoryBot.create(:project)
+    person = FactoryBot.create(:person,project:proj1)
+    other_person = FactoryBot.create(:person)
     person.add_to_project_and_institution(proj2,person.institutions.first)
     person.save!
-    other_creator = Factory(:person,project:proj1)
+    other_creator = FactoryBot.create(:person,project:proj1)
     other_creator.add_to_project_and_institution(proj2,other_creator.institutions.first)
     other_creator.save!
 
-    ft = Factory(:file_template, contributor:person, projects:[proj1], policy:Factory(:private_policy))
+    ft = FactoryBot.create(:file_template, contributor:person, projects:[proj1], policy:FactoryBot.create(:private_policy))
 
     login_as(person)
     assert ft.can_manage?
@@ -299,20 +299,20 @@ class FileTemplatesControllerTest < ActionController::TestCase
   end
 
   test 'manage_update fails without manage rights' do
-    proj1=Factory(:project)
-    proj2=Factory(:project)
-    person = Factory(:person, project:proj1)
+    proj1=FactoryBot.create(:project)
+    proj2=FactoryBot.create(:project)
+    person = FactoryBot.create(:person, project:proj1)
     person.add_to_project_and_institution(proj2,person.institutions.first)
     person.save!
 
-    other_person = Factory(:person)
+    other_person = FactoryBot.create(:person)
 
-    other_creator = Factory(:person,project:proj1)
+    other_creator = FactoryBot.create(:person,project:proj1)
     other_creator.add_to_project_and_institution(proj2,other_creator.institutions.first)
     other_creator.save!
 
-    ft = Factory(:file_template, projects:[proj1], policy:Factory(:private_policy,
-                                                         permissions:[Factory(:permission,contributor:person, access_type:Policy::EDITING)]))
+    ft = FactoryBot.create(:file_template, projects:[proj1], policy:FactoryBot.create(:private_policy,
+                                                         permissions:[FactoryBot.create(:permission,contributor:person, access_type:Policy::EDITING)]))
 
     login_as(person)
     refute ft.can_manage?
@@ -341,7 +341,7 @@ class FileTemplatesControllerTest < ActionController::TestCase
   end
 
   test 'numeric pagination' do
-    FactoryGirl.create_list(:public_file_template, 20)
+    FactoryBot.create_list(:public_file_template, 20)
 
     with_config_value(:results_per_page_default, 5) do
       get :index
@@ -365,7 +365,7 @@ class FileTemplatesControllerTest < ActionController::TestCase
   end
 
   test 'user can change results per page' do
-    FactoryGirl.create_list(:public_file_template, 15)
+    FactoryBot.create_list(:public_file_template, 15)
 
     with_config_value(:results_per_page_default, 5) do
       get :index, params: { per_page: 15 }
@@ -383,14 +383,14 @@ class FileTemplatesControllerTest < ActionController::TestCase
   end
 
   test 'show filters on index' do
-    Factory(:public_file_template)
+    FactoryBot.create(:public_file_template)
 
     get :index
     assert_select '.index-filters', count: 1
   end
 
   test 'do not show filters on index if disabled' do
-    Factory(:public_file_template)
+    FactoryBot.create(:public_file_template)
 
     with_config_value(:filtering_enabled, false) do
       get :index
@@ -399,14 +399,14 @@ class FileTemplatesControllerTest < ActionController::TestCase
   end
 
   test 'available filters are listed' do
-    project = Factory(:project)
-    project_doc = Factory(:public_file_template, created_at: 3.days.ago, projects: [project])
+    project = FactoryBot.create(:project)
+    project_doc = FactoryBot.create(:public_file_template, created_at: 3.days.ago, projects: [project])
     project_doc.annotate_with('awkward&id=1unsafe[]tag !', 'tag', project_doc.contributor)
     disable_authorization_checks { project_doc.save! }
-    old_project_doc = Factory(:public_file_template, created_at: 10.years.ago, projects: [project])
-    other_project = Factory(:project)
-    other_project_doc = Factory(:public_file_template, created_at: 3.days.ago, projects: [other_project])
-    FactoryGirl.create_list(:public_file_template, 5, projects: [project])
+    old_project_doc = FactoryBot.create(:public_file_template, created_at: 10.years.ago, projects: [project])
+    other_project = FactoryBot.create(:project)
+    other_project_doc = FactoryBot.create(:public_file_template, created_at: 3.days.ago, projects: [other_project])
+    FactoryBot.create_list(:public_file_template, 5, projects: [project])
 
     get :index
 
@@ -459,15 +459,15 @@ class FileTemplatesControllerTest < ActionController::TestCase
   end
 
   test 'active filters are listed' do
-    programme = Factory(:programme)
-    project = Factory(:project, programme: programme)
-    project_doc = Factory(:public_file_template, created_at: 3.days.ago, projects: [project])
+    programme = FactoryBot.create(:programme)
+    project = FactoryBot.create(:project, programme: programme)
+    project_doc = FactoryBot.create(:public_file_template, created_at: 3.days.ago, projects: [project])
     project_doc.annotate_with('awkward&id=1unsafe[]tag !', 'tag', project_doc.contributor)
     disable_authorization_checks { project_doc.save! }
-    old_project_doc = Factory(:public_file_template, created_at: 10.years.ago, projects: [project])
-    other_project = Factory(:project, programme: programme)
-    other_project_doc = Factory(:public_file_template, created_at: 3.days.ago, projects: [other_project])
-    FactoryGirl.create_list(:public_file_template, 5, projects: [project])
+    old_project_doc = FactoryBot.create(:public_file_template, created_at: 10.years.ago, projects: [project])
+    other_project = FactoryBot.create(:project, programme: programme)
+    other_project_doc = FactoryBot.create(:public_file_template, created_at: 3.days.ago, projects: [other_project])
+    FactoryBot.create_list(:public_file_template, 5, projects: [project])
 
     get :index, params: { filter: { programme: programme.id, project: other_project.id } }
 
@@ -531,10 +531,10 @@ class FileTemplatesControllerTest < ActionController::TestCase
   end
 
   test 'filtering system obeys authorization and does not leak info on private resources' do
-    programme = Factory(:programme)
-    project = Factory(:project, programme: programme)
-    FactoryGirl.create_list(:public_file_template, 3, projects: [project])
-    private_file_template = Factory(:private_file_template, created_at: 2.years.ago, projects: [project])
+    programme = FactoryBot.create(:programme)
+    project = FactoryBot.create(:project, programme: programme)
+    FactoryBot.create_list(:public_file_template, 3, projects: [project])
+    private_file_template = FactoryBot.create(:private_file_template, created_at: 2.years.ago, projects: [project])
     private_file_template.annotate_with('awkward&id=1unsafe[]tag !', 'tag', private_file_template.contributor)
     disable_authorization_checks { private_file_template.save! }
 
@@ -588,9 +588,9 @@ class FileTemplatesControllerTest < ActionController::TestCase
   end
 
   test 'filtering with search terms' do
-    programme = Factory(:programme)
-    project = Factory(:project, programme: programme)
-    FactoryGirl.create_list(:public_file_template, 3, projects: [project])
+    programme = FactoryBot.create(:programme)
+    project = FactoryBot.create(:project, programme: programme)
+    FactoryBot.create_list(:public_file_template, 3, projects: [project])
 
     get :index, params: { filter: { programme: programme.id, query: 'hello' } }
 
@@ -621,14 +621,14 @@ class FileTemplatesControllerTest < ActionController::TestCase
   end
 
   test 'filtering by creation date' do
-    programme = Factory(:programme)
-    project = Factory(:project, programme: programme)
-    FactoryGirl.create_list(:public_file_template, 1, projects: [project], created_at: 1.hour.ago)
-    FactoryGirl.create_list(:public_file_template, 2, projects: [project], created_at: 2.days.ago) # 3
-    FactoryGirl.create_list(:public_file_template, 3, projects: [project], created_at: 2.weeks.ago) # 6
-    FactoryGirl.create_list(:public_file_template, 4, projects: [project], created_at: 2.months.ago) # 10
-    FactoryGirl.create_list(:public_file_template, 5, projects: [project], created_at: 2.years.ago) # 15
-    FactoryGirl.create_list(:public_file_template, 6, projects: [project], created_at: 10.years.ago) # 21
+    programme = FactoryBot.create(:programme)
+    project = FactoryBot.create(:project, programme: programme)
+    FactoryBot.create_list(:public_file_template, 1, projects: [project], created_at: 1.hour.ago)
+    FactoryBot.create_list(:public_file_template, 2, projects: [project], created_at: 2.days.ago) # 3
+    FactoryBot.create_list(:public_file_template, 3, projects: [project], created_at: 2.weeks.ago) # 6
+    FactoryBot.create_list(:public_file_template, 4, projects: [project], created_at: 2.months.ago) # 10
+    FactoryBot.create_list(:public_file_template, 5, projects: [project], created_at: 2.years.ago) # 15
+    FactoryBot.create_list(:public_file_template, 6, projects: [project], created_at: 10.years.ago) # 21
 
     # No creation date filter
     get :index, params: { filter: { programme: programme.id } }
@@ -807,12 +807,12 @@ class FileTemplatesControllerTest < ActionController::TestCase
   end
 
   test 'filter and sort' do
-    programme = Factory(:programme)
-    project = Factory(:project, programme: programme)
-    other_project = Factory(:project, programme: programme)
-    project_doc = Factory(:public_file_template, created_at: 3.days.ago, projects: [project])
-    old_project_doc = Factory(:public_file_template, created_at: 10.years.ago, projects: [project])
-    other_project_doc = Factory(:public_file_template, created_at: 2.days.ago, projects: [other_project])
+    programme = FactoryBot.create(:programme)
+    project = FactoryBot.create(:project, programme: programme)
+    other_project = FactoryBot.create(:project, programme: programme)
+    project_doc = FactoryBot.create(:public_file_template, created_at: 3.days.ago, projects: [project])
+    old_project_doc = FactoryBot.create(:public_file_template, created_at: 10.years.ago, projects: [project])
+    other_project_doc = FactoryBot.create(:public_file_template, created_at: 2.days.ago, projects: [other_project])
 
     get :index, params: { filter: { programme: programme.id }, order: 'created_at_asc' }
     assert_equal [old_project_doc, project_doc, other_project_doc], assigns(:file_templates).to_a
@@ -828,7 +828,7 @@ class FileTemplatesControllerTest < ActionController::TestCase
   end
 
   test 'should create with discussion link' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
     file_template =  {title: 'FileTemplate', project_ids: [person.projects.first.id], discussion_links_attributes:[{url: "http://www.slack.com/", label:'our slack'}]}
     assert_difference('AssetLink.discussion.count') do
@@ -845,8 +845,8 @@ class FileTemplatesControllerTest < ActionController::TestCase
   end
 
   test 'should show discussion link with label' do
-    asset_link = Factory(:discussion_link, label:'discuss-label')
-    file_template = Factory(:file_template, discussion_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    asset_link = FactoryBot.create(:discussion_link, label:'discuss-label')
+    file_template = FactoryBot.create(:file_template, discussion_links: [asset_link], policy: FactoryBot.create(:public_policy, access_type: Policy::VISIBLE))
     assert_equal [asset_link],file_template.discussion_links
     get :show, params: { id: file_template }
     assert_response :success
@@ -857,8 +857,8 @@ class FileTemplatesControllerTest < ActionController::TestCase
   end
 
   test 'should show discussion link without label' do
-    asset_link = Factory(:discussion_link)
-    file_template = Factory(:file_template, discussion_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    asset_link = FactoryBot.create(:discussion_link)
+    file_template = FactoryBot.create(:file_template, discussion_links: [asset_link], policy: FactoryBot.create(:public_policy, access_type: Policy::VISIBLE))
     assert_equal [asset_link],file_template.discussion_links
     get :show, params: { id: file_template }
     assert_response :success
@@ -880,8 +880,8 @@ class FileTemplatesControllerTest < ActionController::TestCase
   end
 
   test 'should update file_template with new discussion link' do
-    person = Factory(:person)
-    file_template = Factory(:file_template, contributor: person)
+    person = FactoryBot.create(:person)
+    file_template = FactoryBot.create(:file_template, contributor: person)
     login_as(person)
     assert_nil file_template.discussion_links.first
     assert_difference('AssetLink.discussion.count') do
@@ -895,8 +895,8 @@ class FileTemplatesControllerTest < ActionController::TestCase
   end
 
   test 'should update file_template with edited discussion link' do
-    person = Factory(:person)
-    file_template = Factory(:file_template, contributor: person, discussion_links:[Factory(:discussion_link)])
+    person = FactoryBot.create(:person)
+    file_template = FactoryBot.create(:file_template, contributor: person, discussion_links:[FactoryBot.create(:discussion_link)])
     login_as(person)
     assert_equal 1,file_template.discussion_links.count
     assert_no_difference('AssetLink.discussion.count') do

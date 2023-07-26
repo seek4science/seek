@@ -7,7 +7,7 @@ require 'rails/test_help'
 require 'sharing_form_test_helper'
 require 'general_authorization_test_cases'
 require 'ruby-prof'
-require 'factory_girl'
+require 'factory_bot'
 require 'webmock/minitest'
 require 'action_view/test_case'
 require 'tmpdir'
@@ -41,7 +41,7 @@ module ActionView
   end
 end
 
-FactoryGirl.find_definitions # It looks like requiring factory_girl _should_ do this automatically, but it doesn't seem to work
+FactoryBot.find_definitions # It looks like requiring factory_bot _should_ do this automatically, but it doesn't seem to work
 
 Kernel.class_eval do
 
@@ -74,7 +74,21 @@ Kernel.class_eval do
     oldval = Seek::Config.send(config)
     Seek::Config.send("#{config}=", value)
     yield
+  ensure
     Seek::Config.send("#{config}=", oldval)
+  end
+
+  def with_config_values(settings)
+    oldvals = {}
+    settings.each do |config, value|
+      oldvals[config] = Seek::Config.send(config)
+      Seek::Config.send("#{config}=", value)
+    end
+    yield
+  ensure
+    oldvals.each do |config, oldval|
+      Seek::Config.send("#{config}=", oldval)
+    end
   end
 
   def with_relative_root(root)
@@ -105,12 +119,12 @@ class ActiveSupport::TestCase
   # always create initial person, as this will always be an admin. Avoid some confusion in the tests where a person
   # is unexpectedly an admin
   def create_initial_person
-    disable_authorization_checks { Factory(:admin, first_name: 'default admin') }
+    disable_authorization_checks { FactoryBot.create(:admin, first_name: 'default admin') }
   end
 
   # At least one sample attribute type is needed for building sample types from spreadsheets
   def create_sample_attribute_type
-    Factory(:string_sample_attribute_type)
+    FactoryBot.create(:string_sample_attribute_type)
   end
 
   def clear_rails_cache
@@ -235,7 +249,7 @@ class ActiveSupport::TestCase
 end
 
 # Load seed data
-# load "#{Rails.root}/db/seeds.rb" if File.exists?("#{Rails.root}/db/seeds.rb")
+# load "#{Rails.root}/db/seeds.rb" if File.exist?("#{Rails.root}/db/seeds.rb")
 
 VCR.configure do |config|
   config.cassette_library_dir = 'test/vcr_cassettes'
@@ -253,4 +267,16 @@ WebMock.disable_net_connect!(allow_localhost: true) # Need to comment this line 
 # Clear testing filestore before test run (but check its under tmp for safety)
 if File.expand_path(Seek::Config.filestore_path).start_with?(File.expand_path(File.join(Rails.root, 'tmp')))
   FileUtils.rm_r(Seek::Config.filestore_path)
+end
+
+class ActionController::TestCase
+  def self._get_base_host
+    # Cache host_with_port in a variable to avoid adding lots of overhead to each test
+    @host_with_port ||= Seek::Config.host_with_port
+  end
+
+  # Ensure the Host in requests is the configured host from the settings instead of the default "test.host"
+  setup do
+    request.host = self.class._get_base_host
+  end
 end

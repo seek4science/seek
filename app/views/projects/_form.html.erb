@@ -16,7 +16,7 @@
 
 <div class="form-group">
   <%= f.label :funding_codes -%>
-  <%= tags_input('project[funding_codes]', @project.funding_codes) %>
+  <%= tags_input('project[funding_codes]', @project.funding_codes, typeahead: false, placeholder: 'Type the code and then select or hit Enter', class: 'form-control') %>
 </div>
 
 <div class="form-group">

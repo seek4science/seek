@@ -30,10 +30,11 @@ module DynamicTableHelper
 
   def dt_rows(sample_type)
     sample_type.samples.map do |s|
-      ['', s.id] +
         if s.can_view?
+          ['', s.id, s.uuid] +
           JSON(s.json_metadata).values
         else
+          ['', '#HIDDEN', '#HIDDEN'] +
           Array.new(JSON(s.json_metadata).length, '#HIDDEN')
         end
     end
@@ -52,7 +53,7 @@ module DynamicTableHelper
   end
 
   def dt_default_cols(name)
-    [{ title: 'status', name: name, status: true }, { title: 'id', name: name }]
+    [{ title: 'status', name: name, status: true }, { title: 'id', name: name }, { title: 'uuid', name: name }]
   end
 
   def dt_cumulative_rows(sample_types, col_count)
@@ -70,9 +71,9 @@ module DynamicTableHelper
       sample_id_set.each do |sample_id|
         sample = Sample.find(sample_id)
         if sample.can_view?
-          full_row.push(*JSON(sample.json_metadata).values.unshift(sample.id))
+          full_row.push(*JSON(sample.json_metadata).values.unshift(sample.id, sample.uuid))
         else
-          full_row.push(*Array.new(JSON(sample.json_metadata).length, '#HIDDEN').unshift(sample.id))
+          full_row.push(*Array.new(JSON(sample.json_metadata).length, '#HIDDEN').unshift('#HIDDEN', '#HIDDEN'))
         end
       end
       aggregated_rows << full_row.fill('', full_row.length..col_count - 1)
@@ -99,7 +100,7 @@ module DynamicTableHelper
         condition = a.sample_attribute_type.base_type == Seek::Samples::BaseType::SEEK_SAMPLE_MULTI
         attribute.merge!({ multi_link: true, linked_sample_type: a.linked_sample_type.id }) if condition
         attribute
-      end.unshift({ title: 'id' })
+      end.unshift({ title: 'id' }, {title: 'uuid'})
     end
   end
 end

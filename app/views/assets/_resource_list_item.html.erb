@@ -24,7 +24,7 @@
   <div class="panel-heading rli-head">
     <%= list_item_title resource, title_options %>
     <% if resource.respond_to?(:projects) && ![Event, Person, Project, Institution, Programme, Collection].include?(resource.class) %>
-        <div class="rli-project-list">
+        <div class="rli-project-list hidden-xs">
           <%= resource.projects.uniq.map {|p| link_to p.title, p }.join(', ').html_safe %>
         </div>
     <% end %>

@@ -17,11 +17,9 @@
                 complete:()=>{
                     var scripts = [$j("#fileMetadataModalScript")[0],
                      $j('#preview-permission-link-script')[0]]
-                           console.log(scripts)
                     var bodyScripts = $j('body script')
                     for (var i = 0; i < scripts.length; i++) {
                         if($j.inArray(scripts[i], bodyScripts)){
-                          console.log(i)
                             scripts[i].remove()
                         }
                         var script = document.createElement('script');
@@ -29,7 +27,7 @@
                         script.text = scripts[i].innerHTML;
                         $j('body').append(script);
                     }
-                    loadObjectInputs();
+                    ObjectsInput.init();
                     $j('#projects-selector-select').val(pid).change();
                 }
             })

@@ -4,7 +4,7 @@ class CitationsController < ApplicationController
 
   def fetch
     respond_to do |format|
-      format.js { render partial: 'assets/citation', locals: { doi: params[:doi], style: params[:style] } }
+      format.js { render partial: 'assets/citation_from_doi', locals: { doi: params[:doi], style: params[:style] } }
     end
   end
 

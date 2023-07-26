@@ -1,12 +1,13 @@
 <% asset ||= item %>
 <% human_name = text_for_resource(asset) %>
 <% display_asset = version ? asset.find_version(version) : nil %>
-<% data_like = asset.is_a?(DataFile) || asset.is_a?(FileTemplate) %>
+<% explorable_spreadsheet = asset.supports_spreadsheet_explore? %>
 
-<% show_explore_btn = display_asset && data_like && display_asset.supported_spreadsheet_format? %>
+<% show_explore_btn = display_asset && explorable_spreadsheet && display_asset.supported_spreadsheet_format? %>
 <% show_view_content_btn = display_asset&.single_content_blob && !display_asset.single_content_blob.show_as_external_link? %>
 <% show_doi_button = display_asset && (asset.supports_doi? && asset.is_published? && asset.can_manage? && display_asset.can_mint_doi?) %>
 <% show_publish_button = asset.is_in_isa_publishable? && asset.can_publish? %>
+<% show_cancel_publishing_request_button = (asset.is_waiting_approval? || asset.is_rejected?) && asset.can_manage? %>
 
 <%= source_link_button(asset.source_link) if asset.respond_to?(:source_link) && asset.source_link %>
 
@@ -103,6 +104,12 @@
 
   <% if show_publish_button %>
     <li><%= image_tag_for_key('publish', polymorphic_path(asset, action: :check_related_items), nil, { method: :post }, "Publish #{human_name}") -%></li>
+  <% elsif show_cancel_publishing_request_button %>
+    <li><%= image_tag_for_key('unpublish', cancel_publishing_request_person_path(current_user.person,
+                                                                               asset_id: asset.id,
+                                                                               asset_class: asset.class,
+                                                                               from_asset: true),
+                              nil, { method: :post }, "Cancel publishing request") -%></li>
   <% end -%>
 
   <%= delete_icon(asset, current_user)%>

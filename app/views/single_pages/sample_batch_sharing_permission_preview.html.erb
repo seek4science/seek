@@ -1,0 +1,227 @@
+<%
+  sample_ids = (params[:sample_ids] || []).map(&:to_i)
+  
+  items_not_in_isa_hash = SharingPermissionsHelper::ITEMS_NOT_IN_ISA_HASH
+  items_not_in_isa_hash[:children] =[]
+
+  samples = Sample.where(id: sample_ids).order(:title).authorized_for('manage', User.current_user).to_a
+  all_related_items_hash = { 'Sample' => { items: samples }}
+
+  items_not_in_isa = filter_items_not_in_ISA(all_related_items_hash)
+
+  @policy_params = params[:policy_attributes]
+
+  flash_exists = flash[:error] || flash[:notice]
+%>
+
+<% if !flash_exists %>
+  <%= show_title "Change permission of #{t('sample').pluralize}"  -%>
+<% end %>
+
+<div id="sharing_items">
+<%= form_tag({:action => :batch_change_permission_for_selected_items}, :method => :post, id: "change-permission-preview-form") do -%>
+
+  <% if !sample_ids.any? %>
+    <div>
+      <p>
+        <% unless flash_exists %>
+          No sample has been selected...
+        <% end %>
+      </p>
+    </div>  
+  <% end %>
+  <% if flash_exists %>
+    <div id="notice_flash" class="fade in alert alert-<%= flash[:notice] ? "success" : "error" %> alert-dismissable" role="alert">
+      <% if flash[:notice] %>
+        <%= flash[:notice]%>
+      <% else%>
+        <%= flash[:error]%>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% if !flash_exists %>
+
+    <%= folding_panel("Samples", false, :id => 'not_isa_item', :body_options => {:id => 'items_fold_content'},
+    :help_text => nil) do %>
+
+      <label><%= link_to "Select All", "#", id: "select_all_not_isa" -%></label> |
+      <label><%= link_to "Deselect All", "#", id: "deselect_all_not_isa" -%></label> |
+      <label><%= link_to "Expand All", "#", id: "expand_all_not_isa" -%></label> |
+      <label><%= link_to "Collapse All", "#", id: "collapse_all_not_isa" -%></label>
+
+      <% items_not_in_isa.each do |resource_type, resource_items| %>
+        <% asset_node= asset_node_json(resource_type, resource_items) %>
+        <% items_not_in_isa_hash[:children].append(asset_node) %>
+      <% end %>
+      
+      <div id="jstree_not_isa"></div>
+
+    <% end %>
+
+  <% end %>
+
+
+  <% if !flash_exists %>
+
+    <%= submit_tag "Next", data: {disable_with: 'Next'}, :class => 'btn btn-primary', onclick: "submitBatchPermissionPreviewForm()" -%>
+    or
+    <%= cancel_button(@asset, { id: "cancel-batch-permission-preview" }) %>
+
+  <% end -%>
+
+  <div id="hiddencheckboxs"></div>
+
+<% end -%>
+</div>
+
+<script type="text/javascript">
+
+    function addCheckboxToAssetNode(asset,asset_id,is_isa){
+        var container = $j('#hiddencheckboxs');
+        var inputs = container.find('input');
+        var id = inputs.length+1;
+        $j('<input />', { type: 'checkbox', name: is_isa+'['+asset+']['+asset_id+']', id: is_isa+'_'+asset+'_'+asset_id, value: 1,class: asset+'_'+asset_id+' '+is_isa, checked: false}).appendTo(container);
+    }
+
+    $j(document).ready(function () {
+
+        $j('#select_all_not_isa').click(function (event) {
+            event.preventDefault();
+            $j('input[name^="share_not_isa"]').prop("checked", true);
+            $j("#jstree_not_isa").jstree().check_all(true);
+        });
+
+        $j('#deselect_all_not_isa').click(function (event) {
+            event.preventDefault();
+            $j('input[name^="share_not_isa"]').prop("checked", false);
+            $j("#jstree_not_isa").jstree().uncheck_all(true);
+        });
+        $j('#expand_all_not_isa').click(function (event) {
+            event.preventDefault();
+            $j("#jstree_not_isa").jstree("open_all");
+            $j("#jstree_not_isa").find('[id^="Permission-"]').removeClass('hide_permission')
+
+        });
+        $j('#collapse_all_not_isa').click(function (event) {
+            event.preventDefault();
+            $j("#jstree_not_isa").find('[id^="Permission-"]').addClass('hide_permission')
+
+        });
+
+        $j('#select_all_isa').click(function (event) {
+            $j('input[name^="share_isa"]').prop("checked", true);
+            $j("#jstree").jstree().check_all(true);
+            event.preventDefault();
+
+        });
+
+        $j('#deselect_all_isa').click(function (event) {
+            $j('input[name^="share_isa"]').prop("checked", false);
+            $j("#jstree").jstree().uncheck_all(true);
+            event.preventDefault();
+
+        });
+        $j('#expand_all_isa').click(function (event) {
+            event.preventDefault();
+            $j("#jstree").jstree("open_all");
+            $j('#jstree').find(('[id^="Permission-"]')).removeClass('hide_permission')
+
+        });
+        $j('#collapse_all_isa').click(function (event) {
+            event.preventDefault();
+            $j('#jstree').find(('[id^="Permission-"]')).addClass('hide_permission')
+
+        });
+    });
+
+    $j(document).ready(function () {
+
+        $j('#jstree_not_isa').on('loaded.jstree', function (event, data) {
+            // expand all nodes
+            $j("#jstree_not_isa").jstree("open_all");
+            if (<%= @batch_sharing_permission_changed %>){
+                $j('#jstree_not_isa').find(('[id^="Permission-"]')).removeClass('hide_permission')
+            }
+
+            var $tree = $j(this);
+            $j($tree.jstree(true).get_json('#', {
+                flat: true
+            })).each(function(index, value) {
+                var asset = this.id.split('-')[0]
+                var asset_id = this.id.split('-')[1]
+                if ( index != 0 && asset != "Permission" && asset_id != "not_isa"){
+                    addCheckboxToAssetNode(asset,asset_id,'share_not_isa');
+                }
+            });
+
+        })
+            .jstree({
+                'core': {
+                    'multiple' : true,
+                    "check_callback": true,
+                    "themes": {
+                        "variant": "large",
+                        "dots": false
+                    },
+
+                    'data':  <%= items_not_in_isa_hash.to_json.html_safe -%>
+
+                },
+                "checkbox" : {
+                    "three_state" : false,
+                    "whole_node" : false,
+                    "tie_selection" : false
+                },
+                "plugins" : [ "checkbox" ,"changed","json_data"]
+            }).on("check_node.jstree uncheck_node.jstree", function(e, data) {
+
+            var asset = data.node.id.split('-')
+            var asset_id = 'share_not_isa_'+asset[0]+'_'+asset[1]
+
+            if  ($j('input[id="'+asset_id+'"]').prop('checked') ){
+                $j('input[id="'+asset_id+'"]').prop("checked", false);
+            } else {
+                $j('input[id="'+asset_id+'"]').prop("checked", true);
+            }
+
+        }).on("select_node.jstree", function (e, data) {
+            var asset = data.node.id.split('-')
+            var Permission_id = 'Permission-'+asset[0]+'-'+asset[1]
+            var selector = $j('[id^='+Permission_id+']')
+            if (selector.hasClass ("hide_permission")){
+                selector.removeClass('hide_permission')
+            }else{
+                selector.addClass('hide_permission')
+            }
+        });
+
+        $j("#change-permission-preview-form").submit(function(){
+          return false;
+        });
+
+        $j("#cancel-batch-permission-preview").on("click", function(e){
+          e.preventDefault()
+          $j('#change-batch-permission-modal').modal('hide')
+        })
+
+    });
+
+    function submitBatchPermissionPreviewForm () {
+      $j.ajax({
+        method: "POST",
+        url: '<%= batch_change_permission_for_selected_items_single_pages_path -%>?single_page=true',
+        data: $j("#change-permission-preview-form").serialize(),
+        success: (res) => { 
+          $j('#change-batch-permission').html(res);
+          // Handling 'remaining backdrop' issue when multiple modals
+          $j('#add-person-permission-modal').data("backdrop", "");
+          $j('#add-project-permission-modal').data("backdrop", "");
+          ObjectsInput.init();
+        },
+        error: (e) => { console.log(e) }
+      });
+    }
+
+</script>
+

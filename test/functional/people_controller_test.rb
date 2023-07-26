@@ -31,13 +31,13 @@ class PeopleControllerTest < ActionController::TestCase
     Person.delete_all
     Project.delete_all
 
-    project = Factory(:work_group).project
+    project = FactoryBot.create(:work_group).project
     refute_empty project.institutions
     institution = project.institutions.first
     refute_nil(institution)
 
     assert_equal 0, Person.count, 'There should be no people in the database'
-    user = Factory(:activated_user)
+    user = FactoryBot.create(:activated_user)
     login_as user
 
     assert_difference('Person.count') do
@@ -55,7 +55,7 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'trim the email to avoid validation error' do
-    login_as(Factory(:admin))
+    login_as(FactoryBot.create(:admin))
     assert_difference('Person.count') do
       post :create, params: { person: { first_name: 'test', email: ' hghg@sdfsd.com ' } }
     end
@@ -65,9 +65,9 @@ class PeopleControllerTest < ActionController::TestCase
 
   def test_second_registered_person_is_not_admin
     Person.delete_all
-    person = Factory(:brand_new_person, first_name: 'fred', email: 'fred@dddd.com')
+    person = FactoryBot.create(:brand_new_person, first_name: 'fred', email: 'fred@dddd.com')
     assert_equal 1, Person.count, 'There should be 1 person in the database'
-    user = Factory(:activated_user)
+    user = FactoryBot.create(:activated_user)
     login_as user
     assert_difference('Person.count') do
       assert_difference('NotifieeInfo.count') do
@@ -95,9 +95,9 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'activation required after create' do
-    Factory(:person) # make sure a person is present, first person would otherwise be the admin
+    FactoryBot.create(:person) # make sure a person is present, first person would otherwise be the admin
 
-    login_as(Factory(:brand_new_user))
+    login_as(FactoryBot.create(:brand_new_user))
     with_config_value(:activation_required_enabled,true) do
       with_config_value(:email_enabled, true) do
         assert_difference('Person.count') do
@@ -119,14 +119,14 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'cannot access select form as registered user, even admin' do
-    login_as Factory(:admin)
+    login_as FactoryBot.create(:admin)
     get :register
     assert_redirected_to(root_path)
     refute_nil flash[:error]
   end
 
   test 'should reload form for incomplete details' do
-    new_user = Factory(:brand_new_user)
+    new_user = FactoryBot.create(:brand_new_user)
     assert new_user.person.nil?
 
     login_as(new_user)
@@ -145,7 +145,7 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   def test_should_create_person_with_project
-    work_group_id = Factory(:work_group).id
+    work_group_id = FactoryBot.create(:work_group).id
     assert_difference('Person.count') do
       assert_difference('NotifieeInfo.count') do
         post :create, params: { person: { first_name: 'test', email: 'hghg@sdfsd.com' } }
@@ -180,9 +180,9 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'project administrator can edit userless-profiles in their project' do
-    project_admin = Factory(:project_administrator)
-    unregistered_person = Factory(:brand_new_person,
-                                  group_memberships: [Factory(:group_membership,
+    project_admin = FactoryBot.create(:project_administrator)
+    unregistered_person = FactoryBot.create(:brand_new_person,
+                                  group_memberships: [FactoryBot.create(:group_membership,
                                                               work_group: project_admin.group_memberships.first.work_group)])
     refute (project_admin.projects & unregistered_person.projects).empty?,
            'Project administrator should belong to the same project as the person he is trying to edit'
@@ -194,9 +194,9 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test "project administrator cannot edit registered users' profiles in their project" do
-    project_admin = Factory(:project_administrator)
-    registered_person = Factory(:person,
-                                group_memberships: [Factory(:group_membership,
+    project_admin = FactoryBot.create(:project_administrator)
+    registered_person = FactoryBot.create(:person,
+                                group_memberships: [FactoryBot.create(:group_membership,
                                                             work_group: project_admin.group_memberships.first.work_group)])
     refute (project_admin.projects & registered_person.projects).empty?,
            'Project administrator should belong to the same project as the person he is trying to edit'
@@ -214,7 +214,7 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   def test_change_notification_settings
-    p = Factory(:person)
+    p = FactoryBot.create(:person)
     assert p.notifiee_info.receive_notifications?, 'should receive notifications by default in fixtures'
 
     put :update, params: { id: p.id, person: { description: p.description } }
@@ -232,7 +232,7 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   def test_current_user_shows_login_name
-    current_user = Factory(:person).user
+    current_user = FactoryBot.create(:person).user
     login_as(current_user)
     get :show, params: { id: current_user.person }
     assert_select '.box_about_actor p', text: /Login/m
@@ -240,16 +240,16 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   def test_not_current_user_doesnt_show_login_name
-    current_user = Factory(:person).user
-    other_person = Factory(:person)
+    current_user = FactoryBot.create(:person).user
+    other_person = FactoryBot.create(:person)
     login_as(current_user)
     get :show, params: { id: other_person }
     assert_select '.box_about_actor p', text: /Login/m, count: 0
   end
 
   def test_admin_sees_non_current_user_login_name
-    current_user = Factory(:admin).user
-    other_person = Factory(:person)
+    current_user = FactoryBot.create(:admin).user
+    other_person = FactoryBot.create(:person)
     login_as(current_user)
     get :show, params: { id: other_person }
     assert_select '.box_about_actor p', text: /Login/m
@@ -322,11 +322,11 @@ class PeopleControllerTest < ActionController::TestCase
 
   test 'should remove every permissions set on the person before deleting him' do
     login_as(:quentin)
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     # create bunch of permissions on this person
     i = 0
     while i < 10
-      Factory(:permission, contributor: person, access_type: rand(5))
+      FactoryBot.create(:permission, contributor: person, access_type: rand(5))
       i += 1
     end
     permissions = Permission.where(contributor_type: 'Person', contributor_id: person.try(:id))
@@ -341,14 +341,14 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'should have asset housekeeper role on person show page' do
-    asset_housekeeper = Factory(:asset_housekeeper)
+    asset_housekeeper = FactoryBot.create(:asset_housekeeper)
     get :show, params: { id: asset_housekeeper }
     assert_select '#person-roles h3 img[src*=?]', role_image(:asset_housekeeper), count: 1
   end
 
   test 'should have asset housekeeper icon on people index page' do
     6.times do
-      Factory(:asset_housekeeper)
+      FactoryBot.create(:asset_housekeeper)
     end
 
     get :index, params: { page: 'all' }
@@ -358,14 +358,14 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'should have project administrator role on person show page' do
-    project_administrator = Factory(:project_administrator)
+    project_administrator = FactoryBot.create(:project_administrator)
     get :show, params: { id: project_administrator }
     assert_select '#person-roles h3 img[src*=?]', role_image(:project_administrator), count: 1
   end
 
   test 'should have project administrator icon on people index page' do
     6.times do
-      Factory(:project_administrator)
+      FactoryBot.create(:project_administrator)
     end
 
     get :index, params: { page: 'all' }
@@ -375,11 +375,11 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'allow project administrator to edit unregistered people inside their projects, even outside their institutions' do
-    project_admin = Factory(:project_administrator)
+    project_admin = FactoryBot.create(:project_administrator)
     project = project_admin.projects.first
-    person = Factory(:brand_new_person,
-                     group_memberships: [Factory(:group_membership,
-                                                 work_group: Factory(:work_group, project: project))])
+    person = FactoryBot.create(:brand_new_person,
+                     group_memberships: [FactoryBot.create(:group_membership,
+                                                 work_group: FactoryBot.create(:work_group, project: project))])
     assert_includes project_admin.projects, person.projects.first, 'they should be in the same project'
     refute_includes project_admin.institutions, person.institutions.first, 'they should not be in the same institution'
     assert_equal 1, person.institutions.count, 'should only be in 1 project'
@@ -399,13 +399,13 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'project administrator can view profile creation' do
-    login_as(Factory(:project_administrator))
+    login_as(FactoryBot.create(:project_administrator))
     get :new
     assert_response :success
   end
 
   test 'project administrator can create new profile' do
-    login_as(Factory(:project_administrator))
+    login_as(FactoryBot.create(:project_administrator))
     assert_difference('Person.count') do
       post :create, params: { person: { first_name: 'test', email: 'ttt@email.com' } }
     end
@@ -416,14 +416,14 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'normal user cannot can view profile creation' do
-    login_as(Factory(:person))
+    login_as(FactoryBot.create(:person))
     get :new
     assert_redirected_to :root
     refute_nil flash[:error]
   end
 
   test 'normal user cannot create new profile' do
-    login_as(Factory(:person))
+    login_as(FactoryBot.create(:person))
     assert_no_difference('Person.count') do
       post :create, params: { person: { first_name: 'test', email: 'ttt@email.com' } }
     end
@@ -432,8 +432,8 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'not allow project administrator to edit people outside their projects' do
-    project_admin = Factory(:project_administrator)
-    a_person = Factory(:person)
+    project_admin = FactoryBot.create(:project_administrator)
+    a_person = FactoryBot.create(:person)
     refute_includes project_admin.projects, a_person.projects.first, 'they should not be in the same project'
     assert_equal 1, a_person.projects.count, 'should by in only 1 project'
 
@@ -452,8 +452,8 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'project administrator can not edit admin' do
-    project_admin = Factory(:project_administrator)
-    admin = Factory(:admin, group_memberships: [Factory(:group_membership, work_group: project_admin.group_memberships.first.work_group)])
+    project_admin = FactoryBot.create(:project_administrator)
+    admin = FactoryBot.create(:admin, group_memberships: [FactoryBot.create(:group_membership, work_group: project_admin.group_memberships.first.work_group)])
 
     login_as(project_admin)
     get :show, params: { id: admin }
@@ -473,7 +473,7 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'admin can edit other admin' do
-    admin = Factory(:admin)
+    admin = FactoryBot.create(:admin)
     refute_nil admin.user
     assert_not_equal User.current_user, admin.user
 
@@ -503,14 +503,14 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'should show joined date to non admin, and include time for admin' do
-    login_as(Factory(:person))
-    a_person = Factory(:person)
+    login_as(FactoryBot.create(:person))
+    a_person = FactoryBot.create(:person)
     get :show, params: { id: a_person }
     assert_response :success
     assert_select 'p', text: /#{date_as_string(a_person.user.created_at)}/, count: 1
     assert_select 'p', text: /#{date_as_string(a_person.user.created_at, true)}/, count: 0
 
-    login_as(Factory(:admin))
+    login_as(FactoryBot.create(:admin))
     get :show, params: { id: a_person }
     assert_response :success
     assert_select 'p', text: /#{date_as_string(a_person.user.created_at)}/, count: 1
@@ -524,15 +524,15 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'should have gatekeeper role on person show page' do
-    gatekeeper = Factory(:asset_gatekeeper)
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
     get :show, params: { id: gatekeeper }
     assert_select '#person-roles h3 img[src*=?]', role_image(:asset_gatekeeper), count: 1
   end
 
   test 'should show all roles on person show page' do
-    programme = Factory(:programme)
-    project = Factory(:project)
-    person = Factory(:person, project: project)
+    programme = FactoryBot.create(:programme)
+    project = FactoryBot.create(:project)
+    person = FactoryBot.create(:person, project: project)
 
     assert_difference('Role.count', RoleType.all.count) do
       disable_authorization_checks do
@@ -561,7 +561,7 @@ class PeopleControllerTest < ActionController::TestCase
 
   test 'should have gatekeeper icon on people index page' do
     6.times do
-      Factory(:asset_gatekeeper)
+      FactoryBot.create(:asset_gatekeeper)
     end
 
     get :index, params: { page: 'all' }
@@ -574,8 +574,8 @@ class PeopleControllerTest < ActionController::TestCase
     with_config_value 'email_enabled', true do
       current_person = User.current_user.person
       proj = current_person.projects.first
-      sop = Factory(:sop, projects: [proj], policy: Factory(:public_policy))
-      df = Factory(:data_file, projects: [proj], policy: Factory(:public_policy))
+      sop = FactoryBot.create(:sop, projects: [proj], policy: FactoryBot.create(:public_policy))
+      df = FactoryBot.create(:data_file, projects: [proj], policy: FactoryBot.create(:public_policy))
 
       # subscribe to project
       put :update, params: { id: current_person, receive_notifications: true, person: { project_subscriptions_attributes: { '0' => { project_id: proj.id, frequency: 'weekly', _destroy: '0' } } } }
@@ -590,8 +590,8 @@ class PeopleControllerTest < ActionController::TestCase
       assert current_person.receive_notifications?
 
       assert_enqueued_emails 1 do
-        Factory(:activity_log, activity_loggable: sop, action: 'update')
-        Factory(:activity_log, activity_loggable: df, action: 'update')
+        FactoryBot.create(:activity_log, activity_loggable: sop, action: 'update')
+        FactoryBot.create(:activity_log, activity_loggable: df, action: 'update')
         PeriodicSubscriptionEmailJob.perform_now('weekly')
       end
 
@@ -607,15 +607,15 @@ class PeopleControllerTest < ActionController::TestCase
       assert current_person.receive_notifications?
 
       assert_no_enqueued_emails do
-        Factory(:activity_log, activity_loggable: sop, action: 'update')
-        Factory(:activity_log, activity_loggable: df, action: 'update')
+        FactoryBot.create(:activity_log, activity_loggable: sop, action: 'update')
+        FactoryBot.create(:activity_log, activity_loggable: df, action: 'update')
         PeriodicSubscriptionEmailJob.perform_now('weekly')
       end
     end
   end
 
   test 'should show subscription list to only yourself and admin' do
-    a_person = Factory(:person)
+    a_person = FactoryBot.create(:person)
     login_as(a_person.user)
     get :show, params: { id: a_person }
     assert_response :success
@@ -630,8 +630,8 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'should not show subscription list to people that are not yourself and admin' do
-    a_person = Factory(:person)
-    login_as(Factory(:user))
+    a_person = FactoryBot.create(:person)
+    login_as(FactoryBot.create(:user))
     get :show, params: { id: a_person }
     assert_response :success
     assert_select 'div.panel-heading', text: 'Subscriptions', count: 0
@@ -719,8 +719,8 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'people not in projects should be shown in index' do
-    person_not_in_project = Factory(:brand_new_person, first_name: 'Person Not In Project', last_name: 'Petersen', updated_at: 1.second.from_now)
-    person_in_project = Factory(:person, first_name: 'Person in Project', last_name: 'Petersen', updated_at: 1.second.from_now)
+    person_not_in_project = FactoryBot.create(:brand_new_person, first_name: 'Person Not In Project', last_name: 'Petersen', updated_at: 1.second.from_now)
+    person_in_project = FactoryBot.create(:person, first_name: 'Person in Project', last_name: 'Petersen', updated_at: 1.second.from_now)
     assert person_not_in_project.projects.empty?
     refute person_in_project.projects.empty?
 
@@ -742,10 +742,10 @@ class PeopleControllerTest < ActionController::TestCase
   test 'project people through filtered route' do
     assert_routing 'projects/2/people', controller: 'people', action: 'index', project_id: '2'
 
-    person1 = Factory(:person)
+    person1 = FactoryBot.create(:person)
     proj = person1.projects.first
-    person2 = Factory(:person, group_memberships: [Factory(:group_membership, work_group: proj.work_groups.first)])
-    person3 = Factory(:person)
+    person2 = FactoryBot.create(:person, group_memberships: [FactoryBot.create(:group_membership, work_group: proj.work_groups.first)])
+    person3 = FactoryBot.create(:person)
     assert_equal 2, proj.people.count
     refute proj.people.include?(person3)
     get :index, params: { project_id: proj.id }
@@ -759,10 +759,10 @@ class PeopleControllerTest < ActionController::TestCase
 
   test 'filtered by presentation via nested route' do
     assert_routing 'presentations/4/people', controller: 'people', action: 'index', presentation_id: '4'
-    person1 = Factory(:person)
-    person2 = Factory(:person)
-    presentation1 = Factory(:presentation, policy: Factory(:public_policy), contributor: person1)
-    presentation2 = Factory(:presentation, policy: Factory(:public_policy), contributor: person2)
+    person1 = FactoryBot.create(:person)
+    person2 = FactoryBot.create(:person)
+    presentation1 = FactoryBot.create(:presentation, policy: FactoryBot.create(:public_policy), contributor: person1)
+    presentation2 = FactoryBot.create(:presentation, policy: FactoryBot.create(:public_policy), contributor: person2)
 
     refute_equal presentation1.contributor, presentation2.contributor
     get :index, params: { presentation_id: presentation1.id }
@@ -776,10 +776,10 @@ class PeopleControllerTest < ActionController::TestCase
 
   test 'filtered by programme via nested route' do
     assert_routing 'programmes/4/people', controller: 'people', action: 'index', programme_id: '4'
-    person1 = Factory(:person)
-    person2 = Factory(:person)
-    prog1 = Factory(:programme, projects: [person1.projects.first])
-    prog2 = Factory(:programme, projects: [person2.projects.first])
+    person1 = FactoryBot.create(:person)
+    person2 = FactoryBot.create(:person)
+    prog1 = FactoryBot.create(:programme, projects: [person1.projects.first])
+    prog2 = FactoryBot.create(:programme, projects: [person2.projects.first])
 
     get :index, params: { programme_id: prog1.id }
     assert_response :success
@@ -791,7 +791,7 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'should show personal tags according to config' do
-    p = Factory(:person)
+    p = FactoryBot.create(:person)
     get :show, params: { id: p.id }
     assert_response :success
     assert_select 'div#personal_tags', count: 1
@@ -803,7 +803,7 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'should show related items' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     project = person.projects.first
     inst = person.institutions.first
 
@@ -825,8 +825,8 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'should show empty programme as related item if programme administrator' do
-    person1 = Factory(:programme_administrator_not_in_project)
-    prog1 = Factory(:min_programme, programme_administrators: [person1])
+    person1 = FactoryBot.create(:programme_administrator_not_in_project)
+    prog1 = FactoryBot.create(:min_programme, programme_administrators: [person1])
 
     assert person1.projects.empty?
 
@@ -844,10 +844,10 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'related investigations should show where person is creator' do
-    person = Factory(:person)
-    inv1 = Factory(:investigation, contributor: Factory(:person), policy: Factory(:public_policy))
+    person = FactoryBot.create(:person)
+    inv1 = FactoryBot.create(:investigation, contributor: FactoryBot.create(:person), policy: FactoryBot.create(:public_policy))
     AssetsCreator.create asset: inv1, creator: person
-    inv2 = Factory(:investigation, contributor: person)
+    inv2 = FactoryBot.create(:investigation, contributor: person)
 
     login_as(person)
 
@@ -865,10 +865,10 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'related studies should show where person is creator' do
-    person = Factory(:person)
-    study1 = Factory(:study, contributor: Factory(:person), policy: Factory(:public_policy))
+    person = FactoryBot.create(:person)
+    study1 = FactoryBot.create(:study, contributor: FactoryBot.create(:person), policy: FactoryBot.create(:public_policy))
     AssetsCreator.create asset: study1, creator: person
-    study2 = Factory(:study, contributor: person)
+    study2 = FactoryBot.create(:study, contributor: person)
 
     login_as(person)
 
@@ -886,10 +886,10 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'related assays should show where person is creator' do
-    person = Factory(:person)
-    assay1 = Factory(:assay, contributor: Factory(:person), policy: Factory(:public_policy))
+    person = FactoryBot.create(:person)
+    assay1 = FactoryBot.create(:assay, contributor: FactoryBot.create(:person), policy: FactoryBot.create(:public_policy))
     AssetsCreator.create asset: assay1, creator: person
-    assay2 = Factory(:assay, contributor: person)
+    assay2 = FactoryBot.create(:assay, contributor: person)
 
     login_as(person)
 
@@ -907,11 +907,11 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'related sample_types should show where person is creator' do
-    person1 = Factory(:person)
-    person2 = Factory(:person)
-    st1 = Factory(:simple_sample_type, contributor: person1, creators: [person1])
-    st2 = Factory(:simple_sample_type, contributor: person1, creators: [person2])
-    st3 = Factory(:simple_sample_type, contributor: person2, creators: [person1])
+    person1 = FactoryBot.create(:person)
+    person2 = FactoryBot.create(:person)
+    st1 = FactoryBot.create(:simple_sample_type, contributor: person1, creators: [person1])
+    st2 = FactoryBot.create(:simple_sample_type, contributor: person1, creators: [person2])
+    st3 = FactoryBot.create(:simple_sample_type, contributor: person2, creators: [person1])
 
     login_as(person1)
     assert st1.can_view?
@@ -933,8 +933,8 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'redirect after destroy' do
-    person1 = Factory(:person)
-    person2 = Factory(:person)
+    person1 = FactoryBot.create(:person)
+    person2 = FactoryBot.create(:person)
 
     @request.env['HTTP_REFERER'] = "/people/#{person1.id}"
     assert_difference('Person.count', -1) do
@@ -950,12 +950,12 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'contact details only visible for programme' do
-    person1 = Factory(:person, email: 'fish@email.com', skype_name: 'fish')
-    person2 = Factory(:person, email: 'monkey@email.com', skype_name: 'monkey')
-    person3 = Factory(:person, email: 'parrot@email.com', skype_name: 'parrot')
+    person1 = FactoryBot.create(:person, email: 'fish@email.com', skype_name: 'fish')
+    person2 = FactoryBot.create(:person, email: 'monkey@email.com', skype_name: 'monkey')
+    person3 = FactoryBot.create(:person, email: 'parrot@email.com', skype_name: 'parrot')
 
-    prog1 = Factory :programme, projects: (person1.projects | person2.projects)
-    prog2 = Factory :programme, projects: person3.projects
+    prog1 = FactoryBot.create :programme, projects: (person1.projects | person2.projects)
+    prog2 = FactoryBot.create :programme, projects: person3.projects
 
     # check programme assignment
     assert_equal person1.programmes, person2.programmes
@@ -977,9 +977,9 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'is this you? page for register with matching email' do
-    u = Factory(:brand_new_user)
+    u = FactoryBot.create(:brand_new_user)
     refute u.person
-    p = Factory(:brand_new_person, email: 'jkjkjk@theemail.com')
+    p = FactoryBot.create(:brand_new_person, email: 'jkjkjk@theemail.com')
     login_as(u)
     get :register, params: { email: 'jkjkjk@theemail.com' }
     assert_response :success
@@ -989,9 +989,9 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'new profile page when matching email matches person already registered' do
-    u = Factory(:brand_new_user)
+    u = FactoryBot.create(:brand_new_user)
     refute u.person
-    p = Factory(:person, email: 'jkjkjk@theemail.com')
+    p = FactoryBot.create(:person, email: 'jkjkjk@theemail.com')
     login_as(u)
     get :register, params: { email: 'jkjkjk@theemail.com' }
     assert_response :success
@@ -1000,11 +1000,11 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test "orcid not required when creating another person's profile" do
-    login_as(Factory(:admin))
+    login_as(FactoryBot.create(:admin))
 
     with_config_value(:orcid_required, true) do
       assert_nothing_raised do
-        no_orcid = Factory :brand_new_person, email: 'FISH-sOup1@email.com'
+        no_orcid = FactoryBot.create :brand_new_person, email: 'FISH-sOup1@email.com'
         assert no_orcid.valid?
         assert_empty no_orcid.errors[:orcid]
       end
@@ -1012,14 +1012,14 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'my items' do
-    me = Factory(:person)
+    me = FactoryBot.create(:person)
 
     login_as(me)
 
-    someone_else = Factory(:person)
-    data_file = Factory(:data_file, contributor: me, creators: [me])
-    model = Factory(:model, contributor: me, creators: [me])
-    other_data_file = Factory(:data_file, contributor: someone_else, creators: [someone_else])
+    someone_else = FactoryBot.create(:person)
+    data_file = FactoryBot.create(:data_file, contributor: me, creators: [me])
+    model = FactoryBot.create(:model, contributor: me, creators: [me])
+    other_data_file = FactoryBot.create(:data_file, contributor: someone_else, creators: [someone_else])
 
     assert_includes me.contributed_items, data_file
     assert_includes me.contributed_items, model
@@ -1042,12 +1042,12 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'my items permissions' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
 
-    other_person = Factory(:person)
-    data_file = Factory(:data_file, contributor: other_person, creators: [other_person], policy: Factory(:public_policy))
-    data_file2 = Factory(:data_file, contributor: other_person, creators: [other_person], policy: Factory(:private_policy))
+    other_person = FactoryBot.create(:person)
+    data_file = FactoryBot.create(:data_file, contributor: other_person, creators: [other_person], policy: FactoryBot.create(:public_policy))
+    data_file2 = FactoryBot.create(:data_file, contributor: other_person, creators: [other_person], policy: FactoryBot.create(:private_policy))
 
     assert data_file.can_view?(person.user)
     refute data_file2.can_view?(person.user)
@@ -1067,11 +1067,11 @@ class PeopleControllerTest < ActionController::TestCase
 
   test 'my items longer list' do
     # the myitems shows a longer list of 50, rather than the related_items_limit configuration
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
     data_files = []
     50.times do
-      data_files << Factory(:data_file, contributor: person, creators: [person])
+      data_files << FactoryBot.create(:data_file, contributor: person, creators: [person])
     end
 
     assert_equal 50, data_files.length
@@ -1087,45 +1087,45 @@ class PeopleControllerTest < ActionController::TestCase
     end
   end
 
-  test 'autocomplete' do
-    Factory(:brand_new_person, first_name: 'Xavier', last_name: 'Johnson')
-    Factory(:brand_new_person, first_name: 'Xavier', last_name: 'Bohnson')
-    Factory(:brand_new_person, first_name: 'Charles', last_name: 'Bohnson')
-    Factory(:brand_new_person, first_name: 'Jon Bon', last_name: 'Jovi')
-    Factory(:brand_new_person, first_name: 'Jon', last_name: 'Bon Jovi')
+  test 'typeahead autocomplete' do
+    FactoryBot.create(:brand_new_person, first_name: 'Xavier', last_name: 'Johnson')
+    FactoryBot.create(:brand_new_person, first_name: 'Xavier', last_name: 'Bohnson')
+    FactoryBot.create(:brand_new_person, first_name: 'Charles', last_name: 'Bohnson')
+    FactoryBot.create(:brand_new_person, first_name: 'Jon Bon', last_name: 'Jovi')
+    FactoryBot.create(:brand_new_person, first_name: 'Jon', last_name: 'Bon Jovi')
 
-    get :typeahead, params: { format: :json, query: 'xav' }
+    get :typeahead, params: { format: :json, q: 'xav' }
     assert_response :success
-    res = JSON.parse(response.body)
+    res = JSON.parse(response.body)['results']
     assert_equal 2, res.length
-    assert_includes res.map { |r| r['name'] }, 'Xavier Johnson'
-    assert_includes res.map { |r| r['name'] }, 'Xavier Bohnson'
+    assert_includes res.map { |r| r['text'] }, 'Xavier Johnson'
+    assert_includes res.map { |r| r['text'] }, 'Xavier Bohnson'
 
-    get :typeahead, params: { format: :json, query: 'bohn' }
+    get :typeahead, params: { format: :json, q: 'bohn' }
     assert_response :success
-    res = JSON.parse(response.body)
+    res = JSON.parse(response.body)['results']
     assert_equal 2, res.length
-    assert_includes res.map { |r| r['name'] }, 'Charles Bohnson'
-    assert_includes res.map { |r| r['name'] }, 'Xavier Bohnson'
+    assert_includes res.map { |r| r['text'] }, 'Charles Bohnson'
+    assert_includes res.map { |r| r['text'] }, 'Xavier Bohnson'
 
-    get :typeahead, params: { format: :json, query: 'xavier bohn' }
+    get :typeahead, params: { format: :json, q: 'xavier bohn' }
     assert_response :success
-    res = JSON.parse(response.body)
+    res = JSON.parse(response.body)['results']
     assert_equal 1, res.length
-    assert_includes res.map { |r| r['name'] }, 'Xavier Bohnson'
+    assert_includes res.map { |r| r['text'] }, 'Xavier Bohnson'
 
-    get :typeahead, params: { format: :json, query: 'jon bon' }
+    get :typeahead, params: { format: :json, q: 'jon bon' }
     assert_response :success
-    res = JSON.parse(response.body)
+    res = JSON.parse(response.body)['results']
     assert_equal 2, res.length
-    assert_equal res.map { |r| r['name'] }.uniq, ['Jon Bon Jovi']
+    assert_equal res.map { |r| r['text'] }.uniq, ['Jon Bon Jovi']
   end
 
   test 'related samples are checked for authorization' do
-    person = Factory(:person)
-    other_person = Factory(:person)
-    sample1 = Factory(:sample, contributor: other_person, policy: Factory(:public_policy))
-    sample2 = Factory(:sample, contributor: other_person, policy: Factory(:private_policy))
+    person = FactoryBot.create(:person)
+    other_person = FactoryBot.create(:person)
+    sample1 = FactoryBot.create(:sample, contributor: other_person, policy: FactoryBot.create(:public_policy))
+    sample2 = FactoryBot.create(:sample, contributor: other_person, policy: FactoryBot.create(:private_policy))
     login_as(person)
     assert sample1.can_view?
     refute sample2.can_view?
@@ -1147,13 +1147,13 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'admin should destroy person with project subscriptions' do
-    admin = Factory(:admin)
-    person = Factory(:person)
+    admin = FactoryBot.create(:admin)
+    person = FactoryBot.create(:person)
     project = person.projects.first
-    data_file = Factory(:data_file, projects: [project])
+    data_file = FactoryBot.create(:data_file, projects: [project])
 
     project_sub = person.project_subscriptions.first
-    Factory(:subscription, person: person, subscribable: data_file, project_subscription: project_sub)
+    FactoryBot.create(:subscription, person: person, subscribable: data_file, project_subscription: project_sub)
 
     refute data_file.can_delete?(admin.user)
     assert person.can_delete?(admin.user)
@@ -1188,9 +1188,9 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'notification params' do
-    wg1 = Factory(:work_group)
-    wg2 = Factory(:work_group)
-    user = Factory(:activated_user)
+    wg1 = FactoryBot.create(:work_group)
+    wg2 = FactoryBot.create(:work_group)
+    user = FactoryBot.create(:activated_user)
     assert_nil user.person
     login_as(user)
 
@@ -1246,9 +1246,9 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'admin can see user login through API' do
-    login_as(Factory(:admin))
+    login_as(FactoryBot.create(:admin))
 
-    get :show, format: :json, params: { id: Factory(:user, login: 'dave1234').person }
+    get :show, format: :json, params: { id: FactoryBot.create(:user, login: 'dave1234').person }
 
     assert_response :success
     h = JSON.parse(response.body)
@@ -1256,9 +1256,9 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'admin cannot see user login through API if no registered person' do
-    login_as(Factory(:admin))
+    login_as(FactoryBot.create(:admin))
 
-    get :show, format: :json, params: { id: Factory(:brand_new_person) }
+    get :show, format: :json, params: { id: FactoryBot.create(:brand_new_person) }
 
     assert_response :success
     h = JSON.parse(response.body)
@@ -1266,9 +1266,9 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'non-admin cannot see user login through API' do
-    login_as(Factory(:person))
+    login_as(FactoryBot.create(:person))
 
-    get :show, format: :json, params: { id: Factory(:user, login: 'dave1234').person }
+    get :show, format: :json, params: { id: FactoryBot.create(:user, login: 'dave1234').person }
 
     assert_response :success
     h = JSON.parse(response.body)

@@ -2,10 +2,10 @@ require 'test_helper'
 
 class IndexTableColumnDefinitionsTest < ActiveSupport::TestCase
   def setup
-    @assay = Factory(:experimental_assay)
-    @data_file = Factory(:data_file)
-    @person = Factory(:person)
-    @project = Factory(:project)
+    @assay = FactoryBot.create(:experimental_assay)
+    @data_file = FactoryBot.create(:data_file)
+    @person = FactoryBot.create(:person)
+    @project = FactoryBot.create(:project)
   end
 
   test 'required columns' do

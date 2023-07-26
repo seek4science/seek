@@ -5,7 +5,7 @@
   <% if @active_filters&.any? -%>
     <%= resource_text %> matching the given criteria:
     <%= link_to("(Clear all filters)", page_and_sort_params.merge(filter: nil)) %>
-  <% elsif @total_count && klass_from_controller.authorization_supported? %>
+  <% elsif @total_count && controller_model.authorization_supported? %>
     <%= resource_text %> visible to you, out of a total of <strong><%= @total_count %></strong>
   <% else %>
     <%= resource_text %> found

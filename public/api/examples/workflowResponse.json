@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "72",
+    "id": "109",
     "type": "workflows",
     "attributes": {
       "policy": {
@@ -11,7 +11,7 @@
       },
       "discussion_links": [
         {
-          "id": "28",
+          "id": "10",
           "label": "Slack",
           "url": "http://www.slack.com/"
         }
@@ -31,14 +31,14 @@
         {
           "version": 1,
           "revision_comments": null,
-          "url": "http://localhost:3000/workflows/72?version=1",
+          "url": "http://localhost:3000/workflows/109?version=1",
           "doi": null
         }
       ],
       "version": 1,
       "revision_comments": null,
-      "created_at": "2022-07-18T09:03:54.000Z",
-      "updated_at": "2022-07-18T09:03:54.000Z",
+      "created_at": "2023-06-14T10:43:21.000Z",
+      "updated_at": "2023-06-14T10:43:21.000Z",
       "doi": null,
       "content_blobs": [
         {
@@ -47,13 +47,13 @@
           "md5sum": "ef2ea32522098acc937199f6c2b64f41",
           "sha1sum": "a5133ccdb0376324d039431e4eff4f7d21a751cd",
           "content_type": "application/x-yaml",
-          "link": "http://localhost:3000/workflows/72/content_blobs/321",
+          "link": "http://localhost:3000/workflows/109/content_blobs/415",
           "size": 732
         }
       ],
       "creators": [
         {
-          "profile": "/people/670",
+          "profile": "/people/396",
           "family_name": "One",
           "given_name": "Some",
           "affiliation": "University of Somewhere",
@@ -79,13 +79,27 @@
         }
       ],
       "internals": {
-      }
+      },
+      "tools": [
+        {
+          "name": "WorkflowHub",
+          "id": "https://bio.tools/workflowhub"
+        },
+        {
+          "name": "bio.tools",
+          "id": "https://bio.tools/bio.tools"
+        },
+        {
+          "name": "BioRuby",
+          "id": "https://bio.tools/bioruby"
+        }
+      ]
     },
     "relationships": {
       "creators": {
         "data": [
           {
-            "id": "670",
+            "id": "396",
             "type": "people"
           }
         ]
@@ -93,7 +107,7 @@
       "submitter": {
         "data": [
           {
-            "id": "671",
+            "id": "397",
             "type": "people"
           }
         ]
@@ -101,11 +115,11 @@
       "people": {
         "data": [
           {
-            "id": "670",
+            "id": "396",
             "type": "people"
           },
           {
-            "id": "671",
+            "id": "397",
             "type": "people"
           }
         ]
@@ -113,7 +127,7 @@
       "projects": {
         "data": [
           {
-            "id": "691",
+            "id": "407",
             "type": "projects"
           }
         ]
@@ -121,7 +135,7 @@
       "investigations": {
         "data": [
           {
-            "id": "96",
+            "id": "84",
             "type": "investigations"
           }
         ]
@@ -129,7 +143,7 @@
       "studies": {
         "data": [
           {
-            "id": "92",
+            "id": "84",
             "type": "studies"
           }
         ]
@@ -137,7 +151,7 @@
       "assays": {
         "data": [
           {
-            "id": "88",
+            "id": "84",
             "type": "assays"
           }
         ]
@@ -145,7 +159,7 @@
       "publications": {
         "data": [
           {
-            "id": "68",
+            "id": "84",
             "type": "publications"
           }
         ]
@@ -172,14 +186,14 @@
       }
     },
     "links": {
-      "self": "/workflows/72?version=1"
+      "self": "/workflows/109?version=1"
     },
     "meta": {
-      "created": "2022-07-18T09:03:54.000Z",
-      "modified": "2022-07-18T09:03:54.000Z",
+      "created": "2023-06-14T10:43:21.000Z",
+      "modified": "2023-06-14T10:43:21.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "79068240-e8a6-013a-1113-0a81884ed284"
+      "uuid": "3440eef0-ecce-013b-a2d8-000c29a94011"
     }
   },
   "jsonapi": {

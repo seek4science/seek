@@ -5,9 +5,9 @@ class WorkflowRoCrateTest < ActionDispatch::IntegrationTest
   include HtmlHelper
 
   test 'parse generated Workflow RO-Crate' do
-    project = Factory(:project, title: 'Cool Project')
-    person = Factory(:person, first_name: 'Xavier', last_name: 'Xavierson')
-    workflow = Factory(:generated_galaxy_ro_crate_workflow, projects: [project], creators: [person], other_creators: 'Jane Bloggs')
+    project = FactoryBot.create(:project, title: 'Cool Project')
+    person = FactoryBot.create(:person, first_name: 'Xavier', last_name: 'Xavierson')
+    workflow = FactoryBot.create(:generated_galaxy_ro_crate_workflow, projects: [project], creators: [person], other_creators: 'Jane Bloggs')
     zip = workflow.ro_crate_zip
 
     crate = ROCrate::WorkflowCrateReader.read_zip(zip)
@@ -31,7 +31,7 @@ class WorkflowRoCrateTest < ActionDispatch::IntegrationTest
   test 'include remotes in generated Workflow RO-Crate' do
     mock_remote_file "#{Rails.root}/test/fixtures/files/little_file.txt", 'http://internet.internet/file'
 
-    workflow = Factory(:local_git_workflow)
+    workflow = FactoryBot.create(:local_git_workflow)
 
     v = workflow.git_version
     assert v.mutable?
@@ -63,7 +63,7 @@ class WorkflowRoCrateTest < ActionDispatch::IntegrationTest
   end
 
   test 'generate Workflow RO-Crate for repository containing symlink' do
-    git_version = Factory(:remote_git_version, ref: 'refs/remotes/heads/symlink',
+    git_version = FactoryBot.create(:remote_git_version, ref: 'refs/remotes/heads/symlink',
                           commit: '728337a507db00b8b8ba9979330a4f53d6d43b18')
     assert_nothing_raised do
       zip = git_version.ro_crate_zip
@@ -79,7 +79,7 @@ class WorkflowRoCrateTest < ActionDispatch::IntegrationTest
   end
 
   test 'generate Workflow RO-Crate when RO-Crate was previously generated' do
-    git_version = Factory(:remote_git_version)
+    git_version = FactoryBot.create(:remote_git_version)
     git_version = Workflow::Git::Version.find(git_version.id)
     assert_nothing_raised do
       refute File.exist?(git_version.send(:ro_crate_path))
@@ -100,7 +100,7 @@ class WorkflowRoCrateTest < ActionDispatch::IntegrationTest
   end
 
   test 'generate Workflow RO-Crate containing symlink when it was previously generated' do
-    git_version = Factory(:remote_git_version, ref: 'refs/remotes/heads/symlink',
+    git_version = FactoryBot.create(:remote_git_version, ref: 'refs/remotes/heads/symlink',
                           commit: '728337a507db00b8b8ba9979330a4f53d6d43b18')
     git_version = Workflow::Git::Version.find(git_version.id)
     assert_nothing_raised do

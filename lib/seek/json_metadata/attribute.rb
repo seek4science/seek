@@ -16,7 +16,7 @@ module Seek
         # validates that the attribute type is SeekSample if linked_sample_type is set, and vice-versa
         validate :linked_sample_type_and_attribute_type_consistency
 
-        delegate :controlled_vocab?, :seek_cv_list?, :seek_sample?, :seek_sample_multi?, :seek_strain?, :seek_resource?, to: :sample_attribute_type, allow_nil: true
+        delegate :controlled_vocab?, :seek_cv_list?, :seek_sample?, :seek_sample_multi?, :seek_strain?, :seek_resource?, :linked_custom_metadata?, to: :sample_attribute_type, allow_nil: true
       end
 
       # checks whether the value is blank against the attribute type and base type
@@ -73,9 +73,9 @@ module Seek
           errors.add(:sample_attribute_type, 'Attribute type must be SeekSample if linked sample type set')
         end
         if seek_sample? && linked_sample_type.nil?
-          errors.add(:seek_sample, 'Linked Sample Type must be set if attribute type is SeekSample')
+          errors.add(:seek_sample, 'Linked Sample Type must be set if attribute type is Registered Sample')
         elsif seek_sample_multi? && linked_sample_type.nil? 
-          errors.add(:seek_sample_multi, 'Linked Sample Type must be set if attribute type is SeekSampleMulti')
+          errors.add(:seek_sample_multi, 'Linked Sample Type must be set if attribute type is Registered Sample (multiple)')
         end
       end
     end

@@ -56,7 +56,6 @@ class ProgrammesController < ApplicationController
   end
 
   def handle_administrators
-    params[:programme][:programme_administrator_ids] = params[:programme][:programme_administrator_ids].split(',')
     prevent_removal_of_self_as_programme_administrator
   end
 
@@ -150,7 +149,7 @@ class ProgrammesController < ApplicationController
   end
 
   def programme_params
-    handle_administrators if params[:programme][:programme_administrator_ids] && !(params[:programme][:programme_administrator_ids].is_a? Array)
+    handle_administrators if params[:programme][:programme_administrator_ids]
     if action_name == 'create' && !User.admin_logged_in?
       params[:programme][:programme_administrator_ids] ||= []
       params[:programme][:programme_administrator_ids] << current_person.id.to_s
@@ -159,7 +158,7 @@ class ProgrammesController < ApplicationController
 
     params.require(:programme).permit(:avatar_id, :description, :first_letter, :title, :uuid, :web_page,
                                       { project_ids: [] }, :funding_details, { programme_administrator_ids: [] },
-                                      :activation_rejection_reason, :funding_codes,
+                                      :activation_rejection_reason, { funding_codes: [] },
                                       :open_for_projects,
                                       discussion_links_attributes:[:id, :url, :label, :_destroy])
   end

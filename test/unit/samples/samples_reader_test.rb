@@ -5,9 +5,9 @@ class SamplesReaderTest < ActiveSupport::TestCase
     # need a string type registered
     create_sample_attribute_type
 
-    @content_blob = Factory(:sample_type_template_content_blob)
-    @content_blob2 = Factory(:sample_type_template_content_blob2)
-    @binary_blob = Factory(:binary_content_blob)
+    @content_blob = FactoryBot.create(:sample_type_template_content_blob)
+    @content_blob2 = FactoryBot.create(:sample_type_template_content_blob2)
+    @binary_blob = FactoryBot.create(:binary_content_blob)
   end
 
   test 'compatible?' do
@@ -15,7 +15,7 @@ class SamplesReaderTest < ActiveSupport::TestCase
     assert Seek::Templates::SamplesReader.new(@content_blob2).compatible?
 
     refute Seek::Templates::SamplesReader.new(@binary_blob).compatible?
-    refute Seek::Templates::SamplesReader.new(Factory(:rightfield_content_blob)).compatible?
+    refute Seek::Templates::SamplesReader.new(FactoryBot.create(:rightfield_content_blob)).compatible?
     refute Seek::Templates::SamplesReader.new(nil).compatible?
   end
 
@@ -47,7 +47,7 @@ class SamplesReaderTest < ActiveSupport::TestCase
   end
 
   test 'each record' do
-    handler = Seek::Templates::SamplesReader.new(Factory(:sample_type_populated_template_content_blob))
+    handler = Seek::Templates::SamplesReader.new(FactoryBot.create(:sample_type_populated_template_content_blob))
     rows = []
     data = []
     handler.each_record do |row, d|
@@ -69,7 +69,7 @@ class SamplesReaderTest < ActiveSupport::TestCase
   end
 
   test 'each record restricted columns' do
-    handler = Seek::Templates::SamplesReader.new(Factory(:sample_type_populated_template_content_blob))
+    handler = Seek::Templates::SamplesReader.new(FactoryBot.create(:sample_type_populated_template_content_blob))
     rows = []
     data = []
     handler.each_record([1, 4]) do |row, d|

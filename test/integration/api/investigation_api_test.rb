@@ -7,17 +7,17 @@ class InvestigationApiTest < ActionDispatch::IntegrationTest
   def setup
     user_login
 
-    @projects = [Factory(:min_project, title: 'Fred'), Factory(:max_project, title: 'Bert')]
+    @projects = [FactoryBot.create(:min_project, title: 'Fred'), FactoryBot.create(:max_project, title: 'Bert')]
 
-    institution = Factory(:institution)
+    institution = FactoryBot.create(:institution)
     @projects.each { |p| current_person.add_to_project_and_institution(p, institution) }
-    @publication = Factory(:publication)
+    @publication = FactoryBot.create(:publication)
 
-    @investigation = Factory(:investigation, contributor: current_person, policy: Factory(:public_policy))
+    @investigation = FactoryBot.create(:investigation, contributor: current_person, policy: FactoryBot.create(:public_policy))
   end
 
   test 'should not delete investigation with studies' do
-    inv = Factory(:max_investigation)
+    inv = FactoryBot.create(:max_investigation)
     assert_no_difference('Investigation.count') do
       delete "/#{plural_name}/#{inv.id}.json"
       assert_response :forbidden
@@ -26,10 +26,10 @@ class InvestigationApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'can delete an investigation with subscriptions' do
-    inv = Factory(:investigation, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
-    p = Factory(:person)
-    Factory(:subscription, person: inv.contributor, subscribable: inv)
-    Factory(:subscription, person: p, subscribable: inv)
+    inv = FactoryBot.create(:investigation, policy: FactoryBot.create(:public_policy, access_type: Policy::VISIBLE))
+    p = FactoryBot.create(:person)
+    FactoryBot.create(:subscription, person: inv.contributor, subscribable: inv)
+    FactoryBot.create(:subscription, person: p, subscribable: inv)
 
     user_login(inv.contributor)
 

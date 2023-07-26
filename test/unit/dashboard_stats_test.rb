@@ -21,7 +21,7 @@ class DashboardStatsTest < ActiveSupport::TestCase
     end
 
     # project scope
-    proj = Factory(:project)
+    proj = FactoryBot.create(:project)
 
     base = "Project_#{proj.id}_dashboard_stats"
     suffixes.each do |suffix|

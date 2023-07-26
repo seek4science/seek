@@ -5,14 +5,14 @@ module Seek
         class MissingLinkedSampleTypeException < AttributeHandlerException; end
 
         def type
-          'Sample'
+          Sample
         end
 
         def test_value(value)
           if additional_options[:required]
             sample = find_resource(value['id'])
-            fail 'Unable to find Sample in database' unless sample
-            fail 'Sample type does not match' unless sample.sample_type == linked_sample_type
+            raise 'Unable to find Sample in database' unless sample
+            raise 'Sample type does not match' unless sample.sample_type == linked_sample_type
           end
         end
 
@@ -24,7 +24,8 @@ module Seek
 
         def linked_sample_type
           sample_type = additional_options[:linked_sample_type]
-          fail MissingLinkedSampleTypeException.new unless sample_type
+          raise MissingLinkedSampleTypeException unless sample_type
+
           sample_type
         end
       end

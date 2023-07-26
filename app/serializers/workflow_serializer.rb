@@ -10,10 +10,10 @@ class WorkflowSerializer < ContributedResourceSerializer
   attribute :operation_annotations do
     controlled_vocab_annotations('operation_annotations')
   end
+
   attribute :topic_annotations do
     controlled_vocab_annotations('topic_annotations')
   end
-
 
   has_many :people
   has_many :projects
@@ -27,6 +27,15 @@ class WorkflowSerializer < ContributedResourceSerializer
   has_many :documents
 
   attribute :internals
+
+  attribute :tools do
+    object.bio_tools_links.map do |tool|
+      {
+        name: tool.name,
+        id: tool.uri
+      }
+    end
+  end
 
   link(:diagram, if: -> () { (@scope.try(:[], :requested_version) || object).diagram_exists? }) do |s|
     diagram_workflow_path(object, version: (@scope.try(:[], :requested_version) || object).version)

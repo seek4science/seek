@@ -1,0 +1,253 @@
+- hosts: [servers]
+  become: true
+  become_user: '{{user_var}}'
+  vars_files:
+    - group_vars/vars.yml
+    - group_vars/sensitive_vars.yml
+
+  tasks:
+
+    ########## Update and install dependencies
+
+    - name: Update all packages to their latest version
+      become: true
+      become_user: root
+      ansible.builtin.apt:
+        update_cache: yes
+        name: "*"
+        state: latest
+      tags: packages
+
+    - name: Install a list of packages
+      become: true
+      become_user: root
+      ansible.builtin.apt:
+        pkg:
+        - build-essential
+        - cmake
+        - git
+        - graphviz
+        - imagemagick
+        - libcurl4-gnutls-dev
+        - libgmp-dev
+        - libmagick++-dev
+        - libmysqlclient-dev
+        - libpq-dev
+        - libreadline-dev
+        - libreoffice
+        - libssl-dev
+        - libxml++2.6-dev
+        - libxslt1-dev
+        - mysql-server
+        - nodejs
+        - openjdk-11-jdk
+        - openssh-server
+        - poppler-utils
+        - zip
+        - autoconf
+        - automake
+        - bison
+        - curl
+        - gawk
+        - libffi-dev
+        - libgdbm-dev
+        - libncurses5-dev
+        - libsqlite3-dev
+        - libyaml-dev
+        - sqlite3
+      tags: packages
+
+    - name: Correct java version selected
+      become: true
+      become_user: root
+      community.general.alternatives:
+        name: java
+        path: /usr/lib/jvm/java-11-openjdk-amd64/bin/java
+      tags: packages
+
+
+    ########## Install rvm
+
+    - name: Add repository to install rvm
+      become: true
+      become_user: root
+      ansible.builtin.apt_repository:
+        repo: ppa:rael-gc/rvm
+      tags: rvm
+
+    - name: Install rvm
+      become: true
+      become_user: root
+      ansible.builtin.apt:
+        pkg:
+        - software-properties-common
+        - rvm
+      tags: rvm
+
+    - name: Activate user rvm
+      become: true
+      become_user: root
+      shell: >
+        usermod -a -G rvm '{{user_var}}'
+      tags: rvm
+
+    - name: Reset connection  #To allow user changes to take affect with new login shell
+      meta: reset_connection
+      tags: ruby
+
+    ########## Clone SEEK
+
+    - name: SEEK branch to be pulled
+      ansible.builtin.debug:
+        var: git_version
+      tags:
+        - seek
+        - git
+
+    - name: Clone SEEK git repo
+      ansible.builtin.git:
+        repo: 'https://github.com/seek4science/seek.git'
+        dest: '{{git_dest}}/SEEK'
+        version: '{{git_version}}'
+        force: yes
+      tags:
+        - seek
+        - git
+
+    - name: Configure git
+      shell: >
+        git config --global --add safe.directory '{{git_dest}}/SEEK'
+      run_once: true
+      tags: git
+
+
+    ########## Install ruby
+
+    - name:  Install Ruby
+      shell: bash -lc "{{ item }}"
+      with_items:
+        - rvm install $(cat '{{git_dest}}/SEEK/.ruby-version')
+      tags: ruby
+
+    - name: Set default Ruby
+      shell: bash -lc "{{ item }}"
+      with_items:
+        - rvm alias create default $(cat '{{git_dest}}/SEEK/.ruby-version')
+        - rvm --default use $(cat '{{git_dest}}/SEEK/.ruby-version')
+      tags: ruby
+
+    - name: Generate docs
+      shell: bash -lc "{{ item }}"
+      with_items:
+        - rvm all do rvm docs generate
+      ignore_errors: yes                  #Generating docs fails often, and it is not actually necessary...
+      tags: ruby
+
+    - name: Install bundler
+      shell: bash -lc "{{ item }}"
+      with_items:
+        - gem install bundler
+      tags: ruby
+
+
+    ########## Install SEEK Gems
+
+    - name: Install SEEK Gems
+      shell: bash -lc "{{ item }}"
+      with_items:
+        - bundle install
+      args:
+        chdir: '{{git_dest}}/SEEK'
+      tags:
+        - seek
+        - ruby
+
+
+    ########## Install python tools
+
+    - name: Add repository to install python3.9
+      become: true
+      become_user: root
+      ansible.builtin.apt_repository:
+        repo: ppa:deadsnakes/ppa
+      tags: python
+
+    - name: Reset connection 2  #To allow user changes to affect 'current login user'
+      meta: reset_connection
+      tags: python
+
+    - name: Install python tools
+      become: true
+      become_user: root
+      ansible.builtin.apt:
+        pkg:
+        - python3.9-dev
+        - python3.9-distutils
+        - python3-pip
+        - python3-pymysql
+      tags:
+        - python
+        - packages
+
+    - name: Install SEEK's python requirements
+      shell: bash -lc "{{ item }}"
+      with_items:
+        - python3.9 -m pip install setuptools==58
+        - python3.9 -m pip install -r requirements.txt
+      args:
+        chdir: '{{git_dest}}/SEEK'
+      tags:
+        - seek
+        - python
+
+
+    ########## Configure database
+
+    - name: Copy default database config
+      ansible.builtin.copy:
+        src: '{{git_dest}}/SEEK/config/database.default.yml'
+        dest: '{{git_dest}}/SEEK/config/database.yml'
+        remote_src: yes
+      tags: database
+
+    - name: Configure database user
+      ansible.builtin.replace:
+        path: '{{git_dest}}/SEEK/config/database.yml'
+        regexp: 'mysqluser'
+        replace: '{{sql_user}}'
+      tags: database
+
+    - name: Configure database password
+      ansible.builtin.replace:
+        path: '{{git_dest}}/SEEK/config/database.yml'
+        regexp: 'mysqlpassword'
+        replace: '{{sql_password}}'
+      tags: database
+
+    - name: Create database user
+      become: true
+      become_user: root
+      mysql_user:
+        name: '{{sql_user}}'
+        password: '{{sql_password}}'
+        priv: '*.*:ALL,GRANT'
+        state: present
+        login_unix_socket: /run/mysqld/mysqld.sock
+      tags: database
+
+
+    ########## Setup and launch
+
+    - name:  Rake db:setup
+      shell: bash -lc "{{ item }}"
+      with_items:
+        - bundle exec rake db:setup
+      args:
+        chdir: '{{git_dest}}/SEEK'
+      tags: database
+
+    # - name: Rails server
+    #   shell: >
+    #     bundle exec rails server
+    #   args:
+    #     chdir: '{{git_dest}}/SEEK'

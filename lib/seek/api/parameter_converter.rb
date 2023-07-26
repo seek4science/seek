@@ -4,160 +4,190 @@ module Seek
     # A class to convert JSON-API-structured parameters into a form that SEEK's controllers understand.
     # Four stages of conversion:
     # 1. De-serialize - The JSON-API parameters are converted into a Rails-esque form: params['data_file'] = { ... }
-    # 1. Convert - Certain parameter values are converted according to the `CONVERSIONS` mapping between keys and procs.
-    # 3. Rename - Keys the above form are renamed according to the `RENAME` mapping below.
-    # 4. Elevate - Parameters in the `ELEVATE` list are moved up out of e.g. `params['data_file']` into the top-level `params`
+    # 2. Convert - Certain parameter values are converted according to the block passed to each `convert` declaration.
+    # 3. Rename - Keys are renamed if a `convert` declaration has a `rename` key.
+    # 4. Elevate - Parameters are moved up out of e.g. `params['data_file']` into the top-level `params`
+    #              if the `elevate` option is set to `true`.
     class ParameterConverter
       # The JSON-API deserializer needs to know which fields are polymorphic, or the type info gets thrown away.
       POLYMORPHIC_FIELDS = {
-          collection_items: [:asset]
+        collection_items: [:asset]
       }
 
-      # Custom conversions required on certain parameters to fit how the controller expects.
-      CONVERSIONS = {
-          policy: proc { |value|
-            value[:access_type] = PolicyHelper::key_access_type(value.delete(:access))
-            perms = {}
-            (value.delete(:permissions) || []).each_with_index do |permission, index|
-              contributor_id = permission[:resource][:id]
-              contributor_type = permission[:resource][:type].singularize.classify
+      def self.conversions
+        @conversions ||= {}
+      end
 
-              perms[index.to_s] = {
-                  access_type: PolicyHelper::key_access_type(permission[:access]),
-                  contributor_type: contributor_type,
-                  contributor_id: contributor_id,
-              }
-            end
-            value[:permissions_attributes] = perms
+      class Conversion
+        attr_reader :convert, :rename, :elevate
 
-            value
-          },
+        def initialize(rename: nil, elevate: false, only: [], except: [], &block)
+          @convert = block
+          @rename = rename
+          @elevate = elevate
+          @only = Array(only)
+          @except = Array(except)
+        end
 
-          content_blobs: proc { |value|
-            (value || []).map do |cb|
-              cb[:data_url] = cb.delete(:url)
-              cb
-            end
-          },
+        def apply?(controller_name)
+          if @only.length > 0
+            @only.include?(controller_name)
+          elsif @except.length > 0
+            !@except.include?(controller_name)
+          else
+            true
+          end
+        end
+      end
 
-          publication_ids: proc { |value|
-            value.map { |id| "#{id}," }
-          },
+      def self.convert(*attrs, rename: nil, elevate: false, only: [], except: [], &block)
+        attrs.each do |attr|
+          attr = attr.to_sym
+          conversions[attr] ||= []
+          conversions[attr] << Conversion.new(rename: rename, elevate: elevate, only: only, except: except, &block)
+        end
+      end
 
-          assay_class: proc { |value|
-            if value && value[:key]
-              AssayClass.where(key: value[:key]).pluck(:id).first
-            end
-          },
+      convert :policy, :default_policy, rename: :policy_attributes, elevate: true do |value|
+        value[:access_type] = PolicyHelper::key_access_type(value.delete(:access))
+        perms = {}
+        (value.delete(:permissions) || []).each_with_index do |permission, index|
+          contributor_id = permission[:resource][:id]
+          contributor_type = permission[:resource][:type].singularize.classify
 
-          assay_type: proc { |value|
-            value[:uri]
-          },
-
-          technology_type: proc { |value|
-            value[:uri]
-          },
-
-          tags: proc { |value|
-            if value
-              value.join(', ')
-            else
-              ''
-            end
-          },
-
-          operation_annotations: proc {|value|
-            value.collect{|v| v[:identifier]}.join(', ')
-          },
-          topic_annotations: proc {|value|
-            value.collect{|v| v[:identifier]}.join(', ')
-          },
-          data_type_annotations: proc {|value|
-            value.collect{|v| v[:identifier]}.join(', ')
-          },
-          data_format_annotations: proc {|value|
-            value.collect{|v| v[:identifier]}.join(', ')
-          },
-          funding_codes: proc { |value|
-            if value
-              value.join(', ')
-            else
-              ''
-            end
-          },
-
-          programme_ids: proc { |value|
-            value.try(:first)
-          },
-
-          model_type: proc { |value|
-            ModelType.find_by_title(value).try(:id)
-          },
-
-          model_format: proc { |value|
-            ModelFormat.find_by_title(value).try(:id)
-          },
-
-          environment: proc { |value|
-            RecommendedModelEnvironment.find_by_title(value).try(:id)
-          },
-
-          data_file_ids: proc { |value|
-            value.map { |i| { asset_id: i }.with_indifferent_access }
-          },
-
-          sample_ids: proc { |value|
-            value.map { |i| { asset_id: i }.with_indifferent_access }
-          },
-
-          assay_ids: proc { |value|
-            value.map { |i| { assay_id: i } }
-          },
-
-          workflow_class: proc { |value|
-            if value && value[:key]
-              WorkflowClass.where(key: value[:key]).pluck(:id).first
-            end
-          },
-          asset_type: proc { |value| value.classify },
-
-          creators: proc { |value|
-            value.map.with_index do |attrs, i|
-              attrs[:pos] ||= (i + 1)
-              profile = attrs.delete(:profile)
-              attrs[:creator_id] = profile.split('/')&.last&.to_i if profile
-              attrs
-            end
+          perms[index.to_s] = {
+            access_type: PolicyHelper::key_access_type(permission[:access]),
+            contributor_type: contributor_type,
+            contributor_id: contributor_id,
           }
-      }
-      CONVERSIONS[:default_policy] = CONVERSIONS[:policy]
-      CONVERSIONS.freeze
+        end
+        value[:permissions_attributes] = perms
 
-      # Parameters to rename
-      RENAME = {
-        tags: :tag_list,
-        policy: :policy_attributes,
-        default_policy: :policy_attributes,
-        assay_class: :assay_class_id,
-        assay_type: :assay_type_uri,
-        technology_type: :technology_type_uri,
-        programme_ids: :programme_id,
-        model_type: :model_type_id,
-        model_format: :model_format_id,
-        environment: :recommended_environment_id,
-        data_file_ids: :data_files_attributes,
-        sample_ids: :samples_attributes,
-        assay_ids: :assay_assets_attributes,
-        workflow_class: :workflow_class_id,
-        discussion_links: :discussion_links_attributes,
-        template: :template_attributes,
-        creators: :api_assets_creators,
-        administrator_ids: :programme_administrator_ids,
-        attribute_map: :data
-      }.freeze
+        value
+      end
 
-      # Parameters to "elevate" out of params[bla] to the top-level.
-      ELEVATE = %i[tag_list expertise_list tool_list policy_attributes content_blobs revision_comments].freeze
+      convert :content_blobs, elevate: true do |value|
+        (value || []).map do |cb|
+          cb[:data_url] = cb.delete(:url)
+          cb
+        end
+      end
+
+      convert :publication_ids do |value|
+        value.map { |id| "#{id}" }
+      end
+
+      convert :assay_class, rename: :assay_class_id do |value|
+        if value && value[:key]
+          AssayClass.where(key: value[:key]).pluck(:id).first
+        end
+      end
+
+      convert :assay_type, rename: :assay_type_uri do |value|
+        value[:uri]
+      end
+
+      convert :technology_type, rename: :technology_type_uri do |value|
+        value[:uri]
+      end
+
+      convert :tags, rename: :tag_list, elevate: true do |value|
+        if value
+          value.join(', ')
+        else
+          ''
+        end
+      end
+
+      convert :operation_annotations do |value|
+        value.collect{|v| v[:identifier]}
+      end
+
+      convert :topic_annotations do |value|
+        value.collect{|v| v[:identifier]}
+      end
+
+      convert :data_type_annotations do |value|
+        value.collect{|v| v[:identifier]}
+      end
+
+      convert :data_format_annotations do |value|
+        value.collect{|v| v[:identifier]}
+      end
+
+      convert :programme_ids, rename: :programme_id do |value|
+        value.try(:first)
+      end
+
+      convert :model_type, rename: :model_type_id do |value|
+        ModelType.find_by_title(value).try(:id)
+      end
+
+      convert :model_format, rename: :model_format_id do |value|
+        ModelFormat.find_by_title(value).try(:id)
+      end
+
+      convert :environment, rename: :recommended_environment_id do |value|
+        RecommendedModelEnvironment.find_by_title(value).try(:id)
+      end
+
+      convert :data_file_ids, rename: :data_files_attributes, except: [:events, :workflows] do |value|
+        value.map { |i| { asset_id: i }.with_indifferent_access }
+      end
+
+      convert :sample_ids, rename: :samples_attributes do |value|
+        value.map { |i| { asset_id: i }.with_indifferent_access }
+      end
+
+      convert :assay_ids, rename: :assay_assets_attributes do |value|
+        value.map { |i| { assay_id: i } }
+      end
+
+      convert :workflow_class, rename: :workflow_class_id do |value|
+        if value && value[:key]
+          WorkflowClass.where(key: value[:key]).pluck(:id).first
+        end
+      end
+
+      convert :asset_type do |value|
+        value.classify
+      end
+
+      convert :creators, rename: :api_assets_creators do |value|
+        value.map.with_index do |attrs, i|
+          attrs[:pos] ||= (i + 1)
+          profile = attrs.delete(:profile)
+          attrs[:creator_id] = profile.split('/')&.last&.to_i if profile
+          attrs
+        end
+      end
+
+      convert :tools, rename: :tools_attributes, only: :workflows do |value|
+        biotools_client = BioTools::Client.new
+        value.map do |t|
+          biotools_id = BioTools::Client.match_id(t[:id])
+          next unless biotools_id
+          name = t[:name]
+          if name.blank?
+            begin
+              name = biotools_client.tool(biotools_id)['name']
+            rescue StandardError => e
+              Rails.logger.error("Error fetching bio.tools info for #{biotools_id}")
+            end
+          end
+
+          { bio_tools_id: biotools_id, name: name }
+        end.compact
+      end
+
+      convert :administrator_ids, rename: :programme_administrator_ids
+      convert :attribute_map, rename: :data
+      convert :content_blobs, elevate: true
+      convert :discussion_links, rename: :discussion_links_attributes
+      convert :expertise_list, elevate: true
+      convert :revision_comments, elevate: true
+      convert :template, rename: :template_attributes
+      convert :tool_list, elevate: true
 
       def initialize(controller_name, options = {})
         @controller_name = controller_name
@@ -169,56 +199,44 @@ module Seek
 
         # Step 1 - JSON-API -> Rails format
         polymorphic_fields = POLYMORPHIC_FIELDS[@controller_name.to_sym] || []
-        @parameters[@controller_name.singularize.to_sym] =
-            ActiveModelSerializers::Deserialization.jsonapi_parse(@parameters, polymorphic: polymorphic_fields, key_transform: :unaltered)
+        attributes = ActiveModelSerializers::Deserialization.jsonapi_parse(@parameters,
+                                                                           polymorphic: polymorphic_fields,
+                                                                           key_transform: :unaltered)
 
-        # Step 2 - Perform any conversions on parameter values
-        convert_parameters
+        new_attributes = {}
+        elevated = {}
+        attributes.each do |key, value|
+          conversions = self.class.conversions[key.to_sym] || []
+          if conversions.empty?
+            new_attributes[key] = value
+            next
+          end
+          conversions.each do |conversion|
+            new_key = key
+            new_value = value
+            if conversion.apply?(@controller_name.to_sym)
+              # Step 2 - Perform any conversions on parameter values
+              new_value = conversion.convert.call(value, @parameters) if conversion.convert
 
-        # Step 3 - Rename any parameter keys
-        rename_parameters
+              # Step 3 - Rename any parameter keys
+              new_key = conversion.rename if conversion.rename
 
-        # Step 4 - Move any parameters into top-level
-        elevate_parameters
+              # Step 4 - Move any parameters into top-level
+              if conversion.elevate
+                elevated[new_key] = new_value
+                next
+              end
+            end
 
+            new_attributes[new_key] = new_value
+          end
+        end
+
+        @parameters[@controller_name.singularize.to_sym] = new_attributes
         @parameters.delete(:data)
+        @parameters.merge!(elevated)
 
         @parameters
-      end
-
-      private
-
-      def convert_parameters
-        attributes.each do |key, value|
-          unless (conversion = CONVERSIONS[key.to_sym]).nil? || exclude?(:convert, key)
-            attributes[key] = conversion.call(value, @parameters)
-          end
-        end
-      end
-
-      def rename_parameters
-        RENAME.each do |key, new_key|
-          if attributes.key?(key) && !exclude?(:rename, key)
-            attributes[new_key] = attributes.delete(key)
-          end
-        end
-      end
-
-      def elevate_parameters
-        ELEVATE.each do |key|
-          if attributes.key?(key) && !exclude?(:elevate, key)
-            @parameters[key] = attributes.delete(key)
-          end
-        end
-      end
-
-      def attributes
-        @parameters[@controller_name.singularize.to_sym] || {}
-      end
-
-      def exclude?(type, key)
-        (@options[:skip] || []).include?(key.to_sym) ||
-        (@options["skip_#{type}".to_sym] || []).include?(key.to_sym)
       end
     end
   end

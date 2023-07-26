@@ -6,7 +6,7 @@ class ProjectStatsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
 
   test 'clear cache' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     project = person.projects.first
     login_as(person)
     key = "Project_#{project.id}_dashboard_stats_activity"
@@ -24,8 +24,8 @@ class ProjectStatsControllerTest < ActionController::TestCase
   end
 
   test 'none project member cannot clear cache' do
-    person = Factory(:person)
-    project = Factory(:project)
+    person = FactoryBot.create(:person)
+    project = FactoryBot.create(:project)
     login_as(person)
     key = "Project_#{project.id}_dashboard_stats_activity"
     refute Rails.cache.exist?(key)
@@ -41,7 +41,7 @@ class ProjectStatsControllerTest < ActionController::TestCase
   end
 
   test 'project member can get stats' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     project = person.projects.first
     login_as(person)
 
@@ -51,8 +51,8 @@ class ProjectStatsControllerTest < ActionController::TestCase
   end
 
   test 'non-project member cannot get stats' do
-    person = Factory(:person)
-    project = Factory(:project)
+    person = FactoryBot.create(:person)
+    project = FactoryBot.create(:project)
     login_as(person)
 
     get :contributors, params: { project_id: project.id, start_date: '2015-10-10', end_date: '2015-10-11', format: :json }

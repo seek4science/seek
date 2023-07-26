@@ -149,7 +149,7 @@ const setSource = (elem, data) => {
     classes: {
       "ui-autocomplete": "highlight"
     },
-    source: data.map(x => x.name),
+    source: data.results.map(x => x.text),
     minLength: 0,
     mustMatch: true
   });
@@ -157,7 +157,7 @@ const setSource = (elem, data) => {
 
 async function fetchTerms(elem, cvId) {
   if (!elem.find(".loader").length) elem.append("<span class='loader'></span>");
-	const url = '<%= typeahead_sample_controlled_vocabs_path %>' + `?query=${elem.text()}&scv_id=${cvId}`
+	const url = '<%= typeahead_sample_controlled_vocabs_path %>' + `?q=${elem.text()}&scv_id=${cvId}`
   const res = await ajaxCall(url, "GET", { dataType: "json" });
 	setSource(elem, res);
 	elem.focus().autocomplete("search");
@@ -177,7 +177,6 @@ async function batchCreateSample(sampleTypes, projectDefaultPolicy) {
     });
 
     if (data.length == 0) {
-      console.log("No samples to create");
       return;
     }
     return ajaxCall("<%= batch_create_samples_path %>", "POST", { data: JSON.stringify({ data }) });
@@ -196,13 +195,73 @@ async function batchDeleteSample(sampleTypes) {
     });
 
     if (data.length == 0) {
-      console.log("No samples to delete.");
       return;
     }
     return ajaxCall("<%= batch_delete_samples_path %>", "DELETE", { data: JSON.stringify({ data }) });
   } catch (e) {
     console.log(e);
   }
+}
+
+// This function is called when 'excel-export' btn is clicked.
+// Posts the content of the dynamic table to the single_pages_controller,
+// which generates an excel workbook based on a template.
+async function exportToExcel(tableName, studyId, assayId, sampleTypeId) {
+    const headerRow = $j(`table[id=${tableName}] thead tr`)["0"];
+
+    // Cells from the table body => Each row = array
+    // For some reason they contain null values, which should be filtered out
+    let bodyCells = $j(`table[id=${tableName}]`).DataTable().data().toArray().map(subarray => subarray.filter(function(el){return el != null}));
+
+    // Return array of table header cells from headerRow
+    let headerCells = [];
+    $j.each(headerRow.cells, function (i, v) {
+        headerCells.push(v.textContent);
+    });
+
+    // Construct the 'struct' of the table data
+    let data = [];
+    for (let i = 0; i < bodyCells.length; i++) {
+        const row = bodyCells[i];
+        // If a row has been checked / unchecked,
+        // the datatable body gets one extra hidden cell at index 1,
+        // compared to the table header. This has to be removed.
+        if (row.length !== headerCells.length)row.splice(1,1);
+        let obj = {};
+        for (let j = 0; j < headerCells.length; j++) {
+          const attr = headerCells[j];
+          const val = row[j];
+
+          // The source inputs are wrapped in an object and must be unwrapped first
+          // And then packaged as a single element
+          if(j === 0) {
+              obj["selected"] = (val === "") ? false : val;
+          } else {
+              obj[attr] = val;
+          }
+          if(obj.selected) data.push(obj);
+        }
+      }
+
+      // Use ajax for POST request with table data in the body
+      // If succes => Redirect to download path for retrieving excel file
+      $j.ajax({
+        type: 'POST',
+        url: '<%= export_to_excel_single_pages_path() %>',
+        data: { sample_data: JSON.stringify(data),
+          sample_type_id: JSON.stringify(sampleTypeId),
+          study_id: JSON.stringify(studyId),
+          assay_id: JSON.stringify(assayId),
+        },
+        success: function(response) {
+          downloadUrl = `<%= download_samples_excel_single_pages_path() %>?uuid=${response.uuid}`;
+          window.location.href = downloadUrl;
+        },
+        error: function(response) {
+            alert(`Failed to export through excel!\nStatus: ${response.status}\nError: ${JSON.stringify(response.error().statusText)}`);
+        }
+    });
+
 }
 
 async function batchUpdateSample(sampleTypes) {
@@ -215,7 +274,6 @@ async function batchUpdateSample(sampleTypes) {
     });
 
     if (data.length == 0) {
-      console.log("No samples to update");
       return;
     }
     return ajaxCall("<%= batch_update_samples_path %>", "PUT", { data: JSON.stringify({ data }) });

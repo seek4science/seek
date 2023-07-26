@@ -17,22 +17,21 @@ class FavouriteGroup < ApplicationRecord
   # these groups are to be stored per user within favourite_groups table -
   # and the names should be chosen in such a way that the users would not
   # want to pick such names themself 
-  BLACKLIST_NAME = "__blacklist__"
-  WHITELIST_NAME = "__whitelist__"
+  DENYLIST_NAME = "__denylist__"
+  ALLOWLIST_NAME = "__allowlist__"
   
-  # defaults for access types in BLACKLIST and WHITELIST groups
-  BLACKLIST_ACCESS_TYPE = Policy::NO_ACCESS
-  WHITELIST_ACCESS_TYPE = Policy::ACCESSIBLE
-  
-  
-  # check if current favourite group is a blacklist or whitelist
-  def is_whitelist_or_blacklist?
-    return [FavouriteGroup::BLACKLIST_NAME, FavouriteGroup::WHITELIST_NAME].include?(self.name)
+  # defaults for access types in DENYLIST and ALLOWLIST groups
+  DENYLIST_ACCESS_TYPE = Policy::NO_ACCESS
+  ALLOWLIST_ACCESS_TYPE = Policy::ACCESSIBLE
+
+  # check if current favourite group is a denylist or allowlist
+  def is_allowlist_or_denylist?
+    return [FavouriteGroup::DENYLIST_NAME, FavouriteGroup::ALLOWLIST_NAME].include?(self.name)
   end
   
   # return all favourite group [name, id] pairs for a particular user
-  def self.get_all_without_blacklists_and_whitelists(user_id)
+  def self.get_all_without_denylists_and_allowlists(user_id)
     all_groups = FavouriteGroup.where(:user_id => user_id)
-    return all_groups.collect { |g| [g.name, g.id] unless [FavouriteGroup::WHITELIST_NAME, FavouriteGroup::BLACKLIST_NAME].include?(g.name) }.compact
+    return all_groups.collect { |g| [g.name, g.id] unless [FavouriteGroup::ALLOWLIST_NAME, FavouriteGroup::DENYLIST_NAME].include?(g.name) }.compact
   end
 end

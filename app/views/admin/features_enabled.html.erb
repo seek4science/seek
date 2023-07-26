@@ -109,7 +109,9 @@
                              "Single page enabled", "The single page UI for #{t(:project).pluralize}", :onchange=>toggle_appear_javascript('single_page_advanced')) %>
   <div id="single_page_advanced" class="additional_settings" style="<%= show_or_hide_block Seek::Config.project_single_page_enabled -%>">
     <%= admin_checkbox_setting(:project_single_page_advanced_enabled, 1, Seek::Config.project_single_page_advanced_enabled,
-                               "Advanced features enabled","If set, the advance features of the single page is enabled.") %>
+                             "Advanced features enabled","If set, the advance features of the single page is enabled.") %>
+    <%= admin_checkbox_setting(:project_single_page_folders_enabled, 1, Seek::Config.project_single_page_folders_enabled,
+                             "Project folders enabled","If set, the folders of the projects will be shown in the tree view.") %>
   </div>
 
   <%= admin_checkbox_setting(:sample_type_template_enabled, 1, Seek::Config.sample_type_template_enabled,

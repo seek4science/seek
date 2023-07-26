@@ -5,16 +5,16 @@
 
 	<ul class="nav nav-tabs">
 			<li class="active">
-					<a data-toggle="tab" data-target="#source_table" onClick="highlightTreeviewItem('source_material')"><em class="glyphicon glyphicon-list-alt"></em> Sources table</a>
+					<a data-toggle="tab" data-target="#source_table" onClick="highlightTreeviewItem('source_table')"><em class="glyphicon glyphicon-list-alt"></em> Sources table</a>
 			</li>
 			<li>
-					<a data-toggle="tab" data-target="#study_protocol" onClick="highlightTreeviewItem('sample_collection')"><em class="glyphicon glyphicon-list-alt"></em> Protocol</a>
+					<a data-toggle="tab" data-target="#study_protocol" onClick="highlightTreeviewItem('study_protocol')"><em class="glyphicon glyphicon-list-alt"></em> Protocol</a>
 			</li>
 			<li>
-					<a data-toggle="tab" data-target="#study_samples_table" onClick="highlightTreeviewItem('study_samples')"><em class="glyphicon glyphicon-list-alt"></em> Samples table</a>
+					<a data-toggle="tab" data-target="#study_samples_table" onClick="highlightTreeviewItem('study_samples_table')"><em class="glyphicon glyphicon-list-alt"></em> Samples table</a>
 			</li>
 			<li>
-					<a data-toggle="tab" data-target="#study_experiment_overview" onClick="highlightTreeviewItem('study_table')"><em class="glyphicon glyphicon-list-alt"></em> Experiment overview</a>
+					<a data-toggle="tab" data-target="#study_experiment_overview" onClick="highlightTreeviewItem('study_experiment_overview')"><em class="glyphicon glyphicon-list-alt"></em> Experiment overview</a>
 			</li>
 	</ul>
 
@@ -23,7 +23,7 @@
 					<%= render :partial=>"isa_studies/source_material", locals: { study: study} -%>
 			</div>
 			<div id="study_protocol" class="tab-pane fade">
-					<%= render :partial=>"isa_studies/sop", locals: { sop: study ? study.sop : nil} -%>
+					<%= render :partial=>"isa_studies/sop", locals: { sops: study&.sops} -%>
 			</div>
 			<div id="study_samples_table" class="tab-pane fade">
 					<%= render :partial=>"isa_studies/study_samples", locals: { study: study} -%>
@@ -32,17 +32,6 @@
 					<%= render :partial=>"isa_studies/study_table", locals: { study: study} -%>   
 			</div>
 	</div>
-
-	<script>
-			function highlightTreeviewItem(item){
-					$j(".jstree-clicked").removeClass("jstree-clicked")
-					const type = selectedItem.type == "study" ? "study" : selectedItem.parent.type
-					const id = selectedItem.type == "study" ? selectedItem.id : selectedItem.parent.id
-					const parent = $j(`a[_type="${type}"][_id="${id}"]`)
-					$j(parent).next().find(`a[_type="${item}"]`).addClass("jstree-clicked")
-					setTimeout(() => updateContainerHeight(), 1000)
-			}
-	</script>
 
 <% else %>
 	<p>

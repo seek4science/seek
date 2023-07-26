@@ -12,7 +12,7 @@ class Workflow < ApplicationRecord
 
   acts_as_asset
 
-  acts_as_doi_parent(child_accessor: :versions)
+  acts_as_doi_parent
 
   has_controlled_vocab_annotations :topics, :operations
 
@@ -206,7 +206,8 @@ class Workflow < ApplicationRecord
 
   MATURITY_LEVELS = {
       0 => :work_in_progress,
-      1 => :released
+      1 => :released,
+      2 => :deprecated
   }
   MATURITY_LEVELS_INV = MATURITY_LEVELS.invert
 

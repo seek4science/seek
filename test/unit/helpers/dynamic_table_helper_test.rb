@@ -3,18 +3,18 @@ require 'test_helper'
 class DynamicTableHelperTest < ActionView::TestCase
   include AuthenticatedTestHelper
   test 'Should return the dynamic table columns and rows' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     project = person.projects.first
 
     User.with_current_user(person.user) do
-      inv = Factory(:investigation, projects: [project], contributor: person)
+      inv = FactoryBot.create(:investigation, projects: [project], contributor: person)
 
-      sample_a1 = Factory(:max_sample)
+      sample_a1 = FactoryBot.create(:patient_sample)
       type_a = sample_a1.sample_type
-      sample_a2 = Factory(:max_sample, sample_type: type_a)
-      sample_a3 = Factory(:max_sample, sample_type: type_a)
+      sample_a2 = FactoryBot.create(:patient_sample, sample_type: type_a)
+      sample_a3 = FactoryBot.create(:patient_sample, sample_type: type_a)
 
-      type_b = Factory(:multi_linked_sample_type, project_ids: [project.id])
+      type_b = FactoryBot.create(:multi_linked_sample_type, project_ids: [project.id])
       type_b.sample_attributes.last.linked_sample_type = type_a
       type_b.save!
 
@@ -28,7 +28,7 @@ class DynamicTableHelperTest < ActionView::TestCase
       sample_b2.set_attribute_value(:patient, [sample_a2.id])
       disable_authorization_checks { sample_b2.save! }
 
-      type_c = Factory(:multi_linked_sample_type, project_ids: [project.id])
+      type_c = FactoryBot.create(:multi_linked_sample_type, project_ids: [project.id])
       type_c.sample_attributes.last.linked_sample_type = type_b
       type_c.save!
 
@@ -37,8 +37,8 @@ class DynamicTableHelperTest < ActionView::TestCase
       sample_c1.set_attribute_value(:patient, [sample_b1.id])
       disable_authorization_checks { sample_c1.save! }
 
-      study = Factory(:study, investigation: inv, contributor: person, sample_types: [type_a, type_b])
-      assay = Factory(:assay, study: study, contributor: person, sample_type: type_c, position: 1)
+      study = FactoryBot.create(:study, investigation: inv, contributor: person, sample_types: [type_a, type_b])
+      assay = FactoryBot.create(:assay, study: study, contributor: person, sample_type: type_c, position: 1)
 
       # Query with the Study:
       # |-------------------------------------------------|
@@ -51,8 +51,8 @@ class DynamicTableHelperTest < ActionView::TestCase
 
       dt = dt_aggregated(study)
       # Each sample types' attributes count + the sample.id
-      columns_count = study.sample_types[0].sample_attributes.length + 1
-      columns_count += study.sample_types[1].sample_attributes.length + 1
+      columns_count = study.sample_types[0].sample_attributes.length + 2
+      columns_count += study.sample_types[1].sample_attributes.length + 2
 
       assert_equal type_a.samples.length, dt[:rows].length
       assert_equal columns_count, dt[:columns].length
@@ -71,7 +71,7 @@ class DynamicTableHelperTest < ActionView::TestCase
 
       dt = dt_aggregated(study, assay)
       # Each sample types' attributes count + the sample.id
-      columns_count = assay.sample_type.sample_attributes.length + 1
+      columns_count = assay.sample_type.sample_attributes.length + 2
 
       assert_equal type_c.samples.length, dt[:rows].length
       assert_equal columns_count, dt[:columns].length
@@ -82,9 +82,9 @@ class DynamicTableHelperTest < ActionView::TestCase
   end
 
   test 'Should return the sequence of sample_type links' do
-    type1 = Factory(:simple_sample_type)
-    type2 = Factory(:multi_linked_sample_type)
-    type3 = Factory(:multi_linked_sample_type)
+    type1 = FactoryBot.create(:simple_sample_type)
+    type2 = FactoryBot.create(:multi_linked_sample_type)
+    type3 = FactoryBot.create(:multi_linked_sample_type)
     type2.sample_attributes.detect(&:seek_sample_multi?).linked_sample_type = type1
     type3.sample_attributes.detect(&:seek_sample_multi?).linked_sample_type = type2
     type2.save!

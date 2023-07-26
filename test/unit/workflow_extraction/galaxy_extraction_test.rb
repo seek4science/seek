@@ -2,7 +2,7 @@ require 'test_helper'
 
 class GalaxyExtractionTest < ActiveSupport::TestCase
   setup do
-    @galaxy = WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class)
+    @galaxy = WorkflowClass.find_by_key('galaxy') || FactoryBot.create(:galaxy_workflow_class)
   end
 
   test 'extracts metadata from Galaxy workflow file' do

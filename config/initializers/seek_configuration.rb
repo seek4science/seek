@@ -48,6 +48,7 @@ def load_seek_config_defaults!
   Seek::Config.default :external_search_enabled, true
   Seek::Config.default :project_single_page_enabled, false
   Seek::Config.default :project_single_page_advanced_enabled, false
+  Seek::Config.default :project_single_page_folders_enabled, false
   Seek::Config.default :sample_type_template_enabled, false
   Seek::Config.default :project_browser_enabled,false
   Seek::Config.default :experimental_features_enabled,false
@@ -242,6 +243,7 @@ def load_seek_config_defaults!
   Seek::Config.default :openbis_check_new_arrivals, true
 
   Seek::Config.default :default_license, 'CC-BY-4.0'
+  Seek::Config.default :metadata_license, 'CC-BY-4.0'
 
   Seek::Config.default :nels_api_url, 'https://test-fe.cbu.uib.no/nels-api'
   Seek::Config.default :nels_oauth_url, 'https://test-fe.cbu.uib.no/oauth2'

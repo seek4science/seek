@@ -4,8 +4,8 @@ require 'test_helper'
 class RdfHelperTest < ActionView::TestCase
 
   test 'schema_ld_script_block' do
-    @person = Factory(:person)
-    @investigation = Factory(:investigation)
+    @person = FactoryBot.create(:person)
+    @investigation = FactoryBot.create(:investigation)
 
     # blank for not supported
     @controller = InvestigationsController.new

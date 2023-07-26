@@ -3,7 +3,7 @@ require 'test_helper'
 class RdfTripleStoreTest < ActionDispatch::IntegrationTest
   def setup
     @repository = Seek::Rdf::RdfRepository.instance
-    @project = Factory(:project, title: 'Test for RDF storage')
+    @project = FactoryBot.create(:project, title: 'Test for RDF storage')
     skip('these tests need a configured triple store setup') unless @repository.configured?
     
     @private_graph = RDF::URI.new @repository.get_configuration.private_graph
@@ -78,7 +78,7 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
 
   #check that it is removed from both the private and public store, even after its privacy has changed to private.
   test 'remove_rdf removes from both stores even after privacy change' do
-    sop = Factory(:sop, policy: Factory(:public_policy), creators: [Factory(:person)])
+    sop = FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy), creators: [FactoryBot.create(:person)])
     assert sop.can_view?(nil)
     refute_empty sop.creators
 
@@ -114,7 +114,7 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
 
   # check that it is removed from the private store when asked to be removed
   test 'remove_rdf removes from private store' do
-    sop = Factory(:sop, policy: Factory(:private_policy))
+    sop = FactoryBot.create(:sop, policy: FactoryBot.create(:private_policy))
     refute sop.can_view?(nil)
 
     @repository.send_rdf(sop)
@@ -155,10 +155,10 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
   end
 
   test 'uris of items related to' do
-    person = Factory(:person)
-    data_file = Factory(:data_file)
-    model = Factory(:model)
-    sop = Factory(:sop)
+    person = FactoryBot.create(:person)
+    data_file = FactoryBot.create(:data_file)
+    model = FactoryBot.create(:model)
+    sop = FactoryBot.create(:sop)
 
     q = @repository.query.insert([person.rdf_resource, RDF::URI.new('http://is/member_of'), @project.rdf_resource]).graph(@private_graph)
     @repository.insert(q)
@@ -219,7 +219,7 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
   end
 
   test 'update rdf change visibility' do
-    sop = Factory(:sop, policy: Factory(:public_policy))
+    sop = FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy))
     assert sop.can_view?(nil)
 
     count = triple_count(sop)
@@ -284,7 +284,7 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
   #checks the the rdf resource type is updated, and there is not a duplicate. This is in particular for when data changes
   # to simulation data
   test 'update rdf after resource type change' do
-    data_file = Factory(:data_file)
+    data_file = FactoryBot.create(:data_file)
     refute data_file.simulation_data?
 
     @repository.send_rdf(data_file)

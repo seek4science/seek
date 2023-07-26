@@ -20,7 +20,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'should not download private' do
-    model = Factory :model_2_files, policy: Factory(:private_policy)
+    model = FactoryBot.create :model_2_files, policy: FactoryBot.create(:private_policy)
     assert !model.can_download?(User.current_user)
     assert_no_difference('ActivityLog.count') do
       get :download, params: { id: model.id }
@@ -30,7 +30,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'should download without type information' do
-    model = Factory :typeless_model, policy: Factory(:public_policy)
+    model = FactoryBot.create :typeless_model, policy: FactoryBot.create(:public_policy)
     assert model.can_download?
     assert_difference('ActivityLog.count') do
       get :download, params: { id: model.id }
@@ -42,7 +42,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'should download' do
-    model = Factory :model_2_files, title: 'this_model', policy: Factory(:public_policy), contributor: User.current_user.person
+    model = FactoryBot.create :model_2_files, title: 'this_model', policy: FactoryBot.create(:public_policy), contributor: User.current_user.person
     assert_difference('ActivityLog.count') do
       get :download, params: { id: model.id }
     end
@@ -53,7 +53,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'should download model with a single file' do
-    model = Factory :model, title: 'this_model', policy: Factory(:public_policy), contributor: User.current_user.person
+    model = FactoryBot.create :model, title: 'this_model', policy: FactoryBot.create(:public_policy), contributor: User.current_user.person
     assert_difference('ActivityLog.count') do
       get :download, params: { id: model.id }
     end
@@ -65,7 +65,7 @@ class ModelsControllerTest < ActionController::TestCase
 
   test 'should download multiple files with the same name' do
     # 2 files with different names
-    model = Factory :model_2_files, policy: Factory(:public_policy), contributor: User.current_user.person
+    model = FactoryBot.create :model_2_files, policy: FactoryBot.create(:public_policy), contributor: User.current_user.person
     get :download, params: { id: model.id }
     assert_response :success
     assert_equal 'application/zip', @response.header['Content-Type']
@@ -74,7 +74,7 @@ class ModelsControllerTest < ActionController::TestCase
 
     # 3 files, 2 of them have the same name
     first_content_blob = model.content_blobs.first
-    third_content_blob = Factory(:cronwright_model_content_blob, asset: model, asset_version: model.version)
+    third_content_blob = FactoryBot.create(:cronwright_model_content_blob, asset: model, asset_version: model.version)
     assert_equal first_content_blob.original_filename, third_content_blob.original_filename
     model.content_blobs << third_content_blob
 
@@ -91,7 +91,7 @@ class ModelsControllerTest < ActionController::TestCase
   test 'should not download zip with only remote files' do
     stub_request(:head, 'http://www.abc.com').to_return(headers: { content_length: 500, content_type: 'text/plain' }, status: 200)
 
-    model = Factory :model_2_remote_files, title: 'this_model', policy: Factory(:public_policy), contributor: User.current_user.person
+    model = FactoryBot.create :model_2_remote_files, title: 'this_model', policy: FactoryBot.create(:public_policy), contributor: User.current_user.person
     assert_difference('ActivityLog.count') do
       get :download, params: { id: model.id }
     end
@@ -113,9 +113,9 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'creators show in list item' do
-    p1 = Factory :person
-    p2 = Factory :person
-    model = Factory(:model, title: 'ZZZZZ', creators: [p2], contributor: p1, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    p1 = FactoryBot.create :person
+    p2 = FactoryBot.create :person
+    model = FactoryBot.create(:model, title: 'ZZZZZ', creators: [p2], contributor: p1, policy: FactoryBot.create(:public_policy, access_type: Policy::VISIBLE))
 
     get :index, params: { page: 'Z' }
 
@@ -148,7 +148,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'correct title and text for associating a modelling analysis for new' do
-    login_as(Factory(:user))
+    login_as(FactoryBot.create(:user))
 
     get :new
     assert_response :success
@@ -159,7 +159,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'correct title and text for associating a modelling analysis for edit' do
-    model = Factory :model
+    model = FactoryBot.create :model
     login_as(model.contributor.user)
 
     get :edit, params: { id: model.id }
@@ -182,7 +182,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'should get new as admin' do
-    login_as(Factory(:admin).user)
+    login_as(FactoryBot.create(:admin).user)
     get :new
     assert_response :success
   end
@@ -264,7 +264,7 @@ class ModelsControllerTest < ActionController::TestCase
   test 'should create model with mixture of blobs' do
     stub_request(:head, 'http://fair-dom.org/').to_return(status: 200, headers: { 'Content-Type' => 'text/html' })
     stub_request(:head, 'http://fair-dom.org/piccy.png').to_return(status: 200, headers: { 'Content-Type' => 'image/png' })
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person.user)
     project = person.projects.first
     refute_nil project
@@ -337,7 +337,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'should create model version with image' do
-    m = Factory(:model, contributor: User.current_user.person)
+    m = FactoryBot.create(:model, contributor: User.current_user.person)
     assert_difference('Model::Version.count', 1) do
       assert_difference('ModelImage.count') do
         post :create_version, params: { id: m, model: { title: m.title },
@@ -365,7 +365,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'should create model with import details' do
-    user = Factory :user
+    user = FactoryBot.create :user
     login_as(user)
     model_details = valid_model
     model_details[:imported_source] = 'BioModels'
@@ -447,7 +447,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'should show model' do
-    m = Factory :model, policy: Factory(:public_policy)
+    m = FactoryBot.create :model, policy: FactoryBot.create(:public_policy)
     assert_difference('ActivityLog.count') do
       get :show, params: { id: m }
     end
@@ -466,9 +466,9 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'should show request contact button' do
-    p1 = Factory :person
-    p2 = Factory :person
-    m = Factory(:model, title: 'a model', creators: [p1,p2], contributor:User.current_user.person, policy: Factory(:public_policy))
+    p1 = FactoryBot.create :person
+    p2 = FactoryBot.create :person
+    m = FactoryBot.create(:model, title: 'a model', creators: [p1,p2], contributor:User.current_user.person, policy: FactoryBot.create(:public_policy))
 
     assert_difference('ActivityLog.count') do
       get :show, params: { id: m }
@@ -481,7 +481,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'should show model with multiple files' do
-    m = Factory :model_2_files, policy: Factory(:public_policy)
+    m = FactoryBot.create :model_2_files, policy: FactoryBot.create(:public_policy)
 
     assert_difference('ActivityLog.count') do
       get :show, params: { id: m }
@@ -501,7 +501,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'should show model with import details' do
-    m = Factory :model, policy: Factory(:public_policy), imported_source: 'Some place', imported_url: 'http://somewhere/model.xml'
+    m = FactoryBot.create :model, policy: FactoryBot.create(:public_policy), imported_source: 'Some place', imported_url: 'http://somewhere/model.xml'
     assert_difference('ActivityLog.count') do
       get :show, params: { id: m }
     end
@@ -561,7 +561,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   def test_should_show_version
-    m = Factory(:model, contributor: User.current_user.person)
+    m = FactoryBot.create(:model, contributor: User.current_user.person)
     m.save! # to force creation of initial version (fixtures don't include it)
 
     # create new version
@@ -589,7 +589,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   def test_should_create_new_version
-    m = Factory(:model, contributor:User.current_user.person)
+    m = FactoryBot.create(:model, contributor:User.current_user.person)
     assert_equal 1,m.version
     assert_equal 1,m.versions[0].content_blobs.count
     assert m.versions[0].content_blobs.first.file_exists?
@@ -722,7 +722,7 @@ class ModelsControllerTest < ActionController::TestCase
   test "owner should be able to choose policy 'share with everyone' when updating a model" do
     login_as(:model_owner)
     user = users(:model_owner)
-    model = Factory(:model, contributor: user.person)
+    model = FactoryBot.create(:model, contributor: user.person)
     assert model.can_edit?(user), 'model should be editable and manageable for this test'
     assert model.can_manage?(user), 'model should be editable and manageable for this test'
     assert_equal Policy::NO_ACCESS, model.policy.access_type, 'data file should have an initial policy with access type of no access'
@@ -735,17 +735,17 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'update with ajax only applied when viewable' do
-    p = Factory :person
-    p2 = Factory :person
-    viewable_model = Factory :model, contributor: p2, policy: Factory(:publicly_viewable_policy)
-    dummy_model = Factory :model
+    p = FactoryBot.create :person
+    p2 = FactoryBot.create :person
+    viewable_model = FactoryBot.create :model, contributor: p2, policy: FactoryBot.create(:publicly_viewable_policy)
+    dummy_model = FactoryBot.create :model
 
     login_as p.user
 
     assert viewable_model.can_view?(p.user)
     assert !viewable_model.can_edit?(p.user)
 
-    golf = Factory :tag, annotatable: dummy_model, source: p2, value: 'golf'
+    golf = FactoryBot.create :tag, annotatable: dummy_model, source: p2, value: 'golf'
 
     post :update_annotations_ajax, xhr: true, params: { id: viewable_model, tag_list: golf.value.text }
 
@@ -753,7 +753,7 @@ class ModelsControllerTest < ActionController::TestCase
 
     assert_equal ['golf'], viewable_model.annotations.collect { |a| a.value.text }
 
-    private_model = Factory :model, contributor: p2, policy: Factory(:private_policy)
+    private_model = FactoryBot.create :model, contributor: p2, policy: FactoryBot.create(:private_policy)
 
     assert !private_model.can_view?(p.user)
     assert !private_model.can_edit?(p.user)
@@ -765,17 +765,17 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'update tags with ajax' do
-    p = Factory :person
+    p = FactoryBot.create :person
 
     login_as p.user
 
-    p2 = Factory :person
-    model = Factory :model, contributor: p
+    p2 = FactoryBot.create :person
+    model = FactoryBot.create :model, contributor: p
 
     assert model.annotations.empty?, 'this model should have no tags for the test'
 
-    golf = Factory :tag, annotatable: model, source: p2.user, value: 'golf'
-    Factory :tag, annotatable: model, source: p2.user, value: 'sparrow'
+    golf = FactoryBot.create :tag, annotatable: model, source: p2.user, value: 'golf'
+    FactoryBot.create :tag, annotatable: model, source: p2.user, value: 'sparrow'
 
     model.reload
 
@@ -793,7 +793,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'do publish' do
-    model = Factory(:model, contributor: users(:model_owner).person, policy: Factory(:private_policy))
+    model = FactoryBot.create(:model, contributor: users(:model_owner).person, policy: FactoryBot.create(:private_policy))
     assert model.can_manage?, 'The model must be manageable for this test to succeed'
     post :publish, params: { id: model }
     assert_response :redirect
@@ -802,7 +802,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'do not publish if not can_manage?' do
-    model = Factory(:model, contributor: users(:model_owner).person, policy: Factory(:private_policy))
+    model = FactoryBot.create(:model, contributor: users(:model_owner).person, policy: FactoryBot.create(:private_policy))
     login_as(:quentin)
     assert !model.can_manage?, 'The model must not be manageable for this test to succeed'
     post :publish, params: { id: model }
@@ -812,9 +812,9 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'removing an asset should not break show pages for items that have attribution relationships referencing it' do
-    model = Factory :model, contributor: User.current_user.person
+    model = FactoryBot.create :model, contributor: User.current_user.person
     disable_authorization_checks do
-      attribution = Factory :model
+      attribution = FactoryBot.create :model
       model.relationships.create other_object: attribution, predicate: Relationship::ATTRIBUTED_TO
       model.save!
       attribution.destroy
@@ -846,7 +846,7 @@ class ModelsControllerTest < ActionController::TestCase
 
   test 'should show sycamore button for sbml' do
     with_config_value :sycamore_enabled, true do
-      model = Factory :teusink_model
+      model = FactoryBot.create :teusink_model
       login_as(model.contributor)
       get :show, params: { id: model.id }
       assert_response :success
@@ -856,7 +856,7 @@ class ModelsControllerTest < ActionController::TestCase
 
   test 'should submit_to_sycamore' do
     with_config_value :sycamore_enabled, true do
-      model = Factory :teusink_model
+      model = FactoryBot.create :teusink_model
       login_as(model.contributor)
       post :submit_to_sycamore, xhr: true, params: { id: model.id, version: model.version }
       assert_response :success
@@ -866,7 +866,7 @@ class ModelsControllerTest < ActionController::TestCase
 
   test 'should not submit_to_sycamore if sycamore is disable' do
     with_config_value :sycamore_enabled, false do
-      model = Factory :teusink_model
+      model = FactoryBot.create :teusink_model
       login_as(model.contributor)
       post :submit_to_sycamore, xhr: true, params: { id: model.id, version: model.version }
       assert @response.body.include?('Interaction with Sycamore is currently disabled')
@@ -875,7 +875,7 @@ class ModelsControllerTest < ActionController::TestCase
 
   test 'should not submit_to_sycamore if model is not downloadable' do
     with_config_value :sycamore_enabled, true do
-      model = Factory :teusink_model
+      model = FactoryBot.create :teusink_model
       login_as(:quentin)
       assert !model.can_download?
 
@@ -894,7 +894,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'should create new model version based on content_blobs of previous version' do
-    m = Factory(:model_2_files, policy: Factory(:private_policy))
+    m = FactoryBot.create(:model_2_files, policy: FactoryBot.create(:private_policy))
 
     assert_equal 1,m.version
     assert_equal 2,m.versions[0].content_blobs.count
@@ -929,16 +929,16 @@ class ModelsControllerTest < ActionController::TestCase
 
   test 'should have -View content- button on the model containing one inline viewable file' do
 
-    one_file_model = Factory(:doc_model, policy: Factory(:all_sysmo_downloadable_policy))
+    one_file_model = FactoryBot.create(:doc_model, policy: FactoryBot.create(:all_sysmo_downloadable_policy))
     assert_equal 1, one_file_model.content_blobs.count
     assert one_file_model.content_blobs.first.is_content_viewable?
     get :show, params: { id: one_file_model.id }
     assert_response :success
     assert_select '#buttons a', text: /View content/, count: 1
 
-    multiple_files_model = Factory(:model,
-                                   content_blobs: [Factory(:doc_content_blob), Factory(:content_blob)],
-                                   policy: Factory(:all_sysmo_downloadable_policy))
+    multiple_files_model = FactoryBot.create(:model,
+                                   content_blobs: [FactoryBot.create(:doc_content_blob), FactoryBot.create(:content_blob)],
+                                   policy: FactoryBot.create(:all_sysmo_downloadable_policy))
     assert_equal 2, multiple_files_model.content_blobs.count
     assert multiple_files_model.content_blobs.first.is_content_viewable?
     get :show, params: { id: multiple_files_model.id }
@@ -949,7 +949,7 @@ class ModelsControllerTest < ActionController::TestCase
 
   test 'compare versions' do
     # just compares with itself for now
-    model = Factory :model, contributor: User.current_user.person
+    model = FactoryBot.create :model, contributor: User.current_user.person
     assert model.contains_sbml?, 'model should contain sbml'
     assert model.can_download?, 'should be able to download'
 
@@ -959,7 +959,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'cannot compare versions if you cannot download' do
-    model = Factory(:model, contributor: Factory(:person), policy: Factory(:publicly_viewable_policy))
+    model = FactoryBot.create(:model, contributor: FactoryBot.create(:person), policy: FactoryBot.create(:publicly_viewable_policy))
     assert model.can_view?, 'should be able to view this model'
     assert !model.can_download?, 'should not be able to download this model'
     get :compare_versions, params: { id: model, other_version: model.versions.last.version }
@@ -968,12 +968,12 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'compare versions option on page' do
-    p  = Factory(:person)
+    p  = FactoryBot.create(:person)
     login_as(p)
 
-    model = Factory(:teusink_model, contributor: p, policy: Factory(:public_policy))
+    model = FactoryBot.create(:teusink_model, contributor: p, policy: FactoryBot.create(:public_policy))
     model.save_as_new_version
-    Factory(:cronwright_model_content_blob, asset_version: model.version, asset: model)
+    FactoryBot.create(:cronwright_model_content_blob, asset_version: model.version, asset: model)
     model.reload
     assert_equal 2, model.version
     assert model.can_download?
@@ -986,12 +986,12 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'compare versions option not shown when not downloadable' do
-    p  = Factory(:person)
-    login_as(Factory(:person))
-    model = Factory(:teusink_model, contributor: p, policy: Factory(:publicly_viewable_policy))
+    p  = FactoryBot.create(:person)
+    login_as(FactoryBot.create(:person))
+    model = FactoryBot.create(:teusink_model, contributor: p, policy: FactoryBot.create(:publicly_viewable_policy))
     disable_authorization_checks do
       model.save_as_new_version
-      Factory(:cronwright_model_content_blob, asset_version: model.version, asset: model)
+      FactoryBot.create(:cronwright_model_content_blob, asset_version: model.version, asset: model)
     end
 
     model.reload
@@ -1008,7 +1008,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'gracefully handle error when other version missing' do
-    model = Factory :model, contributor: User.current_user.person
+    model = FactoryBot.create :model, contributor: User.current_user.person
     assert model.contains_sbml?, 'model should contain sbml'
     assert model.can_download?, 'should be able to download'
 
@@ -1018,7 +1018,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'should show SBML format for model that contains sbml and format not specified' do
-    model = Factory(:teusink_model, policy: Factory(:public_policy), model_format: nil)
+    model = FactoryBot.create(:teusink_model, policy: FactoryBot.create(:public_policy), model_format: nil)
     assert model.contains_sbml?
     get :show, params: { id: model.id }
     assert_response :success
@@ -1028,7 +1028,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'should display null license text' do
-    model = Factory :model, policy: Factory(:public_policy)
+    model = FactoryBot.create :model, policy: FactoryBot.create(:public_policy)
 
     get :show, params: { id: model }
 
@@ -1036,7 +1036,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'should display license' do
-    model = Factory :model, license: 'CC-BY-4.0', policy: Factory(:public_policy)
+    model = FactoryBot.create :model, license: 'CC-BY-4.0', policy: FactoryBot.create(:public_policy)
 
     get :show, params: { id: model }
 
@@ -1044,8 +1044,8 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'should display license for current version' do
-    model = Factory :model, license: 'CC-BY-4.0', policy: Factory(:public_policy)
-    modelv = Factory :model_version_with_blob, model: model
+    model = FactoryBot.create :model, license: 'CC-BY-4.0', policy: FactoryBot.create(:public_policy)
+    modelv = FactoryBot.create :model_version_with_blob, model: model
 
     model.update license: 'CC0-1.0'
 
@@ -1076,9 +1076,9 @@ class ModelsControllerTest < ActionController::TestCase
 
   test 'programme models through nested routing' do
     assert_routing 'programmes/2/models', { controller: 'models', action: 'index', programme_id: '2' }
-    programme = Factory(:programme)
-    model = Factory(:model, projects: programme.projects, policy: Factory(:public_policy))
-    model2 = Factory(:model, policy: Factory(:public_policy))
+    programme = FactoryBot.create(:programme)
+    model = FactoryBot.create(:model, projects: programme.projects, policy: FactoryBot.create(:public_policy))
+    model2 = FactoryBot.create(:model, policy: FactoryBot.create(:public_policy))
 
     get :index, params: { programme_id: programme.id }
 
@@ -1091,7 +1091,7 @@ class ModelsControllerTest < ActionController::TestCase
 
   test 'can get citation for model with DOI' do
     doi_citation_mock
-    model = Factory(:model, policy: Factory(:public_policy))
+    model = FactoryBot.create(:model, policy: FactoryBot.create(:public_policy))
 
     login_as(model.contributor)
 
@@ -1108,10 +1108,10 @@ class ModelsControllerTest < ActionController::TestCase
 
   test 'associated with assay_ids params' do
     person = User.current_user.person
-    good_assay=Factory(:modelling_assay,contributor:person)
-    good_assay2=Factory(:modelling_assay,contributor:person)
-    bad_assay=Factory(:modelling_assay, contributor:Factory(:person))
-    bad_assay2=Factory(:experimental_assay, contributor:person)
+    good_assay=FactoryBot.create(:modelling_assay,contributor:person)
+    good_assay2=FactoryBot.create(:modelling_assay,contributor:person)
+    bad_assay=FactoryBot.create(:modelling_assay, contributor:FactoryBot.create(:person))
+    bad_assay2=FactoryBot.create(:experimental_assay, contributor:person)
 
     assert good_assay.can_edit?
     assert good_assay2.can_edit?
@@ -1152,9 +1152,13 @@ class ModelsControllerTest < ActionController::TestCase
     check_manage_edit_menu_for_type('model')
   end
 
+  test 'publish menu items appears according to status and permission' do
+    check_publish_menu_for_type('model')
+  end
+
   test 'can access manage page with manage rights' do
-    person = Factory(:person)
-    model = Factory(:model, contributor:person)
+    person = FactoryBot.create(:person)
+    model = FactoryBot.create(:model, contributor:person)
     login_as(person)
     assert model.can_manage?
     get :manage, params: {id: model}
@@ -1173,8 +1177,8 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'cannot access manage page with edit rights' do
-    person = Factory(:person)
-    model = Factory(:model, policy:Factory(:private_policy, permissions:[Factory(:permission, contributor:person, access_type:Policy::EDITING)]))
+    person = FactoryBot.create(:person)
+    model = FactoryBot.create(:model, policy:FactoryBot.create(:private_policy, permissions:[FactoryBot.create(:permission, contributor:person, access_type:Policy::EDITING)]))
     login_as(person)
     assert model.can_edit?
     refute model.can_manage?
@@ -1184,17 +1188,17 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'manage_update' do
-    proj1=Factory(:project)
-    proj2=Factory(:project)
-    person = Factory(:person,project:proj1)
-    other_person = Factory(:person)
+    proj1=FactoryBot.create(:project)
+    proj2=FactoryBot.create(:project)
+    person = FactoryBot.create(:person,project:proj1)
+    other_person = FactoryBot.create(:person)
     person.add_to_project_and_institution(proj2,person.institutions.first)
     person.save!
-    other_creator = Factory(:person,project:proj1)
+    other_creator = FactoryBot.create(:person,project:proj1)
     other_creator.add_to_project_and_institution(proj2,other_creator.institutions.first)
     other_creator.save!
 
-    model = Factory(:model, contributor:person, projects:[proj1], policy:Factory(:private_policy))
+    model = FactoryBot.create(:model, contributor:person, projects:[proj1], policy:FactoryBot.create(:private_policy))
 
     login_as(person)
     assert model.can_manage?
@@ -1220,20 +1224,20 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'manage_update fails without manage rights' do
-    proj1=Factory(:project)
-    proj2=Factory(:project)
-    person = Factory(:person, project:proj1)
+    proj1=FactoryBot.create(:project)
+    proj2=FactoryBot.create(:project)
+    person = FactoryBot.create(:person, project:proj1)
     person.add_to_project_and_institution(proj2,person.institutions.first)
     person.save!
 
-    other_person = Factory(:person)
+    other_person = FactoryBot.create(:person)
 
-    other_creator = Factory(:person,project:proj1)
+    other_creator = FactoryBot.create(:person,project:proj1)
     other_creator.add_to_project_and_institution(proj2,other_creator.institutions.first)
     other_creator.save!
 
-    model = Factory(:model, projects:[proj1], policy:Factory(:private_policy,
-                                                                     permissions:[Factory(:permission,contributor:person, access_type:Policy::EDITING)]))
+    model = FactoryBot.create(:model, projects:[proj1], policy:FactoryBot.create(:private_policy,
+                                                                     permissions:[FactoryBot.create(:permission,contributor:person, access_type:Policy::EDITING)]))
 
     login_as(person)
     refute model.can_manage?
@@ -1262,7 +1266,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'preserves DOI on update' do
-    model = Factory(:teusink_model)
+    model = FactoryBot.create(:teusink_model)
     model.latest_version.update_column(:doi, '10.1000/doi/1')
     login_as(model.contributor)
 
@@ -1272,7 +1276,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'should create with discussion link' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
     model =  {title: 'Model', project_ids: [person.projects.first.id], discussion_links_attributes:[{url: "http://www.slack.com/", label:'the slack about this model'}]}
     assert_difference('AssetLink.discussion.count') do
@@ -1289,16 +1293,16 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'should show discussion link' do
-    asset_link = Factory(:discussion_link)
-    model = Factory(:model, discussion_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    asset_link = FactoryBot.create(:discussion_link)
+    model = FactoryBot.create(:model, discussion_links: [asset_link], policy: FactoryBot.create(:public_policy, access_type: Policy::VISIBLE))
     get :show, params: { id: model }
     assert_response :success
     assert_select 'div.panel-heading', text: /Discussion Channel/, count: 1
   end
 
   test 'should update model with new discussion link' do
-    person = Factory(:person)
-    model = Factory(:model, contributor: person)
+    person = FactoryBot.create(:person)
+    model = FactoryBot.create(:model, contributor: person)
     login_as(person)
     assert_nil model.discussion_links.first
     assert_difference('AssetLink.discussion.count') do
@@ -1311,8 +1315,8 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'should update model with edited discussion link' do
-    person = Factory(:person)
-    model = Factory(:model, contributor: person, discussion_links:[Factory(:discussion_link)])
+    person = FactoryBot.create(:person)
+    model = FactoryBot.create(:model, contributor: person, discussion_links:[FactoryBot.create(:discussion_link)])
     login_as(person)
     assert_equal 1,model.discussion_links.count
     assert_no_difference('AssetLink.discussion.count') do
@@ -1327,10 +1331,10 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'should destroy related assetlink when the discussion link is removed ' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
-    asset_link = Factory(:discussion_link)
-    model = Factory(:model, discussion_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE), contributor: person)
+    asset_link = FactoryBot.create(:discussion_link)
+    model = FactoryBot.create(:model, discussion_links: [asset_link], policy: FactoryBot.create(:public_policy, access_type: Policy::VISIBLE), contributor: person)
     assert_difference('AssetLink.discussion.count', -1) do
       put :update, params: { id: model.id, model: { discussion_links_attributes:[{id: asset_link.id, _destroy:'1'}] } }
     end

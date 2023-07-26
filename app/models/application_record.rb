@@ -95,6 +95,13 @@ class ApplicationRecord < ActiveRecord::Base
     self.class.supports_doi?
   end
 
+  def self.supports_spreadsheet_explore?
+    false
+  end
+  def supports_spreadsheet_explore?
+    self.class.supports_spreadsheet_explore?
+  end
+
   def self.with_search_query(q)
     if searchable? && Seek::Config.solr_enabled
       ids = solr_cache(q) do

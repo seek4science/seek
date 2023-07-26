@@ -50,16 +50,16 @@ function checkAttributionNotInList(attributable) {
 }
 
 $j(function() {
-    $j('#attribution-typeahead').on('itemAdded', function (event) {
-        var attributable = event.item;
+    $j('select#attribution-typeahead').on('select2:select', function (event) {
+        var attributable = event.params.data;
         if(checkAttributionNotInList(attributable)) {
             attributions.push(attributable);
             updateAttributionSettings();
         }
         else {
             alert('The following entity was not added (already in the list of attributions):\n\n' +
-            attributable.type + ': ' + attributable.name);
+            attributable.type + ': ' + attributable.text);
         }
-        $j(this).tagsinput('removeAll'); // clear the input
+        $j('select#attribution-typeahead').val([]).change(); // clear the input
     });
 });

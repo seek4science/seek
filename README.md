@@ -1,4 +1,4 @@
-[![Build Status](https://github.com/seek4science/seek/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/seek4science/seek/actions/workflows/tests.yml)
+[![Build Status](https://github.com/seek4science/seek/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/seek4science/seek/actions/workflows/tests.yml)
 [![DOI](https://zenodo.org/badge/20803285.svg)](https://zenodo.org/badge/latestdoi/20803285)
 
 # FAIRDOM-SEEK

@@ -2,9 +2,11 @@ class Sop < ApplicationRecord
 
   include Seek::Rdf::RdfGeneration
 
+  has_and_belongs_to_many :direct_studies, class_name: 'Study'
+
   acts_as_asset
 
-  acts_as_doi_parent(child_accessor: :versions)
+  acts_as_doi_parent
 
   validates :projects, presence: true, projects: { self: true }
 
@@ -13,7 +15,6 @@ class Sop < ApplicationRecord
 
   has_and_belongs_to_many :workflows
 
-  has_one :study, foreign_key: 'sop_id'
 
   has_filter assay_type: Seek::Filtering::Filter.new(
       value_field: 'assays.assay_type_uri',
@@ -35,6 +36,9 @@ class Sop < ApplicationRecord
             :primary_key => :sop_id, :foreign_key => :asset_id
   end
 
+  def supports_spreadsheet_explore?
+    true
+  end
   def organism_title
     organism.nil? ? "" : organism.title
   end
@@ -47,11 +51,4 @@ class Sop < ApplicationRecord
     true
   end
 
-  def can_delete?(user = User.current_user)
-    if Seek::Config.project_single_page_advanced_enabled
-      super && study.blank?
-    else
-      super
-    end
-  end
 end

@@ -40,9 +40,10 @@ class Sample < ApplicationRecord
 
   before_save :update_sample_resource_links
   after_save :queue_sample_type_update_job
+  after_save :queue_linking_samples_update_job
   after_destroy :queue_sample_type_update_job
 
-
+  
   has_filter :sample_type
 
   def sample_type=(type)
@@ -76,7 +77,8 @@ class Sample < ApplicationRecord
     sample_type.sample_attributes.select(&:seek_resource?).map do |sa|
       value = get_attribute_value(sa)
       type = sa.sample_attribute_type.base_type_handler.type
-      Array.wrap(value).map {|v| type.constantize.find_by_id(v['id']) if v && type} 
+      return [] unless type
+      Array.wrap(value).map { |v| type.find_by_id(v['id']) if v }
     end.flatten.compact
   end
 
@@ -133,9 +135,27 @@ class Sample < ApplicationRecord
     organism_ids | ncbi_linked_organisms.map(&:id)
   end
 
-  #overides default to include sample_type key at the start
+  # overides default to include sample_type key at the start
   def list_item_title_cache_key_prefix
     "#{sample_type.list_item_title_cache_key_prefix}/#{cache_key}"
+  end
+
+  def refresh_linking_samples
+    sample_type_hash = {}
+    linking_samples.each do |s|
+      sample_type_hash = update_sample_type_hash(sample_type_hash, s.sample_type)
+      positions = sample_type_hash[s.sample_type.id]
+      metadata = s.data
+      positions.each do |p|
+        item_linked_samples = Array(metadata.values[p - 1])
+        item_linked_samples.each do |sample|
+          sample['title'] = title if sample['id'] == id
+        end
+        metadata.values[p - 1] = item_linked_samples
+        s.json_metadata = metadata.to_json
+        s.save
+      end
+    end
   end
 
   private
@@ -143,19 +163,20 @@ class Sample < ApplicationRecord
   # organisms linked through an NCBI attribute type
   def ncbi_linked_organisms
     return [] unless sample_type
+
     Rails.cache.fetch("sample-organisms-#{cache_key}-#{Organism.order('updated_at DESC').first.try(:cache_key)}") do
       sample_type.sample_attributes.collect do |attribute|
         next unless attribute.sample_attribute_type.title == 'NCBI ID'
+
         value = get_attribute_value(attribute)
-        if value
-          Organism.all.select { |o| o.ncbi_id && o.ncbi_id.to_s == value }
-        end
+        Organism.all.select { |o| o.ncbi_id && o.ncbi_id.to_s == value } if value
       end.flatten.compact.uniq
     end
   end
 
   def samples_this_links_to
     return [] unless sample_type
+
     seek_sample_attributes = sample_type.sample_attributes.select { |attr| attr.sample_attribute_type.seek_sample? }
     seek_sample_attributes.map do |attr|
       value = get_attribute_value(attr)
@@ -174,11 +195,16 @@ class Sample < ApplicationRecord
   # the designated title attribute
   def title_attribute
     return nil unless sample_type && sample_type.sample_attributes.title_attributes.any?
+
     sample_type.sample_attributes.title_attributes.first
   end
 
   def queue_sample_type_update_job
     SampleTypeUpdateJob.new(sample_type, false).queue_job
+  end
+
+  def queue_linking_samples_update_job
+    LinkingSamplesUpdateJob.new(self).queue_job
   end
 
   def update_sample_resource_links
@@ -190,4 +216,13 @@ class Sample < ApplicationRecord
     SampleAttribute
   end
 
+  def update_sample_type_hash(sample_type_hash, sample_type)
+    if sample_type_hash[sample_type.id].nil?
+      # Select all attributes of type seek_sample_multi or seek_sample
+      sample_type_hash[sample_type.id] = sample_type.sample_attributes.select do |sa|
+        sa.seek_sample_multi? || sa.seek_sample?
+      end.map(&:pos)
+    end
+    sample_type_hash
+  end
 end

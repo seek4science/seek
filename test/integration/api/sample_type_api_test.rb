@@ -5,16 +5,16 @@ class SampleTypeApiTest < ActionDispatch::IntegrationTest
   include WriteApiTestSuite
 
   def setup
-    user_login(Factory(:project_administrator))
+    user_login(FactoryBot.create(:project_administrator))
     @project = @current_user.person.projects.first
-    @sample_type = Factory(:simple_sample_type, project_ids: [@project.id], contributor: current_person)
+    @sample_type = FactoryBot.create(:simple_sample_type, project_ids: [@project.id], contributor: current_person)
     @sample_attribute = @sample_type.sample_attributes.first
     @sample_attribute_type = @sample_attribute.sample_attribute_type
-    @assay = Factory(:assay, contributor: current_person)
+    @assay = FactoryBot.create(:assay, contributor: current_person)
   end
 
   test 'create using attribute_type name' do
-    attribute_type = Factory(:string_sample_attribute_type)
+    attribute_type = FactoryBot.create(:string_sample_attribute_type)
     params = {
       "data": {
         "type": "sample_types",
@@ -61,7 +61,7 @@ class SampleTypeApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'create using attribute_type id' do
-    attribute_type = Factory(:string_sample_attribute_type)
+    attribute_type = FactoryBot.create(:string_sample_attribute_type)
     params = {
       "data": {
         "type": "sample_types",
@@ -108,7 +108,7 @@ class SampleTypeApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'update attribute title and description' do
-    sample_type = Factory(:patient_sample_type, contributor: current_person)
+    sample_type = FactoryBot.create(:patient_sample_type, contributor: current_person)
     assert_equal 5, sample_type.sample_attributes.count
 
     attr = sample_type.sample_attributes.where(title: 'full name').first
@@ -143,10 +143,10 @@ class SampleTypeApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'add an attribute' do
-    sample_type = Factory(:patient_sample_type, contributor: current_person)
+    sample_type = FactoryBot.create(:patient_sample_type, contributor: current_person)
     assert_equal 5, sample_type.sample_attributes.count
 
-    str_attribute_type = Factory(:string_sample_attribute_type)
+    str_attribute_type = FactoryBot.create(:string_sample_attribute_type)
 
     # rename an attribute
     params = {
@@ -183,7 +183,7 @@ class SampleTypeApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'remove an attribute' do
-    sample_type = Factory(:patient_sample_type, contributor: current_person)
+    sample_type = FactoryBot.create(:patient_sample_type, contributor: current_person)
     assert_equal 5, sample_type.sample_attributes.count
 
     attr = sample_type.sample_attributes.where(title: 'age').first

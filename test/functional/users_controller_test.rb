@@ -13,7 +13,7 @@ class UsersControllerTest < ActionController::TestCase
   end
 
   test 'cancel registration' do
-    user = Factory :brand_new_user
+    user = FactoryBot.create :brand_new_user
     refute user.person
     login_as user
     assert_equal user.id, session[:user_id]
@@ -31,7 +31,7 @@ class UsersControllerTest < ActionController::TestCase
   end
 
   test 'whoami_login' do
-    person = Factory :person
+    person = FactoryBot.create :person
 
     login_as person.user
 
@@ -42,7 +42,7 @@ class UsersControllerTest < ActionController::TestCase
   end
 
   test 'cancel registration doesnt destroy user with profile' do
-    person = Factory :person
+    person = FactoryBot.create :person
 
     login_as person.user
     assert_equal person.user.id, session[:user_id]
@@ -60,14 +60,14 @@ class UsersControllerTest < ActionController::TestCase
   end
 
   test 'should destroy only by admin' do
-    user_without_profile = Factory :brand_new_user
-    user = Factory :user
+    user_without_profile = FactoryBot.create :brand_new_user
+    user = FactoryBot.create :user
     login_as user
     assert_difference('User.count', 0) do
       delete :destroy, params: { id: user_without_profile }
     end
     logout
-    admin = Factory(:user, person_id: Factory(:admin).id)
+    admin = FactoryBot.create(:user, person_id: FactoryBot.create(:admin).id)
     login_as admin
     assert_difference('User.count', -1) do
       delete :destroy, params: { id: user_without_profile }
@@ -75,8 +75,8 @@ class UsersControllerTest < ActionController::TestCase
   end
 
   test 'should not destroy user with profile' do
-    person = Factory :person
-    admin = Factory(:user, person_id: Factory(:admin).id)
+    person = FactoryBot.create :person
+    admin = FactoryBot.create(:user, person_id: FactoryBot.create(:admin).id)
     login_as admin
     assert_no_difference('User.count') do
       delete :destroy, params: { id: person.user }
@@ -84,10 +84,10 @@ class UsersControllerTest < ActionController::TestCase
   end
 
   test 'resend activation email only by admin' do
-    person = Factory(:person)
-    user = Factory :brand_new_user, person: person
+    person = FactoryBot.create(:person)
+    user = FactoryBot.create :brand_new_user, person: person
     assert !user.active?
-    login_as Factory(:user)
+    login_as FactoryBot.create(:user)
     assert_enqueued_emails(0) do
       assert_no_difference('ActivationEmailMessageLog.count') do
         post :resend_activation_email, params: { id: user }
@@ -99,7 +99,7 @@ class UsersControllerTest < ActionController::TestCase
     assert_not_nil flash[:error]
     flash.clear
     logout
-    admin = Factory(:user, person_id: Factory(:admin).id)
+    admin = FactoryBot.create(:user, person_id: FactoryBot.create(:admin).id)
     login_as admin
     assert_enqueued_emails(1) do
       assert_difference('ActivationEmailMessageLog.count') do
@@ -111,9 +111,9 @@ class UsersControllerTest < ActionController::TestCase
   end
 
   test 'only admin can bulk_destroy' do
-    user1 = Factory :user
-    user2 = Factory :user
-    admin = Factory(:user, person_id: Factory(:admin).id)
+    user1 = FactoryBot.create :user
+    user2 = FactoryBot.create :user
+    admin = FactoryBot.create(:user, person_id: FactoryBot.create(:admin).id)
     login_as admin
     assert_difference('User.count', -1) do
       post :bulk_destroy, params: { ids: [user1.id] }
@@ -128,12 +128,12 @@ class UsersControllerTest < ActionController::TestCase
   end
 
   test 'bulk destroy' do
-    user1 = Factory :user
-    user2 = Factory :user
-    Factory :favourite_group, user: user1
-    Factory :favourite_group, user: user2
+    user1 = FactoryBot.create :user
+    user2 = FactoryBot.create :user
+    FactoryBot.create :favourite_group, user: user1
+    FactoryBot.create :favourite_group, user: user2
 
-    admin = Factory(:user, person_id: Factory(:admin).id)
+    admin = FactoryBot.create(:user, person_id: FactoryBot.create(:admin).id)
     login_as admin
     # destroy also dependencies
     assert_difference('User.count', -2) do
@@ -144,12 +144,12 @@ class UsersControllerTest < ActionController::TestCase
   end
 
   test 'bulk destroy only ids in params' do
-    user1 = Factory :user
-    user2 = Factory :user
-    Factory :favourite_group, user: user1
-    Factory :favourite_group, user: user2
+    user1 = FactoryBot.create :user
+    user2 = FactoryBot.create :user
+    FactoryBot.create :favourite_group, user: user1
+    FactoryBot.create :favourite_group, user: user2
 
-    admin = Factory(:user, person_id: Factory(:admin).id)
+    admin = FactoryBot.create(:user, person_id: FactoryBot.create(:admin).id)
     login_as admin
     # destroy also dependencies
     assert_difference('User.count', -1) do
@@ -199,7 +199,7 @@ class UsersControllerTest < ActionController::TestCase
   end
 
   test 'should activate user' do
-    user = Factory(:not_activated_person).user    
+    user = FactoryBot.create(:not_activated_person).user
     refute user.active?
 
     #make some logs
@@ -244,10 +244,10 @@ class UsersControllerTest < ActionController::TestCase
   end
 
   def test_associated_with_person
-    u = Factory(:brand_new_user)
+    u = FactoryBot.create(:brand_new_user)
     login_as u
     assert_nil u.person
-    p = Factory(:brand_new_person)
+    p = FactoryBot.create(:brand_new_person)
     post :update, params: { id: u.id, user: { id: u.id, person_id: p.id, email: p.email } }
     assert_nil flash[:error]
     assert_equal p, User.find(u.id).person
@@ -263,7 +263,7 @@ class UsersControllerTest < ActionController::TestCase
   end
 
   test 'reset code cleared after updating password' do
-    user = Factory(:user)
+    user = FactoryBot.create(:user)
     user.reset_password
     user.save!
     login_as(user)
@@ -313,7 +313,7 @@ class UsersControllerTest < ActionController::TestCase
   end
 
   test 'reset password with valid code' do
-    user = Factory(:user)
+    user = FactoryBot.create(:user)
     user.reset_password
     user.save!
     refute_nil(user.reset_password_code)
@@ -341,7 +341,7 @@ class UsersControllerTest < ActionController::TestCase
   end
 
   test 'reset password with expired code' do
-    user = Factory(:user)
+    user = FactoryBot.create(:user)
     user.reset_password
     user.reset_password_code_until = 5.days.ago
     user.save!
@@ -388,10 +388,10 @@ class UsersControllerTest < ActionController::TestCase
   end
 
   test 'admin can activate user' do
-    person = Factory(:not_activated_person)
+    person = FactoryBot.create(:not_activated_person)
     user = person.user
     refute user.active?
-    me = Factory(:admin).user
+    me = FactoryBot.create(:admin).user
     login_as me
 
     assert_enqueued_email_with(Mailer, :welcome, args: [user]) do
@@ -404,10 +404,10 @@ class UsersControllerTest < ActionController::TestCase
   end
 
   test 'non-admin cannot activate user' do
-    person = Factory(:not_activated_person)
+    person = FactoryBot.create(:not_activated_person)
     user = person.user
     refute user.active?
-    me = Factory(:person).user
+    me = FactoryBot.create(:person).user
     login_as me
 
     assert_no_enqueued_emails do
@@ -421,10 +421,10 @@ class UsersControllerTest < ActionController::TestCase
   end
 
   test 'nothing happens when admin activates active user' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     user = person.user
     assert user.active?
-    me = Factory(:admin).user
+    me = FactoryBot.create(:admin).user
     login_as me
 
     assert_no_enqueued_emails do

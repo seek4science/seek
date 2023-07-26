@@ -82,13 +82,14 @@ class InstitutionsController < ApplicationController
 
   # For use in autocompleters
   def typeahead
+    query = (params[:q] || '').downcase
     results = Institution.where("LOWER(title) LIKE :query
                                   OR LOWER(city) LIKE :query
                                   OR LOWER(address) LIKE :query",
-                           query: "%#{params[:query].downcase}%").limit(params[:limit] || 10)
+                           query: "%#{query}%").limit(params[:limit] || 10)
     items = results.map do |institution|
       { id: institution.id,
-        name: institution.title,
+        text: institution.title,
         web_page: institution.web_page,
         city: institution.city,
         country:institution.country,
@@ -96,12 +97,8 @@ class InstitutionsController < ApplicationController
         hint: institution.typeahead_hint }
     end
 
-    if params[:include_new]
-      items.unshift({id:-1, name:params[:query], web_page: '', country: '', country_name: '', city: '', hint:"new item", new: true })
-    end
-
     respond_to do |format|
-      format.json { render json: items.to_json }
+      format.json { render json: {results: items}.to_json }
     end
   end
 

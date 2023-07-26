@@ -109,14 +109,12 @@ module SharingPermissionsHelper
     parent_node
   end
 
-
-  def add_asset_permission_nodes (parent_node)
-
+  def add_asset_permission_nodes(parent_node)
     asset_type = parent_node["id"].split("-")[0]
     asset_id = parent_node["id"].split("-")[1].to_i
 
     # get asset instance
-    asset =  asset_type.camelize.constantize.find(asset_id)
+    asset = safe_class_lookup(asset_type.camelize).find(asset_id)
     parent_node["text"] = "#{h(asset.title)}  #{icon_link_to("", "new_window", asset , options = {target:'blank',class:'asset-icon',:onclick => 'window.open(this.href, "_blank");'})}"
 
     permissions_array = get_permission(asset)

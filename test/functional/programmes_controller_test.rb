@@ -7,20 +7,20 @@ class ProgrammesControllerTest < ActionController::TestCase
   include RdfTestCases
 
   def rdf_test_object
-    login_as(Factory(:admin))
-    Factory(:programme)
+    login_as(FactoryBot.create(:admin))
+    FactoryBot.create(:programme)
   end
 
   # for now just admins can create programmes, later we will change this
   test 'new page accessible admin' do
-    login_as(Factory(:admin))
+    login_as(FactoryBot.create(:admin))
     get :new
     assert_response :success
   end
 
   test 'new page works even when no programme-less projects' do
-    programme = Factory(:programme)
-    admin = Factory(:admin, project:programme.projects.first)
+    programme = FactoryBot.create(:programme)
+    admin = FactoryBot.create(:admin, project:programme.projects.first)
 
     Project.without_programme.delete_all
 
@@ -30,13 +30,13 @@ class ProgrammesControllerTest < ActionController::TestCase
   end
 
   test 'new page accessible to non admin' do
-    login_as(Factory(:person))
+    login_as(FactoryBot.create(:person))
     get :new
     assert_response :success
   end
 
   test 'new page accessible to projectless user' do
-    p = Factory(:person_not_in_project)
+    p = FactoryBot.create(:person_not_in_project)
     login_as(p)
     assert p.projects.empty?
     get :new
@@ -49,8 +49,8 @@ class ProgrammesControllerTest < ActionController::TestCase
   end
 
   test 'only admin can destroy' do
-    login_as(Factory(:person))
-    prog = Factory(:programme)
+    login_as(FactoryBot.create(:person))
+    prog = FactoryBot.create(:programme)
     proj = prog.projects.first
     refute_nil proj
     assert_equal prog, proj.programme
@@ -64,7 +64,7 @@ class ProgrammesControllerTest < ActionController::TestCase
   end
 
   test 'programme admin can destroy when no projects' do
-    programme_administrator = Factory(:programme_administrator)
+    programme_administrator = FactoryBot.create(:programme_administrator)
     login_as(programme_administrator)
     programme = programme_administrator.programmes.first
 
@@ -95,8 +95,8 @@ class ProgrammesControllerTest < ActionController::TestCase
   end
 
   test 'destroy' do
-    login_as(Factory(:admin))
-    prog = Factory(:programme, projects:[])
+    login_as(FactoryBot.create(:admin))
+    prog = FactoryBot.create(:programme, projects:[])
     assert prog.can_delete?
     assert_difference('Programme.count', -1) do
       delete :destroy, params: { id: prog.id }
@@ -106,8 +106,8 @@ class ProgrammesControllerTest < ActionController::TestCase
   end
 
   test 'admin can update' do
-    login_as(Factory(:admin))
-    prog = Factory(:programme, description: 'ggggg')
+    login_as(FactoryBot.create(:admin))
+    prog = FactoryBot.create(:programme, description: 'ggggg')
     put :update, params: { id: prog, programme: { title: 'fish' } }
     prog = assigns(:programme)
     refute_nil prog
@@ -117,9 +117,9 @@ class ProgrammesControllerTest < ActionController::TestCase
   end
 
   test 'programme administrator can update' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
-    prog = Factory(:programme, description: 'ggggg')
+    prog = FactoryBot.create(:programme, description: 'ggggg')
     person.is_programme_administrator = true, prog
     disable_authorization_checks { person.save! }
     put :update, params: { id: prog, programme: { title: 'fish' } }
@@ -131,8 +131,8 @@ class ProgrammesControllerTest < ActionController::TestCase
   end
 
   test 'normal user cannot update' do
-    login_as(Factory(:person))
-    prog = Factory(:programme, description: 'ggggg', title: 'eeeee')
+    login_as(FactoryBot.create(:person))
+    prog = FactoryBot.create(:programme, description: 'ggggg', title: 'eeeee')
     put :update, params: { id: prog, programme: { title: 'fish' } }
     assert_redirected_to prog
     assert_equal 'eeeee', prog.title
@@ -140,14 +140,14 @@ class ProgrammesControllerTest < ActionController::TestCase
   end
 
   test 'set programme administrators at creation' do
-    creator = Factory(:person)
+    creator = FactoryBot.create(:person)
     login_as(creator)
-    person = Factory(:person)
-    person2 = Factory(:person)
+    person = FactoryBot.create(:person)
+    person2 = FactoryBot.create(:person)
     refute person.is_programme_administrator_of_any_programme?
     assert_difference('Role.count', 3) do # Should include creator
       assert_difference('Programme.count', 1) do
-        post :create, params: { programme: { programme_administrator_ids: "#{person.id},#{person2.id}", title: 'programme xxxyxxx2' } }
+        post :create, params: { programme: { programme_administrator_ids: [person.id, person2.id], title: 'programme xxxyxxx2' } }
       end
     end
 
@@ -164,12 +164,12 @@ class ProgrammesControllerTest < ActionController::TestCase
   end
 
   test 'admin sets themself as programme administrator at creation' do
-    admin = Factory(:admin)
+    admin = FactoryBot.create(:admin)
     login_as(admin)
     refute admin.is_programme_administrator_of_any_programme?
     assert_difference('Programme.count', 1) do
       assert_difference('Role.count', 1) do
-        post :create, params: { programme: { programme_administrator_ids: "#{admin.id}", title: 'programme xxxyxxx1' } }
+        post :create, params: { programme: { programme_administrator_ids: [admin.id], title: 'programme xxxyxxx1' } }
       end
     end
 
@@ -182,19 +182,19 @@ class ProgrammesControllerTest < ActionController::TestCase
   end
 
   test 'programme administrator can add new administrators, but not remove themself' do
-    pa = Factory(:programme_administrator)
+    pa = FactoryBot.create(:programme_administrator)
     login_as(pa)
     prog = pa.programmes.first
-    p1 = Factory(:person)
-    p2 = Factory(:person)
-    p3 = Factory(:person)
+    p1 = FactoryBot.create(:person)
+    p2 = FactoryBot.create(:person)
+    p3 = FactoryBot.create(:person)
 
     assert pa.is_programme_administrator?(prog)
     refute p1.is_programme_administrator?(prog)
     refute p2.is_programme_administrator?(prog)
     refute p3.is_programme_administrator?(prog)
 
-    ids = [p1.id, p2.id].join(',')
+    ids = [p1.id, p2.id]
     put :update, params: { id: prog, programme: { programme_administrator_ids: ids } }
 
     assert_redirected_to prog
@@ -214,21 +214,21 @@ class ProgrammesControllerTest < ActionController::TestCase
   end
 
   test 'admin can add new administrators, and not remove themself' do
-    admin = Factory(:programme_administrator)
+    admin = FactoryBot.create(:programme_administrator)
     admin.is_admin = true
     disable_authorization_checks { admin.save! }
     login_as(admin)
     prog = admin.programmes.first
-    p1 = Factory(:person)
-    p2 = Factory(:person)
-    p3 = Factory(:person)
+    p1 = FactoryBot.create(:person)
+    p2 = FactoryBot.create(:person)
+    p3 = FactoryBot.create(:person)
 
     assert admin.is_programme_administrator?(prog)
     refute p1.is_programme_administrator?(prog)
     refute p2.is_programme_administrator?(prog)
     refute p3.is_programme_administrator?(prog)
 
-    ids = [p1.id, p2.id].join(',')
+    ids = [p1.id, p2.id]
     put :update, params: { id: prog, programme: { programme_administrator_ids: ids } }
 
     assert_redirected_to prog
@@ -245,25 +245,25 @@ class ProgrammesControllerTest < ActionController::TestCase
   end
 
   test 'edit page accessible to admin' do
-    login_as(Factory(:admin))
-    p = Factory(:programme)
-    Factory(:avatar, owner: p)
+    login_as(FactoryBot.create(:admin))
+    p = FactoryBot.create(:programme)
+    FactoryBot.create(:avatar, owner: p)
     get :edit, params: { id: p }
     assert_response :success
   end
 
   test 'edit page not accessible to user' do
-    login_as(Factory(:person))
-    p = Factory(:programme)
+    login_as(FactoryBot.create(:person))
+    p = FactoryBot.create(:programme)
     get :edit, params: { id: p }
     assert_redirected_to p
     refute_nil flash[:error]
   end
 
   test 'edit page accessible to programme_administrator' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
-    p = Factory(:programme)
+    p = FactoryBot.create(:programme)
     person.is_programme_administrator = true, p
     disable_authorization_checks { person.save! }
     get :edit, params: { id: p }
@@ -271,25 +271,25 @@ class ProgrammesControllerTest < ActionController::TestCase
   end
 
   test 'should show index' do
-    p = Factory(:programme, projects: [Factory(:project), Factory(:project)])
-    avatar = Factory(:avatar, owner: p)
+    p = FactoryBot.create(:programme, projects: [FactoryBot.create(:project), FactoryBot.create(:project)])
+    avatar = FactoryBot.create(:avatar, owner: p)
     p.avatar = avatar
     disable_authorization_checks { p.save! }
-    Factory(:programme)
+    FactoryBot.create(:programme)
 
     get :index
     assert_response :success
   end
 
   test 'index should not show inactivated except for admin and programme admin' do
-    login_as(Factory(:admin))
-    programme_admin = Factory(:person)
-    p1 = Factory(:programme, title: 'activated programme')
-    p2 = Factory(:programme, title: 'not activated programme')
+    login_as(FactoryBot.create(:admin))
+    programme_admin = FactoryBot.create(:person)
+    p1 = FactoryBot.create(:programme, title: 'activated programme')
+    p2 = FactoryBot.create(:programme, title: 'not activated programme')
     p2.is_activated = false
     p2.save!
 
-    p3 = Factory(:programme, title: 'not activated or with programme administrator')
+    p3 = FactoryBot.create(:programme, title: 'not activated or with programme administrator')
     p3.is_activated = false
     p3.save!
 
@@ -316,7 +316,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_select 'a[href=?]', programme_path(p3), text: p3.title, count: 0
     assert_equal 1, assigns(:programmes).count
 
-    login_as(Factory(:person))
+    login_as(FactoryBot.create(:person))
     get :index
     assert_response :success
     assert_select 'a[href=?]', programme_path(p1), text: p1.title, count: 1
@@ -325,7 +325,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_equal 1, assigns(:programmes).count
     logout
 
-    login_as(Factory(:admin))
+    login_as(FactoryBot.create(:admin))
     get :index
     assert_response :success
     assert_select 'a[href=?]', programme_path(p1), text: p1.title, count: 1
@@ -345,8 +345,8 @@ class ProgrammesControllerTest < ActionController::TestCase
   end
 
   test 'should get show' do
-    p = Factory(:programme, projects: [Factory(:project), Factory(:project)])
-    avatar = Factory(:avatar, owner: p)
+    p = FactoryBot.create(:programme, projects: [FactoryBot.create(:project), FactoryBot.create(:project)])
+    avatar = FactoryBot.create(:avatar, owner: p)
     p.avatar = avatar
     disable_authorization_checks { p.save! }
 
@@ -355,11 +355,11 @@ class ProgrammesControllerTest < ActionController::TestCase
   end
 
   test 'update to default avatar' do
-    p = Factory(:programme, projects: [Factory(:project), Factory(:project)])
-    avatar = Factory(:avatar, owner: p)
+    p = FactoryBot.create(:programme, projects: [FactoryBot.create(:project), FactoryBot.create(:project)])
+    avatar = FactoryBot.create(:avatar, owner: p)
     p.avatar = avatar
     disable_authorization_checks { p.save! }
-    login_as(Factory(:admin))
+    login_as(FactoryBot.create(:admin))
     put :update, params: { id: p, programme: { avatar_id: '0' } }
     prog = assigns(:programme)
     refute_nil prog
@@ -367,7 +367,7 @@ class ProgrammesControllerTest < ActionController::TestCase
   end
 
   test 'can be disabled' do
-    p = Factory(:programme, projects: [Factory(:project), Factory(:project)])
+    p = FactoryBot.create(:programme, projects: [FactoryBot.create(:project), FactoryBot.create(:project)])
     with_config_value :programmes_enabled, false do
       get :show, params: { id: p }
       assert_redirected_to :root
@@ -376,12 +376,12 @@ class ProgrammesControllerTest < ActionController::TestCase
   end
 
   test 'user can create programme, and becomes programme administrator' do
-    p = Factory(:person)
+    p = FactoryBot.create(:person)
     login_as(p)
     with_config_value(:email_enabled, true) do
       assert_difference('Programme.count') do
         assert_enqueued_emails(1) do # activation email
-          post :create, params: { programme: { title: 'A programme', funding_codes: 'aaa,bbb', web_page: '', description: '', funding_details: '' } }
+          post :create, params: { programme: { title: 'A programme', funding_codes: ['','aaa','bbb'], web_page: '', description: '', funding_details: '' } }
         end
       end
     end
@@ -396,7 +396,7 @@ class ProgrammesControllerTest < ActionController::TestCase
   end
 
   test "admin doesn't become programme administrator by default" do
-    p = Factory(:admin)
+    p = FactoryBot.create(:admin)
     login_as(p)
     with_config_value(:email_enabled, true) do
       assert_difference('Programme.count') do
@@ -419,18 +419,18 @@ class ProgrammesControllerTest < ActionController::TestCase
   end
 
   test 'activation review available to admin' do
-    programme = Factory(:programme)
+    programme = FactoryBot.create(:programme)
     programme.is_activated = false
     disable_authorization_checks { programme.save! }
     refute programme.is_activated?
-    login_as(Factory(:admin))
+    login_as(FactoryBot.create(:admin))
     get :activation_review, params: { id: programme }
     assert_response :success
     assert_nil flash[:error]
   end
 
   test 'activation review not available none admin' do
-    person = Factory(:programme_administrator)
+    person = FactoryBot.create(:programme_administrator)
     programme = person.programmes.first
     programme.is_activated = false
     disable_authorization_checks { programme.save! }
@@ -442,8 +442,8 @@ class ProgrammesControllerTest < ActionController::TestCase
   end
 
   test 'activation review not available if active' do
-    programme = Factory(:programme)
-    login_as(Factory(:admin))
+    programme = FactoryBot.create(:programme)
+    login_as(FactoryBot.create(:admin))
     programme.activate
     assert programme.is_activated?
     get :activation_review, params: { id: programme }
@@ -452,12 +452,12 @@ class ProgrammesControllerTest < ActionController::TestCase
   end
 
   test 'accept_activation' do
-    programme_administrator = Factory(:programme_administrator)
+    programme_administrator = FactoryBot.create(:programme_administrator)
     programme = programme_administrator.programmes.first
     programme.is_activated = false
     disable_authorization_checks { programme.save! }
     refute programme.is_activated?
-    login_as(Factory(:admin))
+    login_as(FactoryBot.create(:admin))
 
     with_config_value(:email_enabled, true) do
       assert_enqueued_emails(1) do
@@ -473,7 +473,7 @@ class ProgrammesControllerTest < ActionController::TestCase
   end
 
   test 'no accept_activation for none admin' do
-    programme_administrator = Factory(:programme_administrator)
+    programme_administrator = FactoryBot.create(:programme_administrator)
     programme = programme_administrator.programmes.first
     programme.is_activated = false
     disable_authorization_checks { programme.save! }
@@ -494,11 +494,11 @@ class ProgrammesControllerTest < ActionController::TestCase
   end
 
   test 'no accept_activation for not activated' do
-    programme_administrator = Factory(:programme_administrator)
+    programme_administrator = FactoryBot.create(:programme_administrator)
     programme = programme_administrator.programmes.first
 
     assert programme.is_activated?
-    login_as(Factory(:admin))
+    login_as(FactoryBot.create(:admin))
 
     with_config_value(:email_enabled, true) do
       assert_no_enqueued_emails do
@@ -514,12 +514,12 @@ class ProgrammesControllerTest < ActionController::TestCase
   end
 
   test 'reject activation confirmation' do
-    programme_administrator = Factory(:programme_administrator)
+    programme_administrator = FactoryBot.create(:programme_administrator)
     programme = programme_administrator.programmes.first
     programme.is_activated = false
     disable_authorization_checks { programme.save! }
     refute programme.is_activated?
-    login_as(Factory(:admin))
+    login_as(FactoryBot.create(:admin))
 
     get :reject_activation_confirmation, params: { id: programme }
     assert_response :success
@@ -527,11 +527,11 @@ class ProgrammesControllerTest < ActionController::TestCase
   end
 
   test 'no reject activation confirmation for already activated' do
-    programme_administrator = Factory(:programme_administrator)
+    programme_administrator = FactoryBot.create(:programme_administrator)
     programme = programme_administrator.programmes.first
 
     assert programme.is_activated?
-    login_as(Factory(:admin))
+    login_as(FactoryBot.create(:admin))
 
     get :reject_activation_confirmation, params: { id: programme }
     assert_redirected_to :root
@@ -540,7 +540,7 @@ class ProgrammesControllerTest < ActionController::TestCase
   end
 
   test 'no reject activation confirmation for none admin' do
-    programme_administrator = Factory(:programme_administrator)
+    programme_administrator = FactoryBot.create(:programme_administrator)
     programme = programme_administrator.programmes.first
     programme.is_activated = false
     disable_authorization_checks { programme.save! }
@@ -554,12 +554,12 @@ class ProgrammesControllerTest < ActionController::TestCase
   end
 
   test 'reject_activation' do
-    programme_administrator = Factory(:programme_administrator)
+    programme_administrator = FactoryBot.create(:programme_administrator)
     programme = programme_administrator.programmes.first
     programme.is_activated = false
     disable_authorization_checks { programme.save! }
     refute programme.is_activated?
-    login_as(Factory(:admin))
+    login_as(FactoryBot.create(:admin))
 
     with_config_value(:email_enabled, true) do
       assert_enqueued_emails(1) do
@@ -576,7 +576,7 @@ class ProgrammesControllerTest < ActionController::TestCase
   end
 
   test 'no reject activation for none admin' do
-    programme_administrator = Factory(:programme_administrator)
+    programme_administrator = FactoryBot.create(:programme_administrator)
     programme = programme_administrator.programmes.first
     programme.is_activated = false
     disable_authorization_checks { programme.save! }
@@ -598,11 +598,11 @@ class ProgrammesControllerTest < ActionController::TestCase
   end
 
   test 'no reject_activation for not activated' do
-    programme_administrator = Factory(:programme_administrator)
+    programme_administrator = FactoryBot.create(:programme_administrator)
     programme = programme_administrator.programmes.first
 
     assert programme.is_activated?
-    login_as(Factory(:admin))
+    login_as(FactoryBot.create(:admin))
 
     with_config_value(:email_enabled, true) do
       assert_no_enqueued_emails do
@@ -619,7 +619,7 @@ class ProgrammesControllerTest < ActionController::TestCase
   end
 
   test 'none activated programme only available to administrators' do
-    programme_administrator = Factory(:programme_administrator)
+    programme_administrator = FactoryBot.create(:programme_administrator)
     programme = programme_administrator.programmes.first
     programme.is_activated = false
     disable_authorization_checks { programme.save! }
@@ -637,32 +637,32 @@ class ProgrammesControllerTest < ActionController::TestCase
     logout
     clear_flash(:error)
 
-    login_as(Factory(:admin))
+    login_as(FactoryBot.create(:admin))
     get :show, params: { id: programme }
     assert_response :success
     assert_nil flash[:error]
     logout
     clear_flash(:error)
 
-    login_as(Factory(:person))
+    login_as(FactoryBot.create(:person))
     get :show, params: { id: programme }
     assert_redirected_to :root
     refute_nil flash[:error]
   end
 
   test 'awaiting activation' do
-    login_as(Factory(:admin))
+    login_as(FactoryBot.create(:admin))
     Programme.destroy_all
-    prog_not_activated = Factory(:programme)
+    prog_not_activated = FactoryBot.create(:programme)
     prog_not_activated.is_activated = false
     prog_not_activated.save!
 
-    prog_rejected = Factory(:programme)
+    prog_rejected = FactoryBot.create(:programme)
     prog_rejected.is_activated = false
     prog_rejected.activation_rejection_reason = 'xxx'
     prog_rejected.save!
 
-    prog_normal = Factory(:programme)
+    prog_normal = FactoryBot.create(:programme)
 
     refute prog_not_activated.is_activated?
     refute prog_rejected.is_activated?
@@ -685,8 +685,8 @@ class ProgrammesControllerTest < ActionController::TestCase
   end
 
   test 'awaiting for activation blocked for none admin' do
-    programme_administrator = Factory(:programme_administrator)
-    normal = Factory(:person)
+    programme_administrator = FactoryBot.create(:programme_administrator)
+    normal = FactoryBot.create(:person)
 
     login_as(programme_administrator)
     get :awaiting_activation
@@ -704,9 +704,9 @@ class ProgrammesControllerTest < ActionController::TestCase
   end
 
   test 'can get storage usage' do
-    programme_administrator = Factory(:programme_administrator)
+    programme_administrator = FactoryBot.create(:programme_administrator)
     programme = programme_administrator.programmes.first
-    data_file = Factory(:data_file, project_ids: [programme.projects.first.id])
+    data_file = FactoryBot.create(:data_file, project_ids: [programme.projects.first.id])
     size = data_file.content_blob.file_size
     assert size > 0
 
@@ -719,8 +719,8 @@ class ProgrammesControllerTest < ActionController::TestCase
   end
 
   test 'non admin cannot get storage usage' do
-    programme_administrator = Factory(:programme_administrator)
-    normal = Factory(:person)
+    programme_administrator = FactoryBot.create(:programme_administrator)
+    normal = FactoryBot.create(:person)
     programme = programme_administrator.programmes.first
 
     login_as(normal)
@@ -729,12 +729,33 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute_nil flash[:error]
   end
 
+  test 'storage usage list limits to first 10' do
+    programme_administrator = FactoryBot.create(:programme_administrator)
+    programme = programme_administrator.programmes.first
+    12.times do
+      project = FactoryBot.create(:project, programme: programme)
+      FactoryBot.create(:data_file, project_ids: [project.id])
+    end
+
+    project_count = programme.projects.count
+    size = programme.projects.last.data_files.first.content_blob.file_size
+    total_size = size * 12
+
+    login_as(programme_administrator)
+    get :storage_report, params: { id: programme.id }
+
+    assert_response :success
+    assert_nil flash[:error]
+    assert_select 'strong', text: number_to_human_size(total_size)
+    assert_select 'ul.collapsed li.hidden-item', count: (project_count - 10)
+  end
+
   test 'admin can add and remove funding codes' do
-    login_as(Factory(:admin))
-    prog = Factory(:programme)
+    login_as(FactoryBot.create(:admin))
+    prog = FactoryBot.create(:programme)
 
     assert_difference('Annotation.count', 2) do
-      put :update, params: { id: prog, programme: { funding_codes: '1234,abcd' } }
+      put :update, params: { id: prog, programme: { funding_codes: ['1234','abcd'] } }
     end
 
     assert_redirected_to prog
@@ -744,7 +765,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_includes assigns(:programme).funding_codes, 'abcd'
 
     assert_difference('Annotation.count', -2) do
-      put :update, params: { id: prog, programme: { funding_codes: '' } }
+      put :update, params: { id: prog, programme: { funding_codes: [''] } }
     end
 
     assert_redirected_to prog
@@ -753,7 +774,7 @@ class ProgrammesControllerTest < ActionController::TestCase
   end
 
   test 'should create with discussion link' do
-    person = Factory(:admin)
+    person = FactoryBot.create(:admin)
     login_as(person)
     assert_difference('AssetLink.discussion.count') do
       assert_difference('Programme.count') do
@@ -768,8 +789,8 @@ class ProgrammesControllerTest < ActionController::TestCase
   end
 
   test 'should show discussion link' do
-    disc_link = Factory(:discussion_link)
-    programme = Factory(:programme)
+    disc_link = FactoryBot.create(:discussion_link)
+    programme = FactoryBot.create(:programme)
     programme.discussion_links = [disc_link]
     get :show, params: { id: programme }
     assert_response :success
@@ -777,9 +798,9 @@ class ProgrammesControllerTest < ActionController::TestCase
   end
 
   test 'should update node with discussion link' do
-    person = Factory(:admin)
+    person = FactoryBot.create(:admin)
     login_as(person)
-    programme = Factory(:programme)
+    programme = FactoryBot.create(:programme)
     programme.programme_administrator_ids = [person.id]
     assert_nil programme.discussion_links.first
     assert_difference('AssetLink.discussion.count') do
@@ -792,10 +813,10 @@ class ProgrammesControllerTest < ActionController::TestCase
   end
 
   test 'should destroy related assetlink when the discussion link is removed ' do
-    person = Factory(:admin)
+    person = FactoryBot.create(:admin)
     login_as(person)
-    asset_link = Factory(:discussion_link)
-    programme = Factory(:programme)
+    asset_link = FactoryBot.create(:discussion_link)
+    programme = FactoryBot.create(:programme)
     programme.programme_administrator_ids = [person.id]
     programme.discussion_links = [asset_link]
     assert_difference('AssetLink.discussion.count', -1) do
@@ -806,9 +827,9 @@ class ProgrammesControllerTest < ActionController::TestCase
   end
 
   test 'hide open for projects if disabled' do
-    person = Factory(:admin)
+    person = FactoryBot.create(:admin)
     login_as(person)
-    programme = Factory(:programme)
+    programme = FactoryBot.create(:programme)
     programme.programme_administrator_ids = [person.id]
     programme.save!
     with_config_value :programmes_open_for_projects_enabled, false do
@@ -824,9 +845,9 @@ class ProgrammesControllerTest < ActionController::TestCase
 
   test 'sample type programmes through nested routing' do
     assert_routing 'sample_types/2/programmes', controller: 'programmes', action: 'index', sample_type_id: '2'
-    programme = Factory(:programme)
-    programme2 = Factory(:programme, projects: [Factory(:project)])
-    sample_type = Factory(:patient_sample_type, projects:[programme.projects.first])
+    programme = FactoryBot.create(:programme)
+    programme2 = FactoryBot.create(:programme, projects: [FactoryBot.create(:project)])
+    sample_type = FactoryBot.create(:patient_sample_type, projects:[programme.projects.first])
 
     get :index, params: { sample_type_id: sample_type.id }
 
@@ -839,13 +860,13 @@ class ProgrammesControllerTest < ActionController::TestCase
 
   test 'people programmes through nested routing' do
     assert_routing 'people/2/programmes', controller: 'programmes', action: 'index', person_id: '2'
-    admin = Factory(:admin)
-    person = Factory(:programme_administrator)
+    admin = FactoryBot.create(:admin)
+    person = FactoryBot.create(:programme_administrator)
     programme = person.programmes.first
-    project = Factory(:project)
-    person.add_to_project_and_institution(project, Factory(:institution))
-    programme2 = Factory(:programme, projects: [project])
-    programme3 = Factory(:programme)
+    project = FactoryBot.create(:project)
+    person.add_to_project_and_institution(project, FactoryBot.create(:institution))
+    programme2 = FactoryBot.create(:programme, projects: [project])
+    programme3 = FactoryBot.create(:programme)
     person.save!
     person.reload
     assert_equal [programme, programme2], person.related_programmes
@@ -889,9 +910,9 @@ class ProgrammesControllerTest < ActionController::TestCase
   end
 
   test 'Empty programmes should show programme administrators as related people' do
-    person1 = Factory(:programme_administrator_not_in_project)
-    person2 = Factory(:programme_administrator_not_in_project)
-    prog1 = Factory(:min_programme, programme_administrators: [person1, person2])
+    person1 = FactoryBot.create(:programme_administrator_not_in_project)
+    person2 = FactoryBot.create(:programme_administrator_not_in_project)
+    prog1 = FactoryBot.create(:min_programme, programme_administrators: [person1, person2])
 
     assert person1.projects.empty?
 

@@ -2,13 +2,13 @@ require 'test_helper'
 
 class OauthApplicationTest < ActionDispatch::IntegrationTest
   def setup
-    @read_application = Factory(:oauth_application, scopes: 'read')
-    @write_application = Factory(:oauth_application, scopes: 'write')
-    @person = Factory(:admin)
-    @document = Factory(:private_document, contributor: @person)
+    @read_application = FactoryBot.create(:oauth_application, scopes: 'read')
+    @write_application = FactoryBot.create(:oauth_application, scopes: 'write')
+    @person = FactoryBot.create(:admin)
+    @document = FactoryBot.create(:private_document, contributor: @person)
     @user = @person.user
-    @read_access_token = Factory(:oauth_access_token, scopes: 'read', application: @read_application, resource_owner_id: @user.id)
-    @write_access_token = Factory(:oauth_access_token, scopes: 'write', application: @write_application, resource_owner_id: @user.id)
+    @read_access_token = FactoryBot.create(:oauth_access_token, scopes: 'read', application: @read_application, resource_owner_id: @user.id)
+    @write_access_token = FactoryBot.create(:oauth_access_token, scopes: 'write', application: @write_application, resource_owner_id: @user.id)
   end
 
   test 'should not allow read with no authentication' do

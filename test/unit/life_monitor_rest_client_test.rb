@@ -2,7 +2,7 @@ require 'test_helper'
 
 class LifeMonitorRestClientTest < ActiveSupport::TestCase
   setup do
-    @workflow = Factory(:workflow_with_tests, uuid: '86da0a30-d2cd-013a-a07d-000c29a94011', policy: Factory(:downloadable_public_policy))
+    @workflow = FactoryBot.create(:workflow_with_tests, uuid: '86da0a30-d2cd-013a-a07d-000c29a94011', policy: FactoryBot.create(:downloadable_public_policy))
     @token = 'FUY30D5gtDOeEPE2qu0MbWg2afrrst4whOOB1zHDtF'
     @client = LifeMonitor::Rest::Client.new(@token, 'https://localhost:8443/')
   end

@@ -16,9 +16,9 @@ class RegistrationInfoTest < ActiveSupport::TestCase
   end
 
   test 'merge works' do
-    df = Factory :data_file
-    assay = Factory :assay
-    study = Factory :study
+    df = FactoryBot.create :data_file
+    assay = FactoryBot.create :assay
+    study = FactoryBot.create :study
 
     other = Seek::Openbis::RegistrationInfo.new([study], ['err1'])
     val = @reg_info.merge(other)
@@ -43,11 +43,11 @@ class RegistrationInfoTest < ActiveSupport::TestCase
   end
 
   test 'add_created adds' do
-    df = Factory :data_file
+    df = FactoryBot.create :data_file
     val = @reg_info.add_created df
     assert_same val, @reg_info
     assert_equal [df], @reg_info.created
-    @reg_info.add_created [Factory(:data_file), Factory(:data_file)]
+    @reg_info.add_created [FactoryBot.create(:data_file), FactoryBot.create(:data_file)]
     assert_equal 3, @reg_info.created.count
   end
 end

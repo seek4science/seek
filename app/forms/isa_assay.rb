@@ -44,25 +44,26 @@ class IsaAssay
   def populate(id)
     @assay = Assay.find(id)
     @sample_type = @assay.sample_type
-    @input_sample_type_id = @sample_type.sample_attributes.detect(&:seek_sample_multi?).linked_sample_type_id
+    if @sample_type
+      @input_sample_type_id = @sample_type.sample_attributes.detect(&:seek_sample_multi?).linked_sample_type_id
+    end
   end
 
   private
 
   def validate_objects
-    @assay.errors.each { |e| errors[:base] << "[Assay]: #{e.full_message}" } unless @assay.valid?
-    errors[:base] << '[SOP]: SOP is required' if @assay.sop_ids.blank?
+    @assay.errors.each { |e| errors.add(:base, "[Assay]: #{e.full_message}") } unless @assay.valid?
 
-    @sample_type.errors.full_messages.each { |e| errors[:base] << "[Sample type]: #{e}" } unless @sample_type.valid?
+    @sample_type.errors.full_messages.each { |e| errors.add(:base, "[Sample type]: #{e}") } unless @sample_type.valid?
 
     unless @sample_type.sample_attributes.any?(&:seek_sample_multi?)
-      errors[:base] << '[Sample type]: SEEK Sample Multi attribute is not provided'
+      errors.add(:base, '[Sample type]: SEEK Sample Multi attribute is not provided')
     end
 
     unless @sample_type.sample_attributes.select { |a| a.isa_tag&.isa_protocol? }.one?
-      errors[:base] << '[Sample type]: An attribute with Protocol ISA tag is not provided'
+      errors.add(:base, '[Sample type]: An attribute with Protocol ISA tag is not provided')
     end
 
-    errors[:base] << '[Input Assay]: Input Assay is not provided' if @input_sample_type_id.blank?
+    errors.add(:base, '[Input Assay]: Input Assay is not provided') if @input_sample_type_id.blank?
   end
 end

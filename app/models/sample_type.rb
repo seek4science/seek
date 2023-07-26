@@ -41,6 +41,8 @@ class SampleType < ApplicationRecord
   has_many :assays
   has_and_belongs_to_many :studies
 
+  scope :without_template, -> { where(template_id: nil) }
+
   validates :title, presence: true
   validates :title, length: { maximum: 255 }
   validates :description, length: { maximum: 65_535 }
@@ -118,8 +120,10 @@ class SampleType < ApplicationRecord
       end.nil?
   end
 
-  def can_view?(user = User.current_user, referring_sample = nil)
-    project_membership = (user && user.person && (user.person.projects & projects).any?) 
+  def can_view?(user = User.current_user, referring_sample = nil, view_in_single_page = false)
+    return false if Seek::Config.project_single_page_advanced_enabled && template_id.present? && !view_in_single_page
+
+    project_membership = user&.person && (user.person.projects & projects).any?
     is_creator = creators.include?(user&.person)
     project_membership || public_samples? || is_creator || check_referring_sample_permission(user, referring_sample)
   end
