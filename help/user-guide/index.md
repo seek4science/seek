@@ -41,6 +41,7 @@ layout: page
      - [Organisms](general-attributes.html#organisms)
      - [Experimentalists](general-attributes.html#experimentalists)
      - [Sharing](general-attributes.html#sharing)
+     - [Publishing](general-attributes.html#publishing)
      - [Tags](general-attributes.html#tags)
      - [Attributions](general-attributes.html#attributions)
      - [Creators](general-attributes.html#creators)

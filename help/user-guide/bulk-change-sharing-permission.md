@@ -16,8 +16,12 @@ By clicking "Batch permission changes",
 ![Batch permission changes button](/images/user-guide/bulk-permission-change/button.png){:.screenshot}
 
 you can see all the items you own in two lists: 
-* Items are grouped to those included and those not included in the ISA (Investigation-Study-Assay) structure;
+* Items in the ISA (Investigation-Study-Assay) structure, except for samples.
+* Items not in the ISA structure, including samples.
+
+Note that:
 * The item list excludes **Project**, **Institution** and **Publication** since these are always publicly visible;
+* The items are not visually grouped by project, but they are visualized in descending order based on FAIRDOM-SEEK ID;
 * You can view current permissions of each item by clicking the item's name;
 * Select items you want to change their sharing permissions by checking the checkbox;
 * If no items are selected before clicking the “next” button, the error message “Please choose at least one item!” will pop up.
