@@ -94,18 +94,6 @@ module AssetsHelper
     "publish[#{item.class.name}][#{item.id}]"
   end
 
-  def sharing_item_param(item)
-    if item.try(:is_isa?)
-      "share_isa[#{item.class.name}][#{item.id}]"
-    elsif  (item.respond_to? (:investigations)) && (!item.investigations.any?)
-      "share_not_isa[#{item.class.name}][#{item.id}]"
-    elsif !item.respond_to? (:investigations)
-      "share_not_isa[#{item.class.name}][#{item.id}]"
-    else
-      "share_isa[#{item.class.name}][#{item.id}]"
-    end
-  end
-
   def include_downloadable_item?(items)
     has_downloadable_item = false
     items.each do |item|

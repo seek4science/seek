@@ -3,7 +3,7 @@ module Seek
     module PublishingCommon
       def self.included(base)
         base.before_action :set_asset, only: [:check_related_items, :publish_related_items, :check_gatekeeper_required, :publish, :published]
-        base.before_action :set_assets, :set_investigations, only: [:batch_publishing_preview]
+        base.before_action :set_assets, :set_investigations, only: [:batch_publishing_preview, :batch_sharing_permission_preview, :batch_sharing_permission_changed]
         base.before_action :set_items_for_publishing, only: [:check_gatekeeper_required, :publish]
         base.before_action :set_items_for_potential_publishing, only: [:check_related_items, :publish_related_items]
         base.before_action :publish_auth, only: [:batch_publishing_preview, :check_related_items, :publish_related_items, :check_gatekeeper_required, :publish, :waiting_approval_assets, :cancel_publishing_request]

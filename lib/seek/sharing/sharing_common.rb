@@ -7,7 +7,7 @@ module Seek
       end
 
       def batch_change_permission_for_selected_items
-        @items_for_sharing = resolve_sharing_params(params)
+        @items_for_sharing = resolve_sharing_params(params[:publish])
         if @items_for_sharing.empty?
           flash[:error] = "Please choose at least one item!"
           if params[:single_page]
@@ -40,7 +40,7 @@ module Seek
 
       def batch_sharing_permission_changed
 
-        @items_for_sharing = resolve_sharing_params(params)
+        @items_for_sharing = resolve_sharing_params(params[:publish])
         @batch_sharing_permission_changed = true
         notice_count = 0
         gatekeeper_count = 0
@@ -104,15 +104,12 @@ module Seek
 
       # returns an enumeration of assets for bulk sharing change based upon the parameters passed
       def resolve_sharing_params(params)
-        param_not_isa = params[:share_not_isa] || {}
-        param_isa = params[:share_isa] || {}
-
-        if param_not_isa.blank? && param_isa.blank?
+        if params.blank?
           [@asset].compact
         else
           assets = []
           Seek::Util.authorized_types.each do |klass|
-            ids = (param_not_isa[klass.name]&.keys || []) | (param_isa[klass.name]&.keys || [])
+            ids = params[klass.name]&.keys || []
             assets += klass.where(id: ids).to_a if ids.any?
           end
           assets.compact.uniq
