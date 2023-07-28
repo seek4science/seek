@@ -11,7 +11,9 @@
   toggle ||=false
   cb_parent_selector ||="div\##{item.class.name}_#{item.id}.split_button_parent"
   show_managers=true
-  managed_by_selector ||="div\##{item.class.name}_#{item.id}.managed_by_toggle"
+  managed_by_selector ||="div\##{item.class.name}_#{item.id}.managed_by_list"
+  show_permissions=true
+  permissions_selector ||="div\##{item.class.name}_#{item.id}.permission_list"
 
 -%>
 <div class="isa-tree <%= html_classes -%> <%= tree_class %> _<%= item.id %>">
@@ -32,7 +34,10 @@
     </div>
     <h5 class="type_and_title" style="display: inline">
       <strong><%= text_for_resource item -%>:</strong> <%= link_to item.title, item, :target => "_blank" -%>
-      <%=list_item_visibility(item)-%>
+      <a class="btn btn-default permissions_toggle" style="display: inline; margin-left:2em; padding:6px"
+          data-permissions_selector='<%= permissions_selector %>'>
+        <%=list_item_visibility(item)-%>
+      </a>
     </h5>
   <% else %>
     <div  style="display: inline; margin-right:1em">
@@ -44,16 +49,24 @@
                            cb_parent_selector: cb_parent_selector} -%>
     </div>
     <h5 class="type_and_title" style="display: inline"><strong><%= text_for_resource item -%>:</strong> This item is hidden to you</h5>
+    <%=list_item_visibility(item)-%>
+    <% show_permissions=false%>
     <% unless current_user.try(:person) && item.can_see_hidden_item?(current_user.person) %>
       <% show_managers=false%>
     <% end %>
   <% end %>
   <% if show_managers %>
-    <div class="secondary" style="display: inline; margin-left:2em" data-tooltip="<%= tooltip('Click to toggle asset\'s manager(s).') %>">
-      <a class="managed_by_toggle" data-managed_by_selector='<%= managed_by_selector %>'><span class="glyphicon glyphicon-user" aria-hidden="true"></span></a>
-      <div class="managed_by_toggle" id=<%="#{item.class.name}_#{item.id}"-%> style="display:none;margin-left:5em">
-        Manageable by <%= item.managers.empty? ? "<span class='none_text'>None</span>".html_safe : item.managers.collect { |m| link_to(h(m.title), m) }.join(", ").html_safe -%>
-      </div>
+    <a class="btn btn-default managed_by_toggle" style="display: inline; margin-left:1em; padding:6px"
+        data-managed_by_selector='<%= managed_by_selector %>'>
+      <span class="glyphicon glyphicon-user" aria-hidden="true" style="position:relative; top:2px;" ></span>
+    </a>
+    <div class="managed_by_list" id=<%="#{item.class.name}_#{item.id}"-%> style="display:none;margin-left:5em">
+      <strong>Manageable by:</strong> <%= item.managers.empty? ? "<span class='none_text'>None</span>".html_safe : item.managers.collect { |m| link_to(h(m.title), m) }.join(", ").html_safe -%>
     </div>
+  <% end %>
+  <% if show_permissions %>
+      <div class="permission_list" id=<%="#{item.class.name}_#{item.id}"-%> style="display:none;margin-left:5em" >
+        <%=  get_permission_list item -%>
+      </div>
   <% end %>
 </div>

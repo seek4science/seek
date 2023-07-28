@@ -1,6 +1,7 @@
 <%
   publishing ||= false
   show_hide_blocked ||= false
+  show_hide_permissions ||= false
   blocked_selector ||= ''
 -%>
 
@@ -20,18 +21,24 @@
 <br/><br/>
 <div>
   <label><a class="selectChildren" id="select_all" data-cb_parent_selector='body' >
-    Select all your items </a></label> |
-  <label><a class="deselectChildren" id="deselect_all" data-cb_parent_selector='body' >
-    Deselect all your items </a></label> |
-  <label><a class="collapseChildren" id="collapse_all" data-cb_parent_selector='body' >
-    Collapse all </a></label> |
-  <label><a class="expandChildren" id="expand_all" data-cb_parent_selector='body' >
+    Select all your items </a></label>
+  | <label><a class="deselectChildren" id="deselect_all" data-cb_parent_selector='body' >
+    Deselect all your items </a></label>
+  || <label><a class="collapseChildren" id="collapse_all" data-cb_parent_selector='body' >
+    Collapse all </a></label>
+  | <label><a class="expandChildren" id="expand_all" data-cb_parent_selector='body' >
     Expand all </a></label>
   <% if show_hide_blocked %>
-    | <label><a class="showBlocked" data-cb_parent_selector='div#sorted_by_type,#sorted_by_isa' data-blocked_selector="<%="#{blocked_selector}"%>">
-  Show blocked items </a></label>
+    || <label><a class="showBlocked" data-cb_parent_selector='div#sorted_by_type,#sorted_by_isa' data-blocked_selector="<%="#{blocked_selector}"%>">
+      Show blocked items </a></label>
     | <label><a class="hideBlocked" data-cb_parent_selector='div#sorted_by_type,#sorted_by_isa' data-blocked_selector="<%="#{blocked_selector}"%>">
-  Hide blocked items </a></label>
+      Hide blocked items </a></label>
+  <% end %>
+  <% if show_hide_permissions %>
+    || <label><a class="showPermissions" data-permissions_selector='div.permission_list' >
+      Show all permissions </a></label>
+    | <label><a class="hidePermissions" data-permissions_selector='div.permission_list' >
+      Hide all permissions </a></label>
   <% end %>
 </div>
 
@@ -95,12 +102,12 @@
         | <label><a class="deselectChildren" id="deselect_all_items_in_isa"
                   data-cb_parent_selector='div#items_in_isa' >
           Deselect all items in ISA </a></label>
-        | <label><a class="collapseChildren" id="collapse_isa" data-cb_parent_selector='div#investigation_list' >
+        || <label><a class="collapseChildren" id="collapse_isa" data-cb_parent_selector='div#investigation_list' >
           Collapse all </a></label>
         | <label><a class="expandChildren" id="expand_isa" data-cb_parent_selector='div#items_in_isa' >
           Expand all </a></label>
         <% if show_hide_blocked %>
-          | <label><a class="showBlocked" data-cb_parent_selector='div#items_in_isa' data-blocked_selector="<%="#{blocked_selector}"%>">
+          || <label><a class="showBlocked" data-cb_parent_selector='div#items_in_isa' data-blocked_selector="<%="#{blocked_selector}"%>">
             Show blocked items </a></label>
           | <label><a class="hideBlocked" data-cb_parent_selector='div#items_in_isa' data-blocked_selector="<%="#{blocked_selector}"%>">
             Hide blocked items </a></label>

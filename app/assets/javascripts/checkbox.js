@@ -18,6 +18,15 @@ $j(document).ready(function () {
     $j("a.managed_by_toggle").click(function () {
         toggleManagers(this,$j(this).data("managed_by_selector"))
     })
+    $j("a.permissions_toggle").click(function () {
+        togglePermissions(this,$j(this).data("permissions_selector"),'')
+    })
+    $j("a.showPermissions").click(function () {
+        togglePermissions(this,$j(this).data("permissions_selector"),'show')
+    })
+    $j("a.hidePermissions").click(function () {
+        togglePermissions(this,$j(this).data("permissions_selector"),'hide')
+    })
     $j("div.isa-tree-toggle-open").click(function () {
         isaTreeShow(this,$j(this).data("cb_parent_selector"))
     })
@@ -68,6 +77,19 @@ function checkRepeatedItems(checkbox_element) {
 
 function toggleManagers(item,managed_by_selector) {
     $j(managed_by_selector).toggle()
+}
+
+function togglePermissions(item,permissions_selector,state) {
+    switch(state){
+        case 'show':
+            $j(permissions_selector).show()
+            break
+        case 'hide':
+            $j(permissions_selector).hide()
+            break
+        default:
+            $j(permissions_selector).toggle()
+    }
 }
 
 function isaTreeShow(item,cb_parent_selector) {

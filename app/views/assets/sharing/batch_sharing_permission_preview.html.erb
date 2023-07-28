@@ -8,9 +8,7 @@
 
 <div class="alert alert-info">
   <ul>
-    <li>Items are grouped to those included and those not included in the <b>ISA (Investigation-Study-Assay) structure</b>.</li>
-    <li>The item list excludes <b>Project</b>, <b>Institution</b> and <b>Publication</b> since these are always publicly visible</li>
-    <li>You can view current permissions of each item by clicking the item's name.</li>
+    <li>You can view the details of current permissions for each item by clicking the item's policy icon.</li>
     <li>After your confirmation, the newly modified permissions will be highlighted with <span class="sharing_permission_changed"></span>  .</li>
   </ul>
 </div>
@@ -27,6 +25,7 @@
       <%= render :partial => "assets/batch_asset_selection",
                  :locals => { :publishing => false,
                               :show_hide_blocked => true,
+                              :show_hide_permissions => true,
                               :blocked_selector => '.not-visible,.not-manageable'
                  }
       -%>
@@ -37,3 +36,9 @@
     <% end -%>
   <% end -%>
 </div>
+
+<script type="text/javascript">
+    $j(document).ready(function () {
+        $j('.sharing_permission_changed').parents('div.permission_list').show()
+    })
+</script>
