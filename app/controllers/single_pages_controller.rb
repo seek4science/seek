@@ -3,6 +3,7 @@ require 'isatab_converter'
 class SinglePagesController < ApplicationController
   include Seek::AssetsCommon
   include Seek::Sharing::SharingCommon
+  include Seek::Publishing::PublishingCommon
 
   before_action :set_up_instance_variable
   before_action :project_single_page_enabled?

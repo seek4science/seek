@@ -11,7 +11,7 @@ module Seek
         if @items_for_sharing.empty?
           flash[:error] = "Please choose at least one item!"
           if params[:single_page]
-            redirect_to batch_sharing_permission_preview_person_url(current_user.person, { single_page: true })
+            render 'single_pages/sample_batch_sharing_permissions_changed', { layout: false }
           else
             redirect_to batch_sharing_permission_preview_person_url(current_user.person)
           end
@@ -30,16 +30,11 @@ module Seek
         @batch_sharing_permission_changed = false
         flash[:notice] = nil
         respond_to do |format|
-          if params[:single_page]
-            format.html { render 'single_pages/sample_batch_sharing_permission_preview', { layout: false } }
-          else
-            format.html { render 'assets/sharing/batch_sharing_permission_preview' }
-          end
+          format.html { render 'assets/sharing/batch_sharing_permission_preview' }
         end
       end
 
       def batch_sharing_permission_changed
-
         @items_for_sharing = resolve_sharing_params(params[:publish])
         @batch_sharing_permission_changed = true
         notice_count = 0
@@ -71,10 +66,10 @@ module Seek
         flash[:notice] += gatekeeper_count == 0 ? "": (gatekeeper_flash+"</ul>"+"The #{"item".pluralize(gatekeeper_count)} will not be published until approved.").html_safe
         flash.now[:notice] = (notice_count+gatekeeper_count) == 0 ? nil: flash[:notice].html_safe
         flash.now[:error] = error_count == 0 ? nil: (flash[:error]+"</ul>").html_safe
-        respond_to do |format|
-          if params[:single_page]
-            format.html { render 'single_pages/sample_batch_sharing_permission_preview', { layout: false } }
-          else
+        if params[:single_page]
+          render 'single_pages/sample_batch_sharing_permissions_changed', { layout: false }
+        else
+          respond_to do |format|
             format.html { render 'assets/sharing/batch_sharing_permission_preview' }
           end
         end

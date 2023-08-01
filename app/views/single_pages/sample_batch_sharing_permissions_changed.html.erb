@@ -1,0 +1,21 @@
+<%
+  flash_exists = flash[:error] || flash[:notice]
+%>
+
+<% if !flash_exists %>
+  <%= show_title "I was not expecting anyone to get here... how did you get here?"  -%>
+<% end %>
+
+<% if flash_exists %>
+  <div id="notice_flash" class="fade in alert alert-<%= flash[:notice] ? "success" : "danger" %> alert-dismissable" role="alert">
+    <% if flash[:notice] %>
+      <%= flash[:notice]%>
+    <% else%>
+      <%= flash[:error]%>
+      <% flash[:error]=nil %>
+    <% end %>
+  </div>
+    <a id="hide-permissions-changed" class=" btn btn-default" onclick="$j('#change-batch-permission-modal').modal('hide')">Ok</a>
+<% end %>
+
+

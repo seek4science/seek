@@ -20,11 +20,13 @@ exportToExcel||="sampleExportExcel()"
 <script>
   function loadBatchPermission(dtName, e){
     const sample_ids = window[dtName].selectedSampleIds()
+    let publish_list = {'Sample': {}}
+    for(let id of sample_ids){ publish_list['Sample'][id]='1' }
 
     $j.ajax({
-      method: "GET",
-      url: "<%= batch_sharing_permission_preview_single_pages_path %>",
-      data: { sample_ids, single_page: true },
+      method: "POST",
+      url: "<%= batch_change_permission_for_selected_items_single_pages_path %>",
+      data: { publish: publish_list, single_page: true },
       success: (res) => {
         if (res?.status == "unprocessable_entity"){
           alert(res?.error)
