@@ -32,7 +32,7 @@ module Ga4gh
 
         def set_content_type
           # Needed because otherwise it wrongly gets the JSON-API MIME type
-          self.content_type = "application/json" if content_type.start_with?('application/vnd.api+json')
+          self.content_type = "application/json" if content_type&.start_with?('application/vnd.api+json')
         end
 
         def check_trs_enabled
