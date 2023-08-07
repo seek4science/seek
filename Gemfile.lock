@@ -734,13 +734,6 @@ GEM
     ro-crate (0.5.1)
       addressable (>= 2.7, < 2.9)
       rubyzip (~> 2.0.0)
-    roo (2.10.0)
-      nokogiri (~> 1)
-      rubyzip (>= 1.3.0, < 3.0.0)
-    roo-xls (1.2.0)
-      nokogiri
-      roo (>= 2.0.0, < 3)
-      spreadsheet (> 0.9.0)
     rsolr (2.5.0)
       builder (>= 2.1.2)
       faraday (>= 0.9, < 3, != 2.0.0)
@@ -772,7 +765,6 @@ GEM
       unicode-display_width (>= 1.4.0, < 3.0)
     rubocop-ast (1.15.1)
       parser (>= 3.0.1.1)
-    ruby-ole (1.2.12.2)
     ruby-prof (1.4.3)
     ruby-progressbar (1.11.0)
     ruby2_keywords (0.0.5)
@@ -851,8 +843,6 @@ GEM
     sparql-client (3.2.0)
       net-http-persistent (~> 4.0, >= 4.0.1)
       rdf (~> 3.2)
-    spreadsheet (1.3.0)
-      ruby-ole
     sprockets (4.2.0)
       concurrent-ruby (~> 1.0)
       rack (>= 2.2.4, < 4)
@@ -1071,8 +1061,6 @@ DEPENDENCIES
   rmagick (= 4.2.5)
   ro-bundle (~> 0.3.0)
   ro-crate (~> 0.5.1)
-  roo (~> 2.10.0)
-  roo-xls (~> 1.1)
   rspec-rails (~> 5.1)
   rubocop
   ruby-prof
