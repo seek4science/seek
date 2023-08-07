@@ -119,7 +119,7 @@ class SinglePagesControllerTest < ActionController::TestCase
                                       sample_type_id: source_sample_type.id }
 
       assert_response :bad_request
-      assert_equal flash[:error], "Please upload a valid spreadsheet file with extension '.xls' or '.xlsx'"
+      assert_equal flash[:error], "Please upload a valid spreadsheet file with extension '.xlsx'"
     end
   end
 
