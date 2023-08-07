@@ -14,7 +14,7 @@
 
 <% if valid_assay %>
     <script>
-        let sampleDynamicTable
+        var sampleDynamicTable
         $j(document).ready(function () {
             $j('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
                 $j.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
