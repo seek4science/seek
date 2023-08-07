@@ -209,8 +209,10 @@
     const newSamples = { data: getNewSamples() };
     const updatedSamples= { data: getUpdateSamples() };
 
-      uploadAjaxCall("<%= batch_create_samples_path %>", "POST", { data: JSON.stringify(newSamples) });
-      uploadAjaxCall("<%= batch_update_samples_path %>", "PUT", { data: JSON.stringify(updatedSamples) });
+    if (newSamples.data === "abort") return;
+
+    uploadAjaxCall("<%= batch_create_samples_path %>", "POST", { data: JSON.stringify(newSamples) });
+    uploadAjaxCall("<%= batch_update_samples_path %>", "PUT", { data: JSON.stringify(updatedSamples) });
 
     closeModalForm();
     location.reload();
@@ -227,7 +229,7 @@
         createRows = createRows.concat(duplicatedRows);
       } else {
         closeModalForm();
-        return;
+        return "abort";
       }
     }
 
@@ -249,9 +251,9 @@
     cells.map(function(cell){
       val = cell.textContent;
       key = cell.id.match(/\[.*\]/)[0].replace('[', "").replace("]", '');
-      const multiInputfields = $j(cell).find('span[class*="label"]').toArray();
+      const multiInputfields = $j(cell).find('span[class*="badge"]').toArray();
       if (multiInputfields.length > 0 ){
-        const inputIds = multiInputfields.map(is => is.title).join(',');
+        const inputIds = multiInputfields.map(is => is.title.split(" ").pop()).join(',');
         samplesObj[key] = inputIds;
       } else {
         samplesObj[key] = val;
