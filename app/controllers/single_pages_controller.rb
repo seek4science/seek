@@ -192,7 +192,7 @@ class SinglePagesController < ApplicationController
       obj = {}
       (0..sample_fields.size - 1).map do |i|
         if @multiple_input_fields.include?(sample_fields[i])
-          parsed_excel_input_samples = JSON.parse(excel_sample[i].gsub('=>', ':')).map do |subsample|
+          parsed_excel_input_samples = JSON.parse(excel_sample[i].gsub(/\"=>/x, "\":")).map do |subsample|
             # Uploader should at least have viewing permissions for the inputs he's using
             unless Sample.find(subsample['id'])&.authorized_for_view?
               raise "Unauthorized Sample was detected in spreadsheet: #{subsample.inspect}"
