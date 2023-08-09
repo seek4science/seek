@@ -3,19 +3,19 @@ FactoryBot.define do
     title { 'age' }
     association :sample_attribute_type, factory: :integer_sample_attribute_type
   end
-  
+
   factory(:age_custom_metadata_attribute_with_description_and_label,class:CustomMetadataAttribute) do
     title { 'age' }
     association :sample_attribute_type, factory: :integer_sample_attribute_type
     description { 'You need to enter age.' }
     label { 'Biological age' }
   end
-  
+
   factory(:name_custom_metadata_attribute,class:CustomMetadataAttribute) do
     title { 'name' }
     association :sample_attribute_type, factory: :string_sample_attribute_type
   end
-  
+
   factory(:datetime_custom_metadata_attribute,class:CustomMetadataAttribute) do
     title { 'date' }
     association :sample_attribute_type, factory: :datetime_sample_attribute_type
@@ -34,12 +34,12 @@ FactoryBot.define do
       a.custom_metadata_attributes << cv_attribute
     end
   end
-  
+
   factory(:cv_list_custom_metadata_attribute,class:CustomMetadataAttribute) do
     title { 'CVList' }
     association :sample_attribute_type, factory: :datetime_sample_attribute_type
   end
-  
+
   factory(:simple_investigation_custom_metadata_type,class: CustomMetadataType) do
     title { 'simple investigation custom metadata type' }
     supported_type { 'Investigation' }
@@ -49,7 +49,7 @@ FactoryBot.define do
       a.custom_metadata_attributes << FactoryBot.create(:datetime_custom_metadata_attribute)
     end
   end
-  
+
   factory(:simple_investigation_custom_metadata_type_with_description_and_label,class: CustomMetadataType) do
     title { 'simple investigation custom metadata type' }
     supported_type { 'Investigation' }
@@ -59,17 +59,17 @@ FactoryBot.define do
       a.custom_metadata_attributes << FactoryBot.create(:datetime_custom_metadata_attribute)
     end
   end
-  
+
   factory(:simple_study_custom_metadata_type, parent: :simple_investigation_custom_metadata_type) do
     title { 'simple study custom metadata type' }
     supported_type { 'Study' }
   end
-  
+
   factory(:simple_assay_custom_metadata_type, parent: :simple_investigation_custom_metadata_type) do
     title { 'simple study custom metadata type' }
     supported_type { 'Assay' }
   end
-  
+
   factory(:study_custom_metadata_type_with_spaces, class: CustomMetadataType) do
     title { 'study custom metadata type with spaces' }
     supported_type { 'Study' }
@@ -79,7 +79,7 @@ FactoryBot.define do
     end
   end
 
-  
+
   factory(:study_custom_metadata_type_with_clashes, class: CustomMetadataType) do
     title { 'study custom metadata type with clashes' }
     supported_type { 'Study' }
@@ -89,7 +89,7 @@ FactoryBot.define do
       a.custom_metadata_attributes << FactoryBot.create(:name_custom_metadata_attribute, title:'full  name')
     end
   end
-  
+
   factory(:study_custom_metadata_type_with_symbols, class: CustomMetadataType) do
     title { 'study custom metadata type with symbols' }
     supported_type { 'Study' }
@@ -100,7 +100,7 @@ FactoryBot.define do
       a.custom_metadata_attributes << FactoryBot.create(:name_custom_metadata_attribute, title:'name(name)')
     end
   end
-  
+
   factory(:study_custom_metadata_type_for_MIAPPE, class: CustomMetadataType) do
     title { 'MIAPPE metadata' }
     supported_type { 'Study' }
@@ -157,7 +157,7 @@ FactoryBot.define do
 
   factory(:role_name_custom_metadata_type,class:CustomMetadataType) do
     title { 'role_name' }
-    supported_type { 'Study' }
+    supported_type { 'CustomMetadata' }
     after(:build) do |a|
       a.custom_metadata_attributes << FactoryBot.create(:first_name_custom_metadata_attribute,required: true)
       a.custom_metadata_attributes << FactoryBot.create(:last_name_custom_metadata_attribute, required: true)
@@ -218,9 +218,9 @@ FactoryBot.define do
     association :linked_custom_metadata_type, factory: :role_name_custom_metadata_type
   end
 
-  factory(:child_name_linked_custom_metadata_attribute,class:CustomMetadataAttribute) do
+  factory(:child_name_linked_custom_metadata_attribute_multi_attribute,class:CustomMetadataAttribute) do
     title { 'child' }
-    association :sample_attribute_type, factory: :custom_metadata_sample_attribute_type
+    association :sample_attribute_type, factory: :custom_metadata_multi_sample_attribute_type
     association :linked_custom_metadata_type, factory: :role_name_custom_metadata_type
   end
 
@@ -230,8 +230,55 @@ FactoryBot.define do
     after(:build) do |a|
       a.custom_metadata_attributes << FactoryBot.create(:dad_linked_custom_metadata_attribute,required: true)
       a.custom_metadata_attributes << FactoryBot.create(:mom_linked_custom_metadata_attribute,required: true)
-      a.custom_metadata_attributes << FactoryBot.create(:child_name_linked_custom_metadata_attribute)
+      a.custom_metadata_attributes << FactoryBot.create(:child_name_linked_custom_metadata_attribute_multi_attribute)
     end
   end
 
+
+  # for testing linked custom metadata multi
+  factory(:role_affiliation_name_custom_metadata_attribute,class:CustomMetadataAttribute) do
+    title { 'role_affiliation_name' }
+    association :sample_attribute_type, factory: :string_sample_attribute_type
+  end
+
+
+  factory(:identifier_custom_metadata_attribute,class:CustomMetadataAttribute) do
+    title { 'identifier' }
+    association :sample_attribute_type, factory: :string_sample_attribute_type
+  end
+
+  factory(:scheme_custom_metadata_attribute,class:CustomMetadataAttribute) do
+    title { 'scheme' }
+    association :sample_attribute_type, factory: :string_sample_attribute_type
+  end
+
+
+
+  factory(:role_affiliation_identifiers_linked_custom_metadata_attribute_multi_attribute,class:CustomMetadataAttribute) do
+    title { 'role_affiliation_identifiers' }
+    association :sample_attribute_type, factory: :custom_metadata_multi_sample_attribute_type
+    association :linked_custom_metadata_type, factory: :role_affiliation_identifiers_custom_metadata_type
+  end
+
+  factory(:role_affiliation_identifiers_custom_metadata_type,class:CustomMetadataType) do
+    title { 'role_affiliation_identifiers' }
+    supported_type { 'CustomMetadata' }
+    after(:build) do |a|
+      a.custom_metadata_attributes << FactoryBot.create(:identifier_custom_metadata_attribute, required: true)
+      a.custom_metadata_attributes << FactoryBot.create(:scheme_custom_metadata_attribute, required: true)
+    end
+  end
+
+
+  factory(:role_affiliation_custom_metadata_type,class:CustomMetadataType) do
+    title { 'role_affiliation' }
+    supported_type { 'Study' }
+    after(:build) do |a|
+      a.custom_metadata_attributes << FactoryBot.create(:role_affiliation_name_custom_metadata_attribute,required: true)
+      a.custom_metadata_attributes << FactoryBot.create(:role_affiliation_identifiers_linked_custom_metadata_attribute_multi_attribute,required:true)
+    end
+  end
+
+
 end
+
