@@ -1,3 +1,9 @@
+<%
+  def any_samples_to_upload?
+    !((@new_samples.nil? or @new_samples.compact.none?) and (@update_samples.nil? or @update_samples.compact.none?) and (@possible_duplicates.nil? or @possible_duplicates.compact.none?))
+  end
+%>
+
 <% can_upload = true %>
 <div id="upload-summary">
 
@@ -84,7 +90,7 @@
           </tr>
           <% for update_sample in @update_samples %>
             <tr id='<%= "update-sample-#{update_sample['id']}-updated" %>' >
-              <% db_sample = @db_samples.select { |s| s['id'] == update_sample['id'] }.first %>
+              <% db_sample = @authorized_db_samples.select { |s| s['id'] == update_sample['id'] }.first %>
               <td rowspan=2><button id=<%= "remove-#{update_sample['id']}" %> class="glyphicon glyphicon-trash danger" style="background-color:#d9534f;color:white;" onclick=<%= "removeSample('update-sample-#{update_sample['id']}')" %>></button></td>
               <% update_sample.map do |key, val| %>
                 <% unless key == 'uuid' %>
@@ -123,7 +129,7 @@
 
   <% # Possible Duplicate Samples panel %>
   <% unless @possible_duplicates.nil? or @possible_duplicates.compact.none? %>
-    <%= folding_panel("Possible Duplicates <span id='duplicate-samples-counter' class='label label-danger'>#{@possible_duplicates.size}</span>", true, :id => "existing-samples-panel", :body_options => {:id => "existing-samples-panel-content"},
+    <%= folding_panel("Possible Duplicates <span id='duplicate-samples-counter' class='label label-danger'>#{@possible_duplicates.size}</span>", true, :id => "duplicate-samples-panel", :body_options => {:id => "duplicate-samples-panel-content"},
                     :help_text => "These new samples have been matched to already existing samples.") do %>
       <div class="table-responsive">
         <table id="duplicate-samples-table" class="table">
@@ -174,6 +180,47 @@
     <% end %>
   <% end %>
 
+  <% # Panel for Sample with wrong permissions %>
+  <% unless @unauthorized_samples.nil? or @unauthorized_samples.compact.none? %>
+    <% can_upload = false %>
+    <%= folding_panel("Unauthorized Samples", false, :id => "unauthorized-samples-panel", :body_options => {:id => "unauthorized-samples-panel-content"},
+                  :help_text => "Sample the current user does not have permission to edit them.") do %>
+      <div>
+        <p>
+          <b>You don't have permission to edit the samples listed below. Please contact the submitter of these samples or revert the changes in the spreadsheet to its original values.</b>
+        </p>
+      </div>
+      <div class="table-responsive">
+        <table id="unauthorized-samples-table" class="table">
+          <tr>
+            <% for key in @unauthorized_samples[0].keys %>
+              <% unless key == 'uuid' %>
+                <th><%= key %></th>
+              <% end %>
+            <% end %>
+          </tr>
+          <% for unauthorized_sample in @unauthorized_samples %>
+            <tr id='<%= "unauthorized-sample-#{unauthorized_sample['id']}" %>' class="">
+              <% unauthorized_sample.map do |key, val| %>
+                <% unless key == 'uuid' %>
+                  <% if @multiple_input_fields.include?(key) %>
+                    <td>
+                      <% val.each do |sub_sample| %>
+                        <span class="badge", title='ID: <%= sub_sample['id'] %>'><%= sub_sample['title'] %></span>
+                      <% end %>
+                    </td>
+                  <% else %>
+                    <td><%= val %></td>
+                  <% end %>
+                <% end %>
+              <% end %>
+            </tr>
+          <% end %>
+        </table>
+      </div>
+    <% end %>
+  <% end %>
+
   <div id='check-excel-upload-result'></div>
   <% unless can_upload %>
     <div class="alert alert-danger alert-dismissible" role="alert">
@@ -184,7 +231,7 @@
     </div>
   <% end %>
 
-  <%= submit_tag "Upload", data: {disable_with: 'Uploading ...'}, :class => 'btn btn-primary', onclick: "submitUpload()" if can_upload%>
+  <%= submit_tag "Upload", data: {disable_with: 'Uploading ...'}, :class => 'btn btn-primary', onclick: "submitUpload()" if (can_upload and any_samples_to_upload?)%>
   <%= submit_tag "Cancel", data: {id: 'cancelModalUploadExcel'}, :class => 'btn btn-secondary', onclick: "closeModalForm()" %>
 </div>
 

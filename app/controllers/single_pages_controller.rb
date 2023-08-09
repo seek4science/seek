@@ -178,7 +178,6 @@ class SinglePagesController < ApplicationController
 
     samples_data.compact!
 
-
     # Compare Excel header row to Sample Type Sample Attributes
     # Should raise an error if they don't match
     sample_type_attributes = %w[id uuid].concat(@sample_type.sample_attributes.map(&:title))
@@ -217,17 +216,29 @@ class SinglePagesController < ApplicationController
     existing_excel_samples = excel_samples.map { |sample| sample unless sample['id'].nil? }.compact
     new_excel_samples = excel_samples.map { |sample| sample if sample['id'].nil? }.compact
 
-    @db_samples = @sample_type.samples&.authorized_for(:edit)&.map do |sample|
+    @db_samples = @sample_type.samples&.map do |sample|
       attributes = JSON.parse(sample[:json_metadata])
       { 'id' => sample.id,
         'uuid' => sample.uuid }.merge(attributes)
     end
 
-    # Determine whether samples have been modified or not
-    @update_samples = existing_excel_samples.map do |ees|
+    @authorized_db_samples = @sample_type.samples&.authorized_for(:edit)&.map do |sample|
+      attributes = JSON.parse(sample[:json_metadata])
+      { 'id' => sample.id,
+        'uuid' => sample.uuid }.merge(attributes)
+    end
+
+    # Determine whether samples have been modified or not,
+    # and checking whether the user is permitted to edit them
+    @unauthorized_samples = []
+    @update_samples = []
+    existing_excel_samples.map do |ees|
       db_sample = @db_samples.select { |s| s['id'] == ees['id'] }.first
+
       # An exception is raised if the ID of an existing Sample cannot be found in the DB
       raise "Sample with id '#{ees['id']}' does not exist in the database. Sample upload was aborted!" if db_sample.nil?
+
+      is_authorized_for_update = @authorized_db_samples.select { |s| s['id'] == ees['id'] }.any?
 
       is_changed = false
 
@@ -238,9 +249,14 @@ class SinglePagesController < ApplicationController
         end
       end
 
-      ees if is_changed
+      if is_changed
+        if is_authorized_for_update
+          @update_samples.append(ees)
+        else
+          @unauthorized_samples.append(ees)
+        end
+      end
     end
-    @update_samples.compact!
 
     # Determine if the new samples are no duplicates of existing ones,
     # based on the attribute values
@@ -249,36 +265,26 @@ class SinglePagesController < ApplicationController
     new_excel_samples.map do |nes|
       is_duplicate = true
 
-      @db_samples.map do |dbs|
+      @authorized_db_samples.map do |dbs|
         dbs.map do |k, v|
           unless %w[id uuid].include?(k)
             is_duplicate = (nes[k] == v)
             break unless is_duplicate
           end
         end
+
         if is_duplicate
           @possible_duplicates.append(nes.merge({ 'duplicate' => dbs }))
           break
         end
       end
-      if @db_samples.none?
+
+      if @authorized_db_samples.none?
         @new_samples.append(nes)
       else
         @new_samples.append(nes) unless is_duplicate
       end
     end
-
-    upload_data = { study: @study,
-                    assay: @assay,
-                    sampleType: @sample_type,
-                    excel_samples: excel_samples,
-                    existingExcelSamples: existing_excel_samples,
-                    newExcelSamples: new_excel_samples,
-                    updateSamples: @update_samples,
-                    newSamples: @new_samples,
-                    possibleDuplicates: @possible_duplicates,
-                    dbSamples: @db_samples }
-
 
     respond_to do |format|
       format.json { render json: { uploadData: upload_data } }
