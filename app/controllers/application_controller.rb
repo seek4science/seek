@@ -597,33 +597,26 @@ class ApplicationController < ActionController::Base
   end
 
   def determine_custom_metadata_keys
-
-    root_key = controller_name.singularize.to_sym
-    return [] unless params[root_key][:custom_metadata_attributes].present?
-    attribute_params = params[root_key][:custom_metadata_attributes]
-    recursive_determine_custom_metadata_keys(attribute_params)
-
+    keys = []
+    type_id = params.dig(controller_name.singularize.to_sym, :custom_metadata_attributes, :custom_metadata_type_id)
+    if type_id.present?
+      metadata_type = CustomMetadataType.find(type_id)
+      keys = [:custom_metadata_type_id, :id, data: recursive_determine_custom_metadata_keys(metadata_type)]
+    end
+    keys
   end
 
-  # todo currently 2-level nested attributes are tested, we would like to test if it also works with more level nested attributes
-  def recursive_determine_custom_metadata_keys(attribute_params)
+  def recursive_determine_custom_metadata_keys(metadata_type)
     keys = []
-    if attribute_params && attribute_params[:custom_metadata_type_id].present?
-      metadata_type = CustomMetadataType.find(attribute_params[:custom_metadata_type_id])
-      if metadata_type
-        keys = [:custom_metadata_type_id,:id,:custom_metadata_attribute_id]
-        cma= []
-        metadata_type.custom_metadata_attributes.each do |attr|
-          if attr.sample_attribute_type.controlled_vocab? || attr.sample_attribute_type.seek_sample_multi?
-            cma << {attr.title=>[]}
-            cma << attr.title.to_s
-          elsif  attr.linked_custom_metadata?
-            cma << { attr.title => recursive_determine_custom_metadata_keys(attribute_params[:data][attr.title.to_sym])}
-          else
-            cma << attr.title.to_s
-          end
-        end
-        keys = keys + [{data:cma}]
+    metadata_type.custom_metadata_attributes.each do |attr|
+      key = attr.title.to_sym
+      if attr.sample_attribute_type.controlled_vocab? || attr.sample_attribute_type.seek_sample_multi?
+        keys << key
+        keys << { key => [] }
+      elsif attr.linked_custom_metadata? || attr.linked_custom_metadata_multi?
+        keys << { key => recursive_determine_custom_metadata_keys(attr.linked_custom_metadata_type) }
+      else
+        keys << key
       end
     end
     keys

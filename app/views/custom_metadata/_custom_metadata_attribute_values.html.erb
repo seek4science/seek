@@ -8,10 +8,12 @@
     <div class="panel-body">
 
       <% resource.custom_metadata.custom_metadata_attributes.each do |attribute| %>
-        <p>
-          <label><%= attribute.label %>:</label>
-          <%= display_attribute(resource.custom_metadata, attribute, link: true) %>
-        </p>
+        <% unless resource.custom_metadata.data[attribute.title].blank? %>
+          <p>
+            <label><%= attribute.label %>:</label>
+            <%= display_attribute(resource.custom_metadata, attribute, link: true) %>
+          </p>
+        <% end %>
       <% end %>
 
     </div>

@@ -155,7 +155,23 @@ module Seek
       item.policy.set_attributes_with_sharing(policy_params(parameters)) if policy_params(parameters).present?
     end
 
-    def update_linked_custom_metadatas(item, parameters = params)
+    def handle_asset_save(asset)
+      return if asset.valid?
+      raise ActiveRecord::Rollback
+      asset.errors.messages.each do |error|
+        errors.push({ error: error })
+      end
+    end
+
+    def update_linked_custom_metadatas(item)
+      item.transaction do
+        handle_linked_custom_metadatas(item)
+        handle_asset_save(item)
+      end
+    end
+
+
+    def handle_linked_custom_metadatas(item, parameters = params)
 
       root_key = controller_name.singularize.to_sym
 

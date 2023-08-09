@@ -23,6 +23,7 @@ class CustomMetadataType < ApplicationRecord
 
   def supported_type_must_be_valid_type
     return if supported_type.blank? # already convered by presence validation
+    return if supported_type == "CustomMetadata"
     unless Seek::Util.lookup_class(supported_type, raise: false)
       errors.add(:supported_type, 'is not a type that can supported custom metadata')
     end
