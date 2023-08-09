@@ -286,6 +286,19 @@ class SinglePagesController < ApplicationController
       end
     end
 
+    upload_data = { study: @study,
+                    assay: @assay,
+                    sampleType: @sample_type,
+                    excel_samples: excel_samples,
+                    existingExcelSamples: existing_excel_samples,
+                    newExcelSamples: new_excel_samples,
+                    updateSamples: @update_samples,
+                    newSamples: @new_samples,
+                    possibleDuplicates: @possible_duplicates,
+                    dbSamples: @db_samples,
+                    authorized_db_samples: @authorized_db_samples,
+                    unauthorized_samples: @unauthorized_samples }
+
     respond_to do |format|
       format.json { render json: { uploadData: upload_data } }
       format.html { render 'single_pages/sample_upload_content', { layout: false } }
