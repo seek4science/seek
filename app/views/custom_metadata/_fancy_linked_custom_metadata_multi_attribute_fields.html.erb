@@ -1,0 +1,48 @@
+<% key = attribute.title %>
+<% value ||= [] %>
+
+  <div id="<%= key %>">
+    <div class="table linked_custom_metdata_odd" id="<%= key.singularize %>-table">
+      <% value.each_with_index do |v, index| %>
+        <%= render partial: 'custom_metadata/single_row', locals: { key: key, index: index, value: v, attribute: attribute, element_name: element_name, element_class: element_class } %>
+      <% end %>
+
+      <div id="<%= key.singularize %>-row">
+        <div colspan="6">
+          <%= button_link_to('Add more', 'add', '#', :id => "add-#{key.singularize}-row") %>
+        </div>
+      </div>
+    </div>
+
+    <div id="new-<%= key.singularize %>-row" style="display: none">
+      <%= render partial: 'custom_metadata/single_row', locals: { attribute: attribute, element_name: element_name, element_class: element_class } %>
+    </div>
+  </div>
+
+<script>
+    $j(document).ready(function () {
+
+        $j('#add-<%= key.singularize %>-row').click(function () {
+            var newRow = $j('#new-<%= key.singularize %>-row').clone().html();
+            var index = 0;
+            $j('#<%= key.singularize %>-table div.<%= key.singularize %>').each(function () {
+                var newIndex = parseInt($j(this).data('index'));
+                if (newIndex > index) {
+                    index = newIndex;
+                }
+            });
+            index++;
+            newRow = newRow.replace(/row-template/g, index);
+
+            $j('#<%= key.singularize %>-table #<%= key.singularize %>-row').before($j(newRow));
+            return false;
+        });
+
+        $j('#<%= key.singularize %>-table').on('change', '.destroy-row', function () {
+            var row = $j(this).parents('.single-role');
+            row.remove();
+        });
+    });
+
+
+</script>
