@@ -1095,6 +1095,137 @@ class StudiesControllerTest < ActionController::TestCase
     assert_equal 'rabbit', cm.data['role_name']['first_name']
   end
 
+  test 'multiple levels of has many relationship' do
+    cmt = FactoryBot.create(:study_custom_metadata_type)
+    # linked_cmt = cmt.attributes_with_linked_custom_metadata_type.last.linked_custom_metadata_type
+    # linked_linked_cmt = linked_cmt.attributes_with_linked_custom_metadata_type.last.linked_custom_metadata_type
+    # linked_linked_linked_cmt = linked_linked_cmt.attributes_with_linked_custom_metadata_type.last.linked_custom_metadata_type
+    login_as(FactoryBot.create(:person))
+
+    assert_difference('Study.count') do
+      assert_difference('CustomMetadata.count') do
+        investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+        study_attributes = { title: 'my study', investigation_id: investigation.id }
+        cm_attributes = { custom_metadata_attributes: {
+          custom_metadata_type_id: cmt.id,
+          data: {
+            "study_title":"happy study",
+            "study_sites":{
+              "0":{
+                  "study_site_name":"site1",
+                  "study_site_location":"fairyland",
+                  "participants":{
+                    "0":{
+                      "participant_name":{
+                        "first_name":"alice",
+                        "last_name":"liddell"
+                      },
+                      "participant_age":"7"
+                    },
+                    "1":{
+                      "participant_name":{
+                        "first_name":"pippi",
+                        "last_name":"langstrumpf"
+                      },
+                      "participant_age":"9"
+                    }
+                  }
+              },
+              "1":{
+                "study_site_name":"site2",
+                "study_site_location":"space",
+                "participants":{
+                  "0":{
+                    "participant_name":{
+                      "first_name":"arthur",
+                      "last_name":"Dent"
+                    },
+                    "participant_age":"40"
+                  }
+                }
+              }
+            }
+          }
+        }
+        }
+        post :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
+
+      end
+    end
+
+    assert study = assigns(:study)
+    assert cm = study.custom_metadata
+
+    assert_equal cmt, cm.custom_metadata_type
+    assert_equal "happy study",cm.data['study_title']
+    assert_equal "site1", cm.data['study_sites'][0]['study_site_name']
+    assert_equal "fairyland", cm.data['study_sites'][0]['study_site_location']
+    assert_equal "alice", cm.data['study_sites'][0]['participants'][0]['participant_name']['first_name']
+    assert_equal "langstrumpf", cm.data['study_sites'][0]['participants'][1]['participant_name']['last_name']
+    assert_equal "Dent", cm.data['study_sites'][1]['participants'][0]['participant_name']['last_name']
+    assert_equal "40", cm.data['study_sites'][1]['participants'][0]['participant_age']
+
+
+    # test show
+    get :show, params:{ id:study}
+    assert_response :success
+
+    # test update
+    assert_no_difference('Study.count') do
+      assert_no_difference('CustomMetadata.count') do
+        put :update, params: {
+          id: study.id,
+          study: {
+            title: 'Updated Study',
+            custom_metadata_attributes: {
+              id:cm.id,
+              custom_metadata_type_id: cmt.id,
+              data: {
+                "study_title":"happy study new",
+                "study_sites":{
+                  "0":{
+                    "study_site_name":"site1",
+                    "study_site_location":"better fairyland",
+                    "participants":{
+                      "0":{
+                        "participant_name":{
+                          "first_name":"mad",
+                          "last_name":"hatter"
+                        },
+                        "participant_age":"unknown"
+                      },
+                      "1":{
+                        "participant_name":{
+                          "first_name":"pippi",
+                          "last_name":"langstrumpf"
+                        },
+                        "participant_age":"9"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      end
+    end
+
+    assert new_study = assigns(:study)
+    assert cm = new_study.custom_metadata
+
+    pp cm
+    pp cm.data
+
+    assert_equal "site1", cm.data['study_sites'][0]['study_site_name']
+    assert_equal "better fairyland", cm.data['study_sites'][0]['study_site_location']
+    assert_equal "mad", cm.data['study_sites'][0]['participants'][0]['participant_name']['first_name']
+    assert_equal "hatter", cm.data['study_sites'][0]['participants'][0]['participant_name']['last_name']
+    assert_equal nil, cm.data['study_sites'][1]
+
+
+  end
+
 
   test 'when removing the study with the custom metadata, all its related custom metadtas should be destroyed' do
     cmt = FactoryBot.create(:role_affiliation_custom_metadata_type)

@@ -236,6 +236,8 @@ FactoryBot.define do
 
 
   # for testing linked custom metadata multi
+
+  # case 1
   factory(:role_affiliation_name_custom_metadata_attribute,class:CustomMetadataAttribute) do
     title { 'role_affiliation_name' }
     association :sample_attribute_type, factory: :string_sample_attribute_type
@@ -279,6 +281,78 @@ FactoryBot.define do
     end
   end
 
+
+  # case 2
+
+
+  factory(:study_title_custom_metadata_attribute,class:CustomMetadataAttribute) do
+    title { 'study_title' }
+    association :sample_attribute_type, factory: :string_sample_attribute_type
+  end
+
+  factory(:study_site_name_custom_metadata_attribute,class:CustomMetadataAttribute) do
+    title { 'study_site_name' }
+    association :sample_attribute_type, factory: :string_sample_attribute_type
+  end
+
+  factory(:study_site_location_custom_metadata_attribute,class:CustomMetadataAttribute) do
+    title { 'study_site_location' }
+    association :sample_attribute_type, factory: :string_sample_attribute_type
+  end
+
+  factory(:participant_name_custom_metadata_attribute,class:CustomMetadataAttribute) do
+    title { 'participant_name' }
+    association :sample_attribute_type, factory: :custom_metadata_sample_attribute_type
+    association :linked_custom_metadata_type, factory: :role_name_custom_metadata_type
+  end
+
+
+  factory(:participant_age_custom_metadata_attribute,class:CustomMetadataAttribute) do
+    title { 'participant_age' }
+    association :sample_attribute_type, factory: :string_sample_attribute_type
+  end
+
+  factory(:participants_custom_metadata_type,class:CustomMetadataType) do
+    title { 'participants' }
+    supported_type { 'CustomMetadata' }
+    after(:build) do |a|
+      a.custom_metadata_attributes << FactoryBot.create(:participant_name_custom_metadata_attribute, required: true)
+      a.custom_metadata_attributes << FactoryBot.create(:participant_age_custom_metadata_attribute, required: true)
+    end
+  end
+
+
+  factory(:participants_linked_custom_metadata_attribute_multi_attribute,class:CustomMetadataAttribute) do
+    title { 'participants' }
+    association :sample_attribute_type, factory: :custom_metadata_multi_sample_attribute_type
+    association :linked_custom_metadata_type, factory: :participants_custom_metadata_type
+  end
+
+
+  factory(:study_sites_custom_metadata_type,class:CustomMetadataType) do
+    title { 'study_sites' }
+    supported_type { 'CustomMetadata' }
+    after(:build) do |a|
+      a.custom_metadata_attributes << FactoryBot.create(:study_site_name_custom_metadata_attribute, required: true)
+      a.custom_metadata_attributes << FactoryBot.create(:study_site_location_custom_metadata_attribute, required: true)
+      a.custom_metadata_attributes << FactoryBot.create(:participants_linked_custom_metadata_attribute_multi_attribute,required:true)
+    end
+  end
+
+  factory(:study_sites_linked_custom_metadata_attribute_multi_attribute,class:CustomMetadataAttribute) do
+    title { 'study_sites' }
+    association :sample_attribute_type, factory: :custom_metadata_multi_sample_attribute_type
+    association :linked_custom_metadata_type, factory: :study_sites_custom_metadata_type
+  end
+
+  factory(:study_custom_metadata_type,class:CustomMetadataType) do
+    title { 'study_model' }
+    supported_type { 'Study' }
+    after(:build) do |a|
+      a.custom_metadata_attributes << FactoryBot.create(:study_title_custom_metadata_attribute,required: true)
+      a.custom_metadata_attributes << FactoryBot.create(:study_sites_linked_custom_metadata_attribute_multi_attribute,required:true)
+    end
+  end
 
 end
 
