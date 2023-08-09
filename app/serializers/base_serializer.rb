@@ -123,25 +123,8 @@ class BaseSerializer < SimpleBaseSerializer
 
   attribute :extended_attributes, if: -> { object.respond_to?(:custom_metadata) && !object.custom_metadata.blank? } do
     { extended_metadata_type_id: object.custom_metadata.custom_metadata_type_id.to_s,
-      attribute_map: get_custom_metadata }
+      attribute_map: object.custom_metadata.data.to_hash }
   end
-
-  def get_custom_metadata
-    data = object.custom_metadata.data.to_hash
-    CustomMetadata.find(object.custom_metadata.id).custom_metadata_attributes.each do |attr|
-      if attr.linked_custom_metadata?
-        data[attr.title] = display_custom_metadata_with_id(data[attr.title])
-      elsif attr.linked_custom_metadata_multi?
-        array_data = []
-        data[attr.title]&.each do |id|
-          array_data << display_custom_metadata_with_id(id)
-        end
-        data[attr.title] = array_data
-      end
-    end
-    data
-  end
-
 
 
   def show_policy?
@@ -160,16 +143,6 @@ class BaseSerializer < SimpleBaseSerializer
   end
 
   private
-
-  def display_custom_metadata_with_id(id)
-    linked_data = CustomMetadata.find(id).data.to_hash
-    CustomMetadata.find(id).custom_metadata_attributes.each do |attr|
-      if attr.linked_custom_metadata?
-        linked_data[attr.title] = display_custom_metadata_with_id(linked_data[attr.title])
-      end
-    end
-    linked_data
-  end
 
   def determine_submitter(object)
     return object.owner if object.respond_to?('owner')
