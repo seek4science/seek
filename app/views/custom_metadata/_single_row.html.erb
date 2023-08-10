@@ -9,11 +9,11 @@
                          end %>
 <% field_name_prefix = "#{element_name}[#{index}]" %>
 
-<div id="role-<%= index-%>" class="<%= key.singularize %> single-role multi_linked_custom_metdata" data-index="<%= index-%>">
+<div id="<%= prefix-%>-role-<%= index-%>" class="<%= key.singularize %> single-role multi_linked_custom_metdata" data-index="<%= index-%>">
   <% attribute.linked_custom_metadata_type.custom_metadata_attributes.each do |attr| %>
     <div class="form-group"><label><%= attr.label %></label><%= required_span if attr.required? %>
       <div class="form-group">
-        <% attr_element_name = "#{element_name}][#{index}][#{attr.title}]" %>
+        <% attr_element_name = "#{element_name}[#{index}][#{attr.title}]" %>
         <%= attribute_form_element(attr, value ? value[attr.title] : nil, attr_element_name, element_class) %>
         <% unless attribute.description.nil? %>
           <%= custom_metadata_attribute_description(attr.description) %>
@@ -34,3 +34,15 @@
     <% end %>
   </div>
 </div>
+
+<script>
+    $j(document).ready(function () {
+
+        $j('#<%= prefix-%>-role-<%= index-%>').on('change', '.destroy-row', function () {
+            var row = $j(this).closest('#<%= prefix-%>-role-<%= index-%>');
+            row.remove();
+        });
+
+    });
+
+</script>

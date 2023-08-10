@@ -1,31 +1,43 @@
 <% key = attribute.title %>
 <% value ||= [] %>
 
+<% if value.blank? %>
+  <% index = 0 %>
+<% end %>
+
+<% prefix = element_name.split(/\[|\]/).reject(&:empty?).join("_") %>
+
   <div id="<%= key %>">
     <div class="table linked_custom_metdata_odd" id="<%= key.singularize %>-table">
-      <% value.each_with_index do |v, index| %>
-        <%= render partial: 'custom_metadata/single_row', locals: { key: key, index: index, value: v, attribute: attribute, element_name: element_name, element_class: element_class } %>
+      <% if value.blank? %>
+        <%= render partial: 'custom_metadata/single_row', locals: { index: index, value: nil, attribute: attribute, element_name: element_name, element_class: element_class, prefix: prefix } %>
+      <% else %>
+        <% value.each_with_index do |v, idx| %>
+          <% index = idx %>
+          <%= render partial: 'custom_metadata/single_row', locals: { index: index, value: v, attribute: attribute, element_name: element_name, element_class: element_class, prefix: prefix } %>
+        <% end %>
       <% end %>
-
       <div id="<%= key.singularize %>-row">
         <div colspan="6">
-          <%= button_link_to('Add more', 'add', '#', :id => "add-#{key.singularize}-row") %>
+          <%= button_link_to('Add new', 'add', '#', :id => "add-row-#{prefix}") %>
         </div>
       </div>
     </div>
 
     <div id="new-<%= key.singularize %>-row" style="display: none">
-      <%= render partial: 'custom_metadata/single_row', locals: { attribute: attribute, element_name: element_name, element_class: element_class } %>
+      <%= render partial: 'custom_metadata/single_row', locals: { attribute: attribute, element_name: element_name, element_class: element_class, prefix: prefix } %>
     </div>
   </div>
 
 <script>
+
     $j(document).ready(function () {
 
-        $j('#add-<%= key.singularize %>-row').click(function () {
+        $j('#add-row-<%= prefix %>').click(function () {
+
             var newRow = $j('#new-<%= key.singularize %>-row').clone().html();
             var index = 0;
-            $j('#<%= key.singularize %>-table div.<%= key.singularize %>').each(function () {
+            $j(this).closest('#<%= key.singularize %>-table').find('.<%= key.singularize %>').each(function () {
                 var newIndex = parseInt($j(this).data('index'));
                 if (newIndex > index) {
                     index = newIndex;
@@ -34,15 +46,11 @@
             index++;
             newRow = newRow.replace(/row-template/g, index);
 
-            $j('#<%= key.singularize %>-table #<%= key.singularize %>-row').before($j(newRow));
+            // find the last row of this kind and the new row after that
+            var newContainer = $j(this).closest('#<%= key.singularize %>-table').find('#<%= prefix %>-role-'+(index-1));
+            newContainer.after($j(newRow));
             return false;
         });
 
-        $j('#<%= key.singularize %>-table').on('change', '.destroy-row', function () {
-            var row = $j(this).parents('.single-role');
-            row.remove();
-        });
     });
-
-
 </script>

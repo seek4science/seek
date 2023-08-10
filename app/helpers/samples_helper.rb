@@ -50,7 +50,7 @@ module SamplesHelper
     html = ''
 
     attribute.linked_custom_metadata_type.custom_metadata_attributes.each do |attr|
-      attr_element_name = "#{element_name}][#{attr.title}]"
+      attr_element_name = "#{element_name}[#{attr.title}]"
       html += '<div class="form-group"><label>'+attr.label+'</label>'
       html +=  required_span if attr.required?
       v = value ? value[attr.title] : nil
