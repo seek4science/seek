@@ -1214,14 +1214,12 @@ class StudiesControllerTest < ActionController::TestCase
     assert new_study = assigns(:study)
     assert cm = new_study.custom_metadata
 
-    pp cm
-    pp cm.data
 
     assert_equal "site1", cm.data['study_sites'][0]['study_site_name']
     assert_equal "better fairyland", cm.data['study_sites'][0]['study_site_location']
     assert_equal "mad", cm.data['study_sites'][0]['participants'][0]['participant_name']['first_name']
     assert_equal "hatter", cm.data['study_sites'][0]['participants'][0]['participant_name']['last_name']
-    assert_equal nil, cm.data['study_sites'][1]
+    assert_nil cm.data['study_sites'][1]
 
 
   end
@@ -1473,12 +1471,12 @@ class StudiesControllerTest < ActionController::TestCase
     end
 
     # should reload the form with two role_affiliation_identifiers
-    assert_select 'div#role-0' do
+      assert_select 'div[id$="role-0"]' do
       assert_select 'input#study_custom_metadata_attributes_data_role_affiliation_identifiers_0_identifier[value=?]', '01f7bcy98'
       assert_select 'input#study_custom_metadata_attributes_data_role_affiliation_identifiers_0_scheme[value=?]', 'ROR'
     end
 
-    assert_select 'div#role-1' do
+    assert_select 'div[id$="role-1"]' do
 
       assert_select 'input#study_custom_metadata_attributes_data_role_affiliation_identifiers_1_identifier[value=?]', 'grid.424699.4'
       assert_select 'input#study_custom_metadata_attributes_data_role_affiliation_identifiers_1_scheme[value=?]', 'GRID'
@@ -1519,12 +1517,12 @@ class StudiesControllerTest < ActionController::TestCase
     end
 
     # should reload the form with two role_affiliation_identifiers
-    assert_select 'div#role-0' do
+    assert_select 'div[id$="role-0"]' do
       assert_select 'input#study_custom_metadata_attributes_data_role_affiliation_identifiers_0_identifier[value=?]', ''
       assert_select 'input#study_custom_metadata_attributes_data_role_affiliation_identifiers_0_scheme[value=?]', 'ROR'
     end
 
-    assert_select 'div#role-1' do
+    assert_select 'div[id$="role-1"]' do
       assert_select 'input#study_custom_metadata_attributes_data_role_affiliation_identifiers_1_identifier[value=?]', 'grid.424699.4'
       assert_select 'input#study_custom_metadata_attributes_data_role_affiliation_identifiers_1_scheme[value=?]', ''
     end
@@ -1607,7 +1605,7 @@ class StudiesControllerTest < ActionController::TestCase
     end
 
     # the form should load updated role_affiliation_identifiers value
-    assert_select 'div#role-0' do
+    assert_select 'div[id$="role-0"]' do
       assert_select 'input#study_custom_metadata_attributes_data_role_affiliation_identifiers_0_identifier[value=?]', '027m9bs27'
       assert_select 'input#study_custom_metadata_attributes_data_role_affiliation_identifiers_0_scheme[value=?]', 'ROR'
     end
@@ -1698,7 +1696,7 @@ class StudiesControllerTest < ActionController::TestCase
     end
 
     # the form should load updated role_affiliation_identifiers value
-    assert_select 'div#role-0' do
+    assert_select 'div[id$="role-0"]' do
       assert_select 'input#study_custom_metadata_attributes_data_role_affiliation_identifiers_0_identifier[value=?]', ''
       assert_select 'input#study_custom_metadata_attributes_data_role_affiliation_identifiers_0_scheme[value=?]', 'ROR'
     end
