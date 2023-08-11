@@ -2,14 +2,16 @@
   def any_samples_to_upload?
     !((@new_samples.nil? or @new_samples.compact.none?) and (@update_samples.nil? or @update_samples.compact.none?) and (@possible_duplicates.nil? or @possible_duplicates.compact.none?))
   end
+  errors = []
 %>
 
 <% can_upload = true %>
 <div id="upload-summary">
 
   <% # General information panel %>
-  <%= folding_panel("General Information", true, :id => "general-information-panel") do %>
-    <% [@project, @study, @assay, @sample_type]. map do | asset | %>
+  <%= folding_panel("General Information", true, :id => "general-information-panel",
+  :help_text => "This pane contains an overview of the permissions needed to upload.") do %>
+    <% [@project, @study, @assay]. map do | asset | %>
       <% next if asset.nil? %>
       <% asset_name = asset.class.to_s.singularize %>
       <h4> <%= asset_name %> </h4>
@@ -22,13 +24,15 @@
         <% else %>
           <p><b><%= current_user.person.name %> is member of this project: </b> <span class="glyphicon glyphicon-remove-sign" style="color: red;"></span></p>
           <% can_upload = false %>
+          <% errors.append("You must be a member of this project!") %>
         <% end %>
       <% else %>
-        <% if asset.can_edit?%>
-          <p><b><%= current_user.person.name %> can edit: </b><span class="glyphicon glyphicon-ok-sign" style="color: green;"></span></p>
+        <% if asset.can_view?%>
+          <p><b><%= current_user.person.name %> can view: </b><span class="glyphicon glyphicon-ok-sign" style="color: green;"></span></p>
         <% else %>
-          <p><b><%= current_user.person.name %> can edit: </b> <span class="glyphicon glyphicon-remove-sign" style="color: red;"></span></p>
+          <p><b><%= current_user.person.name %> can view: </b> <span class="glyphicon glyphicon-remove-sign" style="color: red;"></span></p>
         <% can_upload = false %>
+        <% errors.append("You must have at least viewing permission for the #{asset_name} '#{asset.title}'.") %>
         <% end %>
       <% end %>
       <hr>
@@ -183,6 +187,7 @@
   <% # Panel for Sample with wrong permissions %>
   <% unless @unauthorized_samples.nil? or @unauthorized_samples.compact.none? %>
     <% can_upload = false %>
+    <% errors.append("There are unauthorized samples present in the spreadsheet.") %>
     <%= folding_panel("Unauthorized Samples", false, :id => "unauthorized-samples-panel", :body_options => {:id => "unauthorized-samples-panel-content"},
                   :help_text => "Sample the current user does not have permission to edit them.") do %>
       <div>
@@ -225,9 +230,24 @@
   <% unless can_upload %>
     <div class="alert alert-danger alert-dismissible" role="alert">
         <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h3>Error</h3>
+        <h3>Permissions conflict</h3>
         <strong>Unable to upload the current set of samples!</strong>
-        <p>Please expand the 'General Information' pane for more information.</p>
+        <p>Please expand the 'General Information' and/or 'Unauthorized Samples' pane for more information.</p>
+        <p>Correct the following errors:</p>
+        <ul>
+          <% for error in errors %>
+            <li><%= error %></li>
+          <% end %>
+        </ul>
+    </div>
+  <% end %>
+
+  <% if (can_upload and !any_samples_to_upload?) %>
+    <div class="alert alert-info alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h3>No changes detected</h3>
+        <strong>The provided spreadsheet did not include any new samples or changes to already existing ones!</strong>
+        <p>Please click the cancel button to dismiss this window.</p>
     </div>
   <% end %>
 
@@ -376,10 +396,12 @@
         Accept: "application/json"
       },
       success: function(res) {
-        console.log("res", res);
+        location.reload();
       },
       error: function(err) {
         console.log("err", err);
+        alert(json.stringify(err));
+        location.reload();
       }
     });
   };

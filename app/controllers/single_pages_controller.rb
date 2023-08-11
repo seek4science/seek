@@ -265,7 +265,7 @@ class SinglePagesController < ApplicationController
     new_excel_samples.map do |nes|
       is_duplicate = true
 
-      @authorized_db_samples.map do |dbs|
+      @db_samples.map do |dbs|
         dbs.map do |k, v|
           unless %w[id uuid].include?(k)
             is_duplicate = (nes[k] == v)
@@ -279,7 +279,7 @@ class SinglePagesController < ApplicationController
         end
       end
 
-      if @authorized_db_samples.none?
+      if @db_samples.none?
         @new_samples.append(nes)
       else
         @new_samples.append(nes) unless is_duplicate
