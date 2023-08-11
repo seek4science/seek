@@ -36,6 +36,9 @@
         $j('#add-row-<%= prefix %>').click(function () {
 
             var newRow = $j('#new-<%= key.singularize %>-row').clone().html();
+            var lastRow = $j(this).closest('#<%= key.singularize %>-table').find('.<%= key.singularize %>');
+            var container = $j(this).closest('#<%= key.singularize %>-table');
+
             var index = 0;
             $j(this).closest('#<%= key.singularize %>-table').find('.<%= key.singularize %>').each(function () {
                 var newIndex = parseInt($j(this).data('index'));
@@ -46,11 +49,14 @@
             index++;
             newRow = newRow.replace(/row-template/g, index);
 
-            // find the last row of this kind and the new row after that
-            var newContainer = $j(this).closest('#<%= key.singularize %>-table').find('#<%= prefix %>-role-'+(index-1));
-            newContainer.after($j(newRow));
+            if (lastRow.length == 0){
+                container.prepend(newRow);
+            }else{
+                // find the last row of this kind and the new row after that
+                container.find('#<%= prefix %>-role-'+(index-1)).after($j(newRow));
+            }
+
             return false;
         });
-
     });
 </script>
