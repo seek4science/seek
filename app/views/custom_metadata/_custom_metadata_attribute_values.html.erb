@@ -9,16 +9,21 @@
 
       <% resource.custom_metadata.custom_metadata_attributes.each do |attribute| %>
         <% unless resource.custom_metadata.data[attribute.title].blank? %>
-          <p>
-            <label><%= attribute.label %>:</label>
-            <%= display_attribute(resource.custom_metadata, attribute, link: true) %>
-          </p>
+          <div>
+            <% if attribute.linked_custom_metadata? || attribute.linked_custom_metadata_multi? %>
+              <%= content_tag(:span, class: 'linked_custom_metdata_display') do %>
+                <%= folding_panel(attribute.label, true, id:attribute.title) do %>
+                  <%= display_attribute(resource.custom_metadata, attribute, link: true) %>
+                <% end %>
+              <% end %>
+            <% else %>
+              <label><%= attribute.label %>:</label>
+              <%= display_attribute(resource.custom_metadata, attribute, link: true) %>
+            <% end %>
+          </div>
         <% end %>
       <% end %>
-
     </div>
   </div>
-
   <% else %>
-
 <% end %>

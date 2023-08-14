@@ -148,8 +148,16 @@ module SamplesHelper
     attribute.linked_custom_metadata_type.custom_metadata_attributes.each do |attr|
       v = value ? value[attr.title.to_s] : nil
       html += '<li>'
-      html += '<label>'+attr.title+'</label>'+' : '
-      html += display_attribute_value(v, attr)
+      if attr.linked_custom_metadata? || attr.linked_custom_metadata_multi?
+        html += content_tag(:span, class: 'linked_custom_metdata_display') do
+          folding_panel(attr.label, true, id:attr.title) do
+            display_attribute_value(v, attr)
+          end
+        end
+      else
+        html += '<label>'+attr.title+'</label>'+' : '
+        html += display_attribute_value(v, attr)
+      end
       html += '</li>'
     end
     html += '</ul>'

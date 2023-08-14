@@ -36,3 +36,22 @@
     border-radius: 5px;
     margin-bottom: 15px;
 }
+
+.linked_custom_metdata_display .panel-default .panel-heading {
+    font-weight: bold;
+    border: none;
+    background-color: #ffffff;
+    padding: 0px 0px;
+}
+
+
+.linked_custom_metdata_display .panel {
+    border: none;
+    box-shadow: none;
+    margin-bottom: 0px;
+}
+
+.linked_custom_metdata_display .panel-body {
+    padding: 0px 0px;
+    border-radius: 5px;
+}
