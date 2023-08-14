@@ -876,7 +876,7 @@ class StudiesControllerTest < ActionController::TestCase
     get :show, params: { id: study }
     assert_response :success
 
-    assert_select 'p',text:/Granny Smith/, count:2
+    assert_select 'div.custom_metadata',text:/Granny Smith/, count:2
   end
 
   test 'should create and update study with linked custom metadata type' do

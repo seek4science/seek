@@ -9,7 +9,7 @@
 
       <% resource.custom_metadata.custom_metadata_attributes.each do |attribute| %>
         <% unless resource.custom_metadata.data[attribute.title].blank? %>
-          <div>
+          <div class="custom_metadata">
             <% if attribute.linked_custom_metadata? || attribute.linked_custom_metadata_multi? %>
               <%= content_tag(:span, class: 'linked_custom_metdata_display') do %>
                 <%= folding_panel(attribute.label, true, id:attribute.title) do %>
