@@ -34,7 +34,7 @@ class Mailer < ActionMailer::Base
     publish_notification gatekeeper, publisher, resources, "A #{Seek::Config.instance_name} member requested your approval to publish some items."
   end
 
-    def publishing_request_cancellation(gatekeeper, publisher, resources)
+  def publishing_request_cancellation(gatekeeper, publisher, resources)
     @gatekeeper = gatekeeper
     publish_notification gatekeeper, publisher, resources, "A #{Seek::Config.instance_name} member cancelled a publishing approval request."
   end
