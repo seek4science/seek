@@ -82,11 +82,11 @@ module Seek
       private
 
       def blanks?(attr)
-        analysis_hash[attr.to_sym][:has_blanks]
+        !analysis_hash.key?(attr.to_sym) || analysis_hash[attr.to_sym][:has_blanks]
       end
 
       def all_blank?(attr)
-        analysis_hash[attr.to_sym][:all_blank]
+        !analysis_hash.key?(attr.to_sym) || analysis_hash[attr.to_sym][:all_blank]
       end
 
       def analysis_hash
