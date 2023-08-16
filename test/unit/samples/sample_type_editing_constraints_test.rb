@@ -55,6 +55,28 @@ class SampleTypeEditingConstraintsTest < ActiveSupport::TestCase
     refute_nil attr
     assert c.allow_type_change?(attr)
     assert c.allow_type_change?(nil)
+
+    type = FactoryBot.create(:linked_optional_sample_type)
+    c = Seek::Samples::SampleTypeEditingConstraints.new(type)
+    assert c.allow_type_change?(:patient)
+    attr = c.sample_type.sample_attributes.detect { |t| t.accessor_name == 'patient' }
+    refute_nil attr
+    assert c.allow_type_change?(attr)
+    assert c.allow_type_change?(nil)
+
+    person = FactoryBot.create(:person)
+    User.with_current_user(person.user) do
+      type.samples.create!(data: { title: 'Lib-3', patient: nil }, sample_type: type, project_ids: person.project_ids)
+
+      assert Seek::Samples::SampleTypeEditingConstraints.new(type).allow_type_change?(:patient),
+             'Should still allow type change because patient was blank'
+
+      patient_sample = FactoryBot.create(:patient_sample, sample_type: attr.linked_sample_type)
+      type.samples.create!(data: { title: 'Lib-4', patient: patient_sample.id }, sample_type: type, project_ids: person.project_ids)
+
+      refute Seek::Samples::SampleTypeEditingConstraints.new(type).allow_type_change?(:patient),
+             'Should not allow type change because a sample exists with a patient'
+    end
   end
 
   test 'allow_required?' do
