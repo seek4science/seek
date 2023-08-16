@@ -170,10 +170,10 @@ class SinglePagesController < ApplicationController
       sa_attr.title if sa_attr.sample_attribute_type.base_type == 'SeekSampleMulti'
     end
 
-    sample_fields = samples_sheet.row(1).actual_cells.map { |field| field&.value&.sub(' *', '') }
+    sample_fields = samples_sheet.row(1).actual_cells.map { |field| field&.value&.sub(' *', '') }.compact
     samples_data = (2..samples_sheet.actual_rows.size).map do |i|
-      act_cells = samples_sheet.row(i).actual_cells
-      act_cells.map { |cell| cell&.value } unless act_cells.all? { |cell| cell&.value&.empty? }
+      sample_cells = samples_sheet.row(i).cells
+      sample_cells.map { |cell| cell&.value }.drop(1) unless act_cells.all? { |cell| (cell&.value == '' || cell&.value.nil?) }
     end
 
     samples_data.compact!
