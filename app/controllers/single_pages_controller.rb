@@ -173,7 +173,7 @@ class SinglePagesController < ApplicationController
     sample_fields = samples_sheet.row(1).actual_cells.map { |field| field&.value&.sub(' *', '') }.compact
     samples_data = (2..samples_sheet.actual_rows.size).map do |i|
       sample_cells = samples_sheet.row(i).cells
-      sample_cells.map { |cell| cell&.value }.drop(1) unless act_cells.all? { |cell| (cell&.value == '' || cell&.value.nil?) }
+      sample_cells.map { |cell| cell&.value }.drop(1) unless sample_cells.all? { |cell| (cell&.value == '' || cell&.value.nil?) }
     end
 
     samples_data.compact!
