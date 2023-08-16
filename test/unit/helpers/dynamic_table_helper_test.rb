@@ -18,24 +18,18 @@ class DynamicTableHelperTest < ActionView::TestCase
       type_b.sample_attributes.last.linked_sample_type = type_a
       type_b.save!
 
-      sample_b1 = Sample.new(sample_type: type_b, project_ids: [project.id])
-      sample_b1.set_attribute_value(:title, 'sample_b1')
-      sample_b1.set_attribute_value(:patient, [sample_a1.id])
-      disable_authorization_checks { sample_b1.save! }
+      sample_b1 = type_b.samples.create!(data: { title: 'sample_b1', patient: [sample_a1.id] },
+                                         sample_type: type_b, project_ids: [project.id])
 
-      sample_b2 = Sample.new(sample_type: type_b, project_ids: [project.id])
-      sample_b2.set_attribute_value(:title, 'sample_b2')
-      sample_b2.set_attribute_value(:patient, [sample_a2.id])
-      disable_authorization_checks { sample_b2.save! }
+      sample_b2 = type_b.samples.create!(data: { title: 'sample_b2', patient: [sample_a2.id] },
+                                         sample_type: type_b, project_ids: [project.id])
 
       type_c = FactoryBot.create(:multi_linked_sample_type, project_ids: [project.id])
       type_c.sample_attributes.last.linked_sample_type = type_b
       type_c.save!
 
-      sample_c1 = Sample.new(sample_type: type_c, project_ids: [project.id])
-      sample_c1.set_attribute_value(:title, 'sample_c1')
-      sample_c1.set_attribute_value(:patient, [sample_b1.id])
-      disable_authorization_checks { sample_c1.save! }
+      sample_c1 = type_c.samples.create!(data: { title: 'sample_c1', patient: [sample_b1.id] },
+                                         sample_type: type_c, project_ids: [project.id])
 
       study = FactoryBot.create(:study, investigation: inv, contributor: person, sample_types: [type_a, type_b])
       assay = FactoryBot.create(:assay, study: study, contributor: person, sample_type: type_c, position: 1)

@@ -10,7 +10,7 @@ class SampleAttribute < ApplicationRecord
 
   validates :sample_type, presence: true
   validates :pid, format: { with: URI::regexp, allow_blank: true, allow_nil: true, message: 'not a valid URI' }
-  validate :validate_against_editing_constraints
+  validate :validate_against_editing_constraints, if: -> { sample_type.present? }
 
   before_save :store_accessor_name
   before_save :default_pos, :force_required_when_is_title
