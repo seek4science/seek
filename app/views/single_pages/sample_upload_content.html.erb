@@ -395,13 +395,9 @@
         "Content-Type": "application/json",
         Accept: "application/json"
       },
-      success: function(res) {
-        location.reload();
-      },
       error: function(err) {
         console.log("err", err);
         alert(json.stringify(err));
-        location.reload();
       }
     });
   };
