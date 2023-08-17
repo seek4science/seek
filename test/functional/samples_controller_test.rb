@@ -1279,6 +1279,27 @@ class SamplesControllerTest < ActionController::TestCase
     end
   end
 
+  test 'typeahead' do
+    person = FactoryBot.create(:person)
+    sample1 = FactoryBot.create(:sample, title: 'sample1', contributor: person)
+    sample_type = sample1.sample_type
+
+    sample2 = FactoryBot.create(:sample, sample_type: sample_type, title: 'sample2')
+
+    login_as(person)
+    assert_equal sample1.sample_type, sample2.sample_type
+    assert sample1.can_view?
+    refute sample2.can_view?
+
+    get :typeahead, params:{ format: :json, linked_sample_type_id: sample_type.id, q:'samp'}
+    assert_response :success
+    res = JSON.parse(response.body)['results']
+
+    assert_equal 1, res.count
+    assert_equal 'sample1', res.first['text']
+
+  end
+
   private
 
   def populated_patient_sample
