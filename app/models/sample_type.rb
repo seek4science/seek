@@ -203,11 +203,11 @@ class SampleType < ApplicationRecord
     c = editing_constraints
     sample_attributes.each do |a|
       if a.marked_for_destruction? && !c.allow_attribute_removal?(a)
-        errors.add(:base, "Cannot remove: \"#{a.title}\", there are existing samples using this attribute.")
+        errors.add(:sample_attributes, "cannot be removed, there are existing samples using this attribute (#{a.title})")
       end
 
       if a.new_record? && !c.allow_new_attribute?
-        errors.add(:base, "Cannot add: \"#{a.title}\", new attributes are not allowed.")
+        errors.add(:sample_attributes, "cannot be added, new attributes are not allowed (#{a.title})")
       end
     end
   end

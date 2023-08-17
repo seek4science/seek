@@ -1010,7 +1010,7 @@ class SampleTypeTest < ActiveSupport::TestCase
     # Adding attribute
     sample_type.sample_attributes.build(title: 'test 123')
     refute sample_type.valid?
-    assert sample_type.errors.added?(:'base', 'Cannot add: "test 123", new attributes are not allowed.')
+    assert sample_type.errors.added?(:sample_attributes, 'cannot be added, new attributes are not allowed (test 123)')
 
     sample_type.reload
     assert sample_type.valid?
@@ -1018,7 +1018,7 @@ class SampleTypeTest < ActiveSupport::TestCase
     # Removing attribute (via nested attributes)
     sample_type.sample_attributes_attributes = { id: sample_type.sample_attributes.last.id, _destroy: '1' }
     refute sample_type.valid?
-    assert sample_type.errors.added?(:'base', 'Cannot remove: "patient", there are existing samples using this attribute.')
+    assert sample_type.errors.added?(:sample_attributes, 'cannot be removed, there are existing samples using this attribute (patient)')
 
     sample_type.reload
     assert sample_type.valid?
