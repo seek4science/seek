@@ -266,7 +266,7 @@ class SamplesController < ApplicationController
 
     if sample_type
       sample_type.sample_attributes.each do |attr|
-        if attr.sample_attribute_type.controlled_vocab? || attr.sample_attribute_type.seek_sample_multi?
+        if attr.sample_attribute_type.controlled_vocab? || attr.sample_attribute_type.seek_sample_multi? || attr.sample_attribute_type.seek_sample?
           sample_type_param_keys << { attr.title => [] }
           sample_type_param_keys << attr.title.to_sym
         else

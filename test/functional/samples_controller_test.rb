@@ -705,7 +705,7 @@ class SamplesControllerTest < ActionController::TestCase
 
     sample = Sample.create!(sample_type: sample_type, project_ids: person.projects.map(&:id),
                             data: { title: 'Linking sample',
-                                    patient: linked_sample.id})
+                                    patient: linked_sample.id })
 
     # For the sample containing the link
     get :show, params: { id: sample }
@@ -1151,6 +1151,31 @@ class SamplesControllerTest < ActionController::TestCase
       assert result = assigns(:result)
       assert_equal 2, result.length
     end
+  end
+
+  test 'create single linked sample' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    patient = FactoryBot.create(:patient_sample, contributor: person)
+    linked_sample_type = FactoryBot.create(:linked_sample_type, project_ids: [person.projects.first.id])
+    linked_sample_type.sample_attributes.last.linked_sample_type = patient.sample_type
+    linked_sample_type.save!
+
+    assert_difference('Sample.count') do
+      post :create, params: { sample: { sample_type_id: linked_sample_type.id,
+                                        data:{
+                                          "title": 'Single Sample',
+                                          "patient": ['', patient.id.to_s]
+                                        },
+                                        project_ids: [person.projects.first.id]} }
+    end
+    assert assigns(:sample)
+    sample = assigns(:sample)
+    assert_equal 'Single Sample', sample.title
+
+    assert_equal [patient], sample.linked_samples
+    assert_equal patient.id, sample.get_attribute_value(:patient)['id']
+
   end
 
   test 'create multi linked sample' do
