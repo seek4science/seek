@@ -201,7 +201,7 @@ class SamplesController < ApplicationController
     query = params[:q] || ''
     sample_type = SampleType.find(params[:linked_sample_type_id])
     results = sample_type.samples.where("LOWER(title) like :query",
-              query: "%#{query.downcase}%").limit(params[:limit] || 100)
+              query: "%#{query.downcase}%").limit(params[:limit] || 100).authorized_for(:view)
     items = results.map do |sa|
       { id: sa.id,
         text: sa.title }
