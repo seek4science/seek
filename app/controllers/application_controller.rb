@@ -614,7 +614,7 @@ class ApplicationController < ActionController::Base
         keys = [:custom_metadata_type_id,:id,:custom_metadata_attribute_id]
         cma= []
         metadata_type.custom_metadata_attributes.each do |attr|
-          if attr.sample_attribute_type.controlled_vocab? || attr.sample_attribute_type.seek_sample_multi?
+          if attr.sample_attribute_type.controlled_vocab? || attr.sample_attribute_type.seek_sample_multi? || attr.sample_attribute_type.seek_sample?
             cma << {attr.title=>[]}
             cma << attr.title.to_s
           elsif  attr.linked_custom_metadata?
