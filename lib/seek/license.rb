@@ -5,8 +5,8 @@ module Seek
     private_class_method def self.parse_od(licenses)
                            # overrides values taken from the JSON.
                            # Preferable to modifying the JSON file directly which is a definitive source and may be replaced with an updated copy
-                           licenses['notspecified']['title'] = I18n.t('null_license')
-                           licenses['notspecified']['url'] = Seek::Help::HelpDictionary.instance.help_link(:null_license)
+                           licenses[NULL_LICENSE]['title'] = I18n.t('null_license')
+                           licenses[NULL_LICENSE]['url'] = Seek::Help::HelpDictionary.instance.help_link(:null_license)
                            licenses.each_value do |license|
                              license['urls'] = [license['url']].compact_blank
                            end
