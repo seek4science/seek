@@ -1,7 +1,7 @@
 var Licenses = {
     init: function () {
-        $j('[data-seek-license-select="true"]').change(Licenses.displayUrl);
-        $j('[data-seek-license-select="true"]').change();
+        $j('[data-seek-license-select="true"]').on('select2:select', Licenses.displayUrl);
+        $j('[data-seek-license-select="true"]').trigger('select2:select');
     },
 
     displayUrl: function () {
