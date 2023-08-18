@@ -4,15 +4,18 @@ require 'seek/license'
 module LicenseHelper
   def license_select(name, selected = nil, opts = {})
     opts[:data] ||= {}
-    opts[:data]['role'] ||= 'seek-license-select'
+    opts[:data]['seek-license-select'] ||= 'true'
+    opts[:multiple] = false
+
     recommended = opts.delete(:recommended)
     source = opts.delete(:source) || Seek::License.combined
     if recommended
-      options = grouped_options_for_select(grouped_license_options(source.values, recommended), selected)
+      opts[:select_options] = grouped_options_for_select(grouped_license_options(source.values, recommended), selected)
     else
-      options = options_for_select(license_options(source.values), selected)
+      opts[:select_options] = options_for_select(license_options(source.values), selected)
     end
-    select_tag(name, options, opts)
+
+    objects_input(name, [], opts)
   end
 
   def describe_license(id)

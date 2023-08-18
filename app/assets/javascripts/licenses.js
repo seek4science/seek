@@ -1,8 +1,7 @@
 var Licenses = {
     init: function () {
-        $j('[data-role="seek-license-select"]').change(Licenses.displayUrl);
-        $j('[data-role="seek-license-select"]').change();
-        $j('[data-role="seek-license-select"]').select2({ theme: 'bootstrap' });
+        $j('[data-seek-license-select="true"]').change(Licenses.displayUrl);
+        $j('[data-seek-license-select="true"]').change();
     },
 
     displayUrl: function () {
