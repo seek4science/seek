@@ -34,8 +34,8 @@ exportToExcel||="sampleExportExcel()"
           ObjectsInput.init();
         }
       },
-      error: (e) => {
-        console.log(e);
+      error: (err) => {
+        console.log(err);
         alert("An error occurred while fetching data from the server.")
       }
     });
