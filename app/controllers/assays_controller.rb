@@ -18,7 +18,7 @@ class AssaysController < ApplicationController
   api_actions :index, :show, :create, :update, :destroy
 
   def new_object_based_on_existing_one
-    @existing_assay =  Assay.find(params[:id])
+    @existing_assay = Assay.find(params[:id])
     @assay = @existing_assay.clone_with_associations
 
     if @existing_assay.can_view?
@@ -62,9 +62,7 @@ class AssaysController < ApplicationController
       flash[:error]="You do not have the necessary permissions to copy this #{t('assays.assay')}"
       redirect_to @existing_assay
     end
-
-
-   end
+  end
 
   def new
     @assay=setup_new_asset
@@ -110,6 +108,29 @@ class AssaysController < ApplicationController
         format.json { render json: json_api_errors(@assay), status: :unprocessable_entity }
       end
     end
+  end
+
+  def destroy
+    raise 'This assay is not empty. Unable to delete this assay' unless @assay.state_allows_delete?
+
+    raise "You are don't have permission to delete this assay!" unless current_user.can_delete?
+
+    # hkvdghvshdbvjh
+    project_id = @assay.projects&.first&.id
+
+    @assay.sample_type.delete if is_single_page_assay?
+    @assay.delete
+
+    if is_single_page_assay?
+      flash[:notice] = "ISA Assay successfully deleted!"
+      redirect_to single_page_path(Project.find(project_id))
+    else
+      flash[:notice] = "Assay successfully deleted!"
+      redirect_to new_assay_path(:class => @assay.assay_class)
+    end
+  rescue StandardError => e
+    flash[:error] = "#{e}. Couldn't delete Assay!"
+    render json: { status: :unprocessable_entity, error: e.message }
   end
 
   def update
@@ -176,5 +197,9 @@ class AssaysController < ApplicationController
       assay_params[:sop_ids].select! { |id| Sop.find_by_id(id).try(:can_view?) } if assay_params.key?(:sop_ids)
       assay_params[:model_ids].select! { |id| Model.find_by_id(id).try(:can_view?) } if assay_params.key?(:model_ids)
     end
+  end
+
+  def is_single_page_assay?
+    params[:return_to].start_with? '/single_pages/'
   end
 end
