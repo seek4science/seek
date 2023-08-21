@@ -1279,6 +1279,78 @@ class SamplesControllerTest < ActionController::TestCase
     end
   end
 
+  test 'form hides private linked multi samples' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+
+    patient = FactoryBot.create(:patient_sample, contributor: person, policy: FactoryBot.create(:public_policy))
+    patient.set_attribute_value('full name','Public Patient')
+    patient.save!
+    patient2 = FactoryBot.create(:patient_sample, sample_type:patient.sample_type, contributor: person, policy: FactoryBot.create(:private_policy) )
+    patient2.set_attribute_value('full name','Private Patient')
+    patient2.save!
+    multi_linked_sample_type = FactoryBot.create(:multi_linked_sample_type, project_ids: [person.projects.first.id])
+    multi_linked_sample_type.sample_attributes.last.linked_sample_type = patient.sample_type
+    multi_linked_sample_type.save!
+
+    sample = Sample.create(sample_type: multi_linked_sample_type,
+                           data:{
+                              "title": 'Multiple Samples',
+                              "patient": [patient.id.to_s, patient2.id.to_s]
+                            },
+                           project_ids: [person.projects.first.id],
+                           policy: FactoryBot.create(:editing_public_policy)
+    )
+
+    person2 = FactoryBot.create(:person)
+    login_as(person2)
+    assert sample.can_edit?
+
+    get :edit, params: { id: sample.id }
+    assert_response :success
+
+    assert_select 'select#sample_data_patient' do
+      assert_select 'option[value=?]',patient.id, text:/Public Patient/, count:1
+      assert_select 'option[value=?]',patient2.id, text:/Hidden/, count:1
+      assert_select 'option[value=?]',patient2.id, text:/Private Patient/, count:0
+    end
+
+  end
+
+  test 'form hides private linked single sample' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+
+    patient = FactoryBot.create(:patient_sample, contributor: person, policy: FactoryBot.create(:private_policy) )
+    patient.set_attribute_value('full name','Private Patient')
+    patient.save!
+    linked_sample_type = FactoryBot.create(:linked_sample_type, project_ids: [person.projects.first.id])
+    linked_sample_type.sample_attributes.last.linked_sample_type = patient.sample_type
+    linked_sample_type.save!
+
+    sample = Sample.create(sample_type: linked_sample_type,
+                           data:{
+                             "title": 'Single linked sample',
+                             "patient": patient.id.to_s
+                           },
+                           project_ids: [person.projects.first.id],
+                           policy: FactoryBot.create(:editing_public_policy)
+    )
+
+    person2 = FactoryBot.create(:person)
+    login_as(person2)
+    assert sample.can_edit?
+
+    get :edit, params: { id: sample.id }
+    assert_response :success
+
+    assert_select 'select#sample_data_patient' do
+      assert_select 'option[value=?]',patient.id, text:/Hidden/, count:1
+      assert_select 'option[value=?]',patient.id, text:/Private Patient/, count:0
+    end
+
+  end
+
   test 'typeahead' do
     person = FactoryBot.create(:person)
     sample1 = FactoryBot.create(:sample, title: 'sample1', contributor: person)

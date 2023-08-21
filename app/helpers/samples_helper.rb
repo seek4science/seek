@@ -79,7 +79,16 @@ module SamplesHelper
 
     existing_objects = []
     str = Struct.new(:id, :title)
-    value.each {|v| existing_objects << str.new(v[:id], v[:title]) if v} if value
+    if value
+      value = [value] unless value.is_a?(Array)
+      value.compact.each do |v|
+        id = v[:id]
+        title = v[:title]
+        title = '<em>Hidden</em>' unless Sample.find(id).can_view?
+        existing_objects << str.new(id, title)
+      end
+    end
+
     typeahead = { query_url: typeahead_samples_path + "?linked_sample_type_id=#{attribute.linked_sample_type.id}",
                   handlebars_template: 'typeahead/controlled_vocab_term' }
     objects_input(element_name, existing_objects,
