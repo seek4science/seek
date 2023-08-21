@@ -45,7 +45,7 @@
 <div id="sorted_by_type" >
   <% @assets.sort_by { |k, v| v.first.class.name }.each do |type, items| %>
     <div id="<%= items.first.class.table_name %>">
-      <%= render :partial => 'assets/isa-tree-toggle', locals: { cb_parent_selector: "div##{items.first.class.table_name}" } -%>
+      <%= render partial: 'assets/isa-tree-toggle', locals: { cb_parent_selector: "div##{items.first.class.table_name}" } -%>
       <h2 style="display: inline;"><%= text_for_resource items.first %>(s)</h2>
       <div class="isa-tree" style="border-left:none">
         <label><a class="selectChildren" id="<%="select_all_#{items.first.class.table_name}"%>"
@@ -55,10 +55,10 @@
                   data-cb_parent_selector='div#<%= items.first.class.table_name %>' >
           Deselect all <%= "#{(text_for_resource items.first).downcase.pluralize}" %> </a></label>
         <% items.each do |item| %>
-          <%= render :partial => "assets/asset_checkbox_row",
-                     :object => item,
-                     :locals => { :html_classes => "publishing_options",
-                                  :block_published => publishing } -%>
+          <%= render partial: 'assets/asset_checkbox_row',
+                     object: item,
+                     locals: { html_classes: 'publishing_options',
+                                block_published: publishing } -%>
         <% end %>
       </div>
     </div>
@@ -69,7 +69,7 @@
 <div id="sorted_by_isa" >
   <% unless @assets_not_in_isa.empty? %>
     <div id="items_not_in_isa" style="display: inline;">
-      <%= render :partial => 'assets/isa-tree-toggle', locals: { cb_parent_selector: "div#items_not_in_isa" } -%>
+      <%= render partial: 'assets/isa-tree-toggle', locals: { cb_parent_selector: "div#items_not_in_isa" } -%>
       <h2 style="display: inline;">Items not in ISA</h2>
       <div class="isa-tree" style="border-left:none">
         <label><a class="selectChildren" id="select_all_items_not_in_isa"
@@ -80,10 +80,10 @@
           Deselect all items not in ISA </a></label>
       </div>
       <% @assets_not_in_isa.each do |item| %>
-        <%= render :partial => "assets/asset_checkbox_row",
-                   :object => item,
-                   :locals => { :html_classes => "publishing_options",
-                                :block_published => publishing } -%>
+        <%= render partial: 'assets/asset_checkbox_row',
+                   object: item,
+                   locals: { html_classes: "publishing_options",
+                              block_published: publishing } -%>
       <% end %>
       <br/>
     </div>
@@ -93,7 +93,7 @@
 
   <% unless @investigations.empty? %>
     <div id="items_in_isa" style="display: inline;">
-      <%= render :partial => 'assets/isa-tree-toggle', locals: { cb_parent_selector: "div#items_in_isa" } -%>
+      <%= render partial: 'assets/isa-tree-toggle', locals: { cb_parent_selector: "div#items_in_isa" } -%>
       <h2 style="display: inline;">Items in ISA</h2>
       <div class="isa-tree" style="border-left:none">
         <label><a class="selectChildren" id="select_all_items_in_isa"
@@ -115,9 +115,9 @@
       </div>
       <div id="investigation_list">
         <% @investigations.each do |inv| %>
-          <%= render :partial => "assets/isa_tree_preview",
-                     :locals => { :publishing => publishing },
-                     :collection => inv.assays.map(&:study).map(&:investigation).flatten.uniq %>
+          <%= render partial: 'assets/isa_tree_preview',
+                     locals: { publishing: publishing },
+                     collection: inv.assays.map(&:study).map(&:investigation).flatten.uniq %>
         <% end %>
       </div>
       <br/>

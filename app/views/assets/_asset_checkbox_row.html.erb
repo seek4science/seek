@@ -60,12 +60,12 @@
         data-managed_by_selector='<%= managed_by_selector %>'>
       <span class="glyphicon glyphicon-user" aria-hidden="true" style="position:relative; top:2px;" ></span>
     </a>
-    <div class="managed_by_list" id=<%="#{item.class.name}_#{item.id}"-%> style="display:none;margin-left:5em">
+    <div class="managed_by_list" id="<%="#{item.class.name}_#{item.id}"-%>" style="display:none;margin-left:5em">
       <strong>Manageable by:</strong> <%= item.managers.empty? ? "<span class='none_text'>None</span>".html_safe : item.managers.collect { |m| link_to(h(m.title), m) }.join(", ").html_safe -%>
     </div>
   <% end %>
   <% if show_permissions %>
-      <div class="permission_list" id=<%="#{item.class.name}_#{item.id}"-%> style="display:none;margin-left:5em" >
+      <div class="permission_list" id="<%="#{item.class.name}_#{item.id}"-%>" style="display:none;margin-left:5em" >
         <%=  get_permission_list item -%>
       </div>
   <% end %>
