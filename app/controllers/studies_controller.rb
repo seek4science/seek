@@ -88,6 +88,33 @@ class StudiesController < ApplicationController
     end
   end
 
+  def destroy
+    raise 'This assay is not empty. Unable to delete this assay' unless @study.state_allows_delete?
+
+    raise "You are don't have permission to delete this assay!" unless current_user.can_delete?
+
+    project_id = @study.projects&.first&.id
+
+    if is_single_page_assay?
+      @study.sample_types.each do |st|
+        raise "Sample Type '#{st.title}' contains samples. Unable to delete study" unless st.samples.empty?
+        st.delete
+      end
+    end
+    @study.delete
+
+    if is_single_page_assay?
+      flash[:notice] = "ISA Study successfully deleted!"
+      redirect_to single_page_path(Project.find(project_id))
+    else
+      flash[:notice] = "Study successfully deleted!"
+      redirect_to new_study_path
+    end
+  rescue StandardError => e
+    flash[:error] = "#{e}. Couldn't delete Study!"
+    render json: { status: :unprocessable_entity, error: e.message }
+  end
+
   def show
     @study = Study.find(params[:id])
 
@@ -201,7 +228,7 @@ class StudiesController < ApplicationController
       study_params = {
         title: params[:studies][:title][index],
         description: params[:studies][:description][index],
-        investigation_id: params[:study][:investigation_id],        
+        investigation_id: params[:study][:investigation_id],
         custom_metadata: CustomMetadata.new(
           custom_metadata_type: metadata_types,
           data: metadata
@@ -350,4 +377,8 @@ class StudiesController < ApplicationController
                                   { discussion_links_attributes:[:id, :url, :label, :_destroy] },
                                   { custom_metadata_attributes: determine_custom_metadata_keys })
   end
+end
+
+def is_single_page_assay?
+  params[:return_to].start_with? '/single_pages/'
 end

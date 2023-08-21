@@ -115,7 +115,6 @@ class AssaysController < ApplicationController
 
     raise "You are don't have permission to delete this assay!" unless current_user.can_delete?
 
-    # hkvdghvshdbvjh
     project_id = @assay.projects&.first&.id
 
     @assay.sample_type.delete if is_single_page_assay?
