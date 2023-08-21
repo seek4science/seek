@@ -140,4 +140,11 @@ class Ga4ghTrsApiTest < ActionDispatch::IntegrationTest
     assert ids.include?(w1.id.to_s)
     assert ids.include?(w3.id.to_s)
   end
+
+  test 'should not error on HEAD request' do
+    workflow = FactoryBot.create(:nf_core_ro_crate_workflow, policy: FactoryBot.create(:public_policy))
+
+    head "/ga4gh/trs/v2/tools/#{workflow.id}"
+    assert_response :success
+  end
 end
