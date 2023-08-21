@@ -116,6 +116,28 @@ class MailerTest < ActionMailer::TestCase
     assert_equal expected_text, encode_mail(Mailer.request_publishing(owner, publisher, resources))
   end
 
+  test 'cancel publishing request' do
+    gatekeeper = FactoryBot.create(:asset_gatekeeper, first_name: 'Gatekeeper', last_name: 'Last')
+    person = FactoryBot.create(:person, project: gatekeeper.projects.first)
+    resources = [FactoryBot.create(:data_file, projects: gatekeeper.projects, title: 'Picture', contributor:person), FactoryBot.create(:teusink_model, projects: gatekeeper.projects, title: 'Teusink', contributor:person)]
+    requester = FactoryBot.create(:person, first_name: 'Aaron', last_name: 'Spiggle')
+
+    @expected.subject = 'A Sysmo SEEK member cancelled a publishing approval request.'
+    @expected.to = gatekeeper.email_with_name
+    @expected.from = 'no-reply@sysmo-db.org'
+    @expected.reply_to = requester.person.email_with_name
+
+    @expected.body = read_fixture('publishing_request_cancellation')
+
+    expected_text = encode_mail(@expected)
+    expected_text.gsub!('-person_id-', gatekeeper.id.to_s)
+    expected_text.gsub!('-df_id-', resources[0].id.to_s)
+    expected_text.gsub!('-model_id-', resources[1].id.to_s)
+    expected_text.gsub!('-requester_id-', requester.person.id.to_s)
+
+    assert_equal expected_text, encode_mail(Mailer.publishing_request_cancellation(gatekeeper, requester, resources))
+  end
+
   test 'gatekeeper approval feedback' do
     gatekeeper = FactoryBot.create(:asset_gatekeeper, first_name: 'Gatekeeper', last_name: 'Last')
     person = FactoryBot.create(:person, project: gatekeeper.projects.first)
