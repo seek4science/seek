@@ -35,16 +35,27 @@ class Sample < ApplicationRecord
   validates :title, :sample_type, presence: true
 
   validates_with SampleAttributeValidator
+  validate :validate_added_linked_sample_permissions
 
   before_validation :set_title_to_title_attribute_value
 
-  before_save :update_sample_resource_links
+  before_validation :update_sample_resource_links
   after_save :queue_sample_type_update_job
   after_save :queue_linking_samples_update_job
   after_destroy :queue_sample_type_update_job
 
-  
   has_filter :sample_type
+
+  def validate_added_linked_sample_permissions
+    previous_linked_samples = []
+    unless new_record?
+      previous_linked_samples = Sample.find(id).referenced_samples
+    end
+    additions = linked_samples - previous_linked_samples
+    if additions.detect{|sample| !sample.can_view?}
+      errors.add(:linked_samples, 'includes a new private sample')
+    end
+  end
 
   def sample_type=(type)
     super

@@ -1204,6 +1204,30 @@ class SamplesControllerTest < ActionController::TestCase
 
   end
 
+  test 'validates against linking a private sample' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    patient = FactoryBot.create(:patient_sample, contributor: FactoryBot.create(:person), policy: FactoryBot.create(:private_policy))
+
+    multi_linked_sample_type = FactoryBot.create(:multi_linked_sample_type, project_ids: [person.projects.first.id])
+    multi_linked_sample_type.sample_attributes.last.linked_sample_type = patient.sample_type
+    multi_linked_sample_type.save!
+
+    refute patient.can_view?
+
+    assert_no_difference('Sample.count') do
+      post :create, params: { sample: { sample_type_id: multi_linked_sample_type.id,
+                                        data:{
+                                          "title": 'Multiple Samples',
+                                          "patient": ['',patient.id.to_s]
+                                        },
+                                        project_ids: [person.projects.first.id]} }
+    end
+    assert assigns(:sample)
+    refute assigns(:sample).valid?
+
+  end
+
   test 'should return max query result' do
     with_config_value(:sample_type_template_enabled, true) do
       person = FactoryBot.create(:person)
