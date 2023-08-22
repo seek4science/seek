@@ -6,6 +6,7 @@ class StudiesController < ApplicationController
   before_action :studies_enabled?
   before_action :find_assets, only: [:index]
   before_action :find_and_authorize_requested_item, only: %i[edit update destroy manage manage_update show new_object_based_on_existing_one]
+  before_action :delete_linked_sample_types, only: [:destroy]
 
   # project_membership_required_appended is an alias to project_membership_required, but is necesary to include the actions
   # defined in the application controller
@@ -88,32 +89,16 @@ class StudiesController < ApplicationController
     end
   end
 
-  def destroy
-    raise 'This assay is not empty. Unable to delete this assay' unless @study.state_allows_delete?
+  def delete_linked_sample_types
+    return unless is_single_page_assay?
 
-    raise "You are don't have permission to delete this assay!" unless current_user.can_delete?
+    @study.sample_types.each do |st|
+      raise "Sample Type '#{st.title}' contains samples. Unable to delete study" unless st.samples.empty?
 
-    project_id = @study.projects&.first&.id
-
-    if is_single_page_assay?
-      @study.sample_types.each do |st|
-        raise "Sample Type '#{st.title}' contains samples. Unable to delete study" unless st.samples.empty?
-        st.delete
-      end
+      st.delete
     end
-    @study.delete
-
-    if is_single_page_assay?
-      flash[:notice] = "ISA Study successfully deleted!"
-      redirect_to single_page_path(Project.find(project_id))
-    else
-      flash[:notice] = "Study successfully deleted!"
-      redirect_to new_study_path
-    end
-  rescue StandardError => e
-    flash[:error] = "#{e}. Couldn't delete Study!"
-    render json: { status: :unprocessable_entity, error: e.message }
   end
+
 
   def show
     @study = Study.find(params[:id])
@@ -380,5 +365,7 @@ class StudiesController < ApplicationController
 end
 
 def is_single_page_assay?
+  return false unless params.key?(:return_to)
+
   params[:return_to].start_with? '/single_pages/'
 end
