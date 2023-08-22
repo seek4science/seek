@@ -1,0 +1,38 @@
+<%
+  id ||= "items"
+  text ||= "your items"
+  cb_parent_selector ||= 'body'
+  collapse_selector ||= cb_parent_selector
+  show_hide_selector ||= cb_parent_selector
+  blocked_selector ||= ''
+
+  select_deselect_all ||= false
+  collapse_expand ||= false
+  show_hide_blocked ||= false
+  show_hide_permissions ||= false
+%>
+
+<% if select_deselect_all %>
+  <label><a class="selectChildren" id="select_all_<%= id %>" data-cb_parent_selector="<%= cb_parent_selector %>" >
+    Select all <%= text %> </a></label>
+  | <label><a class="deselectChildren" id="deselect_all_<%= id %>" data-cb_parent_selector="<%= cb_parent_selector %>" >
+  Deselect all <%= text %> </a></label>
+<% end %>
+<% if collapse_expand %>
+  || <label><a class="collapseChildren" id="collapse_all_<%= id %>" data-cb_parent_selector="<%= collapse_selector %>" >
+  Collapse all </a></label>
+  | <label><a class="expandChildren" id="expand_all_<%= id %>" data-cb_parent_selector="<%= cb_parent_selector %>" >
+  Expand all </a></label>
+<% end %>
+<% if show_hide_blocked %>
+  || <label><a class="showBlocked" data-cb_parent_selector="<%= show_hide_selector %>" data-blocked_selector="<%= blocked_selector %>">
+  Show blocked items </a></label>
+  | <label><a class="hideBlocked" data-cb_parent_selector="<%= show_hide_selector %>" data-blocked_selector="<%= blocked_selector %>">
+  Hide blocked items </a></label>
+<% end %>
+<% if show_hide_permissions %>
+  || <label><a class="showPermissions" data-permissions_selector='div.permission_list' >
+  Show all permissions </a></label>
+  | <label><a class="hidePermissions" data-permissions_selector='div.permission_list' >
+  Hide all permissions </a></label>
+<% end %>

@@ -20,26 +20,15 @@
 </div>
 <br/><br/>
 <div>
-  <label><a class="selectChildren" id="select_all" data-cb_parent_selector='body' >
-    Select all your items </a></label>
-  | <label><a class="deselectChildren" id="deselect_all" data-cb_parent_selector='body' >
-    Deselect all your items </a></label>
-  || <label><a class="collapseChildren" id="collapse_all" data-cb_parent_selector='body' >
-    Collapse all </a></label>
-  | <label><a class="expandChildren" id="expand_all" data-cb_parent_selector='body' >
-    Expand all </a></label>
-  <% if show_hide_blocked %>
-    || <label><a class="showBlocked" data-cb_parent_selector='div#sorted_by_type,#sorted_by_isa' data-blocked_selector="<%="#{blocked_selector}"%>">
-      Show blocked items </a></label>
-    | <label><a class="hideBlocked" data-cb_parent_selector='div#sorted_by_type,#sorted_by_isa' data-blocked_selector="<%="#{blocked_selector}"%>">
-      Hide blocked items </a></label>
-  <% end %>
-  <% if show_hide_permissions %>
-    || <label><a class="showPermissions" data-permissions_selector='div.permission_list' >
-      Show all permissions </a></label>
-    | <label><a class="hidePermissions" data-permissions_selector='div.permission_list' >
-      Hide all permissions </a></label>
-  <% end %>
+  <%= render partial: 'assets/batch_asset_selection_buttons', locals: {
+    id: "items",
+    text: "your items",
+    cb_parent_selector: "body",
+    show_hide_selector: "div#sorted_by_type,#sorted_by_isa",
+    select_deselect_all: true,
+    collapse_expand: true,
+    show_hide_permissions: show_hide_permissions
+  } %>
 </div>
 
 <div id="sorted_by_type" >
@@ -48,12 +37,12 @@
       <%= render partial: 'assets/isa-tree-toggle', locals: { cb_parent_selector: "div##{items.first.class.table_name}" } -%>
       <h2 style="display: inline;"><%= text_for_resource items.first %>(s)</h2>
       <div class="isa-tree" style="border-left:none">
-        <label><a class="selectChildren" id="<%="select_all_#{items.first.class.table_name}"%>"
-                  data-cb_parent_selector='div#<%= items.first.class.table_name %>' >
-          Select all <%= "#{(text_for_resource items.first).downcase.pluralize}" %> </a></label> |
-        <label><a class="deselectChildren" id="<%="deselect_all_#{items.first.class.table_name}"%>"
-                  data-cb_parent_selector='div#<%= items.first.class.table_name %>' >
-          Deselect all <%= "#{(text_for_resource items.first).downcase.pluralize}" %> </a></label>
+        <%= render partial: 'assets/batch_asset_selection_buttons', locals: {
+          id: items.first.class.table_name,
+          text: (text_for_resource items.first).downcase.pluralize,
+          cb_parent_selector: 'div#'+items.first.class.table_name,
+          select_deselect_all: true
+        } %>
         <% items.each do |item| %>
           <%= render partial: 'assets/asset_checkbox_row',
                      object: item,
@@ -72,12 +61,12 @@
       <%= render partial: 'assets/isa-tree-toggle', locals: { cb_parent_selector: "div#items_not_in_isa" } -%>
       <h2 style="display: inline;">Items not in ISA</h2>
       <div class="isa-tree" style="border-left:none">
-        <label><a class="selectChildren" id="select_all_items_not_in_isa"
-                  data-cb_parent_selector='div#items_not_in_isa' >
-          Select all items not in ISA </a></label> |
-        <label><a class="deselectChildren" id="deselect_all_items_not_in_isa"
-                  data-cb_parent_selector='div#items_not_in_isa' >
-          Deselect all items not in ISA </a></label>
+        <%= render partial: 'assets/batch_asset_selection_buttons', locals: {
+          id: "items_not_in_isa",
+          text: "items not in ISA",
+          cb_parent_selector: 'div#items_not_in_isa',
+          select_deselect_all: true
+        } %>
       </div>
       <% @assets_not_in_isa.each do |item| %>
         <%= render partial: 'assets/asset_checkbox_row',
@@ -96,22 +85,16 @@
       <%= render partial: 'assets/isa-tree-toggle', locals: { cb_parent_selector: "div#items_in_isa" } -%>
       <h2 style="display: inline;">Items in ISA</h2>
       <div class="isa-tree" style="border-left:none">
-        <label><a class="selectChildren" id="select_all_items_in_isa"
-                  data-cb_parent_selector='div#items_in_isa' >
-          Select all items in ISA </a></label>
-        | <label><a class="deselectChildren" id="deselect_all_items_in_isa"
-                  data-cb_parent_selector='div#items_in_isa' >
-          Deselect all items in ISA </a></label>
-        || <label><a class="collapseChildren" id="collapse_isa" data-cb_parent_selector='div#investigation_list' >
-          Collapse all </a></label>
-        | <label><a class="expandChildren" id="expand_isa" data-cb_parent_selector='div#items_in_isa' >
-          Expand all </a></label>
-        <% if show_hide_blocked %>
-          || <label><a class="showBlocked" data-cb_parent_selector='div#items_in_isa' data-blocked_selector="<%="#{blocked_selector}"%>">
-            Show blocked items </a></label>
-          | <label><a class="hideBlocked" data-cb_parent_selector='div#items_in_isa' data-blocked_selector="<%="#{blocked_selector}"%>">
-            Hide blocked items </a></label>
-        <% end %>
+        <%= render partial: 'assets/batch_asset_selection_buttons', locals: {
+          id: "items_in_isa",
+          text: "items in ISA",
+          cb_parent_selector: "div#items_in_isa",
+          collapse_selector: "div#investigation_list",
+          blocked_selector: blocked_selector,
+          select_deselect_all: true,
+          collapse_expand: true,
+          show_hide_blocked: show_hide_blocked
+        } %>
       </div>
       <div id="investigation_list">
         <% @investigations.each do |inv| %>
