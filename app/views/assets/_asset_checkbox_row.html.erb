@@ -65,8 +65,6 @@
     </div>
   <% end %>
   <% if show_permissions %>
-      <div class="permission_list" id="<%="#{item.class.name}_#{item.id}"-%>" style="display:none;margin-left:5em" >
-        <%=  get_permission_list item -%>
-      </div>
+    <%= render :partial => 'assets/permission_list', locals: { item: item} -%>
   <% end %>
 </div>
