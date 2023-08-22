@@ -13,26 +13,51 @@
 %>
 
 <% if select_deselect_all %>
-  <label><a class="selectChildren" id="select_all_<%= id %>" data-cb_parent_selector="<%= cb_parent_selector %>" >
-    Select all <%= text %> </a></label>
-  | <label><a class="deselectChildren" id="deselect_all_<%= id %>" data-cb_parent_selector="<%= cb_parent_selector %>" >
-  Deselect all <%= text %> </a></label>
+  <div class="btn-group" style="padding-right: 15px">
+    <a type="button" style="padding: 2px 6px" class="btn btn-default btn-sm selectChildren"
+       id="select_all_<%= id %>" data-cb_parent_selector="<%= cb_parent_selector %>" >
+      Select all <%= text %>
+    </a>
+    <a type="button" style="padding: 2px 6px" class="btn btn-default btn-sm deselectChildren"
+       id="deselect_all_<%= id %>" data-cb_parent_selector="<%= cb_parent_selector %>" >
+      Deselect all <%= text %>
+    </a>
+  </div>
+
 <% end %>
 <% if collapse_expand %>
-  || <label><a class="collapseChildren" id="collapse_all_<%= id %>" data-cb_parent_selector="<%= collapse_selector %>" >
-  Collapse all </a></label>
-  | <label><a class="expandChildren" id="expand_all_<%= id %>" data-cb_parent_selector="<%= cb_parent_selector %>" >
-  Expand all </a></label>
+  <div class="btn-group" style="padding-right: 15px">
+    <a type="button" style="padding: 2px 6px" class="btn btn-default btn-sm collapseChildren"
+       id="collapse_all_<%= id %>" data-cb_parent_selector="<%= collapse_selector %>" >
+      Collapse all
+    </a>
+    <a type="button" style="padding: 2px 6px" class="btn btn-default btn-sm expandChildren"
+       id="expand_all_<%= id %>" data-cb_parent_selector="<%= cb_parent_selector %>" >
+      Expand all
+    </a>
+  </div>
 <% end %>
 <% if show_hide_blocked %>
-  || <label><a class="showBlocked" data-cb_parent_selector="<%= show_hide_selector %>" data-blocked_selector="<%= blocked_selector %>">
-  Show blocked items </a></label>
-  | <label><a class="hideBlocked" data-cb_parent_selector="<%= show_hide_selector %>" data-blocked_selector="<%= blocked_selector %>">
-  Hide blocked items </a></label>
+  <div class="btn-group" style="padding-right: 15px">
+    <a type="button" style="padding: 2px 6px" class="btn btn-default btn-sm showBlocked"
+       data-cb_parent_selector="<%= show_hide_selector %>" data-blocked_selector="<%= blocked_selector %>">
+      Show blocked items
+    </a>
+    <a type="button" style="padding: 2px 6px" class="btn btn-default btn-sm hideBlocked"
+       data-cb_parent_selector="<%= show_hide_selector %>" data-blocked_selector="<%= blocked_selector %>">
+      Hide blocked items
+    </a>
+  </div>
 <% end %>
 <% if show_hide_permissions %>
-  || <label><a class="showPermissions" data-permissions_selector='div.permission_list' >
-  Show all permissions </a></label>
-  | <label><a class="hidePermissions" data-permissions_selector='div.permission_list' >
-  Hide all permissions </a></label>
+  <div class="btn-group" style="padding-right: 15px">
+    <a type="button" style="padding: 2px 6px" class="btn btn-default btn-sm showPermissions"
+       data-permissions_selector='div.permission_list' >
+      Show all permissions
+    </a>
+    <a type="button" style="padding: 2px 6px" class="btn btn-default btn-sm hidePermissions"
+       data-permissions_selector='div.permission_list' >
+      Hide all permissions
+    </a>
+  </div>
 <% end %>
