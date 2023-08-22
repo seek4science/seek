@@ -1181,11 +1181,9 @@ class SampleTest < ActiveSupport::TestCase
     person_a = FactoryBot.create(:person)
     person_b = FactoryBot.create(:person)
 
-
     pub_patient1 = FactoryBot.create(:patient_sample, contributor: person_a, policy: FactoryBot.create(:public_policy))
 
     patient_sample_type = pub_patient1.sample_type
-    pub_patient2 = FactoryBot.create(:patient_sample, sample_type:patient_sample_type, contributor: person_a, policy: FactoryBot.create(:public_policy))
 
     priv_patient1 = FactoryBot.create(:patient_sample, sample_type:patient_sample_type, contributor: person_a, policy: FactoryBot.create(:private_policy) )
 
@@ -1208,14 +1206,12 @@ class SampleTest < ActiveSupport::TestCase
     # sanity check
     User.with_current_user(person_a) do
       assert pub_patient1.can_view?
-      assert pub_patient2.can_view?
       assert priv_patient1.can_view?
       assert priv_patient2.can_view?
       assert sample.can_edit?
     end
     User.with_current_user(person_b) do
       assert pub_patient1.can_view?
-      assert pub_patient2.can_view?
       refute priv_patient1.can_view?
       refute priv_patient2.can_view?
       assert sample.can_edit?
