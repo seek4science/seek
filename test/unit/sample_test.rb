@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class SampleTest < ActiveSupport::TestCase
+
   test 'validation' do
     sample = FactoryBot.create :sample, title: 'fish', sample_type: FactoryBot.create(:simple_sample_type), data: { the_title: 'fish' }
     assert sample.valid?
@@ -527,7 +528,7 @@ class SampleTest < ActiveSupport::TestCase
 
   test 'linked sample as title' do
     # setup sample type, to be linked to patient sample type
-    patient = FactoryBot.create(:patient_sample)
+    patient = FactoryBot.create(:patient_sample, policy:FactoryBot.create(:public_policy))
     assert_equal 'Fred Bloggs', patient.title
     linked_sample_type = FactoryBot.create(:linked_sample_type, project_ids: [FactoryBot.create(:project).id])
     linked_sample_type.sample_attributes.last.linked_sample_type = patient.sample_type
@@ -607,7 +608,7 @@ class SampleTest < ActiveSupport::TestCase
 
   test 'set linked sample by id' do
     # setup sample type, to be linked to patient sample type
-    patient = FactoryBot.create(:patient_sample)
+    patient = FactoryBot.create(:patient_sample, policy: FactoryBot.create(:public_policy))
     linked_sample_type = FactoryBot.create(:linked_sample_type, project_ids: [FactoryBot.create(:project).id])
     linked_sample_type.sample_attributes.last.linked_sample_type = patient.sample_type
     linked_sample_type.save!
@@ -626,7 +627,7 @@ class SampleTest < ActiveSupport::TestCase
 
   test 'set linked sample by title' do
     # setup sample type, to be linked to patient sample type
-    patient = FactoryBot.create(:patient_sample)
+    patient = FactoryBot.create(:patient_sample, policy: FactoryBot.create(:public_policy))
     linked_sample_type = FactoryBot.create(:linked_sample_type, project_ids: [FactoryBot.create(:project).id])
     linked_sample_type.sample_attributes.last.linked_sample_type = patient.sample_type
 
@@ -1119,8 +1120,8 @@ class SampleTest < ActiveSupport::TestCase
   end
 
   test 'multi linked sample validation' do
-    patient = FactoryBot.create(:patient_sample)
-    patient2 = FactoryBot.create(:patient_sample, sample_type:patient.sample_type )
+    patient = FactoryBot.create(:patient_sample, policy:FactoryBot.create(:public_policy))
+    patient2 = FactoryBot.create(:patient_sample, sample_type:patient.sample_type, policy:FactoryBot.create(:public_policy) )
     multi_linked_sample_type = FactoryBot.create(:multi_linked_sample_type, project_ids: [FactoryBot.create(:project).id])
     multi_linked_sample_type.sample_attributes.last.linked_sample_type = patient.sample_type
     multi_linked_sample_type.save!

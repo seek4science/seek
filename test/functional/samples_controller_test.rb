@@ -1233,6 +1233,8 @@ class SamplesControllerTest < ActionController::TestCase
       person = FactoryBot.create(:person)
       project = FactoryBot.create(:project)
 
+      login_as(person)
+
       template1 = FactoryBot.create(:isa_source_template)
       template2 = FactoryBot.create(:isa_sample_collection_template)
       template3 = FactoryBot.create(:isa_assay_template)
@@ -1252,7 +1254,7 @@ class SamplesControllerTest < ActionController::TestCase
       sample3 = FactoryBot.create :sample, title: 'sample3', sample_type: type3, project_ids: [project.id], contributor: person,
                                  data: { Input: [sample2.id], 'Protocol Assay 1': 'Protocol Assay 1', 'Assay 1 parameter value 1': 'Assay 1 parameter value 1', 'Extract Name': 'Extract Name', 'other material characteristic 1': 'other material characteristic 1' }
 
-      login_as(person)
+
 
       post :query, xhr: true, params: {
         project_ids: [project.id],
