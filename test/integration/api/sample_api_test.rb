@@ -127,7 +127,7 @@ class SampleApiTest < ActionDispatch::IntegrationTest
   test 'create with multi sample and cv list' do
     user_login
     max_sample_type = FactoryBot.create(:max_sample_type)
-    patients = [FactoryBot.create(:patient_sample), FactoryBot.create(:patient_sample)]
+    patients = [FactoryBot.create(:patient_sample, policy:FactoryBot.create(:public_policy)), FactoryBot.create(:patient_sample, policy:FactoryBot.create(:public_policy))]
 
     params = {
       "data": {
@@ -179,7 +179,7 @@ class SampleApiTest < ActionDispatch::IntegrationTest
   test 'create with multi sample and cv list - as array' do
     user_login
     max_sample_type = FactoryBot.create(:max_sample_type)
-    patients = [FactoryBot.create(:patient_sample), FactoryBot.create(:patient_sample)]
+    patients = [FactoryBot.create(:patient_sample, policy:FactoryBot.create(:public_policy)), FactoryBot.create(:patient_sample, policy:FactoryBot.create(:public_policy))]
 
     params = {
       "data": {
