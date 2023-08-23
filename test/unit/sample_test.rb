@@ -1189,7 +1189,7 @@ class SampleTest < ActiveSupport::TestCase
 
     priv_patient2 = FactoryBot.create(:patient_sample, sample_type:patient_sample_type, contributor: person_a, policy: FactoryBot.create(:private_policy) )
 
-    linked_sample_type = FactoryBot.create(:linked_sample_type, project_ids: [person_a.projects.first.id])
+    linked_sample_type = FactoryBot.create(:linked_optional_sample_type, project_ids: [person_a.projects.first.id])
     linked_sample_type.sample_attributes.last.linked_sample_type = patient_sample_type
     linked_sample_type.save!
 
@@ -1251,6 +1251,15 @@ class SampleTest < ActiveSupport::TestCase
     end
     User.with_current_user(person_b) do
       refute sample.valid?
+    end
+
+    # change to nil
+    sample.set_attribute_value(:patient, nil)
+    User.with_current_user(person_a) do
+      assert sample.valid?
+    end
+    User.with_current_user(person_b) do
+      assert sample.valid?
     end
   end
 

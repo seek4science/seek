@@ -17,8 +17,7 @@ module Seek
         end
 
         def convert(value)
-          return super(value) if value.is_a?(String) || value.is_a?(Integer)
-          super(value.compact_blank.first)
+          super(value.is_a?(Array) ? value.compact_blank.first : value)
         end
 
         private
