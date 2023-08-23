@@ -90,7 +90,7 @@ class StudiesController < ApplicationController
   end
 
   def delete_linked_sample_types
-    return unless is_single_page_assay?
+    return unless is_single_page_study?
 
     @study.sample_types.each do |st|
       raise "Sample Type '#{st.title}' contains samples. Unable to delete study" unless st.samples.empty?
@@ -364,7 +364,7 @@ class StudiesController < ApplicationController
   end
 end
 
-def is_single_page_assay?
+def is_single_page_study?
   return false unless params.key?(:return_to)
 
   params[:return_to].start_with? '/single_pages/'
