@@ -223,12 +223,14 @@ const handleSelect = (e) => {
 
         this.table.rows.add(rows).draw();
 
-        if (sampleLinksTitles.length)
+          if (sampleLinksTitles.length)
           alert(
             "No value is pasted for the following column(s): \n" +
             sampleLinksTitles.map((x) => `"${x}"`).join(", ") +
             "\nYou need to manually input them."
           );
+      }).catch((error) =>{
+        alert(`Error occurred:\n${error}`);
       });
     },
     newRow: function() {
