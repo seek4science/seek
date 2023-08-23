@@ -9,10 +9,10 @@ class DynamicTableHelperTest < ActionView::TestCase
     User.with_current_user(person.user) do
       inv = FactoryBot.create(:investigation, projects: [project], contributor: person)
 
-      sample_a1 = FactoryBot.create(:patient_sample)
+      sample_a1 = FactoryBot.create(:patient_sample, contributor: person)
       type_a = sample_a1.sample_type
-      sample_a2 = FactoryBot.create(:patient_sample, sample_type: type_a)
-      sample_a3 = FactoryBot.create(:patient_sample, sample_type: type_a)
+      sample_a2 = FactoryBot.create(:patient_sample, sample_type: type_a, contributor: person)
+      sample_a3 = FactoryBot.create(:patient_sample, sample_type: type_a, contributor: person)
 
       type_b = FactoryBot.create(:multi_linked_sample_type, project_ids: [project.id])
       type_b.sample_attributes.last.linked_sample_type = type_a

@@ -1000,7 +1000,7 @@ class SampleTypeTest < ActiveSupport::TestCase
     patient_sample = nil
     User.with_current_user(@person.user) do
       attr = sample_type.sample_attributes.detect { |t| t.accessor_name == 'patient' }
-      patient_sample = FactoryBot.create(:patient_sample, sample_type: attr.linked_sample_type)
+      patient_sample = FactoryBot.create(:patient_sample, sample_type: attr.linked_sample_type, contributor: @person)
       sample_type.samples.create!(data: { title: 'Lib-4', patient: patient_sample.id }, sample_type: sample_type,
                                   project_ids: @person.project_ids)
     end
