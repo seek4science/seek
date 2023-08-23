@@ -47,8 +47,11 @@ class SampleType < ApplicationRecord
   validates :title, length: { maximum: 255 }
   validates :description, length: { maximum: 65_535 }
   validates :contributor, presence: true
-  validate :validate_one_title_attribute_present, :validate_attribute_title_unique, :validate_attribute_accessor_names_unique, 
-           :validate_title_is_not_type_of_seek_sample_multi
+  validate :validate_one_title_attribute_present,
+           :validate_attribute_title_unique,
+           :validate_attribute_accessor_names_unique,
+           :validate_title_is_not_type_of_seek_sample_multi,
+           :validate_against_editing_constraints
   validates :projects, presence: true, projects: { self: true }
 
   accepts_nested_attributes_for :sample_attributes, allow_destroy: true
@@ -193,6 +196,19 @@ class SampleType < ApplicationRecord
     if dups.any?
       dups_text = dups.map { |_k, v| "(#{v.map(&:title).join(', ')})" }.join(', ')
       errors.add(:sample_attributes, "Attribute names are too similar: #{dups_text}")
+    end
+  end
+
+  def validate_against_editing_constraints
+    c = editing_constraints
+    sample_attributes.each do |a|
+      if a.marked_for_destruction? && !c.allow_attribute_removal?(a)
+        errors.add(:sample_attributes, "cannot be removed, there are existing samples using this attribute (#{a.title})")
+      end
+
+      if a.new_record? && !c.allow_new_attribute?
+        errors.add(:sample_attributes, "cannot be added, new attributes are not allowed (#{a.title})")
+      end
     end
   end
 
