@@ -24,7 +24,7 @@ class ResourceListHelperTest < ActionView::TestCase
 
     assert_equal link_to(data_file.contributor.name, data_file.contributor),
                  resource_list_column_display_value(data_file, 'contributor')
-    assert_equal link_to('Creative Commons Attribution 4.0', 'https://creativecommons.org/licenses/by/4.0/', target: :_blank),
+    assert_equal link_to('Creative Commons Attribution 4.0 International', 'https://spdx.org/licenses/CC-BY-4.0', target: :_blank),
                  resource_list_column_display_value(data_file, 'license')
 
     assert_match(/href="#{data_file_path(data_file)}".*#{data_file.title}/,
