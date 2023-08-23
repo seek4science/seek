@@ -223,14 +223,14 @@ const handleSelect = (e) => {
 
         this.table.rows.add(rows).draw();
 
-          if (sampleLinksTitles.length)
+        if (sampleLinksTitles.length)
           alert(
             "No value is pasted for the following column(s): \n" +
             sampleLinksTitles.map((x) => `"${x}"`).join(", ") +
             "\nYou need to manually input them."
           );
       }).catch((error) =>{
-        alert(`Error occurred:\n${error}`);
+        alert(`Paste action aborted:\n\n${error}\n\nNote: Some browsers require to click 'paste' to paste the information in the table.`);
       });
     },
     newRow: function() {
