@@ -5,6 +5,9 @@
   # User supplied options (not one of the presets), should not appear as options in the dropdown menu.
   option_pairs = options.select { |o| o.data[:preset] }.map { |option| ["#{option.label} (#{option.count})", option.value] } + [['Custom range', 'custom']]
   active_options = options.select(&:active?)
+
+  return unless @visible_count > 0 || active_options.any?
+
   selected_option_value = nil
 
   if active_options.any?
