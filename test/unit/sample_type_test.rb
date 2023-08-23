@@ -994,6 +994,104 @@ class SampleTypeTest < ActiveSupport::TestCase
     refute sample_type.contributor_credited?
   end
 
+  test 'validates changes against editing constraints' do
+    sample_type = FactoryBot.create(:linked_optional_sample_type, contributor: @person)
+    different_sample_type = FactoryBot.create(:simple_sample_type, contributor: @person)
+    patient_sample = nil
+    User.with_current_user(@person.user) do
+      attr = sample_type.sample_attributes.detect { |t| t.accessor_name == 'patient' }
+      patient_sample = FactoryBot.create(:patient_sample, sample_type: attr.linked_sample_type, contributor: @person)
+      sample_type.samples.create!(data: { title: 'Lib-4', patient: patient_sample.id }, sample_type: sample_type,
+                                  project_ids: @person.project_ids)
+    end
+
+    assert sample_type.valid?
+
+    # Adding attribute
+    sample_type.sample_attributes.build(title: 'test 123')
+    refute sample_type.valid?
+    assert sample_type.errors.added?(:sample_attributes, 'cannot be added, new attributes are not allowed (test 123)')
+
+    sample_type.reload
+    assert sample_type.valid?
+
+    # Removing attribute (via nested attributes)
+    sample_type.sample_attributes_attributes = { id: sample_type.sample_attributes.last.id, _destroy: '1' }
+    refute sample_type.valid?
+    assert sample_type.errors.added?(:sample_attributes, 'cannot be removed, there are existing samples using this attribute (patient)')
+
+    sample_type.reload
+    assert sample_type.valid?
+
+    # Changing attribute title
+    sample_type.sample_attributes.last.title = 'banana'
+    refute sample_type.valid?
+    assert sample_type.errors.added?(:'sample_attributes.title', 'cannot be changed (patient)')
+
+    sample_type.reload
+    assert sample_type.valid?
+
+    # Changing "required" attribute
+    User.with_current_user(@person.user) do
+      sample_type.samples.create!(data: { title: 'Lib-5', patient: nil }, sample_type: sample_type,
+                                  project_ids: @person.project_ids)
+    end
+    sample_type.sample_attributes.last.required = true
+    refute sample_type.valid?
+    assert sample_type.errors.added?(:'sample_attributes.required', 'cannot be changed (patient)')
+
+    sample_type.reload
+    assert sample_type.valid?
+
+    # Changing "title" attribute
+    sample_type.sample_attributes.last.is_title = true
+    refute sample_type.valid?
+    assert sample_type.errors.added?(:'sample_attributes.is_title', 'cannot be changed (patient)')
+
+    sample_type.reload
+    assert sample_type.valid?
+
+    # Changing sample attribute type
+    sample_type.sample_attributes.last.sample_attribute_type = FactoryBot.create(:integer_sample_attribute_type)
+    refute sample_type.valid?
+    assert sample_type.errors.added?(:'sample_attributes.sample_attribute_type', 'cannot be changed (patient)')
+
+    sample_type.reload
+    assert sample_type.valid?
+
+    # Changing linked sample type
+    attr = sample_type.sample_attributes.detect { |t| t.accessor_name == 'patient' }
+    attr.linked_sample_type = different_sample_type
+    refute sample_type.valid?
+    assert sample_type.errors.added?(:'sample_attributes.linked_sample_type', 'cannot be changed (patient)')
+
+    sample_type.reload
+    assert sample_type.valid?
+
+    # Changing sample controlled vocab
+    sample_type = FactoryBot.create(:apples_controlled_vocab_sample_type, contributor: @person)
+    User.with_current_user(@person.user) do
+      sample_type.samples.create!(data: { apples: 'Bramley' }, sample_type: sample_type, project_ids: @person.project_ids)
+    end
+
+    assert sample_type.valid?
+    attr = sample_type.sample_attributes.detect { |t| t.accessor_name == 'apples' }
+    attr.sample_controlled_vocab = FactoryBot.create(:sample_controlled_vocab)
+    refute sample_type.valid?
+    assert sample_type.errors.added?(:'sample_attributes.sample_controlled_vocab', 'cannot be changed (apples)')
+
+    sample_type.reload
+    assert sample_type.valid?
+
+    # Changing unit
+    sample_type = patient_sample.sample_type
+    assert sample_type.valid?
+    attr = sample_type.sample_attributes.detect { |t| t.accessor_name == 'weight' }
+    attr.unit = FactoryBot.create(:unit)
+    refute sample_type.valid?
+    assert sample_type.errors.added?(:'sample_attributes.unit', 'cannot be changed (weight)')
+  end
+
   private
 
   # sample type with 3 samples
