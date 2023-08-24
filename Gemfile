@@ -109,7 +109,6 @@ gem 'ransack'
 
 gem 'terser', '~> 1.1', '>= 1.1.1'
 
-gem 'dynamic_sitemaps', github: 'lassebunk/dynamic_sitemaps', branch: 'master'
 
 # Rails 4 upgrade
 gem 'activerecord-session_store'
@@ -204,3 +203,5 @@ group :test, :development do
   gem 'teaspoon'
   gem 'teaspoon-mocha'
 end
+
+gem "sitemap_generator", "~> 6.3"

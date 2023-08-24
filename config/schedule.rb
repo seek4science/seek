@@ -73,7 +73,7 @@ end
 
 # Generate a new sitemap...
 every 1.day, at: '12:45 am' do
-  bundle exec rake "sitemap:generate"
+  rake "-s sitemap:refresh"
 end
 
 # not safe to automatically add in a non containerised environment
