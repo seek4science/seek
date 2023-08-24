@@ -183,11 +183,13 @@ module Seek
         }
       when Investigation
         {
-          children: [:positioned_studies, :publications]
+          children: [:positioned_studies],
+          related: [:publications]
         }
       when Study
         {
-          children: [:positioned_assays, :publications, :sops],
+          children: [:positioned_assays],
+          related: [:publications, :sops],
           parents: [:investigation]
         }
       when Assay
