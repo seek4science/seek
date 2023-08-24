@@ -143,8 +143,7 @@ class IsaGraphGeneratorTest < ActiveSupport::TestCase
     publication = FactoryBot.create(:publication)
     publication2 = FactoryBot.create(:publication)
     assay = FactoryBot.create(:assay, contributor: person, publications: [publication])
-    assay.study.publications << publication2
-    disable_authorization_checks { assay.study.save! }
+    disable_authorization_checks { assay.study.publications << publication2 }
 
     assert_equal [publication], assay.publications
     assert_equal [publication], assay.related_publications
