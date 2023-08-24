@@ -84,6 +84,7 @@
                      grouped_options_for_select(options,
                                         link_to_self ? 'self' : linked_sample_type_id),
                      include_blank: true,
+                     disabled: !allow_type_change,
                      class: 'form-control linked-sample-type-selection' %>
     </div>
   </td>

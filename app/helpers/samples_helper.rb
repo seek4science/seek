@@ -75,13 +75,30 @@ module SamplesHelper
     html.html_safe
   end
 
-  def sample_multi_form_field(attribute, element_name, value)  
+  def sample_form_field(attribute, element_name, value, limit = 1)
+
     existing_objects = []
     str = Struct.new(:id, :title)
-    value.each {|v| existing_objects << str.new(v[:id], v[:title]) if v} if value
+    if value
+      value = [value] unless value.is_a?(Array)
+      value.compact.each do |v|
+        id = v[:id]
+        title = v[:title]
+        title = '<em>Hidden</em>' unless Sample.find(id).can_view?
+        existing_objects << str.new(id, title)
+      end
+    end
+
+    typeahead = { query_url: typeahead_samples_path + "?linked_sample_type_id=#{attribute.linked_sample_type.id}",
+                  handlebars_template: 'typeahead/controlled_vocab_term' }
     objects_input(element_name, existing_objects,
-                  typeahead: { query_url: typeahead_samples_path + "?linked_sample_type_id=#{attribute.linked_sample_type.id}",
-                  handlebars_template: 'typeahead/controlled_vocab_term' }, class: 'form-control')
+                  typeahead: typeahead,
+                  limit: limit,
+                  class: 'form-control')
+  end
+
+  def sample_multi_form_field(attribute, element_name, value)
+    sample_form_field(attribute, element_name, value, nil)
   end
 
   def authorised_samples(projects = nil)
@@ -307,10 +324,7 @@ module SamplesHelper
     when Seek::Samples::BaseType::CV_LIST
       controlled_vocab_list_form_field attribute.sample_controlled_vocab, element_name, value
     when Seek::Samples::BaseType::SEEK_SAMPLE
-      terms = attribute.linked_sample_type.samples.authorized_for('view').to_a
-      options = options_from_collection_for_select(terms, :id, :title, value.try(:[], 'id'))
-      select_tag element_name, options,
-                 include_blank: !attribute.required?, class: "form-control #{element_class}"
+      sample_form_field attribute, element_name, value
     when Seek::Samples::BaseType::SEEK_SAMPLE_MULTI
       sample_multi_form_field attribute, element_name, value
     when Seek::Samples::BaseType::LINKED_CUSTOM_METADATA
