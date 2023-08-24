@@ -18,6 +18,13 @@ GIT
     my_responds_to_parent (1.0.0)
 
 GIT
+  remote: https://github.com/lassebunk/dynamic_sitemaps.git
+  revision: 37beeba143e8202218ee814056231b0e6974bafb
+  branch: master
+  specs:
+    dynamic_sitemaps (2.0.0)
+
+GIT
   remote: https://github.com/seek4science/DOI-query-tool.git
   revision: 7c2ba934885ad404d964cd371e236d3348efb63c
   specs:
@@ -986,6 +993,7 @@ DEPENDENCIES
   doi_query_tool!
   doorkeeper (>= 5.2.5)
   dotenv-rails (~> 2.7.6)
+  dynamic_sitemaps!
   equivalent-xml
   exception_notification
   factory_bot (~> 6.2.1)
