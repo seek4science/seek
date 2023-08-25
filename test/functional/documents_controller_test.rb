@@ -234,6 +234,82 @@ class DocumentsControllerTest < ActionController::TestCase
     assert_select 'a', text: /View content/, count: 1
   end
 
+  test 'show explore button' do
+    doc = FactoryBot.create(:small_test_spreadsheet_document)
+    login_as(doc.contributor.user)
+    get :show, params: { id: doc }
+    assert_response :success
+    assert_select '#buttons' do
+      assert_select 'a[href=?]', explore_document_path(doc, version: doc.version), count: 1
+      assert_select 'a.disabled', text: 'Explore', count: 0
+    end
+  end
+
+  test 'not show explore button if spreadsheet not supported' do
+    doc = FactoryBot.create(:non_spreadsheet_document)
+    login_as(doc.contributor.user)
+    with_config_value(:max_extractable_spreadsheet_size, 0) do
+      get :show, params: { id: doc }
+    end
+    assert_response :success
+    assert_select '#buttons' do
+      assert_select 'a[href=?]', explore_document_path(doc, version: doc.version), count: 0
+      assert_select 'a', text: 'Explore', count: 0
+    end
+  end
+
+  test 'show disabled explore button if spreadsheet too big' do
+    doc = FactoryBot.create(:small_test_spreadsheet_document)
+    login_as(doc.contributor.user)
+    with_config_value(:max_extractable_spreadsheet_size, 0) do
+      get :show, params: { id: doc }
+    end
+    assert_response :success
+    assert_select '#buttons' do
+      assert_select 'a[href=?]', explore_document_path(doc, version: doc.version), count: 0
+      assert_select 'a.disabled', text: 'Explore', count: 1
+    end
+  end
+
+  test 'explore latest version' do
+    data = FactoryBot.create :small_test_spreadsheet_document, policy: FactoryBot.create(:public_policy)
+    get :explore, params: { id: data }
+    assert_response :success
+  end
+
+  test 'explore earlier version' do
+    doc = FactoryBot.create(:small_test_spreadsheet_document)
+    login_as(doc.contributor.user)
+    assert doc.save_as_new_version('no comment')
+    FactoryBot.create(:pdf_content_blob, asset_version: doc.version, asset: doc)
+    doc.reload
+    assert_equal 2, doc.versions.count
+    assert doc.find_version(1).content_blob.is_extractable_excel?
+    refute doc.find_version(2).content_blob.is_extractable_excel?
+    get :explore, params: { id: doc, version: 1 }
+    assert_response :success
+  end
+
+  test 'gracefully handles explore with no spreadsheet' do
+    doc = FactoryBot.create(:document, version: 1)
+    login_as(doc.contributor)
+    get :explore, params: { id: doc, version: 1 }
+    assert_redirected_to document_path(doc, version: 1)
+    assert flash[:error]
+  end
+
+  test 'gracefully handles explore with invalid mime type' do
+    doc = FactoryBot.create(:csv_spreadsheet_document, policy: FactoryBot.create(:public_policy))
+    doc.content_blob.update_column(:content_type, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    # incorrectly thinks it's excel
+    assert doc.content_blob.is_excel?
+    # check mime type cannot be resolved, otherwise it will autofix without error
+    assert_nil doc.content_blob.send(:mime_magic_content_type)
+    get :explore, params: { id: doc, version: 1 }
+    assert_redirected_to document_path(doc, version: 1)
+    assert flash[:error]
+  end
+
   test "assay documents through nested routing" do
     assert_routing 'assays/2/documents', controller: 'documents', action: 'index', assay_id: '2'
     person = FactoryBot.create(:person)
@@ -342,6 +418,10 @@ class DocumentsControllerTest < ActionController::TestCase
 
   test 'manage menu item appears according to permission' do
     check_manage_edit_menu_for_type('document')
+  end
+
+  test 'publish menu items appears according to status and permission' do
+    check_publish_menu_for_type('document')
   end
 
   test 'can access manage page with manage rights' do

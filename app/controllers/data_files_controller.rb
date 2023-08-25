@@ -128,35 +128,6 @@ class DataFilesController < ApplicationController
       ft = FileTemplate.find(params[:file_template_id])
     end
   end
-  
-  def explore
-    #drop invalid explore params
-    [:page_rows, :page, :sheet].each do |param|
-      if params[param].present? && (params[param] =~ /\A\d+\Z/).nil?
-        params.delete(param)
-      end
-    end
-    if @display_data_file.contains_extractable_spreadsheet?
-      begin
-        @workbook = Rails.cache.fetch("spreadsheet-workbook-#{@display_data_file.content_blob.cache_key}") do
-          @display_data_file.spreadsheet
-        end
-        respond_to do |format|
-          format.html
-        end
-      rescue SysMODB::SpreadsheetExtractionException
-        respond_to do |format|
-          flash[:error] = "There was an error when processing the #{t('data_file')} to explore, perhaps it isn't a valid Excel spreadsheet"
-          format.html { redirect_to data_file_path(@data_file, version: @display_data_file.version) }
-        end
-      end
-    else
-      respond_to do |format|
-        flash[:error] = "Unable to explore contents of this #{t('data_file')}"
-        format.html { redirect_to data_file_path(@data_file, version: @display_data_file.version) }
-      end
-    end
-  end
 
   def filter
     scope = DataFile

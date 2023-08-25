@@ -1,13 +1,12 @@
 require_dependency 'seek/util'
 
 class DataFile < ApplicationRecord
-  include Seek::Data::SpreadsheetExplorerRepresentation
   include Seek::Rdf::RdfGeneration
   include Seek::BioSchema::Support
 
   acts_as_asset
 
-  acts_as_doi_parent(child_accessor: :versions)
+  acts_as_doi_parent
 
   has_controlled_vocab_annotations :data_types, :data_formats
 
@@ -43,7 +42,6 @@ class DataFile < ApplicationRecord
 
   explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi', 'file_template_id']) do
 
-    include Seek::Data::SpreadsheetExplorerRepresentation
     acts_as_doi_mintable(proxy: :parent, type: 'Dataset', general_type: 'Dataset')
     acts_as_versioned_resource
     acts_as_favouritable
@@ -104,6 +102,10 @@ class DataFile < ApplicationRecord
   end
 
   def use_mime_type_for_avatar?
+    true
+  end
+
+  def supports_spreadsheet_explore?
     true
   end
 

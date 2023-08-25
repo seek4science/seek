@@ -6,9 +6,9 @@ module Seek
         base.before_action :set_assets, only: [:batch_publishing_preview]
         base.before_action :set_items_for_publishing, only: [:check_gatekeeper_required, :publish]
         base.before_action :set_items_for_potential_publishing, only: [:check_related_items, :publish_related_items]
-        base.before_action :publish_auth, only: [:batch_publishing_preview, :check_related_items, :publish_related_items, :check_gatekeeper_required, :publish, :waiting_approval_assets]
+        base.before_action :publish_auth, only: [:batch_publishing_preview, :check_related_items, :publish_related_items, :check_gatekeeper_required, :publish, :waiting_approval_assets, :cancel_publishing_request]
         # need to put request_publish_approval after log_publishing, so request_publish_approval will get run first.
-        base.after_action :log_publishing, :request_publish_approval, only: [:create, :update]
+        base.after_action :log_publishing, :request_publish_approval, if: -> { @policy_updated }
       end
 
       def batch_publishing_preview
@@ -46,6 +46,13 @@ module Seek
         end
       end
 
+      def update_sharing_policies(*args)
+        param_access_type = params['policy_attributes'] ? params['policy_attributes']['access_type'] : nil
+        current_access_type = args.first.policy.access_type.to_s
+        @policy_updated = true if param_access_type != current_access_type
+        super
+      end
+
       def publish_final_confirmation
         respond_to do |format|
           format.html { render template: 'assets/publishing/publish_final_confirmation' }
@@ -78,9 +85,26 @@ module Seek
       end
 
       def waiting_approval_assets
-        @waiting_approval_assets = ResourcePublishLog.waiting_approval_assets_for(current_user)
+        @requested_approval_assets = ResourcePublishLog.requested_approval_assets_for_user(current_user)
+        @waiting_approval_assets = ResourcePublishLog.waiting_approval_assets(@requested_approval_assets)
+        @rejected_assets = ResourcePublishLog.rejected_assets(@requested_approval_assets)
         respond_to do |format|
           format.html { render template: 'assets/publishing/waiting_approval_assets' }
+        end
+      end
+
+      def cancel_publishing_request
+        asset = safe_class_lookup(params[:asset_class].classify).find(params[:asset_id])
+        if asset.can_manage?
+          if asset.last_publishing_log.publish_state.in?([ResourcePublishLog::WAITING_FOR_APPROVAL, ResourcePublishLog::REJECTED])
+            ResourcePublishLog.add_log(ResourcePublishLog::UNPUBLISHED, asset)
+            notify_gatekeepers_of_approval_request_cancellation [asset]
+            flash[:notice] = "Cancelled request to publish for: #{asset.title}"
+          end
+          redirect_to params[:from_asset] ? asset : waiting_approval_assets_person_path and return
+        else
+          error('You are not permitted to perform this action.', 'Not your publish request to cancel.')
+          return false
         end
       end
 
@@ -142,6 +166,10 @@ module Seek
           log_state = determine_state_for_log(object)
 
           ResourcePublishLog.add_log(log_state, object) if log_state
+
+          if log_state == ResourcePublishLog::WAITING_FOR_APPROVAL
+            flash[:notice] = "#{flash[:notice]}<br/>Your request to publish is in the gatekeeper's approval list.".html_safe
+          end
         end
       end
 
@@ -211,6 +239,10 @@ module Seek
         deliver_publishing_notification_emails :managers, items, :request_publish
       end
 
+      def notify_gatekeepers_of_approval_request_cancellation(items)
+        deliver_publishing_notification_emails :asset_gatekeepers, items, :publishing_request_cancellation
+      end
+
       # returns an enumeration of assets for publishing based upon the parameters passed
       def resolve_publish_params(param)
         if param.blank?
@@ -218,7 +250,7 @@ module Seek
         else
           assets = []
           param.keys.each do |asset_class|
-            klass = asset_class.constantize
+            klass = safe_class_lookup(asset_class)
             param[asset_class].keys.each do |id|
               assets << klass.find_by_id(id)
             end

@@ -137,4 +137,44 @@ class IsaGraphGeneratorTest < ActiveSupport::TestCase
     refute_includes result[:nodes].map(&:object), investigation2
     refute_includes result[:nodes].map(&:object), investigation3
   end
+
+  test 'shows direct associations rather than related' do
+    person = FactoryBot.create(:person)
+    publication = FactoryBot.create(:publication)
+    publication2 = FactoryBot.create(:publication)
+    assay = FactoryBot.create(:assay, contributor: person, publications: [publication])
+    disable_authorization_checks { assay.study.publications << publication2 }
+
+    assert_equal [publication], assay.publications
+    assert_equal [publication], assay.related_publications
+
+    assert_equal [publication2], assay.study.publications
+    assert_equal [publication, publication2].sort, assay.study.related_publications.sort
+
+    assert_empty assay.study.investigation.publications
+    assert_equal [publication, publication2].sort, assay.study.investigation.related_publications.sort
+
+    generator = Seek::IsaGraphGenerator.new(assay)
+    result = generator.generate(parent_depth: nil)
+
+    assert_equal 5, result[:nodes].count
+    assert_equal 4, result[:edges].count
+
+    assay_pub_edges = result[:edges].select { |edge| edge.include?(assay) && edge.include?(publication) }
+    assert_equal 1, assay_pub_edges.count
+    assay_pub_edges = result[:edges].select { |edge| edge.include?(assay) && edge.include?(publication2) }
+    assert_empty assay_pub_edges
+
+    study_pub_edges = result[:edges].select { |edge| edge.include?(assay.study) && edge.include?(publication) }
+    assert_empty study_pub_edges
+
+    study_pub_edges = result[:edges].select { |edge| edge.include?(assay.study) && edge.include?(publication2) }
+    assert_equal 1, study_pub_edges.count
+
+    inv_pub_edges = result[:edges].select { |edge| edge.include?(assay.study.investigation) && edge.include?(publication) }
+    assert_empty inv_pub_edges
+    inv_pub_edges = result[:edges].select { |edge| edge.include?(assay.study.investigation) && edge.include?(publication2) }
+    assert_empty inv_pub_edges
+
+  end
 end

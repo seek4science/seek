@@ -55,6 +55,10 @@ module LifeMonitor
         perform("/registries/current/workflows?status=true&versions=true", :get, content_type: :json)
       end
 
+      def self.status_page_url(workflow, base: Seek::Config.life_monitor_url)
+        URI.join(base, "/workflow;uuid=#{workflow.uuid}").to_s
+      end
+
       private
 
       def perform(path, method, opts = {})

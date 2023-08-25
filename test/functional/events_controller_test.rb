@@ -51,8 +51,10 @@ class EventsControllerTest < ActionController::TestCase
                 project_ids: [FactoryBot.create(:project, title: 'Dont Display Project').id],
                 policy: FactoryBot.create(:public_policy)
     get :index
-    assert !(/Dont Display Person/ =~ @response.body)
-    assert !(/Dont Display Project/ =~ @response.body)
+
+    assert_select '.list_items_container .list_item'
+    assert_select '.list_items_container .list_item', text:/Don't Display Person/, count:0
+    assert_select '.list_items_container .list_item', text:/Don't Display Project/, count:0
   end
 
   test "shouldn't show hidden items in index" do

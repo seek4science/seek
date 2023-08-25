@@ -3,10 +3,10 @@ module Seek
     class RendererFactory
       include Singleton
 
-      def renderer(blob, url_options: {})
+      def renderer(blob, url_options: {}, params: {})
         renderer_class = cache.fetch(blob.cache_key) { detect_renderer(blob).name }.constantize
 
-        renderer_class.new(blob, url_options: url_options)
+        renderer_class.new(blob, url_options: url_options, params: params)
       end
 
       private

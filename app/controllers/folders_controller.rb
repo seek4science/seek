@@ -150,7 +150,7 @@ class FoldersController < ApplicationController
   end
 
   def get_asset
-    @asset = params[:asset_type].constantize.find(params[:asset_id])
+    @asset = safe_class_lookup(params[:asset_type]).find(params[:asset_id])
     unless @asset.can_view?
       error("You cannot view the asset", "is invalid or not authorized")
     end

@@ -754,4 +754,67 @@ class WorkflowTest < ActiveSupport::TestCase
                    wf.bio_tools_links.pluck(:bio_tools_id).sort
     end
   end
+
+  test 'cannot delete workflow with doi' do
+    workflow = FactoryBot.create(:workflow)
+    v = workflow.latest_version
+    User.with_current_user(workflow.contributor.user) do
+      assert workflow.state_allows_delete?
+      assert workflow.can_delete?
+
+      assert v.update(doi: '10.81082/dev-workflowhub.workflow.136.1')
+
+      refute workflow.state_allows_delete?
+      refute workflow.can_delete?
+    end
+  end
+
+  test 'cannot delete git workflow with doi' do
+    workflow = FactoryBot.create(:local_git_workflow)
+    v = workflow.git_version
+    User.with_current_user(workflow.contributor.user) do
+      assert workflow.state_allows_delete?
+      assert workflow.can_delete?
+
+      assert v.update(doi: '10.81082/dev-workflowhub.workflow.136.1')
+
+      refute workflow.state_allows_delete?
+      refute workflow.can_delete?
+    end
+  end
+
+  test 'sets deleted_contributor after contributor deleted' do
+    workflow = FactoryBot.create(:local_git_workflow)
+    assert_nil workflow.deleted_contributor
+    refute workflow.has_deleted_contributor?
+
+    disable_authorization_checks do
+      workflow.contributor.destroy!
+    end
+
+    workflow.reload
+    assert workflow.deleted_contributor
+    assert workflow.has_deleted_contributor?
+  end
+
+  test 'sets maturity level' do
+    workflow = FactoryBot.create(:local_git_workflow)
+    disable_authorization_checks do
+      workflow.maturity_level = :released
+      assert workflow.save
+      assert_equal :released, workflow.maturity_level
+
+      workflow.maturity_level = :work_in_progress
+      assert workflow.save
+      assert_equal :work_in_progress, workflow.maturity_level
+
+      workflow.maturity_level = :deprecated
+      assert workflow.save
+      assert_equal :deprecated, workflow.maturity_level
+
+      workflow.maturity_level = :something
+      assert workflow.save
+      assert_nil workflow.maturity_level
+    end
+  end
 end

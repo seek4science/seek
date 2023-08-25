@@ -4,7 +4,7 @@ class GitControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
 
   def setup
-    @git_version = FactoryBot.create(:git_version)
+    @git_version = FactoryBot.create(:git_version).becomes(Workflow::Git::Version)
     @workflow = @git_version.resource
     @person = @workflow.contributor
     login_as @person
@@ -233,23 +233,26 @@ class GitControllerTest < ActionController::TestCase
   end
 
   test 'getting blob with no permissions throws error' do
-    logout
-    get :blob, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'diagram.png' }, format: :html
+    workflow = FactoryBot.create(:local_git_workflow, policy: FactoryBot.create(:publicly_viewable_policy))
+    get :blob, params: { workflow_id: workflow.id, version: 1, path: 'diagram.png' }, format: :html
 
+    assert_redirected_to workflow
     assert flash[:error].include?('authorized')
   end
 
   test 'getting raw with no permissions throws error' do
-    logout
-    get :raw, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'diagram.png' }, format: :html
+    workflow = FactoryBot.create(:local_git_workflow, policy: FactoryBot.create(:publicly_viewable_policy))
+    get :raw, params: { workflow_id: workflow.id, version: 1, path: 'diagram.png' }, format: :html
 
+    assert_redirected_to workflow
     assert flash[:error].include?('authorized')
   end
 
   test 'download with no permissions throws error' do
-    logout
-    get :download, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'diagram.png' }, format: :html
+    workflow = FactoryBot.create(:local_git_workflow, policy: FactoryBot.create(:publicly_viewable_policy))
+    get :download, params: { workflow_id: workflow.id, version: 1, path: 'diagram.png' }, format: :html
 
+    assert_redirected_to workflow
     assert flash[:error].include?('authorized')
   end
 
@@ -330,9 +333,18 @@ class GitControllerTest < ActionController::TestCase
   end
 
   test 'cannot browse tree with no permissions' do
-    logout
-    get :tree, params: { workflow_id: @workflow.id, version: @git_version.version }
+    workflow = FactoryBot.create(:local_git_workflow, policy: FactoryBot.create(:publicly_viewable_policy))
+    get :tree, params: { workflow_id: workflow.id, version: 1 }
 
+    assert_redirected_to workflow
+    assert flash[:error].include?('authorized')
+  end
+
+  test 'redirects to root if no permission to view' do
+    workflow = FactoryBot.create(:local_git_workflow, policy: FactoryBot.create(:private_policy))
+    get :tree, params: { workflow_id: workflow.id, version: 1 }
+
+    assert_redirected_to root_path
     assert flash[:error].include?('authorized')
   end
 
@@ -647,6 +659,20 @@ class GitControllerTest < ActionController::TestCase
     assert_select '.markdown-body h1', text: 'FAIRDOM-SEEK'
   end
 
+  test 'should display blob as markdown inline' do
+    @git_version.add_file('file.md', FactoryBot.create(:markdown_content_blob))
+    disable_authorization_checks { @git_version.save! }
+
+    get :raw, xhr: true, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'file.md',
+                                   display: 'markdown', disposition: 'inline' }
+
+    assert_response :success
+    assert @response.header['Content-Type'].start_with?('text/html')
+    assert_equal ApplicationController::USER_CONTENT_CSP, @response.header['Content-Security-Policy']
+    assert_select 'body', count: 0
+    assert_select 'iframe'
+  end
+
   test 'should display blob as jupyter' do
     @git_version.add_file('file.ipynb', FactoryBot.create(:jupyter_notebook_content_blob))
     disable_authorization_checks { @git_version.save! }
@@ -693,5 +719,127 @@ class GitControllerTest < ActionController::TestCase
     assert_raises(ActionController::UnknownFormat) do
       get :raw, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'file.png', display: 'text' }
     end
+  end
+
+  test 'can edit version name and comment' do
+    assert_not_equal 'modified', @git_version.name
+    assert_not_equal 'modified', @git_version.name
+
+    patch :update, params: { workflow_id: @workflow.id, version: @git_version.version,
+                                   git_version: { name: 'modified', comment: 'modified' } }
+
+    assert_redirected_to @workflow
+    assert_equal 'modified', @git_version.reload.name
+  end
+
+  test 'can edit version visibility' do
+    disable_authorization_checks { @workflow.save_as_new_git_version }
+
+    assert_equal 2, @workflow.reload.version
+
+    assert_not_equal :registered_users, @workflow.find_version(1).visibility
+    refute @workflow.find_version(1).latest_git_version?
+
+    patch :update, params: { workflow_id: @workflow.id, version: 1,
+                                   git_version: { visibility: 'registered_users' } }
+
+    assert_redirected_to @workflow
+    assert_equal :registered_users, @workflow.find_version(1).reload.visibility
+  end
+
+  test 'cannot edit version visibility if doi minted' do
+    disable_authorization_checks do
+      @workflow.save_as_new_git_version
+      @workflow.find_version(1).update_column(:doi, '10.5072/wtf')
+    end
+
+    assert_equal :public, @workflow.find_version(1).visibility
+
+    patch :update, params: { workflow_id: @workflow.id, version: 1,
+                                   git_version: { visibility: 'registered_users' } }
+
+    assert_redirected_to @workflow
+    assert_equal :public, @workflow.find_version(1).reload.visibility, 'Should not have changed visibility - DOI present'
+  end
+
+  test 'cannot edit version visibility if latest version' do
+    assert @git_version.latest_git_version?
+    assert_equal :public, @workflow.find_version(1).visibility
+
+    patch :update, params: { workflow_id: @workflow.id, version: 1,
+                                   git_version: { visibility: 'private' } }
+
+    assert_redirected_to @workflow
+    assert_equal :public, @workflow.find_version(1).reload.visibility,'Should not have changed visibility - latest version'
+  end
+
+  test 'actions are logged' do
+    @git_version.add_file('file.md', FactoryBot.create(:markdown_content_blob))
+    disable_authorization_checks { @git_version.save! }
+
+    assert_difference('@workflow.download_count') do
+      get :raw, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'concat_two_files.ga' }
+    end
+
+    assert_response :success
+    log = @workflow.activity_logs.last
+    assert_equal 'download', log.action
+    assert_equal 'concat_two_files.ga', log.data[:path]
+
+    assert_no_difference('@workflow.download_count') do
+      assert_difference('@workflow.reload.activity_logs.count') do
+        get :raw, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'file.md', display: 'markdown' }
+      end
+    end
+
+    assert_response :success
+    log = @workflow.activity_logs.last
+    assert_equal 'inline_view', log.action
+    assert_equal 'file.md', log.data[:path]
+    assert_equal 'markdown', log.data[:display]
+  end
+
+  test 'should display CFF blob as citation' do
+    @git_version.add_file('CITATION.cff', open_fixture_file('CITATION.cff'))
+    disable_authorization_checks { @git_version.save! }
+
+    get :raw, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'CITATION.cff',
+                        display: 'citation' }
+
+    assert_response :success
+    assert @response.header['Content-Type'].start_with?('text/html')
+    assert_equal ApplicationController::USER_CONTENT_CSP, @response.header['Content-Security-Policy']
+    assert_select 'body'
+    assert_select '#navbar', count: 0
+    assert_select 'div[data-citation-style=?]', 'apa', text: /van der Real Person, O\. T\./
+  end
+
+  test 'should display CFF blob as citation with selected style' do
+    @git_version.add_file('CITATION.cff', open_fixture_file('CITATION.cff'))
+    disable_authorization_checks { @git_version.save! }
+
+    get :raw, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'CITATION.cff',
+                        display: 'citation', style: 'bibtex' }
+
+    assert_response :success
+    assert @response.header['Content-Type'].start_with?('text/html')
+    assert_equal ApplicationController::USER_CONTENT_CSP, @response.header['Content-Security-Policy']
+    assert_select 'body'
+    assert_select '#navbar', count: 0
+    assert_select 'div[data-citation-style=?]', 'bibtex', text: /author=\{Real Person, One Truly van der, IV and/
+  end
+
+  test 'should display CFF blob as citation inline' do
+    @git_version.add_file('CITATION.cff', open_fixture_file('CITATION.cff'))
+    disable_authorization_checks { @git_version.save! }
+
+    get :raw, xhr: true, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'CITATION.cff',
+                                   display: 'citation', disposition: 'inline', style: 'the-lancet' }
+
+    assert_response :success
+    assert @response.header['Content-Type'].start_with?('text/html')
+    assert_equal ApplicationController::USER_CONTENT_CSP, @response.header['Content-Security-Policy']
+    assert_select 'body', count: 0
+    assert_select 'div[data-citation-style=?]', 'the-lancet', text: /Real Person OT van der IV/
   end
 end

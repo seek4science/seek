@@ -127,20 +127,23 @@ module BootstrapHelper
     options['data-allow-new-items'] = options.delete(:allow_new) if options[:allow_new]
     options['data-placeholder'] = options.delete(:placeholder) if options[:placeholder]
     options[:include_blank] = ''
-    options[:multiple] = true
-    options[:name] = "#{element_name}[]" unless options.key?(:name)
+    options[:multiple] = true unless options.key?(:multiple)
+    options[:name] = "#{element_name}#{options[:multiple] ? '[]': ''}" unless options.key?(:name)
     options.merge!(typeahead_options(options.delete(:typeahead))) if options[:typeahead]
 
-    select_options = options_from_collection_for_select(
-      existing_objects,
-      value_method, text_method,
-      existing_objects.collect { |obj| obj.send(value_method) }
-    )
+    select_options = options.delete(:select_options) ||
+      options_from_collection_for_select(
+        existing_objects,
+        value_method, text_method,
+        existing_objects.collect { |obj| obj.send(value_method) }
+      )
 
-    hidden_field_tag(element_name, '', name: options[:name]) +
-      select_tag(element_name,
-                 select_options,
-                 options)
+    tag = select_tag(element_name, select_options, options)
+    if options[:multiple]
+      hidden_field_tag(element_name, '', name: options[:name]) + tag
+    else
+      tag
+    end
   end
 
   def modal(options = {}, &block)
@@ -181,7 +184,7 @@ module BootstrapHelper
     end
   end
 
-  def tab(*args, &block)
+  def tab(*args, disabled_reason: nil, &block)
     if block_given?
       tab_id, selected = *args
       title = nil
@@ -191,11 +194,28 @@ module BootstrapHelper
 
     selected = show_page_tab == tab_id if selected.nil?
 
-    content_tag(:li, class: selected ? 'active' : '') do
+    tab_options = {}
+    link_options = {
+      data: { target: "##{tab_id}",
+              toggle: 'tab' },
+      aria: { controls: tab_id },
+      role: 'tab'
+    }
+
+    if disabled_reason
+      tab_options[:class] = 'disabled'
+      tab_options['data-tooltip'] = disabled_reason
+      tab_options[:onclick] = "alert('#{disabled_reason}');";
+      link_options = {}
+    elsif selected
+      tab_options[:class] = 'active'
+    end
+
+    content_tag(:li, **tab_options) do
       if block_given?
-        content_tag(:a, data: { target: "##{tab_id}", toggle: 'tab' }, aria: { controls: tab_id }, role: 'tab', &block)
+        content_tag(:a, **link_options, &block)
       else
-        content_tag(:a, title, data: { target: "##{tab_id}", toggle: 'tab' }, aria: { controls: tab_id }, role: 'tab')
+        content_tag(:a, title, **link_options, role: 'tab')
       end
     end
   end

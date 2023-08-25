@@ -20,7 +20,7 @@ class Model < ApplicationRecord
 
   validates :projects, presence: true, projects: { self: true }
 
-  acts_as_doi_parent(child_accessor: :versions)
+  acts_as_doi_parent
 
   include Seek::Models::ModelExtraction
 

@@ -376,8 +376,7 @@ module ApplicationHelper
     if resource_type == 'Assay'
       result = t('assays.assay')
     else
-      translated_resource_type = translate_resource_type(resource_type)
-      result = translated_resource_type.include?('translation missing') ? resource_type : translated_resource_type
+      result = translate_resource_type(resource_type) || resource_type
     end
     pluralize ? result.pluralize : result
   end
@@ -389,14 +388,15 @@ module ApplicationHelper
     elsif resource_type == 'TavernaPlayer::Run'
       result = 'Run'
     else
-      translated_resource_type = translate_resource_type(resource_type)
-      result = translated_resource_type.include?('translation missing') ? resource_type : translated_resource_type
+      result = translate_resource_type(resource_type) || resource_type
     end
     pluralize ? result.pluralize : result
   end
 
   def translate_resource_type(resource_type)
-    I18n.t(resource_type.underscore.to_s)
+    key = resource_type.underscore.to_s
+    return nil unless I18n.exists?(key)
+    I18n.t(key)
   end
 
   def no_deletion_explanation_message(clz)
@@ -416,24 +416,6 @@ module ApplicationHelper
 
   def unable_to_delete_text(model_item)
     no_deletion_explanation_message(model_item.class).html_safe
-  end
-
-  # returns a new instance of the string describing a resource type, or nil if it is not applicable
-  def instance_of_resource_type(resource_type)
-    resource = nil
-    begin
-      resource_class = resource_type.classify.constantize unless resource_type.nil?
-      resource = resource_class.send(:new) if !resource_class.nil? && resource_class.respond_to?(:new)
-    rescue NameError => e
-      logger.error("Unable to find constant for resource type #{resource_type}")
-    end
-    resource
-  end
-
-  # returns the class associated with the controller, e.g. DataFile for data_files
-  #
-  def klass_from_controller(c = controller_name)
-    c.singularize.camelize.constantize
   end
 
   def cancel_button(path, html_options = {})
@@ -472,17 +454,24 @@ module ApplicationHelper
   end
 
   def pending_project_creation_request?
-    return false unless logged_in_and_registered?   
-    ProjectCreationMessageLog.pending_requests.collect do |log|
+    return false unless admin_logged_in? || programme_administrator_logged_in?
+
+    ProjectCreationMessageLog.pending_requests.detect do |log|
       log.can_respond_project_creation_request?(User.current_user)
-    end.any?
+    end.present?
   end
 
   def pending_project_join_request?
     return false unless project_administrator_logged_in?
+    return false if ProjectMembershipMessageLog.pending.count == 0
     person = User.current_user.person
     projects = person.administered_projects
     return ProjectMembershipMessageLog.pending_requests(projects).any?
+  end
+
+  def pending_programme_creation_request?
+    return false unless admin_logged_in?
+    return Programme.not_activated.where('activation_rejection_reason IS NULL').any?
   end
 
   #whether to show a banner encouraging you to join or create a project
@@ -542,6 +531,25 @@ module ApplicationHelper
     "isa_#{type}[#{type}]#{rest}"
   end
 
+  def expandable_list(items, limit: 10, none_text: 'None', id: nil, &block)
+    content_tag(:div, 'data-role' => 'seek-expandable-list') do
+      concat(if items.empty?
+               content_tag(:span, none_text, class: 'none_text')
+             else
+               content_tag(:ul, id: id, class: 'list collapsed') do
+                 items.each_with_index do |item, index|
+                   concat content_tag(:li, capture(item, &block), class: index >= limit ? 'hidden-item' : '')
+                 end
+               end
+             end)
+      if items.any? && items.length > limit
+        concat link_to(('More ' + image('expand')).html_safe, '#', class: 'pull-right',
+                       'data-role' => 'seek-expandable-list-expand')
+        concat link_to(('Less ' + image('collapse')).html_safe, '#', class: 'pull-right',
+                       style: 'display: none', 'data-role' => 'seek-expandable-list-collapse')
+      end
+    end
+  end
 end
 
 class ApplicationFormBuilder < ActionView::Helpers::FormBuilder

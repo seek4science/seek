@@ -195,7 +195,7 @@ class ApplicationController < ActionController::Base
   # handles finding an asset, and responding when it cannot be found. If it can be found the item instance is set (e.g. @project for projects_controller)
   def find_requested_item
     name = controller_name.singularize
-    object = name.camelize.constantize.find_by_id(params[:id])
+    object = controller_model.find_by_id(params[:id])
     if object.nil?
       respond_to do |format|
         flash[:error] = "The #{name.humanize} does not exist!"
@@ -381,9 +381,10 @@ class ApplicationController < ActionController::Base
         action = 'create' if action == 'create_metadata' || action == 'create_from_template'
         action = 'update' if action == 'create_version'
         action = 'inline_view' if action == 'explore'
+        action = 'download' if action == 'ro_crate'
         if %w(show create update destroy download inline_view).include?(action)
           check_log_exists(action, controller_name, object)
-            ActivityLog.create(action: action,
+          ActivityLog.create(action: action,
                              culprit: current_user,
                              referenced: object.projects.first,
                              controller_name: controller_name,
@@ -572,7 +573,7 @@ class ApplicationController < ActionController::Base
     parent_id_param = request.path_parameters.keys.detect { |k| k.to_s.end_with?('_id') }
     if parent_id_param
       parent_type = parent_id_param.to_s.chomp('_id')
-      parent_class = parent_type.camelize.constantize
+      parent_class = safe_class_lookup(parent_type.camelize)
       if parent_class
         @parent_resource = parent_class.find(params[parent_id_param])
       end
@@ -613,7 +614,7 @@ class ApplicationController < ActionController::Base
         keys = [:custom_metadata_type_id,:id,:custom_metadata_attribute_id]
         cma= []
         metadata_type.custom_metadata_attributes.each do |attr|
-          if attr.sample_attribute_type.controlled_vocab? || attr.sample_attribute_type.seek_sample_multi?
+          if attr.sample_attribute_type.controlled_vocab? || attr.sample_attribute_type.seek_sample_multi? || attr.sample_attribute_type.seek_sample?
             cma << {attr.title=>[]}
             cma << attr.title.to_s
           elsif  attr.linked_custom_metadata?
@@ -669,5 +670,9 @@ class ApplicationController < ActionController::Base
     ]
   end
 
+  def safe_class_lookup(class_name, raise: true)
+    Seek::Util.lookup_class(class_name, raise: raise)
+  end
 
+  helper_method :safe_class_lookup
 end

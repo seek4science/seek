@@ -2,9 +2,15 @@ require 'citeproc'
 require 'csl/styles'
 
 module CitationsHelper
-  def render_citation(doi, style)
-    Seek::Citations.generate(doi, style)
+  def render_doi_citation(doi, style)
+    Seek::Citations.from_doi(doi, style)
   rescue JSON::ParserError, RestClient::Exception
+    'An error occurred whilst fetching the citation'
+  end
+
+  def render_cff_citation(blob, style)
+    Seek::Citations.from_cff(blob, style)
+  rescue StandardError
     'An error occurred whilst fetching the citation'
   end
 

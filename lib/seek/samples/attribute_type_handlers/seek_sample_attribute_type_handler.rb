@@ -5,7 +5,7 @@ module Seek
         class MissingLinkedSampleTypeException < AttributeHandlerException; end
 
         def type
-          'Sample'
+          Sample
         end
 
         def test_value(value)
@@ -14,6 +14,10 @@ module Seek
             raise 'Unable to find Sample in database' unless sample
             raise 'Sample type does not match' unless sample.sample_type == linked_sample_type
           end
+        end
+
+        def convert(value)
+          super(value.is_a?(Array) ? value.compact_blank.first : value)
         end
 
         private

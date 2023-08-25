@@ -280,9 +280,10 @@ class Person < ApplicationRecord
 
   # all items, assets, ISA, samples and events that are linked to this person as a contributor
   def contributed_items
-    [Assay, Study, Investigation, DataFile, Document, Sop, Presentation, Model, Sample, Strain, Publication, Event, SampleType].collect do |type|
-      type.where(contributor_id:id)
-    end.flatten.uniq.compact
+    RELATED_RESOURCE_TYPES.flat_map do |type|
+      plural = type.tableize
+      send("contributed_#{plural}")
+    end
   end
 
   def me?

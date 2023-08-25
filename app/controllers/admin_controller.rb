@@ -331,8 +331,8 @@ class AdminController < ApplicationController
 
     Seek::Config.default_license = params[:default_license]
     Seek::Config.metadata_license = params[:metadata_license]
-    Seek::Config.recommended_data_licenses = params[:recommended_data_licenses]
-    Seek::Config.recommended_software_licenses = params[:recommended_software_licenses]
+    Seek::Config.recommended_data_licenses = params[:recommended_data_licenses]&.compact_blank
+    Seek::Config.recommended_software_licenses = params[:recommended_software_licenses]&.compact_blank
     update_flag = (pubmed_email == '' || pubmed_email_valid) && (crossref_email == '' || crossref_email_valid)
     update_redirect_to update_flag, 'settings'
   end
@@ -684,7 +684,6 @@ class AdminController < ApplicationController
   def update_redirect_to(flag, action)
     if flag
       flash[:notice] = RESTART_MSG
-      expire_header_and_footer
       redirect_to action: :show
     else
       redirect_to action: action.to_s

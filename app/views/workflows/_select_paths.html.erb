@@ -6,7 +6,8 @@
     <label class="required">Workflow</label>
     <p class="help-block">The main executable workflow.</p>
     <%= git_path_input '#git-path-select-modal', "#{field_prefix}[main_workflow_path]",
-                       git_version.main_workflow_path, id: 'main-workflow-path-field', class: 'form-control git-path' %>
+                       git_version.main_workflow_path, id: 'main-workflow-path-field', class: 'form-control git-path',
+                       placeholder: 'Select main workflow...' %>
   </div>
 
   <div class="form-group">
@@ -22,7 +23,8 @@
     <label>Abstract CWL</label>
     <p class="help-block">(Optional) The abstract CWL that describes the main workflow.</p>
     <%= git_path_input '#git-path-select-modal', "#{field_prefix}[abstract_cwl_path]",
-                       git_version.abstract_cwl_path, class: 'form-control git-path' %>
+                       git_version.abstract_cwl_path, class: 'form-control git-path',
+                       placeholder: 'Select abstract CWL...' %>
   </div>
 <% end %>
 
@@ -31,7 +33,8 @@
     <label>Diagram</label>
     <p class="help-block">(Optional) A diagram that illustrates the main workflow.</p>
     <%= git_path_input '#git-path-select-modal', "#{field_prefix}[diagram_path]",
-                       git_version.diagram_path, class: 'form-control git-path' %>
+                       git_version.diagram_path, class: 'form-control git-path',
+                       placeholder: 'Select diagram...' %>
   </div>
 <% end %>
 

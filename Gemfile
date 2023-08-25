@@ -59,7 +59,7 @@ gem 'rdf-virtuoso', '>= 0.2.0'
 gem 'terrapin'
 gem 'lograge'
 gem 'psych'
-gem 'stringio', '0.1.0' #locked to the default version for ruby 2.7
+gem 'stringio', '3.0.1' #locked to the default version for ruby 3.1
 gem 'validate_url'
 gem "attr_encrypted", "~> 3.0.0"
 gem 'libreconv'
@@ -153,10 +153,12 @@ gem 'remotipart', '~> 1.4.4' # Allows file upload in AJAX forms
 
 gem 'rails-static-router'
 
-# to avoid warnings after rails 6.1.7.2 update - see https://github.com/ruby/net-imap/issues/16
-gem "net-http"
-gem "net-ftp"
-gem "uri", "0.10.0.2"
+gem 'caxlsx', '>= 3.0' # Write content to an xlsx file
+gem 'caxlsx_rails', '~> 0.6.2'
+
+gem 'net-ftp'
+
+gem 'licensee'
 
 group :production do
   gem 'passenger'

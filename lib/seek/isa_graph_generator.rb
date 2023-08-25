@@ -158,10 +158,10 @@ module Seek
     end
 
     def resolve_association(object, association)
-      if object.respond_to?('related_' + association.to_s)
-        associations = object.send('related_' + association.to_s)
-      elsif object.respond_to?(association)
+      if object.respond_to?(association)
         associations = object.send(association)
+      elsif object.respond_to?('related_' + association.to_s)
+        associations = object.send('related_' + association.to_s)
       else
         return []
       end
@@ -189,8 +189,8 @@ module Seek
       when Study
         {
           children: [:positioned_assays],
-          parents: [:investigation],
-          related: [:publications]
+          related: [:publications, :sops],
+          parents: [:investigation]
         }
       when Assay
         {

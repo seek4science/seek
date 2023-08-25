@@ -2902,6 +2902,8 @@ workflowPost:
               $ref: "#/components/schemas/ontologyTermsList"
             operation_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
+            tools:
+              $ref: "#/components/schemas/workflowtoolsList"
             title:
               $ref: "#/components/schemas/nonEmptyString"
             description:
@@ -2980,6 +2982,8 @@ workflowPatch:
               $ref: "#/components/schemas/ontologyTermsList"
             operation_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
+            tools:
+              $ref: "#/components/schemas/workflowtoolsList"
             title:
               $ref: "#/components/schemas/nonEmptyString"
             description:
@@ -4905,6 +4909,8 @@ workflowResponse:
                     $ref: "#/components/schemas/workflowOutput"
             discussion_links:
               $ref: "#/components/schemas/assetLinkList"
+            tools:
+              $ref: "#/components/schemas/workflowtoolsList"
           required:
             - title
             - workflow_class
@@ -4983,3 +4989,17 @@ workflowResponse:
     - data
     - jsonapi
   additionalProperties: false
+workflowtoolsList:
+  type: array
+  minItems: 0
+  items:
+    $ref: "#/components/schemas/workflowtool"
+workflowtool:
+  type: object
+  properties:
+    id:
+      $ref: "#/components/schemas/uriString"
+    name:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+  required:
+    - id

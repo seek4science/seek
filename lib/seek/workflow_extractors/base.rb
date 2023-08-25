@@ -41,6 +41,18 @@ module Seek
 
       private
 
+      def extract_license(licensee_project)
+        license = nil
+        begin
+          ::Licensee::License # Reference License class otherwise it cannot find ::Licensee::InvalidLicense
+          license = licensee_project&.license&.spdx_id
+        rescue ::Licensee::InvalidLicense
+        rescue ::Licensee::Projects::GitProject::InvalidRepository => e
+          raise e unless Rails.env.production?
+        end
+        license
+      end
+
       # Extract author from a string or a Hash complying to schema.org's `Person`
       def extract_author(obj)
         author = {}

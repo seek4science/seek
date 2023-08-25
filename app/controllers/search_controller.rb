@@ -71,7 +71,7 @@ class SearchController < ApplicationController
         raise InvalidSearchException, "#{type} is not a valid search type"
       end
 
-      sources = [type_name.constantize]
+      sources = [safe_class_lookup(type_name)]
     end
     sources
   end

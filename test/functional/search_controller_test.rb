@@ -54,7 +54,7 @@ class SearchControllerTest < ActionController::TestCase
       get :index, params: { q: 'test' }
     end
 
-    assert_select '#documents a[href=?]', documents_path(filter: { query: 'test' }), text: 'Advanced Documents search with filtering ...'
+    assert_select '#documents a[href=?]', documents_path(filter: { query: 'test' }), text: /Advanced Documents search with filtering/
   end
 
   test 'can render external search results' do
@@ -74,6 +74,22 @@ class SearchControllerTest < ActionController::TestCase
     assert_select '.related-items li a', text: 'BioModels Database (25)'
     assert_select '#models .list_item_title', count: 3
     assert_select '#biomodels-databases .list_item_title', count: 25
+  end
+
+  test 'biomodels search can handle unreleased models' do
+    VCR.use_cassette('biomodels/search-unreleased') do
+      with_config_value(:external_search_enabled, true) do
+        get :index, params: { q: '2024', include_external_search: '1', search_type:'models' }
+      end
+    end
+
+    assert_select '.related-items li a', text: 'BioModels Database (6)'
+    assert_equal 6, assigns(:external_results).count
+    assert_equal 3, assigns(:external_results).select{|r| r.unreleased}.count
+    assert_select '.related-items .list_item_attribute b', text: 'URL of original', count: 6
+    assert_select '.related-items .list_item_attribute b', text: 'Publication date', count: 3
+    assert_select '.related-items .list_item_actions', count: 3
+
   end
 
   test 'can render search results as valid JSON-API collection' do
@@ -134,5 +150,29 @@ class SearchControllerTest < ActionController::TestCase
 
     assert_equal "1 item matched '<b>&lt;a href=&quot;#test-123&quot;&gt;test&lt;/a&gt;</b>' within their title or content.", flash[:notice]
     assert_select 'a[href="#test-123"]', count: 0
+  end
+
+  test 'link for more results' do
+    FactoryBot.create_list(:public_document, 5)
+    with_config_value(:search_results_limit, 2) do
+      Document.stub(:solr_cache, -> (q) { Document.pluck(:id).last(5) }) do
+        get :index, params: { q: 'test' }
+      end
+    end
+
+    assert_select '#resources-shown-count',text:/Showing 2 out of a possible/
+    assert_select '#resources-shown-count a[href=?]',documents_path('filter[query]':'test'), text:'5 Documents'
+    assert_select '#more-results a[href=?]',documents_path('filter[query]':'test'), text:/View all 5 Documents/
+
+    # not shown if within limit
+    with_config_value(:search_results_limit, 6) do
+      Document.stub(:solr_cache, -> (q) { Document.pluck(:id).last(5) }) do
+        get :index, params: { q: 'test' }
+      end
+    end
+
+    assert_select '#resources-shown-count', count:0
+    assert_select '#more-results', count: 0
+
   end
 end

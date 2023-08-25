@@ -10,24 +10,24 @@
 </div>
 
 <%= render partial: 'isa_studies/buttons', locals:{ add_row: "SourceAddNewRow()", paste_cb:
-"SourcePasteFromClipboard()", delete: "SourceSetAsDeleted()", save: "SourceSave()", permissions: "loadBatchPermission('sourceDynamicTable',this)" } %> 
+"SourcePasteFromClipboard()", delete: "SourceSetAsDeleted()", save: "SourceSave()",
+permissions: "loadBatchPermission('sourceDynamicTable',this)", exportToExcel: "sourceExportExcel()" } %>
 
 <% if sample_type %>
     <script>
     // TODO: Load data in a separeta script tag and remove it after DT is loaded
-        var sourceDynamicTable 
         let initialLoad = true;
         $j(document).ready(function () {
             $j('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
                 $j.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
             });
             let dt = <%= sanitize(dt_data(sample_type).to_json) %>
-            sourceDynamicTable = new $j.dynamicTable('#source-material-table')
+            window.sourceDynamicTable = new $j.dynamicTable('#source-material-table')
             const elem = $j("#btn_save_source")
             const options = {
                ajax:{
-									  url: dynamicTableDataPath,
-                    data: function(d) { 
+                    url: dynamicTableDataPath,
+                    data: function(d) {
                         if (initialLoad) {
                             initialLoad = false;
                             return;
@@ -48,27 +48,31 @@
                   $j(".dt-action").removeClass("disabled")
                 }
             }
-            sourceDynamicTable.init(dt.rows, dt.columns, options)
+            window.sourceDynamicTable.init(dt.rows, dt.columns, options)
             dt = []
 
             $j(".dataTables_scrollBody").css("min-height", "300px")
         });
 
         function SourcePasteFromClipboard(){
-            sourceDynamicTable.pasteFromClipboard()
+            window.sourceDynamicTable.pasteFromClipboard()
         }
 
         function SourceSave(){
-            sourceDynamicTable.save()
+            window.sourceDynamicTable.save()
         }
 
         function SourceSetAsDeleted(){
-            sourceDynamicTable.setAsDeleted()
+            window.sourceDynamicTable.setAsDeleted()
         }
 
         function SourceAddNewRow(){
-            sourceDynamicTable.newRow()
+            window.sourceDynamicTable.newRow()
         }
-																														
+
+        function sourceExportExcel() {
+            exportToExcel("source-material-table", '<%=study.id%>', null, '<%=sample_type.id%>');
+        }
+
     </script>
 <% end %>

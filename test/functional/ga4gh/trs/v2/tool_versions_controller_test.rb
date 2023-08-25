@@ -24,7 +24,7 @@ module Ga4gh
         end
 
         test 'should get workflow version as tool version' do
-          workflow = FactoryBot.create(:workflow, policy: FactoryBot.create(:public_policy))
+          workflow = FactoryBot.create(:workflow, policy: FactoryBot.create(:publicly_viewable_policy))
           assert 1, workflow.reload.versions.count
 
           get :show, params: { id: workflow.id, version_id: 1 }
@@ -100,6 +100,16 @@ module Ga4gh
           assert_response :not_found
         end
 
+        test 'should not list tool version files for non-downloadable tool' do
+          workflow = FactoryBot.create(:generated_galaxy_ro_crate_workflow, policy: FactoryBot.create(:publicly_viewable_policy))
+
+          get :files, params: { id: workflow.id, version_id: 1, type: 'GALAXY' }
+
+          assert_response :not_found
+          r = JSON.parse(@response.body)
+          assert r['message'].include?('authorized')
+        end
+
         test 'should get main workflow as primary descriptor' do
           workflow = FactoryBot.create(:generated_galaxy_ro_crate_workflow, policy: FactoryBot.create(:public_policy))
 
@@ -148,6 +158,16 @@ module Ga4gh
           refute @response.body.include?('a_galaxy_workflow')
         end
 
+        test 'should 404 on descriptor for non-downloadable tool' do
+          workflow = FactoryBot.create(:generated_galaxy_ro_crate_workflow, policy: FactoryBot.create(:publicly_viewable_policy))
+
+          get :descriptor, params: { id: workflow.id, version_id: 1, type: 'GALAXY' }
+
+          assert_response :not_found
+          refute @response.body.include?('a_galaxy_workflow')
+          r = JSON.parse(@response.body)
+          assert r['message'].include?('authorized')
+        end
 
         test 'should 404 on missing descriptor file via relative path' do
           workflow = FactoryBot.create(:generated_galaxy_ro_crate_workflow, policy: FactoryBot.create(:public_policy))
@@ -212,6 +232,16 @@ module Ga4gh
           assert r['message'].include?('No container')
         end
 
+        test 'should 404 for containerfile of non-downloadable tool' do
+          workflow = FactoryBot.create(:nf_core_ro_crate_workflow, policy: FactoryBot.create(:publicly_viewable_policy))
+
+          get :containerfile, params: { id: workflow.id, version_id: 1 }
+
+          assert_response :not_found
+          r = JSON.parse(@response.body)
+          assert r['message'].include?('authorized')
+        end
+
         test 'should return empty array if no tests' do
           workflow = FactoryBot.create(:generated_galaxy_ro_crate_workflow, policy: FactoryBot.create(:public_policy))
 
@@ -219,6 +249,16 @@ module Ga4gh
 
           r = JSON.parse(@response.body)
           assert_equal [], r
+        end
+
+        test 'should return 404 when accessing tests of non-downloadable tool' do
+          workflow = FactoryBot.create(:generated_galaxy_ro_crate_workflow, policy: FactoryBot.create(:publicly_viewable_policy))
+
+          get :tests, params: { id: workflow.id, version_id: 1, type: 'GALAXY' }
+
+          assert_response :not_found
+          r = JSON.parse(@response.body)
+          assert r['message'].include?('authorized')
         end
 
         test 'should list tool version files for given version' do
@@ -281,6 +321,16 @@ module Ga4gh
           assert @response.body.include?('a_galaxy_workflow')
         end
 
+        test 'should not get primary descriptor for non-downloadable tool' do
+          workflow = FactoryBot.create(:remote_git_workflow, policy: FactoryBot.create(:publicly_viewable_policy))
+
+          get :descriptor, params: { id: workflow.id, version_id: 1, type: 'GALAXY' }
+
+          assert_response :not_found
+          r = JSON.parse(@response.body)
+          assert r['message'].include?('authorized')
+        end
+
         test 'should get descriptor file via relative path on git workflow' do
           workflow = FactoryBot.create(:remote_git_workflow, policy: FactoryBot.create(:public_policy))
 
@@ -289,6 +339,16 @@ module Ga4gh
           assert_response :success
           assert_equal 'application/json; charset=utf-8', @response.headers['Content-Type']
           assert @response.body.include?('a_galaxy_workflow')
+        end
+
+        test 'should not get descriptor via relative path for non-downloadable tool' do
+          workflow = FactoryBot.create(:remote_git_workflow, policy: FactoryBot.create(:publicly_viewable_policy))
+
+          get :descriptor, params: { id: workflow.id, version_id: 1, type: 'GALAXY', relative_path: 'concat_two_files.ga' }
+
+          assert_response :not_found
+          r = JSON.parse(@response.body)
+          assert r['message'].include?('authorized')
         end
 
         test 'should list tool version files for correct version on git workflow' do

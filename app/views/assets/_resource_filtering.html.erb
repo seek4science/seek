@@ -1,5 +1,9 @@
 <% if @available_filters&.any? %>
-  <div class="index-filters">
+  <div class="index-filters" id="sidebar">
+    <h3 class="index-filters-heading">
+      Filters
+      <button href="#" class="btn pull-right close" id="sidebar-close">&times</button>
+    </h3>
     <% @available_filters.each do |key, options| %>
       <% filter = Seek::Filterer.new(controller_model).get_filter(key) %>
       <% begin %>

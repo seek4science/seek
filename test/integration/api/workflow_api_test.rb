@@ -49,4 +49,22 @@ class WorkflowApiTest < ActionDispatch::IntegrationTest
     template = load_template('post_remote_workflow.json.erb')
     api_post_test(template)
   end
+
+  test 'can lookup tool names if only id provided' do
+    VCR.use_cassette('bio_tools/fetch_galaxy_tool_names') do
+      template = load_template('post_tooled_workflow.json.erb')
+
+      post '/workflows.json', params: template, as: :json
+      assert_response :success
+
+      validate_json response.body, "#/components/schemas/#{singular_name.camelize(:lower)}Response"
+      res = JSON.parse(response.body)
+      tools = res['data']['attributes']['tools']
+      assert_equal 3, tools.length
+      assert_equal('MultiQC', tools.detect { |t| t['id'] == 'https://bio.tools/multiqc' }['name'])
+      assert_equal('European Nucleotide Archive (ENA)', tools.detect { |t| t['id'] == 'https://bio.tools/ena' }['name'])
+      assert_equal('Ruby!!!', tools.detect { |t| t['id'] == 'https://bio.tools/bioruby' }['name'])
+      assert_nil tools.detect { |t| t['id'] == 'https://ignore.me/galaxy' }
+    end
+  end
 end

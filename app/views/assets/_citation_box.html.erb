@@ -1,4 +1,6 @@
 <% snapshot ||= nil %>
+<% blob ||= nil %>
+<% url = blob ? blob.content_path(display: 'citation', disposition: 'inline') : citation_path(doi) %>
 
 <div class="panel panel-default">
   <div class="panel-heading">
@@ -10,11 +12,15 @@
   </div>
   <div class="panel-body">
     <div id="citation" class="well well-sm citation-box">
-      <%= render partial: 'assets/citation', locals: { doi: doi, style: selected_citation_style } %>
+      <% if blob %>
+        <%= render partial: 'assets/citation_from_cff', locals: { blob: blob, style: selected_citation_style } %>
+      <% else %>
+        <%= render partial: 'assets/citation_from_doi', locals: { doi: doi, style: selected_citation_style } %>
+      <% end %>
     </div>
 
     <%= select_tag(nil, citation_style_options, id: 'citation-style-select', class: 'form-control',
-                   data: { url: citation_path(doi) }) %>
+                   data: { url: url }) %>
 
     <% if snapshot %>
       <span class="subtle">

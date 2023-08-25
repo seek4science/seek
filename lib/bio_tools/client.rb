@@ -22,6 +22,11 @@ module BioTools
       "#{BASE}#{id}"
     end
 
+    def self.match_id(input)
+      matches = input.match(/#{BASE}(.+)/)
+      matches[1] if matches
+    end
+
     private
 
     def perform(path, method: :get, **opts)

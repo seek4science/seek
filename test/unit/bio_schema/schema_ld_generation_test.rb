@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'minitest/mock'
 
 class SchemaLdGenerationTest < ActiveSupport::TestCase
   def setup
@@ -857,7 +858,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'name' => 'Workflows',
       'url' => 'http://localhost:3000/workflows',
       'keywords' => [],
-      'license' => 'https://creativecommons.org/publicdomain/zero/1.0/',
+      'license' => 'https://spdx.org/licenses/CC0-1.0',
       'creator' => [{'@type' => 'Organization',
                      '@id' => 'http://www.sysmo-db.org',
                      'name' => 'SysMO-DB',
@@ -880,7 +881,6 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     FactoryBot.create(:workflow)
     dump = Workflow.public_schema_ld_dump
     dump.write
-    time = Time.now
     size = ActiveSupport::NumberHelper::NumberToHumanSizeConverter.new(dump.size, {}).convert
 
     expected = {
@@ -892,7 +892,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'name' => 'Workflows',
       'url' => 'http://localhost:3000/workflows',
       'keywords' => [],
-      'license' => 'https://creativecommons.org/licenses/by/4.0/',
+      'license' => 'https://spdx.org/licenses/CC-BY-4.0',
       'creator' => [{ '@type' => 'Organization',
                       '@id' => 'http://www.sysmo-db.org',
                       'name' => 'SysMO-DB',
@@ -903,14 +903,16 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                           'encodingFormat' => 'application/ld+json',
                           'name' => 'workflows-bioschemas-dump.jsonld',
                           'description' => 'A collection of public Workflows in Sysmo SEEK, serialized as an array of JSON-LD objects conforming to Bioschemas profiles.',
-                          'dateModified' => time.iso8601 },
+                          'dateModified' => @current_time.iso8601 },
       'includedInDataCatalog' => { '@id' => 'http://localhost:3000' }
     }
 
-    resource = Seek::BioSchema::Dataset.new(Workflow)
-    assert dump.exists?
-    json = JSON.parse(resource.to_schema_ld)
-    assert_equal expected, json
+    File.stub(:mtime, @current_time) do
+      resource = Seek::BioSchema::Dataset.new(Workflow)
+      assert dump.exists?
+      json = JSON.parse(resource.to_schema_ld)
+      assert_equal expected, json
+    end
   end
 
   private

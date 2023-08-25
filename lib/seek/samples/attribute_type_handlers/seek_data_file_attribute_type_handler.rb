@@ -3,7 +3,7 @@ module Seek
     module AttributeTypeHandlers
       class SeekDataFileAttributeTypeHandler < SeekResourceAttributeTypeHandler
         def type
-          'DataFile'
+          DataFile
         end
       end
     end
