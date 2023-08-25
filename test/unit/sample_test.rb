@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class SampleTest < ActiveSupport::TestCase
+
   test 'validation' do
     sample = FactoryBot.create :sample, title: 'fish', sample_type: FactoryBot.create(:simple_sample_type), data: { the_title: 'fish' }
     assert sample.valid?
@@ -527,7 +528,7 @@ class SampleTest < ActiveSupport::TestCase
 
   test 'linked sample as title' do
     # setup sample type, to be linked to patient sample type
-    patient = FactoryBot.create(:patient_sample)
+    patient = FactoryBot.create(:patient_sample, policy:FactoryBot.create(:public_policy))
     assert_equal 'Fred Bloggs', patient.title
     linked_sample_type = FactoryBot.create(:linked_sample_type, project_ids: [FactoryBot.create(:project).id])
     linked_sample_type.sample_attributes.last.linked_sample_type = patient.sample_type
@@ -607,7 +608,7 @@ class SampleTest < ActiveSupport::TestCase
 
   test 'set linked sample by id' do
     # setup sample type, to be linked to patient sample type
-    patient = FactoryBot.create(:patient_sample)
+    patient = FactoryBot.create(:patient_sample, policy: FactoryBot.create(:public_policy))
     linked_sample_type = FactoryBot.create(:linked_sample_type, project_ids: [FactoryBot.create(:project).id])
     linked_sample_type.sample_attributes.last.linked_sample_type = patient.sample_type
     linked_sample_type.save!
@@ -626,7 +627,7 @@ class SampleTest < ActiveSupport::TestCase
 
   test 'set linked sample by title' do
     # setup sample type, to be linked to patient sample type
-    patient = FactoryBot.create(:patient_sample)
+    patient = FactoryBot.create(:patient_sample, policy: FactoryBot.create(:public_policy))
     linked_sample_type = FactoryBot.create(:linked_sample_type, project_ids: [FactoryBot.create(:project).id])
     linked_sample_type.sample_attributes.last.linked_sample_type = patient.sample_type
 
@@ -1119,8 +1120,8 @@ class SampleTest < ActiveSupport::TestCase
   end
 
   test 'multi linked sample validation' do
-    patient = FactoryBot.create(:patient_sample)
-    patient2 = FactoryBot.create(:patient_sample, sample_type:patient.sample_type )
+    patient = FactoryBot.create(:patient_sample, policy:FactoryBot.create(:public_policy))
+    patient2 = FactoryBot.create(:patient_sample, sample_type:patient.sample_type, policy:FactoryBot.create(:public_policy) )
     multi_linked_sample_type = FactoryBot.create(:multi_linked_sample_type, project_ids: [FactoryBot.create(:project).id])
     multi_linked_sample_type.sample_attributes.last.linked_sample_type = patient.sample_type
     multi_linked_sample_type.save!
@@ -1173,6 +1174,184 @@ class SampleTest < ActiveSupport::TestCase
     old = sample.list_item_title_cache_key_prefix
     disable_authorization_checks { sample.update(title:'changed', updated_at: 1.minute.from_now) }
     refute_equal old, sample.list_item_title_cache_key_prefix
+
+  end
+
+  test 'validation of single linked sample permissions' do
+    person_a = FactoryBot.create(:person)
+    person_b = FactoryBot.create(:person)
+
+    pub_patient1 = FactoryBot.create(:patient_sample, contributor: person_a, policy: FactoryBot.create(:public_policy))
+
+    patient_sample_type = pub_patient1.sample_type
+
+    priv_patient1 = FactoryBot.create(:patient_sample, sample_type:patient_sample_type, contributor: person_a, policy: FactoryBot.create(:private_policy) )
+
+    priv_patient2 = FactoryBot.create(:patient_sample, sample_type:patient_sample_type, contributor: person_a, policy: FactoryBot.create(:private_policy) )
+
+    linked_sample_type = FactoryBot.create(:linked_optional_sample_type, project_ids: [person_a.projects.first.id])
+    linked_sample_type.sample_attributes.last.linked_sample_type = patient_sample_type
+    linked_sample_type.save!
+
+    sample = Sample.new(sample_type: linked_sample_type,
+                        data:{
+                          "title": 'Multiple Samples',
+                          "patient": priv_patient1.id.to_s
+                        },
+                        contributor: person_a,
+                        project_ids: [person_a.projects.first.id],
+                        policy: FactoryBot.create(:editing_public_policy)
+    )
+
+    # sanity check
+    User.with_current_user(person_a) do
+      assert pub_patient1.can_view?
+      assert priv_patient1.can_view?
+      assert priv_patient2.can_view?
+      assert sample.can_edit?
+    end
+    User.with_current_user(person_b) do
+      assert pub_patient1.can_view?
+      refute priv_patient1.can_view?
+      refute priv_patient2.can_view?
+      assert sample.can_edit?
+    end
+
+    # new sample
+    User.with_current_user(person_b) do
+      refute sample.valid?
+    end
+    User.with_current_user(person_a) do
+      assert sample.valid?
+      assert sample.save!
+    end
+
+    # change title attribute
+    sample.set_attribute_value(:title, 'new title')
+    User.with_current_user(person_a) do
+      assert sample.valid?
+    end
+    User.with_current_user(person_b) do
+      assert sample.valid?
+    end
+
+    #change to a public patient
+    sample.set_attribute_value(:patient, pub_patient1.id)
+    User.with_current_user(person_a) do
+      assert sample.valid?
+    end
+    User.with_current_user(person_b) do
+      assert sample.valid?
+    end
+
+    # change to different private patient
+    sample.set_attribute_value(:patient, priv_patient2.id)
+    User.with_current_user(person_a) do
+      assert sample.valid?
+    end
+    User.with_current_user(person_b) do
+      refute sample.valid?
+    end
+
+    # change to nil
+    sample.set_attribute_value(:patient, nil)
+    User.with_current_user(person_a) do
+      assert sample.valid?
+    end
+    User.with_current_user(person_b) do
+      assert sample.valid?
+    end
+  end
+
+  test 'validation of multi linked sample permissions' do
+    person_a = FactoryBot.create(:person)
+    person_b = FactoryBot.create(:person)
+
+
+    pub_patient1 = FactoryBot.create(:patient_sample, contributor: person_a, policy: FactoryBot.create(:public_policy))
+
+    patient_sample_type = pub_patient1.sample_type
+    pub_patient2 = FactoryBot.create(:patient_sample, sample_type:patient_sample_type, contributor: person_a, policy: FactoryBot.create(:public_policy))
+
+    priv_patient1 = FactoryBot.create(:patient_sample, sample_type:patient_sample_type, contributor: person_a, policy: FactoryBot.create(:private_policy) )
+
+    priv_patient2 = FactoryBot.create(:patient_sample, sample_type:patient_sample_type, contributor: person_a, policy: FactoryBot.create(:private_policy) )
+
+    multi_linked_sample_type = FactoryBot.create(:multi_linked_sample_type, project_ids: [person_a.projects.first.id])
+    multi_linked_sample_type.sample_attributes.last.linked_sample_type = patient_sample_type
+    multi_linked_sample_type.save!
+
+    sample = Sample.new(sample_type: multi_linked_sample_type,
+                           data:{
+                             "title": 'Multiple Samples',
+                             "patient": [pub_patient1.id.to_s, priv_patient1.id.to_s]
+                           },
+                           contributor: person_a,
+                           project_ids: [person_a.projects.first.id],
+                           policy: FactoryBot.create(:editing_public_policy)
+    )
+
+    # sanity check
+    User.with_current_user(person_a) do
+      assert pub_patient1.can_view?
+      assert pub_patient2.can_view?
+      assert priv_patient1.can_view?
+      assert priv_patient2.can_view?
+      assert sample.can_edit?
+    end
+    User.with_current_user(person_b) do
+      assert pub_patient1.can_view?
+      assert pub_patient2.can_view?
+      refute priv_patient1.can_view?
+      refute priv_patient2.can_view?
+      assert sample.can_edit?
+    end
+
+    # new sample
+    User.with_current_user(person_b) do
+      refute sample.valid?
+    end
+    User.with_current_user(person_a) do
+      assert sample.valid?
+      assert sample.save!
+    end
+
+    # add a private entry
+    sample.set_attribute_value(:patient, [pub_patient1.id.to_s, priv_patient1.id.to_s, priv_patient2.id.to_s])
+    User.with_current_user(person_a) do
+      assert sample.valid?
+    end
+    User.with_current_user(person_b) do
+      refute sample.valid?
+    end
+
+    # add a public entry
+    sample.set_attribute_value(:patient, [pub_patient1.id.to_s, priv_patient1.id.to_s, pub_patient2.id.to_s])
+    User.with_current_user(person_a) do
+      assert sample.valid?
+    end
+    User.with_current_user(person_b) do
+      assert sample.valid?
+    end
+
+    # replace with a public entry
+    sample.set_attribute_value(:patient, [pub_patient2.id.to_s])
+    User.with_current_user(person_a) do
+      assert sample.valid?
+    end
+    User.with_current_user(person_b) do
+      assert sample.valid?
+    end
+
+    # replace with a private entry
+    sample.set_attribute_value(:patient, [priv_patient2.id.to_s])
+    User.with_current_user(person_a) do
+      assert sample.valid?
+    end
+    User.with_current_user(person_b) do
+      refute sample.valid?
+    end
+
 
   end
 

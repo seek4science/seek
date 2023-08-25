@@ -698,6 +698,22 @@ class SampleTypesControllerTest < ActionController::TestCase
     end
   end
 
+  test 'validates changes against editing constraints' do
+    @sample_type.samples.create!(data: { the_title: 'yes' }, sample_type: @sample_type, project_ids: @project_ids)
+
+    assert_no_difference('ActivityLog.count') do
+      put :update, params: { id: @sample_type, sample_type: {
+        sample_attributes_attributes: {
+          '0' => { id: @sample_type.sample_attributes.first.id, pos: '1', title: 'banana', required: '1' }
+        }
+      } }
+    end
+
+    assert_response :unprocessable_entity
+    assert_select 'div#error_explanation' do
+      assert_select 'ul > li', text: 'Sample attributes title cannot be changed (the_title)'
+    end
+  end
 
   private
 
