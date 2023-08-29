@@ -95,7 +95,7 @@ class StudiesController < ApplicationController
     @study.sample_types.each do |st|
       raise "Sample Type '#{st.title}' contains samples. Unable to delete study" unless st.samples.empty?
 
-      st.delete
+      st.destroy
     end
   end
 
