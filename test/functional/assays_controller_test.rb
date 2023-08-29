@@ -1923,7 +1923,7 @@ class AssaysControllerTest < ActionController::TestCase
 
   test 'should delete empty assay with linked sample type' do
     person = FactoryBot.create(:person)
-    assay_sample_type = FactoryBot.create :linked_sample_type
+    assay_sample_type = FactoryBot.create :linked_sample_type, contributor: person
     assay = FactoryBot.create(:assay,
                               policy:FactoryBot.create(:private_policy, permissions:[FactoryBot.create(:permission,contributor: person, access_type:Policy::EDITING)]),
                               sample_type: assay_sample_type,

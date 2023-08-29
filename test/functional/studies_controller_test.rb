@@ -1396,8 +1396,8 @@ class StudiesControllerTest < ActionController::TestCase
 
   test 'should delete empty study with linked sample type' do
     person = FactoryBot.create(:person)
-    study_source_sample_type = FactoryBot.create :linked_sample_type
-    study_sample_sample_type = FactoryBot.create :linked_sample_type
+    study_source_sample_type = FactoryBot.create :linked_sample_type, contributor: person
+    study_sample_sample_type = FactoryBot.create :linked_sample_type, contributor: person
     study = FactoryBot.create(:study,
                               policy:FactoryBot.create(:private_policy, permissions:[FactoryBot.create(:permission,contributor: person, access_type:Policy::EDITING)]),
                               sample_types: [study_source_sample_type, study_sample_sample_type],
