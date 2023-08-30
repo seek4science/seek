@@ -92,11 +92,10 @@ class StudiesController < ApplicationController
   def delete_linked_sample_types
     return unless is_single_page_study?
 
-    @study.sample_types.each do |st|
-      raise "Sample Type '#{st.title}' contains samples. Unable to delete study" unless st.samples.empty?
-
-      st.destroy
-    end
+    # The study sample types must be destroyed in reversed order
+    # otherwise the first sample type won't be removed becaused it is linked from the second
+    study_st_ids = @study.sample_types.map(&:id).sort { |a, b| b <=> a }
+    SampleType.destroy(study_st_ids)
   end
 
 
