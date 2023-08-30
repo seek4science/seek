@@ -78,7 +78,8 @@ module TemplatesHelper
       required: attribute.required,
       unit_id: attribute.unit_id,
       pos: attribute.pos,
-      isa_tag_id: attribute.isa_tag_id
+      isa_tag_id: attribute.isa_tag_id,
+      isa_tag_title: attribute.isa_tag&.title
     }
   end
 end
