@@ -12,7 +12,7 @@
   <% item.policy.permissions.map do |permission| %>
     <% sharing_permission_changed = @batch_sharing_permission_changed && (@items_for_sharing.include? item) ? PolicyHelper::permission_changed_item_class(permission, @policy_params) : "" %>
     <div id="<%= item_id %>-Permission-<%= permission.contributor_type %>}-<%= permission.contributor.id %>" class="permission-node <%= sharing_permission_changed %>">
-      <strong><%=  get_permission_type permission -%>:</strong>
+      <strong><%=  permission_title(permission, member_prefix: false, icon: false, link: true) -%>:</strong>
         <%= Policy.get_access_type_wording(permission.access_type, downloadable) %>
     </div>
   <% end %>
