@@ -4,11 +4,19 @@
 
 %>
 
-<%= show_title "Change permissions of items related to #{link_to(h(current_user.person.name),current_user.person)} in batch".html_safe -%>
+<%= show_title "Change permissions of assets related to #{link_to(h(current_user.person.name),current_user.person)} in batch".html_safe -%>
 
 <div class="alert alert-info">
   <ul>
-    <li>You can view the details of current permissions for each item by clicking the item's policy icon.</li>
+    <li>You can view the details of current permissions for each item by clicking the item's policy icon (
+      <%= image('world', title: 'Was published', class: 'visibility_icon') %>
+      <%= image('partial_world', title: 'Visible to everyone, but not accessible', class: 'visibility_icon') %>
+      <%= image('manage', title: 'Custom policy', class: 'visibility_icon') %>
+      <%= image('lock', title: 'Private', class: 'visibility_icon') %>
+      ).</li>
+    <li>You can view the managers for each item by clicking the
+      <span class="glyphicon glyphicon-user" aria-hidden="true" style="position:relative; top:2px;"></span>
+      icon.</li>
     <li>After your confirmation, the newly modified permissions will be highlighted with <span class="sharing_permission_changed"></span>  .</li>
   </ul>
 </div>
