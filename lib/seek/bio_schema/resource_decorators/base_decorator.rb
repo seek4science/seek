@@ -50,11 +50,15 @@ module Seek
           }
         end
 
+        def reference
+          { '@id': identifier.to_s }
+        end
+
         def resource_url(resource, opts = {})
           strip_version = opts.delete(:strip_version)
           opts.reverse_merge!(Seek::Config.site_url_options)
           resource = Array(resource).map do |r|
-            if r.is_a_version?
+            if r.respond_to?(:is_a_version?) && r.is_a_version?
               opts[:version] = r.version unless strip_version
               r.parent
             else

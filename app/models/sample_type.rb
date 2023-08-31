@@ -41,12 +41,17 @@ class SampleType < ApplicationRecord
   has_many :assays
   has_and_belongs_to_many :studies
 
+  scope :without_template, -> { where(template_id: nil) }
+
   validates :title, presence: true
   validates :title, length: { maximum: 255 }
   validates :description, length: { maximum: 65_535 }
   validates :contributor, presence: true
-  validate :validate_one_title_attribute_present, :validate_attribute_title_unique, :validate_attribute_accessor_names_unique, 
-           :validate_title_is_not_type_of_seek_sample_multi
+  validate :validate_one_title_attribute_present,
+           :validate_attribute_title_unique,
+           :validate_attribute_accessor_names_unique,
+           :validate_title_is_not_type_of_seek_sample_multi,
+           :validate_against_editing_constraints
   validates :projects, presence: true, projects: { self: true }
 
   accepts_nested_attributes_for :sample_attributes, allow_destroy: true
@@ -118,8 +123,10 @@ class SampleType < ApplicationRecord
       end.nil?
   end
 
-  def can_view?(user = User.current_user, referring_sample = nil)
-    project_membership = (user && user.person && (user.person.projects & projects).any?) 
+  def can_view?(user = User.current_user, referring_sample = nil, view_in_single_page = false)
+    return false if Seek::Config.project_single_page_advanced_enabled && template_id.present? && !view_in_single_page
+
+    project_membership = user&.person && (user.person.projects & projects).any?
     is_creator = creators.include?(user&.person)
     project_membership || public_samples? || is_creator || check_referring_sample_permission(user, referring_sample)
   end
@@ -189,6 +196,19 @@ class SampleType < ApplicationRecord
     if dups.any?
       dups_text = dups.map { |_k, v| "(#{v.map(&:title).join(', ')})" }.join(', ')
       errors.add(:sample_attributes, "Attribute names are too similar: #{dups_text}")
+    end
+  end
+
+  def validate_against_editing_constraints
+    c = editing_constraints
+    sample_attributes.each do |a|
+      if a.marked_for_destruction? && !c.allow_attribute_removal?(a)
+        errors.add(:sample_attributes, "cannot be removed, there are existing samples using this attribute (#{a.title})")
+      end
+
+      if a.new_record? && !c.allow_new_attribute?
+        errors.add(:sample_attributes, "cannot be added, new attributes are not allowed (#{a.title})")
+      end
     end
   end
 

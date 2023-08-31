@@ -14,7 +14,7 @@ module Seek
     end
 
     def self.clear_cached
-      @@cache = {}
+      @cache = {}
     end
 
     def self.ensure_models_loaded
@@ -146,17 +146,33 @@ module Seek
     end
 
     def self.python_exec(cmd)
-      "python3.7 #{cmd}"
+      "python3.9 #{cmd}"
+    end
+
+    def self.lookup_class(class_name, raise: true)
+      c = persistent_class_lookup[class_name]
+      raise NameError "#{class_name} not an appropriate class" if c.nil? && raise
+      c
     end
 
     private
 
+    def self.persistent_class_lookup
+      cache('persistent_class_lookup') do
+        lookup = {}
+        persistent_classes.each do |klass|
+          lookup[klass.name] = klass
+        end
+        lookup
+      end
+    end
+
     def self.cache(name, &block)
-      @@cache ||= {}
+      @cache ||= {}
       if Rails.env.development? # Don't use caching in development mode
         block.call
       else
-        @@cache[name] ||= block.call
+        @cache[name] ||= block.call
       end
     end
 

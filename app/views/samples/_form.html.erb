@@ -7,7 +7,7 @@
     <label>Sample type: </label> <%= link_to(h(@sample.sample_type.title), @sample.sample_type) %>
     <% if @sample.new_record? %>
       <span style="font-size:smaller">
-        (<%= link_to('change', select_sample_types_path) %>)
+        (<%= link_to('change', select_sample_types_path(act: :create)) %>)
       </span>
     <% end %>
     <%= f.hidden_field(:sample_type_id) %>

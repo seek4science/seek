@@ -1,0 +1,76 @@
+<%= show_title "New sharing policy and permissions" -%>
+
+<%= form_tag({ :action => :batch_sharing_permission_changed }, id: "change-permission-form") do %>
+  <% resource =  @asset %>
+  <%= folding_panel('Sharing', false, id: 'sharing_form',
+                    help_text: "Here you can specify who can view, access and manage this.") do %>
+    <div class="alert alert-info">
+      Specify the new sharing policies for the following <%= "item".pluralize(@items_for_sharing.size) %>:<br>
+      <% if include_downloadable_item? (@items_for_sharing) %>
+      Please note that the <a herf="#" class="highlight-colour">Download</a> option is only applied to the items which are downloadable with the icon <span><%= icon_tag("download") %>.</span>
+      <% end %>
+    </div>
+
+
+    <ul class="sharing_options" style="max-height:200px;overflow-y:scroll">
+      <% @items_for_sharing.each do |item| %>
+        <%= hidden_field_tag sharing_item_param(item), 1 %>
+        <li class="type_and_title">
+          <%= text_for_resource item -%>: <%= link_to item.title, item -%>
+          <% if  item.try(:is_downloadable?) %>
+          <span><%= icon_tag("download") %></span>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+
+
+    <% if include_downloadable_item? (@items_for_sharing) %>
+        <%= render partial: 'sharing/permissions_table', locals: { object: DataFile.new, policy: Policy.new, projects: [] } %>
+    <% else %>
+       <%= render partial: 'sharing/permissions_table', locals: { object: Study.new, policy: Policy.new, projects: [] } %>
+    <% end %>
+  <% end %>
+
+  <%= submit_tag "Confirm", data: { disable_with: 'Confirm....' }, :class => 'btn btn-primary confirm-button',
+    disabled: true, onclick: "submitBatchPermissionForm()"  -%>
+  or
+  <%= cancel_button(resource, { id: "cancel-batch-permission" }) %>
+<% end %>
+
+
+
+<script>
+    $j(document).ready(function () {
+        $j(".permission-column:contains('Download')").addClass('sharing-color');
+
+        $j('#permissions-table').on("DOMSubtreeModified", function(){
+          $j(".confirm-button").prop("disabled", false);
+        });
+
+        $j("#permissions-table").on('click', function() {
+          $j(".confirm-button").prop("disabled", false);
+        });
+
+        $j("#change-permission-form").submit(function(){
+          return false;
+        });
+
+        $j("#cancel-batch-permission").on("click", function(e){
+          e.preventDefault()
+          $j('#change-batch-permission-modal').modal('hide')
+        })
+
+    });
+
+    function submitBatchPermissionForm () {
+      $j.ajax({
+        method: "POST",
+        url: '<%= batch_sharing_permission_changed_single_pages_path -%>?id=change-permission-form&single_page=true',
+        data: $j("#change-permission-form").serialize(),
+        success: (res) => { $j('#change-batch-permission').html(res) },
+        error: (e) => { console.log(e) }
+      });
+    }
+
+</script>

@@ -6,7 +6,7 @@ class SampleControlledVocabApiTest < ActionDispatch::IntegrationTest
 
   def setup
     admin_login
-    login_as(Factory(:project_administrator))
+    login_as(FactoryBot.create(:project_administrator))
 
     @sample_controlled_vocab = SampleControlledVocab.new({ title:"a title", description:"some description",
                                                            source_ontology: "EFO", ols_root_term_uri: "http://a_uri",

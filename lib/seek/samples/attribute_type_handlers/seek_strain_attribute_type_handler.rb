@@ -2,11 +2,9 @@ module Seek
   module Samples
     module AttributeTypeHandlers
       class SeekStrainAttributeTypeHandler < SeekResourceAttributeTypeHandler
-
         def type
-          'Strain'
+          Strain
         end
-
       end
     end
   end

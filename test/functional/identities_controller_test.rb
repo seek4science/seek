@@ -4,7 +4,7 @@ class IdentitiesControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
 
   test 'should get empty identities lists' do
-    user = Factory(:user)
+    user = FactoryBot.create(:user)
     login_as(user)
 
     get :index, params: { user_id: user.id }
@@ -13,8 +13,8 @@ class IdentitiesControllerTest < ActionController::TestCase
   end
 
   test "shouldn't get identity list for other user" do
-    user = Factory(:user)
-    other_user = Factory(:user)
+    user = FactoryBot.create(:user)
+    other_user = FactoryBot.create(:user)
     login_as(other_user)
 
     get :index, params: { user_id: user.id }
@@ -24,7 +24,7 @@ class IdentitiesControllerTest < ActionController::TestCase
   end
 
   test 'should list identities' do
-    identity = Factory(:identity)
+    identity = FactoryBot.create(:identity)
     login_as(identity.user)
 
     get :index, params: { user_id: identity.user.id }
@@ -35,7 +35,7 @@ class IdentitiesControllerTest < ActionController::TestCase
   end
 
   test 'should delete identity' do
-    identity = Factory(:identity)
+    identity = FactoryBot.create(:identity)
     user = identity.user
     login_as(user)
 
@@ -47,8 +47,8 @@ class IdentitiesControllerTest < ActionController::TestCase
   end
 
   test "shouldn't delete other users' identity" do
-    identity = Factory(:identity)
-    other_user = Factory(:user)
+    identity = FactoryBot.create(:identity)
+    other_user = FactoryBot.create(:user)
     login_as(other_user)
 
     assert_no_difference('Identity.count') do

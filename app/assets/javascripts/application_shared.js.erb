@@ -243,13 +243,13 @@ $j(document).ready(function () {
         }
     });
 
-    $j('#citation-style-select').change(function () {
+    $j('#citation-style-select').select2({ theme: 'bootstrap' }).on('select2:select', function () {
         var style = $j(this).val();
         var url = $j(this).data('url');
         var target = $j('#citation');
-        var currentStyle = $j('#citation').data('citationStyle');
+        var currentStyle = $j('#citation div').data('citationStyle');
 
-        if (style && style !== currentStyle) {
+        if (style && currentStyle && style !== currentStyle) {
             $j.ajax({
                 url: url,
                 data: { style: style },
@@ -266,7 +266,7 @@ $j(document).ready(function () {
             });
             target.spinner('add');
         }
-    }).change();
+    });
 
     new Clipboard('.clipboard-btn');
 
@@ -352,6 +352,53 @@ $j(document).ready(function () {
             div.after(btn);
         }
     });
+
+    // Popout filter sidebar on small screens
+    var Sidebar = {
+        close: function () {
+            $j('.sidebar-backdrop').remove();
+            $j('#sidebar').removeClass('open');
+            $j('#sidebar-toggle').button('reset');
+        },
+        open: function () {
+            $j('body').append($j('<div class="sidebar-backdrop modal-backdrop fade in"></div>'));
+            $j('#sidebar').addClass('open');
+        },
+        toggle: function () {
+            var toggleButton = $j('#sidebar-toggle');
+            toggleButton.button('toggle');
+
+            if(toggleButton.hasClass('active')) {
+                Sidebar.open();
+            } else {
+                Sidebar.close();
+            }
+
+            return false;
+        }
+    };
+
+    $j(document).on('click', '[data-role="seek-expandable-list-expand"]', function () {
+        var wrapper = $j(this).closest('[data-role="seek-expandable-list"]');
+        wrapper.find('ul:first').removeClass('collapsed');
+        wrapper.find('[data-role="seek-expandable-list-expand"]:first').hide();
+        wrapper.find('[data-role="seek-expandable-list-collapse"]:first').show();
+
+        return false;
+    });
+
+    $j(document).on('click', '[data-role="seek-expandable-list-collapse"]', function () {
+        var wrapper = $j(this).closest('[data-role="seek-expandable-list"]');
+        wrapper.find('ul:first').addClass('collapsed');
+        wrapper.find('[data-role="seek-expandable-list-expand"]:first').show();
+        wrapper.find('[data-role="seek-expandable-list-collapse"]:first').hide();
+
+        return false;
+    });
+
+    $j('#sidebar-toggle').click(Sidebar.toggle);
+    $j('#sidebar-close').click(Sidebar.toggle);
+    $j(document).on('click', '.sidebar-backdrop', Sidebar.toggle);
 });
 
 var URL_ROOT = '<%= Rails.application.config.relative_url_root %>';

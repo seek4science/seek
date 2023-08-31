@@ -6,7 +6,7 @@ class AdminControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
 
   def setup
-    login_as(Factory(:admin))
+    login_as(FactoryBot.create(:admin))
   end
 
   test 'should show rebrand' do
@@ -15,7 +15,7 @@ class AdminControllerTest < ActionController::TestCase
   end
 
   test 'non admin cannot restart the server' do
-    login_as(Factory(:user))
+    login_as(FactoryBot.create(:user))
     post :restart_server
     refute_nil flash[:error]
   end
@@ -31,7 +31,7 @@ class AdminControllerTest < ActionController::TestCase
   end
 
   test 'non admin cannot restart the delayed job' do
-    login_as(Factory(:user))
+    login_as(FactoryBot.create(:user))
     post :restart_delayed_job
     refute_nil flash[:error]
   end
@@ -42,7 +42,7 @@ class AdminControllerTest < ActionController::TestCase
   end
 
   test 'none admin not get registration form' do
-    login_as Factory(:user)
+    login_as FactoryBot.create(:user)
     get :registration_form
     assert !User.current_user.person.is_admin?
     assert_redirected_to root_path
@@ -71,7 +71,7 @@ class AdminControllerTest < ActionController::TestCase
   end
 
   test 'invisible to non admin' do
-    login_as(Factory(:user))
+    login_as(FactoryBot.create(:user))
     get :index
     assert_response :redirect
     refute_nil flash[:error]
@@ -167,15 +167,14 @@ class AdminControllerTest < ActionController::TestCase
     aaron = people(:aaron_person)
 
     assert quentin.is_admin?
-    assert !aaron.is_admin?
+    refute aaron.is_admin?
 
-    post :update_admins, params: { admins: "#{aaron.id}" }
+    post :update_admins, params: { admins: ['', aaron.id.to_s] }
 
     quentin.reload
     aaron.reload
 
-    assert !quentin.is_admin?
-    assert aaron.is_admin?
+    refute quentin.is_admin?
     assert aaron.is_admin?
     assert User.current_user.person.is_admin?
   end
@@ -202,18 +201,18 @@ class AdminControllerTest < ActionController::TestCase
   end
 
   test 'get edit tag' do
-    p = Factory(:person)
-    model = Factory(:model)
-    tag = Factory :tag, value: 'twinkle', source: p.user, annotatable: model
+    p = FactoryBot.create(:person)
+    model = FactoryBot.create(:model)
+    tag = FactoryBot.create :tag, value: 'twinkle', source: p.user, annotatable: model
     get :edit_tag, params: { id: tag.value.id }
     assert_response :success
   end
 
   test 'non admin cannot get edit tag' do
-    login_as(Factory(:user))
-    p = Factory(:person)
-    model = Factory(:model)
-    tag = Factory :tag, value: 'twinkle', source: p.user, annotatable: model
+    login_as(FactoryBot.create(:user))
+    p = FactoryBot.create(:person)
+    model = FactoryBot.create(:model)
+    tag = FactoryBot.create :tag, value: 'twinkle', source: p.user, annotatable: model
     get :edit_tag, params: { id: tag.value.id }
     assert_response :redirect
     refute_nil flash[:error]
@@ -238,8 +237,8 @@ class AdminControllerTest < ActionController::TestCase
   end
 
   test 'storage usage stats' do
-    Factory(:rightfield_datafile)
-    Factory(:rightfield_annotated_datafile)
+    FactoryBot.create(:rightfield_datafile)
+    FactoryBot.create(:rightfield_annotated_datafile)
     get :get_stats, xhr: true, params: { page: 'storage_usage_stats' }
     assert_response :success
   end
@@ -345,8 +344,8 @@ class AdminControllerTest < ActionController::TestCase
   end
 
   test 'snapshot and doi stats' do
-    investigation = Factory(:investigation, title: 'i1', description: 'not blank',
-                            policy: Factory(:downloadable_public_policy))
+    investigation = FactoryBot.create(:investigation, title: 'i1', description: 'not blank',
+                            policy: FactoryBot.create(:downloadable_public_policy))
     snapshot = investigation.create_snapshot
     snapshot.update_column(:doi, '10.5072/testytest')
     AssetDoiLog.create(asset_type: 'investigation',
@@ -373,7 +372,7 @@ class AdminControllerTest < ActionController::TestCase
 
   test 'admin required to clear failed jobs' do
     logout
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
 
     Delayed::Job.destroy_all
     job = Delayed::Job.create!
@@ -578,8 +577,8 @@ class AdminControllerTest < ActionController::TestCase
     Rails.cache.write('test-key', 'hello')
     assert_equal 'hello', Rails.cache.fetch('test-key')
 
-    admin = Factory(:admin)
-    person = Factory(:project_administrator)
+    admin = FactoryBot.create(:admin)
+    person = FactoryBot.create(:project_administrator)
 
     login_as(person)
     post :clear_cache

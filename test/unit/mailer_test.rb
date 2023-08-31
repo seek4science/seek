@@ -18,8 +18,8 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test 'announcement notification' do
-    announcement = Factory(:mail_announcement)
-    recipient = Factory(:person)
+    announcement = FactoryBot.create(:mail_announcement)
+    recipient = FactoryBot.create(:person)
 
     @expected.subject = "Sysmo SEEK Announcement: #{announcement.title}"
     @expected.to = recipient.email_with_name
@@ -59,12 +59,12 @@ class MailerTest < ActionMailer::TestCase
     @expected.to = ['Maximilian Maxi-Mum <maximal_person@email.com>']
     @expected.from = 'no-reply@sysmo-db.org'
     @expected.body = read_fixture('request_contact')
-    @owner = Factory(:max_person)
+    @owner = FactoryBot.create(:max_person)
     details = 'here are some more details.'
-    presentation = Factory :ppt_presentation, contributor: @owner
+    presentation = FactoryBot.create :ppt_presentation, contributor: @owner
     @expected.subject = 'A Sysmo SEEK member requests to discuss with you regarding '+ presentation.title
 
-    requester = Factory(:person, first_name: 'Aaron', last_name: 'Spiggle')
+    requester = FactoryBot.create(:person, first_name: 'Aaron', last_name: 'Spiggle')
     @expected.reply_to = requester.person.email_with_name
 
     expected_text = encode_mail(@expected)
@@ -75,10 +75,10 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test 'request publish approval' do
-    gatekeeper = Factory(:asset_gatekeeper, first_name: 'Gatekeeper', last_name: 'Last')
-    person = Factory(:person, project: gatekeeper.projects.first)
-    resources = [Factory(:data_file, projects: gatekeeper.projects, title: 'Picture', contributor:person), Factory(:teusink_model, projects: gatekeeper.projects, title: 'Teusink', contributor:person)]
-    requester = Factory(:person, first_name: 'Aaron', last_name: 'Spiggle')
+    gatekeeper = FactoryBot.create(:asset_gatekeeper, first_name: 'Gatekeeper', last_name: 'Last')
+    person = FactoryBot.create(:person, project: gatekeeper.projects.first)
+    resources = [FactoryBot.create(:data_file, projects: gatekeeper.projects, title: 'Picture', contributor:person), FactoryBot.create(:teusink_model, projects: gatekeeper.projects, title: 'Teusink', contributor:person)]
+    requester = FactoryBot.create(:person, first_name: 'Aaron', last_name: 'Spiggle')
 
     @expected.subject = 'A Sysmo SEEK member requested your approval to publish some items.'
 
@@ -116,12 +116,34 @@ class MailerTest < ActionMailer::TestCase
     assert_equal expected_text, encode_mail(Mailer.request_publishing(owner, publisher, resources))
   end
 
+  test 'cancel publishing request' do
+    gatekeeper = FactoryBot.create(:asset_gatekeeper, first_name: 'Gatekeeper', last_name: 'Last')
+    person = FactoryBot.create(:person, project: gatekeeper.projects.first)
+    resources = [FactoryBot.create(:data_file, projects: gatekeeper.projects, title: 'Picture', contributor:person), FactoryBot.create(:teusink_model, projects: gatekeeper.projects, title: 'Teusink', contributor:person)]
+    requester = FactoryBot.create(:person, first_name: 'Aaron', last_name: 'Spiggle')
+
+    @expected.subject = 'A Sysmo SEEK member cancelled a publishing approval request.'
+    @expected.to = gatekeeper.email_with_name
+    @expected.from = 'no-reply@sysmo-db.org'
+    @expected.reply_to = requester.person.email_with_name
+
+    @expected.body = read_fixture('publishing_request_cancellation')
+
+    expected_text = encode_mail(@expected)
+    expected_text.gsub!('-person_id-', gatekeeper.id.to_s)
+    expected_text.gsub!('-df_id-', resources[0].id.to_s)
+    expected_text.gsub!('-model_id-', resources[1].id.to_s)
+    expected_text.gsub!('-requester_id-', requester.person.id.to_s)
+
+    assert_equal expected_text, encode_mail(Mailer.publishing_request_cancellation(gatekeeper, requester, resources))
+  end
+
   test 'gatekeeper approval feedback' do
-    gatekeeper = Factory(:asset_gatekeeper, first_name: 'Gatekeeper', last_name: 'Last')
-    person = Factory(:person, project: gatekeeper.projects.first)
-    item = Factory(:data_file, projects: gatekeeper.projects, title: 'Picture', contributor:person)
+    gatekeeper = FactoryBot.create(:asset_gatekeeper, first_name: 'Gatekeeper', last_name: 'Last')
+    person = FactoryBot.create(:person, project: gatekeeper.projects.first)
+    item = FactoryBot.create(:data_file, projects: gatekeeper.projects, title: 'Picture', contributor:person)
     items_and_comments = [{ item: item, comment: nil }]
-    requester = Factory(:person, first_name: 'Aaron', last_name: 'Spiggle')
+    requester = FactoryBot.create(:person, first_name: 'Aaron', last_name: 'Spiggle')
     @expected.subject = "A Sysmo SEEK #{I18n.t('asset_gatekeeper').downcase} approved your publishing requests."
 
     @expected.to = requester.email_with_name
@@ -138,12 +160,12 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test 'gatekeeper reject feedback' do
-    gatekeeper = Factory(:asset_gatekeeper, first_name: 'Gatekeeper', last_name: 'Last')
-    person = Factory(:person, project: gatekeeper.projects.first)
-    item = Factory(:data_file, projects: gatekeeper.projects, title: 'Picture',contributor:person)
+    gatekeeper = FactoryBot.create(:asset_gatekeeper, first_name: 'Gatekeeper', last_name: 'Last')
+    person = FactoryBot.create(:person, project: gatekeeper.projects.first)
+    item = FactoryBot.create(:data_file, projects: gatekeeper.projects, title: 'Picture',contributor:person)
     items_and_comments = [{ item: item, comment: 'not ready' }]
 
-    requester = Factory(:person, first_name: 'Aaron', last_name: 'Spiggle')
+    requester = FactoryBot.create(:person, first_name: 'Aaron', last_name: 'Spiggle')
     @expected.subject = "A Sysmo SEEK #{I18n.t('asset_gatekeeper').downcase} rejected your publishing requests."
 
     @expected.to = requester.email_with_name
@@ -176,7 +198,7 @@ class MailerTest < ActionMailer::TestCase
 
   test 'contact_admin_new_user' do
 
-    new_registree = Factory(:person,first_name:'Fred',last_name:'Jones', email:'fredjones@email.com')
+    new_registree = FactoryBot.create(:person,first_name:'Fred',last_name:'Jones', email:'fredjones@email.com')
 
     @expected.subject = 'Sysmo SEEK member signed up'
     @expected.to = 'Quentin Jones <quentin@email.com>'
@@ -210,7 +232,7 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test 'project changed' do
-    project_admin = Factory(:project_administrator)
+    project_admin = FactoryBot.create(:project_administrator)
     project = project_admin.projects.first
 
     @expected.subject = "The Sysmo SEEK Project #{project.title} information has been changed"
@@ -225,7 +247,7 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test 'programme activation required' do
-    creator = Factory(:programme_administrator)
+    creator = FactoryBot.create(:programme_administrator)
     programme = creator.programmes.first
     @expected.subject = "The Sysmo SEEK Programme #{programme.title} was created and needs activating"
     @expected.to = 'Quentin Jones <quentin@email.com>'
@@ -241,7 +263,7 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test 'programme activated' do
-    creator = Factory(:programme_administrator)
+    creator = FactoryBot.create(:programme_administrator)
     programme = creator.programmes.first
 
     @expected.subject = "The Sysmo SEEK Programme #{programme.title} has been activated"
@@ -257,7 +279,7 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test 'programme rejected' do
-    creator = Factory(:programme_administrator)
+    creator = FactoryBot.create(:programme_administrator)
     programme = creator.programmes.first
 
     @expected.subject = "The Sysmo SEEK Programme #{programme.title} has been rejected"
@@ -304,10 +326,10 @@ class MailerTest < ActionMailer::TestCase
   test 'request join project with new institution' do
     with_config_value(:instance_name, 'SEEK EMAIL TEST') do
       with_config_value(:site_base_host, 'https://hub.com') do
-        project = Factory(:project)
+        project = FactoryBot.create(:project)
         institution = Institution.new({title:'My lovely institution', web_page:'http://inst.org', country:'DE'})
         comments = 'some comments'
-        person = Factory(:person)
+        person = FactoryBot.create(:person)
         log = ProjectMembershipMessageLog.log_request(sender:person, project:project, institution:institution, comments:comments)
         email = Mailer.request_join_project(person.user, project, institution.to_json,comments, log)
         refute_nil email
@@ -319,10 +341,10 @@ class MailerTest < ActionMailer::TestCase
   test 'request join project existing institution' do
     with_config_value(:instance_name, 'SEEK EMAIL TEST') do
       with_config_value(:site_base_host, 'https://securefred.com:1337') do
-        project = Factory(:project)
-        institution = Factory(:institution)
+        project = FactoryBot.create(:project)
+        institution = FactoryBot.create(:institution)
         comments = 'some comments'
-        person = Factory(:person)
+        person = FactoryBot.create(:person)
         log = ProjectMembershipMessageLog.log_request(sender:person, project:project, institution:institution, comments:comments)
         email = Mailer.request_join_project(person.user, project, institution.to_json,comments, log)
         refute_nil email
@@ -335,12 +357,12 @@ class MailerTest < ActionMailer::TestCase
   test 'request create project for programme' do
     with_config_value(:instance_name, 'SEEK EMAIL TEST') do
       with_config_value(:site_base_host, 'https://securefred.com:1337') do
-        programme_admin = Factory(:programme_administrator)
+        programme_admin = FactoryBot.create(:programme_administrator)
         programme = programme_admin.programmes.first
         refute_empty programme.programme_administrators
         project = Project.new(title:'My lovely project')
-        institution = Factory(:institution)
-        sender = Factory(:person)
+        institution = FactoryBot.create(:institution)
+        sender = FactoryBot.create(:person)
         log = ProjectCreationMessageLog.log_request(sender:sender, programme:programme, project:project, institution:institution)
         email = Mailer.request_create_project_for_programme(sender.user, programme, project.to_json, institution.to_json,log)
         refute_nil email
@@ -354,8 +376,8 @@ class MailerTest < ActionMailer::TestCase
     with_config_value(:instance_name, 'SEEK EMAIL TEST') do
       with_config_value(:site_base_host, 'https://securefred.com:1337') do
         project = Project.new(title:'My lovely project')
-        institution = Factory(:institution)
-        sender = Factory(:person)
+        institution = FactoryBot.create(:institution)
+        sender = FactoryBot.create(:person)
         log = ProjectCreationMessageLog.log_request(sender:sender, project:project, institution:institution)
         email = Mailer.request_create_project(sender.user, project.to_json, institution.to_json,log)
         refute_nil email
@@ -370,7 +392,7 @@ class MailerTest < ActionMailer::TestCase
         institution = Institution.new({title:'My lovely institution', web_page:'http://inst.org', country:'DE'})
         project = Project.new(title:'My lovely project')
         programme = Programme.new(title:'My lovely programme')
-        sender = Factory(:person)
+        sender = FactoryBot.create(:person)
         log = ProjectCreationMessageLog.log_request(sender:sender, programme:programme, project:project, institution:institution)
         email = Mailer.request_create_project_and_programme(sender.user, programme.to_json, project.to_json, institution.to_json,log)
         refute_nil email
@@ -380,8 +402,8 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test 'join project rejected' do
-    project = Factory(:project,title:'project to join')
-    requester = Factory(:person)
+    project = FactoryBot.create(:project,title:'project to join')
+    requester = FactoryBot.create(:person)
     comments = "You are evil"
     email = Mailer.join_project_rejected(requester, project, comments)
     refute_nil email
@@ -390,7 +412,7 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test 'create project rejected' do
-    requester = Factory(:person)
+    requester = FactoryBot.create(:person)
     project_name='My Project'
     comments = 'load of rubbish'
     email = Mailer.create_project_rejected(requester,project_name,comments)
@@ -399,8 +421,8 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test 'notify_admins_project_creation_accepted' do
-    responder = Factory(:programme_administrator)
-    requester = Factory(:person)
+    responder = FactoryBot.create(:programme_administrator)
+    requester = FactoryBot.create(:person)
     project = responder.projects.first
 
     email = Mailer.notify_admins_project_creation_accepted(responder, requester, project)
@@ -409,8 +431,8 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test 'notify_admins_project_join_accepted' do
-    responder = Factory(:project_administrator)
-    requester = Factory(:person)
+    responder = FactoryBot.create(:project_administrator)
+    requester = FactoryBot.create(:person)
     project = responder.projects.first
 
     email = Mailer.notify_admins_project_join_accepted(responder, requester, project)
@@ -419,8 +441,8 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test 'notify_admins_project_join_rejected' do
-    responder = Factory(:project_administrator)
-    requester = Factory(:person)
+    responder = FactoryBot.create(:project_administrator)
+    requester = FactoryBot.create(:person)
     project = responder.projects.first
 
     email = Mailer.notify_admins_project_join_rejected(responder, requester, project, "we don't want you here")
@@ -429,9 +451,9 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test 'notify_admins_project_creation_rejected existing programme' do
-    responder = Factory(:programme_administrator)
-    requester = Factory(:person)
-    project = Factory.build(:project)
+    responder = FactoryBot.create(:programme_administrator)
+    requester = FactoryBot.create(:person)
+    project = FactoryBot.build(:project)
     programme = responder.programmes.first
 
     email = Mailer.notify_admins_project_creation_rejected(responder, requester, project.title, programme.to_json, "sorry")
@@ -440,9 +462,9 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test 'notify_admins_project_creation_rejected nil programme' do
-    responder = Factory(:admin)
-    requester = Factory(:person)
-    project = Factory.build(:project)
+    responder = FactoryBot.create(:admin)
+    requester = FactoryBot.create(:person)
+    project = FactoryBot.build(:project)
 
     email = Mailer.notify_admins_project_creation_rejected(responder, requester, project.title, nil, "sorry")
     refute_nil email
@@ -450,10 +472,10 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test 'notify_admins_project_creation_rejected new programme' do
-    responder = Factory(:admin)
-    requester = Factory(:person)
-    project = Factory.build(:project)
-    programme = Factory.build(:programme)
+    responder = FactoryBot.create(:admin)
+    requester = FactoryBot.create(:person)
+    project = FactoryBot.build(:project)
+    programme = FactoryBot.build(:programme)
     assert_nil programme.id
 
     email = Mailer.notify_admins_project_creation_rejected(responder, requester, project.title, programme.to_json, "sorry")

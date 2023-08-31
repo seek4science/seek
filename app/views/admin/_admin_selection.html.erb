@@ -5,13 +5,9 @@
 <%= form_tag :action => "update_admins" do -%>
     <div class="form-group">
       <label>Administrators</label>
-      <%= objects_input('admins', admins, :typeahead => {:query_url => typeahead_people_path + '?query=%QUERY'}) -%>
+      <%= objects_input('admins', admins, :typeahead => {:query_url => typeahead_people_path}, class:'form-control') -%>
       <p class="help-block">To add administrators, start typing a member's name into the field above.</p>
     </div>
 
     <%= submit_tag "Submit", :class => 'btn btn-primary' %>
 <% end -%>
-
-<script>
-    $j(document).ready(loadObjectInputs);
-</script>

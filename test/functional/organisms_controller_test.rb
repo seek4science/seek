@@ -11,7 +11,7 @@ class OrganismsControllerTest < ActionController::TestCase
   end
 
   def rdf_test_object
-    Factory(:organism, bioportal_concept: Factory(:bioportal_concept))
+    FactoryBot.create(:organism, bioportal_concept: FactoryBot.create(:bioportal_concept))
   end
 
   test 'new organism route' do
@@ -62,7 +62,7 @@ class OrganismsControllerTest < ActionController::TestCase
   end
 
   test 'project administrator can get new' do
-    login_as(Factory(:project_administrator))
+    login_as(FactoryBot.create(:project_administrator))
     get :new
     assert_response :success
     assert_nil flash[:error]
@@ -70,7 +70,7 @@ class OrganismsControllerTest < ActionController::TestCase
   end
 
   test 'programme administrator can get new' do
-    pa = Factory(:programme_administrator_not_in_project)
+    pa = FactoryBot.create(:programme_administrator_not_in_project)
     login_as(pa)
 
     # check not already in a project
@@ -89,8 +89,8 @@ class OrganismsControllerTest < ActionController::TestCase
   end
 
   test 'admin has create organism menu option' do
-    login_as(Factory(:admin))
-    get :show, params: { id: Factory(:organism) }
+    login_as(FactoryBot.create(:admin))
+    get :show, params: { id: FactoryBot.create(:organism) }
     assert_response :success
     assert_select 'li#create-menu' do
       assert_select 'ul.dropdown-menu' do
@@ -100,8 +100,8 @@ class OrganismsControllerTest < ActionController::TestCase
   end
 
   test 'project administrator has create organism menu option' do
-    login_as(Factory(:project_administrator))
-    get :show, params: { id: Factory(:organism) }
+    login_as(FactoryBot.create(:project_administrator))
+    get :show, params: { id: FactoryBot.create(:organism) }
     assert_response :success
     assert_select 'li#create-menu' do
       assert_select 'ul.dropdown-menu' do
@@ -111,8 +111,8 @@ class OrganismsControllerTest < ActionController::TestCase
   end
 
   test 'non admin doesn not have create organism menu option' do
-    login_as(Factory(:user))
-    get :show, params: { id: Factory(:organism) }
+    login_as(FactoryBot.create(:user))
+    get :show, params: { id: FactoryBot.create(:organism) }
     assert_response :success
     assert_select 'li#create-menu' do
       assert_select 'ul.dropdown-menu' do
@@ -154,14 +154,14 @@ class OrganismsControllerTest < ActionController::TestCase
   #should convert to the purl version
   test 'update organism with ncbi id number' do
     login_as(:quentin)
-    org = Factory(:organism)
+    org = FactoryBot.create(:organism)
     patch :update, params: { id: org.id, organism: {concept_uri:'2222'} }
     assert_not_nil assigns(:organism)
     assert_equal 'http://purl.bioontology.org/ontology/NCBITAXON/2222',assigns(:organism).concept_uri
   end
 
   test 'project administrator can create new organism' do
-    login_as(Factory(:project_administrator))
+    login_as(FactoryBot.create(:project_administrator))
     assert_difference('Organism.count') do
       post :create, params: { organism: { title: 'An organism' } }
     end
@@ -170,7 +170,7 @@ class OrganismsControllerTest < ActionController::TestCase
   end
 
   test 'programme administrator can create new organism' do
-    login_as(Factory(:programme_administrator_not_in_project))
+    login_as(FactoryBot.create(:programme_administrator_not_in_project))
     assert_difference('Organism.count') do
       post :create, params: { organism: { title: 'An organism' } }
     end
@@ -211,7 +211,7 @@ class OrganismsControllerTest < ActionController::TestCase
   end
 
   test 'project administrator sees create buttons' do
-    login_as(Factory(:project_administrator))
+    login_as(FactoryBot.create(:project_administrator))
     y = organisms(:human)
     get :show, params: { id: y }
     assert_response :success
@@ -244,7 +244,7 @@ class OrganismsControllerTest < ActionController::TestCase
   end
 
   test 'delete as project administrator' do
-    login_as(Factory(:project_administrator))
+    login_as(FactoryBot.create(:project_administrator))
     o = organisms(:human)
     assert_difference('Organism.count', -1) do
       delete :destroy, params: { id: o }
@@ -270,12 +270,12 @@ class OrganismsControllerTest < ActionController::TestCase
   end
 
   test 'should list strains' do
-    user = Factory :user
+    user = FactoryBot.create :user
     login_as(user)
-    organism = Factory :organism
-    strain_a = Factory :strain, title: 'strainA', organism: organism
-    parent_strain = Factory :strain
-    strain_b = Factory :strain, title: 'strainB', parent: parent_strain, organism: organism
+    organism = FactoryBot.create :organism
+    strain_a = FactoryBot.create :strain, title: 'strainA', organism: organism
+    parent_strain = FactoryBot.create :strain
+    strain_b = FactoryBot.create :strain, title: 'strainB', parent: parent_strain, organism: organism
 
     get :show, params: { id: organism }
     assert_response :success
@@ -290,8 +290,8 @@ class OrganismsControllerTest < ActionController::TestCase
 
   test 'strains cleaned up when organism deleted' do
     login_as(:quentin)
-    organism = Factory(:organism)
-    strains = FactoryGirl.create_list(:strain, 3, organism: organism, contributor: nil)
+    organism = FactoryBot.create(:organism)
+    strains = FactoryBot.create_list(:strain, 3, organism: organism, contributor: nil)
 
     assert_difference('Organism.count', -1) do
       assert_difference('Strain.count', -3) do
@@ -301,10 +301,10 @@ class OrganismsControllerTest < ActionController::TestCase
   end
 
   test 'samples in related items' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person.user)
-    sample_type = Factory(:strain_sample_type)
-    strain = Factory(:strain)
+    sample_type = FactoryBot.create(:strain_sample_type)
+    strain = FactoryBot.create(:strain)
     organism = strain.organism
 
     sample = Sample.new(sample_type: sample_type, contributor: person, project_ids: [person.projects.first.id])
@@ -320,7 +320,7 @@ class OrganismsControllerTest < ActionController::TestCase
   end
 
   test 'create multiple organisms with blank concept uri' do
-    login_as(Factory(:admin))
+    login_as(FactoryBot.create(:admin))
     assert_difference('Organism.count') do
       post :create, params: { organism: { title: 'An organism', concept_uri:'' } }
     end
@@ -338,11 +338,11 @@ class OrganismsControllerTest < ActionController::TestCase
   test 'project organisms through nested route' do
     assert_routing 'projects/3/organisms', controller: 'organisms', action: 'index', project_id: '3'
 
-    o1 = Factory(:organism)
-    o2 = Factory(:organism)
+    o1 = FactoryBot.create(:organism)
+    o2 = FactoryBot.create(:organism)
 
-    p1 = Factory(:project,organisms:[o1])
-    p2 = Factory(:project,organisms:[o2])
+    p1 = FactoryBot.create(:project,organisms:[o1])
+    p2 = FactoryBot.create(:project,organisms:[o2])
 
     refute_includes p1.organisms,o2
 
@@ -368,11 +368,11 @@ class OrganismsControllerTest < ActionController::TestCase
   test 'programme organisms through nested route' do
     assert_routing 'programmes/3/organisms', controller: 'organisms', action: 'index', programme_id: '3'
 
-    o1 = Factory(:organism)
-    o2 = Factory(:organism)
+    o1 = FactoryBot.create(:organism)
+    o2 = FactoryBot.create(:organism)
 
-    p1 = Factory(:project,organisms:[o1],programme:Factory(:programme))
-    p2 = Factory(:project,organisms:[o2],programme:Factory(:programme))
+    p1 = FactoryBot.create(:project,organisms:[o1],programme:FactoryBot.create(:programme))
+    p2 = FactoryBot.create(:project,organisms:[o2],programme:FactoryBot.create(:programme))
 
     refute_includes p1.organisms,o2
 
@@ -401,12 +401,12 @@ class OrganismsControllerTest < ActionController::TestCase
   test 'publication organisms through nested route' do
     assert_routing 'publications/3/organisms', controller: 'organisms', action: 'index', publication_id: '3'
 
-    o1 = Factory(:organism)
-    o2 = Factory(:organism)
-    a1 = Factory(:assay,organisms:[o1])
-    a2 = Factory(:assay,organisms:[o2])
-    pub1 = Factory(:publication, assays:[a1])
-    pub2 = Factory(:publication, assays:[a2])
+    o1 = FactoryBot.create(:organism)
+    o2 = FactoryBot.create(:organism)
+    a1 = FactoryBot.create(:assay,organisms:[o1])
+    a2 = FactoryBot.create(:assay,organisms:[o2])
+    pub1 = FactoryBot.create(:publication, assays:[a1])
+    pub2 = FactoryBot.create(:publication, assays:[a2])
 
     assert_equal [o1],pub1.related_organisms
     assert_equal [o2],pub2.related_organisms
@@ -428,12 +428,12 @@ class OrganismsControllerTest < ActionController::TestCase
   test 'assay organisms through nested route' do
     assert_routing 'assays/3/organisms', controller: 'organisms', action: 'index', assay_id: '3'
 
-    o1 = Factory(:organism)
-    o2 = Factory(:organism)
+    o1 = FactoryBot.create(:organism)
+    o2 = FactoryBot.create(:organism)
 
 
-    a1 = Factory(:assay,organisms:[o1])
-    a2 = Factory(:assay,organisms:[o2])
+    a1 = FactoryBot.create(:assay,organisms:[o1])
+    a2 = FactoryBot.create(:assay,organisms:[o2])
 
 
     get :index, params: { assay_id:a1 }

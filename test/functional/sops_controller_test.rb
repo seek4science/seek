@@ -17,9 +17,9 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'creators do not show in list item' do
-    p1 = Factory :person
-    p2 = Factory :person
-    sop = Factory(:sop, title: 'ZZZZZ', creators: [p2], contributor: p1, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    p1 = FactoryBot.create :person
+    p2 = FactoryBot.create :person
+    sop = FactoryBot.create(:sop, title: 'ZZZZZ', creators: [p2], contributor: p1, policy: FactoryBot.create(:public_policy, access_type: Policy::VISIBLE))
 
     get :index, params: { page: 'Z' }
 
@@ -74,14 +74,14 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'should not show private sop to logged out user' do
-    sop = Factory :sop
+    sop = FactoryBot.create :sop
     logout
     get :show, params: { id: sop }
     assert_response :forbidden
   end
 
   test 'should not show private sop to another user' do
-    sop = Factory :sop, contributor: Factory(:person)
+    sop = FactoryBot.create :sop, contributor: FactoryBot.create(:person)
     get :show, params: { id: sop }
     assert_response :forbidden
   end
@@ -126,12 +126,12 @@ class SopsControllerTest < ActionController::TestCase
 
   test 'associates assay' do
     login_as(:owner_of_my_first_sop) # can edit assay_can_edit_by_my_first_sop_owner
-    s = Factory(:sop, contributor:User.current_user.person)
-    original_assay = Factory(:assay, contributor:User.current_user.person, assay_assets: [Factory(:assay_asset, asset:s)])
+    s = FactoryBot.create(:sop, contributor:User.current_user.person)
+    original_assay = FactoryBot.create(:assay, contributor:User.current_user.person, assay_assets: [FactoryBot.create(:assay_asset, asset:s)])
 
     assert_includes original_assay.sops, s
 
-    new_assay = Factory(:assay, contributor:User.current_user.person)
+    new_assay = FactoryBot.create(:assay, contributor:User.current_user.person)
 
     refute_includes new_assay.sops, s
 
@@ -149,7 +149,7 @@ class SopsControllerTest < ActionController::TestCase
 
   test 'should create sop' do
     sop, blob = valid_sop
-    assay = Factory(:assay, contributor: User.current_user.person)
+    assay = FactoryBot.create(:assay, contributor: User.current_user.person)
     assert_difference('Sop.count') do
       assert_difference('ContentBlob.count') do
         post :create, params: { sop: sop.merge(assay_assets_attributes: [{ assay_id: assay.id }]), content_blobs: [blob], policy_attributes: valid_sharing }
@@ -199,7 +199,7 @@ class SopsControllerTest < ActionController::TestCase
 
   test 'should show sop' do
     login_as(:owner_of_my_first_sop)
-    s = Factory :pdf_sop, policy: Factory(:public_policy)
+    s = FactoryBot.create :pdf_sop, policy: FactoryBot.create(:public_policy)
 
     assert_difference('ActivityLog.count') do
       get :show, params: { id: s.id }
@@ -223,6 +223,49 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal 'Rails Testing', al.user_agent
   end
 
+  test 'should show gatekeeper status bar' do
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    person = FactoryBot.create(:person, project: gatekeeper.projects.first)
+    other_person = FactoryBot.create(:person)
+    sop = FactoryBot.create(:sop, contributor: person, policy: FactoryBot.create(:policy, access_type: Policy::VISIBLE))
+    login_as(person)
+    assert sop.can_manage?
+    assert sop.gatekeeper_required?
+
+    # not shown if not waiting approval or rejected
+    assert_not sop.is_waiting_approval?
+    assert_not sop.is_rejected?
+    get :show, params: { id: sop }
+    assert_response :success
+    assert_select 'div#gatekeeper_status', count: 0
+
+    # shown for waiting approval
+    ResourcePublishLog.add_log ResourcePublishLog::WAITING_FOR_APPROVAL, sop
+    assert sop.is_waiting_approval?
+    get :show, params: { id: sop }
+    assert_response :success
+    assert_select 'div#gatekeeper_status', count: 1 do
+      assert_select 'div.alert-warning#gatekeeper_warning', text: /waiting for the gatekeeper/, count: 1
+    end
+
+    # shown for rejected
+    ResourcePublishLog.add_log ResourcePublishLog::REJECTED, sop
+    assert sop.is_rejected?
+    get :show, params: { id: sop }
+    assert_response :success
+    assert_select 'div#gatekeeper_status', count: 1 do
+      assert_select 'div.alert-danger#gatekeeper_warning', text: /gatekeeper has rejected/, count: 1
+    end
+
+    # not shown if cannot manage
+    login_as(other_person)
+    assert_not sop.can_manage?
+    assert sop.can_view?
+    get :show, params: { id: sop }
+    assert_response :success
+    assert_select 'div#gatekeeper_status', count: 0
+  end
+
   test 'should get edit' do
     login_as(:owner_of_my_first_sop)
     get :edit, params: { id: sops(:my_first_sop) }
@@ -242,8 +285,8 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'should update sop' do
-    login_as(person = Factory(:person))
-    sop = Factory(:sop, contributor: person)
+    login_as(person = FactoryBot.create(:person))
+    sop = FactoryBot.create(:sop, contributor: person)
     assert_empty sop.policy.permissions
     put :update, params: { id: sop.id, sop: { title: 'Test2' }, policy_attributes: { access_type: Policy::ACCESSIBLE, permissions_attributes: project_permissions(sop.projects, Policy::ACCESSIBLE) } }
     sop = assigns(:sop)
@@ -277,7 +320,7 @@ class SopsControllerTest < ActionController::TestCase
 
 
   test 'should show request contact button' do
-    s = Factory(:sop, contributor: Factory(:person), policy: Factory(:public_policy))
+    s = FactoryBot.create(:sop, contributor: FactoryBot.create(:person), policy: FactoryBot.create(:public_policy))
     get :show, params: { id: s }
     assert_response :success
     assert_select 'a.disabled', text: /Request Contact/, count: 0
@@ -285,14 +328,14 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'should not show request contact button when there is no contributor or creator' do
-    get :show, params: { id: sops(:sop_with_no_contributor), policy: Factory(:public_policy)}
+    get :show, params: { id: sops(:sop_with_no_contributor), policy: FactoryBot.create(:public_policy)}
     assert_response :success
     assert_select 'a.disabled', text: /Request Contact/, count: 0
     assert_select 'a#request_contact_button', text: /Request Contact/, count: 0
   end
 
   test 'should not show request contact button when the current user is the only contributor or creator' do
-    s = Factory(:sop, contributor: @user.person)
+    s = FactoryBot.create(:sop, contributor: @user.person)
     get :show, params: { id: s }
     assert_response :success
     assert_select 'a.disabled', text: /Request Contact/, count: 0
@@ -300,7 +343,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'request contact' do
-    s = Factory(:sop, contributor: Factory(:person), policy: Factory(:public_policy))
+    s = FactoryBot.create(:sop, contributor: FactoryBot.create(:person), policy: FactoryBot.create(:public_policy))
     assert_enqueued_emails(1) do
       assert_difference('ContactRequestMessageLog.count') do
         post :request_contact, format: :js, params: { id:s, details:'blah blah' }
@@ -315,7 +358,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   def test_should_show_version
-    s = Factory(:sop, contributor: @user.person)
+    s = FactoryBot.create(:sop, contributor: @user.person)
 
     # !!!description cannot be changed in new version but revision comments and file name,etc
 
@@ -343,7 +386,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'should download SOP from standard route' do
-    sop = Factory :doc_sop, policy: Factory(:public_policy)
+    sop = FactoryBot.create :doc_sop, policy: FactoryBot.create(:public_policy)
     login_as(sop.contributor.user)
     assert_difference('ActivityLog.count') do
       get :download, params: { id: sop.id }
@@ -358,7 +401,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   def test_should_create_new_version
-    s = Factory(:sop, contributor: @user.person)
+    s = FactoryBot.create(:sop, contributor: @user.person)
 
     assert_difference('Sop::Version.count', 1) do
       post :create_version, params: { id: s, sop: { title: s.title }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision' }
@@ -465,8 +508,8 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'should not be able to update sharing without manage rights' do
-    sop = Factory(:sop)
-    sop.policy.permissions << Factory(:permission, contributor: @user.person, access_type: Policy::EDITING)
+    sop = FactoryBot.create(:sop)
+    sop.policy.permissions << FactoryBot.create(:permission, contributor: @user.person, access_type: Policy::EDITING)
 
     assert sop.can_edit?(@user), 'sop should be editable but not manageable for this test'
     refute sop.can_manage?(@user), 'sop should be editable but not manageable for this test'
@@ -481,10 +524,10 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'owner should be able to update sharing' do
-    user = Factory(:user)
+    user = FactoryBot.create(:user)
     login_as(user)
 
-    sop = Factory :sop, contributor: User.current_user.person, policy: Factory(:policy, access_type: Policy::EDITING)
+    sop = FactoryBot.create :sop, contributor: User.current_user.person, policy: FactoryBot.create(:policy, access_type: Policy::EDITING)
 
     put :update, params: { id: sop, sop: { title: 'new title' }, policy_attributes: { access_type: Policy::NO_ACCESS } }
     assert_redirected_to sop_path(sop)
@@ -514,8 +557,8 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'the gatekeeper should have right to view the item when an item is requested to be published' do
-    gatekeeper = Factory(:asset_gatekeeper)
-    @user.person.add_to_project_and_institution(gatekeeper.projects.first, Factory(:institution))
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    @user.person.add_to_project_and_institution(gatekeeper.projects.first, FactoryBot.create(:institution))
     post :create, params: { sop: { title: 'text sop', project_ids: gatekeeper.projects.collect(&:id) }, content_blobs: [{ data: picture_file }], policy_attributes: { access_type: Policy::NO_ACCESS } }
     sop = assigns(:sop)
 
@@ -537,35 +580,152 @@ class SopsControllerTest < ActionController::TestCase
     assert_select 'p.list_item_attribute', text: /#{I18n.t('creator').pluralize.capitalize}: None/, count: no_other_creator_sops.count
   end
 
-  test 'should set the policy to projects_policy if the item is requested to be published, when creating new sop' do
-    gatekeeper = Factory(:asset_gatekeeper)
-    @user.person.add_to_project_and_institution(gatekeeper.projects.first, Factory(:institution))
-    post :create, params: { sop: { title: 'test', project_ids: gatekeeper.projects.collect(&:id) }, content_blobs: [{ data: picture_file }], policy_attributes: { access_type: Policy::VISIBLE } }
+  test 'should set the policy access_type to No_ACCESS if the item is requested to be published, when creating new sop' do
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    @user.person.add_to_project_and_institution(gatekeeper.projects.first, FactoryBot.create(:institution))
+    post :create, params: { sop: { title: 'test', project_ids: gatekeeper.projects.collect(&:id) }, content_blobs: [{ data: picture_file }],
+                            policy_attributes: {access_type: Policy::ACCESSIBLE,
+                                                permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: FactoryBot.create(:person).id, access_type: Policy::VISIBLE},
+                                                                         '2' => {contributor_type: 'Person', contributor_id: FactoryBot.create(:person).id, access_type: Policy::MANAGING}
+                            } } }
     sop = assigns(:sop)
     assert_redirected_to (sop)
     policy = sop.policy
     assert_equal Policy::NO_ACCESS, policy.access_type
-    assert_equal 1, policy.permissions.count
-    assert_equal gatekeeper.projects.first, policy.permissions.first.contributor
-    assert_equal Policy::ACCESSIBLE, policy.permissions.first.access_type
+    assert_enqueued_emails 1
+    assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL, sop.last_publishing_log.publish_state
+    assert_equal 2, policy.permissions.count
+    assert_equal Policy::VISIBLE, policy.permissions.first.access_type
+    assert_equal Policy::MANAGING, policy.permissions.second.access_type
+    assert_includes flash[:notice],("gatekeeper's approval list.")
   end
 
-  test 'should not change the policy if the item is requested to be published, when managing sop' do
-    gatekeeper = Factory(:asset_gatekeeper)
-    policy = Factory(:policy, access_type: Policy::NO_ACCESS, permissions: [Factory(:permission)])
-    sop = Factory(:sop, project_ids: gatekeeper.projects.collect(&:id), policy: policy)
+  test 'should allow to set the policy to visible when creating new sop' do
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    @user.person.add_to_project_and_institution(gatekeeper.projects.first, FactoryBot.create(:institution))
+    post :create, params: { sop: { title: 'test', project_ids: gatekeeper.projects.collect(&:id) }, content_blobs: [{ data: picture_file }], policy_attributes: { access_type: Policy::VISIBLE } }
+    sop = assigns(:sop)
+    assert_redirected_to (sop)
+    policy = sop.policy
+    assert_equal Policy::VISIBLE, policy.access_type
+    assert_equal 'SOP was successfully uploaded and saved.', flash[:notice]
+  end
+
+  test 'should not allow to change the policy to published when managing sop' do
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    policy = FactoryBot.create(:policy, access_type: Policy::NO_ACCESS, permissions: [FactoryBot.create(:permission)])
+    sop = FactoryBot.create(:sop, project_ids: gatekeeper.projects.collect(&:id), policy: policy)
+    login_as(sop.contributor)
+    assert sop.can_manage?
+    put :update, params: { id: sop.id, sop: { title: sop.title }, policy_attributes: { access_type: Policy::ACCESSIBLE } }
+    sop = assigns(:sop)
+    # Does not update policy
+    assert_equal Policy::NO_ACCESS, sop.policy.access_type
+    assert_redirected_to(sop)
+    # Gatekeeper knows - Logs adequately
+    assert_enqueued_emails 1
+    assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL, sop.last_publishing_log.publish_state
+  end
+
+  test 'manage_update with gatekeeper - should not allow to publish, but can change permissions' do
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    policy = FactoryBot.create(:policy, access_type: Policy::NO_ACCESS)
+    sop = FactoryBot.create(:sop, project_ids: gatekeeper.projects.collect(&:id), policy: policy)
+    other_person = FactoryBot.create(:person)
+    login_as(sop.contributor)
+    assert sop.can_manage?
+    patch :manage_update, params: { id: sop,
+                                           sop: { creator_ids: [sop.contributor.id],
+                                                  project_ids: [gatekeeper.projects.collect(&:id)] },
+                                           policy_attributes: { access_type: Policy::ACCESSIBLE,
+                                                                permissions_attributes: {
+                                                                  '1' => {contributor_type: 'Person', contributor_id: sop.contributor.id, access_type: Policy::MANAGING},
+                                                                  '2' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}
+                                                               } } }
+    sop.reload
+    # Does not update policy
+    assert_equal Policy::NO_ACCESS, sop.policy.access_type
+    # Does add permissions
+    assert_equal other_person.id, policy.permissions.second.contributor_id
+    assert_equal Policy::MANAGING, policy.permissions.second.access_type
+    assert_redirected_to sop
+    # User knows - Flash indicates to user that it is in gatekeeper's hands
+    assert_includes flash[:notice],("gatekeeper's approval list.")
+    # Gatekeeper knows - Logs adequately
+    assert_enqueued_emails 1
+    assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL, sop.last_publishing_log.publish_state
+  end
+
+  test 'manage_update with gatekeeper - should stay visible' do
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    policy = FactoryBot.create(:policy, access_type: Policy::VISIBLE)
+    sop = FactoryBot.create(:sop, project_ids: gatekeeper.projects.collect(&:id), policy: policy)
+    other_person = FactoryBot.create(:person)
+    login_as(sop.contributor)
+    assert sop.can_manage?
+    patch :manage_update, params: { id: sop,
+                                    sop: { creator_ids: [sop.contributor.id],
+                                           project_ids: [gatekeeper.projects.collect(&:id)] },
+                                    policy_attributes: { access_type: Policy::ACCESSIBLE,
+                                                         permissions_attributes: {
+                                                           '1' => {contributor_type: 'Person', contributor_id: sop.contributor.id, access_type: Policy::MANAGING},
+                                                           '2' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}
+                                                         } } }
+    sop.reload
+    # Does not update policy
+    assert_equal Policy::VISIBLE, sop.policy.access_type
+    # Does add permissions
+    assert_equal other_person.id, policy.permissions.second.contributor_id
+    assert_equal Policy::MANAGING, policy.permissions.second.access_type
+    assert_redirected_to sop
+    # User knows - Flash indicates to user that it is in gatekeeper's hands
+    assert_includes flash[:notice],("gatekeeper's approval list.")
+    # Gatekeeper knows - Logs adequately
+    assert_enqueued_emails 1
+    assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL, sop.last_publishing_log.publish_state
+  end
+
+  test 'manage_update with gatekeeper - should allow to make visible' do
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    policy = FactoryBot.create(:policy, access_type: Policy::NO_ACCESS, permissions: [FactoryBot.create(:permission)])
+    sop = FactoryBot.create(:sop, project_ids: gatekeeper.projects.collect(&:id), policy: policy)
+    login_as(sop.contributor)
+    assert sop.can_manage?
+    patch :manage_update, params: { id: sop,
+                                    sop: { creator_ids: [sop.contributor.id],
+                                           project_ids: [gatekeeper.projects.collect(&:id)] },
+                                    policy_attributes: { access_type: Policy::VISIBLE } }
+    sop.reload
+    # Does update policy
+    assert_equal Policy::VISIBLE, sop.policy.access_type
+    assert_redirected_to sop
+    # User knows - Flash indicates success
+    assert_equal 'SOP was successfully updated.', flash[:notice]
+    # Gatekeeper does not need to know
+    assert_enqueued_emails 0
+    assert_nil sop.last_publishing_log
+  end
+
+  test 'should allow to change the policy to visible' do
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    policy = FactoryBot.create(:policy, access_type: Policy::NO_ACCESS, permissions: [FactoryBot.create(:permission)])
+    sop = FactoryBot.create(:sop, project_ids: gatekeeper.projects.collect(&:id), policy: policy)
     login_as(sop.contributor)
     assert sop.can_manage?
     put :update, params: { id: sop.id, sop: { title: sop.title }, policy_attributes: { access_type: Policy::VISIBLE } }
     sop = assigns(:sop)
+    # Does update policy
+    assert_equal Policy::VISIBLE, sop.policy.access_type
     assert_redirected_to(sop)
-    updated_policy = sop.policy
-    assert_equal policy, updated_policy
-    assert_equal policy.permissions, updated_policy.permissions
+    # User knows - Flash indicates success
+    assert_equal "SOP metadata was successfully updated.",flash[:notice]
+    # Gatekeeper does not need to know
+    assert_enqueued_emails 0
+    assert_nil sop.last_publishing_log
   end
 
   test 'should be able to view pdf content' do
-    sop = Factory(:sop, policy: Factory(:all_sysmo_downloadable_policy))
+    sop = FactoryBot.create(:sop, policy: FactoryBot.create(:all_sysmo_downloadable_policy))
     assert sop.content_blob.is_content_viewable?
     get :show, params: { id: sop.id }
     assert_response :success
@@ -574,7 +734,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'should be able to view ms/open office word content' do
-    ms_word_sop = Factory(:doc_sop, policy: Factory(:all_sysmo_downloadable_policy))
+    ms_word_sop = FactoryBot.create(:doc_sop, policy: FactoryBot.create(:all_sysmo_downloadable_policy))
     content_blob = ms_word_sop.content_blob
     pdf_filepath = content_blob.filepath('pdf')
     FileUtils.rm pdf_filepath if File.exist?(pdf_filepath)
@@ -584,7 +744,7 @@ class SopsControllerTest < ActionController::TestCase
     assert_select 'a', text: /View content/, count: 1
     assert_select 'a.disabled', text: /View content/, count: 0
 
-    openoffice_word_sop = Factory(:odt_sop, policy: Factory(:all_sysmo_downloadable_policy))
+    openoffice_word_sop = FactoryBot.create(:odt_sop, policy: FactoryBot.create(:all_sysmo_downloadable_policy))
     assert openoffice_word_sop.content_blob.is_content_viewable?
     get :show, params: { id: openoffice_word_sop.id }
     assert_response :success
@@ -596,7 +756,7 @@ class SopsControllerTest < ActionController::TestCase
     tmp = Seek::Config.pdf_conversion_enabled
     Seek::Config.pdf_conversion_enabled = false
 
-    ms_word_sop = Factory(:doc_sop, policy: Factory(:all_sysmo_downloadable_policy))
+    ms_word_sop = FactoryBot.create(:doc_sop, policy: FactoryBot.create(:all_sysmo_downloadable_policy))
     content_blob = ms_word_sop.content_blob
     pdf_filepath = content_blob.filepath('pdf')
     FileUtils.rm pdf_filepath if File.exist?(pdf_filepath)
@@ -606,6 +766,82 @@ class SopsControllerTest < ActionController::TestCase
     assert_select 'a.disabled', text: /View content/, count: 1
 
     Seek::Config.pdf_conversion_enabled = tmp
+  end
+
+  test 'show explore button' do
+    sop = FactoryBot.create(:small_test_spreadsheet_sop)
+    login_as(sop.contributor.user)
+    get :show, params: { id: sop }
+    assert_response :success
+    assert_select '#buttons' do
+      assert_select 'a[href=?]', explore_sop_path(sop, version: sop.version), count: 1
+      assert_select 'a.disabled', text: 'Explore', count: 0
+    end
+  end
+
+  test 'not show explore button if spreadsheet not supported' do
+    sop = FactoryBot.create(:non_spreadsheet_sop)
+    login_as(sop.contributor.user)
+    with_config_value(:max_extractable_spreadsheet_size, 0) do
+      get :show, params: { id: sop }
+    end
+    assert_response :success
+    assert_select '#buttons' do
+      assert_select 'a[href=?]', explore_sop_path(sop, version: sop.version), count: 0
+      assert_select 'a', text: 'Explore', count: 0
+    end
+  end
+
+  test 'show disabled explore button if spreadsheet too big' do
+    sop = FactoryBot.create(:small_test_spreadsheet_sop)
+    login_as(sop.contributor.user)
+    with_config_value(:max_extractable_spreadsheet_size, 0) do
+      get :show, params: { id: sop }
+    end
+    assert_response :success
+    assert_select '#buttons' do
+      assert_select 'a[href=?]', explore_sop_path(sop, version: sop.version), count: 0
+      assert_select 'a.disabled', text: 'Explore', count: 1
+    end
+  end
+
+  test 'explore latest version' do
+    data = FactoryBot.create :small_test_spreadsheet_sop, policy: FactoryBot.create(:public_policy)
+    get :explore, params: { id: data }
+    assert_response :success
+  end
+
+  test 'explore earlier version' do
+    sop = FactoryBot.create(:small_test_spreadsheet_sop)
+    login_as(sop.contributor.user)
+    assert sop.save_as_new_version('no comment')
+    FactoryBot.create(:pdf_content_blob, asset_version: sop.version, asset: sop)
+    sop.reload
+    assert_equal 2, sop.versions.count
+    assert sop.find_version(1).content_blob.is_extractable_excel?
+    refute sop.find_version(2).content_blob.is_extractable_excel?
+    get :explore, params: { id: sop, version: 1 }
+    assert_response :success
+  end
+
+  test 'gracefully handles explore with no spreadsheet' do
+    sop = FactoryBot.create(:sop, version: 1)
+    login_as(sop.contributor)
+    get :explore, params: { id: sop, version: 1 }
+    assert_redirected_to sop_path(sop, version: 1)
+    assert flash[:error]
+  end
+
+  test 'gracefully handles explore with invalid mime type' do
+    sop = FactoryBot.create(:csv_spreadsheet_sop, policy: FactoryBot.create(:public_policy))
+    sop.content_blob.update_column(:content_type, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    # incorrectly thinks it's excel
+    assert sop.content_blob.is_excel?
+    # check mime type cannot be resolved, otherwise it will autofix without error
+    assert_nil sop.content_blob.send(:mime_magic_content_type)
+    get :explore, params: { id: sop, version: 1 }
+    assert_redirected_to sop_path(sop, version: 1)
+    assert flash[:error]
   end
 
   test 'duplicated logs are NOT created by uploading new version' do
@@ -630,7 +866,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'should not create duplication sop_versions_projects when uploading new version' do
-    sop = Factory(:sop)
+    sop = FactoryBot.create(:sop)
     login_as(sop.contributor)
     post :create_version, params: { id: sop, sop: { title: sop.title }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision' }
 
@@ -649,7 +885,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'should destroy all versions related when destroying sop' do
-    sop = Factory(:sop)
+    sop = FactoryBot.create(:sop)
     assert_equal 1, sop.versions.count
     sop_version = sop.latest_version
     assert_equal 1, sop_version.projects.count
@@ -663,8 +899,8 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'send publish approval request' do
-    gatekeeper = Factory(:asset_gatekeeper)
-    sop = Factory(:sop, project_ids: gatekeeper.projects.collect(&:id))
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    sop = FactoryBot.create(:sop, project_ids: gatekeeper.projects.collect(&:id))
 
     # request publish
     login_as(sop.contributor)
@@ -675,8 +911,8 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'dont send publish approval request if can_publish' do
-    gatekeeper = Factory(:asset_gatekeeper)
-    sop = Factory(:sop, contributor: gatekeeper, project_ids: gatekeeper.projects.collect(&:id))
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    sop = FactoryBot.create(:sop, contributor: gatekeeper, project_ids: gatekeeper.projects.collect(&:id))
 
     # request publish
     login_as(sop.contributor)
@@ -688,8 +924,8 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'dont send publish approval request again if it was already sent by this person' do
-    gatekeeper = Factory(:asset_gatekeeper)
-    sop = Factory(:sop, project_ids: gatekeeper.projects.collect(&:id))
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    sop = FactoryBot.create(:sop, project_ids: gatekeeper.projects.collect(&:id))
 
     # request publish
     login_as(sop.contributor)
@@ -705,8 +941,8 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'dont send publish approval request if item was already public' do
-    gatekeeper = Factory(:asset_gatekeeper)
-    sop = Factory(:sop, project_ids: gatekeeper.projects.collect(&:id), policy: Factory(:public_policy))
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    sop = FactoryBot.create(:sop, project_ids: gatekeeper.projects.collect(&:id), policy: FactoryBot.create(:public_policy))
     login_as(sop.contributor)
 
     assert sop.can_view?(nil)
@@ -715,12 +951,12 @@ class SopsControllerTest < ActionController::TestCase
       put :update, params: { sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::ACCESSIBLE } }
     end
 
-    assert_empty ResourcePublishLog.requested_approval_assets_for(gatekeeper)
+    assert_empty ResourcePublishLog.requested_approval_assets_for_gatekeeper(gatekeeper)
   end
 
   test 'dont send publish approval request if item is only being made visible' do
-    gatekeeper = Factory(:asset_gatekeeper)
-    sop = Factory(:sop, project_ids: gatekeeper.projects.collect(&:id), policy: Factory(:private_policy))
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    sop = FactoryBot.create(:sop, project_ids: gatekeeper.projects.collect(&:id), policy: FactoryBot.create(:private_policy))
     login_as(sop.contributor)
 
     refute sop.can_view?(nil)
@@ -729,12 +965,12 @@ class SopsControllerTest < ActionController::TestCase
       put :update, params: { sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::VISIBLE } }
     end
 
-    assert_empty ResourcePublishLog.requested_approval_assets_for(gatekeeper)
+    assert_empty ResourcePublishLog.requested_approval_assets_for_gatekeeper(gatekeeper)
   end
 
   test 'send publish approval request if elevating permissions from VISIBLE -> ACCESSIBLE' do
-    gatekeeper = Factory(:asset_gatekeeper)
-    sop = Factory(:sop, project_ids: gatekeeper.projects.collect(&:id), policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    sop = FactoryBot.create(:sop, project_ids: gatekeeper.projects.collect(&:id), policy: FactoryBot.create(:public_policy, access_type: Policy::VISIBLE))
     login_as(sop.contributor)
 
     refute sop.is_published?
@@ -749,16 +985,16 @@ class SopsControllerTest < ActionController::TestCase
     assert sop.can_view?(nil)
     refute sop.can_download?(nil)
 
-    assert_includes ResourcePublishLog.requested_approval_assets_for(gatekeeper), sop
+    assert_includes ResourcePublishLog.requested_approval_assets_for_gatekeeper(gatekeeper), sop
   end
 
   test 'should not loose permissions when managing a sop' do
-    policy = Factory(:private_policy)
-    a_person = Factory(:person)
-    permission = Factory(:permission, contributor: a_person, access_type: Policy::MANAGING)
+    policy = FactoryBot.create(:private_policy)
+    a_person = FactoryBot.create(:person)
+    permission = FactoryBot.create(:permission, contributor: a_person, access_type: Policy::MANAGING)
     policy.permissions = [permission]
     policy.save
-    sop = Factory :sop, contributor: User.current_user.person, policy: policy
+    sop = FactoryBot.create :sop, contributor: User.current_user.person, policy: policy
     assert sop.can_manage?
 
     put :update, params: { id: sop.id, sop: { title: sop.title }, policy_attributes: { access_type: Policy::NO_ACCESS,
@@ -772,8 +1008,8 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'should not lose project assignment when an asset is managed by a person from different project' do
-    sop = Factory(:sop)
-    sop.policy.permissions << Factory(:permission, contributor: User.current_user.person, access_type: Policy::MANAGING)
+    sop = FactoryBot.create(:sop)
+    sop.policy.permissions << FactoryBot.create(:permission, contributor: User.current_user.person, access_type: Policy::MANAGING)
     assert sop.can_manage?
     assert_not_equal sop.projects.first, User.current_user.person.projects.first
 
@@ -785,7 +1021,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'should show tags box according to config' do
-    sop = Factory(:sop, policy: Factory(:public_policy))
+    sop = FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy))
     get :show, params: { id: sop.id }
     assert_response :success
     assert_select 'div#tags_box', count: 1
@@ -803,7 +1039,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'should display null license text' do
-    sop = Factory :sop, policy: Factory(:public_policy)
+    sop = FactoryBot.create :sop, policy: FactoryBot.create(:public_policy)
 
     get :show, params: { id: sop }
 
@@ -811,7 +1047,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'should display license' do
-    sop = Factory :sop, license: 'CC-BY-4.0', policy: Factory(:public_policy)
+    sop = FactoryBot.create :sop, license: 'CC-BY-4.0', policy: FactoryBot.create(:public_policy)
 
     get :show, params: { id: sop }
 
@@ -819,8 +1055,8 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'should display license for current version' do
-    sop = Factory :sop, license: 'CC-BY-4.0', policy: Factory(:public_policy)
-    sopv = Factory :sop_version_with_blob, sop: sop
+    sop = FactoryBot.create :sop, license: 'CC-BY-4.0', policy: FactoryBot.create(:public_policy)
+    sopv = FactoryBot.create :sop_version_with_blob, sop: sop
 
     sop.update license: 'CC0-1.0'
 
@@ -834,7 +1070,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'should update license' do
-    sop = Factory(:sop, contributor: @user.person, license: nil)
+    sop = FactoryBot.create(:sop, contributor: @user.person, license: nil)
 
     assert_nil sop.license
 
@@ -849,9 +1085,9 @@ class SopsControllerTest < ActionController::TestCase
 
   test 'programme sops through nested routing' do
     assert_routing 'programmes/2/sops', { controller: 'sops', action: 'index', programme_id: '2' }
-    programme = Factory(:programme)
-    sop = Factory(:sop, projects: programme.projects, policy: Factory(:public_policy))
-    sop2 = Factory(:sop, policy: Factory(:public_policy))
+    programme = FactoryBot.create(:programme)
+    sop = FactoryBot.create(:sop, projects: programme.projects, policy: FactoryBot.create(:public_policy))
+    sop2 = FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy))
 
     get :index, params: { programme_id: programme.id }
 
@@ -863,7 +1099,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'permission popup setting set in sharing form' do
-    sop = Factory :sop, contributor: User.current_user.person
+    sop = FactoryBot.create :sop, contributor: User.current_user.person
     with_config_value :permissions_popup, Seek::Config::PERMISSION_POPUP_ON_CHANGE do
       get :manage, params: { id: sop }
     end
@@ -882,7 +1118,7 @@ class SopsControllerTest < ActionController::TestCase
 
   test 'can get citation for sop with DOI' do
     doi_citation_mock
-    sop = Factory(:sop, policy: Factory(:public_policy))
+    sop = FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy))
 
     login_as(sop.contributor)
 
@@ -898,7 +1134,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'shows how to get doi for private sop' do
-    sop = Factory(:sop, policy: Factory(:private_policy))
+    sop = FactoryBot.create(:sop, policy: FactoryBot.create(:private_policy))
 
     login_as(sop.contributor)
 
@@ -910,7 +1146,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'shows how to get doi for time-locked sop' do
-    sop = Factory(:sop, policy: Factory(:private_policy))
+    sop = FactoryBot.create(:sop, policy: FactoryBot.create(:private_policy))
 
     login_as(sop.contributor)
 
@@ -924,7 +1160,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'shows how to get doi for eligible sop' do
-    sop = Factory(:sop, policy: Factory(:public_policy))
+    sop = FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy))
 
     login_as(sop.contributor)
 
@@ -936,7 +1172,7 @@ class SopsControllerTest < ActionController::TestCase
 
   test 'does not show how to get a doi if the version is not set to visible to anyone' do
 
-    sop = Factory(:sop, contributor: @user.person)
+    sop = FactoryBot.create(:sop, contributor: @user.person)
 
     assert_difference('Sop::Version.count', 1) do
       post :create_version, params: { id: sop, sop: { title: sop.title }, content_blobs: [{ data: picture_file }], revision_comments: 'version 2' }
@@ -958,8 +1194,8 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'does not show how to get a doi if no manage permission' do
-    sop = Factory(:sop, policy: Factory(:publicly_viewable_policy))
-    person = Factory(:person)
+    sop = FactoryBot.create(:sop, policy: FactoryBot.create(:publicly_viewable_policy))
+    person = FactoryBot.create(:person)
     refute sop.can_manage?(person.user)
 
     login_as(person)
@@ -1015,7 +1251,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'should show sop as RDF' do
-    sop = Factory(:sop, policy: Factory(:publicly_viewable_policy))
+    sop = FactoryBot.create(:sop, policy: FactoryBot.create(:publicly_viewable_policy))
 
     get :show, params: { id: sop, format: :rdf }
 
@@ -1023,20 +1259,20 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'when updating, assay linked to must be editable' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
-    sop = Factory(:sop,contributor:person,projects:person.projects)
+    sop = FactoryBot.create(:sop,contributor:person,projects:person.projects)
     assert sop.can_edit?
-    another_person = Factory(:person)
+    another_person = FactoryBot.create(:person)
     another_person.add_to_project_and_institution(person.projects.first,person.institutions.first)
     another_person.save!
 
-    investigation = Factory(:investigation,contributor:person,projects:person.projects)
+    investigation = FactoryBot.create(:investigation,contributor:person,projects:person.projects)
 
-    study = Factory(:study, contributor:person, investigation:investigation)
+    study = FactoryBot.create(:study, contributor:person, investigation:investigation)
 
-    good_assay = Factory(:assay,study_id:study.id,contributor:another_person,policy:Factory(:editing_public_policy))
-    bad_assay = Factory(:assay,study_id:study.id,contributor:another_person,policy:Factory(:publicly_viewable_policy))
+    good_assay = FactoryBot.create(:assay,study_id:study.id,contributor:another_person,policy:FactoryBot.create(:editing_public_policy))
+    bad_assay = FactoryBot.create(:assay,study_id:study.id,contributor:another_person,policy:FactoryBot.create(:publicly_viewable_policy))
 
     assert good_assay.can_edit?
     refute bad_assay.can_edit?
@@ -1061,16 +1297,16 @@ class SopsControllerTest < ActionController::TestCase
   test 'when creating, assay linked to must be editable' do
     person = @user.person
 
-    another_person = Factory(:person)
+    another_person = FactoryBot.create(:person)
     another_person.add_to_project_and_institution(person.projects.first,person.institutions.first)
     another_person.save!
 
-    investigation = Factory(:investigation,contributor:person,projects:person.projects)
+    investigation = FactoryBot.create(:investigation,contributor:person,projects:person.projects)
 
-    study = Factory(:study, contributor:person, investigation:investigation)
+    study = FactoryBot.create(:study, contributor:person, investigation:investigation)
 
-    good_assay = Factory(:assay,study_id:study.id,contributor:another_person,policy:Factory(:editing_public_policy))
-    bad_assay = Factory(:assay,study_id:study.id,contributor:another_person,policy:Factory(:publicly_viewable_policy))
+    good_assay = FactoryBot.create(:assay,study_id:study.id,contributor:another_person,policy:FactoryBot.create(:editing_public_policy))
+    bad_assay = FactoryBot.create(:assay,study_id:study.id,contributor:another_person,policy:FactoryBot.create(:publicly_viewable_policy))
 
     assert good_assay.can_edit?
     refute bad_assay.can_edit?
@@ -1095,8 +1331,8 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'should not allow sharing with a project that the contributor is not a member of' do
-    sop = Factory(:sop)
-    another_project = Factory(:project)
+    sop = FactoryBot.create(:sop)
+    another_project = FactoryBot.create(:project)
     login_as(sop.contributor)
     assert sop.can_manage?
 
@@ -1106,8 +1342,8 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'should only validate newly added projects' do
-    sop = Factory(:sop)
-    another_project = Factory(:project)
+    sop = FactoryBot.create(:sop)
+    another_project = FactoryBot.create(:project)
     disable_authorization_checks { sop.projects << another_project }
 
     login_as(sop.contributor)
@@ -1121,10 +1357,10 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'should allow association of projects even if the original contributor was not a member' do
-    sop = Factory(:sop)
-    another_manager = Factory(:person)
+    sop = FactoryBot.create(:sop)
+    another_manager = FactoryBot.create(:person)
     another_project = another_manager.projects.first
-    another_manager.add_to_project_and_institution(sop.projects.first, Factory(:institution))
+    another_manager.add_to_project_and_institution(sop.projects.first, FactoryBot.create(:institution))
     sop.policy.permissions.create!(contributor: another_manager, access_type: Policy::MANAGING)
 
     login_as(another_manager)
@@ -1139,7 +1375,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'should not allow contributing to a project that user has left' do
-    person = Factory(:person_in_multiple_projects)
+    person = FactoryBot.create(:person_in_multiple_projects)
     active_project = person.projects.first
     former_project = person.projects.last
     login_as(person)
@@ -1164,9 +1400,9 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'should not create new version if person has left the project' do
-    project = Factory(:project)
-    sop = Factory(:sop, projects: [project], policy: Factory(:publicly_viewable_policy, permissions: [Factory(:manage_permission, contributor: project)]))
-    person = Factory(:person, project: project)
+    project = FactoryBot.create(:project)
+    sop = FactoryBot.create(:sop, projects: [project], policy: FactoryBot.create(:publicly_viewable_policy, permissions: [FactoryBot.create(:manage_permission, contributor: project)]))
+    person = FactoryBot.create(:person, project: project)
     gm = person.group_memberships.detect { |gm| gm.project == project }
     gm.has_left = true
     gm.save!
@@ -1178,7 +1414,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'should not include former projects in project selector' do
-    person = Factory(:person_in_multiple_projects)
+    person = FactoryBot.create(:person_in_multiple_projects)
     active_project = person.projects.first
     former_project = person.projects.last
     gm = person.group_memberships.detect { |gm| gm.project == former_project }
@@ -1197,9 +1433,9 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'authlookup item queued if creators changed' do
-    sop = Factory(:sop)
+    sop = FactoryBot.create(:sop)
     login_as(sop.contributor)
-    creator = Factory(:person)
+    creator = FactoryBot.create(:person)
 
     AuthLookupUpdateQueue.destroy_all
 
@@ -1254,9 +1490,13 @@ class SopsControllerTest < ActionController::TestCase
     check_manage_edit_menu_for_type('sop')
   end
 
+  test 'publish menu items appears according to status and permission' do
+    check_publish_menu_for_type('sop')
+  end
+
   test 'can access manage page with manage rights' do
-    person = Factory(:person)
-    sop = Factory(:sop, contributor:person)
+    person = FactoryBot.create(:person)
+    sop = FactoryBot.create(:sop, contributor:person)
     login_as(person)
     assert sop.can_manage?
     get :manage, params: {id: sop}
@@ -1277,9 +1517,46 @@ class SopsControllerTest < ActionController::TestCase
     assert_select 'div.alert-info', text: /the #{I18n.t('sop')}/
   end
 
+  test 'manage page shows warning if waiting gatekeeper approval' do
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    person = FactoryBot.create(:person, project: gatekeeper.projects.first)
+    sop = FactoryBot.create(:sop, contributor: person)
+    cancel_path = cancel_publishing_request_person_path(person, asset_id: sop.id, asset_class: sop.class, from_asset: true)
+    login_as(person)
+    assert sop.can_manage?
+    assert sop.gatekeeper_required?
+
+    # not shown if not waiting approval or rejected
+    assert_not sop.is_waiting_approval?
+    assert_not sop.is_rejected?
+    get :manage, params: {id: sop}
+    assert_response :success
+    assert_select 'div.alert-danger#gatekeeper_warning', count: 0
+
+    # shown for waiting approval
+    ResourcePublishLog.add_log ResourcePublishLog::WAITING_FOR_APPROVAL, sop
+    assert sop.is_waiting_approval?
+    get :manage, params: {id: sop}
+    assert_response :success
+    assert_select 'div.alert-danger#gatekeeper_warning', count: 1 do
+      assert_select 'div#warning', text: /waiting for the gatekeeper/, count: 1
+      assert_select 'a.cancel_publish_request[href=?]', cancel_path, count: 1
+    end
+
+    # shown for rejected
+    ResourcePublishLog.add_log ResourcePublishLog::REJECTED, sop
+    assert sop.is_rejected?
+    get :manage, params: {id: sop}
+    assert_response :success
+    assert_select 'div.alert-danger#gatekeeper_warning', count: 1 do
+      assert_select 'div#warning', text: /the gatekeeper has rejected it/, count: 1
+      assert_select 'a.cancel_publish_request[href=?]', cancel_path, count: 1
+    end
+  end
+
   test 'cannot access manage page with edit rights' do
-    person = Factory(:person)
-    sop = Factory(:sop, policy:Factory(:private_policy, permissions:[Factory(:permission, contributor:person, access_type:Policy::EDITING)]))
+    person = FactoryBot.create(:person)
+    sop = FactoryBot.create(:sop, policy:FactoryBot.create(:private_policy, permissions:[FactoryBot.create(:permission, contributor:person, access_type:Policy::EDITING)]))
     login_as(person)
     assert sop.can_edit?
     refute sop.can_manage?
@@ -1289,17 +1566,17 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'manage_update' do
-    proj1=Factory(:project)
-    proj2=Factory(:project)
-    person = Factory(:person,project:proj1)
-    other_person = Factory(:person)
+    proj1=FactoryBot.create(:project)
+    proj2=FactoryBot.create(:project)
+    person = FactoryBot.create(:person,project:proj1)
+    other_person = FactoryBot.create(:person)
     person.add_to_project_and_institution(proj2,person.institutions.first)
     person.save!
-    other_creator = Factory(:person,project:proj1)
+    other_creator = FactoryBot.create(:person,project:proj1)
     other_creator.add_to_project_and_institution(proj2,other_creator.institutions.first)
     other_creator.save!
 
-    sop = Factory(:sop, contributor:person, projects:[proj1], policy:Factory(:private_policy))
+    sop = FactoryBot.create(:sop, contributor:person, projects:[proj1], policy:FactoryBot.create(:private_policy))
 
     login_as(person)
     assert sop.can_manage?
@@ -1327,20 +1604,20 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'manage_update fails without manage rights' do
-    proj1=Factory(:project)
-    proj2=Factory(:project)
-    person = Factory(:person, project:proj1)
+    proj1=FactoryBot.create(:project)
+    proj2=FactoryBot.create(:project)
+    person = FactoryBot.create(:person, project:proj1)
     person.add_to_project_and_institution(proj2,person.institutions.first)
     person.save!
 
-    other_person = Factory(:person)
+    other_person = FactoryBot.create(:person)
 
-    other_creator = Factory(:person,project:proj1)
+    other_creator = FactoryBot.create(:person,project:proj1)
     other_creator.add_to_project_and_institution(proj2,other_creator.institutions.first)
     other_creator.save!
 
-    sop = Factory(:sop, projects:[proj1], policy:Factory(:private_policy,
-                                                                     permissions:[Factory(:permission,contributor:person, access_type:Policy::EDITING)]))
+    sop = FactoryBot.create(:sop, projects:[proj1], policy:FactoryBot.create(:private_policy,
+                                                                     permissions:[FactoryBot.create(:permission,contributor:person, access_type:Policy::EDITING)]))
 
     login_as(person)
     refute sop.can_manage?
@@ -1370,8 +1647,8 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'sort by update by default on index' do
-    s1 = Factory(:sop, title: 'AAABSop', updated_at: 10.minutes.from_now, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
-    s2 = Factory(:sop, title: 'AAAASop', updated_at: 9.minutes.from_now, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    s1 = FactoryBot.create(:sop, title: 'AAABSop', updated_at: 10.minutes.from_now, policy: FactoryBot.create(:public_policy, access_type: Policy::VISIBLE))
+    s2 = FactoryBot.create(:sop, title: 'AAAASop', updated_at: 9.minutes.from_now, policy: FactoryBot.create(:public_policy, access_type: Policy::VISIBLE))
 
     get :index
 
@@ -1382,8 +1659,8 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'sort by title by default on A page' do
-    s1 = Factory(:sop, title: 'AAABSop', updated_at: 10.minutes.from_now, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
-    s2 = Factory(:sop, title: 'AAAASop', updated_at: 9.minutes.from_now, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    s1 = FactoryBot.create(:sop, title: 'AAABSop', updated_at: 10.minutes.from_now, policy: FactoryBot.create(:public_policy, access_type: Policy::VISIBLE))
+    s2 = FactoryBot.create(:sop, title: 'AAAASop', updated_at: 9.minutes.from_now, policy: FactoryBot.create(:public_policy, access_type: Policy::VISIBLE))
 
     get :index, params: { page: 'A' }
 
@@ -1394,9 +1671,9 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'custom sorting on top page' do
-    s1 = Factory(:sop, title: 'ZZZZZSop', updated_at: 10.minutes.from_now, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
-    s2 = Factory(:sop, title: 'ZZZZXSop', updated_at: 9.minutes.from_now, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
-    s3 = Factory(:sop, title: 'ZZZZYSop', updated_at: 8.minutes.from_now, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    s1 = FactoryBot.create(:sop, title: 'ZZZZZSop', updated_at: 10.minutes.from_now, policy: FactoryBot.create(:public_policy, access_type: Policy::VISIBLE))
+    s2 = FactoryBot.create(:sop, title: 'ZZZZXSop', updated_at: 9.minutes.from_now, policy: FactoryBot.create(:public_policy, access_type: Policy::VISIBLE))
+    s3 = FactoryBot.create(:sop, title: 'ZZZZYSop', updated_at: 8.minutes.from_now, policy: FactoryBot.create(:public_policy, access_type: Policy::VISIBLE))
 
     get :index, params: { order: 'title_desc' }
 
@@ -1408,9 +1685,9 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'custom sorting on G page' do
-    s1 = Factory(:sop, title: 'GZSop', created_at: 2.years.ago, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
-    s2 = Factory(:sop, title: 'GXSop', created_at: 1.years.ago, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
-    s3 = Factory(:sop, title: 'GYSop', created_at: 10.years.ago, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    s1 = FactoryBot.create(:sop, title: 'GZSop', created_at: 2.years.ago, policy: FactoryBot.create(:public_policy, access_type: Policy::VISIBLE))
+    s2 = FactoryBot.create(:sop, title: 'GXSop', created_at: 1.years.ago, policy: FactoryBot.create(:public_policy, access_type: Policy::VISIBLE))
+    s3 = FactoryBot.create(:sop, title: 'GYSop', created_at: 10.years.ago, policy: FactoryBot.create(:public_policy, access_type: Policy::VISIBLE))
 
     get :index, params: { page: 'G', order: 'created_at_asc' }
 
@@ -1424,12 +1701,12 @@ class SopsControllerTest < ActionController::TestCase
   test 'sorting on numeric paging' do
     Sop.delete_all
 
-    s1 = Factory(:sop, title: 'GZSop', created_at: 2.years.ago, updated_at: 1.week.ago,
-                 policy: Factory(:public_policy, access_type: Policy::VISIBLE))
-    s2 = Factory(:sop, title: 'GXSop', created_at: 1.years.ago, updated_at: 2.weeks.ago,
-                 policy: Factory(:public_policy, access_type: Policy::VISIBLE))
-    s3 = Factory(:sop, title: 'GYSop', created_at: 10.years.ago, updated_at: 3.weeks.ago,
-                 policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    s1 = FactoryBot.create(:sop, title: 'GZSop', created_at: 2.years.ago, updated_at: 1.week.ago,
+                 policy: FactoryBot.create(:public_policy, access_type: Policy::VISIBLE))
+    s2 = FactoryBot.create(:sop, title: 'GXSop', created_at: 1.years.ago, updated_at: 2.weeks.ago,
+                 policy: FactoryBot.create(:public_policy, access_type: Policy::VISIBLE))
+    s3 = FactoryBot.create(:sop, title: 'GYSop', created_at: 10.years.ago, updated_at: 3.weeks.ago,
+                 policy: FactoryBot.create(:public_policy, access_type: Policy::VISIBLE))
 
     with_config_value(:results_per_page_default, 2) do
       get :index, params: { page: 1, order: 'created_at_desc'}
@@ -1471,10 +1748,10 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'JSON-API multiple sorting' do
-    s1 = Factory(:sop, title: 'ZZSop', created_at: 2.years.ago, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
-    s2 = Factory(:sop, title: 'ZXSop', created_at: 1.years.ago, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
-    s3 = Factory(:sop, title: 'ZXSop', created_at: 10.years.ago, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
-    s4 = Factory(:sop, title: 'ZYSop', created_at: 10.years.ago, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    s1 = FactoryBot.create(:sop, title: 'ZZSop', created_at: 2.years.ago, policy: FactoryBot.create(:public_policy, access_type: Policy::VISIBLE))
+    s2 = FactoryBot.create(:sop, title: 'ZXSop', created_at: 1.years.ago, policy: FactoryBot.create(:public_policy, access_type: Policy::VISIBLE))
+    s3 = FactoryBot.create(:sop, title: 'ZXSop', created_at: 10.years.ago, policy: FactoryBot.create(:public_policy, access_type: Policy::VISIBLE))
+    s4 = FactoryBot.create(:sop, title: 'ZYSop', created_at: 10.years.ago, policy: FactoryBot.create(:public_policy, access_type: Policy::VISIBLE))
 
     get :index, params: { page: 'Z', sort: 'title,-created_at' }
 
@@ -1487,7 +1764,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'should create with discussion link' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
     sop =  {title: 'SOP', project_ids: [person.projects.first.id], discussion_links_attributes:[{url: "http://www.slack.com/"}]}
     assert_difference('AssetLink.discussion.count') do
@@ -1504,8 +1781,8 @@ class SopsControllerTest < ActionController::TestCase
 
 
   test 'should show discussion link' do
-    asset_link = Factory(:discussion_link)
-    sop = Factory(:sop, discussion_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    asset_link = FactoryBot.create(:discussion_link)
+    sop = FactoryBot.create(:sop, discussion_links: [asset_link], policy: FactoryBot.create(:public_policy, access_type: Policy::VISIBLE))
     get :show, params: { id: sop }
     assert_response :success
     assert_select 'div.panel-heading', text: /Discussion Channel/, count: 1
@@ -1513,8 +1790,8 @@ class SopsControllerTest < ActionController::TestCase
 
 
   test 'should update sop with new discussion link' do
-    person = Factory(:person)
-    sop = Factory(:sop, contributor: person)
+    person = FactoryBot.create(:person)
+    sop = FactoryBot.create(:sop, contributor: person)
     login_as(person)
     assert_nil sop.discussion_links.first
     assert_difference('AssetLink.discussion.count') do
@@ -1527,8 +1804,8 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'should update sop with edited discussion link' do
-    person = Factory(:person)
-    sop = Factory(:sop, contributor: person, discussion_links:[Factory(:discussion_link)])
+    person = FactoryBot.create(:person)
+    sop = FactoryBot.create(:sop, contributor: person, discussion_links:[FactoryBot.create(:discussion_link)])
     login_as(person)
     assert_equal 1,sop.discussion_links.count
     assert_no_difference('AssetLink.discussion.count') do
@@ -1543,10 +1820,10 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'should destroy related assetlink when the discussion link is removed ' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
-    asset_link = Factory(:discussion_link)
-    sop = Factory(:sop, discussion_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE), contributor: person)
+    asset_link = FactoryBot.create(:discussion_link)
+    sop = FactoryBot.create(:sop, discussion_links: [asset_link], policy: FactoryBot.create(:public_policy, access_type: Policy::VISIBLE), contributor: person)
     assert_difference('AssetLink.discussion.count', -1) do
       put :update, params: { id: sop.id, sop: { discussion_links_attributes:[{id:asset_link.id, _destroy:'1'}] } }
     end
@@ -1556,8 +1833,8 @@ class SopsControllerTest < ActionController::TestCase
 
   test 'should immediately update auth for anon user' do
     with_config_value(:auth_lookup_enabled, true) do
-      login_as(person = Factory(:person))
-      sop = Factory(:sop, contributor: person, policy: Factory(:private_policy))
+      login_as(person = FactoryBot.create(:person))
+      sop = FactoryBot.create(:sop, contributor: person, policy: FactoryBot.create(:private_policy))
       AuthLookupUpdateQueue.destroy_all
       refute sop.can_view?(nil)
 
@@ -1570,7 +1847,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'can edit version revision comments' do
-    sop = Factory(:sop)
+    sop = FactoryBot.create(:sop)
     login_as(sop.contributor)
     disable_authorization_checks do
       sop.save_as_new_version('something')
@@ -1585,7 +1862,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'can edit version visibility' do
-    sop = Factory(:sop)
+    sop = FactoryBot.create(:sop)
     login_as(sop.contributor)
     disable_authorization_checks do
       sop.save_as_new_version('new v')
@@ -1600,7 +1877,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'cannot edit version visibility if doi minted' do
-    sop = Factory(:sop)
+    sop = FactoryBot.create(:sop)
     login_as(sop.contributor)
     disable_authorization_checks do
       sop.save_as_new_version('yep')
@@ -1616,7 +1893,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'cannot edit version visibility if latest version' do
-    sop = Factory(:sop)
+    sop = FactoryBot.create(:sop)
     login_as(sop.contributor)
     disable_authorization_checks do
       sop.save_as_new_version('fhsdkjhfgjlk')
@@ -1631,8 +1908,8 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'can add assets_creators via API' do
-    sop = Factory(:sop)
-    person = Factory(:person, first_name: 'Jane', last_name: 'Smith')
+    sop = FactoryBot.create(:sop)
+    person = FactoryBot.create(:person, first_name: 'Jane', last_name: 'Smith')
     login_as(sop.contributor)
     assert_difference('AssetsCreator.count', 2) do
       disable_authorization_checks do
@@ -1657,9 +1934,9 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'can update assets_creators via API' do
-    person = Factory(:person, first_name: 'Jane', last_name: 'Smith')
-    person2 = Factory(:person, first_name: 'Sally', last_name: 'Smith')
-    sop = Factory(:sop)
+    person = FactoryBot.create(:person, first_name: 'Jane', last_name: 'Smith')
+    person2 = FactoryBot.create(:person, first_name: 'Sally', last_name: 'Smith')
+    sop = FactoryBot.create(:sop)
     ac1 = nil
     ac2 = nil
     ac3 = nil
@@ -1711,8 +1988,8 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'can adjust assets_creators positions in API without creating/deleting records' do
-    person = Factory(:person, first_name: 'Jane', last_name: 'Smith')
-    sop = Factory(:sop)
+    person = FactoryBot.create(:person, first_name: 'Jane', last_name: 'Smith')
+    sop = FactoryBot.create(:sop)
     ac1 = nil
     ac2 = nil
     disable_authorization_checks do

@@ -4,7 +4,7 @@ require 'openbis_test_helper'
 class OpenbisExternalAssetTest < ActiveSupport::TestCase
   def setup
     mock_openbis_calls
-    @endpoint = Factory(:openbis_endpoint)
+    @endpoint = FactoryBot.create(:openbis_endpoint)
 
     @asset = OpenbisExternalAsset.new
     @asset.seek_service = @endpoint

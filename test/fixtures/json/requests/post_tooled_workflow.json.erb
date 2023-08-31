@@ -1,0 +1,42 @@
+{
+  "data": {
+    "type": "workflows",
+    "attributes": {
+      "title": "A Minimal Workflow",
+      "workflow_class": {
+        "key": "cwl"
+      },
+      "content_blobs": [
+        {
+          "original_filename": "rp2-to-rp2path.cwl",
+          "content_type": "application/x-yaml"
+        }
+      ],
+      "tools": [
+        {
+          "id": "https://bio.tools/multiqc"
+        },
+        {
+          "id": "https://bio.tools/ena"
+        },
+        {
+          "id": "https://bio.tools/bioruby",
+          "name": "Ruby!!!"
+        },
+        {
+          "id": "https://ignore.me/galaxy"
+        }
+      ]
+    },
+    "relationships": {
+      "projects": {
+        "data": [
+          {
+            "id": "<%= @project.id %>",
+            "type": "projects"
+          }
+        ]
+      }
+    }
+  }
+}

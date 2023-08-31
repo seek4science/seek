@@ -1,0 +1,160 @@
+require 'caxlsx'
+require 'uuid'
+
+#####################################
+debug = false
+#####################################
+
+if debug
+  secret_pwd = 'florakevinrafael'
+else
+  secret_pwd = UUID.new.generate
+end
+
+workbook = xlsx_package.workbook
+# Prevents formula injections
+# TODO: Find out why this doesn't work
+# Axlsx.escape_formulas = true
+
+# Get Sample data
+sample_data = @samples.map do |sample|
+  { 'id': sample.id }.merge({ 'uuid': sample.uuid }, JSON.parse(sample[:json_metadata]))
+end
+
+# Colors
+# TODO: Make the colors depend on the type of branding instead of hard-coded colors
+# REQUIREMENT: branding configuration in seek
+datahub_blue = '486273'
+datahub_yellow = 'F2b035'
+
+# Cell Styles
+unlocked = workbook.styles.add_style locked: false
+locked = workbook.styles.add_style locked: true
+title_style = workbook.styles.add_style(bg_color: datahub_yellow,
+                                        fg_color: datahub_blue,
+                                        b: true,
+                                        u: true,
+                                        sz: 18)
+
+workbook.add_worksheet(name: 'Metadata') do |sheet|
+  sheet.add_row ['Study:'], style: title_style
+  sheet.add_row ['Fairdom ID:', @study.id]
+  sheet.add_row ['UUID:', @study.uuid]
+
+  if @assay
+    sheet.add_row ['Assay:'], style: title_style
+    sheet.add_row ['Fairdom ID:', @assay.id]
+    sheet.add_row ['UUID:', @assay.uuid]
+  end
+
+  sheet.add_row ['Sample Type:'], style: title_style
+  sheet.add_row ['Fairdom ID:', @sample_type.id]
+  sheet.add_row ['UUID:', @sample_type.uuid]
+
+  sheet.add_row ['Template:'], style: title_style
+  sheet.add_row ['Fairdom ID:', @template.id]
+  sheet.add_row ['UUID:', @template.uuid]
+
+  sheet.sheet_protection.password = secret_pwd
+end
+
+# CV / Ontologies sheet
+## Function to get a fixed size matrix
+def transposed_filled_arrays(arrays)
+  raise 'Input is no array' unless arrays.is_a?(Array)
+
+  size = 0
+  arrays.map { |array| size = array.size if array.size > size }
+
+  filled_arrays = []
+  arrays.map { |array| filled_arrays.push(Array.new(size) { |i| array[i] }) }
+
+  filled_arrays.transpose
+end
+
+## Populate and protect CV / Ontologies sheet
+workbook.add_worksheet name: 'cv_ontology', state: :hidden do |sheet|
+  rows = []
+  @sa_cv_terms.map do |cv|
+    row = [cv['name']]
+
+    if cv['has_cv']
+      cv['data']&.map do |val|
+        row.push val
+      end
+    end
+    rows.push(row)
+  end
+  tfs_rows = transposed_filled_arrays(rows)
+  tfs_rows.map do |tfs_row|
+    sheet.add_row tfs_row
+  end
+  sheet.sheet_protection.password = secret_pwd
+end
+
+# Sample sheet
+workbook.add_worksheet(name: 'Samples') do |sheet|
+  ## Adding the header cells
+  header_row = @sa_cv_terms.map do |sa_cv_term|
+    sa_cv_term['required'] ? "#{sa_cv_term['name']} *" : sa_cv_term['name']
+  end
+  sheet.add_row header_row
+
+  ## populating the sheet with the data
+  sample_data.each do |item|
+    row = item.collect { |_key, val| val }
+    sheet.add_row row, style: unlocked
+  end
+
+  ## Adding extra empty rows so new samples can be added to the table
+  1000.times do
+    sheet.add_row Array::new(sample_data[0].keys.length), style: unlocked
+  end
+
+  ## styling
+  [0, 1].each { |col_index| sheet.col_style(col_index, locked) }
+  sheet.row_style(0, title_style)
+
+  ## filtering
+  sheet.auto_filter = "#{sheet.cells.first.r}:#{sheet.cells.last.r}"
+
+  ## Data Validation
+  # https://github.com/caxlsx/caxlsx/blob/master/examples/list_validation_example.md
+  attribute_size = @sa_cv_terms.size - 1
+  (0..attribute_size).map do |col_nr|
+
+    # If the has_cv field is false, it should skip this iteration and not apply the data validation
+    next if @sa_cv_terms[col_nr]['has_cv'] == false
+
+    # Get sa_cv_terms_length
+    sa_cv_terms_size = @sa_cv_terms[col_nr]['data'].size
+
+    prompt_text = "Choose a valid option. #{(@sa_cv_terms[col_nr]['required'] ? 'This value is REQUIRED!' : 'This value is optional.')}"
+
+    col_ref = Axlsx.cell_r(col_nr, 1).gsub(/\d+/, '')
+    dv_range = "#{col_ref}2:#{col_ref}1000000"
+    sheet.add_data_validation(dv_range,
+                              type: :list,
+                              formula1: "'cv_ontology'!$#{col_ref}$2:$#{col_ref}$#{sa_cv_terms_size + 1}",
+                              showErrorMessage: !@sa_cv_terms[col_nr]['allows_custom_input'],
+                              errorTitle: 'Input Error!',
+                              error: 'Please select one of the available options',
+                              errorStyle: :stop, # options here are: 'information', 'stop', 'warning'
+                              showInputMessage: true,
+                              promptTitle: @sa_cv_terms[col_nr]['name'],
+                              prompt: prompt_text)
+  end
+
+  ## Password protections Samples sheet
+  sheet.sheet_protection.password = secret_pwd
+  sheet.sheet_protection.format_cells = false
+  sheet.sheet_protection.format_columns = false
+  sheet.sheet_protection.format_rows = false
+  sheet.sheet_protection.auto_filter = false
+  sheet.sheet_protection.insert_rows = false
+  sheet.sheet_protection.delete_rows = false
+  sheet.sheet_protection.sort = false
+end
+
+# TODO: Extra 'very hidden' sheet with identification attributes
+# This is necessary to ensure that the user uploads the same spreadsheet back to the UI and not a altered copy.

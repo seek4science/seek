@@ -67,6 +67,10 @@ every 1.day, at: offset(3) do
   runner 'Galaxy::ToolMap.instance.refresh'
 end
 
+every 1.day, at: '12:10 am' do
+  runner "Seek::BioSchema::DataDump.generate_dumps"
+end
+
 # not safe to automatically add in a non containerised environment
 if Seek::Docker.using_docker?
   every 10.minutes do

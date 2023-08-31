@@ -10,8 +10,8 @@ class SamplesControllerTest < ActionController::TestCase
   include GeneralAuthorizationTestCases
 
   test 'should return 406 when requesting RDF' do
-    login_as(Factory(:user))
-    sample = Factory :sample, contributor: User.current_user.person
+    login_as(FactoryBot.create(:user))
+    sample = FactoryBot.create :sample, contributor: User.current_user.person
     assert sample.can_view?
 
     get :show, params: { id: sample, format: :rdf }
@@ -19,9 +19,8 @@ class SamplesControllerTest < ActionController::TestCase
     assert_response :not_acceptable
   end
 
-
   test 'index' do
-    Factory(:sample, policy: Factory(:public_policy))
+    FactoryBot.create(:sample, policy: FactoryBot.create(:public_policy))
     get :index
     assert_response :success
     assert_select 'div.index-filters'
@@ -31,9 +30,9 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'new without sample type id' do
-    login_as(Factory(:person))
+    login_as(FactoryBot.create(:person))
     get :new
-    assert_redirected_to select_sample_types_path
+    assert_redirected_to select_sample_types_path(act: :create)
   end
 
   test 'show' do
@@ -42,8 +41,8 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'new with sample type id' do
-    login_as(Factory(:person))
-    type = Factory(:patient_sample_type)
+    login_as(FactoryBot.create(:person))
+    type = FactoryBot.create(:patient_sample_type)
     get :new, params: { sample_type_id: type.id }
     assert_response :success
     assert assigns(:sample)
@@ -54,10 +53,10 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'create from form' do
-    person = Factory(:person)
-    creator = Factory(:person)
+    person = FactoryBot.create(:person)
+    creator = FactoryBot.create(:person)
     login_as(person)
-    type = Factory(:patient_sample_type)
+    type = FactoryBot.create(:patient_sample_type)
     assert_enqueued_with(job: SampleTypeUpdateJob, args: [type, false]) do
       assert_difference('Sample.count') do
         post :create, params: { sample: { sample_type_id: type.id,
@@ -82,10 +81,10 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'create' do
-    person = Factory(:person)
-    creator = Factory(:person)
+    person = FactoryBot.create(:person)
+    creator = FactoryBot.create(:person)
     login_as(person)
-    type = Factory(:patient_sample_type)
+    type = FactoryBot.create(:patient_sample_type)
     assert_enqueued_with(job: SampleTypeUpdateJob, args: [type, false]) do
       assert_difference('Sample.count') do
         post :create, params: { sample: { sample_type_id: type.id,
@@ -105,10 +104,10 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'create with validation error' do
-    person = Factory(:person)
-    creator = Factory(:person)
+    person = FactoryBot.create(:person)
+    creator = FactoryBot.create(:person)
     login_as(person)
-    type = Factory(:patient_sample_type)
+    type = FactoryBot.create(:patient_sample_type)
     assert_no_difference('Sample.count') do
       post :create, params: { sample: { sample_type_id: type.id,
                                         data: { 'full name': 'Fred Smith', age: 'Fish' },
@@ -126,10 +125,10 @@ class SamplesControllerTest < ActionController::TestCase
 
   #FIXME: there is an inconstency between the existing tests, and how the form behaved - see https://jira-bsse.ethz.ch/browse/OPSK-1205
   test 'create and update with boolean from form' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
-    type = Factory(:simple_sample_type)
-    type.sample_attributes << Factory(:sample_attribute, title: 'bool', sample_attribute_type: Factory(:boolean_sample_attribute_type), required: false, sample_type: type)
+    type = FactoryBot.create(:simple_sample_type)
+    type.sample_attributes << FactoryBot.create(:sample_attribute, title: 'bool', sample_attribute_type: FactoryBot.create(:boolean_sample_attribute_type), required: false, sample_type: type)
     type.save!
     assert_difference('Sample.count') do
       post :create, params: { sample: { sample_type_id: type.id,
@@ -150,9 +149,9 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'create with symbols' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
-    type = Factory(:sample_type_with_symbols)
+    type = FactoryBot.create(:sample_type_with_symbols)
     assert_difference('Sample.count') do
       post :create, params: { sample: { sample_type_id: type.id,
                                         data:{
@@ -169,10 +168,10 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'create and update with boolean' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
-    type = Factory(:simple_sample_type)
-    type.sample_attributes << Factory(:sample_attribute, title: 'bool', sample_attribute_type: Factory(:boolean_sample_attribute_type), required: false, sample_type: type)
+    type = FactoryBot.create(:simple_sample_type)
+    type.sample_attributes << FactoryBot.create(:sample_attribute, title: 'bool', sample_attribute_type: FactoryBot.create(:boolean_sample_attribute_type), required: false, sample_type: type)
     type.save!
     assert_difference('Sample.count') do
       post :create, params: { sample: { sample_type_id: type.id, data: { the_title: 'ttt', bool: '1' },
@@ -190,10 +189,10 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'create and update with cv list' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
 
-    type = Factory(:apples_list_controlled_vocab_sample_type)
+    type = FactoryBot.create(:apples_list_controlled_vocab_sample_type)
     assert_difference('Sample.count') do
       post :create, params: { sample: { sample_type_id: type.id,
                                         data: { apples: ['Granny Smith', 'Bramley'] },
@@ -214,39 +213,13 @@ class SamplesControllerTest < ActionController::TestCase
 
   end
 
-  test 'create and update with cv list comma seperated' do
-    person = Factory(:person)
-    login_as(person)
-
-    type = Factory(:apples_list_controlled_vocab_sample_type)
-    assert_difference('Sample.count') do
-      post :create, params: { sample: { sample_type_id: type.id,
-                                        data: { apples: 'Granny Smith, Bramley' },
-                                        project_ids: [person.projects.first.id] } }
-    end
-    assert_not_nil sample = assigns(:sample)
-    assert_equal ['Granny Smith', 'Bramley'], sample.get_attribute_value(:apples)
-
-    # cv list type data must be an array
-    assert_no_difference('Sample.count') do
-      put :update, params: { id: sample.id, sample: { data: { apples: 'Granny Smith' } } }
-    end
-
-    # the required attribute must be filled in
-    assert_no_difference('Sample.count') do
-      put :update, params: { id: sample.id, sample: { data: { apples: nil } } }
-    end
-
-  end
-
-
   test 'show sample with boolean' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
-    type = Factory(:simple_sample_type)
-    type.sample_attributes << Factory(:sample_attribute, title: 'bool', sample_attribute_type: Factory(:boolean_sample_attribute_type), required: false, sample_type: type)
+    type = FactoryBot.create(:simple_sample_type)
+    type.sample_attributes << FactoryBot.create(:sample_attribute, title: 'bool', sample_attribute_type: FactoryBot.create(:boolean_sample_attribute_type), required: false, sample_type: type)
     type.save!
-    sample = Factory(:sample, sample_type: type, contributor: person)
+    sample = FactoryBot.create(:sample, sample_type: type, contributor: person)
     sample.set_attribute_value(:the_title, 'ttt')
     sample.set_attribute_value(:bool, true)
     sample.save!
@@ -255,7 +228,7 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'edit' do
-    login_as(Factory(:person))
+    login_as(FactoryBot.create(:person))
 
     get :edit, params: { id: populated_patient_sample.id }
 
@@ -263,8 +236,8 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test "can't edit if extracted from a data file" do
-    person = Factory(:person)
-    sample = Factory(:sample_from_file, contributor: person)
+    person = FactoryBot.create(:person)
+    sample = FactoryBot.create(:sample_from_file, contributor: person)
     login_as(person)
 
     get :edit, params: { id: sample.id }
@@ -275,8 +248,8 @@ class SamplesControllerTest < ActionController::TestCase
 
   #FIXME: there is an inconstency between the existing tests, and how the form behaved - see https://jira-bsse.ethz.ch/browse/OPSK-1205
   test 'update from form' do
-    login_as(Factory(:person))
-    creator = Factory(:person)
+    login_as(FactoryBot.create(:person))
+    creator = FactoryBot.create(:person)
     sample = populated_patient_sample
     type_id = sample.sample_type.id
 
@@ -307,8 +280,8 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'update' do
-    login_as(Factory(:person))
-    creator = Factory(:person)
+    login_as(FactoryBot.create(:person))
+    creator = FactoryBot.create(:person)
     sample = populated_patient_sample
     type_id = sample.sample_type.id
 
@@ -336,9 +309,9 @@ class SamplesControllerTest < ActionController::TestCase
 
   #FIXME: there is an inconstency between the existing tests, and how the form behaved - see https://jira-bsse.ethz.ch/browse/OPSK-1205
   test 'associate with project on create from form' do
-    person = Factory(:person_in_multiple_projects)
+    person = FactoryBot.create(:person_in_multiple_projects)
     login_as(person)
-    type = Factory(:patient_sample_type)
+    type = FactoryBot.create(:patient_sample_type)
     assert person.projects.count >= 3 # incase the factory changes
     project_ids = person.projects[0..1].collect(&:id)
     assert_difference('Sample.count') do
@@ -356,9 +329,9 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'associate with project on create' do
-    person = Factory(:person_in_multiple_projects)
+    person = FactoryBot.create(:person_in_multiple_projects)
     login_as(person)
-    type = Factory(:patient_sample_type)
+    type = FactoryBot.create(:patient_sample_type)
     assert person.projects.count >= 3 # incase the factory changes
     project_ids = person.projects[0..1].collect(&:id)
     assert_difference('Sample.count') do
@@ -372,7 +345,7 @@ class SamplesControllerTest < ActionController::TestCase
 
   #FIXME: there is an inconstency between the existing tests, and how the form behaved - see https://jira-bsse.ethz.ch/browse/OPSK-1205
   test 'associate with project on update from form' do
-    person = Factory(:person_in_multiple_projects)
+    person = FactoryBot.create(:person_in_multiple_projects)
     login_as(person)
     sample = populated_patient_sample
     assert person.projects.count >= 3 # incase the factory changes
@@ -387,7 +360,7 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'associate with project on update' do
-    person = Factory(:person_in_multiple_projects)
+    person = FactoryBot.create(:person_in_multiple_projects)
     login_as(person)
     sample = populated_patient_sample
     assert person.projects.count >= 3 # incase the factory changes
@@ -402,51 +375,51 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'contributor can view' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
-    sample = Factory(:sample, policy: Factory(:private_policy), contributor: person)
+    sample = FactoryBot.create(:sample, policy: FactoryBot.create(:private_policy), contributor: person)
     get :show, params: { id: sample.id }
     assert_response :success
   end
 
   test 'non contributor cannot view' do
-    person = Factory(:person)
-    other_person = Factory(:person)
+    person = FactoryBot.create(:person)
+    other_person = FactoryBot.create(:person)
     login_as(other_person)
-    sample = Factory(:sample, policy: Factory(:private_policy), contributor: person)
+    sample = FactoryBot.create(:sample, policy: FactoryBot.create(:private_policy), contributor: person)
     get :show, params: { id: sample.id }
     assert_response :forbidden
   end
 
   test 'anonymous cannot view' do
-    person = Factory(:person)
-    sample = Factory(:sample, policy: Factory(:private_policy), contributor: person)
+    person = FactoryBot.create(:person)
+    sample = FactoryBot.create(:sample, policy: FactoryBot.create(:private_policy), contributor: person)
     get :show, params: { id: sample.id }
     assert_response :forbidden
   end
 
   test 'contributor can edit' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
 
-    sample = Factory(:sample, policy: Factory(:private_policy), contributor: person)
+    sample = FactoryBot.create(:sample, policy: FactoryBot.create(:private_policy), contributor: person)
     get :edit, params: { id: sample.id }
     assert_response :success
   end
 
   test 'non contributor cannot edit' do
-    person = Factory(:person)
-    other_person = Factory(:person)
+    person = FactoryBot.create(:person)
+    other_person = FactoryBot.create(:person)
     login_as(other_person)
-    sample = Factory(:sample, policy: Factory(:private_policy), contributor: person)
+    sample = FactoryBot.create(:sample, policy: FactoryBot.create(:private_policy), contributor: person)
     get :edit, params: { id: sample.id }
     assert_redirected_to sample
     refute_nil flash[:error]
   end
 
   test 'anonymous cannot edit' do
-    person = Factory(:person)
-    sample = Factory(:sample, policy: Factory(:private_policy), contributor: person)
+    person = FactoryBot.create(:person)
+    sample = FactoryBot.create(:sample, policy: FactoryBot.create(:private_policy), contributor: person)
     get :edit, params: { id: sample.id }
     assert_redirected_to sample
     refute_nil flash[:error]
@@ -454,9 +427,9 @@ class SamplesControllerTest < ActionController::TestCase
 
   #FIXME: there is an inconstency between the existing tests, and how the form behaved - see https://jira-bsse.ethz.ch/browse/OPSK-1205
   test 'create with sharing from form' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
-    type = Factory(:patient_sample_type)
+    type = FactoryBot.create(:patient_sample_type)
 
     assert_difference('Sample.count') do
       post :create, params: { sample: { sample_type_id: type.id, title: 'My Sample',
@@ -470,13 +443,13 @@ class SamplesControllerTest < ActionController::TestCase
     end
     assert sample = assigns(:sample)
     assert_equal person, sample.contributor
-    assert sample.can_view?(Factory(:person).user)
+    assert sample.can_view?(FactoryBot.create(:person).user)
   end
 
   test 'create with sharing' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
-    type = Factory(:patient_sample_type)
+    type = FactoryBot.create(:patient_sample_type)
 
     assert_difference('Sample.count') do
       post :create, params: { sample: { sample_type_id: type.id, title: 'My Sample',
@@ -485,18 +458,18 @@ class SamplesControllerTest < ActionController::TestCase
     end
     assert sample = assigns(:sample)
     assert_equal person, sample.contributor
-    assert sample.can_view?(Factory(:person).user)
+    assert sample.can_view?(FactoryBot.create(:person).user)
   end
 
   #FIXME: there is an inconstency between the existing tests, and how the form behaved - see https://jira-bsse.ethz.ch/browse/OPSK-1205
   test 'update with sharing from form' do
-    person = Factory(:person)
-    other_person = Factory(:person)
+    person = FactoryBot.create(:person)
+    other_person = FactoryBot.create(:person)
     login_as(person)
     sample = populated_patient_sample
     sample.contributor = person
     sample.projects = person.projects
-    sample.policy = Factory(:private_policy)
+    sample.policy = FactoryBot.create(:private_policy)
     sample.save!
     sample.reload
     refute sample.can_view?(other_person.user)
@@ -508,13 +481,13 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'update with sharing' do
-    person = Factory(:person)
-    other_person = Factory(:person)
+    person = FactoryBot.create(:person)
+    other_person = FactoryBot.create(:person)
     login_as(person)
     sample = populated_patient_sample
     sample.contributor = person
     sample.projects = person.projects
-    sample.policy = Factory(:private_policy)
+    sample.policy = FactoryBot.create(:private_policy)
     sample.save!
     sample.reload
     refute sample.can_view?(other_person.user)
@@ -534,10 +507,10 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'filter by sample type' do
-    sample_type1 = Factory(:simple_sample_type)
-    sample_type2 = Factory(:simple_sample_type)
-    sample1 = Factory(:sample, sample_type: sample_type1, policy: Factory(:public_policy), title: 'SAMPLE 1')
-    sample2 = Factory(:sample, sample_type: sample_type2, policy: Factory(:public_policy), title: 'SAMPLE 2')
+    sample_type1 = FactoryBot.create(:simple_sample_type)
+    sample_type2 = FactoryBot.create(:simple_sample_type)
+    sample1 = FactoryBot.create(:sample, sample_type: sample_type1, policy: FactoryBot.create(:public_policy), title: 'SAMPLE 1')
+    sample2 = FactoryBot.create(:sample, sample_type: sample_type2, policy: FactoryBot.create(:public_policy), title: 'SAMPLE 2')
 
     get :index, params: { sample_type_id: sample_type1.id }
     assert_response :success
@@ -547,12 +520,12 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'filter by template' do
-    template1 = Factory(:template, policy: Factory(:public_policy ))
-    template2 = Factory(:template, policy: Factory(:public_policy ))
-    sample_type1 = Factory(:simple_sample_type, template_id: template1.id)
-    sample_type2 = Factory(:simple_sample_type, template_id: template2.id)
-    sample1 = Factory(:sample, sample_type: sample_type1, policy: Factory(:public_policy), title: 'SAMPLE 1')
-    sample2 = Factory(:sample, sample_type: sample_type2, policy: Factory(:public_policy), title: 'SAMPLE 2')
+    template1 = FactoryBot.create(:template, policy: FactoryBot.create(:public_policy ))
+    template2 = FactoryBot.create(:template, policy: FactoryBot.create(:public_policy ))
+    sample_type1 = FactoryBot.create(:simple_sample_type, template_id: template1.id)
+    sample_type2 = FactoryBot.create(:simple_sample_type, template_id: template2.id)
+    sample1 = FactoryBot.create(:sample, sample_type: sample_type1, policy: FactoryBot.create(:public_policy), title: 'SAMPLE 1')
+    sample2 = FactoryBot.create(:sample, sample_type: sample_type2, policy: FactoryBot.create(:public_policy), title: 'SAMPLE 2')
 
     get :index, params: { template_id: template1.id }
     assert_response :success
@@ -562,10 +535,10 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'should get table view for data file' do
-    data_file = Factory(:data_file, policy: Factory(:private_policy))
-    sample_type = Factory(:simple_sample_type)
+    data_file = FactoryBot.create(:data_file, policy: FactoryBot.create(:private_policy))
+    sample_type = FactoryBot.create(:simple_sample_type)
     3.times do # public
-      Factory(:sample, sample_type: sample_type, contributor: data_file.contributor, policy: Factory(:private_policy),
+      FactoryBot.create(:sample, sample_type: sample_type, contributor: data_file.contributor, policy: FactoryBot.create(:private_policy),
                        originating_data_file: data_file)
     end
 
@@ -580,13 +553,13 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'should get table view for sample type' do
-    person = Factory(:person)
-    sample_type = Factory(:simple_sample_type)
+    person = FactoryBot.create(:person)
+    sample_type = FactoryBot.create(:simple_sample_type)
     2.times do # public
-      Factory(:sample, sample_type: sample_type, contributor: person, policy: Factory(:private_policy))
+      FactoryBot.create(:sample, sample_type: sample_type, contributor: person, policy: FactoryBot.create(:private_policy))
     end
     3.times do # private
-      Factory(:sample, sample_type: sample_type, policy: Factory(:private_policy))
+      FactoryBot.create(:sample, sample_type: sample_type, policy: FactoryBot.create(:private_policy))
     end
 
     login_as(person.user)
@@ -599,14 +572,14 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'should get table view for template' do
-    person = Factory(:person)
-    template =  Factory(:template, policy: Factory(:public_policy ))
-    sample_type = Factory(:simple_sample_type, template_id: template.id)
+    person = FactoryBot.create(:person)
+    template =  FactoryBot.create(:template, policy: FactoryBot.create(:public_policy ))
+    sample_type = FactoryBot.create(:simple_sample_type, template_id: template.id)
     2.times do # public
-      Factory(:sample, sample_type: sample_type, contributor: person, policy: Factory(:private_policy))
+      FactoryBot.create(:sample, sample_type: sample_type, contributor: person, policy: FactoryBot.create(:private_policy))
     end
     3.times do # private
-      Factory(:sample, sample_type: sample_type, policy: Factory(:private_policy))
+      FactoryBot.create(:sample, sample_type: sample_type, policy: FactoryBot.create(:private_policy))
     end
 
     login_as(person.user)
@@ -619,12 +592,12 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'show table with a boolean sample' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
-    type = Factory(:simple_sample_type)
-    type.sample_attributes << Factory(:sample_attribute, title: 'bool', sample_attribute_type: Factory(:boolean_sample_attribute_type), required: false, sample_type: type)
+    type = FactoryBot.create(:simple_sample_type)
+    type.sample_attributes << FactoryBot.create(:sample_attribute, title: 'bool', sample_attribute_type: FactoryBot.create(:boolean_sample_attribute_type), required: false, sample_type: type)
     type.save!
-    sample = Factory(:sample, sample_type: type, contributor: person)
+    sample = FactoryBot.create(:sample, sample_type: type, contributor: person)
     sample.set_attribute_value(:the_title, 'ttt')
     sample.set_attribute_value(:bool, true)
     sample.save!
@@ -633,10 +606,10 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'filtering for association forms' do
-    person = Factory(:person)
-    Factory(:sample, contributor: person, policy: Factory(:public_policy), title: 'fish')
-    Factory(:sample, contributor: person, policy: Factory(:public_policy), title: 'frog')
-    Factory(:sample, contributor: person, policy: Factory(:public_policy), title: 'banana')
+    person = FactoryBot.create(:person)
+    FactoryBot.create(:sample, contributor: person, policy: FactoryBot.create(:public_policy), title: 'fish')
+    FactoryBot.create(:sample, contributor: person, policy: FactoryBot.create(:public_policy), title: 'frog')
+    FactoryBot.create(:sample, contributor: person, policy: FactoryBot.create(:public_policy), title: 'banana')
     login_as(person.user)
 
     get :filter, params: { filter: '' }
@@ -654,10 +627,10 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'turns strain attributes into links' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person.user)
-    sample_type = Factory(:strain_sample_type)
-    strain = Factory(:strain)
+    sample_type = FactoryBot.create(:strain_sample_type)
+    strain = FactoryBot.create(:strain)
 
     sample = Sample.new(sample_type: sample_type, contributor: person, project_ids: [person.projects.first.id])
     sample.set_attribute_value(:name, 'Strain sample')
@@ -671,10 +644,10 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'strains show up in related items' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person.user)
-    sample_type = Factory(:strain_sample_type)
-    strain = Factory(:strain)
+    sample_type = FactoryBot.create(:strain_sample_type)
+    strain = FactoryBot.create(:strain)
 
     sample = Sample.new(sample_type: sample_type, contributor: person, project_ids: [person.projects.first.id])
     sample.set_attribute_value(:name, 'Strain sample')
@@ -688,7 +661,7 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'cannot access when disabled' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person.user)
     with_config_value :samples_enabled, false do
       get :show, params: { id: populated_patient_sample.id }
@@ -710,8 +683,8 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'destroy' do
-    person = Factory(:person)
-    sample = Factory(:patient_sample, contributor: person)
+    person = FactoryBot.create(:person)
+    sample = FactoryBot.create(:patient_sample, contributor: person)
     type = sample.sample_type
     login_as(person.user)
     assert sample.can_delete?
@@ -724,15 +697,15 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'linked samples show up in related items, for both directions' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person.user)
 
-    sample_type = Factory(:linked_optional_sample_type, project_ids: person.projects.map(&:id))
-    linked_sample = Factory(:patient_sample, sample_type: sample_type.sample_attributes.last.linked_sample_type, contributor: person)
+    sample_type = FactoryBot.create(:linked_optional_sample_type, project_ids: person.projects.map(&:id))
+    linked_sample = FactoryBot.create(:patient_sample, sample_type: sample_type.sample_attributes.last.linked_sample_type, contributor: person)
 
     sample = Sample.create!(sample_type: sample_type, project_ids: person.projects.map(&:id),
                             data: { title: 'Linking sample',
-                                    patient: linked_sample.id})
+                                    patient: linked_sample.id })
 
     # For the sample containing the link
     get :show, params: { id: sample }
@@ -749,11 +722,11 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'related samples index link works correctly' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person.user)
 
-    sample_type = Factory(:linked_optional_sample_type, project_ids: person.projects.map(&:id))
-    linked_sample = Factory(:patient_sample, sample_type: sample_type.sample_attributes.last.linked_sample_type, contributor: person)
+    sample_type = FactoryBot.create(:linked_optional_sample_type, project_ids: person.projects.map(&:id))
+    linked_sample = FactoryBot.create(:patient_sample, sample_type: sample_type.sample_attributes.last.linked_sample_type, contributor: person)
 
     sample = Sample.create!(sample_type: sample_type, project_ids: person.projects.map(&:id),
                             data: { title: 'Middle sample',
@@ -768,15 +741,17 @@ class SamplesControllerTest < ActionController::TestCase
     end
 
     assert_response :success
-    assert_select 'div.related-items a[href=?]', sample_samples_path(sample), text: "Advanced Samples list for this Sample with search and filtering ..."
+
+    assert_select 'div.related-items #resources-shown-count a[href=?]', sample_samples_path(sample), text: "2 Samples"
+    assert_select 'div.related-items #advanced-search-link a[href=?]', sample_samples_path(sample), text: "Advanced Samples list for this Sample with search and filtering"
   end
 
   test 'related samples index page works correctly' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person.user)
 
-    sample_type = Factory(:linked_optional_sample_type, project_ids: person.projects.map(&:id))
-    linked_sample = Factory(:patient_sample, sample_type: sample_type.sample_attributes.last.linked_sample_type, contributor: person)
+    sample_type = FactoryBot.create(:linked_optional_sample_type, project_ids: person.projects.map(&:id))
+    linked_sample = FactoryBot.create(:patient_sample, sample_type: sample_type.sample_attributes.last.linked_sample_type, contributor: person)
 
     sample = Sample.create!(sample_type: sample_type, project_ids: person.projects.map(&:id),
                             data: { title: 'Middle sample',
@@ -796,8 +771,8 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'referring sample id is added to sample type link, if necessary' do
-    person = Factory(:person)
-    sample = Factory(:sample,policy:Factory(:private_policy,permissions:[Factory(:permission,contributor:person, access_type:Policy::VISIBLE)]))
+    person = FactoryBot.create(:person)
+    sample = FactoryBot.create(:sample,policy:FactoryBot.create(:private_policy,permissions:[FactoryBot.create(:permission,contributor:person, access_type:Policy::VISIBLE)]))
     sample_type = sample.sample_type
     login_as(person.user)
 
@@ -809,7 +784,7 @@ class SamplesControllerTest < ActionController::TestCase
 
     assert_select 'a[href=?]',sample_type_path(sample_type,referring_sample_id:sample.id),text:/#{sample_type.title}/
 
-    sample2 = Factory(:sample,policy:Factory(:public_policy))
+    sample2 = FactoryBot.create(:sample,policy:FactoryBot.create(:public_policy))
     sample_type2 = sample2.sample_type
 
     assert sample2.can_view?
@@ -824,10 +799,10 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'referring sample id is added to sample type links in list items' do
-    person = Factory(:person)
-    sample = Factory(:sample,policy:Factory(:private_policy,permissions:[Factory(:permission,contributor:person, access_type:Policy::VISIBLE)]))
+    person = FactoryBot.create(:person)
+    sample = FactoryBot.create(:sample,policy:FactoryBot.create(:private_policy,permissions:[FactoryBot.create(:permission,contributor:person, access_type:Policy::VISIBLE)]))
     sample_type = sample.sample_type
-    sample2 = Factory(:sample,policy:Factory(:public_policy))
+    sample2 = FactoryBot.create(:sample,policy:FactoryBot.create(:public_policy))
     sample_type2 = sample2.sample_type
     login_as(person.user)
 
@@ -851,8 +826,8 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'can access manage page with manage rights' do
-    person = Factory(:person)
-    sample = Factory(:sample, contributor:person)
+    person = FactoryBot.create(:person)
+    sample = FactoryBot.create(:sample, contributor:person)
     login_as(person)
     assert sample.can_manage?
     get :manage, params: {id: sample}
@@ -871,8 +846,8 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'cannot access manage page with edit rights' do
-    person = Factory(:person)
-    sample = Factory(:sample, policy:Factory(:private_policy, permissions:[Factory(:permission, contributor:person, access_type:Policy::EDITING)]))
+    person = FactoryBot.create(:person)
+    sample = FactoryBot.create(:sample, policy:FactoryBot.create(:private_policy, permissions:[FactoryBot.create(:permission, contributor:person, access_type:Policy::EDITING)]))
     login_as(person)
     assert sample.can_edit?
     refute sample.can_manage?
@@ -882,14 +857,14 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'manage_update' do
-    proj1=Factory(:project)
-    proj2=Factory(:project)
-    person = Factory(:person,project:proj1)
-    other_person = Factory(:person)
+    proj1=FactoryBot.create(:project)
+    proj2=FactoryBot.create(:project)
+    person = FactoryBot.create(:person,project:proj1)
+    other_person = FactoryBot.create(:person)
     person.add_to_project_and_institution(proj2,person.institutions.first)
     person.save!
 
-    sample = Factory(:sample, contributor:person, projects:[proj1], policy:Factory(:private_policy))
+    sample = FactoryBot.create(:sample, contributor:person, projects:[proj1], policy:FactoryBot.create(:private_policy))
 
     login_as(person)
     assert sample.can_manage?
@@ -913,17 +888,17 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'manage_update fails without manage rights' do
-    proj1=Factory(:project)
-    proj2=Factory(:project)
-    person = Factory(:person, project:proj1)
+    proj1=FactoryBot.create(:project)
+    proj2=FactoryBot.create(:project)
+    person = FactoryBot.create(:person, project:proj1)
     person.add_to_project_and_institution(proj2,person.institutions.first)
     person.save!
 
-    other_person = Factory(:person)
+    other_person = FactoryBot.create(:person)
 
 
-    sample = Factory(:sample, projects:[proj1], policy:Factory(:private_policy,
-                                                             permissions:[Factory(:permission,contributor:person, access_type:Policy::EDITING)]))
+    sample = FactoryBot.create(:sample, projects:[proj1], policy:FactoryBot.create(:private_policy,
+                                                             permissions:[FactoryBot.create(:permission,contributor:person, access_type:Policy::EDITING)]))
 
     login_as(person)
     refute sample.can_manage?
@@ -951,8 +926,8 @@ class SamplesControllerTest < ActionController::TestCase
 
   test 'hide manage menu for manageable but not editable items' do
     # an odd case, where you can manage but not edit, see https://jira-bsse.ethz.ch/browse/OPSK-2041
-    person = Factory(:person)
-    sample = Factory(:sample_from_file, contributor:person)
+    person = FactoryBot.create(:person)
+    sample = FactoryBot.create(:sample_from_file, contributor:person)
     login_as(person)
     assert sample.can_manage?
     assert sample.can_view?
@@ -968,10 +943,10 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'should create with discussion link' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
 
-    type = Factory(:patient_sample_type)
+    type = FactoryBot.create(:patient_sample_type)
 
     sample =  {sample_type_id: type.id,
                data: { 'full name': 'Fred Smith', age: '22', weight: '22.1', postcode: 'M13 9PL' },
@@ -988,8 +963,8 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'should show discussion link' do
-    asset_link = Factory(:discussion_link)
-    sample = Factory(:sample, discussion_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    asset_link = FactoryBot.create(:discussion_link)
+    sample = FactoryBot.create(:sample, discussion_links: [asset_link], policy: FactoryBot.create(:public_policy, access_type: Policy::VISIBLE))
     assert_equal [asset_link],sample.discussion_links
     get :show, params: { id: sample }
     assert_response :success
@@ -997,8 +972,8 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'should update document with new discussion link' do
-    person = Factory(:person)
-    sample = Factory(:sample, contributor: person)
+    person = FactoryBot.create(:person)
+    sample = FactoryBot.create(:sample, contributor: person)
     login_as(person)
     assert_nil sample.discussion_links.first
     assert_difference('AssetLink.discussion.count') do
@@ -1011,10 +986,10 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'batch_create' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
-    type = Factory(:patient_sample_type)
-    assay = Factory(:assay, contributor: person)
+    type = FactoryBot.create(:patient_sample_type)
+    assay = FactoryBot.create(:assay, contributor: person)
     assert_difference('Sample.count', 2) do
       assert_difference('AssayAsset.count', 1) do
           post :batch_create, params: { data: [
@@ -1053,10 +1028,10 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'terminate batch_create if error' do
-    person = Factory(:person)
-    creator = Factory(:person)
+    person = FactoryBot.create(:person)
+    creator = FactoryBot.create(:person)
     login_as(person)
-    type = Factory(:patient_sample_type)
+    type = FactoryBot.create(:patient_sample_type)
     assert_difference('Sample.count', 0) do
         post :batch_create, params: {data:[
         {ex_id: "1",data:{type: "samples", attributes:{attribute_map:{"full name": 'Fred Smith', "age": '22', "weight": '22.1' ,"postcode": 'M13 9PL'}},
@@ -1074,8 +1049,8 @@ class SamplesControllerTest < ActionController::TestCase
 
 
   test 'batch_update' do
-    login_as(Factory(:person))
-    creator = Factory(:person)
+    login_as(FactoryBot.create(:person))
+    creator = FactoryBot.create(:person)
     sample1 = populated_patient_sample
     sample2 = populated_patient_sample
     type_id1 = sample1.sample_type.id
@@ -1113,9 +1088,9 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'batch_delete' do
-    person = Factory(:person)
-    sample1 = Factory(:patient_sample, contributor: person)
-    sample2 = Factory(:patient_sample, contributor: person)
+    person = FactoryBot.create(:person)
+    sample1 = FactoryBot.create(:patient_sample, contributor: person)
+    sample2 = FactoryBot.create(:patient_sample, contributor: person)
     type1 = sample1.sample_type
     type2 = sample1.sample_type
     login_as(person.user)
@@ -1131,7 +1106,7 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'JS request does not raise CORS error' do
-    sample = Factory(:sample)
+    sample = FactoryBot.create(:sample)
     login_as(sample.contributor)
 
     assert_raises(ActionController::UnknownFormat) do
@@ -1148,8 +1123,8 @@ class SamplesControllerTest < ActionController::TestCase
 
   test 'should populate user projects in query form' do
     with_config_value(:sample_type_template_enabled, true) do
-      person = Factory(:person)
-      person.add_to_project_and_institution(Factory(:project), Factory(:institution))
+      person = FactoryBot.create(:person)
+      person.add_to_project_and_institution(FactoryBot.create(:project), FactoryBot.create(:institution))
       login_as(person)
 
       get :query_form
@@ -1162,12 +1137,12 @@ class SamplesControllerTest < ActionController::TestCase
 
   test 'should not return private samples with basic query' do
     with_config_value(:sample_type_template_enabled, true) do
-      person = Factory(:person)
-      template = Factory(:template)
-      sample_type = Factory(:simple_sample_type, template_id: template.id)
-      sample1 = Factory(:sample, sample_type: sample_type, contributor: person)
-      sample2 = Factory(:sample, sample_type: sample_type, contributor: person)
-      sample3 = Factory(:sample, sample_type: sample_type)
+      person = FactoryBot.create(:person)
+      template = FactoryBot.create(:template)
+      sample_type = FactoryBot.create(:simple_sample_type, template_id: template.id)
+      sample1 = FactoryBot.create(:sample, sample_type: sample_type, contributor: person)
+      sample2 = FactoryBot.create(:sample, sample_type: sample_type, contributor: person)
+      sample3 = FactoryBot.create(:sample, sample_type: sample_type)
 
       login_as(person)
 
@@ -1178,31 +1153,108 @@ class SamplesControllerTest < ActionController::TestCase
     end
   end
 
+  test 'create single linked sample' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    patient = FactoryBot.create(:patient_sample, contributor: person)
+    linked_sample_type = FactoryBot.create(:linked_sample_type, project_ids: [person.projects.first.id])
+    linked_sample_type.sample_attributes.last.linked_sample_type = patient.sample_type
+    linked_sample_type.save!
+
+    assert_difference('Sample.count') do
+      post :create, params: { sample: { sample_type_id: linked_sample_type.id,
+                                        data:{
+                                          "title": 'Single Sample',
+                                          "patient": ['', patient.id.to_s]
+                                        },
+                                        project_ids: [person.projects.first.id]} }
+    end
+    assert assigns(:sample)
+    sample = assigns(:sample)
+    assert_equal 'Single Sample', sample.title
+
+    assert_equal [patient], sample.linked_samples
+    assert_equal patient.id, sample.get_attribute_value(:patient)['id']
+
+  end
+
+  test 'create multi linked sample' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    patient = FactoryBot.create(:patient_sample, contributor: person)
+    patient2 = FactoryBot.create(:patient_sample, sample_type:patient.sample_type, contributor: person )
+    multi_linked_sample_type = FactoryBot.create(:multi_linked_sample_type, project_ids: [person.projects.first.id])
+    multi_linked_sample_type.sample_attributes.last.linked_sample_type = patient.sample_type
+    multi_linked_sample_type.save!
+
+    assert_difference('Sample.count') do
+      post :create, params: { sample: { sample_type_id: multi_linked_sample_type.id,
+                                        data:{
+                                          "title": 'Multiple Samples',
+                                          "patient": ['',patient.id.to_s, patient2.id.to_s]
+                                        },
+                                        project_ids: [person.projects.first.id]} }
+    end
+    assert assigns(:sample)
+    sample = assigns(:sample)
+    assert_equal 'Multiple Samples', sample.title
+
+    assert_equal [patient, patient2], sample.linked_samples
+    assert_equal [patient.id, patient2.id], sample.get_attribute_value(:patient).collect{|v| v['id']}
+
+  end
+
+  test 'validates against linking a private sample' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    patient = FactoryBot.create(:patient_sample, contributor: FactoryBot.create(:person), policy: FactoryBot.create(:private_policy))
+
+    multi_linked_sample_type = FactoryBot.create(:multi_linked_sample_type, project_ids: [person.projects.first.id])
+    multi_linked_sample_type.sample_attributes.last.linked_sample_type = patient.sample_type
+    multi_linked_sample_type.save!
+
+    refute patient.can_view?
+
+    assert_no_difference('Sample.count') do
+      post :create, params: { sample: { sample_type_id: multi_linked_sample_type.id,
+                                        data:{
+                                          "title": 'Multiple Samples',
+                                          "patient": ['',patient.id.to_s]
+                                        },
+                                        project_ids: [person.projects.first.id]} }
+    end
+    assert assigns(:sample)
+    refute assigns(:sample).valid?
+
+  end
+
   test 'should return max query result' do
     with_config_value(:sample_type_template_enabled, true) do
-      person = Factory(:person)
-      project = Factory(:project)
-
-      template1 = Factory(:isa_source_template)
-      template2 = Factory(:isa_sample_collection_template)
-      template3 = Factory(:isa_assay_template)
-
-      type1 = Factory(:isa_source_sample_type, contributor: person, project_ids: [project.id], isa_template: template1)
-      type2 = Factory(:isa_sample_collection_sample_type, contributor: person, project_ids: [project.id],
-                                                          isa_template: template2, linked_sample_type: type1)
-      type3 = Factory(:isa_assay_sample_type, contributor: person, project_ids: [project.id], isa_template: template3,
-                                              linked_sample_type: type2)
-
-      sample1 = Factory :sample, title: 'sample1', sample_type: type1, project_ids: [project.id], contributor: person,
-                                 data: { 'Source Name': 'Source Name', 'Source Characteristic 1': 'Source Characteristic 1', 'Source Characteristic 2': "Cox's Orange Pippin" }
-
-      sample2 = Factory :sample, title: 'sample2', sample_type: type2, project_ids: [project.id], contributor: person,
-                                 data: { Input: [sample1.id], 'sample collection': 'sample collection', 'sample collection parameter value 1': 'sample collection parameter value 1', 'Sample Name': 'sample name', 'sample characteristic 1': 'sample characteristic 1' }
-
-      sample3 = Factory :sample, title: 'sample3', sample_type: type3, project_ids: [project.id], contributor: person,
-                                 data: { Input: [sample2.id], 'Protocol Assay 1': 'Protocol Assay 1', 'Assay 1 parameter value 1': 'Assay 1 parameter value 1', 'Extract Name': 'Extract Name', 'other material characteristic 1': 'other material characteristic 1' }
+      person = FactoryBot.create(:person)
+      project = FactoryBot.create(:project)
 
       login_as(person)
+
+      template1 = FactoryBot.create(:isa_source_template)
+      template2 = FactoryBot.create(:isa_sample_collection_template)
+      template3 = FactoryBot.create(:isa_assay_template)
+
+      type1 = FactoryBot.create(:isa_source_sample_type, contributor: person, project_ids: [project.id], isa_template: template1)
+      type2 = FactoryBot.create(:isa_sample_collection_sample_type, contributor: person, project_ids: [project.id],
+                                                          isa_template: template2, linked_sample_type: type1)
+      type3 = FactoryBot.create(:isa_assay_sample_type, contributor: person, project_ids: [project.id], isa_template: template3,
+                                              linked_sample_type: type2)
+
+      sample1 = FactoryBot.create :sample, title: 'sample1', sample_type: type1, project_ids: [project.id], contributor: person,
+                                 data: { 'Source Name': 'Source Name', 'Source Characteristic 1': 'Source Characteristic 1', 'Source Characteristic 2': "Cox's Orange Pippin" }
+
+      sample2 = FactoryBot.create :sample, title: 'sample2', sample_type: type2, project_ids: [project.id], contributor: person,
+                                 data: { Input: [sample1.id], 'sample collection': 'sample collection', 'sample collection parameter value 1': 'sample collection parameter value 1', 'Sample Name': 'sample name', 'sample characteristic 1': 'sample characteristic 1' }
+
+      sample3 = FactoryBot.create :sample, title: 'sample3', sample_type: type3, project_ids: [project.id], contributor: person,
+                                 data: { Input: [sample2.id], 'Protocol Assay 1': 'Protocol Assay 1', 'Assay 1 parameter value 1': 'Assay 1 parameter value 1', 'Extract Name': 'Extract Name', 'other material characteristic 1': 'other material characteristic 1' }
+
+
 
       post :query, xhr: true, params: {
         project_ids: [project.id],
@@ -1253,17 +1305,129 @@ class SamplesControllerTest < ActionController::TestCase
     end
   end
 
+  test 'form hides private linked multi samples' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+
+    patient = FactoryBot.create(:patient_sample, contributor: person, policy: FactoryBot.create(:public_policy))
+    patient.set_attribute_value('full name','Public Patient')
+    patient.save!
+    patient2 = FactoryBot.create(:patient_sample, sample_type:patient.sample_type, contributor: person, policy: FactoryBot.create(:private_policy) )
+    patient2.set_attribute_value('full name','Private Patient')
+    patient2.save!
+    multi_linked_sample_type = FactoryBot.create(:multi_linked_sample_type, project_ids: [person.projects.first.id])
+    multi_linked_sample_type.sample_attributes.last.linked_sample_type = patient.sample_type
+    multi_linked_sample_type.save!
+
+    sample = Sample.create(sample_type: multi_linked_sample_type,
+                           data:{
+                              "title": 'Multiple Samples',
+                              "patient": [patient.id.to_s, patient2.id.to_s]
+                            },
+                           project_ids: [person.projects.first.id],
+                           policy: FactoryBot.create(:editing_public_policy)
+    )
+
+    person2 = FactoryBot.create(:person)
+    login_as(person2)
+    assert sample.can_edit?
+
+    get :edit, params: { id: sample.id }
+    assert_response :success
+
+    assert_select 'select#sample_data_patient' do
+      assert_select 'option[value=?]',patient.id, text:/Public Patient/, count:1
+      assert_select 'option[value=?]',patient2.id, text:/Hidden/, count:1
+      assert_select 'option[value=?]',patient2.id, text:/Private Patient/, count:0
+    end
+
+  end
+
+  test 'form hides private linked single sample' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+
+    patient = FactoryBot.create(:patient_sample, contributor: person, policy: FactoryBot.create(:private_policy) )
+    patient.set_attribute_value('full name','Private Patient')
+    patient.save!
+    linked_sample_type = FactoryBot.create(:linked_sample_type, project_ids: [person.projects.first.id])
+    linked_sample_type.sample_attributes.last.linked_sample_type = patient.sample_type
+    linked_sample_type.save!
+
+    sample = Sample.create(sample_type: linked_sample_type,
+                           data:{
+                             "title": 'Single linked sample',
+                             "patient": patient.id.to_s
+                           },
+                           project_ids: [person.projects.first.id],
+                           policy: FactoryBot.create(:editing_public_policy)
+    )
+
+    person2 = FactoryBot.create(:person)
+    login_as(person2)
+    assert sample.can_edit?
+
+    get :edit, params: { id: sample.id }
+    assert_response :success
+
+    assert_select 'select#sample_data_patient' do
+      assert_select 'option[value=?]',patient.id, text:/Hidden/, count:1
+      assert_select 'option[value=?]',patient.id, text:/Private Patient/, count:0
+    end
+
+  end
+
+  test 'typeahead' do
+    person = FactoryBot.create(:person)
+    sample1 = FactoryBot.create(:sample, title: 'sample1', contributor: person)
+    sample_type = sample1.sample_type
+
+    sample2 = FactoryBot.create(:sample, sample_type: sample_type, title: 'sample2')
+
+    login_as(person)
+    assert_equal sample1.sample_type, sample2.sample_type
+    assert sample1.can_view?
+    refute sample2.can_view?
+
+    get :typeahead, params:{ format: :json, linked_sample_type_id: sample_type.id, q:'samp'}
+    assert_response :success
+    res = JSON.parse(response.body)['results']
+
+    assert_equal 1, res.count
+    assert_equal 'sample1', res.first['text']
+
+  end
+
   private
 
   def populated_patient_sample
-    person = Factory(:person)
-    sample = Sample.new title: 'My Sample', policy: Factory(:public_policy),
+    person = FactoryBot.create(:person)
+    sample = Sample.new title: 'My Sample', policy: FactoryBot.create(:public_policy),
                         project_ids:person.projects.collect(&:id),contributor:person
-    sample.sample_type = Factory(:patient_sample_type)
+    sample.sample_type = FactoryBot.create(:patient_sample_type)
     sample.title = 'My sample'
     sample.set_attribute_value('full name', 'Fred Bloggs')
     sample.set_attribute_value(:age, 22)
     sample.save!
     sample
+  end
+
+  test 'unauthorized users should not do batch operations' do
+    sample = FactoryBot.create(:sample)
+
+    post :batch_create
+    assert_redirected_to :root
+    assert_not_nil flash[:error]
+
+    params = { data: [
+      { id: sample.id,
+        data: { type: 'samples',
+                attributes: { attribute_map: { "full name": 'Alfred Marcus', "age": '22', "weight": '22.1' } } } }
+    ] }
+    put :batch_update, params: params
+    assert_equal JSON.parse(response.body)['status'], 'unprocessable_entity'
+
+    delete :batch_delete, params: { data: [{ id: sample.id }] }
+    assert_equal JSON.parse(response.body)['status'], 'unprocessable_entity'
   end
 end

@@ -6,7 +6,7 @@ class StudiesExtractorTest < ActiveSupport::TestCase
     @zip_file = "#{Rails.root}/test/fixtures/files/study_batch.zip"
     user_uuid = 'user_uuid'
     @data_files, @studies = StudyBatchUpload.unzip_batch @zip_file, user_uuid
-     #Factory(:study_template_content_blob)
+     #FactoryBot.create(:study_template_content_blob)
   end
 
   test 'check extracted files' do
@@ -18,15 +18,15 @@ class StudiesExtractorTest < ActiveSupport::TestCase
 
     assert_same 3, data_files.count
     assert_same 1, studies.count
-    assert_same true, File.exists?("#{Rails.root}/tmp/#{user_uuid}_studies_upload/#{data_files.first.name}")
-    assert_same true, File.exists?("#{Rails.root}/tmp/#{user_uuid}_studies_upload/#{studies.first.name}")
+    assert_same true, File.exist?("#{Rails.root}/tmp/#{user_uuid}_studies_upload/#{data_files.first.name}")
+    assert_same true, File.exist?("#{Rails.root}/tmp/#{user_uuid}_studies_upload/#{studies.first.name}")
 
     FileUtils.rm_r("#{Rails.root}/tmp/#{user_uuid}_studies_upload/")
   end
 
   test 'read study file' do
 
-    Factory(:study_custom_metadata_type_for_MIAPPE)
+    FactoryBot.create(:study_custom_metadata_type_for_MIAPPE)
     user_uuid = 'user_uuid'
     studies_file = ContentBlob.new
     studies_file.tmp_io_object = File.open("#{Rails.root}/tmp/#{user_uuid}_studies_upload/#{@studies.first.name}")
@@ -39,7 +39,7 @@ class StudiesExtractorTest < ActiveSupport::TestCase
 
   test 'extract study correctly' do
     user_uuid = 'user_uuid'
-    Factory(:study_custom_metadata_type_for_MIAPPE)
+    FactoryBot.create(:study_custom_metadata_type_for_MIAPPE)
     studies_file = ContentBlob.new
     studies_file.tmp_io_object = File.open("#{Rails.root}/tmp/#{user_uuid}_studies_upload/#{@studies.first.name}")
     studies_file.original_filename = @studies.first.name.to_s
@@ -82,7 +82,7 @@ class StudiesExtractorTest < ActiveSupport::TestCase
 
   test 'get right licence from file' do
     user_uuid = 'user_uuid'
-    Factory(:study_custom_metadata_type_for_MIAPPE)
+    FactoryBot.create(:study_custom_metadata_type_for_MIAPPE)
     studies_file = ContentBlob.new
     studies_file.tmp_io_object = File.open("#{Rails.root}/tmp/#{user_uuid}_studies_upload/#{@studies.first.name}")
     studies_file.original_filename = @studies.first.name.to_s

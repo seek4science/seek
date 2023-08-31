@@ -3,11 +3,6 @@
 
 # includes some helper methods for commonly used fragament expirations
 module CommonSweepers
-  def expire_header_and_footer
-    expire_fragment(/header.*/)
-    expire_fragment(/footer.*/)
-  end
-
   def expire_download_activity
     expire_fragment(/download_activity.*/)
   end

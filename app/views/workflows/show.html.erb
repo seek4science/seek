@@ -21,7 +21,7 @@
           <% end %>
 
           <% if @display_workflow.test_status %>
-            <%= test_status_badge(@display_workflow.test_status) %>
+            <%= test_status_badge(@display_workflow) %>
           <% end %>
         </div>
 
@@ -77,7 +77,7 @@
     </div>
   <% end %>
 
-  <% if @display_workflow.is_git_versioned? %>
+  <% if @display_workflow.is_git_versioned? && @display_workflow.can_download? %>
     <%= tab_pane('files') do %>
       <%= render partial: 'git/files', locals: { resource: @workflow, git_version: @display_workflow } %>
     <% end %>

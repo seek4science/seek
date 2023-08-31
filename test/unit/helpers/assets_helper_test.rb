@@ -5,8 +5,8 @@ class AssetsHelperTest < ActionView::TestCase
     User.destroy_all
     assert User.all.blank?
 
-    @project = Factory :project
-    @user = Factory(:person,project:@project).user
+    @project = FactoryBot.create :project
+    @user = FactoryBot.create(:person,project:@project).user
   end
 
   test 'authorised assets' do
@@ -34,8 +34,8 @@ class AssetsHelperTest < ActionView::TestCase
   test 'submit button text' do
     new_assay = Assay.new
     new_model = Model.new
-    data_file = Factory(:data_file)
-    investigation = Factory(:investigation)
+    data_file = FactoryBot.create(:data_file)
+    investigation = FactoryBot.create(:investigation)
 
     assert_equal t('submit_button.create'), submit_button_text(new_assay)
     assert_equal t('submit_button.upload'), submit_button_text(new_model)
@@ -50,23 +50,23 @@ class AssetsHelperTest < ActionView::TestCase
                      slideshare_api_url,
                      'Content-Type' => 'application/json')
 
-    person = Factory(:admin)
+    person = FactoryBot.create(:admin)
     User.current_user = person.user
 
     # show something for presentation
-    pres = Factory(:presentation, policy: Factory(:public_policy))
+    pres = FactoryBot.create(:presentation, policy: FactoryBot.create(:public_policy))
     pres.content_blob.url = slideshare_url
     pres.content_blob.save!
     refute rendered_asset_view(pres).blank?
 
     # nothing  for private
-    pres = Factory(:presentation, policy: Factory(:private_policy))
+    pres = FactoryBot.create(:presentation, policy: FactoryBot.create(:private_policy))
     pres.content_blob.url = slideshare_url
     pres.content_blob.save!
     assert rendered_asset_view(pres).blank?
 
     # nothing  for none slideshare
-    pres = Factory(:presentation, content_blob: Factory(:binary_content_blob), policy: Factory(:public_policy))
+    pres = FactoryBot.create(:presentation, content_blob: FactoryBot.create(:binary_content_blob), policy: FactoryBot.create(:public_policy))
     assert rendered_asset_view(pres).blank?
   end
 
@@ -90,10 +90,10 @@ class AssetsHelperTest < ActionView::TestCase
 
 
   test 'request_contact_button_enabled?' do
-    @owner = Factory(:max_person)
-    presentation = Factory :ppt_presentation, contributor: @owner
-    requester = Factory(:person, first_name: 'Aaron', last_name: 'Spiggle')
-    sop = Factory(:sop, projects: [@project],contributor: nil)
+    @owner = FactoryBot.create(:max_person)
+    presentation = FactoryBot.create :ppt_presentation, contributor: @owner
+    requester = FactoryBot.create(:person, first_name: 'Aaron', last_name: 'Spiggle')
+    sop = FactoryBot.create(:sop, projects: [@project],contributor: nil)
     sop.contributor= nil
 
     with_config_value(:email_enabled,true) do
@@ -149,7 +149,7 @@ class AssetsHelperTest < ActionView::TestCase
       assert_equal 2, authorised.count
       assert_equal %w(B D), authorised.collect(&:title).sort
 
-      authorised = authorised_assets Sop, Factory(:project)
+      authorised = authorised_assets Sop, FactoryBot.create(:project)
       assert_empty authorised
 
       authorised = authorised_assets Sop, nil, 'manage'
@@ -168,7 +168,7 @@ class AssetsHelperTest < ActionView::TestCase
       assert_equal %w(A B), authorised.collect(&:title).sort
     end
 
-    User.with_current_user(Factory(:user)) do
+    User.with_current_user(FactoryBot.create(:user)) do
       authorised = authorised_assets DataFile, nil, 'download'
       assert_equal 2, authorised.count
       assert_equal %w(A B), authorised.collect(&:title).sort
@@ -180,7 +180,7 @@ class AssetsHelperTest < ActionView::TestCase
   end
 
   test 'add_new_item_to_options filters disabled' do
-    publication = Factory(:publication)
+    publication = FactoryBot.create(:publication)
     with_config_value(:data_files_enabled, true) do
       options = []
       add_new_item_to_options(publication) do |text, path|
@@ -205,7 +205,7 @@ class AssetsHelperTest < ActionView::TestCase
   end
 
   def create_a_bunch_of_assets
-    other_person = Factory :person
+    other_person = FactoryBot.create :person
     disable_authorization_checks do
       Sop.delete_all
       DataFile.delete_all
@@ -213,13 +213,13 @@ class AssetsHelperTest < ActionView::TestCase
     assert Sop.all.blank?
     assert DataFile.all.blank?
     assets = []
-    assets << Factory(:sop, title: 'A', contributor: other_person, policy: Factory(:public_policy))
-    assets << Factory(:sop, title: 'B', contributor: @user.person, policy: Factory(:private_policy))
-    assets << Factory(:sop, title: 'C', contributor: other_person, policy: Factory(:private_policy))
-    assets << Factory(:sop, title: 'D', contributor: @user.person, policy: Factory(:publicly_viewable_policy))
-    assets << Factory(:sop, title: 'E', contributor: other_person, policy: Factory(:publicly_viewable_policy))
-    assets << Factory(:data_file, title: 'A', contributor: @user.person, policy: Factory(:downloadable_public_policy))
-    assets << Factory(:data_file, title: 'B', contributor: other_person, policy: Factory(:downloadable_public_policy))
+    assets << FactoryBot.create(:sop, title: 'A', contributor: other_person, policy: FactoryBot.create(:public_policy))
+    assets << FactoryBot.create(:sop, title: 'B', contributor: @user.person, policy: FactoryBot.create(:private_policy))
+    assets << FactoryBot.create(:sop, title: 'C', contributor: other_person, policy: FactoryBot.create(:private_policy))
+    assets << FactoryBot.create(:sop, title: 'D', contributor: @user.person, policy: FactoryBot.create(:publicly_viewable_policy))
+    assets << FactoryBot.create(:sop, title: 'E', contributor: other_person, policy: FactoryBot.create(:publicly_viewable_policy))
+    assets << FactoryBot.create(:data_file, title: 'A', contributor: @user.person, policy: FactoryBot.create(:downloadable_public_policy))
+    assets << FactoryBot.create(:data_file, title: 'B', contributor: other_person, policy: FactoryBot.create(:downloadable_public_policy))
     assets
   end
 end

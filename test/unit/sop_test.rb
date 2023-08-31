@@ -5,7 +5,7 @@ class SopTest < ActiveSupport::TestCase
   fixtures :all
 
   def setup
-    @person = Factory(:person)
+    @person = FactoryBot.create(:person)
     @project = @person.projects.first
     @user = @person.user
   end
@@ -17,9 +17,9 @@ class SopTest < ActiveSupport::TestCase
   end
 
   test 'to_rdf' do
-    @person.add_to_project_and_institution(Factory(:project),Factory(:institution))
-    object = Factory :sop, description: 'An excellent SOP', contributor:@person, assay_ids: [Factory(:assay).id]
-    Factory :assets_creator, asset: object, creator: Factory(:person)
+    @person.add_to_project_and_institution(FactoryBot.create(:project),FactoryBot.create(:institution))
+    object = FactoryBot.create :sop, description: 'An excellent SOP', contributor:@person, assay_ids: [FactoryBot.create(:assay).id]
+    FactoryBot.create :assets_creator, asset: object, creator: FactoryBot.create(:person)
 
     object = Sop.find(object.id)
     refute_empty object.creators
@@ -37,15 +37,15 @@ class SopTest < ActiveSupport::TestCase
   end
 
   def test_title_trimmed
-    sop = Factory(:sop, title: ' test sop')
+    sop = FactoryBot.create(:sop, title: ' test sop')
     assert_equal('test sop', sop.title)
   end
 
   test 'validation' do
-    asset = Sop.new title: 'fred', projects: [projects(:sysmo_project)], policy: Factory(:private_policy)
+    asset = Sop.new title: 'fred', projects: [projects(:sysmo_project)], policy: FactoryBot.create(:private_policy)
     assert asset.valid?
 
-    asset = Sop.new projects: [projects(:sysmo_project)], policy: Factory(:private_policy)
+    asset = Sop.new projects: [projects(:sysmo_project)], policy: FactoryBot.create(:private_policy)
     assert !asset.valid?
   end
 
@@ -74,7 +74,7 @@ class SopTest < ActiveSupport::TestCase
 
   test 'policy defaults to system default' do
     with_config_value 'default_all_visitors_access_type', Policy::NO_ACCESS do
-      sop = Factory.build(:sop)
+      sop = FactoryBot.build(:sop)
       refute sop.persisted?
       sop.save!
       sop.reload
@@ -86,7 +86,7 @@ class SopTest < ActiveSupport::TestCase
   end
 
   def test_version_created_for_new_sop
-    sop = Factory(:sop)
+    sop = FactoryBot.create(:sop)
 
     sop = Sop.find(sop.id)
 
@@ -111,7 +111,7 @@ class SopTest < ActiveSupport::TestCase
   end
 
   def test_create_new_version
-    sop = Factory(:sop, title:'My First Favourite SOP')
+    sop = FactoryBot.create(:sop, title:'My First Favourite SOP')
     User.current_user = sop.contributor
     sop.save!
     sop = Sop.find(sop.id)
@@ -151,8 +151,8 @@ class SopTest < ActiveSupport::TestCase
   test 'assign projects' do
 
     User.with_current_user(@person.user) do
-      sop = Factory(:sop, projects: [@project],contributor:@person)
-      another_project = Factory(:project)
+      sop = FactoryBot.create(:sop, projects: [@project],contributor:@person)
+      another_project = FactoryBot.create(:project)
       @person.add_to_project_and_institution(another_project,@person.institutions.first)
       projects = [@project, another_project]
       sop.update(project_ids: projects.map(&:id))
@@ -169,7 +169,7 @@ class SopTest < ActiveSupport::TestCase
   end
 
   test 'versions destroyed as dependent' do
-    sop = Factory(:sop)
+    sop = FactoryBot.create(:sop)
     assert_equal 1, sop.versions.size, 'There should be 1 version of this SOP'
     assert_difference(['Sop.count', 'Sop::Version.count'], -1) do
       User.current_user = sop.contributor.user
@@ -178,7 +178,7 @@ class SopTest < ActiveSupport::TestCase
   end
 
   test 'make sure content blob is preserved after deletion' do
-    sop = Factory(:sop)
+    sop = FactoryBot.create(:sop)
     assert_not_nil sop.content_blob, 'Must have an associated content blob for this test to work'
     cb = sop.content_blob
     assert_difference('Sop.count', -1) do
@@ -206,15 +206,15 @@ class SopTest < ActiveSupport::TestCase
   end
 
   test 'contributing_user' do
-    sop = Factory :sop
+    sop = FactoryBot.create :sop
     assert sop.contributor
     assert_equal sop.contributor.user, sop.contributing_user
     assert_equal sop.contributor.user, sop.latest_version.contributing_user
   end
 
   test 'new version sets appropriate contributor' do
-    user = Factory(:person).user
-    sop = Factory(:sop, policy: Factory(:public_policy))
+    user = FactoryBot.create(:person).user
+    sop = FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy))
     User.current_user = user
 
     assert_not_equal user, sop.contributor.user
@@ -229,8 +229,8 @@ class SopTest < ActiveSupport::TestCase
   end
 
   test 'contributors method on versioned asset' do
-    user = Factory(:person).user
-    sop = Factory(:sop, policy: Factory(:public_policy))
+    user = FactoryBot.create(:person).user
+    sop = FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy))
     User.current_user = user
 
     assert_not_equal user, sop.contributor.user
@@ -245,7 +245,7 @@ class SopTest < ActiveSupport::TestCase
   end
 
   test 'sets default version visibility' do
-    sop = Factory(:sop)
+    sop = FactoryBot.create(:sop)
     disable_authorization_checks do
       sop.save_as_new_version('Updated sop as part of a test')
     end
@@ -257,7 +257,7 @@ class SopTest < ActiveSupport::TestCase
   end
 
   test 'gets and sets version visibility' do
-    sop = Factory(:sop)
+    sop = FactoryBot.create(:sop)
     disable_authorization_checks do
       sop.save_as_new_version('Updated sop as part of a test')
     end
@@ -276,7 +276,7 @@ class SopTest < ActiveSupport::TestCase
   end
 
   test 'lists visible versions' do
-    sop = Factory(:sop)
+    sop = FactoryBot.create(:sop)
     pub, reg, priv = nil
 
     disable_authorization_checks do
@@ -302,7 +302,7 @@ class SopTest < ActiveSupport::TestCase
     refute priv.visible?(nil)
     assert_equal [pub].sort, sop.visible_versions(nil).sort
 
-    registered_user = Factory(:person).user
+    registered_user = FactoryBot.create(:person).user
     assert pub.visible?(registered_user)
     assert reg.visible?(registered_user)
     refute priv.visible?(registered_user)
@@ -317,7 +317,7 @@ class SopTest < ActiveSupport::TestCase
   end
 
   test 'can change visibility?' do
-    sop = Factory(:sop)
+    sop = FactoryBot.create(:sop)
     disable_authorization_checks do
       sop.save_as_new_version('This version has a DOI')
       sop.latest_version.update_column(:doi, '10.5072/test_doi')
@@ -343,24 +343,4 @@ class SopTest < ActiveSupport::TestCase
     refute v3.can_change_visibility?
   end
 
-  test 'should not destroy if sop has associated studies with single page enabled' do
-    person = Factory(:person)
-    with_config_value(:project_single_page_advanced_enabled, true) do
-      sop = Factory(:sop, contributor: person)
-      assert_equal true, sop.can_delete?(person)
-      study = Factory(:study, sop: sop)
-      disable_authorization_checks do
-        sop.study = study
-        sop.save!
-      end
-      assert_equal false, sop.can_delete?(person)
-    end
-    sop = Factory(:sop, contributor: person)
-    study = Factory(:study, sop: sop)
-    disable_authorization_checks do
-      sop.study = study
-      sop.save!
-    end
-    assert_equal true, sop.can_delete?(person)
-  end
 end

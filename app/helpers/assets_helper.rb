@@ -124,10 +124,8 @@ module AssetsHelper
       resource_type = resource_or_text.class.name
       text = if resource_or_text.is_a?(Assay)
                resource_or_text.is_modelling? ? t('assays.modelling_analysis') : t('assays.assay')
-             elsif !(translated = translate_resource_type(resource_type)).include?('translation missing')
-               translated
              else
-               resource_type.underscore.humanize
+               translate_resource_type(resource_type) || resource_type.underscore.humanize
              end
     end
     text

@@ -7,26 +7,26 @@ class SnapshotTest < ActiveSupport::TestCase
   fixtures :investigations
 
   setup do
-    contributor = Factory(:person)
+    contributor = FactoryBot.create(:person)
     User.current_user = contributor.user
 
-    @investigation = Factory(:investigation, title: 'i1', description: 'not blank',
-                                             policy: Factory(:downloadable_public_policy), contributor:contributor)
-    @study = Factory(:study, title: 's1', investigation: @investigation, contributor: @investigation.contributor,
-                             policy: Factory(:downloadable_public_policy))
-    @assay = Factory(:assay, title: 'a1', study: @study, contributor: @investigation.contributor,
-                             policy: Factory(:downloadable_public_policy))
-    @assay2 = Factory(:assay, title: 'a2', study: @study, contributor: @investigation.contributor,
-                              policy: Factory(:downloadable_public_policy))
-    @data_file = Factory(:data_file, title: 'df1', contributor: @investigation.contributor,
-                                     content_blob: Factory(:doc_content_blob, original_filename: 'word.doc'),
-                                     policy: Factory(:downloadable_public_policy))
-    @publication = Factory(:publication, title: 'p1', contributor: @investigation.contributor,
-                                         policy: Factory(:downloadable_public_policy))
+    @investigation = FactoryBot.create(:investigation, title: 'i1', description: 'not blank',
+                                             policy: FactoryBot.create(:downloadable_public_policy), contributor:contributor)
+    @study = FactoryBot.create(:study, title: 's1', investigation: @investigation, contributor: @investigation.contributor,
+                             policy: FactoryBot.create(:downloadable_public_policy))
+    @assay = FactoryBot.create(:assay, title: 'a1', study: @study, contributor: @investigation.contributor,
+                             policy: FactoryBot.create(:downloadable_public_policy))
+    @assay2 = FactoryBot.create(:assay, title: 'a2', study: @study, contributor: @investigation.contributor,
+                              policy: FactoryBot.create(:downloadable_public_policy))
+    @data_file = FactoryBot.create(:data_file, title: 'df1', contributor: @investigation.contributor,
+                                     content_blob: FactoryBot.create(:doc_content_blob, original_filename: 'word.doc'),
+                                     policy: FactoryBot.create(:downloadable_public_policy))
+    @publication = FactoryBot.create(:publication, title: 'p1', contributor: @investigation.contributor,
+                                         policy: FactoryBot.create(:downloadable_public_policy))
 
     @assay.associate(@data_file)
     @assay2.associate(@data_file)
-    Factory(:relationship, subject: @assay, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: @publication)
+    FactoryBot.create(:relationship, subject: @assay, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: @publication)
   end
 
   test 'snapshot number correctly set' do
@@ -307,7 +307,7 @@ class SnapshotTest < ActiveSupport::TestCase
   end
 
   test 'all_related_people handles case where contributor is deleted' do
-    sop = Factory(:sop, policy: Factory(:public_policy))
+    sop = FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy))
     disable_authorization_checks do
       sop.deleted_contributor = "#{sop.contributor.class}:#{sop.contributor.id}"
       sop.contributor = nil

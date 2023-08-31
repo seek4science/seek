@@ -1,8 +1,8 @@
 <% if @data_file || @sample_type || @template %>
   <% if @sample_type %>
-    <p>
-      Showing for Sample Type: <%= link_to @sample_type.title,@sample_type %>
-    </p>
+    <% unless Seek::Config.project_single_page_enabled %>
+      <p> Showing for Sample Type: <%= link_to @sample_type.title,@sample_type %> </p>
+    <% end %>
     <% resource_hash = get_related_resources(@sample_type) %>
     <% @total_count = resource_hash["Sample"][:items].count + resource_hash["Sample"][:hidden_count] %>
     <% @visible_count = resource_hash["Sample"][:items].count %>

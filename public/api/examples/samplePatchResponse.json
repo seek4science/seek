@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "8",
+    "id": "3",
     "type": "samples",
     "attributes": {
       "policy": {
@@ -12,18 +12,38 @@
       "discussion_links": [
 
       ],
-      "title": "changed title",
+      "title": "Fred Bloggs",
       "tags": [
 
       ],
-      "created_at": "2022-06-07T14:12:29.000Z",
-      "updated_at": "2022-06-07T14:12:30.000Z",
+      "created_at": "2023-03-06T15:24:15.832Z",
+      "updated_at": "2023-03-06T15:24:15.975Z",
       "creators": [
 
       ],
       "other_creators": null,
       "attribute_map": {
-        "the_title": "changed title"
+        "full_name": "Fred Bloggs",
+        "address": "ZZ",
+        "postcode": "M13 8PL",
+        "CAPITAL key": "changed",
+        "apple": "Granny Smith",
+        "apples": [
+          "Golden Delicious",
+          "Bramley"
+        ],
+        "patients": [
+          {
+            "id": 1,
+            "type": "Sample",
+            "title": "Fred Bloggs"
+          },
+          {
+            "id": 2,
+            "type": "Sample",
+            "title": "Fred Bloggs"
+          }
+        ]
       }
     },
     "relationships": {
@@ -35,21 +55,21 @@
       "submitter": {
         "data": [
           {
-            "id": "61",
+            "id": "2",
             "type": "people"
           }
         ]
       },
       "sample_type": {
         "data": {
-          "id": "13",
+          "id": "2",
           "type": "sample_types"
         }
       },
       "projects": {
         "data": [
           {
-            "id": "68",
+            "id": "2",
             "type": "projects"
           }
         ]
@@ -77,21 +97,21 @@
       "people": {
         "data": [
           {
-            "id": "61",
+            "id": "2",
             "type": "people"
           }
         ]
       }
     },
     "links": {
-      "self": "/samples/8"
+      "self": "/samples/3"
     },
     "meta": {
-      "created": "2022-06-07T14:12:29.000Z",
-      "modified": "2022-06-07T14:12:30.000Z",
+      "created": "2023-03-06T15:24:15.832Z",
+      "modified": "2023-03-06T15:24:15.975Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "ca41f520-c899-013a-0f7e-0a81884ed284"
+      "uuid": "e133a800-9e60-013b-15a0-0a81884ed284"
     }
   },
   "jsonapi": {

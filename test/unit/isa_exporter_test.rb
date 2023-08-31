@@ -2,43 +2,44 @@ require 'test_helper'
 
 class IsaExporterTest < ActionController::TestCase
   test 'find sample origin' do
-    controller = IsaExporter::Exporter.new Factory(:investigation)
-    project = Factory(:project)
+    controller = IsaExporter::Exporter.new FactoryBot.create(:investigation)
+    project = FactoryBot.create(:project)
 
-    type_1 = Factory(:simple_sample_type, project_ids: [project.id])
-    type_2 = Factory(:multi_linked_sample_type, project_ids: [project.id])
+    type_1 = FactoryBot.create(:simple_sample_type, project_ids: [project.id])
+    type_2 = FactoryBot.create(:multi_linked_sample_type, project_ids: [project.id])
     type_2.sample_attributes.last.linked_sample_type = type_1
     type_2.save!
 
-    type_3 = Factory(:multi_linked_sample_type, project_ids: [project.id])
+    type_3 = FactoryBot.create(:multi_linked_sample_type, project_ids: [project.id])
     type_3.sample_attributes.last.linked_sample_type = type_2
     type_3.save!
 
-    type_4 = Factory(:multi_linked_sample_type, project_ids: [project.id])
+    type_4 = FactoryBot.create(:multi_linked_sample_type, project_ids: [project.id])
     type_4.sample_attributes.last.linked_sample_type = type_3
     type_4.save!
 
     # Create Samples
     parent =
-      Factory :sample,
+      FactoryBot.create :sample,
               title: 'PARENT 1',
               sample_type: type_1,
               project_ids: [project.id],
+              policy: FactoryBot.create(:public_policy),
               data: {
           the_title: 'PARENT 1'
               }
 
-    child_1 = Sample.new(sample_type: type_2, project_ids: [project.id])
+    child_1 = Sample.new(sample_type: type_2, project_ids: [project.id], policy:FactoryBot.create(:public_policy))
     child_1.set_attribute_value(:patient, [parent.id])
     child_1.set_attribute_value(:title, 'CHILD 1')
     child_1.save!
 
-    child_2 = Sample.new(sample_type: type_3, project_ids: [project.id])
+    child_2 = Sample.new(sample_type: type_3, project_ids: [project.id], policy:FactoryBot.create(:public_policy))
     child_2.set_attribute_value(:patient, [child_1.id])
     child_2.set_attribute_value(:title, 'CHILD 2')
     child_2.save!
 
-    child_3 = Sample.new(sample_type: type_4, project_ids: [project.id])
+    child_3 = Sample.new(sample_type: type_4, project_ids: [project.id], policy:FactoryBot.create(:public_policy))
     child_3.set_attribute_value(:patient, [child_2.id])
     child_3.set_attribute_value(:title, 'CHILD 3')
     child_3.save!
@@ -50,10 +51,11 @@ class IsaExporterTest < ActionController::TestCase
 
     # Create another parent for child 1
     parent_2 =
-      Factory :sample,
+      FactoryBot.create :sample,
               title: 'PARENT 2',
               sample_type: type_1,
               project_ids: [project.id],
+              policy:FactoryBot.create(:public_policy),
               data: {
           the_title: 'PARENT 2'
               }

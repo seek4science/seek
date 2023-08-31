@@ -3,7 +3,7 @@ require 'test_helper'
 class ObservedVariableSetsTest < ActiveSupport::TestCase
     
     test 'factory' do
-        set = Factory.build(:observed_variable_set, title: 'my set')
+        set = FactoryBot.build(:observed_variable_set, title: 'my set')
         assert_equal 'my set', set.title 
         refute_nil set.contributor       
         assert_difference('ObservedVariableSet.count') do
@@ -16,7 +16,7 @@ class ObservedVariableSetsTest < ActiveSupport::TestCase
 
         assert_difference('ObservedVariableSet.count') do
             assert_difference('ObservedVariable.count', 1) do
-                Factory(:observed_variable_set)
+                FactoryBot.create(:observed_variable_set)
             end
         end
     end

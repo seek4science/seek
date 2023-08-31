@@ -73,6 +73,7 @@ class StudiesController < ApplicationController
       update_sharing_policies @study
       update_annotations(params[:tag_list], @study)
       update_relationships(@study, params)
+      update_linked_custom_metadatas @study
 
       respond_to do |format|
         if @study.save
@@ -102,6 +103,8 @@ class StudiesController < ApplicationController
     update_sharing_policies @study
     update_annotations(params[:tag_list], @study)
     update_relationships(@study, params)
+    update_linked_custom_metadatas @study
+
     ### TO DO: what about validation of person responsible? is it already included (for json?)
     if @study.save
       respond_to do |format|
@@ -115,7 +118,7 @@ class StudiesController < ApplicationController
         format.json { render json: json_api_errors(@study), status: :unprocessable_entity }
       end
     end
-  end  
+  end
 
   def check_assays_are_for_this_study
     study_id = params[:id]
@@ -186,7 +189,7 @@ class StudiesController < ApplicationController
 
   def batch_create
     # create method will be called for each study
-    # e.g: Study.new(title: 'title', investigation: investigations(:metabolomics_investigation), policy: Factory(:private_policy))
+    # e.g: Study.new(title: 'title', investigation: investigations(:metabolomics_investigation), policy: FactoryBot.create(:private_policy))
     # study.policy = Policy.create(name: 'default policy', access_type: 1)
     # render plain: params[:studies].inspect
     metadata_types = CustomMetadataType.where(title: 'MIAPPE metadata', supported_type: 'Study').last
@@ -337,9 +340,7 @@ class StudiesController < ApplicationController
         AssayAsset.where(assay_id: assay.id).delete_all
       end
       assays.delete_all
-
     end
-
   end
 
   private

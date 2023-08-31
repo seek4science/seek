@@ -6,53 +6,99 @@ module SamplesHelper
     attribute_form_element(attribute, resource, element_name, element_class)
   end
 
-  def controlled_vocab_form_field(sample_controlled_vocab, element_name, values, limit=1)
-    if sample_controlled_vocab.sample_controlled_vocab_terms.count < Seek::Config.cv_dropdown_limit && sample_controlled_vocab.source_ontology.blank?
-      options = options_from_collection_for_select(
-        sample_controlled_vocab.sample_controlled_vocab_terms,
-        :label, :label,
-        values
-      )
-      select_tag element_name,
-                 options,
-                 class: "form-control",
-                 include_blank: ""
-    else
-      scv_id = sample_controlled_vocab.id
-      is_ontology = sample_controlled_vocab.source_ontology.present?
-      object_struct = Struct.new(:id, :name)
-      existing_objects = Array(values).collect do |value|
-        object_struct.new(value, value)
-      end
-      objects_input(element_name, existing_objects,
-                    typeahead: { query_url: typeahead_sample_controlled_vocabs_path + "?query=%QUERY&scv_id=#{scv_id}", 
-                    handlebars_template: 'typeahead/controlled_vocab_term' }, 
-                    limit: limit, ontology: is_ontology)
-    end
-  end
-
-  def controlled_vocab_list_form_field(sample_controlled_vocab, element_name, values)
+  def controlled_vocab_form_field(sample_controlled_vocab, element_name, values, limit = 1)
 
     scv_id = sample_controlled_vocab.id
-    is_ontology = sample_controlled_vocab.source_ontology.present?
-    object_struct = Struct.new(:id, :name)
+    object_struct = Struct.new(:id, :title)
     existing_objects = Array(values).collect do |value|
       object_struct.new(value, value)
     end
+
+    typeahead = { handlebars_template: 'typeahead/controlled_vocab_term' }
+
+    if sample_controlled_vocab.sample_controlled_vocab_terms.count < Seek::Config.cv_dropdown_limit
+      values = sample_controlled_vocab.sample_controlled_vocab_terms.collect do |term|
+        {
+          id: term.label,
+          text: term.label,
+          iri: term.iri
+        }
+      end
+      typeahead[:values] = values
+    else
+      typeahead[:query_url] = typeahead_sample_controlled_vocabs_path + "?scv_id=#{scv_id}"
+    end
+
     objects_input(element_name, existing_objects,
-                  typeahead: { query_url: typeahead_sample_controlled_vocabs_path + "?query=%QUERY&scv_id=#{scv_id}",
-                               handlebars_template: 'typeahead/controlled_vocab_term' }, ontology: is_ontology
-    )
+                  typeahead: typeahead,
+                  limit: limit,
+                  allow_new: sample_controlled_vocab.custom_input?,
+                  class: 'form-control')
+
   end
 
-  def sample_multi_form_field(attribute, element_name, value)  
+  def controlled_vocab_list_form_field(sample_controlled_vocab, element_name, values)
+    controlled_vocab_form_field(sample_controlled_vocab, element_name, values, nil)
+  end
+
+  def linked_custom_metadata_form_field(attribute,resource,element_name, element_class,depth)
+    linked_cms = resource.linked_custom_metadatas.select{|cm|cm.custom_metadata_attribute==attribute}
+
+    id = linked_cms.blank? ? nil : linked_cms.select{|cm| cm.custom_metadata_type.id == attribute.linked_custom_metadata_type.id}.first.id
+
+    html = ''
+    html +=  hidden_field_tag "#{element_name}[id]",id
+    html +=  hidden_field_tag "#{element_name}[custom_metadata_type_id]", attribute.linked_custom_metadata_type.id
+    html +=  hidden_field_tag "#{element_name}[custom_metadata_attribute_id]", attribute.id
+
+    attribute.linked_custom_metadata_type.custom_metadata_attributes.each do |attr|
+      linked_cm = linked_cms.select{|cm| cm.custom_metadata_type_id == attr.custom_metadata_type_id}.first
+      linked_cm ||= CustomMetadata.new(:custom_metadata_type_id => attr.custom_metadata_type_id)
+
+      attr_element_name = "#{element_name}][data][#{attr.title}]"
+      html += '<div class="form-group"><label>'+attr.label+'</label>'
+      html +=  required_span if attr.required?
+      if attr.linked_custom_metadata?
+        html += '<div class="form-group linked_custom_metdata_'+(depth.even? ? 'even' : 'odd')+'">'
+        html +=  attribute_form_element(attr, linked_cm, attr_element_name, element_class,depth+1)
+        html += '</div>'
+      else
+        html +=  attribute_form_element(attr, linked_cm, attr_element_name, element_class)
+      end
+
+      unless attr.description.nil?
+        html += custom_metadata_attribute_description(attr.description)
+      end
+      html += '</div>'
+    end
+
+    html.html_safe
+  end
+
+  def sample_form_field(attribute, element_name, value, limit = 1)
+
     existing_objects = []
-    str = Struct.new(:id, :name)
-    value.each {|v| existing_objects << str.new(v[:id], v[:title]) if v} if value
+    str = Struct.new(:id, :title)
+    if value
+      value = [value] unless value.is_a?(Array)
+      value.compact.each do |v|
+        id = v[:id]
+        title = v[:title]
+        title = '<em>Hidden</em>' unless Sample.find(id).can_view?
+        existing_objects << str.new(id, title)
+      end
+    end
+
+    typeahead = { query_url: typeahead_samples_path + "?linked_sample_type_id=#{attribute.linked_sample_type.id}",
+                  handlebars_template: 'typeahead/controlled_vocab_term' }
     objects_input(element_name, existing_objects,
-                  typeahead: { query_url: typeahead_samples_path + "?query=%QUERY&linked_sample_type_id=#{attribute.linked_sample_type.id}", 
-                  handlebars_template: 'typeahead/controlled_vocab_term' }, 
-                  limit: 5)
+                  typeahead: typeahead,
+                  limit: limit,
+                  class: 'form-control')
+  end
+
+  def sample_multi_form_field(attribute, element_name, value)
+    sample_form_field(attribute, element_name, value, nil)
   end
 
   def authorised_samples(projects = nil)
@@ -94,6 +140,8 @@ module SamplesHelper
         seek_cv_attribute_display(value, attribute)
       when Seek::Samples::BaseType::CV_LIST
         value.each{|v| seek_cv_attribute_display(v, attribute) }.join(', ')
+      when Seek::Samples::BaseType::LINKED_CUSTOM_METADATA
+        linked_custom_metadata_attribute_display(value)
       else
         default_attribute_display(attribute, options, sample, value)
       end
@@ -103,10 +151,23 @@ module SamplesHelper
   def seek_cv_attribute_display(value, attribute)
     term = attribute.sample_controlled_vocab.sample_controlled_vocab_terms.where(label:value).last
     content = value
-    if term && term.iri
+    if term && term.iri.present?
       content << " (#{term.iri}) "
     end
     content
+  end
+
+  def linked_custom_metadata_attribute_display(value)
+    html = ''
+    html += '<ul>'
+       CustomMetadata.find(value.id).custom_metadata_attributes.each do |attr|
+       html += '<li>'
+         html += '<label>'+attr.title+'</label>'+' : '
+         html += display_attribute(value,attr)
+       html += '</li>'
+      end
+    html += '</ul>'
+    html.html_safe
   end
 
   def seek_sample_attribute_display(value)
@@ -161,6 +222,8 @@ module SamplesHelper
 
   # link for the sample type for the provided sample. Handles a referring_sample_id if required
   def sample_type_link(sample, user=User.current_user)
+    return nil if Seek::Config.project_single_page_advanced_enabled && !sample.sample_type.template_id.nil?
+
     if (sample.sample_type.can_view?(user))
       link_to sample.sample_type.title,sample.sample_type
     else
@@ -219,7 +282,7 @@ module SamplesHelper
 
   private
 
-  def attribute_form_element(attribute, resource, element_name, element_class )
+  def attribute_form_element(attribute, resource, element_name, element_class, depth=1)
     value = resource.get_attribute_value(attribute.title)
     placeholder = "e.g. #{attribute.sample_attribute_type.placeholder}" unless attribute.sample_attribute_type.placeholder.blank?
 
@@ -261,15 +324,16 @@ module SamplesHelper
     when Seek::Samples::BaseType::CV_LIST
       controlled_vocab_list_form_field attribute.sample_controlled_vocab, element_name, value
     when Seek::Samples::BaseType::SEEK_SAMPLE
-      terms = attribute.linked_sample_type.samples.authorized_for('view').to_a
-      options = options_from_collection_for_select(terms, :id, :title, value.try(:[], 'id'))
-      select_tag element_name, options,
-                 include_blank: !attribute.required?, class: "form-control #{element_class}"
+      sample_form_field attribute, element_name, value
     when Seek::Samples::BaseType::SEEK_SAMPLE_MULTI
       sample_multi_form_field attribute, element_name, value
+    when Seek::Samples::BaseType::LINKED_CUSTOM_METADATA
+      linked_custom_metadata_form_field attribute, resource, element_name, element_class,depth
     else
       text_field_tag element_name, value, class: "form-control #{element_class}", placeholder: placeholder
     end
   end
 
 end
+
+

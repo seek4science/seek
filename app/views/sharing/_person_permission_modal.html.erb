@@ -5,7 +5,7 @@
     <%= modal_body do %>
         <div class="form-group">
           <label>The following <%= t('person').pluralize %>...</label>
-          <%= objects_input('permission-people-ids', [], typeahead: { values: Person.all.map { |p| { id: p.id, name: p.name, hint: p.typeahead_hint } } }, name: nil) -%>
+          <%= objects_input('permission-people-ids', [], typeahead: { values: Person.all.map { |p| { id: p.id, text: p.name, hint: p.typeahead_hint } } }, name: nil) -%>
           <p class="help-block">Start typing a <%= t('person') %>'s name and select from the list that appears. You can select multiple <%= t('person').pluralize %>.</p>
         </div>
         <div class="form-group">
@@ -23,27 +23,30 @@
 <% end %>
 
 <script>
-  // Display person modal
-  $j('#add-person-permission-button').click(function () {
-    $j('#add-person-permission-modal').modal('show');
-    $j('#permission-people-ids').tagsinput('focus');
+    // Display person modal
+    $j('#add-person-permission-button').click(function () {
+        $j('#add-person-permission-modal').modal('show');
+        $j('select#permission-people-ids').focus();
 
-    return false;
-  });
-
-  // Add a person permission to the table
-  $j('#permission-people-confirm').click(function () {
-    var people = $j('#permission-people-ids').tagsinput('items');
-
-    people.forEach(function (person, index) {
-      Sharing.addPermission(
-          { contributor_type: 'Person',
-            contributor_id: parseInt(person.id),
-            title: person.name,
-            access_type: parseInt($j('#permission-people-access-type').val()) });
+        return false;
     });
 
-    // Reset form
-    $j('#permission-people-ids').tagsinput('removeAll');
-  });
+    // Add a person permission to the table
+    $j('#permission-people-confirm').click(function () {
+        let people = $j('select#permission-people-ids').select2('data');
+
+        people.forEach(function (person, index) {
+            Sharing.addPermission(
+                {
+                    contributor_type: 'Person',
+                    contributor_id: parseInt(person.id),
+                    title: person.text,
+                    access_type: parseInt($j('#permission-people-access-type').val())
+                });
+        });
+
+        // Reset form
+        $j('select#permission-people-ids').val([]).change();
+        $j('#permission-people-access-type').val('<%= Policy::ACCESSIBLE %>').change();
+    });
 </script>

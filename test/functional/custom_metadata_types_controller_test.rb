@@ -5,9 +5,9 @@ class CustomMetadataTypesControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
 
   test 'get form fields' do
-    cmt = Factory(:simple_investigation_custom_metadata_type)
+    cmt = FactoryBot.create(:simple_investigation_custom_metadata_type)
 
-    login_as(Factory(:person))
+    login_as(FactoryBot.create(:person))
 
     get :form_fields, params:{id:cmt.id}
 
@@ -18,8 +18,8 @@ class CustomMetadataTypesControllerTest < ActionController::TestCase
   end
 
   test 'show help text' do
-    cmt = Factory(:simple_investigation_custom_metadata_type_with_description_and_label)
-    login_as(Factory(:person))
+    cmt = FactoryBot.create(:simple_investigation_custom_metadata_type_with_description_and_label)
+    login_as(FactoryBot.create(:person))
     get :form_fields, params:{id:cmt.id}
     assert_select 'small', 'You need to enter age.'
     assert_select 'small', 1

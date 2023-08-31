@@ -14,7 +14,7 @@ module Ga4gh
         end
 
         test 'should list workflows as tools' do
-          workflow = Factory(:workflow, policy: Factory(:public_policy))
+          workflow = FactoryBot.create(:workflow, policy: FactoryBot.create(:public_policy))
           assert workflow.can_view?
 
           get :index
@@ -25,7 +25,7 @@ module Ga4gh
         end
 
         test 'should not list private workflows' do
-          workflow = Factory(:workflow, policy: Factory(:private_policy))
+          workflow = FactoryBot.create(:workflow, policy: FactoryBot.create(:private_policy))
           refute workflow.can_view?
 
           get :index
@@ -36,7 +36,7 @@ module Ga4gh
         end
 
         test 'should get workflow as tool' do
-          workflow = Factory(:workflow, policy: Factory(:public_policy))
+          workflow = FactoryBot.create(:workflow, policy: FactoryBot.create(:public_policy))
           assert workflow.can_view?
 
           get :show, params: { id: workflow.id }
@@ -54,7 +54,7 @@ module Ga4gh
         end
 
         test 'should throw not found error for private workflow' do
-          workflow = Factory(:workflow, policy: Factory(:private_policy))
+          workflow = FactoryBot.create(:workflow, policy: FactoryBot.create(:private_policy))
 
           get :show, params: { id: workflow.id }
 
@@ -66,9 +66,9 @@ module Ga4gh
 
         # Filtering
         test 'should filter workflows by name' do
-          w1 = Factory(:workflow, title: 'Cool Workflow', policy: Factory(:public_policy))
-          w2 = Factory(:workflow, title: 'Hot Workflow', policy: Factory(:public_policy))
-          w3 = Factory(:workflow, title: 'Cooler Workflow', policy: Factory(:public_policy))
+          w1 = FactoryBot.create(:workflow, title: 'Cool Workflow', policy: FactoryBot.create(:public_policy))
+          w2 = FactoryBot.create(:workflow, title: 'Hot Workflow', policy: FactoryBot.create(:public_policy))
+          w3 = FactoryBot.create(:workflow, title: 'Cooler Workflow', policy: FactoryBot.create(:public_policy))
 
           get :index, params: { name: 'cool' }
 
@@ -95,9 +95,9 @@ module Ga4gh
         end
 
         test 'should filter workflows by description' do
-          w1 = Factory(:workflow, description: 'A very cool Workflow indeed!', policy: Factory(:public_policy))
-          w2 = Factory(:workflow, description: 'A very hot Workflow indeed!', policy: Factory(:public_policy))
-          w3 = Factory(:workflow, description: 'A very cooler Workflow indeed!', policy: Factory(:public_policy))
+          w1 = FactoryBot.create(:workflow, description: 'A very cool Workflow indeed!', policy: FactoryBot.create(:public_policy))
+          w2 = FactoryBot.create(:workflow, description: 'A very hot Workflow indeed!', policy: FactoryBot.create(:public_policy))
+          w3 = FactoryBot.create(:workflow, description: 'A very cooler Workflow indeed!', policy: FactoryBot.create(:public_policy))
 
           get :index, params: { description: 'cool' }
 
@@ -122,9 +122,9 @@ module Ga4gh
         end
 
         test 'should filter workflows by toolClass' do
-          w1 = Factory(:workflow, policy: Factory(:public_policy))
-          w2 = Factory(:workflow, policy: Factory(:public_policy))
-          w3 = Factory(:workflow, policy: Factory(:public_policy))
+          w1 = FactoryBot.create(:workflow, policy: FactoryBot.create(:public_policy))
+          w2 = FactoryBot.create(:workflow, policy: FactoryBot.create(:public_policy))
+          w3 = FactoryBot.create(:workflow, policy: FactoryBot.create(:public_policy))
 
           get :index, params: { toolClass: 'Workflow' }
 
@@ -143,9 +143,9 @@ module Ga4gh
         end
 
         test 'should filter workflows by descriptorType' do
-          w1 = Factory(:cwl_workflow, policy: Factory(:public_policy))
-          w2 = Factory(:existing_galaxy_ro_crate_workflow, policy: Factory(:public_policy))
-          w3 = Factory(:nf_core_ro_crate_workflow, policy: Factory(:public_policy))
+          w1 = FactoryBot.create(:cwl_workflow, policy: FactoryBot.create(:public_policy))
+          w2 = FactoryBot.create(:existing_galaxy_ro_crate_workflow, policy: FactoryBot.create(:public_policy))
+          w3 = FactoryBot.create(:nf_core_ro_crate_workflow, policy: FactoryBot.create(:public_policy))
 
           get :index, params: { descriptorType: 'CWL' }
 
@@ -176,11 +176,11 @@ module Ga4gh
         end
 
         test 'should filter workflows by organization' do
-          p1 = Factory(:project, title: 'MegaWorkflows')
-          p2 = Factory(:project, title: 'CovidSux')
-          w1 = Factory(:workflow, projects: [p1], policy: Factory(:public_policy))
-          w2 = Factory(:workflow, projects: [p2], policy: Factory(:public_policy))
-          w3 = Factory(:workflow, projects: [p1, p2], policy: Factory(:public_policy))
+          p1 = FactoryBot.create(:project, title: 'MegaWorkflows')
+          p2 = FactoryBot.create(:project, title: 'CovidSux')
+          w1 = FactoryBot.create(:workflow, projects: [p1], policy: FactoryBot.create(:public_policy))
+          w2 = FactoryBot.create(:workflow, projects: [p2], policy: FactoryBot.create(:public_policy))
+          w3 = FactoryBot.create(:workflow, projects: [p1, p2], policy: FactoryBot.create(:public_policy))
 
           get :index, params: { organization: 'CovidSux' }
 
@@ -206,12 +206,12 @@ module Ga4gh
         end
 
         test 'should filter workflows by author' do
-          p1 = Factory(:person, first_name: 'Bob', last_name: 'Lastname')
-          p2 = Factory(:person, first_name: 'Jane', last_name: 'Lastname')
-          w1 = Factory(:workflow, creators: [p1], other_creators: 'Sandra Testington, John Johnson', policy: Factory(:public_policy))
-          w2 = Factory(:workflow, creators: [p2], other_creators: 'Sandra Testington, Ivan Ivanov', policy: Factory(:public_policy))
-          w3 = Factory(:workflow, creators: [p1, p2], other_creators: 'Bob Lastname', policy: Factory(:public_policy))
-          w4 = Factory(:workflow, creators: [], other_creators: 'Bob Lastname', policy: Factory(:public_policy))
+          p1 = FactoryBot.create(:person, first_name: 'Bob', last_name: 'Lastname')
+          p2 = FactoryBot.create(:person, first_name: 'Jane', last_name: 'Lastname')
+          w1 = FactoryBot.create(:workflow, creators: [p1], other_creators: 'Sandra Testington, John Johnson', policy: FactoryBot.create(:public_policy))
+          w2 = FactoryBot.create(:workflow, creators: [p2], other_creators: 'Sandra Testington, Ivan Ivanov', policy: FactoryBot.create(:public_policy))
+          w3 = FactoryBot.create(:workflow, creators: [p1, p2], other_creators: 'Bob Lastname', policy: FactoryBot.create(:public_policy))
+          w4 = FactoryBot.create(:workflow, creators: [], other_creators: 'Bob Lastname', policy: FactoryBot.create(:public_policy))
 
           get :index, params: { author: 'Bob Lastname' }
 
@@ -253,9 +253,9 @@ module Ga4gh
         end
 
         test 'should filter workflows by "checker"' do
-          w1 = Factory(:workflow, policy: Factory(:public_policy))
-          w2 = Factory(:workflow, policy: Factory(:public_policy))
-          w3 = Factory(:workflow, policy: Factory(:public_policy))
+          w1 = FactoryBot.create(:workflow, policy: FactoryBot.create(:public_policy))
+          w2 = FactoryBot.create(:workflow, policy: FactoryBot.create(:public_policy))
+          w3 = FactoryBot.create(:workflow, policy: FactoryBot.create(:public_policy))
 
           get :index, params: { checker: 'true' }
 
@@ -272,14 +272,14 @@ module Ga4gh
         end
 
         test 'should filter by multiple criterion' do
-          p1 = Factory(:project, title: 'CovidBad')
-          p2 = Factory(:project, title: 'WorkflowsGood')
-          cwl1 = Factory(:cwl_workflow, title: 'Covid fixer', projects: [p1], policy: Factory(:public_policy))
-          cwl2 = Factory(:cwl_workflow, title: 'Thing doer', projects: [p2], policy: Factory(:public_policy))
-          gal1 = Factory(:existing_galaxy_ro_crate_workflow, title: 'Stop covid', projects: [p1],  policy: Factory(:public_policy))
-          gal2 = Factory(:existing_galaxy_ro_crate_workflow, title: 'Concat 2 strings', projects: [p2], policy: Factory(:public_policy))
-          nfl1 = Factory(:nf_core_ro_crate_workflow, title: 'Covid sim', policy: Factory(:public_policy))
-          nfl2 = Factory(:nf_core_ro_crate_workflow, title: 'RNA something', policy: Factory(:public_policy))
+          p1 = FactoryBot.create(:project, title: 'CovidBad')
+          p2 = FactoryBot.create(:project, title: 'WorkflowsGood')
+          cwl1 = FactoryBot.create(:cwl_workflow, title: 'Covid fixer', projects: [p1], policy: FactoryBot.create(:public_policy))
+          cwl2 = FactoryBot.create(:cwl_workflow, title: 'Thing doer', projects: [p2], policy: FactoryBot.create(:public_policy))
+          gal1 = FactoryBot.create(:existing_galaxy_ro_crate_workflow, title: 'Stop covid', projects: [p1],  policy: FactoryBot.create(:public_policy))
+          gal2 = FactoryBot.create(:existing_galaxy_ro_crate_workflow, title: 'Concat 2 strings', projects: [p2], policy: FactoryBot.create(:public_policy))
+          nfl1 = FactoryBot.create(:nf_core_ro_crate_workflow, title: 'Covid sim', policy: FactoryBot.create(:public_policy))
+          nfl2 = FactoryBot.create(:nf_core_ro_crate_workflow, title: 'RNA something', policy: FactoryBot.create(:public_policy))
 
           get :index, params: { name: 'covid', descriptorType: 'NFL' }
 
@@ -311,14 +311,14 @@ module Ga4gh
         end
 
         test 'should paginate tools' do
-          p1 = Factory(:project, title: 'CovidBad')
-          p2 = Factory(:project, title: 'WorkflowsGood')
-          cwl1 = Factory(:cwl_workflow, title: 'Covid fixer', projects: [p1], policy: Factory(:public_policy))
-          cwl2 = Factory(:cwl_workflow, title: 'Thing doer', projects: [p2], policy: Factory(:public_policy))
-          gal1 = Factory(:existing_galaxy_ro_crate_workflow, title: 'Stop covid', projects: [p1],  policy: Factory(:public_policy))
-          gal2 = Factory(:existing_galaxy_ro_crate_workflow, title: 'Concat 2 strings', projects: [p2], policy: Factory(:public_policy))
-          nfl1 = Factory(:nf_core_ro_crate_workflow, title: 'Covid sim', policy: Factory(:public_policy))
-          nfl2 = Factory(:nf_core_ro_crate_workflow, title: 'RNA something', policy: Factory(:public_policy))
+          p1 = FactoryBot.create(:project, title: 'CovidBad')
+          p2 = FactoryBot.create(:project, title: 'WorkflowsGood')
+          cwl1 = FactoryBot.create(:cwl_workflow, title: 'Covid fixer', projects: [p1], policy: FactoryBot.create(:public_policy))
+          cwl2 = FactoryBot.create(:cwl_workflow, title: 'Thing doer', projects: [p2], policy: FactoryBot.create(:public_policy))
+          gal1 = FactoryBot.create(:existing_galaxy_ro_crate_workflow, title: 'Stop covid', projects: [p1],  policy: FactoryBot.create(:public_policy))
+          gal2 = FactoryBot.create(:existing_galaxy_ro_crate_workflow, title: 'Concat 2 strings', projects: [p2], policy: FactoryBot.create(:public_policy))
+          nfl1 = FactoryBot.create(:nf_core_ro_crate_workflow, title: 'Covid sim', policy: FactoryBot.create(:public_policy))
+          nfl2 = FactoryBot.create(:nf_core_ro_crate_workflow, title: 'RNA something', policy: FactoryBot.create(:public_policy))
 
           count = Workflow.count
           assert_equal 6, count

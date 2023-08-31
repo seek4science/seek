@@ -2,7 +2,7 @@ require 'test_helper'
 
 class KnimeExtractionTest < ActiveSupport::TestCase
   setup do
-    @knime = WorkflowClass.find_by_key('knime') || Factory(:knime_workflow_class)
+    @knime = WorkflowClass.find_by_key('knime') || FactoryBot.create(:knime_workflow_class)
   end
 
   test 'can parse KNIME workflow without metadata' do

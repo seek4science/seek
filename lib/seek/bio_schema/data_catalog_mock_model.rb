@@ -39,6 +39,12 @@ module Seek
         Seek::Util.routes.root_url.chomp('/')
       end
 
+      def datasets
+        Seek::Util.searchable_types.select(&:schema_org_supported?).map do |t|
+          Dataset.new(t)
+        end
+      end
+
       def schema_org_supported?
         true
       end

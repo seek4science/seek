@@ -10,7 +10,7 @@
 <%= index_and_new_help_icon 'sample' %>
 
 <div class="row contribution-header">
-	<% if templates_enabled %>
+	<% if templates_enabled && params[:act] != "create" %>
 		<div class="col-md-12">
 			<%= link_to "Search by #{t('template').pluralize}", query_form_samples_path, class: "btn btn-default btn-lg" %>
 			<p style="font-size:20px;margin-top:20px">OR</p>

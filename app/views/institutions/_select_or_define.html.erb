@@ -17,7 +17,7 @@
   </div>
 
   <label class="control-label">Type the name of the <%= t('institution') %> </label><span class="required">*</span>
-  <%= objects_input('institution[id]', [], typeahead:  {query_url: typeahead_institutions_path + '?query=%QUERY&include_new=true',handlebars_template:'typeahead/institution'}, limit:1) -%>
+  <%= objects_input('institution[id]', [], typeahead:  {query_url: typeahead_institutions_path, handlebars_template:'typeahead/institution'}, limit:1, allow_new: true, class:'form-control') -%>
 </div>
 
 <%= hidden_field_tag 'institution[title]' %>
@@ -48,22 +48,22 @@
             checkSubmitButtonEnabled();
         });
 
-        $j('input#institution_id').on('itemAdded', function(event) {
-            console.log(event.item.id)
-            if (event.item.id=='-1') {
+        $j('select#institution_id').on('select2:select', function(event) {
+            var data = event.params.data;
+            if (data.id==data.text) { //new record
                 toggleUserInput(false);
             }
             else {
                 toggleUserInput(true);
             }
-            $j('#institution_title').val(event.item.name);
-            $j('#institution_web_page').val(event.item.web_page);
-            $j('#institution_city').val(event.item.city);
-            $j('#institution_country').val(event.item.country);
+            $j('#institution_title').val(data.text);
+            $j('#institution_web_page').val(data.web_page);
+            $j('#institution_city').val(data.city);
+            $j('#institution_country').val(data.country);
             checkSubmitButtonEnabled();
         });
 
-        $j('input#institution_id').on('itemRemoved', function(event) {
+        $j('select#institution_id').on('select2:unselect', function(event) {
             toggleUserInput(true);
             $j('#institution_title').val('');
             $j('#institution_web_page').val('');

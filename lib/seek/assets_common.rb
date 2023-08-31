@@ -44,17 +44,18 @@ module Seek
 
     # For use in autocompleters
     def typeahead
+      query = params[:q] || ''
       model_name = controller_name.classify
       model_class = class_for_controller_name
 
-      results = model_class.where('title LIKE ?', "#{params[:query]}%").authorized_for('view')
+      results = model_class.where('title LIKE ?', "%#{query}%").authorized_for('view')
       items = results.first(params[:limit] || 10).map do |item|
         contributor_name = item.contributor.try(:person).try(:name)
-        { id: item.id, name: item.title, hint: contributor_name, type: model_name, contributor: contributor_name }
+        { id: item.id, text: item.title, hint: contributor_name, type: model_name, contributor: contributor_name }
       end
 
       respond_to do |format|
-        format.json { render json: items.to_json }
+        format.json { render json: {results: items}.to_json }
       end
     end
 

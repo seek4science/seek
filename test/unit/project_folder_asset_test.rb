@@ -2,9 +2,9 @@ require 'test_helper'
 
 class ProjectFolderAssetTest < ActiveSupport::TestCase
   test 'associations' do
-    pf = Factory :project_folder
-    person = Factory(:person,project:pf.project)
-    sop = Factory :sop, policy: Factory(:public_policy), projects: [pf.project], contributor:person
+    pf = FactoryBot.create :project_folder
+    person = FactoryBot.create(:person,project:pf.project)
+    sop = FactoryBot.create :sop, policy: FactoryBot.create(:public_policy), projects: [pf.project], contributor:person
     pfa = ProjectFolderAsset.create asset: sop, project_folder: pf
     pfa.save!
     pfa.reload
@@ -20,9 +20,9 @@ class ProjectFolderAssetTest < ActiveSupport::TestCase
   end
 
   test 'dependents destroyed' do
-    pf = Factory :project_folder
-    person = Factory(:person,project:pf.project)
-    sop = Factory :sop, policy: Factory(:public_policy), projects: [pf.project], contributor: person
+    pf = FactoryBot.create :project_folder
+    person = FactoryBot.create(:person,project:pf.project)
+    sop = FactoryBot.create :sop, policy: FactoryBot.create(:public_policy), projects: [pf.project], contributor: person
     pfa = ProjectFolderAsset.create asset: sop, project_folder: pf
 
     assert_difference('ProjectFolderAsset.count', -1) do
@@ -30,9 +30,9 @@ class ProjectFolderAssetTest < ActiveSupport::TestCase
       assert_nil ProjectFolderAsset.find_by_id(pfa.id)
     end
 
-    pf = Factory :project_folder
-    person = Factory(:person,project:pf.project)
-    sop = Factory :sop, policy: Factory(:public_policy), projects: [pf.project], contributor:person
+    pf = FactoryBot.create :project_folder
+    person = FactoryBot.create(:person,project:pf.project)
+    sop = FactoryBot.create :sop, policy: FactoryBot.create(:public_policy), projects: [pf.project], contributor:person
     pfa = ProjectFolderAsset.create asset: sop, project_folder: pf
 
     assert_difference('ProjectFolderAsset.count', -1) do
@@ -42,13 +42,13 @@ class ProjectFolderAssetTest < ActiveSupport::TestCase
   end
 
   test 'assets added to default folder upon creation' do
-    pf = Factory :project_folder, title: 'Unsorted items', editable: false, incoming: true
-    pf2 = Factory :project_folder, title: 'Unsorted items', editable: false, incoming: true
+    pf = FactoryBot.create :project_folder, title: 'Unsorted items', editable: false, incoming: true
+    pf2 = FactoryBot.create :project_folder, title: 'Unsorted items', editable: false, incoming: true
 
-    person = Factory(:person,project: pf.project)
+    person = FactoryBot.create(:person,project: pf.project)
     person.add_to_project_and_institution(pf2.project, person.institutions.first)
 
-    model = Factory.build :model, projects: [pf.project, pf2.project], policy: Factory(:public_policy), contributor: person
+    model = FactoryBot.build :model, projects: [pf.project, pf2.project], policy: FactoryBot.create(:public_policy), contributor: person
 
     model.save!
 
@@ -65,9 +65,9 @@ class ProjectFolderAssetTest < ActiveSupport::TestCase
 
   test 'validations' do
     pfa = ProjectFolderAsset.new
-    pf = Factory :project_folder
-    person = Factory(:person, project: pf.project)
-    model = Factory :model, policy: Factory(:public_policy), projects: [pf.project], contributor: person
+    pf = FactoryBot.create :project_folder
+    person = FactoryBot.create(:person, project: pf.project)
+    model = FactoryBot.create :model, policy: FactoryBot.create(:public_policy), projects: [pf.project], contributor: person
 
     assert !pfa.valid?
 
@@ -82,12 +82,12 @@ class ProjectFolderAssetTest < ActiveSupport::TestCase
     # asset must belong in same project as folder
     pfa.asset = model
     assert pfa.valid?
-    person.add_to_project_and_institution(Factory(:project),person.institutions.first)
-    pfa.asset = Factory :model, policy: Factory(:public_policy), projects: person.projects, contributor: person
+    person.add_to_project_and_institution(FactoryBot.create(:project),person.institutions.first)
+    pfa.asset = FactoryBot.create :model, policy: FactoryBot.create(:public_policy), projects: person.projects, contributor: person
     assert pfa.valid?
 
-    other_person = Factory(:person)
-    pfa.asset = Factory :model, policy: Factory(:public_policy), projects: other_person.projects,contributor: other_person
+    other_person = FactoryBot.create(:person)
+    pfa.asset = FactoryBot.create :model, policy: FactoryBot.create(:public_policy), projects: other_person.projects,contributor: other_person
     assert !pfa.valid?
 
     # final check for save
@@ -97,20 +97,20 @@ class ProjectFolderAssetTest < ActiveSupport::TestCase
 
   test 'assign existing assets to folders' do
 
-    proj = Factory :project
-    contributor = Factory(:person,project:proj)
+    proj = FactoryBot.create :project
+    contributor = FactoryBot.create(:person,project:proj)
 
-    old_sop = Factory :sop, policy: Factory(:public_policy), projects: [proj], contributor:contributor
-    old_model = Factory :model, policy: Factory(:public_policy), projects: [proj], contributor:contributor
-    old_presentation = Factory :presentation, policy: Factory(:public_policy), projects: [proj], contributor:contributor
-    old_publication = Factory :publication, policy: Factory(:public_policy), projects: [proj], contributor:contributor
-    old_datafile = Factory :data_file, policy: Factory(:public_policy), projects: [proj], contributor:contributor
-    old_private_datafile = Factory :data_file, policy: Factory(:private_policy), projects: [proj], contributor:contributor
-    old_datafile_other_proj = Factory :model, policy: Factory(:public_policy), contributor:Factory(:person)
+    old_sop = FactoryBot.create :sop, policy: FactoryBot.create(:public_policy), projects: [proj], contributor:contributor
+    old_model = FactoryBot.create :model, policy: FactoryBot.create(:public_policy), projects: [proj], contributor:contributor
+    old_presentation = FactoryBot.create :presentation, policy: FactoryBot.create(:public_policy), projects: [proj], contributor:contributor
+    old_publication = FactoryBot.create :publication, policy: FactoryBot.create(:public_policy), projects: [proj], contributor:contributor
+    old_datafile = FactoryBot.create :data_file, policy: FactoryBot.create(:public_policy), projects: [proj], contributor:contributor
+    old_private_datafile = FactoryBot.create :data_file, policy: FactoryBot.create(:private_policy), projects: [proj], contributor:contributor
+    old_datafile_other_proj = FactoryBot.create :model, policy: FactoryBot.create(:public_policy), contributor:FactoryBot.create(:person)
 
-    pf = Factory :project_folder, project: proj
-    pf_incoming = Factory :project_folder, project: pf.project, title: 'New items', incoming: true
-    already_assigned_sop = Factory :sop, policy: Factory(:public_policy), projects: [proj], contributor:contributor
+    pf = FactoryBot.create :project_folder, project: proj
+    pf_incoming = FactoryBot.create :project_folder, project: pf.project, title: 'New items', incoming: true
+    already_assigned_sop = FactoryBot.create :sop, policy: FactoryBot.create(:public_policy), projects: [proj], contributor:contributor
     pf.add_assets already_assigned_sop
 
     ProjectFolderAsset.assign_existing_assets(proj)

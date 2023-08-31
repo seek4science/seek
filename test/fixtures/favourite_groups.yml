@@ -7,58 +7,58 @@ my_collaborators_group_for_owner_of_a_sop_with_complex_permissions:
   updated_at: <%= 2.days.ago.to_s :db %>
 
 
-whitelist_for_owner_of_a_sop_with_complex_permissions:
+allowlist_for_owner_of_a_sop_with_complex_permissions:
   user: owner_of_a_sop_with_complex_permissions
-  name: <%= FavouriteGroup::WHITELIST_NAME %>
+  name: <%= FavouriteGroup::ALLOWLIST_NAME %>
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
 
 
-blacklist_for_owner_of_a_sop_with_complex_permissions:
+denylist_for_owner_of_a_sop_with_complex_permissions:
   user: owner_of_a_sop_with_complex_permissions
-  name: <%= FavouriteGroup::BLACKLIST_NAME %>
+  name: <%= FavouriteGroup::DENYLIST_NAME %>
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
 
 
-whitelist_for_owner_of_my_first_sop:
+allowlist_for_owner_of_my_first_sop:
   user: owner_of_my_first_sop
-  name: <%= FavouriteGroup::WHITELIST_NAME %>
+  name: <%= FavouriteGroup::ALLOWLIST_NAME %>
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
 
 
-blacklist_for_owner_of_my_first_sop:
+denylist_for_owner_of_my_first_sop:
   user: owner_of_my_first_sop
-  name: <%= FavouriteGroup::BLACKLIST_NAME %>
+  name: <%= FavouriteGroup::DENYLIST_NAME %>
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
 
 
-whitelist_for_owner_of_private_policy_using_custom_sharing:
+allowlist_for_owner_of_private_policy_using_custom_sharing:
   user: owner_of_private_policy_using_custom_sharing
-  name: <%= FavouriteGroup::WHITELIST_NAME %>
+  name: <%= FavouriteGroup::ALLOWLIST_NAME %>
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
 
 
-blacklist_for_owner_of_private_policy_using_custom_sharing:
+denylist_for_owner_of_private_policy_using_custom_sharing:
   user: owner_of_private_policy_using_custom_sharing
-  name: <%= FavouriteGroup::BLACKLIST_NAME %>
+  name: <%= FavouriteGroup::DENYLIST_NAME %>
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
 
 
-whitelist_for_owner_of_editing_for_all_sysmo_users_policy:
+allowlist_for_owner_of_editing_for_all_sysmo_users_policy:
   user: owner_of_editing_for_all_sysmo_users_policy
-  name: <%= FavouriteGroup::WHITELIST_NAME %>
+  name: <%= FavouriteGroup::ALLOWLIST_NAME %>
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
 
 
-blacklist_for_owner_of_editing_for_all_sysmo_users_policy:
+denylist_for_owner_of_editing_for_all_sysmo_users_policy:
   user: owner_of_editing_for_all_sysmo_users_policy
-  name: <%= FavouriteGroup::BLACKLIST_NAME %>
+  name: <%= FavouriteGroup::DENYLIST_NAME %>
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
 

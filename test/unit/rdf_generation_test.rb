@@ -5,7 +5,7 @@ class RDFGenerationTest < ActiveSupport::TestCase
   include RightField
 
   test 'rightfield rdf generation' do
-    df = Factory :rightfield_annotated_datafile
+    df = FactoryBot.create :rightfield_annotated_datafile
     refute_nil(df.content_blob)
     rdf = generate_rightfield_rdf(df)
     refute_nil(rdf)
@@ -18,15 +18,15 @@ class RDFGenerationTest < ActiveSupport::TestCase
   end
 
   test 'rdf storage path' do
-    public = Factory(:assay, policy: Factory(:public_policy))
+    public = FactoryBot.create(:assay, policy: FactoryBot.create(:public_policy))
     assert_equal File.join(Rails.root, 'tmp/testing-filestore/rdf/public', "Assay-test-#{public.id}.rdf"), public.rdf_storage_path
 
-    private = Factory(:assay, policy: Factory(:private_policy))
+    private = FactoryBot.create(:assay, policy: FactoryBot.create(:private_policy))
     assert_equal File.join(Rails.root, 'tmp/testing-filestore/rdf/private', "Assay-test-#{private.id}.rdf"), private.rdf_storage_path
   end
 
   test 'save rdf file' do
-    assay = Factory(:assay, policy: Factory(:public_policy))
+    assay = FactoryBot.create(:assay, policy: FactoryBot.create(:public_policy))
     assert assay.can_view?(nil)
 
     expected_rdf_file = File.join(Rails.root, 'tmp/testing-filestore/rdf/public', "Assay-test-#{assay.id}.rdf")
@@ -46,7 +46,7 @@ class RDFGenerationTest < ActiveSupport::TestCase
 
   test 'rdf with problem excel file' do
     # a file that was found to cause an error during the RightField part of the RDF generation.
-    df = Factory(:data_file, content_blob: Factory(:spreadsheet_content_blob, data: File.new("#{Rails.root}/test/fixtures/files/test_file_FakStudied_OK.xls", 'rb').read))
+    df = FactoryBot.create(:data_file, content_blob: FactoryBot.create(:spreadsheet_content_blob, data: File.new("#{Rails.root}/test/fixtures/files/test_file_FakStudied_OK.xls", 'rb').read))
     rdf = df.to_rdf
     assert_not_nil(rdf)
 
@@ -57,7 +57,7 @@ class RDFGenerationTest < ActiveSupport::TestCase
   end
 
   test 'save private rdf' do
-    sop = Factory(:sop, policy: Factory(:private_policy))
+    sop = FactoryBot.create(:sop, policy: FactoryBot.create(:private_policy))
     assert !sop.can_view?(nil)
 
     expected_rdf_file = File.join(Rails.root, 'tmp/testing-filestore/rdf/private', "Sop-test-#{sop.id}.rdf")
@@ -76,8 +76,8 @@ class RDFGenerationTest < ActiveSupport::TestCase
   end
 
   test 'rdf moves from public to private when permissions change' do
-    User.with_current_user Factory(:user) do
-      assay = Factory(:assay, policy: Factory(:public_policy))
+    User.with_current_user FactoryBot.create(:user) do
+      assay = FactoryBot.create(:assay, policy: FactoryBot.create(:public_policy))
       assert assay.can_view?(nil)
 
       public_rdf_file = File.join(Rails.root, 'tmp/testing-filestore/rdf/public', "Assay-test-#{assay.id}.rdf")
@@ -91,7 +91,7 @@ class RDFGenerationTest < ActiveSupport::TestCase
       assert File.exist?(public_rdf_file)
       assert !File.exist?(private_rdf_file)
 
-      assay.policy = Factory(:private_policy)
+      assay.policy = FactoryBot.create(:private_policy)
       disable_authorization_checks do
         assay.save!
       end
@@ -103,7 +103,7 @@ class RDFGenerationTest < ActiveSupport::TestCase
       assert File.exist?(private_rdf_file)
       assert !File.exist?(public_rdf_file)
 
-      assay.policy = Factory(:public_policy)
+      assay.policy = FactoryBot.create(:public_policy)
       disable_authorization_checks do
         assay.save!
       end
@@ -118,7 +118,7 @@ class RDFGenerationTest < ActiveSupport::TestCase
   end
 
   test 'rightfield rdf graph generation' do
-    df = Factory :rightfield_annotated_datafile
+    df = FactoryBot.create :rightfield_annotated_datafile
     rdf = generate_rightfield_rdf_graph(df)
     assert_not_nil rdf
     assert rdf.is_a?(RDF::Graph)
@@ -127,7 +127,7 @@ class RDFGenerationTest < ActiveSupport::TestCase
   end
 
   test 'datafile to_rdf' do
-    df = Factory :rightfield_annotated_datafile
+    df = FactoryBot.create :rightfield_annotated_datafile
     rdf = df.to_rdf
     assert_not_nil rdf
     # just checks it is valid rdf/xml and contains some statements for now
@@ -138,7 +138,7 @@ class RDFGenerationTest < ActiveSupport::TestCase
   end
 
   test 'non spreadsheet datafile to_rdf' do
-    df = Factory :non_spreadsheet_datafile
+    df = FactoryBot.create :non_spreadsheet_datafile
     rdf = df.to_rdf
     assert_not_nil rdf
 
@@ -149,7 +149,7 @@ class RDFGenerationTest < ActiveSupport::TestCase
   end
 
   test 'xlsx datafile to_rdf' do
-    df = Factory :xlsx_spreadsheet_datafile
+    df = FactoryBot.create :xlsx_spreadsheet_datafile
 
     rdf = df.to_rdf
     assert_not_nil rdf
@@ -161,32 +161,32 @@ class RDFGenerationTest < ActiveSupport::TestCase
   end
 
   test 'rdf type uri' do
-    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#Data'), Factory(:data_file).rdf_type_uri
-    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#Model'), Factory(:model).rdf_type_uri
-    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#SOP'), Factory(:sop).rdf_type_uri
-    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#Experimental_assay'), Factory(:experimental_assay).rdf_type_uri
-    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#Modelling_analysis'), Factory(:modelling_assay).rdf_type_uri
-    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#Organism'), Factory(:organism).rdf_type_uri
+    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#Data'), FactoryBot.create(:data_file).rdf_type_uri
+    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#Model'), FactoryBot.create(:model).rdf_type_uri
+    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#SOP'), FactoryBot.create(:sop).rdf_type_uri
+    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#Experimental_assay'), FactoryBot.create(:experimental_assay).rdf_type_uri
+    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#Modelling_analysis'), FactoryBot.create(:modelling_assay).rdf_type_uri
+    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#Organism'), FactoryBot.create(:organism).rdf_type_uri
 
 
-    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#Simulation_data'), Factory(:data_file,simulation_data:true).rdf_type_uri
+    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#Simulation_data'), FactoryBot.create(:data_file,simulation_data:true).rdf_type_uri
 
   end
 
   test 'rdf_seek_id' do
-    df = Factory(:data_file)
+    df = FactoryBot.create(:data_file)
     assert_equal "http://localhost:3000/data_files/#{df.id}",df.rdf_seek_id
   end
 
   test 'rdf_supported?' do
-    assert Factory(:person).rdf_supported?
-    assert Factory(:assay).rdf_supported?
-    assert Factory(:data_file).rdf_supported?
+    assert FactoryBot.create(:person).rdf_supported?
+    assert FactoryBot.create(:assay).rdf_supported?
+    assert FactoryBot.create(:data_file).rdf_supported?
 
 
-    refute Factory(:event).rdf_supported?
-    refute Factory(:institution).rdf_supported?
-    refute Factory(:document).rdf_supported?
+    refute FactoryBot.create(:event).rdf_supported?
+    refute FactoryBot.create(:institution).rdf_supported?
+    refute FactoryBot.create(:document).rdf_supported?
   end
 
 end

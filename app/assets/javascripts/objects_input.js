@@ -1,61 +1,66 @@
-function loadObjectInputs(elem) {
-    (elem?.item || $j('[data-role="seek-objectsinput"]')).each(function () {
-        var options = { tagClass: 'label label-default',
-            itemValue: 'id',
-            itemText: 'name'
-        };
+var ObjectsInput = {
 
-        if($j(this).data('tagsLimit'))
-            options.maxTags = $j(this).data('tagsLimit');
+    init: function(element) {
+        (element?.item || $j('[data-role="seek-objectsinput"]')).each(function () {
 
-        if($j(this).data('typeahead')) {
-            var opts = {
-                datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
-                queryTokenizer: Bloodhound.tokenizers.whitespace
+            //skip if already initialised
+            if ($j(this).data('select2')) {
+                return true;
+            }
+
+            const opts = {
+                placeholder: 'Search ...',
+                theme: "bootstrap",
+                width: '100%'
             };
 
-            if(prefetchUrl = $j(this).data('typeahead-prefetch-url'))
-                opts.prefetch = { url: prefetchUrl };
-            if(queryUrl = $j(this).data('typeahead-query-url'))
-                opts.remote = { url: queryUrl };
-            if(localValues = $j(this).data('typeahead-local-values'))
-                opts.local = localValues;
-            
-            opts.limit=20;                
+            if ($j(this).data('placeholder')) {
+                opts.placeholder = $j(this).data('placeholder');
+            }
 
-            var d = new Bloodhound(opts);
-            d.initialize();
+            if ($j(this).data('tags-limit')) {
+                opts.maximumSelectionLength = $j(this).data('tags-limit');
+            }
 
-            var template = $j(this).data('typeahead-template') || 'typeahead/hint';
+            if ($j(this).data('allow-new-items')) {
+                opts.tags = $j(this).data('allow-new-items')
+            }
 
-            options.typeaheadjs = {
-                displayKey: 'name',
-                source: d.ttAdapter(),                
-                templates: {
-                    suggestion: HandlebarsTemplates[template]
+            if ($j(this).data('typeahead-local-values')) {
+                opts.data = $j(this).data('typeahead-local-values');
+            }
+
+            const template = $j(this).data('typeahead-template') || 'typeahead/hint';
+            opts.templateResult = HandlebarsTemplates[template];
+            opts.escapeMarkup = function (m) {
+                return m;
+            }
+
+            if ($j(this).data('typeahead-query-url')) {
+                opts.ajax={
+                    url: $j(this).data('typeahead-query-url'),
+                    dataType: 'json'
                 }
-            };
-        }
+            }
 
-        $j(this).tagsinput(options);
-
-        var objects = $j(this).data('existingObjects');
-        if(objects)
-            for(var i = 0; i < objects.length; i++)
-                $j(this).tagsinput('add', objects[i]);
-
-        if ($j(this).data("ontology")) {
-            const tagsinput = $j(this).prev(".bootstrap-tagsinput").first();
-            const input = $j(tagsinput).find("input.tt-input").first();
-            $j(tagsinput).on("focusout", () => {
-                if (input.val().length !== 0) $j(this).tagsinput("add", { id: input.val(), name: input.val() });
-                // TODO: use the item event listener
-                setTimeout(() => {
-                    $j(input).val("");
-                }, 1);
-            });
-        }
-    });
+            $j(this).select2(
+                opts
+            );
+        });
+    }
 }
+$j(document).ready(function () {
 
-$j(document).ready(loadObjectInputs);
+    ObjectsInput.init();
+
+    $j('[data-role="seek-suggested-tags"]').on('click', function () {
+        const selectName = $j(this).data('tag-input');
+        const text = $j(this).text();
+        const selector = $j('select#'+selectName);
+        const vals = selector.val() || [];
+        vals.push(text);
+        selector.val(vals);
+        selector.change();
+        return false;
+    });
+});

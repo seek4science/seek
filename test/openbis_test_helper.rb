@@ -81,7 +81,7 @@ end
 
 def openbis_linked_data_file(user = User.current_user, endpoint = nil)
   User.with_current_user(user) do
-    endpoint ||= Factory(:openbis_endpoint, project:user.person.projects.first)
+    endpoint ||= FactoryBot.create(:openbis_endpoint, project:user.person.projects.first)
     set = Seek::Openbis::Dataset.new(endpoint, '20160210130454955-23')
 
     df = Seek::Openbis::SeekUtil.new.createDataFileFromObisSet(set, user)

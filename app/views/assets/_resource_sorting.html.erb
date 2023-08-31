@@ -2,8 +2,11 @@
 <% options = [[Seek::ListSorter::ORDER_OPTIONS[:relevance][:title], :relevance], *options] if @active_filters[:query]&.present? %>
 <% url_template = url_for(page_and_sort_params.merge(page: nil, order: '_order_')) %>
 
-<form class="form-inline pull-right">
-  <div class="form-group">
+<div>
+  <button class="btn btn-default" id="sidebar-toggle" type="button" autocomplete="off">
+    <span class="glyphicon glyphicon-filter" aria-hidden="true"></span> Filters
+  </button>
+  <div class="pull-right" style="margin: 2px 0">
     <div class="input-group">
       <span class="input-group-addon"><i title="Sort by" class="glyphicon glyphicon-sort" aria-hidden="true"></i></span>
       <%= select_tag(:index_sort_order, options_for_select(options, @order.first),
@@ -13,7 +16,7 @@
       %>
     </div>
   </div>
-</form>
+</div>
 
 <script>
   $j('#index_sort_order').change(function () {

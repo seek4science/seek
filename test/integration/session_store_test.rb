@@ -11,7 +11,7 @@ class SessionStoreTest < ActionDispatch::IntegrationTest
     # cannot test with `with_config_value` due to being too late after the tests start
 
     assert_equal 30.minutes, Rails.application.config.session_options[:expire_after]
-    df = Factory :data_file, contributor: User.current_user.person
+    df = FactoryBot.create :data_file, contributor: User.current_user.person
     User.current_user = nil
     get "/data_files/#{df.id}"
     assert_response :success
@@ -35,7 +35,7 @@ class SessionStoreTest < ActionDispatch::IntegrationTest
   end
 
   test 'should forbid the unauthorized page' do
-    data_file = Factory :data_file, contributor: User.current_user.person
+    data_file = FactoryBot.create :data_file, contributor: User.current_user.person
     get "/data_files/#{data_file.id}", headers: { 'HTTP_REFERER' => "http://www.example.com/data_files/#{data_file.id}" }
     assert_response :success
 
@@ -55,7 +55,7 @@ class SessionStoreTest < ActionDispatch::IntegrationTest
     assert_response :success
     logout 'http://www.example.com/sops'
 
-    data_file = Factory :data_file, policy: Factory(:public_policy)
+    data_file = FactoryBot.create :data_file, policy: FactoryBot.create(:public_policy)
     get "/data_files/#{data_file.id}"
     assert_response :success
 
@@ -65,7 +65,7 @@ class SessionStoreTest < ActionDispatch::IntegrationTest
 
   test 'should go to last visited page(except search) after browsing a forbidden page, accessible page, then login' do
     with_config_value :internal_help_enabled, true do
-      data_file = Factory :data_file, contributor: User.current_user.person
+      data_file = FactoryBot.create :data_file, contributor: User.current_user.person
 
       logout 'http://www.example.com/'
       get "/data_files/#{data_file.id}", headers: { 'HTTP_REFERER' => "http://www.example.com/data_files/#{data_file.id}" }
@@ -90,7 +90,7 @@ class SessionStoreTest < ActionDispatch::IntegrationTest
   private
 
   def test_user
-    User.authenticate('test', generate_user_password) || Factory(:user, login: 'test')
+    User.authenticate('test', generate_user_password) || FactoryBot.create(:user, login: 'test')
   end
 
   def login_as_test_user(referer)

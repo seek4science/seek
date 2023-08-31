@@ -75,10 +75,10 @@ var SampleTypes = {
 				var is_ontology = $j(this).find(':selected').data('is-ontology');
         var cv_element = $j(this).siblings('.controlled-vocab-block');
         if (use_cv) {
-					var cv_selection = cv_element.find('.controlled-vocab-selection')
-					cv_selection.find('option').show()
-					cv_selection.find(`option[data-is-ontology="${!is_ontology}"]`).hide()
-					if (resetSelection) cv_selection.find('option:selected').prop("selected", false)
+					var cv_selection = cv_element.find('.controlled-vocab-selection');
+					cv_selection.find('option').show();
+					cv_selection.find(`option[data-is-ontology="${!is_ontology}"]`).hide();
+					if (resetSelection) cv_selection.find('option:selected').prop("selected", false);
           cv_element.show();
         }
         else {

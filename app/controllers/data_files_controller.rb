@@ -128,35 +128,6 @@ class DataFilesController < ApplicationController
       ft = FileTemplate.find(params[:file_template_id])
     end
   end
-  
-  def explore
-    #drop invalid explore params
-    [:page_rows, :page, :sheet].each do |param|
-      if params[param].present? && (params[param] =~ /\A\d+\Z/).nil?
-        params.delete(param)
-      end
-    end
-    if @display_data_file.contains_extractable_spreadsheet?
-      begin
-        @workbook = Rails.cache.fetch("spreadsheet-workbook-#{@display_data_file.content_blob.cache_key}") do
-          @display_data_file.spreadsheet
-        end
-        respond_to do |format|
-          format.html
-        end
-      rescue SysMODB::SpreadsheetExtractionException
-        respond_to do |format|
-          flash[:error] = "There was an error when processing the #{t('data_file')} to explore, perhaps it isn't a valid Excel spreadsheet"
-          format.html { redirect_to data_file_path(@data_file, version: @display_data_file.version) }
-        end
-      end
-    else
-      respond_to do |format|
-        flash[:error] = "Unable to explore contents of this #{t('data_file')}"
-        format.html { redirect_to data_file_path(@data_file, version: @display_data_file.version) }
-      end
-    end
-  end
 
   def filter
     scope = DataFile
@@ -488,7 +459,8 @@ class DataFilesController < ApplicationController
                                       { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                       { assay_assets_attributes: [:assay_id, :relationship_type_id] },
                                       { creator_ids: [] }, { assay_assets_attributes: [:assay_id, :relationship_type_id] },
-                                      :file_template_id, :data_format_annotations, :data_type_annotations,
+                                      :file_template_id,
+                                      { data_format_annotations: [] }, { data_type_annotations: [] },
                                       { publication_ids: [] }, { workflow_ids: [] },
                                       { workflow_data_files_attributes:[:id, :workflow_id, :workflow_data_file_relationship_id, :_destroy] },
                                       discussion_links_attributes:[:id, :url, :label, :_destroy])

@@ -1,19 +1,24 @@
+<%= render partial: 'general/item_title', locals: { item: @template, buttons_partial: 'buttons' } %>
+
+<%= render partial: 'general/show_page_tab_definitions' %>
+
+<div class="tab-content">
+  <%= tab_pane('overview') do %>
+    <div class="col-md-9 col-sm-8 box_about_actor">
+      <%= item_description h(@template.description) -%>
+
+      <%= render partial: "template_details", locals: { template: @template } %>
+
+      <h2>Attributes</h2>
 
 
-<%= render partial: "general/item_title", locals: { item: @template, buttons_partial: 'buttons' } %>
+      <%=
+        template_attribute_details_table(@template.template_attributes)
+      %>
 
-<%= item_description h(@template.description) -%>
-
-<%= render partial: "template_details", locals: { template: @template } %>
-
-<h2>Attributes</h2>
-
-<ul>
-<%=
-  @template.template_attributes.collect do |attribute|
-    content_tag(:li){template_attribute_details(attribute)}
-  end.join.html_safe
-%>
-</ul>
-
-<%= render partial: "general/items_related_to", object: @template %>
+    </div>
+  <% end %>
+  <%= tab_pane('related-items') do %>
+    <%= render partial: 'general/items_related_to', object: @template %>
+  <% end %>
+</div>

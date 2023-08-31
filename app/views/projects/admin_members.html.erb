@@ -7,7 +7,7 @@
     <%= panel('Add members', :id => "add_member") do %>
         <div class="form-group">
           <label class="control-label">1. Type the names of the people you wish to add to the <%= t('project').downcase %></label>
-          <%= objects_input('people_ids', [], :typeahead => {:values => Person.all.map {|p| {:id => p.id, :name => p.name, :hint => p.typeahead_hint}}}) -%>
+          <%= objects_input('people_ids', [], :typeahead => {:values => Person.all.map {|p| {:id => p.id, :text => p.name, :hint => p.typeahead_hint}}}, class: 'form-control') -%>
         </div>
 
         <div class="form-group">
@@ -15,7 +15,7 @@
           <%#= select_tag :institution_ids, options_from_collection_for_select(Institution.order(:title), "id", "title"),
                          :include_blank => true,
                          :class => 'form-control' %>
-          <%= objects_input('institution_id', [], typeahead:  {query_url: typeahead_institutions_path + '?query=%QUERY',handlebars_template:'typeahead/institution'}, limit:1) -%>
+          <%= objects_input('institution_id', [], typeahead:  {query_url: typeahead_institutions_path, handlebars_template:'typeahead/institution'}, limit:1, class: 'form-control') -%>
         </div>
 
         <%= button_link_to('Add', 'new', 'javascript:Projects.actions.add();') -%>

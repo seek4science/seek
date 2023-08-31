@@ -3,7 +3,7 @@
 <h2>New tags</h2>
 
 <%= form_tag edit_tag_admin_path(:id=>@tag.id) do %>
-  <%= tags_input(:tag_list, [@tag.text], :typeahead => true) %>
+  <%= tags_input(:tag_list, [@tag.text], class: 'form-control') %>
   <%= submit_tag "Update" -%>
 <% end -%>
 

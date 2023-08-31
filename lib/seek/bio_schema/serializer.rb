@@ -39,6 +39,11 @@ module Seek
         supported_types.include?(resource.class)
       end
 
+      # Check if a class is supported
+      def self.supported_type?(klass)
+        supported_types.include?(klass)
+      end
+
       def self.supported_types
         SUPPORTED_TYPES
       end

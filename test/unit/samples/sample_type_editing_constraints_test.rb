@@ -2,7 +2,7 @@ require 'test_helper'
 
 class SampleTypeEditingConstraintsTest < ActiveSupport::TestCase
   test 'initialize' do
-    sample_type = Factory(:simple_sample_type)
+    sample_type = FactoryBot.create(:simple_sample_type)
     c = Seek::Samples::SampleTypeEditingConstraints.new(sample_type)
     assert_equal sample_type, c.sample_type
     assert_empty c.samples
@@ -16,7 +16,7 @@ class SampleTypeEditingConstraintsTest < ActiveSupport::TestCase
     c = Seek::Samples::SampleTypeEditingConstraints.new(sample_type_with_samples)
     assert c.samples?
 
-    c = Seek::Samples::SampleTypeEditingConstraints.new(Factory(:simple_sample_type))
+    c = Seek::Samples::SampleTypeEditingConstraints.new(FactoryBot.create(:simple_sample_type))
     refute c.samples?
   end
 
@@ -29,7 +29,7 @@ class SampleTypeEditingConstraintsTest < ActiveSupport::TestCase
     assert c.allow_name_change?(nil)
 
     # ok if there are no samples
-    c = Seek::Samples::SampleTypeEditingConstraints.new(Factory(:simple_sample_type))
+    c = Seek::Samples::SampleTypeEditingConstraints.new(FactoryBot.create(:simple_sample_type))
     assert c.allow_name_change?(:the_title)
     attr = c.sample_type.sample_attributes.detect { |t| t.accessor_name == 'the_title' }
     refute_nil attr
@@ -49,12 +49,35 @@ class SampleTypeEditingConstraintsTest < ActiveSupport::TestCase
     assert c.allow_type_change?(:postcode)
 
     # ok if there are no samples
-    c = Seek::Samples::SampleTypeEditingConstraints.new(Factory(:simple_sample_type))
+    c = Seek::Samples::SampleTypeEditingConstraints.new(FactoryBot.create(:simple_sample_type))
     assert c.allow_type_change?(:the_title)
     attr = c.sample_type.sample_attributes.detect { |t| t.accessor_name == 'the_title' }
     refute_nil attr
     assert c.allow_type_change?(attr)
     assert c.allow_type_change?(nil)
+
+    type = FactoryBot.create(:linked_optional_sample_type)
+    c = Seek::Samples::SampleTypeEditingConstraints.new(type)
+    assert c.allow_type_change?(:patient)
+    attr = c.sample_type.sample_attributes.detect { |t| t.accessor_name == 'patient' }
+    refute_nil attr
+    assert c.allow_type_change?(attr)
+    assert c.allow_type_change?(nil)
+
+    person = FactoryBot.create(:person)
+    User.with_current_user(person.user) do
+      type.samples.create!(data: { title: 'Lib-3', patient: nil }, sample_type: type, project_ids: person.project_ids)
+
+      assert Seek::Samples::SampleTypeEditingConstraints.new(type).allow_type_change?(:patient),
+             'Should still allow type change because patient was blank'
+
+      patient_sample = FactoryBot.create(:patient_sample, sample_type: attr.linked_sample_type, contributor: person)
+      type.samples.create!(data: { title: 'Lib-4', patient: patient_sample.id }, sample_type: type,
+                           project_ids: person.project_ids)
+
+      refute Seek::Samples::SampleTypeEditingConstraints.new(type).allow_type_change?(:patient),
+             'Should not allow type change because a sample exists with a patient'
+    end
   end
 
   test 'allow_required?' do
@@ -92,7 +115,7 @@ class SampleTypeEditingConstraintsTest < ActiveSupport::TestCase
     # nil indicates a new attribute, allow_required? is determined by whether there are already samples
     c = Seek::Samples::SampleTypeEditingConstraints.new(sample_type_with_samples)
     refute c.allow_required?(nil)
-    c = Seek::Samples::SampleTypeEditingConstraints.new(Factory(:simple_sample_type))
+    c = Seek::Samples::SampleTypeEditingConstraints.new(FactoryBot.create(:simple_sample_type))
     assert c.allow_required?(nil)
   end
 
@@ -100,7 +123,7 @@ class SampleTypeEditingConstraintsTest < ActiveSupport::TestCase
     # nil indicates a new attribute, removal is always allowed
     c = Seek::Samples::SampleTypeEditingConstraints.new(sample_type_with_samples)
     assert c.allow_attribute_removal?(nil)
-    c = Seek::Samples::SampleTypeEditingConstraints.new(Factory(:simple_sample_type))
+    c = Seek::Samples::SampleTypeEditingConstraints.new(FactoryBot.create(:simple_sample_type))
     assert c.allow_attribute_removal?(nil)
   end
 
@@ -124,7 +147,7 @@ class SampleTypeEditingConstraintsTest < ActiveSupport::TestCase
     # currently only allowed if there are not samples
     c = Seek::Samples::SampleTypeEditingConstraints.new(sample_type_with_samples)
     refute c.allow_new_attribute?
-    c = Seek::Samples::SampleTypeEditingConstraints.new(Factory(:simple_sample_type))
+    c = Seek::Samples::SampleTypeEditingConstraints.new(FactoryBot.create(:simple_sample_type))
     assert c.allow_new_attribute?
   end
 
@@ -135,11 +158,11 @@ class SampleTypeEditingConstraintsTest < ActiveSupport::TestCase
   # - the postcode is always blank
   # - full name and age are required and always have values
   def sample_type_with_samples
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
 
     sample_type = User.with_current_user(person.user) do
       project = person.projects.first
-      sample_type = Factory(:patient_sample_type, project_ids: [project.id])
+      sample_type = FactoryBot.create(:patient_sample_type, project_ids: [project.id])
       sample = Sample.new sample_type: sample_type, project_ids: [project.id]
       sample.set_attribute_value('full name', 'Fred Blogs')
       sample.set_attribute_value(:age, 22)

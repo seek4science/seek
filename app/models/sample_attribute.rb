@@ -10,6 +10,7 @@ class SampleAttribute < ApplicationRecord
 
   validates :sample_type, presence: true
   validates :pid, format: { with: URI::regexp, allow_blank: true, allow_nil: true, message: 'not a valid URI' }
+  validate :validate_against_editing_constraints, if: -> { sample_type.present? }
 
   before_save :store_accessor_name
   before_save :default_pos, :force_required_when_is_title
@@ -70,4 +71,22 @@ class SampleAttribute < ApplicationRecord
     true
   end
 
+  def validate_against_editing_constraints
+    c = sample_type.editing_constraints
+    error_message = "cannot be changed (#{title_was})" # Use pre-change title in error message.
+
+    errors.add(:title, error_message) if title_changed? && !c.allow_name_change?(self)
+
+    unless c.allow_required?(self)
+      errors.add(:is_title, error_message) if is_title_changed?
+      errors.add(:required, error_message) if required_changed?
+    end
+
+    unless c.allow_type_change?(self)
+      errors.add(:sample_attribute_type, error_message) if sample_attribute_type_id_changed?
+      errors.add(:sample_controlled_vocab, error_message) if sample_controlled_vocab_id_changed?
+      errors.add(:linked_sample_type, error_message) if linked_sample_type_id_changed?
+      errors.add(:unit, error_message) if unit_id_changed?
+    end
+  end
 end

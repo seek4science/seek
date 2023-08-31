@@ -24,23 +24,12 @@ module Seek
       end
 
       def state_allows_publish?(user = User.current_user)
-        if new_record?
-          return true unless gatekeeper_required?
-          !is_waiting_approval?(user)
-        else
-          return false if is_published?
-          return true unless gatekeeper_required?
-          return true if user.person.is_asset_gatekeeper_of?(self)
-          return false if is_waiting_approval?(user)
-           if is_rejected?
-             if is_updated_since_be_rejected?
-               return true
-             else
-               return false
-             end
-           end
-          return true
-        end
+        return false if is_published?
+        return true unless gatekeeper_required?
+        return true if user.person.is_asset_gatekeeper_of?(self)
+        return false if is_waiting_approval?
+        return true unless is_rejected?
+        return is_updated_since_be_rejected?
       end
 
       def publish!(comment = nil, force = false)
@@ -123,12 +112,12 @@ module Seek
       def temporary_policy_while_waiting_for_publishing_approval
         return true unless authorization_checks_enabled
         return true if User.current_user.blank?
-        if policy.public? && !is_a?(Publication) && gatekeeper_required? && !User.current_user.person.is_asset_gatekeeper_of?(self)
-          self.policy = if new_record?
-                          Policy.projects_policy(projects)
-                        else
-                          Policy.find_by_id(policy.id)
-                        end
+        if is_published? && !is_a?(Publication) && gatekeeper_required? && !User.current_user.person.is_asset_gatekeeper_of?(self)
+          policy.access_type = if new_record?
+                                 Policy::NO_ACCESS
+                               else
+                                 Policy.find_by_id(policy.id).access_type
+                               end
         end
       end
     end

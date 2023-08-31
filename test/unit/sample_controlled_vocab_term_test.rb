@@ -9,10 +9,10 @@ class SampleControlledVocabTermTest < ActiveSupport::TestCase
   end
 
   test 'ontology_based?' do
-    term = Factory(:apples_sample_controlled_vocab).sample_controlled_vocab_terms.first
+    term = FactoryBot.create(:apples_sample_controlled_vocab).sample_controlled_vocab_terms.first
     refute term.ontology_based?
 
-    term = Factory(:topics_controlled_vocab).sample_controlled_vocab_terms.first
+    term = FactoryBot.create(:topics_controlled_vocab).sample_controlled_vocab_terms.first
     assert term.ontology_based?
 
     term = SampleControlledVocabTerm.new

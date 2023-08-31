@@ -6,7 +6,7 @@ class RemoteGitContentFetchingJobTest < ActiveSupport::TestCase
   test 'perform' do
     mock_remote_file "#{Rails.root}/test/fixtures/files/little_file.txt", 'http://somewhere.com/text.txt'
 
-    gv = Factory(:git_version)
+    gv = FactoryBot.create(:git_version)
     disable_authorization_checks do
       gv.add_file('remote-file.txt', StringIO.new(''))
       gv.remote_sources = { 'remote-file.txt' => 'http://somewhere.com/text.txt' }
@@ -28,7 +28,7 @@ class RemoteGitContentFetchingJobTest < ActiveSupport::TestCase
   test 'fail due to http error' do
     mock_remote_file "#{Rails.root}/test/fixtures/files/little_file.txt", 'http://somewhere.com/text.txt', {}, 404
 
-    gv = Factory(:git_version)
+    gv = FactoryBot.create(:git_version)
     disable_authorization_checks do
       gv.add_file('remote-file.txt', StringIO.new(''))
       gv.remote_sources = { 'remote-file.txt' => 'http://somewhere.com/text.txt' }

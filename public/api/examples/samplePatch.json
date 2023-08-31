@@ -1,10 +1,18 @@
 {
   "data": {
     "type": "samples",
-    "id": "8",
+    "id": "3",
     "attributes": {
       "attribute_map": {
-        "the_title": "changed title"
+        "full_name": "Fred Bloggs",
+        "address": "ZZ",
+        "postcode": "M13 8PL",
+        "CAPITAL key": "changed",
+        "apple": "Granny Smith",
+        "apples": [
+          "Golden Delicious",
+          "Bramley"
+        ]
       },
       "tags": [
 
@@ -14,7 +22,7 @@
       "projects": {
         "data": [
           {
-            "id": "68",
+            "id": "2",
             "type": "projects"
           }
         ]

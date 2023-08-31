@@ -3,10 +3,10 @@ require 'test_helper'
 class ProjectsHelperTest < ActionView::TestCase
 
   test 'request_project_membership_button_enabled?' do
-    project_no_admins = Factory(:project)
-    project_administrator = Factory(:project_administrator)
+    project_no_admins = FactoryBot.create(:project)
+    project_administrator = FactoryBot.create(:project_administrator)
     project_with_admins = project_administrator.projects.first
-    another_person = Factory(:person)
+    another_person = FactoryBot.create(:person)
 
 
     with_config_value(:email_enabled,true) do

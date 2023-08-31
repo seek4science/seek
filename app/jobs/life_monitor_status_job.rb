@@ -9,6 +9,7 @@ class LifeMonitorStatusJob < ApplicationJob
     response['items'].each do |wf|
       workflow = Workflow.find_by_uuid(wf['uuid'])
       if workflow
+        Rails.cache.write("lifemonitor-results-#{workflow.cache_key}", { date: Time.now, response: wf })
         wf['versions'].each do |wfv|
           workflow_version = workflow.find_version(wfv['version'])
           if workflow_version
