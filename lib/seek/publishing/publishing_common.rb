@@ -135,8 +135,7 @@ module Seek
       def set_assets
         # get the assets that current_user can manage
         @assets = {}
-        publishable_types = Seek::Util.authorized_types.select { |authorized_type| authorized_type.first.try(:is_in_isa_publishable?) }
-        publishable_types.each do |klass|
+        Seek::Util.asset_types.each do |klass|
           can_manage_assets = klass.authorized_for 'manage', current_user
           unless can_manage_assets.empty?
             @assets[klass.name] = can_manage_assets
