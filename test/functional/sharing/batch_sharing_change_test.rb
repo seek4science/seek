@@ -47,12 +47,12 @@ class BatchSharingChangeTest < ActionController::TestCase
       assert_select 'a[href=?]', "/people/#{person.id}", text: /#{person.name}/, count: 1
     end
     assert_select 'div#sorted_by_type', count: 1 do
-      # Should only see assets: df, doc, ft, model, pres, sop, wf
-      assert_select '.type_and_title', count: 7
+      # Should see all items with policies
+      assert_select '.type_and_title', count: 21
     end
     assert_select 'div#sorted_by_isa', count: 1 do
-      # Should see assets + inv, study, assay
-      assert_select '.type_and_title', count: 10
+      # Should see all items with policies
+      assert_select '.type_and_title', count: 21
     end
 
   end

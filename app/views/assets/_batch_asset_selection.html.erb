@@ -98,9 +98,12 @@
       </div>
       <div id="investigation_list">
         <% @investigations.each do |inv| %>
+          <% collection = inv.assays.map(&:study).map(&:investigation).flatten.uniq %>
+          <% collection = inv.studies.map(&:investigation).flatten.uniq if collection.empty? %>
+          <% collection = [inv] if collection.empty?%>
           <%= render partial: 'assets/isa_tree_preview',
                      locals: { publishing: publishing },
-                     collection: inv.assays.map(&:study).map(&:investigation).flatten.uniq %>
+                     collection: collection %>
         <% end %>
       </div>
       <br/>

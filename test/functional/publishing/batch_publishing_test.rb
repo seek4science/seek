@@ -15,7 +15,7 @@ class BatchPublishingTest < ActionController::TestCase
   test 'should have the -Publish your assets- only on your own profile' do
     get :show, params: { id: User.current_user.person }
     assert_response :success
-    assert_select 'a[href=?]', batch_publishing_preview_person_path, text: /Publish your assets/
+    assert_select 'a[href=?]', batch_publishing_preview_person_path, text: /Publish your items/
 
     get :batch_publishing_preview, params: { id: User.current_user.person.id }
     assert_response :success
@@ -44,14 +44,14 @@ class BatchPublishingTest < ActionController::TestCase
       assert a.can_publish?, 'The asset must not be publishable for this test to succeed'
       assert a.gatekeeper_required?, "This asset must require gatekeeper's approval for this test to succeed"
     end
+
     total_asset_count = (publish_immediately_assets + gatekeeper_required_assets).count
 
     get :batch_publishing_preview, params: { id: User.current_user.person.id }
     assert_response :success
-
     assert_select 'div#sorted_by_type,#sorted_by_isa', count: 2 do |sorted_by|
       sorted_by.each do |sorted_by_block|
-        assert_select sorted_by_block, '.type_and_title', count: total_asset_count do
+        assert_select sorted_by_block, '.type_and_title', count: total_asset_count + 1 do # event will also be shown
           publish_immediately_assets.each do |a|
             assert_select 'a[href=?]', eval("#{a.class.name.underscore}_path(#{a.id})"), text: /#{a.title}/
           end
@@ -61,7 +61,7 @@ class BatchPublishingTest < ActionController::TestCase
           assert_select '.type_and_title img[src*=?][title=?]', 'lock.png', 'Private', count: total_asset_count
         end
 
-        assert_select sorted_by_block, '.parent-btn-checkbox', count: total_asset_count do
+        assert_select sorted_by_block, '.parent-btn-checkbox', count: total_asset_count + 1 do # event will also be shown
           publish_immediately_assets.each do |a|
             assert_select "input[type='checkbox'][id=?]", "publish_#{a.class.name}_#{a.id}"
           end

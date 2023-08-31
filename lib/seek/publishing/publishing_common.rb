@@ -135,7 +135,7 @@ module Seek
       def set_assets
         # get the assets that current_user can manage
         @assets = {}
-        Seek::Util.asset_types.each do |klass|
+        Seek::Util.authorized_types.each do |klass|
           can_manage_assets = klass.authorized_for 'manage', current_user
           unless can_manage_assets.empty?
             @assets[klass.name] = can_manage_assets
@@ -145,8 +145,12 @@ module Seek
 
       def set_investigations
         @investigations = []
+        @assets['Investigation']&.each do |inv|
+          @investigations.push(inv)
+        end
         @assets_not_in_isa = []
         @assets.each do |type, klass|
+          next if %w[Investigation Study Assay].include? type
           klass.each do |asset|
             if asset.investigations.empty?
               @assets_not_in_isa.push(asset)
@@ -156,6 +160,8 @@ module Seek
                 @investigations.push(inv)
               end
             end
+            rescue NoMethodError
+              @assets_not_in_isa.push(asset)
           end
         end
       end
