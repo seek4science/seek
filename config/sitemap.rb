@@ -13,7 +13,7 @@ end
 Seek::Util.searchable_types.each do |type|
   SitemapGenerator::Sitemap.create(filename: type.table_name, include_root: false) do
     type.authorized_for('view', nil).find_all do |obj|
-      add polymorphic_path(obj), lastmod: type.maximum(:updated_at), changefreq: 'daily', priority: 0.7
+      add polymorphic_path(obj), lastmod: obj.updated_at, changefreq: 'daily', priority: 0.7
     end
   end
 end
