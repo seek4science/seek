@@ -7,12 +7,6 @@
 <%= form_for(@template, html: { multipart: true }) do |f| %>
     <%= f.error_messages %>
 
-    <% if @template.new_record? %>
-        <%= folding_panel('Create template using existing template', false, {help_text: "Create template based on existing templates", :body_options => {:id => 'add_custom_attribute_panel'}}) do %>
-            <input type="button" value="Choose from existing templates" class="btn btn-primary" onClick="showTemplateModal()">
-        <% end %>
-    <% end %>
-
     <div class="form-group">
         <label>Title</label><%= required_span %>
         <%= f.text_field :title, :class => 'form-control', :placeholder => 'Template name' %>
@@ -31,10 +25,14 @@
 
     <div class="tab-content">
         <div role="tabpanel" class="tab-pane<%= ' active'.html_safe if tab == 'manual' -%>" id="manual">
-            
+
             <%= render :partial => "templates/template_modal" -%>
 
             <h3>Attributes</h3>
+            <% if @template.new_record? %>
+                <input type="button" value="Choose from existing templates" class="btn btn-primary" onClick="showTemplateModal()">
+            <% end %>
+
             <table class="table" id="attribute-table">
                 <thead>
                     <tr>
@@ -45,6 +43,7 @@
                         <th>Type<%= required_span %></th>
                         <th>Description</th>
                         <th>PID</th>
+                        <th>ISA Tag</th>
                         <th>Unit</th>
                     </tr>
                 </thead>
@@ -106,9 +105,15 @@
         $j('#attribute-table').on('change', '.sample-type-attribute-type', SampleTypes.attributeTypeChanged);
         $j('#attribute-table').on('change', '.controlled-vocab-selection', SampleTypeControlledVocab.controlledVocabChanged);
         $j('#attribute-table .sample-type-attribute-type').trigger("change", [false]);
-				$j('.templates').select2({theme: "bootstrap"});
-				initSelect2($j('.templates'), $j('#existing_templates'))
+        $j('.templates').select2({theme: "bootstrap"});
+        $j('#attribute-table').on('change', 'select[data-attr="isa_tag_title"]', function() {
+            const hiddenInputName = $j(this).attr('name').replace('isa_tag_title', 'isa_tag_id');
+            const isa_tag_id_sel = $j(this).val();
 
+            $j(`input:hidden[name="${hiddenInputName}"]`).val(isa_tag_id_sel);
+
+        });
+        initSelect2($j('.templates'), $j('#existing_templates'));
         Templates.clearContext();
         Templates.init($j('#template-attributes'));
     });

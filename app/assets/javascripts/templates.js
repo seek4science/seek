@@ -45,7 +45,8 @@ Templates.init = function (elem) {
     },
     { title: "PID", width: "10%" },
     { title: "pos" },
-    { title: "isa_tag_id" },
+    { title: "ISA Tag ID", width: "10%" },
+    { title: "ISA Tag", width: "10%" },
     {
       title: "Remove",
       width: "5%",
@@ -89,7 +90,7 @@ function loadTemplates(data) {
 
   $j.each(Object.keys(categorized), (i, key) => {
     const elem = $j(`<optgroup label=${key}></optgroup>`);
-    
+
     $j.each(categorized[key], (j, sub_item) => {
       elem.append(
         $j(`<option>${sub_item.title}</option>`).attr("value", sub_item.template_id).text(key.title)
@@ -119,13 +120,14 @@ Templates.mapData = (data) =>
     item.is_title,
     item.pid,
     item.pos,
-    item.isa_tag_id
+    item.isa_tag_id,
+    item.isa_tag_title
   ]);
 
 function loadFilterSelectors(data) {
   $j.each($j("select[id^='templates_']"), (i, elem) => {
     const key = elem.getAttribute("data-key");
-    
+
     // Gets the set of values to choose from per data-key
     let dt = [...new Set(data.map((item) => item[key]))];
     // If the key == level => options should be filtered out, depending on the 'field_name' context.
@@ -173,7 +175,7 @@ const applyTemplate = () => {
 
   $j(`${attribute_table} tbody`).find("tr:not(:last)").remove();
   SampleTypes.unbindSortable();
-  // Make sure default sorted attributes are added to the table 
+  // Make sure default sorted attributes are added to the table
   Templates.table.order([9, "asc"]).draw();
   $j.each(Templates.table.rows().data(), (i, row) => {
     var newRow = $j(`${attribute_row} tbody`).clone().html();
@@ -197,6 +199,7 @@ const applyTemplate = () => {
     $j(newRow).find(".sample-type-is-title").prop("checked", row[7]);
     $j(newRow).find('[data-attr="pid"]').val(row[8]);
     $j(newRow).find('[data-attr="isa_tag_id"]').val(row[10]);
+    $j(newRow).find(`[data-attr="isa_tag_title"]`).val(row[10]);
 
     // Show the CV block if cv_id is not empty
     if (row[4]) $j(newRow).find(".controlled-vocab-block").show();
