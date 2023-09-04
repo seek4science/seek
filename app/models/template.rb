@@ -27,6 +27,10 @@ class Template < ApplicationRecord
     resolve_controlled_vocabs_inconsistencies
   end
 
+  def valid_template_attributes?
+    template_attributes.reject { |ta| ta.title == 'Input' }.map(&:isa_tag_id).none? nil
+  end
+
   private
 
   # fixes the consistency of the attribute controlled vocabs where the attribute doesn't match.
@@ -37,6 +41,5 @@ class Template < ApplicationRecord
       attribute.sample_controlled_vocab = nil unless attribute.sample_attribute_type.controlled_vocab?
     end
   end
-  
-end
 
+end
