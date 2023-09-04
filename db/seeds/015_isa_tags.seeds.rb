@@ -1,4 +1,6 @@
 # ISA tags
+default = IsaTag.find_or_initialize_by(title: 'default isa-tag')
+default.save
 source = IsaTag.find_or_initialize_by(title:'source')
 source.save
 source_characteristic = IsaTag.find_or_initialize_by(title:'source_characteristic')
