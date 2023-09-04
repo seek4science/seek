@@ -30,6 +30,8 @@ class TemplatesController < ApplicationController
   def new
     @tab = 'manual'
     @template = Template.new
+    @template.level = 'study source'
+    @template.organism = 'any'
     respond_with(@template)
   end
 
