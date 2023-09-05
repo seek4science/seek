@@ -41,6 +41,20 @@ class BatchSharingChangeTest < ActionController::TestCase
     bulk_create_sharing_assets        # Creates one of each everything
     Sop.last.assays = [Assay.last]    # Links sop with isa structure
 
+    # Add manageable df link to isa that cannot be managed
+    other_user = FactoryBot.create(:user).person
+    o_inv=FactoryBot.create(:investigation, contributor: other_user)
+    o_study = FactoryBot.create(:study, investigation: o_inv, contributor: other_user)
+    o_assay = FactoryBot.create(:assay, study: o_study, contributor: other_user, policy: FactoryBot.create(:policy, access_type: Policy::VISIBLE))
+    df = FactoryBot.create(:data_file, contributor: @user.person, assay_ids: [o_assay.id])
+    assert df.can_manage?
+    assert !o_assay.can_manage?
+    assert !o_study.can_manage?
+    assert !o_inv.can_manage?
+
+    # Items that can be changed should be 1 of each except events(+1), investigations(+2), studies(+1) and datafiles(+1)
+    related_items_count = Seek::Util.authorized_types.length + 5
+
     get :batch_sharing_permission_preview, params: { id: person.id }
     assert_response :success
     assert_select 'h1', text: /items related to/, count: 1 do
@@ -48,11 +62,16 @@ class BatchSharingChangeTest < ActionController::TestCase
     end
     assert_select 'div#sorted_by_type', count: 1 do
       # Should see all items with policies
-      assert_select '.type_and_title', count: 21
+      assert_select '.type_and_title', count: related_items_count
+      assert_select '[type=checkbox]', count: related_items_count
     end
     assert_select 'div#sorted_by_isa', count: 1 do
-      # Should see all items with policies
-      assert_select '.type_and_title', count: 21
+      # Should see all items with policies and blocked ISA
+      assert_select '.type_and_title', count: related_items_count + 3
+      assert_select '[type=checkbox]', count: related_items_count
+      assert_select '.parent-btn-checkbox.cant_manage', count: 1
+      assert_select '.parent-btn-checkbox.not_visible', count: 2
+      assert_select '.type_and_title', text: /This item is hidden to you/, count: 2 # Doesn't even show title
     end
 
   end

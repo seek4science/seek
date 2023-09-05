@@ -23,20 +23,20 @@
 <div class="btn-group" >
 
   <% if published %>
-    <button type="button" class="btn parent-btn-checkbox label-default">
+    <button type="button" class="btn parent-btn-checkbox label-default published">
       <span class="label" style="padding: 1px" data-tooltip="<%= tooltip('This item has already been published.') %>">
           <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
           Published
       </span>
     </button>
   <% elsif cant_manage %>
-    <button type="button" class="btn parent-btn-checkbox label-warning">
+    <button type="button" class="btn parent-btn-checkbox label-warning cant_manage">
       <span class="label" style="padding: 1px" data-tooltip="<%= tooltip('You do not have permission to manage this item.') %>">
           <span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span>
       </span>
     </button>
   <% elsif not_visible %>
-    <button type="button" class="btn parent-btn-checkbox label-danger">
+    <button type="button" class="btn parent-btn-checkbox label-danger not_visible">
       <span class="label" style="padding: 1px" data-tooltip="<%= tooltip('You do not have permission to view this item.') %>">
         <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
       </span>
