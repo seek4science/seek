@@ -206,6 +206,7 @@ const applyTemplate = () => {
     $j(newRow).find('[data-attr="pid"]').val(row[8]);
     $j(newRow).find('[data-attr="isa_tag_id"]').val(row[10]);
     $j(newRow).find(`[data-attr="isa_tag_title"]`).val(row[10]);
+    $j(newRow).find(`[data-attr="isa_tag_title"]`).attr('disabled', true);
 
     // Show the CV block if cv_id is not empty
     if (row[4]) $j(newRow).find(".controlled-vocab-block").show();
