@@ -41,6 +41,7 @@ class TemplatesController < ApplicationController
     @template.contributor = User.current_user.person
 
     @tab = 'manual'
+    raise "Some template attributes don't have an ISA tag specified. Please make sure all attributes have an ISA tag!" unless @template.valid_template_attributes?
 
     respond_to do |format|
       if @template.save
@@ -48,6 +49,12 @@ class TemplatesController < ApplicationController
       else
         format.html { render action: 'new' }
       end
+    end
+  rescue StandardError => e
+    flash[:error] = "The following error occurred: #{e}"
+    respond_to do |format|
+      format.html { render :action => 'new', status: :unprocessable_entity }
+      format.json { render json: @template.errors, status: :unprocessable_entity }
     end
   end
 
@@ -58,6 +65,7 @@ class TemplatesController < ApplicationController
   def update
     @template.update(template_params)
     @template.resolve_inconsistencies
+    raise "Some template attributes don't have an ISA tag specified." unless @template.valid_template_attributes?
     respond_to do |format|
       if @template.save
         format.html { redirect_to @template, notice: 'Template was successfully updated.' }
@@ -66,6 +74,12 @@ class TemplatesController < ApplicationController
         format.html { render action: 'edit', status: :unprocessable_entity }
         format.json { render json: @template.errors, status: :unprocessable_entity }
       end
+    end
+  rescue StandardError => e
+    flash[:error] = "The following error occurred: #{e}"
+    respond_to do |format|
+      format.html { render action: 'edit', status: :unprocessable_entity }
+      format.json { render json: @template.errors, status: :unprocessable_entity }
     end
   end
 
