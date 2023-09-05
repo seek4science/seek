@@ -23,6 +23,12 @@
 <% link_to_self = sample_attribute && sample_attribute.deferred_link_to_self %>
 <% hide_seek_sample_multi = seek_sample_multi && displaying_single_page? %>
 <% isa_tag_id = sample_attribute&.isa_tag_id %>
+<% isa_tags_options = IsaTag.all.map { |it| [it.title, it.id] }
+   default_tag_id = IsaTag.all.select { |tag| tag.title == 'default isa-tag' }.first.id
+%>
+<% isa_tag = sample_attribute&.isa_tag %>
+<% isa_tag_id = sample_attribute&.isa_tag_id %>
+<% isa_tag_title = isa_tag&.title %>
 
 <tr class="sample-attribute <%= 'success' if sample_attribute.nil? -%><%='hidden' if hide_seek_sample_multi -%>" data-index="<%= index-%>">
   <th scope="row" class="attribute-position">
@@ -64,7 +70,7 @@
                      class: 'form-control controlled-vocab-selection',
                      disabled: !allow_type_change, data: { attr: "cv_id" }%>
       <% if allow_type_change %>
-        <%= button_link_to('Edit', 'edit', '#', class:'cv-edit-button', disabled: true, target: :_blank) %>        
+        <%= button_link_to('Edit', 'edit', '#', class:'cv-edit-button', disabled: true, target: :_blank) %>
         <%= create_sample_controlled_vocab_modal_button  %>
       <% end %>
       <%= button_link_to('View current', 'show', '#', class:'cv-show-button', disabled: true, target: :_blank) %>
@@ -95,6 +101,13 @@
     <%= text_field_tag "#{field_name_prefix}[pid]", pid, class: 'form-control',
                        placeholder: 'Identifier URI',  data: { attr: "pid" } %>
   </td>
+
+  <td>
+    <%= select_tag "#{field_name_prefix}[isa_tag_title]",
+                    options_for_select(isa_tags_options, default_tag_id),
+                    class: 'form-control', data: {attr: "isa_tag_title"} %>
+  </td>
+
   <td>
     <%= select_tag "#{field_name_prefix}[unit_id]",
                    options_for_select(Unit.order(:order).map { |u| ["#{u.symbol} #{u.title}", "#{u.id}"] },

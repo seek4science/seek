@@ -38,7 +38,8 @@
 						<th width="5em">Title?</th>
 						<th>Type<%= required_span %></th>
 						<th>Description</th>
-						<th>PID</th>
+            <th>PID <%= help_icon(t('samples.pid_info_text')) %> </th>
+            <th>ISA Tag<%= required_span %> <%= help_icon(t('templates.isa_tag_info_text')) %></th>
 						<th>Unit</th>
 					</tr>
 				</thead>
@@ -71,8 +72,8 @@
 
 <script>
     //used to hold the element Id that needs updating after creating a new CV
-    $j(document).ready(function () {        
-        SampleTypeControlledVocab.blankControlledVocabModelForm=$j('#cv-modal').clone();        
+    $j(document).ready(function () {
+        SampleTypeControlledVocab.blankControlledVocabModelForm=$j('#cv-modal').clone();
         SampleTypeControlledVocab.resetModalControlledVocabForm();
         // Make rows sortable
         SampleTypes.bindSortable("#<%=attribute_table_id%>");
@@ -107,5 +108,5 @@
       // Remove the table from the form
       $j("#<%=new_attribute_id%>").remove()
       return true
-    });         
+    });
 </script>
