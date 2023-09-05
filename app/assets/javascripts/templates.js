@@ -175,6 +175,12 @@ const applyTemplate = () => {
 
   $j(`${attribute_table} tbody`).find("tr:not(:last)").remove();
   SampleTypes.unbindSortable();
+
+  // Set template group, level and organism
+  $j('#template_group').val(data.group);
+  $j('#template_organism').val(data.organism);
+  $j('#template_level').val(data.level);
+
   // Make sure default sorted attributes are added to the table
   Templates.table.order([9, "asc"]).draw();
   $j.each(Templates.table.rows().data(), (i, row) => {
