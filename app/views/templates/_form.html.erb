@@ -74,7 +74,8 @@
                     <% @template.template_attributes.each_with_index do |template_attribute, index| %>
                         <%= render :partial => 'template_attribute_form', :locals => { :index => index,
                                                                                 :template_attribute => template_attribute,
-                                                                                :template=>@template} %>
+                                                                                :template=>@template,
+                                                                                :set_default_tag_id => false} %>
                     <% end %>
                     <tr id="add-attribute-row">
                         <td colspan="6">
@@ -92,7 +93,7 @@
 
 <table id="new-attribute-row" style="display: none">
     <tbody>
-        <%= render :partial => 'template_attribute_form', :locals=> {:template=>@template} %>
+        <%= render :partial => 'template_attribute_form', :locals=> {:template=>@template, :set_default_tag_id => true} %>
     </tbody>
 </table>
 
@@ -118,7 +119,7 @@
             newRow = newRow.replace(/replace-me/g, index);
             SampleTypes.unbindSortable();
             $j('#attribute-table #add-attribute-row').before($j(newRow));
-            debugger;
+
             SampleTypes.recalculatePositions();
             SampleTypes.bindSortable();
             return false;

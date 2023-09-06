@@ -59,7 +59,10 @@ class TemplatesController < ApplicationController
   end
 
   def edit
-    respond_with(@template)
+    respond_to do |format|
+      format.html
+    end
+
   end
 
   def update
