@@ -26,6 +26,7 @@
 <% isa_tags_options = IsaTag.all.map { |it| [it.title, it.id] }
    default_tag_id = IsaTag.all.select { |tag| tag.title == 'default isa-tag' }.first.id
    set_default_tag_id ||= false
+   display_isa_tag ||= false
 %>
 <% isa_tag = sample_attribute&.isa_tag %>
 <% isa_tag_id = set_default_tag_id ? default_tag_id : sample_attribute&.isa_tag_id %>
@@ -103,11 +104,13 @@
                        placeholder: 'Identifier URI',  data: { attr: "pid" } %>
   </td>
 
-  <td>
-    <%= select_tag "#{field_name_prefix}[isa_tag_title]",
-                    options_for_select(isa_tags_options, isa_tag_id),
-                    class: 'form-control', data: {attr: "isa_tag_title"} %>
-  </td>
+  <% if display_isa_tag %>
+    <td>
+      <%= select_tag "#{field_name_prefix}[isa_tag_title]",
+                      options_for_select(isa_tags_options, isa_tag_id),
+                      class: 'form-control', data: {attr: "isa_tag_title"} %>
+    </td>
+  <% end %>
 
   <td>
     <%= select_tag "#{field_name_prefix}[unit_id]",
@@ -121,7 +124,7 @@
 
   <td>
     <% if allow_attribute_removal %>
-      <%= hidden_field_tag "#{field_name_prefix}[isa_tag_id]", isa_tag_id, data: { attr: "isa_tag_id" }  %>
+      <%= hidden_field_tag "#{field_name_prefix}[isa_tag_id]", (display_isa_tag ? isa_tag_id : nil), data: { attr: "isa_tag_id" }  %>
       <%= hidden_field_tag "#{field_name_prefix}[_destroy]", '0', autocomplete: 'off' %>
       <div class="btn-group" data-toggle="buttons">
         <label class="btn btn-danger">

@@ -47,7 +47,9 @@
           <% @sample_type.sample_attributes.each_with_index do |sample_attribute, index| %>
               <%= render :partial => 'sample_attribute_form', :locals => { :index => index,
                                                                            :sample_attribute => sample_attribute,
-                                                                           :sample_type=>@sample_type} %>
+                                                                           :sample_type=>@sample_type,
+                                                                           :display_isa_tag => false,
+                                                                           :set_default_tag_id => true } %>
           <% end %>
 
           <% unless @sample_type.uploaded_template? || !@sample_type.editing_constraints.allow_new_attribute? %>
@@ -80,14 +82,16 @@
 
 <table id="new-attribute-row" style="display: none">
   <tbody>
-    <%= render :partial => 'sample_attribute_form', :locals=> {:sample_type=>@sample_type} %>
+    <%= render :partial => 'sample_attribute_form', :locals=> { :sample_type=>@sample_type,
+                                                                :display_isa_tag => false,
+                                                                :set_default_tag_id => true } %>
   </tbody>
 </table>
 
 <script>
     //used to hold the element Id that needs updating after creating a new CV
-    $j(document).ready(function () {        
-        SampleTypeControlledVocab.blankControlledVocabModelForm=$j('#cv-modal').clone();        
+    $j(document).ready(function () {
+        SampleTypeControlledVocab.blankControlledVocabModelForm=$j('#cv-modal').clone();
         SampleTypeControlledVocab.resetModalControlledVocabForm();
         // Make rows sortable
         SampleTypes.bindSortable();
