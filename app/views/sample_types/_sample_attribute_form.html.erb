@@ -25,9 +25,10 @@
 <% isa_tag_id = sample_attribute&.isa_tag_id %>
 <% isa_tags_options = IsaTag.all.map { |it| [it.title, it.id] }
    default_tag_id = IsaTag.all.select { |tag| tag.title == 'default isa-tag' }.first.id
+   set_default_tag_id ||= false
 %>
 <% isa_tag = sample_attribute&.isa_tag %>
-<% isa_tag_id = sample_attribute&.isa_tag_id %>
+<% isa_tag_id = set_default_tag_id ? default_tag_id : sample_attribute&.isa_tag_id %>
 <% isa_tag_title = isa_tag&.title %>
 
 <tr class="sample-attribute <%= 'success' if sample_attribute.nil? -%><%='hidden' if hide_seek_sample_multi -%>" data-index="<%= index-%>">
@@ -104,7 +105,7 @@
 
   <td>
     <%= select_tag "#{field_name_prefix}[isa_tag_title]",
-                    options_for_select(isa_tags_options, default_tag_id),
+                    options_for_select(isa_tags_options, isa_tag_id),
                     class: 'form-control', data: {attr: "isa_tag_title"} %>
   </td>
 
@@ -120,7 +121,7 @@
 
   <td>
     <% if allow_attribute_removal %>
-      <%= hidden_field_tag "#{field_name_prefix}[isa_tag_id]", default_tag_id, data: { attr: "isa_tag_id" }  %>
+      <%= hidden_field_tag "#{field_name_prefix}[isa_tag_id]", isa_tag_id, data: { attr: "isa_tag_id" }  %>
       <%= hidden_field_tag "#{field_name_prefix}[_destroy]", '0', autocomplete: 'off' %>
       <div class="btn-group" data-toggle="buttons">
         <label class="btn btn-danger">
