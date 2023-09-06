@@ -1,13 +1,25 @@
-<% sample_type_count = SampleType.where(template_id: template.id).length -%>
+<%
+	sample_type_count = SampleType.where(template_id: @template.id).length
+%>
 <div class="row">
 	<div class="col-md-6">
 		<p>
+			<%= persistent_resource_id(@template) %>
+		</p>
+		<p>
+			<%= t('contributor').capitalize -%>:
+			<%= link_to @template.contributor&.name, @template.contributor -%>
+		</p>
+		<p>
+			<%= render :partial => 'projects/show_project_relationship', :locals => { :resource => @template } %>
+		</p>
+		<p>
 			<strong>Version:</strong>
-			<%= template.version -%>
+			<%= @template.version -%>
 		</p>
 		<p>
 			<strong>Group:</strong>
-			<%= template.group -%>
+			<%= @template.group -%>
 		</p>
 		<p>
 			<em>
@@ -20,11 +32,23 @@
 	<div class="col-md-6">
 		<p>
 			<strong>Level:</strong>
-			<%= template.level -%>
+			<%= @template.level -%>
 		</p>
 		<p>
 			<strong>Organism:</strong>
-			<%= template.organism -%>
+			<%= @template.organism -%>
 		</p>
+		<p>
+			<strong>Parent Template:</strong>
+			<%= link_to @template.parent&.title, @template.parent %>
+		</p>
+		<strong>Child Templates:</strong>
+		<ul>
+			<% @template.children.map do |child| %>
+				<li>
+					<%= link_to child.title, child %>
+				</li>
+			<% end %>
+		</ul>
 	</div>
 </div>
