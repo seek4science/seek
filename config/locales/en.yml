@@ -68,7 +68,7 @@ en:
     pid_info_text: 'The identifier assigns a unique and unequivocal meaning to the attribute name.'
 
   templates:
-    isa_tag_info_text: 'Some help text...'
+    isa_tag_info_text: 'ISA tags define the relation of each attribute to either the sample or the protocol, following the categories specified by the ISA model.'
 
   gadget:
     new_heading: "New or upload"
