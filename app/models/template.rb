@@ -4,6 +4,9 @@ class Template < ApplicationRecord
   has_many :template_attributes, -> { order(:pos) }, inverse_of: :template, dependent: :destroy
   has_many :sample_types
   has_many :samples, through: :sample_types
+  has_many :children, class_name: 'Template', foreign_key: 'parent_id'
+  belongs_to :parent, class_name: 'Template', optional: true
+
 
   validates :title, presence: true
   validates :title, uniqueness: { scope: [:group, :version] }

@@ -177,9 +177,9 @@ const applyTemplate = () => {
   SampleTypes.unbindSortable();
 
   // Set template group, level and organism
-  $j('#template_group').val(data.group);
   $j('#template_organism').val(data.organism);
   $j('#template_level').val(data.level);
+  $j('#template_parent_id').val(data.template_id);
 
   // Make sure default sorted attributes are added to the table
   Templates.table.order([9, "asc"]).draw();

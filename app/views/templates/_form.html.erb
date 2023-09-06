@@ -21,27 +21,33 @@
 
     <%= render partial: 'assets/manage_specific_attributes', locals:{f:f} if show_form_manage_specific_attributes? %>
 
-    <%= f.hidden_field :parent_id %>
-
     <div class="tab-content">
         <div role="tabpanel" class="tab-pane<%= ' active'.html_safe if tab == 'manual' -%>" id="manual">
 
             <%= render :partial => "templates/template_modal" -%>
             <div class="form-group">
 
-            <h3>Template Information</h3>
-            <%= f.label :level %>
-            <br>
-            <%= f.select:level, ["assay", "study source", "study sample"], {class: 'form-control required'} %>
-            <br>
-            <br>
+                <h3>Template Information</h3>
+                <div class="form-group">
+                    <%= f.label :level %>
+                    <%= f.text_field :level, { class: 'form-control', readonly: true } %>
+                </div>
+                <div class="form-group">
+                    <%= f.label :organism %>
+                    <%= f.text_field :organism, {class: 'form-control'} %>
+                </div>
+                <div class="form-group">
+                    <%= f.label :version %>
+                    <%= f.text_field :version, {class: 'form-control', value: (@template.new_record? ? '0.0.1' : nil)} %>
+                </div>
+                <div class="form-group">
+                    <%= f.label :group %>
+                    <%= f.text_field :group, {class: 'form-control', readonly: true} %>
+                </div>
+                <div class="form-group">
+                    <%= f.text_field :parent_id , {class: 'form-control', readonly: true}%>
+                </div>
 
-            <%= f.label :organism %>
-            <%= f.text_field :organism, {class: 'form-control'} %>
-            </div>
-
-            <div>
-                <%= f.hidden_field :group %>
             </div>
 
             <h3>Attributes</h3>
