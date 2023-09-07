@@ -54,9 +54,11 @@
 			<div class="scrollable-div" style="max-height: 150px; overflow-y: scroll">
 				<ul>
 					<% @template.children.map do |child| %>
-						<li>
-							<%= link_to child.title, child %>
-						</li>
+						<% if child.can_view? %>
+							<li>
+								<%= link_to child.title, child %>
+							</li>
+						<% end %>
 					<% end %>
 				</ul>
 			</div>
