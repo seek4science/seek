@@ -28,13 +28,12 @@ class TemplatesControllerTest < ActionController::TestCase
   end
 
   test 'should create template' do
-    template_attr_1 = FactoryBot.create(:template_attribute, title: 'a string')
     assert_difference('Template.count') do
       post :create, params: { template: { title: 'Hello!',
                                           project_ids: @project_ids,
                                           level: 'study source',
                                           organism: 'any',
-                                          version: '0.0.1',
+                                          version: '1.0.0',
                                           parent_id: nil,
                                           description: 'The description!!',
                                           template_attributes_attributes: {
