@@ -3,8 +3,11 @@ FactoryBot.define do
   factory(:template_attribute) do
     sequence(:title) { |n| "Template attribute #{n}" }
     association :template, factory: :template
+    after(:build) do |type|
+      type.isa_tag_id = IsaTag.find_by_title('default isa-tag').id
+    end
   end
-  
+
   factory(:apples_controlled_vocab_template_attribute, parent: :template_attribute) do
     sequence(:title) { |n| "apples controlled vocab template attribute #{n}" }
     after(:build) do |type|

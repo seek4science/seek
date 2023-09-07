@@ -14,7 +14,7 @@
 <% seek_sample_multi = template_attribute.try(:seek_sample_multi?) %>
 <% is_title = template_attribute ? template_attribute.is_title : false %>
 <%  isa_tags_options = IsaTag.all.map { |it| [it.title, it.id] }
-   default_tag_id = IsaTag.all.select { |tag| tag.title == 'default isa-tag' }.first.id
+   default_tag_id = IsaTag.all.select { |tag| tag.title == 'default isa-tag' }.first&.id
    set_default_tag_id ||= false
 %>
 <% isa_tag = template_attribute&.isa_tag %>

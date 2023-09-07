@@ -24,7 +24,7 @@
 <% hide_seek_sample_multi = seek_sample_multi && displaying_single_page? %>
 <% isa_tag_id = sample_attribute&.isa_tag_id %>
 <% isa_tags_options = IsaTag.all.map { |it| [it.title, it.id] }
-   default_tag_id = IsaTag.all.select { |tag| tag.title == 'default isa-tag' }.first.id
+   default_tag_id = IsaTag.all.select { |tag| tag.title == 'default isa-tag' }.first&.id
    set_default_tag_id ||= false
    display_isa_tag ||= false
 %>
