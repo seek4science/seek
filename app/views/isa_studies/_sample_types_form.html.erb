@@ -49,7 +49,6 @@
                                                                                         :sample_attribute => sample_attribute,
                                                                                         :sample_type=>sample_type,
                                                                                         :prefix => "isa_#{isa_element}[#{main_field_name}]",
-                                                                                        :set_default_tag_id => false,
                                                                                         :display_isa_tag => true } %>
 					<% end %>
 
@@ -71,7 +70,6 @@
   <tbody>
     <%= render :partial => 'sample_types/sample_attribute_form', :locals=> { sample_type:sample_type,
                                                                              prefix: "isa_#{isa_element}[#{main_field_name}]",
-                                                                             set_default_tag_id: true,
                                                                              display_isa_tag: true } %>
   </tbody>
 </table>

@@ -1,5 +1,6 @@
 <%
 	sample_type_count = SampleType.where(template_id: @template.id).length
+	hidden_children_count = @template.children.size - @template.children.authorized_for(:view).size
 %>
 <div class="row">
 	<div class="col-md-6">
@@ -35,7 +36,7 @@
 
 	<div class="col-md-6">
 		<p>
-			<strong>Level:</strong>
+			<strong>ISA Level:</strong>
 			<%= @template.level -%>
 		</p>
 		<p>
@@ -59,6 +60,9 @@
 								<%= link_to child.title, child %>
 							</li>
 						<% end %>
+					<% end %>
+					<% if hidden_children_count > 0 %>
+						<li><em><%= "#{hidden_children_count} child template#{hidden_children_count > 1 ? "s are" : " is"} hidden to you" %></em></li>
 					<% end %>
 				</ul>
 			</div>

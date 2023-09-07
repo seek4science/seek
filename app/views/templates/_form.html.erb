@@ -81,8 +81,7 @@
                     <% @template.template_attributes.each_with_index do |template_attribute, index| %>
                         <%= render :partial => 'template_attribute_form', :locals => { :index => index,
                                                                                 :template_attribute => template_attribute,
-                                                                                :template=>@template,
-                                                                                :set_default_tag_id => false} %>
+                                                                                :template=>@template } %>
                     <% end %>
                     <tr id="add-attribute-row">
                         <td colspan="6">
@@ -100,7 +99,7 @@
 
 <table id="new-attribute-row" style="display: none">
     <tbody>
-        <%= render :partial => 'template_attribute_form', :locals=> {:template=>@template, :set_default_tag_id => true} %>
+        <%= render :partial => 'template_attribute_form', :locals=> {:template=>@template } %>
     </tbody>
 </table>
 
@@ -148,6 +147,9 @@
         initSelect2($j('.templates'), $j('#existing_templates'));
         Templates.clearContext();
         Templates.init($j('#template-attributes'));
+
+        // Makes sure existing sampletype attributes are disabled
+        $j('#attribute-table').find('tr.sample-attribute [data-attr="isa_tag_title"]').attr('disabled', true);
     });
 
     const templates = <%= load_templates().to_json.html_safe %>
