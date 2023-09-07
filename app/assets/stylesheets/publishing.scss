@@ -64,11 +64,6 @@ ul.item_for_decision {
 .publishing_options {
   padding: 0.5em 1em;
 
-  &.publishable {
-    background-color: #fafaff;
-    border-left-color: $btn-success-bg;
-  }
-
   &.not-manageable {
     border-left-color: $btn-warning-bg;
   }

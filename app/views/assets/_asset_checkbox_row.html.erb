@@ -3,10 +3,19 @@
   checked ||= false
   block_published ||= false
 
+  can_manage=item.can_manage?
+  can_view=item.can_view?
+  published=false
   tree_class = 'not-manageable'
-  tree_class = 'publishable' if item.can_publish? && item.can_manage?
-  tree_class = 'already-published' if item.is_published?
-  tree_class = 'not-visible' unless item.can_view?
+  tree_class = 'manageable' if can_manage
+  tree_class = 'not-visible' unless can_view
+  if block_published
+    if item.is_published?
+      published=true
+      tree_class = 'already-published'
+    end
+  end
+
 
   toggle ||=false
   cb_parent_selector ||="div\##{item.class.name}_#{item.id}.split_button_parent"
@@ -20,15 +29,15 @@
   <% if toggle %>
     <%= render :partial => 'assets/isa-tree-toggle', locals: { cb_parent_selector: cb_parent_selector } -%>
   <% end %>
-  <% if item.can_view? %>
+  <% if can_view %>
     <div  style="display: inline; margin-right:1em">
       <%= render :partial => 'general/split_button_checkbox',
                  locals: { checkbox_id: publishing_item_param(item),
                            checkbox_class: "#{item.class.name}_#{item.id}",
                            checked: checked,
                            checkbox_text: "",
-                           published: (item.is_published? && block_published),
-                           cant_manage: !(item.can_manage?),
+                           published: published,
+                           cant_manage: !(can_manage),
                            toggle: toggle,
                            cb_parent_selector: cb_parent_selector} -%>
     </div>
