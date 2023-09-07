@@ -110,7 +110,6 @@ class BatchPublishingTest < ActionController::TestCase
 
     get :check_gatekeeper_required, params: params.merge(id: person.id)
     assert_response :success
-    pp(params.merge(id: person.id))
 
     # Publishable shown in immediate publishing section
     assert_select 'h2', text: /The following items will be published:/, count: 1
@@ -137,6 +136,26 @@ class BatchPublishingTest < ActionController::TestCase
         assert_select 'a[href=?]', data_file_path(waiting), text: waiting.title
       end
     end
+  end
+
+  test 'Events are skipped *in publish related items' do
+    person = User.current_user.person
+    assay = FactoryBot.create(:assay, contributor: person)
+    df = FactoryBot.create(:data_file, projects: [person.projects.first], assays: [assay], contributor: person)
+    event = FactoryBot.create(:event, contributor: person)
+    login_as(person.user)
+    assert df.can_publish?
+    assert event.can_publish?
+
+    params = { publish: {} }
+    [df, event].each do |asset|
+      params[:publish][asset.class.name] ||= {}
+      params[:publish][asset.class.name][asset.id.to_s] = '1'
+    end
+
+    get :check_related_items, params: params.merge(id: person.id)
+    assert_response :success
+
   end
 
   test 'do not have not_publishable_type item in batch_publishing_preview' do
