@@ -13,13 +13,9 @@
 <% field_name_prefix = "template[template_attributes_attributes][#{index}]" %>
 <% seek_sample_multi = template_attribute.try(:seek_sample_multi?) %>
 <% is_title = template_attribute ? template_attribute.is_title : false %>
-<%  isa_tags_options = IsaTag.all.map { |it| [it.title, it.id] }
-   default_tag_id = IsaTag.all.select { |tag| tag.title == 'default isa-tag' }.first&.id
-   set_default_tag_id ||= false
-%>
-<% isa_tag = template_attribute&.isa_tag %>
-<% isa_tag_id = set_default_tag_id ? default_tag_id : template_attribute&.isa_tag_id %>
-<% isa_tag_title = isa_tag&.title %>
+<% isa_tags_options = IsaTag.all.map { |it| [it.title, it.id] } %>
+<% isa_tag_id = template_attribute&.isa_tag_id %>
+<% isa_tag_title = template_attribute&.isa_tag&.title %>
 
 <tr class="sample-attribute <%= 'success' if template_attribute.nil? -%>" data-index="<%= index-%>">
   <th scope="row" class="attribute-position">
@@ -55,7 +51,7 @@
       <%= select_tag "#{field_name_prefix}[sample_controlled_vocab_id]",
                      options_for_select(SampleControlledVocab.all.map { |scv| [scv.title, scv.id, {'data-editable'=>scv.can_edit?, 'data-is-ontology'=>scv.custom_input?}] },
                       sample_controlled_vocab_id),include_blank: true,
-                     class: 'form-control controlled-vocab-selection', data: {attr: "cv_id"} %>
+                      class: 'form-control controlled-vocab-selection', data: {attr: "cv_id"} %>
 
       <%= button_link_to('Edit', 'edit', '#', class:'cv-edit-button', disabled: true, target: :_blank) %>
       <%= create_sample_controlled_vocab_modal_button  %>
@@ -91,7 +87,7 @@
   <td>
     <%= select_tag "#{field_name_prefix}[isa_tag_title]",
                     options_for_select(isa_tags_options, isa_tag_id),
-                    class: 'form-control', data: {attr: "isa_tag_title"} %>
+                    include_blank: true, class: 'form-control', data: {attr: "isa_tag_title"} %>
   </td>
 
   <td>
