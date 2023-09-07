@@ -16,16 +16,17 @@
     end
   end
 
+  itemid="#{item.class.name}_#{item.id}"
 
   toggle ||=false
-  cb_parent_selector ||="div\##{item.class.name}_#{item.id}.split_button_parent"
+  cb_parent_selector ||="div\##{itemid}.split_button_parent"
   show_managers=true
-  managed_by_selector ||="div\##{item.class.name}_#{item.id}.managed_by_list"
+  managed_by_selector ||="div\##{itemid}.managed_by_list"
   show_permissions=true
-  permissions_selector ||="div\##{item.class.name}_#{item.id}.permission_list"
+  permissions_selector ||="div\##{itemid}.permission_list"
 
 -%>
-<div class="isa-tree <%= html_classes -%> <%= tree_class %> _<%= item.id %>">
+<div class="isa-tree <%= html_classes -%> <%= tree_class %> <%= itemid %>">
   <% if toggle %>
     <%= render :partial => 'assets/isa-tree-toggle', locals: { cb_parent_selector: cb_parent_selector } -%>
   <% end %>
@@ -33,7 +34,7 @@
     <div  style="display: inline; margin-right:1em">
       <%= render :partial => 'general/split_button_checkbox',
                  locals: { checkbox_id: publishing_item_param(item),
-                           checkbox_class: "#{item.class.name}_#{item.id}",
+                           checkbox_class: itemid,
                            checked: checked,
                            checkbox_text: "",
                            published: published,
@@ -52,7 +53,7 @@
     <div  style="display: inline; margin-right:1em">
       <%= render :partial => 'general/split_button_checkbox',
                  locals: { checkbox_id: publishing_item_param(item),
-                           checkbox_class: "#{item.class.name}_#{item.id}",
+                           checkbox_class: itemid,
                            not_visible: true,
                            toggle: toggle,
                            cb_parent_selector: cb_parent_selector} -%>
@@ -69,7 +70,7 @@
         data-managed_by_selector='<%= managed_by_selector %>'>
       <span class="glyphicon glyphicon-user" aria-hidden="true" style="position:relative; top:2px;" ></span>
     </a>
-    <div class="managed_by_list" id="<%="#{item.class.name}_#{item.id}"-%>" style="display:none;margin-left:5em">
+    <div class="managed_by_list" id="<%= itemid -%>" style="display:none;margin-left:5em">
       <strong>Manageable by:</strong> <%= item.managers.empty? ? "<span class='none_text'>None</span>".html_safe : item.managers.collect { |m| link_to(h(m.title), m) }.join(", ").html_safe -%>
     </div>
   <% end %>

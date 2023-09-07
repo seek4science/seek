@@ -37,12 +37,8 @@ module Seek
       def check_gatekeeper_required
         @waiting_for_publish_items = @items_for_publishing.select { |item| item.gatekeeper_required? && !User.current_user.person.is_asset_gatekeeper_of?(item) }
         @items_for_immediate_publishing = @items_for_publishing - @waiting_for_publish_items
-        unless @waiting_for_publish_items.empty?
-          respond_to do |format|
-            format.html { render template: 'assets/publishing/waiting_approval_list' }
-          end
-        else
-          publish_final_confirmation
+        respond_to do |format|
+          format.html { render template: 'assets/publishing/publish_final_confirmation' }
         end
       end
 
@@ -51,12 +47,6 @@ module Seek
         current_access_type = args.first.policy.access_type.to_s
         @policy_updated = true if param_access_type != current_access_type
         super
-      end
-
-      def publish_final_confirmation
-        respond_to do |format|
-          format.html { render template: 'assets/publishing/publish_final_confirmation' }
-        end
       end
 
       def publish
@@ -169,6 +159,7 @@ module Seek
       # sets the @items_for_publishing based on the :publish param, and filtered by whether than can_publish?
       def set_items_for_publishing
         @items_for_publishing = resolve_publish_params(params[:publish]).select(&:can_publish?)
+        @items_cannot_publish = resolve_publish_params(params[:publish]) - @items_for_publishing
       end
 
       # sets the @items_for_publishing based on the :publish param, and filtered by whether than can_publish? OR contains_publishable_items?

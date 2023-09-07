@@ -73,17 +73,70 @@ class BatchPublishingTest < ActionController::TestCase
     end
   end
 
-  test 'do not have not-publishable items in batch_publishing_preview' do
+  test 'Cannot select already-published items in batch_publishing_preview' do
     published_item = FactoryBot.create(:data_file,
-                             contributor: User.current_user.person,
-                             policy: FactoryBot.create(:public_policy))
-    assert !published_item.can_publish?, 'This data file must not be publishable for the test to succeed'
+                                       contributor: User.current_user.person,
+                                       policy: FactoryBot.create(:public_policy))
+    assert published_item.is_published?
 
     get :batch_publishing_preview, params: { id: User.current_user.person.id }
     assert_response :success
 
-    assert_select "input[type='checkbox'][id=?]", "publish_#{published_item.class.name}_#{published_item.id}",
-                  count: 0
+    assert_select ".isa-tree.#{published_item.class.name}_#{published_item.id}", count: 2 do
+      assert_select "input[type='checkbox']", count: 0
+    end
+  end
+
+  test 'publish_final_confirmation' do
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    person = User.current_user.person
+    gatekept_project = gatekeeper.projects.first
+    publishable = FactoryBot.create(:data_file, projects: [person.projects.first], contributor: person)
+    gatekept = FactoryBot.create(:data_file, projects: [gatekept_project], contributor: person)
+    waiting = FactoryBot.create(:data_file, projects: [gatekept_project], contributor: person)
+    ResourcePublishLog.add_log(ResourcePublishLog::WAITING_FOR_APPROVAL, waiting, nil, person.user)
+
+    login_as(person.user)
+    assert publishable.can_publish?
+    assert gatekept.can_publish?
+    assert gatekept.gatekeeper_required?
+    assert !waiting.can_publish?
+
+    params = { publish: {} }
+    [publishable, gatekept, waiting].each do |asset|
+      params[:publish][asset.class.name] ||= {}
+      params[:publish][asset.class.name][asset.id.to_s] = '1'
+    end
+
+    get :check_gatekeeper_required, params: params.merge(id: person.id)
+    assert_response :success
+    pp(params.merge(id: person.id))
+
+    # Publishable shown in immediate publishing section
+    assert_select 'h2', text: /The following items will be published:/, count: 1
+    assert_select 'div.alert-info', text: /immediately accessible to the public/, count: 1
+    assert_select 'ul.publishing_options#publish_immediately', count: 1 do
+      assert_select 'li.type_and_title', count: 1 do
+        assert_select 'a[href=?]', data_file_path(publishable), text: publishable.title
+      end
+    end
+    # Gatekept explains waiting approval
+    assert_select 'h2', text: /The following items require approval:/, count: 1
+    assert_select 'div.alert-warning', text: /an email will be sent to that person, and they will either approve or reject/, count: 1
+    assert_select 'ul.publishing_options#waiting_approval', count: 1 do
+      assert_select 'li.type_and_title', count: 1 do
+        assert_select 'a[href=?]', data_file_path(gatekept), text: gatekept.title
+      end
+    end
+
+    # If not-publishable warning is issued
+    assert_select 'h2', text: /The following items cannot be published:/, count: 1
+    assert_select 'div.alert-danger', text: /One or more of the items you selected cannot be published/, count: 1
+    assert_select 'ul.publishing_options#cannot_publish', count: 1 do
+      assert_select 'li.type_and_title', count: 1 do
+        assert_select 'a[href=?]', data_file_path(waiting), text: waiting.title
+      end
+    end
   end
 
   test 'do not have not_publishable_type item in batch_publishing_preview' do

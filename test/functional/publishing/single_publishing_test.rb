@@ -164,7 +164,7 @@ class SinglePublishingTest < ActionController::TestCase
 
     # split-button dropdown menu shown for tree branches
     should_have_dropdown.each do |asset|
-      assert_select "._#{asset.id}", count: 1 do
+      assert_select ".isa-tree.#{asset.class.name}_#{asset.id}", count: 1 do
         assert_select '.parent-btn-dropdown', count: 1
         assert_select '.dropdown-menu', count: 1 do
           assert_select 'li', count: 2 do
@@ -181,7 +181,7 @@ class SinglePublishingTest < ActionController::TestCase
     end
     # split-button dropdown menu not shown for tree leafs
     should_not_have_dropdown.each do |asset|
-      assert_select "._#{asset.id}", count: 1 do
+      assert_select ".isa-tree.#{asset.class.name}_#{asset.id}", count: 1 do
         assert_select '.parent-btn-dropdown', count: 0
         assert_select '.dropdown-menu', count: 0
       end
