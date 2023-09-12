@@ -13,7 +13,6 @@
 <% field_name_prefix = "template[template_attributes_attributes][#{index}]" %>
 <% seek_sample_multi = template_attribute.try(:seek_sample_multi?) %>
 <% is_title = template_attribute ? template_attribute.is_title : false %>
-<% isa_tags_options = IsaTag.all.map { |it| [it.title, it.id] } %>
 <% isa_tag_id = template_attribute&.isa_tag_id %>
 <% isa_tag_title = template_attribute&.isa_tag&.title %>
 
@@ -86,7 +85,7 @@
 
   <td>
     <%= select_tag "#{field_name_prefix}[isa_tag_title]",
-                    options_for_select(isa_tags_options, isa_tag_id),
+                    options_for_select([], nil),
                     include_blank: true, class: 'form-control', data: {attr: "isa_tag_title"} %>
   </td>
 

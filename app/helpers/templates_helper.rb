@@ -17,9 +17,13 @@ module TemplatesHelper
   def load_templates
     privilege = Seek::Permissions::Translator.translate('view')
     Template.order(:group, :group_order).select { |t| t.can_perform?(privilege) }.map do |item|
-      { title: item.title, group: item.group, level: item.level,
-        organism: item.organism, template_id: item.id,
-        description: item.description, group_order: item.group_order,
+      { title: item.title,
+        group: item.group,
+        level: item.level,
+        organism: item.organism,
+        template_id: item.id,
+        description: item.description,
+        group_order: item.group_order,
         attributes: item.template_attributes.order(:pos).map { |a| map_template_attributes(a) } }
     end
   end

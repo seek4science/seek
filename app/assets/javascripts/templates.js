@@ -161,6 +161,25 @@ function loadFilterSelectors(data) {
   });
 }
 
+function get_filtered_isa_tags(level) {
+  var result;
+  $j.ajax({
+    type: 'POST',
+    async: false,
+    url: '/templates/filter_isa_tags_by_level',
+    data: {level: level},
+    dataType: 'json',
+    success: function(res) {
+      result = res.result;
+    },
+    error: function (errMsg) {
+      alert(`Couldn't find valid ISA Tags because of the following error:\n${errMsg}`);
+      result = [];
+    }
+  });
+  return result;
+}
+
 const applyTemplate = () => {
   const id = $j("#source_select").find(":selected").val();
   const data = templates.find((t) => t.template_id == id);
@@ -172,6 +191,18 @@ const applyTemplate = () => {
   const attribute_table = "#attribute-table" + suffix;
   const attribute_row = "#new-attribute-row" + suffix;
   const addAttributeRow = "#add-attribute-row" + suffix;
+
+  // Append filtered option to a new attribute row
+  const isa_tags = get_filtered_isa_tags(data.level);
+  console.log('Template level:', data.level);
+  console.log('ISA Tags:', isa_tags);
+
+  $j.each(isa_tags, function (i, tag) {
+    $j(attribute_row).find('select[data-attr="isa_tag_title"]').append($j('<option>', {
+      value: tag.value,
+      text: tag.text
+    }));
+  });
 
   $j(`${attribute_table} tbody`).find("tr:not(:last)").remove();
   SampleTypes.unbindSortable();
@@ -205,8 +236,8 @@ const applyTemplate = () => {
     $j(newRow).find(".sample-type-is-title").prop("checked", row[7]);
     $j(newRow).find('[data-attr="pid"]').val(row[8]);
     $j(newRow).find('[data-attr="isa_tag_id"]').val(row[10]);
-    $j(newRow).find(`[data-attr="isa_tag_title"]`).val(row[10]);
-    $j(newRow).find(`[data-attr="isa_tag_title"]`).attr('disabled', true);
+    $j(newRow).find('[data-attr="isa_tag_title"]').val(row[10]);
+    $j(newRow).find('[data-attr="isa_tag_title"]').attr('disabled', true);
 
     // Show the CV block if cv_id is not empty
     if (row[4]) $j(newRow).find(".controlled-vocab-block").show();
