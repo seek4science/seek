@@ -83,8 +83,12 @@ class IsaStudy
       errors[:base] << '[Sample type]: An attribute with source ISA tag is not provided'
     end
 
-    unless @sample_collection_sample_type.sample_attributes.select { |a| a.isa_tag&.isa_sample? }.one?
-      errors[:base] << '[Sample type]: An attribute with sample ISA tag is not provided'
+    [:isa_sample?, :isa_protocol?].each do |tag_type|
+      sample_type_tag_types = @sample_collection_sample_type.sample_attributes.select { |a| a.isa_tag&.send(tag_type) }
+      unless sample_type_tag_types.one?
+        tag_title = sample_type_tag_types[0]&.isa_tag&.title
+        errors[:base] << "[Sample type]: Should have exaclty one attribute with the '#{tag_title}' ISA tag selected"
+      end
     end
 
     unless @sample_collection_sample_type.sample_attributes.any?(&:seek_sample_multi?)

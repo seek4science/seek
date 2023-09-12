@@ -107,6 +107,24 @@
         $j("#<%=attribute_table_id%>").on('change', '.controlled-vocab-selection', SampleTypeControlledVocab.controlledVocabChanged);
         $j('.controlled-vocab-selection').change();
 
+        // Change ISA tag ID of the study source when the select is changed
+        $j('#attribute-table_source_sample_type').on('change', 'select[data-attr="isa_tag_title"]', function() {
+            const hiddenInputName = $j(this).attr('name').replace('isa_tag_title', 'isa_tag_id');
+            const isa_tag_id_sel = $j(this).val();
+
+            $j(`input:hidden[name="${hiddenInputName}"]`).val(isa_tag_id_sel);
+
+        });
+
+        // Change ISA tag ID of the study sample when the select is changed
+        $j('#attribute-table_sample_collection_sample_type').on('change', 'select[data-attr="isa_tag_title"]', function() {
+            const hiddenInputName = $j(this).attr('name').replace('isa_tag_title', 'isa_tag_id');
+            const isa_tag_id_sel = $j(this).val();
+
+            $j(`input:hidden[name="${hiddenInputName}"]`).val(isa_tag_id_sel);
+
+        });
+
         // Disable select ISA tags of existing attributes
         $j('#attribute-table_source_sample_type').find('tr.sample-attribute [data-attr="isa_tag_title"]').attr('disabled', true);
         $j('#attribute-table_sample_collection_sample_type').find('tr.sample-attribute [data-attr="isa_tag_title"]').attr('disabled', true);
