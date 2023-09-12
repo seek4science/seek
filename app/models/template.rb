@@ -7,7 +7,6 @@ class Template < ApplicationRecord
   has_many :children, class_name: 'Template', foreign_key: 'parent_id'
   belongs_to :parent, class_name: 'Template', optional: true
 
-
   validates :title, presence: true
   validates :title, uniqueness: { scope: [:group, :version] }
 
@@ -31,8 +30,9 @@ class Template < ApplicationRecord
   end
 
   def valid_template_attributes?
-    template_attributes.reject { |ta| ta.title == 'Input' }.map(&:isa_tag_id).none? nil
+    none_empty_isa_tag && test_tag_occurences
   end
+
 
   private
 
@@ -45,4 +45,13 @@ class Template < ApplicationRecord
     end
   end
 
+  def none_empty_isa_tag
+    template_attributes.reject { |ta| ta.title == 'Input' }.map(&:isa_tag_id).none? nil
+  end
+
+  def test_tag_occurences
+    %w[source protocol sample data_file other_material].map do |tag|
+      template_attributes.map(&:isa_tag).map(&:title).count(tag) > 1
+    end.compact&.none? true
+  end
 end
