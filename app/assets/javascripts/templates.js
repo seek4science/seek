@@ -180,6 +180,25 @@ function get_filtered_isa_tags(level) {
   return result;
 }
 
+function updateIsaTagSelect(template_level, attribute_row) {
+  const isa_tags = get_filtered_isa_tags(template_level);
+  console.log('Template level:', template_level);
+  console.log('ISA Tags:', isa_tags);
+  // debugger;
+  // Remove all options first, except blank one
+  $j(attribute_row).find('select[data-attr="isa_tag_title"] option:not([value=""])').each(function() {
+    $j(this).remove();
+  });
+
+  // Append filtered option to a new attribute row
+  $j.each(isa_tags, function (i, tag) {
+    $j(attribute_row).find('select[data-attr="isa_tag_title"]').append($j('<option>', {
+      value: tag.value,
+      text: tag.text
+    }));
+  });
+}
+
 const applyTemplate = () => {
   const id = $j("#source_select").find(":selected").val();
   const data = templates.find((t) => t.template_id == id);
@@ -192,17 +211,7 @@ const applyTemplate = () => {
   const attribute_row = "#new-attribute-row" + suffix;
   const addAttributeRow = "#add-attribute-row" + suffix;
 
-  // Append filtered option to a new attribute row
-  const isa_tags = get_filtered_isa_tags(data.level);
-  console.log('Template level:', data.level);
-  console.log('ISA Tags:', isa_tags);
-
-  $j.each(isa_tags, function (i, tag) {
-    $j(attribute_row).find('select[data-attr="isa_tag_title"]').append($j('<option>', {
-      value: tag.value,
-      text: tag.text
-    }));
-  });
+  updateIsaTagSelect(data.level, attribute_row);
 
   $j(`${attribute_table} tbody`).find("tr:not(:last)").remove();
   SampleTypes.unbindSortable();

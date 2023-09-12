@@ -40,19 +40,23 @@ class TemplatesController < ApplicationController
     @template.contributor = User.current_user.person
 
     @tab = 'manual'
-    raise "Some template attributes don't have an ISA tag specified. Please make sure all attributes have an ISA tag!" unless @template.valid_template_attributes?
+    raise "Some template attributes are invalid. Please make sure the followig criteria:
+    <ul>
+    <li>All attributes have an ISA tag!</li>
+    <li>protocol, sample, source, data_file and other_material can only occur once as an ISA tag!</li>
+    </ul>" unless @template.valid_template_attributes?
 
     respond_to do |format|
       if @template.save
         format.html { redirect_to @template, notice: 'Template was successfully created.' }
       else
-        format.html { render action: 'new' }
+        format.html { render :new }
       end
     end
   rescue StandardError => e
-    flash[:error] = "The following error occurred: #{e}"
+    flash[:error] = "<b>The following error occurred:</b><br/> #{e}".html_safe
     respond_to do |format|
-      format.html { render :action => 'new', status: :unprocessable_entity }
+      format.html { render :new, status: :unprocessable_entity }
       format.json { render json: @template.errors, status: :unprocessable_entity }
     end
   end
@@ -73,14 +77,14 @@ class TemplatesController < ApplicationController
         format.html { redirect_to @template, notice: 'Template was successfully updated.' }
         format.json { render json: @template, include: [params[:include]] }
       else
-        format.html { render action: 'edit', status: :unprocessable_entity }
+        format.html { render action: :edit, status: :unprocessable_entity }
         format.json { render json: @template.errors, status: :unprocessable_entity }
       end
     end
   rescue StandardError => e
     flash[:error] = "The following error occurred: #{e}"
     respond_to do |format|
-      format.html { render action: 'edit', status: :unprocessable_entity }
+      format.html { render action: :edit, status: :unprocessable_entity }
       format.json { render json: @template.errors, status: :unprocessable_entity }
     end
   end
