@@ -138,7 +138,7 @@ function loadFilterSelectors(data) {
       } else if(Templates.context.field_name === 'source_sample_type'){
         dt = dt.filter(lvl => lvl === "study source")
       } else if(Templates.context.field_name === 'sample_type') {
-        dt = dt.filter(lvl => lvl === "assay")
+        dt = dt.filter(lvl => ["assay - material", "assay - data file"].includes(lvl))
       }
       $j(elem).find("option").remove(); // Removes all options, even the first, i.e. "not selected"
     }
@@ -285,7 +285,7 @@ const updateTypeSelect = function(field_name) {
   } else if (field_name === 'source_sample_type') {
 		$j("#templates_type_select").val("study source").change();
   } else if(field_name === 'sample_type') {
-    $j("#templates_type_select").val("assay").change();
+    $j("#templates_type_select").val("assay - material").change();
   } else {
     $j("#templates_type_select option").first().change();
   }
