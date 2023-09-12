@@ -142,7 +142,7 @@ class TemplatesController < ApplicationController
 
     case level
     when 'study source'
-      isa_tags_options = all_isa_tags_options.select { |tag| %w[source source_characteristic parameter_value].include?(tag[:text]) }
+      isa_tags_options = all_isa_tags_options.select { |tag| %w[source source_characteristic].include?(tag[:text]) }
     when 'study sample'
       isa_tags_options = all_isa_tags_options.select { |tag| %w[protocol sample sample_characteristic parameter_value].include?(tag[:text]) }
     when 'assay - material'
