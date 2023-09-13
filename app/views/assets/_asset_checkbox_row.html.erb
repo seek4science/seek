@@ -28,11 +28,11 @@
 -%>
 <div class="isa-tree <%= html_classes -%> <%= tree_class %> <%= itemid %>">
   <% if toggle %>
-    <%= render :partial => 'assets/isa-tree-toggle', locals: { cb_parent_selector: cb_parent_selector } -%>
+    <%= render partial: 'assets/isa-tree-toggle', locals: { cb_parent_selector: cb_parent_selector } -%>
   <% end %>
   <% if can_view %>
     <div  style="display: inline; margin-right:1em">
-      <%= render :partial => 'general/split_button_checkbox',
+      <%= render partial: 'general/split_button_checkbox',
                  locals: { checkbox_id: publishing_item_param(item),
                            checkbox_class: itemid,
                            checked: checked,
@@ -43,7 +43,7 @@
                            cb_parent_selector: cb_parent_selector} -%>
     </div>
     <h5 class="type_and_title" style="display: inline">
-      <strong><%= text_for_resource item -%>:</strong> <%= link_to item.title, item, :target => "_blank" -%>
+      <strong><%= text_for_resource item -%>:</strong> <%= link_to item.title, item, target: "_blank" -%>
       <a class="btn btn-default permissions_toggle" style="display: inline; margin-left:2em; padding:6px"
           data-permissions_selector='<%= permissions_selector %>'>
         <%=list_item_visibility(item)-%>
@@ -51,7 +51,7 @@
     </h5>
   <% else %>
     <div  style="display: inline; margin-right:1em">
-      <%= render :partial => 'general/split_button_checkbox',
+      <%= render partial: 'general/split_button_checkbox',
                  locals: { checkbox_id: publishing_item_param(item),
                            checkbox_class: itemid,
                            not_visible: true,
@@ -75,6 +75,6 @@
     </div>
   <% end %>
   <% if show_permissions %>
-    <%= render :partial => 'assets/permission_list', locals: { item: item} -%>
+    <%= render partial: 'assets/permission_list', locals: { item: item} -%>
   <% end %>
 </div>

@@ -30,7 +30,7 @@
   <ul class="publishing_options" id="waiting_approval" style="margin-left: 2em">
     <% @waiting_for_publish_items.each do |item| %>
       <li class="type_and_title"><%= text_for_resource item -%>
-        :&nbsp;<%= link_to item.title, item, :target => "_blank" -%></li>
+        :&nbsp;<%= link_to item.title, item, target: "_blank" -%></li>
       <ul><li class="secondary">Approval required from: <%= item.asset_gatekeepers.collect { |m| link_to(m.title, m) }.join(" or ").html_safe -%></li></ul>
       <br/>
   <% end %>
@@ -52,13 +52,13 @@
   <ul class="publishing_options" id="cannot_publish" style="margin-left: 2em">
     <% @items_cannot_publish.each do |item| %>
       <li class="type_and_title"><%= text_for_resource item -%>
-        :&nbsp;<%= link_to item.title, item, :target => "_blank" -%></li>
+        :&nbsp;<%= link_to item.title, item, target: "_blank" -%></li>
       <br/>
     <% end %>
   </ul>
 <% end -%>
 
-<%= form_tag :action => :publish do %>
+<%= form_tag action: :publish do %>
   <div style="display:none;">
     <% @items_for_publishing.each do |item| %>
       <%= hidden_field_tag publishing_item_param(item), 1 %>
@@ -68,7 +68,7 @@
   <br/>
 
   <% resource = (controller_name == 'people') ? current_user.person : @asset %>
-  <%= submit_tag "Confirm", data: { disable_with: 'Confirm' }, :class => 'btn btn-primary' -%>
+  <%= submit_tag "Confirm", data: { disable_with: 'Confirm' }, class: 'btn btn-primary' -%>
   or
   <%= cancel_button(resource) %>
 <% end %>

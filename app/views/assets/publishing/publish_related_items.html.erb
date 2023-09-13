@@ -12,25 +12,25 @@
 </p>
 
 <br/>
-<%= form_tag({:action => :check_gatekeeper_required},:method=>:post) do %>
+<%= form_tag({action: :check_gatekeeper_required}, method: :post) do %>
   <% @items_for_publishing.each do |item| %>
     <% if item.contains_publishable_items? %>
       <% if item.is_asset? %>
-        <%= render :partial => "assets/isa_tree_preview",
-                   :collection => item.assays.map(&:study).map(&:investigation).flatten.uniq,
-                   :locals => { :preselected => item, :publishing => true } %>
+        <%= render partial: "assets/isa_tree_preview",
+                   collection: item.assays.map(&:study).map(&:investigation).flatten.uniq,
+                   locals: { preselected: item, publishing: true } %>
       <% else %>
-        <%= render :partial => "assets/isa_tree_preview", :object => item,
-                     :locals => { :preselected => item, :publishing => true } %>
+        <%= render partial: "assets/isa_tree_preview", object: item,
+                     locals: { preselected: item, publishing: true } %>
       <% end %>
     <% else %>
-      <%= check_box_tag publishing_item_param(item), 1, true, {:style => 'display:none;'} %>
+      <%= check_box_tag publishing_item_param(item), 1, true, {style: 'display:none;'} %>
     <% end %>
   <% end %>
 
   <% resource = (controller_name == 'people') ? current_user.person : @asset %>
 
-  <%= submit_tag "Next",data: { disable_with: 'Next' }, :class => 'btn btn-primary' -%>
+  <%= submit_tag "Next",data: { disable_with: 'Next' }, class: 'btn btn-primary' -%>
   or
   <%= cancel_button(resource) %>
 <% end %>

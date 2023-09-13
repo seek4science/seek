@@ -16,22 +16,22 @@
 
 </div>
 
-<%= form_tag({:action => :check_related_items},:method=>:post)  do -%>
+<%= form_tag({action: :check_related_items},method: :post)  do -%>
   <% if @assets.empty? %>
     <span class="no_unpublished_asset">All your assets are published or you have no assets in <%= Seek::Config.instance_name %></span>
     <br/>
     <br/>
     <%= link_to "Back to profile", person_path(params[:id].to_i) -%>
   <% else %>
-    <%= render :partial => "assets/batch_asset_selection",
-                  :locals => { :publishing => true,
-                               :show_hide_blocked => true,
-                               :show_hide_permissions => true,
-                               :blocked_selector => '.not-visible,.not-manageable,.already-published'
+    <%= render partial: "assets/batch_asset_selection",
+                  locals: { publishing: true,
+                            show_hide_blocked: true,
+                            show_hide_permissions: true,
+                            blocked_selector: '.not-visible,.not-manageable,.already-published'
                   }
     -%>
     <br/>
-    <%= submit_tag "Next",data: { disable_with: 'Next' }, :class => 'btn btn-primary' -%>
+    <%= submit_tag "Next",data: { disable_with: 'Next' }, class: 'btn btn-primary' -%>
     Or
     <%= cancel_button person_path(params[:id].to_i)-%>
   <% end -%>
