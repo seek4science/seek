@@ -286,6 +286,7 @@ GEM
       loofah (>= 2.3.1)
       sax-machine (>= 1.0)
     ffi (1.15.5)
+    flamegraph (0.9.5)
     fssm (0.2.10)
     gem-licenses (0.2.2)
     gitlab_omniauth-ldap (2.2.0)
@@ -854,6 +855,7 @@ GEM
       activesupport (>= 5.2)
       sprockets (>= 3.0.0)
     sqlite3 (1.4.2)
+    stackprof (0.2.25)
     stringio (3.0.1)
     sunspot (2.6.0)
       pr_geohash (~> 1.0)
@@ -992,6 +994,7 @@ DEPENDENCIES
   exception_notification
   factory_bot (~> 6.2.1)
   feedjira
+  flamegraph (~> 0.9.5)
   fleximage!
   fssm
   gem-licenses
@@ -1078,6 +1081,7 @@ DEPENDENCIES
   sitemap_generator (~> 6.3)
   sprockets-rails
   sqlite3 (~> 1.4)
+  stackprof (~> 0.2.25)
   stringio (= 3.0.1)
   sunspot_matchers
   sunspot_rails
