@@ -87,7 +87,7 @@ class TemplatesController < ApplicationController
 
   def populate_template
     uploaded_file = params[:template_json_file]
-    dir = Rails.root.join('config', 'default_data', 'source_types')
+    dir = Seek::Config.append_filestore_path('source_types')
 
     if Dir.exist?(dir)
       `rm #{dir}/*`
@@ -146,11 +146,11 @@ class TemplatesController < ApplicationController
   end
 
   def lockfile
-    Rails.root.join('tmp', 'populate_templates.lock')
+    Rails.root.join(Seek::Config.temporary_filestore_path, 'populate_templates.lock')
   end
 
   def resultfile
-    Rails.root.join('tmp', 'populate_templates.result')
+    Rails.root.join(Seek::Config.temporary_filestore_path, 'populate_templates.result')
   end
 
   def running!
