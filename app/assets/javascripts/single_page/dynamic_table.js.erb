@@ -231,8 +231,8 @@ const handleSelect = (e) => {
               "\nYou need to manually input them."
             );
         }).catch((error) =>{
-          alert(`Paste action aborted:\n\n${error}\n\nNote: Some browsers require to click 'paste' to paste the information in the table.`);
-          });
+        alert(`Paste action aborted:\n\n${error}\n\nNote: Some browsers require to click 'paste' to paste the information in the table.`);
+        });
 
       } catch (error) {
         if (error instanceof TypeError && navigator.userAgent.toLowerCase().includes('firefox')){
