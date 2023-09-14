@@ -1,17 +1,3 @@
-<%
-  flash_exists = flash[:error] || flash[:notice]
-%>
+<%= render partial: 'sharing/batch_change_results' %>
 
-<% if flash_exists %>
-  <div id="notice_flash" class="fade in alert alert-<%= flash[:notice] ? "success" : "danger" %> alert-dismissable" role="alert">
-    <% if flash[:notice] %>
-      <%= flash[:notice]%>
-    <% else%>
-      <%= flash[:error]%>
-      <% flash[:error]=nil %>
-    <% end %>
-  </div>
-    <a id="hide-permissions-changed" class=" btn btn-default" onclick="$j('#change-batch-permission-modal').modal('hide')">Ok</a>
-<% end %>
-
-
+<a id="hide-permissions-changed" class=" btn btn-default" onclick="$j('#change-batch-permission-modal').modal('hide')">OK</a>

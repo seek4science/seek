@@ -21,6 +21,10 @@ exportToExcel||="sampleExportExcel()"
   function loadBatchPermission(dtName, e){
     const sample_ids = window[dtName].selectedSampleIds()
     let publish_list = {'Sample': {}}
+    if (!sample_ids.length) {
+        alert('Please select at least one sample.');
+        return;
+    }
     for(let id of sample_ids){ publish_list['Sample'][id]='1' }
 
     $j.ajax({

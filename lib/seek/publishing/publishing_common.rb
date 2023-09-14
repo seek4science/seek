@@ -142,7 +142,7 @@ module Seek
         @assets.each do |type, klass|
           next if %w[Investigation Study Assay].include? type
           klass.each do |asset|
-            if asset.investigations.empty?
+            if !asset.respond_to?(:investigations) || asset.investigations.empty?
               @assets_not_in_isa.push(asset)
             else
               asset.investigations.each do |inv|
@@ -150,8 +150,6 @@ module Seek
                 @investigations.push(inv)
               end
             end
-            rescue NoMethodError
-              @assets_not_in_isa.push(asset)
           end
         end
       end

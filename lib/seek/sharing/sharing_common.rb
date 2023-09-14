@@ -37,35 +37,23 @@ module Seek
       def batch_sharing_permission_changed
         @items_for_sharing = resolve_sharing_params(params[:publish])
         @batch_sharing_permission_changed = true
-        notice_count = 0
-        gatekeeper_count = 0
-        error_count = 0
-        flash[:notice] = "The sharing policies for your selected #{"item".pluralize(@items_for_sharing.size)} were successfully updated:<ul id=\"ok\"> "
-        gatekeeper_flash = "Publishing the following #{"item".pluralize(@items_for_sharing.size)} requires approval from a gatekeeper:<ul id=\"gk\"> "
-        flash[:error] = "The sharing policies for your selected #{"item".pluralize(@items_for_sharing.size)} were not successfully updated:<ul> "
+        @success = []
+        @gatekeeper_required = []
+        @error = []
         @items_for_sharing.each do |item|
           item.policy.update_with_bulk_sharing_policy(policy_params) if policy_params.present?
-          begin
-            item.save!
+          if item.save
             request_publish_approval_batch_sharing(item)  # Has to go before log_publishing_batch_sharing(item)
             log_publishing_batch_sharing(item)
             if item.is_waiting_approval? && is_gatekeeper_approval_required?(item)
-              gatekeeper_count += 1
-              gatekeeper_flash += "<li>#{item.title}</li>"
+              @gatekeeper_required << item
             else
-              notice_count += 1
-              flash[:notice] += "<li>#{item.title}</li>"
+              @success << item
             end
-          rescue Exception => e
-            error_count += 1
-            flash[:error] += "<li>#{item.title}<br>"
-            flash[:error] += "The reason:  #{e.message}</li>"
+          else
+            @error << item
           end
         end
-        flash[:notice] = notice_count == 0 ? "": (flash[:notice]+"</ul>").html_safe
-        flash[:notice] += gatekeeper_count == 0 ? "": (gatekeeper_flash+"</ul>"+"The #{"item".pluralize(gatekeeper_count)} will not be published until approved.").html_safe
-        flash.now[:notice] = (notice_count+gatekeeper_count) == 0 ? nil: flash[:notice].html_safe
-        flash.now[:error] = error_count == 0 ? nil: (flash[:error]+"</ul>").html_safe
         if params[:single_page]
           render 'single_pages/sample_batch_sharing_permissions_changed', { layout: false }
         else

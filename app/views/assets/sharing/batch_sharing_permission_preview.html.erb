@@ -3,6 +3,7 @@
   @policy_params = params[:policy_attributes]
 
 %>
+<%= render partial: 'sharing/batch_change_results' %>
 
 <%= show_title "Change permissions of items related to #{link_to(h(current_user.person.name),current_user.person)} in batch".html_safe -%>
 
