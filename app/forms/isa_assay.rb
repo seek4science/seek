@@ -69,6 +69,11 @@ class IsaAssay
                  "[Sample type]: Should have exaclty one attribute with the title 'Input' <u><b>and</b></u> no ISA tag".html_safe)
     end
 
+    if @sample_type.sample_attributes.select { |a| a.title != 'Input' && a.isa_tag.nil? }.any?
+      errors.add(:base,
+                 "[Sample type]: All attributes should have an ISA Tag except for the <em>'Input'</em> attribute (hidden)".html_safe)
+    end
+
     assay_sample_or_datafile_attributes = @sample_type.sample_attributes.select do |a|
       a.isa_tag&.isa_other_material? || a.isa_tag&.isa_data_file?
     end

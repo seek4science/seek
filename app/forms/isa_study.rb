@@ -15,12 +15,10 @@ class IsaStudy
     @source_sample_type = SampleType.new((params[:source_sample_type] || {}).merge({ project_ids: @study.project_ids }))
     @sample_collection_sample_type = SampleType.new((params[:sample_collection_sample_type] || {}).merge({ project_ids: @study.project_ids }))
 
-    unless params[:source_sample_type]
-      @source_sample_type.sample_attributes.build(is_title: true, required: true)
-    end
-    unless params[:sample_collection_sample_type]
-      @sample_collection_sample_type.sample_attributes.build(is_title: true, required: true)
-    end
+    @source_sample_type.sample_attributes.build(is_title: true, required: true) unless params[:source_sample_type]
+    return if params[:sample_collection_sample_type]
+
+    @sample_collection_sample_type.sample_attributes.build(is_title: true, required: true)
   end
 
   def save
@@ -73,6 +71,15 @@ class IsaStudy
       @source_sample_type.errors.full_messages.each { |e| errors.add(:base, "[Source sample type]: #{e}") }
     end
 
+    if @source_sample_type.sample_attributes.select { |a| a.isa_tag.nil? }.any?
+      errors.add(:base, '[Source sample type]: All attributes must have an ISA tag')
+    end
+
+    if @sample_collection_sample_type.sample_attributes.select { |a| a.isa_tag.nil? && a.title != 'Input' }.any?
+      errors.add(:base,
+                 "[Sample collection sample type]: All attributes should have an ISA Tag except for the <em>'Input'</em> attribute (hidden)")
+    end
+
     unless @sample_collection_sample_type.valid?
       @sample_collection_sample_type.errors.full_messages.each do |e|
         errors.add(:base, "[Sample collection sample type]: #{e}")
@@ -91,8 +98,8 @@ class IsaStudy
       end
     end
 
-    unless @sample_collection_sample_type.sample_attributes.any?(&:seek_sample_multi?)
-      errors.add(:base, '[Sample Collection sample type]: SEEK Sample Multi attribute is not provided')
-    end
+    return if @sample_collection_sample_type.sample_attributes.any?(&:seek_sample_multi?)
+
+    errors.add(:base, '[Sample Collection sample type]: SEEK Sample Multi attribute is not provided')
   end
 end
