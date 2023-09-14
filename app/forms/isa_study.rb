@@ -67,32 +67,32 @@ class IsaStudy
   private
 
   def validate_objects
-    @study.errors.each { |e| errors[:base] << "[Study]: #{e.full_message}" } unless @study.valid?
+    @study.errors.each { |e| errors.add(:base, "[Study]: #{e.full_message}") } unless @study.valid?
 
     unless @source_sample_type.valid?
-      @source_sample_type.errors.full_messages.each { |e| errors[:base] << "[Source sample type]: #{e}" }
+      @source_sample_type.errors.full_messages.each { |e| errors.add(:base, "[Source sample type]: #{e}") }
     end
 
     unless @sample_collection_sample_type.valid?
       @sample_collection_sample_type.errors.full_messages.each do |e|
-        errors[:base] << "[Sample collection sample type]: #{e}"
+        errors.add(:base, "[Sample collection sample type]: #{e}")
       end
     end
 
     unless @source_sample_type.sample_attributes.select { |a| a.isa_tag&.isa_source? }.one?
-      errors[:base] << '[Sample type]: An attribute with source ISA tag is not provided'
+      errors.add(:base, "[Sample type]: Should have exaclty one attribute with the 'source' ISA tag selected")
     end
 
-    [:isa_sample?, :isa_protocol?].each do |tag_type|
+    %i[isa_sample? isa_protocol?].each do |tag_type|
       sample_type_tag_types = @sample_collection_sample_type.sample_attributes.select { |a| a.isa_tag&.send(tag_type) }
       unless sample_type_tag_types.one?
         tag_title = sample_type_tag_types[0]&.isa_tag&.title
-        errors[:base] << "[Sample type]: Should have exaclty one attribute with the '#{tag_title}' ISA tag selected"
+        errors.add(:base, "[Sample type]: Should have exaclty one attribute with the '#{tag_title}' ISA tag selected")
       end
     end
 
     unless @sample_collection_sample_type.sample_attributes.any?(&:seek_sample_multi?)
-      errors[:base] << '[Sample Collection sample type]: SEEK Sample Multi attribute is not provided'
+      errors.add(:base, '[Sample Collection sample type]: SEEK Sample Multi attribute is not provided')
     end
   end
 end
