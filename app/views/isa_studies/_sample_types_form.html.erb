@@ -125,6 +125,15 @@
 
         });
 
+        // Change ISA tag ID of the assay sample when the select is changed
+        $j('#attribute-table_sample_type').on('change', 'select[data-attr="isa_tag_title"]', function() {
+            const hiddenInputName = $j(this).attr('name').replace('isa_tag_title', 'isa_tag_id');
+            const isa_tag_id_sel = $j(this).val();
+
+            $j(`input:hidden[name="${hiddenInputName}"]`).val(isa_tag_id_sel);
+
+        });
+
         // Disable select ISA tags of existing attributes
         $j('#attribute-table_source_sample_type').find('tr.sample-attribute [data-attr="isa_tag_title"]').attr('disabled', true);
         $j('#attribute-table_sample_collection_sample_type').find('tr.sample-attribute [data-attr="isa_tag_title"]').attr('disabled', true);
@@ -132,6 +141,8 @@
         // Filter ISA tags for new rows
         updateIsaTagSelect("study source", "#new-attribute-row_source_sample_type");
         updateIsaTagSelect("study sample", "#new-attribute-row_sample_collection_sample_type");
+        updateIsaTagSelect("assay - material", "#new-attribute-row_sample_type");
+        updateIsaTagSelect("assay - data file", "#new-attribute-row_sample_type");
     });
     $j(document).on('submit', function(){
       // Remove the table from the form
