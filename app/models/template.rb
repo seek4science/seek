@@ -1,3 +1,4 @@
+# Template class for the creation of Sample Type Templates
 class Template < ApplicationRecord
   acts_as_asset
 
@@ -8,7 +9,7 @@ class Template < ApplicationRecord
   belongs_to :parent, class_name: 'Template', optional: true
 
   validates :title, presence: true
-  validates :title, uniqueness: { scope: [:group, :version] }
+  validates :title, uniqueness: { scope: %i[group version] }
 
   accepts_nested_attributes_for :template_attributes, allow_destroy: true
 
@@ -30,9 +31,8 @@ class Template < ApplicationRecord
   end
 
   def valid_template_attributes?
-    none_empty_isa_tag && test_tag_occurences
+    none_empty_isa_tag && test_tag_occurences && test_input_occurence
   end
-
 
   private
 
@@ -53,5 +53,9 @@ class Template < ApplicationRecord
     %w[source protocol sample data_file other_material].map do |tag|
       template_attributes.map(&:isa_tag).map(&:title).count(tag) > 1
     end.compact&.none? true
+  end
+
+  def test_input_occurence
+    template_attributes.map(:title).count('Input') <= 1
   end
 end
