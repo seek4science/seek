@@ -163,6 +163,7 @@ class AdminController < ApplicationController
     Seek::Config.life_monitor_url = params[:life_monitor_url]&.strip&.chomp('/')
     Seek::Config.life_monitor_client_id = params[:life_monitor_client_id]&.strip
     Seek::Config.life_monitor_client_secret = params[:life_monitor_client_secret]&.strip
+    Seek::Config.life_monitor_ui_url = params[:life_monitor_ui_url]&.strip&.chomp('/')
 
     Seek::Config.bio_tools_enabled = string_to_boolean(params[:bio_tools_enabled])
 
