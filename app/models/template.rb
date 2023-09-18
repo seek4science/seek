@@ -10,6 +10,7 @@ class Template < ApplicationRecord
 
   validates :title, presence: true
   validates :title, uniqueness: { scope: %i[group version] }
+  validate :validate_template_attributes
 
   accepts_nested_attributes_for :template_attributes, allow_destroy: true
 
@@ -30,8 +31,19 @@ class Template < ApplicationRecord
     resolve_controlled_vocabs_inconsistencies
   end
 
-  def valid_template_attributes?
-    none_empty_isa_tag && test_tag_occurences && test_input_occurence
+  def validate_template_attributes
+    errors.add(:base, '[Template attribute]: Some attributes are missing ISA tags') unless none_empty_isa_tag
+
+    unless test_tag_occurences.any?
+      test_tag_occurences.map do |tag|
+        errors.add(:base,
+                   "[Template attribute]: The <em>'#{tag}'</em> ISA tag is not allowed to be used more then once".html_safe)
+      end
+    end
+
+    return if test_input_occurence
+
+    errors.add(:base, '[Template attribute]: You are not allowed to have more than one Input attribute.')
   end
 
   private
@@ -46,16 +58,41 @@ class Template < ApplicationRecord
   end
 
   def none_empty_isa_tag
-    template_attributes.reject { |ta| ta.title == 'Input' }.map(&:isa_tag_id).none? nil
+    template_attributes.reject { |ta| ta&.title == 'Input' }.map(&:isa_tag_id).none? nil
   end
 
   def test_tag_occurences
     %w[source protocol sample data_file other_material].map do |tag|
-      template_attributes.map(&:isa_tag).map(&:title).count(tag) > 1
-    end.compact&.none? true
+      tag if template_attributes.reject { |ta| ta&.title == 'Input' }.map(&:isa_tag).compact.map(&:title).count(tag) > 1
+    end.compact
   end
 
   def test_input_occurence
-    template_attributes.map(:title).count('Input') <= 1
+    template_attributes.map(&:title).count('Input') <= 1
+  end
+
+  def isa_tag_white_list(template_level)
+    case template_level
+    when 'study source'
+      [Seek::ISA::TagType::SOURCE,
+       Seek::ISA::TagType::SOURCE_CHARACTERISTIC]
+    when 'study sample'
+      [Seek::ISA::TagType::SAMPLE,
+       Seek::ISA::TagType::SAMPLE_CHARACTERISTIC,
+       Seek::ISA::TagType::PROTOCOL,
+       Seek::ISA::TagType::PARAMETER_VALUE]
+    when 'assay - material'
+      [Seek::ISA::TagType::OTHER_MATERIAL,
+       Seek::ISA::TagType::OTHER_MATERIAL_CHARACTERISTIC,
+       Seek::ISA::TagType::PROTOCOL,
+       Seek::ISA::TagType::PARAMETER_VALUE]
+    when 'assay - data file'
+      [Seek::ISA::TagType::PROTOCOL,
+       Seek::ISA::TagType::DATA_FILE,
+       Seek::ISA::TagType::DATA_FILE_COMMENT,
+       Seek::ISA::TagType::PARAMETER_VALUE]
+    else
+      []
+    end
   end
 end

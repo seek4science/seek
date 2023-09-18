@@ -40,38 +40,26 @@ class TemplatesController < ApplicationController
     @template.contributor = User.current_user.person
 
     @tab = 'manual'
-    raise "Some template attributes are invalid. Please make sure the followig criteria:
-    <ul>
-    <li>All attributes have an ISA tag!</li>
-    <li>protocol, sample, source, data_file and other_material can only occur once as an ISA tag!</li>
-    </ul>" unless @template.valid_template_attributes?
 
     respond_to do |format|
       if @template.save
         format.html { redirect_to @template, notice: 'Template was successfully created.' }
+        format.json { render json: @template, include: [params[:include]] }
       else
-        format.html { render :new }
+        format.html { render new_template_path(@template), status: :unprocessable_entity }
+        format.json { render json: @template.errors, status: :unprocessable_entity }
       end
-    end
-  rescue StandardError => e
-    flash[:error] = "<b>The following error occurred:</b><br/> #{e}".html_safe
-    respond_to do |format|
-      format.html { render :new, status: :unprocessable_entity }
-      format.json { render json: @template.errors, status: :unprocessable_entity }
     end
   end
 
   def edit
-    respond_to do |format|
-      format.html
-    end
-
+    respond_to(&:html)
   end
 
   def update
     @template.update(template_params)
     @template.resolve_inconsistencies
-    raise "Some template attributes don't have an ISA tag specified." unless @template.valid_template_attributes?
+
     respond_to do |format|
       if @template.save
         format.html { redirect_to @template, notice: 'Template was successfully updated.' }
@@ -80,12 +68,6 @@ class TemplatesController < ApplicationController
         format.html { render action: :edit, status: :unprocessable_entity }
         format.json { render json: @template.errors, status: :unprocessable_entity }
       end
-    end
-  rescue StandardError => e
-    flash[:error] = "The following error occurred: #{e}"
-    respond_to do |format|
-      format.html { render action: :edit, status: :unprocessable_entity }
-      format.json { render json: @template.errors, status: :unprocessable_entity }
     end
   end
 
@@ -121,13 +103,13 @@ class TemplatesController < ApplicationController
       file.write(uploaded_file.read)
     end
 
-    unless running?
-      begin
-        running!
-        PopulateTemplatesJob.new.queue_job
-      rescue StandardError
-        done!
-      end
+    return if running?
+
+    begin
+      running!
+      PopulateTemplatesJob.new.queue_job
+    rescue StandardError
+      done!
     end
   end
 
@@ -148,21 +130,24 @@ class TemplatesController < ApplicationController
     when 'study source'
       isa_tags_options = all_isa_tags_options.select { |tag| %w[source source_characteristic].include?(tag[:text]) }
     when 'study sample'
-      isa_tags_options = all_isa_tags_options.select { |tag| %w[protocol sample sample_characteristic parameter_value].include?(tag[:text]) }
+      isa_tags_options = all_isa_tags_options.select do |tag|
+        %w[protocol sample sample_characteristic parameter_value].include?(tag[:text])
+      end
     when 'assay - material'
-      isa_tags_options = all_isa_tags_options.select { |tag| %w[protocol other_material other_material_characteristic parameter_value].include?(tag[:text]) }
+      isa_tags_options = all_isa_tags_options.select do |tag|
+        %w[protocol other_material other_material_characteristic parameter_value].include?(tag[:text])
+      end
     when 'assay - data file'
-      isa_tags_options = all_isa_tags_options.select { |tag| %w[protocol data_file data_file_comment parameter_value].include?(tag[:text]) }
+      isa_tags_options = all_isa_tags_options.select do |tag|
+        %w[protocol data_file data_file_comment parameter_value].include?(tag[:text])
+      end
     else
       isa_tags_options = all_isa_tags_options
     end
 
     puts "ISA Tags: #{isa_tags_options}"
     render json: { result: isa_tags_options }
-
   end
-
-
 
   private
 

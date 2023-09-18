@@ -16,6 +16,7 @@
 <% isa_tag_options = IsaTag.all.map { |it| [it.title, it.id] } %>
 <% isa_tag_id = template_attribute&.isa_tag_id %>
 <% isa_tag_title = template_attribute&.isa_tag&.title %>
+<% is_parent_attribute ||= false %>
 
 <tr class="sample-attribute <%= 'success' if template_attribute.nil? -%>" data-index="<%= index-%>">
   <th scope="row" class="attribute-position">
@@ -97,7 +98,7 @@
   </td>
   <td>
     <div class="btn-group" data-toggle="buttons">
-      <%= hidden_field_tag "#{field_name_prefix}[isa_tag_id]", isa_tag_id,  data: { attr: "isa_tag_id" }  %>
+      <%= hidden_field_tag "#{field_name_prefix}[isa_tag_id]", isa_tag_id, data: { attr: "isa_tag_id" } %>
       <%= hidden_field_tag "#{field_name_prefix}[_destroy]", '0', autocomplete: 'off' %>
       <label class="btn btn-danger">
         Remove
