@@ -575,12 +575,40 @@ class SnapshotsControllerTest < ActionController::TestCase
     assert_equal 'download', activity.action
   end
 
+  test 'minting DOI for invalid snapshot shows errors' do
+    datacite_mock
+    @user = FactoryBot.create(:user)
+    @investigation = FactoryBot.create(:investigation, description: 'not blank',
+                                       policy: FactoryBot.create(:publicly_viewable_policy),
+                                       contributor: @user.person,
+                                       assets_creators_attributes: { })
+    @snapshot = @investigation.create_snapshot
+
+    assert_empty @snapshot.creators
+    login_as(@user)
+
+    post :mint_doi, params: { investigation_id: @investigation, id: @snapshot.snapshot_number }
+
+    @snapshot = @snapshot.reload
+
+    pp flash[:error]
+    assert flash[:error].include?('There was a problem minting the DOI')
+    assert flash[:error].include?("Creators can't be blank")
+    assert_redirected_to investigation_snapshot_path(@investigation, @snapshot.snapshot_number)
+    assert @snapshot.doi.nil?
+  end
+
   private
 
   def create_investigation_snapshot
     @user = FactoryBot.create(:user)
-    @investigation = FactoryBot.create(:investigation, description: 'not blank', policy: FactoryBot.create(:publicly_viewable_policy),
-                                       contributor: @user.person, creators: [@user.person])
+    @investigation = FactoryBot.create(:investigation, description: 'not blank',
+                                       policy: FactoryBot.create(:publicly_viewable_policy),
+                                       contributor: @user.person,
+                                       assets_creators_attributes: {
+                                         '1' => { creator_id: @user.person.id }
+                                       }
+    )
     @snapshot = @investigation.create_snapshot
   end
 

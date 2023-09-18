@@ -8,12 +8,14 @@ class DataciteMetadataTest < ActiveSupport::TestCase
     User.current_user = contributor.user
 
     @investigation = FactoryBot.create(:investigation, title: 'i1', description: 'not blank',
-                                                       policy: FactoryBot.create(:downloadable_public_policy),
-                                                       contributor: contributor, creators: [contributor])
+                                       assets_creators: add_creator,
+                                       policy: FactoryBot.create(:downloadable_public_policy), contributor: contributor)
     @study = FactoryBot.create(:study, title: 's1', investigation: @investigation, contributor: @investigation.contributor,
-                     policy: FactoryBot.create(:downloadable_public_policy), creators: [contributor])
+                               assets_creators: add_creator,
+                               policy: FactoryBot.create(:downloadable_public_policy))
     @assay = FactoryBot.create(:assay, title: 'a1', study: @study, contributor: @investigation.contributor,
-                     policy: FactoryBot.create(:downloadable_public_policy), creators: [contributor])
+                               assets_creators: add_creator,
+                               policy: FactoryBot.create(:downloadable_public_policy))
     @assay2 = FactoryBot.create(:assay, title: 'a2', study: @study, contributor: @investigation.contributor,
                       policy: FactoryBot.create(:downloadable_public_policy))
     @data_file = FactoryBot.create(:data_file, title: 'df1', contributor: @investigation.contributor,
@@ -25,18 +27,28 @@ class DataciteMetadataTest < ActiveSupport::TestCase
     @assay.associate(@data_file)
     @assay2.associate(@data_file)
     FactoryBot.create(:relationship, subject: @assay, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: @publication)
+
+    @metadata = DataCite::Metadata.new(
+      title: 'The title',
+      identifier: '10.5072/abcd',
+      publisher: 'My System',
+      year: 2009,
+      creators: [FactoryBot.create(:person)],
+      resource_type: 'Something',
+      resource_type_general: 'Dataset')
   end
 
   test 'generates valid DataCite metadata' do
     types = [@investigation.create_snapshot, @study.create_snapshot, @assay.create_snapshot,
-             FactoryBot.create(:data_file, policy: FactoryBot.create(:public_policy)).latest_version,
-             FactoryBot.create(:model, policy: FactoryBot.create(:public_policy)).latest_version,
-             FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy)).latest_version,
-             FactoryBot.create(:workflow, policy: FactoryBot.create(:public_policy)).latest_version,
-             FactoryBot.create(:document, policy: FactoryBot.create(:public_policy)).latest_version]
+             FactoryBot.create(:data_file, policy: FactoryBot.create(:public_policy), assets_creators: add_creator).latest_version,
+             FactoryBot.create(:model, policy: FactoryBot.create(:public_policy), assets_creators: add_creator).latest_version,
+             FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy), assets_creators: add_creator).latest_version,
+             FactoryBot.create(:workflow, policy: FactoryBot.create(:public_policy), assets_creators: add_creator).latest_version,
+             FactoryBot.create(:document, policy: FactoryBot.create(:public_policy), assets_creators: add_creator).latest_version]
 
     types.each do |type|
-      assert type.datacite_metadata.validate, "#{type.class.name} did not generate valid metadata."
+      meta = type.datacite_metadata
+      assert meta.valid?, "#{type.class.name} did not generate valid metadata: #{meta.errors.full_messages.join(', ')}"
     end
   end
 
@@ -77,10 +89,10 @@ class DataciteMetadataTest < ActiveSupport::TestCase
   test 'DataCite metadata' do
     someone = FactoryBot.create(:person, first_name: 'Jane', last_name: 'Bloggs')
     thing = FactoryBot.create(:data_file, policy: FactoryBot.create(:public_policy),
-                    title: 'The title',
-                    description: 'The description',
-                    creators: [someone],
-                    contributor: FactoryBot.create(:person, first_name: 'Joe', last_name: 'Bloggs', orcid: 'https://orcid.org/0000-0002-1694-233X')
+                              title: 'The title',
+                              description: 'The description',
+                              creators: [someone],
+                              contributor: FactoryBot.create(:person, first_name: 'Joe', last_name: 'Bloggs', orcid: 'https://orcid.org/0000-0002-1694-233X')
     ).latest_version
     thing.assets_creators.create!(given_name: 'Phil', family_name: 'Collins', orcid: 'https://orcid.org/0000-0002-1694-233X')
 
@@ -106,5 +118,34 @@ class DataciteMetadataTest < ActiveSupport::TestCase
     assert_equal Seek::Config.instance_name, resource.xpath('./xmlns:publisher').first.text
     assert_equal 'Dataset', resource.xpath('./xmlns:resourceType').first.text
     assert_equal 'Dataset', resource.xpath('./xmlns:resourceType/@resourceTypeGeneral').first.text
+  end
+
+  test 'validates DataCite metadata required fields' do
+    assert @metadata.valid?
+
+    @metadata.identifier = nil
+    @metadata.creators = []
+    refute @metadata.valid?
+    assert @metadata.errors.added?(:identifier, :blank)
+    assert @metadata.errors.added?(:creators, :blank)
+  end
+
+  test 'validates DataCite metadata creator fields' do
+    @metadata.creators = [AssetsCreator.new(given_name: 'John')]
+    refute @metadata.valid?
+    assert @metadata.errors.added?(:creators, 'missing last name')
+  end
+
+  test 'validates DataCite metadata resource_type_general' do
+    @metadata.resource_type_general = 'Banana'
+    refute @metadata.valid?
+    assert @metadata.errors.added?(:resource_type_general, :inclusion, value: 'Banana')
+  end
+
+  private
+
+  def add_creator
+    [AssetsCreator.new(affiliation: 'University of Somewhere',
+                       creator: FactoryBot.create(:person, first_name: 'Some', last_name: 'One'))]
   end
 end

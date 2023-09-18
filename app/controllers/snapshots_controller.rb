@@ -55,7 +55,7 @@ class SnapshotsController < ApplicationController
         flash[:notice] = "DOI successfully minted"
         redirect_to polymorphic_path([@resource, @snapshot])
       else
-        flash[:error] = @snapshot.errors.full_messages
+        flash[:error] = "There was a problem minting the DOI: #{@snapshot.errors.full_messages.join(', ')}"
         redirect_to polymorphic_path([@resource, @snapshot])
       end
     end

@@ -48,7 +48,15 @@ module Seek
           url = Seek::Config.datacite_url.blank? ? nil : Seek::Config.datacite_url
           endpoint = DataCite::Client.new(username, password, url)
 
-          endpoint.upload_metadata(datacite_metadata.to_s)
+          metadata = datacite_metadata
+          unless metadata.valid?
+            # Merge the metadata errors
+            metadata.errors.full_messages.each do |error|
+              errors.add(:base, error)
+            end
+            return false
+          end
+          endpoint.upload_metadata(metadata.serialize)
           endpoint.mint(suggested_doi, doi_target_url)
 
           update_attribute(:doi, suggested_doi)
@@ -67,9 +75,10 @@ module Seek
               title: title,
               description: description,
               creators: respond_to?(:assets_creators) ? assets_creators : creators,
-              year: Time.now.year.to_s,
+              year: Time.now.year,
               publisher: Seek::Config.instance_name,
-              resource_type: [datacite_resource_type, datacite_resource_type_general]
+              resource_type: datacite_resource_type,
+              resource_type_general: datacite_resource_type_general
           )
         end
 

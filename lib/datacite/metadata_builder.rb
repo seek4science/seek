@@ -2,8 +2,8 @@ require 'nokogiri'
 
 module DataCite
   class MetadataBuilder
-    def initialize(hash)
-      @hash = hash
+    def initialize(metadata)
+      @metadata = metadata
     end
 
     def build
@@ -13,9 +13,9 @@ module DataCite
                       'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance',
                       'xsi:schemaLocation' => 'http://datacite.org/schema/kernel-4 '\
                                            'http://schema.datacite.org/meta/kernel-4.3/metadata.xsd') do
-          @hash.each do |key, value|
+          @metadata.attributes.each do |key, value|
             if respond_to?(key, true)
-              send(key, value)
+              send(key)
             else
               @xml.send(key, value)
             end
@@ -26,13 +26,13 @@ module DataCite
 
     private
 
-    def identifier(doi)
-      @xml.identifier doi, 'identifierType' => 'DOI'
+    def identifier
+      @xml.identifier @metadata.identifier, 'identifierType' => 'DOI'
     end
 
-    def creators(creator_list)
+    def creators
       @xml.creators do
-        creator_list.each do |creator|
+        @metadata.creators.each do |creator|
           @xml.creator do
             @xml.creatorName "#{creator.last_name}, #{creator.first_name}"
             @xml.nameIdentifier creator.orcid_uri, 'nameIdentifierScheme' => 'ORCID', 'schemeURI' => 'https://orcid.org' if creator.orcid.present?
@@ -41,32 +41,28 @@ module DataCite
       end
     end
 
-    def title(title)
+    def title
       @xml.titles do
-        @xml.title title, 'xml:lang' => 'en-gb'
+        @xml.title @metadata.title, 'xml:lang' => 'en-gb'
       end
     end
 
-    def description(desc)
-      unless desc.blank?
+    def description
+      unless @metadata.description.blank?
         @xml.descriptions do
-          @xml.description ActionView::Base.full_sanitizer.sanitize(desc),
+          @xml.description ActionView::Base.full_sanitizer.sanitize(@metadata.description),
                            'xml:lang' => 'en-gb',
                            'descriptionType' => 'Abstract'
         end
       end
     end
 
-    def publisher(publisher_name)
-      @xml.publisher publisher_name
+    def year
+      @xml.publicationYear(@metadata.year.to_s)
     end
 
-    def year(year)
-      @xml.publicationYear year
-    end
-
-    def resource_type(types)
-      @xml.resourceType types[0], 'resourceTypeGeneral' => types[1]
+    def resource_type
+      @xml.resourceType(@metadata.resource_type, 'resourceTypeGeneral' => @metadata.resource_type_general)
     end
   end
 end

@@ -55,9 +55,9 @@ class Snapshot < ApplicationRecord
 
   def creators
     if metadata['creators']
-      metadata['creators'].map do |contributor|
-        Person.find_by_id(contributor['uri'].match(/people\/([1-9][0-9]*)/)[1])
-      end
+      metadata['creators'].map do |creator|
+        Person.find_by_id(creator['uri'].match(/people\/([1-9][0-9]*)/)[1]) if creator['uri']
+      end.compact
     else
       []
     end
@@ -75,7 +75,7 @@ class Snapshot < ApplicationRecord
       if k == 'contributor'
         people << Person.find_by_id(v['uri'].match(/people\/([1-9][0-9]*)/)[1])
       elsif k == 'creators'
-        people |= v.compact.map { |p| Person.find_by_id(p['uri'].match(/people\/([1-9][0-9]*)/)[1]) }
+        people |= v.map { |p| Person.find_by_id(p['uri'].match(/people\/([1-9][0-9]*)/)[1]) if p && p['uri'].present? }.compact
       elsif v.is_a?(Hash)
         people |= all_related_people(v)
       elsif v.is_a?(Array)
