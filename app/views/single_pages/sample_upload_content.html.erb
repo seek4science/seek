@@ -8,7 +8,7 @@
 <% can_upload = true %>
 <div id="upload-summary">
 
-  <% # General information panel %>
+  <%# General information panel %>
   <%= folding_panel("General Information", true, :id => "general-information-panel",
   :help_text => "This pane contains an overview of the permissions needed to upload.") do %>
     <% [@project, @study, @assay]. map do | asset | %>
@@ -39,7 +39,7 @@
     <% end %>
   <% end %>
 
-  <% # New Samples panel %>
+  <%# New Samples panel %>
   <% unless @new_samples.nil? or @new_samples.compact.none? %>
     <%= folding_panel("New Samples <span id='new-samples-counter' class='label label-primary'>#{@new_samples.size}</span>", true, :id => "new-samples-panel", :body_options => {:id => "new-samples-panel-content"},
     :help_text => "These samples have been detected as new samples and will be created.") do %>
@@ -56,7 +56,7 @@
           <% for new_sample in @new_samples %>
             <% new_sample_id = UUID.generate %>
             <tr id='<%= "new-sample-#{new_sample_id}" %>'>
-              <td><button id=<%= "remove-#{new_sample_id}" %> class="glyphicon glyphicon-trash danger" style="background-color:#d9534f;color:white;" onclick=<%= "removeSample('new-sample-#{new_sample_id}')" %>></button></td>
+              <td><button id=<%= "remove-#{new_sample_id}" %> class="btn glyphicon glyphicon-trash danger" style="background-color:#d9534f;color:white;" onclick=<%= "removeSample('new-sample-#{new_sample_id}')" %>></button></td>
                 <% new_sample.map do |key, val| %>
                   <% val = '<new>' if key =='id' %>
                 <% unless key == 'uuid' %>
@@ -78,7 +78,7 @@
     <% end %>
   <% end %>
 
-  <% # Update Samples panel %>
+  <%# Update Samples panel %>
   <% unless @update_samples.nil? or @update_samples.compact.none? %>
     <%= folding_panel("Samples to Update <span id='update-samples-counter' class='label label-warning'>#{@update_samples.size}</span>", true, :id => "existing-samples-panel", :body_options => {:id => "existing-samples-panel-content"},
     :help_text => "These samples were detected existing samples and will be updated.") do %>
@@ -95,7 +95,7 @@
           <% for update_sample in @update_samples %>
             <tr id='<%= "update-sample-#{update_sample['id']}-updated" %>' >
               <% db_sample = @authorized_db_samples.select { |s| s['id'] == update_sample['id'] }.first %>
-              <td rowspan=2><button id=<%= "remove-#{update_sample['id']}" %> class="glyphicon glyphicon-trash danger" style="background-color:#d9534f;color:white;" onclick=<%= "removeSample('update-sample-#{update_sample['id']}')" %>></button></td>
+              <td rowspan=2><button id=<%= "remove-#{update_sample['id']}" %> class="btn glyphicon glyphicon-trash danger" style="background-color:#d9534f;color:white;" onclick=<%= "removeSample('update-sample-#{update_sample['id']}')" %>></button></td>
               <% update_sample.map do |key, val| %>
                 <% unless key == 'uuid' %>
                   <% if @multiple_input_fields.include?(key)%>
@@ -131,7 +131,7 @@
     <% end %>
   <% end %>
 
-  <% # Possible Duplicate Samples panel %>
+  <%# Possible Duplicate Samples panel %>
   <% unless @possible_duplicates.nil? or @possible_duplicates.compact.none? %>
     <%= folding_panel("Possible Duplicates <span id='duplicate-samples-counter' class='label label-danger'>#{@possible_duplicates.size}</span>", true, :id => "duplicate-samples-panel", :body_options => {:id => "duplicate-samples-panel-content"},
                     :help_text => "These new samples have been matched to already existing samples.") do %>
@@ -147,7 +147,7 @@
           </tr>
           <% for dupl_sample in @possible_duplicates %>
             <tr id='<%= "duplicate-sample-#{dupl_sample['duplicate']['id']}-1" %>' >
-              <td rowspan=2><button id=<%= "remove-#{dupl_sample['duplicate']['id']}" %> class="glyphicon glyphicon-trash danger" style="background-color:#d9534f;color:white;" onclick=<%= "removeSample('duplicate-sample-#{dupl_sample['duplicate']['id']}')" %>></button></td>
+              <td rowspan=2><button id=<%= "remove-#{dupl_sample['duplicate']['id']}" %> class="btn glyphicon glyphicon-trash danger" style="background-color:#d9534f;color:white;" onclick=<%= "removeSample('duplicate-sample-#{dupl_sample['duplicate']['id']}')" %>></button></td>
             <% dupl_sample.map do |key, val| %>
               <% val = '<new>' if key =='id' %>
               <% unless %w[uuid duplicate].include?(key) %>
@@ -184,7 +184,7 @@
     <% end %>
   <% end %>
 
-  <% # Panel for Sample with wrong permissions %>
+  <%# Panel for Sample with wrong permissions %>
   <% unless @unauthorized_samples.nil? or @unauthorized_samples.compact.none? %>
     <% can_upload = false %>
     <% errors.append("There are unauthorized samples present in the spreadsheet.") %>
