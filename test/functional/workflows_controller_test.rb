@@ -1764,6 +1764,6 @@ class WorkflowsControllerTest < ActionController::TestCase
 
     get :show, params: { id: wf }
 
-    assert_select 'a.lifemonitor-status[href=?]', "https://localhost:8443/workflow;uuid=#{wf.uuid}"
+    assert_select 'a.lifemonitor-status[href=?]', "https://app.lifemonitor.eu/workflow;uuid=#{wf.uuid}"
   end
 end
