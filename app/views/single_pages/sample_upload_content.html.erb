@@ -50,6 +50,7 @@
 
   <%= submit_tag "Upload", data: {disable_with: 'Uploading ...'}, :class => 'btn btn-primary', onclick: "submitUpload()" if (@can_upload and any_samples_to_upload?)%>
   <%= submit_tag "Cancel", data: {id: 'cancelModalUploadExcel'}, :class => 'btn btn-secondary', onclick: "closeModalForm()" %>
+  <%= image_tag('ajax-loader.gif', id: 'sample-upload-spinner', style: 'display: none') %>
 </div>
 
 <script type="text/javascript">
@@ -74,12 +75,20 @@
     const updatedSamples= { data: getUpdateSamples() };
 
     if (newSamples.data === "abort") return;
+    makeSampleUploadAjaxCalls(newSamples, updatedSamples);
+ }
 
-    uploadAjaxCall("<%= batch_create_samples_path %>", "POST", { data: JSON.stringify(newSamples) });
-    uploadAjaxCall("<%= batch_update_samples_path %>", "PUT", { data: JSON.stringify(updatedSamples) });
-
-    closeModalForm();
-    location.reload();
+  async function makeSampleUploadAjaxCalls(newSamples, updatedSamples){
+    $j('#sample-upload-spinner').show();
+    try{
+      const postCall = await uploadAjaxCall("<%= batch_create_samples_path %>", "POST", { data: JSON.stringify(newSamples) });
+      const putCall = await uploadAjaxCall("<%= batch_update_samples_path %>", "PUT", { data: JSON.stringify(updatedSamples) });
+      $j('#sample-upload-spinner').hide();
+      closeModalForm();
+      location.reload();
+    } catch (error){
+      $j('#sample-upload-spinner').hide();
+    }
   }
 
   // Retrieves the samples from the create-samples-table and the duplicate-samples-table
@@ -182,7 +191,7 @@
     const { data, cache, dataType } = params;
     if (!url || !method) throw new Error("Parameter(s) missing");
     return $j.ajax({
-      async: false,
+      async: true,
       method,
       url,
       data,
