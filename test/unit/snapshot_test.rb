@@ -10,19 +10,22 @@ class SnapshotTest < ActiveSupport::TestCase
     contributor = FactoryBot.create(:person)
     User.current_user = contributor.user
 
-    @investigation = FactoryBot.create(:investigation, title: 'i1', description: 'not blank', contributor: contributor,
-                                        policy: FactoryBot.create(:downloadable_public_policy), creators: [contributor])
-    @study = FactoryBot.create(:study, title: 's1', investigation: @investigation, contributor: @investigation.contributor,
-                                       policy: FactoryBot.create(:downloadable_public_policy), creators: [contributor])
-    @assay = FactoryBot.create(:assay, title: 'a1', study: @study, contributor: @investigation.contributor,
-                                       policy: FactoryBot.create(:downloadable_public_policy), creators: [contributor])
+    @investigation = FactoryBot.create(:investigation, title: 'i1', description: 'not blank',
+                                       assets_creators: add_creator,
+                                       policy: FactoryBot.create(:downloadable_public_policy), contributor: contributor)
+    @study = FactoryBot.create(:study, title: 's1', investigation: @investigation,
+                               contributor: @investigation.contributor, assets_creators: add_creator,
+                               policy: FactoryBot.create(:downloadable_public_policy))
+    @assay = FactoryBot.create(:assay, title: 'a1', study: @study,
+                               contributor: @investigation.contributor, assets_creators: add_creator,
+                               policy: FactoryBot.create(:downloadable_public_policy))
     @assay2 = FactoryBot.create(:assay, title: 'a2', study: @study, contributor: @investigation.contributor,
-                                        policy: FactoryBot.create(:downloadable_public_policy), creators: [contributor])
+                                policy: FactoryBot.create(:downloadable_public_policy))
     @data_file = FactoryBot.create(:data_file, title: 'df1', contributor: @investigation.contributor,
-                                     content_blob: FactoryBot.create(:doc_content_blob, original_filename: 'word.doc'),
-                                     policy: FactoryBot.create(:downloadable_public_policy))
+                                   content_blob: FactoryBot.create(:doc_content_blob, original_filename: 'word.doc'),
+                                   policy: FactoryBot.create(:downloadable_public_policy))
     @publication = FactoryBot.create(:publication, title: 'p1', contributor: @investigation.contributor,
-                                         policy: FactoryBot.create(:downloadable_public_policy))
+                                     policy: FactoryBot.create(:downloadable_public_policy))
 
     @assay.associate(@data_file)
     @assay2.associate(@data_file)
@@ -340,5 +343,10 @@ class SnapshotTest < ActiveSupport::TestCase
     end
 
     results.flatten
+  end
+
+  def add_creator
+    [AssetsCreator.new(affiliation: 'University of Somewhere',
+                       creator: FactoryBot.create(:person, first_name: 'Some', last_name: 'One'))]
   end
 end
