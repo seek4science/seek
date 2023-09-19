@@ -292,7 +292,7 @@ async function handleUploadSubmit(formData){
     contentType: false,
     enctype: 'multipart/form-data',
     success: function(response){
-      $j('#upload-excel-modal').modal('show').focus();
+      $j('#upload-excel-modal').modal({backdrop: 'static', keyboard: false}, 'show').focus();
       $j('#upload-excel').html(response);
     },
     error: function(err){
