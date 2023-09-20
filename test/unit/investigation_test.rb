@@ -144,7 +144,9 @@ class InvestigationTest < ActiveSupport::TestCase
   end
 
   test 'can create snapshot of investigation' do
-    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:publicly_viewable_policy))
+    person = FactoryBot.create(:person)
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:publicly_viewable_policy),
+                                      contributor: person, creators: [person])
     FactoryBot.create(:study, contributor: investigation.contributor)
     snapshot = nil
 
