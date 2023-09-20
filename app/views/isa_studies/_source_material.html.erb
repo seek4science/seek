@@ -1,5 +1,8 @@
-<% study ||= nil %>
-<% sample_type = study&.sample_types&.first %>
+<%
+  study ||= nil
+  sample_type = study&.sample_types&.first
+  project = study&.projects&.first
+%>
 
 <div style="padding:0 20px 20px 20px;">
     <div class="row">
@@ -11,7 +14,8 @@
 
 <%= render partial: 'isa_studies/buttons', locals:{ add_row: "SourceAddNewRow()", paste_cb:
 "SourcePasteFromClipboard()", delete: "SourceSetAsDeleted()", save: "SourceSave()",
-permissions: "loadBatchPermission('sourceDynamicTable',this)", exportToExcel: "sourceExportExcel()" } %>
+permissions: "loadBatchPermission('sourceDynamicTable',this)", exportToExcel: "sourceExportExcel()",
+uploadExcel: 'sourceUploadExcel()', sample_type_id: sample_type&.id} %>
 
 <% if sample_type %>
     <script>
@@ -72,6 +76,19 @@ permissions: "loadBatchPermission('sourceDynamicTable',this)", exportToExcel: "s
 
         function sourceExportExcel() {
             exportToExcel("source-material-table", '<%=study.id%>', null, '<%=sample_type.id%>');
+        }
+
+        function sourceUploadExcel(){
+          const file = $j('input[type="file"][id="file-<%=sample_type.id%>"]').toArray()[0].files[0];
+          if (!file) {
+            alert("File not found! Please select a file to upload.");
+            return
+          }
+          let formData = new FormData();
+          formData.append('file', file);
+          formData.append('sample_type_id', <%=sample_type&.id%>);
+          formData.append('project_id', <%=project&.id%>);
+          handleUploadSubmit(formData);
         }
 
     </script>

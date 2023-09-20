@@ -1,6 +1,9 @@
-<% assay ||= nil %>
-<% valid_assay = assay&.sample_type.present? %>
-<% sample_type = assay&.sample_type %>
+<%
+  assay ||= nil
+  valid_assay = assay&.sample_type.present?
+  sample_type = assay&.sample_type
+  project = assay&.projects&.first
+%>
 
 <div style="padding:0 20px 20px 20px;">
     <div class="row">
@@ -10,7 +13,7 @@
     </div>
 </div>
 
-<%= render partial: 'isa_studies/buttons' %>
+<%= render partial: 'isa_studies/buttons', locals: {uploadExcel: "assaySampleUploadExcel()", sample_type_id: sample_type&.id} %>
 
 <% if valid_assay %>
     <script>
@@ -59,6 +62,19 @@
 
         function sampleExportExcel() {
             exportToExcel("assay-samples-table", '<%=assay.study_id%>', '<%=assay.id%>', '<%=sample_type.id%>');
+        }
+
+        function assaySampleUploadExcel(){
+          const file = $j('input[type="file"][id="file-<%=sample_type.id%>"]').toArray()[0].files[0];
+          if (!file) {
+            alert("File not found! Please select a file to upload.");
+            return
+          }
+          let formData = new FormData();
+          formData.append('file', file);
+          formData.append('sample_type_id', <%=sample_type&.id%>);
+          formData.append('project_id', <%=project&.id%>);
+          handleUploadSubmit(formData);
         }
 
     </script>
