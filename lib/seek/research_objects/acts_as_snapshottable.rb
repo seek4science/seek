@@ -29,7 +29,7 @@ module Seek #:nodoc:
       module InstanceMethods
         def create_snapshot
           if self.creators.empty?
-            errors.add(:base, "At least one creator is required. To add, go to Actions -> Manage #{self.class.name}.")
+            errors.add(:base, "At least one creator is required. To add, go to Actions -> Manage #{self.class.model_name.human}.")
             return nil
           end
           Rails.logger.debug("Creating snapshot for: #{self.class.name} #{id}")
