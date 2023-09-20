@@ -150,7 +150,7 @@ class SnapshotsControllerTest < ActionController::TestCase
         post :create, params: { "#{type}_id": snap.id }
       end
       assert_redirected_to Seek::Util.routes.polymorphic_path(snap)
-      assert flash[:error].include?('no creator')
+      assert flash[:error].include?('creator is required')
     end
   end
 

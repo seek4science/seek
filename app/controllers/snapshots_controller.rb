@@ -15,12 +15,11 @@ class SnapshotsController < ApplicationController
 
   def create
     @snapshot = @resource.create_snapshot
-    if @snapshot.is_a?(Snapshot)
+    if @snapshot
       flash[:notice] = "Snapshot created"
       redirect_to polymorphic_path([@resource, @snapshot])
-    elsif @snapshot.nil?
-      flash[:error] = "The #{self.class.name} you are trying to snapshot has no creators.
-                        Please add creators and then try again."
+    else
+      flash[:error] = @resource.errors.full_messages.join(', ')
       redirect_to polymorphic_path(@resource)
     end
   end
