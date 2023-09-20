@@ -137,11 +137,12 @@ class SnapshotsControllerTest < ActionController::TestCase
                               contributor: user.person, creators: [])
 
     login_as(user)
-    [study, investigation, assay].each do |snap|
+    [investigation, study, assay].each do |snap|
       assert snap.can_manage?(user)
       assert snap.creators.empty?
       type = snap.class.name.underscore
-      request.path = Seek::Util.routes.polymorphic_path(snap)+"/snapshots"
+      # Updating the request.path is needed so that @resource is correctly set, and the snapshots is created for the correct item in the loop
+      request.path = Seek::Util.routes.polymorphic_path([snap, :snapshots])
       # Get preview
       get :new, params: { "#{type}_id": snap.id }
       assert_response :success
