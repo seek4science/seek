@@ -33,22 +33,6 @@ class Snapshot < ApplicationRecord
     @ro_metadata ||= parse_metadata
   end
 
-  def title
-    if content_blob.present?
-      metadata['title']
-    else
-      'incomplete snapshot'
-    end
-  end
-
-  def description
-    if content_blob.present?
-      metadata['description']
-    else
-      'The snapshot currently has no content, and could still be being generated.'
-    end
-  end
-
   def contributor
     Person.find(metadata['contributor']['uri'].match(/people\/([1-9][0-9]*)/)[1])
   end

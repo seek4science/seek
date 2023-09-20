@@ -26,8 +26,6 @@ class SnapshotsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-
-
   test "can't get snapshot preview if no manage permissions" do
     user = FactoryBot.create(:user)
     investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:publicly_viewable_policy))
@@ -58,7 +56,7 @@ class SnapshotsControllerTest < ActionController::TestCase
     login_as(user)
 
     assert_difference('Snapshot.count') do
-      post :create, params: { investigation_id: investigation }
+      post :create, params: { investigation_id: investigation, snapshot: empty_snapshot }
     end
 
     assert investigation.can_manage?(user)
@@ -71,7 +69,7 @@ class SnapshotsControllerTest < ActionController::TestCase
     login_as(user)
 
     assert_difference('Snapshot.count') do
-      post :create, params: { study_id: study }
+      post :create, params: { study_id: study, snapshot: empty_snapshot }
     end
 
     assert study.can_manage?(user)
@@ -84,11 +82,64 @@ class SnapshotsControllerTest < ActionController::TestCase
     login_as(user)
 
     assert_difference('Snapshot.count') do
-      post :create, params: { assay_id: assay }
+      post :create, params: { assay_id: assay, snapshot: empty_snapshot }
     end
 
     assert assay.can_manage?(user)
     assert_redirected_to assay_snapshot_path(assay, assigns(:snapshot).snapshot_number)
+  end
+
+  test 'snapshot title saved correctly' do
+    user = FactoryBot.create(:user)
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:publicly_viewable_policy), contributor: user.person)
+    login_as(user)
+    assert_difference('Snapshot.count') do
+      post :create, params: { investigation_id: investigation, 
+                              snapshot: { title: 'MyTitle', description: 'Some info' } }
+    end
+    assert_equal 'MyTitle', investigation.snapshots.last.title
+    assert_equal 'Some info', investigation.snapshots.last.description
+  end
+
+  test 'snapshot title and description correctly displayed' do
+    user = FactoryBot.create(:user)
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:publicly_viewable_policy), 
+                                      contributor: user.person, description: 'Not a snapshot', title: 'My Investigation')
+    login_as(user)
+    post :create, params: { investigation_id: investigation,
+                            snapshot: { title: 'My first snapshot', description: 'Some info' } }
+    post :create, params: { investigation_id: investigation,
+                            snapshot: { title: 'My second snapshot', description: 'Other info' } }
+    post :create, params: { investigation_id: investigation, snapshot: empty_snapshot }
+
+    get :show, params: { investigation_id: investigation, id: 1 }
+    assert_response :success
+    assert_select 'h1', 'My first snapshot'
+    assert_select 'div#description', 'Some info'
+    assert_select 'div#snapshots' do
+      assert_select 'strong', 'My first snapshot'
+      assert_select 'a[href=?]', investigation_snapshot_path(investigation, 2), text: 'My second snapshot'
+      assert_select 'a[data-tooltip=?]', 'Other info'
+      assert_select 'a[href=?]', investigation_snapshot_path(investigation, 3), text: 'Snapshot 3'
+    end
+  end
+
+  test 'snapshot shows captured state' do
+    user = FactoryBot.create(:user)
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:publicly_viewable_policy),
+                                      contributor: user.person, title: 'Old Title', description: 'Old description')
+    login_as(user)
+    post :create, params: { investigation_id: investigation,
+                            snapshot: { title: 'My snapshot', description: 'Snapshot info' } }
+    investigation.update(title: 'New title', description: 'New description')
+    get :show, params: { investigation_id: investigation, id: 1 }
+    assert_response :success
+    assert_select 'h1', 'My snapshot'
+    assert_select 'div#description', 'Snapshot info'
+    assert_select 'div.panel-body' do
+      assert_select 'h1', 'Old Title'
+      assert_select 'div#description', 'Old description'
+    end
   end
 
   test "can't create snapshot if no manage permissions" do
@@ -159,7 +210,84 @@ class SnapshotsControllerTest < ActionController::TestCase
     assert flash[:error].include?('exist')
   end
 
+  test 'edit button is shown for authorized users' do
+    create_investigation_snapshot
+    login_as(@user)
+    get :show, params: { investigation_id: @investigation, id: @snapshot.snapshot_number }
+    assert_select 'a', text: 'Edit'
+  end
 
+  test 'edit button not shown for unauthorized users' do
+    create_investigation_snapshot
+    login_as(FactoryBot.create(:user))
+    get :show, params: { investigation_id: @investigation, id: @snapshot.snapshot_number }
+    assert_select 'a', text: 'Edit', count: 0
+  end
+
+  test 'edit button not shown for snapshots with DOI' do
+    create_investigation_snapshot
+    login_as(@user)
+    @snapshot.doi = '10.5072/123'
+    @snapshot.save
+    get :show, params: { investigation_id: @investigation, id: @snapshot.snapshot_number }
+    assert_select 'a', text: 'Edit', count: 0
+  end
+
+  test 'authorized users can edit snapshot title and description' do
+    create_investigation_snapshot
+    login_as(@user)
+    get :edit, params: { investigation_id: @investigation, id: @snapshot.snapshot_number }
+    assert_response :success
+  end
+
+  test "unauthorized user can't edit snapshot" do
+    create_investigation_snapshot
+    login_as(FactoryBot.create(:user))
+    get :edit, params: { investigation_id: @investigation, id: @snapshot.snapshot_number }
+    assert_redirected_to investigation_path(@investigation)
+    assert flash[:error]
+  end
+
+  test "can't edit snapshot with DOI" do
+    create_investigation_snapshot
+    login_as(@user)
+    @snapshot.doi = '10.5072/123'
+    @snapshot.save
+    get :edit, params: { investigation_id: @investigation, id: @snapshot.snapshot_number }
+    assert_redirected_to investigation_snapshot_path(@investigation, @snapshot)
+    assert flash[:error].include?('DOI')
+  end
+
+  test 'authorized users can update snapshot' do
+    create_investigation_snapshot
+    login_as(@user)
+    put :update, params: { investigation_id: @investigation, id: @snapshot.snapshot_number,
+                           snapshot: { title: 'My mod snapshot', description: 'Snapshot mod info' } }
+    assert_redirected_to investigation_snapshot_path(@investigation, @snapshot)
+    @snapshot.reload
+    assert_equal 'My mod snapshot', @snapshot.title
+    assert_equal 'Snapshot mod info', @snapshot.description
+  end
+
+  test "unauthorized users can't update snapshot" do
+    create_investigation_snapshot
+    login_as(FactoryBot.create(:user))
+    put :update, params: { investigation_id: @investigation, id: @snapshot.snapshot_number,
+                           snapshot: { title: 'My mod snapshot', description: 'Snapshot mod info' } }
+    assert_redirected_to investigation_path(@investigation)
+    assert flash[:error]
+  end
+
+  test "can't update snapshot with doi" do
+    create_investigation_snapshot
+    login_as(@user)
+    @snapshot.doi = '10.5072/123'
+    @snapshot.save
+    put :update, params: { investigation_id: @investigation, id: @snapshot.snapshot_number,
+                           snapshot: { title: 'My mod snapshot', description: 'Snapshot mod info' } }
+    assert_redirected_to investigation_snapshot_path(@investigation, @snapshot)
+    assert flash[:error].include?('DOI')
+  end
 
   test 'can get confirmation when minting DOI for snapshot' do
     datacite_mock
@@ -540,6 +668,10 @@ class SnapshotsControllerTest < ActionController::TestCase
   end
 
   private
+
+  def empty_snapshot
+    { title: '', description: '' }
+  end
 
   def create_investigation_snapshot
     @user = FactoryBot.create(:user)
