@@ -28,6 +28,10 @@ module Seek #:nodoc:
 
       module InstanceMethods
         def create_snapshot
+          if self.creators.empty?
+            Rails.logger.debug("No creators for #{self.class.name} #{id}, cancelling snapshot.")
+            return nil
+          end
           Rails.logger.debug("Creating snapshot for: #{self.class.name} #{id}")
           snapshot = snapshots.create
           filename = "#{self.class.name.underscore}-#{id}-#{snapshot.snapshot_number}.ro.zip"
