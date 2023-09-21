@@ -4,8 +4,10 @@ class AssaysController < ApplicationController
   include Seek::AssetsCommon
 
   before_action :assays_enabled?
-  before_action :find_assets, :only=>[:index]
-  before_action :find_and_authorize_requested_item, :only=>[:edit, :update, :destroy, :manage, :manage_update, :show, :new_object_based_on_existing_one]
+  before_action :find_assets, only: [:index]
+  before_action :find_and_authorize_requested_item,
+                only: %i[edit update destroy manage manage_update show new_object_based_on_existing_one]
+  before_action :fix_assay_linkage, only: [:destroy]
   before_action :delete_linked_sample_types, only: [:destroy]
 
   #project_membership_required_appended is an alias to project_membership_required, but is necessary to include the actions
@@ -116,6 +118,21 @@ class AssaysController < ApplicationController
     return unless is_single_page_assay?
 
     @assay.sample_type.destroy
+  end
+
+  def fix_assay_linkage
+    return unless is_single_page_assay?
+    return unless @assay.has_linked_child_assay?
+
+    previous_assay_linked_st_id = @assay.sample_type.sample_attributes.first.linked_sample_type_id
+
+    next_assay = Assay.all.select do |a|
+                   a.sample_type&.sample_attributes&.first&.linked_sample_type_id == @assay.sample_type_id
+                 end&.first
+    next_assay_st_attr = next_assay.sample_type&.sample_attributes&.first
+    return unless next_assay || previous_assay_linked_st_id || next_assay_st_attr
+
+    next_assay_st_attr.update(linked_sample_type_id: previous_assay_linked_st_id)
   end
 
   def update
