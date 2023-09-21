@@ -20,9 +20,9 @@
 
   toggle ||=false
   cb_parent_selector ||="div\##{itemid}.split_button_parent"
-  show_managers=true
+  show_managers ||= false
   managed_by_selector ||="div\##{itemid}.managed_by_list"
-  show_permissions=true
+  show_permissions ||= false
   permissions_selector ||="div\##{itemid}.permission_list"
 
 -%>
@@ -44,10 +44,12 @@
     </div>
     <h5 class="type_and_title" style="display: inline">
       <strong><%= text_for_resource item -%>:</strong> <%= link_to item.title, item, target: "_blank" -%>
-      <a class="btn btn-default permissions_toggle" style="display: inline; margin-left:2em; padding:6px"
-          data-permissions_selector='<%= permissions_selector %>'>
-        <%=list_item_visibility(item)-%>
-      </a>
+      <% if show_permissions %>
+        <a class="btn btn-default permissions_toggle" style="display: inline; margin-left:2em; padding:6px"
+            data-permissions_selector='<%= permissions_selector %>'>
+          <%=list_item_visibility(item)-%>
+        </a>
+      <% end %>
     </h5>
   <% else %>
     <div  style="display: inline; margin-right:1em">

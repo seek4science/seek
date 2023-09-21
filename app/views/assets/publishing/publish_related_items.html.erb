@@ -18,10 +18,10 @@
       <% if item.is_asset? %>
         <%= render partial: "assets/isa_tree_preview",
                    collection: item.assays.map(&:study).map(&:investigation).flatten.uniq,
-                   locals: { preselected: item, publishing: true } %>
+                   locals: { preselected: item, publishing: true, show_permissions: true } %>
       <% else %>
         <%= render partial: "assets/isa_tree_preview", object: item,
-                     locals: { preselected: item, publishing: true } %>
+                     locals: { preselected: item, publishing: true, show_permissions: true } %>
       <% end %>
     <% else %>
       <%= check_box_tag publishing_item_param(item), 1, true, {style: 'display:none;'} %>
