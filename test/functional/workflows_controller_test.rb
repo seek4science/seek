@@ -507,7 +507,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'handles error when generating diagram from CWL' do
-    bad_generator = MiniTest::Mock.new
+    bad_generator = Minitest::Mock.new
     def bad_generator.write_graph(struct)
       raise 'oh dear'
     end
