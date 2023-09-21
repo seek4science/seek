@@ -75,6 +75,14 @@ function checkRepeatedItems(checkbox_element) {
     }
 }
 
+function button_checkRepeatedItems(button_element) {
+    if(this.event.target.nodeName.includes("BUTTON")){
+        let checkbox_element = $j(button_element).find('input')[0]
+        checkbox_element.checked = !(checkbox_element.checked)
+        checkRepeatedItems(checkbox_element)
+    }
+}
+
 function toggleManagers(item,managed_by_selector) {
     $j(managed_by_selector).toggle()
 }

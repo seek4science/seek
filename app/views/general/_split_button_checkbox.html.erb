@@ -31,7 +31,7 @@
       </span>
     </button>
   <% else %>
-    <button type="button" class="btn parent-btn-checkbox">
+    <button type="button" class="btn parent-btn-checkbox" onclick="button_checkRepeatedItems(this)">
       <label style="font-weight:normal;">
         <%= check_box_tag checkbox_id, 1, checked,
                           {class: checkbox_class,
