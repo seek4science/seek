@@ -6,6 +6,7 @@ class StudiesController < ApplicationController
   before_action :studies_enabled?
   before_action :find_assets, only: [:index]
   before_action :find_and_authorize_requested_item, only: %i[edit update destroy manage manage_update show new_object_based_on_existing_one]
+  before_action :delete_linked_sample_types, only: [:destroy]
 
   # project_membership_required_appended is an alias to project_membership_required, but is necesary to include the actions
   # defined in the application controller
@@ -87,6 +88,16 @@ class StudiesController < ApplicationController
       end
     end
   end
+
+  def delete_linked_sample_types
+    return unless is_single_page_study?
+
+    # The study sample types must be destroyed in reversed order
+    # otherwise the first sample type won't be removed becaused it is linked from the second
+    study_st_ids = @study.sample_types.map(&:id).sort { |a, b| b <=> a }
+    SampleType.destroy(study_st_ids)
+  end
+
 
   def show
     @study = Study.find(params[:id])
@@ -201,7 +212,7 @@ class StudiesController < ApplicationController
       study_params = {
         title: params[:studies][:title][index],
         description: params[:studies][:description][index],
-        investigation_id: params[:study][:investigation_id],        
+        investigation_id: params[:study][:investigation_id],
         custom_metadata: CustomMetadata.new(
           custom_metadata_type: metadata_types,
           data: metadata
@@ -350,4 +361,10 @@ class StudiesController < ApplicationController
                                   { discussion_links_attributes:[:id, :url, :label, :_destroy] },
                                   { custom_metadata_attributes: determine_custom_metadata_keys })
   end
+end
+
+def is_single_page_study?
+  return false unless params.key?(:return_to)
+
+  params[:return_to].start_with? '/single_pages/'
 end

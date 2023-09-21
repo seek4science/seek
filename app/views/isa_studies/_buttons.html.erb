@@ -6,6 +6,7 @@ delete||="SampleSetAsDeleted()"
 save||="SampleSave()"
 permissions||="loadBatchPermission('sampleDynamicTable',this)"
 exportToExcel||="sampleExportExcel()"
+uploadExcel||="studySampleUploadExcel()"
 %>
 
 <div class="btn-group">
@@ -15,6 +16,18 @@ exportToExcel||="sampleExportExcel()"
   <input class="btn btn-default btn_set_permission" type="button" value="Batch sharing permissions" onClick=<%=permissions%> />
   <input class="btn btn-default" type="button" value="Batch download to Excel" onClick=<%=exportToExcel%> />
   <button class="btn btn-primary dt-action" id="btn_save_assay_sample" onClick=<%=save%>>Save</button>
+</div>
+
+<div class="container-sm" style="max-width: 780px; margin-top:25px;">
+  <label for="file-<%= sample_type_id %>" class="form-label">Upload excel spreadsheet:</label>
+  <div class="input-group">
+    <div class="mb-3">
+      <input id="file-<%= sample_type_id %>" name="file-<%= sample_type_id %>" type="file" accept=".xlsx, .xls" class="form-control form-control-lg"/>
+    </div>
+    <div class="input-group-btn">
+      <button class="btn btn-primary" onClick=<%= uploadExcel %>>Upload</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -40,11 +53,12 @@ exportToExcel||="sampleExportExcel()"
           ObjectsInput.init();
         }
       },
-      error: (e) => {
-        console.log(e);
+      error: (err) => {
+        console.log(err);
         alert("An error occurred while fetching data from the server.")
       }
     });
 
   }
+
 </script>

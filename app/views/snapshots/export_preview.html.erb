@@ -33,8 +33,8 @@
 
             <div class="form-group" id="license-section">
               <label>License</label>
-              <%= grouped_license_select('metadata[license]', 'cc-by', :id => 'license-select', :class => 'form-control',
-                                         :source => Seek::License.zenodo[:all]) %>
+              <%= license_select('metadata[license]', 'cc-by', :id => 'license-select', :class => 'form-control',
+                                         :source => Seek::License.zenodo) %>
               <span class="help-block license-url-block">
                 For more information on this license, please visit
                 <a id="license-url" href="" target="_blank"></a>
@@ -89,7 +89,6 @@
                                                                 sort_by { |p| p[:name] }.to_json.html_safe %>;
 
     $j(document).ready(function () {
-        $j('#license-select').change(zenodoExport.setLicenseUrl);
         $j('#access-right-section input:radio').change(zenodoExport.toggleSections);
         $j('#add-creator-button').click(zenodoExport.addCreator);
         $j('#add-creator').keypress(function(e) {
@@ -101,7 +100,6 @@
         });
 
         zenodoExport.toggleSections();
-        zenodoExport.setLicenseUrl();
         zenodoExport.renderCreatorList();
     });
 </script>

@@ -23,7 +23,6 @@
               <b><%= "Study position" %>: </b>
               <%= @study.position %>
             </p>
-            <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => @study}%>
             <% unless @study.experimentalists.blank? %>
               <p>
                 <b>Experimentalists:</b>
@@ -56,7 +55,7 @@
       </div>
     </div>
   <% end %>
-	
+
   <%= tab_pane('related-items') do %>
     <%= render partial: 'general/items_related_to', object: @study %>
   <% end %>

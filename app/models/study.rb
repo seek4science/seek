@@ -2,7 +2,7 @@ class Study < ApplicationRecord
 
   enum status: [:planned, :running, :completed, :cancelled, :failed]
   belongs_to :assignee, class_name: 'Person'
-  
+
   searchable(:auto_index => false) do
     text :experimentalists
   end if Seek::Config.solr_enabled
@@ -22,7 +22,7 @@ class Study < ApplicationRecord
   has_many :sop_versions, through: :assays
 
   has_one :external_asset, as: :seek_entity, dependent: :destroy
-  
+
   has_and_belongs_to_many :sops
 
   has_and_belongs_to_many :sample_types
@@ -41,7 +41,16 @@ class Study < ApplicationRecord
   end
 
   def state_allows_delete? *args
-    assays.empty? && super
+    assays.empty? && associated_samples_through_sample_type.empty? && super
+  end
+
+  def associated_samples_through_sample_type
+    return [] if sample_types.nil?
+    st_samples = []
+    sample_types.map do |st|
+      st.samples.map { |sts| st_samples.push sts }
+    end
+    st_samples
   end
 
   def clone_with_associations

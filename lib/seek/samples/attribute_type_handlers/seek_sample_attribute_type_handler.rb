@@ -16,6 +16,10 @@ module Seek
           end
         end
 
+        def convert(value)
+          super(value.is_a?(Array) ? value.compact_blank.first : value)
+        end
+
         private
 
         def find_resource(value)

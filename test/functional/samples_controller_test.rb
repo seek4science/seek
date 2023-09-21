@@ -19,7 +19,6 @@ class SamplesControllerTest < ActionController::TestCase
     assert_response :not_acceptable
   end
 
-
   test 'index' do
     FactoryBot.create(:sample, policy: FactoryBot.create(:public_policy))
     get :index
@@ -706,7 +705,7 @@ class SamplesControllerTest < ActionController::TestCase
 
     sample = Sample.create!(sample_type: sample_type, project_ids: person.projects.map(&:id),
                             data: { title: 'Linking sample',
-                                    patient: linked_sample.id})
+                                    patient: linked_sample.id })
 
     # For the sample containing the link
     get :show, params: { id: sample }
@@ -742,7 +741,9 @@ class SamplesControllerTest < ActionController::TestCase
     end
 
     assert_response :success
-    assert_select 'div.related-items a[href=?]', sample_samples_path(sample), text: "Advanced Samples list for this Sample with search and filtering ..."
+
+    assert_select 'div.related-items #resources-shown-count a[href=?]', sample_samples_path(sample), text: "2 Samples"
+    assert_select 'div.related-items #advanced-search-link a[href=?]', sample_samples_path(sample), text: "Advanced Samples list for this Sample with search and filtering"
   end
 
   test 'related samples index page works correctly' do
@@ -1152,6 +1153,31 @@ class SamplesControllerTest < ActionController::TestCase
     end
   end
 
+  test 'create single linked sample' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    patient = FactoryBot.create(:patient_sample, contributor: person)
+    linked_sample_type = FactoryBot.create(:linked_sample_type, project_ids: [person.projects.first.id])
+    linked_sample_type.sample_attributes.last.linked_sample_type = patient.sample_type
+    linked_sample_type.save!
+
+    assert_difference('Sample.count') do
+      post :create, params: { sample: { sample_type_id: linked_sample_type.id,
+                                        data:{
+                                          "title": 'Single Sample',
+                                          "patient": ['', patient.id.to_s]
+                                        },
+                                        project_ids: [person.projects.first.id]} }
+    end
+    assert assigns(:sample)
+    sample = assigns(:sample)
+    assert_equal 'Single Sample', sample.title
+
+    assert_equal [patient], sample.linked_samples
+    assert_equal patient.id, sample.get_attribute_value(:patient)['id']
+
+  end
+
   test 'create multi linked sample' do
     person = FactoryBot.create(:person)
     login_as(person)
@@ -1178,10 +1204,36 @@ class SamplesControllerTest < ActionController::TestCase
 
   end
 
+  test 'validates against linking a private sample' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    patient = FactoryBot.create(:patient_sample, contributor: FactoryBot.create(:person), policy: FactoryBot.create(:private_policy))
+
+    multi_linked_sample_type = FactoryBot.create(:multi_linked_sample_type, project_ids: [person.projects.first.id])
+    multi_linked_sample_type.sample_attributes.last.linked_sample_type = patient.sample_type
+    multi_linked_sample_type.save!
+
+    refute patient.can_view?
+
+    assert_no_difference('Sample.count') do
+      post :create, params: { sample: { sample_type_id: multi_linked_sample_type.id,
+                                        data:{
+                                          "title": 'Multiple Samples',
+                                          "patient": ['',patient.id.to_s]
+                                        },
+                                        project_ids: [person.projects.first.id]} }
+    end
+    assert assigns(:sample)
+    refute assigns(:sample).valid?
+
+  end
+
   test 'should return max query result' do
     with_config_value(:sample_type_template_enabled, true) do
       person = FactoryBot.create(:person)
       project = FactoryBot.create(:project)
+
+      login_as(person)
 
       template1 = FactoryBot.create(:isa_source_template)
       template2 = FactoryBot.create(:isa_sample_collection_template)
@@ -1202,7 +1254,7 @@ class SamplesControllerTest < ActionController::TestCase
       sample3 = FactoryBot.create :sample, title: 'sample3', sample_type: type3, project_ids: [project.id], contributor: person,
                                  data: { Input: [sample2.id], 'Protocol Assay 1': 'Protocol Assay 1', 'Assay 1 parameter value 1': 'Assay 1 parameter value 1', 'Extract Name': 'Extract Name', 'other material characteristic 1': 'other material characteristic 1' }
 
-      login_as(person)
+
 
       post :query, xhr: true, params: {
         project_ids: [project.id],
@@ -1251,6 +1303,99 @@ class SamplesControllerTest < ActionController::TestCase
       assert result = assigns(:result)
       assert_equal 1, result.length
     end
+  end
+
+  test 'form hides private linked multi samples' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+
+    patient = FactoryBot.create(:patient_sample, contributor: person, policy: FactoryBot.create(:public_policy))
+    patient.set_attribute_value('full name','Public Patient')
+    patient.save!
+    patient2 = FactoryBot.create(:patient_sample, sample_type:patient.sample_type, contributor: person, policy: FactoryBot.create(:private_policy) )
+    patient2.set_attribute_value('full name','Private Patient')
+    patient2.save!
+    multi_linked_sample_type = FactoryBot.create(:multi_linked_sample_type, project_ids: [person.projects.first.id])
+    multi_linked_sample_type.sample_attributes.last.linked_sample_type = patient.sample_type
+    multi_linked_sample_type.save!
+
+    sample = Sample.create(sample_type: multi_linked_sample_type,
+                           data:{
+                              "title": 'Multiple Samples',
+                              "patient": [patient.id.to_s, patient2.id.to_s]
+                            },
+                           project_ids: [person.projects.first.id],
+                           policy: FactoryBot.create(:editing_public_policy)
+    )
+
+    person2 = FactoryBot.create(:person)
+    login_as(person2)
+    assert sample.can_edit?
+
+    get :edit, params: { id: sample.id }
+    assert_response :success
+
+    assert_select 'select#sample_data_patient' do
+      assert_select 'option[value=?]',patient.id, text:/Public Patient/, count:1
+      assert_select 'option[value=?]',patient2.id, text:/Hidden/, count:1
+      assert_select 'option[value=?]',patient2.id, text:/Private Patient/, count:0
+    end
+
+  end
+
+  test 'form hides private linked single sample' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+
+    patient = FactoryBot.create(:patient_sample, contributor: person, policy: FactoryBot.create(:private_policy) )
+    patient.set_attribute_value('full name','Private Patient')
+    patient.save!
+    linked_sample_type = FactoryBot.create(:linked_sample_type, project_ids: [person.projects.first.id])
+    linked_sample_type.sample_attributes.last.linked_sample_type = patient.sample_type
+    linked_sample_type.save!
+
+    sample = Sample.create(sample_type: linked_sample_type,
+                           data:{
+                             "title": 'Single linked sample',
+                             "patient": patient.id.to_s
+                           },
+                           project_ids: [person.projects.first.id],
+                           policy: FactoryBot.create(:editing_public_policy)
+    )
+
+    person2 = FactoryBot.create(:person)
+    login_as(person2)
+    assert sample.can_edit?
+
+    get :edit, params: { id: sample.id }
+    assert_response :success
+
+    assert_select 'select#sample_data_patient' do
+      assert_select 'option[value=?]',patient.id, text:/Hidden/, count:1
+      assert_select 'option[value=?]',patient.id, text:/Private Patient/, count:0
+    end
+
+  end
+
+  test 'typeahead' do
+    person = FactoryBot.create(:person)
+    sample1 = FactoryBot.create(:sample, title: 'sample1', contributor: person)
+    sample_type = sample1.sample_type
+
+    sample2 = FactoryBot.create(:sample, sample_type: sample_type, title: 'sample2')
+
+    login_as(person)
+    assert_equal sample1.sample_type, sample2.sample_type
+    assert sample1.can_view?
+    refute sample2.can_view?
+
+    get :typeahead, params:{ format: :json, linked_sample_type_id: sample_type.id, q:'samp'}
+    assert_response :success
+    res = JSON.parse(response.body)['results']
+
+    assert_equal 1, res.count
+    assert_equal 'sample1', res.first['text']
+
   end
 
   private

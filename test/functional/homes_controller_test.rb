@@ -501,6 +501,46 @@ class HomesControllerTest < ActionController::TestCase
     assert_select "div#pending-project-creation-warning", text: /There are pending/, count: 0
   end
 
+  test 'alert for programme creation pending' do
+    admin = FactoryBot.create(:admin)
+    person = FactoryBot.create(:person)
+
+    login_as(admin)
+    get :index
+    assert_select "div#pending-programme-creation-warning", text: /There are pending/, count: 0
+    login_as(person)
+    get :index
+    assert_select "div#pending-programme-creation-warning", text: /There are pending/, count: 0
+
+    prog = FactoryBot.create(:programme)
+    login_as(admin)
+    get :index
+    assert_select "div#pending-programme-creation-warning", text: /There are pending/, count: 0
+    login_as(person)
+    get :index
+    assert_select "div#pending-programme-creation-warning", text: /There are pending/, count: 0
+
+    prog.update_column(:is_activated, false)
+    login_as(admin)
+    get :index
+    assert_select "div#pending-programme-creation-warning", text: /There are pending/, count:1 do
+      assert_select "a[href=?]", awaiting_activation_programmes_path, count: 1
+    end
+
+    login_as(person)
+    get :index
+    assert_select "div#pending-programme-creation-warning", text: /There are pending/, count: 0
+
+    prog.update_column(:activation_rejection_reason, 'its rubbish')
+    prog = FactoryBot.create(:programme)
+    login_as(admin)
+    get :index
+    assert_select "div#pending-programme-creation-warning", text: /There are pending/, count: 0
+    login_as(person)
+    get :index
+    assert_select "div#pending-programme-creation-warning", text: /There are pending/, count: 0
+  end
+
   test 'can disable tag cloud' do
     with_config_value :tagging_enabled, true do
       with_config_value :tag_cloud_enabled, false do

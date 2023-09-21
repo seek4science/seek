@@ -39,6 +39,9 @@ class Event < ApplicationRecord
 
   validates :country, country:true, allow_blank: true
 
+  has_filter :country
+  has_filter start_date: Seek::Filtering::DateFilter.new(field: :start_date)
+
   validate :validate_data_files
   def validate_data_files
     df = data_files.to_a

@@ -11,7 +11,7 @@ class StudiesControllerTest < ActionController::TestCase
   def setup
     login_as FactoryBot.create(:admin).user
   end
-  
+
   test 'should get index' do
     FactoryBot.create :study, policy: FactoryBot.create(:public_policy)
     get :index
@@ -1229,7 +1229,7 @@ class StudiesControllerTest < ActionController::TestCase
                             policy: FactoryBot.create(:public_policy),
                             contributor: person)
     get :show, params: { id: study.id }
-    
+
     assert_response :success
     assert_select 'a[href=?]',
                   order_assays_study_path(study), count: 0
@@ -1392,6 +1392,24 @@ class StudiesControllerTest < ActionController::TestCase
     login_as(person)
     put :update, params: { id: study.id, study: { title: 'test' }, tag_list: 'my_tag' }
     assert_equal 'my_tag', assigns(:study).tags_as_text_array.first
+  end
+
+  test 'should delete empty study with linked sample type' do
+    person = FactoryBot.create(:person)
+    study_source_sample_type = FactoryBot.create :linked_sample_type, contributor: person
+    study_sample_sample_type = FactoryBot.create :linked_sample_type, contributor: person
+    study = FactoryBot.create(:study,
+                              policy:FactoryBot.create(:private_policy, permissions:[FactoryBot.create(:permission,contributor: person, access_type:Policy::EDITING)]),
+                              sample_types: [study_source_sample_type, study_sample_sample_type],
+                              contributor: person)
+
+    login_as(person)
+
+    assert_difference('SampleType.count', -2) do
+      assert_difference('Study.count', -1) do
+        delete :destroy, params: { id: study.id, return_to: '/single_pages/' }
+      end
+    end
   end
 
 end
