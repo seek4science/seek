@@ -166,7 +166,7 @@ FactoryBot.define do
 
   factory(:role_address_custom_metadata_type,class:CustomMetadataType) do
     title { 'role_address' }
-    supported_type { 'Study' }
+    supported_type { 'CustomMetadata' }
     after(:build) do |a|
       a.custom_metadata_attributes << FactoryBot.create(:street_custom_metadata_attribute,required: true)
       a.custom_metadata_attributes << FactoryBot.create(:city_custom_metadata_attribute, required: true)
@@ -317,7 +317,7 @@ FactoryBot.define do
     supported_type { 'CustomMetadata' }
     after(:build) do |a|
       a.custom_metadata_attributes << FactoryBot.create(:participant_name_custom_metadata_attribute, required: true)
-      a.custom_metadata_attributes << FactoryBot.create(:participant_age_custom_metadata_attribute, required: true)
+      a.custom_metadata_attributes << FactoryBot.create(:participant_age_custom_metadata_attribute)
     end
   end
 
@@ -334,7 +334,7 @@ FactoryBot.define do
     supported_type { 'CustomMetadata' }
     after(:build) do |a|
       a.custom_metadata_attributes << FactoryBot.create(:study_site_name_custom_metadata_attribute, required: true)
-      a.custom_metadata_attributes << FactoryBot.create(:study_site_location_custom_metadata_attribute, required: true)
+      a.custom_metadata_attributes << FactoryBot.create(:study_site_location_custom_metadata_attribute)
       a.custom_metadata_attributes << FactoryBot.create(:participants_linked_custom_metadata_attribute_multi_attribute,required:true)
     end
   end
@@ -350,7 +350,7 @@ FactoryBot.define do
     supported_type { 'Study' }
     after(:build) do |a|
       a.custom_metadata_attributes << FactoryBot.create(:study_title_custom_metadata_attribute,required: true)
-      a.custom_metadata_attributes << FactoryBot.create(:study_sites_linked_custom_metadata_attribute_multi_attribute,required:true)
+      a.custom_metadata_attributes << FactoryBot.create(:study_sites_linked_custom_metadata_attribute_multi_attribute)
     end
   end
 

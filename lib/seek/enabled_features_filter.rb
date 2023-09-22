@@ -1,6 +1,6 @@
 module Seek
   module EnabledFeaturesFilter
-    FEATURES = %i[assays biosamples documentation events models
+    FEATURES = %i[assays biosamples documentation events models custom_metadata
                   nels openbis organisms human_diseases programmes publications samples
                   studies investigations documents workflows collections observed_variables 
 									observed_variable_sets sample_type_template project_single_page].freeze

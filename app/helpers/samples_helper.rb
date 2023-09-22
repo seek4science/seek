@@ -42,8 +42,8 @@ module SamplesHelper
   end
 
   def linked_custom_metadata_multi_form_field(attribute, value, element_name, element_class)
-    render :partial => 'custom_metadata/fancy_linked_custom_metadata_multi_attribute_fields',
-           :locals=> {:value=>value, :attribute => attribute,:element_name => element_name,:element_class => element_class, :collapsed=>false}
+    render partial: 'custom_metadata/fancy_linked_custom_metadata_multi_attribute_fields',
+           locals: { value: value, attribute: attribute, element_name: element_name, element_class: element_class, collapsed: false }
   end
 
   def linked_custom_metadata_form_field(attribute, value, element_name, element_class,depth)

@@ -6,22 +6,8 @@
   <div id="custom-metadata" class="panel panel-default">
     <div class="panel-heading"><%= label %> (<%= resource.custom_metadata.custom_metadata_type.title %>)</div>
     <div class="panel-body">
-
       <% resource.custom_metadata.custom_metadata_attributes.each do |attribute| %>
-        <% unless resource.custom_metadata.data[attribute.title].blank? %>
-          <div class="custom_metadata">
-            <% if attribute.linked_custom_metadata? || attribute.linked_custom_metadata_multi? %>
-              <%= content_tag(:span, class: 'linked_custom_metdata_display') do %>
-                <%= folding_panel(attribute.label, true, id:attribute.title) do %>
-                  <%= display_attribute(resource.custom_metadata, attribute, link: true) %>
-                <% end %>
-              <% end %>
-            <% else %>
-              <label><%= attribute.label %>:</label>
-              <%= display_attribute(resource.custom_metadata, attribute, link: true) %>
-            <% end %>
-          </div>
-        <% end %>
+        <%= render_custom_metadata_value(attribute, resource) %>
       <% end %>
     </div>
   </div>
