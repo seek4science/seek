@@ -33,9 +33,9 @@
     end
   end
 -%>
-<div class="batch-asset-selection-isa batch-selection-scope">
-  <div class="isa-tree batch-asset-selection-row <%= html_classes -%> <%= tree_class %>">
-    <%= batch_asset_collapse_toggle if children.any? %>
+<div class="batch-selection-asset batch-selection-scope">
+  <div class="isa-tree batch-selection-asset-row <%= html_classes -%> <%= tree_class %>">
+    <%= batch_selection_collapse_toggle if children.any? %>
 
     <%= render partial: 'assets/batch_selection/checkbox',
                locals: { checkbox_id: publishing_item_param(item),
@@ -57,7 +57,7 @@
 
     <% if show_permissions %>
       <% if can_view %>
-        <a class="btn btn-default btn-sm permissions_toggle">
+        <a class="btn btn-default btn-sm batch-selection-permissions-toggle">
           <%= list_item_visibility(item)-%>
         </a>
       <% else %>
@@ -66,14 +66,14 @@
     <% end %>
 
     <% if show_managers %>
-      <a class="btn btn-default btn-sm managed_by_toggle">
+      <a class="btn btn-default btn-sm batch-selection-managed-by-toggle">
         <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
       </a>
     <% end %>
   </div>
 
   <% if show_managers %>
-    <div class="managed_by_list" id="<%= itemid -%>" style="display:none;">
+    <div class="batch-selection-managed-by-list" style="display: none;">
       <strong>Manageable by:</strong>
       <% if item.managers.empty? %>
         <span class="none_text">None</span>
@@ -87,7 +87,7 @@
   <% end %>
 
   <% if show_children && children.any? %>
-    <div class="batch-asset-selection-isa-children batch-asset-collapse-scope">
+    <div class="batch-selection-children batch-selection-collapse">
       <% children.each do |child| %>
         <%= render partial: 'assets/batch_selection/checkbox_row',
                    object: child,

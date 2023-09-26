@@ -22,7 +22,7 @@
       <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
     </button>
   <% else %>
-    <button type="button" class="btn btn-sm parent-btn-checkbox btn-default batch-asset-select-btn">
+    <button type="button" class="btn btn-sm parent-btn-checkbox btn-default batch-selection-check-btn">
       <%= check_box_tag checkbox_id, 1, checked, { class: checkbox_class } -%>
     </button>
   <% end %>
@@ -34,10 +34,10 @@
       <span class="sr-only">Toggle Dropdown</span>
     </button>
     <ul class="dropdown-menu text-left" role="menu">
-      <li><a class="selectChildren" href="#">
+      <li><a class="batch-selection-select-children" href="#">
         <%= image('checkbox_select_all', height: 30) %>
         Select this item and all of its sub-items. </a></li>
-      <li><a class="deselectChildren" href="#">
+      <li><a class="batch-selection-deselect-children" href="#">
         <%= image('checkbox_deselect_all', height: 30) %>
         Deselect this item and all of its sub-items. </a></li>
     </ul>

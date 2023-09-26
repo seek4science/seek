@@ -88,13 +88,13 @@ ul.decided_item li.type_and_title {
   margin: 0.3em 0em;
 }
 
-.batch-asset-selection-buttons {
+.batch-selection-buttons {
   margin-bottom: 1em;
   display: flex;
   gap: 1em;
 }
 
-.batch-asset-selection-row {
+.batch-selection-asset-row {
   display: flex;
   gap: 1em;
   align-items: center;
@@ -103,21 +103,19 @@ ul.decided_item li.type_and_title {
   }
 }
 
-.permission_list, .managed_by_list {
+.batch-selection-permission-list,
+.batch-selection-managed-by-list,
+.batch-selection-children {
   margin-left: 3em;
 }
 
-.batch-asset-selection-isa-children {
-  margin-left: 3em;
-}
-
-.batch-asset-select-btn {
+.batch-selection-check-btn {
   input {
     margin: 0;
   }
 }
 
-.batch-asset-collapse-toggle {
+.batch-selection-collapse-toggle {
   cursor: pointer;
 
   .glyphicon-menu-down { display: none; };

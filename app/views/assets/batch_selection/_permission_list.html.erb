@@ -2,7 +2,7 @@
   item ||= permission_list
   downloadable = item.try(:is_downloadable?)
 -%>
-<div class="permission_list" style="display: none;">
+<div class="batch-selection-permission-list" style="display: none;">
   <% sharing_policy_changed = (@batch_sharing_permission_changed && (@items_for_sharing.include? item) && !@policy_params[:access_type].nil?)? "sharing_permission_changed" : "" %>
   <div class="permission-node <%= sharing_policy_changed %>">
     <strong>Public:</strong>
