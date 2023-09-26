@@ -5,7 +5,7 @@
   cant_manage ||= false
   not_visible ||= false
   checked ||= false
-  toggle ||= false
+  has_children ||= false
 -%>
 <div class="btn-group">
   <% if published %>
@@ -27,7 +27,7 @@
     </button>
   <% end %>
 
-  <% if toggle %>
+  <% if has_children %>
     <button type="button" class="btn btn-sm dropdown-toggle parent-btn-dropdown btn-default"
             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       <span class="caret"></span>

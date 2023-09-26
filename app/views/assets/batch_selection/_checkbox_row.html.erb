@@ -1,49 +1,59 @@
 <%
   item = checkbox_row
-  checked ||= false
-  block_published ||= false
-
-  can_manage=item.can_manage?
-  can_view=item.can_view?
-  published=false
+  preselected ||= nil
+  checked ||= (item == preselected)
+  publishing ||= false
+  can_manage = item.can_manage?
+  can_view = item.can_view?
+  published = false
+  html_classes ||= "publishing_options"
   tree_class = 'not-manageable'
   tree_class = 'manageable' if can_manage
   tree_class = 'not-visible' unless can_view
-  if block_published
+  if publishing
     if item.is_published?
-      published=true
+      published = true
       tree_class = 'already-published'
     end
   end
-
-  itemid="#{item.class.name}_#{item.id}"
-
-  toggle ||= false
+  item_id = "#{item.class.name}_#{item.id}"
   show_managers ||= false
   show_permissions ||= false
   show_managers = show_managers && (can_view || item.can_see_hidden_item?(current_user.person))
+  show_children ||= false
+  children = []
+  if show_children
+    case item
+    when Investigation
+      children = item.studies
+    when Study
+      children = item.assays
+    when Assay
+      children = item.assets
+    end
+  end
 -%>
-<div class="isa-tree <%= html_classes -%> <%= tree_class %> <%= itemid %>">
-  <div class="batch-asset-selection-row">
-    <%= batch_asset_collapse_toggle if toggle %>
+<div class="batch-asset-selection-isa batch-selection-scope">
+  <div class="isa-tree batch-asset-selection-row <%= html_classes -%> <%= tree_class %>">
+    <%= batch_asset_collapse_toggle if children.any? %>
 
     <%= render partial: 'assets/batch_selection/checkbox',
                locals: { checkbox_id: publishing_item_param(item),
-                         checkbox_class: itemid,
+                         checkbox_class: item_id,
                          checked: can_view && checked,
                          not_visible: !can_view,
                          published: can_view && published,
-                         cant_manage: !(can_manage),
-                         toggle: toggle } -%>
+                         cant_manage: !can_manage,
+                         has_children: children.any? } -%>
 
-    <h5 class="type_and_title" style="display: inline">
+    <span class="type_and_title">
       <strong><%= text_for_resource item -%>:</strong>
       <% if can_view %>
         <%= link_to item.title, item, target: "_blank" -%>
       <% else %>
         This item is hidden to you
       <% end %>
-    </h5>
+    </span>
 
     <% if show_permissions %>
       <% if can_view %>
@@ -74,5 +84,21 @@
   <% end %>
   <% if show_permissions && can_view %>
     <%= render partial: 'assets/batch_selection/permission_list', locals: { item: item } -%>
+  <% end %>
+
+  <% if show_children && children.any? %>
+    <div class="batch-asset-selection-isa-children batch-asset-collapse-scope">
+      <% children.each do |child| %>
+        <%= render partial: 'assets/batch_selection/checkbox_row',
+                   object: child,
+                   locals: { preselected: preselected,
+                             publishing: publishing,
+                             html_classes: "publishing_options",
+                             show_permissions: show_permissions,
+                             show_managers: show_managers,
+                             show_children: true
+                   } -%>
+      <% end %>
+    </div>
   <% end %>
 </div>

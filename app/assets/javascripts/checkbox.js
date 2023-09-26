@@ -2,17 +2,17 @@ $j(document).ready(function () {
     $j("a.selectChildren").click(BatchAssetSelection.selectChildren);
     $j("a.deselectChildren").click(BatchAssetSelection.deselectChildren);
     $j("a.managed_by_toggle").click(BatchAssetSelection.toggleManagers);
-    $j("a.permissions_toggle").click(function () {
-        BatchAssetSelection.togglePermissions($j(this).closest('.isa-tree'));
-        return false;
+    $j("a.permissions_toggle").click(function (event) {
+        event.preventDefault();
+        $j('.permission_list:first', $j(this).closest('.batch-selection-scope')).toggle();
     });
-    $j("a.showPermissions").click(function () {
-        BatchAssetSelection.togglePermissions($j(this).closest('.batch-selection-scope'), 'show');
-        return false;
+    $j("a.showPermissions").click(function (event) {
+        event.preventDefault();
+        $j('.permission_list', $j(this).closest('.batch-selection-scope')).show();
     })
-    $j("a.hidePermissions").click(function () {
-        BatchAssetSelection.togglePermissions($j(this).closest('.batch-selection-scope'), 'hide');
-        return false;
+    $j("a.hidePermissions").click(function (event) {
+        event.preventDefault();
+        $j('.permission_list', $j(this).closest('.batch-selection-scope')).hide();
     })
     $j(".batch-asset-collapse-toggle").click(function () {
         BatchAssetSelection.toggleCollapse(this);
@@ -64,20 +64,6 @@ const BatchAssetSelection = {
         return false;
     },
 
-    togglePermissions: function (scope, state) {
-        const permissions = $j('.permission_list', scope);
-        switch(state){
-            case 'show':
-                permissions.show()
-                break
-            case 'hide':
-                permissions.hide()
-                break
-            default:
-                permissions.toggle()
-        }
-    },
-
     toggleCollapse: function (element, state) {
         if (state === undefined) {
             state = !element.classList.contains('open');
@@ -107,17 +93,13 @@ const BatchAssetSelection = {
     },
 
     hideBlocked: function () {
-        let children_assets = $j($j(this).data('blocked_selector'), $j(this).closest('.batch-selection-scope'));
-        for (let asset of children_assets) {
-            //Items in isa tree
-            if ($j($j(asset).parents('div.batch-asset-selection-isa')).length > 0) {
-                // Don't hide "parents" of non-blocked items
-                if (!$j('input[type=checkbox]', $j(asset).parent()).length > 0) {
-                    $j($j(asset).parents('div.batch-asset-selection-isa')[0]).hide();
-                }
-                //Items not in isa tree
-            } else {
-                $j(asset).hide();
+        const scope = $j(this).closest('.batch-selection-scope');
+        const children = $j($j(this).data('blocked_selector'), scope).closest('.batch-asset-selection-isa');
+        for (let child of children) {
+            const element = $j(child);
+            // Don't hide if any non-blocked children
+            if (!$j(':checkbox', element).length) {
+                element.hide();
             }
         }
 
@@ -125,14 +107,8 @@ const BatchAssetSelection = {
     },
 
     showBlocked: function () {
-        let children_assets = $j($j(this).data('blocked_selector'), $j(this).closest('.batch-selection-scope'));
-        for (let asset of children_assets) {
-            if ($j($j(asset).parents('div.batch-asset-selection-isa')).length > 0) {
-                $j($j(asset).parents('div.batch-asset-selection-isa')[0]).show()
-            } else {
-                $j(asset).show()
-            }
-        }
+        const scope = $j(this).closest('.batch-selection-scope');
+        $j($j(this).data('blocked_selector'), scope).closest('.batch-asset-selection-isa').show();
 
         return false;
     }

@@ -15,12 +15,12 @@
   <% @items_for_publishing.each do |item| %>
     <% if item.contains_publishable_items? %>
       <% if item.is_asset? %>
-        <%= render partial: "assets/batch_selection/isa_tree",
+        <%= render partial: "assets/batch_selection/checkbox_row",
                    collection: item.assays.map(&:study).map(&:investigation).flatten.uniq,
-                   locals: { preselected: item, publishing: true, show_permissions: true } %>
+                   locals: { preselected: item, publishing: true, show_permissions: true, show_children: true } %>
       <% else %>
-        <%= render partial: "assets/batch_selection/isa_tree", object: item,
-                     locals: { preselected: item, publishing: true, show_permissions: true } %>
+        <%= render partial: "assets/batch_selection/checkbox_row", object: item,
+                     locals: { preselected: item, publishing: true, show_permissions: true, show_children: true } %>
       <% end %>
     <% else %>
       <%= check_box_tag publishing_item_param(item), 1, true, {style: 'display:none;'} %>
