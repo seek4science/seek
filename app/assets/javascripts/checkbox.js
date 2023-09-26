@@ -28,24 +28,24 @@ $j(document).ready(function () {
 });
 
 const BatchAssetSelection = {
-    selectChildren: function () {
+    selectChildren: function (event) {
+        event.preventDefault();
+
         let children_checkboxes = $j(':checkbox', $j(this).closest('.batch-selection-scope'));
         for (let checkbox of children_checkboxes){
             let checkbox_element = { className: checkbox.className, checked: true }
             BatchAssetSelection.checkRepeatedItems.apply(checkbox_element);
         }
-
-        return false;
     },
 
-    deselectChildren: function () {
+    deselectChildren: function (event) {
+        event.preventDefault();
+
         let children_checkboxes = $j(':checkbox', $j(this).closest('.batch-selection-scope'));
         for (let checkbox of children_checkboxes){
             let checkbox_element = { className: checkbox.className, checked: false }
             BatchAssetSelection.checkRepeatedItems.apply(checkbox_element)
         }
-
-        return false;
     },
 
     checkRepeatedItems: function () {
