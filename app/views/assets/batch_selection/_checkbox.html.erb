@@ -1,6 +1,5 @@
 <%
   checkbox_class ||= "no_name"   # <- Needed!
-  checkbox_id ||= checkbox_class
   published ||= false
   cant_manage ||= false
   not_visible ||= false
@@ -13,13 +12,13 @@
       <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
       Published
     </button>
-  <% elsif cant_manage %>
-    <button type="button" class="btn btn-sm parent-btn-checkbox btn-warning cant_manage disabled" data-tooltip="<%= tooltip('You do not have permission to manage this item.') %>">
-      <span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span>
-    </button>
   <% elsif not_visible %>
     <button type="button" class="btn btn-sm parent-btn-checkbox btn-danger not_visible disabled" data-tooltip="<%= tooltip('You do not have permission to view this item.') %>">
       <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
+    </button>
+  <% elsif cant_manage %>
+    <button type="button" class="btn btn-sm parent-btn-checkbox btn-warning cant_manage disabled" data-tooltip="<%= tooltip('You do not have permission to manage this item.') %>">
+      <span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span>
     </button>
   <% else %>
     <button type="button" class="btn btn-sm parent-btn-checkbox btn-default batch-selection-check-btn">

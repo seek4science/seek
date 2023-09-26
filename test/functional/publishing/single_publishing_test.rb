@@ -138,9 +138,7 @@ class SinglePublishingTest < ActionController::TestCase
       assert_select "input[type='checkbox'][id=?]", "publish_DataFile_#{request_publishing_df.id}"
     end
 
-    assert_select '.parent-btn-checkbox.label-warning', count: 1 do
-      assert_select 'span[data-tooltip=?]', 'You do not have permission to manage this item.', count: 1
-    end
+    assert_select '.parent-btn-checkbox.btn-warning[data-tooltip=?]', 'You do not have permission to manage this item.', count: 1
   end
 
   test 'split-button recursive selection' do

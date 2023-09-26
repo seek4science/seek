@@ -51,14 +51,14 @@ class BatchPublishingTest < ActionController::TestCase
     assert_response :success
     assert_select 'div#sorted_by_type,#sorted_by_isa', count: 2 do |sorted_by|
       sorted_by.each do |sorted_by_block|
-        assert_select sorted_by_block, '.type_and_title', count: total_asset_count + 1 do # event will also be shown
+        assert_select sorted_by_block, '.batch-selection-asset', count: total_asset_count + 1 do # event will also be shown
           publish_immediately_assets.each do |a|
             assert_select 'a[href=?]', eval("#{a.class.name.underscore}_path(#{a.id})"), text: /#{a.title}/
           end
           gatekeeper_required_assets.each do |a|
             assert_select 'a[href=?]', eval("#{a.class.name.underscore}_path(#{a.id})"), text: /#{a.title}/
           end
-          assert_select '.type_and_title img[src*=?][title=?]', 'lock.png', 'Private', count: total_asset_count
+          assert_select 'img[src*=?][title=?]', 'lock.png', 'Private', count: total_asset_count
         end
 
         assert_select sorted_by_block, '.parent-btn-checkbox', count: total_asset_count + 1 do # event will also be shown
@@ -82,9 +82,8 @@ class BatchPublishingTest < ActionController::TestCase
     get :batch_publishing_preview, params: { id: User.current_user.person.id }
     assert_response :success
 
-    assert_select ".isa-tree.#{published_item.class.name}_#{published_item.id}", count: 2 do
-      assert_select "input[type='checkbox']", count: 0
-    end
+    assert_select '.batch-selection-asset .type_and_title a[href=?]', data_file_path(published_item)
+    assert_select "input[type='checkbox'].#{published_item.class.name}_#{published_item.id}", count: 0
   end
 
   test 'publish_final_confirmation' do
