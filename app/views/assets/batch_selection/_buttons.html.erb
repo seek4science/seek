@@ -1,7 +1,5 @@
 <%
   text ||= "your items"
-  blocked_selector ||= ''
-
   select_deselect_all ||= false
   collapse_expand ||= false
   show_hide_blocked ||= false
@@ -31,12 +29,10 @@
   <% end %>
   <% if show_hide_blocked %>
     <div class="btn-group">
-      <a type="button" class="btn btn-default btn-xs showBlocked"
-         data-blocked_selector="<%= blocked_selector %>">
+      <a type="button" class="btn btn-default btn-xs showBlocked">
         Show blocked items
       </a>
-      <a type="button" class="btn btn-default btn-xs hideBlocked"
-         data-blocked_selector="<%= blocked_selector %>">
+      <a type="button" class="btn btn-default btn-xs hideBlocked">
         Hide blocked items
       </a>
     </div>

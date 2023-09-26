@@ -3,7 +3,6 @@
   show_hide_blocked ||= false
   show_permissions ||= false
   show_managers ||= false
-  blocked_selector ||= ''
 -%>
 
 <div class="batch-selection-scope tabpanel" id="batch-asset-selection">
@@ -79,7 +78,6 @@
           <div class="batch-asset-collapse-scope">
             <%= render partial: 'assets/batch_selection/buttons', locals: {
               text: "items in ISA",
-              blocked_selector: blocked_selector,
               select_deselect_all: true,
               collapse_expand: true,
               show_hide_blocked: show_hide_blocked
@@ -105,8 +103,3 @@
   </div>
 </div>
 
-<script type="text/javascript">
-    $j(document).ready(function () {
-        BatchAssetSelection.hideBlocked('<%= blocked_selector -%>');
-    })
-</script>

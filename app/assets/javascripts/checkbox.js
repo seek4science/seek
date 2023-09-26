@@ -20,7 +20,7 @@ $j(document).ready(function () {
     });
     $j("a.collapseChildren").click(BatchAssetSelection.collapseRecursively);
     $j("a.expandChildren").click(BatchAssetSelection.expandRecursively);
-    $j(".hideBlocked").click(BatchAssetSelection.hideBlocked);
+    $j(".hideBlocked").click(BatchAssetSelection.hideBlocked).click(); // Trigger on page load
     $j(".showBlocked").click(BatchAssetSelection.showBlocked);
     $j(".batch-asset-select-btn").click(function (event) {
         if (event.target.nodeName.includes("BUTTON")) {
@@ -33,6 +33,7 @@ $j(document).ready(function () {
 });
 
 const BatchAssetSelection = {
+    blockedSelectors: '.not-visible, .not-manageable, .already-published',
     selectChildren: function (event) {
         event.preventDefault();
         BatchAssetSelection.setChildren($j(this).closest('.batch-selection-scope'), true);
@@ -93,8 +94,9 @@ const BatchAssetSelection = {
     },
 
     hideBlocked: function () {
-        const scope = $j(this).closest('.batch-selection-scope');
-        const children = $j($j(this).data('blocked_selector'), scope).closest('.batch-asset-selection-isa');
+        const children = $j(this).closest('.batch-selection-scope')
+            .find(BatchAssetSelection.blockedSelectors)
+            .closest('.batch-asset-selection-isa');
         for (let child of children) {
             const element = $j(child);
             // Don't hide if any non-blocked children
@@ -107,8 +109,9 @@ const BatchAssetSelection = {
     },
 
     showBlocked: function () {
-        const scope = $j(this).closest('.batch-selection-scope');
-        $j($j(this).data('blocked_selector'), scope).closest('.batch-asset-selection-isa').show();
+        $j(this).closest('.batch-selection-scope')
+            .find(BatchAssetSelection.blockedSelectors)
+            .closest('.batch-asset-selection-isa').show();
 
         return false;
     }
