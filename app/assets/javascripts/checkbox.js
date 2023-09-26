@@ -30,9 +30,9 @@ $j(document).ready(function () {
 const BatchAssetSelection = {
     selectChildren: function () {
         let children_checkboxes = $j(':checkbox', $j(this).closest('.batch-selection-scope'));
-        for(let checkbox of children_checkboxes){
+        for (let checkbox of children_checkboxes){
             let checkbox_element = { className: checkbox.className, checked: true }
-            BatchAssetSelection.checkRepeatedItems(checkbox_element)
+            BatchAssetSelection.checkRepeatedItems.apply(checkbox_element);
         }
 
         return false;
@@ -40,9 +40,9 @@ const BatchAssetSelection = {
 
     deselectChildren: function () {
         let children_checkboxes = $j(':checkbox', $j(this).closest('.batch-selection-scope'));
-        for(let checkbox of children_checkboxes){
+        for (let checkbox of children_checkboxes){
             let checkbox_element = { className: checkbox.className, checked: false }
-            BatchAssetSelection.checkRepeatedItems(checkbox_element)
+            BatchAssetSelection.checkRepeatedItems.apply(checkbox_element)
         }
 
         return false;
@@ -60,7 +60,7 @@ const BatchAssetSelection = {
         if (event.target.nodeName.includes("BUTTON")){
             let checkbox_element = $j(this).find('input')[0]
             checkbox_element.checked = !(checkbox_element.checked)
-            BatchAssetSelection.checkRepeatedItems(checkbox_element)
+            BatchAssetSelection.checkRepeatedItems.apply(checkbox_element)
         }
     },
 
