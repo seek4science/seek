@@ -38,16 +38,6 @@
 <script>
     $j(document).ready(function () {
 
-        ObjectsInput.init();
-
-        $j('#<%= prefix-%>-role-<%= index-%>').find('.single-attr-row').each(function() {
-            $j(this).find("span.select2").each(function(index) {
-                if (index > 0) {
-                    $j(this).remove();
-                }
-            });
-        });
-
         $j('#<%= prefix-%>-role-<%= index-%>').on('change', '.destroy-row', function () {
             var row = $j(this).closest('#<%= prefix-%>-role-<%= index-%>');
             row.remove();

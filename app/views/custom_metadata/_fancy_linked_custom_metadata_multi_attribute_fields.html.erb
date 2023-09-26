@@ -56,6 +56,20 @@
                 container.find('#' + prefix + '-role-' + (index - 1)).after($j(newRow));
             }
 
+
+            ObjectsInput.init();
+
+            $j('#<%= prefix-%>-role-'+index).find('.single-attr-row').each(function() {
+                var children = $j(this).find("span.select2");
+                if (children.length > 1) {
+                    children.each(function(index) {
+                        if (index > 0) {
+                            $j(this).remove();
+                        }
+                    });
+                }
+            });
+
             return false;
         });
     });
