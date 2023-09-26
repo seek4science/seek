@@ -17,12 +17,11 @@
   show_permissions ||= false
   show_managers ||= false
 -%>
-<div class="split_button_parent" id="<%= "#{item.class.name}_#{item.id}" %>">
+<div class="batch-selection-scope split_button_parent">
   <%= render partial: "assets/asset_checkbox_row",
              object: item,
              locals: { html_classes: "publishing_options",
                        toggle: children.any?,
-                       cb_parent_selector: "div\##{item.class.name}_#{item.id}.split_button_parent",
                        block_published: publishing,
                        checked: (item == preselected),
                        show_permissions: show_permissions,
@@ -30,7 +29,7 @@
              } -%>
 
   <% if children.any? %>
-    <div style="margin-left: 3em">
+    <div class="collapse-scope" style="margin-left: 3em">
       <% children.each do |child| %>
         <%= render partial: "assets/isa_tree_preview",
                    object: child,

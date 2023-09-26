@@ -1,70 +1,48 @@
 $j(document).ready(function () {
-    $j("a.selectChildren").click(function (event) {
-        event.preventDefault();
-        selectChildren(this,$j(this).data("cb_parent_selector"))
-    })
-    $j("a.deselectChildren").click(function (event) {
-        event.preventDefault();
-        deselectChildren(this,$j(this).data("cb_parent_selector"))
-    })
-    $j('#jstree').on('click', 'a.selectChildren', function (event) {
-        event.preventDefault();
-        selectChildren(this,$j(this).data("cb_parent_selector"))
-    })
-    $j('#jstree').on('click', 'a.deselectChildren', function (event) {
-        event.preventDefault();
-        deselectChildren(this,$j(this).data("cb_parent_selector"))
-    })
-    $j("a.managed_by_toggle").click(function () {
-        toggleManagers(this,$j(this).data("managed_by_selector"))
-    })
+    $j("a.selectChildren").click(selectChildren);
+    $j("a.deselectChildren").click(deselectChildren);
+    $j("a.managed_by_toggle").click(toggleManagers);
     $j("a.permissions_toggle").click(function () {
-        togglePermissions(this,$j(this).data("permissions_selector"),'')
-    })
+        togglePermissions($j(this).closest('.isa-tree'));
+
+        return false;
+    });
     $j("a.showPermissions").click(function () {
-        togglePermissions(this,$j(this).data("permissions_selector"),'show')
+        togglePermissions($j(this).closest('.batch-selection-scope'), 'show');
+
+        return false;
     })
     $j("a.hidePermissions").click(function () {
-        togglePermissions(this,$j(this).data("permissions_selector"),'hide')
+        togglePermissions($j(this).closest('.batch-selection-scope'), 'hide');
+
+        return false;
     })
-    $j("div.isa-tree-toggle-open").click(function () {
-        isaTreeShow(this,$j(this).data("cb_parent_selector"))
-    })
-    $j("div.isa-tree-toggle-close").click(function () {
-        isaTreeHide(this,$j(this).data("cb_parent_selector"))
-    })
-    $j("a.collapseChildren").click(function (event) {
-        event.preventDefault();
-        collapseRecursively($j(this).data("cb_parent_selector"))
-    })
-    $j("a.expandChildren").click(function (event) {
-        event.preventDefault();
-        expandRecursively($j(this).data("cb_parent_selector"))
-    })
-    $j(".hideBlocked").click(function (event) {
-        event.preventDefault();
-        hideBlocked($j(this).data("cb_parent_selector"),$j(this).data("blocked_selector"))
-    })
-    $j(".showBlocked").click(function (event) {
-        event.preventDefault();
-        showBlocked($j(this).data("cb_parent_selector"),$j(this).data("blocked_selector"))
-    })
+    $j(".isa-tree-toggle-open").click(isaTreeShow);
+    $j(".isa-tree-toggle-close").click(isaTreeHide);
+    $j("a.collapseChildren").click(collapseRecursively);
+    $j("a.expandChildren").click(expandRecursively);
+    $j(".hideBlocked").click(hideBlocked);
+    $j(".showBlocked").click(showBlocked);
 })
 
-function selectChildren(select_all_element,cb_parent_selector){
-    let children_checkboxes = $j(':checkbox', $j(select_all_element).parents(cb_parent_selector))
+function selectChildren() {
+    let children_checkboxes = $j(':checkbox', $j(this).closest('.batch-selection-scope'));
     for(let checkbox of children_checkboxes){
         let checkbox_element = { className: checkbox.className, checked: true }
         checkRepeatedItems(checkbox_element)
     }
+
+    return false;
 }
 
-function deselectChildren(deselect_all_element,cb_parent_selector){
-    let children_checkboxes = $j(':checkbox', $j(deselect_all_element).parents(cb_parent_selector))
+function deselectChildren() {
+    let children_checkboxes = $j(':checkbox', $j(this).closest('.batch-selection-scope'));
     for(let checkbox of children_checkboxes){
         let checkbox_element = { className: checkbox.className, checked: false }
         checkRepeatedItems(checkbox_element)
     }
+
+    return false;
 }
 
 function checkRepeatedItems(checkbox_element) {
@@ -83,72 +61,68 @@ function button_checkRepeatedItems(button_element) {
     }
 }
 
-function toggleManagers(item,managed_by_selector) {
-    $j(managed_by_selector).toggle()
+function toggleManagers() {
+    $j(this).siblings('.managed_by_list').toggle();
+
+    return false;
 }
 
-function togglePermissions(item,permissions_selector,state) {
+function togglePermissions(scope, state) {
+    const permissions = $j('.permission_list', scope);
     switch(state){
         case 'show':
-            $j(permissions_selector).show()
+            permissions.show()
             break
         case 'hide':
-            $j(permissions_selector).hide()
+            permissions.hide()
             break
         default:
-            $j(permissions_selector).toggle()
+            permissions.toggle()
     }
 }
 
-function isaTreeShow(item,cb_parent_selector) {
-    let children_assets = $j('.isa-tree', $j(item).parents(cb_parent_selector))
-    if(cb_parent_selector.includes('split_button_parent')){
-        children_assets.splice(0, 1);
-    }
-    let keep_closed = []
-    for (let asset of children_assets) {
-        $j(asset).show()
-        for (let caret of $j('.isa-tree-toggle-close', $j(asset))){
-            if (caret.style.display == "none"){
-                keep_closed.push(caret)
-            }
-        }
-    }
-    $j($j('.isa-tree-toggle-open', $j(item).parents(cb_parent_selector))[0]).hide()
-    $j($j('.isa-tree-toggle-close', $j(item).parents(cb_parent_selector))[0]).show()
+function isaTreeShow() {
+    $j(this).closest('.batch-selection-scope').children('.collapse-scope').show();
+    $j(this).siblings('.isa-tree-toggle-close').show();
+    $j(this).hide();
 
-    for (let caret of keep_closed){
-        isaTreeHide(caret,$j(caret).data("cb_parent_selector"))
-    }
-}
-function isaTreeHide(item,cb_parent_selector){
-    let children_assets = $j('.isa-tree', $j(item).parents(cb_parent_selector))
-    if(cb_parent_selector.includes('split_button_parent')){
-        children_assets.splice(0, 1);
-    }
-    for (let asset of children_assets) {
-        $j(asset).hide()
-    }
-    $j($j('.isa-tree-toggle-open', $j(item).parents(cb_parent_selector))[0]).show()
-    $j($j('.isa-tree-toggle-close', $j(item).parents(cb_parent_selector))[0]).hide()
+    return false;
 }
 
-function collapseRecursively(cb_parent_selector){
-    let children_assets = $j('[class^=isa-tree-toggle]', $j(cb_parent_selector))
-    for (let asset of children_assets) {
-        isaTreeHide(asset,$j(asset).data("cb_parent_selector"))
-    }
+function isaTreeHide(){
+    $j(this).closest('.batch-selection-scope').children('.collapse-scope').hide();
+    $j(this).siblings('.isa-tree-toggle-open').show();
+    $j(this).hide();
+
+    return false;
 }
 
-function expandRecursively(cb_parent_selector){
-    let children_assets = $j('[class^=isa-tree-toggle]', $j(cb_parent_selector))
-    for (let asset of children_assets) {
-        isaTreeShow(asset,$j(asset).data("cb_parent_selector"))
+function collapseRecursively() {
+    const scope = $j(this).closest('.batch-selection-scope').children('.collapse-scope');
+    const toggles = $j('.isa-tree-toggle-close', scope);
+    for (let toggle of toggles) {
+        if (toggle.style.display === 'none') // Skip those that are already closed
+            continue;
+        isaTreeHide.apply(toggle);
     }
+
+    return false;
 }
 
-function hideBlocked(cb_parent_selector,blocked_selector){
-    let children_assets = $j(blocked_selector, $j(cb_parent_selector))
+function expandRecursively() {
+    const scope = $j(this).closest('.batch-selection-scope').children('.collapse-scope');
+    const toggles = $j('.isa-tree-toggle-open', scope);
+    for (let toggle of toggles) {
+        if (toggle.style.display === 'none')
+            continue;
+        isaTreeShow.apply(toggle);
+    }
+
+    return false;
+}
+
+function hideBlocked(){
+    let children_assets = $j($j(this).data('blocked_selector'), $j(this).closest('.batch-selection-scope'));
     for (let asset of children_assets) {
         //Items in isa tree
         if($j($j(asset).parents('div.split_button_parent')).length>0) {
@@ -161,10 +135,12 @@ function hideBlocked(cb_parent_selector,blocked_selector){
             $j(asset).hide()
         }
     }
+
+    return false;
 }
 
-function showBlocked(cb_parent_selector,blocked_selector){
-    let children_assets = $j(blocked_selector, $j(cb_parent_selector))
+function showBlocked(){
+    let children_assets = $j($j(this).data('blocked_selector'), $j(this).closest('.batch-selection-scope'));
     for (let asset of children_assets) {
         if($j($j(asset).parents('div.split_button_parent')).length>0) {
             $j($j(asset).parents('div.split_button_parent')[0]).show()
@@ -172,4 +148,6 @@ function showBlocked(cb_parent_selector,blocked_selector){
             $j(asset).show()
         }
     }
+
+    return false;
 }

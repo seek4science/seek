@@ -7,7 +7,6 @@
   checkbox_text ||= ""
   checked ||= false
   toggle ||= false
-  cb_parent_selector ||= "div\##{checkbox_class}.split_button_parent"
 -%>
 <div class="btn-group" >
 
@@ -48,10 +47,10 @@
       <span class="sr-only">Toggle Dropdown</span>
     </button>
     <ul class="dropdown-menu text-left" role="menu" style="width: auto;" >
-      <li><a class="selectChildren" id="<%= checkbox_class %>" data-cb_parent_selector='<%= cb_parent_selector %>' href="#" >
+      <li><a class="selectChildren" href="#">
         <%= image('checkbox_select_all', options = {height: 30}) %>
         Select this item and all of its sub-items. </a></li>
-      <li><a class="deselectChildren" id="<%= checkbox_class %>" data-cb_parent_selector='<%= cb_parent_selector %>' href="#" >
+      <li><a class="deselectChildren" href="#">
         <%= image('checkbox_deselect_all', options = {height: 30}) %>
         Deselect this item and all of its sub-items. </a></li>
     </ul>

@@ -19,19 +19,15 @@
   itemid="#{item.class.name}_#{item.id}"
 
   toggle ||=false
-  cb_parent_selector ||="div\##{itemid}.split_button_parent"
   show_managers ||= false
-  managed_by_selector ||="div\##{itemid}.managed_by_list"
   show_permissions ||= false
-  permissions_selector ||="div\##{itemid}.permission_list"
-
 -%>
 <div class="isa-tree <%= html_classes -%> <%= tree_class %> <%= itemid %>">
   <% if toggle %>
-    <%= render partial: 'assets/isa-tree-toggle', locals: { cb_parent_selector: cb_parent_selector } -%>
+    <%= render partial: 'assets/isa-tree-toggle' -%>
   <% end %>
   <% if can_view %>
-    <div  style="display: inline; margin-right:1em">
+    <div  style="display: inline; margin: 0 1em">
       <%= render partial: 'general/split_button_checkbox',
                  locals: { checkbox_id: publishing_item_param(item),
                            checkbox_class: itemid,
@@ -39,15 +35,13 @@
                            checkbox_text: "",
                            published: published,
                            cant_manage: !(can_manage),
-                           toggle: toggle,
-                           cb_parent_selector: cb_parent_selector} -%>
+                           toggle: toggle } -%>
     </div>
     <h5 class="type_and_title" style="display: inline">
       <strong><%= text_for_resource item -%>:</strong> <%= link_to item.title, item, target: "_blank" -%>
       <% if show_permissions %>
-        <a class="btn btn-default permissions_toggle" style="display: inline; margin-left:2em; padding:6px"
-            data-permissions_selector='<%= permissions_selector %>'>
-          <%=list_item_visibility(item)-%>
+        <a class="btn btn-default permissions_toggle" style="display: inline; margin-left:2em; padding:6px">
+          <%= list_item_visibility(item)-%>
         </a>
       <% end %>
     </h5>
@@ -68,8 +62,7 @@
     <% end %>
   <% end %>
   <% if show_managers %>
-    <a class="btn btn-default managed_by_toggle" style="display: inline; margin-left:1em; padding:6px"
-        data-managed_by_selector='<%= managed_by_selector %>'>
+    <a class="btn btn-default managed_by_toggle" style="display: inline; margin-left:1em; padding:6px">
       <span class="glyphicon glyphicon-user" aria-hidden="true" style="position:relative; top:2px;" ></span>
     </a>
     <div class="managed_by_list" id="<%= itemid -%>" style="display:none;margin-left:5em">

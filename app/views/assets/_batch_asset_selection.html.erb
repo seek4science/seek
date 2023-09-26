@@ -6,7 +6,6 @@
   blocked_selector ||= ''
 -%>
 
-
 <div class="btn-group btn-group-toggle" id="sort_by" data-toggle="buttons">
   <label class="btn btn-secondary active" style="border: 1px solid"
          onclick="$j('div#sorted_by_type').show();$j('div#sorted_by_isa').hide()">
@@ -20,105 +19,97 @@
   </label>
 </div>
 <br/><br/>
-<div>
+<div class="batch-selection-scope">
   <%= render partial: 'assets/batch_asset_selection_buttons', locals: {
     id: "items",
     text: "your items",
-    cb_parent_selector: "body",
-    show_hide_selector: "div#sorted_by_type,#sorted_by_isa",
     select_deselect_all: true,
     collapse_expand: true,
     show_hide_permissions: show_permissions
   } %>
-</div>
 
-<div id="sorted_by_type" >
-  <% @assets.sort_by { |k, v| v.first.class.name }.each do |type, items| %>
-    <div id="<%= items.first.class.table_name %>">
-      <%= render partial: 'assets/isa-tree-toggle', locals: { cb_parent_selector: "div##{items.first.class.table_name}" } -%>
-      <h2 style="display: inline;"><%= text_for_resource items.first %>(s)</h2>
-      <div class="isa-tree" style="border-left:none">
-        <%= render partial: 'assets/batch_asset_selection_buttons', locals: {
-          id: items.first.class.table_name,
-          text: (text_for_resource items.first).downcase.pluralize,
-          cb_parent_selector: 'div#'+items.first.class.table_name,
-          select_deselect_all: true
-        } %>
-        <% items.each do |item| %>
-          <%= render partial: 'assets/asset_checkbox_row',
-                     object: item,
-                     locals: { html_classes: 'publishing_options',
-                               block_published: publishing,
-                               show_permissions: show_permissions,
-                               show_managers: show_managers
-                     } -%>
-        <% end %>
-      </div>
-    </div>
-  <% end %>
-  <br/>
-</div>
-
-<div id="sorted_by_isa" >
-  <% unless @assets_not_in_isa.empty? %>
-    <div id="items_not_in_isa" style="display: inline;">
-      <%= render partial: 'assets/isa-tree-toggle', locals: { cb_parent_selector: "div#items_not_in_isa" } -%>
-      <h2 style="display: inline;">Items not in ISA</h2>
-      <div class="isa-tree" style="border-left:none">
-        <%= render partial: 'assets/batch_asset_selection_buttons', locals: {
-          id: "items_not_in_isa",
-          text: "items not in ISA",
-          cb_parent_selector: 'div#items_not_in_isa',
-          select_deselect_all: true
-        } %>
-      </div>
-      <% @assets_not_in_isa.each do |item| %>
-        <%= render partial: 'assets/asset_checkbox_row',
-                   object: item,
-                   locals: { html_classes: "publishing_options",
-                             block_published: publishing,
-                             show_permissions: show_permissions,
-                             show_managers: show_managers
-                   } -%>
+  <div class="collapse-scope">
+    <div id="sorted_by_type">
+      <% @assets.sort_by { |k, v| v.first.class.name }.each do |type, items| %>
+        <div id="<%= items.first.class.table_name %>" class="batch-selection-scope">
+          <h2><%= render partial: 'assets/isa-tree-toggle' -%> <%= text_for_resource items.first %>(s)</h2>
+          <div class="collapse-scope">
+            <%= render partial: 'assets/batch_asset_selection_buttons', locals: {
+              id: items.first.class.table_name,
+              text: (text_for_resource items.first).downcase.pluralize,
+              select_deselect_all: true
+            } %>
+            <% items.each do |item| %>
+              <%= render partial: 'assets/asset_checkbox_row',
+                         object: item,
+                         locals: { html_classes: 'publishing_options',
+                                   block_published: publishing,
+                                   show_permissions: show_permissions,
+                                   show_managers: show_managers
+                         } -%>
+            <% end %>
+          </div>
+        </div>
       <% end %>
-      <br/>
     </div>
-  <% end %>
 
-  <br/>
+    <div id="sorted_by_isa">
+      <% unless @assets_not_in_isa.empty? %>
+        <div id="items_not_in_isa" class="batch-selection-scope">
+          <h2><%= render partial: 'assets/isa-tree-toggle' -%> Items not in ISA</h2>
+          <div class="collapse-scope">
+            <%= render partial: 'assets/batch_asset_selection_buttons', locals: {
+              id: "items_not_in_isa",
+              text: "items not in ISA",
+              select_deselect_all: true
+            } %>
+            <% @assets_not_in_isa.each do |item| %>
+              <%= render partial: 'assets/asset_checkbox_row',
+                         object: item,
+                         locals: { html_classes: "publishing_options",
+                                   block_published: publishing,
+                                   show_permissions: show_permissions,
+                                   show_managers: show_managers
+                         } -%>
+            <% end %>
+          </div>
+          <br/>
+        </div>
+      <% end %>
 
-  <% unless @investigations.empty? %>
-    <div id="items_in_isa" style="display: inline;">
-      <%= render partial: 'assets/isa-tree-toggle', locals: { cb_parent_selector: "div#items_in_isa" } -%>
-      <h2 style="display: inline;">Items in ISA</h2>
-      <div class="isa-tree" style="border-left:none">
-        <%= render partial: 'assets/batch_asset_selection_buttons', locals: {
-          id: "items_in_isa",
-          text: "items in ISA",
-          cb_parent_selector: "div#items_in_isa",
-          collapse_selector: "div#investigation_list",
-          blocked_selector: blocked_selector,
-          select_deselect_all: true,
-          collapse_expand: true,
-          show_hide_blocked: show_hide_blocked
-        } %>
-      </div>
-      <div id="investigation_list">
-        <% @investigations.each do |inv| %>
-          <% collection = inv.assays.map(&:study).map(&:investigation).flatten.uniq %>
-          <% collection = inv.studies.map(&:investigation).flatten.uniq if collection.empty? %>
-          <% collection = [inv] if collection.empty?%>
-          <%= render partial: 'assets/isa_tree_preview',
-                     locals: { publishing: publishing,
-                               show_permissions: show_permissions,
-                               show_managers: show_managers
-                     },
-                     collection: collection %>
-        <% end %>
-      </div>
       <br/>
+
+      <% unless @investigations.empty? %>
+        <div id="items_in_isa" class="batch-selection-scope">
+          <h2><%= render partial: 'assets/isa-tree-toggle'-%> Items in ISA</h2>
+          <div class="collapse-scope">
+            <%= render partial: 'assets/batch_asset_selection_buttons', locals: {
+              id: "items_in_isa",
+              text: "items in ISA",
+              blocked_selector: blocked_selector,
+              select_deselect_all: true,
+              collapse_expand: true,
+              show_hide_blocked: show_hide_blocked
+            } %>
+            <div id="investigation_list">
+              <% @investigations.each do |inv| %>
+                <% collection = inv.assays.map(&:study).map(&:investigation).flatten.uniq %>
+                <% collection = inv.studies.map(&:investigation).flatten.uniq if collection.empty? %>
+                <% collection = [inv] if collection.empty?%>
+                <%= render partial: 'assets/isa_tree_preview',
+                           locals: { publishing: publishing,
+                                     show_permissions: show_permissions,
+                                     show_managers: show_managers
+                           },
+                           collection: collection %>
+              <% end %>
+            </div>
+            <br/>
+          </div>
+        </div>
+      <% end %>
     </div>
-  <% end %>
+  </div>
 </div>
 
 <script type="text/javascript">

@@ -1,9 +1,6 @@
 <%
   id ||= "items"
   text ||= "your items"
-  cb_parent_selector ||= 'body'
-  collapse_selector ||= cb_parent_selector
-  show_hide_selector ||= cb_parent_selector
   blocked_selector ||= ''
 
   select_deselect_all ||= false
@@ -15,11 +12,11 @@
 <% if select_deselect_all %>
   <div class="btn-group" style="padding-right: 15px">
     <a type="button" style="padding: 2px 6px" class="btn btn-default btn-sm selectChildren"
-       id="select_all_<%= id %>" data-cb_parent_selector="<%= cb_parent_selector %>" >
+       id="select_all_<%= id %>">
       Select all <%= text %>
     </a>
     <a type="button" style="padding: 2px 6px" class="btn btn-default btn-sm deselectChildren"
-       id="deselect_all_<%= id %>" data-cb_parent_selector="<%= cb_parent_selector %>" >
+       id="deselect_all_<%= id %>">
       Deselect all <%= text %>
     </a>
   </div>
@@ -28,11 +25,11 @@
 <% if collapse_expand %>
   <div class="btn-group" style="padding-right: 15px">
     <a type="button" style="padding: 2px 6px" class="btn btn-default btn-sm collapseChildren"
-       id="collapse_all_<%= id %>" data-cb_parent_selector="<%= collapse_selector %>" >
+       id="collapse_all_<%= id %>">
       Collapse all
     </a>
     <a type="button" style="padding: 2px 6px" class="btn btn-default btn-sm expandChildren"
-       id="expand_all_<%= id %>" data-cb_parent_selector="<%= cb_parent_selector %>" >
+       id="expand_all_<%= id %>">
       Expand all
     </a>
   </div>
@@ -40,23 +37,21 @@
 <% if show_hide_blocked %>
   <div class="btn-group" style="padding-right: 15px">
     <a type="button" style="padding: 2px 6px" class="btn btn-default btn-sm showBlocked"
-       data-cb_parent_selector="<%= show_hide_selector %>" data-blocked_selector="<%= blocked_selector %>">
+       data-blocked_selector="<%= blocked_selector %>">
       Show blocked items
     </a>
     <a type="button" style="padding: 2px 6px" class="btn btn-default btn-sm hideBlocked"
-       data-cb_parent_selector="<%= show_hide_selector %>" data-blocked_selector="<%= blocked_selector %>">
+       data-blocked_selector="<%= blocked_selector %>">
       Hide blocked items
     </a>
   </div>
 <% end %>
 <% if show_hide_permissions %>
   <div class="btn-group" style="padding-right: 15px">
-    <a type="button" style="padding: 2px 6px" class="btn btn-default btn-sm showPermissions"
-       data-permissions_selector='div.permission_list' >
+    <a type="button" style="padding: 2px 6px" class="btn btn-default btn-sm showPermissions">
       Show all permissions
     </a>
-    <a type="button" style="padding: 2px 6px" class="btn btn-default btn-sm hidePermissions"
-       data-permissions_selector='div.permission_list' >
+    <a type="button" style="padding: 2px 6px" class="btn btn-default btn-sm hidePermissions">
       Hide all permissions
     </a>
   </div>
