@@ -4,17 +4,14 @@ $j(document).ready(function () {
     $j("a.managed_by_toggle").click(BatchAssetSelection.toggleManagers);
     $j("a.permissions_toggle").click(function () {
         BatchAssetSelection.togglePermissions($j(this).closest('.isa-tree'));
-
         return false;
     });
     $j("a.showPermissions").click(function () {
         BatchAssetSelection.togglePermissions($j(this).closest('.batch-selection-scope'), 'show');
-
         return false;
     })
     $j("a.hidePermissions").click(function () {
         BatchAssetSelection.togglePermissions($j(this).closest('.batch-selection-scope'), 'hide');
-
         return false;
     })
     $j(".isa-tree-toggle-open").click(BatchAssetSelection.isaTreeShow);
@@ -23,45 +20,40 @@ $j(document).ready(function () {
     $j("a.expandChildren").click(BatchAssetSelection.expandRecursively);
     $j(".hideBlocked").click(BatchAssetSelection.hideBlocked);
     $j(".showBlocked").click(BatchAssetSelection.showBlocked);
-    $j(".batch-asset-select-btn").click(BatchAssetSelection.button_checkRepeatedItems);
-    $j('.batch-asset-select-btn input[type="checkbox"]').click(BatchAssetSelection.checkRepeatedItems);
+    $j(".batch-asset-select-btn").click(function (event) {
+        if (event.target.nodeName.includes("BUTTON")) {
+            $j(this).find(':checkbox').click();
+        }
+    });
+    $j('.batch-asset-select-btn :checkbox').click(function () {
+        BatchAssetSelection.checkRepeatedItems(this.className, this.checked);
+    });
 });
 
 const BatchAssetSelection = {
     selectChildren: function (event) {
         event.preventDefault();
-
-        let children_checkboxes = $j(':checkbox', $j(this).closest('.batch-selection-scope'));
-        for (let checkbox of children_checkboxes){
-            let checkbox_element = { className: checkbox.className, checked: true }
-            BatchAssetSelection.checkRepeatedItems.apply(checkbox_element);
-        }
+        BatchAssetSelection.setChildren($j(this).closest('.batch-selection-scope'), true);
     },
 
     deselectChildren: function (event) {
         event.preventDefault();
-
-        let children_checkboxes = $j(':checkbox', $j(this).closest('.batch-selection-scope'));
-        for (let checkbox of children_checkboxes){
-            let checkbox_element = { className: checkbox.className, checked: false }
-            BatchAssetSelection.checkRepeatedItems.apply(checkbox_element)
-        }
+        BatchAssetSelection.setChildren($j(this).closest('.batch-selection-scope'), false);
     },
 
-    checkRepeatedItems: function () {
-        let repeated_elements = document.getElementsByClassName(this.className)
-        let check = this.checked
-        for(let element of repeated_elements){
-            element.checked = check
+    setChildren: function (scope, value) {
+        const children = $j(':checkbox', scope);
+        const classes = new Set();
+        for (let child of children) {
+            classes.add(child.className);
         }
+
+        classes.forEach(c => BatchAssetSelection.checkRepeatedItems(c, value));
     },
 
-    button_checkRepeatedItems: function (event) {
-        if (event.target.nodeName.includes("BUTTON")){
-            let checkbox_element = $j(this).find('input')[0]
-            checkbox_element.checked = !(checkbox_element.checked)
-            BatchAssetSelection.checkRepeatedItems.apply(checkbox_element)
-        }
+    checkRepeatedItems: function (className, check) {
+        document.getElementById('batch-asset-selection')
+            .querySelectorAll('.' + className).forEach(e => e.checked = check);
     },
 
     toggleManagers: function () {
@@ -124,30 +116,30 @@ const BatchAssetSelection = {
         return false;
     },
 
-    hideBlocked: function (){
+    hideBlocked: function () {
         let children_assets = $j($j(this).data('blocked_selector'), $j(this).closest('.batch-selection-scope'));
         for (let asset of children_assets) {
             //Items in isa tree
-            if($j($j(asset).parents('div.batch-asset-selection-isa')).length>0) {
+            if ($j($j(asset).parents('div.batch-asset-selection-isa')).length > 0) {
                 // Don't hide "parents" of non-blocked items
                 if (!$j('input[type=checkbox]', $j(asset).parent()).length > 0) {
-                    $j($j(asset).parents('div.batch-asset-selection-isa')[0]).hide()
+                    $j($j(asset).parents('div.batch-asset-selection-isa')[0]).hide();
                 }
                 //Items not in isa tree
             } else {
-                $j(asset).hide()
+                $j(asset).hide();
             }
         }
 
         return false;
     },
 
-    showBlocked: function (){
+    showBlocked: function () {
         let children_assets = $j($j(this).data('blocked_selector'), $j(this).closest('.batch-selection-scope'));
         for (let asset of children_assets) {
-            if($j($j(asset).parents('div.batch-asset-selection-isa')).length>0) {
+            if ($j($j(asset).parents('div.batch-asset-selection-isa')).length > 0) {
                 $j($j(asset).parents('div.batch-asset-selection-isa')[0]).show()
-            } else{
+            } else {
                 $j(asset).show()
             }
         }
