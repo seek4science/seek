@@ -7,7 +7,7 @@
 -%>
 
 <div class="batch-selection-scope tabpanel">
-  <%= render partial: 'assets/batch_asset_selection_buttons', locals: {
+  <%= render partial: 'assets/batch_selection/buttons', locals: {
     text: "your items",
     select_deselect_all: true,
     collapse_expand: true,
@@ -31,14 +31,14 @@
     <div id="sorted_by_type" role="tabpanel" class="tab-pane active">
       <% @assets.sort_by { |k, v| v.first.class.name }.each do |type, items| %>
         <div id="<%= items.first.class.table_name %>" class="batch-selection-scope">
-          <h2><%= render partial: 'assets/isa-tree-toggle' -%> <%= text_for_resource items.first %>(s)</h2>
+          <h2><%= render partial: 'assets/batch_selection/isa_tree_toggle' -%> <%= text_for_resource items.first %>(s)</h2>
           <div class="collapse-scope">
-            <%= render partial: 'assets/batch_asset_selection_buttons', locals: {
+            <%= render partial: 'assets/batch_selection/buttons', locals: {
               text: (text_for_resource items.first).downcase.pluralize,
               select_deselect_all: true
             } %>
             <% items.each do |item| %>
-              <%= render partial: 'assets/asset_checkbox_row',
+              <%= render partial: 'assets/batch_selection/checkbox_row',
                          object: item,
                          locals: { html_classes: 'publishing_options',
                                    block_published: publishing,
@@ -54,14 +54,14 @@
     <div id="sorted_by_isa" role="tabpanel" class="tab-pane">
       <% unless @assets_not_in_isa.empty? %>
         <div id="items_not_in_isa" class="batch-selection-scope">
-          <h2><%= render partial: 'assets/isa-tree-toggle' -%> Items not in ISA</h2>
+          <h2><%= render partial: 'assets/batch_selection/isa_tree_toggle' -%> Items not in ISA</h2>
           <div class="collapse-scope">
-            <%= render partial: 'assets/batch_asset_selection_buttons', locals: {
+            <%= render partial: 'assets/batch_selection/buttons', locals: {
               text: "items not in ISA",
               select_deselect_all: true
             } %>
             <% @assets_not_in_isa.each do |item| %>
-              <%= render partial: 'assets/asset_checkbox_row',
+              <%= render partial: 'assets/batch_selection/checkbox_row',
                          object: item,
                          locals: { html_classes: "publishing_options",
                                    block_published: publishing,
@@ -78,9 +78,9 @@
 
       <% unless @investigations.empty? %>
         <div id="items_in_isa" class="batch-selection-scope">
-          <h2><%= render partial: 'assets/isa-tree-toggle'-%> Items in ISA</h2>
+          <h2><%= render partial: 'assets/batch_selection/isa_tree_toggle'-%> Items in ISA</h2>
           <div class="collapse-scope">
-            <%= render partial: 'assets/batch_asset_selection_buttons', locals: {
+            <%= render partial: 'assets/batch_selection/buttons', locals: {
               text: "items in ISA",
               blocked_selector: blocked_selector,
               select_deselect_all: true,
@@ -92,7 +92,7 @@
                 <% collection = inv.assays.map(&:study).map(&:investigation).flatten.uniq %>
                 <% collection = inv.studies.map(&:investigation).flatten.uniq if collection.empty? %>
                 <% collection = [inv] if collection.empty?%>
-                <%= render partial: 'assets/isa_tree_preview',
+                <%= render partial: 'assets/batch_selection/isa_tree',
                            locals: { publishing: publishing,
                                      show_permissions: show_permissions,
                                      show_managers: show_managers

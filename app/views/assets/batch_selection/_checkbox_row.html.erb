@@ -1,5 +1,5 @@
 <%
-  item = asset_checkbox_row
+  item = checkbox_row
   checked ||= false
   block_published ||= false
 
@@ -26,10 +26,10 @@
 <div class="isa-tree <%= html_classes -%> <%= tree_class %> <%= itemid %>">
   <div class="batch-asset-selection-row">
     <% if toggle %>
-      <%= render partial: 'assets/isa-tree-toggle' -%>
+      <%= render partial: 'assets/batch_selection/isa_tree_toggle' -%>
     <% end %>
 
-    <%= render partial: 'general/split_button_checkbox',
+    <%= render partial: 'assets/batch_selection/checkbox',
                locals: { checkbox_id: publishing_item_param(item),
                          checkbox_class: itemid,
                          checked: can_view && checked,
@@ -75,6 +75,6 @@
     </div>
   <% end %>
   <% if show_permissions && can_view %>
-    <%= render partial: 'assets/permission_list', locals: { item: item } -%>
+    <%= render partial: 'assets/batch_selection/permission_list', locals: { item: item } -%>
   <% end %>
 </div>

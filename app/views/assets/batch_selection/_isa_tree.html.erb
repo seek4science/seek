@@ -1,5 +1,5 @@
 <%
-  item = isa_tree_preview
+  item = isa_tree
   preselected ||=[]
   publishing ||= false
 
@@ -18,7 +18,7 @@
   show_managers ||= false
 -%>
 <div class="batch-asset-selection-isa batch-selection-scope">
-  <%= render partial: "assets/asset_checkbox_row",
+  <%= render partial: 'assets/batch_selection/checkbox_row',
              object: item,
              locals: { html_classes: "publishing_options",
                        toggle: children.any?,
@@ -31,7 +31,7 @@
   <% if children.any? %>
     <div class="batch-asset-selection-isa-children collapse-scope">
       <% children.each do |child| %>
-        <%= render partial: "assets/isa_tree_preview",
+        <%= render partial: 'assets/batch_selection/isa_tree',
                    object: child,
                    locals: { preselected: preselected,
                              publishing: publishing,
