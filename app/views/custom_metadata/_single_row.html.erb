@@ -12,7 +12,7 @@
 <div id="<%= prefix-%>-role-<%= index-%>" class="<%= key.singularize %> single-role multi_linked_custom_metdata" data-index="<%= index-%>">
   <% attribute.linked_custom_metadata_type.custom_metadata_attributes.each do |attr| %>
     <div class="form-group"><label><%= attr.label %></label><%= required_span if attr.required? %>
-      <div class="form-group">
+      <div class="form-group single-attr-row">
         <% attr_element_name = "#{element_name}[#{index}][#{attr.title}]" %>
         <%= attribute_form_element(attr, value ? value[attr.title] : nil, attr_element_name, element_class) %>
         <% unless attribute.description.nil? %>
@@ -37,6 +37,16 @@
 
 <script>
     $j(document).ready(function () {
+
+        ObjectsInput.init();
+
+        $j('#<%= prefix-%>-role-<%= index-%>').find('.single-attr-row').each(function() {
+            $j(this).find("span.select2").each(function(index) {
+                if (index > 0) {
+                    $j(this).remove();
+                }
+            });
+        });
 
         $j('#<%= prefix-%>-role-<%= index-%>').on('change', '.destroy-row', function () {
             var row = $j(this).closest('#<%= prefix-%>-role-<%= index-%>');
