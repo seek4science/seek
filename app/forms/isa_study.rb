@@ -75,9 +75,9 @@ class IsaStudy
       errors.add(:base, '[Source sample type]: All attributes must have an ISA tag')
     end
 
-    if @sample_collection_sample_type.sample_attributes.select { |a| a.isa_tag.nil? && a.title != 'Input' }.any?
+    if @sample_collection_sample_type.sample_attributes.select { |a| a.isa_tag.nil? && !a.title.include?('Input') }.any?
       errors.add(:base,
-                 "[Sample collection sample type]: All attributes should have an ISA Tag except for the <em>'Input'</em> attribute (hidden)")
+                 "[Sample collection sample type]: All attributes should have an ISA Tag except for the <em>'Input'</em> attribute (hidden)".html_safe)
     end
 
     unless @sample_collection_sample_type.valid?
