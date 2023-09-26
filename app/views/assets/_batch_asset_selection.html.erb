@@ -117,6 +117,6 @@
         $j('div#sorted_by_isa').hide()
     })
     $j(document).ready(function () {
-        hideBlocked(document,"<%="#{blocked_selector}"%>")
+        BatchAssetSelection.hideBlocked('<%= blocked_selector -%>');
     })
 </script>

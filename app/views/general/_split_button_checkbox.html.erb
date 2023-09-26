@@ -30,11 +30,9 @@
       </span>
     </button>
   <% else %>
-    <button type="button" class="btn parent-btn-checkbox" onclick="button_checkRepeatedItems(this)">
+    <button type="button" class="btn parent-btn-checkbox batch-asset-select-btn">
       <label style="font-weight:normal;">
-        <%= check_box_tag checkbox_id, 1, checked,
-                          {class: checkbox_class,
-                           onclick: "checkRepeatedItems(this)"} -%>
+        <%= check_box_tag checkbox_id, 1, checked, { class: checkbox_class } -%>
         <%= checkbox_text -%>
       </label>
     </button>
