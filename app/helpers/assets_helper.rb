@@ -334,4 +334,10 @@ module AssetsHelper
     end.join(', ').html_safe
   end
 
+  def batch_asset_collapse_toggle
+    content_tag(:span, class: 'batch-asset-collapse-toggle open') do
+      concat content_tag(:span, '', class: 'glyphicon glyphicon-menu-down', 'aria-hidden' => 'true')
+      concat content_tag(:span, '', class: 'glyphicon glyphicon-menu-right', 'aria-hidden' => 'true')
+    end
+  end
 end

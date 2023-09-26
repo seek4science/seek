@@ -14,8 +14,10 @@ $j(document).ready(function () {
         BatchAssetSelection.togglePermissions($j(this).closest('.batch-selection-scope'), 'hide');
         return false;
     })
-    $j(".isa-tree-toggle-open").click(BatchAssetSelection.isaTreeShow);
-    $j(".isa-tree-toggle-close").click(BatchAssetSelection.isaTreeHide);
+    $j(".batch-asset-collapse-toggle").click(function () {
+        BatchAssetSelection.toggleCollapse(this);
+        return false;
+    });
     $j("a.collapseChildren").click(BatchAssetSelection.collapseRecursively);
     $j("a.expandChildren").click(BatchAssetSelection.expandRecursively);
     $j(".hideBlocked").click(BatchAssetSelection.hideBlocked);
@@ -76,41 +78,29 @@ const BatchAssetSelection = {
         }
     },
 
-    isaTreeShow: function () {
-        $j(this).closest('.batch-selection-scope').children('.collapse-scope').show();
-        $j(this).siblings('.isa-tree-toggle-close').show();
-        $j(this).hide();
-
-        return false;
-    },
-
-    isaTreeHide: function (){
-        $j(this).closest('.batch-selection-scope').children('.collapse-scope').hide();
-        $j(this).siblings('.isa-tree-toggle-open').show();
-        $j(this).hide();
-
-        return false;
+    toggleCollapse: function (element, state) {
+        if (state === undefined) {
+            state = !element.classList.contains('open');
+        }
+        element.classList.toggle('open', state);
+        $j(element).closest('.batch-selection-scope').children('.batch-asset-collapse-scope').toggle(state);
     },
 
     collapseRecursively: function () {
-        const scope = $j(this).closest('.batch-selection-scope').children('.collapse-scope');
-        const toggles = $j('.isa-tree-toggle-close', scope);
+        const scope = $j(this).closest('.batch-selection-scope').children('.batch-asset-collapse-scope');
+        const toggles = $j('.batch-asset-collapse-toggle', scope);
         for (let toggle of toggles) {
-            if (toggle.style.display === 'none') // Skip those that are already closed
-                continue;
-            BatchAssetSelection.isaTreeHide.apply(toggle);
+            BatchAssetSelection.toggleCollapse(toggle, false);
         }
 
         return false;
     },
 
     expandRecursively: function () {
-        const scope = $j(this).closest('.batch-selection-scope').children('.collapse-scope');
-        const toggles = $j('.isa-tree-toggle-open', scope);
+        const scope = $j(this).closest('.batch-selection-scope').children('.batch-asset-collapse-scope');
+        const toggles = $j('.batch-asset-collapse-toggle', scope);
         for (let toggle of toggles) {
-            if (toggle.style.display === 'none')
-                continue;
-            BatchAssetSelection.isaTreeShow.apply(toggle);
+            BatchAssetSelection.toggleCollapse(toggle, true);
         }
 
         return false;

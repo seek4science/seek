@@ -29,7 +29,7 @@
              } -%>
 
   <% if children.any? %>
-    <div class="batch-asset-selection-isa-children collapse-scope">
+    <div class="batch-asset-selection-isa-children batch-asset-collapse-scope">
       <% children.each do |child| %>
         <%= render partial: 'assets/batch_selection/isa_tree',
                    object: child,

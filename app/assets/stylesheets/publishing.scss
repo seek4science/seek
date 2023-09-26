@@ -116,3 +116,15 @@ ul.decided_item li.type_and_title {
     margin: 0;
   }
 }
+
+.batch-asset-collapse-toggle {
+  cursor: pointer;
+
+  .glyphicon-menu-down { display: none; };
+  .glyphicon-menu-right { display: inline; };
+
+  &.open {
+    .glyphicon-menu-down { display: inline; };
+    .glyphicon-menu-right { display: none; };
+  }
+}

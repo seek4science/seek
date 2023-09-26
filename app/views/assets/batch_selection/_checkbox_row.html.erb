@@ -25,9 +25,7 @@
 -%>
 <div class="isa-tree <%= html_classes -%> <%= tree_class %> <%= itemid %>">
   <div class="batch-asset-selection-row">
-    <% if toggle %>
-      <%= render partial: 'assets/batch_selection/isa_tree_toggle' -%>
-    <% end %>
+    <%= batch_asset_collapse_toggle if toggle %>
 
     <%= render partial: 'assets/batch_selection/checkbox',
                locals: { checkbox_id: publishing_item_param(item),

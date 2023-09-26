@@ -27,12 +27,12 @@
     </li>
   </ul>
 
-  <div class="tab-content collapse-scope">
+  <div class="tab-content batch-asset-collapse-scope">
     <div id="sorted_by_type" role="tabpanel" class="tab-pane active">
       <% @assets.sort_by { |k, v| v.first.class.name }.each do |type, items| %>
         <div id="<%= items.first.class.table_name %>" class="batch-selection-scope">
-          <h2><%= render partial: 'assets/batch_selection/isa_tree_toggle' -%> <%= text_for_resource items.first %>(s)</h2>
-          <div class="collapse-scope">
+          <h2><%= batch_asset_collapse_toggle -%> <%= text_for_resource items.first %>(s)</h2>
+          <div class="batch-asset-collapse-scope">
             <%= render partial: 'assets/batch_selection/buttons', locals: {
               text: (text_for_resource items.first).downcase.pluralize,
               select_deselect_all: true
@@ -54,8 +54,8 @@
     <div id="sorted_by_isa" role="tabpanel" class="tab-pane">
       <% unless @assets_not_in_isa.empty? %>
         <div id="items_not_in_isa" class="batch-selection-scope">
-          <h2><%= render partial: 'assets/batch_selection/isa_tree_toggle' -%> Items not in ISA</h2>
-          <div class="collapse-scope">
+          <h2><%= batch_asset_collapse_toggle -%> Items not in ISA</h2>
+          <div class="batch-asset-collapse-scope">
             <%= render partial: 'assets/batch_selection/buttons', locals: {
               text: "items not in ISA",
               select_deselect_all: true
@@ -70,16 +70,13 @@
                          } -%>
             <% end %>
           </div>
-          <br/>
         </div>
       <% end %>
 
-      <br/>
-
       <% unless @investigations.empty? %>
         <div id="items_in_isa" class="batch-selection-scope">
-          <h2><%= render partial: 'assets/batch_selection/isa_tree_toggle'-%> Items in ISA</h2>
-          <div class="collapse-scope">
+          <h2><%= batch_asset_collapse_toggle-%> Items in ISA</h2>
+          <div class="batch-asset-collapse-scope">
             <%= render partial: 'assets/batch_selection/buttons', locals: {
               text: "items in ISA",
               blocked_selector: blocked_selector,
@@ -100,7 +97,6 @@
                            collection: collection %>
               <% end %>
             </div>
-            <br/>
           </div>
         </div>
       <% end %>
