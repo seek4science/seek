@@ -17,7 +17,7 @@
   show_permissions ||= false
   show_managers ||= false
 -%>
-<div class="batch-selection-scope split_button_parent">
+<div class="batch-asset-selection-isa batch-selection-scope">
   <%= render partial: "assets/asset_checkbox_row",
              object: item,
              locals: { html_classes: "publishing_options",
@@ -29,7 +29,7 @@
              } -%>
 
   <% if children.any? %>
-    <div class="collapse-scope" style="margin-left: 3em">
+    <div class="batch-asset-selection-isa-children collapse-scope">
       <% children.each do |child| %>
         <%= render partial: "assets/isa_tree_preview",
                    object: child,

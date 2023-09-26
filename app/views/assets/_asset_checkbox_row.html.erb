@@ -18,58 +18,63 @@
 
   itemid="#{item.class.name}_#{item.id}"
 
-  toggle ||=false
+  toggle ||= false
   show_managers ||= false
   show_permissions ||= false
+  show_managers = show_managers && (can_view || item.can_see_hidden_item?(current_user.person))
 -%>
 <div class="isa-tree <%= html_classes -%> <%= tree_class %> <%= itemid %>">
-  <% if toggle %>
-    <%= render partial: 'assets/isa-tree-toggle' -%>
-  <% end %>
-  <% if can_view %>
-    <div  style="display: inline; margin: 0 1em">
-      <%= render partial: 'general/split_button_checkbox',
-                 locals: { checkbox_id: publishing_item_param(item),
-                           checkbox_class: itemid,
-                           checked: checked,
-                           checkbox_text: "",
-                           published: published,
-                           cant_manage: !(can_manage),
-                           toggle: toggle } -%>
-    </div>
+  <div class="batch-asset-selection-row">
+    <% if toggle %>
+      <%= render partial: 'assets/isa-tree-toggle' -%>
+    <% end %>
+
+    <%= render partial: 'general/split_button_checkbox',
+               locals: { checkbox_id: publishing_item_param(item),
+                         checkbox_class: itemid,
+                         checked: can_view && checked,
+                         not_visible: !can_view,
+                         published: can_view && published,
+                         cant_manage: !(can_manage),
+                         toggle: toggle } -%>
+
     <h5 class="type_and_title" style="display: inline">
-      <strong><%= text_for_resource item -%>:</strong> <%= link_to item.title, item, target: "_blank" -%>
-      <% if show_permissions %>
-        <a class="btn btn-default permissions_toggle" style="display: inline; margin-left:2em; padding:6px">
-          <%= list_item_visibility(item)-%>
-        </a>
+      <strong><%= text_for_resource item -%>:</strong>
+      <% if can_view %>
+        <%= link_to item.title, item, target: "_blank" -%>
+      <% else %>
+        This item is hidden to you
       <% end %>
     </h5>
-  <% else %>
-    <div  style="display: inline; margin-right:1em">
-      <%= render partial: 'general/split_button_checkbox',
-                 locals: { checkbox_id: publishing_item_param(item),
-                           checkbox_class: itemid,
-                           not_visible: true,
-                           toggle: toggle,
-                           cb_parent_selector: cb_parent_selector} -%>
-    </div>
-    <h5 class="type_and_title" style="display: inline"><strong><%= text_for_resource item -%>:</strong> This item is hidden to you</h5>
-    <%=list_item_visibility(item)-%>
-    <% show_permissions=false%>
-    <% unless current_user.try(:person) && item.can_see_hidden_item?(current_user.person) %>
-      <% show_managers=false%>
+
+    <% if show_permissions %>
+      <% if can_view %>
+        <a class="btn btn-default btn-sm permissions_toggle">
+          <%= list_item_visibility(item)-%>
+        </a>
+      <% else %>
+        <%= list_item_visibility(item)-%>
+      <% end %>
     <% end %>
-  <% end %>
+
+    <% if show_managers %>
+      <a class="btn btn-default btn-sm managed_by_toggle">
+        <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+      </a>
+    <% end %>
+  </div>
+
   <% if show_managers %>
-    <a class="btn btn-default managed_by_toggle" style="display: inline; margin-left:1em; padding:6px">
-      <span class="glyphicon glyphicon-user" aria-hidden="true" style="position:relative; top:2px;" ></span>
-    </a>
-    <div class="managed_by_list" id="<%= itemid -%>" style="display:none;margin-left:5em">
-      <strong>Manageable by:</strong> <%= item.managers.empty? ? "<span class='none_text'>None</span>".html_safe : item.managers.collect { |m| link_to(h(m.title), m) }.join(", ").html_safe -%>
+    <div class="managed_by_list" id="<%= itemid -%>" style="display:none;">
+      <strong>Manageable by:</strong>
+      <% if item.managers.empty? %>
+        <span class="none_text">None</span>
+      <% else %>
+        <%= item.managers.collect { |m| link_to(h(m.title), m) }.join(", ").html_safe -%>
+      <% end %>
     </div>
   <% end %>
-  <% if show_permissions %>
-    <%= render partial: 'assets/permission_list', locals: { item: item} -%>
+  <% if show_permissions && can_view %>
+    <%= render partial: 'assets/permission_list', locals: { item: item } -%>
   <% end %>
 </div>

@@ -4,52 +4,41 @@
   published ||= false
   cant_manage ||= false
   not_visible ||= false
-  checkbox_text ||= ""
   checked ||= false
   toggle ||= false
 -%>
-<div class="btn-group" >
-
+<div class="btn-group">
   <% if published %>
-    <button type="button" class="btn parent-btn-checkbox label-default published">
-      <span class="label" style="padding: 1px" data-tooltip="<%= tooltip('This item has already been published.') %>">
-          <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
-          Published
-      </span>
+    <button type="button" class="btn btn-sm parent-btn-checkbox btn-success published disabled" data-tooltip="<%= tooltip('This item has already been published.') %>">
+      <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+      Published
     </button>
   <% elsif cant_manage %>
-    <button type="button" class="btn parent-btn-checkbox label-warning cant_manage">
-      <span class="label" style="padding: 1px" data-tooltip="<%= tooltip('You do not have permission to manage this item.') %>">
-          <span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span>
-      </span>
+    <button type="button" class="btn btn-sm parent-btn-checkbox btn-warning cant_manage disabled" data-tooltip="<%= tooltip('You do not have permission to manage this item.') %>">
+      <span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span>
     </button>
   <% elsif not_visible %>
-    <button type="button" class="btn parent-btn-checkbox label-danger not_visible">
-      <span class="label" style="padding: 1px" data-tooltip="<%= tooltip('You do not have permission to view this item.') %>">
-        <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
-      </span>
+    <button type="button" class="btn btn-sm parent-btn-checkbox btn-danger not_visible disabled" data-tooltip="<%= tooltip('You do not have permission to view this item.') %>">
+      <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
     </button>
   <% else %>
-    <button type="button" class="btn parent-btn-checkbox batch-asset-select-btn">
-      <label style="font-weight:normal;">
-        <%= check_box_tag checkbox_id, 1, checked, { class: checkbox_class } -%>
-        <%= checkbox_text -%>
-      </label>
+    <button type="button" class="btn btn-sm parent-btn-checkbox btn-default batch-asset-select-btn">
+      <%= check_box_tag checkbox_id, 1, checked, { class: checkbox_class } -%>
     </button>
   <% end %>
 
   <% if toggle %>
-    <button type="button" class="btn dropdown-toggle parent-btn-dropdown"
+    <button type="button" class="btn btn-sm dropdown-toggle parent-btn-dropdown btn-default"
             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       <span class="caret"></span>
       <span class="sr-only">Toggle Dropdown</span>
     </button>
-    <ul class="dropdown-menu text-left" role="menu" style="width: auto;" >
+    <ul class="dropdown-menu text-left" role="menu">
       <li><a class="selectChildren" href="#">
-        <%= image('checkbox_select_all', options = {height: 30}) %>
+        <%= image('checkbox_select_all', height: 30) %>
         Select this item and all of its sub-items. </a></li>
       <li><a class="deselectChildren" href="#">
-        <%= image('checkbox_deselect_all', options = {height: 30}) %>
+        <%= image('checkbox_deselect_all', height: 30) %>
         Deselect this item and all of its sub-items. </a></li>
     </ul>
   <% end %>

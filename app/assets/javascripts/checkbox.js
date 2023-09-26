@@ -65,7 +65,7 @@ const BatchAssetSelection = {
     },
 
     toggleManagers: function () {
-        $j(this).siblings('.managed_by_list').toggle();
+        $j('.managed_by_list', $j(this).closest('.isa-tree')).toggle();
 
         return false;
     },
@@ -128,10 +128,10 @@ const BatchAssetSelection = {
         let children_assets = $j($j(this).data('blocked_selector'), $j(this).closest('.batch-selection-scope'));
         for (let asset of children_assets) {
             //Items in isa tree
-            if($j($j(asset).parents('div.split_button_parent')).length>0) {
+            if($j($j(asset).parents('div.batch-asset-selection-isa')).length>0) {
                 // Don't hide "parents" of non-blocked items
                 if (!$j('input[type=checkbox]', $j(asset).parent()).length > 0) {
-                    $j($j(asset).parents('div.split_button_parent')[0]).hide()
+                    $j($j(asset).parents('div.batch-asset-selection-isa')[0]).hide()
                 }
                 //Items not in isa tree
             } else {
@@ -145,8 +145,8 @@ const BatchAssetSelection = {
     showBlocked: function (){
         let children_assets = $j($j(this).data('blocked_selector'), $j(this).closest('.batch-selection-scope'));
         for (let asset of children_assets) {
-            if($j($j(asset).parents('div.split_button_parent')).length>0) {
-                $j($j(asset).parents('div.split_button_parent')[0]).show()
+            if($j($j(asset).parents('div.batch-asset-selection-isa')).length>0) {
+                $j($j(asset).parents('div.batch-asset-selection-isa')[0]).show()
             } else{
                 $j(asset).show()
             }

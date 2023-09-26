@@ -1,17 +1,16 @@
 <%
   item ||= permission_list
-  item_id = "#{item.class.name}_#{item.id}"
   downloadable = item.try(:is_downloadable?)
 -%>
-<div class="permission_list" id="<%="#{item.class.name}_#{item.id}"-%>" style="display:none;margin-left:5em" >
+<div class="permission_list" style="display: none;">
   <% sharing_policy_changed = (@batch_sharing_permission_changed && (@items_for_sharing.include? item) && !@policy_params[:access_type].nil?)? "sharing_permission_changed" : "" %>
-  <div id="<%= item_id %>-Permission-Policy" class="permission-node <%= sharing_policy_changed %>">
+  <div class="permission-node <%= sharing_policy_changed %>">
     <strong>Public:</strong>
       <%= Policy.get_access_type_wording(item.policy.access_type, downloadable) %>.
   </div>
   <% item.policy.permissions.map do |permission| %>
     <% sharing_permission_changed = @batch_sharing_permission_changed && (@items_for_sharing.include? item) ? PolicyHelper::permission_changed_item_class(permission, @policy_params) : "" %>
-    <div id="<%= item_id %>-Permission-<%= permission.contributor_type %>}-<%= permission.contributor.id %>" class="permission-node <%= sharing_permission_changed %>">
+    <div class="permission-node <%= sharing_permission_changed %>">
       <strong><%=  permission_title(permission, member_prefix: false, icon: false, link: true) -%>:</strong>
         <%= Policy.get_access_type_wording(permission.access_type, downloadable) %>
     </div>

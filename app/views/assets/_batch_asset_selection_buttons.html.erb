@@ -8,45 +8,45 @@
   show_hide_permissions ||= false
 %>
 
-<div style="margin-bottom: 1em">
+<div class="batch-asset-selection-buttons">
   <% if select_deselect_all %>
-    <div class="btn-group" style="padding-right: 15px">
-      <a type="button" style="padding: 2px 6px" class="btn btn-default btn-sm selectChildren">
+    <div class="btn-group">
+      <a type="button" class="btn btn-default btn-xs selectChildren">
         Select all <%= text %>
       </a>
-      <a type="button" style="padding: 2px 6px" class="btn btn-default btn-sm deselectChildren">
+      <a type="button" class="btn btn-default btn-xs deselectChildren">
         Deselect all <%= text %>
       </a>
     </div>
   <% end %>
   <% if collapse_expand %>
-    <div class="btn-group" style="padding-right: 15px">
-      <a type="button" style="padding: 2px 6px" class="btn btn-default btn-sm collapseChildren">
+    <div class="btn-group">
+      <a type="button" class="btn btn-default btn-xs collapseChildren">
         Collapse all
       </a>
-      <a type="button" style="padding: 2px 6px" class="btn btn-default btn-sm expandChildren">
+      <a type="button" class="btn btn-default btn-xs expandChildren">
         Expand all
       </a>
     </div>
   <% end %>
   <% if show_hide_blocked %>
-    <div class="btn-group" style="padding-right: 15px">
-      <a type="button" style="padding: 2px 6px" class="btn btn-default btn-sm showBlocked"
+    <div class="btn-group">
+      <a type="button" class="btn btn-default btn-xs showBlocked"
          data-blocked_selector="<%= blocked_selector %>">
         Show blocked items
       </a>
-      <a type="button" style="padding: 2px 6px" class="btn btn-default btn-sm hideBlocked"
+      <a type="button" class="btn btn-default btn-xs hideBlocked"
          data-blocked_selector="<%= blocked_selector %>">
         Hide blocked items
       </a>
     </div>
   <% end %>
   <% if show_hide_permissions %>
-    <div class="btn-group" style="padding-right: 15px">
-      <a type="button" style="padding: 2px 6px" class="btn btn-default btn-sm showPermissions">
+    <div class="btn-group">
+      <a type="button" class="btn btn-default btn-xs showPermissions">
         Show all permissions
       </a>
-      <a type="button" style="padding: 2px 6px" class="btn btn-default btn-sm hidePermissions">
+      <a type="button" class="btn btn-default btn-xs hidePermissions">
         Hide all permissions
       </a>
     </div>
