@@ -37,7 +37,7 @@
               select_deselect_all: true
             } %>
             <% items.each do |item| %>
-              <%= render partial: 'assets/batch_selection/checkbox_row',
+              <%= render partial: 'assets/batch_selection/asset_row',
                          object: item,
                          locals: { html_classes: 'publishing_options',
                                    publishing: publishing,
@@ -60,7 +60,7 @@
               select_deselect_all: true
             } %>
             <% @assets_not_in_isa.each do |item| %>
-              <%= render partial: 'assets/batch_selection/checkbox_row',
+              <%= render partial: 'assets/batch_selection/asset_row',
                          object: item,
                          locals: { html_classes: "publishing_options",
                                    publishing: publishing,
@@ -87,7 +87,7 @@
                 <% collection = inv.assays.map(&:study).map(&:investigation).flatten.uniq %>
                 <% collection = inv.studies.map(&:investigation).flatten.uniq if collection.empty? %>
                 <% collection = [inv] if collection.empty?%>
-                <%= render partial: 'assets/batch_selection/checkbox_row',
+                <%= render partial: 'assets/batch_selection/asset_row',
                            locals: { publishing: publishing,
                                      show_permissions: show_permissions,
                                      show_managers: show_managers,

@@ -1,5 +1,5 @@
 <%
-  item = checkbox_row
+  item = asset_row
   preselected ||= nil
   checked ||= (item == preselected)
   publishing ||= false
@@ -89,7 +89,7 @@
   <% if show_children && children.any? %>
     <div class="batch-selection-children batch-selection-collapse">
       <% children.each do |child| %>
-        <%= render partial: 'assets/batch_selection/checkbox_row',
+        <%= render partial: 'assets/batch_selection/asset_row',
                    object: child,
                    locals: { preselected: preselected,
                              publishing: publishing,
