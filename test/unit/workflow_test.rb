@@ -148,7 +148,7 @@ class WorkflowTest < ActiveSupport::TestCase
   end
 
   test 'generates RO-Crate and gracefully handles diagram error for workflow/abstract workflow' do
-    bad_generator = MiniTest::Mock.new
+    bad_generator = Minitest::Mock.new
     def bad_generator.write_graph(struct)
       raise 'oh dear'
     end
@@ -795,5 +795,26 @@ class WorkflowTest < ActiveSupport::TestCase
     workflow.reload
     assert workflow.deleted_contributor
     assert workflow.has_deleted_contributor?
+  end
+
+  test 'sets maturity level' do
+    workflow = FactoryBot.create(:local_git_workflow)
+    disable_authorization_checks do
+      workflow.maturity_level = :released
+      assert workflow.save
+      assert_equal :released, workflow.maturity_level
+
+      workflow.maturity_level = :work_in_progress
+      assert workflow.save
+      assert_equal :work_in_progress, workflow.maturity_level
+
+      workflow.maturity_level = :deprecated
+      assert workflow.save
+      assert_equal :deprecated, workflow.maturity_level
+
+      workflow.maturity_level = :something
+      assert workflow.save
+      assert_nil workflow.maturity_level
+    end
   end
 end

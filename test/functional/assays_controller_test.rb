@@ -1921,4 +1921,20 @@ class AssaysControllerTest < ActionController::TestCase
     assert_select 'span.updated_last_by a', false, 'Last editor should not be shown if editor user has been deleted'
   end
 
+  test 'should delete empty assay with linked sample type' do
+    person = FactoryBot.create(:person)
+    assay_sample_type = FactoryBot.create :linked_sample_type, contributor: person
+    assay = FactoryBot.create(:assay,
+                              policy:FactoryBot.create(:private_policy, permissions:[FactoryBot.create(:permission,contributor: person, access_type:Policy::EDITING)]),
+                              sample_type: assay_sample_type,
+                              contributor: person)
+
+    login_as(person)
+
+    assert_difference('SampleType.count', -1) do
+      assert_difference('Assay.count', -1) do
+        delete :destroy, params: { id: assay.id, return_to: '/single_pages/' }
+      end
+    end
+  end
 end

@@ -45,6 +45,24 @@ class StudyTest < ActiveSupport::TestCase
     assert !study.can_delete?(study.contributor)
   end
 
+  # Users shouldn't be able to delete studies populated with samples through their linked sample types
+  test 'can only delete studies with empty sample types' do
+    study_source_sample_type = FactoryBot.create(:simple_sample_type, title: "Source Sample Type")
+    empty_sample_type = FactoryBot.create(:simple_sample_type, title: "Empty study Sample Type")
+    sources = (0..4).map do |i|
+      FactoryBot.create(:sample, title: "Source nr. #{i}", sample_type: study_source_sample_type)
+    end
+
+    study = FactoryBot.create(:study, title: "First study", sample_types: [study_source_sample_type])
+    empty_study = FactoryBot.create(:study, title: "Empty study", sample_types:[empty_sample_type])
+
+    assert_equal(study.sample_types.first.samples.size, 5)
+    assert(empty_study.sample_types.first.samples.none?)
+
+    assert_equal(study.state_allows_delete?, false)
+    assert_equal(empty_study.state_allows_delete?, true)
+  end
+
   test 'publications through assays' do
     assay1 = FactoryBot.create(:assay)
     study = assay1.study

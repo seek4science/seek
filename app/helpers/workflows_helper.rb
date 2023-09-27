@@ -36,9 +36,21 @@ module WorkflowsHelper
   end
 
   def maturity_badge(level)
-    content_tag(:span,
-                t("maturity_level.#{level}"),
-                class: "maturity-level label #{level == :released ? 'label-success' : 'label-warning'}")
+    label_class = case level
+                when :released
+                  'label-success'
+                when :work_in_progress
+                  'label-warning'
+                when :deprecated
+                  'label-danger'
+                else
+                  'label-default'
+                end
+    content_tag(:span, t("maturity_level.#{level}"), class: "maturity-level label #{label_class}")
+  end
+
+  def life_monitor_status_page_url(resource, base: Seek::Config.life_monitor_ui_url)
+    URI.join(base, "/workflow;uuid=#{resource.uuid}").to_s
   end
 
   def test_status_badge(resource)
@@ -57,9 +69,8 @@ module WorkflowsHelper
       label_class = 'label-default'
       label = t('test_status.not_available')
     end
-    url = LifeMonitor::Rest::Client.status_page_url(resource)
-    link_to(url, class: 'lifemonitor-status btn btn-default', target: '_blank', rel: 'noopener',
-            'data-tooltip' => 'Click to view in LifeMonitor') do
+    link_to(life_monitor_status_page_url(resource), class: 'lifemonitor-status btn btn-default', target: '_blank',
+            rel: 'noopener', 'data-tooltip' => 'Click to view in LifeMonitor') do
       image('life_monitor_icon', class: 'icon lifemonitor-logo') +
         'Tests ' +
         content_tag(:span, label, class: "test-status label #{label_class}")

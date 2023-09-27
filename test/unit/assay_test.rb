@@ -260,6 +260,25 @@ class AssayTest < ActiveSupport::TestCase
     assert !one_assay_with_publication.can_delete?(User.current_user.person)
   end
 
+  # Users shouldn't be able to delete assays populated with samples through their linked sample types
+  test 'can only delete assays with empty sample types' do
+    assay_sample_type = FactoryBot.create(:simple_sample_type, title: "Assay Sample Type with samples")
+    empty_sample_type = FactoryBot.create(:simple_sample_type, title: "Empty assay Sample Type")
+    assay_samples = (0..4).map do |i|
+      FactoryBot.create(:sample, title: "DNA Extract nr. #{i}", sample_type: assay_sample_type)
+    end
+
+    assay = FactoryBot.create(:assay, title: "First Assay", sample_type: assay_sample_type)
+    empty_assay = FactoryBot.create(:assay, title: "Empty assay", sample_type:empty_sample_type)
+
+    assert_equal(assay.sample_type.samples.size, 5)
+    assert(empty_assay.sample_type.samples.none?)
+
+    assert_equal(assay.state_allows_delete?, false)
+    assert_equal(empty_assay.state_allows_delete?, true)
+  end
+
+
   test 'assets' do
     assay = assays(:metabolomics_assay)
     assert_equal 3, assay.assets.size, 'should be 2 sops and 1 data file'

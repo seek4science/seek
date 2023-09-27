@@ -8,13 +8,33 @@
   <div class="panel-body">
     <% if @not_activated.any? %>
         These are items that are still waiting a response. Click the link to accept or reject it.
-        <ul>
-          <% @not_activated.each do |prog| %>
-              <li>
-                <%= link_to(prog.title, activation_review_programme_path(prog)) %>
-              </li>
-          <% end %>
-        </ul>
+          <table id='project-create-requests' class='table table-bordered table-hover'>
+            <thead>
+            <tr>
+              <th>Requester</th>
+              <th><%= t('programme') %></th>
+              <th>Date requested</th>
+              <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <% @not_activated.each do |programme| %>
+              <tr>
+                <td>
+                  <%= programme.programme_administrators.collect do |admin|
+                    link_to(admin.title, admin)
+                    end.join(', ').html_safe
+                  %>
+                    </td>
+                <td><%= link_to(programme.title, programme) %></td>
+                <td><%= date_as_string(programme.created_at, true)  %></td>
+                <td class="text-center">
+                  <%= link_to('Respond', activation_review_programme_path(programme), class:'btn btn-primary') %>
+                </td>
+              </tr>
+            <% end %>
+            </tbody>
+          </table>
     <% else %>
         There are no items awaiting a response.
     <% end %>
@@ -29,13 +49,35 @@
   <div class="panel-body">
     <% if @rejected.any? %>
         These are items that have been rejected but still exist. Click the link to accept or delete it.
-        <ul>
-          <% @rejected.each do |prog| %>
-              <li>
-                <%= link_to(prog.title, activation_review_programme_path(prog)) %>
-              </li>
-          <% end %>
-        </ul>
+      <table id='project-create-requests' class='table table-bordered table-hover'>
+        <thead>
+        <tr>
+          <th>Requester</th>
+          <th><%= t('programme') %></th>
+          <th>Date requested</th>
+          <th>Reason</th>
+          <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <% @rejected.each do |programme| %>
+          <tr>
+            <td>
+              <%= programme.programme_administrators.collect do |admin|
+                link_to(admin.title, admin)
+              end.join(', ').html_safe
+              %>
+            </td>
+            <td><%= link_to(programme.title, programme) %></td>
+            <td><%= date_as_string(programme.created_at, true)  %></td>
+            <td><%= programme.activation_rejection_reason %></td>
+            <td class="text-center">
+              <%= link_to('Respond', activation_review_programme_path(programme), class:'btn btn-primary') %>
+            </td>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
     <% else %>
         There are no rejected items.
     <% end %>

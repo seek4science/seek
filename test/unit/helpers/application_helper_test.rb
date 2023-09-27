@@ -328,6 +328,59 @@ class ApplicationHelperTest < ActionView::TestCase
     end
   end
 
+  test 'pending_programme_creation_request?' do
+    admin = FactoryBot.create(:admin)
+    prog_admin = FactoryBot.create(:programme_administrator)
+    person = FactoryBot.create(:person)
+
+    programme = FactoryBot.create(:programme)
+    assert programme.is_activated?
+
+    User.with_current_user(admin) do
+      refute pending_programme_creation_request?
+    end
+    User.with_current_user(nil) do
+      refute pending_programme_creation_request?
+    end
+    User.with_current_user(person) do
+      refute pending_programme_creation_request?
+    end
+    User.with_current_user(prog_admin) do
+      refute pending_programme_creation_request?
+    end
+
+    programme2 = FactoryBot.create(:programme)
+    programme2.update_column(:is_activated, false)
+    refute programme2.is_activated?
+    User.with_current_user(admin) do
+      assert pending_programme_creation_request?
+    end
+    User.with_current_user(nil) do
+      refute pending_programme_creation_request?
+    end
+    User.with_current_user(person) do
+      refute pending_programme_creation_request?
+    end
+    User.with_current_user(prog_admin) do
+      refute pending_programme_creation_request?
+    end
+
+    programme2.update_column(:activation_rejection_reason, 'its rubbish')
+    assert programme2.rejected?
+    User.with_current_user(admin) do
+      refute pending_programme_creation_request?
+    end
+    User.with_current_user(nil) do
+      refute pending_programme_creation_request?
+    end
+    User.with_current_user(person) do
+      refute pending_programme_creation_request?
+    end
+    User.with_current_user(prog_admin) do
+      refute pending_programme_creation_request?
+    end
+  end
+
   test 'markdown generation allows block quotes without compromising HTML sanitization' do
     assert_equal "<blockquote>\n<p>quote</p>\n</blockquote>\n", text_or_not_specified("> quote", markdown: true).to_s
     assert_equal "<blockquote>\n<p>quote</p>\n</blockquote>\n", text_or_not_specified(" > quote", markdown: true).to_s
