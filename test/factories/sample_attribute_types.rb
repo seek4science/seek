@@ -53,6 +53,11 @@ FactoryBot.define do
     sequence(:title) { |n| "Linked Custom Metadata attribute type #{n}" }
     base_type { Seek::Samples::BaseType::LINKED_CUSTOM_METADATA }
   end
+
+  factory(:custom_metadata_multi_sample_attribute_type, class: SampleAttributeType) do
+    sequence(:title) { |n| "Linked Custom Metadata multi attribute type #{n}" }
+    base_type { Seek::Samples::BaseType::LINKED_CUSTOM_METADATA_MULTI }
+  end
   
   factory(:data_file_sample_attribute_type, class: SampleAttributeType) do
     sequence(:title) { |n| "Data file attribute type #{n}" }
