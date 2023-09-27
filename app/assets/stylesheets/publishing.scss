@@ -17,14 +17,6 @@ ul.publishing_options li.secondary {
 
 }
 
-.published {
-    color: limegreen;
-}
-
-span.published {
-    color: green;
-}
-
 span.approve {
     color: limegreen;
     font-weight: bolder;
@@ -64,30 +56,17 @@ ul.item_for_decision {
 .publishing_options {
   padding: 0.5em 1em;
 
-  &.publishable {
-    background-color: #fafaff;
-    border-left-color: $btn-success-bg;
+  &.not-manageable {
+    border-left-color: $btn-warning-bg;
   }
 
-  &.not-publishable {
-    border-left-color: $btn-warning-bg;
+  &.not-visible {
+    border-left-color: $btn-danger-bg;
   }
 
   &.already-published {
     border-left-color: $gray-light;
   }
-}
-
-.publish-colour {
-  color: $btn-success-bg;
-}
-
-.publish-checkbox {
-  background-color: $btn-success-bg;
-  color: $btn-success-color;
-  padding: 0px 10px;
-  border-radius: 5px;
-  display: inline-block;
 }
 
 ul.decided_item {
@@ -107,4 +86,44 @@ ul.decided_item li.type_and_title {
 .rejected_items {
   padding: 0.5em 15px;
   margin: 0.3em 0em;
+}
+
+.batch-selection-buttons {
+  margin-bottom: 1em;
+  display: flex;
+  gap: 1em;
+}
+
+.batch-selection-asset-row {
+  display: flex;
+  gap: 1em;
+  align-items: center;
+  .visibility_icon {
+    margin: 0;
+  }
+}
+
+.batch-selection-permission-list,
+.batch-selection-managed-by-list,
+.batch-selection-children {
+  margin-left: 3em;
+}
+
+.batch-selection-check-btn {
+  input {
+    margin: 0;
+    vertical-align: middle;
+  }
+}
+
+.batch-selection-collapse-toggle {
+  cursor: pointer;
+
+  .glyphicon-menu-down { display: none; };
+  .glyphicon-menu-right { display: inline; };
+
+  &.open {
+    .glyphicon-menu-down { display: inline; };
+    .glyphicon-menu-right { display: none; };
+  }
 }

@@ -1,0 +1,50 @@
+<%
+  text ||= "your items"
+  select_deselect_all ||= false
+  collapse_expand ||= false
+  show_hide_blocked ||= false
+  show_hide_permissions ||= false
+%>
+
+<div class="batch-selection-buttons">
+  <% if select_deselect_all %>
+    <div class="btn-group">
+      <a type="button" class="btn btn-default btn-xs batch-selection-select-children">
+        Select all <%= text %>
+      </a>
+      <a type="button" class="btn btn-default btn-xs batch-selection-deselect-children">
+        Deselect all <%= text %>
+      </a>
+    </div>
+  <% end %>
+  <% if collapse_expand %>
+    <div class="btn-group">
+      <a type="button" class="btn btn-default btn-xs batch-selection-collapse-children">
+        Collapse all
+      </a>
+      <a type="button" class="btn btn-default btn-xs batch-selection-expand-children">
+        Expand all
+      </a>
+    </div>
+  <% end %>
+  <% if show_hide_blocked %>
+    <div class="btn-group">
+      <a type="button" class="btn btn-default btn-xs batch-selection-show-blocked">
+        Show blocked items
+      </a>
+      <a type="button" class="btn btn-default btn-xs batch-selection-hide-blocked">
+        Hide blocked items
+      </a>
+    </div>
+  <% end %>
+  <% if show_hide_permissions %>
+    <div class="btn-group">
+      <a type="button" class="btn btn-default btn-xs batch-selection-show-permissions">
+        Show all permissions
+      </a>
+      <a type="button" class="btn btn-default btn-xs batch-selection-hide-permissions">
+        Hide all permissions
+      </a>
+    </div>
+  <% end %>
+</div>

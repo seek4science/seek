@@ -38,32 +38,59 @@ class BatchSharingChangeTest < ActionController::TestCase
 
     login_as(@user)
     person = User.current_user.person
-    bulk_create_sharing_assets
+    bulk_create_sharing_assets        # Creates one of each everything
+    Sop.last.assays = [Assay.last]    # Links sop with isa structure
+
+    # Add manageable df link to isa that cannot be managed
+    other_user = FactoryBot.create(:user).person
+    o_inv=FactoryBot.create(:investigation, contributor: other_user)
+    o_study = FactoryBot.create(:study, investigation: o_inv, contributor: other_user)
+    o_assay = FactoryBot.create(:assay, study: o_study, contributor: other_user, policy: FactoryBot.create(:policy, access_type: Policy::VISIBLE))
+    df = FactoryBot.create(:data_file, contributor: @user.person, assay_ids: [o_assay.id])
+    assert df.can_manage?
+    assert !o_assay.can_manage?
+    assert !o_study.can_manage?
+    assert !o_inv.can_manage?
+
+    # Items that can be changed should be 1 of each except events(+1), investigations(+2), studies(+1) and datafiles(+1)
+    related_items_count = Seek::Util.authorized_types.length + 5
 
     get :batch_sharing_permission_preview, params: { id: person.id }
     assert_response :success
-
-    assert_select 'a[href=?]', "/people/#{person.id}", text:/#{person.name}/, count:1
-    assert_select 'div#jstree', count:1
-    assert_select 'div#jstree_not_isa', count:1
+    assert_select 'h1', text: /items related to/, count: 1 do
+      assert_select 'a[href=?]', "/people/#{person.id}", text: /#{person.name}/, count: 1
+    end
+    assert_select 'div#sorted_by_type', count: 1 do
+      # Should see all items with policies
+      assert_select '.type_and_title', count: related_items_count
+      assert_select '[type=checkbox]', count: related_items_count
+    end
+    assert_select 'div#sorted_by_isa', count: 1 do
+      # Should see all items with policies and blocked ISA
+      assert_select '.type_and_title', count: related_items_count + 3
+      assert_select '[type=checkbox]', count: related_items_count
+      assert_select '.parent-btn-checkbox.cant_manage', count: 1
+      assert_select '.parent-btn-checkbox.not_visible', count: 2
+      assert_select '.type_and_title', text: /This item is hidden to you/, count: 2 # Doesn't even show title
+    end
 
   end
 
 
   test 'should list the selected items' do
 
-    params = { share_not_isa: {}, share_isa: {}}
+    params = { publish: {} }
     params= params.merge(id: @person.id)
     post :batch_change_permission_for_selected_items, params: params
     assert_response :redirect
     assert_equal flash[:error], 'Please choose at least one item!'
 
 
-    #selected items don't include downloadable items
-    params[:share_not_isa] = {}
+    # selected items don't include downloadable items
+    params[:publish] = {}
     event = FactoryBot.create(:event, contributor: @person)
-    params[:share_not_isa][event.class.name]||= {}
-    params[:share_not_isa][event.class.name][event.id.to_s] = '1'
+    params[:publish][event.class.name] ||= {}
+    params[:publish][event.class.name][event.id.to_s] = '1'
 
     post :batch_change_permission_for_selected_items, params: params.merge(id: @person.id)
     assert_select '.highlight-colour', count: 0
@@ -72,22 +99,22 @@ class BatchSharingChangeTest < ActionController::TestCase
     end
 
     #selected items include downloadable items
-    params[:share_not_isa] = {}
+    params[:publish] = {}
     model = FactoryBot.create(:model, contributor: @person, projects: [@person.projects.first])
-    params[:share_not_isa][model.class.name] ||= {}
-    params[:share_not_isa][model.class.name][model.id.to_s] = '1'
+    params[:publish][model.class.name] ||= {}
+    params[:publish][model.class.name][model.id.to_s] = '1'
 
     df = data_with_isa
-    params[:share_isa][df.class.name]||= {}
-    params[:share_isa][df.class.name][df.id.to_s] = '1'
+    params[:publish][df.class.name] ||= {}
+    params[:publish][df.class.name][df.id.to_s] = '1'
     post :batch_change_permission_for_selected_items, params: params.merge(id: @person.id)
 
     assert_select '.type_and_title', count: 2 do
-      assert_select 'a[href=?]', data_file_path(df), text:/#{df.title}/
-      assert_select 'a[href=?]', model_path(model), text:/#{model.title}/
+      assert_select 'a[href=?]', data_file_path(df), text: /#{df.title}/
+      assert_select 'a[href=?]', model_path(model), text: /#{model.title}/
       assert_select '.icon', count: 2
     end
-    assert_select '.highlight-colour', count: 1, text:/Download/
+    assert_select '.highlight-colour', count: 1, text: /Download/
   end
 
 
@@ -105,15 +132,15 @@ class BatchSharingChangeTest < ActionController::TestCase
     assert !df.can_download?(other_person)
 
 
-    params = { share_not_isa: {}, share_isa: {}}
-    params[:share_not_isa][model.class.name] ||= {}
-    params[:share_not_isa][model.class.name][model.id.to_s] = '1'
-    params[:share_isa][df.class.name]||= {}
-    params[:share_isa][df.class.name][df.id.to_s] = '1'
-    params[:share_isa]['Banana'] = { '123' => '1' } # Should be ignored
+    params = { publish: {} }
+    params[:publish][model.class.name] ||= {}
+    params[:publish][model.class.name][model.id.to_s] = '1'
+    params[:publish][df.class.name] ||= {}
+    params[:publish][df.class.name][df.id.to_s] = '1'
+    params[:publish]['Banana'] = { '123': '1' } # Should be ignored
 
     # batch change sharing policy and grant other_people manage right
-    params[:policy_attributes] = {access_type: Policy::NO_ACCESS, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}}
+    params[:policy_attributes] = {access_type: Policy::NO_ACCESS, permissions_attributes: {'1': {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}}
     params= params.merge(id: @person.id)
     post :batch_sharing_permission_changed, params: params
     assert_response :success
@@ -150,13 +177,13 @@ class BatchSharingChangeTest < ActionController::TestCase
     assert !df.gatekeeper_required?
 
     # Batch change sharing policy params
-    params = { share_not_isa: {}, share_isa: {}}
-    params[:share_not_isa][gk_model.class.name] ||= {}
-    params[:share_not_isa][gk_model.class.name][gk_model.id.to_s] = '1'
-    params[:share_isa][gk_df.class.name] ||= {}
-    params[:share_isa][gk_df.class.name][gk_df.id.to_s] = '1'
-    params[:share_isa][df.class.name] ||= {}
-    params[:share_isa][df.class.name][df.id.to_s] = '1'
+    params = { publish: {} }
+    params[:publish][gk_model.class.name] ||= {}
+    params[:publish][gk_model.class.name][gk_model.id.to_s] = '1'
+    params[:publish][gk_df.class.name] ||= {}
+    params[:publish][gk_df.class.name][gk_df.id.to_s] = '1'
+    params[:publish][df.class.name] ||= {}
+    params[:publish][df.class.name][df.id.to_s] = '1'
     params = params.merge(id: a_person.id)
 
     # Can't make public without involving gatekeeper

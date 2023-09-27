@@ -4,6 +4,7 @@ require 'isatab_converter'
 class SinglePagesController < ApplicationController
   include Seek::AssetsCommon
   include Seek::Sharing::SharingCommon
+  include Seek::Publishing::PublishingCommon
   include Seek::Data::SpreadsheetExplorerRepresentation
 
   before_action :set_up_instance_variable
