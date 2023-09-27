@@ -34,7 +34,7 @@
   end
 -%>
 <div class="batch-selection-asset batch-selection-scope">
-  <div class="isa-tree batch-selection-asset-row <%= html_classes -%> <%= tree_class %>">
+  <div class="isa-tree batch-selection-asset-row <%= html_classes -%> <%= tree_class %>" data-asset-id="<%= item_id -%>">
     <%= batch_selection_collapse_toggle if children.any? %>
 
     <%= render partial: 'assets/batch_selection/checkbox',

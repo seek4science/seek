@@ -162,15 +162,15 @@ class SinglePublishingTest < ActionController::TestCase
 
     # split-button dropdown menu shown for tree branches
     should_have_dropdown.each do |asset|
-      assert_select ".isa-tree.#{asset.class.name}_#{asset.id}", count: 1 do
+      assert_select '.isa-tree[data-asset-id=?]', "#{asset.class.name}_#{asset.id}", count: 1 do
         assert_select '.parent-btn-dropdown', count: 1
         assert_select '.dropdown-menu', count: 1 do
           assert_select 'li', count: 2 do
-            assert_select 'a.selectChildren', text: /Select this item and all of its sub-items./, count: 1 do
+            assert_select 'a.batch-selection-select-children', text: /Select this item and all of its sub-items./, count: 1 do
               assert_select 'img[src=?]', '/assets/checkbox_select_all.svg'
             end
 
-            assert_select 'a.deselectChildren', text: /Deselect this item and all of its sub-items./, count: 1 do
+            assert_select 'a.batch-selection-deselect-children', text: /Deselect this item and all of its sub-items./, count: 1 do
               assert_select 'img[src=?]', '/assets/checkbox_deselect_all.svg'
             end
           end
@@ -179,7 +179,7 @@ class SinglePublishingTest < ActionController::TestCase
     end
     # split-button dropdown menu not shown for tree leafs
     should_not_have_dropdown.each do |asset|
-      assert_select ".isa-tree.#{asset.class.name}_#{asset.id}", count: 1 do
+      assert_select '.isa-tree[data-asset-id=?]', "#{asset.class.name}_#{asset.id}", count: 1 do
         assert_select '.parent-btn-dropdown', count: 0
         assert_select '.dropdown-menu', count: 0
       end
