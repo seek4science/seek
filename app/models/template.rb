@@ -40,9 +40,8 @@ class Template < ApplicationRecord
       end
     end
 
-    return if test_input_occurence
-
-    errors.add(:base, '[Template attribute]: You are not allowed to have more than one Input attribute.')
+    test_input_occurence
+    test_attribute_title_uniqueness
   end
 
   private
@@ -67,7 +66,19 @@ class Template < ApplicationRecord
   end
 
   def test_input_occurence
-    template_attributes.map(&:title).count('Input') <= 1
+    return if template_attributes.map(&:title).map(&:downcase).compact.count('input') <= 1
+
+    errors.add(:base, '[Template attribute]: You are not allowed to have more than one Input attribute.')
+  end
+
+  def test_attribute_title_uniqueness
+    template_attribute_titles = template_attributes.map(&:title).uniq
+    duplicate_attributes = template_attribute_titles.map do |tat|
+      if template_attributes.select { |ta| ta.title.downcase == tat.downcase }.map(&:title).count > 1
+        errors.add(:template_attributes, "Attribute names must be unique, there are duplicates of #{tat}")
+        return tat
+      end
+    end
   end
 
   def isa_tag_white_list(template_level)
