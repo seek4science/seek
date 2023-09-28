@@ -91,7 +91,7 @@ module SampleTypesHelper
   private
 
   def displayed_sample_attribute_types
-    SampleAttributeType.all.select{|x|!x.linked_custom_metadata?}
+    SampleAttributeType.all.reject{ |x|x.linked_custom_metadata? || x.linked_custom_metadata_multi? }
   end
 
   def attribute_type_link(sample_type_attribute)

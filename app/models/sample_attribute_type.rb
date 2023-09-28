@@ -88,6 +88,10 @@ class SampleAttributeType < ApplicationRecord
     base_type == Seek::Samples::BaseType::LINKED_CUSTOM_METADATA
   end
 
+  def linked_custom_metadata_multi?
+    base_type == Seek::Samples::BaseType::LINKED_CUSTOM_METADATA_MULTI
+  end
+
   def seek_sample?
     base_type == Seek::Samples::BaseType::SEEK_SAMPLE
   end
