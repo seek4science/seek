@@ -33,8 +33,7 @@ class Template < ApplicationRecord
 
   def validate_template_attributes
     errors.add(:base, '[Template attribute]: Some attributes are missing ISA tags') unless none_empty_isa_tag
-
-    unless test_tag_occurences.any?
+    if test_tag_occurences.any?
       test_tag_occurences.map do |tag|
         errors.add(:base,
                    "[Template attribute]: The <em>'#{tag}'</em> ISA tag is not allowed to be used more then once".html_safe)
