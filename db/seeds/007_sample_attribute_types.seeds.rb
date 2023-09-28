@@ -88,6 +88,9 @@ cv_list_type.update(base_type: Seek::Samples::BaseType::CV_LIST)
 linked_custom_metadata_type = SampleAttributeType.find_or_initialize_by(title:'Linked Custom Metadata')
 linked_custom_metadata_type.update(base_type: Seek::Samples::BaseType::LINKED_CUSTOM_METADATA)
 
+linked_custom_metadata_multi_type = SampleAttributeType.find_or_initialize_by(title:'Linked Custom Metadata (multiple)')
+linked_custom_metadata_multi_type.update(base_type: Seek::Samples::BaseType::LINKED_CUSTOM_METADATA_MULTI)
+
 puts "Seeded #{SampleAttributeType.count - count} sample attribute types"
 
 # Sample types

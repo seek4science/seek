@@ -201,7 +201,7 @@ class SamplesController < ApplicationController
     query = params[:q] || ''
     sample_type = SampleType.find(params[:linked_sample_type_id])
     results = sample_type.samples.where("LOWER(title) like :query",
-              query: "%#{query.downcase}%").limit(params[:limit] || 100)
+              query: "%#{query.downcase}%").limit(params[:limit] || 100).authorized_for(:view)
     items = results.map do |sa|
       { id: sa.id,
         text: sa.title }
@@ -266,7 +266,7 @@ class SamplesController < ApplicationController
 
     if sample_type
       sample_type.sample_attributes.each do |attr|
-        if attr.sample_attribute_type.controlled_vocab? || attr.sample_attribute_type.seek_sample_multi?
+        if attr.sample_attribute_type.controlled_vocab? || attr.sample_attribute_type.seek_sample_multi? || attr.sample_attribute_type.seek_sample?
           sample_type_param_keys << { attr.title => [] }
           sample_type_param_keys << attr.title.to_sym
         else

@@ -59,6 +59,44 @@ class CustomMetadataTest < ActiveSupport::TestCase
     assert_equal date, cm.get_attribute_value(:date)
   end
 
+  test 'mass assign attribute with linked custom metadata' do
+    cm = CustomMetadata.new(custom_metadata_type: FactoryBot.build(:role_custom_metadata_type), item: FactoryBot.create(:study))
+    pp   cm.update( data: {
+      "role_email":"alice@email.com",
+      "role_phone":"0012345",
+      "role_name": {
+        "first_name":"alice",
+        "last_name": "liddell"
+      }
+    }
+    )
+    assert cm.valid?
+    assert_equal 'alice@email.com', cm.get_attribute_value(:role_email)
+    assert_equal '0012345', cm.get_attribute_value(:role_phone)
+    assert_equal 'alice', cm.get_attribute_value(:role_name)["first_name"]
+    assert_equal 'liddell', cm.get_attribute_value(:role_name)["last_name"]
+  end
+
+  test 'mass assign attribute with multi linked custom metadatas' do
+    cm = CustomMetadata.new(custom_metadata_type: FactoryBot.build(:family_custom_metadata_type), item: FactoryBot.create(:study))
+    pp   cm.update( data: {
+      "dad":{"first_name":"tom", "last_name":"liddell"},
+      "mom": { "first_name": "lily", "last_name": "liddell" },
+      "child":{
+        "0":{"first_name":"rabbit", "last_name":"wonderland"},
+        "1":{"first_name":"mad", "last_name":"hatter"}
+      }
+    }
+    )
+    assert cm.valid?
+    assert_equal 'tom', cm.get_attribute_value(:dad)["first_name"]
+    assert_equal 'liddell', cm.get_attribute_value(:dad)["last_name"]
+    assert_equal 'lily', cm.get_attribute_value(:mom)["first_name"]
+    assert_equal 'rabbit', cm.get_attribute_value(:child).first["first_name"]
+    assert_equal 'mad', cm.get_attribute_value(:child).last["first_name"]
+  end
+
+
   test 'mass assignment mismatch attributes' do
     cm = simple_test_object
     date = Time.now.to_s
@@ -157,6 +195,25 @@ class CustomMetadataTest < ActiveSupport::TestCase
     end
   end
 
+  test 'mass assign attributes with the linked custom metadata' do
+    cm = CustomMetadata.new(custom_metadata_type: FactoryBot.build(:family_custom_metadata_type), item: FactoryBot.create(:study))
+    pp   cm.update( data: {
+      "dad":{"first_name":"tom", "last_name":"liddell"},
+      "mom": { "first_name": "lily", "last_name": "liddell" },
+      "child":{
+        "0":{"first_name":"rabbit", "last_name":"wonderland"},
+        "1":{"first_name":"mad", "last_name":"hatter"}
+      }
+    }
+    )
+    assert cm.valid?
+    assert_equal 'tom', cm.get_attribute_value('dad')["first_name"]
+    assert_equal 'liddell', cm.get_attribute_value('dad')["last_name"]
+    assert_equal 'lily', cm.get_attribute_value('mom')["first_name"]
+    assert_equal 'rabbit', cm.get_attribute_value('child').first["first_name"]
+    assert_equal 'mad', cm.get_attribute_value('child').last["first_name"]
+  end
+
   test 'associated metadata destroyed with study' do
     contributor = FactoryBot.create(:person)
     User.with_current_user(contributor.user) do
@@ -216,6 +273,8 @@ class CustomMetadataTest < ActiveSupport::TestCase
       end
     end
   end
+
+
 
   private
 

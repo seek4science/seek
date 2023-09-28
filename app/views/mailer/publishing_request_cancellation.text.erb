@@ -1,0 +1,16 @@
+Hi <%= @gatekeeper.name -%>,
+
+    The <%= Seek::Config.instance_name %> user <%= @publisher.name -%>, <%= person_url(@publisher) -%>, has cancelled a request previously sent to you to publish the following item(s):
+    <% @resources.each do |resource|%>
+        <% controller=resource.class.name.underscore.pluralize -%>
+        <%= resource.model_name.human -%>: <%= resource.title -%> - <%= url_for(:action=>:show,:controller=>controller,:id=>resource, :only_path => false) -%>
+
+    <% end %>
+
+    You do not need to take action.
+
+    You can contact <%= @publisher.first_name.capitalize -%> by replying to this email.
+
+    This is an automated email.
+
+- <%= Seek::Config.instance_admins_name %> Team

@@ -1,61 +1,64 @@
-<% if options.any? %>
-  <%
-    start_date = nil
-    end_date = nil
-    # User supplied options (not one of the presets), should not appear as options in the dropdown menu.
-    option_pairs = options.select { |o| o.data[:preset] }.map { |option| ["#{option.label} (#{option.count})", option.value] } + [['Custom range', 'custom']]
-    active_options = options.select(&:active?)
-    selected_option_value = nil
 
-    if active_options.any?
-      if active_options.length == 1
-        active_option = active_options.first
-        if active_option.data[:preset]
-          selected_option_value = active_option.value
-        elsif active_option.data[:date_range].begin.is_a?(Date) # It might be a Time if a custom duration was used (e.g. PT2H), and the field only fits YYYY-MM-DD.
-          date_range = active_option.data[:date_range]
-          start_date = date_range.begin.iso8601
-          end_date = date_range.end.iso8601 unless date_range.end.is_a?(Date::Infinity)
-          selected_option_value = 'custom'
-        end
-      end
+<%
+  start_date = nil
+  end_date = nil
+  # User supplied options (not one of the presets), should not appear as options in the dropdown menu.
+  option_pairs = options.select { |o| o.data[:preset] }.map { |option| ["#{option.label} (#{option.count})", option.value] } + [['Custom range', 'custom']]
+  active_options = options.select(&:active?)
 
-      # If the user has used a custom duration, or crafted some complex filter with multiple values,
-      # we can't hope to fit it into the date range form, so just add an "Other" option to the dropdown.
-      if selected_option_value.nil?
-        option_pairs += [['Other', 'other']]
-        selected_option_value = 'other'
+  return unless @visible_count > 0 || active_options.any?
+
+  selected_option_value = nil
+
+  if active_options.any?
+    if active_options.length == 1
+      active_option = active_options.first
+      if active_option.data[:preset]
+        selected_option_value = active_option.value
+      elsif active_option.data[:date_range].begin.is_a?(Date) # It might be a Time if a custom duration was used (e.g. PT2H), and the field only fits YYYY-MM-DD.
+        date_range = active_option.data[:date_range]
+        start_date = date_range.begin.iso8601
+        end_date = date_range.end.iso8601 unless date_range.end.is_a?(Date::Infinity)
+        selected_option_value = 'custom'
       end
     end
 
-    apply_url = url_for({ page: nil, filter: with_filter(key, '_date_', replace: true) }) # We will replace _date_ using JS
-    remove_url = url_for({ page: nil, filter: without_filter(key) })
-  %>
+    # If the user has used a custom duration, or crafted some complex filter with multiple values,
+    # we can't hope to fit it into the date range form, so just add an "Other" option to the dropdown.
+    if selected_option_value.nil?
+      option_pairs += [['Other', 'other']]
+      selected_option_value = 'other'
+    end
+  end
 
-  <%= content_tag(:div, class: 'filter-category', data: { 'filter-category' => key.to_s,
-                                                          role: 'seek-date-filter',
-                                                          'apply-filter-url' => apply_url,
-                                                          'remove-filter-url' => remove_url  }) do %>
-    <div class="filter-category-title"><%= t(key, default: key.to_s).titleize %></div>
-    <%= select_tag(nil,
-                   options_for_select(option_pairs, selected_option_value),
-                   data: { role: 'seek-date-filter-select' },
-                   autocomplete: 'off',
-                   include_blank: 'Any time',
-                   class: 'filter-option-dropdown')
-    %>
-    <%= content_tag(:div, { class: 'filter-option-field-group', style: 'border-top: 1px solid #ccc;', data: { role: 'seek-date-filter-custom' } }) do %>
-      <%= text_field_tag(nil, start_date,
-                         data: { role: 'seek-date-filter-period-start' },
-                         placeholder: 'Start',
-                         autocomplete: 'off',
-                         class: 'filter-option-field') -%>
-      <%= text_field_tag(nil, end_date,
-                         data: { role: 'seek-date-filter-period-end' },
-                         placeholder: 'End (optional)',
-                         autocomplete: 'off',
-                         class: 'filter-option-field') -%>
-      <%= link_to('Go', '#', data: { role: 'seek-date-filter-btn' }, class: 'filter-option-field-button') %>
-    <% end %>
+  apply_url = url_for({ page: nil, filter: with_filter(key, '_date_', replace: true) }) # We will replace _date_ using JS
+  remove_url = url_for({ page: nil, filter: without_filter(key) })
+%>
+
+<%= content_tag(:div, class: 'filter-category', data: { 'filter-category' => key.to_s,
+                                                        role: 'seek-date-filter',
+                                                        'apply-filter-url' => apply_url,
+                                                        'remove-filter-url' => remove_url  }) do %>
+  <div class="filter-category-title"><%= t(key, default: key.to_s).titleize %></div>
+  <%= select_tag(nil,
+                 options_for_select(option_pairs, selected_option_value),
+                 data: { role: 'seek-date-filter-select' },
+                 autocomplete: 'off',
+                 include_blank: 'Any time',
+                 class: 'filter-option-dropdown')
+  %>
+  <%= content_tag(:div, { class: 'filter-option-field-group', style: 'border-top: 1px solid #ccc;', data: { role: 'seek-date-filter-custom' } }) do %>
+    <%= text_field_tag(nil, start_date,
+                       data: { role: 'seek-date-filter-period-start' },
+                       placeholder: 'Start',
+                       autocomplete: 'off',
+                       class: 'filter-option-field') -%>
+    <%= text_field_tag(nil, end_date,
+                       data: { role: 'seek-date-filter-period-end' },
+                       placeholder: 'End (optional)',
+                       autocomplete: 'off',
+                       class: 'filter-option-field') -%>
+    <%= link_to('Go', '#', data: { role: 'seek-date-filter-btn' }, class: 'filter-option-field-button') %>
   <% end %>
 <% end %>
+
