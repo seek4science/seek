@@ -75,6 +75,11 @@ class SamplesController < ApplicationController
 
   def edit
     @sample = Sample.find(params[:id])
+    if !@sample.originating_data_file.nil? && (@sample.created_at == @sample.updated_at)
+      flash.now[:error] = '<strong>Warning:</strong> This sample was extracted from a datafile.
+                           If you edit the sample, it will no longer correspond to the original source data.<br/>
+                           Unless you cancel, a label will be added to the sample\'s source field to indicate it is no longer valid.'.html_safe
+    end
     respond_with(@sample)
   end
 
