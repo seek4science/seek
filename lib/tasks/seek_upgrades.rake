@@ -45,7 +45,7 @@ namespace :seek do
     end
   end
 
-  task(decouple_extracted_samples_policies) do
+  task(decouple_extracted_samples_policies: [:environment]) do
     puts '... creating independent policies for extracted samples...'
     decoupled = 0
     disable_authorization_checks do
