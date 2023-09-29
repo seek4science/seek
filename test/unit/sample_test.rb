@@ -723,7 +723,7 @@ class SampleTest < ActiveSupport::TestCase
 
     samples = data_file.extract_samples(sample_type, true)
     sample = samples.first
-    sample2 = samples.last
+    sample2 = samples.second
 
     # check samples *copied* policy and permissions
     assert_equal Policy::PRIVATE, sample.policy.access_type
@@ -733,6 +733,17 @@ class SampleTest < ActiveSupport::TestCase
     # check policies are independent
     refute_equal sample.policy, data_file.policy
     refute_equal sample.policy, sample2.policy
+
+    disable_authorization_checks do
+      sample.policy.access_type = Policy::ACCESSIBLE
+      sample.policy.save
+    end
+    data_file.reload
+    sample.reload
+    sample2.reload
+    refute data_file.can_view?(nil)
+    assert sample.can_view?(nil)
+    refute sample2.can_view?(nil)
   end
 
   test 'extracted samples inherit projects from data file' do
