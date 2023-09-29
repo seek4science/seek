@@ -1,0 +1,76 @@
+<% key = attribute.title %>
+<% value ||= [] %>
+
+<% if value.blank? %>
+  <% index = 0 %>
+<% end %>
+
+<% prefix = element_name.split(/\[|\]/).reject(&:empty?).join("_") %>
+
+  <div id="<%= key %>">
+    <div class="table linked_custom_metdata_odd" id="<%= key.singularize %>-table">
+      <% if value.blank? %>
+        <%= render partial: 'custom_metadata/single_row', locals: { index: index, value: nil, attribute: attribute, element_name: element_name, element_class: element_class, prefix: prefix } %>
+      <% else %>
+        <% value.each_with_index do |v, idx| %>
+          <% index = idx %>
+          <%= render partial: 'custom_metadata/single_row', locals: { index: index, value: v, attribute: attribute, element_name: element_name, element_class: element_class, prefix: prefix } %>
+        <% end %>
+      <% end %>
+      <div id="<%= key.singularize %>-row">
+        <div colspan="6">
+          <%= button_link_to('Add new', 'add', '#', :id => "add-row-#{prefix}") %>
+        </div>
+      </div>
+    </div>
+
+    <div id="new-<%= key.singularize %>-row" style="display: none">
+      <%= render partial: 'custom_metadata/single_row', locals: { attribute: attribute, element_name: element_name, element_class: element_class, prefix: prefix } %>
+    </div>
+  </div>
+
+<script>
+    $j(document).ready(function () {
+
+        var key = '<%= key.singularize %>';
+        var prefix = '<%= prefix %>';
+
+        $j('#add-row-' + prefix).click(function () {
+            var newRow = $j('#new-' + key + '-row').clone().html();
+            var lastRow = $j(this).closest('#' + key + '-table').find('.' + key);
+            var container = $j(this).closest('#' + key + '-table');
+
+            var index = 0;
+            $j(this).closest('#' + key + '-table').find('.' + key).each(function () {
+                var newIndex = parseInt($j(this).data('index'));
+                if (newIndex > index) {
+                    index = newIndex;
+                }
+            });
+            index++;
+            newRow = newRow.replace(/row-template/g, index);
+
+            if (lastRow.length == 0) {
+                container.prepend(newRow);
+            } else {
+                container.find('#' + prefix + '-role-' + (index - 1)).after($j(newRow));
+            }
+
+
+            ObjectsInput.init();
+
+            $j('#<%= prefix-%>-role-'+index).find('.single-attr-row').each(function() {
+                var children = $j(this).find("span.select2");
+                if (children.length > 1) {
+                    children.each(function(index) {
+                        if (index > 0) {
+                            $j(this).remove();
+                        }
+                    });
+                }
+            });
+
+            return false;
+        });
+    });
+</script>

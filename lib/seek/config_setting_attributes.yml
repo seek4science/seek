@@ -231,13 +231,13 @@ omniauth_github_client_id:
 omniauth_github_secret:
   encrypt: true
 ga4gh_trs_api_enabled:
-custom_metadata_enabled: false
 search_results_limit:
   convert: :to_i
 life_monitor_enabled:
 life_monitor_url:
 life_monitor_client_id:
 life_monitor_client_secret:
+life_monitor_ui_url:
 galaxy_instance_name:
 galaxy_instance_trs_import_url:
 # Controlled vocabs

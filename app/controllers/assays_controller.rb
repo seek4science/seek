@@ -6,6 +6,7 @@ class AssaysController < ApplicationController
   before_action :assays_enabled?
   before_action :find_assets, :only=>[:index]
   before_action :find_and_authorize_requested_item, :only=>[:edit, :update, :destroy, :manage, :manage_update, :show, :new_object_based_on_existing_one]
+  before_action :delete_linked_sample_types, only: [:destroy]
 
   #project_membership_required_appended is an alias to project_membership_required, but is necessary to include the actions
   #defined in the application controller
@@ -18,7 +19,7 @@ class AssaysController < ApplicationController
   api_actions :index, :show, :create, :update, :destroy
 
   def new_object_based_on_existing_one
-    @existing_assay =  Assay.find(params[:id])
+    @existing_assay = Assay.find(params[:id])
     @assay = @existing_assay.clone_with_associations
 
     if @existing_assay.can_view?
@@ -62,9 +63,7 @@ class AssaysController < ApplicationController
       flash[:error]="You do not have the necessary permissions to copy this #{t('assays.assay')}"
       redirect_to @existing_assay
     end
-
-
-   end
+  end
 
   def new
     @assay=setup_new_asset
@@ -110,6 +109,13 @@ class AssaysController < ApplicationController
         format.json { render json: json_api_errors(@assay), status: :unprocessable_entity }
       end
     end
+  end
+
+
+  def delete_linked_sample_types
+    return unless is_single_page_assay?
+
+    @assay.sample_type.destroy
   end
 
   def update
@@ -176,5 +182,11 @@ class AssaysController < ApplicationController
       assay_params[:sop_ids].select! { |id| Sop.find_by_id(id).try(:can_view?) } if assay_params.key?(:sop_ids)
       assay_params[:model_ids].select! { |id| Model.find_by_id(id).try(:can_view?) } if assay_params.key?(:model_ids)
     end
+  end
+
+  def is_single_page_assay?
+    return false unless params.key?(:return_to)
+
+    params[:return_to].start_with? '/single_pages/'
   end
 end

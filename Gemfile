@@ -109,6 +109,7 @@ gem 'ransack'
 
 gem 'terser', '~> 1.1', '>= 1.1.1'
 
+
 # Rails 4 upgrade
 gem 'activerecord-session_store'
 gem 'rails-observers'
@@ -177,6 +178,8 @@ group :development do
 
   gem 'web-console', '>= 4.1.0'
   gem 'rack-mini-profiler', '~> 2.0'
+  gem "flamegraph", "~> 0.9.5"
+  gem "stackprof", "~> 0.2.25"
   gem 'listen', '~> 3.3'
 end
 
@@ -202,3 +205,5 @@ group :test, :development do
   gem 'teaspoon'
   gem 'teaspoon-mocha'
 end
+
+gem "sitemap_generator", "~> 6.3"

@@ -259,8 +259,10 @@ class HomesControllerTest < ActionController::TestCase
 
   test 'recently added and download should include snapshot' do
     person = FactoryBot.create(:person)
-    snapshot1 = FactoryBot.create(:investigation, policy: FactoryBot.create(:publicly_viewable_policy), title: 'inv with snap', contributor: person).create_snapshot
-    snapshot2 = FactoryBot.create(:assay, policy: FactoryBot.create(:publicly_viewable_policy), title: 'assay with snap', contributor: person).create_snapshot
+    snapshot1 = FactoryBot.create(:investigation, policy: FactoryBot.create(:publicly_viewable_policy),
+                                  title: 'inv with snap', contributor: person, creators: [person]).create_snapshot
+    snapshot2 = FactoryBot.create(:assay, policy: FactoryBot.create(:publicly_viewable_policy),
+                                  title: 'assay with snap', contributor: person, creators: [person]).create_snapshot
     assert_difference 'ActivityLog.count', 2 do
       FactoryBot.create(:activity_log, action: 'create', activity_loggable: snapshot1, created_at: 1.day.ago, culprit: person.user)
       FactoryBot.create(:activity_log, action: 'download', activity_loggable: snapshot2, created_at: 1.day.ago, culprit: person.user)
@@ -374,7 +376,8 @@ class HomesControllerTest < ActionController::TestCase
 
     df = FactoryBot.create :data_file, title: 'A new data file', contributor: person, policy: FactoryBot.create(:public_policy)
     sop = FactoryBot.create :sop, title: 'A new sop', contributor: person, policy: FactoryBot.create(:public_policy)
-    assay = FactoryBot.create :assay, title: 'A new assay', contributor: person, policy: FactoryBot.create(:public_policy)
+    assay = FactoryBot.create :assay, title: 'A new assay', contributor: person,
+                              policy: FactoryBot.create(:public_policy), creators: [person]
     snapshot = assay.create_snapshot
 
     FactoryBot.create :activity_log, activity_loggable: df, controller_name: 'data_files', culprit: person.user

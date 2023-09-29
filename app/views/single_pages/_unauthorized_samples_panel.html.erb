@@ -1,0 +1,40 @@
+<% unless @unauthorized_samples.nil? or @unauthorized_samples.compact.none? %>
+  <% @can_upload = false %>
+  <% errors.append("There are unauthorized samples present in the spreadsheet.") %>
+  <%= folding_panel("Unauthorized Samples", false, :id => "unauthorized-samples-panel", :body_options => {:id => "unauthorized-samples-panel-content"},
+                :help_text => "Sample the current user does not have permission to edit them.") do %>
+    <div>
+      <p>
+        <b>You don't have permission to edit the samples listed below. Please contact the submitter of these samples or revert the changes in the spreadsheet to its original values.</b>
+      </p>
+    </div>
+    <div class="table-responsive">
+      <table id="unauthorized-samples-table" class="table">
+        <tr>
+          <% for key in @unauthorized_samples[0].keys %>
+            <% unless key == 'uuid' %>
+              <th><%= key %></th>
+            <% end %>
+          <% end %>
+        </tr>
+        <% for unauthorized_sample in @unauthorized_samples %>
+          <tr id='<%= "unauthorized-sample-#{unauthorized_sample['id']}" %>' class="">
+            <% unauthorized_sample.map do |key, val| %>
+              <% unless key == 'uuid' %>
+                <% if @multiple_input_fields.include?(key) %>
+                  <td>
+                    <% val.each do |sub_sample| %>
+                      <span class="badge", title='ID: <%= sub_sample['id'] %>'><%= sub_sample['title'] %></span>
+                    <% end %>
+                  </td>
+                <% else %>
+                  <td><%= val %></td>
+                <% end %>
+              <% end %>
+            <% end %>
+          </tr>
+        <% end %>
+      </table>
+    </div>
+  <% end %>
+<% end %>

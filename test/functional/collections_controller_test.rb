@@ -65,13 +65,14 @@ class CollectionsControllerTest < ActionController::TestCase
 
   test 'should show all item types without error' do
     all_types_collection = FactoryBot.create(:collection_with_all_types)
-    items = all_types_collection.collection_items
+    items = all_types_collection.items
+    assert items.any?
 
     get :show, params: { id: all_types_collection }
 
     assert_response :success
     items.each do |item|
-      assert_select '#items-table tr a[href=?]', polymorphic_path(item.asset), "#{item.asset_type} collection item missing"
+      assert_select 'ul.feed li a[href=?]', Seek::Util.routes.polymorphic_path(item.asset)
     end
   end
 

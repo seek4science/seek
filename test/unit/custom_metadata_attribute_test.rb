@@ -75,10 +75,6 @@ class CustomMetadataAttributeTest < ActiveSupport::TestCase
     refute attribute.validate_value?(['Peter','Granny Smith'])
 
 
-    attribute = CustomMetadataAttribute.new(title: 'role', sample_attribute_type: FactoryBot.create(:custom_metadata_sample_attribute_type),
-                                            linked_custom_metadata_type: FactoryBot.create(:role_name_custom_metadata_type))
-    assert attribute.linked_custom_metadata_type.custom_metadata_attributes.first.validate_value?('first name')
-    refute attribute.linked_custom_metadata_type.custom_metadata_attributes.first.validate_value?(nil)
   end
 
   test 'validate value with required' do
@@ -110,6 +106,93 @@ class CustomMetadataAttributeTest < ActiveSupport::TestCase
     assert attribute.validate_value?(['Granny Smith'])
 
   end
+
+  test 'validate value for linked custom metadata type' do
+
+    attribute = CustomMetadataAttribute.new(title: 'role', sample_attribute_type: FactoryBot.create(:custom_metadata_sample_attribute_type),
+                                            linked_custom_metadata_type: FactoryBot.create(:role_name_custom_metadata_type))
+
+    assert attribute.linked_custom_metadata_type.custom_metadata_attributes.first.validate_value?('first name')
+    refute attribute.linked_custom_metadata_type.custom_metadata_attributes.first.validate_value?('')
+    refute attribute.linked_custom_metadata_type.custom_metadata_attributes.first.validate_value?(nil)
+    refute attribute.linked_custom_metadata_type.custom_metadata_attributes.first.validate_value?([])
+
+
+    assert attribute.linked_custom_metadata_type.custom_metadata_attributes.last.validate_value?('last name')
+    refute attribute.linked_custom_metadata_type.custom_metadata_attributes.last.validate_value?(nil)
+    refute attribute.linked_custom_metadata_type.custom_metadata_attributes.last.validate_value?('')
+    refute attribute.linked_custom_metadata_type.custom_metadata_attributes.last.validate_value?([])
+
+
+
+    attribute = CustomMetadataAttribute.new(title: 'study', sample_attribute_type: FactoryBot.create(:custom_metadata_sample_attribute_type),
+                                            linked_custom_metadata_type: FactoryBot.create(:study_custom_metadata_type))
+
+
+    # study_title required
+    refute attribute.linked_custom_metadata_type.custom_metadata_attributes.first.validate_value?([])
+    refute attribute.linked_custom_metadata_type.custom_metadata_attributes.first.validate_value?('')
+    refute attribute.linked_custom_metadata_type.custom_metadata_attributes.first.validate_value?(nil)
+    assert attribute.linked_custom_metadata_type.custom_metadata_attributes.first.validate_value?('study_title')
+
+
+
+    study_sites_attr = attribute.linked_custom_metadata_type.custom_metadata_attributes.last
+
+
+    # study_sites not required
+    assert study_sites_attr.validate_value?([])
+    assert study_sites_attr.validate_value?('')
+    assert study_sites_attr.validate_value?(nil)
+
+    study_site_name_attr = study_sites_attr.linked_custom_metadata_type.custom_metadata_attributes[0]
+    study_site_location_attr = study_sites_attr.linked_custom_metadata_type.custom_metadata_attributes[1]
+    participants_attr = study_sites_attr.linked_custom_metadata_type.custom_metadata_attributes[2]
+
+    # study_site_name required
+    refute study_site_name_attr.validate_value?('')
+    refute study_site_name_attr.validate_value?(nil)
+    refute study_site_name_attr.validate_value?([])
+    assert study_site_name_attr.validate_value?('study_site_name')
+
+    # study_site_location not required
+    assert study_site_location_attr.validate_value?('')
+    assert study_site_location_attr.validate_value?(nil)
+    assert study_site_location_attr.validate_value?([])
+    assert study_site_location_attr.validate_value?('study_site_location')
+
+    # participants required
+    refute participants_attr.validate_value?('')
+    refute participants_attr.validate_value?(nil)
+    refute participants_attr.validate_value?([])
+
+    participant_name_attr = participants_attr.linked_custom_metadata_type.custom_metadata_attributes[0]
+    first_name_attr = participant_name_attr.linked_custom_metadata_type.custom_metadata_attributes[0]
+    last_name_attr = participant_name_attr.linked_custom_metadata_type.custom_metadata_attributes[1]
+
+    # first_name required
+    refute first_name_attr.validate_value?('')
+    refute first_name_attr.validate_value?(nil)
+    refute first_name_attr.validate_value?([])
+    assert first_name_attr.validate_value?('first_name')
+
+    # last_name required
+    refute last_name_attr.validate_value?('')
+    refute last_name_attr.validate_value?(nil)
+    refute last_name_attr.validate_value?([])
+    assert last_name_attr.validate_value?('first_name')
+
+    participant_age_attr = participants_attr.linked_custom_metadata_type.custom_metadata_attributes[1]
+
+    # participant_age not required
+    assert participant_age_attr.validate_value?('')
+    assert participant_age_attr.validate_value?(nil)
+    assert participant_age_attr.validate_value?([])
+    assert participant_age_attr.validate_value?('participant_age')
+
+
+  end
+
 
   test 'accessor name' do
     attribute = CustomMetadataAttribute.new title: 'fish', sample_attribute_type: FactoryBot.create(:datetime_sample_attribute_type)
