@@ -696,10 +696,10 @@ class SampleTest < ActiveSupport::TestCase
     end
   end
 
-  test 'samples extracted from a data file cannot be edited' do
+  test 'samples extracted from a data file can be edited' do
     sample = FactoryBot.create(:sample_from_file)
 
-    refute sample.state_allows_edit?
+    assert sample.state_allows_edit?
   end
 
   test 'samples not extracted from a data file can be edited' do

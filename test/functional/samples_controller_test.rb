@@ -233,17 +233,47 @@ class SamplesControllerTest < ActionController::TestCase
     get :edit, params: { id: populated_patient_sample.id }
 
     assert_response :success
+    assert_nil flash[:error]
   end
 
-  test "can't edit if extracted from a data file" do
+  test "warn on first edit if extracted from a data file" do
     person = FactoryBot.create(:person)
     sample = FactoryBot.create(:sample_from_file, contributor: person)
     login_as(person)
 
     get :edit, params: { id: sample.id }
-
-    assert_redirected_to sample_path(sample)
+    assert_response :success
     assert_not_nil flash[:error]
+  end
+
+  test "source data datafile taged as invalid after edit" do
+    person = FactoryBot.create(:person)
+    sample = FactoryBot.create(:sample_from_file, contributor: person)
+    login_as(person)
+
+    put :update, params: { id: sample.id, sample: { data: { "name": "Modified Sample" } } }
+    sample.reload
+    assert_equal "Modified Sample", sample.title
+    assert sample.edit_count.positive?
+
+    get :show, params: { id: sample.id }
+    assert_response :success
+    assert_select 'span.label-danger', text: /No longer valid/, count: 1
+  end
+
+  test "no longer warn if sample extracted from a data file has already been edited" do
+    person = FactoryBot.create(:person)
+    sample = FactoryBot.create(:sample_from_file, contributor: person)
+    login_as(person)
+
+    put :update, params: { id: sample.id, sample: { data: { "name": "Modified Sample" } } }
+    sample.reload
+    assert_equal "Modified Sample", sample.title
+    assert sample.edit_count.positive?
+
+    get :edit, params: { id: sample.id }
+    assert_response :success
+    assert_nil flash[:error]
   end
 
   #FIXME: there is an inconstency between the existing tests, and how the form behaved - see https://jira-bsse.ethz.ch/browse/OPSK-1205
@@ -924,22 +954,30 @@ class SamplesControllerTest < ActionController::TestCase
 
   end
 
-  test 'hide manage menu for manageable but not editable items' do
-    # an odd case, where you can manage but not edit, see https://jira-bsse.ethz.ch/browse/OPSK-2041
-    person = FactoryBot.create(:person)
-    sample = FactoryBot.create(:sample_from_file, contributor:person)
+  test 'manage_update does not invalidate source data' do
+    proj=FactoryBot.create(:project)
+    person = FactoryBot.create(:person, project:proj)
+    other_person = FactoryBot.create(:person)
+    sample = FactoryBot.create(:sample_from_file, contributor: person)
+
     login_as(person)
-    assert sample.can_manage?
-    assert sample.can_view?
-    refute sample.can_edit?
+    patch :manage_update, params: { id: sample,
+                                    sample: { project_ids: [proj.id] },
+                                    policy_attributes: { access_type: Policy::VISIBLE,
+                                                         permissions_attributes: { '1' => {
+                                                           contributor_type: 'Person',
+                                                           contributor_id: other_person.id,
+                                                           access_type: Policy::MANAGING
+                                                         } } } }
+    assert_redirected_to sample
+    sample.reload
+    assert_equal Policy::VISIBLE, sample.policy.access_type
+    assert_equal 1, sample.policy.permissions.count
+    assert sample.edit_count.zero?
 
-    get :show, params:{ id:sample.id }
+    get :show, params: { id: sample.id }
     assert_response :success
-
-    assert_select 'a[href=?]',manage_sample_path(sample),text:/manage sample/i, count:0
-    assert_select 'a[href=?]',edit_sample_path(sample),text:/edit sample/i, count:0
-    assert_select 'a[data-method="delete"][href=?]',sample_path(sample),text:/delete sample/i, count:1
-
+    assert_select 'span.label-danger', text: /No longer valid/, count: 0
   end
 
   test 'should create with discussion link' do
