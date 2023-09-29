@@ -708,45 +708,31 @@ class SampleTest < ActiveSupport::TestCase
     assert sample.state_allows_edit?
   end
 
-  test 'extracted samples inherit permissions from data file' do
+  test 'extracted samples copy permissions from data file' do
     person = FactoryBot.create(:person)
     other_person = FactoryBot.create(:person)
     sample_type = FactoryBot.create(:strain_sample_type)
-    data_file = FactoryBot.create(:strain_sample_data_file, policy: FactoryBot.create(:public_policy), contributor: person)
+    data_file = FactoryBot.create(:strain_sample_data_file, contributor: person, policy: FactoryBot.create(:private_policy,
+                     permissions:[FactoryBot.create(:permission, contributor:other_person, access_type:Policy::MANAGING)]))
+
+    # sanity check - data_file policy
+    assert_equal Policy::PRIVATE, data_file.policy.access_type
+    assert_equal 1, data_file.policy.permissions.count
+    assert_equal other_person, data_file.policy.permissions.first.contributor
+    assert_equal Policy::MANAGING, data_file.policy.permissions.first.access_type
 
     samples = data_file.extract_samples(sample_type, true)
     sample = samples.first
+    sample2 = samples.last
 
-    assert sample.can_view?(person.user)
-    assert sample.can_view?(nil)
-    assert sample.can_view?(other_person.user)
-
-    policy = data_file.policy
-    disable_authorization_checks do
-      policy.access_type = Policy::NO_ACCESS
-      policy.save
-      sample.reload
-    end
-
-    assert sample.can_view?(person.user)
-    refute sample.can_view?(nil)
-    refute sample.can_view?(other_person.user)
-  end
-
-  test 'sample policy persists even after originating data file deleted' do
-    person = FactoryBot.create(:person)
-    sample_type = FactoryBot.create(:strain_sample_type)
-    data_file = FactoryBot.create(:strain_sample_data_file, policy: FactoryBot.create(:public_policy), contributor: person)
-    samples = data_file.extract_samples(sample_type, true)
-    sample = samples.first
-
-    assert_equal sample.policy_id, data_file.policy_id
-
-    old_policy_id = sample.policy_id
-    disable_authorization_checks { data_file.destroy }
-
-    assert_not_nil sample.reload.policy
-    assert_equal old_policy_id, sample.policy_id
+    # check samples *copied* policy and permissions
+    assert_equal Policy::PRIVATE, sample.policy.access_type
+    assert_equal 1, sample.policy.permissions.count
+    assert_equal other_person, sample.policy.permissions.first.contributor
+    assert_equal Policy::MANAGING, sample.policy.permissions.first.access_type
+    # check policies are independent
+    refute_equal sample.policy, data_file.policy
+    refute_equal sample.policy, sample2.policy
   end
 
   test 'extracted samples inherit projects from data file' do
