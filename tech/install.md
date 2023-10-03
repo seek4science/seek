@@ -1,5 +1,5 @@
 ---
-title: install
+title: Install Guide
 layout: page
 redirect_from: "/install.html"
 ---
@@ -25,12 +25,6 @@ installation of SEEK up and running, some background reading on Ruby on Rails
 would be beneficial if it is new to you. Documentation and resources
 describing Ruby on Rails can be found at http://rubyonrails.org/documentation
 .
-
-<div class="alert alert-warning">
-Note that we don't currently support Ubuntu 22.04 due to a problem installing Ruby with RVM (openssl version mismatch).
-
-This is something we are looking into and hoping to address soon.
-</div>
 
 SEEK is built upon Rails, and requires Ruby 2.7.
 
@@ -124,11 +118,26 @@ Ruby and RubyGems version. Although you can use the version that comes with
 your linux distribution, it is more difficult to control the version you use
 and keep up to date.
 
-To install RVM on Ubuntu there is package available described at <https://github.com/rvm/ubuntu_rvm>, otherwise follow the steps at <https://rvm.io/rvm/install> .
+To install RVM on Ubuntu there is package available described at <https://github.com/rvm/ubuntu_rvm>, the steps being
+
+    sudo apt-add-repository -y ppa:rael-gc/rvm
+    sudo apt-get update
+    sudo apt-get install rvm
+    sudo usermod -a -G rvm $USER
+
+... the guide recommends rebooting here, but logging in and out again usually works.
+
+Other ways to install RVM can be found at <https://rvm.io/rvm/install> .
 
 now install the appropriate version of Ruby
 
     rvm install $(cat .ruby-version)
+
+<div class="alert alert-warning" markdown="1">
+You may encounter a compilation error when installing Ruby 2.7 on Ubuntu 22.04, due to an openssl version mismatch.
+    
+Steps to solve this can be found at [Installing Ruby 2.7 on Ubuntu 22.04](/tech/ruby-2.7-ubuntu-22.04)
+</div>
 
 ## Installing Gems
 

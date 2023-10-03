@@ -167,7 +167,13 @@ you can do so by running (as the `seek` user)
     
 ### Configuring for HTTPS
 
-We would strongly recommend using [Lets Encrypt](https://letsencrypt.org/) for free SSL certificates.     
+We would strongly recommend using [Lets Encrypt](https://letsencrypt.org/) for free SSL certificates.
+
+### Setup Cron Services
+
+SEEK requires some cron jobs for periodic background jobs to run. To create these run:
+
+    bundle exec whenever --update-crontab
 
 ### Setting up the services
 
