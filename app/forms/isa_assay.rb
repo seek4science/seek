@@ -64,12 +64,12 @@ class IsaAssay
       errors.add(:base, "[Sample type]: Should have exaclty one attribute with the 'protocol' ISA tag selected")
     end
 
-    unless @sample_type.sample_attributes.select { |a| a.title == 'Input' && a.isa_tag.nil? }.one?
+    unless @sample_type.sample_attributes.select { |a| a.title.include?('Input') && a.isa_tag.nil? }.one?
       errors.add(:base,
                  "[Sample type]: Should have exaclty one attribute with the title 'Input' <u><b>and</b></u> no ISA tag".html_safe)
     end
 
-    if @sample_type.sample_attributes.select { |a| a.title != 'Input' && a.isa_tag.nil? }.any?
+    if @sample_type.sample_attributes.select { |a| !a.title.include?('Input') && a.isa_tag.nil? }.any?
       errors.add(:base,
                  "[Sample type]: All attributes should have an ISA Tag except for the <em>'Input'</em> attribute (hidden)".html_safe)
     end
