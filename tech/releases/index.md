@@ -11,6 +11,27 @@ Please see [Getting FAIRDOM-SEEK](/get-seek.html) for details about installing S
 
 If you have any comments or feedback about a release, then please [Contact Us](/contacting-us.html)
 
+## Version 1.14.0
+
+Release date: _October 2023_
+
+A major release that contains a number of improvements, upgrades and bug fixes, including:
+
+* Nest Extended Metadata (previously referred to as Custom Metadata)
+* Upgrade to Rails, latest 6.1 release
+* Upgrade of Ruby, from Ruby 2.7 to Ruby 3.1
+* Event filtering improvements
+* Prevent publications and some other items appearing in multiple places in ISA tree and graph
+* Updated and unified auto complete text fields to use an improved UI component - select2 - consistent throughout
+* Notify administrators when a Programme creation request is pending
+* Additional explanatory text for Programme creation
+* Made easier and clearer that you can jump from search results to the full list or results along with filtering  
+* Excel files can now be viewed in the browser regardless of asset tyep (previously on DataFiles)
+* Overhaul and improvements to the Gatekeeper functionality
+* UI improvements when viewing on a phone or tablet
+
+For a full list, see [closed issues for 1.14.0](https://github.com/seek4science/seek/milestone/16?closed=1)
+
 ## Version 1.13.4
 
 Release date: _14th June 2023_
