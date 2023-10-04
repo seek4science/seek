@@ -150,7 +150,7 @@ class DataFile < ApplicationRecord
       sample.project_ids = project_ids
       sample.contributor = contributor
       sample.originating_data_file = self
-      sample.policy = policy
+      sample.policy = policy.deep_copy
       sample.save if sample.valid? && confirm
 
       extracted << sample

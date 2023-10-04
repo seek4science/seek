@@ -89,10 +89,6 @@ class Sample < ApplicationRecord
     referenced_resources.select { |r| r.is_a?(Sample) }
   end
 
-  def state_allows_edit?(*args)
-    (id.nil? || originating_data_file.nil?) && super
-  end
-
   def extracted?
     !!originating_data_file
   end

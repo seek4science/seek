@@ -8,6 +8,7 @@ namespace :seek do
   # these are the tasks required for this version upgrade
   task upgrade_version_tasks: %i[
     environment
+    decouple_extracted_samples_policies
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -42,6 +43,22 @@ namespace :seek do
     ensure
       Seek::Config.solr_enabled = solr
     end
+  end
+
+  task(decouple_extracted_samples_policies: [:environment]) do
+    puts '... creating independent policies for extracted samples...'
+    decoupled = 0
+    disable_authorization_checks do
+      Sample.find_each do |sample|
+        # check if the sample was extracted from a datafile and their policies are linked
+        if sample.extracted? && sample.policy == sample.originating_data_file&.policy
+          sample.policy = sample.policy.deep_copy
+          sample.policy.save
+          decoupled += 1
+        end
+      end
+    end
+    puts " ... finished creating independent policies of #{decoupled.to_s} extracted samples"
   end
 
   private
