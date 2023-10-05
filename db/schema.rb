@@ -1,5 +1,4 @@
 # This file is auto-generated from the current state of the database. Instead
-# This file is auto-generated from the current state of the database. Instead
 # of editing this file, please use the migrations feature of Active Record to
 # incrementally modify your database, and then regenerate this schema definition.
 #
@@ -11,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_09_28_124725) do
+ActiveRecord::Schema.define(version: 2023_10_05_153610) do
 
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
@@ -636,7 +635,7 @@ ActiveRecord::Schema.define(version: 2023_09_28_124725) do
     t.integer "linked_extended_metadata_type_id"
     t.index ["extended_metadata_type_id"], name: "index_extended_metadata_attributes_on_extended_metadata_type_id"
     t.index ["sample_attribute_type_id"], name: "index_extended_metadata_attributes_on_sample_attribute_type_id"
-    t.index ["sample_controlled_vocab_id"], name: "index_extended_metadata_attributes_on_sample_controlled_vocab_id"
+    t.index ["sample_controlled_vocab_id"], name: "index_extended_metadata_attributes_on_sample_cv_id"
   end
 
   create_table "extended_metadata_types", force: :cascade do |t|
