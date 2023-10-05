@@ -62,7 +62,8 @@
 				"Controlled Vocabulary",
 				"URI",
 				"Ontology",
-				"Registered Data file"
+				"Registered Data file",
+				"ENA collection date"
 			]
 		},
 		"CVList": {
