@@ -1,14 +1,14 @@
-class CustomMetadataTypeSerializer < BaseSerializer
+class ExtendedMetadataTypeSerializer < BaseSerializer
   attributes :title, :supported_type
-  attribute :custom_metadata_attributes
+  attribute :extended_metadata_attributes
 
-  def custom_metadata_attributes
-    object.custom_metadata_attributes.collect do |attribute|
-      get_custom_metadata_attribute(attribute)
+  def extended_metadata_attributes
+    object.extended_metadata_attributes.collect do |attribute|
+      get_extended_metadata_attribute(attribute)
     end
   end
 
-  def get_custom_metadata_attribute(attribute)
+  def get_extended_metadata_attribute(attribute)
     {
       "id": attribute.id.to_s,
       "title": attribute.title,

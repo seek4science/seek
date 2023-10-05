@@ -71,7 +71,7 @@
           </div>
         <% end %>
 
-        <%= render partial: 'custom_metadata/custom_metadata_attribute_values', locals: { resource: @assay } %>
+        <%= render partial: 'extended_metadata/extended_metadata_attribute_values', locals: { resource: @assay } %>
 
         <% if ((@assay.is_modelling?) && !@assay.models.empty? && !@assay.data_files.empty?) %><%#MODELLING ASSAY %>
           <div class="data_model_relationship">

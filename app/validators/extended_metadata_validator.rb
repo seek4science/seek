@@ -1,6 +1,6 @@
-class CustomMetadataValidator < ActiveModel::Validator
+class ExtendedMetadataValidator < ActiveModel::Validator
   def validate(record)
-    record.custom_metadata_attributes.each do |attribute|
+    record.extended_metadata_attributes.each do |attribute|
       val = record.get_attribute_value(attribute)
       validate_attribute(record, attribute, val)
     end
@@ -17,12 +17,12 @@ class CustomMetadataValidator < ActiveModel::Validator
       end
     end
 
-    if attribute.linked_custom_metadata?
-      attribute.linked_custom_metadata_type.custom_metadata_attributes.each do |attr|
+    if attribute.linked_extended_metadata?
+      attribute.linked_extended_metadata_type.extended_metadata_attributes.each do |attr|
         validate_attribute(record, attr, value ? value[attr.accessor_name.to_s] : nil, "#{attribute.title}.")
       end
-    elsif attribute.linked_custom_metadata_multi?
-      linked_attributes = attribute.linked_custom_metadata_type.custom_metadata_attributes
+    elsif attribute.linked_extended_metadata_multi?
+      linked_attributes = attribute.linked_extended_metadata_type.extended_metadata_attributes
       value.each_with_index do |val, index|
         linked_attributes.each do |attr|
           validate_attribute(record, attr, val ? val[attr.accessor_name.to_s] : nil, "#{attribute.title}.#{index + 1}.")

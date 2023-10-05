@@ -3,20 +3,20 @@
 <% index ||= 'row-template' %>
 
 <%   allow_row_removal = if index == 0
-                           attribute.linked_custom_metadata_type.custom_metadata_attributes.none?(&:required?)
+                           attribute.linked_extended_metadata_type.extended_metadata_attributes.none?(&:required?)
                          else
                            true
                          end %>
 <% field_name_prefix = "#{element_name}[#{index}]" %>
 
-<div id="<%= prefix-%>-role-<%= index-%>" class="<%= key.singularize %> single-role multi_linked_custom_metdata" data-index="<%= index-%>">
-  <% attribute.linked_custom_metadata_type.custom_metadata_attributes.each do |attr| %>
+<div id="<%= prefix-%>-role-<%= index-%>" class="<%= key.singularize %> single-role multi_linked_extended_metdata" data-index="<%= index-%>">
+  <% attribute.linked_extended_metadata_type.extended_metadata_attributes.each do |attr| %>
     <div class="form-group"><label><%= attr.label %></label><%= required_span if attr.required? %>
       <div class="form-group single-attr-row">
         <% attr_element_name = "#{element_name}[#{index}][#{attr.title}]" %>
         <%= attribute_form_element(attr, value ? value[attr.title] : nil, attr_element_name, element_class) %>
         <% unless attribute.description.nil? %>
-          <%= custom_metadata_attribute_description(attr.description) %>
+          <%= extended_metadata_attribute_description(attr.description) %>
         <% end %>
       </div>
     </div>

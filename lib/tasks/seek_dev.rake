@@ -354,14 +354,14 @@ namespace :seek_dev do
 
 
       #
-      unless CustomMetadataType.where(title:'NFDI4Health study metadata', supported_type:'Study').any?
-        cmt = CustomMetadataType.new(title: 'NFDI4Health study metadata', supported_type:'Study')
-        cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'name', sample_attribute_type: SampleAttributeType.where(title:'String').first)
-        cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'resource_type_general_cv', required:true,
+      unless ExtendedMetadataType.where(title:'NFDI4Health study metadata', supported_type:'Study').any?
+        cmt = ExtendedMetadataType.new(title: 'NFDI4Health study metadata', supported_type:'Study')
+        cmt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'name', sample_attribute_type: SampleAttributeType.where(title:'String').first)
+        cmt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'resource_type_general_cv', required:true,
                                                                       sample_attribute_type: SampleAttributeType.where(title:'Controlled Vocabulary').first, sample_controlled_vocab: resource_type_general_cv, description: "resource type general cv", label: "resource type general cv" , pos:3)
-        cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'resource_type_general_list', required:true,
+        cmt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'resource_type_general_list', required:true,
                                                                       sample_attribute_type: SampleAttributeType.where(title:'Controlled Vocabulary List').first, sample_controlled_vocab: resource_type_general_cv, description: "resource type general", label: "resource type general" , pos:1)
-        cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'resource_study_country_list', required:true,
+        cmt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'resource_study_country_list', required:true,
                                                                       sample_attribute_type: SampleAttributeType.where(title:'Controlled Vocabulary List').first, sample_controlled_vocab: study_country_cv, description: "study country", label: "study country" , pos:2)
         cmt.save!
         puts 'NFDI4Health study metadata'
