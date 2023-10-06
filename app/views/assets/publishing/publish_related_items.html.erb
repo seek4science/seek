@@ -12,6 +12,14 @@
 
 <br/>
 <%= form_tag({action: :check_gatekeeper_required}, method: :post) do %>
+  <div class="batch-selection-scope" id="batch-asset-selection">
+    <%= render partial: 'assets/batch_selection/buttons', locals: {
+      text: "your items",
+      select_deselect_all: true,
+      collapse_expand: true,
+      show_hide_blocked: true,
+      show_hide_permissions: true
+    } %>
   <% @items_for_publishing.each do |item| %>
     <% if item.contains_publishable_items? %>
       <% if item.is_asset? %>
@@ -26,7 +34,7 @@
       <%= check_box_tag publishing_item_param(item), 1, true, {style: 'display:none;'} %>
     <% end %>
   <% end %>
-
+  </div>
   <% resource = (controller_name == 'people') ? current_user.person : @asset %>
 
   <%= submit_tag "Next",data: { disable_with: 'Next' }, class: 'btn btn-primary' -%>
