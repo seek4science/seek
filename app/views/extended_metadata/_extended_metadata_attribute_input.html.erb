@@ -6,7 +6,7 @@
 <%= folding_panel(panel_label, false, style:panel_style,id:'extended_metadata_attribute_panel') do %>
   <div id="extended_attributes">
     <% if resource.extended_metadata.try(:extended_metadata_type) %>
-      <%= render partial: 'extended_metadata/extended_metadata_fields', locals: { extended_metadata_type: resource.extended_metadata.extended_metadata_type, resource: resource } %>
+      <%= render partial: 'extended_metadata/extended_metadata_fields', locals: { extended_metadata_type: resource.extended_metadata.extended_metadata_type, resource: resource, parent_resource: "isa_assay" } %>
     <% end %>
   </div>
 <% end %>
