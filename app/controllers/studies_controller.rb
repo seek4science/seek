@@ -91,6 +91,7 @@ class StudiesController < ApplicationController
 
   def delete_linked_sample_types
     return unless is_single_page_study?
+    return if @study.sample_types.empty?
 
     # The study sample types must be destroyed in reversed order
     # otherwise the first sample type won't be removed becaused it is linked from the second
