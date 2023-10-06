@@ -41,7 +41,6 @@ module Seek
             )
             samples.each do |sample|
               sample.project_ids = project_ids
-              disable_authorization_checks { sample.save }
             end
             ReindexingQueue.enqueue(samples)
             AuthLookupUpdateQueue.enqueue(samples)
