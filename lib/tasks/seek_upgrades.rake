@@ -76,7 +76,7 @@ namespace :seek do
           decoupled += 1
         end
       end
-      unless hash_array.empty? do
+      unless hash_array.empty?
         class ProjectsSample < ActiveRecord::Base; end;
         ProjectsSample.insert_all(hash_array)
       end
