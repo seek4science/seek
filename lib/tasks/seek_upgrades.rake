@@ -65,13 +65,20 @@ namespace :seek do
   task(decouple_extracted_samples_projects: [:environment]) do
     puts '... copying project ids for extracted samples...'
     decoupled = 0
+    hash_array = []
     disable_authorization_checks do
       Sample.find_each do |sample|
         # check if the sample was extracted from a datafile and their projects are linked
         if sample.extracted? && sample.project_ids.empty?
-          sample.project_ids = sample.originating_data_file.project_ids
+          sample.originating_data_file.project_ids.each do |project_id|
+            hash_array << { project_id: project_id, sample_id: sample.id }
+          end
           decoupled += 1
         end
+      end
+      unless hash_array.empty? do
+        class ProjectsSample < ActiveRecord::Base; end;
+        ProjectsSample.insert_all(hash_array)
       end
     end
     puts " ... finished copying project ids of #{decoupled.to_s} extracted samples"
