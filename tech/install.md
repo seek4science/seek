@@ -133,11 +133,6 @@ now install the appropriate version of Ruby
 
     rvm install $(cat .ruby-version)
 
-<div class="alert alert-warning" markdown="1">
-You may encounter a compilation error when installing Ruby 2.7 on Ubuntu 22.04, due to an openssl version mismatch.
-    
-Steps to solve this can be found at [Installing Ruby 2.7 on Ubuntu 22.04](/tech/ruby-2.7-ubuntu-22.04)
-</div>
 
 ## Installing Gems
 
