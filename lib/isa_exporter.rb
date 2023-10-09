@@ -134,9 +134,9 @@ module IsaExporter
             'value': val
           })
         end
-        custom_metadata
       end
 
+      custom_metadata.compact
     end
 
     def convert_assays(assays)

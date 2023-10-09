@@ -14,7 +14,7 @@ input_sample_type_id ||=
 show_custom_metadata =
   if params[:is_source]
     true
-  elsif source_assay.position.zero? && !@isa_assay.assay.new_record?
+  elsif source_assay&.position&.zero? && !@isa_assay.assay.new_record?
     true # Custom metadata should be shown in edit as well if assay position is 0.
   else
     false
