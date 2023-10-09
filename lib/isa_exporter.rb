@@ -144,12 +144,23 @@ module IsaExporter
       first_assay = assays.detect { |s| s.position.zero? }
       raise 'No assay could be found!' unless first_assay
 
+      stream_name = 'a_assays.txt'
+      assay_comments = convert_assay_comments(assays)
+      assay_comments.delete_if do |c|
+        if c[:name] == 'assay_stream'
+          stream_name = c[:value]
+          true # True is returned comment is 'assay_stream'
+        else
+          false
+        end
+      end
+
       isa_assay = {}
       isa_assay['@id'] = "#assay/#{assays.pluck(:id).join('_')}"
-      isa_assay[:filename] = 'a_assays.txt' # assay&.sample_type&.isa_template&.title
+      isa_assay[:filename] = "a_#{stream_name.downcase.tr(" ", "_")}.txt"
       isa_assay[:measurementType] = { annotationValue: '', termSource: '', termAccession: '' }
       isa_assay[:technologyType] = { annotationValue: '', termSource: '', termAccession: '' }
-      isa_assay[:comments] = convert_assay_comments(assays)
+      isa_assay[:comments] = assay_comments
       isa_assay[:technologyPlatform] = ''
       isa_assay[:characteristicCategories] = convert_characteristic_categories(nil, assays)
       isa_assay[:materials] = {
