@@ -33,11 +33,11 @@ module IsaExporter
       people = []
       @investigation.related_people.each { |p| people << convert_person(p) }
       isa_investigation[:people] = people
-     
+
       studies = []
       @investigation.studies.each { |s| studies << convert_study(s) }
       isa_investigation[:studies] = studies
-      
+
       @OBJECT_MAP = @OBJECT_MAP.merge(isa_investigation)
 
       isa_investigation
@@ -109,6 +109,25 @@ module IsaExporter
       isa_annotation
     end
 
+    def convert_assay_comments(assays)
+      custom_metadata = []
+      assay_streams = assays.select { |a| a.position.zero? }
+      assay_streams.map do |assay|
+        next if assay.custom_metadata.nil?
+
+        json = JSON.parse(assay.custom_metadata&.json_metadata)
+        json.map do |key, val|
+          custom_metadata.push({
+            '@id': assay.custom_metadata.id,
+            'name': key,
+            'value': val
+          })
+        end
+        custom_metadata
+      end
+
+    end
+
     def convert_assays(assays)
       all_sample_types = assays.map(&:sample_type)
       first_assay = assays.detect { |s| s.position.zero? }
@@ -119,6 +138,7 @@ module IsaExporter
       isa_assay[:filename] = 'a_assays.txt' # assay&.sample_type&.isa_template&.title
       isa_assay[:measurementType] = { annotationValue: '', termSource: '', termAccession: '' }
       isa_assay[:technologyType] = { annotationValue: '', termSource: '', termAccession: '' }
+      isa_assay[:comments] = convert_assay_comments(assays)
       isa_assay[:technologyPlatform] = ''
       isa_assay[:characteristicCategories] = convert_characteristic_categories(nil, assays)
       isa_assay[:materials] = {
