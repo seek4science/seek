@@ -77,7 +77,7 @@ class Assay < ApplicationRecord
   end
 
   def state_allows_delete?(*args)
-    assets.empty? && publications.empty? && super
+    assets.empty? && publications.empty? && associated_samples_through_sample_type.empty? && super
   end
 
   # returns true if this is a modelling class of assay
@@ -88,6 +88,10 @@ class Assay < ApplicationRecord
   # returns true if this is an experimental class of assay
   def is_experimental?
     !assay_class.nil? && assay_class.key == 'EXP'
+  end
+
+  def associated_samples_through_sample_type
+    (sample_type.nil? || sample_type.samples.nil?) ? [] : sample_type.samples
   end
 
   # Create or update relationship of this assay to another, with a specific relationship type and version

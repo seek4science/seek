@@ -148,7 +148,7 @@ class WorkflowTest < ActiveSupport::TestCase
   end
 
   test 'generates RO-Crate and gracefully handles diagram error for workflow/abstract workflow' do
-    bad_generator = MiniTest::Mock.new
+    bad_generator = Minitest::Mock.new
     def bad_generator.write_graph(struct)
       raise 'oh dear'
     end

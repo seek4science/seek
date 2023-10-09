@@ -220,7 +220,7 @@ class WorkflowsControllerTest < ActionController::TestCase
 
     get :show, params: { id: workflow }
 
-    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0'
+    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0 International'
   end
 
   test 'should display license for current version' do
@@ -231,11 +231,11 @@ class WorkflowsControllerTest < ActionController::TestCase
 
     get :show, params: { id: workflow, version: 1 }
     assert_response :success
-    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0'
+    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0 International'
 
     get :show, params: { id: workflow, version: workflowv.version }
     assert_response :success
-    assert_select '.panel .panel-body a', text: 'CC0 1.0'
+    assert_select '.panel .panel-body a', text: 'Creative Commons Zero v1.0 Universal'
   end
 
   test 'should update license' do
@@ -250,7 +250,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_response :redirect
 
     get :show, params: { id: workflow }
-    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution Share-Alike 4.0'
+    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution Share Alike 4.0 International'
     assert_equal 'CC-BY-SA-4.0', assigns(:workflow).license
   end
 
@@ -507,7 +507,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'handles error when generating diagram from CWL' do
-    bad_generator = MiniTest::Mock.new
+    bad_generator = Minitest::Mock.new
     def bad_generator.write_graph(struct)
       raise 'oh dear'
     end
@@ -1764,6 +1764,6 @@ class WorkflowsControllerTest < ActionController::TestCase
 
     get :show, params: { id: wf }
 
-    assert_select 'a.lifemonitor-status[href=?]', "https://localhost:8443/workflow;uuid=#{wf.uuid}"
+    assert_select 'a.lifemonitor-status[href=?]', "https://app.lifemonitor.eu/workflow;uuid=#{wf.uuid}"
   end
 end

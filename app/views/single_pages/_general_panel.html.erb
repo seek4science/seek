@@ -1,0 +1,29 @@
+<%= folding_panel("General Information", true, :id => "general-information-panel",
+:help_text => "This pane contains an overview of the permissions needed to upload.") do %>
+  <% [@project, @study, @assay]. map do | asset | %>
+    <% next if asset.nil? %>
+    <% asset_name = asset.class.to_s.singularize %>
+    <h4> <%= asset_name %> </h4>
+    <p><b>ID: </b><span><%= asset.id%></span></p>
+    <p><b>UUID: </b><span><%= asset.uuid %></span></p>
+    <p><b>Title: </b><span><%= asset.title %></span></p>
+    <% if asset_name == "Project"%>
+      <% if current_user.person.member_of?(asset)%>
+        <p><b><%= current_user.person.name %> is member of this project: </b><span class="glyphicon glyphicon-ok-sign" style="color: green;"></span></p>
+      <% else %>
+        <p><b><%= current_user.person.name %> is member of this project: </b> <span class="glyphicon glyphicon-remove-sign" style="color: red;"></span></p>
+        <% can_upload = false %>
+        <% errors.append("You must be a member of this project!") %>
+      <% end %>
+    <% else %>
+      <% if asset.can_view?%>
+        <p><b><%= current_user.person.name %> can view: </b><span class="glyphicon glyphicon-ok-sign" style="color: green;"></span></p>
+      <% else %>
+        <p><b><%= current_user.person.name %> can view: </b> <span class="glyphicon glyphicon-remove-sign" style="color: red;"></span></p>
+      <% can_upload = false %>
+      <% errors.append("You must have at least viewing permission for the #{asset_name} '#{asset.title}'.") %>
+      <% end %>
+    <% end %>
+    <hr>
+  <% end %>
+<% end %>

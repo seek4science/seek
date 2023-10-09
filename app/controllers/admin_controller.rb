@@ -163,6 +163,7 @@ class AdminController < ApplicationController
     Seek::Config.life_monitor_url = params[:life_monitor_url]&.strip&.chomp('/')
     Seek::Config.life_monitor_client_id = params[:life_monitor_client_id]&.strip
     Seek::Config.life_monitor_client_secret = params[:life_monitor_client_secret]&.strip
+    Seek::Config.life_monitor_ui_url = params[:life_monitor_ui_url]&.strip&.chomp('/')
 
     Seek::Config.bio_tools_enabled = string_to_boolean(params[:bio_tools_enabled])
 
@@ -331,8 +332,8 @@ class AdminController < ApplicationController
 
     Seek::Config.default_license = params[:default_license]
     Seek::Config.metadata_license = params[:metadata_license]
-    Seek::Config.recommended_data_licenses = params[:recommended_data_licenses]
-    Seek::Config.recommended_software_licenses = params[:recommended_software_licenses]
+    Seek::Config.recommended_data_licenses = params[:recommended_data_licenses]&.compact_blank
+    Seek::Config.recommended_software_licenses = params[:recommended_software_licenses]&.compact_blank
     update_flag = (pubmed_email == '' || pubmed_email_valid) && (crossref_email == '' || crossref_email_valid)
     update_redirect_to update_flag, 'settings'
   end

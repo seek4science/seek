@@ -9,7 +9,7 @@ module HasCustomMetadata
 
   class_methods do
     def has_extended_custom_metadata
-      has_one :custom_metadata, as: :item, dependent: :destroy
+      has_one :custom_metadata, as: :item, dependent: :destroy, autosave: true
       accepts_nested_attributes_for :custom_metadata
 
       if Seek::Config.solr_enabled

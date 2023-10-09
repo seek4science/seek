@@ -30,7 +30,7 @@
   title = t('project').pluralize
   title += '<span class="required">*</span>'.html_safe unless allow_nil
 
-  object_type_text = resource.class.name.underscore.humanize
+  object_type_text = text_for_resource(resource)
 %>
 
 <%= folding_panel(title, false, id: "add_projects_form",
@@ -106,8 +106,7 @@
                 var licenseSelect = $j('#license-select');
                 if (licenseSelect.length && licenseSelect.data('canOverwrite') &&
                     $j('option[value="'+Sharing.defaultLicenses[project.id]+'"]', licenseSelect).length) {
-                    licenseSelect.val(Sharing.defaultLicenses[project.id]);
-                    zenodoExport.setLicenseUrl();
+                    licenseSelect.val(Sharing.defaultLicenses[project.id]).change();
                 }
             }
             this.possibilities.splice(i, 1);

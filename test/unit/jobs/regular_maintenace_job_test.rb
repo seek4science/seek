@@ -15,7 +15,7 @@ class RegularMaintenaceJobTest < ActiveSupport::TestCase
     travel_to(9.hours.ago) do
       to_go = FactoryBot.create(:content_blob)
       keep1 = FactoryBot.create(:data_file).content_blob
-      keep2 = FactoryBot.create(:investigation).create_snapshot.content_blob
+      keep2 = FactoryBot.create(:investigation, creators: [FactoryBot.create(:person)]).create_snapshot.content_blob
       keep3 = FactoryBot.create(:strain_sample_type).content_blob
     end
 

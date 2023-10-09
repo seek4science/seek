@@ -389,14 +389,6 @@ ActiveRecord::Schema.define(version: 2023_08_25_123444) do
     t.index ["sample_controlled_vocab_id"], name: "index_custom_metadata_attributes_on_sample_controlled_vocab_id"
   end
 
-  create_table "custom_metadata_resource_links", force: :cascade do |t|
-    t.bigint "custom_metadata_id"
-    t.string "resource_type"
-    t.bigint "resource_id"
-    t.index ["custom_metadata_id"], name: "index_custom_metadata_resource_links_on_custom_metadata_id"
-    t.index ["resource_type", "resource_id"], name: "index_custom_metadata_resource_links_on_resource"
-  end
-
   create_table "custom_metadata_types", force: :cascade do |t|
     t.string "title"
     t.integer "contributor_id"

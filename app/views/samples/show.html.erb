@@ -20,6 +20,12 @@
               <p>
                 <label>Source data:</label>
                 <%= link_to @sample.originating_data_file.title, @sample.originating_data_file %>
+                <% if @sample.edit_count.positive? %>
+                  <span class="label label-danger"
+                        data-tooltip='<%= tooltip("The sample has been edited since it was extracted from this datafile.") -%>'>
+                    No longer valid
+                  </span>
+                <% end %>
               </p>
             <% end %>
             <%= render :partial => "attribute_values", :locals => { :sample => @sample } %>

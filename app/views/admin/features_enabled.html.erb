@@ -193,11 +193,13 @@
     <div class="row">
       <div class="col-sm-7">
         <%= admin_text_setting(:life_monitor_url, Seek::Config.life_monitor_url,
-                               'LifeMonitor URL', "The URL of a LifeMonitor instance.") %>
+                               'LifeMonitor API URL', "The API URL of a LifeMonitor instance.") %>
         <%= admin_text_setting(:life_monitor_client_id, Seek::Config.life_monitor_client_id,
                                'LifeMonitor OAuth client ID', 'The ID for this application to authenticate users through the LifeMonitor OAuth provider.') %>
         <%= admin_text_setting(:life_monitor_client_secret, Seek::Config.life_monitor_client_secret,
                                'LifeMonitor OAuth client secret', 'The secret token for this application to authenticate users through the LifeMonitor OAuth provider.') %>
+        <%= admin_text_setting(:life_monitor_ui_url, Seek::Config.life_monitor_ui_url,
+                               'LifeMonitor UI URL', "The UI (app) URL of a LifeMonitor instance.") %>
       </div>
     </div>
   </div>

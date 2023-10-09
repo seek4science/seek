@@ -6,17 +6,10 @@
   <div id="custom-metadata" class="panel panel-default">
     <div class="panel-heading"><%= label %> (<%= resource.custom_metadata.custom_metadata_type.title %>)</div>
     <div class="panel-body">
-
       <% resource.custom_metadata.custom_metadata_attributes.each do |attribute| %>
-        <p>
-          <label><%= attribute.label %>:</label>
-          <%= display_attribute(resource.custom_metadata, attribute, link: true) %>
-        </p>
+        <%= render_custom_metadata_value(attribute, resource) %>
       <% end %>
-
     </div>
   </div>
-
   <% else %>
-
 <% end %>

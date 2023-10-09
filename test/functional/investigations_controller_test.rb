@@ -453,7 +453,7 @@ class InvestigationsControllerTest < ActionController::TestCase
   test 'shows how to get a citation for a snapshotted investigation' do
     study = FactoryBot.create(:study)
     investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:publicly_viewable_policy),
-                                            studies: [study], contributor:study.contributor)
+                                            studies: [study], contributor:study.contributor, creators: [study.contributor])
 
     login_as(investigation.contributor)
     investigation.create_snapshot
@@ -473,7 +473,8 @@ class InvestigationsControllerTest < ActionController::TestCase
     another_person = FactoryBot.create(:person,project:person.projects.first)
     study = FactoryBot.create(:study,contributor:another_person)
     investigation = FactoryBot.create(:investigation, projects:another_person.projects, contributor:another_person,
-                                            policy: FactoryBot.create(:publicly_viewable_policy), studies: [study])
+                                            policy: FactoryBot.create(:publicly_viewable_policy), studies: [study],
+                                      creators: [another_person])
 
     login_as(person)
     investigation.create_snapshot

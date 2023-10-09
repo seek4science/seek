@@ -94,18 +94,6 @@ module AssetsHelper
     "publish[#{item.class.name}][#{item.id}]"
   end
 
-  def sharing_item_param(item)
-    if item.try(:is_isa?)
-      "share_isa[#{item.class.name}][#{item.id}]"
-    elsif  (item.respond_to? (:investigations)) && (!item.investigations.any?)
-      "share_not_isa[#{item.class.name}][#{item.id}]"
-    elsif !item.respond_to? (:investigations)
-      "share_not_isa[#{item.class.name}][#{item.id}]"
-    else
-      "share_isa[#{item.class.name}][#{item.id}]"
-    end
-  end
-
   def include_downloadable_item?(items)
     has_downloadable_item = false
     items.each do |item|
@@ -346,4 +334,10 @@ module AssetsHelper
     end.join(', ').html_safe
   end
 
+  def batch_selection_collapse_toggle
+    content_tag(:span, class: 'batch-selection-collapse-toggle open') do
+      concat content_tag(:span, '', class: 'glyphicon glyphicon-menu-down', 'aria-hidden' => 'true')
+      concat content_tag(:span, '', class: 'glyphicon glyphicon-menu-right', 'aria-hidden' => 'true')
+    end
+  end
 end
