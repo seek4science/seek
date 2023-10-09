@@ -31,6 +31,10 @@ disable_authorization_checks do
                                                                   label: 'ENA Study Type')
     cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'new_study_type', required: false,
                                                                   sample_attribute_type: SampleAttributeType.find_by(title: 'String'))
+    cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'assay_stream', required: true,
+                                                                  sample_attribute_type: SampleAttributeType.find_by(title: 'String'),
+                                                                  description: 'This is the name that will be transferred to the ISA JSON. Example: "My assay" will be defined as "a_my_assay.txt" in the ISA JSON',
+                                                                  label: 'Name Assay Stream:')
     cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'ENA study alias prefix', required: true,
                                                                   sample_attribute_type: SampleAttributeType.find_by(title: 'String'))
     cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'ENA experiment prefix', required: true,
