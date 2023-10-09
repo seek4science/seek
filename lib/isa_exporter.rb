@@ -91,8 +91,19 @@ module IsaExporter
       isa_study[:protocols] = protocols
 
       isa_study[:processSequence] = convert_process_sequence(study.sample_types.second, study.sops.map(&:id).join("_"), study.id)
+      assay_streams = study.assays.map { |assay| [assay] if assay.position.zero? }
+                           .compact
+                           .map do |assay_stream|
+        last_assay = assay_stream.first
+        until last_assay.linked_assay.nil?
+          linked_assay = last_assay.linked_assay
+          assay_stream.push(linked_assay)
+          last_assay = linked_assay
+        end
+        assay_stream
+      end
 
-      isa_study[:assays] = [convert_assays(study.assays)]
+      isa_study[:assays] = assay_streams.map { |assay_stream| convert_assays(assay_stream) }
 
       isa_study[:factors] = []
       isa_study[:unitCategories] = []
