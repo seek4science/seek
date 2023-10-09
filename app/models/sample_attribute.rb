@@ -54,7 +54,7 @@ class SampleAttribute < ApplicationRecord
     URI.parse(pid).fragment || pid.gsub(/.*\//,'') || pid
   end
 
-  def linked_custom_metadata_type
+  def linked_extended_metadata_type
     nil
   end
 

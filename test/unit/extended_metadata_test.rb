@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class CustomMetadataTest < ActiveSupport::TestCase
+class ExtendedMetadataTest < ActiveSupport::TestCase
   test 'initialise' do
     cm = simple_test_object
     cm.set_attribute_value('name', 'fred')
@@ -9,11 +9,11 @@ class CustomMetadataTest < ActiveSupport::TestCase
     cm.save!
   end
 
-  test 'validate associated custom metadata type' do
+  test 'validate associated extended metadata type' do
     # invalid metadata type
-    type = CustomMetadataType.new(title: 'invalid', supported_type: 'Study')
+    type = ExtendedMetadataType.new(title: 'invalid', supported_type: 'Study')
     refute type.valid?
-    cm = CustomMetadata.new(custom_metadata_type: type, item: FactoryBot.create(:study))
+    cm = ExtendedMetadata.new(extended_metadata_type: type, item: FactoryBot.create(:study))
     refute cm.valid?
   end
 
@@ -24,7 +24,7 @@ class CustomMetadataTest < ActiveSupport::TestCase
     assert_equal 'fred', cm.get_attribute_value('name')
 
     cm.save!
-    cm = CustomMetadata.find(cm.id)
+    cm = ExtendedMetadata.find(cm.id)
     assert_equal 'fred', cm.get_attribute_value('name')
   end
 
@@ -59,8 +59,8 @@ class CustomMetadataTest < ActiveSupport::TestCase
     assert_equal date, cm.get_attribute_value(:date)
   end
 
-  test 'mass assign attribute with linked custom metadata' do
-    cm = CustomMetadata.new(custom_metadata_type: FactoryBot.build(:role_custom_metadata_type), item: FactoryBot.create(:study))
+  test 'mass assign attribute with linked extended metadata' do
+    cm = ExtendedMetadata.new(extended_metadata_type: FactoryBot.build(:role_extended_metadata_type), item: FactoryBot.create(:study))
     pp   cm.update( data: {
       "role_email":"alice@email.com",
       "role_phone":"0012345",
@@ -77,8 +77,8 @@ class CustomMetadataTest < ActiveSupport::TestCase
     assert_equal 'liddell', cm.get_attribute_value(:role_name)["last_name"]
   end
 
-  test 'mass assign attribute with multi linked custom metadatas' do
-    cm = CustomMetadata.new(custom_metadata_type: FactoryBot.build(:family_custom_metadata_type), item: FactoryBot.create(:study))
+  test 'mass assign attribute with multi linked extended metadatas' do
+    cm = ExtendedMetadata.new(extended_metadata_type: FactoryBot.build(:family_extended_metadata_type), item: FactoryBot.create(:study))
     pp   cm.update( data: {
       "dad":{"first_name":"tom", "last_name":"liddell"},
       "mom": { "first_name": "lily", "last_name": "liddell" },
@@ -108,7 +108,7 @@ class CustomMetadataTest < ActiveSupport::TestCase
     assert_match /culprits -/, exception.message
     assert_match /wrong_age,wrong_date/, exception.message
 
-    cm = CustomMetadata.new(custom_metadata_type: FactoryBot.build(:study_custom_metadata_type_with_spaces), item: FactoryBot.create(:study))
+    cm = ExtendedMetadata.new(extended_metadata_type: FactoryBot.build(:study_extended_metadata_type_with_spaces), item: FactoryBot.create(:study))
 
     exception = assert_raises Seek::JSONMetadata::Data::InvalidKeyException do
       cm.update(data: {
@@ -122,7 +122,7 @@ class CustomMetadataTest < ActiveSupport::TestCase
   end
 
   test 'mass assign attributes with spaces' do
-    cm = CustomMetadata.new(custom_metadata_type: FactoryBot.build(:study_custom_metadata_type_with_spaces), item: FactoryBot.create(:study))
+    cm = ExtendedMetadata.new(extended_metadata_type: FactoryBot.build(:study_extended_metadata_type_with_spaces), item: FactoryBot.create(:study))
 
     cm.update(data: {
                            'full name' => 'Stuart Little',
@@ -134,7 +134,7 @@ class CustomMetadataTest < ActiveSupport::TestCase
   end
 
   test 'mass assign attributes with symbols' do
-    cm = CustomMetadata.new(custom_metadata_type: FactoryBot.build(:study_custom_metadata_type_with_symbols), item: FactoryBot.create(:study))
+    cm = ExtendedMetadata.new(extended_metadata_type: FactoryBot.build(:study_extended_metadata_type_with_symbols), item: FactoryBot.create(:study))
 
     cm.update(data: {
                            '+name' => '+name',
@@ -150,7 +150,7 @@ class CustomMetadataTest < ActiveSupport::TestCase
   end
 
   test 'construct with item with mass assigment' do
-    metadata_type = FactoryBot.create(:simple_study_custom_metadata_type)
+    metadata_type = FactoryBot.create(:simple_study_extended_metadata_type)
     contributor = FactoryBot.create(:person)
     investigation = FactoryBot.create(:investigation, contributor: contributor)
     date = Time.now.to_s
@@ -159,44 +159,44 @@ class CustomMetadataTest < ActiveSupport::TestCase
       study = Study.new(title: 'test study',
                         investigation: investigation,
                         contributor: contributor,
-                        custom_metadata: CustomMetadata.new(
-                          custom_metadata_type: metadata_type,
+                        extended_metadata: ExtendedMetadata.new(
+                          extended_metadata_type: metadata_type,
                           data: { name: 'Fred', age: 25, date: date }
                         ))
       assert study.valid?
       study.save!
       study.reload
-      refute_nil study.custom_metadata
-      refute_nil study.custom_metadata.custom_metadata_type
+      refute_nil study.extended_metadata
+      refute_nil study.extended_metadata.extended_metadata_type
       assert_equal 'test study', study.title
-      assert_equal 'Fred', study.custom_metadata.get_attribute_value(:name)
-      assert_equal 25, study.custom_metadata.get_attribute_value(:age)
-      assert_equal date, study.custom_metadata.get_attribute_value(:date)
+      assert_equal 'Fred', study.extended_metadata.get_attribute_value(:name)
+      assert_equal 25, study.extended_metadata.get_attribute_value(:age)
+      assert_equal date, study.extended_metadata.get_attribute_value(:date)
 
       ## constructed in 2 steps
 
       study2 = Study.new(title: 'test study 2',
                          investigation: investigation,
                          contributor: contributor)
-      study2.custom_metadata = CustomMetadata.new(
-        custom_metadata_type: metadata_type,
+      study2.extended_metadata = ExtendedMetadata.new(
+        extended_metadata_type: metadata_type,
         data: { name: 'Fred', age: 25, date: date }
       )
 
       assert study2.valid?
       study2.save!
       study2.reload
-      refute_nil study2.custom_metadata
-      refute_nil study2.custom_metadata.custom_metadata_type
+      refute_nil study2.extended_metadata
+      refute_nil study2.extended_metadata.extended_metadata_type
       assert_equal 'test study 2', study2.title
-      assert_equal 'Fred', study2.custom_metadata.get_attribute_value(:name)
-      assert_equal 25, study2.custom_metadata.get_attribute_value(:age)
-      assert_equal date, study2.custom_metadata.get_attribute_value(:date)
+      assert_equal 'Fred', study2.extended_metadata.get_attribute_value(:name)
+      assert_equal 25, study2.extended_metadata.get_attribute_value(:age)
+      assert_equal date, study2.extended_metadata.get_attribute_value(:date)
     end
   end
 
-  test 'mass assign attributes with the linked custom metadata' do
-    cm = CustomMetadata.new(custom_metadata_type: FactoryBot.build(:family_custom_metadata_type), item: FactoryBot.create(:study))
+  test 'mass assign attributes with the linked extended metadata' do
+    cm = ExtendedMetadata.new(extended_metadata_type: FactoryBot.build(:family_extended_metadata_type), item: FactoryBot.create(:study))
     pp   cm.update( data: {
       "dad":{"first_name":"tom", "last_name":"liddell"},
       "mom": { "first_name": "lily", "last_name": "liddell" },
@@ -219,15 +219,15 @@ class CustomMetadataTest < ActiveSupport::TestCase
     User.with_current_user(contributor.user) do
       study = FactoryBot.build(:study, title: 'test study',
                                     contributor: contributor,
-                                    custom_metadata: CustomMetadata.new(
-                                      custom_metadata_type: FactoryBot.create(:simple_study_custom_metadata_type),
+                                    extended_metadata: ExtendedMetadata.new(
+                                      extended_metadata_type: FactoryBot.create(:simple_study_extended_metadata_type),
                                       data: { name: 'Fred', age: 25 }
                                     ))
       assert study.valid?
       study.save!
       study.reload
       assert_difference('Study.count', -1) do
-        assert_difference('CustomMetadata.count', -1) do
+        assert_difference('ExtendedMetadata.count', -1) do
           study.destroy
         end
       end
@@ -239,15 +239,15 @@ class CustomMetadataTest < ActiveSupport::TestCase
     User.with_current_user(contributor.user) do
       inv = FactoryBot.build(:investigation, title: 'test inv',
                                           contributor: contributor,
-                                          custom_metadata: CustomMetadata.new(
-                                            custom_metadata_type: FactoryBot.create(:simple_investigation_custom_metadata_type),
+                                          extended_metadata: ExtendedMetadata.new(
+                                            extended_metadata_type: FactoryBot.create(:simple_investigation_extended_metadata_type),
                                             data: { name: 'Fred', age: 25 }
                                           ))
       assert inv.valid?
       inv.save!
       inv.reload
       assert_difference('Investigation.count', -1) do
-        assert_difference('CustomMetadata.count', -1) do
+        assert_difference('ExtendedMetadata.count', -1) do
           inv.destroy
         end
       end
@@ -259,15 +259,15 @@ class CustomMetadataTest < ActiveSupport::TestCase
     User.with_current_user(contributor.user) do
       assay = FactoryBot.build(:assay, title: 'test assay',
                                     contributor: contributor,
-                                    custom_metadata: CustomMetadata.new(
-                                      custom_metadata_type: FactoryBot.create(:simple_assay_custom_metadata_type),
+                                    extended_metadata: ExtendedMetadata.new(
+                                      extended_metadata_type: FactoryBot.create(:simple_assay_extended_metadata_type),
                                       data: { name: 'Fred', age: 25 }
                                     ))
       assert assay.valid?
       assay.save!
       assay.reload
       assert_difference('Assay.count', -1) do
-        assert_difference('CustomMetadata.count', -1) do
+        assert_difference('ExtendedMetadata.count', -1) do
           assay.destroy
         end
       end
@@ -279,6 +279,6 @@ class CustomMetadataTest < ActiveSupport::TestCase
   private
 
   def simple_test_object
-    CustomMetadata.new(custom_metadata_type: FactoryBot.build(:simple_investigation_custom_metadata_type), item: FactoryBot.create(:investigation))
+    ExtendedMetadata.new(extended_metadata_type: FactoryBot.build(:simple_investigation_extended_metadata_type), item: FactoryBot.create(:investigation))
   end
 end

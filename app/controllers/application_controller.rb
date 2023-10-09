@@ -596,25 +596,25 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def determine_custom_metadata_keys
+  def determine_extended_metadata_keys
     keys = []
-    type_id = params.dig(controller_name.singularize.to_sym, :custom_metadata_attributes, :custom_metadata_type_id)
+    type_id = params.dig(controller_name.singularize.to_sym, :extended_metadata_attributes, :extended_metadata_type_id)
     if type_id.present?
-      metadata_type = CustomMetadataType.find(type_id)
-      keys = [:custom_metadata_type_id, :id, data: recursive_determine_custom_metadata_keys(metadata_type)]
+      metadata_type = ExtendedMetadataType.find(type_id)
+      keys = [:extended_metadata_type_id, :id, data: recursive_determine_extended_metadata_keys(metadata_type)]
     end
     keys
   end
 
-  def recursive_determine_custom_metadata_keys(metadata_type)
+  def recursive_determine_extended_metadata_keys(metadata_type)
     keys = []
-    metadata_type.custom_metadata_attributes.each do |attr|
+    metadata_type.extended_metadata_attributes.each do |attr|
       key = attr.title.to_sym
       if attr.sample_attribute_type.controlled_vocab? || attr.sample_attribute_type.seek_sample_multi? || attr.sample_attribute_type.seek_sample?
         keys << key
         keys << { key => [] }
-      elsif attr.linked_custom_metadata? || attr.linked_custom_metadata_multi?
-        keys << { key => recursive_determine_custom_metadata_keys(attr.linked_custom_metadata_type) }
+      elsif attr.linked_extended_metadata? || attr.linked_extended_metadata_multi?
+        keys << { key => recursive_determine_extended_metadata_keys(attr.linked_extended_metadata_type) }
       else
         keys << key
       end
