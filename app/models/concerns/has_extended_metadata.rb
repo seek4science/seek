@@ -8,7 +8,7 @@ module HasExtendedMetadata
   end
 
   class_methods do
-    def has_extended_extended_metadata
+    def has_extended_metadata
       has_one :extended_metadata, as: :item, dependent: :destroy, autosave: true
       accepts_nested_attributes_for :extended_metadata
 
