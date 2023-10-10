@@ -22,27 +22,27 @@ disable_authorization_checks do
   study_type_cv = SampleControlledVocab.where(title: 'ENA Study Types').first_or_create!(sample_controlled_vocab_terms_attributes: create_sample_controlled_vocab_terms_attributes(existing_study_types))
 
   # Assay
-  unless CustomMetadataType.where(title: 'ENA Study metadata', supported_type: 'Assay').any?
-    cmt = CustomMetadataType.new(title: 'ENA Study metadata', supported_type: 'Assay')
-    cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'study_type', required: true,
+  unless ExtendedMetadataType.where(title: 'ENA Study metadata', supported_type: 'Assay').any?
+    cmt = ExtendedMetadataType.new(title: 'ENA Study metadata', supported_type: 'Assay')
+    cmt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'study_type', required: true,
                                                                   sample_attribute_type: SampleAttributeType.find_by(title: 'Controlled Vocabulary'),
                                                                   sample_controlled_vocab: study_type_cv,
                                                                   description: 'The STUDY_TYPE presents a controlled vocabulary for expressing the overall purpose of the study.',
                                                                   label: 'ENA Study Type')
-    cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'new_study_type', required: false,
+    cmt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'new_study_type', required: false,
                                                                   sample_attribute_type: SampleAttributeType.find_by(title: 'String'))
-    cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'assay_stream', required: true,
+    cmt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'assay_stream', required: true,
                                                                   sample_attribute_type: SampleAttributeType.find_by(title: 'String'),
                                                                   description: 'This is the name that will be transferred to the ISA JSON. Example: "My assay" will be defined as "a_my_assay.txt" in the ISA JSON',
                                                                   label: 'Name Assay Stream:')
-    cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'ENA study alias prefix', required: true,
+    cmt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'ENA study alias prefix', required: true,
                                                                   sample_attribute_type: SampleAttributeType.find_by(title: 'String'))
-    cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'ENA experiment prefix', required: true,
+    cmt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'ENA experiment prefix', required: true,
                                                                   sample_attribute_type: SampleAttributeType.find_by(title: 'String'))
-    cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'ENA sample alias prefix', required: true,
+    cmt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'ENA sample alias prefix', required: true,
                                                                   sample_attribute_type: SampleAttributeType.find_by(title: 'String'))
 
     cmt.save!
   end
 end
-puts 'Seeded ENA custom metadata'
+puts 'Seeded ENA extended metadata'
