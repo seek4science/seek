@@ -124,9 +124,11 @@ module IsaExporter
     end
 
     def convert_assay_comments(assays)
-      extended_metadata = []
+      assay_comments = []
       assay_streams = assays.select { |a| a.position.zero? }
       assay_stream_id = assays.pluck(:id).join('_')
+
+      linked_assays = assays.map { |assay| { 'id': assay.id, 'title': assay.title } }
 
       assay_streams.map do |assay|
         next if assay.extended_metadata.nil?
@@ -136,7 +138,7 @@ module IsaExporter
           study_id = assay.study_id
           cm_id = assay&.extended_metadata&.id
           cma_id = cm_attributes.detect { |cma| cma.title == key }&.id
-          extended_metadata.push({
+          assay_comments.push({
             '@id': "#assay_comment/#{[study_id, assay_stream_id, cm_id, cma_id].join('_')}",
             'name': key,
             'value': val
@@ -144,7 +146,12 @@ module IsaExporter
         end
       end
 
-      extended_metadata.compact
+      assay_comments.push({
+        '@id': "#assay_comment/#{assay_stream_id}",
+        'name': 'linked_assays',
+        'value': linked_assays
+      })
+      assay_comments.compact
     end
 
     def convert_assays(assays)
@@ -209,16 +216,21 @@ module IsaExporter
       status[:annotationValue] = ''
       isa_publication[:status] = status
       isa_publication[:title] = publication.title
-      isa_publication[:author_list] = publication.authors.map(&:full_name).join(', ')
+      isa_publication[:author_list] = publication.seek_authors.map(&:full_name).join(', ')
+
       isa_publication[:comments] = [
         {
-          "@id": nil,
-          "name": nil,
-          "value": nil
+          "@id": "#publication_comment/#{publication.id}_#{publication.assays.map(&:id).join('_')}",
+          "name": "linked_assays",
+          "value": publication.assays.map { |assay| {"id": assay.id, "title": assay.title} }
+        },
+        {
+          "@id": "#publication_comment/#{publication.id}_#{publication.studies.map(&:id).join('_')}",
+          "name": "linked_studies",
+          "value": publication.studies.map { |study| {"id": study.id, "title": study.title} }
         }
       ]
 
-      # publication
       isa_publication
     end
 
