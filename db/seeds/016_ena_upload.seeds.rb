@@ -24,6 +24,9 @@ disable_authorization_checks do
   # Assay
   unless ExtendedMetadataType.where(title: 'ENA Study metadata', supported_type: 'Assay').any?
     cmt = ExtendedMetadataType.new(title: 'ENA Study metadata', supported_type: 'Assay')
+    cmt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'ena_study_title', required: true,
+                                                                  sample_attribute_type: SampleAttributeType.find_by(title: 'String'), label: 'ENA study title',
+                                                                  description: 'Title of the study as would be used in a publication.')
     cmt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'study_type', required: true,
                                                                   sample_attribute_type: SampleAttributeType.find_by(title: 'Controlled Vocabulary'),
                                                                   sample_controlled_vocab: study_type_cv,
