@@ -63,7 +63,12 @@ you may remove 3.7 unless it is used for other applications. If unsure there is 
 
     bundle exec rake seek:workers:stop 
 
-### Updating from GitHub
+### Getting the upgrade
+
+The steps to fetch the upgrade will be different depending on whether it was originally installed directly
+from Github or via a downloaded tarball.
+
+#### Updating from GitHub
 
 If you have an existing installation linked to our GitHub, you can fetch the
 files with:
@@ -71,7 +76,7 @@ files with:
     git pull
     git checkout v1.14.0
 
-### Updating using the tarball
+#### Updating using the tarball
 
 You can download the file from
 <https://github.com/seek4science/seek/archive/v1.14.0.tar.gz> You can
