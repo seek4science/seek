@@ -17,16 +17,16 @@ Release date: _October 2023_
 
 A major release that contains a number of improvements, upgrades and bug fixes, including:
 
-* Upgrade of Ruby, from Ruby 2.7 to Ruby 3.1. 
+* **Upgrade of Ruby**, from Ruby 2.7 to Ruby 3.1. 
   * This gives improved speed and overall performance, along with keeping up with security patches.
-* Upgrade to Rails, to the latest 6.1 release.  
-* Nested Extended Metadata (previously referred to as Custom Metadata).
+* **Upgrade to Rails**, to the latest 6.1 release.  
+* **Nested Extended Metadata** (previously referred to as Custom Metadata).
     * Extended Metadata allows items to be customized with additional typed metadata, similar to samples, and was used to support MIAPPE along
     with some bespoke installations. 
     * Extended Metadata can now be nested, i.e one Extended Metadata type definition can include a reference to another, 
       and these will be nested together in a single form.
     * The inner Extended Metadata type can also now be defined as a list, with the form allowing new items to be added or removed.
-* Overhaul and improvements to the Gatekeeper functionality
+* **Gatekeeper behaviour** refresh and fixes
   * Many bugs fixed, along with improvements and refinements.
   * Fixes to notifications for when a gatekeeper intervention is required.
   * Fixes to tracking items waiting to be published, and updating the list when they are rejected or approved.
@@ -36,16 +36,16 @@ A major release that contains a number of improvements, upgrades and bug fixes, 
   * Added support for Samples.
   * Improved integration with DataHub and the Single Page View.  
   * Updated documentation.  
-* Excel files can now be viewed in the browser regardless of asset type (previously only Data Files were supported).
-* Event filtering improvements.
+* **Viewing of Excel files in the browser** for all asset types (previously only Data Files were supported).
+* **Event filtering improvements**.
   * Includes the full set of common filters available for other items, plus the addition of Event specific filters.
-* Prevent publications and some other items appearing in multiple places in ISA tree and graph.
-* Updated and unified auto complete text fields to use an improved UI component and be consistent throughout.
+* **Fix duplications in the ISA graph and tree**, particularly for publications
+* **Updated and unified auto complete text fields** to use an improved UI component and be consistent throughout.
   * Type ahead fields that autocomplete (e.g. tagging, sample controlled vocabularies) have now been updated to use select2 throughout.   
-* Notify administrators when a Programme creation request is pending.
-* Additional explanatory text for Programme creation.
-* Made easier and clearer that you can jump from search results to the full list of results along with filtering.
-* UI improvements when viewing on a phone or tablet.
+* **Programme creation request notifications** to adminstrators are now shown in the browser as well as by email.
+* **Explanatory text for Programme creation** has been provided.
+* **Navigating from broad search results across all types, to the full list** with filtering for a specific type has been made clearer 
+* **Better phone and tablet support** for some places in the UI.
 
 For a full list, see [closed issues for 1.14.0](https://github.com/seek4science/seek/milestone/16?closed=1)
 
