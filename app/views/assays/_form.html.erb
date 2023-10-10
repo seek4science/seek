@@ -15,9 +15,9 @@
   <%= f.text_area :description, :rows => 5, :class=>"form-control rich-text-edit"  -%>
 </div>
 
-<%= render partial: 'custom_metadata/custom_metadata_type_selection', locals:{f:f, resource:@assay} %>
+<%= render partial: 'extended_metadata/extended_metadata_type_selection', locals:{f:f, resource:@assay} %>
 
-<%= render partial: 'custom_metadata/custom_metadata_attribute_input', locals:{f:f,resource:@assay} %>
+<%= render partial: 'extended_metadata/extended_metadata_attribute_input', locals:{f:f,resource:@assay} %>
 
 <div class="form-group">
   <label class="required"><%= t('study') -%></label>

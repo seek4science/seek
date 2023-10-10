@@ -1,10 +1,10 @@
 module Seek
   module Samples
     module AttributeTypeHandlers
-      class LinkedCustomMetadataMultiAttributeTypeHandler < LinkedCustomMetadataAttributeTypeHandler
+      class LinkedExtendedMetadataMultiAttributeTypeHandler < LinkedExtendedMetadataAttributeTypeHandler
 
         def test_value(value)
-          fail 'Not a custom metadata multi' unless value.is_a?(Array)
+          fail 'Not a extended metadata multi' unless value.is_a?(Array)
         end
 
         # Params from form are passed as a hash from controller, e.g. { "1" => { "attribute" => "value" } , "2" => ... }

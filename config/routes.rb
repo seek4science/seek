@@ -203,7 +203,7 @@ SEEK::Application.routes.draw do
   get 'index.html' => 'homes#index'
   get 'index' => 'homes#index'
 
-  resources :custom_metadata_types do
+  resources :extended_metadata_types do
     collection do
       get :form_fields
     end

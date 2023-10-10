@@ -49,14 +49,14 @@ FactoryBot.define do
     base_type { Seek::Samples::BaseType::SEEK_SAMPLE_MULTI }
   end
 
-  factory(:custom_metadata_sample_attribute_type, class: SampleAttributeType) do
-    sequence(:title) { |n| "Linked Custom Metadata attribute type #{n}" }
-    base_type { Seek::Samples::BaseType::LINKED_CUSTOM_METADATA }
+  factory(:extended_metadata_sample_attribute_type, class: SampleAttributeType) do
+    sequence(:title) { |n| "Linked Extended Metadata attribute type #{n}" }
+    base_type { Seek::Samples::BaseType::LINKED_EXTENDED_METADATA }
   end
 
-  factory(:custom_metadata_multi_sample_attribute_type, class: SampleAttributeType) do
-    sequence(:title) { |n| "Linked Custom Metadata multi attribute type #{n}" }
-    base_type { Seek::Samples::BaseType::LINKED_CUSTOM_METADATA_MULTI }
+  factory(:extended_metadata_multi_sample_attribute_type, class: SampleAttributeType) do
+    sequence(:title) { |n| "Linked Extended Metadata multi attribute type #{n}" }
+    base_type { Seek::Samples::BaseType::LINKED_EXTENDED_METADATA_MULTI }
   end
   
   factory(:data_file_sample_attribute_type, class: SampleAttributeType) do

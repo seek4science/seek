@@ -88,7 +88,7 @@ class IsaStudiesController < ApplicationController
     [:title, :description, :experimentalists, :investigation_id, { sop_ids: [] },
      *creator_related_params, :position, { scales: [] }, { publication_ids: [] },
      { discussion_links_attributes: %i[id url label _destroy] },
-     { custom_metadata_attributes: determine_custom_metadata_keys }]
+     { extended_metadata_attributes: determine_extended_metadata_keys }]
   end
 
   def sample_type_params(params, field)
