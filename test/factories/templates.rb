@@ -2,6 +2,7 @@ FactoryBot.define do
   # Template
   factory(:template) do
     sequence(:title) { |n| "Template #{n}" }
+    level {"study source"}
     with_project_contributor
   end
 
