@@ -14,18 +14,23 @@ They are expected to be added to FAIRDOM-SEEK in roughly the order they are pres
 
 | Feature | Milestone date |
 | --- |----------------|
-| Extended integration with the Norwegian e-Infrastructure for Life Sciences (NeLS) system | Q2 2023        |
-| Enhancements to Sample support | Q2 2023        |
-| UI for creating Custom Metadata Extensions | Q3 2023        |
-| Additional Search configuration improvements, with UI improvements for Search filtering | Q3 2023        |
-| API support for creating new versions | 2023           |
-| Project folders, to help organise files outside of the ISA structure | 2023           |
-| ISA improvements, with a single page for creating and managing them | 2023           |
-| Deposition to repositories, such as ENA | 2023           |
-| Integration with UNLOCK | 2023           |
-| Integration with other file storage systems, e.g. Dropbox, Google Drive, Nextcloud | 2023           |
-| License improvements, using SPDX | 2023           |
-| Better and easier definition of institutions, integrating the Research Organization Registry (ROR) | 2023           |
+| Provide a Sitemap XML | Q4 2023 |
+| Extended integration with the Norwegian e-Infrastructure for Life Sciences (NeLS) system | Q4 2023 |
+| License improvements, using SPDX | Q4 2023 |
+| RO-Crate for collections | Q1 2024 |
+| Easier mechanism for administrators to define and manage Extended Metadata | Q1 2024 |
+| Enhanced ISA-JSON export (via DataHub) supporting brokering tools to submit to repositories | Q1 2024 |
+| UI Improvements to the Admin area | Q1 2024 |
+| Extended Metadata write API extensions | Q2 2024 |
+| Research Organisation Registry (ROR) integration for institutions | Q2 2024 |
+| Harmonize and tidy up the submission forms, and remove the DataFile upload wizard to improve consistency | Q2 2024 |
+| Rails 7 and Ruby 3.2 upgrades | Q3 2024 |
+| Implement editable Sample Types (with shared permission) | Q3 2024 |
+| Visible history log for Sample changes | Q3 2024 |
+| ISA RO-Crate profile, along with updated snapshots and export | Q4 2024 |
+| Improving search to support more advanced queries | Q4 2024 |
+| Improve usability of single page view | Q4 2024 |
+
 
 <br/>
 
@@ -45,6 +50,7 @@ You can find more details about each release in our [Change Logs](/tech/releases
 
 | Feature | SEEK version |
 | --- | --- |
+| Upgrade to Ruby 3.1 | 1.14.0 |
 | Backend storage changes with better versioning support | 1.13.0 |
 | Better support for GitHub | 1.13.0 |
 | Search configuration improvements, with UI improvements for Search filtering | 1.13.0 |
