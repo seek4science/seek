@@ -20,7 +20,7 @@ input_sample_type_id ||=
     source_assay.sample_type.id if params[:source_assay_id]
   end
 
-show_custom_metadata =
+show_extended_metadata =
   if params[:is_source]
     true
   elsif source_assay&.position&.zero? && !@isa_assay.assay.new_record?
@@ -44,7 +44,7 @@ show_custom_metadata =
     <%= assay_fields.text_area :description, :rows => 5, :class=>"form-control rich-text-edit"  -%>
   </div>
 
-  <% if show_custom_metadata %>
+  <% if show_extended_metadata %>
     <%= render partial: 'extended_metadata/extended_metadata_type_selection', locals:{f:assay_fields, resource:@isa_assay.assay} %>
     <%= render partial: 'extended_metadata/extended_metadata_attribute_input', locals:{f:assay_fields,resource:@isa_assay.assay, parent_resource: "isa_assay"} %>
   <% end %>
