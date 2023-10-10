@@ -10,6 +10,7 @@ class Template < ApplicationRecord
 
   validates :title, presence: true
   validates :title, uniqueness: { scope: %i[group version] }
+  validates :level, presence: true
   validate :validate_template_attributes
 
   accepts_nested_attributes_for :template_attributes, allow_destroy: true
