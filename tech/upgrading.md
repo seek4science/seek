@@ -53,25 +53,6 @@ you may remove 3.7 unless it is used for other applications. If unsure there is 
 
     sudo apt remove python3.7-dev python3.7-distutils
 
----
-
-## Steps to upgrade from 1.12.x to 1.13.x
-
-### Dependencies
-
-Graphviz, and Python 3.7 are new required dependencies
-
-First add a repo which contains python versions that may not be available in the default repositories
-
-    sudo apt update
-    sudo apt install software-properties-common
-    sudo add-apt-repository ppa:deadsnakes/ppa
-    sudo apt update
-
-and now install the packages:
-
-    sudo apt install graphviz python3.7-dev python3.7-distutils python3-pip
-
 ### Set RAILS_ENV
 
 **If upgrading a production instance of SEEK, remember to set the RAILS_ENV first**
@@ -80,8 +61,7 @@ and now install the packages:
 
 ### Stopping services before upgrading
 
-    bundle exec rake seek:workers:stop
-    bundle exec rake sunspot:solr:stop
+    bundle exec rake seek:workers:stop 
 
 ### Updating from GitHub
 
@@ -89,17 +69,17 @@ If you have an existing installation linked to our GitHub, you can fetch the
 files with:
 
     git pull
-    git checkout v1.13.4
+    git checkout v1.14.0
 
 ### Updating using the tarball
 
 You can download the file from
-<https://github.com/seek4science/seek/archive/v1.13.4.tar.gz> You can
+<https://github.com/seek4science/seek/archive/v1.14.0.tar.gz> You can
 unpack this file using:
 
-    tar zxvf seek-1.13.4.tar.gz
+    tar zxvf seek-1.14.0.tar.gz
     mv seek seek-previous
-    mv seek-1.13.4 seek
+    mv seek-1.14.0 seek
     cd seek/
 
 and then copy across your existing filestore and database configuration file
@@ -111,15 +91,15 @@ and the filestore is simply _filestore/_
 
 First, a specific version of `setuptools` needs to be installed to avoid an issue when installing dependencies
 
-    python3.7 -m pip install setuptools==58
+    python3.9 -m pip install setuptools==58
 
 Then the other dependencies can be installed
 
-    python3.7 -m pip install -r requirements.txt
+    python3.9 -m pip install -r requirements.txt
 
 ### Upgrading Ruby
 
-You are recommended to upgrade to Ruby 2.7.8 If you are using [RVM](https://rvm.io/) (according to the [Installation Guide](install.html) )you should be prompted to install during the standard installation steps that follow.
+It is necessary to upgrade to Ruby 3.1.4. If you are using [RVM](https://rvm.io/) (according to the [Installation Guide](install.html) )you should be prompted to install during the standard installation steps that follow.
 If you are not prompted you can install with the command:
 
     rvm install $(cat .ruby-version)
@@ -134,7 +114,7 @@ content.
 
     cd . #this is to allow RVM to pick up the ruby and gemset changes
     gem install bundler
-    bundle install --deployment --without development test
+    bundle install
     bundle exec rake seek:upgrade
     bundle exec rake assets:precompile # this task will take a while
 
