@@ -58,6 +58,9 @@ module IsaExporter
 
       publications = []
       study.publications.each { |p| publications << convert_publication(p) }
+      study.assays.each do |assay|
+        assay.publications.each { |p| publications << convert_publication(p) }
+      end
       isa_study[:publications] = publications
 
       people = []
@@ -121,22 +124,27 @@ module IsaExporter
     end
 
     def convert_assay_comments(assays)
-      custom_metadata = []
+      extended_metadata = []
       assay_streams = assays.select { |a| a.position.zero? }
-      assay_streams.map do |assay|
-        next if assay.custom_metadata.nil?
+      assay_stream_id = assays.pluck(:id).join('_')
 
-        json = JSON.parse(assay.custom_metadata&.json_metadata)
+      assay_streams.map do |assay|
+        next if assay.extended_metadata.nil?
+        json = JSON.parse(assay.extended_metadata&.json_metadata)
+        cm_attributes = assay.extended_metadata.extended_metadata_attributes
         json.map do |key, val|
-          custom_metadata.push({
-            '@id': assay.custom_metadata.id,
+          study_id = assay.study_id
+          cm_id = assay&.extended_metadata&.id
+          cma_id = cm_attributes.detect { |cma| cma.title == key }&.id
+          extended_metadata.push({
+            '@id': "#assay_comment/#{[study_id, assay_stream_id, cm_id, cma_id].join('_')}",
             'name': key,
             'value': val
           })
         end
       end
 
-      custom_metadata.compact
+      extended_metadata.compact
     end
 
     def convert_assays(assays)
@@ -146,14 +154,10 @@ module IsaExporter
 
       stream_name = 'a_assays.txt'
       assay_comments = convert_assay_comments(assays)
-      assay_comments.delete_if do |c|
-        if c[:name] == 'assay_stream'
-          stream_name = c[:value]
-          true # True is returned comment is 'assay_stream'
-        else
-          false
-        end
-      end
+
+      # Retrieve assay_stream if
+      stream_name_comment = assay_comments.detect { |ac| ac[:name] == 'assay_stream' }
+      stream_name = stream_name_comment[:value] unless stream_name_comment.nil?
 
       isa_assay = {}
       isa_assay['@id'] = "#assay/#{assays.pluck(:id).join('_')}"
@@ -206,8 +210,16 @@ module IsaExporter
       isa_publication[:status] = status
       isa_publication[:title] = publication.title
       isa_publication[:author_list] = publication.authors.map(&:full_name).join(', ')
+      isa_publication[:comments] = [
+        {
+          "@id": nil,
+          "name": nil,
+          "value": nil
+        }
+      ]
 
-      publication
+      # publication
+      isa_publication
     end
 
     def convert_ontologies

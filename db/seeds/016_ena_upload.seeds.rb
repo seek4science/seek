@@ -30,17 +30,21 @@ disable_authorization_checks do
                                                                   description: 'The STUDY_TYPE presents a controlled vocabulary for expressing the overall purpose of the study.',
                                                                   label: 'ENA Study Type')
     cmt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'new_study_type', required: false,
-                                                                  sample_attribute_type: SampleAttributeType.find_by(title: 'String'))
+                                                                  sample_attribute_type: SampleAttributeType.find_by(title: 'String'), label: 'New Study Type',
+                                                                  description: 'Specify a new Study Type here if "Other" was chosen as "ENA Study Type".')
+    cmt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'ena_study_abstract', required: true,
+                                                                  sample_attribute_type: SampleAttributeType.find_by(title: 'Text'), label: 'ENA study abstract',
+                                                                  description: 'Briefly describes the goals, purpose, and scope of the Study.  This need not be listed if it can be inherited from a referenced publication.')
     cmt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'assay_stream', required: true,
                                                                   sample_attribute_type: SampleAttributeType.find_by(title: 'String'),
                                                                   description: 'This is the name that will be transferred to the ISA JSON. Example: "My assay" will be defined as "a_my_assay.txt" in the ISA JSON',
-                                                                  label: 'Name Assay Stream:')
-    cmt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'ENA study alias prefix', required: true,
-                                                                  sample_attribute_type: SampleAttributeType.find_by(title: 'String'))
-    cmt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'ENA experiment prefix', required: true,
-                                                                  sample_attribute_type: SampleAttributeType.find_by(title: 'String'))
-    cmt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'ENA sample alias prefix', required: true,
-                                                                  sample_attribute_type: SampleAttributeType.find_by(title: 'String'))
+                                                                  label: 'Name Assay Stream')
+    cmt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'ena_study_alias_prefix', required: true,
+                                                                  sample_attribute_type: SampleAttributeType.find_by(title: 'String'), label: 'ENA study alias prefix')
+    cmt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'ena_experiment_alias_prefix', required: true,
+                                                                  sample_attribute_type: SampleAttributeType.find_by(title: 'String'), label: 'ENA experiment alias prefix')
+    cmt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'ena_sample_alias_prefix', required: true,
+                                                                  sample_attribute_type: SampleAttributeType.find_by(title: 'String'), label: 'ENA sample alias prefix')
 
     cmt.save!
   end
