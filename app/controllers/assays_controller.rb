@@ -114,6 +114,7 @@ class AssaysController < ApplicationController
 
   def delete_linked_sample_types
     return unless is_single_page_assay?
+    return if @assay.sample_type.nil?
 
     @assay.sample_type.destroy
   end
