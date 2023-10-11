@@ -128,7 +128,7 @@ module IsaExporter
       assay_streams = assays.select { |a| a.position.zero? }
       assay_stream_id = assays.pluck(:id).join('_')
 
-      linked_assays = assays.map { |assay| { 'id': assay.id, 'title': assay.title } }
+      linked_assays = assays.map { |assay| { 'id': assay.id, 'title': assay.title } }.to_json
 
       assay_streams.map do |assay|
         next if assay.extended_metadata.nil?
@@ -222,12 +222,12 @@ module IsaExporter
         {
           "@id": "#publication_comment/#{publication.id}_#{publication.assays.map(&:id).join('_')}",
           "name": "linked_assays",
-          "value": publication.assays.map { |assay| {"id": assay.id, "title": assay.title} }
+          "value": publication.assays.map { |assay| {"id": assay.id, "title": assay.title} }.to_json
         },
         {
           "@id": "#publication_comment/#{publication.id}_#{publication.studies.map(&:id).join('_')}",
           "name": "linked_studies",
-          "value": publication.studies.map { |study| {"id": study.id, "title": study.title} }
+          "value": publication.studies.map { |study| {"id": study.id, "title": study.title} }.to_json
         }
       ]
 
@@ -290,7 +290,6 @@ module IsaExporter
       with_tag_source_characteristic =
         sample_type.sample_attributes.select { |sa| sa.isa_tag&.isa_source_characteristic? }
 
-      # attributes = sample_type.sample_attributes.select{ |sa| sa.isa_tag&.isa_source_characteristic? }
       sample_type.samples.map do |s|
         {
           '@id': "#source/#{s.id}",
