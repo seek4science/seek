@@ -15,8 +15,13 @@ class SnapshotsController < ApplicationController
 
   def create
     @snapshot = @resource.create_snapshot
-    flash[:notice] = "Snapshot created"
-    redirect_to polymorphic_path([@resource, @snapshot])
+    if @snapshot
+      flash[:notice] = "Snapshot created"
+      redirect_to polymorphic_path([@resource, @snapshot])
+    else
+      flash[:error] = @resource.errors.full_messages.join(', ')
+      redirect_to polymorphic_path(@resource)
+    end
   end
 
   def show

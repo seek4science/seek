@@ -1,0 +1,36 @@
+<% return unless @items_for_sharing %>
+<% items_text = 'item'.pluralize(@items_for_sharing.size) %>
+<% if @success&.any? || @gatekeeper_required&.any? %>
+  <div id="notice_flash" class="fade in alert alert-success alert-dismissable" role="alert">
+    <% if @success.any? %>
+      The sharing policies for your selected <%= items_text -%> were successfully updated:
+      <ul id="ok">
+        <% @success.each do |item| %>
+          <li><%= item.title %></li>
+        <% end %>
+      </ul>
+    <% end %>
+
+    <% if @gatekeeper_required.any? %>
+      Publishing the following <%= items_text -%> requires approval from a gatekeeper:
+      <ul id="gk">
+        <% @gatekeeper_required.each do |item| %>
+          <li><%= item.title %></li>
+        <% end %>
+      </ul>
+      The <%= items_text -%> will not be published until approved.
+    <% end %>
+  </div>
+<% elsif @error&.any? %>
+  <div id="notice_flash" class="fade in alert alert-danger alert-dismissable" role="alert">
+    The sharing policies for your selected <%= items_text -%> were not successfully updated:
+    <ul>
+      <% @error.each do |item| %>
+        <li>
+          <%= item.title %><br>
+          The reason: <%= item.errors.full_messages.join(', ') %>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>

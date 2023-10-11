@@ -282,6 +282,25 @@ async function batchUpdateSample(sampleTypes) {
   }
 }
 
+async function handleUploadSubmit(formData){
+  $j.ajax({
+    type: 'POST',
+    url: "<%= upload_samples_single_pages_path %>",
+    data: formData,
+    dataType: 'html',
+    processData: false,
+    contentType: false,
+    enctype: 'multipart/form-data',
+    success: function(response){
+      $j('#upload-excel-modal').modal({backdrop: 'static', keyboard: false}, 'show').focus();
+      $j('#upload-excel').html(response);
+    },
+    error: function(err){
+      location.reload(); // Page needs reloading for the notice message to appear
+    }
+  });
+}
+
 function isMobile() {
 	/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
 }

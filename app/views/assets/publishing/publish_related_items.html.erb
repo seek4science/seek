@@ -5,32 +5,41 @@
 </p>
 
 <p>
-  If you have the required access rights, you can choose to publish it by <b>checking</b> the
-  <span class="publish-colour"><b>Publish</b></span> checkbox beside the item.
+  If you have the required access rights, you can choose to publish it by <b>checking</b> the checkbox beside the item.
   If you do not have the required access rights to publish, the checkbox is
   <span style="color:gray;font-weight:bolder">disabled</span>. Somebody that can publish that item is listed next to it and you should contact them and ask them to publish it for you.
 </p>
 
 <br/>
-<%= form_tag({:action => :check_gatekeeper_required},:method=>:post) do %>
-  <% @items_for_publishing.each do |item| %>
-    <% if item.contains_publishable_items? %>
-      <% if item.is_asset? %>
-        <%= render :partial => "assets/publishing/isa_publishing_preview",
-                   :collection => item.assays.map(&:study).map(&:investigation).flatten.uniq,
-                   :locals => { :preselected => item } %>
-      <% else %>
-        <%= render :partial => "assets/publishing/isa_publishing_preview", :object => item,
-                   :locals => { :preselected => item } %>
+<%= form_tag({action: :check_gatekeeper_required}, method: :post) do %>
+  <div class="batch-selection-scope" id="batch-asset-selection">
+    <%= render partial: 'assets/batch_selection/buttons', locals: {
+      text: "your items",
+      select_deselect_all: true,
+      collapse_expand: true,
+      show_hide_blocked: true,
+      show_hide_permissions: true
+    } %>
+    <div class="batch-selection-collapse" id="batch-asset-collapse">
+      <% @items_for_publishing.each do |item| %>
+        <% if item.contains_publishable_items? %>
+          <% if item.is_asset? %>
+            <%= render partial: "assets/batch_selection/asset_row",
+                       collection: item.assays.map(&:study).map(&:investigation).flatten.uniq,
+                       locals: { preselected: item, publishing: true, show_permissions: true, show_children: true } %>
+          <% else %>
+            <%= render partial: "assets/batch_selection/asset_row", object: item,
+                         locals: { preselected: item, publishing: true, show_permissions: true, show_children: true } %>
+          <% end %>
+        <% else %>
+          <%= check_box_tag publishing_item_param(item), 1, true, {style: 'display:none;'} %>
+        <% end %>
       <% end %>
-    <% else %>
-      <%= check_box_tag publishing_item_param(item), 1, true, {:style => 'display:none;'} %>
-    <% end %>
-  <% end %>
-
+    </div>
+  </div>
   <% resource = (controller_name == 'people') ? current_user.person : @asset %>
 
-  <%= submit_tag "Next",data: { disable_with: 'Next' }, :class => 'btn btn-primary' -%>
+  <%= submit_tag "Next",data: { disable_with: 'Next' }, class: 'btn btn-primary' -%>
   or
   <%= cancel_button(resource) %>
 <% end %>

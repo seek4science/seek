@@ -27,10 +27,10 @@
     <div class="form-group" id="license-section">
       <label><%= label %></label>
 
-      <%= grouped_license_select("#{resource.class.name.underscore}[#{accessor.to_s}]", selected_license,
+      <%= license_select("#{resource.class.name.underscore}[#{accessor.to_s}]", selected_license,
                                  id: 'license-select', class: 'form-control',
                                  data: { 'can-overwrite': using_default },
-                                 source: Seek::License.open_definition[:all],
+                                 source: Seek::License.combined,
                                  recommended: recommended_licenses) %>
 
       <span class="help-block license-url-block">
@@ -38,10 +38,3 @@
       </span>
     </div>
 <% end %>
-
-<script>
-    $j(document).ready(function () {
-        $j('#license-select').change(zenodoExport.setLicenseUrl); // Set URL on user change
-        zenodoExport.setLicenseUrl(); // Set URL on initial page load
-    });
-</script>

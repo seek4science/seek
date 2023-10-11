@@ -90,6 +90,7 @@ class StudiesController < ApplicationController
 
   def delete_linked_sample_types
     return unless is_single_page_study?
+    return if @study.sample_types.empty?
 
     # The study sample types must be destroyed in reversed order
     # otherwise the first sample type won't be removed becaused it is linked from the second
@@ -201,7 +202,7 @@ class StudiesController < ApplicationController
     # e.g: Study.new(title: 'title', investigation: investigations(:metabolomics_investigation), policy: FactoryBot.create(:private_policy))
     # study.policy = Policy.create(name: 'default policy', access_type: 1)
     # render plain: params[:studies].inspect
-    metadata_types = CustomMetadataType.where(title: 'MIAPPE metadata', supported_type: 'Study').last
+    metadata_types = ExtendedMetadataType.where(title: 'MIAPPE metadata', supported_type: 'Study').last
     studies_length = params[:studies][:title].length
     studies_uploaded = false
     data_file_uploaded = false
@@ -211,14 +212,14 @@ class StudiesController < ApplicationController
         title: params[:studies][:title][index],
         description: params[:studies][:description][index],
         investigation_id: params[:study][:investigation_id],
-        custom_metadata: CustomMetadata.new(
-          custom_metadata_type: metadata_types,
+        extended_metadata: ExtendedMetadata.new(
+          extended_metadata_type: metadata_types,
           data: metadata
         )
       }
       @study = Study.new(study_params)
       StudyBatchUpload.check_study_is_MIAPPE_compliant(@study, metadata)
-      if @study.valid? && @study.save! && @study.custom_metadata.valid?
+      if @study.valid? && @study.save! && @study.extended_metadata.valid?
         studies_uploaded = true if @study.save
       end
       data_file_uploaded = create_batch_assay_asset(params, index)
@@ -262,7 +263,7 @@ class StudiesController < ApplicationController
     data_file_names.length.times do |data_file_index|
 
       study_metadata_id = params[:studies][:id][index]
-      study_id = CustomMetadata.where('json_metadata LIKE ?', "%\"id\":\"#{study_metadata_id}\"%").last.item_id
+      study_id = ExtendedMetadata.where('json_metadata LIKE ?', "%\"id\":\"#{study_metadata_id}\"%").last.item_id
       assay_class_id = AssayClass.where(title: 'Experimental assay').first.id
       data_file_description = params[:studies][:data_file_description][index].remove(' ').split(',')
       assay_params = {
@@ -343,7 +344,7 @@ class StudiesController < ApplicationController
       metadata_id = JSON.parse(study.gsub("=>",":"))["metadata_id"].to_i
 
       Study.where(id: study_id).delete_all
-      CustomMetadata.where(id: metadata_id).delete_all
+      ExtendedMetadata.where(id: metadata_id).delete_all
       assays = Assay.where(study_id: study_id)
       assays.each do |assay|
         AssayAsset.where(assay_id: assay.id).delete_all
@@ -357,7 +358,7 @@ class StudiesController < ApplicationController
     params.require(:study).permit(:title, :description, :experimentalists, :investigation_id,
                                   *creator_related_params, :position, { publication_ids: [] },
                                   { discussion_links_attributes:[:id, :url, :label, :_destroy] },
-                                  { custom_metadata_attributes: determine_custom_metadata_keys })
+                                  { extended_metadata_attributes: determine_extended_metadata_keys })
   end
 end
 

@@ -1,321 +1,53 @@
 <%
-  items_not_in_isa_hash = SharingPermissionsHelper::ITEMS_NOT_IN_ISA_HASH
-  items_not_in_isa_hash[:children] =[]
-
-  all_investigations_hash = SharingPermissionsHelper::ALL_INVESTIGATIONS_HASH
-  all_investigations_hash[:children] = []
-
-  #include items which can change sharing permissions, the 'publication' is intendedly excluded.
-  all_related_items_hash = get_related_resources(current_user.person).slice(*Seek::Util.authorized_types.map(&:name)).except!('Publication')
-
-  items_not_in_isa = filter_items_not_in_ISA(all_related_items_hash)
 
   @policy_params = params[:policy_attributes]
 
 %>
+<%= render partial: 'sharing/batch_change_results' %>
 
 <%= show_title "Change permissions of items related to #{link_to(h(current_user.person.name),current_user.person)} in batch".html_safe -%>
 
 <div class="alert alert-info">
   <ul>
-    <li>Items are grouped to those included and those not included in the <b>ISA (Investigation-Study-Assay) structure</b>.</li>
-    <li>The item list excludes <b>Project</b>, <b>Institution</b> and <b>Publication</b> since these are always publicly visible</li>
-    <li>You can view current permissions of each item by clicking the item's name.</li>
+    <li>You can view the details of current permissions for each item by clicking the item's policy icon (
+      <%= image('world', title: 'Was published', class: 'visibility_icon') %>
+      <%= image('partial_world', title: 'Visible to everyone, but not accessible', class: 'visibility_icon') %>
+      <%= image('manage', title: 'Custom policy', class: 'visibility_icon') %>
+      <%= image('lock', title: 'Private', class: 'visibility_icon') %>
+      ).</li>
+    <li>You can view the managers for each item by clicking the
+      <span class="glyphicon glyphicon-user" aria-hidden="true" style="position:relative; top:2px;"></span>
+      icon.</li>
     <li>After your confirmation, the newly modified permissions will be highlighted with <span class="sharing_permission_changed"></span>  .</li>
   </ul>
 </div>
 
 <div id="sharing_items">
-<%= form_tag({:action => :batch_change_permission_for_selected_items}, :method => :post) do -%>
+  <%= form_tag({action: :batch_change_permission_for_selected_items}, method: :post) do -%>
 
-  <%= folding_panel("Items not in ISA", false, :id => 'not_isa_item', :body_options => {:id => 'items_fold_content'},
-                    :help_text => nil) do %>
-
-    <label><%= link_to "Select All", "#", id: "select_all_not_isa" -%></label> |
-    <label><%= link_to "Deselect All", "#", id: "deselect_all_not_isa" -%></label> |
-    <label><%= link_to "Expand All", "#", id: "expand_all_not_isa" -%></label> |
-    <label><%= link_to "Collapse All", "#", id: "collapse_all_not_isa" -%></label>
-
-
-    <% items_not_in_isa.each do |resource_type, resource_items| %>
-      <% asset_node= asset_node_json(resource_type, resource_items) %>
-      <% items_not_in_isa_hash[:children].append(asset_node) %>
-    <% end %>
-
-    <div id="jstree_not_isa"></div>
-
-  <% end %>
-
-
-  <% all_related_items_hash.each do |resource_type, resource_items| %>
-    <% if resource_type == "Investigation" %>
-      <%  resource_items[:items].each do |item| %>
-        <% options ||= { depth: 4, parent_depth: nil, sibling_depth: nil, include_self: true } %>
-        <%  hash = Seek::IsaGraphGenerator.new(item).generate(**options) %>
-        <% tree = JSON.parse(build_tree_json(hash, item)) %>
-        <% tree = add_permissions_to_tree_json(tree) %>
-        <% all_investigations_hash[:children].append(tree.first) %>
-      <% end %>
-    <% end %>
-  <% end %>
-
-  <%= folding_panel("Items in ISA: ", false, :id => 'isa_item', :body_options => {:id => 'items_fold_content'},
-                    :help_text => nil) do %>
-
-    <label><%= link_to "Select All", "#", id: "select_all_isa" -%></label> |
-    <label><%= link_to "Deselect All", "#", id: "deselect_all_isa" -%></label> |
-    <label><%= link_to "Expand All", "#", id: "expand_all_isa" -%></label> |
-    <label><%= link_to "Collapse All", "#", id: "collapse_all_isa" -%></label>
-
-    <div id="jstree"></div>
-
+    <% if @assets.empty? %>
+      <span class="no_manageable_asset">You have no manageable assets in <%= Seek::Config.instance_name %></span>
+      <br/>
+      <br/>
+      <%= link_to "Back to profile", person_path(params[:id].to_i) -%>
+    <% else %>
+      <%= render partial: "assets/batch_asset_selection",
+                    locals: { publishing: false,
+                              show_hide_blocked: true,
+                              show_permissions: true,
+                              show_managers: false
+                 }
+      -%>
+      <br/>
+      <%= submit_tag "Next",data: { disable_with: 'Next' }, class: 'btn btn-primary' -%>
+      Or
+      <%= cancel_button person_path(params[:id].to_i)-%>
+    <% end -%>
   <% end -%>
-
-  <% resource = (controller_name == 'people') ? current_user.person : @asset %>
-
-  <%= submit_tag "Next", data: {disable_with: 'Next'}, :class => 'btn btn-primary', :onclick => 'show_all_checkboxes()' -%>
-
-  or
-  <%= cancel_button(resource, button_text: "Back to profile") %>
-
-<% end -%>
 </div>
 
 <script type="text/javascript">
-
-    function addCheckboxToAssetNode(asset,asset_id,is_isa){
-        var container = $j('#hiddencheckboxs');
-        var inputs = container.find('input');
-        var id = inputs.length+1;
-        $j('<input />', { type: 'checkbox', name: is_isa+'['+asset+']['+asset_id+']', id: is_isa+'_'+asset+'_'+asset_id, value: 1,class: asset+'_'+asset_id+' '+is_isa, checked: false}).appendTo(container);
-    }
-
     $j(document).ready(function () {
-
-        $j('#select_all_not_isa').click(function (event) {
-            event.preventDefault();
-            $j("#jstree_not_isa").trigger("sb_select_all")
-        });
-
-        $j('#deselect_all_not_isa').click(function (event) {
-            event.preventDefault();
-            $j("#jstree_not_isa").trigger("sb_deselect_all")
-        });
-        $j('#expand_all_not_isa').click(function (event) {
-            event.preventDefault();
-            $j("#jstree_not_isa").jstree("open_all");
-            $j("#jstree_not_isa").find('[id^="Permission-"]').removeClass('hide_permission')
-
-        });
-        $j('#collapse_all_not_isa').click(function (event) {
-            event.preventDefault();
-            $j("#jstree_not_isa").find('[id^="Permission-"]').addClass('hide_permission')
-
-        });
-
-        $j('#select_all_isa').click(function (event) {
-            $j('input[name^="share_isa"]').prop("checked", true);
-            $j("#jstree").jstree().check_all(true);
-            event.preventDefault();
-            $j("#jstree").trigger("sb_select_all")
-        });
-
-        $j('#deselect_all_isa').click(function (event) {
-            $j('input[name^="share_isa"]').prop("checked", false);
-            $j("#jstree").jstree().uncheck_all(true);
-            event.preventDefault();
-            $j("#jstree").trigger("sb_deselect_all")
-        });
-        $j('#expand_all_isa').click(function (event) {
-            event.preventDefault();
-            $j("#jstree").jstree("open_all");
-            $j('#jstree').find(('[id^="Permission-"]')).removeClass('hide_permission')
-
-        });
-        $j('#collapse_all_isa').click(function (event) {
-            event.preventDefault();
-            $j('#jstree').find(('[id^="Permission-"]')).addClass('hide_permission')
-
-        });
-    });
-
-    $j(document).ready(function () {
-
-        $j('#jstree_not_isa').on('loaded.jstree', function (event, data) {
-            // expand all nodes
-            $j("#jstree_not_isa").jstree("open_all");
-            if (<%= @batch_sharing_permission_changed %>){
-                $j('#jstree_not_isa').find(('[id^="Permission-"]')).removeClass('hide_permission')
-            }
-        })
-        .jstree({
-            'core': {
-                'multiple' : true,
-                "check_callback": true,
-                "themes": {
-                    "variant": "large",
-                    "dots": false
-                },
-                'data':  <%= items_not_in_isa_hash.to_json.html_safe -%>
-            },
-            "split_btn_checkbox" : {'share_type':"not_isa",
-                                    'data':  <%= items_not_in_isa_hash.to_json.html_safe -%>},
-            "plugins" : [ "split_btn_checkbox" ,"changed","json_data"]
-        }).on("select_node.jstree", function (e, data) {
-            var asset = data.node.id.split('-')
-            var Permission_id = 'Permission-'+asset[0]+'-'+asset[1]
-            var selector = $j('[id^='+Permission_id+']')
-            if (selector.hasClass ("hide_permission")){
-                selector.removeClass('hide_permission')
-            }else{
-                selector.addClass('hide_permission')
-            }
-        });
-    });
-
-    $j(document).ready(function () {
-        $j('#jstree').on('loaded.jstree', function (event, data) {
-            // expand all nodes
-            $j("#jstree").jstree("open_all");
-            if (<%= @batch_sharing_permission_changed %>){
-                $j('#jstree').find(('[id^="Permission-"]')).removeClass('hide_permission')
-            }
-        })
-        .jstree({
-            'core': {
-                'multiple' : true,
-                "check_callback": true,
-                "themes": {
-                    "variant": "large",
-                    "dots": false
-                },
-                'data':  <%= all_investigations_hash.to_json.html_safe -%>
-            },
-            "split_btn_checkbox" : {'share_type':"isa",
-                                    'data':  <%= all_investigations_hash.to_json.html_safe -%>},
-            "plugins" : [ "split_btn_checkbox","changed","json_data"]
-        })
-        .on("select_node.jstree", function (e, data) {
-            var asset = data.node.id.split('-')
-            var Permission_id = 'Permission-'+asset[0]+'-'+asset[1]
-            var selector = $j('[id^='+Permission_id+']')
-            if (selector.hasClass ("hide_permission")){
-                selector.removeClass('hide_permission')
-            }else{
-                selector.addClass('hide_permission')
-            }
-        });
-    });
-
-    // split button checkbox on asset nodes (outside of anchor)
-    (function ($, undefined) {
-        "use strict";
-        $.jstree.defaults.split_btn_checkbox = $.noop;
-        $.jstree.plugins.split_btn_checkbox = function (options, parent) {
-            this.share="share_"+options.share_type;
-            this.assets=options.data.children;
-            this.asset_key=get_asset_key(this.assets)
-            this.bind = function () {
-                parent.bind.call(this);
-                this.element
-                  .on("click.jstree", ".jstree-split_btn_checkbox", function (e) {
-                      e.stopImmediatePropagation();
-                      this.settings.split_btn_checkbox.call(this, this.get_node(e.target));
-                  }.bind(this))
-                  .on("change.input",function(e){
-                      this.get_node(e.target.id).data['checkbox_status']=e.target.checked
-                  }.bind(this))
-                  .on("sb_select_all", function (){
-                      change_all(this,true)
-                  }.bind(this))
-                  .on("sb_deselect_all", function (){
-                      change_all(this,false)
-                  }.bind(this));
-            };
-            this.teardown = function () {
-                if(this.settings.split_btn_checkbox) {
-                    this.element.find(".jstree-split_btn_checkbox").remove();
-                }
-                parent.teardown.call(this);
-            };
-            this.redraw_node = function(obj, deep, callback, force_draw) {
-                obj = parent.redraw_node.call(this, obj, deep, callback, force_draw);
-                if(obj.classList.contains('asset-node-row')) {
-                    let sbtn_checkbox = document.createElement("span",)
-                    let asset_id=obj.getAttribute("data-node-id")
-                    let node = this.get_node(obj.id)
-                    if(node.data['checkbox_status']===undefined){
-                        node.data['checkbox_status']=false
-                        node.data['has_children']=this.asset_key.find(o => o.data_node_id === asset_id).has_children
-                    }
-                    let sbc_html = ""
-                    if(node.data['has_children']){
-                        sbc_html = "<%= escape_javascript( render :partial => 'general/split_button_checkbox',
-                                                                    :locals => { checkbox_id: "_asset_id_",
-                                                                                 checkbox_class: "_asset_id_",
-                                                                                 checked: false,
-                                                                                 toggle: true,
-                                                                                 cb_parent_selector: '[data-node-id="_asset_id_"]' } ) %>"
-                    } else {
-                        sbc_html = "<%= escape_javascript( render :partial => 'general/split_button_checkbox',
-                                                                    :locals => { checkbox_id: "_asset_id_",
-                                                                                 checkbox_class: "_asset_id_",
-                                                                                 checked: false,
-                                                                                 toggle: false,
-                                                                                 cb_parent_selector: '[data-node-id="_asset_id_"]' } ) %>"
-                    }
-                    sbc_html = sbc_html.replaceAll("name=\"_asset_id_\"",
-                                    "name=\""+this.share+"["+asset_id.split("-")[0]+"]["+asset_id.split("-")[1]+"]\"")
-                    sbc_html = sbc_html.replaceAll("_asset_id_", asset_id)
-                    sbtn_checkbox.innerHTML=sbc_html
-                    let tmp = sbtn_checkbox.cloneNode(true);
-                    obj.insertBefore(tmp, obj.childNodes[1]);
-                    if(node.data['checkbox_status']) {
-                        obj.childNodes[1].querySelector('input').checked=true
-                    }
-                }
-                return obj;
-            };
-        };
-    })(jQuery);
-    function get_asset_key(data){
-        let asset_key=[]
-        for(let asset of data){
-            let data_node_id=asset.li_attr["data-node-id"]
-            let has_children=false
-            let n_perm=0
-            for(let child of asset.children){
-                if(!(child.id.includes('Permission'))){
-                    has_children=true
-                    break
-                }
-                n_perm=n_perm+1
-            }
-            if(data_node_id){
-                asset_key.push({data_node_id:data_node_id,
-                                node_id:asset.id,
-                                has_children:has_children})
-            }
-            let grandchildren=[]
-            if(has_children) {
-                grandchildren=get_asset_key(asset.children.slice(n_perm))
-            }
-            asset_key=asset_key.concat(grandchildren)
-        }
-        return asset_key
-    }
-    function change_all(tree,status){
-        for(let asset of tree.asset_key) {
-            tree.get_node(asset.node_id).data['checkbox_status']=status
-            try{
-                document.getElementById(asset.data_node_id).checked=status
-            }
-            catch(err) {}
-        }
-    }
-    function show_all_checkboxes(){
-        $j("#jstree_not_isa").jstree("open_all");
-        $j("#jstree").jstree("open_all");
-    }
+        $j('.sharing_permission_changed').parents('div.permission_list').show()
+    })
 </script>
-

@@ -106,8 +106,7 @@
                 var licenseSelect = $j('#license-select');
                 if (licenseSelect.length && licenseSelect.data('canOverwrite') &&
                     $j('option[value="'+Sharing.defaultLicenses[project.id]+'"]', licenseSelect).length) {
-                    licenseSelect.val(Sharing.defaultLicenses[project.id]);
-                    zenodoExport.setLicenseUrl();
+                    licenseSelect.val(Sharing.defaultLicenses[project.id]).change();
                 }
             }
             this.possibilities.splice(i, 1);

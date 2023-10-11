@@ -399,6 +399,8 @@ $j(document).ready(function () {
     $j('#sidebar-toggle').click(Sidebar.toggle);
     $j('#sidebar-close').click(Sidebar.toggle);
     $j(document).on('click', '.sidebar-backdrop', Sidebar.toggle);
+
+    Licenses.init();
 });
 
 var URL_ROOT = '<%= Rails.application.config.relative_url_root %>';

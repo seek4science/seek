@@ -114,6 +114,7 @@ class AssaysController < ApplicationController
 
   def delete_linked_sample_types
     return unless is_single_page_assay?
+    return if @assay.sample_type.nil?
 
     @assay.sample_type.destroy
   end
@@ -175,7 +176,7 @@ class AssaysController < ApplicationController
                                   { data_files_attributes: [:asset_id, :direction, :relationship_type_id] },
                                   { placeholders_attributes: [:asset_id, :direction, :relationship_type_id] },
                                   { publication_ids: [] },
-                                  { custom_metadata_attributes: determine_custom_metadata_keys },
+                                  { extended_metadata_attributes: determine_extended_metadata_keys },
           { discussion_links_attributes:[:id, :url, :label, :_destroy] }
                                   ).tap do |assay_params|
       assay_params[:document_ids].select! { |id| Document.find_by_id(id).try(:can_view?) } if assay_params.key?(:document_ids)

@@ -345,7 +345,7 @@ class AdminControllerTest < ActionController::TestCase
 
   test 'snapshot and doi stats' do
     investigation = FactoryBot.create(:investigation, title: 'i1', description: 'not blank',
-                            policy: FactoryBot.create(:downloadable_public_policy))
+                            policy: FactoryBot.create(:downloadable_public_policy), creators: [FactoryBot.create(:person)])
     snapshot = investigation.create_snapshot
     snapshot.update_column(:doi, '10.5072/testytest')
     AssetDoiLog.create(asset_type: 'investigation',

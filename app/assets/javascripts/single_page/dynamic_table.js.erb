@@ -35,7 +35,7 @@ const handleSelect = (e) => {
     dtSelectAll.html("Select all rows")
     dtSelectAll.css("display", "none")
   }
-  const dtName = $j(e).parents("table").data("dtname")
+  const dtName = $j(e).parents("table").data("dtname");
   window[dtName].setPermissionBTNActivity()
 }
 

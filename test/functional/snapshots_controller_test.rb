@@ -17,7 +17,8 @@ class SnapshotsControllerTest < ActionController::TestCase
 
   test 'can get snapshot preview page' do
     user = FactoryBot.create(:user)
-    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:publicly_viewable_policy), contributor: user.person)
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:publicly_viewable_policy),
+                                      contributor: user.person, creators: [user.person])
     login_as(user)
 
     get :new, params: { investigation_id: investigation }
@@ -30,7 +31,8 @@ class SnapshotsControllerTest < ActionController::TestCase
 
   test "can't get snapshot preview if no manage permissions" do
     user = FactoryBot.create(:user)
-    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:publicly_viewable_policy))
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:publicly_viewable_policy),
+                                      creators: [FactoryBot.create(:user).person])
     login_as(user)
 
     get :new, params: { investigation_id: investigation }
@@ -42,7 +44,8 @@ class SnapshotsControllerTest < ActionController::TestCase
 
   test "can't get snapshot preview if not publicly accessible" do
     user = FactoryBot.create(:user)
-    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:private_policy), contributor: user.person)
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:private_policy),
+                                      contributor: user.person, creators: [user.person])
     login_as(user)
 
     get :new, params: { investigation_id: investigation }
@@ -54,7 +57,8 @@ class SnapshotsControllerTest < ActionController::TestCase
 
   test 'can create investigation snapshot' do
     user = FactoryBot.create(:user)
-    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:publicly_viewable_policy), contributor: user.person)
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:publicly_viewable_policy),
+                                      contributor: user.person, creators: [user.person])
     login_as(user)
 
     assert_difference('Snapshot.count') do
@@ -67,7 +71,8 @@ class SnapshotsControllerTest < ActionController::TestCase
 
   test 'can create study snapshot' do
     user = FactoryBot.create(:user)
-    study = FactoryBot.create(:study, policy: FactoryBot.create(:publicly_viewable_policy), contributor: user.person)
+    study = FactoryBot.create(:study, policy: FactoryBot.create(:publicly_viewable_policy),
+                              contributor: user.person, creators: [user.person])
     login_as(user)
 
     assert_difference('Snapshot.count') do
@@ -80,7 +85,8 @@ class SnapshotsControllerTest < ActionController::TestCase
 
   test 'can create assay snapshot' do
     user = FactoryBot.create(:user)
-    assay = FactoryBot.create(:assay, policy: FactoryBot.create(:publicly_viewable_policy), contributor: user.person)
+    assay = FactoryBot.create(:assay, policy: FactoryBot.create(:publicly_viewable_policy),
+                              contributor: user.person, creators: [user.person])
     login_as(user)
 
     assert_difference('Snapshot.count') do
@@ -93,7 +99,8 @@ class SnapshotsControllerTest < ActionController::TestCase
 
   test "can't create snapshot if no manage permissions" do
     user = FactoryBot.create(:user)
-    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:publicly_viewable_policy))
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:publicly_viewable_policy),
+                                      creators: [FactoryBot.create(:user).person])
     login_as(user)
 
     assert_no_difference('Snapshot.count') do
@@ -107,7 +114,8 @@ class SnapshotsControllerTest < ActionController::TestCase
 
   test "can't create snapshot if not publicly accessible" do
     user = FactoryBot.create(:user)
-    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:private_policy), contributor: user.person)
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:private_policy),
+                                      contributor: user.person, creators: [user.person])
     login_as(user)
 
     assert_no_difference('Snapshot.count') do
@@ -117,6 +125,34 @@ class SnapshotsControllerTest < ActionController::TestCase
     assert investigation.can_manage?(user)
     assert_redirected_to investigation_path(investigation)
     assert flash[:error].include?('accessible')
+  end
+
+  test "can't create snapshot if there are no creators" do
+    user = FactoryBot.create(:user)
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:publicly_viewable_policy),
+                                      contributor: user.person, creators: [])
+    study = FactoryBot.create(:study, investigation: investigation, policy: FactoryBot.create(:publicly_viewable_policy),
+                              contributor: user.person, creators: [])
+    assay = FactoryBot.create(:assay, study: study, policy: FactoryBot.create(:publicly_viewable_policy),
+                              contributor: user.person, creators: [])
+
+    login_as(user)
+    [investigation, study, assay].each do |snap|
+      assert snap.can_manage?(user)
+      assert snap.creators.empty?
+      type = snap.class.name.underscore
+      # Updating the request.path is needed so that @resource is correctly set, and the snapshots is created for the correct item in the loop
+      request.path = Seek::Util.routes.polymorphic_path([snap, :snapshots])
+      # Get preview
+      get :new, params: { "#{type}_id": snap.id }
+      assert_response :success
+      # Can't create snapshot
+      assert_no_difference('Snapshot.count') do
+        post :create, params: { "#{type}_id": snap.id }
+      end
+      assert_redirected_to Seek::Util.routes.polymorphic_path(snap)
+      assert flash[:error].include?('creator is required')
+    end
   end
 
   test 'can get snapshot show page' do
@@ -543,14 +579,16 @@ class SnapshotsControllerTest < ActionController::TestCase
 
   def create_investigation_snapshot
     @user = FactoryBot.create(:user)
-    @investigation = FactoryBot.create(:investigation, description: 'not blank', policy: FactoryBot.create(:publicly_viewable_policy), contributor: @user.person)
+    @investigation = FactoryBot.create(:investigation, description: 'not blank', policy: FactoryBot.create(:publicly_viewable_policy),
+                                       contributor: @user.person, creators: [@user.person])
     @snapshot = @investigation.create_snapshot
   end
 
   def create_study_snapshot
     @user = FactoryBot.create(:user)
     @investigation = FactoryBot.create(:investigation, description: 'not blank', policy: FactoryBot.create(:publicly_viewable_policy), contributor: @user.person)
-    @study = FactoryBot.create(:study, description: 'not blank', policy: FactoryBot.create(:publicly_viewable_policy), contributor: @user.person)
+    @study = FactoryBot.create(:study, description: 'not blank', policy: FactoryBot.create(:publicly_viewable_policy),
+                               contributor: @user.person, creators: [@user.person])
     @snapshot = @study.create_snapshot
   end
 
@@ -558,7 +596,8 @@ class SnapshotsControllerTest < ActionController::TestCase
     @user = FactoryBot.create(:user)
     @investigation = FactoryBot.create(:investigation, description: 'not blank', policy: FactoryBot.create(:publicly_viewable_policy), contributor: @user.person)
     @study = FactoryBot.create(:study, description: 'not blank', policy: FactoryBot.create(:publicly_viewable_policy), contributor: @user.person)
-    @assay = FactoryBot.create(:assay, description: 'not blank', policy: FactoryBot.create(:publicly_viewable_policy), contributor: @user.person)
+    @assay = FactoryBot.create(:assay, description: 'not blank', policy: FactoryBot.create(:publicly_viewable_policy),
+                               contributor: @user.person, creators: [@user.person])
     @snapshot = @assay.create_snapshot
   end
 end
