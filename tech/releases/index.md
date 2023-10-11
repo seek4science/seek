@@ -20,7 +20,7 @@ A major release that contains a number of improvements, upgrades and bug fixes, 
 * **Upgrade of Ruby**, from Ruby 2.7 to Ruby 3.1. 
   * This gives improved speed and overall performance, along with keeping up with security patches.
 * **Upgrade to Rails**, to the latest 6.1 release.  
-* **Nested Extended Metadata** (previously referred to as Custom Metadata).
+* **Nested [Extended Metadata](/tech/extended-metadata)** (previously referred to as Custom Metadata).
     * Extended Metadata allows items to be customized with additional typed metadata, similar to samples, and was used to support MIAPPE along
     with some bespoke installations. 
     * Extended Metadata can now be nested, i.e one Extended Metadata type definition can include a reference to another, 
