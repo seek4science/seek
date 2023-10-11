@@ -4,7 +4,7 @@ class TemplatesController < ApplicationController
   include Seek::IndexPager
   include Seek::AssetsCommon
 
-  before_action :sample_type_template_enabled?
+  before_action :project_single_page_advanced_enabled?
   before_action :find_assets, only: [:index]
   before_action :auth_to_create, only: %i[new create]
   before_action :find_and_authorize_requested_item, only: %i[manage manage_update show edit destroy update]

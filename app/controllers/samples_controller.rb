@@ -323,7 +323,7 @@ class SamplesController < ApplicationController
   end
 
   def templates_enabled?
-    unless Seek::Config.sample_type_template_enabled
+    unless Seek::Config.project_single_page_advanced_enabled
       flash[:error] = 'Not available'
       redirect_to select_sample_types_path
     end
