@@ -93,14 +93,6 @@ class Sample < ApplicationRecord
     !!originating_data_file
   end
 
-  def projects
-    extracted? ? originating_data_file.projects : super
-  end
-
-  def project_ids
-    extracted? ? originating_data_file.project_ids : super
-  end
-
   def creators
     extracted? ? originating_data_file.creators : super
   end

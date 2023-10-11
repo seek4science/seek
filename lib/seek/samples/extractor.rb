@@ -30,6 +30,7 @@ module Seek
 
             last_id = Sample.last.try(:id) || 0
             sample_type = samples.first.sample_type
+            project_ids = samples.first.project_ids
             disable_authorization_checks { Sample.import(samples, validate: false, batch_size: 2000) }
             SampleTypeUpdateJob.new(sample_type, false).queue_job
 
@@ -38,6 +39,9 @@ module Seek
             samples = Sample.where(sample_type: sample_type, title: samples.collect(&:title), contributor: contributor).where(
               'id > ?', last_id
             )
+            samples.each do |sample|
+              sample.project_ids = project_ids
+            end
             ReindexingQueue.enqueue(samples)
             AuthLookupUpdateQueue.enqueue(samples)
           end

@@ -9,6 +9,7 @@ namespace :seek do
   task upgrade_version_tasks: %i[
     environment
     decouple_extracted_samples_policies
+    decouple_extracted_samples_projects
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -59,6 +60,28 @@ namespace :seek do
       end
     end
     puts " ... finished creating independent policies of #{decoupled.to_s} extracted samples"
+  end
+
+  task(decouple_extracted_samples_projects: [:environment]) do
+    puts '... copying project ids for extracted samples...'
+    decoupled = 0
+    hash_array = []
+    disable_authorization_checks do
+      Sample.find_each do |sample|
+        # check if the sample was extracted from a datafile and their projects are linked
+        if sample.extracted? && sample.project_ids.empty?
+          sample.originating_data_file.project_ids.each do |project_id|
+            hash_array << { project_id: project_id, sample_id: sample.id }
+          end
+          decoupled += 1
+        end
+      end
+      unless hash_array.empty?
+        class ProjectsSample < ActiveRecord::Base; end;
+        ProjectsSample.insert_all(hash_array)
+      end
+    end
+    puts " ... finished copying project ids of #{decoupled.to_s} extracted samples"
   end
 
   private
