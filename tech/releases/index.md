@@ -39,13 +39,23 @@ A major release that contains a number of improvements, upgrades and bug fixes, 
 * **Viewing of Excel files in the browser** for all asset types (previously only Data Files were supported).
 * **Event filtering improvements**.
   * Includes the full set of common filters available for other items, plus the addition of Event specific filters.
-* **Fix duplications in the ISA graph and tree**, particularly for publications
+* **Fix duplications in the ISA graph and tree**, particularly for publications.
 * **Updated and unified auto complete text fields** to use an improved UI component and be consistent throughout.
   * Type ahead fields that autocomplete (e.g. tagging, sample controlled vocabularies) have now been updated to use select2 throughout.   
 * **Programme creation request notifications** to adminstrators are now shown in the browser as well as by email.
 * **Explanatory text for Programme creation** has been provided.
-* **Navigating from broad search results across all types, to the full list** with filtering for a specific type has been made clearer 
+* **Navigating from broad search results across all types, to the full list** with filtering for a specific type has been made clearer .
 * **Better phone and tablet support** for some places in the UI.
+* **[FAIR Signposting](https://signposting.org/FAIR/) support** option added.
+  * Data dumps containing aggregated Bioschemas metadata generated daily for each asset type.
+* **bio.tools** support extended to API.
+* **Workflow metadata improvements**.
+  * Automatic identification of license from `LICENSE` etc. files in Git repositories or RO-Crates.
+  * Recognize additional metadata from CFF files.
+  * Add "Deprecated" as a maturity level option.
+* **Citation improvements**.
+  * Citations can now be generated from CFF files for resources without a DOI.
+  * Citation style select list can now be filtered.
 
 For a full list, see [closed issues for 1.14.0](https://github.com/seek4science/seek/milestone/16?closed=1)
 
