@@ -35,7 +35,7 @@ A major release that contains a number of improvements, upgrades and bug fixes, 
   * Users can now cancel a publishing request.
   * Added support for Samples.
   * Improved integration with DataHub and the Single Page View.  
-  * Updated [documentation](/user-guide/roles.html#asset-gatekeeper).  
+  * Updated [documentation](/help/user-guide/roles.html#asset-gatekeeper).  
 * **Viewing of Excel files in the browser** for all asset types (previously only Data Files were supported).
 * **Event filtering improvements**.
   * Includes the full set of common filters available for other items, plus the addition of Event specific filters.
