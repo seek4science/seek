@@ -46,4 +46,9 @@ By default only MIAPPE is provided, but other bespoke installations have used th
 
 We are planning on making it easier for an instance administrator to define Extended Metadata themselves, initially through simple JSON or an Excel template, and then longer term through a user interface.
 
+If you have a metadata scheme that you think is in a mature state and would like to be added as a default installation,
+or need help adding to your own instance, then please [contact us](/contacting-us)
+
 This is something we've been rolling out slowly and carefully, after initially using internally, because once defined and populated they are difficult to redefine.
+
+ 
