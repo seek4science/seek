@@ -70,6 +70,16 @@ FactoryBot.define do
     supported_type { 'Assay' }
   end
 
+  factory(:simple_document_extended_metadata_type,class: ExtendedMetadataType) do
+    title { 'simple document extended metadata type' }
+    supported_type { 'Document' }
+    after(:build) do |a|
+      a.extended_metadata_attributes << FactoryBot.create(:age_extended_metadata_attribute)
+      a.extended_metadata_attributes << FactoryBot.create(:name_extended_metadata_attribute, required: true)
+      a.extended_metadata_attributes << FactoryBot.create(:datetime_extended_metadata_attribute)
+    end
+  end
+
   factory(:study_extended_metadata_type_with_spaces, class: ExtendedMetadataType) do
     title { 'study extended metadata type with spaces' }
     supported_type { 'Study' }
