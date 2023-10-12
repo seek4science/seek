@@ -12,7 +12,7 @@ MIAPPE but designed for future use.
 It provides the ability to define additional metadata attributes for a particular type, to support a particular standard (i.e MIAPPE).
 
 <div class="alert alert-warning" markdown="1">
-It was originally referred to as 'Custom Metadata' but the renamed to avoid confusion, as the metadata can only be extended but not entirely customised. 
+It was originally referred to as 'Custom Metadata' but recently renamed to avoid confusion, as the metadata can only be extended but not entirely customised. 
 You may sometimes hear or read it referred to as Custom Metadata, and they are the same thing.
 </div>
 
