@@ -43,6 +43,38 @@ module IsaExporter
       isa_investigation
     end
 
+    def convert_study_comments(study)
+      study_comments = []
+      study_id = study.id
+
+      # Study Custom Metadata
+      unless study.extended_metadata.nil?
+        json = JSON.parse(study.extended_metadata.json_metadata)
+        extended_metadata_attributes = study.extended_metadata.extended_metadata_attributes
+        em_id = study.extended_metadata.id
+        json.map do |key, val|
+          ema_id = extended_metadata_attributes.detect { |ema| ema.title == key }&.id
+          study_comments.push({
+            '@id': "#study_comment/#{ [study_id, em_id, ema_id].join('_') }",
+            'name': key,
+            'value': val
+          })
+        end
+      end
+      ###################################################
+
+      study_comments.append({
+        '@id': "#study_comment/#{ [study_id, UUID.new.generate].join('_') }",
+        'name': 'SEEK Study ID',
+        'value': study_id.to_s
+      })
+      study_comments.append({
+        '@id': "#study_comment/#{ [study_id, UUID.new.generate].join('_') }",
+        'name': 'SEEK creation date',
+        'value': study.created_at.utc.iso8601
+      })
+    end
+
     def convert_study(study)
       isa_study = {}
       isa_study[:identifier] = '' # study.id
@@ -51,10 +83,7 @@ module IsaExporter
       isa_study[:submissionDate] = '' # study.created_at.to_date.iso8601
       isa_study[:publicReleaseDate] = '' # study.created_at.to_date.iso8601
       isa_study[:filename] = "#{study.title}.txt"
-      isa_study[:comments] = [
-        { name: 'SEEK Study ID', value: study.id.to_s },
-        { name: 'SEEK creation date', value: study.created_at.utc.iso8601 }
-      ]
+      isa_study[:comments] = convert_study_comments(study)
 
       publications = []
       study.publications.each { |p| publications << convert_publication(p) }
@@ -131,12 +160,13 @@ module IsaExporter
       linked_assays = assays.map { |assay| { 'id': assay.id, 'title': assay.title } }.to_json
 
       assay_streams.map do |assay|
+        study_id = assay.study_id
         next if assay.extended_metadata.nil?
+
         json = JSON.parse(assay.extended_metadata&.json_metadata)
         cm_attributes = assay.extended_metadata.extended_metadata_attributes
+        cm_id = assay.extended_metadata&.id
         json.map do |key, val|
-          study_id = assay.study_id
-          cm_id = assay&.extended_metadata&.id
           cma_id = cm_attributes.detect { |cma| cma.title == key }&.id
           assay_comments.push({
             '@id': "#assay_comment/#{[study_id, assay_stream_id, cm_id, cma_id].join('_')}",
