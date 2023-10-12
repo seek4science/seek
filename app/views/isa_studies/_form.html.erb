@@ -32,7 +32,6 @@
       <%= study_fields.number_field :position, :rows => 5, :class=>"form-control"  -%>
     </div>
 
-
     <%= render partial: 'assets/manage_specific_attributes', locals: { f: study_fields } if show_form_manage_specific_attributes? %>
 
     <%= study_fields.fancy_multiselect :publications, { other_projects_checkbox: true, name: "isa_study[study][publication_ids]" } %>
