@@ -122,7 +122,8 @@ class DataFile < ApplicationRecord
   end
 
   def related_samples
-    extracted_samples
+    sample_ids = SampleResourceLink.where('resource_type': DataFile, 'resource_id': id).pluck('sample_id')
+    extracted_samples + Sample.where(id: sample_ids)
   end
 
   # Extracts samples using the given sample_type
