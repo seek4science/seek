@@ -10,6 +10,7 @@ namespace :seek do
     environment
     decouple_extracted_samples_policies
     decouple_extracted_samples_projects
+    link_sample_datafile_attributes
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -82,6 +83,20 @@ namespace :seek do
       end
     end
     puts " ... finished copying project ids of #{decoupled.to_s} extracted samples"
+  end
+
+  task(link_sample_datafile_attributes: [:environment]) do
+    puts '... updating sample_resource_links for samples with data_file attributes...'
+    samples_updated = 0
+    disable_authorization_checks do
+      df_attrs = SampleAttribute.joins(:sample_attribute_type).where('sample_attribute_types.base_type' => Seek::Samples::BaseType::SEEK_DATA_FILE).pluck(:id)
+      samples = Sample.joins(sample_type: :sample_attributes).where('sample_attributes.id' => df_attrs)
+      samples.each do |sample|
+        sample.send(:update_sample_resource_links)
+        samples_updated += 1
+      end
+    end
+    puts " ... finished updating sample_resource_links of #{samples_updated.to_s} samples with data_file attributes"
   end
 
   private
