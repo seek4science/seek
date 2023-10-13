@@ -60,8 +60,13 @@ class Sample < ApplicationRecord
     User.logged_in_and_member? && Seek::Config.samples_enabled
   end
 
-  def related_data_file
-    originating_data_file
+  def related_data_files
+    rdf = [originating_data_file].compact
+    data_file_ids = sample_type.sample_attributes.joins(:sample_attribute_type)
+                               .where('sample_attribute_types.base_type' => Seek::Samples::BaseType::SEEK_DATA_FILE)
+                               .map { |attr| get_attribute_value(attr)["id"] }
+    rdf += DataFile.where(id: data_file_ids)
+    rdf
   end
 
   def related_samples
