@@ -709,7 +709,7 @@ class StudiesControllerTest < ActionController::TestCase
     assert cm = study.extended_metadata
     assert_equal cmt, cm.extended_metadata_type
     assert_equal 'fred',cm.get_attribute_value('name')
-    assert_equal '22',cm.get_attribute_value('age')
+    assert_equal 22,cm.get_attribute_value('age')
     assert_nil cm.get_attribute_value('date')
 
     # test update
@@ -729,7 +729,7 @@ class StudiesControllerTest < ActionController::TestCase
     assert new_study = assigns(:study)
     assert_equal 'new title', new_study.title
     assert_equal 'max', new_study.extended_metadata.get_attribute_value('name')
-    assert_equal '20', new_study.extended_metadata.get_attribute_value('age')
+    assert_equal 20, new_study.extended_metadata.get_attribute_value('age')
     assert_equal old_id, new_study.extended_metadata.id
   end
 
