@@ -65,8 +65,12 @@ class Assay < ApplicationRecord
 
   enforce_authorization_on_association :study, :view
 
+  def previous_linked_assay_sample_type
+    sample_type.sample_attributes.detect { |sa| sa.isa_tag.nil? && sa.title.include?('Input') }&.linked_sample_type
+  end
+
   def has_linked_child_assay?
-    sample_type.linked_sample_attributes.any?
+    sample_type&.linked_sample_attributes&.any?
   end
 
   def default_contributor

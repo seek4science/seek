@@ -116,13 +116,15 @@ class AssaysController < ApplicationController
     return unless is_single_page_assay?
     return unless @assay.has_linked_child_assay?
 
-    previous_assay_linked_st_id = @assay.sample_type.sample_attributes.first.linked_sample_type_id
+    previous_assay_linked_st_id = @assay.previous_linked_assay_sample_type&.id
 
-    next_assay = Assay.all.select do |a|
-                   a.sample_type&.sample_attributes&.first&.linked_sample_type_id == @assay.sample_type_id
-                 end&.first
+    next_assay = Assay.all.detect do |a|
+      a.sample_type&.sample_attributes&.first&.linked_sample_type_id == @assay.sample_type_id
+    end
+
     next_assay_st_attr = next_assay.sample_type&.sample_attributes&.first
-    return unless next_assay || previous_assay_linked_st_id || next_assay_st_attr
+
+    return unless next_assay && previous_assay_linked_st_id && next_assay_st_attr
 
     next_assay_st_attr.update(linked_sample_type_id: previous_assay_linked_st_id)
   end
