@@ -203,7 +203,7 @@ SEEK::Application.routes.draw do
   get 'index.html' => 'homes#index'
   get 'index' => 'homes#index'
 
-  resources :custom_metadata_types do
+  resources :extended_metadata_types do
     collection do
       get :form_fields
     end
@@ -757,6 +757,7 @@ SEEK::Application.routes.draw do
       post :batch_sharing_permission_changed
       post :export_to_excel, action: :export_to_excel
       get :download_samples_excel, action: :download_samples_excel
+      post :upload_samples, action: :upload_samples
     end
   end
 

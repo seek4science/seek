@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_06_06_102509) do
+ActiveRecord::Schema.define(version: 2023_10_05_153610) do
 
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
@@ -364,45 +364,6 @@ ActiveRecord::Schema.define(version: 2023_06_06_102509) do
     t.datetime "updated_at"
   end
 
-  create_table "custom_metadata", force: :cascade do |t|
-    t.text "json_metadata"
-    t.string "item_type"
-    t.bigint "item_id"
-    t.bigint "custom_metadata_type_id"
-    t.integer "custom_metadata_attribute_id"
-    t.index ["custom_metadata_type_id"], name: "index_custom_metadata_on_custom_metadata_type_id"
-    t.index ["item_type", "item_id"], name: "index_custom_metadata_on_item_type_and_item_id"
-  end
-
-  create_table "custom_metadata_attributes", force: :cascade do |t|
-    t.bigint "custom_metadata_type_id"
-    t.bigint "sample_attribute_type_id"
-    t.boolean "required", default: false
-    t.integer "pos"
-    t.string "title"
-    t.bigint "sample_controlled_vocab_id"
-    t.text "description"
-    t.string "label"
-    t.integer "linked_custom_metadata_type_id"
-    t.index ["custom_metadata_type_id"], name: "index_custom_metadata_attributes_on_custom_metadata_type_id"
-    t.index ["sample_attribute_type_id"], name: "index_custom_metadata_attributes_on_sample_attribute_type_id"
-    t.index ["sample_controlled_vocab_id"], name: "index_custom_metadata_attributes_on_sample_controlled_vocab_id"
-  end
-
-  create_table "custom_metadata_resource_links", force: :cascade do |t|
-    t.bigint "custom_metadata_id"
-    t.string "resource_type"
-    t.bigint "resource_id"
-    t.index ["custom_metadata_id"], name: "index_custom_metadata_resource_links_on_custom_metadata_id"
-    t.index ["resource_type", "resource_id"], name: "index_custom_metadata_resource_links_on_resource"
-  end
-
-  create_table "custom_metadata_types", force: :cascade do |t|
-    t.string "title"
-    t.integer "contributor_id"
-    t.text "supported_type"
-  end
-
   create_table "data_file_auth_lookup", force: :cascade do |t|
     t.integer "user_id"
     t.integer "asset_id"
@@ -650,6 +611,37 @@ ActiveRecord::Schema.define(version: 2023_06_06_102509) do
     t.datetime "updated_at"
     t.integer "sop_version"
     t.index ["sop_id"], name: "index_experimental_conditions_on_sop_id"
+  end
+
+  create_table "extended_metadata", force: :cascade do |t|
+    t.text "json_metadata"
+    t.string "item_type"
+    t.bigint "item_id"
+    t.bigint "extended_metadata_type_id"
+    t.integer "extended_metadata_attribute_id"
+    t.index ["extended_metadata_type_id"], name: "index_extended_metadata_on_extended_metadata_type_id"
+    t.index ["item_type", "item_id"], name: "index_extended_metadata_on_item_type_and_item_id"
+  end
+
+  create_table "extended_metadata_attributes", force: :cascade do |t|
+    t.bigint "extended_metadata_type_id"
+    t.bigint "sample_attribute_type_id"
+    t.boolean "required", default: false
+    t.integer "pos"
+    t.string "title"
+    t.bigint "sample_controlled_vocab_id"
+    t.text "description"
+    t.string "label"
+    t.integer "linked_extended_metadata_type_id"
+    t.index ["extended_metadata_type_id"], name: "index_extended_metadata_attributes_on_extended_metadata_type_id"
+    t.index ["sample_attribute_type_id"], name: "index_extended_metadata_attributes_on_sample_attribute_type_id"
+    t.index ["sample_controlled_vocab_id"], name: "index_extended_metadata_attributes_on_sample_cv_id"
+  end
+
+  create_table "extended_metadata_types", force: :cascade do |t|
+    t.string "title"
+    t.integer "contributor_id"
+    t.text "supported_type"
   end
 
   create_table "external_assets", id: :integer, force: :cascade do |t|

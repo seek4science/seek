@@ -507,7 +507,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'handles error when generating diagram from CWL' do
-    bad_generator = MiniTest::Mock.new
+    bad_generator = Minitest::Mock.new
     def bad_generator.write_graph(struct)
       raise 'oh dear'
     end
@@ -1764,6 +1764,6 @@ class WorkflowsControllerTest < ActionController::TestCase
 
     get :show, params: { id: wf }
 
-    assert_select 'a.lifemonitor-status[href=?]', "https://localhost:8443/workflow;uuid=#{wf.uuid}"
+    assert_select 'a.lifemonitor-status[href=?]', "https://app.lifemonitor.eu/workflow;uuid=#{wf.uuid}"
   end
 end

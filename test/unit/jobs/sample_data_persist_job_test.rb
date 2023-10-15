@@ -6,13 +6,15 @@ class SampleDataPersistJobTest < ActiveSupport::TestCase
     @person = FactoryBot.create(:project_administrator)
     User.current_user = @person.user
 
+    @project_id = @person.projects.first.id
+
     @data_file = FactoryBot.create :data_file, content_blob: FactoryBot.create(:sample_type_populated_template_content_blob),
                                      policy: FactoryBot.create(:private_policy), contributor: @person
     refute @data_file.sample_template?
     assert_empty @data_file.possible_sample_types
 
     @sample_type = SampleType.new title: 'from template', uploaded_template: true,
-                                  project_ids: [@person.projects.first.id], contributor: @person
+                                  project_ids: [@project_id], contributor: @person
     @sample_type.content_blob = FactoryBot.create(:sample_type_template_content_blob)
     @sample_type.build_attributes_from_template
     # this is to force the full name to be 2 words, so that one row fails
@@ -47,6 +49,7 @@ class SampleDataPersistJobTest < ActiveSupport::TestCase
     assert_equal 3, @data_file.extracted_samples.count
     assert_equal @sample_type, @data_file.extracted_samples.first.sample_type
     assert_equal @person, @data_file.extracted_samples.first.contributor
+    assert_equal [@project_id], @data_file.extracted_samples.first.project_ids
   end
 
   test 'persists samples and associate with assay' do

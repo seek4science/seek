@@ -287,36 +287,36 @@ class AssaysControllerTest < ActionController::TestCase
     assert_equal 'fish', assay.assay_type_label
   end
 
-  test 'create a assay with custom metadata' do
-    cmt = FactoryBot.create(:simple_assay_custom_metadata_type)
+  test 'create a assay with extended metadata' do
+    cmt = FactoryBot.create(:simple_assay_extended_metadata_type)
     login_as(FactoryBot.create(:person))
     assert_difference('Assay.count') do
 
       assay_attributes = { title: 'test',
                            study_id: FactoryBot.create(:study,contributor:User.current_user.person).id,
                            assay_class_id: assay_classes(:modelling_assay_class).id }
-      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id,
+      cm_attributes = {extended_metadata_attributes:{extended_metadata_type_id: cmt.id,
                                                    data:{'name':'fred','age':22}}}
        post :create, params: { assay: assay_attributes.merge(cm_attributes), sharing: valid_sharing }
     end
 
     assert assay=assigns(:assay)
-    assert cm = assay.custom_metadata
-    assert_equal cmt, cm.custom_metadata_type
+    assert cm = assay.extended_metadata
+    assert_equal cmt, cm.extended_metadata_type
     assert_equal 'fred',cm.get_attribute_value('name')
     assert_equal '22',cm.get_attribute_value('age')
     assert_nil cm.get_attribute_value('date')
   end
 
-  test 'create a assay with custom metadata validated' do
-    cmt = FactoryBot.create(:simple_assay_custom_metadata_type)
+  test 'create a assay with extended metadata validated' do
+    cmt = FactoryBot.create(:simple_assay_extended_metadata_type)
     login_as(FactoryBot.create(:person))
 
     assert_no_difference('Assay.count') do
       assay_attributes = { title: 'test',
                            study_id: FactoryBot.create(:study,contributor:User.current_user.person).id,
                            assay_class_id: assay_classes(:modelling_assay_class).id }
-      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id, data:{'name':'fred','age':'not a number'}}}
+      cm_attributes = {extended_metadata_attributes:{extended_metadata_type_id: cmt.id, data:{'name':'fred','age':'not a number'}}}
 
 
       post :create, params: { assay: assay_attributes.merge(cm_attributes), sharing: valid_sharing }
@@ -329,7 +329,7 @@ class AssaysControllerTest < ActionController::TestCase
       assay_attributes = { title: 'test',
                            study_id: FactoryBot.create(:study,contributor:User.current_user.person).id,
                            assay_class_id: assay_classes(:modelling_assay_class).id }
-      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id, data:{'name':nil,'age':22}}}
+      cm_attributes = {extended_metadata_attributes:{extended_metadata_type_id: cmt.id, data:{'name':nil,'age':22}}}
 
       post :create, params: { assay: assay_attributes.merge(cm_attributes), sharing: valid_sharing }
     end

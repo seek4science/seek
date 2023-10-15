@@ -453,7 +453,7 @@ class InvestigationsControllerTest < ActionController::TestCase
   test 'shows how to get a citation for a snapshotted investigation' do
     study = FactoryBot.create(:study)
     investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:publicly_viewable_policy),
-                                            studies: [study], contributor:study.contributor)
+                                            studies: [study], contributor:study.contributor, creators: [study.contributor])
 
     login_as(investigation.contributor)
     investigation.create_snapshot
@@ -473,7 +473,8 @@ class InvestigationsControllerTest < ActionController::TestCase
     another_person = FactoryBot.create(:person,project:person.projects.first)
     study = FactoryBot.create(:study,contributor:another_person)
     investigation = FactoryBot.create(:investigation, projects:another_person.projects, contributor:another_person,
-                                            policy: FactoryBot.create(:publicly_viewable_policy), studies: [study])
+                                            policy: FactoryBot.create(:publicly_viewable_policy), studies: [study],
+                                      creators: [another_person])
 
     login_as(person)
     investigation.create_snapshot
@@ -602,14 +603,14 @@ class InvestigationsControllerTest < ActionController::TestCase
 
 
 
-  test 'create an investigation with custom metadata' do
-    cmt = FactoryBot.create(:simple_investigation_custom_metadata_type)
+  test 'create an investigation with extended metadata' do
+    cmt = FactoryBot.create(:simple_investigation_extended_metadata_type)
 
     login_as(FactoryBot.create(:person))
 
     assert_difference('Investigation.count') do
       inv_attributes = FactoryBot.attributes_for(:investigation, project_ids: [User.current_user.person.projects.first.id])
-      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id,
+      cm_attributes = {extended_metadata_attributes:{extended_metadata_type_id: cmt.id,
                                                    data:{
                                                        "name":'fred',
                                                        "age":22}}}
@@ -619,23 +620,23 @@ class InvestigationsControllerTest < ActionController::TestCase
 
     assert inv=assigns(:investigation)
 
-    assert cm = inv.custom_metadata
+    assert cm = inv.extended_metadata
 
-    assert_equal cmt, cm.custom_metadata_type
+    assert_equal cmt, cm.extended_metadata_type
     assert_equal 'fred',cm.get_attribute_value('name')
     assert_equal '22',cm.get_attribute_value('age')
     assert_nil cm.get_attribute_value('date')
   end
 
-  test 'create an investigation with custom metadata validated' do
-    cmt = FactoryBot.create(:simple_investigation_custom_metadata_type)
+  test 'create an investigation with extended metadata validated' do
+    cmt = FactoryBot.create(:simple_investigation_extended_metadata_type)
 
     login_as(FactoryBot.create(:person))
 
     # invalid age - needs to be a number
     assert_no_difference('Investigation.count') do
       inv_attributes = FactoryBot.attributes_for(:investigation, project_ids: [User.current_user.person.projects.first.id])
-      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id, data:{'name':'fred','age':'not a number'}}}
+      cm_attributes = {extended_metadata_attributes:{extended_metadata_type_id: cmt.id, data:{'name':'fred','age':'not a number'}}}
 
       put :create, params: { investigation: inv_attributes.merge(cm_attributes), sharing: valid_sharing }
     end
@@ -646,7 +647,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     # name is required
     assert_no_difference('Investigation.count') do
       inv_attributes = FactoryBot.attributes_for(:investigation, project_ids: [User.current_user.person.projects.first.id])
-      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id, data:{'name':nil,'age':22}}}
+      cm_attributes = {extended_metadata_attributes:{extended_metadata_type_id: cmt.id, data:{'name':nil,'age':22}}}
 
       put :create, params: { investigation: inv_attributes.merge(cm_attributes), sharing: valid_sharing }
     end

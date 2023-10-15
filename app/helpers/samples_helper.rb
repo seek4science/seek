@@ -3,7 +3,7 @@ module SamplesHelper
     element_class = "sample_attribute_#{attribute.sample_attribute_type.base_type.downcase}"
     element_name = "sample[data][#{attribute.title}]"
 
-    attribute_form_element(attribute, resource, element_name, element_class)
+    attribute_form_element(attribute, resource.get_attribute_value(attribute.title), element_name, element_class)
   end
 
   def controlled_vocab_form_field(sample_controlled_vocab, element_name, values, limit = 1)
@@ -41,33 +41,31 @@ module SamplesHelper
     controlled_vocab_form_field(sample_controlled_vocab, element_name, values, nil)
   end
 
-  def linked_custom_metadata_form_field(attribute,resource,element_name, element_class,depth)
-    linked_cms = resource.linked_custom_metadatas.select{|cm|cm.custom_metadata_attribute==attribute}
+  def linked_extended_metadata_multi_form_field(attribute, value, element_name, element_class)
+    render partial: 'extended_metadata/fancy_linked_extended_metadata_multi_attribute_fields',
+           locals: { value: value, attribute: attribute, element_name: element_name, element_class: element_class, collapsed: false }
+  end
 
-    id = linked_cms.blank? ? nil : linked_cms.select{|cm| cm.custom_metadata_type.id == attribute.linked_custom_metadata_type.id}.first.id
-
+  def linked_extended_metadata_form_field(attribute, value, element_name, element_class,depth)
     html = ''
-    html +=  hidden_field_tag "#{element_name}[id]",id
-    html +=  hidden_field_tag "#{element_name}[custom_metadata_type_id]", attribute.linked_custom_metadata_type.id
-    html +=  hidden_field_tag "#{element_name}[custom_metadata_attribute_id]", attribute.id
 
-    attribute.linked_custom_metadata_type.custom_metadata_attributes.each do |attr|
-      linked_cm = linked_cms.select{|cm| cm.custom_metadata_type_id == attr.custom_metadata_type_id}.first
-      linked_cm ||= CustomMetadata.new(:custom_metadata_type_id => attr.custom_metadata_type_id)
+    Rails.logger.info ActiveSupport::LogSubscriber.new.send(:color, attribute.inspect, :blue, bold = true)
 
-      attr_element_name = "#{element_name}][data][#{attr.title}]"
+    attribute.linked_extended_metadata_type.extended_metadata_attributes.each do |attr|
+      attr_element_name = "#{element_name}[#{attr.title}]"
       html += '<div class="form-group"><label>'+attr.label+'</label>'
       html +=  required_span if attr.required?
-      if attr.linked_custom_metadata?
-        html += '<div class="form-group linked_custom_metdata_'+(depth.even? ? 'even' : 'odd')+'">'
-        html +=  attribute_form_element(attr, linked_cm, attr_element_name, element_class,depth+1)
+      v = value ? value[attr.title] : nil
+      if attr.linked_extended_metadata?
+        html += '<div class="form-group linked_extended_metdata_'+(depth.even? ? 'even' : 'odd')+'">'
+        html +=  attribute_form_element(attr, v, attr_element_name, element_class,depth+1)
         html += '</div>'
       else
-        html +=  attribute_form_element(attr, linked_cm, attr_element_name, element_class)
+        html +=  attribute_form_element(attr, v, attr_element_name, element_class)
       end
 
       unless attr.description.nil?
-        html += custom_metadata_attribute_description(attr.description)
+        html += extended_metadata_attribute_description(attr.description)
       end
       html += '</div>'
     end
@@ -118,8 +116,12 @@ module SamplesHelper
     title.html_safe
   end
 
-  def display_attribute(sample, attribute, options = {})
-    value = sample.get_attribute_value(attribute)
+  def display_attribute(resource, attribute, options = {})
+    value = resource.get_attribute_value(attribute)
+    display_attribute_value(value, attribute, options.merge(resource: resource))
+  end
+
+  def display_attribute_value(value, attribute, options = {})
     if value.blank?
       text_or_not_specified(value)
     else
@@ -140,10 +142,12 @@ module SamplesHelper
         seek_cv_attribute_display(value, attribute)
       when Seek::Samples::BaseType::CV_LIST
         value.each{|v| seek_cv_attribute_display(v, attribute) }.join(', ')
-      when Seek::Samples::BaseType::LINKED_CUSTOM_METADATA
-        linked_custom_metadata_attribute_display(value)
+      when Seek::Samples::BaseType::LINKED_EXTENDED_METADATA
+        linked_extended_metadata_attribute_display(value, attribute)
+      when Seek::Samples::BaseType::LINKED_EXTENDED_METADATA_MULTI
+        linked_extended_metadata_multi_attribute_display(value, attribute)
       else
-        default_attribute_display(attribute, options, sample, value)
+        default_attribute_display(value, attribute, options)
       end
     end
   end
@@ -157,16 +161,33 @@ module SamplesHelper
     content
   end
 
-  def linked_custom_metadata_attribute_display(value)
+  def linked_extended_metadata_attribute_display(value, attribute)
     html = ''
     html += '<ul>'
-       CustomMetadata.find(value.id).custom_metadata_attributes.each do |attr|
-       html += '<li>'
-         html += '<label>'+attr.title+'</label>'+' : '
-         html += display_attribute(value,attr)
-       html += '</li>'
+    attribute.linked_extended_metadata_type.extended_metadata_attributes.each do |attr|
+      v = value ? value[attr.title.to_s] : nil
+      html += '<li>'
+      if attr.linked_extended_metadata? || attr.linked_extended_metadata_multi?
+        html += content_tag(:span, class: 'linked_extended_metdata_display') do
+          folding_panel(attr.label, true, id:attr.title) do
+            display_attribute_value(v, attr)
+          end
+        end
+      else
+        html += '<label>'+attr.title+'</label>'+' : '
+        html += display_attribute_value(v, attr)
       end
+      html += '</li>'
+    end
     html += '</ul>'
+    html.html_safe
+  end
+
+  def linked_extended_metadata_multi_attribute_display(values, attribute)
+    html = ''
+    values.each do |value|
+      html += linked_extended_metadata_attribute_display(value, attribute)
+    end
     html.html_safe
   end
 
@@ -195,14 +216,14 @@ module SamplesHelper
     end
   end
 
-  def default_attribute_display(attribute, options, sample, value)
-    resolution = attribute.resolve (value)
-    if (resolution != nil)
+  def default_attribute_display(value, attribute, options)
+    resolution = attribute.resolve(value)
+    if resolution
       link_to(value, resolution, target: :_blank)
-    else if options[:link] && attribute.is_title
-        link_to(value, sample)
+    else
+      if options[:link] && options[:resource] && attribute.is_title
+        link_to(value, options[:resource])
       else
-      
         text_or_not_specified(value, auto_link: options[:link])
       end
     end
@@ -282,8 +303,7 @@ module SamplesHelper
 
   private
 
-  def attribute_form_element(attribute, resource, element_name, element_class, depth=1)
-    value = resource.get_attribute_value(attribute.title)
+  def attribute_form_element(attribute, value, element_name, element_class, depth=1)
     placeholder = "e.g. #{attribute.sample_attribute_type.placeholder}" unless attribute.sample_attribute_type.placeholder.blank?
 
     case attribute.sample_attribute_type.base_type
@@ -327,8 +347,10 @@ module SamplesHelper
       sample_form_field attribute, element_name, value
     when Seek::Samples::BaseType::SEEK_SAMPLE_MULTI
       sample_multi_form_field attribute, element_name, value
-    when Seek::Samples::BaseType::LINKED_CUSTOM_METADATA
-      linked_custom_metadata_form_field attribute, resource, element_name, element_class,depth
+    when Seek::Samples::BaseType::LINKED_EXTENDED_METADATA
+      linked_extended_metadata_form_field attribute, value, element_name, element_class,depth
+    when Seek::Samples::BaseType::LINKED_EXTENDED_METADATA_MULTI
+      linked_extended_metadata_multi_form_field attribute, value, element_name, element_class
     else
       text_field_tag element_name, value, class: "form-control #{element_class}", placeholder: placeholder
     end

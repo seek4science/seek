@@ -54,6 +54,10 @@ class SampleAttribute < ApplicationRecord
     URI.parse(pid).fragment || pid.gsub(/.*\//,'') || pid
   end
 
+  def linked_extended_metadata_type
+    nil
+  end
+
   private
 
   def store_accessor_name

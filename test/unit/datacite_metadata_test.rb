@@ -8,11 +8,12 @@ class DataciteMetadataTest < ActiveSupport::TestCase
     User.current_user = contributor.user
 
     @investigation = FactoryBot.create(:investigation, title: 'i1', description: 'not blank',
-                             policy: FactoryBot.create(:downloadable_public_policy), contributor:contributor)
+                                                       policy: FactoryBot.create(:downloadable_public_policy),
+                                                       contributor: contributor, creators: [contributor])
     @study = FactoryBot.create(:study, title: 's1', investigation: @investigation, contributor: @investigation.contributor,
-                     policy: FactoryBot.create(:downloadable_public_policy))
+                     policy: FactoryBot.create(:downloadable_public_policy), creators: [contributor])
     @assay = FactoryBot.create(:assay, title: 'a1', study: @study, contributor: @investigation.contributor,
-                     policy: FactoryBot.create(:downloadable_public_policy))
+                     policy: FactoryBot.create(:downloadable_public_policy), creators: [contributor])
     @assay2 = FactoryBot.create(:assay, title: 'a2', study: @study, contributor: @investigation.contributor,
                       policy: FactoryBot.create(:downloadable_public_policy))
     @data_file = FactoryBot.create(:data_file, title: 'df1', contributor: @investigation.contributor,
