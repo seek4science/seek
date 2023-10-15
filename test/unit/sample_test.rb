@@ -746,7 +746,7 @@ class SampleTest < ActiveSupport::TestCase
     refute sample2.can_view?(nil)
   end
 
-  test 'extracted samples inherit projects from data file' do
+  test 'extracted samples copy projects from data file' do
     person = FactoryBot.create(:person)
     create_sample_attribute_type
     data_file = FactoryBot.create :data_file, content_blob: FactoryBot.create(:sample_type_populated_template_content_blob),
@@ -769,9 +769,9 @@ class SampleTest < ActiveSupport::TestCase
       data_file.save!
     end
 
-    assert_equal new_projects.sort, sample.projects.sort
-    assert_equal sample.projects.sort, data_file.projects.sort
-    assert_equal sample.project_ids.sort, data_file.project_ids.sort
+    assert_not_equal new_projects.sort, sample.projects.sort
+    assert_not_equal sample.projects.sort, data_file.projects.sort
+    assert_not_equal sample.project_ids.sort, data_file.project_ids.sort
   end
 
   test 'extracted samples inherit creators from data file' do
