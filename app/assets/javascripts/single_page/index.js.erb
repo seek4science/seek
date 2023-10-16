@@ -213,6 +213,14 @@ async function exportToExcel(tableName, studyId, assayId, sampleTypeId) {
     // For some reason they contain null values, which should be filtered out
     let bodyCells = $j(`table[id=${tableName}]`).DataTable().data().toArray().map(subarray => subarray.filter(function(el){return el != null}));
 
+    // Checks whether the dynamic table has errors
+    // The excel export will be aborted as long as the dynamic table has errors
+    hasErrorcells = $j(`table[id=${tableName}]`).find('select.select2__error').size() > 0
+    if (hasErrorcells) {
+      alert('It appears the dynamic table has some errors. Please correct the errors in the dynamic table and try downloading again.');
+      return;
+    }
+
     // Return array of table header cells from headerRow
     let headerCells = [];
     $j.each(headerRow.cells, function (i, v) {
