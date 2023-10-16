@@ -251,9 +251,6 @@ class ModelsControllerTest < ActionController::TestCase
     person = FactoryBot.create(:person)
     login_as(person)
 
-    # pp cmt
-    # pp cmt.extended_metadata_attributes
-
     assert_difference('ActivityLog.count') do
       assert_difference('Model.count') do
         assert_difference('Model::Version.count') do
@@ -273,7 +270,6 @@ class ModelsControllerTest < ActionController::TestCase
 
     assert model = assigns(:model)
     cm = model.extended_metadata
-    pp cm
     assert_equal cmt, cm.extended_metadata_type
     assert_equal 'fred',cm.get_attribute_value('name')
     assert_equal 22,cm.get_attribute_value('age')

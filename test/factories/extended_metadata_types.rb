@@ -78,6 +78,11 @@ FactoryBot.define do
   factory(:simple_model_extended_metadata_type, parent: :simple_investigation_extended_metadata_type) do
     title { 'simple model extended metadata type' }
     supported_type { 'Model' }
+    end
+
+  factory(:simple_data_file_extended_metadata_type, parent: :simple_investigation_extended_metadata_type) do
+    title { 'simple data file extended metadata type' }
+    supported_type { 'DataFile' }
   end
 
   factory(:study_extended_metadata_type_with_spaces, class: ExtendedMetadataType) do

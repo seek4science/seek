@@ -3302,6 +3302,74 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal [sop], assay.sops
   end
 
+  test 'create, update and show a data file with extended metadata' do
+    cmt = FactoryBot.create(:simple_data_file_extended_metadata_type)
+
+    person = FactoryBot.create(:person)
+    login_as(person)
+    blob = FactoryBot.create(:content_blob)
+    session[:uploaded_content_blob_id] = blob.id
+    project = person.projects.last
+    params = { data_file: {
+      title: 'Small File',
+      project_ids: [project.id],
+      extended_metadata_attributes:{ extended_metadata_type_id: cmt.id,
+                                     data:{ 'age': 22,'name':'fred'}}
+    }, tag_list:'fish, soup',
+               policy_attributes: valid_sharing,
+               content_blob_id: blob.id.to_s,
+               assay_ids: [] }
+
+
+
+    assert_difference('ActivityLog.count') do
+      assert_difference('DataFile.count') do
+        assert_no_difference('Assay.count') do
+          assert_no_difference('AssayAsset.count') do
+            assert_difference('ExtendedMetadata.count') do
+              post :create_metadata, params: params
+            end
+          end
+        end
+      end
+    end
+
+    assert (df = assigns(:data_file))
+
+    cm = df.extended_metadata
+    assert_equal cmt, cm.extended_metadata_type
+    assert_equal 'fred',cm.get_attribute_value('name')
+    assert_equal 22,cm.get_attribute_value('age')
+    assert_nil cm.get_attribute_value('date')
+
+    get :show, params: { id: df }
+    assert_response :success
+
+    assert_select 'div.extended_metadata',text:/fred/, count:1
+    assert_select 'div.extended_metadata',text:/22/, count:1
+
+    # test update
+    old_id = cm.id
+    assert_no_difference('DataFile.count') do
+      assert_no_difference('ExtendedMetadata.count') do
+        put :update, params: { id: df.id, data_file: { title: "new title",
+                                                      extended_metadata_attributes: { extended_metadata_type_id: cmt.id, id: cm.id,
+                                                                                      data: {
+                                                                                        "age": 20,
+                                                                                        "name": 'max'
+                                                                                      } }
+        }
+        }
+      end
+    end
+
+    assert new_df = assigns(:data_file)
+    assert_equal 'new title', new_df.title
+    assert_equal 'max', new_df.extended_metadata.get_attribute_value('name')
+    assert_equal 20, new_df.extended_metadata.get_attribute_value('age')
+    assert_equal old_id, new_df.extended_metadata.id
+  end
+
   test 'new assay adopts datafile policy' do
     person = FactoryBot.create(:person)
     manager = FactoryBot.create(:person)
