@@ -69,7 +69,7 @@ const handleSelect = (e) => {
               const hasUnlinkedSamples = unLinkedSamples.length > 0 ? true : false;
 
               const extraClass = hasUnlinkedSamples ? 'select2__error' : '';
-              const titleText = hasUnlinkedSamples ? `Sample(s) '${unLinkedSamples.map(uls => uls.title).join(', ')}' not recognised as sources. Please correct this issue!` : '';
+              const titleText = hasUnlinkedSamples ? `Sample(s) '${unLinkedSamples.map(uls => uls.title).join(', ')}' not recognised as input. Please correct this issue!` : '';
 
               return objectInputTemp
               .replace(/_NAME_/g, objectInputName)
