@@ -115,9 +115,6 @@ class DocumentsControllerTest < ActionController::TestCase
     person = FactoryBot.create(:person)
     login_as(person)
 
-    # pp cmt
-    # pp cmt.extended_metadata_attributes
-
     assert_difference('ActivityLog.count') do
       assert_difference('Document.count') do
         assert_difference('Document::Version.count') do
