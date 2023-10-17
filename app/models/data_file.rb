@@ -20,6 +20,8 @@ class DataFile < ApplicationRecord
 
   belongs_to :file_template
   has_many :extracted_samples, class_name: 'Sample', foreign_key: :originating_data_file_id
+  has_many :sample_resource_links, -> { where(resource_type: 'DataFile') }, class_name: 'SampleResourceLink', foreign_key: :resource_id
+  has_many :linked_samples, through: :sample_resource_links, source: :sample
 
   has_many :workflow_data_files, dependent: :destroy, autosave: true
   has_many :workflows, ->{ distinct }, through: :workflow_data_files
@@ -122,8 +124,7 @@ class DataFile < ApplicationRecord
   end
 
   def related_samples
-    sample_ids = SampleResourceLink.where('resource_type': 'DataFile', 'resource_id': id).pluck('sample_id')
-    extracted_samples + Sample.where(id: sample_ids)
+    extracted_samples + linked_samples
   end
 
   # Extracts samples using the given sample_type
