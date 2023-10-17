@@ -1354,31 +1354,32 @@ class SampleTest < ActiveSupport::TestCase
 
   test 'related datafiles include datafiles in attributes and originating datafile' do
     project = FactoryBot.create(:project)
-    type1 = FactoryBot.create(:simple_sample_type, project_ids: [project.id])
-    type2 = FactoryBot.create(:data_file_sample_type, project_ids: [project.id])
-    type2.sample_attributes << FactoryBot.build(:data_file_sample_attribute, title: 'data file 2', sample_type: type2)
+    simple_type = FactoryBot.create(:simple_sample_type, project_ids: [project.id])
+    type_with_df_attr = FactoryBot.create(:data_file_sample_type, project_ids: [project.id])
+    df_attr = FactoryBot.build(:data_file_sample_attribute, title: 'data file 2', sample_type: type_with_df_attr)
+    type_with_df_attr.sample_attributes << df_attr
     df1 = FactoryBot.create(:data_file)
     df2 = FactoryBot.create(:data_file)
     df3 = FactoryBot.create(:data_file)
     # Sample with no data files linked as attribute nor originating data file
-    sample1 = Sample.new(sample_type: type1, project_ids: [project.id])
+    sample_no_df = Sample.new(sample_type: simple_type, project_ids: [project.id])
     # Sample with originating data file only
-    sample2 = Sample.new(sample_type: type1, project_ids: [project.id], originating_data_file: df3)
+    sample_extracted = Sample.new(sample_type: simple_type, project_ids: [project.id], originating_data_file: df3)
     # Sample with data files linked as attributes
-    sample3 = Sample.new(sample_type: type2, project_ids: [project.id])
-    sample3.update(data: { 'data file': df1.id })
-    sample3.update(data: { 'data file 2': df2.id })
-    sample3.save!
+    sample_attributes = Sample.new(sample_type: type_with_df_attr, project_ids: [project.id])
+    sample_attributes.update(data: { 'data file': df1.id })
+    sample_attributes.update(data: { 'data file 2': df2.id })
+    sample_attributes.save!
     # Sample with data files linked as attributes and originating data file
-    sample4 = Sample.new(sample_type: type2, project_ids: [project.id], originating_data_file: df3)
-    sample4.update(data: { 'data file': df1.id })
-    sample4.update(data: { 'data file 2': df2.id })
-    sample4.save!
+    sample_ext_attr = Sample.new(sample_type: type_with_df_attr, project_ids: [project.id], originating_data_file: df3)
+    sample_ext_attr.update(data: { 'data file': df1.id })
+    sample_ext_attr.update(data: { 'data file 2': df2.id })
+    sample_ext_attr.save!
 
-    assert_equal [], sample1.related_data_files
-    assert_equal [df3], sample2.related_data_files
-    assert_equal [df1, df2].sort_by(&:id), sample3.related_data_files.sort_by(&:id)
-    assert_equal [df1, df2, df3].sort_by(&:id), sample4.related_data_files.sort_by(&:id)
+    assert_equal [], sample_no_df.related_data_files
+    assert_equal [df3], sample_extracted.related_data_files
+    assert_equal [df1, df2].sort_by(&:id), sample_attributes.related_data_files.sort_by(&:id)
+    assert_equal [df1, df2, df3].sort_by(&:id), sample_ext_attr.related_data_files.sort_by(&:id)
   end
 
 end
