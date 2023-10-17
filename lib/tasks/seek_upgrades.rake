@@ -92,8 +92,10 @@ namespace :seek do
       df_attrs = SampleAttribute.joins(:sample_attribute_type).where('sample_attribute_types.base_type' => Seek::Samples::BaseType::SEEK_DATA_FILE).pluck(:id)
       samples = Sample.joins(sample_type: :sample_attributes).where('sample_attributes.id' => df_attrs)
       samples.each do |sample|
-        sample.send(:update_sample_resource_links)
-        samples_updated += 1
+        if sample.sample_resource_links.where(resource_type: 'DataFile').empty?
+          sample.send(:update_sample_resource_links)
+          samples_updated += 1
+        end
       end
     end
     puts " ... finished updating sample_resource_links of #{samples_updated.to_s} samples with data_file attributes"
