@@ -217,7 +217,7 @@ async function exportToExcel(tableName, studyId, assayId, sampleTypeId) {
     // The excel export will be aborted as long as the dynamic table has errors
     hasErrorcells = $j(`table[id=${tableName}]`).find('select.select2__error').size() > 0
     if (hasErrorcells) {
-      alert('It appears the dynamic table has some errors. Please correct the errors in the dynamic table and try downloading again.');
+      alert('It appears this sample table has some errors. Please correct the errors in the current sample table and try downloading again.');
       return;
     }
 
