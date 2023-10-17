@@ -70,7 +70,9 @@ class SinglePagesController < ApplicationController
     @project = @study.projects.first
     @samples = Sample.where(id: sample_ids)&.authorized_for(:view)&.sort_by(&:id)
 
-    raise 'Nothing to export to Excel.' if @samples.nil? || @samples == [] || sample_type_id.nil?
+    if @samples.nil? || @samples == [] || sample_type_id.nil?
+      raise 'Nothing to export to Excel. Please select samples in the table and try downloading the table again.'
+    end
 
     @sample_type = SampleType.find(sample_type_id)
 
