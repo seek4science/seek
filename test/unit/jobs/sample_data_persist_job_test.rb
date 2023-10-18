@@ -25,7 +25,7 @@ class SampleDataPersistJobTest < ActiveSupport::TestCase
 
   test 'queue job' do
     assert_enqueued_jobs(1, only: SampleDataPersistJob) do
-      SampleDataPersistJob.new(@data_file, @sample_type).queue_job
+      SampleDataPersistJob.new(@data_file, @sample_type, @person.user).queue_job
     end
     @data_file.reload
     assert_equal Task::STATUS_QUEUED, @data_file.sample_persistence_task.status
@@ -36,7 +36,7 @@ class SampleDataPersistJobTest < ActiveSupport::TestCase
       assert_difference('ReindexingQueue.count', 3) do
         assert_difference('AuthLookupUpdateQueue.count', 3) do
           with_config_value(:auth_lookup_enabled, true) do # needed to test added to queue
-            SampleDataPersistJob.perform_now(@data_file, @sample_type)
+            SampleDataPersistJob.perform_now(@data_file, @sample_type, @person.user)
           end
         end
       end
@@ -59,7 +59,7 @@ class SampleDataPersistJobTest < ActiveSupport::TestCase
 
     assert_difference('AssayAsset.count', 3) do
       assert_difference('Sample.count', 3) do
-        SampleDataPersistJob.perform_now(@data_file, @sample_type, assay_ids: [assay_asset1.assay_id])
+        SampleDataPersistJob.perform_now(@data_file, @sample_type, @person.user, assay_ids: [assay_asset1.assay_id])
       end
     end
 
@@ -72,12 +72,12 @@ class SampleDataPersistJobTest < ActiveSupport::TestCase
 
   test 'records exception' do
     class FailingSampleDataPersistJob < SampleDataPersistJob
-      def perform(data_file, sample_type, assay_ids: nil)
+      def perform(data_file, sample_type, user, assay_ids: nil)
         raise 'critical error'
       end
     end
 
-    FailingSampleDataPersistJob.perform_now(@data_file, @sample_type)
+    FailingSampleDataPersistJob.perform_now(@data_file, @sample_type, @person.user)
 
     task = @data_file.sample_persistence_task
     assert task.failed?
