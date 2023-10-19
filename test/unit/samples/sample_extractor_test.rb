@@ -66,6 +66,9 @@ class SampleExtractorTest < ActiveSupport::TestCase
     assert_difference('Sample.count', 2) do
       extracted_samples = Seek::Samples::Extractor.new(template_data_file, sample_type).persist(person.user)
       assert_equal 2, extracted_samples.count
+      assert_equal ['sample one', 'sample two'], extracted_samples.collect(&:title).sort
+      assert_equal [child_sample1], extracted_samples.detect{|s| s.title=='sample one'}.linked_samples
+      assert_equal [child_sample2], extracted_samples.detect{|s| s.title=='sample two'}.linked_samples
     end
   end
 
