@@ -259,6 +259,12 @@ FactoryBot.define do
     content_type { 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }
     data { File.new("#{Rails.root}/test/fixtures/files/linked-samples-complete.xlsx", 'rb').read }
   end
+
+  factory(:linked_samples_with_patient_content_blob, parent: :content_blob) do
+    original_filename { 'Patient Samples.xlsx' }
+    content_type { 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }
+    data { File.new("#{Rails.root}/test/fixtures/files/linked-samples-with-patient.xlsx", 'rb').read }
+  end
   
   factory(:rightfield_master_template, parent: :content_blob) do
     original_filename { 'populated-master-template.xlsx' }
