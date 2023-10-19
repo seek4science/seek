@@ -8,7 +8,7 @@ class SampleDataPersistJob < TaskJob
     Rails.logger.info('Starting to persist samples')
     time = Benchmark.measure do
       User.with_current_user(user) do
-        samples = extractor.persist.select(&:persisted?)
+        samples = extractor.persist(user).select(&:persisted?)
         extractor.clear
         data_file.copy_assay_associations(samples, assay_ids) unless assay_ids.blank?
       end
