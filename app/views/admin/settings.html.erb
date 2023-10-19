@@ -28,7 +28,7 @@
                            'Session store timeout', 'The length of time, in MINUTES, that the server session store is active until it expires. (Requires a restart after changing)') %>
     <%= admin_checkbox_setting(:cache_remote_files, 1, Seek::Config.cache_remote_files,
                                "Cache remote files", "If this setting is enabled, SEEK will attempt to download remote content from the provided URL and store the content in the filestore.",
-                               :onchange=>toggle_appear_javascript('cache_remote_block')) %>
+                               onchange: toggle_appear_javascript('cache_remote_block')) %>
     <div id="cache_remote_block" class="additional_settings" style="<%= show_or_hide_block Seek::Config.cache_remote_files -%>">
       <%= admin_text_setting(:max_cachable_size, Seek::Config.max_cachable_size,
                              'Maximum file size', 'The size limit (in bytes) below which SEEK will automatically cache remote files. Remote files larger than this limit will be ignored unless the user explicitly requests.',
@@ -96,7 +96,7 @@
     <h2>Registration settings</h2>
     <%= admin_checkbox_setting(:registration_disabled, 1, Seek::Config.registration_disabled,
                                "Registration disabled", "Whether new accounts creation is disabled. Can be useful in combination with external authentication (e.g. LDAP)",
-                               :onchange=>toggle_appear_javascript('registration_disabled_textarea')) %>
+                               onchange: toggle_appear_javascript('registration_disabled_textarea')) %>
     <div id="registration_disabled_textarea" class="additional_settings" style="<%= show_or_hide_block Seek::Config.registration_disabled -%>">
 
       <%= admin_textarea_setting(:registration_disabled_description, Seek::Config.registration_disabled_description,
@@ -111,7 +111,7 @@
 
     <%= admin_checkbox_setting(:recaptcha_enabled, 1, Seek::Config.recaptcha_enabled,
                                'Captcha enabled', 'Enable to show a captcha on forms susceptible to spam',
-                               :onchange=>toggle_appear_javascript('captcha_key_settings')) %>
+                               onchange: toggle_appear_javascript('captcha_key_settings')) %>
 
     <div id="captcha_key_settings" class="additional_settings" style="<%= show_or_hide_block(Seek::Config.recaptcha_enabled) %>">
       <p>
