@@ -1,5 +1,3 @@
-<% tab ||= 'manual' %>
-
 <span id='modal-dialogues'>
     <%= sample_controlled_vocab_model_dialog('cv-modal') %>
 </span>
@@ -7,34 +5,62 @@
 <%= form_for(@template, html: { multipart: true }) do |f| %>
     <%= f.error_messages %>
 
-    <% if @template.new_record? %>
-        <%= folding_panel('Create template using existing template', false, {help_text: "Create template based on existing templates", :body_options => {:id => 'add_custom_attribute_panel'}}) do %>
-            <input type="button" value="Choose from existing templates" class="btn btn-primary" onClick="showTemplateModal()">
-        <% end %>
-    <% end %>
-
     <div class="form-group">
         <label>Title</label><%= required_span %>
-        <%= f.text_field :title, :class => 'form-control', :placeholder => 'Template name' %>
+        <%= f.text_field :title, class: 'form-control', placeholder: 'Template name' %>
     </div>
 
     <div class="form-group">
         <label>Description</label>
-        <%= f.text_area :description, :class=>"form-control rich-text-edit", rows: 5, id: "template-description" -%>
+        <%= f.text_area :description, class: "form-control rich-text-edit", rows: 5, id: "template-description" -%>
     </div>
 
-    <%= render :partial => "projects/project_selector", :locals => { :resource => @template } -%>
+    <%= render partial: "projects/project_selector", locals: { resource: @template } -%>
 
     <%= render partial: 'assets/manage_specific_attributes', locals:{f:f} if show_form_manage_specific_attributes? %>
 
-    <%= f.hidden_field :parent_id %>
-
     <div class="tab-content">
-        <div role="tabpanel" class="tab-pane<%= ' active'.html_safe if tab == 'manual' -%>" id="manual">
-            
-            <%= render :partial => "templates/template_modal" -%>
+        <div role="tabpanel" class="active" id="manual">
+
+            <%= render partial: "templates/template_modal" -%>
+            <div class="form-group">
+
+                <h3>Template Information</h3>
+
+                <% if @template.new_record? %>
+                    <div class="form-group">
+                        <input type="button" value="Choose from existing templates" class="btn btn-primary" onClick="showTemplateModal()">
+                    </div>
+                <% end %>
+
+                <div class="form-group">
+                    <%= f.label :level, 'ISA Level' %>
+                    <%= f.text_field :level, { class: 'form-control', readonly: true } %>
+                </div>
+                <div class="form-group">
+                    <%= f.label :organism %>
+                    <%= f.text_field :organism, {class: 'form-control'} %>
+                </div>
+                <div class="form-group">
+                    <%= f.label :version %>
+                    <%= f.text_field :version, {class: 'form-control', value: (@template.new_record? ? '1.0.0' : nil)} %>
+                </div>
+                <div class="form-group">
+                    <%= f.label :group %>
+                    <%= f.text_field :group, {class: 'form-control', readonly: true} %>
+                </div>
+                <div class="form-group">
+                    <%= f.hidden_field :parent_id %>
+                </div>
+
+            </div>
 
             <h3>Attributes</h3>
+            <div class="alert alert-warning alert-dismissible" role="alert">
+                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                <b class="text-danger">To ensure compliance with the original template, please do not modify the existing ISA-tags and attributes in the form below. You can always add new attributes.</b>
+            </div>
+
             <table class="table" id="attribute-table">
                 <thead>
                     <tr>
@@ -44,19 +70,20 @@
                         <th width="5em">Title?</th>
                         <th>Type<%= required_span %></th>
                         <th>Description</th>
-                        <th>PID</th>
+                        <th>PID <%= help_icon(t('samples.pid_info_text')) %> </th>
+                        <th>ISA Tag<%= required_span %> <%= help_icon(t('templates.isa_tag_info_text')) %></th>
                         <th>Unit</th>
                     </tr>
                 </thead>
                 <tbody>
                     <% @template.template_attributes.each_with_index do |template_attribute, index| %>
-                        <%= render :partial => 'template_attribute_form', :locals => { :index => index,
-                                                                                :template_attribute => template_attribute,
-                                                                                :template=>@template} %>
+                        <%= render partial: 'template_attribute_form', locals: { index: index,
+                                                                                template_attribute: template_attribute,
+                                                                                template: @template } %>
                     <% end %>
                     <tr id="add-attribute-row">
                         <td colspan="6">
-                            <%= button_link_to('Add new attribute', 'add', '#', :id => 'add-attribute') %>
+                            <%= button_link_to('Add new attribute', 'add', '#', id: 'add-attribute') %>
                         </td>
                     </tr>
                 </tbody>
@@ -70,7 +97,7 @@
 
 <table id="new-attribute-row" style="display: none">
     <tbody>
-        <%= render :partial => 'template_attribute_form', :locals=> {:template=>@template} %>
+        <%= render partial: 'template_attribute_form', locals: { template: @template } %>
     </tbody>
 </table>
 
@@ -96,6 +123,7 @@
             newRow = newRow.replace(/replace-me/g, index);
             SampleTypes.unbindSortable();
             $j('#attribute-table #add-attribute-row').before($j(newRow));
+
             SampleTypes.recalculatePositions();
             SampleTypes.bindSortable();
             return false;
@@ -106,12 +134,23 @@
         $j('#attribute-table').on('change', '.sample-type-attribute-type', SampleTypes.attributeTypeChanged);
         $j('#attribute-table').on('change', '.controlled-vocab-selection', SampleTypeControlledVocab.controlledVocabChanged);
         $j('#attribute-table .sample-type-attribute-type').trigger("change", [false]);
-				$j('.templates').select2({theme: "bootstrap"});
-				initSelect2($j('.templates'), $j('#existing_templates'))
+        $j('.templates').select2({theme: "bootstrap"});
+        $j('#attribute-table').on('change', 'select[data-attr="isa_tag_title"]', function() {
+            const hiddenInputName = $j(this).attr('name').replace('isa_tag_title', 'isa_tag_id');
+            const isa_tag_id_sel = $j(this).val();
 
+            $j(`input:hidden[name="${hiddenInputName}"]`).val(isa_tag_id_sel);
+
+        });
+        initSelect2($j('.templates'), $j('#existing_templates'));
         Templates.clearContext();
         Templates.init($j('#template-attributes'));
+
+        // Makes sure existing sampletype attributes are disabled
+        $j('#attribute-table tr.sample-attribute')
+            .has('input[data-attr="isa_tag_id"][value]')
+            .find('[data-attr="isa_tag_title"]').attr('disabled', true);
     });
 
-    const templates = <%= load_templates().to_json.html_safe %>
+    const templates = <%= load_templates().to_json.html_safe %>;
 </script>
