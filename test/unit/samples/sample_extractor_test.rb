@@ -72,7 +72,7 @@ class SampleExtractorTest < ActiveSupport::TestCase
 
       # check the linked resources have been updated via a callback
       assert_equal [child_sample1], sample1.linked_samples
-      assert_equal [child_sample2], sample2.detect{|s| s.title=='sample two'}.linked_samples
+      assert_equal [child_sample2], sample2.linked_samples
 
       # check the title is set and saved via a callback
       assert_equal 'sample one', Sample.find(sample1.id).title
