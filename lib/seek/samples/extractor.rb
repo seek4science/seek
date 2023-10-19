@@ -39,6 +39,10 @@ module Seek
               samples = Sample.where(sample_type: sample_type, title: samples.collect(&:title), contributor: contributor).where(
                 'id > ?', last_id
               )
+              # makes sure linked resources are updated
+              samples.each do |sample|
+                sample.run_callbacks(:validation) { false }
+              end
               ReindexingQueue.enqueue(samples)
               AuthLookupUpdateQueue.enqueue(samples)
             end
