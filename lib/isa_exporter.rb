@@ -189,7 +189,7 @@ module IsaExporter
       first_assay = assays.detect { |s| s.position.zero? }
       raise 'No assay could be found!' unless first_assay
 
-      stream_name = 'a_assays.txt'
+      stream_name = "assays_#{assays.pluck(:id).join('_')}"
       assay_comments = convert_assay_comments(assays)
 
       # Retrieve assay_stream if
