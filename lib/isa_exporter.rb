@@ -547,7 +547,7 @@ module IsaExporter
 
     def process_sequence_output(sample)
       prefix = 'sample'
-      if sample.sample_type.isa_template.level == 'assay'
+      if sample.sample_type.isa_template.level.include?('assay')
         if detect_other_material(sample.sample_type)
           prefix = 'other_material'
         elsif detect_data_file(sample.sample_type)
