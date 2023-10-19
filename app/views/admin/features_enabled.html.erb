@@ -35,7 +35,7 @@
                                "Project folders enabled","If set, the folders of the projects will be shown in the tree view.") %>
   </div>
   <%= admin_checkbox_setting(:isa_json_compliance_enabled, 1, Seek::Config.isa_json_compliance_enabled,
-                             "Compliance with ISA-JSON schemas enabled","Whether the option to comply with the ISA-JSON format specification is enabled. The user will be able to create Investigation, Study and Assay according to the ISA-JSON specification, and to export information as an ISA-JSON file. Requires 'Single Page enabled' and 'ISA enabled'. If set, an option appears to upload default Templates to specify instance-wide ISA-JSON compliant schemas.", :onchange=>toggle_appear_javascript('add_default_templates')) %>
+                             "Compliance with ISA-JSON schemas enabled","Whether the option to comply with the ISA-JSON format specification is enabled. The user will be able to create Investigation, Study and Assay according to the ISA-JSON specification, and to export information as an ISA-JSON file. <strong>Requires 'Single Page enabled', 'ISA enabled' and 'Samples enabled'. 'SOPs enabled' is recommended.</strong> <br>If enabled, an option appears to upload default Templates to specify instance-wide ISA-JSON compliant schemas.", :onchange=>toggle_appear_javascript('add_default_templates')) %>
   <div id="add_default_templates" class="additional_settings" style="<%= show_or_hide_block Seek::Config.isa_json_compliance_enabled -%>">
     <%= link_to("Add default #{t(:template).pluralize}", default_templates_templates_path, class: 'btn btn-default', id: 'add_default_templates_btn', disabled: !Seek::Config.isa_json_compliance_enabled) %>
   </div>
