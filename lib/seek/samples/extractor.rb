@@ -18,32 +18,38 @@ module Seek
       end
 
       # Persist the extracted samples to the database
-      def persist
-        samples = extract.select(&:valid?) # Re-extracts samples if cache expired, otherwise returns the cached samples
+      def persist(user = User.current_user)
+        User.with_current_user(user) do
+          samples = extract.select(&:valid?) # Re-extracts samples if cache expired, otherwise returns the cached samples
 
-        if samples.any?
-          Sample.transaction do
-            samples.each do |sample|
-              sample.run_callbacks(:save) { false }
-              sample.run_callbacks(:create) { false }
+          if samples.any?
+            Sample.transaction do
+              samples.each do |sample|
+                sample.run_callbacks(:save) { false }
+                sample.run_callbacks(:create) { false }
+              end
+
+              last_id = Sample.last.try(:id) || 0
+              sample_type = samples.first.sample_type
+              Sample.import(samples, validate: false, batch_size: 2000)
+              SampleTypeUpdateJob.new(sample_type, false).queue_job
+
+              contributor = samples.first.contributor
+              # to get the created samples. There is a very small potential of picking up samples created from an overlapping process but it will just trigger some additional jobs
+              samples = Sample.where(sample_type: sample_type, title: samples.collect(&:title), contributor: contributor).where(
+                'id > ?', last_id
+              )
+              # makes sure linked resources are updated
+              samples.each do |sample|
+                sample.run_callbacks(:validation) { false }
+              end
+              ReindexingQueue.enqueue(samples)
+              AuthLookupUpdateQueue.enqueue(samples)
             end
-
-            last_id = Sample.last.try(:id) || 0
-            sample_type = samples.first.sample_type
-            disable_authorization_checks { Sample.import(samples, validate: false, batch_size: 2000) }
-            SampleTypeUpdateJob.new(sample_type, false).queue_job
-
-            contributor = samples.first.contributor
-            # to get the created samples. There is a very small potential of picking up samples created from an overlapping process but it will just trigger some additional jobs
-            samples = Sample.where(sample_type: sample_type, title: samples.collect(&:title), contributor: contributor).where(
-              'id > ?', last_id
-            )
-            ReindexingQueue.enqueue(samples)
-            AuthLookupUpdateQueue.enqueue(samples)
           end
-        end
 
-        samples
+          samples
+        end
       end
 
       # Clear the temporarily-stored samples
