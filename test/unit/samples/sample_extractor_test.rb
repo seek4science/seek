@@ -67,8 +67,15 @@ class SampleExtractorTest < ActiveSupport::TestCase
       extracted_samples = Seek::Samples::Extractor.new(template_data_file, sample_type).persist(person.user)
       assert_equal 2, extracted_samples.count
       assert_equal ['sample one', 'sample two'], extracted_samples.collect(&:title).sort
-      assert_equal [child_sample1], extracted_samples.detect{|s| s.title=='sample one'}.linked_samples
-      assert_equal [child_sample2], extracted_samples.detect{|s| s.title=='sample two'}.linked_samples
+      sample1 = extracted_samples.detect{|s| s.title=='sample one'}
+      sample2 = extracted_samples.detect{|s| s.title=='sample two'}
+
+      # check the linked resources have been updated via a callback
+      assert_equal [child_sample1], sample1.linked_samples
+      assert_equal [child_sample2], sample2.detect{|s| s.title=='sample two'}.linked_samples
+
+      # check the title is set and saved via a callback
+      assert_equal 'sample one', Sample.find(sample1.id).title
     end
   end
 
