@@ -140,6 +140,7 @@ class InvestigationsController < ApplicationController
   def investigation_params
     params.require(:investigation).permit(:title, :description, { project_ids: [] }, *creator_related_params,
                                           :position, { publication_ids: [] },
+                                          :is_ISA_JSON_compliant,
                                           { discussion_links_attributes:[:id, :url, :label, :_destroy] },
                                           { extended_metadata_attributes: determine_extended_metadata_keys })
   end
