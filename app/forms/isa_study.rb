@@ -87,14 +87,14 @@ class IsaStudy
     end
 
     unless @source_sample_type.sample_attributes.select { |a| a.isa_tag&.isa_source? }.one?
-      errors.add(:base, "[Sample type]: Should have exaclty one attribute with the 'source' ISA tag selected")
+      errors.add(:base, "[Sample type]: Should have exactly one attribute with the 'source' ISA tag selected")
     end
 
     %i[isa_sample? isa_protocol?].each do |tag_type|
       sample_type_tag_types = @sample_collection_sample_type.sample_attributes.select { |a| a.isa_tag&.send(tag_type) }
       unless sample_type_tag_types.one?
         tag_title = sample_type_tag_types[0]&.isa_tag&.title
-        errors.add(:base, "[Sample type]: Should have exaclty one attribute with the '#{tag_title}' ISA tag selected")
+        errors.add(:base, "[Sample type]: Should have exactly one attribute with the '#{tag_title}' ISA tag selected")
       end
     end
 
