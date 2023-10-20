@@ -1,3 +1,6 @@
+<%= javascript_include_tag "single_page/index" %>
+<%= javascript_include_tag "single_page/dynamic_table" %>
+
 <%= render partial: 'general/item_title', locals: { item: @study, buttons_partial: 'studies/buttons' } -%>
 
 <%= render partial: 'general/show_page_tab_definitions', locals: { resource: @study } %>
@@ -60,7 +63,7 @@
     <%= render partial: 'general/items_related_to', object: @study %>
   <% end %>
 
-	<% if Seek::Config.isa_json_compliance_enabled && displaying_single_page?%>
+	<% if Seek::Config.isa_json_compliance_enabled && @study.is_ISA_JSON_compliant%>
 		<%= tab_pane('study_design') do %>
 			<%= render :partial=>"isa_studies/study_design", locals: { study: @study} -%>
 		<% end %>
