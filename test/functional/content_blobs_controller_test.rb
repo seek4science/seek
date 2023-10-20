@@ -406,7 +406,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
     assert_response :success
 
-    download_path = download_sop_content_blob_path(sop, sop.content_blob.id, format: :pdf, disposition: :inline, intent: :inline_view)
+    download_path = download_sop_content_blob_path(sop, sop.content_blob.id, format: :pdf, intent: :inline_view)
     assert @response.body.include?("DEFAULT_URL = '#{download_path}'")
 
     al = ActivityLog.last
@@ -826,7 +826,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert_response :success
     assert @response.header['Content-Type'].start_with?('text/html')
     assert_equal ApplicationController::USER_CONTENT_CSP, @response.header['Content-Security-Policy']
-    assert_select 'img.git-image-preview[src=?]', download_sop_content_blob_path(sop, blob, disposition: 'inline')
+    assert_select 'img.git-image-preview[src=?]', download_sop_content_blob_path(sop, blob)
   end
 
   test 'should view content for jupyter blob as text if requested' do
