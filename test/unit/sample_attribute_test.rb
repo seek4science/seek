@@ -66,6 +66,7 @@ class SampleAttributeTest < ActiveSupport::TestCase
                                     sample_attribute_type: FactoryBot.create(:integer_sample_attribute_type),
                                     sample_type: FactoryBot.create(:simple_sample_type)
     refute attribute.valid?
+
     attribute.pid = 'http://somewhere.org#fish'
     assert attribute.valid?
     attribute.pid = 'dc:fish'
@@ -74,6 +75,17 @@ class SampleAttributeTest < ActiveSupport::TestCase
 
     attribute = SampleAttribute.new
     refute attribute.valid?
+  end
+
+  test 'auto strip pid' do
+    attribute = SampleAttribute.new title: 'fish', pid:"   wibble:12\t  ",
+                                    sample_attribute_type: FactoryBot.create(:integer_sample_attribute_type),
+                                    sample_type: FactoryBot.create(:simple_sample_type)
+    assert attribute.valid?
+    assert_equal 'wibble:12', attribute.pid
+    attribute.pid = "  wibble:12\n "
+    assert attribute.valid?
+    assert_equal 'wibble:12', attribute.pid
   end
 
   test 'validate value - without required' do
@@ -313,6 +325,12 @@ class SampleAttributeTest < ActiveSupport::TestCase
 
     attribute = FactoryBot.create(:string_sample_attribute_with_description_and_pid, is_title: true, pid: 'http://pid.org/attr/title', sample_type: FactoryBot.create(:simple_sample_type))
     assert_equal 'title',attribute.short_pid
+
+    attribute.update_column(:pid, "CHEBI:222\t")
+    assert_equal 'CHEBI:222',attribute.short_pid
+
+    attribute.pid = "   CHEBI:222  "
+    assert_equal 'CHEBI:222',attribute.short_pid
 
     attribute = FactoryBot.create(:sample_sample_attribute, sample_type: FactoryBot.create(:simple_sample_type))
     assert_equal '', attribute.short_pid
