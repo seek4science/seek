@@ -53,6 +53,10 @@ class Study < ApplicationRecord
     st_samples
   end
 
+  def is_ISA_JSON_compliant
+    investigation.is_ISA_JSON_compliant
+  end
+
   def clone_with_associations
     new_object = dup
     new_object.policy = policy.deep_copy

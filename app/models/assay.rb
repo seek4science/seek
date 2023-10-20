@@ -80,6 +80,10 @@ class Assay < ApplicationRecord
     assets.empty? && publications.empty? && associated_samples_through_sample_type.empty? && super
   end
 
+  def is_ISA_JSON_compliant
+    investigation.is_ISA_JSON_compliant
+  end
+
   # returns true if this is a modelling class of assay
   def is_modelling?
     assay_class && assay_class.is_modelling?
