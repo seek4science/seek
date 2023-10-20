@@ -29,7 +29,7 @@ class IsaStudiesController < ApplicationController
 
     else
       respond_to do |format|
-        format.html { render action: 'new' }
+        format.html { render action: 'new', status: :unprocessable_entity }
         format.json { render json: @isa_study.errors, status: :unprocessable_entity }
       end
     end

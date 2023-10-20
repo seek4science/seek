@@ -9,7 +9,7 @@ class TemplateTest < ActiveSupport::TestCase
   end
 
   test 'validation' do
-    template = Template.new(title: 'Test', project_ids: @project_ids, policy: FactoryBot.create(:private_policy))
+    template = Template.new(title: 'Test', level: 'study source', project_ids: @project_ids, policy: FactoryBot.create(:private_policy))
     assert template.valid?
     template.title = ''
     assert !template.valid?
