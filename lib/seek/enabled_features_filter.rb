@@ -3,7 +3,7 @@ module Seek
     FEATURES = %i[assays biosamples documentation events models
                   nels openbis organisms human_diseases programmes publications samples
                   studies investigations documents workflows collections observed_variables 
-									observed_variable_sets sample_type_template project_single_page].freeze
+									observed_variable_sets project_single_page isa_json_compliance].freeze
 
     def feature_enabled?(feature)
       feature = feature.to_s

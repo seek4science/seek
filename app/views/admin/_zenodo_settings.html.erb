@@ -1,6 +1,6 @@
 <%= admin_checkbox_setting(:zenodo_publishing_enabled, 1, Seek::Config.zenodo_publishing_enabled,
                            "Zenodo publishing enabled", "Allows publishing of resources into Zenodo.",
-                           :onchange=>toggle_appear_javascript('zenodo_publishing_block')) %>
+                           onchange: toggle_appear_javascript('zenodo_publishing_block')) %>
 <div id="zenodo_publishing_block" class="additional_settings" style="<%= show_or_hide_block Seek::Config.zenodo_publishing_enabled -%>">
 
   <%= admin_text_setting(:zenodo_api_url, Seek::Config.zenodo_api_url,

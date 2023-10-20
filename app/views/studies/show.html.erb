@@ -44,7 +44,7 @@
 
         <%= render partial: 'general/isa_graph', locals: { root_item: @study, options: { depth: 4 } } -%>
 
-				<% if Seek::Config.project_single_page_advanced_enabled %>
+				<% if Seek::Config.isa_json_compliance_enabled %>
 						<%= render partial: 'isa_studies/applied_templates', locals: { resource: @study } -%>
 				<% end %>
 
@@ -60,7 +60,7 @@
     <%= render partial: 'general/items_related_to', object: @study %>
   <% end %>
 
-	<% if Seek::Config.project_single_page_advanced_enabled && displaying_single_page?%>
+	<% if Seek::Config.isa_json_compliance_enabled && displaying_single_page?%>
 		<%= tab_pane('study_design') do %>
 			<%= render :partial=>"isa_studies/study_design", locals: { study: @study} -%>
 		<% end %>

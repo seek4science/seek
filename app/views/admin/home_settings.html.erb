@@ -35,7 +35,7 @@
 
   <%= admin_checkbox_setting(:news_enabled, 1, Seek::Config.news_enabled,
                               "News enabled", "Display news in the homepage",
-                              :onchange=>toggle_appear_javascript('news_block')) %>
+                              onchange: toggle_appear_javascript('news_block')) %>
   <div id="news_block" class="additional_settings" style="<%= show_or_hide_block Seek::Config.news_enabled -%>">
     <%= admin_text_setting(:news_feed_urls, Seek::Config.news_feed_urls,
                             'Feed URLs', "The urls of the news feeds you want for the news box. The multiple urls are separated by a comma. The format of the feeds can either be RSS or ATOM") %>
