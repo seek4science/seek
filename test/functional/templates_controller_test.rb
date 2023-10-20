@@ -8,7 +8,7 @@ class TemplatesControllerTest < ActionController::TestCase
   fixtures :isa_tags
 
   setup do
-    Seek::Config.send('sample_type_template_enabled=', true)
+    Seek::Config.send('isa_json_compliance_enabled=', true)
     FactoryBot.create(:person) # to prevent person being first person and therefore admin
     @person = FactoryBot.create(:project_administrator)
     @project = @person.projects.first

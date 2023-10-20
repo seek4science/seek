@@ -57,7 +57,7 @@ module Seek
       if @parent_resource
         @parent_resource.get_related(controller_name.classify)
       else
-        if controller_model == SampleType && Seek::Config.project_single_page_advanced_enabled
+        if controller_model == SampleType && Seek::Config.isa_json_compliance_enabled
           return SampleType.without_template
         end
 

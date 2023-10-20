@@ -692,7 +692,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     params = { projects: [project.id]}
     get :filter_for_select, params: params
     assert_equal assigns(:sample_types).length, 1
-    with_config_value(:project_single_page_advanced_enabled, true) do
+    with_config_value(:isa_json_compliance_enabled, true) do
       get :filter_for_select, params: params
       assert_equal assigns(:sample_types).length, 0
     end
