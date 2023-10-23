@@ -5,7 +5,7 @@ module Ebi
   class OlsClient
     def all_descendants(ontology_id, term_iri)
       Rails.cache.fetch("ebi_ontology_terms_#{ontology_id}_#{term_iri}") do
-        url = "https://www.ebi.ac.uk/ols/api/ontologies/#{ontology_id}/terms/#{double_url_encode(term_iri)}"
+        url = "https://www.ebi.ac.uk/ols4/api/ontologies/#{ontology_id}/terms/#{double_url_encode(term_iri)}"
 
         self_json = JSON.parse(RestClient.get(url, accept: :json))
         @collected_iris = []
@@ -21,7 +21,7 @@ module Ebi
 
       term[:parent_iri] = parent_iri if parent_iri
 
-      url = "https://www.ebi.ac.uk/ols/api/ontologies/#{term_json['ontology_name']}/terms/#{double_url_encode(term_json['iri'])}/children"
+      url = "https://www.ebi.ac.uk/ols4/api/ontologies/#{term_json['ontology_name']}/terms/#{double_url_encode(term_json['iri'])}/children"
       child_terms = []
 
       if term_json['has_children']
@@ -50,7 +50,7 @@ module Ebi
 
       ontology_list = begin
         Rails.cache.fetch('ebi_ontology_options') do
-          JSON.parse(RestClient.get('https://www.ebi.ac.uk/ols/api/ontologies?size=1000',
+          JSON.parse(RestClient.get('https://www.ebi.ac.uk/ols4/api/ontologies?size=1000',
                                     accept: :json))
         end
       rescue StandardError
