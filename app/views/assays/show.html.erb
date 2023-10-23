@@ -61,7 +61,17 @@
             <% if Seek::Config.human_diseases_enabled %>
               <%= list_assay_human_diseases("Human Diseases", @assay.assay_human_diseases, { :id => "human_disease" }) %>
             <% end %>
+
+            <% if Seek::Config.isa_json_compliance_enabled %>
+              <p id="isa_json_compliance">
+                <b><%= "Is ISA-JSON compliant" %>: </b>
+                <%= @assay.is_ISA_JSON_compliant %>
+              </p>
+              <%= render partial: 'isa_studies/applied_templates', locals: { resource: @assay } -%>
+            <% end %>
+
           </div>
+
         </div>
         <% if @assay.external_asset %>
           <div class="row">
@@ -107,11 +117,11 @@
                 </div>
             <% end %>
         <% end %>
+
+
         <%= render partial: 'general/isa_graph', locals: { root_item: @assay, options: { depth: 4 } } %>
 
-        <% if Seek::Config.isa_json_compliance_enabled %>
-            <%= render partial: 'isa_studies/applied_templates', locals: { resource: @assay } -%>
-        <% end %>
+
 
       </div>
 
