@@ -52,7 +52,6 @@ class SampleAttribute < ApplicationRecord
 
   def short_pid
     return '' unless pid.present?
-    pid.strip!
     URI.parse(pid).fragment || pid.gsub(/.*\//,'') || pid
   end
 

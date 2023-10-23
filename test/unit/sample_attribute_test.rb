@@ -326,12 +326,6 @@ class SampleAttributeTest < ActiveSupport::TestCase
     attribute = FactoryBot.create(:string_sample_attribute_with_description_and_pid, is_title: true, pid: 'http://pid.org/attr/title', sample_type: FactoryBot.create(:simple_sample_type))
     assert_equal 'title',attribute.short_pid
 
-    attribute.update_column(:pid, "CHEBI:222\t")
-    assert_equal 'CHEBI:222',attribute.short_pid
-
-    attribute.pid = "   CHEBI:222  "
-    assert_equal 'CHEBI:222',attribute.short_pid
-
     attribute = FactoryBot.create(:sample_sample_attribute, sample_type: FactoryBot.create(:simple_sample_type))
     assert_equal '', attribute.short_pid
   end
