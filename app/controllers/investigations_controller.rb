@@ -39,6 +39,16 @@ class InvestigationsController < ApplicationController
     send_data JSON.pretty_generate(the_hash) , filename: 'isatab.json'
   end
 
+  def export_isa
+    isa = IsaExporter::Exporter.new(Investigation.find(params[:id])).export
+    send_data isa, filename: 'isa.json', type: 'application/json', deposition: 'attachment'
+  rescue Exception => e
+    respond_to do |format|
+        flash[:error] = e.message
+      format.html { redirect_to investigation_path(Investigation.find(params[:id])) }
+    end
+  end
+
   def show
     @investigation=Investigation.find(params[:id])
 

@@ -405,6 +405,7 @@ SEEK::Application.routes.draw do
     resources :people, :programmes, :projects, :assays, :studies, :models, :sops, :workflows, :data_files, :publications, :documents, only: [:index]
     member do
       get :export_isatab_json
+      get :export_isa, action: :export_isa
       get :manage
       get :order_studies
       patch :manage_update
