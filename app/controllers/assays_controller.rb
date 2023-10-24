@@ -1,16 +1,17 @@
 class AssaysController < ApplicationController
-
   include Seek::IndexPager
   include Seek::AssetsCommon
 
   before_action :assays_enabled?
-  before_action :find_assets, :only=>[:index]
-  before_action :find_and_authorize_requested_item, :only=>[:edit, :update, :destroy, :manage, :manage_update, :show, :new_object_based_on_existing_one]
+  before_action :find_assets, only: [:index]
+  before_action :find_and_authorize_requested_item,
+                only: %i[edit update destroy manage manage_update show new_object_based_on_existing_one]
+  before_action :fix_assay_linkage, only: [:destroy]
   before_action :delete_linked_sample_types, only: [:destroy]
 
-  #project_membership_required_appended is an alias to project_membership_required, but is necessary to include the actions
-  #defined in the application controller
-  before_action :project_membership_required_appended, :only=>[:new_object_based_on_existing_one]
+  # project_membership_required_appended is an alias to project_membership_required, but is necessary to include the actions
+  # defined in the application controller
+  before_action :project_membership_required_appended, only: [:new_object_based_on_existing_one]
 
   include Seek::Publishing::PublishingCommon
 
@@ -30,69 +31,63 @@ class AssaysController < ApplicationController
       end
 
       @existing_assay.data_files.each do |d|
-        if !d.can_view?
+        unless d.can_view?
           notice_message << "Some or all #{t('data_file').pluralize} of the existing #{t('assays.assay')} cannot be viewed, you may specify your own! <br/>"
           break
         end
       end
       @existing_assay.sops.each do |s|
-        if !s.can_view?
-          notice_message << "Some or all #{t('sop').pluralize} of the existing #{ t('assays.assay')} cannot be viewed, you may specify your own! <br/>"
+        unless s.can_view?
+          notice_message << "Some or all #{t('sop').pluralize} of the existing #{t('assays.assay')} cannot be viewed, you may specify your own! <br/>"
           break
         end
       end
       @existing_assay.models.each do |m|
-        if !m.can_view?
+        unless m.can_view?
           notice_message << "Some or all #{t('model').pluralize} of the existing #{t('assays.assay')} cannot be viewed, you may specify your own! <br/>"
           break
         end
       end
       @existing_assay.documents.each do |d|
-        if !d.can_view?
+        unless d.can_view?
           notice_message << "Some or all #{t('document').pluralize} of the existing #{t('assays.assay')} cannot be viewed, you may specify your own! <br/>"
           break
         end
       end
 
-      unless notice_message.blank?
-        flash.now[:notice] = notice_message.html_safe
-      end
+      flash.now[:notice] = notice_message.html_safe unless notice_message.blank?
 
-      render :action=>"new"
+      render action: 'new'
     else
-      flash[:error]="You do not have the necessary permissions to copy this #{t('assays.assay')}"
+      flash[:error] = "You do not have the necessary permissions to copy this #{t('assays.assay')}"
       redirect_to @existing_assay
     end
   end
 
   def new
-    @assay=setup_new_asset
-    @assay_class=params[:class]
+    @assay = setup_new_asset
+    @assay_class = params[:class]
     @permitted_params = assay_params if params[:assay]
 
-    #jump straight to experimental if modelling analysis is disabled
-    @assay_class ||= "experimental" unless Seek::Config.modelling_analysis_enabled
+    # jump straight to experimental if modelling analysis is disabled
+    @assay_class ||= 'experimental' unless Seek::Config.modelling_analysis_enabled
 
-    @assay.assay_class=AssayClass.for_type(@assay_class) unless @assay_class.nil?
+    @assay.assay_class = AssayClass.for_type(@assay_class) unless @assay_class.nil?
 
-    respond_to do |format|
-      format.html
-    end
+    respond_to(&:html)
   end
 
   def edit
-    respond_to do |format|
-      format.html
-    end
+    respond_to(&:html)
   end
 
   def create
-    params[:assay_class_id] ||= AssayClass.for_type("experimental").id
+    params[:assay_class_id] ||= AssayClass.for_type('experimental').id
     @assay = Assay.new(assay_params)
 
     update_assay_organisms @assay, params
     update_assay_human_diseases @assay, params
-    @assay.contributor=current_person
+    @assay.contributor = current_person
     update_sharing_policies @assay
     update_annotations(params[:tag_list], @assay)
     update_relationships(@assay, params)
@@ -101,22 +96,38 @@ class AssaysController < ApplicationController
       respond_to do |format|
         flash[:notice] = "#{t('assays.assay')} was successfully created."
         format.html { redirect_to(@assay) }
-        format.json {render json: @assay, include: [params[:include]]}
+        format.json { render json: @assay, include: [params[:include]] }
       end
     else
       respond_to do |format|
-        format.html { render :action => "new", status: :unprocessable_entity }
+        format.html { render action: 'new', status: :unprocessable_entity }
         format.json { render json: json_api_errors(@assay), status: :unprocessable_entity }
       end
     end
   end
-
 
   def delete_linked_sample_types
     return unless is_single_page_assay?
     return if @assay.sample_type.nil?
 
     @assay.sample_type.destroy
+  end
+
+  def fix_assay_linkage
+    return unless is_single_page_assay?
+    return unless @assay.has_linked_child_assay?
+
+    previous_assay_linked_st_id = @assay.previous_linked_assay_sample_type&.id
+
+    next_assay = Assay.all.detect do |a|
+      a.sample_type&.sample_attributes&.first&.linked_sample_type_id == @assay.sample_type_id
+    end
+
+    next_assay_st_attr = next_assay.sample_type&.sample_attributes&.first
+
+    return unless next_assay && previous_assay_linked_st_id && next_assay_st_attr
+
+    next_assay_st_attr.update(linked_sample_type_id: previous_assay_linked_st_id)
   end
 
   def update
@@ -130,26 +141,26 @@ class AssaysController < ApplicationController
       if @assay.update(assay_params)
         flash[:notice] = "#{t('assays.assay')} was successfully updated."
         format.html { redirect_to(@assay) }
-        format.json {render json: @assay, include: [params[:include]]}
+        format.json { render json: @assay, include: [params[:include]] }
       else
-        format.html { render :action => "edit", status: :unprocessable_entity }
+        format.html { render action: 'edit', status: :unprocessable_entity }
         format.json { render json: json_api_errors(@assay), status: :unprocessable_entity }
       end
     end
   end
 
-  def update_assay_organisms assay,params
+  def update_assay_organisms(assay, params)
     organisms             = params[:assay_organism_ids] || params[:assay][:organism_ids] || []
     assay.assay_organisms = [] # This means new AssayOrganisms are created every time the assay is updated!
     Array(organisms).each do |text|
       # TODO: Refactor this to use proper nested params:
-      o_id, strain,strain_id,culture_growth_type_text,t_id,t_title=text.split(",")
-      culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
-      assay.associate_organism(o_id, strain_id, culture_growth,t_id,t_title)
+      o_id, strain, strain_id, culture_growth_type_text, t_id, t_title = text.split(',')
+      culture_growth = CultureGrowthType.find_by_title(culture_growth_type_text)
+      assay.associate_organism(o_id, strain_id, culture_growth, t_id, t_title)
     end
   end
 
-  def update_assay_human_diseases assay,params
+  def update_assay_human_diseases(assay, params)
     human_diseases             = params[:assay_human_disease_ids] || params[:assay][:human_disease_ids] || []
     assay.assay_human_diseases = []
     Array(human_diseases).each do |human_disease_id|
@@ -159,10 +170,9 @@ class AssaysController < ApplicationController
 
   def show
     respond_to do |format|
-      format.html { render(params[:only_content] ? { layout: false } : {})}
-      format.rdf { render :template=>'rdf/show'}
-      format.json {render json: @assay, include: [params[:include]]}
-
+      format.html { render(params[:only_content] ? { layout: false } : {}) }
+      format.rdf { render template: 'rdf/show' }
+      format.json { render json: @assay, include: [params[:include]] }
     end
   end
 
@@ -170,11 +180,11 @@ class AssaysController < ApplicationController
 
   def assay_params
     params.require(:assay).permit(:title, :description, :study_id, :assay_class_id, :assay_type_uri, :technology_type_uri,
-                                  :license, *creator_related_params, :position, { document_ids: []},
+                                  :license, *creator_related_params, :position, { document_ids: [] },
                                   { sop_ids: [] }, { model_ids: [] },
-                                  { samples_attributes: [:asset_id, :direction] },
-                                  { data_files_attributes: [:asset_id, :direction, :relationship_type_id] },
-                                  { placeholders_attributes: [:asset_id, :direction, :relationship_type_id] },
+                                  { samples_attributes: %i[asset_id direction] },
+                                  { data_files_attributes: %i[asset_id direction relationship_type_id] },
+                                  { placeholders_attributes: %i[asset_id direction relationship_type_id] },
                                   { publication_ids: [] },
                                   { extended_metadata_attributes: determine_extended_metadata_keys },
           { discussion_links_attributes:[:id, :url, :label, :_destroy] }
