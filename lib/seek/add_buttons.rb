@@ -11,8 +11,11 @@ module Seek
         [Model, 'model[project_ids][]'],
         [Placeholder, 'placeholder[project_ids][]'],
         [Presentation, 'presentation[project_ids][]'],
+        [Publication, 'publication[project_ids][]'],
         [SampleType, 'sample_type[project_ids][]'],
-        [Sop, 'sop[project_ids][]']
+        [Sop, 'sop[project_ids][]'],
+        [Strain, 'strain[project_ids][]'],
+        [Template, 'template[project_ids][]']
       ],
       'Investigation' => [[Study, 'study[investigation_id]']],
       'Study' => [[Assay, 'assay[study_id]']],

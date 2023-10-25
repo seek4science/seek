@@ -29,7 +29,7 @@ class TemplatesController < ApplicationController
 
   def new
     @tab = 'manual'
-    @template = Template.new
+    @template = setup_new_asset
     @template.organism = 'any'
     respond_with(@template)
   end
