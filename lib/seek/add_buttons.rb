@@ -5,6 +5,7 @@ module Seek
       'Project' => [
         [Investigation, 'investigation[project_ids][]'],
         [Collection, 'collection[project_ids][]'],
+        [DataFile, 'data_file[project_ids][]'],
         [Document, 'document[project_ids][]'],
         [Event, 'event[project_ids][]'],
         [FileTemplate, 'file_template[project_ids][]'],
