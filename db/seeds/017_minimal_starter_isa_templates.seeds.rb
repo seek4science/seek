@@ -1,10 +1,6 @@
 # Source - ISA minimal starter template
-if Template.where(title: 'Source - ISA minimal starter template', level: 'study source').any?
-  disable_authorization_checks do
-    Template.where(title: 'Source - ISA minimal starter template', level: 'study source').first.destroy
-  end
-end
-source_template = Template.new(title: 'Source - ISA minimal starter template', level: 'study source')
+source_template = Template.find_or_initialize_by(title: 'Source - ISA minimal starter template', level: 'study source',
+                                                 group: 'ISA minimal starter')
 
 source_temp_attributes = []
 source_temp_attributes << TemplateAttribute.new(title: 'Source Name',
@@ -18,29 +14,26 @@ source_temp_attributes << TemplateAttribute.new(title: 'Source Characteristic 1'
                                                 description: 'A characteristic of the source.',
                                                 sample_attribute_type: SampleAttributeType.find_by(title: 'String'),
                                                 is_title: false,
-                                                required: false,
+                                                required: true,
                                                 isa_tag: IsaTag.find_by(title: 'source_characteristic'))
 
-source_template.update(group: 'ISA minimal starter',
-                       group_order: 1,
-                       temporary_name: '1_Source - ISA minimal starter template',
-                       version: '1.0.0',
-                       isa_config: 'isaconfig-default_v2015-07-02/studySample.xml',
-                       repo_schema_id: 'none',
-                       organism: 'any',
-                       projects: [Project.find_or_create_by(title: 'Default Project')],
-                       policy: Policy.public_policy,
-                       template_attributes: source_temp_attributes)
+disable_authorization_checks do
+  source_template.update(group_order: 1,
+                         temporary_name: '1_Source - ISA minimal starter template',
+                         version: '1.0.0',
+                         isa_config: 'isaconfig-default_v2015-07-02/studySample.xml',
+                         repo_schema_id: 'none',
+                         organism: 'any',
+                         projects: [Project.find_or_create_by(title: 'Default Project')],
+                         policy: Policy.public_policy,
+                         template_attributes: source_temp_attributes)
 
-source_template.save
+  source_template.save
+end
 
 # Sample - ISA minimal starter template
-if Template.where(title: 'Sample - ISA minimal starter template', level: 'study sample').any?
-  disable_authorization_checks do
-    Template.where(title: 'Sample - ISA minimal starter template', level: 'study sample').first.destroy
-  end
-end
-sample_template = Template.new(title: 'Sample - ISA minimal starter template', level: 'study sample')
+sample_template = Template.find_or_initialize_by(title: 'Sample - ISA minimal starter template', level: 'study sample',
+                                                 group: 'ISA minimal starter')
 
 sample_temp_attributes = []
 sample_temp_attributes << TemplateAttribute.new(title: 'Input',
@@ -78,28 +71,25 @@ sample_temp_attributes << TemplateAttribute.new(title: 'Sample Characteristic 1'
                                                 sample_controlled_vocab: nil,
                                                 isa_tag: IsaTag.find_by(title: 'sample_characteristic'))
 
-sample_template.update(group: 'ISA minimal starter',
-                       group_order: 2,
-                       temporary_name: '2_Sample - ISA minimal starter template',
-                       version: '1.0.0',
-                       isa_config: 'isaconfig-default_v2015-07-02/studySample.xml',
-                       isa_measurement_type: 'sample',
-                       isa_protocol_type: 'protocol with samples as outputs collection',
-                       repo_schema_id: 'none',
-                       organism: 'any',
-                       projects: [Project.find_or_create_by(title: 'Default Project')],
-                       policy: Policy.public_policy,
-                       template_attributes: sample_temp_attributes)
+disable_authorization_checks do
+  sample_template.update(group_order: 2,
+                         temporary_name: '2_Sample - ISA minimal starter template',
+                         version: '1.0.0',
+                         isa_config: 'isaconfig-default_v2015-07-02/studySample.xml',
+                         isa_measurement_type: 'sample',
+                         isa_protocol_type: 'protocol with samples as outputs collection',
+                         repo_schema_id: 'none',
+                         organism: 'any',
+                         projects: [Project.find_or_create_by(title: 'Default Project')],
+                         policy: Policy.public_policy,
+                         template_attributes: sample_temp_attributes)
 
-sample_template.save
+  sample_template.save
+end
 
 # Material output assay - ISA minimal starter template
-if Template.where(title: 'Material output assay - ISA minimal starter template', level: 'assay - material').any?
-  disable_authorization_checks do
-    Template.where(title: 'Material output assay - ISA minimal starter template', level: 'assay - material').first.destroy
-  end
-end
-material_template = Template.new(title: 'Material output assay - ISA minimal starter template', level: 'assay - material')
+material_template = Template.find_or_initialize_by(title: 'Material output assay - ISA minimal starter template',
+                                                   level: 'assay - material', group: 'ISA minimal starter')
 
 material_temp_attributes = []
 material_temp_attributes << TemplateAttribute.new(title: 'Input',
@@ -126,7 +116,7 @@ material_temp_attributes << TemplateAttribute.new(title: 'Output material Name',
                                                   description: 'Name of the major material output resulting from the application of the protocol.',
                                                   sample_attribute_type: SampleAttributeType.find_by(title: 'String'),
                                                   is_title: true,
-                                                  required: false,
+                                                  required: true,
                                                   isa_tag: IsaTag.find_by(title: 'other_material'))
 
 material_temp_attributes << TemplateAttribute.new(title: 'Output material characteristic 1',
@@ -136,32 +126,28 @@ material_temp_attributes << TemplateAttribute.new(title: 'Output material charac
                                                   required: true,
                                                   isa_tag: IsaTag.find_by(title: 'other_material_characteristic'))
 
-material_template.update(group: 'ISA minimal starter',
-                         group_order: 3,
-                         temporary_name: '3_Material output assay - ISA minimal starter template',
-                         version: '1.0.0',
-                         isa_config: 'none',
-                         isa_measurement_type: 'any',
-                         isa_technology_type: 'any',
-                         isa_protocol_type: 'protocol with material output',
-                         repo_schema_id: 'none',
-                         organism: 'any',
-                         projects: [Project.find_or_create_by(title: 'Default Project')],
-                         policy: Policy.public_policy,
-                         template_attributes: material_temp_attributes)
+disable_authorization_checks do
+  material_template.update(group_order: 3,
+                           temporary_name: '3_Material output assay - ISA minimal starter template',
+                           version: '1.0.0',
+                           isa_config: 'none',
+                           isa_measurement_type: 'any',
+                           isa_technology_type: 'any',
+                           isa_protocol_type: 'protocol with material output',
+                           repo_schema_id: 'none',
+                           organism: 'any',
+                           projects: [Project.find_or_create_by(title: 'Default Project')],
+                           policy: Policy.public_policy,
+                           template_attributes: material_temp_attributes)
 
-material_template.save
+  material_template.save
+end
 
 # Data file output assay - ISA minimal starter template
-if Template.where(title: 'Data file output assay - ISA minimal starter template', level: 'assay - data file').any?
-  disable_authorization_checks do
-    Template.where(title: 'Data file output assay - ISA minimal starter template', level: 'assay - data file').first.destroy
-  end
-end
-data_file_template = Template.new(title: 'Data file output assay - ISA minimal starter template', level: 'assay - data file')
+data_file_template = Template.find_or_initialize_by(title: 'Data file output assay - ISA minimal starter template',
+                                                    level: 'assay - data file', group: 'ISA minimal starter')
 
 data_file_temp_attributes = []
-
 data_file_temp_attributes << TemplateAttribute.new(title: 'Input',
                                                    description: 'Registered Samples in the platform used as input for this protocol.',
                                                    sample_attribute_type: SampleAttributeType.find_by(title: 'Registered Sample (multiple)'),
@@ -196,20 +182,21 @@ data_file_temp_attributes << TemplateAttribute.new(title: 'Data file characteris
                                                    required: true,
                                                    isa_tag: IsaTag.find_by(title: 'data_file_comment'))
 
-data_file_template.update(group: 'ISA minimal starter',
-                          group_order: 4,
-                          temporary_name: '4_Data file output assay - ISA minimal starter template',
-                          version: '1.0.0',
-                          isa_config: 'none',
-                          isa_measurement_type: 'any',
-                          isa_technology_type: 'any',
-                          isa_protocol_type: 'protocol with data file output',
-                          repo_schema_id: 'none',
-                          organism: 'any',
-                          projects: [Project.find_or_create_by(title: 'Default Project')],
-                          policy: Policy.public_policy,
-                          template_attributes: material_temp_attributes)
+disable_authorization_checks do
+  data_file_template.update(group_order: 4,
+                            temporary_name: '4_Data file output assay - ISA minimal starter template',
+                            version: '1.0.0',
+                            isa_config: 'none',
+                            isa_measurement_type: 'any',
+                            isa_technology_type: 'any',
+                            isa_protocol_type: 'protocol with data file output',
+                            repo_schema_id: 'none',
+                            organism: 'any',
+                            projects: [Project.find_or_create_by(title: 'Default Project')],
+                            policy: Policy.public_policy,
+                            template_attributes: data_file_temp_attributes)
 
-data_file_template.save
+  data_file_template.save
+end
 
 puts 'Seeded minimal templates for organizing ISA JSON compliant experiments.'
