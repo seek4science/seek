@@ -1902,7 +1902,7 @@ class StudiesControllerTest < ActionController::TestCase
     get :new
     assert_response :success
     assert_select 'div.panel-heading', text: /Tags/, count: 1
-    assert_select 'input#tag_list', count: 1
+    assert_select 'select#tag_list', count: 1
   end
 
   test 'new should not include tags element when tags disabled' do
@@ -1910,7 +1910,7 @@ class StudiesControllerTest < ActionController::TestCase
       get :new
       assert_response :success
       assert_select 'div.panel-heading', text: /Tags/, count: 0
-      assert_select 'input#tag_list', count: 0
+      assert_select 'select#tag_list', count: 0
     end
   end
 
@@ -1920,7 +1920,7 @@ class StudiesControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select 'div.panel-heading', text: /Tags/, count: 1
-    assert_select 'input#tag_list', count: 1
+    assert_select 'select#tag_list', count: 1
   end
 
   test 'edit should not include tags element when tags disabled' do
@@ -1930,7 +1930,7 @@ class StudiesControllerTest < ActionController::TestCase
       assert_response :success
 
       assert_select 'div.panel-heading', text: /Tags/, count: 0
-      assert_select 'input#tag_list', count: 0
+      assert_select 'select#tag_list', count: 0
     end
   end
 
@@ -1940,7 +1940,7 @@ class StudiesControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select 'div.panel-heading', text: /Tags/, count: 1
-    assert_select 'input#tag_list', count: 1
+    assert_select 'select#tag_list', count: 1
   end
 
   test 'show should not include tags box when tags disabled' do
@@ -1950,7 +1950,7 @@ class StudiesControllerTest < ActionController::TestCase
       assert_response :success
 
       assert_select 'div.panel-heading', text: /Tags/, count: 0
-      assert_select 'input#tag_list', count: 0
+      assert_select 'select#tag_list', count: 0
     end
   end
 
