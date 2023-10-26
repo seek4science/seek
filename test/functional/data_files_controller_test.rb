@@ -2828,11 +2828,11 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal visible, assigns(:visible_count)
   end
 
-  test 'delete with data file with extracted samples' do
+  test 'delete data file and extracted samples' do
     login_as(FactoryBot.create(:person))
-    df = nil
 
     df = data_file_with_extracted_samples
+    sample = df.extracted_samples.first
 
     assert_no_difference('DataFile.count') do
       delete :destroy, params: { id: df.id }
@@ -2841,17 +2841,37 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_difference('DataFile.count', -1) do
       assert_difference('Sample.count', -4) do
-        delete :destroy, params: { id: df.id, destroy_extracted_samples: '1' }
+        assert_enqueued_jobs(5, only: AuthLookupDeleteJob) do
+          assert_enqueued_with(job: AuthLookupDeleteJob, args: ['DataFile', df.id]) do
+            assert_enqueued_with(job: AuthLookupDeleteJob, args: ['Sample', sample.id]) do
+              delete :destroy, params: { id: df.id, destroy_extracted_samples: '1' }
+            end
+          end
+        end
       end
     end
 
     assert_redirected_to data_files_path
+  end
+
+  test 'delete data file but not extracted samples' do
+    login_as(FactoryBot.create(:person))
 
     df = data_file_with_extracted_samples
+    sample = df.extracted_samples.first
+
+    assert_no_difference('DataFile.count') do
+      delete :destroy, params: { id: df.id }
+    end
+    assert_redirected_to destroy_samples_confirm_data_file_path(df)
 
     assert_difference('DataFile.count', -1) do
       assert_no_difference('Sample.count') do
-        delete :destroy, params: { id: df.id, destroy_extracted_samples: '0' }
+        assert_enqueued_jobs(1, only: AuthLookupDeleteJob) do
+          assert_enqueued_with(job: AuthLookupDeleteJob, args: ['DataFile', df.id]) do
+            delete :destroy, params: { id: df.id, destroy_extracted_samples: '0' }
+          end
+        end
       end
     end
 
