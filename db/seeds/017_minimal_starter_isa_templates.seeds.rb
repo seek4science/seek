@@ -8,7 +8,7 @@ source_template = Template.new(title: 'Source - ISA minimal starter template', l
 
 source_temp_attributes = []
 source_temp_attributes << TemplateAttribute.new(title: 'Source Name',
-                                                description: 'Do not edit the name of this attribute. Sources are considered as the starting biological material used in a study.',
+                                                description: 'Sources are considered as the starting biological material used in a study.',
                                                 sample_attribute_type: SampleAttributeType.find_by(title: 'String'),
                                                 is_title: true,
                                                 required: true,
@@ -49,8 +49,8 @@ sample_temp_attributes << TemplateAttribute.new(title: 'Input',
                                                 is_title: false,
                                                 required: true)
 
-sample_temp_attributes << TemplateAttribute.new(title: 'Sample collection',
-                                                description: 'Do not edit the name of this attribute. Type of assay or experimental step performed.',
+sample_temp_attributes << TemplateAttribute.new(title: 'Name of a protocol with samples as outputs',
+                                                description: 'Type of experimental step that generates samples as outputs from the study sources.',
                                                 sample_attribute_type: SampleAttributeType.find_by(title: 'String'),
                                                 is_title: false,
                                                 required: true,
@@ -64,7 +64,7 @@ sample_temp_attributes << TemplateAttribute.new(title: 'Name of protocol paramet
                                                 isa_tag: IsaTag.find_by(title: 'parameter_value'))
 
 sample_temp_attributes << TemplateAttribute.new(title: 'Sample Name',
-                                                description: 'Do not edit the name of this attribute. Samples are considered as biological material sampled from sources and used in the study.',
+                                                description: 'Samples are considered as biological material sampled from sources and used in the study.',
                                                 sample_attribute_type: SampleAttributeType.find_by(title: 'String'),
                                                 is_title: true,
                                                 required: true,
@@ -84,7 +84,7 @@ sample_template.update(group: 'ISA minimal starter',
                        version: '1.0.0',
                        isa_config: 'isaconfig-default_v2015-07-02/studySample.xml',
                        isa_measurement_type: 'sample',
-                       isa_protocol_type: 'sample collection',
+                       isa_protocol_type: 'protocol with samples as outputs collection',
                        repo_schema_id: 'none',
                        organism: 'any',
                        projects: [Project.find_or_create_by(title: 'Default Project')],
