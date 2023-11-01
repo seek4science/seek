@@ -13,11 +13,12 @@ module Seek
         [Placeholder, 'placeholder[project_ids][]'],
         [Presentation, 'presentation[project_ids][]'],
         [Publication, 'publication[project_ids][]'],
-        [Sample, 'sample[project_ids][]'], # Does not work, Sample creation is not standard... have to select SampleType first
+        [Sample, 'sample[project_ids][]'],
         [SampleType, 'sample_type[project_ids][]'],
         [Sop, 'sop[project_ids][]'],
         [Strain, 'strain[project_ids][]'],
-        [Template, 'template[project_ids][]']
+        [Template, 'template[project_ids][]'],
+        [Workflow, 'workflow[project_ids][]']
       ],
       'Investigation' => [[Study, 'study[investigation_id]']],
       'Study' => [[Assay, 'assay[study_id]']],

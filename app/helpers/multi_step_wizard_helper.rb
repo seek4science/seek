@@ -47,7 +47,7 @@ module MultiStepWizardHelper
         html << hidden_field_tag('data_file[publication_ids][]', params[key][:publication_ids])
       end
       params[key][:project_ids]&.each do |p|
-        html << hidden_field_tag('data_file[project_ids][]', p)
+        html << hidden_field_tag("#{key}[project_ids][]", p)
       end
     end
     html.html_safe
