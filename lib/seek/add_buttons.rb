@@ -13,6 +13,7 @@ module Seek
         [Placeholder, 'placeholder[project_ids][]'],
         [Presentation, 'presentation[project_ids][]'],
         [Publication, 'publication[project_ids][]'],
+        [Sample, 'sample[project_ids][]'], # Does not work, Sample creation is not standard... have to select SampleType first
         [SampleType, 'sample_type[project_ids][]'],
         [Sop, 'sop[project_ids][]'],
         [Strain, 'strain[project_ids][]'],
