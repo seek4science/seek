@@ -31,7 +31,7 @@
     </span>
 <% end -%>
 
-<% if item.can_edit? -%>
+<% if item.can_edit? && User.current_user.person.current_projects.include?(item) -%>
   <% if displaying_single_page? %>
     <%= button_link_to("Design #{t('investigation')}", 'new', new_investigation_path("investigation[project_id]": item.id, single_page: params[:id])) %>
   <% else -%>
