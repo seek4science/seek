@@ -106,6 +106,7 @@ class WorkflowsController < ApplicationController
   def create_from_ro_crate
     @crate_extractor = WorkflowCrateExtractor.new(ro_crate_extractor_params)
     @workflow = @crate_extractor.build
+    @workflow.project_ids |= params[:workflow] ? params[:workflow][:project_ids] : params[:project_ids]
 
     respond_to do |format|
       if @crate_extractor.valid?
@@ -121,6 +122,7 @@ class WorkflowsController < ApplicationController
     @crate_builder = WorkflowRepositoryBuilder.new(ro_crate_params)
     @crate_builder.workflow_class = @workflow.workflow_class
     @workflow = @crate_builder.build
+    @workflow.project_ids |= params[:workflow] ? params[:workflow][:project_ids] : params[:project_ids]
 
     respond_to do |format|
       if @crate_builder.valid?

@@ -40,7 +40,7 @@ class SamplesController < ApplicationController
 
   def new
     if params[:sample_type_id]
-      @sample = Sample.new(sample_type_id: params[:sample_type_id])
+      @sample = Sample.new(sample_type_id: params[:sample_type_id], project_ids: params[:project_ids])
       respond_with(@sample)
     else
       project_ids_param = params[:sample] ? params[:sample][:project_ids] : {}
