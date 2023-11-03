@@ -43,7 +43,8 @@ class SamplesController < ApplicationController
       @sample = Sample.new(sample_type_id: params[:sample_type_id])
       respond_with(@sample)
     else
-      redirect_to select_sample_types_path(act: :create, project_ids: params[:sample][:project_ids])
+      project_ids_param = params[:sample] ? params[:sample][:project_ids] : {}
+      redirect_to select_sample_types_path(act: :create, project_ids: project_ids_param)
     end
   end
 
