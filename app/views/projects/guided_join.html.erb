@@ -6,8 +6,7 @@
         <% if @project %>
           You are requesting to join <%= link_to(@project.title, @project) %>
 
-          <%= hidden_field_tag 'projects',@project.id %>
-
+          <%= hidden_field_tag 'project_ids[]', @project.id, id: 'project_ids' %>
         <% else %>
           
           <div class="help-block">
@@ -63,9 +62,8 @@
 <script type='application/javascript'>
 
   function checkSubmitButtonEnabled() {
-    var enabled = $j('select#institution_id').val()
-      && $j('select#project_ids').val()
-    $j('#submit-button').prop('disabled',!enabled);    
+    var enabled = $j('select#institution_id').val() && $j('#project_ids').val();
+    $j('#submit-button').prop('disabled', !enabled);
   }
   
   $j(document).ready(function () {

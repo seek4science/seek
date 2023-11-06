@@ -137,7 +137,7 @@ module BootstrapHelper
       existing_objects.collect { |obj| obj.send(value_method) }
     )
 
-    hidden_field_tag(element_name, '', name: options[:name]) +
+    hidden_field_tag(element_name, '', name: options[:name], id: nil) +
       select_tag(element_name,
                  select_options,
                  options)

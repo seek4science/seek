@@ -1730,7 +1730,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
     get :guided_join, params: { id: project.id }
     assert_response :success
-    assert_select 'input#projects', value: project.id
+    assert_select '#project_ids', value: project.id
   end
 
   test 'invalid guided join' do
