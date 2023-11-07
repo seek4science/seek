@@ -11,6 +11,7 @@ namespace :seek do
     decouple_extracted_samples_policies
     decouple_extracted_samples_projects
     link_sample_datafile_attributes
+    strip_sample_attribute_pids
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -45,6 +46,19 @@ namespace :seek do
     ensure
       Seek::Config.solr_enabled = solr
     end
+  end
+
+  task(strip_sample_attribute_pids: [:environment]) do
+    puts '... Stripping Sample Attribute PIds ...'
+    n = 0
+    SampleAttribute.where('pid is NOT NULL AND pid !=?','').each do |attribute|
+      new_pid = attribute.pid.strip
+      if attribute.pid != new_pid
+        attribute.update_column(:pid, new_pid)
+        n += 1
+      end
+    end
+    puts "... Finished stripping #{n} Sample Attribute PIds."
   end
 
   task(decouple_extracted_samples_policies: [:environment]) do

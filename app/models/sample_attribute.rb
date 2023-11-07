@@ -8,6 +8,7 @@ class SampleAttribute < ApplicationRecord
 
   belongs_to :isa_tag
 
+  auto_strip_attributes :pid
   validates :sample_type, presence: true
   validates :pid, format: { with: URI::regexp, allow_blank: true, allow_nil: true, message: 'not a valid URI' }
   validate :validate_against_editing_constraints, if: -> { sample_type.present? }
