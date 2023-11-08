@@ -59,6 +59,11 @@ class SampleAttribute < ApplicationRecord
     nil
   end
 
+  # whether this attribute is tied to a controlled vocab which has a source ontology
+  def ontology_based?
+    controlled_vocab? && sample_controlled_vocab&.source_ontology.present?
+  end
+
   private
 
   def store_accessor_name
