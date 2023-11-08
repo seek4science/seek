@@ -79,9 +79,6 @@ ncbi_type.update(base_type: Seek::Samples::BaseType::STRING, regexp: '[0-9]+', p
 data_file_type = SampleAttributeType.find_or_initialize_by(title: 'Registered Data file')
 data_file_type.update(base_type: Seek::Samples::BaseType::SEEK_DATA_FILE)
 
-ontology_type = SampleAttributeType.find_or_initialize_by(title:'Ontology')
-ontology_type.update(base_type: Seek::Samples::BaseType::CV)
-
 cv_list_type = SampleAttributeType.find_or_initialize_by(title:'Controlled Vocabulary List')
 cv_list_type.update(base_type: Seek::Samples::BaseType::CV_LIST)
 
