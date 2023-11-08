@@ -247,4 +247,22 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
     type = FactoryBot.create(:controlled_vocab_attribute_type)
     refute type.seek_data_file?
   end
+
+  test 'isa_template_attributes' do
+    type = FactoryBot.create(:age_sample_attribute_type)
+    type2 = FactoryBot.create(:weight_sample_attribute_type)
+
+    ta1 = FactoryBot.create(:template_attribute, sample_attribute_type: type)
+    ta2 = FactoryBot.create(:template_attribute, sample_attribute_type: type)
+    ta3 = FactoryBot.create(:template_attribute, sample_attribute_type: type)
+    ta4 = FactoryBot.create(:template_attribute, sample_attribute_type: type2)
+
+    type.reload
+    template_attributes = type.isa_template_attributes
+    assert_equal 3, template_attributes.count
+    assert_includes template_attributes, ta1
+    assert_includes template_attributes, ta2
+    assert_includes template_attributes, ta3
+    assert_not_includes template_attributes, ta4
+  end
 end
