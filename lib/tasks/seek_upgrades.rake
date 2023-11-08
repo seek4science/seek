@@ -9,6 +9,7 @@ namespace :seek do
   task upgrade_version_tasks: %i[
     environment
     strip_sample_attribute_pids
+    rename_registered_sample_multiple_attribute_type
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -45,8 +46,16 @@ namespace :seek do
     end
   end
 
+  task(rename_registered_sample_multiple_attribute_type: [:environment]) do
+    attr = SampleAttributeType.find_by(title:'Registered Sample (multiple)')
+    if attr
+      puts "..... Renaming sample attribute type 'Registered Sample (multiple)' to 'Registered Sample List'."
+      attr.update_column(:title, 'Registered Sample List')
+    end
+  end
+
   task(strip_sample_attribute_pids: [:environment]) do
-    puts '... Stripping Sample Attribute PIds ...'
+    puts '..... Stripping Sample Attribute PIds ...'
     n = 0
     SampleAttribute.where('pid is NOT NULL AND pid !=?','').each do |attribute|
       new_pid = attribute.pid.strip
@@ -55,7 +64,7 @@ namespace :seek do
         n += 1
       end
     end
-    puts "... Finished stripping #{n} Sample Attribute PIds."
+    puts "..... Finished stripping #{n} Sample Attribute PIds."
   end
 
   private

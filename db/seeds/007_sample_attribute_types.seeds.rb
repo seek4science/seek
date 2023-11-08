@@ -61,11 +61,17 @@ strain_type.update(base_type: Seek::Samples::BaseType::SEEK_STRAIN)
 seek_sample_type = SampleAttributeType.find_or_initialize_by(title:'Registered Sample')
 seek_sample_type.update(base_type: Seek::Samples::BaseType::SEEK_SAMPLE)
 
-seek_sample_multi_type = SampleAttributeType.find_or_initialize_by(title:'Registered Sample (multiple)')
+seek_sample_multi_type = SampleAttributeType.find_or_initialize_by(title:'Registered Sample List')
 seek_sample_multi_type.update(base_type: Seek::Samples::BaseType::SEEK_SAMPLE_MULTI)
+
+ontology_type = SampleAttributeType.find_or_initialize_by(title:'Ontology')
+ontology_type.update(base_type: Seek::Samples::BaseType::CV)
 
 cv_type = SampleAttributeType.find_or_initialize_by(title:'Controlled Vocabulary')
 cv_type.update(base_type: Seek::Samples::BaseType::CV)
+
+cv_list_type = SampleAttributeType.find_or_initialize_by(title:'Controlled Vocabulary List')
+cv_list_type.update(base_type: Seek::Samples::BaseType::CV_LIST)
 
 uri_type = SampleAttributeType.find_or_initialize_by(title:'URI')
 uri_type.update(base_type: Seek::Samples::BaseType::STRING, regexp: URI.regexp.to_s, placeholder: 'http://www.example.com/123', resolution:'\\0')
@@ -78,12 +84,6 @@ ncbi_type.update(base_type: Seek::Samples::BaseType::STRING, regexp: '[0-9]+', p
 
 data_file_type = SampleAttributeType.find_or_initialize_by(title: 'Registered Data file')
 data_file_type.update(base_type: Seek::Samples::BaseType::SEEK_DATA_FILE)
-
-ontology_type = SampleAttributeType.find_or_initialize_by(title:'Ontology')
-ontology_type.update(base_type: Seek::Samples::BaseType::CV)
-
-cv_list_type = SampleAttributeType.find_or_initialize_by(title:'Controlled Vocabulary List')
-cv_list_type.update(base_type: Seek::Samples::BaseType::CV_LIST)
 
 linked_custom_metadata_type = SampleAttributeType.find_or_initialize_by(title:'Linked Custom Metadata')
 linked_custom_metadata_type.update(base_type: Seek::Samples::BaseType::LINKED_CUSTOM_METADATA)
