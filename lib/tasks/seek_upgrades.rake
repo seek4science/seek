@@ -9,6 +9,7 @@ namespace :seek do
   task upgrade_version_tasks: %i[
     environment
     strip_sample_attribute_pids
+    remove_ontology_attribute_type
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -56,6 +57,32 @@ namespace :seek do
       end
     end
     puts "... Finished stripping #{n} Sample Attribute PIds."
+  end
+
+  task(remove_ontology_attribute_type: [:environment]) do
+    ontology_attr_type = SampleAttributeType.find_by(title:'Ontology')
+    cv_attr_type = SampleAttributeType.find_by(title:'Controlled Vocabulary')
+    if ontology_attr_type
+      puts '..... Removing the Ontology sample attribute type ...'
+      if cv_attr_type
+        if ontology_attr_type.sample_attributes.any?
+          puts "..... Moving #{ontology_attr_type.sample_attributes.count} sample attributes to Controlled Vocabulary"
+          ontology_attr_type.sample_attributes.each do |attr_type|
+            attr_type.update_column(:sample_attribute_type_id, cv_attr_type.id)
+          end
+        end
+        if ontology_attr_type.isa_template_attributes.any?
+          puts "..... Moving #{ontology_attr_type.isa_template_attributes.count} template attributes to Controlled Vocabulary"
+          ontology_attr_type.isa_template_attributes.each do |attr_type|
+            attr_type.update_column(:sample_attribute_type_id, cv_attr_type.id)
+          end
+        end
+
+        ontology_attr_type.destroy
+      else
+        puts '..... Target Controlled Vocabulary attribute not found'
+      end
+    end
   end
 
   private
