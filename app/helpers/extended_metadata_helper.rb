@@ -1,7 +1,7 @@
 module ExtendedMetadataHelper
   include SamplesHelper
 
-  def extended_metadata_form_field_for_attribute(attribute, resource)
+  def extended_metadata_form_field_for_attribute(attribute, resource, parent_resource=nil)
     element_class = "extended_metadata_attribute_#{attribute.sample_attribute_type.base_type.downcase}"
 
     if parent_resource
