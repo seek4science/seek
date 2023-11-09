@@ -92,7 +92,7 @@ Now you are ready for installing SEEK. You can either install directly from Gith
 ### Install directly from Github
 
 If you wish to install directly from GitHub, the latest version of SEEK is
-tagged as *(v{{ site.current_seek_version }})*. To fetch this run:
+tagged as *v{{ site.current_seek_version }}*. To fetch this run:
 
     git clone https://github.com/seek4science/seek.git
     cd seek/
