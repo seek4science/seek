@@ -11,4 +11,4 @@ Google Analytics records the pages you visited on the site, and information abou
 
 The information we gather from Google Analytics helps us measure which parts of the site are useful and popular, and which parts do not work so well. This allows us to tailor and improve the site for our visitors.
 
-You can learn more about [Google Analytics](http://www.google.com/analytics/learn/privacy.html), or if you wish to you can [Opt Out](https://tools.google.com/dlpage/gaoptout)
+You can learn more about [Google Analytics](https://www.google.com/analytics/learn/privacy.html), or if you wish to you can [Opt Out](https://tools.google.com/dlpage/gaoptout)

@@ -68,7 +68,7 @@ below (comma or space seperated).
 
 ## Configuring BioPortal
 
-[BioPortal](http://bioportal.bioontology.org/) is a service used in SEEK for
+[BioPortal](https://bioportal.bioontology.org/) is a service used in SEEK for
 supporting and searching ontologies, which we communicate with via its API.
 However, the API requires an api-key that we are unable to distribute with
 SEEK. To be able to link organisms with NCBI terms, or search for organisms
@@ -77,23 +77,23 @@ for more widespread uses of ontologies - such as for the Assay and Technology
 types, and for tagging with semantic terms.
 
 To get an api-key you first need to register with BioPortal at
-http://bioportal.bioontology.org/accounts/new, and once registered and logged
+https://bioportal.bioontology.org/accounts/new, and once registered and logged
 in your api-key should be shown under Account details. More information is
 available at
-http://www.bioontology.org/wiki/index.php/BioPortal_REST_services.
+https://www.bioontology.org/wiki/index.php/BioPortal_REST_services.
 
 In SEEK, you apply the BioPortal api-key under the Admin->Configuration->Settings.
 
 ## Configuring DOI and PubMed search
 
 To be able to support adding publications using a
-[PubMed](http://www.ncbi.nlm.nih.gov/pubmed) ID or DOI to your SEEK
+[PubMed](https://www.ncbi.nlm.nih.gov/pubmed) ID or DOI to your SEEK
 installation, you need to do 2 things.
 
 *   For PubMed you simply need to add your email address under Admin->Configuration->Settings
 *   For DOI - you need to register your email address with
-    [CrossRef](http://www.crossref.org/) at
-    http://www.crossref.org/requestaccount/ and then provide that email to
+    [CrossRef](https://www.crossref.org/) at
+    https://www.crossref.org/requestaccount/ and then provide that email to
     SEEK under Admin->Configuration->Settings
 
 ## Configuring Session Store Timeout

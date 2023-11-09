@@ -38,6 +38,6 @@ layout: page
 
 ## Contributing 
 
-There are many ways in which you can contribute to the SEEK software, these documents or our [FAIRDOM](http://fair-dom.org) project.
+There are many ways in which you can contribute to the SEEK software, these documents or our [FAIRDOM](https://fair-dom.org) project.
 
 If you are interested in contributing please visit our [Contributors guide](/contributing.html).

@@ -8,7 +8,7 @@ redirect_from: "/faq.html"
 
 *Here we refer to SEEK, but is also relevant for [FAIRDOMHUB](https://www.fairdomhub.org/), which is an instance of SEEK.*
 
-Please see our general [Seek4Science FAQ](http://seek4science.org/faq)  
+Please see our general [Seek4Science FAQ](https://seek4science.org/faq)  
 
 ## Contributing 
 If you want to contribute to the SEEK software please visit our [Contribution Guide](/contributing.html)

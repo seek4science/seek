@@ -14,7 +14,7 @@ For how to install and run using Docker, which in many cases is simpler and quic
 
 If you have installed SEEK, please take a moment to fill out our very
 short,optional [SEEK Registration
-Form](http://seek4science.org/seek-registration)
+Form](https://seek4science.org/seek-registration)
 
 If you have any problems or questions, you should contact us. The following
 link will give you details on how to [Contact Us](/contacting_us.html)
@@ -23,13 +23,13 @@ SEEK is based upon the Ruby on Rails platform. Although the information on
 this page should provide you with everything you need to get a basic
 installation of SEEK up and running, some background reading on Ruby on Rails
 would be beneficial if it is new to you. Documentation and resources
-describing Ruby on Rails can be found at http://rubyonrails.org/documentation
+describing Ruby on Rails can be found at https://rubyonrails.org/documentation
 .
 
 SEEK is built upon Rails, and requires Ruby 3.1.
 
 We recommend that you run SEEK on a Linux system. This guide is based on an
-[Ubuntu (20.04 LTS)](http://releases.ubuntu.com/20.04/) system. However, running on other Linux distributions the
+[Ubuntu (20.04 LTS)](https://releases.ubuntu.com/20.04/) system. However, running on other Linux distributions the
 main difference is the name of the required packages that have to be installed
 for that distribution, other than that the steps will be the same. If you want
 to install on different distribution or version please visit [Other

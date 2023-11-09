@@ -165,7 +165,7 @@ http://sergiy.kyrylkov.name/2012/02/26/phusion-passenger-with-apache-on-rhel-6
 -centos-6-sl-6-with-selinux but we have been unable to get this to work.
 
 If you have a solution on how to re-enable SELinux, please contact us. You can
-find details about how to contact us at http://seek4science.org/contact
+find details about how to contact us at https://seek4science.org/contact
 
 
 ## Ubuntu 10.04 (LTS)

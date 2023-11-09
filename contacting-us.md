@@ -11,7 +11,7 @@ We have a number of ways you can contact us:
 
 ## Contact FAIRDOM
 
-You can contact us through [FAIRDOM](http://fair-dom.org) using [various channels](https://fair-dom.org/get_involved).
+You can contact us through [FAIRDOM](https://fair-dom.org) using [various channels](https://fair-dom.org/get_involved).
 
 This should be used if your query or feedback is of a more confidential nature. Remember to provide your email address.
 
@@ -31,6 +31,6 @@ For more details and guidelines please visit [Reporting Bugs and raising Feature
 
 We have 2 Google Groups. These groups are open to anonymous queries, you don't have to be a group member to submit a query.
 
-* For technical or development related queries please use [SEEK Developers Group](http://groups.google.com/group/seek-developers)
-* For general queries, or queries about using SEEK please us [Seek4Science Group](http://groups.google.com/group/seek4science)
+* For technical or development related queries please use [SEEK Developers Group](https://groups.google.com/group/seek-developers)
+* For general queries, or queries about using SEEK please us [Seek4Science Group](https://groups.google.com/group/seek4science)
 

@@ -661,11 +661,11 @@ Release date: _December 11th 2017_
 
 This is quite a large release, and the main highlights include:
 
-  * Our first released version of our **JSON API**. This has been built to conform to the [JSON API](http://jsonapi.org) specification, 
+  * Our first released version of our **JSON API**. This has been built to conform to the [JSON API](https://jsonapi.org) specification, 
     and is documented on [SwaggerHub](https://app.swaggerhub.com/apis/FAIRDOM/SEEK/0.1).
     This read API has been developed in conjuction with, and feeds into, a write API which will be released incrementally
     in subsequent releases. For more details please read [API](/help/user-guide/api.html).
-  * Incorporating the new **[JERM 2 ontology](http://jermontology.org)**, along with updates and extensions to the RDF produced by 
+  * Incorporating the new **[JERM 2 ontology](https://jermontology.org)**, along with updates and extensions to the RDF produced by 
     SEEK.
   * **Migrated legacy sharing permissions**: Given registration for SEEK is open to anyone, 
   we have removed the ability to administer sharing permissions of items for _“all registered users”_. 
@@ -754,7 +754,7 @@ Release date: _March 17th 2017_
 
 ![new_sharing_matrix](/images/release-notes/openbis.png)
 
-This is the first public release that supports [openBIS](http://fair-dom.org/platform/openbis/) integration. This version includes
+This is the first public release that supports [openBIS](https://fair-dom.org/platform/openbis/) integration. This version includes
 
   * Ability to link and browse an openBIS space and datastore, and browse DataSets
   * Easily register an openBIS DataSet with SEEK as a DataFile
@@ -802,7 +802,7 @@ Release date: _January 23rd 2017_
 Large update with many new features and improvements, in particular a new approach to handling Sample information.
 
   * A major reimplementation and design of our support for Samples
-    * Developed as part of our discussions within the [FAIRDOM-ELIXIR Samples Club](http://fair-dom.org/communities/samplesclub/), which was setup specifically to overcome problems with
+    * Developed as part of our discussions within the [FAIRDOM-ELIXIR Samples Club](https://fair-dom.org/communities/samplesclub/), which was setup specifically to overcome problems with
      our old BioSamples
     * Flexible system that allows users to design their own Sample Type standards, which are associated with an 
     extractable spreadsheet template
@@ -870,7 +870,7 @@ Small fixes and minor improvements - for full details see [SEEK v1.1.1 release n
 Release date: _June 15th 2016_
 
   * New icons and front page changes - in particular
-      * New and improved SEEK logo - [http://goo.gl/NeALVA](http://goo.gl/NeALVA)
+      * New and improved SEEK logo - [https://goo.gl/NeALVA](https://goo.gl/NeALVA)
       * New default avatars for Project and Institution
       * New logos for Investigation, Study and Assays
       * New logos badges for the different roles
@@ -936,7 +936,7 @@ Release date: _December 8th 2015_
 
 ### Investigation Snapshots and publication
 
-* Support for creating a [Research Object](http://www.researchobject.org/) for an Investigation to form a *Snapshot*.
+* Support for creating a [Research Object](https://www.researchobject.org/) for an Investigation to form a *Snapshot*.
   * This allows an Investigation to be frozen in time for publication, whilst allowing it to continue to change in the future.
   * Support for easily and quickly making a full Investigation publically available.
 * A DOI can be generated and associated with an Investigation Snapshot.
@@ -966,7 +966,7 @@ Release date: _December 8th 2015_
 
 * Improvements to ISA graph rendering.
 * Better reporting of the source of error, if an error occurs with a 3rd party service integration.
-* [ORCiD](http://orcid.org/) field can be made mandatory during registration.
+* [ORCiD](https://orcid.org/) field can be made mandatory during registration.
 * File extensions and urls are indexed for search.
 * [Imprint/Impressum](https://en.wikipedia.org/wiki/Impressum) support.
 
@@ -976,4 +976,4 @@ A full detailed list of changes included in this release can be found in the [SE
 
 [//]: <>## Previous releases
 
-[//]: <>For previous releases please visit our [Earlier Changelogs](http://seek4science.org/changes).
+[//]: <>For previous releases please visit our [Earlier Changelogs](https://seek4science.org/changes).

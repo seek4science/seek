@@ -9,7 +9,7 @@ layout: page
 
 The metadata sheet in the templates allows some basic information to be collected and recorded along with the data.
 
-The template has been construced using the [JERM Ontology](http://jermontology.org), and built using [RightField](http://rightfield.org.uk).
+The template has been construced using the [JERM Ontology](https://jermontology.org), and built using [RightField](https://rightfield.org.uk).
 
 When uploaded to SEEK this information is then automatically detected and used to populate the form.
 

@@ -22,4 +22,4 @@ For details on how to upgrade an existing FAIRDOM-SEEK installation please refer
 
 ## Docker
 
-FAIRDOM-SEEK can also be deployed using [Docker](http://docker.com), for which we provide Docker images. Please read our [Docker guide](/tech/docker.html).
+FAIRDOM-SEEK can also be deployed using [Docker](https://docker.com), for which we provide Docker images. Please read our [Docker guide](/tech/docker.html).

@@ -56,7 +56,7 @@ You can define the different types of data that the attributes should be:
 * **Date**: A selected date (e.g. 2nd December 2016)
 * **Date time**: a selected date and time (e.g. 2nd December 2016 at 14:00 GMT)
 * **Real number**: A number that can be a fraction and include a decimal place, e.g 1.25
-* **Web link**: a link to a specific web page (e.g. http://fair-dom.org)
+* **Web link**: a link to a specific web page (e.g. https://fair-dom.org)
 * **Email address**: e.g. support@fair-dom.org
 * **CHEBI ID**: An identification for a specific chemical structure registered in the ChEBI database (https://www.ebi.ac.uk/chebi/) (e.g. CHEBI:17234)
 * **Boolean**: a true/false declaration, 1 or 0 can also be accepted.
