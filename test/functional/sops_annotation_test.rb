@@ -256,11 +256,11 @@ class SopsAnnotationTest < ActionController::TestCase
     login_as p.user
     get :new
     assert_response :success
-    assert_select 'input#tag_list'
+    assert_select 'select#tag_list'
 
     sop = FactoryBot.create :sop, contributor: p
     get :edit, params: { id: sop }
     assert_response :success
-    assert_select 'input#tag_list'
+    assert_select 'select#tag_list'
   end
 end

@@ -29,7 +29,7 @@ class StudyBatchUpload < ApplicationRecord
   def self.extract_studies_from_file(studies_file)
     studies = []
     parsed_sheet = Seek::Templates::StudiesReader.new(studies_file)
-    metadata_type = CustomMetadataType.where(title: 'MIAPPE metadata', supported_type: 'Study').last
+    metadata_type = ExtendedMetadataType.where(title: 'MIAPPE metadata', supported_type: 'Study').last
     columns = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
     study_start_row_index = 4
     parsed_sheet.each_record(3, columns) do |index, data|
@@ -37,8 +37,8 @@ class StudyBatchUpload < ApplicationRecord
         studies << Study.new(
             title: data[1].value,
             description: data[2].value,
-            custom_metadata: CustomMetadata.new(
-                custom_metadata_type: metadata_type,
+            extended_metadata: ExtendedMetadata.new(
+                extended_metadata_type: metadata_type,
                 data: generate_metadata(data)
             )
         )
@@ -106,8 +106,8 @@ class StudyBatchUpload < ApplicationRecord
   def self.get_existing_studies(studies)
     existing_studies = []
     studies.each do |study|
-      study_metadata_id = study.custom_metadata.data[:id]
-      find_metadata = CustomMetadata.where('json_metadata LIKE ?', "%\"id\":\"#{study_metadata_id}\"%")
+      study_metadata_id = study.extended_metadata.data[:id]
+      find_metadata = ExtendedMetadata.where('json_metadata LIKE ?', "%\"id\":\"#{study_metadata_id}\"%")
       next if find_metadata.nil?
 
       find_metadata.each do |metadata|

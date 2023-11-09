@@ -23,37 +23,50 @@ class IsaStudiesControllerTest < ActionController::TestCase
         post :create, params: { isa_study: { study: { title: 'test', investigation_id: inv.id, sop_id: FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy)).id },
                                              source_sample_type: { title: 'source', project_ids: [projects.first.id],
                                                                    sample_attributes_attributes: {
-                                                                     '0' => {
-                                                                       pos: '1', title: 'a string', required: '1', is_title: '1',
-                                                                       sample_attribute_type_id: FactoryBot.create(:string_sample_attribute_type).id, _destroy: '0'
-                                                                     },
-                                                                     '1' => {
-                                                                       pos: '2', title: 'source', required: '1',
+                                                                     '1': {
+                                                                       pos: '1', title: 'Source Name', required: '1', is_title: '1',
                                                                        sample_attribute_type_id: FactoryBot.create(:string_sample_attribute_type).id,
                                                                        isa_tag_id: IsaTag.find_by_title(Seek::ISA::TagType::SOURCE).id, _destroy: '0'
                                                                      },
-                                                                     '2' => {
-                                                                       pos: '3', title: 'a sample', required: '1',
-                                                                       sample_attribute_type_id: FactoryBot.create(:string_sample_attribute_type).id, _destroy: '0'
+                                                                     '2': {
+                                                                       pos: '2', title: 'Source Characteristic 1', required: '1', is_title: '0',
+                                                                       sample_attribute_type_id: FactoryBot.create(:string_sample_attribute_type).id,
+                                                                       isa_tag_id: IsaTag.find_by_title(Seek::ISA::TagType::SOURCE_CHARACTERISTIC).id, _destroy: '0'
                                                                      }
                                                                    } },
-                                             sample_collection_sample_type: { title: 'collection', project_ids: [projects.first.id],
+                                             sample_collection_sample_type: { title: 'sample collection', project_ids: [projects.first.id],
                                                                               sample_attributes_attributes: {
-                                                                                '0' => {
-                                                                                  pos: '1', title: 'a string', required: '1', is_title: '1',
-                                                                                  sample_attribute_type_id: FactoryBot.create(:string_sample_attribute_type).id, _destroy: '0'
-                                                                                },
-                                                                                '1' => {
-                                                                                  pos: '2', title: 'sample', required: '1',
-                                                                                  sample_attribute_type_id: FactoryBot.create(:string_sample_attribute_type).id,
-                                                                                  isa_tag_id: IsaTag.find_by_title(Seek::ISA::TagType::SAMPLE).id, _destroy: '0'
-                                                                                },
-                                                                                '2' => {
-                                                                                  pos: '3', title: 'a sample', required: '1',
+                                                                                '1': {
+                                                                                  pos: '1', title: 'Input', required: '1', is_title: '0',
                                                                                   sample_attribute_type_id: FactoryBot.create(:sample_multi_sample_attribute_type).id,
-                                                                                  linked_sample_type_id: 'self', _destroy: '0'
+                                                                                  linked_sample_type_id: 'self',
+                                                                                  _destroy: '0'
+                                                                                },
+                                                                                '2': {
+                                                                                  pos: '2', title: 'sample collection', required: '1', is_title: '0',
+                                                                                  sample_attribute_type_id: FactoryBot.create(:string_sample_attribute_type).id,
+                                                                                  isa_tag_id: IsaTag.find_by_title(Seek::ISA::TagType::PARAMETER_VALUE).id,
+                                                                                  _destroy: '0'
+                                                                                },
+                                                                                '3': {
+                                                                                  pos: '3', title: 'sampling site', required: '0', is_title: '0',
+                                                                                  sample_attribute_type_id: FactoryBot.create(:string_sample_attribute_type).id,
+                                                                                  isa_tag_id: IsaTag.find_by_title(Seek::ISA::TagType::PROTOCOL).id,
+                                                                                  _destroy: '0'
+                                                                                },
+                                                                                '4': {
+                                                                                  pos: '4', title: 'Sample Name', required: '1', is_title: '1',
+                                                                                  sample_attribute_type_id: FactoryBot.create(:string_sample_attribute_type).id,
+                                                                                  isa_tag_id: IsaTag.find_by_title(Seek::ISA::TagType::SAMPLE).id,
+                                                                                  _destroy: '0'
+                                                                                },
+                                                                                '5': {
+                                                                                  pos: '5', title: 'material type', required: '1', is_title: '0',
+                                                                                  sample_attribute_type_id: FactoryBot.create(:string_sample_attribute_type).id,
+                                                                                  isa_tag_id: IsaTag.find_by_title(Seek::ISA::TagType::SAMPLE_CHARACTERISTIC).id,
+                                                                                  _destroy: '0'
                                                                                 }
-                                                                              } } } }
+                                                                                } } } }
       end
     end
     i = assigns(:isa_study)

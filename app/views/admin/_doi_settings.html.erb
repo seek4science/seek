@@ -1,6 +1,6 @@
 <%= admin_checkbox_setting(:doi_minting_enabled, 1, Seek::Config.doi_minting_enabled,
                            "DOI minting enabled", "Allows you to generate a DOI for an asset, using DataCite Metadata Store Web service. A contract is required with DataCite to be able to use their service, otherwise you should disable this setting.",
-                           :onchange=>toggle_appear_javascript('doi_minting_block')) %>
+                           onchange: toggle_appear_javascript('doi_minting_block')) %>
 <div id="doi_minting_block" class="additional_settings" style="<%= show_or_hide_block Seek::Config.doi_minting_enabled -%>">
   <%= admin_text_setting(:datacite_username, Seek::Config.datacite_username,
                          'Datacite username', 'The username DataCite provided you with for your organization.') %>

@@ -10,6 +10,7 @@
     text: "your items",
     select_deselect_all: true,
     collapse_expand: true,
+    show_hide_blocked: publishing,
     show_hide_permissions: show_permissions
   } %>
 
@@ -34,6 +35,7 @@
           <div class="batch-selection-collapse">
             <%= render partial: 'assets/batch_selection/buttons', locals: {
               text: (text_for_resource items.first).downcase.pluralize,
+              show_hide_blocked: publishing,
               select_deselect_all: true
             } %>
             <% items.each do |item| %>
@@ -57,6 +59,7 @@
           <div class="batch-selection-collapse">
             <%= render partial: 'assets/batch_selection/buttons', locals: {
               text: "items not in ISA",
+              show_hide_blocked: publishing,
               select_deselect_all: true
             } %>
             <% @assets_not_in_isa.each do |item| %>

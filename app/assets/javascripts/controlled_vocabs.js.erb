@@ -215,7 +215,7 @@ CVTerms = {
                 CVTerms.disableAddTermButton('<%= I18n.t('controlled_vocabs.add_new_term_disabled_reason') %>');
                 var link = $j('a#selected-ols-link');
                 link.text(selected.text);
-                link.attr('href', 'https://www.ebi.ac.uk/ols/ontologies/' + selected.value);
+                link.attr('href', '<%= Ebi::OlsClient::ROOT_URL %>/ontologies/' + selected.value);
             }
         });
 

@@ -22,7 +22,10 @@
 <% seek_sample_multi = sample_attribute.try(:seek_sample_multi?) %>
 <% link_to_self = sample_attribute && sample_attribute.deferred_link_to_self %>
 <% hide_seek_sample_multi = seek_sample_multi && displaying_single_page? %>
+<% isa_tags_options = IsaTag.all.map { |it| [it.title, it.id] } %>
+<% display_isa_tag ||= false %>
 <% isa_tag_id = sample_attribute&.isa_tag_id %>
+<% isa_tag_title = sample_attribute&.isa_tag&.title %>
 
 <tr class="sample-attribute <%= 'success' if sample_attribute.nil? -%><%='hidden' if hide_seek_sample_multi -%>" data-index="<%= index-%>">
   <th scope="row" class="attribute-position">
@@ -52,19 +55,21 @@
   </td>
   <td>
     <%= select_tag "#{field_name_prefix}[sample_attribute_type_id]",
-                   options_for_select(displayed_sample_attribute_types.sort_by(&:title).sort_by { |t| t.default? ? 0 : 1 }.map { |t| [t.title, t.id,{'data-use-cv'=>t.controlled_vocab? || t.seek_cv_list?,'data-is-ontology'=>t.ontology?, 'data-is-seek-sample'=>t.seek_sample? || t.seek_sample_multi? }] }, attribute_type_id),
+                   options_for_select(displayed_sample_attribute_types.sort_by(&:title).sort_by { |t| t.default? ? 0 : 1 }.map do |t|
+                     [t.title, t.id,{'data-use-cv': t.controlled_vocab? || t.seek_cv_list?, 'data-is-seek-sample': t.seek_sample? || t.seek_sample_multi? }]
+                   end , attribute_type_id),
                    class: 'form-control sample-type-attribute-type',
                    disabled: !allow_type_change, data: { attr: "type" } %>
     <div class='controlled-vocab-block' style="<%= 'display:none;' unless sample_attribute.try(:controlled_vocab?) || sample_attribute.try(:seek_cv_list?) %>">
       <br/>
       <%= select_tag "#{field_name_prefix}[sample_controlled_vocab_id]",
-                     options_for_select(SampleControlledVocab.all.map { |scv| [scv.title, scv.id, {'data-editable'=>scv.can_edit?, 'data-is-ontology'=>scv.custom_input?}] },
+                     options_for_select(SampleControlledVocab.all.map { |scv| [scv.title, scv.id, {'data-editable': scv.can_edit?}] },
                                         sample_controlled_vocab_id),
                      include_blank: true,
                      class: 'form-control controlled-vocab-selection',
                      disabled: !allow_type_change, data: { attr: "cv_id" }%>
       <% if allow_type_change %>
-        <%= button_link_to('Edit', 'edit', '#', class:'cv-edit-button', disabled: true, target: :_blank) %>        
+        <%= button_link_to('Edit', 'edit', '#', class:'cv-edit-button', disabled: true, target: :_blank) %>
         <%= create_sample_controlled_vocab_modal_button  %>
       <% end %>
       <%= button_link_to('View current', 'show', '#', class:'cv-show-button', disabled: true, target: :_blank) %>
@@ -96,6 +101,15 @@
     <%= text_field_tag "#{field_name_prefix}[pid]", pid, class: 'form-control',
                        placeholder: 'Identifier URI',  data: { attr: "pid" } %>
   </td>
+
+  <% if display_isa_tag %>
+    <td>
+      <%= select_tag "#{field_name_prefix}[isa_tag_title]",
+                      options_for_select(isa_tags_options, isa_tag_id),
+                      include_blank: true, class: 'form-control', data: {attr: "isa_tag_title"} %>
+    </td>
+  <% end %>
+
   <td>
     <%= select_tag "#{field_name_prefix}[unit_id]",
                    options_for_select(Unit.order(:order).map { |u| ["#{u.symbol} #{u.title}", "#{u.id}"] },
@@ -108,7 +122,7 @@
 
   <td>
     <% if allow_attribute_removal %>
-      <%= hidden_field_tag "#{field_name_prefix}[isa_tag_id]", isa_tag_id, data: { attr: "isa_tag_id" }  %>
+      <%= hidden_field_tag "#{field_name_prefix}[isa_tag_id]", (display_isa_tag ? isa_tag_id : nil), data: { attr: "isa_tag_id" }  %>
       <%= hidden_field_tag "#{field_name_prefix}[_destroy]", '0', autocomplete: 'off' %>
       <div class="btn-group" data-toggle="buttons">
         <label class="btn btn-danger">

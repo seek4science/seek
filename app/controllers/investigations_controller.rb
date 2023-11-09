@@ -141,7 +141,7 @@ class InvestigationsController < ApplicationController
     params.require(:investigation).permit(:title, :description, { project_ids: [] }, *creator_related_params,
                                           :position, { publication_ids: [] },
                                           { discussion_links_attributes:[:id, :url, :label, :_destroy] },
-                                          { custom_metadata_attributes: determine_custom_metadata_keys })
+                                          { extended_metadata_attributes: determine_extended_metadata_keys })
   end
 
   def check_studies_are_for_this_investigation

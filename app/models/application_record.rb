@@ -15,7 +15,7 @@ class ApplicationRecord < ActiveRecord::Base
   include Seek::TitleTrimmer
   include Seek::ActsAsAsset
   include Seek::ActsAsISA
-  include HasCustomMetadata
+  include HasExtendedMetadata
   include Seek::Doi::ActsAsDoiMintable
   include Seek::Doi::ActsAsDoiParent
   include Seek::ResearchObjects::ActsAsSnapshottable

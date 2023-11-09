@@ -1,0 +1,16 @@
+<% return if ExtendedMetadataType.where(supported_type:resource.class.name).empty? %>
+
+<%
+  label ||= 'Extended Metadata'
+%>
+
+<div class="form-group">
+  <%= f.fields_for(:extended_metadata,resource.extended_metadata || ExtendedMetadata.new) do |ff| %>
+    <%= f.label label %>
+    <%= ff.collection_select(:extended_metadata_type_id,ExtendedMetadataType.where(supported_type:resource.class.name),
+                             :id, :title,
+                             {prompt:'Select'},
+                             {class:"form-control", id:'extended_metadata_attributes_extended_metadata_type_id'}) %>
+  <% end %>
+</div>
+

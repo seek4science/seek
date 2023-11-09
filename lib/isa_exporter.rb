@@ -173,7 +173,7 @@ module IsaExporter
       sample_types = @investigation.studies.map(&:sample_types) + @investigation.assays.map(&:sample_type)
       sample_types.flatten.each do |sa|
         sa.sample_attributes.each do |atr|
-          source_ontologies << atr.sample_controlled_vocab.source_ontology if atr.sample_attribute_type.ontology?
+          source_ontologies << atr.sample_controlled_vocab.source_ontology if atr.ontology_based?
         end
       end
       source_ontologies.uniq.map { |s| { name: s, file: '', version: '', description: '' } }
@@ -487,7 +487,7 @@ module IsaExporter
     end
 
     def get_ontology_details(sample_attribute, label, vocab_term)
-      is_ontology = sample_attribute.sample_attribute_type.ontology?
+      is_ontology = sample_attribute.ontology_based?
       iri = ''
       if is_ontology
         iri =

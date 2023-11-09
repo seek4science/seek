@@ -75,6 +75,11 @@ class SamplesController < ApplicationController
 
   def edit
     @sample = Sample.find(params[:id])
+    if !@sample.originating_data_file.nil? && @sample.edit_count.zero?
+      flash.now[:error] = '<strong>Warning:</strong> This sample was extracted from a datafile.
+                           If you edit the sample, it will no longer correspond to the original source data.<br/>
+                           Unless you cancel, a label will be added to the sample\'s source field to indicate it is no longer valid.'.html_safe
+    end
     respond_with(@sample)
   end
 
@@ -323,7 +328,7 @@ class SamplesController < ApplicationController
   end
 
   def templates_enabled?
-    unless Seek::Config.sample_type_template_enabled
+    unless Seek::Config.isa_json_compliance_enabled
       flash[:error] = 'Not available'
       redirect_to select_sample_types_path
     end

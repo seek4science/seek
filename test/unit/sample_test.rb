@@ -696,10 +696,10 @@ class SampleTest < ActiveSupport::TestCase
     end
   end
 
-  test 'samples extracted from a data file cannot be edited' do
+  test 'samples extracted from a data file can be edited' do
     sample = FactoryBot.create(:sample_from_file)
 
-    refute sample.state_allows_edit?
+    assert sample.state_allows_edit?
   end
 
   test 'samples not extracted from a data file can be edited' do
@@ -708,48 +708,45 @@ class SampleTest < ActiveSupport::TestCase
     assert sample.state_allows_edit?
   end
 
-  test 'extracted samples inherit permissions from data file' do
+  test 'extracted samples copy permissions from data file' do
     person = FactoryBot.create(:person)
     other_person = FactoryBot.create(:person)
     sample_type = FactoryBot.create(:strain_sample_type)
-    data_file = FactoryBot.create(:strain_sample_data_file, policy: FactoryBot.create(:public_policy), contributor: person)
+    data_file = FactoryBot.create(:strain_sample_data_file, contributor: person, policy: FactoryBot.create(:private_policy,
+                     permissions:[FactoryBot.create(:permission, contributor:other_person, access_type:Policy::MANAGING)]))
+
+    # sanity check - data_file policy
+    assert_equal Policy::PRIVATE, data_file.policy.access_type
+    assert_equal 1, data_file.policy.permissions.count
+    assert_equal other_person, data_file.policy.permissions.first.contributor
+    assert_equal Policy::MANAGING, data_file.policy.permissions.first.access_type
 
     samples = data_file.extract_samples(sample_type, true)
     sample = samples.first
+    sample2 = samples.second
 
-    assert sample.can_view?(person.user)
-    assert sample.can_view?(nil)
-    assert sample.can_view?(other_person.user)
+    # check samples *copied* policy and permissions
+    assert_equal Policy::PRIVATE, sample.policy.access_type
+    assert_equal 1, sample.policy.permissions.count
+    assert_equal other_person, sample.policy.permissions.first.contributor
+    assert_equal Policy::MANAGING, sample.policy.permissions.first.access_type
+    # check policies are independent
+    refute_equal sample.policy, data_file.policy
+    refute_equal sample.policy, sample2.policy
 
-    policy = data_file.policy
     disable_authorization_checks do
-      policy.access_type = Policy::NO_ACCESS
-      policy.save
-      sample.reload
+      sample.policy.access_type = Policy::ACCESSIBLE
+      sample.policy.save
     end
-
-    assert sample.can_view?(person.user)
-    refute sample.can_view?(nil)
-    refute sample.can_view?(other_person.user)
+    data_file.reload
+    sample.reload
+    sample2.reload
+    refute data_file.can_view?(nil)
+    assert sample.can_view?(nil)
+    refute sample2.can_view?(nil)
   end
 
-  test 'sample policy persists even after originating data file deleted' do
-    person = FactoryBot.create(:person)
-    sample_type = FactoryBot.create(:strain_sample_type)
-    data_file = FactoryBot.create(:strain_sample_data_file, policy: FactoryBot.create(:public_policy), contributor: person)
-    samples = data_file.extract_samples(sample_type, true)
-    sample = samples.first
-
-    assert_equal sample.policy_id, data_file.policy_id
-
-    old_policy_id = sample.policy_id
-    disable_authorization_checks { data_file.destroy }
-
-    assert_not_nil sample.reload.policy
-    assert_equal old_policy_id, sample.policy_id
-  end
-
-  test 'extracted samples inherit projects from data file' do
+  test 'extracted samples copy projects from data file' do
     person = FactoryBot.create(:person)
     create_sample_attribute_type
     data_file = FactoryBot.create :data_file, content_blob: FactoryBot.create(:sample_type_populated_template_content_blob),
@@ -772,9 +769,9 @@ class SampleTest < ActiveSupport::TestCase
       data_file.save!
     end
 
-    assert_equal new_projects.sort, sample.projects.sort
-    assert_equal sample.projects.sort, data_file.projects.sort
-    assert_equal sample.project_ids.sort, data_file.project_ids.sort
+    assert_not_equal new_projects.sort, sample.projects.sort
+    assert_not_equal sample.projects.sort, data_file.projects.sort
+    assert_not_equal sample.project_ids.sort, data_file.project_ids.sort
   end
 
   test 'extracted samples inherit creators from data file' do
@@ -1353,6 +1350,36 @@ class SampleTest < ActiveSupport::TestCase
     end
 
 
+  end
+
+  test 'related datafiles include datafiles in attributes and originating datafile' do
+    project = FactoryBot.create(:project)
+    simple_type = FactoryBot.create(:simple_sample_type, project_ids: [project.id])
+    type_with_df_attr = FactoryBot.create(:data_file_sample_type, project_ids: [project.id])
+    df_attr = FactoryBot.build(:data_file_sample_attribute, title: 'data file 2', sample_type: type_with_df_attr)
+    type_with_df_attr.sample_attributes << df_attr
+    df1 = FactoryBot.create(:data_file)
+    df2 = FactoryBot.create(:data_file)
+    df3 = FactoryBot.create(:data_file)
+    # Sample with no data files linked as attribute nor originating data file
+    sample_no_df = Sample.new(sample_type: simple_type, project_ids: [project.id])
+    # Sample with originating data file only
+    sample_extracted = Sample.new(sample_type: simple_type, project_ids: [project.id], originating_data_file: df3)
+    # Sample with data files linked as attributes
+    sample_attributes = Sample.new(sample_type: type_with_df_attr, project_ids: [project.id])
+    sample_attributes.update(data: { 'data file': df1.id })
+    sample_attributes.update(data: { 'data file 2': df2.id })
+    sample_attributes.save!
+    # Sample with data files linked as attributes and originating data file
+    sample_ext_attr = Sample.new(sample_type: type_with_df_attr, project_ids: [project.id], originating_data_file: df3)
+    sample_ext_attr.update(data: { 'data file': df1.id })
+    sample_ext_attr.update(data: { 'data file 2': df2.id })
+    sample_ext_attr.save!
+
+    assert_equal [], sample_no_df.related_data_files
+    assert_equal [df3], sample_extracted.related_data_files
+    assert_equal [df1, df2].sort_by(&:id), sample_attributes.related_data_files.sort_by(&:id)
+    assert_equal [df1, df2, df3].sort_by(&:id), sample_ext_attr.related_data_files.sort_by(&:id)
   end
 
 end

@@ -3,14 +3,14 @@
   new_item_path = polymorphic_path([:new, controller_name.singularize.to_sym])
   items ||= instance_variable_get("@#{controller_name}")
   show_new_button = true unless local_assigns.has_key?(:show_new_button)
+  show_samples_query_button = false unless local_assigns.has_key?(:show_samples_query_button)
   title ||= nil
   subtitle ||= nil
-	isa_templates_enabled = Seek::Config.sample_type_template_enabled && Seek::Config.project_single_page_advanced_enabled
 %>
 
 <div class="pull-right">
   <% if show_new_button && controller_model.can_create? %>
-    <% if isa_templates_enabled %>
+    <% if show_samples_query_button %>
       <%= link_to "Query by #{t('template').pluralize}", query_form_samples_path, class: "btn btn-default btn" %>
     <% end %>
     <%= button_link_to(new_item_label, "new", new_item_path) %>

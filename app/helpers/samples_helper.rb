@@ -41,21 +41,23 @@ module SamplesHelper
     controlled_vocab_form_field(sample_controlled_vocab, element_name, values, nil)
   end
 
-  def linked_custom_metadata_multi_form_field(attribute, value, element_name, element_class)
-    render partial: 'custom_metadata/fancy_linked_custom_metadata_multi_attribute_fields',
+  def linked_extended_metadata_multi_form_field(attribute, value, element_name, element_class)
+    render partial: 'extended_metadata/fancy_linked_extended_metadata_multi_attribute_fields',
            locals: { value: value, attribute: attribute, element_name: element_name, element_class: element_class, collapsed: false }
   end
 
-  def linked_custom_metadata_form_field(attribute, value, element_name, element_class,depth)
+  def linked_extended_metadata_form_field(attribute, value, element_name, element_class,depth)
     html = ''
 
-    attribute.linked_custom_metadata_type.custom_metadata_attributes.each do |attr|
+    Rails.logger.info ActiveSupport::LogSubscriber.new.send(:color, attribute.inspect, :blue, bold = true)
+
+    attribute.linked_extended_metadata_type.extended_metadata_attributes.each do |attr|
       attr_element_name = "#{element_name}[#{attr.title}]"
       html += '<div class="form-group"><label>'+attr.label+'</label>'
       html +=  required_span if attr.required?
       v = value ? value[attr.title] : nil
-      if attr.linked_custom_metadata?
-        html += '<div class="form-group linked_custom_metdata_'+(depth.even? ? 'even' : 'odd')+'">'
+      if attr.linked_extended_metadata?
+        html += '<div class="form-group linked_extended_metdata_'+(depth.even? ? 'even' : 'odd')+'">'
         html +=  attribute_form_element(attr, v, attr_element_name, element_class,depth+1)
         html += '</div>'
       else
@@ -63,7 +65,7 @@ module SamplesHelper
       end
 
       unless attr.description.nil?
-        html += custom_metadata_attribute_description(attr.description)
+        html += extended_metadata_attribute_description(attr.description)
       end
       html += '</div>'
     end
@@ -140,10 +142,10 @@ module SamplesHelper
         seek_cv_attribute_display(value, attribute)
       when Seek::Samples::BaseType::CV_LIST
         value.each{|v| seek_cv_attribute_display(v, attribute) }.join(', ')
-      when Seek::Samples::BaseType::LINKED_CUSTOM_METADATA
-        linked_custom_metadata_attribute_display(value, attribute)
-      when Seek::Samples::BaseType::LINKED_CUSTOM_METADATA_MULTI
-        linked_custom_metadata_multi_attribute_display(value, attribute)
+      when Seek::Samples::BaseType::LINKED_EXTENDED_METADATA
+        linked_extended_metadata_attribute_display(value, attribute)
+      when Seek::Samples::BaseType::LINKED_EXTENDED_METADATA_MULTI
+        linked_extended_metadata_multi_attribute_display(value, attribute)
       else
         default_attribute_display(value, attribute, options)
       end
@@ -159,14 +161,14 @@ module SamplesHelper
     content
   end
 
-  def linked_custom_metadata_attribute_display(value, attribute)
+  def linked_extended_metadata_attribute_display(value, attribute)
     html = ''
     html += '<ul>'
-    attribute.linked_custom_metadata_type.custom_metadata_attributes.each do |attr|
+    attribute.linked_extended_metadata_type.extended_metadata_attributes.each do |attr|
       v = value ? value[attr.title.to_s] : nil
       html += '<li>'
-      if attr.linked_custom_metadata? || attr.linked_custom_metadata_multi?
-        html += content_tag(:span, class: 'linked_custom_metdata_display') do
+      if attr.linked_extended_metadata? || attr.linked_extended_metadata_multi?
+        html += content_tag(:span, class: 'linked_extended_metdata_display') do
           folding_panel(attr.label, true, id:attr.title) do
             display_attribute_value(v, attr)
           end
@@ -181,10 +183,10 @@ module SamplesHelper
     html.html_safe
   end
 
-  def linked_custom_metadata_multi_attribute_display(values, attribute)
+  def linked_extended_metadata_multi_attribute_display(values, attribute)
     html = ''
     values.each do |value|
-      html += linked_custom_metadata_attribute_display(value, attribute)
+      html += linked_extended_metadata_attribute_display(value, attribute)
     end
     html.html_safe
   end
@@ -241,7 +243,7 @@ module SamplesHelper
 
   # link for the sample type for the provided sample. Handles a referring_sample_id if required
   def sample_type_link(sample, user=User.current_user)
-    return nil if Seek::Config.project_single_page_advanced_enabled && !sample.sample_type.template_id.nil?
+    return nil if Seek::Config.isa_json_compliance_enabled && !sample.sample_type.template_id.nil?
 
     if (sample.sample_type.can_view?(user))
       link_to sample.sample_type.title,sample.sample_type
@@ -261,12 +263,12 @@ module SamplesHelper
   end
 
   def ols_ontology_link(ols_id)
-    link = "https://www.ebi.ac.uk/ols/ontologies/#{ols_id}"
+    link = "#{Ebi::OlsClient::ROOT_URL}/ontologies/#{ols_id}"
     link_to(link,link,target: :_blank)
   end
 
   def ols_root_term_link(ols_id, term_uri)
-    ols_link = "https://www.ebi.ac.uk/ols/ontologies/#{ols_id}/terms?iri=#{term_uri}"
+    ols_link = "#{Ebi::OlsClient::ROOT_URL}/ontologies/#{ols_id}/terms?iri=#{term_uri}"
     link_to(term_uri, ols_link, target: :_blank)
   end
 
@@ -345,10 +347,10 @@ module SamplesHelper
       sample_form_field attribute, element_name, value
     when Seek::Samples::BaseType::SEEK_SAMPLE_MULTI
       sample_multi_form_field attribute, element_name, value
-    when Seek::Samples::BaseType::LINKED_CUSTOM_METADATA
-      linked_custom_metadata_form_field attribute, value, element_name, element_class,depth
-    when Seek::Samples::BaseType::LINKED_CUSTOM_METADATA_MULTI
-      linked_custom_metadata_multi_form_field attribute, value, element_name, element_class
+    when Seek::Samples::BaseType::LINKED_EXTENDED_METADATA
+      linked_extended_metadata_form_field attribute, value, element_name, element_class,depth
+    when Seek::Samples::BaseType::LINKED_EXTENDED_METADATA_MULTI
+      linked_extended_metadata_multi_form_field attribute, value, element_name, element_class
     else
       text_field_tag element_name, value, class: "form-control #{element_class}", placeholder: placeholder
     end

@@ -1711,14 +1711,14 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select 'div.panel-heading', text: /Tags/, count: 1
-    assert_select 'input#tag_list', count: 1
+    assert_select 'select#tag_list', count: 1
   end
 
   test 'register form should include tags element' do
     register_content_blob
     assert_response :success
     assert_select 'div.panel-heading', text: /Tags/, count: 1
-    assert_select 'input#tag_list', count: 1
+    assert_select 'select#tag_list', count: 1
   end
 
   test 'edit should include not include tags element when tags disabled' do
@@ -1728,7 +1728,7 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_response :success
 
       assert_select 'div.panel-heading', text: /Tags/, count: 0
-      assert_select 'input#tag_list', count: 0
+      assert_select 'select#tag_list', count: 0
     end
   end
 
@@ -1737,7 +1737,7 @@ class DataFilesControllerTest < ActionController::TestCase
       register_content_blob
       assert_response :success
       assert_select 'div.panel-heading', text: /Tags/, count: 0
-      assert_select 'input#tag_list', count: 0
+      assert_select 'select#tag_list', count: 0
     end
   end
 
@@ -2373,7 +2373,7 @@ class DataFilesControllerTest < ActionController::TestCase
     other_person = FactoryBot.create(:person)
     df = FactoryBot.create(:data_file, contributor: person, policy: FactoryBot.create(:publicly_viewable_policy))
     sample_type = FactoryBot.create(:patient_sample_type)
-    SampleDataPersistJob.new(df, sample_type).queue_job
+    SampleDataPersistJob.new(df, sample_type, person.user).queue_job
     df.reload
 
     login_as(other_person)

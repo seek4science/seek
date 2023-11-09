@@ -8,6 +8,10 @@ module Seek
         has_many :activity_logs, as: :activity_loggable
       end
 
+      def edit_count
+        count_actions('update')
+      end
+
       def download_count
         count_actions('download')
       end

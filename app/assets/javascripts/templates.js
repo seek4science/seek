@@ -45,7 +45,8 @@ Templates.init = function (elem) {
     },
     { title: "PID", width: "10%" },
     { title: "pos" },
-    { title: "isa_tag_id" },
+    { title: "ISA Tag ID", width: "10%" },
+    { title: "ISA Tag", width: "10%" },
     {
       title: "Remove",
       width: "5%",
@@ -89,7 +90,7 @@ function loadTemplates(data) {
 
   $j.each(Object.keys(categorized), (i, key) => {
     const elem = $j(`<optgroup label=${key}></optgroup>`);
-    
+
     $j.each(categorized[key], (j, sub_item) => {
       elem.append(
         $j(`<option>${sub_item.title}</option>`).attr("value", sub_item.template_id).text(key.title)
@@ -119,13 +120,14 @@ Templates.mapData = (data) =>
     item.is_title,
     item.pid,
     item.pos,
-    item.isa_tag_id
+    item.isa_tag_id,
+    item.isa_tag_title
   ]);
 
 function loadFilterSelectors(data) {
   $j.each($j("select[id^='templates_']"), (i, elem) => {
     const key = elem.getAttribute("data-key");
-    
+
     // Gets the set of values to choose from per data-key
     let dt = [...new Set(data.map((item) => item[key]))];
     // If the key == level => options should be filtered out, depending on the 'field_name' context.
@@ -136,7 +138,7 @@ function loadFilterSelectors(data) {
       } else if(Templates.context.field_name === 'source_sample_type'){
         dt = dt.filter(lvl => lvl === "study source")
       } else if(Templates.context.field_name === 'sample_type') {
-        dt = dt.filter(lvl => lvl === "assay")
+        dt = dt.filter(lvl => ["assay - material", "assay - data file"].includes(lvl))
       }
       $j(elem).find("option").remove(); // Removes all options, even the first, i.e. "not selected"
     }
@@ -159,6 +161,42 @@ function loadFilterSelectors(data) {
   });
 }
 
+function get_filtered_isa_tags(level) {
+  var result;
+  $j.ajax({
+    type: 'POST',
+    async: false,
+    url: '/templates/filter_isa_tags_by_level',
+    data: {level: level},
+    dataType: 'json',
+    success: function(res) {
+      result = res.result;
+    },
+    error: function (errMsg) {
+      alert(`Couldn't find valid ISA Tags because of the following error:\n${errMsg}`);
+      result = [];
+    }
+  });
+  return result;
+}
+
+function updateIsaTagSelect(template_level, attribute_row) {
+  const isa_tags = get_filtered_isa_tags(template_level);
+
+  // Remove all options first, except blank one
+  $j(attribute_row).find('select[data-attr="isa_tag_title"] option:not([value=""])').each(function() {
+    $j(this).remove();
+  });
+
+  // Append filtered option to a new attribute row
+  $j.each(isa_tags, function (i, tag) {
+    $j(attribute_row).find('select[data-attr="isa_tag_title"]').append($j('<option>', {
+      value: tag.value,
+      text: tag.text
+    }));
+  });
+}
+
 const applyTemplate = () => {
   const id = $j("#source_select").find(":selected").val();
   const data = templates.find((t) => t.template_id == id);
@@ -170,10 +208,17 @@ const applyTemplate = () => {
   const attribute_table = "#attribute-table" + suffix;
   const attribute_row = "#new-attribute-row" + suffix;
   const addAttributeRow = "#add-attribute-row" + suffix;
+  updateIsaTagSelect(data.level, attribute_row);
 
   $j(`${attribute_table} tbody`).find("tr:not(:last)").remove();
   SampleTypes.unbindSortable();
-  // Make sure default sorted attributes are added to the table 
+
+  // Set template group, level and organism
+  $j('#template_organism').val(data.organism);
+  $j('#template_level').val(data.level);
+  $j('#template_parent_id').val(data.template_id);
+
+  // Make sure default sorted attributes are added to the table
   Templates.table.order([9, "asc"]).draw();
   $j.each(Templates.table.rows().data(), (i, row) => {
     var newRow = $j(`${attribute_row} tbody`).clone().html();
@@ -197,6 +242,8 @@ const applyTemplate = () => {
     $j(newRow).find(".sample-type-is-title").prop("checked", row[7]);
     $j(newRow).find('[data-attr="pid"]').val(row[8]);
     $j(newRow).find('[data-attr="isa_tag_id"]').val(row[10]);
+    $j(newRow).find('[data-attr="isa_tag_title"]').val(row[10]);
+    $j(newRow).find('[data-attr="isa_tag_title"]').attr('disabled', true);
 
     // Show the CV block if cv_id is not empty
     if (row[4]) $j(newRow).find(".controlled-vocab-block").show();
@@ -238,7 +285,7 @@ const updateTypeSelect = function(field_name) {
   } else if (field_name === 'source_sample_type') {
 		$j("#templates_type_select").val("study source").change();
   } else if(field_name === 'sample_type') {
-    $j("#templates_type_select").val("assay").change();
+    $j("#templates_type_select").val("assay - material").change();
   } else {
     $j("#templates_type_select option").first().change();
   }

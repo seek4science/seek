@@ -23,7 +23,11 @@
           Samples.initTable($j('#samples-table'));
         });
       </script>
+  <% else %>
+    <div class='alert alert-warning'>
+      There are no Samples available to be displayed
+    </div>
   <% end %>
 <% else %>
-    <%= render partial: "general/index" %>
+    <%= render partial: "general/index", locals: { show_samples_query_button: Seek::Config.isa_json_compliance_enabled }  %>
 <% end %>
