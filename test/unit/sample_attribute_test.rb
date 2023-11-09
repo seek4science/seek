@@ -330,6 +330,22 @@ class SampleAttributeTest < ActiveSupport::TestCase
     assert_equal '', attribute.short_pid
   end
 
+  test 'ontology_based?' do
+    attribute = FactoryBot.create(:sample_sample_attribute, sample_type: FactoryBot.create(:simple_sample_type))
+    refute attribute.ontology_based?
+
+    attribute = FactoryBot.create(:simple_string_sample_attribute, sample_type: FactoryBot.create(:simple_sample_type))
+    refute attribute.ontology_based?
+
+    attribute = FactoryBot.create(:apples_controlled_vocab_attribute, sample_type: FactoryBot.create(:simple_sample_type))
+    refute attribute.sample_controlled_vocab.ontology_based?
+    refute attribute.ontology_based?
+
+    attribute.sample_controlled_vocab = FactoryBot.create(:topics_controlled_vocab)
+    assert attribute.sample_controlled_vocab.ontology_based?
+    assert attribute.ontology_based?
+  end
+
   private
 
   def valid_value?(attribute, value)

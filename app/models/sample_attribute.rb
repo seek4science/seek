@@ -22,6 +22,9 @@ class SampleAttribute < ApplicationRecord
   # sample type exists
   attr_reader :deferred_link_to_self
 
+  # whether this attribute is tied to a controlled vocab which has a source ontology
+  delegate :ontology_based?, to: :sample_controlled_vocab, allow_nil: true
+
   def title=(title)
     super
     store_accessor_name
@@ -57,11 +60,6 @@ class SampleAttribute < ApplicationRecord
 
   def linked_custom_metadata_type
     nil
-  end
-
-  # whether this attribute is tied to a controlled vocab which has a source ontology
-  def ontology_based?
-    controlled_vocab? && sample_controlled_vocab&.source_ontology.present?
   end
 
   private
