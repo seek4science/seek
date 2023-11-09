@@ -4,6 +4,7 @@ class SampleAttributeType < ApplicationRecord
   validate :validate_allowed_type, :validate_regular_expression, :validate_resolution
 
   has_many :sample_attributes, inverse_of: :sample_attribute_type
+  has_many :isa_template_attributes, class_name: 'TemplateAttribute', inverse_of: :sample_attribute_type
   has_many :custom_metadata_attributes, inverse_of: :sample_attribute_type
 
   before_save :set_defaults_attributes
@@ -106,10 +107,6 @@ class SampleAttributeType < ApplicationRecord
 
   def seek_data_file?
     base_type == Seek::Samples::BaseType::SEEK_DATA_FILE
-  end
-
-  def ontology?
-    controlled_vocab? && title == 'Ontology'
   end
 
   def base_type_handler(additional_options = {})
