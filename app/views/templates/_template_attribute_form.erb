@@ -42,13 +42,15 @@
   </td>
   <td>
     <%= select_tag "#{field_name_prefix}[sample_attribute_type_id]",
-                   options_for_select(SampleAttributeType.all.sort_by(&:title).sort_by { |t| t.default? ? 0 : 1 }.map { |t| [t.title, t.id,{'data-is-cv'=>t.controlled_vocab?,'data-is-seek-sample'=>t.seek_sample? || t.seek_sample_multi? }] }, attribute_type_id),
+                   options_for_select(SampleAttributeType.all.sort_by(&:title).sort_by { |t| t.default? ? 0 : 1 }.map do |t|
+                     [t.title, t.id,{'data-is-cv': t.controlled_vocab?,'data-is-seek-sample': t.seek_sample? || t.seek_sample_multi? }]
+                   end, attribute_type_id),
                    class: 'form-control sample-type-attribute-type', data: {attr: "type"} %>
 
     <div class='controlled-vocab-block' style="<%= 'display:none;' unless template_attribute.try(:controlled_vocab?) %>">
       <br/>
       <%= select_tag "#{field_name_prefix}[sample_controlled_vocab_id]",
-                     options_for_select(SampleControlledVocab.all.map { |scv| [scv.title, scv.id, {'data-editable'=>scv.can_edit?}] },
+                     options_for_select(SampleControlledVocab.all.map { |scv| [scv.title, scv.id, {'data-editable': scv.can_edit?}] },
                       sample_controlled_vocab_id),include_blank: true,
                      class: 'form-control controlled-vocab-selection', data: {attr: "cv_id"} %>
 
