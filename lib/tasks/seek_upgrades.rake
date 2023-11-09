@@ -89,7 +89,7 @@ namespace :seek do
 
         ontology_attr_type.destroy
       else
-        puts '..... Target Controlled Vocabulary attribute not found'
+        puts '..... Target Controlled Vocabulary attribute type not found'
       end
     end
   end
