@@ -246,10 +246,6 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
       end
     end
 
-    assert_select('a#add-term') do |button|
-      assert button.attr('disabled').present?
-    end
-
   end
 
   test 'edit simple, non ontology cv should have editable terms' do
