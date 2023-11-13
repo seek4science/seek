@@ -1,5 +1,4 @@
 <div id="ft">
-  <%= render partial: 'layouts/workfowhub_logos' %>
   <div class="container">
     <div id="seek-credit">
       <a href="https://seek4science.org/" target="_blank" class="powered-by">
@@ -17,7 +16,7 @@
         <% if logged_in_and_registered? %>
           <%= link_to 'Provide feedback', feedback_home_path -%> |
         <% end %>
-        <%= link_to 'Funding and Programmes', funding_home_path -%> |
+        <%= link_to 'Acknowledgements', 'https://about.workflowhub.eu/project/acknowledgements/', target: '_blank' -%> |
         <% if Seek::Config.funding_link.present? %>
           <%= link_to Seek::Config.funding_link, Seek::Config.funding_link, target: '_blank' %> |
         <% end %>
