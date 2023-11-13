@@ -13,7 +13,7 @@ If you have any comments or feedback about a release, then please [Contact Us](/
 
 ## Version 1.14.1
 
-Release date: _12th November 2023_
+Release date: _13th November 2023_
 
 A patch release that includes some important bug fixes and improvments:
 
