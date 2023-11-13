@@ -19,6 +19,7 @@
 *= require organisms
 *= require human_diseases
 *= require samples
+*= require controlled_vocabs
 *= require DataTables-1.11.3/dataTables.bootstrap
 *= require DataTables-1.11.3/select.bootstrap
 *= require DataTables-1.11.3/buttons.bootstrap
