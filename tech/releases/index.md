@@ -15,7 +15,7 @@ If you have any comments or feedback about a release, then please [Contact Us](/
 
 Release date: _13th November 2023_
 
-A patch release that includes some important bug fixes and improvments:
+A patch release that includes some important bug fixes and improvements:
 
 * Fixed a problem that prevented extracted samples that include links to other samples being successfully registered.
 * Fixed an error that was occurring when a sample attrribute PID was inadvertently set to an invalid IRI.
