@@ -13,9 +13,9 @@ If you have any comments or feedback about a release, then please [Contact Us](/
 
 ## Version 1.14.1
 
-Release date: _10th November 2023_
+Release date: _12th November 2023_
 
-A patch release that includes some important bug fixes:
+A patch release that includes some important bug fixes and improvments:
 
 * Fixed a problem that prevented extracted samples that include links to other samples being successfully registered.
 * Fixed an error that was occurring when a sample attrribute PID was inadvertently set to an invalid IRI.
@@ -24,6 +24,7 @@ A patch release that includes some important bug fixes:
 * The sample attribute type "Registered Sample (multiple)" has been renamed "Registered Sample List" to be consistent with other types.
 * The sample attribute type "Ontology" has been removed, as it was just duplicate of "Controlled Vocabulary". We are looking at ways to distinguish between
 plain CV's and ontology based CV's in the UI.
+* Allow a Controlled Vocabulary that has been populated from an ontology via the Ontology Lookup Service to now also allow additional terms to be manually added.
 
 For a full list, see [closed issues for 1.14.1](https://github.com/seek4science/seek/milestone/20?closed=1)
 
