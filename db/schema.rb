@@ -633,6 +633,7 @@ ActiveRecord::Schema.define(version: 2023_11_14_110917) do
     t.text "description"
     t.string "label"
     t.integer "linked_extended_metadata_type_id"
+    t.boolean "allow_cv_free_text", default: false
     t.index ["extended_metadata_type_id"], name: "index_extended_metadata_attributes_on_extended_metadata_type_id"
     t.index ["sample_attribute_type_id"], name: "index_extended_metadata_attributes_on_sample_attribute_type_id"
     t.index ["sample_controlled_vocab_id"], name: "index_extended_metadata_attributes_on_sample_cv_id"
@@ -2095,6 +2096,7 @@ ActiveRecord::Schema.define(version: 2023_11_14_110917) do
     t.boolean "is_title", default: false
     t.integer "isa_tag_id"
     t.string "pid"
+    t.boolean "allow_cv_free_text", default: false
     t.index ["template_id", "title"], name: "index_template_id_asset_id_title"
   end
 
