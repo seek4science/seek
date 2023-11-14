@@ -5,7 +5,7 @@ module Seek
         class MissingControlledVocabularyException < AttributeHandlerException; end
 
         def test_value(value)
-          unless controlled_vocab.includes_term?(value)
+          unless additional_options[:allow_cv_free_text] || controlled_vocab.includes_term?(value)
             raise "'#{value}' is not included in the controlled vocabulary"
           end
         end

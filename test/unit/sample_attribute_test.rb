@@ -231,6 +231,13 @@ class SampleAttributeTest < ActiveSupport::TestCase
     refute attribute.validate_value?(1)
   end
 
+  test 'controlled vocab validate value with allowed free text' do
+    attribute = FactoryBot.create(:apples_controlled_vocab_attribute, is_title: true, allow_cv_free_text: true, sample_type: FactoryBot.create(:simple_sample_type))
+    assert attribute.validate_value?('Granny Smith')
+    assert attribute.validate_value?('Orange')
+    assert attribute.validate_value?(1)
+  end
+
   test 'controlled vocab must exist for CV type' do
     attribute = FactoryBot.create(:apples_controlled_vocab_attribute, is_title: true, sample_type: FactoryBot.create(:simple_sample_type))
     assert attribute.valid?

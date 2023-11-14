@@ -13,7 +13,7 @@ class CVAttributeTypeHandlerTest < ActiveSupport::TestCase
 
   test 'validate value' do
     vocab = FactoryBot.create(:apples_sample_controlled_vocab)
-    handler = Seek::Samples::AttributeTypeHandlers::CVAttributeTypeHandler.new(controlled_vocab: vocab)
+    handler = Seek::Samples::AttributeTypeHandlers::CVAttributeTypeHandler.new(controlled_vocab: vocab, allow_cv_free_text: false)
     assert handler.validate_value?('Granny Smith')
     refute handler.validate_value?('Pear')
   end
@@ -25,10 +25,9 @@ class CVAttributeTypeHandlerTest < ActiveSupport::TestCase
     end
   end
 
-  test 'bypass validation for controlled vocabs set as custom input' do
-    skip('custom input needs updating to use attribute')
+  test 'bypass validation for controlled vocabs together with allow_cv_free_text' do
     ontology_vocab = FactoryBot.create(:ontology_sample_controlled_vocab)
-    handler = Seek::Samples::AttributeTypeHandlers::CVAttributeTypeHandler.new(controlled_vocab: ontology_vocab)
+    handler = Seek::Samples::AttributeTypeHandlers::CVAttributeTypeHandler.new(controlled_vocab: ontology_vocab, allow_cv_free_text: true)
     assert handler.validate_value?('Parent')
     assert handler.validate_value?('custom value')
   end
