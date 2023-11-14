@@ -6,8 +6,9 @@ module SamplesHelper
     attribute_form_element(attribute, resource.get_attribute_value(attribute.title), element_name, element_class)
   end
 
-  def controlled_vocab_form_field(sample_controlled_vocab, element_name, values, limit = 1)
+  def controlled_vocab_form_field(attribute, element_name, values, limit = 1)
 
+    sample_controlled_vocab = attribute.sample_controlled_vocab
     scv_id = sample_controlled_vocab.id
     object_struct = Struct.new(:id, :title)
     existing_objects = Array(values).collect do |value|
@@ -32,13 +33,13 @@ module SamplesHelper
     objects_input(element_name, existing_objects,
                   typeahead: typeahead,
                   limit: limit,
-                  allow_new: sample_controlled_vocab.custom_input?,
+                  allow_new: attribute.allow_cv_free_text?,
                   class: 'form-control')
 
   end
 
-  def controlled_vocab_list_form_field(sample_controlled_vocab, element_name, values)
-    controlled_vocab_form_field(sample_controlled_vocab, element_name, values, nil)
+  def controlled_vocab_list_form_field(attribute, element_name, values)
+    controlled_vocab_form_field(attribute, element_name, values, nil)
   end
 
   def linked_extended_metadata_multi_form_field(attribute, value, element_name, element_class)
@@ -340,9 +341,9 @@ module SamplesHelper
                                                    :title, value.try(:[], 'id'))
       select_tag(element_name, options, include_blank: !attribute.required?, class: "form-control #{element_class}")
     when Seek::Samples::BaseType::CV
-      controlled_vocab_form_field attribute.sample_controlled_vocab, element_name, value
+      controlled_vocab_form_field attribute, element_name, value
     when Seek::Samples::BaseType::CV_LIST
-      controlled_vocab_list_form_field attribute.sample_controlled_vocab, element_name, value
+      controlled_vocab_list_form_field attribute, element_name, value
     when Seek::Samples::BaseType::SEEK_SAMPLE
       sample_form_field attribute, element_name, value
     when Seek::Samples::BaseType::SEEK_SAMPLE_MULTI
