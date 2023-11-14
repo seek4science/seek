@@ -100,6 +100,11 @@ FactoryBot.define do
     supported_type { 'Presentation' }
   end
 
+  factory(:simple_project_extended_metadata_type, parent: :simple_investigation_extended_metadata_type) do
+    title { 'simple project extended metadata type' }
+    supported_type { 'Project' }
+  end
+
   factory(:study_extended_metadata_type_with_spaces, class: ExtendedMetadataType) do
     title { 'study extended metadata type with spaces' }
     supported_type { 'Study' }
