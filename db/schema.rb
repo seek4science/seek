@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_10_05_153610) do
+ActiveRecord::Schema.define(version: 2023_11_14_110205) do
 
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
@@ -1709,6 +1709,7 @@ ActiveRecord::Schema.define(version: 2023_10_05_153610) do
     t.string "pid"
     t.text "description"
     t.integer "isa_tag_id"
+    t.boolean "allow_cv_free_text", default: false
     t.index ["sample_type_id"], name: "index_sample_attributes_on_sample_type_id"
     t.index ["unit_id"], name: "index_sample_attributes_on_unit_id"
   end
