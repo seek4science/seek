@@ -5,9 +5,9 @@ module Seek
         class MissingControlledVocabularyException < AttributeHandlerException; end
 
         def test_value(value)
-          unless controlled_vocab.custom_input? || controlled_vocab.includes_term?(value)
-            raise "'#{value}' is not included in the controlled vocabulary"
-          end
+          # unless controlled_vocab.custom_input? || controlled_vocab.includes_term?(value)
+          #   raise "'#{value}' is not included in the controlled vocabulary"
+          # end
         end
 
         def convert(value)
