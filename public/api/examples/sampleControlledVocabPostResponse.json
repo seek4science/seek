@@ -1,17 +1,16 @@
 {
   "data": {
-    "id": "10",
+    "id": "17",
     "type": "sample_controlled_vocabs",
     "attributes": {
       "title": "New Vocab Max",
       "description": "some description",
       "source_ontology": "EFO",
       "ols_root_term_uri": null,
-      "required": true,
       "short_name": "short_name",
       "sample_controlled_vocab_terms_attributes": [
         {
-          "id": "34",
+          "id": "16",
           "label": "organism",
           "iri": "http://some_iri",
           "parent_iri": "http://another_iri"
@@ -22,18 +21,18 @@
       "sample_controlled_vocab_terms": {
         "data": [
           {
-            "id": "34",
+            "id": "16",
             "type": "sample_controlled_vocab_terms"
           }
         ]
       }
     },
     "links": {
-      "self": "/sample_controlled_vocabs/10"
+      "self": "/sample_controlled_vocabs/17"
     },
     "meta": {
-      "created": "2022-06-07T14:14:38.000Z",
-      "modified": "2022-06-07T14:14:38.000Z",
+      "created": "2023-11-15T16:36:00.000Z",
+      "modified": "2023-11-15T16:36:00.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000"
     }
