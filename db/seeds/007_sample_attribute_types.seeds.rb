@@ -53,10 +53,10 @@ inchi_type.update(base_type: Seek::Samples::BaseType::STRING,
 
 
 # Custom Date dataType tailored to what ENA expects => combination of regex and controlled vocabulary
-ena_iso_date_type = SampleAttributeType.find_or_initialize_by(title: 'ENA collection date')
-ena_iso_date_type.update(base_type: Seek::Samples::BaseType::STRING,
+ena_custom_date_type = SampleAttributeType.find_or_initialize_by(title: 'ENA custom date')
+ena_custom_date_type.update(base_type: Seek::Samples::BaseType::STRING,
                          regexp: '^(?:[12]\d{3}(?:-(?:0[1-9]|1[0-2])(?:-(?:0[1-9]|[12]\d|3[01]))?)?(?:T\d{2}:\d{2}(?::\d{2})?Z?(?:[+-]\d{1,2})?)?(?:\/\d{4}-(?:\d{2}-(?:\d{2}(?:T\d{2}:\d{2}(?::\d{2})?Z?(?:[+-]\d{1,2})?)?)?)?)?)?$|^not collected$|^not provided$|^restricted access$|^missing: control sample$|^missing: sample group$|^missing: synthetic construct$|^missing: lab stock$|^missing: third party data$|^missing: data agreement established pre-2023$|^missing: endangered species$|^missing: human-identifiable$',
-                         placeholder: '2015 or 2015-01 or 2015-01-01')
+                         placeholder: '2015 or 2015-01 or 2015-01-01. Also accepted: "not collected", "not provided", ... (complete list of accepted terms available in ERC000011 checklist)')
 
 bool_type = SampleAttributeType.find_or_initialize_by(title:'Boolean')
 bool_type.update(base_type: Seek::Samples::BaseType::BOOLEAN)
