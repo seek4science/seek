@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_11_14_110917) do
+ActiveRecord::Schema.define(version: 2023_11_15_152940) do
 
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
@@ -1744,7 +1744,6 @@ ActiveRecord::Schema.define(version: 2023_11_14_110917) do
     t.string "first_letter", limit: 1
     t.string "source_ontology"
     t.string "ols_root_term_uri"
-    t.boolean "required"
     t.string "short_name"
     t.string "key"
     t.integer "template_id"
