@@ -80,7 +80,7 @@ class SinglePagesController < ApplicationController
       obj = if sa.sample_controlled_vocab_id.nil?
               { sa_cv_title: sa.title, sa_cv_id: nil }
             else
-              { sa_cv_title: sa.title, sa_cv_id: sa.sample_controlled_vocab_id }
+              { sa_cv_title: sa.title, sa_cv_id: sa.sample_controlled_vocab_id, allows_custom_input: sa.allow_cv_free_text }
             end
       obj.merge({ required: sa.required })
     end
@@ -94,10 +94,9 @@ class SinglePagesController < ApplicationController
         @sa_cv_terms.push({ 'name' => sa[:sa_cv_title], 'has_cv' => false, 'data' => nil,
                             'allows_custom_input' => nil, 'required' => sa[:required] })
       else
-        allows_custom_input = SampleControlledVocab.find(sa[:sa_cv_id])&.custom_input
         sa_terms = SampleControlledVocabTerm.where(sample_controlled_vocab_id: sa[:sa_cv_id]).map(&:label)
         @sa_cv_terms.push({ 'name' => sa[:sa_cv_title], 'has_cv' => true, 'data' => sa_terms,
-                            'allows_custom_input' => allows_custom_input, 'required' => sa[:required] })
+                            'allows_custom_input' => sa[:allows_custom_input], 'required' => sa[:required] })
       end
     end
     @template = Template.find(@sample_type.template_id)
