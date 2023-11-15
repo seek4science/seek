@@ -14,6 +14,7 @@ namespace :seek do
     strip_sample_attribute_pids
     rename_registered_sample_multiple_attribute_type
     remove_ontology_attribute_type
+    db:seed:007_sample_attribute_types
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change

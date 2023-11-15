@@ -43,6 +43,38 @@ module IsaExporter
       isa_investigation
     end
 
+    def convert_study_comments(study)
+      study_comments = []
+      study_id = study.id
+
+      # Study Custom Metadata
+      unless study.extended_metadata.nil?
+        json = JSON.parse(study.extended_metadata.json_metadata)
+        extended_metadata_attributes = study.extended_metadata.extended_metadata_attributes
+        em_id = study.extended_metadata.id
+        json.map do |key, val|
+          ema_id = extended_metadata_attributes.detect { |ema| ema.title == key }&.id
+          study_comments.push({
+            '@id': "#study_comment/#{ [study_id, em_id, ema_id].join('_') }",
+            'name': key,
+            'value': val
+          })
+        end
+      end
+      ###################################################
+
+      study_comments.append({
+        '@id': "#study_comment/#{ [study_id, UUID.new.generate].join('_') }",
+        'name': 'SEEK Study ID',
+        'value': study_id.to_s
+      })
+      study_comments.append({
+        '@id': "#study_comment/#{ [study_id, UUID.new.generate].join('_') }",
+        'name': 'SEEK creation date',
+        'value': study.created_at.utc.iso8601
+      })
+    end
+
     def convert_study(study)
       isa_study = {}
       isa_study[:identifier] = '' # study.id
@@ -51,13 +83,13 @@ module IsaExporter
       isa_study[:submissionDate] = '' # study.created_at.to_date.iso8601
       isa_study[:publicReleaseDate] = '' # study.created_at.to_date.iso8601
       isa_study[:filename] = "#{study.title}.txt"
-      isa_study[:comments] = [
-        { name: 'SEEK Study ID', value: study.id.to_s },
-        { name: 'SEEK creation date', value: study.created_at.utc.iso8601 }
-      ]
+      isa_study[:comments] = convert_study_comments(study)
 
       publications = []
       study.publications.each { |p| publications << convert_publication(p) }
+      study.assays.each do |assay|
+        assay.publications.each { |p| publications << convert_publication(p) }
+      end
       isa_study[:publications] = publications
 
       people = []
@@ -91,8 +123,19 @@ module IsaExporter
       isa_study[:protocols] = protocols
 
       isa_study[:processSequence] = convert_process_sequence(study.sample_types.second, study.sops.map(&:id).join("_"), study.id)
+      assay_streams = study.assays.map { |assay| [assay] if assay.position.zero? }
+                           .compact
+                           .map do |assay_stream|
+        last_assay = assay_stream.first
+        until last_assay.linked_assay.nil?
+          linked_assay = last_assay.linked_assay
+          assay_stream.push(linked_assay)
+          last_assay = linked_assay
+        end
+        assay_stream
+      end
 
-      isa_study[:assays] = [convert_assays(study.assays)]
+      isa_study[:assays] = assay_streams.map { |assay_stream| convert_assays(assay_stream) }
 
       isa_study[:factors] = []
       isa_study[:unitCategories] = []
@@ -109,16 +152,56 @@ module IsaExporter
       isa_annotation
     end
 
+    def convert_assay_comments(assays)
+      assay_comments = []
+      assay_streams = assays.select { |a| a.position.zero? }
+      assay_stream_id = assays.pluck(:id).join('_')
+
+      linked_assays = assays.map { |assay| { 'id': assay.id, 'title': assay.title } }.to_json
+
+      assay_streams.map do |assay|
+        study_id = assay.study_id
+        next if assay.extended_metadata.nil?
+
+        json = JSON.parse(assay.extended_metadata&.json_metadata)
+        cm_attributes = assay.extended_metadata.extended_metadata_attributes
+        cm_id = assay.extended_metadata&.id
+        json.map do |key, val|
+          cma_id = cm_attributes.detect { |cma| cma.title == key }&.id
+          assay_comments.push({
+            '@id': "#assay_comment/#{[study_id, assay_stream_id, cm_id, cma_id].join('_')}",
+            'name': key,
+            'value': val
+          })
+        end
+      end
+
+      assay_comments.push({
+        '@id': "#assay_comment/#{assay_stream_id}",
+        'name': 'linked_assays',
+        'value': linked_assays
+      })
+      assay_comments.compact
+    end
+
     def convert_assays(assays)
       all_sample_types = assays.map(&:sample_type)
       first_assay = assays.detect { |s| s.position.zero? }
       raise 'No assay could be found!' unless first_assay
 
+      stream_name = "assays_#{assays.pluck(:id).join('_')}"
+      assay_comments = convert_assay_comments(assays)
+
+      # Retrieve assay_stream if
+      stream_name_comment = assay_comments.detect { |ac| ac[:name] == 'assay_stream' }
+      stream_name = stream_name_comment[:value] unless stream_name_comment.nil?
+
       isa_assay = {}
       isa_assay['@id'] = "#assay/#{assays.pluck(:id).join('_')}"
-      isa_assay[:filename] = 'a_assays.txt' # assay&.sample_type&.isa_template&.title
+      isa_assay[:filename] = "a_#{stream_name.downcase.tr(" ", "_")}.txt"
       isa_assay[:measurementType] = { annotationValue: '', termSource: '', termAccession: '' }
       isa_assay[:technologyType] = { annotationValue: '', termSource: '', termAccession: '' }
+      isa_assay[:comments] = assay_comments
       isa_assay[:technologyPlatform] = ''
       isa_assay[:characteristicCategories] = convert_characteristic_categories(nil, assays)
       isa_assay[:materials] = {
@@ -163,9 +246,22 @@ module IsaExporter
       status[:annotationValue] = ''
       isa_publication[:status] = status
       isa_publication[:title] = publication.title
-      isa_publication[:author_list] = publication.authors.map(&:full_name).join(', ')
+      isa_publication[:author_list] = publication.seek_authors.map(&:full_name).join(', ')
 
-      publication
+      isa_publication[:comments] = [
+        {
+          "@id": "#publication_comment/#{publication.id}_#{publication.assays.map(&:id).join('_')}",
+          "name": "linked_assays",
+          "value": publication.assays.map { |assay| {"id": assay.id, "title": assay.title} }.to_json
+        },
+        {
+          "@id": "#publication_comment/#{publication.id}_#{publication.studies.map(&:id).join('_')}",
+          "name": "linked_studies",
+          "value": publication.studies.map { |study| {"id": study.id, "title": study.title} }.to_json
+        }
+      ]
+
+      isa_publication
     end
 
     def convert_ontologies
@@ -224,7 +320,6 @@ module IsaExporter
       with_tag_source_characteristic =
         sample_type.sample_attributes.select { |sa| sa.isa_tag&.isa_source_characteristic? }
 
-      # attributes = sample_type.sample_attributes.select{ |sa| sa.isa_tag&.isa_source_characteristic? }
       sample_type.samples.map do |s|
         {
           '@id': "#source/#{s.id}",
@@ -494,7 +589,7 @@ module IsaExporter
       prefix = 'sample'
       samples_hash.map do |sample_hash|
         sample = Sample.find(sample_hash[:id])
-        if sample.sample_type.isa_template.level == 'assay'
+        if sample.sample_type.isa_template.level.include?('assay')
           if detect_other_material(sample.sample_type)
             prefix = 'other_material'
           elsif detect_data_file(sample.sample_type)
