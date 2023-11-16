@@ -3663,6 +3663,54 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_select 'a.btn[disabled=disabled]', text: 'Request membership', count: 1
   end
 
+  test 'should not show add new button to admin unless active member' do
+    admin = FactoryBot.create(:admin)
+    project = FactoryBot.create(:project)
+    refute project.has_member?(admin)
+    login_as(admin)
+    assert project.can_edit?
+    get :show, params: { id: project.id }
+    assert_response :success
+    assert_select '#buttons' do
+      assert_select 'div[type=button]', text: /Add new/, count: 0
+    end
+  end
+
+  test 'should show list of directly linkable assets in add new button to active members' do
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+    login_as(person)
+    assert project.has_member?(person)
+    assert project.can_edit?
+    get :show, params: { id: project.id }
+    assert_response :success
+    params = { project_ids: [project.id] }
+    directly_linked_types = [
+      Investigation,
+      Collection,
+      DataFile,
+      Document,
+      Event,
+      FileTemplate,
+      Model,
+      Placeholder,
+      Presentation,
+      Publication,
+      Sample,
+      SampleType,
+      Sop,
+      Strain,
+      Template,
+      Workflow,
+    ]
+    assert_select '#buttons' do
+      assert_select 'div[type=button]', text: /Add new/
+      for type in directly_linked_types
+        assert_select 'a[href=?]', Seek::Util.routes.polymorphic_path(type, action: :new, "#{type.name.underscore}": params)
+      end
+    end
+  end
+
   private
 
   def check_project(project)
