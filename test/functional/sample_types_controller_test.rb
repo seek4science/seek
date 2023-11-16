@@ -593,7 +593,7 @@ class SampleTypesControllerTest < ActionController::TestCase
                                                  '1' => {
                                                    pos: '2', title: 'cv', required: '1',
                                                    sample_attribute_type_id: @controlled_vocab_type.id,
-                                                   allow_cv_free_text: false,
+                                                   allow_cv_free_text: '0',
                                                    sample_controlled_vocab_id: cv.id,
                                                    destroy: '0'
                                                  }
@@ -624,7 +624,7 @@ class SampleTypesControllerTest < ActionController::TestCase
                                                  '1' => {
                                                    pos: '2', title: 'cv', required: '1',
                                                    sample_attribute_type_id: @controlled_vocab_type.id,
-                                                   allow_cv_free_text: true,
+                                                   allow_cv_free_text: '1',
                                                    sample_controlled_vocab_id: cv.id,
                                                    destroy: '0'
                                                  }
