@@ -88,6 +88,10 @@ module SampleTypesHelper
     help_icon(t('samples.pid_info_text'))
   end
 
+  def allow_free_text_help_icon
+    help_icon(t('samples.allow_free_text_info_text'))
+  end
+
   private
 
   def displayed_sample_attribute_types
