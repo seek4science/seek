@@ -1,13 +1,30 @@
-<% sample_type_count = SampleType.where(template_id: template.id).length -%>
+<%
+	sample_type_count = SampleType.where(template_id: @template.id).length
+	hidden_children_count = @template.children.size - @template.children.authorized_for(:view).size
+%>
 <div class="row">
 	<div class="col-md-6">
 		<p>
+			<%= persistent_resource_id(@template) %>
+		</p>
+		<p>
+			<strong><%= t('contributor').capitalize -%>:</strong>
+			<% if @template.contributor.nil?%>
+				System
+			<% else %>
+				<%= link_to @template.contributor&.name, @template.contributor -%>
+			<% end %>
+		</p>
+		<p>
+			<%= render :partial => 'projects/show_project_relationship', :locals => { :resource => @template } %>
+		</p>
+		<p>
 			<strong>Version:</strong>
-			<%= template.version -%>
+			<%= @template.version -%>
 		</p>
 		<p>
 			<strong>Group:</strong>
-			<%= template.group -%>
+			<%= @template.group -%>
 		</p>
 		<p>
 			<em>
@@ -19,12 +36,35 @@
 
 	<div class="col-md-6">
 		<p>
-			<strong>Level:</strong>
-			<%= template.level -%>
+			<strong>ISA Level:</strong>
+			<%= @template.level -%>
 		</p>
 		<p>
 			<strong>Organism:</strong>
-			<%= template.organism -%>
+			<%= @template.organism -%>
 		</p>
+		<p>
+			<strong>Parent Template:</strong>
+			<% if @template.parent.nil? %>
+				None
+			<% else %>
+				<%= link_to @template.parent&.title, @template.parent %>
+			<% end %>
+		</p>
+		<strong>Child Templates:</strong>
+			<div class="scrollable-div" style="max-height: 150px; overflow-y: scroll">
+				<ul>
+					<% @template.children.map do |child| %>
+						<% if child.can_view? %>
+							<li>
+								<%= link_to child.title, child %>
+							</li>
+						<% end %>
+					<% end %>
+					<% if hidden_children_count > 0 %>
+						<li><em><%= "#{hidden_children_count} child template#{hidden_children_count > 1 ? "s are" : " is"} hidden to you" %></em></li>
+					<% end %>
+				</ul>
+			</div>
 	</div>
 </div>

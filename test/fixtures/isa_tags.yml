@@ -29,3 +29,5 @@ data_file_comment_isa_tag:
 parameter_value_isa_tag:
   title: parameter_value
 
+default_isa_tag:
+  title: default isa-tag

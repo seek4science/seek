@@ -8,7 +8,7 @@ module DynamicTableHelper
   def dt_aggregated(study, assay = nil)
     sample_types =
       if assay
-        link_sequence(assay.sample_type).reverse.drop(2)
+        link_sequence(assay.sample_type).reverse.drop(2) # Remove the two Study sample types, so only the assays remain
       else
         study.sample_types.map(&:clone)
       end
@@ -19,6 +19,7 @@ module DynamicTableHelper
 
   private
 
+  # Links all sample_types in a sequence of sample_types
   def link_sequence(sample_type)
     sequence = [sample_type]
     while link = sample_type.sample_attributes.detect(&:seek_sample_multi?)&.linked_sample_type
@@ -30,14 +31,34 @@ module DynamicTableHelper
 
   def dt_rows(sample_type)
     sample_type.samples.map do |s|
-        if s.can_view?
-          ['', s.id, s.uuid] +
-          JSON(s.json_metadata).values
-        else
-          ['', '#HIDDEN', '#HIDDEN'] +
+      if s.can_view?
+        sanitized_json_metadata = hide_unauthorized_inputs(JSON(s.json_metadata))
+        ['', s.id, s.uuid] +
+          sanitized_json_metadata.values
+      else
+        ['', '#HIDDEN', '#HIDDEN'] +
           Array.new(JSON(s.json_metadata).length, '#HIDDEN')
-        end
+      end
     end
+  end
+
+  def hide_unauthorized_inputs(json_metadata)
+    input_key = json_metadata.keys.detect { |jmdk| jmdk.downcase.include? 'input' }
+
+    unless input_key.nil?
+      json_metadata[input_key] = json_metadata[input_key].map do |input|
+        input_exists = Sample.where(id: input['id']).any?
+        if !input_exists
+          input
+        elsif Sample.find(input['id']).can_view?
+          input
+        else
+          { 'id' => input['id'], 'type' => input['type'], 'title' => '#HIDDEN' }
+        end
+      end
+    end
+
+    json_metadata
   end
 
   def dt_cols(sample_type)

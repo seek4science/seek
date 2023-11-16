@@ -6,7 +6,7 @@ class TreeviewBuilder
     @folders = folders
   end
 
-  SP_ADVANCED_ENABLED = Seek::Config.project_single_page_advanced_enabled
+  SP_ADVANCED_ENABLED = Seek::Config.isa_json_compliance_enabled
   BOLD = { 'style': 'font-weight:bold' }.freeze
 
   def build_tree_data

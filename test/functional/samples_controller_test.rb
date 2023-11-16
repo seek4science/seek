@@ -1153,14 +1153,14 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'should show query form' do
-    with_config_value(:sample_type_template_enabled, true) do
+    with_config_value(:isa_json_compliance_enabled, true) do
       get :query_form
       assert_response :success
     end
   end
 
   test 'should populate user projects in query form' do
-    with_config_value(:sample_type_template_enabled, true) do
+    with_config_value(:isa_json_compliance_enabled, true) do
       person = FactoryBot.create(:person)
       person.add_to_project_and_institution(FactoryBot.create(:project), FactoryBot.create(:institution))
       login_as(person)
@@ -1174,7 +1174,7 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'should not return private samples with basic query' do
-    with_config_value(:sample_type_template_enabled, true) do
+    with_config_value(:isa_json_compliance_enabled, true) do
       person = FactoryBot.create(:person)
       template = FactoryBot.create(:template)
       sample_type = FactoryBot.create(:simple_sample_type, template_id: template.id)
@@ -1267,7 +1267,7 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'should return max query result' do
-    with_config_value(:sample_type_template_enabled, true) do
+    with_config_value(:isa_json_compliance_enabled, true) do
       person = FactoryBot.create(:person)
       project = FactoryBot.create(:project)
 

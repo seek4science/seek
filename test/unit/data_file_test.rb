@@ -489,4 +489,25 @@ class DataFileTest < ActiveSupport::TestCase
     assert data_file.respond_to?(:data_format_annotations)
     assert data_file.respond_to?(:data_type_annotations)
   end
+
+  test 'related samples include extracted samples and samples linked in attributes' do
+    project = FactoryBot.create(:project)
+    df_no_samples = FactoryBot.create(:data_file) # No samples
+    df_extracted = FactoryBot.create(:data_file)  # Extracted samples
+    df_attributes = FactoryBot.create(:data_file) # Linked in sample's attributes only
+    df_ext_attr = FactoryBot.create(:data_file)   # Extracted samples and linked in sample's attributes
+    type = FactoryBot.create(:data_file_sample_type, project_ids: [project.id])
+    sample1 = Sample.new(sample_type: type, project_ids: [project.id], originating_data_file: df_extracted)
+    sample1.update(data: { 'data file': df_ext_attr.id })
+    sample1.save!
+    sample2 = Sample.new(sample_type: type, project_ids: [project.id], originating_data_file: df_ext_attr)
+    sample2.update(data: { 'data file': df_attributes.id })
+    sample2.save!
+
+    assert_equal [], df_no_samples.related_samples
+    assert_equal [sample1], df_extracted.related_samples
+    assert_equal [sample2].sort_by(&:id), df_attributes.related_samples
+    assert_equal [sample1, sample2].sort_by(&:id), df_ext_attr.related_samples.sort_by(&:id)
+  end
+
 end

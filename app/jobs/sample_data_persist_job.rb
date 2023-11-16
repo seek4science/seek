@@ -3,13 +3,15 @@ class SampleDataPersistJob < TaskJob
 
   attr_accessor :extractor
 
-  def perform(data_file, sample_type, assay_ids: [])
+  def perform(data_file, sample_type, user, assay_ids: [])
     @extractor = Seek::Samples::Extractor.new(data_file, sample_type)
     Rails.logger.info('Starting to persist samples')
     time = Benchmark.measure do
-      samples = extractor.persist.select(&:persisted?)
-      extractor.clear
-      data_file.copy_assay_associations(samples, assay_ids) unless assay_ids.blank?
+      User.with_current_user(user) do
+        samples = extractor.persist(user).select(&:persisted?)
+        extractor.clear
+        data_file.copy_assay_associations(samples, assay_ids) unless assay_ids.blank?
+      end
     end
 
     Rails.logger.info("Benchmark for persist: #{time}")

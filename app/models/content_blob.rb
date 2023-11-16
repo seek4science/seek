@@ -248,7 +248,7 @@ class ContentBlob < ApplicationRecord
   has_task :remote_content_fetch
 
   def content_path(opts = {})
-    opts.reverse_merge!(action: 'download', disposition: 'inline')
+    opts.reverse_merge!(action: 'download')
     Seek::Util.routes.polymorphic_path([asset, self], opts)
   end
 

@@ -9,6 +9,12 @@ namespace :seek do
   task upgrade_version_tasks: %i[
     environment
     decouple_extracted_samples_policies
+    decouple_extracted_samples_projects
+    link_sample_datafile_attributes
+    strip_sample_attribute_pids
+    rename_registered_sample_multiple_attribute_type
+    remove_ontology_attribute_type
+    db:seed:007_sample_attribute_types
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -45,6 +51,53 @@ namespace :seek do
     end
   end
 
+  task(rename_registered_sample_multiple_attribute_type: [:environment]) do
+    attr = SampleAttributeType.find_by(title:'Registered Sample (multiple)')
+    if attr
+      puts "..... Renaming sample attribute type 'Registered Sample (multiple)' to 'Registered Sample List'."
+      attr.update_column(:title, 'Registered Sample List')
+    end
+  end
+
+  task(strip_sample_attribute_pids: [:environment]) do
+    puts '..... Stripping Sample Attribute PIds ...'
+    n = 0
+    SampleAttribute.where('pid is NOT NULL AND pid !=?','').each do |attribute|
+      new_pid = attribute.pid.strip
+      if attribute.pid != new_pid
+        attribute.update_column(:pid, new_pid)
+        n += 1
+      end
+    end
+    puts "..... Finished stripping #{n} Sample Attribute PIds."
+  end
+
+  task(remove_ontology_attribute_type: [:environment]) do
+    ontology_attr_type = SampleAttributeType.find_by(title:'Ontology')
+    cv_attr_type = SampleAttributeType.find_by(title:'Controlled Vocabulary')
+    if ontology_attr_type
+      puts '..... Removing the Ontology sample attribute type ...'
+      if cv_attr_type
+        if ontology_attr_type.sample_attributes.any?
+          puts "..... Moving #{ontology_attr_type.sample_attributes.count} sample attributes to Controlled Vocabulary"
+          ontology_attr_type.sample_attributes.each do |attr_type|
+            attr_type.update_column(:sample_attribute_type_id, cv_attr_type.id)
+          end
+        end
+        if ontology_attr_type.isa_template_attributes.any?
+          puts "..... Moving #{ontology_attr_type.isa_template_attributes.count} template attributes to Controlled Vocabulary"
+          ontology_attr_type.isa_template_attributes.each do |attr_type|
+            attr_type.update_column(:sample_attribute_type_id, cv_attr_type.id)
+          end
+        end
+
+        ontology_attr_type.destroy
+      else
+        puts '..... Target Controlled Vocabulary attribute type not found'
+      end
+    end
+  end
+
   task(decouple_extracted_samples_policies: [:environment]) do
     puts '... creating independent policies for extracted samples...'
     decoupled = 0
@@ -59,6 +112,44 @@ namespace :seek do
       end
     end
     puts " ... finished creating independent policies of #{decoupled.to_s} extracted samples"
+  end
+
+  task(decouple_extracted_samples_projects: [:environment]) do
+    puts '... copying project ids for extracted samples...'
+    decoupled = 0
+    hash_array = []
+    disable_authorization_checks do
+      Sample.find_each do |sample|
+        # check if the sample was extracted from a datafile and their projects are linked
+        if sample.extracted? && sample.project_ids.empty?
+          sample.originating_data_file.project_ids.each do |project_id|
+            hash_array << { project_id: project_id, sample_id: sample.id }
+          end
+          decoupled += 1
+        end
+      end
+      unless hash_array.empty?
+        class ProjectsSample < ActiveRecord::Base; end;
+        ProjectsSample.insert_all(hash_array)
+      end
+    end
+    puts " ... finished copying project ids of #{decoupled.to_s} extracted samples"
+  end
+
+  task(link_sample_datafile_attributes: [:environment]) do
+    puts '... updating sample_resource_links for samples with data_file attributes...'
+    samples_updated = 0
+    disable_authorization_checks do
+      df_attrs = SampleAttribute.joins(:sample_attribute_type).where('sample_attribute_types.base_type' => Seek::Samples::BaseType::SEEK_DATA_FILE).pluck(:id)
+      samples = Sample.joins(sample_type: :sample_attributes).where('sample_attributes.id' => df_attrs)
+      samples.each do |sample|
+        if sample.sample_resource_links.where(resource_type: 'DataFile').empty?
+          sample.send(:update_sample_resource_links)
+          samples_updated += 1
+        end
+      end
+    end
+    puts " ... finished updating sample_resource_links of #{samples_updated.to_s} samples with data_file attributes"
   end
 
   private

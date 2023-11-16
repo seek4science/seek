@@ -66,6 +66,7 @@ class SampleAttributeTest < ActiveSupport::TestCase
                                     sample_attribute_type: FactoryBot.create(:integer_sample_attribute_type),
                                     sample_type: FactoryBot.create(:simple_sample_type)
     refute attribute.valid?
+
     attribute.pid = 'http://somewhere.org#fish'
     assert attribute.valid?
     attribute.pid = 'dc:fish'
@@ -74,6 +75,17 @@ class SampleAttributeTest < ActiveSupport::TestCase
 
     attribute = SampleAttribute.new
     refute attribute.valid?
+  end
+
+  test 'auto strip pid' do
+    attribute = SampleAttribute.new title: 'fish', pid:"   wibble:12\t  ",
+                                    sample_attribute_type: FactoryBot.create(:integer_sample_attribute_type),
+                                    sample_type: FactoryBot.create(:simple_sample_type)
+    assert attribute.valid?
+    assert_equal 'wibble:12', attribute.pid
+    attribute.pid = "  wibble:12\n "
+    assert attribute.valid?
+    assert_equal 'wibble:12', attribute.pid
   end
 
   test 'validate value - without required' do
@@ -219,6 +231,13 @@ class SampleAttributeTest < ActiveSupport::TestCase
     refute attribute.validate_value?(1)
   end
 
+  test 'controlled vocab validate value with allowed free text' do
+    attribute = FactoryBot.create(:apples_controlled_vocab_attribute, is_title: true, allow_cv_free_text: true, sample_type: FactoryBot.create(:simple_sample_type))
+    assert attribute.validate_value?('Granny Smith')
+    assert attribute.validate_value?('Orange')
+    assert attribute.validate_value?(1)
+  end
+
   test 'controlled vocab must exist for CV type' do
     attribute = FactoryBot.create(:apples_controlled_vocab_attribute, is_title: true, sample_type: FactoryBot.create(:simple_sample_type))
     assert attribute.valid?
@@ -316,6 +335,22 @@ class SampleAttributeTest < ActiveSupport::TestCase
 
     attribute = FactoryBot.create(:sample_sample_attribute, sample_type: FactoryBot.create(:simple_sample_type))
     assert_equal '', attribute.short_pid
+  end
+
+  test 'ontology_based?' do
+    attribute = FactoryBot.create(:sample_sample_attribute, sample_type: FactoryBot.create(:simple_sample_type))
+    refute attribute.ontology_based?
+
+    attribute = FactoryBot.create(:simple_string_sample_attribute, sample_type: FactoryBot.create(:simple_sample_type))
+    refute attribute.ontology_based?
+
+    attribute = FactoryBot.create(:apples_controlled_vocab_attribute, sample_type: FactoryBot.create(:simple_sample_type))
+    refute attribute.sample_controlled_vocab.ontology_based?
+    refute attribute.ontology_based?
+
+    attribute.sample_controlled_vocab = FactoryBot.create(:topics_controlled_vocab)
+    assert attribute.sample_controlled_vocab.ontology_based?
+    assert attribute.ontology_based?
   end
 
   private

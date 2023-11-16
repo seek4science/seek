@@ -6,8 +6,9 @@ module SamplesHelper
     attribute_form_element(attribute, resource.get_attribute_value(attribute.title), element_name, element_class)
   end
 
-  def controlled_vocab_form_field(sample_controlled_vocab, element_name, values, limit = 1)
+  def controlled_vocab_form_field(attribute, element_name, values, limit = 1)
 
+    sample_controlled_vocab = attribute.sample_controlled_vocab
     scv_id = sample_controlled_vocab.id
     object_struct = Struct.new(:id, :title)
     existing_objects = Array(values).collect do |value|
@@ -32,13 +33,13 @@ module SamplesHelper
     objects_input(element_name, existing_objects,
                   typeahead: typeahead,
                   limit: limit,
-                  allow_new: sample_controlled_vocab.custom_input?,
+                  allow_new: attribute.allow_cv_free_text?,
                   class: 'form-control')
 
   end
 
-  def controlled_vocab_list_form_field(sample_controlled_vocab, element_name, values)
-    controlled_vocab_form_field(sample_controlled_vocab, element_name, values, nil)
+  def controlled_vocab_list_form_field(attribute, element_name, values)
+    controlled_vocab_form_field(attribute, element_name, values, nil)
   end
 
   def linked_extended_metadata_multi_form_field(attribute, value, element_name, element_class)
@@ -243,7 +244,7 @@ module SamplesHelper
 
   # link for the sample type for the provided sample. Handles a referring_sample_id if required
   def sample_type_link(sample, user=User.current_user)
-    return nil if Seek::Config.project_single_page_advanced_enabled && !sample.sample_type.template_id.nil?
+    return nil if Seek::Config.isa_json_compliance_enabled && !sample.sample_type.template_id.nil?
 
     if (sample.sample_type.can_view?(user))
       link_to sample.sample_type.title,sample.sample_type
@@ -263,12 +264,12 @@ module SamplesHelper
   end
 
   def ols_ontology_link(ols_id)
-    link = "https://www.ebi.ac.uk/ols/ontologies/#{ols_id}"
+    link = "#{Ebi::OlsClient::ROOT_URL}/ontologies/#{ols_id}"
     link_to(link,link,target: :_blank)
   end
 
   def ols_root_term_link(ols_id, term_uri)
-    ols_link = "https://www.ebi.ac.uk/ols/ontologies/#{ols_id}/terms?iri=#{term_uri}"
+    ols_link = "#{Ebi::OlsClient::ROOT_URL}/ontologies/#{ols_id}/terms?iri=#{term_uri}"
     link_to(term_uri, ols_link, target: :_blank)
   end
 
@@ -340,9 +341,9 @@ module SamplesHelper
                                                    :title, value.try(:[], 'id'))
       select_tag(element_name, options, include_blank: !attribute.required?, class: "form-control #{element_class}")
     when Seek::Samples::BaseType::CV
-      controlled_vocab_form_field attribute.sample_controlled_vocab, element_name, value
+      controlled_vocab_form_field attribute, element_name, value
     when Seek::Samples::BaseType::CV_LIST
-      controlled_vocab_list_form_field attribute.sample_controlled_vocab, element_name, value
+      controlled_vocab_list_form_field attribute, element_name, value
     when Seek::Samples::BaseType::SEEK_SAMPLE
       sample_form_field attribute, element_name, value
     when Seek::Samples::BaseType::SEEK_SAMPLE_MULTI

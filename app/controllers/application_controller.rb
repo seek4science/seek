@@ -596,9 +596,13 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def determine_extended_metadata_keys
+  def determine_extended_metadata_keys(asset = nil)
     keys = []
-    type_id = params.dig(controller_name.singularize.to_sym, :extended_metadata_attributes, :extended_metadata_type_id)
+    if asset
+      type_id = params.dig(controller_name.singularize.to_sym, asset, :extended_metadata_attributes, :extended_metadata_type_id)
+    else
+      type_id = params.dig(controller_name.singularize.to_sym, :extended_metadata_attributes, :extended_metadata_type_id)
+    end
     if type_id.present?
       metadata_type = ExtendedMetadataType.find(type_id)
       keys = [:extended_metadata_type_id, :id, data: recursive_determine_extended_metadata_keys(metadata_type)]
