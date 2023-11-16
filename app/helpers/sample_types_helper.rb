@@ -106,6 +106,7 @@ module SampleTypesHelper
 
     if sample_type_attribute.controlled_vocab? || sample_type_attribute.seek_cv_list?
       type += ' - ' + link_to(sample_type_attribute.sample_controlled_vocab.title, sample_type_attribute.sample_controlled_vocab)
+      type += " (#{t('samples.allow_free_text_label_hint')})" if sample_type_attribute.allow_cv_free_text?
     end
     type
   end
