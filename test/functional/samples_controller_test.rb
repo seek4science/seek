@@ -1434,20 +1434,6 @@ class SamplesControllerTest < ActionController::TestCase
 
   end
 
-  private
-
-  def populated_patient_sample
-    person = FactoryBot.create(:person)
-    sample = Sample.new title: 'My Sample', policy: FactoryBot.create(:public_policy),
-                        project_ids:person.projects.collect(&:id),contributor:person
-    sample.sample_type = FactoryBot.create(:patient_sample_type)
-    sample.title = 'My sample'
-    sample.set_attribute_value('full name', 'Fred Bloggs')
-    sample.set_attribute_value(:age, 22)
-    sample.save!
-    sample
-  end
-
   test 'unauthorized users should not do batch operations' do
     sample = FactoryBot.create(:sample)
 
@@ -1466,4 +1452,41 @@ class SamplesControllerTest < ActionController::TestCase
     delete :batch_delete, params: { data: [{ id: sample.id }] }
     assert_equal JSON.parse(response.body)['status'], 'unprocessable_entity'
   end
+
+  test 'should show label to say controlled vocab allows free text' do
+    login_as(FactoryBot.create(:person))
+
+    type = FactoryBot.create(:simple_sample_type)
+    FactoryBot.create(:apples_controlled_vocab_attribute, is_title: true, title: 'allowed', allow_cv_free_text: true, sample_type: type)
+    FactoryBot.create(:apples_controlled_vocab_attribute, title: 'not allowed', allow_cv_free_text: false, sample_type: type)
+
+
+    get :new, params: { sample_type_id: type.id }
+    assert_response :success
+
+    assert_select 'label',text: /allowed/ do
+      assert_select 'span.subtle', text:/#{I18n.t('samples.allow_free_text_label_hint')}/
+    end
+
+    assert_select 'label',text: /not allowed/ do
+      assert_select 'span.subtle', text:/#{I18n.t('samples.allow_free_text_label_hint')}/, count: 0
+    end
+
+  end
+
+  private
+
+  def populated_patient_sample
+    person = FactoryBot.create(:person)
+    sample = Sample.new title: 'My Sample', policy: FactoryBot.create(:public_policy),
+                        project_ids:person.projects.collect(&:id),contributor:person
+    sample.sample_type = FactoryBot.create(:patient_sample_type)
+    sample.title = 'My sample'
+    sample.set_attribute_value('full name', 'Fred Bloggs')
+    sample.set_attribute_value(:age, 22)
+    sample.save!
+    sample
+  end
+
+
 end
