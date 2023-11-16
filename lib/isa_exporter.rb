@@ -1,8 +1,9 @@
 # noinspection ALL
 module IsaExporter
   class Exporter
-    def initialize(investigation)
+    def initialize(investigation, user)
       @investigation = investigation
+      @current_user = user
       @OBJECT_MAP = {}
     end
 
