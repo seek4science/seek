@@ -3,8 +3,6 @@ require 'test_helper'
 class SinglePagesControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
 
-  fixtures :isa_tags, :templates
-
   def setup
     @instance_name = Seek::Config.instance_name
     @member = FactoryBot.create :user

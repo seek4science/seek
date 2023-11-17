@@ -2,8 +2,6 @@ require 'test_helper'
 
 class SamplesControllerTest < ActionController::TestCase
 
-  fixtures :isa_tags
-
   include AuthenticatedTestHelper
   include SharingFormTestHelper
   include HtmlHelper
