@@ -74,7 +74,7 @@
         <label>
           <%= hidden_field_tag "#{field_name_prefix}[allow_cv_free_text]", '0'  %>
           <%= check_box_tag "#{field_name_prefix}[allow_cv_free_text]", '1', allow_cv_free_text  %>
-          Allow free text? <%= allow_free_text_help_icon %>
+          <%= t('samples.allow_free_text_checkbox_label') %> <%= allow_free_text_help_icon %>
         </label>
       </div>
 
