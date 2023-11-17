@@ -28,11 +28,8 @@ module Seek
         return false if required? && test_blank?(value)
         return true if test_blank?(value) && !required?
 
-        sample_attribute_type.validate_value?(value, required: required?,
-                                                     allow_cv_free_text: allow_cv_free_text,
-                                                     controlled_vocab: sample_controlled_vocab,
-                                                     linked_sample_type: linked_sample_type
-        )
+        sample_attribute_type.validate_value?(value, self)
+
       end
 
       def accessor_name
@@ -47,10 +44,7 @@ module Seek
       end
 
       def pre_process_value(value)
-        sample_attribute_type.pre_process_value(value,
-                                                controlled_vocab: sample_controlled_vocab,
-                                                linked_extended_metadata_type: linked_extended_metadata_type,
-                                                linked_sample_type: linked_sample_type)
+        sample_attribute_type.pre_process_value(value, self)
       end
 
       private
