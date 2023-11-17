@@ -5,8 +5,6 @@ class TemplatesControllerTest < ActionController::TestCase
   include SharingFormTestHelper
   include GeneralAuthorizationTestCases
 
-  fixtures :isa_tags
-
   setup do
     Seek::Config.send('isa_json_compliance_enabled=', true)
     FactoryBot.create(:person) # to prevent person being first person and therefore admin
