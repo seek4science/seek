@@ -14,10 +14,11 @@ class AttributeTypeHandlerFactoryTest < ActiveSupport::TestCase
     end
   end
 
-  test 'passes additional options' do
-    type = @factory.for_base_type('SeekSample', fish: 'soup')
-    options = type.send(:additional_options)
-    assert_equal({ fish: 'soup' }, options)
+  test 'for_base_type passes attribute' do
+    st = FactoryBot.create(:simple_sample_type)
+    attr = FactoryBot.create(:simple_string_sample_attribute, sample_type: st)
+    type = @factory.for_base_type('SeekSample', attr)
+    assert_equal attr, type.send(:attribute)
   end
 
   test 'exception for invalid type' do

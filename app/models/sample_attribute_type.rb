@@ -34,8 +34,8 @@ class SampleAttributeType < ApplicationRecord
     base_type_handler({}).test_blank?(value)
   end
 
-  def validate_value?(value, additional_options = {})
-    check_value_against_base_type(value, additional_options) && check_value_against_regular_expression(value)
+  def validate_value?(value, attribute = nil)
+    check_value_against_base_type(value, attribute) && check_value_against_regular_expression(value)
   end
 
   def as_json(_options = nil)
@@ -65,12 +65,12 @@ class SampleAttributeType < ApplicationRecord
     !resolution.present? || (resolution.include? '\\')
   end
 
-  def check_value_against_base_type(value, additional_options)
-    base_type_handler(additional_options).validate_value?(value)
+  def check_value_against_base_type(value, attribute)
+    base_type_handler(attribute).validate_value?(value)
   end
 
-  def pre_process_value(value, additional_options)
-    base_type_handler(additional_options).convert(value)
+  def pre_process_value(value, attribute)
+    base_type_handler(attribute).convert(value)
   end
 
   def controlled_vocab?
@@ -82,7 +82,7 @@ class SampleAttributeType < ApplicationRecord
   end
 
   def seek_resource?
-    base_type_handler.is_a?(Seek::Samples::AttributeTypeHandlers::SeekResourceAttributeTypeHandler)
+    base_type_handler(nil).is_a?(Seek::Samples::AttributeTypeHandlers::SeekResourceAttributeTypeHandler)
   end
 
   def linked_extended_metadata?
@@ -109,7 +109,7 @@ class SampleAttributeType < ApplicationRecord
     base_type == Seek::Samples::BaseType::SEEK_DATA_FILE
   end
 
-  def base_type_handler(additional_options = {})
-    Seek::Samples::AttributeTypeHandlers::AttributeTypeHandlerFactory.instance.for_base_type(base_type, additional_options)
+  def base_type_handler(attribute)
+    Seek::Samples::AttributeTypeHandlers::AttributeTypeHandlerFactory.instance.for_base_type(base_type, attribute)
   end
 end

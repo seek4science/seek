@@ -17,7 +17,7 @@ module Seek
         private
 
         def linked_extended_metadata_type
-          linked_extended_metadata_type = additional_options[:linked_extended_metadata_type]
+          linked_extended_metadata_type = attribute.linked_extended_metadata_type
           raise MissingLinkedExtendedMetadataTypeException unless linked_extended_metadata_type
 
           linked_extended_metadata_type

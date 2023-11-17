@@ -4,7 +4,7 @@ module Seek
       class CVListAttributeTypeHandler < CVAttributeTypeHandler
         def test_value(array_value)
           array_value.each do |value|
-            unless additional_options[:allow_cv_free_text] || controlled_vocab.includes_term?(value)
+            unless allow_cv_free_text? || controlled_vocab.includes_term?(value)
               raise "'#{value}' is not included in the controlled vocabulary"
             end
           end
