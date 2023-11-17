@@ -48,7 +48,8 @@ FactoryBot.define do
   end
 
   factory(:isa_source_template, parent: :template) do
-    title { 'An ISA Source Template' }
+    sequence (:title) { |n| "ISA Source Template #{n}" }
+    level { 'study source' }
     after(:build) do |template|
       template.template_attributes << FactoryBot.build(:template_attribute, title: 'Source Name', isa_tag_id: FactoryBot.create(:source_isa_tag).id, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), required: true, is_title: true)
       template.template_attributes << FactoryBot.build(:template_attribute, title: 'Source Characteristic 1', isa_tag_id: FactoryBot.create(:source_characteristic_isa_tag).id, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), required: true)
@@ -58,7 +59,8 @@ FactoryBot.define do
   end
 
   factory(:isa_sample_collection_template, parent: :template) do
-    title { 'An ISA Sample Collection Template' }
+    sequence (:title) { |n| "ISA Sample Collection Template #{n}" }
+    level { 'study sample' }
     after(:build) do |template|
       template.template_attributes << FactoryBot.build(:template_attribute, title: 'Input', sample_attribute_type: FactoryBot.create(:sample_multi_sample_attribute_type), required: true)
       template.template_attributes << FactoryBot.build(:template_attribute, title: 'sample collection', isa_tag_id: FactoryBot.create(:protocol_isa_tag).id, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), required: true)
@@ -72,18 +74,35 @@ FactoryBot.define do
     end
   end
 
-  factory(:isa_assay_template, parent: :template) do
-    sequence(:title) { |n| "ISA Assay Template #{n}" }
+  factory(:isa_assay_material_template, parent: :template) do
+    sequence(:title) { |n| "ISA Assay Material Template #{n}" }
+    level { 'assay - material' }
     after(:build) do |template|
       template.template_attributes << FactoryBot.build(:template_attribute, title: 'Input', sample_attribute_type: FactoryBot.create(:sample_multi_sample_attribute_type), required: true)
-      template.template_attributes << FactoryBot.build(:template_attribute, title: 'Protocol Assay 1', isa_tag_id: FactoryBot.create(:protocol_isa_tag).id, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), required: true)
-      template.template_attributes << FactoryBot.build(:template_attribute, title: 'Assay 1 parameter value 1', isa_tag_id: FactoryBot.create(:parameter_value_isa_tag).id, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), required: true)
-      template.template_attributes << FactoryBot.build(:template_attribute, title: 'Assay 1 parameter value 2', isa_tag_id: FactoryBot.create(:parameter_value_isa_tag).id, sample_attribute_type: FactoryBot.create(:controlled_vocab_attribute_type), sample_controlled_vocab: FactoryBot.create(:apples_sample_controlled_vocab))
-      template.template_attributes << FactoryBot.build(:template_attribute, title: 'Assay 1 parameter value 3', isa_tag_id: FactoryBot.create(:parameter_value_isa_tag).id, sample_attribute_type: FactoryBot.create(:controlled_vocab_attribute_type, title: 'Ontology'), sample_controlled_vocab: FactoryBot.create(:obi_ontology))
+      template.template_attributes << FactoryBot.build(:template_attribute, title: 'Protocol Assay', isa_tag_id: FactoryBot.create(:protocol_isa_tag).id, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), required: true)
+      template.template_attributes << FactoryBot.build(:template_attribute, title: 'Assay parameter value 1', isa_tag_id: FactoryBot.create(:parameter_value_isa_tag).id, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), required: true)
+      template.template_attributes << FactoryBot.build(:template_attribute, title: 'Assay parameter value 2', isa_tag_id: FactoryBot.create(:parameter_value_isa_tag).id, sample_attribute_type: FactoryBot.create(:controlled_vocab_attribute_type), sample_controlled_vocab: FactoryBot.create(:apples_sample_controlled_vocab))
+      template.template_attributes << FactoryBot.build(:template_attribute, title: 'Assay parameter value 3', isa_tag_id: FactoryBot.create(:parameter_value_isa_tag).id, sample_attribute_type: FactoryBot.create(:controlled_vocab_attribute_type, title: 'Ontology'), sample_controlled_vocab: FactoryBot.create(:obi_ontology))
       template.template_attributes << FactoryBot.build(:template_attribute, title: 'Extract Name', isa_tag_id: FactoryBot.create(:other_material_isa_tag).id, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), required: true, is_title: true)
       template.template_attributes << FactoryBot.build(:template_attribute, title: 'other material characteristic 1', isa_tag_id: FactoryBot.create(:other_material_characteristic_isa_tag).id, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), required: true)
       template.template_attributes << FactoryBot.build(:template_attribute, title: 'other material characteristic 2', isa_tag_id: FactoryBot.create(:other_material_characteristic_isa_tag).id, sample_attribute_type: FactoryBot.create(:controlled_vocab_attribute_type), sample_controlled_vocab: FactoryBot.create(:apples_sample_controlled_vocab))
       template.template_attributes << FactoryBot.build(:template_attribute, title: 'other material characteristic 3', isa_tag_id: FactoryBot.create(:other_material_characteristic_isa_tag).id, sample_attribute_type: FactoryBot.create(:controlled_vocab_attribute_type, title: 'Ontology'), sample_controlled_vocab: FactoryBot.create(:efo_ontology))
+    end
+  end
+
+  factory(:isa_assay_data_file_template, parent: :template) do
+    sequence(:title) { |n| "ISA Assay Data File Template #{n}" }
+    level { 'assay - data file' }
+    after(:build) do |template|
+      template.template_attributes << FactoryBot.build(:template_attribute, title: 'Input', sample_attribute_type: FactoryBot.create(:sample_multi_sample_attribute_type), required: true)
+      template.template_attributes << FactoryBot.build(:template_attribute, title: 'Protocol Assay', isa_tag_id: FactoryBot.create(:protocol_isa_tag).id, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), required: true)
+      template.template_attributes << FactoryBot.build(:template_attribute, title: 'Assay parameter value 1', isa_tag_id: FactoryBot.create(:parameter_value_isa_tag).id, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), required: true)
+      template.template_attributes << FactoryBot.build(:template_attribute, title: 'Assay parameter value 2', isa_tag_id: FactoryBot.create(:parameter_value_isa_tag).id, sample_attribute_type: FactoryBot.create(:controlled_vocab_attribute_type), sample_controlled_vocab: FactoryBot.create(:apples_sample_controlled_vocab))
+      template.template_attributes << FactoryBot.build(:template_attribute, title: 'Assay parameter value 3', isa_tag_id: FactoryBot.create(:parameter_value_isa_tag).id, sample_attribute_type: FactoryBot.create(:controlled_vocab_attribute_type, title: 'Ontology'), sample_controlled_vocab: FactoryBot.create(:obi_ontology))
+      template.template_attributes << FactoryBot.build(:template_attribute, title: 'File Name', isa_tag_id: FactoryBot.create(:data_file_isa_tag).id, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), required: true, is_title: true)
+      template.template_attributes << FactoryBot.build(:template_attribute, title: 'Data file comment 1', isa_tag_id: FactoryBot.create(:data_file_comment_isa_tag).id, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), required: true)
+      template.template_attributes << FactoryBot.build(:template_attribute, title: 'Data file comment 2', isa_tag_id: FactoryBot.create(:data_file_comment_isa_tag).id, sample_attribute_type: FactoryBot.create(:controlled_vocab_attribute_type), sample_controlled_vocab: FactoryBot.create(:apples_sample_controlled_vocab))
+      template.template_attributes << FactoryBot.build(:template_attribute, title: 'Data file comment 3', isa_tag_id: FactoryBot.create(:data_file_comment_isa_tag).id, sample_attribute_type: FactoryBot.create(:controlled_vocab_attribute_type, title: 'Ontology'), sample_controlled_vocab: FactoryBot.create(:efo_ontology))
     end
   end
 end
