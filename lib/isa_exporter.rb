@@ -36,7 +36,7 @@ module IsaExporter
       isa_investigation[:people] = people
 
       studies = []
-      @investigation.studies.each { |s| studies << convert_study(s) }
+      @investigation.studies.each { |s| studies << convert_study(s) if s.can_view?(@current_user) }
       isa_investigation[:studies] = studies
 
       @OBJECT_MAP = @OBJECT_MAP.merge(isa_investigation)
@@ -62,7 +62,6 @@ module IsaExporter
           })
         end
       end
-      ###################################################
 
       study_comments.append({
         '@id': "#study_comment/#{ [study_id, UUID.new.generate].join('_') }",
@@ -136,7 +135,7 @@ module IsaExporter
         assay_stream
       end
 
-      isa_study[:assays] = assay_streams.map { |assay_stream| convert_assays(assay_stream) }
+      isa_study[:assays] = assay_streams.map { |assay_stream| convert_assays(assay_stream) }.compact
 
       isa_study[:factors] = []
       isa_study[:unitCategories] = []
@@ -186,6 +185,8 @@ module IsaExporter
     end
 
     def convert_assays(assays)
+      return unless assays.all? { |a| a.can_view?(@current_user) }
+
       all_sample_types = assays.map(&:sample_type)
       first_assay = assays.detect { |s| s.position.zero? }
       raise 'No assay could be found!' unless first_assay
