@@ -128,7 +128,7 @@ class IsaAssaysControllerTest < ActionController::TestCase
     source_type = FactoryBot.create(:isa_source_sample_type, contributor: person, projects: [project])
     sample_collection_type = FactoryBot.create(:isa_sample_collection_sample_type, contributor: person, projects: [project],
                                                                                    linked_sample_type: source_type)
-    assay_type = FactoryBot.create(:isa_assay_sample_type, contributor: person, projects: [project],
+    assay_type = FactoryBot.create(:isa_assay_material_sample_type, contributor: person, projects: [project],
                                                            linked_sample_type: sample_collection_type)
 
     study = FactoryBot.create(:study, investigation:, contributor: person,

@@ -200,14 +200,22 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
 
   # 23
   test 'Samples, other materials, and DataFiles declared SHOULD be used in at least one Process at the Assay-level.' do
+    puts "\nFailing test:"
     studies = @json['studies']
     studies.each do |s|
       s['assays'].each do |a|
         other_materials = a['materials']['samples'] + a['materials']['otherMaterials'] + a['dataFiles']
         other_materials = other_materials.map { |m| m['@id'] }
         processes = a['processSequence'].map { |p| p['inputs'] + p['outputs'] }
+        puts 'processes 1'
+        puts processes
         processes = processes.flatten.map { |p| p['@id'] }
 
+        puts 'processes 2'
+        puts processes
+
+        puts 'Other materials'
+        other_materials.each { |p| puts p }
         other_materials.each { |p| assert processes.include?(p) }
       end
     end
@@ -314,10 +322,10 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
       )
     assay_sample_type =
       FactoryBot.create(
-        :isa_assay_sample_type,
+        :isa_assay_material_sample_type,
         contributor: person,
         project_ids: [@project.id],
-        isa_template: FactoryBot.build(:isa_assay_template),
+        isa_template: FactoryBot.build(:isa_assay_material_template),
         linked_sample_type: sample_collection
       )
 
@@ -371,7 +379,7 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
               }
 
     FactoryBot.create :sample,
-            title: 'sample_2',
+            title: 'sample_3',
             sample_type: assay_sample_type,
             project_ids: [@project.id],
             data: {
