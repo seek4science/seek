@@ -549,7 +549,7 @@ module IsaExporter
 
     def previous_process(samples_hash)
       sample = Sample.find(samples_hash.first[:id])
-      # hvfjkbdfk
+
       sample_type = sample.linked_samples.first&.sample_type
       if (sample_type)
         protocol = detect_protocol(sample_type)
