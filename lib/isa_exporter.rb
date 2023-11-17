@@ -458,7 +458,7 @@ module IsaExporter
           parameterValues: convert_parameter_values(samples_group, isa_parameter_value_attributes),
           performer: '',
           date: '',
-          inputs: input_ids.first.map { |input| { '@id': "##{type}/#{input[:id]}" } },
+          inputs: process_sequence_input(input_ids.first, type),
           outputs: process_sequence_output(samples_group)
         }
         # Study processes don't have a previousProcess and nextProcess
@@ -617,6 +617,17 @@ module IsaExporter
       grouped_samples.transform_keys { |key| group_id(key) }
     end
 
+    def process_sequence_input(input_ids, type)
+      authorized_sample_ids = Sample.where(id: input_ids).select { |s| s.can_view?(@current_user).map(&:id) }
+      input_ids.map do |input|
+        if authorized_sample_ids.include?(input[:id])
+          { '@id': "##{type}/#{input[:id]}" }
+        else
+          { '@id': "##{type}/HIDDEN" }
+        end
+      end
+    end
+
     def process_sequence_output(samples_hash)
       prefix = 'sample'
       samples_hash.map do |sample_hash|
@@ -630,7 +641,11 @@ module IsaExporter
             raise 'Defective ISA process!'
           end
         end
-        { '@id': "##{prefix}/#{sample.id}" }
+        if sample.can_view?(@current_user)
+          { '@id': "##{prefix}/#{sample.id}" }
+        else
+          { '@id': "##{prefix}/HIDDEN" }
+        end
       end
     end
 
