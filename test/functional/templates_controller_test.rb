@@ -19,7 +19,7 @@ class TemplatesControllerTest < ActionController::TestCase
     @string_type = FactoryBot.create(:string_sample_attribute_type)
     @int_type = FactoryBot.create(:integer_sample_attribute_type)
     @controlled_vocab_type = FactoryBot.create(:controlled_vocab_attribute_type)
-    @default_isa_tag = IsaTag.find_by_title('default isa-tag')
+    @default_isa_tag = FactoryBot.create(:default_isa_tag)
   end
 
   test 'should get new' do
