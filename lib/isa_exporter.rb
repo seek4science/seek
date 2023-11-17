@@ -345,25 +345,47 @@ module IsaExporter
         sample_type.sample_attributes.select { |sa| sa.isa_tag&.isa_sample_characteristic? }
       seek_sample_multi_attribute = sample_type.sample_attributes.detect(&:seek_sample_multi?)
       sample_type.samples.map do |s|
-        {
-          '@id': "#sample/#{s.id}",
-          name: s.get_attribute_value(with_tag_sample),
-          derivesFrom: extract_sample_ids(s.get_attribute_value(seek_sample_multi_attribute), 'source'),
-          characteristics: convert_characteristics(s, with_tag_sample_characteristic),
-          factorValues: [
-            {
-              category: {
-                '@id': ''
-              },
-              value: {
-                annotationValue: '',
-                termSource: '',
-                termAccession: ''
-              },
-              unit: get_unit
-            }
-          ]
-        }
+        if s.can_view?(@current_user)
+          {
+            '@id': "#sample/#{s.id}",
+            name: s.get_attribute_value(with_tag_sample),
+            derivesFrom: extract_sample_ids(s.get_attribute_value(seek_sample_multi_attribute), 'source'),
+            characteristics: convert_characteristics(s, with_tag_sample_characteristic),
+            factorValues: [
+              {
+                category: {
+                  '@id': ''
+                },
+                value: {
+                  annotationValue: '',
+                  termSource: '',
+                  termAccession: ''
+                },
+                unit: get_unit
+              }
+            ]
+          }
+        else
+          {
+            '@id': "#sample/HIDDEN",
+            name: '',
+            derivesFrom: extract_sample_ids(s.get_attribute_value(seek_sample_multi_attribute), 'source'),
+            characteristics: [],
+            factorValues: [
+              {
+                category: {
+                  '@id': ''
+                },
+                value: {
+                  annotationValue: '',
+                  termSource: '',
+                  termAccession: ''
+                },
+                unit: { termSource: '', termAccession: '', comments: [] }
+              }
+            ]
+          }
+        end
       end
     end
 
@@ -633,8 +655,17 @@ module IsaExporter
       end
     end
 
-    def extract_sample_ids(obj, type)
-      Array.wrap(obj).map { |item| { '@id': "##{type}/#{item[:id]}" } }
+    def extract_sample_ids(input_obj_list, type)
+      sample_ids = input_obj_list.map { |io| io[:id] }
+      authorized_sample_ids = Sample.where(id: sample_ids).select { |sample| sample.can_view?(@current_user) }.map(&:id)
+
+      sample_ids.map do |s_id|
+        if authorized_sample_ids.include?(s_id)
+          { '@id': "##{type}/#{s_id}" }
+        else
+          { '@id': "##{type}/HIDDEN" }
+        end
+      end
     end
 
     def get_ontology_details(sample_attribute, label, vocab_term)
