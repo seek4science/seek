@@ -302,14 +302,14 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
         :isa_source_sample_type,
         contributor: person,
         project_ids: [@project.id],
-        isa_template: Template.find_by_title('ISA Source')
+        isa_template: FactoryBot.build(:isa_source_template)
       )
     sample_collection =
       FactoryBot.create(
         :isa_sample_collection_sample_type,
         contributor: person,
         project_ids: [@project.id],
-        isa_template: Template.find_by_title('ISA sample collection'),
+        isa_template: FactoryBot.build(:isa_sample_collection_template),
         linked_sample_type: source
       )
     assay_sample_type =
@@ -317,7 +317,7 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
         :isa_assay_sample_type,
         contributor: person,
         project_ids: [@project.id],
-        isa_template: Template.find_by_title('ISA Assay 1'),
+        isa_template: FactoryBot.build(:isa_assay_template),
         linked_sample_type: sample_collection
       )
 
