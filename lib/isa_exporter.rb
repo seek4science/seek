@@ -208,8 +208,7 @@ module IsaExporter
       isa_assay[:characteristicCategories] = convert_characteristic_categories(nil, assays)
       isa_assay[:materials] = {
         # Here, the first assay's samples will be enough
-        samples:
-          first_assay.samples.map { |s| find_sample_origin([s], 1) }.flatten.uniq.map { |s| { '@id': "#sample/#{s}" } }, # the samples from study level that are referenced in this assay's samples,
+        samples: assay_samples(first_assay), # the samples from study level that are referenced in this assay's samples,
         otherMaterials: convert_other_materials(all_sample_types)
       }
       isa_assay[:processSequence] =
@@ -391,7 +390,7 @@ module IsaExporter
 
     def convert_characteristics(sample, attributes)
       attributes.map do |c|
-        value = sample.get_attribute_value(c) || ''
+        value = sample.can_view?(@current_user) ? (sample.get_attribute_value(c) || '') : ''
         ontology = get_ontology_details(c, value, true)
         {
           category: {
@@ -482,12 +481,21 @@ module IsaExporter
       return [] unless with_tag_data_file
 
       st.samples.map do |s|
-        {
-          '@id': "#data_file/#{s.id}",
-          name: s.get_attribute_value(with_tag_data_file),
-          type: with_tag_data_file.title,
-          comments: with_tag_data_file_comment.map { |d| { name: d.title, value: s.get_attribute_value(d).to_s } }
-        }
+        if s.can_view?(@current_user)
+          {
+            '@id': "#data_file/#{s.id}",
+            name: s.get_attribute_value(with_tag_data_file),
+            type: with_tag_data_file.title,
+            comments: with_tag_data_file_comment.map { |d| { name: d.title, value: s.get_attribute_value(d).to_s } }
+          }
+        else
+          {
+            '@id': "#data_file/HIDDEN",
+            name: 'HIDDEN',
+            type: with_tag_data_file.title,
+            comments: []
+          }
+        end
       end
     end
 
@@ -513,18 +521,33 @@ module IsaExporter
           st
             .samples
             .map do |s|
-              {
-                '@id': "#other_material/#{s.id}",
-                name: s.get_attribute_value(with_tag_isa_other_material),
-                type: with_tag_isa_other_material.title,
-                characteristics: convert_characteristics(s, with_tag_isa_other_material_characteristics),
-                # It can sometimes be other_material or sample!!!! SHOULD BE DYNAMIC
-                derivesFrom: extract_sample_ids(s.get_attribute_value(seek_sample_multi_attribute), type)
-              }
+              if s.can_view?(@current_user)
+                {
+                  '@id': "#other_material/#{s.id}",
+                  name: s.get_attribute_value(with_tag_isa_other_material),
+                  type: with_tag_isa_other_material.title,
+                  characteristics: convert_characteristics(s, with_tag_isa_other_material_characteristics),
+                  # It can sometimes be other_material or sample!!!! SHOULD BE DYNAMIC
+                  derivesFrom: extract_sample_ids(s.get_attribute_value(seek_sample_multi_attribute), type)
+                }
+              else
+                {
+                  '@id': "#other_material/HIDDEN",
+                  name: 'HIDDEN',
+                  type: with_tag_isa_other_material.title,
+                  characteristics: convert_characteristics(s, with_tag_isa_other_material_characteristics),
+                  # It can sometimes be other_material or sample!!!! SHOULD BE DYNAMIC
+                  derivesFrom: extract_sample_ids(s.get_attribute_value(seek_sample_multi_attribute), type)
+                }
+              end
             end
             .flatten
       end
       other_materials
+    end
+
+    def assay_samples(first_assay)
+      first_assay.samples.map { |s| find_sample_origin([s], 1) }.flatten.uniq.map { |s| { '@id': "#sample/#{s}" } }
     end
 
     def export
