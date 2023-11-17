@@ -323,11 +323,19 @@ module IsaExporter
         sample_type.sample_attributes.select { |sa| sa.isa_tag&.isa_source_characteristic? }
 
       sample_type.samples.map do |s|
-        {
-          '@id': "#source/#{s.id}",
-          name: s.get_attribute_value(with_tag_source),
-          characteristics: convert_characteristics(s, with_tag_source_characteristic)
-        }
+        if s.can_view?(@current_user)
+          {
+            '@id': "#source/#{s.id}",
+            name: s.get_attribute_value(with_tag_source),
+            characteristics: convert_characteristics(s, with_tag_source_characteristic)
+          }
+        else
+          {
+            '@id': "#source/HIDDEN",
+            name: 'Hidden Sample',
+            characteristics: []
+          }
+        end
       end
     end
 
