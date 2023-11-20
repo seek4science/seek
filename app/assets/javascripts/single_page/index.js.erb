@@ -258,7 +258,7 @@ async function exportToExcel(tableName, studyId, assayId, sampleTypeId) {
         obj[attr] = val;
       }
     }
-    if (!hasHiddenInputs) data.push(obj);
+    if (!hasHiddenInputs && obj["selected"]) data.push(obj);
   }
 
   // Use ajax for POST request with table data in the body

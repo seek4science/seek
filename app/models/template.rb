@@ -57,12 +57,12 @@ class Template < ApplicationRecord
   end
 
   def none_empty_isa_tag
-    template_attributes.reject { |ta| ta&.title == 'Input' }.map(&:isa_tag_id).none? nil
+    template_attributes.select { |ta| !ta.title.include?('Input') && ta.isa_tag_id.nil? }.none?
   end
 
   def test_tag_occurences
     %w[source protocol sample data_file other_material].map do |tag|
-      tag if template_attributes.reject { |ta| ta&.title == 'Input' }.map(&:isa_tag).compact.map(&:title).count(tag) > 1
+      tag if template_attributes.reject { |ta| ta.title.include?('Input') }.map(&:isa_tag).compact.map(&:title).count(tag) > 1
     end.compact
   end
 
