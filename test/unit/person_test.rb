@@ -2,6 +2,7 @@ require 'test_helper'
 
 class PersonTest < ActiveSupport::TestCase
   fixtures :users, :people, :roles
+  include Seek::Merging::PersonMerge
 
   def test_work_groups
     p = FactoryBot.create(:person_in_multiple_projects)
@@ -1407,4 +1408,18 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal [project, project2, project3], person.projects.sort_by(&:id)
     assert_equal [project,project2], person.administered_projects.sort_by(&:id)
   end
+
+  test 'merge simple attributes' do
+    person_to_keep = FactoryBot.create(:min_person)
+    other_person = FactoryBot.create(:max_person)
+    person_to_keep.merge(other_person)
+    assert_equal 'Minimal', person_to_keep.last_name
+    assert_equal 'minimal_person@email.com', person_to_keep.email
+    attributes = simple_attributes - %i[last_name email]
+    attributes.each do |attribute|
+      assert_equal other_person.send(attribute), person_to_keep.send(attribute),
+                   "Should copy #{attribute} if empty in person to keep"
+    end
+  end
+
 end
