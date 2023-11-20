@@ -35,13 +35,33 @@ class SinglePagesControllerTest < ActionController::TestCase
     assert_equal inv_two.title, json['children'][1]['text']
   end
 
-  test 'should not export isa from unauthorized investigation' do
+  test 'Should not export an isa json with unauthorized studies and assays' do
     with_config_value(:project_single_page_enabled, true) do
+      current_user = FactoryBot.create(:user)
+      other_user = FactoryBot.create(:user)
+
+      login_as(current_user)
       project = FactoryBot.create(:project)
-      investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:private_policy), projects: [project])
+      current_user.person.add_to_project_and_institution(project, current_user.person.institutions.first)
+      other_user.person.add_to_project_and_institution(project, current_user.person.institutions.first)
+      investigation = FactoryBot.create(:investigation, projects: [project], contributor: current_user.person)
+
+      source_sample_type = FactoryBot.create(:isa_source_sample_type)
+      sample_collection_sample_type = FactoryBot.create(:isa_sample_collection_sample_type, linked_sample_type: source_sample_type)
+      accessible_study = FactoryBot.create(:study,
+                                            investigation: investigation,
+                                            sample_types:[source_sample_type, sample_collection_sample_type],
+                                            contributor: current_user.person)
+
+      assay_sample_type = FactoryBot.create(:isa_assay_sample_type, linked_sample_type: sample_collection_sample_type)
+      # Create a 'private' assay
+      FactoryBot.create(:assay, sample_type: assay_sample_type, study: accessible_study, contributor: other_user.person)
+
       get :export_isa, params: { id: project.id, investigation_id: investigation.id }
-      assert_equal flash[:error], 'The investigation cannot be found!'
-      assert_redirected_to action: :show
+
+      json_investigation = JSON.parse(response.body)
+      assert json_investigation['studies'].map { |s| s['title'] }.include? accessible_study.title
+      assert json_investigation['studies'].first['assays'].blank?
     end
   end
 
