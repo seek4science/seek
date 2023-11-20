@@ -640,11 +640,12 @@ module IsaExporter
       grouped_samples.transform_keys { |key| group_id(key) }
     end
 
-    def process_sequence_input(input_ids, type)
-      authorized_sample_ids = Sample.where(id: input_ids).select { |s| s.can_view?(@current_user).map(&:id) }
-      input_ids.map do |input|
-        if authorized_sample_ids.include?(input[:id])
-          { '@id': "##{type}/#{input[:id]}" }
+    def process_sequence_input(inputs, type)
+      input_ids = inputs.map { |input| input[:id] }
+      authorized_sample_ids = Sample.where(id: input_ids).select { |s| s.can_view?(@current_user) }.map(&:id).compact
+      input_ids.map do |input_id|
+        if authorized_sample_ids.include?(input_id)
+          { '@id': "##{type}/#{input_id}" }
         else
           { '@id': "##{type}/HIDDEN" }
         end
