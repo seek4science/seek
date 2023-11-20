@@ -21,8 +21,8 @@
       </div>
 
       <%= fields_for(@presentation) do |presentation_fields| %>
-        <%= render :partial => 'extended_metadata/extended_metadata_type_selection', :locals => {:f => presentation_fields,:resource => @presentation } %>
-        <%= render :partial => 'extended_metadata/extended_metadata_attribute_input', :locals => {:f => presentation_fields, :resource => @presentation } %>
+        <%= render partial: 'extended_metadata/extended_metadata_type_selection', locals: { f: presentation_fields, resource: @presentation } %>
+        <%= render partial: 'extended_metadata/extended_metadata_attribute_input', locals: { f: presentation_fields, resource: @presentation } %>
       <% end %>
 
       <%= render :partial => "projects/project_selector", :locals => { :resource => @presentation } -%>

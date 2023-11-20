@@ -21,8 +21,8 @@
       </div>
 
       <%= fields_for(@document) do |document_fields| %>
-        <%= render :partial => 'extended_metadata/extended_metadata_type_selection', :locals => {:f => document_fields,:resource => @document } %>
-        <%= render :partial => 'extended_metadata/extended_metadata_attribute_input', :locals => {:f => document_fields, :resource => @document } %>
+        <%= render partial: 'extended_metadata/extended_metadata_type_selection', locals: { f: document_fields, resource: @document } %>
+        <%= render partial: 'extended_metadata/extended_metadata_attribute_input', locals: { f: document_fields, resource: @document } %>
       <% end %>
 
 
