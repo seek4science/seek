@@ -3,6 +3,7 @@ module Seek
     module PersonMerge
       def merge(other_person)
         merge_simple_attributes(other_person)
+        merge_annotations(other_person)
 
         # Merging group_memberships deals with work_groups and projects
         merge_associations(group_memberships, other_person.group_memberships, 'work_group_id')
@@ -35,6 +36,19 @@ module Seek
           send("#{attribute}=", other_person.send(attribute)) if send(attribute).nil?
         end
         update_first_letter
+      end
+
+      def annotation_types
+        %w[
+          expertise
+          tools
+        ]
+      end
+
+      def merge_annotations(other_person)
+        annotation_types.each do |annotation_type|
+          add_annotations(send(annotation_type)+other_person.send(annotation_type), annotation_type.singularize, self)
+        end
       end
 
       def merge_associations(current_associations, other_associations, check_existing)
