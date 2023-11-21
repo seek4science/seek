@@ -46,14 +46,61 @@ class SinglePagesControllerTest < ActionController::TestCase
       other_user.person.add_to_project_and_institution(project, current_user.person.institutions.first)
       investigation = FactoryBot.create(:investigation, projects: [project], contributor: current_user.person)
 
-      source_sample_type = FactoryBot.create(:isa_source_sample_type)
-      sample_collection_sample_type = FactoryBot.create(:isa_sample_collection_sample_type, linked_sample_type: source_sample_type)
+      source_sample_type = FactoryBot.create(:isa_source_sample_type, template_id: FactoryBot.create(:isa_source_template).id)
+      sample_collection_sample_type = FactoryBot.create(:isa_sample_collection_sample_type, linked_sample_type: source_sample_type, template_id: FactoryBot.create(:isa_sample_collection_template).id)
       accessible_study = FactoryBot.create(:study,
                                             investigation: investigation,
                                             sample_types:[source_sample_type, sample_collection_sample_type],
                                             contributor: current_user.person)
 
-      assay_sample_type = FactoryBot.create(:isa_assay_sample_type, linked_sample_type: sample_collection_sample_type)
+
+      source_sample = FactoryBot.create(:sample,
+      title: 'source 1',
+      sample_type: source_sample_type,
+      project_ids: [project.id],
+      data: {
+        'Source Name': 'Source Name',
+        'Source Characteristic 1': 'Source Characteristic 1',
+        'Source Characteristic 2':
+        source_sample_type
+            .sample_attributes
+            .find_by_title('Source Characteristic 2')
+            .sample_controlled_vocab
+            .sample_controlled_vocab_terms
+            .first
+            .label
+      },
+      contributor: current_user.person)
+
+      study_sample =
+      FactoryBot.create(:sample,
+              title: 'study sample 1',
+              sample_type: sample_collection_sample_type,
+              project_ids: [project.id],
+              data: {
+                Input: [source_sample.id],
+                'sample collection': 'sample collection',
+                'sample collection parameter value 1': 'sample collection parameter value 1',
+                'Sample Name': 'sample name',
+                'sample characteristic 1': 'sample characteristic 1'
+              },
+              contributor: current_user.person)
+
+      hidden_study_sample =
+      FactoryBot.create(:sample,
+              title: 'study sample 2',
+              sample_type: sample_collection_sample_type,
+              project_ids: [project.id],
+              data: {
+                Input: [source_sample.id],
+                'sample collection': 'sample collection',
+                'sample collection parameter value 1': 'sample collection parameter value 2',
+                'Sample Name': 'sample name 2',
+                'sample characteristic 1': 'sample characteristic 2'
+              },
+              contributor: other_user.person)
+
+      assay_sample_type = FactoryBot.create(:isa_assay_material_sample_type, linked_sample_type: sample_collection_sample_type, template_id: FactoryBot.create(:isa_assay_material_template).id)
       # Create a 'private' assay
       FactoryBot.create(:assay, sample_type: assay_sample_type, study: accessible_study, contributor: other_user.person)
 
@@ -61,7 +108,22 @@ class SinglePagesControllerTest < ActionController::TestCase
 
       json_investigation = JSON.parse(response.body)
       assert json_investigation['studies'].map { |s| s['title'] }.include? accessible_study.title
-      assert json_investigation['studies'].first['assays'].blank?
+      study_json = json_investigation['studies'].first
+      assert study_json['assays'].blank?
+
+      sample_names = study_json['materials']['samples'].map { |sample| sample['name'] }
+
+      assert sample_names.include?(study_sample.title)
+      refute sample_names.include?(hidden_study_sample.title)
+
+      study_process_sequence = study_json['processSequence']
+      output_ids=[]
+      study_process_samples = study_process_sequence.map do |process|
+        process['outputs'].map { |output| output_ids.push(output['@id']) }
+      end
+
+      assert output_ids.include? "#sample/#{study_sample.id}"
+      refute output_ids.include? "#sample/#{hidden_study_sample.id}"
     end
   end
 
