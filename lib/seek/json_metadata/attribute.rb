@@ -16,20 +16,23 @@ module Seek
         # validates that the attribute type is SeekSample if linked_sample_type is set, and vice-versa
         validate :linked_sample_type_and_attribute_type_consistency
 
-        delegate :controlled_vocab?, :seek_cv_list?, :seek_sample?, :seek_sample_multi?, :seek_strain?, :seek_resource?, :linked_extended_metadata?,:linked_extended_metadata_multi?, to: :sample_attribute_type, allow_nil: true
+        delegate :controlled_vocab?, :seek_cv_list?, :seek_sample?, :seek_sample_multi?, :seek_strain?, :linked_extended_metadata?,:linked_extended_metadata_multi?, to: :sample_attribute_type, allow_nil: true
       end
 
       # checks whether the value is blank against the attribute type and base type
       def test_blank?(value)
-        sample_attribute_type.test_blank?(value)
+        base_type_handler.test_blank?(value)
       end
 
       def validate_value?(value)
         return false if required? && test_blank?(value)
         return true if test_blank?(value) && !required?
 
-        sample_attribute_type.validate_value?(value, self)
+        check_value_against_base_type(value) && check_value_against_regular_expression(value)
+      end
 
+      def pre_process_value(value)
+        base_type_handler.convert(value)
       end
 
       def accessor_name
@@ -43,8 +46,12 @@ module Seek
         resolution
       end
 
-      def pre_process_value(value)
-        sample_attribute_type.pre_process_value(value, self)
+      def seek_resource?
+        base_type_handler.is_a?(Seek::Samples::AttributeTypeHandlers::SeekResourceAttributeTypeHandler)
+      end
+
+      def base_type_handler
+        Seek::Samples::AttributeTypeHandlers::AttributeTypeHandlerFactory.instance.for_base_type(sample_attribute_type.base_type, self)
       end
 
       private
@@ -77,6 +84,16 @@ module Seek
           errors.add(:seek_sample_multi, 'Linked Sample Type must be set if attribute type is Registered Sample (multiple)')
         end
       end
+
+      def check_value_against_regular_expression(value)
+        match = sample_attribute_type.regular_expression.match(value.to_s)
+        match && (match.to_s == value.to_s)
+      end
+
+      def check_value_against_base_type(value)
+        base_type_handler.validate_value?(value)
+      end
+
     end
   end
 end
