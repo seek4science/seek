@@ -45,13 +45,13 @@
   <td class="text-center">
     <div class="checkbox-inline">
       <%= hidden_field_tag "#{field_name_prefix}[required]", '0' %>
-      <%= check_box_tag "#{field_name_prefix}[required]", '1', required, disabled: !allow_required, data: { attr: "required" } %>
+      <%= check_box_tag "#{field_name_prefix}[required]", '1', required, disabled: !allow_required, data: { attr: "required" }, title: allow_required ? 'Check to make this a required field' : 'Changing an optional field to a required one is not permitted' %>
     </div>
   </td>
   <td class="text-center">
     <div class="checkbox-inline">
       <%= hidden_field_tag "#{field_name_prefix}[is_title]", '0' %>
-      <%= check_box_tag "#{field_name_prefix}[is_title]", '1', is_title, class:'sample-type-is-title',disabled: seek_sample_multi || !allow_required %>
+      <%= check_box_tag "#{field_name_prefix}[is_title]", '1', is_title, class:'sample-type-is-title',disabled: seek_sample_multi || !allow_required, title: allow_required ? 'Check to make this field the title' : 'Changing the title tag of an optional field is not permitted' %>
     </div>
   </td>
   <td>
