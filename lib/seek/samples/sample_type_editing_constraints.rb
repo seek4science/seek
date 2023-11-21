@@ -18,10 +18,12 @@ module Seek
       # an attribute can be changed to required, if no samples have that field blank
       # attr can be the attribute accessor name, or the attribute itself
       # if attr is nil, indicates a new attribute. required is not allowed if there are already samples
-      def allow_required?(attr)
-        if attr.is_a?(SampleAttribute)
-          return true if attr.new_record?
-          attr = attr.accessor_name
+      def allow_required?(attr_)
+        if attr_.is_a?(SampleAttribute)
+          return true if attr_.new_record?
+          return false unless attr_.required?
+
+          attr = attr_.accessor_name
         end
         if attr
           !blanks?(attr)

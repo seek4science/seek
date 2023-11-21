@@ -91,7 +91,6 @@ class SampleAttribute < ApplicationRecord
 
     unless c.allow_required?(self)
       errors.add(:is_title, error_message) if is_title_changed?
-      errors.add(:required, error_message) if required_changed?
     end
 
     unless c.allow_type_change?(self)
