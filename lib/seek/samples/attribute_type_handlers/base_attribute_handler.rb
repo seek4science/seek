@@ -4,7 +4,7 @@ module Seek
       class AttributeHandlerException < RuntimeError; end
 
       class BaseAttributeHandler
-        def initialize(attribute=nil)
+        def initialize(attribute)
           @attribute = attribute
         end
 
