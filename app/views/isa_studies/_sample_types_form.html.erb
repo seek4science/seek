@@ -52,13 +52,11 @@
                                                                                   display_isa_tag: true } %>
 					<% end %>
 
-					<% unless sample_type.uploaded_template? || !sample_type.editing_constraints.allow_new_attribute? %>
-							<tr id=<%=add_attribute_row_id%> >
-								<td colspan="6">
-									<%= button_link_to('Add new attribute', 'add', '#', :id => add_attribute_id  ) %>
-								</td>
-							</tr>
-					<% end %>
+          <tr id=<%=add_attribute_row_id%> >
+            <td colspan="6">
+              <%= button_link_to('Add new attribute', 'add', '#', id: add_attribute_id  ) %>
+            </td>
+          </tr>
 				</tbody>
 			</table>
 		</div>
