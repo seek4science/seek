@@ -123,7 +123,7 @@ module IsaExporter
       isa_study[:protocols] = protocols
 
       isa_study[:processSequence] = convert_process_sequence(study.sample_types.second, study.sops.map(&:id).join("_"), study.id)
-      assay_streams = study.assays.map { |assay| [assay] if assay&.position&.zero? }.compact
+      assay_streams = study.assays.map { |assay| [assay] if assay&.position&.zero? }
                            .compact
                            .map do |assay_stream|
         last_assay = assay_stream.first
