@@ -2081,6 +2081,70 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal 'http://mockedlocation.com/txt_test.txt', assigns(:data_file).content_blob.url
   end
 
+
+  test 'users should be able to override URL validation when the URL examination returns a 404 or 400 status code.' do
+    mock_http
+
+    params = { data_file: {
+      title: 'Remote File',
+      project_ids: [projects(:sysmo_project).id]
+    },
+               content_blobs: [{
+                                 data_url: 'http://mocked404.com',
+                                 make_local_copy: '1'
+                               }],
+               policy_attributes: valid_sharing }
+
+    assert_no_difference('DataFile.count') do
+      assert_no_difference('ContentBlob.count') do
+        post :create, params: params
+      end
+    end
+
+    params = { data_file: {
+      title: 'Remote File',
+      project_ids: [projects(:sysmo_project).id]
+    },
+               content_blobs: [{
+                                 data_url: 'http://mocked404.com',
+                                 make_local_copy: '1',
+                                 override_url_check: 'yes'
+                               }],
+               policy_attributes: valid_sharing }
+
+    assert_difference('DataFile.count') do
+      assert_difference('ContentBlob.count') do
+        post :create, params: params
+      end
+    end
+
+    assert_redirected_to data_file_path(assigns(:data_file))
+    assert_equal 'http://mocked404.com', assigns(:data_file).content_blob.url
+
+
+    params = { data_file: {
+      title: 'Remote File',
+      project_ids: [projects(:sysmo_project).id]
+    },
+               content_blobs: [{
+                                 data_url: 'http://mocked400.com',
+                                 make_local_copy: '1',
+                                 override_url_check: 'yes'
+                               }],
+               policy_attributes: valid_sharing }
+
+    assert_difference('DataFile.count') do
+      assert_difference('ContentBlob.count') do
+        post :create, params: params
+      end
+    end
+
+    assert_redirected_to data_file_path(assigns(:data_file))
+    assert_equal 'http://mocked400.com', assigns(:data_file).content_blob.url
+
+
+  end
+
   test 'should display null license text' do
     df = FactoryBot.create :data_file, policy: FactoryBot.create(:public_policy)
 
@@ -3648,6 +3712,7 @@ class DataFilesControllerTest < ActionController::TestCase
     stub_request(:any, 'http://mocked302.com').to_return(status: 302, headers: { location: 'http://redirectlocation.com' })
     stub_request(:any, 'http://mocked401.com/file.txt').to_return(status: 401)
     stub_request(:any, 'http://mocked403.com/file.txt').to_return(status: 403)
+    stub_request(:any, 'http://mocked400.com').to_return(status: 400)
     stub_request(:any, 'http://mocked404.com').to_return(status: 404)
 
     stub_request(:get, 'http://mockedlocation.com/small.txt').to_return(body: 'bananafish' * 10, status: 200, headers: { content_type: 'text/plain; charset=UTF-8', content_length: 100 })
