@@ -3567,6 +3567,23 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal [good_assay],data_file.assays
   end
 
+  test 'provide metadata with controlled vocabs' do
+    FactoryBot.create(:data_formats_controlled_vocab)
+    FactoryBot.create(:data_types_controlled_vocab)
+    df = FactoryBot.build(:data_file, content_blob:FactoryBot.create(:txt_content_blob))
+    refute_nil df.content_blob
+    assay_to_be_created = FactoryBot.build(:assay,title:'new assay')
+    session[:processed_datafile]=df
+    session[:processed_assay]=assay_to_be_created
+
+    get :provide_metadata
+
+    assert_response :success
+
+    assert_select 'input+select#data_file_data_type_annotations'
+    assert_select 'input+select#data_file_data_format_annotations'
+  end
+
   test 'create assay should be checked with new assay containing title' do
     df = FactoryBot.build(:data_file, content_blob:FactoryBot.create(:txt_content_blob))
     refute_nil df.content_blob
