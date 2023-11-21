@@ -4,6 +4,8 @@ module Seek
       def merge(other_person)
         merge_simple_attributes(other_person)
 
+        # Merging group_memberships deals with work_groups and projects
+        merge_associations(group_memberships, other_person.group_memberships, 'work_group_id')
         other_person.destroy
       end
 
@@ -30,6 +32,24 @@ module Seek
           send("#{attribute}=", other_person.send(attribute)) if send(attribute).nil?
         end
         update_first_letter
+      end
+
+      def merge_associations(current_associations, other_associations, check_existing)
+        other_associations.each do |other_association|
+          existing_association = nil
+          if check_existing
+            existing_association = current_associations.find do |assoc|
+              # Check if association already exists
+              assoc.send(check_existing) == other_association.send(check_existing)
+            end
+          end
+
+          next if existing_association
+
+          duplicated_association = other_association.dup
+          duplicated_association.person_id = id
+          current_associations << duplicated_association
+        end
       end
 
     end

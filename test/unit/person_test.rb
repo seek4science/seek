@@ -1422,6 +1422,18 @@ class PersonTest < ActiveSupport::TestCase
     end
   end
 
+  test 'merge group_memberships without duplication' do
+    person_to_keep = FactoryBot.create(:person_in_multiple_projects)
+    orig_wg_ids = person_to_keep.work_group_ids
+    orig_proj_ids = person_to_keep.project_ids
+    other_person = FactoryBot.create(:max_person)
+    other_person.work_groups << person_to_keep.work_groups[0]
+    person_to_keep.merge(other_person)
+    person_to_keep.reload
+    assert_equal (orig_wg_ids + other_person.work_group_ids).compact.uniq.sort, person_to_keep.work_group_ids.sort
+    assert_equal (orig_proj_ids + other_person.project_ids).compact.uniq.sort, person_to_keep.project_ids.sort
+  end
+
   test 'other person is destroyed after merge' do
     person_to_keep = FactoryBot.create(:min_person)
     other_person = FactoryBot.create(:max_person)
