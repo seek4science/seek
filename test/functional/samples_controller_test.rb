@@ -2,8 +2,6 @@ require 'test_helper'
 
 class SamplesControllerTest < ActionController::TestCase
 
-  fixtures :isa_tags
-
   include AuthenticatedTestHelper
   include SharingFormTestHelper
   include HtmlHelper
@@ -1275,12 +1273,12 @@ class SamplesControllerTest < ActionController::TestCase
 
       template1 = FactoryBot.create(:isa_source_template)
       template2 = FactoryBot.create(:isa_sample_collection_template)
-      template3 = FactoryBot.create(:isa_assay_template)
+      template3 = FactoryBot.create(:isa_assay_material_template)
 
       type1 = FactoryBot.create(:isa_source_sample_type, contributor: person, project_ids: [project.id], isa_template: template1)
       type2 = FactoryBot.create(:isa_sample_collection_sample_type, contributor: person, project_ids: [project.id],
                                                           isa_template: template2, linked_sample_type: type1)
-      type3 = FactoryBot.create(:isa_assay_sample_type, contributor: person, project_ids: [project.id], isa_template: template3,
+      type3 = FactoryBot.create(:isa_assay_material_sample_type, contributor: person, project_ids: [project.id], isa_template: template3,
                                               linked_sample_type: type2)
 
       sample1 = FactoryBot.create :sample, title: 'sample1', sample_type: type1, project_ids: [project.id], contributor: person,

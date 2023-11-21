@@ -3,8 +3,6 @@ require 'test_helper'
 class SinglePagesControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
 
-  fixtures :isa_tags, :templates
-
   def setup
     @instance_name = Seek::Config.instance_name
     @member = FactoryBot.create :user
@@ -257,8 +255,8 @@ class SinglePagesControllerTest < ActionController::TestCase
                                                       studies: [study],
                                                       linked_sample_type: source_sample_type)
 
-    assay_sample_type_template = FactoryBot.create(:isa_assay_template, id: 10_008)
-    assay_sample_type = FactoryBot.create(:isa_assay_sample_type,
+    assay_sample_type_template = FactoryBot.create(:isa_assay_material_template, id: 10_008)
+    assay_sample_type = FactoryBot.create(:isa_assay_material_sample_type,
                                           id: 10_005,
                                           contributor: person,
                                           isa_template: assay_sample_type_template,

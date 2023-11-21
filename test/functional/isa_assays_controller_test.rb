@@ -52,12 +52,12 @@ class IsaAssaysControllerTest < ActionController::TestCase
                                                               '0' => {
                                                                 pos: '1', title: 'a string', required: '1', is_title: '1',
                                                                 sample_attribute_type_id: FactoryBot.create(:string_sample_attribute_type).id, _destroy: '0',
-                                                                isa_tag_id: IsaTag.find_by_title(Seek::ISA::TagType::OTHER_MATERIAL).id
+                                                                isa_tag_id: FactoryBot.create(:other_material_isa_tag).id
                                                               },
                                                               '1' => {
                                                                 pos: '2', title: 'protocol', required: '1', is_title: '0',
                                                                 sample_attribute_type_id: FactoryBot.create(:string_sample_attribute_type).id,
-                                                                isa_tag_id: IsaTag.find_by_title(Seek::ISA::TagType::PROTOCOL).id, _destroy: '0'
+                                                                isa_tag_id: FactoryBot.create(:protocol_isa_tag).id, _destroy: '0'
                                                               },
                                                               '2' => {
                                                                 pos: '3', title: 'Input', required: '1',
@@ -65,10 +65,10 @@ class IsaAssaysControllerTest < ActionController::TestCase
                                                                 linked_sample_type_id: 'self', _destroy: '0'
                                                               },
                                                               '3' => {
-                                                                pos: '4', title: 'Som material characteristic', required: '1',
+                                                                pos: '4', title: 'Some material characteristic', required: '1',
                                                                 sample_attribute_type_id: FactoryBot.create(:string_sample_attribute_type).id,
                                                                 _destroy: '0',
-                                                                isa_tag_id: IsaTag.find_by_title(Seek::ISA::TagType::OTHER_MATERIAL_CHARACTERISTIC).id
+                                                                isa_tag_id: FactoryBot.create(:other_material_characteristic_isa_tag).id
                                                               }
                                                             } } } }
       end
@@ -128,7 +128,7 @@ class IsaAssaysControllerTest < ActionController::TestCase
     source_type = FactoryBot.create(:isa_source_sample_type, contributor: person, projects: [project])
     sample_collection_type = FactoryBot.create(:isa_sample_collection_sample_type, contributor: person, projects: [project],
                                                                                    linked_sample_type: source_type)
-    assay_type = FactoryBot.create(:isa_assay_sample_type, contributor: person, projects: [project],
+    assay_type = FactoryBot.create(:isa_assay_material_sample_type, contributor: person, projects: [project],
                                                            linked_sample_type: sample_collection_type)
 
     study = FactoryBot.create(:study, investigation:, contributor: person,
@@ -197,12 +197,12 @@ class IsaAssaysControllerTest < ActionController::TestCase
                                               '0' => {
                                                 pos: '1', title: 'a string', required: '1', is_title: '1',
                                                 sample_attribute_type_id: FactoryBot.create(:string_sample_attribute_type).id, _destroy: '0',
-                                                isa_tag_id: IsaTag.find_by_title(Seek::ISA::TagType::OTHER_MATERIAL).id
+                                                isa_tag_id: FactoryBot.create(:other_material_isa_tag).id
                                               },
                                               '1' => {
                                                 pos: '2', title: 'protocol', required: '1', is_title: '0',
                                                 sample_attribute_type_id: FactoryBot.create(:string_sample_attribute_type).id,
-                                                isa_tag_id: IsaTag.find_by_title(Seek::ISA::TagType::PROTOCOL).id, _destroy: '0'
+                                                isa_tag_id: FactoryBot.create(:protocol_isa_tag).id, _destroy: '0'
                                               },
                                               '2' => {
                                                 pos: '3', title: 'Input', required: '1',
@@ -210,10 +210,10 @@ class IsaAssaysControllerTest < ActionController::TestCase
                                                 linked_sample_type_id: 'self', _destroy: '0'
                                               },
                                               '3' => {
-                                                pos: '4', title: 'Som material characteristic', required: '1',
+                                                pos: '4', title: 'Some material characteristic', required: '1',
                                                 sample_attribute_type_id: FactoryBot.create(:string_sample_attribute_type).id,
                                                 _destroy: '0',
-                                                isa_tag_id: IsaTag.find_by_title(Seek::ISA::TagType::OTHER_MATERIAL_CHARACTERISTIC).id
+                                                isa_tag_id: FactoryBot.create(:other_material_characteristic_isa_tag).id
                                               }
                                             } } }
 
