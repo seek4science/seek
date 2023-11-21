@@ -1412,12 +1412,19 @@ class PersonTest < ActiveSupport::TestCase
   test 'merge simple attributes' do
     person_to_keep = FactoryBot.create(:min_person)
     other_person = FactoryBot.create(:max_person)
-    person_to_keep.merge(other_person)
+    other_person_attributes = {}
+    simple_attributes.each do |attribute|
+      other_person_attributes[attribute] = other_person.send(attribute)
+    end
+
+    disable_authorization_checks { person_to_keep.merge(other_person) }
+    person_to_keep.reload
+
     assert_equal 'Minimal', person_to_keep.last_name
     assert_equal 'minimal_person@email.com', person_to_keep.email
     attributes = simple_attributes - %i[last_name email]
     attributes.each do |attribute|
-      assert_equal other_person.send(attribute), person_to_keep.send(attribute),
+      assert_equal other_person_attributes[attribute], person_to_keep.send(attribute),
                    "Should copy #{attribute} if empty in person to keep"
     end
   end
@@ -1428,10 +1435,14 @@ class PersonTest < ActiveSupport::TestCase
     orig_proj_ids = person_to_keep.project_ids
     other_person = FactoryBot.create(:max_person)
     other_person.work_groups << person_to_keep.work_groups[0]
-    person_to_keep.merge(other_person)
+    other_wg_ids = other_person.work_group_ids
+    other_proj_ids = other_person.project_ids
+
+    disable_authorization_checks { person_to_keep.merge(other_person) }
     person_to_keep.reload
-    assert_equal (orig_wg_ids + other_person.work_group_ids).compact.uniq.sort, person_to_keep.work_group_ids.sort
-    assert_equal (orig_proj_ids + other_person.project_ids).compact.uniq.sort, person_to_keep.project_ids.sort
+
+    assert_equal (orig_wg_ids + other_wg_ids).compact.uniq.sort, person_to_keep.work_group_ids.sort
+    assert_equal (orig_proj_ids + other_proj_ids).compact.uniq.sort, person_to_keep.project_ids.sort
   end
 
   test 'other person is destroyed after merge' do

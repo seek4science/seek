@@ -6,7 +6,10 @@ module Seek
 
         # Merging group_memberships deals with work_groups and projects
         merge_associations(group_memberships, other_person.group_memberships, 'work_group_id')
-        other_person.destroy
+        Person.transaction do
+          save!
+          other_person.destroy
+        end
       end
 
       private
