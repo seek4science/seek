@@ -3,6 +3,8 @@ module Seek
     module PersonMerge
       def merge(other_person)
         merge_simple_attributes(other_person)
+
+        other_person.destroy
       end
 
       private

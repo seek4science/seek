@@ -1422,4 +1422,13 @@ class PersonTest < ActiveSupport::TestCase
     end
   end
 
+  test 'other person is destroyed after merge' do
+    person_to_keep = FactoryBot.create(:min_person)
+    other_person = FactoryBot.create(:max_person)
+    assert_difference('Person.count', -1) do
+      disable_authorization_checks { person_to_keep.merge(other_person) }
+    end
+    assert_nil Person.find_by_id(other_person.id)
+  end
+
 end
