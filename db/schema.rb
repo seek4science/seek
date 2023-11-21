@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_11_14_110917) do
+ActiveRecord::Schema.define(version: 2023_11_21_100719) do
 
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
@@ -311,6 +311,7 @@ ActiveRecord::Schema.define(version: 2023_11_14_110917) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "avatar_id"
+    t.string "deleted_contributor"
     t.index ["avatar_id"], name: "index_collections_on_avatar_id"
     t.index ["contributor_id"], name: "index_collections_on_contributor_id"
     t.index ["policy_id"], name: "index_collections_on_policy_id"
