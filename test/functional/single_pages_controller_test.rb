@@ -100,30 +100,233 @@ class SinglePagesControllerTest < ActionController::TestCase
               },
               contributor: other_user.person)
 
-      assay_sample_type = FactoryBot.create(:isa_assay_material_sample_type, linked_sample_type: sample_collection_sample_type, template_id: FactoryBot.create(:isa_assay_material_template).id)
-      # Create a 'private' assay
-      FactoryBot.create(:assay, sample_type: assay_sample_type, study: accessible_study, contributor: other_user.person)
+      # Create a 'private' assay in an assay stream
+      assay_1_stream_1_sample_type = FactoryBot.create(:isa_assay_material_sample_type, linked_sample_type: sample_collection_sample_type, template_id: FactoryBot.create(:isa_assay_material_template).id)
+      assay_1_stream_1 = FactoryBot.create(:assay, position: 0, sample_type: assay_1_stream_1_sample_type, study: accessible_study, contributor: current_user.person)
+      assay_2_stream_1_sample_type = FactoryBot.create(:isa_assay_data_file_sample_type, linked_sample_type: assay_1_stream_1_sample_type, template_id: FactoryBot.create(:isa_assay_data_file_template).id)
+      assay_2_stream_1 = FactoryBot.create(:assay, position:1, sample_type: assay_2_stream_1_sample_type, study: accessible_study, contributor: other_user.person)
+
+      # Create an assay stream with all assays visible
+      assay_1_stream_2_sample_type = FactoryBot.create(:isa_assay_material_sample_type, linked_sample_type: sample_collection_sample_type, template_id: FactoryBot.create(:isa_assay_material_template).id)
+      assay_1_stream_2 = FactoryBot.create(:assay, position: 0, sample_type: assay_1_stream_2_sample_type, study: accessible_study, contributor: current_user.person)
+      assay_2_stream_2_sample_type = FactoryBot.create(:isa_assay_data_file_sample_type, linked_sample_type: assay_1_stream_2_sample_type, template_id: FactoryBot.create(:isa_assay_data_file_template).id)
+      assay_2_stream_2 = FactoryBot.create(:assay, position:1, sample_type: assay_2_stream_2_sample_type, study: accessible_study, contributor: current_user.person)
+
+      # create samples in second assay stream with viewing permission
+
+      assay_1_stream_2_sample =
+      FactoryBot.create(:sample,
+              title: 'Assay 1 - stream 2 - sample 1',
+              sample_type: assay_1_stream_2_sample_type,
+              project_ids: [project.id],
+              data: {
+                Input: [study_sample.id],
+                'Protocol Assay 1': 'Protocol Assay 1',
+                'Assay 1 parameter value 1': 'Assay 1 parameter value 1',
+                'Assay 1 parameter value 2': assay_1_stream_2_sample_type
+                                            .sample_attributes
+                                            .find_by(title: 'Assay 1 parameter value 2')
+                                            .sample_controlled_vocab
+                                            .sample_controlled_vocab_terms
+                                            .first
+                                            .label,
+                'Assay 1 parameter value 3': assay_1_stream_2_sample_type
+                                            .sample_attributes
+                                            .find_by(title: 'Assay 1 parameter value 3')
+                                            .sample_controlled_vocab
+                                            .sample_controlled_vocab_terms
+                                            .first
+                                            .label,
+                'Extract Name': 'Extract 1 stream 2',
+                'other material characteristic 1': 'other material characteristic 1',
+                'other material characteristic 2': assay_1_stream_2_sample_type
+                                                  .sample_attributes
+                                                  .find_by(title: 'other material characteristic 2')
+                                                  .sample_controlled_vocab
+                                                  .sample_controlled_vocab_terms
+                                                  .first
+                                                  .label,
+                'other material characteristic 3': assay_1_stream_2_sample_type
+                                                  .sample_attributes
+                                                  .find_by(title: 'other material characteristic 3')
+                                                  .sample_controlled_vocab
+                                                  .sample_controlled_vocab_terms
+                                                  .first
+                                                  .label},
+              contributor: current_user.person)
+
+              assay_1_stream_2_hidden_sample =
+              FactoryBot.create(:sample,
+                      title: 'Assay 1 - stream 2 - sample 2',
+                      sample_type: assay_1_stream_2_sample_type,
+                      project_ids: [project.id],
+                      data: {
+                        Input: [study_sample.id],
+                        'Protocol Assay 1': 'Protocol Assay 1',
+                        'Assay 1 parameter value 1': 'Assay 1 parameter value 1',
+                        'Assay 1 parameter value 2': assay_1_stream_2_sample_type
+                                                    .sample_attributes
+                                                    .find_by(title: 'Assay 1 parameter value 2')
+                                                    .sample_controlled_vocab
+                                                    .sample_controlled_vocab_terms
+                                                    .second
+                                                    .label,
+                        'Assay 1 parameter value 3': assay_1_stream_2_sample_type
+                                                    .sample_attributes
+                                                    .find_by(title: 'Assay 1 parameter value 3')
+                                                    .sample_controlled_vocab
+                                                    .sample_controlled_vocab_terms
+                                                    .second
+                                                    .label,
+                        'Extract Name': 'Extract 1 stream 2',
+                        'other material characteristic 1': 'other material characteristic 1',
+                        'other material characteristic 2': assay_1_stream_2_sample_type
+                                                          .sample_attributes
+                                                          .find_by(title: 'other material characteristic 2')
+                                                          .sample_controlled_vocab
+                                                          .sample_controlled_vocab_terms
+                                                          .second
+                                                          .label,
+                        'other material characteristic 3': assay_1_stream_2_sample_type
+                                                          .sample_attributes
+                                                          .find_by(title: 'other material characteristic 3')
+                                                          .sample_controlled_vocab
+                                                          .sample_controlled_vocab_terms
+                                                          .second
+                                                          .label},
+                      contributor: other_user.person)
+
+      assay_2_stream_2_sample =
+      FactoryBot.create(:sample,
+              title: 'Assay 2 - stream 2 - sample 1',
+              sample_type: assay_2_stream_2_sample_type,
+              project_ids: [project.id],
+              data: {
+                Input: [assay_1_stream_2_sample.id],
+                'Protocol Assay 2': 'Protocol Assay 2',
+                'Assay 2 parameter value 1': 'Assay 2 parameter value 1',
+                'Assay 2 parameter value 2': assay_2_stream_2_sample_type
+                                            .sample_attributes
+                                            .find_by(title: 'Assay 2 parameter value 2')
+                                            .sample_controlled_vocab
+                                            .sample_controlled_vocab_terms
+                                            .first
+                                            .label,
+                'Assay 2 parameter value 3': assay_2_stream_2_sample_type
+                                            .sample_attributes
+                                            .find_by(title: 'Assay 2 parameter value 3')
+                                            .sample_controlled_vocab
+                                            .sample_controlled_vocab_terms
+                                            .first
+                                            .label,
+                'File Name': 'file 1 stream 2',
+                'Data file comment 1': 'Data file comment 1',
+                'Data file comment 2': assay_2_stream_2_sample_type
+                                      .sample_attributes
+                                      .find_by(title: 'Data file comment 2')
+                                      .sample_controlled_vocab
+                                      .sample_controlled_vocab_terms
+                                      .first
+                                      .label,
+                'Data file comment 3': assay_2_stream_2_sample_type
+                                      .sample_attributes
+                                      .find_by(title: 'Data file comment 3')
+                                      .sample_controlled_vocab
+                                      .sample_controlled_vocab_terms
+                                      .first
+                                      .label},
+              contributor: current_user.person)
+
+      assay_2_stream_2_hidden_sample =
+      FactoryBot.create(:sample,
+              title: 'Assay 2 - stream 2 - sample 2',
+              sample_type: assay_2_stream_2_sample_type,
+              project_ids: [project.id],
+              data: {
+                Input: [assay_1_stream_2_sample.id],
+                'Protocol Assay 2': 'Protocol Assay 2',
+                'Assay 2 parameter value 1': 'Assay 2 parameter value 1',
+                'Assay 2 parameter value 2': assay_2_stream_2_sample_type
+                                            .sample_attributes
+                                            .find_by(title: 'Assay 2 parameter value 2')
+                                            .sample_controlled_vocab
+                                            .sample_controlled_vocab_terms
+                                            .second
+                                            .label,
+                'Assay 2 parameter value 3': assay_2_stream_2_sample_type
+                                            .sample_attributes
+                                            .find_by(title: 'Assay 2 parameter value 3')
+                                            .sample_controlled_vocab
+                                            .sample_controlled_vocab_terms
+                                            .second
+                                            .label,
+                'File Name': 'file 1 stream 2',
+                'Data file comment 1': 'Data file comment 1',
+                'Data file comment 2': assay_2_stream_2_sample_type
+                                      .sample_attributes
+                                      .find_by(title: 'Data file comment 2')
+                                      .sample_controlled_vocab
+                                      .sample_controlled_vocab_terms
+                                      .second
+                                      .label,
+                'Data file comment 3': assay_2_stream_2_sample_type
+                                      .sample_attributes
+                                      .find_by(title: 'Data file comment 3')
+                                      .sample_controlled_vocab
+                                      .sample_controlled_vocab_terms
+                                      .second
+                                      .label},
+              contributor: other_user.person)
+
 
       get :export_isa, params: { id: project.id, investigation_id: investigation.id }
 
+      assert_response :success
       json_investigation = JSON.parse(response.body)
       assert json_investigation['studies'].map { |s| s['title'] }.include? accessible_study.title
       study_json = json_investigation['studies'].first
-      assert study_json['assays'].blank?
 
-      sample_names = study_json['materials']['samples'].map { |sample| sample['name'] }
+      # Only one assay should end up in 1 assay stream in the ISA JSON
+      assert_equal accessible_study.assays.count, 4
+      assert_equal study_json['assays'].count, 1
 
-      assert sample_names.include?(study_sample.title)
-      refute sample_names.include?(hidden_study_sample.title)
+      sample_ids = study_json['materials']['samples'].map { |sample| sample['@id'] }
 
-      study_process_sequence = study_json['processSequence']
-      output_ids=[]
-      study_process_samples = study_process_sequence.map do |process|
-        process['outputs'].map { |output| output_ids.push(output['@id']) }
+      # Check whether permitted samples end up in the materials
+      assert sample_ids.include?("#sample/#{study_sample.id}")
+      refute sample_ids.include?("#sample/#{hidden_study_sample.id}")
+
+      # Check whether permitted study samples end up in the study's processSequence
+      study_output_ids = []
+      study_json['processSequence'].map do |process|
+        process['outputs'].map { |output| study_output_ids.push(output['@id']) }
       end
 
-      assert output_ids.include? "#sample/#{study_sample.id}"
-      refute output_ids.include? "#sample/#{hidden_study_sample.id}"
+      assert study_output_ids.include? "#sample/#{study_sample.id}"
+      refute study_output_ids.include? "#sample/#{hidden_study_sample.id}"
+
+      assay_json = study_json['assays'].first
+
+      # Check otherMaterials
+      other_material_ids = assay_json['materials']['otherMaterials'].map { |om| om['@id'] }
+      assert other_material_ids.include? "#other_material/#{assay_1_stream_2_sample.id}"
+      refute other_material_ids.include? "#other_material/#{assay_1_stream_2_hidden_sample.id}"
+
+      # Check dataFiles
+      data_file_ids = assay_json['dataFiles'].map { |df| df['@id'] }
+      assert data_file_ids.include? "#data_file/#{assay_2_stream_2_sample.id}"
+      refute data_file_ids.include? "#data_file/#{assay_2_stream_2_hidden_sample.id}"
+
+      # Check whether permitted study samples end up in the assay's processSequence
+      assay_output_ids = []
+      assay_json['processSequence'].map do |process|
+        process['outputs'].map { |output| assay_output_ids.push(output['@id']) }
+      end
+
+      assert assay_output_ids.include? "#other_material/#{assay_1_stream_2_sample.id}"
+      assert assay_output_ids.include? "#data_file/#{assay_2_stream_2_sample.id}"
+      refute assay_output_ids.include? "#other_material/#{assay_1_stream_2_hidden_sample.id}"
+      refute assay_output_ids.include? "#data_file/#{assay_2_stream_2_hidden_sample.id}"
     end
   end
 
