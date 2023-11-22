@@ -28,7 +28,7 @@ class SampleTypesController < ApplicationController
   def new
     @tab = 'manual'
 
-    attr = params["sample_type"] ? send("sample_type_params") : {}
+    attr = params["sample_type"] ? sample_type_params : {}
     @sample_type = SampleType.new(attr)
     @sample_type.sample_attributes.build(is_title: true, required: true) # Initial attribute
 

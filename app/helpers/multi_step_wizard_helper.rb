@@ -46,8 +46,8 @@ module MultiStepWizardHelper
       if params[key][:publication_ids]
         html << hidden_field_tag('data_file[publication_ids][]', params[key][:publication_ids])
       end
-      params[key][:project_ids]&.each do |p|
-        html << hidden_field_tag("#{key}[project_ids][]", p)
+      if params[key][:project_ids]
+        html << hidden_field_tag("#{key}[project_ids][]", params[key][:project_ids])
       end
     end
     html.html_safe
