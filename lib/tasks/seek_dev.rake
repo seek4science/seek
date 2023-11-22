@@ -4,6 +4,7 @@ require 'rubygems'
 require 'rake'
 require 'active_record/fixtures'
 require 'benchmark'
+require 'ruby-prof'
 
 include SysMODB::SpreadsheetExtractor
 
@@ -35,6 +36,21 @@ namespace :seek_dev do
     output.rewind
     puts output.read
   end
+
+  task(:profile_command, [:command] => :environment) do |_t, args|
+    unless args[:command].present?
+      puts "command not found"
+      puts
+      puts "Usage: bundle exec rake seek_dev:profile_command['the command']"
+      exit -1
+    end
+    result = RubyProf.profile do
+      eval(args[:command])
+    end
+    printer = RubyProf::GraphHtmlPrinter.new(result)
+    printer.print(STDOUT, {})
+  end
+
 
   task(:dump_controlled_vocab, [:id] => :environment) do |_t, args|
     vocab = SampleControlledVocab.find(args.id)
