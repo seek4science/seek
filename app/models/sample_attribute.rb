@@ -97,7 +97,6 @@ class SampleAttribute < ApplicationRecord
       errors.add(:sample_attribute_type, error_message) if sample_attribute_type_id_changed?
       errors.add(:sample_controlled_vocab, error_message) if sample_controlled_vocab_id_changed?
       errors.add(:linked_sample_type, error_message) if linked_sample_type_id_changed?
-      errors.add(:unit, error_message) if unit_id_changed?
     end
   end
 end
