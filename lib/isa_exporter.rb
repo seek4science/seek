@@ -642,7 +642,7 @@ module IsaExporter
 
     def process_sequence_input(inputs, type)
       input_ids = inputs.map { |input| input[:id] }
-      authorized_sample_ids = Sample.where(id: input_ids).select { |s| s.can_view?(@current_user) }.map(&:id).compact
+      authorized_sample_ids = Sample.where(id: input_ids).authorized_for(:view, @current_user).map(&:id)
       input_ids.map do |input_id|
         if authorized_sample_ids.include?(input_id)
           { '@id': "##{type}/#{input_id}" }
@@ -696,7 +696,7 @@ module IsaExporter
 
     def extract_sample_ids(input_obj_list, type)
       sample_ids = input_obj_list.map { |io| io[:id] }
-      authorized_sample_ids = Sample.where(id: sample_ids).select { |sample| sample.can_view?(@current_user) }.map(&:id)
+      authorized_sample_ids = Sample.where(id: sample_ids).authorized_for(:view, @current_user).map(&:id)
 
       sample_ids.map do |s_id|
         if authorized_sample_ids.include?(s_id)
