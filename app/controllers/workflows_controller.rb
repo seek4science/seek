@@ -104,7 +104,8 @@ class WorkflowsController < ApplicationController
 
   # Takes a single RO-Crate zip file
   def create_from_ro_crate
-    @crate_extractor = WorkflowCrateExtractor.new(ro_crate_extractor_params.merge(params: workflow_params))
+    @crate_extractor = WorkflowCrateExtractor.new(ro_crate_extractor_params.merge(
+      params: params.key?(:workflow) ? workflow_params : {}))
     @workflow = @crate_extractor.build
 
     respond_to do |format|
