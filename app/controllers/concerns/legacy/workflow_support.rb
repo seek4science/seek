@@ -11,7 +11,6 @@ module Legacy
     def create_ro_crate
       @crate_builder = Legacy::WorkflowCrateBuilder.new(legacy_ro_crate_params)
       @workflow.workflow_class = @crate_builder.workflow_class = WorkflowClass.find_by_id(params[:workflow_class_id])
-      @workflow.project_ids |= params[:workflow] ? params[:workflow][:project_ids] : params[:project_ids] || []
       blob_params = @crate_builder.build
       @content_blob = ContentBlob.new(blob_params)
 
@@ -32,7 +31,6 @@ module Legacy
         if handle_upload_data && @workflow.content_blob.save
           @content_blob = @workflow.content_blob
           @workflow = workflow
-          @workflow.project_ids |= params[:workflow] ? params[:workflow][:project_ids] : params[:project_ids] || []
           if extract_metadata(@content_blob)
             format.html { render :provide_metadata }
           else
@@ -48,9 +46,11 @@ module Legacy
     private
 
     def legacy_ro_crate_params
-      params.require(:ro_crate).permit({ workflow: [:data, :data_url, :make_local_copy] },
+      l_params = params.require(:ro_crate).permit({ workflow: [:data, :data_url, :make_local_copy]},
                                        { abstract_cwl: [:data, :data_url, :make_local_copy] },
                                        { diagram: [:data, :data_url, :make_local_copy] })
+      l_params[:workflow][:project_ids] = params.dig(:workflow, :project_ids) || []
+      l_params
     end
 
     def legacy_set_workflow
