@@ -168,7 +168,7 @@ GEM
     builder (3.2.4)
     case_transform (0.2)
       activesupport
-    caxlsx (3.3.0)
+    caxlsx (4.0.0)
       htmlentities (~> 4.3, >= 4.3.4)
       marcel (~> 1.0)
       nokogiri (~> 1.10, >= 1.10.4)
@@ -979,7 +979,7 @@ DEPENDENCIES
   bootsnap (>= 1.4.4)
   bootstrap-sass (>= 3.4.1)
   bundler (>= 1.8.4)
-  caxlsx (>= 3.0)
+  caxlsx (>= 4.0)
   caxlsx_rails (~> 0.6.2)
   cff (~> 0.9.0)
   citeproc-ruby (~> 2.0.0)
