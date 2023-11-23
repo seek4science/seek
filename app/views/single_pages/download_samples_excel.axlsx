@@ -13,8 +13,7 @@ end
 
 workbook = xlsx_package.workbook
 # Prevents formula injections
-# TODO: Find out why this doesn't work
-# Axlsx.escape_formulas = true
+Axlsx.escape_formulas = true
 
 # Get Sample data
 sample_data = @samples.map do |sample|
