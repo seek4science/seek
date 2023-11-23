@@ -125,18 +125,24 @@ workbook.add_worksheet(name: 'Samples') do |sheet|
   (0..attribute_size).map do |col_nr|
 
     # If the has_cv field is false, it should skip this iteration and not apply the data validation
-    next if @sa_cv_terms[col_nr][:has_cv] == false
+    next unless @sa_cv_terms[col_nr][:has_cv]
 
     # Get sa_cv_terms_length
     sa_cv_terms_size = @sa_cv_terms[col_nr][:data].size
 
-    prompt_text = "Choose a valid option. #{(@sa_cv_terms[col_nr][:required] ? 'This value is REQUIRED!' : 'This value is optional.')}"
+    if @sa_cv_terms[col_nr][:is_cv_list]
+      terms = @sa_cv_terms[col_nr][:data]
+      prompt_text = "Any combination of these terms between are accepted: #{terms.join(', ')}. E.g. [''#{terms.first}'', ''#{terms.last}''].\n\r#{(@sa_cv_terms[col_nr][:required] ? 'This field is REQUIRED!' : 'This field is optional.')}"
+    else
+      prompt_text = "Choose a valid option. #{(@sa_cv_terms[col_nr][:required] ? 'This field is REQUIRED!' : 'This field is optional.')}"
+    end
 
     col_ref = Axlsx.cell_r(col_nr, 1).gsub(/\d+/, '')
     dv_range = "#{col_ref}2:#{col_ref}1000000"
     sheet.add_data_validation(dv_range,
                               type: :list,
                               formula1: "'cv_ontology'!$#{col_ref}$2:$#{col_ref}$#{sa_cv_terms_size + 1}",
+                              hideDropDown: @sa_cv_terms[col_nr][:is_cv_list], # CV lists should not have dropdown
                               showErrorMessage: !@sa_cv_terms[col_nr][:allows_custom_input],
                               errorTitle: 'Input Error!',
                               error: 'Please select one of the available options',
@@ -156,6 +162,3 @@ workbook.add_worksheet(name: 'Samples') do |sheet|
   sheet.sheet_protection.delete_rows = false
   sheet.sheet_protection.sort = false
 end
-
-# TODO: Extra 'very hidden' sheet with identification attributes
-# This is necessary to ensure that the user uploads the same spreadsheet back to the UI and not a altered copy.
