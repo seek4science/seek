@@ -195,7 +195,7 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
     end
     materials = materials.map { |so| so['@id'] }
     processes = processes.flatten.map { |p| p['@id'] }
-    materials.each { |p| assert processes.include?(p) }
+materials.each { |p| assert processes.include?(p) }
   end
 
   # 23
@@ -295,7 +295,7 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
   end
 
   def create_basic_isa_project
-    person = FactoryBot.create(:person, project: @project)
+    person = @current_user.person
 
     source =
       FactoryBot.create(
@@ -326,7 +326,8 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
         :study,
         investigation: @investigation,
         sample_types: [source, sample_collection],
-        sops: [FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy))]
+        sops: [FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy))],
+        contributor: person
       )
 
     FactoryBot.create(
@@ -334,7 +335,7 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
       study: study,
       sample_type: assay_sample_type,
       sop_ids: [FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy)).id],
-      contributor: @current_user.person,
+      contributor: person,
       position: 0
     )
 
@@ -355,7 +356,8 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
                     .sample_controlled_vocab_terms
                     .first
                     .label
-              }
+              },
+              contributor: person
 
     sample_2 =
       FactoryBot.create :sample,
@@ -368,7 +370,8 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
                 'sample collection parameter value 1': 'sample collection parameter value 1',
                 'Sample Name': 'sample name',
                 'sample characteristic 1': 'sample characteristic 1'
-              }
+              },
+              contributor: person
 
     FactoryBot.create :sample,
             title: 'sample_3',
@@ -380,7 +383,8 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
               'Assay 1 parameter value 1': 'Assay 1 parameter value 1',
               'Extract Name': 'Extract Name',
               'other material characteristic 1': 'other material characteristic 1'
-            }
+            },
+            contributor: person
 
     { source: source,
       sample_collection: sample_collection,

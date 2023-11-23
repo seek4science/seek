@@ -9,7 +9,6 @@ class SinglePagesController < ApplicationController
 
   before_action :set_up_instance_variable
   before_action :project_single_page_enabled?
-  before_action :find_authorized_investigation, only: :export_isa
   before_action :check_user_logged_in,
                 only: %i[batch_sharing_permission_preview batch_change_permission_for_selected_items]
   respond_to :html, :js
@@ -50,9 +49,10 @@ class SinglePagesController < ApplicationController
   end
 
   def export_isa
+    @inv = Investigation.find(params[:investigation_id])
     raise 'The investigation cannot be found!' if @inv.blank?
 
-    isa = IsaExporter::Exporter.new(@inv).export
+    isa = IsaExporter::Exporter.new(@inv, current_user).export
     send_data isa, filename: 'isa.json', type: 'application/json', deposition: 'attachment'
   rescue Exception => e
     respond_to do |format|
@@ -356,11 +356,6 @@ class SinglePagesController < ApplicationController
 
   def set_up_instance_variable
     @single_page = true
-  end
-
-  def find_authorized_investigation
-    investigation = Investigation.find(params[:investigation_id])
-    @inv = investigation if investigation.can_edit?
   end
 
   def check_user_logged_in
