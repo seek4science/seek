@@ -1457,17 +1457,26 @@ class PersonTest < ActiveSupport::TestCase
 
   test 'merge group_memberships without duplication' do
     person_to_keep = FactoryBot.create(:person_in_multiple_projects)
+    FactoryBot.create(:programme, project_ids: [person_to_keep.project_ids.last])
     orig_wg_ids = person_to_keep.work_group_ids
+    orig_programme_ids = person_to_keep.programme_ids
+    orig_inst_ids = person_to_keep.institution_ids
     orig_proj_ids = person_to_keep.project_ids
+
     other_person = FactoryBot.create(:max_person)
+    FactoryBot.create(:programme, project_ids: [other_person.project_ids.last])
     other_person.work_groups << person_to_keep.work_groups[0]
     other_wg_ids = other_person.work_group_ids
+    other_programme_ids = other_person.programme_ids
+    other_inst_ids = other_person.institution_ids
     other_proj_ids = other_person.project_ids
 
     disable_authorization_checks { person_to_keep.merge(other_person) }
     person_to_keep.reload
 
     assert_equal (orig_wg_ids + other_wg_ids).compact.uniq.sort, person_to_keep.work_group_ids.sort
+    assert_equal (orig_programme_ids + other_programme_ids).compact.uniq.sort, person_to_keep.programme_ids.sort
+    assert_equal (orig_inst_ids + other_inst_ids).compact.uniq.sort, person_to_keep.institution_ids.sort
     assert_equal (orig_proj_ids + other_proj_ids).compact.uniq.sort, person_to_keep.project_ids.sort
   end
 

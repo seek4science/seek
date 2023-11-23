@@ -5,7 +5,7 @@ module Seek
         merge_simple_attributes(other_person)
         merge_annotations(other_person)
 
-        # Merging group_memberships deals with work_groups and projects
+        # Merging group_memberships deals with work_groups, programmes, institutions and projects
         merge_associations(group_memberships, other_person.group_memberships, 'work_group_id')
         Person.transaction do
           save!
