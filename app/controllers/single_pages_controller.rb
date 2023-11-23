@@ -70,44 +70,46 @@ class SinglePagesController < ApplicationController
     @project = @study.projects.first
     @samples = Sample.where(id: sample_ids)&.authorized_for(:view)&.sort_by(&:id)
 
-    if @samples.nil? || @samples == [] || sample_type_id.nil?
-      raise 'Nothing to export to Excel. Please select samples in the table and try downloading the table again.'
-    end
+    notice_message = "Contents of <b>#{@assay ? 'Assay [ID: ' + @assay.id.to_s + ', Title: ' + @assay.title : 'Study [ID: ' + @study.id.to_s + ', Title: ' + @study.title}]</b> downloaded:<br/><ul>"
+    notice_message << "<li class='checkmark'><b>#{@samples.count < 1 ? 'No' : @samples.count} sample#{@samples.count != 1 ? 's' : ''}</b> visible to you #{@samples.count != 1 ? 'were' : 'was'} included</li>"
+    raise 'Export aborted! Sample type not included in request!' if sample_type_id.nil?
 
     @sample_type = SampleType.find(sample_type_id)
+    @template = Template.find(@sample_type.template_id)
 
     sample_attributes = @sample_type.sample_attributes.map do |sa|
+      is_cv_list = sa.sample_attribute_type.base_type == Seek::Samples::BaseType::CV_LIST
       obj = if sa.sample_controlled_vocab_id.nil?
               { sa_cv_title: sa.title, sa_cv_id: nil }
             else
               { sa_cv_title: sa.title, sa_cv_id: sa.sample_controlled_vocab_id, allows_custom_input: sa.allow_cv_free_text }
             end
-      obj.merge({ required: sa.required })
+      obj.merge({ required: sa.required, is_cv_list: })
     end
 
-    @sa_cv_terms = [{ 'name' => 'id', 'has_cv' => false, 'data' => nil, 'allows_custom_input' => nil, 'required' => nil },
-                    { 'name' => 'uuid', 'has_cv' => false, 'data' => nil, 'allows_custom_input' => nil,
-                      'required' => nil }]
+    @sa_cv_terms = [{ name: 'id', has_cv: false, data: nil, allows_custom_input: nil, required: nil, is_cv_list: nil },
+                    { name: 'uuid', has_cv: false, data: nil, allows_custom_input: nil, required: nil, is_cv_list: nil }]
 
     sample_attributes.map do |sa|
       if sa[:sa_cv_id].nil?
-        @sa_cv_terms.push({ 'name' => sa[:sa_cv_title], 'has_cv' => false, 'data' => nil,
-                            'allows_custom_input' => nil, 'required' => sa[:required] })
+        @sa_cv_terms.push({ name: sa[:sa_cv_title], has_cv: false, data: nil,
+                            allows_custom_input: nil, required: sa[:required], is_cv_list: nil })
       else
         sa_terms = SampleControlledVocabTerm.where(sample_controlled_vocab_id: sa[:sa_cv_id]).map(&:label)
-        @sa_cv_terms.push({ 'name' => sa[:sa_cv_title], 'has_cv' => true, 'data' => sa_terms,
-                            'allows_custom_input' => sa[:allows_custom_input], 'required' => sa[:required] })
+        @sa_cv_terms.push({ name: sa[:sa_cv_title], has_cv: true, data: sa_terms,
+                            allows_custom_input: sa[:allows_custom_input], required: sa[:required], is_cv_list: sa[:is_cv_list] })
       end
     end
-    @template = Template.find(@sample_type.template_id)
 
+    notice_message << '</ul>'
+    flash[:notice] = notice_message.html_safe
     render xlsx: 'download_samples_excel', filename: 'samples_table.xlsx', disposition: 'inline'
   rescue StandardError => e
     flash[:error] = e.message
     respond_to do |format|
       format.html { redirect_to single_page_path(@project.id) }
       format.json do
-        render json: { parameters: { sample_ids:, sample_type_id:, study_id: } }
+        render json: { parameters: { sample_ids:, sample_type_id:, study_id: }, errors: e }, status: :bad_request
       end
     end
   end
