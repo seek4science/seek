@@ -4,7 +4,7 @@ require 'rubygems'
 require 'rake'
 require 'active_record/fixtures'
 require 'benchmark'
-require 'ruby-prof'
+#require 'ruby-prof'
 
 include SysMODB::SpreadsheetExtractor
 
