@@ -58,10 +58,9 @@
 				"String",
 				"Boolean",
 				"Registered Sample",
-				"Registered Sample (multiple)",
+				"Registered Sample List",
 				"Controlled Vocabulary",
 				"URI",
-				"Ontology",
 				"Registered Data file"
 			]
 		},
