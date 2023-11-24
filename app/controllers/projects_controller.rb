@@ -75,6 +75,9 @@ class ProjectsController < ApplicationController
   end
 
   def guided_create
+    @institution = Institution.new
+    @project = Project.new
+
     respond_to do |format|
       format.html
     end
@@ -177,7 +180,7 @@ class ProjectsController < ApplicationController
 
     @institution = Institution.find_by_id(params[:institution][:id])
     if @institution.nil?
-      inst_params = params.require(:institution).permit([:id, :title, :web_page, :city, :country])
+      inst_params = params.require(:institution).permit([:title, :web_page, :city, :country])
       @institution = Institution.new(inst_params)
     end
 
@@ -190,6 +193,17 @@ class ProjectsController < ApplicationController
         log = ProjectCreationMessageLog.log_request(sender:current_person, programme:@programme, project:@project, institution:@institution)
       elsif @programme.site_managed?
         log = ProjectCreationMessageLog.log_request(sender:current_person, programme:@programme, project:@project, institution:@institution)
+        if Seek::Config.auto_activate_site_managed_projects
+          @message_log = log
+          errors = confirm_project_create_request(skip_permissions: true)
+          if errors.present?
+            flash.now[:error] = errors
+            render action: :guided_create
+          else
+            flash[:notice] = "Thank you, your #{t('project')} has been created"
+            redirect_to(@project)
+          end
+        end
         if Seek::Config.email_enabled
           Mailer.request_create_project_for_programme(current_user, @programme, @project.to_json, @institution.to_json, log).deliver_later
         end
@@ -539,15 +553,9 @@ class ProjectsController < ApplicationController
   end
 
   def respond_create_project_request
-
     requester = @message_log.sender
-    make_programme_admin = false
 
     if params['accept_request']=='1'
-
-      # @programme already populated in before_filter when checking permissions
-      make_programme_admin = @programme&.new_record?
-
       if params['institution']['id']
         @institution = Institution.find(params['institution']['id'])
       else
@@ -557,62 +565,13 @@ class ProjectsController < ApplicationController
       @project = Project.new(params.require(:project).permit([:title, :web_page, :description]))
       @project.programme = @programme
 
-      validate_error_msg = []
-
-      unless @project.valid?
-        validate_error_msg << "The #{t('project')} is invalid, #{@project.errors.full_messages.join(', ')}"
-      end
-      unless @programme.nil? || @programme.valid?
-        validate_error_msg << "The #{t('programme')} is invalid, #{@programme.errors.full_messages.join(', ')}"
-      end
-      unless @institution.valid?
-        validate_error_msg << "The #{t('institution')} is invalid, #{@institution.errors.full_messages.join(', ')}"
-      end
-
-      unless @programme&.allows_user_projects? || Institution.can_create?
-        validate_error_msg << "The #{t('institution')} cannot be created, as you do not have access rights"
-      end
-
-      unless Project.can_create?
-        validate_error_msg << "The #{t('project')} cannot be created, as you do not have access rights"
-      end
-
-      validate_error_msg = validate_error_msg.join('<br/>').html_safe
-
-      if validate_error_msg.blank?
-        @project.save!
-
-        # they are soon to become a project administrator, with permission to create
-        disable_authorization_checks { @institution.save! }
-
-        requester.add_to_project_and_institution(@project, @institution)
-        requester.is_project_administrator = true,@project
-        requester.is_programme_administrator = true, @programme if make_programme_admin
-
-        disable_authorization_checks do
-          requester.save!
-        end
-
-        if @message_log.sent_by_self?
-          @message_log.destroy
-          flash[:notice]="#{t('project')} created"
-        else
-          @message_log.respond('Accepted')
-          if Seek::Config.email_enabled
-            flash[:notice]="Request accepted and #{requester.name} added to #{t('project')} and notified"
-            Mailer.notify_user_projects_assigned(requester,[@project]).deliver_later
-            Mailer.notify_admins_project_creation_accepted(current_person, requester, @project).deliver_later
-          else
-            flash[:notice]="Request accepted and #{requester.name} added to #{t('project')}"
-          end
-        end
-
-        redirect_to(@project)
-      else
-        flash.now[:error] = validate_error_msg
+      errors = confirm_project_create_request
+      if errors.present?
+        flash.now[:error] = errors
         render action: :administer_create_project_request
+      else
+        redirect_to(@project)
       end
-
     else
       if @message_log.sent_by_self? || params['delete_request'] == '1'
         @message_log.destroy
@@ -848,5 +807,63 @@ class ProjectsController < ApplicationController
       error(error_msg, error_msg)
       return false
     end
+  end
+
+  def confirm_project_create_request(skip_permissions: false)
+    requester = @message_log.sender
+    validate_error_msg = []
+
+    unless @project.valid?
+      validate_error_msg << "The #{t('project')} is invalid, #{@project.errors.full_messages.join(', ')}"
+    end
+
+    unless @programme.nil? || @programme.valid?
+      validate_error_msg << "The #{t('programme')} is invalid, #{@programme.errors.full_messages.join(', ')}"
+    end
+
+    unless @institution.valid?
+      validate_error_msg << "The #{t('institution')} is invalid, #{@institution.errors.full_messages.join(', ')}"
+    end
+
+    unless @programme&.allows_user_projects? || skip_permissions || Institution.can_create?
+      validate_error_msg << "The #{t('institution')} cannot be created, as you do not have access rights"
+    end
+
+    unless skip_permissions || Project.can_create?
+      validate_error_msg << "The #{t('project')} cannot be created, as you do not have access rights"
+    end
+
+    validate_error_msg = validate_error_msg.join('<br/>').html_safe
+    return validate_error_msg unless validate_error_msg.blank?
+
+    disable_authorization_checks { @project.save! }
+
+    # they are soon to become a project administrator, with permission to create
+    disable_authorization_checks { @institution.save! }
+
+    requester.add_to_project_and_institution(@project, @institution)
+    requester.is_project_administrator = true, @project
+      # @programme already populated in before_filter when checking permissions
+    requester.is_programme_administrator = true, @programme if @programme&.new_record?
+
+    disable_authorization_checks do
+      requester.save!
+    end
+
+    if @message_log.sent_by_self?
+      @message_log.destroy
+      flash[:notice]="#{t('project')} created"
+    else
+      @message_log.respond('Accepted')
+      if Seek::Config.email_enabled
+        flash[:notice]="Request accepted and #{requester.name} added to #{t('project')} and notified"
+        Mailer.notify_user_projects_assigned(requester,[@project]).deliver_later
+        Mailer.notify_admins_project_creation_accepted(current_person, requester, @project).deliver_later
+      else
+        flash[:notice]="Request accepted and #{requester.name} added to #{t('project')}"
+      end
+    end
+
+    nil
   end
 end
