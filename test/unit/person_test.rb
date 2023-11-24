@@ -1481,6 +1481,28 @@ class PersonTest < ActiveSupport::TestCase
     end
   end
 
+  test 'merge subscriptions without duplication' do
+    sop_keep = FactoryBot.create :sop
+    sop_both = FactoryBot.create :sop
+    sop_other = FactoryBot.create :sop
+    person_to_keep = FactoryBot.create(:person)
+    other_person = FactoryBot.create(:max_person)
+    FactoryBot.create :subscription, person: person_to_keep, subscribable: sop_keep
+    FactoryBot.create :subscription, person: person_to_keep, subscribable: sop_both
+    FactoryBot.create :subscription, person: other_person, subscribable: sop_both
+    FactoryBot.create :subscription, person: other_person, subscribable: sop_other
+    orig_subs = person_to_keep.subscriptions.pluck(:subscribable_id)
+    other_subs = other_person.subscriptions.pluck(:subscribable_id)
+    assert orig_subs.include?(sop_keep.id)
+    assert orig_subs.include?(sop_both.id) && other_subs.include?(sop_both.id)
+    assert other_subs.include?(sop_other.id)
+
+    disable_authorization_checks { person_to_keep.merge(other_person) }
+    person_to_keep.reload
+
+    assert_equal (orig_subs + other_subs).compact.uniq.sort, person_to_keep.subscriptions.pluck(:subscribable_id).sort
+  end
+
   test 'other person is destroyed after merge' do
     person_to_keep = FactoryBot.create(:min_person)
     other_person = FactoryBot.create(:max_person)

@@ -7,6 +7,7 @@ module Seek
 
         # Merging group_memberships deals with work_groups, programmes, institutions and projects
         merge_associations(group_memberships, other_person.group_memberships, 'work_group_id')
+        merge_associations(subscriptions, other_person.subscriptions, 'subscribable_id')
         Person.transaction do
           save!
           other_person.destroy
