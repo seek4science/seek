@@ -2,7 +2,7 @@ require 'caxlsx'
 require 'uuid'
 
 #####################################
-debug = false
+debug = true
 #####################################
 
 if debug
@@ -143,7 +143,7 @@ workbook.add_worksheet(name: 'Samples') do |sheet|
                               type: :list,
                               formula1: "'cv_ontology'!$#{col_ref}$2:$#{col_ref}$#{sa_cv_terms_size + 1}",
                               hideDropDown: @sa_cv_terms[col_nr][:is_cv_list], # CV lists should not have dropdown
-                              showErrorMessage: !@sa_cv_terms[col_nr][:allows_custom_input],
+                              showErrorMessage: !@sa_cv_terms[col_nr][:allows_custom_input] && !@sa_cv_terms[col_nr][:is_cv_list], # CV Lists must have free text input
                               errorTitle: 'Input Error!',
                               error: 'Please select one of the available options',
                               errorStyle: :stop, # options here are: 'information', 'stop', 'warning'
