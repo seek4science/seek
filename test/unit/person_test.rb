@@ -1541,6 +1541,44 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal resource_types - types_without_creators.length, person_to_keep.created_items.length
   end
 
+  test 'merge permissions without duplication' do
+    person_to_keep = FactoryBot.create(:person)
+    other_person = FactoryBot.create(:person)
+
+    sop_keep = FactoryBot.create(:sop)
+    sop_keep.policy.permissions.build(contributor: person_to_keep, access_type: Policy::MANAGING)
+    sop_keep.policy.save
+    sop_both = FactoryBot.create :sop
+    sop_both.policy.permissions.build(contributor: person_to_keep, access_type: Policy::MANAGING)
+    sop_both.policy.permissions.build(contributor: other_person, access_type: Policy::MANAGING)
+    sop_both.policy.save
+    sop_other = FactoryBot.create :sop
+    sop_other.policy.permissions.build(contributor: other_person, access_type: Policy::MANAGING)
+    sop_other.policy.save
+
+    assert sop_keep.can_manage?(person_to_keep)
+    assert sop_both.can_manage?(person_to_keep)
+    refute sop_other.can_manage?(person_to_keep)
+    refute sop_keep.can_manage?(other_person)
+    assert sop_both.can_manage?(other_person)
+    assert sop_other.can_manage?(other_person)
+
+    disable_authorization_checks { person_to_keep.merge(other_person) }
+    person_to_keep.reload
+    sop_keep.reload
+    sop_both.reload
+    sop_other.reload
+    sop_keep.permission_for = nil
+    sop_both.permission_for = nil
+    sop_other.permission_for = nil
+
+    assert sop_keep.can_manage?(person_to_keep)
+    assert sop_both.can_manage?(person_to_keep)
+    assert sop_other.can_manage?(person_to_keep)
+    assert 1, sop_both.policy.permissions.length
+    assert 3, Permission.where(contributor_type: "Person",contributor_id: person_to_keep.id).length
+  end
+
   test 'other person is destroyed after merge' do
     person_to_keep = FactoryBot.create(:min_person)
     other_person = FactoryBot.create(:max_person)

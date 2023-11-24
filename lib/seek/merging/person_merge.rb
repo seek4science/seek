@@ -9,6 +9,7 @@ module Seek
         merge_associations(group_memberships, other_person.group_memberships, 'work_group_id')
         merge_associations(subscriptions, other_person.subscriptions, 'subscribable_id')
         merge_resources(other_person)
+        merge_permissions(other_person)
         Person.transaction do
           save!
           other_person.destroy
@@ -82,6 +83,14 @@ module Seek
         AssetsCreator.where(creator_id: other_person.id).update_all(creator_id: id)
         # Reload to prevent destruction of unlinked resources
         other_person.reload
+      end
+
+      def merge_permissions(other_person)
+        permissions_other = Permission.where(contributor_type: "Person", contributor_id: other_person.id)
+        permissions_slef = Permission.where(contributor_type: "Person", contributor_id: id)
+        duplicated = permissions_other.pluck(:policy_id) & permissions_slef.pluck(:policy_id)
+        permissions_other.where(policy_id: duplicated).destroy_all
+        permissions_other.update_all(contributor_id: id)
       end
 
     end
