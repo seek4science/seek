@@ -172,7 +172,11 @@ class SinglePagesController < ApplicationController
     end
 
     @multiple_input_fields = @sample_type.sample_attributes.map do |sa_attr|
-      sa_attr.title if sa_attr.sample_attribute_type.base_type == 'SeekSampleMulti'
+      sa_attr.title if sa_attr.sample_attribute_type.base_type == Seek::Samples::BaseType::SEEK_SAMPLE_MULTI
+    end
+
+    @cv_list_fields = @sample_type.sample_attributes.map do |sa_attr|
+      sa_attr.title if sa_attr.sample_attribute_type.base_type == Seek::Samples::BaseType::CV_LIST
     end
 
     sample_fields, samples_data = get_spreadsheet_data(samples_sheet)
@@ -260,6 +264,9 @@ class SinglePagesController < ApplicationController
             subsample
           end
           obj.merge!(sample_fields[i] => parsed_excel_input_samples)
+        elsif @cv_list_fields.include?(sample_fields[i])
+          parsed_cv_terms = JSON.parse(excel_sample[i])
+          obj.merge!(sample_fields[i] => parsed_cv_terms)
         elsif sample_fields[i] == 'id'
           if excel_sample[i] == ''
             obj.merge!(sample_fields[i] => nil)
