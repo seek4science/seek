@@ -183,14 +183,24 @@ class SinglePagesController < ApplicationController
 
     # Compare Excel header row to Sample Type Sample Attributes
     # Should raise an error if they don't match
-    sample_type_attributes = %w[id uuid].concat(@sample_type.sample_attributes.map(&:title))
-    has_unmapped_sample_attributes = sample_type_attributes.map { |sa| sample_fields.include?(sa) }.include?(false)
+    sample_type_attributes = [{ id: nil, title: 'id', is_cv: false, allows_custom_input: false, cv_terms: nil },
+                              { id: nil, title: 'uuid', is_cv: false, allows_custom_input: false, cv_terms: nil }]
+                             .concat(@sample_type.sample_attributes.includes(sample_controlled_vocab: [:sample_controlled_vocab_terms]).map do |sa|
+                              if sa.controlled_vocab?
+                                cv_terms = sa.sample_controlled_vocab.sample_controlled_vocab_terms.map(&:label)
+                                { id: sa.id, title: sa.title, is_cv: sa.controlled_vocab?, allows_custom_input: sa.allow_cv_free_text?, cv_terms: }
+                              else
+                                { id: sa.id, title: sa.title, is_cv: sa.controlled_vocab?, allows_custom_input: sa.allow_cv_free_text?, cv_terms: nil }
+                              end
+                            end)
+
+    has_unmapped_sample_attributes = sample_type_attributes.map { |sa| sample_fields.include?(sa[:title]) }.include?(false)
     if has_unmapped_sample_attributes
       raise "The Sample Attributes from the excel sheet don't match those of the Sample Type in the database. Sample upload was aborted!"
     end
 
     # Construct Samples objects from Excel data
-    excel_samples = generate_excel_samples(samples_data, sample_fields)
+    excel_samples = generate_excel_samples(samples_data, sample_fields, sample_type_attributes)
 
     existing_excel_samples = excel_samples.map { |sample| sample unless sample['id'].nil? }.compact
     new_excel_samples = excel_samples.map { |sample| sample if sample['id'].nil? }.compact
@@ -250,10 +260,13 @@ class SinglePagesController < ApplicationController
     [sample_fields, samples_data]
   end
 
-  def generate_excel_samples(samples_data, sample_fields)
+  def generate_excel_samples(samples_data, sample_fields, sample_type_attributes)
+    cv_sample_attributes = sample_type_attributes.select { |sa| sa[:is_cv] && !sa[:allows_custom_input] }
     samples_data.map do |excel_sample|
       obj = {}
       (0..sample_fields.size - 1).map do |i|
+        validate_cv_terms = cv_sample_attributes.map{ |cv_sa| cv_sa[:title] }.include?(sample_fields[i])
+        attr_terms = validate_cv_terms ? cv_sample_attributes.detect { |sa| sa[:title] == sample_fields[i] }[:cv_terms] : []
         if @multiple_input_fields.include?(sample_fields[i])
           parsed_excel_input_samples = JSON.parse(excel_sample[i].gsub(/"=>/x, '":')).map do |subsample|
             # Uploader should at least have viewing permissions for the inputs he's using
@@ -266,6 +279,12 @@ class SinglePagesController < ApplicationController
           obj.merge!(sample_fields[i] => parsed_excel_input_samples)
         elsif @cv_list_fields.include?(sample_fields[i])
           parsed_cv_terms = JSON.parse(excel_sample[i])
+          # CV validation for CV_LIST attributes
+          parsed_cv_terms.map do |term|
+            unless attr_terms.include?(term) || !validate_cv_terms
+              raise "Invalid Controlled vocabulary term detected '#{term}' in sample ID #{excel_sample[0]}: #{sample_fields[i]} => #{parsed_cv_terms.inspect}"
+            end
+          end
           obj.merge!(sample_fields[i] => parsed_cv_terms)
         elsif sample_fields[i] == 'id'
           if excel_sample[i] == ''
@@ -274,6 +293,11 @@ class SinglePagesController < ApplicationController
             obj.merge!(sample_fields[i] => excel_sample[i]&.to_i)
           end
         else
+          if validate_cv_terms
+            unless attr_terms.include?(excel_sample[i])
+              raise "Invalid Controlled vocabulary term detected '#{excel_sample[i]}' in sample ID #{excel_sample[0]}: #{sample_fields[i]} => #{excel_sample[i]}"
+            end
+          end
           obj.merge!(sample_fields[i] => excel_sample[i])
         end
       end
