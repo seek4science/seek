@@ -1503,6 +1503,44 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal (orig_subs + other_subs).compact.uniq.sort, person_to_keep.subscriptions.pluck(:subscribable_id).sort
   end
 
+  test 'merge resources without duplication' do
+    person_to_keep = FactoryBot.create(:person)
+    other_person = FactoryBot.create(:person)
+    s1 = FactoryBot.create(:sop, contributor: person_to_keep)
+    s2 = FactoryBot.create(:sop, contributor: person_to_keep, creator_ids: [person_to_keep.id, other_person.id])
+    s3 = FactoryBot.create(:sop, contributor: other_person)
+    s4 = FactoryBot.create(:sop, contributor: other_person, creator_ids: [person_to_keep.id, other_person.id])
+    s5 = FactoryBot.create(:sop, contributor: FactoryBot.create(:person), creator_ids: [other_person.id])
+
+    disable_authorization_checks { person_to_keep.merge(other_person) }
+    person_to_keep.reload
+
+    assert_equal [s1, s2, s3, s4].sort, person_to_keep.contributed_sops.sort
+    assert_equal [s2, s4, s5].sort, person_to_keep.created_sops.sort
+  end
+
+  test 'merge all types of resources' do
+    person_to_keep = FactoryBot.create(:person)
+    other_person = FactoryBot.create(:person)
+
+    types_without_creators = ["Event", "Strain"]
+    Person::RELATED_RESOURCE_TYPES.each do |resource_type|
+      sym = resource_type == "SampleType" ? :simple_sample_type : resource_type.underscore.to_sym
+      FactoryBot.create(sym, contributor: other_person)
+      unless types_without_creators.include?(resource_type)
+        FactoryBot.create(sym, contributor: FactoryBot.create(:person), creator_ids: [other_person.id])
+      end
+    end
+
+    disable_authorization_checks { person_to_keep.merge(other_person) }
+    person_to_keep.reload
+
+    resource_types = Person::RELATED_RESOURCE_TYPES.length
+    added_isa_structure = 3 # An additional inv is created for the study, and inv and study are created for the assay
+    assert_equal resource_types + added_isa_structure, person_to_keep.contributed_items.length
+    assert_equal resource_types - types_without_creators.length, person_to_keep.created_items.length
+  end
+
   test 'other person is destroyed after merge' do
     person_to_keep = FactoryBot.create(:min_person)
     other_person = FactoryBot.create(:max_person)

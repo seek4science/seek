@@ -8,6 +8,7 @@ module Seek
         # Merging group_memberships deals with work_groups, programmes, institutions and projects
         merge_associations(group_memberships, other_person.group_memberships, 'work_group_id')
         merge_associations(subscriptions, other_person.subscriptions, 'subscribable_id')
+        merge_resources(other_person)
         Person.transaction do
           save!
           other_person.destroy
@@ -68,6 +69,19 @@ module Seek
           duplicated_association.person_id = id
           current_associations << duplicated_association
         end
+      end
+
+      def merge_resources(other_person)
+        # Contributed
+        Person::RELATED_RESOURCE_TYPES.each do |resource_type|
+          resource_type.constantize.where(contributor_id: other_person.id).update_all(contributor_id: id)
+        end
+        # Created
+        duplicated = other_person.created_items.pluck(:id) & created_items.pluck(:id)
+        AssetsCreator.where(creator_id: other_person.id, asset_id: duplicated).destroy_all
+        AssetsCreator.where(creator_id: other_person.id).update_all(creator_id: id)
+        # Reload to prevent destruction of unlinked resources
+        other_person.reload
       end
 
     end
