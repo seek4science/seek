@@ -1579,6 +1579,49 @@ class PersonTest < ActiveSupport::TestCase
     assert 3, Permission.where(contributor_type: "Person",contributor_id: person_to_keep.id).length
   end
 
+  test 'merge roles without duplication' do
+    person_to_keep = FactoryBot.create(:person_in_multiple_projects)
+    other_person = FactoryBot.create(:asset_gatekeeper)
+    other_person.work_groups << person_to_keep.work_groups.last
+
+    keep_proj = person_to_keep.projects.first
+    shared_proj = person_to_keep.projects.last
+    other_proj = other_person.projects.last
+
+    refute keep_proj.has_member?(other_person)
+    assert shared_proj.has_member?(person_to_keep)
+    assert shared_proj.has_member?(other_person)
+    refute other_proj.has_member?(person_to_keep)
+
+    person_to_keep.is_asset_housekeeper = true, keep_proj
+    person_to_keep.is_pal = true, shared_proj
+    other_person.is_pal = true, shared_proj
+    other_person.is_project_administrator = true, shared_proj
+    disable_authorization_checks do
+      person_to_keep.save!
+      other_person.save!
+    end
+    person_to_keep.reload
+    other_person.reload
+
+    assert person_to_keep.is_asset_housekeeper?(keep_proj)
+    assert person_to_keep.is_pal?(shared_proj)
+    refute person_to_keep.is_project_administrator?(shared_proj)
+    refute person_to_keep.is_asset_gatekeeper?(other_proj)
+    assert other_person.is_pal?(shared_proj)
+    assert other_person.is_project_administrator?(shared_proj)
+    assert other_person.is_asset_gatekeeper?(other_proj)
+
+    disable_authorization_checks { person_to_keep.merge(other_person) }
+    person_to_keep.reload
+
+    assert person_to_keep.is_asset_housekeeper?(keep_proj)
+    assert person_to_keep.is_pal?(shared_proj)
+    assert person_to_keep.is_project_administrator?(shared_proj)
+    assert person_to_keep.is_asset_gatekeeper?(other_proj)
+    assert_equal 4, person_to_keep.roles.length
+  end
+
   test 'other person is destroyed after merge' do
     person_to_keep = FactoryBot.create(:min_person)
     other_person = FactoryBot.create(:max_person)

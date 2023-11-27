@@ -10,6 +10,7 @@ module Seek
         merge_associations(subscriptions, other_person.subscriptions, 'subscribable_id')
         merge_resources(other_person)
         merge_permissions(other_person)
+        merge_roles(other_person)
         Person.transaction do
           save!
           other_person.destroy
@@ -91,6 +92,20 @@ module Seek
         duplicated = permissions_other.pluck(:policy_id) & permissions_slef.pluck(:policy_id)
         permissions_other.where(policy_id: duplicated).destroy_all
         permissions_other.update_all(contributor_id: id)
+      end
+
+      def merge_roles(other_person)
+        other_roles = other_person.roles.pluck('scope_type', 'scope_id', 'role_type_id')
+        self_roles = roles.pluck('scope_type', 'scope_id', 'role_type_id')
+        duplicated = other_roles & self_roles
+        other_person.roles.where({
+                                   scope_type: duplicated.map { |triple| triple[0] },
+                                   scope_id: duplicated.map { |triple| triple[1] },
+                                   role_type_id: duplicated.map { |triple| triple[2] }
+                                 }).destroy_all
+        other_person.roles.update_all(person_id: id)
+        # Reload to prevent destruction of unlinked roles
+        other_person.reload
       end
 
     end
