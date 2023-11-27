@@ -30,7 +30,7 @@ class ProgrammesController < ApplicationController
         # also activation email is sent
         unless User.admin_logged_in?
           if Seek::Config.auto_activate_programmes
-            @programe.activate
+            @programme.activate
             Mailer.programme_activated(@programme).deliver_later if Seek::Config.email_enabled
           else
             Mailer.programme_activation_required(@programme, current_person).deliver_later if Seek::Config.email_enabled
