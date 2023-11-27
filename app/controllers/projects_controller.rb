@@ -63,6 +63,7 @@ class ProjectsController < ApplicationController
   end
 
   def guided_join
+    @institution = Institution.new
     @project = Project.find(params[:id]) if params[:id]
     respond_to do |format|
       if @project && !@project.allow_request_membership?
