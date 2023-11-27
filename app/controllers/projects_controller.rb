@@ -813,6 +813,7 @@ class ProjectsController < ApplicationController
   def confirm_project_create_request(skip_permissions: false)
     requester = @message_log.sender
     validate_error_msg = []
+    make_programme_admin = @programme&.new_record?
 
     unless @project.valid?
       validate_error_msg << "The #{t('project')} is invalid, #{@project.errors.full_messages.join(', ')}"
@@ -837,15 +838,17 @@ class ProjectsController < ApplicationController
     validate_error_msg = validate_error_msg.join('<br/>').html_safe
     return validate_error_msg unless validate_error_msg.blank?
 
-    disable_authorization_checks { @project.save! }
-
-    # they are soon to become a project administrator, with permission to create
-    disable_authorization_checks { @institution.save! }
+    # They are soon to become a project administrator, with permission to create institutions,
+    # and `Project.can_create?` is already checked
+    disable_authorization_checks do
+      @project.save! # Implicitly saves the @programme too
+      @institution.save!
+    end
 
     requester.add_to_project_and_institution(@project, @institution)
     requester.is_project_administrator = true, @project
       # @programme already populated in before_filter when checking permissions
-    requester.is_programme_administrator = true, @programme if @programme&.new_record?
+    requester.is_programme_administrator = true, @programme if make_programme_admin
 
     disable_authorization_checks do
       requester.save!
