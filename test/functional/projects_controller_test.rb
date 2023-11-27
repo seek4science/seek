@@ -2019,14 +2019,19 @@ class ProjectsControllerTest < ActionController::TestCase
           institution: { id: [institution.id] }
       }
       assert_enqueued_emails(1) do
-        assert_difference('ProjectCreationMessageLog.count') do
-          post :request_create, params: params
+        assert_no_difference('Project.count') do
+          assert_no_difference('Institution.count') do
+            assert_difference('ProjectCreationMessageLog.count') do
+              post :request_create, params: params
+            end
+          end
         end
       end
 
       assert_response :success
       assert flash[:notice]
       log = ProjectCreationMessageLog.last
+      refute log.responded?
       details = log.parsed_details
       assert_equal institution.title, details.institution.title
       assert_equal institution.id, details.institution.id
@@ -2038,6 +2043,101 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'requesting site managed programme project with auto approval' do
+    with_config_value(:auto_activate_site_managed_projects, true) do
+      FactoryBot.create(:admin)
+      person = FactoryBot.create(:person_not_in_project)
+      programme = FactoryBot.create(:programme)
+
+      prog_admin = FactoryBot.create(:person)
+      prog_admin.is_programme_administrator = true, programme
+      prog_admin.save!
+      another_prog_admin = FactoryBot.create(:person)
+      another_prog_admin.is_programme_administrator = true, programme
+      another_prog_admin.save!
+      programme.reload
+      assert_equal 2, programme.programme_administrators.count
+
+      institution = FactoryBot.create(:institution)
+
+      refute programme.programme_administrators.select(&:is_admin?).any?
+      login_as(person)
+      with_config_value(:managed_programme_id, programme.id) do
+        params = {
+          programme_id: programme.id,
+          project: { title: 'The Project', description: 'description', web_page: 'https://example.com' },
+          institution: { id: [institution.id] }
+        }
+        assert_enqueued_emails(1) do
+          assert_difference('Project.count', 1) do
+            assert_no_difference('Institution.count') do
+              assert_no_difference('ProjectCreationMessageLog.count') do
+                post :request_create, params: params
+              end
+            end
+          end
+        end
+
+        project = Project.last
+
+        assert_redirected_to project_path(project)
+        assert flash[:notice]
+        gm = person.reload.group_memberships.last
+        assert_equal institution, gm.institution
+        assert_equal 'description', gm.project.description
+        assert_equal 'The Project', gm.project.title
+        assert_equal project, gm.project
+        assert_equal programme, gm.project.programme
+      end
+    end
+  end
+
+  test 'requesting site managed programme project with errors does not trigger emails or logs' do
+    with_config_value(:auto_activate_site_managed_projects, true) do
+      FactoryBot.create(:admin)
+      person = FactoryBot.create(:person_not_in_project)
+      programme = FactoryBot.create(:programme)
+
+      prog_admin = FactoryBot.create(:person)
+      prog_admin.is_programme_administrator = true, programme
+      prog_admin.save!
+      another_prog_admin = FactoryBot.create(:person)
+      another_prog_admin.is_programme_administrator = true, programme
+      another_prog_admin.save!
+      programme.reload
+      assert_equal 2, programme.programme_administrators.count
+
+      refute programme.programme_administrators.select(&:is_admin?).any?
+      login_as(person)
+      with_config_value(:managed_programme_id, programme.id) do
+        params = {
+          programme_id: programme.id,
+          project: { title: '', description: 'description', web_page: 'invalid' },
+          institution: { title: 'new inst', country: 'xyz' }
+        }
+        assert_no_enqueued_emails do
+          assert_no_difference('Project.count') do
+            assert_no_difference('Institution.count') do
+              assert_no_difference('ProjectCreationMessageLog.count') do
+                post :request_create, params: params
+              end
+            end
+          end
+        end
+
+        assert_response :unprocessable_entity
+        assert flash[:error].include?("Title can't be blank")
+        assert flash[:error].include?("Web page is not a valid URL")
+        assert flash[:error].include?("Country isn't a valid country or code")
+        assert_equal 'new inst', assigns(:institution).title
+        assert_equal 'description', assigns(:project).description
+        assert_equal '', assigns(:project).title
+        assert_equal 'invalid', assigns(:project).web_page
+        assert_equal programme.id, params[:programme_id]
+      end
+    end
+  end
+
   test 'request create project with own administered programme' do
     person = FactoryBot.create(:programme_administrator)
     programme = person.programmes.first
@@ -2046,7 +2146,7 @@ class ProjectsControllerTest < ActionController::TestCase
     with_config_value(:managed_programme_id, nil) do
       params = {
         programme_id: programme.id,
-        project: { title: 'The Project',description:'description',web_page:'web_page'},
+        project: { title: 'The Project',description:'description',web_page:'https://example.com'},
         institution: {id: [institution.id]}
       }
       assert_enqueued_emails(0) do

@@ -193,17 +193,24 @@ class ProjectsController < ApplicationController
       if @programme.can_associate_projects?
         log = ProjectCreationMessageLog.log_request(sender:current_person, programme:@programme, project:@project, institution:@institution)
       elsif @programme.site_managed?
-        log = ProjectCreationMessageLog.log_request(sender:current_person, programme:@programme, project:@project, institution:@institution)
+        log = ProjectCreationMessageLog.prepare_request(sender:current_person, programme:@programme, project:@project, institution:@institution)
         if Seek::Config.auto_activate_site_managed_projects
           @message_log = log
+          @project.programme = @programme
           errors = confirm_project_create_request(skip_permissions: true)
           if errors.present?
             flash.now[:error] = errors
-            render action: :guided_create
+            render action: :guided_create, status: :unprocessable_entity
           else
             flash[:notice] = "Thank you, your #{t('project')} has been created"
+            if Seek::Config.email_enabled
+              Mailer.notify_admins_project_creation_accepted(current_person, current_person, @project).deliver_later
+            end
             redirect_to(@project)
           end
+          return
+        else
+          log.save!
         end
         if Seek::Config.email_enabled
           Mailer.request_create_project_for_programme(current_user, @programme, @project.to_json, @institution.to_json, log).deliver_later
