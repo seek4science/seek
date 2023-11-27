@@ -220,7 +220,7 @@ const handleSelect = (e) => {
               const missingColsCount = colsCount - defaultCols.length - splitted.length;
               splitted = _defaultCols.concat(splitted);
 
-              // Preserve empty placeholder for columns of type of 'Registered Sample (multiple)'
+              // Preserve empty placeholder for columns of type of 'Registered Sample List'
               sampleLinkIndexes.forEach((x) => splitted.splice(x, 0, []));
 
               return missingColsCount < 0 ?

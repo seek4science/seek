@@ -181,10 +181,10 @@ group :development do
   gem "flamegraph", "~> 0.9.5"
   gem "stackprof", "~> 0.2.25"
   gem 'listen', '~> 3.3'
+  gem 'ruby-prof'
 end
 
 group :test do
-  gem 'ruby-prof'
   gem 'test-prof'
   gem 'rails-perftest'
   gem 'minitest', '~> 5.14'

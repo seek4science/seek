@@ -158,13 +158,19 @@ module Seek
       end
 
       def self.get_sample_attribute_type(title)
-        SampleAttributeType.where(title: title).first.id
+        sa = SampleAttributeType.find_by(title: title)
+        raise "Could not find a Sample Attribute named '#{title}'" if sa.nil?
+
+        sa.id
       end
 
       def self.get_isa_tag_id(title)
         return nil if title.blank?
 
-        IsaTag.where(title: title).first.id
+        it = IsaTag.find_by(title: title)
+        raise "Could not find an ISA Tag named '#{title}'" if it.nil?
+
+        it.id
       end
 
       def self.seed_isa_tags
