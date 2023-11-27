@@ -51,7 +51,7 @@ module Seek
       end
 
       def base_type_handler
-        Seek::Samples::AttributeTypeHandlers::AttributeTypeHandlerFactory.instance.for_base_type(sample_attribute_type.base_type, self)
+        Seek::Samples::AttributeTypeHandlers::AttributeTypeHandlerFactory.instance.for_base_type(self)
       end
 
       private
