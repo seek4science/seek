@@ -3,7 +3,7 @@ require 'test_helper'
 class SeekResourceAttributeTypeHandlerTest < ActiveSupport::TestCase
 
   test 'blank?' do
-    handler = Seek::Samples::AttributeTypeHandlers::SeekResourceAttributeHandler.new({})
+    handler = Seek::Samples::AttributeHandlers::SeekResourceAttributeHandler.new({})
 
     assert handler.test_blank?(nil)
     assert handler.test_blank?('')

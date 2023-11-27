@@ -1,6 +1,6 @@
 module Seek
   module Samples
-    module AttributeTypeHandlers
+    module AttributeHandlers
       class LinkedExtendedMetadataMultiAttributeHandler < LinkedExtendedMetadataAttributeHandler
 
         def test_value(value)

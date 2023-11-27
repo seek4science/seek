@@ -1,6 +1,6 @@
 module Seek
   module Samples
-    module AttributeTypeHandlers
+    module AttributeHandlers
       class SeekDataFileAttributeHandler < SeekResourceAttributeHandler
         def type
           DataFile

@@ -1,6 +1,6 @@
 module Seek
   module Samples
-    module AttributeTypeHandlers
+    module AttributeHandlers
       class SeekResourceAttributeHandler < BaseAttributeHandler
         def test_value(value)
           raise "Not a valid SEEK #{type.name.humanize} ID" unless value[:id].to_i.positive?

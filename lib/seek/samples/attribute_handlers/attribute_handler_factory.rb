@@ -1,6 +1,6 @@
 module Seek
   module Samples
-    module AttributeTypeHandlers
+    module AttributeHandlers
       class AttributeHandlerFactory
         include Singleton
 
@@ -11,7 +11,7 @@ module Seek
         end
 
         def for_base_type(attribute)
-          "Seek::Samples::AttributeTypeHandlers::#{attribute.sample_attribute_type.base_type}AttributeHandler".constantize.new(attribute)
+          "Seek::Samples::AttributeHandlers::#{attribute.sample_attribute_type.base_type}AttributeHandler".constantize.new(attribute)
         rescue NameError
           raise UnrecognisedAttributeHandler, "unrecognised attribute base type '#{attribute.sample_attribute_type.base_type}'"
         end

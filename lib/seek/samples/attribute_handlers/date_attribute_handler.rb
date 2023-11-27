@@ -1,6 +1,6 @@
 module Seek
   module Samples
-    module AttributeTypeHandlers
+    module AttributeHandlers
       class DateAttributeHandler < BaseAttributeHandler
         def test_value(value)
           raise 'Not a date time' unless Date.parse(value.to_s)
