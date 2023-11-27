@@ -1,7 +1,7 @@
 module Seek
   module Samples
     module AttributeTypeHandlers
-      class TextAttributeTypeHandler < StringAttributeTypeHandler
+      class TextAttributeHandler < StringAttributeHandler
       end
     end
   end

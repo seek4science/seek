@@ -1,0 +1,23 @@
+module Seek
+  module Samples
+    module AttributeTypeHandlers
+      class AttributeHandlerFactory
+        include Singleton
+
+        attr_accessor :handlers
+
+        def initialize
+          @handlers = {}
+        end
+
+        def for_base_type(attribute)
+          "Seek::Samples::AttributeTypeHandlers::#{attribute.sample_attribute_type.base_type}AttributeHandler".constantize.new(attribute)
+        rescue NameError
+          raise UnrecognisedAttributeHandler, "unrecognised attribute base type '#{attribute.sample_attribute_type.base_type}'"
+        end
+      end
+
+      class UnrecognisedAttributeHandler < RuntimeError; end
+    end
+  end
+end
