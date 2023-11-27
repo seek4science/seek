@@ -38,7 +38,7 @@ sample_template = Template.find_or_initialize_by(title: 'Sample - ISA minimal st
 sample_temp_attributes = []
 sample_temp_attributes << TemplateAttribute.new(title: 'Input',
                                                 description: 'Registered Samples in the platform used as input for this protocol.',
-                                                sample_attribute_type: SampleAttributeType.find_by(title: 'Registered Sample (multiple)'),
+                                                sample_attribute_type: SampleAttributeType.find_by(title: 'Registered Sample List'),
                                                 is_title: false,
                                                 required: true)
 
@@ -94,7 +94,7 @@ material_template = Template.find_or_initialize_by(title: 'Material output assay
 material_temp_attributes = []
 material_temp_attributes << TemplateAttribute.new(title: 'Input',
                                                   description: 'Registered Samples in the platform used as input for this protocol.',
-                                                  sample_attribute_type: SampleAttributeType.find_by(title: 'Registered Sample (multiple)'),
+                                                  sample_attribute_type: SampleAttributeType.find_by(title: 'Registered Sample List'),
                                                   is_title: false,
                                                   required: true)
 
@@ -150,7 +150,7 @@ data_file_template = Template.find_or_initialize_by(title: 'Data file output ass
 data_file_temp_attributes = []
 data_file_temp_attributes << TemplateAttribute.new(title: 'Input',
                                                    description: 'Registered Samples in the platform used as input for this protocol.',
-                                                   sample_attribute_type: SampleAttributeType.find_by(title: 'Registered Sample (multiple)'),
+                                                   sample_attribute_type: SampleAttributeType.find_by(title: 'Registered Sample List'),
                                                    is_title: false,
                                                    required: true)
 
