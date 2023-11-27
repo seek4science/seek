@@ -1,7 +1,7 @@
 module Seek
   module Samples
     module AttributeTypeHandlers
-      class SeekSampleAttributeTypeHandler < SeekResourceAttributeTypeHandler
+      class SeekSampleAttributeHandler < SeekResourceAttributeHandler
         class MissingLinkedSampleTypeException < AttributeHandlerException; end
 
         def type
