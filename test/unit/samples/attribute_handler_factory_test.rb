@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class AttributeTypeHandlerFactoryTest < ActiveSupport::TestCase
+class AttributeHandlerFactoryTest < ActiveSupport::TestCase
   def setup
     @factory = Seek::Samples::AttributeHandlers::AttributeHandlerFactory.instance
   end

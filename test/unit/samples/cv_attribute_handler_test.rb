@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class CVAttributeTypeHandlerTest < ActiveSupport::TestCase
+class CVAttributeHandlerTest < ActiveSupport::TestCase
 
   test 'test value' do
     st = FactoryBot.create(:simple_sample_type)

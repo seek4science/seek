@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class BooleanAttributeTypeHandlerTest < ActiveSupport::TestCase
+class BooleanAttributeHandlerTest < ActiveSupport::TestCase
 
   test 'blank?' do
     handler = Seek::Samples::AttributeHandlers::BooleanAttributeHandler.new({})

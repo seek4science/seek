@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class SeekResourceAttributeTypeHandlerTest < ActiveSupport::TestCase
+class SeekResourceAttributeHandlerTest < ActiveSupport::TestCase
 
   test 'blank?' do
     handler = Seek::Samples::AttributeHandlers::SeekResourceAttributeHandler.new({})
