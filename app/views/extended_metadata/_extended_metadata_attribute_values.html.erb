@@ -1,0 +1,15 @@
+<%
+  label = 'Extended Metadata'
+%>
+<% if resource.respond_to?(:extended_metadata) && resource.extended_metadata %>
+
+  <div id="extended-metadata" class="panel panel-default">
+    <div class="panel-heading"><%= label %> (<%= resource.extended_metadata.extended_metadata_type.title %>)</div>
+    <div class="panel-body">
+      <% resource.extended_metadata.extended_metadata_attributes.each do |attribute| %>
+        <%= render_extended_metadata_value(attribute, resource) %>
+      <% end %>
+    </div>
+  </div>
+  <% else %>
+<% end %>

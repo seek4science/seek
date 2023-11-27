@@ -946,5 +946,24 @@ class ProjectTest < ActiveSupport::TestCase
     project.topic_annotations = 'Chemistry'
     assert project.controlled_vocab_annotations?
   end
-  
+
+  test 'total asset size includes blobs and git repos without duplication' do
+    project = FactoryBot.create(:project)
+    df = FactoryBot.create(:data_file, projects: [project])
+    workflow1 = FactoryBot.create(:local_git_workflow, projects: [project])
+    workflow2 = FactoryBot.create(:local_git_workflow, projects: [project])
+    repo_size = 116994  # repo_size = `du -bs #{workflow1.local_git_repository.local_path}`.split("\t").first.to_i
+    df_blob_size = 8827 # df_blob_size = df.content_blob.file_size
+
+    assert_equal 1, workflow2.git_versions.length
+    one_version_size = project.total_asset_size
+
+    disable_authorization_checks { workflow2.save_as_new_git_version }
+    assert_equal 2, workflow2.git_versions.length
+    assert_equal workflow2.git_versions.first.git_repository.local_path, workflow2.git_versions.last.git_repository.local_path
+
+    assert_equal one_version_size, project.total_asset_size, "total_asset_size is the same before and after adding a new version"
+    assert_equal df_blob_size + 2 * repo_size, project.total_asset_size, "total_asset_size includes each workflow and df"
+  end
+
 end

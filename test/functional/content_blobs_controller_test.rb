@@ -169,7 +169,8 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert_response 400
     assert_equal 404, assigns(:info)[:code]
     assert @response.body.include?('Nothing can be found at that URL')
-    assert_equal 'error', assigns(:type)
+    assert @response.body.include?('I understand the risks and want to override URL validation')
+    assert_equal 'override', assigns(:type)
     assert assigns(:error_msg)
   end
 
@@ -192,7 +193,8 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert_response 400
     assert_equal 404, assigns(:info)[:code]
     assert @response.body.include?('Nothing can be found at that URL')
-    assert_equal 'error', assigns(:type)
+    assert @response.body.include?('I understand the risks and want to override URL validation')
+    assert_equal 'override', assigns(:type)
     assert assigns(:error_msg)
   end
 
@@ -201,7 +203,8 @@ class ContentBlobsControllerTest < ActionController::TestCase
     get :examine_url, xhr: true, params: { data_url: 'this is not a uri' }
     assert_response 400
     assert @response.body.include?('The URL appears to be invalid')
-    assert_equal 'error', assigns(:type)
+    assert @response.body.include?('I understand the risks and want to override URL validation')
+    assert_equal 'override', assigns(:type)
     assert assigns(:error_msg)
   end
 
@@ -222,6 +225,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
         assert_response 400
         assert_equal 490, assigns(:info)[:code]
         assert @response.body.include?('URL is inaccessible')
+        refute @response.body.include?('I understand the risks and want to override URL validation')
         assert_equal 'error', assigns(:type)
         assert assigns(:error_msg)
       end
@@ -406,7 +410,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
     assert_response :success
 
-    download_path = download_sop_content_blob_path(sop, sop.content_blob.id, format: :pdf, disposition: :inline, intent: :inline_view)
+    download_path = download_sop_content_blob_path(sop, sop.content_blob.id, format: :pdf, intent: :inline_view)
     assert @response.body.include?("DEFAULT_URL = '#{download_path}'")
 
     al = ActivityLog.last
@@ -826,7 +830,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert_response :success
     assert @response.header['Content-Type'].start_with?('text/html')
     assert_equal ApplicationController::USER_CONTENT_CSP, @response.header['Content-Security-Policy']
-    assert_select 'img.git-image-preview[src=?]', download_sop_content_blob_path(sop, blob, disposition: 'inline')
+    assert_select 'img.git-image-preview[src=?]', download_sop_content_blob_path(sop, blob)
   end
 
   test 'should view content for jupyter blob as text if requested' do

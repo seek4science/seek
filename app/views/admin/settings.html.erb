@@ -28,7 +28,7 @@
                            'Session store timeout', 'The length of time, in MINUTES, that the server session store is active until it expires. (Requires a restart after changing)') %>
     <%= admin_checkbox_setting(:cache_remote_files, 1, Seek::Config.cache_remote_files,
                                "Cache remote files", "If this setting is enabled, SEEK will attempt to download remote content from the provided URL and store the content in the filestore.",
-                               :onchange=>toggle_appear_javascript('cache_remote_block')) %>
+                               onchange: toggle_appear_javascript('cache_remote_block')) %>
     <div id="cache_remote_block" class="additional_settings" style="<%= show_or_hide_block Seek::Config.cache_remote_files -%>">
       <%= admin_text_setting(:max_cachable_size, Seek::Config.max_cachable_size,
                              'Maximum file size', 'The size limit (in bytes) below which SEEK will automatically cache remote files. Remote files larger than this limit will be ignored unless the user explicitly requests.',
@@ -56,22 +56,29 @@
         admin_dropdown_setting(:max_all_visitors_access_type, option_tags, 'Permission Limits',
                                'Maximum permission option for all visitors, including those without a login') %>
 
-    <%= admin_setting_block('Default License', "The default license to use when one is not specified by a #{t('project').pluralize}.") do
-      grouped_license_select(:default_license, Seek::Config.default_license, id: 'license-select',
-                             class: 'form-control', source: Seek::License.open_definition[:data])
-    end %>
+    <%= admin_setting_block('Default License', "The default license to use when one is not specified by a #{t('project').pluralize}.") do %>
+      <%= license_select(:default_license, Seek::Config.default_license, id: 'license-select', class: 'form-control') %>
+    <% end %>
 
-    <%= admin_setting_block('Recommended data licenses', "The licenses to recommend when data, such as a #{t('data_file')} or #{t('document')}, is registered. Hold down CTRL (or Command on Mac) to select multiple or to deselect.") do
-	select_tag :recommended_data_licenses, options_for_select(Seek::License.open_definition[:data].map { |l| [l['title'], l['id']]}, Seek::Config.recommended_data_licenses), multiple: true, class: 'form-control'
-    end %>
+    <%= admin_setting_block('Recommended data licenses', "The licenses to recommend when data, such as a #{t('data_file')} or #{t('document')}, is registered.") do %>
+      <%= associations_list('recommended-data-licenses', 'associations/general',
+                            Seek::Config.recommended_data_licenses.map { |id| { id: id, title: Seek::License.find(id).title } }.to_json,
+                            'data-field-name' => 'recommended_data_licenses',
+                            empty_text: 'No recommended licenses') %>
+      <%= license_select(:_recommended_data_license_select, nil, prompt: 'Select a license to add it to the list...', class: 'form-control') %>
+    <% end %>
 
-    <%= admin_setting_block('Recommended software licenses', "The licenses to recommend when software such as a #{t('workflow')}, is registered. Hold down CTRL (or Command on Mac) to select multiple or to deselect.") do
-	select_tag :recommended_software_licenses, options_for_select(Seek::License.open_definition[:software].map { |l| [l['title'], l['id']]}, Seek::Config.recommended_software_licenses), multiple: true, class: 'form-control'
-    end %>
+    <%= admin_setting_block('Recommended software licenses', "The licenses to recommend when software, such as a #{t('workflow')}, is registered.") do %>
+      <%= associations_list('recommended-software-licenses', 'associations/general',
+                            Seek::Config.recommended_software_licenses.map { |id| { id: id, title: Seek::License.find(id).title } }.to_json,
+                            'data-field-name' => 'recommended_software_licenses',
+                            empty_text: 'No recommended licenses') %>
+      <%= license_select(:_recommended_software_license_select, nil, prompt: 'Select a license to add it to the list...', class: 'form-control') %>
+    <% end %>
 
   <%= admin_setting_block('Metadata License', "The license granted on metadata produced by this SEEK instance.") do
-    grouped_license_select(:metadata_license, Seek::Config.metadata_license, id: 'metadata-license-select',
-                           class: 'form-control', source: Seek::License.open_definition[:data])
+    license_select(:metadata_license, Seek::Config.metadata_license, id: 'metadata-license-select',
+                           class: 'form-control', source: Seek::License.combined)
   end %>
 
     <%= admin_dropdown_setting(:permissions_popup,
@@ -89,7 +96,7 @@
     <h2>Registration settings</h2>
     <%= admin_checkbox_setting(:registration_disabled, 1, Seek::Config.registration_disabled,
                                "Registration disabled", "Whether new accounts creation is disabled. Can be useful in combination with external authentication (e.g. LDAP)",
-                               :onchange=>toggle_appear_javascript('registration_disabled_textarea')) %>
+                               onchange: toggle_appear_javascript('registration_disabled_textarea')) %>
     <div id="registration_disabled_textarea" class="additional_settings" style="<%= show_or_hide_block Seek::Config.registration_disabled -%>">
 
       <%= admin_textarea_setting(:registration_disabled_description, Seek::Config.registration_disabled_description,
@@ -104,7 +111,7 @@
 
     <%= admin_checkbox_setting(:recaptcha_enabled, 1, Seek::Config.recaptcha_enabled,
                                'Captcha enabled', 'Enable to show a captcha on forms susceptible to spam',
-                               :onchange=>toggle_appear_javascript('captcha_key_settings')) %>
+                               onchange: toggle_appear_javascript('captcha_key_settings')) %>
 
     <div id="captcha_key_settings" class="additional_settings" style="<%= show_or_hide_block(Seek::Config.recaptcha_enabled) %>">
       <p>
@@ -122,3 +129,26 @@
     <%= submit_tag "Update", data: { disable_with: 'Updating...' }, :class => 'btn btn-primary' -%> or
     <%= cancel_button admin_path %>
 <% end -%>
+
+
+<script>
+    $j('#_recommended_data_license_select').on('select2:select', function (event) {
+        if ($j(this).val()) {
+            $j('#recommended-data-licenses').data('associationList').add({
+                title: event.params.data.text,
+                id: event.params.data.id
+            });
+        }
+        $j(this).val('').change();
+    });
+
+    $j('#_recommended_software_license_select').on('select2:select', function (event) {
+        if ($j(this).val()) {
+            $j('#recommended-software-licenses').data('associationList').add({
+                title: event.params.data.text,
+                id: event.params.data.id
+            });
+        }
+        $j(this).val('').change();
+    });
+</script>

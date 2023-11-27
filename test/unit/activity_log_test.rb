@@ -82,7 +82,8 @@ class ActivityLogTest < ActiveSupport::TestCase
 
       refute public_log.reload.can_render_link?
 
-      assay = FactoryBot.create(:assay, policy: FactoryBot.create(:publicly_viewable_policy))
+      assay = FactoryBot.create(:assay, policy: FactoryBot.create(:publicly_viewable_policy),
+                                        creators: [FactoryBot.create(:person)])
       snapshot = assay.create_snapshot
       snapshot_log = FactoryBot.create(:activity_log, activity_loggable: snapshot, action: 'create', created_at: 2.hour.ago)
 

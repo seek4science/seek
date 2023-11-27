@@ -3,6 +3,7 @@ class TemplateAttribute < ApplicationRecord
   belongs_to :sample_attribute_type
   belongs_to :template, inverse_of: :template_attributes
   belongs_to :unit
+  belongs_to :isa_tag
   validates :title, presence: true
 
   before_save :default_pos

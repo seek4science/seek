@@ -12,7 +12,7 @@
   <%= f.text_area :description, :rows => 5, :class=>"form-control rich-text-edit" -%>
 </div>
 
-<%= render partial: 'custom_metadata/custom_metadata_type_selection', locals:{f:f, resource:@investigation} %>
+<%= render partial: 'extended_metadata/extended_metadata_type_selection', locals:{f:f, resource:@investigation} %>
 <div class="<%= "hidden" if displaying_single_page? %>">
   <%= render :partial => 'projects/project_selector', :locals => {:resource => @investigation,:allow_nil=>false} if show_form_manage_specific_attributes? -%>
 </div>
@@ -22,7 +22,7 @@
   <%= f.number_field :position, :rows => 5, :class=>"form-control"  -%>
 </div>
 
-<%= render partial: 'custom_metadata/custom_metadata_attribute_input', locals:{f:f,resource:@investigation} %>
+<%= render partial: 'extended_metadata/extended_metadata_attribute_input', locals:{f:f,resource:@investigation} %>
 
 <% if displaying_single_page?%>
   <input name="single_page" type="hidden" value=<%=params[:single_page]%> />
@@ -38,7 +38,7 @@
 
 <%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @investigation} -%>
 
-<!-- custom metadata experiment end -->
+<!-- extended metadata experiment end -->
 
 <%= form_submit_buttons(@investigation) %>
 

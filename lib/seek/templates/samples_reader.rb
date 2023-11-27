@@ -42,7 +42,6 @@ module Seek
       def build_samples_from_datafile(sample_type, datafile_content_blob)
         samples = []
         columns = sample_type.sample_attributes.collect(&:template_column_index)
-
         handler = Seek::Templates::SamplesReader.new(datafile_content_blob)
         handler.each_record(columns) do |_row, data|
           samples << build_sample_from_template_data(sample_type, data)

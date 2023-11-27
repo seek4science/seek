@@ -3,7 +3,7 @@
   projects = Project.all.select{|p| p.sample_types.any? }
   your_projects = projects & current_user.person.projects
   other_projects = projects - your_projects
-	templates_enabled = Seek::Config.sample_type_template_enabled
+	templates_enabled = Seek::Config.isa_json_compliance_enabled
 %>
 
 <% # The Select page is the base browse page for sample     %>

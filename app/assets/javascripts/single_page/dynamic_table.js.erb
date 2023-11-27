@@ -35,7 +35,7 @@ const handleSelect = (e) => {
     dtSelectAll.html("Select all rows")
     dtSelectAll.css("display", "none")
   }
-  const dtName = $j(e).parents("table").data("dtname")
+  const dtName = $j(e).parents("table").data("dtname");
   window[dtName].setPermissionBTNActivity()
 }
 
@@ -50,7 +50,14 @@ const handleSelect = (e) => {
           if (c.multi_link) {
             data = data && Array.isArray(data) ? data : [data];
             data = data[0]?.id ? data : [];
-            const existingOptions = data.map((e) => `<option selected="selected" title="ID: ${e.id}" value="${e.id}">${e.title}</option>`).join("");
+            const existingOptions = data.map((e) => {
+              isHiddenInput = (e.title == '#HIDDEN')
+              if (isHiddenInput) {
+                return `<option selected="selected" title="ID: hidden" value="hidden">hidden</option>`
+              } else {
+                return `<option selected="selected" title="ID: ${e.id}" value="${e.id}">${e.title}</option>`
+              }
+            }).join("");
             if (options.readonly) {
               return data.map((e) => `<span title="ID: ${e.id}" class="badge">${e.title}</span>`).join(" ");
             } else {
@@ -61,7 +68,7 @@ const handleSelect = (e) => {
               const linkedSamples = retrieveLinkedSamples(url);
               const linkedSampleIds = linkedSamples.map((ls) => ls.id);
               const unLinkedSamples = data.reduce(function(filtered, sample) {
-                if(!linkedSampleIds.includes(parseInt(sample.id))){
+                if(!linkedSampleIds.includes(parseInt(sample.id)) && sample.title != '#HIDDEN'){
                   filtered.push(sample);
                 }
                 return filtered;
@@ -69,7 +76,7 @@ const handleSelect = (e) => {
               const hasUnlinkedSamples = unLinkedSamples.length > 0 ? true : false;
 
               const extraClass = hasUnlinkedSamples ? 'select2__error' : '';
-              const titleText = hasUnlinkedSamples ? `Sample(s) '${unLinkedSamples.map(uls => uls.title).join(', ')}' not recognised as sources. Please correct this issue!` : '';
+              const titleText = hasUnlinkedSamples ? `Sample(s) '${unLinkedSamples.map(uls => uls.title).join(', ')}' not recognised as input. Please correct this issue!` : '';
 
               return objectInputTemp
               .replace(/_NAME_/g, objectInputName)
@@ -213,7 +220,7 @@ const handleSelect = (e) => {
               const missingColsCount = colsCount - defaultCols.length - splitted.length;
               splitted = _defaultCols.concat(splitted);
 
-              // Preserve empty placeholder for columns of type of 'Registered Sample (multiple)'
+              // Preserve empty placeholder for columns of type of 'Registered Sample List'
               sampleLinkIndexes.forEach((x) => splitted.splice(x, 0, []));
 
               return missingColsCount < 0 ?

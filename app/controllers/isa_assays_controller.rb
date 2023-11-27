@@ -86,7 +86,7 @@ class IsaAssaysController < ApplicationController
      { samples_attributes: %i[asset_id direction] },
      { data_files_attributes: %i[asset_id direction relationship_type_id] },
      { publication_ids: [] },
-     { custom_metadata_attributes: determine_custom_metadata_keys },
+     { extended_metadata_attributes: determine_extended_metadata_keys(:assay) },
      { discussion_links_attributes: %i[id url label _destroy] }]
   end
 
@@ -119,6 +119,7 @@ class IsaAssaysController < ApplicationController
                                         sample_controlled_vocab_id
                                         linked_sample_type_id
                                         description pid
+                                        allow_cv_free_text
                                         unit_id _destroy] }, { assay_ids: [] }]
   end
 

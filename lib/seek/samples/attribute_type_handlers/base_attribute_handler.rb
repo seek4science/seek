@@ -4,8 +4,8 @@ module Seek
       class AttributeHandlerException < RuntimeError; end
 
       class BaseAttributeHandler
-        def initialize(additional_options = {})
-          self.additional_options = additional_options
+        def initialize(attribute)
+          @attribute = attribute
         end
 
         def convert(value)
@@ -30,7 +30,7 @@ module Seek
 
         private
 
-        attr_accessor :additional_options
+        attr_reader :attribute
       end
     end
   end

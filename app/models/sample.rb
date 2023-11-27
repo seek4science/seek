@@ -30,6 +30,8 @@ class Sample < ApplicationRecord
   has_many :linked_samples, through: :sample_resource_links, source: :resource, source_type: 'Sample'
   has_many :linking_samples, through: :reverse_sample_resource_links, source: :sample
 
+  has_many :linked_data_files, through: :sample_resource_links, source: :resource, source_type: 'DataFile'
+
   validates :projects, presence: true, projects: { self: true }
   validates :title, :sample_type, presence: true
 
@@ -60,8 +62,8 @@ class Sample < ApplicationRecord
     User.logged_in_and_member? && Seek::Config.samples_enabled
   end
 
-  def related_data_file
-    originating_data_file
+  def related_data_files
+    [originating_data_file].compact + linked_data_files
   end
 
   def related_samples
@@ -75,10 +77,14 @@ class Sample < ApplicationRecord
   def referenced_resources
     sample_type.sample_attributes.select(&:seek_resource?).map do |sa|
       value = get_attribute_value(sa)
-      type = sa.sample_attribute_type.base_type_handler.type
+      type = sa.base_type_handler.type
       return [] unless type
       Array.wrap(value).map { |v| type.find_by_id(v['id']) if v }
     end.flatten.compact
+  end
+
+  def referenced_data_files
+    referenced_resources.select { |r| r.is_a?(DataFile) }
   end
 
   def referenced_strains
@@ -89,20 +95,8 @@ class Sample < ApplicationRecord
     referenced_resources.select { |r| r.is_a?(Sample) }
   end
 
-  def state_allows_edit?(*args)
-    (id.nil? || originating_data_file.nil?) && super
-  end
-
   def extracted?
     !!originating_data_file
-  end
-
-  def projects
-    extracted? ? originating_data_file.projects : super
-  end
-
-  def project_ids
-    extracted? ? originating_data_file.project_ids : super
   end
 
   def creators
@@ -210,6 +204,7 @@ class Sample < ApplicationRecord
     return unless sample_type.present?
     self.strains = referenced_strains
     self.linked_samples = referenced_samples
+    self.linked_data_files = referenced_data_files
   end
 
   def attribute_class

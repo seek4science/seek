@@ -6,6 +6,7 @@ delete||="SampleSetAsDeleted()"
 save||="SampleSave()"
 permissions||="loadBatchPermission('sampleDynamicTable',this)"
 exportToExcel||="sampleExportExcel()"
+uploadExcel||="studySampleUploadExcel()"
 %>
 
 <div class="btn-group">
@@ -17,14 +18,32 @@ exportToExcel||="sampleExportExcel()"
   <button class="btn btn-primary dt-action" id="btn_save_assay_sample" onClick=<%=save%>>Save</button>
 </div>
 
+<div class="container-sm" style="max-width: 780px; margin-top:25px;">
+  <label for="file-<%= sample_type_id %>" class="form-label">Upload excel spreadsheet:</label>
+  <div class="input-group">
+    <div class="mb-3">
+      <input id="file-<%= sample_type_id %>" name="file-<%= sample_type_id %>" type="file" accept=".xlsx, .xls" class="form-control form-control-lg"/>
+    </div>
+    <div class="input-group-btn">
+      <button class="btn btn-primary" onClick=<%= uploadExcel %>>Upload</button>
+    </div>
+  </div>
+</div>
+
 <script>
   function loadBatchPermission(dtName, e){
     const sample_ids = window[dtName].selectedSampleIds()
+    let publish_list = {'Sample': {}}
+    if (!sample_ids.length) {
+        alert('Please select at least one sample.');
+        return;
+    }
+    for(let id of sample_ids){ publish_list['Sample'][id]='1' }
 
     $j.ajax({
-      method: "GET",
-      url: "<%= batch_sharing_permission_preview_single_pages_path %>",
-      data: { sample_ids, single_page: true },
+      method: "POST",
+      url: "<%= batch_change_permission_for_selected_items_single_pages_path %>",
+      data: { publish: publish_list, single_page: true },
       success: (res) => {
         if (res?.status == "unprocessable_entity"){
           alert(res?.error)
@@ -34,11 +53,12 @@ exportToExcel||="sampleExportExcel()"
           ObjectsInput.init();
         }
       },
-      error: (e) => {
-        console.log(e);
+      error: (err) => {
+        console.log(err);
         alert("An error occurred while fetching data from the server.")
       }
     });
 
   }
+
 </script>

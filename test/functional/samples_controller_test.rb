@@ -2,8 +2,6 @@ require 'test_helper'
 
 class SamplesControllerTest < ActionController::TestCase
 
-  fixtures :isa_tags
-
   include AuthenticatedTestHelper
   include SharingFormTestHelper
   include HtmlHelper
@@ -72,7 +70,7 @@ class SamplesControllerTest < ActionController::TestCase
     sample = assigns(:sample)
     assert_equal 'Fred Smith', sample.title
     assert_equal 'Fred Smith', sample.get_attribute_value('full name')
-    assert_equal '22', sample.get_attribute_value(:age)
+    assert_equal 22, sample.get_attribute_value(:age)
     assert_equal '22.1', sample.get_attribute_value(:weight)
     assert_equal 'M13 9PL', sample.get_attribute_value(:postcode)
     assert_equal person, sample.contributor
@@ -96,7 +94,7 @@ class SamplesControllerTest < ActionController::TestCase
     sample = assigns(:sample)
     assert_equal 'Fred Smith', sample.title
     assert_equal 'Fred Smith', sample.get_attribute_value('full name')
-    assert_equal '22', sample.get_attribute_value(:age)
+    assert_equal 22, sample.get_attribute_value(:age)
     assert_equal '22.1', sample.get_attribute_value(:weight)
     assert_equal 'M13 9PL', sample.get_attribute_value(:postcode)
     assert_equal person, sample.contributor
@@ -233,17 +231,47 @@ class SamplesControllerTest < ActionController::TestCase
     get :edit, params: { id: populated_patient_sample.id }
 
     assert_response :success
+    assert_nil flash[:error]
   end
 
-  test "can't edit if extracted from a data file" do
+  test "warn on first edit if extracted from a data file" do
     person = FactoryBot.create(:person)
     sample = FactoryBot.create(:sample_from_file, contributor: person)
     login_as(person)
 
     get :edit, params: { id: sample.id }
-
-    assert_redirected_to sample_path(sample)
+    assert_response :success
     assert_not_nil flash[:error]
+  end
+
+  test "source data datafile taged as invalid after edit" do
+    person = FactoryBot.create(:person)
+    sample = FactoryBot.create(:sample_from_file, contributor: person)
+    login_as(person)
+
+    put :update, params: { id: sample.id, sample: { data: { "name": "Modified Sample" } } }
+    sample.reload
+    assert_equal "Modified Sample", sample.title
+    assert sample.edit_count.positive?
+
+    get :show, params: { id: sample.id }
+    assert_response :success
+    assert_select 'span.label-danger', text: /No longer valid/, count: 1
+  end
+
+  test "no longer warn if sample extracted from a data file has already been edited" do
+    person = FactoryBot.create(:person)
+    sample = FactoryBot.create(:sample_from_file, contributor: person)
+    login_as(person)
+
+    put :update, params: { id: sample.id, sample: { data: { "name": "Modified Sample" } } }
+    sample.reload
+    assert_equal "Modified Sample", sample.title
+    assert sample.edit_count.positive?
+
+    get :edit, params: { id: sample.id }
+    assert_response :success
+    assert_nil flash[:error]
   end
 
   #FIXME: there is an inconstency between the existing tests, and how the form behaved - see https://jira-bsse.ethz.ch/browse/OPSK-1205
@@ -274,7 +302,7 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal type_id, updated_sample.sample_type.id
     assert_equal 'Jesus Jones', updated_sample.title
     assert_equal 'Jesus Jones', updated_sample.get_attribute_value('full name')
-    assert_equal '47', updated_sample.get_attribute_value(:age)
+    assert_equal 47, updated_sample.get_attribute_value(:age)
     assert_nil updated_sample.get_attribute_value(:weight)
     assert_equal 'M13 9QL', updated_sample.get_attribute_value(:postcode)
   end
@@ -302,7 +330,7 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal type_id, updated_sample.sample_type.id
     assert_equal 'Jesus Jones', updated_sample.title
     assert_equal 'Jesus Jones', updated_sample.get_attribute_value('full name')
-    assert_equal '47', updated_sample.get_attribute_value(:age)
+    assert_equal 47, updated_sample.get_attribute_value(:age)
     assert_nil updated_sample.get_attribute_value(:weight)
     assert_equal 'M13 9QL', updated_sample.get_attribute_value(:postcode)
   end
@@ -924,22 +952,30 @@ class SamplesControllerTest < ActionController::TestCase
 
   end
 
-  test 'hide manage menu for manageable but not editable items' do
-    # an odd case, where you can manage but not edit, see https://jira-bsse.ethz.ch/browse/OPSK-2041
-    person = FactoryBot.create(:person)
-    sample = FactoryBot.create(:sample_from_file, contributor:person)
+  test 'manage_update does not invalidate source data' do
+    proj=FactoryBot.create(:project)
+    person = FactoryBot.create(:person, project:proj)
+    other_person = FactoryBot.create(:person)
+    sample = FactoryBot.create(:sample_from_file, contributor: person)
+
     login_as(person)
-    assert sample.can_manage?
-    assert sample.can_view?
-    refute sample.can_edit?
+    patch :manage_update, params: { id: sample,
+                                    sample: { project_ids: [proj.id] },
+                                    policy_attributes: { access_type: Policy::VISIBLE,
+                                                         permissions_attributes: { '1' => {
+                                                           contributor_type: 'Person',
+                                                           contributor_id: other_person.id,
+                                                           access_type: Policy::MANAGING
+                                                         } } } }
+    assert_redirected_to sample
+    sample.reload
+    assert_equal Policy::VISIBLE, sample.policy.access_type
+    assert_equal 1, sample.policy.permissions.count
+    assert sample.edit_count.zero?
 
-    get :show, params:{ id:sample.id }
+    get :show, params: { id: sample.id }
     assert_response :success
-
-    assert_select 'a[href=?]',manage_sample_path(sample),text:/manage sample/i, count:0
-    assert_select 'a[href=?]',edit_sample_path(sample),text:/edit sample/i, count:0
-    assert_select 'a[data-method="delete"][href=?]',sample_path(sample),text:/delete sample/i, count:1
-
+    assert_select 'span.label-danger', text: /No longer valid/, count: 0
   end
 
   test 'should create with discussion link' do
@@ -1014,7 +1050,7 @@ class SamplesControllerTest < ActionController::TestCase
     sample1 = samples.first
     assert_equal 'Fred Smith', sample1.title
     assert_equal 'Fred Smith', sample1.get_attribute_value('full name')
-    assert_equal '22', sample1.get_attribute_value(:age)
+    assert_equal 22, sample1.get_attribute_value(:age)
     assert_equal '22.1', sample1.get_attribute_value(:weight)
     assert_equal 'M13 9PL', sample1.get_attribute_value(:postcode)
     assert_equal [assay], sample1.assays
@@ -1022,7 +1058,7 @@ class SamplesControllerTest < ActionController::TestCase
     sample2 = samples.last
     assert_equal 'David Tailor', sample2.title
     assert_equal 'David Tailor', sample2.get_attribute_value('full name')
-    assert_equal '33', sample2.get_attribute_value(:age)
+    assert_equal 33, sample2.get_attribute_value(:age)
     assert_equal '33.1', sample2.get_attribute_value(:weight)
     assert_equal 'M12 8PL', sample2.get_attribute_value(:postcode)
   end
@@ -1074,7 +1110,7 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal type_id1, first_updated_sample.sample_type.id
     assert_equal 'Alfred Marcus', first_updated_sample.title
     assert_equal 'Alfred Marcus', first_updated_sample.get_attribute_value('full name')
-    assert_equal '22', first_updated_sample.get_attribute_value(:age)
+    assert_equal 22, first_updated_sample.get_attribute_value(:age)
     assert_nil first_updated_sample.get_attribute_value(:postcode)
     assert_equal '22.1', first_updated_sample.get_attribute_value(:weight)
 
@@ -1082,7 +1118,7 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal type_id2, last_updated_sample.sample_type.id
     assert_equal 'David Tailor', last_updated_sample.title
     assert_equal 'David Tailor', last_updated_sample.get_attribute_value('full name')
-    assert_equal '33', last_updated_sample.get_attribute_value(:age)
+    assert_equal 33, last_updated_sample.get_attribute_value(:age)
     assert_nil last_updated_sample.get_attribute_value(:postcode)
     assert_equal '33.1', last_updated_sample.get_attribute_value(:weight)
   end
@@ -1115,14 +1151,14 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'should show query form' do
-    with_config_value(:sample_type_template_enabled, true) do
+    with_config_value(:isa_json_compliance_enabled, true) do
       get :query_form
       assert_response :success
     end
   end
 
   test 'should populate user projects in query form' do
-    with_config_value(:sample_type_template_enabled, true) do
+    with_config_value(:isa_json_compliance_enabled, true) do
       person = FactoryBot.create(:person)
       person.add_to_project_and_institution(FactoryBot.create(:project), FactoryBot.create(:institution))
       login_as(person)
@@ -1136,7 +1172,7 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'should not return private samples with basic query' do
-    with_config_value(:sample_type_template_enabled, true) do
+    with_config_value(:isa_json_compliance_enabled, true) do
       person = FactoryBot.create(:person)
       template = FactoryBot.create(:template)
       sample_type = FactoryBot.create(:simple_sample_type, template_id: template.id)
@@ -1229,7 +1265,7 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'should return max query result' do
-    with_config_value(:sample_type_template_enabled, true) do
+    with_config_value(:isa_json_compliance_enabled, true) do
       person = FactoryBot.create(:person)
       project = FactoryBot.create(:project)
 
@@ -1237,12 +1273,12 @@ class SamplesControllerTest < ActionController::TestCase
 
       template1 = FactoryBot.create(:isa_source_template)
       template2 = FactoryBot.create(:isa_sample_collection_template)
-      template3 = FactoryBot.create(:isa_assay_template)
+      template3 = FactoryBot.create(:isa_assay_material_template)
 
       type1 = FactoryBot.create(:isa_source_sample_type, contributor: person, project_ids: [project.id], isa_template: template1)
       type2 = FactoryBot.create(:isa_sample_collection_sample_type, contributor: person, project_ids: [project.id],
                                                           isa_template: template2, linked_sample_type: type1)
-      type3 = FactoryBot.create(:isa_assay_sample_type, contributor: person, project_ids: [project.id], isa_template: template3,
+      type3 = FactoryBot.create(:isa_assay_material_sample_type, contributor: person, project_ids: [project.id], isa_template: template3,
                                               linked_sample_type: type2)
 
       sample1 = FactoryBot.create :sample, title: 'sample1', sample_type: type1, project_ids: [project.id], contributor: person,
@@ -1398,20 +1434,6 @@ class SamplesControllerTest < ActionController::TestCase
 
   end
 
-  private
-
-  def populated_patient_sample
-    person = FactoryBot.create(:person)
-    sample = Sample.new title: 'My Sample', policy: FactoryBot.create(:public_policy),
-                        project_ids:person.projects.collect(&:id),contributor:person
-    sample.sample_type = FactoryBot.create(:patient_sample_type)
-    sample.title = 'My sample'
-    sample.set_attribute_value('full name', 'Fred Bloggs')
-    sample.set_attribute_value(:age, 22)
-    sample.save!
-    sample
-  end
-
   test 'unauthorized users should not do batch operations' do
     sample = FactoryBot.create(:sample)
 
@@ -1430,4 +1452,41 @@ class SamplesControllerTest < ActionController::TestCase
     delete :batch_delete, params: { data: [{ id: sample.id }] }
     assert_equal JSON.parse(response.body)['status'], 'unprocessable_entity'
   end
+
+  test 'should show label to say controlled vocab allows free text' do
+    login_as(FactoryBot.create(:person))
+
+    type = FactoryBot.create(:simple_sample_type)
+    FactoryBot.create(:apples_controlled_vocab_attribute, is_title: true, title: 'allowed', allow_cv_free_text: true, sample_type: type)
+    FactoryBot.create(:apples_controlled_vocab_attribute, title: 'not allowed', allow_cv_free_text: false, sample_type: type)
+
+
+    get :new, params: { sample_type_id: type.id }
+    assert_response :success
+
+    assert_select 'label',text: /allowed/ do
+      assert_select 'span.subtle', text:/#{I18n.t('samples.allow_free_text_label_hint')}/
+    end
+
+    assert_select 'label',text: /not allowed/ do
+      assert_select 'span.subtle', text:/#{I18n.t('samples.allow_free_text_label_hint')}/, count: 0
+    end
+
+  end
+
+  private
+
+  def populated_patient_sample
+    person = FactoryBot.create(:person)
+    sample = Sample.new title: 'My Sample', policy: FactoryBot.create(:public_policy),
+                        project_ids:person.projects.collect(&:id),contributor:person
+    sample.sample_type = FactoryBot.create(:patient_sample_type)
+    sample.title = 'My sample'
+    sample.set_attribute_value('full name', 'Fred Bloggs')
+    sample.set_attribute_value(:age, 22)
+    sample.save!
+    sample
+  end
+
+
 end

@@ -1,21 +1,6 @@
 var zenodoExport = {
     creatorList: [],
 
-    setLicenseUrl: function () {
-        var element = $j('#license-select option:selected');
-        var link = $j('#license-url');
-        var block = link.parents('.license-url-block');
-
-        if(element.data('url') == '') {
-            block.hide();
-        } else {
-            block.show();
-        }
-
-        link.attr('href', element.data('url'));
-        link.html(element.data('url'));
-    },
-
     enableSection: function (sectionElement) {
         sectionElement.show().children(":input").prop("disabled", false);
     },

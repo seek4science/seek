@@ -61,7 +61,25 @@ class IsaAssay
     end
 
     unless @sample_type.sample_attributes.select { |a| a.isa_tag&.isa_protocol? }.one?
-      errors.add(:base, '[Sample type]: An attribute with Protocol ISA tag is not provided')
+      errors.add(:base, "[Sample type]: Should have exactly one attribute with the 'protocol' ISA tag selected")
+    end
+
+    unless @sample_type.sample_attributes.select { |a| a.title.include?('Input') && a.isa_tag.nil? }.one?
+      errors.add(:base,
+                 "[Sample type]: Should have exactly one attribute with the title 'Input' <u><b>and</b></u> no ISA tag".html_safe)
+    end
+
+    if @sample_type.sample_attributes.select { |a| !a.title.include?('Input') && a.isa_tag.nil? }.any?
+      errors.add(:base,
+                 "[Sample type]: All attributes should have an ISA Tag except for the <em>'Input'</em> attribute (hidden)".html_safe)
+    end
+
+    assay_sample_or_datafile_attributes = @sample_type.sample_attributes.select do |a|
+      a.isa_tag&.isa_other_material? || a.isa_tag&.isa_data_file?
+    end
+    unless assay_sample_or_datafile_attributes.one?
+      errors.add(:base,
+                 "[Sample type]: Should have exactly one attribute with the 'data_file' <u><b>or</b></u> 'other_material' ISA tag selected".html_safe)
     end
 
     errors.add(:base, '[Input Assay]: Input Assay is not provided') if @input_sample_type_id.blank?

@@ -11,7 +11,7 @@ class IsaAssaysControllerTest < ActionController::TestCase
   end
 
   test 'should get new' do
-    inv = FactoryBot.create(:investigation, projects: projects, contributor: User.current_user.person)
+    inv = FactoryBot.create(:investigation, projects:, contributor: User.current_user.person)
     study = FactoryBot.create(:study, investigation_id: inv.id, contributor: User.current_user.person)
     sample_type = FactoryBot.create(:simple_sample_type)
     study.sample_types << sample_type
@@ -23,7 +23,7 @@ class IsaAssaysControllerTest < ActionController::TestCase
 
   test 'should create' do
     projects = User.current_user.person.projects
-    inv = FactoryBot.create(:investigation, projects: projects, contributor: User.current_user.person)
+    inv = FactoryBot.create(:investigation, projects:, contributor: User.current_user.person)
     study = FactoryBot.create(:study, investigation_id: inv.id, contributor: User.current_user.person)
     other_creator = FactoryBot.create(:person)
     this_person = User.current_user.person
@@ -31,7 +31,7 @@ class IsaAssaysControllerTest < ActionController::TestCase
     source_sample_type = FactoryBot.create(:simple_sample_type, title: 'source sample_type')
 
     sample_collection_sample_type = FactoryBot.create(:multi_linked_sample_type, project_ids: [projects.first.id],
-                                                                       title: 'sample_collection sample_type')
+                                                                                 title: 'sample_collection sample_type')
     sample_collection_sample_type.sample_attributes.last.linked_sample_type = source_sample_type
 
     study.sample_types = [source_sample_type, sample_collection_sample_type]
@@ -45,22 +45,30 @@ class IsaAssaysControllerTest < ActionController::TestCase
                                                       sop_ids: [FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy)).id],
                                                       creator_ids: [this_person.id, other_creator.id],
                                                       other_creators: 'other collaborators',
-                                                      position: 0, assay_class_id: 1, policy_attributes: policy_attributes },
+                                                      position: 0, assay_class_id: 1, policy_attributes: },
                                              input_sample_type_id: sample_collection_sample_type.id,
                                              sample_type: { title: 'assay sample_type', project_ids: [projects.first.id], template_id: 1,
                                                             sample_attributes_attributes: {
                                                               '0' => {
                                                                 pos: '1', title: 'a string', required: '1', is_title: '1',
-                                                                sample_attribute_type_id: FactoryBot.create(:string_sample_attribute_type).id, _destroy: '0'
+                                                                sample_attribute_type_id: FactoryBot.create(:string_sample_attribute_type).id, _destroy: '0',
+                                                                isa_tag_id: FactoryBot.create(:other_material_isa_tag).id
                                                               },
                                                               '1' => {
                                                                 pos: '2', title: 'protocol', required: '1', is_title: '0',
-                                                                sample_attribute_type_id: FactoryBot.create(:string_sample_attribute_type).id, isa_tag_id: IsaTag.find_by_title(Seek::ISA::TagType::PROTOCOL).id, _destroy: '0'
+                                                                sample_attribute_type_id: FactoryBot.create(:string_sample_attribute_type).id,
+                                                                isa_tag_id: FactoryBot.create(:protocol_isa_tag).id, _destroy: '0'
                                                               },
                                                               '2' => {
-                                                                pos: '3', title: 'link', required: '1',
+                                                                pos: '3', title: 'Input', required: '1',
                                                                 sample_attribute_type_id: FactoryBot.create(:sample_multi_sample_attribute_type).id,
                                                                 linked_sample_type_id: 'self', _destroy: '0'
+                                                              },
+                                                              '3' => {
+                                                                pos: '4', title: 'Some material characteristic', required: '1',
+                                                                sample_attribute_type_id: FactoryBot.create(:string_sample_attribute_type).id,
+                                                                _destroy: '0',
+                                                                isa_tag_id: FactoryBot.create(:other_material_characteristic_isa_tag).id
                                                               }
                                                             } } } }
       end
@@ -83,13 +91,13 @@ class IsaAssaysControllerTest < ActionController::TestCase
   test 'author form partial uses correct nested param attributes' do
     get :new, params: { study_id: FactoryBot.create(:study, contributor: User.current_user.person) }
     assert_response :success
-    assert_select '#author-list[data-field-name=?]','isa_assay[assay][assets_creators_attributes]'
+    assert_select '#author-list[data-field-name=?]', 'isa_assay[assay][assets_creators_attributes]'
     assert_select '#isa_assay_assay_other_creators'
   end
 
   test 'should show new when parameters are incomplete' do
     projects = User.current_user.person.projects
-    inv = FactoryBot.create(:investigation, projects: projects, contributor: User.current_user.person)
+    inv = FactoryBot.create(:investigation, projects:, contributor: User.current_user.person)
     study = FactoryBot.create(:study, investigation_id: inv.id, contributor: User.current_user.person)
 
     source_sample_type = FactoryBot.create(:simple_sample_type)
@@ -117,25 +125,24 @@ class IsaAssaysControllerTest < ActionController::TestCase
     investigation = FactoryBot.create(:investigation, projects: [project])
     other_creator = FactoryBot.create(:person)
 
-
     source_type = FactoryBot.create(:isa_source_sample_type, contributor: person, projects: [project])
     sample_collection_type = FactoryBot.create(:isa_sample_collection_sample_type, contributor: person, projects: [project],
-                                                                         linked_sample_type: source_type)
-    assay_type = FactoryBot.create(:isa_assay_sample_type, contributor: person, projects: [project],
-                                                 linked_sample_type: sample_collection_type)
+                                                                                   linked_sample_type: source_type)
+    assay_type = FactoryBot.create(:isa_assay_material_sample_type, contributor: person, projects: [project],
+                                                           linked_sample_type: sample_collection_type)
 
-    study = FactoryBot.create(:study, investigation: investigation, contributor: person,
-                            sops: [FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy))],
-                            sample_types: [source_type, sample_collection_type])
+    study = FactoryBot.create(:study, investigation:, contributor: person,
+                                      sops: [FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy))],
+                                      sample_types: [source_type, sample_collection_type])
 
-    assay = FactoryBot.create(:assay, study: study, contributor: person)
+    assay = FactoryBot.create(:assay, study:, contributor: person)
     put :update, params: { id: assay, isa_assay: { assay: { title: 'assay title' } } }
     assert_redirected_to single_page_path(id: project, item_type: 'assay', item_id: assay.id)
     assert flash[:error].include?('Resource not found.')
 
-    assay = FactoryBot.create(:assay, study: study, sample_type: assay_type, contributor: person)
+    assay = FactoryBot.create(:assay, study:, sample_type: assay_type, contributor: person)
 
-    put :update, params: { id: assay, isa_assay: { assay: { title: 'assay title',  sop_ids: [FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy)).id],
+    put :update, params: { id: assay, isa_assay: { assay: { title: 'assay title', sop_ids: [FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy)).id],
                                                             creator_ids: [person.id, other_creator.id], other_creators: 'other collaborators' },
                                                    sample_type: { title: 'sample type title' } } }
 
@@ -146,5 +153,75 @@ class IsaAssaysControllerTest < ActionController::TestCase
 
     assert_equal [person, other_creator], isa_assay.assay.creators
     assert_equal 'other collaborators', isa_assay.assay.other_creators
+  end
+
+  test 'should create an isa assay with extended metadata' do
+    projects = User.current_user.person.projects
+    inv = FactoryBot.create(:investigation, projects:, contributor: User.current_user.person)
+    study = FactoryBot.create(:study, investigation_id: inv.id, contributor: User.current_user.person)
+    other_creator = FactoryBot.create(:person)
+    this_person = User.current_user.person
+
+    source_sample_type = FactoryBot.create(:simple_sample_type, title: 'source sample_type')
+
+    sample_collection_sample_type = FactoryBot.create(:multi_linked_sample_type, project_ids: [projects.first.id],
+                                                                                 title: 'sample_collection sample_type')
+    sample_collection_sample_type.sample_attributes.last.linked_sample_type = source_sample_type
+
+    study.sample_types = [source_sample_type, sample_collection_sample_type]
+
+    policy_attributes = { access_type: Policy::ACCESSIBLE,
+                          permissions_attributes: project_permissions([projects.first], Policy::ACCESSIBLE) }
+
+    emt = FactoryBot.create(:simple_assay_extended_metadata_type)
+
+    emt_attributes = { extended_metadata_attributes: {
+      extended_metadata_type_id: emt.id,
+      data: {
+        "age": 43,
+        "name": 'Jane Doe',
+        "date": '14-11-1980'
+      }
+    } }
+
+    assay_attributes = { title: 'First assay with custom metadata', study_id: study.id,
+                         sop_ids: [FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy)).id],
+                         creator_ids: [this_person.id, other_creator.id],
+                         other_creators: 'other collaborators',
+                         position: 0, assay_class_id: 1, policy_attributes: }
+
+    isa_assay_attributes = { assay: assay_attributes.merge(emt_attributes),
+                             input_sample_type_id: sample_collection_sample_type.id,
+                             sample_type: { title: 'assay sample_type', project_ids: [projects.first.id], template_id: 1,
+                                            sample_attributes_attributes: {
+                                              '0' => {
+                                                pos: '1', title: 'a string', required: '1', is_title: '1',
+                                                sample_attribute_type_id: FactoryBot.create(:string_sample_attribute_type).id, _destroy: '0',
+                                                isa_tag_id: FactoryBot.create(:other_material_isa_tag).id
+                                              },
+                                              '1' => {
+                                                pos: '2', title: 'protocol', required: '1', is_title: '0',
+                                                sample_attribute_type_id: FactoryBot.create(:string_sample_attribute_type).id,
+                                                isa_tag_id: FactoryBot.create(:protocol_isa_tag).id, _destroy: '0'
+                                              },
+                                              '2' => {
+                                                pos: '3', title: 'Input', required: '1',
+                                                sample_attribute_type_id: FactoryBot.create(:sample_multi_sample_attribute_type).id,
+                                                linked_sample_type_id: 'self', _destroy: '0'
+                                              },
+                                              '3' => {
+                                                pos: '4', title: 'Some material characteristic', required: '1',
+                                                sample_attribute_type_id: FactoryBot.create(:string_sample_attribute_type).id,
+                                                _destroy: '0',
+                                                isa_tag_id: FactoryBot.create(:other_material_characteristic_isa_tag).id
+                                              }
+                                            } } }
+
+    assert_difference 'Assay.count', 1 do
+      assert_difference 'ExtendedMetadata.count', 1 do
+        post :create,
+             params: { isa_assay: isa_assay_attributes }
+      end
+    end
   end
 end

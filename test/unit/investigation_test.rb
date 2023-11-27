@@ -144,7 +144,9 @@ class InvestigationTest < ActiveSupport::TestCase
   end
 
   test 'can create snapshot of investigation' do
-    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:publicly_viewable_policy))
+    person = FactoryBot.create(:person)
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:publicly_viewable_policy),
+                                      contributor: person, creators: [person])
     FactoryBot.create(:study, contributor: investigation.contributor)
     snapshot = nil
 
@@ -207,18 +209,18 @@ class InvestigationTest < ActiveSupport::TestCase
     assert item2.has_jerm_contributor?
   end
 
-  test 'custom metadata attribute values for search' do
+  test 'extended metadata attribute values for search' do
     item = FactoryBot.create(:investigation)
-    assert_equal [],item.custom_metadata_attribute_values_for_search
+    assert_equal [],item.extended_metadata_attribute_values_for_search
 
-    metadata_type = FactoryBot.create(:simple_investigation_custom_metadata_type)
+    metadata_type = FactoryBot.create(:simple_investigation_extended_metadata_type)
     item = FactoryBot.create(:investigation,
-                   custom_metadata:CustomMetadata.new(
-                     custom_metadata_type: metadata_type,
-                     data: { name: 'James', age: '25' }
+                   extended_metadata:ExtendedMetadata.new(
+                     extended_metadata_type: metadata_type,
+                     data: { name: 'James', age: 25 }
                    )
     )
-    assert_equal ['James','25'].sort, item.custom_metadata_attribute_values_for_search.sort
+    assert_equal ['James','25'].sort, item.extended_metadata_attribute_values_for_search.map(&:to_s).sort
   end
   
   test 'related sop ids' do

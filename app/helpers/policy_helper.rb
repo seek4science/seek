@@ -159,7 +159,7 @@ module PolicyHelper
     hash.to_json.html_safe
   end
 
-  def permission_title(permission, member_prefix: false, icon: false)
+  def permission_title(permission, member_prefix: false, icon: false, link: false)
     if permission.is_a?(Permission)
       type = permission.contributor_type
       contributor = permission.contributor
@@ -168,18 +168,31 @@ module PolicyHelper
       contributor = permission
     end
 
-    if type == 'Person'
+    option = { target: :_blank }
+    case type
+    when 'Person'
       text = "#{contributor.first_name} #{contributor.last_name}"
-    elsif type == 'WorkGroup'
-      text = "#{member_prefix ? 'Members of ' : ''}#{contributor.project.title} @ #{contributor.institution.title}"
+      text = link_to(h(text), contributor, option).html_safe if link
+    when 'WorkGroup'
+      institution = contributor.institution
+      project = contributor.project
+      if link
+        text = "#{member_prefix ? 'Members of ' : ''}#{link_to(h(project.title), project, option)} @ #{link_to(h(institution.title), institution, option)}".html_safe
+      else
+        text = "#{member_prefix ? 'Members of ' : ''}#{project.title} @ #{institution.title}"
+      end
     else
-      text = "#{member_prefix ? 'Members of ' : ''}#{contributor.title}"
+      if link
+        text = "#{member_prefix ? 'Members of ' : ''}#{link_to(h(contributor.title), contributor, option)}".html_safe
+      else
+        text = "#{member_prefix ? 'Members of ' : ''}#{contributor.title}"
+      end
     end
 
     if icon
       content_tag(:span, class: 'type-icon-wrapper') do
         image_tag(asset_path(icon_filename_for_key(type.underscore)), class: 'type-icon')
-      end.html_safe + " #{text}"
+      end.html_safe + " #{text}".html_safe
     else
       text
     end

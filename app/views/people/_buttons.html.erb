@@ -1,15 +1,15 @@
 <% if mine?(@person) -%>
-    <% tooltip_text_sharing = "You can change the sharing policy and permissions for your assets in batch. A preview of selected assets will be given before you choose new permissions for them." %>
-    <% tooltip_text_publishing = "Publish your owned assets in one click. A preview will be given before publishing" %>
-    <%= button_link_to "Batch permission changes", "publish", batch_sharing_permission_preview_person_path(@person), 'data-tooltip' => tooltip(tooltip_text_sharing) -%>
-    <%= button_link_to "Publish your assets", "publish", batch_publishing_preview_person_path(@person), 'data-tooltip' => tooltip(tooltip_text_publishing) -%>
+    <% tooltip_text_sharing = "You can change the sharing policy and permissions for your items in batch. A preview of selected items will be given before you choose new permissions for them." %>
+    <% tooltip_text_publishing = "Publish your owned items in one click. A preview will be given before publishing" %>
+    <%= button_link_to "Batch permission changes", "publish", batch_sharing_permission_preview_person_path(@person), 'data-tooltip': tooltip(tooltip_text_sharing) -%>
+    <%= button_link_to "Publish your items", "publish", batch_publishing_preview_person_path(@person), 'data-tooltip': tooltip(tooltip_text_publishing) -%>
   <% if @person.is_in_any_gatekept_projects? %>
     <%= button_link_to "Assets awaiting approval", "waiting", waiting_approval_assets_person_path(@person),
-                       'data-tooltip' => tooltip("The assets you have requested to publish, but are awaiting the #{t('asset_gatekeeper').downcase} approval") -%>
+                       'data-tooltip': tooltip("The assets you have requested to publish, but are awaiting the #{t('asset_gatekeeper').downcase} approval") -%>
   <% end %>
   <% if @person.is_asset_gatekeeper_of_any_project? %>
     <%= button_link_to "Assets you are Gatekeeping", "waiting", requested_approval_assets_person_path(@person),
-                       'data-tooltip' => tooltip("The assets people have requested to publish, but are still awaiting your approval") -%>
+                       'data-tooltip': tooltip("The assets people have requested to publish, but are still awaiting your approval") -%>
   <% end %>
 <% end %>
 
@@ -20,7 +20,7 @@
       </li>
       <% if mine?(@person) -%>
           <li>
-            <%= image_tag_for_key "lock", url_for({:controller=>:users, :action=>:edit, :id=>@person.user}), "Manage Account", nil, "Manage Account" -%>
+            <%= image_tag_for_key "lock", url_for({controller: :users, action: :edit, id: @person.user}), "Manage Account", nil, "Manage Account" -%>
           </li>
           <% if Seek::Config.omniauth_enabled %>
             <li>
@@ -45,7 +45,7 @@
       <% if admin_logged_in? -%>
           <li class="divider"></li>
           <li>
-            <%= image_tag_for_key "destroy", person_path(@person), "Delete Person", { data: { confirm: 'Are you sure?' }, :method => :delete}, "Delete Person" -%>
+            <%= image_tag_for_key "destroy", person_path(@person), "Delete Person", { data: { confirm: 'Are you sure?' }, method: :delete}, "Delete Person" -%>
           </li>
       <% end -%>
   <% end %>

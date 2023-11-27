@@ -3,6 +3,9 @@
 <% else %>
   <div id='programme-details' style="display:none;">
 <% end %>
+<div class="help-block">
+  Specify a title for a new <%= t('programme') %>, which your new <%= t('project') %> will be associated with.
+</div>
 <%= label_tag :programme_title, "Title" %><span class="required">*</span>
 <%= text_field_tag 'programme[title]', '', class: 'form-control' %>
 </div>

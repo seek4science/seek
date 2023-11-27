@@ -18,7 +18,7 @@ gem 'RedCloth', '>=4.3.0'
 gem 'simple-spreadsheet-extractor', '~> 0.18.0'
 gem 'open4'
 gem 'sample-template-generator', '~>0.7'
-gem 'rmagick', '4.2.5'
+gem 'rmagick', '5.3.0'
 gem 'rest-client', '~>2.0'
 gem 'factory_bot', '~> 6.2.1'
 gem 'bio', '~> 1.5.1'
@@ -109,6 +109,7 @@ gem 'ransack'
 
 gem 'terser', '~> 1.1', '>= 1.1.1'
 
+
 # Rails 4 upgrade
 gem 'activerecord-session_store'
 gem 'rails-observers'
@@ -177,11 +178,13 @@ group :development do
 
   gem 'web-console', '>= 4.1.0'
   gem 'rack-mini-profiler', '~> 2.0'
+  gem "flamegraph", "~> 0.9.5"
+  gem "stackprof", "~> 0.2.25"
   gem 'listen', '~> 3.3'
+  gem 'ruby-prof'
 end
 
 group :test do
-  gem 'ruby-prof'
   gem 'test-prof'
   gem 'rails-perftest'
   gem 'minitest', '~> 5.14'
@@ -202,3 +205,5 @@ group :test, :development do
   gem 'teaspoon'
   gem 'teaspoon-mocha'
 end
+
+gem "sitemap_generator", "~> 6.3"

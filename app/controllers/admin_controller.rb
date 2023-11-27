@@ -148,9 +148,8 @@ class AdminController < ApplicationController
     Seek::Config.openbis_enabled = string_to_boolean(params[:openbis_enabled])
     Seek::Config.copasi_enabled = string_to_boolean(params[:copasi_enabled])
     Seek::Config.project_single_page_enabled = string_to_boolean(params[:project_single_page_enabled])
-    Seek::Config.project_single_page_advanced_enabled = string_to_boolean(params[:project_single_page_advanced_enabled])
+    Seek::Config.isa_json_compliance_enabled = string_to_boolean(params[:isa_json_compliance_enabled])
     Seek::Config.project_single_page_folders_enabled= string_to_boolean(params[:project_single_page_folders_enabled])
-    Seek::Config.sample_type_template_enabled = string_to_boolean(params[:sample_type_template_enabled])
 
     Seek::Config.nels_enabled = string_to_boolean(params[:nels_enabled])
     Seek::Config.nels_client_id = params[:nels_client_id]&.strip
@@ -332,8 +331,8 @@ class AdminController < ApplicationController
 
     Seek::Config.default_license = params[:default_license]
     Seek::Config.metadata_license = params[:metadata_license]
-    Seek::Config.recommended_data_licenses = params[:recommended_data_licenses]
-    Seek::Config.recommended_software_licenses = params[:recommended_software_licenses]
+    Seek::Config.recommended_data_licenses = params[:recommended_data_licenses]&.compact_blank
+    Seek::Config.recommended_software_licenses = params[:recommended_software_licenses]&.compact_blank
     update_flag = (pubmed_email == '' || pubmed_email_valid) && (crossref_email == '' || crossref_email_valid)
     update_redirect_to update_flag, 'settings'
   end

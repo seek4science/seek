@@ -60,79 +60,79 @@ disable_authorization_checks do
   #   )
   #
   # Can later be used like that:
-  # create_custom_metadata_attribute(title: 'CM Metadata attribute using CV', required: true, sample_attribute_type: cv_type,
+  # create_extended_metadata_attribute(title: 'CM Metadata attribute using CV', required: true, sample_attribute_type: cv_type,
   #                                        sample_controlled_vocab: example_cv),
 
   # Definition of the Custom Metadata types
 
   # Helper
-  def create_custom_metadata_attribute(title:, required:, sample_attribute_type:, sample_controlled_vocab: nil)
-    CustomMetadataAttribute.where(title).create!(title: title, required: required,
+  def create_extended_metadata_attribute(title:, required:, sample_attribute_type:, sample_controlled_vocab: nil)
+    ExtendedMetadataAttribute.where(title).create!(title: title, required: required,
                                                  sample_attribute_type: sample_attribute_type,
                                                  sample_controlled_vocab: sample_controlled_vocab)
   end
 
   # Investigation
-  CustomMetadataType.where(title: 'ENA Metadata Investigation', supported_type: 'Investigation').first_or_create!(
+  ExtendedMetadataType.where(title: 'ENA Metadata Investigation', supported_type: 'Investigation').first_or_create!(
     title: 'ENA Metadata Investigation', supported_type: 'Investigation',
-    custom_metadata_attributes: [
+    extended_metadata_attributes: [
       # For "normal" sample_attribute_type:
-      # create_custom_metadata_attribute(title: 'Internal Identifier', required: true, sample_attribute_type: text_type),
+      # create_extended_metadata_attribute(title: 'Internal Identifier', required: true, sample_attribute_type: text_type),
       # or, if the type does not have an alias:
-      # create_custom_metadata_attribute(title: 'Organism Tax Id', required: true, sample_attribute_type: SampleAttributeType.where(title:'NCBI ID').first),
+      # create_extended_metadata_attribute(title: 'Organism Tax Id', required: true, sample_attribute_type: SampleAttributeType.where(title:'NCBI ID').first),
       #
       # "NCBI ID" is from the list of available sample_attribute_types (default listed there: https://docs.google.com/spreadsheets/d/1n7L-xcyyS9suIz-CFKYlUJSvaXjWfW0PaVumT6e6qjY/edit#gid=325725849)
       #
       # For Controlled Vocabulary:
       # if defined above:
-      # create_custom_metadata_attribute(title: 'Work package', required: true, sample_attribute_type: cv_type,
+      # create_extended_metadata_attribute(title: 'Work package', required: true, sample_attribute_type: cv_type,
       #                                        sample_controlled_vocab: work_package_cv),
       # if predefined:
-      # create_custom_metadata_attribute(title: 'Work package', required: true, sample_attribute_type: cv_type,
+      # create_extended_metadata_attribute(title: 'Work package', required: true, sample_attribute_type: cv_type,
       #                                        sample_controlled_vocab: SampleControlledVocab.where(title:'One predefined CV').first),
 
-      create_custom_metadata_attribute(title: 'Internal Identifier', required: true, sample_attribute_type: text_type),
-      create_custom_metadata_attribute(title: 'Institution', required: true, sample_attribute_type: text_type),
-      create_custom_metadata_attribute(title: 'Work package', required: true, sample_attribute_type: cv_type,
+      create_extended_metadata_attribute(title: 'Internal Identifier', required: true, sample_attribute_type: text_type),
+      create_extended_metadata_attribute(title: 'Institution', required: true, sample_attribute_type: text_type),
+      create_extended_metadata_attribute(title: 'Work package', required: true, sample_attribute_type: cv_type,
                                        sample_controlled_vocab: work_package_cv),
-      create_custom_metadata_attribute(title: 'Keywords', required: true, sample_attribute_type: text_type),
-      create_custom_metadata_attribute(title: 'Start Date', required: false, sample_attribute_type: date_type),
-      create_custom_metadata_attribute(title: 'End Date', required: false, sample_attribute_type: date_type)
+      create_extended_metadata_attribute(title: 'Keywords', required: true, sample_attribute_type: text_type),
+      create_extended_metadata_attribute(title: 'Start Date', required: false, sample_attribute_type: date_type),
+      create_extended_metadata_attribute(title: 'End Date', required: false, sample_attribute_type: date_type)
     ]
   )
 
-  CustomMetadataType.where(title: 'ENA Metadata Study', supported_type: 'Study').first_or_create!(
+  ExtendedMetadataType.where(title: 'ENA Metadata Study', supported_type: 'Study').first_or_create!(
     title: 'ENA Metadata Study', supported_type: 'Study',
-    custom_metadata_attributes: [
-      create_custom_metadata_attribute(title: 'Primary Accession', required: true, sample_attribute_type: text_type),
-      create_custom_metadata_attribute(title: 'Secondary Accession', required: true, sample_attribute_type: text_type),
-      create_custom_metadata_attribute(title: 'Short name', required: true, sample_attribute_type: text_type),
-      create_custom_metadata_attribute(title: 'Description', required: true, sample_attribute_type: text_type),
-      create_custom_metadata_attribute(title: 'Start Date', required: false, sample_attribute_type: date_type),
-      create_custom_metadata_attribute(title: 'End Date', required: false, sample_attribute_type: date_type),
-      create_custom_metadata_attribute(title: 'Submission Date', required: false, sample_attribute_type: date_type),
-      create_custom_metadata_attribute(title: 'Factor', required: false, sample_attribute_type: text_type),
-      create_custom_metadata_attribute(title: 'Person(s) responsible', required: false, sample_attribute_type: text_type),
-      create_custom_metadata_attribute(title: 'Keywords', required: true, sample_attribute_type: text_type),
-      create_custom_metadata_attribute(title: 'Functional genome annotation', required: false, sample_attribute_type: bool_type),
-      create_custom_metadata_attribute(title: 'Status', required: false, sample_attribute_type: cv_type, sample_controlled_vocab: status_cv)
+    extended_metadata_attributes: [
+      create_extended_metadata_attribute(title: 'Primary Accession', required: true, sample_attribute_type: text_type),
+      create_extended_metadata_attribute(title: 'Secondary Accession', required: true, sample_attribute_type: text_type),
+      create_extended_metadata_attribute(title: 'Short name', required: true, sample_attribute_type: text_type),
+      create_extended_metadata_attribute(title: 'Description', required: true, sample_attribute_type: text_type),
+      create_extended_metadata_attribute(title: 'Start Date', required: false, sample_attribute_type: date_type),
+      create_extended_metadata_attribute(title: 'End Date', required: false, sample_attribute_type: date_type),
+      create_extended_metadata_attribute(title: 'Submission Date', required: false, sample_attribute_type: date_type),
+      create_extended_metadata_attribute(title: 'Factor', required: false, sample_attribute_type: text_type),
+      create_extended_metadata_attribute(title: 'Person(s) responsible', required: false, sample_attribute_type: text_type),
+      create_extended_metadata_attribute(title: 'Keywords', required: true, sample_attribute_type: text_type),
+      create_extended_metadata_attribute(title: 'Functional genome annotation', required: false, sample_attribute_type: bool_type),
+      create_extended_metadata_attribute(title: 'Status', required: false, sample_attribute_type: cv_type, sample_controlled_vocab: status_cv)
     ]
   )
 
-  CustomMetadataType.where(title: 'ENA Metadata Assay', supported_type: 'Assay').first_or_create!(
+  ExtendedMetadataType.where(title: 'ENA Metadata Assay', supported_type: 'Assay').first_or_create!(
     title: 'ENA Metadata Assay', supported_type: 'Assay',
-    custom_metadata_attributes: [
-      create_custom_metadata_attribute(title: 'Unique Name Prefix', required: true, sample_attribute_type: text_type),
-      create_custom_metadata_attribute(title: 'Title', required: true, sample_attribute_type: text_type),
-      create_custom_metadata_attribute(title: 'Description', required: false, sample_attribute_type: text_type),
-      create_custom_metadata_attribute(title: 'Organism Tax Id', required: true, sample_attribute_type: SampleAttributeType.where(title:'NCBI ID').first),
-      create_custom_metadata_attribute(title: 'Scientific Name', required: true, sample_attribute_type: text_type),
-      create_custom_metadata_attribute(title: 'Cell Type', required: false, sample_attribute_type: text_type),
-      create_custom_metadata_attribute(title: 'Tissue Type', required: true, sample_attribute_type: text_type),
-      create_custom_metadata_attribute(title: 'Sex', required: false, sample_attribute_type: cv_type,
+    extended_metadata_attributes: [
+      create_extended_metadata_attribute(title: 'Unique Name Prefix', required: true, sample_attribute_type: text_type),
+      create_extended_metadata_attribute(title: 'Title', required: true, sample_attribute_type: text_type),
+      create_extended_metadata_attribute(title: 'Description', required: false, sample_attribute_type: text_type),
+      create_extended_metadata_attribute(title: 'Organism Tax Id', required: true, sample_attribute_type: SampleAttributeType.where(title:'NCBI ID').first),
+      create_extended_metadata_attribute(title: 'Scientific Name', required: true, sample_attribute_type: text_type),
+      create_extended_metadata_attribute(title: 'Cell Type', required: false, sample_attribute_type: text_type),
+      create_extended_metadata_attribute(title: 'Tissue Type', required: true, sample_attribute_type: text_type),
+      create_extended_metadata_attribute(title: 'Sex', required: false, sample_attribute_type: cv_type,
                                        sample_controlled_vocab: sex_cv),
-      create_custom_metadata_attribute(title: 'Collection Date', required: false, sample_attribute_type: date_type),
-      create_custom_metadata_attribute(title: 'Collected by', required: false, sample_attribute_type: text_type)
+      create_extended_metadata_attribute(title: 'Collection Date', required: false, sample_attribute_type: date_type),
+      create_extended_metadata_attribute(title: 'Collected by', required: false, sample_attribute_type: text_type)
     ]
   )
 

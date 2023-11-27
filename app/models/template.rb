@@ -1,12 +1,17 @@
+# Template class for the creation of Sample Type Templates
 class Template < ApplicationRecord
   acts_as_asset
 
   has_many :template_attributes, -> { order(:pos) }, inverse_of: :template, dependent: :destroy
   has_many :sample_types
   has_many :samples, through: :sample_types
+  has_many :children, class_name: 'Template', foreign_key: 'parent_id'
+  belongs_to :parent, class_name: 'Template', optional: true
 
   validates :title, presence: true
-  validates :title, uniqueness: { scope: [:group, :version] }
+  validates :title, uniqueness: { scope: %i[group version] }
+  validates :level, presence: true
+  validate :validate_template_attributes
 
   accepts_nested_attributes_for :template_attributes, allow_destroy: true
 
@@ -27,6 +32,19 @@ class Template < ApplicationRecord
     resolve_controlled_vocabs_inconsistencies
   end
 
+  def validate_template_attributes
+    errors.add(:base, '[Template attribute]: Some attributes are missing ISA tags') unless none_empty_isa_tag
+    if test_tag_occurences.any?
+      test_tag_occurences.map do |tag|
+        errors.add(:base,
+                   "[Template attribute]: The <em>'#{tag}'</em> ISA tag is not allowed to be used more then once".html_safe)
+      end
+    end
+
+    test_input_occurence
+    test_attribute_title_uniqueness
+  end
+
   private
 
   # fixes the consistency of the attribute controlled vocabs where the attribute doesn't match.
@@ -37,6 +55,55 @@ class Template < ApplicationRecord
       attribute.sample_controlled_vocab = nil unless attribute.sample_attribute_type.controlled_vocab?
     end
   end
-  
-end
 
+  def none_empty_isa_tag
+    template_attributes.select { |ta| !ta.title.include?('Input') && ta.isa_tag_id.nil? }.none?
+  end
+
+  def test_tag_occurences
+    %w[source protocol sample data_file other_material].map do |tag|
+      tag if template_attributes.reject { |ta| ta.title.include?('Input') }.map(&:isa_tag).compact.map(&:title).count(tag) > 1
+    end.compact
+  end
+
+  def test_input_occurence
+    return if template_attributes.map(&:title).map(&:downcase).compact.count('input') <= 1
+
+    errors.add(:base, '[Template attribute]: You are not allowed to have more than one Input attribute.')
+  end
+
+  def test_attribute_title_uniqueness
+    template_attribute_titles = template_attributes.map(&:title).uniq
+    duplicate_attributes = template_attribute_titles.map do |tat|
+      if template_attributes.select { |ta| ta.title.downcase == tat.downcase }.map(&:title).count > 1
+        errors.add(:template_attributes, "Attribute names must be unique, there are duplicates of #{tat}")
+        return tat
+      end
+    end
+  end
+
+  def isa_tag_white_list(template_level)
+    case template_level
+    when 'study source'
+      [Seek::ISA::TagType::SOURCE,
+       Seek::ISA::TagType::SOURCE_CHARACTERISTIC]
+    when 'study sample'
+      [Seek::ISA::TagType::SAMPLE,
+       Seek::ISA::TagType::SAMPLE_CHARACTERISTIC,
+       Seek::ISA::TagType::PROTOCOL,
+       Seek::ISA::TagType::PARAMETER_VALUE]
+    when 'assay - material'
+      [Seek::ISA::TagType::OTHER_MATERIAL,
+       Seek::ISA::TagType::OTHER_MATERIAL_CHARACTERISTIC,
+       Seek::ISA::TagType::PROTOCOL,
+       Seek::ISA::TagType::PARAMETER_VALUE]
+    when 'assay - data file'
+      [Seek::ISA::TagType::PROTOCOL,
+       Seek::ISA::TagType::DATA_FILE,
+       Seek::ISA::TagType::DATA_FILE_COMMENT,
+       Seek::ISA::TagType::PARAMETER_VALUE]
+    else
+      []
+    end
+  end
+end

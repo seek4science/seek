@@ -19,7 +19,7 @@
   <%= panel('Ontology') do %>
 
     <div class="help-block">
-      You can, optionally, populate the terms from an ontology available from the <%= link_to('Ontology Lookup Service','https://www.ebi.ac.uk/ols/index',target: :_blank) %>.
+      You can, optionally, populate the terms from an ontology available from the <%= link_to('Ontology Lookup Service',"#{Ebi::OlsClient::ROOT_URL}",target: :_blank) %>.
       To do so, select the ontology below, and then choose the root term - from which itself and all children will be added to the terms. You can choose the root term by following the
       link provide to browse the ontology.
       <br/>
@@ -67,7 +67,7 @@
 
     <div id='controlled-vocab-terms'>
       <div id='controlled-vocab-terms-fixed'>
-        <table id="new-terms" class="table" style="width:100%;">
+        <table id='new-terms' class='table'>
           <thead>
           <th>Label<span class="required">*</span></th>
           <th>URI</th>
@@ -103,11 +103,7 @@
         </table>
       </div>
       <div>
-        <%
-          options = {id: 'add-term'}
-          options.merge!({disabled:true, disabled_reason:t('controlled_vocabs.add_new_term_disabled_reason')}) if @sample_controlled_vocab.ontology_based?
-        %>
-        <%= button_link_to('Add new term', 'add', '#', options) %>
+        <%= button_link_to('Add new term', 'add', '#', id: 'add-term') %>
         <%= button_link_to('Remove all terms', 'destroy', '#', :id => 'clear-terms', class:'btn btn-danger') %>
       </div>
     </div>

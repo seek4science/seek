@@ -41,12 +41,6 @@ workbook.add_worksheet(name: 'Metadata') do |sheet|
   sheet.add_row ['Fairdom ID:', @study.id]
   sheet.add_row ['UUID:', @study.uuid]
 
-  if @assay
-    sheet.add_row ['Assay:'], style: title_style
-    sheet.add_row ['Fairdom ID:', @assay.id]
-    sheet.add_row ['UUID:', @assay.uuid]
-  end
-
   sheet.add_row ['Sample Type:'], style: title_style
   sheet.add_row ['Fairdom ID:', @sample_type.id]
   sheet.add_row ['UUID:', @sample_type.uuid]
@@ -54,6 +48,12 @@ workbook.add_worksheet(name: 'Metadata') do |sheet|
   sheet.add_row ['Template:'], style: title_style
   sheet.add_row ['Fairdom ID:', @template.id]
   sheet.add_row ['UUID:', @template.uuid]
+
+  if @assay
+    sheet.add_row ['Assay:'], style: title_style
+    sheet.add_row ['Fairdom ID:', @assay.id]
+    sheet.add_row ['UUID:', @assay.uuid]
+  end
 
   sheet.sheet_protection.password = secret_pwd
 end

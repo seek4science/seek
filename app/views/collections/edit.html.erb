@@ -14,6 +14,9 @@
         <%= f.text_area :description, :class=>"form-control rich-text-edit", :rows => 5 -%>
       </div>
 
+      <%= render partial: 'extended_metadata/extended_metadata_type_selection', locals: {f: f, resource: @collection } %>
+      <%= render partial: 'extended_metadata/extended_metadata_attribute_input', locals: {f: f, resource: @collection } %>
+
       <%= panel('Items') do %>
         <p class="help-block">Items can be re-arranged by clicking and dragging the button on the left-hand side of each row.</p>
         <table class="table" id="items-table">

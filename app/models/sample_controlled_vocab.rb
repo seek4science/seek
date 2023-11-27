@@ -6,7 +6,8 @@ class SampleControlledVocab < ApplicationRecord
                                            after_remove: :update_sample_type_templates,
                                            dependent: :destroy
   has_many :sample_attributes, inverse_of: :sample_controlled_vocab
-  has_many :custom_metadata_attributes, inverse_of: :sample_controlled_vocab
+  has_many :extended_metadata_attributes, inverse_of: :sample_controlled_vocab
+  has_many :template_attributes, inverse_of: :sample_controlled_vocab
 
   has_many :sample_types, through: :sample_attributes
   has_many :samples, through: :sample_types

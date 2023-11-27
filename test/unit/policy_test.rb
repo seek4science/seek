@@ -196,31 +196,27 @@ class PolicyTest < ActiveSupport::TestCase
 
   test 'policy not destroyed if still referenced by assets' do
     policy = FactoryBot.create(:public_policy)
-    sample_type = FactoryBot.create(:strain_sample_type)
-    data_file = FactoryBot.create(:strain_sample_data_file, policy: policy)
-    samples = data_file.extract_samples(sample_type, true).select(&:persisted?)
-    sample = samples.first
+    sop1 = FactoryBot.create(:sop, policy: policy)
+    sop2 = FactoryBot.create(:sop, policy: policy)
 
-    assert_equal sample.policy, data_file.policy
+    assert_equal sop1.policy, sop2.policy
 
     assert_no_difference('Policy.count') do
-      disable_authorization_checks { data_file.destroy }
+      disable_authorization_checks { sop1.destroy }
     end
 
-    assert_not_nil sample.reload.policy
+    assert_not_nil sop2.reload.policy
     assert_not_nil Policy.find_by_id(policy.id)
   end
 
   test 'policy destroyed when no longer referenced' do
     policy = FactoryBot.create(:public_policy)
-    sample_type = FactoryBot.create(:strain_sample_type)
-    data_file = FactoryBot.create(:strain_sample_data_file, policy: policy)
-    samples = data_file.extract_samples(sample_type, true).select(&:persisted?)
-
-    disable_authorization_checks { data_file.destroy }
+    sop1 = FactoryBot.create(:sop, policy: policy)
+    sop2 = FactoryBot.create(:sop, policy: policy)
+    sops = [sop1, sop2]
 
     assert_difference('Policy.count', -1) do
-      disable_authorization_checks { samples.each(&:destroy) }
+      disable_authorization_checks { sops.each(&:destroy) }
     end
 
     assert_nil Policy.find_by_id(policy.id)

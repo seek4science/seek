@@ -1,10 +1,12 @@
 require 'test_helper'
 
 class CVAttributeTypeHandlerTest < ActiveSupport::TestCase
+
   test 'test value' do
-    handler = Seek::Samples::AttributeTypeHandlers::CVAttributeTypeHandler.new
-    vocab = FactoryBot.create(:apples_sample_controlled_vocab)
-    handler.send('additional_options=', controlled_vocab: vocab)
+    st = FactoryBot.create(:simple_sample_type)
+    attr = FactoryBot.create(:apples_controlled_vocab_attribute, sample_type: st)
+    handler = Seek::Samples::AttributeTypeHandlers::CVAttributeTypeHandler.new(attr)
+
     handler.test_value('Granny Smith')
     assert_raises(RuntimeError) do
       handler.test_value('Pear')
@@ -12,23 +14,28 @@ class CVAttributeTypeHandlerTest < ActiveSupport::TestCase
   end
 
   test 'validate value' do
-    vocab = FactoryBot.create(:apples_sample_controlled_vocab)
-    handler = Seek::Samples::AttributeTypeHandlers::CVAttributeTypeHandler.new(controlled_vocab: vocab)
+    st = FactoryBot.create(:simple_sample_type)
+    attr = FactoryBot.create(:apples_controlled_vocab_attribute, allow_cv_free_text: false, sample_type: st)
+    handler = Seek::Samples::AttributeTypeHandlers::CVAttributeTypeHandler.new(attr)
     assert handler.validate_value?('Granny Smith')
     refute handler.validate_value?('Pear')
   end
 
   test 'exception thrown for missing controlled vocab' do
-    handler = Seek::Samples::AttributeTypeHandlers::CVAttributeTypeHandler.new
+    st = FactoryBot.create(:simple_sample_type)
+    attr = FactoryBot.create(:simple_string_sample_attribute, sample_type: st)
+    assert_nil attr.sample_controlled_vocab
+    handler = Seek::Samples::AttributeTypeHandlers::CVAttributeTypeHandler.new(attr)
     assert_raises(Seek::Samples::AttributeTypeHandlers::CVAttributeTypeHandler::MissingControlledVocabularyException) do
       assert handler.validate_value?('Granny Smith')
     end
   end
 
-  test 'bypass validation for controlled vocabs set as custom input' do
-    ontology_vocab = FactoryBot.create(:ontology_sample_controlled_vocab, custom_input: true)
-    handler = Seek::Samples::AttributeTypeHandlers::CVAttributeTypeHandler.new(controlled_vocab: ontology_vocab)
-    assert handler.validate_value?('Parent')
+  test 'bypass validation for controlled vocabs together with allow_cv_free_text' do
+    st = FactoryBot.create(:simple_sample_type)
+    attr = FactoryBot.create(:apples_controlled_vocab_attribute, allow_cv_free_text: true, sample_type: st)
+    handler = Seek::Samples::AttributeTypeHandlers::CVAttributeTypeHandler.new(attr)
+    assert handler.validate_value?('Granny Smith')
     assert handler.validate_value?('custom value')
   end
 
