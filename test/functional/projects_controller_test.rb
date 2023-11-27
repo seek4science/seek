@@ -3679,7 +3679,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
     put :update, params: { id: project.id, project: { topic_annotations: ['Chemistry', 'Sample collections'] } }
 
-    assert_equal ['http://edamontology.org/topic_3314','http://edamontology.org/topic_3277'], assigns(:project).topic_annotations
+    assert_equal ['http://edamontology.org/topic_3314','http://edamontology.org/topic_3277'].sort, assigns(:project).topic_annotations.sort
 
   end
 
