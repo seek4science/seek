@@ -1,6 +1,6 @@
 module Seek
   module Samples
-    module AttributeTypeHandlers
+    module AttributeHandlers
       class CVAttributeHandler < BaseAttributeHandler
         class MissingControlledVocabularyException < AttributeHandlerException; end
 

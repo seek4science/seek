@@ -1,6 +1,6 @@
 module Seek
   module Samples
-    module AttributeTypeHandlers
+    module AttributeHandlers
       class BooleanAttributeHandler < BaseAttributeHandler
         def initialize(attribute)
           super(attribute)

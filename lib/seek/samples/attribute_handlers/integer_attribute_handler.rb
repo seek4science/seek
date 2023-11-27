@@ -1,6 +1,6 @@
 module Seek
   module Samples
-    module AttributeTypeHandlers
+    module AttributeHandlers
       class IntegerAttributeHandler < BaseAttributeHandler
         def test_value(value)
           raise 'Not an integer' unless Integer(value.to_f) # the to_f is to allow "1.0" type numbers

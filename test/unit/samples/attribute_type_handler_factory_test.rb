@@ -2,7 +2,7 @@ require 'test_helper'
 
 class AttributeTypeHandlerFactoryTest < ActiveSupport::TestCase
   def setup
-    @factory = Seek::Samples::AttributeTypeHandlers::AttributeHandlerFactory.instance
+    @factory = Seek::Samples::AttributeHandlers::AttributeHandlerFactory.instance
   end
 
   test 'handlers to for base type' do
@@ -12,7 +12,7 @@ class AttributeTypeHandlerFactoryTest < ActiveSupport::TestCase
     types = Seek::Samples::BaseType::ALL_TYPES + Seek::Samples::BaseType::ALL_TYPES
     types.each do |type|
       attr.sample_attribute_type.base_type = type
-      expected = "Seek::Samples::AttributeTypeHandlers::#{type}AttributeHandler".constantize
+      expected = "Seek::Samples::AttributeHandlers::#{type}AttributeHandler".constantize
       assert_kind_of expected, @factory.for_base_type(attr), "Expected #{expected.name} for #{type}"
     end
   end
@@ -21,7 +21,7 @@ class AttributeTypeHandlerFactoryTest < ActiveSupport::TestCase
     st = FactoryBot.create(:simple_sample_type)
     attr = FactoryBot.create(:simple_string_sample_attribute, sample_type: st)
     attr.sample_attribute_type.base_type = 'fish'
-    e = assert_raise(Seek::Samples::AttributeTypeHandlers::UnrecognisedAttributeHandler) do
+    e = assert_raise(Seek::Samples::AttributeHandlers::UnrecognisedAttributeHandler) do
       @factory.for_base_type(attr)
     end
     assert_equal "unrecognised attribute base type 'fish'", e.message

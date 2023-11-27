@@ -1,6 +1,6 @@
 module Seek
   module Samples
-    module AttributeTypeHandlers
+    module AttributeHandlers
       class StringAttributeHandler < BaseAttributeHandler
         def test_value(value)
           raise 'Not a string' unless value.is_a?(String)

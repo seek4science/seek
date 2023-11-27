@@ -47,11 +47,11 @@ module Seek
       end
 
       def seek_resource?
-        base_type_handler.is_a?(Seek::Samples::AttributeTypeHandlers::SeekResourceAttributeHandler)
+        base_type_handler.is_a?(Seek::Samples::AttributeHandlers::SeekResourceAttributeHandler)
       end
 
       def base_type_handler
-        Seek::Samples::AttributeTypeHandlers::AttributeHandlerFactory.instance.for_base_type(self)
+        Seek::Samples::AttributeHandlers::AttributeHandlerFactory.instance.for_base_type(self)
       end
 
       private

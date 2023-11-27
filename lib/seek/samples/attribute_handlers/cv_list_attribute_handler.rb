@@ -1,6 +1,6 @@
 module Seek
   module Samples
-    module AttributeTypeHandlers
+    module AttributeHandlers
       class CVListAttributeHandler < CVAttributeHandler
         def test_value(array_value)
           array_value.each do |value|
