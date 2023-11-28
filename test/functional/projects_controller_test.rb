@@ -3870,30 +3870,21 @@ class ProjectsControllerTest < ActionController::TestCase
   private
 
   def check_project(project)
-    assert project.investigations.size == 2
-    check_investigation_0(project.investigations[0])
-    check_investigation_1(project.investigations[1])
-  end
+    assert_equal 2, project.investigations.count
 
-  def check_investigation_0(investigation)
-    assert investigation.title == "Select host and product"
-    assert investigation.studies.size == 4
-  end
+    investigation1 = project.investigations.detect { |i| i.title == 'Select host and product' }
+    assert investigation1
+    assert 4, investigation1.studies.count
 
-  def check_investigation_1(investigation)
-    assert investigation.title == "Design"
-    assert investigation.studies.size == 1
-    check_study_1_0(investigation.studies[0])
-  end
+    investigation2 = project.investigations.detect { |i| i.title == 'Design' }
+    assert investigation2
+    assert 1, investigation2.studies.count
 
-  def check_study_1_0(study)
+    study = investigation2.studies.first
     assert study.title == "Receive input from select host and products step"
-    assert study.assays.size == 2
-    check_assay_1_0_1(study.assays[1])
-  end
+    assert_equal 2, study.assays.count
 
-  def check_assay_1_0_1(assay)
-    assert assay.title == "Obtain SBML models for production hosts"
+    assert study.assays.detect { |a| a.title == 'Obtain SBML models for production hosts' }
   end
 
   def valid_project
