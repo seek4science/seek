@@ -1431,8 +1431,8 @@ class PersonTest < ActiveSupport::TestCase
 
   test 'merge annotations' do
     person_to_keep = FactoryBot.create(:min_person)
-    person_to_keep.annotate_with(['golf','merging'], 'expertise', person_to_keep)
-    person_to_keep.annotate_with(['merger'], 'tool', person_to_keep)
+    person_to_keep.annotate_with(%w[golf merging], 'expertise', person_to_keep)
+    person_to_keep.annotate_with(%w[merger], 'tool', person_to_keep)
     person_to_keep.save!
     person_to_keep.reload
     orig_annotations = {}
@@ -1449,7 +1449,7 @@ class PersonTest < ActiveSupport::TestCase
     person_to_keep.reload
 
     annotation_types.each do |annotation_type|
-      assert_equal (orig_annotations[annotation_type]+other_annotations[annotation_type]).compact.uniq.sort,
+      assert_equal (orig_annotations[annotation_type] + other_annotations[annotation_type]).compact.uniq.sort,
                    person_to_keep.send(annotation_type).sort,
                    "Should copy #{annotation_type} if not present in person to keep"
     end
@@ -1462,7 +1462,7 @@ class PersonTest < ActiveSupport::TestCase
     FactoryBot.create(:programme, project_ids: [other_person.project_ids.last])
     other_person.work_groups << person_to_keep.work_groups[0]
 
-    ids = [:work_group_ids, :programme_ids, :institution_ids, :project_ids]
+    ids = %i[work_group_ids programme_ids institution_ids project_ids]
     expected = {}
     ids.each do |var|
       orig_ids = person_to_keep.send(var)
@@ -1523,9 +1523,9 @@ class PersonTest < ActiveSupport::TestCase
     person_to_keep = FactoryBot.create(:person)
     other_person = FactoryBot.create(:person)
 
-    types_without_creators = ["Event", "Strain"]
+    types_without_creators = %w[Event Strain]
     Person::RELATED_RESOURCE_TYPES.each do |resource_type|
-      sym = resource_type == "SampleType" ? :simple_sample_type : resource_type.underscore.to_sym
+      sym = resource_type == 'SampleType' ? :simple_sample_type : resource_type.underscore.to_sym
       FactoryBot.create(sym, contributor: other_person)
       unless types_without_creators.include?(resource_type)
         FactoryBot.create(sym, contributor: FactoryBot.create(:person), creator_ids: [other_person.id])
@@ -1576,7 +1576,7 @@ class PersonTest < ActiveSupport::TestCase
     assert sop_both.can_manage?(person_to_keep)
     assert sop_other.can_manage?(person_to_keep)
     assert 1, sop_both.policy.permissions.length
-    assert 3, Permission.where(contributor_type: "Person",contributor_id: person_to_keep.id).length
+    assert 3, Permission.where(contributor_type: 'Person', contributor_id: person_to_keep.id).length
   end
 
   test 'merge roles without duplication' do
@@ -1626,10 +1626,10 @@ class PersonTest < ActiveSupport::TestCase
     person_to_keep = FactoryBot.create(:person)
     other_person = FactoryBot.create(:person)
 
-    FactoryBot.create(:identity, uid: "ldap-keep", user_id: person_to_keep.user.id)
-    FactoryBot.create(:identity, uid: "ldap-shared", user_id: person_to_keep.user.id)
-    FactoryBot.create(:identity, uid: "ldap-shared", user_id: other_person.user.id)
-    FactoryBot.create(:identity, uid: "ldap-other", user_id: other_person.user.id)
+    FactoryBot.create(:identity, uid: 'ldap-keep', user_id: person_to_keep.user.id)
+    FactoryBot.create(:identity, uid: 'ldap-shared', user_id: person_to_keep.user.id)
+    FactoryBot.create(:identity, uid: 'ldap-shared', user_id: other_person.user.id)
+    FactoryBot.create(:identity, uid: 'ldap-other', user_id: other_person.user.id)
 
     disable_authorization_checks { person_to_keep.merge(other_person) }
     person_to_keep.reload
@@ -1690,11 +1690,16 @@ class PersonTest < ActiveSupport::TestCase
     ap_o = FactoryBot.create(:oauth_application, redirect_uri: "#{oauth_url}_other", owner: other_person.user)
     # Access grants
     grant_url = 'https://localhost:3000/grant'
-    FactoryBot.create(:oauth_access_grant, application: ap_k, redirect_uri: "#{grant_url}_keep", resource_owner_id: person_to_keep.user.id)
-    FactoryBot.create(:oauth_access_grant, application: ap_s, redirect_uri: "#{grant_url}_shared", resource_owner_id: person_to_keep.user.id)
-    FactoryBot.create(:oauth_access_grant, application: ap_s, redirect_uri: "#{grant_url}_shared", resource_owner_id: other_person.user.id)
-    FactoryBot.create(:oauth_access_grant, application: ap_s, redirect_uri: "#{grant_url}_shared", resource_owner_id: other_person.user.id, scopes: 'write')
-    FactoryBot.create(:oauth_access_grant, application: ap_o, redirect_uri: "#{grant_url}_other", resource_owner_id: other_person.user.id)
+    FactoryBot.create(:oauth_access_grant, application: ap_k, redirect_uri: "#{grant_url}_keep",
+                                           resource_owner_id: person_to_keep.user.id)
+    FactoryBot.create(:oauth_access_grant, application: ap_s, redirect_uri: "#{grant_url}_shared",
+                                           resource_owner_id: person_to_keep.user.id)
+    FactoryBot.create(:oauth_access_grant, application: ap_s, redirect_uri: "#{grant_url}_shared",
+                                           resource_owner_id: other_person.user.id)
+    FactoryBot.create(:oauth_access_grant, application: ap_s, redirect_uri: "#{grant_url}_shared",
+                                           resource_owner_id: other_person.user.id, scopes: 'write')
+    FactoryBot.create(:oauth_access_grant, application: ap_o, redirect_uri: "#{grant_url}_other",
+                                           resource_owner_id: other_person.user.id)
 
     disable_authorization_checks { person_to_keep.merge(other_person) }
     person_to_keep.reload

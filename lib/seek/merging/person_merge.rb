@@ -55,7 +55,7 @@ module Seek
 
       def merge_annotations(other_person)
         annotation_types.each do |annotation_type|
-          add_annotations(send(annotation_type)+other_person.send(annotation_type), annotation_type.singularize, self)
+          add_annotations(send(annotation_type) + other_person.send(annotation_type), annotation_type.singularize, self)
         end
       end
 
