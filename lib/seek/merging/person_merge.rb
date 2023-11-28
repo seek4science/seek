@@ -2,17 +2,18 @@ module Seek
   module Merging
     module PersonMerge
       def merge(other_person)
-        merge_simple_attributes(other_person)
-        merge_annotations(other_person)
-        # Roles have to be merged before group_memberships
-        merge_associations(other_person, 'roles', %i[scope_type scope_id role_type_id], { person_id: id })
-        # Merging group_memberships deals with work_groups, programmes, institutions and projects
-        merge_associations(other_person, 'group_memberships', [:work_group_id], { person_id: id })
-        merge_associations(other_person, 'subscriptions', [:subscribable_id], { person_id: id })
-        merge_associations(other_person, 'dependent_permissions', [:policy_id], { contributor_id: id })
-        merge_resources(other_person)
-        merge_user(other_person)
         Person.transaction do
+          merge_simple_attributes(other_person)
+          merge_annotations(other_person)
+          # Roles have to be merged before group_memberships
+          merge_associations(other_person, 'roles', %i[scope_type scope_id role_type_id], { person_id: id })
+          # Merging group_memberships deals with work_groups, programmes, institutions and projects
+          merge_associations(other_person, 'group_memberships', [:work_group_id], { person_id: id })
+          merge_associations(other_person, 'subscriptions', [:subscribable_id], { person_id: id })
+          merge_associations(other_person, 'dependent_permissions', [:policy_id], { contributor_id: id })
+          merge_resources(other_person)
+          merge_user(other_person)
+
           save!
           other_person.reload # To prevent destruction of unlinked roles
           other_person.destroy
