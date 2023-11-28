@@ -204,7 +204,7 @@ class ProjectsController < ApplicationController
           else
             flash[:notice] = "Thank you, your #{t('project')} has been created"
             if Seek::Config.email_enabled
-              Mailer.notify_admins_project_creation_accepted(current_person, current_person, @project).deliver_later
+              Mailer.notify_admins_project_creation_accepted(nil, current_person, @project).deliver_later
             end
             redirect_to(@project)
           end
