@@ -23,6 +23,12 @@
                       <span class="badge", title='ID: <%= sub_sample['id'] %>'><%= sub_sample['title'] %></span>
                     <% end %>
                   </td>
+                <% elsif @cv_list_fields.include?(key) %>
+                  <td class='<%= (val != db_sample[key]) ? "warning" : "default" %>' id='<%= "update-sample-#{update_sample['id']}[#{key}]"%>' >
+                    <% val.each do |cv_term| %>
+                      <span class="label label-default", title='<%= cv_term %>'><%= cv_term %></span>
+                    <% end %>
+                  </td>
                 <% else %>
                   <td class='<%= (val != db_sample[key]) ? "warning" : "default" %>' id='<%= "update-sample-#{update_sample['id']}[#{key}]"%>' ><%= val %></td>
                 <% end %>
@@ -36,6 +42,12 @@
                   <td>
                     <% val.each do |sub_sample| %>
                       <span class="badge", title='ID: <%= sub_sample['id'] %>'><%= sub_sample['title'] %></span>
+                    <% end %>
+                  </td>
+                <% elsif @cv_list_fields.include?(key) %>
+                  <td>
+                    <% val.each do |cv_term| %>
+                      <span class="label label-default", title='<%= cv_term %>'><%= cv_term %></span>
                     <% end %>
                   </td>
                 <% else %>
