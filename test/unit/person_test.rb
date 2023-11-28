@@ -1622,6 +1622,87 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal 4, person_to_keep.roles.length
   end
 
+  test 'merge user identities without duplication' do
+    person_to_keep = FactoryBot.create(:person)
+    other_person = FactoryBot.create(:person)
+
+    FactoryBot.create(:identity, uid: "ldap-keep", user_id: person_to_keep.user.id)
+    FactoryBot.create(:identity, uid: "ldap-shared", user_id: person_to_keep.user.id)
+    FactoryBot.create(:identity, uid: "ldap-shared", user_id: other_person.user.id)
+    FactoryBot.create(:identity, uid: "ldap-other", user_id: other_person.user.id)
+
+    disable_authorization_checks { person_to_keep.merge(other_person) }
+    person_to_keep.reload
+
+    expected = %w[keep shared other]
+    assert_equal (expected.map { |exp| "ldap-#{exp}" }).sort, person_to_keep.user.identities.pluck(:uid).sort
+  end
+
+  test 'merge user oauth_applications without duplication' do
+    person_to_keep = FactoryBot.create(:person)
+    other_person = FactoryBot.create(:person)
+
+    oauth_url = 'https://localhost:3000/oauth'
+    FactoryBot.create(:oauth_application, redirect_uri: "#{oauth_url}_keep", owner: person_to_keep.user)
+    FactoryBot.create(:oauth_application, redirect_uri: "#{oauth_url}_shared", owner: person_to_keep.user)
+    FactoryBot.create(:oauth_application, redirect_uri: "#{oauth_url}_shared", owner: other_person.user)
+    FactoryBot.create(:oauth_application, redirect_uri: "#{oauth_url}_other", owner: other_person.user)
+
+    disable_authorization_checks { person_to_keep.merge(other_person) }
+    person_to_keep.reload
+
+    expected = %w[keep shared other]
+    assert_equal (expected.map { |exp| "#{oauth_url}_#{exp}" }).sort,
+                 person_to_keep.user.oauth_applications.pluck(:redirect_uri).sort
+  end
+
+  test 'merge user access_tokens without duplication' do
+    person_to_keep = FactoryBot.create(:person)
+    other_person = FactoryBot.create(:person)
+
+    # OAuth Applications
+    oauth_url = 'https://localhost:3000/oauth'
+    ap_k = FactoryBot.create(:oauth_application, redirect_uri: "#{oauth_url}_keep", owner: person_to_keep.user)
+    ap_s = FactoryBot.create(:oauth_application, redirect_uri: "#{oauth_url}_shared", owner: person_to_keep.user)
+    ap_o = FactoryBot.create(:oauth_application, redirect_uri: "#{oauth_url}_other", owner: other_person.user)
+    # Access tokens
+    FactoryBot.create(:oauth_access_token, application: ap_k, resource_owner_id: person_to_keep.user.id)
+    FactoryBot.create(:oauth_access_token, application: ap_s, resource_owner_id: person_to_keep.user.id)
+    FactoryBot.create(:oauth_access_token, application: ap_s, resource_owner_id: other_person.user.id)
+    FactoryBot.create(:oauth_access_token, application: ap_s, resource_owner_id: other_person.user.id, scopes: 'write')
+    FactoryBot.create(:oauth_access_token, application: ap_o, resource_owner_id: other_person.user.id)
+
+    disable_authorization_checks { person_to_keep.merge(other_person) }
+    person_to_keep.reload
+
+    assert_equal [[ap_k.id, 'read'], [ap_s.id, 'read'], [ap_s.id, 'write'], [ap_o.id, 'read']].sort,
+                 person_to_keep.user.access_tokens.pluck(:application_id, :scopes).sort
+  end
+
+  test 'merge user access_grants without duplication' do
+    person_to_keep = FactoryBot.create(:person)
+    other_person = FactoryBot.create(:person)
+
+    # OAuth Applications
+    oauth_url = 'https://localhost:3000/oauth'
+    ap_k = FactoryBot.create(:oauth_application, redirect_uri: "#{oauth_url}_keep", owner: person_to_keep.user)
+    ap_s = FactoryBot.create(:oauth_application, redirect_uri: "#{oauth_url}_shared", owner: person_to_keep.user)
+    ap_o = FactoryBot.create(:oauth_application, redirect_uri: "#{oauth_url}_other", owner: other_person.user)
+    # Access grants
+    grant_url = 'https://localhost:3000/grant'
+    FactoryBot.create(:oauth_access_grant, application: ap_k, redirect_uri: "#{grant_url}_keep", resource_owner_id: person_to_keep.user.id)
+    FactoryBot.create(:oauth_access_grant, application: ap_s, redirect_uri: "#{grant_url}_shared", resource_owner_id: person_to_keep.user.id)
+    FactoryBot.create(:oauth_access_grant, application: ap_s, redirect_uri: "#{grant_url}_shared", resource_owner_id: other_person.user.id)
+    FactoryBot.create(:oauth_access_grant, application: ap_s, redirect_uri: "#{grant_url}_shared", resource_owner_id: other_person.user.id, scopes: 'write')
+    FactoryBot.create(:oauth_access_grant, application: ap_o, redirect_uri: "#{grant_url}_other", resource_owner_id: other_person.user.id)
+
+    disable_authorization_checks { person_to_keep.merge(other_person) }
+    person_to_keep.reload
+
+    assert_equal [[ap_k.id, 'read'], [ap_s.id, 'read'], [ap_s.id, 'write'], [ap_o.id, 'read']].sort,
+                 person_to_keep.user.access_grants.pluck(:application_id, :scopes).sort
+  end
+
   test 'other person is destroyed after merge' do
     person_to_keep = FactoryBot.create(:min_person)
     other_person = FactoryBot.create(:max_person)

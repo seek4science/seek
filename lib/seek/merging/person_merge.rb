@@ -11,6 +11,7 @@ module Seek
         merge_associations(other_person, 'subscriptions', [:subscribable_id], { person_id: id })
         merge_associations(other_person, 'dependent_permissions', [:policy_id], { contributor_id: id })
         merge_resources(other_person)
+        merge_user(other_person)
         Person.transaction do
           save!
           other_person.reload # To prevent destruction of unlinked roles
@@ -79,6 +80,31 @@ module Seek
         other_person.send(assoc).where(duplicated_hash).destroy_all
 
         other_person.send(assoc).update_all(update_hash)
+      end
+
+      def merge_user(other_person)
+        return unless user
+
+        merge_user_associations(other_person, 'identities',
+                                %i[provider uid], { user_id: user.id })
+        merge_user_associations(other_person, 'oauth_applications',
+                                %i[redirect_uri scopes], { owner_id: user.id })
+        merge_user_associations(other_person, 'access_tokens',
+                                %i[application_id scopes], { resource_owner_id: user.id })
+        merge_user_associations(other_person, 'access_grants',
+                                %i[application_id redirect_uri scopes], { resource_owner_id: user.id })
+      end
+
+      def merge_user_associations(other_person, assoc, duplicates_match, update_hash)
+        other_items = other_person.user.send(assoc).pluck(*duplicates_match)
+        self_items = user.send(assoc).pluck(*duplicates_match)
+        duplicated = other_items & self_items
+        duplicated = duplicated.map { |item| [item] } if duplicates_match.length == 1
+
+        duplicated_hash = Hash[duplicates_match.zip(duplicated.transpose)]
+        other_person.user.send(assoc).where(duplicated_hash).destroy_all
+
+        other_person.user.send(assoc).update_all(update_hash)
       end
 
     end
