@@ -16,6 +16,8 @@ module Seek
           save!
           other_person.reload # To prevent destruction of unlinked roles
           other_person.destroy
+          ActivityLog.create!(action: 'MERGE-person',
+                              data: "Person with id #{other_person.id} was merged into person with id #{id}.")
         end
       end
 

@@ -1712,4 +1712,18 @@ class PersonTest < ActiveSupport::TestCase
     assert_nil Person.find_by_id(other_person.id)
   end
 
+  test 'log added after successful merge' do
+    person_to_keep = FactoryBot.create(:person)
+    other_person = FactoryBot.create(:max_person)
+
+    assert_difference('ActivityLog.count') do
+      disable_authorization_checks { person_to_keep.merge(other_person) }
+    end
+
+    merge_log = ActivityLog.last
+    assert_equal 'MERGE-person', merge_log.action
+    assert_includes merge_log.data, "#{other_person.id} was merged into"
+    assert_includes merge_log.data, "#{person_to_keep.id}."
+  end
+
 end
