@@ -10,7 +10,7 @@ module Seek
           @handlers = {}
         end
 
-        def for_base_type(attribute)
+        def for_attribute(attribute)
           "Seek::Samples::AttributeHandlers::#{attribute.sample_attribute_type.base_type}AttributeHandler".constantize.new(attribute)
         rescue NameError
           raise UnrecognisedAttributeHandler, "unrecognised attribute base type '#{attribute.sample_attribute_type.base_type}'"

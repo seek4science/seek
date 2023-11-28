@@ -5,7 +5,7 @@ class AttributeHandlerFactoryTest < ActiveSupport::TestCase
     @factory = Seek::Samples::AttributeHandlers::AttributeHandlerFactory.instance
   end
 
-  test 'handlers to for base type' do
+  test 'handlers to for attribute' do
     st = FactoryBot.create(:simple_sample_type)
     attr = FactoryBot.create(:simple_string_sample_attribute, sample_type: st)
     # they are repeated twice to check for any caching issues
@@ -13,7 +13,7 @@ class AttributeHandlerFactoryTest < ActiveSupport::TestCase
     types.each do |type|
       attr.sample_attribute_type.base_type = type
       expected = "Seek::Samples::AttributeHandlers::#{type}AttributeHandler".constantize
-      assert_kind_of expected, @factory.for_base_type(attr), "Expected #{expected.name} for #{type}"
+      assert_kind_of expected, @factory.for_attribute(attr), "Expected #{expected.name} for #{type}"
     end
   end
 
@@ -22,7 +22,7 @@ class AttributeHandlerFactoryTest < ActiveSupport::TestCase
     attr = FactoryBot.create(:simple_string_sample_attribute, sample_type: st)
     attr.sample_attribute_type.base_type = 'fish'
     e = assert_raise(Seek::Samples::AttributeHandlers::UnrecognisedAttributeHandler) do
-      @factory.for_base_type(attr)
+      @factory.for_attribute(attr)
     end
     assert_equal "unrecognised attribute base type 'fish'", e.message
   end
