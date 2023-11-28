@@ -2,7 +2,7 @@ require 'caxlsx'
 require 'uuid'
 
 #####################################
-debug = true
+debug = false
 #####################################
 
 if debug
