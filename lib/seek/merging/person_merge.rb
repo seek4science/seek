@@ -4,15 +4,16 @@ module Seek
       def merge(other_person)
         merge_simple_attributes(other_person)
         merge_annotations(other_person)
-
+        # Roles have to be merged before group_memberships
+        merge_associations(other_person, 'roles', %i[scope_type scope_id role_type_id], { person_id: id })
         # Merging group_memberships deals with work_groups, programmes, institutions and projects
-        merge_associations(group_memberships, other_person.group_memberships, 'work_group_id')
-        merge_associations(subscriptions, other_person.subscriptions, 'subscribable_id')
+        merge_associations(other_person, 'group_memberships', [:work_group_id], { person_id: id })
+        merge_associations(other_person, 'subscriptions', [:subscribable_id], { person_id: id })
+        merge_associations(other_person, 'dependent_permissions', [:policy_id], { contributor_id: id })
         merge_resources(other_person)
-        merge_permissions(other_person)
-        merge_roles(other_person)
         Person.transaction do
           save!
+          other_person.reload # To prevent destruction of unlinked roles
           other_person.destroy
         end
       end
@@ -55,24 +56,6 @@ module Seek
         end
       end
 
-      def merge_associations(current_associations, other_associations, check_existing)
-        other_associations.each do |other_association|
-          existing_association = nil
-          if check_existing
-            existing_association = current_associations.find do |assoc|
-              # Check if association already exists
-              assoc.send(check_existing) == other_association.send(check_existing)
-            end
-          end
-
-          next if existing_association
-
-          duplicated_association = other_association.dup
-          duplicated_association.person_id = id
-          current_associations << duplicated_association
-        end
-      end
-
       def merge_resources(other_person)
         # Contributed
         Person::RELATED_RESOURCE_TYPES.each do |resource_type|
@@ -86,26 +69,16 @@ module Seek
         other_person.reload
       end
 
-      def merge_permissions(other_person)
-        permissions_other = Permission.where(contributor_type: "Person", contributor_id: other_person.id)
-        permissions_slef = Permission.where(contributor_type: "Person", contributor_id: id)
-        duplicated = permissions_other.pluck(:policy_id) & permissions_slef.pluck(:policy_id)
-        permissions_other.where(policy_id: duplicated).destroy_all
-        permissions_other.update_all(contributor_id: id)
-      end
+      def merge_associations(other_person, assoc, duplicates_match, update_hash)
+        other_items = other_person.send(assoc).pluck(*duplicates_match)
+        self_items = send(assoc).pluck(*duplicates_match)
+        duplicated = other_items & self_items
+        duplicated = duplicated.map { |item| [item] } if duplicates_match.length == 1
 
-      def merge_roles(other_person)
-        other_roles = other_person.roles.pluck('scope_type', 'scope_id', 'role_type_id')
-        self_roles = roles.pluck('scope_type', 'scope_id', 'role_type_id')
-        duplicated = other_roles & self_roles
-        other_person.roles.where({
-                                   scope_type: duplicated.map { |triple| triple[0] },
-                                   scope_id: duplicated.map { |triple| triple[1] },
-                                   role_type_id: duplicated.map { |triple| triple[2] }
-                                 }).destroy_all
-        other_person.roles.update_all(person_id: id)
-        # Reload to prevent destruction of unlinked roles
-        other_person.reload
+        duplicated_hash = Hash[duplicates_match.zip(duplicated.transpose)]
+        other_person.send(assoc).where(duplicated_hash).destroy_all
+
+        other_person.send(assoc).update_all(update_hash)
       end
 
     end
