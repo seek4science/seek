@@ -7,14 +7,10 @@ class ProjectCreationMessageLog < MessageLog
   # project creation requests that haven't been responded to
   scope :pending_requests, -> { pending }
 
-  def self.prepare_request(sender:, project:, institution:, programme: nil)
+  def self.log_request(sender:, project:, institution:, programme: nil)
     details = details_json(programme: programme, project: project, institution: institution)
     # FIXME: needs a subject, but can't use programme as it will save it if it is new
-    ProjectCreationMessageLog.new(subject: sender, sender: sender, details: details)
-  end
-
-  def self.log_request(sender:, project:, institution:, programme: nil)
-    prepare_request(sender: sender, project: project, institution: institution, programme: programme).tap(&:save)
+    ProjectCreationMessageLog.create(subject: sender, sender: sender, details: details)
   end
 
   # whether the person can respond to the creation request

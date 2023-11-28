@@ -193,11 +193,9 @@ class ProjectsController < ApplicationController
       if @programme.can_associate_projects?
         log = ProjectCreationMessageLog.log_request(sender:current_person, programme:@programme, project:@project, institution:@institution)
       elsif @programme.site_managed?
-        log = ProjectCreationMessageLog.prepare_request(sender:current_person, programme:@programme, project:@project, institution:@institution)
         if Seek::Config.auto_activate_site_managed_projects
-          @message_log = log
           @project.programme = @programme
-          errors = confirm_project_create_request(skip_permissions: true)
+          errors = confirm_project_create_request(current_person, skip_permissions: true)
           if errors.present?
             flash.now[:error] = errors
             render action: :guided_create, status: :unprocessable_entity
@@ -210,7 +208,7 @@ class ProjectsController < ApplicationController
           end
           return
         else
-          log.save!
+          log = ProjectCreationMessageLog.log_request(sender:current_person, programme:@programme, project:@project, institution:@institution)
         end
         if Seek::Config.email_enabled
           Mailer.request_create_project_for_programme(current_user, @programme, @project.to_json, @institution.to_json, log).deliver_later
@@ -573,11 +571,24 @@ class ProjectsController < ApplicationController
       @project = Project.new(params.require(:project).permit([:title, :web_page, :description]))
       @project.programme = @programme
 
-      errors = confirm_project_create_request
+      errors = confirm_project_create_request(requester)
       if errors.present?
         flash.now[:error] = errors
         render action: :administer_create_project_request
       else
+        if @message_log.sent_by_self?
+          @message_log.destroy
+          flash[:notice]="#{t('project')} created"
+        else
+          @message_log.respond('Accepted')
+          if Seek::Config.email_enabled
+            flash[:notice]="Request accepted and #{requester.name} added to #{t('project')} and notified"
+            Mailer.notify_user_projects_assigned(requester,[@project]).deliver_later
+            Mailer.notify_admins_project_creation_accepted(current_person, requester, @project).deliver_later
+          else
+            flash[:notice]="Request accepted and #{requester.name} added to #{t('project')}"
+          end
+        end
         redirect_to(@project)
       end
     else
@@ -817,8 +828,7 @@ class ProjectsController < ApplicationController
     end
   end
 
-  def confirm_project_create_request(skip_permissions: false)
-    requester = @message_log.sender
+  def confirm_project_create_request(requester, skip_permissions: false)
     validate_error_msg = []
     make_programme_admin = @programme&.new_record?
 
@@ -859,20 +869,6 @@ class ProjectsController < ApplicationController
 
     disable_authorization_checks do
       requester.save!
-    end
-
-    if @message_log.sent_by_self?
-      @message_log.destroy
-      flash[:notice]="#{t('project')} created"
-    else
-      @message_log.respond('Accepted')
-      if Seek::Config.email_enabled
-        flash[:notice]="Request accepted and #{requester.name} added to #{t('project')} and notified"
-        Mailer.notify_user_projects_assigned(requester,[@project]).deliver_later
-        Mailer.notify_admins_project_creation_accepted(current_person, requester, @project).deliver_later
-      else
-        flash[:notice]="Request accepted and #{requester.name} added to #{t('project')}"
-      end
     end
 
     nil
