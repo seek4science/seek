@@ -38,6 +38,7 @@ module Seek
         acts_as_discussable
         grouped_pagination
         title_trimmer
+        has_extended_metadata
 
         attr_writer :original_filename, :content_type
 

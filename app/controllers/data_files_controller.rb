@@ -462,6 +462,7 @@ class DataFilesController < ApplicationController
                                       :file_template_id,
                                       { data_format_annotations: [] }, { data_type_annotations: [] },
                                       { publication_ids: [] }, { workflow_ids: [] },
+                                      { extended_metadata_attributes: determine_extended_metadata_keys },
                                       { workflow_data_files_attributes:[:id, :workflow_id, :workflow_data_file_relationship_id, :_destroy] },
                                       discussion_links_attributes:[:id, :url, :label, :_destroy])
   end

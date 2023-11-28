@@ -77,7 +77,7 @@ class Sample < ApplicationRecord
   def referenced_resources
     sample_type.sample_attributes.select(&:seek_resource?).map do |sa|
       value = get_attribute_value(sa)
-      type = sa.sample_attribute_type.base_type_handler.type
+      type = sa.base_type_handler.type
       return [] unless type
       Array.wrap(value).map { |v| type.find_by_id(v['id']) if v }
     end.flatten.compact

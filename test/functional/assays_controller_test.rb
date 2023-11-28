@@ -304,7 +304,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert cm = assay.extended_metadata
     assert_equal cmt, cm.extended_metadata_type
     assert_equal 'fred',cm.get_attribute_value('name')
-    assert_equal '22',cm.get_attribute_value('age')
+    assert_equal 22,cm.get_attribute_value('age')
     assert_nil cm.get_attribute_value('date')
   end
 
@@ -1928,7 +1928,7 @@ class AssaysControllerTest < ActionController::TestCase
     sample_collection_st = FactoryBot.create(:isa_sample_collection_sample_type, contributor: person, projects: [project],
     linked_sample_type: source_st)
 
-    assay_sample_type = FactoryBot.create :isa_assay_sample_type, linked_sample_type: sample_collection_st, contributor: person, isa_template: Template.find_by_title('ISA Assay 1')
+    assay_sample_type = FactoryBot.create :isa_assay_material_sample_type, linked_sample_type: sample_collection_st, contributor: person, isa_template: FactoryBot.build(:isa_assay_material_template)
     assay = FactoryBot.create(:assay,
                               policy:FactoryBot.create(:private_policy, permissions:[FactoryBot.create(:permission,contributor: person, access_type:Policy::EDITING)]),
                               sample_type: assay_sample_type,
@@ -1953,14 +1953,16 @@ class AssaysControllerTest < ActionController::TestCase
     sample_collection_st = FactoryBot.create(:isa_sample_collection_sample_type, contributor: person, projects: [project],
                                                                                  linked_sample_type: source_st)
 
-    assay_st1 = FactoryBot.create(:isa_assay_sample_type, contributor: person, projects: [project],
-                                                          linked_sample_type: sample_collection_st, isa_template: Template.find_by_title('ISA Assay 1'))
 
-    assay_st2 = FactoryBot.create(:isa_assay_sample_type, contributor: person, projects: [project],
-                                                          linked_sample_type: assay_st1, isa_template: Template.find_by_title('ISA Assay 1'))
+    assay_template_1 = FactoryBot.create(:isa_assay_material_template)
+    assay_st1 = FactoryBot.create(:isa_assay_material_sample_type, contributor: person, projects: [project],
+                                                          linked_sample_type: sample_collection_st, isa_template: assay_template_1)
 
-    assay_st3 = FactoryBot.create(:isa_assay_sample_type, contributor: person, projects: [project],
-                                                          linked_sample_type: assay_st2, isa_template: Template.find_by_title('ISA Assay 1'))
+    assay_st2 = FactoryBot.create(:isa_assay_material_sample_type, contributor: person, projects: [project],
+                                                          linked_sample_type: assay_st1, isa_template: assay_template_1)
+
+    assay_st3 = FactoryBot.create(:isa_assay_material_sample_type, contributor: person, projects: [project],
+                                                          linked_sample_type: assay_st2, isa_template: assay_template_1)
 
     study = FactoryBot.create(:study, investigation:, contributor: person,
                                       policy: FactoryBot.create(:private_policy, permissions: [FactoryBot.create(:permission, contributor: person, access_type: Policy::MANAGING)]),

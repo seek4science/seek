@@ -1,8 +1,8 @@
 module Seek
   module Samples
-    module AttributeTypeHandlers
-      class LinkedExtendedMetadataAttributeTypeHandler < BaseAttributeHandler
-        class MissingLinkedExtendedMetadataTypeException < AttributeHandlerException; end
+    module AttributeHandlers
+      class LinkedExtendedMetadataAttributeHandler < BaseAttributeHandler
+        class MissingLinkedExtendedMetadataException < AttributeHandlerException; end
 
         def test_value(value)
           fail 'Not a extended metadata' unless value.is_a?(Hash)
@@ -17,8 +17,8 @@ module Seek
         private
 
         def linked_extended_metadata_type
-          linked_extended_metadata_type = additional_options[:linked_extended_metadata_type]
-          raise MissingLinkedExtendedMetadataTypeException unless linked_extended_metadata_type
+          linked_extended_metadata_type = attribute.linked_extended_metadata_type
+          raise MissingLinkedExtendedMetadataException unless linked_extended_metadata_type
 
           linked_extended_metadata_type
         end

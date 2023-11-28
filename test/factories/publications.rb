@@ -123,4 +123,17 @@ FactoryBot.define do
     first_name { 'Author_registered' }
     last_name { 'LastReg' }
   end
+
+  # Publication::Version
+  factory(:publication_version, class: Publication::Version) do
+    association :publication
+    projects { publication.projects }
+    after(:create) do |publication_version|
+      publication_version.publication.version += 1
+      publication_version.publication.save
+      publication_version.version = publication_version.publication.version
+      publication_version.title = publication_version.publication.title
+      publication_version.save
+    end
+  end
 end

@@ -5,6 +5,7 @@ class Project < ApplicationRecord
 
   acts_as_yellow_pages
   title_trimmer
+  has_extended_metadata
 
   has_and_belongs_to_many :investigations
   has_many :studies, through: :investigations

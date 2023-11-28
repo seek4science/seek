@@ -1,7 +1,7 @@
 module Seek
   module Samples
-    module AttributeTypeHandlers
-      class SeekSampleAttributeTypeHandler < SeekResourceAttributeTypeHandler
+    module AttributeHandlers
+      class SeekSampleAttributeHandler < SeekResourceAttributeHandler
         class MissingLinkedSampleTypeException < AttributeHandlerException; end
 
         def type
@@ -9,7 +9,7 @@ module Seek
         end
 
         def test_value(value)
-          if additional_options[:required]
+          if attribute.required?
             sample = find_resource(value['id'])
             raise 'Unable to find Sample in database' unless sample
             raise 'Sample type does not match' unless sample.sample_type == linked_sample_type
@@ -27,7 +27,7 @@ module Seek
         end
 
         def linked_sample_type
-          sample_type = additional_options[:linked_sample_type]
+          sample_type = attribute.linked_sample_type
           raise MissingLinkedSampleTypeException unless sample_type
 
           sample_type

@@ -14,6 +14,7 @@ namespace :seek do
     strip_sample_attribute_pids
     rename_registered_sample_multiple_attribute_type
     remove_ontology_attribute_type
+    db:seed:007_sample_attribute_types
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -98,23 +99,27 @@ namespace :seek do
   end
 
   task(decouple_extracted_samples_policies: [:environment]) do
-    puts '... creating independent policies for extracted samples...'
-    decoupled = 0
+    puts '..... creating independent policies for extracted samples (this can take a while if there are many samples) ...'
+    affected_samples = []
     disable_authorization_checks do
-      Sample.find_each do |sample|
+      Sample.includes(:originating_data_file).find_each do |sample|
         # check if the sample was extracted from a datafile and their policies are linked
-        if sample.extracted? && sample.policy == sample.originating_data_file&.policy
-          sample.policy = sample.policy.deep_copy
-          sample.policy.save
-          decoupled += 1
+        if sample.extracted? && sample.policy_id == sample.originating_data_file&.policy_id
+          policy = sample.policy.deep_copy
+          policy.save
+          sample.update_column(:policy_id, policy.id)
+          putc('.')
+          affected_samples << sample
         end
       end
+      #won't have been queued, as the policy has no associated assets yet when saved
+      AuthLookupUpdateQueue.enqueue(affected_samples) if affected_samples.any?
     end
-    puts " ... finished creating independent policies of #{decoupled.to_s} extracted samples"
+    puts "..... finished creating independent policies of #{affected_samples.count} extracted samples"
   end
 
   task(decouple_extracted_samples_projects: [:environment]) do
-    puts '... copying project ids for extracted samples...'
+    puts '..... copying project ids for extracted samples...'
     decoupled = 0
     hash_array = []
     disable_authorization_checks do

@@ -1,8 +1,9 @@
 # noinspection ALL
 module IsaExporter
   class Exporter
-    def initialize(investigation)
+    def initialize(investigation, user)
       @investigation = investigation
+      @current_user = user
       @OBJECT_MAP = {}
     end
 
@@ -35,12 +36,43 @@ module IsaExporter
       isa_investigation[:people] = people
 
       studies = []
-      @investigation.studies.each { |s| studies << convert_study(s) }
+      @investigation.studies.each { |s| studies << convert_study(s) if s.can_view?(@current_user) }
       isa_investigation[:studies] = studies
 
       @OBJECT_MAP = @OBJECT_MAP.merge(isa_investigation)
 
       isa_investigation
+    end
+
+    def convert_study_comments(study)
+      study_comments = []
+      study_id = study.id
+
+      # Study Custom Metadata
+      unless study.extended_metadata.nil?
+        json = JSON.parse(study.extended_metadata.json_metadata)
+        extended_metadata_attributes = study.extended_metadata.extended_metadata_attributes
+        em_id = study.extended_metadata.id
+        json.map do |key, val|
+          ema_id = extended_metadata_attributes.detect { |ema| ema.title == key }&.id
+          study_comments.push({
+            '@id': "#study_comment/#{ [study_id, em_id, ema_id].join('_') }",
+            'name': key,
+            'value': val
+          })
+        end
+      end
+
+      study_comments.append({
+        '@id': "#study_comment/#{ [study_id, UUID.new.generate].join('_') }",
+        'name': 'SEEK Study ID',
+        'value': study_id.to_s
+      })
+      study_comments.append({
+        '@id': "#study_comment/#{ [study_id, UUID.new.generate].join('_') }",
+        'name': 'SEEK creation date',
+        'value': study.created_at.utc.iso8601
+      })
     end
 
     def convert_study(study)
@@ -51,13 +83,13 @@ module IsaExporter
       isa_study[:submissionDate] = '' # study.created_at.to_date.iso8601
       isa_study[:publicReleaseDate] = '' # study.created_at.to_date.iso8601
       isa_study[:filename] = "#{study.title}.txt"
-      isa_study[:comments] = [
-        { name: 'SEEK Study ID', value: study.id.to_s },
-        { name: 'SEEK creation date', value: study.created_at.utc.iso8601 }
-      ]
+      isa_study[:comments] = convert_study_comments(study)
 
       publications = []
       study.publications.each { |p| publications << convert_publication(p) }
+      study.assays.each do |assay|
+        assay.publications.each { |p| publications << convert_publication(p) }
+      end
       isa_study[:publications] = publications
 
       people = []
@@ -91,8 +123,19 @@ module IsaExporter
       isa_study[:protocols] = protocols
 
       isa_study[:processSequence] = convert_process_sequence(study.sample_types.second, study.sops.map(&:id).join("_"), study.id)
+      assay_streams = study.assays.map { |assay| [assay] if assay&.position&.zero? }
+                           .compact
+                           .map do |assay_stream|
+        last_assay = assay_stream.first
+        until last_assay.linked_assay.nil?
+          linked_assay = last_assay.linked_assay
+          assay_stream.push(linked_assay)
+          last_assay = linked_assay
+        end
+        assay_stream
+      end
 
-      isa_study[:assays] = [convert_assays(study.assays)]
+      isa_study[:assays] = assay_streams.map { |assay_stream| convert_assays(assay_stream) }.compact
 
       isa_study[:factors] = []
       isa_study[:unitCategories] = []
@@ -109,22 +152,63 @@ module IsaExporter
       isa_annotation
     end
 
+    def convert_assay_comments(assays)
+      assay_comments = []
+      assay_streams = assays.select { |a| a.position.zero? }
+      assay_stream_id = assays.pluck(:id).join('_')
+
+      linked_assays = assays.map { |assay| { 'id': assay.id, 'title': assay.title } }.to_json
+
+      assay_streams.map do |assay|
+        study_id = assay.study_id
+        next if assay.extended_metadata.nil?
+
+        json = JSON.parse(assay.extended_metadata&.json_metadata)
+        cm_attributes = assay.extended_metadata.extended_metadata_attributes
+        cm_id = assay.extended_metadata&.id
+        json.map do |key, val|
+          cma_id = cm_attributes.detect { |cma| cma.title == key }&.id
+          assay_comments.push({
+            '@id': "#assay_comment/#{[study_id, assay_stream_id, cm_id, cma_id].join('_')}",
+            'name': key,
+            'value': val
+          })
+        end
+      end
+
+      assay_comments.push({
+        '@id': "#assay_comment/#{assay_stream_id}",
+        'name': 'linked_assays',
+        'value': linked_assays
+      })
+      assay_comments.compact
+    end
+
     def convert_assays(assays)
+      return unless assays.all? { |a| a.can_view?(@current_user) }
+
       all_sample_types = assays.map(&:sample_type)
       first_assay = assays.detect { |s| s.position.zero? }
       raise 'No assay could be found!' unless first_assay
 
+      stream_name = "assays_#{assays.pluck(:id).join('_')}"
+      assay_comments = convert_assay_comments(assays)
+
+      # Retrieve assay_stream if
+      stream_name_comment = assay_comments.detect { |ac| ac[:name] == 'assay_stream' }
+      stream_name = stream_name_comment[:value] unless stream_name_comment.nil?
+
       isa_assay = {}
       isa_assay['@id'] = "#assay/#{assays.pluck(:id).join('_')}"
-      isa_assay[:filename] = 'a_assays.txt' # assay&.sample_type&.isa_template&.title
+      isa_assay[:filename] = "a_#{stream_name.downcase.tr(" ", "_")}.txt"
       isa_assay[:measurementType] = { annotationValue: '', termSource: '', termAccession: '' }
       isa_assay[:technologyType] = { annotationValue: '', termSource: '', termAccession: '' }
+      isa_assay[:comments] = assay_comments
       isa_assay[:technologyPlatform] = ''
       isa_assay[:characteristicCategories] = convert_characteristic_categories(nil, assays)
       isa_assay[:materials] = {
         # Here, the first assay's samples will be enough
-        samples:
-          first_assay.samples.map { |s| find_sample_origin([s], 1) }.flatten.uniq.map { |s| { '@id': "#sample/#{s}" } }, # the samples from study level that are referenced in this assay's samples,
+        samples: assay_samples(first_assay), # the samples from study level that are referenced in this assay's samples,
         otherMaterials: convert_other_materials(all_sample_types)
       }
       isa_assay[:processSequence] =
@@ -163,9 +247,22 @@ module IsaExporter
       status[:annotationValue] = ''
       isa_publication[:status] = status
       isa_publication[:title] = publication.title
-      isa_publication[:author_list] = publication.authors.map(&:full_name).join(', ')
+      isa_publication[:author_list] = publication.seek_authors.map(&:full_name).join(', ')
 
-      publication
+      isa_publication[:comments] = [
+        {
+          "@id": "#publication_comment/#{publication.id}_#{publication.assays.map(&:id).join('_')}",
+          "name": "linked_assays",
+          "value": publication.assays.map { |assay| {"id": assay.id, "title": assay.title} }.to_json
+        },
+        {
+          "@id": "#publication_comment/#{publication.id}_#{publication.studies.map(&:id).join('_')}",
+          "name": "linked_studies",
+          "value": publication.studies.map { |study| {"id": study.id, "title": study.title} }.to_json
+        }
+      ]
+
+      isa_publication
     end
 
     def convert_ontologies
@@ -224,13 +321,20 @@ module IsaExporter
       with_tag_source_characteristic =
         sample_type.sample_attributes.select { |sa| sa.isa_tag&.isa_source_characteristic? }
 
-      # attributes = sample_type.sample_attributes.select{ |sa| sa.isa_tag&.isa_source_characteristic? }
       sample_type.samples.map do |s|
-        {
-          '@id': "#source/#{s.id}",
-          name: s.get_attribute_value(with_tag_source),
-          characteristics: convert_characteristics(s, with_tag_source_characteristic)
-        }
+        if s.can_view?(@current_user)
+          {
+            '@id': "#source/#{s.id}",
+            name: s.get_attribute_value(with_tag_source),
+            characteristics: convert_characteristics(s, with_tag_source_characteristic)
+          }
+        else
+          {
+            '@id': "#source/HIDDEN",
+            name: 'Hidden Sample',
+            characteristics: []
+          }
+        end
       end
     end
 
@@ -240,31 +344,53 @@ module IsaExporter
         sample_type.sample_attributes.select { |sa| sa.isa_tag&.isa_sample_characteristic? }
       seek_sample_multi_attribute = sample_type.sample_attributes.detect(&:seek_sample_multi?)
       sample_type.samples.map do |s|
-        {
-          '@id': "#sample/#{s.id}",
-          name: s.get_attribute_value(with_tag_sample),
-          derivesFrom: extract_sample_ids(s.get_attribute_value(seek_sample_multi_attribute), 'source'),
-          characteristics: convert_characteristics(s, with_tag_sample_characteristic),
-          factorValues: [
-            {
-              category: {
-                '@id': ''
-              },
-              value: {
-                annotationValue: '',
-                termSource: '',
-                termAccession: ''
-              },
-              unit: get_unit
-            }
-          ]
-        }
+        if s.can_view?(@current_user)
+          {
+            '@id': "#sample/#{s.id}",
+            name: s.get_attribute_value(with_tag_sample),
+            derivesFrom: extract_sample_ids(s.get_attribute_value(seek_sample_multi_attribute), 'source'),
+            characteristics: convert_characteristics(s, with_tag_sample_characteristic),
+            factorValues: [
+              {
+                category: {
+                  '@id': ''
+                },
+                value: {
+                  annotationValue: '',
+                  termSource: '',
+                  termAccession: ''
+                },
+                unit: get_unit
+              }
+            ]
+          }
+        else
+          {
+            '@id': "#sample/HIDDEN",
+            name: '',
+            derivesFrom: extract_sample_ids(s.get_attribute_value(seek_sample_multi_attribute), 'source'),
+            characteristics: [],
+            factorValues: [
+              {
+                category: {
+                  '@id': ''
+                },
+                value: {
+                  annotationValue: '',
+                  termSource: '',
+                  termAccession: ''
+                },
+                unit: { termSource: '', termAccession: '', comments: [] }
+              }
+            ]
+          }
+        end
       end
     end
 
     def convert_characteristics(sample, attributes)
       attributes.map do |c|
-        value = sample.get_attribute_value(c) || ''
+        value = sample.can_view?(@current_user) ? (sample.get_attribute_value(c) || '') : ''
         ontology = get_ontology_details(c, value, true)
         {
           category: {
@@ -331,7 +457,7 @@ module IsaExporter
           parameterValues: convert_parameter_values(samples_group, isa_parameter_value_attributes),
           performer: '',
           date: '',
-          inputs: input_ids.first.map { |input| { '@id': "##{type}/#{input[:id]}" } },
+          inputs: process_sequence_input(input_ids.first, type),
           outputs: process_sequence_output(samples_group)
         }
         # Study processes don't have a previousProcess and nextProcess
@@ -355,12 +481,21 @@ module IsaExporter
       return [] unless with_tag_data_file
 
       st.samples.map do |s|
-        {
-          '@id': "#data_file/#{s.id}",
-          name: s.get_attribute_value(with_tag_data_file),
-          type: with_tag_data_file.title,
-          comments: with_tag_data_file_comment.map { |d| { name: d.title, value: s.get_attribute_value(d).to_s } }
-        }
+        if s.can_view?(@current_user)
+          {
+            '@id': "#data_file/#{s.id}",
+            name: s.get_attribute_value(with_tag_data_file),
+            type: with_tag_data_file.title,
+            comments: with_tag_data_file_comment.map { |d| { name: d.title, value: s.get_attribute_value(d).to_s } }
+          }
+        else
+          {
+            '@id': "#data_file/HIDDEN",
+            name: 'HIDDEN',
+            type: with_tag_data_file.title,
+            comments: []
+          }
+        end
       end
     end
 
@@ -386,18 +521,33 @@ module IsaExporter
           st
             .samples
             .map do |s|
-              {
-                '@id': "#other_material/#{s.id}",
-                name: s.get_attribute_value(with_tag_isa_other_material),
-                type: with_tag_isa_other_material.title,
-                characteristics: convert_characteristics(s, with_tag_isa_other_material_characteristics),
-                # It can sometimes be other_material or sample!!!! SHOULD BE DYNAMIC
-                derivesFrom: extract_sample_ids(s.get_attribute_value(seek_sample_multi_attribute), type)
-              }
+              if s.can_view?(@current_user)
+                {
+                  '@id': "#other_material/#{s.id}",
+                  name: s.get_attribute_value(with_tag_isa_other_material),
+                  type: with_tag_isa_other_material.title,
+                  characteristics: convert_characteristics(s, with_tag_isa_other_material_characteristics),
+                  # It can sometimes be other_material or sample!!!! SHOULD BE DYNAMIC
+                  derivesFrom: extract_sample_ids(s.get_attribute_value(seek_sample_multi_attribute), type)
+                }
+              else
+                {
+                  '@id': "#other_material/HIDDEN",
+                  name: 'HIDDEN',
+                  type: with_tag_isa_other_material.title,
+                  characteristics: convert_characteristics(s, with_tag_isa_other_material_characteristics),
+                  # It can sometimes be other_material or sample!!!! SHOULD BE DYNAMIC
+                  derivesFrom: extract_sample_ids(s.get_attribute_value(seek_sample_multi_attribute), type)
+                }
+              end
             end
             .flatten
       end
       other_materials
+    end
+
+    def assay_samples(first_assay)
+      first_assay.samples.map { |s| find_sample_origin([s], 1) }.flatten.uniq.map { |s| { '@id': "#sample/#{s}" } }
     end
 
     def export
@@ -454,7 +604,7 @@ module IsaExporter
 
     def previous_process(samples_hash)
       sample = Sample.find(samples_hash.first[:id])
-      # hvfjkbdfk
+
       sample_type = sample.linked_samples.first&.sample_type
       if (sample_type)
         protocol = detect_protocol(sample_type)
@@ -490,11 +640,23 @@ module IsaExporter
       grouped_samples.transform_keys { |key| group_id(key) }
     end
 
+    def process_sequence_input(inputs, type)
+      input_ids = inputs.map { |input| input[:id] }
+      authorized_sample_ids = Sample.where(id: input_ids).authorized_for(:view, @current_user).map(&:id)
+      input_ids.map do |input_id|
+        if authorized_sample_ids.include?(input_id)
+          { '@id': "##{type}/#{input_id}" }
+        else
+          { '@id': "##{type}/HIDDEN" }
+        end
+      end
+    end
+
     def process_sequence_output(samples_hash)
       prefix = 'sample'
       samples_hash.map do |sample_hash|
         sample = Sample.find(sample_hash[:id])
-        if sample.sample_type.isa_template.level == 'assay'
+        if sample.sample_type.isa_template.level.include?('assay')
           if detect_other_material(sample.sample_type)
             prefix = 'other_material'
           elsif detect_data_file(sample.sample_type)
@@ -503,7 +665,11 @@ module IsaExporter
             raise 'Defective ISA process!'
           end
         end
-        { '@id': "##{prefix}/#{sample.id}" }
+        if sample.can_view?(@current_user)
+          { '@id': "##{prefix}/#{sample.id}" }
+        else
+          { '@id': "##{prefix}/HIDDEN" }
+        end
       end
     end
 
@@ -528,8 +694,17 @@ module IsaExporter
       end
     end
 
-    def extract_sample_ids(obj, type)
-      Array.wrap(obj).map { |item| { '@id': "##{type}/#{item[:id]}" } }
+    def extract_sample_ids(input_obj_list, type)
+      sample_ids = input_obj_list.map { |io| io[:id] }
+      authorized_sample_ids = Sample.where(id: sample_ids).authorized_for(:view, @current_user).map(&:id)
+
+      sample_ids.map do |s_id|
+        if authorized_sample_ids.include?(s_id)
+          { '@id': "##{type}/#{s_id}" }
+        else
+          { '@id': "##{type}/HIDDEN" }
+        end
+      end
     end
 
     def get_ontology_details(sample_attribute, label, vocab_term)

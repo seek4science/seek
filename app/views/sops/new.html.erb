@@ -20,6 +20,11 @@
         <%= text_area_tag 'sop[description]', sop_description_value, :class=>"form-control rich-text-edit" -%>
       </div>
 
+      <%= fields_for(@sop) do |sop_fields| %>
+        <%= render partial: 'extended_metadata/extended_metadata_type_selection', locals: { f: sop_fields, resource: @sop } %>
+        <%= render partial: 'extended_metadata/extended_metadata_attribute_input', locals: { f: sop_fields, resource: @sop } %>
+      <% end %>
+
       <%= render :partial => "projects/project_selector", :locals => { :resource => @sop } %>
 
       <%= render :partial => 'assets/license_selector', :locals => { :resource => @sop } %>

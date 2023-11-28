@@ -70,6 +70,46 @@ FactoryBot.define do
     supported_type { 'Assay' }
   end
 
+  factory(:simple_document_extended_metadata_type, parent: :simple_investigation_extended_metadata_type) do
+    title { 'simple document extended metadata type' }
+    supported_type { 'Document' }
+  end
+
+  factory(:simple_model_extended_metadata_type, parent: :simple_investigation_extended_metadata_type) do
+    title { 'simple model extended metadata type' }
+    supported_type { 'Model' }
+    end
+
+  factory(:simple_data_file_extended_metadata_type, parent: :simple_investigation_extended_metadata_type) do
+    title { 'simple data file extended metadata type' }
+    supported_type { 'DataFile' }
+  end
+
+  factory(:simple_collection_extended_metadata_type, parent: :simple_investigation_extended_metadata_type) do
+    title { 'simple collection extended metadata type' }
+    supported_type { 'Collection' }
+  end
+
+  factory(:simple_sop_extended_metadata_type, parent: :simple_investigation_extended_metadata_type) do
+    title { 'simple sop extended metadata type' }
+    supported_type { 'Sop' }
+  end
+
+  factory(:simple_presentation_extended_metadata_type, parent: :simple_investigation_extended_metadata_type) do
+    title { 'simple presentation extended metadata type' }
+    supported_type { 'Presentation' }
+  end
+
+  factory(:simple_project_extended_metadata_type, parent: :simple_investigation_extended_metadata_type) do
+    title { 'simple project extended metadata type' }
+    supported_type { 'Project' }
+  end
+
+  factory(:simple_event_extended_metadata_type, parent: :simple_investigation_extended_metadata_type) do
+    title { 'simple event extended metadata type' }
+    supported_type { 'Event' }
+  end
+
   factory(:study_extended_metadata_type_with_spaces, class: ExtendedMetadataType) do
     title { 'study extended metadata type with spaces' }
     supported_type { 'Study' }

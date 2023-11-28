@@ -1,9 +1,14 @@
 module ExtendedMetadataHelper
   include SamplesHelper
 
-  def extended_metadata_form_field_for_attribute(attribute, resource)
+  def extended_metadata_form_field_for_attribute(attribute, resource, parent_resource=nil)
     element_class = "extended_metadata_attribute_#{attribute.sample_attribute_type.base_type.downcase}"
-    element_name = "#{resource.class.name.underscore}[extended_metadata_attributes][data][#{attribute.title}]"
+
+    if parent_resource
+      element_name = "#{parent_resource}[#{resource.class.name.underscore}][extended_metadata_attributes][data][#{attribute.title}]"
+    else
+      element_name = "#{resource.class.name.underscore}[extended_metadata_attributes][data][#{attribute.title}]"
+    end
 
     if attribute.linked_extended_metadata? || attribute.linked_extended_metadata_multi?
       content_tag(:span, class: 'linked_extended_metdata') do

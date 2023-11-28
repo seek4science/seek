@@ -1,7 +1,7 @@
 module Seek
   module Samples
-    module AttributeTypeHandlers
-      class FloatAttributeTypeHandler < BaseAttributeHandler
+    module AttributeHandlers
+      class FloatAttributeHandler < BaseAttributeHandler
         def test_value(value)
           Float(value)
         end

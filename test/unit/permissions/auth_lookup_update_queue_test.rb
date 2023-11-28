@@ -296,20 +296,20 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
   end
 
   test 'dequeue' do
-    df = FactoryBot.create(:data_file)
+    df1 = FactoryBot.create(:data_file)
     df2 = FactoryBot.create(:data_file)
     df3 = FactoryBot.create(:data_file)
-    user = df.contributor.user
+    user = df1.contributor.user
 
     AuthLookupUpdateQueue.destroy_all
 
-    AuthLookupUpdateQueue.enqueue(df3, priority: 1)
-    AuthLookupUpdateQueue.enqueue(df2, priority: 3)
-    AuthLookupUpdateQueue.enqueue(user, df, priority: 2)
+    AuthLookupUpdateQueue.enqueue(df1, priority: 1)
+    AuthLookupUpdateQueue.enqueue(user, df2, priority: 2)
+    AuthLookupUpdateQueue.enqueue(df3, priority: 3)
 
     assert_difference('AuthLookupUpdateQueue.count', -4) do
       items = AuthLookupUpdateQueue.dequeue(4)
-      assert_equal [df3, df, user, df2], items, "should be ordered by priority, type, then ID"
+      assert_equal [df1, user, df2, df3], items, "should be ordered by priority, then ID"
     end
 
     FactoryBot.create_list(:document, 10)

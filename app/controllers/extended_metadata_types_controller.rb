@@ -6,6 +6,7 @@ class ExtendedMetadataTypesController < ApplicationController
   # generated for form, to display fields for selected metadata type
   def form_fields
     id = params[:id]
+    parent_resource = params[:parentResource] unless params[:parentResource]&.empty?
     respond_to do |format|
       if id.blank?
         format.html { render html: '' }
@@ -15,7 +16,7 @@ class ExtendedMetadataTypesController < ApplicationController
         resource.extended_metadata = ExtendedMetadata.new(extended_metadata_type: cm)
         format.html do
           render partial: 'extended_metadata/extended_metadata_fields',
-                 locals: { extended_metadata_type: cm, resource: resource }
+                 locals: { extended_metadata_type: cm, resource:, parent_resource: }
         end
       end
     end
