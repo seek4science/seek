@@ -43,7 +43,7 @@ that can be used to delete both the container and volume.
 
 The following describes the steps for installing and setting up Solr on Ubuntu 20.04, but the process should be the same for
 all Debian based distributions, and very similar for others. It is based on the guide found at [https://tecadmin.net/install-apache-solr-on-ubuntu-20-04/](https://tecadmin.net/install-apache-solr-on-ubuntu-20-04/) 
-but the follwoing steps have been updated for solr 8.11.1.
+but the follwoing steps have been updated for solr 8.11.2.
 
 First you should make sure Java 11 is installed. OpenJDK is fine
 
@@ -61,9 +61,9 @@ If an different version is shown, use the following command and select the numbe
 The next step is to download and install Solr into _/opt/_, and set it up as a service
 
     cd /opt
-    sudo wget https://downloads.apache.org/lucene/solr/8.11.1/solr-8.11.1.tgz
-    sudo tar xzf solr-8.11.1.tgz solr-8.11.1/bin/install_solr_service.sh --strip-components=2
-    sudo bash ./install_solr_service.sh solr-8.11.1.tgz
+    sudo wget https://downloads.apache.org/lucene/solr/8.11.2/solr-8.11.2.tgz
+    sudo tar xzf solr-8.11.2.tgz solr-8.11.2/bin/install_solr_service.sh --strip-components=2
+    sudo bash ./install_solr_service.sh solr-8.11.2.tgz
 
 The services can be stopped and started the usual way with
 
