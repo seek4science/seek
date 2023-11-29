@@ -24,37 +24,18 @@ module Seek
 
       private
 
-      # This attributes are directly copied from other_person if they are empty in the person to which its merging.
-      # first_letter is also updated
-      def simple_attributes
-        %i[
-          first_name
-          last_name
-          email
-          phone
-          skype_name
-          web_page
-          description
-          avatar_id
-          orcid
-        ]
-      end
-
       def merge_simple_attributes(other_person)
+        # This attributes are directly copied from other_person if they are empty in the person to which its merging.
+        # first_letter is also updated
+        simple_attributes = %i[first_name last_name email phone skype_name web_page description avatar_id orcid]
         simple_attributes.each do |attribute|
           send("#{attribute}=", other_person.send(attribute)) if send(attribute).nil?
         end
         update_first_letter
       end
 
-      def annotation_types
-        %w[
-          expertise
-          tools
-        ]
-      end
-
       def merge_annotations(other_person)
+        annotation_types = %w[expertise tools]
         annotation_types.each do |annotation_type|
           add_annotations(send(annotation_type) + other_person.send(annotation_type), annotation_type.singularize, self)
         end

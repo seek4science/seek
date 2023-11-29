@@ -1413,6 +1413,7 @@ class PersonTest < ActiveSupport::TestCase
     person_to_keep = FactoryBot.create(:min_person)
     other_person = FactoryBot.create(:max_person)
     other_person_attributes = {}
+    simple_attributes = %i[first_name last_name email phone skype_name web_page description avatar_id orcid]
     simple_attributes.each do |attribute|
       other_person_attributes[attribute] = other_person.send(attribute)
     end
@@ -1436,6 +1437,7 @@ class PersonTest < ActiveSupport::TestCase
     person_to_keep.save!
     person_to_keep.reload
     orig_annotations = {}
+    annotation_types = %w[expertise tools]
     annotation_types.each do |annotation_type|
       orig_annotations[annotation_type] = person_to_keep.send(annotation_type)
     end
