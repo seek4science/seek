@@ -1526,21 +1526,25 @@ class PersonTest < ActiveSupport::TestCase
     other_person = FactoryBot.create(:person)
 
     types_without_creators = %w[Event Strain]
+    contributed_items = []
+    created_items = []
     Person::RELATED_RESOURCE_TYPES.each do |resource_type|
       sym = resource_type == 'SampleType' ? :simple_sample_type : resource_type.underscore.to_sym
-      FactoryBot.create(sym, contributor: other_person)
+      co = FactoryBot.create(sym, contributor: other_person)
+      contributed_items << [co.class.to_s, co.id]
+      contributed_items << ['Investigation', co.investigation.id] if %w[Study Assay].include?(resource_type)
+      contributed_items << ['Study', co.study.id] if resource_type == 'Assay'
       unless types_without_creators.include?(resource_type)
-        FactoryBot.create(sym, contributor: FactoryBot.create(:person), creator_ids: [other_person.id])
+        cr = FactoryBot.create(sym, contributor: FactoryBot.create(:person), creator_ids: [other_person.id])
+        created_items << [cr.class.to_s, cr.id]
       end
     end
 
     disable_authorization_checks { person_to_keep.merge(other_person) }
     person_to_keep.reload
 
-    resource_types = Person::RELATED_RESOURCE_TYPES.length
-    added_isa_structure = 3 # An additional inv is created for the study, and inv and study are created for the assay
-    assert_equal resource_types + added_isa_structure, person_to_keep.contributed_items.length
-    assert_equal resource_types - types_without_creators.length, person_to_keep.created_items.length
+    assert_equal created_items.sort, (person_to_keep.created_items.map { |cr| [cr.class.to_s, cr.id] }).sort
+    assert_equal contributed_items.sort, (person_to_keep.contributed_items.map { |co| [co.class.to_s, co.id] }).sort
   end
 
   test 'merge permissions without duplication' do
