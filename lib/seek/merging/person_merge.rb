@@ -84,7 +84,7 @@ module Seek
       end
 
       def merge_user(other_person)
-        return unless user
+        return unless user && other_person.user
 
         merge_user_associations(other_person, 'identities',
                                 %i[provider uid], { user_id: user.id })
