@@ -63,12 +63,12 @@ module Seek
       def merge_resources(other_person)
         # Contributed
         Person::RELATED_RESOURCE_TYPES.each do |resource_type|
-          other_person.send("contributed_#{resource_type.underscore.pluralize}").update_all(contributor_id: id)
+          other_person.send("contributed_#{resource_type.underscore.pluralize}").in_batches.update_all(contributor_id: id)
         end
         # Created
         duplicated = other_person.created_items.pluck(:id) & created_items.pluck(:id)
-        AssetsCreator.where(creator_id: other_person.id, asset_id: duplicated).destroy_all
-        AssetsCreator.where(creator_id: other_person.id).update_all(creator_id: id)
+        AssetsCreator.where(creator_id: other_person.id, asset_id: duplicated).in_batches.destroy_all
+        AssetsCreator.where(creator_id: other_person.id).in_batches.update_all(creator_id: id)
       end
 
       def merge_associations(other_person, assoc, duplicates_match, update_hash)
@@ -78,9 +78,9 @@ module Seek
         duplicated = duplicated.map { |item| [item] } if duplicates_match.length == 1
 
         duplicated_hash = Hash[duplicates_match.zip(duplicated.transpose)]
-        other_person.send(assoc).where(duplicated_hash).destroy_all
+        other_person.send(assoc).where(duplicated_hash).in_batches.destroy_all
 
-        other_person.send(assoc).update_all(update_hash)
+        other_person.send(assoc).in_batches.update_all(update_hash)
       end
 
       def merge_user(other_person)
@@ -103,9 +103,9 @@ module Seek
         duplicated = duplicated.map { |item| [item] } if duplicates_match.length == 1
 
         duplicated_hash = Hash[duplicates_match.zip(duplicated.transpose)]
-        other_person.user.send(assoc).where(duplicated_hash).destroy_all
+        other_person.user.send(assoc).where(duplicated_hash).in_batches.destroy_all
 
-        other_person.user.send(assoc).update_all(update_hash)
+        other_person.user.send(assoc).in_batches.update_all(update_hash)
       end
 
     end
