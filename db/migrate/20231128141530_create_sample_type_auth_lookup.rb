@@ -11,7 +11,7 @@ class CreateSampleTypeAuthLookup < ActiveRecord::Migration[6.1]
     end
     add_index :sample_type_auth_lookup, [:user_id, :asset_id, :can_view], :name => "index_sample_type_user_id_asset_id_can_view"
     add_index :sample_type_auth_lookup, [:user_id, :can_view], :name => "index_sample_type_auth_lookup_on_user_id_and_can_view"
+    add_column :sample_types, :policy_id, :integer
   end
 
-  add_column :sample_types, :policy_id, :integer
 end

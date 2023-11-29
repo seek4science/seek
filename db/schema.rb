@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_11_28_141530) do
+ActiveRecord::Schema.define(version: 2023_11_15_152940) do
 
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
@@ -1761,18 +1761,6 @@ ActiveRecord::Schema.define(version: 2023_11_28_141530) do
     t.index ["sample_id"], name: "index_sample_resource_links_on_sample_id"
   end
 
-  create_table "sample_type_auth_lookup", id: false, force: :cascade do |t|
-    t.integer "user_id"
-    t.integer "asset_id"
-    t.boolean "can_view", default: false
-    t.boolean "can_manage", default: false
-    t.boolean "can_edit", default: false
-    t.boolean "can_download", default: false
-    t.boolean "can_delete", default: false
-    t.index ["user_id", "asset_id", "can_view"], name: "index_sample_type_user_id_asset_id_can_view"
-    t.index ["user_id", "can_view"], name: "index_sample_type_auth_lookup_on_user_id_and_can_view"
-  end
-
   create_table "sample_types", id: :integer, force: :cascade do |t|
     t.string "title"
     t.string "uuid"
@@ -1785,7 +1773,6 @@ ActiveRecord::Schema.define(version: 2023_11_28_141530) do
     t.string "deleted_contributor"
     t.integer "template_id"
     t.text "other_creators"
-    t.integer "policy_id"
   end
 
   create_table "sample_types_studies", force: :cascade do |t|
