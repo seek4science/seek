@@ -2,6 +2,7 @@ class SampleTypesController < ApplicationController
   respond_to :html, :json
   include Seek::UploadHandling::DataUpload
   include Seek::IndexPager
+  include Seek::AssetsCommon
 
   before_action :samples_enabled?
   before_action :find_sample_type, only: [:show, :edit, :update, :destroy, :template_details, :batch_upload]
@@ -9,6 +10,7 @@ class SampleTypesController < ApplicationController
   before_action :find_assets, only: [:index]
   before_action :auth_to_create, only: [:new, :create]
   before_action :project_membership_required, only: [:create, :new, :select, :filter_for_select]
+  before_action :find_and_authorize_requested_item, except: [:index, :new, :create, :preview, :update_annotations_ajax]
 
   before_action :authorize_requested_sample_type, except: [:index, :new, :create]
 

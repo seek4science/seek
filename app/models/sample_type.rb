@@ -1,6 +1,7 @@
 class SampleType < ApplicationRecord
   # attr_accessible :title, :uuid, :sample_attributes_attributes,
   #                 :description, :uploaded_template, :project_ids, :tags
+  acts_as_asset
 
   if Seek::Config.solr_enabled
     searchable(auto_index: false) do
@@ -12,8 +13,6 @@ class SampleType < ApplicationRecord
   include Seek::Search::BackgroundReindexing
   include Seek::Stats::ActivityCounts
   include Seek::Creators
-
-  include Seek::ProjectAssociation
 
   # everything concerned with sample type templates
   include Seek::Templates::SampleTypeTemplateConcerns
@@ -40,6 +39,7 @@ class SampleType < ApplicationRecord
 
   has_many :assays
   has_and_belongs_to_many :studies
+  has_many :investigations, through: :studies
 
   scope :without_template, -> { where(template_id: nil) }
 
