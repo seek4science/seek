@@ -213,7 +213,7 @@ class ProjectsController < ApplicationController
         if Seek::Config.email_enabled
           Mailer.request_create_project_for_programme(current_user, @programme, @project.to_json, @institution.to_json, log).deliver_later
         end
-        flash.now[:notice]="Thank you, your request for a new #{t('project')} has been sent"
+        flash.now[:notice] = "Thank you, your request for a new #{t('project')} has been sent"
       else
         raise 'Invalid Programme'
       end

@@ -3,7 +3,8 @@
 </div>
 <% if !admin_logged_in? && Programme.site_managed_programme.present? %>
   <div class="help-block">
-    You can also choose the <%= "#{Seek::Config.instance_admins_name} managed #{t('programme')}" %>, <%= link_to Programme.site_managed_programme.title, Programme.site_managed_programme %>, and if so you will need to wait for approval.
+    You can also choose the <%= "#{Seek::Config.instance_admins_name} managed #{t('programme')}" %>,
+    <%= link_to Programme.site_managed_programme.title, Programme.site_managed_programme %><%= ', and if so you will need to wait for approval' unless Seek::Config.auto_activate_site_managed_projects -%>.
   </div>
 <% end %>
 
@@ -16,7 +17,7 @@
   end
 %>
 
-<%= select_tag :programme_id,options_from_collection_for_select(programmes,:id, :title), class: 'form-control' %>
+<%= select_tag :programme_id, options_from_collection_for_select(programmes, :id, :title, @programme&.id), class: 'form-control' %>
 
 <% if Seek::ProjectFormProgrammeOptions.creation_allowed? %>
   <div class="help-block">

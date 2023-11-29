@@ -18,9 +18,9 @@
 
   <label class="control-label">Type the name of the <%= t('institution') %> </label><span class="required">*</span>
 
-  <%# I am setting the institution id to a junk value of `_` (if blank) to get around a bug in select2 wherein an <option>
+  <%# I am setting the institution id to a junk value of 0 (if blank) to get around a bug in select2 wherein an <option>
       with a blank `value`, that is selected when the page is loaded, does not get rendered as a "tag". %>
-  <%= objects_input('institution[id]', @institution.title.present? ? [@institution.tap { |i| i.id ||= '_' }] : [],
+  <%= objects_input('institution[id]', @institution.title.present? ? [@institution.tap { |i| i.id ||= 0 }] : [],
                     typeahead: { query_url: typeahead_institutions_path,
                                  handlebars_template:'typeahead/institution' },
                     limit: 1, allow_new: true, class: 'form-control') -%>
@@ -47,8 +47,7 @@
         $j(".institution-user-input").prop('disabled',disabled);
     }
     $j(document).ready(function () {
-
-        toggleUserInput(<%= @institution.id.present? ? 'false' : 'true' -%>);
+        toggleUserInput(<%= (@institution.id.blank? || @institution.id == 0) ? 'false' : 'true' -%>);
 
         $j('select#institution_country').on('change',function() {
             checkSubmitButtonEnabled();
