@@ -39,6 +39,13 @@ module Seek
         annotation_types.each do |annotation_type|
           add_annotations(send(annotation_type) + other_person.send(annotation_type), annotation_type.singularize, self)
         end
+
+        # Update annotations by other_user
+        return unless user && other_person.user
+
+        merge_user_associations(other_person, 'annotations_by',
+                                %i[annotatable_type annotatable_id value_id],
+                                { source_id: user.id })
       end
 
       def merge_resources(other_person)

@@ -1457,6 +1457,25 @@ class PersonTest < ActiveSupport::TestCase
     end
   end
 
+  test 'merge annotations_by' do
+    person_to_keep = FactoryBot.create(:person)
+    other_person = FactoryBot.create(:max_person)
+    sop = FactoryBot.create(:sop, creator_ids: [person_to_keep.id, other_person.id])
+    expected_a_by = []
+    a_by = FactoryBot.create(:tag, value: 'Tag_1', annotatable: sop, source: person_to_keep.user)
+    expected_a_by << [a_by.id, a_by.value_id]
+    a_by = FactoryBot.create(:tag, value: 'Tag_2', annotatable: sop, source: person_to_keep.user)
+    expected_a_by << [a_by.id, a_by.value_id]
+    FactoryBot.create(:tag, value: a_by.value, annotatable: sop, source: other_person.user)
+    a_by = FactoryBot.create(:tag, value: 'Tag_3', annotatable: sop, source: other_person.user)
+    expected_a_by << [a_by.id, a_by.value_id]
+
+    disable_authorization_checks { person_to_keep.merge(other_person) }
+    person_to_keep.reload
+
+    assert_equal expected_a_by.sort, person_to_keep.user.annotations_by.pluck(:id, :value_id)
+  end
+
   test 'merge group_memberships without duplication' do
     person_to_keep = FactoryBot.create(:person_in_multiple_projects)
     FactoryBot.create(:programme, project_ids: [person_to_keep.project_ids.last])
