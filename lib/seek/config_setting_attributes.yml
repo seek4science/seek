@@ -64,7 +64,6 @@ seek_video_link:
 scales:
 delete_asset_version_enabled:
 recaptcha_enabled:
-publish_button_enabled:
 project_browser_enabled:
 project_single_page_enabled:
 isa_json_compliance_enabled:
