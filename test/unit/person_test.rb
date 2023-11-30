@@ -1434,27 +1434,13 @@ class PersonTest < ActiveSupport::TestCase
     person_to_keep = FactoryBot.create(:min_person)
     person_to_keep.annotate_with(%w[golf merging], 'expertise', person_to_keep)
     person_to_keep.annotate_with(%w[merger], 'tool', person_to_keep)
-    person_to_keep.save!
-    person_to_keep.reload
-    orig_annotations = {}
-    annotation_types = %w[expertise tools]
-    annotation_types.each do |annotation_type|
-      orig_annotations[annotation_type] = person_to_keep.send(annotation_type)
-    end
     other_person = FactoryBot.create(:max_person)
-    other_annotations = {}
-    annotation_types.each do |annotation_type|
-      other_annotations[annotation_type] = other_person.send(annotation_type)
-    end
 
     disable_authorization_checks { person_to_keep.merge(other_person) }
     person_to_keep.reload
 
-    annotation_types.each do |annotation_type|
-      assert_equal (orig_annotations[annotation_type] + other_annotations[annotation_type]).compact.uniq.sort,
-                   person_to_keep.send(annotation_type).sort,
-                   "Should copy #{annotation_type} if not present in person to keep"
-    end
+    assert_equal %w[fishing golf merging].sort, person_to_keep.expertise.sort
+    assert_equal ['fishing rod', 'merger'].sort, person_to_keep.tools.sort
   end
 
   test 'merge annotations_by' do
