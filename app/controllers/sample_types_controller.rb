@@ -5,14 +5,14 @@ class SampleTypesController < ApplicationController
   include Seek::AssetsCommon
 
   before_action :samples_enabled?
-  before_action :find_sample_type, only: [:show, :edit, :update, :destroy, :template_details, :batch_upload]
+  before_action :find_sample_type, only: %i[show edit update destroy template_details batch_upload]
   before_action :check_no_created_samples, only: [:destroy]
   before_action :find_assets, only: [:index]
-  before_action :auth_to_create, only: [:new, :create]
-  before_action :project_membership_required, only: [:create, :new, :select, :filter_for_select]
-  before_action :find_and_authorize_requested_item, except: [:index, :new, :create, :preview, :update_annotations_ajax]
+  before_action :auth_to_create, only: %i[new create]
+  before_action :project_membership_required, only: %i[create new select filter_for_select]
+  before_action :find_and_authorize_requested_item, except: %i[index new create preview update_annotations_ajax]
 
-  before_action :authorize_requested_sample_type, except: [:index, :new, :create]
+  before_action :authorize_requested_sample_type, except: %i[index new create]
 
   api_actions :index
 
@@ -21,7 +21,7 @@ class SampleTypesController < ApplicationController
   def show
     respond_to do |format|
       format.html
-      format.json {render json: @sample_type, include: [params[:include]]}
+      format.json { render json: @sample_type, include: [params[:include]] }
     end
   end
 
@@ -75,10 +75,10 @@ class SampleTypesController < ApplicationController
     respond_to do |format|
       if @sample_type.save
         format.html { redirect_to @sample_type, notice: 'Sample type was successfully created.' }
-        format.json { render json: @sample_type, status: :created, location: @sample_type, include: [params[:include]]}
+        format.json { render json: @sample_type, status: :created, location: @sample_type, include: [params[:include]] }
       else
         format.html { render action: 'new' }
-        format.json { render json: @sample_type.errors, status: :unprocessable_entity}
+        format.json { render json: @sample_type.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -92,10 +92,10 @@ class SampleTypesController < ApplicationController
     respond_to do |format|
       if @sample_type.save
         format.html { redirect_to @sample_type, notice: 'Sample type was successfully updated.' }
-        format.json {render json: @sample_type, include: [params[:include]]}
+        format.json { render json: @sample_type, include: [params[:include]] }
       else
         format.html { render action: 'edit', status: :unprocessable_entity }
-        format.json { render json: @sample_type.errors, status: :unprocessable_entity}
+        format.json { render json: @sample_type.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -104,13 +104,18 @@ class SampleTypesController < ApplicationController
   # DELETE /sample_types/1.json
   def destroy
     respond_to do |format|
-    if @sample_type.can_delete? && @sample_type.destroy
-      format.html { redirect_to @sample_type,location: sample_types_path, notice: 'Sample type was successfully deleted.' }
-      format.json {render json: @sample_type, include: [params[:include]]}
-    else
-      format.html { redirect_to @sample_type, location: sample_types_path, notice: 'It was not possible to delete the sample type.' }
-      format.json { render json: @sample_type.errors, status: :unprocessable_entity}
-    end
+      if @sample_type.can_delete? && @sample_type.destroy
+        format.html do
+          redirect_to @sample_type, location: sample_types_path, notice: 'Sample type was successfully deleted.'
+        end
+        format.json { render json: @sample_type, include: [params[:include]] }
+      else
+        format.html do
+          redirect_to @sample_type, location: sample_types_path,
+                                    notice: 'It was not possible to delete the sample type.'
+        end
+        format.json { render json: @sample_type.errors, status: :unprocessable_entity }
+      end
     end
   end
 
@@ -139,22 +144,21 @@ class SampleTypesController < ApplicationController
     render partial: 'sample_types/select/filtered_sample_types'
   end
 
-  def batch_upload
-
-  end
+  def batch_upload; end
 
   private
 
   def sample_type_params
     attributes = params[:sample_type][:sample_attributes]
-    if (attributes)
+    if attributes
       params[:sample_type][:sample_attributes_attributes] = []
       attributes.each do |attribute|
         if attribute[:sample_attribute_type]
           if attribute[:sample_attribute_type][:id]
             attribute[:sample_attribute_type_id] = attribute[:sample_attribute_type][:id].to_i
           elsif attribute[:sample_attribute_type][:title]
-            attribute[:sample_attribute_type_id] = SampleAttributeType.where(title: attribute[:sample_attribute_type][:title]).first.id
+            attribute[:sample_attribute_type_id] =
+              SampleAttributeType.where(title: attribute[:sample_attribute_type][:title]).first.id
           end
         end
         attribute[:unit_id] = Unit.where(symbol: attribute[:unit_symbol]).first.id unless attribute[:unit_symbol].nil?
@@ -162,19 +166,18 @@ class SampleTypesController < ApplicationController
       end
     end
 
-    if (params[:sample_type][:assay_assets_attributes])
+    if params[:sample_type][:assay_assets_attributes]
       params[:sample_type][:assay_ids] = params[:sample_type][:assay_assets_attributes].map { |x| x[:assay_id] }
     end
 
-    params.require(:sample_type).permit(:title, :description, {tags: []}, :template_id, *creator_related_params,
+    params.require(:sample_type).permit(:title, :description, { tags: [] }, :template_id, *creator_related_params,
                                         { project_ids: [],
-                                          sample_attributes_attributes: [:id, :title, :pos, :required, :is_title,
-                                                                         :description, :pid, :sample_attribute_type_id,
-                                                                         :sample_controlled_vocab_id, :isa_tag_id,
-                                                                         :allow_cv_free_text, :linked_sample_type_id,
-                                                                         :unit_id, :_destroy] }, :assay_ids => [])
+                                          sample_attributes_attributes: %i[id title pos required is_title
+                                                                           description pid sample_attribute_type_id
+                                                                           sample_controlled_vocab_id isa_tag_id
+                                                                           allow_cv_free_text linked_sample_type_id
+                                                                           unit_id _destroy] }, assay_ids: [])
   end
-
 
   def build_sample_type_from_template
     @sample_type = SampleType.new(sample_type_params)
@@ -185,24 +188,22 @@ class SampleTypesController < ApplicationController
     @sample_type.build_attributes_from_template
   end
 
-  private
-
   def find_sample_type
     scope = Seek::Config.isa_json_compliance_enabled ? SampleType.without_template : SampleType
     @sample_type = scope.find(params[:id])
   end
 
-  #intercepts the standard 'find_and_authorize_requested_item' for additional special check for a referring_sample_id
+  # intercepts the standard 'find_and_authorize_requested_item' for additional special check for a referring_sample_id
   def authorize_requested_sample_type
     privilege = Seek::Permissions::Translator.translate(action_name)
     return if privilege.nil?
 
     if privilege == :view && params[:referring_sample_id].present?
-      @sample_type.can_view?(User.current_user,Sample.find_by_id(params[:referring_sample_id])) || find_and_authorize_requested_item
+      @sample_type.can_view?(User.current_user,
+                             Sample.find_by_id(params[:referring_sample_id])) || find_and_authorize_requested_item
     else
       find_and_authorize_requested_item
     end
-
   end
 
   def check_no_created_samples
