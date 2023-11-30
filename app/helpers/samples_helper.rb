@@ -6,7 +6,7 @@ module SamplesHelper
     attribute_form_element(attribute, resource.get_attribute_value(attribute.title), element_name, element_class)
   end
 
-  def controlled_vocab_form_field(sample_controlled_vocab, element_name, values, allow_new = false, limit = 1)
+  def controlled_vocab_form_field(sample_controlled_vocab, element_name, values, allow_new, limit = 1)
 
     scv_id = sample_controlled_vocab.id
     object_struct = Struct.new(:id, :title)
