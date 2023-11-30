@@ -1560,33 +1560,29 @@ class PersonTest < ActiveSupport::TestCase
     sop_keep.policy.permissions.build(contributor: person_to_keep, access_type: Policy::MANAGING)
     sop_keep.policy.save
     sop_both = FactoryBot.create :sop
-    sop_both.policy.permissions.build(contributor: person_to_keep, access_type: Policy::MANAGING)
-    sop_both.policy.permissions.build(contributor: other_person, access_type: Policy::MANAGING)
+    sop_both.policy.permissions.build(contributor: person_to_keep, access_type: Policy::EDITING)
+    sop_both.policy.permissions.build(contributor: other_person, access_type: Policy::EDITING)
     sop_both.policy.save
     sop_other = FactoryBot.create :sop
-    sop_other.policy.permissions.build(contributor: other_person, access_type: Policy::MANAGING)
+    sop_other.policy.permissions.build(contributor: other_person, access_type: Policy::VISIBLE)
     sop_other.policy.save
 
-    assert sop_keep.can_manage?(person_to_keep)
-    assert sop_both.can_manage?(person_to_keep)
-    refute sop_other.can_manage?(person_to_keep)
-    refute sop_keep.can_manage?(other_person)
-    assert sop_both.can_manage?(other_person)
-    assert sop_other.can_manage?(other_person)
+    assert_equal [[person_to_keep.id, Policy::MANAGING]],
+                 sop_keep.policy.permissions.pluck(:contributor_id, :access_type)
+    assert_equal [[other_person.id, Policy::EDITING], [person_to_keep.id, Policy::EDITING]].sort,
+                 sop_both.policy.permissions.pluck(:contributor_id, :access_type)
+    assert_equal [[other_person.id, Policy::VISIBLE]],
+                 sop_other.policy.permissions.pluck(:contributor_id, :access_type)
 
     disable_authorization_checks { person_to_keep.merge(other_person) }
     person_to_keep.reload
-    sop_keep.reload
-    sop_both.reload
-    sop_other.reload
-    sop_keep.permission_for = nil
-    sop_both.permission_for = nil
-    sop_other.permission_for = nil
 
-    assert sop_keep.can_manage?(person_to_keep)
-    assert sop_both.can_manage?(person_to_keep)
-    assert sop_other.can_manage?(person_to_keep)
-    assert 1, sop_both.policy.permissions.length
+    assert_equal [[person_to_keep.id, Policy::MANAGING]],
+                 sop_keep.policy.permissions.pluck(:contributor_id, :access_type)
+    assert_equal [[person_to_keep.id, Policy::EDITING]],
+                 sop_both.policy.permissions.pluck(:contributor_id, :access_type)
+    assert_equal [[person_to_keep.id, Policy::VISIBLE]],
+                 sop_other.policy.permissions.pluck(:contributor_id, :access_type)
     assert 3, Permission.where(contributor_type: 'Person', contributor_id: person_to_keep.id).length
   end
 
