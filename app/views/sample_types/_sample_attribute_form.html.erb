@@ -19,7 +19,6 @@
 <% allow_required = constraints.allow_required?(sample_attribute) %>
 <% allow_attribute_removal = constraints.allow_attribute_removal?(sample_attribute)  %>
 <% allow_type_change = constraints.allow_type_change?(sample_attribute) %>
-<% allow_name_change = constraints.allow_name_change?(sample_attribute) %>
 <% seek_sample_multi = sample_attribute&.seek_sample_multi? %>
 <% link_to_self = sample_attribute && sample_attribute.deferred_link_to_self %>
 <% hide_seek_sample_multi = seek_sample_multi && displaying_single_page? && sample_attribute&.isa_tag.blank? && sample_attribute&.title.downcase.include?('input') %>
@@ -39,7 +38,7 @@
   <td>
 
     <%= text_field_tag "#{field_name_prefix}[title]", title, class: 'form-control',
-                       placeholder: 'Attribute name', disabled: !allow_name_change, data: { attr: "title" } %>
+                       placeholder: 'Attribute name', data: { attr: "title" } %>
   </td>
 
   <td class="text-center">
