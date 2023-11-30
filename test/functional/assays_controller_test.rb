@@ -1964,16 +1964,16 @@ class AssaysControllerTest < ActionController::TestCase
     assay_st3 = FactoryBot.create(:isa_assay_material_sample_type, contributor: person, projects: [project],
                                                           linked_sample_type: assay_st2, isa_template: assay_template_1)
 
-    study = FactoryBot.create(:study, investigation:, contributor: person,
+    study = FactoryBot.create(:study, investigation: investigation, contributor: person,
                                       policy: FactoryBot.create(:private_policy, permissions: [FactoryBot.create(:permission, contributor: person, access_type: Policy::MANAGING)]),
                                       sops: [FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy))],
                                       sample_types: [source_st, sample_collection_st])
 
-    assay1 = FactoryBot.create(:assay, study:, contributor: person, sample_type: assay_st1,
+    assay1 = FactoryBot.create(:assay, study: study, contributor: person, sample_type: assay_st1,
                                        policy: FactoryBot.create(:private_policy, permissions: [FactoryBot.create(:permission, contributor: person, access_type: Policy::MANAGING)]))
-    assay2 = FactoryBot.create(:assay, study:, contributor: person, sample_type: assay_st2,
+    assay2 = FactoryBot.create(:assay, study: study, contributor: person, sample_type: assay_st2,
                                        policy: FactoryBot.create(:private_policy, permissions: [FactoryBot.create(:permission, contributor: person, access_type: Policy::MANAGING)]))
-    assay3 = FactoryBot.create(:assay, study:, contributor: person, sample_type: assay_st3,
+    assay3 = FactoryBot.create(:assay, study: study, contributor: person, sample_type: assay_st3,
                                        policy: FactoryBot.create(:private_policy, permissions: [FactoryBot.create(:permission, contributor: person, access_type: Policy::MANAGING)]))
 
     login_as(person)
