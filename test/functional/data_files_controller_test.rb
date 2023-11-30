@@ -3644,8 +3644,8 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_response :success
 
-    assert_select 'input+select#data_file_data_type_annotations'
-    assert_select 'input+select#data_file_data_format_annotations'
+    assert_select 'input+select#data_file_data_type_annotations[data-tags-limit=10]'
+    assert_select 'input+select#data_file_data_format_annotations[data-tags-limit=10]'
   end
 
   test 'create assay should be checked with new assay containing title' do
