@@ -96,12 +96,11 @@ class PlaceholdersController < ApplicationController
 
   def placeholder_params
     params.require(:placeholder).permit(:title, :description, { project_ids: [] }, :license, :other_creators,
-                                { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
-                                { creator_ids: [] }, { assay_assets_attributes: [:assay_id] },
-                                :file_template_id,
-                                :data_format_annotations, :data_type_annotations,
-                                :data_file_id,
-                                discussion_links_attributes:[:id, :url, :label, :_destroy])
+                                        { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
+                                        { creator_ids: [] }, { assay_assets_attributes: [:assay_id] },
+                                        { data_format_annotations: [] }, { data_type_annotations: [] },
+                                        :file_template_id, :data_file_id, # Check if these are needed
+                                        discussion_links_attributes: [:id, :url, :label, :_destroy])
   end
 
   alias_method :asset_params, :placeholder_params
