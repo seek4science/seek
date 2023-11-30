@@ -1,4 +1,4 @@
-<%= render :partial => "subscriptions/subscribe", :locals => { :object => item } %>
+<%= render partial: "subscriptions/subscribe", locals: { object: item } %>
 
 <% if Seek::Config.project_single_page_enabled %>
 	<% if !displaying_single_page? %>
@@ -43,8 +43,7 @@
     <% else %>
       <li><%= image_tag_for_key('manage', manage_study_path(item), "Manage #{t('study')}", nil, "Manage #{t('study')}") -%></li>
     <% end %>
-
-    <%= render :partial => 'snapshots/new_snapshot_link', :locals => { :item => item } %>
+    <%= render partial: 'snapshots/new_snapshot_link', locals: { item: item } %>
   <% end -%>
 
   <%= order_icon(item, current_user, order_assays_study_path(item), item.assays, 'assay') -%>
