@@ -1761,7 +1761,7 @@ ActiveRecord::Schema.define(version: 2023_11_28_141530) do
     t.index ["sample_id"], name: "index_sample_resource_links_on_sample_id"
   end
 
-  create_table "sample_type_auth_lookup", id: false, force: :cascade do |t|
+  create_table "sample_type_auth_lookup", force: :cascade do |t|
     t.integer "user_id"
     t.integer "asset_id"
     t.boolean "can_view", default: false
