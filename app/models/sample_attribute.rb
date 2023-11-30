@@ -87,8 +87,6 @@ class SampleAttribute < ApplicationRecord
     c = sample_type.editing_constraints
     error_message = "cannot be changed (#{title_was})" # Use pre-change title in error message.
 
-    errors.add(:title, error_message) if title_changed? && !c.allow_name_change?(self)
-
     unless c.allow_required?(self)
       errors.add(:is_title, error_message) if is_title_changed?
     end
