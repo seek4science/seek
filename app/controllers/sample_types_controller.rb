@@ -64,6 +64,10 @@ class SampleTypesController < ApplicationController
     @sample_type = SampleType.new(sample_type_params)
     @sample_type.contributor = User.current_user.person
 
+    update_sharing_policies(@sample_type)
+    # update_annotations(params[:tag_list], @data_file)
+    update_relationships(@sample_type, params)
+
     # removes controlled vocabularies or linked seek samples where the type may differ
     @sample_type.resolve_inconsistencies
     @tab = 'manual'
