@@ -18,6 +18,7 @@ class IsaAssaysController < ApplicationController
   end
 
   def create
+    update_sharing_policies @isa_assay.sample_type
     if @isa_assay.save
       redirect_to single_page_path(id: @isa_assay.assay.projects.first, item_type: 'assay',
                                    item_id: @isa_assay.assay, notice: 'The ISA assay was created successfully!')

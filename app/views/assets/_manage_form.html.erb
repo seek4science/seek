@@ -1,6 +1,7 @@
 <h1>Manage <%= text_for_resource(resource) %> : <%= link_to(h(resource.title), resource) -%></h1>
 
 <%
+  resource_class = resource.class.name
   show_projects = true if show_projects.nil?
   sharing_link = true if sharing_link.nil?
 %>
@@ -13,6 +14,15 @@
   <% end %>
   <%= render partial: 'assets/manage_specific_attributes', locals: {f: f, sharing_link: sharing_link} %>
 
-  <%= form_submit_buttons(resource, validate:false) %>
+    <% if params[:is_isa_assay] %>
+    <div class="alert alert-info">
+      <h4>ISA Compliant structure</h4>
+      <p>
+        This <%= "#{t(resource_class)}".downcase.html_safe%> is part of an ISA compliant structure. The permissions of all sample types linked to it will be equally updated.
+      </p>
+    </div>
+    <% end %>
+
+  <%= form_submit_buttons(resource, validate:false, locals: { update_sample_types: true }) %>
 
 <% end -%>
