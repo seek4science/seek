@@ -445,4 +445,12 @@ class OrganismsControllerTest < ActionController::TestCase
       assert_select 'a[href=?]', organism_path(o2), text: o2.title, count: 0
     end
   end
+
+  test 'do not get index if feature disabled' do
+    with_config_value(:organisms_enabled, false) do
+      get :index
+      assert_redirected_to root_path
+      assert flash[:error].include?('disabled')
+    end
+  end
 end

@@ -1986,4 +1986,12 @@ class AssaysControllerTest < ActionController::TestCase
 
     assert_equal(assay3.previous_linked_assay_sample_type&.id, assay1.sample_type&.id)
   end
+
+  test 'do not get index if feature disabled' do
+    with_config_value(:isa_enabled, false) do
+      get :index
+      assert_redirected_to root_path
+      assert flash[:error].include?('disabled')
+    end
+  end
 end

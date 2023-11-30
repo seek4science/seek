@@ -9,7 +9,7 @@ class FileTemplatesController < ApplicationController
 
   include Seek::AssetsCommon
 
-#  before_action :file_templates_enabled?
+  before_action :file_templates_enabled?
   before_action :find_assets, :only => [ :index ]
   before_action :find_and_authorize_requested_item, :except => [ :index, :new, :create,:preview, :update_annotations_ajax]
   before_action :find_display_asset, :only=>[:show, :download]

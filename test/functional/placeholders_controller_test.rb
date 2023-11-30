@@ -803,4 +803,12 @@ class PlaceholdersControllerTest < ActionController::TestCase
     get :index, params: { filter: { programme: programme.id, project: project.id }, order: 'created_at_desc' }
     assert_equal [project_doc, old_project_doc], assigns(:placeholders).to_a
   end
+
+  test 'do not get index if feature disabled' do
+    with_config_value(:placeholders_enabled, false) do
+      get :index
+      assert_redirected_to root_path
+      assert flash[:error].include?('disabled')
+    end
+  end
 end

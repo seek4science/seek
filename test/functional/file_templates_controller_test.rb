@@ -910,6 +910,14 @@ class FileTemplatesControllerTest < ActionController::TestCase
     assert_equal 'http://www.wibble.com/', file_template.discussion_links.first.url
   end
 
+  test 'do not get index if feature disabled' do
+    with_config_value(:file_templates_enabled, false) do
+      get :index
+      assert_redirected_to root_path
+      assert flash[:error].include?('disabled')
+    end
+  end
+
   def valid_content_blob
     { data: fixture_file_upload('a_pdf_file.pdf'), data_url: '' }
   end
