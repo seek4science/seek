@@ -65,26 +65,11 @@ class IsaAssaysController < ApplicationController
     end
   end
 
-  def update_sample_json_metadata
-    samples = @isa_assay.assay.sample_type.samples
-    sample_attributes = @isa_assay.assay.sample_type.sample_attributes.map(&:title)
-
-    samples.each do |sample|
-      metadata = JSON.parse(sample.json_metadata)
-      missing_attributes = sample_attributes - metadata.keys
-      missing_attributes.map do |attr|
-        metadata[attr] = nil
-      end
-      # lsdnsdn
-      # TODO: What should happen to samples that this user is not permitted to see?
-      # For now permission is not necessary and all samples will be updated
-      disable_authorization_checks do
-        Sample.find(sample.id).update(json_metadata: metadata.to_json)
-      end
-    end
-  end
-
   private
+
+  def update_sample_json_metadata
+    UpdateSampleMetadataJob.new(@isa_assay.assay.sample_type).queue_job
+  end
 
   def fix_assay_linkage_for_new_assays
     return unless @isa_assay.assay.is_isa_json_compliant?
