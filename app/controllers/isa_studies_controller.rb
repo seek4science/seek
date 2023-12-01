@@ -4,6 +4,7 @@ class IsaStudiesController < ApplicationController
 
   before_action :set_up_instance_variable
   before_action :find_requested_item, only: %i[edit update]
+  after_action :update_sample_json_metadata, only: :update
 
   def new
     @isa_study = IsaStudy.new
@@ -75,6 +76,12 @@ class IsaStudiesController < ApplicationController
   end
 
   private
+
+  def update_sample_json_metadata
+    @isa_study.study.sample_types.map do |st|
+      UpdateSampleMetadataJob.new(st).queue_job
+    end
+  end
 
   def isa_study_params
     # TODO: get the params from a shared module
