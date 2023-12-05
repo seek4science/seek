@@ -81,6 +81,8 @@
         SampleTypes.bindSortable("#<%=attribute_table_id%>");
         SampleTypes.recalculatePositions("#<%=attribute_table_id%>");
 
+        sampleTypeLevel = "<%= sample_type.isa_template.level %>"
+
         $j("#<%=add_attribute_id%>").click(function () {
             var newRow = $j("#<%=new_attribute_id%> tbody").clone().html();
             var index = 0;
@@ -137,10 +139,19 @@
         $j('#attribute-table_sample_collection_sample_type').find('tr.sample-attribute [data-attr="isa_tag_title"]').attr('disabled', true);
 
         // Filter ISA tags for new rows
+         if (sampleTypeLevel === "study source"){
         updateIsaTagSelect("study source", "#new-attribute-row_source_sample_type");
+         } else if (sampleTypeLevel === "study sample"){
         updateIsaTagSelect("study sample", "#new-attribute-row_sample_collection_sample_type");
-        updateIsaTagSelect("assay - material", "#new-attribute-row_sample_type");
-        updateIsaTagSelect("assay - data file", "#new-attribute-row_sample_type");
+         } else if (sampleTypeLevel === "assay - material"){
+          updateIsaTagSelect("assay - material", "#new-attribute-row_sample_type");
+         } else if (sampleTypeLevel === "assay - material"){
+          updateIsaTagSelect("assay - data file", "#new-attribute-row_sample_type");
+         } else if (sampleTypeLevel === "assay") {
+          updateIsaTagSelect("assay", "#new-attribute-row_sample_type");
+         } else {
+          updateIsaTagSelect("other", "#new-attribute-row_sample_type");
+         }
     });
     $j(document).on('submit', function(){
       // Remove the table from the form
