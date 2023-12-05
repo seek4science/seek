@@ -16,17 +16,21 @@ module Seek
       end
 
       # an attribute can be changed to required, if no samples have that field blank
+      # Only required attributes can be made optional, not the other way around
       # attr can be the attribute accessor name, or the attribute itself
       # if attr is nil, indicates a new attribute. required is not allowed if there are already samples
       def allow_required?(attr_)
         if attr_.is_a?(SampleAttribute)
           return true if attr_.new_record?
-          return false unless attr_.required?
 
           attr = attr_.accessor_name
         end
-        if attr
-          !blanks?(attr)
+        if attr # If exists
+          if !attr_.required? # If attribute is optional
+            !blanks?(attr) # Optional attributes can be made required if no blanks
+          else
+            true # Required attributes can always be made optional
+          end
         else
           !samples?
         end
@@ -46,13 +50,7 @@ module Seek
         end
       end
 
-      # whether a new attribtue can be created
-      def allow_new_attribute?
-        !samples?
-      end
-
-      # whether the name of the attribute can be changed
-      def allow_name_change?(attr)
+      def allow_change_isa_tag?(attr)
         if attr.is_a?(SampleAttribute)
           return true if attr.new_record?
           attr = attr.accessor_name
