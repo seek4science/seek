@@ -12,6 +12,8 @@ class IsaStudiesController < ApplicationController
 
   def create
     @isa_study = IsaStudy.new(isa_study_params)
+    @isa_study.source.policy = @isa_study.study.policy
+    @isa_study.sample_collection.policy = @isa_study.study.policy
     update_sharing_policies @isa_study.study
     update_sharing_policies @isa_study.source
     update_sharing_policies @isa_study.sample_collection
