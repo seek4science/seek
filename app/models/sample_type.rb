@@ -224,7 +224,7 @@ class SampleType < ApplicationRecord
         errors.add(:sample_attributes, "cannot be removed, there are existing samples using this attribute (#{a.title})")
       end
 
-      if a.new_record? && a.required?
+      if a.new_record? && a.required? && !new_record?
         errors.add(:sample_attributes, "cannot be added, new attributes must be optional (#{a.title})")
       end
     end
