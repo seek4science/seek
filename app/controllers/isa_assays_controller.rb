@@ -19,6 +19,8 @@ class IsaAssaysController < ApplicationController
 
   def create
     @isa_assay.sample_type.policy = @isa_assay.assay.policy
+    @isa_assay.sample_type.title = @isa_assay.assay.title
+
     update_sharing_policies @isa_assay.sample_type
     update_sharing_policies @isa_assay.assay
     @isa_assay.assay.contributor = current_person
