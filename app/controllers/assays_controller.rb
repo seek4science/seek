@@ -159,9 +159,8 @@ class AssaysController < ApplicationController
   end
 
   def manage_update
-    unless @assay.sample_type.nil?
-      update_sharing_policies(@assay.sample_type)
-    end
+    update_sharing_policies(@assay.sample_type) unless @assay.sample_type.nil?
+
     super
   end
 
