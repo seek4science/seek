@@ -2244,6 +2244,101 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'request create project with new programme and institution with auto activation' do
+    with_config_value(:auto_activate_programmes, true) do
+      FactoryBot.create(:admin)
+      person = FactoryBot.create(:person_not_in_project)
+      managed_programme = FactoryBot.create(:programme)
+      assert Person.admins.count > 1
+      login_as(person)
+      with_config_value(:managed_programme_id, managed_programme.id) do
+        params = {
+          project: { title: 'The Project', description: 'description', web_page: 'https://example.com' },
+          institution: { id: ['the inst'], title: 'the inst', web_page: 'https://example.com/inst', city: 'London', country: 'GB' },
+          programme_id: '',
+          programme: { title: 'the prog' }
+        }
+        project = nil
+        assert_enqueued_emails(1) do
+          assert_difference('Programme.count', 1) do
+            assert_difference('Project.count', 1) do
+              assert_difference('Institution.count', 1) do
+                assert_no_difference('ProjectCreationMessageLog.count') do
+                  post :request_create, params: params
+
+                  project = Project.last
+                  assert_redirected_to project_path(project)
+                end
+              end
+            end
+          end
+        end
+
+        programme = Programme.last
+        institution = Institution.last
+
+        assert flash[:notice]
+        gm = person.reload.group_memberships.last
+        assert_equal 'description', gm.project.description
+        assert_equal 'The Project', gm.project.title
+        assert_equal project, gm.project
+
+        assert_equal programme, gm.project.programme
+        assert programme.is_activated?
+        assert_equal 'the prog', programme.title
+
+        assert_equal institution, gm.institution
+        assert_equal 'the inst', institution.title
+        assert_equal 'https://example.com/inst', institution.web_page
+        assert_equal 'London', institution.city
+        assert_equal 'GB', institution.country
+      end
+    end
+  end
+
+  test 'request create project with new programme and institution with auto activation and errors' do
+    with_config_value(:auto_activate_programmes, true) do
+      FactoryBot.create(:admin)
+      person = FactoryBot.create(:person_not_in_project)
+      existing_programme = FactoryBot.create(:programme, title: 'A Cool Programme')
+      managed_programme = FactoryBot.create(:programme)
+      assert Person.admins.count > 1
+      login_as(person)
+      with_config_value(:managed_programme_id, managed_programme.id) do
+        params = {
+          project: { title: '', description: 'description', web_page: 'https://example.com' },
+          institution: { id: ['the inst'], title: 'the inst', web_page: 'https://example.com/inst', city: 'London', country: 'XY' },
+          programme_id: '',
+          programme: { title: 'A Cool Programme' }
+        }
+        project = nil
+        assert_no_enqueued_emails do
+          assert_no_difference('Programme.count') do
+            assert_no_difference('Project.count') do
+              assert_no_difference('Institution.count') do
+                assert_no_difference('ProjectCreationMessageLog.count') do
+                  post :request_create, params: params
+
+                  assert_response :unprocessable_entity
+                end
+              end
+            end
+          end
+        end
+
+        assert flash[:error].include?("The Project is invalid, Title can't be blank")
+        assert flash[:error].include?("The Programme is invalid, Title has already been taken")
+        assert flash[:error].include?("The Institution is invalid, Country isn't a valid country or code")
+        assert_equal 'the inst', assigns(:institution).title
+        assert_equal 'https://example.com/inst', assigns(:institution).web_page
+        assert_equal 'description', assigns(:project).description
+        assert_equal '', assigns(:project).title
+        assert_equal 'https://example.com', assigns(:project).web_page
+        assert_equal 'A Cool Programme', assigns(:programme).title
+      end
+    end
+  end
+
   test 'request create project without programmes' do
     person = FactoryBot.create(:person_not_in_project)
 

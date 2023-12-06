@@ -64,6 +64,8 @@
              }
              checkSubmitButtonEnabled();
          });
+
+        $j('input#managed_programme').change(); // Trigger initial state on page load
        <% end %>
 
        <% if Seek::ProjectFormProgrammeOptions.creation_allowed? && Seek::ProjectFormProgrammeOptions.programme_dropdown? %>
@@ -83,6 +85,7 @@
             }
             checkSubmitButtonEnabled();
         });
+        $j('input#new_programme').change(); // Trigger initial state on page load
        <% end %>
 
        $j('input#programme_title').on('input',function() {

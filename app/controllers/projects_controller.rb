@@ -221,11 +221,28 @@ class ProjectsController < ApplicationController
     elsif Seek::ProjectFormProgrammeOptions.creation_allowed?
       prog_params = params.require(:programme).permit([:title])
       @programme = Programme.new(prog_params)
-      log = ProjectCreationMessageLog.log_request(sender:current_person, programme:@programme, project:@project, institution:@institution)
-      if  Seek::Config.email_enabled && !User.admin_logged_in?
-        Mailer.request_create_project_and_programme(current_user, @programme.to_json, @project.to_json, @institution.to_json, log).deliver_later
+      if Seek::Config.auto_activate_programmes
+        @project.programme = @programme
+        errors = confirm_project_create_request(current_person, skip_permissions: true)
+        if errors.present?
+          flash.now[:error] = errors
+          render action: :guided_create, status: :unprocessable_entity
+        else
+          @programme.activate
+          flash[:notice] = "Thank you, your #{t('programme')} and #{t('project')} have been created"
+          if Seek::Config.email_enabled
+            Mailer.notify_admins_project_creation_accepted(nil, current_person, @project).deliver_later
+          end
+          redirect_to(@project)
+        end
+        return
+      else
+        log = ProjectCreationMessageLog.log_request(sender:current_person, programme:@programme, project:@project, institution:@institution)
+        if  Seek::Config.email_enabled && !User.admin_logged_in?
+          Mailer.request_create_project_and_programme(current_user, @programme.to_json, @project.to_json, @institution.to_json, log).deliver_later
+        end
+        flash.now[:notice] = "Thank you, your request for a new #{t('programme')} and #{t('project')} has been sent"
       end
-      flash.now[:notice] = "Thank you, your request for a new #{t('programme')} and #{t('project')} has been sent"
     # No Programme at all
     elsif !Seek::ProjectFormProgrammeOptions.show_programme_box?
       @programme=nil

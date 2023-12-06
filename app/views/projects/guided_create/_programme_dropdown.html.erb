@@ -24,7 +24,7 @@
     Alternatively you can choose to create a new <%= t('programme') %>, which your new <%= t('project') %> will be associated with.
   </div>
   <label>
-    <%= check_box_tag :new_programme, '1', false %>
+    <%= check_box_tag :new_programme, '1', @programme && !@programme.site_managed? %>
     <%= "Create a new #{t('programme')}?" %>
   </label>
 <% end %>
