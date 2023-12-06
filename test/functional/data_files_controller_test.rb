@@ -4145,4 +4145,12 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal 'Dataset', resource.xpath('./xmlns:resourceType').first.text
     assert_equal 'Dataset', resource.xpath('./xmlns:resourceType/@resourceTypeGeneral').first.text
   end
+
+  test 'do not get index if feature disabled' do
+    with_config_value(:data_files_enabled, false) do
+      get :index
+      assert_redirected_to root_path
+      assert flash[:error].include?('disabled')
+    end
+  end
 end

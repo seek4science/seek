@@ -1402,6 +1402,13 @@ class ModelsControllerTest < ActionController::TestCase
     assert_empty model.discussion_links
   end
 
+  test 'do not get index if feature disabled' do
+    with_config_value(:models_enabled, false) do
+      get :index
+      assert_redirected_to root_path
+      assert flash[:error].include?('disabled')
+    end
+  end
 
   private
 
