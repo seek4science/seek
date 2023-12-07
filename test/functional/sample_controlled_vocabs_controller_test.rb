@@ -316,6 +316,19 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'fetch ols terms as html' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    VCR.use_cassette('ols/fetch_obo_plant_cell_papilla') do
+      get :fetch_ols_terms_html, params: { source_ontology_id: 'go',
+                                      root_uri: 'http://purl.obolibrary.org/obo/GO_0090395',
+                                      include_root_term: '1' }
+
+      assert_response :success
+      pp response.body
+    end
+  end
+
   test 'can access typeahead with samples disabled' do
     person = FactoryBot.create(:person)
     login_as(person)

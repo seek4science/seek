@@ -86,6 +86,9 @@ CVTerms = {
             $j(':input:not(.destroy-attribute)', row).prop('disabled', false);
         }
     },
+    handleOntologyTermsHTMLResponse: function (html) {
+        $j('#add-term-button-row').before(html);
+    },
     // processes the JSON response when fetching terms, and populates the term list
     handleOntologyTermsJSONResponse: function (json) {
         let index=0
@@ -151,8 +154,8 @@ CVTerms = {
         $j('input#fetch-ontology-terms-submit').prop('disabled', true);
 
         $j.ajax({
-            url: '<%= fetch_ols_terms_sample_controlled_vocabs_path %>',
-            dataType: "json",
+            url: '<%= fetch_ols_terms_html_sample_controlled_vocabs_path %>',
+            dataType: "html",
             data: {
                 source_ontology_id: $j('select#sample_controlled_vocab_source_ontology').val(),
                 root_uri: $j('#sample_controlled_vocab_ols_root_term_uri').val(),
@@ -160,7 +163,7 @@ CVTerms = {
             },
             success: function (resp) {
                 CVTerms.clearAllTerms();
-                CVTerms.handleOntologyTermsJSONResponse((resp));
+                CVTerms.handleOntologyTermsHTMLResponse(resp);
             },
             error: function (resp) {
                 CVTerms.reportFetchError(resp.responseJSON);
