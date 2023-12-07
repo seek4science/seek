@@ -110,6 +110,31 @@ class SampleControlledVocabsController < ApplicationController
     end
   end
 
+  def fetch_ols_terms_html
+    error_msg = nil
+    begin
+      source_ontology = params[:source_ontology_id]
+      root_uri = params[:root_uri]
+
+      raise 'No root URI provided' if root_uri.blank?
+
+      client = Ebi::OlsClient.new
+      @terms = client.all_descendants(source_ontology, root_uri)
+      @terms.reject! { |t| t[:iri] == root_uri } unless params[:include_root_term] == '1'
+      error_msg = "There are no descendant terms to populate the list." unless @terms.present?
+    # rescue StandardError => e
+    #   error_msg = e.message
+    end
+
+    respond_to do |format|
+      if error_msg
+        format.html { render json: { errors: [{ details: error_msg }] }, status: :unprocessable_entity }
+      else
+        format.html { render layout: false }
+      end
+    end
+  end
+
   def typeahead
     query = params[:q] || ''
     scv = SampleControlledVocab.find(params[:scv_id])
