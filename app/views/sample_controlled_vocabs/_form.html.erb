@@ -31,7 +31,8 @@
 
     <div class="form-group">
       <label>Ontology</label>
-      <%= f.select :source_ontology, Ebi::OlsClient.ontology_choices, { include_blank: 'No Ontology' }, class: 'form-control' -%>
+      <%#= f.select :source_ontology, Ebi::OlsClient.ontology_choices, { include_blank: 'No Ontology' }, class: 'form-control' -%>
+      <%= select_cv_source_ontology(@sample_controlled_vocab) %>
       <br/>
 
       <div id='ontology-root-uri' style="display:none;">
