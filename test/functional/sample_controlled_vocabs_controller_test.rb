@@ -240,10 +240,12 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
     get :edit, params:{id: cv.id}
     assert_response :success
 
+    record_body
+
     assert_select 'table#new-terms' do
-      assert_select 'tr.sample-cv-term input[type=text]', count:cv.sample_controlled_vocab_terms.length * 3 do |input|
-        assert input.attr('readonly').present?
-      end
+      # 3 hidden fields for each field, and an extra one for the remove button default
+      assert_select 'tr.sample-cv-term input[type=hidden]', count:cv.sample_controlled_vocab_terms.length * 4
+      assert_select 'div.disabled-cv-field', count: cv.sample_controlled_vocab_terms.length * 3
     end
 
   end
