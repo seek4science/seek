@@ -99,9 +99,9 @@ CVTerms = {
             newTerm = newTerm.replace(/--index--/g, index);
             $j('#add-term-button-row').before($j(newTerm));
 
-            var row = $j('table#new-terms tr.sample-cv-term').last();
+            let row = $j('table#new-terms tr.sample-cv-term').last();
 
-            var inputs = $j(row).find('td input');
+            let inputs = $j(row).find('td input');
             $j(inputs).prop('readonly',true);
 
             //inputs 0,1,2 are label, iri, and parent_iri
@@ -112,19 +112,17 @@ CVTerms = {
 
             index++;
         });
-        console.log('added '+index+' ontology terms');
     },
     // adds a new blank row to the terms list
     addNewTermRow: function () {
-        var newTerm = $j('#new-term-row tbody').clone().html();
+        let newTerm = $j('#new-term-row tbody').clone().html();
 
-        var index = 0;
-        $j('#new-terms tr.sample-cv-term').each(function () {
-            var newIndex = parseInt($j(this).data('index'));
-            if (newIndex > index) {
-                index = newIndex;
-            }
-        });
+        let index = 0;
+
+        //can't be reordered, so the last should always be the highest index
+        if ($j('#new-terms tr.sample-cv-term').length) {
+            index = parseInt($j('#new-terms tr.sample-cv-term').last().data('index'));
+        }
         index++;
 
         newTerm = newTerm.replace(/--index--/g, index);
