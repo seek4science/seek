@@ -152,6 +152,22 @@ module SamplesHelper
     end
   end
 
+  def select_cv_source_ontology(sample_controlled_vocab)
+    ontology_choices = Ebi::OlsClient.ontology_choices
+    local_options = ontology_choices.collect do |choice|
+      { id: choice[1], text: choice[0]}
+    end
+    existing = []
+    if sample_controlled_vocab.source_ontology
+      label = ontology_choices.select{|choice| choice[1] == sample_controlled_vocab.source_ontology}.first.try(:[],0)
+      existing = [OpenStruct.new({id: sample_controlled_vocab.source_ontology, title: label })]
+    end
+    placeholder = 'Select or Search, or leave blank for No Ontology'
+    objects_input 'sample_controlled_vocab[source_ontology]', existing, {typeahead: {values:local_options},
+                                                                         placeholder: placeholder,
+                                                                         multiple: false}
+  end
+
   def seek_cv_attribute_display(value, attribute)
     term = attribute.sample_controlled_vocab.sample_controlled_vocab_terms.where(label:value).last
     content = value
