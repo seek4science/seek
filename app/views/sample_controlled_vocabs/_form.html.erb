@@ -76,12 +76,10 @@
           </thead>
           <tbody>
           <% @sample_controlled_vocab.sample_controlled_vocab_terms.each_with_index do |term, index| %>
-            <%= f.fields_for :sample_controlled_vocab_terms, term do |terms_f| %>
-              <% if term.ontology_based? %>
-                <%= render partial:'sample_controlled_vocabs/term_form_row_disabled', locals:{f:terms_f, index: index, term: term} %>
-              <% else %>
-                <%= render partial:'sample_controlled_vocabs/term_form_row', locals:{f:terms_f, index: index, term: term} %>
-              <% end %>
+            <% if term.ontology_based? %>
+              <%= render partial:'sample_controlled_vocabs/term_form_row_disabled', locals:{index: index, term: term} %>
+            <% else %>
+              <%= render partial:'sample_controlled_vocabs/term_form_row', locals:{index: index, term: term} %>
             <% end %>
           <% end %>
           <tr id='add-term-button-row'>
