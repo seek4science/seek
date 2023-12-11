@@ -686,6 +686,14 @@ span.disabled {
   max-height: 20em;
 }
 
+/* job queue table */
+.job-queue-table {
+  display:block;
+  overflow-y: auto;
+  max-height: 40em;
+  margin-bottom: 1em;
+}
+
 .citation-box {
   overflow-x: auto;
 }
