@@ -336,10 +336,22 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
       get :fetch_ols_terms_html, params: { source_ontology_id: 'go',
                                            root_uri: 'http://purl.obolibrary.org/obo/GO_0090395',
                                            include_root_term: '1' }
-
-      assert_response :success
-      pp response.body
     end
+
+    assert_response :success
+    assert_select 'tr.sample-cv-term', count: 4
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_0_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090395'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_0_parent_iri:not([value])'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_0_label[value=?]','plant cell papilla'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_1_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090397'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_1_parent_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090395'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_1_label[value=?]','stigma papilla'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_2_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090396'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_2_parent_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090395'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_2_label[value=?]','leaf papilla'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_3_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090705'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_3_parent_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090395'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_3_label[value=?]','trichome papilla'
   end
 
   test 'fetch ols terms as HTML without root term included' do
@@ -348,10 +360,18 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
     VCR.use_cassette('ols/fetch_obo_plant_cell_papilla') do
       get :fetch_ols_terms_html, params: { source_ontology_id: 'go',
                                       root_uri: 'http://purl.obolibrary.org/obo/GO_0090395' }
-
-      assert_response :success
-      pp response.body
     end
+    assert_response :success
+    assert_select 'tr.sample-cv-term', count: 3
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_0_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090397'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_0_parent_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090395'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_0_label[value=?]','stigma papilla'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_1_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090396'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_1_parent_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090395'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_1_label[value=?]','leaf papilla'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_2_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090705'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_2_parent_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090395'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_2_label[value=?]','trichome papilla'
   end
 
   test 'can access typeahead with samples disabled' do
