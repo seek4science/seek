@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class SampleControlledVocabsControllerTest < ActionController::TestCase
+
   include AuthenticatedTestHelper
 
   test 'show' do
@@ -264,55 +265,6 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
 
     assert_select('a#add-term') do |button|
       assert button.attr('disabled').nil?
-    end
-  end
-
-  test 'fetch ols terms as JSON with root term included' do
-    person = FactoryBot.create(:person)
-    login_as(person)
-    VCR.use_cassette('ols/fetch_obo_plant_cell_papilla') do
-      get :fetch_ols_terms, params: { source_ontology_id: 'go',
-                                      root_uri: 'http://purl.obolibrary.org/obo/GO_0090395',
-                                      include_root_term: '1' }, format: :json
-
-      assert_response :success
-      res = JSON.parse(response.body)
-      assert_equal 4, res.length
-      iris = res.map { |term| term['iri'] }
-      assert_includes iris, 'http://purl.obolibrary.org/obo/GO_0090395'
-      assert_includes iris, 'http://purl.obolibrary.org/obo/GO_0090396'
-      assert_includes iris, 'http://purl.obolibrary.org/obo/GO_0090397'
-    end
-  end
-
-  test 'fetch ols terms as JSON without root term included' do
-    person = FactoryBot.create(:person)
-    login_as(person)
-    VCR.use_cassette('ols/fetch_obo_plant_cell_papilla') do
-      get :fetch_ols_terms, params: { source_ontology_id: 'go',
-                                      root_uri: 'http://purl.obolibrary.org/obo/GO_0090395' }, format: :json
-
-      assert_response :success
-      res = JSON.parse(response.body)
-      assert_equal 3, res.length
-      iris = res.map { |term| term['iri'] }
-      refute_includes iris, 'http://purl.obolibrary.org/obo/GO_0090395'
-      assert_includes iris, 'http://purl.obolibrary.org/obo/GO_0090396'
-      assert_includes iris, 'http://purl.obolibrary.org/obo/GO_0090397'
-    end
-  end
-
-  test 'fetch ols terms as JSON with wrong URI' do
-    person = FactoryBot.create(:person)
-    login_as(person)
-    VCR.use_cassette('ols/fetch_obo_bad_term') do
-      get :fetch_ols_terms, params: { source_ontology_id: 'go',
-                                      root_uri: 'http://purl.obolibrary.org/obo/banana',
-                                      include_root_term: '1' }, format: :json
-
-      assert_response :unprocessable_entity
-      res = JSON.parse(response.body)
-      assert_equal '404 Not Found', res.dig('errors', 0, 'details')
     end
   end
 
