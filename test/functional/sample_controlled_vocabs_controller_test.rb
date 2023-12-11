@@ -267,7 +267,7 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'fetch ols terms with root term included' do
+  test 'fetch ols terms as JSON with root term included' do
     person = FactoryBot.create(:person)
     login_as(person)
     VCR.use_cassette('ols/fetch_obo_plant_cell_papilla') do
@@ -285,7 +285,7 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'fetch ols terms without root term included' do
+  test 'fetch ols terms as JSON without root term included' do
     person = FactoryBot.create(:person)
     login_as(person)
     VCR.use_cassette('ols/fetch_obo_plant_cell_papilla') do
@@ -302,7 +302,7 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'fetch ols terms with wrong URI' do
+  test 'fetch ols terms as JSON with wrong URI' do
     person = FactoryBot.create(:person)
     login_as(person)
     VCR.use_cassette('ols/fetch_obo_bad_term') do
@@ -316,13 +316,38 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'fetch ols terms as html' do
+  test 'fetch ols terms as HTML with wrong URI' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    VCR.use_cassette('ols/fetch_obo_bad_term') do
+      get :fetch_ols_terms_html, params: { source_ontology_id: 'go',
+                                      root_uri: 'http://purl.obolibrary.org/obo/banana',
+                                      include_root_term: '1' }
+
+      assert_response :unprocessable_entity
+      assert_equal '404 Not Found', response.body
+    end
+  end
+
+  test 'fetch ols terms as HTML with root term included' do
     person = FactoryBot.create(:person)
     login_as(person)
     VCR.use_cassette('ols/fetch_obo_plant_cell_papilla') do
       get :fetch_ols_terms_html, params: { source_ontology_id: 'go',
-                                      root_uri: 'http://purl.obolibrary.org/obo/GO_0090395',
-                                      include_root_term: '1' }
+                                           root_uri: 'http://purl.obolibrary.org/obo/GO_0090395',
+                                           include_root_term: '1' }
+
+      assert_response :success
+      pp response.body
+    end
+  end
+
+  test 'fetch ols terms as HTML without root term included' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    VCR.use_cassette('ols/fetch_obo_plant_cell_papilla') do
+      get :fetch_ols_terms_html, params: { source_ontology_id: 'go',
+                                      root_uri: 'http://purl.obolibrary.org/obo/GO_0090395' }
 
       assert_response :success
       pp response.body
