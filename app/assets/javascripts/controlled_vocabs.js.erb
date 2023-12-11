@@ -129,8 +129,9 @@ CVTerms = {
         $j('#add-term-button-row').before($j(newTerm));
     },
     // reports the error when the ajax method to fetch the terms is unsuccessful
-    reportFetchError: function (json) {
-        var error_message = json.errors[0].details;
+    reportFetchError: function (error_message) {
+//        let json = JSON.parse(response);
+//        const error_message = json.errors[0].details;
         $j('div#fetch-error-message').text("An error occurred fetching the terms: " + error_message);
         $j('div#fetch-error-message').show();
     },
@@ -164,7 +165,7 @@ CVTerms = {
                 CVTerms.handleOntologyTermsHTMLResponse(resp);
             },
             error: function (resp) {
-                CVTerms.reportFetchError(resp.responseJSON);
+                CVTerms.reportFetchError(resp.responseText);
             },
             complete: function () {
                 $j('#fetch-terms-spinner').spinner('remove');
