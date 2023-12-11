@@ -23,6 +23,12 @@
                     <span class="badge", title='ID: <%= sub_sample['id'] %>'><%= sub_sample['title'] %></span>
                   <% end %>
                 </td>
+              <% elsif @cv_list_fields.include?(key) %>
+                <td>
+                  <% val.each do |cv_term| %>
+                    <span class="label label-default", title='<%= cv_term %>'><%= cv_term %></span>
+                  <% end %>
+                </td>
               <% else %>
                 <td id='<%= "#{dupl_sample['duplicate']['id']}[#{key}]" %>' ><%= val %></td>
               <% end %>
@@ -35,6 +41,12 @@
                     <td>
                       <% val.each do |sub_sample| %>
                         <span class="badge", title='ID: <%= sub_sample['id'] %>'><%= sub_sample['title'] %></span>
+                      <% end %>
+                    </td>
+                  <% elsif @cv_list_fields.include?(key) %>
+                    <td>
+                      <% val.each do |cv_term| %>
+                        <span class="label label-default", title='<%= cv_term %>'><%= cv_term %></span>
                       <% end %>
                     </td>
                   <% else %>

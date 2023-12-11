@@ -3644,8 +3644,8 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_response :success
 
-    assert_select 'input+select#data_file_data_type_annotations'
-    assert_select 'input+select#data_file_data_format_annotations'
+    assert_select 'input+select#data_file_data_type_annotations[data-tags-limit=10]'
+    assert_select 'input+select#data_file_data_format_annotations[data-tags-limit=10]'
   end
 
   test 'create assay should be checked with new assay containing title' do
@@ -4144,5 +4144,13 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal Seek::Config.instance_name, resource.xpath('./xmlns:publisher').first.text
     assert_equal 'Dataset', resource.xpath('./xmlns:resourceType').first.text
     assert_equal 'Dataset', resource.xpath('./xmlns:resourceType/@resourceTypeGeneral').first.text
+  end
+
+  test 'do not get index if feature disabled' do
+    with_config_value(:data_files_enabled, false) do
+      get :index
+      assert_redirected_to root_path
+      assert flash[:error].include?('disabled')
+    end
   end
 end

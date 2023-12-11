@@ -1,6 +1,6 @@
 module Seek
   module Samples
-    module AttributeTypeHandlers
+    module AttributeHandlers
       class AttributeHandlerException < RuntimeError; end
 
       class BaseAttributeHandler

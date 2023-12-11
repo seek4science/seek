@@ -22,10 +22,11 @@ const defaultCols = [{
 
 const objectInputTemp = '<input type="hidden" name="_NAME_[]" id="inpt-_NAME_" value="" autocomplete="off" />' +
   '<select name="_NAME_[]" id="select-_NAME_" class="form-control _EXTRACLASS_" title="_TITLE_" data-role="seek-objectsinput" ' +
-  'data-tags-limit="100" multiple="multiple" style="background-color: coral;" data-typeahead-template="typeahead/single_pages_samples"' +
-  'data-typeahead-query-url="_URL_">_OPTIONS_</select>';
+  'data-tags-limit="100" multiple="multiple" style="background-color: coral;" data-typeahead-template="_TYPEHEAD_"' +
+  'data-typeahead-query-url="_URL_" data-allow-new-items=_ALLOW_FREE_TEXT_>_OPTIONS_</select>';
 
-const typeaheadUrl = "<%= typeahead_samples_path(linked_sample_type_id: '_LINKED_') %>";
+const typeaheadSamplesUrl = "<%= typeahead_samples_path(linked_sample_type_id: '_LINKED_') %>";
+const typeaheadCVUrl = "<%= typeahead_sample_controlled_vocabs_path(scv_id: '_CVID_') %>";
 
 const handleSelect = (e) => {
   $j(e).parents("table").DataTable().row(e.closest("tr")).data()[0] = e.is(":checked")
@@ -46,49 +47,38 @@ const handleSelect = (e) => {
   $j.dynamicTable.prototype = {
     init: function(rows, columns, options = {}) {
       columns.forEach((c) => {
-        c["render"] = function(data, type, full, meta) {
-          if (c.multi_link) {
-            data = data && Array.isArray(data) ? data : [data];
+        let linkedSamplesUrl;
+        let cvUrl;
+        if (c.linked_sample_type) {
+          linkedSamplesUrl = typeaheadSamplesUrl.replace("_LINKED_", c.linked_sample_type);
+          const linkedSamples = retrieveLinkedSamples(linkedSamplesUrl);
+          c.linkedSampleIds = linkedSamples.map((ls) => ls.id);
+        }
+
+        if(c.is_cv_list && 'cv_id' in c){
+          cvUrl = typeaheadCVUrl.replace("_CVID_", c.cv_id);
+        }
+
+        c["render"] = function(data_, type, full, meta) {
+          if(c.multi_link){
+            data = data_ && Array.isArray(data_) ? data_ : [data_];
             data = data[0]?.id ? data : [];
-            const existingOptions = data.map((e) => {
-              isHiddenInput = (e.title == '#HIDDEN')
-              if (isHiddenInput) {
-                return `<option selected="selected" title="ID: hidden" value="hidden">hidden</option>`
+            return inputObjectsInput(c, data, options, linkedSamplesUrl);
+          }else if(c.is_cv_list && data_ !== "#HIDDEN"){
+            data = data_ && Array.isArray(data_) ? data_ : [data_];
+            data = data.map((e) => {
+              if (e?.id){
+                return e.id
               } else {
-                return `<option selected="selected" title="ID: ${e.id}" value="${e.id}">${e.title}</option>`
+                return e
               }
-            }).join("");
-            if (options.readonly) {
-              return data.map((e) => `<span title="ID: ${e.id}" class="badge">${e.title}</span>`).join(" ");
-            } else {
-              const url = typeaheadUrl.replace("_LINKED_", c.linked_sample_type);
-              const objectInputName = data.map((e) => e.id).join('-') + '-' + crypto.randomUUID();
-              setTimeout(ObjectsInput.init);
+            });
 
-              const linkedSamples = retrieveLinkedSamples(url);
-              const linkedSampleIds = linkedSamples.map((ls) => ls.id);
-              const unLinkedSamples = data.reduce(function(filtered, sample) {
-                if(!linkedSampleIds.includes(parseInt(sample.id)) && sample.title != '#HIDDEN'){
-                  filtered.push(sample);
-                }
-                return filtered;
-              }, []);
-              const hasUnlinkedSamples = unLinkedSamples.length > 0 ? true : false;
-
-              const extraClass = hasUnlinkedSamples ? 'select2__error' : '';
-              const titleText = hasUnlinkedSamples ? `Sample(s) '${unLinkedSamples.map(uls => uls.title).join(', ')}' not recognised as input. Please correct this issue!` : '';
-
-              return objectInputTemp
-              .replace(/_NAME_/g, objectInputName)
-              .replace('_URL_', url)
-              .replace('_OPTIONS_', existingOptions)
-              .replace('_EXTRACLASS_', extraClass)
-              .replace('_TITLE_', titleText);
-            }
-          } else if (data === "#HIDDEN") {
+            return cvListObjectsInput(c, data, options, cvUrl);
+          }else if (data_ === "#HIDDEN") {
             return "<em><small>Hidden</small></em>";
           } else {
-            return data;
+            return data_;
           }
         };
         c["createdCell"] = function(td, cellData, rowData, row, col) {
@@ -542,7 +532,6 @@ function retrieveLinkedSamples(url){
     contentType: "application/json",
     success: function (data) {
       linkedSamples = data.results;
-      // console.log("data", data.results);
     },
     error: function (xhr, status) {
       linkedSamples = []
@@ -551,6 +540,68 @@ function retrieveLinkedSamples(url){
     }
   });
   return linkedSamples;
+}
+
+function inputObjectsInput(column, data, options, url){
+  const existingOptions = data.map((e) => {
+    isHiddenInput = (e.title == '#HIDDEN');
+    if (isHiddenInput) {
+      return `<option selected="selected" title="ID: hidden" value="hidden">hidden</option>`
+    } else {
+      return `<option selected="selected" title="ID: ${e.id}" value="${e.id}">${e.title}</option>`
+    }
+  }).join("");
+  if (options.readonly) {
+    return data.map((e) => `<span title="ID: ${e.id}" class="badge">${e.title}</span>`).join(" ");
+  } else {
+    const typeaheadTemplate = 'typeahead/single_pages_samples'
+    const objectInputName = data.map((e) => e.id).join('-') + '-' + crypto.randomUUID();
+
+
+    const unLinkedSamples = data.reduce(function(filtered, sample) {
+      if(!column.linkedSampleIds.includes(parseInt(sample.id)) && sample.title != '#HIDDEN'){
+        filtered.push(sample);
+      }
+      return filtered;
+    }, []);
+    const hasUnlinkedSamples = unLinkedSamples.length > 0 ? true : false;
+
+    const extraClass = hasUnlinkedSamples ? 'select2__error' : '';
+    const titleText = hasUnlinkedSamples ? `Sample(s) '${unLinkedSamples.map(uls => uls.title).join(', ')}' not recognised as input. Please correct this issue!` : '';
+    setTimeout(ObjectsInput.init);
+
+    return objectInputTemp
+    .replace(/_NAME_/g, objectInputName)
+    .replace('_TYPEHEAD_', typeaheadTemplate)
+    .replace('_URL_', url)
+    .replace('_OPTIONS_', existingOptions)
+    .replace('_EXTRACLASS_', extraClass)
+    .replace('_TITLE_', titleText)
+    .replace('_ALLOW_FREE_TEXT_', false);
+  }
+}
+
+function cvListObjectsInput(column, data, options, url){
+  const existingOptions = data.map((e) => `<option selected="selected" value="${e}">${e}</option>`);
+  if (options.readonly) {
+    return data.map((e) => `<span title="ID: ${e}" class="badge">${e}</span>`).join(" ");
+  } else {
+    const typeaheadTemplate = 'typeahead/controlled_vocab_term';
+    const objectInputName = data.map((e) => e.title).join('-') + '-' + crypto.randomUUID();
+    const extraClass = '';
+    const titleText = '';
+    const allowNewItems = column.cv_allows_free_text;
+    setTimeout(ObjectsInput.init);
+
+    return objectInputTemp
+    .replace(/_NAME_/g, objectInputName)
+    .replace('_TYPEHEAD_', typeaheadTemplate)
+    .replace('_URL_', url)
+    .replace('_OPTIONS_', existingOptions)
+    .replace('_EXTRACLASS_', extraClass)
+    .replace('_TITLE_', titleText)
+    .replace('_ALLOW_FREE_TEXT_', allowNewItems);
+  }
 }
 
 const handleFailure = (table, res) => {

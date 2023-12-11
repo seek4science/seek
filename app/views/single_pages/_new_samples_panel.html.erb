@@ -24,6 +24,12 @@
                       <span class="badge", title='ID: <%= sub_sample['id'] %>'><%= sub_sample['title'] %></span>
                     <% end %>
                   </td>
+                <% elsif @cv_list_fields.include?(key) %>
+                  <td id='<%= "new-sample-#{new_sample_id}[#{key}]" %>' >
+                    <% val.each do |cv_term| %>
+                      <span class="label label-default", title='<%= cv_term %>'><%= cv_term %></span>
+                    <% end %>
+                  </td>
                 <% else %>
                   <td id='<%= "new-sample-#{new_sample_id}[#{key}]" %>' ><%= val %></td>
                 <% end %>

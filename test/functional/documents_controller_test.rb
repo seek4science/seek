@@ -1450,7 +1450,14 @@ class DocumentsControllerTest < ActionController::TestCase
 
       assert_select 'a#add-programme-permission-button', text: /Share with a Programme/, count: 0
     end
+  end
 
+  test 'do not get index if feature disabled' do
+    with_config_value(:documents_enabled, false) do
+      get :index
+      assert_redirected_to root_path
+      assert flash[:error].include?('disabled')
+    end
   end
 
   private

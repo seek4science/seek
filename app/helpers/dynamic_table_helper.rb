@@ -66,8 +66,11 @@ module DynamicTableHelper
       attribute = { title: a.title, name: sample_type.id.to_s, required: a.required, description: a.description,
                     is_title: a.is_title }
       attribute.merge!({ cv_id: a.sample_controlled_vocab_id }) unless a.sample_controlled_vocab_id.blank?
-      condition = a.sample_attribute_type.base_type == Seek::Samples::BaseType::SEEK_SAMPLE_MULTI
-      attribute.merge!({ multi_link: true, linked_sample_type: a.linked_sample_type.id }) if condition
+      is_seek_multi_sample = a.sample_attribute_type.base_type == Seek::Samples::BaseType::SEEK_SAMPLE_MULTI
+      is_cv_list = a.sample_attribute_type.base_type == Seek::Samples::BaseType::CV_LIST
+      cv_allows_free_text =  a.allow_cv_free_text
+      attribute.merge!({ multi_link: true, linked_sample_type: a.linked_sample_type.id }) if is_seek_multi_sample
+      attribute.merge!({is_cv_list: , cv_allows_free_text:}) if is_cv_list
       attribute
     end
     (dt_default_cols(sample_type.id.to_s) + attribs).flatten

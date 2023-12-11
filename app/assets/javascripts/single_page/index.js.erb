@@ -270,14 +270,17 @@ async function exportToExcel(tableName, studyId, assayId, sampleTypeId) {
       sample_type_id: JSON.stringify(sampleTypeId),
       study_id: JSON.stringify(studyId),
       assay_id: JSON.stringify(assayId),
-    },
-    success: function(response) {
-      downloadUrl = `<%= download_samples_excel_single_pages_path() %>?uuid=${response.uuid}`;
-      window.location.href = downloadUrl;
-    },
-    error: function(response) {
-        alert(`Failed to export through excel!\nStatus: ${response.status}\nError: ${JSON.stringify(response.error().statusText)}`);
     }
+  })
+  .done( function(response){
+    downloadUrl = `<%= download_samples_excel_single_pages_path() %>?uuid=${response.uuid}`;
+    window.location.href = downloadUrl;
+  })
+  .fail( function(response){
+    alert(`Failed to export through excel!\nStatus: ${response.status}\nError: ${JSON.stringify(response.error().statusText)}`);
+  })
+  .always( function(response){
+    setTimeout(() => {location.reload()}, 2000);
   });
 }
 

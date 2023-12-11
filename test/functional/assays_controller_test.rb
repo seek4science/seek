@@ -1964,16 +1964,16 @@ class AssaysControllerTest < ActionController::TestCase
     assay_st3 = FactoryBot.create(:isa_assay_material_sample_type, contributor: person, projects: [project],
                                                           linked_sample_type: assay_st2, isa_template: assay_template_1)
 
-    study = FactoryBot.create(:study, investigation:, contributor: person,
+    study = FactoryBot.create(:study, investigation: investigation, contributor: person,
                                       policy: FactoryBot.create(:private_policy, permissions: [FactoryBot.create(:permission, contributor: person, access_type: Policy::MANAGING)]),
                                       sops: [FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy))],
                                       sample_types: [source_st, sample_collection_st])
 
-    assay1 = FactoryBot.create(:assay, study:, contributor: person, sample_type: assay_st1,
+    assay1 = FactoryBot.create(:assay, study: study, contributor: person, sample_type: assay_st1,
                                        policy: FactoryBot.create(:private_policy, permissions: [FactoryBot.create(:permission, contributor: person, access_type: Policy::MANAGING)]))
-    assay2 = FactoryBot.create(:assay, study:, contributor: person, sample_type: assay_st2,
+    assay2 = FactoryBot.create(:assay, study: study, contributor: person, sample_type: assay_st2,
                                        policy: FactoryBot.create(:private_policy, permissions: [FactoryBot.create(:permission, contributor: person, access_type: Policy::MANAGING)]))
-    assay3 = FactoryBot.create(:assay, study:, contributor: person, sample_type: assay_st3,
+    assay3 = FactoryBot.create(:assay, study: study, contributor: person, sample_type: assay_st3,
                                        policy: FactoryBot.create(:private_policy, permissions: [FactoryBot.create(:permission, contributor: person, access_type: Policy::MANAGING)]))
 
     login_as(person)
@@ -1985,5 +1985,13 @@ class AssaysControllerTest < ActionController::TestCase
     assay3.reload
 
     assert_equal(assay3.previous_linked_assay_sample_type&.id, assay1.sample_type&.id)
+  end
+
+  test 'do not get index if feature disabled' do
+    with_config_value(:isa_enabled, false) do
+      get :index
+      assert_redirected_to root_path
+      assert flash[:error].include?('disabled')
+    end
   end
 end

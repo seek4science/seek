@@ -1745,7 +1745,6 @@ ActiveRecord::Schema.define(version: 2023_11_21_100719) do
     t.string "first_letter", limit: 1
     t.string "source_ontology"
     t.string "ols_root_term_uri"
-    t.boolean "required"
     t.string "short_name"
     t.string "key"
     t.integer "template_id"

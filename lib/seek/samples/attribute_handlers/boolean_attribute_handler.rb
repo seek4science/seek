@@ -1,7 +1,7 @@
 module Seek
   module Samples
-    module AttributeTypeHandlers
-      class BooleanAttributeTypeHandler < BaseAttributeHandler
+    module AttributeHandlers
+      class BooleanAttributeHandler < BaseAttributeHandler
         def initialize(attribute)
           super(attribute)
           @conversion_map = { '1' => true, '0' => false, 'true' => true, 'false' => false }

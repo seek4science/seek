@@ -70,44 +70,46 @@ class SinglePagesController < ApplicationController
     @project = @study.projects.first
     @samples = Sample.where(id: sample_ids)&.authorized_for(:view)&.sort_by(&:id)
 
-    if @samples.nil? || @samples == [] || sample_type_id.nil?
-      raise 'Nothing to export to Excel. Please select samples in the table and try downloading the table again.'
-    end
+    notice_message = "Contents of <b>#{@assay ? 'Assay [ID: ' + @assay.id.to_s + ', Title: ' + @assay.title : 'Study [ID: ' + @study.id.to_s + ', Title: ' + @study.title}]</b> downloaded:<br/><ul>"
+    notice_message << "<li class='checkmark'><b>#{@samples.count < 1 ? 'No' : @samples.count} sample#{@samples.count != 1 ? 's' : ''}</b> visible to you #{@samples.count != 1 ? 'were' : 'was'} included</li>"
+    raise 'Export aborted! Sample type not included in request!' if sample_type_id.nil?
 
     @sample_type = SampleType.find(sample_type_id)
+    @template = Template.find(@sample_type.template_id)
 
     sample_attributes = @sample_type.sample_attributes.map do |sa|
+      is_cv_list = sa.sample_attribute_type.base_type == Seek::Samples::BaseType::CV_LIST
       obj = if sa.sample_controlled_vocab_id.nil?
               { sa_cv_title: sa.title, sa_cv_id: nil }
             else
               { sa_cv_title: sa.title, sa_cv_id: sa.sample_controlled_vocab_id, allows_custom_input: sa.allow_cv_free_text }
             end
-      obj.merge({ required: sa.required })
+      obj.merge({ required: sa.required, is_cv_list: })
     end
 
-    @sa_cv_terms = [{ 'name' => 'id', 'has_cv' => false, 'data' => nil, 'allows_custom_input' => nil, 'required' => nil },
-                    { 'name' => 'uuid', 'has_cv' => false, 'data' => nil, 'allows_custom_input' => nil,
-                      'required' => nil }]
+    @sa_cv_terms = [{ name: 'id', has_cv: false, data: nil, allows_custom_input: nil, required: nil, is_cv_list: nil },
+                    { name: 'uuid', has_cv: false, data: nil, allows_custom_input: nil, required: nil, is_cv_list: nil }]
 
     sample_attributes.map do |sa|
       if sa[:sa_cv_id].nil?
-        @sa_cv_terms.push({ 'name' => sa[:sa_cv_title], 'has_cv' => false, 'data' => nil,
-                            'allows_custom_input' => nil, 'required' => sa[:required] })
+        @sa_cv_terms.push({ name: sa[:sa_cv_title], has_cv: false, data: nil,
+                            allows_custom_input: nil, required: sa[:required], is_cv_list: nil })
       else
         sa_terms = SampleControlledVocabTerm.where(sample_controlled_vocab_id: sa[:sa_cv_id]).map(&:label)
-        @sa_cv_terms.push({ 'name' => sa[:sa_cv_title], 'has_cv' => true, 'data' => sa_terms,
-                            'allows_custom_input' => sa[:allows_custom_input], 'required' => sa[:required] })
+        @sa_cv_terms.push({ name: sa[:sa_cv_title], has_cv: true, data: sa_terms,
+                            allows_custom_input: sa[:allows_custom_input], required: sa[:required], is_cv_list: sa[:is_cv_list] })
       end
     end
-    @template = Template.find(@sample_type.template_id)
 
+    notice_message << '</ul>'
+    flash[:notice] = notice_message.html_safe
     render xlsx: 'download_samples_excel', filename: 'samples_table.xlsx', disposition: 'inline'
   rescue StandardError => e
     flash[:error] = e.message
     respond_to do |format|
       format.html { redirect_to single_page_path(@project.id) }
       format.json do
-        render json: { parameters: { sample_ids:, sample_type_id:, study_id: } }
+        render json: { parameters: { sample_ids:, sample_type_id:, study_id: }, errors: e }, status: :bad_request
       end
     end
   end
@@ -170,21 +172,35 @@ class SinglePagesController < ApplicationController
     end
 
     @multiple_input_fields = @sample_type.sample_attributes.map do |sa_attr|
-      sa_attr.title if sa_attr.sample_attribute_type.base_type == 'SeekSampleMulti'
+      sa_attr.title if sa_attr.sample_attribute_type.base_type == Seek::Samples::BaseType::SEEK_SAMPLE_MULTI
+    end
+
+    @cv_list_fields = @sample_type.sample_attributes.map do |sa_attr|
+      sa_attr.title if sa_attr.sample_attribute_type.base_type == Seek::Samples::BaseType::CV_LIST
     end
 
     sample_fields, samples_data = get_spreadsheet_data(samples_sheet)
 
     # Compare Excel header row to Sample Type Sample Attributes
     # Should raise an error if they don't match
-    sample_type_attributes = %w[id uuid].concat(@sample_type.sample_attributes.map(&:title))
-    has_unmapped_sample_attributes = sample_type_attributes.map { |sa| sample_fields.include?(sa) }.include?(false)
+    sample_type_attributes = [{ id: nil, title: 'id', is_cv: false, allows_custom_input: false, cv_terms: nil, required: true },
+                              { id: nil, title: 'uuid', is_cv: false, allows_custom_input: false, cv_terms: nil, required: true }]
+                             .concat(@sample_type.sample_attributes.includes(sample_controlled_vocab: [:sample_controlled_vocab_terms]).map do |sa|
+                              if sa.controlled_vocab?
+                                cv_terms = sa.sample_controlled_vocab.sample_controlled_vocab_terms.map(&:label)
+                                { id: sa.id, title: sa.title, is_cv: sa.controlled_vocab?, allows_custom_input: sa.allow_cv_free_text?, cv_terms:, required: sa.required? }
+                              else
+                                { id: sa.id, title: sa.title, is_cv: sa.controlled_vocab?, allows_custom_input: sa.allow_cv_free_text?, cv_terms: nil, required: sa.required?}
+                              end
+                            end)
+
+    has_unmapped_sample_attributes = sample_type_attributes.map { |sa| sample_fields.include?(sa[:title]) }.include?(false)
     if has_unmapped_sample_attributes
       raise "The Sample Attributes from the excel sheet don't match those of the Sample Type in the database. Sample upload was aborted!"
     end
 
     # Construct Samples objects from Excel data
-    excel_samples = generate_excel_samples(samples_data, sample_fields)
+    excel_samples = generate_excel_samples(samples_data, sample_fields, sample_type_attributes)
 
     existing_excel_samples = excel_samples.map { |sample| sample unless sample['id'].nil? }.compact
     new_excel_samples = excel_samples.map { |sample| sample if sample['id'].nil? }.compact
@@ -244,10 +260,15 @@ class SinglePagesController < ApplicationController
     [sample_fields, samples_data]
   end
 
-  def generate_excel_samples(samples_data, sample_fields)
+  def generate_excel_samples(samples_data, sample_fields, sample_type_attributes)
+    cv_sample_attributes = sample_type_attributes.select { |sa| sa[:is_cv] && !sa[:allows_custom_input] }
     samples_data.map do |excel_sample|
       obj = {}
       (0..sample_fields.size - 1).map do |i|
+        current_sample_attribute = sample_type_attributes.detect { |sa| sa[:title] == sample_fields[i] }
+        validate_cv_terms = cv_sample_attributes.map{ |cv_sa| cv_sa[:title] }.include?(sample_fields[i])
+        validate_cv_terms &&= current_sample_attribute[:required] && !excel_sample[i].blank?
+        attr_terms = validate_cv_terms ? cv_sample_attributes.detect { |sa| sa[:title] == sample_fields[i] }[:cv_terms] : []
         if @multiple_input_fields.include?(sample_fields[i])
           parsed_excel_input_samples = JSON.parse(excel_sample[i].gsub(/"=>/x, '":')).map do |subsample|
             # Uploader should at least have viewing permissions for the inputs he's using
@@ -258,13 +279,27 @@ class SinglePagesController < ApplicationController
             subsample
           end
           obj.merge!(sample_fields[i] => parsed_excel_input_samples)
+        elsif @cv_list_fields.include?(sample_fields[i])
+          parsed_cv_terms = JSON.parse(excel_sample[i])
+          # CV validation for CV_LIST attributes
+          parsed_cv_terms.map do |term|
+            if !attr_terms.include?(term) && validate_cv_terms
+              raise "Invalid Controlled vocabulary term detected '#{term}' in sample ID #{excel_sample[0]}: { #{sample_fields[i]}: #{parsed_cv_terms.inspect} }"
+            end
+          end
+          obj.merge!(sample_fields[i] => parsed_cv_terms)
         elsif sample_fields[i] == 'id'
-          if excel_sample[i] == ''
+          if excel_sample[i].blank?
             obj.merge!(sample_fields[i] => nil)
           else
             obj.merge!(sample_fields[i] => excel_sample[i]&.to_i)
           end
         else
+          if validate_cv_terms
+            unless attr_terms.include?(excel_sample[i])
+              raise "Invalid Controlled vocabulary term detected '#{excel_sample[i]}' in sample ID #{excel_sample[0]}: { #{sample_fields[i]}: #{excel_sample[i]} }"
+            end
+          end
           obj.merge!(sample_fields[i] => excel_sample[i])
         end
       end

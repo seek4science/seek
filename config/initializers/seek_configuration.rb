@@ -43,7 +43,6 @@ def load_seek_config_defaults!
   Seek::Config.default :home_description, 'You can configure the text that goes here within the Admin pages: Site Configuration->Home page settings.'
   Seek::Config.default :home_description_position, 'side'
   Seek::Config.default :tagline_prefix, 'Find, share and exchange <b>Data</b>, <b>Models</b> and <b>Processes</b> within the'
-  Seek::Config.default :publish_button_enabled, true
   Seek::Config.default :auth_lookup_enabled,true
   Seek::Config.default :external_search_enabled, true
   Seek::Config.default :project_single_page_enabled, false

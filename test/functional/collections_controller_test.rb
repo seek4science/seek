@@ -492,6 +492,14 @@ class CollectionsControllerTest < ActionController::TestCase
     assert_select 'li a[href=?]', document_path(document), count: 0
   end
 
+  test 'do not get index if feature disabled' do
+    with_config_value(:collections_enabled, false) do
+      get :index
+      assert_redirected_to root_path
+      assert flash[:error].include?('disabled')
+    end
+  end
+
   private
 
   def valid_collection
