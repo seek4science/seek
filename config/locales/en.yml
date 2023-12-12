@@ -66,6 +66,9 @@ en:
 
   samples:
     pid_info_text: 'The identifier assigns a unique and unequivocal meaning to the attribute name.'
+    allow_free_text_info_text: 'If selected it is possible to provide any text for the attribute value and the Controlled Vocabulary terms are just suggestions; otherwise it values are strictly restricted to only the terms available.'
+    allow_free_text_label_hint: 'free text allowed'
+    allow_free_text_checkbox_label: 'Allow free text?'
 
   templates:
     isa_tag_info_text: 'ISA tags define the relation of each attribute to either the sample or the protocol, following the categories specified by the ISA model.'
@@ -286,9 +289,6 @@ you can choose to have a %{project} linked to a site managed %{programme} instea
   <p>
   Alternatively, if you are unable to use the %{issue_tracker_link}, or the issue is of a private nature, then you can use the %{feedback_link}.
   <p>'
-
-  controlled_vocabs:
-    add_new_term_disabled_reason: "You are unable to add new terms when linked to an Ontology"
 
   info_text:
     institution: "An Institution in SEEK is where someone is employed or works or a person's affiliation."

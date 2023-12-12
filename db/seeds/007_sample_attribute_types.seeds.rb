@@ -52,6 +52,12 @@ inchi_type.update(base_type: Seek::Samples::BaseType::STRING,
                              resolution:'http://identifiers.org/inchi/\\0')
 
 
+# Custom Date dataType tailored to what ENA expects => combination of regex and controlled vocabulary
+ena_custom_date_type = SampleAttributeType.find_or_initialize_by(title: 'ENA custom date')
+ena_custom_date_type.update(base_type: Seek::Samples::BaseType::STRING,
+                         regexp: '^(?:[12]\d{3}(?:-(?:0[1-9]|1[0-2])(?:-(?:0[1-9]|[12]\d|3[01]))?)?(?:T\d{2}:\d{2}(?::\d{2})?Z?(?:[+-]\d{1,2})?)?(?:\/\d{4}-(?:\d{2}-(?:\d{2}(?:T\d{2}:\d{2}(?::\d{2})?Z?(?:[+-]\d{1,2})?)?)?)?)?)?$|^not collected$|^not provided$|^restricted access$|^missing: control sample$|^missing: sample group$|^missing: synthetic construct$|^missing: lab stock$|^missing: third party data$|^missing: data agreement established pre-2023$|^missing: endangered species$|^missing: human-identifiable$',
+                         placeholder: '2015 or 2015-01 or 2015-01-01. Also accepted: "not collected", "not provided", ... (complete list of accepted terms available in ERC000011 checklist)')
+
 bool_type = SampleAttributeType.find_or_initialize_by(title:'Boolean')
 bool_type.update(base_type: Seek::Samples::BaseType::BOOLEAN)
 
@@ -61,11 +67,14 @@ strain_type.update(base_type: Seek::Samples::BaseType::SEEK_STRAIN)
 seek_sample_type = SampleAttributeType.find_or_initialize_by(title:'Registered Sample')
 seek_sample_type.update(base_type: Seek::Samples::BaseType::SEEK_SAMPLE)
 
-seek_sample_multi_type = SampleAttributeType.find_or_initialize_by(title:'Registered Sample (multiple)')
+seek_sample_multi_type = SampleAttributeType.find_or_initialize_by(title:'Registered Sample List')
 seek_sample_multi_type.update(base_type: Seek::Samples::BaseType::SEEK_SAMPLE_MULTI)
 
 cv_type = SampleAttributeType.find_or_initialize_by(title:'Controlled Vocabulary')
 cv_type.update(base_type: Seek::Samples::BaseType::CV)
+
+cv_list_type = SampleAttributeType.find_or_initialize_by(title:'Controlled Vocabulary List')
+cv_list_type.update(base_type: Seek::Samples::BaseType::CV_LIST)
 
 uri_type = SampleAttributeType.find_or_initialize_by(title:'URI')
 uri_type.update(base_type: Seek::Samples::BaseType::STRING, regexp: URI.regexp.to_s, placeholder: 'http://www.example.com/123', resolution:'\\0')
@@ -78,12 +87,6 @@ ncbi_type.update(base_type: Seek::Samples::BaseType::STRING, regexp: '[0-9]+', p
 
 data_file_type = SampleAttributeType.find_or_initialize_by(title: 'Registered Data file')
 data_file_type.update(base_type: Seek::Samples::BaseType::SEEK_DATA_FILE)
-
-ontology_type = SampleAttributeType.find_or_initialize_by(title:'Ontology')
-ontology_type.update(base_type: Seek::Samples::BaseType::CV)
-
-cv_list_type = SampleAttributeType.find_or_initialize_by(title:'Controlled Vocabulary List')
-cv_list_type.update(base_type: Seek::Samples::BaseType::CV_LIST)
 
 linked_extended_metadata_type = SampleAttributeType.find_or_initialize_by(title:'Linked Extended Metadata')
 linked_extended_metadata_type.update(base_type: Seek::Samples::BaseType::LINKED_EXTENDED_METADATA)

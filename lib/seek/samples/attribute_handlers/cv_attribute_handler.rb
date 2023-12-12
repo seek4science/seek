@@ -1,11 +1,11 @@
 module Seek
   module Samples
-    module AttributeTypeHandlers
-      class CVAttributeTypeHandler < BaseAttributeHandler
+    module AttributeHandlers
+      class CVAttributeHandler < BaseAttributeHandler
         class MissingControlledVocabularyException < AttributeHandlerException; end
 
         def test_value(value)
-          unless controlled_vocab.custom_input? || controlled_vocab.includes_term?(value)
+          unless allow_cv_free_text? || controlled_vocab.includes_term?(value)
             raise "'#{value}' is not included in the controlled vocabulary"
           end
         end
@@ -18,8 +18,10 @@ module Seek
 
         private
 
+        delegate :allow_cv_free_text?, to: :attribute
+
         def controlled_vocab
-          vocab = additional_options[:controlled_vocab]
+          vocab = attribute.sample_controlled_vocab
           raise MissingControlledVocabularyException unless vocab
 
           vocab

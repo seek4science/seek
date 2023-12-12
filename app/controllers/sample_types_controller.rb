@@ -164,7 +164,7 @@ class SampleTypesController < ApplicationController
                                           sample_attributes_attributes: [:id, :title, :pos, :required, :is_title,
                                                                          :description, :pid, :sample_attribute_type_id,
                                                                          :sample_controlled_vocab_id, :isa_tag_id,
-                                                                         :linked_sample_type_id,
+                                                                         :allow_cv_free_text, :linked_sample_type_id,
                                                                          :unit_id, :_destroy] }, :assay_ids => [])
   end
 

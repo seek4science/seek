@@ -13,7 +13,8 @@
       <%= study_fields.text_area :description, :rows=>5, :class=>"form-control rich-text-edit" %>
     </div>
 
-    <%= render partial: 'extended_metadata/extended_metadata_type_selection', locals:{f:f, resource:@isa_study.study} %>
+    <%= render partial: 'extended_metadata/extended_metadata_type_selection', locals:{f:study_fields, resource:@isa_study.study} %>
+    <%= render partial: 'extended_metadata/extended_metadata_attribute_input', locals:{f:study_fields,resource:@isa_study.study, parent_resource: "isa_study"} %>
 
     <% unless @isa_study.study.experimentalists.blank? %>
       <div class="form-group">
@@ -24,14 +25,12 @@
 
     <div id="investigation_collection" class="hidden">
       <%= render :partial=>"studies/investigation_list",:locals=>{study:@isa_study.study, :investigations=>Investigation.all.select {|i|current_user.person.member_of? i.projects}} -%>
-    </div>    
+    </div>
 
     <div class="form-group">
       <%= study_fields.label "Study position" -%><br/>
       <%= study_fields.number_field :position, :rows => 5, :class=>"form-control"  -%>
     </div>
-
-    <%= render partial: 'extended_metadata/extended_metadata_attribute_input', locals:{f:f,resource:@isa_study.study} %>
 
     <%= render partial: 'assets/manage_specific_attributes', locals: { f: study_fields } if show_form_manage_specific_attributes? %>
 
@@ -42,48 +41,56 @@
     <%= render partial: 'projects/implicit_project_selector', locals: { action: action,
                                                                           select_id: '#study_investigation_id',
                                                                           parents: Investigation.authorized_for('edit') } %>
-    
+
     <%= folding_panel("Define #{t(:sample_type)} for Source") do %>
       <%= render partial: 'sample_types_form', locals: {f: f, sample_type: @isa_study.source, id_suffix: "_source_sample_type", action: action } if @isa_study.source %>
     <% end %>
 
 		<%= folding_panel(t(:sop).pluralize) do %>
 			<p class="help-block">The following <%= t(:sop).pluralize %> are associated with this <%= t(:study) %>:</p>
-			
+
       <%= study_fields.fancy_multiselect :sops, { other_projects_checkbox: true, name: "isa_study[study][sop_ids]" } %>
-     
+
 		<% end %>
 
     <%= folding_panel("Define #{t(:sample_type)} for Sample") do %>
       <%= render partial: 'sample_types_form', locals: {f: f, sample_type: @isa_study.sample_collection, id_suffix: "_sample_collection_sample_type", action: action  } if @isa_study.sample_collection %>
     <% end %>
 
-<% end -%> 
+<% end -%>
 
 
 
- 
+
 <%= form_submit_buttons(@isa_study.study) %>
 
 <script>
     const templates = <%= load_templates().to_json.html_safe %>
     const initTemplateModal = function(field_name) {
-      Templates.context.description_elem = `#isa_study_${field_name}_description`
-      Templates.context.suffix = "_" + field_name
-      Templates.context.field_name = field_name
-      showTemplateModal()
+      if (templates.length > 0) {
+        Templates.context.description_elem = `#isa_study_${field_name}_description`
+        Templates.context.suffix = "_" + field_name
+        Templates.context.field_name = field_name
+        showTemplateModal()
+      }else{
+        if (confirm("No templates available for this project. Click 'OK' to create a project specific template or 'cancel' to close this window.")){
+          window.open('/templates/new')
+        }
+      }
     }
 
-    $j(document).ready(function () {   
+    $j(document).ready(function () {
       const urlSearchParams = new URLSearchParams(window.location.search);
       const params = Object.fromEntries(urlSearchParams.entries());
       const investigation_id = params["investigation_id"]
       // Prevent setting the hidden field on redirect (query string parameters are missing)
       if(investigation_id) {
-          $j("#isa_study_study_investigation_id").val(investigation_id); 
+          $j("#isa_study_study_investigation_id").val(investigation_id);
           $j("#study_investigation_id").val(investigation_id).change();
-      } 
+      }
 
-      Templates.init($j('#template-attributes'));   
-    }); 
+      if (templates.length > 0) {
+        Templates.init($j('#template-attributes'));
+      }
+    });
 </script>

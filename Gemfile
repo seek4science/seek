@@ -18,7 +18,7 @@ gem 'RedCloth', '>=4.3.0'
 gem 'simple-spreadsheet-extractor', '~> 0.18.0'
 gem 'open4'
 gem 'sample-template-generator', '~>0.7'
-gem 'rmagick', '4.2.5'
+gem 'rmagick', '5.3.0'
 gem 'rest-client', '~>2.0'
 gem 'factory_bot', '~> 6.2.1'
 gem 'bio', '~> 1.5.1'
@@ -154,7 +154,7 @@ gem 'remotipart', '~> 1.4.4' # Allows file upload in AJAX forms
 
 gem 'rails-static-router'
 
-gem 'caxlsx', '>= 3.0' # Write content to an xlsx file
+gem 'caxlsx', '>= 4.0' # Write content to an xlsx file
 gem 'caxlsx_rails', '~> 0.6.2'
 
 gem 'net-ftp'
@@ -181,10 +181,10 @@ group :development do
   gem "flamegraph", "~> 0.9.5"
   gem "stackprof", "~> 0.2.25"
   gem 'listen', '~> 3.3'
+  gem 'ruby-prof'
 end
 
 group :test do
-  gem 'ruby-prof'
   gem 'test-prof'
   gem 'rails-perftest'
   gem 'minitest', '~> 5.14'

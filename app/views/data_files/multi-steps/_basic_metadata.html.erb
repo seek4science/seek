@@ -13,6 +13,10 @@
       <label>Description</label>
       <%= f.text_area :description, :class => 'form-control rich-text-edit', :rows => 5 -%>
     </div>
+
+    <%= render partial: 'extended_metadata/extended_metadata_type_selection', locals: { f: f, resource: @data_file } %>
+    <%= render partial: 'extended_metadata/extended_metadata_attribute_input', locals: { f: f, resource: @data_file } %>
+
     <div class='form-group'>
       <div class='help-block'>Check this box if this data is the result of a model simulation</div>
       <label>

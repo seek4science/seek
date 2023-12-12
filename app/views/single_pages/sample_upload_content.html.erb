@@ -125,9 +125,13 @@
       val = cell.textContent;
       key = cell.id.match(/\[.*\]/)[0].replace('[', "").replace("]", '');
       const multiInputfields = $j(cell).find('span[class*="badge"]').toArray();
+      const cvListFields = $j(cell).find('span[class*="label"]').toArray();
       if (multiInputfields.length > 0 ){
         const inputIds = multiInputfields.map(is => is.title.split(" ").pop()).join(',');
         samplesObj[key] = inputIds;
+      } else if (cvListFields.length > 0){
+        cvTerms = cvListFields.map(cvt => cvt.title)
+        samplesObj[key] = cvTerms;
       } else {
         samplesObj[key] = val;
       }
@@ -183,6 +187,7 @@
         };
     }
   }
+
   function closeModalForm(){
     $j('#upload-excel-modal').modal('hide');
   }

@@ -709,7 +709,7 @@ class StudiesControllerTest < ActionController::TestCase
     assert cm = study.extended_metadata
     assert_equal cmt, cm.extended_metadata_type
     assert_equal 'fred',cm.get_attribute_value('name')
-    assert_equal '22',cm.get_attribute_value('age')
+    assert_equal 22,cm.get_attribute_value('age')
     assert_nil cm.get_attribute_value('date')
 
     # test update
@@ -729,7 +729,7 @@ class StudiesControllerTest < ActionController::TestCase
     assert new_study = assigns(:study)
     assert_equal 'new title', new_study.title
     assert_equal 'max', new_study.extended_metadata.get_attribute_value('name')
-    assert_equal '20', new_study.extended_metadata.get_attribute_value('age')
+    assert_equal 20, new_study.extended_metadata.get_attribute_value('age')
     assert_equal old_id, new_study.extended_metadata.id
   end
 
@@ -1902,7 +1902,7 @@ class StudiesControllerTest < ActionController::TestCase
     get :new
     assert_response :success
     assert_select 'div.panel-heading', text: /Tags/, count: 1
-    assert_select 'input#tag_list', count: 1
+    assert_select 'select#tag_list', count: 1
   end
 
   test 'new should not include tags element when tags disabled' do
@@ -1910,7 +1910,7 @@ class StudiesControllerTest < ActionController::TestCase
       get :new
       assert_response :success
       assert_select 'div.panel-heading', text: /Tags/, count: 0
-      assert_select 'input#tag_list', count: 0
+      assert_select 'select#tag_list', count: 0
     end
   end
 
@@ -1920,7 +1920,7 @@ class StudiesControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select 'div.panel-heading', text: /Tags/, count: 1
-    assert_select 'input#tag_list', count: 1
+    assert_select 'select#tag_list', count: 1
   end
 
   test 'edit should not include tags element when tags disabled' do
@@ -1930,7 +1930,7 @@ class StudiesControllerTest < ActionController::TestCase
       assert_response :success
 
       assert_select 'div.panel-heading', text: /Tags/, count: 0
-      assert_select 'input#tag_list', count: 0
+      assert_select 'select#tag_list', count: 0
     end
   end
 
@@ -1940,7 +1940,7 @@ class StudiesControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select 'div.panel-heading', text: /Tags/, count: 1
-    assert_select 'input#tag_list', count: 1
+    assert_select 'select#tag_list', count: 1
   end
 
   test 'show should not include tags box when tags disabled' do
@@ -1950,7 +1950,7 @@ class StudiesControllerTest < ActionController::TestCase
       assert_response :success
 
       assert_select 'div.panel-heading', text: /Tags/, count: 0
-      assert_select 'input#tag_list', count: 0
+      assert_select 'select#tag_list', count: 0
     end
   end
 
@@ -1992,4 +1992,11 @@ class StudiesControllerTest < ActionController::TestCase
     end
   end
 
+  test 'do not get index if feature disabled' do
+    with_config_value(:isa_enabled, false) do
+      get :index
+      assert_redirected_to root_path
+      assert flash[:error].include?('disabled')
+    end
+  end
 end

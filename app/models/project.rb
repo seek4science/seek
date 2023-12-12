@@ -5,6 +5,7 @@ class Project < ApplicationRecord
 
   acts_as_yellow_pages
   title_trimmer
+  has_extended_metadata
 
   has_and_belongs_to_many :investigations
   has_many :studies, through: :investigations
@@ -222,7 +223,7 @@ class Project < ApplicationRecord
   end
 
   def total_asset_size
-    assets.sum do |asset|
+    blobs = assets.sum do |asset|
       if asset.respond_to?(:content_blob)
         asset.content_blob.try(:file_size) || 0
       elsif asset.respond_to?(:content_blobs)
@@ -233,6 +234,25 @@ class Project < ApplicationRecord
         0
       end
     end
+    local_paths = []
+    git_repos = assets.sum do |asset|
+      if asset.is_git_versioned?
+        asset.git_versions.sum do |ver|
+          lp = ver.git_repository.local_path
+          dir_size = 0
+          unless lp.in?(local_paths)
+            Dir.glob(File.join(lp, '**', '*'), File::FNM_DOTMATCH) do |file|
+              dir_size += File.size(file)
+            end
+            local_paths << lp
+          end
+          dir_size
+        end
+      else
+        0
+      end
+    end
+    blobs + git_repos
   end
 
   # whether the user is able to request membership of this project

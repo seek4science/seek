@@ -1,0 +1,351 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0090395
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - application/json
+      User-Agent:
+      - rest-client/2.1.0 (linux x86_64) ruby/3.1.4p223
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - www.ebi.ac.uk
+  response:
+    status:
+      code: 200
+      message: ''
+    headers:
+      Vary:
+      - Access-Control-Request-Headers
+      - Access-Control-Request-Method
+      - Origin
+      Content-Type:
+      - application/json
+      Strict-Transport-Security:
+      - max-age=0
+      Date:
+      - Mon, 23 Oct 2023 09:22:31 GMT
+      Transfer-Encoding:
+      - chunked
+      Content-Disposition:
+      - inline;filename=f.txt
+    body:
+      encoding: UTF-8
+      string: |-
+        {
+          "iri" : "http://purl.obolibrary.org/obo/GO_0090395",
+          "lang" : "en",
+          "description" : [ "A cell projection that is a short, rounded projection from a plant epidermal cell.", "Part of papilla cell (PO:0025166), which is a shoot epidermal cell (PO:0025165) in plants. Replaces the obsolete term papillae (PO:0002001)." ],
+          "synonyms" : [ ],
+          "annotation" : {
+            "created_by" : [ "tb" ],
+            "creation_date" : [ "2010-12-15T03:26:20Z" ],
+            "has_obo_namespace" : [ "cellular_component" ],
+            "id" : [ "GO:0090395" ]
+          },
+          "label" : "plant cell papilla",
+          "ontology_name" : "go",
+          "ontology_prefix" : "GO",
+          "ontology_iri" : "http://purl.obolibrary.org/obo/go/extensions/go-plus.owl",
+          "is_obsolete" : false,
+          "term_replaced_by" : null,
+          "is_defining_ontology" : true,
+          "has_children" : true,
+          "is_root" : false,
+          "short_form" : "GO_0090395",
+          "obo_id" : "GO:0090395",
+          "in_subset" : null,
+          "obo_definition_citation" : [ {
+            "definition" : "A cell projection that is a short, rounded projection from a plant epidermal cell.",
+            "oboXrefs" : [ {
+              "database" : "GOC",
+              "id" : "tb",
+              "description" : null,
+              "url" : null
+            } ]
+          } ],
+          "obo_xref" : null,
+          "obo_synonym" : null,
+          "is_preferred_root" : false,
+          "_links" : {
+            "self" : {
+              "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0090395?lang=en"
+            },
+            "parents" : {
+              "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0090395/parents"
+            },
+            "ancestors" : {
+              "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0090395/ancestors"
+            },
+            "hierarchicalParents" : {
+              "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0090395/hierarchicalParents"
+            },
+            "hierarchicalAncestors" : {
+              "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0090395/hierarchicalAncestors"
+            },
+            "jstree" : {
+              "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0090395/jstree"
+            },
+            "children" : {
+              "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0090395/children"
+            },
+            "descendants" : {
+              "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0090395/descendants"
+            },
+            "hierarchicalChildren" : {
+              "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0090395/hierarchicalChildren"
+            },
+            "hierarchicalDescendants" : {
+              "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0090395/hierarchicalDescendants"
+            },
+            "graph" : {
+              "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0090395/graph"
+            },
+            "part_of" : {
+              "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0090395/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FBFO_0000050"
+            },
+            "only_in_taxon" : {
+              "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0090395/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FRO_0002160"
+            }
+          }
+        }
+    http_version: 
+  recorded_at: Mon, 23 Oct 2023 09:22:31 GMT
+- request:
+    method: get
+    uri: https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0090395/children
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - application/json
+      User-Agent:
+      - rest-client/2.1.0 (linux x86_64) ruby/3.1.4p223
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - www.ebi.ac.uk
+  response:
+    status:
+      code: 200
+      message: ''
+    headers:
+      Vary:
+      - Access-Control-Request-Headers
+      - Access-Control-Request-Method
+      - Origin
+      Content-Type:
+      - application/json
+      Strict-Transport-Security:
+      - max-age=0
+      Date:
+      - Mon, 23 Oct 2023 09:22:31 GMT
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: UTF-8
+      string: |-
+        {
+          "_embedded" : {
+            "terms" : [ {
+              "iri" : "http://purl.obolibrary.org/obo/GO_0090397",
+              "lang" : "en",
+              "description" : [ "A plant cell papilla that is part of a stigma papilla cell.", "Part of stigma papilla cell (PO:0025168)." ],
+              "synonyms" : [ ],
+              "annotation" : {
+                "created_by" : [ "tb" ],
+                "creation_date" : [ "2010-12-15T03:26:20Z" ],
+                "has_obo_namespace" : [ "cellular_component" ],
+                "id" : [ "GO:0090397" ]
+              },
+              "label" : "stigma papilla",
+              "ontology_name" : "go",
+              "ontology_prefix" : "GO",
+              "ontology_iri" : "http://purl.obolibrary.org/obo/go/extensions/go-plus.owl",
+              "is_obsolete" : false,
+              "term_replaced_by" : null,
+              "is_defining_ontology" : true,
+              "has_children" : false,
+              "is_root" : false,
+              "short_form" : "GO_0090397",
+              "obo_id" : "GO:0090397",
+              "in_subset" : null,
+              "obo_definition_citation" : [ {
+                "definition" : "A plant cell papilla that is part of a stigma papilla cell.",
+                "oboXrefs" : [ {
+                  "database" : "GOC",
+                  "id" : "tb",
+                  "description" : null,
+                  "url" : null
+                } ]
+              } ],
+              "obo_xref" : null,
+              "obo_synonym" : null,
+              "is_preferred_root" : false,
+              "_links" : {
+                "self" : {
+                  "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0090397?lang=en"
+                },
+                "parents" : {
+                  "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0090397/parents"
+                },
+                "ancestors" : {
+                  "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0090397/ancestors"
+                },
+                "hierarchicalParents" : {
+                  "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0090397/hierarchicalParents"
+                },
+                "hierarchicalAncestors" : {
+                  "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0090397/hierarchicalAncestors"
+                },
+                "jstree" : {
+                  "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0090397/jstree"
+                },
+                "graph" : {
+                  "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0090397/graph"
+                }
+              }
+            }, {
+              "iri" : "http://purl.obolibrary.org/obo/GO_0090396",
+              "lang" : "en",
+              "description" : [ "A plant cell papilla that is part of a leaf papilla cell.", "Part of leaf papilla cell (PO:0025167)." ],
+              "synonyms" : [ ],
+              "annotation" : {
+                "created_by" : [ "tb" ],
+                "creation_date" : [ "2010-12-15T03:26:20Z" ],
+                "has_obo_namespace" : [ "cellular_component" ],
+                "id" : [ "GO:0090396" ]
+              },
+              "label" : "leaf papilla",
+              "ontology_name" : "go",
+              "ontology_prefix" : "GO",
+              "ontology_iri" : "http://purl.obolibrary.org/obo/go/extensions/go-plus.owl",
+              "is_obsolete" : false,
+              "term_replaced_by" : null,
+              "is_defining_ontology" : true,
+              "has_children" : false,
+              "is_root" : false,
+              "short_form" : "GO_0090396",
+              "obo_id" : "GO:0090396",
+              "in_subset" : null,
+              "obo_definition_citation" : [ {
+                "definition" : "A plant cell papilla that is part of a leaf papilla cell.",
+                "oboXrefs" : [ {
+                  "database" : "GOC",
+                  "id" : "tb",
+                  "description" : null,
+                  "url" : null
+                } ]
+              } ],
+              "obo_xref" : null,
+              "obo_synonym" : null,
+              "is_preferred_root" : false,
+              "_links" : {
+                "self" : {
+                  "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0090396?lang=en"
+                },
+                "parents" : {
+                  "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0090396/parents"
+                },
+                "ancestors" : {
+                  "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0090396/ancestors"
+                },
+                "hierarchicalParents" : {
+                  "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0090396/hierarchicalParents"
+                },
+                "hierarchicalAncestors" : {
+                  "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0090396/hierarchicalAncestors"
+                },
+                "jstree" : {
+                  "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0090396/jstree"
+                },
+                "graph" : {
+                  "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0090396/graph"
+                }
+              }
+            }, {
+              "iri" : "http://purl.obolibrary.org/obo/GO_0090705",
+              "lang" : "en",
+              "description" : [ "A plant cell papilla that is part of a trichome cell.", "Part of trichome cell (PO:0008030)." ],
+              "synonyms" : [ ],
+              "annotation" : {
+                "created_by" : [ "tb" ],
+                "creation_date" : [ "2016-09-26T12:49:36Z" ],
+                "has_obo_namespace" : [ "cellular_component" ],
+                "id" : [ "GO:0090705" ]
+              },
+              "label" : "trichome papilla",
+              "ontology_name" : "go",
+              "ontology_prefix" : "GO",
+              "ontology_iri" : "http://purl.obolibrary.org/obo/go/extensions/go-plus.owl",
+              "is_obsolete" : false,
+              "term_replaced_by" : null,
+              "is_defining_ontology" : true,
+              "has_children" : false,
+              "is_root" : false,
+              "short_form" : "GO_0090705",
+              "obo_id" : "GO:0090705",
+              "in_subset" : null,
+              "obo_definition_citation" : [ {
+                "definition" : "A plant cell papilla that is part of a trichome cell.",
+                "oboXrefs" : [ {
+                  "database" : "GOC",
+                  "id" : "tb",
+                  "description" : null,
+                  "url" : null
+                }, {
+                  "database" : "PMID",
+                  "id" : "24014871",
+                  "description" : null,
+                  "url" : "http://www.ncbi.nlm.nih.gov/pubmed/24014871"
+                } ]
+              } ],
+              "obo_xref" : null,
+              "obo_synonym" : null,
+              "is_preferred_root" : false,
+              "_links" : {
+                "self" : {
+                  "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0090705?lang=en"
+                },
+                "parents" : {
+                  "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0090705/parents"
+                },
+                "ancestors" : {
+                  "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0090705/ancestors"
+                },
+                "hierarchicalParents" : {
+                  "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0090705/hierarchicalParents"
+                },
+                "hierarchicalAncestors" : {
+                  "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0090705/hierarchicalAncestors"
+                },
+                "jstree" : {
+                  "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0090705/jstree"
+                },
+                "graph" : {
+                  "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0090705/graph"
+                }
+              }
+            } ]
+          },
+          "_links" : {
+            "self" : {
+              "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0090395/children?page=0&size=20"
+            }
+          },
+          "page" : {
+            "size" : 20,
+            "totalElements" : 3,
+            "totalPages" : 1,
+            "number" : 0
+          }
+        }
+    http_version: 
+  recorded_at: Mon, 23 Oct 2023 09:22:31 GMT
+recorded_with: VCR 2.9.3

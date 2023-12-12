@@ -8,6 +8,7 @@ class SampleAttribute < ApplicationRecord
 
   belongs_to :isa_tag
 
+  auto_strip_attributes :pid
   validates :sample_type, presence: true
   validates :pid, format: { with: URI::regexp, allow_blank: true, allow_nil: true, message: 'not a valid URI' }
   validate :validate_against_editing_constraints, if: -> { sample_type.present? }
@@ -20,6 +21,9 @@ class SampleAttribute < ApplicationRecord
   # to store that this attribute should be linked to the sample_type it is being assigned to, but needs to wait until the
   # sample type exists
   attr_reader :deferred_link_to_self
+
+  # whether this attribute is tied to a controlled vocab which is based on an ontology
+  delegate :ontology_based?, to: :sample_controlled_vocab, allow_nil: true
 
   def title=(title)
     super

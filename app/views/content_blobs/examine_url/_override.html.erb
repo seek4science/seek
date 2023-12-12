@@ -1,0 +1,19 @@
+<div class="alert alert-danger" role="alert">
+  <span class="error_icon"></span>
+  Processing the URL responded with a response code <%= @info[:code] %>. <%= @error_msg %>.
+</div>
+
+<div class="alert alert-warning" role="alert">
+  <span class="warning_icon"></span>
+  <b>Warning</b>: You are attempting to register a remote URL that may not be valid. Our system is designed to validate URLs to ensure security and functionality. Please double-check the URL for accuracy.
+  If you are certain that the URL is correct and want to proceed despite the validation warning, please check the box below to override the URL check:
+
+ <%  title = "I understand the risks and want to override URL validation." %>
+  <%=
+  content_tag(:div, class: 'checkbox') do
+    content_tag(:label, class: 'override_url_check') do
+        check_box_tag("content_blobs[][override_url_check]",'yes', false) + title.html_safe
+        end
+  end
+%>
+</div>

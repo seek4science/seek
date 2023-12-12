@@ -9,6 +9,7 @@ class DataFilesController < ApplicationController
 
   include Seek::AssetsCommon
 
+  before_action :data_files_enabled?
   before_action :find_assets, only: [:index]
   before_action :find_and_authorize_requested_item, except: [:index, :new, :create, :create_content_blob,
                                                              :preview, :update_annotations_ajax, :rightfield_extraction_ajax, :provide_metadata]
@@ -462,6 +463,7 @@ class DataFilesController < ApplicationController
                                       :file_template_id,
                                       { data_format_annotations: [] }, { data_type_annotations: [] },
                                       { publication_ids: [] }, { workflow_ids: [] },
+                                      { extended_metadata_attributes: determine_extended_metadata_keys },
                                       { workflow_data_files_attributes:[:id, :workflow_id, :workflow_data_file_relationship_id, :_destroy] },
                                       discussion_links_attributes:[:id, :url, :label, :_destroy])
   end

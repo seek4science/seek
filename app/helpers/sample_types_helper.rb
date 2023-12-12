@@ -88,6 +88,10 @@ module SampleTypesHelper
     help_icon(t('samples.pid_info_text'))
   end
 
+  def allow_free_text_help_icon
+    help_icon(t('samples.allow_free_text_info_text'))
+  end
+
   private
 
   def displayed_sample_attribute_types
@@ -102,6 +106,7 @@ module SampleTypesHelper
 
     if sample_type_attribute.controlled_vocab? || sample_type_attribute.seek_cv_list?
       type += ' - ' + link_to(sample_type_attribute.sample_controlled_vocab.title, sample_type_attribute.sample_controlled_vocab)
+      type += " (#{t('samples.allow_free_text_label_hint')})" if sample_type_attribute.allow_cv_free_text?
     end
     type
   end

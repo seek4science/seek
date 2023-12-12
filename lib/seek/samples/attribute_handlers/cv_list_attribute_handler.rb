@@ -1,10 +1,10 @@
 module Seek
   module Samples
-    module AttributeTypeHandlers
-      class CVListAttributeTypeHandler < CVAttributeTypeHandler
+    module AttributeHandlers
+      class CVListAttributeHandler < CVAttributeHandler
         def test_value(array_value)
           array_value.each do |value|
-            unless controlled_vocab.custom_input? || controlled_vocab.includes_term?(value)
+            unless allow_cv_free_text? || controlled_vocab.includes_term?(value)
               raise "'#{value}' is not included in the controlled vocabulary"
             end
           end

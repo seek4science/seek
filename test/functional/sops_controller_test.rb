@@ -1779,6 +1779,66 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal AssetLink::DISCUSSION, sop.discussion_links.first.link_type
   end
 
+  test 'create, update and show a sop with extended metadata' do
+    cmt = FactoryBot.create(:simple_sop_extended_metadata_type)
+
+    person = FactoryBot.create(:person)
+    login_as(person)
+
+    sop =  {title: 'SOP', project_ids: [person.projects.first.id],
+            discussion_links_attributes:[{url: "http://www.slack.com/"}],
+            extended_metadata_attributes:{ extended_metadata_type_id: cmt.id,
+                                           data:{ 'age': 22,'name':'fred'}}}
+
+    assert_difference('AssetLink.discussion.count') do
+      assert_difference('Sop.count') do
+        assert_difference('ContentBlob.count') do
+          assert_difference('ExtendedMetadata.count') do
+            post :create, params: {sop: sop, content_blobs: [{ data: file_for_upload }], policy_attributes: { access_type: Policy::VISIBLE }}
+          end
+        end
+      end
+    end
+
+    assert sop = assigns(:sop)
+    cm = sop.extended_metadata
+
+    assert_equal cmt, cm.extended_metadata_type
+    assert_equal 'fred',cm.get_attribute_value('name')
+    assert_equal 22,cm.get_attribute_value('age')
+    assert_nil cm.get_attribute_value('date')
+
+
+    get :show, params: { id: sop }
+    assert_response :success
+
+    assert_select 'div.extended_metadata',text:/fred/, count:1
+    assert_select 'div.extended_metadata',text:/22/, count:1
+
+    # test update
+    old_id = cm.id
+    assert_no_difference('Sop.count') do
+      assert_no_difference('ExtendedMetadata.count') do
+        put :update, params: { id: sop.id, sop: { title: "new title",
+                                                            extended_metadata_attributes: { extended_metadata_type_id: cmt.id, id: cm.id,
+                                                                                            data: {
+                                                                                              "age": 20,
+                                                                                              "name": 'max'
+                                                                                            } }
+        }
+        }
+      end
+    end
+
+
+    assert new_sop = assigns(:sop)
+    assert_equal 'new title', new_sop.title
+    assert_equal 'max', new_sop.extended_metadata.get_attribute_value('name')
+    assert_equal 20, new_sop.extended_metadata.get_attribute_value('age')
+    assert_equal old_id, new_sop.extended_metadata.id
+  end
+
+
 
   test 'should show discussion link' do
     asset_link = FactoryBot.create(:discussion_link)
@@ -2023,6 +2083,14 @@ class SopsControllerTest < ActionController::TestCase
         assert_includes names, 'Bob Smith'
         assert_includes names, 'Jane Smith'
       end
+    end
+  end
+
+  test 'do not get index if feature disabled' do
+    with_config_value(:sops_enabled, false) do
+      get :index
+      assert_redirected_to root_path
+      assert flash[:error].include?('disabled')
     end
   end
 

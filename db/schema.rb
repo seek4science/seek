@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_10_19_133344) do
+ActiveRecord::Schema.define(version: 2023_11_21_100719) do
 
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
@@ -311,6 +311,7 @@ ActiveRecord::Schema.define(version: 2023_10_19_133344) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "avatar_id"
+    t.string "deleted_contributor"
     t.index ["avatar_id"], name: "index_collections_on_avatar_id"
     t.index ["contributor_id"], name: "index_collections_on_contributor_id"
     t.index ["policy_id"], name: "index_collections_on_policy_id"
@@ -633,6 +634,7 @@ ActiveRecord::Schema.define(version: 2023_10_19_133344) do
     t.text "description"
     t.string "label"
     t.integer "linked_extended_metadata_type_id"
+    t.boolean "allow_cv_free_text", default: false
     t.index ["extended_metadata_type_id"], name: "index_extended_metadata_attributes_on_extended_metadata_type_id"
     t.index ["sample_attribute_type_id"], name: "index_extended_metadata_attributes_on_sample_attribute_type_id"
     t.index ["sample_controlled_vocab_id"], name: "index_extended_metadata_attributes_on_sample_cv_id"
@@ -1710,6 +1712,7 @@ ActiveRecord::Schema.define(version: 2023_10_19_133344) do
     t.string "pid"
     t.text "description"
     t.integer "isa_tag_id"
+    t.boolean "allow_cv_free_text", default: false
     t.index ["sample_type_id"], name: "index_sample_attributes_on_sample_type_id"
     t.index ["unit_id"], name: "index_sample_attributes_on_unit_id"
   end
@@ -1743,11 +1746,9 @@ ActiveRecord::Schema.define(version: 2023_10_19_133344) do
     t.string "first_letter", limit: 1
     t.string "source_ontology"
     t.string "ols_root_term_uri"
-    t.boolean "required"
     t.string "short_name"
     t.string "key"
     t.integer "template_id"
-    t.boolean "custom_input", default: false
   end
 
   create_table "sample_resource_links", id: :integer, force: :cascade do |t|
@@ -2096,6 +2097,7 @@ ActiveRecord::Schema.define(version: 2023_10_19_133344) do
     t.boolean "is_title", default: false
     t.integer "isa_tag_id"
     t.string "pid"
+    t.boolean "allow_cv_free_text", default: false
     t.index ["template_id", "title"], name: "index_template_id_asset_id_title"
   end
 

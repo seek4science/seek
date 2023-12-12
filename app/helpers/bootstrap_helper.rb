@@ -140,7 +140,7 @@ module BootstrapHelper
 
     tag = select_tag(element_name, select_options, options)
     if options[:multiple]
-      hidden_field_tag(element_name, '', name: options[:name]) + tag
+      hidden_field_tag(element_name, '', name: options[:name], id: nil) + tag
     else
       tag
     end

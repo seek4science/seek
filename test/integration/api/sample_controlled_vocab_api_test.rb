@@ -10,7 +10,7 @@ class SampleControlledVocabApiTest < ActionDispatch::IntegrationTest
 
     @sample_controlled_vocab = SampleControlledVocab.new({ title:"a title", description:"some description",
                                                            source_ontology: "EFO", ols_root_term_uri: "http://a_uri",
-                                                           required: "true", short_name: "short_name" })
+                                                           short_name: "short_name" })
                                                            
     @sample_controlled_vocab_term = SampleControlledVocabTerm.new({ label: "organism", iri: "http://some_iri",
                                                                     parent_iri: "http://another_iri" })

@@ -1,7 +1,7 @@
 module Seek
   module Samples
-    module AttributeTypeHandlers
-      class SeekSampleMultiAttributeTypeHandler < SeekSampleAttributeTypeHandler
+    module AttributeHandlers
+      class SeekSampleMultiAttributeHandler < SeekSampleAttributeHandler
         class MissingLinkedSampleTypeException < AttributeHandlerException; end
 
         def type
@@ -24,7 +24,7 @@ module Seek
         private
 
         def test_value_item(value)
-          if additional_options[:required]
+          if attribute.required?
             sample = find_resource(value['id'])
             raise 'Unable to find Sample in database' unless sample
             raise 'Sample type does not match' unless sample.sample_type == linked_sample_type
@@ -36,7 +36,7 @@ module Seek
         end
 
         def linked_sample_type
-          sample_type = additional_options[:linked_sample_type]
+          sample_type = attribute.linked_sample_type
           raise MissingLinkedSampleTypeException unless sample_type
 
           sample_type

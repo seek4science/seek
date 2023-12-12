@@ -40,6 +40,68 @@ class PresentationsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'create, update and show a presentation with extended metadata' do
+
+    cmt = FactoryBot.create(:simple_presentation_extended_metadata_type)
+
+    person = FactoryBot.create(:person)
+    login_as(person)
+
+    assert_difference('ActivityLog.count') do
+      assert_difference('Presentation.count') do
+          assert_difference('ContentBlob.count') do
+            assert_difference('ExtendedMetadata.count') do
+              post :create, params: { presentation: { title: 'Presentation', project_ids: [person.projects.first.id],
+                                               extended_metadata_attributes:{ extended_metadata_type_id: cmt.id,
+                                                                              data:{ 'age': 22,'name':'fred'}}},
+                                      content_blobs: [{ data: file_for_upload }], policy_attributes: valid_sharing
+              }
+          end
+        end
+      end
+    end
+
+    assert presentation = assigns(:presentation)
+    cm = presentation.extended_metadata
+
+    assert_equal cmt, cm.extended_metadata_type
+    assert_equal 'fred',cm.get_attribute_value('name')
+    assert_equal 22,cm.get_attribute_value('age')
+    assert_nil cm.get_attribute_value('date')
+
+
+    get :show, params: { id: presentation }
+    assert_response :success
+
+    assert_select 'div.extended_metadata',text:/fred/, count:1
+    assert_select 'div.extended_metadata',text:/22/, count:1
+
+    # test update
+    old_id = cm.id
+    assert_no_difference('Presentation.count') do
+      assert_no_difference('ExtendedMetadata.count') do
+        put :update, params: { id: presentation.id, presentation: { title: "new title",
+                                                  extended_metadata_attributes: { extended_metadata_type_id: cmt.id, id: cm.id,
+                                                                                  data: {
+                                                                                    "age": 20,
+                                                                                    "name": 'max'
+                                                                                  } }
+        }
+        }
+      end
+    end
+
+
+    assert new_presentation = assigns(:presentation)
+    assert_equal 'new title', new_presentation.title
+    assert_equal 'max', new_presentation.extended_metadata.get_attribute_value('name')
+    assert_equal 20, new_presentation.extended_metadata.get_attribute_value('age')
+    assert_equal old_id, new_presentation.extended_metadata.id
+
+
+  end
+
+
   test 'can edit' do
     presentation = FactoryBot.create :presentation, contributor: User.current_user.person
 
@@ -585,5 +647,13 @@ class PresentationsControllerTest < ActionController::TestCase
     end
     assert_redirected_to presentation_path(presentation = assigns(:presentation ))
     assert_empty presentation.discussion_links
+  end
+
+  test 'do not get index if feature disabled' do
+    with_config_value(:presentations_enabled, false) do
+      get :index
+      assert_redirected_to root_path
+      assert flash[:error].include?('disabled')
+    end
   end
 end

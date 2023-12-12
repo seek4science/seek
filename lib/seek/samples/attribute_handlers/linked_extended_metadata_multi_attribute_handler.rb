@@ -1,7 +1,7 @@
 module Seek
   module Samples
-    module AttributeTypeHandlers
-      class LinkedExtendedMetadataMultiAttributeTypeHandler < LinkedExtendedMetadataAttributeTypeHandler
+    module AttributeHandlers
+      class LinkedExtendedMetadataMultiAttributeHandler < LinkedExtendedMetadataAttributeHandler
 
         def test_value(value)
           fail 'Not a extended metadata multi' unless value.is_a?(Array)

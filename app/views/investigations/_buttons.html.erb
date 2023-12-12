@@ -9,11 +9,14 @@
 <% if item.can_edit? -%>
   <% if Seek::Config.isa_json_compliance_enabled && item.is_ISA_JSON_compliant %>
     <%= button_link_to("Design #{t('study')}", 'new', new_isa_study_path(investigation_id: item, single_page: params[:single_page])) %>
-		<%= button_link_to("Export ISA", 'download', export_isa_investigation_path(item)) %>
   <% else -%>
     <%= add_new_item_to_dropdown(item) %>
   <% end -%>
 <% end -%>
+
+<% if item.can_view? && Seek::Config.isa_json_compliance_enabled && item.is_ISA_JSON_compliant%>
+	<%= button_link_to("Export ISA", 'download', export_isa_investigation_path(item)) %>
+<% end %>
 
 <%= item_actions_dropdown do %>
   <% if item.can_edit? %>
