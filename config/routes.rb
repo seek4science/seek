@@ -700,7 +700,7 @@ SEEK::Application.routes.draw do
   resources :sample_controlled_vocabs do
     collection do
       get :typeahead
-      get :fetch_ols_terms
+      get :fetch_ols_terms_html
     end
   end
 

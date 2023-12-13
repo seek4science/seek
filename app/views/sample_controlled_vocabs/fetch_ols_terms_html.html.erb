@@ -1,0 +1,5 @@
+<% @terms.each_with_index do |term, index| %>
+
+  <%= render partial: 'sample_controlled_vocabs/term_form_row_disabled', locals: { index: index, term: OpenStruct.new(term)} %>
+
+<% end %>

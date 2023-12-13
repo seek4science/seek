@@ -1,0 +1,24 @@
+<tr class="sample-cv-term" data-index="<%= index %>">
+  <td>
+    <%= hidden_field_tag "sample_controlled_vocab[sample_controlled_vocab_terms_attributes][#{index}][label]", term.label  %>
+    <div class='disabled-cv-field form-control'><%= term.label %></div>
+  </td>
+  <td>
+    <%= hidden_field_tag "sample_controlled_vocab[sample_controlled_vocab_terms_attributes][#{index}][iri]", term.iri  %>
+    <div class='disabled-cv-field form-control'><%= term.iri %></div>
+  </td>
+  <td>
+    <%= hidden_field_tag "sample_controlled_vocab[sample_controlled_vocab_terms_attributes][#{index}][parent_iri]", term.parent_iri  %>
+    <div class='disabled-cv-field form-control'><%= term.parent_iri %></div>
+  </td>
+  <td>
+    <div class="btn-group" data-toggle="buttons">
+      <%= hidden_field_tag "sample_controlled_vocab[sample_controlled_vocab_terms_attributes][#{index}][_destroy]", '0', :autocomplete => 'off' %>
+      <label class="btn btn-danger">
+        Remove
+        <%= check_box_tag "sample_controlled_vocab[sample_controlled_vocab_terms_attributes][#{index}][_destroy]", '1', false,
+                          :class => 'destroy-attribute', :autocomplete => 'off',id:"sample_controlled_vocab-checkbox[sample_controlled_vocab_terms_attributes][#{index}][_destroy]" %>
+      </label>
+    </div>
+  </td>
+</tr>
