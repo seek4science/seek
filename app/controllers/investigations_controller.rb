@@ -40,7 +40,7 @@ class InvestigationsController < ApplicationController
   end
 
   def export_isa
-    isa = IsaExporter::Exporter.new(Investigation.find(params[:id])).export
+    isa = IsaExporter::Exporter.new(Investigation.find(params[:id]), current_user).export
     send_data isa, filename: 'isa.json', type: 'application/json', deposition: 'attachment'
   rescue Exception => e
     respond_to do |format|
