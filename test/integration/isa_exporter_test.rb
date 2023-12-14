@@ -26,7 +26,7 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
       @investigation = FactoryBot.create(:investigation, projects: [@project], contributor: @current_user.person)
       isa_project_vars = create_basic_isa_project
       with_config_value(:project_single_page_enabled, true) do
-        get export_isa_single_page_path(@project.id, investigation_id: @investigation.id)
+        get export_isa_investigation_path(@investigation.id)
       end
 
       isa_project_vars.merge(
