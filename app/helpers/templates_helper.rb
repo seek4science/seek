@@ -75,6 +75,7 @@ module TemplatesHelper
       attribute_type_id: attribute.sample_attribute_type_id,
       data_type: SampleAttributeType.find(attribute.sample_attribute_type_id)&.title,
       cv_id: attribute.sample_controlled_vocab_id,
+      allow_cv_free_text: attribute.allow_cv_free_text,
       title: attribute.title,
       is_title: attribute.is_title,
       short_name: attribute.short_name,
