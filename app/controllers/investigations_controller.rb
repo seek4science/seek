@@ -44,7 +44,7 @@ class InvestigationsController < ApplicationController
     send_data isa, filename: 'isa.json', type: 'application/json', deposition: 'attachment'
   rescue Exception => e
     respond_to do |format|
-        flash[:error] = e.message
+      flash[:error] = e.message
       format.html { redirect_to investigation_path(Investigation.find(params[:id])) }
     end
   end
