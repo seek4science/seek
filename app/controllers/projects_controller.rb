@@ -9,10 +9,11 @@ class ProjectsController < ApplicationController
   include Seek::DestroyHandling
   include Seek::Projects::Population
 
-  before_action :login_required, only: [:guided_join, :guided_create, :request_join, :request_create,
+  before_action :login_required, only: [:guided_join, :guided_create, :guided_import, :request_join, :request_create, :request_import,
                                         :administer_join_request, :respond_join_request,
                                         :administer_create_project_request, :respond_create_project_request,
-                                        :project_join_requests, :project_creation_requests, :typeahead]
+                                        :administer_import_project_request, :respond_import_project_request,
+                                        :project_join_requests, :project_creation_requests, :project_importation_requests, :typeahead]
 
   before_action :find_requested_item, only: %i[show admin edit update destroy admin_members
                                                asset_report populate populate_from_spreadsheet
@@ -22,7 +23,7 @@ class ProjectsController < ApplicationController
   before_action :has_spreadsheets, only: %i[:populate populate_from_spreadsheet]
 
   before_action :find_assets, only: [:index]
-  before_action :auth_to_create, only: %i[new create,:administer_create_project_request, :respond_create_project_request]
+  before_action :auth_to_create, only: %i[new create, :administer_create_project_request, :administer_import_project_request, :respond_create_project_request, :respond_import_project_request]
   before_action :editable_by_user, only: %i[edit update]
   before_action :check_investigations_are_for_this_project, only: %i[update]
   before_action :administerable_by_user, only: %i[admin admin_members admin_member_roles destroy update_members storage_report administer_join_request respond_join_request populate populate_from_spreadsheet]
@@ -31,8 +32,10 @@ class ProjectsController < ApplicationController
 
   before_action :validate_message_log_for_join, only: [:administer_join_request, :respond_join_request]
   before_action :validate_message_log_for_create, only: [:administer_create_project_request, :respond_create_project_request]
-  before_action :parse_message_log_details, only: [:administer_create_project_request]
-  before_action :check_message_log_programme_permissions, only: [:administer_create_project_request, :respond_create_project_request], if: Proc.new{Seek::Config.programmes_enabled}
+  before_action :validate_message_log_for_import, only: [:administer_import_project_request, :respond_import_project_request]
+  before_action :parse_message_log_details, only: [:administer_create_project_request, :administer_import_project_request]
+  before_action :check_message_log_programme_permissions, only: [:administer_create_project_request, :administer_import_project_request, 
+                                                                 :respond_create_project_request, :respond_import_project_request], if: Proc.new{Seek::Config.programmes_enabled}
 
   skip_before_action :project_membership_required
 
@@ -62,6 +65,16 @@ class ProjectsController < ApplicationController
     end
   end
 
+  def project_importation_requests
+    @requests = ProjectImportationMessageLog.pending_requests.select do |r|
+      r.can_respond_project_importation_request?(current_user)
+    end
+
+    respond_to do |format|
+      format.html
+    end
+  end
+
   def guided_join
     @project = Project.find(params[:id]) if params[:id]
     respond_to do |format|
@@ -75,6 +88,12 @@ class ProjectsController < ApplicationController
   end
 
   def guided_create
+    respond_to do |format|
+      format.html
+    end
+  end
+
+  def guided_import
     respond_to do |format|
       format.html
     end
@@ -218,6 +237,90 @@ class ProjectsController < ApplicationController
 
     if (@programme.nil? && admin_logged_in?) || @programme&.can_associate_projects?
       redirect_to administer_create_project_request_projects_path(message_log_id: log.id)
+    else
+      respond_to do |format|
+        format.html
+      end
+    end
+  end
+
+  def request_import
+    # Import a project from a DMP file which follows the RDA DMP Common Standard
+    proj_params = params.require(:project).permit([:dmp])
+    file = JSON.parse(proj_params["dmp"].read)
+
+    unless file.has_key?("dmp")
+      flash[:error] = "Invalid file format, missing top-level \"dmp\" tag"
+      redirect_back fallback_location: import_projects_path
+      return
+    end
+    dmp = file["dmp"]
+
+    unless dmp.has_key?("project")
+      flash[:error] = "Invalid file format, missing project properties"
+      redirect_back fallback_location: import_projects_path
+      return
+    end
+    project_data = dmp["project"][0]
+
+    # Create project
+    @project = Project.new(
+      title:       project_data["title"],
+      description: project_data["description"],
+      start_date:  project_data["start"],
+      end_date:    project_data["end"]
+    )
+
+    # Create institution
+    @institution = Institution.find_by_id(params[:institution][:id])
+    if @institution.nil?
+      inst_params = params.require(:institution).permit([:id, :title, :web_page, :city, :country])
+      @institution = Institution.new(inst_params)
+    end
+
+    # Create people
+    @people = dmp["contributor"].map { |person| Person.new(
+      first_name: person["name"].split(" ")[0],
+      last_name:  person["name"].split(" ")[-1],
+      email:      person["mbox"]
+    ) } if dmp.has_key?("contributor")
+
+    # A Programme has been selected, or it is a Site Managed Programme
+    if params[:programme_id].present?
+      @programme = Programme.find(params[:programme_id])
+      raise "no #{t('programme')} can be found" if @programme.nil?
+      if @programme.can_associate_projects?
+        log = ProjectImportationMessageLog.log_request(sender:current_person, programme:@programme, project:@project, institution:@institution, people:@people)
+      elsif @programme.site_managed?
+        log = ProjectImportationMessageLog.log_request(sender:current_person, programme:@programme, project:@project, institution:@institution, people:@people)
+        if Seek::Config.email_enabled
+          Mailer.request_import_project_for_programme(current_user, @programme, @project.to_json, @institution.to_json, @people.to_json, log).deliver_later
+        end
+        flash.now[:notice]="Thank you, your request for a new #{t('project')} has been sent"
+      else
+        raise 'Invalid Programme'
+      end
+    # A new project has been requested
+    elsif Seek::ProjectFormProgrammeOptions.creation_allowed?
+      prog_params = params.require(:programme).permit([:title])
+      @programme = Programme.new(prog_params)
+      log = ProjectImportationMessageLog.log_request(sender:current_person, programme:@programme, project:@project, institution:@institution, people:@people)
+      if  Seek::Config.email_enabled && !User.admin_logged_in?
+        Mailer.request_import_project_and_programme(current_user, @programme.to_json, @project.to_json, @institution.to_json, @people.to_json, log).deliver_later
+      end
+      flash.now[:notice] = "Thank you, your request for a new #{t('programme')} and #{t('project')} has been sent"
+    # No Programme at all
+    elsif !Seek::ProjectFormProgrammeOptions.show_programme_box?
+      @programme=nil
+      log = ProjectImportationMessageLog.log_request(sender:current_person, programme:@programme, project:@project, institution:@institution, people:@people)
+      if Seek::Config.email_enabled && !User.admin_logged_in?
+        Mailer.request_import_project(current_user, @project.to_json, @institution.to_json, @people.to_json, log).deliver_later
+      end
+      flash.now[:notice]="Thank you, your request for a new #{t('project')} has been sent"
+    end
+
+    if (@programme.nil? && admin_logged_in?) || @programme&.can_associate_projects?
+      redirect_to administer_import_project_request_projects_path(message_log_id: log.id)
     else
       respond_to do |format|
         format.html
@@ -538,6 +641,14 @@ class ProjectsController < ApplicationController
 
   end
 
+  def administer_import_project_request
+
+    respond_to do |format|
+      format.html
+    end
+
+  end
+
   def respond_create_project_request
 
     requester = @message_log.sender
@@ -611,6 +722,125 @@ class ProjectsController < ApplicationController
       else
         flash.now[:error] = validate_error_msg
         render action: :administer_create_project_request
+      end
+
+    else
+      if @message_log.sent_by_self? || params['delete_request'] == '1'
+        @message_log.destroy
+        flash[:notice]="#{t('project')} creation cancelled"
+      else
+        comments = params['reject_details']
+        @message_log.respond(comments)
+        project_name = JSON.parse(@message_log.details)['project']['title']
+        if Seek::Config.email_enabled
+          Mailer.create_project_rejected(requester,project_name,comments).deliver_later
+          Mailer.notify_admins_project_creation_rejected(current_person, requester, project_name, @programme&.to_json, comments).deliver_later
+          flash[:notice] = "Request rejected and #{requester.name} has been notified"
+        else
+          flash[:notice] = "Request rejected"
+        end
+
+      end
+
+      redirect_to :root
+    end
+  end
+
+  def respond_import_project_request
+
+    requester = @message_log.sender
+    make_programme_admin = false
+
+    if params['accept_request']=='1'
+
+      # @programme already populated in before_filter when checking permissions
+      make_programme_admin = @programme&.new_record?
+
+      if params['institution']['id']
+        @institution = Institution.find(params['institution']['id'])
+      else
+        @institution = Institution.new(params.require(:institution).permit([:title, :web_page, :city, :country]))
+      end
+
+      @project = Project.new(params.require(:project).permit([:title, :web_page, :description, :start_date, :end_date]))
+      @project.programme = @programme
+
+      people_params = params.permit(people: [:first_name, :last_name, :email])
+      @people = people_params['people'].map do |person_params|
+        Person.find_or_initialize_by(email: person_params['email']) do |person|
+          person.first_name = person_params['first_name']
+          person.last_name = person_params['last_name']
+        end
+      end if people_params.has_key?('people')
+
+      validate_error_msg = []
+
+      unless @project.valid?
+        validate_error_msg << "The #{t('project')} is invalid, #{@project.errors.full_messages.join(', ')}"
+      end
+      unless @programme.nil? || @programme.valid?
+        validate_error_msg << "The #{t('programme')} is invalid, #{@programme.errors.full_messages.join(', ')}"
+      end
+      unless @institution.valid?
+        validate_error_msg << "The #{t('institution')} is invalid, #{@institution.errors.full_messages.join(', ')}"
+      end
+      for person in @people
+        unless person.valid?
+          validate_error_msg << "The #{t('person')} is invalid, #{person.errors.full_messages.join(', ')}"
+        end
+      end if @people
+
+      unless @programme&.allows_user_projects? || Institution.can_create?
+        validate_error_msg << "The #{t('institution')} cannot be created, as you do not have access rights"
+      end
+
+      unless Project.can_create?
+        validate_error_msg << "The #{t('project')} cannot be created, as you do not have access rights"
+      end
+
+      unless Person.can_create?
+        validate_error_msg << "The #{t('person')} cannot be created, as you do not have access rights"
+      end
+
+      validate_error_msg = validate_error_msg.join('<br/>').html_safe
+
+      if validate_error_msg.blank?
+        @project.save!
+
+        # they are soon to become a project administrator, with permission to create
+        disable_authorization_checks { @institution.save! }
+
+        requester.add_to_project_and_institution(@project, @institution)
+        requester.is_project_administrator = true,@project
+        requester.is_programme_administrator = true, @programme if make_programme_admin
+
+        disable_authorization_checks do
+          requester.save!
+        end
+
+        @people.each do |person|
+          person.add_to_project_and_institution(@project, @institution)
+          person.save!
+        end if @people
+
+        if @message_log.sent_by_self?
+          @message_log.destroy
+          flash[:notice]="#{t('project')} created"
+        else
+          @message_log.respond('Accepted')
+          if Seek::Config.email_enabled
+            flash[:notice]="Request accepted and #{requester.name} added to #{t('project')} and notified"
+            Mailer.notify_user_projects_assigned(requester,[@project]).deliver_later
+            Mailer.notify_admins_project_creation_accepted(current_person, requester, @project).deliver_later
+          else
+            flash[:notice]="Request accepted and #{requester.name} added to #{t('project')}"
+          end
+        end
+
+        redirect_to(@project)
+      else
+        flash.now[:error] = validate_error_msg
+        render action: :administer_import_project_request
       end
 
     else
@@ -812,12 +1042,30 @@ class ProjectsController < ApplicationController
 
   end
 
+  def validate_message_log_for_import
+    @message_log = ProjectImportationMessageLog.find_by_id(params[:message_log_id])
+    if @message_log
+      error_msg ||= "you do not have permission to respond to this request" unless @message_log.can_respond_project_importation_request?(current_user)
+      error_msg ||= ("incorrect type of message log" unless @message_log.project_importation_request?)
+      error_msg ||= ("message has already been responded to" if @message_log.responded?)
+    else
+      error_msg = "message cannot be found, it is possible it has been deleted by another administrator"
+    end
+
+    if error_msg
+      error(error_msg, error_msg)
+      return false
+    end
+
+  end
+
   def parse_message_log_details
     details = @message_log.parsed_details
 
     @programme = details.programme
     @project = details.project
     @institution = details.institution
+    @people = details.people
 
     if @institution.new_record?
       # override with existing institution if already exists with same title, it could have been created since the request was made

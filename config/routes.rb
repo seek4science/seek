@@ -318,12 +318,17 @@ SEEK::Application.routes.draw do
       get :request_institutions
       get :guided_join
       get :guided_create
+      get :guided_import
       post :request_join
       post :request_create
+      post :request_import
       get :administer_create_project_request
+      get :administer_import_project_request
       post :respond_create_project_request
+      post :respond_import_project_request
       get :project_join_requests
       get :project_creation_requests
+      get :project_importation_requests
       get  :typeahead
     end
     member do
@@ -737,7 +742,7 @@ SEEK::Application.routes.draw do
       post :template_attributes
     end
     collection do
-      post :filter_isa_tags_by_level
+post :filter_isa_tags_by_level
       get :task_status
       get :default_templates
       post :populate_template

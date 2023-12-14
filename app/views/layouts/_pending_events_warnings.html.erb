@@ -18,6 +18,13 @@
     </div>
   <% end %>
 
+    <% if pending_project_importation_request? %>
+    <div id='pending-project-importation-warning' class="alert alert-danger text-center">
+      There are pending <%= t('project') %> importation requests
+      - <%= link_to('Full List', project_importation_requests_projects_path) %>
+    </div>
+  <% end %>
+
   <% if pending_project_join_request? %>
     <div id='pending-project-join-warning' class="alert alert-danger text-center">
       There are pending join requests for <%= t('project').pluralize %> you administer
