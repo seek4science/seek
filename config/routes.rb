@@ -751,7 +751,6 @@ SEEK::Application.routes.draw do
   resources :single_pages do
     member do
       get :dynamic_table_data
-      get :export_isa, action: :export_isa
     end
     collection do
       get :batch_sharing_permission_preview
