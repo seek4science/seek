@@ -47,20 +47,7 @@ class SinglePagesController < ApplicationController
   rescue Exception => e
     render json: { status: :unprocessable_entity, error: e.message }
   end
-
-  def export_isa
-    @inv = Investigation.find(params[:investigation_id])
-    raise 'The investigation cannot be found!' if @inv.blank?
-
-    isa = IsaExporter::Exporter.new(@inv, current_user).export
-    send_data isa, filename: 'isa.json', type: 'application/json', deposition: 'attachment'
-  rescue Exception => e
-    respond_to do |format|
-      flash[:error] = e.message
-      format.html { redirect_to single_page_path(Project.find(params[:id])) }
-    end
-  end
-
+  
   def download_samples_excel
     sample_ids, sample_type_id, study_id, assay_id = Rails.cache.read(params[:uuid]).values_at(:sample_ids, :sample_type_id,
                                                                                                :study_id, :assay_id)
