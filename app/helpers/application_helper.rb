@@ -461,6 +461,14 @@ module ApplicationHelper
     end.present?
   end
 
+  def pending_project_importation_request?
+    return false unless admin_logged_in? || programme_administrator_logged_in?
+
+    ProjectImportationMessageLog.pending_requests.detect do |log|
+      log.can_respond_project_importation_request?(User.current_user)
+    end.present?
+  end
+
   def pending_project_join_request?
     return false unless project_administrator_logged_in?
     return false if ProjectMembershipMessageLog.pending.count == 0
