@@ -11,7 +11,7 @@ Templates.init = function (elem) {
   const columnDefs = [
     { orderable: false, targets: [0, 7, 11] },
     {
-      targets: [3, 4, 9, 10],
+      targets: [3, 4, 5, 10, 11],
       visible: false,
       searchable: false
     },
@@ -33,6 +33,7 @@ Templates.init = function (elem) {
     { title: "Description", width: "40%" },
     { title: "attribute_type_id" },
     { title: "cv_id" },
+    { title: "allow_cv_free_text" },
     { title: "Unit", width: "5%" },
     { title: "Data type", width: "10%" },
     {
@@ -115,6 +116,7 @@ Templates.mapData = (data) =>
     item.description,
     item.attribute_type_id,
     item.cv_id,
+    item.allow_cv_free_text,
     item.unit_id,
     item.data_type,
     item.is_title,
@@ -232,17 +234,17 @@ const applyTemplate = () => {
     index++;
 
     newRow = $j(newRow.replace(/replace-me/g, index));
-
     $j(newRow).find('[data-attr="required"]').prop("checked", row[0]);
     $j(newRow).find('[data-attr="title"]').val(row[1]);
     $j(newRow).find('[data-attr="description"]').val(row[2]);
     $j(newRow).find('[data-attr="type"]').val(row[3]);
     $j(newRow).find('[data-attr="cv_id"]').val(row[4]);
-    $j(newRow).find('[data-attr="unit"]').val(row[5]);
-    $j(newRow).find(".sample-type-is-title").prop("checked", row[7]);
-    $j(newRow).find('[data-attr="pid"]').val(row[8]);
-    $j(newRow).find('[data-attr="isa_tag_id"]').val(row[10]);
-    $j(newRow).find('[data-attr="isa_tag_title"]').val(row[10]);
+    $j(newRow).find('[data-attr="allow_cv_free_text"]').prop("checked", row[5]);
+    $j(newRow).find('[data-attr="unit"]').val(row[6]);
+    $j(newRow).find(".sample-type-is-title").prop("checked", row[8]);
+    $j(newRow).find('[data-attr="pid"]').val(row[9]);
+    $j(newRow).find('[data-attr="isa_tag_id"]').val(row[11]);
+    $j(newRow).find('[data-attr="isa_tag_title"]').val(row[11]);
     $j(newRow).find('[data-attr="isa_tag_title"]').attr('disabled', true);
 
     // Show the CV block if cv_id is not empty
