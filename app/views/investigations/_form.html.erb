@@ -19,10 +19,15 @@
   <%= folding_panel("Compliance with ISA-JSON schemas", false, id: "set_ISA_JSON_compliance",
                     help_text: "Here you can choose to adhere to ISA-JSON schemas to enable ISA-JSON export.") do %>
     <div class="help-block">
-      You can choose to make your <%= t('investigation') %> compliant with ISA-JSON schemas to enable ISA-JSON export. If checked, all associated ISA elements such as <%= t('study').pluralize %> and <%= t('assay').pluralize %> will also be ISA-JSON compliant.
+      You can choose to make your <%= t('investigation') %> compliant with ISA-JSON schemas to enable ISA-JSON export. If checked, all associated ISA elements such as <%= t('study').pluralize %> and <%= t('assay').pluralize %> will also be ISA-JSON compliant. <br>
+      The checkbox cannot be toggled once child ISA elements such as <%= t('study').pluralize %> and <%= t('assay').pluralize %> have been associated.
     </div>
     <label>
-      <%= f.check_box :is_ISA_JSON_compliant%>
+      <% if @investigation.studies.any? %>
+        <%= f.check_box :is_ISA_JSON_compliant, disabled: "disabled"%>
+      <% else %>
+        <%= f.check_box :is_ISA_JSON_compliant%>
+      <% end %>
       <%= "Make #{t('investigation')} compliant to ISA-JSON schemas?" %>
     </label>
   <% end %>
