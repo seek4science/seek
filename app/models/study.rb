@@ -54,7 +54,7 @@ class Study < ApplicationRecord
   end
 
   def is_ISA_JSON_compliant
-    investigation.is_ISA_JSON_compliant
+    investigation.is_ISA_JSON_compliant && sample_types.any?
   end
 
   def clone_with_associations

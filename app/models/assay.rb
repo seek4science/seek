@@ -95,7 +95,7 @@ class Assay < ApplicationRecord
   end
 
   def is_ISA_JSON_compliant
-    investigation.is_ISA_JSON_compliant
+    investigation.is_ISA_JSON_compliant && !sample_type.nil?
   end
 
   # returns true if this is a modelling class of assay
