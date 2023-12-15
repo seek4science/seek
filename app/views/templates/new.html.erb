@@ -5,8 +5,7 @@
 <p>
   Templates can be defined manually through the form below or based on repository templates.
 </p>
-
-<div class="asset_form"> 
+<div class="asset_form">
   <%= render partial: 'templates/form', locals: { tab: tab } %>
 </div>
 
@@ -22,7 +21,7 @@
       .addClass('hidden'); // Hide the row
 
     // Update the ISA tag select
-    const attribute_row = "#new-attribute-row"
+    const attribute_row = ".sample-attribute";
     updateIsaTagSelect("<%= @template.level %>", attribute_row);
   });
 </script>
