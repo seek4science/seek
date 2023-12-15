@@ -23,7 +23,7 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
       post '/session', params: { login: 'test', password: generate_user_password }
       @current_user = User.current_user
       @current_user.person.add_to_project_and_institution(@project, @current_user.person.institutions.first)
-      @investigation = FactoryBot.create(:investigation, projects: [@project], contributor: @current_user.person)
+      @investigation = FactoryBot.create(:investigation, projects: [@project], contributor: @current_user.person, is_ISA_JSON_compliant: true)
       isa_project_vars = create_basic_isa_project
       with_config_value(:project_single_page_enabled, true) do
         get export_isa_investigation_path(@investigation.id)
