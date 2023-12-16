@@ -463,6 +463,7 @@ class WorkflowsControllerTest < ActionController::TestCase
 
     assert_response :success
     assert_equal 'image/svg+xml', response.headers['Content-Type']
+    assert_equal ApplicationController::USER_CONTENT_CSP, @response.header['Content-Security-Policy']
     assert wf.diagram_exists?
   end
 

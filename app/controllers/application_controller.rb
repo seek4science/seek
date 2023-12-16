@@ -129,11 +129,15 @@ class ApplicationController < ActionController::Base
   helper_method :controller_model
 
   def self.api_actions(*actions)
-    @api_actions ||= (superclass.respond_to?(:api_actions) ? superclass.api_actions.dup : []) + actions.map(&:to_sym)
+    @api_actions ||= []
+    @api_actions |= actions.map(&:to_sym)
+    @api_actions
   end
 
   def self.user_content_actions(*actions)
-    @user_content_actions ||= (superclass.respond_to?(:user_content_actions) ? superclass.user_content_actions.dup : []) + actions.map(&:to_sym)
+    @user_content_actions ||= []
+    @user_content_actions |= actions.map(&:to_sym)
+    @user_content_actions
   end
 
   private
@@ -628,7 +632,7 @@ class ApplicationController < ActionController::Base
 
   # Stop hosted user content from running scripts etc.
   def secure_user_content
-    if self.class.user_content_actions.include?(action_name.to_sym)
+    if self.class._user_content_actions.include?(action_name.to_sym)
       response.set_header('Content-Security-Policy', USER_CONTENT_CSP)
     end
   end
