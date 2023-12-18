@@ -138,6 +138,10 @@ module Seek
       blob.content_type_file_extensions.include?('ipynb')
     end
 
+    def is_svg?(blob = self)
+      blob.content_type_file_extensions.include?('svg')
+    end
+
     def unknown_file_type?(blob = self)
       blob.human_content_type == 'Unknown file type'
     end
