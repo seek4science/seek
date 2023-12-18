@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_12_18_113249) do
+ActiveRecord::Schema.define(version: 2023_12_18_133053) do
 
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
@@ -2098,6 +2098,7 @@ ActiveRecord::Schema.define(version: 2023_12_18_113249) do
     t.integer "isa_tag_id"
     t.string "pid"
     t.boolean "allow_cv_free_text", default: false
+    t.integer "linked_sample_type_id"
     t.index ["template_id", "title"], name: "index_template_id_asset_id_title"
   end
 
