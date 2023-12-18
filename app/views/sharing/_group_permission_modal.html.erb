@@ -40,8 +40,9 @@
 
   // Display project/institution/workgroup modal
   $j('#add-project-permission-button').click(function () {
-    $j('#add-project-permission-modal').modal('show');
-
+      $j('#permission-institution-id').val('');
+      $j('#permission-project-id').val('').trigger('change');
+      $j('#add-project-permission-modal').modal('show');
     return false;
   });
 
