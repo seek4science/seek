@@ -104,7 +104,8 @@ class WorkflowsController < ApplicationController
 
   # Takes a single RO-Crate zip file
   def create_from_ro_crate
-    @crate_extractor = WorkflowCrateExtractor.new(ro_crate_extractor_params)
+    @crate_extractor = WorkflowCrateExtractor.new(ro_crate_extractor_params.merge(
+      params: params.key?(:workflow) ? workflow_params : {}))
     @workflow = @crate_extractor.build
 
     respond_to do |format|
@@ -370,7 +371,8 @@ class WorkflowsController < ApplicationController
   def ro_crate_params
     params.require(:ro_crate).permit({ main_workflow: [:data, :data_url, :make_local_copy] },
                                      { abstract_cwl: [:data, :data_url, :make_local_copy] },
-                                     { diagram: [:data, :data_url, :make_local_copy] })
+                                     { diagram: [:data, :data_url, :make_local_copy] }).merge(
+      params.fetch(:workflow, {}).permit(project_ids: []))
   end
 
   def ro_crate_extractor_params

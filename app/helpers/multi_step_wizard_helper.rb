@@ -46,6 +46,9 @@ module MultiStepWizardHelper
       if params[key][:publication_ids]
         html << hidden_field_tag('data_file[publication_ids][]', params[key][:publication_ids])
       end
+      if params[key][:project_ids]
+        html << hidden_field_tag("#{key}[project_ids][]", params[key][:project_ids])
+      end
     end
     html.html_safe
   end
@@ -56,7 +59,8 @@ module MultiStepWizardHelper
       key => {
         assay_assets_attributes: resource.assay_assets.collect(&:assay_id).collect { |id| { assay_id: id.to_s } },
         event_ids: resource.events.collect(&:id),
-        publication_ids: resource.publications.collect(&:id)
+        publication_ids: resource.publications.collect(&:id),
+        project_ids: resource.projects.collect(&:id)
       }
     }
   end

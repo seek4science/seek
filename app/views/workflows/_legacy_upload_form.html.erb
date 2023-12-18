@@ -12,6 +12,7 @@
   <div class="tab-content">
     <div id="new-ro-crate" role="tabpanel" class="tab-pane active">
       <%= form_tag({ action: :create_ro_crate, anchor: 'new-ro-crate' }, multipart: true) do -%>
+        <%= forward_params(:workflow) %>
         <div class="asset_form">
           <%= error_messages_for :workflow -%>
           <%= error_messages_for :crate_builder, header_message: "Could not build Workflow RO-Crate" -%>
@@ -80,6 +81,7 @@
 
     <div id="existing-ro-crate" role="tabpanel" class="tab-pane">
       <%= form_tag({ action: :create_content_blob, anchor: 'existing-ro-crate' }, multipart: true) do -%>
+        <%= forward_params(:workflow) %>
         <div class="asset_form">
           <%= error_messages_for :workflow -%>
           <%= error_messages_for :crate_extractor -%>
