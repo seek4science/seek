@@ -1096,6 +1096,28 @@ class SampleTypeTest < ActiveSupport::TestCase
     assert sample_type.errors.added?(:'sample_attributes.unit', 'cannot be changed (weight)')
   end
 
+  test 'determin whether sample types are considered ISA-JSON compliant' do
+    assay_sample_type = FactoryBot.create(:patient_sample_type)
+    refute assay_sample_type.is_isa_json_compliant?
+
+    FactoryBot.create(:assay, sample_type: assay_sample_type)
+    assert assay_sample_type.is_isa_json_compliant?
+
+    source_sample_type = FactoryBot.create(:patient_sample_type)
+    sample_collection_sample_type= FactoryBot.create(:patient_sample_type)
+
+    [source_sample_type, sample_collection_sample_type].each do |st|
+      refute st.is_isa_json_compliant?
+    end
+
+    FactoryBot.create(:study, sample_types: [source_sample_type, sample_collection_sample_type])
+
+    [source_sample_type, sample_collection_sample_type].each do |st|
+      assert st.is_isa_json_compliant?
+    end
+
+  end
+
   private
 
   # sample type with 3 samples
