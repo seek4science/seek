@@ -401,6 +401,19 @@ $j(document).ready(function () {
     $j(document).on('click', '.sidebar-backdrop', Sidebar.toggle);
 
     Licenses.init();
+
+    $j('.svg-pan-zoom').each(function () {
+        // Does not seem to work using jQuery load event, so doing it vanilla way
+        this.addEventListener('load', function () {
+            svgPanZoom(this, {
+                zoomEnabled: true,
+                dblClickZoomEnabled: false,
+                controlIconsEnabled: true,
+                fit: true
+            });
+        });
+    });
 });
+
 
 var URL_ROOT = '<%= Rails.application.config.relative_url_root %>';
