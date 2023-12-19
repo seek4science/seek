@@ -38,7 +38,7 @@ module IsaExporter
 
       studies = []
 
-      unless @investigation.studies.all?(&:is_isa_json_compliant)
+      unless @investigation.studies.all?(&:is_isa_json_compliant?)
           raise "All studies in investigation '#{investigation.title}' should be ISA-JSON compliant"
       end
 
@@ -130,7 +130,7 @@ module IsaExporter
 
       isa_study[:processSequence] = convert_process_sequence(study.sample_types.second, study.sops.map(&:id).join("_"), study.id)
 
-      unless study.assays.all?(&:is_isa_json_compliant)
+      unless study.assays.all?(&:is_isa_json_compliant?)
         raise "All assays in study `#{study.title}` should be ISA-JSON compliant."
       end
 
