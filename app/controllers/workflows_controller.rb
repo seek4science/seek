@@ -18,7 +18,6 @@ class WorkflowsController < ApplicationController
   include Legacy::WorkflowSupport
 
   api_actions :index, :show, :create, :update, :destroy, :ro_crate, :create_version
-  user_content_actions :diagram
 
   rescue_from ROCrate::ReadException do |e|
     logger.error("Error whilst attempting to read RO-Crate metadata for #{@workflow&.id}.")
@@ -249,6 +248,7 @@ class WorkflowsController < ApplicationController
   def diagram
     @diagram = @display_workflow.diagram
     if @diagram
+      response.set_header('Content-Security-Policy', USER_SVG_CSP)
       send_file(@diagram.path,
                 filename: @diagram.filename,
                 type: @diagram.content_type,
