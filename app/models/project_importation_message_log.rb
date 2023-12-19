@@ -4,7 +4,7 @@ class ProjectImportationMessageLog < MessageLog
   
     default_scope { where(message_type: :project_importation_request) }
   
-    # project creation requests that haven't been responded to
+    # project importation requests that haven't been responded to
     scope :pending_requests, -> { pending }
   
     def self.log_request(sender:, people:, project:, institution:, programme: nil)

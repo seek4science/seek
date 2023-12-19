@@ -1,21 +1,21 @@
 
 Hi <%= @admins.collect{|o| o.name}.join(", ") -%>,
 
-<% if @programme %>
+The <%= Seek::Config.instance_name %> user <%= "#{@requester.name} (#{person_url(@requester)})" %>, has requested a new <%= t('programme') %> and <%= t('project')  %>.
 
-  The <%= Seek::Config.instance_name %> user <%= "#{@requester.name} (#{person_url(@requester)})" %>, has requested a new <%= t('project')  %> is imported within your <%= t('programme') %>.
-
-  The <%= t('programme') %> is <%= "#{@programme.title} (#{programme_url(@programme)})" %>
-
-<% else %>
-
-  The <%= Seek::Config.instance_name %> user <%= "#{@requester.name} (#{person_url(@requester)})" %>, has requested a new <%= t('project')  %> is imported.
-
-<% end %>
-
+They provided the following details about the <%= t('programme') %>
+  <%= t('programme') %> title: '<%= @programme.title %>'
 
 They provided the following details about the <%= t('project') %>
-  <%= t('project') %> title: '<%= @project.title %>'
+<%
+  title = @project.title.blank? ? 'No title provided' : @project.title
+  web_page = @project.web_page.blank? ? 'No web page provided' : @project.web_page
+  description = @project.description.blank? ? 'No description provided' : @project.description
+
+%>
+  <%= t('project') %> title: '<%= title %>'
+  <%= t('project') %> description: '<%= description %>'
+  <%= t('project') %> web_page: '<%= web_page %>'
 
 <% if @institution.id.nil? %>
   <%
@@ -29,7 +29,7 @@ They provided the following details about their <%= t('institution') %>:
   <%= t('institution') %> web page: '<%= web_page %>'
   <%= t('institution') %> country: '<%= country %>'
 <% else %>
-They indicated that they are associated with the existing <%= "#{@institution.title} (#{institution_url(@institution)})" %>
+They indicated that they are associated with the existing <%= t('institution') %> <%= "#{@institution.title} (#{institution_url(@institution)})" %>
 <% end %>
 
 <% if Array(@people).length > 0 %>

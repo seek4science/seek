@@ -229,7 +229,7 @@ class Mailer < ActionMailer::Base
     @requester = user.person
     @institution = Institution.new(JSON.parse(institution_json))
     @project = Project.new(JSON.parse(project_json))
-    @people = people_json.map { |person_json| Person.new(JSON.parse(person_json)) }
+    @people = JSON.parse(people_json).map { |person| Person.new(person) }
     @message_log = message_log
 
     mail(from: Seek::Config.noreply_sender,
@@ -245,7 +245,7 @@ class Mailer < ActionMailer::Base
     @requester = user.person
     @institution = Institution.new(JSON.parse(institution_json))
     @project = Project.new(JSON.parse(project_json))
-    @people = people_json.map { |person_json| Person.new(JSON.parse(person_json)) }
+    @people = JSON.parse(people_json).map { |person| Person.new(person) }
     @message_log = message_log
     mail(from: Seek::Config.noreply_sender,
          to: admin_emails,
@@ -258,7 +258,7 @@ class Mailer < ActionMailer::Base
     @requester = user.person
     @institution = Institution.new(JSON.parse(institution_json))
     @project = Project.new(JSON.parse(project_json))
-    @people = people_json.map { |person_json| Person.new(JSON.parse(person_json)) }
+    @people = JSON.parse(people_json).map { |person| Person.new(person) }
     @message_log = message_log
     mail(from: Seek::Config.noreply_sender,
          to: admin_emails,

@@ -762,7 +762,7 @@ class ProjectsController < ApplicationController
         @institution = Institution.new(params.require(:institution).permit([:title, :web_page, :city, :country]))
       end
 
-      @project = Project.new(params.require(:project).permit([:title, :web_page, :description, :start_date, :end_date]))
+      @project = Project.new(params.require(:project).permit([:title, :web_page, :description]))
       @project.programme = @programme
 
       people_params = params.permit(people: [:first_name, :last_name, :email])
