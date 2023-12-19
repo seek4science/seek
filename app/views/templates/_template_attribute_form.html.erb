@@ -10,6 +10,7 @@
 <% attribute_type_id = template_attribute ? template_attribute.sample_attribute_type_id : nil %>
 <% sample_controlled_vocab_id = template_attribute ? template_attribute.sample_controlled_vocab_id : nil %>
 <% unit_id = template_attribute ? template_attribute.unit_id : nil %>
+<% linked_sample_type_id = template_attribute&.linked_sample_type_id %>
 <% field_name_prefix = "template[template_attributes_attributes][#{index}]" %>
 <% seek_sample_multi = template_attribute.try(:seek_sample_multi?) %>
 <% is_title = template_attribute ? template_attribute.is_title : false %>
@@ -82,7 +83,7 @@
         end
       %>
       <%= select_tag "#{field_name_prefix}[linked_sample_type_id]",
-                     grouped_options_for_select(options, nil),
+                     grouped_options_for_select(options, linked_sample_type_id),
                      include_blank: true,
                      class: 'form-control linked-sample-type-selection' %>
     </div>
