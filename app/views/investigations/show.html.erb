@@ -21,7 +21,7 @@
         <% if Seek::Config.isa_json_compliance_enabled %>
           <p id="isa_json_compliance">
             <b><%= "Is ISA-JSON compliant" %>: </b>
-            <%= @investigation.is_ISA_JSON_compliant %>
+            <%= @investigation.is_isa_json_compliant? %>
           </p>
         <% end %>
         <%= render partial: 'extended_metadata/extended_metadata_attribute_values', locals: {resource: @investigation} %>

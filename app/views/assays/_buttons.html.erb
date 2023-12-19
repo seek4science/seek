@@ -14,13 +14,13 @@
 <% end -%>
 
 <% if logged_in_and_member? %>
-	<% unless item.is_ISA_JSON_compliant%>
+	<% unless item.is_isa_json_compliant?%>
 		<%= button_link_to("New #{assay_word} based on this one", 'new', new_object_based_on_existing_one_assay_path(item, :controller_name => "assays")) %>
 	<% end %>
 <% end %>
 
 <% if item.can_edit? %>
-	<% if Seek::Config.isa_json_compliance_enabled && item.is_ISA_JSON_compliant %>
+	<% if Seek::Config.isa_json_compliance_enabled && item.is_isa_json_compliant? %>
 		<% valid_study = item&.study&.sample_types.present? %>
 		<% valid_assay = item&.sample_type.present? %>
 		<% if valid_study && valid_assay %>
@@ -37,7 +37,7 @@
 
 <%= item_actions_dropdown do %>
   <% if item.can_edit? %>
-    <% if Seek::Config.isa_json_compliance_enabled && item.is_ISA_JSON_compliant %>
+    <% if Seek::Config.isa_json_compliance_enabled && item.is_isa_json_compliant? %>
       <li><%= image_tag_for_key('edit', edit_isa_assay_path(item, source_assay_id: item.id, study_id: item.study.id, single_page: params[:single_page]), "Edit #{t('isa_assay')}", nil, "Edit #{t('isa_assay')}") -%></li>
     <% else %>
       <li><%= image_tag_for_key('edit', edit_assay_path(item), "Edit #{assay_word}", nil, "Edit #{assay_word}") -%></li>

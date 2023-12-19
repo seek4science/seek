@@ -24,9 +24,9 @@
     </div>
     <label>
       <% if @investigation.studies.any? %>
-        <%= f.check_box :is_ISA_JSON_compliant, disabled: "disabled"%>
+        <%= f.check_box :is_isa_json_compliant, disabled: "disabled"%>
       <% else %>
-        <%= f.check_box :is_ISA_JSON_compliant%>
+        <%= f.check_box :is_isa_json_compliant%>
       <% end %>
       <%= "Make #{t('investigation')} compliant to ISA-JSON schemas?" %>
     </label>

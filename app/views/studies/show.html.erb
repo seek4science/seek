@@ -36,7 +36,7 @@
             <% if Seek::Config.isa_json_compliance_enabled %>
               <p id="isa_json_compliance">
                 <b><%= "Is ISA-JSON compliant" %>: </b>
-                <%= @study.is_ISA_JSON_compliant %>
+                <%= @study.is_isa_json_compliant? %>
               </p>
               <%= render partial: 'isa_studies/applied_templates', locals: { resource: @study } -%>
             <% end %>
@@ -68,7 +68,7 @@
     <%= render partial: 'general/items_related_to', object: @study %>
   <% end %>
 
-	<% if Seek::Config.isa_json_compliance_enabled && @study.is_ISA_JSON_compliant%>
+	<% if Seek::Config.isa_json_compliance_enabled && @study.is_isa_json_compliant?%>
 		<%= tab_pane('study_design') do %>
 			<%= render :partial=>"isa_studies/study_design", locals: { study: @study} -%>
 		<% end %>
@@ -76,7 +76,7 @@
 
 </div>
 <script>
-  const isIsaCompliant = <%= @study.is_ISA_JSON_compliant %>
+  const isIsaCompliant = <%= @study.is_isa_json_compliant? %>
   if (isIsaCompliant) {
     var id = <%= @study.id %>;
     var pid = <%= @study.projects.first.id %>;

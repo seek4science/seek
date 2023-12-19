@@ -18,7 +18,7 @@
   <% end %>
 
 	<% if resource %>
-		<% if Seek::Config.isa_json_compliance_enabled && resource.is_ISA_JSON_compliant %>
+		<% if Seek::Config.isa_json_compliance_enabled && resource.is_isa_json_compliant? %>
 			<%= tab(resource_name&.downcase + "_design") do %>
 				<span class="glyphicon glyphicon-th-list"></span> <%= resource.model_name.human %> design
 			<% end %>

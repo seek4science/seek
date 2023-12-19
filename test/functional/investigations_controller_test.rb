@@ -854,7 +854,7 @@ class InvestigationsControllerTest < ActionController::TestCase
       project = FactoryBot.create(:project)
       current_user.person.add_to_project_and_institution(project, current_user.person.institutions.first)
       other_user.person.add_to_project_and_institution(project, current_user.person.institutions.first)
-      investigation = FactoryBot.create(:investigation, projects: [project], contributor: current_user.person, is_ISA_JSON_compliant: true)
+      investigation = FactoryBot.create(:investigation, projects: [project], contributor: current_user.person, is_isa_json_compliant: true)
 
       source_sample_type = FactoryBot.create(:isa_source_sample_type, template_id: FactoryBot.create(:isa_source_template).id)
       sample_collection_sample_type = FactoryBot.create(:isa_sample_collection_sample_type, linked_sample_type: source_sample_type, template_id: FactoryBot.create(:isa_sample_collection_template).id)
