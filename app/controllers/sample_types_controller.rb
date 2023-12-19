@@ -11,6 +11,7 @@ class SampleTypesController < ApplicationController
   before_action :auth_to_create, only: %i[new create]
   before_action :project_membership_required, only: %i[create new select filter_for_select]
   before_action :find_and_authorize_requested_item, except: %i[index new create preview update_annotations_ajax]
+  after_action :update_sample_json_metadata, only: :update
 
   before_action :authorize_requested_sample_type, except: %i[index new create]
 
@@ -147,6 +148,11 @@ class SampleTypesController < ApplicationController
   def batch_upload; end
 
   private
+
+  def update_sample_json_metadata
+    # UpdateSampleMetadataJob.new(@sample_type).queue_job
+    UpdateSampleMetadataJob.new(@sample_type).perform_now
+  end
 
   def sample_type_params
     attributes = params[:sample_type][:sample_attributes]

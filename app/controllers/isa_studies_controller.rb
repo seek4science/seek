@@ -86,7 +86,7 @@ class IsaStudiesController < ApplicationController
 
   def update_sample_json_metadata
     @isa_study.study.sample_types.map do |st|
-      UpdateSampleMetadataJob.new(st).queue_job
+      UpdateSampleMetadataJob.new(st).perform_now
     end
   end
 

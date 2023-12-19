@@ -74,7 +74,7 @@ class IsaAssaysController < ApplicationController
   private
 
   def update_sample_json_metadata
-    UpdateSampleMetadataJob.new(@isa_assay.assay.sample_type).queue_job
+    UpdateSampleMetadataJob.new(@isa_assay.assay.sample_type).perform_now
   end
 
   def fix_assay_linkage_for_new_assays
