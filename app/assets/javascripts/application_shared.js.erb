@@ -407,8 +407,10 @@ $j(document).ready(function () {
         this.addEventListener('load', function () {
             svgPanZoom(this, {
                 zoomEnabled: true,
-                dblClickZoomEnabled: false,
+                dblClickZoomEnabled: true,
+                mouseWheelZoomEnabled: false,
                 controlIconsEnabled: true,
+                contain: false,
                 fit: true
             });
         });

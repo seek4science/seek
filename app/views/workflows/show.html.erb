@@ -34,7 +34,8 @@
                 <div class="workflow-diagram">
                   <% diagram_path = diagram_workflow_path(@workflow, version: @display_workflow.version) %>
                   <% if @display_workflow&.diagram.extension == 'svg' %>
-                    <%= content_tag(:embed, '', type: 'image/svg+xml', src: diagram_path, class: 'svg-pan-zoom')  %>
+                    <%= content_tag(:embed, '', type: 'image/svg+xml', src: diagram_path, class: 'svg-pan-zoom', width: 1000, height: 500)  %>
+                    <p class="help-block">Click and drag the diagram to pan, double click or use the controls to zoom.</p>
                   <% else %>
                     <%= image_tag(diagram_path) %>
                   <% end %>
