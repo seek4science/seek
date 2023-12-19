@@ -63,6 +63,10 @@ module TemplatesHelper
   def template_attribute_type_link(template_attribute)
     type = template_attribute.sample_attribute_type.title
 
+    if template_attribute.sample_attribute_type.seek_sample? || template_attribute.sample_attribute_type.seek_sample_multi?
+      type += ' - ' + link_to(template_attribute.linked_sample_type&.title, template_attribute.linked_sample_type)
+    end
+
     if template_attribute.sample_attribute_type.controlled_vocab?
       type += ' - ' + link_to(template_attribute.sample_controlled_vocab.title,
                               template_attribute.sample_controlled_vocab)
