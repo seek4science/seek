@@ -11,7 +11,7 @@ Templates.init = function (elem) {
   const columnDefs = [
     { orderable: false, targets: [0, 7, 11] },
     {
-      targets: [3, 4, 5, 10, 11],
+      targets: [3, 4, 5, 10, 11, 13],
       visible: false,
       searchable: false
     },
@@ -57,7 +57,8 @@ Templates.init = function (elem) {
           ? ""
           : '<a class="btn btn-danger btn-sm" href="javascript:void(0)" onClick="remove(this)">Remove</a>';
       }
-    }
+    },
+    { title: "linked sample type id", width: "10%" }
   ];
 
   Templates.table = elem.DataTable({
@@ -123,7 +124,8 @@ Templates.mapData = (data) =>
     item.pid,
     item.pos,
     item.isa_tag_id,
-    item.isa_tag_title
+    item.isa_tag_title,
+    item.linked_sample_type_id
   ]);
 
 function loadFilterSelectors(data) {
@@ -234,7 +236,6 @@ const applyTemplate = () => {
     index++;
 
     const isInputRow = row[7] === 'Registered Sample List' && row[1].includes('Input') && row[11] === null
-    if (isInputRow) debugger;
     newRow = $j(newRow.replace(/replace-me/g, index));
     $j(newRow).find('[data-attr="required"]').prop("checked", row[0]);
     $j(newRow).find('[data-attr="title"]').val(row[1]);
@@ -252,9 +253,18 @@ const applyTemplate = () => {
     // Show the CV block if cv_id is not empty
     if (row[4]) $j(newRow).find(".controlled-vocab-block").show();
 
-    // Hide the input row
+    // If input-row: use input-sample-type-id
+    // else: set the linked_sample_type_id
     if (isInputRow) {
+      const previousSampleTypeId = $j('#isa_assay_input_sample_type_id').val();
+      if(previousSampleTypeId){
+        $j(newRow).find('.linked-sample-type-selection').val(previousSampleTypeId)
+      } else {
+        $j(newRow).find(".linked-sample-type-selection optgroup option:first").attr("selected", "selected");
+      }
       $j(newRow).hide();
+    } else {
+      $j(newRow).find('.linked-sample-type-selection').val(row[13])
     }
 
     $j(`${attribute_table} ${addAttributeRow}`).before(newRow);
