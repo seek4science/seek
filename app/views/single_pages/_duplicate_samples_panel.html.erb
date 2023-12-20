@@ -29,6 +29,8 @@
                     <span class="label label-default", title='<%= cv_term %>'><%= cv_term %></span>
                   <% end %>
                 </td>
+              <% elsif @registered_sample_fields.include?(key) %>
+                <td><span class="badge", title='<%= val['id'] %>'><%= val['title'] %></span></td>
               <% else %>
                 <td id='<%= "#{dupl_sample['duplicate']['id']}[#{key}]" %>' ><%= val %></td>
               <% end %>
@@ -49,6 +51,8 @@
                         <span class="label label-default", title='<%= cv_term %>'><%= cv_term %></span>
                       <% end %>
                     </td>
+                  <% elsif @registered_sample_fields.include?(key) %>
+                    <td><span class="badge", title='<%= val['id'] %>'><%= val['title'] %></span></td>
                   <% else %>
                     <td><%= val%></td>
                   <% end %>

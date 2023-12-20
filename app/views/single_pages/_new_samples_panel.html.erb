@@ -30,6 +30,8 @@
                       <span class="label label-default", title='<%= cv_term %>'><%= cv_term %></span>
                     <% end %>
                   </td>
+                <% elsif @registered_sample_fields.include?(key) %>
+                  <td><span class="badge", title='<%= val['id'] %>'><%= val['title'] %></span></td>
                 <% else %>
                   <td id='<%= "new-sample-#{new_sample_id}[#{key}]" %>' ><%= val %></td>
                 <% end %>

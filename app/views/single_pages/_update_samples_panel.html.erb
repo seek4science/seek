@@ -29,6 +29,10 @@
                       <span class="label label-default", title='<%= cv_term %>'><%= cv_term %></span>
                     <% end %>
                   </td>
+                <% elsif @registered_sample_fields.include?(key) %>
+                  <td class='<%= (val != db_sample[key]) ? "warning" : "default" %>'>
+                    <span class="badge", title='<%= val['id'] %>'><%= val['title'] %></span>
+                  </td>
                 <% else %>
                   <td class='<%= (val != db_sample[key]) ? "warning" : "default" %>' id='<%= "update-sample-#{update_sample['id']}[#{key}]"%>' ><%= val %></td>
                 <% end %>
@@ -50,6 +54,8 @@
                       <span class="label label-default", title='<%= cv_term %>'><%= cv_term %></span>
                     <% end %>
                   </td>
+                <% elsif @registered_sample_fields.include?(key) %>
+                  <td><span class="badge", title='<%= val['id'] %>'><%= val['title'] %></span></td>
                 <% else %>
                   <td><%= val %></td>
                 <% end %>
