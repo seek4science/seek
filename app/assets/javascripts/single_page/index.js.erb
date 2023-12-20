@@ -242,12 +242,12 @@ async function exportToExcel(tableName, studyId, assayId, sampleTypeId) {
       const val = row[j];
 
       // Check whether sample has one or more hidden Inputs or if sample is completely hidden
-      if (attr.toLowerCase().includes('input')) {
-        if (Array.isArray(val)){
-          hasHiddenInputs = val.some(input => input.title === '#HIDDEN'); // Sample has hidden inputs
-        } else {
-          hasHiddenInputs = val === '#HIDDEN'; // Sample is completely hidden
-        }
+      if (Array.isArray(val)){
+        hasHiddenInputs = hasHiddenInputs || val.some(input => input.title === '#HIDDEN'); // Sample has hidden Registered Samples in list
+      } else if(typeof val === 'object' && val !== null && 'title' in val){
+        hasHiddenInputs = hasHiddenInputs || (val.title === '#HIDDEN'); // Sample has hidden Registered Sample
+      } else {
+        hasHiddenInputs = hasHiddenInputs || (val === '#HIDDEN'); // Sample is completely hidden
       }
 
       // The source inputs are wrapped in an object and must be unwrapped first
