@@ -1012,9 +1012,8 @@ class SampleTypeTest < ActiveSupport::TestCase
     assert sample_type.valid?
 
     # Adding attribute
-    sample_type.sample_attributes.build(title: 'test 123')
-    refute sample_type.valid?
-    assert sample_type.errors.added?(:sample_attributes, 'cannot be added, new attributes are not allowed (test 123)')
+    sample_type.sample_attributes.build(title: 'test 123', sample_attribute_type: FactoryBot.build(:string_sample_attribute_type))
+    assert sample_type.valid?
 
     sample_type.reload
     assert sample_type.valid?
@@ -1029,8 +1028,7 @@ class SampleTypeTest < ActiveSupport::TestCase
 
     # Changing attribute title
     sample_type.sample_attributes.last.title = 'banana'
-    refute sample_type.valid?
-    assert sample_type.errors.added?(:'sample_attributes.title', 'cannot be changed (patient)')
+    assert sample_type.valid?
 
     sample_type.reload
     assert sample_type.valid?
@@ -1041,16 +1039,15 @@ class SampleTypeTest < ActiveSupport::TestCase
                                   project_ids: @person.project_ids)
     end
     sample_type.sample_attributes.last.required = true
-    refute sample_type.valid?
-    assert sample_type.errors.added?(:'sample_attributes.required', 'cannot be changed (patient)')
+    assert sample_type.valid?
 
     sample_type.reload
     assert sample_type.valid?
 
     # Changing "title" attribute
+    sample_type.sample_attributes.first.is_title = false
     sample_type.sample_attributes.last.is_title = true
-    refute sample_type.valid?
-    assert sample_type.errors.added?(:'sample_attributes.is_title', 'cannot be changed (patient)')
+    assert sample_type.valid?
 
     sample_type.reload
     assert sample_type.valid?
@@ -1092,8 +1089,7 @@ class SampleTypeTest < ActiveSupport::TestCase
     assert sample_type.valid?
     attr = sample_type.sample_attributes.detect { |t| t.accessor_name == 'weight' }
     attr.unit = FactoryBot.create(:unit)
-    refute sample_type.valid?
-    assert sample_type.errors.added?(:'sample_attributes.unit', 'cannot be changed (weight)')
+    assert sample_type.valid?
   end
 
   test 'determin whether sample types are considered ISA-JSON compliant' do
