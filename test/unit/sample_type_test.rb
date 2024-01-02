@@ -1018,6 +1018,19 @@ class SampleTypeTest < ActiveSupport::TestCase
     sample_type.reload
     assert sample_type.valid?
 
+    # Adding a mandatory attribute
+    sample_type.sample_attributes.build(title: 'test abc', sample_attribute_type: FactoryBot.build(:string_sample_attribute_type), required: true)
+    refute sample_type.valid? # Shouldn't work since the sample type has samples linked to it.
+
+    sample_type.reload
+    assert sample_type.valid?
+
+    different_sample_type.sample_attributes.build(title: 'test abc', sample_attribute_type: FactoryBot.build(:string_sample_attribute_type), required: true)
+    assert different_sample_type.valid? # Should work since the sample type has no samples linked to it.
+
+    different_sample_type.reload
+    assert different_sample_type.valid?
+
     # Removing attribute (via nested attributes)
     sample_type.sample_attributes_attributes = { id: sample_type.sample_attributes.last.id, _destroy: '1' }
     refute sample_type.valid?

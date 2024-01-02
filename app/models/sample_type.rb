@@ -225,7 +225,9 @@ class SampleType < ApplicationRecord
       end
 
       if a.new_record? && a.required? && !new_record?
-        errors.add(:sample_attributes, "cannot be added, new attributes must be optional (#{a.title})")
+        if samples.any?
+            errors.add(:sample_attributes, "cannot be added, new attributes must be optional (#{a.title})")
+        end
       end
     end
   end
