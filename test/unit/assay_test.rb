@@ -753,7 +753,7 @@ class AssayTest < ActiveSupport::TestCase
 
   test 'isa json compliance' do
     isa_json_compliant_study = FactoryBot.create(:isa_json_compliant_study)
-    assert study.is_isa_json_compliant?
+    assert isa_json_compliant_study.is_isa_json_compliant?
     default_assay = FactoryBot.create(:assay, study: isa_json_compliant_study)
     refute default_assay.is_isa_json_compliant?
 
