@@ -29,6 +29,13 @@ SEEK::Application.routes.draw do
     end
   end
 
+  #Fhir
+  namespace :fhir do
+    namespace :v4 do
+      get 'studies/:id' => 'research_studies#show'
+    end
+  end
+
   # Concerns
   concern :has_content_blobs do
     member do
