@@ -68,29 +68,22 @@ module Scrapers
     def create_resources(repositories)
       repositories.map do |repo|
         output.puts "  Considering #{repo.remote.chomp('.git')}..."
-        latest_tag = `cd #{repo.git_base.path}/.. && git describe --tags --abbrev=0 remotes/origin/#{@main_branch}`.chomp
-        unless $?.success?
+        tag = latest_tag(repo)
+        if tag.nil?
           output.puts "    Error while getting latest tag - wrong branch name?"
           next
         end
-        wiz = GitWorkflowWizard.new(params: {
-          git_version_attributes: {
-            git_repository_id: repo.id,
-            ref: "refs/tags/#{latest_tag}",
-            name: latest_tag,
-            comment: "Updated to #{latest_tag}"
-          }
-        })
+        wiz = workflow_wizard(repo, tag)
         workflow = existing_resource(repo)
         new_version = false
         if workflow
           new_version = true
           wiz.workflow = workflow
-          unless workflow.git_versions.none? { |gv| gv.name == latest_tag }
-            output.puts "    Version #{latest_tag} already registered, doing nothing"
+          unless workflow.git_versions.none? { |gv| gv.name == tag }
+            output.puts "    Version #{tag} already registered, doing nothing"
             next
           end
-          output.puts "    New version detected! (#{latest_tag}), creating new version"
+          output.puts "    New version detected! (#{tag}), creating new version"
         else
           output.puts "    Creating new workflow"
         end
@@ -115,6 +108,21 @@ module Scrapers
 
         workflow
       end.compact
+    end
+
+    def main_branch(repo)
+      @main_branch
+    end
+
+    def workflow_wizard(repo, tag)
+      GitWorkflowWizard.new(params: {
+        git_version_attributes: {
+          git_repository_id: repo.id,
+          ref: "refs/tags/#{tag}",
+          name: tag,
+          comment: "Updated to #{tag}"
+        }
+      })
     end
 
     # Get all the repositories in the given org from the GitHub API.
@@ -147,6 +155,13 @@ module Scrapers
         File.write(path, yield)
         File.read(path)
       end
+    end
+
+    def latest_tag(repo)
+      tag = `cd #{repo.git_base.path}/.. && git describe --tags --abbrev=0 remotes/origin/#{main_branch(repo)}`.chomp
+      return nil unless $?.success?
+
+      tag
     end
   end
 end
