@@ -6,7 +6,7 @@ module Seek
       end
 
       def render_content
-        "<pre>#{blob.read}</pre>"
+        "<pre>#{h(blob.read)}</pre>"
       end
 
       def render_standalone
