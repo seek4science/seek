@@ -302,8 +302,12 @@ module SamplesHelper
   end
 
   def show_extract_samples_button?(asset, display_asset)
-    return false unless ( asset.can_manage? && (display_asset.version == asset.version) && asset.sample_template? && asset.extracted_samples.empty? )
-    return ! ( asset.sample_extraction_task&.in_progress? || ( asset.sample_extraction_task&.success? && Seek::Samples::Extractor.new(asset).fetch.present? ) )
+    return false unless asset.extracted_samples.empty? && (display_asset.version == asset.version) && asset.can_manage?
+    return false if asset.sample_extraction_task&.in_progress?
+    return false if asset.sample_extraction_task&.success? && Seek::Samples::Extractor.new(asset).fetch.present?
+    return false unless content_blob&.is_extractable_spreadsheet?
+
+    return asset.matching_sample_type?
 
     rescue Seek::Samples::FetchException
       return true # allows to try again

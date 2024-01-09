@@ -111,9 +111,9 @@ class DataFile < ApplicationRecord
     true
   end
 
-  # FIXME: bad name, its not whether it IS a template, but whether it originates from a template
-  def sample_template?
+  def matching_sample_type?
     return false if external_asset.is_a? OpenbisExternalAsset
+    Rails.logger.debug("Checking for matching sample template for data file ##{id}")
     possible_sample_types.any?
   rescue SysMODB::SpreadsheetExtractionException
     false

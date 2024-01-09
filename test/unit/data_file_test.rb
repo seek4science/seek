@@ -217,14 +217,14 @@ class DataFileTest < ActiveSupport::TestCase
     end
   end
 
-  test 'sample template?' do
+  test 'matching sample type?' do
     create_sample_attribute_type
 
     person = FactoryBot.create(:person)
 
     User.with_current_user(person.user) do
       data_file = FactoryBot.create :data_file, content_blob: FactoryBot.create(:sample_type_populated_template_content_blob), policy: FactoryBot.create(:public_policy)
-      refute data_file.sample_template?
+      refute data_file.matching_sample_type?
       assert_empty data_file.possible_sample_types
 
       sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id], contributor: person
@@ -232,12 +232,12 @@ class DataFileTest < ActiveSupport::TestCase
       sample_type.build_attributes_from_template
       disable_authorization_checks { sample_type.save! }
 
-      assert data_file.sample_template?
+      assert data_file.matching_sample_type?
       assert_includes data_file.possible_sample_types, sample_type
 
       #doesn't match
       data_file = FactoryBot.create :data_file, content_blob: FactoryBot.create(:small_test_spreadsheet_content_blob), policy: FactoryBot.create(:public_policy)
-      refute data_file.sample_template?
+      refute data_file.matching_sample_type?
       assert_empty data_file.possible_sample_types
 
     end
@@ -249,7 +249,7 @@ class DataFileTest < ActiveSupport::TestCase
     person = FactoryBot.create(:person)
 
     data_file = FactoryBot.create :data_file, content_blob: FactoryBot.create(:sample_type_populated_template_content_blob), policy: FactoryBot.create(:public_policy)
-    refute data_file.sample_template?
+    refute data_file.matching_sample_type?
     assert_empty data_file.possible_sample_types
 
     #visible
