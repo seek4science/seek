@@ -1,3 +1,7 @@
+<%= javascript_include_tag "single_page/index" %>
+<%= javascript_include_tag "single_page/dynamic_table" %>
+<%= javascript_include_tag "project_folders" %>
+
 <%= render partial: 'general/item_title', locals: { item: @assay, buttons_partial: 'assays/buttons' } -%>
 
 <%= render partial: 'general/show_page_tab_definitions', locals: { resource: @assay } %>
@@ -140,3 +144,11 @@
 		<% end %>
 	<% end %>
 </div>
+<script>
+  const isIsaCompliant = <%= @assay.is_isa_json_compliant? %>
+  if (isIsaCompliant) {
+    var id = <%= @assay.id %>;
+    var pid = <%= @assay.projects.first.id %>;
+    var dynamicTableDataPath = '<%= Seek::Util.routes.dynamic_table_data_single_page_path(@assay.projects.first.id) %>';
+  }
+</script>
