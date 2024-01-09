@@ -37,6 +37,7 @@ class SearchController < ApplicationController
     end
 
     if search_params[:include_external_search] == '1'
+      @include_external_search = true
       @external_results = Seek::ExternalSearch.instance.external_search(downcase_query, @search_type&.downcase)
     end
 
