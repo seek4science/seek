@@ -1140,18 +1140,32 @@ class InvestigationsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'display single page button if feature enabled' do
+    with_config_value(:project_single_page_enabled, true) do
+      current_user = FactoryBot.create(:user)
+      login_as(current_user)
+      inv = FactoryBot.create(:investigation, contributor: current_user.person)
+
+      get :show, params: { id: inv }
+      assert_response :success
+
+      assert_select 'a', text: 'Single Page', count: 1
+    end
+  end
+
   test 'display adjusted buttons if isa json compliant' do
-    current_user = FactoryBot.create(:user)
-    login_as(current_user)
+    with_config_value(:isa_json_compliance_enabled, true) do
+      current_user = FactoryBot.create(:user)
+      login_as(current_user)
+      inv = FactoryBot.create(:investigation, is_isa_json_compliant: true, contributor: current_user.person)
 
-    inv = FactoryBot.create(:investigation, is_isa_json_compliant: true)
+      get :show, params: { id: inv }
+      assert_response :success
 
-    get :show, params: { id: inv }
-    assert_response :success
+      assert_select 'a', text: /Design #{I18n.t('study')}/i, count: 1
+      assert_select 'a', text: 'Export ISA', count: 1
 
-    assert_select 'a', text: /Design #{I18n.t('study')}/i, count: 1
-    assert_select 'a', text: 'Export ISA', count: 1
-
-    assert_select 'a', text: /Add a #{I18n.t('study')}/i, count: 0
+      assert_select 'a', text: /Add a #{I18n.t('study')}/i, count: 0
+    end
   end
 end
