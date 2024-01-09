@@ -1994,4 +1994,17 @@ class AssaysControllerTest < ActionController::TestCase
       assert flash[:error].include?('disabled')
     end
   end
+
+  test 'display single page button if feature enabled' do
+    with_config_value(:project_single_page_enabled, true) do
+      current_user = FactoryBot.create(:user)
+      login_as(current_user)
+      assay = FactoryBot.create(:assay, contributor: current_user.person)
+
+      get :show, params: { id: assay }
+      assert_response :success
+
+      assert_select 'a', text: 'Single Page', count: 1
+    end
+  end
 end
