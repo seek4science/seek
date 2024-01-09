@@ -4,12 +4,14 @@
 input_sample_type_id = params[:isa_assay][:input_sample_type_id] if params.dig(:isa_assay, :input_sample_type_id)
 source_assay = Assay.find(params[:source_assay_id]) if params[:source_assay_id]
 
-if !@isa_assay.assay.new_record?
-  assay_position = source_assay.position
-elsif params[:source_assay_id]
-  assay_position = source_assay.position + 1
+if @isa_assay.assay.new_record?
+  if params[:source_assay_id]
+    assay_position = source_assay.position + 1
+  else
+    assay_position = 0
+  end
 else
-  assay_position = 0
+  assay_position = @isa_assay.assay.position
 end
 
 # assay_position = params[:source_assay_id] ? source_assay.position + 1 : 0
