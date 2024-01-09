@@ -175,6 +175,9 @@ function digValue(object, path) {
             elements.removeClass(cssClass)
         }, 1100);
     };
+
+    // Fixes select2 in modals: https://github.com/select2/select2/issues/1436
+    $j.fn.modal.Constructor.prototype.enforceFocus = function () {};
 }(jQuery));
 
 $j(document).ready(function () {
