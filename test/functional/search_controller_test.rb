@@ -184,7 +184,7 @@ class SearchControllerTest < ActionController::TestCase
 
     VCR.use_cassette('biomodels/search') do
       with_config_value(:external_search_enabled, true) do
-        Model.stub(:solr_cache, -> (q) { Model.pluck(:id).last(3) }) do
+        Model.stub(:solr_cache, -> (q) { Model.pluck(:id).last(1) }) do
           get :index, params: { q: 'yeast', include_external_search: '1' }
         end
       end
