@@ -239,6 +239,7 @@ class DataFileTest < ActiveSupport::TestCase
       data_file = FactoryBot.create :data_file, content_blob: FactoryBot.create(:small_test_spreadsheet_content_blob), policy: FactoryBot.create(:public_policy)
       refute data_file.matching_sample_type?
       assert_empty data_file.possible_sample_types
+      assert_nil data_file.detect_possible_sample_type
 
     end
   end
@@ -273,6 +274,43 @@ class DataFileTest < ActiveSupport::TestCase
       refute_empty possible
       assert_includes possible,sample_type1
       refute_includes possible,sample_type2
+    end
+  end
+
+  test 'detect possible sample type' do
+    create_sample_attribute_type
+
+    person = FactoryBot.create(:person)
+
+    data_file = FactoryBot.create :data_file, content_blob: FactoryBot.create(:sample_type_populated_template_content_blob), policy: FactoryBot.create(:public_policy)
+    refute data_file.matching_sample_type?
+    assert_empty data_file.possible_sample_types
+
+    sample_type1 = SampleType.new title: 'st 1', uploaded_template: true, project_ids: person.projects.collect(&:id), contributor: person
+    sample_type1.content_blob = FactoryBot.create(:sample_type_template_content_blob)
+    sample_type1.build_attributes_from_template
+    disable_authorization_checks { sample_type1.save! }
+
+    sample_type2 = SampleType.new title: 'st 2', uploaded_template: true, project_ids: person.projects.collect(&:id), contributor: person
+    sample_type2.content_blob = FactoryBot.create(:sample_type_template_content_blob)
+    sample_type2.build_attributes_from_template
+    disable_authorization_checks { sample_type2.save! }
+
+    User.with_current_user(person.user) do
+      assert sample_type1.can_view?
+      assert sample_type2.can_view?
+
+      assert_equal [sample_type1, sample_type2], data_file.possible_sample_types
+      assert_equal sample_type1, data_file.detect_possible_sample_type
+    end
+
+    # check hidden not returned
+    User.with_current_user(FactoryBot.create(:person).user) do
+      refute sample_type1.can_view?
+      refute sample_type2.can_view?
+
+      assert_empty data_file.possible_sample_types
+      assert_nil data_file.detect_possible_sample_type
     end
   end
 

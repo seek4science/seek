@@ -114,13 +114,20 @@ class DataFile < ApplicationRecord
   def matching_sample_type?
     return false if external_asset.is_a? OpenbisExternalAsset
     Rails.logger.debug("Checking for matching sample template for data file ##{id}")
-    possible_sample_types.any?
+    detect_possible_sample_type.present?
   rescue SysMODB::SpreadsheetExtractionException
     false
   end
 
+  # returns all matching sample types
   def possible_sample_types(user = User.current_user)
     content_blob.present? ? SampleType.sample_types_matching_content_blob(content_blob,user) : []
+  end
+
+  # returns the first matching sample type
+  def detect_possible_sample_type(user = User.current_user)
+    return nil unless content_blob.present?
+    SampleType.detect_sample_type_matching_content_blob(content_blob,user)
   end
 
   def related_samples

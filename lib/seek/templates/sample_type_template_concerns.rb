@@ -93,6 +93,12 @@ module Seek
             type.matches_content_blob?(content_blob)
           end
         end
+
+        def detect_sample_type_matching_content_blob(content_blob, user = User.current_user)
+          SampleType.all.select{|st| st.can_view?(user)}.detect do |type|
+            type.matches_content_blob?(content_blob)
+          end
+        end
       end
     end
   end
