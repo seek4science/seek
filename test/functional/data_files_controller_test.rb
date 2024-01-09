@@ -2216,7 +2216,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     data_file = FactoryBot.create :data_file, content_blob: FactoryBot.create(:sample_type_populated_template_content_blob),
                         policy: FactoryBot.create(:private_policy), contributor: person
-    refute data_file.sample_template?
+    refute data_file.matching_sample_type?
     assert_empty data_file.possible_sample_types
 
     sample_type = SampleType.new title: 'visible1', uploaded_template: true, project_ids: [person.projects.first.id], contributor: person
@@ -2374,7 +2374,7 @@ class DataFilesControllerTest < ActionController::TestCase
     login_as(person)
 
     data_file = FactoryBot.create :data_file, content_blob: FactoryBot.create(:sample_type_populated_template_content_blob), policy: FactoryBot.create(:private_policy), contributor: person
-    refute data_file.sample_template?
+    refute data_file.matching_sample_type?
     assert_empty data_file.possible_sample_types
 
     sample_type = SampleType.new title: 'from template', project_ids: [person.projects.first.id], contributor: person
@@ -2402,7 +2402,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     data_file = FactoryBot.create :data_file, content_blob: FactoryBot.create(:sample_type_populated_template_content_blob),
                         policy: FactoryBot.create(:private_policy), contributor: person
-    refute data_file.sample_template?
+    refute data_file.matching_sample_type?
     assert_empty data_file.possible_sample_types
 
     sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id], contributor: person
@@ -2553,7 +2553,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     data_file = FactoryBot.create :data_file, content_blob: FactoryBot.create(:sample_type_populated_template_content_blob),
                         policy: FactoryBot.create(:private_policy), contributor: person
-    refute data_file.sample_template?
+    refute data_file.matching_sample_type?
     assert_empty data_file.possible_sample_types
 
     # First matching type
@@ -2588,7 +2588,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     data_file = FactoryBot.create :data_file, content_blob: FactoryBot.create(:sample_type_populated_template_content_blob),
                         policy: FactoryBot.create(:private_policy), contributor: person
-    refute data_file.sample_template?
+    refute data_file.matching_sample_type?
     assert_empty data_file.possible_sample_types
 
     sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id], contributor: person
@@ -2608,7 +2608,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     data_file = FactoryBot.create :data_file, content_blob: FactoryBot.create(:sample_type_populated_template_content_blob),
                         policy: FactoryBot.create(:private_policy), contributor: person
-    refute data_file.sample_template?
+    refute data_file.matching_sample_type?
     assert_empty data_file.possible_sample_types
 
     sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id], contributor: person
@@ -2630,7 +2630,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     data_file = FactoryBot.create :data_file, content_blob: FactoryBot.create(:sample_type_populated_template_content_blob),
                         policy: FactoryBot.create(:private_policy), contributor: person
-    refute data_file.sample_template?
+    refute data_file.matching_sample_type?
     assert_empty data_file.possible_sample_types
 
     sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id], contributor: person
@@ -2653,7 +2653,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     data_file = FactoryBot.create :data_file, content_blob: FactoryBot.create(:sample_type_populated_template_content_blob),
                         policy: FactoryBot.create(:private_policy), contributor: person
-    refute data_file.sample_template?
+    refute data_file.matching_sample_type?
     assert_empty data_file.possible_sample_types
 
     sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id], contributor: person
@@ -2685,7 +2685,7 @@ class DataFilesControllerTest < ActionController::TestCase
     data_file = FactoryBot.create :data_file, content_blob: FactoryBot.create(:sample_type_populated_template_content_blob),
                         policy: FactoryBot.create(:private_policy),
                         contributor: person
-    refute data_file.sample_template?
+    refute data_file.matching_sample_type?
     assert_empty data_file.possible_sample_types
 
     sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id], contributor: person

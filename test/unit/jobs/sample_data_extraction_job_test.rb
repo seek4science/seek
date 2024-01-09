@@ -9,7 +9,7 @@ class SampleDataExtractionJobTest < ActiveSupport::TestCase
 
     @data_file = FactoryBot.create :data_file, content_blob: FactoryBot.create(:sample_type_populated_template_content_blob),
                          policy: FactoryBot.create(:private_policy), contributor: @person
-    refute @data_file.sample_template?
+    refute @data_file.matching_sample_type?
     assert_empty @data_file.possible_sample_types
 
     @sample_type = SampleType.new title: 'from template', uploaded_template: true,
