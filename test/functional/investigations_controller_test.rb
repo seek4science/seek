@@ -1139,4 +1139,19 @@ class InvestigationsControllerTest < ActionController::TestCase
       refute assay_output_ids.include? "#data_file/#{assay_2_stream_2_hidden_sample.id}"
     end
   end
+
+  test 'display adjusted buttons if isa json compliant' do
+    current_user = FactoryBot.create(:user)
+    login_as(current_user)
+
+    inv = FactoryBot.create(:investigation, is_isa_json_compliant: true)
+
+    get :show, params: { id: inv }
+    assert_response :success
+
+    assert_select 'a', text: /Design #{I18n.t('study')}/i, count: 1
+    assert_select 'a', text: 'Export ISA', count: 1
+
+    assert_select 'a', text: /Add a #{I18n.t('study')}/i, count: 0
+  end
 end
