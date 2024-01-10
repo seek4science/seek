@@ -5,7 +5,6 @@ require 'openbis_test_helper'
 
 class DataFilesControllerTest < ActionController::TestCase
 
-  fixtures :all
 
   include AuthenticatedTestHelper
   include RdfTestCases

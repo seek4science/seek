@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class FavouriteTest < ActiveSupport::TestCase
-  fixtures :all
 
   test 'remove redundant' do
     fav = favourites(:data_file_fav)
