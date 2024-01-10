@@ -161,15 +161,19 @@ namespace :seek do
     puts '... searching for ISA compliant investigations'
     investigations_updated = 0
     disable_authorization_checks do
-      isa_json_compliant_studies = Study.all.select { |study| study.sample_types.any? }
-      isa_json_compliant_studies.each do |study|
-        inv = study.investigation
-        inv.update(is_isa_json_compliant: true)
-        inv.save
+      investigations_to_update = Study.joins(:investigation)
+                                      .where('investigations.is_isa_json_compliant = ?', false)
+                                      .select { |study| study.sample_types.any? }
+                                      .map(&:investigation)
+                                      .compact
+                                      .uniq
+
+      investigations_to_update.each do |inv|
+        inv.update_column(:is_isa_json_compliant, true)
         investigations_updated += 1
       end
     end
-    puts "...Updated #{investigations_updated} investigations"
+    puts "...Updated #{investigations_updated.to_s} investigations"
   end
 
   private
