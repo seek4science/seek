@@ -1,26 +1,43 @@
 <% assay_word = item.is_modelling? ? t('assays.modelling_analysis') : t('assays.assay') %>
 <%= render :partial => "subscriptions/subscribe", :locals => {:object => item} %>
+
+<% if Seek::Config.project_single_page_enabled %>
+	<% if !displaying_single_page? %>
+		<span>
+     <%= button_link_to("Single Page", 'sop', single_page_path(id: item.projects.first.id, item_type: 'assay', item_id: item.id)) -%>
+    </span>
+	<% else %>
+		<span>
+      <%= button_link_to("Default View", 'sop', assay_path(item.id)) -%>
+    </span>
+	<% end %>
+<% end -%>
+
 <% if logged_in_and_member? %>
-  <% if displaying_single_page? %>
+	<% unless item.is_isa_json_compliant?%>
+		<%= button_link_to("New #{assay_word} based on this one", 'new', new_object_based_on_existing_one_assay_path(item, :controller_name => "assays")) %>
+	<% end %>
+<% end %>
+
+<% if item.can_edit? %>
+	<% if Seek::Config.isa_json_compliance_enabled && item.is_isa_json_compliant? %>
 		<% valid_study = item&.study&.sample_types.present? %>
 		<% valid_assay = item&.sample_type.present? %>
 		<% if valid_study && valid_assay %>
     	<%= button_link_to("Design the next #{t('assay')}", 'new', new_isa_assay_path(source_assay_id: item.id, study_id: item.study.id, single_page: params[:single_page])) %>
 		<% end %>
 	<% else %>
-    <%= button_link_to("New #{assay_word} based on this one", 'new', new_object_based_on_existing_one_assay_path(item, :controller_name => "assays")) %>
-  <% end %>
-  <% if item.can_edit? %>
     <%= add_new_item_to_dropdown(item) %>
   <% end %>
 <% end %>
+
 <% if show_nels_button?(item) %>
   <%= button_link_to('Add data from NeLS', 'add', assay_nels_path(item.id)) %>
 <% end -%>
 
 <%= item_actions_dropdown do %>
   <% if item.can_edit? %>
-    <% if displaying_single_page? %>
+    <% if Seek::Config.isa_json_compliance_enabled && item.is_isa_json_compliant? %>
       <li><%= image_tag_for_key('edit', edit_isa_assay_path(item, source_assay_id: item.id, study_id: item.study.id, single_page: params[:single_page]), "Edit #{t('isa_assay')}", nil, "Edit #{t('isa_assay')}") -%></li>
     <% else %>
       <li><%= image_tag_for_key('edit', edit_assay_path(item), "Edit #{assay_word}", nil, "Edit #{assay_word}") -%></li>

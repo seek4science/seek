@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_11_21_100719) do
+ActiveRecord::Schema.define(version: 2023_12_18_113249) do
 
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
@@ -940,6 +940,7 @@ ActiveRecord::Schema.define(version: 2023_11_21_100719) do
     t.text "other_creators"
     t.string "deleted_contributor"
     t.integer "position"
+    t.boolean "is_isa_json_compliant"
   end
 
   create_table "investigations_projects", id: false, force: :cascade do |t|

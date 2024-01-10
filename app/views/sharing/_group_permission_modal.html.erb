@@ -40,6 +40,7 @@
 
   // Display project/institution/workgroup modal
   $j('#add-project-permission-button').click(function () {
+      $j.fn.modal.Constructor.prototype.enforceFocus = function() {};
       $j('#permission-institution-id').val('');
       $j('#permission-project-id').val('').trigger('change');
       $j('#add-project-permission-modal').modal('show');

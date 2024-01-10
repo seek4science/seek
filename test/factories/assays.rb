@@ -95,6 +95,15 @@ FactoryBot.define do
     assets_creators { [AssetsCreator.new(affiliation: 'University of Somewhere', creator: FactoryBot.create(:person, first_name: 'Some', last_name: 'One'))] }
   end
 
+  factory(:isa_json_compliant_assay, parent: :assay) do
+    title { 'ISA JSON compliant assay' }
+    description { 'An assay linked to an ISA JSON compliant study and a sample type' }
+    after(:build) do |assay|
+      assay.study = FactoryBot.create(:isa_json_compliant_study)
+      assay.sample_type = FactoryBot.create(:isa_assay_material_sample_type, linked_sample_type: assay.study.sample_types.last)
+    end
+  end
+
   # AssayAsset
   factory :assay_asset do
     association :assay

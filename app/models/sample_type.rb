@@ -60,6 +60,10 @@ class SampleType < ApplicationRecord
 
   has_annotation_type :sample_type_tag, method_name: :tags
 
+  def is_isa_json_compliant?
+    studies.any? || assays.any?
+  end
+
   def validate_value?(attribute_name, value)
     attribute = sample_attributes.detect { |attr| attr.title == attribute_name }
     raise UnknownAttributeException, "Unknown attribute #{attribute_name}" unless attribute

@@ -18,6 +18,9 @@ class SearchControllerTest < ActionController::TestCase
         assert_select '.list_item_title a[href=?]', document_path(doc)
       end
     end
+
+    refute assigns(:include_external_search)
+    assert_select 'div#advanced-search input#include_external_search[type=checkbox]:not(checked)'
   end
 
   test 'search result order retained' do
@@ -174,5 +177,23 @@ class SearchControllerTest < ActionController::TestCase
     assert_select '#resources-shown-count', count:0
     assert_select '#more-results', count: 0
 
+  end
+
+  test 'remember external search' do
+    FactoryBot.create(:model, policy: FactoryBot.create(:public_policy))
+
+    VCR.use_cassette('biomodels/search') do
+      with_config_value(:external_search_enabled, true) do
+        Model.stub(:solr_cache, -> (q) { Model.pluck(:id).last(1) }) do
+          get :index, params: { q: 'yeast', include_external_search: '1' }
+        end
+      end
+    end
+
+    assert_equal 1, assigns(:results)['Model'].count
+    assert_equal 25, assigns(:external_results).count
+
+    assert assigns(:include_external_search)
+    assert_select 'div#advanced-search input#include_external_search[type=checkbox][checked=checked]'
   end
 end
