@@ -412,6 +412,15 @@ class DataFilesController < ApplicationController
     end
   end
 
+  # ajax call to check if data file has matching sample type ( used to check if button should be shown)
+  def has_matching_sample_type
+    result = @data_file.matching_sample_type?
+
+    respond_to do |format|
+      format.json { render json: { result: result} }
+    end
+  end
+
   protected
 
   def get_sample_type
