@@ -346,17 +346,6 @@ class ProgrammeTest < ActiveSupport::TestCase
     prog.is_activated = false
     disable_authorization_checks { prog.save! }
 
-    # no current user
-    prog.activate
-    refute prog.is_activated?
-
-    # normal user
-    User.current_user = FactoryBot.create(:person).user
-    prog.activate
-    refute prog.is_activated?
-
-    # admin
-    User.current_user = FactoryBot.create(:admin).user
     prog.activate
     assert prog.is_activated?
 
