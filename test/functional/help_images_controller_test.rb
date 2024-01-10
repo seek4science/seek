@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class HelpImagesControllerTest < ActionController::TestCase
-  fixtures :all
 
   include AuthenticatedTestHelper
 

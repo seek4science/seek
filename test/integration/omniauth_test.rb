@@ -4,7 +4,6 @@ class OmniauthTest < ActionDispatch::IntegrationTest
   include AuthenticatedTestHelper
   include HtmlHelper
 
-  fixtures :users, :people
 
   def setup
     OmniAuth.config.test_mode = true

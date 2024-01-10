@@ -71,7 +71,6 @@ class EventsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  fixtures :all
   test 'should destroy Event' do
     assert_difference('Event.count', -1) do
       delete :destroy, params: { id: events(:event_with_no_files) }

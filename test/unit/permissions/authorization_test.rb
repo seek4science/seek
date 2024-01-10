@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class AuthorizationTest < ActiveSupport::TestCase
-  fixtures :all
 
   # ************************************************************************
   # this section tests individual helper methods within Authorization module
