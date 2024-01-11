@@ -254,10 +254,10 @@ class Mailer < ActionMailer::Base
       recipients = admins
     end
 
-    subject = "The request to create the #{t('project')}, #{@project.title}, has been APPROVED by #{@responder.name}"
+    subject = "The request to create the #{t('project')}, #{@project.title}, has been APPROVED #{@responder.nil? ? 'automatically' : "by #{@responder.name}"}"
     mail(from: Seek::Config.noreply_sender,
          to: recipients.collect(&:email_with_name),
-         reply_to: @responder.email_with_name,
+         reply_to: @responder&.email_with_name,
          subject: subject)
 
   end

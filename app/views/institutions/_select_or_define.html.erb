@@ -17,17 +17,23 @@
   </div>
 
   <label class="control-label">Type the name of the <%= t('institution') %> </label><span class="required">*</span>
-  <%= objects_input('institution[id]', [], typeahead:  {query_url: typeahead_institutions_path, handlebars_template:'typeahead/institution'}, limit:1, allow_new: true, class:'form-control') -%>
+
+  <%# I am setting the institution id to a junk value of 0 (if blank) to get around a bug in select2 wherein an <option>
+      with a blank `value`, that is selected when the page is loaded, does not get rendered as a "tag". %>
+  <%= objects_input('institution[id]', @institution.title.present? ? [@institution.tap { |i| i.id ||= 0 }] : [],
+                    typeahead: { query_url: typeahead_institutions_path,
+                                 handlebars_template:'typeahead/institution' },
+                    limit: 1, allow_new: true, class: 'form-control') -%>
 </div>
 
-<%= hidden_field_tag 'institution[title]' %>
+<%= hidden_field_tag 'institution[title]', @institution.title %>
 
 <div class="form-group" id='additional-institution-details'>
   <label class="control-label">Website</label>
-  <%= text_field_tag('institution[web_page]','',class:'form-control institution-user-input') %>
+  <%= text_field_tag('institution[web_page]', @institution.web_page, class:'form-control institution-user-input') %>
 
   <label class="control-label">City</label>
-  <%= text_field_tag('institution[city]','',class:'form-control institution-user-input') %>
+  <%= text_field_tag('institution[city]', @institution.city, class:'form-control institution-user-input') %>
 
   <label class="control-label">Country</label>
   <%= country_select('institution','country',
@@ -41,8 +47,7 @@
         $j(".institution-user-input").prop('disabled',disabled);
     }
     $j(document).ready(function () {
-
-        toggleUserInput(true);
+        toggleUserInput(<%= (@institution.id.blank? || @institution.id == 0) ? 'false' : 'true' -%>);
 
         $j('select#institution_country').on('change',function() {
             checkSubmitButtonEnabled();

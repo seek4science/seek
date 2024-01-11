@@ -115,6 +115,8 @@ class AdminController < ApplicationController
     Seek::Config.organisms_enabled = string_to_boolean params[:organisms_enabled]
     Seek::Config.programmes_enabled = string_to_boolean params[:programmes_enabled]
     Seek::Config.programmes_open_for_projects_enabled = string_to_boolean params[:programmes_open_for_projects_enabled]
+    Seek::Config.auto_activate_programmes = string_to_boolean params[:auto_activate_programmes]
+    Seek::Config.auto_activate_site_managed_projects = string_to_boolean params[:auto_activate_site_managed_projects]
     Seek::Config.presentations_enabled = string_to_boolean params[:presentations_enabled]
     Seek::Config.publications_enabled = string_to_boolean params[:publications_enabled]
     Seek::Config.samples_enabled = string_to_boolean params[:samples_enabled]

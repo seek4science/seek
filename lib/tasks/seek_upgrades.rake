@@ -15,6 +15,7 @@ namespace :seek do
     rename_registered_sample_multiple_attribute_type
     remove_ontology_attribute_type
     db:seed:007_sample_attribute_types
+    recognise_isa_json_compliant_items
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -154,6 +155,25 @@ namespace :seek do
       end
     end
     puts " ... finished updating sample_resource_links of #{samples_updated.to_s} samples with data_file attributes"
+  end
+
+  task(recognise_isa_json_compliant_items: [:environment]) do
+    puts '... searching for ISA compliant investigations'
+    investigations_updated = 0
+    disable_authorization_checks do
+      investigations_to_update = Study.joins(:investigation)
+                                      .where('investigations.is_isa_json_compliant = ?', false)
+                                      .select { |study| study.sample_types.any? }
+                                      .map(&:investigation)
+                                      .compact
+                                      .uniq
+
+      investigations_to_update.each do |inv|
+        inv.update_column(:is_isa_json_compliant, true)
+        investigations_updated += 1
+      end
+    end
+    puts "...Updated #{investigations_updated.to_s} investigations"
   end
 
   private

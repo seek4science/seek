@@ -29,8 +29,11 @@ class ProgrammesController < ApplicationController
         # current person becomes the programme administrator, unless they are logged in
         # also activation email is sent
         unless User.admin_logged_in?
-          if Seek::Config.email_enabled
-            Mailer.programme_activation_required(@programme,current_person).deliver_later
+          if Seek::Config.auto_activate_programmes
+            @programme.activate
+            Mailer.programme_activated(@programme).deliver_later if Seek::Config.email_enabled
+          else
+            Mailer.programme_activation_required(@programme, current_person).deliver_later if Seek::Config.email_enabled
           end
         end
         format.html {respond_with(@programme)}
