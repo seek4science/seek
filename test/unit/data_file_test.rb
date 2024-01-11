@@ -233,20 +233,17 @@ class DataFileTest < ActiveSupport::TestCase
       disable_authorization_checks { sample_type.save! }
 
       assert data_file.matching_sample_type?
-      assert_equal sample_type, data_file.detect_possible_sample_type
       assert_includes data_file.possible_sample_types, sample_type
 
       #doesn't match
       data_file = FactoryBot.create :data_file, content_blob: FactoryBot.create(:small_test_spreadsheet_content_blob), policy: FactoryBot.create(:public_policy)
       refute data_file.matching_sample_type?
       assert_empty data_file.possible_sample_types
-      assert_nil data_file.detect_possible_sample_type
 
       # nil blob
       data_file = FactoryBot.create :data_file, content_blob: nil, policy: FactoryBot.create(:public_policy)
       refute data_file.matching_sample_type?
       assert_empty data_file.possible_sample_types
-      assert_nil data_file.detect_possible_sample_type
     end
   end
 
@@ -307,7 +304,6 @@ class DataFileTest < ActiveSupport::TestCase
       assert sample_type2.can_view?
 
       assert_equal [sample_type1, sample_type2], data_file.possible_sample_types
-      assert_equal sample_type1, data_file.detect_possible_sample_type
     end
 
     # check hidden not returned
@@ -316,7 +312,6 @@ class DataFileTest < ActiveSupport::TestCase
       refute sample_type2.can_view?
 
       assert_empty data_file.possible_sample_types
-      assert_nil data_file.detect_possible_sample_type
     end
   end
 
