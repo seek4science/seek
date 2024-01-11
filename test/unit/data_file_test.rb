@@ -233,6 +233,7 @@ class DataFileTest < ActiveSupport::TestCase
       disable_authorization_checks { sample_type.save! }
 
       assert data_file.matching_sample_type?
+      assert_equal sample_type, data_file.detect_possible_sample_type
       assert_includes data_file.possible_sample_types, sample_type
 
       #doesn't match
@@ -241,6 +242,11 @@ class DataFileTest < ActiveSupport::TestCase
       assert_empty data_file.possible_sample_types
       assert_nil data_file.detect_possible_sample_type
 
+      # nil blob
+      data_file = FactoryBot.create :data_file, content_blob: nil, policy: FactoryBot.create(:public_policy)
+      refute data_file.matching_sample_type?
+      assert_empty data_file.possible_sample_types
+      assert_nil data_file.detect_possible_sample_type
     end
   end
 

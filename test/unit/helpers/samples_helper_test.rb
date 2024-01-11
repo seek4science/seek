@@ -47,8 +47,12 @@ class SamplesHelperTest < ActionView::TestCase
   test 'attempt to show sample extract button' do
     person = FactoryBot.create(:person)
     User.with_current_user(person.user) do
-      #good
+      # no sample types
       data_file = FactoryBot.create(:xlsx_spreadsheet_datafile, contributor: person)
+      refute attempt_to_show_extract_samples_button?(data_file, data_file.latest_version)
+
+      FactoryBot.create(:min_sample_type)
+      # good
       assert attempt_to_show_extract_samples_button?(data_file, data_file.latest_version)
 
       # no manage permissions
