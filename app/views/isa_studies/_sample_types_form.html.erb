@@ -5,6 +5,9 @@
 <% main_field_name = id_suffix[1..-1] %>
 <% isa_element ||= "study" %>
 
+<span id='modal-dialogues'>
+    <%= sample_controlled_vocab_model_dialog('cv-modal') %>
+</span>
 <%=  f.fields_for main_field_name, sample_type do |field| %>
 
 	<% unless action == :edit %>
