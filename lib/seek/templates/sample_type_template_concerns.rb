@@ -45,7 +45,8 @@ module Seek
 
       def matches_content_blob?(blob)
         return false unless content_blob && blob
-        Rails.cache.fetch("st-match-#{blob.id}-#{content_blob.id}") do
+        key = ['st-match', blob, content_blob, Seek::Config.jvm_memory_allocation, Seek::Config.max_extractable_spreadsheet_size]
+        Rails.cache.fetch(key) do
           template_reader.matches?(blob)
         end
       rescue SysMODB::SpreadsheetExtractionException=>e
@@ -94,12 +95,6 @@ module Seek
       module ClassMethods
         def sample_types_matching_content_blob(content_blob, user = User.current_user)
           SampleType.all.select{|st| st.can_view?(user)}.select do |type|
-            type.matches_content_blob?(content_blob)
-          end
-        end
-
-        def detect_sample_type_matching_content_blob(content_blob, user = User.current_user)
-          SampleType.all.select{|st| st.can_view?(user)}.detect do |type|
             type.matches_content_blob?(content_blob)
           end
         end
