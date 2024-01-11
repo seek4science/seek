@@ -639,7 +639,7 @@ class ApplicationController < ActionController::Base
   end
 
   def check_displaying_single_page
-    if params[:single_page]
+    if params[:view] == 'single_page'
       @single_page = true
     end
   end

@@ -1,7 +1,7 @@
 <% if Seek::Config.project_single_page_enabled %>
   <% if !displaying_single_page? %>
     <span>
-      <%= button_link_to("Single Page", 'sop', single_page_path(item.id)) -%>
+      <%= button_link_to("Single Page", 'sop', project_path(id: item.id, view: 'single_page' )) -%>
     </span>
   <% else %>
     <span>
