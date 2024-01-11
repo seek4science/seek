@@ -116,7 +116,6 @@ class DataFile < ApplicationRecord
 
     Rails.logger.debug("Checking for matching sample template for data file ##{id}")
     possible_sample_types.any?
-
   end
 
   # returns all matching sample types
