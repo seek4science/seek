@@ -135,8 +135,49 @@ class MessageLogTest < ActiveSupport::TestCase
     assert_equal 'FR', details.institution.country
   end
 
-  test 'responded' do
+  test 'log project importation request' do
+    requester = FactoryBot.create(:person)
+    programme = FactoryBot.create(:programme)
+    project = Project.new(title: 'a project', web_page: 'http://page')
+    institution = Institution.new(title: 'an inst', country: 'FR')
+    people = FactoryBot.create_list(:person, 3)
+    assert_difference('ProjectImportationMessageLog.count') do
+      ProjectImportationMessageLog.log_request(sender: requester, programme: programme, project: project,
+                                            institution: institution, people: people)
+    end
+    log = ProjectImportationMessageLog.last
+    assert_equal requester, log.subject
+    assert_equal requester, log.sender
+    assert_equal 'project_importation_request', log.message_type
+    assert log.project_importation_request?
+    details = log.parsed_details
+    assert_equal programme.title, details.programme.title
+    assert_equal programme.id, details.programme.id
+    refute details.programme.new_record?
+    assert_equal 'a project', details.project.title
+    assert_nil details.project.id
+    assert details.project.new_record?
+    assert_equal 'an inst', details.institution.title
+    assert_nil details.institution.id
+    assert details.institution.new_record?
+    assert_equal 'FR', details.institution.country
+    people.each { |p| assert_includes details.people, p }
+  end
+
+  test 'responded - creation' do
     log = ProjectCreationMessageLog.new
+    assert_nil log.response
+    refute log.responded?
+
+    log.response = ''
+    refute log.responded?
+
+    log.response = 'Accepted'
+    assert log.responded?
+  end
+
+  test 'responded - importation' do
+    log = ProjectImportationMessageLog.new
     assert_nil log.response
     refute log.responded?
 
@@ -178,6 +219,27 @@ class MessageLogTest < ActiveSupport::TestCase
     log1.respond('Accepted')
     assert_equal [log1, log2], ProjectCreationMessageLog.all.sort_by(&:id)
     assert_equal [log2], ProjectCreationMessageLog.pending_requests
+  end
+
+  test 'project importation request scope' do
+    project = Project.new(title: 'my project')
+    project2 = Project.new(title: 'my project 2')
+    person = FactoryBot.create(:person)
+    admin = FactoryBot.create(:admin)
+    institution = FactoryBot.create(:institution)
+    people = FactoryBot.create_list(:person, 3)
+
+    log1 = ProjectImportationMessageLog.log_request(sender: person, programme: FactoryBot.create(:programme), project: project,
+                                                 institution: institution, people: people)
+    log2 = ProjectImportationMessageLog.log_request(sender: person, programme: FactoryBot.create(:programme), project: project2,
+                                                 institution: institution, people: people)
+
+    assert_equal [log1, log2], ProjectImportationMessageLog.all.sort_by(&:id)
+    assert_equal [log1, log2], ProjectImportationMessageLog.pending_requests.sort_by(&:id)
+
+    log1.respond('Accepted')
+    assert_equal [log1, log2], ProjectImportationMessageLog.all.sort_by(&:id)
+    assert_equal [log2], ProjectImportationMessageLog.pending_requests
   end
 
   test 'pending project join requests' do

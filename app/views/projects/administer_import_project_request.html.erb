@@ -1,0 +1,203 @@
+<div>
+  <%= form_tag respond_import_project_request_projects_path do %>
+
+    <%= hidden_field_tag :message_log_id,@message_log.id %>
+
+    <div class="panel panel-default">
+      <div class="panel-body">
+
+        <% unless @message_log.sent_by_self? %>
+          <div>
+            The user <%= link_to(@message_log.sender.title, @message_log.sender) %> has requested to import a <%= t('project') %>
+          </div>
+        <% end %>
+
+        <% if Seek::Config.programmes_enabled && @programme %>
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <%= t('programme') %>
+            </div>
+            <div class="panel-body">
+              <% if @programme.new_record? %>
+                They have requested a new <%= t('programme') %>, with the following:
+                <div class="form-group">
+                  <%= label_tag 'Title' %><span class="required">*</span>
+                  <%= text_field_tag 'programme[title]',@programme.title, class:'form-control' %>
+                </div>
+              <% else %>
+                It will be associated with the <%= t('programme') %>, <%= link_to @programme.title,@programme %>, which you administer.
+                <%= hidden_field_tag 'programme[id]',@programme.id %>
+              <% end %>
+            </div>
+
+          </div>
+        <% end %>
+
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <%= t('project') %>
+          </div>
+          <div class="panel-body">
+            <div>
+              The <%= t('project') %> details provided are as follows:
+              <div class="form-group">
+                <%= label_tag 'Title' %><span class="required">*</span>
+                <%= text_field_tag 'project[title]',@project.title, class:'form-control' %>
+
+                <%= label_tag 'Description' %>
+                <%= text_field_tag 'project[description]',@project.description, class:'form-control' %>
+
+                <%= label_tag 'Website' %>
+                <%= text_field_tag 'project[web_page]',@project.web_page, class:'form-control' %>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <%= t('institution') %>
+          </div>
+          <div class="panel-body">
+            <% if @institution.new_record? %>
+              <div>
+                They have requested a new <%= t('institution') %>, and provided the following details.
+                Please edit or complete if and where you feel necessary.
+                <div class="form-group">
+                  <%= label_tag 'Title' %><span class="required">*</span>
+                  <%= text_field_tag 'institution[title]',@institution.title, class:'form-control' %>
+
+                  <%= label_tag 'Website' %>
+                  <%= text_field_tag 'institution[web_page]',@institution.web_page, class:'form-control' %>
+
+                  <%= label_tag 'City' %>
+                  <%= text_field_tag 'institution[city]',@institution.city, class:'form-control' %>
+
+                  <%= label_tag 'Country' %>
+                  <%= country_select 'institution', 'country', { include_blank: 'Select a country' }, {class:'form-control'} %>
+                </div>
+              </div>
+            <% else %>
+              <div>
+                They wish to be associated with <%= link_to(@institution.title, @institution) %>
+              </div>
+              <%= hidden_field_tag 'institution[id]',@institution.id %>
+            <% end %>
+          </div>
+        </div>
+
+        <% if @people.length() > 0 %>
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <%= t('people') %>
+            </div>
+            <div class="panel-body">
+              <div>
+                They have requested to create the following users if they do not exist:
+                <ul class="list-group">
+                  <% @people.each do |person| %>
+                    <li class="list-group-item">
+                      <%= person.name %> (<%= person.email %>)
+                      <%= hidden_field_tag 'people[][first_name]', person.first_name %>
+                      <%= hidden_field_tag 'people[][last_name]', person.last_name %>
+                      <%= hidden_field_tag 'people[][email]', person.email %>
+                    </li>
+                  <% end %>
+                </ul>
+                These users will be associated with the <%= t('project') %> through the selected <%= t('institution') %>.
+              </div>
+            </div>
+          </div>
+        <% end %>
+
+        <% if @message_log.sent_by_self? %>
+          <span style="display:none">
+            <%= check_box_tag 'accept_request','1',true %>
+          </span>
+          <%= submit_tag('Create', class: 'btn btn-success',id:'submit-button') %>
+          <%= submit_tag('Cancel', class: 'btn btn-default',id:'cancel-button') %>
+
+        <% else %>
+          <div>
+            <label>
+              <%= check_box_tag 'accept_request','1',true %>
+              Accept this request
+            </label>
+          </div>
+
+          <div id='reject-details-block' style="display:none;">
+
+            <%= label_tag "Reasons for rejection" %>
+            <div class="help-block">
+              Provide details why it was rejected. Note that this will be forwarded onto to the requester.
+            </div>
+            <%= text_area_tag 'reject_details','',class:'form-control' %>
+          </div>
+
+          <%= submit_tag('Accept', class: 'btn btn-success',id:'submit-button') %>
+          <span style="display:none">
+            <%= check_box_tag 'delete_request','1',false %>
+          </span>
+          <%= submit_tag('Delete without response', class: 'btn btn-danger',id:'delete-button', style:'display:none;') %>
+
+        <% end %>
+
+
+      </div>
+    </div>
+
+  <% end %>
+</div>
+
+<script type=application/javascript>
+
+
+    function submitButtonStatus() {
+        if ($j('input#accept_request').is(':checked')) {
+            $j('#submit-button').val('Accept');
+            $j('#submit-button').addClass('btn-success').removeClass('btn-danger');
+            $j('#delete-button').hide();
+        }
+        else {
+            $j('#submit-button').val('Reject');
+            $j('#submit-button').addClass('btn-danger').removeClass('btn-success');
+            $j('#delete-button').show();
+        }
+    }
+
+    function rejectDetailsStatus() {
+        if ($j('input#accept_request').is(':checked')) {
+            $j('#reject-details-block').hide();
+        }
+        else {
+            $j('#reject-details-block').show();
+        }
+    }
+
+    $j(document).ready(function () {
+        <% if @message_log.sent_by_self? %>
+          $j('#cancel-button').on('click',function() {
+              $j('input#accept_request').prop( "checked", false );
+          });
+        <% else %>
+          $j('input#accept_request').on('change',function() {
+              submitButtonStatus();
+              rejectDetailsStatus();
+          });
+          submitButtonStatus();
+          rejectDetailsStatus();
+        <% end %>
+
+        $j('input#delete-button').on('click', function() {
+            if (confirm("Are you sure? This will permanently delete the request, and the requester won't be notified")) {
+                $j('input#accept_request').prop( "checked", false );
+                $j('input#delete_request').prop( "checked", true );
+            }
+            else {
+                return false;
+            }
+        });
+    });
+
+</script>
