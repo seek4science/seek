@@ -30,14 +30,20 @@ var SampleTypeControlledVocab = {
         initialise_rich_text_editors(".rich-text-edit");            
     },
 
+    copyBlankModalForm: function() {
+        // first destroy any select2 elements, which won't survive being cloned. They will be initialised again when reset
+        $j('#cv-modal select[data-role="seek-objectsinput"]').select2('destroy');
+        SampleTypeControlledVocab.blankControlledVocabModelForm=$j('#cv-modal').clone();
+    },
+
     //resets the modal
     resetModalControlledVocabForm: function () {
         $j('#cv-modal').remove();
         $j('#modal-dialogues').append(SampleTypeControlledVocab.blankControlledVocabModelForm.clone());
         CVTerms.init();
+        ObjectsInput.init();
         SampleTypeControlledVocab.bindNewControlledVocabShowEvent();
         SampleTypeControlledVocab.initialise_deferred_rich_editor_modal();
-        
     },    
 
     //selected CV item changed
