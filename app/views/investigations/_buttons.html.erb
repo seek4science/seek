@@ -3,7 +3,8 @@
 <% if Seek::Config.project_single_page_enabled %>
 	<% if !displaying_single_page? %>
 		<span>
-      <%= button_link_to("Single Page", 'sop', single_page_path(id: item.projects.first.id, item_type: 'investigation', item_id: item.id)) -%>
+      <%#= button_link_to("Single Page", 'sop', single_page_path(id: item.projects.first.id, item_type: 'investigation', item_id: item.id)) -%>
+			<%= button_link_to("Single Page", 'sop', investigation_path(id: item.id, view: 'single_page')) -%>
     </span>
 	<% else %>
 		<span>

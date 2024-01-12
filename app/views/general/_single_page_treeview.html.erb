@@ -2,8 +2,10 @@
 <%= javascript_include_tag "single_page/dynamic_table" %>
 <%= javascript_include_tag "project_folders" %>
 <%
-  project = item.is_a?(Project) ? item : item.projects.first
-  default_folder = initial_folder(project)
+  # unless project
+  #   project = item.is_a?(Project) ? item : item.projects.first
+  # end
+  default_folder = initial_folder(@project)
   content_partial ||= nil
 %>
 
@@ -78,7 +80,6 @@
 
     $j(document).ready(function() {
         $j("#content .container-fluid").removeClass("container-fluid").addClass("container-fluid-single-page")
-
         setupFoldersTree( <%= ((TreeviewBuilder.new(@project, @folders)).build_tree_data).html_safe -%> , 'single_page_tree', 'draggable_folder_item');
         $j("#item_contents").show();
         pid = <%= @project.id %>

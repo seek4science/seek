@@ -1,0 +1,39 @@
+<%= render partial: 'general/item_title', locals: { item: @investigation, buttons_partial: 'investigations/buttons' } %>
+
+<%= render partial: 'general/show_page_tab_definitions' %>
+
+<div class="tab-content">
+  <%= tab_pane('overview') do %>
+    <div class="row">
+      <div class="col-md-9 col-sm-8 box_about_actor">
+        <%= item_description @investigation.description -%>
+
+        <div class="row">
+          <div class="col-md-6">
+            <%= persistent_resource_id(@investigation) %>
+            <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => @investigation}  %>
+          </div>
+        </div>
+        <p id="position">
+          <b><%= "Investigation position" %>: </b>
+          <%= @investigation.position %>
+        </p>
+        <% if Seek::Config.isa_json_compliance_enabled %>
+          <p id="isa_json_compliance">
+            <b><%= "Is ISA-JSON compliant" %>: </b>
+            <%= @investigation.is_isa_json_compliant? %>
+          </p>
+        <% end %>
+        <%= render partial: 'extended_metadata/extended_metadata_attribute_values', locals: {resource: @investigation} %>
+        <%= render partial: 'general/isa_graph', locals: { root_item: @investigation, options: { depth: 4 } } -%>
+      </div>
+      <div class="col-md-3 col-sm-4">
+        <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @investigation } %>
+      </div>
+    </div>
+  <% end %>
+
+  <%= tab_pane('related-items') do %>
+    <%= render partial: 'general/items_related_to', object: @investigation %>
+  <% end %>
+</div>
