@@ -86,43 +86,26 @@ CVTerms = {
             $j(':input:not(.destroy-attribute)', row).prop('disabled', false);
         }
     },
-    // processes the JSON response when fetching terms, and populates the term list
-    handleOntologyTermsJSONResponse: function (json) {
-        $j.each(json, function (key, term) {
-            //make a new term
-            CVTerms.addNewTermRow();
-
-            //get the last row and its inputs
-            var row = $j('table#new-terms tr.sample-cv-term').last();
-            var inputs = $j(row).find('td input');
-
-            $j(inputs).prop('readonly',true);
-
-            //inputs 0,1,2 are label, iri, and parent_iri
-            $j(inputs[0]).val(term.label);
-            $j(inputs[1]).val(term.iri);
-            $j(inputs[2]).val(term.parent_iri);
-        });
+    handleOntologyTermsHTMLResponse: function (html) {
+        $j('#add-term-button-row').before(html);
     },
     // adds a new blank row to the terms list
     addNewTermRow: function () {
-        var newTerm = $j('#new-term-row tbody').clone().html();
+        let newTerm = $j('#new-term-row tbody').clone().html();
 
-        var index = 0;
-        $j('#new-terms tr.sample-cv-term').each(function () {
-            var newIndex = parseInt($j(this).data('index'));
-            if (newIndex > index) {
-                index = newIndex;
-            }
-        });
+        let index = 0;
+
+        //can't be reordered, so the last should always be the highest index
+        if ($j('#new-terms tr.sample-cv-term').length) {
+            index = parseInt($j('#new-terms tr.sample-cv-term').last().data('index'));
+        }
         index++;
 
         newTerm = newTerm.replace(/--index--/g, index);
         $j('#add-term-button-row').before($j(newTerm));
     },
     // reports the error when the ajax method to fetch the terms is unsuccessful
-    reportFetchError: function (json) {
-        var error_message = json.errors[0].details;
+    reportFetchError: function (error_message) {
         $j('div#fetch-error-message').text("An error occurred fetching the terms: " + error_message);
         $j('div#fetch-error-message').show();
     },
@@ -144,8 +127,8 @@ CVTerms = {
         $j('input#fetch-ontology-terms-submit').prop('disabled', true);
 
         $j.ajax({
-            url: '<%= fetch_ols_terms_sample_controlled_vocabs_path %>',
-            dataType: "json",
+            url: '<%= fetch_ols_terms_html_sample_controlled_vocabs_path %>',
+            dataType: "html",
             data: {
                 source_ontology_id: $j('select#sample_controlled_vocab_source_ontology').val(),
                 root_uri: $j('#sample_controlled_vocab_ols_root_term_uri').val(),
@@ -153,10 +136,10 @@ CVTerms = {
             },
             success: function (resp) {
                 CVTerms.clearAllTerms();
-                CVTerms.handleOntologyTermsJSONResponse((resp));
+                CVTerms.handleOntologyTermsHTMLResponse(resp);
             },
             error: function (resp) {
-                CVTerms.reportFetchError(resp.responseJSON);
+                CVTerms.reportFetchError(resp.responseText);
             },
             complete: function () {
                 $j('#fetch-terms-spinner').spinner('remove');

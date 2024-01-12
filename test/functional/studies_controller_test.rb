@@ -1999,4 +1999,31 @@ class StudiesControllerTest < ActionController::TestCase
       assert flash[:error].include?('disabled')
     end
   end
+
+  test 'display single page button if feature enabled' do
+    with_config_value(:project_single_page_enabled, true) do
+      current_user = FactoryBot.create(:user)
+      login_as(current_user)
+      study = FactoryBot.create(:study, contributor: current_user.person)
+
+      get :show, params: { id: study }
+      assert_response :success
+
+      assert_select 'a', text: 'Single Page', count: 1
+    end
+  end
+
+  test 'display adjusted buttons if isa json compliant' do
+    with_config_value(:isa_json_compliance_enabled, true) do
+      current_user = FactoryBot.create(:user)
+      login_as(current_user)
+      study = FactoryBot.create(:isa_json_compliant_study, contributor: current_user.person)
+
+      get :show, params: { id: study }
+      assert_response :success
+
+      assert_select 'a', text: /Design #{I18n.t('assay')}/i, count: 1
+      assert_select 'a', text: /Add new #{I18n.t('assay')}/i, count: 0
+    end
+  end
 end

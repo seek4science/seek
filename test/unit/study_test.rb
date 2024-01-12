@@ -225,4 +225,16 @@ class StudyTest < ActiveSupport::TestCase
     assert_equal [assay1, assay2, assay3, assay4], related_items_hash['Assay'][:items]
   end
 
+  test 'isa json compliance' do
+    investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true)
+    study = FactoryBot.create(:study, investigation:)
+
+    refute study.is_isa_json_compliant?
+
+    source_st = FactoryBot.create(:isa_source_sample_type, studies: [study])
+    sample_collection_st = FactoryBot.create(:isa_sample_collection_sample_type, studies: [study], linked_sample_type: source_st)
+
+    assert study.is_isa_json_compliant?
+  end
+
 end

@@ -2,7 +2,24 @@ module Seek
   # defines what can be added to a particular item, and the params used
   class AddButtons
     DEFINITIONS = {
-      'Project' => [[Investigation, 'investigation[project_id]']],
+      'Project' => [
+        [Investigation, 'investigation[project_ids][]'],
+        [Collection, 'collection[project_ids][]'],
+        [DataFile, 'data_file[project_ids][]'],
+        [Document, 'document[project_ids][]'],
+        [Event, 'event[project_ids][]'],
+        [FileTemplate, 'file_template[project_ids][]'],
+        [Model, 'model[project_ids][]'],
+        [Placeholder, 'placeholder[project_ids][]'],
+        [Presentation, 'presentation[project_ids][]'],
+        [Publication, 'publication[project_ids][]'],
+        [Sample, 'sample[project_ids][]'],
+        [SampleType, 'sample_type[project_ids][]'],
+        [Sop, 'sop[project_ids][]'],
+        [Strain, 'strain[project_ids][]'],
+        [Template, 'template[project_ids][]'],
+        [Workflow, 'workflow[project_ids][]']
+      ],
       'Investigation' => [[Study, 'study[investigation_id]']],
       'Study' => [[Assay, 'assay[study_id]']],
       'Modelling Analysis' => [[DataFile, 'data_file[assay_assets_attributes[][assay_id]]'],

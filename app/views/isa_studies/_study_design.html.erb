@@ -1,20 +1,26 @@
 <% study ||= nil %>
 <% valid_study = study&.sample_types.present? %>
+<%
+	source_table_action = displaying_single_page? ? "highlightTreeviewItem('source_table')" : "loadDynamicTableFromDefaultView('source_table')"
+	study_protocol_action = displaying_single_page? ? "highlightTreeviewItem('study_protocol')" : "loadDynamicTableFromDefaultView('study_protocol')"
+	study_samples_table_action = displaying_single_page? ? "highlightTreeviewItem('study_samples_table')" : "loadDynamicTableFromDefaultView('study_samples_table')"
+	study_experiment_overview_action = displaying_single_page? ? "highlightTreeviewItem('study_experiment_overview')" : "loadDynamicTableFromDefaultView('study_experiment_overview')"
+%>
 
 <% if valid_study %>
 
 	<ul class="nav nav-tabs">
 			<li class="active">
-					<a data-toggle="tab" data-target="#source_table" onClick="highlightTreeviewItem('source_table')"><em class="glyphicon glyphicon-list-alt"></em> Sources table</a>
+					<a data-toggle="tab" data-target="#source_table" onClick="<%= source_table_action %>"><em class="glyphicon glyphicon-list-alt"></em> Sources table</a>
 			</li>
 			<li>
-					<a data-toggle="tab" data-target="#study_protocol" onClick="highlightTreeviewItem('study_protocol')"><em class="glyphicon glyphicon-list-alt"></em> Protocol</a>
+					<a data-toggle="tab" data-target="#study_protocol" onClick="<%= study_protocol_action %>"><em class="glyphicon glyphicon-list-alt"></em> Protocol</a>
 			</li>
 			<li>
-					<a data-toggle="tab" data-target="#study_samples_table" onClick="highlightTreeviewItem('study_samples_table')"><em class="glyphicon glyphicon-list-alt"></em> Samples table</a>
+					<a data-toggle="tab" data-target="#study_samples_table" onClick="<%= study_samples_table_action %>"><em class="glyphicon glyphicon-list-alt"></em> Samples table</a>
 			</li>
 			<li>
-					<a data-toggle="tab" data-target="#study_experiment_overview" onClick="highlightTreeviewItem('study_experiment_overview')"><em class="glyphicon glyphicon-list-alt"></em> Experiment overview</a>
+					<a data-toggle="tab" data-target="#study_experiment_overview" onClick="<%= study_experiment_overview_action %>"><em class="glyphicon glyphicon-list-alt"></em> Experiment overview</a>
 			</li>
 	</ul>
 
@@ -29,15 +35,21 @@
 					<%= render :partial=>"isa_studies/study_samples", locals: { study: study} -%>
 			</div>
 			<div id="study_experiment_overview" class="tab-pane fade">
-					<%= render :partial=>"isa_studies/study_table", locals: { study: study} -%>   
+					<%= render :partial=>"isa_studies/study_table", locals: { study: study} -%>
 			</div>
 	</div>
 
 <% else %>
 	<p>
 		<em>
-			This <%="#{t(:study)}"%>	has not been created in Single Page. 
+			This <%="#{t(:study)}"%>	has not been created in Single Page.
 			Please, create the <%="#{t(:study)}"%> by using the <strong>Design <%="#{t(:study)}"%></strong> button at the <%="#{t(:investigation)}"%> level.
 		</em>
 	</p>
 <% end %>
+
+<script>
+	async function loadDynamicTableFromDefaultView(element) {
+		await loadItemDetails(`/studies/${id}`, { view: "default" });
+	}
+</script>
