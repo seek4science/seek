@@ -308,7 +308,7 @@ module SamplesHelper
     return false unless asset.extracted_samples.empty? && (display_asset.version == asset.version)
     return false if asset.sample_extraction_task&.in_progress?
 
-    asset.sample_extraction_task&.success? && Seek::Samples::Extractor.new(asset).fetch.present?
+    !(asset.sample_extraction_task&.success? && Seek::Samples::Extractor.new(asset).fetch.present?)
 
   rescue Seek::Samples::FetchException
     true #allows to try again, the previous cached of results may be broken
