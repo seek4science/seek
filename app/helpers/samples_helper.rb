@@ -301,8 +301,8 @@ module SamplesHelper
     }
   end
 
-  # whether to attempt to show the extract samples button, the final check of whether there is a sample type will be done
-  # asynchronously
+  # whether to attempt to show the extract samples button,
+  # the final check of whether there is a sample type will be done asynchronously
   def attempt_to_show_extract_samples_button?(asset, display_asset)
     return false unless SampleType.any? && asset.can_manage? && asset.content_blob&.is_extractable_spreadsheet?
     return false unless asset.extracted_samples.empty? && (display_asset.version == asset.version)
@@ -311,7 +311,7 @@ module SamplesHelper
     !(asset.sample_extraction_task&.success? && Seek::Samples::Extractor.new(asset).fetch.present?)
 
   rescue Seek::Samples::FetchException
-    true #allows to try again, the previous cached of results may be broken
+    true #allows to try again, the previous cached results may be broken
   end
 
   def show_sample_extraction_status?(data_file)
