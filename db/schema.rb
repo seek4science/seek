@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_12_18_133053) do
+ActiveRecord::Schema.define(version: 2024_01_12_141513) do
 
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
@@ -189,6 +189,8 @@ ActiveRecord::Schema.define(version: 2023_12_18_133053) do
     t.string "deleted_contributor"
     t.integer "sample_type_id"
     t.integer "position"
+    t.integer "assay_stream_id"
+    t.index ["assay_stream_id"], name: "index_assays_on_assay_stream_id"
     t.index ["sample_type_id"], name: "index_assays_on_sample_type_id"
   end
 
