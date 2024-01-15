@@ -1,10 +1,6 @@
 module Scrapers
   class NfcoreScraper < GithubScraper
 
-    def initialize(organization, project, contributor, main_branch: 'master', debug: false, output: STDOUT)
-      super
-    end
-
     private
 
     def list_repositories

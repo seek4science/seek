@@ -109,6 +109,44 @@ class NfcoreScraperTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test 'can scrape all tags (and skips duplicates)' do
+    project = Scrapers::Util.bot_project(title: 'test')
+    bot = Scrapers::Util.bot_account
+    scraper = Scrapers::NfcoreScraper.new('test-123', project, bot, output: StringIO.new, only_latest: false)
+
+    repos = [FactoryBot.create(:nfcore_remote_repository)]
+    # These are the available remote Git tags in the above repo:
+    tags = ['1.0', '1.1', '1.2', '1.3', '1.4', '1.4.1', '1.4.2', '2.0', '3.0']
+
+    existing = FactoryBot.create(:nfcore_git_workflow,
+                                 contributor: bot,
+                                 projects: [project],
+                                 source_link_url: 'https://github.com/nf-core/rnaseq',
+                                 git_version_attributes: { name: '3.0',
+                                                           git_repository_id: repos.first.id,
+                                                           ref: 'refs/tags/3.0',
+                                                           commit: '3643a94',
+                                                           main_workflow_path: 'nextflow.config',
+                                                           mutable: false })
+
+    assert_equal 1, existing.versions.count
+    scraper.stub(:clone_repositories, -> (_) { repos }) do
+      assert_no_difference('Workflow.count') do
+        assert_difference('Workflow::Git::Version.count', tags.count - 1) do
+          assert_difference('Git::Annotation.count',  tags.count - 1) do
+            assert_no_difference('Git::Repository.count') do
+              scraped = scraper.scrape
+              refute scraped.empty?
+
+              assert_equal tags.count, existing.reload.versions.count
+              assert_equal tags.sort, existing.versions.map(&:name).sort
+            end
+          end
+        end
+      end
+    end
+  end
+
   private
 
   def login_as(user)
