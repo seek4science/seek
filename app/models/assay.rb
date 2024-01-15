@@ -25,6 +25,9 @@ class Assay < ApplicationRecord
 
   belongs_to :sample_type
 
+  has_many :child_assays, class_name: 'Assay', foreign_key: 'assay_stream_id'
+  belongs_to :assay_stream, class_name: 'Assay', optional: true
+
   belongs_to :assay_class
   has_many :assay_organisms, dependent: :destroy, inverse_of: :assay
   has_many :organisms, through: :assay_organisms, inverse_of: :assays
@@ -64,6 +67,10 @@ class Assay < ApplicationRecord
   has_filter :assay_class, :assay_type, :technology_type
 
   enforce_authorization_on_association :study, :view
+
+  def is_assay_stream?
+    child_assays.any?
+  end
 
   def previous_linked_assay_sample_type
     sample_type.sample_attributes.detect { |sa| sa.isa_tag.nil? && sa.title.include?('Input') }&.linked_sample_type
