@@ -21,10 +21,14 @@
 
 <% if item.can_edit? %>
 	<% if Seek::Config.isa_json_compliance_enabled && item.is_isa_json_compliant? %>
-		<% valid_study = item&.study&.sample_types.present? %>
-		<% valid_assay = item&.sample_type.present? %>
+		<% valid_study = item&.study&.is_isa_json_compliant? %>
+		<% valid_assay = item&.is_isa_json_compliant? %>
 		<% if valid_study && valid_assay %>
-    	<%= button_link_to("Design the next #{t('assay')}", 'new', new_isa_assay_path(source_assay_id: item.id, study_id: item.study.id, single_page: params[:single_page])) %>
+      <% if item&.is_assay_stream? %>
+    	  <%= button_link_to("Design #{t('assay')}", 'new', new_isa_assay_path(source_assay_id: item.id, study_id: item.study.id, single_page: params[:single_page])) %>
+      <% else %>
+    	  <%= button_link_to("Design the next #{t('assay')}", 'new', new_isa_assay_path(source_assay_id: item.id, study_id: item.study.id, single_page: params[:single_page])) %>
+      <% end %>
 		<% end %>
 	<% else %>
     <%= add_new_item_to_dropdown(item) %>
