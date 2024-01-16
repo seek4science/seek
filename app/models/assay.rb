@@ -69,7 +69,7 @@ class Assay < ApplicationRecord
   enforce_authorization_on_association :study, :view
 
   def is_assay_stream?
-    child_assays.any?
+    assay_class.is_assay_stream?
   end
 
   def previous_linked_assay_sample_type
@@ -102,7 +102,7 @@ class Assay < ApplicationRecord
   end
 
   def is_isa_json_compliant?
-    investigation.is_isa_json_compliant? && !sample_type.nil?
+    investigation.is_isa_json_compliant? && (!sample_type.nil? || is_assay_stream?)
   end
 
   # returns true if this is a modelling class of assay
