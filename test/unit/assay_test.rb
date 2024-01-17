@@ -760,4 +760,13 @@ class AssayTest < ActiveSupport::TestCase
     isa_json_compliant_assay = FactoryBot.create(:isa_json_compliant_assay)
     assert isa_json_compliant_assay.is_isa_json_compliant?
   end
+
+  test 'is assay stream' do
+    isa_json_compliant_study = FactoryBot.create(:isa_json_compliant_study)
+    assay_stream = FactoryBot.create(:assay_stream, study: isa_json_compliant_study)
+    assert assay_stream.is_assay_stream?
+
+    default_assay = FactoryBot.create(:assay)
+    refute default_assay.is_assay_stream?
+  end
 end
