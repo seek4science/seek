@@ -80,13 +80,6 @@ class Assay < ApplicationRecord
     sample_type&.linked_sample_attributes&.any?
   end
 
-  # Fetches the assay which is linked through linked_sample_attributes (Single Page specific method)
-  def linked_assay
-    sample_type.linked_sample_attributes
-               .select { |lsa| lsa.isa_tag.nil? && lsa.title.include?('Input') }
-               .first&.sample_type&.assays&.first
-  end
-
   def default_contributor
     User.current_user.try :person
   end
