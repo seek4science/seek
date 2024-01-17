@@ -16,6 +16,7 @@ en:
     assay: "Assay"
     experimental_assay: "Experimental assay"
     modelling_analysis:  "Modelling analysis"
+    assay_stream:  "Assay Stream"
 
   isa_study: "ISA Study"
   study_design: "Study Design"

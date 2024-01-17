@@ -7,5 +7,5 @@ modelling_assay_class:
   key: MODEL
 
 assay_stream_class:
-  title: 'Assay Stream'
-  key: 'ASS'
+  title: <%= I18n.t('assays.assay_stream') %>
+  key: ASS

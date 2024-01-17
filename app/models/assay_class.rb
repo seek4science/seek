@@ -2,8 +2,8 @@ class AssayClass < ApplicationRecord
   # this returns an instance of AssayClass according to one of the types "experimental", "modelling" or "assay_stream"
   # if there is not a match nil is returned
   def self.for_type(type)
-    keys = { "experimental": 'EXP', "modelling": 'MODEL', 'assay_stream': 'ASS' }
-    AssayClass.find_by(key: keys[type])
+    keys = { "experimental": 'EXP', "modelling": 'MODEL', "assay_stream": 'ASS' }
+    AssayClass.find_by(key: keys[type.to_sym])
   end
 
   def self.experimental
@@ -15,7 +15,7 @@ class AssayClass < ApplicationRecord
   end
 
   def self.assay_stream
-    for_type('assay_stream')
+    for_type('assaystream')
   end
 
   def is_modelling?
