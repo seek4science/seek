@@ -1,5 +1,5 @@
 class AssayClass < ApplicationRecord
-  # this returns an instance of AssayClass according to one of the types "experimental" or "modelling"
+  # this returns an instance of AssayClass according to one of the types "experimental", "modelling" or "assay_stream"
   # if there is not a match nil is returned
   def self.for_type(type)
     keys = { "experimental": 'EXP', "modelling": 'MODEL', 'assay_stream': 'ASS' }
