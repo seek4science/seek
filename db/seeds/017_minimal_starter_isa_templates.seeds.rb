@@ -200,3 +200,8 @@ disable_authorization_checks do
 end
 
 puts 'Seeded minimal templates for organizing ISA JSON compliant experiments.'
+
+disable_authorization_checks do
+  AssayClass.find_or_create_by(title: 'Assay Stream', key: 'ASS',
+                               description: 'Special type of class that is user in Single Page, specifying this is a container for a stream of assays')
+end
