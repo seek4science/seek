@@ -25,7 +25,7 @@ class Assay < ApplicationRecord
 
   belongs_to :sample_type
 
-  has_many :child_assays, class_name: 'Assay', foreign_key: 'assay_stream_id'
+  has_many :child_assays, class_name: 'Assay', foreign_key: 'assay_stream_id', dependent: :destroy
   belongs_to :assay_stream, class_name: 'Assay', optional: true
 
   belongs_to :assay_class
