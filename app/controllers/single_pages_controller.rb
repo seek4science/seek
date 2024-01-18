@@ -162,6 +162,10 @@ class SinglePagesController < ApplicationController
       sa_attr.title if sa_attr.sample_attribute_type.base_type == Seek::Samples::BaseType::SEEK_SAMPLE_MULTI
     end
 
+    @registered_sample_fields = @sample_type.sample_attributes.map do |sa_attr|
+      sa_attr.title if sa_attr.sample_attribute_type.base_type == Seek::Samples::BaseType::SEEK_SAMPLE
+    end
+
     @cv_list_fields = @sample_type.sample_attributes.map do |sa_attr|
       sa_attr.title if sa_attr.sample_attribute_type.base_type == Seek::Samples::BaseType::CV_LIST
     end
@@ -266,6 +270,12 @@ class SinglePagesController < ApplicationController
             subsample
           end
           obj.merge!(sample_fields[i] => parsed_excel_input_samples)
+        elsif @registered_sample_fields.include?(sample_fields[i])
+          parsed_excel_registered_sample = JSON.parse(excel_sample[i].gsub(/"=>/x, '":'))
+          unless Sample.find(parsed_excel_registered_sample['id'])&.authorized_for_view?
+            raise "Unauthorized Sample was detected in spreadsheet: #{parsed_excel_registered_sample.inspect}"
+          end
+          obj.merge!(sample_fields[i] => parsed_excel_registered_sample)
         elsif @cv_list_fields.include?(sample_fields[i])
           parsed_cv_terms = JSON.parse(excel_sample[i])
           # CV validation for CV_LIST attributes
