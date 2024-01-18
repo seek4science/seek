@@ -184,9 +184,14 @@ module IsaExporter
       return unless assay_stream.can_view?(@current_user)
       return unless child_assays.all? { |a| a.can_view?(@current_user) }
 
+      child_assays.map do |ca|
+        unless ca.sample_type.present?
+          raise "No Sample type was found in Assay '#{ca.id} - #{ca.title}'," \
+                " part of Assay Stream '#{assay_stream.id - assay_stream.title}'"
+        end
+      end
+
       all_sample_types = child_assays.map(&:sample_type).compact
-      # first_assay = assays.detect { |s| s.position.zero? }
-      # raise 'No assay could be found!' unless first_assay
 
       stream_name = "assays_#{child_assays.pluck(:id).join('_')}"
       assay_comments = convert_assay_comments(assay_stream)
@@ -745,7 +750,7 @@ module IsaExporter
     end
 
     def get_derived_from_type(sample_type)
-      raise 'There is no sample!' if sample_type.samples.length == 0
+      raise "There are no samples in '#{sample_type.title}'!" if sample_type.samples.blank?
 
       prev_sample_type = sample_type.samples[0]&.linked_samples[0]&.sample_type
       return nil if prev_sample_type.blank?

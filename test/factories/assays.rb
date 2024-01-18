@@ -14,7 +14,7 @@ FactoryBot.define do
   end
 
   factory(:assay_stream_class, class: AssayClass) do
-    title { 'Assay Stream' }
+    title { I18n.t('assays.assay_stream') }
     key { 'ASS' }
     description { "An assay stream class description" }
   end
@@ -115,7 +115,7 @@ FactoryBot.define do
     description { 'A holder assay holding multiple child assays' }
     association :assay_class, factory: :assay_stream_class
     after(:build) do |assay|
-      assay.study = FactoryBot.create(:isa_json_compliant_study)
+      assay.study ||= FactoryBot.create(:isa_json_compliant_study, contributor: assay.contributor)
     end
   end
 
