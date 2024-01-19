@@ -69,7 +69,7 @@ class Assay < ApplicationRecord
   enforce_authorization_on_association :study, :view
 
   def is_assay_stream?
-    assay_class.is_assay_stream?
+    assay_class&.is_assay_stream?
   end
 
   def previous_linked_assay_sample_type
