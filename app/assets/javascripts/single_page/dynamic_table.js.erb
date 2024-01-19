@@ -21,7 +21,7 @@ const defaultCols = [{
 
 const objectInputTemp = '<input type="hidden" name="_NAME_[]" id="inpt-_NAME_" value="" autocomplete="off" />' +
   '<select name="_NAME_[]" id="select-_NAME_" class="form-control _EXTRACLASS_" title="_TITLE_" data-role="seek-objectsinput" ' +
-  'data-tags-limit="100" multiple="multiple" style="background-color: coral;" data-typeahead-template="_TYPEHEAD_"' +
+  'data-tags-limit="100" _MULTIPLE?_ style="background-color: coral;" data-typeahead-template="_TYPEHEAD_"' +
   'data-typeahead-query-url="_URL_" data-allow-new-items=_ALLOW_FREE_TEXT_>_OPTIONS_</select>';
 
 const typeaheadSamplesUrl = "<%= typeahead_samples_path(linked_sample_type_id: '_LINKED_') %>";
@@ -59,22 +59,21 @@ const handleSelect = (e) => {
         }
 
         c["render"] = function(data_, type, full, meta) {
-          if(c.multi_link){
+          if(c.linked_sample_type){
             data = data_ && Array.isArray(data_) ? data_ : [data_];
             data = data[0]?.id ? data : [];
             return inputObjectsInput(c, data, options, linkedSamplesUrl);
-          }else if(c.is_cv_list && data_ !== "#HIDDEN"){
-            data = data_ && Array.isArray(data_) ? data_ : [data_];
-            data = data.map((e) => {
-              if (e?.id){
-                return e.id
-              } else {
-                return e
-              }
-            });
-
-            return cvListObjectsInput(c, data, options, cvUrl);
-          }else if (data_ === "#HIDDEN") {
+          } else if(c.is_cv_list && data_ !== "#HIDDEN"){
+              data = data_ && Array.isArray(data_) ? data_ : [data_];
+              data = data.map((e) => {
+                if (e?.id){
+                  return e.id
+                } else {
+                  return e
+                }
+              });
+              return cvListObjectsInput(c, data, options, cvUrl);
+          } else if (data_ === "#HIDDEN") {
             return "<em><small>Hidden</small></em>";
           } else {
             return data_;
@@ -565,6 +564,7 @@ function inputObjectsInput(column, data, options, url){
     }, []);
     const hasUnlinkedSamples = unLinkedSamples.length > 0 ? true : false;
 
+    const hasMultipleInputs = column.multi_link ? 'multiple="multiple"' : ''
     const extraClass = hasUnlinkedSamples ? 'select2__error' : '';
     const titleText = hasUnlinkedSamples ? `Sample(s) '${unLinkedSamples.map(uls => uls.title).join(', ')}' not recognised as input. Please correct this issue!` : '';
     setTimeout(ObjectsInput.init);
@@ -576,6 +576,7 @@ function inputObjectsInput(column, data, options, url){
     .replace('_OPTIONS_', existingOptions)
     .replace('_EXTRACLASS_', extraClass)
     .replace('_TITLE_', titleText)
+    .replace('_MULTIPLE?_', hasMultipleInputs)
     .replace('_ALLOW_FREE_TEXT_', false);
   }
 }
@@ -599,6 +600,7 @@ function cvListObjectsInput(column, data, options, url){
     .replace('_OPTIONS_', existingOptions)
     .replace('_EXTRACLASS_', extraClass)
     .replace('_TITLE_', titleText)
+    .replace('_MULTIPLE?_', 'multiple="multiple"')
     .replace('_ALLOW_FREE_TEXT_', allowNewItems);
   }
 }

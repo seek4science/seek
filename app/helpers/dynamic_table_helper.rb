@@ -30,9 +30,12 @@ module DynamicTableHelper
   end
 
   def dt_rows(sample_type)
+    registered_sample_attributes = sample_type.sample_attributes.select { |sa| sa.sample_attribute_type.base_type == Seek::Samples::BaseType::SEEK_SAMPLE }
+    registered_sample_multi_attributes = sample_type.sample_attributes.select { |sa| sa.sample_attribute_type.base_type == Seek::Samples::BaseType::SEEK_SAMPLE_MULTI }
+
     sample_type.samples.map do |s|
       if s.can_view?
-        sanitized_json_metadata = hide_unauthorized_inputs(JSON(s.json_metadata))
+        sanitized_json_metadata = hide_unauthorized_inputs(JSON(s.json_metadata), registered_sample_attributes, registered_sample_multi_attributes)
         ['', s.id, s.uuid] +
           sanitized_json_metadata.values
       else
@@ -42,11 +45,20 @@ module DynamicTableHelper
     end
   end
 
-  def hide_unauthorized_inputs(json_metadata)
-    input_key = json_metadata.keys.detect { |jmdk| jmdk.downcase.include? 'input' }
+  def hide_unauthorized_inputs(json_metadata, registered_sample_attributes, registered_sample_multi_attributes)
+    registered_sample_multi_attributes.map(&:title).each do |rsma|
+      json_metadata = transform_registered_sample_multi(json_metadata, rsma)
+    end
+    registered_sample_attributes.map(&:title).each do |rma|
+      json_metadata = transform_registered_sample_single(json_metadata, rma)
+    end
 
+    json_metadata
+  end
+
+  def transform_registered_sample_multi(json_metadata, input_key)
     unless input_key.nil?
-      json_metadata[input_key] = json_metadata[input_key].map do |input|
+        json_metadata[input_key] = json_metadata[input_key].map do |input|
         input_exists = Sample.where(id: input['id']).any?
         if !input_exists
           input
@@ -57,7 +69,21 @@ module DynamicTableHelper
         end
       end
     end
+    json_metadata
+  end
 
+  def transform_registered_sample_single(json_metadata, input_key)
+    unless input_key.nil?
+      input = json_metadata[input_key]
+      input_exists = Sample.where(id: input['id']).any?
+      if !input_exists
+        json_metadata[input_key] = input
+      elsif Sample.find(input['id']).can_view?
+        json_metadata[input_key] = input
+      else
+        json_metadata[input_key] = { 'id' => input['id'], 'type' => input['type'], 'title' => '#HIDDEN' }
+      end
+    end
     json_metadata
   end
 
@@ -66,10 +92,12 @@ module DynamicTableHelper
       attribute = { title: a.title, name: sample_type.id.to_s, required: a.required, description: a.description,
                     is_title: a.is_title }
       attribute.merge!({ cv_id: a.sample_controlled_vocab_id }) unless a.sample_controlled_vocab_id.blank?
+      is_seek_sample = a.sample_attribute_type.base_type == Seek::Samples::BaseType::SEEK_SAMPLE
       is_seek_multi_sample = a.sample_attribute_type.base_type == Seek::Samples::BaseType::SEEK_SAMPLE_MULTI
       is_cv_list = a.sample_attribute_type.base_type == Seek::Samples::BaseType::CV_LIST
       cv_allows_free_text =  a.allow_cv_free_text
       attribute.merge!({ multi_link: true, linked_sample_type: a.linked_sample_type.id }) if is_seek_multi_sample
+      attribute.merge!({ multi_link: false, linked_sample_type: a.linked_sample_type.id }) if is_seek_sample
       attribute.merge!({is_cv_list: , cv_allows_free_text:}) if is_cv_list
       attribute
     end
