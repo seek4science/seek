@@ -7,6 +7,6 @@
   it. To have one created, then please provide the name. You will be able to provide additional details, if you wish, once it has been created.
 </div>
 <label>
-  <%= check_box_tag :managed_programme, '1', true %>
+  <%= check_box_tag :managed_programme, '1', @programme.nil? || @programme.site_managed? %>
   <%= "#{Seek::Config.instance_admins_name} managed #{t('programme')}?" %>
 </label>

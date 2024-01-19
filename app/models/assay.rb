@@ -73,6 +73,13 @@ class Assay < ApplicationRecord
     sample_type&.linked_sample_attributes&.any?
   end
 
+  # Fetches the assay which is linked through linked_sample_attributes (Single Page specific method)
+  def linked_assay
+    sample_type.linked_sample_attributes
+               .select { |lsa| lsa.isa_tag.nil? && lsa.title.include?('Input') }
+               .first&.sample_type&.assays&.first
+  end
+
   def default_contributor
     User.current_user.try :person
   end
@@ -85,6 +92,10 @@ class Assay < ApplicationRecord
 
   def state_allows_delete?(*args)
     assets.empty? && publications.empty? && associated_samples_through_sample_type.empty? && super
+  end
+
+  def is_isa_json_compliant?
+    investigation.is_isa_json_compliant? && !sample_type.nil?
   end
 
   # returns true if this is a modelling class of assay

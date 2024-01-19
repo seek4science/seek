@@ -151,7 +151,7 @@ module Seek
 
     def self.lookup_class(class_name, raise: true)
       c = persistent_class_lookup[class_name]
-      raise NameError "#{class_name} not an appropriate class" if c.nil? && raise
+      raise NameError, "#{class_name} not an appropriate class" if c.nil? && raise
       c
     end
 

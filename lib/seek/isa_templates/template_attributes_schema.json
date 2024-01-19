@@ -58,11 +58,11 @@
 				"String",
 				"Boolean",
 				"Registered Sample",
-				"Registered Sample (multiple)",
+				"Registered Sample List",
 				"Controlled Vocabulary",
 				"URI",
-				"Ontology",
-				"Registered Data file"
+				"Registered Data file",
+				"ENA custom date"
 			]
 		},
 		"CVList": {

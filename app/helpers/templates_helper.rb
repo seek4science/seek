@@ -63,6 +63,10 @@ module TemplatesHelper
   def template_attribute_type_link(template_attribute)
     type = template_attribute.sample_attribute_type.title
 
+    if template_attribute.sample_attribute_type.seek_sample? || template_attribute.sample_attribute_type.seek_sample_multi?
+      type += ' - ' + link_to(template_attribute.linked_sample_type&.title, template_attribute.linked_sample_type)
+    end
+
     if template_attribute.sample_attribute_type.controlled_vocab?
       type += ' - ' + link_to(template_attribute.sample_controlled_vocab.title,
                               template_attribute.sample_controlled_vocab)
@@ -75,6 +79,7 @@ module TemplatesHelper
       attribute_type_id: attribute.sample_attribute_type_id,
       data_type: SampleAttributeType.find(attribute.sample_attribute_type_id)&.title,
       cv_id: attribute.sample_controlled_vocab_id,
+      allow_cv_free_text: attribute.allow_cv_free_text,
       title: attribute.title,
       is_title: attribute.is_title,
       short_name: attribute.short_name,
@@ -84,7 +89,8 @@ module TemplatesHelper
       unit_id: attribute.unit_id,
       pos: attribute.pos,
       isa_tag_id: attribute.isa_tag_id,
-      isa_tag_title: attribute.isa_tag&.title
+      isa_tag_title: attribute.isa_tag&.title,
+      linked_sample_type_id: attribute.linked_sample_type_id
     }
   end
 end

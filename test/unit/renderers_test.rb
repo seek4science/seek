@@ -344,6 +344,15 @@ class RenderersTest < ActiveSupport::TestCase
     git_blob.rewind
     assert_equal "This is a txt format\n", renderer.render_standalone
 
+    @git.add_file('test.html', StringIO.new('<script>Danger!</script>'))
+    git_blob = @git.get_blob('test.html')
+    renderer = Seek::Renderers::TextRenderer.new(git_blob)
+    assert renderer.can_render?
+    assert_equal "<pre>&lt;script&gt;Danger!&lt;/script&gt;</pre>", renderer.render
+
+    git_blob.rewind
+    assert_equal "<script>Danger!</script>", renderer.render_standalone # Content-Security-Policy will prevent execution in standalone
+
     blob = FactoryBot.create(:csv_content_blob, asset: @asset)
     renderer = Seek::Renderers::TextRenderer.new(blob)
     assert renderer.can_render?

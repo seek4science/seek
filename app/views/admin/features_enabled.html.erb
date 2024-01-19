@@ -72,12 +72,20 @@
                                "User creation of #{t('programme').pluralize} enabled", "Controls whether standard users can create their own #{t('programme').pluralize}. If disabled only full administrators will be able to create #{t('programme').pluralize}. If enabled a full administrator is still required to allow and activate the #{t('programme')}") %>
     <% managed_programme_options = options_for_select(Programme.all.map{|p|[p.title, p.id]}, Seek::Config.managed_programme_id) %>
     <%= admin_dropdown_setting(:managed_programme_id, managed_programme_options,
-                               "Site mananaged #{t('programme')}",
+                               "Site managed #{t('programme')}",
                                "The #{t('programme')} the users can request to have a #{t('project')} created and associated with, without the need to create and manage their own",
                                include_blank:'None') %>
     <%= admin_checkbox_setting(:programmes_open_for_projects_enabled, 1, Seek::Config.programmes_open_for_projects_enabled,
                                "#{t('programme').pluralize} open for #{t(:project).pluralize} enabled",
                                "When enabled, gives the ability for individual #{t(:programme).pluralize} to be configured to allow any other registered user to create a #{t(:project)} linked to that #{t(:programme)} without requiring approval or admin rights. Use with care if open user registration is enabled, as it could allow any user to register, create a project and start adding content to that Programme.") %>
+
+    <%= admin_checkbox_setting(:auto_activate_programmes, 1, Seek::Config.auto_activate_programmes,
+                               "Automatically activate #{t('programme').pluralize}",
+                               "Activates user-created #{t('programme').pluralize} immediately without requiring administrator approval (although they are still notified if email is enabled).") %>
+
+    <%= admin_checkbox_setting(:auto_activate_site_managed_projects, 1, Seek::Config.auto_activate_site_managed_projects,
+                               "Automatically approve #{t('project').pluralize} under site managed #{t('programme')}",
+                               "Approves #{t('project')} creation requests automatically (administrators are still notified if email is enabled).") %>
   </div>
 
   <%= admin_checkbox_setting(:presentations_enabled, 1, Seek::Config.presentations_enabled,

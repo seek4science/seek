@@ -3,8 +3,6 @@ require 'test_helper'
 class SinglePagesControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
 
-  fixtures :isa_tags, :templates
-
   def setup
     @instance_name = Seek::Config.instance_name
     @member = FactoryBot.create :user
@@ -35,16 +33,6 @@ class SinglePagesControllerTest < ActionController::TestCase
 
     assert_equal 'hidden item', json['children'][0]['text']
     assert_equal inv_two.title, json['children'][1]['text']
-  end
-
-  test 'should not export isa from unauthorized investigation' do
-    with_config_value(:project_single_page_enabled, true) do
-      project = FactoryBot.create(:project)
-      investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:private_policy), projects: [project])
-      get :export_isa, params: { id: project.id, investigation_id: investigation.id }
-      assert_equal flash[:error], 'The investigation cannot be found!'
-      assert_redirected_to action: :show
-    end
   end
 
   test 'generates a valid export of sources in single page' do
@@ -257,8 +245,8 @@ class SinglePagesControllerTest < ActionController::TestCase
                                                       studies: [study],
                                                       linked_sample_type: source_sample_type)
 
-    assay_sample_type_template = FactoryBot.create(:isa_assay_template, id: 10_008)
-    assay_sample_type = FactoryBot.create(:isa_assay_sample_type,
+    assay_sample_type_template = FactoryBot.create(:isa_assay_material_template, id: 10_008)
+    assay_sample_type = FactoryBot.create(:isa_assay_material_sample_type,
                                           id: 10_005,
                                           contributor: person,
                                           isa_template: assay_sample_type_template,

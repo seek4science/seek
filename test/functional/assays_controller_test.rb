@@ -304,7 +304,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert cm = assay.extended_metadata
     assert_equal cmt, cm.extended_metadata_type
     assert_equal 'fred',cm.get_attribute_value('name')
-    assert_equal '22',cm.get_attribute_value('age')
+    assert_equal 22,cm.get_attribute_value('age')
     assert_nil cm.get_attribute_value('date')
   end
 
@@ -1928,7 +1928,7 @@ class AssaysControllerTest < ActionController::TestCase
     sample_collection_st = FactoryBot.create(:isa_sample_collection_sample_type, contributor: person, projects: [project],
     linked_sample_type: source_st)
 
-    assay_sample_type = FactoryBot.create :isa_assay_sample_type, linked_sample_type: sample_collection_st, contributor: person, isa_template: Template.find_by_title('ISA Assay 1')
+    assay_sample_type = FactoryBot.create :isa_assay_material_sample_type, linked_sample_type: sample_collection_st, contributor: person, isa_template: FactoryBot.build(:isa_assay_material_template)
     assay = FactoryBot.create(:assay,
                               policy:FactoryBot.create(:private_policy, permissions:[FactoryBot.create(:permission,contributor: person, access_type:Policy::EDITING)]),
                               sample_type: assay_sample_type,
@@ -1953,25 +1953,27 @@ class AssaysControllerTest < ActionController::TestCase
     sample_collection_st = FactoryBot.create(:isa_sample_collection_sample_type, contributor: person, projects: [project],
                                                                                  linked_sample_type: source_st)
 
-    assay_st1 = FactoryBot.create(:isa_assay_sample_type, contributor: person, projects: [project],
-                                                          linked_sample_type: sample_collection_st, isa_template: Template.find_by_title('ISA Assay 1'))
 
-    assay_st2 = FactoryBot.create(:isa_assay_sample_type, contributor: person, projects: [project],
-                                                          linked_sample_type: assay_st1, isa_template: Template.find_by_title('ISA Assay 1'))
+    assay_template_1 = FactoryBot.create(:isa_assay_material_template)
+    assay_st1 = FactoryBot.create(:isa_assay_material_sample_type, contributor: person, projects: [project],
+                                                          linked_sample_type: sample_collection_st, isa_template: assay_template_1)
 
-    assay_st3 = FactoryBot.create(:isa_assay_sample_type, contributor: person, projects: [project],
-                                                          linked_sample_type: assay_st2, isa_template: Template.find_by_title('ISA Assay 1'))
+    assay_st2 = FactoryBot.create(:isa_assay_material_sample_type, contributor: person, projects: [project],
+                                                          linked_sample_type: assay_st1, isa_template: assay_template_1)
 
-    study = FactoryBot.create(:study, investigation:, contributor: person,
+    assay_st3 = FactoryBot.create(:isa_assay_material_sample_type, contributor: person, projects: [project],
+                                                          linked_sample_type: assay_st2, isa_template: assay_template_1)
+
+    study = FactoryBot.create(:study, investigation: investigation, contributor: person,
                                       policy: FactoryBot.create(:private_policy, permissions: [FactoryBot.create(:permission, contributor: person, access_type: Policy::MANAGING)]),
                                       sops: [FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy))],
                                       sample_types: [source_st, sample_collection_st])
 
-    assay1 = FactoryBot.create(:assay, study:, contributor: person, sample_type: assay_st1,
+    assay1 = FactoryBot.create(:assay, study: study, contributor: person, sample_type: assay_st1,
                                        policy: FactoryBot.create(:private_policy, permissions: [FactoryBot.create(:permission, contributor: person, access_type: Policy::MANAGING)]))
-    assay2 = FactoryBot.create(:assay, study:, contributor: person, sample_type: assay_st2,
+    assay2 = FactoryBot.create(:assay, study: study, contributor: person, sample_type: assay_st2,
                                        policy: FactoryBot.create(:private_policy, permissions: [FactoryBot.create(:permission, contributor: person, access_type: Policy::MANAGING)]))
-    assay3 = FactoryBot.create(:assay, study:, contributor: person, sample_type: assay_st3,
+    assay3 = FactoryBot.create(:assay, study: study, contributor: person, sample_type: assay_st3,
                                        policy: FactoryBot.create(:private_policy, permissions: [FactoryBot.create(:permission, contributor: person, access_type: Policy::MANAGING)]))
 
     login_as(person)
@@ -1983,5 +1985,39 @@ class AssaysControllerTest < ActionController::TestCase
     assay3.reload
 
     assert_equal(assay3.previous_linked_assay_sample_type&.id, assay1.sample_type&.id)
+  end
+
+  test 'do not get index if feature disabled' do
+    with_config_value(:isa_enabled, false) do
+      get :index
+      assert_redirected_to root_path
+      assert flash[:error].include?('disabled')
+    end
+  end
+
+  test 'display single page button if feature enabled' do
+    with_config_value(:project_single_page_enabled, true) do
+      current_user = FactoryBot.create(:user)
+      login_as(current_user)
+      assay = FactoryBot.create(:assay, contributor: current_user.person)
+
+      get :show, params: { id: assay }
+      assert_response :success
+
+      assert_select 'a', text: 'Single Page', count: 1
+    end
+  end
+
+  test 'display adjusted buttons if isa json compliant' do
+    with_config_value(:isa_json_compliance_enabled, true) do
+      current_user = FactoryBot.create(:user)
+      login_as(current_user)
+      assay = FactoryBot.create(:isa_json_compliant_assay, contributor: current_user.person)
+
+      get :show, params: { id: assay }
+      assert_response :success
+
+      assert_select 'a', text: /Design the next #{I18n.t('assay')}/i, count: 1
+    end
   end
 end

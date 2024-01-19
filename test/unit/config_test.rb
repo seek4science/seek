@@ -399,10 +399,6 @@ class ConfigTest < ActiveSupport::TestCase
     assert_equal 'A new description', Seek::Config.registration_disabled_description
   end
 
-  test 'publish_button_enabled' do
-    assert Seek::Config.publish_button_enabled
-  end
-
   test 'recaptcha enabled' do
     assert Seek::Config.recaptcha_enabled
   end

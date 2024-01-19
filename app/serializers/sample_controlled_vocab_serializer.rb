@@ -1,5 +1,5 @@
 class SampleControlledVocabSerializer < BaseSerializer
-  attributes :title, :description, :source_ontology, :ols_root_term_uri, :required, :short_name
+  attributes :title, :description, :source_ontology, :ols_root_term_uri, :short_name
   attributes :sample_controlled_vocab_terms_attributes
   
   has_many :sample_controlled_vocab_terms

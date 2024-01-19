@@ -39,6 +39,16 @@ class InvestigationsController < ApplicationController
     send_data JSON.pretty_generate(the_hash) , filename: 'isatab.json'
   end
 
+  def export_isa
+    isa = IsaExporter::Exporter.new(Investigation.find(params[:id]), current_user).export
+    send_data isa, filename: 'isa.json', type: 'application/json', deposition: 'attachment'
+  rescue Exception => e
+    respond_to do |format|
+      flash[:error] = e.message
+      format.html { redirect_to investigation_path(Investigation.find(params[:id])) }
+    end
+  end
+
   def show
     @investigation=Investigation.find(params[:id])
 
@@ -140,6 +150,7 @@ class InvestigationsController < ApplicationController
   def investigation_params
     params.require(:investigation).permit(:title, :description, { project_ids: [] }, *creator_related_params,
                                           :position, { publication_ids: [] },
+                                          :is_isa_json_compliant,
                                           { discussion_links_attributes:[:id, :url, :label, :_destroy] },
                                           { extended_metadata_attributes: determine_extended_metadata_keys })
   end

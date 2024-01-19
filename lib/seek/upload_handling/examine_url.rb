@@ -30,7 +30,7 @@ module Seek
         end
 
         respond_to do |format|
-          format.html { render partial: 'content_blobs/examine_url_result', status: @type == 'error' ? 400 : 200 }
+          format.html { render partial: 'content_blobs/examine_url_result', status: ( @type == 'error'|| @type == 'override') ? 400 : 200 }
         end
       end
 
@@ -74,8 +74,10 @@ module Seek
         when 405
           @error_msg = "We can't find out information about this URL - Method not allowed response."
         when 404
+          @type = 'override'
           @error_msg = 'Nothing can be found at that URL. Please check the address and try again'
         when 400
+          @type = 'override'
           @error_msg = 'The URL appears to be invalid'
         when 490
           @error_msg = 'That URL is inaccessible. Please check the address and try again'

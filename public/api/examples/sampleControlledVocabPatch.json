@@ -1,17 +1,16 @@
 {
   "data": {
-    "id": "11",
+    "id": "18",
     "type": "sample_controlled_vocabs",
     "attributes": {
       "title": "new title",
       "description": "new description",
       "source_ontology": "new source ontology",
       "ols_root_term_uri": "http://new-uri.org",
-      "required": true,
       "short_name": "new short name",
       "sample_controlled_vocab_terms_attributes": [
         {
-          "id": "35",
+          "id": "17",
           "label": "new term label",
           "iri": "new iri",
           "parent_iri": "new parent_iri"

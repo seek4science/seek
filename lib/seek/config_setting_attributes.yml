@@ -64,7 +64,6 @@ seek_video_link:
 scales:
 delete_asset_version_enabled:
 recaptcha_enabled:
-publish_button_enabled:
 project_browser_enabled:
 project_single_page_enabled:
 isa_json_compliance_enabled:
@@ -256,3 +255,5 @@ galaxy_tool_sources:
 metadata_license:
 regular_job_offset:
   convert: :to_i
+auto_activate_programmes:
+auto_activate_site_managed_projects:

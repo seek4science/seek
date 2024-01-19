@@ -1,0 +1,24 @@
+<h1><%= @requests.count %> Pending <%= t('project') %> importation <%= "request".pluralize(@requests.count) %></h1>
+
+<table id='project-import-requests' class='table table-bordered table-hover'>
+  <thead>
+  <tr>
+    <th>Requester</th>
+    <th><%= t('project') %> name</th>
+    <th>Date requested</th>
+    <th></th>
+  </tr>
+  </thead>
+  <tbody>
+  <% @requests.select(&:sender).each do |request| %>
+    <tr>
+      <td><%= link_to(request.sender.title, request.sender) %></td>
+      <td><%= JSON.parse(request.details)['project']['title'] %></td>
+      <td><%= date_as_string(request.created_at, true)  %></td>
+      <td class="text-center">
+        <%= link_to('Respond', administer_import_project_request_projects_path(message_log_id: request.id),class:'btn btn-primary') %>
+      </td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>

@@ -63,7 +63,7 @@
 <script>
   var SampleTypeFilters={
     optionChanged:function() {
-      $j.ajax('<%= filter_for_select_sample_types_path %>', {
+      $j.ajax('<%= filter_for_select_sample_types_path(project_ids: params[:project_ids]) %>', {
             data: SampleTypeFilters.queryData(),
             success: function (html) {
               $j('#selected-sample-types').html(html);

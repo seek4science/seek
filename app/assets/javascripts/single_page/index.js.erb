@@ -242,12 +242,12 @@ async function exportToExcel(tableName, studyId, assayId, sampleTypeId) {
       const val = row[j];
 
       // Check whether sample has one or more hidden Inputs or if sample is completely hidden
-      if (attr.toLowerCase().includes('input')) {
-        if (Array.isArray(val)){
-          hasHiddenInputs = val.some(input => input.title === '#HIDDEN'); // Sample has hidden inputs
-        } else {
-          hasHiddenInputs = val === '#HIDDEN'; // Sample is completely hidden
-        }
+      if (Array.isArray(val)){
+        hasHiddenInputs = hasHiddenInputs || val.some(input => input.title === '#HIDDEN'); // Sample has hidden Registered Samples in list
+      } else if(typeof val === 'object' && val !== null && 'title' in val){
+        hasHiddenInputs = hasHiddenInputs || (val.title === '#HIDDEN'); // Sample has hidden Registered Sample
+      } else {
+        hasHiddenInputs = hasHiddenInputs || (val === '#HIDDEN'); // Sample is completely hidden
       }
 
       // The source inputs are wrapped in an object and must be unwrapped first
@@ -258,7 +258,7 @@ async function exportToExcel(tableName, studyId, assayId, sampleTypeId) {
         obj[attr] = val;
       }
     }
-    if (!hasHiddenInputs) data.push(obj);
+    if (!hasHiddenInputs && obj["selected"]) data.push(obj);
   }
 
   // Use ajax for POST request with table data in the body
@@ -270,14 +270,17 @@ async function exportToExcel(tableName, studyId, assayId, sampleTypeId) {
       sample_type_id: JSON.stringify(sampleTypeId),
       study_id: JSON.stringify(studyId),
       assay_id: JSON.stringify(assayId),
-    },
-    success: function(response) {
-      downloadUrl = `<%= download_samples_excel_single_pages_path() %>?uuid=${response.uuid}`;
-      window.location.href = downloadUrl;
-    },
-    error: function(response) {
-        alert(`Failed to export through excel!\nStatus: ${response.status}\nError: ${JSON.stringify(response.error().statusText)}`);
     }
+  })
+  .done( function(response){
+    downloadUrl = `<%= download_samples_excel_single_pages_path() %>?uuid=${response.uuid}`;
+    window.location.href = downloadUrl;
+  })
+  .fail( function(response){
+    alert(`Failed to export through excel!\nStatus: ${response.status}\nError: ${JSON.stringify(response.error().statusText)}`);
+  })
+  .always( function(response){
+    setTimeout(() => {location.reload()}, 2000);
   });
 }
 

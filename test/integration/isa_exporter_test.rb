@@ -23,10 +23,10 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
       post '/session', params: { login: 'test', password: generate_user_password }
       @current_user = User.current_user
       @current_user.person.add_to_project_and_institution(@project, @current_user.person.institutions.first)
-      @investigation = FactoryBot.create(:investigation, projects: [@project], contributor: @current_user.person)
+      @investigation = FactoryBot.create(:investigation, projects: [@project], contributor: @current_user.person, is_isa_json_compliant: true)
       isa_project_vars = create_basic_isa_project
       with_config_value(:project_single_page_enabled, true) do
-        get export_isa_single_page_path(@project.id, investigation_id: @investigation.id)
+        get export_isa_investigation_path(@investigation.id)
       end
 
       isa_project_vars.merge(
@@ -195,7 +195,7 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
     end
     materials = materials.map { |so| so['@id'] }
     processes = processes.flatten.map { |p| p['@id'] }
-    materials.each { |p| assert processes.include?(p) }
+materials.each { |p| assert processes.include?(p) }
   end
 
   # 23
@@ -295,29 +295,29 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
   end
 
   def create_basic_isa_project
-    person = FactoryBot.create(:person, project: @project)
+    person = @current_user.person
 
     source =
       FactoryBot.create(
         :isa_source_sample_type,
         contributor: person,
         project_ids: [@project.id],
-        isa_template: Template.find_by_title('ISA Source')
+        isa_template: FactoryBot.build(:isa_source_template)
       )
     sample_collection =
       FactoryBot.create(
         :isa_sample_collection_sample_type,
         contributor: person,
         project_ids: [@project.id],
-        isa_template: Template.find_by_title('ISA sample collection'),
+        isa_template: FactoryBot.build(:isa_sample_collection_template),
         linked_sample_type: source
       )
     assay_sample_type =
       FactoryBot.create(
-        :isa_assay_sample_type,
+        :isa_assay_material_sample_type,
         contributor: person,
         project_ids: [@project.id],
-        isa_template: Template.find_by_title('ISA Assay 1'),
+        isa_template: FactoryBot.build(:isa_assay_material_template),
         linked_sample_type: sample_collection
       )
 
@@ -326,7 +326,8 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
         :study,
         investigation: @investigation,
         sample_types: [source, sample_collection],
-        sops: [FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy))]
+        sops: [FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy))],
+        contributor: person
       )
 
     FactoryBot.create(
@@ -334,7 +335,7 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
       study: study,
       sample_type: assay_sample_type,
       sop_ids: [FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy)).id],
-      contributor: @current_user.person,
+      contributor: person,
       position: 0
     )
 
@@ -355,7 +356,8 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
                     .sample_controlled_vocab_terms
                     .first
                     .label
-              }
+              },
+              contributor: person
 
     sample_2 =
       FactoryBot.create :sample,
@@ -368,10 +370,11 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
                 'sample collection parameter value 1': 'sample collection parameter value 1',
                 'Sample Name': 'sample name',
                 'sample characteristic 1': 'sample characteristic 1'
-              }
+              },
+              contributor: person
 
     FactoryBot.create :sample,
-            title: 'sample_2',
+            title: 'sample_3',
             sample_type: assay_sample_type,
             project_ids: [@project.id],
             data: {
@@ -380,7 +383,8 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
               'Assay 1 parameter value 1': 'Assay 1 parameter value 1',
               'Extract Name': 'Extract Name',
               'other material characteristic 1': 'other material characteristic 1'
-            }
+            },
+            contributor: person
 
     { source: source,
       sample_collection: sample_collection,

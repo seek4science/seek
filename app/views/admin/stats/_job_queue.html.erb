@@ -4,73 +4,82 @@
    delayed_jobs = Delayed::Job.order(locked_at: :desc, created_at: :asc)
 %>
 
-<p>
+<h4>
   Total delayed jobs waiting = <%= delayed_jobs.count -%>
-</p>
+</h4>
 
 <% if Delayed::Job.where('failed_at IS NOT NULL').count > 0 %>
   <%= button_link_to "Clear failed jobs", 'destroy', '#', id: 'clear-failed-btn', class: 'btn-primary' %>
 <% end %>
 
-<table class="table table-hover">
-  <thead>
-  <tr>
-    <th>Time created</th>
-    <th>Priority</th>
-    <th>Queue</th>
-    <th>Attempts</th>
-    <th>Run at</th>
-    <th>Locked at</th>
-    <th>Failed at</th>
-    <th>Handler</th>
-  </tr>
-  </thead>
-  <% delayed_jobs.each do |item| %>
+<div class='job-queue-table'>
+  <table class="table table-hover">
+    <thead>
       <tr>
-        <td><%= date_as_string(item.created_at,true) -%></td>
-        <td><%= item.priority -%></td>
-        <td><%= item.queue -%></td>
-        <td><%= item.attempts -%></td>
-        <td><%= date_as_string(item.run_at,true) -%></td>
-        <td><%= date_as_string(item.locked_at,true) -%></td>
-        <td>
-          <%= item.failed_at.nil? ? date_as_string(item.failed_at,true) : link_to(date_as_string(item.failed_at,true), '#', onclick: "$j('#last_error_#{item.id}').fadeIn(); return false;") -%>
-        </td>
-        <td><%= item.handler -%></td>
+        <th>Time created</th>
+        <th>Priority</th>
+        <th>Queue</th>
+        <th>Attempts</th>
+        <th>Run at</th>
+        <th>Locked at</th>
+        <th>Failed at</th>
+        <th>Handler</th>
       </tr>
-      <% unless item.last_error.nil? -%>
-          <tr id='<%= "last_error_#{item.id}" -%>' style="display:none;">
-            <td colspan="7">
-              <pre><%= item.last_error -%></pre>
+    </thead>
+    <tbody>
+      <% delayed_jobs.each do |item| %>
+          <tr>
+            <td><%= date_as_string(item.created_at,true) -%></td>
+            <td><%= item.priority -%></td>
+            <td><%= item.queue -%></td>
+            <td><%= item.attempts -%></td>
+            <td><%= date_as_string(item.run_at,true) -%></td>
+            <td><%= date_as_string(item.locked_at,true) -%></td>
+            <td>
+              <%= item.failed_at.nil? ? date_as_string(item.failed_at,true) : link_to(date_as_string(item.failed_at,true), '#', onclick: "$j('#last_error_#{item.id}').fadeIn(); return false;") -%>
             </td>
+            <td><%= item.handler -%></td>
           </tr>
-      <% end %>
-  <% end -%>
-</table>
-
+          <% unless item.last_error.nil? -%>
+              <tr id='<%= "last_error_#{item.id}" -%>' style="display:none;">
+                <td colspan="7">
+                  <pre><%= item.last_error -%></pre>
+                </td>
+              </tr>
+          <% end %>
+      <% end -%>
+    </tbody>
+  </table>
+</div>
 <hr/>
+<h4>
+  Total items waiting in queues = <%= queue.count -%>
+</h4>
 
-<p>
-  Total waiting in queues = <%= queue.count -%>
-</p>
-<table id="job_queue" class="table table-hover">
-  <tr>
-    <th>Time created</th>
-    <th>Priority</th>
-    <th>Item type</th>
-    <th>Item id</th>
-    <th>Type</th>
-  </tr>
-  <% queue.each do |item| %>
+<div class='job-queue-table'>
+  <table id="job_queue" class="table table-hover">
+    <thead>
       <tr>
-        <td><%= date_as_string(item.created_at,true) -%></td>
-        <td><%= item.respond_to?(:priority) ? item.priority : "<span class='none_text'>N/A</span>".html_safe -%></td>
-        <td><%= item.item_type -%></td>
-        <td><%= item.item_id -%></td>
-        <td><%= item.class.name -%></td>
+        <th>Time created</th>
+        <th>Priority</th>
+        <th>Item type</th>
+        <th>Item id</th>
+        <th>Type</th>
       </tr>
-  <% end -%>
-</table>
+    </thead>
+    <tbody>
+      <% queue.each do |item| %>
+          <tr>
+            <td><%= date_as_string(item.created_at,true) -%></td>
+            <td><%= item.respond_to?(:priority) ? item.priority : "<span class='none_text'>N/A</span>".html_safe -%></td>
+            <td><%= item.item_type -%></td>
+            <td><%= item.item_id -%></td>
+            <td><%= item.class.name -%></td>
+          </tr>
+      <% end -%>
+    </tbody>
+  </table>
+</div>
 
 <script type="application/javascript">
 

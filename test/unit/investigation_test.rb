@@ -217,10 +217,10 @@ class InvestigationTest < ActiveSupport::TestCase
     item = FactoryBot.create(:investigation,
                    extended_metadata:ExtendedMetadata.new(
                      extended_metadata_type: metadata_type,
-                     data: { name: 'James', age: '25' }
+                     data: { name: 'James', age: 25 }
                    )
     )
-    assert_equal ['James','25'].sort, item.extended_metadata_attribute_values_for_search.sort
+    assert_equal ['James','25'].sort, item.extended_metadata_attribute_values_for_search.map(&:to_s).sort
   end
   
   test 'related sop ids' do

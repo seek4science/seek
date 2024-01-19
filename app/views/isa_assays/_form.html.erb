@@ -3,11 +3,32 @@
 <%
 input_sample_type_id = params[:isa_assay][:input_sample_type_id] if params.dig(:isa_assay, :input_sample_type_id)
 source_assay = Assay.find(params[:source_assay_id]) if params[:source_assay_id]
-input_sample_type_id ||= 
+
+if @isa_assay.assay.new_record?
+  if params[:source_assay_id]
+    assay_position = source_assay.position + 1
+  else
+    assay_position = 0
+  end
+else
+  assay_position = @isa_assay.assay.position
+end
+
+# assay_position = params[:source_assay_id] ? source_assay.position + 1 : 0
+input_sample_type_id ||=
   if params[:is_source]
     study.sample_types.second.id
   else
     source_assay.sample_type.id if params[:source_assay_id]
+  end
+
+show_extended_metadata =
+  if params[:is_source]
+    true
+  elsif source_assay&.position&.zero? && !@isa_assay.assay.new_record?
+    true # Custom metadata should be shown in edit as well if assay position is 0.
+  else
+    false
   end
 %>
 
@@ -25,8 +46,10 @@ input_sample_type_id ||=
     <%= assay_fields.text_area :description, :rows => 5, :class=>"form-control rich-text-edit"  -%>
   </div>
 
-  <%= render partial: 'extended_metadata/extended_metadata_type_selection', locals:{f:assay_fields, resource:@isa_assay.assay} %>
-  <%= render partial: 'extended_metadata/extended_metadata_attribute_input', locals:{f:assay_fields,resource:@isa_assay.assay} %>
+  <% if show_extended_metadata %>
+    <%= render partial: 'extended_metadata/extended_metadata_type_selection', locals:{f:assay_fields, resource:@isa_assay.assay} %>
+    <%= render partial: 'extended_metadata/extended_metadata_attribute_input', locals:{f:assay_fields,resource:@isa_assay.assay, parent_resource: "isa_assay"} %>
+  <% end %>
 
   <div class="form-group hidden"  >
     <label class="required"><%= t('study') -%></label>
@@ -34,7 +57,7 @@ input_sample_type_id ||=
   </div>
 
   <div class="hidden">
-    <%= assay_fields.number_field :position, value: source_assay&.position || study.assays.length -%>
+    <%= assay_fields.number_field :position, value: assay_position || study.assays.length -%>
   </div>
 
   <%= assay_fields.hidden_field :assay_class_id -%>
@@ -48,7 +71,7 @@ input_sample_type_id ||=
 
   <%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @isa_assay.assay} -%>
 
-<% end -%> 
+<% end -%>
 
 <%= f.hidden_field :input_sample_type_id, value: input_sample_type_id  -%>
 
@@ -57,7 +80,7 @@ input_sample_type_id ||=
     <%= render partial: 'isa_studies/sample_types_form', locals: {f: f, sample_type: @isa_assay.sample_type, id_suffix: "_sample_type", isa_element: "assay", action: action} %>
   <% end %>
 <% end %>
- 
+
 <%= form_submit_buttons(@isa_assay.assay) %>
 
 
@@ -75,15 +98,15 @@ input_sample_type_id ||=
       showTemplateModal()
     }
 
-    $j(document).ready(function () {   
+    $j(document).ready(function () {
       const urlSearchParams = new URLSearchParams(window.location.search);
       const params = Object.fromEntries(urlSearchParams.entries());
       const study_id = params["study_id"]
       $j("option:enabled", "#isa_assay_input_sample_type_id").prop('selected', true);
       // Prevent setting the hidden field on redirect (query string parameters are missing)
-      if(study_id) 
-        $j("#isa_assay_assay_study_id").val(study_id).change(); 
+      if(study_id)
+        $j("#isa_assay_assay_study_id").val(study_id).change();
 
-      Templates.init($j('#template-attributes'));   
-    }); 
+      Templates.init($j('#template-attributes'));
+    });
 </script>

@@ -144,13 +144,17 @@ module Seek
         when 'http', 'https'
           handler = Seek::DownloadHandling::HTTPHandler.new(@data_url)
           info = handler.info
-          if info[:code] == 490
-            flash.now[:error] = 'The given URL is inaccessible.'
-            return false
-          end
-          unless [200, 401, 403].include?(info[:code])
-            flash.now[:error] = "Processing the URL responded with a response code (#{info[:code]}), indicating the URL is inaccessible."
-            return false
+          if (info[:code] == 400 || 404) && blob_params[:override_url_check].present?
+            flash.now[:notice] = 'The given URL is inaccessible but you can override the url validation.'
+          else
+            if info[:code] == 490
+              flash.now[:error] = 'The given URL is inaccessible.'
+              return false
+            end
+            unless [200, 401, 403].include?(info[:code])
+              flash.now[:error] = "Processing the URL responded with a response code (#{info[:code]}), indicating the URL is inaccessible."
+              return false
+            end
           end
         when 'ftp'
           handler = Seek::DownloadHandling::FTPHandler.new(@data_url)

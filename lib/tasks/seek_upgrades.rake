@@ -14,6 +14,8 @@ namespace :seek do
     strip_sample_attribute_pids
     rename_registered_sample_multiple_attribute_type
     remove_ontology_attribute_type
+    db:seed:007_sample_attribute_types
+    recognise_isa_json_compliant_items
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -98,23 +100,27 @@ namespace :seek do
   end
 
   task(decouple_extracted_samples_policies: [:environment]) do
-    puts '... creating independent policies for extracted samples...'
-    decoupled = 0
+    puts '..... creating independent policies for extracted samples (this can take a while if there are many samples) ...'
+    affected_samples = []
     disable_authorization_checks do
-      Sample.find_each do |sample|
+      Sample.includes(:originating_data_file).find_each do |sample|
         # check if the sample was extracted from a datafile and their policies are linked
-        if sample.extracted? && sample.policy == sample.originating_data_file&.policy
-          sample.policy = sample.policy.deep_copy
-          sample.policy.save
-          decoupled += 1
+        if sample.extracted? && sample.policy_id == sample.originating_data_file&.policy_id
+          policy = sample.policy.deep_copy
+          policy.save
+          sample.update_column(:policy_id, policy.id)
+          putc('.')
+          affected_samples << sample
         end
       end
+      #won't have been queued, as the policy has no associated assets yet when saved
+      AuthLookupUpdateQueue.enqueue(affected_samples) if affected_samples.any?
     end
-    puts " ... finished creating independent policies of #{decoupled.to_s} extracted samples"
+    puts "..... finished creating independent policies of #{affected_samples.count} extracted samples"
   end
 
   task(decouple_extracted_samples_projects: [:environment]) do
-    puts '... copying project ids for extracted samples...'
+    puts '..... copying project ids for extracted samples...'
     decoupled = 0
     hash_array = []
     disable_authorization_checks do
@@ -149,6 +155,25 @@ namespace :seek do
       end
     end
     puts " ... finished updating sample_resource_links of #{samples_updated.to_s} samples with data_file attributes"
+  end
+
+  task(recognise_isa_json_compliant_items: [:environment]) do
+    puts '... searching for ISA compliant investigations'
+    investigations_updated = 0
+    disable_authorization_checks do
+      investigations_to_update = Study.joins(:investigation)
+                                      .where('investigations.is_isa_json_compliant = ?', false)
+                                      .select { |study| study.sample_types.any? }
+                                      .map(&:investigation)
+                                      .compact
+                                      .uniq
+
+      investigations_to_update.each do |inv|
+        inv.update_column(:is_isa_json_compliant, true)
+        investigations_updated += 1
+      end
+    end
+    puts "...Updated #{investigations_updated.to_s} investigations"
   end
 
   private

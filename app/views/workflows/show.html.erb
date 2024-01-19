@@ -32,12 +32,19 @@
             <div class="row">
               <div class="col-md-12">
                 <div class="workflow-diagram">
-                  <%= image_tag(diagram_workflow_path(@workflow, version: @display_workflow.version)) %>
+                  <% diagram_path = diagram_workflow_path(@workflow, version: @display_workflow.version) %>
+                  <% if @display_workflow&.diagram.extension == 'svg' %>
+                    <%= content_tag(:embed, '', type: 'image/svg+xml', src: diagram_path, class: 'svg-pan-zoom', width: 1000, height: 500)  %>
+                    <p class="help-block">Click and drag the diagram to pan, double click or use the controls to zoom.</p>
+                  <% else %>
+                    <%= image_tag(diagram_path) %>
+                  <% end %>
                 </div>
               </div>
             </div>
           <% end %>
         <% rescue StandardError => e %>
+          <% raise e if Rails.env.development? %>
           <% Rails.logger.error(e.inspect) %>
           <% Rails.logger.error(e.backtrace.join("\n")) %>
           <div class="alert alert-warning">Could not render the workflow diagram.</div>

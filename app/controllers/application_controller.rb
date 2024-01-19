@@ -6,6 +6,7 @@ require 'authenticated_system'
 
 class ApplicationController < ActionController::Base
   USER_CONTENT_CSP = "default-src 'self'"
+  USER_SVG_CSP = "#{USER_CONTENT_CSP}; style-src 'unsafe-inline';"
 
   include Seek::Errors::ControllerErrorHandling
   include Seek::EnabledFeaturesFilter
@@ -129,11 +130,15 @@ class ApplicationController < ActionController::Base
   helper_method :controller_model
 
   def self.api_actions(*actions)
-    @api_actions ||= (superclass.respond_to?(:api_actions) ? superclass.api_actions.dup : []) + actions.map(&:to_sym)
+    @api_actions ||= []
+    @api_actions |= actions.map(&:to_sym)
+    @api_actions
   end
 
   def self.user_content_actions(*actions)
-    @user_content_actions ||= (superclass.respond_to?(:user_content_actions) ? superclass.user_content_actions.dup : []) + actions.map(&:to_sym)
+    @user_content_actions ||= []
+    @user_content_actions |= actions.map(&:to_sym)
+    @user_content_actions
   end
 
   private
@@ -596,9 +601,13 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def determine_extended_metadata_keys
+  def determine_extended_metadata_keys(asset = nil)
     keys = []
-    type_id = params.dig(controller_name.singularize.to_sym, :extended_metadata_attributes, :extended_metadata_type_id)
+    if asset
+      type_id = params.dig(controller_name.singularize.to_sym, asset, :extended_metadata_attributes, :extended_metadata_type_id)
+    else
+      type_id = params.dig(controller_name.singularize.to_sym, :extended_metadata_attributes, :extended_metadata_type_id)
+    end
     if type_id.present?
       metadata_type = ExtendedMetadataType.find(type_id)
       keys = [:extended_metadata_type_id, :id, data: recursive_determine_extended_metadata_keys(metadata_type)]

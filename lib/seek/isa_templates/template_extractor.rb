@@ -46,8 +46,7 @@ module Seek
                       {
                         title: attribute['name'],
                         source_ontology: is_ontology ? attribute['ontology']['name'] : nil,
-                        ols_root_term_uri: is_ontology ? attribute['ontology']['rootTermURI'] : nil,
-                        custom_input: true
+                        ols_root_term_uri: is_ontology ? attribute['ontology']['rootTermURI'] : nil
                       }
                     )
                 end
@@ -98,7 +97,8 @@ module Seek
                                                                             description: attribute['description'],
                                                                             sample_controlled_vocab_id: scv&.id,
                                                                             pid: attribute['pid'],
-                                                                            sample_attribute_type_id: get_sample_attribute_type(attribute['dataType'])
+                                                                            sample_attribute_type_id: get_sample_attribute_type(attribute['dataType']),
+                                                                            allow_cv_free_text: attribute['ontology'].present?
                                                                           }))
               end
             end
@@ -158,13 +158,19 @@ module Seek
       end
 
       def self.get_sample_attribute_type(title)
-        SampleAttributeType.where(title: title).first.id
+        sa = SampleAttributeType.find_by(title: title)
+        raise "Could not find a Sample Attribute named '#{title}'" if sa.nil?
+
+        sa.id
       end
 
       def self.get_isa_tag_id(title)
         return nil if title.blank?
 
-        IsaTag.where(title: title).first.id
+        it = IsaTag.find_by(title: title)
+        raise "Could not find an ISA Tag named '#{title}'" if it.nil?
+
+        it.id
       end
 
       def self.seed_isa_tags
