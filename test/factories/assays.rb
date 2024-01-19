@@ -105,7 +105,7 @@ FactoryBot.define do
     title { 'ISA JSON compliant assay' }
     description { 'An assay linked to an ISA JSON compliant study and a sample type' }
     after(:build) do |assay|
-      assay.study = FactoryBot.create(:isa_json_compliant_study)
+      assay.study ||= FactoryBot.create(:isa_json_compliant_study)
       assay.sample_type = FactoryBot.create(:isa_assay_material_sample_type, linked_sample_type: assay.study.sample_types.last)
     end
   end

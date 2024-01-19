@@ -2012,9 +2012,12 @@ class AssaysControllerTest < ActionController::TestCase
     with_config_value(:isa_json_compliance_enabled, true) do
       current_user = FactoryBot.create(:user)
       login_as(current_user)
-      assay_stream = FactoryBot.create(:assay_stream, contributor: current_user.person)
-      assay1 = FactoryBot.create(:isa_json_compliant_assay, contributor: current_user.person, study: assay_stream.study, assay_stream:)
-      assay2 = FactoryBot.create(:isa_json_compliant_assay, contributor: current_user.person, study: assay_stream.study, assay_stream:)
+      study = FactoryBot.create(:isa_json_compliant_study)
+      assay_stream = FactoryBot.create(:assay_stream, study: , contributor: current_user.person)
+      assay1 = FactoryBot.create(:isa_json_compliant_assay, contributor: current_user.person, study: , assay_stream:)
+      assay2 = FactoryBot.create(:isa_json_compliant_assay, contributor: current_user.person, study: , assay_stream:)
+
+      assert_equal assay_stream.study, assay1.study
 
       get :show, params: { id: assay_stream }
       assert_response :success

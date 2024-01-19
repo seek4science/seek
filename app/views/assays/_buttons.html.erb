@@ -2,7 +2,7 @@
   if item.is_modelling?
     t('assays.modelling_analysis')
   elsif item.is_assay_stream?
-    'Assay Stream'
+    t('assays.assay_stream')
   elsif Seek::Config.isa_json_compliance_enabled && item.is_isa_json_compliant?
     t('isa_assay')
   else
