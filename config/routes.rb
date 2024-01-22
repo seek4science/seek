@@ -744,7 +744,7 @@ SEEK::Application.routes.draw do
       post :template_attributes
     end
     collection do
-post :filter_isa_tags_by_level
+      post :filter_isa_tags_by_level
       get :task_status
       get :default_templates
       post :populate_template
