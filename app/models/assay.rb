@@ -72,12 +72,34 @@ class Assay < ApplicationRecord
     assay_class&.is_assay_stream?
   end
 
-  def previous_linked_assay_sample_type
-    sample_type.sample_attributes.detect { |sa| sa.isa_tag.nil? && sa.title.include?('Input') }&.linked_sample_type
+  def previous_linked_sample_type
+    return unless is_isa_json_compliant?
+
+    if is_assay_stream?
+      study.sample_types.second
+    else
+      sample_type.sample_attributes.detect { |sa| sa.isa_tag.nil? && sa.title.include?('Input') }&.linked_sample_type
+    end
   end
 
   def has_linked_child_assay?
-    sample_type&.linked_sample_attributes&.any?
+    return false unless is_isa_json_compliant?
+
+    if is_assay_stream?
+      child_assays.any?
+    else
+      sample_type&.linked_sample_attributes&.any?
+    end
+  end
+
+  def next_linked_child_assay
+    return unless has_linked_child_assay?
+
+    if is_assay_stream?
+      previous_linked_sample_type&.linked_sample_attributes&.detect { |sa| sa.isa_tag.nil? && sa.title.include?('Input') }&.sample_type&.assays&.first
+    else
+      sample_type.linked_sample_attributes.detect { |sa| sa.isa_tag.nil? && sa.title.include?('Input') }&.sample_type&.assays&.first
+    end
   end
 
   def default_contributor

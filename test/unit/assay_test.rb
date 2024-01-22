@@ -773,4 +773,69 @@ class AssayTest < ActiveSupport::TestCase
     default_assay = FactoryBot.create(:assay)
     refute default_assay.is_assay_stream?
   end
+
+  test 'previous linked sample type' do
+    isa_study = FactoryBot.create(:isa_json_compliant_study)
+    def_study = FactoryBot.create(:study)
+
+    assay_stream = FactoryBot.create(:assay_stream, study: isa_study)
+    assert_equal assay_stream.previous_linked_sample_type, isa_study.sample_types.second
+
+    def_assay = FactoryBot.create(:assay, study:def_study)
+    assert_nil def_assay.previous_linked_sample_type
+
+    first_isa_assay = FactoryBot.create(:isa_json_compliant_assay,
+                                         assay_stream: ,
+                                         study: isa_study)
+    assert_equal first_isa_assay.previous_linked_sample_type, isa_study.sample_types.second
+
+    data_file_sample_type = FactoryBot.create(:isa_assay_data_file_sample_type,
+                                              linked_sample_type: first_isa_assay.sample_type)
+    second_isa_assay = FactoryBot.create(:assay,
+                                          study: isa_study,
+                                          assay_stream: ,
+                                          sample_type: data_file_sample_type)
+
+    assert_equal second_isa_assay.previous_linked_sample_type, first_isa_assay.sample_type
+  end
+
+  test 'has_linked_child_assay?' do
+    isa_study = FactoryBot.create(:isa_json_compliant_study)
+    def_study = FactoryBot.create(:study)
+    def_assay = FactoryBot.create(:assay, study:def_study)
+
+    assay_stream = FactoryBot.create(:assay_stream, study: isa_study)
+    first_isa_assay = FactoryBot.create(:isa_json_compliant_assay, study: isa_study)
+    data_file_sample_type = FactoryBot.create(:isa_assay_data_file_sample_type,
+                                              linked_sample_type: first_isa_assay.sample_type)
+    second_isa_assay = FactoryBot.create(:assay,
+                                          study: isa_study,
+                                          assay_stream: ,
+                                          sample_type: data_file_sample_type)
+
+    assert assay_stream.has_linked_child_assay?
+    refute def_assay.has_linked_child_assay?
+    assert first_isa_assay.has_linked_child_assay?
+    refute second_isa_assay.has_linked_child_assay?
+  end
+
+  test 'next_linked_child_assay' do
+    isa_study = FactoryBot.create(:isa_json_compliant_study)
+    def_study = FactoryBot.create(:study)
+    def_assay = FactoryBot.create(:assay, study:def_study)
+
+    assay_stream = FactoryBot.create(:assay_stream, study: isa_study)
+    first_isa_assay = FactoryBot.create(:isa_json_compliant_assay, study: isa_study)
+    data_file_sample_type = FactoryBot.create(:isa_assay_data_file_sample_type,
+                                              linked_sample_type: first_isa_assay.sample_type)
+    second_isa_assay = FactoryBot.create(:assay,
+                                          study: isa_study,
+                                          assay_stream: ,
+                                          sample_type: data_file_sample_type)
+
+    assert_equal assay_stream.next_linked_child_assay, first_isa_assay
+    assert_nil def_assay.next_linked_child_assay
+    assert_equal first_isa_assay.next_linked_child_assay, second_isa_assay
+    assert_nil second_isa_assay.next_linked_child_assay
+  end
 end

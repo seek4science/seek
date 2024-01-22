@@ -1947,7 +1947,7 @@ class AssaysControllerTest < ActionController::TestCase
     # person = User.current_user.person
     person = FactoryBot.create(:person)
     project = person.projects.first
-    investigation = FactoryBot.create(:investigation, projects: [project])
+    investigation = FactoryBot.create(:investigation, projects: [project], is_isa_json_compliant: true)
 
     source_st = FactoryBot.create(:isa_source_sample_type, contributor: person, projects: [project])
     sample_collection_st = FactoryBot.create(:isa_sample_collection_sample_type, contributor: person, projects: [project],
@@ -1984,7 +1984,7 @@ class AssaysControllerTest < ActionController::TestCase
 
     assay3.reload
 
-    assert_equal(assay3.previous_linked_assay_sample_type&.id, assay1.sample_type&.id)
+    assert_equal(assay3.previous_linked_sample_type&.id, assay1.sample_type&.id)
   end
 
   test 'do not get index if feature disabled' do

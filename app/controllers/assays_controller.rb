@@ -117,7 +117,7 @@ class AssaysController < ApplicationController
     return unless is_single_page_assay?
     return unless @assay.has_linked_child_assay?
 
-    previous_assay_linked_st_id = @assay.previous_linked_assay_sample_type&.id
+    previous_assay_linked_st_id = @assay.previous_linked_sample_type&.id
 
     next_assay = Assay.all.detect do |a|
       a.sample_type&.sample_attributes&.first&.linked_sample_type_id == @assay.sample_type_id
