@@ -1,5 +1,8 @@
-<h1>Edit <%= t('isa_assay') %></h1>
-
+<% if @isa_assay.assay.is_assay_stream? %>
+	<h1>Edit <%= t('assays.assay_stream') %></h1>
+<% else %>
+	<h1>Edit <%= t('isa_assay') %></h1>
+<% end %>
 <%= render partial: "templates/template_modal" -%>
 <div class="show_basic">
 	<%= form_for @isa_assay, url: { controller: "isa_assays", action: "update", id: params[:id] }, method: :put do |f| %>
