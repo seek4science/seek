@@ -107,14 +107,14 @@ class AssaysController < ApplicationController
   end
 
   def delete_linked_sample_types
-    return unless is_single_page_assay?
+    return unless @assay.is_isa_json_compliant?
     return if @assay.sample_type.nil?
 
     @assay.sample_type.destroy
   end
 
   def fix_assay_linkage
-    return unless is_single_page_assay?
+    return unless @assay.is_isa_json_compliant?
     return unless @assay.has_linked_child_assay?
 
     previous_assay_linked_st_id = @assay.previous_linked_sample_type&.id
@@ -193,11 +193,5 @@ class AssaysController < ApplicationController
       assay_params[:sop_ids].select! { |id| Sop.find_by_id(id).try(:can_view?) } if assay_params.key?(:sop_ids)
       assay_params[:model_ids].select! { |id| Model.find_by_id(id).try(:can_view?) } if assay_params.key?(:model_ids)
     end
-  end
-
-  def is_single_page_assay?
-    return false unless params.key?(:return_to)
-
-    params[:return_to].start_with? '/single_pages/'
   end
 end
