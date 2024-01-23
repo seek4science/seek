@@ -47,16 +47,18 @@
               <b><%= "Assay position" %>: </b>
               <%= @assay.position %>
             </p>
-            <p id="assay_type">
-              <b><%= assay_type_text -%>:</b>
-              <%= link_to_assay_type(@assay) -%>
-            </p>
-            <% unless @assay.is_modelling? -%>
-              <p id="technology_type">
-                <b>Technology type: </b>
-                <%= link_to_technology_type(@assay) -%>
+            <% unless @assay.is_isa_json_compliant? %>
+              <p id="assay_type">
+                <b><%= assay_type_text -%>:</b>
+                <%= link_to_assay_type(@assay) -%>
               </p>
-            <% end -%>
+              <% unless @assay.is_modelling? -%>
+                <p id="technology_type">
+                  <b>Technology type: </b>
+                  <%= link_to_technology_type(@assay) -%>
+                </p>
+              <% end -%>
+            <% end %>
 
             <% if Seek::Config.organisms_enabled %>
               <%= list_assay_organisms("Organisms", @assay.assay_organisms, { :id => "organism" }) %>
