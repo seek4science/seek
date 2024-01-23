@@ -193,12 +193,13 @@ module IsaExporter
 
       all_sample_types = child_assays.map(&:sample_type).compact
 
-      stream_name = "assays_#{child_assays.pluck(:id).join('_')}"
+      # stream_name = "assays_#{child_assays.pluck(:id).join('_')}"
+      stream_name = "#{ assay_stream.title }_#{assay_stream.id}_#{child_assays.pluck(:id).join('_')}"
       assay_comments = convert_assay_comments(assay_stream)
 
       # Retrieve assay_stream if
-      stream_name_comment = assay_comments.detect { |ac| ac[:name] == 'assay_stream' }
-      stream_name = stream_name_comment[:value] unless stream_name_comment.nil?
+      # stream_name_comment = assay_comments.detect { |ac| ac[:name] == 'assay_stream' }
+      # stream_name = stream_name_comment[:value] unless stream_name_comment.nil?
 
       isa_assay = {}
       isa_assay['@id'] = "#assay/#{child_assays.pluck(:id).join('_')}"
