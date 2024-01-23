@@ -27,6 +27,7 @@ class RenderersTest < ActiveSupport::TestCase
     assert_equal Seek::Renderers::NotebookRenderer, factory.renderer(FactoryBot.create(:jupyter_notebook_content_blob)).class
     assert_equal Seek::Renderers::TextRenderer, factory.renderer(FactoryBot.create(:txt_content_blob)).class
     assert_equal Seek::Renderers::ImageRenderer, factory.renderer(FactoryBot.create(:image_content_blob)).class
+    assert_equal Seek::Renderers::ImageRenderer, factory.renderer(FactoryBot.create(:svg_content_blob)).class
     assert_equal Seek::Renderers::BlankRenderer, factory.renderer(FactoryBot.create(:binary_content_blob)).class
   end
 

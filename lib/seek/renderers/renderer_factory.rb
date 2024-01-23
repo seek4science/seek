@@ -23,7 +23,7 @@ module Seek
 
       # Ordered list of Renderer classes. More generic renderers appear last.
       def renderer_instances
-        [SlideshareRenderer, YoutubeRenderer, MarkdownRenderer, NotebookRenderer, TextRenderer, PdfRenderer, ImageRenderer, BlankRenderer]
+        [SlideshareRenderer, YoutubeRenderer, MarkdownRenderer, NotebookRenderer, PdfRenderer, ImageRenderer, TextRenderer, BlankRenderer]
       end
     end
   end
