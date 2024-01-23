@@ -388,9 +388,22 @@ class RenderersTest < ActiveSupport::TestCase
     assert_select 'iframe', count: 0
     assert_select '#navbar', count: 0
     assert_select 'img.git-image-preview'
+
     blob = FactoryBot.create(:txt_content_blob, asset: @asset)
     renderer = Seek::Renderers::ImageRenderer.new(blob)
     refute renderer.can_render?
+
+    @git.add_file('test.svg', open_fixture_file('transparent-fairdom-logo-square.svg'))
+    git_blob = @git.get_blob('test.svg')
+    renderer = Seek::Renderers::ImageRenderer.new(git_blob)
+    assert renderer.can_render?
+    @html = Nokogiri::HTML.parse(renderer.render)
+    assert_select 'img.git-image-preview'
+
+    @html = Nokogiri::HTML.parse(renderer.render_standalone)
+    assert_select 'iframe', count: 0
+    assert_select '#navbar', count: 0
+    assert_select 'img.git-image-preview'
   end
 
   def document_root_element
