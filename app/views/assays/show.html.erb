@@ -76,22 +76,26 @@
               <%= render partial: 'isa_studies/applied_templates', locals: { resource: @assay } -%>
             <% end %>
 
-            <% if @assay.is_assay_stream? %>
-              <p id="child_assays">
-                <b>Child assays:</b>
-                <ul>
-                  <% @assay.child_assays.map do |ca| %>
-                    <li>
-                      <%= link_to ca.title, ca %>
-                    </li>
-                  <% end %>
-                </ul>
-              </p>
-            <% else %>
-              <p id="assay_stream">
-                <b><%= t('assays.assay_stream') %>: </b>
-                <%= link_to @assay.assay_stream.title, @assay.assay_stream %>
-              </p>
+            <% if @assay.is_isa_json_compliant? %>
+              <% if @assay.is_assay_stream? %>
+                <p id="child_assays">
+                  <b>Child assays:</b>
+                    <ul>
+                      <% @assay.child_assays.map do |ca| %>
+                        <% unless @assay.child_assays.blank? %>
+                          <li>
+                            <%= link_to ca.title, ca %>
+                          </li>
+                      <% end %>
+                    <% end %>
+                    </ul>
+                </p>
+              <% else %>
+                <p id="assay_stream">
+                  <b><%= t('assays.assay_stream') %>: </b>
+                  <%= link_to @assay.assay_stream.title, @assay.assay_stream %>
+                </p>
+              <% end %>
             <% end %>
 
           </div>
