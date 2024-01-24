@@ -186,15 +186,15 @@ namespace :seek do
       # Should be isa json compliant
       # Shouldn't already have an assay stream (don't update assays that have been updated already)
       # Previous ST should be second ST of study
-      first_assays_in_stream = Assay.joins(:sample_type)
-        .select(&:is_isa_json_compliant?)
-        .select { |a| a.assay_stream_id.nil? && (a.previous_linked_sample_type == a.study.sample_types.second) }
+      first_assays_in_stream = Assay.joins(:sample_type, study: :investigation)
+                                    .where(assay_stream_id: nil, investigation: { is_isa_json_compliant: true })
+                                    .select { |a| a.previous_linked_sample_type == a.study.sample_types.second }
 
       first_assays_in_stream.map do |fas|
         stream_name = "Assay Stream - #{UUID.generate}"
         assay_stream = Assay.create(title: stream_name,
                                     study_id: fas.study_id,
-                                    assay_class_id: AssayClass.for_type('assay_stream').id,
+                                    assay_class_id: AssayClass.for_type(Seek::ISA::AssayClass::STREAM).id,
                                     contributor: fas.contributor,
                                     position: 0)
 
