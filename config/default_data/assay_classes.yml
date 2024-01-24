@@ -11,4 +11,4 @@ modelling_assay_class:
 assay_stream_class:
   id: 3
   title: <%= I18n.t('assays.assay_stream') %>
-  key: ASS
+  key: STREAM

@@ -7,9 +7,9 @@ class IsaAssaysController < ApplicationController
 
   def new
     if params[:is_assay_stream]
-      @isa_assay = IsaAssay.new({ assay: { assay_class_id: AssayClass.for_type('assay_stream').id } })
+      @isa_assay = IsaAssay.new({ assay: { assay_class_id: AssayClass.for_type(Seek::ISA::AssayClass::STREAM).id } })
     else
-      @isa_assay = IsaAssay.new({ assay: { assay_class_id: AssayClass.for_type('experimental').id } })
+      @isa_assay = IsaAssay.new({ assay: { assay_class_id: AssayClass.for_type(Seek::ISA::AssayClass::EXP).id } })
     end
   end
 
@@ -141,9 +141,9 @@ class IsaAssaysController < ApplicationController
 
   def find_requested_item
     if params[:is_assay_stream]
-      @isa_assay = IsaAssay.new({ assay: { assay_class_id: AssayClass.for_type('assay_stream').id } })
+      @isa_assay = IsaAssay.new({ assay: { assay_class_id: AssayClass.for_type(Seek::ISA::AssayClass::STREAM).id } })
     else
-      @isa_assay = IsaAssay.new({ assay: { assay_class_id: AssayClass.for_type('experimental').id } })
+      @isa_assay = IsaAssay.new({ assay: { assay_class_id: AssayClass.for_type(Seek::ISA::AssayClass::EXP).id } })
     end
     @isa_assay.populate(params[:id])
 

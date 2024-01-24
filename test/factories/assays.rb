@@ -4,18 +4,18 @@ FactoryBot.define do
 
   factory(:modelling_assay_class, class: AssayClass) do
     title { I18n.t('assays.modelling_analysis') }
-    key { 'MODEL' }
+    key { Seek::ISA::AssayClass::MODEL }
   end
 
   factory(:experimental_assay_class, class: AssayClass) do
     title { I18n.t('assays.experimental_assay') }
-    key { 'EXP' }
+    key { Seek::ISA::AssayClass::EXP }
     description { "An experimental assay class description" }
   end
 
   factory(:assay_stream_class, class: AssayClass) do
     title { I18n.t('assays.assay_stream') }
-    key { 'ASS' }
+    key { Seek::ISA::AssayClass::STREAM }
     description { "An assay stream class description" }
   end
 

@@ -82,7 +82,7 @@ class AssaysController < ApplicationController
   end
 
   def create
-    params[:assay_class_id] ||= AssayClass.for_type('experimental').id
+    params[:assay_class_id] ||= AssayClass.for_type(Seek::ISA::AssayClass::EXP).id
     @assay = Assay.new(assay_params)
 
     update_assay_organisms @assay, params
