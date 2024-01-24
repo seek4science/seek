@@ -4,6 +4,7 @@ class IsaAssaysController < ApplicationController
 
   before_action :set_up_instance_variable
   before_action :find_requested_item, only: %i[edit update]
+  after_action :fix_assay_linkage_for_new_assays, only: :create
 
   def new
     if params[:is_assay_stream]
@@ -62,6 +63,20 @@ class IsaAssaysController < ApplicationController
         format.json { render json: @isa_assay.errors, status: :unprocessable_entity }
       end
     end
+  end
+
+  def fix_assay_linkage_for_new_assays
+    return unless @isa_assay.assay.is_isa_json_compliant?
+
+    previous_assay_st = @isa_assay.assay.previous_linked_sample_type
+    previous_assay = previous_assay_st.assays.first
+    next_assay = previous_assay.next_linked_child_assay
+    next_assay.update(position: @isa_assay.assay.position + 1)
+    return unless next_assay
+
+    current_assay_st = @isa_assay.assay.sample_type
+    previous_assay_st.update(linked_sample_attribute_ids: [@isa_assay.assay.sample_type.sample_attributes.detect { |sa| sa.isa_tag.nil? && sa.title.include?('Input') }.id])
+    current_assay_st.update(linked_sample_attribute_ids: [next_assay.sample_type.sample_attributes.detect { |sa| sa.isa_tag.nil? && sa.title.include?('Input') }.id])
   end
 
   private
