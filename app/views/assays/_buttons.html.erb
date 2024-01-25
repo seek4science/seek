@@ -1,12 +1,10 @@
 <% assay_word ||=
-  if item.is_modelling?
-    t('assays.modelling_analysis')
-  elsif item.is_assay_stream?
+  if item.is_assay_stream?
     t('assays.assay_stream')
   elsif Seek::Config.isa_json_compliance_enabled && item.is_isa_json_compliant?
     t('isa_assay')
   else
-    t('assays.assay')
+    t("assays.#{item.assay_class.long_key.delete(' ').underscore}")
   end
 %>
 <%= render :partial => "subscriptions/subscribe", :locals => {:object => item} %>
