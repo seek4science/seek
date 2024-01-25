@@ -1,0 +1,85 @@
+<%= javascript_include_tag "single_page/index" %>
+<%= javascript_include_tag "single_page/dynamic_table" %>
+<%= javascript_include_tag "project_folders" %>
+
+<%= render partial: 'general/item_title', locals: { item: @study, buttons_partial: 'studies/buttons' } -%>
+
+<%= render partial: 'general/show_page_tab_definitions', locals: { resource: @study } %>
+
+<div class="tab-content">
+  <%= tab_pane('overview') do %>
+    <div class="row">
+      <div class="col-md-9 col-sm-8 box_about_actor">
+        <%= item_description @study.description -%>
+
+        <div class="row">
+          <div class="col-md-6">
+
+            <%= persistent_resource_id(@study) %>
+
+            <p class="investigation">
+              <label><%= t('investigation') %>:</label>
+              <%= investigation_link(@study.investigation) %>
+            </p>
+
+            <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => @study}%>
+            <p id="position">
+              <b><%= "Study position" %>: </b>
+              <%= @study.position %>
+            </p>
+            <% unless @study.experimentalists.blank? %>
+              <p>
+                <b>Experimentalists:</b>
+                <%= text_or_not_specified(@study.experimentalists) %>
+              </p>
+            <% end %>
+            <% if Seek::Config.isa_json_compliance_enabled %>
+              <p id="isa_json_compliance">
+                <b><%= "Is ISA-JSON compliant" %>: </b>
+                <%= @study.is_isa_json_compliant? %>
+              </p>
+              <%= render partial: 'isa_studies/applied_templates', locals: { resource: @study } -%>
+            <% end %>
+
+          </div>
+        </div>
+        <% if @study.external_asset %>
+          <div class="row">
+            <div class="col-md-12">
+              <%= external_asset_details(@study) %>
+            </div>
+          </div>
+        <% end %>
+
+        <%= render partial: 'extended_metadata/extended_metadata_attribute_values', locals: {resource: @study} %>
+
+        <%= render partial: 'general/isa_graph', locals: { root_item: @study, options: { depth: 4 } } -%>
+
+
+      </div>
+
+      <div class="col-md-3 col-sm-4">
+        <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @study } %>
+      </div>
+    </div>
+  <% end %>
+
+  <%= tab_pane('related-items') do %>
+    <%= render partial: 'general/items_related_to', object: @study %>
+  <% end %>
+
+  <% if Seek::Config.isa_json_compliance_enabled && @study.is_isa_json_compliant?%>
+    <%= tab_pane('study_design') do %>
+      <%= render :partial=>"isa_studies/study_design", locals: { study: @study} -%>
+    <% end %>
+  <% end %>
+
+</div>
+<script>
+    const isIsaCompliant = <%= @study.is_isa_json_compliant? %>
+    if (isIsaCompliant) {
+        var id = <%= @study.id %>;
+        var pid = <%= @study.projects.first.id %>;
+        var dynamicTableDataPath = '<%= Seek::Util.routes.dynamic_table_data_single_page_path(@study.projects.first.id) %>';
+    }
+</script>

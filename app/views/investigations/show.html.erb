@@ -2,7 +2,6 @@
   @project =  @investigation.projects.first
 %>
 
-
 <% if Seek::Config.project_single_page_enabled && displaying_single_page? %>
   <%= render partial: 'general/single_page_treeview', locals: { item: @investigation,
                                                                 content_partial: 'investigations/show_main_content',
