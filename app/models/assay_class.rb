@@ -33,6 +33,6 @@ class AssayClass < ApplicationRecord
   # for cases where a longer more descriptive key is useful, but can't rely on the title
   #  which may have been changed over time
   def long_key
-    { 'EXP': 'Experimental Assay', 'MODEL': 'Modelling Analysis', 'STREAM': 'Assay Stream' }[key.to_sym]
+    { "#{Seek::ISA::AssayClass::EXP}": 'Experimental Assay', "#{Seek::ISA::AssayClass::MODEL}": 'Modelling Analysis', "#{Seek::ISA::AssayClass::STREAM}": 'Assay Stream' }[key.to_sym]
   end
 end
