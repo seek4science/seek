@@ -60,6 +60,14 @@ class SampleType < ApplicationRecord
 
   has_annotation_type :sample_type_tag, method_name: :tags
 
+  def previous_linked_sample_type
+    sample_attributes.detect(&:input_attribute?)&.linked_sample_type
+  end
+
+  def next_linked_sample_types
+    linked_sample_attributes.select(&:input_attribute?).map(&:sample_type).compact
+  end
+
   def is_isa_json_compliant?
     studies.any? || assays.any?
   end
