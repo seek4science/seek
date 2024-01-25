@@ -148,7 +148,7 @@ function folder_clicked(folder_id, project_id) {
 async function item_clicked(type, id, parent) {
 	hideAllViews();
 	updateBreadcrumb(type);
-  updateLocationHash(type, id)
+  //updateLocationHash(type, id)
   const tempParent = selectedItem.parent
   selectedItem.id = id;
 	selectedItem.type = type;
