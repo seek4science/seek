@@ -6,16 +6,19 @@ class AssaysController < ApplicationController
   before_action :find_assets, only: [:index]
   before_action :find_and_authorize_requested_item,
                 only: %i[edit update destroy manage manage_update show new_object_based_on_existing_one]
-  before_action :fix_assay_linkage, only: [:destroy]
-  before_action :delete_linked_sample_types, only: [:destroy]
 
   # project_membership_required_appended is an alias to project_membership_required, but is necessary to include the actions
   # defined in the application controller
   before_action :project_membership_required_appended, only: [:new_object_based_on_existing_one]
 
-  # Only for ISA JSON compliant assays => Fix sample type linkage
+  # Only for ISA JSON compliant assays
+  # => Delete sample type of deleted assay
+  before_action :fix_assay_linkage_when_deleting_assays, only: [:destroy]
+  # => Fix sample type linkage
+  before_action :delete_linked_sample_types, only: [:destroy]
   before_action :fix_assay_linkage_for_new_assays, only: :create
-  after_action :rearrange_assay_positions, only: [:create, :destroy]
+  # => Rearrange positions
+  after_action :rearrange_assay_positions, only: %i[create destroy]
 
   include Seek::Publishing::PublishingCommon
 
@@ -110,30 +113,6 @@ class AssaysController < ApplicationController
     end
   end
 
-  def delete_linked_sample_types
-    return unless @assay.is_isa_json_compliant?
-    return if @assay.sample_type.nil?
-
-    @assay.sample_type.destroy
-  end
-
-  def fix_assay_linkage
-    return unless @assay.is_isa_json_compliant?
-    return unless @assay.has_linked_child_assay?
-
-    previous_assay_linked_st_id = @assay.previous_linked_sample_type&.id
-
-    next_assay = Assay.all.detect do |a|
-      a.sample_type&.sample_attributes&.first&.linked_sample_type_id == @assay.sample_type_id
-    end
-
-    next_assay_st_attr = next_assay.sample_type&.sample_attributes&.first
-
-    return unless next_assay && previous_assay_linked_st_id && next_assay_st_attr
-
-    next_assay_st_attr.update(linked_sample_type_id: previous_assay_linked_st_id)
-  end
-
   def update
     update_assay_organisms @assay, params
     update_assay_human_diseases @assay, params
@@ -182,7 +161,31 @@ class AssaysController < ApplicationController
 
   private
 
-  def fix_assay_linkage_for_new_assays
+  def delete_linked_sample_types
+    return unless @assay.is_isa_json_compliant?
+    return if @assay.sample_type.nil?
+
+    @assay.sample_type.destroy
+  end
+
+  def fix_assay_linkage_when_deleting_assays
+    return unless @assay.is_isa_json_compliant?
+    return unless @assay.has_linked_child_assay?
+
+    previous_assay_linked_st_id = @assay.previous_linked_sample_type&.id
+
+    next_assay = Assay.all.detect do |a|
+      a.sample_type&.sample_attributes&.first&.linked_sample_type_id == @assay.sample_type_id
+    end
+
+    next_assay_st_attr = next_assay.sample_type&.sample_attributes&.first
+
+    return unless next_assay && previous_assay_linked_st_id && next_assay_st_attr
+
+    next_assay_st_attr.update(linked_sample_type_id: previous_assay_linked_st_id)
+  end
+
+def fix_assay_linkage_for_new_assays
     return unless @isa_assay.assay.is_isa_json_compliant?
 
     previous_assay_st = @isa_assay.assay.sample_type.previous_linked_sample_type
