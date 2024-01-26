@@ -78,7 +78,7 @@ class Assay < ApplicationRecord
     if is_assay_stream?
       study.sample_types.second
     else
-      sample_type.sample_attributes.detect { |sa| sa.isa_tag.nil? && sa.title.include?('Input') }&.linked_sample_type
+      sample_type.previous_linked_sample_type
     end
   end
 
