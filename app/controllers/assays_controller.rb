@@ -15,6 +15,7 @@ class AssaysController < ApplicationController
 
   # Only for ISA JSON compliant assays => Fix sample type linkage
   before_action :fix_assay_linkage_for_new_assays, only: :create
+  after_action :rearrange_assay_positions, only: [:create, :destroy]
 
   include Seek::Publishing::PublishingCommon
 
@@ -195,6 +196,18 @@ class AssaysController < ApplicationController
     previous_assay_st.update(linked_sample_attribute_ids: [@isa_assay.assay.sample_type.sample_attributes.detect(&:input_attribute?).id])
   end
 
+  def rearrange_assay_positions
+    current_assay_stream = @assay.assay_stream
+    next_assay = current_assay_stream.next_linked_child_assay
+    assay_position = 0
+
+    # While there is a next assay, increment position by
+    while next_assay
+      next_assay.update(position: assay_position)
+      next_assay = next_assay.next_linked_child_assay
+      assay_position += 1
+    end
+  end
 
   def assay_params
     params.require(:assay).permit(:title, :description, :study_id, :assay_class_id, :assay_type_uri, :technology_type_uri,
