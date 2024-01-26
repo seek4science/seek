@@ -13,12 +13,11 @@ class AssaysController < ApplicationController
 
   # Only for ISA JSON compliant assays
   # => Delete sample type of deleted assay
-  before_action :fix_assay_linkage_when_deleting_assays, only: [:destroy]
+  before_action :delete_linked_sample_types, only: :destroy
   # => Fix sample type linkage
-  before_action :delete_linked_sample_types, only: [:destroy]
-  before_action :fix_assay_linkage_for_new_assays, only: :create
+  before_action :fix_assay_linkage_when_deleting_assays, only: :destroy
   # => Rearrange positions
-  after_action :rearrange_assay_positions, only: %i[create destroy]
+  after_action :rearrange_assay_positions_at_destroy, only: :destroy
 
   include Seek::Publishing::PublishingCommon
 
@@ -183,31 +182,8 @@ class AssaysController < ApplicationController
     next_assay_st_attr.update(linked_sample_type_id: previous_assay_linked_st_id)
   end
 
-def fix_assay_linkage_for_new_assays
-    return unless @isa_assay.assay.is_isa_json_compliant?
-
-    previous_assay_st = @isa_assay.assay.sample_type.previous_linked_sample_type
-    previous_assay = previous_assay_st.assays.first
-    next_assay = previous_assay.next_linked_child_assay
-
-    # In case no next assay (an assay was appended to the end of the stream), assay linkage does not have to be fixed.
-    return unless next_assay
-
-    @isa_assay.assay.sample_type.linked_sample_attribute_ids = [next_assay.sample_type.sample_attributes.detect(&:input_attribute?).id]
-    previous_assay_st.update(linked_sample_attribute_ids: [@isa_assay.assay.sample_type.sample_attributes.detect(&:input_attribute?).id])
-  end
-
-  def rearrange_assay_positions
-    current_assay_stream = @assay.assay_stream
-    next_assay = current_assay_stream.next_linked_child_assay
-    assay_position = 0
-
-    # While there is a next assay, increment position by
-    while next_assay
-      next_assay.update(position: assay_position)
-      next_assay = next_assay.next_linked_child_assay
-      assay_position += 1
-    end
+  def rearrange_assay_positions_at_destroy
+    rearrange_assay_positions(@assay.assay_stream)
   end
 
   def assay_params
