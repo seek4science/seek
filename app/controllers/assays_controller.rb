@@ -13,6 +13,9 @@ class AssaysController < ApplicationController
   # defined in the application controller
   before_action :project_membership_required_appended, only: [:new_object_based_on_existing_one]
 
+  # Only for ISA JSON compliant assays => Fix sample type linkage
+  before_action :fix_assay_linkage_for_new_assays, only: :create
+
   include Seek::Publishing::PublishingCommon
 
   include Seek::IsaGraphExtensions
@@ -177,6 +180,21 @@ class AssaysController < ApplicationController
   end
 
   private
+
+  def fix_assay_linkage_for_new_assays
+    return unless @isa_assay.assay.is_isa_json_compliant?
+
+    previous_assay_st = @isa_assay.assay.sample_type.previous_linked_sample_type
+    previous_assay = previous_assay_st.assays.first
+    next_assay = previous_assay.next_linked_child_assay
+
+    # In case no next assay (an assay was appended to the end of the stream), assay linkage does not have to be fixed.
+    return unless next_assay
+
+    @isa_assay.assay.sample_type.linked_sample_attribute_ids = [next_assay.sample_type.sample_attributes.detect(&:input_attribute?).id]
+    previous_assay_st.update(linked_sample_attribute_ids: [@isa_assay.assay.sample_type.sample_attributes.detect(&:input_attribute?).id])
+  end
+
 
   def assay_params
     params.require(:assay).permit(:title, :description, :study_id, :assay_class_id, :assay_type_uri, :technology_type_uri,
