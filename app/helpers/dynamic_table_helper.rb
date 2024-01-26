@@ -22,7 +22,7 @@ module DynamicTableHelper
   # Links all sample_types in a sequence of sample_types
   def link_sequence(sample_type)
     sequence = [sample_type]
-    while link = sample_type.sample_attributes.detect(&:seek_sample_multi?)&.linked_sample_type
+    while link = sample_type.previous_linked_sample_type
       sequence << link
       sample_type = link
     end
@@ -96,8 +96,8 @@ module DynamicTableHelper
       is_seek_multi_sample = a.sample_attribute_type.base_type == Seek::Samples::BaseType::SEEK_SAMPLE_MULTI
       is_cv_list = a.sample_attribute_type.base_type == Seek::Samples::BaseType::CV_LIST
       cv_allows_free_text =  a.allow_cv_free_text
-      attribute.merge!({ multi_link: true, linked_sample_type: a.linked_sample_type.id }) if is_seek_multi_sample
-      attribute.merge!({ multi_link: false, linked_sample_type: a.linked_sample_type.id }) if is_seek_sample
+      attribute.merge!({ multi_link: true, linked_sample_type: a.linked_sample_type_id }) if is_seek_multi_sample
+      attribute.merge!({ multi_link: false, linked_sample_type: a.linked_sample_type_id }) if is_seek_sample
       attribute.merge!({is_cv_list: , cv_allows_free_text:}) if is_cv_list
       attribute
     end
