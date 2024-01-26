@@ -188,7 +188,8 @@ unless ExtendedMetadataType.where(title: 'family', supported_type: 'Investigatio
 end
 
 ```
-![](/images/user-guide/extended-metadata/extended-metadata-family.png){:.screenshot}
+
+![](/images/user-guide/extended-metadata/extended_metadata_family.png)
 
 You can find the complete example [here](db/seeds/extended_metadata_drafts/family_example.seeds.rb), you need to move the file under the `db/seeds` folder, then run the seed file using the command
 ```bundle exec rake db:seed:family_example``` from the Seek root path.
