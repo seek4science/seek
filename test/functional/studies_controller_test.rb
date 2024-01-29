@@ -1976,14 +1976,18 @@ class StudiesControllerTest < ActionController::TestCase
 
   test 'should delete empty study with linked sample type' do
     person = FactoryBot.create(:person)
-    study_source_sample_type = FactoryBot.create :linked_sample_type, contributor: person
-    study_sample_sample_type = FactoryBot.create :linked_sample_type, contributor: person
+    investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true)
+    study_source_sample_type = FactoryBot.create :isa_source_sample_type, contributor: person
+    study_sample_sample_type = FactoryBot.create :isa_sample_collection_sample_type, linked_sample_type: study_source_sample_type, contributor: person
     study = FactoryBot.create(:study,
+                              investigation: ,
                               policy:FactoryBot.create(:private_policy, permissions:[FactoryBot.create(:permission,contributor: person, access_type:Policy::EDITING)]),
                               sample_types: [study_source_sample_type, study_sample_sample_type],
                               contributor: person)
 
     login_as(person)
+
+    assert study.is_isa_json_compliant?
 
     assert_difference('SampleType.count', -2) do
       assert_difference('Study.count', -1) do
