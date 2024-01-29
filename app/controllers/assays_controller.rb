@@ -12,10 +12,10 @@ class AssaysController < ApplicationController
   before_action :project_membership_required_appended, only: [:new_object_based_on_existing_one]
 
   # Only for ISA JSON compliant assays
-  # => Delete sample type of deleted assay
-  before_action :delete_linked_sample_types, only: :destroy
   # => Fix sample type linkage
   before_action :fix_assay_linkage_when_deleting_assays, only: :destroy
+  # => Delete sample type of deleted assay
+  before_action :delete_linked_sample_types, only: :destroy
   # => Rearrange positions
   after_action :rearrange_assay_positions_at_destroy, only: :destroy
 
@@ -175,7 +175,7 @@ class AssaysController < ApplicationController
 
     next_assay = @assay.next_linked_child_assay
 
-    next_assay_st_attr = next_assay.sample_type&.sample_attributes&.first
+    next_assay_st_attr = next_assay.sample_type&.sample_attributes&.detect(&:input_attribute?)
 
     return unless next_assay && previous_assay_linked_st_id && next_assay_st_attr
 
