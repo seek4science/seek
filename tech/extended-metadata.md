@@ -18,11 +18,13 @@ You may sometimes hear or read it referred to as Custom Metadata, and they are t
 
 It is not a feature a user would directly see, other than revealed through extensions that are made available:
 
-![](/images/user-guide/extended-metadata/extended-metadata-select.png){:.screenshot}
+![](/images/user-guide/extended-metadata/extended-metadata-select.png)
+{:.screenshot}
 
 ... will reveal new fields below:
 
-![](/images/user-guide/extended-metadata/extended-metadata-fields.png){:.screenshot}
+![](/images/user-guide/extended-metadata/extended-metadata-fields.png)
+{:.screenshot}
 
 The attributes can be associated with a particular attribute type, and marked as optional or mandatory, and will be validated against. This is very similar to Samples.
 
@@ -46,7 +48,8 @@ ExtendedMetadataType.new(title: 'person', supported_type: 'YOUR_TYPE_NAME')
 You can think of Extended Metadata being a Sample, but instead of standing alone is embedded within another type to extend it's metadata.
 This is explained in the following high level representation.
 
-![](/images/user-guide/extended-metadata/high-level-arch.png){:.screenshot}
+![](/images/user-guide/extended-metadata/high-level-arch.png)
+{:.screenshot}
 
 Currently, Extended Metadata can only be defined by directly making entries in the database. 
 This is generally done through a seed file, for example the [MIAPPE Extended Metadata Seed](https://github.com/seek4science/seek/blob/main/db/seeds/008_miappe_extended_metadata.seeds.rb).
@@ -88,54 +91,59 @@ The following are the supported Extended Metadata Attribute Types, each accompan
     
 )
 ```
-![](/images/user-guide/extended-metadata/atrribute_string_type.png) {:.screenshot}
+![](/images/user-guide/extended-metadata/atrribute_string_type.png) 
+{:.screenshot}
 
 2. **Text type**: the attribute is used for longer, variable-length character fields. (e.g. "The 4th experiment in the batch, it was sampled late, so may not be as accurate" ).
 
 ```
  ExtendedMetadataAttribute.new(title: 'description', required:true, sample_attribute_type: SampleAttributeType.where(title:'Text').first)
 ```
-![](/images/user-guide/extended-metadata/attribute_text_type.png) {:.screenshot}
+![](/images/user-guide/extended-metadata/attribute_text_type.png) 
+{:.screenshot}
 
 3. **Date type**: the attribute is used to represent dates. (e.g. January 1, 2015)
 ```
  ExtendedMetadataAttribute.new(title: 'study_start_date', required:true, sample_attribute_type: SampleAttributeType.where(title:'Date').first)
 ```
-![](/images/user-guide/extended-metadata/attribute_date_type.png) {:.screenshot}
+![](/images/user-guide/extended-metadata/attribute_date_type.png) 
+{:.screenshot}
 
 4. **Date-Time type**: the attribute is used to represent dates and times. (e.g. January 1, 2015 at 14:00 GMT)
 
 ```
  ExtendedMetadataAttribute.new(title: 'study_start_time', required:true, sample_attribute_type: SampleAttributeType.where(title:'Date time').first)
 ```
-![](/images/user-guide/extended-metadata/attribute_time_type.png) {:.screenshot}
+![](/images/user-guide/extended-metadata/attribute_time_type.png) 
+{:.screenshot}
 
 5. **Integer type**: the attribute is positive, negative, or zero numbers that do not have a fractional part. (e.g. 1, 2, 3, 4)
 
 ```
  ExtendedMetadataAttribute.new(title: 'study_age', required:true, sample_attribute_type: SampleAttributeType.where(title:'Integer').first)
 ```
-![](/images/user-guide/extended-metadata/attribute_integer_type.png) {:.screenshot}
+![](/images/user-guide/extended-metadata/attribute_integer_type.png) 
+{:.screenshot}
 
 6. **Real Number**: the attribute is used to represent numbers that may have a fractional component or decimal point. (e.g. 180.5)
 
 ```
  ExtendedMetadataAttribute.new(title: 'cholesterol_level', required:true, sample_attribute_type: SampleAttributeType.where(title:'Real number').first)
 ```
-![](/images/user-guide/extended-metadata/attribute_real_number_type.png) {:.screenshot}
+![](/images/user-guide/extended-metadata/attribute_real_number_type.png) 
+{:.screenshot}
 
 7. **Boolean**: the attribute uses true and false to represent truth values. (e.g. true, false)
 
 ```
  ExtendedMetadataAttribute.new(title: 'resource_use_rights_authors_confirmation', required:true, sample_attribute_type: SampleAttributeType.where(title:'Boolean').first)
 ```
-![](/images/user-guide/extended-metadata/attribute_boolean_type.png) {:.screenshot}
+![](/images/user-guide/extended-metadata/attribute_boolean_type.png) 
+{:.screenshot}
 
 8. **Controlled Vocabulary**: The attribute is limited to a predefined set of terms, and users must choose from this set. This selection is presented as a single-select dropdown list in the user interface.
 
 ```
-
-
 def create_sample_controlled_vocab_terms_attributes(array)
   attributes = []
   array.each do |type|
@@ -154,7 +162,8 @@ end
     
 ```
 
-![](/images/user-guide/extended-metadata/attribute_cv_type.png) {:.screenshot}
+![](/images/user-guide/extended-metadata/attribute_cv_type.png) 
+{:.screenshot}
 
 9. **Controlled Vocabulary List**: Unlike a single-select option in Controlled Vocabulary, Controlled Vocabulary List allows users to make multiple selections from a predefined set of terms for a given attribute. 
 
@@ -177,7 +186,8 @@ end
 
  ExtendedMetadataAttribute.new(title: 'study_country', required:true, sample_attribute_type: SampleAttributeType.where(title:'Controlled Vocabulary List').first, sample_controlled_vocab: study_country_cv)
 ```
-![](/images/user-guide/extended-metadata/attribute_cvlist_type.png) {:.screenshot}
+![](/images/user-guide/extended-metadata/attribute_cvlist_type.png) 
+{:.screenshot}
 
 10. **Nested Extended Metadata**: Nested extended metadata attribute allows for a hierarchical structure where one Extended Metadata type definition can reference another, resulting in the nesting of these types within a single form. 
 Furthermore, The inner Extended Metadata type can also now be defined as a list, with the form allowing new items to be added or removed.
@@ -233,12 +243,13 @@ unless ExtendedMetadataType.where(title: 'family', supported_type: 'Investigatio
 end
 
 ```
-![](/images/user-guide/extended-metadata/attribute_nested_type.png) {:.screenshot}
+![](/images/user-guide/extended-metadata/attribute_nested_type.png) 
+{:.screenshot}
 
 You can find the complete example [here](db/seeds/extended_metadata_drafts/family_example.seeds.rb), you need to move the file under the `db/seeds` folder, then run the seed file using the command
 ```bundle exec rake db:seed:family_example``` from the SEEK instance root path.
 
-### How to run the seed file 
+### How to run the seed file?
 
 [Here](db/seeds/extended_metadata_drafts/extended_study_metadata_example.seeds.rb) is a seed file named **extended_study_metadata_example.seeds.rb**, which creates an Extended Metadata type named **"My study metadata"** for study. 
 
