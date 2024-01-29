@@ -76,6 +76,8 @@ module Seek
     end
 
     def rearrange_assay_positions(assay_stream)
+      return unless assay_stream
+
       disable_authorization_checks do
         next_assay = assay_stream.next_linked_child_assay
         assay_position = 0

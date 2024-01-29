@@ -75,7 +75,7 @@ class Assay < ApplicationRecord
   def previous_linked_sample_type
     return unless is_isa_json_compliant?
 
-    if is_assay_stream?
+    if is_assay_stream? || first_assay_in_stream?
       study.sample_types.second
     else
       sample_type.previous_linked_sample_type
@@ -100,6 +100,10 @@ class Assay < ApplicationRecord
     else
       sample_type.linked_sample_attributes.detect { |sa| sa.isa_tag.nil? && sa.title.include?('Input') }&.sample_type&.assays&.first
     end
+  end
+
+  def first_assay_in_stream?
+    self == assay_stream.child_assays.first
   end
 
   def default_contributor

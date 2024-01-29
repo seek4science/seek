@@ -1924,21 +1924,35 @@ class AssaysControllerTest < ActionController::TestCase
   test 'should delete empty assay with linked sample type' do
     person = FactoryBot.create(:person)
     project = person.projects.first
+    investigation = FactoryBot.create(:investigation, projects: [project], is_isa_json_compliant: true, contributor: person)
     source_st = FactoryBot.create(:isa_source_sample_type, contributor: person, projects: [project])
     sample_collection_st = FactoryBot.create(:isa_sample_collection_sample_type, contributor: person, projects: [project],
     linked_sample_type: source_st)
 
-    assay_sample_type = FactoryBot.create :isa_assay_material_sample_type, linked_sample_type: sample_collection_st, contributor: person, isa_template: FactoryBot.build(:isa_assay_material_template)
+    study = FactoryBot.create(:study, investigation: , contributor: person,
+                              policy: FactoryBot.create(:private_policy, permissions: [FactoryBot.create(:permission, contributor: person, access_type: Policy::MANAGING)]),
+                              sops: [FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy))],
+                              sample_types: [source_st, sample_collection_st])
+    assay_stream = FactoryBot.create(:assay_stream, study: , contributor: person)
+    assay_sample_type = FactoryBot.create :isa_assay_material_sample_type, linked_sample_type: sample_collection_st,
+                                          contributor: person, isa_template: FactoryBot.build(:isa_assay_material_template)
     assay = FactoryBot.create(:assay,
-                              policy:FactoryBot.create(:private_policy, permissions:[FactoryBot.create(:permission,contributor: person, access_type:Policy::EDITING)]),
+                              study: ,
+                              policy: FactoryBot.create(:private_policy, permissions:[FactoryBot.create(:permission,contributor: person, access_type:Policy::EDITING)]),
                               sample_type: assay_sample_type,
-                              contributor: person)
+                              contributor: person,
+                              assay_stream: )
+
 
     login_as(person)
 
+    assert assay.is_isa_json_compliant?
+    assert assay.sample_type.is_isa_json_compliant?
+    assert assay.sample_type.can_delete?
+
     assert_difference('SampleType.count', -1) do
       assert_difference('Assay.count', -1) do
-        delete :destroy, params: { id: assay.id, return_to: '/single_pages/' }
+        delete :destroy, params: { id: assay.id }
       end
     end
   end
@@ -1969,22 +1983,29 @@ class AssaysControllerTest < ActionController::TestCase
                                       sops: [FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy))],
                                       sample_types: [source_st, sample_collection_st])
 
-    assay1 = FactoryBot.create(:assay, study: study, contributor: person, sample_type: assay_st1,
-                                       policy: FactoryBot.create(:private_policy, permissions: [FactoryBot.create(:permission, contributor: person, access_type: Policy::MANAGING)]))
+    assay_stream = FactoryBot.create(:assay_stream, study: , contributor: person)
+    assay1 = FactoryBot.create(:assay, study: , contributor: person, sample_type: assay_st1,
+                                       policy: FactoryBot.create(:private_policy, permissions: [FactoryBot.create(:permission, contributor: person, access_type: Policy::MANAGING)]),
+                                       position: 0, assay_stream: )
     assay2 = FactoryBot.create(:assay, study: study, contributor: person, sample_type: assay_st2,
-                                       policy: FactoryBot.create(:private_policy, permissions: [FactoryBot.create(:permission, contributor: person, access_type: Policy::MANAGING)]))
+                                       policy: FactoryBot.create(:private_policy, permissions: [FactoryBot.create(:permission, contributor: person, access_type: Policy::MANAGING)]),
+                                       position: 1, assay_stream: )
     assay3 = FactoryBot.create(:assay, study: study, contributor: person, sample_type: assay_st3,
-                                       policy: FactoryBot.create(:private_policy, permissions: [FactoryBot.create(:permission, contributor: person, access_type: Policy::MANAGING)]))
+                                       policy: FactoryBot.create(:private_policy, permissions: [FactoryBot.create(:permission, contributor: person, access_type: Policy::MANAGING)]),
+                                       position: 2, assay_stream: )
 
     login_as(person)
 
-    assert_difference "Assay.count", -1 do
-      delete :destroy, params: { id: assay2.id, return_to: '/single_pages/' }
+    assert_difference("SampleType.count", -1) do
+      assert_difference("Assay.count", -1) do
+        delete :destroy, params: { id: assay2.id }
+      end
     end
 
     assay3.reload
 
     assert_equal(assay3.previous_linked_sample_type&.id, assay1.sample_type&.id)
+    assert_equal assay3.position, 1
   end
 
   test 'do not get index if feature disabled' do
