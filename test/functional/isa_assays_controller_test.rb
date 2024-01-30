@@ -300,7 +300,7 @@ class IsaAssaysControllerTest < ActionController::TestCase
     linked_sample_type: study.sample_types.second,
     projects: [project],
     contributor: person)
-    end_assay = FactoryBot.create(:assay, contributor: person, study: , sample_type: end_assay_sample_type, assay_stream: )
+    end_assay = FactoryBot.create(:assay, position: 0, contributor: person, study: , sample_type: end_assay_sample_type, assay_stream: )
 
     refute end_assay.is_assay_stream?
     assert_equal end_assay.previous_linked_sample_type, assay_stream.previous_linked_sample_type, study.sample_types.second
@@ -316,7 +316,7 @@ class IsaAssaysControllerTest < ActionController::TestCase
                                       assay_class_id: AssayClass.for_type(Seek:: ISA:: AssayClass::EXP).id,
                                       creator_ids: [person.id],
                                       policy_attributes: ,
-                                      assay_stream_id: assay_stream.id}
+                                      assay_stream_id: assay_stream.id, position: 0}
 
     intermediate_assay_sample_type_attributes1 = { title: "Intermediate Assay Sample type 1",
                                                     project_ids: [project.id],
@@ -382,14 +382,14 @@ class IsaAssaysControllerTest < ActionController::TestCase
                                                 linked_sample_type: study.sample_types.second,
                                                 projects: [project],
                                                 contributor: person)
-    begin_assay = FactoryBot.create(:assay, title: 'Begin Assay', contributor: person, study: , sample_type: begin_assay_sample_type, assay_stream: )
+    begin_assay = FactoryBot.create(:assay, title: 'Begin Assay', position: 0, contributor: person, study: , sample_type: begin_assay_sample_type, assay_stream: )
 
     ## Create an assay at the end of the stream
     end_assay_sample_type = FactoryBot.create(:isa_assay_data_file_sample_type,
                                               linked_sample_type: begin_assay_sample_type,
                                               projects: [project],
                                               contributor: person)
-    end_assay = FactoryBot.create(:assay, title: 'End Assay', contributor: person, study: , sample_type: end_assay_sample_type, assay_stream: )
+    end_assay = FactoryBot.create(:assay, title: 'End Assay', position: 1, contributor: person, study: , sample_type: end_assay_sample_type, assay_stream: )
 
     refute end_assay.is_assay_stream?
     assert_equal begin_assay.previous_linked_sample_type, assay_stream.previous_linked_sample_type, study.sample_types.second

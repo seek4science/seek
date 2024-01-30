@@ -801,6 +801,7 @@ class AssayTest < ActiveSupport::TestCase
                                           sample_type: data_file_sample_type)
 
     assert_equal second_isa_assay.previous_linked_sample_type, first_isa_assay.sample_type
+    assert_equal first_isa_assay.previous_linked_sample_type, isa_study.sample_types.second
   end
 
   test 'has_linked_child_assay?' do
@@ -839,6 +840,8 @@ class AssayTest < ActiveSupport::TestCase
                                           assay_stream: ,
                                           sample_type: data_file_sample_type)
 
+    assert_equal assay_stream.first_assay_in_stream, first_isa_assay
+    assert first_isa_assay.first_assay_in_stream?
     assert_equal assay_stream.next_linked_child_assay, first_isa_assay
     assert_nil def_assay.next_linked_child_assay
     assert_equal first_isa_assay.next_linked_child_assay, second_isa_assay

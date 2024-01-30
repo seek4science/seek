@@ -96,14 +96,22 @@ class Assay < ApplicationRecord
     return unless has_linked_child_assay?
 
     if is_assay_stream?
-      child_assays.first
+      first_assay_in_stream
     else
       sample_type.next_linked_sample_types.map(&:assays).flatten.detect { |a| a.assay_stream_id == assay_stream_id }
     end
   end
 
+  def first_assay_in_stream
+    if is_assay_stream?
+      child_assays.detect { |a| a.sample_type.previous_linked_sample_type == a.study.sample_types.second }
+    else
+      assay_stream.child_assays.detect { |a| a.sample_type.previous_linked_sample_type == a.study.sample_types.second }
+    end
+  end
+
   def first_assay_in_stream?
-    self == assay_stream.child_assays.first
+    self == first_assay_in_stream
   end
 
   def default_contributor

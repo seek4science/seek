@@ -78,16 +78,15 @@ module Seek
     def rearrange_assay_positions(assay_stream)
       return unless assay_stream
 
-      disable_authorization_checks do
-        next_assay = assay_stream.next_linked_child_assay
-        assay_position = 0
+      # updating the position should happen whether or not the user has the right permissions
+      next_assay = assay_stream.next_linked_child_assay
+      assay_position = 0
 
-        # While there is a next assay, increment position by
-        while next_assay
-          next_assay.update(position: assay_position)
-          next_assay = next_assay.next_linked_child_assay
-          assay_position += 1
-        end
+      # While there is a next assay, increment position by
+      while next_assay
+        Assay.find(next_assay.id).update_column(:position, assay_position) unless assay_position == next_assay.position
+        next_assay = next_assay.next_linked_child_assay
+        assay_position += 1
       end
     end
   end
