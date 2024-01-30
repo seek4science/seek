@@ -5,7 +5,7 @@ class IsaAssaysController < ApplicationController
   before_action :set_up_instance_variable
   before_action :find_requested_item, only: %i[edit update]
   before_action :initialize_isa_assay, only: :create
-  after_action :fix_assay_linkage_for_new_assays, only: :create
+  before_action :fix_assay_linkage_for_new_assays, only: :create
   after_action :rearrange_assay_positions_create_isa_assay, only: :create
 
   def new
