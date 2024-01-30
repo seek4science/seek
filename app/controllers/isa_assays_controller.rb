@@ -88,6 +88,9 @@ class IsaAssaysController < ApplicationController
   end
 
   def rearrange_assay_positions_create_isa_assay
+    return if @isa_assay.assay.is_assay_stream?
+    return unless @isa_assay.assay.is_isa_json_compliant?
+
     rearrange_assay_positions(@isa_assay.assay.assay_stream)
   end
 
