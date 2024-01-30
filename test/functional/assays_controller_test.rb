@@ -2033,26 +2033,45 @@ class AssaysControllerTest < ActionController::TestCase
     with_config_value(:isa_json_compliance_enabled, true) do
       current_user = FactoryBot.create(:user)
       login_as(current_user)
-      study = FactoryBot.create(:isa_json_compliant_study)
+      investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, contributor: current_user.person)
+      study = FactoryBot.create(:isa_json_compliant_study, investigation: )
       assay_stream = FactoryBot.create(:assay_stream, study: , contributor: current_user.person)
-      assay1 = FactoryBot.create(:isa_json_compliant_assay, contributor: current_user.person, study: , assay_stream:)
-      assay2 = FactoryBot.create(:isa_json_compliant_assay, contributor: current_user.person, study: , assay_stream:)
+      get :show, params: { id: assay_stream }
+      assert_response :success
+
+      # If stream has no assays, it should say 'Design Assay'
+      assert_select 'a', text: /Design #{I18n.t('assay')}/i, count: 1
+
+      assay_sample_type1 = FactoryBot.create(:isa_assay_material_sample_type, linked_sample_type: study.sample_types.second)
+      assay1 = FactoryBot.create(:assay, contributor: current_user.person, study: , assay_stream:, sample_type: assay_sample_type1)
 
       assert_equal assay_stream.study, assay1.study
 
       get :show, params: { id: assay_stream }
       assert_response :success
 
-      assert_select 'a', text: /Design #{I18n.t('assay')}/i, count: 1
+      # If stream has child assays, it should say 'Insert a new Assay'
+      assert_select 'a', text: /Insert a new #{I18n.t('assay')}/i, count: 1
 
       get :show, params: { id: assay1 }
       assert_response :success
 
+      # If current assay doesn't have a next assay in the same stream, it should say 'Design the next Assay'
       assert_select 'a', text: /Design the next #{I18n.t('assay')}/i, count: 1
+
+      assay_sample_type2 = FactoryBot.create(:isa_assay_material_sample_type, linked_sample_type: assay_sample_type1)
+      assay2 = FactoryBot.create(:assay, contributor: current_user.person, study: , assay_stream:, sample_type: assay_sample_type2)
+
+      get :show, params: { id: assay1 }
+      assert_response :success
+
+      # If current assay has a next assay in the same stream, it should say 'Insert a new Assay'
+      assert_select 'a', text: /Insert a new #{I18n.t('assay')}/i, count: 1
 
       get :show, params: { id: assay2 }
       assert_response :success
 
+      # If current assay is at the end of the stream, it should say 'Design the next Assay' again
       assert_select 'a', text: /Design the next #{I18n.t('assay')}/i, count: 1
     end
   end

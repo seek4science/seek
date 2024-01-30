@@ -283,7 +283,6 @@ class IsaAssaysControllerTest < ActionController::TestCase
   end
 
   test 'insert assay between assay stream and experimental assay' do
-    # TODO: Test button text
     person = FactoryBot.create(:person)
     project = person.projects.first
     login_as(person)
@@ -364,7 +363,6 @@ class IsaAssaysControllerTest < ActionController::TestCase
   end
 
   test 'insert assay between two experimental assays' do
-    # TODO: Test button text
     person = FactoryBot.create(:person)
     project = person.projects.first
     login_as(person)
