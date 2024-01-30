@@ -2032,6 +2032,7 @@ class AssaysControllerTest < ActionController::TestCase
   test 'display adjusted buttons if isa json compliant' do
     with_config_value(:isa_json_compliance_enabled, true) do
       current_user = FactoryBot.create(:user)
+      project = current_user.person.projects.first
       login_as(current_user)
       investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, contributor: current_user.person)
       study = FactoryBot.create(:isa_json_compliant_study, investigation: )
@@ -2073,6 +2074,59 @@ class AssaysControllerTest < ActionController::TestCase
 
       # If current assay is at the end of the stream, it should say 'Design the next Assay' again
       assert_select 'a', text: /Design the next #{I18n.t('assay')}/i, count: 1
+
+      source_sample =
+        FactoryBot.create :sample,
+              title: 'source 1',
+              sample_type: study.sample_types.first,
+              project_ids: [project.id],
+              data: {
+                'Source Name': 'Source Name',
+                'Source Characteristic 1': 'Source Characteristic 1',
+                'Source Characteristic 2':
+                  study.sample_types.first
+                    .sample_attributes
+                    .find_by_title('Source Characteristic 2')
+                    .sample_controlled_vocab
+                    .sample_controlled_vocab_terms
+                    .first
+                    .label
+              },
+              contributor: current_user.person
+
+      sample_sample =
+        FactoryBot.create :sample,
+              title: 'sample 1',
+              sample_type: study.sample_types.second,
+              project_ids: [project.id],
+              data: {
+                Input: [source_sample.id],
+                'sample collection': 'sample collection',
+                'sample collection parameter value 1': 'sample collection parameter value 1',
+                'Sample Name': 'sample name',
+                'sample characteristic 1': 'sample characteristic 1'
+              },
+              contributor: current_user.person
+
+      FactoryBot.create :sample,
+        title: 'assay 1 - sample 1',
+        sample_type: assay_sample_type1,
+        project_ids: [project.id],
+        data: {
+          Input: [sample_sample.id],
+          'Protocol Assay 1': 'Protocol Assay 1',
+          'Assay 1 parameter value 1': 'Assay 1 parameter value 1',
+          'Extract Name': 'Extract Name',
+          'other material characteristic 1': 'other material characteristic 1'
+      },
+        contributor: current_user.person
+
+      get :show, params: { id: assay_stream }
+      assert_response :success
+
+      # If the next assay's sample type has samples, the 'new assay' button should be disabled'
+      assert_select 'a', text: /Insert a new #{I18n.t('assay')}/i, class: 'disabled', count: 1
+
     end
   end
 end
