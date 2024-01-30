@@ -60,6 +60,8 @@ copasi_enabled:
 external_search_enabled:
 piwik_analytics_enabled:
 piwik_analytics_tracking_notice:
+custom_analytics_snippet_enabled:
+custom_analytics_snippet:
 seek_video_link:
 scales:
 delete_asset_version_enabled:
