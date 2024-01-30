@@ -96,9 +96,9 @@ class Assay < ApplicationRecord
     return unless has_linked_child_assay?
 
     if is_assay_stream?
-      previous_linked_sample_type&.linked_sample_attributes&.detect { |sa| sa.isa_tag.nil? && sa.title.include?('Input') }&.sample_type&.assays&.first
+      child_assays.first
     else
-      sample_type.linked_sample_attributes.detect { |sa| sa.isa_tag.nil? && sa.title.include?('Input') }&.sample_type&.assays&.first
+      sample_type.next_linked_sample_types.map(&:assays).flatten.detect { |a| a.assay_stream_id == assay_stream_id }
     end
   end
 
