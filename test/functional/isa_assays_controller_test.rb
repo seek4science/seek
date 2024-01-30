@@ -360,6 +360,8 @@ class IsaAssaysControllerTest < ActionController::TestCase
 
     assert_equal isa_assay.assay.sample_type.previous_linked_sample_type, study.sample_types.second
     assert_equal isa_assay.assay.next_linked_child_assay, end_assay
+
+    # TODO: Test the assay positions after reorganising
   end
 
   test 'insert assay between two experimental assays' do
@@ -446,13 +448,141 @@ class IsaAssaysControllerTest < ActionController::TestCase
     isa_assay = assigns(:isa_assay)
     assert_redirected_to single_page_path(id: project, item_type: 'assay', item_id: isa_assay.assay.id, notice: 'The ISA assay was created successfully!')
 
-    puts "Assay added: #{isa_assay.assay.inspect}"
-    puts "Assay ST added: #{isa_assay.assay.sample_type.inspect}"
-    puts "Assay from DB added: #{Assay.last.inspect}"
-
     assert_equal begin_assay.previous_linked_sample_type, study.sample_types.second
     assert_equal isa_assay.assay.sample_type.previous_linked_sample_type, begin_assay.sample_type
     assert_equal isa_assay.assay.next_linked_child_assay, end_assay
+
+    # TODO: Test the assay positions after reorganising
   end
 
+  test 'should not insert assay if next assay has samples' do
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+    login_as(person)
+    investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, contributor: person)
+    study = FactoryBot.create(:isa_json_compliant_study, investigation: , contributor: person )
+
+    ## Create an assay stream
+    assay_stream = FactoryBot.create(:assay_stream, contributor: person, study: )
+    assert assay_stream.is_assay_stream?
+    assert_equal assay_stream.previous_linked_sample_type, study.sample_types.second
+    assert_nil assay_stream.next_linked_child_assay
+
+    ## Create an assay at the begin of the stream
+    begin_assay_sample_type = FactoryBot.create(:isa_assay_material_sample_type,
+                                                linked_sample_type: study.sample_types.second,
+                                                projects: [project],
+                                                contributor: person)
+    begin_assay = FactoryBot.create(:assay, title: 'Begin Assay', contributor: person, study: , sample_type: begin_assay_sample_type, assay_stream: )
+
+    ## Create an assay at the end of the stream
+    end_assay_sample_type = FactoryBot.create(:isa_assay_data_file_sample_type,
+                                              linked_sample_type: begin_assay_sample_type,
+                                              projects: [project],
+                                              contributor: person)
+    end_assay = FactoryBot.create(:assay, title: 'End Assay', contributor: person, study: , sample_type: end_assay_sample_type, assay_stream: )
+
+    refute end_assay.is_assay_stream?
+    assert_equal begin_assay.previous_linked_sample_type, assay_stream.previous_linked_sample_type, study.sample_types.second
+    assert_nil end_assay.next_linked_child_assay
+
+    source_sample =
+    FactoryBot.create :sample,
+          title: 'source 1',
+          sample_type: study.sample_types.first,
+          project_ids: [project.id],
+          data: {
+            'Source Name': 'Source Name',
+            'Source Characteristic 1': 'Source Characteristic 1',
+            'Source Characteristic 2':
+              study.sample_types.first
+                .sample_attributes
+                .find_by_title('Source Characteristic 2')
+                .sample_controlled_vocab
+                .sample_controlled_vocab_terms
+                .first
+                .label
+          },
+          contributor: person
+
+    sample_sample =
+      FactoryBot.create :sample,
+          title: 'sample 1',
+          sample_type: study.sample_types.second,
+          project_ids: [project.id],
+          data: {
+            Input: [source_sample.id],
+            'sample collection': 'sample collection',
+            'sample collection parameter value 1': 'sample collection parameter value 1',
+            'Sample Name': 'sample name',
+            'sample characteristic 1': 'sample characteristic 1'
+          },
+          contributor: person
+
+    FactoryBot.create :sample,
+      title: 'Begin Material 1',
+      sample_type: begin_assay_sample_type,
+      project_ids: [project.id],
+      data: {
+        Input: [sample_sample.id],
+        'Protocol Assay 1': 'Protocol Assay 1',
+        'Assay 1 parameter value 1': 'Assay 1 parameter value 1',
+        'Extract Name': 'Extract Name',
+        'other material characteristic 1': 'other material characteristic 1'
+    },
+    contributor: person
+
+
+    assert assay_stream.next_linked_child_assay.sample_type.samples.any?
+
+    # Test assay linkage
+    ## Post intermediate assay
+    policy_attributes = { access_type: Policy::ACCESSIBLE,
+                          permissions_attributes: project_permissions([projects.first], Policy::ACCESSIBLE) }
+
+    intermediate_assay_attributes3 = { title: 'Third intermediate assay',
+                                      study_id: study.id,
+                                      assay_class_id: AssayClass.for_type(Seek:: ISA:: AssayClass::EXP).id,
+                                      creator_ids: [person.id],
+                                      policy_attributes: ,
+                                      assay_stream_id: assay_stream.id}
+
+    intermediate_assay_sample_type_attributes3 = { title: "Intermediate Assay Sample type 3",
+                                                    project_ids: [project.id],
+                                                    sample_attributes_attributes: {
+                                                      '0': {
+                                                        pos: '1', title: 'a string', required: '1', is_title: '1',
+                                                        sample_attribute_type_id: FactoryBot.create(:string_sample_attribute_type).id, _destroy: '0',
+                                                        isa_tag_id: FactoryBot.create(:other_material_isa_tag).id
+                                                      },
+                                                      '1': {
+                                                        pos: '2', title: 'protocol', required: '1', is_title: '0',
+                                                        sample_attribute_type_id: FactoryBot.create(:string_sample_attribute_type).id,
+                                                        isa_tag_id: FactoryBot.create(:protocol_isa_tag).id, _destroy: '0'
+                                                      },
+                                                      '2': {
+                                                        pos: '3', title: 'Input sample', required: '1',
+                                                        sample_attribute_type_id: FactoryBot.create(:sample_multi_sample_attribute_type).id,
+                                                        linked_sample_type_id: study.sample_types.second.id, _destroy: '0'
+                                                      },
+                                                      '3': {
+                                                        pos: '4', title: 'Some material characteristic', required: '1',
+                                                        sample_attribute_type_id: FactoryBot.create(:string_sample_attribute_type).id,
+                                                        _destroy: '0',
+                                                        isa_tag_id: FactoryBot.create(:other_material_characteristic_isa_tag).id
+                                                      }
+                                                    }
+                                                  }
+
+    intermediate_isa_assay_attributes3 = { assay: intermediate_assay_attributes3,
+                                           input_sample_type_id: assay_stream.id,
+                                           sample_type: intermediate_assay_sample_type_attributes3 }
+
+    assert_no_difference "Assay.count" do
+      assert_no_difference "SampleType.count" do
+        post :create, params: { isa_assay: intermediate_isa_assay_attributes3 }
+      end
+    end
+    assert_response :not_found
+  end
 end
