@@ -52,6 +52,7 @@ class SearchBiomodelsAdaptorTest < ActiveSupport::TestCase
       assert_equal DateTime.parse('2012-12-14 14:24:40 +0000'), result.last_modification_date
       assert_equal 'search/partials/test_partial', result.partial_path
       assert_equal 'EBI Biomodels', result.tab
+      assert_equal 'BIOMD0000000429_url.xml', result.main_filename
     end
 
   end
@@ -60,6 +61,14 @@ class SearchBiomodelsAdaptorTest < ActiveSupport::TestCase
     VCR.use_cassette('biomodels/search') do
       adaptor = Seek::BiomodelsSearch::SearchBiomodelsAdaptor.new('partial_path' => 'search/partials/test_partial')
       results = adaptor.search('yeast')
+      assert_equal 25, results.count
+    end
+  end
+
+  test 'search does not files' do
+    VCR.use_cassette('biomodels/search-2024') do
+      adaptor = Seek::BiomodelsSearch::SearchBiomodelsAdaptor.new('partial_path' => 'search/partials/test_partial')
+      results = adaptor.search('2024')
       assert_equal 25, results.count
     end
   end

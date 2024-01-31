@@ -25,7 +25,7 @@
           </div>
         <% end %>
       </div>
-      <% unless resource.unreleased %>
+      <% unless resource.unreleased || resource.main_filename.blank? %>
         <div class="col-sm-2 text-right list_item_actions">
           <%
              biomodel_download_link = resource.download_link
