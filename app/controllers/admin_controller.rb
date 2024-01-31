@@ -137,6 +137,7 @@ class AdminController < ApplicationController
     Seek::Config.custom_analytics_snippet_enabled = string_to_boolean params[:custom_analytics_snippet_enabled]
     Seek::Config.custom_analytics_snippet = params[:custom_analytics_snippet]
     Seek::Config.custom_analytics_tracking_notice = params[:custom_analytics_tracking_notice]
+    Seek::Config.custom_analytics_name = params[:custom_analytics_name]
 
     Seek::Config.doi_minting_enabled = string_to_boolean params[:doi_minting_enabled]
     Seek::Config.datacite_username = params[:datacite_username]

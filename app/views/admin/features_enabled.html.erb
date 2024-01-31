@@ -157,11 +157,14 @@
                              onchange: toggle_appear_javascript('custom_analytics_block')) %>
 
   <div id="custom_analytics_block" class="additional_settings" style="<%= show_or_hide_block(Seek::Config.custom_analytics_snippet_enabled) %>">
+    <%= admin_text_setting(:custom_analytics_name, Seek::Config.custom_analytics_name,
+                           'Custom analytics name', "The name of the analytics software used for tracking traffic.") %>
     <%= admin_textarea_setting(:custom_analytics_snippet, Seek::Config.custom_analytics_snippet,
                                "Code Snippet", "A custom code snippet, taking care of site traffic.") %>
     <%= admin_checkbox_setting(:custom_analytics_tracking_notice, 1, Seek::Config.custom_analytics_tracking_notice,
                            'Custom tracking notice', "Warn users about the use of analytics software.") %>
   </div>
+
   <%= render :partial => "admin/doi_settings" %>
 
   <%= render :partial => "admin/zenodo_settings" %>
