@@ -49,11 +49,9 @@
   <%= render partial: 'layouts/piwik' if Seek::Config.piwik_analytics_enabled  %>
   <% if Seek::Config.custom_analytics_snippet_enabled %>
     <!-- Custom snippet -->
-
-    <script id="custom-tracking-script" type="text/javascript">
-      <%= sanitize Seek::Config.custom_analytics_snippet %>
-    </script>
-
+    <div id="custom-analytics-snippet">
+      <%= raw Seek::Config.custom_analytics_snippet %>
+    </div>
     <!-- End Custom snippet -->
   <% end %>
   <% if Seek::Config.google_analytics_enabled %>
