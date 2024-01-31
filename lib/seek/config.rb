@@ -7,7 +7,7 @@ module Seek
     def instance_admins_name_fallback
       instance_name
     end
-    
+
     def instance_admins_link_fallback
       instance_link
     end
@@ -527,6 +527,10 @@ module Seek
 
     read_project_setting_attributes.each do |method, opts|
       register_encrypted_setting(method) if opts && opts[:encrypt]
+    end
+
+    def self.analytics_enabled
+      google_analytics_enabled || piwik_analytics_enabled || custom_analytics_snippet_enabled
     end
 
     def self.schema_org_supported?
