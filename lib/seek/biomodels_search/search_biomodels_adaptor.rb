@@ -14,8 +14,9 @@ module Seek
         json['models'].collect do |result|
           begin
             BiomodelsSearchResult.new result['id']
-          rescue NoMethodError=>e
+          rescue NoMethodError=>exception
             Seek::Errors::ExceptionForwarder.send_notification(exception, data: { error: 'error reading response from BioModels', item_id: result['id'], query: query })
+            nil
           end
         end.compact.reject do |biomodels_result|
           biomodels_result.title.blank?
