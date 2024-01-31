@@ -50,7 +50,7 @@
   <% if Seek::Config.custom_analytics_snippet_enabled %>
     <!-- Custom snippet -->
 
-    <script type="text/javascript">
+    <script id="custom-tracking-script" type="text/javascript">
       <%= sanitize Seek::Config.custom_analytics_snippet %>
     </script>
 
