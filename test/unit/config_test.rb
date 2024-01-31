@@ -180,8 +180,11 @@ class ConfigTest < ActiveSupport::TestCase
   test 'custom_analytics_enabled' do
     assert !Seek::Config.custom_analytics_snippet_enabled
   end
- test 'custom analytics name' do
+  test 'custom analytics name' do
     assert_equal 'Custom name', Seek::Config.custom_analytics_name
+  end
+  test 'custom analytics snippet' do
+    assert_equal '<script id="custom-tracking-script"></script>', Seek::Config.custom_analytics_snippet
   end
 
   # homepage settings
