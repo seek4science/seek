@@ -35,6 +35,7 @@ def load_seek_config_defaults!
   Seek::Config.default :piwik_analytics_tracking_notice, true
   Seek::Config.default :custom_analytics_snippet_enabled, false
   Seek::Config.default :custom_analytics_snippet, ''
+  Seek::Config.default :custom_analytics_tracking_notice, true
   Seek::Config.default :bioportal_api_key,''
   Seek::Config.default :project_news_enabled,false
   Seek::Config.default :project_news_feed_urls,''
