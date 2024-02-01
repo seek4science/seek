@@ -1,6 +1,5 @@
 puts 'Seeded My Study Metadata Example'
 
-
 string_type = SampleAttributeType.find_or_initialize_by(title: 'String')
 string_type.update(base_type: Seek::Samples::BaseType::STRING)
 
@@ -90,7 +89,7 @@ disable_authorization_checks do
     emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'scheme', required:true,
                                                                       sample_attribute_type: cv_type, sample_controlled_vocab: role_name_identifier_scheme_cv,
                                                                       description: "scheme")
-    emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'identifier', sample_attribute_type: SampleAttributeType.where(title:'String').first)
+    emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'identifier', sample_attribute_type: string_type )
     emt.save!
   end
 
@@ -99,21 +98,19 @@ disable_authorization_checks do
     emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'role_name_personal_title', required:true,
                                                                       sample_attribute_type: cv_type, sample_controlled_vocab: role_name_personal_title_cv,
                                                                       description: "role_name_personal_title", label: "personal title")
-    emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'first_name', sample_attribute_type: SampleAttributeType.where(title:'String').first, label: "first name", description: "First name of the role")
-    emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'last_name', sample_attribute_type: SampleAttributeType.where(title:'String').first, label: "last name", description: "Last name of the role")
+    emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'first_name', sample_attribute_type: string_type, label: "first name", description: "First name of the role")
+    emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'last_name', sample_attribute_type: string_type, label: "last name", description: "Last name of the role")
     emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'role_type', required:true,
                                                                       sample_attribute_type: cv_type, sample_controlled_vocab: role_type_cv, description: "role type", label: "Role type")
 
 
     emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'role_name_identifiers',
-                                                                      sample_attribute_type: SampleAttributeType.where(title:'Linked Extended Metadata (multiple)').first, linked_extended_metadata_type: ExtendedMetadataType.where(title:'role_name_identifiers', supported_type:'ExtendedMetadata').first )
+                                                                      sample_attribute_type: linked_extended_metadata_type_list, linked_extended_metadata_type: ExtendedMetadataType.where(title:'role_name_identifiers', supported_type:'ExtendedMetadata').first )
 
 
     emt.save!
   end
 
-
-  # ************************ role related end *********************************
 
   study_country_cv = SampleControlledVocab.where(title: 'European Study Country').first_or_create!(
     sample_controlled_vocab_terms_attributes: create_sample_controlled_vocab_terms_attributes(["Albania","Austria","Belgium","Bosnia and Herzegovina","Bulgaria","Croatia","Cyprus",
@@ -148,9 +145,9 @@ disable_authorization_checks do
 
   unless ExtendedMetadataType.where(title:'study_conditions_emt', supported_type:'ExtendedMetadata').any?
     emt = ExtendedMetadataType.new(title: 'study_conditions_emt', supported_type:'ExtendedMetadata')
-    emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'study_conditions', sample_attribute_type: SampleAttributeType.where(title:'String').first,description: "study_conditions", label: "study_conditions", required:true)
-    emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'study_conditions_classification',sample_attribute_type: SampleAttributeType.where(title:'String').first,description: "study_conditions_classification", label: "study_conditions_classification")
-    emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'study_conditions_classification_code',sample_attribute_type: SampleAttributeType.where(title:'String').first,description: "study_conditions_classification_code", label: "study_conditions_classification_code")
+    emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'study_conditions', sample_attribute_type: string_type, description: "study_conditions", label: "study_conditions", required:true)
+    emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'study_conditions_classification',sample_attribute_type: string_type, description: "study_conditions_classification", label: "study_conditions_classification")
+    emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'study_conditions_classification_code',sample_attribute_type: string_type, description: "study_conditions_classification_code", label: "study_conditions_classification_code")
     emt.save!
   end
 
@@ -159,7 +156,7 @@ disable_authorization_checks do
     emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'study_primary_design', required:true,
                                                                       sample_attribute_type: cv_type, sample_controlled_vocab: study_primary_design_cv)
     emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'study_conditions',
-                                                                      sample_attribute_type: SampleAttributeType.where(title:'Linked Extended Metadata (multiple)').first, linked_extended_metadata_type: ExtendedMetadataType.where(title:'study_conditions_emt', supported_type:'ExtendedMetadata').first )
+                                                                      sample_attribute_type:linked_extended_metadata_type_list, linked_extended_metadata_type: ExtendedMetadataType.where(title:'study_conditions_emt', supported_type:'ExtendedMetadata').first )
     emt.save!
   end
 
@@ -168,21 +165,19 @@ disable_authorization_checks do
   unless ExtendedMetadataType.where(title:'My Study Metadata Example', supported_type:'Study').any?
 
     emt = ExtendedMetadataType.new(title: 'My Study Metadata Example', supported_type:'Study')
-    ###################################################################
+
     emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(
       title: 'title', # The attribute's identifier or name .
       required: true, # Indicates whether this attribute is mandatory for the associated metadata.
-      sample_attribute_type: SampleAttributeType.where(title: 'String').first, # Specifies the attribute type, here set to 'String'.
+      sample_attribute_type: string_type, # Specifies the attribute type, here set to 'String'.
       description: 'the title of your study', # A brief description providing additional details about the attribute. By default, it is set to the empty string.
       label: 'study title' # The label to be displayed in the user interface, conveying the purpose of the attribute. By default, it is set to the value of the 'title' attribute."
     )
 
-    emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'description', required:true, sample_attribute_type: SampleAttributeType.where(title:'Text').first)
+    emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'description', required:true, sample_attribute_type: text_type )
 
-    emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'study_age', required:true, sample_attribute_type: SampleAttributeType.where(title:'Integer').first)
-    emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'cholesterol_level', required:true, sample_attribute_type: SampleAttributeType.where(title:'Real number').first)
-
-    ###################################################################
+    emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'study_age', required:true, sample_attribute_type: int_type)
+    emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'cholesterol_level', required:true, sample_attribute_type: float_type)
     emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'resource_type_general', required:true,
                                                                       sample_attribute_type: cv_type, sample_controlled_vocab: resource_type_general_cv)
     emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'study_start_date', required:true, sample_attribute_type: date_type)
@@ -192,19 +187,12 @@ disable_authorization_checks do
     emt.extended_metadata_attributes <<  ExtendedMetadataAttribute.new(title: 'study_country', required:true, sample_attribute_type: cv_type_list, sample_controlled_vocab: study_country_cv)
     emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'resource_use_rights',
                                                                       sample_attribute_type: linked_extended_metadata_type, linked_extended_metadata_type: ExtendedMetadataType.where(title:'resource_use_rights_emt', supported_type:'ExtendedMetadata').first )
-
     emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'resource_role',
                                                                       sample_attribute_type: linked_extended_metadata_type_list, linked_extended_metadata_type: ExtendedMetadataType.where(title:'role_emt', supported_type:'ExtendedMetadata').first )
-
     emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'study_design',
                                                                       sample_attribute_type: linked_extended_metadata_type, linked_extended_metadata_type: ExtendedMetadataType.where(title:'study_design_emt', supported_type:'ExtendedMetadata').first )
 
     emt.save!
     puts 'My study metadata is created'
   end
-
-
-
-
-
 end
