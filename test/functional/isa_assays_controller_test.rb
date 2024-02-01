@@ -313,7 +313,7 @@ class IsaAssaysControllerTest < ActionController::TestCase
 
     intermediate_assay_attributes1 = { title: 'First intermediate assay',
                                       study_id: study.id,
-                                      assay_class_id: AssayClass.for_type(Seek:: ISA:: AssayClass::EXP).id,
+                                      assay_class_id: AssayClass.experimental.id,
                                       creator_ids: [person.id],
                                       policy_attributes: ,
                                       assay_stream_id: assay_stream.id, position: 0}
@@ -361,7 +361,13 @@ class IsaAssaysControllerTest < ActionController::TestCase
     assert_equal isa_assay.assay.sample_type.previous_linked_sample_type, study.sample_types.second
     assert_equal isa_assay.assay.next_linked_child_assay, end_assay
 
-    # TODO: Test the assay positions after reorganising
+    # Test the assay positions after reorganising
+    end_assay.reload
+    refute_equal end_assay.position, 0
+    assert_equal end_assay.position, 1
+
+    isa_assay.assay.reload
+    assert_equal isa_assay.assay.position, 0
   end
 
   test 'insert assay between two experimental assays' do
@@ -402,7 +408,7 @@ class IsaAssaysControllerTest < ActionController::TestCase
 
     intermediate_assay_attributes2 = { title: 'Second intermediate assay',
                                       study_id: study.id,
-                                      assay_class_id: AssayClass.for_type(Seek:: ISA:: AssayClass::EXP).id,
+                                      assay_class_id: AssayClass.experimental.id,
                                       creator_ids: [person.id],
                                       policy_attributes: ,
                                       assay_stream_id: assay_stream.id}
@@ -452,7 +458,13 @@ class IsaAssaysControllerTest < ActionController::TestCase
     assert_equal isa_assay.assay.sample_type.previous_linked_sample_type, begin_assay.sample_type
     assert_equal isa_assay.assay.next_linked_child_assay, end_assay
 
-    # TODO: Test the assay positions after reorganising
+    # Test the assay positions after reorganising
+    end_assay.reload
+    refute_equal end_assay.position, 1
+    assert_equal end_assay.position, 2
+
+    isa_assay.assay.reload
+    assert_equal isa_assay.assay.position, 1
   end
 
   test 'should not insert assay if next assay has samples' do
@@ -542,7 +554,7 @@ class IsaAssaysControllerTest < ActionController::TestCase
 
     intermediate_assay_attributes3 = { title: 'Third intermediate assay',
                                       study_id: study.id,
-                                      assay_class_id: AssayClass.for_type(Seek:: ISA:: AssayClass::EXP).id,
+                                      assay_class_id: AssayClass.experimental.id,
                                       creator_ids: [person.id],
                                       policy_attributes: ,
                                       assay_stream_id: assay_stream.id}

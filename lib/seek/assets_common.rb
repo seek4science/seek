@@ -78,6 +78,9 @@ module Seek
     def rearrange_assay_positions(assay_stream)
       return unless assay_stream
 
+      # Reload the assay stream to also include newly created assays
+      assay_stream.reload
+
       # updating the position should happen whether or not the user has the right permissions
       next_assay = assay_stream.next_linked_child_assay
       assay_position = 0
