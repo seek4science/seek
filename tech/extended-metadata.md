@@ -189,7 +189,7 @@ end
 ![](/images/user-guide/extended-metadata/attribute_cvlist_type.png) 
 {:.screenshot}
 
-10. **Nested Extended Metadata**: Nested extended metadata attribute allows for a hierarchical structure where one Extended Metadata type definition can reference another, resulting in the nesting of these types within a single form. 
+10. **Nested Extended Metadata**: the attribute allows for a hierarchical structure where one Extended Metadata type definition can reference another, resulting in the nesting of these types within a single form. 
 Furthermore, The inner Extended Metadata type can also now be defined as a list, with the form allowing new items to be added or removed.
 
 ```
@@ -246,12 +246,12 @@ end
 ![](/images/user-guide/extended-metadata/attribute_nested_type.png) 
 {:.screenshot}
 
-You can find the complete example [here](db/seeds/extended_metadata_drafts/family_example.seeds.rb), you need to move the file under the `db/seeds` folder, then run the seed file using the command
+You can find the complete example [here](https://github.com/seek4science/seek/blob/main/db/seeds/extended_metadata_drafts/family_example.seeds.rb), you need to move the file under the `db/seeds` folder, then run the seed file using the command
 ```bundle exec rake db:seed:family_example``` from the SEEK instance root path.
 
 ### How to run the seed file?
 
-[Here](db/seeds/extended_metadata_drafts/extended_study_metadata_example.seeds.rb) is a seed file named **extended_study_metadata_example.seeds.rb**, which creates an Extended Metadata type named **"My study metadata"** for study. 
+[Here](https://github.com/seek4science/seek/blob/main/db/seeds/extended_metadata_drafts/extended_study_metadata_example.seeds.rb) is a seed file named **extended_study_metadata_example.seeds.rb**, which creates an Extended Metadata type named **"My study metadata"** for study. 
 
 You can place it under the `db/seeds` folder, then run the seed file using the command
 ```bundle exec rake db:seed:extended_study_metadata_example``` from the SEEK instance root path.
