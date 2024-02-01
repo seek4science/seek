@@ -13,6 +13,12 @@ FactoryBot.define do
     description { "An experimental assay class description" }
   end
 
+  factory(:assay_stream_class, class: AssayClass) do
+    title { I18n.t('assays.assay_stream') }
+    key { 'STREAM' }
+    description { "An assay stream class description" }
+  end
+
   # SuggestedTechnologyType
   factory(:suggested_technology_type) do
     sequence(:label) { | n | "A TechnologyType#{n}" }
@@ -99,8 +105,17 @@ FactoryBot.define do
     title { 'ISA JSON compliant assay' }
     description { 'An assay linked to an ISA JSON compliant study and a sample type' }
     after(:build) do |assay|
-      assay.study = FactoryBot.create(:isa_json_compliant_study)
+      assay.study ||= FactoryBot.create(:isa_json_compliant_study)
       assay.sample_type = FactoryBot.create(:isa_assay_material_sample_type, linked_sample_type: assay.study.sample_types.last)
+    end
+  end
+
+  factory(:assay_stream, parent: :assay_base) do
+    title { 'Assay Stream' }
+    description { 'A holder assay holding multiple child assays' }
+    association :assay_class, factory: :assay_stream_class
+    after(:build) do |assay|
+      assay.study ||= FactoryBot.create(:isa_json_compliant_study, contributor: assay.contributor)
     end
   end
 

@@ -1,4 +1,12 @@
-<% assay_word = item.is_modelling? ? t('assays.modelling_analysis') : t('assays.assay') %>
+<% assay_word ||=
+  if item.is_assay_stream?
+    t('assays.assay_stream')
+  elsif Seek::Config.isa_json_compliance_enabled && item.is_isa_json_compliant?
+    t('isa_assay')
+  else
+    t("assays.#{item.assay_class.long_key.delete(' ').underscore}")
+  end
+%>
 <%= render :partial => "subscriptions/subscribe", :locals => {:object => item} %>
 
 <% if Seek::Config.project_single_page_enabled %>
@@ -21,10 +29,14 @@
 
 <% if item.can_edit? %>
 	<% if Seek::Config.isa_json_compliance_enabled && item.is_isa_json_compliant? %>
-		<% valid_study = item&.study&.sample_types.present? %>
-		<% valid_assay = item&.sample_type.present? %>
+		<% valid_study = item&.study&.is_isa_json_compliant? %>
+		<% valid_assay = item&.is_isa_json_compliant? %>
 		<% if valid_study && valid_assay %>
-    	<%= button_link_to("Design the next #{t('assay')}", 'new', new_isa_assay_path(source_assay_id: item.id, study_id: item.study.id, single_page: params[:single_page])) %>
+      <% if item&.is_assay_stream? %>
+    	  <%= button_link_to("Design #{t('assay')}", 'new', new_isa_assay_path(source_assay_id: item.id, study_id: item.study.id, single_page: params[:single_page], assay_stream_id: item.id)) %>
+      <% else %>
+    	  <%= button_link_to("Design the next #{t('assay')}", 'new', new_isa_assay_path(source_assay_id: item.id, study_id: item.study.id, single_page: params[:single_page], assay_stream_id: item.assay_stream_id)) %>
+      <% end %>
 		<% end %>
 	<% else %>
     <%= add_new_item_to_dropdown(item) %>
@@ -38,7 +50,11 @@
 <%= item_actions_dropdown do %>
   <% if item.can_edit? %>
     <% if Seek::Config.isa_json_compliance_enabled && item.is_isa_json_compliant? %>
-      <li><%= image_tag_for_key('edit', edit_isa_assay_path(item, source_assay_id: item.id, study_id: item.study.id, single_page: params[:single_page]), "Edit #{t('isa_assay')}", nil, "Edit #{t('isa_assay')}") -%></li>
+      <% if item&.is_assay_stream? %>
+        <li><%= image_tag_for_key('edit', edit_isa_assay_path(item, source_assay_id: item.id, study_id: item.study.id, single_page: params[:single_page], is_assay_stream: true), "Edit #{assay_word}", nil, "Edit #{assay_word}") -%></li>
+      <% else %>
+        <li><%= image_tag_for_key('edit', edit_isa_assay_path(item, source_assay_id: item.id, study_id: item.study.id, single_page: params[:single_page], assay_stream_id: item.assay_stream_id), "Edit #{assay_word}", nil, "Edit #{assay_word}") -%></li>
+      <% end %>
     <% else %>
       <li><%= image_tag_for_key('edit', edit_assay_path(item), "Edit #{assay_word}", nil, "Edit #{assay_word}") -%></li>
     <% end %>
@@ -46,8 +62,8 @@
 
   <% if item.can_manage? -%>
     <li><%= image_tag_for_key('manage', manage_assay_path(item), "Manage #{assay_word}", nil, "Manage #{assay_word}") -%></li>
-    <%= render :partial => 'snapshots/new_snapshot_link', :locals => {:item => item} %>
+    <%= render partial: 'snapshots/new_snapshot_link', locals: {item: item} %>
   <% end -%>
 
-  <%= delete_icon(item, current_user) %>
+  <%= delete_icon(item, current_user, 'Are you sure?', assay_word) %>
 <% end %>

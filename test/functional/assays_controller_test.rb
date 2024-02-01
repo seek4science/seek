@@ -587,14 +587,14 @@ class AssaysControllerTest < ActionController::TestCase
 
   test 'get new with class doesnt present options for class' do
     login_as(:model_owner)
-    get :new, params: { class: 'experimental' }
+    get :new, params: { class: 'EXP' }
     assert_response :success
     assert_select 'a[href=?]', new_assay_path(class: :experimental), count: 0
     assert_select 'a', text: /An #{I18n.t('assays.experimental_assay')}/i, count: 0
     assert_select 'a[href=?]', new_assay_path(class: :modelling), count: 0
     assert_select 'a', text: /A #{I18n.t('assays.modelling_analysis')}/i, count: 0
 
-    get :new, params: { class: 'modelling' }
+    get :new, params: { class: 'MODEL' }
     assert_response :success
     assert_select 'a[href=?]', new_assay_path(class: :experimental), count: 0
     assert_select 'a', text: /An #{I18n.t('assays.experimental_assay')}/i, count: 0
@@ -1065,7 +1065,7 @@ class AssaysControllerTest < ActionController::TestCase
   end
 
   test 'new should include tags element' do
-    get :new, params: { class: :experimental }
+    get :new, params: { class: 'EXP' }
     assert_response :success
     assert_select 'div.panel-heading', text: /Tags/, count: 1
     assert_select 'select#tag_list', count: 1
@@ -1121,7 +1121,7 @@ class AssaysControllerTest < ActionController::TestCase
   end
 
   test 'should show experimental assay types for new experimental assay' do
-    get :new, params: { class: :experimental }
+    get :new, params: { class: 'EXP' }
     assert_response :success
     assert_select 'label', text: /assay type/i
     assert_select 'select#assay_assay_type_uri' do
@@ -1131,7 +1131,7 @@ class AssaysControllerTest < ActionController::TestCase
   end
 
   test 'should show modelling assay types for new modelling assay' do
-    get :new, params: { class: :modelling }
+    get :new, params: { class: 'MODEL' }
     assert_response :success
     assert_select 'label', text: /Biological problem addressed/i
     assert_select 'select#assay_assay_type_uri' do
@@ -1947,7 +1947,7 @@ class AssaysControllerTest < ActionController::TestCase
     # person = User.current_user.person
     person = FactoryBot.create(:person)
     project = person.projects.first
-    investigation = FactoryBot.create(:investigation, projects: [project])
+    investigation = FactoryBot.create(:investigation, projects: [project], is_isa_json_compliant: true)
 
     source_st = FactoryBot.create(:isa_source_sample_type, contributor: person, projects: [project])
     sample_collection_st = FactoryBot.create(:isa_sample_collection_sample_type, contributor: person, projects: [project],
@@ -1984,7 +1984,7 @@ class AssaysControllerTest < ActionController::TestCase
 
     assay3.reload
 
-    assert_equal(assay3.previous_linked_assay_sample_type&.id, assay1.sample_type&.id)
+    assert_equal(assay3.previous_linked_sample_type&.id, assay1.sample_type&.id)
   end
 
   test 'do not get index if feature disabled' do
@@ -2012,9 +2012,24 @@ class AssaysControllerTest < ActionController::TestCase
     with_config_value(:isa_json_compliance_enabled, true) do
       current_user = FactoryBot.create(:user)
       login_as(current_user)
-      assay = FactoryBot.create(:isa_json_compliant_assay, contributor: current_user.person)
+      study = FactoryBot.create(:isa_json_compliant_study)
+      assay_stream = FactoryBot.create(:assay_stream, study: , contributor: current_user.person)
+      assay1 = FactoryBot.create(:isa_json_compliant_assay, contributor: current_user.person, study: , assay_stream:)
+      assay2 = FactoryBot.create(:isa_json_compliant_assay, contributor: current_user.person, study: , assay_stream:)
 
-      get :show, params: { id: assay }
+      assert_equal assay_stream.study, assay1.study
+
+      get :show, params: { id: assay_stream }
+      assert_response :success
+
+      assert_select 'a', text: /Design #{I18n.t('assay')}/i, count: 1
+
+      get :show, params: { id: assay1 }
+      assert_response :success
+
+      assert_select 'a', text: /Design the next #{I18n.t('assay')}/i, count: 1
+
+      get :show, params: { id: assay2 }
       assert_response :success
 
       assert_select 'a', text: /Design the next #{I18n.t('assay')}/i, count: 1
