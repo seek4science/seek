@@ -6,7 +6,7 @@
 
   if @isa_assay.assay.new_record?
     if params[:is_assay_stream]
-      assay_position = 0
+      assay_position = study.assay_streams.map(&:position).max + 1
       assay_class_id = AssayClass.assay_stream.id
       is_assay_stream = true
     else
@@ -48,7 +48,7 @@
 
   <div class="form-group">
     <%= assay_fields.label :description -%><br/>
-    <%= assay_fields.text_area :description, :rows => 5, :class=>"form-control rich-text-edit"  -%>
+    <%= assay_fields.text_area :description, rows: 5, class: "form-control rich-text-edit" -%>
   </div>
 
   <% if show_extended_metadata %>
@@ -61,9 +61,17 @@
     <%= assay_study_selection('isa_assay[assay][study_id]',@isa_assay.assay.study) %>
   </div>
 
-  <div class="hidden">
-    <%= assay_fields.number_field :position, value: assay_position || study.assays.length -%>
-  </div>
+  <% if is_assay_stream %>
+    <div class="form-group">
+      <%= assay_fields.label "Assay position" -%><br/>
+      <%= assay_fields.number_field :position, rows: 5, class: "form-control", value: assay_position %>
+    </div>
+  <% else %>
+    <div class="hidden">
+      <%= assay_fields.number_field :position, value: assay_position || study.assays.length -%>
+    </div>
+  <% end %>
+
 
   <%= assay_fields.hidden_field :assay_stream_id, value: assay_stream_id -%>
   <%= assay_fields.hidden_field :assay_class_id, value: assay_class_id -%>
