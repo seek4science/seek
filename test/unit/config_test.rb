@@ -177,6 +177,16 @@ class ConfigTest < ActiveSupport::TestCase
     assert_equal 'localhost/piwik/', Seek::Config.piwik_analytics_url
   end
 
+  test 'custom_analytics_enabled' do
+    assert !Seek::Config.custom_analytics_snippet_enabled
+  end
+  test 'custom analytics name' do
+    assert_equal 'Custom name', Seek::Config.custom_analytics_name
+  end
+  test 'custom analytics snippet' do
+    assert_equal '<script id="custom-tracking-script"></script>', Seek::Config.custom_analytics_snippet
+  end
+
   # homepage settings
   test 'project_news_enabled' do
     assert !Seek::Config.project_news_enabled
