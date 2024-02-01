@@ -7,11 +7,11 @@
   if @isa_assay.assay.new_record?
     if params[:is_assay_stream]
       assay_position = 0
-      assay_class_id = AssayClass.for_type(Seek::ISA::AssayClass::STREAM).id
+      assay_class_id = AssayClass.assay_stream.id
       is_assay_stream = true
     else
       assay_position = params[:source_assay_id].nil? ? 1 : source_assay.position + 1
-      assay_class_id = AssayClass.for_type(Seek::ISA::AssayClass::EXP).id
+      assay_class_id = AssayClass.experimental.id
       is_assay_stream = false
     end
   else

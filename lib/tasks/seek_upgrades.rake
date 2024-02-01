@@ -194,7 +194,7 @@ namespace :seek do
         stream_name = "Assay Stream - #{UUID.generate}"
         assay_stream = Assay.create(title: stream_name,
                                     study_id: fas.study_id,
-                                    assay_class_id: AssayClass.for_type(Seek::ISA::AssayClass::STREAM).id,
+                                    assay_class_id: AssayClass.assay_stream.id,
                                     contributor: fas.contributor,
                                     position: 0)
 

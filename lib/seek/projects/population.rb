@@ -111,7 +111,7 @@ module Seek
             set_description(assay, r, description_index)
             assay.position = assay_position
             assay_position += 1
-            assay.assay_class = AssayClass.for_type(Seek::ISA::AssayClass::EXP)
+            assay.assay_class = AssayClass.experimental
 
             set_assignees(assay, r, assignee_indices)
 

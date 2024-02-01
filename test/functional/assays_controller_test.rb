@@ -587,14 +587,14 @@ class AssaysControllerTest < ActionController::TestCase
 
   test 'get new with class doesnt present options for class' do
     login_as(:model_owner)
-    get :new, params: { class: Seek::ISA::AssayClass::EXP }
+    get :new, params: { class: 'EXP' }
     assert_response :success
     assert_select 'a[href=?]', new_assay_path(class: :experimental), count: 0
     assert_select 'a', text: /An #{I18n.t('assays.experimental_assay')}/i, count: 0
     assert_select 'a[href=?]', new_assay_path(class: :modelling), count: 0
     assert_select 'a', text: /A #{I18n.t('assays.modelling_analysis')}/i, count: 0
 
-    get :new, params: { class: Seek::ISA::AssayClass::MODEL }
+    get :new, params: { class: 'MODEL' }
     assert_response :success
     assert_select 'a[href=?]', new_assay_path(class: :experimental), count: 0
     assert_select 'a', text: /An #{I18n.t('assays.experimental_assay')}/i, count: 0
@@ -1065,7 +1065,7 @@ class AssaysControllerTest < ActionController::TestCase
   end
 
   test 'new should include tags element' do
-    get :new, params: { class: Seek::ISA::AssayClass::EXP }
+    get :new, params: { class: 'EXP' }
     assert_response :success
     assert_select 'div.panel-heading', text: /Tags/, count: 1
     assert_select 'select#tag_list', count: 1
@@ -1121,7 +1121,7 @@ class AssaysControllerTest < ActionController::TestCase
   end
 
   test 'should show experimental assay types for new experimental assay' do
-    get :new, params: { class: Seek::ISA::AssayClass::EXP }
+    get :new, params: { class: 'EXP' }
     assert_response :success
     assert_select 'label', text: /assay type/i
     assert_select 'select#assay_assay_type_uri' do
@@ -1131,7 +1131,7 @@ class AssaysControllerTest < ActionController::TestCase
   end
 
   test 'should show modelling assay types for new modelling assay' do
-    get :new, params: { class: Seek::ISA::AssayClass::MODEL }
+    get :new, params: { class: 'MODEL' }
     assert_response :success
     assert_select 'label', text: /Biological problem addressed/i
     assert_select 'select#assay_assay_type_uri' do

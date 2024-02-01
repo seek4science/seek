@@ -45,7 +45,7 @@ class IsaAssaysControllerTest < ActionController::TestCase
                                                       sop_ids: [FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy)).id],
                                                       creator_ids: [this_person.id, other_creator.id],
                                                       other_creators: 'other collaborators',
-                                                      assay_class_id: AssayClass.for_type(Seek::ISA::AssayClass::EXP).id,
+                                                      assay_class_id: AssayClass.experimental.id,
                                                       position: 0, policy_attributes: },
                                              input_sample_type_id: sample_collection_sample_type.id,
                                              sample_type: { title: 'assay sample_type', project_ids: [projects.first.id], template_id: 1,
@@ -189,7 +189,7 @@ class IsaAssaysControllerTest < ActionController::TestCase
                          sop_ids: [FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy)).id],
                          creator_ids: [this_person.id, other_creator.id],
                          other_creators: 'other collaborators',
-                         position: 0, assay_class_id: AssayClass.for_type(Seek::ISA::AssayClass::EXP).id, policy_attributes: }
+                         position: 0, assay_class_id: AssayClass.experimental.id, policy_attributes: }
 
     isa_assay_attributes = { assay: assay_attributes.merge(emt_attributes),
                              input_sample_type_id: sample_collection_sample_type.id,

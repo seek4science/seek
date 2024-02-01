@@ -6,33 +6,33 @@ class AssayClass < ApplicationRecord
   end
 
   def self.experimental
-    for_type(Seek::ISA::AssayClass::EXP)
+    for_type('EXP')
   end
 
   def self.modelling
-    for_type(Seek::ISA::AssayClass::MODEL)
+    for_type('MODEL')
 
   end
 
   def self.assay_stream
-    for_type(Seek::ISA::AssayClass::STREAM)
+    for_type('STREAM')
   end
 
   def is_modelling?
-    key == Seek::ISA::AssayClass::MODEL
+    key == 'MODEL'
   end
 
   def is_experimental?
-    key == Seek::ISA::AssayClass::EXP
+    key == 'EXP'
   end
 
   def is_assay_stream?
-    key == Seek::ISA::AssayClass::STREAM
+    key == 'STREAM'
   end
 
   # for cases where a longer more descriptive key is useful, but can't rely on the title
   #  which may have been changed over time
   def long_key
-    { "#{Seek::ISA::AssayClass::EXP}": 'Experimental Assay', "#{Seek::ISA::AssayClass::MODEL}": 'Modelling Analysis', "#{Seek::ISA::AssayClass::STREAM}": 'Assay Stream' }[key.to_sym]
+    { 'EXP': 'Experimental Assay', 'MODEL': 'Modelling Analysis', 'STREAM': 'Assay Stream' }[key.to_sym]
   end
 end

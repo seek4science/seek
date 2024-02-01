@@ -70,7 +70,7 @@ class AssaysController < ApplicationController
     @permitted_params = assay_params if params[:assay]
 
     # jump straight to experimental if modelling analysis is disabled
-    @assay_class ||= 'experimental' unless Seek::Config.modelling_analysis_enabled
+    @assay_class ||= 'EXP' unless Seek::Config.modelling_analysis_enabled
 
     @assay.assay_class = AssayClass.for_type(@assay_class) unless @assay_class.nil?
 
@@ -82,7 +82,7 @@ class AssaysController < ApplicationController
   end
 
   def create
-    params[:assay_class_id] ||= AssayClass.for_type(Seek::ISA::AssayClass::EXP).id
+    params[:assay_class_id] ||= AssayClass.experimental.id
     @assay = Assay.new(assay_params)
 
     update_assay_organisms @assay, params
