@@ -2129,4 +2129,34 @@ class AssaysControllerTest < ActionController::TestCase
 
     end
   end
+
+  test 'assay position after deletion' do
+    with_config_value(:isa_json_compliance_enabled, true) do
+      person = FactoryBot.create(:person)
+      project = person.projects.first
+      login_as(person)
+      investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, contributor: person)
+      study = FactoryBot.create(:isa_json_compliant_study, investigation: )
+      assay_stream = FactoryBot.create(:assay_stream, study: , contributor: person, position: 0)
+
+      begin_assay_sample_type = FactoryBot.create(:isa_assay_material_sample_type, linked_sample_type: study.sample_types.second, projects: [project], contributor: person)
+      begin_assay = FactoryBot.create(:assay, contributor: person, study: , assay_stream:, sample_type: begin_assay_sample_type, position: 0)
+
+      middle_assay_sample_type = FactoryBot.create(:isa_assay_material_sample_type, linked_sample_type: begin_assay_sample_type, projects: [project], contributor: person)
+      middle_assay = FactoryBot.create(:assay, contributor: person, study: , assay_stream:, sample_type: middle_assay_sample_type, position: 1)
+
+      end_assay_sample_type = FactoryBot.create(:isa_assay_data_file_sample_type, linked_sample_type: middle_assay_sample_type, projects: [project], contributor: person)
+      end_assay = FactoryBot.create(:assay, contributor: person, study: , assay_stream:, sample_type: end_assay_sample_type, position: 2)
+
+      assert_difference('Assay.count', -1) do
+        assert_difference('SampleType.count', -1) do
+          delete :destroy, params: {id: middle_assay}
+        end
+      end
+
+      end_assay.reload
+      refute_equal end_assay.position, 2
+      assert_equal end_assay.position, 1
+    end
+  end
 end
