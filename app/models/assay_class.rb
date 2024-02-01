@@ -30,9 +30,11 @@ class AssayClass < ApplicationRecord
     key == 'STREAM'
   end
 
+  LONG_KEYS = { 'EXP': 'Experimental Assay', 'MODEL': 'Modelling Analysis', 'STREAM': 'Assay Stream' }.freeze
+
   # for cases where a longer more descriptive key is useful, but can't rely on the title
   #  which may have been changed over time
   def long_key
-    { 'EXP': 'Experimental Assay', 'MODEL': 'Modelling Analysis', 'STREAM': 'Assay Stream' }[key.to_sym]
+    LONG_KEYS[key.to_sym]
   end
 end
