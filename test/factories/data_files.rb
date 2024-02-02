@@ -121,6 +121,10 @@ FactoryBot.define do
   factory(:small_test_spreadsheet_datafile, parent: :data_file) do
     association :content_blob, factory: :small_test_spreadsheet_content_blob
   end
+
+  factory(:spreadsheet_with_error_logs_datafile, parent: :data_file) do
+    association :content_blob, factory: :spreadsheet_with_error_logs_content_blob
+  end
   
   factory(:strain_sample_data_file, parent: :data_file) do
     association :content_blob, factory: :strain_sample_data_content_blob
