@@ -1,5 +1,9 @@
 <% assay = params[:isa_assay][:assay] if params.dig(:isa_assay, :assay) %>
 <% study = Study.find(params[:study_id] || assay[:study_id]) %>
+<% def first_assay_in_stream?
+    params[:source_assay_id].nil? || (params[:source_assay_id] == params[:assay_stream_id])
+   end
+%>
 <%
   source_assay = Assay.find(params[:source_assay_id]) if params[:source_assay_id]
   assay_stream_id = params[:assay_stream_id] if params[:assay_stream_id]
@@ -10,7 +14,7 @@
       assay_class_id = AssayClass.assay_stream.id
       is_assay_stream = true
     else
-      assay_position = params[:source_assay_id].nil? ? 1 : source_assay.position + 1
+      assay_position = first_assay_in_stream? ? 0 : source_assay.position + 1
       assay_class_id = AssayClass.experimental.id
       is_assay_stream = false
     end
@@ -68,7 +72,7 @@
     </div>
   <% else %>
     <div class="hidden">
-      <%= assay_fields.number_field :position, value: assay_position || study.assays.length -%>
+      <%= assay_fields.hidden_field :position, value: assay_position -%>
     </div>
   <% end %>
 

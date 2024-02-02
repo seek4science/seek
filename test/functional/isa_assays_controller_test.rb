@@ -600,4 +600,34 @@ class IsaAssaysControllerTest < ActionController::TestCase
     end
     assert_response :not_found
   end
+
+  test 'position when creating assays' do
+    person = FactoryBot.create(:person)
+    investigation = FactoryBot.create(:investigation, contributor: person, is_isa_json_compliant: true)
+    study = FactoryBot.create(:isa_json_compliant_study, contributor: person, investigation: )
+
+    login_as(person)
+
+    get :new, params: { study_id: study.id, is_assay_stream: true }
+    assert_response :success
+    # New assay stream should have position 0 and is of type 'number'
+    assert_select 'input[type=number][value=0]#isa_assay_assay_position', count: 1
+
+    assay_stream1 = FactoryBot.create(:assay_stream, study: , contributor: person, position: 0)
+    get :new, params: { study_id: study.id, is_assay_stream: true }
+    assert_response :success
+    # New assay stream should have position 1 and is of type 'number'
+    assert_select 'input[type=number][value=1]#isa_assay_assay_position', count: 1
+
+    assay_stream2 = FactoryBot.create(:assay_stream, study: , contributor: person, position: 5)
+    get :new, params: { study_id: study.id, is_assay_stream: true }
+    assert_response :success
+    # New assay stream should have position 6 and is of type 'number'
+    assert_select 'input[type=number][value=6]#isa_assay_assay_position', count: 1
+
+    get :new, params: {study_id: study.id, assay_stream_id: assay_stream1.id, source_assay_id: assay_stream1.id}
+    # New assay should have position 0 and is of type 'hidden'
+    assert_select 'input[type=hidden][value=0]#isa_assay_assay_position', count: 1
+
+  end
 end
