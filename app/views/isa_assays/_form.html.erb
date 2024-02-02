@@ -6,7 +6,7 @@
 
   if @isa_assay.assay.new_record?
     if params[:is_assay_stream]
-      assay_position = study.assay_streams.map(&:position).max + 1
+      assay_position = study.assay_streams.any? ? study.assay_streams.map(&:position).max + 1 : 0
       assay_class_id = AssayClass.assay_stream.id
       is_assay_stream = true
     else

@@ -228,8 +228,11 @@ class IsaAssaysControllerTest < ActionController::TestCase
 
   test 'hide sops, publications, documents, and discussion channels if assay stream' do
     person = FactoryBot.create(:person)
-    study = FactoryBot.create(:isa_json_compliant_study, contributor: person)
-    assay_stream = FactoryBot.create(:assay_stream, study: , contributor: person)
+    investigation = FactoryBot.create(:investigation, contributor: person, is_isa_json_compliant: true)
+    study = FactoryBot.create(:isa_json_compliant_study, contributor: person, investigation: )
+    assay_stream = FactoryBot.create(:assay_stream, study: , contributor: person, position: 0)
+
+    login_as(person)
 
     get :new, params: {study_id: study.id, is_assay_stream: true}
     assert_response :success

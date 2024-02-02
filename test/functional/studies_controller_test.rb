@@ -2019,9 +2019,10 @@ class StudiesControllerTest < ActionController::TestCase
 
   test 'display adjusted buttons if isa json compliant' do
     with_config_value(:isa_json_compliance_enabled, true) do
-      current_user = FactoryBot.create(:user)
-      login_as(current_user)
-      study = FactoryBot.create(:isa_json_compliant_study, contributor: current_user.person)
+      person = FactoryBot.create(:person)
+      login_as(person)
+      investigation = FactoryBot.create(:investigation, contributor: person, is_isa_json_compliant: true)
+      study = FactoryBot.create(:isa_json_compliant_study, contributor: person, investigation: )
 
       get :show, params: { id: study }
       assert_response :success
