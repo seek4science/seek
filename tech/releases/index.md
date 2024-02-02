@@ -11,6 +11,21 @@ Please see [Getting FAIRDOM-SEEK](/get-seek.html) for details about installing S
 
 If you have any comments or feedback about a release, then please [Contact Us](/contacting-us.html)
 
+## Version 1.14.2
+
+Release date: _2nd February 2024_
+
+A patch release that includes some important bug fixes and improvements:
+
+* Significant performance improvements for jobs updating the authorization tables.
+* Stop displaying usage metrics (views, downloads) from list items, due to a large overhead. The metrics are still available when viewing an individual item.
+* Allow users to override http response code validation, but with a warning, when attempting to register and item via a URL - as some servers do not always provide the correct response code.
+* Fixes to the BioModels search to better handle unexpected JSON responses, or where information is missing.
+* Fix to parsing Excel spreadsheets which have errors reported in the logging, but the errors don't prevent the spreadsheet being successfully parse.
+* Keep the "External Search" box ticked between searches.
+
+For a full list, see [closed issues for 1.14.2](https://github.com/seek4science/seek/milestone/21?closed=1)
+
 ## Version 1.14.1
 
 Release date: _13th November 2023_
