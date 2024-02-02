@@ -579,9 +579,9 @@ class AssaysControllerTest < ActionController::TestCase
     login_as(:model_owner)
     get :new
     assert_response :success
-    assert_select 'a[href=?]', new_assay_path(class: :experimental), count: 1
+    assert_select 'a[href=?]', new_assay_path(class: 'EXP'), count: 1
     assert_select 'a', text: /An #{I18n.t('assays.experimental_assay')}/i, count: 1
-    assert_select 'a[href=?]', new_assay_path(class: :modelling), count: 1
+    assert_select 'a[href=?]', new_assay_path(class: 'MODEL'), count: 1
     assert_select 'a', text: /A #{I18n.t('assays.modelling_analysis')}/i, count: 1
   end
 
@@ -589,16 +589,16 @@ class AssaysControllerTest < ActionController::TestCase
     login_as(:model_owner)
     get :new, params: { class: 'EXP' }
     assert_response :success
-    assert_select 'a[href=?]', new_assay_path(class: :experimental), count: 0
+    assert_select 'a[href=?]', new_assay_path(class: 'EXP'), count: 0
     assert_select 'a', text: /An #{I18n.t('assays.experimental_assay')}/i, count: 0
-    assert_select 'a[href=?]', new_assay_path(class: :modelling), count: 0
+    assert_select 'a[href=?]', new_assay_path(class: 'MODEL'), count: 0
     assert_select 'a', text: /A #{I18n.t('assays.modelling_analysis')}/i, count: 0
 
     get :new, params: { class: 'MODEL' }
     assert_response :success
-    assert_select 'a[href=?]', new_assay_path(class: :experimental), count: 0
+    assert_select 'a[href=?]', new_assay_path(class: 'EXP'), count: 0
     assert_select 'a', text: /An #{I18n.t('assays.experimental_assay')}/i, count: 0
-    assert_select 'a[href=?]', new_assay_path(class: :modelling), count: 0
+    assert_select 'a[href=?]', new_assay_path(class: 'MODEL'), count: 0
     assert_select 'a', text: /A #{I18n.t('assays.modelling_analysis')}/i, count: 0
   end
 
@@ -1084,7 +1084,7 @@ class AssaysControllerTest < ActionController::TestCase
 
   test 'new should not include tags element when tags disabled' do
     with_config_value :tagging_enabled, false do
-      get :new, params: { class: :experimental }
+      get :new, params: { class: 'EXP' }
       assert_response :success
       assert_select 'div.panel-heading', text: /Tags/, count: 0
       assert_select 'select#tag_list', count: 0
