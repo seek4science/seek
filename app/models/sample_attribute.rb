@@ -7,6 +7,7 @@ class SampleAttribute < ApplicationRecord
   belongs_to :linked_sample_type, class_name: 'SampleType'
 
   belongs_to :isa_tag
+  belongs_to :template_attribute, class_name: 'TemplateAttribute', foreign_key: 'template_id'
 
   auto_strip_attributes :pid
   validates :sample_type, presence: true

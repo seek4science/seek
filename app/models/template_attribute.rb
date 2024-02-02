@@ -5,6 +5,7 @@ class TemplateAttribute < ApplicationRecord
   belongs_to :unit
   belongs_to :isa_tag
   belongs_to :linked_sample_type, class_name: 'SampleType'
+  has_many :sample_attributes
 
   validates :title, presence: true
 
