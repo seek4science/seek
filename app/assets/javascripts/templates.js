@@ -58,7 +58,6 @@ Templates.init = function (elem) {
           : '<a class="btn btn-danger btn-sm" href="javascript:void(0)" onClick="remove(this)">Remove</a>';
       }
     },
-    { title: "linked sample type id", width: "10%" }
   ];
 
   Templates.table = elem.DataTable({
@@ -125,7 +124,8 @@ Templates.mapData = (data) =>
     item.pos,
     item.isa_tag_id,
     item.isa_tag_title,
-    item.linked_sample_type_id
+    item.linked_sample_type_id,
+    item.template_attribute_id
   ]);
 
 function loadFilterSelectors(data) {
@@ -249,6 +249,7 @@ const applyTemplate = () => {
     $j(newRow).find('[data-attr="isa_tag_id"]').val(row[11]);
     $j(newRow).find('[data-attr="isa_tag_title"]').val(row[11]);
     $j(newRow).find('[data-attr="isa_tag_title"]').attr('disabled', true);
+    $j(newRow).find('[data-attr="template_attribute_id"]').val(row[14]);
 
     // Show the CV block if cv_id is not empty
     if (row[4]) $j(newRow).find(".controlled-vocab-block").show();
