@@ -31,7 +31,7 @@
 
     <div class="form-group">
       <label>Ontology</label>
-      <%= f.select :source_ontology, Ebi::OlsClient.ontology_choices, { include_blank: 'No Ontology' }, class: 'form-control' -%>
+      <%= select_cv_source_ontology(@sample_controlled_vocab) %>
       <br/>
 
       <div id='ontology-root-uri' style="display:none;">
@@ -76,24 +76,10 @@
           </thead>
           <tbody>
           <% @sample_controlled_vocab.sample_controlled_vocab_terms.each_with_index do |term, index| %>
-            <%= f.fields_for :sample_controlled_vocab_terms, term do |terms_f| %>
-
-              <tr class="sample-cv-term" data-index="<%= index %>">
-                <td><%= terms_f.text_field :label, :class => 'form-control', readonly:term.ontology_based? %></td>
-                <td><%= terms_f.text_field :iri, :class => 'form-control', readonly:term.ontology_based? %></td>
-                <td><%= terms_f.text_field :parent_iri, :class => 'form-control', readonly:term.ontology_based? %></td>
-                <td>
-                  <div class="btn-group" data-toggle="buttons">
-                    <%= hidden_field_tag "sample_controlled_vocab[sample_controlled_vocab_terms_attributes][#{index}][_destroy]", '0', :autocomplete => 'off' %>
-                    <label class="btn btn-danger">
-                      Remove
-                      <%= check_box_tag "sample_controlled_vocab[sample_controlled_vocab_terms_attributes][#{index}][_destroy]", '1', false,
-                                        :class => 'destroy-attribute', :autocomplete => 'off',id:"sample_controlled_vocab-checkbox[sample_controlled_vocab_terms_attributes][#{index}][_destroy]" %>
-                    </label>
-                  </div>
-
-                </td>
-              </tr>
+            <% if term.ontology_based? %>
+              <%= render partial:'sample_controlled_vocabs/term_form_row_disabled', locals:{index: index, term: term} %>
+            <% else %>
+              <%= render partial:'sample_controlled_vocabs/term_form_row', locals:{index: index, term: term} %>
             <% end %>
           <% end %>
           <tr id='add-term-button-row'>

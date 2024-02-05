@@ -4,6 +4,7 @@ class SopsController < ApplicationController
 
   include Seek::AssetsCommon
 
+  before_action :sops_enabled?
   before_action :find_assets, :only => [ :index ]
   before_action :find_and_authorize_requested_item, :except => [ :index, :new, :create, :preview, :update_annotations_ajax]
   before_action :find_display_asset, :only=>[:show, :explore, :download]
@@ -62,6 +63,7 @@ class SopsController < ApplicationController
                                 { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                 { assay_assets_attributes: [:assay_id] },
                                 { publication_ids: [] }, {workflow_ids: []},
+                                { extended_metadata_attributes: determine_extended_metadata_keys },
                                 discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
 

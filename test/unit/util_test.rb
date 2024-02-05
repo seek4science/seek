@@ -178,8 +178,9 @@ class UtilTest < ActiveSupport::TestCase
     assert_nil Seek::Util.lookup_class('String', raise: false)
     assert_nil Seek::Util.lookup_class('WorkflowInternals::Structure', raise: false)
     assert_nil Seek::Util.lookup_class('gdfghdfhdfhdfhdfhdfh', raise: false)
-    assert_raises NameError do
+    exception = assert_raises(NameError) do
       Seek::Util.lookup_class('String')
     end
+    assert_includes exception.message, 'not an appropriate class'
   end
 end

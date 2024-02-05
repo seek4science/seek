@@ -1,0 +1,13 @@
+@import 'variables';
+
+#controlled-vocab-terms #controlled-vocab-terms-fixed {
+    margin-bottom: 1em;
+}
+
+#controlled-vocab-terms #new-terms {
+    width: 100%;
+}
+
+.sample-cv-term .disabled-cv-field {
+    background-color: $input-bg-disabled;
+}

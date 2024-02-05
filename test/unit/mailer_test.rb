@@ -401,6 +401,56 @@ class MailerTest < ActionMailer::TestCase
     end
   end
 
+  test 'request import project for programme' do
+    with_config_value(:instance_name, 'SEEK EMAIL TEST') do
+      with_config_value(:site_base_host, 'https://securefred.com:1337') do
+        programme_admin = FactoryBot.create(:programme_administrator)
+        programme = programme_admin.programmes.first
+        refute_empty programme.programme_administrators
+        project = Project.new(title:'My lovely project')
+        institution = FactoryBot.create(:institution)
+        people = FactoryBot.create_list(:person, 3)
+        sender = FactoryBot.create(:person)
+        log = ProjectImportationMessageLog.log_request(sender:sender, programme:programme, project:project, institution:institution, people:people)
+        email = Mailer.request_import_project_for_programme(sender.user, programme, project.to_json, institution.to_json, people.to_json,log)
+        refute_nil email
+        refute_nil email.body
+        assert_equal [programme_admin.email],email.to
+      end
+    end
+  end
+
+  test 'request import project' do
+    with_config_value(:instance_name, 'SEEK EMAIL TEST') do
+      with_config_value(:site_base_host, 'https://securefred.com:1337') do
+        project = Project.new(title:'My lovely project')
+        institution = FactoryBot.create(:institution)
+        people = FactoryBot.create_list(:person, 3)
+        sender = FactoryBot.create(:person)
+        log = ProjectImportationMessageLog.log_request(sender:sender, project:project, institution:institution, people:people)
+        email = Mailer.request_import_project(sender.user, project.to_json, institution.to_json, people.to_json,log)
+        refute_nil email
+        refute_nil email.body
+      end
+    end
+  end
+
+  test 'request import project and programme' do
+    with_config_value(:instance_name, 'SEEK EMAIL TEST') do
+      with_config_value(:site_base_host, 'https://securefred.com:1337') do
+        institution = Institution.new({title:'My lovely institution', web_page:'http://inst.org', country:'DE'})
+        project = Project.new(title:'My lovely project')
+        programme = Programme.new(title:'My lovely programme')
+        people = FactoryBot.create_list(:person, 3)
+        sender = FactoryBot.create(:person)
+        log = ProjectImportationMessageLog.log_request(sender:sender, programme:programme, project:project, institution:institution, people:people)
+        email = Mailer.request_import_project_and_programme(sender.user, programme.to_json, project.to_json, institution.to_json, people.to_json,log)
+        refute_nil email
+        refute_nil email.body        
+      end
+    end
+  end
+
   test 'join project rejected' do
     project = FactoryBot.create(:project,title:'project to join')
     requester = FactoryBot.create(:person)

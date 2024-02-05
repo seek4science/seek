@@ -4,6 +4,7 @@ class PlaceholdersController < ApplicationController
 
   include Seek::AssetsCommon
 
+  before_action :placeholders_enabled?
   before_action :find_assets, :only=>[:index]
   before_action :find_and_authorize_requested_item,:only=>[:edit, :manage, :update, :manage_update, :destroy, :show,:new_object_based_on_existing_one ]
 
@@ -96,12 +97,11 @@ class PlaceholdersController < ApplicationController
 
   def placeholder_params
     params.require(:placeholder).permit(:title, :description, { project_ids: [] }, :license, :other_creators,
-                                { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
-                                { creator_ids: [] }, { assay_assets_attributes: [:assay_id] },
-                                :file_template_id,
-                                :data_format_annotations, :data_type_annotations,
-                                :data_file_id,
-                                discussion_links_attributes:[:id, :url, :label, :_destroy])
+                                        { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
+                                        { creator_ids: [] }, { assay_assets_attributes: [:assay_id] },
+                                        { data_format_annotations: [] }, { data_type_annotations: [] },
+                                        :file_template_id, :data_file_id, # Check if these are needed
+                                        discussion_links_attributes: [:id, :url, :label, :_destroy])
   end
 
   alias_method :asset_params, :placeholder_params

@@ -70,7 +70,7 @@ class SamplesControllerTest < ActionController::TestCase
     sample = assigns(:sample)
     assert_equal 'Fred Smith', sample.title
     assert_equal 'Fred Smith', sample.get_attribute_value('full name')
-    assert_equal '22', sample.get_attribute_value(:age)
+    assert_equal 22, sample.get_attribute_value(:age)
     assert_equal '22.1', sample.get_attribute_value(:weight)
     assert_equal 'M13 9PL', sample.get_attribute_value(:postcode)
     assert_equal person, sample.contributor
@@ -94,7 +94,7 @@ class SamplesControllerTest < ActionController::TestCase
     sample = assigns(:sample)
     assert_equal 'Fred Smith', sample.title
     assert_equal 'Fred Smith', sample.get_attribute_value('full name')
-    assert_equal '22', sample.get_attribute_value(:age)
+    assert_equal 22, sample.get_attribute_value(:age)
     assert_equal '22.1', sample.get_attribute_value(:weight)
     assert_equal 'M13 9PL', sample.get_attribute_value(:postcode)
     assert_equal person, sample.contributor
@@ -302,7 +302,7 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal type_id, updated_sample.sample_type.id
     assert_equal 'Jesus Jones', updated_sample.title
     assert_equal 'Jesus Jones', updated_sample.get_attribute_value('full name')
-    assert_equal '47', updated_sample.get_attribute_value(:age)
+    assert_equal 47, updated_sample.get_attribute_value(:age)
     assert_nil updated_sample.get_attribute_value(:weight)
     assert_equal 'M13 9QL', updated_sample.get_attribute_value(:postcode)
   end
@@ -330,7 +330,7 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal type_id, updated_sample.sample_type.id
     assert_equal 'Jesus Jones', updated_sample.title
     assert_equal 'Jesus Jones', updated_sample.get_attribute_value('full name')
-    assert_equal '47', updated_sample.get_attribute_value(:age)
+    assert_equal 47, updated_sample.get_attribute_value(:age)
     assert_nil updated_sample.get_attribute_value(:weight)
     assert_equal 'M13 9QL', updated_sample.get_attribute_value(:postcode)
   end
@@ -1050,7 +1050,7 @@ class SamplesControllerTest < ActionController::TestCase
     sample1 = samples.first
     assert_equal 'Fred Smith', sample1.title
     assert_equal 'Fred Smith', sample1.get_attribute_value('full name')
-    assert_equal '22', sample1.get_attribute_value(:age)
+    assert_equal 22, sample1.get_attribute_value(:age)
     assert_equal '22.1', sample1.get_attribute_value(:weight)
     assert_equal 'M13 9PL', sample1.get_attribute_value(:postcode)
     assert_equal [assay], sample1.assays
@@ -1058,7 +1058,7 @@ class SamplesControllerTest < ActionController::TestCase
     sample2 = samples.last
     assert_equal 'David Tailor', sample2.title
     assert_equal 'David Tailor', sample2.get_attribute_value('full name')
-    assert_equal '33', sample2.get_attribute_value(:age)
+    assert_equal 33, sample2.get_attribute_value(:age)
     assert_equal '33.1', sample2.get_attribute_value(:weight)
     assert_equal 'M12 8PL', sample2.get_attribute_value(:postcode)
   end
@@ -1110,7 +1110,7 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal type_id1, first_updated_sample.sample_type.id
     assert_equal 'Alfred Marcus', first_updated_sample.title
     assert_equal 'Alfred Marcus', first_updated_sample.get_attribute_value('full name')
-    assert_equal '22', first_updated_sample.get_attribute_value(:age)
+    assert_equal 22, first_updated_sample.get_attribute_value(:age)
     assert_nil first_updated_sample.get_attribute_value(:postcode)
     assert_equal '22.1', first_updated_sample.get_attribute_value(:weight)
 
@@ -1118,7 +1118,7 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal type_id2, last_updated_sample.sample_type.id
     assert_equal 'David Tailor', last_updated_sample.title
     assert_equal 'David Tailor', last_updated_sample.get_attribute_value('full name')
-    assert_equal '33', last_updated_sample.get_attribute_value(:age)
+    assert_equal 33, last_updated_sample.get_attribute_value(:age)
     assert_nil last_updated_sample.get_attribute_value(:postcode)
     assert_equal '33.1', last_updated_sample.get_attribute_value(:weight)
   end
@@ -1434,20 +1434,6 @@ class SamplesControllerTest < ActionController::TestCase
 
   end
 
-  private
-
-  def populated_patient_sample
-    person = FactoryBot.create(:person)
-    sample = Sample.new title: 'My Sample', policy: FactoryBot.create(:public_policy),
-                        project_ids:person.projects.collect(&:id),contributor:person
-    sample.sample_type = FactoryBot.create(:patient_sample_type)
-    sample.title = 'My sample'
-    sample.set_attribute_value('full name', 'Fred Bloggs')
-    sample.set_attribute_value(:age, 22)
-    sample.save!
-    sample
-  end
-
   test 'unauthorized users should not do batch operations' do
     sample = FactoryBot.create(:sample)
 
@@ -1466,4 +1452,41 @@ class SamplesControllerTest < ActionController::TestCase
     delete :batch_delete, params: { data: [{ id: sample.id }] }
     assert_equal JSON.parse(response.body)['status'], 'unprocessable_entity'
   end
+
+  test 'should show label to say controlled vocab allows free text' do
+    login_as(FactoryBot.create(:person))
+
+    type = FactoryBot.create(:simple_sample_type)
+    FactoryBot.create(:apples_controlled_vocab_attribute, is_title: true, title: 'allowed', allow_cv_free_text: true, sample_type: type)
+    FactoryBot.create(:apples_controlled_vocab_attribute, title: 'not allowed', allow_cv_free_text: false, sample_type: type)
+
+
+    get :new, params: { sample_type_id: type.id }
+    assert_response :success
+
+    assert_select 'label',text: /allowed/ do
+      assert_select 'span.subtle', text:/#{I18n.t('samples.allow_free_text_label_hint')}/
+    end
+
+    assert_select 'label',text: /not allowed/ do
+      assert_select 'span.subtle', text:/#{I18n.t('samples.allow_free_text_label_hint')}/, count: 0
+    end
+
+  end
+
+  private
+
+  def populated_patient_sample
+    person = FactoryBot.create(:person)
+    sample = Sample.new title: 'My Sample', policy: FactoryBot.create(:public_policy),
+                        project_ids:person.projects.collect(&:id),contributor:person
+    sample.sample_type = FactoryBot.create(:patient_sample_type)
+    sample.title = 'My sample'
+    sample.set_attribute_value('full name', 'Fred Bloggs')
+    sample.set_attribute_value(:age, 22)
+    sample.save!
+    sample
+  end
+
+
 end

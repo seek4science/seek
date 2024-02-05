@@ -8,13 +8,21 @@ module Ebi
     API_ROOT_URL = "#{ROOT_URL}/api".freeze
 
     def all_descendants(ontology_id, term_iri)
-      Rails.cache.fetch("ebi_ontology_terms_#{ontology_id}_#{term_iri}") do
+      key = "ebi_ontology_terms_#{ontology_id}_#{term_iri}"
+
+      if Rails.cache.exist?(key)
+        Rails.logger.debug("[OLS] Cache present for #{key}...")
+      end
+
+      res = Rails.cache.fetch(key) do
         url = "#{API_ROOT_URL}/ontologies/#{ontology_id}/terms/#{double_url_encode(term_iri)}"
 
         self_json = JSON.parse(RestClient.get(url, accept: :json))
         @collected_iris = []
         all_children(self_json)
       end
+      Rails.logger.debug("[OLS] Finished fetching all_descendants...")
+      return res
     end
 
     def all_children(term_json, parent_iri = nil)

@@ -9,7 +9,7 @@
         </div>
         <% if Sample.can_create? %>
           <div class="col-sm-2">
-            <%= link_to "New sample", new_sample_path(:sample_type_id => sample_type.id), class: "btn btn-primary" %>
+            <%= link_to "New sample", new_sample_path(:sample_type_id => sample_type.id, project_ids: params[:project_ids]), class: "btn btn-primary" %>
           </div>
           <div class="col-sm-2">
             <%= link_to "New batch submission", batch_upload_sample_type_path(sample_type), class: "btn btn-primary" %>

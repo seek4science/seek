@@ -45,7 +45,8 @@ class IsaAssaysControllerTest < ActionController::TestCase
                                                       sop_ids: [FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy)).id],
                                                       creator_ids: [this_person.id, other_creator.id],
                                                       other_creators: 'other collaborators',
-                                                      position: 0, assay_class_id: 1, policy_attributes: },
+                                                      assay_class_id: AssayClass.experimental.id,
+                                                      position: 0, policy_attributes: },
                                              input_sample_type_id: sample_collection_sample_type.id,
                                              sample_type: { title: 'assay sample_type', project_ids: [projects.first.id], template_id: 1,
                                                             sample_attributes_attributes: {
@@ -188,7 +189,7 @@ class IsaAssaysControllerTest < ActionController::TestCase
                          sop_ids: [FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy)).id],
                          creator_ids: [this_person.id, other_creator.id],
                          other_creators: 'other collaborators',
-                         position: 0, assay_class_id: 1, policy_attributes: }
+                         position: 0, assay_class_id: AssayClass.experimental.id, policy_attributes: }
 
     isa_assay_attributes = { assay: assay_attributes.merge(emt_attributes),
                              input_sample_type_id: sample_collection_sample_type.id,
@@ -223,5 +224,61 @@ class IsaAssaysControllerTest < ActionController::TestCase
              params: { isa_assay: isa_assay_attributes }
       end
     end
+  end
+
+  test 'hide sops, publications, documents, and discussion channels if assay stream' do
+    person = FactoryBot.create(:person)
+    study = FactoryBot.create(:isa_json_compliant_study, contributor: person)
+    assay_stream = FactoryBot.create(:assay_stream, study: , contributor: person)
+
+    get :new, params: {study_id: study.id, is_assay_stream: true}
+    assert_response :success
+
+    assert_select 'div#add_sops_form', text: /SOPs/i, count: 0
+    assert_select 'div#add_publications_form', text: /Publications/i, count: 0
+    assert_select 'div#add_documents_form', text: /Documents/i, count: 0
+    assert_select 'div.panel-heading', text: /Discussion Channels/i, count: 0
+    assert_select 'div.panel-heading', text: /Define Sample type for Assay/i, count: 0
+
+    get :edit, params: { id: assay_stream.id, study_id: study.id, source_assay_id: assay_stream.id, is_assay_stream: true }
+    assert_response :success
+
+    assert_select 'div#add_sops_form', text: /SOPs/i, count: 0
+    assert_select 'div#add_publications_form', text: /Publications/i, count: 0
+    assert_select 'div#add_documents_form', text: /Documents/i, count: 0
+    assert_select 'div.panel-heading', text: /Discussion Channels/i, count: 0
+    assert_select 'div.panel-heading', text: /Define Sample type for Assay/i, count: 0
+end
+
+  test 'show sops, publications, documents, and discussion channels if experimental assay' do
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+    investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, contributor: person, projects: [project])
+    study = FactoryBot.create(:isa_json_compliant_study, contributor: person, investigation: )
+    assay_stream = FactoryBot.create(:assay_stream, study: , contributor: person, position: 0)
+
+    login_as(person)
+
+    get :new, params: {study_id: study.id, assay_stream_id: assay_stream.id, source_assay_id: assay_stream.id}
+    assert_response :success
+
+    assert_select 'div#add_sops_form', text: /SOPs/i, count: 1
+    assert_select 'div#add_publications_form', text: /Publications/i, count: 1
+    assert_select 'div#add_documents_form', text: /Documents/i, count:1
+    assert_select 'div.panel-heading', text: /Discussion Channels/i, count: 1
+    assert_select 'div.panel-heading', text: /Define Sample type for Assay/i, count: 1
+
+    first_assay_st = FactoryBot.create(:isa_assay_material_sample_type, contributor: person, projects: [project], linked_sample_type: study.sample_types.second)
+    first_assay = FactoryBot.create(:assay, contributor: person, study: , assay_stream: , position: 1, sample_type: first_assay_st)
+    assert_equal assay_stream, first_assay.assay_stream
+
+    get :edit, params: { id: first_assay.id, assay_stream_id: assay_stream.id, source_assay_id: first_assay.id, study_id: study.id }
+    assert_response :success
+
+    assert_select 'div#add_sops_form', text: /SOPs/i, count: 1
+    assert_select 'div#add_publications_form', text: /Publications/i, count: 1
+    assert_select 'div#add_documents_form', text: /Documents/i, count: 1
+    assert_select 'div.panel-heading', text: /Discussion Channels/i, count: 1
+    assert_select 'div.panel-heading', text: /Define Sample type for Assay/i, count: 1
   end
 end

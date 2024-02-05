@@ -23,6 +23,7 @@ class Event < ApplicationRecord
   acts_as_authorized
   acts_as_uniquely_identifiable
   acts_as_favouritable
+  has_extended_metadata
 
   # load the configuration for the pagination
   grouped_pagination

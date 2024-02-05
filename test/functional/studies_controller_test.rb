@@ -709,7 +709,7 @@ class StudiesControllerTest < ActionController::TestCase
     assert cm = study.extended_metadata
     assert_equal cmt, cm.extended_metadata_type
     assert_equal 'fred',cm.get_attribute_value('name')
-    assert_equal '22',cm.get_attribute_value('age')
+    assert_equal 22,cm.get_attribute_value('age')
     assert_nil cm.get_attribute_value('date')
 
     # test update
@@ -729,7 +729,7 @@ class StudiesControllerTest < ActionController::TestCase
     assert new_study = assigns(:study)
     assert_equal 'new title', new_study.title
     assert_equal 'max', new_study.extended_metadata.get_attribute_value('name')
-    assert_equal '20', new_study.extended_metadata.get_attribute_value('age')
+    assert_equal 20, new_study.extended_metadata.get_attribute_value('age')
     assert_equal old_id, new_study.extended_metadata.id
   end
 
@@ -1992,4 +1992,38 @@ class StudiesControllerTest < ActionController::TestCase
     end
   end
 
+  test 'do not get index if feature disabled' do
+    with_config_value(:isa_enabled, false) do
+      get :index
+      assert_redirected_to root_path
+      assert flash[:error].include?('disabled')
+    end
+  end
+
+  test 'display single page button if feature enabled' do
+    with_config_value(:project_single_page_enabled, true) do
+      current_user = FactoryBot.create(:user)
+      login_as(current_user)
+      study = FactoryBot.create(:study, contributor: current_user.person)
+
+      get :show, params: { id: study }
+      assert_response :success
+
+      assert_select 'a', text: 'Single Page', count: 1
+    end
+  end
+
+  test 'display adjusted buttons if isa json compliant' do
+    with_config_value(:isa_json_compliance_enabled, true) do
+      current_user = FactoryBot.create(:user)
+      login_as(current_user)
+      study = FactoryBot.create(:isa_json_compliant_study, contributor: current_user.person)
+
+      get :show, params: { id: study }
+      assert_response :success
+
+      assert_select 'a', text: /Design #{I18n.t('assay')} Stream/i, count: 1
+      assert_select 'a', text: /Add new #{I18n.t('assay')}/i, count: 0
+    end
+  end
 end

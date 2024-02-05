@@ -89,7 +89,7 @@
 <script>
     //used to hold the element Id that needs updating after creating a new CV
     $j(document).ready(function () {
-        SampleTypeControlledVocab.blankControlledVocabModelForm=$j('#cv-modal').clone();
+        SampleTypeControlledVocab.copyBlankModalForm();
         SampleTypeControlledVocab.resetModalControlledVocabForm();
         // Make rows sortable
         SampleTypes.bindSortable();

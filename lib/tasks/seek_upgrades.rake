@@ -15,6 +15,9 @@ namespace :seek do
     rename_registered_sample_multiple_attribute_type
     remove_ontology_attribute_type
     db:seed:007_sample_attribute_types
+    db:seed:001_create_controlled_vocabs
+    recognise_isa_json_compliant_items
+    implement_assay_streams_for_isa_assays
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -99,23 +102,27 @@ namespace :seek do
   end
 
   task(decouple_extracted_samples_policies: [:environment]) do
-    puts '... creating independent policies for extracted samples...'
-    decoupled = 0
+    puts '..... creating independent policies for extracted samples (this can take a while if there are many samples) ...'
+    affected_samples = []
     disable_authorization_checks do
-      Sample.find_each do |sample|
+      Sample.includes(:originating_data_file).find_each do |sample|
         # check if the sample was extracted from a datafile and their policies are linked
-        if sample.extracted? && sample.policy == sample.originating_data_file&.policy
-          sample.policy = sample.policy.deep_copy
-          sample.policy.save
-          decoupled += 1
+        if sample.extracted? && sample.policy_id == sample.originating_data_file&.policy_id
+          policy = sample.policy.deep_copy
+          policy.save
+          sample.update_column(:policy_id, policy.id)
+          putc('.')
+          affected_samples << sample
         end
       end
+      #won't have been queued, as the policy has no associated assets yet when saved
+      AuthLookupUpdateQueue.enqueue(affected_samples) if affected_samples.any?
     end
-    puts " ... finished creating independent policies of #{decoupled.to_s} extracted samples"
+    puts "..... finished creating independent policies of #{affected_samples.count} extracted samples"
   end
 
   task(decouple_extracted_samples_projects: [:environment]) do
-    puts '... copying project ids for extracted samples...'
+    puts '..... copying project ids for extracted samples...'
     decoupled = 0
     hash_array = []
     disable_authorization_checks do
@@ -150,6 +157,67 @@ namespace :seek do
       end
     end
     puts " ... finished updating sample_resource_links of #{samples_updated.to_s} samples with data_file attributes"
+  end
+
+  task(recognise_isa_json_compliant_items: [:environment]) do
+    puts '... searching for ISA compliant investigations'
+    investigations_updated = 0
+    disable_authorization_checks do
+      investigations_to_update = Study.joins(:investigation)
+                                      .where('investigations.is_isa_json_compliant = ?', false)
+                                      .select { |study| study.sample_types.any? }
+                                      .map(&:investigation)
+                                      .compact
+                                      .uniq
+
+      investigations_to_update.each do |inv|
+        inv.update_column(:is_isa_json_compliant, true)
+        investigations_updated += 1
+      end
+    end
+    puts "...Updated #{investigations_updated.to_s} investigations"
+  end
+
+  task(implement_assay_streams_for_isa_assays: [:environment]) do
+    puts '... Organising isa json compliant assays in assay streams'
+    assay_streams_created = 0
+    disable_authorization_checks do
+      # find assays linked to a study through their sample_types
+      # Should be isa json compliant
+      # Shouldn't already have an assay stream (don't update assays that have been updated already)
+      # Previous ST should be second ST of study
+      first_assays_in_stream = Assay.joins(:sample_type, study: :investigation)
+                                    .where(assay_stream_id: nil, investigation: { is_isa_json_compliant: true })
+                                    .select { |a| a.previous_linked_sample_type == a.study.sample_types.second }
+
+      first_assays_in_stream.map do |fas|
+        stream_name = "Assay Stream - #{UUID.generate}"
+        assay_stream = Assay.create(title: stream_name,
+                                    study_id: fas.study_id,
+                                    assay_class_id: AssayClass.assay_stream.id,
+                                    contributor: fas.contributor,
+                                    position: 0)
+
+        # Transfer extended metadata from first assay to newly created assay stream
+        unless fas.extended_metadata.nil?
+          em = ExtendedMetadata.find_by(item_id: fas.id)
+          em.update_column(:item_id, assay_stream.id)
+        end
+
+        assay_position = 1
+        current_assay = fas
+        while current_assay
+          current_assay.update_column(:position, assay_position)
+          current_assay.update_column(:assay_stream_id, assay_stream.id)
+
+          assay_position += 1
+          current_assay = current_assay.next_linked_child_assay
+        end
+        assay_streams_created += 1
+      end
+    end
+
+    puts "...Created #{assay_streams_created} new assay streams"
   end
 
   private

@@ -1,3 +1,5 @@
+<%# The study experiment overview table %>
+
 <% study ||= nil %>
 <% valid_study = study&.sample_types&.second %>
 
@@ -15,15 +17,15 @@
 <% if valid_study %>
     <script>
         var studyDynamicTable
-        let initialLoad = true;
+        let studyTableInitialLoad = true;
         $j(document).ready(function () {
             const dt = <%= sanitize(dt_aggregated(study, false).to_json) %>
             studyDynamicTable = new $j.dynamicTable('#study-table')
             const ajax = {
                 url: dynamicTableDataPath,
                 data: function(d) {
-                    if (initialLoad) {
-                        initialLoad = false;
+                    if (studyTableInitialLoad) {
+                        studyTableInitialLoad = false;
                         return;
                     }
                     d.study_id = '<%=study.id%>';

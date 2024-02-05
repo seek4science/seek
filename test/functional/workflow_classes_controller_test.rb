@@ -32,6 +32,40 @@ class WorkflowClassesControllerTest < ActionController::TestCase
                   workflow_class_avatar_path(user_added_3, user_added_3.avatar, size: '32x32'), count: 1
   end
 
+  test 'get index as json-ld' do
+    person = FactoryBot.create(:person)
+    disable_authorization_checks do
+      FactoryBot.create(:cwl_workflow_class)
+      FactoryBot.create(:galaxy_workflow_class)
+      FactoryBot.create(:nextflow_workflow_class)
+      WorkflowClass.create!(title: 'My Class', key: 'mine', contributor: person)
+    end
+
+    login_as(person)
+
+    get :index, format: :jsonld
+
+    assert_response :success
+    classes = JSON.parse(response.body)
+    assert_equal 4, classes.length
+
+    cwl = classes.detect { |c| c['@id'] == '#cwl' }
+    assert cwl
+    assert_equal 'Common Workflow Language', cwl['name']
+    assert_equal 'ComputerLanguage', cwl['@type']
+    assert_equal 'CWL', cwl['alternateName']
+    assert_equal({ '@id' => 'https://w3id.org/cwl/v1.0/' }, cwl['identifier'])
+    assert_equal({ '@id' =>'https://www.commonwl.org/' }, cwl['url'])
+
+    assert classes.detect { |c| c['@id'] == '#galaxy' }
+    assert classes.detect { |c| c['@id'] == '#nextflow' }
+
+    user_added = classes.detect { |c| c['@id'] == '#mine' }
+    assert_equal 'My Class', user_added['name']
+    refute user_added.key?('identifier')
+    refute user_added.key?('url')
+  end
+
   test 'admin can edit any workflow class' do
     person = FactoryBot.create(:person)
     core_type, c1, c2 = nil

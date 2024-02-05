@@ -52,7 +52,7 @@ class GitController < ApplicationController
   def raw
     if render_display?
       render_display(@blob)
-    elsif @blob.binary?
+    elsif @blob.binary? || @blob.is_image? # SVG is an image but not binary
       send_data(@blob.content, filename: path_param.split('/').last, disposition: 'inline')
     else
       # Set Content-Type if it's an image to allow use in img tags

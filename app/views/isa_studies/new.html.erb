@@ -2,8 +2,9 @@
   <%= button_link_to("New #{t('investigation')}", 'arrow_right', new_investigation_path) -%>
 <% else %>
   <span id='modal-dialogues'>
-    	<%= sample_controlled_vocab_model_dialog('cv-modal') %>
-	</span>
+      <%= sample_controlled_vocab_model_dialog('cv-modal') %>
+  </span>
+
   <h1>New <%=t('isa_study')%></h1>
 
   <%= render :partial => "templates/template_modal" -%>

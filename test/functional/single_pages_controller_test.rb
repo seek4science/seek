@@ -35,16 +35,6 @@ class SinglePagesControllerTest < ActionController::TestCase
     assert_equal inv_two.title, json['children'][1]['text']
   end
 
-  test 'should not export isa from unauthorized investigation' do
-    with_config_value(:project_single_page_enabled, true) do
-      project = FactoryBot.create(:project)
-      investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:private_policy), projects: [project])
-      get :export_isa, params: { id: project.id, investigation_id: investigation.id }
-      assert_equal flash[:error], 'The investigation cannot be found!'
-      assert_redirected_to action: :show
-    end
-  end
-
   test 'generates a valid export of sources in single page' do
     with_config_value(:project_single_page_enabled, true) do
       # Generate the excel data

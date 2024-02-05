@@ -23,8 +23,8 @@
     <%= button_link_to("View samples", 'view_samples', data_file_samples_path(asset)) %>
   <% end %>
 
-  <% if show_extract_samples_button?(asset, display_asset) %>
-      <%= button_link_to('Extract samples', 'extract_samples', extract_samples_data_file_path(@data_file), method: :post) %>
+  <% if attempt_to_show_extract_samples_button?(asset, display_asset) %>
+      <%= render partial: 'data_files/extract_samples_button' %>
   <% end %>
 
 <% end %>

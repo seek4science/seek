@@ -46,9 +46,11 @@ module Legacy
     private
 
     def legacy_ro_crate_params
-      params.require(:ro_crate).permit({ workflow: [:data, :data_url, :make_local_copy] },
+      l_params = params.require(:ro_crate).permit({ workflow: [:data, :data_url, :make_local_copy]},
                                        { abstract_cwl: [:data, :data_url, :make_local_copy] },
                                        { diagram: [:data, :data_url, :make_local_copy] })
+      l_params[:workflow][:project_ids] = params.dig(:workflow, :project_ids) || []
+      l_params
     end
 
     def legacy_set_workflow

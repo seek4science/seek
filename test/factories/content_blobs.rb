@@ -313,6 +313,12 @@ FactoryBot.define do
     content_type { 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }
     data { File.new("#{Rails.root}/test/fixtures/files/blank-master-template.xlsx", 'rb').read }
   end
+
+  factory(:spreadsheet_with_error_logs_content_blob, parent: :content_blob) do
+    original_filename { 'spreadsheet-with-poi-error-logs.xlsx' }
+    content_type { 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }
+    data { File.new("#{Rails.root}/test/fixtures/files/spreadsheet-with-poi-error-logs.xlsx", 'rb').read }
+  end
   
   factory(:blank_content_blob, class: ContentBlob) do
     url { nil }

@@ -70,7 +70,7 @@ class AssaysController < ApplicationController
     @permitted_params = assay_params if params[:assay]
 
     # jump straight to experimental if modelling analysis is disabled
-    @assay_class ||= 'experimental' unless Seek::Config.modelling_analysis_enabled
+    @assay_class ||= 'EXP' unless Seek::Config.modelling_analysis_enabled
 
     @assay.assay_class = AssayClass.for_type(@assay_class) unless @assay_class.nil?
 
@@ -82,7 +82,7 @@ class AssaysController < ApplicationController
   end
 
   def create
-    params[:assay_class_id] ||= AssayClass.for_type('experimental').id
+    params[:assay_class_id] ||= AssayClass.experimental.id
     @assay = Assay.new(assay_params)
 
     update_assay_organisms @assay, params
@@ -117,7 +117,7 @@ class AssaysController < ApplicationController
     return unless is_single_page_assay?
     return unless @assay.has_linked_child_assay?
 
-    previous_assay_linked_st_id = @assay.previous_linked_assay_sample_type&.id
+    previous_assay_linked_st_id = @assay.previous_linked_sample_type&.id
 
     next_assay = Assay.all.detect do |a|
       a.sample_type&.sample_attributes&.first&.linked_sample_type_id == @assay.sample_type_id

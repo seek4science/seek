@@ -1,6 +1,7 @@
 <h1>New <%= t('workflow') %><%= ' Version' if @workflow.persisted? %></h1>
 
 <%= form_tag(polymorphic_path(@workflow.persisted? ? [:create_version_from_git, @workflow] : [:create_from_git, :workflows])) do %>
+  <%= hidden_field_tag "workflow[project_ids][]",@workflow.project_ids %>
   <%= fields_for('workflow[git_version_attributes]', @workflow.git_version) do |f| %>
     <% if false %>
       <h2>Version Metadata</h2>

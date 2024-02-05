@@ -117,6 +117,62 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_includes project.funding_codes, 'bbb'
   end
 
+  test 'create, update and show a project with extended metadata' do
+    cmt = FactoryBot.create(:simple_project_extended_metadata_type)
+
+    person = FactoryBot.create(:admin)
+    login_as(person)
+
+    assert_difference('ActivityLog.count') do
+      assert_difference('Project.count') do
+            assert_difference('ExtendedMetadata.count') do
+              post :create, params: { project: { title: 'proj with extended metadata',
+                                               extended_metadata_attributes:{ extended_metadata_type_id: cmt.id,
+                                                                              data:{ 'age': 22,'name':'fred'}}}
+              }
+            end
+      end
+    end
+
+
+    project = assigns(:project)
+    cm = project.extended_metadata
+    assert_equal cmt, cm.extended_metadata_type
+    assert_equal 'fred',cm.get_attribute_value('name')
+    assert_equal 22,cm.get_attribute_value('age')
+    assert_nil cm.get_attribute_value('date')
+
+
+    get :show, params: { id: project }
+    assert_response :success
+
+    assert_select 'div.extended_metadata',text:/fred/, count:1
+    assert_select 'div.extended_metadata',text:/22/, count:1
+
+    # test update
+    old_id = cm.id
+    assert_no_difference('Project.count') do
+      assert_no_difference('ExtendedMetadata.count') do
+        put :update, params: { id: project.id, project: { title: "new title",
+                                                      extended_metadata_attributes: { extended_metadata_type_id: cmt.id, id: cm.id,
+                                                                                      data: {
+                                                                                        "age": 20,
+                                                                                        "name": 'max'
+                                                                                      } }
+        }
+        }
+      end
+    end
+
+
+    assert new_project = assigns(:project)
+    assert_equal 'new title', new_project.title
+    assert_equal 'max', new_project.extended_metadata.get_attribute_value('name')
+    assert_equal 20, new_project.extended_metadata.get_attribute_value('age')
+    assert_equal old_id, new_project.extended_metadata.id
+  end
+
+
   test 'can add and remove funding codes' do
     login_as(FactoryBot.create(:admin))
     project = FactoryBot.create(:project)
@@ -1963,14 +2019,19 @@ class ProjectsControllerTest < ActionController::TestCase
           institution: { id: [institution.id] }
       }
       assert_enqueued_emails(1) do
-        assert_difference('ProjectCreationMessageLog.count') do
-          post :request_create, params: params
+        assert_no_difference('Project.count') do
+          assert_no_difference('Institution.count') do
+            assert_difference('ProjectCreationMessageLog.count') do
+              post :request_create, params: params
+            end
+          end
         end
       end
 
       assert_response :success
       assert flash[:notice]
       log = ProjectCreationMessageLog.last
+      refute log.responded?
       details = log.parsed_details
       assert_equal institution.title, details.institution.title
       assert_equal institution.id, details.institution.id
@@ -1982,6 +2043,101 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'requesting site managed programme project with auto approval' do
+    with_config_value(:auto_activate_site_managed_projects, true) do
+      FactoryBot.create(:admin)
+      person = FactoryBot.create(:person_not_in_project)
+      programme = FactoryBot.create(:programme)
+
+      prog_admin = FactoryBot.create(:person)
+      prog_admin.is_programme_administrator = true, programme
+      prog_admin.save!
+      another_prog_admin = FactoryBot.create(:person)
+      another_prog_admin.is_programme_administrator = true, programme
+      another_prog_admin.save!
+      programme.reload
+      assert_equal 2, programme.programme_administrators.count
+
+      institution = FactoryBot.create(:institution)
+
+      refute programme.programme_administrators.select(&:is_admin?).any?
+      login_as(person)
+      with_config_value(:managed_programme_id, programme.id) do
+        params = {
+          programme_id: programme.id,
+          project: { title: 'The Project', description: 'description', web_page: 'https://example.com' },
+          institution: { id: [institution.id] }
+        }
+        assert_enqueued_emails(1) do
+          assert_difference('Project.count', 1) do
+            assert_no_difference('Institution.count') do
+              assert_no_difference('ProjectCreationMessageLog.count') do
+                post :request_create, params: params
+              end
+            end
+          end
+        end
+
+        project = Project.last
+
+        assert_redirected_to project_path(project)
+        assert flash[:notice]
+        gm = person.reload.group_memberships.last
+        assert_equal institution, gm.institution
+        assert_equal 'description', gm.project.description
+        assert_equal 'The Project', gm.project.title
+        assert_equal project, gm.project
+        assert_equal programme, gm.project.programme
+      end
+    end
+  end
+
+  test 'requesting site managed programme project with errors does not trigger emails or logs' do
+    with_config_value(:auto_activate_site_managed_projects, true) do
+      FactoryBot.create(:admin)
+      person = FactoryBot.create(:person_not_in_project)
+      programme = FactoryBot.create(:programme)
+
+      prog_admin = FactoryBot.create(:person)
+      prog_admin.is_programme_administrator = true, programme
+      prog_admin.save!
+      another_prog_admin = FactoryBot.create(:person)
+      another_prog_admin.is_programme_administrator = true, programme
+      another_prog_admin.save!
+      programme.reload
+      assert_equal 2, programme.programme_administrators.count
+
+      refute programme.programme_administrators.select(&:is_admin?).any?
+      login_as(person)
+      with_config_value(:managed_programme_id, programme.id) do
+        params = {
+          programme_id: programme.id,
+          project: { title: '', description: 'description', web_page: 'invalid' },
+          institution: { title: 'new inst', country: 'xyz' }
+        }
+        assert_no_enqueued_emails do
+          assert_no_difference('Project.count') do
+            assert_no_difference('Institution.count') do
+              assert_no_difference('ProjectCreationMessageLog.count') do
+                post :request_create, params: params
+              end
+            end
+          end
+        end
+
+        assert_response :unprocessable_entity
+        assert flash[:error].include?("Title can't be blank")
+        assert flash[:error].include?("Web page is not a valid URL")
+        assert flash[:error].include?("Country isn't a valid country or code")
+        assert_equal 'new inst', assigns(:institution).title
+        assert_equal 'description', assigns(:project).description
+        assert_equal '', assigns(:project).title
+        assert_equal 'invalid', assigns(:project).web_page
+        assert_equal programme.id, params[:programme_id]
+      end
+    end
+  end
+
   test 'request create project with own administered programme' do
     person = FactoryBot.create(:programme_administrator)
     programme = person.programmes.first
@@ -1990,7 +2146,7 @@ class ProjectsControllerTest < ActionController::TestCase
     with_config_value(:managed_programme_id, nil) do
       params = {
         programme_id: programme.id,
-        project: { title: 'The Project',description:'description',web_page:'web_page'},
+        project: { title: 'The Project',description:'description',web_page:'https://example.com'},
         institution: {id: [institution.id]}
       }
       assert_enqueued_emails(0) do
@@ -2088,6 +2244,101 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'request create project with new programme and institution with auto activation' do
+    with_config_value(:auto_activate_programmes, true) do
+      FactoryBot.create(:admin)
+      person = FactoryBot.create(:person_not_in_project)
+      managed_programme = FactoryBot.create(:programme)
+      assert Person.admins.count > 1
+      login_as(person)
+      with_config_value(:managed_programme_id, managed_programme.id) do
+        params = {
+          project: { title: 'The Project', description: 'description', web_page: 'https://example.com' },
+          institution: { id: ['the inst'], title: 'the inst', web_page: 'https://example.com/inst', city: 'London', country: 'GB' },
+          programme_id: '',
+          programme: { title: 'the prog' }
+        }
+        project = nil
+        assert_enqueued_emails(1) do
+          assert_difference('Programme.count', 1) do
+            assert_difference('Project.count', 1) do
+              assert_difference('Institution.count', 1) do
+                assert_no_difference('ProjectCreationMessageLog.count') do
+                  post :request_create, params: params
+
+                  project = Project.last
+                  assert_redirected_to project_path(project)
+                end
+              end
+            end
+          end
+        end
+
+        programme = Programme.last
+        institution = Institution.last
+
+        assert flash[:notice]
+        gm = person.reload.group_memberships.last
+        assert_equal 'description', gm.project.description
+        assert_equal 'The Project', gm.project.title
+        assert_equal project, gm.project
+
+        assert_equal programme, gm.project.programme
+        assert programme.is_activated?
+        assert_equal 'the prog', programme.title
+
+        assert_equal institution, gm.institution
+        assert_equal 'the inst', institution.title
+        assert_equal 'https://example.com/inst', institution.web_page
+        assert_equal 'London', institution.city
+        assert_equal 'GB', institution.country
+      end
+    end
+  end
+
+  test 'request create project with new programme and institution with auto activation and errors' do
+    with_config_value(:auto_activate_programmes, true) do
+      FactoryBot.create(:admin)
+      person = FactoryBot.create(:person_not_in_project)
+      existing_programme = FactoryBot.create(:programme, title: 'A Cool Programme')
+      managed_programme = FactoryBot.create(:programme)
+      assert Person.admins.count > 1
+      login_as(person)
+      with_config_value(:managed_programme_id, managed_programme.id) do
+        params = {
+          project: { title: '', description: 'description', web_page: 'https://example.com' },
+          institution: { id: ['the inst'], title: 'the inst', web_page: 'https://example.com/inst', city: 'London', country: 'XY' },
+          programme_id: '',
+          programme: { title: 'A Cool Programme' }
+        }
+        project = nil
+        assert_no_enqueued_emails do
+          assert_no_difference('Programme.count') do
+            assert_no_difference('Project.count') do
+              assert_no_difference('Institution.count') do
+                assert_no_difference('ProjectCreationMessageLog.count') do
+                  post :request_create, params: params
+
+                  assert_response :unprocessable_entity
+                end
+              end
+            end
+          end
+        end
+
+        assert flash[:error].include?("The Project is invalid, Title can't be blank")
+        assert flash[:error].include?("The Programme is invalid, Title has already been taken")
+        assert flash[:error].include?("The Institution is invalid, Country isn't a valid country or code")
+        assert_equal 'the inst', assigns(:institution).title
+        assert_equal 'https://example.com/inst', assigns(:institution).web_page
+        assert_equal 'description', assigns(:project).description
+        assert_equal '', assigns(:project).title
+        assert_equal 'https://example.com', assigns(:project).web_page
+        assert_equal 'A Cool Programme', assigns(:programme).title
+      end
+    end
+  end
+
   test 'request create project without programmes' do
     person = FactoryBot.create(:person_not_in_project)
 
@@ -2123,6 +2374,214 @@ class ProjectsControllerTest < ActionController::TestCase
       assert_nil  details.project.id
 
       assert_nil details.programme
+    end
+  end
+
+  test 'request import project with site managed programme' do
+    FactoryBot.create(:admin)
+    person = FactoryBot.create(:person_not_in_project)
+    programme = FactoryBot.create(:programme)
+
+    prog_admin = FactoryBot.create(:person)
+    prog_admin.is_programme_administrator = true, programme
+    prog_admin.save!
+    another_prog_admin = FactoryBot.create(:person)
+    another_prog_admin.is_programme_administrator = true, programme
+    another_prog_admin.save!
+    programme.reload
+    assert_equal 2, programme.programme_administrators.count
+
+    institution = FactoryBot.create(:institution)
+
+    refute programme.programme_administrators.select(&:is_admin?).any?
+    login_as(person)
+    with_config_value(:managed_programme_id, programme.id) do
+      params = {
+          programme_id: programme.id,
+          project: {dmp: fixture_file_upload('dmp.json', 'application/json')},
+          institution: { id: [institution.id] }
+      }
+      assert_enqueued_emails(1) do
+        assert_difference('ProjectImportationMessageLog.count') do
+          post :request_import, params: params
+        end
+      end
+
+      assert_response :success
+      assert flash[:notice]
+      log = ProjectImportationMessageLog.last
+      details = log.parsed_details
+      assert_equal institution.title, details.institution.title
+      assert_equal institution.id, details.institution.id
+      assert_equal institution.country, details.institution.country
+      assert_equal programme.title, details.programme.title
+      assert_equal programme.id, details.programme.id
+      assert_equal 'description', details.project.description
+      assert_equal 'The Project', details.project.title
+
+      assert_equal 2, details.people.length
+      assert details.people.any? { |p| p.first_name == 'Test' && p.last_name == 'User' && p.email == 'user@test.com' }
+      assert details.people.any? { |p| p.first_name == 'Another' && p.last_name == 'User' && p.email == 'user2@test.com' }
+    end
+  end
+
+  test 'request import project with own administered programme' do
+    person = FactoryBot.create(:programme_administrator)
+    programme = person.programmes.first
+    institution = FactoryBot.create(:institution)
+    login_as(person)
+    with_config_value(:managed_programme_id, nil) do
+      params = {
+        programme_id: programme.id,
+        project: {dmp: fixture_file_upload('dmp.json', 'application/json')},
+        institution: {id: [institution.id]}
+      }
+      assert_enqueued_emails(0) do
+        assert_difference('ProjectImportationMessageLog.count',1) do
+          post :request_import, params: params
+        end
+      end
+      log = ProjectImportationMessageLog.last
+      assert_redirected_to administer_import_project_request_projects_path(message_log_id:log.id)
+
+      details = log.parsed_details
+      assert_equal institution.title, details.institution.title
+      assert_equal institution.id, details.institution.id
+      assert_equal institution.country, details.institution.country
+      assert_equal programme.title, details.programme.title
+      assert_equal programme.id, details.programme.id
+
+      assert_equal 'description', details.project.description
+      assert_equal 'The Project', details.project.title
+
+      assert_equal 2, details.people.length
+      assert details.people.any? { |p| p.first_name == 'Test' && p.last_name == 'User' && p.email == 'user@test.com' }
+      assert details.people.any? { |p| p.first_name == 'Another' && p.last_name == 'User' && p.email == 'user2@test.com' }
+    end
+  end
+
+  test 'request import project as admin but no programme' do
+    person = FactoryBot.create(:admin)
+
+    institution = FactoryBot.create(:institution)
+    login_as(person)
+    with_config_value(:managed_programme_id, nil) do
+      params = {
+        project: {dmp: fixture_file_upload('dmp.json', 'application/json')},
+        institution: {id: [institution.id]}
+      }
+      assert_enqueued_emails(0) do
+        assert_difference('ProjectImportationMessageLog.count',1) do
+          with_config_value(:programmes_enabled, false) do
+            post :request_import, params: params
+          end
+        end
+      end
+      log = ProjectImportationMessageLog.last
+      assert_redirected_to administer_import_project_request_projects_path(message_log_id:log.id)
+
+      details = log.parsed_details
+      assert_equal institution.title, details.institution.title
+      assert_equal institution.id, details.institution.id
+      assert_equal institution.country, details.institution.country
+
+      assert_equal 'description', details.project.description
+      assert_equal 'The Project', details.project.title
+
+      assert_equal 2, details.people.length
+      assert details.people.any? { |p| p.first_name == 'Test' && p.last_name == 'User' && p.email == 'user@test.com' }
+      assert details.people.any? { |p| p.first_name == 'Another' && p.last_name == 'User' && p.email == 'user2@test.com' }
+    end
+  end
+
+  test 'request import project with new programme and institution' do
+    FactoryBot.create(:admin)
+    person = FactoryBot.create(:person_not_in_project)
+    programme = FactoryBot.create(:programme)
+    assert Person.admins.count > 1
+    login_as(person)
+    with_config_value(:managed_programme_id, programme.id) do
+      params = {
+        project: {dmp: fixture_file_upload('dmp.json', 'application/json')},
+          institution: {id: ['the inst'], title: 'the inst', web_page: 'the page', city: 'London', country: 'GB'},
+          programme_id: '',
+          programme: {title: 'the prog'}
+      }
+      assert_enqueued_emails(1) do
+        assert_difference('ProjectImportationMessageLog.count') do
+          assert_no_difference('Institution.count') do
+            assert_no_difference('Project.count') do
+              assert_no_difference('Programme.count') do
+                post :request_import, params: params
+              end
+            end
+          end
+        end
+      end
+
+      assert_response :success
+      assert flash[:notice]
+      log = ProjectImportationMessageLog.last
+      details = log.parsed_details
+
+      assert_equal 'GB',details.institution.country
+      assert_equal 'London',details.institution.city
+      assert_equal 'the page',details.institution.web_page
+      assert_equal 'the inst',details.institution.title
+      assert_nil details.institution.id
+
+      assert_equal 'description', details.project.description
+      assert_equal 'The Project', details.project.title
+      assert_nil  details.project.id
+
+      assert_equal 'the prog',details.programme.title
+      assert_nil details.programme.id
+
+      assert_equal 2, details.people.length
+      assert details.people.any? { |p| p.first_name == 'Test' && p.last_name == 'User' && p.email == 'user@test.com' }
+      assert details.people.any? { |p| p.first_name == 'Another' && p.last_name == 'User' && p.email == 'user2@test.com' }
+    end
+  end
+
+  test 'request import project without programmes' do
+    person = FactoryBot.create(:person_not_in_project)
+
+    login_as(person)
+    with_config_value(:programmes_enabled, false) do
+      params = {
+        project: {dmp: fixture_file_upload('dmp.json', 'application/json')},
+        institution: {id: ['the inst'], title:'the inst',web_page:'the page',city:'London',country:'GB'}
+      }
+      assert_enqueued_emails(1) do
+        assert_difference('ProjectImportationMessageLog.count') do
+          assert_no_difference('Institution.count') do
+            assert_no_difference('Project.count') do
+              post :request_import, params: params
+            end
+          end
+        end
+      end
+
+      assert_response :success
+      assert flash[:notice]
+      log = ProjectImportationMessageLog.last
+      details = log.parsed_details
+
+      assert_equal 'GB',details.institution.country
+      assert_equal 'London',details.institution.city
+      assert_equal 'the page',details.institution.web_page
+      assert_equal 'the inst',details.institution.title
+      assert_nil details.institution.id
+
+      assert_equal 'description', details.project.description
+      assert_equal 'The Project', details.project.title
+      assert_nil  details.project.id
+
+      assert_nil details.programme
+
+      assert_equal 2, details.people.length
+      assert details.people.any? { |p| p.first_name == 'Test' && p.last_name == 'User' && p.email == 'user@test.com' }
+      assert details.people.any? { |p| p.first_name == 'Another' && p.last_name == 'User' && p.email == 'user2@test.com' }
     end
   end
 
@@ -3201,6 +3660,770 @@ class ProjectsControllerTest < ActionController::TestCase
 
   end
 
+  test 'administer import request project with new programme and institution' do
+    person = FactoryBot.create(:admin)
+    login_as(person)
+    project = Project.new(title:'new project')
+    programme = Programme.new(title:'new programme')
+    institution = Institution.new(title:'my institution')
+    people = FactoryBot.create_list(:person, 3)
+    log = ProjectImportationMessageLog.log_request(sender:FactoryBot.create(:person), programme:programme, project:project, institution:institution, people:people)
+    get :administer_import_project_request, params:{message_log_id:log.id}
+    assert_response :success
+  end
+
+  test 'administer import project request, message log deleted' do
+    person = FactoryBot.create(:admin)
+    login_as(person)
+    id = (MessageLog.last&.id || 0) + 1
+    get :administer_import_project_request, params:{message_log_id:id}
+    assert_redirected_to :root
+    refute_nil flash[:error]
+    assert_match /deleted/i, flash[:error]
+  end
+
+  test 'administer import request project with institution already created' do
+    # when a new institution when requested, but it has then been created before the request is handled
+    person = FactoryBot.create(:admin)
+    login_as(person)
+    project = Project.new(title:'new project')
+    programme = Programme.new(title:'new programme')
+    institution = Institution.new(title:'my institution')
+    people = FactoryBot.create_list(:person, 3)
+    log = ProjectImportationMessageLog.log_request(sender:FactoryBot.create(:person), programme:programme, project:project, institution:institution, people:people)
+    created_inst = FactoryBot.create(:institution,title:'my institution')
+    get :administer_import_project_request, params:{message_log_id:log.id}
+    assert_response :success
+
+    assert_select 'input#institution_title', count: 0
+    assert_select 'input#institution_id', value: created_inst.id, count: 1
+  end
+
+  test 'admininister import request can be accessed by programme admin' do
+    person = FactoryBot.create(:programme_administrator)
+    login_as(person)
+    project = Project.new(title:'new project')
+    programme = person.programmes.first
+    institution = Institution.new(title:'my institution')
+    people = FactoryBot.create_list(:person, 3)
+    log = ProjectImportationMessageLog.log_request(sender:FactoryBot.create(:person), programme:programme, project:project, institution:institution, people:people)
+    get :administer_import_project_request, params:{message_log_id:log.id}
+    assert_response :success
+
+    another_person = FactoryBot.create(:programme_administrator)
+    login_as(another_person)
+    get :administer_import_project_request, params:{message_log_id:log.id}
+    assert_redirected_to :root
+    refute_nil flash[:error]
+  end
+
+  test 'admininister import request cannot be accessed by a different programme admin' do
+    person = FactoryBot.create(:programme_administrator)
+    another_person = FactoryBot.create(:programme_administrator)
+    login_as(another_person)
+
+    project = Project.new(title:'new project')
+    programme = person.programmes.first
+    institution = Institution.new(title:'my institution')
+    people = FactoryBot.create_list(:person, 3)
+    log = ProjectImportationMessageLog.log_request(sender:FactoryBot.create(:person), programme:programme, project:project, institution:institution, people:people)
+    get :administer_import_project_request, params:{message_log_id:log.id}
+
+    assert_redirected_to :root
+    refute_nil flash[:error]
+  end
+
+  test 'administer import request can be accessed by site admin for new programme' do
+    person = FactoryBot.create(:admin)
+    login_as(person)
+    project = Project.new(title:'new project')
+    programme = Programme.new(title:'new programme')
+    institution = Institution.new(title:'my institution')
+    people = FactoryBot.create_list(:person, 3)
+    log = ProjectImportationMessageLog.log_request(sender:FactoryBot.create(:person), programme:programme, project:project, institution:institution, people:people)
+    get :administer_import_project_request, params:{message_log_id:log.id}
+    assert_response :success
+  end
+
+  test 'administer import request cannot be accessed by none site admin for new programme' do
+    person = FactoryBot.create(:programme_administrator)
+    login_as(person)
+    project = Project.new(title:'new project')
+    programme = Programme.new(title:'new programme')
+    institution = Institution.new(title:'my institution')
+    people = FactoryBot.create_list(:person, 3)
+    log = ProjectImportationMessageLog.log_request(sender:FactoryBot.create(:person), programme:programme, project:project, institution:institution, people:people)
+    get :administer_import_project_request, params:{message_log_id:log.id}
+
+    assert_redirected_to :root
+    refute_nil flash[:error]
+  end
+
+  test 'respond import project request - new programme and institution' do
+    person = FactoryBot.create(:admin)
+    login_as(person)
+    project = Project.new(title:'new project',web_page:'my new project')
+    programme = Programme.new(title:'new programme')
+    institution = Institution.new({title:'institution', country:'DE'})
+    people = FactoryBot.create_list(:person, 3)
+    requester = FactoryBot.create(:person)
+    log = ProjectImportationMessageLog.log_request(sender:requester, programme:programme, project:project, institution:institution, people:people)
+    params = {
+        message_log_id:log.id,
+        accept_request: '1',
+        project:{
+            title:'new project updated',
+            web_page:'http://proj.org'
+        },
+        programme:{
+            title:'new programme updated'
+        },
+        institution:{
+            title:'new institution updated',
+            city:'Paris',
+            country:'FR'
+        },
+        people: people.map { |p| {first_name: p.first_name, last_name: p.last_name, email: p.email} }
+    }
+
+    assert_enqueued_emails(2) do
+      assert_difference('Programme.count') do
+        assert_difference('Project.count') do
+          assert_difference('Institution.count') do
+            assert_difference('GroupMembership.count', 4) do
+              assert_difference('WorkGroup.count') do
+                post :respond_import_project_request, params:params
+              end
+            end
+          end
+        end
+      end
+    end
+
+    project = Project.last
+    programme = Programme.last
+    institution = Institution.last
+    people = Person.last(3)
+    requester.reload
+
+    assert_redirected_to(project_path(project))
+    assert_equal "Request accepted and #{log.sender.name} added to Project and notified",flash[:notice]
+
+    assert_equal 'new project updated', project.title
+    assert_equal 'new programme updated', programme.title
+    assert_equal 'new institution updated', institution.title
+
+    assert_includes programme.projects,project
+    assert_includes project.people, requester
+    people.each { |p| assert_includes project.people, p }
+    assert_includes project.institutions, institution
+    assert_includes programme.programme_administrators, requester
+    assert_includes project.project_administrators, requester
+
+    assert_equal WorkGroup.last, requester.work_groups.last
+    assert_equal institution, requester.work_groups.last.institution
+    assert_equal project, requester.work_groups.last.project
+
+    log.reload
+    assert log.responded?
+    assert_equal 'Accepted',log.response
+
+  end
+
+  test 'respond import project request - new programme requires site admin' do
+    person = FactoryBot.create(:programme_administrator)
+    login_as(person)
+    project = Project.new(title:'new project',web_page:'my new project')
+    programme = Programme.new(title:'new programme')
+    institution = Institution.new({title:'institution', country:'DE'})
+    people = FactoryBot.create_list(:person, 3)
+    requester = FactoryBot.create(:person)
+    log = ProjectImportationMessageLog.log_request(sender:requester, programme:programme, project:project, institution:institution, people:people)
+    params = {
+        message_log_id:log.id,
+        accept_request: '1',
+        project:{
+            title:'new project updated',
+            web_page:'http://proj.org'
+        },
+        programme:{
+            title:'new programme updated'
+        },
+        institution:{
+            title:'new institution updated',
+            city:'Paris',
+            country:'FR'
+        },
+        people: people.map { |p| {first_name: p.first_name, last_name: p.last_name, email: p.email} }
+    }
+
+    assert_enqueued_emails(0) do
+      assert_no_difference('Programme.count') do
+        assert_no_difference('Project.count') do
+          assert_no_difference('Institution.count') do
+            assert_no_difference('GroupMembership.count') do
+              post :respond_import_project_request, params:params
+            end
+          end
+        end
+      end
+    end
+
+    assert_redirected_to :root
+    refute_nil flash[:error]
+
+    log.reload
+    refute log.responded?
+  end
+
+  test 'respond import project request - programme open for projects (disabled)' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    project = Project.new(title:'new project',web_page:'my new project')
+    programme = FactoryBot.create(:programme, open_for_projects: true)
+    institution = Institution.new({title:'institution', country:'DE'})
+    people = FactoryBot.create_list(:person, 3)
+    log = ProjectImportationMessageLog.log_request(sender: person, programme:programme, project:project, institution:institution, people:people)
+    params = {
+      message_log_id:log.id,
+      accept_request: '1',
+      project:{
+        title:'new project',
+        web_page:'http://proj.org'
+      },
+      programme:{
+        id: programme.id
+      },
+      institution:{
+        title:'new institution',
+        city:'Paris',
+        country:'FR'
+      },
+      people: people.map { |p| {first_name: p.first_name, last_name: p.last_name, email: p.email} }
+    }
+
+    assert_no_enqueued_emails do
+      assert_no_difference('Programme.count') do
+        assert_no_difference('Project.count') do
+          assert_no_difference('Institution.count') do
+            assert_no_difference('GroupMembership.count') do
+              assert_no_difference('WorkGroup.count') do
+                with_config_value(:programmes_open_for_projects_enabled, false) do
+                  post :respond_import_project_request, params:params
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+
+    assert_redirected_to :root
+    refute_nil flash[:error]
+
+    log.reload
+    refute log.responded?
+
+  end
+
+  test 'respond import project request - new programme and institution, project invalid' do
+    person = FactoryBot.create(:admin)
+    login_as(person)
+    project = Project.new(title:'new project',web_page:'my new project')
+    programme = Programme.new(title:'new programme')
+    institution = Institution.new({title:'institution', country:'DE'})
+    people = FactoryBot.create_list(:person, 3)
+    requester = FactoryBot.create(:person)
+    log = ProjectImportationMessageLog.log_request(sender:requester, programme:programme, project:project, institution:institution, people:people)
+    params = {
+        message_log_id:log.id,
+        accept_request: '1',
+        project:{
+            title:''
+        },
+        programme:{
+            title:'new programme updated'
+        },
+        institution:{
+            title:'new institution updated',
+            city:'Paris',
+            country:'FR'
+        },
+        people: people.map { |p| {first_name: p.first_name, last_name: p.last_name, email: p.email} }
+    }
+
+    assert_enqueued_emails(0) do
+      assert_no_difference('Programme.count') do
+        assert_no_difference('Project.count') do
+          assert_no_difference('Institution.count') do
+            assert_no_difference('GroupMembership.count') do
+              post :respond_import_project_request, params:params
+            end
+          end
+        end
+      end
+    end
+
+    assert_equal "The Project is invalid, Title can't be blank",flash[:error]
+
+    log.reload
+    refute log.responded?
+
+  end
+
+
+  test 'respond import project request - new programme and institution, programme and institution invalid' do
+    person = FactoryBot.create(:admin)
+    duplicate_institution=FactoryBot.create(:institution)
+    login_as(person)
+    project = Project.new(title:'new project',web_page:'my new project')
+    programme = Programme.new(title:'new programme')
+    institution = Institution.new({title:'institution', country:'DE'})
+    people = FactoryBot.create_list(:person, 3)
+    requester = FactoryBot.create(:person)
+    log = ProjectImportationMessageLog.log_request(sender:requester, programme:programme, project:project, institution:institution, people:people)
+    params = {
+        message_log_id:log.id,
+        accept_request: '1',
+        project:{
+            title:'a valid project'
+        },
+        programme:{
+            title:''
+        },
+        institution:{
+            title:duplicate_institution.title,
+            city:'Paris',
+            country:'FR'
+        },
+        people: people.map { |p| {first_name: p.first_name, last_name: p.last_name, email: p.email} }
+    }
+
+    assert_enqueued_emails(0) do
+      assert_no_difference('Programme.count') do
+        assert_no_difference('Project.count') do
+          assert_no_difference('Institution.count') do
+            assert_no_difference('GroupMembership.count') do
+              assert_no_difference('WorkGroup.count') do
+                post :respond_import_project_request, params:params
+              end
+            end
+          end
+        end
+      end
+    end
+
+    assert_equal "The Programme is invalid, Title can't be blank<br/>The Institution is invalid, Title has already been taken",flash[:error]
+
+    log.reload
+    refute log.responded?
+  end
+
+  test 'respond import project request - existing programme and institution' do
+    person = FactoryBot.create(:programme_administrator)
+    programme = person.programmes.first
+    institution = FactoryBot.create(:institution)
+    login_as(person)
+    project = Project.new(title:'new project',web_page:'my new project')
+    people = FactoryBot.create_list(:person, 3)
+    requester = FactoryBot.create(:person)
+    log = ProjectImportationMessageLog.log_request(sender:requester, programme:programme, project:project, institution:institution, people:people)
+    params = {
+        message_log_id:log.id,
+        accept_request: '1',
+        project:{
+            title:'new project',
+            web_page:'http://proj.org'
+        },
+        programme:{
+            id:programme.id
+        },
+        institution:{
+            id:institution.id
+        },
+        people: people.map { |p| {first_name: p.first_name, last_name: p.last_name, email: p.email} }
+    }
+
+    assert_enqueued_emails(2) do
+      assert_no_difference('Programme.count') do
+        assert_difference('Project.count') do
+          assert_no_difference('Institution.count') do
+            assert_difference('GroupMembership.count', 4) do
+              post :respond_import_project_request, params:params
+            end
+          end
+        end
+      end
+    end
+
+    project = Project.last
+    people = Person.last(3)
+    programme.reload
+
+    assert_redirected_to(project_path(project))
+    assert_equal "Request accepted and #{log.sender.name} added to Project and notified",flash[:notice]
+
+    assert_includes programme.projects,project
+    assert_includes project.people, requester
+    people.each { |p| assert_includes project.people, p }
+    assert_includes project.institutions, institution
+    refute_includes programme.programme_administrators, requester
+    assert_includes project.project_administrators, requester
+
+    log.reload
+    assert log.responded?
+    assert_equal 'Accepted',log.response
+
+  end
+
+  test 'respond import project request as the same user' do
+    person = FactoryBot.create(:programme_administrator)
+    programme = person.programmes.first
+    institution = FactoryBot.create(:institution)
+    login_as(person)
+    project = Project.new(title:'new project',web_page:'my new project')
+    people = FactoryBot.create_list(:person, 3)
+    requester = person
+    log = ProjectImportationMessageLog.log_request(sender:requester, programme:programme, project:project, institution:institution, people:people)
+    assert log.sent_by_self?
+    params = {
+      message_log_id:log.id,
+      accept_request: '1',
+      project:{
+        title:'new project',
+        web_page:'http://proj.org'
+      },
+      programme:{
+        id:programme.id
+      },
+      institution:{
+        id:institution.id
+      },
+      people: people.map { |p| {first_name: p.first_name, last_name: p.last_name, email: p.email} }
+    }
+
+    assert_enqueued_emails(0) do
+      assert_no_difference('Programme.count') do
+        assert_difference('Project.count') do
+          assert_no_difference('Institution.count') do
+            assert_difference('GroupMembership.count', 4) do
+              assert_difference('ProjectImportationMessageLog.count',-1) do
+                post :respond_import_project_request, params:params
+              end
+            end
+          end
+        end
+      end
+    end
+
+    project = Project.last
+    people = Person.last(3)
+    programme.reload
+
+    assert_redirected_to(project_path(project))
+    assert_equal "Project created",flash[:notice]
+
+    assert_includes programme.projects,project
+    assert_includes project.people, requester
+    people.each { |p| assert_includes project.people, p }
+    assert_includes project.institutions, institution
+    assert_includes project.project_administrators, requester
+
+  end
+
+  test 'respond import project request as the same user - cancel' do
+    person = FactoryBot.create(:programme_administrator)
+    programme = person.programmes.first
+    institution = FactoryBot.create(:institution)
+    login_as(person)
+    project = Project.new(title:'new project',web_page:'my new project')
+    people = FactoryBot.create_list(:person, 3)
+    requester = person
+    log = ProjectImportationMessageLog.log_request(sender:requester, programme:programme, project:project, institution:institution, people:people)
+    assert log.sent_by_self?
+    params = {
+      message_log_id:log.id,
+      project:{
+        title:'new project',
+        web_page:'http://proj.org'
+      },
+      programme:{
+        id:programme.id
+      },
+      institution:{
+        id:institution.id
+      },
+      people: people.map { |p| {first_name: p.first_name, last_name: p.last_name, email: p.email} }
+    }
+
+    assert_enqueued_emails(0) do
+      assert_no_difference('Programme.count') do
+        assert_no_difference('Project.count') do
+          assert_no_difference('Institution.count') do
+            assert_no_difference('GroupMembership.count') do
+              assert_difference('ProjectImportationMessageLog.count',-1) do
+                post :respond_import_project_request, params:params
+              end
+            end
+          end
+        end
+      end
+    end
+
+    assert_redirected_to :root
+    assert_equal "Project creation cancelled",flash[:notice]
+  end
+
+  test 'respond import project request - delete' do
+    person = FactoryBot.create(:programme_administrator)
+    programme = person.programmes.first
+    institution = FactoryBot.create(:institution)
+    login_as(person)
+    project = Project.new(title: 'new project', web_page: 'my new project')
+    people = FactoryBot.create_list(:person, 3)
+    requester = FactoryBot.create(:person)
+    log = ProjectImportationMessageLog.log_request(sender: requester, programme: programme, project: project, institution: institution, people: people)
+    refute log.sent_by_self?
+    params = {
+      message_log_id:log.id,
+      project:{
+        title:'new project',
+        web_page:'http://proj.org'
+      },
+      programme:{
+        id:programme.id
+      },
+      institution:{
+        id:institution.id
+      },
+      people: people.map { |p| {first_name: p.first_name, last_name: p.last_name, email: p.email} },
+      delete_request: '1'
+    }
+
+    assert_enqueued_emails(0) do
+      assert_no_difference('Programme.count') do
+        assert_no_difference('Project.count') do
+          assert_no_difference('Institution.count') do
+            assert_no_difference('GroupMembership.count') do
+              assert_difference('ProjectImportationMessageLog.count',-1) do
+                post :respond_import_project_request, params:params
+              end
+            end
+          end
+        end
+      end
+    end
+
+    assert_redirected_to :root
+    assert_equal "Project creation cancelled",flash[:notice]
+  end
+
+  test 'respond import project request - cannot delete without rights' do
+    person = FactoryBot.create(:person)
+    programme = FactoryBot.create(:programme)
+    institution = FactoryBot.create(:institution)
+    login_as(person)
+    project = Project.new(title: 'new project', web_page: 'my new project')
+    people = FactoryBot.create_list(:person, 3)
+    requester = FactoryBot.create(:person)
+    log = ProjectImportationMessageLog.log_request(sender: requester, programme: programme, project: project, institution: institution, people: people)
+    refute log.sent_by_self?
+    refute programme.can_manage?
+    params = {
+      message_log_id:log.id,
+      project:{
+        title:'new project',
+        web_page:'http://proj.org'
+      },
+      programme:{
+        id:programme.id
+      },
+      institution:{
+        id:institution.id
+      },
+      people: people.map { |p| {first_name: p.first_name, last_name: p.last_name, email: p.email} },
+      delete_request: '1'
+    }
+
+    assert_enqueued_emails(0) do
+      assert_no_difference('Programme.count') do
+        assert_no_difference('Project.count') do
+          assert_no_difference('Institution.count') do
+            assert_no_difference('GroupMembership.count') do
+              assert_no_difference('ProjectCreationMessageLog.count') do
+                post :respond_import_project_request, params:params
+              end
+            end
+          end
+        end
+      end
+    end
+
+    assert_redirected_to :root
+    refute_nil flash[:error]
+  end
+
+  test 'respond import project request - existing programme need prog admin rights' do
+    person = FactoryBot.create(:programme_administrator)
+    another_admin = FactoryBot.create(:programme_administrator)
+    programme = person.programmes.first
+    institution = FactoryBot.create(:institution)
+    login_as(another_admin)
+    project = Project.new(title:'new project',web_page:'my new project')
+    people = FactoryBot.create_list(:person, 3)
+    requester = FactoryBot.create(:person)
+    log = ProjectImportationMessageLog.log_request(sender:requester, programme:programme, project:project, institution:institution, people:people)
+    params = {
+        message_log_id:log.id,
+        accept_request: '1',
+        project:{
+            title:'new project',
+            web_page:'http://proj.org'
+        },
+        programme:{
+            id:programme.id
+        },
+        institution:{
+            id:institution.id
+        },
+        people: people.map { |p| {first_name: p.first_name, last_name: p.last_name, email: p.email} }
+    }
+
+    assert_enqueued_emails(0) do
+      assert_no_difference('Programme.count') do
+        assert_no_difference('Project.count') do
+          assert_no_difference('Institution.count') do
+            assert_no_difference('GroupMembership.count') do
+              post :respond_import_project_request, params:params
+            end
+          end
+        end
+      end
+    end
+
+    assert_redirected_to :root
+    refute_nil flash[:error]
+
+    log.reload
+    refute log.responded?
+
+
+  end
+
+  test 'respond import project request - rejected' do
+    person = FactoryBot.create(:programme_administrator)
+    programme = person.programmes.first
+    institution = FactoryBot.create(:institution)
+    login_as(person)
+    project = Project.new(title:'new project',web_page:'my new project')
+    people = FactoryBot.create_list(:person, 3)
+    requester = FactoryBot.create(:person)
+    log = ProjectImportationMessageLog.log_request(sender:requester, programme:programme, project:project, institution:institution, people:people)
+    params = {
+        message_log_id:log.id,
+        reject_details:'not very good',
+        project:{
+            title:'new project',
+            web_page:'http://proj.org'
+        },
+        programme:{
+            id:programme.id
+        },
+        institution:{
+            id:institution.id
+        },
+        people: people.map { |p| {first_name: p.first_name, last_name: p.last_name, email: p.email} }
+    }
+
+    assert_enqueued_emails(2) do
+      assert_no_difference('Programme.count') do
+        assert_no_difference('Project.count') do
+          assert_no_difference('Institution.count') do
+            assert_no_difference('GroupMembership.count') do
+              post :respond_import_project_request, params:params
+            end
+          end
+        end
+      end
+    end
+
+    assert_redirected_to(root_path)
+    assert_equal "Request rejected and #{log.sender.name} has been notified",flash[:notice]
+
+    refute_includes programme.programme_administrators, requester
+
+    log.reload
+    assert log.responded?
+    assert_equal 'not very good',log.response
+
+  end
+
+  test 'respond import project request - programmes disabled' do
+    person = FactoryBot.create(:admin)
+    login_as(person)
+    project = Project.new(title:'new project',web_page:'my new project')
+    institution = Institution.new({title:'institution', country:'DE'})
+    people = FactoryBot.create_list(:person, 3)
+    requester = FactoryBot.create(:person)
+    log = ProjectImportationMessageLog.log_request(sender:requester, project:project, institution:institution, people:people)
+    params = {
+      message_log_id:log.id,
+      accept_request: '1',
+      project:{
+        title:'new project updated',
+        web_page:'http://proj.org'
+      },
+      institution:{
+        title:'new institution updated',
+        city:'Paris',
+        country:'FR'
+      },
+      people: people.map { |p| {first_name: p.first_name, last_name: p.last_name, email: p.email} }
+    }
+
+    assert_enqueued_emails(2) do
+      assert_no_difference('Programme.count') do
+        assert_difference('Project.count') do
+          assert_difference('Institution.count') do
+            assert_difference('GroupMembership.count', 4) do
+              assert_difference('WorkGroup.count') do
+                with_config_value(:programmes_enabled, false) do
+                  post :respond_import_project_request, params:params
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+
+    project = Project.last
+    institution = Institution.last
+    people = Person.last(3)
+    requester.reload
+
+    assert_redirected_to(project_path(project))
+    assert_equal "Request accepted and #{log.sender.name} added to Project and notified",flash[:notice]
+
+    assert_equal 'new project updated', project.title
+    assert_nil project.programme
+    assert_equal 'new institution updated', institution.title
+
+    assert_includes project.people, requester
+    people.each { |p| assert_includes project.people, p }
+    assert_includes project.institutions, institution
+    assert_includes project.project_administrators, requester
+
+    assert_equal WorkGroup.last, requester.work_groups.last
+    assert_equal institution, requester.work_groups.last.institution
+    assert_equal project, requester.work_groups.last.project
+
+    log.reload
+    assert log.responded?
+    assert_equal 'Accepted',log.response
+
+  end
+
   test 'project join request' do
     person1 = FactoryBot.create(:project_administrator)
     person2 = FactoryBot.create(:project_administrator)
@@ -3323,6 +4546,74 @@ class ProjectsControllerTest < ActionController::TestCase
       assert_select "a[href=?]", person_path(person), text: person.title, count: 0
       assert_select "a[href=?]", administer_create_project_request_projects_path(message_log_id: log_new_programme.id), count: 0
       assert_select "a[href=?]", administer_create_project_request_projects_path(message_log_id: log_existing_programme.id), count: 0
+    end
+  end
+
+  test "project importation requests" do
+    admin = FactoryBot.create(:admin)
+    prog_admin = FactoryBot.create(:programme_administrator)
+    programme = prog_admin.programmes.first
+    person = FactoryBot.create(:person)
+    institution = FactoryBot.create(:institution)
+    project = Project.new(title: "new")
+    people = FactoryBot.create_list(:person, 3)
+
+    log_existing_programme = ProjectImportationMessageLog.log_request(sender:person, programme:programme, project:project, institution:institution, people:people)
+    log_new_programme = ProjectImportationMessageLog.log_request(sender:person, programme:Programme.new(title: "new"), project:project, institution:institution, people:people)
+
+    # no user
+    logout
+    get :project_importation_requests
+    assert_redirected_to :login
+    refute_nil flash[:error]
+
+    login_as(prog_admin)
+    get :project_importation_requests
+    assert_response :success
+
+    assert_select "h1", text: /1 pending project importation/i
+    assert_select "table#project-import-requests" do
+      assert_select "tbody tr", count: 1
+      assert_select "a[href=?]", person_path(person), text: person.title
+      assert_select "a[href=?]", administer_import_project_request_projects_path(message_log_id: log_existing_programme.id)
+      assert_select "a[href=?]", administer_import_project_request_projects_path(message_log_id: log_new_programme.id), count: 0
+    end
+
+    login_as(admin)
+    get :project_importation_requests
+    assert_response :success
+
+    assert_select "h1", text: /1 pending project importation/i
+    assert_select "table#project-import-requests" do
+      assert_select "tbody tr", count: 1
+      assert_select "a[href=?]", person_path(person), text: person.title
+      assert_select "a[href=?]", administer_import_project_request_projects_path(message_log_id: log_new_programme.id)
+      assert_select "a[href=?]", administer_import_project_request_projects_path(message_log_id: log_existing_programme.id), count: 0
+    end
+
+    with_config_value(:managed_programme_id, programme.id) do
+      get :project_importation_requests
+      assert_response :success
+
+      assert_select "h1", text: /2 pending project importation/i
+      assert_select "table#project-import-requests" do
+        assert_select "tbody tr", count: 2
+        assert_select "a[href=?]", person_path(person), text: person.title, count: 2
+        assert_select "a[href=?]", administer_import_project_request_projects_path(message_log_id: log_new_programme.id)
+        assert_select "a[href=?]", administer_import_project_request_projects_path(message_log_id: log_existing_programme.id)
+      end
+    end
+
+    login_as(person)
+    get :project_importation_requests
+    assert_response :success
+
+    assert_select "h1", text: /0 pending project importation/i
+    assert_select "table#project-import-requests" do
+      assert_select "tbody tr", count: 0
+      assert_select "a[href=?]", person_path(person), text: person.title, count: 0
+      assert_select "a[href=?]", administer_import_project_request_projects_path(message_log_id: log_new_programme.id), count: 0
+      assert_select "a[href=?]", administer_import_project_request_projects_path(message_log_id: log_existing_programme.id), count: 0
     end
   end
 
@@ -3623,7 +4914,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
     put :update, params: { id: project.id, project: { topic_annotations: ['Chemistry', 'Sample collections'] } }
 
-    assert_equal ['http://edamontology.org/topic_3314','http://edamontology.org/topic_3277'], assigns(:project).topic_annotations
+    assert_equal ['http://edamontology.org/topic_3314','http://edamontology.org/topic_3277'].sort, assigns(:project).topic_annotations.sort
 
   end
 
@@ -3663,33 +4954,72 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_select 'a.btn[disabled=disabled]', text: 'Request membership', count: 1
   end
 
+  test 'should not show add new button to admin unless active member' do
+    admin = FactoryBot.create(:admin)
+    project = FactoryBot.create(:project)
+    refute project.has_member?(admin)
+    login_as(admin)
+    assert project.can_edit?
+    get :show, params: { id: project.id }
+    assert_response :success
+    assert_select '#buttons' do
+      assert_select 'div[type=button]', text: /Add new/, count: 0
+    end
+  end
+
+  test 'should show list of directly linkable assets in add new button to active members' do
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+    login_as(person)
+    assert project.has_member?(person)
+    assert project.can_edit?
+    get :show, params: { id: project.id }
+    assert_response :success
+    params = { project_ids: [project.id] }
+    directly_linked_types = [
+      Investigation,
+      Collection,
+      DataFile,
+      Document,
+      Event,
+      FileTemplate,
+      Model,
+      Placeholder,
+      Presentation,
+      Publication,
+      Sample,
+      SampleType,
+      Sop,
+      Strain,
+      Template,
+      Workflow,
+    ]
+    assert_select '#buttons' do
+      assert_select 'div[type=button]', text: /Add new/
+      for type in directly_linked_types
+        assert_select 'a[href=?]', Seek::Util.routes.polymorphic_path(type, action: :new, "#{type.name.underscore}": params)
+      end
+    end
+  end
+
   private
 
   def check_project(project)
-    assert project.investigations.size == 2
-    check_investigation_0(project.investigations[0])
-    check_investigation_1(project.investigations[1])
-  end
+    assert_equal 2, project.investigations.count
 
-  def check_investigation_0(investigation)
-    assert investigation.title == "Select host and product"
-    assert investigation.studies.size == 4
-  end
+    investigation1 = project.investigations.detect { |i| i.title == 'Select host and product' }
+    assert investigation1
+    assert 4, investigation1.studies.count
 
-  def check_investigation_1(investigation)
-    assert investigation.title == "Design"
-    assert investigation.studies.size == 1
-    check_study_1_0(investigation.studies[0])
-  end
+    investigation2 = project.investigations.detect { |i| i.title == 'Design' }
+    assert investigation2
+    assert 1, investigation2.studies.count
 
-  def check_study_1_0(study)
+    study = investigation2.studies.first
     assert study.title == "Receive input from select host and products step"
-    assert study.assays.size == 2
-    check_assay_1_0_1(study.assays[1])
-  end
+    assert_equal 2, study.assays.count
 
-  def check_assay_1_0_1(assay)
-    assert assay.title == "Obtain SBML models for production hosts"
+    assert study.assays.detect { |a| a.title == 'Obtain SBML models for production hosts' }
   end
 
   def valid_project

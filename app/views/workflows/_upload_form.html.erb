@@ -25,6 +25,7 @@
     <div class="tab-content">
       <div id="new-ro-crate" role="tabpanel" class="tab-pane active">
         <%= form_tag({ action: :create_from_files, anchor: 'new-ro-crate' }, multipart: true) do -%>
+          <%= forward_params(:workflow) %>
           <%= error_messages_for :workflow -%>
           <%= error_messages_for :crate_builder, header_message: "Could not build Workflow RO-Crate" -%>
 
@@ -90,6 +91,7 @@
 
       <div id="git-repo" role="tabpanel" class="tab-pane">
         <%= form_tag({ action: :create_from_git, anchor: 'git-repo' }) do -%>
+          <%= forward_params(:workflow) %>
           <%= error_messages_for :workflow -%>
 
           <%= panel do %>
@@ -109,6 +111,7 @@
 
       <div id="existing-ro-crate" role="tabpanel" class="tab-pane">
         <%= form_tag({ action: :create_from_ro_crate, anchor: 'existing-ro-crate' }, multipart: true) do -%>
+          <%= forward_params(:workflow) %>
           <%= error_messages_for :workflow -%>
           <%= error_messages_for :crate_extractor -%>
 

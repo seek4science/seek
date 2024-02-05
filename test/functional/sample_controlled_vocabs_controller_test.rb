@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class SampleControlledVocabsControllerTest < ActionController::TestCase
+
   include AuthenticatedTestHelper
 
   test 'show' do
@@ -241,9 +242,9 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select 'table#new-terms' do
-      assert_select 'tr.sample-cv-term input[type=text]', count:cv.sample_controlled_vocab_terms.length * 3 do |input|
-        assert input.attr('readonly').present?
-      end
+      # 3 hidden fields for each field, and an extra one for the remove button default
+      assert_select 'tr.sample-cv-term input[type=hidden]', count:cv.sample_controlled_vocab_terms.length * 4
+      assert_select 'div.disabled-cv-field', count: cv.sample_controlled_vocab_terms.length * 3
     end
 
   end
@@ -267,53 +268,62 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'fetch ols terms with root term included' do
-    person = FactoryBot.create(:person)
-    login_as(person)
-    VCR.use_cassette('ols/fetch_obo_plant_cell_papilla') do
-      get :fetch_ols_terms, params: { source_ontology_id: 'go',
-                                      root_uri: 'http://purl.obolibrary.org/obo/GO_0090395',
-                                      include_root_term: '1' }, format: :json
-
-      assert_response :success
-      res = JSON.parse(response.body)
-      assert_equal 4, res.length
-      iris = res.map { |term| term['iri'] }
-      assert_includes iris, 'http://purl.obolibrary.org/obo/GO_0090395'
-      assert_includes iris, 'http://purl.obolibrary.org/obo/GO_0090396'
-      assert_includes iris, 'http://purl.obolibrary.org/obo/GO_0090397'
-    end
-  end
-
-  test 'fetch ols terms without root term included' do
-    person = FactoryBot.create(:person)
-    login_as(person)
-    VCR.use_cassette('ols/fetch_obo_plant_cell_papilla') do
-      get :fetch_ols_terms, params: { source_ontology_id: 'go',
-                                      root_uri: 'http://purl.obolibrary.org/obo/GO_0090395' }, format: :json
-
-      assert_response :success
-      res = JSON.parse(response.body)
-      assert_equal 3, res.length
-      iris = res.map { |term| term['iri'] }
-      refute_includes iris, 'http://purl.obolibrary.org/obo/GO_0090395'
-      assert_includes iris, 'http://purl.obolibrary.org/obo/GO_0090396'
-      assert_includes iris, 'http://purl.obolibrary.org/obo/GO_0090397'
-    end
-  end
-
-  test 'fetch ols terms with wrong URI' do
+  test 'fetch ols terms as HTML with wrong URI' do
     person = FactoryBot.create(:person)
     login_as(person)
     VCR.use_cassette('ols/fetch_obo_bad_term') do
-      get :fetch_ols_terms, params: { source_ontology_id: 'go',
+      get :fetch_ols_terms_html, params: { source_ontology_id: 'go',
                                       root_uri: 'http://purl.obolibrary.org/obo/banana',
-                                      include_root_term: '1' }, format: :json
+                                      include_root_term: '1' }
 
       assert_response :unprocessable_entity
-      res = JSON.parse(response.body)
-      assert_equal '404 Not Found', res.dig('errors', 0, 'details')
+      assert_equal '404 Not Found', response.body
     end
+  end
+
+  test 'fetch ols terms as HTML with root term included' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    VCR.use_cassette('ols/fetch_obo_plant_cell_papilla') do
+      get :fetch_ols_terms_html, params: { source_ontology_id: 'go',
+                                           root_uri: 'http://purl.obolibrary.org/obo/GO_0090395',
+                                           include_root_term: '1' }
+    end
+
+    assert_response :success
+    assert_select 'tr.sample-cv-term', count: 4
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_0_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090395'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_0_parent_iri:not([value])'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_0_label[value=?]','plant cell papilla'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_1_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090397'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_1_parent_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090395'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_1_label[value=?]','stigma papilla'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_2_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090396'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_2_parent_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090395'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_2_label[value=?]','leaf papilla'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_3_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090705'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_3_parent_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090395'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_3_label[value=?]','trichome papilla'
+  end
+
+  test 'fetch ols terms as HTML without root term included' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    VCR.use_cassette('ols/fetch_obo_plant_cell_papilla') do
+      get :fetch_ols_terms_html, params: { source_ontology_id: 'go',
+                                      root_uri: 'http://purl.obolibrary.org/obo/GO_0090395' }
+    end
+    assert_response :success
+    assert_select 'tr.sample-cv-term', count: 3
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_0_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090397'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_0_parent_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090395'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_0_label[value=?]','stigma papilla'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_1_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090396'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_1_parent_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090395'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_1_label[value=?]','leaf papilla'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_2_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090705'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_2_parent_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090395'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_2_label[value=?]','trichome papilla'
   end
 
   test 'can access typeahead with samples disabled' do
