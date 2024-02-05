@@ -75,11 +75,29 @@ module Seek
         end
       end
 
+      def allow_isa_tag_change?(attr)
+        if attr.is_a?(SampleAttribute)
+            return false if inherrited?(attr)
+
+            attr = attr.accessor_name
+        end
+
+        if attr
+          all_blank?(attr)
+        else
+          true
+        end
+      end
+
       def refresh_cache
         do_analysis
       end
 
       private
+
+      def inherrited?(attr)
+        attr&.template_attribute_id?
+      end
 
       def blanks?(attr)
         !analysis_hash.key?(attr.to_sym) || analysis_hash[attr.to_sym][:has_blanks]

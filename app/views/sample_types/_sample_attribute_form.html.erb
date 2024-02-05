@@ -119,7 +119,9 @@
     <td>
       <%= select_tag "#{field_name_prefix}[isa_tag_title]",
                       options_for_select(isa_tags_options, isa_tag_id),
-                      include_blank: true, class: 'form-control', data: {attr: "isa_tag_title"} %>
+                      include_blank: true, class: 'form-control',
+                      data: {attr: "isa_tag_title"},
+                      disabled: !allow_isa_tag_change %>
     </td>
   <% end %>
 
@@ -136,7 +138,7 @@
   <td>
     <% if allow_attribute_removal %>
       <%= hidden_field_tag "#{field_name_prefix}[isa_tag_id]", (display_isa_tag ? isa_tag_id : nil), data: { attr: "isa_tag_id" }  %>
-      <%= hidden_field_tag "#{field_name_prefix}[template_attribute_id]", template_attribute_id, data: { attr: "template_attribute_id" }  %>
+      <%= hidden_field_tag "#{field_name_prefix}[template_attribute_id]", template_attribute_id, data: { attr: "template_attribute_id" } %>
       <%= hidden_field_tag "#{field_name_prefix}[_destroy]", '0', autocomplete: 'off' %>
       <div class="btn-group" data-toggle="buttons">
         <label class="btn btn-danger">
