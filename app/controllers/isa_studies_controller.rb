@@ -119,6 +119,7 @@ class IsaStudiesController < ApplicationController
                                         sample_attribute_type_id isa_tag_id
                                         sample_controlled_vocab_id
                                         linked_sample_type_id
+                                        template_attribute_id
                                         description pid
                                         allow_cv_free_text
                                         unit_id _destroy] }, { assay_ids: [] }]
