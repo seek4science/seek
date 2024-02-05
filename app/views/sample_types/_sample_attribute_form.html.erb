@@ -28,6 +28,8 @@
 <% display_isa_tag ||= false %>
 <% isa_tag_id = sample_attribute&.isa_tag_id %>
 <% isa_tag_title = sample_attribute&.isa_tag&.title %>
+<% template_attribute_id = sample_attribute&.template_attribute_id %>
+<% allow_isa_tag_change = constraints.allow_isa_tag_change?(sample_attribute) %>
 
 <tr class="sample-attribute <%= 'success' if sample_attribute.nil? -%><%='hidden' if hide_seek_sample_multi -%>" data-index="<%= index-%>">
   <th scope="row" class="attribute-position">
@@ -134,6 +136,7 @@
   <td>
     <% if allow_attribute_removal %>
       <%= hidden_field_tag "#{field_name_prefix}[isa_tag_id]", (display_isa_tag ? isa_tag_id : nil), data: { attr: "isa_tag_id" }  %>
+      <%= hidden_field_tag "#{field_name_prefix}[template_attribute_id]", template_attribute_id, data: { attr: "template_attribute_id" }  %>
       <%= hidden_field_tag "#{field_name_prefix}[_destroy]", '0', autocomplete: 'off' %>
       <div class="btn-group" data-toggle="buttons">
         <label class="btn btn-danger">
