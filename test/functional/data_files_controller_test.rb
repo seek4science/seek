@@ -608,7 +608,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
   end
 
-  test 'show explore button' do
+  test 'show explore button and magnify icon' do
     df = FactoryBot.create(:small_test_spreadsheet_datafile)
     login_as(df.contributor.user)
     get :show, params: { id: df }
@@ -617,9 +617,12 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_select 'a[href=?]', explore_data_file_path(df, version: df.version), count: 1
       assert_select 'a.disabled', text: 'Explore', count: 0
     end
+    assert_select 'div.fileinfo span.filename' do
+      assert_select 'a[href=?][title=?]', explore_data_file_path(df, version: df.version), 'Explore the contents of this file', count: 1
+    end
   end
 
-  test 'show explore button for csv file' do
+  test 'show explore button  and magnify icon for csv file' do
     df = FactoryBot.create(:csv_spreadsheet_datafile)
     login_as(df.contributor.user)
     get :show, params: { id: df }
@@ -627,6 +630,9 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select '#buttons' do
       assert_select 'a[href=?]', explore_data_file_path(df, version: df.version), count: 1
       assert_select 'a.disabled', text: 'Explore', count: 0
+    end
+    assert_select 'div.fileinfo span.filename' do
+      assert_select 'a[href=?][title=?]', explore_data_file_path(df, version: df.version), 'Explore the contents of this file', count: 1
     end
   end
 
@@ -642,9 +648,12 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_select 'a[href=?]', explore_data_file_path(df, version: df.version), count: 0
       assert_select 'a', text: 'Explore', count: 0
     end
+    assert_select 'div.fileinfo span.filename' do
+      assert_select 'a[href=?][title=?]', explore_data_file_path(df, version: df.version), 'Explore the contents of this file', count: 0
+    end
   end
 
-  test 'show disabled explore button if spreadsheet too big' do
+  test 'show disabled explore button and magnify icon if spreadsheet too big' do
     df = FactoryBot.create(:small_test_spreadsheet_datafile)
     login_as(df.contributor.user)
     with_config_value(:max_extractable_spreadsheet_size, 0) do
@@ -654,6 +663,10 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select '#buttons' do
       assert_select 'a[href=?]', explore_data_file_path(df, version: df.version), count: 0
       assert_select 'a.disabled', text: 'Explore', count: 1
+    end
+    assert_select 'div.fileinfo span.filename' do
+      assert_select 'a[href=?][title=?]', explore_data_file_path(df, version: df.version), 'Explore the contents of this file', count: 0
+      assert_select 'span > a.disabled > img', count: 1
     end
   end
 
