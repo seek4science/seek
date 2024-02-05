@@ -3,10 +3,10 @@ require 'test_helper'
 class OntologySynchronizationTest < ActiveSupport::TestCase
 
   def setup
-    unless AssayClass.for_type('modelling')
+    unless AssayClass.modelling
       FactoryBot.create(:modelling_assay_class)
     end
-    unless AssayClass.for_type('experimental')
+    unless AssayClass.experimental
       FactoryBot.create(:experimental_assay_class)
     end
   end

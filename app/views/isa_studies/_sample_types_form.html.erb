@@ -5,9 +5,6 @@
 <% main_field_name = id_suffix[1..-1] %>
 <% isa_element ||= "study" %>
 
-<span id='modal-dialogues'>
-    <%= sample_controlled_vocab_model_dialog('cv-modal') %>
-</span>
 <%=  f.fields_for main_field_name, sample_type do |field| %>
 
 	<% unless action == :edit %>
@@ -80,7 +77,7 @@
 <script>
     //used to hold the element Id that needs updating after creating a new CV
     $j(document).ready(function () {
-        SampleTypeControlledVocab.blankControlledVocabModelForm=$j('#cv-modal').clone();
+        SampleTypeControlledVocab.copyBlankModalForm();
         SampleTypeControlledVocab.resetModalControlledVocabForm();
         // Make rows sortable
         SampleTypes.bindSortable("#<%=attribute_table_id%>");

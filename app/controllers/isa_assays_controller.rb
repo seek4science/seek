@@ -6,14 +6,18 @@ class IsaAssaysController < ApplicationController
   before_action :find_requested_item, only: %i[edit update]
 
   def new
-    @isa_assay = IsaAssay.new
+    if params[:is_assay_stream]
+      @isa_assay = IsaAssay.new({ assay: { assay_class_id: AssayClass.assay_stream.id } })
+    else
+      @isa_assay = IsaAssay.new({ assay: { assay_class_id: AssayClass.experimental.id } })
+    end
   end
 
   def create
     @isa_assay = IsaAssay.new(isa_assay_params)
     update_sharing_policies @isa_assay.assay
     @isa_assay.assay.contributor = current_person
-    @isa_assay.sample_type.contributor = User.current_user.person
+    @isa_assay.sample_type.contributor = User.current_user.person if isa_assay_params[:sample_type]
     if @isa_assay.save
       redirect_to single_page_path(id: @isa_assay.assay.projects.first, item_type: 'assay',
                                    item_id: @isa_assay.assay, notice: 'The ISA assay was created successfully!')
@@ -27,7 +31,11 @@ class IsaAssaysController < ApplicationController
 
   def edit
     # let edit the assay if the sample_type is not authorized
-    @isa_assay.sample_type = nil unless requested_item_authorized?(@isa_assay.sample_type)
+    if @isa_assay.assay.is_assay_stream?
+      @isa_assay.sample_type = nil
+    else
+      @isa_assay.sample_type = nil unless requested_item_authorized?(@isa_assay.sample_type)
+    end
 
     respond_to do |format|
       format.html
@@ -38,9 +46,11 @@ class IsaAssaysController < ApplicationController
     @isa_assay.assay.attributes = isa_assay_params[:assay]
 
     # update the sample_type
-    if requested_item_authorized?(@isa_assay.sample_type)
-      @isa_assay.sample_type.update(isa_assay_params[:sample_type])
-      @isa_assay.sample_type.resolve_inconsistencies
+    unless @isa_assay.assay.is_assay_stream?
+      if requested_item_authorized?(@isa_assay.sample_type)
+        @isa_assay.sample_type.update(isa_assay_params[:sample_type])
+        @isa_assay.sample_type.resolve_inconsistencies
+      end
     end
 
     if @isa_assay.save
@@ -87,10 +97,12 @@ class IsaAssaysController < ApplicationController
      { data_files_attributes: %i[asset_id direction relationship_type_id] },
      { publication_ids: [] },
      { extended_metadata_attributes: determine_extended_metadata_keys(:assay) },
-     { discussion_links_attributes: %i[id url label _destroy] }]
+     { discussion_links_attributes: %i[id url label _destroy] }, :assay_stream_id]
   end
 
   def sample_type_params(params)
+    return [] unless params[:sample_type]
+
     attributes = params[:sample_type][:sample_attributes]
     if attributes
       params[:sample_type][:sample_attributes_attributes] = []
@@ -128,8 +140,15 @@ class IsaAssaysController < ApplicationController
   end
 
   def find_requested_item
-    @isa_assay = IsaAssay.new
+    if params[:is_assay_stream]
+      @isa_assay = IsaAssay.new({ assay: { assay_class_id: AssayClass.assay_stream.id } })
+    else
+      @isa_assay = IsaAssay.new({ assay: { assay_class_id: AssayClass.experimental.id } })
+    end
     @isa_assay.populate(params[:id])
+
+    # Should not deal with sample type if assay has assay_class assay stream
+    return if @isa_assay.assay.is_assay_stream?
 
     if @isa_assay.sample_type.nil? || !requested_item_authorized?(@isa_assay.assay)
       flash[:error] = "You are not authorized to edit this #{t('isa_assay')}"

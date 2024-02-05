@@ -1255,6 +1255,13 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test 'explore spreadsheet with error logs' do
+    data = FactoryBot.create :spreadsheet_with_error_logs_datafile, policy: FactoryBot.create(:public_policy)
+    get :explore, params: { id: data }
+    assert_response :success
+    assert_select 'div#spreadsheet_1 table.sheet td#cell_B4',text:'ProjectDescription'
+  end
+
   test 'explore earlier version' do
 
     df = FactoryBot.create(:small_test_spreadsheet_datafile)

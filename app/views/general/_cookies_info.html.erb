@@ -3,6 +3,7 @@
   <% analytics = [] %>
   <% analytics << 'Google Analytics' if Seek::Config.google_analytics_enabled %>
   <% analytics << 'Matomo' if Seek::Config.piwik_analytics_enabled %>
+  <% analytics << Seek::Config.custom_analytics_name if Seek::Config.custom_analytics_snippet_enabled %>
   <% if analytics.any? %>
     <%= t('cookies.analytics', analytics: analytics.join(' and '), instance_name: Seek::Config.instance_name) %>
   <% end %>
@@ -11,5 +12,5 @@
  <% if Seek::Config.privacy_enabled %>
     See our <%= link_to 'Privacy Policy', privacy_home_path %> for more information.
   <% end %>
-  
+
 </p>

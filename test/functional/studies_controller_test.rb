@@ -2022,7 +2022,7 @@ class StudiesControllerTest < ActionController::TestCase
       get :show, params: { id: study }
       assert_response :success
 
-      assert_select 'a', text: /Design #{I18n.t('assay')}/i, count: 1
+      assert_select 'a', text: /Design #{I18n.t('assay')} Stream/i, count: 1
       assert_select 'a', text: /Add new #{I18n.t('assay')}/i, count: 0
     end
   end

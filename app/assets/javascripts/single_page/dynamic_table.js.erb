@@ -83,7 +83,7 @@ const handleSelect = (e) => {
           if (cellData == "#HIDDEN") $j(td).addClass("disabled");
         };
 				// Changes the id header to an instance id
-        if (c.title == "id") c.title = instanceName + " id";
+        if (c.title == "id") c.title = window.instanceName + " id";
       });
       // Retrieve the column index of the multi-input cells (select2 items)
       // if column has a multi-input cell, it adds the index to the t array (=accumulator)

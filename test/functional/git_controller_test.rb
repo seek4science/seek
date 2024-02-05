@@ -200,6 +200,16 @@ class GitControllerTest < ActionController::TestCase
     assert_select 'img.git-image-preview[src=?]', workflow_git_raw_path(@workflow, version: @git_version.version, path: 'diagram.png')
   end
 
+  test 'get svg file blob' do
+    @git_version.add_file('test.svg', open_fixture_file('transparent-fairdom-logo-square.svg'))
+    @git_version.save!
+    get :blob, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'test.svg', format: 'html' } # Not sure why this is needed
+
+    assert_response :success
+    assert_select 'a.btn[href=?]', workflow_git_remove_file_path(@workflow, version: @git_version.version, path: 'test.svg')
+    assert_select 'img.git-image-preview[src=?]', workflow_git_raw_path(@workflow, version: @git_version.version, path: 'test.svg')
+  end
+
   test 'get raw binary file' do
     get :raw, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'diagram.png' }
 

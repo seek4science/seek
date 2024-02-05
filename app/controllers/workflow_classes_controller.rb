@@ -50,6 +50,10 @@ class WorkflowClassesController < ApplicationController
 
   def index
     @workflow_classes = WorkflowClass.order(extractor: :desc).all
+    respond_to do |format|
+      format.html
+      format.jsonld { render json: @workflow_classes.map(&:ro_crate_metadata), adapter: :attributes }
+    end
   end
 
   private

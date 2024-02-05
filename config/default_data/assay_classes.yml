@@ -7,3 +7,8 @@ modelling_assay_class:
   id: 2
   title: <%= I18n.t('assays.modelling_analysis') %>
   key: MODEL
+
+assay_stream_class:
+  id: 3
+  title: <%= I18n.t('assays.assay_stream') %>
+  key: STREAM
