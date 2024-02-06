@@ -52,7 +52,7 @@ gem 'will_paginate', '~> 3.1'
 gem 'yaml_db'
 gem 'rails_autolink'
 gem 'rfc-822'
-gem 'nokogiri', '~> 1.14.3'
+gem 'nokogiri', '~> 1.16.2'
 #necessary for newer hashie dependency, original api_smith is no longer active
 gem 'api_smith', git: 'https://github.com/youroute/api_smith.git', ref: '1fb428cebc17b9afab25ac9f809bde87b0ec315b'
 gem 'rdf-virtuoso', '>= 0.2.0'
