@@ -22,7 +22,7 @@
 <% allow_name_change = constraints.allow_name_change?(sample_attribute) %>
 <% seek_sample_multi = sample_attribute&.seek_sample_multi? %>
 <% link_to_self = sample_attribute && sample_attribute.deferred_link_to_self %>
-<% hide_seek_sample_multi = seek_sample_multi && displaying_single_page? && sample_attribute&.isa_tag.blank? && sample_attribute&.title.downcase.include?('input') %>
+<% hide_seek_sample_multi = sample_attribute&.input_attribute? && displaying_single_page? %>
 <% level = sample_type.level %>
 <% isa_tags_options = IsaTag.allowed_isa_tags_for_level(level).map { |it| [it.title, it.id] } %>
 <% display_isa_tag ||= false %>
