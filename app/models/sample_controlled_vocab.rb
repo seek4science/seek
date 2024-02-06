@@ -62,7 +62,7 @@ class SampleControlledVocab < ApplicationRecord
 
   def validate_ols_root_term_uris
     return if self.ols_root_term_uris.blank?
-    uris = self.ols_root_term_uris.split(',').collect(&:strip)
+    uris = self.ols_root_term_uris.split(',').collect(&:strip).reject(&:blank?)
     uris.each do |uri|
       unless valid_url?(uri)
         errors.add(:ols_root_term_uris, "invalid URI - #{uri}")

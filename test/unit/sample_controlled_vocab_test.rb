@@ -55,6 +55,10 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
     vocab.ols_root_term_uris = 'http://purl.obolibrary.org/obo/GO_0090395, '
     assert vocab.valid?
     assert_equal 'http://purl.obolibrary.org/obo/GO_0090395', vocab.ols_root_term_uris
+
+    vocab.ols_root_term_uris = 'http://purl.obolibrary.org/obo/GO_0090395, http://purl.obolibrary.org/obo/GO_0085035,  '
+    assert vocab.valid?
+    assert_equal 'http://purl.obolibrary.org/obo/GO_0090395, http://purl.obolibrary.org/obo/GO_0085035', vocab.ols_root_term_uris
   end
 
   test 'validate unique key' do

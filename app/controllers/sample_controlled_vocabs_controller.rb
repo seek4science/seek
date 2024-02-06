@@ -89,12 +89,12 @@ class SampleControlledVocabsController < ApplicationController
     error_msg = nil
     begin
       source_ontology = params[:source_ontology_id]
-      root_uri = params[:root_uri]
+      root_uris = params[:root_uris]
 
-      raise 'No root URI provided' if root_uri.blank?
+      raise 'No root URI provided' if root_uris.blank?
       @terms = []
       client = Ebi::OlsClient.new
-      root_uri.split(',').collect(&:strip).each do |uri|
+      root_uris.split(',').collect(&:strip).reject(&:blank?).each do |uri|
         terms = client.all_descendants(source_ontology, uri)
         terms.reject! { |t| t[:iri] == uri } unless params[:include_root_term] == '1'
         @terms = @terms | terms

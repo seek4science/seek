@@ -273,7 +273,7 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
     login_as(person)
     VCR.use_cassette('ols/fetch_obo_bad_term') do
       get :fetch_ols_terms_html, params: { source_ontology_id: 'go',
-                                      root_uri: 'http://purl.obolibrary.org/obo/banana',
+                                      root_uris: 'http://purl.obolibrary.org/obo/banana',
                                       include_root_term: '1' }
 
       assert_response :unprocessable_entity
@@ -286,7 +286,7 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
     login_as(person)
     VCR.use_cassette('ols/fetch_obo_plant_cell_papilla') do
       get :fetch_ols_terms_html, params: { source_ontology_id: 'go',
-                                           root_uri: 'http://purl.obolibrary.org/obo/GO_0090395',
+                                           root_uris: 'http://purl.obolibrary.org/obo/GO_0090395',
                                            include_root_term: '1' }
     end
 
@@ -335,7 +335,7 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
     VCR.use_cassette('ols/fetch_obo_plant_cell_papilla') do
       VCR.use_cassette('ols/fetch_obo_haustorium') do
         get :fetch_ols_terms_html, params: { source_ontology_id: 'go',
-                                             root_uri: 'http://purl.obolibrary.org/obo/GO_0090395, http://purl.obolibrary.org/obo/GO_0085035',
+                                             root_uris: 'http://purl.obolibrary.org/obo/GO_0090395, http://purl.obolibrary.org/obo/GO_0085035',
                                              include_root_term: '1' }
         end
     end
@@ -370,7 +370,7 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
     VCR.use_cassette('ols/fetch_obo_plant_cell_papilla') do
       VCR.use_cassette('ols/fetch_obo_haustorium') do
         get :fetch_ols_terms_html, params: { source_ontology_id: 'go',
-                                             root_uri: 'http://purl.obolibrary.org/obo/GO_0090395, http://purl.obolibrary.org/obo/GO_0085035',
+                                             root_uris: 'http://purl.obolibrary.org/obo/GO_0090395, http://purl.obolibrary.org/obo/GO_0085035',
                                              include_root_term: '0' }
       end
     end
@@ -394,12 +394,28 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
 
   end
 
+  test 'fetch ols terms as HTML with multiple root uris forgiving of trailing comma' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    VCR.use_cassette('ols/fetch_obo_plant_cell_papilla') do
+      VCR.use_cassette('ols/fetch_obo_haustorium') do
+        get :fetch_ols_terms_html, params: { source_ontology_id: 'go',
+                                             root_uris: 'http://purl.obolibrary.org/obo/GO_0090395, http://purl.obolibrary.org/obo/GO_0085035,  ',
+                                             include_root_term: '0' }
+      end
+    end
+
+    assert_response :success
+    assert_select 'tr.sample-cv-term', count: 4
+  end
+
+
   test 'fetch ols terms as HTML without root term included' do
     person = FactoryBot.create(:person)
     login_as(person)
     VCR.use_cassette('ols/fetch_obo_plant_cell_papilla') do
       get :fetch_ols_terms_html, params: { source_ontology_id: 'go',
-                                      root_uri: 'http://purl.obolibrary.org/obo/GO_0090395' }
+                                      root_uris: 'http://purl.obolibrary.org/obo/GO_0090395' }
     end
     assert_response :success
     assert_select 'tr.sample-cv-term', count: 3
