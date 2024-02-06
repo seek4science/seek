@@ -81,11 +81,14 @@
                                                                                 template_attribute: template_attribute,
                                                                                 template: @template } %>
                     <% end %>
-                    <tr id="add-attribute-row">
-                        <td colspan="6">
-                            <%= button_link_to('Add new attribute', 'add', '#', id: 'add-attribute') %>
-                        </td>
-                    </tr>
+
+                    <% if @template.children.none? %>
+                        <tr id="add-attribute-row">
+                            <td colspan="6">
+                                <%= button_link_to('Add new attribute', 'add', '#', id: 'add-attribute') %>
+                            </td>
+                        </tr>
+                    <% end %>
                 </tbody>
             </table>
         </div>
