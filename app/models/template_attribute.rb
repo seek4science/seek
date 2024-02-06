@@ -6,6 +6,8 @@ class TemplateAttribute < ApplicationRecord
   belongs_to :isa_tag
   belongs_to :linked_sample_type, class_name: 'SampleType'
   has_many :sample_attributes
+  has_many :child_template_attributes, class_name: 'TemplateAttribute', foreign_key: 'parent_attribute_id'
+  belongs_to :parent_attribute_id, class_name: 'TemplateAttribute', optional: true
 
   validates :title, presence: true
 
