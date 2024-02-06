@@ -311,7 +311,7 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
     assert_difference('SampleControlledVocab.count') do
       assert_difference('SampleControlledVocabTerm.count', 2) do
         post :create, params: { sample_controlled_vocab: { title: 'plant_cell_papilla and haustorium', description: 'multiple root uris',
-                                                           ols_root_term_uri: 'http://purl.obolibrary.org/obo/GO_0090395,   http://purl.obolibrary.org/obo/GO_0085035',
+                                                           ols_root_term_uris: 'http://purl.obolibrary.org/obo/GO_0090395,   http://purl.obolibrary.org/obo/GO_0085035',
                                                            sample_controlled_vocab_terms_attributes: {
                                                              '0' => { label: 'plant cell papilla', iri:'http://purl.obolibrary.org/obo/GO_0090395', parent_iri:'', _destroy: '0' },
                                                              '1' => { label: 'haustorium', iri:'http://purl.obolibrary.org/obo/GO_0085035', parent_iri:'', _destroy: '0' }
@@ -326,7 +326,7 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
     assert_equal 2, cv.sample_controlled_vocab_terms.count
     assert_equal ['plant cell papilla','haustorium'], cv.labels
     assert_equal ['http://purl.obolibrary.org/obo/GO_0090395','http://purl.obolibrary.org/obo/GO_0085035'], cv.sample_controlled_vocab_terms.collect(&:iri)
-    assert_equal 'http://purl.obolibrary.org/obo/GO_0090395, http://purl.obolibrary.org/obo/GO_0085035', cv.ols_root_term_uri
+    assert_equal 'http://purl.obolibrary.org/obo/GO_0090395, http://purl.obolibrary.org/obo/GO_0085035', cv.ols_root_term_uris
   end
 
   test 'fetch ols terms as HTML with multiple root uris and root term included' do

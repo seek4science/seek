@@ -725,7 +725,7 @@ module IsaExporter
           if vocab_term
             sample_attribute.sample_controlled_vocab.sample_controlled_vocab_terms.find_by_label(label)&.iri
           else
-            sample_attribute.sample_controlled_vocab.ols_root_term_uri
+            sample_attribute.sample_controlled_vocab.ols_root_term_uris
           end
       end
       term_accession = iri || ''

@@ -53,7 +53,7 @@ namespace :seek_dev do
 
   task(:dump_controlled_vocab, [:id] => :environment) do |_t, args|
     vocab = SampleControlledVocab.find(args.id)
-    json = { title: vocab.title, description: vocab.description, ols_root_term_uri: vocab.ols_root_term_uri,
+    json = { title: vocab.title, description: vocab.description, ols_root_term_uris: vocab.ols_root_term_uris,
              source_ontology: vocab.source_ontology, terms: [] }
     vocab.sample_controlled_vocab_terms.each do |term|
       json[:terms] << { label: term.label, iri: term.iri, parent_iri: term.parent_iri }
