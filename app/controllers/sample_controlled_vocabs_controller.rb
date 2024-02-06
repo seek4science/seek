@@ -92,10 +92,13 @@ class SampleControlledVocabsController < ApplicationController
       root_uri = params[:root_uri]
 
       raise 'No root URI provided' if root_uri.blank?
-
+      @terms = []
       client = Ebi::OlsClient.new
-      @terms = client.all_descendants(source_ontology, root_uri)
-      @terms.reject! { |t| t[:iri] == root_uri } unless params[:include_root_term] == '1'
+      root_uri.split(',').collect(&:strip).each do |uri|
+        terms = client.all_descendants(source_ontology, uri)
+        terms.reject! { |t| t[:iri] == uri } unless params[:include_root_term] == '1'
+        @terms = @terms | terms
+      end
       error_msg = "There are no descendant terms to populate the list." unless @terms.present?
     rescue StandardError => e
       error_msg = e.message
