@@ -13,7 +13,7 @@ class SampleControlledVocab < ApplicationRecord
   has_many :samples, through: :sample_types
   belongs_to :repository_standard, inverse_of: :sample_controlled_vocabs
 
-  auto_strip_attributes :ols_root_term_uri
+  auto_strip_attributes :ols_root_term_uris
 
   validates :title, presence: true, uniqueness: true
   validates :key, uniqueness: { allow_blank: true }
@@ -57,19 +57,19 @@ class SampleControlledVocab < ApplicationRecord
 
   # whether the controlled vocab is linked to an ontology
   def ontology_based?
-    source_ontology.present? && ols_root_term_uri.present?
+    source_ontology.present? && ols_root_term_uris.present?
   end
 
   def validate_ols_root_term_uris
-    return if self.ols_root_term_uri.blank?
-    uris = self.ols_root_term_uri.split(',').collect(&:strip)
+    return if self.ols_root_term_uris.blank?
+    uris = self.ols_root_term_uris.split(',').collect(&:strip)
     uris.each do |uri|
       unless valid_url?(uri)
-        errors.add(:ols_root_term_uri, "invalid URI - #{uri}")
+        errors.add(:ols_root_term_uris, "invalid URI - #{uri}")
         return false
       end
     end
-    self.ols_root_term_uri = uris.join(', ')
+    self.ols_root_term_uris = uris.join(', ')
   end
 
   private

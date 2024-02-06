@@ -9,7 +9,7 @@ class SampleControlledVocabApiTest < ActionDispatch::IntegrationTest
     login_as(FactoryBot.create(:project_administrator))
 
     @sample_controlled_vocab = SampleControlledVocab.new({ title:"a title", description:"some description",
-                                                           source_ontology: "EFO", ols_root_term_uri: "http://a_uri",
+                                                           source_ontology: "EFO", ols_root_term_uris: "http://a_uri",
                                                            short_name: "short_name" })
                                                            
     @sample_controlled_vocab_term = SampleControlledVocabTerm.new({ label: "organism", iri: "http://some_iri",
