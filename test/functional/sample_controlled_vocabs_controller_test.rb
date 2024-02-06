@@ -306,6 +306,29 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
     assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_3_label[value=?]','trichome papilla'
   end
 
+  test 'create with root uris' do
+    login_as(FactoryBot.create(:project_administrator))
+    assert_difference('SampleControlledVocab.count') do
+      assert_difference('SampleControlledVocabTerm.count', 2) do
+        post :create, params: { sample_controlled_vocab: { title: 'plant_cell_papilla and haustorium', description: 'multiple root uris',
+                                                           ols_root_term_uri: 'http://purl.obolibrary.org/obo/GO_0090395,   http://purl.obolibrary.org/obo/GO_0085035',
+                                                           sample_controlled_vocab_terms_attributes: {
+                                                             '0' => { label: 'plant cell papilla', iri:'http://purl.obolibrary.org/obo/GO_0090395', parent_iri:'', _destroy: '0' },
+                                                             '1' => { label: 'haustorium', iri:'http://purl.obolibrary.org/obo/GO_0085035', parent_iri:'', _destroy: '0' }
+                                                           }
+        } }
+      end
+    end
+    assert cv = assigns(:sample_controlled_vocab)
+    assert_redirected_to sample_controlled_vocab_path(cv)
+    assert_equal 'plant_cell_papilla and haustorium', cv.title
+    assert_equal 'multiple root uris', cv.description
+    assert_equal 2, cv.sample_controlled_vocab_terms.count
+    assert_equal ['plant cell papilla','haustorium'], cv.labels
+    assert_equal ['http://purl.obolibrary.org/obo/GO_0090395','http://purl.obolibrary.org/obo/GO_0085035'], cv.sample_controlled_vocab_terms.collect(&:iri)
+    assert_equal 'http://purl.obolibrary.org/obo/GO_0090395, http://purl.obolibrary.org/obo/GO_0085035', cv.ols_root_term_uri
+  end
+
   test 'fetch ols terms as HTML with multiple root uris and root term included' do
     person = FactoryBot.create(:person)
     login_as(person)
