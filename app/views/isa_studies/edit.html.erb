@@ -6,11 +6,3 @@
 	  <%= render :partial => "form", :locals => { :f => f, :action=>:edit } -%>
 	<% end -%>
 </div>
-
-<script>
-  $j(document).ready(function() {
-		// Filter ISA tags for new rows
-		updateIsaTagSelect("study source", "#new-attribute-row_source_sample_type");
-		updateIsaTagSelect("study sample", "#new-attribute-row_sample_collection_sample_type");
-  });
-</script>

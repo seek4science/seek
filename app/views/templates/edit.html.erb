@@ -11,9 +11,4 @@
       .has('select[data-attr="isa_tag_title"]:not([value])') // Has a select with data-attr "isa_tag_title" but no value
       .first() // Take the first one in case there are more
       .addClass('hidden'); // Hide the row
-
-    // Update the ISA tag select
-    const attribute_row = ".sample-attribute";
-    updateIsaTagSelect("<%= @template.level %>", attribute_row);
-  });
 </script>

@@ -249,7 +249,8 @@ const applyTemplate = () => {
     $j(newRow).find('[data-attr="isa_tag_id"]').val(row[11]);
     $j(newRow).find('[data-attr="isa_tag_title"]').val(row[11]);
     $j(newRow).find('[data-attr="isa_tag_title"]').attr('disabled', true);
-    $j(newRow).find('[data-attr="template_attribute_id"]').val(row[14]);
+    $j(newRow).find('[data-attr="template_attribute_id"]').val(row[14]); // In case of a sample type
+    $j(newRow).find('[data-attr="parent_attribute_id"]').val(row[14]); // In case of a template
 
     // Show the CV block if cv_id is not empty
     if (row[4]) $j(newRow).find(".controlled-vocab-block").show();

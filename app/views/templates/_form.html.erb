@@ -135,6 +135,8 @@
         $j('#attribute-table').on('change', '.controlled-vocab-selection', SampleTypeControlledVocab.controlledVocabChanged);
         $j('#attribute-table .sample-type-attribute-type').trigger("change", [false]);
         $j('.templates').select2({theme: "bootstrap"});
+
+        // Change ISA Tag ID when ISA Tag title changes
         $j('#attribute-table').on('change', 'select[data-attr="isa_tag_title"]', function() {
             const hiddenInputName = $j(this).attr('name').replace('isa_tag_title', 'isa_tag_id');
             const isa_tag_id_sel = $j(this).val();
@@ -142,14 +144,10 @@
             $j(`input:hidden[name="${hiddenInputName}"]`).val(isa_tag_id_sel);
 
         });
+
         initSelect2($j('.templates'), $j('#existing_templates'));
         Templates.clearContext();
         Templates.init($j('#template-attributes'));
-
-        // Makes sure existing sampletype attributes are disabled
-        $j('#attribute-table tr.sample-attribute')
-            .has('input[data-attr="isa_tag_id"][value]')
-            .find('[data-attr="isa_tag_title"]').attr('disabled', true);
     });
 
     const templates = <%= load_templates().to_json.html_safe %>;
