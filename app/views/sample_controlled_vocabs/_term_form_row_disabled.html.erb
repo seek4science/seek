@@ -1,4 +1,12 @@
-<tr class="sample-cv-term" data-index="<%= index %>">
+<%
+  new_term ||= false
+  row_class = 'sample-cv-term'
+  # will be marked in green, and also the javascript will immediately remove rather than mark for removal
+  if new_term
+    row_class+=' success'
+  end
+%>
+<tr class="<%= row_class %>" data-index="<%= index %>">
   <td>
     <%= hidden_field_tag "sample_controlled_vocab[sample_controlled_vocab_terms_attributes][#{index}][label]", term.label  %>
     <div class='disabled-cv-field form-control'><%= term.label %></div>

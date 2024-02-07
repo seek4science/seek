@@ -1,16 +1,20 @@
 <% assay = params[:isa_assay][:assay] if params.dig(:isa_assay, :assay) %>
 <% study = Study.find(params[:study_id] || assay[:study_id]) %>
+<% def first_assay_in_stream?
+    params[:source_assay_id].nil? || (params[:source_assay_id] == params[:assay_stream_id])
+   end
+%>
 <%
   source_assay = Assay.find(params[:source_assay_id]) if params[:source_assay_id]
   assay_stream_id = params[:assay_stream_id] if params[:assay_stream_id]
 
   if @isa_assay.assay.new_record?
     if params[:is_assay_stream]
-      assay_position = 0
+      assay_position = study.assay_streams.any? ? study.assay_streams.map(&:position).max + 1 : 0
       assay_class_id = AssayClass.assay_stream.id
       is_assay_stream = true
     else
-      assay_position = params[:source_assay_id].nil? ? 1 : source_assay.position + 1
+      assay_position = first_assay_in_stream? ? 0 : source_assay.position + 1
       assay_class_id = AssayClass.experimental.id
       is_assay_stream = false
     end
@@ -48,7 +52,7 @@
 
   <div class="form-group">
     <%= assay_fields.label :description -%><br/>
-    <%= assay_fields.text_area :description, :rows => 5, :class=>"form-control rich-text-edit"  -%>
+    <%= assay_fields.text_area :description, rows: 5, class: "form-control rich-text-edit" -%>
   </div>
 
   <% if show_extended_metadata %>
@@ -61,9 +65,17 @@
     <%= assay_study_selection('isa_assay[assay][study_id]',@isa_assay.assay.study) %>
   </div>
 
-  <div class="hidden">
-    <%= assay_fields.number_field :position, value: assay_position || study.assays.length -%>
-  </div>
+  <% if is_assay_stream %>
+    <div class="form-group">
+      <%= assay_fields.label "Assay position" -%><br/>
+      <%= assay_fields.number_field :position, rows: 5, class: "form-control", value: assay_position %>
+    </div>
+  <% else %>
+    <div class="hidden">
+      <%= assay_fields.hidden_field :position, value: assay_position -%>
+    </div>
+  <% end %>
+
 
   <%= assay_fields.hidden_field :assay_stream_id, value: assay_stream_id -%>
   <%= assay_fields.hidden_field :assay_class_id, value: assay_class_id -%>

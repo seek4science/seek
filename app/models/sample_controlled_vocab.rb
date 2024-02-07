@@ -1,5 +1,5 @@
 class SampleControlledVocab < ApplicationRecord
-  # attr_accessible :title, :description, :sample_controlled_vocab_terms_attributes
+  include Seek::UrlValidation
 
   has_many :sample_controlled_vocab_terms, inverse_of: :sample_controlled_vocab,
                                            after_add: :update_sample_type_templates,
@@ -13,11 +13,11 @@ class SampleControlledVocab < ApplicationRecord
   has_many :samples, through: :sample_types
   belongs_to :repository_standard, inverse_of: :sample_controlled_vocabs
 
-  auto_strip_attributes :ols_root_term_uri
+  auto_strip_attributes :ols_root_term_uris
 
   validates :title, presence: true, uniqueness: true
-  validates :ols_root_term_uri, url: { allow_blank: true }
   validates :key, uniqueness: { allow_blank: true }
+  validate :validate_ols_root_term_uris
 
   accepts_nested_attributes_for :sample_controlled_vocab_terms, allow_destroy: true
   accepts_nested_attributes_for :repository_standard, reject_if: :check_repository_standard
@@ -57,7 +57,19 @@ class SampleControlledVocab < ApplicationRecord
 
   # whether the controlled vocab is linked to an ontology
   def ontology_based?
-    source_ontology.present? && ols_root_term_uri.present?
+    source_ontology.present? && ols_root_term_uris.present?
+  end
+
+  def validate_ols_root_term_uris
+    return if self.ols_root_term_uris.blank?
+    uris = self.ols_root_term_uris.split(',').collect(&:strip).reject(&:blank?)
+    uris.each do |uri|
+      unless valid_url?(uri)
+        errors.add(:ols_root_term_uris, "invalid URI - #{uri}")
+        return false
+      end
+    end
+    self.ols_root_term_uris = uris.join(', ')
   end
 
   private
@@ -65,6 +77,8 @@ class SampleControlledVocab < ApplicationRecord
   def update_sample_type_templates(_term)
     sample_types.each(&:queue_template_generation) unless new_record?
   end
+
+
 
   class SystemVocabs
     # property -> database key

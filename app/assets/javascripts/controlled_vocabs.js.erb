@@ -137,7 +137,7 @@ CVTerms = {
             dataType: "html",
             data: {
                 source_ontology_id: $j('select#sample_controlled_vocab_source_ontology').val(),
-                root_uri: $j('#sample_controlled_vocab_ols_root_term_uri').val(),
+                root_uris: $j('#sample_controlled_vocab_ols_root_term_uris').val(),
                 include_root_term: $j('#include_root_term:checked').val()
             },
             success: function (resp) {
@@ -179,7 +179,7 @@ CVTerms = {
         $j('select#sample_controlled_vocab_source_ontology').on('change', function () {
             var selected = this.selectedOptions[0];
             if (selected.value == "") {
-                $j('#sample_controlled_vocab_ols_root_term_uri').val('');
+                $j('#sample_controlled_vocab_ols_root_term_uris').val('');
                 $j('#ontology-root-uri').hide();
             } else {
                 $j('#ontology-root-uri').show();

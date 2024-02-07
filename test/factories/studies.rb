@@ -41,7 +41,7 @@ FactoryBot.define do
     title { 'ISA JSON compliant study' }
     description { 'A study which is linked to an ISA JSON compliant investigation and has two sample types linked to it.' }
     after(:build) do |study|
-      study.investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true)
+      study.investigation ||= FactoryBot.create(:investigation, is_isa_json_compliant: true)
       source_st = FactoryBot.create(:isa_source_sample_type)
       sample_collection_st = FactoryBot.create(:isa_sample_collection_sample_type, linked_sample_type: source_st)
       study.sample_types = [source_st, sample_collection_st]

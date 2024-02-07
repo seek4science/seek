@@ -46,7 +46,7 @@ module Seek
                       {
                         title: attribute['name'],
                         source_ontology: is_ontology ? attribute['ontology']['name'] : nil,
-                        ols_root_term_uri: is_ontology ? attribute['ontology']['rootTermURI'] : nil
+                        ols_root_term_uris: is_ontology ? attribute['ontology']['rootTermURI'] : nil
                       }
                     )
                 end

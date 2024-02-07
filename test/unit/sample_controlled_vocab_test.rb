@@ -35,6 +35,32 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
     end
   end
 
+  test 'validate ols ols_root_term_uris' do
+    vocab = SampleControlledVocab.new(title: 'multiple uris')
+    assert vocab.valid?
+
+    vocab.ols_root_term_uris = 'http://purl.obolibrary.org/obo/GO_0090395'
+    assert vocab.valid?
+    vocab.ols_root_term_uris = 'wibble'
+    refute vocab.valid?
+
+    vocab.ols_root_term_uris = 'http://purl.obolibrary.org/obo/GO_0090395, http://purl.obolibrary.org/obo/GO_0085035'
+    assert vocab.valid?
+    vocab.ols_root_term_uris = 'http://purl.obolibrary.org/obo/GO_0090395, http://purl.obolibrary.org/obo/GO_0085035,   http://purl.obolibrary.org/obo/GO_0090396'
+    assert vocab.valid?
+    assert_equal 'http://purl.obolibrary.org/obo/GO_0090395, http://purl.obolibrary.org/obo/GO_0085035, http://purl.obolibrary.org/obo/GO_0090396', vocab.ols_root_term_uris
+    vocab.ols_root_term_uris = 'http://purl.obolibrary.org/obo/GO_0090395, wibble'
+    refute vocab.valid?
+
+    vocab.ols_root_term_uris = 'http://purl.obolibrary.org/obo/GO_0090395, '
+    assert vocab.valid?
+    assert_equal 'http://purl.obolibrary.org/obo/GO_0090395', vocab.ols_root_term_uris
+
+    vocab.ols_root_term_uris = 'http://purl.obolibrary.org/obo/GO_0090395, http://purl.obolibrary.org/obo/GO_0085035,  '
+    assert vocab.valid?
+    assert_equal 'http://purl.obolibrary.org/obo/GO_0090395, http://purl.obolibrary.org/obo/GO_0085035', vocab.ols_root_term_uris
+  end
+
   test 'validate unique key' do
     User.with_current_user(FactoryBot.create(:project_administrator).user) do
       SampleControlledVocab.create(title: 'no key')
