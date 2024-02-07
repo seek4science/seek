@@ -513,6 +513,18 @@ class SampleAttributeTest < ActiveSupport::TestCase
     refute attribute.validate_value?('moonbeam')
   end
 
+  test 'is input attribute?' do
+    correct_input_attribute = FactoryBot.create(:sample_multi_sample_attribute, title: 'Input from previous sample type', isa_tag: nil, is_title: true, sample_type: FactoryBot.create(:simple_sample_type))
+    assert correct_input_attribute.input_attribute?
+
+    incorrect_input_attribute = FactoryBot.create(:sample_multi_sample_attribute, title: 'Input from previous sample type', isa_tag: FactoryBot.create(:default_isa_tag), is_title: true, sample_type: FactoryBot.create(:simple_sample_type))
+    refute incorrect_input_attribute.input_attribute?
+    second_incorrect_input_attribute = FactoryBot.create(:sample_multi_sample_attribute, title: 'Ingoing material', isa_tag: nil, is_title: true, sample_type: FactoryBot.create(:simple_sample_type))
+    refute second_incorrect_input_attribute.input_attribute?
+    third_incorrect_input_attribute = FactoryBot.create(:sample_sample_attribute, title: 'Input from previous sample type', isa_tag: nil, is_title: true, sample_type: FactoryBot.create(:simple_sample_type))
+    refute third_incorrect_input_attribute.input_attribute?
+  end
+
   private
 
   def valid_value?(attribute, value)

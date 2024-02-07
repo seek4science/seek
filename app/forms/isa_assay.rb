@@ -56,6 +56,12 @@ class IsaAssay
   def validate_objects
     @assay.errors.each { |e| errors.add(:base, "[Assay]: #{e.full_message}") } unless @assay.valid?
 
+    if @assay.new_record? && @assay.next_linked_child_assay&.sample_type&.samples&.any?
+      next_assay_id = @assay.next_linked_child_assay.id
+      next_assay_title = @assay.next_linked_child_assay.title
+      errors.add(:base, "[Assay]: Not allowed to create an assay before assay '#{next_assay_id} - #{next_assay_title}'. It has samples linked to it.")
+    end
+
     return if @assay.is_assay_stream?
 
     errors.add(:base, '[Assay]: The assay is missing a sample type.') if @sample_type.nil?

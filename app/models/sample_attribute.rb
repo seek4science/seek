@@ -25,6 +25,10 @@ class SampleAttribute < ApplicationRecord
   # whether this attribute is tied to a controlled vocab which is based on an ontology
   delegate :ontology_based?, to: :sample_controlled_vocab, allow_nil: true
 
+  def input_attribute?
+    isa_tag.nil? && title.downcase.include?('input') && seek_sample_multi?
+  end
+
   def title=(title)
     super
     store_accessor_name

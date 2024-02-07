@@ -6,12 +6,18 @@ class AssaysController < ApplicationController
   before_action :find_assets, only: [:index]
   before_action :find_and_authorize_requested_item,
                 only: %i[edit update destroy manage manage_update show new_object_based_on_existing_one]
-  before_action :fix_assay_linkage, only: [:destroy]
-  before_action :delete_linked_sample_types, only: [:destroy]
 
   # project_membership_required_appended is an alias to project_membership_required, but is necessary to include the actions
   # defined in the application controller
   before_action :project_membership_required_appended, only: [:new_object_based_on_existing_one]
+
+  # Only for ISA JSON compliant assays
+  # => Fix sample type linkage
+  before_action :fix_assay_linkage_when_deleting_assays, only: :destroy
+  # => Delete sample type of deleted assay
+  before_action :delete_linked_sample_types, only: :destroy
+  # => Rearrange positions
+  after_action :rearrange_assay_positions_at_destroy, only: :destroy
 
   include Seek::Publishing::PublishingCommon
 
@@ -106,30 +112,6 @@ class AssaysController < ApplicationController
     end
   end
 
-  def delete_linked_sample_types
-    return unless is_single_page_assay?
-    return if @assay.sample_type.nil?
-
-    @assay.sample_type.destroy
-  end
-
-  def fix_assay_linkage
-    return unless is_single_page_assay?
-    return unless @assay.has_linked_child_assay?
-
-    previous_assay_linked_st_id = @assay.previous_linked_sample_type&.id
-
-    next_assay = Assay.all.detect do |a|
-      a.sample_type&.sample_attributes&.first&.linked_sample_type_id == @assay.sample_type_id
-    end
-
-    next_assay_st_attr = next_assay.sample_type&.sample_attributes&.first
-
-    return unless next_assay && previous_assay_linked_st_id && next_assay_st_attr
-
-    next_assay_st_attr.update(linked_sample_type_id: previous_assay_linked_st_id)
-  end
-
   def update
     update_assay_organisms @assay, params
     update_assay_human_diseases @assay, params
@@ -178,6 +160,32 @@ class AssaysController < ApplicationController
 
   private
 
+  def delete_linked_sample_types
+    return unless @assay.is_isa_json_compliant?
+    return if @assay.sample_type.nil?
+
+    @assay.sample_type.destroy
+  end
+
+  def fix_assay_linkage_when_deleting_assays
+    return unless @assay.is_isa_json_compliant?
+    return unless @assay.has_linked_child_assay?
+
+    previous_assay_linked_st_id = @assay.previous_linked_sample_type&.id
+
+    next_assay = @assay.next_linked_child_assay
+
+    next_assay_st_attr = next_assay.sample_type&.sample_attributes&.detect(&:input_attribute?)
+
+    return unless next_assay && previous_assay_linked_st_id && next_assay_st_attr
+
+    next_assay_st_attr.update(linked_sample_type_id: previous_assay_linked_st_id)
+  end
+
+  def rearrange_assay_positions_at_destroy
+    rearrange_assay_positions(@assay.assay_stream)
+  end
+
   def assay_params
     params.require(:assay).permit(:title, :description, :study_id, :assay_class_id, :assay_type_uri, :technology_type_uri,
                                   :license, *creator_related_params, :position, { document_ids: [] },
@@ -193,11 +201,5 @@ class AssaysController < ApplicationController
       assay_params[:sop_ids].select! { |id| Sop.find_by_id(id).try(:can_view?) } if assay_params.key?(:sop_ids)
       assay_params[:model_ids].select! { |id| Model.find_by_id(id).try(:can_view?) } if assay_params.key?(:model_ids)
     end
-  end
-
-  def is_single_page_assay?
-    return false unless params.key?(:return_to)
-
-    params[:return_to].start_with? '/single_pages/'
   end
 end
