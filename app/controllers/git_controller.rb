@@ -233,8 +233,18 @@ class GitController < ApplicationController
     # However this results in an UnknownFormat error when trying to load the HTML view, as Rails still seems to be
     # looking for an e.g. application/yaml view.
     # You can fix this by adding { defaults: { format: :html } }, but then it is not possible to request JSON,
-    # even with an explicit `Accept: application/json` header! -Finn
-    request.format = :html unless json_api_request?
+    # even with an explicit `Accept: application/json` header!
+    #
+    # GitLab uses a monkeypatch to avoid this:
+    # https://gitlab.com/gitlab-org/gitlab/-/blob/7a0c278e/config/initializers/action_dispatch_http_mime_negotiation.rb
+    # but not sure what the wider consequences of that are.
+    # -Finn
+    accept_format = request.accepts.first
+    if accept_format.nil? || accept_format.ref == '*/*'
+      request.format = :html
+    else
+      request.format = accept_format.symbol
+    end
   end
 
   def file_content
