@@ -39,17 +39,19 @@
           You have selected the <a id="selected-ols-link" href="" target="_blank"></a> ontology,
           click the link to browse on the Ontology Lookup Service in another tab and find the suitable root term URI.
           You should then copy that URI into the field below.
+          If you wish to include terms from more than one root, then add the URI's separated by a comma (,).
         </div>
+
         <div>
-          <label>Root term</label>
-          <%= f.text_field :ols_root_term_uri, :class => 'form-control', :placeholder => 'e.g. http://www.ebi.ac.uk/efo/EFO_0000635' %>
+          <label>Root terms</label>
+          <%= f.text_field :ols_root_term_uris, :class => 'form-control', :placeholder => 'e.g. http://www.ebi.ac.uk/efo/EFO_0000635' %>
         </div>
 
         <div class="checkbox">
           <label>
             <%= check_box_tag(:include_root_term, '1', false, name: nil, autocomplete: 'off') %>
-            <strong>Include root term?</strong>
-            <p class="help-block">If checked, the selected root term will be included in the list of options. Otherwise, only children of the root term will be included.</p>
+            <strong>Include root terms?</strong>
+            <p class="help-block">If checked, the selected roots term will be included in the list of options. Otherwise, only children of the root terms will be included.</p>
           </label>
         </div>
 

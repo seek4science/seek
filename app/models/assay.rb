@@ -75,10 +75,10 @@ class Assay < ApplicationRecord
   def previous_linked_sample_type
     return unless is_isa_json_compliant?
 
-    if is_assay_stream?
+    if is_assay_stream? || first_assay_in_stream?
       study.sample_types.second
     else
-      sample_type.sample_attributes.detect { |sa| sa.isa_tag.nil? && sa.title.include?('Input') }&.linked_sample_type
+      sample_type.previous_linked_sample_type
     end
   end
 
@@ -96,10 +96,22 @@ class Assay < ApplicationRecord
     return unless has_linked_child_assay?
 
     if is_assay_stream?
-      previous_linked_sample_type&.linked_sample_attributes&.detect { |sa| sa.isa_tag.nil? && sa.title.include?('Input') }&.sample_type&.assays&.first
+      first_assay_in_stream
     else
-      sample_type.linked_sample_attributes.detect { |sa| sa.isa_tag.nil? && sa.title.include?('Input') }&.sample_type&.assays&.first
+      sample_type.next_linked_sample_types.map(&:assays).flatten.detect { |a| a.assay_stream_id == assay_stream_id }
     end
+  end
+
+  def first_assay_in_stream
+    if is_assay_stream?
+      child_assays.detect { |a| a.sample_type.previous_linked_sample_type == a.study.sample_types.second }
+    else
+      assay_stream.child_assays.detect { |a| a.sample_type.previous_linked_sample_type == a.study.sample_types.second }
+    end
+  end
+
+  def first_assay_in_stream?
+    self == first_assay_in_stream
   end
 
   def default_contributor

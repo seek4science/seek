@@ -283,9 +283,11 @@ module SamplesHelper
     link_to(link,link,target: :_blank)
   end
 
-  def ols_root_term_link(ols_id, term_uri)
-    ols_link = "#{Ebi::OlsClient::ROOT_URL}/ontologies/#{ols_id}/terms?iri=#{term_uri}"
-    link_to(term_uri, ols_link, target: :_blank)
+  def ols_root_term_link(ols_id, term_uris)
+    term_uris.split(',').collect(&:strip).collect do |uri|
+      ols_link = "#{Ebi::OlsClient::ROOT_URL}/ontologies/#{ols_id}/terms?iri=#{uri}"
+      link_to(uri, ols_link, target: :_blank)
+    end.join(', ').html_safe
   end
 
   def get_extra_info(sample)

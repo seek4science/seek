@@ -4,6 +4,9 @@ class IsaAssaysController < ApplicationController
 
   before_action :set_up_instance_variable
   before_action :find_requested_item, only: %i[edit update]
+  before_action :initialize_isa_assay, only: :create
+  before_action :fix_assay_linkage_for_new_assays, only: :create
+  after_action :rearrange_assay_positions_create_isa_assay, only: :create
 
   def new
     if params[:is_assay_stream]
@@ -14,10 +17,6 @@ class IsaAssaysController < ApplicationController
   end
 
   def create
-    @isa_assay = IsaAssay.new(isa_assay_params)
-    update_sharing_policies @isa_assay.assay
-    @isa_assay.assay.contributor = current_person
-    @isa_assay.sample_type.contributor = User.current_user.person if isa_assay_params[:sample_type]
     if @isa_assay.save
       redirect_to single_page_path(id: @isa_assay.assay.projects.first, item_type: 'assay',
                                    item_id: @isa_assay.assay, notice: 'The ISA assay was created successfully!')
@@ -65,6 +64,42 @@ class IsaAssaysController < ApplicationController
   end
 
   private
+
+  def fix_assay_linkage_for_new_assays
+    return unless @isa_assay.assay.is_isa_json_compliant?
+    return if @isa_assay.assay.is_assay_stream? # Should not fix anything when creating an assay stream
+
+    previous_sample_type = SampleType.find(params[:isa_assay][:input_sample_type_id])
+    previous_assay = previous_sample_type.assays.first
+
+    # In case an assay is inserted right at the beginning of an assay stream,
+    # the next assay is the current first one in the assay stream.
+    next_assay = previous_assay.nil? ? @isa_assay.assay.assay_stream.next_linked_child_assay : previous_assay.next_linked_child_assay
+
+    # In case no next assay (an assay was appended to the end of the stream), assay linkage does not have to be fixed.
+    return unless next_assay
+
+    next_assay_input_attribute_id = next_assay.sample_type.sample_attributes.detect(&:input_attribute?).id
+    return unless next_assay_input_attribute_id
+
+    # Add link of next assay sample type to currently created assay sample type
+    updated_lsai = @isa_assay.assay.sample_type.linked_sample_attribute_ids.push(next_assay_input_attribute_id)
+    @isa_assay.assay.sample_type.update(linked_sample_attribute_ids: updated_lsai)
+  end
+
+  def rearrange_assay_positions_create_isa_assay
+    return if @isa_assay.assay.is_assay_stream?
+    return unless @isa_assay.assay.is_isa_json_compliant?
+
+    rearrange_assay_positions(@isa_assay.assay.assay_stream)
+  end
+
+  def initialize_isa_assay
+    @isa_assay = IsaAssay.new(isa_assay_params)
+    update_sharing_policies @isa_assay.assay
+    @isa_assay.assay.contributor = current_person
+    @isa_assay.sample_type.contributor = User.current_user.person if isa_assay_params[:sample_type]
+  end
 
   def isa_assay_params
     # TODO: get the params from a shared module

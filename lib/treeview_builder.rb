@@ -16,8 +16,8 @@ class TreeviewBuilder
     @project.investigations.map do |investigation|
       if investigation.is_isa_json_compliant?
         investigation.studies.map do |study|
-          assay_stream_items = study.assay_streams.map do |assay_stream|
-            assay_items = assay_stream.child_assays.map do |child_assay|
+          assay_stream_items = study.assay_streams.sort_by{ |stream| stream.position }.map do |assay_stream|
+            assay_items = assay_stream.child_assays.order(:position).map do |child_assay|
               build_assay_item(child_assay)
             end
             build_assay_stream_item(assay_stream, assay_items)

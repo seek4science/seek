@@ -1,7 +1,7 @@
 {
     "title": "Data Formats",
     "description": "Data formats, used for annotating. Describes a defined way or layout of representing and structuring data in a computer file, blob, string, message, or elsewhere. Initially seeded from the EDAM ontology.",
-    "ols_root_term_uri": "http://edamontology.org/format_1915",
+    "ols_root_term_uris": "http://edamontology.org/format_1915",
     "source_ontology": "edam",
     "terms": [
 	{

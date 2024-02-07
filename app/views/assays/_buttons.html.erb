@@ -6,6 +6,23 @@
   else
     t("assays.#{item.assay_class.long_key.delete(' ').underscore}")
   end
+
+  isa_assay_verb ||=
+    if item&.is_assay_stream?
+      if item.next_linked_child_assay
+        "Insert a new"
+      else
+        "Design"
+      end
+    else
+      if item.next_linked_child_assay
+        "Insert a new"
+      else
+        "Design the next"
+      end
+    end
+
+  hide_new_assays_button = item.next_linked_child_assay&.sample_type&.samples&.any?
 %>
 <%= render :partial => "subscriptions/subscribe", :locals => {:object => item} %>
 
@@ -32,10 +49,14 @@
 		<% valid_study = item&.study&.is_isa_json_compliant? %>
 		<% valid_assay = item&.is_isa_json_compliant? %>
 		<% if valid_study && valid_assay %>
-      <% if item&.is_assay_stream? %>
-    	  <%= button_link_to("Design #{t('assay')}", 'new', new_isa_assay_path(source_assay_id: item.id, study_id: item.study.id, single_page: params[:single_page], assay_stream_id: item.id)) %>
+      <% if hide_new_assays_button %>
+        <%= button_link_to("#{isa_assay_verb} #{t('assay')}", 'new', nil, disabled_reason: 'The next linked assay has samples. Cannot insert new assay here.') %>
       <% else %>
-    	  <%= button_link_to("Design the next #{t('assay')}", 'new', new_isa_assay_path(source_assay_id: item.id, study_id: item.study.id, single_page: params[:single_page], assay_stream_id: item.assay_stream_id)) %>
+        <% if item&.is_assay_stream? %>
+            <%= button_link_to("#{isa_assay_verb} #{t('assay')}", 'new', new_isa_assay_path(source_assay_id: item.id, study_id: item.study.id, single_page: params[:single_page], assay_stream_id: item.id)) %>
+        <% else %>
+          <%= button_link_to("#{isa_assay_verb} #{t('assay')}", 'new', new_isa_assay_path(source_assay_id: item.id, study_id: item.study.id, single_page: params[:single_page], assay_stream_id: item.assay_stream_id)) %>
+        <% end %>
       <% end %>
 		<% end %>
 	<% else %>
