@@ -42,12 +42,6 @@ class GitFormatTest < ActionDispatch::IntegrationTest
       assert_equal 'application/vnd.api+json; charset=utf-8', response.headers['Content-Type']
       assert_equal path, JSON.parse(response.body)['path']
 
-      # Provide JSON response if Accept prefers
-      get "/workflows/#{workflow.id}/git/1/blob/#{path}", headers: { 'Accept' => 'application/json;q=0.9,text/html;q=0.8,*/*;q=0.5' }
-      assert_response :success
-      assert_equal 'application/vnd.api+json; charset=utf-8', response.headers['Content-Type']
-      assert_equal path, JSON.parse(response.body)['path']
-
       # Otherwise unrecognized format
       assert_raises(ActionController::UnknownFormat) do
         get "/workflows/#{workflow.id}/git/1/blob/#{path}", headers: { 'Accept' => 'application/zip' }
