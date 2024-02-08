@@ -21,3 +21,11 @@ module ActionDispatch
     end
   end
 end
+
+module ActionController
+  class Base
+    def self.ignore_format_from_extension
+      false
+    end
+  end
+end

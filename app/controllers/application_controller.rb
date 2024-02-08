@@ -677,9 +677,4 @@ class ApplicationController < ActionController::Base
   end
 
   helper_method :safe_class_lookup
-
-  # See: config/initializers/action_dispatch_http_mime_negotiation.rb
-  def self.ignore_format_from_extension
-    false
-  end
 end
