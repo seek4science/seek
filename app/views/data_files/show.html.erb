@@ -29,7 +29,7 @@
 
             <%= render :partial => "assets/asset_doi", :locals => {:displayed_resource=>@display_data_file} %>
 
-            <%= render partial: 'extended_metadata_types/extended_metadata_attribute_values', locals: { resource: @data_file } %>
+            <%= render partial: 'extended_metadata/extended_metadata_attribute_values', locals: { resource: @data_file } %>
 
             <%= render :partial => 'nels/data_sheet', locals: { displayed_resource: @display_data_file } if @data_file.nels? %>
           </div>

@@ -12,7 +12,7 @@
   <%= f.text_area :description, :rows => 5, :class=>"form-control rich-text-edit" -%>
 </div>
 
-<%= render partial: 'extended_metadata_types/extended_metadata_type_selection', locals:{f:f, resource:@investigation} %>
+<%= render partial: 'extended_metadata/extended_metadata_type_selection', locals:{f:f, resource:@investigation} %>
 
 <div class="<%= "hidden" if !Seek::Config.isa_json_compliance_enabled %>">
   <%#= panel("Compliance with ISA-JSON schemas") do %>
@@ -42,7 +42,7 @@
   <%= f.number_field :position, :rows => 5, :class=>"form-control"  -%>
 </div>
 
-<%= render partial: 'extended_metadata_types/extended_metadata_attribute_input', locals:{f:f,resource:@investigation} %>
+<%= render partial: 'extended_metadata/extended_metadata_attribute_input', locals:{f:f,resource:@investigation} %>
 
 <% if displaying_single_page?%>
   <input name="single_page" type="hidden" value=<%=params[:single_page]%> />

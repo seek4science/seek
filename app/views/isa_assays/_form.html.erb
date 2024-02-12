@@ -56,8 +56,8 @@
   </div>
 
   <% if show_extended_metadata %>
-    <%= render partial: 'extended_metadata_types/extended_metadata_type_selection', locals:{f:assay_fields, resource:@isa_assay.assay} %>
-    <%= render partial: 'extended_metadata_types/extended_metadata_attribute_input', locals:{f:assay_fields,resource:@isa_assay.assay, parent_resource: "isa_assay"} %>
+    <%= render partial: 'extended_metadata/extended_metadata_type_selection', locals:{f:assay_fields, resource:@isa_assay.assay} %>
+    <%= render partial: 'extended_metadata/extended_metadata_attribute_input', locals:{f:assay_fields,resource:@isa_assay.assay, parent_resource: "isa_assay"} %>
   <% end %>
 
   <div class="form-group hidden"  >

@@ -10,11 +10,11 @@
   <div id="<%= key %>">
     <div class="table linked_extended_metdata_odd" id="<%= key.singularize %>-table">
       <% if value.blank? %>
-        <%= render partial: 'extended_metadata_types/single_row', locals: { index: index, value: nil, attribute: attribute, element_name: element_name, element_class: element_class, prefix: prefix } %>
+        <%= render partial: 'extended_metadata/single_row', locals: { index: index, value: nil, attribute: attribute, element_name: element_name, element_class: element_class, prefix: prefix } %>
       <% else %>
         <% value.each_with_index do |v, idx| %>
           <% index = idx %>
-          <%= render partial: 'extended_metadata_types/single_row', locals: { index: index, value: v, attribute: attribute, element_name: element_name, element_class: element_class, prefix: prefix } %>
+          <%= render partial: 'extended_metadata/single_row', locals: { index: index, value: v, attribute: attribute, element_name: element_name, element_class: element_class, prefix: prefix } %>
         <% end %>
       <% end %>
       <div id="<%= key.singularize %>-row">
@@ -25,7 +25,7 @@
     </div>
 
     <div id="new-<%= key.singularize %>-row" style="display: none">
-      <%= render partial: 'extended_metadata_types/single_row', locals: { attribute: attribute, element_name: element_name, element_class: element_class, prefix: prefix } %>
+      <%= render partial: 'extended_metadata/single_row', locals: { attribute: attribute, element_name: element_name, element_class: element_class, prefix: prefix } %>
     </div>
   </div>
 

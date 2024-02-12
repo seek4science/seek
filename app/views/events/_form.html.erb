@@ -62,8 +62,8 @@
       </div>
 
       <div class="form-group">
-        <%= render partial: 'extended_metadata_types/extended_metadata_type_selection', locals: { f: f, resource: @event } %>
-        <%= render partial: 'extended_metadata_types/extended_metadata_attribute_input', locals: { f: f, resource: @event } %>
+        <%= render partial: 'extended_metadata/extended_metadata_type_selection', locals: { f: f, resource: @event } %>
+        <%= render partial: 'extended_metadata/extended_metadata_attribute_input', locals: { f: f, resource: @event } %>
       </div>
 
       <% if show_form_manage_specific_attributes? && @event.can_manage? %>
