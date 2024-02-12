@@ -270,4 +270,57 @@ class TemplatesControllerTest < ActionController::TestCase
       assert_select 'a[href=?]', template_path(template2), text: template2.title, count: 0
     end
   end
+
+  test 'editable isa tags' do
+    login_as(@person)
+    parent_template = FactoryBot.create(:isa_source_template, project_ids: @project_ids, contributor: @person)
+    inherited_template = create_template_from_parent_template(parent_template)
+
+    refute parent_template.template_attributes.all?(&:inherited?)
+    assert inherited_template.template_attributes.all?(&:inherited?)
+
+    get :edit, params: { id: inherited_template.id }
+    assert_response :success
+
+    inherited_template.template_attributes.each_with_index do |_ta, i|
+      puts "i: #{i}"
+      id = "select#template_template_attributes_attributes_#{i}_isa_tag_title[disabled='disabled']"
+      assert_select id
+    end
+
+    inherited_template.template_attributes << FactoryBot.create(:template_attribute, title: 'Extra attribute', isa_tag: FactoryBot.create(:source_characteristic_isa_tag), sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), pos: 4)
+    inherited_template.reload
+
+    assert inherited_template.template_attributes.last.title == 'Extra attribute'
+    refute inherited_template.template_attributes.last.inherited?
+    assert inherited_template.template_attributes.first.title == 'Source Name'
+    assert inherited_template.template_attributes.first.inherited?
+    refute inherited_template.template_attributes.first.allow_isa_tag_change?
+    assert inherited_template.template_attributes.last.allow_isa_tag_change?
+
+    get :edit, params: { id: inherited_template.id }
+    assert_response :success
+
+    # puts 'response'
+    # puts JSON.parse(response.body.inspect)
+
+    assert_select "select#template_template_attributes_attributes_0_isa_tag_title[disabled='disabled']"
+    cnt_last_attribute = inherited_template.template_attributes.count - 1
+
+    puts 'in memory:'
+    puts inherited_template.template_attributes.last.inspect
+
+    puts 'From database:'
+    puts Template.find(inherited_template.id).template_attributes.last.inspect
+
+    assert_select "select#template_template_attributes_attributes_#{cnt_last_attribute}_isa_tag_title[disabled='disabled']", text: 'source_characteristic', count: 0
+
+  end
+
+  def create_template_from_parent_template(parent_template, person= @person, linked_sample_type= nil)
+    child_template_attributes = parent_template.template_attributes.map do |ta|
+      FactoryBot.create(:template_attribute, parent_attribute_id: ta.id, title: ta.title, isa_tag_id: ta.isa_tag_id, sample_attribute_type: ta.sample_attribute_type, is_title: ta.is_title, required: ta.required, sample_controlled_vocab: ta.sample_controlled_vocab, pos: ta.pos)
+    end
+    FactoryBot.create(:template, contributor: person, template_attributes: child_template_attributes, parent_id: parent_template.id)
+  end
 end

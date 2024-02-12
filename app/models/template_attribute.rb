@@ -18,9 +18,7 @@ class TemplateAttribute < ApplicationRecord
   end
 
   def allow_isa_tag_change?
-    return false if inherited?
-
-    template.children.none?
+    !inherited?
   end
 
   def inherited?
