@@ -18,6 +18,22 @@ class ExtendedMetadataTypesControllerTest < ActionController::TestCase
 
   end
 
+  test 'administer update enabled' do
+    emt = FactoryBot.create(:simple_investigation_extended_metadata_type)
+    person = FactoryBot.create(:admin)
+    login_as(person)
+
+    assert emt.enabled?
+
+    put :administer_update, params:{id: emt.id, extended_metadata_type: {enabled: false}}
+    assert_redirected_to administer_extended_metadata_types_path
+    refute emt.reload.enabled?
+
+    put :administer_update, params:{id: emt.id, extended_metadata_type: {enabled: true}}
+    assert_redirected_to administer_extended_metadata_types_path
+    assert emt.reload.enabled?
+  end
+
   test 'show help text' do
     cmt = FactoryBot.create(:simple_investigation_extended_metadata_type_with_description_and_label)
     login_as(FactoryBot.create(:person))

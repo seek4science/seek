@@ -34,4 +34,8 @@ class ExtendedMetadataType < ApplicationRecord
       errors.add(:extended_metadata_attributes, 'must have unique titles')
     end
   end
+
+  def extended_type?
+    supported_type == 'ExtendedMetadata'
+  end
 end

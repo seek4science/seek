@@ -208,6 +208,9 @@ SEEK::Application.routes.draw do
       get :form_fields
       get :administer
     end
+    member do
+      put :administer_update
+    end
   end
 
   resource :favourites do

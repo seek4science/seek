@@ -1,7 +1,8 @@
 class ExtendedMetadataTypesController < ApplicationController
 
+
   before_action :is_user_admin_auth, except: [:form_fields, :show]
-  before_action :find_extended_metadata_type, only: [:show]
+  before_action :find_requested_item, only: [:administer_update, :show]
 
 
   # generated for form, to display fields for selected metadata type
@@ -29,6 +30,16 @@ class ExtendedMetadataTypesController < ApplicationController
       end
   end
 
+  def administer_update
+    @extended_metadata_type.update(extended_metadata_type_params)
+    unless @extended_metadata_type.save
+      flash[:error] = "Unable to save"
+    end
+    respond_to do |format|
+      format.html { redirect_to administer_extended_metadata_types_path }
+    end
+  end
+
   def administer
     @extended_metadata_types = ExtendedMetadataType.all
     respond_to do |format|
@@ -38,8 +49,8 @@ class ExtendedMetadataTypesController < ApplicationController
 
   private
 
-  def find_extended_metadata_type
-    @extended_metadata_type = ExtendedMetadataType.find(params[:id])
+  def extended_metadata_type_params
+    params.require(:extended_metadata_type).permit(:title, :enabled)
   end
 
 end

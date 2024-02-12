@@ -1,5 +1,18 @@
 <tr>
+  <td><%= extended_metadata_type.id %></td>
   <td><%= extended_metadata_type.title %></td>
   <td><%= extended_metadata_type.supported_type %></td>
   <td><%= extended_metadata_type.extended_metadatas.count %></td>
+  <td>
+    <% unless extended_metadata_type.extended_type? %>
+      <%= form_for(extended_metadata_type, url: { action: 'administer_update' }, method: :put) do |f| %>
+        <%= f.hidden_field :enabled, value: !extended_metadata_type.enabled? %>
+        <% if extended_metadata_type.enabled? %>
+          <%= f.submit 'Disable' %>
+        <% else %>
+          <%= f.submit 'Enable' %>
+        <% end %>
+      <% end %>
+    <% end %>
+  </td>
 </tr>
