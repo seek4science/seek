@@ -23,7 +23,7 @@
           </div>
         </div>
 
-        <%= render partial: 'extended_metadata/extended_metadata_attribute_values', locals: { resource: @sop } %>
+        <%= render partial: 'extended_metadata_types/extended_metadata_attribute_values', locals: { resource: @sop } %>
 
         <%= render :partial=>"general/isa_graph", :locals => {:root_item => @sop, :deep => true, :include_parents => true} %>
       </div>

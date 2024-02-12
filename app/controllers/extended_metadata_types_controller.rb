@@ -16,7 +16,7 @@ class ExtendedMetadataTypesController < ApplicationController
         resource = safe_class_lookup(cm.supported_type).new
         resource.extended_metadata = ExtendedMetadata.new(extended_metadata_type: cm)
         format.html do
-          render partial: 'extended_metadata/extended_metadata_fields',
+          render partial: 'extended_metadata_types/extended_metadata_fields',
                  locals: { extended_metadata_type: cm, resource: resource, parent_resource: parent_resource}
         end
       end
