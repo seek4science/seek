@@ -10,6 +10,7 @@ class ExtendedMetadataTypesControllerTest < ActionController::TestCase
     login_as(FactoryBot.create(:person))
 
     get :form_fields, params:{id:cmt.id}
+    assert_response :success
 
     assert_select "input#investigation_extended_metadata_attributes_data_age[name=?]","investigation[extended_metadata_attributes][data][age]"
     assert_select "input#investigation_extended_metadata_attributes_data_name[name=?]","investigation[extended_metadata_attributes][data][name]"
@@ -26,6 +27,22 @@ class ExtendedMetadataTypesControllerTest < ActionController::TestCase
     assert_select 'p.help-block', 1
     assert_select 'label',  text:'Biological age', count:1
     assert_select 'label',  text:'Date', count:1
+  end
+
+  test 'can access administer as admin' do
+    person = FactoryBot.create(:admin)
+    login_as(person)
+    get :administer
+    assert_response :success
+    refute flash[:error]
+  end
+
+  test 'can access administer as project admin' do
+    person = FactoryBot.create(:project_administrator)
+    login_as(person)
+    get :administer
+    assert_redirected_to :root
+    assert flash[:error]
   end
 
 end
