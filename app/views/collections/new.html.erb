@@ -19,8 +19,8 @@
       </div>
 
       <%= fields_for(@collection) do |collection_fields| %>
-        <%= render partial: 'extended_metadata_types/extended_metadata_type_selection', locals: { f: collection_fields, resource: @collection } %>
-        <%= render partial: 'extended_metadata_types/extended_metadata_attribute_input', locals: { f: collection_fields, resource: @collection } %>
+        <%= render partial: 'extended_metadata/extended_metadata_type_selection', locals: { f: collection_fields, resource: @collection } %>
+        <%= render partial: 'extended_metadata/extended_metadata_attribute_input', locals: { f: collection_fields, resource: @collection } %>
       <% end %>
 
       <%= render :partial => "projects/project_selector", :locals => { :resource => @collection } %>

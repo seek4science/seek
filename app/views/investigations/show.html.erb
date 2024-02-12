@@ -24,7 +24,7 @@
             <%= @investigation.is_isa_json_compliant? %>
           </p>
         <% end %>
-        <%= render partial: 'extended_metadata_types/extended_metadata_attribute_values', locals: {resource: @investigation} %>
+        <%= render partial: 'extended_metadata/extended_metadata_attribute_values', locals: {resource: @investigation} %>
         <%= render partial: 'general/isa_graph', locals: { root_item: @investigation, options: { depth: 4 } } -%>
       </div>
       <div class="col-md-3 col-sm-4">

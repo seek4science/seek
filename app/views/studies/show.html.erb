@@ -51,7 +51,7 @@
           </div>
         <% end %>
 
-        <%= render partial: 'extended_metadata_types/extended_metadata_attribute_values', locals: {resource: @study} %>
+        <%= render partial: 'extended_metadata/extended_metadata_attribute_values', locals: {resource: @study} %>
 
         <%= render partial: 'general/isa_graph', locals: { root_item: @study, options: { depth: 4 } } -%>
 
