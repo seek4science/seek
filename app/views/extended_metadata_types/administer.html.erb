@@ -1,0 +1,14 @@
+<table class='table table-hover'>
+  <thead>
+    <th>Title</th>
+    <th>Supported Type</th>
+    <th>Usage</th>
+  </thead>
+  <tbody>
+    <% @extended_metadata_types.each do |extended_metadata_type| %>
+
+      <%= render partial: 'extended_metadata_type_table_row', locals: { extended_metadata_type: extended_metadata_type } %>
+
+    <% end %>
+  </tbody>
+</table>

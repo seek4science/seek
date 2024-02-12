@@ -29,15 +29,25 @@ class ExtendedMetadataTypesControllerTest < ActionController::TestCase
     assert_select 'label',  text:'Date', count:1
   end
 
-  test 'can access administer as admin' do
+  test 'administer' do
+    emt = FactoryBot.create(:simple_investigation_extended_metadata_type)
     person = FactoryBot.create(:admin)
     login_as(person)
     get :administer
     assert_response :success
     refute flash[:error]
+    assert_select 'table tbody tr', count: 1
+    assert_select 'table tbody tr td', text: emt.title
   end
 
-  test 'can access administer as project admin' do
+  test 'can access administer as admin' do
+    person = FactoryBot.create(:admin)
+    login_as(person)
+    get :administer
+    assert_response :success
+  end
+
+  test 'cannot access administer as project admin' do
     person = FactoryBot.create(:project_administrator)
     login_as(person)
     get :administer
