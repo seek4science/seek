@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_02_06_132054) do
+ActiveRecord::Schema.define(version: 2024_02_12_145449) do
 
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
@@ -646,6 +646,7 @@ ActiveRecord::Schema.define(version: 2024_02_06_132054) do
     t.string "title"
     t.integer "contributor_id"
     t.text "supported_type"
+    t.boolean "enabled", default: true
   end
 
   create_table "external_assets", id: :integer, force: :cascade do |t|
