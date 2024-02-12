@@ -301,17 +301,8 @@ class TemplatesControllerTest < ActionController::TestCase
     get :edit, params: { id: inherited_template.id }
     assert_response :success
 
-    # puts 'response'
-    # puts JSON.parse(response.body.inspect)
-
     assert_select "select#template_template_attributes_attributes_0_isa_tag_title[disabled='disabled']"
     cnt_last_attribute = inherited_template.template_attributes.count - 1
-
-    puts 'in memory:'
-    puts inherited_template.template_attributes.last.inspect
-
-    puts 'From database:'
-    puts Template.find(inherited_template.id).template_attributes.last.inspect
 
     assert_select "select#template_template_attributes_attributes_#{cnt_last_attribute}_isa_tag_title[disabled='disabled']", text: 'source_characteristic', count: 0
 
