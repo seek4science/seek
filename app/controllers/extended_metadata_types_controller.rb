@@ -30,6 +30,7 @@ class ExtendedMetadataTypesController < ApplicationController
   end
 
   def administer
+    @extended_metadata_types = ExtendedMetadataType.all
     respond_to do |format|
       format.html
     end
