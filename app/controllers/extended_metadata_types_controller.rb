@@ -1,7 +1,8 @@
 class ExtendedMetadataTypesController < ApplicationController
-  respond_to :json
 
+  before_action :is_user_admin_auth, except: [:form_fields, :show]
   before_action :find_extended_metadata_type, only: [:show]
+
 
   # generated for form, to display fields for selected metadata type
   def form_fields
@@ -16,7 +17,7 @@ class ExtendedMetadataTypesController < ApplicationController
         resource.extended_metadata = ExtendedMetadata.new(extended_metadata_type: cm)
         format.html do
           render partial: 'extended_metadata/extended_metadata_fields',
-                 locals: { extended_metadata_type: cm, resource:, parent_resource: }
+                 locals: { extended_metadata_type: cm, resource: resource, parent_resource: parent_resource}
         end
       end
     end
@@ -26,6 +27,12 @@ class ExtendedMetadataTypesController < ApplicationController
      respond_to do |format|
         format.json {render json: @extended_metadata_type}
       end
+  end
+
+  def administer
+    respond_to do |format|
+      format.html
+    end
   end
 
   private
