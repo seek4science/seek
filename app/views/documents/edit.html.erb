@@ -15,8 +15,8 @@
         <%= f.text_area :description, :class=>"form-control rich-text-edit", :rows => 5 -%>
       </div>
 
-      <%= render partial: 'extended_metadata/extended_metadata_type_selection', locals: { f: f, resource: @document } %>
-      <%= render partial: 'extended_metadata/extended_metadata_attribute_input', locals: { f: f, resource: @document } %>
+      <%= render partial: 'extended_metadata_types/extended_metadata_type_selection', locals: { f: f, resource: @document } %>
+      <%= render partial: 'extended_metadata_types/extended_metadata_attribute_input', locals: { f: f, resource: @document } %>
 
       <%= render :partial => 'assets/license_selector', :locals => { :resource => @document } %>
 

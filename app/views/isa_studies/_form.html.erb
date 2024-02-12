@@ -13,8 +13,8 @@
       <%= study_fields.text_area :description, :rows=>5, :class=>"form-control rich-text-edit" %>
     </div>
 
-    <%= render partial: 'extended_metadata/extended_metadata_type_selection', locals:{f:study_fields, resource:@isa_study.study} %>
-    <%= render partial: 'extended_metadata/extended_metadata_attribute_input', locals:{f:study_fields,resource:@isa_study.study, parent_resource: "isa_study"} %>
+    <%= render partial: 'extended_metadata_types/extended_metadata_type_selection', locals:{f:study_fields, resource:@isa_study.study} %>
+    <%= render partial: 'extended_metadata_types/extended_metadata_attribute_input', locals:{f:study_fields,resource:@isa_study.study, parent_resource: "isa_study"} %>
 
     <% unless @isa_study.study.experimentalists.blank? %>
       <div class="form-group">

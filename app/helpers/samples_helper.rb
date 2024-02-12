@@ -42,7 +42,7 @@ module SamplesHelper
   end
 
   def linked_extended_metadata_multi_form_field(attribute, value, element_name, element_class)
-    render partial: 'extended_metadata/fancy_linked_extended_metadata_multi_attribute_fields',
+    render partial: 'extended_metadata_types/fancy_linked_extended_metadata_multi_attribute_fields',
            locals: { value: value, attribute: attribute, element_name: element_name, element_class: element_class, collapsed: false }
   end
 

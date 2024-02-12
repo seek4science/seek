@@ -33,8 +33,8 @@
       </div>
 
       <%= fields_for(@model) do |model_fields| %>
-        <%= render partial: 'extended_metadata/extended_metadata_type_selection', locals: { f: model_fields, resource: @model } %>
-        <%= render partial: 'extended_metadata/extended_metadata_attribute_input', locals: { f: model_fields, resource: @model } %>
+        <%= render partial: 'extended_metadata_types/extended_metadata_type_selection', locals: { f: model_fields, resource: @model } %>
+        <%= render partial: 'extended_metadata_types/extended_metadata_attribute_input', locals: { f: model_fields, resource: @model } %>
       <% end %>
 
       <%= render partial: "projects/project_selector", locals: { resource: @model } -%>
