@@ -1,16 +1,29 @@
+<% nested, top_level = @extended_metadata_types.partition(&:extended_type?) %>
+
 <table class='table table-hover'>
   <thead>
     <th>Internal Id</th>
     <th>Title</th>
     <th>Supported Type</th>
     <th>Usage</th>
+    <th>Status</th>
     <th/>
   </thead>
+
   <tbody>
-    <% @extended_metadata_types.each do |extended_metadata_type| %>
 
+    <tr class="emt-partition-title"><td colspan="100%"><h4>Top Level</h4></td></tr>
+    <% top_level.each do |extended_metadata_type| %>
       <%= render partial: 'extended_metadata_type_table_row', locals: { extended_metadata_type: extended_metadata_type } %>
-
     <% end %>
+
+    <tr class="emt-partition-title"><td colspan="100%"><h4>Nested</h4></td></tr>
+    <% nested.each do |extended_metadata_type| %>
+      <%= render partial: 'extended_metadata_type_table_row', locals: { extended_metadata_type: extended_metadata_type } %>
+    <% end %>
+
   </tbody>
+
 </table>
+
+

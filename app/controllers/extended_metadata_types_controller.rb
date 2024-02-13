@@ -41,7 +41,7 @@ class ExtendedMetadataTypesController < ApplicationController
   end
 
   def administer
-    @extended_metadata_types = ExtendedMetadataType.all
+    @extended_metadata_types = ExtendedMetadataType.order(:supported_type)
     respond_to do |format|
       format.html
     end

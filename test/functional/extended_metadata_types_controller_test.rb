@@ -52,8 +52,8 @@ class ExtendedMetadataTypesControllerTest < ActionController::TestCase
     get :administer
     assert_response :success
     refute flash[:error]
-    assert_select 'table tbody tr', count: 1
-    assert_select 'table tbody tr td', text: emt.title
+    assert_select 'table tbody tr:not(.emt-partition-title)', count: 1
+    assert_select 'table tbody tr:not(.emt-partition-title) td', text: emt.title
   end
 
   test 'can access administer as admin' do
