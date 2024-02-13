@@ -6,6 +6,7 @@ class ExtendedMetadataType < ApplicationRecord
   validates :supported_type, presence: true
   validate :supported_type_must_be_valid_type
   validate :unique_titles_for_extended_metadata_attributes
+  validate :cannot_disable_nested_extended_metadata
 
   alias_method :metadata_attributes, :extended_metadata_attributes
 
@@ -19,6 +20,10 @@ class ExtendedMetadataType < ApplicationRecord
 
   def attributes_with_linked_extended_metadata_type
     extended_metadata_attributes.reject {|attr| attr.linked_extended_metadata_type.nil?}
+  end
+
+  def extended_type?
+    supported_type == 'ExtendedMetadata'
   end
 
   def supported_type_must_be_valid_type
@@ -35,7 +40,13 @@ class ExtendedMetadataType < ApplicationRecord
     end
   end
 
-  def extended_type?
-    supported_type == 'ExtendedMetadata'
+  def cannot_disable_nested_extended_metadata
+    if !enabled && extended_type?
+      errors.add(:enabled, 'cannot be set to false if it is an extended_type used for nested types')
+    end
   end
+
+
+
+
 end
