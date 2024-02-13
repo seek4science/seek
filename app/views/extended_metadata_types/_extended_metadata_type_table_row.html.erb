@@ -5,7 +5,7 @@
   <td><%= extended_metadata_type.extended_metadatas.count %></td>
   <td>
     <% unless extended_metadata_type.extended_type? %>
-      <%= form_for(extended_metadata_type, url: { action: 'administer_update' }, method: :put) do |f| %>
+      <%= form_for(extended_metadata_type, url: administer_update_extended_metadata_type_path(extended_metadata_type), method: :put) do |f| %>
         <%= f.hidden_field :enabled, value: !extended_metadata_type.enabled? %>
         <% if extended_metadata_type.enabled? %>
           <%= f.submit 'Disable' %>
