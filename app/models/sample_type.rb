@@ -141,8 +141,7 @@ class SampleType < ApplicationRecord
     end
   end
 
-  def can_view?(user = User.current_user, referring_sample = nil, view_in_single_page = false)
-    return false if Seek::Config.isa_json_compliance_enabled && template_id.present? && !view_in_single_page
+  def can_view?(user = User.current_user, referring_sample = nil)
 
     project_membership = user&.person && (user.person.projects & projects).any?
     is_creator = creators.include?(user&.person)
