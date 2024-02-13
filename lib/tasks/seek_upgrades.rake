@@ -18,6 +18,7 @@ namespace :seek do
     db:seed:001_create_controlled_vocabs
     recognise_isa_json_compliant_items
     implement_assay_streams_for_isa_assays
+    assign_sample_type_permissions
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -218,6 +219,34 @@ namespace :seek do
     end
 
     puts "...Created #{assay_streams_created} new assay streams"
+  end
+
+  task(assign_sample_type_permissions: [:environment]) do
+    puts '... Assigning permissions to Sample Types'
+    sample_types = SampleType.where(policy_id: nil)
+
+    update_st_cntr = 0
+
+    assay_sample_types = sample_types.select { |st| st.assays.any? }
+    assay_sample_types.map do |st|
+      st.update_column(:policy_id, st.assays.first.policy_id)
+      update_st_cntr += 1
+    end
+
+    study_sample_types = sample_types.select { |st| st.studies.any? }
+    study_sample_types.map do |st|
+      st.update_column(:policy_id, st.studies.first.policy_id)
+      update_st_cntr += 1
+    end
+
+    project_sample_types = sample_types.select { |st| st.projects.any? && st.assays.none? && st.studies.none? }
+    project_sample_types.map do |st|
+      policy = Policy.create(name: 'default policy', access_type: 0)
+      st.update_column(:policy_id, policy.id)
+      update_st_cntr += 1
+    end
+
+    puts "... Provided #{update_st_cntr} Sample Types with permissions."
   end
 
   private
