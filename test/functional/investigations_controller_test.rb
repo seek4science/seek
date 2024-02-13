@@ -657,6 +657,23 @@ class InvestigationsControllerTest < ActionController::TestCase
 
   end
 
+  test 'show enabled extended metadata types only' do
+    emt = FactoryBot.create(:simple_investigation_extended_metadata_type)
+    emt2 = FactoryBot.create(:simple_investigation_extended_metadata_type, enabled: false)
+    login_as(FactoryBot.create(:person))
+    get :new
+    assert_response :success
+    assert_select 'select#extended_metadata_attributes_extended_metadata_type_id' do
+      assert_select 'option[value=?]',emt.id, text:emt.title, count: 1
+      assert_select 'option[value=?]',emt2.id, text:emt2.title, count: 0
+    end
+    emt.update_column(:enabled, false)
+    get :new
+    assert_response :success
+    assert_select 'select#extended_metadata_attributes_extended_metadata_type_id', count: 0
+
+  end
+
   test 'should create with discussion link' do
     person = FactoryBot.create(:person)
     login_as(person)

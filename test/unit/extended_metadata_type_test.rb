@@ -90,4 +90,12 @@ class ExtendedMetadataTypeTest < ActiveSupport::TestCase
     assert cmt.destroyed?
     assert_equal attributes, attributes.select(&:destroyed?)
   end
+
+  test 'enabled' do
+    cmt = FactoryBot.create(:simple_investigation_extended_metadata_type)
+    cmt2 = FactoryBot.create(:simple_investigation_extended_metadata_type, enabled: false)
+
+    assert_equal [cmt,cmt2], ExtendedMetadataType.all.order(:id)
+    assert_equal [cmt], ExtendedMetadataType.enabled.order(:id)
+  end
 end
