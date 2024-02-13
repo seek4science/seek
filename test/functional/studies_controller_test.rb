@@ -763,6 +763,25 @@ class StudiesControllerTest < ActionController::TestCase
     refute study.valid?
   end
 
+  test 'should not show extended metadata if disabled' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    emt = FactoryBot.create(:simple_study_extended_metadata_type)
+    study = FactoryBot.create(:study, extended_metadata: ExtendedMetadata.new(extended_metadata_type: emt, data: { name: 'Fred', age: 25 }), contributor: person)
+
+    #first check it's shown
+    get :show, params: {id: study}
+    assert_response :success
+    assert_select 'div#extended-metadata.panel', count: 1
+
+    emt.update_column(:enabled, false)
+    get :show, params: {id: study}
+    assert_response :success
+    assert_select 'div#extended-metadata.panel', count: 0
+
+
+  end
+
   test 'create a study with extended metadata with spaces in attribute names' do
     cmt = FactoryBot.create(:study_extended_metadata_type_with_spaces)
 
@@ -1980,7 +1999,7 @@ class StudiesControllerTest < ActionController::TestCase
     study_source_sample_type = FactoryBot.create :isa_source_sample_type, contributor: person
     study_sample_sample_type = FactoryBot.create :isa_sample_collection_sample_type, linked_sample_type: study_source_sample_type, contributor: person
     study = FactoryBot.create(:study,
-                              investigation: ,
+                              investigation: investigation ,
                               policy:FactoryBot.create(:private_policy, permissions:[FactoryBot.create(:permission,contributor: person, access_type:Policy::EDITING)]),
                               sample_types: [study_source_sample_type, study_sample_sample_type],
                               contributor: person)
@@ -2022,7 +2041,7 @@ class StudiesControllerTest < ActionController::TestCase
       person = FactoryBot.create(:person)
       login_as(person)
       investigation = FactoryBot.create(:investigation, contributor: person, is_isa_json_compliant: true)
-      study = FactoryBot.create(:isa_json_compliant_study, contributor: person, investigation: )
+      study = FactoryBot.create(:isa_json_compliant_study, contributor: person, investigation: investigation)
 
       get :show, params: { id: study }
       assert_response :success
