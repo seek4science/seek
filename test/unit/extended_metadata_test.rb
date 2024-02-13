@@ -275,6 +275,12 @@ class ExtendedMetadataTest < ActiveSupport::TestCase
   end
 
 
+  test 'enabled' do
+    em = simple_test_object
+    assert em.enabled?
+    em.extended_metadata_type.enabled = false
+    refute em.enabled?
+  end
 
   private
 
