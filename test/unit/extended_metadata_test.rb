@@ -282,6 +282,37 @@ class ExtendedMetadataTest < ActiveSupport::TestCase
     refute em.enabled?
   end
 
+  test 'validate that type is enabled for new records only' do
+    em = simple_test_object
+    em.set_attribute_value('name', 'bob')
+    assert em.new_record?
+    assert em.valid?
+    em.extended_metadata_type.enabled = false
+    refute em.valid?
+
+    em.extended_metadata_type.enabled = true
+    em.save!
+    em.extended_metadata_type.enabled = false
+    assert em.valid?
+  end
+
+  test 'validate item - not valid if em disabled if new record but ok if existing' do
+    emt = FactoryBot.create(:simple_study_extended_metadata_type)
+    study = FactoryBot.build(:study, extended_metadata: ExtendedMetadata.new(extended_metadata_type: emt, data: { name: 'Fred', age: 25 }), contributor: FactoryBot.create(:person))
+    assert study.new_record?
+    assert study.extended_metadata.new_record?
+    assert study.valid?
+    study.extended_metadata.extended_metadata_type.enabled = false
+    refute study.valid?
+
+    study.extended_metadata.extended_metadata_type.enabled = true
+    disable_authorization_checks do
+      study.save!
+    end
+    study.extended_metadata.extended_metadata_type.enabled = false
+    assert study.valid?
+  end
+
   private
 
   def simple_test_object
