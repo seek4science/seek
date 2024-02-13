@@ -10,6 +10,8 @@ class ExtendedMetadataType < ApplicationRecord
 
   alias_method :metadata_attributes, :extended_metadata_attributes
 
+  scope :enabled, ->{ where(enabled: true) }
+
   def attribute_by_title(title)
     extended_metadata_attributes.where(title: title).first
   end
