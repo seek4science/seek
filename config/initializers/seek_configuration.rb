@@ -271,6 +271,8 @@ def load_seek_config_defaults!
   load_seek_testing_defaults! if Rails.env.test?
 end
 
-SEEK::Application.configure do
-  load_seek_config_defaults!
+Rails.configuration.after_initialize do
+  SEEK::Application.configure do
+    load_seek_config_defaults!
+  end
 end

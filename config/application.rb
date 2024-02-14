@@ -13,7 +13,7 @@ end
 module SEEK
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 5.2
+    config.load_defaults 7.0
 
     # Force all environments to use the same logger level
     # Configuration for the application, engines, and railties goes here.
