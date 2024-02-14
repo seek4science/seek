@@ -1,4 +1,4 @@
-<tr>
+<tr class="<%= 'warning' if extended_metadata_type.disabled_but_used? %>">
   <td><%= extended_metadata_type.id %></td>
   <td><%= extended_metadata_type.title %></td>
   <td><%= extended_metadata_type.supported_type %></td>
