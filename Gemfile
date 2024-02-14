@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-gem 'rails', '~> 6.1.7'
+gem 'rails', '~> 7.0.7.2'
 gem 'rdoc'
 
 #database adaptors
@@ -41,7 +41,6 @@ gem 'rubyzip'
 gem 'equivalent-xml'
 # FIXME: Change back to "official" docsplit if this PR is ever merged: https://github.com/documentcloud/docsplit/pull/159
 gem 'docsplit', git: 'https://github.com/tuttiq/docsplit.git', ref: '6127e3912b8db94ed84dca6be5622d3d5ec0d879'
-gem 'pothoven-attachment_fu'
 gem 'exception_notification'
 gem 'fssm'
 gem 'acts-as-taggable-on'
@@ -61,7 +60,7 @@ gem 'lograge'
 gem 'psych'
 gem 'stringio', '3.0.1.1' #locked to the default version for ruby 3.1
 gem 'validate_url'
-gem "attr_encrypted", "~> 3.0.0"
+gem "attr_encrypted", "~> 4.0.0"
 gem 'libreconv'
 
 # gem for BiVeS and BudHat
