@@ -11,6 +11,7 @@ class ExtendedMetadataType < ApplicationRecord
   alias_method :metadata_attributes, :extended_metadata_attributes
 
   scope :enabled, ->{ where(enabled: true) }
+  scope :disabled, ->{ where(enabled: false) }
 
   def attribute_by_title(title)
     extended_metadata_attributes.where(title: title).first
@@ -46,6 +47,18 @@ class ExtendedMetadataType < ApplicationRecord
     if !enabled && extended_type?
       errors.add(:enabled, 'cannot be set to false if it is an extended_type used for nested types')
     end
+  end
+
+  def usage
+    extended_metadatas.count
+  end
+
+  def disabled_but_used?
+    !enabled && usage > 0
+  end
+
+  def self.disabled_but_in_use
+    disabled.select{|emt| emt.disabled_but_used?}
   end
 
 
