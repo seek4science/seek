@@ -7,7 +7,7 @@ require_relative './http_handler'
 
 module Seek
   module DownloadHandling
-    class GalaxyHTTPHandler < Seek::DownloadHandling::HTTPHandler
+    class GalaxyHttpHandler < Seek::DownloadHandling::HttpHandler
       attr_reader :galaxy_host, :workflow_id
 
       URL_PATTERNS = [

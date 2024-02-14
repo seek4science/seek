@@ -4,7 +4,7 @@ module Seek
   module DownloadHandling
     ##
     # A class to handle streaming remote content over FTP.
-    class FTPStreamer
+    class FtpStreamer
       def initialize(url, options = {})
         @url = url
         @size_limit = options[:size_limit]

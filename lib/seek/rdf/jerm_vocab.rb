@@ -1,6 +1,6 @@
 module Seek
   module Rdf
-    class JERMVocab < RDF::Vocabulary('http://jermontology.org/ontology/JERMOntology#')
+    class JermVocab < RDF::Vocabulary('http://jermontology.org/ontology/JERMOntology#')
       # these are explicitly defined, to prevent the undercores being changed to camelCase
       property :NCBI_ID
       property :Experimental_assay

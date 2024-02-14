@@ -1,7 +1,7 @@
 module Seek
   module Samples
     module AttributeHandlers
-      class CVAttributeHandler < BaseAttributeHandler
+      class CvAttributeHandler < BaseAttributeHandler
         class MissingControlledVocabularyException < AttributeHandlerException; end
 
         def test_value(value)

@@ -1,5 +1,5 @@
 module Seek
-  module JSONMetadata
+  module JsonMetadata
     module Attribute
       extend ActiveSupport::Concern
 

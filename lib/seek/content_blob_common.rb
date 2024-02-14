@@ -181,10 +181,10 @@ module Seek
     end
 
     def stream_from_http_url
-      info = Seek::DownloadHandling::HTTPHandler.new(@content_blob.url).info
+      info = Seek::DownloadHandling::HttpHandler.new(@content_blob.url).info
       case info[:code]
       when 200
-        stream_with(Seek::DownloadHandling::HTTPStreamer.new(@content_blob.url), info)
+        stream_with(Seek::DownloadHandling::HttpStreamer.new(@content_blob.url), info)
       when 401, 403
         # Try redirecting the user to the URL if SEEK cannot access it
         redirect_to @content_blob.url
@@ -200,7 +200,7 @@ module Seek
     end
 
     def stream_from_ftp_url
-      stream_with(Seek::DownloadHandling::FTPStreamer.new(@content_blob.url))
+      stream_with(Seek::DownloadHandling::FtpStreamer.new(@content_blob.url))
     end
 
     def stream_with(streamer, info={})

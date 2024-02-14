@@ -37,9 +37,9 @@ module Seek
       private
 
       def handle_good_http_response(handler)
-        if handler.is_a?(Seek::DownloadHandling::GithubHTTPHandler)
+        if handler.is_a?(Seek::DownloadHandling::GithubHttpHandler)
           @type = 'github'
-        elsif handler.is_a?(Seek::DownloadHandling::GalaxyHTTPHandler)
+        elsif handler.is_a?(Seek::DownloadHandling::GalaxyHttpHandler)
           @type = 'galaxy'
         elsif is_myexperiment_url?(handler.url)
           @type = 'webpage'

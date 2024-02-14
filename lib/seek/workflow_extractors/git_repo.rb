@@ -4,7 +4,7 @@ require 'licensee'
 
 module Seek
   module WorkflowExtractors
-    class GitRepo < ROLike
+    class GitRepo < RoLike
       def metadata
         m = super
 

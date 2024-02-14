@@ -7,7 +7,7 @@ class CWLExtractionTest < ActiveSupport::TestCase
 
   test 'extracts metadata from packed CWL' do
     wf = open_fixture_file('workflows/rp2-to-rp2path-packed.cwl')
-    extractor = Seek::WorkflowExtractors::CWL.new(wf)
+    extractor = Seek::WorkflowExtractors::Cwl.new(wf)
     metadata = extractor.metadata
     internals = metadata[:internals]
 
@@ -19,7 +19,7 @@ class CWLExtractionTest < ActiveSupport::TestCase
 
   test 'extracts metadata from CWL in workflow RO-Crate' do
     wf = open_fixture_file('workflows/rp2.crate.zip')
-    extractor = Seek::WorkflowExtractors::ROCrate.new(wf)
+    extractor = Seek::WorkflowExtractors::RoCrate.new(wf)
     metadata = extractor.metadata
     internals = metadata[:internals]
 
@@ -53,7 +53,7 @@ class CWLExtractionTest < ActiveSupport::TestCase
 
   test 'structure test' do
     wf = open_fixture_file('workflows/rp2-to-rp2path-packed.cwl')
-    extractor = Seek::WorkflowExtractors::CWL.new(wf)
+    extractor = Seek::WorkflowExtractors::Cwl.new(wf)
     metadata = extractor.metadata
     internals = metadata[:internals]
 
@@ -67,7 +67,7 @@ class CWLExtractionTest < ActiveSupport::TestCase
 
   test 'generates diagram' do
     wf = open_fixture_file('workflows/with_quotes.cwl')
-    extractor = Seek::WorkflowExtractors::CWL.new(wf)
+    extractor = Seek::WorkflowExtractors::Cwl.new(wf)
     diagram = extractor.generate_diagram
     assert diagram.length > 100
     assert diagram[0..256].include?('<svg ')

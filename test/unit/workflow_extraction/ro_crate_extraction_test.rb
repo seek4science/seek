@@ -3,7 +3,7 @@ require 'test_helper'
 class RoCrateExtractionTest < ActiveSupport::TestCase
   test 'extracts metadata from ro-crate' do
     wf = open_fixture_file('workflows/author_test.crate.zip')
-    extractor = Seek::WorkflowExtractors::ROCrate.new(wf)
+    extractor = Seek::WorkflowExtractors::RoCrate.new(wf)
     metadata = extractor.metadata
 
     assert_equal 'My First Workflow', metadata[:title]
@@ -39,7 +39,7 @@ class RoCrateExtractionTest < ActiveSupport::TestCase
 
   test 'extracts both authors and creators from ro-crate' do
     wf = open_fixture_file('workflows/author_and_creator_test.crate.zip')
-    extractor = Seek::WorkflowExtractors::ROCrate.new(wf)
+    extractor = Seek::WorkflowExtractors::RoCrate.new(wf)
     metadata = extractor.metadata
 
     assert_equal "Cool University, Dave's Ice Cream Shop", metadata[:other_creators]
@@ -79,14 +79,14 @@ class RoCrateExtractionTest < ActiveSupport::TestCase
   test 'handles RO-Crate with remote directories' do
     assert_nothing_raised do
       wf = open_fixture_file('workflows/COMPSs_RO-Crate.crate.zip')
-      extractor = Seek::WorkflowExtractors::ROCrate.new(wf)
+      extractor = Seek::WorkflowExtractors::RoCrate.new(wf)
       extractor.metadata
     end
   end
 
   test 'extracts metadata from CFF' do
     wf = open_fixture_file('workflows/ro-crate-with-cff.crate.zip')
-    extractor = Seek::WorkflowExtractors::ROCrate.new(wf)
+    extractor = Seek::WorkflowExtractors::RoCrate.new(wf)
     metadata = extractor.metadata
 
     assert_equal "Title from CFF", metadata[:title]
@@ -121,7 +121,7 @@ class RoCrateExtractionTest < ActiveSupport::TestCase
 
   test 'extracts license from LICENSE file' do
     wf = open_fixture_file('workflows/ro-crate-with-license.crate.zip')
-    extractor = Seek::WorkflowExtractors::ROCrate.new(wf)
+    extractor = Seek::WorkflowExtractors::RoCrate.new(wf)
     metadata = extractor.metadata
 
     assert_equal 'Apache-2.0', metadata[:license]

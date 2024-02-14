@@ -9,7 +9,7 @@ module Seek
         end
 
         def convert(value)
-          data = Seek::JSONMetadata::Data.new(linked_extended_metadata_type)
+          data = Seek::JsonMetadata::Data.new(linked_extended_metadata_type)
           data.mass_assign(value)
           data
         end

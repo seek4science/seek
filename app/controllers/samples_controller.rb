@@ -3,7 +3,7 @@ class SamplesController < ApplicationController
   include Seek::PreviewHandling
   include Seek::AssetsCommon
   include Seek::IndexPager
-  include Seek::JSONMetadata
+  include Seek::JsonMetadata
 
   before_action :samples_enabled?
   before_action :find_index_assets, only: :index

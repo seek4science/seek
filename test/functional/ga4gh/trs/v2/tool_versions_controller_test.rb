@@ -79,7 +79,7 @@ module Ga4gh
             t.binmode
             t << response.body
             t.close
-            crate = ROCrate::WorkflowCrateReader.read_zip(t.path, target_dir: dir)
+            crate = RoCrate::WorkflowCrateReader.read_zip(t.path, target_dir: dir)
             assert crate.main_workflow
           end
         end

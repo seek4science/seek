@@ -1,5 +1,5 @@
 module Seek
-  module JSONMetadata
+  module JsonMetadata
     class Data < HashWithIndifferentAccess
       class InvalidKeyException < RuntimeError; end
 

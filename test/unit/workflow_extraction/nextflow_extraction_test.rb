@@ -35,7 +35,7 @@ class NextflowExtractionTest < ActiveSupport::TestCase
 
   test 'extracts metadata from nextflow workflow RO-Crate' do
     wf = open_fixture_file('workflows/ro-crate-nf-core-ampliseq.crate.zip')
-    extractor = Seek::WorkflowExtractors::ROCrate.new(wf)
+    extractor = Seek::WorkflowExtractors::RoCrate.new(wf)
     metadata = extractor.metadata
 
     assert_equal 'nf-core/ampliseq', metadata[:title]

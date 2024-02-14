@@ -6,7 +6,7 @@ module Seek
   module WorkflowExtractors
     # Abstract extractor class for a "Research Object-like" structured bundle of files,
     # e.g. an RO-Crate or an annotated Git repository.
-    class ROLike < Base
+    class RoLike < Base
       def initialize(obj, main_workflow_class: nil)
         @obj = obj
         @main_workflow_class = main_workflow_class
@@ -112,15 +112,15 @@ module Seek
       def abstract_cwl_extractor
         return @abstract_cwl_extractor if defined?(@abstract_cwl_extractor)
 
-        @abstract_cwl_extractor = abstract_cwl_path ? Seek::WorkflowExtractors::CWL.new(file(abstract_cwl_path)) : nil
+        @abstract_cwl_extractor = abstract_cwl_path ? Seek::WorkflowExtractors::Cwl.new(file(abstract_cwl_path)) : nil
       end
 
       def cff_extractor
         return @cff_extractor if defined?(@cff_extractor)
 
-        cff = file(Seek::WorkflowExtractors::CFF::FILENAME)
+        cff = file(Seek::WorkflowExtractors::Cff::FILENAME)
 
-        @cff_extractor = cff ? Seek::WorkflowExtractors::CFF.new(cff) : nil
+        @cff_extractor = cff ? Seek::WorkflowExtractors::Cff.new(cff) : nil
       end
     end
   end

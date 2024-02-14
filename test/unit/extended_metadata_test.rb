@@ -101,7 +101,7 @@ class ExtendedMetadataTest < ActiveSupport::TestCase
     cm = simple_test_object
     date = Time.now.to_s
     refute cm.valid?
-    exception = assert_raises Seek::JSONMetadata::Data::InvalidKeyException do
+    exception = assert_raises Seek::JsonMetadata::Data::InvalidKeyException do
       cm.update(data: { name: 'Fred', wrong_age: 25, wrong_date: date })
     end
 
@@ -110,7 +110,7 @@ class ExtendedMetadataTest < ActiveSupport::TestCase
 
     cm = ExtendedMetadata.new(extended_metadata_type: FactoryBot.build(:study_extended_metadata_type_with_spaces), item: FactoryBot.create(:study))
 
-    exception = assert_raises Seek::JSONMetadata::Data::InvalidKeyException do
+    exception = assert_raises Seek::JsonMetadata::Data::InvalidKeyException do
       cm.update(data: {
                              'wrong full name' => 'Stuart Little',
                              'full address' => 'On earth'

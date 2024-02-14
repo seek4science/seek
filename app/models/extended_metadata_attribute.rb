@@ -1,5 +1,5 @@
 class ExtendedMetadataAttribute < ApplicationRecord
-  include Seek::JSONMetadata::Attribute
+  include Seek::JsonMetadata::Attribute
 
   belongs_to :extended_metadata_type
   belongs_to :linked_extended_metadata_type, class_name: 'ExtendedMetadataType'

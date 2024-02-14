@@ -1,6 +1,6 @@
 module Seek
   module Rdf
-    module CSVMappingsHandling
+    module CsvMappingsHandling
       MAPPINGS_FILE = File.join(File.dirname(__FILE__), 'rdf_mappings.csv')
 
       def generate_from_csv_definitions(rdf_graph)

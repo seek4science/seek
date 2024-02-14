@@ -65,7 +65,7 @@ module Seek
 
     def self.rdf_capable_types
       cache('rdf_capable_types') do
-        Seek::Rdf::JERMVocab.defined_types.keys
+        Seek::Rdf::JermVocab.defined_types.keys
       end
     end
 

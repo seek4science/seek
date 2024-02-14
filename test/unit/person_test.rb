@@ -171,10 +171,10 @@ class PersonTest < ActiveSupport::TestCase
       assert reader.has_triple? ["http://localhost:3000/people/#{object.id}", RDF::Vocab::FOAF.mbox_sha1sum, 'b507549e01d249ee5ed98bd40e4d86d1470a13b8']
 
       #none rdf supported created items are filtered out
-      assert reader.has_triple? ["http://localhost:3000/people/#{object.id}", Seek::Rdf::JERMVocab.isCreatorOf, "http://localhost:3000/assays/#{assay.id}"]
-      assert reader.has_triple? ["http://localhost:3000/people/#{object.id}", Seek::Rdf::JERMVocab.isCreatorOf, "http://localhost:3000/sops/#{sop.id}"]
-      refute reader.has_triple? ["http://localhost:3000/people/#{object.id}", Seek::Rdf::JERMVocab.isCreatorOf, "http://localhost:3000/documents/#{doc.id}"]
-      refute reader.has_triple? ["http://localhost:3000/people/#{object.id}", Seek::Rdf::JERMVocab.isCreatorOf, "http://localhost:3000/presentations/#{presentation.id}"]
+      assert reader.has_triple? ["http://localhost:3000/people/#{object.id}", Seek::Rdf::JermVocab.isCreatorOf, "http://localhost:3000/assays/#{assay.id}"]
+      assert reader.has_triple? ["http://localhost:3000/people/#{object.id}", Seek::Rdf::JermVocab.isCreatorOf, "http://localhost:3000/sops/#{sop.id}"]
+      refute reader.has_triple? ["http://localhost:3000/people/#{object.id}", Seek::Rdf::JermVocab.isCreatorOf, "http://localhost:3000/documents/#{doc.id}"]
+      refute reader.has_triple? ["http://localhost:3000/people/#{object.id}", Seek::Rdf::JermVocab.isCreatorOf, "http://localhost:3000/presentations/#{presentation.id}"]
     end
   end
 

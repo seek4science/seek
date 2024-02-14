@@ -54,7 +54,7 @@ module Seek
 
         include Seek::Stats::ActivityCounts
 
-        include Seek::ActsAsAsset::ISA::Associations
+        include Seek::ActsAsAsset::Isa::Associations
         include Seek::ActsAsAsset::Folders::Associations
         include Seek::ActsAsAsset::Relationships::Associations
 
@@ -104,7 +104,7 @@ module Seek
 
     module InstanceMethods
       include Seek::ActsAsAsset::ContentBlobs::InstanceMethods
-      include Seek::ActsAsAsset::ISA::InstanceMethods
+      include Seek::ActsAsAsset::Isa::InstanceMethods
       include Seek::ActsAsAsset::Relationships::InstanceMethods
       include Seek::ActsAsAsset::Folders::InstanceMethods
       include Seek::ResearchObjects::Packaging

@@ -14,7 +14,7 @@ class ApplicationRecord < ActiveRecord::Base
   include Seek::GroupedPagination
   include Seek::TitleTrimmer
   include Seek::ActsAsAsset
-  include Seek::ActsAsISA
+  include Seek::ActsAsIsa
   include HasExtendedMetadata
   include Seek::Doi::ActsAsDoiMintable
   include Seek::Doi::ActsAsDoiParent

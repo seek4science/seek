@@ -2,7 +2,7 @@ require 'cff'
 
 module Seek
   module WorkflowExtractors
-    class CFF
+    class Cff
       FILENAME = 'CITATION.cff'
 
       def initialize(io)

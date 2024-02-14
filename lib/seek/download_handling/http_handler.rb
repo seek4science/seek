@@ -6,7 +6,7 @@ require 'private_address_check/tcpsocket_ext'
 
 module Seek
   module DownloadHandling
-    class HTTPHandler
+    class HttpHandler
       include Seek::UploadHandling::ContentInspection
 
       attr_reader :url, :fallback_to_get
@@ -96,7 +96,7 @@ module Seek
       private
 
       def streamer
-        Seek::DownloadHandling::HTTPStreamer.new(url, size_limit: Seek::Config.hard_max_cachable_size)
+        Seek::DownloadHandling::HttpStreamer.new(url, size_limit: Seek::Config.hard_max_cachable_size)
       end
 
       # if it is a slideshare url, which starts with www.slideshare.net, and is made up of 2 parts (params ignored)

@@ -1,5 +1,5 @@
 class SampleAttribute < ApplicationRecord
-  include Seek::JSONMetadata::Attribute
+  include Seek::JsonMetadata::Attribute
 
   belongs_to :sample_type, inverse_of: :sample_attributes
   belongs_to :unit

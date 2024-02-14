@@ -56,7 +56,7 @@ class GitWorkflowWizard
 
     if git_version.ro_crate?
       git_version.in_temp_dir do |dir|
-        crate = ROCrate::WorkflowCrateReader.read(dir)
+        crate = RoCrate::WorkflowCrateReader.read(dir)
         git_version.main_workflow_path ||= crate.main_workflow&.id if crate.main_workflow&.id
         git_version.abstract_cwl_path ||= crate.main_workflow&.cwl_description&.id if crate.main_workflow&.cwl_description&.id
         git_version.diagram_path ||= crate.main_workflow&.diagram&.id if crate.main_workflow&.diagram&.id

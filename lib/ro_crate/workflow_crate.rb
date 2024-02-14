@@ -1,6 +1,6 @@
 require 'ro_crate'
 
-module ROCrate
+module RoCrate
   class WorkflowCrate < ::ROCrate::Crate
     PROFILE_REF = { '@id' => 'https://w3id.org/workflowhub/workflow-ro-crate/1.0' }.freeze
 

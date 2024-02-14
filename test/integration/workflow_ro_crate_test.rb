@@ -10,7 +10,7 @@ class WorkflowRoCrateTest < ActionDispatch::IntegrationTest
     workflow = FactoryBot.create(:generated_galaxy_ro_crate_workflow, projects: [project], creators: [person], other_creators: 'Jane Bloggs')
     zip = workflow.ro_crate_zip
 
-    crate = ROCrate::WorkflowCrateReader.read_zip(zip)
+    crate = RoCrate::WorkflowCrateReader.read_zip(zip)
     jane = crate.get('#Jane Bloggs')
     assert jane
     assert_equal 'Jane Bloggs', jane.name
@@ -54,7 +54,7 @@ class WorkflowRoCrateTest < ActionDispatch::IntegrationTest
 
     zip = workflow.ro_crate_zip
 
-    crate = ROCrate::WorkflowCrateReader.read_zip(zip)
+    crate = RoCrate::WorkflowCrateReader.read_zip(zip)
     remote1 = crate.get('http://internet.internet/file')
     assert remote1.is_a?(::ROCrate::File)
 

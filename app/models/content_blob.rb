@@ -229,14 +229,14 @@ class ContentBlob < ApplicationRecord
     uri = URI(url)
     case uri.scheme
     when 'ftp'
-      Seek::DownloadHandling::FTPHandler.new(url)
+      Seek::DownloadHandling::FtpHandler.new(url)
     when 'http', 'https'
       if uri.hostname.include?('github.com') || uri.hostname.include?('raw.githubusercontent.com')
-        Seek::DownloadHandling::GithubHTTPHandler.new(url)
-      elsif Seek::DownloadHandling::GalaxyHTTPHandler.is_galaxy_workflow_url?(uri)
-        Seek::DownloadHandling::GalaxyHTTPHandler.new(url)
+        Seek::DownloadHandling::GithubHttpHandler.new(url)
+      elsif Seek::DownloadHandling::GalaxyHttpHandler.is_galaxy_workflow_url?(uri)
+        Seek::DownloadHandling::GalaxyHttpHandler.new(url)
       else
-        Seek::DownloadHandling::HTTPHandler.new(url)
+        Seek::DownloadHandling::HttpHandler.new(url)
       end
     end
   end

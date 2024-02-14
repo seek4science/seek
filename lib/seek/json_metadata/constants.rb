@@ -1,4 +1,4 @@
 module Seek
-  module JSONMetadata
+  module JsonMetadata
   end
 end
