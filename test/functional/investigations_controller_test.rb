@@ -674,6 +674,22 @@ class InvestigationsControllerTest < ActionController::TestCase
 
   end
 
+  test 'editing an investigation with disabled extended metadata should show the option' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    emt = FactoryBot.create(:simple_study_extended_metadata_type)
+    investigation = FactoryBot.create(:investigation, extended_metadata: ExtendedMetadata.new(extended_metadata_type: emt, data: { name: 'John', age: 12 }), contributor: person)
+    investigation.save!
+    investigation.extended_metadata.extended_metadata_type.update_column(:enabled, false)
+    refute investigation.extended_metadata.enabled?
+
+    get :edit, params: { id: investigation }
+    assert_response :success
+    assert_select 'select#extended_metadata_attributes_extended_metadata_type_id' do
+      assert_select 'option[value=?]',emt.id, text: "#{emt.title} (DISABLED)", count: 1
+    end
+  end
+
   test 'should create with discussion link' do
     person = FactoryBot.create(:person)
     login_as(person)
