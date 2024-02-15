@@ -159,35 +159,35 @@ class SampleTypeEditingConstraintsTest < ActiveSupport::TestCase
     sample_type = FactoryBot.create(:isa_source_sample_type, projects: [project], contributor: person)
 
     c = Seek::Samples::SampleTypeEditingConstraints.new(sample_type)
-    c_inherrited = Seek::Samples::SampleTypeEditingConstraints.new(sample_type_from_template)
-    sample_type.sample_attributes.map { |attribute| refute c.send(:inherrited?, attribute) }
-    sample_type_from_template.sample_attributes.map { |attribute| assert c_inherrited.send(:inherrited?, attribute) }
-    sample_type_from_template.sample_attributes.map { |attribute| refute c_inherrited.allow_isa_tag_change?(attribute) }
+    c_inherited = Seek::Samples::SampleTypeEditingConstraints.new(sample_type_from_template)
+    sample_type.sample_attributes.map { |attribute| refute c.send(:inherited?, attribute) }
+    sample_type_from_template.sample_attributes.map { |attribute| assert c_inherited.send(:inherited?, attribute) }
+    sample_type_from_template.sample_attributes.map { |attribute| refute c_inherited.allow_isa_tag_change?(attribute) }
     sample_type.sample_attributes.map { |attribute| assert c.allow_isa_tag_change?(attribute) }
 
     # Adding an extra attribute to the sample_type
     sample_type_from_template.sample_attributes << FactoryBot.create(:sample_attribute, title: 'Extra Source Characteristic', sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), required: false, isa_tag_id: FactoryBot.create(:source_characteristic_isa_tag).id, sample_type: sample_type_from_template)
     sample_type_from_template.reload
-    c_inherrited = Seek::Samples::SampleTypeEditingConstraints.new(sample_type_from_template)
+    c_inherited = Seek::Samples::SampleTypeEditingConstraints.new(sample_type_from_template)
     extra_source_characteristic = sample_type_from_template.sample_attributes.detect { |sa| sa.title == 'Extra Source Characteristic' }
     refute extra_source_characteristic.nil?
     ## Extra source characteristic should be all blank, since there are no samples
-    assert c_inherrited.send(:all_blank?, extra_source_characteristic.accessor_name)
+    assert c_inherited.send(:all_blank?, extra_source_characteristic.accessor_name)
     ## Extra source characteristic is not inherrited from a template
-    refute c_inherrited.send(:inherrited?, extra_source_characteristic)
+    refute c_inherited.send(:inherited?, extra_source_characteristic)
     ## Extra source characteristic should be editable
-    assert c_inherrited.allow_isa_tag_change?(extra_source_characteristic)
+    assert c_inherited.allow_isa_tag_change?(extra_source_characteristic)
 
     # Add sample to the sample type but leave the extra characteristic empty
     isa_source_no_extra_char = FactoryBot.create(:isa_source, sample_type: sample_type_from_template, contributor: person)
     sample_type_from_template.samples << isa_source_no_extra_char
     sample_type_from_template.save
     ## Extra source characteristic should be all blank
-    assert c_inherrited.send(:all_blank?, extra_source_characteristic.accessor_name)
+    assert c_inherited.send(:all_blank?, extra_source_characteristic.accessor_name)
     ## The first attribute has a sample which is filled in => Not allowed to change ISA tag
-    refute c_inherrited.allow_isa_tag_change?(sample_type_from_template.sample_attributes.first)
+    refute c_inherited.allow_isa_tag_change?(sample_type_from_template.sample_attributes.first)
     ## Extra source characteristic is completely empty => Allowed to change ISA tag
-    assert c_inherrited.allow_isa_tag_change?(extra_source_characteristic)
+    assert c_inherited.allow_isa_tag_change?(extra_source_characteristic)
 
     # Add sample to the sample type with an extra characteristic value
     isa_source_with_extra_char = FactoryBot.create(:isa_source, sample_type: sample_type_from_template, contributor: person)
@@ -195,11 +195,11 @@ class SampleTypeEditingConstraintsTest < ActiveSupport::TestCase
     isa_source_with_extra_char.save
     sample_type_from_template.samples << isa_source_with_extra_char
     sample_type_from_template.save
-    c_inherrited = Seek::Samples::SampleTypeEditingConstraints.new(sample_type_from_template)
+    c_inherited = Seek::Samples::SampleTypeEditingConstraints.new(sample_type_from_template)
     ## Extra source characteristic isn't all blank anymore
-    refute c_inherrited.send(:all_blank?, extra_source_characteristic.accessor_name)
+    refute c_inherited.send(:all_blank?, extra_source_characteristic.accessor_name)
     ## Extra source characteristic is not empty => Not allowed to change ISA tag
-    refute c_inherrited.allow_isa_tag_change?(extra_source_characteristic)
+    refute c_inherited.allow_isa_tag_change?(extra_source_characteristic)
   end
 
   private

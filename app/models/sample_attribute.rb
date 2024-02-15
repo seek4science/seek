@@ -30,6 +30,10 @@ class SampleAttribute < ApplicationRecord
     isa_tag.nil? && title&.downcase&.include?('input') && seek_sample_multi?
   end
 
+  def inherited_from_template_attribute?
+    template_attribute_id.present?
+  end
+
   def title=(title)
     super
     store_accessor_name

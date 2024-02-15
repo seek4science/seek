@@ -77,9 +77,9 @@ module Seek
 
       def allow_isa_tag_change?(attr)
         if attr.is_a?(SampleAttribute)
-            return false if inherrited?(attr)
+          return false if inherited?(attr)
 
-            attr = attr.accessor_name
+          attr = attr.accessor_name
         end
 
         if attr
@@ -95,8 +95,8 @@ module Seek
 
       private
 
-      def inherrited?(attr)
-        attr&.template_attribute_id?
+      def inherited?(attr)
+        attr&.inherited_from_template_attribute?
       end
 
       def blanks?(attr)

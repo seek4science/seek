@@ -22,7 +22,7 @@ class TemplateAttribute < ApplicationRecord
   end
 
   def inherited?
-    !parent_attribute_id.nil?
+    !parent_attribute_id.present?
   end
 
   def input_attribute?
