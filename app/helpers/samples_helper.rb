@@ -6,7 +6,7 @@ module SamplesHelper
     attribute_form_element(attribute, resource.get_attribute_value(attribute.title), element_name, element_class)
   end
 
-  def controlled_vocab_form_field(sample_controlled_vocab, element_name, values, allow_new = false, limit = 1)
+  def controlled_vocab_form_field(sample_controlled_vocab, element_name, values, allow_new, limit = 1)
 
     scv_id = sample_controlled_vocab.id
     object_struct = Struct.new(:id, :title)
@@ -152,6 +152,22 @@ module SamplesHelper
     end
   end
 
+  def select_cv_source_ontology(sample_controlled_vocab)
+    ontology_choices = Ebi::OlsClient.ontology_choices
+    local_options = ontology_choices.collect do |choice|
+      { id: choice[1], text: choice[0]}
+    end
+    existing = []
+    if sample_controlled_vocab.source_ontology
+      label = ontology_choices.select{|choice| choice[1] == sample_controlled_vocab.source_ontology}.first.try(:[],0)
+      existing = [OpenStruct.new({id: sample_controlled_vocab.source_ontology, title: label })]
+    end
+    placeholder = 'Select or Search, or leave blank for No Ontology'
+    objects_input 'sample_controlled_vocab[source_ontology]', existing, {typeahead: {values:local_options},
+                                                                         placeholder: placeholder,
+                                                                         multiple: false}
+  end
+
   def seek_cv_attribute_display(value, attribute)
     term = attribute.sample_controlled_vocab.sample_controlled_vocab_terms.where(label:value).last
     content = value
@@ -267,9 +283,11 @@ module SamplesHelper
     link_to(link,link,target: :_blank)
   end
 
-  def ols_root_term_link(ols_id, term_uri)
-    ols_link = "#{Ebi::OlsClient::ROOT_URL}/ontologies/#{ols_id}/terms?iri=#{term_uri}"
-    link_to(term_uri, ols_link, target: :_blank)
+  def ols_root_term_link(ols_id, term_uris)
+    term_uris.split(',').collect(&:strip).collect do |uri|
+      ols_link = "#{Ebi::OlsClient::ROOT_URL}/ontologies/#{ols_id}/terms?iri=#{uri}"
+      link_to(uri, ols_link, target: :_blank)
+    end.join(', ').html_safe
   end
 
   def get_extra_info(sample)
@@ -285,13 +303,17 @@ module SamplesHelper
     }
   end
 
-  def show_extract_samples_button?(asset, display_asset)
-    return false unless ( asset.can_manage? && (display_asset.version == asset.version) && asset.sample_template? && asset.extracted_samples.empty? )
-    return ! ( asset.sample_extraction_task&.in_progress? || ( asset.sample_extraction_task&.success? && Seek::Samples::Extractor.new(asset).fetch.present? ) )
+  # whether to attempt to show the extract samples button,
+  # the final check of whether there is a sample type will be done asynchronously
+  def attempt_to_show_extract_samples_button?(asset, display_asset)
+    return false unless SampleType.any? && asset.can_manage? && asset.content_blob&.is_extractable_spreadsheet?
+    return false unless asset.extracted_samples.empty? && (display_asset.version == asset.version)
+    return false if asset.sample_extraction_task&.in_progress?
 
-    rescue Seek::Samples::FetchException
-      return true # allows to try again
+    !(asset.sample_extraction_task&.success? && Seek::Samples::Extractor.new(asset).fetch.present?)
 
+  rescue Seek::Samples::FetchException
+    true #allows to try again, the previous cached results may be broken
   end
 
   def show_sample_extraction_status?(data_file)

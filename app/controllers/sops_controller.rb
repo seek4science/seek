@@ -4,6 +4,7 @@ class SopsController < ApplicationController
 
   include Seek::AssetsCommon
 
+  before_action :sops_enabled?
   before_action :find_assets, :only => [ :index ]
   before_action :find_and_authorize_requested_item, :except => [ :index, :new, :create, :preview, :update_annotations_ajax]
   before_action :find_display_asset, :only=>[:show, :explore, :download]

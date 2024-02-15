@@ -1,3 +1,5 @@
+<%# Dynamic table with the source samples where users interact with sources %>
+
 <%
   study ||= nil
   sample_type = study&.sample_types&.first
@@ -20,7 +22,7 @@ uploadExcel: 'sourceUploadExcel()', sample_type_id: sample_type&.id} %>
 <% if sample_type %>
     <script>
     // TODO: Load data in a separeta script tag and remove it after DT is loaded
-        let initialLoad = true;
+        let sourceMaterialInitialLoad = true;
         $j(document).ready(function () {
             $j('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
                 $j.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
@@ -32,8 +34,8 @@ uploadExcel: 'sourceUploadExcel()', sample_type_id: sample_type&.id} %>
                ajax:{
                     url: dynamicTableDataPath,
                     data: function(d) {
-                        if (initialLoad) {
-                            initialLoad = false;
+                        if (sourceMaterialInitialLoad) {
+                            sourceMaterialInitialLoad = false;
                             return;
                         }
                         d.sample_type_id = '<%=sample_type.id%>';

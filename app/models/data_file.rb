@@ -111,17 +111,17 @@ class DataFile < ApplicationRecord
     true
   end
 
-  # FIXME: bad name, its not whether it IS a template, but whether it originates from a template
-  def sample_template?
+  def matching_sample_type?
     return false if external_asset.is_a? OpenbisExternalAsset
+
     possible_sample_types.any?
-  rescue SysMODB::SpreadsheetExtractionException
-    false
   end
 
+  # returns all matching sample types
   def possible_sample_types(user = User.current_user)
-    content_blob.present? ? SampleType.sample_types_matching_content_blob(content_blob,user) : []
+    SampleType.sample_types_matching_content_blob(content_blob,user)
   end
+
 
   def related_samples
     extracted_samples + linked_samples

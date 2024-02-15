@@ -2,8 +2,8 @@
  resource.sample_types.map {|s| s.isa_template } : [resource.sample_type&.isa_template]  %>
  
 <% if applied_templates.any? %>
-  <div>
-    <h3>Applied <%=applied_templates.second ? t('template').pluralize() :  t('template') %></h3>
+  <div style="margin-left: 20px">
+    <b>Applied <%=applied_templates.second ? t('template').pluralize() :  t('template') %>:</b>
     <div>
     <ul>
       <% applied_templates.each do |t| %>

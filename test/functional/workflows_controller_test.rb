@@ -463,6 +463,7 @@ class WorkflowsControllerTest < ActionController::TestCase
 
     assert_response :success
     assert_equal 'image/svg+xml', response.headers['Content-Type']
+    assert_equal ApplicationController::USER_SVG_CSP, @response.header['Content-Security-Policy']
     assert wf.diagram_exists?
   end
 
@@ -1765,5 +1766,13 @@ class WorkflowsControllerTest < ActionController::TestCase
     get :show, params: { id: wf }
 
     assert_select 'a.lifemonitor-status[href=?]', "https://app.lifemonitor.eu/workflow;uuid=#{wf.uuid}"
+  end
+
+  test 'do not get index if feature disabled' do
+    with_config_value(:workflows_enabled, false) do
+      get :index
+      assert_redirected_to root_path
+      assert flash[:error].include?('disabled')
+    end
   end
 end

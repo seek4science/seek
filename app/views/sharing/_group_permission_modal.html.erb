@@ -5,8 +5,14 @@
     <%= modal_body do %>
         <div class="form-group">
           <label>Members of...</label>
-          <%= select_tag('permission-project-id', projects_grouped_by_programme, name: nil,
-                         prompt: "any #{t('project')}", class: 'form-control', autocomplete: 'off') -%>
+          <%
+            opts = {}
+            opts[:select_options] = projects_grouped_by_programme
+            opts[:multiple] = false
+          %>
+
+          <%= objects_input('permission-project-id', [], opts) %>
+
         </div>
         <div class="form-group">
           <label>working at...</label>
@@ -34,8 +40,9 @@
 
   // Display project/institution/workgroup modal
   $j('#add-project-permission-button').click(function () {
-    $j('#add-project-permission-modal').modal('show');
-
+      $j('#permission-institution-id').val('');
+      $j('#permission-project-id').val('').trigger('change');
+      $j('#add-project-permission-modal').modal('show');
     return false;
   });
 

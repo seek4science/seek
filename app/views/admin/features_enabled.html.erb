@@ -72,12 +72,20 @@
                                "User creation of #{t('programme').pluralize} enabled", "Controls whether standard users can create their own #{t('programme').pluralize}. If disabled only full administrators will be able to create #{t('programme').pluralize}. If enabled a full administrator is still required to allow and activate the #{t('programme')}") %>
     <% managed_programme_options = options_for_select(Programme.all.map{|p|[p.title, p.id]}, Seek::Config.managed_programme_id) %>
     <%= admin_dropdown_setting(:managed_programme_id, managed_programme_options,
-                               "Site mananaged #{t('programme')}",
+                               "Site managed #{t('programme')}",
                                "The #{t('programme')} the users can request to have a #{t('project')} created and associated with, without the need to create and manage their own",
                                include_blank:'None') %>
     <%= admin_checkbox_setting(:programmes_open_for_projects_enabled, 1, Seek::Config.programmes_open_for_projects_enabled,
                                "#{t('programme').pluralize} open for #{t(:project).pluralize} enabled",
                                "When enabled, gives the ability for individual #{t(:programme).pluralize} to be configured to allow any other registered user to create a #{t(:project)} linked to that #{t(:programme)} without requiring approval or admin rights. Use with care if open user registration is enabled, as it could allow any user to register, create a project and start adding content to that Programme.") %>
+
+    <%= admin_checkbox_setting(:auto_activate_programmes, 1, Seek::Config.auto_activate_programmes,
+                               "Automatically activate #{t('programme').pluralize}",
+                               "Activates user-created #{t('programme').pluralize} immediately without requiring administrator approval (although they are still notified if email is enabled).") %>
+
+    <%= admin_checkbox_setting(:auto_activate_site_managed_projects, 1, Seek::Config.auto_activate_site_managed_projects,
+                               "Automatically approve #{t('project').pluralize} under site managed #{t('programme')}",
+                               "Approves #{t('project')} creation requests automatically (administrators are still notified if email is enabled).") %>
   </div>
 
   <%= admin_checkbox_setting(:presentations_enabled, 1, Seek::Config.presentations_enabled,
@@ -118,7 +126,7 @@
 
 
   <%= admin_checkbox_setting(:require_cookie_consent, 1, Seek::Config.require_cookie_consent,
-                             "Add a cookie consent banner and a cookie setting page", "Show a banner asking for consent for the use of cookies. SEEK uses an essential cookie for session handling, and optional cookies for tracking if set below. 
+                             "Add a cookie consent banner and a cookie setting page", "Show a banner asking for consent for the use of cookies. SEEK uses an essential cookie for session handling, and optional cookies for tracking if set below.
                              Some cookies might be also set by embedded content. This banner will offer 3 choices: Only necessary, Embedded content, All.
                              Setting up this option will also add a cookie setting page accessible from the footer.") %>
 
@@ -142,6 +150,19 @@
                            'Piwik analytics url', "The URL to your Piwik installation, withouth the http:// or https://, e.g. #{Seek::Config.default_piwik_analytics_url} ") %>
     <%= admin_checkbox_setting(:piwik_analytics_tracking_notice, 1, Seek::Config.piwik_analytics_tracking_notice,
                            'Piwik tracking notice', "Warn users about the use of analytics software.") %>
+  </div>
+
+  <%= admin_checkbox_setting(:custom_analytics_snippet_enabled, 1, Seek::Config.custom_analytics_snippet_enabled,
+                             "Include a custom analytics snippet", "Adds custom snippet to the page keep track of site traffic.",
+                             onchange: toggle_appear_javascript('custom_analytics_block')) %>
+
+  <div id="custom_analytics_block" class="additional_settings" style="<%= show_or_hide_block(Seek::Config.custom_analytics_snippet_enabled) %>">
+    <%= admin_text_setting(:custom_analytics_name, Seek::Config.custom_analytics_name,
+                           'Custom analytics name', "The name of the analytics software used for tracking traffic.") %>
+    <%= admin_textarea_setting(:custom_analytics_snippet, Seek::Config.custom_analytics_snippet,
+                               "Code Snippet", "A custom code snippet, taking care of site traffic.") %>
+    <%= admin_checkbox_setting(:custom_analytics_tracking_notice, 1, Seek::Config.custom_analytics_tracking_notice,
+                           'Custom tracking notice', "Warn users about the use of analytics software.") %>
   </div>
 
   <%= render :partial => "admin/doi_settings" %>

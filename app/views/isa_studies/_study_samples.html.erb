@@ -1,3 +1,5 @@
+<%# Dynamic table of the Study samples %>
+
 <%
   study ||= nil
   sample_type = study&.sample_types&.second
@@ -16,7 +18,7 @@
 
 <% if sample_type %>
     <script>
-        let initialLoad = true;
+        let studySamplesInitialLoad = true;
         $j(document).ready(function () {
             const dt = <%= sanitize(dt_data(sample_type).to_json) %>
             window.sampleDynamicTable = new $j.dynamicTable('#study-samples-table')
@@ -25,8 +27,8 @@
                ajax:{
                     url: dynamicTableDataPath,
                     data: function(d) {
-                        if (initialLoad) {
-                            initialLoad = false;
+                        if (studySamplesInitialLoad) {
+                            studySamplesInitialLoad = false;
                             return;
                         }
                         d.sample_type_id = '<%=sample_type.id%>';

@@ -129,7 +129,7 @@ FactoryBot.define do
   
   factory(:ontology_sample_controlled_vocab, parent: :sample_controlled_vocab) do
     source_ontology { 'http://ontology.org' }
-    ols_root_term_uri { 'http://ontology.org/#parent' }
+    ols_root_term_uris { 'http://ontology.org/#parent' }
     after(:build) do |vocab|
       vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'Parent',iri:'http://ontology.org/#parent',parent_iri:'')
       vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'Mother',iri:'http://ontology.org/#mother',parent_iri:'http://ontology.org/#parent')
@@ -139,7 +139,7 @@ FactoryBot.define do
   
   factory(:topics_controlled_vocab, parent: :sample_controlled_vocab) do
     title { 'Topics' }
-    ols_root_term_uri { 'http://edamontology.org/topic_0003' }
+    ols_root_term_uris { 'http://edamontology.org/topic_0003' }
     key { SampleControlledVocab::SystemVocabs.database_key_for_property(:topics) }
     source_ontology { 'edam' }
     after(:build) do |vocab|
@@ -152,7 +152,7 @@ FactoryBot.define do
   
   factory(:operations_controlled_vocab, parent: :sample_controlled_vocab) do
     title { 'Operations' }
-    ols_root_term_uri { 'http://edamontology.org/operation_0004' }
+    ols_root_term_uris { 'http://edamontology.org/operation_0004' }
     key { SampleControlledVocab::SystemVocabs.database_key_for_property(:operations) }
     source_ontology { 'edam' }
     after(:build) do |vocab|
@@ -165,7 +165,7 @@ FactoryBot.define do
   
   factory(:data_types_controlled_vocab, parent: :sample_controlled_vocab) do
     title { 'Data' }
-    ols_root_term_uri { 'http://edamontology.org/data_0006' }
+    ols_root_term_uris { 'http://edamontology.org/data_0006' }
     key { SampleControlledVocab::SystemVocabs.database_key_for_property(:data_types) }
     source_ontology { 'edam' }
     after(:build) do |vocab|
@@ -176,7 +176,7 @@ FactoryBot.define do
   
   factory(:data_formats_controlled_vocab, parent: :sample_controlled_vocab) do
     title { 'Formats' }
-    ols_root_term_uri { 'http://edamontology.org/format_1915' }
+    ols_root_term_uris { 'http://edamontology.org/format_1915' }
     key { SampleControlledVocab::SystemVocabs.database_key_for_property(:data_formats) }
     source_ontology { 'edam' }
     after(:build) do |vocab|
@@ -188,7 +188,7 @@ FactoryBot.define do
   factory(:efo_ontology, class: SampleControlledVocab) do
     sequence(:title) { |n| "EFO ontology #{n}" }
     source_ontology { 'EFO' }
-    ols_root_term_uri { 'http://www.ebi.ac.uk/efo/EFO_0000635' }
+    ols_root_term_uris { 'http://www.ebi.ac.uk/efo/EFO_0000635' }
     after(:build) do |vocab|
       vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'anatomical entity')
       vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'retroperitoneal space')
@@ -199,7 +199,7 @@ FactoryBot.define do
   factory(:obi_ontology, class: SampleControlledVocab) do
     sequence(:title) { |n| "OBI ontology #{n}" }
     source_ontology { 'OBI' }
-    ols_root_term_uri { 'http://purl.obolibrary.org/obo/OBI_0000094' }
+    ols_root_term_uris { 'http://purl.obolibrary.org/obo/OBI_0000094' }
     after(:build) do |vocab|
       vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'dissection')
       vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'enzymatic cleavage')

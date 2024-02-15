@@ -33,11 +33,17 @@ class Template < ApplicationRecord
   end
 
   def validate_template_attributes
-    errors.add(:base, '[Template attribute]: Some attributes are missing ISA tags') unless none_empty_isa_tag
+    unless attributes_with_empty_isa_tag.none?
+      attributes_with_empty_isa_tag.map do |attribute|
+        errors.add("[#{:template_attributes}]:", "Attribute '#{attribute.title}' is missing an ISA tag")
+      end
+    end
+
     if test_tag_occurences.any?
       test_tag_occurences.map do |tag|
-        errors.add(:base,
-                   "[Template attribute]: The <em>'#{tag}'</em> ISA tag is not allowed to be used more then once".html_safe)
+        attributes_with_duplicate_tags = template_attributes.select { |tat| tat.isa_tag&.title == tag }.map(&:title)
+        errors.add("[#{:template_attributes}]:",
+                   "The '#{tag}' ISA Tag was used in these attributes => #{attributes_with_duplicate_tags.inspect}. This ISA tag is not allowed to be used more then once!")
       end
     end
 
@@ -56,8 +62,8 @@ class Template < ApplicationRecord
     end
   end
 
-  def none_empty_isa_tag
-    template_attributes.select { |ta| !ta.title.include?('Input') && ta.isa_tag_id.nil? }.none?
+  def attributes_with_empty_isa_tag
+    template_attributes.select { |ta| !ta.title.include?('Input') && ta.isa_tag_id.nil? }
   end
 
   def test_tag_occurences
@@ -74,7 +80,7 @@ class Template < ApplicationRecord
 
   def test_attribute_title_uniqueness
     template_attribute_titles = template_attributes.map(&:title).uniq
-    duplicate_attributes = template_attribute_titles.map do |tat|
+    template_attribute_titles.map do |tat|
       if template_attributes.select { |ta| ta.title.downcase == tat.downcase }.map(&:title).count > 1
         errors.add(:template_attributes, "Attribute names must be unique, there are duplicates of #{tat}")
         return tat

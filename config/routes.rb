@@ -325,12 +325,17 @@ SEEK::Application.routes.draw do
       get :request_institutions
       get :guided_join
       get :guided_create
+      get :guided_import
       post :request_join
       post :request_create
+      post :request_import
       get :administer_create_project_request
+      get :administer_import_project_request
       post :respond_create_project_request
+      post :respond_import_project_request
       get :project_join_requests
       get :project_creation_requests
+      get :project_importation_requests
       get  :typeahead
     end
     member do
@@ -412,6 +417,7 @@ SEEK::Application.routes.draw do
     resources :people, :programmes, :projects, :assays, :studies, :models, :sops, :workflows, :data_files, :publications, :documents, only: [:index]
     member do
       get :export_isatab_json
+      get :export_isa, action: :export_isa
       get :manage
       get :order_studies
       patch :manage_update
@@ -493,6 +499,7 @@ SEEK::Application.routes.draw do
       get :destroy_samples_confirm
       post :retrieve_nels_sample_metadata
       get :retrieve_nels_sample_metadata
+      get :has_matching_sample_type
     end
     resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :collections, :workflows, :file_templates, :placeholders, only: [:index]
   end
@@ -706,7 +713,7 @@ SEEK::Application.routes.draw do
   resources :sample_controlled_vocabs do
     collection do
       get :typeahead
-      get :fetch_ols_terms
+      get :fetch_ols_terms_html
     end
   end
 
@@ -757,7 +764,6 @@ SEEK::Application.routes.draw do
   resources :single_pages do
     member do
       get :dynamic_table_data
-      get :export_isa, action: :export_isa
     end
     collection do
       get :batch_sharing_permission_preview

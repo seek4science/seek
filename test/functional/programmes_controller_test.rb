@@ -161,6 +161,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert person2.is_programme_administrator?(prog)
     assert person2.is_programme_administrator_of_any_programme?
     assert person2.has_role?('programme_administrator')
+    refute assigns(:programme).is_activated?
   end
 
   test 'admin sets themself as programme administrator at creation' do
@@ -927,6 +928,33 @@ class ProgrammesControllerTest < ActionController::TestCase
           assert_select 'a[href=?]', person_path(person2), text: person2.title
         end
       end
+    end
+  end
+
+  test 'do not get index if feature disabled' do
+    with_config_value(:programmes_enabled, false) do
+      get :index
+      assert_redirected_to root_path
+      assert flash[:error].include?('disabled')
+    end
+  end
+
+  test 'automatically activate programme if setting enabled' do
+    with_config_value(:auto_activate_programmes, true) do
+      creator = FactoryBot.create(:person)
+      refute creator.is_admin?
+      login_as(creator)
+      assert_difference('Role.count', 1) do # Should include creator
+        assert_difference('Programme.count', 1) do
+          post :create, params: { programme: { title: 'programme xxxyxxx2' } }
+        end
+      end
+
+      assert prog = assigns(:programme)
+      assert assigns(:programme).is_activated?
+      assert creator.is_programme_administrator?(prog)
+      assert creator.is_programme_administrator_of_any_programme?
+      assert creator.has_role?('programme_administrator')
     end
   end
 end

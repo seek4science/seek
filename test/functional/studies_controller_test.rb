@@ -1976,14 +1976,18 @@ class StudiesControllerTest < ActionController::TestCase
 
   test 'should delete empty study with linked sample type' do
     person = FactoryBot.create(:person)
-    study_source_sample_type = FactoryBot.create :linked_sample_type, contributor: person
-    study_sample_sample_type = FactoryBot.create :linked_sample_type, contributor: person
+    investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true)
+    study_source_sample_type = FactoryBot.create :isa_source_sample_type, contributor: person
+    study_sample_sample_type = FactoryBot.create :isa_sample_collection_sample_type, linked_sample_type: study_source_sample_type, contributor: person
     study = FactoryBot.create(:study,
+                              investigation: ,
                               policy:FactoryBot.create(:private_policy, permissions:[FactoryBot.create(:permission,contributor: person, access_type:Policy::EDITING)]),
                               sample_types: [study_source_sample_type, study_sample_sample_type],
                               contributor: person)
 
     login_as(person)
+
+    assert study.is_isa_json_compliant?
 
     assert_difference('SampleType.count', -2) do
       assert_difference('Study.count', -1) do
@@ -1992,4 +1996,39 @@ class StudiesControllerTest < ActionController::TestCase
     end
   end
 
+  test 'do not get index if feature disabled' do
+    with_config_value(:isa_enabled, false) do
+      get :index
+      assert_redirected_to root_path
+      assert flash[:error].include?('disabled')
+    end
+  end
+
+  test 'display single page button if feature enabled' do
+    with_config_value(:project_single_page_enabled, true) do
+      current_user = FactoryBot.create(:user)
+      login_as(current_user)
+      study = FactoryBot.create(:study, contributor: current_user.person)
+
+      get :show, params: { id: study }
+      assert_response :success
+
+      assert_select 'a', text: 'Single Page', count: 1
+    end
+  end
+
+  test 'display adjusted buttons if isa json compliant' do
+    with_config_value(:isa_json_compliance_enabled, true) do
+      person = FactoryBot.create(:person)
+      login_as(person)
+      investigation = FactoryBot.create(:investigation, contributor: person, is_isa_json_compliant: true)
+      study = FactoryBot.create(:isa_json_compliant_study, contributor: person, investigation: )
+
+      get :show, params: { id: study }
+      assert_response :success
+
+      assert_select 'a', text: /Design #{I18n.t('assay')} Stream/i, count: 1
+      assert_select 'a', text: /Add new #{I18n.t('assay')}/i, count: 0
+    end
+  end
 end

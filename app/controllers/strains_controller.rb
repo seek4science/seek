@@ -16,7 +16,7 @@ class StrainsController < ApplicationController
       @strain = parent_strain.clone_with_associations
       @strain.parent_id = parent_strain.id
     else
-      @strain = Strain.new
+      @strain = setup_new_asset
     end
   end
 

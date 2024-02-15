@@ -96,12 +96,9 @@ class Programme < ApplicationRecord
     !(activation_rejection_reason.nil? || is_activated?)
   end
 
-  # callback, activates if current user is an admin or nil, otherwise it needs activating
   def activate
-    if can_activate?
-      update_attribute(:is_activated, true)
-      update_attribute(:activation_rejection_reason, nil)
-    end
+    update_attribute(:is_activated, true)
+    update_attribute(:activation_rejection_reason, nil)
   end
 
   def can_activate?(user = User.current_user)

@@ -13,6 +13,26 @@
 </div>
 
 <%= render partial: 'extended_metadata/extended_metadata_type_selection', locals:{f:f, resource:@investigation} %>
+
+<div class="<%= "hidden" if !Seek::Config.isa_json_compliance_enabled %>">
+  <%#= panel("Compliance with ISA-JSON schemas") do %>
+  <%= folding_panel("Compliance with ISA-JSON schemas", false, id: "set_ISA_JSON_compliance",
+                    help_text: "Here you can choose to adhere to ISA-JSON schemas to enable ISA-JSON export.") do %>
+    <div class="help-block">
+      You can choose to make your <%= t('investigation') %> compliant with ISA-JSON schemas to enable ISA-JSON export. If checked, all associated ISA elements such as <%= t('study').pluralize %> and <%= t('assay').pluralize %> will also be ISA-JSON compliant. <br>
+      The checkbox cannot be toggled once child ISA elements such as <%= t('study').pluralize %> and <%= t('assay').pluralize %> have been associated.
+    </div>
+    <label>
+      <% if @investigation.studies.any? %>
+        <%= f.check_box :is_isa_json_compliant, disabled: "disabled"%>
+      <% else %>
+        <%= f.check_box :is_isa_json_compliant%>
+      <% end %>
+      <%= "Make #{t('investigation')} compliant to ISA-JSON schemas?" %>
+    </label>
+  <% end %>
+</div>
+
 <div class="<%= "hidden" if displaying_single_page? %>">
   <%= render :partial => 'projects/project_selector', :locals => {:resource => @investigation,:allow_nil=>false} if show_form_manage_specific_attributes? -%>
 </div>
@@ -43,11 +63,11 @@
 <%= form_submit_buttons(@investigation) %>
 
 <script>
-    $j(document).ready(function () {   
-        const urlSearchParams = new URLSearchParams(window.location.search);
-        const params = Object.fromEntries(urlSearchParams.entries());
-        const project_id = params["investigation[project_id]"]
-        if(project_id)
-          $j("#projects-selector-select").val(project_id).change();
-    }); 
+  $j(document).ready(function () {
+    const urlSearchParams = new URLSearchParams(window.location.search);
+    const params = Object.fromEntries(urlSearchParams.entries());
+    const project_id = params["investigation[project_id]"]
+    if(project_id)
+      $j("#projects-selector-select").val(project_id).change();
+  });
 </script>

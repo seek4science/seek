@@ -6,6 +6,7 @@ require 'authenticated_system'
 
 class ApplicationController < ActionController::Base
   USER_CONTENT_CSP = "default-src 'self'"
+  USER_SVG_CSP = "#{USER_CONTENT_CSP}; style-src 'unsafe-inline';"
 
   include Seek::Errors::ControllerErrorHandling
   include Seek::EnabledFeaturesFilter
@@ -129,11 +130,15 @@ class ApplicationController < ActionController::Base
   helper_method :controller_model
 
   def self.api_actions(*actions)
-    @api_actions ||= (superclass.respond_to?(:api_actions) ? superclass.api_actions.dup : []) + actions.map(&:to_sym)
+    @api_actions ||= []
+    @api_actions |= actions.map(&:to_sym)
+    @api_actions
   end
 
   def self.user_content_actions(*actions)
-    @user_content_actions ||= (superclass.respond_to?(:user_content_actions) ? superclass.user_content_actions.dup : []) + actions.map(&:to_sym)
+    @user_content_actions ||= []
+    @user_content_actions |= actions.map(&:to_sym)
+    @user_content_actions
   end
 
   private

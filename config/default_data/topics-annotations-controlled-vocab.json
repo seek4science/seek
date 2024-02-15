@@ -1,7 +1,7 @@
 {
   "title": "Topics",
   "description": "Topics, used for annotating. Describes the domain, field of interest, of study, application, work, data, or technology. Initially seeded from the EDAM ontology.",
-  "ols_root_term_uri": "http://edamontology.org/topic_0003",
+  "ols_root_term_uris": "http://edamontology.org/topic_0003",
   "source_ontology": "edam",
   "terms": [
     {

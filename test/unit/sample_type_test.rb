@@ -1096,6 +1096,48 @@ class SampleTypeTest < ActiveSupport::TestCase
     assert sample_type.errors.added?(:'sample_attributes.unit', 'cannot be changed (weight)')
   end
 
+  test 'determin whether sample types are considered ISA-JSON compliant' do
+    assay_sample_type = FactoryBot.create(:patient_sample_type)
+    refute assay_sample_type.is_isa_json_compliant?
+
+    FactoryBot.create(:assay, sample_type: assay_sample_type)
+    assert assay_sample_type.is_isa_json_compliant?
+
+    source_sample_type = FactoryBot.create(:patient_sample_type)
+    sample_collection_sample_type= FactoryBot.create(:patient_sample_type)
+
+    [source_sample_type, sample_collection_sample_type].each do |st|
+      refute st.is_isa_json_compliant?
+    end
+
+    FactoryBot.create(:study, sample_types: [source_sample_type, sample_collection_sample_type])
+
+    [source_sample_type, sample_collection_sample_type].each do |st|
+      assert st.is_isa_json_compliant?
+    end
+
+  end
+
+  test 'previous linked sample type' do
+    first_sample_type = FactoryBot.create(:isa_source_sample_type)
+    second_sample_type = FactoryBot.create(:isa_sample_collection_sample_type, linked_sample_type: first_sample_type)
+    third_sample_type = FactoryBot.create(:isa_assay_material_sample_type, linked_sample_type: second_sample_type)
+
+    assert_equal second_sample_type.previous_linked_sample_type, first_sample_type
+    refute_equal third_sample_type.previous_linked_sample_type, first_sample_type
+    refute_equal first_sample_type.previous_linked_sample_type, second_sample_type
+  end
+
+  test 'next linked sample types' do
+    first_sample_type = FactoryBot.create(:isa_source_sample_type)
+    second_sample_type = FactoryBot.create(:isa_sample_collection_sample_type, linked_sample_type: first_sample_type)
+    third_sample_type = FactoryBot.create(:isa_assay_material_sample_type, linked_sample_type: second_sample_type)
+
+    assert_equal first_sample_type.next_linked_sample_types, [second_sample_type]
+    assert_equal second_sample_type.next_linked_sample_types, [third_sample_type]
+    assert third_sample_type.next_linked_sample_types.blank?
+  end
+
   private
 
   # sample type with 3 samples

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_11_21_100719) do
+ActiveRecord::Schema.define(version: 2024_02_06_132054) do
 
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
@@ -189,6 +189,8 @@ ActiveRecord::Schema.define(version: 2023_11_21_100719) do
     t.string "deleted_contributor"
     t.integer "sample_type_id"
     t.integer "position"
+    t.integer "assay_stream_id"
+    t.index ["assay_stream_id"], name: "index_assays_on_assay_stream_id"
     t.index ["sample_type_id"], name: "index_assays_on_sample_type_id"
   end
 
@@ -940,6 +942,7 @@ ActiveRecord::Schema.define(version: 2023_11_21_100719) do
     t.text "other_creators"
     t.string "deleted_contributor"
     t.integer "position"
+    t.boolean "is_isa_json_compliant"
   end
 
   create_table "investigations_projects", id: false, force: :cascade do |t|
@@ -1744,8 +1747,7 @@ ActiveRecord::Schema.define(version: 2023_11_21_100719) do
     t.datetime "updated_at", null: false
     t.string "first_letter", limit: 1
     t.string "source_ontology"
-    t.string "ols_root_term_uri"
-    t.boolean "required"
+    t.string "ols_root_term_uris"
     t.string "short_name"
     t.string "key"
     t.integer "template_id"
@@ -2098,6 +2100,7 @@ ActiveRecord::Schema.define(version: 2023_11_21_100719) do
     t.integer "isa_tag_id"
     t.string "pid"
     t.boolean "allow_cv_free_text", default: false
+    t.integer "linked_sample_type_id"
     t.index ["template_id", "title"], name: "index_template_id_asset_id_title"
   end
 

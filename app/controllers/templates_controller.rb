@@ -29,7 +29,7 @@ class TemplatesController < ApplicationController
 
   def new
     @tab = 'manual'
-    @template = Template.new
+    @template = setup_new_asset
     @template.organism = 'any'
     respond_with(@template)
   end
@@ -157,7 +157,8 @@ class TemplatesController < ApplicationController
                                        template_attributes_attributes: %i[id title pos required description
                                                                           sample_attribute_type_id isa_tag_id is_title
                                                                           sample_controlled_vocab_id pid
-                                                                          unit_id _destroy] })
+                                                                          unit_id _destroy allow_cv_free_text
+                                                                          linked_sample_type_id] })
   end
 
   def find_template

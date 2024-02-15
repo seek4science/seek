@@ -1,3 +1,5 @@
+<%# The read-only table in experiments overview %>
+
 <% assay ||= nil %>
 <% valid_assay = assay&.sample_type.present? %>
 
@@ -15,15 +17,15 @@
 <% if valid_assay %>
     <script>
         var assayDynamicTable
-        let initialLoad = true;
+        let assayOverviewInitialLoad = true;
         $j(document).ready(function () {
             const dt = <%= sanitize(dt_aggregated(assay.study, assay).to_json) %>
             assayDynamicTable = new $j.dynamicTable('#assay-table')
             const ajax = {
                 url: dynamicTableDataPath,
                 data: function(d) {
-                    if (initialLoad) {
-                        initialLoad = false;
+                    if (assayOverviewInitialLoad) {
+                        assayOverviewInitialLoad = false;
                         return;
                     }
                     d.study_id = '<%=assay.study.id%>';

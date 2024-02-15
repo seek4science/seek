@@ -686,6 +686,13 @@ span.disabled {
   max-height: 20em;
 }
 
+/* job queue table */
+.job-queue-table {
+  overflow-y: auto;
+  max-height: 40em;
+  margin-bottom: 1em;
+}
+
 .citation-box {
   overflow-x: auto;
 }
@@ -786,4 +793,9 @@ div#super_tag_cloud {
   .lifemonitor-logo {
     height: 16px;
   }
+}
+
+.svg-pan-zoom {
+  max-width: 100%;
+  border: 1px solid #ddd;
 }
