@@ -30,6 +30,15 @@ class DataFilesControllerTest < ActionController::TestCase
 
   end
 
+  test 'get data file redirects if feature disabled' do
+    df = FactoryBot.create(:data_file, policy: FactoryBot.create(:public_policy))
+    with_config_value(:data_files_enabled, false) do
+      get :show, params: { id: df }
+      assert_redirected_to root_path
+      assert_equal 'Data files are disabled', flash[:error]
+    end
+  end
+
   test 'json link includes version' do
     df = FactoryBot.create(:data_file, policy: FactoryBot.create(:public_policy))
 
@@ -1772,6 +1781,16 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal df.version, json['data']['attributes']['version']
   end
 
+  test 'get data_file as json returns error if feature disabled' do
+    df = FactoryBot.create(:data_file, policy: FactoryBot.create(:public_policy))
+    with_config_value(:data_files_enabled, false) do
+      get :show, params: { id: df, format: 'json' }
+      assert_response :unprocessable_entity
+      json = JSON.parse(response.body)
+      assert_equal 'Data files are disabled', json['title']
+    end
+  end
+
   test 'landing page for hidden private_item' do
     df = FactoryBot.create(:data_file, policy: FactoryBot.create(:private_policy), title: 'fish flop', description: 'testing json description')
     assert !df.can_view?
@@ -2306,7 +2325,6 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select 'a', text: /fish/
   end
 
-
   test 'filtering using other fields in association form' do
     person = FactoryBot.create(:person)
     project1 = person.projects.first
@@ -2340,6 +2358,14 @@ class DataFilesControllerTest < ActionController::TestCase
     get :filter, params: { filter: 'datax', simulation_data: 'true' }
     assert response.body.blank?
     assert_response :success
+  end
+
+  test 'filtering returns error message if feature disabled' do
+    with_config_value(:data_files_enabled, false) do
+      get :filter, xhr: true, params: { filter: 'hello?' }
+      assert_response :unprocessable_entity
+      assert_select 'div.alert-danger', text: /Data files are disabled/
+    end
   end
 
   test 'programme data files through nested routing' do
