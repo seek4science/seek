@@ -283,7 +283,6 @@ class TemplatesControllerTest < ActionController::TestCase
     assert_response :success
 
     inherited_template.template_attributes.each_with_index do |_ta, i|
-      puts "i: #{i}"
       id = "select#template_template_attributes_attributes_#{i}_isa_tag_title[disabled='disabled']"
       assert_select id
     end
