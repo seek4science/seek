@@ -255,6 +255,10 @@ module Seek
             @sheets[x]
           end
         end
+
+        def sheet_names
+          @sheets.map(&:name)
+        end
       end
 
       class Style

@@ -1,6 +1,11 @@
-<% assay ||= nil %>
-<% valid_assay = assay&.sample_type.present? %>
-<% sample_type = assay&.sample_type %>
+<%# The dynamic table where users can interact with %>
+
+<%
+  assay ||= nil
+  valid_assay = assay&.sample_type.present?
+  sample_type = assay&.sample_type
+  project = assay&.projects&.first
+%>
 
 <div style="padding:0 20px 20px 20px;">
     <div class="row">
@@ -10,20 +15,29 @@
     </div>
 </div>
 
-<%= render partial: 'isa_studies/buttons' %>
+<%= render partial: 'isa_studies/buttons', locals: {uploadExcel: "assaySampleUploadExcel()", sample_type_id: sample_type&.id} %>
 
 <% if valid_assay %>
     <script>
-        let sampleDynamicTable
+        let assaySamplesInitialLoad = true;
         $j(document).ready(function () {
             $j('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
                 $j.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
             });
             const dt = <%= sanitize(dt_data(sample_type).to_json) %>
-            sampleDynamicTable = new $j.dynamicTable('#assay-samples-table');
+            window.sampleDynamicTable = new $j.dynamicTable('#assay-samples-table');
             const elem = $j("#btn_save_assay_sample")
             const options = {
-                assayId:  selectedItem.type =="assay" ? selectedItem.id : null,
+                assayId:  "<%= assay&.id %>",
+                url: dynamicTableDataPath,
+                data: function(d) {
+                    if (assaySamplesInitialLoad) {
+                        assaySamplesInitialLoad = false;
+                        return;
+                    }
+                    d.sample_type_id = '<%=sample_type.id%>';
+                    d.rows_pad = "true"
+                },
                 callback: () => assayDynamicTable.table.ajax.reload(),
                 enableLoading: () => {
                   $j("#dt-overlay").css("display", "flex")
@@ -37,29 +51,42 @@
                 }
             }
 
-            sampleDynamicTable.init(dt.rows, dt.columns, options)
+            window.sampleDynamicTable.init(dt.rows, dt.columns, options)
 
             $j(".dataTables_scrollBody").css("min-height", "300px")
         });
 
         function SamplePasteFromClipboard(){
-            sampleDynamicTable.pasteFromClipboard()
+            window.sampleDynamicTable.pasteFromClipboard()
         }
 
         function SampleSave(){
-            sampleDynamicTable.save()
+            window.sampleDynamicTable.save()
         }
 
         function SampleSetAsDeleted(){
-            sampleDynamicTable.setAsDeleted()
+            window.sampleDynamicTable.setAsDeleted()
         }
 
         function SampleAddNewRow(){
-            sampleDynamicTable.newRow()
+            window.sampleDynamicTable.newRow()
         }
 
         function sampleExportExcel() {
             exportToExcel("assay-samples-table", '<%=assay.study_id%>', '<%=assay.id%>', '<%=sample_type.id%>');
+        }
+
+        function assaySampleUploadExcel(){
+          const file = $j('input[type="file"][id="file-<%=sample_type.id%>"]').toArray()[0].files[0];
+          if (!file) {
+            alert("File not found! Please select a file to upload.");
+            return
+          }
+          let formData = new FormData();
+          formData.append('file', file);
+          formData.append('sample_type_id', <%=sample_type&.id%>);
+          formData.append('project_id', <%=project&.id%>);
+          handleUploadSubmit(formData);
         }
 
     </script>

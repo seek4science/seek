@@ -207,61 +207,81 @@ async function batchDeleteSample(sampleTypes) {
 // Posts the content of the dynamic table to the single_pages_controller,
 // which generates an excel workbook based on a template.
 async function exportToExcel(tableName, studyId, assayId, sampleTypeId) {
-    const headerRow = $j(`table[id=${tableName}] thead tr`)["0"];
+  const headerRow = $j(`table[id=${tableName}] thead tr`)["0"];
 
-    // Cells from the table body => Each row = array
-    // For some reason they contain null values, which should be filtered out
-    let bodyCells = $j(`table[id=${tableName}]`).DataTable().data().toArray().map(subarray => subarray.filter(function(el){return el != null}));
+  // Cells from the table body => Each row = array
+  // For some reason they contain null values, which should be filtered out
+  let bodyCells = $j(`table[id=${tableName}]`).DataTable().data().toArray().map(subarray => subarray.filter(function(el){return el != null}));
 
-    // Return array of table header cells from headerRow
-    let headerCells = [];
-    $j.each(headerRow.cells, function (i, v) {
-        headerCells.push(v.textContent);
-    });
+  // Checks whether the dynamic table has errors
+  // The excel export will be aborted as long as the dynamic table has errors
+  hasErrorcells = $j(`table[id=${tableName}]`).find('select.select2__error').size() > 0
+  if (hasErrorcells) {
+    alert('It appears this sample table has some errors. Please correct the errors in the current sample table and try downloading again.');
+    return;
+  }
 
-    // Construct the 'struct' of the table data
-    let data = [];
-    for (let i = 0; i < bodyCells.length; i++) {
-        const row = bodyCells[i];
-        // If a row has been checked / unchecked,
-        // the datatable body gets one extra hidden cell at index 1,
-        // compared to the table header. This has to be removed.
-        if (row.length !== headerCells.length)row.splice(1,1);
-        let obj = {};
-        for (let j = 0; j < headerCells.length; j++) {
-          const attr = headerCells[j];
-          const val = row[j];
+  // Return array of table header cells from headerRow
+  let headerCells = [];
+  $j.each(headerRow.cells, function (i, v) {
+      headerCells.push(v.textContent);
+  });
 
-          // The source inputs are wrapped in an object and must be unwrapped first
-          // And then packaged as a single element
-          if(j === 0) {
-              obj["selected"] = (val === "") ? false : val;
-          } else {
-              obj[attr] = val;
-          }
-          if(obj.selected) data.push(obj);
-        }
+  // Construct the 'struct' of the table data
+  let data = [];
+  for (let i = 0; i < bodyCells.length; i++) {
+    const row = bodyCells[i];
+    // If a row has been checked / unchecked,
+    // the datatable body gets one extra hidden cell at index 1,
+    // compared to the table header. This has to be removed.
+    if (row.length !== headerCells.length)row.splice(1,1);
+    let obj = {};
+    let hasHiddenInputs = false;
+    for (let j = 0; j < headerCells.length; j++) {
+      const attr = headerCells[j];
+      const val = row[j];
+
+      // Check whether sample has one or more hidden Inputs or if sample is completely hidden
+      if (Array.isArray(val)){
+        hasHiddenInputs = hasHiddenInputs || val.some(input => input.title === '#HIDDEN'); // Sample has hidden Registered Samples in list
+      } else if(typeof val === 'object' && val !== null && 'title' in val){
+        hasHiddenInputs = hasHiddenInputs || (val.title === '#HIDDEN'); // Sample has hidden Registered Sample
+      } else {
+        hasHiddenInputs = hasHiddenInputs || (val === '#HIDDEN'); // Sample is completely hidden
       }
 
-      // Use ajax for POST request with table data in the body
-      // If succes => Redirect to download path for retrieving excel file
-      $j.ajax({
-        type: 'POST',
-        url: '<%= export_to_excel_single_pages_path() %>',
-        data: { sample_data: JSON.stringify(data),
-          sample_type_id: JSON.stringify(sampleTypeId),
-          study_id: JSON.stringify(studyId),
-          assay_id: JSON.stringify(assayId),
-        },
-        success: function(response) {
-          downloadUrl = `<%= download_samples_excel_single_pages_path() %>?uuid=${response.uuid}`;
-          window.location.href = downloadUrl;
-        },
-        error: function(response) {
-            alert(`Failed to export through excel!\nStatus: ${response.status}\nError: ${JSON.stringify(response.error().statusText)}`);
-        }
-    });
+      // The source inputs are wrapped in an object and must be unwrapped first
+      // And then packaged as a single element
+      if(j === 0) {
+        obj["selected"] = (val === "") ? false : val;
+      } else {
+        obj[attr] = val;
+      }
+    }
+    if (!hasHiddenInputs && obj["selected"]) data.push(obj);
+  }
 
+  // Use ajax for POST request with table data in the body
+  // If succes => Redirect to download path for retrieving excel file
+  $j.ajax({
+    type: 'POST',
+    url: '<%= export_to_excel_single_pages_path() %>',
+    data: { sample_data: JSON.stringify(data),
+      sample_type_id: JSON.stringify(sampleTypeId),
+      study_id: JSON.stringify(studyId),
+      assay_id: JSON.stringify(assayId),
+    }
+  })
+  .done( function(response){
+    downloadUrl = `<%= download_samples_excel_single_pages_path() %>?uuid=${response.uuid}`;
+    window.location.href = downloadUrl;
+  })
+  .fail( function(response){
+    alert(`Failed to export through excel!\nStatus: ${response.status}\nError: ${JSON.stringify(response.error().statusText)}`);
+  })
+  .always( function(response){
+    setTimeout(() => {location.reload()}, 2000);
+  });
 }
 
 async function batchUpdateSample(sampleTypes) {
@@ -280,6 +300,25 @@ async function batchUpdateSample(sampleTypes) {
   } catch (e) {
     console.log(e);
   }
+}
+
+async function handleUploadSubmit(formData){
+  $j.ajax({
+    type: 'POST',
+    url: "<%= upload_samples_single_pages_path %>",
+    data: formData,
+    dataType: 'html',
+    processData: false,
+    contentType: false,
+    enctype: 'multipart/form-data',
+    success: function(response){
+      $j('#upload-excel-modal').modal({backdrop: 'static', keyboard: false}, 'show').focus();
+      $j('#upload-excel').html(response);
+    },
+    error: function(err){
+      location.reload(); // Page needs reloading for the notice message to appear
+    }
+  });
 }
 
 function isMobile() {

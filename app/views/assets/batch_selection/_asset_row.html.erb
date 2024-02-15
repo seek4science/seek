@@ -1,0 +1,104 @@
+<%
+  item = asset_row
+  preselected ||= nil
+  checked ||= (item == preselected)
+  publishing ||= false
+  can_manage = item.can_manage?
+  can_view = item.can_view?
+  published = false
+  html_classes ||= "publishing_options"
+  tree_class = 'not-manageable'
+  tree_class = 'manageable' if can_manage
+  tree_class = 'not-visible' unless can_view
+  if publishing
+    if item.is_published?
+      published = true
+      tree_class = 'already-published'
+    end
+  end
+  item_id = "#{item.class.name}_#{item.id}"
+  show_managers ||= false
+  show_permissions ||= false
+  show_managers = show_managers && (can_view || item.can_see_hidden_item?(current_user.person))
+  show_children ||= false
+  children = []
+  if show_children
+    case item
+    when Investigation
+      children = item.studies
+    when Study
+      children = item.assays
+    when Assay
+      children = item.assets
+    end
+  end
+-%>
+<div class="batch-selection-asset batch-selection-scope">
+  <div class="isa-tree batch-selection-asset-row <%= html_classes -%> <%= tree_class %>" data-asset-id="<%= item_id -%>">
+    <%= batch_selection_collapse_toggle if children.any? %>
+
+    <%= render partial: 'assets/batch_selection/checkbox',
+               locals: { checkbox_id: publishing_item_param(item),
+                         checkbox_class: item_id,
+                         checked: can_view && checked,
+                         not_visible: !can_view,
+                         published: can_view && published,
+                         cant_manage: !can_manage,
+                         has_children: children.any? } -%>
+
+    <span class="type_and_title">
+      <strong><%= text_for_resource item -%>:</strong>
+      <% if can_view %>
+        <%= link_to item.title, item, target: "_blank" -%>
+      <% else %>
+        This item is hidden to you
+      <% end %>
+    </span>
+
+    <% if show_permissions %>
+      <% if can_view %>
+        <a class="btn btn-default btn-sm batch-selection-permissions-toggle">
+          <%= list_item_visibility(item)-%>
+        </a>
+      <% else %>
+        <%= list_item_visibility(item)-%>
+      <% end %>
+    <% end %>
+
+    <% if show_managers %>
+      <a class="btn btn-default btn-sm batch-selection-managed-by-toggle">
+        <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+      </a>
+    <% end %>
+  </div>
+
+  <% if show_managers %>
+    <div class="batch-selection-managed-by-list" style="display: none;">
+      <strong>Manageable by:</strong>
+      <% if item.managers.empty? %>
+        <span class="none_text">None</span>
+      <% else %>
+        <%= item.managers.collect { |m| link_to(h(m.title), m) }.join(", ").html_safe -%>
+      <% end %>
+    </div>
+  <% end %>
+  <% if show_permissions && can_view %>
+    <%= render partial: 'assets/batch_selection/permission_list', locals: { item: item } -%>
+  <% end %>
+
+  <% if show_children && children.any? %>
+    <div class="batch-selection-children batch-selection-collapse">
+      <% children.each do |child| %>
+        <%= render partial: 'assets/batch_selection/asset_row',
+                   object: child,
+                   locals: { preselected: preselected,
+                             publishing: publishing,
+                             html_classes: "publishing_options",
+                             show_permissions: show_permissions,
+                             show_managers: show_managers,
+                             show_children: true
+                   } -%>
+      <% end %>
+    </div>
+  <% end %>
+</div>

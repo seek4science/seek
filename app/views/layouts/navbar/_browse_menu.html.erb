@@ -17,6 +17,7 @@
         [t('investigation').pluralize, investigations_path, Seek::Config.investigations_enabled],
         [t('study').pluralize, studies_path, Seek::Config.studies_enabled],
         [t('assay').pluralize, assays_path, Seek::Config.assays_enabled],
+        [t('template').pluralize, templates_path, Seek::Config.isa_json_compliance_enabled],
     ]) %>
 
     <%= render_menu_group(t('menu.assets'), [
@@ -37,7 +38,6 @@
 
     <%= render_menu_group(t('menu.samples'), [
         [t('sample').pluralize, samples_path, Seek::Config.samples_enabled],
-        [t('template').pluralize, templates_path, Seek::Config.sample_type_template_enabled],
         [t('sample_type').pluralize, sample_types_path, Seek::Config.samples_enabled],
         [t('strain').pluralize, strains_path,  Seek::Config.organisms_enabled],
         [t('organism').pluralize, organisms_path,  Seek::Config.organisms_enabled],

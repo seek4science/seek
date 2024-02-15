@@ -1,5 +1,12 @@
 <div class="contribution_title">
-	<h1>New <%=t("isa_assay")%></h1>
+<span id='modal-dialogues'>
+    <%= sample_controlled_vocab_model_dialog('cv-modal') %>
+</span>
+	<% if params[:is_assay_stream] %>
+		<h1>New <%=t("assays.assay_stream")%></h1>
+	<% else %>
+		<h1>New <%=t("isa_assay")%></h1>
+	<% end %>
 </div>
 
 <%= render partial: "templates/template_modal" -%>

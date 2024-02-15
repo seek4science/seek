@@ -13,7 +13,7 @@ class AdminController < ApplicationController
     respond_to do |format|
       format.html
     end
-  end  
+  end
 
   def update_admins
     # Don't let admin remove themselves or they won't be able to manage roles
@@ -115,6 +115,8 @@ class AdminController < ApplicationController
     Seek::Config.organisms_enabled = string_to_boolean params[:organisms_enabled]
     Seek::Config.programmes_enabled = string_to_boolean params[:programmes_enabled]
     Seek::Config.programmes_open_for_projects_enabled = string_to_boolean params[:programmes_open_for_projects_enabled]
+    Seek::Config.auto_activate_programmes = string_to_boolean params[:auto_activate_programmes]
+    Seek::Config.auto_activate_site_managed_projects = string_to_boolean params[:auto_activate_site_managed_projects]
     Seek::Config.presentations_enabled = string_to_boolean params[:presentations_enabled]
     Seek::Config.publications_enabled = string_to_boolean params[:publications_enabled]
     Seek::Config.samples_enabled = string_to_boolean params[:samples_enabled]
@@ -132,6 +134,11 @@ class AdminController < ApplicationController
     Seek::Config.piwik_analytics_url = params[:piwik_analytics_url]
     Seek::Config.piwik_analytics_tracking_notice = params[:piwik_analytics_tracking_notice]
 
+    Seek::Config.custom_analytics_snippet_enabled = string_to_boolean params[:custom_analytics_snippet_enabled]
+    Seek::Config.custom_analytics_snippet = params[:custom_analytics_snippet]
+    Seek::Config.custom_analytics_tracking_notice = params[:custom_analytics_tracking_notice]
+    Seek::Config.custom_analytics_name = params[:custom_analytics_name]
+
     Seek::Config.doi_minting_enabled = string_to_boolean params[:doi_minting_enabled]
     Seek::Config.datacite_username = params[:datacite_username]
     Seek::Config.datacite_password = params[:datacite_password]
@@ -148,9 +155,8 @@ class AdminController < ApplicationController
     Seek::Config.openbis_enabled = string_to_boolean(params[:openbis_enabled])
     Seek::Config.copasi_enabled = string_to_boolean(params[:copasi_enabled])
     Seek::Config.project_single_page_enabled = string_to_boolean(params[:project_single_page_enabled])
-    Seek::Config.project_single_page_advanced_enabled = string_to_boolean(params[:project_single_page_advanced_enabled])
+    Seek::Config.isa_json_compliance_enabled = string_to_boolean(params[:isa_json_compliance_enabled])
     Seek::Config.project_single_page_folders_enabled= string_to_boolean(params[:project_single_page_folders_enabled])
-    Seek::Config.sample_type_template_enabled = string_to_boolean(params[:sample_type_template_enabled])
 
     Seek::Config.nels_enabled = string_to_boolean(params[:nels_enabled])
     Seek::Config.nels_client_id = params[:nels_client_id]&.strip
@@ -332,8 +338,8 @@ class AdminController < ApplicationController
 
     Seek::Config.default_license = params[:default_license]
     Seek::Config.metadata_license = params[:metadata_license]
-    Seek::Config.recommended_data_licenses = params[:recommended_data_licenses]
-    Seek::Config.recommended_software_licenses = params[:recommended_software_licenses]
+    Seek::Config.recommended_data_licenses = params[:recommended_data_licenses]&.compact_blank
+    Seek::Config.recommended_software_licenses = params[:recommended_software_licenses]&.compact_blank
     update_flag = (pubmed_email == '' || pubmed_email_valid) && (crossref_email == '' || crossref_email_valid)
     update_redirect_to update_flag, 'settings'
   end

@@ -4,7 +4,7 @@ class TemplatesController < ApplicationController
   include Seek::IndexPager
   include Seek::AssetsCommon
 
-  before_action :sample_type_template_enabled?
+  before_action :isa_json_compliance_enabled?
   before_action :find_assets, only: [:index]
   before_action :auth_to_create, only: %i[new create]
   before_action :find_and_authorize_requested_item, only: %i[manage manage_update show edit destroy update]
@@ -29,7 +29,8 @@ class TemplatesController < ApplicationController
 
   def new
     @tab = 'manual'
-    @template = Template.new
+    @template = setup_new_asset
+    @template.organism = 'any'
     respond_with(@template)
   end
 
@@ -43,25 +44,28 @@ class TemplatesController < ApplicationController
     respond_to do |format|
       if @template.save
         format.html { redirect_to @template, notice: 'Template was successfully created.' }
+        format.json { render json: @template, include: [params[:include]] }
       else
-        format.html { render action: 'new' }
+        format.html { render new_template_path(@template), status: :unprocessable_entity }
+        format.json { render json: @template.errors, status: :unprocessable_entity }
       end
     end
   end
 
   def edit
-    respond_with(@template)
+    respond_to(&:html)
   end
 
   def update
     @template.update(template_params)
     @template.resolve_inconsistencies
+
     respond_to do |format|
       if @template.save
         format.html { redirect_to @template, notice: 'Template was successfully updated.' }
         format.json { render json: @template, include: [params[:include]] }
       else
-        format.html { render action: 'edit', status: :unprocessable_entity }
+        format.html { render action: :edit, status: :unprocessable_entity }
         format.json { render json: @template.errors, status: :unprocessable_entity }
       end
     end
@@ -99,13 +103,13 @@ class TemplatesController < ApplicationController
       file.write(uploaded_file.read)
     end
 
-    unless running?
-      begin
-        running!
-        PopulateTemplatesJob.new.queue_job
-      rescue StandardError
-        done!
-      end
+    return if running?
+
+    begin
+      running!
+      PopulateTemplatesJob.new.queue_job
+    rescue StandardError
+      done!
     end
   end
 
@@ -118,15 +122,43 @@ class TemplatesController < ApplicationController
     end
   end
 
+  def filter_isa_tags_by_level
+    level = params[:level]
+    all_isa_tags_options = IsaTag.all.map { |it| { text: it.title, value: it.id } }
+
+    case level
+    when 'study source'
+      isa_tags_options = all_isa_tags_options.select { |tag| %w[source source_characteristic].include?(tag[:text]) }
+    when 'study sample'
+      isa_tags_options = all_isa_tags_options.select do |tag|
+        %w[protocol sample sample_characteristic parameter_value].include?(tag[:text])
+      end
+    when 'assay - material'
+      isa_tags_options = all_isa_tags_options.select do |tag|
+        %w[protocol other_material other_material_characteristic parameter_value].include?(tag[:text])
+      end
+    when 'assay - data file'
+      isa_tags_options = all_isa_tags_options.select do |tag|
+        %w[protocol data_file data_file_comment parameter_value].include?(tag[:text])
+      end
+    else
+      isa_tags_options = all_isa_tags_options
+    end
+
+    puts "ISA Tags: #{isa_tags_options}"
+    render json: { result: isa_tags_options }
+  end
+
   private
 
   def template_params
-    params.require(:template).permit(:title, :description, :group, :level, :organism, :pid, :parent_id, *creator_related_params,
+    params.require(:template).permit(:title, :description, :group, :level, :organism, :pid, :version, :parent_id, *creator_related_params,
                                      { project_ids: [],
                                        template_attributes_attributes: %i[id title pos required description
                                                                           sample_attribute_type_id isa_tag_id is_title
                                                                           sample_controlled_vocab_id pid
-                                                                          unit_id _destroy] })
+                                                                          unit_id _destroy allow_cv_free_text
+                                                                          linked_sample_type_id] })
   end
 
   def find_template

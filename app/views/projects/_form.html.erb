@@ -2,6 +2,10 @@
 
 <%= f.error_messages %>
 
+<div class="help-block">
+  A project may also be <a href="./guided_import">imported</a> from a Data Management Plan (DMP) file.
+</div>
+
 <div class="form-group">
   <%= f.label :title, class: 'required' -%>
   <%= f.text_field :title, :class=>"form-control"-%>
@@ -11,6 +15,10 @@
   <%= f.label :description -%>
   <%= f.text_area :description, :rows => 5, :class=>"form-control rich-text-edit" -%>
 </div>
+
+<%= render partial: 'extended_metadata/extended_metadata_type_selection', locals: {f: f, resource: @project } %>
+<%= render partial: 'extended_metadata/extended_metadata_attribute_input', locals: {f: f, resource: @project } %>
+
 
 <%= render partial: 'assets/controlled_vocab_annotations_form_properties', locals: { resource: @project } %>
 

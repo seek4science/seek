@@ -11,7 +11,7 @@ Templates.init = function (elem) {
   const columnDefs = [
     { orderable: false, targets: [0, 7, 11] },
     {
-      targets: [3, 4, 9, 10],
+      targets: [3, 4, 5, 10, 11, 13],
       visible: false,
       searchable: false
     },
@@ -33,6 +33,7 @@ Templates.init = function (elem) {
     { title: "Description", width: "40%" },
     { title: "attribute_type_id" },
     { title: "cv_id" },
+    { title: "allow_cv_free_text" },
     { title: "Unit", width: "5%" },
     { title: "Data type", width: "10%" },
     {
@@ -45,7 +46,8 @@ Templates.init = function (elem) {
     },
     { title: "PID", width: "10%" },
     { title: "pos" },
-    { title: "isa_tag_id" },
+    { title: "ISA Tag ID", width: "10%" },
+    { title: "ISA Tag", width: "10%" },
     {
       title: "Remove",
       width: "5%",
@@ -55,7 +57,8 @@ Templates.init = function (elem) {
           ? ""
           : '<a class="btn btn-danger btn-sm" href="javascript:void(0)" onClick="remove(this)">Remove</a>';
       }
-    }
+    },
+    { title: "linked sample type id", width: "10%" }
   ];
 
   Templates.table = elem.DataTable({
@@ -89,7 +92,7 @@ function loadTemplates(data) {
 
   $j.each(Object.keys(categorized), (i, key) => {
     const elem = $j(`<optgroup label=${key}></optgroup>`);
-    
+
     $j.each(categorized[key], (j, sub_item) => {
       elem.append(
         $j(`<option>${sub_item.title}</option>`).attr("value", sub_item.template_id).text(key.title)
@@ -114,18 +117,21 @@ Templates.mapData = (data) =>
     item.description,
     item.attribute_type_id,
     item.cv_id,
+    item.allow_cv_free_text,
     item.unit_id,
     item.data_type,
     item.is_title,
     item.pid,
     item.pos,
-    item.isa_tag_id
+    item.isa_tag_id,
+    item.isa_tag_title,
+    item.linked_sample_type_id
   ]);
 
 function loadFilterSelectors(data) {
   $j.each($j("select[id^='templates_']"), (i, elem) => {
     const key = elem.getAttribute("data-key");
-    
+
     // Gets the set of values to choose from per data-key
     let dt = [...new Set(data.map((item) => item[key]))];
     // If the key == level => options should be filtered out, depending on the 'field_name' context.
@@ -136,7 +142,7 @@ function loadFilterSelectors(data) {
       } else if(Templates.context.field_name === 'source_sample_type'){
         dt = dt.filter(lvl => lvl === "study source")
       } else if(Templates.context.field_name === 'sample_type') {
-        dt = dt.filter(lvl => lvl === "assay")
+        dt = dt.filter(lvl => ["assay - material", "assay - data file"].includes(lvl))
       }
       $j(elem).find("option").remove(); // Removes all options, even the first, i.e. "not selected"
     }
@@ -159,6 +165,42 @@ function loadFilterSelectors(data) {
   });
 }
 
+function get_filtered_isa_tags(level) {
+  var result;
+  $j.ajax({
+    type: 'POST',
+    async: false,
+    url: '/templates/filter_isa_tags_by_level',
+    data: {level: level},
+    dataType: 'json',
+    success: function(res) {
+      result = res.result;
+    },
+    error: function (errMsg) {
+      alert(`Couldn't find valid ISA Tags because of the following error:\n${errMsg}`);
+      result = [];
+    }
+  });
+  return result;
+}
+
+function updateIsaTagSelect(template_level, attribute_row) {
+  const isa_tags = get_filtered_isa_tags(template_level);
+
+  // Remove all options first from the select items that were not disabled, except blank one
+  $j(attribute_row).find('select[data-attr="isa_tag_title"]:not(:disabled) option:not([value=""])').each(function() {
+    $j(this).remove();
+  });
+
+  // Append filtered option to a new attribute row
+  $j.each(isa_tags, function (i, tag) {
+    $j(attribute_row).find('select[data-attr="isa_tag_title"]:not(:disabled)').append($j('<option>', {
+      value: tag.value,
+      text: tag.text
+    }));
+  });
+}
+
 const applyTemplate = () => {
   const id = $j("#source_select").find(":selected").val();
   const data = templates.find((t) => t.template_id == id);
@@ -170,10 +212,17 @@ const applyTemplate = () => {
   const attribute_table = "#attribute-table" + suffix;
   const attribute_row = "#new-attribute-row" + suffix;
   const addAttributeRow = "#add-attribute-row" + suffix;
+  updateIsaTagSelect(data.level, attribute_row);
 
   $j(`${attribute_table} tbody`).find("tr:not(:last)").remove();
   SampleTypes.unbindSortable();
-  // Make sure default sorted attributes are added to the table 
+
+  // Set template group, level and organism
+  $j('#template_organism').val(data.organism);
+  $j('#template_level').val(data.level);
+  $j('#template_parent_id').val(data.template_id);
+
+  // Make sure default sorted attributes are added to the table
   Templates.table.order([9, "asc"]).draw();
   $j.each(Templates.table.rows().data(), (i, row) => {
     var newRow = $j(`${attribute_row} tbody`).clone().html();
@@ -186,30 +235,36 @@ const applyTemplate = () => {
     });
     index++;
 
+    const isInputRow = row[7] === 'Registered Sample List' && row[1].includes('Input') && row[11] === null
     newRow = $j(newRow.replace(/replace-me/g, index));
-
     $j(newRow).find('[data-attr="required"]').prop("checked", row[0]);
     $j(newRow).find('[data-attr="title"]').val(row[1]);
     $j(newRow).find('[data-attr="description"]').val(row[2]);
     $j(newRow).find('[data-attr="type"]').val(row[3]);
     $j(newRow).find('[data-attr="cv_id"]').val(row[4]);
-    $j(newRow).find('[data-attr="unit"]').val(row[5]);
-    $j(newRow).find(".sample-type-is-title").prop("checked", row[7]);
-    $j(newRow).find('[data-attr="pid"]').val(row[8]);
-    $j(newRow).find('[data-attr="isa_tag_id"]').val(row[10]);
+    $j(newRow).find('[data-attr="allow_cv_free_text"]').prop("checked", row[5]);
+    $j(newRow).find('[data-attr="unit"]').val(row[6]);
+    $j(newRow).find(".sample-type-is-title").prop("checked", row[8]);
+    $j(newRow).find('[data-attr="pid"]').val(row[9]);
+    $j(newRow).find('[data-attr="isa_tag_id"]').val(row[11]);
+    $j(newRow).find('[data-attr="isa_tag_title"]').val(row[11]);
+    $j(newRow).find('[data-attr="isa_tag_title"]').attr('disabled', true);
 
     // Show the CV block if cv_id is not empty
     if (row[4]) $j(newRow).find(".controlled-vocab-block").show();
 
-    // Show the sample-type-block block if type is SEEK sample
-    const is_seek_sample = $j(newRow)
-      .find(".sample-type-attribute-type")
-      .find(":selected")
-      .data("is-seek-sample");
-    if (is_seek_sample) {
-      // Select the first item by default and hide the row
-      $j(newRow).find(".linked-sample-type-selection optgroup option:first").attr("selected", "selected");
+    // If input-row: use input-sample-type-id
+    // else: set the linked_sample_type_id
+    if (isInputRow) {
+      const previousSampleTypeId = $j('#isa_assay_input_sample_type_id').val();
+      if(previousSampleTypeId){
+        $j(newRow).find('.linked-sample-type-selection').val(previousSampleTypeId)
+      } else {
+        $j(newRow).find(".linked-sample-type-selection optgroup option:first").attr("selected", "selected");
+      }
       $j(newRow).hide();
+    } else {
+      $j(newRow).find('.linked-sample-type-selection').val(row[13])
     }
 
     $j(`${attribute_table} ${addAttributeRow}`).before(newRow);
@@ -238,7 +293,7 @@ const updateTypeSelect = function(field_name) {
   } else if (field_name === 'source_sample_type') {
 		$j("#templates_type_select").val("study source").change();
   } else if(field_name === 'sample_type') {
-    $j("#templates_type_select").val("assay").change();
+    $j("#templates_type_select").val("assay - material").change();
   } else {
     $j("#templates_type_select option").first().change();
   }

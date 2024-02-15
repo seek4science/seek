@@ -16,21 +16,23 @@ module Seek
         # validates that the attribute type is SeekSample if linked_sample_type is set, and vice-versa
         validate :linked_sample_type_and_attribute_type_consistency
 
-        delegate :controlled_vocab?, :seek_cv_list?, :seek_sample?, :seek_sample_multi?, :seek_strain?, :seek_resource?, :linked_custom_metadata?,:linked_custom_metadata_multi?, to: :sample_attribute_type, allow_nil: true
+        delegate :controlled_vocab?, :seek_cv_list?, :seek_sample?, :seek_sample_multi?, :seek_strain?, :linked_extended_metadata?,:linked_extended_metadata_multi?, to: :sample_attribute_type, allow_nil: true
       end
 
       # checks whether the value is blank against the attribute type and base type
       def test_blank?(value)
-        sample_attribute_type.test_blank?(value)
+        base_type_handler.test_blank?(value)
       end
 
       def validate_value?(value)
         return false if required? && test_blank?(value)
         return true if test_blank?(value) && !required?
 
-        sample_attribute_type.validate_value?(value, required: required?,
-                                                     controlled_vocab: sample_controlled_vocab,
-                                                     linked_sample_type: linked_sample_type)
+        check_value_against_base_type(value) && check_value_against_regular_expression(value)
+      end
+
+      def pre_process_value(value)
+        base_type_handler.convert(value)
       end
 
       def accessor_name
@@ -44,11 +46,12 @@ module Seek
         resolution
       end
 
-      def pre_process_value(value)
-        sample_attribute_type.pre_process_value(value,
-                                                controlled_vocab: sample_controlled_vocab,
-                                                linked_custom_metadata_type: linked_custom_metadata_type,
-                                                linked_sample_type: linked_sample_type)
+      def seek_resource?
+        base_type_handler.is_a?(Seek::Samples::AttributeHandlers::SeekResourceAttributeHandler)
+      end
+
+      def base_type_handler
+        Seek::Samples::AttributeHandlers::AttributeHandlerFactory.instance.for_attribute(self)
       end
 
       private
@@ -81,6 +84,16 @@ module Seek
           errors.add(:seek_sample_multi, 'Linked Sample Type must be set if attribute type is Registered Sample List')
         end
       end
+
+      def check_value_against_regular_expression(value)
+        match = sample_attribute_type.regular_expression.match(value.to_s)
+        match && (match.to_s == value.to_s)
+      end
+
+      def check_value_against_base_type(value)
+        base_type_handler.validate_value?(value)
+      end
+
     end
   end
 end

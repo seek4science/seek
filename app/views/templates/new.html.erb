@@ -1,20 +1,11 @@
-<% tab = @tab || 'manual' %>
-
-<h1>New Template</h1>
+<h1>New <%= t('template') %></h1>
 
 <%= index_and_new_help_icon controller_name %>
 
 <p>
   Templates can be defined manually through the form below or based on repository templates.
 </p>
-
-<div>
-  <ul id="sample-type-tabs" class="nav nav-tabs" role="tablist">
-    <li role="presentation" <%= 'class="active"'.html_safe if tab == 'manual' -%>>
-      <a href="#manual" aria-controls="from-template" role="tab" data-toggle="tab">Form</a>
-    </li>
-  </ul>
-
+<div class="asset_form">
   <%= render partial: 'templates/form', locals: { tab: tab } %>
 </div>
 
@@ -22,14 +13,15 @@
   $j(document).ready(function () {
     // A function to switch the form action depending on which tab is selected.
     // Also disables form elements in the hidden tab.
-    var switchFormTarget = function () {
-      var form = $j('#new_template');
-      $j('.tab-pane :input:not(".template-input")', form).attr('disabled', true);
-      $j('.tab-pane.active :input:not(".template-input")', form).attr('disabled', false);
-    };
+   $j('#attribute-table')
+      .find('tr.sample-attribute')
+      .has('input[data-attr="title"][value="Input"]') // Has an input with value "Input"
+      .has('select[data-attr="isa_tag_title"]:not([value])') // Has a select with data-attr "isa_tag_title" but no value
+      .first() // Take the first one in case there are more
+      .addClass('hidden'); // Hide the row
 
-    $j('#sample-type-tabs a[data-toggle="tab"]').on('shown.bs.tab', switchFormTarget);
-
-    switchFormTarget();
+    // Update the ISA tag select
+    const attribute_row = ".sample-attribute";
+    updateIsaTagSelect("<%= @template.level %>", attribute_row);
   });
 </script>

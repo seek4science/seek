@@ -9,6 +9,7 @@ class DataFilesController < ApplicationController
 
   include Seek::AssetsCommon
 
+  before_action :data_files_enabled?
   before_action :find_assets, only: [:index]
   before_action :find_and_authorize_requested_item, except: [:index, :new, :create, :create_content_blob,
                                                              :preview, :update_annotations_ajax, :rightfield_extraction_ajax, :provide_metadata]
@@ -411,6 +412,19 @@ class DataFilesController < ApplicationController
     end
   end
 
+  # ajax call to check if data file has matching sample type ( used to check if button should be shown)
+  def has_matching_sample_type
+    return false unless @data_file.content_blob && SampleType.any?
+    key = ['has_matching_sample_type', @data_file.content_blob, SampleType.order(:updated_at).last.template, Seek::Config.jvm_memory_allocation, Seek::Config.max_extractable_spreadsheet_size]
+    result = Rails.cache.fetch(key) do
+      @data_file.matching_sample_type?
+    end
+
+    respond_to do |format|
+      format.json { render json: { result: result} }
+    end
+  end
+
   protected
 
   def get_sample_type
@@ -462,6 +476,7 @@ class DataFilesController < ApplicationController
                                       :file_template_id,
                                       { data_format_annotations: [] }, { data_type_annotations: [] },
                                       { publication_ids: [] }, { workflow_ids: [] },
+                                      { extended_metadata_attributes: determine_extended_metadata_keys },
                                       { workflow_data_files_attributes:[:id, :workflow_id, :workflow_data_file_relationship_id, :_destroy] },
                                       discussion_links_attributes:[:id, :url, :label, :_destroy])
   end

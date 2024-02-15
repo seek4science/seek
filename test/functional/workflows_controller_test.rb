@@ -220,7 +220,7 @@ class WorkflowsControllerTest < ActionController::TestCase
 
     get :show, params: { id: workflow }
 
-    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0'
+    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0 International'
   end
 
   test 'should display license for current version' do
@@ -231,11 +231,11 @@ class WorkflowsControllerTest < ActionController::TestCase
 
     get :show, params: { id: workflow, version: 1 }
     assert_response :success
-    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0'
+    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0 International'
 
     get :show, params: { id: workflow, version: workflowv.version }
     assert_response :success
-    assert_select '.panel .panel-body a', text: 'CC0 1.0'
+    assert_select '.panel .panel-body a', text: 'Creative Commons Zero v1.0 Universal'
   end
 
   test 'should update license' do
@@ -250,7 +250,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_response :redirect
 
     get :show, params: { id: workflow }
-    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution Share-Alike 4.0'
+    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution Share Alike 4.0 International'
     assert_equal 'CC-BY-SA-4.0', assigns(:workflow).license
   end
 
@@ -463,6 +463,7 @@ class WorkflowsControllerTest < ActionController::TestCase
 
     assert_response :success
     assert_equal 'image/svg+xml', response.headers['Content-Type']
+    assert_equal ApplicationController::USER_SVG_CSP, @response.header['Content-Security-Policy']
     assert wf.diagram_exists?
   end
 
@@ -1765,5 +1766,13 @@ class WorkflowsControllerTest < ActionController::TestCase
     get :show, params: { id: wf }
 
     assert_select 'a.lifemonitor-status[href=?]', "https://app.lifemonitor.eu/workflow;uuid=#{wf.uuid}"
+  end
+
+  test 'do not get index if feature disabled' do
+    with_config_value(:workflows_enabled, false) do
+      get :index
+      assert_redirected_to root_path
+      assert flash[:error].include?('disabled')
+    end
   end
 end

@@ -222,6 +222,51 @@ class Mailer < ActionMailer::Base
          template_name: :request_create_project_for_programme)
   end
 
+  def request_import_project_for_programme(user, programme, project_json, institution_json, people_json, message_log)
+    @admins = programme.programme_administrators
+    @admins |= admins if programme.site_managed?
+    @programme = programme
+    @requester = user.person
+    @institution = Institution.new(JSON.parse(institution_json))
+    @project = Project.new(JSON.parse(project_json))
+    @people = JSON.parse(people_json).map { |person| Person.new(person) }
+    @message_log = message_log
+
+    mail(from: Seek::Config.noreply_sender,
+         to: @admins.collect(&:email_with_name),
+         reply_to: @requester.email_with_name,
+         subject: "NEW #{t('project')} request from #{@requester.name} for your #{t('programme')}: #{@project.title}")
+
+  end
+
+  def request_import_project_and_programme(user, programme_json, project_json, institution_json, people_json, message_log)
+    @admins = admins
+    @programme = Programme.new(JSON.parse(programme_json))
+    @requester = user.person
+    @institution = Institution.new(JSON.parse(institution_json))
+    @project = Project.new(JSON.parse(project_json))
+    @people = JSON.parse(people_json).map { |person| Person.new(person) }
+    @message_log = message_log
+    mail(from: Seek::Config.noreply_sender,
+         to: admin_emails,
+         reply_to: @requester.email_with_name,
+         subject: "New #{t('project')} and #{t('programme')} request from #{@requester.name}: #{@project.title}")
+  end
+
+  def request_import_project(user, project_json, institution_json, people_json, message_log)
+    @admins = admins
+    @requester = user.person
+    @institution = Institution.new(JSON.parse(institution_json))
+    @project = Project.new(JSON.parse(project_json))
+    @people = JSON.parse(people_json).map { |person| Person.new(person) }
+    @message_log = message_log
+    mail(from: Seek::Config.noreply_sender,
+         to: admin_emails,
+         reply_to: @requester.email_with_name,
+         subject: "New #{t('project')} request from #{@requester.name}: #{@project.title}",
+         template_name: :request_import_project_for_programme)
+  end
+
   def join_project_rejected(requester, project, comments)
     @requester = requester
     @project = project
@@ -254,10 +299,10 @@ class Mailer < ActionMailer::Base
       recipients = admins
     end
 
-    subject = "The request to create the #{t('project')}, #{@project.title}, has been APPROVED by #{@responder.name}"
+    subject = "The request to create the #{t('project')}, #{@project.title}, has been APPROVED #{@responder.nil? ? 'automatically' : "by #{@responder.name}"}"
     mail(from: Seek::Config.noreply_sender,
          to: recipients.collect(&:email_with_name),
-         reply_to: @responder.email_with_name,
+         reply_to: @responder&.email_with_name,
          subject: subject)
 
   end

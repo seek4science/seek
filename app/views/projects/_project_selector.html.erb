@@ -106,8 +106,7 @@
                 var licenseSelect = $j('#license-select');
                 if (licenseSelect.length && licenseSelect.data('canOverwrite') &&
                     $j('option[value="'+Sharing.defaultLicenses[project.id]+'"]', licenseSelect).length) {
-                    licenseSelect.val(Sharing.defaultLicenses[project.id]);
-                    zenodoExport.setLicenseUrl();
+                    licenseSelect.val(Sharing.defaultLicenses[project.id]).change();
                 }
             }
             this.possibilities.splice(i, 1);
@@ -119,12 +118,19 @@
   });
 
   $j(document).ready(function () {
-      <% if params[:project_ids] && resource && resource.new_record? %>
-      // Auto select projects from params if this is a new object
-      <% params[:project_ids].each do |project_id| %>
-      Sharing.projectsSelector.add(<%= project_id %>, true);
+    // Auto select projects from params[:project_ids] or params[resource][:project_ids] if this is a new object
+    <% if resource && resource.new_record? %>
+      <% if params[:project_ids] %>
+        <% params[:project_ids].each do |project_id| %>
+          Sharing.projectsSelector.add(<%= project_id %>, true);
+        <% end %>
       <% end %>
+      <% if params[controller_name.singularize] && params[controller_name.singularize][:project_ids] %>
+        <% params[controller_name.singularize][:project_ids].each do |project_id| %>
+          Sharing.projectsSelector.add(<%= project_id %>, true);
+        <% end %>
       <% end %>
+    <% end %>
     // Auto select project if there is only one
     if (Sharing.projectsSelector.possibilities.length === 1 &&
         Sharing.projectsSelector.selected.length === 0) {

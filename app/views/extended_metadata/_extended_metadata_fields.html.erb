@@ -1,0 +1,8 @@
+<% extended_metadata_type.extended_metadata_attributes.each do |attribute| %>
+  <div class="form-group">
+    <%= extended_metadata_form_field_for_attribute(attribute,resource, parent_resource) %>
+    <% unless attribute.description.nil? %>
+      <%= extended_metadata_attribute_description(attribute.description) %>
+    <% end %>
+  </div>
+<% end %>

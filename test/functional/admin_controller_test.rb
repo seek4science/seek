@@ -227,7 +227,7 @@ class AdminControllerTest < ActionController::TestCase
     get :get_stats, xhr: true, params: { page: 'job_queue' }
     assert_response :success
 
-    assert_select 'p', text: 'Total delayed jobs waiting = 1'
+    assert_select 'h4', text: 'Total delayed jobs waiting = 1'
     assert_select 'tr' do
       assert_select 'td', text: /11th Sep 2010 at/, count: 1
       assert_select 'td', text: /12th Sep 2010 at/, count: 1
@@ -345,7 +345,7 @@ class AdminControllerTest < ActionController::TestCase
 
   test 'snapshot and doi stats' do
     investigation = FactoryBot.create(:investigation, title: 'i1', description: 'not blank',
-                            policy: FactoryBot.create(:downloadable_public_policy))
+                            policy: FactoryBot.create(:downloadable_public_policy), creators: [FactoryBot.create(:person)])
     snapshot = investigation.create_snapshot
     snapshot.update_column(:doi, '10.5072/testytest')
     AssetDoiLog.create(asset_type: 'investigation',

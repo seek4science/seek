@@ -1,14 +1,15 @@
 <% sample_attribute ||= nil %>
 <% index ||= 'replace-me' %>
-<% id = sample_attribute ? sample_attribute.id : '' %>
-<% title = sample_attribute ? sample_attribute.title : '' %>
-<% description = sample_attribute ? sample_attribute.description : '' %>
-<% pid = sample_attribute ? sample_attribute.pid : '' %>
-<% pos = sample_attribute ? sample_attribute.pos : '' %>
-<% required = sample_attribute ? sample_attribute.required : false %>
-<% is_title = sample_attribute ? sample_attribute.is_title : false %>
-<% attribute_type_id = sample_attribute ? sample_attribute.sample_attribute_type_id : nil %>
-<% sample_controlled_vocab_id = sample_attribute ? sample_attribute.sample_controlled_vocab_id : nil %>
+<% id = sample_attribute&.id || '' %>
+<% title = sample_attribute&.title || '' %>
+<% description = sample_attribute&.description || '' %>
+<% pid = sample_attribute&.pid || '' %>
+<% pos = sample_attribute&.pos || '' %>
+<% required = sample_attribute&.required || false %>
+<% is_title = sample_attribute&.is_title || false %>
+<% attribute_type_id = sample_attribute&.sample_attribute_type_id %>
+<% sample_controlled_vocab_id = sample_attribute&.sample_controlled_vocab_id %>
+<% allow_cv_free_text = sample_attribute&.allow_cv_free_text || false %>
 <% linked_sample_type_id = sample_attribute ? sample_attribute.linked_sample_type_id : nil %>
 <% unit_id = sample_attribute ? sample_attribute.unit_id : nil %>
 <% template_column_index = sample_attribute ? sample_attribute.template_column_index : nil %>
@@ -19,10 +20,13 @@
 <% allow_attribute_removal = constraints.allow_attribute_removal?(sample_attribute)  %>
 <% allow_type_change = constraints.allow_type_change?(sample_attribute) %>
 <% allow_name_change = constraints.allow_name_change?(sample_attribute) %>
-<% seek_sample_multi = sample_attribute.try(:seek_sample_multi?) %>
+<% seek_sample_multi = sample_attribute&.seek_sample_multi? %>
 <% link_to_self = sample_attribute && sample_attribute.deferred_link_to_self %>
-<% hide_seek_sample_multi = seek_sample_multi && displaying_single_page? %>
+<% hide_seek_sample_multi = seek_sample_multi && displaying_single_page? && sample_attribute&.isa_tag.blank? && sample_attribute&.title.downcase.include?('input') %>
+<% isa_tags_options = IsaTag.all.map { |it| [it.title, it.id] } %>
+<% display_isa_tag ||= false %>
 <% isa_tag_id = sample_attribute&.isa_tag_id %>
+<% isa_tag_title = sample_attribute&.isa_tag&.title %>
 
 <tr class="sample-attribute <%= 'success' if sample_attribute.nil? -%><%='hidden' if hide_seek_sample_multi -%>" data-index="<%= index-%>">
   <th scope="row" class="attribute-position">
@@ -65,8 +69,17 @@
                      include_blank: true,
                      class: 'form-control controlled-vocab-selection',
                      disabled: !allow_type_change, data: { attr: "cv_id" }%>
+
+      <div>
+        <label>
+          <%= hidden_field_tag "#{field_name_prefix}[allow_cv_free_text]", '0'  %>
+          <%= check_box_tag "#{field_name_prefix}[allow_cv_free_text]", '1', allow_cv_free_text, data: { attr: 'allow_cv_free_text' } %>
+          <%= t('samples.allow_free_text_checkbox_label') %> <%= allow_free_text_help_icon %>
+        </label>
+      </div>
+
       <% if allow_type_change %>
-        <%= button_link_to('Edit', 'edit', '#', class:'cv-edit-button', disabled: true, target: :_blank) %>        
+        <%= button_link_to('Edit', 'edit', '#', class:'cv-edit-button', disabled: true, target: :_blank) %>
         <%= create_sample_controlled_vocab_modal_button  %>
       <% end %>
       <%= button_link_to('View current', 'show', '#', class:'cv-show-button', disabled: true, target: :_blank) %>
@@ -98,6 +111,15 @@
     <%= text_field_tag "#{field_name_prefix}[pid]", pid, class: 'form-control',
                        placeholder: 'Identifier URI',  data: { attr: "pid" } %>
   </td>
+
+  <% if display_isa_tag %>
+    <td>
+      <%= select_tag "#{field_name_prefix}[isa_tag_title]",
+                      options_for_select(isa_tags_options, isa_tag_id),
+                      include_blank: true, class: 'form-control', data: {attr: "isa_tag_title"} %>
+    </td>
+  <% end %>
+
   <td>
     <%= select_tag "#{field_name_prefix}[unit_id]",
                    options_for_select(Unit.order(:order).map { |u| ["#{u.symbol} #{u.title}", "#{u.id}"] },
@@ -110,7 +132,7 @@
 
   <td>
     <% if allow_attribute_removal %>
-      <%= hidden_field_tag "#{field_name_prefix}[isa_tag_id]", isa_tag_id, data: { attr: "isa_tag_id" }  %>
+      <%= hidden_field_tag "#{field_name_prefix}[isa_tag_id]", (display_isa_tag ? isa_tag_id : nil), data: { attr: "isa_tag_id" }  %>
       <%= hidden_field_tag "#{field_name_prefix}[_destroy]", '0', autocomplete: 'off' %>
       <div class="btn-group" data-toggle="buttons">
         <label class="btn btn-danger">

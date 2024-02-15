@@ -10,7 +10,7 @@
   <%= f.text_area :description, :rows=>5, :class=>"form-control rich-text-edit" %>
 </div>
 
-<%= render partial: 'custom_metadata/custom_metadata_type_selection', locals:{f:f, resource:@study} %>
+<%= render partial: 'extended_metadata/extended_metadata_type_selection', locals:{f:f, resource:@study} %>
 
 <% unless @study.experimentalists.blank? %>
   <div class="form-group">
@@ -31,7 +31,7 @@
   <%= f.number_field :position, :rows => 5, :class=>"form-control"  -%>
 </div>
 
-<%= render partial: 'custom_metadata/custom_metadata_attribute_input', locals:{f:f,resource:@study} %>
+<%= render partial: 'extended_metadata/extended_metadata_attribute_input', locals:{f:f,resource:@study} %>
 
 <%= render partial: 'assets/manage_specific_attributes', locals:{f:f} if show_form_manage_specific_attributes? %>
 
@@ -43,7 +43,7 @@
 
 <%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @study} -%>
 
-<%#= render partial: 'custom_metadata/custom_metadata_fields_form_input', locals:{f:f, resource:@study} %>
+<%#= render partial: 'extended_metadata/extended_metadata_fields_form_input', locals:{f:f, resource:@study} %>
 
 <%= form_submit_buttons(@study) %>
 

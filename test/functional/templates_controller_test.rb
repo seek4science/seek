@@ -6,7 +6,7 @@ class TemplatesControllerTest < ActionController::TestCase
   include GeneralAuthorizationTestCases
 
   setup do
-    Seek::Config.send('sample_type_template_enabled=', true)
+    Seek::Config.send('isa_json_compliance_enabled=', true)
     FactoryBot.create(:person) # to prevent person being first person and therefore admin
     @person = FactoryBot.create(:project_administrator)
     @project = @person.projects.first
@@ -17,6 +17,7 @@ class TemplatesControllerTest < ActionController::TestCase
     @string_type = FactoryBot.create(:string_sample_attribute_type)
     @int_type = FactoryBot.create(:integer_sample_attribute_type)
     @controlled_vocab_type = FactoryBot.create(:controlled_vocab_attribute_type)
+    @default_isa_tag = FactoryBot.create(:default_isa_tag)
   end
 
   test 'should get new' do
@@ -28,24 +29,37 @@ class TemplatesControllerTest < ActionController::TestCase
     assert_difference('Template.count') do
       post :create, params: { template: { title: 'Hello!',
                                           project_ids: @project_ids,
-                                          level: 'level', group: 'group', organism: 'organism',
+                                          level: 'study source',
+                                          organism: 'any',
+                                          version: '1.0.0',
+                                          parent_id: nil,
                                           description: 'The description!!',
                                           template_attributes_attributes: {
                                             '0' => {
-                                              pos: '1', title: 'a string', required: '1',
+                                              pos: '1',
+                                              title: 'a string',
+                                              required: '1',
                                               short_name: 'attribute1 short name',
                                               ontology_version: '0.1.1',
                                               description: 'attribute1 description',
-                                              sample_attribute_type_id: @string_type.id, _destroy: '0'
+                                              sample_attribute_type_id: @string_type.id,
+                                              _destroy: '0',
+                                              isa_tag_id: @default_isa_tag
                                             },
                                             '1' => {
-                                              pos: '2', title: 'a number', required: '1',
+                                              pos: '2',
+                                              title: 'a number',
+                                              required: '1',
                                               short_name: 'attribute2 short name',
                                               ontology_version: '0.1.2',
                                               description: 'attribute2 description',
-                                              sample_attribute_type_id: @int_type.id, _destroy: '0'
+                                              sample_attribute_type_id: @int_type.id,
+                                              _destroy: '0',
+                                              isa_tag_id: @default_isa_tag
                                             }
-                                          } } }
+                                          }
+                                        }
+                            }
     end
 
     refute_nil template = assigns(:template)
@@ -82,7 +96,9 @@ class TemplatesControllerTest < ActionController::TestCase
         description: attribute.description,
         sample_attribute_type_id: attribute.sample_attribute_type_id,
         _destroy: '0',
-        id: attribute.id }
+        id: attribute.id,
+        isa_tag_id: attribute.isa_tag_id
+      }
     end
 
     template_attributes_fields[0][:title] = 'full_name'
@@ -109,7 +125,9 @@ class TemplatesControllerTest < ActionController::TestCase
         required: (attribute.required ? '1' : '0'),
         sample_attribute_type_id: @string_type.id,
         _destroy: '0',
-        id: attribute.id }
+        id: attribute.id,
+        isa_tag_id: attribute.isa_tag_id
+      }
     ]
     put :update, params: { id: template, template: { title: template.title,
                                                      template_attributes_attributes: attribute_fields } }

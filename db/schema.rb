@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_08_09_054421) do
+ActiveRecord::Schema.define(version: 2024_02_06_132054) do
 
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
@@ -189,6 +189,8 @@ ActiveRecord::Schema.define(version: 2023_08_09_054421) do
     t.string "deleted_contributor"
     t.integer "sample_type_id"
     t.integer "position"
+    t.integer "assay_stream_id"
+    t.index ["assay_stream_id"], name: "index_assays_on_assay_stream_id"
     t.index ["sample_type_id"], name: "index_assays_on_sample_type_id"
   end
 
@@ -311,6 +313,7 @@ ActiveRecord::Schema.define(version: 2023_08_09_054421) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "avatar_id"
+    t.string "deleted_contributor"
     t.index ["avatar_id"], name: "index_collections_on_avatar_id"
     t.index ["contributor_id"], name: "index_collections_on_contributor_id"
     t.index ["policy_id"], name: "index_collections_on_policy_id"
@@ -362,37 +365,6 @@ ActiveRecord::Schema.define(version: 2023_08_09_054421) do
     t.integer "age_at_sampling"
     t.datetime "created_at"
     t.datetime "updated_at"
-  end
-
-  create_table "custom_metadata", force: :cascade do |t|
-    t.text "json_metadata"
-    t.string "item_type"
-    t.bigint "item_id"
-    t.bigint "custom_metadata_type_id"
-    t.integer "custom_metadata_attribute_id"
-    t.index ["custom_metadata_type_id"], name: "index_custom_metadata_on_custom_metadata_type_id"
-    t.index ["item_type", "item_id"], name: "index_custom_metadata_on_item_type_and_item_id"
-  end
-
-  create_table "custom_metadata_attributes", force: :cascade do |t|
-    t.bigint "custom_metadata_type_id"
-    t.bigint "sample_attribute_type_id"
-    t.boolean "required", default: false
-    t.integer "pos"
-    t.string "title"
-    t.bigint "sample_controlled_vocab_id"
-    t.text "description"
-    t.string "label"
-    t.integer "linked_custom_metadata_type_id"
-    t.index ["custom_metadata_type_id"], name: "index_custom_metadata_attributes_on_custom_metadata_type_id"
-    t.index ["sample_attribute_type_id"], name: "index_custom_metadata_attributes_on_sample_attribute_type_id"
-    t.index ["sample_controlled_vocab_id"], name: "index_custom_metadata_attributes_on_sample_controlled_vocab_id"
-  end
-
-  create_table "custom_metadata_types", force: :cascade do |t|
-    t.string "title"
-    t.integer "contributor_id"
-    t.text "supported_type"
   end
 
   create_table "data_file_auth_lookup", force: :cascade do |t|
@@ -642,6 +614,38 @@ ActiveRecord::Schema.define(version: 2023_08_09_054421) do
     t.datetime "updated_at"
     t.integer "sop_version"
     t.index ["sop_id"], name: "index_experimental_conditions_on_sop_id"
+  end
+
+  create_table "extended_metadata", force: :cascade do |t|
+    t.text "json_metadata"
+    t.string "item_type"
+    t.bigint "item_id"
+    t.bigint "extended_metadata_type_id"
+    t.integer "extended_metadata_attribute_id"
+    t.index ["extended_metadata_type_id"], name: "index_extended_metadata_on_extended_metadata_type_id"
+    t.index ["item_type", "item_id"], name: "index_extended_metadata_on_item_type_and_item_id"
+  end
+
+  create_table "extended_metadata_attributes", force: :cascade do |t|
+    t.bigint "extended_metadata_type_id"
+    t.bigint "sample_attribute_type_id"
+    t.boolean "required", default: false
+    t.integer "pos"
+    t.string "title"
+    t.bigint "sample_controlled_vocab_id"
+    t.text "description"
+    t.string "label"
+    t.integer "linked_extended_metadata_type_id"
+    t.boolean "allow_cv_free_text", default: false
+    t.index ["extended_metadata_type_id"], name: "index_extended_metadata_attributes_on_extended_metadata_type_id"
+    t.index ["sample_attribute_type_id"], name: "index_extended_metadata_attributes_on_sample_attribute_type_id"
+    t.index ["sample_controlled_vocab_id"], name: "index_extended_metadata_attributes_on_sample_cv_id"
+  end
+
+  create_table "extended_metadata_types", force: :cascade do |t|
+    t.string "title"
+    t.integer "contributor_id"
+    t.text "supported_type"
   end
 
   create_table "external_assets", id: :integer, force: :cascade do |t|
@@ -938,6 +942,7 @@ ActiveRecord::Schema.define(version: 2023_08_09_054421) do
     t.text "other_creators"
     t.string "deleted_contributor"
     t.integer "position"
+    t.boolean "is_isa_json_compliant"
   end
 
   create_table "investigations_projects", id: false, force: :cascade do |t|
@@ -1709,6 +1714,7 @@ ActiveRecord::Schema.define(version: 2023_08_09_054421) do
     t.string "pid"
     t.text "description"
     t.integer "isa_tag_id"
+    t.boolean "allow_cv_free_text", default: false
     t.index ["sample_type_id"], name: "index_sample_attributes_on_sample_type_id"
     t.index ["unit_id"], name: "index_sample_attributes_on_unit_id"
   end
@@ -1741,12 +1747,10 @@ ActiveRecord::Schema.define(version: 2023_08_09_054421) do
     t.datetime "updated_at", null: false
     t.string "first_letter", limit: 1
     t.string "source_ontology"
-    t.string "ols_root_term_uri"
-    t.boolean "required"
+    t.string "ols_root_term_uris"
     t.string "short_name"
     t.string "key"
     t.integer "template_id"
-    t.boolean "custom_input", default: false
   end
 
   create_table "sample_resource_links", id: :integer, force: :cascade do |t|
@@ -2095,6 +2099,8 @@ ActiveRecord::Schema.define(version: 2023_08_09_054421) do
     t.boolean "is_title", default: false
     t.integer "isa_tag_id"
     t.string "pid"
+    t.boolean "allow_cv_free_text", default: false
+    t.integer "linked_sample_type_id"
     t.index ["template_id", "title"], name: "index_template_id_asset_id_title"
   end
 
@@ -2112,7 +2118,7 @@ ActiveRecord::Schema.define(version: 2023_08_09_054421) do
 
   create_table "templates", force: :cascade do |t|
     t.string "title"
-    t.string "group", default: "other"
+    t.string "group", default: "Project specific templates"
     t.integer "group_order"
     t.string "temporary_name"
     t.string "version"
@@ -2121,8 +2127,8 @@ ActiveRecord::Schema.define(version: 2023_08_09_054421) do
     t.string "isa_technology_type"
     t.string "isa_protocol_type"
     t.string "repo_schema_id"
-    t.string "organism", default: "other"
-    t.string "level", default: "other"
+    t.string "organism", default: "any"
+    t.string "level"
     t.text "description"
     t.integer "policy_id"
     t.integer "contributor_id"

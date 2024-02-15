@@ -121,9 +121,9 @@ class BaseSerializer < SimpleBaseSerializer
     end
   end
 
-  attribute :extended_attributes, if: -> { object.respond_to?(:custom_metadata) && !object.custom_metadata.blank? } do
-    { extended_metadata_type_id: object.custom_metadata.custom_metadata_type_id.to_s,
-      attribute_map: object.custom_metadata.data.to_hash }
+  attribute :extended_attributes, if: -> { object.respond_to?(:extended_metadata) && !object.extended_metadata.blank? } do
+    { extended_metadata_type_id: object.extended_metadata.extended_metadata_type_id.to_s,
+      attribute_map: object.extended_metadata.data.to_hash }
   end
 
 

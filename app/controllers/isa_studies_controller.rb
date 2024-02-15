@@ -29,7 +29,7 @@ class IsaStudiesController < ApplicationController
 
     else
       respond_to do |format|
-        format.html { render action: 'new' }
+        format.html { render action: 'new', status: :unprocessable_entity }
         format.json { render json: @isa_study.errors, status: :unprocessable_entity }
       end
     end
@@ -88,7 +88,7 @@ class IsaStudiesController < ApplicationController
     [:title, :description, :experimentalists, :investigation_id, { sop_ids: [] },
      *creator_related_params, :position, { scales: [] }, { publication_ids: [] },
      { discussion_links_attributes: %i[id url label _destroy] },
-     { custom_metadata_attributes: determine_custom_metadata_keys }]
+     { extended_metadata_attributes: determine_extended_metadata_keys(:study) }]
   end
 
   def sample_type_params(params, field)
@@ -120,6 +120,7 @@ class IsaStudiesController < ApplicationController
                                         sample_controlled_vocab_id
                                         linked_sample_type_id
                                         description pid
+                                        allow_cv_free_text
                                         unit_id _destroy] }, { assay_ids: [] }]
   end
 

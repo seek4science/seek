@@ -43,4 +43,43 @@ class SamplesHelperTest < ActionView::TestCase
     attribute = FactoryBot.create(:sample_sample_attribute, title:'The title',pid:'http://pid.org/attr#title',sample_type: FactoryBot.create(:simple_sample_type))
     assert_equal "The title<small data-tooltip=\"http://pid.org/attr#title\"> [ title ]</small>",sample_attribute_display_title(attribute)
   end
+
+  test 'attempt to show sample extract button' do
+    person = FactoryBot.create(:person)
+    User.with_current_user(person.user) do
+      # no sample types
+      data_file = FactoryBot.create(:xlsx_spreadsheet_datafile, contributor: person)
+      refute attempt_to_show_extract_samples_button?(data_file, data_file.latest_version)
+
+      FactoryBot.create(:min_sample_type)
+      # good
+      assert attempt_to_show_extract_samples_button?(data_file, data_file.latest_version)
+
+      # no manage permissions
+      data_file = FactoryBot.create(:xlsx_spreadsheet_datafile)
+      refute attempt_to_show_extract_samples_button?(data_file, data_file.latest_version)
+
+      # not a spreadsheet
+      data_file = FactoryBot.create(:non_spreadsheet_datafile, contributor: person)
+      refute attempt_to_show_extract_samples_button?(data_file, data_file.latest_version)
+
+      # not the latest version
+      data_file = FactoryBot.create(:xlsx_spreadsheet_datafile, contributor: person)
+      data_file.save_as_new_version
+      FactoryBot.create(:xlsx_content_blob, asset: data_file, asset_version: data_file.version)
+      data_file.reload
+      refute attempt_to_show_extract_samples_button?(data_file, data_file.versions.first)
+
+      # has extracted samples
+      data_file = FactoryBot.create(:xlsx_spreadsheet_datafile, contributor: person)
+      data_file.extracted_samples << FactoryBot.create(:sample)
+      refute attempt_to_show_extract_samples_button?(data_file, data_file.latest_version)
+
+      # in progress
+      data_file = FactoryBot.create(:xlsx_spreadsheet_datafile, contributor: person)
+      data_file.sample_extraction_task.update_attribute(:status, Task::STATUS_ACTIVE)
+      assert data_file.sample_extraction_task.in_progress?
+      refute attempt_to_show_extract_samples_button?(data_file, data_file.latest_version)
+    end
+  end
 end

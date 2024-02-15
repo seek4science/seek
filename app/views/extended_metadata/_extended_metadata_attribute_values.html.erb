@@ -1,0 +1,39 @@
+<%
+  label = 'Extended Metadata'
+%>
+<% if resource.respond_to?(:extended_metadata) && resource.extended_metadata %>
+  <% metadata_type = resource.extended_metadata.extended_metadata_type  %>
+  <div id="extended-metadata" class="panel panel-default">
+    <div class="panel-heading panel-heading-button">
+      <div>
+        <%= label %> (<%= metadata_type.title %>)
+      </div>
+      <% if metadata_type.attributes_with_linked_extended_metadata_type.any? %>
+      <div>
+        <a href="#" class="btn btn-primary extended_metadata-small-btn" id="expandAllBtn" onclick="expandAll()">Expand All</a>
+        <a href="#" class="btn btn-primary extended_metadata-small-btn" id="collapseAllBtn" onclick="collapseAll()">Collapse All</a>
+      </div>
+      <% end %>
+    </div>
+    <div class="panel-body">
+      <% metadata_type.extended_metadata_attributes.each do |attribute| %>
+        <%= render_extended_metadata_value(attribute, resource) %>
+      <% end %>
+    </div>
+  </div>
+  <% else %>
+<% end %>
+
+<script>
+    $j(document).ready(function() {
+        var panelcollaps = $j('#extended-metadata .panel-collapse');
+
+        window.expandAll = function() {
+            panelcollaps.addClass('in');
+        };
+
+        window.collapseAll = function() {
+            panelcollaps.removeClass('in');
+        };
+    });
+</script>

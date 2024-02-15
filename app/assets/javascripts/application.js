@@ -56,7 +56,7 @@
 //= require calendar
 //= require inplace
 //= require strain
-//= require checkbox
+//= require batch_asset_selection
 //= require cytoscape.js-2.5.0/cytoscape
 //= require cytoscape_isa_graph
 //= require bives
@@ -75,3 +75,5 @@
 //= require git
 //= require jquery.splitter/jquery.splitter.min
 //= require select2.full.min
+//= require licenses
+//= require svg-pan-zoom-3.6.1/svg-pan-zoom.min

@@ -36,7 +36,7 @@
       <% @studies.each do |study| %>
         <tr>
           <th scope="row">
-            <%= f.text_field :id, required: true, :readonly => true, name: "studies[id][]", :class => "form-control", value: study.custom_metadata.data[:id] %>
+            <%= f.text_field :id, required: true, :readonly => true, name: "studies[id][]", :class => "form-control", value: study.extended_metadata.data[:id] %>
           </th>
           <td>
             <%= f.text_area :title, required: true, name: "studies[title][]", :class => "form-control", value: study.title %>
@@ -45,55 +45,55 @@
             <%= f.text_area :description, required: false, name: "studies[description][]", :class => "form-control", value: study.description %>
           </td>
           <td>
-            <%= f.date_field :startDate, required: true, name: "studies[startDate][]", :class => "form-control", value: study.custom_metadata.data[:study_start_date] %>
+            <%= f.date_field :startDate, required: true, name: "studies[startDate][]", :class => "form-control", value: study.extended_metadata.data[:study_start_date] %>
           </td>
           <td>
-            <%= f.date_field :endDate, required: false, name: "studies[endDate][]", :class => "form-control", value: study.custom_metadata.data[:study_end_date] %>
+            <%= f.date_field :endDate, required: false, name: "studies[endDate][]", :class => "form-control", value: study.extended_metadata.data[:study_end_date] %>
           </td>
           <td>
-            <%= f.text_area :contactInstitution, required: true, name: "studies[contactInstitution][]", :class => "form-control", value: study.custom_metadata.data[:contact_institution] %>
+            <%= f.text_area :contactInstitution, required: true, name: "studies[contactInstitution][]", :class => "form-control", value: study.extended_metadata.data[:contact_institution] %>
           </td>
           <td>
-            <%= f.text_field :geographicLocationCountry, required: true, name: "studies[geographicLocationCountry][]", :class => "form-control", value: study.custom_metadata.data[:geographic_location_country] %>
+            <%= f.text_field :geographicLocationCountry, required: true, name: "studies[geographicLocationCountry][]", :class => "form-control", value: study.extended_metadata.data[:geographic_location_country] %>
           </td>
           <td>
-            <%= f.text_field :experimentalSiteName, required: true, name: "studies[experimentalSiteName][]", :class => "form-control", value: study.custom_metadata.data[:experimental_site_name] %>
+            <%= f.text_field :experimentalSiteName, required: true, name: "studies[experimentalSiteName][]", :class => "form-control", value: study.extended_metadata.data[:experimental_site_name] %>
           </td>
           <td>
-            <%= f.text_field :latitude, required: false, name: "studies[latitude][]", :class => "form-control", value: study.custom_metadata.data[:latitude] %>
+            <%= f.text_field :latitude, required: false, name: "studies[latitude][]", :class => "form-control", value: study.extended_metadata.data[:latitude] %>
           </td>
           <td>
-            <%= f.text_field :longitude, required: false, name: "studies[longitude][]", :class => "form-control", value: study.custom_metadata.data[:longitude] %>
+            <%= f.text_field :longitude, required: false, name: "studies[longitude][]", :class => "form-control", value: study.extended_metadata.data[:longitude] %>
           </td>
           <td>
-            <%= f.text_field :altitude, required: false, name: "studies[altitude][]", :class => "form-control", value: study.custom_metadata.data[:altitude] %>
+            <%= f.text_field :altitude, required: false, name: "studies[altitude][]", :class => "form-control", value: study.extended_metadata.data[:altitude] %>
           </td>
           <td>
-            <%= f.text_area :descriptionOfTheExperimentalDesign, required: true, name: "studies[descriptionOfTheExperimentalDesign][]", :class => "form-control", value: study.custom_metadata.data[:description_of_the_experimental_design] %>
+            <%= f.text_area :descriptionOfTheExperimentalDesign, required: true, name: "studies[descriptionOfTheExperimentalDesign][]", :class => "form-control", value: study.extended_metadata.data[:description_of_the_experimental_design] %>
           </td>
           <td>
-            <%= f.text_area :typeOfExperimentalDesign, required: false, name: "studies[typeOfExperimentalDesign][]", :class => "form-control", value: study.custom_metadata.data[:type_of_experimental_design] %>
+            <%= f.text_area :typeOfExperimentalDesign, required: false, name: "studies[typeOfExperimentalDesign][]", :class => "form-control", value: study.extended_metadata.data[:type_of_experimental_design] %>
           </td>
           <td>
-            <%= f.text_area :observationUnitLevelHierarchy, required: false, name: "studies[observationUnitLevelHierarchy][]", :class => "form-control", value: study.custom_metadata.data[:observation_unit_level_hierarchy] %>
+            <%= f.text_area :observationUnitLevelHierarchy, required: false, name: "studies[observationUnitLevelHierarchy][]", :class => "form-control", value: study.extended_metadata.data[:observation_unit_level_hierarchy] %>
           </td>
           <td>
-            <%= f.text_area :observationUnitDescription, required: true, name: "studies[observationUnitDescription][]", :class => "form-control", value: study.custom_metadata.data[:observation_unit_description] %>
+            <%= f.text_area :observationUnitDescription, required: true, name: "studies[observationUnitDescription][]", :class => "form-control", value: study.extended_metadata.data[:observation_unit_description] %>
           </td>
           <td>
-            <%= f.text_area :descriptionOfGrowthFacility, required: true, name: "studies[descriptionOfGrowthFacility][]", :class => "form-control", value: study.custom_metadata.data[:description_of_growth_facility] %>
+            <%= f.text_area :descriptionOfGrowthFacility, required: true, name: "studies[descriptionOfGrowthFacility][]", :class => "form-control", value: study.extended_metadata.data[:description_of_growth_facility] %>
           </td>
           <td>
-            <%= f.text_area :typeOfGrowthFacility, required: false, name: "studies[typeOfGrowthFacility][]", :class => "form-control", value: study.custom_metadata.data[:type_of_growth_facility] %>
+            <%= f.text_area :typeOfGrowthFacility, required: false, name: "studies[typeOfGrowthFacility][]", :class => "form-control", value: study.extended_metadata.data[:type_of_growth_facility] %>
           </td>
           <td>
-            <%= f.text_area :culturalPractices, required: false, name: "studies[culturalPractices][]", :class => "form-control", value: study.custom_metadata.data[:cultural_practices] %>
+            <%= f.text_area :culturalPractices, required: false, name: "studies[culturalPractices][]", :class => "form-control", value: study.extended_metadata.data[:cultural_practices] %>
           </td>
           <td>
-            <%= f.text_area :culturalPractices, required: false, name: "studies[data_files][]", :class => "form-control", value: @studies_datafiles[study.custom_metadata.data[:id]][:data_file].join(", ") %>
+            <%= f.text_area :culturalPractices, required: false, name: "studies[data_files][]", :class => "form-control", value: @studies_datafiles[study.extended_metadata.data[:id]][:data_file].join(", ") %>
           </td>
         </tr>
-        <%= hidden_field_tag "studies[data_file_description][]", @studies_datafiles[study.custom_metadata.data[:id]][:data_file_description].join(", ") %>
+        <%= hidden_field_tag "studies[data_file_description][]", @studies_datafiles[study.extended_metadata.data[:id]][:data_file_description].join(", ") %>
         <%= hidden_field_tag "studies[license]", @license %>
       <% end %>
       <% @existing_studies.each do |existing_study| %>

@@ -50,8 +50,8 @@ class InvestigationsControllerTest < ActionController::TestCase
 
       investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:public_policy),contributor:person)
       study = FactoryBot.create(:study, policy: FactoryBot.create(:public_policy),
-                              assays: [assay1, assay2],
-                              investigation: investigation,contributor:person)
+                                assays: [assay1, assay2],
+                                investigation: investigation,contributor:person)
     end
 
 
@@ -146,7 +146,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     login_as(user)
     assert_difference('Investigation.count') do
       post :create, params: { investigation: FactoryBot.attributes_for(:investigation, project_ids: [User.current_user.person.projects.first.id]), policy_attributes: { access_type: Policy::ACCESSIBLE,
-                                                                                                                                                                     permissions_attributes: project_permissions([project, another_project], Policy::EDITING) } }
+                                                                                                                                                                        permissions_attributes: project_permissions([project, another_project], Policy::EDITING) } }
     end
 
     investigation = assigns(:investigation)
@@ -394,7 +394,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     gatekeeper = FactoryBot.create(:asset_gatekeeper)
     person = FactoryBot.create(:person,project:gatekeeper.projects.first)
     investigation = FactoryBot.create(:investigation, projects: gatekeeper.projects, contributor:person,
-                                            policy: FactoryBot.create(:public_policy, access_type: Policy::VISIBLE))
+                                      policy: FactoryBot.create(:public_policy, access_type: Policy::VISIBLE))
     login_as(person)
 
     assert investigation.is_published?
@@ -439,7 +439,7 @@ class InvestigationsControllerTest < ActionController::TestCase
   test 'shows how to publish investigation to get a citation' do
     study = FactoryBot.create(:study)
     investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:private_policy),
-                                            studies: [study], contributor:study.contributor)
+                                      studies: [study], contributor:study.contributor)
     login_as(investigation.contributor)
 
     refute investigation.permitted_for_research_object?
@@ -453,7 +453,7 @@ class InvestigationsControllerTest < ActionController::TestCase
   test 'shows how to get a citation for a snapshotted investigation' do
     study = FactoryBot.create(:study)
     investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:publicly_viewable_policy),
-                                            studies: [study], contributor:study.contributor)
+                                      studies: [study], contributor:study.contributor, creators: [study.contributor])
 
     login_as(investigation.contributor)
     investigation.create_snapshot
@@ -473,7 +473,8 @@ class InvestigationsControllerTest < ActionController::TestCase
     another_person = FactoryBot.create(:person,project:person.projects.first)
     study = FactoryBot.create(:study,contributor:another_person)
     investigation = FactoryBot.create(:investigation, projects:another_person.projects, contributor:another_person,
-                                            policy: FactoryBot.create(:publicly_viewable_policy), studies: [study])
+                                      policy: FactoryBot.create(:publicly_viewable_policy), studies: [study],
+                                      creators: [another_person])
 
     login_as(person)
     investigation.create_snapshot
@@ -538,12 +539,12 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert investigation.can_manage?
 
     patch :manage_update, params: { id: investigation,
-                                   investigation: {
-                                     creator_ids: [other_creator.id],
-                                     project_ids: [proj1.id, proj2.id]
-                                 },
-                                   policy_attributes: { access_type: Policy::VISIBLE, permissions_attributes: { '1' => { contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING } }
-                                 } }
+                                    investigation: {
+                                      creator_ids: [other_creator.id],
+                                      project_ids: [proj1.id, proj2.id]
+                                    },
+                                    policy_attributes: { access_type: Policy::VISIBLE, permissions_attributes: { '1' => { contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING } }
+                                    } }
 
     assert_redirected_to investigation
 
@@ -571,7 +572,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     other_creator.save!
 
     investigation = FactoryBot.create(:investigation, projects:[proj1], policy:FactoryBot.create(:private_policy,
-                                                                             permissions:[FactoryBot.create(:permission,contributor:person, access_type:Policy::EDITING)]))
+                                                                                                 permissions:[FactoryBot.create(:permission,contributor:person, access_type:Policy::EDITING)]))
 
     login_as(person)
     refute investigation.can_manage?
@@ -581,12 +582,12 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert_empty investigation.creators
 
     patch :manage_update, params: { id: investigation,
-                                   investigation: {
-                                     creator_ids: [other_creator.id],
-                                     project_ids: [proj1.id, proj2.id]
-                                 },
-                                   policy_attributes: { access_type: Policy::VISIBLE, permissions_attributes: { '1' => { contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING } }
-                                 } }
+                                    investigation: {
+                                      creator_ids: [other_creator.id],
+                                      project_ids: [proj1.id, proj2.id]
+                                    },
+                                    policy_attributes: { access_type: Policy::VISIBLE, permissions_attributes: { '1' => { contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING } }
+                                    } }
 
     refute_nil flash[:error]
 
@@ -602,15 +603,15 @@ class InvestigationsControllerTest < ActionController::TestCase
 
 
 
-  test 'create an investigation with custom metadata' do
-    cmt = FactoryBot.create(:simple_investigation_custom_metadata_type)
+  test 'create an investigation with extended metadata' do
+    cmt = FactoryBot.create(:simple_investigation_extended_metadata_type)
 
     login_as(FactoryBot.create(:person))
 
     assert_difference('Investigation.count') do
       inv_attributes = FactoryBot.attributes_for(:investigation, project_ids: [User.current_user.person.projects.first.id])
-      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id,
-                                                   data:{
+      cm_attributes = {extended_metadata_attributes:{extended_metadata_type_id: cmt.id,
+                                                     data:{
                                                        "name":'fred',
                                                        "age":22}}}
 
@@ -619,23 +620,23 @@ class InvestigationsControllerTest < ActionController::TestCase
 
     assert inv=assigns(:investigation)
 
-    assert cm = inv.custom_metadata
+    assert cm = inv.extended_metadata
 
-    assert_equal cmt, cm.custom_metadata_type
+    assert_equal cmt, cm.extended_metadata_type
     assert_equal 'fred',cm.get_attribute_value('name')
-    assert_equal '22',cm.get_attribute_value('age')
+    assert_equal 22,cm.get_attribute_value('age')
     assert_nil cm.get_attribute_value('date')
   end
 
-  test 'create an investigation with custom metadata validated' do
-    cmt = FactoryBot.create(:simple_investigation_custom_metadata_type)
+  test 'create an investigation with extended metadata validated' do
+    cmt = FactoryBot.create(:simple_investigation_extended_metadata_type)
 
     login_as(FactoryBot.create(:person))
 
     # invalid age - needs to be a number
     assert_no_difference('Investigation.count') do
       inv_attributes = FactoryBot.attributes_for(:investigation, project_ids: [User.current_user.person.projects.first.id])
-      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id, data:{'name':'fred','age':'not a number'}}}
+      cm_attributes = {extended_metadata_attributes:{extended_metadata_type_id: cmt.id, data:{'name':'fred','age':'not a number'}}}
 
       put :create, params: { investigation: inv_attributes.merge(cm_attributes), sharing: valid_sharing }
     end
@@ -646,7 +647,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     # name is required
     assert_no_difference('Investigation.count') do
       inv_attributes = FactoryBot.attributes_for(:investigation, project_ids: [User.current_user.person.projects.first.id])
-      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id, data:{'name':nil,'age':22}}}
+      cm_attributes = {extended_metadata_attributes:{extended_metadata_type_id: cmt.id, data:{'name':nil,'age':22}}}
 
       put :create, params: { investigation: inv_attributes.merge(cm_attributes), sharing: valid_sharing }
     end
@@ -708,29 +709,29 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert_empty investigation.discussion_links
   end
 
- test 'investigation needs more than one study for ordering' do
+  test 'investigation needs more than one study for ordering' do
     person = FactoryBot.create(:admin)
     login_as(person)
     investigation = FactoryBot.create(:investigation,
-                            policy: FactoryBot.create(:public_policy),
-                            contributor: person)
+                                      policy: FactoryBot.create(:public_policy),
+                                      contributor: person)
     get :show, params: { id: investigation.id }
-    
+
     assert_response :success
     assert_select 'a[href=?]',
                   order_studies_investigation_path(investigation), count: 0
 
     investigation.studies += [FactoryBot.create(:study,
-                                      policy: FactoryBot.create(:public_policy),
-                                      contributor: person)]
+                                                policy: FactoryBot.create(:public_policy),
+                                                contributor: person)]
     get :show, params: { id: investigation.id }
     assert_response :success
     assert_select 'a[href=?]',
                   order_studies_investigation_path(investigation), count: 0
 
     investigation.studies +=  [FactoryBot.create(:study,
-                                      policy: FactoryBot.create(:public_policy),
-                                      contributor: person)]
+                                                 policy: FactoryBot.create(:public_policy),
+                                                 contributor: person)]
     get :show, params: { id: investigation.id }
     assert_response :success
     assert_select 'a[href=?]',
@@ -741,14 +742,14 @@ class InvestigationsControllerTest < ActionController::TestCase
     person = FactoryBot.create(:admin)
     login_as(person)
     investigation = FactoryBot.create(:investigation,
-                            policy: FactoryBot.create(:all_sysmo_viewable_policy),
-                            contributor: person)
+                                      policy: FactoryBot.create(:all_sysmo_viewable_policy),
+                                      contributor: person)
     investigation.studies += [FactoryBot.create(:study,
-                                      policy: FactoryBot.create(:public_policy),
-                                      contributor: person)]
+                                                policy: FactoryBot.create(:public_policy),
+                                                contributor: person)]
     investigation.studies += [FactoryBot.create(:study,
-                                      policy: FactoryBot.create(:public_policy),
-                                      contributor: person)]
+                                                policy: FactoryBot.create(:public_policy),
+                                                contributor: person)]
     get :show, params: { id: investigation.id }
     assert_response :success
     assert_select 'a[href=?]',
@@ -835,5 +836,347 @@ class InvestigationsControllerTest < ActionController::TestCase
     put :update, params: { id: inv.id, investigation: { title: 'test' }, tag_list: 'my_tag' }
     assert_equal 'my_tag', assigns(:investigation).tags_as_text_array.first
   end
- 
+
+  test 'do not get index if feature disabled' do
+    with_config_value(:isa_enabled, false) do
+      get :index
+      assert_redirected_to root_path
+      assert flash[:error].include?('disabled')
+    end
+  end
+
+  test 'Should not export an isa json with unauthorized studies and assays' do
+    with_config_value(:project_single_page_enabled, true) do
+      current_user = FactoryBot.create(:user)
+      other_user = FactoryBot.create(:user)
+
+      login_as(current_user)
+      project = FactoryBot.create(:project)
+      current_user.person.add_to_project_and_institution(project, current_user.person.institutions.first)
+      other_user.person.add_to_project_and_institution(project, current_user.person.institutions.first)
+      investigation = FactoryBot.create(:investigation, projects: [project], contributor: current_user.person, is_isa_json_compliant: true)
+
+      source_sample_type = FactoryBot.create(:isa_source_sample_type, template_id: FactoryBot.create(:isa_source_template).id)
+      sample_collection_sample_type = FactoryBot.create(:isa_sample_collection_sample_type, linked_sample_type: source_sample_type, template_id: FactoryBot.create(:isa_sample_collection_template).id)
+      accessible_study = FactoryBot.create(:study,
+                                           investigation: investigation,
+                                           sample_types:[source_sample_type, sample_collection_sample_type],
+                                           contributor: current_user.person)
+
+
+      source_sample = FactoryBot.create(:sample,
+                                        title: 'source 1',
+                                        sample_type: source_sample_type,
+                                        project_ids: [project.id],
+                                        data: {
+                                          'Source Name': 'Source Name',
+                                          'Source Characteristic 1': 'Source Characteristic 1',
+                                          'Source Characteristic 2':
+                                            source_sample_type
+                                              .sample_attributes
+                                              .find_by_title('Source Characteristic 2')
+                                              .sample_controlled_vocab
+                                              .sample_controlled_vocab_terms
+                                              .first
+                                              .label
+                                        },
+                                        contributor: current_user.person)
+
+      study_sample =
+        FactoryBot.create(:sample,
+                          title: 'study sample 1',
+                          sample_type: sample_collection_sample_type,
+                          project_ids: [project.id],
+                          data: {
+                            Input: [source_sample.id],
+                            'sample collection': 'sample collection',
+                            'sample collection parameter value 1': 'sample collection parameter value 1',
+                            'Sample Name': 'sample name',
+                            'sample characteristic 1': 'sample characteristic 1'
+                          },
+                          contributor: current_user.person)
+
+      hidden_study_sample =
+        FactoryBot.create(:sample,
+                          title: 'study sample 2',
+                          sample_type: sample_collection_sample_type,
+                          project_ids: [project.id],
+                          data: {
+                            Input: [source_sample.id],
+                            'sample collection': 'sample collection',
+                            'sample collection parameter value 1': 'sample collection parameter value 2',
+                            'Sample Name': 'sample name 2',
+                            'sample characteristic 1': 'sample characteristic 2'
+                          },
+                          contributor: other_user.person)
+
+      # Create a 'private' assay in an assay stream
+      stream_1 = FactoryBot.create(:assay_stream, title: 'Assay Stream 1', study: accessible_study, contributor: other_user.person)
+      assert_equal(stream_1.study, accessible_study)
+      assert(stream_1.is_assay_stream?)
+      assay_1_stream_1_sample_type = FactoryBot.create(:isa_assay_material_sample_type, contributor: other_user.person, linked_sample_type: sample_collection_sample_type, template_id: FactoryBot.create(:isa_assay_material_template).id)
+      assay_1_stream_1 = FactoryBot.create(:assay, position: 1, sample_type: assay_1_stream_1_sample_type, study: accessible_study, contributor: other_user.person, assay_stream_id: stream_1.id)
+      assay_2_stream_1_sample_type = FactoryBot.create(:isa_assay_data_file_sample_type, contributor: other_user.person, linked_sample_type: assay_1_stream_1_sample_type, template_id: FactoryBot.create(:isa_assay_data_file_template).id)
+      assay_2_stream_1 = FactoryBot.create(:assay, position: 2, sample_type: assay_2_stream_1_sample_type, study: accessible_study, contributor: other_user.person, assay_stream_id: stream_1.id)
+
+      # Create an assay stream with all assays visible
+      stream_2 = FactoryBot.create(:assay_stream, title: 'Assay Stream 2', study: accessible_study, contributor: current_user.person)
+      assert_equal(stream_2.study, accessible_study)
+      assert(stream_2.is_assay_stream?)
+      assay_1_stream_2_sample_type = FactoryBot.create(:isa_assay_material_sample_type, contributor: current_user.person, linked_sample_type: sample_collection_sample_type, template_id: FactoryBot.create(:isa_assay_material_template).id)
+      assay_1_stream_2 = FactoryBot.create(:assay, position: 1, sample_type: assay_1_stream_2_sample_type, study: accessible_study, contributor: current_user.person, assay_stream_id: stream_2.id)
+      assay_2_stream_2_sample_type = FactoryBot.create(:isa_assay_data_file_sample_type, contributor: current_user.person, linked_sample_type: assay_1_stream_2_sample_type, template_id: FactoryBot.create(:isa_assay_data_file_template).id)
+      assay_2_stream_2 = FactoryBot.create(:assay, position: 2, sample_type: assay_2_stream_2_sample_type, study: accessible_study, contributor: current_user.person, assay_stream_id: stream_2.id)
+
+      # create samples in second assay stream with viewing permission
+
+      assay_1_stream_2_sample =
+        FactoryBot.create(:sample,
+                          title: 'Assay 1 - stream 2 - sample 1',
+                          sample_type: assay_1_stream_2_sample_type,
+                          project_ids: [project.id],
+                          data: {
+                            Input: [study_sample.id],
+                            'Protocol Assay 1': 'Protocol Assay 1',
+                            'Assay 1 parameter value 1': 'Assay 1 parameter value 1',
+                            'Assay 1 parameter value 2': assay_1_stream_2_sample_type
+                                                           .sample_attributes
+                                                           .find_by(title: 'Assay 1 parameter value 2')
+                                                           .sample_controlled_vocab
+                                                           .sample_controlled_vocab_terms
+                                                           .first
+                                                           .label,
+                            'Assay 1 parameter value 3': assay_1_stream_2_sample_type
+                                                           .sample_attributes
+                                                           .find_by(title: 'Assay 1 parameter value 3')
+                                                           .sample_controlled_vocab
+                                                           .sample_controlled_vocab_terms
+                                                           .first
+                                                           .label,
+                            'Extract Name': 'Extract 1 stream 2',
+                            'other material characteristic 1': 'other material characteristic 1',
+                            'other material characteristic 2': assay_1_stream_2_sample_type
+                                                                 .sample_attributes
+                                                                 .find_by(title: 'other material characteristic 2')
+                                                                 .sample_controlled_vocab
+                                                                 .sample_controlled_vocab_terms
+                                                                 .first
+                                                                 .label,
+                            'other material characteristic 3': assay_1_stream_2_sample_type
+                                                                 .sample_attributes
+                                                                 .find_by(title: 'other material characteristic 3')
+                                                                 .sample_controlled_vocab
+                                                                 .sample_controlled_vocab_terms
+                                                                 .first
+                                                                 .label},
+                          contributor: current_user.person)
+
+      assay_1_stream_2_hidden_sample =
+        FactoryBot.create(:sample,
+                          title: 'Assay 1 - stream 2 - sample 2',
+                          sample_type: assay_1_stream_2_sample_type,
+                          project_ids: [project.id],
+                          data: {
+                            Input: [study_sample.id],
+                            'Protocol Assay 1': 'Protocol Assay 1',
+                            'Assay 1 parameter value 1': 'Assay 1 parameter value 1',
+                            'Assay 1 parameter value 2': assay_1_stream_2_sample_type
+                                                           .sample_attributes
+                                                           .find_by(title: 'Assay 1 parameter value 2')
+                                                           .sample_controlled_vocab
+                                                           .sample_controlled_vocab_terms
+                                                           .second
+                                                           .label,
+                            'Assay 1 parameter value 3': assay_1_stream_2_sample_type
+                                                           .sample_attributes
+                                                           .find_by(title: 'Assay 1 parameter value 3')
+                                                           .sample_controlled_vocab
+                                                           .sample_controlled_vocab_terms
+                                                           .second
+                                                           .label,
+                            'Extract Name': 'Extract 1 stream 2',
+                            'other material characteristic 1': 'other material characteristic 1',
+                            'other material characteristic 2': assay_1_stream_2_sample_type
+                                                                 .sample_attributes
+                                                                 .find_by(title: 'other material characteristic 2')
+                                                                 .sample_controlled_vocab
+                                                                 .sample_controlled_vocab_terms
+                                                                 .second
+                                                                 .label,
+                            'other material characteristic 3': assay_1_stream_2_sample_type
+                                                                 .sample_attributes
+                                                                 .find_by(title: 'other material characteristic 3')
+                                                                 .sample_controlled_vocab
+                                                                 .sample_controlled_vocab_terms
+                                                                 .second
+                                                                 .label},
+                          contributor: other_user.person)
+
+      assay_2_stream_2_sample =
+        FactoryBot.create(:sample,
+                          title: 'Assay 2 - stream 2 - sample 1',
+                          sample_type: assay_2_stream_2_sample_type,
+                          project_ids: [project.id],
+                          data: {
+                            Input: [assay_1_stream_2_sample.id],
+                            'Protocol Assay 2': 'Protocol Assay 2',
+                            'Assay 2 parameter value 1': 'Assay 2 parameter value 1',
+                            'Assay 2 parameter value 2': assay_2_stream_2_sample_type
+                                                           .sample_attributes
+                                                           .find_by(title: 'Assay 2 parameter value 2')
+                                                           .sample_controlled_vocab
+                                                           .sample_controlled_vocab_terms
+                                                           .first
+                                                           .label,
+                            'Assay 2 parameter value 3': assay_2_stream_2_sample_type
+                                                           .sample_attributes
+                                                           .find_by(title: 'Assay 2 parameter value 3')
+                                                           .sample_controlled_vocab
+                                                           .sample_controlled_vocab_terms
+                                                           .first
+                                                           .label,
+                            'File Name': 'file 1 stream 2',
+                            'Data file comment 1': 'Data file comment 1',
+                            'Data file comment 2': assay_2_stream_2_sample_type
+                                                     .sample_attributes
+                                                     .find_by(title: 'Data file comment 2')
+                                                     .sample_controlled_vocab
+                                                     .sample_controlled_vocab_terms
+                                                     .first
+                                                     .label,
+                            'Data file comment 3': assay_2_stream_2_sample_type
+                                                     .sample_attributes
+                                                     .find_by(title: 'Data file comment 3')
+                                                     .sample_controlled_vocab
+                                                     .sample_controlled_vocab_terms
+                                                     .first
+                                                     .label},
+                          contributor: current_user.person)
+
+      assay_2_stream_2_hidden_sample =
+        FactoryBot.create(:sample,
+                          title: 'Assay 2 - stream 2 - sample 2',
+                          sample_type: assay_2_stream_2_sample_type,
+                          project_ids: [project.id],
+                          data: {
+                            Input: [assay_1_stream_2_sample.id],
+                            'Protocol Assay 2': 'Protocol Assay 2',
+                            'Assay 2 parameter value 1': 'Assay 2 parameter value 1',
+                            'Assay 2 parameter value 2': assay_2_stream_2_sample_type
+                                                           .sample_attributes
+                                                           .find_by(title: 'Assay 2 parameter value 2')
+                                                           .sample_controlled_vocab
+                                                           .sample_controlled_vocab_terms
+                                                           .second
+                                                           .label,
+                            'Assay 2 parameter value 3': assay_2_stream_2_sample_type
+                                                           .sample_attributes
+                                                           .find_by(title: 'Assay 2 parameter value 3')
+                                                           .sample_controlled_vocab
+                                                           .sample_controlled_vocab_terms
+                                                           .second
+                                                           .label,
+                            'File Name': 'file 1 stream 2',
+                            'Data file comment 1': 'Data file comment 1',
+                            'Data file comment 2': assay_2_stream_2_sample_type
+                                                     .sample_attributes
+                                                     .find_by(title: 'Data file comment 2')
+                                                     .sample_controlled_vocab
+                                                     .sample_controlled_vocab_terms
+                                                     .second
+                                                     .label,
+                            'Data file comment 3': assay_2_stream_2_sample_type
+                                                     .sample_attributes
+                                                     .find_by(title: 'Data file comment 3')
+                                                     .sample_controlled_vocab
+                                                     .sample_controlled_vocab_terms
+                                                     .second
+                                                     .label},
+                          contributor: other_user.person)
+
+
+      get :export_isa, params: { id: investigation.id }
+
+      assert_response :success
+      json_investigation = JSON.parse(response.body)
+      assert json_investigation['studies'].map { |s| s['title'] }.include? accessible_study.title
+      study_json = json_investigation['studies'].first
+
+      # Total assays
+      assert_equal accessible_study.assays.count, 6
+      # Assay_streams
+      assert_equal accessible_study.assay_streams.count, 2
+      # Child assays
+      assert_equal accessible_study.assay_streams.map(&:child_assays).compact.flatten.count, 4
+      # Only one assay should end up in 1 assay stream in the ISA JSON
+      assert_equal study_json['assays'].count, 1
+
+      sample_ids = study_json['materials']['samples'].map { |sample| sample['@id'] }
+
+      # Check whether permitted samples end up in the materials
+      assert sample_ids.include?("#sample/#{study_sample.id}")
+      refute sample_ids.include?("#sample/#{hidden_study_sample.id}")
+
+      # Check whether permitted study samples end up in the study's processSequence
+      study_output_ids = []
+      study_json['processSequence'].map do |process|
+        process['outputs'].map { |output| study_output_ids.push(output['@id']) }
+      end
+
+      assert study_output_ids.include? "#sample/#{study_sample.id}"
+      refute study_output_ids.include? "#sample/#{hidden_study_sample.id}"
+
+      assay_json = study_json['assays'].first
+
+      # Check otherMaterials
+      other_material_ids = assay_json['materials']['otherMaterials'].map { |om| om['@id'] }
+      assert other_material_ids.include? "#other_material/#{assay_1_stream_2_sample.id}"
+      refute other_material_ids.include? "#other_material/#{assay_1_stream_2_hidden_sample.id}"
+
+      # Check dataFiles
+      data_file_ids = assay_json['dataFiles'].map { |df| df['@id'] }
+      assert data_file_ids.include? "#data_file/#{assay_2_stream_2_sample.id}"
+      refute data_file_ids.include? "#data_file/#{assay_2_stream_2_hidden_sample.id}"
+
+      # Check whether permitted study samples end up in the assay's processSequence
+      assay_output_ids = []
+      assay_json['processSequence'].map do |process|
+        process['outputs'].map { |output| assay_output_ids.push(output['@id']) }
+      end
+
+      assert assay_output_ids.include? "#other_material/#{assay_1_stream_2_sample.id}"
+      assert assay_output_ids.include? "#data_file/#{assay_2_stream_2_sample.id}"
+      refute assay_output_ids.include? "#other_material/#{assay_1_stream_2_hidden_sample.id}"
+      refute assay_output_ids.include? "#data_file/#{assay_2_stream_2_hidden_sample.id}"
+    end
+  end
+
+  test 'display single page button if feature enabled' do
+    with_config_value(:project_single_page_enabled, true) do
+      current_user = FactoryBot.create(:user)
+      login_as(current_user)
+      inv = FactoryBot.create(:investigation, contributor: current_user.person)
+
+      get :show, params: { id: inv }
+      assert_response :success
+
+      assert_select 'a', text: 'Single Page', count: 1
+    end
+  end
+
+  test 'display adjusted buttons if isa json compliant' do
+    with_config_value(:isa_json_compliance_enabled, true) do
+      current_user = FactoryBot.create(:user)
+      login_as(current_user)
+      inv = FactoryBot.create(:investigation, is_isa_json_compliant: true, contributor: current_user.person)
+
+      get :show, params: { id: inv }
+      assert_response :success
+
+      assert_select 'a', text: /Design #{I18n.t('study')}/i, count: 1
+      assert_select 'a', text: 'Export ISA', count: 1
+
+      assert_select 'a', text: /Add a #{I18n.t('study')}/i, count: 0
+    end
+  end
 end

@@ -1,21 +1,35 @@
 <%= render :partial => "subscriptions/subscribe", :locals => { :object => item } %>
+
+<% if Seek::Config.project_single_page_enabled %>
+	<% if !displaying_single_page? %>
+		<span>
+      <%= button_link_to("Single Page", 'sop', single_page_path(id: item.projects.first.id, item_type: 'investigation', item_id: item.id)) -%>
+    </span>
+	<% else %>
+		<span>
+      <%= button_link_to("Default View", 'sop', investigation_path(item.id)) -%>
+    </span>
+	<% end %>
+<% end -%>
+
 <% if logged_in_and_member? %>
-  <% unless displaying_single_page? %>
+  <% unless item.is_isa_json_compliant? %>
 		<%= button_link_to("New #{t('investigation')} based on this one", 'new', new_object_based_on_existing_one_investigation_path(item, :controller_name => "investigations")) %>
   <% end %>
   <!--    <%= button_link_to("Export ISATab JSON", 'publish', export_isatab_json_investigation_path(item)) %> -->
 <% end %>
 
 <% if item.can_edit? -%>
-  <% if displaying_single_page? %>
+  <% if Seek::Config.isa_json_compliance_enabled && item.is_isa_json_compliant? %>
     <%= button_link_to("Design #{t('study')}", 'new', new_isa_study_path(investigation_id: item, single_page: params[:single_page])) %>
-    <% if Seek::Config.project_single_page_advanced_enabled %>
-      <%= button_link_to("Export ISA", 'download', export_isa_single_page_path(id: params[:single_page], investigation_id: item)) %>
-    <% end -%>
   <% else -%>
     <%= add_new_item_to_dropdown(item) %>
   <% end -%>
 <% end -%>
+
+<% if item.can_view? && Seek::Config.isa_json_compliance_enabled && item.is_isa_json_compliant?%>
+	<%= button_link_to("Export ISA", 'download', export_isa_investigation_path(item)) %>
+<% end %>
 
 <%= item_actions_dropdown do %>
   <% if item.can_edit? %>

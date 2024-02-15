@@ -31,6 +31,7 @@ module Seek
 
               last_id = Sample.last.try(:id) || 0
               sample_type = samples.first.sample_type
+	      project_ids = samples.first.project_ids
               Sample.import(samples, validate: false, batch_size: 2000)
               SampleTypeUpdateJob.new(sample_type, false).queue_job
 
@@ -41,6 +42,7 @@ module Seek
               )
               # makes sure linked resources are updated
               samples.each do |sample|
+                sample.project_ids = project_ids
                 sample.run_callbacks(:validation) { false }
               end
               ReindexingQueue.enqueue(samples)

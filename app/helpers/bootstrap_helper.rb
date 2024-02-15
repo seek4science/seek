@@ -127,20 +127,23 @@ module BootstrapHelper
     options['data-allow-new-items'] = options.delete(:allow_new) if options[:allow_new]
     options['data-placeholder'] = options.delete(:placeholder) if options[:placeholder]
     options[:include_blank] = ''
-    options[:multiple] = true
-    options[:name] = "#{element_name}[]" unless options.key?(:name)
+    options[:multiple] = true unless options.key?(:multiple)
+    options[:name] = "#{element_name}#{options[:multiple] ? '[]': ''}" unless options.key?(:name)
     options.merge!(typeahead_options(options.delete(:typeahead))) if options[:typeahead]
 
-    select_options = options_from_collection_for_select(
-      existing_objects,
-      value_method, text_method,
-      existing_objects.collect { |obj| obj.send(value_method) }
-    )
+    select_options = options.delete(:select_options) ||
+      options_from_collection_for_select(
+        existing_objects,
+        value_method, text_method,
+        existing_objects.collect { |obj| obj.send(value_method) }
+      )
 
-    hidden_field_tag(element_name, '', name: options[:name], id: nil) +
-      select_tag(element_name,
-                 select_options,
-                 options)
+    tag = select_tag(element_name, select_options, options)
+    if options[:multiple]
+      hidden_field_tag(element_name, '', name: options[:name], id: nil) + tag
+    else
+      tag
+    end
   end
 
   def modal(options = {}, &block)

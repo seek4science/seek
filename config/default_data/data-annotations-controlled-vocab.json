@@ -1,7 +1,7 @@
 {
     "title": "Data types",
     "description": "Data types, used for annotating. Describes information that is that can be processed by dedicated computational tools that can use the data as input or produce it as output. Initially seeded from the EDAM ontology",
-    "ols_root_term_uri": "http://edamontology.org/data_0006",
+    "ols_root_term_uris": "http://edamontology.org/data_0006",
     "source_ontology": "edam",
     "terms": [
   {

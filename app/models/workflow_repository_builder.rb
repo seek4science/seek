@@ -6,14 +6,14 @@ require 'seek/download_handling/http_streamer'
 class WorkflowRepositoryBuilder
   include ActiveModel::Model
 
-  attr_accessor :main_workflow, :abstract_cwl, :diagram, :workflow_class
+  attr_accessor :main_workflow, :abstract_cwl, :diagram, :workflow_class, :project_ids
 
   validates :main_workflow, presence: true
   validate :resolve_remotes
   validate :workflow_data_present
 
   def build
-    @workflow = Workflow.new(workflow_class: workflow_class, is_git_versioned: true)
+    @workflow = Workflow.new(workflow_class: workflow_class, is_git_versioned: true, project_ids: project_ids || [])
 
     if valid?
       gv = @workflow.git_version

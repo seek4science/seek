@@ -1,0 +1,220 @@
+<%
+  def any_samples_to_upload?
+    !((@new_samples.nil? or @new_samples.compact.none?) and (@update_samples.nil? or @update_samples.compact.none?) and (@possible_duplicates.nil? or @possible_duplicates.compact.none?))
+  end
+  errors = []
+%>
+
+<% @can_upload = true %>
+<div id="upload-summary">
+
+  <%# General information panel %>
+  <%= render partial: 'general_panel' %>
+
+  <%# New Samples panel %>
+  <%= render partial: 'new_samples_panel' %>
+
+  <%# Update Samples panel %>
+  <%= render partial: 'update_samples_panel' %>
+
+  <%# Possible Duplicate Samples panel %>
+  <%= render partial: 'duplicate_samples_panel' %>
+
+  <%# Panel for Sample with wrong permissions %>
+  <%= render partial: 'unauthorized_samples_panel' %>
+
+  <div id='check-excel-upload-result'></div>
+  <% unless @can_upload %>
+    <div class="alert alert-danger alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h3>Permissions conflict</h3>
+        <strong>Unable to upload the current set of samples!</strong>
+        <p>Please expand the 'General Information' and/or 'Unauthorized Samples' pane for more information.</p>
+        <p>Correct the following errors:</p>
+        <ul>
+          <% for error in errors %>
+            <li><%= error %></li>
+          <% end %>
+        </ul>
+    </div>
+  <% end %>
+
+  <% if (@can_upload and !any_samples_to_upload?) %>
+    <div class="alert alert-info alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h3>No changes detected</h3>
+        <strong>The provided spreadsheet did not include any new samples or changes to already existing ones!</strong>
+        <p>Please click the cancel button to dismiss this window.</p>
+    </div>
+  <% end %>
+
+  <%= submit_tag "Upload", data: {disable_with: 'Uploading ...'}, :class => 'btn btn-primary', onclick: "submitUpload()" if (@can_upload and any_samples_to_upload?)%>
+  <%= submit_tag "Cancel", data: {id: 'cancelModalUploadExcel'}, :class => 'btn btn-secondary', onclick: "closeModalForm()" %>
+  <%= image_tag('ajax-loader.gif', id: 'sample-upload-spinner', style: 'display: none') %>
+</div>
+
+<script type="text/javascript">
+  function removeSample(elementName){
+    let counterName = ''
+    if (/duplicate-sample/.test(elementName)){
+      counterName = 'duplicate-samples-counter'
+    } else if (/new-sample/.test(elementName)){
+      counterName = 'new-samples-counter'
+    } else if(/update-sample/.test(elementName)){
+      counterName = 'update-samples-counter'
+    }
+
+    $j(`tr[id*='${elementName}']`).remove();
+    const counter = parseInt($j(`span[id='${counterName}']`)[0].textContent);
+    const newCounter = (counter > 0) ? (counter - 1) : counter;
+    $j(`span[id='${counterName}']`).text(newCounter);
+  }
+
+  function submitUpload(){
+    const newSamples = { data: getNewSamples() };
+    const updatedSamples= { data: getUpdateSamples() };
+
+    if (newSamples.data === "abort") return;
+    makeSampleUploadAjaxCalls(newSamples, updatedSamples);
+ }
+
+  async function makeSampleUploadAjaxCalls(newSamples, updatedSamples){
+    $j('#sample-upload-spinner').show();
+    try{
+      const postCall = await uploadAjaxCall("<%= batch_create_samples_path %>", "POST", { data: JSON.stringify(newSamples) });
+      const putCall = await uploadAjaxCall("<%= batch_update_samples_path %>", "PUT", { data: JSON.stringify(updatedSamples) });
+      $j('#sample-upload-spinner').hide();
+      closeModalForm();
+      location.reload();
+    } catch (error){
+      $j('#sample-upload-spinner').hide();
+    }
+  }
+
+  // Retrieves the samples from the create-samples-table and the duplicate-samples-table
+  function getNewSamples(){
+    const newRows = $j('#create-samples-table tr:not(:has(th))').toArray();
+    const duplicatedRows = $j('#duplicate-samples-table tr:not([class="danger"]):not(:has(th))').toArray();
+    let createRows = newRows;
+
+    if (duplicatedRows.length > 0 ) {
+      if (confirm("Are you sure you want to add potentially duplicated rows?")) {
+        createRows = createRows.concat(duplicatedRows);
+      } else {
+        closeModalForm();
+        return "abort";
+      }
+    }
+
+    const sampleObjects = createRows.map((cr, index) => createSampleObject(cr, "new", index));
+    return sampleObjects;
+  }
+
+  function getUpdateSamples(){
+    const updateRows = $j('#update-samples-table [id*="updated"]').toArray();
+
+    const sampleObjects = updateRows.map((ur, index) => createSampleObject(ur, "update", index));
+    return sampleObjects
+  }
+
+  function createSampleObject(row, action, index){
+
+    cells = $j(row).find('td:not(:has(".danger"))').toArray();
+    samplesObj = {};
+    cells.map(function(cell){
+      const val = cell.textContent;
+      const key = cell.id.match(/\[.*\]/)[0].replace('[', "").replace("]", '');
+      const multiInputfields = $j(cell).find('span[data-attr_type="seek-sample-multi"]').toArray();
+      const cvListFields = $j(cell).find('span[data-attr_type="cv-list"]').toArray();
+      const seekSample = $j(cell).find('span[data-attr_type="seek-sample"]');
+
+      if (multiInputfields.length > 0 ){
+        const inputIds = multiInputfields.map(is => is.title.split(" ").pop()).join(',');
+        samplesObj[key] = inputIds;
+      } else if (cvListFields.length > 0){
+        cvTerms = cvListFields.map(cvt => cvt.title)
+        samplesObj[key] = cvTerms;
+      } else if (seekSample.length > 0) {
+        samplesObj[key] = seekSample[0].title
+      } else {
+        samplesObj[key] = val;
+      }
+    });
+
+    const {id: objId, ...attrMap} = samplesObj;
+
+    attrMap["status"] = action;
+
+    if (action === "update"){
+      return {
+        id: objId,
+        ex_id: `update-${index}-<%= @sample_type.id %>`,
+        data: {
+          type: "samples",
+          attributes: {
+            attribute_map: attrMap
+          }
+        }
+      };
+    } else {
+        return {
+          ex_id: `new-${index}-<%= @sample_type.id %>`,
+            data:{
+              type: "samples",
+              tags: null,
+              attributes: {
+              policy: {
+                access: getAccess(projectDefaultPolicy),
+                permissions: [
+                  {
+                    resource: { type: "Project", id: <%= @project.id %> },
+                    access: getPermission(projectDefaultPolicy, <%= @project.id %>)
+                  }
+                ]
+              },
+              attribute_map: attrMap
+              },
+              relationships: {
+                projects: {
+                  data: [
+                    {type: "projects", id: <%= @project.id %>}
+                  ]
+                },
+                sample_type: {
+                  data: {
+                    type: "sample_types",
+                    id: <%= @sample_type.id %>
+                  }
+                }
+              }
+            }
+        };
+    }
+  }
+
+  function closeModalForm(){
+    $j('#upload-excel-modal').modal('hide');
+  }
+
+  const uploadAjaxCall = (url, method, params) => {
+    const { data, cache, dataType } = params;
+    if (!url || !method) throw new Error("Parameter(s) missing");
+    return $j.ajax({
+      async: true,
+      method,
+      url,
+      data,
+      dataType,
+      cache: cache || false,
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json"
+      },
+      error: function(err) {
+        console.log("err", err);
+        alert(json.stringify(err));
+      }
+    });
+  };
+
+</script>

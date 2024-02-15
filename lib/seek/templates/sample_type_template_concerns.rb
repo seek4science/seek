@@ -44,10 +44,15 @@ module Seek
       end
 
       def matches_content_blob?(blob)
-        return false unless content_blob
-        Rails.cache.fetch("st-match-#{blob.id}-#{content_blob.id}") do
+        return false unless content_blob && blob
+        key = ['st-match', blob, content_blob, Seek::Config.jvm_memory_allocation, Seek::Config.max_extractable_spreadsheet_size]
+        Rails.cache.fetch(key) do
           template_reader.matches?(blob)
         end
+      rescue SysMODB::SpreadsheetExtractionException=>e
+        Rails.logger.error("Error matching sample template blob #{content_blob.id} with blob #{blob.id} - #{e.message}")
+        false
+
       end
 
       def build_samples_from_template(content_blob)

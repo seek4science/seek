@@ -4,8 +4,8 @@ class SampleAttributeType < ApplicationRecord
   validate :validate_allowed_type, :validate_regular_expression, :validate_resolution
 
   has_many :sample_attributes, inverse_of: :sample_attribute_type
+  has_many :extended_metadata_attributes, inverse_of: :sample_attribute_type
   has_many :isa_template_attributes, class_name: 'TemplateAttribute', inverse_of: :sample_attribute_type
-  has_many :custom_metadata_attributes, inverse_of: :sample_attribute_type
 
   before_save :set_defaults_attributes
   after_initialize :set_defaults_attributes
@@ -30,14 +30,6 @@ class SampleAttributeType < ApplicationRecord
     self == self.class.default
   end
 
-  def test_blank?(value)
-    base_type_handler({}).test_blank?(value)
-  end
-
-  def validate_value?(value, additional_options = {})
-    check_value_against_base_type(value, additional_options) && check_value_against_regular_expression(value)
-  end
-
   def as_json(_options = nil)
     { title: title, base_type: base_type, regexp: regexp }
   end
@@ -56,21 +48,8 @@ class SampleAttributeType < ApplicationRecord
     /#{regexp}/m
   end
 
-  def check_value_against_regular_expression(value)
-    match = regular_expression.match(value.to_s)
-    match && (match.to_s == value.to_s)
-  end
-
   def validate_resolution
     !resolution.present? || (resolution.include? '\\')
-  end
-
-  def check_value_against_base_type(value, additional_options)
-    base_type_handler(additional_options).validate_value?(value)
-  end
-
-  def pre_process_value(value, additional_options)
-    base_type_handler(additional_options).convert(value)
   end
 
   def controlled_vocab?
@@ -81,16 +60,12 @@ class SampleAttributeType < ApplicationRecord
     base_type == Seek::Samples::BaseType::CV_LIST
   end
 
-  def seek_resource?
-    base_type_handler.is_a?(Seek::Samples::AttributeTypeHandlers::SeekResourceAttributeTypeHandler)
+  def linked_extended_metadata?
+    base_type == Seek::Samples::BaseType::LINKED_EXTENDED_METADATA
   end
 
-  def linked_custom_metadata?
-    base_type == Seek::Samples::BaseType::LINKED_CUSTOM_METADATA
-  end
-
-  def linked_custom_metadata_multi?
-    base_type == Seek::Samples::BaseType::LINKED_CUSTOM_METADATA_MULTI
+  def linked_extended_metadata_multi?
+    base_type == Seek::Samples::BaseType::LINKED_EXTENDED_METADATA_MULTI
   end
 
   def seek_sample?
@@ -109,7 +84,5 @@ class SampleAttributeType < ApplicationRecord
     base_type == Seek::Samples::BaseType::SEEK_DATA_FILE
   end
 
-  def base_type_handler(additional_options = {})
-    Seek::Samples::AttributeTypeHandlers::AttributeTypeHandlerFactory.instance.for_base_type(base_type, additional_options)
-  end
+
 end

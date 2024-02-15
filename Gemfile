@@ -15,10 +15,10 @@ gem 'hpricot', '~>0.8.2'
 gem 'libxml-ruby', '~>2.9.0', require: 'libxml'
 gem 'uuid', '~>2.3'
 gem 'RedCloth', '>=4.3.0'
-gem 'simple-spreadsheet-extractor', '~> 0.18.0'
+gem 'simple-spreadsheet-extractor', '0.18.1'
 gem 'open4'
 gem 'sample-template-generator', '~>0.7'
-gem 'rmagick', '4.2.5'
+gem 'rmagick', '5.3.0'
 gem 'rest-client', '~>2.0'
 gem 'factory_bot', '~> 6.2.1'
 gem 'bio', '~> 1.5.1'
@@ -52,7 +52,7 @@ gem 'will_paginate', '~> 3.1'
 gem 'yaml_db'
 gem 'rails_autolink'
 gem 'rfc-822'
-gem 'nokogiri', '~> 1.14.3'
+gem 'nokogiri', '~> 1.16.2'
 #necessary for newer hashie dependency, original api_smith is no longer active
 gem 'api_smith', git: 'https://github.com/youroute/api_smith.git', ref: '1fb428cebc17b9afab25ac9f809bde87b0ec315b'
 gem 'rdf-virtuoso', '>= 0.2.0'
@@ -109,6 +109,7 @@ gem 'ransack'
 
 gem 'terser', '~> 1.1', '>= 1.1.1'
 
+
 # Rails 4 upgrade
 gem 'activerecord-session_store'
 gem 'rails-observers'
@@ -153,7 +154,7 @@ gem 'remotipart', '~> 1.4.4' # Allows file upload in AJAX forms
 
 gem 'rails-static-router'
 
-gem 'caxlsx', '>= 3.0' # Write content to an xlsx file
+gem 'caxlsx', '>= 4.0' # Write content to an xlsx file
 gem 'caxlsx_rails', '~> 0.6.2'
 
 gem 'net-ftp'
@@ -177,6 +178,8 @@ group :development do
 
   gem 'web-console', '>= 4.1.0'
   gem 'rack-mini-profiler', '~> 2.0'
+  gem "flamegraph", "~> 0.9.5"
+  gem "stackprof", "~> 0.2.25"
   gem 'listen', '~> 3.3'
   gem 'ruby-prof'
 end
@@ -202,3 +205,5 @@ group :test, :development do
   gem 'teaspoon'
   gem 'teaspoon-mocha'
 end
+
+gem "sitemap_generator", "~> 6.3"

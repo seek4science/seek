@@ -20,6 +20,12 @@
         <%= text_area_tag 'document[description]', document_description_value, :class=>"form-control rich-text-edit" -%>
       </div>
 
+      <%= fields_for(@document) do |document_fields| %>
+        <%= render partial: 'extended_metadata/extended_metadata_type_selection', locals: { f: document_fields, resource: @document } %>
+        <%= render partial: 'extended_metadata/extended_metadata_attribute_input', locals: { f: document_fields, resource: @document } %>
+      <% end %>
+
+
       <%= render :partial => "projects/project_selector", :locals => { :resource => @document } %>
 
       <%= render :partial => 'assets/license_selector', :locals => { :resource => @document } %>

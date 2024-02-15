@@ -22,12 +22,23 @@
 
   <%= admin_checkbox_setting(:internal_help_enabled, 1, Seek::Config.internal_help_enabled,
                              "Internal help enabled", "Whether internal help pages should be used. Disabling this allows the use of external help pages.",
-                             :onchange=>toggle_appear_javascript('external_help_details', reverse: true)) %>
+                             onchange: toggle_appear_javascript('external_help_details', reverse: true)) %>
   <div id="external_help_details" class="additional_settings" style="<%= show_or_hide_block !Seek::Config.internal_help_enabled -%>">
     <%= admin_text_setting(:external_help_url, Seek::Config.external_help_url,
                            'Help URL', "This is the URL for the external help e.g #{Seek::Config.default_external_help_url}.") %>
   </div>
 
+  <%= admin_checkbox_setting(:project_single_page_enabled, 1, Seek::Config.project_single_page_enabled,
+                             "Single page enabled", "The single page UI for #{t(:project).pluralize}", onchange: toggle_appear_javascript('single_page_folders')) %>
+  <div id="single_page_folders" class="additional_settings" style="<%= show_or_hide_block Seek::Config.project_single_page_enabled -%>">
+    <%= admin_checkbox_setting(:project_single_page_folders_enabled, 1, Seek::Config.project_single_page_folders_enabled,
+                               "Project folders enabled","If set, the folders of the projects will be shown in the tree view.") %>
+  </div>
+  <%= admin_checkbox_setting(:isa_json_compliance_enabled, 1, Seek::Config.isa_json_compliance_enabled,
+                             "Compliance with ISA-JSON schemas enabled","Whether the option to comply with the ISA-JSON format specification is enabled. The user will be able to create Investigation, Study and Assay according to the ISA-JSON specification, and to export information as an ISA-JSON file. <strong>Requires 'Single Page enabled', 'ISA enabled' and 'Samples enabled'. 'SOPs enabled' is recommended.</strong> <br>If enabled, an option appears to upload default Templates to specify instance-wide ISA-JSON compliant schemas.", onchange: toggle_appear_javascript('add_default_templates')) %>
+  <div id="add_default_templates" class="additional_settings" style="<%= show_or_hide_block Seek::Config.isa_json_compliance_enabled -%>">
+    <%= link_to("Add default #{t(:template).pluralize}", default_templates_templates_path, class: 'btn btn-default', id: 'add_default_templates_btn', disabled: !Seek::Config.isa_json_compliance_enabled) %>
+  </div>
 
   <h3>Resource Types</h3>
   <%= admin_checkbox_setting(:file_templates_enabled, 1, Seek::Config.file_templates_enabled,
@@ -42,7 +53,7 @@
   <%= admin_checkbox_setting(:documents_enabled, 1, Seek::Config.documents_enabled,
                              "Documents enabled", "Whether the users can register documents in SEEK.") %>
 
-  <%= admin_checkbox_setting(:events_enabled, 1,Seek::Config.events_enabled,
+  <%= admin_checkbox_setting(:events_enabled, 1, Seek::Config.events_enabled,
                              "#{t('event').pluralize} enabled","Whether the #{t('event').pluralize} are displayed and can be added.") %>
 
   <%= admin_checkbox_setting(:isa_enabled, 1, Seek::Config.isa_enabled,
@@ -55,18 +66,26 @@
                              "Organisms enabled", "Whether the users can register organisms in SEEK.") %>
 
   <%= admin_checkbox_setting(:programmes_enabled, 1, Seek::Config.programmes_enabled,
-                             "#{t('programme').pluralize} enabled", "Whether #{t('programme').pluralize} are enabled. #{t('programme').pluralize} allow a collection of #{t('project').pluralize} to be grouped together. This is useful if you have a large number of #{t('project').pluralize} from different initiatives.",:onchange=>toggle_appear_javascript('programme_details')) %>
+                             "#{t('programme').pluralize} enabled", "Whether #{t('programme').pluralize} are enabled. #{t('programme').pluralize} allow a collection of #{t('project').pluralize} to be grouped together. This is useful if you have a large number of #{t('project').pluralize} from different initiatives.",onchange: toggle_appear_javascript('programme_details')) %>
   <div id="programme_details" class="additional_settings" style="<%= show_or_hide_block Seek::Config.programmes_enabled -%>">
     <%= admin_checkbox_setting(:programme_user_creation_enabled, 1, Seek::Config.programme_user_creation_enabled,
                                "User creation of #{t('programme').pluralize} enabled", "Controls whether standard users can create their own #{t('programme').pluralize}. If disabled only full administrators will be able to create #{t('programme').pluralize}. If enabled a full administrator is still required to allow and activate the #{t('programme')}") %>
     <% managed_programme_options = options_for_select(Programme.all.map{|p|[p.title, p.id]}, Seek::Config.managed_programme_id) %>
     <%= admin_dropdown_setting(:managed_programme_id, managed_programme_options,
-                               "Site mananaged #{t('programme')}",
+                               "Site managed #{t('programme')}",
                                "The #{t('programme')} the users can request to have a #{t('project')} created and associated with, without the need to create and manage their own",
                                include_blank:'None') %>
     <%= admin_checkbox_setting(:programmes_open_for_projects_enabled, 1, Seek::Config.programmes_open_for_projects_enabled,
                                "#{t('programme').pluralize} open for #{t(:project).pluralize} enabled",
                                "When enabled, gives the ability for individual #{t(:programme).pluralize} to be configured to allow any other registered user to create a #{t(:project)} linked to that #{t(:programme)} without requiring approval or admin rights. Use with care if open user registration is enabled, as it could allow any user to register, create a project and start adding content to that Programme.") %>
+
+    <%= admin_checkbox_setting(:auto_activate_programmes, 1, Seek::Config.auto_activate_programmes,
+                               "Automatically activate #{t('programme').pluralize}",
+                               "Activates user-created #{t('programme').pluralize} immediately without requiring administrator approval (although they are still notified if email is enabled).") %>
+
+    <%= admin_checkbox_setting(:auto_activate_site_managed_projects, 1, Seek::Config.auto_activate_site_managed_projects,
+                               "Automatically approve #{t('project').pluralize} under site managed #{t('programme')}",
+                               "Approves #{t('project')} creation requests automatically (administrators are still notified if email is enabled).") %>
   </div>
 
   <%= admin_checkbox_setting(:presentations_enabled, 1, Seek::Config.presentations_enabled,
@@ -76,7 +95,7 @@
                              "Publications enabled", "Whether the users can register publications in SEEK.") %>
 
   <%= admin_checkbox_setting(:samples_enabled, 1, Seek::Config.samples_enabled,
-                             "Samples enabled", "Whether the Samples framework is enabled. The framework allows users to create their own custom Sample types to describe their biological samples and other metadata.",:onchange=>toggle_appear_javascript('sample_type_pa_only')) %>
+                             "Samples enabled", "Whether the Samples framework is enabled. The framework allows users to create their own custom Sample types to describe their biological samples and other metadata.",onchange: toggle_appear_javascript('sample_type_pa_only')) %>
   <div id="sample_type_pa_only" class="additional_settings" style="<%= show_or_hide_block Seek::Config.samples_enabled -%>">
     <%= admin_checkbox_setting(:project_admin_sample_type_restriction, 1, Seek::Config.project_admin_sample_type_restriction,
                                "Sample Type creation restricted to Project Administrators","If set, then only Project Administrators will have the ability to create new Sample Types for the Project. If unset, any Project member is able to.") %>
@@ -96,7 +115,7 @@
   <h2>Integrations</h2>
   <%= admin_checkbox_setting(:jws_enabled, 1, Seek::Config.jws_enabled,
                              "JWS Online enabled", "Whether integration with JWS Online is enabled. Enabling this allows simulation of SBML models with JWS Online.",
-                             :onchange=>toggle_appear_javascript('jws_online_details')) %>
+                             onchange: toggle_appear_javascript('jws_online_details')) %>
   <div id="jws_online_details" class="additional_settings" style="<%= show_or_hide_block Seek::Config.jws_enabled -%>">
     <%= admin_text_setting(:jws_online_root, Seek::Config.jws_online_root,
                            'JWS Online Root URL', "This is the root URL for the JWS Online server SEEK communicates with, e.g. #{Seek::Config.default_jws_online_root} .") %>
@@ -105,29 +124,15 @@
   <%= admin_checkbox_setting(:copasi_enabled, 1, Seek::Config.copasi_enabled,
                              "Copasi enabled", "Whether support for running a publicly available model in Copasi is enabled.") %>
 
-  <%= admin_checkbox_setting(:project_single_page_enabled, 1, Seek::Config.project_single_page_enabled,
-                             "Single page enabled", "The single page UI for #{t(:project).pluralize}", :onchange=>toggle_appear_javascript('single_page_advanced')) %>
-  <div id="single_page_advanced" class="additional_settings" style="<%= show_or_hide_block Seek::Config.project_single_page_enabled -%>">
-    <%= admin_checkbox_setting(:project_single_page_advanced_enabled, 1, Seek::Config.project_single_page_advanced_enabled,
-                             "Advanced features enabled","If set, the advance features of the single page is enabled.") %>
-    <%= admin_checkbox_setting(:project_single_page_folders_enabled, 1, Seek::Config.project_single_page_folders_enabled,
-                             "Project folders enabled","If set, the folders of the projects will be shown in the tree view.") %>
-  </div>
-
-  <%= admin_checkbox_setting(:sample_type_template_enabled, 1, Seek::Config.sample_type_template_enabled,
-                             "#{t(:sample_type)} #{t(:template)} enabled", "Whether users can create and manage #{t(:template).pluralize} for #{t(:sample_type).pluralize}", :onchange=>toggle_appear_javascript('add_default_templates')) %>
-  <div id="add_default_templates" class="additional_settings" style="<%= show_or_hide_block Seek::Config.sample_type_template_enabled -%>">
-		<%= link_to("Add default #{t(:template).pluralize}", default_templates_templates_path, class: 'btn btn-default', id: 'add_default_templates_btn', disabled: !Seek::Config.sample_type_template_enabled) %>
-	</div>
 
   <%= admin_checkbox_setting(:require_cookie_consent, 1, Seek::Config.require_cookie_consent,
-                             "Add a cookie consent banner and a cookie setting page", "Show a banner asking for consent for the use of cookies. SEEK uses an essential cookie for session handling, and optional cookies for tracking if set below. 
+                             "Add a cookie consent banner and a cookie setting page", "Show a banner asking for consent for the use of cookies. SEEK uses an essential cookie for session handling, and optional cookies for tracking if set below.
                              Some cookies might be also set by embedded content. This banner will offer 3 choices: Only necessary, Embedded content, All.
                              Setting up this option will also add a cookie setting page accessible from the footer.") %>
 
   <%= admin_checkbox_setting(:google_analytics_enabled, 1, Seek::Config.google_analytics_enabled,
                              "Google analytics enabled", "Allows you to keep track of site traffic using Google Analytics. You need to register with Google Analytics and get a tracker ID.",
-                             :onchange=>toggle_appear_javascript('google_anaylitics_block')) %>
+                             onchange: toggle_appear_javascript('google_anaylitics_block')) %>
   <div id="google_anaylitics_block" class="additional_settings" style="<%= show_or_hide_block Seek::Config.google_analytics_enabled -%>">
     <%= admin_text_setting(:google_analytics_tracker_id, Seek::Config.google_analytics_tracker_id,
                            'Google analytics tracker id', "The tracker ID provided to you by Google.") %>
@@ -137,7 +142,7 @@
 
   <%= admin_checkbox_setting(:piwik_analytics_enabled, 1, Seek::Config.piwik_analytics_enabled,
                              "Piwik analytics enabled", "Allows you to keep track of site traffic using Piwik Analytics.",
-                             :onchange=>toggle_appear_javascript('piwik_anaylitics_block')) %>
+                             onchange: toggle_appear_javascript('piwik_anaylitics_block')) %>
   <div id="piwik_anaylitics_block" class="additional_settings" style="<%= show_or_hide_block Seek::Config.piwik_analytics_enabled -%>">
     <%= admin_text_setting(:piwik_analytics_id_site, Seek::Config.piwik_analytics_id_site,
                            'Piwik analytics id site', "The ID of your website inside Piwik. It is the numeric value corresponding to the ID of the site created in Piwik.") %>
@@ -145,6 +150,19 @@
                            'Piwik analytics url', "The URL to your Piwik installation, withouth the http:// or https://, e.g. #{Seek::Config.default_piwik_analytics_url} ") %>
     <%= admin_checkbox_setting(:piwik_analytics_tracking_notice, 1, Seek::Config.piwik_analytics_tracking_notice,
                            'Piwik tracking notice', "Warn users about the use of analytics software.") %>
+  </div>
+
+  <%= admin_checkbox_setting(:custom_analytics_snippet_enabled, 1, Seek::Config.custom_analytics_snippet_enabled,
+                             "Include a custom analytics snippet", "Adds custom snippet to the page keep track of site traffic.",
+                             onchange: toggle_appear_javascript('custom_analytics_block')) %>
+
+  <div id="custom_analytics_block" class="additional_settings" style="<%= show_or_hide_block(Seek::Config.custom_analytics_snippet_enabled) %>">
+    <%= admin_text_setting(:custom_analytics_name, Seek::Config.custom_analytics_name,
+                           'Custom analytics name', "The name of the analytics software used for tracking traffic.") %>
+    <%= admin_textarea_setting(:custom_analytics_snippet, Seek::Config.custom_analytics_snippet,
+                               "Code Snippet", "A custom code snippet, taking care of site traffic.") %>
+    <%= admin_checkbox_setting(:custom_analytics_tracking_notice, 1, Seek::Config.custom_analytics_tracking_notice,
+                           'Custom tracking notice', "Warn users about the use of analytics software.") %>
   </div>
 
   <%= render :partial => "admin/doi_settings" %>

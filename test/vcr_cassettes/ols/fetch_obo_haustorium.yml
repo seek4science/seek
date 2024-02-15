@@ -1,0 +1,224 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0085035
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - application/json
+      User-Agent:
+      - rest-client/2.1.0 (linux x86_64) ruby/3.1.4p223
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - www.ebi.ac.uk
+  response:
+    status:
+      code: 200
+      message: ''
+    headers:
+      Vary:
+      - Access-Control-Request-Headers
+      - Access-Control-Request-Method
+      - Origin
+      Content-Type:
+      - application/json
+      Strict-Transport-Security:
+      - max-age=0
+      Date:
+      - Tue, 06 Feb 2024 10:29:41 GMT
+      Transfer-Encoding:
+      - chunked
+      Content-Disposition:
+      - inline;filename=f.txt
+    body:
+      encoding: UTF-8
+      string: |-
+        {
+          "iri" : "http://purl.obolibrary.org/obo/GO_0085035",
+          "lang" : "en",
+          "description" : [ "A projection from a cell or tissue that penetrates the host's cell wall and invaginates the host cell membrane.", "See also: extrahaustorial matrix ; GO:0085036 and extrahaustorial membrane ; GO:0085037." ],
+          "synonyms" : [ ],
+          "annotation" : {
+            "created_by" : [ "jl" ],
+            "creation_date" : [ "2010-07-27T03:42:24Z" ],
+            "has_obo_namespace" : [ "cellular_component" ],
+            "id" : [ "GO:0085035" ]
+          },
+          "label" : "haustorium",
+          "ontology_name" : "go",
+          "ontology_prefix" : "GO",
+          "ontology_iri" : "http://purl.obolibrary.org/obo/go/extensions/go-plus.owl",
+          "is_obsolete" : false,
+          "term_replaced_by" : null,
+          "is_defining_ontology" : true,
+          "has_children" : true,
+          "is_root" : false,
+          "short_form" : "GO_0085035",
+          "obo_id" : "GO:0085035",
+          "in_subset" : null,
+          "obo_definition_citation" : [ {
+            "definition" : "A projection from a cell or tissue that penetrates the host's cell wall and invaginates the host cell membrane.",
+            "oboXrefs" : [ {
+              "database" : "GOC",
+              "id" : "pamgo_curators",
+              "description" : null,
+              "url" : null
+            } ]
+          } ],
+          "obo_xref" : null,
+          "obo_synonym" : null,
+          "is_preferred_root" : false,
+          "_links" : {
+            "self" : {
+              "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0085035?lang=en"
+            },
+            "parents" : {
+              "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0085035/parents"
+            },
+            "ancestors" : {
+              "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0085035/ancestors"
+            },
+            "hierarchicalParents" : {
+              "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0085035/hierarchicalParents"
+            },
+            "hierarchicalAncestors" : {
+              "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0085035/hierarchicalAncestors"
+            },
+            "jstree" : {
+              "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0085035/jstree"
+            },
+            "children" : {
+              "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0085035/children"
+            },
+            "descendants" : {
+              "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0085035/descendants"
+            },
+            "hierarchicalChildren" : {
+              "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0085035/hierarchicalChildren"
+            },
+            "hierarchicalDescendants" : {
+              "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0085035/hierarchicalDescendants"
+            },
+            "graph" : {
+              "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0085035/graph"
+            }
+          }
+        }
+    http_version: 
+  recorded_at: Tue, 06 Feb 2024 10:29:41 GMT
+- request:
+    method: get
+    uri: https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0085035/children
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - application/json
+      User-Agent:
+      - rest-client/2.1.0 (linux x86_64) ruby/3.1.4p223
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - www.ebi.ac.uk
+  response:
+    status:
+      code: 200
+      message: ''
+    headers:
+      Vary:
+      - Access-Control-Request-Headers
+      - Access-Control-Request-Method
+      - Origin
+      Content-Type:
+      - application/json
+      Strict-Transport-Security:
+      - max-age=0
+      Date:
+      - Tue, 06 Feb 2024 10:29:41 GMT
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: UTF-8
+      string: |-
+        {
+          "_embedded" : {
+            "terms" : [ {
+              "iri" : "http://purl.obolibrary.org/obo/GO_0085041",
+              "lang" : "en",
+              "description" : [ "Highly branched symbiont haustoria within host root cortex cells, responsible for nutrient exchange.", "See also: periarbuscular membrane ; GO:0085042." ],
+              "synonyms" : [ ],
+              "annotation" : {
+                "created_by" : [ "jl" ],
+                "creation_date" : [ "2010-07-27T04:29:03Z" ],
+                "has_obo_namespace" : [ "cellular_component" ],
+                "id" : [ "GO:0085041" ]
+              },
+              "label" : "arbuscule",
+              "ontology_name" : "go",
+              "ontology_prefix" : "GO",
+              "ontology_iri" : "http://purl.obolibrary.org/obo/go/extensions/go-plus.owl",
+              "is_obsolete" : false,
+              "term_replaced_by" : null,
+              "is_defining_ontology" : true,
+              "has_children" : false,
+              "is_root" : false,
+              "short_form" : "GO_0085041",
+              "obo_id" : "GO:0085041",
+              "in_subset" : null,
+              "obo_definition_citation" : [ {
+                "definition" : "Highly branched symbiont haustoria within host root cortex cells, responsible for nutrient exchange.",
+                "oboXrefs" : [ {
+                  "database" : "GOC",
+                  "id" : "pamgo_curators",
+                  "description" : null,
+                  "url" : null
+                } ]
+              } ],
+              "obo_xref" : null,
+              "obo_synonym" : null,
+              "is_preferred_root" : false,
+              "_links" : {
+                "self" : {
+                  "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0085041?lang=en"
+                },
+                "parents" : {
+                  "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0085041/parents"
+                },
+                "ancestors" : {
+                  "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0085041/ancestors"
+                },
+                "hierarchicalParents" : {
+                  "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0085041/hierarchicalParents"
+                },
+                "hierarchicalAncestors" : {
+                  "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0085041/hierarchicalAncestors"
+                },
+                "jstree" : {
+                  "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0085041/jstree"
+                },
+                "graph" : {
+                  "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0085041/graph"
+                }
+              }
+            } ]
+          },
+          "_links" : {
+            "self" : {
+              "href" : "https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FGO_0085035/children?page=0&size=20"
+            }
+          },
+          "page" : {
+            "size" : 20,
+            "totalElements" : 1,
+            "totalPages" : 1,
+            "number" : 0
+          }
+        }
+    http_version: 
+  recorded_at: Tue, 06 Feb 2024 10:29:41 GMT
+recorded_with: VCR 2.9.3

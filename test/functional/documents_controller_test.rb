@@ -109,6 +109,68 @@ class DocumentsControllerTest < ActionController::TestCase
     assert_equal 'new version!', assigns(:document).latest_version.revision_comments
   end
 
+  test 'create, update and show a document with extended metadata' do
+    cmt = FactoryBot.create(:simple_document_extended_metadata_type)
+
+    person = FactoryBot.create(:person)
+    login_as(person)
+
+    assert_difference('ActivityLog.count') do
+      assert_difference('Document.count') do
+        assert_difference('Document::Version.count') do
+          assert_difference('ContentBlob.count') do
+            assert_difference('ExtendedMetadata.count') do
+            post :create, params: { document: { title: 'Document', project_ids: [person.projects.first.id],
+                                                extended_metadata_attributes:{ extended_metadata_type_id: cmt.id,
+                                                                               data:{ 'age': 22,'name':'fred'}}},
+                                    content_blobs: [valid_content_blob], policy_attributes: valid_sharing
+                                     }
+            end
+          end
+        end
+      end
+    end
+
+
+    assert document = assigns(:document)
+    cm = document.extended_metadata
+
+    assert_equal cmt, cm.extended_metadata_type
+    assert_equal 'fred',cm.get_attribute_value('name')
+    assert_equal 22,cm.get_attribute_value('age')
+    assert_nil cm.get_attribute_value('date')
+
+
+    get :show, params: { id: document }
+    assert_response :success
+
+    assert_select 'div.extended_metadata',text:/fred/, count:1
+    assert_select 'div.extended_metadata',text:/22/, count:1
+
+    # test update
+    old_id = cm.id
+    assert_no_difference('Document.count') do
+      assert_no_difference('ExtendedMetadata.count') do
+        put :update, params: { id: document.id, document: { title: "new title",
+                                                      extended_metadata_attributes: { extended_metadata_type_id: cmt.id, id: cm.id,
+                                                                                      data: {
+                                                                                        "age": 20,
+                                                                                        "name": 'max'
+                                                                                        } }
+        }
+        }
+      end
+    end
+
+
+    assert new_document = assigns(:document)
+    assert_equal 'new title', new_document.title
+    assert_equal 'max', new_document.extended_metadata.get_attribute_value('name')
+    assert_equal 20, new_document.extended_metadata.get_attribute_value('age')
+    assert_equal old_id, new_document.extended_metadata.id
+  end
+
+
   test 'should create and link to event' do
     person = FactoryBot.create(:person)
     login_as(person)
@@ -1388,7 +1450,14 @@ class DocumentsControllerTest < ActionController::TestCase
 
       assert_select 'a#add-programme-permission-button', text: /Share with a Programme/, count: 0
     end
+  end
 
+  test 'do not get index if feature disabled' do
+    with_config_value(:documents_enabled, false) do
+      get :index
+      assert_redirected_to root_path
+      assert flash[:error].include?('disabled')
+    end
   end
 
   private

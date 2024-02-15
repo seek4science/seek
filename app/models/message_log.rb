@@ -7,7 +7,8 @@ class MessageLog < ApplicationRecord
     contact_request: 2,
     programme_creation_request: 3, # no longer used
     project_creation_request: 4,
-    activation_email: 5
+    activation_email: 5,
+    project_importation_request: 6
   }
 
   belongs_to :subject, polymorphic: true
