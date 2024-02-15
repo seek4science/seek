@@ -11,14 +11,19 @@ module Seek
       if Seek::Config.send("#{feature}_enabled")
         true
       else
+        error = "#{feature.humanize} are disabled"
         respond_to do |format|
           format.html do
-            flash[:error] = "#{feature.capitalize} are disabled"
-            redirect_to main_app.root_path
+            if request.xhr?
+              render html: "<div class=\"alert alert-danger\">#{error}</div>".html_safe, status: :unprocessable_entity
+            else
+              flash[:error] = error
+              redirect_to main_app.root_path
+            end
           end
-          format.xml { render xml: '<error>' + "#{feature.capitalize} are disabled" + '</error>', status: :unprocessable_entity }
+          format.xml { render xml: "<error>#{error}</error>", status: :unprocessable_entity }
           format.json do
-            render json: { title: "#{feature.capitalize} are disabled" }, status: :unprocessable_entity
+            render json: { title: error }, status: :unprocessable_entity
           end
         end
 

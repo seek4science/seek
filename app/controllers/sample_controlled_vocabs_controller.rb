@@ -6,7 +6,6 @@ class SampleControlledVocabsController < ApplicationController
 
   before_action :samples_enabled?, except: :typeahead
   before_action :login_required, except: %i[show index]
-  before_action :is_user_admin_auth, only: %i[destroy update]
   before_action :find_and_authorize_requested_item, except: %i[index new create]
   before_action :find_assets, only: :index
   before_action :auth_to_create, only: %i[new create]

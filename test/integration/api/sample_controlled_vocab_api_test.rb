@@ -17,4 +17,12 @@ class SampleControlledVocabApiTest < ActionDispatch::IntegrationTest
     @sample_controlled_vocab.sample_controlled_vocab_terms << @sample_controlled_vocab_term
     @sample_controlled_vocab.save!
   end
+
+  def private_resource
+    # setting the key to a known key will make it a system vocab which isn't editable or deletable
+    @sample_controlled_vocab.update_column(:key, SampleControlledVocab::SystemVocabs.database_key_for_property(:topics))
+    refute @sample_controlled_vocab.can_edit?
+    refute @sample_controlled_vocab.can_delete?
+    @sample_controlled_vocab
+  end
 end

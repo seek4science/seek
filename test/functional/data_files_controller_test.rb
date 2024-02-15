@@ -30,6 +30,15 @@ class DataFilesControllerTest < ActionController::TestCase
 
   end
 
+  test 'get data file redirects if feature disabled' do
+    df = FactoryBot.create(:data_file, policy: FactoryBot.create(:public_policy))
+    with_config_value(:data_files_enabled, false) do
+      get :show, params: { id: df }
+      assert_redirected_to root_path
+      assert_equal 'Data files are disabled', flash[:error]
+    end
+  end
+
   test 'json link includes version' do
     df = FactoryBot.create(:data_file, policy: FactoryBot.create(:public_policy))
 
@@ -608,7 +617,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
   end
 
-  test 'show explore button' do
+  test 'show explore button and magnify icon' do
     df = FactoryBot.create(:small_test_spreadsheet_datafile)
     login_as(df.contributor.user)
     get :show, params: { id: df }
@@ -617,9 +626,12 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_select 'a[href=?]', explore_data_file_path(df, version: df.version), count: 1
       assert_select 'a.disabled', text: 'Explore', count: 0
     end
+    assert_select 'div.fileinfo span.filename' do
+      assert_select 'a[href=?][title=?]', explore_data_file_path(df, version: df.version), 'Explore the contents of this file', count: 1
+    end
   end
 
-  test 'show explore button for csv file' do
+  test 'show explore button  and magnify icon for csv file' do
     df = FactoryBot.create(:csv_spreadsheet_datafile)
     login_as(df.contributor.user)
     get :show, params: { id: df }
@@ -627,6 +639,9 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select '#buttons' do
       assert_select 'a[href=?]', explore_data_file_path(df, version: df.version), count: 1
       assert_select 'a.disabled', text: 'Explore', count: 0
+    end
+    assert_select 'div.fileinfo span.filename' do
+      assert_select 'a[href=?][title=?]', explore_data_file_path(df, version: df.version), 'Explore the contents of this file', count: 1
     end
   end
 
@@ -642,9 +657,12 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_select 'a[href=?]', explore_data_file_path(df, version: df.version), count: 0
       assert_select 'a', text: 'Explore', count: 0
     end
+    assert_select 'div.fileinfo span.filename' do
+      assert_select 'a[href=?][title=?]', explore_data_file_path(df, version: df.version), 'Explore the contents of this file', count: 0
+    end
   end
 
-  test 'show disabled explore button if spreadsheet too big' do
+  test 'show disabled explore button and magnify icon if spreadsheet too big' do
     df = FactoryBot.create(:small_test_spreadsheet_datafile)
     login_as(df.contributor.user)
     with_config_value(:max_extractable_spreadsheet_size, 0) do
@@ -654,6 +672,10 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select '#buttons' do
       assert_select 'a[href=?]', explore_data_file_path(df, version: df.version), count: 0
       assert_select 'a.disabled', text: 'Explore', count: 1
+    end
+    assert_select 'div.fileinfo span.filename' do
+      assert_select 'a[href=?][title=?]', explore_data_file_path(df, version: df.version), 'Explore the contents of this file', count: 0
+      assert_select 'span > a.disabled > img', count: 1
     end
   end
 
@@ -1759,6 +1781,16 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal df.version, json['data']['attributes']['version']
   end
 
+  test 'get data_file as json returns error if feature disabled' do
+    df = FactoryBot.create(:data_file, policy: FactoryBot.create(:public_policy))
+    with_config_value(:data_files_enabled, false) do
+      get :show, params: { id: df, format: 'json' }
+      assert_response :unprocessable_entity
+      json = JSON.parse(response.body)
+      assert_equal 'Data files are disabled', json['title']
+    end
+  end
+
   test 'landing page for hidden private_item' do
     df = FactoryBot.create(:data_file, policy: FactoryBot.create(:private_policy), title: 'fish flop', description: 'testing json description')
     assert !df.can_view?
@@ -2293,7 +2325,6 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select 'a', text: /fish/
   end
 
-
   test 'filtering using other fields in association form' do
     person = FactoryBot.create(:person)
     project1 = person.projects.first
@@ -2327,6 +2358,14 @@ class DataFilesControllerTest < ActionController::TestCase
     get :filter, params: { filter: 'datax', simulation_data: 'true' }
     assert response.body.blank?
     assert_response :success
+  end
+
+  test 'filtering returns error message if feature disabled' do
+    with_config_value(:data_files_enabled, false) do
+      get :filter, xhr: true, params: { filter: 'hello?' }
+      assert_response :unprocessable_entity
+      assert_select 'div.alert-danger', text: /Data files are disabled/
+    end
   end
 
   test 'programme data files through nested routing' do

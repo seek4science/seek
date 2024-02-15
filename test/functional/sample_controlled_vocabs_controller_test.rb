@@ -173,6 +173,45 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
     assert_response :redirect
   end
 
+  test 'can_edit permission required to edit' do
+    login_as(FactoryBot.create(:person))
+    cv = FactoryBot.create(:apples_sample_controlled_vocab)
+    assert cv.can_edit?
+
+    get :edit, params: { id: cv.id }
+    assert_response :success
+
+    # a system vocab cannot be edited or deleted
+    cv2 = FactoryBot.create(:topics_controlled_vocab)
+    refute cv2.can_edit?
+
+    get :edit, params: { id: cv2.id }
+    assert_response :redirect
+  end
+
+  test 'can_edit permission required to update' do
+    login_as(FactoryBot.create(:person))
+
+    # a system vocab cannot be edited or deleted
+    cv_bad = FactoryBot.create(:topics_controlled_vocab)
+    refute cv_bad.can_edit?
+
+    cv_good = FactoryBot.create(:apples_sample_controlled_vocab)
+    assert cv_good.can_edit?
+
+    put :update, params: { id: cv_good, sample_controlled_vocab: { title: 'updated title' } }
+    assert_redirected_to sample_controlled_vocab_path(cv_good)
+    refute flash[:error]
+    assert_equal 'updated title',assigns(:sample_controlled_vocab).title
+    assert_equal 'updated title',cv_good.reload.title
+
+    put :update, params: { id: cv_bad, sample_controlled_vocab: { title: 'updated title' } }
+    assert_redirected_to sample_controlled_vocab_path(cv_bad)
+    assert flash[:error]
+    refute_equal 'updated title',cv_bad.reload.title
+
+  end
+
   test 'index' do
     cv = FactoryBot.create(:apples_sample_controlled_vocab)
     get :index
@@ -199,15 +238,32 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
     assert_response :redirect
   end
 
-  test 'need to be project member to destroy' do
-    login_as(FactoryBot.create(:user))
-    cv = FactoryBot.create(:apples_sample_controlled_vocab)
-    assert_no_difference('SampleControlledVocab.count') do
-      assert_no_difference('SampleControlledVocabTerm.count') do
-        delete :destroy, params: { id: cv }
+  test 'can_delete permission required to destroy' do
+    login_as(FactoryBot.create(:person))
+
+    # a system vocab cannot be edited or deleted
+    cv_bad = FactoryBot.create(:topics_controlled_vocab)
+    refute cv_bad.can_delete?
+
+    cv_good = FactoryBot.create(:apples_sample_controlled_vocab)
+    assert cv_good.can_delete?
+
+    assert_difference('SampleControlledVocab.count', -1) do
+      assert_difference('SampleControlledVocabTerm.count', -4) do
+        delete :destroy, params: { id: cv_good }
       end
     end
-    assert_response :redirect
+    assert_redirected_to sample_controlled_vocabs_path
+    refute flash[:error]
+
+    assert_no_difference('SampleControlledVocab.count') do
+      assert_no_difference('SampleControlledVocabTerm.count') do
+        delete :destroy, params: { id: cv_bad }
+      end
+    end
+    assert_redirected_to sample_controlled_vocab_path(cv_bad)
+    assert flash[:error]
+
   end
 
   test 'cannot access when disabled' do

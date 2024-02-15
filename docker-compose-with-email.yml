@@ -1,9 +1,9 @@
 version: '3'
 services:
   db: # Database implementation, in this case MySQL
-    image: mysql:5.7
+    image: mysql:8.0
     container_name: seek-mysql
-    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --log-error-verbosity=1
     restart: always
     stop_grace_period: 1m30s
     env_file:
