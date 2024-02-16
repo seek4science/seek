@@ -56,6 +56,18 @@ class ExtendedMetadataTypesControllerTest < ActionController::TestCase
     assert_select 'table tbody tr:not(.emt-partition-title) td', text: emt.title
   end
 
+  test 'administer table - disabled as text-secondary' do
+    emt = FactoryBot.create(:simple_investigation_extended_metadata_type)
+    person = FactoryBot.create(:admin)
+    login_as(person)
+    get :administer
+    assert_select 'table tr.text-secondary', count: 0
+
+    emt.update_column(:enabled, false)
+    get :administer
+    assert_select 'table tr.text-secondary', count: 1
+  end
+
   test 'can access administer as admin' do
     person = FactoryBot.create(:admin)
     login_as(person)
