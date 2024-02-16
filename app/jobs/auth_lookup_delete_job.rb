@@ -9,7 +9,7 @@ class AuthLookupDeleteJob < ApplicationJob
         type.lookup_class.where(user: item_id).in_batches(of: BATCH_SIZE).delete_all
       end
     else
-      item_class.constantize.lookup_class.where(asset_id: item_id).in_batches(of: BATCH_SIZE).delete_all
+      item_class.constantize.lookup_class.where(asset_id: item_id).in_batches(of: 100000, order: :desc) { |r| r.delete_all }
     end
   end
 end
