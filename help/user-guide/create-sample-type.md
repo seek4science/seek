@@ -117,9 +117,9 @@ Notably, only project members who can view, edit, or manage a Sample Type are al
 Non-project members with viewing, editing or managing rights to a Sample Type cannot create samples.
 
 The following sharing permissions will be applied retrospectively to existing sample types:
-* Public: No access
-* Creator/Submitter: Can manage
-* Project members: Can view
+* If at least 1 sample in a Sample Type is public --> then, any registered users (non project members) can create samples
+* If 0 samples in a Sample Type are public → then, Public: No access & Project member: Can view (only project members will be able to create samples)
+
 
 
 
