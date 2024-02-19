@@ -111,11 +111,17 @@ Once completed click update. Your Sample Type can now be used to generate Sample
 
 ## Sharing permissions for Sample Type
 
-In FAIRDOM-SEEK v1.15 and later, Sample Types now share permissions with other items in the system. 
+In FAIRDOM-SEEK v1.15 and onwards, Sample Types now have their own sharing permissions, allowing for customization similar to other items in the system.
 
 Notably, only project members who can view, edit, or manage a Sample Type are allowed to create samples within it. 
-
 Non-project members with viewing, editing or managing rights to a Sample Type cannot create samples.
+
+The following sharing permissions will be applied retrospectively to existing sample types:
+* Public: No access
+* Creator/Submitter: Can manage
+* Project members: Can view
+
+
 
 | Project member | Sharing permissions for Sample Type | View/Download Sample Type | Edit Sample Type | Manage Sample Type | Create samples |
 |----------------|-------------------------------------|---------------------------|------------------|--------------------|----------------|
