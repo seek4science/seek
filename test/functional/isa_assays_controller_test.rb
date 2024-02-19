@@ -271,7 +271,7 @@ class IsaAssaysControllerTest < ActionController::TestCase
     assert_select 'div.panel-heading', text: /Discussion Channels/i, count: 1
     assert_select 'div.panel-heading', text: /Define Sample type for Assay/i, count: 1
 
-    first_assay_st = FactoryBot.create(:isa_assay_material_sample_type, contributor: person, projects: [project], linked_sample_type: study.sample_types.second)
+    first_assay_st = FactoryBot.create(:isa_assay_material_sample_type, contributor: person, projects: [project], linked_sample_type: study.sample_types.second, isa_template: FactoryBot.build(:isa_assay_material_template))
     first_assay = FactoryBot.create(:assay, contributor: person, study: , assay_stream: , position: 1, sample_type: first_assay_st)
     assert_equal assay_stream, first_assay.assay_stream
 

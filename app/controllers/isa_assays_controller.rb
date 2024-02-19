@@ -7,6 +7,7 @@ class IsaAssaysController < ApplicationController
   before_action :initialize_isa_assay, only: :create
   before_action :fix_assay_linkage_for_new_assays, only: :create
   after_action :rearrange_assay_positions_create_isa_assay, only: :create
+  after_action :update_sample_json_metadata, only: :update
 
   def new
     if params[:is_assay_stream]
@@ -17,6 +18,13 @@ class IsaAssaysController < ApplicationController
   end
 
   def create
+    @isa_assay.sample_type.policy = @isa_assay.assay.policy
+    @isa_assay.sample_type.title = @isa_assay.assay.title
+
+    update_sharing_policies @isa_assay.sample_type
+    update_sharing_policies @isa_assay.assay
+    @isa_assay.assay.contributor = current_person
+    @isa_assay.sample_type.contributor = User.current_user.person
     if @isa_assay.save
       redirect_to single_page_path(id: @isa_assay.assay.projects.first, item_type: 'assay',
                                    item_id: @isa_assay.assay, notice: 'The ISA assay was created successfully!')
@@ -64,6 +72,10 @@ class IsaAssaysController < ApplicationController
   end
 
   private
+
+  def update_sample_json_metadata
+    UpdateSampleMetadataJob.new(@isa_assay.assay.sample_type).perform_now
+  end
 
   def fix_assay_linkage_for_new_assays
     return unless @isa_assay.assay.is_isa_json_compliant?

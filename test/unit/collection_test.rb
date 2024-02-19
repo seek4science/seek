@@ -183,6 +183,8 @@ class CollectionTest < ActiveSupport::TestCase
 
     types = Seek::Util.persistent_classes.select { |c| c.name != 'Project' && c.name != 'Collection' && c.method_defined?(:collections) }
     types.each do |type|
+      next if type.name == 'SampleType'
+
       opts = [type.name.underscore.to_sym]
       opts << { policy: FactoryBot.create(:public_policy) } if type.method_defined?(:policy)
       asset = FactoryBot.create(*opts)

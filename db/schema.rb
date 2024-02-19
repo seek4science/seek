@@ -1716,7 +1716,9 @@ ActiveRecord::Schema.define(version: 2024_02_12_145449) do
     t.text "description"
     t.integer "isa_tag_id"
     t.boolean "allow_cv_free_text", default: false
+    t.integer "template_attribute_id"
     t.index ["sample_type_id"], name: "index_sample_attributes_on_sample_type_id"
+    t.index ["template_attribute_id"], name: "index_sample_attributes_on_template_attribute_id"
     t.index ["unit_id"], name: "index_sample_attributes_on_unit_id"
   end
 
@@ -1762,6 +1764,18 @@ ActiveRecord::Schema.define(version: 2024_02_12_145449) do
     t.index ["sample_id"], name: "index_sample_resource_links_on_sample_id"
   end
 
+  create_table "sample_type_auth_lookup", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "asset_id"
+    t.boolean "can_view", default: false
+    t.boolean "can_manage", default: false
+    t.boolean "can_edit", default: false
+    t.boolean "can_download", default: false
+    t.boolean "can_delete", default: false
+    t.index ["user_id", "asset_id", "can_view"], name: "index_sample_type_user_id_asset_id_can_view"
+    t.index ["user_id", "can_view"], name: "index_sample_type_auth_lookup_on_user_id_and_can_view"
+  end
+
   create_table "sample_types", id: :integer, force: :cascade do |t|
     t.string "title"
     t.string "uuid"
@@ -1774,6 +1788,7 @@ ActiveRecord::Schema.define(version: 2024_02_12_145449) do
     t.string "deleted_contributor"
     t.integer "template_id"
     t.text "other_creators"
+    t.integer "policy_id"
   end
 
   create_table "sample_types_studies", force: :cascade do |t|
@@ -2102,6 +2117,8 @@ ActiveRecord::Schema.define(version: 2024_02_12_145449) do
     t.string "pid"
     t.boolean "allow_cv_free_text", default: false
     t.integer "linked_sample_type_id"
+    t.integer "parent_attribute_id"
+    t.index ["parent_attribute_id"], name: "index_template_attributes_on_parent_attribute_id"
     t.index ["template_id", "title"], name: "index_template_id_asset_id_title"
   end
 

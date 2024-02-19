@@ -158,6 +158,12 @@ class AssaysController < ApplicationController
     end
   end
 
+  def manage_update
+    update_sharing_policies(@assay.sample_type) unless @assay.sample_type.nil?
+
+    super
+  end
+
   private
 
   def delete_linked_sample_types

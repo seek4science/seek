@@ -4573,6 +4573,10 @@ sampleTypeResponse:
               $ref: "#/components/schemas/sampleTypeSampleAttributesResponse"
             tags:
               $ref: "#/components/schemas/tags"
+            policy:
+              $ref: "#/components/schemas/policy"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkList"
           required:
             - title
           additionalProperties: false

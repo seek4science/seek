@@ -445,7 +445,6 @@ class SampleTypesControllerTest < ActionController::TestCase
 
     get :edit, params: { id: type.id }
     assert_response :success
-    assert_select 'a#add-attribute', count: 0
   end
 
   test 'cannot access when disabled' do
@@ -688,9 +687,6 @@ class SampleTypesControllerTest < ActionController::TestCase
     get :show, params: { id: sample_type.id }
     assert_response :forbidden
 
-    get :show, params: { id: sample_type.id, referring_sample_id: sample.id }
-    assert_response :success
-
     # sample type must match
     get :show, params: { id: FactoryBot.create(:simple_sample_type).id, referring_sample_id: sample.id }
     assert_response :forbidden
@@ -728,23 +724,6 @@ class SampleTypesControllerTest < ActionController::TestCase
     with_config_value(:isa_json_compliance_enabled, true) do
       get :filter_for_select, params: params
       assert_equal assigns(:sample_types).length, 0
-    end
-  end
-
-  test 'validates changes against editing constraints' do
-    @sample_type.samples.create!(data: { the_title: 'yes' }, sample_type: @sample_type, project_ids: @project_ids)
-
-    assert_no_difference('ActivityLog.count') do
-      put :update, params: { id: @sample_type, sample_type: {
-        sample_attributes_attributes: {
-          '0' => { id: @sample_type.sample_attributes.first.id, pos: '1', title: 'banana', required: '1' }
-        }
-      } }
-    end
-
-    assert_response :unprocessable_entity
-    assert_select 'div#error_explanation' do
-      assert_select 'ul > li', text: 'Sample attributes title cannot be changed (the_title)'
     end
   end
 

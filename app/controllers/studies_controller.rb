@@ -353,6 +353,13 @@ class StudiesController < ApplicationController
     end
   end
 
+  def manage_update
+    @study.sample_types.map { |st| update_sharing_policies(st) } unless @study.sample_types.none?
+
+    super
+  end
+
+
   private
   def study_params
     params.require(:study).permit(:title, :description, :experimentalists, :investigation_id,

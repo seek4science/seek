@@ -141,11 +141,14 @@ class TemplatesController < ApplicationController
       isa_tags_options = all_isa_tags_options.select do |tag|
         %w[protocol data_file data_file_comment parameter_value].include?(tag[:text])
       end
+    when 'assay'
+      isa_tags_options = all_isa_tags_options.select do |tag|
+        %w[protocol other_material other_material_characteristic data_file data_file_comment parameter_value].include?(tag[:text])
+      end
     else
       isa_tags_options = all_isa_tags_options
     end
 
-    puts "ISA Tags: #{isa_tags_options}"
     render json: { result: isa_tags_options }
   end
 

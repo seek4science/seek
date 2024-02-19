@@ -4,6 +4,7 @@ class IsaStudiesController < ApplicationController
 
   before_action :set_up_instance_variable
   before_action :find_requested_item, only: %i[edit update]
+  after_action :update_sample_json_metadata, only: :update
 
   def new
     @isa_study = IsaStudy.new
@@ -11,7 +12,16 @@ class IsaStudiesController < ApplicationController
 
   def create
     @isa_study = IsaStudy.new(isa_study_params)
+
+    @isa_study.source.policy = @isa_study.study.policy
+    @isa_study.source.title = @isa_study.study.title
+
+    @isa_study.sample_collection.policy = @isa_study.study.policy
+    @isa_study.sample_collection.title = @isa_study.study.title
+
     update_sharing_policies @isa_study.study
+    update_sharing_policies @isa_study.source
+    update_sharing_policies @isa_study.sample_collection
     @isa_study.source.contributor = User.current_user.person
     @isa_study.sample_collection.contributor = User.current_user.person
     @isa_study.study.sample_types = [@isa_study.source, @isa_study.sample_collection]
@@ -47,7 +57,6 @@ class IsaStudiesController < ApplicationController
   def update
     # update the study
     @isa_study.study.attributes = isa_study_params[:study]
-    update_sharing_policies @isa_study.study
     update_relationships(@isa_study.study, isa_study_params[:study])
 
     # update the source
@@ -74,6 +83,12 @@ class IsaStudiesController < ApplicationController
   end
 
   private
+
+  def update_sample_json_metadata
+    @isa_study.study.sample_types.map do |st|
+      UpdateSampleMetadataJob.new(st).perform_now
+    end
+  end
 
   def isa_study_params
     # TODO: get the params from a shared module
@@ -113,14 +128,12 @@ class IsaStudiesController < ApplicationController
       params[field][:assay_ids] = params[field][:assay_assets_attributes].map { |x| x[:assay_id] }
     end
 
-    [:title, :description, :tags, :template_id,
+    [:title, :description, { tags: [] }, :template_id,
      { project_ids: [],
        sample_attributes_attributes: %i[id title pos required is_title
-                                        sample_attribute_type_id isa_tag_id
-                                        sample_controlled_vocab_id
-                                        linked_sample_type_id
-                                        description pid
-                                        allow_cv_free_text
+                                        description pid sample_attribute_type_id
+                                        sample_controlled_vocab_id isa_tag_id
+                                        allow_cv_free_text linked_sample_type_id
                                         unit_id _destroy] }, { assay_ids: [] }]
   end
 

@@ -1,6 +1,7 @@
 class SampleType < ApplicationRecord
   # attr_accessible :title, :uuid, :sample_attributes_attributes,
   #                 :description, :uploaded_template, :project_ids, :tags
+  acts_as_asset
 
   if Seek::Config.solr_enabled
     searchable(auto_index: false) do
@@ -12,8 +13,6 @@ class SampleType < ApplicationRecord
   include Seek::Search::BackgroundReindexing
   include Seek::Stats::ActivityCounts
   include Seek::Creators
-
-  include Seek::ProjectAssociation
 
   # everything concerned with sample type templates
   include Seek::Templates::SampleTypeTemplateConcerns
@@ -40,6 +39,7 @@ class SampleType < ApplicationRecord
 
   has_many :assays
   has_and_belongs_to_many :studies
+  has_many :investigations, through: :studies
 
   scope :without_template, -> { where(template_id: nil) }
 
@@ -141,8 +141,7 @@ class SampleType < ApplicationRecord
     end
   end
 
-  def can_view?(user = User.current_user, referring_sample = nil, view_in_single_page = false)
-    return false if Seek::Config.isa_json_compliance_enabled && template_id.present? && !view_in_single_page
+  def can_view?(user = User.current_user, referring_sample = nil)
 
     project_membership = user&.person && (user.person.projects & projects).any?
     is_creator = creators.include?(user&.person)
@@ -224,8 +223,10 @@ class SampleType < ApplicationRecord
         errors.add(:sample_attributes, "cannot be removed, there are existing samples using this attribute (#{a.title})")
       end
 
-      if a.new_record? && !c.allow_new_attribute?
-        errors.add(:sample_attributes, "cannot be added, new attributes are not allowed (#{a.title})")
+      if a.new_record? && a.required? && !new_record?
+        if samples.any?
+            errors.add(:sample_attributes, "cannot be added, new attributes must be optional (#{a.title})")
+        end
       end
     end
   end

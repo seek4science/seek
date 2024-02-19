@@ -52,12 +52,8 @@ class TreeviewBuilder
   end
 
   def create_node(obj)
-    can_view = if obj[:resource].is_a?(SampleType)
-                 obj[:resource].can_view?(User.current_user, nil, true)
-               else
-                 obj[:resource].can_view?
-               end
-    unless can_view
+    can_view = obj[:resource].can_view?
+   unless can_view
       obj[:text] = 'hidden item'
       obj[:a_attr] = { 'style': 'font-style:italic;font-weight:bold;color:#ccc' }
     end
