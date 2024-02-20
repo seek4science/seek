@@ -206,6 +206,10 @@ SEEK::Application.routes.draw do
   resources :extended_metadata_types do
     collection do
       get :form_fields
+      get :administer
+    end
+    member do
+      put :administer_update
     end
   end
 

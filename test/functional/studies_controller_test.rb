@@ -733,6 +733,55 @@ class StudiesControllerTest < ActionController::TestCase
     assert_equal old_id, new_study.extended_metadata.id
   end
 
+  test 'create a study with disabled extended metadata should fail' do
+    cmt = FactoryBot.create(:simple_study_extended_metadata_type, enabled: false)
+
+    login_as(FactoryBot.create(:person))
+
+    assert_no_difference('Study.count') do
+      assert_no_difference('ExtendedMetadata.count') do
+        investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+        study_attributes = { title: 'test', investigation_id: investigation.id }
+        cm_attributes = {extended_metadata_attributes:{ extended_metadata_type_id: cmt.id,
+                                                        data:{
+                                                          "name":'fred',
+                                                          "age":22}}}
+
+        post :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
+      end
+    end
+    assert study=assigns(:study)
+    refute study.valid?
+  end
+
+  test 'update a study with disabled extended metadata should succeed' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    emt = FactoryBot.create(:simple_study_extended_metadata_type)
+    study = FactoryBot.create(:study, extended_metadata: ExtendedMetadata.new(extended_metadata_type: emt, data: { name: 'John', age: 12 }), contributor: person)
+    study.save!
+    study.extended_metadata.extended_metadata_type.update_column(:enabled, false)
+    refute study.extended_metadata.enabled?
+
+    assert_no_difference('Study.count') do
+      assert_no_difference('ExtendedMetadata.count') do
+        put :update, params: { id: study.id, study: { title: "new title",
+                                                      extended_metadata_attributes: { extended_metadata_type_id: emt.id,
+                                                                                      id: study.extended_metadata.id,
+                                                                                      data: {
+                                                                                        "name": 'max',
+                                                                                        "age": 20 } }
+        }
+        }
+      end
+    end
+    assert study = assigns(:study)
+    assert study.valid?
+    assert_equal 'new title', study.title
+    assert_equal 'max', study.extended_metadata.get_attribute_value('name')
+    assert_equal 20, study.extended_metadata.get_attribute_value('age')
+  end
+
   test 'create a study with extended metadata validated' do
     cmt = FactoryBot.create(:simple_study_extended_metadata_type)
 
@@ -744,7 +793,7 @@ class StudiesControllerTest < ActionController::TestCase
       study_attributes = { title: 'test', investigation_id: investigation.id }
       cm_attributes = {extended_metadata_attributes:{extended_metadata_type_id: cmt.id, data:{'name':'fred','age':'not a number'}}}
 
-      put :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
+      post :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
     end
 
     assert study=assigns(:study)
@@ -761,6 +810,25 @@ class StudiesControllerTest < ActionController::TestCase
 
     assert study=assigns(:study)
     refute study.valid?
+  end
+
+  test 'should not show extended metadata if disabled' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    emt = FactoryBot.create(:simple_study_extended_metadata_type)
+    study = FactoryBot.create(:study, extended_metadata: ExtendedMetadata.new(extended_metadata_type: emt, data: { name: 'Fred', age: 25 }), contributor: person)
+
+    #first check it's shown
+    get :show, params: {id: study}
+    assert_response :success
+    assert_select 'div#extended-metadata.panel', count: 1
+
+    emt.update_column(:enabled, false)
+    get :show, params: {id: study}
+    assert_response :success
+    assert_select 'div#extended-metadata.panel', count: 0
+
+
   end
 
   test 'create a study with extended metadata with spaces in attribute names' do
@@ -1980,7 +2048,7 @@ class StudiesControllerTest < ActionController::TestCase
     study_source_sample_type = FactoryBot.create :isa_source_sample_type, contributor: person
     study_sample_sample_type = FactoryBot.create :isa_sample_collection_sample_type, linked_sample_type: study_source_sample_type, contributor: person
     study = FactoryBot.create(:study,
-                              investigation: ,
+                              investigation: investigation ,
                               policy:FactoryBot.create(:private_policy, permissions:[FactoryBot.create(:permission,contributor: person, access_type:Policy::EDITING)]),
                               sample_types: [study_source_sample_type, study_sample_sample_type],
                               contributor: person)
@@ -2022,7 +2090,7 @@ class StudiesControllerTest < ActionController::TestCase
       person = FactoryBot.create(:person)
       login_as(person)
       investigation = FactoryBot.create(:investigation, contributor: person, is_isa_json_compliant: true)
-      study = FactoryBot.create(:isa_json_compliant_study, contributor: person, investigation: )
+      study = FactoryBot.create(:isa_json_compliant_study, contributor: person, investigation: investigation)
 
       get :show, params: { id: study }
       assert_response :success
