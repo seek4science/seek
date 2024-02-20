@@ -38,7 +38,7 @@ class DataFilesController < ApplicationController
       redirect_to destroy_samples_confirm_data_file_path(@data_file)
     else
       if params[:destroy_extracted_samples] == '1'
-        @data_file.extracted_samples_ids.each_slice(500) do |ids|
+        @data_file.extracted_sample_ids.each_slice(500) do |ids|
           SamplesBatchDeleteJob.perform_later(ids)
         end
       end
