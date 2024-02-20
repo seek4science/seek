@@ -27,7 +27,6 @@
 <% level = sample_type.level if display_isa_tag %>
 <% isa_tags_options = IsaTag.allowed_isa_tags_for_level(level).map { |it| [it.title, it.id] } if display_isa_tag %>
 <% isa_tag_id = sample_attribute&.isa_tag_id %>
-<% isa_tag_title = sample_attribute&.isa_tag&.title %>
 <% template_attribute_id = sample_attribute&.template_attribute_id if display_isa_tag %>
 <% allow_isa_tag_change = constraints.allow_isa_tag_change?(sample_attribute) if display_isa_tag %>
 
