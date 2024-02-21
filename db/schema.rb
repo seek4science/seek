@@ -1716,7 +1716,9 @@ ActiveRecord::Schema.define(version: 2024_02_12_145449) do
     t.text "description"
     t.integer "isa_tag_id"
     t.boolean "allow_cv_free_text", default: false
+    t.integer "template_attribute_id"
     t.index ["sample_type_id"], name: "index_sample_attributes_on_sample_type_id"
+    t.index ["template_attribute_id"], name: "index_sample_attributes_on_template_attribute_id"
     t.index ["unit_id"], name: "index_sample_attributes_on_unit_id"
   end
 
@@ -2102,6 +2104,8 @@ ActiveRecord::Schema.define(version: 2024_02_12_145449) do
     t.string "pid"
     t.boolean "allow_cv_free_text", default: false
     t.integer "linked_sample_type_id"
+    t.integer "parent_attribute_id"
+    t.index ["parent_attribute_id"], name: "index_template_attributes_on_parent_attribute_id"
     t.index ["template_id", "title"], name: "index_template_id_asset_id_title"
   end
 

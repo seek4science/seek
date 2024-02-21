@@ -22,11 +22,13 @@
 <% allow_name_change = constraints.allow_name_change?(sample_attribute) %>
 <% seek_sample_multi = sample_attribute&.seek_sample_multi? %>
 <% link_to_self = sample_attribute && sample_attribute.deferred_link_to_self %>
-<% hide_seek_sample_multi = seek_sample_multi && displaying_single_page? && sample_attribute&.isa_tag.blank? && sample_attribute&.title.downcase.include?('input') %>
-<% isa_tags_options = IsaTag.all.map { |it| [it.title, it.id] } %>
 <% display_isa_tag ||= false %>
+<% hide_seek_sample_multi = display_isa_tag ? (sample_attribute&.input_attribute? && displaying_single_page?) : false %>
+<% level = sample_type.level if display_isa_tag %>
+<% isa_tags_options = IsaTag.allowed_isa_tags_for_level(level).map { |it| [it.title, it.id] } if display_isa_tag %>
 <% isa_tag_id = sample_attribute&.isa_tag_id %>
-<% isa_tag_title = sample_attribute&.isa_tag&.title %>
+<% template_attribute_id = sample_attribute&.template_attribute_id if display_isa_tag %>
+<% allow_isa_tag_change = constraints.allow_isa_tag_change?(sample_attribute) if display_isa_tag %>
 
 <tr class="sample-attribute <%= 'success' if sample_attribute.nil? -%><%='hidden' if hide_seek_sample_multi -%>" data-index="<%= index-%>">
   <th scope="row" class="attribute-position">
@@ -116,7 +118,9 @@
     <td>
       <%= select_tag "#{field_name_prefix}[isa_tag_title]",
                       options_for_select(isa_tags_options, isa_tag_id),
-                      include_blank: true, class: 'form-control', data: {attr: "isa_tag_title"} %>
+                      include_blank: true, class: 'form-control',
+                      data: {attr: "isa_tag_title"},
+                      disabled: !allow_isa_tag_change %>
     </td>
   <% end %>
 
@@ -133,6 +137,7 @@
   <td>
     <% if allow_attribute_removal %>
       <%= hidden_field_tag "#{field_name_prefix}[isa_tag_id]", (display_isa_tag ? isa_tag_id : nil), data: { attr: "isa_tag_id" }  %>
+      <%= hidden_field_tag "#{field_name_prefix}[template_attribute_id]", template_attribute_id, data: { attr: "template_attribute_id" } %>
       <%= hidden_field_tag "#{field_name_prefix}[_destroy]", '0', autocomplete: 'off' %>
       <div class="btn-group" data-toggle="buttons">
         <label class="btn btn-danger">
