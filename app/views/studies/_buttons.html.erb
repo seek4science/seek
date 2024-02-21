@@ -50,4 +50,7 @@
   <%= order_icon(item, current_user, order_assays_study_path(item), item.assays, 'assay') -%>
 
   <%= delete_icon item, current_user -%>
+
+	<li><%= image_tag_for_key('export_to_fhir', Seek::Config.site_base_host+'/fhir/v4/research_studies/'+item.id.to_s+'.json', "Export to FHIR", nil, "Export to FHIR") -%></li>
+
 <% end -%>

@@ -878,3 +878,6 @@ z_file: 'file_icons/small/z.png'
 zabw_file: 'file_icons/small/zabw.png'
 zip2_file: 'file_icons/small/zip2.png'
 zoo_file: 'file_icons/small/zoo.png'
+
+#fhir
+export_to_fhir: 'file_icons/small/fhir.png'
