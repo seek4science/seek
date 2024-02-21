@@ -32,7 +32,7 @@ SEEK::Application.routes.draw do
   #Fhir
   namespace :fhir do
     namespace :v4 do
-      get 'studies/:id' => 'research_studies#show'
+      get 'research_studies/:id' => 'research_studies#show'
     end
   end
 
