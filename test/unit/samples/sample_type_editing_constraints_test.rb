@@ -102,7 +102,7 @@ class SampleTypeEditingConstraintsTest < ActiveSupport::TestCase
     assert c.allow_attribute_removal?(:postcode)
     refute c.allow_attribute_removal?(:age)
     refute c.allow_attribute_removal?('full name')
-    # accespts attribute
+    # accepts attribute
     attr = c.sample_type.sample_attributes.detect { |t| t.accessor_name == 'address' }
     refute_nil attr
     refute c.allow_attribute_removal?(attr)
@@ -264,6 +264,7 @@ class SampleTypeEditingConstraintsTest < ActiveSupport::TestCase
                       projects:[project],
                       contributor: person,
                       template_id: template.id,
+                      assays: [FactoryBot.build(:assay, contributor: person)],
                       sample_attributes: )
   end
 end

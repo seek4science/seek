@@ -5,6 +5,7 @@ module Seek
     class SampleTypeEditingConstraints
       attr_reader :sample_type
       delegate :samples, to: :sample_type
+      delegate :is_isa_json_compliant?, to: :sample_type
 
       def initialize(sample_type)
         fail Exception.new('Sample type cannot be nil') unless sample_type
@@ -21,6 +22,7 @@ module Seek
       def allow_required?(attr)
         if attr.is_a?(SampleAttribute)
           return true if attr.new_record?
+
           attr = attr.accessor_name
         end
         if attr
@@ -34,7 +36,9 @@ module Seek
       # attr can be the attribute accessor name, or the attribute itself
       def allow_attribute_removal?(attr)
         if attr.is_a?(SampleAttribute)
-          return true if attr.new_record?
+          return true if attr.new_record? && !inherited?(attr)
+          return false if inherited?(attr) && attr.required?
+
           attr = attr.accessor_name
         end
         if attr
@@ -53,6 +57,8 @@ module Seek
       def allow_name_change?(attr)
         if attr.is_a?(SampleAttribute)
           return true if attr.new_record?
+          return false if inherited?(attr)
+
           attr = attr.accessor_name
         end
         if attr
@@ -66,6 +72,8 @@ module Seek
       def allow_type_change?(attr)
         if attr.is_a?(SampleAttribute)
           return true if attr.new_record?
+          return false if inherited?(attr)
+
           attr = attr.accessor_name
         end
         if attr
@@ -96,7 +104,7 @@ module Seek
       private
 
       def inherited?(attr)
-        attr&.inherited_from_template_attribute?
+        attr&.inherited_from_template_attribute? && is_isa_json_compliant?
       end
 
       def blanks?(attr)
