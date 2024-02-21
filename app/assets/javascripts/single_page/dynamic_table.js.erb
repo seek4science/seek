@@ -105,6 +105,7 @@ const handleSelect = (e) => {
       ];
       const editor = this.editor;
       this.table = this.table.DataTable({
+        colReorder: true,
         columnDefs,
         columns,
         scrollX: "100%",
