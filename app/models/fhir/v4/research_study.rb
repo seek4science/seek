@@ -102,7 +102,7 @@ module Fhir
       def enrollment
         [
           {
-            "reference": "#{resource_intitial}-enrollment"
+            "reference": "##{resource_intitial}-enrollment"
           }
         ]
       end
@@ -116,28 +116,28 @@ module Fhir
 
       def sponsor
         {
-          "reference": "#{resource_intitial}-sponsor"
+          "reference": "##{resource_intitial}-sponsor"
         }
       end
 
       def principalInvestigator
         {
-          "reference": "#{resource_intitial}-pi"
+          "reference": "##{resource_intitial}-pi"
         }
       end
 
       def extension
         [
           {
-            "url": '#study-acronym',
+            "url": 'http://example.com/#study-acronym',
             "valueString": metadata['study_acronym']
           },
           {
-            "url": '#study-sites-number',
+            "url": 'http://example.com/#study-sites-number',
             "valueInteger": metadata['study_sites_number']
           },
           {
-            "url": '#study-dmp',
+            "url": 'http://example.com/#study-dmp',
             "valueCodeableConcept": {
               "coding": [
                 {
