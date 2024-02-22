@@ -94,7 +94,6 @@ const handleSelect = (e) => {
       columns.unshift(...defaultCols);
 
       const columnDefs = [{
-          orderable: false,
           targets: options.readonly ? [0] : [0, 1]
         },
         {
