@@ -9,13 +9,17 @@ module Fhir
         @study = study
       end
 
+      def id
+        @study.id.to_s
+      end
+
       def identifier
 
         [
           {
             "use": 'official',
             # currently hardcoded.
-            "system": 'https://clinicaltrials.gov/',
+            "system": 'https://clinicaltrials.gov',
             "value": metadata['study_identifier']
           },
           {
@@ -52,7 +56,7 @@ module Fhir
             "coding": [
               {
                 "code": con['ICD-10 code'],
-                "system": "https://fhir.de/CodeSystem/bfarm/#{con['ICD-10 code']}"
+                "system": "http://hl7.org/fhir/sid/icd-10"
               }
             ],
             "text": con['ICD-10 code']
@@ -77,25 +81,28 @@ module Fhir
           }
         ]
 
-        # add seek creators to the FHIR contact
-        @study.assets_creators.map do |c|
-          contact << {
-           name: "#{c.last_name} #{c.family_name}",
-           telecom: [
-             system: 'url',
-             value: Seek::Util.routes.person_url(@study.id)
-           ]
-         }
+        # Add seek creators to the FHIR contact
+        contact += @study.assets_creators.map do |c|
+          contact_info = {
+            name: "#{c.given_name} #{c.family_name}"
+          }
+
+          if c.creator_id
+            contact_info[:telecom] = [
+              { system: 'url', value: Seek::Util.routes.person_url(c.creator_id) }
+            ]
+          end
+
+          contact_info
         end
 
         contact
-
       end
 
       def enrollment
         [
           {
-            "reference": "##{resource_intitial}-enrollment"
+            "reference": "#{resource_intitial}-enrollment"
           }
         ]
       end
@@ -109,13 +116,13 @@ module Fhir
 
       def sponsor
         {
-          "reference": "##{resource_intitial}-sponsor"
+          "reference": "#{resource_intitial}-sponsor"
         }
       end
 
       def principalInvestigator
         {
-          "reference": "##{resource_intitial}-pi"
+          "reference": "#{resource_intitial}-pi"
         }
       end
 
@@ -135,8 +142,8 @@ module Fhir
               "coding": [
                 {
                   "code": "none",
-                  "system": "http://example.com/study_dmp/",
-                  "display": "No"
+                  "system": "http://example.com/study-dmp",
+                  "display": metadata['study_dmp']
                 }
               ]
             }

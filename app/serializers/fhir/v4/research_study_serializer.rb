@@ -9,7 +9,7 @@ module Fhir
 
         attributes :id,:identifier,
                    :title, :status, :category, :condition,
-                   :contact, :description,:enrollment,:period,:sponsor, :extension,
+                   :contact, :description,:enrollment,:period,:sponsor, :principalInvestigator, :extension,
                    :contained
 
       end
