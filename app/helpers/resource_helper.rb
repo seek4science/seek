@@ -20,4 +20,11 @@ module ResourceHelper
       versioned_resource_for_controller || resource_for_controller
     end
   end
+
+  def show_fhir_button?
+    #todo: need to revisit the condition.
+    Seek::Config.fhir_enabled && !resource_for_controller.extended_metadata.nil?  &&
+      resource_for_controller.extended_metadata.extended_metadata_type.title == "MIMCT Metadata V0.7 for object type Study"
+  end
+
 end

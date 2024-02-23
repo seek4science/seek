@@ -261,3 +261,4 @@ regular_job_offset:
   convert: :to_i
 auto_activate_programmes:
 auto_activate_site_managed_projects:
+fhir_enabled:
