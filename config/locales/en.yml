@@ -10,6 +10,7 @@ en:
     github: 'GitHub'
 
   single_page: "Single Page"
+  default_view: "Default View"
   investigation: &investigation "Investigation"
   study: &study "Study"
   assay: &assay "Assay"
@@ -293,6 +294,7 @@ you can choose to have a %{project} linked to a site managed %{programme} instea
   <p>'
 
   info_text:
+    default_view: "The default view is the view that is shown when you first visit a page. You can change the default view by clicking on the 'Default View' button."
     single_page: "A view specifically designed to visualize and interact with ISA JSON compliant items."
     institution: "An Institution in SEEK is where someone is employed or works or a person's affiliation."
     #person: "A Person (People) in SEEK is a registered user or a Profile of a person that has not registered with SEEK. A Person is someone who participates directly or indirectly in the scientific research described within SEEK."
