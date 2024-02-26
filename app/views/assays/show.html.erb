@@ -171,10 +171,12 @@
 	<% end %>
 </div>
 <script>
-  const isIsaCompliant = <%= @assay.is_isa_json_compliant? %>
-  if (isIsaCompliant) {
-    var id = <%= @assay.id %>;
-    var pid = <%= @assay.projects.first.id %>;
-    var dynamicTableDataPath = '<%= Seek::Util.routes.dynamic_table_data_single_page_path(@assay.projects.first.id) %>';
-  }
+    const projectDefaultPolicy = '<%= @assay.projects.first.default_policy_id %>';
+    const isIsaCompliant =
+    <%= @assay.is_isa_json_compliant? %>
+    if (isIsaCompliant) {
+        var id = <%= @assay.id %>;
+        var pid = <%= @assay.projects.first.id %>;
+        var dynamicTableDataPath = '<%= Seek::Util.routes.dynamic_table_data_single_page_path(@assay.projects.first.id) %>';
+    }
 </script>
