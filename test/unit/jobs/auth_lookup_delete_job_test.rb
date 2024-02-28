@@ -40,7 +40,7 @@ class AuthLookupDeleteJobTest < ActiveSupport::TestCase
   test 'perform when asset record no longer exists' do
     assert_nothing_raised do
       assert_no_difference('DataFile::AuthLookup.count') do
-        AuthLookupDeleteJob.perform_now('DataFile', DataFile.maximum(:id) + 10)
+        AuthLookupDeleteJob.perform_now('DataFile', (DataFile.maximum(:id) || 0) + 10)
       end
     end
   end
@@ -48,7 +48,7 @@ class AuthLookupDeleteJobTest < ActiveSupport::TestCase
   test 'perform when user record no longer exists' do
     assert_nothing_raised do
       assert_no_difference('DataFile::AuthLookup.count') do
-        AuthLookupDeleteJob.perform_now('User', User.maximum(:id) + 10)
+        AuthLookupDeleteJob.perform_now('User', (User.maximum(:id) || 0) + 10)
       end
     end
   end
