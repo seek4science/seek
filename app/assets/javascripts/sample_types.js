@@ -12,7 +12,7 @@ var SampleTypes = {
             helper: SampleTypes.fixHelper,
             handle: '.attribute-handle'
         }).on('sortupdate', function() {
-            SampleTypes.recalculatePositions();
+            SampleTypes.recalculatePositions(selector);
         });
     },
 
