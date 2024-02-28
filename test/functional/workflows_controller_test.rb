@@ -1777,7 +1777,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'shows run button for galaxy workflows using default galaxy endpoint' do
-    workflow = Factory(:existing_galaxy_ro_crate_workflow, policy: Factory(:public_policy))
+    workflow = FactoryBot.create(:existing_galaxy_ro_crate_workflow, policy: FactoryBot.create(:public_policy))
 
     get :show, params: { id: workflow.id }
 
@@ -1789,7 +1789,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'shows run button for galaxy workflows using specified galaxy endpoint' do
-    workflow = Factory(:existing_galaxy_ro_crate_workflow, policy: Factory(:public_policy),
+    workflow = FactoryBot.create(:existing_galaxy_ro_crate_workflow, policy: FactoryBot.create(:public_policy),
                        execution_instance_url: 'https://galaxygalaxy.org/mygalaxy/')
 
     get :show, params: { id: workflow.id }

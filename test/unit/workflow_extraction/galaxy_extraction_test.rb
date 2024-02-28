@@ -77,7 +77,7 @@ class GalaxyExtractionTest < ActiveSupport::TestCase
 
   test 'extracts execution instance URL' do
     mock_remote_file "#{Rails.root}/test/fixtures/files/workflows/1-PreProcessing.ga", 'http://galaxy.instance/workflow/export_to_file?id=abcdxyz'
-    git_version = Factory(:git_version)
+    git_version = FactoryBot.create(:git_version)
     disable_authorization_checks do
       git_version.add_remote_file('1-PreProcessing.ga', 'http://galaxy.instance/workflows/?id=abcdxyz')
       git_version.fetch_remote_file('1-PreProcessing.ga')

@@ -819,7 +819,7 @@ class WorkflowTest < ActiveSupport::TestCase
   end
 
   test 'can get and set execution instance URL' do
-    workflow = Factory(:workflow)
+    workflow = FactoryBot.create(:workflow)
 
     assert_no_difference('AssetLink.count') do
       workflow.execution_instance_url = 'https://mygalaxy.instance/'
@@ -833,7 +833,7 @@ class WorkflowTest < ActiveSupport::TestCase
   end
 
   test 'can clear execution instance URL' do
-    workflow = Factory(:workflow, execution_instance_url: 'https://mygalaxy.instance/')
+    workflow = FactoryBot.create(:workflow, execution_instance_url: 'https://mygalaxy.instance/')
     assert workflow.execution_instance
     assert workflow.execution_instance_url
 
@@ -850,22 +850,22 @@ class WorkflowTest < ActiveSupport::TestCase
   end
 
   test 'can_run?' do
-    assert Factory(:generated_galaxy_ro_crate_workflow, policy: Factory(:public_policy)).can_run?
-    assert Factory(:generated_galaxy_ro_crate_workflow, policy: Factory(:public_policy), execution_instance_url: 'https://mygalaxy.instance/').can_run?
-    refute Factory(:generated_galaxy_ro_crate_workflow, policy: Factory(:private_policy)).can_run?
-    refute Factory(:cwl_workflow, policy: Factory(:public_policy)).can_run?
+    assert FactoryBot.create(:generated_galaxy_ro_crate_workflow, policy: FactoryBot.create(:public_policy)).can_run?
+    assert FactoryBot.create(:generated_galaxy_ro_crate_workflow, policy: FactoryBot.create(:public_policy), execution_instance_url: 'https://mygalaxy.instance/').can_run?
+    refute FactoryBot.create(:generated_galaxy_ro_crate_workflow, policy: FactoryBot.create(:private_policy)).can_run?
+    refute FactoryBot.create(:cwl_workflow, policy: FactoryBot.create(:public_policy)).can_run?
   end
 
   test 'run_url' do
     # Using default
     with_config_value(:galaxy_instance_default, 'http://default-galaxy-instance.com') do
-      default = Factory(:generated_galaxy_ro_crate_workflow)
+      default = FactoryBot.create(:generated_galaxy_ro_crate_workflow)
       trs_url = URI.encode_www_form_component("http://localhost:3000/ga4gh/trs/v2/tools/#{default.id}/versions/1")
       assert_equal "http://default-galaxy-instance.com/workflows/trs_import?trs_url=#{trs_url}&run_form=true", default.run_url
     end
 
     # With explicit execution instance
-    workflow = Factory(:generated_galaxy_ro_crate_workflow, execution_instance_url: 'https://mygalaxy.instance/')
+    workflow = FactoryBot.create(:generated_galaxy_ro_crate_workflow, execution_instance_url: 'https://mygalaxy.instance/')
     trs_url = URI.encode_www_form_component("http://localhost:3000/ga4gh/trs/v2/tools/#{workflow.id}/versions/1")
     assert_equal "https://mygalaxy.instance/workflows/trs_import?trs_url=#{trs_url}&run_form=true", workflow.run_url
 
@@ -878,11 +878,11 @@ class WorkflowTest < ActiveSupport::TestCase
     assert_equal "https://mygalaxy.instance/workflows/trs_import?trs_url=#{trs_url}&run_form=true", workflow.find_version(1).run_url
 
     # Galaxy instance with sub-URI
-    workflow = Factory(:generated_galaxy_ro_crate_workflow, execution_instance_url: 'https://mygalaxy.instance/galaxy/')
+    workflow = FactoryBot.create(:generated_galaxy_ro_crate_workflow, execution_instance_url: 'https://mygalaxy.instance/galaxy/')
     trs_url = URI.encode_www_form_component("http://localhost:3000/ga4gh/trs/v2/tools/#{workflow.id}/versions/1")
     assert_equal "https://mygalaxy.instance/galaxy/workflows/trs_import?trs_url=#{trs_url}&run_form=true", workflow.run_url
 
     # Not supported for non-galaxy currently
-    assert_nil Factory(:cwl_workflow, policy: Factory(:public_policy)).run_url
+    assert_nil FactoryBot.create(:cwl_workflow, policy: FactoryBot.create(:public_policy)).run_url
   end
 end

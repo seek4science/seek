@@ -323,8 +323,8 @@ class GitWorkflowCreationTest < ActionDispatch::IntegrationTest
     version_count = Git::Version.count
     annotation_count = Git::Annotation.count
 
-    person = Factory(:person)
-    galaxy = WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class)
+    person = FactoryBot.create(:person)
+    galaxy = WorkflowClass.find_by_key('galaxy') || FactoryBot.create(:galaxy_workflow_class)
     login_as(person.user)
 
     get new_workflow_path
