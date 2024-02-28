@@ -7,10 +7,6 @@ module Scrapers
   class GithubScraper
     attr_reader :output
 
-    GIT_DESTINATION = Rails.root.join('tmp', 'scrapers', 'git')
-    CRATE_DESTINATION = Rails.root.join('tmp', 'scrapers', 'crates')
-    CACHE_DESTINATION = Rails.root.join('tmp', 'scrapers', 'cache')
-
     def initialize(organization, project, contributor, main_branch: 'master', debug: false, output: STDOUT, only_latest: true)
       @organization = organization # The GitHub organization to scrape
       raise "Missing GitHub organization" unless @organization
@@ -155,20 +151,6 @@ module Scrapers
 
     def github
       RestClient::Resource.new('https://api.github.com', {})
-    end
-
-    def cache_path
-      ::File.join(CACHE_DESTINATION, @organization).tap { |x| FileUtils.mkdir_p(x) }
-    end
-
-    def cached(name)
-      path = File.expand_path(File.join(cache_path, name.gsub('/', '-')))
-      if File.exist?(path)
-        File.read(path)
-      else
-        File.write(path, yield)
-        File.read(path)
-      end
     end
 
     def latest_tag(repo)
