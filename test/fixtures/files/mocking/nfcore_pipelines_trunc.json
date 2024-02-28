@@ -1,0 +1,1658 @@
+{
+  "remote_workflows": [
+    {
+      "id": 127293091,
+      "node_id": "MDEwOlJlcG9zaXRvcnkxMjcyOTMwOTE=",
+      "name": "rnaseq",
+      "full_name": "nf-core/rnaseq",
+      "private": false,
+      "description": "RNA sequencing analysis pipeline using STAR, RSEM, HISAT2 or Salmon with gene/isoform counts and extensive quality control.",
+      "fork": false,
+      "url": "https://api.github.com/repos/nf-core/rnaseq",
+      "created_at": "2018-03-29T13:10:58Z",
+      "updated_at": "2024-01-04T13:18:56Z",
+      "pushed_at": "2024-01-04T12:54:23Z",
+      "homepage": "https://nf-co.re/rnaseq",
+      "size": 66190,
+      "stargazers_count": 713,
+      "watchers_count": 713,
+      "language": "Nextflow",
+      "has_issues": true,
+      "has_projects": false,
+      "has_downloads": true,
+      "has_wiki": false,
+      "has_pages": false,
+      "has_discussions": false,
+      "forks_count": 623,
+      "archived": false,
+      "disabled": false,
+      "open_issues_count": 56,
+      "allow_forking": true,
+      "is_template": false,
+      "web_commit_signoff_required": false,
+      "topics": [
+        "rna",
+        "rna-seq"
+      ],
+      "visibility": "public",
+      "forks": 623,
+      "open_issues": 56,
+      "watchers": 713,
+      "default_branch": "master",
+      "network_count": 623,
+      "subscribers_count": 135,
+      "open_pr_count": 8,
+      "contributors": [
+        {
+          "name": "drpatelh",
+          "count": 2041,
+          "avatar_url": "https://avatars.githubusercontent.com/u/23529759?v=4"
+        },
+        {
+          "name": "ewels",
+          "count": 633,
+          "avatar_url": "https://avatars.githubusercontent.com/u/465550?v=4"
+        },
+        {
+          "name": "apeltzer",
+          "count": 301,
+          "avatar_url": "https://avatars.githubusercontent.com/u/2359510?v=4"
+        },
+        {
+          "name": "olgabot",
+          "count": 174,
+          "avatar_url": "https://avatars.githubusercontent.com/u/806256?v=4"
+        },
+        {
+          "name": "pinin4fjords",
+          "count": 165,
+          "avatar_url": "https://avatars.githubusercontent.com/u/5775915?v=4"
+        },
+        {
+          "name": "grst",
+          "count": 71,
+          "avatar_url": "https://avatars.githubusercontent.com/u/7051479?v=4"
+        },
+        {
+          "name": "maxulysse",
+          "count": 61,
+          "avatar_url": "https://avatars.githubusercontent.com/u/1019628?v=4"
+        },
+        {
+          "name": "Galithil",
+          "count": 54,
+          "avatar_url": "https://avatars.githubusercontent.com/u/7523280?v=4"
+        },
+        {
+          "name": "pranathivemuri",
+          "count": 51,
+          "avatar_url": "https://avatars.githubusercontent.com/u/10284094?v=4"
+        },
+        {
+          "name": "silviamorins",
+          "count": 36,
+          "avatar_url": "https://avatars.githubusercontent.com/u/35500664?v=4"
+        },
+        {
+          "name": "lpantano",
+          "count": 33,
+          "avatar_url": "https://avatars.githubusercontent.com/u/1621788?v=4"
+        },
+        {
+          "name": "mahesh-panchal",
+          "count": 32,
+          "avatar_url": "https://avatars.githubusercontent.com/u/15652539?v=4"
+        },
+        {
+          "name": "MatthiasZepper",
+          "count": 30,
+          "avatar_url": "https://avatars.githubusercontent.com/u/6963520?v=4"
+        },
+        {
+          "name": "robsyme",
+          "count": 25,
+          "avatar_url": "https://avatars.githubusercontent.com/u/31576?v=4"
+        },
+        {
+          "name": "macroscian",
+          "count": 23,
+          "avatar_url": "https://avatars.githubusercontent.com/u/1587213?v=4"
+        },
+        {
+          "name": "FriederikeHanssen",
+          "count": 18,
+          "avatar_url": "https://avatars.githubusercontent.com/u/12273093?v=4"
+        },
+        {
+          "name": "adamrtalbot",
+          "count": 16,
+          "avatar_url": "https://avatars.githubusercontent.com/u/12817534?v=4"
+        },
+        {
+          "name": "jfy133",
+          "count": 15,
+          "avatar_url": "https://avatars.githubusercontent.com/u/17950287?v=4"
+        },
+        {
+          "name": "JoseEspinosa",
+          "count": 12,
+          "avatar_url": "https://avatars.githubusercontent.com/u/6224346?v=4"
+        },
+        {
+          "name": "rfenouil",
+          "count": 12,
+          "avatar_url": "https://avatars.githubusercontent.com/u/35697321?v=4"
+        },
+        {
+          "name": "chris-cheshire",
+          "count": 12,
+          "avatar_url": "https://avatars.githubusercontent.com/u/2357039?v=4"
+        },
+        {
+          "name": "marchoeppner",
+          "count": 10,
+          "avatar_url": "https://avatars.githubusercontent.com/u/22975?v=4"
+        },
+        {
+          "name": "edmundmiller",
+          "count": 9,
+          "avatar_url": "https://avatars.githubusercontent.com/u/20095261?v=4"
+        },
+        {
+          "name": "orionzhou",
+          "count": 9,
+          "avatar_url": "https://avatars.githubusercontent.com/u/332126?v=4"
+        },
+        {
+          "name": "G-Sarah",
+          "count": 9,
+          "avatar_url": "https://avatars.githubusercontent.com/u/99276764?v=4"
+        },
+        {
+          "name": "ggabernet",
+          "count": 8,
+          "avatar_url": "https://avatars.githubusercontent.com/u/3973503?v=4"
+        },
+        {
+          "name": "c-mertes",
+          "count": 6,
+          "avatar_url": "https://avatars.githubusercontent.com/u/22544249?v=4"
+        },
+        {
+          "name": "d4straub",
+          "count": 6,
+          "avatar_url": "https://avatars.githubusercontent.com/u/42973691?v=4"
+        },
+        {
+          "name": "pditommaso",
+          "count": 6,
+          "avatar_url": "https://avatars.githubusercontent.com/u/816968?v=4"
+        },
+        {
+          "name": "senthil10",
+          "count": 5,
+          "avatar_url": "https://avatars.githubusercontent.com/u/5311007?v=4"
+        },
+        {
+          "name": "george-hall-ucl",
+          "count": 5,
+          "avatar_url": "https://avatars.githubusercontent.com/u/77325372?v=4"
+        },
+        {
+          "name": "sven1103",
+          "count": 5,
+          "avatar_url": "https://avatars.githubusercontent.com/u/9976560?v=4"
+        },
+        {
+          "name": "drejom",
+          "count": 4,
+          "avatar_url": "https://avatars.githubusercontent.com/u/91294?v=4"
+        },
+        {
+          "name": "jun-wan",
+          "count": 4,
+          "avatar_url": "https://avatars.githubusercontent.com/u/5436208?v=4"
+        },
+        {
+          "name": "mashehu",
+          "count": 3,
+          "avatar_url": "https://avatars.githubusercontent.com/u/6169021?v=4"
+        },
+        {
+          "name": "alneberg",
+          "count": 3,
+          "avatar_url": "https://avatars.githubusercontent.com/u/1250075?v=4"
+        },
+        {
+          "name": "aanil",
+          "count": 3,
+          "avatar_url": "https://avatars.githubusercontent.com/u/11080857?v=4"
+        },
+        {
+          "name": "SpikyClip",
+          "count": 3,
+          "avatar_url": "https://avatars.githubusercontent.com/u/74215773?v=4"
+        },
+        {
+          "name": "sofiahag",
+          "count": 3,
+          "avatar_url": "https://avatars.githubusercontent.com/u/37932118?v=4"
+        },
+        {
+          "name": "RaqManzano",
+          "count": 3,
+          "avatar_url": "https://avatars.githubusercontent.com/u/36073691?v=4"
+        },
+        {
+          "name": "kviljoen",
+          "count": 3,
+          "avatar_url": "https://avatars.githubusercontent.com/u/9252016?v=4"
+        },
+        {
+          "name": "amayer21",
+          "count": 3,
+          "avatar_url": "https://avatars.githubusercontent.com/u/31933289?v=4"
+        },
+        {
+          "name": "ryanyord",
+          "count": 2,
+          "avatar_url": "https://avatars.githubusercontent.com/u/85899130?v=4"
+        },
+        {
+          "name": "jemten",
+          "count": 2,
+          "avatar_url": "https://avatars.githubusercontent.com/u/3168925?v=4"
+        },
+        {
+          "name": "arontommi",
+          "count": 2,
+          "avatar_url": "https://avatars.githubusercontent.com/u/15101751?v=4"
+        },
+        {
+          "name": "zxl124",
+          "count": 2,
+          "avatar_url": "https://avatars.githubusercontent.com/u/37191025?v=4"
+        },
+        {
+          "name": "suhrig",
+          "count": 2,
+          "avatar_url": "https://avatars.githubusercontent.com/u/10560654?v=4"
+        },
+        {
+          "name": "skrakau",
+          "count": 2,
+          "avatar_url": "https://avatars.githubusercontent.com/u/1982769?v=4"
+        },
+        {
+          "name": "RHReynolds",
+          "count": 2,
+          "avatar_url": "https://avatars.githubusercontent.com/u/31013971?v=4"
+        },
+        {
+          "name": "ppericard",
+          "count": 2,
+          "avatar_url": "https://avatars.githubusercontent.com/u/7090732?v=4"
+        },
+        {
+          "name": "paulklemm",
+          "count": 2,
+          "avatar_url": "https://avatars.githubusercontent.com/u/2169489?v=4"
+        },
+        {
+          "name": "pcantalupo",
+          "count": 2,
+          "avatar_url": "https://avatars.githubusercontent.com/u/310962?v=4"
+        },
+        {
+          "name": "veeravalli",
+          "count": 2,
+          "avatar_url": "https://avatars.githubusercontent.com/u/9376769?v=4"
+        },
+        {
+          "name": "jordwil",
+          "count": 2,
+          "avatar_url": "https://avatars.githubusercontent.com/u/3279797?v=4"
+        },
+        {
+          "name": "jburos",
+          "count": 2,
+          "avatar_url": "https://avatars.githubusercontent.com/u/923453?v=4"
+        },
+        {
+          "name": "colindaven",
+          "count": 2,
+          "avatar_url": "https://avatars.githubusercontent.com/u/6094884?v=4"
+        },
+        {
+          "name": "na399",
+          "count": 1,
+          "avatar_url": "https://avatars.githubusercontent.com/u/13469652?v=4"
+        },
+        {
+          "name": "mvanins",
+          "count": 1,
+          "avatar_url": "https://avatars.githubusercontent.com/u/8451093?v=4"
+        },
+        {
+          "name": "rsuchecki",
+          "count": 1,
+          "avatar_url": "https://avatars.githubusercontent.com/u/5534231?v=4"
+        },
+        {
+          "name": "rhr-cosyne",
+          "count": 1,
+          "avatar_url": "https://avatars.githubusercontent.com/u/116022680?v=4"
+        },
+        {
+          "name": "smoe",
+          "count": 1,
+          "avatar_url": "https://avatars.githubusercontent.com/u/207407?v=4"
+        },
+        {
+          "name": "tomsing1",
+          "count": 1,
+          "avatar_url": "https://avatars.githubusercontent.com/u/10490984?v=4"
+        },
+        {
+          "name": "adf-ncgr",
+          "count": 1,
+          "avatar_url": "https://avatars.githubusercontent.com/u/2009605?v=4"
+        },
+        {
+          "name": "ctuni",
+          "count": 1,
+          "avatar_url": "https://avatars.githubusercontent.com/u/49684557?v=4"
+        },
+        {
+          "name": "hmehlan",
+          "count": 1,
+          "avatar_url": "https://avatars.githubusercontent.com/u/43400079?v=4"
+        },
+        {
+          "name": "KevinMenden",
+          "count": 1,
+          "avatar_url": "https://avatars.githubusercontent.com/u/15126788?v=4"
+        },
+        {
+          "name": "matrulda",
+          "count": 1,
+          "avatar_url": "https://avatars.githubusercontent.com/u/1584541?v=4"
+        },
+        {
+          "name": "lbeltrame",
+          "count": 1,
+          "avatar_url": "https://avatars.githubusercontent.com/u/25192?v=4"
+        },
+        {
+          "name": "jlorent",
+          "count": 1,
+          "avatar_url": "https://avatars.githubusercontent.com/u/5382593?v=4"
+        },
+        {
+          "name": "jenmuell",
+          "count": 1,
+          "avatar_url": "https://avatars.githubusercontent.com/u/43847598?v=4"
+        },
+        {
+          "name": "Ghepardo",
+          "count": 1,
+          "avatar_url": "https://avatars.githubusercontent.com/u/71766441?v=4"
+        },
+        {
+          "name": "vezzi",
+          "count": 1,
+          "avatar_url": "https://avatars.githubusercontent.com/u/1209695?v=4"
+        },
+        {
+          "name": "drpowell",
+          "count": 1,
+          "avatar_url": "https://avatars.githubusercontent.com/u/123456?v=4"
+        },
+        {
+          "name": "chuan-wang",
+          "count": 1,
+          "avatar_url": "https://avatars.githubusercontent.com/u/18303540?v=4"
+        },
+        {
+          "name": "adomingues",
+          "count": 1,
+          "avatar_url": "https://avatars.githubusercontent.com/u/2607577?v=4"
+        },
+        {
+          "name": "abhi18av",
+          "count": 1,
+          "avatar_url": "https://avatars.githubusercontent.com/u/12799326?v=4"
+        }
+      ],
+      "releases": [
+        {
+          "tag_name": "3.13.2",
+          "published_at": "2023-11-21T11:36:49Z",
+          "tag_sha": "a10f41afa204538d5dcc89a5910c299d68f94f41",
+          "has_schema": true,
+          "doc_files": [
+            "docs/output.md",
+            "docs/usage.md"
+          ],
+          "components": {
+            "modules": [
+              "bbmap_bbsplit",
+              "cat_fastq",
+              "custom_dumpsoftwareversions",
+              "custom_getchromsizes",
+              "fastp",
+              "fastqc",
+              "fq_subsample",
+              "gffread",
+              "gunzip",
+              "hisat2_align",
+              "hisat2_build",
+              "hisat2_extractsplicesites",
+              "kallisto_index",
+              "kallisto_quant",
+              "picard_markduplicates",
+              "preseq_lcextrap",
+              "qualimap_rnaseq",
+              "rsem_calculateexpression",
+              "rsem_preparereference",
+              "rseqc_bamstat",
+              "rseqc_inferexperiment",
+              "rseqc_innerdistance",
+              "rseqc_junctionannotation",
+              "rseqc_junctionsaturation",
+              "rseqc_readdistribution",
+              "rseqc_readduplication",
+              "rseqc_tin",
+              "salmon_index",
+              "salmon_quant",
+              "samtools_flagstat",
+              "samtools_idxstats",
+              "samtools_index",
+              "samtools_sort",
+              "samtools_stats",
+              "sortmerna",
+              "star_align",
+              "star_genomegenerate",
+              "stringtie_stringtie",
+              "subread_featurecounts",
+              "trimgalore",
+              "ucsc_bedclip",
+              "ucsc_bedgraphtobigwig",
+              "umitools_dedup",
+              "umitools_extract",
+              "untar"
+            ],
+            "subworkflows": [
+              "bam_dedup_stats_samtools_umitools",
+              "bam_markduplicates_picard",
+              "bam_rseqc",
+              "bam_sort_stats_samtools",
+              "bam_stats_samtools",
+              "bedgraph_bedclip_bedgraphtobigwig",
+              "fastq_align_hisat2",
+              "fastq_fastqc_umitools_fastp",
+              "fastq_fastqc_umitools_trimgalore",
+              "fastq_subsample_fq_salmon"
+            ]
+          }
+        },
+        {
+          "tag_name": "3.13.1",
+          "published_at": "2023-11-17T18:04:37Z",
+          "tag_sha": "b59e87a54eae60e02f9ae12e3b9c9c59959328d7",
+          "has_schema": true,
+          "doc_files": [
+            "docs/output.md",
+            "docs/usage.md"
+          ],
+          "components": {
+            "modules": [
+              "bbmap_bbsplit",
+              "cat_fastq",
+              "custom_dumpsoftwareversions",
+              "custom_getchromsizes",
+              "fastp",
+              "fastqc",
+              "fq_subsample",
+              "gffread",
+              "gunzip",
+              "hisat2_align",
+              "hisat2_build",
+              "hisat2_extractsplicesites",
+              "kallisto_index",
+              "kallisto_quant",
+              "picard_markduplicates",
+              "preseq_lcextrap",
+              "qualimap_rnaseq",
+              "rsem_calculateexpression",
+              "rsem_preparereference",
+              "rseqc_bamstat",
+              "rseqc_inferexperiment",
+              "rseqc_innerdistance",
+              "rseqc_junctionannotation",
+              "rseqc_junctionsaturation",
+              "rseqc_readdistribution",
+              "rseqc_readduplication",
+              "rseqc_tin",
+              "salmon_index",
+              "salmon_quant",
+              "samtools_flagstat",
+              "samtools_idxstats",
+              "samtools_index",
+              "samtools_sort",
+              "samtools_stats",
+              "sortmerna",
+              "star_align",
+              "star_genomegenerate",
+              "stringtie_stringtie",
+              "subread_featurecounts",
+              "trimgalore",
+              "ucsc_bedclip",
+              "ucsc_bedgraphtobigwig",
+              "umitools_dedup",
+              "umitools_extract",
+              "untar"
+            ],
+            "subworkflows": [
+              "bam_dedup_stats_samtools_umitools",
+              "bam_markduplicates_picard",
+              "bam_rseqc",
+              "bam_sort_stats_samtools",
+              "bam_stats_samtools",
+              "bedgraph_bedclip_bedgraphtobigwig",
+              "fastq_align_hisat2",
+              "fastq_fastqc_umitools_fastp",
+              "fastq_fastqc_umitools_trimgalore",
+              "fastq_subsample_fq_salmon"
+            ]
+          }
+        },
+        {
+          "tag_name": "3.13.0",
+          "published_at": "2023-11-17T15:29:38Z",
+          "tag_sha": "14f9d26444e08da7b51ddcb1b8c4e0703edde375",
+          "has_schema": true,
+          "doc_files": [
+            "docs/output.md",
+            "docs/usage.md"
+          ],
+          "components": {
+            "modules": [
+              "bbmap_bbsplit",
+              "cat_fastq",
+              "custom_dumpsoftwareversions",
+              "custom_getchromsizes",
+              "fastp",
+              "fastqc",
+              "fq_subsample",
+              "gffread",
+              "gunzip",
+              "hisat2_align",
+              "hisat2_build",
+              "hisat2_extractsplicesites",
+              "kallisto_index",
+              "kallisto_quant",
+              "picard_markduplicates",
+              "preseq_lcextrap",
+              "qualimap_rnaseq",
+              "rsem_calculateexpression",
+              "rsem_preparereference",
+              "rseqc_bamstat",
+              "rseqc_inferexperiment",
+              "rseqc_innerdistance",
+              "rseqc_junctionannotation",
+              "rseqc_junctionsaturation",
+              "rseqc_readdistribution",
+              "rseqc_readduplication",
+              "rseqc_tin",
+              "salmon_index",
+              "salmon_quant",
+              "samtools_flagstat",
+              "samtools_idxstats",
+              "samtools_index",
+              "samtools_sort",
+              "samtools_stats",
+              "sortmerna",
+              "star_align",
+              "star_genomegenerate",
+              "stringtie_stringtie",
+              "subread_featurecounts",
+              "trimgalore",
+              "ucsc_bedclip",
+              "ucsc_bedgraphtobigwig",
+              "umitools_dedup",
+              "umitools_extract",
+              "untar"
+            ],
+            "subworkflows": [
+              "bam_dedup_stats_samtools_umitools",
+              "bam_markduplicates_picard",
+              "bam_rseqc",
+              "bam_sort_stats_samtools",
+              "bam_stats_samtools",
+              "bedgraph_bedclip_bedgraphtobigwig",
+              "fastq_align_hisat2",
+              "fastq_fastqc_umitools_fastp",
+              "fastq_fastqc_umitools_trimgalore",
+              "fastq_subsample_fq_salmon"
+            ]
+          }
+        },
+        {
+          "tag_name": "3.12.0",
+          "published_at": "2023-06-02T15:39:54Z",
+          "tag_sha": "3bec2331cac2b5ff88a1dc71a21fab6529b57a0f",
+          "has_schema": true,
+          "doc_files": [
+            "docs/output.md",
+            "docs/usage.md"
+          ],
+          "components": {
+            "modules": [
+              "bbmap_bbsplit",
+              "cat_fastq",
+              "custom_dumpsoftwareversions",
+              "custom_getchromsizes",
+              "fastp",
+              "fastqc",
+              "fq_subsample",
+              "gffread",
+              "gunzip",
+              "hisat2_align",
+              "hisat2_build",
+              "hisat2_extractsplicesites",
+              "picard_markduplicates",
+              "preseq_lcextrap",
+              "qualimap_rnaseq",
+              "rsem_calculateexpression",
+              "rsem_preparereference",
+              "rseqc_bamstat",
+              "rseqc_inferexperiment",
+              "rseqc_innerdistance",
+              "rseqc_junctionannotation",
+              "rseqc_junctionsaturation",
+              "rseqc_readdistribution",
+              "rseqc_readduplication",
+              "rseqc_tin",
+              "salmon_index",
+              "salmon_quant",
+              "samtools_flagstat",
+              "samtools_idxstats",
+              "samtools_index",
+              "samtools_sort",
+              "samtools_stats",
+              "sortmerna",
+              "star_align",
+              "star_genomegenerate",
+              "stringtie_stringtie",
+              "subread_featurecounts",
+              "trimgalore",
+              "ucsc_bedclip",
+              "ucsc_bedgraphtobigwig",
+              "umitools_dedup",
+              "umitools_extract",
+              "untar"
+            ],
+            "subworkflows": [
+              "bam_dedup_stats_samtools_umitools",
+              "bam_markduplicates_picard",
+              "bam_rseqc",
+              "bam_sort_stats_samtools",
+              "bam_stats_samtools",
+              "bedgraph_bedclip_bedgraphtobigwig",
+              "fastq_align_hisat2",
+              "fastq_fastqc_umitools_fastp",
+              "fastq_fastqc_umitools_trimgalore",
+              "fastq_subsample_fq_salmon"
+            ]
+          }
+        },
+        {
+          "tag_name": "3.11.2",
+          "published_at": "2023-04-25T10:56:51Z",
+          "tag_sha": "5671b65af97fe78a2f9b4d05d850304918b1b86e",
+          "has_schema": true,
+          "doc_files": [
+            "docs/output.md",
+            "docs/usage.md"
+          ],
+          "components": {
+            "modules": [
+              "bbmap_bbsplit",
+              "cat_fastq",
+              "custom_dumpsoftwareversions",
+              "custom_getchromsizes",
+              "fastp",
+              "fastqc",
+              "fq_subsample",
+              "gffread",
+              "gunzip",
+              "hisat2_align",
+              "hisat2_build",
+              "hisat2_extractsplicesites",
+              "picard_markduplicates",
+              "preseq_lcextrap",
+              "qualimap_rnaseq",
+              "rsem_calculateexpression",
+              "rsem_preparereference",
+              "rseqc_bamstat",
+              "rseqc_inferexperiment",
+              "rseqc_innerdistance",
+              "rseqc_junctionannotation",
+              "rseqc_junctionsaturation",
+              "rseqc_readdistribution",
+              "rseqc_readduplication",
+              "rseqc_tin",
+              "salmon_index",
+              "salmon_quant",
+              "samtools_flagstat",
+              "samtools_idxstats",
+              "samtools_index",
+              "samtools_sort",
+              "samtools_stats",
+              "sortmerna",
+              "star_align",
+              "star_genomegenerate",
+              "stringtie_stringtie",
+              "subread_featurecounts",
+              "trimgalore",
+              "ucsc_bedclip",
+              "ucsc_bedgraphtobigwig",
+              "umitools_dedup",
+              "umitools_extract",
+              "untar"
+            ],
+            "subworkflows": [
+              "bam_dedup_stats_samtools_umitools",
+              "bam_markduplicates_picard",
+              "bam_rseqc",
+              "bam_sort_stats_samtools",
+              "bam_stats_samtools",
+              "bedgraph_bedclip_bedgraphtobigwig",
+              "fastq_align_hisat2",
+              "fastq_fastqc_umitools_fastp",
+              "fastq_fastqc_umitools_trimgalore",
+              "fastq_subsample_fq_salmon"
+            ]
+          }
+        },
+        {
+          "tag_name": "3.11.1",
+          "published_at": "2023-03-31T16:06:30Z",
+          "tag_sha": "287afcfe30a93de77e9b7cf70a1085f58c9525d8",
+          "has_schema": true,
+          "doc_files": [
+            "docs/output.md",
+            "docs/usage.md"
+          ],
+          "components": {
+            "modules": [
+              "bbmap_bbsplit",
+              "cat_fastq",
+              "custom_dumpsoftwareversions",
+              "custom_getchromsizes",
+              "fastp",
+              "fastqc",
+              "fq_subsample",
+              "gffread",
+              "gunzip",
+              "hisat2_align",
+              "hisat2_build",
+              "hisat2_extractsplicesites",
+              "picard_markduplicates",
+              "preseq_lcextrap",
+              "qualimap_rnaseq",
+              "rsem_calculateexpression",
+              "rsem_preparereference",
+              "rseqc_bamstat",
+              "rseqc_inferexperiment",
+              "rseqc_innerdistance",
+              "rseqc_junctionannotation",
+              "rseqc_junctionsaturation",
+              "rseqc_readdistribution",
+              "rseqc_readduplication",
+              "rseqc_tin",
+              "salmon_index",
+              "salmon_quant",
+              "samtools_flagstat",
+              "samtools_idxstats",
+              "samtools_index",
+              "samtools_sort",
+              "samtools_stats",
+              "sortmerna",
+              "star_align",
+              "star_genomegenerate",
+              "stringtie_stringtie",
+              "subread_featurecounts",
+              "trimgalore",
+              "ucsc_bedclip",
+              "ucsc_bedgraphtobigwig",
+              "umitools_dedup",
+              "umitools_extract",
+              "untar"
+            ],
+            "subworkflows": [
+              "bam_dedup_stats_samtools_umitools",
+              "bam_markduplicates_picard",
+              "bam_rseqc",
+              "bam_sort_stats_samtools",
+              "bam_stats_samtools",
+              "bedgraph_bedclip_bedgraphtobigwig",
+              "fastq_align_hisat2",
+              "fastq_fastqc_umitools_fastp",
+              "fastq_fastqc_umitools_trimgalore",
+              "fastq_subsample_fq_salmon"
+            ]
+          }
+        },
+        {
+          "tag_name": "3.11.0",
+          "published_at": "2023-03-30T13:52:38Z",
+          "tag_sha": "48fb9b4ea640f029f48c79283217d0f20661d38e",
+          "has_schema": true,
+          "doc_files": [
+            "docs/output.md",
+            "docs/usage.md"
+          ],
+          "components": {
+            "modules": [
+              "bbmap_bbsplit",
+              "cat_fastq",
+              "custom_dumpsoftwareversions",
+              "custom_getchromsizes",
+              "fastp",
+              "fastqc",
+              "fq_subsample",
+              "gffread",
+              "gunzip",
+              "hisat2_align",
+              "hisat2_build",
+              "hisat2_extractsplicesites",
+              "picard_markduplicates",
+              "preseq_lcextrap",
+              "qualimap_rnaseq",
+              "rsem_calculateexpression",
+              "rsem_preparereference",
+              "rseqc_bamstat",
+              "rseqc_inferexperiment",
+              "rseqc_innerdistance",
+              "rseqc_junctionannotation",
+              "rseqc_junctionsaturation",
+              "rseqc_readdistribution",
+              "rseqc_readduplication",
+              "rseqc_tin",
+              "salmon_index",
+              "salmon_quant",
+              "samtools_flagstat",
+              "samtools_idxstats",
+              "samtools_index",
+              "samtools_sort",
+              "samtools_stats",
+              "sortmerna",
+              "star_align",
+              "star_genomegenerate",
+              "stringtie_stringtie",
+              "subread_featurecounts",
+              "trimgalore",
+              "ucsc_bedclip",
+              "ucsc_bedgraphtobigwig",
+              "umitools_dedup",
+              "umitools_extract",
+              "untar"
+            ],
+            "subworkflows": [
+              "bam_dedup_stats_samtools_umitools",
+              "bam_markduplicates_picard",
+              "bam_rseqc",
+              "bam_sort_stats_samtools",
+              "bam_stats_samtools",
+              "bedgraph_bedclip_bedgraphtobigwig",
+              "fastq_align_hisat2",
+              "fastq_fastqc_umitools_fastp",
+              "fastq_fastqc_umitools_trimgalore",
+              "fastq_subsample_fq_salmon"
+            ]
+          }
+        },
+        {
+          "tag_name": "3.10.1",
+          "published_at": "2023-01-05T12:14:44Z",
+          "tag_sha": "6e1e448f535ccf34d11cc691bb241cfd6e60a647",
+          "has_schema": true,
+          "doc_files": [
+            "docs/output.md",
+            "docs/usage.md"
+          ],
+          "components": {
+            "modules": [
+              "bbmap_bbsplit",
+              "cat_fastq",
+              "custom_dumpsoftwareversions",
+              "custom_getchromsizes",
+              "fastqc",
+              "fq_subsample",
+              "gffread",
+              "gunzip",
+              "hisat2_align",
+              "hisat2_build",
+              "hisat2_extractsplicesites",
+              "picard_markduplicates",
+              "preseq_lcextrap",
+              "qualimap_rnaseq",
+              "rsem_calculateexpression",
+              "rsem_preparereference",
+              "rseqc_bamstat",
+              "rseqc_inferexperiment",
+              "rseqc_innerdistance",
+              "rseqc_junctionannotation",
+              "rseqc_junctionsaturation",
+              "rseqc_readdistribution",
+              "rseqc_readduplication",
+              "rseqc_tin",
+              "salmon_index",
+              "salmon_quant",
+              "samtools_flagstat",
+              "samtools_idxstats",
+              "samtools_index",
+              "samtools_sort",
+              "samtools_stats",
+              "sortmerna",
+              "star_align",
+              "star_genomegenerate",
+              "stringtie_stringtie",
+              "subread_featurecounts",
+              "trimgalore",
+              "ucsc_bedclip",
+              "ucsc_bedgraphtobigwig",
+              "umitools_dedup",
+              "umitools_extract",
+              "untar"
+            ],
+            "subworkflows": [
+              "bam_dedup_stats_samtools_umitools",
+              "bam_markduplicates_picard",
+              "bam_rseqc",
+              "bam_sort_stats_samtools",
+              "bam_stats_samtools",
+              "bedgraph_bedclip_bedgraphtobigwig",
+              "fastq_align_hisat2",
+              "fastq_fastqc_umitools_trimgalore",
+              "fastq_subsample_fq_salmon"
+            ]
+          }
+        },
+        {
+          "tag_name": "3.10",
+          "published_at": "2022-12-21T13:49:31Z",
+          "tag_sha": "adce7ce9abc8f6b338b4f53d0d988ff9a0fd52ff",
+          "has_schema": true,
+          "doc_files": [
+            "docs/output.md",
+            "docs/usage.md"
+          ],
+          "components": {
+            "modules": [
+              "bbmap_bbsplit",
+              "cat_fastq",
+              "custom_dumpsoftwareversions",
+              "custom_getchromsizes",
+              "fastqc",
+              "fq_subsample",
+              "gffread",
+              "gunzip",
+              "hisat2_align",
+              "hisat2_build",
+              "hisat2_extractsplicesites",
+              "picard_markduplicates",
+              "preseq_lcextrap",
+              "qualimap_rnaseq",
+              "rsem_calculateexpression",
+              "rsem_preparereference",
+              "rseqc_bamstat",
+              "rseqc_inferexperiment",
+              "rseqc_innerdistance",
+              "rseqc_junctionannotation",
+              "rseqc_junctionsaturation",
+              "rseqc_readdistribution",
+              "rseqc_readduplication",
+              "rseqc_tin",
+              "salmon_index",
+              "salmon_quant",
+              "samtools_flagstat",
+              "samtools_idxstats",
+              "samtools_index",
+              "samtools_sort",
+              "samtools_stats",
+              "sortmerna",
+              "star_align",
+              "star_genomegenerate",
+              "stringtie_stringtie",
+              "subread_featurecounts",
+              "trimgalore",
+              "ucsc_bedclip",
+              "ucsc_bedgraphtobigwig",
+              "umitools_dedup",
+              "umitools_extract",
+              "untar"
+            ],
+            "subworkflows": [
+              "bam_dedup_stats_samtools_umitools",
+              "bam_markduplicates_picard",
+              "bam_rseqc",
+              "bam_sort_stats_samtools",
+              "bam_stats_samtools",
+              "bedgraph_bedclip_bedgraphtobigwig",
+              "fastq_align_hisat2",
+              "fastq_fastqc_umitools_trimgalore",
+              "fastq_subsample_fq_salmon"
+            ]
+          }
+        },
+        {
+          "tag_name": "3.9",
+          "published_at": "2022-09-30T20:24:37Z",
+          "tag_sha": "e049f51f0214b2aef7624b9dd496a404a7c34d14",
+          "has_schema": true,
+          "doc_files": [
+            "docs/output.md",
+            "docs/usage.md"
+          ],
+          "components": {
+            "modules": [
+              "bbmap_bbsplit",
+              "cat_fastq",
+              "custom_dumpsoftwareversions",
+              "custom_getchromsizes",
+              "fastqc",
+              "gffread",
+              "gunzip",
+              "hisat2_align",
+              "hisat2_build",
+              "hisat2_extractsplicesites",
+              "picard_markduplicates",
+              "preseq_lcextrap",
+              "qualimap_rnaseq",
+              "rsem_calculateexpression",
+              "rsem_preparereference",
+              "rseqc_bamstat",
+              "rseqc_inferexperiment",
+              "rseqc_innerdistance",
+              "rseqc_junctionannotation",
+              "rseqc_junctionsaturation",
+              "rseqc_readdistribution",
+              "rseqc_readduplication",
+              "rseqc_tin",
+              "salmon_index",
+              "salmon_quant",
+              "samtools_flagstat",
+              "samtools_idxstats",
+              "samtools_index",
+              "samtools_sort",
+              "samtools_stats",
+              "sortmerna",
+              "star_align",
+              "star_genomegenerate",
+              "stringtie_stringtie",
+              "subread_featurecounts",
+              "trimgalore",
+              "ucsc_bedclip",
+              "ucsc_bedgraphtobigwig",
+              "umitools_dedup",
+              "umitools_extract",
+              "untar"
+            ]
+          }
+        },
+        {
+          "tag_name": "3.8.1",
+          "published_at": "2022-05-27T16:34:40Z",
+          "tag_sha": "89bf536ce4faa98b4d50a8ec0a0343780bc62e0a",
+          "has_schema": true,
+          "doc_files": [
+            "docs/output.md",
+            "docs/usage.md"
+          ],
+          "components": {
+            "modules": [
+              "bbmap_bbsplit",
+              "cat_fastq",
+              "custom_dumpsoftwareversions",
+              "custom_getchromsizes",
+              "fastqc",
+              "gffread",
+              "gunzip",
+              "hisat2_align",
+              "hisat2_build",
+              "hisat2_extractsplicesites",
+              "picard_markduplicates",
+              "preseq_lcextrap",
+              "qualimap_rnaseq",
+              "rsem_calculateexpression",
+              "rsem_preparereference",
+              "rseqc_bamstat",
+              "rseqc_inferexperiment",
+              "rseqc_innerdistance",
+              "rseqc_junctionannotation",
+              "rseqc_junctionsaturation",
+              "rseqc_readdistribution",
+              "rseqc_readduplication",
+              "rseqc_tin",
+              "salmon_index",
+              "salmon_quant",
+              "samtools_flagstat",
+              "samtools_idxstats",
+              "samtools_index",
+              "samtools_sort",
+              "samtools_stats",
+              "sortmerna",
+              "star_align",
+              "star_genomegenerate",
+              "stringtie_stringtie",
+              "subread_featurecounts",
+              "trimgalore",
+              "ucsc_bedclip",
+              "ucsc_bedgraphtobigwig",
+              "umitools_dedup",
+              "umitools_extract",
+              "untar"
+            ]
+          }
+        },
+        {
+          "tag_name": "3.8",
+          "published_at": "2022-05-25T09:45:00Z",
+          "tag_sha": "6995330476244a6bffe55ddcbe50b8ed5cf6c2e2",
+          "has_schema": true,
+          "doc_files": [
+            "docs/output.md",
+            "docs/usage.md"
+          ],
+          "components": {
+            "modules": [
+              "bbmap_bbsplit",
+              "cat_fastq",
+              "custom_dumpsoftwareversions",
+              "custom_getchromsizes",
+              "fastqc",
+              "gffread",
+              "gunzip",
+              "hisat2_align",
+              "hisat2_build",
+              "hisat2_extractsplicesites",
+              "picard_markduplicates",
+              "preseq_lcextrap",
+              "qualimap_rnaseq",
+              "rsem_calculateexpression",
+              "rsem_preparereference",
+              "rseqc_bamstat",
+              "rseqc_inferexperiment",
+              "rseqc_innerdistance",
+              "rseqc_junctionannotation",
+              "rseqc_junctionsaturation",
+              "rseqc_readdistribution",
+              "rseqc_readduplication",
+              "rseqc_tin",
+              "salmon_index",
+              "salmon_quant",
+              "samtools_flagstat",
+              "samtools_idxstats",
+              "samtools_index",
+              "samtools_sort",
+              "samtools_stats",
+              "sortmerna",
+              "stringtie_stringtie",
+              "subread_featurecounts",
+              "trimgalore",
+              "ucsc_bedclip",
+              "ucsc_bedgraphtobigwig",
+              "umitools_dedup",
+              "umitools_extract",
+              "untar"
+            ]
+          }
+        },
+        {
+          "tag_name": "3.7",
+          "published_at": "2022-05-03T11:13:51Z",
+          "tag_sha": "e0dfce9af5c2299bcc2b8a74b6559ce055965455",
+          "has_schema": true,
+          "doc_files": [
+            "docs/output.md",
+            "docs/usage.md"
+          ],
+          "components": {
+            "modules": [
+              "bbmap_bbsplit",
+              "cat_fastq",
+              "custom_dumpsoftwareversions",
+              "custom_getchromsizes",
+              "fastqc",
+              "gffread",
+              "gunzip",
+              "hisat2_align",
+              "hisat2_build",
+              "hisat2_extractsplicesites",
+              "picard_markduplicates",
+              "preseq_lcextrap",
+              "qualimap_rnaseq",
+              "rsem_calculateexpression",
+              "rsem_preparereference",
+              "rseqc_bamstat",
+              "rseqc_inferexperiment",
+              "rseqc_innerdistance",
+              "rseqc_junctionannotation",
+              "rseqc_junctionsaturation",
+              "rseqc_readdistribution",
+              "rseqc_readduplication",
+              "rseqc_tin",
+              "salmon_index",
+              "salmon_quant",
+              "samtools_flagstat",
+              "samtools_idxstats",
+              "samtools_index",
+              "samtools_sort",
+              "samtools_stats",
+              "sortmerna",
+              "stringtie_stringtie",
+              "subread_featurecounts",
+              "trimgalore",
+              "ucsc_bedclip",
+              "ucsc_bedgraphtobigwig",
+              "umitools_dedup",
+              "umitools_extract",
+              "untar"
+            ]
+          }
+        },
+        {
+          "tag_name": "3.6",
+          "published_at": "2022-03-04T13:46:29Z",
+          "tag_sha": "7106bd792b3fb04f9f09b4e737165fa4e736ea81",
+          "has_schema": true,
+          "doc_files": [
+            "docs/output.md",
+            "docs/usage.md"
+          ],
+          "components": {
+            "modules": [
+              "bbmap_bbsplit",
+              "cat_fastq",
+              "custom_dumpsoftwareversions",
+              "custom_getchromsizes",
+              "fastqc",
+              "gffread",
+              "gunzip",
+              "hisat2_align",
+              "hisat2_build",
+              "hisat2_extractsplicesites",
+              "picard_markduplicates",
+              "preseq_lcextrap",
+              "qualimap_rnaseq",
+              "rsem_calculateexpression",
+              "rsem_preparereference",
+              "rseqc_bamstat",
+              "rseqc_inferexperiment",
+              "rseqc_innerdistance",
+              "rseqc_junctionannotation",
+              "rseqc_junctionsaturation",
+              "rseqc_readdistribution",
+              "rseqc_readduplication",
+              "rseqc_tin",
+              "salmon_index",
+              "salmon_quant",
+              "samtools_flagstat",
+              "samtools_idxstats",
+              "samtools_index",
+              "samtools_sort",
+              "samtools_stats",
+              "sortmerna",
+              "stringtie_stringtie",
+              "subread_featurecounts",
+              "trimgalore",
+              "ucsc_bedclip",
+              "ucsc_bedgraphtobigwig",
+              "umitools_dedup",
+              "umitools_extract",
+              "untar"
+            ]
+          }
+        },
+        {
+          "tag_name": "3.5",
+          "published_at": "2021-12-17T16:08:03Z",
+          "tag_sha": "646723c70f04ee6d66391758b02822d4f0fe2966",
+          "has_schema": true,
+          "doc_files": [
+            "docs/output.md",
+            "docs/usage.md"
+          ],
+          "components": {
+            "modules": [
+              "bbmap_bbsplit",
+              "cat_fastq",
+              "custom_dumpsoftwareversions",
+              "fastqc",
+              "gffread",
+              "gunzip",
+              "hisat2_align",
+              "hisat2_build",
+              "hisat2_extractsplicesites",
+              "picard_markduplicates",
+              "preseq_lcextrap",
+              "qualimap_rnaseq",
+              "rsem_calculateexpression",
+              "rsem_preparereference",
+              "rseqc_bamstat",
+              "rseqc_inferexperiment",
+              "rseqc_innerdistance",
+              "rseqc_junctionannotation",
+              "rseqc_junctionsaturation",
+              "rseqc_readdistribution",
+              "rseqc_readduplication",
+              "rseqc_tin",
+              "salmon_index",
+              "salmon_quant",
+              "samtools_flagstat",
+              "samtools_idxstats",
+              "samtools_index",
+              "samtools_sort",
+              "samtools_stats",
+              "sortmerna",
+              "stringtie_stringtie",
+              "subread_featurecounts",
+              "trimgalore",
+              "ucsc_bedclip",
+              "ucsc_bedgraphtobigwig",
+              "umitools_dedup",
+              "umitools_extract",
+              "untar"
+            ]
+          }
+        },
+        {
+          "tag_name": "3.4",
+          "published_at": "2021-10-05T13:46:22Z",
+          "tag_sha": "964425e3fd8bfc3dc7bce43279a98d17a874d3f7",
+          "has_schema": true,
+          "doc_files": [
+            "docs/output.md",
+            "docs/usage.md"
+          ],
+          "components": {
+            "modules": [
+              "bbmap_bbsplit",
+              "cat_fastq",
+              "custom_dumpsoftwareversions",
+              "fastqc",
+              "gffread",
+              "gunzip",
+              "hisat2_align",
+              "hisat2_build",
+              "hisat2_extractsplicesites",
+              "picard_markduplicates",
+              "preseq_lcextrap",
+              "qualimap_rnaseq",
+              "rsem_calculateexpression",
+              "rsem_preparereference",
+              "rseqc_bamstat",
+              "rseqc_inferexperiment",
+              "rseqc_innerdistance",
+              "rseqc_junctionannotation",
+              "rseqc_junctionsaturation",
+              "rseqc_readdistribution",
+              "rseqc_readduplication",
+              "salmon_index",
+              "salmon_quant",
+              "samtools_flagstat",
+              "samtools_idxstats",
+              "samtools_index",
+              "samtools_sort",
+              "samtools_stats",
+              "sortmerna",
+              "stringtie_stringtie",
+              "subread_featurecounts",
+              "trimgalore",
+              "ucsc_bedclip",
+              "ucsc_bedgraphtobigwig",
+              "umitools_dedup",
+              "umitools_extract",
+              "untar"
+            ]
+          }
+        },
+        {
+          "tag_name": "3.3",
+          "published_at": "2021-07-29T13:24:52Z",
+          "tag_sha": "8094c42add6dcdf69ce54dfdec957789c37ae903",
+          "has_schema": true,
+          "doc_files": [
+            "docs/output.md",
+            "docs/usage.md"
+          ],
+          "components": {
+            "modules": [
+              "cat_fastq",
+              "fastqc",
+              "gffread",
+              "gunzip",
+              "hisat2_align",
+              "hisat2_build",
+              "hisat2_extractsplicesites",
+              "picard_markduplicates",
+              "preseq_lcextrap",
+              "qualimap_rnaseq",
+              "rsem_calculateexpression",
+              "rsem_preparereference",
+              "rseqc_bamstat",
+              "rseqc_inferexperiment",
+              "rseqc_innerdistance",
+              "rseqc_junctionannotation",
+              "rseqc_junctionsaturation",
+              "rseqc_readdistribution",
+              "rseqc_readduplication",
+              "salmon_index",
+              "salmon_quant",
+              "samtools_flagstat",
+              "samtools_idxstats",
+              "samtools_index",
+              "samtools_sort",
+              "samtools_stats",
+              "sortmerna",
+              "star_align",
+              "star_genomegenerate",
+              "stringtie_stringtie",
+              "subread_featurecounts",
+              "trimgalore",
+              "ucsc_bedclip",
+              "ucsc_bedgraphtobigwig",
+              "umitools_dedup",
+              "umitools_extract",
+              "untar"
+            ]
+          }
+        },
+        {
+          "tag_name": "3.2",
+          "published_at": "2021-06-18T13:59:37Z",
+          "tag_sha": "b3ff92bc54363faf17d820689a8e9074ffd99045",
+          "has_schema": true,
+          "doc_files": [
+            "docs/output.md",
+            "docs/usage.md"
+          ]
+        },
+        {
+          "tag_name": "3.1",
+          "published_at": "2021-05-13T13:02:56Z",
+          "tag_sha": "0fcbb0ac491ecb8a80ef879c4f3dad5f869021f9",
+          "has_schema": true,
+          "doc_files": [
+            "docs/output.md",
+            "docs/usage.md"
+          ]
+        },
+        {
+          "tag_name": "3.0",
+          "published_at": "2020-12-15T16:22:27Z",
+          "tag_sha": "3643a94411b65f42bce5357c5015603099556ad9",
+          "has_schema": true,
+          "doc_files": [
+            "docs/output.md",
+            "docs/usage.md"
+          ]
+        },
+        {
+          "tag_name": "2.0",
+          "published_at": "2020-11-12T20:01:34Z",
+          "tag_sha": "bc5fc76f40b2da6082a854927184c9d6e5060393",
+          "has_schema": true,
+          "doc_files": [
+            "docs/output.md",
+            "docs/usage.md"
+          ]
+        },
+        {
+          "tag_name": "1.4.2",
+          "published_at": "2019-10-18T10:51:00Z",
+          "tag_sha": "3b6df9bd104927298fcdf69e97cca7ff1f80527c",
+          "has_schema": false,
+          "doc_files": [
+            "docs/output.md",
+            "docs/usage.md"
+          ]
+        },
+        {
+          "tag_name": "1.4.1",
+          "published_at": "2019-10-17T17:40:46Z",
+          "tag_sha": "f213557a0851d3f897efb1faeb3e54e8eee1424c",
+          "has_schema": false,
+          "doc_files": [
+            "docs/output.md",
+            "docs/usage.md"
+          ]
+        },
+        {
+          "tag_name": "1.4",
+          "published_at": "2019-10-15T13:11:57Z",
+          "tag_sha": "55eee0c01c36db013d1dcbe6a4e65b407c358f0f",
+          "has_schema": false,
+          "doc_files": [
+            "docs/output.md",
+            "docs/usage.md"
+          ]
+        },
+        {
+          "tag_name": "1.3",
+          "published_at": "2019-03-26T20:04:29Z",
+          "tag_sha": "37f260d360e59df7166cfd60e2b3c9a3999adf75",
+          "has_schema": false,
+          "doc_files": [
+            "docs/output.md",
+            "docs/usage.md"
+          ]
+        },
+        {
+          "tag_name": "1.2",
+          "published_at": "2018-12-12T16:44:28Z",
+          "tag_sha": "e8376373da8c1dfb0cae5372947cf5b241056076",
+          "has_schema": false,
+          "doc_files": [
+            "docs/output.md",
+            "docs/usage.md"
+          ]
+        },
+        {
+          "tag_name": "1.1",
+          "published_at": "2018-10-05T22:20:27Z",
+          "tag_sha": "1cd5ab733a35727b01370de2ae8462d65f57fbb9",
+          "has_schema": false,
+          "doc_files": [
+            "docs/output.md",
+            "docs/usage.md"
+          ]
+        },
+        {
+          "tag_name": "1.0",
+          "published_at": "2018-08-20T16:39:10Z",
+          "tag_sha": "44f1525d7adfa3a6afcafdcf7730eca78a1a2511",
+          "has_schema": false,
+          "doc_files": [
+            "docs/output.md",
+            "docs/usage.md"
+          ]
+        },
+        {
+          "tag_name": "dev",
+          "published_at": "2024-01-04T11:18:39Z",
+          "tag_sha": "63df1d7fd7f25bc9d65400ed7fabe3d6b734e690",
+          "has_schema": true,
+          "doc_files": [
+            "docs/output.md",
+            "docs/usage.md"
+          ],
+          "components": {
+            "modules": [
+              "bbmap_bbsplit",
+              "cat_fastq",
+              "custom_dumpsoftwareversions",
+              "custom_getchromsizes",
+              "fastp",
+              "fastqc",
+              "fq_subsample",
+              "gffread",
+              "gunzip",
+              "hisat2_align",
+              "hisat2_build",
+              "hisat2_extractsplicesites",
+              "kallisto_index",
+              "kallisto_quant",
+              "picard_markduplicates",
+              "preseq_lcextrap",
+              "qualimap_rnaseq",
+              "rsem_calculateexpression",
+              "rsem_preparereference",
+              "rseqc_bamstat",
+              "rseqc_inferexperiment",
+              "rseqc_innerdistance",
+              "rseqc_junctionannotation",
+              "rseqc_junctionsaturation",
+              "rseqc_readdistribution",
+              "rseqc_readduplication",
+              "rseqc_tin",
+              "salmon_index",
+              "salmon_quant",
+              "samtools_flagstat",
+              "samtools_idxstats",
+              "samtools_index",
+              "samtools_sort",
+              "samtools_stats",
+              "sortmerna",
+              "star_align",
+              "star_genomegenerate",
+              "stringtie_stringtie",
+              "subread_featurecounts",
+              "trimgalore",
+              "ucsc_bedclip",
+              "ucsc_bedgraphtobigwig",
+              "umitools_dedup",
+              "umitools_extract",
+              "untar"
+            ],
+            "subworkflows": [
+              "bam_dedup_stats_samtools_umitools",
+              "bam_markduplicates_picard",
+              "bam_rseqc",
+              "bam_sort_stats_samtools",
+              "bam_stats_samtools",
+              "bedgraph_bedclip_bedgraphtobigwig",
+              "fastq_align_hisat2",
+              "fastq_fastqc_umitools_fastp",
+              "fastq_fastqc_umitools_trimgalore",
+              "fastq_subsample_fq_salmon"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
