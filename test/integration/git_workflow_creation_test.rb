@@ -315,7 +315,7 @@ class GitWorkflowCreationTest < ActionDispatch::IntegrationTest
 
   test 'can extract source metadata using original URL for galaxy workflow' do
     mock_remote_file "#{Rails.root}/test/fixtures/files/workflows/1-PreProcessing.ga",
-                     'http://galaxy.instance/workflow/export_to_file?id=abcdxyz',
+                     'http://galaxy.instance/api/workflows/abcdxyz/download?format=json-download',
                      { 'content-disposition' => 'attachment; filename="1-PreProcessing.ga"'}
 
     repo_count = Git::Repository.count
@@ -334,7 +334,7 @@ class GitWorkflowCreationTest < ActionDispatch::IntegrationTest
         assert_no_difference('Task.count') do
           post create_from_files_workflows_path, params: {
             ro_crate: {
-              main_workflow: { data_url: 'http://galaxy.instance/workflows/?id=abcdxyz' },
+              main_workflow: { data_url: 'http://galaxy.instance/workflows/run?id=abcdxyz' },
             },
             workflow_class_id: galaxy.id
           } # Should go to metadata page...
@@ -346,7 +346,7 @@ class GitWorkflowCreationTest < ActionDispatch::IntegrationTest
     assert_select 'input[name="workflow[title]"]', count: 1
     a = assigns(:workflow).git_version.remote_source_annotations
     assert_equal 1, a.length
-    assert_equal 'http://galaxy.instance/workflows/?id=abcdxyz', a.first.value
+    assert_equal 'http://galaxy.instance/workflows/run?id=abcdxyz', a.first.value
     assert_equal  '1-PreProcessing.ga', a.first.path
     assert_equal 'http://galaxy.instance/', assigns(:workflow).execution_instance_url
     assert_select '#workflow_execution_instance_url[value=?]', 'http://galaxy.instance/'
@@ -367,7 +367,7 @@ class GitWorkflowCreationTest < ActionDispatch::IntegrationTest
                 ref: 'refs/heads/master',
                 main_workflow_path: '1-PreProcessing.ga',
                 remote_sources: {
-                  '1-PreProcessing.ga' => 'http://galaxy.instance/workflows/?id=abcdxyz'
+                  '1-PreProcessing.ga' => 'http://galaxy.instance/workflows/run?id=abcdxyz'
                 }
               }
             }
@@ -383,7 +383,7 @@ class GitWorkflowCreationTest < ActionDispatch::IntegrationTest
     refute assigns(:workflow).latest_git_version.git_repository.remote?
     assert_equal assigns(:workflow), assigns(:workflow).latest_git_version.git_repository.resource
     assert assigns(:workflow).latest_git_version.get_blob('1-PreProcessing.ga').remote?
-    assert_equal({ '1-PreProcessing.ga' => 'http://galaxy.instance/workflows/?id=abcdxyz' },
+    assert_equal({ '1-PreProcessing.ga' => 'http://galaxy.instance/workflows/run?id=abcdxyz' },
                  assigns(:workflow).latest_git_version.remote_sources)
     assert_equal 'http://galaxy.instance/', assigns(:workflow).latest_git_version.execution_instance_url
 
