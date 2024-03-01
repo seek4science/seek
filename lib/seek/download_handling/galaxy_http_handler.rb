@@ -11,7 +11,7 @@ module Seek
       attr_reader :galaxy_host, :workflow_id
 
       URL_PATTERNS = [
-        /(.+)\/api\/workflows\/([^\/]+)\/download?format=json-download/, # Download
+        /(.+)\/api\/workflows\/([^\/]+)\/download\?format=json-download/, # Download
         /(.+)\/workflows\/run\?id=([^&]+)/, # Run
         /(.+)\/published\/workflow\?id=([^&]+)/, # View
       ].freeze
