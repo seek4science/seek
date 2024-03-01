@@ -119,7 +119,7 @@
 
   $j(document).ready(function () {
     // Auto select projects from params[:project_ids] or params[resource][:project_ids] if this is a new object
-    <% if resource &.new_record? %>
+    <% if resource&.new_record? %>
       <% project_ids = (params[:project_ids] || params.dig(controller_name.singularize, :project_ids) || []).compact_blank %>
       <% project_ids.each do |project_id| %>
         Sharing.projectsSelector.add(<%= project_id %>, true);
