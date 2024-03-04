@@ -1,25 +1,50 @@
 module BioInd
   module FairData
     class Base
-      attr_reader :identifier
+      attr_reader :resource_uri
       attr_reader :graph
       attr_reader :children
 
-      def initialize(identifier, graph)
-        @identifier = identifier
+      def initialize(resource_uri, graph)
+        @resource_uri = resource_uri
         @graph = graph
         @jerm = RDF::Vocabulary.new("http://jermontology.org/ontology/JERMOntology#")
+        @schema = RDF::Vocabulary.new("http://schema.org/")
         @children = []
+      end
+
+      def identifier
+        find_annotation_value(@schema.identifier.to_s)
+      end
+
+      def title
+        find_annotation_value(@schema.title) || find_annotation_value(@schema.name)
+      end
+
+      def description
+        find_annotation_value(@schema.description)
       end
 
       def annotations
         sparql = SPARQL::Client.new(graph)
         query = sparql.select.where(
-          [identifier, :type, :value]
+          [resource_uri, :type, :value]
         )
 
         query.execute.collect do |prop|
           [prop.type.to_s, prop.value.to_s]
+        end
+      end
+
+      def find_annotation_value(property)
+        annotations.detect do |ann|
+          ann[0] == property
+        end&.[](1)
+      end
+
+      def pp_annotations
+        annotations.sort_by{|a| a[0]}.each do |pair|
+          pp "#{pair[0]} -> #{pair[1]}"
         end
       end
 
@@ -37,7 +62,7 @@ module BioInd
       def fetch_children
         sparql = SPARQL::Client.new(graph)
         query = sparql.select.where(
-          [identifier, @jerm.hasPart, :child]
+          [resource_uri, @jerm.hasPart, :child]
         )
 
         query.execute.collect do |solution|
