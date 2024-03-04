@@ -1,15 +1,13 @@
 module BioInd
   module FairData
     class Base
-      attr_reader :resource_uri
-      attr_reader :graph
-      attr_reader :children
+      attr_reader :resource_uri, :graph, :children
 
       def initialize(resource_uri, graph)
         @resource_uri = resource_uri
         @graph = graph
-        @jerm = RDF::Vocabulary.new("http://jermontology.org/ontology/JERMOntology#")
-        @schema = RDF::Vocabulary.new("http://schema.org/")
+        @jerm = RDF::Vocabulary.new('http://jermontology.org/ontology/JERMOntology#')
+        @schema = RDF::Vocabulary.new('http://schema.org/')
         @children = []
       end
 
@@ -43,7 +41,7 @@ module BioInd
       end
 
       def pp_annotations
-        annotations.sort_by{|a| a[0]}.each do |pair|
+        annotations.sort_by { |a| a[0] }.each do |pair|
           pp "#{pair[0]} -> #{pair[1]}"
         end
       end
@@ -75,11 +73,8 @@ module BioInd
           [resource_uri, @jerm.hasPart, :child]
         )
 
-        query.execute.collect do |solution|
-          solution.child
-        end
+        query.execute.collect(&:child)
       end
-
     end
   end
 end

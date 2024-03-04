@@ -1,8 +1,7 @@
 module BioInd
   module FairData
     class Investigation < Base
-
-      alias_method :studies, :children
+      alias studies children
 
       def child_class
         BioInd::FairData::Study

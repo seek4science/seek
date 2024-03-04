@@ -1,8 +1,7 @@
 module BioInd
   module FairData
     class ObservationUnit < Base
-
-      alias_method :samples, :children
+      alias samples children
 
       def child_class
         BioInd::FairData::Sample
