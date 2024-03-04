@@ -59,6 +59,16 @@ module BioInd
         @children.last.populate
       end
 
+      def datasets
+        sparql = SPARQL::Client.new(graph)
+        query = sparql.select.where(
+          [resource_uri, @schema.dataset, :dataset]
+        )
+        query.execute.collect do |solution|
+          BioInd::FairData::DataSet.new(solution.dataset, graph)
+        end
+      end
+
       def fetch_children
         sparql = SPARQL::Client.new(graph)
         query = sparql.select.where(

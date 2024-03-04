@@ -52,6 +52,8 @@ class FairDataReaderTest < ActiveSupport::TestCase
     sample = obs_unit.samples.first
     assay = sample.assays.first
 
+    assay.pp_annotations
+
     assert_equal 'HIV-1 infected individuals in Ghana', inv.title
     assert_equal 'Exploration of HIV-1 infected individuals in Ghana', inv.description
 
@@ -66,6 +68,26 @@ class FairDataReaderTest < ActiveSupport::TestCase
 
     assert_nil assay.title
     assert_equal 'Illumina MiSeq paired end sequencing of SAMD00244451', assay.description
+  end
+
+  test 'datasets' do
+    path = "#{Rails.root}/test/fixtures/files/fairdatastation/demo.ttl"
+
+    inv = BioInd::FairData::Reader.parse_graph(path).first
+    study = inv.studies.first
+    obs_unit = study.observation_units.first
+    sample = obs_unit.samples.first
+    assay = sample.assays.first
+
+    datasets = assay.datasets
+    assert_equal 2, datasets.count
+    assert_equal ["DRR243856_1.fastq.gz", "DRR243856_2.fastq.gz"], datasets.collect(&:identifier).sort
+    assert_equal ["demultiplexed forward file", "demultiplexed reverse file"], datasets.collect(&:description).sort
+
+    assert_equal 0, inv.datasets.count
+    assert_equal 0, study.datasets.count
+    assert_equal 0, obs_unit.datasets.count
+    assert_equal 0, sample.datasets.count
   end
 
 end
