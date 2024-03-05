@@ -27,7 +27,7 @@ class Study < ApplicationRecord
 
   has_and_belongs_to_many :sample_types
 
-  validates :investigation, presence: { :message => "is blank or invalid" }, projects: true
+  validates :investigation, presence: { :message => "is blank or invalid" }
 
   enforce_authorization_on_association :investigation, :view
 

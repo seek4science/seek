@@ -75,6 +75,10 @@ module BioInd
 
         query.execute.collect(&:child)
       end
+
+      def seek_attributes
+        {title: title, description: description}
+      end
     end
   end
 end

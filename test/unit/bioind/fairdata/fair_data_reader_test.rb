@@ -92,4 +92,37 @@ class FairDataReaderTest < ActiveSupport::TestCase
     assert_equal 0, obs_unit.datasets.count
     assert_equal 0, sample.datasets.count
   end
+
+  test 'construct seek isa' do
+    path = "#{Rails.root}/test/fixtures/files/fairdatastation/demo.ttl"
+    inv = BioInd::FairData::Reader.parse_graph(path).first
+
+    contributor = FactoryBot.create(:person)
+    project = contributor.projects.first
+    FactoryBot.create(:experimental_assay_class)
+
+    investigation = BioInd::FairData::Reader.construct_isa(inv, contributor, [project])
+    studies = investigation.studies.to_a
+    assays = studies.first.assays.to_a
+
+    assert_equal 1, studies.count
+    assert_equal 9, assays.count
+
+    assert investigation.valid?
+    assert studies.first.valid?
+
+    pp assays.first.errors unless assays.first.valid?
+    assert assays.first.valid?
+
+    assert_difference('Investigation.count',1) do
+      assert_difference('Study.count',1) do
+        assert_difference('Assay.count', 9) do
+          User.with_current_user(contributor.user) do
+            investigation.save!
+          end
+        end
+      end
+    end
+
+  end
 end
