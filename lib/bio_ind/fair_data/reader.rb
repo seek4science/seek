@@ -5,6 +5,7 @@ require 'sparql/client'
 module BioInd
   module FairData
     class Reader
+
       def self.parse_graph(path)
         graph = RDF::Graph.load(path, format: :ttl)
         sparql = SPARQL::Client.new(graph)

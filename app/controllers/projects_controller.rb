@@ -18,7 +18,8 @@ class ProjectsController < ApplicationController
   before_action :find_requested_item, only: %i[show admin edit update destroy admin_members
                                                asset_report populate populate_from_spreadsheet
                                                admin_member_roles update_members storage_report
-                                               overview administer_join_request respond_join_request]
+                                               overview administer_join_request respond_join_request
+                                               import_from_fairdata_station submit_fairdata_station]
 
   before_action :has_spreadsheets, only: %i[:populate populate_from_spreadsheet]
 
@@ -192,6 +193,18 @@ class ProjectsController < ApplicationController
     respond_to do |format|
       format.html
     end
+  end
+
+  def submit_fairdata_station
+    path = params[:datastation_data].path
+    datadata_inv = BioInd::FairData::Reader.parse_graph(path)
+    @investigation = BioInd::FairData::Reader.construct_isa(datadata_inv.first, current_person, [@project])
+    @investigation.save!
+
+    respond_to do |format|
+      format.html { redirect_to(@investigation) }
+    end
+
   end
 
   def request_create

@@ -349,6 +349,8 @@ SEEK::Application.routes.draw do
       get :administer_join_request
       post :respond_join_request
       get :guided_join
+      get :import_from_fairdata_station
+      post :submit_fairdata_station
     end
     resources :programmes, :people, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows, :data_files, :presentations,
               :publications, :events, :sample_types, :samples, :specimens, :strains, :search, :organisms, :human_diseases, :documents, :file_templates, :placeholders, :collections, :templates, only: [:index]

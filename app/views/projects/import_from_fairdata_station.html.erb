@@ -1,0 +1,10 @@
+<%= render :partial => "general/page_title",:locals=>{:title=>"Import ISA from FAIRData Station for #{ t('Project') } #{link_to(@project.title, @project)}".html_safe} %>
+
+<%= form_tag submit_fairdata_station_project_path(@project), multipart: true do %>
+<p>
+
+  <%= file_field_tag "datastation_data" -%>
+
+  <%= submit_tag("Submit") %>
+</p>
+<% end %>

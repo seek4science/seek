@@ -5002,6 +5002,25 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'populate from fairdata station ttl' do
+
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+    login_as(person)
+
+    ttl_file = fixture_file_upload('fairdatastation/demo.ttl')
+
+    post :submit_fairdata_station, params: {id: project, datastation_data: ttl_file}
+
+    assert investigation = assigns(:investigation)
+    assert_redirected_to investigation
+
+    assert_equal person, investigation.contributor
+    assert_equal 1, investigation.studies.count
+    assert_equal 9, investigation.studies.first.assays.count
+
+  end
+
   private
 
   def check_project(project)
