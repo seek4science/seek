@@ -104,9 +104,11 @@ class FairDataReaderTest < ActiveSupport::TestCase
     investigation = BioInd::FairData::Reader.construct_isa(inv, contributor, [project])
     studies = investigation.studies.to_a
     assays = studies.first.assays.to_a
+    data_files = assays.first.assay_assets.to_a.collect(&:asset)
 
     assert_equal 1, studies.count
     assert_equal 9, assays.count
+    assert_equal 2, data_files.count
 
     assert investigation.valid?
     assert studies.first.valid?
@@ -114,11 +116,18 @@ class FairDataReaderTest < ActiveSupport::TestCase
     pp assays.first.errors unless assays.first.valid?
     assert assays.first.valid?
 
+    pp data_files.first.errors unless data_files.first.valid?
+    assert data_files.first.valid?
+
     assert_difference('Investigation.count',1) do
       assert_difference('Study.count',1) do
         assert_difference('Assay.count', 9) do
-          User.with_current_user(contributor.user) do
-            investigation.save!
+          assert_difference('AssayAsset.count', 18) do
+            assert_difference('DataFile.count', 18) do
+              User.with_current_user(contributor.user) do
+                investigation.save!
+              end
+            end
           end
         end
       end

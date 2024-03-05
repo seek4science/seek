@@ -32,7 +32,16 @@ module BioInd
           study = investigation.studies.build(study_attributes)
           datastation_study.assays.each do |datastation_assay|
             assay_attributes = datastation_assay.seek_attributes.merge({contributor: contributor, study:studies.last, assay_class: AssayClass.experimental})
-            study.assays.build(assay_attributes)
+            assay = study.assays.build(assay_attributes)
+            datastation_assay.datasets.each do |datastation_dataset|
+              blob = ContentBlob.new(url: datastation_dataset.resource_uri.to_s, original_filename: datastation_dataset.identifier )
+              data_file_attributes = datastation_dataset.seek_attributes.merge({
+                                                                                 contributor: contributor, projects: projects,
+                                                                                 content_blob: blob
+                                                                               })
+              df = DataFile.new(data_file_attributes)
+              assay.assay_assets.build(asset: df)
+            end
           end
         end
 
