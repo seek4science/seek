@@ -165,7 +165,7 @@ namespace :seek do
     investigations_updated = 0
     disable_authorization_checks do
       investigations_to_update = Study.joins(:investigation)
-                                      .where('investigations.is_isa_json_compliant = ?', false)
+                                   .where('investigations.is_isa_json_compliant IS NULL OR investigations.is_isa_json_compliant = ?', false)
                                       .select { |study| study.sample_types.any? }
                                       .map(&:investigation)
                                       .compact
