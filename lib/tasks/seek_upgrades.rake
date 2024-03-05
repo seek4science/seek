@@ -189,7 +189,7 @@ namespace :seek do
       # Previous ST should be second ST of study
       first_assays_in_stream = Assay.joins(:sample_type, study: :investigation)
                                     .where(assay_stream_id: nil, investigation: { is_isa_json_compliant: true })
-                                    .select { |a| a.previous_linked_sample_type == a.study.sample_types.second }
+                                 .select { |a| a.sample_type.previous_linked_sample_type == a.study.sample_types.second }
 
       first_assays_in_stream.map do |fas|
         stream_name = "Assay Stream - #{UUID.generate}"
@@ -212,7 +212,11 @@ namespace :seek do
           current_assay.update_column(:assay_stream_id, assay_stream.id)
 
           assay_position += 1
-          current_assay = current_assay.next_linked_child_assay
+          current_assay = if current_assay.sample_type.nil?
+                            nil
+                          else
+                            current_assay.sample_type.next_linked_sample_types.first&.assays&.first
+                          end
         end
         assay_streams_created += 1
       end
