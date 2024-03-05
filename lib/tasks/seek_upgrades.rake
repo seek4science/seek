@@ -16,6 +16,7 @@ namespace :seek do
     remove_ontology_attribute_type
     db:seed:007_sample_attribute_types
     db:seed:001_create_controlled_vocabs
+    db:seed:017_minimal_starter_isa_templates
     recognise_isa_json_compliant_items
     implement_assay_streams_for_isa_assays
   ]
