@@ -8,6 +8,7 @@ module Seek
       end
 
       def metadata
+        metadata = super
         galaxy_string = @io.read
         f = Tempfile.new('ga')
         f.binmode
@@ -21,13 +22,13 @@ module Seek
         end
         cf.rewind
         if status.success?
-          metadata = Seek::WorkflowExtractors::CWL.new(cf).metadata
+          metadata.merge!(Seek::WorkflowExtractors::CWL.new(cf).metadata)
         else
-          metadata = super
           metadata[:warnings] ||= []
           metadata[:warnings] << 'Unable to convert workflow to CWL, some metadata may be missing.'
           Rails.logger.error("Galaxy -> CWL conversion failed. Error was: #{err}")
         end
+
         galaxy = JSON.parse(galaxy_string)
 
         if galaxy.has_key?('name')

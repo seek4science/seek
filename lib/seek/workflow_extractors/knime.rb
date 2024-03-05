@@ -8,7 +8,7 @@ module Seek
       def metadata
         metadata = super
 
-        metadata.merge(parse_internal_workflow(extract_workflow))
+        metadata.merge!(parse_internal_workflow(extract_workflow))
 
         metadata
       end

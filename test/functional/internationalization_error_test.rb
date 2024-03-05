@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class InternationalizationTest < ActionController::TestCase
+class InternationalizationErrorTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
 

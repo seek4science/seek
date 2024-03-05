@@ -30,6 +30,9 @@ class Workflow < ApplicationRecord
 
   accepts_nested_attributes_for :workflow_data_files
 
+  has_one :execution_instance, -> { where(link_type: AssetLink::EXECUTION_INSTANCE) },
+          class_name: 'AssetLink', as: :asset, dependent: :destroy, inverse_of: :asset, autosave: true
+
   def initialize(*args)
     @extraction_errors = []
     @extraction_warnings = []
@@ -129,6 +132,10 @@ class Workflow < ApplicationRecord
 
     def source_link_url
       parent&.source_link&.url
+    end
+
+    def execution_instance_url
+      parent&.execution_instance&.url
     end
 
     def submit_to_life_monitor
@@ -235,6 +242,18 @@ class Workflow < ApplicationRecord
     v = find_version(ver)
     v.test_status = status
     v.save!
+  end
+
+  def execution_instance_url= url
+    (execution_instance || build_execution_instance).assign_attributes(url: url)
+
+    execution_instance.mark_for_destruction if url.blank?
+
+    url
+  end
+
+  def execution_instance_url
+    execution_instance&.url
   end
 
   has_filter maturity: Seek::Filtering::Filter.new(
