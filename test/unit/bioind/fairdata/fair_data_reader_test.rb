@@ -34,6 +34,15 @@ class FairDataReaderTest < ActiveSupport::TestCase
     assert_equal 'DRR243856', assay.identifier
   end
 
+  test 'annotations' do
+    path = "#{Rails.root}/test/fixtures/files/fairdatastation/demo.ttl"
+
+    study = BioInd::FairData::Reader.parse_graph(path).first.studies.first
+
+    assert_equal 14, study.annotations.count
+    assert_includes study.annotations, ["http://fairbydesign.nl/ontology/center_name", "NIID"]
+  end
+
   test 'study assays' do
     path = "#{Rails.root}/test/fixtures/files/fairdatastation/demo.ttl"
 
