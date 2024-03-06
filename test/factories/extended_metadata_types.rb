@@ -411,7 +411,19 @@ FactoryBot.define do
       a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Submission Alias', property_type_id:'http://fairbydesign.nl/ontology/submission_alias')
       a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Submission Lab Name', property_type_id:'http://fairbydesign.nl/ontology/submission_lab_name')
     end
+  end
 
+  factory(:fairdata_virtual_demo_assay_extended_metadata, class: ExtendedMetadataType) do
+    title {'Fair Data Station Virtual Demo'}
+    supported_type { 'Assay' }
+    after(:build) do |a|
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Facility', property_type_id:'http://fairbydesign.nl/ontology/facility')
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Forward Primer', property_type_id:'http://fairbydesign.nl/ontology/forwardPrimer')
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Instrument Model', property_type_id:'http://fairbydesign.nl/ontology/instrument_model')
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Library Selection', property_type_id:'http://fairbydesign.nl/ontology/library_selection')
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Library Source', property_type_id:'http://fairbydesign.nl/ontology/library_source')
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Library Strategy', property_type_id:'http://fairbydesign.nl/ontology/library_strategy')
+    end
   end
 
 end

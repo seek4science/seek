@@ -37,6 +37,10 @@ module BioInd
           datastation_study.assays.each do |datastation_assay|
             assay_attributes = datastation_assay.seek_attributes.merge({contributor: contributor, study:studies.last, assay_class: AssayClass.experimental})
             assay = study.assays.build(assay_attributes)
+            if emt = ExtendedMetadataType.where(title:'Fair Data Station Virtual Demo', supported_type: 'Assay').first
+              assay.extended_metadata = ExtendedMetadata.new(extended_metadata_type: emt)
+              datastation_assay.populate_extended_metadata(assay)
+            end
             datastation_assay.datasets.each do |datastation_dataset|
               blob = ContentBlob.new(url: datastation_dataset.resource_uri.to_s, original_filename: datastation_dataset.identifier )
               data_file_attributes = datastation_dataset.seek_attributes.merge({

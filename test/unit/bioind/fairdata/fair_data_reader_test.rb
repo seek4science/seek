@@ -63,6 +63,8 @@ class FairDataReaderTest < ActiveSupport::TestCase
     sample = obs_unit.samples.first
     assay = sample.assays.first
 
+    assay.pp_annotations
+
     assert_equal 'HIV-1 infected individuals in Ghana', inv.title
     assert_equal 'Exploration of HIV-1 infected individuals in Ghana', inv.description
 
@@ -145,7 +147,8 @@ class FairDataReaderTest < ActiveSupport::TestCase
   end
 
   test 'populate extended metadata' do
-    metadata_type = FactoryBot.create(:fairdata_virtual_demo_study_extended_metadata)
+    study_metadata_type = FactoryBot.create(:fairdata_virtual_demo_study_extended_metadata)
+    assay_metadata_type = FactoryBot.create(:fairdata_virtual_demo_assay_extended_metadata)
     FactoryBot.create(:experimental_assay_class)
 
     path = "#{Rails.root}/test/fixtures/files/fairdatastation/demo.ttl"
@@ -154,9 +157,9 @@ class FairDataReaderTest < ActiveSupport::TestCase
     project = contributor.projects.first
 
     investigation = BioInd::FairData::Reader.construct_isa(inv, contributor, [project])
-    study = investigation.studies.to_a.first
+    study = investigation.studies.first
     refute_nil study.extended_metadata
-    assert_equal metadata_type, study.extended_metadata.extended_metadata_type
+    assert_equal study_metadata_type, study.extended_metadata.extended_metadata_type
 
     assert_equal 'NIID', study.extended_metadata.get_attribute_value('Centre Name')
     assert_equal 'human gut metagenome', study.extended_metadata.get_attribute_value('Centre Project Name')
@@ -164,7 +167,19 @@ class FairDataReaderTest < ActiveSupport::TestCase
     assert_equal 'DRA010770', study.extended_metadata.get_attribute_value('Submission Accession')
     assert_equal 'DRA010770', study.extended_metadata.get_attribute_value('Submission Alias')
     assert_equal 'AIDS Research Center2022-8-31', study.extended_metadata.get_attribute_value('Submission Lab Name')
-    assert_difference('ExtendedMetadata.count', 1) do
+
+    assay = study.assays.first
+    refute_nil assay.extended_metadata
+    assert_equal assay_metadata_type, assay.extended_metadata.extended_metadata_type
+
+    assert_equal 'NMIMR', assay.extended_metadata.get_attribute_value('Facility')
+    assert_equal 'CCTACGGGNGGCWGCAG', assay.extended_metadata.get_attribute_value('Forward Primer')
+    assert_equal 'Illumina MiSeq', assay.extended_metadata.get_attribute_value('Instrument Model')
+    assert_equal 'PCR', assay.extended_metadata.get_attribute_value('Library Selection')
+    assert_equal 'METAGENOMIC', assay.extended_metadata.get_attribute_value('Library Source')
+    assert_equal 'AMPLICON', assay.extended_metadata.get_attribute_value('Library Strategy')
+
+    assert_difference('ExtendedMetadata.count', 10) do
       User.with_current_user(contributor.user) do
         study.save!
       end
