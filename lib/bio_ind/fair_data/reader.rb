@@ -30,6 +30,10 @@ module BioInd
         datastation_inv.studies.each do |datastation_study|
           study_attributes = datastation_study.seek_attributes.merge({contributor: contributor, investigation: investigation})
           study = investigation.studies.build(study_attributes)
+          if emt = ExtendedMetadataType.where(title:'Fair Data Station Virtual Demo', supported_type: 'Study').first
+            study.extended_metadata = ExtendedMetadata.new(extended_metadata_type: emt)
+            datastation_study.populate_extended_metadata(study)
+          end
           datastation_study.assays.each do |datastation_assay|
             assay_attributes = datastation_assay.seek_attributes.merge({contributor: contributor, study:studies.last, assay_class: AssayClass.experimental})
             assay = study.assays.build(assay_attributes)

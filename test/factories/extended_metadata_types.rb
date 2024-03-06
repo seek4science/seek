@@ -385,6 +385,8 @@ FactoryBot.define do
     association :linked_extended_metadata_type, factory: :study_sites_extended_metadata_type
   end
 
+
+
   factory(:study_extended_metadata_type,class:ExtendedMetadataType) do
     title { 'study_model' }
     supported_type { 'Study' }
@@ -392,6 +394,24 @@ FactoryBot.define do
       a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute,required: true)
       a.extended_metadata_attributes << FactoryBot.create(:study_sites_linked_extended_metadata_attribute_multi_attribute)
     end
+  end
+
+  factory(:extended_metadata_attribute, class:ExtendedMetadataAttribute) do
+
+  end
+
+  factory(:fairdata_virtual_demo_study_extended_metadata, class: ExtendedMetadataType) do
+    title {'Fair Data Station Virtual Demo'}
+    supported_type { 'Study' }
+    after(:build) do |a|
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Centre Name', property_type_id:'http://fairbydesign.nl/ontology/center_name')
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Centre Project Name', property_type_id:'http://fairbydesign.nl/ontology/center_project_name')
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'External Ids', property_type_id:'http://fairbydesign.nl/ontology/external_ids')
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Submission Accession', property_type_id:'http://fairbydesign.nl/ontology/submission_accession')
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Submission Alias', property_type_id:'http://fairbydesign.nl/ontology/submission_alias')
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Submission Lab Name', property_type_id:'http://fairbydesign.nl/ontology/submission_lab_name')
+    end
+
   end
 
 end

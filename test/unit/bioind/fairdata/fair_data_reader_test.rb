@@ -77,7 +77,7 @@ class FairDataReaderTest < ActiveSupport::TestCase
     assert_equal 'sample DRS176892', sample.title
     assert_equal 'Sample obtained from Single age 30 collected on 2017-09-13 from the human gut', sample.description
 
-    assert_nil assay.title
+    assert_equal 'Assay - DRR243856', assay.title
     assert_equal 'Illumina MiSeq paired end sequencing of SAMD00244451', assay.description
   end
 
@@ -128,8 +128,8 @@ class FairDataReaderTest < ActiveSupport::TestCase
     pp data_files.first.errors unless data_files.first.valid?
     assert data_files.first.valid?
 
-    assert_difference('Investigation.count',1) do
-      assert_difference('Study.count',1) do
+    assert_difference('Investigation.count', 1) do
+      assert_difference('Study.count', 1) do
         assert_difference('Assay.count', 9) do
           assert_difference('AssayAsset.count', 18) do
             assert_difference('DataFile.count', 18) do
@@ -142,5 +142,32 @@ class FairDataReaderTest < ActiveSupport::TestCase
       end
     end
 
+  end
+
+  test 'populate extended metadata' do
+    metadata_type = FactoryBot.create(:fairdata_virtual_demo_study_extended_metadata)
+    FactoryBot.create(:experimental_assay_class)
+
+    path = "#{Rails.root}/test/fixtures/files/fairdatastation/demo.ttl"
+    inv = BioInd::FairData::Reader.parse_graph(path).first
+    contributor = FactoryBot.create(:person)
+    project = contributor.projects.first
+
+    investigation = BioInd::FairData::Reader.construct_isa(inv, contributor, [project])
+    study = investigation.studies.to_a.first
+    refute_nil study.extended_metadata
+    assert_equal metadata_type, study.extended_metadata.extended_metadata_type
+
+    assert_equal 'NIID', study.extended_metadata.get_attribute_value('Centre Name')
+    assert_equal 'human gut metagenome', study.extended_metadata.get_attribute_value('Centre Project Name')
+    assert_equal 'PRJDB10485', study.extended_metadata.get_attribute_value('External Ids')
+    assert_equal 'DRA010770', study.extended_metadata.get_attribute_value('Submission Accession')
+    assert_equal 'DRA010770', study.extended_metadata.get_attribute_value('Submission Alias')
+    assert_equal 'AIDS Research Center2022-8-31', study.extended_metadata.get_attribute_value('Submission Lab Name')
+    assert_difference('ExtendedMetadata.count', 1) do
+      User.with_current_user(contributor.user) do
+        study.save!
+      end
+    end
   end
 end

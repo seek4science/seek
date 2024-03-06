@@ -79,6 +79,20 @@ module BioInd
       def seek_attributes
         {title: title, description: description}
       end
+
+      def populate_extended_metadata(seek_resource)
+        extended_metadata_type = seek_resource.extended_metadata.extended_metadata_type
+        data = {}
+        annotations.each do |annotation|
+          property = annotation[0]
+          value = annotation[1]
+          attribute = extended_metadata_type.extended_metadata_attributes.where(property_type_id: property).first
+          if attribute
+            data[attribute.title] = value
+          end
+        end
+        seek_resource.extended_metadata.data = data
+      end
     end
   end
 end
