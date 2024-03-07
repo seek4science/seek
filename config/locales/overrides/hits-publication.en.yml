@@ -1,0 +1,7 @@
+en:
+  project: &project Research Group
+  attributes:
+    project: *project
+    projects: Research Groups
+  activerecord:
+    project: *project

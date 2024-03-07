@@ -56,7 +56,7 @@ en:
   human_disease: "Human Disease"
 
   person: &person "Person"
-  project: &project "Research Group"
+  project: &project "Project"
   institution: &institution "Institution"
   programme: &programme "Programme"
   avatar: "Avatar"
