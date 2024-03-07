@@ -559,7 +559,7 @@ end
   def can_soft_delete_full_text?(user = User.current_user)
     return false if user.nil? || user.person.nil? || !Seek::Config.allow_publications_fulltext
     return true if user.is_admin?
-    contributor == can_edit(user) || projects.detect { |project| project.can_manage?(user) }.present?
+    contributor == can_edit?(user) || projects.detect { |project| project.can_manage?(user) }.present?
   end
 
   private
