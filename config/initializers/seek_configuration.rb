@@ -260,6 +260,8 @@ def load_seek_config_defaults!
   Seek::Config.default :life_monitor_ui_url, 'https://app.lifemonitor.eu/'
   Seek::Config.default :git_support_enabled, false
   Seek::Config.default :bio_tools_enabled, false
+  Seek::Config.default :allow_publications_fulltext, true
+  Seek::Config.default :allow_edit_of_registered_publ, true
 
   load_seek_testing_defaults! if Rails.env.test?
 end
