@@ -232,6 +232,10 @@ omniauth_github_enabled:
 omniauth_github_client_id:
 omniauth_github_secret:
   encrypt: true
+omniauth_oidc_enabled:
+omniauth_oidc_name:
+omniauth_oidc_settings:
+  encrypt: true
 ga4gh_trs_api_enabled:
 search_results_limit:
   convert: :to_i

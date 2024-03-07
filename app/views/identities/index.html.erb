@@ -10,6 +10,9 @@
     <% if Seek::Config.omniauth_github_enabled %>
       <li><%= link_to(t("login.github"), omniauth_authorize_path(:github), method: :post) -%></li>
     <% end %>
+    <% if Seek::Config.omniauth_oidc_enabled %>
+      <li><%= link_to(Seek::Config.omniauth_oidc_name, omniauth_authorize_path(:oidc), method: :post) -%></li>
+    <% end %>
   <% end %>
 </div>
 

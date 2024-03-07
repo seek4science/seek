@@ -90,6 +90,9 @@
       <% end %>
       </li>
     <% end %>
+    <% if show_oidc_login? %>
+      <li><%= link_to "Log in using #{Seek::Config.omniauth_oidc_name}", omniauth_authorize_path(:oidc, state: "return_to:/") %></li>
+    <% end %>
   </ul>
 <% end %>
 

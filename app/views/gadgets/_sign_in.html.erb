@@ -31,6 +31,11 @@
                 <a href="#github_login" aria-controls="github_login" role="tab" data-toggle="tab"><%= t('login.github') %></a>
               <% end %>
             <% end %>
+            <% if show_oidc_login? %>
+              <%= content_tag(:li, role: 'presentation', class: strategy == 'oidc' ? 'active' : nil) do %>
+                <a href="#oidc_login" aria-controls="oidc_login" role="tab" data-toggle="tab"><%= Seek::Config.omniauth_oidc_name %></a>
+              <% end %>
+            <% end %>
           </ul>
         <% end #omniauth enabled and providers available %>
 
@@ -80,6 +85,13 @@
               <%= content_tag(:div, id: 'github_login', role: 'tabpanel', class: strategy == 'github' ? 'tab-pane active' : 'tab-pane') do %>
                 <div class='text-center'>
                   <%= button_link_to 'Sign in with GitHub', 'github_large', omniauth_authorize_path(:github, state: "return_to:#{original_path}"), method: :post %>
+                </div>
+              <% end %>
+            <% end %>
+            <% if show_oidc_login? %>
+              <%= content_tag(:div, id: 'oidc_login', role: 'tabpanel', class: strategy == 'oidc' ? 'tab-pane active' : 'tab-pane') do %>
+                <div class='text-center'>
+                  <%= button_link_to Seek::Config.omniauth_oidc_name, 'lock', omniauth_authorize_path(:oidc, state: "return_to:#{original_path}"), method: :post %>
                 </div>
               <% end %>
             <% end %>

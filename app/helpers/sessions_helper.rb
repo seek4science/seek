@@ -47,4 +47,8 @@ module SessionsHelper
   def show_github_login?
     Seek::Config.omniauth_github_enabled
   end
+
+  def show_oidc_login?
+    Seek::Config.omniauth_oidc_enabled
+  end
 end

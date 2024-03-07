@@ -30,6 +30,8 @@ class SessionsController < ApplicationController
                            Seek::Config.omniauth_ldap_enabled
                          when 'elixir_aai'
                            Seek::Config.omniauth_elixir_aai_enabled
+                         when 'oidc'
+                           Seek::Config.omniauth_oidc_enabled
                          else
                            true
                          end
