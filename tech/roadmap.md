@@ -34,7 +34,7 @@ They are expected to be added to FAIRDOM-SEEK in roughly the order they are pres
 | Visible history log for Sample changes | Q4 2024 |
 | Improving search to support more advanced queries | Q4 2024 |
 | Improve usability of single page view | Q4 2024 |
-| ISA RO-Crate profile, along with updated snapshots and export | Q1 2025 |
+| ISA RO-Crate import and export support for compliant ISA-JSON | Q1 2025 |
 
 
 <br/>
