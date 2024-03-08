@@ -53,4 +53,18 @@
     <%= admin_password_setting(:omniauth_github_secret, Seek::Config.omniauth_github_secret,
                                'GitHub Secret', 'The secret key provided by GitHub for your installation.') %>
   </div>
+
+  <%= admin_checkbox_setting(:omniauth_oidc_enabled, 1, Seek::Config.omniauth_oidc_enabled,
+                             "#{t('login.oidc')} authentication", "Enables use of a #{t('login.oidc')} provider for authentication.",
+                             onchange: toggle_appear_javascript('omniauth_oidc_settings')) %>
+  <div id="omniauth_oidc_settings" class="additional_settings" style="<%= show_or_hide_block(Seek::Config.omniauth_oidc_enabled) -%>;">
+    <%= admin_text_setting(:omniauth_oidc_name, Seek::Config.omniauth_oidc_name,
+                           "#{t('login.oidc')} Name", "The name of this authentication method that will be displayed to users.") %>
+    <%= admin_text_setting(:omniauth_oidc_issuer, Seek::Config.omniauth_oidc_issuer,
+                           "#{t('login.oidc')} URL", "The base URL of the #{t('login.oidc')} provider. It is expected that the discovery endpoint <code>/.well-known/openid-configuration</code> exists under this URL.") %>
+    <%= admin_text_setting(:omniauth_oidc_client_id, Seek::Config.omniauth_oidc_client_id,
+                           "#{t('login.oidc')} Client ID", "The client ID to use to authenticate with the #{t('login.oidc')} provider.") %>
+    <%= admin_password_setting(:omniauth_oidc_secret, Seek::Config.omniauth_oidc_secret,
+                               "#{t('login.oidc')} Secret", "The secret to use to authenticate with the #{t('login.oidc')} provider.") %>
+  </div>
 </div>

@@ -94,6 +94,13 @@ class AdminController < ApplicationController
     Seek::Config.omniauth_github_client_id = params[:omniauth_github_client_id]
     Seek::Config.omniauth_github_secret = params[:omniauth_github_secret]
 
+    Seek::Config.omniauth_oidc_enabled = string_to_boolean params[:omniauth_oidc_enabled]
+    Seek::Config.omniauth_oidc_name = params[:omniauth_oidc_name]
+    params[:omniauth_oidc_issuer] = params[:omniauth_oidc_issuer].chomp('/') + '/' if params[:omniauth_oidc_issuer].present?
+    Seek::Config.omniauth_oidc_issuer = params[:omniauth_oidc_issuer]
+    Seek::Config.omniauth_oidc_client_id = params[:omniauth_oidc_client_id]
+    Seek::Config.omniauth_oidc_secret = params[:omniauth_oidc_secret]
+
     Seek::Config.solr_enabled = string_to_boolean params[:solr_enabled]
     Seek::Config.filtering_enabled = string_to_boolean params[:filtering_enabled]
     Seek::Config.jws_enabled = string_to_boolean params[:jws_enabled]

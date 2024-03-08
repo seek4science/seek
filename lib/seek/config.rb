@@ -378,24 +378,26 @@ module Seek
     def omniauth_oidc_config
       # Cannot use url helpers here because routes are not loaded at this point :( -Finn
       callback_path = 'identities/auth/oidc/callback'
-
-      omniauth_oidc_settings.merge(
-        {
-          callback_path: "#{Rails.application.config.relative_url_root}/#{callback_path}",
-          name: :oidc,
-          response_type: 'code',
-          discovery: true,
-          client_options: omniauth_oidc_settings.merge(
-            redirect_uri: site_base_url.join(callback_path).to_s)
-        })
+      {
+        callback_path: "#{Rails.application.config.relative_url_root}/#{callback_path}",
+        issuer: omniauth_oidc_issuer,
+        name: :oidc,
+        response_type: 'code',
+        discovery: true,
+        client_options: {
+          identifier: omniauth_oidc_client_id,
+          secret: omniauth_oidc_secret,
+          redirect_uri: site_base_url.join(callback_path).to_s
+        }
+      }
     end
 
     def omniauth_providers
-      providers = {}
-      providers[:ldap] = omniauth_ldap_config.merge(name: :ldap, form: SessionsController.action(:new)) if omniauth_ldap_enabled
-      providers[:openid_connect] = omniauth_elixir_aai_config if omniauth_elixir_aai_enabled
-      providers[:github] = omniauth_github_config if omniauth_github_enabled
-      providers[:oidc] = omniauth_oidc_config if omniauth_oidc_enabled
+      providers = []
+      providers << [:ldap, omniauth_ldap_config.merge(name: :ldap, form: SessionsController.action(:new))] if omniauth_ldap_enabled
+      providers << [:github, omniauth_github_config] if omniauth_github_enabled
+      providers << [:openid_connect, omniauth_elixir_aai_config] if omniauth_elixir_aai_enabled
+      providers << [:openid_connect, omniauth_oidc_config] if omniauth_oidc_enabled
       providers
     end
   end

@@ -51,4 +51,11 @@ module SessionsHelper
   def show_oidc_login?
     Seek::Config.omniauth_oidc_enabled
   end
+
+  def omniauth_method_name(key)
+    name = nil
+    name = Seek::Config.omniauth_oidc_name if key == :oidc
+    name = t("login.#{key}") if name.blank?
+    name
+  end
 end

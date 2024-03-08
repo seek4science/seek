@@ -234,7 +234,9 @@ omniauth_github_secret:
   encrypt: true
 omniauth_oidc_enabled:
 omniauth_oidc_name:
-omniauth_oidc_settings:
+omniauth_oidc_issuer:
+omniauth_oidc_client_id:
+omniauth_oidc_secret:
   encrypt: true
 ga4gh_trs_api_enabled:
 search_results_limit:

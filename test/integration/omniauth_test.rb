@@ -42,6 +42,16 @@ class OmniauthTest < ActionDispatch::IntegrationTest
             'email' => 'new_github_user@example.com'
         }
     })
+
+    @oidc_mock_auth = OmniAuth::AuthHash.new({
+        provider: 'oidc',
+        uid: 'google-auth2|357823572abcbde',
+        info: {
+            'nickname' => 'john_oidc',
+            'name' => 'New OIDC user',
+            'email' => 'new_oidc_user@example.com'
+        }
+    })
   end
 
   # This test is to support the legacy LDAP integration that matched users having the same SEEK and LDAP usernames
@@ -224,6 +234,32 @@ class OmniauthTest < ActionDispatch::IntegrationTest
     identity = user.identities.first
     assert_equal 'elixir_aai', identity.provider
     assert_equal 'new_elixir_aai_user', identity.uid
+    assert_match(/You have successfully registered your account, but you need to create a profile/, flash[:notice])
+  end
+
+  test 'should create and activate new OIDC user' do
+    OmniAuth.config.mock_auth[:oidc] = @oidc_mock_auth
+
+    assert_difference('User.count', 1) do
+      assert_difference('Identity.count', 1) do
+        post omniauth_authorize_path(:oidc)
+        follow_redirect! # OmniAuth callback
+        assert_redirected_to(/#{register_people_path}/)
+        follow_redirect! # New profile
+      end
+    end
+
+    assert_equal 'OIDC', assigns(:person).last_name
+    assert_equal 'New', assigns(:person).first_name
+    assert_equal 'new_oidc_user@example.com', assigns(:person).email
+    assert session[:user_id]
+    user = User.find_by_id(session[:user_id])
+    assert user
+    assert user.active?
+    assert_equal 1, user.identities.count
+    identity = user.identities.first
+    assert_equal 'oidc', identity.provider
+    assert_equal 'google-auth2|357823572abcbde', identity.uid
     assert_match(/You have successfully registered your account, but you need to create a profile/, flash[:notice])
   end
 
