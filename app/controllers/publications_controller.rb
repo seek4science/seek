@@ -149,7 +149,7 @@ class PublicationsController < ApplicationController
 
   def soft_delete_fulltext
     # replace this version as a new empty version
-    if @publication.can_soft_delete_full_text?
+    if @publication.can_delete?
       # create an empty version
       respond_to do |format|
         create_new_version 'Soft delete'
