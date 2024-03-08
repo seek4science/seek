@@ -354,7 +354,7 @@ class TemplatesControllerTest < ActionController::TestCase
       post :create, params: { template: bad_template_params }
       assert_response :unprocessable_entity
       assert_template :new
-      assert_select 'div#error_explanation'
+      assert_select 'div#error_explanation', text: /Linked Sample Type must be set if attribute type is Registered Sample/
     end
 
     sample_type = FactoryBot.create(:simple_sample_type, project_ids: @project_ids, contributor: @person)
@@ -450,6 +450,86 @@ class TemplatesControllerTest < ActionController::TestCase
       assert_redirected_to template_path(assigns(:template))
     end
 
+  end
+
+  test 'should not allow to create template with controlled vocabulary template attributes with no sample controlled vocabulary' do
+    source_isa_tag = FactoryBot.create(:source_isa_tag)
+    source_characteristic_isa_tag = FactoryBot.create(:source_characteristic_isa_tag)
+    source_attribute = {
+      pos: '1',
+      title: 'Source Name',
+      required: '1',
+      short_name: 'attribute1 short name',
+      ontology_version: '0.1.1',
+      description: 'attribute1 description',
+      isa_tag_id: source_isa_tag.id,
+      sample_attribute_type_id: @string_type.id,
+      is_title: '1',
+      _destroy: '0'
+    }
+
+    bad_controlled_vocab_attribute = {
+      pos: '2',
+      title: 'Correct registered sample attribute',
+      required: '1',
+      short_name: 'attribute2 short name',
+      ontology_version: '0.1.2',
+      description: 'attribute2 description',
+      isa_tag_id: source_characteristic_isa_tag,
+      sample_attribute_type_id: @controlled_vocab_type.id,
+      _destroy: '0'
+    }
+
+    bad_template_params = { title: 'Bad template',
+                            project_ids: @project_ids,
+                            level: 'study source',
+                            organism: 'any',
+                            version: '1.0.0',
+                            parent_id: nil,
+                            description: 'Template containing controlled vocabulary attributes with no sample controlled vocabulary',
+                            template_attributes_attributes: {
+                              '0' => source_attribute,
+                              '1' => bad_controlled_vocab_attribute
+                            } }
+
+    assert_no_difference('Template.count') do
+      post :create, params: { template: bad_template_params }
+      assert_response :unprocessable_entity
+      assert_template :new
+      assert_select 'div#error_explanation', text: /Controlled vocabulary must be set if attribute type is CV/
+    end
+
+    controlled_vocab = FactoryBot.create(:apples_sample_controlled_vocab)
+    correct_controlled_vocab_attribute = {
+      pos: '2',
+      title: 'Correct registered sample attribute',
+      required: '1',
+      short_name: 'attribute2 short name',
+      ontology_version: '0.1.2',
+      description: 'attribute2 description',
+      isa_tag_id: source_characteristic_isa_tag,
+      sample_attribute_type_id: @controlled_vocab_type.id,
+      sample_controlled_vocab_id: controlled_vocab.id,
+      _destroy: '0'
+    }
+
+    correct_source_template_params = { title: 'Correct source template',
+                                       project_ids: @project_ids,
+                                       level: 'study source',
+                                       organism: 'any',
+                                       version: '1.0.0',
+                                       parent_id: nil,
+                                       description: 'Template containing controlled vocabulary attributes with no linked sample type',
+                                       template_attributes_attributes: {
+                                         '0' => source_attribute,
+                                         '1' => correct_controlled_vocab_attribute
+                                       } }
+
+    assert_difference('Template.count', 1) do
+      post :create, params: { template: correct_source_template_params }
+      assert_response :redirect
+      assert_redirected_to template_path(assigns(:template))
+    end
   end
 
   def create_template_from_parent_template(parent_template, person= @person, linked_sample_type= nil)
