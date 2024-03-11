@@ -1447,10 +1447,13 @@ class PublicationsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'can soft-delete content_blob' do
-    publication = FactoryBot.create :max_publication, contributor: User.current_user.person
+  test 'can soft-delete content_blob if the user is submitter' do
+    person = FactoryBot.create(:person)
+    publication = FactoryBot.create :max_publication, contributor: person
 
-    login_as(User.current_user.person)
+    refute person.user.is_admin?
+
+    login_as(person)
 
     with_config_value(:allow_publications_fulltext, true) do
       assert_difference('Publication::Version.count', 1) do
