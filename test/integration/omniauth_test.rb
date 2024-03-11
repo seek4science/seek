@@ -367,7 +367,23 @@ class OmniauthTest < ActionDispatch::IntegrationTest
         assert_redirected_to(omniauth_failure_path(strategy: 'ldap', message: 'invalid_credentials'))
         follow_redirect!
 
-        assert_equal "LDAP authentication failure (Invalid username/password?)", flash[:error]
+        assert_equal "LDAP authentication failure (Invalid username/password)", flash[:error]
+        assert_select '#ldap_login.active'
+        assert_select '#password_login.active', count: 0
+      end
+    end
+  end
+
+  test 'LDAP auth failure should redirect to login page and show generic error if message not recognized' do
+    OmniAuth.config.mock_auth[:ldap] = 'blagjsdkgjsdfgi'
+
+    assert_no_difference('User.count') do
+      assert_no_difference('Identity.count') do
+        post omniauth_callback_path(:ldap)
+        assert_redirected_to(omniauth_failure_path(strategy: 'ldap', message: 'blagjsdkgjsdfgi'))
+        follow_redirect!
+
+        assert_equal "LDAP authentication failure", flash[:error]
         assert_select '#ldap_login.active'
         assert_select '#password_login.active', count: 0
       end
@@ -384,7 +400,7 @@ class OmniauthTest < ActionDispatch::IntegrationTest
         assert_redirected_to(omniauth_failure_path(strategy: 'elixir_aai', message: 'invalid_credentials'))
         follow_redirect!
 
-        assert_equal "LS Login authentication failure (Invalid username/password?)", flash[:error]
+        assert_equal "LS Login authentication failure (Invalid username/password)", flash[:error]
         assert_select '#elixir_aai_login.active'
         assert_select '#ldap_login.active', count: 0
         assert_select '#password_login.active', count: 0

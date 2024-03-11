@@ -45,7 +45,17 @@ class SessionsController < ApplicationController
   end
 
   def omniauth_failure
-    flash[:error] = "#{t("login.#{params[:strategy]}")} authentication failure (Invalid username/password?)"
+    failure_message = case params[:message]
+                      when 'invalid_credentials'
+                        'Invalid username/password'
+                      when 'missing_credentials'
+                        'Missing credentials'
+                      else
+                        nil
+                      end
+    error = "#{t("login.#{params[:strategy]}")} authentication failure"
+    error += " (#{failure_message})" if failure_message
+    flash[:error] = error
     respond_to do |format|
       format.html { render :new }
     end
