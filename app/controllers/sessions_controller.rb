@@ -56,6 +56,8 @@ class SessionsController < ApplicationController
     error = "#{t("login.#{params[:strategy]}")} authentication failure"
     error += " (#{failure_message})" if failure_message
     flash[:error] = error
+    # Ideally we would return to the original "return_to", prior to the error, but it gets lost somewhere along the way.
+    params[:return_to] = root_path
     respond_to do |format|
       format.html { render :new }
     end

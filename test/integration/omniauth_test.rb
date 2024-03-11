@@ -2,6 +2,7 @@ require 'test_helper'
 
 class OmniauthTest < ActionDispatch::IntegrationTest
   include AuthenticatedTestHelper
+  include HtmlHelper
 
   fixtures :users, :people
 
@@ -404,6 +405,8 @@ class OmniauthTest < ActionDispatch::IntegrationTest
         assert_select '#elixir_aai_login.active'
         assert_select '#ldap_login.active', count: 0
         assert_select '#password_login.active', count: 0
+        # Should override return_to, to avoid it redirecting back to the login form with garbled error message.
+        assert_select '#elixir_aai_login a[href=?]', omniauth_authorize_path(:elixir_aai, state: 'return_to:/')
       end
     end
   end
