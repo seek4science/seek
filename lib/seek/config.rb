@@ -392,6 +392,20 @@ module Seek
       }
     end
 
+    def omniauth_oidc_image
+      Avatar.find_by_id(omniauth_oidc_image_id) if omniauth_oidc_image_id
+    end
+
+    def omniauth_oidc_image= file
+      return if file.blank?
+      current = omniauth_oidc_image
+      omniauth_oidc_image.destroy! if current
+      avatar = Avatar.new(original_filename: file.original_filename, image_file: file, skip_owner_validation: true)
+      avatar.save!
+      self.omniauth_oidc_image_id = avatar.id
+      avatar
+    end
+
     def omniauth_providers
       providers = []
       providers << [:ldap, omniauth_ldap_config.merge(name: :ldap, form: SessionsController.action(:new))] if omniauth_ldap_enabled

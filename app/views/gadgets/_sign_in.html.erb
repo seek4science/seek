@@ -91,7 +91,7 @@
             <% if show_oidc_login? %>
               <%= content_tag(:div, id: 'oidc_login', role: 'tabpanel', class: strategy == 'oidc' ? 'tab-pane active' : 'tab-pane') do %>
                 <div class='text-center'>
-                  <%= button_link_to Seek::Config.omniauth_oidc_name, 'lock', omniauth_authorize_path(:oidc, state: "return_to:#{original_path}"), method: :post %>
+                  <%= oidc_login_button(original_path) %>
                 </div>
               <% end %>
             <% end %>

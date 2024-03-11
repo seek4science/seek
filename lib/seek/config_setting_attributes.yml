@@ -234,6 +234,7 @@ omniauth_github_secret:
   encrypt: true
 omniauth_oidc_enabled:
 omniauth_oidc_name:
+omniauth_oidc_image_id:
 omniauth_oidc_issuer:
 omniauth_oidc_client_id:
 omniauth_oidc_secret:

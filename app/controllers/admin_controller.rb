@@ -96,6 +96,9 @@ class AdminController < ApplicationController
 
     Seek::Config.omniauth_oidc_enabled = string_to_boolean params[:omniauth_oidc_enabled]
     Seek::Config.omniauth_oidc_name = params[:omniauth_oidc_name]
+    Seek::Config.omniauth_oidc_image&.destroy! if params[:clear_omniauth_oidc_image] == '1'
+    Seek::Config.omniauth_oidc_image = params[:omniauth_oidc_image]
+
     params[:omniauth_oidc_issuer] = params[:omniauth_oidc_issuer].chomp('/') + '/' if params[:omniauth_oidc_issuer].present?
     Seek::Config.omniauth_oidc_issuer = params[:omniauth_oidc_issuer]
     Seek::Config.omniauth_oidc_client_id = params[:omniauth_oidc_client_id]
@@ -249,7 +252,7 @@ class AdminController < ApplicationController
 
     Seek::Config.header_image_enabled = string_to_boolean params[:header_image_enabled]
     Seek::Config.header_image_title = params[:header_image_title]
-    header_image_file
+    set_header_image_file
 
     Seek::Config.copyright_addendum_enabled = string_to_boolean params[:copyright_addendum_enabled]
     Seek::Config.copyright_addendum_content = params[:copyright_addendum_content]
@@ -556,7 +559,7 @@ class AdminController < ApplicationController
     end
   end
 
-  def header_image_file
+  def set_header_image_file
     if params[:header_image_file]
       file_io = params[:header_image_file]
       avatar = Avatar.new(original_filename: file_io.original_filename, image_file: file_io, skip_owner_validation: true)
@@ -621,23 +624,6 @@ class AdminController < ApplicationController
   end
 
   private
-
-  def created_at_data_for_model(model)
-    x = {}
-    start = '1 Nov 2008'
-
-    x[Date.parse(start).jd] = 0
-    x[Date.today.jd] = 0
-
-    model.order(:created_at).each do |i|
-      date = i.created_at.to_date
-      day = date.jd
-      x[day] ||= 0
-      x[day] += 1
-    end
-    sorted_keys = x.keys.sort
-    (sorted_keys.first..sorted_keys.last).map { |i| x[i].nil? ? 0 : x[i] }
-  end
 
   def check_valid_email(email_address, field)
     if email_address.blank? || email_address =~ /^([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})$/

@@ -60,6 +60,20 @@
   <div id="omniauth_oidc_settings" class="additional_settings" style="<%= show_or_hide_block(Seek::Config.omniauth_oidc_enabled) -%>;">
     <%= admin_text_setting(:omniauth_oidc_name, Seek::Config.omniauth_oidc_name,
                            "#{t('login.oidc')} Name", "The name of this authentication method that will be displayed to users.") %>
+    <%= admin_file_setting(:omniauth_oidc_image,
+                           "#{t('login.oidc')} Login Image", "An image to use as the login button for #{t('login.oidc')}.") %>
+    <% if Seek::Config.omniauth_oidc_image_id && (oidc_image = Avatar.find_by_id(Seek::Config.omniauth_oidc_image_id)) %>
+      <div>
+        Current image:<br/>
+        <%= image_tag(oidc_image.public_asset_url) %>
+        <div class="checkbox">
+          <label>
+            <%= check_box_tag(:clear_omniauth_oidc_image, '1', false) %>
+            Remove image?
+          </label>
+        </div>
+      </div>
+    <% end %>
     <%= admin_text_setting(:omniauth_oidc_issuer, Seek::Config.omniauth_oidc_issuer,
                            "#{t('login.oidc')} URL", "The base URL of the #{t('login.oidc')} provider. It is expected that the discovery endpoint <code>/.well-known/openid-configuration</code> exists under this URL.") %>
     <%= admin_text_setting(:omniauth_oidc_client_id, Seek::Config.omniauth_oidc_client_id,
