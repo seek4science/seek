@@ -507,4 +507,59 @@ class AssetTest < ActiveSupport::TestCase
       end
     end
   end
+
+  test 'content blobs flagged as deleted on destroy' do
+    [:data_file, :presentation, :sop, :document, :file_template, :workflow, :max_publication].each do |type|
+      asset = FactoryBot.create(type)
+      cb = asset.content_blob
+      refute cb.deleted?
+      refute_nil cb, "content blob nil for #{type}"
+      disable_authorization_checks do
+        asset.destroy
+      end
+      assert asset.destroyed?
+      cb.reload
+      assert cb.deleted?, "content blob not marked as deleted for #{type}"
+    end
+
+    [:max_model].each do |type|
+      asset = FactoryBot.create(type)
+      cbs = asset.content_blobs
+      cbs.each do |cb|
+        refute cb.deleted?
+      end
+      refute_empty cbs, "no content blobs for #{type}"
+      disable_authorization_checks do
+        asset.destroy
+      end
+      assert asset.destroyed?
+      cbs.each do |cb|
+        cb.reload
+        assert cb.deleted?, "content blob not marked as deleted for #{type}"
+      end
+    end
+  end
+
+  test 'delted content blob not included in associations' do
+    [:data_file, :presentation, :sop, :document, :file_template, :workflow, :max_publication].each do |type|
+      asset = FactoryBot.create(type)
+      cb = asset.content_blob
+      refute_nil cb, "content blob nil for #{type}"
+      cb.update_column(:deleted, true)
+      asset.reload
+      assert_nil asset.content_blob, "deleted content blob should not be returned for #{type}"
+    end
+
+    [:max_model].each do |type|
+      asset = FactoryBot.create(type)
+      cbs = asset.content_blobs
+      refute_empty cbs, "no content blobs present for #{type}"
+      cbs.each do |cb|
+        cb.update_column(:deleted, true)
+      end
+      asset.reload
+      assert_empty asset.content_blobs, "deleted content blobs should not be returned for #{type}"
+    end
+
+  end
 end
