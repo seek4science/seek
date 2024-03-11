@@ -1448,7 +1448,6 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   test 'can soft-delete content_blob if the user is submitter' do
-
     person = FactoryBot.create(:person)
     publication = FactoryBot.create :max_publication, contributor: person
 
