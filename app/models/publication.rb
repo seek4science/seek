@@ -45,7 +45,7 @@ class Publication < ApplicationRecord
   has_many :publication_authors, dependent: :destroy, autosave: true
   has_many :people, through: :publication_authors
 
-  has_one :content_blob, ->(r) { where('content_blobs.asset_version =?', r.version) }, as: :asset, foreign_key: :asset_id
+  has_one :content_blob, ->(r) { where('content_blobs.asset_version =? AND deleted=?', r.version, false) }, as: :asset, foreign_key: :asset_id
 
   explicit_versioning(:version_column => "version", sync_ignore_columns: ['license','other_creators']) do
     acts_as_versioned_resource
