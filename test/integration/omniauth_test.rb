@@ -376,7 +376,7 @@ class OmniauthTest < ActionDispatch::IntegrationTest
   end
 
   test 'LDAP auth failure should redirect to login page and show generic error if message not recognized' do
-    OmniAuth.config.mock_auth[:ldap] = 'blagjsdkgjsdfgi'
+    OmniAuth.config.mock_auth[:ldap] = :blagjsdkgjsdfgi
 
     assert_no_difference('User.count') do
       assert_no_difference('Identity.count') do
