@@ -111,7 +111,9 @@ class GeneratorTest < ActiveSupport::TestCase
                        study: study,
                        contributor:contributor)
 
-    FactoryBot.create :relationship, subject: expassay, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: FactoryBot.create(:publication)
+
+    publication = FactoryBot.create :publication, policy: FactoryBot.create(:public_policy, access_type: Policy::ACCESSIBLE)
+    FactoryBot.create :relationship, subject: expassay, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: publication
 
     FactoryBot.create(:modelling_assay,
             assay_assets: [@assay_asset5, @assay_asset6],
