@@ -36,7 +36,7 @@ module BioInd
 
       def metadata_annotations
         annotations.select do |annotation|
-          [@schema.title, @schema.description, @schema.identifier, @jerm.hasPart, RDF.type].detect do |skip|
+          [@schema.title, @schema.description, @schema.identifier, @schema.contributor, @jerm.hasPart, RDF.type].detect do |skip|
             annotation[0].start_with?(skip)
           end.nil?
         end

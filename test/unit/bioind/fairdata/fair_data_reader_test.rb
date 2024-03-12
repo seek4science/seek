@@ -46,7 +46,10 @@ class FairDataReaderTest < ActiveSupport::TestCase
   test 'metadata annotations' do
     path = "#{Rails.root}/test/fixtures/files/fairdatastation/demo.ttl"
 
-    study = BioInd::FairData::Reader.parse_graph(path).first.studies.first
+    inv = BioInd::FairData::Reader.parse_graph(path).first
+    assert_empty inv.metadata_annotations
+
+    study = inv.studies.first
 
     assert_equal 8, study.metadata_annotations.count
     assert_includes study.annotations, ["http://fairbydesign.nl/ontology/center_name", "NIID"]
@@ -158,7 +161,11 @@ class FairDataReaderTest < ActiveSupport::TestCase
 
   test 'populate extended metadata' do
     study_metadata_type = FactoryBot.create(:fairdata_virtual_demo_study_extended_metadata)
+    FactoryBot.create(:study_extended_metadata_type)
+    FactoryBot.create(:fairdata_virtual_demo_study_extended_metadata_partial)
     assay_metadata_type = FactoryBot.create(:fairdata_virtual_demo_assay_extended_metadata)
+    FactoryBot.create(:simple_assay_extended_metadata_type)
+    FactoryBot.create(:simple_investigation_extended_metadata_type_with_description_and_label)
     FactoryBot.create(:experimental_assay_class)
 
     path = "#{Rails.root}/test/fixtures/files/fairdatastation/demo.ttl"
@@ -167,10 +174,13 @@ class FairDataReaderTest < ActiveSupport::TestCase
     project = contributor.projects.first
 
     investigation = BioInd::FairData::Reader.construct_isa(inv, contributor, [project])
+    assert_nil investigation.extended_metadata
+
     study = investigation.studies.first
     refute_nil study.extended_metadata
     assert_equal study_metadata_type, study.extended_metadata.extended_metadata_type
 
+    assert_equal 'DRP007092', study.extended_metadata.get_attribute_value('Alias')
     assert_equal 'NIID', study.extended_metadata.get_attribute_value('Centre Name')
     assert_equal 'human gut metagenome', study.extended_metadata.get_attribute_value('Centre Project Name')
     assert_equal 'PRJDB10485', study.extended_metadata.get_attribute_value('External Ids')

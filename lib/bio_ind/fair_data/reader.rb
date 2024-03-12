@@ -57,7 +57,17 @@ module BioInd
       end
 
       def self.detect_extended_metadata(seek_entity, datastation_entity)
-        ExtendedMetadataType.where(title:'Fair Data Station Virtual Demo', supported_type: seek_entity.class.name).first
+        property_ids = datastation_entity.metadata_annotations.collect{|annotation| annotation[0]}
+
+        # collect and sort those with the most properties that match, eliminating any where no properties match
+        candidates = ExtendedMetadataType.where(supported_type: seek_entity.class.name).includes(:extended_metadata_attributes).collect do |emt|
+          ids = emt.extended_metadata_attributes.collect(&:property_type_id)
+          score = (property_ids - ids).length
+          emt = nil if (property_ids & ids).empty?
+          [score, emt]
+        end.sort_by{|x| x[0]}
+
+        candidates.first&.last
       end
 
     end
