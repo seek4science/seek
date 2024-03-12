@@ -24,23 +24,16 @@ module BioInd
       def self.construct_isa(datastation_inv, contributor, projects)
         inv_attributes = datastation_inv.seek_attributes.merge({contributor: contributor, projects: projects})
         investigation = ::Investigation.new(inv_attributes)
-        studies = []
-        assays = []
+        populate_extended_metadata(investigation, datastation_inv)
 
         datastation_inv.studies.each do |datastation_study|
           study_attributes = datastation_study.seek_attributes.merge({contributor: contributor, investigation: investigation})
           study = investigation.studies.build(study_attributes)
-          if emt = ExtendedMetadataType.where(title:'Fair Data Station Virtual Demo', supported_type: 'Study').first
-            study.extended_metadata = ExtendedMetadata.new(extended_metadata_type: emt)
-            datastation_study.populate_extended_metadata(study)
-          end
+          populate_extended_metadata(study, datastation_study)
           datastation_study.assays.each do |datastation_assay|
-            assay_attributes = datastation_assay.seek_attributes.merge({contributor: contributor, study:studies.last, assay_class: AssayClass.experimental})
+            assay_attributes = datastation_assay.seek_attributes.merge({contributor: contributor, study:study, assay_class: AssayClass.experimental})
             assay = study.assays.build(assay_attributes)
-            if emt = ExtendedMetadataType.where(title:'Fair Data Station Virtual Demo', supported_type: 'Assay').first
-              assay.extended_metadata = ExtendedMetadata.new(extended_metadata_type: emt)
-              datastation_assay.populate_extended_metadata(assay)
-            end
+            populate_extended_metadata(assay, datastation_assay)
             datastation_assay.datasets.each do |datastation_dataset|
               blob = ContentBlob.new(url: datastation_dataset.resource_uri.to_s, original_filename: datastation_dataset.identifier )
               data_file_attributes = datastation_dataset.seek_attributes.merge({
@@ -55,6 +48,18 @@ module BioInd
 
         return investigation
       end
+
+      def self.populate_extended_metadata(seek_entity, datastation_entity)
+        if emt = detect_extended_metadata(seek_entity, datastation_entity)
+          seek_entity.extended_metadata = ExtendedMetadata.new(extended_metadata_type: emt)
+          datastation_entity.populate_extended_metadata(seek_entity)
+        end
+      end
+
+      def self.detect_extended_metadata(seek_entity, datastation_entity)
+        ExtendedMetadataType.where(title:'Fair Data Station Virtual Demo', supported_type: seek_entity.class.name).first
+      end
+
     end
   end
 end

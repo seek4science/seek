@@ -34,6 +34,14 @@ module BioInd
         end
       end
 
+      def metadata_annotations
+        annotations.select do |annotation|
+          [@schema.title, @schema.description, @schema.identifier, @jerm.hasPart, RDF.type].detect do |skip|
+            annotation[0].start_with?(skip)
+          end.nil?
+        end
+      end
+
       def find_annotation_value(property)
         annotations.detect do |ann|
           ann[0] == property
@@ -83,7 +91,7 @@ module BioInd
       def populate_extended_metadata(seek_resource)
         extended_metadata_type = seek_resource.extended_metadata.extended_metadata_type
         data = {}
-        annotations.each do |annotation|
+        metadata_annotations.each do |annotation|
           property = annotation[0]
           value = annotation[1]
           attribute = extended_metadata_type.extended_metadata_attributes.where(property_type_id: property).first

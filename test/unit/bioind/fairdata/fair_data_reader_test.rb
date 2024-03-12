@@ -43,6 +43,18 @@ class FairDataReaderTest < ActiveSupport::TestCase
     assert_includes study.annotations, ["http://fairbydesign.nl/ontology/center_name", "NIID"]
   end
 
+  test 'metadata annotations' do
+    path = "#{Rails.root}/test/fixtures/files/fairdatastation/demo.ttl"
+
+    study = BioInd::FairData::Reader.parse_graph(path).first.studies.first
+
+    assert_equal 8, study.metadata_annotations.count
+    assert_includes study.annotations, ["http://fairbydesign.nl/ontology/center_name", "NIID"]
+    study.metadata_annotations.each do |annotation|
+      assert annotation[0].start_with?('http://fairbydesign.nl/ontology/'), "#{annotation[0]} is not expected"
+    end
+  end
+
   test 'study assays' do
     path = "#{Rails.root}/test/fixtures/files/fairdatastation/demo.ttl"
 
@@ -62,8 +74,6 @@ class FairDataReaderTest < ActiveSupport::TestCase
     obs_unit = study.observation_units.first
     sample = obs_unit.samples.first
     assay = sample.assays.first
-
-    assay.pp_annotations
 
     assert_equal 'HIV-1 infected individuals in Ghana', inv.title
     assert_equal 'Exploration of HIV-1 infected individuals in Ghana', inv.description
@@ -185,4 +195,5 @@ class FairDataReaderTest < ActiveSupport::TestCase
       end
     end
   end
+
 end
