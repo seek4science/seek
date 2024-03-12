@@ -28,7 +28,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Configure ansible for local install
         working-directory: /home/runner/work/seek/seek/script/ansible/

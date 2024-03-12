@@ -139,5 +139,6 @@ def load_seek_testing_defaults!
       Settings.defaults[:git_support_enabled] = true
       Settings.defaults[:fair_signposting_enabled] = true
       Settings.defaults[:bio_tools_enabled] = true
+      Settings.defaults[:galaxy_instance_default] = 'https://usegalaxy.eu'
     end
 end

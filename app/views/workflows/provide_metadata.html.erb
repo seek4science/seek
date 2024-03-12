@@ -45,6 +45,14 @@
       <%= text_area_tag 'workflow[description]', @workflow.description, class: "form-control rich-text-edit" -%>
     </div>
 
+    <% if @workflow.workflow_class&.executable? %>
+      <div class="form-group">
+        <label>Galaxy Instance</label>
+        <%= text_field_tag 'workflow[execution_instance_url]', @workflow.execution_instance_url, placeholder: 'https://usegalaxy.eu/', class: 'form-control' -%>
+        <p class="help-block">The root URL of the Galaxy instance where this workflow originated from.</p>
+      </div>
+    <% end %>
+
     <div class="form-group">
       <label>Source</label>
       <%= text_field_tag 'workflow[source_link_url]', @workflow.source_link_url, placeholder: 'https://...', class: "form-control" -%>

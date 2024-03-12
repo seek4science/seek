@@ -240,8 +240,8 @@ life_monitor_url:
 life_monitor_client_id:
 life_monitor_client_secret:
 life_monitor_ui_url:
-galaxy_instance_name:
-galaxy_instance_trs_import_url:
+galaxy_instance_default:
+galaxy_instance_trs_server:
 # Controlled vocabs
 cv_dropdown_limit:
   convert: :to_i

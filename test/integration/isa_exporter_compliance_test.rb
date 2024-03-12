@@ -2,7 +2,7 @@ require 'test_helper'
 require 'json'
 require 'json-schema'
 
-class IsaExporterTest < ActionDispatch::IntegrationTest
+class IsaExporterComplianceTest < ActionDispatch::IntegrationTest
   fixtures :all
   include SharingFormTestHelper
 

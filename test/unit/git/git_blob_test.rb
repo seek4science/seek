@@ -59,6 +59,21 @@ class GitBlobTest < ActiveSupport::TestCase
     remote_blob.file_contents(fetch_remote: true) do |c|
       assert_equal 'lit', c.read(3)
     end
+
+    # fetch_remote
+    refute remote_blob.fetch_remote
+    assert_equal 0, remote_blob.size
+    assert_equal 0, remote_blob.file_contents.size
+    remote_blob.file_contents do |c|
+      assert_nil c.read(1)
+    end
+
+    remote_blob.fetch_remote = true
+    assert remote_blob.fetch_remote
+    assert_equal 11, remote_blob.file_contents.size
+    remote_blob.file_contents do |c|
+      assert_equal 'lit', c.read(3)
+    end
   end
 
   test 'fetched remote blob' do
