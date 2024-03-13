@@ -335,7 +335,7 @@ module Seek
     def omniauth_elixir_aai_config
       if omniauth_elixir_aai_legacy_mode
         {
-            callback_path: omniauth_callback_path('elixir_aai'),
+            callback_path: legacy_omniauth_callback_path('elixir_aai'),
             name: :elixir_aai,
             scope: [:openid, :email],
             response_type: 'code',
@@ -349,7 +349,7 @@ module Seek
             client_options: {
                 identifier: omniauth_elixir_aai_client_id,
                 secret: omniauth_elixir_aai_secret,
-                redirect_uri: omniauth_redirect_uri('elixir_aai'),
+                redirect_uri: legacy_omniauth_redirect_uri('elixir_aai'),
                 scheme: 'https',
                 host: 'login.elixir-czech.org',
                 port: 443,
@@ -429,12 +429,20 @@ module Seek
 
     private
 
+    # Cannot use url helpers here because routes are not loaded at this point :( -Finn
     def omniauth_callback_path(provider)
-      # Cannot use url helpers here because routes are not loaded at this point :( -Finn
+      "#{Rails.application.config.relative_url_root}/auth/#{provider}/callback"
+    end
+
+    def legacy_omniauth_callback_path(provider)
       "#{Rails.application.config.relative_url_root}/identities/auth/#{provider}/callback"
     end
 
     def omniauth_redirect_uri(provider)
+      site_base_url.join("auth/#{provider}/callback").to_s
+    end
+
+    def legacy_omniauth_redirect_uri(provider)
       site_base_url.join("identities/auth/#{provider}/callback").to_s
     end
   end
