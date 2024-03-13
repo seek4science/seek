@@ -9,7 +9,7 @@ layout: page
 
 - [Registering in SEEK](registering.html)
 - [Logging into SEEK](login.html)
-     - [Logging into SEEK via ELIXIR AAI](aai.html)
+     - [Logging into SEEK via LS Login](aai.html)
 - [Editing your profile](editing-profile.html)
 - [Managing your account](managing-account.html)
      - [Managing your identities/alternative login methods](managing-identities.html)

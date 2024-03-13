@@ -8,8 +8,9 @@ layout: page
 Depending on the configuration of the SEEK instance, in addition to the usual username/password method, 
 you may be able to login through one of the following: 
  * LDAP
- * ELIXIR AAI
+ * LS Login
  * GitHub
+ * A custom OIDC provider
  
 Each different way you login is considered an "identity", and you can potentially have multiple identities connected
 to your SEEK account.
@@ -29,11 +30,11 @@ If you already have a SEEK account and want to login using a different method, y
 (The options listed will vary depending on the SEEK configuration)
 
 Clicking one of the identity options will direct you to login via that provider. 
-For more detail on how to proceed with ELIXIR AAI login, see [here](aai.html#aai-flow).
+For more detail on how to proceed with LS Login, see [here](aai.html#aai-flow).
 
 After successfully logging in, you should be redirected back to the "Manage Identities" page, and see the new identity listed.
 
-![New AAI identity listed](/images/user-guide/omniauth/identity_added.png){:.screenshot}
+![New identity listed](/images/user-guide/omniauth/identity_added.png){:.screenshot}
 
 ## Removing an identity
 
