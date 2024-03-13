@@ -225,6 +225,7 @@ omniauth_elixir_aai_enabled:
 omniauth_elixir_aai_client_id:
 omniauth_elixir_aai_secret:
   encrypt: true
+omniauth_elixir_aai_legacy_mode:
 omniauth_ldap_enabled:
 omniauth_ldap_config:
   encrypt: true

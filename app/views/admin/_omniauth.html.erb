@@ -44,6 +44,8 @@
                                "#{t('login.elixir_aai')} Client ID", "The client ID provided by #{t('login.elixir_aai')} for your installation.") %>
         <%= admin_password_setting(:omniauth_elixir_aai_secret, Seek::Config.omniauth_elixir_aai_secret,
                                    "#{t('login.elixir_aai')} Secret", "The secret key provided by #{t('login.elixir_aai')} for your installation.") %>
+        <%= admin_checkbox_setting(:omniauth_elixir_aai_legacy_mode, 1, Seek::Config.omniauth_elixir_aai_legacy_mode,
+                                   "Use legacy configuration", "Use this if your client was registered prior to the transition from #{t('login.elixir_aai_legacy')} to #{t('login.elixir_aai')}.") %>
       </div>
       <div class="col-sm-5">
         <%= panel('Client Info') do %>
