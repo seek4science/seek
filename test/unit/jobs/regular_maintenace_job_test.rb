@@ -9,8 +9,8 @@ class RegularMaintenaceJobTest < ActiveSupport::TestCase
     assert_equal 4.hours, RegularMaintenanceJob::RUN_PERIOD
   end
 
-  test 'cleans content blobs' do
-    assert_equal 8.hours, RegularMaintenanceJob::BLOB_GRACE_PERIOD
+  test 'removes dangling content blobs' do
+    assert_equal 8.hours, RegularMaintenanceJob::REMOVE_DANGLING_BLOB_GRACE_PERIOD
     to_go, keep1, keep2, keep3, keep4 = nil
     travel_to(9.hours.ago) do
       to_go = FactoryBot.create(:content_blob)
@@ -35,7 +35,7 @@ class RegularMaintenaceJobTest < ActiveSupport::TestCase
   end
 
   test 'remove deleted content blobs' do
-    assert_equal 24.hours, RegularMaintenanceJob::DELETE_BLOB_GRACE_PERIOD
+    assert_equal 24.hours, RegularMaintenanceJob::REMOVE_DELETED_BLOB_GRACE_PERIOD
     to_go, to_keep1, to_keep2, to_keep3 = nil
 
     travel_to(25.hours.ago) do
