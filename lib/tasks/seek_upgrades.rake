@@ -19,6 +19,7 @@ namespace :seek do
     db:seed:017_minimal_starter_isa_templates
     recognise_isa_json_compliant_items
     implement_assay_streams_for_isa_assays
+    set_ls_login_legacy_mode
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -223,6 +224,15 @@ namespace :seek do
     end
 
     puts "...Created #{assay_streams_created} new assay streams"
+  end
+
+  task(set_ls_login_legacy_mode: [:environment]) do
+    only_once('ls_login_legacy') do
+      if Seek::Config.omniauth_elixir_aai_enabled
+        puts "Enabling LS Login legacy mode"
+        Seek::Config.omniauth_elixir_aai_legacy_mode = true
+      end
+    end
   end
 
   private
