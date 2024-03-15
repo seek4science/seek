@@ -1,0 +1,56 @@
+{
+  "data": {
+    "type": "studies",
+    "id": "3096",
+    "attributes": {
+      "title": "A Maximal Study",
+      "description": "The Study of many things",
+      "experimentalists": "Wet lab people",
+      "other_creators": "Marie Curie",
+      "policy": {
+        "access": "download",
+        "permissions": [
+          {
+            "resource": {
+              "id": "11830",
+              "type": "projects"
+            },
+            "access": "view"
+          }
+        ]
+      },
+      "extended_attributes": {
+        "extended_metadata_type_id": "940",
+        "attribute_map": {
+          "name": "Fred Bloggs",
+          "age": 44,
+          "date": "2024-01-01"
+        }
+      }
+    },
+    "relationships": {
+      "investigation": {
+        "data": {
+          "id": "4131",
+          "type": "investigations"
+        }
+      },
+      "publications": {
+        "data": [
+          {
+            "id": "1531",
+            "type": "publications"
+          }
+        ]
+      },
+      "creators": {
+        "data": [
+          {
+            "id": "10375",
+            "type": "people"
+          }
+        ]
+      }
+    }
+  }
+}

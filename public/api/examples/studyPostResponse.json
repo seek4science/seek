@@ -1,0 +1,134 @@
+{
+  "data": {
+    "id": "3078",
+    "type": "studies",
+    "attributes": {
+      "policy": {
+        "access": "download",
+        "permissions": [
+          {
+            "resource": {
+              "id": "11779",
+              "type": "projects"
+            },
+            "access": "view"
+          }
+        ]
+      },
+      "discussion_links": [
+
+      ],
+      "extended_attributes": {
+        "extended_metadata_type_id": "935",
+        "attribute_map": {
+          "age": 44,
+          "name": "Fred Bloggs",
+          "date": "2024-01-01"
+        }
+      },
+      "snapshots": [
+
+      ],
+      "title": "A Maximal Study",
+      "description": "The Study of many things",
+      "experimentalists": "Wet lab people",
+      "other_creators": "Marie Curie",
+      "position": null,
+      "creators": [
+        {
+          "profile": "/people/10329",
+          "family_name": "Last",
+          "given_name": "Person99",
+          "affiliation": "An Institution: 127",
+          "orcid": null
+        }
+      ]
+    },
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "10329",
+            "type": "people"
+          }
+        ]
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "10329",
+            "type": "people"
+          }
+        ]
+      },
+      "people": {
+        "data": [
+          {
+            "id": "10329",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "11779",
+            "type": "projects"
+          }
+        ]
+      },
+      "investigation": {
+        "data": {
+          "id": "4110",
+          "type": "investigations"
+        }
+      },
+      "assays": {
+        "data": [
+
+        ]
+      },
+      "data_files": {
+        "data": [
+
+        ]
+      },
+      "models": {
+        "data": [
+
+        ]
+      },
+      "sops": {
+        "data": [
+
+        ]
+      },
+      "publications": {
+        "data": [
+          {
+            "id": "1526",
+            "type": "publications"
+          }
+        ]
+      },
+      "documents": {
+        "data": [
+
+        ]
+      }
+    },
+    "links": {
+      "self": "/studies/3078"
+    },
+    "meta": {
+      "created": "2024-03-15T10:03:23.000Z",
+      "modified": "2024-03-15T10:03:23.000Z",
+      "api_version": "0.3",
+      "base_url": "http://localhost:3000",
+      "uuid": "2f175c70-c4e1-013c-640d-7efdca78d793"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

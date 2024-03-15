@@ -1,0 +1,151 @@
+{
+  "data": {
+    "id": "3095",
+    "type": "studies",
+    "attributes": {
+      "policy": {
+        "access": "no_access",
+        "permissions": [
+
+        ]
+      },
+      "discussion_links": [
+        {
+          "id": "507",
+          "label": "Slack",
+          "url": "http://www.slack.com/"
+        }
+      ],
+      "extended_attributes": {
+        "extended_metadata_type_id": "939",
+        "attribute_map": {
+          "age": 44,
+          "name": "Fred Bloggs",
+          "date": "2024-01-01"
+        }
+      },
+      "snapshots": [
+
+      ],
+      "title": "A Maximal Study",
+      "description": "The Study of many things",
+      "experimentalists": "Wet lab people",
+      "other_creators": "Marie Curie",
+      "position": null,
+      "creators": [
+        {
+          "profile": "/people/10358",
+          "family_name": "One",
+          "given_name": "Some",
+          "affiliation": "University of Somewhere",
+          "orcid": null
+        }
+      ]
+    },
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "10358",
+            "type": "people"
+          }
+        ]
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "10356",
+            "type": "people"
+          }
+        ]
+      },
+      "people": {
+        "data": [
+          {
+            "id": "10356",
+            "type": "people"
+          },
+          {
+            "id": "10358",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "11810",
+            "type": "projects"
+          }
+        ]
+      },
+      "investigation": {
+        "data": {
+          "id": "4124",
+          "type": "investigations"
+        }
+      },
+      "assays": {
+        "data": [
+          {
+            "id": "1498",
+            "type": "assays"
+          }
+        ]
+      },
+      "data_files": {
+        "data": [
+          {
+            "id": "390",
+            "type": "data_files"
+          }
+        ]
+      },
+      "models": {
+        "data": [
+          {
+            "id": "511",
+            "type": "models"
+          }
+        ]
+      },
+      "sops": {
+        "data": [
+          {
+            "id": "372",
+            "type": "sops"
+          }
+        ]
+      },
+      "publications": {
+        "data": [
+          {
+            "id": "1530",
+            "type": "publications"
+          }
+        ]
+      },
+      "documents": {
+        "data": [
+          {
+            "id": "442",
+            "type": "documents"
+          }
+        ]
+      }
+    },
+    "links": {
+      "self": "/studies/3095"
+    },
+    "meta": {
+      "created": "2024-03-15T10:03:27.000Z",
+      "modified": "2024-03-15T10:03:27.000Z",
+      "api_version": "0.3",
+      "base_url": "http://localhost:3000",
+      "uuid": "3100d260-c4e1-013c-640d-7efdca78d793"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

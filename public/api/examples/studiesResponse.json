@@ -1,0 +1,28 @@
+{
+  "data": [
+    {
+      "id": "3086",
+      "type": "studies",
+      "attributes": {
+        "title": "Study49"
+      },
+      "links": {
+        "self": "/studies/3086"
+      }
+    }
+  ],
+  "jsonapi": {
+    "version": "1.0"
+  },
+  "links": {
+    "self": "/studies?page%5Bnumber%5D=1&page%5Bsize%5D=1000000",
+    "first": "/studies?page%5Bnumber%5D=1&page%5Bsize%5D=1000000",
+    "prev": null,
+    "next": null,
+    "last": "/studies?page%5Bnumber%5D=1&page%5Bsize%5D=1000000"
+  },
+  "meta": {
+    "base_url": "http://localhost:3000",
+    "api_version": "0.3"
+  }
+}
