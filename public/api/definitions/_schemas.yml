@@ -167,6 +167,17 @@ assetLinkPatchList:
     anyOf:
       - $ref: "#/components/schemas/assetLink"
       - $ref: "#/components/schemas/assetLinkCreate"
+extendedMetadata:
+  type: object
+  properties:
+    extended_metadata_type_id:
+      type: string
+    attribute_map:
+      $ref: "#/components/schemas/sampleAttributeMap"
+  required:
+    - extended_metadata_type_id
+    - attribute_map
+  additionalProperties: false
 snapshotSkeleton:
   type: object
   properties:
@@ -818,6 +829,7 @@ sampleAttributeMap:
       - type: string
       - type: array
       - type: 'null'
+      - type: integer
 # --- Types ---
 anyType:
   type: string
@@ -2813,6 +2825,8 @@ studyPost:
               $ref: "#/components/schemas/policy"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPostList"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           required:
             - title
           additionalProperties: false
@@ -2863,6 +2877,8 @@ studyPatch:
               $ref: "#/components/schemas/assetsCreatorsList"
             policy:
               $ref: "#/components/schemas/policy"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPatchList"
           additionalProperties: false
@@ -4765,6 +4781,8 @@ studyResponse:
               $ref: "#/components/schemas/policy"
             discussion_links:
               $ref: "#/components/schemas/assetLinkList"
+            extended_attributes:
+                $ref: "#/components/schemas/extendedMetadata"
             position:
               $ref: "#/components/schemas/nullableInteger"
           required:

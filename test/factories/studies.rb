@@ -29,6 +29,7 @@ FactoryBot.define do
     title { "A Maximal Study" }
     description { "The Study of many things" }
     discussion_links { [FactoryBot.build(:discussion_link, label:'Slack')] }
+    extended_metadata { FactoryBot.build(:simple_extended_metadata)}
     experimentalists { "Wet lab people" }
     other_creators { "Marie Curie" }
     after(:build) do |s|
