@@ -75,20 +75,23 @@
     <% if show_elixir_aai_login? %>
       <li>
         <%= link_to(omniauth_authorize_path(:elixir_aai, state: "return_to:/"), method: :post) do %>
-          Log in using <%= t('login.elixir_aai') -%><br/>
+          Log in using <%= omniauth_method_name(:elixir_aai) -%><br/>
           <%= image('elixir_aai_login') %>
         <% end %>
       </li>
     <% end %>
     <% if show_ldap_login? %>
-      <li><%= link_to "Log in using #{t('login.ldap')}", login_path(anchor: 'ldap_login') %></li>
+      <li><%= link_to "Log in using #{omniauth_method_name(:ldap)}", login_path(anchor: 'ldap_login') %></li>
     <% end %>
     <% if show_github_login? %>
       <li>
         <%= link_to(omniauth_authorize_path(:github, state: "return_to:/"), method: :post) do%>
-          Log in using <%= t('login.github') -%> <%= image('github') %>
+          Log in using <%= omniauth_method_name(:github) -%> <%= image('github') %>
       <% end %>
       </li>
+    <% end %>
+    <% if show_oidc_login? %>
+      <li><%= link_to "Log in using #{omniauth_method_name(:oidc)}", omniauth_authorize_path(:oidc, state: "return_to:/") %></li>
     <% end %>
   </ul>
 <% end %>
