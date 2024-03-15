@@ -518,6 +518,8 @@ modelAttributes:
       $ref: "#/components/schemas/nullableNonEmptyString"
     policy:
       $ref: "#/components/schemas/policy"
+    extended_attributes:
+      $ref: "#/components/schemas/extendedMetadata"
     other_creators:
       $ref: "#/components/schemas/nullableOtherCreatorsString"
     creators:
@@ -1266,6 +1268,8 @@ collectionPost:
               $ref: "#/components/schemas/assetsCreatorsList"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPostList"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           required:
             - title
           additionalProperties: false
@@ -1318,6 +1322,8 @@ collectionPatch:
               $ref: "#/components/schemas/assetsCreatorsList"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPatchList"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           additionalProperties: false
         relationships:
           type: object
@@ -1437,6 +1443,8 @@ dataFilePost:
               $ref: "#/components/schemas/assetsCreatorsList"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPostList"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           required:
             - title
             - content_blobs
@@ -1502,6 +1510,8 @@ dataFilePatch:
               $ref: "#/components/schemas/assetsCreatorsList"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPatchList"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           additionalProperties: false
         relationships:
           type: object
@@ -1669,6 +1679,8 @@ eventPost:
               $ref: "#/components/schemas/nullableDateTimeString"
             policy:
               $ref: "#/components/schemas/policy"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           required:
             - title
             - start_date
@@ -1728,6 +1740,8 @@ eventPatch:
               $ref: "#/components/schemas/dateTimeString"
             policy:
               $ref: "#/components/schemas/policy"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           additionalProperties: false
         relationships:
           type: object
@@ -1950,6 +1964,8 @@ modelPost:
               $ref: "#/components/schemas/nullableNonEmptyString"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPostList"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           required:
             - title
             - content_blobs
@@ -2015,6 +2031,8 @@ modelPatch:
               $ref: "#/components/schemas/nullableNonEmptyString"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPatchList"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           additionalProperties: false
         relationships:
           type: object
@@ -2156,6 +2174,8 @@ presentationPost:
               $ref: "#/components/schemas/assetsCreatorsList"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPostList"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           required:
             - title
             - content_blobs
@@ -2215,6 +2235,8 @@ presentationPatch:
               $ref: "#/components/schemas/assetsCreatorsList"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPatchList"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           additionalProperties: false
         relationships:
           type: object
@@ -2726,6 +2748,8 @@ sopPost:
               $ref: "#/components/schemas/assetsCreatorsList"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPostList"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           required:
             - title
             - content_blobs
@@ -2783,6 +2807,8 @@ sopPatch:
               $ref: "#/components/schemas/assetsCreatorsList"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPatchList"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           additionalProperties: false
         relationships:
           type: object
@@ -3295,6 +3321,8 @@ collectionResponse:
               $ref: "#/components/schemas/multipleReferences"
             items:
               $ref: "#/components/schemas/multipleReferences"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           required:
             - creators
             - submitter
@@ -3470,6 +3498,8 @@ dataFileResponse:
               $ref: "#/components/schemas/assetsCreatorsList"
             discussion_links:
               $ref: "#/components/schemas/assetLinkList"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           required:
             - title
             - license
@@ -3632,6 +3662,8 @@ eventResponse:
               $ref: "#/components/schemas/nullableDateTimeString"
             policy:
               $ref: "#/components/schemas/policy"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           required:
             - title
             - description
