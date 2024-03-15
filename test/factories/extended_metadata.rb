@@ -9,4 +9,13 @@ FactoryBot.define do
     end
   end
 
+  factory(:family_extended_metadata, class: ExtendedMetadata) do
+    association :extended_metadata_type, factory: :family_extended_metadata_type, strategy: :create
+    after(:build) do |em|
+      em.set_attribute_value(:dad, {"first_name":"john", "last_name":"liddell"})
+      em.set_attribute_value(:mom, {"first_name":"lily", "last_name":"liddell"})
+      em.set_attribute_value(:child, {"0":{"first_name":"rabbit", "last_name":"wonderland"},"1":{"first_name":"mad", "last_name":"hatter"}})
+    end
+  end
+
 end

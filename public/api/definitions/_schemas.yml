@@ -824,12 +824,7 @@ projectMembersList:
     additionalProperties: false
 sampleAttributeMap:
   type: object
-  additionalProperties:
-    anyOf:
-      - type: string
-      - type: array
-      - type: 'null'
-      - type: integer
+  additionalProperties: true
 # --- Types ---
 anyType:
   type: string
@@ -2353,6 +2348,8 @@ projectPost:
               $ref: "#/components/schemas/nullableLicense"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPostList"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
             topic_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
           required:
@@ -2404,6 +2401,8 @@ projectPatch:
               $ref: "#/components/schemas/nullableLicense"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPatchList"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
             topic_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
           additionalProperties: false
@@ -4232,6 +4231,8 @@ projectResponse:
               $ref: "#/components/schemas/nullableLicense"
             discussion_links:
               $ref: "#/components/schemas/assetLinkList"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
             topic_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
             start_date:
