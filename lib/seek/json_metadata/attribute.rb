@@ -78,9 +78,9 @@ module Seek
         if sample_attribute_type && linked_sample_type && !seek_sample? && !seek_sample_multi?
           errors.add(:sample_attribute_type, 'Attribute type must be SeekSample if linked sample type set')
         end
-        if seek_sample? && linked_sample_type.nil? && is_isa_compliant_input?
+        if seek_sample? && linked_sample_type.nil? && !is_isa_compliant_input?
           errors.add(:seek_sample, 'Linked Sample Type must be set if attribute type is Registered Sample')
-        elsif seek_sample_multi? && linked_sample_type.nil? && is_isa_compliant_input?
+        elsif seek_sample_multi? && linked_sample_type.nil? && !is_isa_compliant_input?
           errors.add(:seek_sample_multi, 'Linked Sample Type must be set if attribute type is Registered Sample List')
         end
       end
@@ -96,9 +96,9 @@ module Seek
 
       def is_isa_compliant_input?
         if is_a?(SampleAttribute)
-          !(input_attribute? && sample_type.is_isa_json_compliant?)
+          input_attribute? && sample_type.is_isa_json_compliant?
         else
-          !input_attribute?
+          input_attribute?
         end
       end
     end
