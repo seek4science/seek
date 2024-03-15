@@ -18,4 +18,14 @@ FactoryBot.define do
     end
   end
 
+  factory(:role_multiple_extended_metadata, class: ExtendedMetadata) do
+    association :extended_metadata_type, factory: :role_multiple_extended_metadata_type, strategy: :create
+    after(:build) do |em|
+      em.set_attribute_value(:role_email, "alice@email.com")
+      em.set_attribute_value(:role_phone, "0012345")
+      em.set_attribute_value(:role_name, {"first_name":"alice", "last_name": "liddell"})
+      em.set_attribute_value(:role_address, {"street":"wonder","city": "land" })
+    end
+  end
+
 end

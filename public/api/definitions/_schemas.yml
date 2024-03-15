@@ -438,6 +438,8 @@ contributedTypeAttributes:
       $ref: "#/components/schemas/assetsCreatorsList"
     discussion_links:
       $ref: "#/components/schemas/assetLinkList"
+    extended_attributes:
+      $ref: "#/components/schemas/extendedMetadata"
   required:
     - title
     - license
@@ -1555,6 +1557,8 @@ documentPost:
               $ref: "#/components/schemas/assetsCreatorsList"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPostList"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           required:
             - title
             - content_blobs
@@ -1612,6 +1616,8 @@ documentPatch:
               $ref: "#/components/schemas/assetsCreatorsList"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPatchList"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           additionalProperties: false
         relationships:
           type: object
