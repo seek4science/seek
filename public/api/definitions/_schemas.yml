@@ -173,7 +173,7 @@ extendedMetadata:
     extended_metadata_type_id:
       type: string
     attribute_map:
-      $ref: "#/components/schemas/sampleAttributeMap"
+      $ref: "#/components/schemas/extendedMetadataAttributeMap"
   required:
     - extended_metadata_type_id
     - attribute_map
@@ -827,6 +827,13 @@ projectMembersList:
       - institution_id
     additionalProperties: false
 sampleAttributeMap:
+  type: object
+  additionalProperties:
+    anyOf:
+      - type: string
+      - type: array
+      - type: 'null'
+extendedMetadataAttributeMap:
   type: object
   additionalProperties: true
 # --- Types ---
