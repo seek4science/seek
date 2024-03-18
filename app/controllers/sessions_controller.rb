@@ -30,6 +30,8 @@ class SessionsController < ApplicationController
                            Seek::Config.omniauth_ldap_enabled
                          when 'elixir_aai'
                            Seek::Config.omniauth_elixir_aai_enabled
+                         when 'oidc'
+                           Seek::Config.omniauth_oidc_enabled
                          else
                            true
                          end
@@ -43,7 +45,19 @@ class SessionsController < ApplicationController
   end
 
   def omniauth_failure
-    flash[:error] = "#{t("login.#{params[:strategy]}")} authentication failure (Invalid username/password?)"
+    failure_message = case params[:message]
+                      when 'invalid_credentials'
+                        'Invalid username/password'
+                      when 'missing_credentials'
+                        'Missing credentials'
+                      else
+                        nil
+                      end
+    error = "#{t("login.#{params[:strategy]}")} authentication failure"
+    error += " (#{failure_message})" if failure_message
+    flash[:error] = error
+    # Ideally we would return to the original "return_to", prior to the error, but it gets lost somewhere along the way.
+    params[:return_to] = root_path
     respond_to do |format|
       format.html { render :new }
     end

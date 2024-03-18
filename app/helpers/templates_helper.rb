@@ -67,7 +67,7 @@ module TemplatesHelper
       type += ' - ' + link_to(template_attribute.linked_sample_type&.title, template_attribute.linked_sample_type)
     end
 
-    if template_attribute.sample_attribute_type.controlled_vocab?
+    if template_attribute.sample_attribute_type.controlled_vocab? && template_attribute.sample_controlled_vocab
       type += ' - ' + link_to(template_attribute.sample_controlled_vocab.title,
                               template_attribute.sample_controlled_vocab)
     end

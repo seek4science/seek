@@ -595,4 +595,42 @@ class AdminControllerTest < ActionController::TestCase
     assert_nil Rails.cache.fetch('test-key')
   end
 
+  test 'set/update oidc image' do
+    refute Seek::Config.omniauth_oidc_image_id
+    assert_difference('Avatar.count', 1) do
+      post :update_features_enabled, params: { omniauth_oidc_image: fixture_file_upload('file_picture.png', 'image/png') }
+    end
+
+    id = Seek::Config.omniauth_oidc_image_id
+    assert id
+
+    assert_no_difference('Avatar.count') do
+      post :update_features_enabled, params: { omniauth_oidc_image: fixture_file_upload('file_picture.png', 'image/png') }
+    end
+
+    new_id = Seek::Config.omniauth_oidc_image_id
+    assert new_id
+    assert_not_equal id, new_id
+  end
+
+  test 'clear oidc image' do
+    assert_difference('Avatar.count') do
+      Seek::Config.omniauth_oidc_image = fixture_file_upload('file_picture.png', 'image/png')
+      refute_nil Seek::Config.omniauth_oidc_image_id
+    end
+
+    assert_difference('Avatar.count', -1) do
+      post :update_features_enabled, params: { clear_omniauth_oidc_image: '1' }
+    end
+  end
+
+  test 'clear oidc image does nothing if no image' do
+    assert_nil Seek::Config.omniauth_oidc_image_id
+
+    assert_no_difference('Avatar.count') do
+      post :update_features_enabled, params: { clear_omniauth_oidc_image: '1' }
+    end
+
+    assert flash[:error].blank?
+  end
 end

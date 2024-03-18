@@ -1,4 +1,5 @@
 class TemplateAttribute < ApplicationRecord
+  include Seek::JSONMetadata::Attribute
   belongs_to :sample_controlled_vocab
   belongs_to :sample_attribute_type
   belongs_to :template, inverse_of: :template_attributes

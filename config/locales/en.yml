@@ -6,8 +6,10 @@ en:
 
   login:
     elixir_aai: 'LS Login'
+    elixir_aai_legacy: 'ELIXIR AAI'
     ldap: 'LDAP'
     github: 'GitHub'
+    oidc: 'OpenID Connect'
 
   single_page: "Single Page"
   default_view: "Default View"
