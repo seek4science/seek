@@ -833,6 +833,8 @@ sampleAttributeMap:
       - type: string
       - type: array
       - type: 'null'
+      - type: number
+      - type: boolean
 extendedMetadataAttributeMap:
   type: object
   additionalProperties: true
