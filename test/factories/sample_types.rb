@@ -124,6 +124,9 @@ FactoryBot.define do
       type.sample_attributes << FactoryBot.build(:sample_attribute, title: 'apple', sample_attribute_type: FactoryBot.create(:controlled_vocab_attribute_type), required: false, sample_controlled_vocab: FactoryBot.create(:apples_sample_controlled_vocab), sample_type: type)
       type.sample_attributes << FactoryBot.build(:sample_attribute, title: 'apples', sample_attribute_type: FactoryBot.create(:cv_list_attribute_type), required: false, sample_controlled_vocab: FactoryBot.create(:apples_sample_controlled_vocab), sample_type: type)
       type.sample_attributes << FactoryBot.build(:sample_multi_sample_attribute, title: 'patients', linked_sample_type: FactoryBot.create(:patient_sample_type), required: false, sample_type: type)
+      type.sample_attributes << FactoryBot.build(:sample_attribute, title: 'weight', sample_attribute_type: FactoryBot.create(:float_sample_attribute_type), required: false, sample_type: type)
+      type.sample_attributes << FactoryBot.build(:sample_attribute, title: 'age', sample_attribute_type: FactoryBot.create(:integer_sample_attribute_type), required: false, sample_type: type)
+      type.sample_attributes << FactoryBot.build(:sample_attribute, title: 'bool', sample_attribute_type: FactoryBot.create(:boolean_sample_attribute_type), required: false, sample_type: type)
     end
     after(:create) do |type|
       type.annotate_with(['tag1', 'tag2'], 'sample_type_tag', type.contributor)
