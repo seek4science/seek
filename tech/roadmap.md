@@ -14,22 +14,27 @@ They are expected to be added to FAIRDOM-SEEK in roughly the order they are pres
 
 | Feature | Milestone date |
 | --- |----------------|
-| Provide a Sitemap XML | Q4 2023 |
-| Extended integration with the Norwegian e-Infrastructure for Life Sciences (NeLS) system | Q4 2023 |
-| License improvements, using SPDX | Q4 2023 |
-| RO-Crate for collections | Q1 2024 |
-| Easier mechanism for administrators to define and manage Extended Metadata | Q1 2024 |
-| Enhanced ISA-JSON export (via DataHub) supporting brokering tools to submit to repositories | Q1 2024 |
-| UI Improvements to the Admin area | Q1 2024 |
-| Extended Metadata write API extensions | Q2 2024 |
+| Provide a Sitemap XML | Q1 2024 |
+| License improvements, using SPDX | Q1 2024 |
+| Improve navigation between ISA-JSON compliant single page and default view | Q1 2024 |
+| Visualise study and assay design in default view | Q1 2024 |
+| Extended integration with the Norwegian e-Infrastructure for Life Sciences (NeLS) system | Q2 2024 |
+| Easier mechanism for administrators to define and manage Extended Metadata | Q2 2024 |
+| UI Improvements to the Admin area | Q2 2024 |
 | Research Organisation Registry (ROR) integration for institutions | Q2 2024 |
-| Harmonize and tidy up the submission forms, and remove the DataFile upload wizard to improve consistency | Q2 2024 |
-| Rails 7 and Ruby 3.2 upgrades | Q3 2024 |
-| Implement editable Sample Types (with shared permission) | Q3 2024 |
-| Visible history log for Sample changes | Q3 2024 |
-| ISA RO-Crate profile, along with updated snapshots and export | Q4 2024 |
+| Rails 7 and Ruby 3.2 upgrades | Q2 2024 |
+| Implement editable Sample Types (with shared permission) | Q2 2024 |
+| Ability to Merge accounts | Q2 2024 |
+| Improving the configurations for Search Indexing and Query parsing | Q2 2024 |
+| JERM RO-Crate profile and support for snapshots, export and import | Q2 2024 |
+| Extended Metadata write API extensions | Q2 2024 |
+| RO-Crate profile to support Collections | Q3 2024 |
+| Enhanced ISA-JSON export (via DataHub) supporting brokering tools to submit to repositories | Q3 2024 |
+| Harmonize and tidy up the submission forms, and remove the DataFile upload wizard to improve consistency | Q3 2024 |
+| Visible history log for Sample changes | Q4 2024 |
 | Improving search to support more advanced queries | Q4 2024 |
 | Improve usability of single page view | Q4 2024 |
+| ISA RO-Crate import and export support for compliant ISA-JSON | Q1 2025 |
 
 
 <br/>
