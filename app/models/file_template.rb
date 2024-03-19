@@ -16,7 +16,7 @@ class FileTemplate < ApplicationRecord
   has_controlled_vocab_annotations :data_types, :data_formats
 
   #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
-  has_one :content_blob, -> (r) { where('content_blobs.asset_version = ?', r.version) }, :as => :asset, :foreign_key => :asset_id
+  has_one :content_blob, -> (r) { where('content_blobs.asset_version =? AND deleted =?', r.version, false) }, :as => :asset, :foreign_key => :asset_id
 
   has_many :data_files, inverse_of: :file_template
   has_many :placeholders, inverse_of: :file_template

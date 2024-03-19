@@ -1,6 +1,6 @@
 <h1>Enable or disable features</h1>
 
-<%= form_tag :action=>"update_features_enabled" do -%>
+<%= form_tag({ action: 'update_features_enabled' }, multipart: true) do -%>
   <h2>SEEK services</h2>
   <%= admin_checkbox_setting(:solr_enabled, 1, Seek::Config.solr_enabled,
                              "Search enabled", "Whether the search is enabled. If switched on you need to ensure SOLR is running and its index is up to date. You need to restart both the server, and the Background service, after changing this setting.") %>
@@ -126,7 +126,7 @@
 
 
   <%= admin_checkbox_setting(:require_cookie_consent, 1, Seek::Config.require_cookie_consent,
-                             "Add a cookie consent banner and a cookie setting page", "Show a banner asking for consent for the use of cookies. SEEK uses an essential cookie for session handling, and optional cookies for tracking if set below. 
+                             "Add a cookie consent banner and a cookie setting page", "Show a banner asking for consent for the use of cookies. SEEK uses an essential cookie for session handling, and optional cookies for tracking if set below.
                              Some cookies might be also set by embedded content. This banner will offer 3 choices: Only necessary, Embedded content, All.
                              Setting up this option will also add a cookie setting page accessible from the footer.") %>
 
@@ -150,6 +150,19 @@
                            'Piwik analytics url', "The URL to your Piwik installation, withouth the http:// or https://, e.g. #{Seek::Config.default_piwik_analytics_url} ") %>
     <%= admin_checkbox_setting(:piwik_analytics_tracking_notice, 1, Seek::Config.piwik_analytics_tracking_notice,
                            'Piwik tracking notice', "Warn users about the use of analytics software.") %>
+  </div>
+
+  <%= admin_checkbox_setting(:custom_analytics_snippet_enabled, 1, Seek::Config.custom_analytics_snippet_enabled,
+                             "Include a custom analytics snippet", "Adds custom snippet to the page keep track of site traffic.",
+                             onchange: toggle_appear_javascript('custom_analytics_block')) %>
+
+  <div id="custom_analytics_block" class="additional_settings" style="<%= show_or_hide_block(Seek::Config.custom_analytics_snippet_enabled) %>">
+    <%= admin_text_setting(:custom_analytics_name, Seek::Config.custom_analytics_name,
+                           'Custom analytics name', "The name of the analytics software used for tracking traffic.") %>
+    <%= admin_textarea_setting(:custom_analytics_snippet, Seek::Config.custom_analytics_snippet,
+                               "Code Snippet", "A custom code snippet, taking care of site traffic.") %>
+    <%= admin_checkbox_setting(:custom_analytics_tracking_notice, 1, Seek::Config.custom_analytics_tracking_notice,
+                           'Custom tracking notice', "Warn users about the use of analytics software.") %>
   </div>
 
   <%= render :partial => "admin/doi_settings" %>

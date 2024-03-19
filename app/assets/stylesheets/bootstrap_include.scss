@@ -124,3 +124,8 @@ textarea.form-control {
 .nav-tabs a[data-target] {
   cursor: pointer;
 }
+
+/* is missing from the documented options - https://getbootstrap.com/docs/4.0/utilities/colors/ - so added to match */
+.text-secondary {
+  color: $text-secondary !important
+}

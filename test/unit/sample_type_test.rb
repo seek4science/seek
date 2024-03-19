@@ -1118,6 +1118,26 @@ class SampleTypeTest < ActiveSupport::TestCase
 
   end
 
+  test 'previous linked sample type' do
+    first_sample_type = FactoryBot.create(:isa_source_sample_type)
+    second_sample_type = FactoryBot.create(:isa_sample_collection_sample_type, linked_sample_type: first_sample_type)
+    third_sample_type = FactoryBot.create(:isa_assay_material_sample_type, linked_sample_type: second_sample_type)
+
+    assert_equal second_sample_type.previous_linked_sample_type, first_sample_type
+    refute_equal third_sample_type.previous_linked_sample_type, first_sample_type
+    refute_equal first_sample_type.previous_linked_sample_type, second_sample_type
+  end
+
+  test 'next linked sample types' do
+    first_sample_type = FactoryBot.create(:isa_source_sample_type)
+    second_sample_type = FactoryBot.create(:isa_sample_collection_sample_type, linked_sample_type: first_sample_type)
+    third_sample_type = FactoryBot.create(:isa_assay_material_sample_type, linked_sample_type: second_sample_type)
+
+    assert_equal first_sample_type.next_linked_sample_types, [second_sample_type]
+    assert_equal second_sample_type.next_linked_sample_types, [third_sample_type]
+    assert third_sample_type.next_linked_sample_types.blank?
+  end
+
   private
 
   # sample type with 3 samples

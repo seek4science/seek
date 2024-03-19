@@ -2,12 +2,12 @@
 
 <% if Seek::Config.project_single_page_enabled %>
 	<% if !displaying_single_page? %>
-		<span>
-      <%= button_link_to("Single Page", 'sop', single_page_path(id: item.projects.first.id, item_type: 'study', item_id: item.id)) -%>
+		<span title="<%= t("info_text.single_page") %>">
+      <%= button_link_to(t("single_page"), 'sop', single_page_path(id: item.projects.first.id, item_type: 'study', item_id: item.id)) -%>
     </span>
 	<% else %>
-		<span>
-      <%= button_link_to("Default View", 'sop', study_path(item.id)) -%>
+		<span title="<%= t('info_text.default_view') %>">
+      <%= button_link_to(t('default_view'), 'sop', study_path(item.id)) -%>
     </span>
 	<% end %>
 <% end -%>
@@ -21,7 +21,7 @@
 <% if item.can_edit? -%>
   <% if Seek::Config.isa_json_compliance_enabled && item.is_isa_json_compliant? %>
     <% if item&.sample_types.present? %>
-      <%= button_link_to("Design #{t('assay')}", 'new', new_isa_assay_path(study_id: item.id, single_page: params[:single_page], is_source: true)) %>
+      <%= button_link_to("Design #{t('assays.assay_stream')}", 'new', new_isa_assay_path(study_id: item.id, single_page: params[:single_page], is_assay_stream: true)) %>
     <% end -%>
   <% else -%>
     <%= add_new_item_to_dropdown(item) %>
@@ -38,7 +38,12 @@
   <% end %>
 
   <% if item.can_manage? -%>
-    <li><%= image_tag_for_key('manage', manage_study_path(item), "Manage #{t('study')}", nil, "Manage #{t('study')}") -%></li>
+    <% if Seek::Config.isa_json_compliance_enabled && item.is_isa_json_compliant? %>
+      <li><%= image_tag_for_key('manage', manage_study_path(item), "Manage #{t('study')}", nil, "Manage #{t('isa_study')}") -%></li>
+    <% else %>
+      <li><%= image_tag_for_key('manage', manage_study_path(item), "Manage #{t('study')}", nil, "Manage #{t('study')}") -%></li>
+    <% end %>
+
     <%= render :partial => 'snapshots/new_snapshot_link', :locals => { :item => item } %>
   <% end -%>
 

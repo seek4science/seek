@@ -5,25 +5,22 @@
 <% main_field_name = id_suffix[1..-1] %>
 <% isa_element ||= "study" %>
 
-<span id='modal-dialogues'>
-    <%= sample_controlled_vocab_model_dialog('cv-modal') %>
-</span>
 <%=  f.fields_for main_field_name, sample_type do |field| %>
 
 	<% unless action == :edit %>
-    <%= folding_panel("Choose a #{t(:template)} to create a #{t(:sample_type)}", false, {help_text: "Create #{t(:template)} based on existing #{t(:template).pluralize()}", :body_options => {:id => 'add_custom_attribute_panel'}}) do %>
+    <%= folding_panel("Choose a #{t(:template)} to create a #{t(:sample_type)}", false, {help_text: "Create #{t(:template)} based on existing #{t(:template).pluralize()}", body_options: {id: 'add_custom_attribute_panel'}}) do %>
       <input type="button" value="Existing <%= t(:template).pluralize%>" class="btn btn-primary" onClick="initTemplateModal('<%=main_field_name%>')">
     <% end %>
 	<% end %>
 
   <div class="form-group">
       <label>Title</label><%= required_span %>
-      <%= field.text_field :title, :class => 'form-control', :placeholder => 'Sample type name' %>
+      <%= field.text_field :title, class: 'form-control', placeholder: 'Sample type name' %>
   </div>
 
   <div class="form-group">
     <label>Description</label>
-    <%= field.text_area :description, :class=>"form-control rich-text-edit", :rows => 5 -%>
+    <%= field.text_area :description, class: "form-control rich-text-edit", rows: 5 -%>
   </div>
 
   <%= field.hidden_field :template_id, { id: "isa_study#{id_suffix}template_parent_id" } %>
@@ -48,17 +45,17 @@
 				</thead>
 				<tbody>
 					<% sample_type.sample_attributes.each_with_index do |sample_attribute, index| %>
-							<%= render :partial => 'sample_types/sample_attribute_form', :locals => { :index => index,
-                                                                                        :sample_attribute => sample_attribute,
-                                                                                        :sample_type=>sample_type,
-                                                                                        :prefix => "isa_#{isa_element}[#{main_field_name}]",
-                                                                                        :display_isa_tag => true } %>
+							<%= render partial: 'sample_types/sample_attribute_form', locals: { index: index,
+                                                                                  sample_attribute: sample_attribute,
+                                                                                  sample_type: sample_type,
+                                                                                  prefix: "isa_#{isa_element}[#{main_field_name}]",
+                                                                                  display_isa_tag: true } %>
 					<% end %>
 
 					<% unless sample_type.uploaded_template? || !sample_type.editing_constraints.allow_new_attribute? %>
 							<tr id=<%=add_attribute_row_id%> >
 								<td colspan="6">
-									<%= button_link_to('Add new attribute', 'add', '#', :id => add_attribute_id  ) %>
+									<%= button_link_to('Add new attribute', 'add', '#', id: add_attribute_id  ) %>
 								</td>
 							</tr>
 					<% end %>
@@ -71,16 +68,16 @@
 
 <table id=<%=new_attribute_id%> style="display:none">
   <tbody>
-    <%= render :partial => 'sample_types/sample_attribute_form', :locals=> { sample_type:sample_type,
-                                                                             prefix: "isa_#{isa_element}[#{main_field_name}]",
-                                                                             display_isa_tag: true } %>
+    <%= render partial: 'sample_types/sample_attribute_form', locals: { sample_type: sample_type,
+                                                                        prefix: "isa_#{isa_element}[#{main_field_name}]",
+                                                                        display_isa_tag: true } %>
   </tbody>
 </table>
 
 <script>
     //used to hold the element Id that needs updating after creating a new CV
     $j(document).ready(function () {
-        SampleTypeControlledVocab.blankControlledVocabModelForm=$j('#cv-modal').clone();
+        SampleTypeControlledVocab.copyBlankModalForm();
         SampleTypeControlledVocab.resetModalControlledVocabForm();
         // Make rows sortable
         SampleTypes.bindSortable("#<%=attribute_table_id%>");
@@ -136,16 +133,6 @@
             $j(`input:hidden[name="${hiddenInputName}"]`).val(isa_tag_id_sel);
 
         });
-
-        // Disable select ISA tags of existing attributes
-        $j('#attribute-table_source_sample_type').find('tr.sample-attribute [data-attr="isa_tag_title"]').attr('disabled', true);
-        $j('#attribute-table_sample_collection_sample_type').find('tr.sample-attribute [data-attr="isa_tag_title"]').attr('disabled', true);
-
-        // Filter ISA tags for new rows
-        updateIsaTagSelect("study source", "#new-attribute-row_source_sample_type");
-        updateIsaTagSelect("study sample", "#new-attribute-row_sample_collection_sample_type");
-        updateIsaTagSelect("assay - material", "#new-attribute-row_sample_type");
-        updateIsaTagSelect("assay - data file", "#new-attribute-row_sample_type");
     });
     $j(document).on('submit', function(){
       // Remove the table from the form

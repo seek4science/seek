@@ -1,35 +1,44 @@
 <% assay = params[:isa_assay][:assay] if params.dig(:isa_assay, :assay) %>
 <% study = Study.find(params[:study_id] || assay[:study_id]) %>
+<% def first_assay_in_stream?
+    params[:source_assay_id].nil? || (params[:source_assay_id] == params[:assay_stream_id])
+   end
+%>
 <%
-input_sample_type_id = params[:isa_assay][:input_sample_type_id] if params.dig(:isa_assay, :input_sample_type_id)
-source_assay = Assay.find(params[:source_assay_id]) if params[:source_assay_id]
+  source_assay = Assay.find(params[:source_assay_id]) if params[:source_assay_id]
+  assay_stream_id = params[:assay_stream_id] if params[:assay_stream_id]
 
-if @isa_assay.assay.new_record?
-  if params[:source_assay_id]
-    assay_position = source_assay.position + 1
+  if @isa_assay.assay.new_record?
+    if params[:is_assay_stream]
+      assay_position = study.assay_streams.any? ? study.assay_streams.map(&:position).max + 1 : 0
+      assay_class_id = AssayClass.assay_stream.id
+      is_assay_stream = true
+    else
+      assay_position = first_assay_in_stream? ? 0 : source_assay.position + 1
+      assay_class_id = AssayClass.experimental.id
+      is_assay_stream = false
+    end
   else
-    assay_position = 0
-  end
-else
-  assay_position = @isa_assay.assay.position
-end
-
-# assay_position = params[:source_assay_id] ? source_assay.position + 1 : 0
-input_sample_type_id ||=
-  if params[:is_source]
-    study.sample_types.second.id
-  else
-    source_assay.sample_type.id if params[:source_assay_id]
+    assay_position = @isa_assay.assay.position
+    assay_class_id = @isa_assay.assay.assay_class_id
+    is_assay_stream = @isa_assay.assay.is_assay_stream?
   end
 
-show_extended_metadata =
-  if params[:is_source]
-    true
-  elsif source_assay&.position&.zero? && !@isa_assay.assay.new_record?
-    true # Custom metadata should be shown in edit as well if assay position is 0.
-  else
-    false
-  end
+  input_sample_type_id ||=
+    if is_assay_stream || source_assay&.assay_class&.is_assay_stream?
+      study.sample_types.second.id
+    else
+      source_assay.sample_type.id if source_assay
+    end
+
+  show_extended_metadata =
+    if is_assay_stream
+      true
+    elsif source_assay&.position&.zero? && !@isa_assay.assay.new_record?
+      true # Custom metadata should be shown in edit as well if assay position is 0.
+    else
+      false
+    end
 %>
 
 <%= error_messages_for :isa_assay %>
@@ -43,7 +52,7 @@ show_extended_metadata =
 
   <div class="form-group">
     <%= assay_fields.label :description -%><br/>
-    <%= assay_fields.text_area :description, :rows => 5, :class=>"form-control rich-text-edit"  -%>
+    <%= assay_fields.text_area :description, rows: 5, class: "form-control rich-text-edit" -%>
   </div>
 
   <% if show_extended_metadata %>
@@ -56,26 +65,37 @@ show_extended_metadata =
     <%= assay_study_selection('isa_assay[assay][study_id]',@isa_assay.assay.study) %>
   </div>
 
-  <div class="hidden">
-    <%= assay_fields.number_field :position, value: assay_position || study.assays.length -%>
-  </div>
+  <% if is_assay_stream %>
+    <div class="form-group">
+      <%= assay_fields.label "Assay position" -%><br/>
+      <%= assay_fields.number_field :position, rows: 5, class: "form-control", value: assay_position %>
+    </div>
+  <% else %>
+    <div class="hidden">
+      <%= assay_fields.hidden_field :position, value: assay_position -%>
+    </div>
+  <% end %>
 
-  <%= assay_fields.hidden_field :assay_class_id -%>
 
-  <% if User.current_user -%>
-    <%= render partial: 'assets/manage_specific_attributes', locals:{f:assay_fields} if show_form_manage_specific_attributes? %>
-    <%= assay_fields.fancy_multiselect(:sops, other_projects_checkbox: true, name: "isa_assay[assay][sop_ids]")%>
-    <%= assay_fields.fancy_multiselect :publications, { other_projects_checkbox: true, name: "isa_assay[assay][publication_ids]" } %>
-    <%= assay_fields.fancy_multiselect :documents, { other_projects_checkbox: true, name: "isa_assay[assay][document_ids]" } %>
+  <%= assay_fields.hidden_field :assay_stream_id, value: assay_stream_id -%>
+  <%= assay_fields.hidden_field :assay_class_id, value: assay_class_id -%>
+
+  <% unless is_assay_stream %>
+    <% if User.current_user  -%>
+      <%= render partial: 'assets/manage_specific_attributes', locals:{f:assay_fields} if show_form_manage_specific_attributes? %>
+      <%= assay_fields.fancy_multiselect(:sops, other_projects_checkbox: true, name: "isa_assay[assay][sop_ids]")%>
+      <%= assay_fields.fancy_multiselect :publications, { other_projects_checkbox: true, name: "isa_assay[assay][publication_ids]" } %>
+      <%= assay_fields.fancy_multiselect :documents, { other_projects_checkbox: true, name: "isa_assay[assay][document_ids]" } %>
+    <% end -%>
+
+    <%= render partial: "assets/discussion_links_form", locals: { resource: @isa_assay.assay } -%>
+
   <% end -%>
-
-  <%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @isa_assay.assay} -%>
-
 <% end -%>
 
 <%= f.hidden_field :input_sample_type_id, value: input_sample_type_id  -%>
 
-<% if @isa_assay.sample_type %>
+<% unless is_assay_stream %>
   <%= folding_panel("Define #{t(:sample_type)} for #{t(:assay)}") do %>
     <%= render partial: 'isa_studies/sample_types_form', locals: {f: f, sample_type: @isa_assay.sample_type, id_suffix: "_sample_type", isa_element: "assay", action: action} %>
   <% end %>

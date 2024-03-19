@@ -6,9 +6,13 @@ en:
 
   login:
     elixir_aai: 'LS Login'
+    elixir_aai_legacy: 'ELIXIR AAI'
     ldap: 'LDAP'
     github: 'GitHub'
+    oidc: 'OpenID Connect'
 
+  single_page: "Single Page"
+  default_view: "Default View"
   investigation: &investigation "Investigation"
   study: &study "Study"
   assay: &assay "Assay"
@@ -16,6 +20,7 @@ en:
     assay: "Assay"
     experimental_assay: "Experimental assay"
     modelling_analysis:  "Modelling analysis"
+    assay_stream:  "Assay Stream"
 
   isa_study: "ISA Study"
   study_design: "Study Design"
@@ -291,6 +296,8 @@ you can choose to have a %{project} linked to a site managed %{programme} instea
   <p>'
 
   info_text:
+    default_view: "The default view used to visualize your experiments."
+    single_page: "A view specifically designed to visualize and interact with your experiments."
     institution: "An Institution in SEEK is where someone is employed or works or a person's affiliation."
     #person: "A Person (People) in SEEK is a registered user or a Profile of a person that has not registered with SEEK. A Person is someone who participates directly or indirectly in the scientific research described within SEEK."
     programme: "A Programme is an umbrella to group one or more Projects."

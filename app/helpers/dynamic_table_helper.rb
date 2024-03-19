@@ -1,8 +1,19 @@
 module DynamicTableHelper
   def dt_data(sample_type)
-    rows = dt_rows(sample_type)
     columns = dt_cols(sample_type)
-    { columns: columns, rows: rows }
+    rows = dt_rows(sample_type)
+    row_values = get_rows_for_columns(rows, columns)
+    { columns:, rows: row_values }
+  end
+
+  # Gets the row values from the JSON metadata in the order that the columns are.
+  # Makes switching attribute positions possible without scrambling the JSON metadata
+  def get_rows_for_columns(rows, columns)
+    rows.map do |row|
+      columns.map do |col|
+        row[col[:title]]
+      end
+    end
   end
 
   def dt_aggregated(study, assay = nil)
@@ -14,7 +25,7 @@ module DynamicTableHelper
       end
     columns = dt_cumulative_cols(sample_types)
     rows = dt_cumulative_rows(sample_types, columns.length)
-    { columns: columns, rows: rows, sample_types: sample_types.map { |s| { title: s.title, id: s.id } } }
+    { columns:, rows:, sample_types: sample_types.map { |s| { title: s.title, id: s.id } } }
   end
 
   private
@@ -22,7 +33,7 @@ module DynamicTableHelper
   # Links all sample_types in a sequence of sample_types
   def link_sequence(sample_type)
     sequence = [sample_type]
-    while link = sample_type.sample_attributes.detect(&:seek_sample_multi?)&.linked_sample_type
+    while link = sample_type.previous_linked_sample_type
       sequence << link
       sample_type = link
     end
@@ -35,12 +46,10 @@ module DynamicTableHelper
 
     sample_type.samples.map do |s|
       if s.can_view?
-        sanitized_json_metadata = hide_unauthorized_inputs(JSON(s.json_metadata), registered_sample_attributes, registered_sample_multi_attributes)
-        ['', s.id, s.uuid] +
-          sanitized_json_metadata.values
+        sanitized_json_metadata = hide_unauthorized_inputs(JSON.parse(s.json_metadata), registered_sample_attributes, registered_sample_multi_attributes)
+        { 'selected' => '', 'id' => s.id, 'uuid' => s.uuid }.merge!(sanitized_json_metadata)
       else
-        ['', '#HIDDEN', '#HIDDEN'] +
-          Array.new(JSON(s.json_metadata).length, '#HIDDEN')
+        { 'selected' => '', 'id' => '#HIDDEN', 'uuid' => '#HIDDEN' }.merge!(sanitized_json_metadata&.transform_values { '#HIDDEN' })
       end
     end
   end
@@ -96,8 +105,8 @@ module DynamicTableHelper
       is_seek_multi_sample = a.sample_attribute_type.base_type == Seek::Samples::BaseType::SEEK_SAMPLE_MULTI
       is_cv_list = a.sample_attribute_type.base_type == Seek::Samples::BaseType::CV_LIST
       cv_allows_free_text =  a.allow_cv_free_text
-      attribute.merge!({ multi_link: true, linked_sample_type: a.linked_sample_type.id }) if is_seek_multi_sample
-      attribute.merge!({ multi_link: false, linked_sample_type: a.linked_sample_type.id }) if is_seek_sample
+      attribute.merge!({ multi_link: true, linked_sample_type: a.linked_sample_type_id }) if is_seek_multi_sample
+      attribute.merge!({ multi_link: false, linked_sample_type: a.linked_sample_type_id }) if is_seek_sample
       attribute.merge!({is_cv_list: , cv_allows_free_text:}) if is_cv_list
       attribute
     end
@@ -105,7 +114,7 @@ module DynamicTableHelper
   end
 
   def dt_default_cols(name)
-    [{ title: 'status', name: name, status: true }, { title: 'id', name: name }, { title: 'uuid', name: name }]
+    [{ title: 'status', name:, status: true }, { title: 'id', name: }, { title: 'uuid', name: }]
   end
 
   def dt_cumulative_rows(sample_types, col_count)

@@ -27,7 +27,7 @@ module Seek
         zample = obis_asset.content
         openbis_endpoint = obis_asset.seek_service
 
-        assay_params[:assay_class_id] ||= AssayClass.for_type('experimental').id
+        assay_params[:assay_class_id] ||= AssayClass.experimental.id
         assay_params[:title] ||= extract_title(zample) ## "OpenBIS #{zample.perm_id}"
         assay = Assay.new(assay_params)
 
@@ -88,7 +88,7 @@ module Seek
         assay = study.assays.where(title: FAKE_FILE_ASSAY_NAME).first
         return assay if assay
 
-        assay_params = {assay_class_id: AssayClass.for_type('experimental').id,
+        assay_params = {assay_class_id: AssayClass.experimental.id,
                         title: FAKE_FILE_ASSAY_NAME,
                         description: 'Automatically generated assay to host openbis files that are linked to
 the original OpenBIS experiment. Its content and linked data files will be updated by the system
@@ -446,7 +446,7 @@ if automatic synchronization was selected.'}
         Seek::Openbis::EntityType.ExperimentType(openbis_endpoint).find_by_codes(study_codes)
       end
 
-      
+
     end
   end
 end

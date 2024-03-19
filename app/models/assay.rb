@@ -25,6 +25,9 @@ class Assay < ApplicationRecord
 
   belongs_to :sample_type
 
+  has_many :child_assays, class_name: 'Assay', foreign_key: 'assay_stream_id', dependent: :destroy
+  belongs_to :assay_stream, class_name: 'Assay', optional: true
+
   belongs_to :assay_class
   has_many :assay_organisms, dependent: :destroy, inverse_of: :assay
   has_many :organisms, through: :assay_organisms, inverse_of: :assays
@@ -65,19 +68,50 @@ class Assay < ApplicationRecord
 
   enforce_authorization_on_association :study, :view
 
-  def previous_linked_assay_sample_type
-    sample_type.sample_attributes.detect { |sa| sa.isa_tag.nil? && sa.title.include?('Input') }&.linked_sample_type
+  def is_assay_stream?
+    assay_class&.is_assay_stream?
+  end
+
+  def previous_linked_sample_type
+    return unless is_isa_json_compliant?
+
+    if is_assay_stream? || first_assay_in_stream?
+      study.sample_types.second
+    else
+      sample_type.previous_linked_sample_type
+    end
   end
 
   def has_linked_child_assay?
-    sample_type&.linked_sample_attributes&.any?
+    return false unless is_isa_json_compliant?
+
+    if is_assay_stream?
+      child_assays.any?
+    else
+      sample_type&.linked_sample_attributes&.any?
+    end
   end
 
-  # Fetches the assay which is linked through linked_sample_attributes (Single Page specific method)
-  def linked_assay
-    sample_type.linked_sample_attributes
-               .select { |lsa| lsa.isa_tag.nil? && lsa.title.include?('Input') }
-               .first&.sample_type&.assays&.first
+  def next_linked_child_assay
+    return unless has_linked_child_assay?
+
+    if is_assay_stream?
+      first_assay_in_stream
+    else
+      sample_type.next_linked_sample_types.map(&:assays).flatten.detect { |a| a.assay_stream_id == assay_stream_id }
+    end
+  end
+
+  def first_assay_in_stream
+    if is_assay_stream?
+      child_assays.detect { |a| a.sample_type.previous_linked_sample_type == a.study.sample_types.second }
+    else
+      assay_stream.child_assays.detect { |a| a.sample_type.previous_linked_sample_type == a.study.sample_types.second }
+    end
+  end
+
+  def first_assay_in_stream?
+    self == first_assay_in_stream
   end
 
   def default_contributor
@@ -95,7 +129,7 @@ class Assay < ApplicationRecord
   end
 
   def is_isa_json_compliant?
-    investigation.is_isa_json_compliant? && !sample_type.nil?
+    investigation.is_isa_json_compliant? && (!sample_type.nil? || is_assay_stream?)
   end
 
   # returns true if this is a modelling class of assay

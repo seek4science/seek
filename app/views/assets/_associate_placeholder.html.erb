@@ -1,4 +1,5 @@
 <%
+  return unless Seek::Config.placeholders_enabled
   has_direction ||= false
   has_relationships ||= false
   resource_text ||= text_for_resource(resource)

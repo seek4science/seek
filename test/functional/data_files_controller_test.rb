@@ -30,6 +30,15 @@ class DataFilesControllerTest < ActionController::TestCase
 
   end
 
+  test 'get data file redirects if feature disabled' do
+    df = FactoryBot.create(:data_file, policy: FactoryBot.create(:public_policy))
+    with_config_value(:data_files_enabled, false) do
+      get :show, params: { id: df }
+      assert_redirected_to root_path
+      assert_equal 'Data files are disabled', flash[:error]
+    end
+  end
+
   test 'json link includes version' do
     df = FactoryBot.create(:data_file, policy: FactoryBot.create(:public_policy))
 
@@ -608,7 +617,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
   end
 
-  test 'show explore button' do
+  test 'show explore button and magnify icon' do
     df = FactoryBot.create(:small_test_spreadsheet_datafile)
     login_as(df.contributor.user)
     get :show, params: { id: df }
@@ -617,9 +626,12 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_select 'a[href=?]', explore_data_file_path(df, version: df.version), count: 1
       assert_select 'a.disabled', text: 'Explore', count: 0
     end
+    assert_select 'div.fileinfo span.filename' do
+      assert_select 'a[href=?][title=?]', explore_data_file_path(df, version: df.version), 'Explore the contents of this file', count: 1
+    end
   end
 
-  test 'show explore button for csv file' do
+  test 'show explore button  and magnify icon for csv file' do
     df = FactoryBot.create(:csv_spreadsheet_datafile)
     login_as(df.contributor.user)
     get :show, params: { id: df }
@@ -627,6 +639,9 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select '#buttons' do
       assert_select 'a[href=?]', explore_data_file_path(df, version: df.version), count: 1
       assert_select 'a.disabled', text: 'Explore', count: 0
+    end
+    assert_select 'div.fileinfo span.filename' do
+      assert_select 'a[href=?][title=?]', explore_data_file_path(df, version: df.version), 'Explore the contents of this file', count: 1
     end
   end
 
@@ -642,9 +657,12 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_select 'a[href=?]', explore_data_file_path(df, version: df.version), count: 0
       assert_select 'a', text: 'Explore', count: 0
     end
+    assert_select 'div.fileinfo span.filename' do
+      assert_select 'a[href=?][title=?]', explore_data_file_path(df, version: df.version), 'Explore the contents of this file', count: 0
+    end
   end
 
-  test 'show disabled explore button if spreadsheet too big' do
+  test 'show disabled explore button and magnify icon if spreadsheet too big' do
     df = FactoryBot.create(:small_test_spreadsheet_datafile)
     login_as(df.contributor.user)
     with_config_value(:max_extractable_spreadsheet_size, 0) do
@@ -654,6 +672,10 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select '#buttons' do
       assert_select 'a[href=?]', explore_data_file_path(df, version: df.version), count: 0
       assert_select 'a.disabled', text: 'Explore', count: 1
+    end
+    assert_select 'div.fileinfo span.filename' do
+      assert_select 'a[href=?][title=?]', explore_data_file_path(df, version: df.version), 'Explore the contents of this file', count: 0
+      assert_select 'span > a.disabled > img', count: 1
     end
   end
 
@@ -1255,6 +1277,13 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test 'explore spreadsheet with error logs' do
+    data = FactoryBot.create :spreadsheet_with_error_logs_datafile, policy: FactoryBot.create(:public_policy)
+    get :explore, params: { id: data }
+    assert_response :success
+    assert_select 'div#spreadsheet_1 table.sheet td#cell_B4',text:'ProjectDescription'
+  end
+
   test 'explore earlier version' do
 
     df = FactoryBot.create(:small_test_spreadsheet_datafile)
@@ -1750,6 +1779,16 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal 'fish flop', json['data']['attributes']['title']
     assert_equal 'testing json description', json['data']['attributes']['description']
     assert_equal df.version, json['data']['attributes']['version']
+  end
+
+  test 'get data_file as json returns error if feature disabled' do
+    df = FactoryBot.create(:data_file, policy: FactoryBot.create(:public_policy))
+    with_config_value(:data_files_enabled, false) do
+      get :show, params: { id: df, format: 'json' }
+      assert_response :unprocessable_entity
+      json = JSON.parse(response.body)
+      assert_equal 'Data files are disabled', json['title']
+    end
   end
 
   test 'landing page for hidden private_item' do
@@ -2286,7 +2325,6 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select 'a', text: /fish/
   end
 
-
   test 'filtering using other fields in association form' do
     person = FactoryBot.create(:person)
     project1 = person.projects.first
@@ -2320,6 +2358,14 @@ class DataFilesControllerTest < ActionController::TestCase
     get :filter, params: { filter: 'datax', simulation_data: 'true' }
     assert response.body.blank?
     assert_response :success
+  end
+
+  test 'filtering returns error message if feature disabled' do
+    with_config_value(:data_files_enabled, false) do
+      get :filter, xhr: true, params: { filter: 'hello?' }
+      assert_response :unprocessable_entity
+      assert_select 'div.alert-danger', text: /Data files are disabled/
+    end
   end
 
   test 'programme data files through nested routing' do
@@ -2782,11 +2828,12 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal visible, assigns(:visible_count)
   end
 
-  test 'delete with data file with extracted samples' do
+  test 'delete data file and extracted samples' do
     login_as(FactoryBot.create(:person))
-    df = nil
 
     df = data_file_with_extracted_samples
+    sample = df.extracted_samples.first
+    sample_ids = df.extracted_sample_ids
 
     assert_no_difference('DataFile.count') do
       delete :destroy, params: { id: df.id }
@@ -2794,18 +2841,42 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_redirected_to destroy_samples_confirm_data_file_path(df)
 
     assert_difference('DataFile.count', -1) do
-      assert_difference('Sample.count', -4) do
-        delete :destroy, params: { id: df.id, destroy_extracted_samples: '1' }
+      assert_no_difference('Sample.count') do
+        assert_enqueued_jobs(1, only: AuthLookupDeleteJob) do
+          assert_enqueued_with(job: AuthLookupDeleteJob, args: ['DataFile', df.id]) do
+            assert_enqueued_jobs(1, only: SamplesBatchDeleteJob) do
+              assert_enqueued_with(job: SamplesBatchDeleteJob, args: [sample_ids]) do
+                delete :destroy, params: { id: df.id, destroy_extracted_samples: '1' }
+              end
+            end
+          end
+        end
       end
     end
 
     assert_redirected_to data_files_path
+  end
+
+  test 'delete data file but not extracted samples' do
+    login_as(FactoryBot.create(:person))
 
     df = data_file_with_extracted_samples
+    sample = df.extracted_samples.first
+
+    assert_no_difference('DataFile.count') do
+      delete :destroy, params: { id: df.id }
+    end
+    assert_redirected_to destroy_samples_confirm_data_file_path(df)
 
     assert_difference('DataFile.count', -1) do
       assert_no_difference('Sample.count') do
-        delete :destroy, params: { id: df.id, destroy_extracted_samples: '0' }
+        assert_enqueued_jobs(1, only: AuthLookupDeleteJob) do
+          assert_enqueued_with(job: AuthLookupDeleteJob, args: ['DataFile', df.id]) do
+            assert_no_enqueued_jobs(only: SamplesBatchDeleteJob) do
+              delete :destroy, params: { id: df.id, destroy_extracted_samples: '0' }
+            end
+          end
+        end
       end
     end
 

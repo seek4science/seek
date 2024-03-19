@@ -117,7 +117,7 @@ module IsaExporter
       # raise "The Study with the title '#{study.title}' does not have any SOP" if study.sops.blank?
       protocols << convert_protocol(study.sops, study.id, with_tag_protocol_study, with_tag_parameter_value_study)
 
-      study.assays.each do |a|
+      study.assay_streams.map(&:child_assays).flatten.each do |a|
         # There should be only one attribute with isa_tag == protocol
         protocol_attribute = a.sample_type.sample_attributes.detect { |sa| sa.isa_tag&.isa_protocol? }
         with_tag_parameter_value = a.sample_type.sample_attributes.select { |sa| sa.isa_tag&.isa_parameter_value? }
@@ -134,20 +134,7 @@ module IsaExporter
         raise "All assays in study `#{study.title}` should be ISA-JSON compliant."
       end
 
-      assay_streams = study.assays.map { |assay| [assay] if assay&.position&.zero? }
-                           .compact
-                           .map do |assay_stream|
-        last_assay = assay_stream.first
-        until last_assay.linked_assay.nil?
-          linked_assay = last_assay.linked_assay
-          assay_stream.push(linked_assay)
-          last_assay = linked_assay
-        end
-        assay_stream
-      end
-
-      isa_study[:assays] = assay_streams.map { |assay_stream| convert_assays(assay_stream) }.compact
-
+      isa_study[:assays] = study.assay_streams.map { |assay_stream| convert_assays(assay_stream) }.compact
       isa_study[:factors] = []
       isa_study[:unitCategories] = []
 
@@ -163,28 +150,25 @@ module IsaExporter
       isa_annotation
     end
 
-    def convert_assay_comments(assays)
+    def convert_assay_comments(assay_stream)
       assay_comments = []
-      assay_streams = assays.select { |a| a.position.zero? }
-      assay_stream_id = assays.pluck(:id).join('_')
+      assay_stream_id = assay_stream&.id
 
-      linked_assays = assays.map { |assay| { 'id': assay.id, 'title': assay.title } }.to_json
+      linked_assays = assay_stream.child_assays.map { |assay| { 'id': assay.id, 'title': assay.title } }.to_json
 
-      assay_streams.map do |assay|
-        study_id = assay.study_id
-        next if assay.extended_metadata.nil?
+      study_id = assay_stream.study_id
+      return [] if assay_stream.extended_metadata.nil?
 
-        json = JSON.parse(assay.extended_metadata&.json_metadata)
-        cm_attributes = assay.extended_metadata.extended_metadata_attributes
-        cm_id = assay.extended_metadata&.id
-        json.map do |key, val|
-          cma_id = cm_attributes.detect { |cma| cma.title == key }&.id
-          assay_comments.push({
-            '@id': "#assay_comment/#{[study_id, assay_stream_id, cm_id, cma_id].join('_')}",
-            'name': key,
-            'value': val
-          })
-        end
+      json = JSON.parse(assay_stream.extended_metadata&.json_metadata)
+      cm_attributes = assay_stream.extended_metadata.extended_metadata_attributes
+      cm_id = assay_stream.extended_metadata&.id
+      json.map do |key, val|
+        cma_id = cm_attributes.detect { |cma| cma.title == key }&.id
+        assay_comments.push({
+          '@id': "#assay_comment/#{[study_id, assay_stream_id, cm_id, cma_id].join('_')}",
+          'name': key,
+          'value': val
+        })
       end
 
       assay_comments.push({
@@ -195,35 +179,43 @@ module IsaExporter
       assay_comments.compact
     end
 
-    def convert_assays(assays)
-      return unless assays.all? { |a| a.can_view?(@current_user) }
+    def convert_assays(assay_stream)
+      child_assays = assay_stream.child_assays
+      return unless assay_stream.can_view?(@current_user)
+      return unless child_assays.all? { |a| a.can_view?(@current_user) }
 
-      all_sample_types = assays.map(&:sample_type)
-      first_assay = assays.detect { |s| s.position.zero? }
-      raise 'No assay could be found!' unless first_assay
+      child_assays.map do |ca|
+        unless ca.sample_type.present?
+          raise "No Sample type was found in Assay '#{ca.id} - #{ca.title}'," \
+                " part of Assay Stream '#{assay_stream.id - assay_stream.title}'"
+        end
+      end
 
-      stream_name = "assays_#{assays.pluck(:id).join('_')}"
-      assay_comments = convert_assay_comments(assays)
+      all_sample_types = child_assays.map(&:sample_type).compact
+
+      # stream_name = "assays_#{child_assays.pluck(:id).join('_')}"
+      stream_name = "#{ assay_stream.title }_#{assay_stream.id}_#{child_assays.pluck(:id).join('_')}"
+      assay_comments = convert_assay_comments(assay_stream)
 
       # Retrieve assay_stream if
-      stream_name_comment = assay_comments.detect { |ac| ac[:name] == 'assay_stream' }
-      stream_name = stream_name_comment[:value] unless stream_name_comment.nil?
+      # stream_name_comment = assay_comments.detect { |ac| ac[:name] == 'assay_stream' }
+      # stream_name = stream_name_comment[:value] unless stream_name_comment.nil?
 
       isa_assay = {}
-      isa_assay['@id'] = "#assay/#{assays.pluck(:id).join('_')}"
+      isa_assay['@id'] = "#assay/#{child_assays.pluck(:id).join('_')}"
       isa_assay[:filename] = "a_#{stream_name.downcase.tr(" ", "_")}.txt"
       isa_assay[:measurementType] = { annotationValue: '', termSource: '', termAccession: '' }
       isa_assay[:technologyType] = { annotationValue: '', termSource: '', termAccession: '' }
       isa_assay[:comments] = assay_comments
       isa_assay[:technologyPlatform] = ''
-      isa_assay[:characteristicCategories] = convert_characteristic_categories(nil, assays)
+      isa_assay[:characteristicCategories] = convert_characteristic_categories(nil, child_assays)
       isa_assay[:materials] = {
         # Here, the first assay's samples will be enough
-        samples: assay_samples(first_assay), # the samples from study level that are referenced in this assay's samples,
+        samples: assay_samples(child_assays.first), # the samples from study level that are referenced in this assay's samples,
         otherMaterials: convert_other_materials(all_sample_types)
       }
       isa_assay[:processSequence] =
-        assays.map { |a| convert_process_sequence(a.sample_type, a.sops.map(&:id).join("_"), a.id) }.flatten
+        child_assays.map { |a| convert_process_sequence(a.sample_type, a.sops.map(&:id).join("_"), a.id) }.flatten
       isa_assay[:dataFiles] = convert_data_files(all_sample_types)
       isa_assay[:unitCategories] = []
       isa_assay
@@ -278,7 +270,14 @@ module IsaExporter
 
     def convert_ontologies
       source_ontologies = []
-      sample_types = @investigation.studies.map(&:sample_types) + @investigation.assays.map(&:sample_type)
+      sample_types = @investigation.studies.map(&:sample_types) + @investigation.assays
+                                                                                .select(&:is_assay_stream?)
+                                                                                .map(&:child_assays)
+                                                                                .compact
+                                                                                .flatten
+                                                                                .map(&:sample_type)
+                                                                                .compact
+
       sample_types.flatten.each do |sa|
         sa.sample_attributes.each do |atr|
           source_ontologies << atr.sample_controlled_vocab.source_ontology if atr.ontology_based?
@@ -726,7 +725,7 @@ module IsaExporter
           if vocab_term
             sample_attribute.sample_controlled_vocab.sample_controlled_vocab_terms.find_by_label(label)&.iri
           else
-            sample_attribute.sample_controlled_vocab.ols_root_term_uri
+            sample_attribute.sample_controlled_vocab.ols_root_term_uris
           end
       end
       term_accession = iri || ''
@@ -752,7 +751,7 @@ module IsaExporter
     end
 
     def get_derived_from_type(sample_type)
-      raise 'There is no sample!' if sample_type.samples.length == 0
+      raise "There are no samples in '#{sample_type.title}'!" if sample_type.samples.blank?
 
       prev_sample_type = sample_type.samples[0]&.linked_samples[0]&.sample_type
       return nil if prev_sample_type.blank?

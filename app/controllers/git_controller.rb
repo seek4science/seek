@@ -8,7 +8,6 @@ class GitController < ApplicationController
   before_action :fetch_git_version
   before_action :get_tree, only: [:tree]
   before_action :get_blob, only: [:blob, :download, :raw]
-  before_action :coerce_format
 
   user_content_actions :raw
 
@@ -16,6 +15,11 @@ class GitController < ApplicationController
   rescue_from Git::PathNotFoundException, with: :render_path_not_found_error
   rescue_from Git::InvalidPathException, with: :render_invalid_path_error
   rescue_from URI::InvalidURIError, with: :render_invalid_url_error
+
+  # See: config/initializers/action_dispatch_http_mime_negotiation.rb
+  def self.ignore_format_from_extension
+    true
+  end
 
   def browse
     respond_to do |format|
@@ -25,12 +29,12 @@ class GitController < ApplicationController
 
   def tree
     respond_to do |format|
-      format.json { render json: @tree, adapter: :attributes, root: '' }
       if request.xhr?
         format.html { render partial: 'tree' }
       else
         format.html
       end
+      format.json { render json: @tree, adapter: :attributes, root: '' }
     end
   end
 
@@ -40,12 +44,12 @@ class GitController < ApplicationController
 
   def blob
     respond_to do |format|
-      format.json { render json: @blob, adapter: :attributes, root: '' }
       if request.xhr?
         format.html { render partial: 'blob' }
       else
         format.html
       end
+      format.json { render json: @blob, adapter: :attributes, root: '' }
     end
   end
 
@@ -118,7 +122,6 @@ class GitController < ApplicationController
 
   def operation_response(notice = nil, status: 200)
     respond_to do |format|
-      format.json { render json: { }, status: status, adapter: :attributes, root: '' }
       format.html do
         if request.xhr?
           render partial: 'files', locals: { resource: @parent_resource, git_version: @git_version }, status: status
@@ -127,6 +130,7 @@ class GitController < ApplicationController
           redirect_to polymorphic_path(@parent_resource, tab: 'files')
         end
       end
+      format.json { render json: { }, status: status, adapter: :attributes, root: '' }
     end
   end
 
@@ -224,17 +228,6 @@ class GitController < ApplicationController
     path = file_params[:url].split('/').last if path.blank?
     @git_version.add_remote_file(path, file_params[:url], fetch: file_params[:fetch] == '1')
     @git_version.save!
-  end
-
-  def coerce_format
-    # I have to do this because Rails doesn't seem to be behaving as expected.
-    # In routes.rb, the git routes are scoped with "format: false", so Rails should disregard the extension
-    # (e.g. /git/1/blob/my_file.yml) when determining the response format.
-    # However this results in an UnknownFormat error when trying to load the HTML view, as Rails still seems to be
-    # looking for an e.g. application/yaml view.
-    # You can fix this by adding { defaults: { format: :html } }, but then it is not possible to request JSON,
-    # even with an explicit `Accept: application/json` header! -Finn
-    request.format = :html unless json_api_request?
   end
 
   def file_content

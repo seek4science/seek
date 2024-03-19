@@ -6,7 +6,6 @@ class SampleControlledVocabsController < ApplicationController
 
   before_action :samples_enabled?, except: :typeahead
   before_action :login_required, except: %i[show index]
-  before_action :is_user_admin_auth, only: %i[destroy update]
   before_action :find_and_authorize_requested_item, except: %i[index new create]
   before_action :find_assets, only: :index
   before_action :auth_to_create, only: %i[new create]
@@ -89,13 +88,16 @@ class SampleControlledVocabsController < ApplicationController
     error_msg = nil
     begin
       source_ontology = params[:source_ontology_id]
-      root_uri = params[:root_uri]
+      root_uris = params[:root_uris]
 
-      raise 'No root URI provided' if root_uri.blank?
-
+      raise 'No root URI provided' if root_uris.blank?
+      @terms = []
       client = Ebi::OlsClient.new
-      @terms = client.all_descendants(source_ontology, root_uri)
-      @terms.reject! { |t| t[:iri] == root_uri } unless params[:include_root_term] == '1'
+      root_uris.split(',').collect(&:strip).reject(&:blank?).each do |uri|
+        terms = client.all_descendants(source_ontology, uri)
+        terms.reject! { |t| t[:iri] == uri } unless params[:include_root_term] == '1'
+        @terms = @terms | terms
+      end
       error_msg = "There are no descendant terms to populate the list." unless @terms.present?
     rescue StandardError => e
       error_msg = e.message
@@ -129,7 +131,7 @@ class SampleControlledVocabsController < ApplicationController
   private
 
   def cv_params
-    params.require(:sample_controlled_vocab).permit(:title, :description, :group, :source_ontology, :ols_root_term_uri,
+    params.require(:sample_controlled_vocab).permit(:title, :description, :group, :source_ontology, :ols_root_term_uris,
                                                     :required, :short_name,
                                                     { sample_controlled_vocab_terms_attributes: %i[id _destroy label
                                                                                                    iri parent_iri] })

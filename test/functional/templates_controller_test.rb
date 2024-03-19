@@ -16,7 +16,10 @@ class TemplatesControllerTest < ActionController::TestCase
     @template = FactoryBot.create(:min_template, project_ids: @project_ids, contributor: @person)
     @string_type = FactoryBot.create(:string_sample_attribute_type)
     @int_type = FactoryBot.create(:integer_sample_attribute_type)
+    @registered_sample_attribute_type = FactoryBot.create(:sample_sample_attribute_type)
+    @registered_sample_multi_attribute_type = FactoryBot.create(:sample_multi_sample_attribute_type)
     @controlled_vocab_type = FactoryBot.create(:controlled_vocab_attribute_type)
+    @controlled_vocab_list_type = FactoryBot.create(:cv_list_attribute_type)
     @default_isa_tag = FactoryBot.create(:default_isa_tag)
   end
 
@@ -269,5 +272,351 @@ class TemplatesControllerTest < ActionController::TestCase
       assert_select 'a[href=?]', template_path(template), text: template.title
       assert_select 'a[href=?]', template_path(template2), text: template2.title, count: 0
     end
+  end
+
+  test 'editable isa tags' do
+    login_as(@person)
+    parent_template = FactoryBot.create(:isa_source_template, project_ids: @project_ids, contributor: @person)
+    inherited_template = create_template_from_parent_template(parent_template)
+
+    refute parent_template.template_attributes.all?(&:inherited?)
+    assert inherited_template.template_attributes.all?(&:inherited?)
+
+    get :edit, params: { id: inherited_template.id }
+    assert_response :success
+
+    inherited_template.template_attributes.each_with_index do |_ta, i|
+      id = "select#template_template_attributes_attributes_#{i}_isa_tag_title[disabled='disabled']"
+      assert_select id
+    end
+
+    inherited_template.template_attributes << FactoryBot.create(:template_attribute, title: 'Extra attribute', isa_tag: FactoryBot.create(:source_characteristic_isa_tag), sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), pos: 4)
+    inherited_template.reload
+
+    assert inherited_template.template_attributes.last.title == 'Extra attribute'
+    refute inherited_template.template_attributes.last.inherited?
+    assert inherited_template.template_attributes.first.title == 'Source Name'
+    assert inherited_template.template_attributes.first.inherited?
+    refute inherited_template.template_attributes.first.allow_isa_tag_change?
+    assert inherited_template.template_attributes.last.allow_isa_tag_change?
+
+    get :edit, params: { id: inherited_template.id }
+    assert_response :success
+
+    assert_select "select#template_template_attributes_attributes_0_isa_tag_title[disabled='disabled']"
+    cnt_last_attribute = inherited_template.template_attributes.count - 1
+
+    assert_select "select#template_template_attributes_attributes_#{cnt_last_attribute}_isa_tag_title[disabled='disabled']", text: 'source_characteristic', count: 0
+
+  end
+
+  test 'should not allow to create template with registered sample template attributes with no linked sample type' do
+    source_isa_tag = FactoryBot.create(:source_isa_tag)
+    source_characteristic_isa_tag = FactoryBot.create(:source_characteristic_isa_tag)
+    source_attribute = {
+      pos: '1',
+      title: 'Source Name',
+      required: '1',
+      short_name: 'attribute1 short name',
+      ontology_version: '0.1.1',
+      description: 'attribute1 description',
+      isa_tag_id: source_isa_tag.id,
+      sample_attribute_type_id: @string_type.id,
+      is_title: '1',
+      _destroy: '0'
+    }
+
+    bad_registered_sample_attribute = {
+      pos: '2',
+      title: 'Correct registered sample attribute',
+      required: '1',
+      short_name: 'attribute2 short name',
+      ontology_version: '0.1.2',
+      description: 'attribute2 description',
+      isa_tag_id: source_characteristic_isa_tag,
+      sample_attribute_type_id: @registered_sample_attribute_type.id,
+      linked_sample_type_id: nil,
+      _destroy: '0'
+    }
+
+    bad_template_params = { title: 'Bad template',
+                            project_ids: @project_ids,
+                            level: 'study source',
+                            organism: 'any',
+                            version: '1.0.0',
+                            parent_id: nil,
+                            description: 'Template containing registered samples attributes with no linked sample type',
+                            template_attributes_attributes: {
+                              '0' => source_attribute,
+                              '1' => bad_registered_sample_attribute
+                            } }
+
+    assert_no_difference('Template.count') do
+      post :create, params: { template: bad_template_params }
+      assert_response :unprocessable_entity
+      assert_template :new
+      assert_select 'div#error_explanation', text: /Linked Sample Type must be set if attribute type is Registered Sample/
+    end
+
+    sample_type = FactoryBot.create(:simple_sample_type, project_ids: @project_ids, contributor: @person)
+
+    correct_registered_sample_attribute = {
+      pos: '2',
+      title: 'Correct registered sample attribute',
+      required: '1',
+      short_name: 'attribute2 short name',
+      ontology_version: '0.1.2',
+      description: 'attribute2 description',
+      isa_tag_id: source_characteristic_isa_tag,
+      sample_attribute_type_id: @registered_sample_attribute_type.id,
+      linked_sample_type_id: sample_type.id,
+      _destroy: '0'
+    }
+
+    correct_source_template_params = { title: 'Correct source template',
+                                       project_ids: @project_ids,
+                                       level: 'study source',
+                                       organism: 'any',
+                                       version: '1.0.0',
+                                       parent_id: nil,
+                                       description: 'Template containing attributes with no isa tags',
+                                       template_attributes_attributes: {
+                                         '0' => source_attribute,
+                                         '1' => correct_registered_sample_attribute
+                                       } }
+
+    assert_difference('Template.count', 1) do
+      post :create, params: { template: correct_source_template_params }
+      assert_response :redirect
+      assert_redirected_to template_path(assigns(:template))
+    end
+
+    sample_isa_tag = FactoryBot.create(:sample_isa_tag)
+    sample_characteristic_isa_tag = FactoryBot.create(:sample_characteristic_isa_tag)
+
+    input_sample_attribute = {
+      pos: '1',
+      title: 'Input (Source sample)',
+      required: '1',
+      short_name: 'attribute1 short name',
+      ontology_version: '0.1.2',
+      description: 'attribute1 description',
+      sample_attribute_type_id: @registered_sample_multi_attribute_type.id,
+      linked_sample_type_id: nil,
+      _destroy: '0'
+    }
+
+    collected_sample_attribute = {
+      pos: '2',
+      title: 'Sample Name',
+      required: '1',
+      short_name: 'attribute2 short name',
+      ontology_version: '0.1.1',
+      description: 'attribute2 description',
+      isa_tag_id: sample_isa_tag.id,
+      sample_attribute_type_id: @string_type.id,
+      is_title: '1',
+      _destroy: '0'
+    }
+
+    sample_characteristic_attribute = {
+      pos: '3',
+      title: 'Correct registered sample attribute',
+      required: '1',
+      short_name: 'attribute3 short name',
+      ontology_version: '0.1.2',
+      description: 'attribute3 description',
+      isa_tag_id: sample_characteristic_isa_tag.id,
+      sample_attribute_type_id: @registered_sample_attribute_type.id,
+      linked_sample_type_id: sample_type.id,
+      _destroy: '0'
+    }
+
+    correct_sample_collection_template_params = { title: 'Correct Sample collection template',
+                                                  project_ids: @project_ids,
+                                                  level: 'study sample',
+                                                  organism: 'any',
+                                                  version: '1.0.0',
+                                                  parent_id: nil,
+                                                  description: 'Sample collection template made correctly',
+                                                  template_attributes_attributes: {
+                                                    '0' => input_sample_attribute,
+                                                    '1' => collected_sample_attribute,
+                                                    '2' => sample_characteristic_attribute
+                                                  } }
+
+    assert_difference('Template.count', 1) do
+      post :create, params: { template: correct_sample_collection_template_params }
+      assert_response :redirect
+      assert_redirected_to template_path(assigns(:template))
+    end
+
+  end
+
+  test 'should not allow to create template with controlled vocabulary template attributes with no sample controlled vocabulary' do
+    source_isa_tag = FactoryBot.create(:source_isa_tag)
+    source_characteristic_isa_tag = FactoryBot.create(:source_characteristic_isa_tag)
+    source_attribute = {
+      pos: '1',
+      title: 'Source Name',
+      required: '1',
+      short_name: 'attribute1 short name',
+      ontology_version: '0.1.1',
+      description: 'attribute1 description',
+      isa_tag_id: source_isa_tag.id,
+      sample_attribute_type_id: @string_type.id,
+      is_title: '1',
+      _destroy: '0'
+    }
+
+    bad_controlled_vocab_attribute = {
+      pos: '2',
+      title: 'Correct registered sample attribute',
+      required: '1',
+      short_name: 'attribute2 short name',
+      ontology_version: '0.1.2',
+      description: 'attribute2 description',
+      isa_tag_id: source_characteristic_isa_tag,
+      sample_attribute_type_id: @controlled_vocab_type.id,
+      _destroy: '0'
+    }
+
+    bad_template_params = { title: 'Bad template',
+                            project_ids: @project_ids,
+                            level: 'study source',
+                            organism: 'any',
+                            version: '1.0.0',
+                            parent_id: nil,
+                            description: 'Template containing controlled vocabulary attributes with no sample controlled vocabulary',
+                            template_attributes_attributes: {
+                              '0' => source_attribute,
+                              '1' => bad_controlled_vocab_attribute
+                            } }
+
+    assert_no_difference('Template.count') do
+      post :create, params: { template: bad_template_params }
+      assert_response :unprocessable_entity
+      assert_template :new
+      assert_select 'div#error_explanation', text: /Controlled vocabulary must be set if attribute type is CV/
+    end
+
+    controlled_vocab = FactoryBot.create(:apples_sample_controlled_vocab)
+    correct_controlled_vocab_attribute = {
+      pos: '2',
+      title: 'Correct registered sample attribute',
+      required: '1',
+      short_name: 'attribute2 short name',
+      ontology_version: '0.1.2',
+      description: 'attribute2 description',
+      isa_tag_id: source_characteristic_isa_tag,
+      sample_attribute_type_id: @controlled_vocab_type.id,
+      sample_controlled_vocab_id: controlled_vocab.id,
+      _destroy: '0'
+    }
+
+    correct_source_template_params = { title: 'Correct source template',
+                                       project_ids: @project_ids,
+                                       level: 'study source',
+                                       organism: 'any',
+                                       version: '1.0.0',
+                                       parent_id: nil,
+                                       description: 'Template containing controlled vocabulary attributes with sample controlled vocabulary',
+                                       template_attributes_attributes: {
+                                         '0' => source_attribute,
+                                         '1' => correct_controlled_vocab_attribute
+                                       } }
+
+    assert_difference('Template.count', 1) do
+      post :create, params: { template: correct_source_template_params }
+      assert_response :redirect
+      assert_redirected_to template_path(assigns(:template))
+    end
+  end
+
+  test 'should not allow to create template with controlled vocabulary list template attributes with no sample controlled vocabulary' do
+    source_isa_tag = FactoryBot.create(:source_isa_tag)
+    source_characteristic_isa_tag = FactoryBot.create(:source_characteristic_isa_tag)
+    source_attribute = {
+      pos: '1',
+      title: 'Source Name',
+      required: '1',
+      short_name: 'attribute1 short name',
+      ontology_version: '0.1.1',
+      description: 'attribute1 description',
+      isa_tag_id: source_isa_tag.id,
+      sample_attribute_type_id: @string_type.id,
+      is_title: '1',
+      _destroy: '0'
+    }
+
+    bad_controlled_vocab_list_attribute = {
+      pos: '2',
+      title: 'Correct registered sample attribute',
+      required: '1',
+      short_name: 'attribute2 short name',
+      ontology_version: '0.1.2',
+      description: 'attribute2 description',
+      isa_tag_id: source_characteristic_isa_tag,
+      sample_attribute_type_id: @controlled_vocab_list_type.id,
+      _destroy: '0'
+    }
+
+    bad_template_params = { title: 'Bad template',
+                            project_ids: @project_ids,
+                            level: 'study source',
+                            organism: 'any',
+                            version: '1.0.0',
+                            parent_id: nil,
+                            description: 'Template containing controlled vocabulary list attributes with no sample controlled vocabulary',
+                            template_attributes_attributes: {
+                              '0' => source_attribute,
+                              '1' => bad_controlled_vocab_list_attribute
+                            } }
+
+    assert_no_difference('Template.count') do
+      post :create, params: { template: bad_template_params }
+      assert_response :unprocessable_entity
+      assert_template :new
+      assert_select 'div#error_explanation', text: /Controlled vocabulary must be set if attribute type is LIST/
+    end
+
+    controlled_vocab = FactoryBot.create(:apples_sample_controlled_vocab)
+    correct_controlled_vocab_list_attribute = {
+      pos: '2',
+      title: 'Correct registered sample attribute',
+      required: '1',
+      short_name: 'attribute2 short name',
+      ontology_version: '0.1.2',
+      description: 'attribute2 description',
+      isa_tag_id: source_characteristic_isa_tag,
+      sample_attribute_type_id: @controlled_vocab_list_type.id,
+      sample_controlled_vocab_id: controlled_vocab.id,
+      _destroy: '0'
+    }
+
+    correct_source_template_params = { title: 'Correct source template',
+                                       project_ids: @project_ids,
+                                       level: 'study source',
+                                       organism: 'any',
+                                       version: '1.0.0',
+                                       parent_id: nil,
+                                       description: 'Template containing controlled vocabulary attributes with sample controlled vocabulary',
+                                       template_attributes_attributes: {
+                                         '0' => source_attribute,
+                                         '1' => correct_controlled_vocab_list_attribute
+                                       } }
+
+    assert_difference('Template.count', 1) do
+      post :create, params: { template: correct_source_template_params }
+      assert_response :redirect
+      assert_redirected_to template_path(assigns(:template))
+    end
+  end
+
+  def create_template_from_parent_template(parent_template, person= @person, linked_sample_type= nil)
+    child_template_attributes = parent_template.template_attributes.map do |ta|
+      FactoryBot.create(:template_attribute, parent_attribute_id: ta.id, title: ta.title, isa_tag_id: ta.isa_tag_id, sample_attribute_type: ta.sample_attribute_type, is_title: ta.is_title, required: ta.required, sample_controlled_vocab: ta.sample_controlled_vocab, pos: ta.pos)
+    end
+    FactoryBot.create(:template, contributor: person, template_attributes: child_template_attributes, parent_id: parent_template.id)
   end
 end

@@ -58,7 +58,6 @@ Templates.init = function (elem) {
           : '<a class="btn btn-danger btn-sm" href="javascript:void(0)" onClick="remove(this)">Remove</a>';
       }
     },
-    { title: "linked sample type id", width: "10%" }
   ];
 
   Templates.table = elem.DataTable({
@@ -125,7 +124,8 @@ Templates.mapData = (data) =>
     item.pos,
     item.isa_tag_id,
     item.isa_tag_title,
-    item.linked_sample_type_id
+    item.linked_sample_type_id,
+    item.template_attribute_id
   ]);
 
 function loadFilterSelectors(data) {
@@ -235,20 +235,39 @@ const applyTemplate = () => {
     });
     index++;
 
-    const isInputRow = row[7] === 'Registered Sample List' && row[1].includes('Input') && row[11] === null
+    const isInputRow =
+        row[7] === "Registered Sample List" &&
+        row[1].includes("Input") &&
+        row[11] === null;
+    const isInherited = row[14] !== "undefined" || row[14] !== null;
+    const isRequired = row[0] ? "checked" : "";
     newRow = $j(newRow.replace(/replace-me/g, index));
     $j(newRow).find('[data-attr="required"]').prop("checked", row[0]);
     $j(newRow).find('[data-attr="title"]').val(row[1]);
+    $j(newRow).find('[data-attr="title"]').addClass("disabled");
     $j(newRow).find('[data-attr="description"]').val(row[2]);
     $j(newRow).find('[data-attr="type"]').val(row[3]);
+    $j(newRow).find('[data-attr="type"]').addClass("disabled");
     $j(newRow).find('[data-attr="cv_id"]').val(row[4]);
+    $j(newRow).find('[data-attr="cv_id"]').parent().addClass("disabled");
     $j(newRow).find('[data-attr="allow_cv_free_text"]').prop("checked", row[5]);
+    $j(newRow)
+        .find('[data-attr="allow_cv_free_text"]')
+        .addClass("disabled");
     $j(newRow).find('[data-attr="unit"]').val(row[6]);
+    $j(newRow).find('[data-attr="unit"]').addClass("disabled");
     $j(newRow).find(".sample-type-is-title").prop("checked", row[8]);
     $j(newRow).find('[data-attr="pid"]').val(row[9]);
     $j(newRow).find('[data-attr="isa_tag_id"]').val(row[11]);
     $j(newRow).find('[data-attr="isa_tag_title"]').val(row[11]);
-    $j(newRow).find('[data-attr="isa_tag_title"]').attr('disabled', true);
+    $j(newRow)
+        .find('[data-attr="isa_tag_title"]')
+        .addClass("disabled");
+    $j(newRow).find('[data-attr="template_attribute_id"]').val(row[14]); // In case of a sample type
+    $j(newRow).find('[data-attr="parent_attribute_id"]').val(row[14]); // In case of a template
+    if (isRequired) {
+      $j(newRow).find('label.btn.btn-danger').addClass("hidden");
+    }
 
     // Show the CV block if cv_id is not empty
     if (row[4]) $j(newRow).find(".controlled-vocab-block").show();

@@ -81,11 +81,14 @@
                                                                                 template_attribute: template_attribute,
                                                                                 template: @template } %>
                     <% end %>
-                    <tr id="add-attribute-row">
-                        <td colspan="6">
-                            <%= button_link_to('Add new attribute', 'add', '#', id: 'add-attribute') %>
-                        </td>
-                    </tr>
+
+                    <% if @template.children.none? %>
+                        <tr id="add-attribute-row">
+                            <td colspan="6">
+                                <%= button_link_to('Add new attribute', 'add', '#', id: 'add-attribute') %>
+                            </td>
+                        </tr>
+                    <% end %>
                 </tbody>
             </table>
         </div>
@@ -104,7 +107,7 @@
 <script>
     //used to hold the element Id that needs updating after creating a new CV
     $j(document).ready(function() {
-        SampleTypeControlledVocab.blankControlledVocabModelForm = $j('#cv-modal').clone();
+        SampleTypeControlledVocab.copyBlankModalForm();
         SampleTypeControlledVocab.resetModalControlledVocabForm();
         //Make rows sortable
         SampleTypes.bindSortable();
@@ -135,6 +138,8 @@
         $j('#attribute-table').on('change', '.controlled-vocab-selection', SampleTypeControlledVocab.controlledVocabChanged);
         $j('#attribute-table .sample-type-attribute-type').trigger("change", [false]);
         $j('.templates').select2({theme: "bootstrap"});
+
+        // Change ISA Tag ID when ISA Tag title changes
         $j('#attribute-table').on('change', 'select[data-attr="isa_tag_title"]', function() {
             const hiddenInputName = $j(this).attr('name').replace('isa_tag_title', 'isa_tag_id');
             const isa_tag_id_sel = $j(this).val();
@@ -142,14 +147,10 @@
             $j(`input:hidden[name="${hiddenInputName}"]`).val(isa_tag_id_sel);
 
         });
+
         initSelect2($j('.templates'), $j('#existing_templates'));
         Templates.clearContext();
         Templates.init($j('#template-attributes'));
-
-        // Makes sure existing sampletype attributes are disabled
-        $j('#attribute-table tr.sample-attribute')
-            .has('input[data-attr="isa_tag_id"][value]')
-            .find('[data-attr="isa_tag_title"]').attr('disabled', true);
     });
 
     const templates = <%= load_templates().to_json.html_safe %>;

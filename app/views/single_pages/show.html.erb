@@ -47,27 +47,13 @@
 
     <div id="provide-metadata-content"></div>
 
-    <%= modal(id: 'change-batch-permission-modal', size: 'xl') do %>
-      <%= modal_header("Batch permission changes") %>
-      <%= modal_body do %>
-        <div id="change-batch-permission">
-          hello
-        </div>
-      <% end %>
-    <% end %>
-
-    <%= modal(id: 'upload-excel-modal', size: 'xl') do %>
-      <%= modal_header("Upload from spreadsheet") %>
-      <%= modal_body do %>
-        <div id="upload-excel">...</div>
-      <% end %>
-    <% end %>
-
+  <%= render partial: 'change_batch_persmission_modal' %>
+  <%= render partial: 'upload_excel_modal' %>
 </div>
 
 <script type="text/javascript">
     var selectedItem = {type:"",id:""}, pid, uid, projectDefaultPolicy, dynamicTableDataPath
-    const instanceName = "<%= Seek::Config.instance_name %>";
+    window.instanceName = "<%= Seek::Config.instance_name %>";
 
 		$j(document).ready(function() {
 			  $j("#content .container-fluid").removeClass("container-fluid").addClass("container-fluid-single-page")

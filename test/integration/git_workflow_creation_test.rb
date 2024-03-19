@@ -313,6 +313,87 @@ class GitWorkflowCreationTest < ActionDispatch::IntegrationTest
     assert_select '#extraction-errors ul li', text: /Couldn't parse main workflow/
   end
 
+  test 'can extract source metadata using original URL for galaxy workflow' do
+    mock_remote_file "#{Rails.root}/test/fixtures/files/workflows/1-PreProcessing.ga",
+                     'http://galaxy.instance/api/workflows/abcdxyz/download?format=json-download',
+                     { 'content-disposition' => 'attachment; filename="1-PreProcessing.ga"'}
+
+    repo_count = Git::Repository.count
+    workflow_count = Workflow.count
+    version_count = Git::Version.count
+    annotation_count = Git::Annotation.count
+
+    person = FactoryBot.create(:person)
+    galaxy = WorkflowClass.find_by_key('galaxy') || FactoryBot.create(:galaxy_workflow_class)
+    login_as(person.user)
+
+    get new_workflow_path
+
+    assert_enqueued_jobs(0) do
+      assert_difference('Git::Repository.count', 1) do
+        assert_no_difference('Task.count') do
+          post create_from_files_workflows_path, params: {
+            ro_crate: {
+              main_workflow: { data_url: 'http://galaxy.instance/workflows/run?id=abcdxyz' },
+            },
+            workflow_class_id: galaxy.id
+          } # Should go to metadata page...
+        end
+      end
+    end
+
+    repo = assigns(:workflow).git_version.git_repository
+    assert_select 'input[name="workflow[title]"]', count: 1
+    a = assigns(:workflow).git_version.remote_source_annotations
+    assert_equal 1, a.length
+    assert_equal 'http://galaxy.instance/workflows/run?id=abcdxyz', a.first.value
+    assert_equal  '1-PreProcessing.ga', a.first.path
+    assert_equal 'http://galaxy.instance/', assigns(:workflow).execution_instance_url
+    assert_select '#workflow_execution_instance_url[value=?]', 'http://galaxy.instance/'
+
+    assert_difference('Workflow.count', 1) do
+      assert_difference('Git::Version.count', 1) do
+        # 2 annotations = Main WF path, 1x remote source
+        assert_difference('Git::Annotation.count', 2) do
+          post create_metadata_workflows_path, params: {
+            workflow: {
+              workflow_class_id: galaxy.id,
+              title: 'blabla',
+              execution_instance_url: 'http://galaxy.instance/',
+              project_ids: [person.projects.first.id],
+              git_version_attributes: {
+                root_path: '/',
+                git_repository_id: repo.id,
+                ref: 'refs/heads/master',
+                main_workflow_path: '1-PreProcessing.ga',
+                remote_sources: {
+                  '1-PreProcessing.ga' => 'http://galaxy.instance/workflows/run?id=abcdxyz'
+                }
+              }
+            }
+          } # Should go to workflow page...
+        end
+      end
+    end
+
+    assert_redirected_to workflow_path(assigns(:workflow))
+
+    assert assigns(:workflow).latest_git_version.commit.present?
+    assert_equal 'refs/heads/master', assigns(:workflow).latest_git_version.ref
+    refute assigns(:workflow).latest_git_version.git_repository.remote?
+    assert_equal assigns(:workflow), assigns(:workflow).latest_git_version.git_repository.resource
+    assert assigns(:workflow).latest_git_version.get_blob('1-PreProcessing.ga').remote?
+    assert_equal({ '1-PreProcessing.ga' => 'http://galaxy.instance/workflows/run?id=abcdxyz' },
+                 assigns(:workflow).latest_git_version.remote_sources)
+    assert_equal 'http://galaxy.instance/', assigns(:workflow).latest_git_version.execution_instance_url
+
+    # Check there wasn't anything extra created in the whole flow...
+    assert_equal repo_count + 1, Git::Repository.count
+    assert_equal workflow_count + 1, Workflow.count
+    assert_equal version_count + 1, Git::Version.count
+    assert_equal annotation_count + 2, Git::Annotation.count
+  end
+
   private
 
   def login_as(user)

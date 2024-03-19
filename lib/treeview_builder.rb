@@ -14,9 +14,22 @@ class TreeviewBuilder
     investigation_items = []
 
     @project.investigations.map do |investigation|
-      investigation.studies.map do |study|
-        assay_items = study.assays.map { |assay| build_assay_item(assay) }
-        study_items << build_study_item(study, assay_items)
+      if investigation.is_isa_json_compliant?
+        investigation.studies.map do |study|
+          assay_stream_items = study.assay_streams.sort_by{ |stream| stream.position }.map do |assay_stream|
+            assay_items = assay_stream.child_assays.order(:position).map do |child_assay|
+              build_assay_item(child_assay)
+            end
+            build_assay_stream_item(assay_stream, assay_items)
+          end
+
+          study_items << build_study_item(study, assay_stream_items)
+        end
+      else
+        investigation.studies.map do |study|
+          assay_items = study.assays.map { |assay| build_assay_item(assay) }
+          study_items << build_study_item(study, assay_items)
+        end
       end
       investigation_items << build_investigation_item(investigation, study_items)
       study_items = []
@@ -123,6 +136,11 @@ class TreeviewBuilder
   def build_study_item(study, assay_items)
     create_node({ text: study.title, _type: 'study', _id: study.id, a_attr: BOLD, label: 'Study',
                   children: isa_study_elements(study) + assay_items, resource: study })
+  end
+
+  def build_assay_stream_item(assay_stream, child_assays)
+    create_node({ text: assay_stream.title, _type: 'assay', label: 'Assay Stream', _id: assay_stream.id, a_attr: BOLD,
+                  children: isa_assay_elements(assay_stream) + child_assays, resource: assay_stream })
   end
 
   def build_assay_item(assay)

@@ -4,6 +4,10 @@ class ExtendedMetadataValidator < ActiveModel::Validator
       val = record.get_attribute_value(attribute)
       validate_attribute(record, attribute, val)
     end
+
+    if record.new_record? && !record.enabled?
+      record.errors.add(:extended_metadata_type, "is not enabled, which is invalid for a new record")
+    end
   end
 
   private

@@ -173,6 +173,45 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
     assert_response :redirect
   end
 
+  test 'can_edit permission required to edit' do
+    login_as(FactoryBot.create(:person))
+    cv = FactoryBot.create(:apples_sample_controlled_vocab)
+    assert cv.can_edit?
+
+    get :edit, params: { id: cv.id }
+    assert_response :success
+
+    # a system vocab cannot be edited or deleted
+    cv2 = FactoryBot.create(:topics_controlled_vocab)
+    refute cv2.can_edit?
+
+    get :edit, params: { id: cv2.id }
+    assert_response :redirect
+  end
+
+  test 'can_edit permission required to update' do
+    login_as(FactoryBot.create(:person))
+
+    # a system vocab cannot be edited or deleted
+    cv_bad = FactoryBot.create(:topics_controlled_vocab)
+    refute cv_bad.can_edit?
+
+    cv_good = FactoryBot.create(:apples_sample_controlled_vocab)
+    assert cv_good.can_edit?
+
+    put :update, params: { id: cv_good, sample_controlled_vocab: { title: 'updated title' } }
+    assert_redirected_to sample_controlled_vocab_path(cv_good)
+    refute flash[:error]
+    assert_equal 'updated title',assigns(:sample_controlled_vocab).title
+    assert_equal 'updated title',cv_good.reload.title
+
+    put :update, params: { id: cv_bad, sample_controlled_vocab: { title: 'updated title' } }
+    assert_redirected_to sample_controlled_vocab_path(cv_bad)
+    assert flash[:error]
+    refute_equal 'updated title',cv_bad.reload.title
+
+  end
+
   test 'index' do
     cv = FactoryBot.create(:apples_sample_controlled_vocab)
     get :index
@@ -199,15 +238,32 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
     assert_response :redirect
   end
 
-  test 'need to be project member to destroy' do
-    login_as(FactoryBot.create(:user))
-    cv = FactoryBot.create(:apples_sample_controlled_vocab)
-    assert_no_difference('SampleControlledVocab.count') do
-      assert_no_difference('SampleControlledVocabTerm.count') do
-        delete :destroy, params: { id: cv }
+  test 'can_delete permission required to destroy' do
+    login_as(FactoryBot.create(:person))
+
+    # a system vocab cannot be edited or deleted
+    cv_bad = FactoryBot.create(:topics_controlled_vocab)
+    refute cv_bad.can_delete?
+
+    cv_good = FactoryBot.create(:apples_sample_controlled_vocab)
+    assert cv_good.can_delete?
+
+    assert_difference('SampleControlledVocab.count', -1) do
+      assert_difference('SampleControlledVocabTerm.count', -4) do
+        delete :destroy, params: { id: cv_good }
       end
     end
-    assert_response :redirect
+    assert_redirected_to sample_controlled_vocabs_path
+    refute flash[:error]
+
+    assert_no_difference('SampleControlledVocab.count') do
+      assert_no_difference('SampleControlledVocabTerm.count') do
+        delete :destroy, params: { id: cv_bad }
+      end
+    end
+    assert_redirected_to sample_controlled_vocab_path(cv_bad)
+    assert flash[:error]
+
   end
 
   test 'cannot access when disabled' do
@@ -273,7 +329,7 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
     login_as(person)
     VCR.use_cassette('ols/fetch_obo_bad_term') do
       get :fetch_ols_terms_html, params: { source_ontology_id: 'go',
-                                      root_uri: 'http://purl.obolibrary.org/obo/banana',
+                                      root_uris: 'http://purl.obolibrary.org/obo/banana',
                                       include_root_term: '1' }
 
       assert_response :unprocessable_entity
@@ -286,7 +342,7 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
     login_as(person)
     VCR.use_cassette('ols/fetch_obo_plant_cell_papilla') do
       get :fetch_ols_terms_html, params: { source_ontology_id: 'go',
-                                           root_uri: 'http://purl.obolibrary.org/obo/GO_0090395',
+                                           root_uris: 'http://purl.obolibrary.org/obo/GO_0090395',
                                            include_root_term: '1' }
     end
 
@@ -306,12 +362,116 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
     assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_3_label[value=?]','trichome papilla'
   end
 
+  test 'create with root uris' do
+    login_as(FactoryBot.create(:project_administrator))
+    assert_difference('SampleControlledVocab.count') do
+      assert_difference('SampleControlledVocabTerm.count', 2) do
+        post :create, params: { sample_controlled_vocab: { title: 'plant_cell_papilla and haustorium', description: 'multiple root uris',
+                                                           ols_root_term_uris: 'http://purl.obolibrary.org/obo/GO_0090395,   http://purl.obolibrary.org/obo/GO_0085035',
+                                                           sample_controlled_vocab_terms_attributes: {
+                                                             '0' => { label: 'plant cell papilla', iri:'http://purl.obolibrary.org/obo/GO_0090395', parent_iri:'', _destroy: '0' },
+                                                             '1' => { label: 'haustorium', iri:'http://purl.obolibrary.org/obo/GO_0085035', parent_iri:'', _destroy: '0' }
+                                                           }
+        } }
+      end
+    end
+    assert cv = assigns(:sample_controlled_vocab)
+    assert_redirected_to sample_controlled_vocab_path(cv)
+    assert_equal 'plant_cell_papilla and haustorium', cv.title
+    assert_equal 'multiple root uris', cv.description
+    assert_equal 2, cv.sample_controlled_vocab_terms.count
+    assert_equal ['plant cell papilla','haustorium'], cv.labels
+    assert_equal ['http://purl.obolibrary.org/obo/GO_0090395','http://purl.obolibrary.org/obo/GO_0085035'], cv.sample_controlled_vocab_terms.collect(&:iri)
+    assert_equal 'http://purl.obolibrary.org/obo/GO_0090395, http://purl.obolibrary.org/obo/GO_0085035', cv.ols_root_term_uris
+  end
+
+  test 'fetch ols terms as HTML with multiple root uris and root term included' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    VCR.use_cassette('ols/fetch_obo_plant_cell_papilla') do
+      VCR.use_cassette('ols/fetch_obo_haustorium') do
+        get :fetch_ols_terms_html, params: { source_ontology_id: 'go',
+                                             root_uris: 'http://purl.obolibrary.org/obo/GO_0090395, http://purl.obolibrary.org/obo/GO_0085035',
+                                             include_root_term: '1' }
+        end
+    end
+
+    assert_response :success
+    assert_select 'tr.sample-cv-term', count: 6
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_0_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090395'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_0_parent_iri:not([value])'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_0_label[value=?]','plant cell papilla'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_1_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090397'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_1_parent_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090395'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_1_label[value=?]','stigma papilla'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_2_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090396'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_2_parent_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090395'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_2_label[value=?]','leaf papilla'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_3_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090705'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_3_parent_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090395'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_3_label[value=?]','trichome papilla'
+
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_4_iri[value=?]','http://purl.obolibrary.org/obo/GO_0085035'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_4_parent_iri:not([value])'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_4_label[value=?]','haustorium'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_5_iri[value=?]','http://purl.obolibrary.org/obo/GO_0085041'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_5_parent_iri[value=?]','http://purl.obolibrary.org/obo/GO_0085035'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_5_label[value=?]','arbuscule'
+
+  end
+
+  test 'fetch ols terms as HTML with multiple root uris and no root term included' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    VCR.use_cassette('ols/fetch_obo_plant_cell_papilla') do
+      VCR.use_cassette('ols/fetch_obo_haustorium') do
+        get :fetch_ols_terms_html, params: { source_ontology_id: 'go',
+                                             root_uris: 'http://purl.obolibrary.org/obo/GO_0090395, http://purl.obolibrary.org/obo/GO_0085035',
+                                             include_root_term: '0' }
+      end
+    end
+
+    assert_response :success
+    assert_select 'tr.sample-cv-term', count: 4
+
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_0_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090397'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_0_parent_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090395'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_0_label[value=?]','stigma papilla'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_1_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090396'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_1_parent_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090395'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_1_label[value=?]','leaf papilla'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_2_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090705'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_2_parent_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090395'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_2_label[value=?]','trichome papilla'
+
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_3_iri[value=?]','http://purl.obolibrary.org/obo/GO_0085041'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_3_parent_iri[value=?]','http://purl.obolibrary.org/obo/GO_0085035'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_3_label[value=?]','arbuscule'
+
+  end
+
+  test 'fetch ols terms as HTML with multiple root uris forgiving of trailing comma' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    VCR.use_cassette('ols/fetch_obo_plant_cell_papilla') do
+      VCR.use_cassette('ols/fetch_obo_haustorium') do
+        get :fetch_ols_terms_html, params: { source_ontology_id: 'go',
+                                             root_uris: 'http://purl.obolibrary.org/obo/GO_0090395, http://purl.obolibrary.org/obo/GO_0085035,  ',
+                                             include_root_term: '0' }
+      end
+    end
+
+    assert_response :success
+    assert_select 'tr.sample-cv-term', count: 4
+  end
+
+
   test 'fetch ols terms as HTML without root term included' do
     person = FactoryBot.create(:person)
     login_as(person)
     VCR.use_cassette('ols/fetch_obo_plant_cell_papilla') do
       get :fetch_ols_terms_html, params: { source_ontology_id: 'go',
-                                      root_uri: 'http://purl.obolibrary.org/obo/GO_0090395' }
+                                      root_uris: 'http://purl.obolibrary.org/obo/GO_0090395' }
     end
     assert_response :success
     assert_select 'tr.sample-cv-term', count: 3

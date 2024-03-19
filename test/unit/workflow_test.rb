@@ -116,7 +116,6 @@ class WorkflowTest < ActiveSupport::TestCase
     end
 
     assert_equal 'https://github.com/seek4science/cool-workflow', workflow.source_link_url
-    assert_equal 'https://github.com/seek4science/cool-workflow', workflow.source_link.url
   end
 
   test 'can clear source URL' do
@@ -133,6 +132,7 @@ class WorkflowTest < ActiveSupport::TestCase
     end
 
     assert_nil workflow.reload.source_link
+    assert_nil workflow.reload.source_link_url
   end
 
   test 'generates RO-Crate and diagram for workflow/abstract workflow' do
@@ -816,5 +816,73 @@ class WorkflowTest < ActiveSupport::TestCase
       assert workflow.save
       assert_nil workflow.maturity_level
     end
+  end
+
+  test 'can get and set execution instance URL' do
+    workflow = FactoryBot.create(:workflow)
+
+    assert_no_difference('AssetLink.count') do
+      workflow.execution_instance_url = 'https://mygalaxy.instance/'
+    end
+
+    assert_difference('AssetLink.count', 1) do
+      disable_authorization_checks { workflow.save! }
+    end
+
+    assert_equal 'https://mygalaxy.instance/', workflow.execution_instance_url
+  end
+
+  test 'can clear execution instance URL' do
+    workflow = FactoryBot.create(:workflow, execution_instance_url: 'https://mygalaxy.instance/')
+    assert workflow.execution_instance
+    assert workflow.execution_instance_url
+
+    assert_no_difference('AssetLink.count') do
+      workflow.execution_instance_url = nil
+    end
+
+    assert_difference('AssetLink.count', -1) do
+      disable_authorization_checks { workflow.save! }
+    end
+
+    assert_nil workflow.reload.execution_instance
+    assert_nil workflow.reload.execution_instance_url
+  end
+
+  test 'can_run?' do
+    assert FactoryBot.create(:generated_galaxy_ro_crate_workflow, policy: FactoryBot.create(:public_policy)).can_run?
+    assert FactoryBot.create(:generated_galaxy_ro_crate_workflow, policy: FactoryBot.create(:public_policy), execution_instance_url: 'https://mygalaxy.instance/').can_run?
+    refute FactoryBot.create(:generated_galaxy_ro_crate_workflow, policy: FactoryBot.create(:private_policy)).can_run?
+    refute FactoryBot.create(:cwl_workflow, policy: FactoryBot.create(:public_policy)).can_run?
+  end
+
+  test 'run_url' do
+    # Using default
+    with_config_value(:galaxy_instance_default, 'http://default-galaxy-instance.com') do
+      default = FactoryBot.create(:generated_galaxy_ro_crate_workflow)
+      trs_url = URI.encode_www_form_component("http://localhost:3000/ga4gh/trs/v2/tools/#{default.id}/versions/1")
+      assert_equal "http://default-galaxy-instance.com/workflows/trs_import?trs_url=#{trs_url}&run_form=true", default.run_url
+    end
+
+    # With explicit execution instance
+    workflow = FactoryBot.create(:generated_galaxy_ro_crate_workflow, execution_instance_url: 'https://mygalaxy.instance/')
+    trs_url = URI.encode_www_form_component("http://localhost:3000/ga4gh/trs/v2/tools/#{workflow.id}/versions/1")
+    assert_equal "https://mygalaxy.instance/workflows/trs_import?trs_url=#{trs_url}&run_form=true", workflow.run_url
+
+    # Versions
+    disable_authorization_checks do
+      workflow.save_as_new_version('new version')
+    end
+    v2_trs_url = URI.encode_www_form_component("http://localhost:3000/ga4gh/trs/v2/tools/#{workflow.id}/versions/2")
+    assert_equal "https://mygalaxy.instance/workflows/trs_import?trs_url=#{v2_trs_url}&run_form=true", workflow.run_url
+    assert_equal "https://mygalaxy.instance/workflows/trs_import?trs_url=#{trs_url}&run_form=true", workflow.find_version(1).run_url
+
+    # Galaxy instance with sub-URI
+    workflow = FactoryBot.create(:generated_galaxy_ro_crate_workflow, execution_instance_url: 'https://mygalaxy.instance/galaxy/')
+    trs_url = URI.encode_www_form_component("http://localhost:3000/ga4gh/trs/v2/tools/#{workflow.id}/versions/1")
+    assert_equal "https://mygalaxy.instance/galaxy/workflows/trs_import?trs_url=#{trs_url}&run_form=true", workflow.run_url
+
+    # Not supported for non-galaxy currently
+    assert_nil FactoryBot.create(:cwl_workflow, policy: FactoryBot.create(:public_policy)).run_url
   end
 end

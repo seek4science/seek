@@ -33,6 +33,10 @@ def load_seek_config_defaults!
   Seek::Config.default :piwik_analytics_id_site, 1
   Seek::Config.default :piwik_analytics_url, 'localhost/piwik/'
   Seek::Config.default :piwik_analytics_tracking_notice, true
+  Seek::Config.default :custom_analytics_snippet_enabled, false
+  Seek::Config.default :custom_analytics_name, 'Custom name'
+  Seek::Config.default :custom_analytics_snippet, '<script id="custom-tracking-script"></script>'
+  Seek::Config.default :custom_analytics_tracking_notice, true
   Seek::Config.default :bioportal_api_key,''
   Seek::Config.default :project_news_enabled,false
   Seek::Config.default :project_news_feed_urls,''
@@ -134,7 +138,7 @@ def load_seek_config_defaults!
   Seek::Config.default :contact_link, ''
 
   Seek::Config.default :funding_link, ''
-  
+
   #Terms and conditions page
   Settings.defaults[:terms_enabled]= false
   Seek::Config.default :terms_page, File.read(Rails.root.join('config/default_data/terms_and_conditions_example'))
@@ -233,6 +237,8 @@ def load_seek_config_defaults!
     password: '',
     bind_dn: ''
   }
+  Seek::Config.default :omniauth_oidc_enabled, false
+  Seek::Config.default :omniauth_oidc_name, 'OpenID Connect Provider'
 
   Seek::Config.default :openbis_enabled,false
   Seek::Config.default :openbis_download_limit, 2.gigabytes

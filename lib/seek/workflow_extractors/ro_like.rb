@@ -36,24 +36,27 @@ module Seek
       end
 
       def metadata
+        m = super
         # Use CWL description
-        m = if abstract_cwl_extractor
-              begin
-                abstract_cwl_extractor.metadata
-              rescue StandardError => e
-                Rails.logger.error('Error extracting abstract CWL:')
-                Rails.logger.error(e)
-                { errors: ["Couldn't parse abstract CWL"] }
-              end
-            else
-              begin
-                main_workflow_extractor.metadata
-              rescue StandardError => e
-                Rails.logger.error('Error extracting workflow:')
-                Rails.logger.error(e)
-                { errors: ["Couldn't parse main workflow"] }
-              end
-            end
+        if abstract_cwl_extractor
+          begin
+            m.merge!(abstract_cwl_extractor.metadata)
+          rescue StandardError => e
+            Rails.logger.error('Error extracting abstract CWL:')
+            Rails.logger.error(e)
+            m[:errors] ||= []
+            m[:errors] << "Couldn't parse abstract CWL"
+          end
+        else
+          begin
+            m.merge!(main_workflow_extractor.metadata)
+          rescue StandardError => e
+            Rails.logger.error('Error extracting workflow:')
+            Rails.logger.error(e)
+            m[:errors] ||= []
+            m[:errors] << "Couldn't parse main workflow"
+          end
+        end
 
         if file_exists?('README.md')
           m[:description] ||= file('README.md').read.force_encoding('utf-8').gsub(/^(---\s*\n.*?\n?)^(---\s*$\n?)/m,'') # Remove "Front matter"

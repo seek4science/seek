@@ -29,22 +29,22 @@ module ExtendedMetadataHelper
     html.html_safe
   end
 
-    def render_extended_metadata_value(attribute, resource)
+  def render_extended_metadata_value(attribute, resource)
 
-      if resource.extended_metadata.data[attribute.title].blank?
-        return '' # Return an empty string if the extended metadata is blank.
-      end
+    if resource.extended_metadata.data[attribute.title].blank?
+      return '' # Return an empty string if the extended metadata is blank.
+    end
 
-      content_tag(:div, class: 'extended_metadata') do
-        if attribute.linked_extended_metadata? || attribute.linked_extended_metadata_multi?
-          content_tag(:span, class: 'linked_extended_metdata_display') do
-            folding_panel(attribute.label, false, id: attribute.title) do
-              display_attribute(resource.extended_metadata, attribute, link: true)
-            end
+    content_tag(:div, class: 'extended_metadata') do
+      if attribute.linked_extended_metadata? || attribute.linked_extended_metadata_multi?
+        content_tag(:span, class: 'linked_extended_metdata_display') do
+          folding_panel(attribute.label, false, id: attribute.title) do
+            display_attribute(resource.extended_metadata, attribute, link: true)
           end
-        else
-          label_tag("#{attribute.label} : ") + " " + display_attribute(resource.extended_metadata, attribute, link: true)
         end
+      else
+        label_tag("#{attribute.label} : ") + " " + display_attribute(resource.extended_metadata, attribute, link: true)
       end
     end
+  end
 end

@@ -7,6 +7,7 @@ class SampleAttribute < ApplicationRecord
   belongs_to :linked_sample_type, class_name: 'SampleType'
 
   belongs_to :isa_tag
+  belongs_to :template_attribute, class_name: 'TemplateAttribute', foreign_key: 'template_id'
 
   auto_strip_attributes :pid
   validates :sample_type, presence: true
@@ -24,6 +25,14 @@ class SampleAttribute < ApplicationRecord
 
   # whether this attribute is tied to a controlled vocab which is based on an ontology
   delegate :ontology_based?, to: :sample_controlled_vocab, allow_nil: true
+
+  def input_attribute?
+    isa_tag.nil? && title&.downcase&.include?('input') && seek_sample_multi?
+  end
+
+  def inherited_from_template_attribute?
+    template_attribute_id.present?
+  end
 
   def title=(title)
     super

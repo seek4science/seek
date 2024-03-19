@@ -12,7 +12,12 @@ module Seek
 
         json = JSON.parse(json)
         json['models'].collect do |result|
-          BiomodelsSearchResult.new result['id']
+          begin
+            BiomodelsSearchResult.new result['id']
+          rescue NoMethodError=>exception
+            Seek::Errors::ExceptionForwarder.send_notification(exception, data: { error: 'error reading response from BioModels', item_id: result['id'], query: query })
+            nil
+          end
         end.compact.reject do |biomodels_result|
           biomodels_result.title.blank?
         end
@@ -62,14 +67,15 @@ module Seek
           self.publication_title = json.dig('publication', 'title')
           self.authors = (json.dig('publication', 'authors') || []).collect { |author| author['name'] }
           self.published_date = Time.at(json['firstPublished'] / 1000)
-          latest_version = json['history']['revisions'].sort { |rev| rev['version'] }.first
-          self.last_modification_date = Time.at(latest_version['submitted'] / 1000)
-          self.main_filename = json['files']['main'].first['name']
+          latest_version = (json.dig('history','revisions') || []).sort { |rev| rev['version'] }&.first
+          if latest_version&.fetch('submitted')
+            self.last_modification_date = Time.at(latest_version['submitted'] / 1000)
+          end
+          self.main_filename = (json.dig('files','main') || []).first&.fetch('name')
           self.unreleased = false
         else
           self.unreleased = true
         end
-
       end
     end
   end

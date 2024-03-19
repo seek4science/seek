@@ -42,13 +42,14 @@
 <% else %>
 	<p>
 		<em>
-			This <%="#{t(:study)}"%>	has not been created in Single Page.
+			This <%= "#{t(:study)}" %>  has not been created in <%= "#{t(:single_page)}" %> .
 			Please, create the <%="#{t(:study)}"%> by using the <strong>Design <%="#{t(:study)}"%></strong> button at the <%="#{t(:investigation)}"%> level.
 		</em>
 	</p>
 <% end %>
 
 <script>
+	window.instanceName = "<%= Seek::Config.instance_name %>";
 	async function loadDynamicTableFromDefaultView(element) {
 		await loadItemDetails(`/studies/${id}`, { view: "default" });
 	}

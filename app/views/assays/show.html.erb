@@ -47,16 +47,18 @@
               <b><%= "Assay position" %>: </b>
               <%= @assay.position %>
             </p>
-            <p id="assay_type">
-              <b><%= assay_type_text -%>:</b>
-              <%= link_to_assay_type(@assay) -%>
-            </p>
-            <% unless @assay.is_modelling? -%>
-              <p id="technology_type">
-                <b>Technology type: </b>
-                <%= link_to_technology_type(@assay) -%>
+            <% unless @assay.is_isa_json_compliant? %>
+              <p id="assay_type">
+                <b><%= assay_type_text -%>:</b>
+                <%= link_to_assay_type(@assay) -%>
               </p>
-            <% end -%>
+              <% unless @assay.is_modelling? -%>
+                <p id="technology_type">
+                  <b>Technology type: </b>
+                  <%= link_to_technology_type(@assay) -%>
+                </p>
+              <% end -%>
+            <% end %>
 
             <% if Seek::Config.organisms_enabled %>
               <%= list_assay_organisms("Organisms", @assay.assay_organisms, { :id => "organism" }) %>
@@ -68,10 +70,32 @@
 
             <% if Seek::Config.isa_json_compliance_enabled %>
               <p id="isa_json_compliance">
-                <b><%= "Is ISA-JSON compliant" %>: </b>
+                <b>Is ISA-JSON compliant: </b>
                 <%= @assay.is_isa_json_compliant? %>
               </p>
               <%= render partial: 'isa_studies/applied_templates', locals: { resource: @assay } -%>
+            <% end %>
+
+            <% if @assay.is_isa_json_compliant? %>
+              <% if @assay.is_assay_stream? %>
+                <p id="child_assays">
+                  <b>Child assays:</b>
+                    <ul>
+                      <% @assay.child_assays.map do |ca| %>
+                        <% unless @assay.child_assays.blank? %>
+                          <li>
+                            <%= link_to ca.title, ca %>
+                          </li>
+                      <% end %>
+                    <% end %>
+                    </ul>
+                </p>
+              <% else %>
+                <p id="assay_stream">
+                  <b><%= t('assays.assay_stream') %>: </b>
+                  <%= link_to @assay.assay_stream.title, @assay.assay_stream %>
+                </p>
+              <% end %>
             <% end %>
 
           </div>
@@ -141,14 +165,18 @@
 	<% if Seek::Config.isa_json_compliance_enabled && @assay.is_isa_json_compliant? %>
 		<%= tab_pane('assay_design') do %>
 			<%= render :partial=>"isa_assays/assay_design", locals: { assay: @assay} -%>
+      <%= render partial: 'single_pages/change_batch_persmission_modal' %>
+      <%= render partial: 'single_pages/upload_excel_modal' %>
 		<% end %>
 	<% end %>
 </div>
 <script>
-  const isIsaCompliant = <%= @assay.is_isa_json_compliant? %>
-  if (isIsaCompliant) {
-    var id = <%= @assay.id %>;
-    var pid = <%= @assay.projects.first.id %>;
-    var dynamicTableDataPath = '<%= Seek::Util.routes.dynamic_table_data_single_page_path(@assay.projects.first.id) %>';
-  }
+    const projectDefaultPolicy = '<%= @assay.projects.first.default_policy_id %>';
+    const isIsaCompliant =
+    <%= @assay.is_isa_json_compliant? %>
+    if (isIsaCompliant) {
+        var id = <%= @assay.id %>;
+        var pid = <%= @assay.projects.first.id %>;
+        var dynamicTableDataPath = '<%= Seek::Util.routes.dynamic_table_data_single_page_path(@assay.projects.first.id) %>';
+    }
 </script>

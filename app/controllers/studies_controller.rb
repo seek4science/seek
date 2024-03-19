@@ -89,7 +89,7 @@ class StudiesController < ApplicationController
   end
 
   def delete_linked_sample_types
-    return unless is_single_page_study?
+    return unless @study.is_isa_json_compliant?
     return if @study.sample_types.empty?
 
     # The study sample types must be destroyed in reversed order
@@ -360,10 +360,4 @@ class StudiesController < ApplicationController
                                   { discussion_links_attributes:[:id, :url, :label, :_destroy] },
                                   { extended_metadata_attributes: determine_extended_metadata_keys })
   end
-end
-
-def is_single_page_study?
-  return false unless params.key?(:return_to)
-
-  params[:return_to].start_with? '/single_pages/'
 end

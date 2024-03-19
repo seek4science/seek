@@ -43,4 +43,21 @@ class IsaTag < ApplicationRecord
   def isa_parameter_value?
     title == Seek::ISA::TagType::PARAMETER_VALUE
   end
+
+  def self.allowed_isa_tags_for_level(level)
+    tags = case level
+    when 'study source'
+      Seek::ISA::TagType::SOURCE_TAGS
+    when 'study sample'
+      Seek::ISA::TagType::SAMPLE_TAGS
+    when 'assay - material'
+      Seek::ISA::TagType::OTHER_MATERIAL_TAGS
+    when 'assay - data file'
+      Seek::ISA::TagType::DATA_FILE_TAGS
+    else
+      Seek::ISA::TagType::ALL_TYPES
+    end
+
+    tags.map { |tag| IsaTag.find_by(title: tag) }
+  end
 end

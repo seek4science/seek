@@ -657,6 +657,39 @@ class InvestigationsControllerTest < ActionController::TestCase
 
   end
 
+  test 'show enabled extended metadata types only' do
+    emt = FactoryBot.create(:simple_investigation_extended_metadata_type)
+    emt2 = FactoryBot.create(:simple_investigation_extended_metadata_type, enabled: false)
+    login_as(FactoryBot.create(:person))
+    get :new
+    assert_response :success
+    assert_select 'select#extended_metadata_attributes_extended_metadata_type_id' do
+      assert_select 'option[value=?]',emt.id, text:emt.title, count: 1
+      assert_select 'option[value=?]',emt2.id, text:emt2.title, count: 0
+    end
+    emt.update_column(:enabled, false)
+    get :new
+    assert_response :success
+    assert_select 'select#extended_metadata_attributes_extended_metadata_type_id', count: 0
+
+  end
+
+  test 'editing an investigation with disabled extended metadata should show the option' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    emt = FactoryBot.create(:simple_study_extended_metadata_type)
+    investigation = FactoryBot.create(:investigation, extended_metadata: ExtendedMetadata.new(extended_metadata_type: emt, data: { name: 'John', age: 12 }), contributor: person)
+    investigation.save!
+    investigation.extended_metadata.extended_metadata_type.update_column(:enabled, false)
+    refute investigation.extended_metadata.enabled?
+
+    get :edit, params: { id: investigation }
+    assert_response :success
+    assert_select 'select#extended_metadata_attributes_extended_metadata_type_id' do
+      assert_select 'option[value=?]',emt.id, text: "#{emt.title} (DISABLED)", count: 1
+    end
+  end
+
   test 'should create with discussion link' do
     person = FactoryBot.create(:person)
     login_as(person)
@@ -911,16 +944,22 @@ class InvestigationsControllerTest < ActionController::TestCase
                           contributor: other_user.person)
 
       # Create a 'private' assay in an assay stream
-      assay_1_stream_1_sample_type = FactoryBot.create(:isa_assay_material_sample_type, linked_sample_type: sample_collection_sample_type, template_id: FactoryBot.create(:isa_assay_material_template).id)
-      assay_1_stream_1 = FactoryBot.create(:assay, position: 0, sample_type: assay_1_stream_1_sample_type, study: accessible_study, contributor: current_user.person)
-      assay_2_stream_1_sample_type = FactoryBot.create(:isa_assay_data_file_sample_type, linked_sample_type: assay_1_stream_1_sample_type, template_id: FactoryBot.create(:isa_assay_data_file_template).id)
-      assay_2_stream_1 = FactoryBot.create(:assay, position:1, sample_type: assay_2_stream_1_sample_type, study: accessible_study, contributor: other_user.person)
+      stream_1 = FactoryBot.create(:assay_stream, title: 'Assay Stream 1', study: accessible_study, contributor: other_user.person)
+      assert_equal(stream_1.study, accessible_study)
+      assert(stream_1.is_assay_stream?)
+      assay_1_stream_1_sample_type = FactoryBot.create(:isa_assay_material_sample_type, contributor: other_user.person, linked_sample_type: sample_collection_sample_type, template_id: FactoryBot.create(:isa_assay_material_template).id)
+      assay_1_stream_1 = FactoryBot.create(:assay, position: 1, sample_type: assay_1_stream_1_sample_type, study: accessible_study, contributor: other_user.person, assay_stream_id: stream_1.id)
+      assay_2_stream_1_sample_type = FactoryBot.create(:isa_assay_data_file_sample_type, contributor: other_user.person, linked_sample_type: assay_1_stream_1_sample_type, template_id: FactoryBot.create(:isa_assay_data_file_template).id)
+      assay_2_stream_1 = FactoryBot.create(:assay, position: 2, sample_type: assay_2_stream_1_sample_type, study: accessible_study, contributor: other_user.person, assay_stream_id: stream_1.id)
 
       # Create an assay stream with all assays visible
-      assay_1_stream_2_sample_type = FactoryBot.create(:isa_assay_material_sample_type, linked_sample_type: sample_collection_sample_type, template_id: FactoryBot.create(:isa_assay_material_template).id)
-      assay_1_stream_2 = FactoryBot.create(:assay, position: 0, sample_type: assay_1_stream_2_sample_type, study: accessible_study, contributor: current_user.person)
-      assay_2_stream_2_sample_type = FactoryBot.create(:isa_assay_data_file_sample_type, linked_sample_type: assay_1_stream_2_sample_type, template_id: FactoryBot.create(:isa_assay_data_file_template).id)
-      assay_2_stream_2 = FactoryBot.create(:assay, position:1, sample_type: assay_2_stream_2_sample_type, study: accessible_study, contributor: current_user.person)
+      stream_2 = FactoryBot.create(:assay_stream, title: 'Assay Stream 2', study: accessible_study, contributor: current_user.person)
+      assert_equal(stream_2.study, accessible_study)
+      assert(stream_2.is_assay_stream?)
+      assay_1_stream_2_sample_type = FactoryBot.create(:isa_assay_material_sample_type, contributor: current_user.person, linked_sample_type: sample_collection_sample_type, template_id: FactoryBot.create(:isa_assay_material_template).id)
+      assay_1_stream_2 = FactoryBot.create(:assay, position: 1, sample_type: assay_1_stream_2_sample_type, study: accessible_study, contributor: current_user.person, assay_stream_id: stream_2.id)
+      assay_2_stream_2_sample_type = FactoryBot.create(:isa_assay_data_file_sample_type, contributor: current_user.person, linked_sample_type: assay_1_stream_2_sample_type, template_id: FactoryBot.create(:isa_assay_data_file_template).id)
+      assay_2_stream_2 = FactoryBot.create(:assay, position: 2, sample_type: assay_2_stream_2_sample_type, study: accessible_study, contributor: current_user.person, assay_stream_id: stream_2.id)
 
       # create samples in second assay stream with viewing permission
 
@@ -1096,8 +1135,13 @@ class InvestigationsControllerTest < ActionController::TestCase
       assert json_investigation['studies'].map { |s| s['title'] }.include? accessible_study.title
       study_json = json_investigation['studies'].first
 
+      # Total assays
+      assert_equal accessible_study.assays.count, 6
+      # Assay_streams
+      assert_equal accessible_study.assay_streams.count, 2
+      # Child assays
+      assert_equal accessible_study.assay_streams.map(&:child_assays).compact.flatten.count, 4
       # Only one assay should end up in 1 assay stream in the ISA JSON
-      assert_equal accessible_study.assays.count, 4
       assert_equal study_json['assays'].count, 1
 
       sample_ids = study_json['materials']['samples'].map { |sample| sample['@id'] }

@@ -83,10 +83,15 @@
     try{
       const postCall = await uploadAjaxCall("<%= batch_create_samples_path %>", "POST", { data: JSON.stringify(newSamples) });
       const putCall = await uploadAjaxCall("<%= batch_update_samples_path %>", "PUT", { data: JSON.stringify(updatedSamples) });
+        let errors = {newSamples: postCall.errors, updatedSamples: putCall.errors};
+        if (errors.newSamples.length > 0 || errors.updatedSamples.length > 0) {
+            throw new Error(JSON.stringify(errors));
+        }
       $j('#sample-upload-spinner').hide();
       closeModalForm();
       location.reload();
     } catch (error){
+        alert(`Error: ${error}`);
       $j('#sample-upload-spinner').hide();
     }
   }
@@ -132,7 +137,7 @@
         const inputIds = multiInputfields.map(is => is.title.split(" ").pop()).join(',');
         samplesObj[key] = inputIds;
       } else if (cvListFields.length > 0){
-        cvTerms = cvListFields.map(cvt => cvt.title)
+          let cvTerms = cvListFields.map(cvt => cvt.title)
         samplesObj[key] = cvTerms;
       } else if (seekSample.length > 0) {
         samplesObj[key] = seekSample[0].title
@@ -143,7 +148,7 @@
 
     const {id: objId, ...attrMap} = samplesObj;
 
-    attrMap["status"] = action;
+      attrMap["sampleUploadAction"] = action;
 
     if (action === "update"){
       return {
