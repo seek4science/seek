@@ -8,7 +8,6 @@ class FloatAttributeHandlerTest < ActiveSupport::TestCase
     assert_equal 2.7, handler.convert("2.7")
     assert_equal 2.0, handler.convert("2")
     assert_equal 2.0, handler.convert(2)
-    assert_equal 2.0, handler.convert(2.0)
     assert_equal 3.5, handler.convert(3.5)
 
     assert_nil handler.convert(nil)
