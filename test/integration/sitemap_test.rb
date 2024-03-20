@@ -66,4 +66,20 @@ class SitemapTest < ActionDispatch::IntegrationTest
     assert_equal 0, doc.xpath('//urlset/url/loc[text()="http://localhost:3000/models/'+@private_model.id.to_s+'"]').count
   end
 
+  test 'site' do
+    get '/sitemaps/site.xml'
+    assert_response :success
+
+    doc = Nokogiri::XML.parse(response.body)
+    doc.remove_namespaces!
+
+    assert_equal Seek::Util.searchable_types.count + 1, doc.xpath('//urlset/url').count
+    assert_equal 1, doc.xpath('//urlset/url/loc[text()="http://localhost:3000/"]').count
+    assert_equal 1, doc.xpath('//urlset/url/loc[text()="http://localhost:3000/institutions"]').count
+
+    # disabled aren't shown, but types without content are
+    assert_equal 1, doc.xpath('//urlset/url/loc[text()="http://localhost:3000/data_files"]').count
+    assert_equal 0, doc.xpath('//urlset/url/loc[text()="http://localhost:3000/sops"]').count
+  end
+
 end
