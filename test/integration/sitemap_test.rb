@@ -12,16 +12,15 @@ class SessionStoreTest < ActionDispatch::IntegrationTest
     @people = Person.all
     @institutions = Institution.all
 
-    sitemap_path = "#{Rails.root}/public/sitemap.xml"
     sitemaps_dir = "#{Rails.root}/public/sitemaps"
-    FileUtils.rm(sitemap_path) if File.exist?(sitemap_path)
     FileUtils.rm_rf(sitemaps_dir) if File.exist?(sitemaps_dir)
 
     SitemapGenerator::Interpreter.run(verbose: false)
   end
 
   test 'root sitemap' do
-    get '/sitemaps/sitemap.xml'
+    get '/sitemap.xml'
+    assert_response :success
   end
 
 end
