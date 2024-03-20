@@ -155,10 +155,6 @@ module Seek
       c
     end
 
-    def self.clear_cache
-      @cache = nil
-    end
-
     private
 
     def self.persistent_class_lookup

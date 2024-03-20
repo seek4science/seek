@@ -19,7 +19,7 @@ class SitemapTest < ActionDispatch::IntegrationTest
     FileUtils.rm_rf(sitemaps_dir) if File.exist?(sitemaps_dir)
 
     # avoid earlier cached types being included even if disabled
-    Seek::Util.clear_cache
+    Seek::Util.clear_cached
 
     with_config_value(:sops_enabled, false) do
       SitemapGenerator::Interpreter.run(verbose: false)
