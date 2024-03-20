@@ -1,18 +1,16 @@
 require 'test_helper'
 require 'sitemap_generator'
 
-
 class SitemapTest < ActionDispatch::IntegrationTest
-
   def setup
     disable_authorization_checks do
       DataFile.destroy_all
       Model.destroy_all
       Sop.destroy_all
     end
-    @models = FactoryBot.create_list(:model,3, policy:FactoryBot.create(:public_policy))
+    @models = FactoryBot.create_list(:model, 3, policy: FactoryBot.create(:public_policy))
     @private_model = FactoryBot.create(:model, policy: FactoryBot.create(:private_policy))
-    @sops = FactoryBot.create_list(:sop,3, policy:FactoryBot.create(:public_policy))
+    @sops = FactoryBot.create_list(:sop, 3, policy: FactoryBot.create(:public_policy))
     @projects = Project.all
     @people = Person.all
     @institutions = Institution.all
@@ -23,7 +21,6 @@ class SitemapTest < ActionDispatch::IntegrationTest
     with_config_value(:sops_enabled, false) do
       SitemapGenerator::Interpreter.run(verbose: false)
     end
-
   end
 
   test 'root sitemap' do
@@ -61,9 +58,10 @@ class SitemapTest < ActionDispatch::IntegrationTest
     doc.remove_namespaces!
     assert_equal 3, doc.xpath('//urlset/url/loc').count
     @models.each do |model|
-      assert_equal 1, doc.xpath('//urlset/url/loc[text()="http://localhost:3000/models/'+model.id.to_s+'"]').count
+      assert_equal 1, doc.xpath("//urlset/url/loc[text()=\"http://localhost:3000/models/#{model.id}\"]").count
     end
-    assert_equal 0, doc.xpath('//urlset/url/loc[text()="http://localhost:3000/models/'+@private_model.id.to_s+'"]').count
+    assert_equal 0,
+                 doc.xpath("//urlset/url/loc[text()=\"http://localhost:3000/models/#{@private_model.id}\"]").count
   end
 
   test 'site' do
@@ -81,5 +79,4 @@ class SitemapTest < ActionDispatch::IntegrationTest
     assert_equal 1, doc.xpath('//urlset/url/loc[text()="http://localhost:3000/data_files"]').count
     assert_equal 0, doc.xpath('//urlset/url/loc[text()="http://localhost:3000/sops"]').count
   end
-
 end
