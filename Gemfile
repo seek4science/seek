@@ -161,6 +161,8 @@ gem 'net-ftp'
 
 gem 'licensee'
 
+gem "sitemap_generator", "~> 6.3"
+
 group :production do
   gem 'passenger'
 end
@@ -205,5 +207,3 @@ group :test, :development do
   gem 'teaspoon'
   gem 'teaspoon-mocha'
 end
-
-gem "sitemap_generator", "~> 6.3"
