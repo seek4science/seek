@@ -1,9 +1,8 @@
 require 'test_helper'
-require 'rubygems'
 require 'sitemap_generator'
-require 'rake'
 
-class SessionStoreTest < ActionDispatch::IntegrationTest
+
+class SitemapTest < ActionDispatch::IntegrationTest
 
   def setup
     @models = FactoryBot.create_list(:model,3, policy:FactoryBot.create(:public_policy))
@@ -21,6 +20,15 @@ class SessionStoreTest < ActionDispatch::IntegrationTest
   test 'root sitemap' do
     get '/sitemap.xml'
     assert_response :success
+    doc = Nokogiri::XML.parse(response.body)
+    doc.remove_namespaces!
+    assert_equal 1, doc.xpath('//sitemapindex').count
+    assert_equal 1, doc.xpath('//sitemapindex/sitemap/loc[text()="http://localhost:3000/sitemaps/site.xml"]').count
+    assert_equal 1, doc.xpath('//sitemapindex/sitemap/loc[text()="http://localhost:3000/sitemaps/models.xml"]').count
+    assert_equal 1, doc.xpath('//sitemapindex/sitemap/loc[text()="http://localhost:3000/sitemaps/sops.xml"]').count
+    assert_equal 1, doc.xpath('//sitemapindex/sitemap/loc[text()="http://localhost:3000/sitemaps/projects.xml"]').count
+    assert_equal 1, doc.xpath('//sitemapindex/sitemap/loc[text()="http://localhost:3000/sitemaps/people.xml"]').count
+    assert_equal 1, doc.xpath('//sitemapindex/sitemap/loc[text()="http://localhost:3000/sitemaps/institutions.xml"]').count
   end
 
 end
