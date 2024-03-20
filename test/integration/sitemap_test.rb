@@ -18,6 +18,9 @@ class SitemapTest < ActionDispatch::IntegrationTest
     sitemaps_dir = "#{Rails.root}/public/sitemaps"
     FileUtils.rm_rf(sitemaps_dir) if File.exist?(sitemaps_dir)
 
+    # avoid earlier cached types being included even if disabled
+    Seek::Util.clear_cache
+
     with_config_value(:sops_enabled, false) do
       SitemapGenerator::Interpreter.run(verbose: false)
     end
