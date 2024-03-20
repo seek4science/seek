@@ -19,7 +19,7 @@ SitemapGenerator::Sitemap.create do
   types.each do |type|
     group(filename: type.table_name) do
       type.authorized_for('view', nil).each do |resource|
-        add polymorphic_path(resource), lastmod: resource.updated_at, changefreq: 'daily', priority: 0.7
+        add polymorphic_path(resource), lastmod: resource.updated_at, changefreq: 'weekly', priority: 0.7
       end
     end
   end
