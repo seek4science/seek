@@ -84,11 +84,13 @@ Kernel.class_eval do
     oldvals = {}
     settings.each do |config, value|
       oldvals[config] = Seek::Config.send(config)
+      Seek::Util.clear_cached if config.to_s.ends_with?('enabled')
       Seek::Config.send("#{config}=", value)
     end
     yield
   ensure
     oldvals.each do |config, oldval|
+      Seek::Util.clear_cached if config.to_s.ends_with?('enabled')
       Seek::Config.send("#{config}=", oldval)
     end
   end
