@@ -1,7 +1,6 @@
 # https://github.com/kjvarga/sitemap_generator#sitemapgenerator
 
 SitemapGenerator::Sitemap.sitemaps_path = 'sitemaps'
-# SitemapGenerator::Sitemap.create_index = "auto"
 SitemapGenerator::Sitemap.compress = false
 SitemapGenerator::Sitemap.include_root = false
 SitemapGenerator::Sitemap.default_host = URI.parse(Seek::Config.site_base_url)
