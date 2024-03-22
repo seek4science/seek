@@ -18,7 +18,6 @@ environment rails_env
 
 stdout_redirect 'log/puma.out', 'log/puma.err'
 
-
 bind 'tcp://0.0.0.0:2000'
 # bind 'unix:///var/run/puma.sock'
 # bind 'unix:///var/run/puma.sock?umask=0111'
