@@ -109,23 +109,42 @@ At least one attribute must be required and set to the title, and other attribut
 
 Once completed click update. Your Sample Type can now be used to generate Samples.
 
-## Sample Type Visibility
+## Sharing permissions for Sample Type
 
-Initially, a Sample Type is only visible and accessible to members of the Project it is associated with.
+In FAIRDOM-SEEK v1.15 and onwards, Sample Types now have their own sharing permissions, allowing for customization similar to other items in the system.
 
-However, once a Sample Type has instances of Samples associated with them, and those Samples are shared publically (i.e. to logged out members), the Sample Type
-also becomes visible.
+Notably, only project members who can view, edit, or manage a Sample Type are allowed to create samples within it. 
+Non-project members with viewing, editing or managing rights to a Sample Type cannot create samples.
 
-When a Sample is shared outside of a Project, but is still not accessible publicly, then the Sample Type will adopt the visibility of the referring Sample
-when accessed via a link. For example if a Sample is shared with another Project, a member of that other Project may view the Sample Type when clicking the link
-the link from the Sample description. However, in this case, the Sample Type won't appear in lists or search results.
+The following sharing permissions will be applied retrospectively to existing sample types:
+* If at least 1 sample in a Sample Type is public --> then, any registered users (non project members) can create samples
+* If 0 samples in a Sample Type are public → then, Public: No access & Project member: Can view (only project members will be able to create samples)
 
-## Editing Sample Types
 
-The Sample Type may be edited by the original creator, or somebody that can administer the related projects.
 
-If no samples have yet been created, you can freely edit the Sample Type and its attributes. Once Samples have been created for a Sample Type, it is no longer possible to modify the attributes - however other details about the Sample Type can be changed.
- 
+
+| Project member | Sharing permissions for Sample Type | View/Download Sample Type | Edit Sample Type | Manage Sample Type | Create samples |
+|----------------|-------------------------------------|---------------------------|------------------|--------------------|----------------|
+| no             | no access                           | no                        | no               | no                 | no             |
+| no             | view                                | yes                       | no               | no                 | no             |
+| no             | edit                                | yes                       | yes              | no                 | no             |
+| no             | manage                              | yes                       | yes              | yes                | no             |
+| yes            | no access                           | no                        | no               | no                 | no             |
+| yes            | view                                | yes                       | no               | no                 | yes            |
+| yes            | edit                                | yes                       | yes              | no                 | yes            |
+| yes            | manage                              | yes                       | yes              | yes                | yes            |
+
+For Sample Types with existing samples, there are specific editing actions available. Here's a breakdown of what can and cannot be edited in Sample Types containing samples.
+
+CAN DO:
+* Edit Sample Type title, description, tags, and associated project.
+* Rearrange the order of attributes.
+* Edit anything in attributes with values, excluding the "attribute type."
+* Add a new attribute as a non-required (optional) one.
+
+CANNOT DO:
+* Edit "attribute type" for an attribute containing values.
+* Add a new attribute as required or as titled.
 
 For details on how to create a Sample please go to [Creating a Sample](create-sample.html) 
 
