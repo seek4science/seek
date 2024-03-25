@@ -860,7 +860,7 @@ GEM
       sprockets (>= 3.0.0)
     sqlite3 (1.4.2)
     stackprof (0.2.25)
-    stringio (3.0.1)
+    stringio (3.0.1.1)
     sunspot (2.6.0)
       pr_geohash (~> 1.0)
       rsolr (>= 1.1.1, < 3)
@@ -1085,7 +1085,7 @@ DEPENDENCIES
   sprockets-rails
   sqlite3 (~> 1.4)
   stackprof (~> 0.2.25)
-  stringio (= 3.0.1)
+  stringio (= 3.0.1.1)
   sunspot_matchers
   sunspot_rails
   teaspoon
