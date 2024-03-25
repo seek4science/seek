@@ -2,13 +2,16 @@
 <div class="pull-right">
   <%= dropdown_button('Add identity', 'add') do %>
     <% if Seek::Config.omniauth_elixir_aai_enabled %>
-      <li><%= link_to(t("login.elixir_aai"), omniauth_authorize_path(:elixir_aai), method: :post) -%></li>
+      <li><%= link_to(omniauth_method_name(:elixir_aai), omniauth_authorize_path(:elixir_aai), method: :post) -%></li>
     <% end %>
     <% if Seek::Config.omniauth_ldap_enabled %>
-      <li><%= link_to(t("login.ldap"), '#', 'data-toggle' => 'modal', 'data-target' => "#ldap-form") -%></li>
+      <li><%= link_to(omniauth_method_name(:ldap), '#', 'data-toggle' => 'modal', 'data-target' => "#ldap-form") -%></li>
     <% end %>
     <% if Seek::Config.omniauth_github_enabled %>
-      <li><%= link_to(t("login.github"), omniauth_authorize_path(:github), method: :post) -%></li>
+      <li><%= link_to(omniauth_method_name(:github), omniauth_authorize_path(:github), method: :post) -%></li>
+    <% end %>
+    <% if Seek::Config.omniauth_oidc_enabled %>
+      <li><%= link_to(omniauth_method_name(:oidc), omniauth_authorize_path(:oidc), method: :post) -%></li>
     <% end %>
   <% end %>
 </div>
@@ -45,7 +48,7 @@
       <tbody>
       <% @identities.each do |identity| %>
         <tr>
-          <td><%= t("login.#{identity.provider}") %></td>
+          <td><%= omniauth_method_name(identity.provider.to_sym) %></td>
           <td><%= content_tag(:pre, identity.uid) %></td>
           <td><%= identity.created_at %></td>
           <td>

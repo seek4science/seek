@@ -131,6 +131,42 @@
           "is_title": false,
           "sample_controlled_vocab_id": null,
           "linked_sample_type_id": "<%= res.sample_attributes[6].linked_sample_type_id %>"
+        },
+        {
+          "id": "<%= res.sample_attributes[7].id %>",
+          "title": "weight",
+          "description": null,
+          "pid": null,
+          "sample_attribute_type": {
+            "id": "<%= res.sample_attributes[7].sample_attribute_type_id %>",
+            "title": "<%= res.sample_attributes[7].sample_attribute_type.title %>",
+            "base_type": "Float",
+            "regexp": ".*"
+          }
+        },
+        {
+          "id": "<%= res.sample_attributes[8].id %>",
+          "title": "age",
+          "description": null,
+          "pid": null,
+          "sample_attribute_type": {
+            "id": "<%= res.sample_attributes[8].sample_attribute_type_id %>",
+            "title": "<%= res.sample_attributes[8].sample_attribute_type.title %>",
+            "base_type": "Integer",
+            "regexp": ".*"
+          }
+        },
+        {
+          "id": "<%= res.sample_attributes[9].id %>",
+          "title": "bool",
+          "description": null,
+          "pid": null,
+          "sample_attribute_type": {
+            "id": "<%= res.sample_attributes[9].sample_attribute_type_id %>",
+            "title": "<%= res.sample_attributes[9].sample_attribute_type.title %>",
+            "base_type": "Boolean",
+            "regexp": ".*"
+          }
         }
       ],
       "tags": [

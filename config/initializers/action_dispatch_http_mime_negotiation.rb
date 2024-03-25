@@ -16,7 +16,12 @@ module ActionDispatch
       alias original_format_from_path_extension format_from_path_extension
 
       def format_from_path_extension
-        controller_class&.ignore_format_from_extension ? nil : original_format_from_path_extension
+        clz = controller_class
+        if clz != ActionDispatch::Request::PASS_NOT_FOUND && clz&.ignore_format_from_extension
+          nil
+        else
+          original_format_from_path_extension
+        end
       end
     end
   end

@@ -18,17 +18,22 @@
             <% end %>
             <% if show_elixir_aai_login? %>
               <%= content_tag(:li, role: 'presentation', class: strategy == 'elixir_aai' ? 'active' : nil) do %>
-                <a href="#elixir_aai_login" aria-controls="elixir_aai_login" role="tab" data-toggle="tab"><%= t('login.elixir_aai') %></a>
+                <a href="#elixir_aai_login" aria-controls="elixir_aai_login" role="tab" data-toggle="tab"><%= omniauth_method_name(:elixir_aai) %></a>
               <% end %>
             <% end %>
             <% if show_ldap_login? %>
               <%= content_tag(:li, role: 'presentation', class: strategy == 'ldap' ? 'active' : nil) do %>
-                <a href="#ldap_login" aria-controls="ldap_login" role="tab" data-toggle="tab"><%= t('login.ldap') %></a>
+                <a href="#ldap_login" aria-controls="ldap_login" role="tab" data-toggle="tab"><%= omniauth_method_name(:ldap) %></a>
               <% end %>
             <% end %>
             <% if show_github_login? %>
               <%= content_tag(:li, role: 'presentation', class: strategy == 'github' ? 'active' : nil) do %>
-                <a href="#github_login" aria-controls="github_login" role="tab" data-toggle="tab"><%= t('login.github') %></a>
+                <a href="#github_login" aria-controls="github_login" role="tab" data-toggle="tab"><%= omniauth_method_name(:github) %></a>
+              <% end %>
+            <% end %>
+            <% if show_oidc_login? %>
+              <%= content_tag(:li, role: 'presentation', class: strategy == 'oidc' ? 'active' : nil) do %>
+                <a href="#oidc_login" aria-controls="oidc_login" role="tab" data-toggle="tab"><%= omniauth_method_name(:oidc) %></a>
               <% end %>
             <% end %>
           </ul>
@@ -80,6 +85,13 @@
               <%= content_tag(:div, id: 'github_login', role: 'tabpanel', class: strategy == 'github' ? 'tab-pane active' : 'tab-pane') do %>
                 <div class='text-center'>
                   <%= button_link_to 'Sign in with GitHub', 'github_large', omniauth_authorize_path(:github, state: "return_to:#{original_path}"), method: :post %>
+                </div>
+              <% end %>
+            <% end %>
+            <% if show_oidc_login? %>
+              <%= content_tag(:div, id: 'oidc_login', role: 'tabpanel', class: strategy == 'oidc' ? 'tab-pane active' : 'tab-pane') do %>
+                <div class='text-center'>
+                  <%= oidc_login_button(original_path) %>
                 </div>
               <% end %>
             <% end %>

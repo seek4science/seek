@@ -607,8 +607,8 @@ class ConfigTest < ActiveSupport::TestCase
             config = Seek::Config.omniauth_elixir_aai_config
             assert_equal 'abc', config[:client_options][:identifier]
             assert_equal '123', config[:client_options][:secret]
-            assert_equal '/identities/auth/elixir_aai/callback', config[:callback_path]
-            assert_equal 'https://secure.website:3001/identities/auth/elixir_aai/callback', config[:client_options][:redirect_uri]
+            assert_equal '/auth/elixir_aai/callback', config[:callback_path]
+            assert_equal 'https://secure.website:3001/auth/elixir_aai/callback', config[:client_options][:redirect_uri]
           end
         end
       end
@@ -616,8 +616,17 @@ class ConfigTest < ActiveSupport::TestCase
     with_config_value(:site_base_host, 'http://localhost') do
       with_relative_root('/seeks/seek1') do
         config = Seek::Config.omniauth_elixir_aai_config
-        assert_equal '/seeks/seek1/identities/auth/elixir_aai/callback', config[:callback_path]
-        assert_equal 'http://localhost/seeks/seek1/identities/auth/elixir_aai/callback', config[:client_options][:redirect_uri]
+        refute Seek::Config.omniauth_elixir_aai_legacy_mode
+        assert_equal '/seeks/seek1/auth/elixir_aai/callback', config[:callback_path]
+        assert_equal 'http://localhost/seeks/seek1/auth/elixir_aai/callback', config[:client_options][:redirect_uri]
+        assert_equal 'https://proxy.aai.lifescience-ri.eu/',config[:issuer]
+        with_config_value(:omniauth_elixir_aai_legacy_mode, true) do
+          assert Seek::Config.omniauth_elixir_aai_legacy_mode
+          config = Seek::Config.omniauth_elixir_aai_config
+          assert_equal '/seeks/seek1/identities/auth/elixir_aai/callback', config[:callback_path]
+          assert_equal 'http://localhost/seeks/seek1/identities/auth/elixir_aai/callback', config[:client_options][:redirect_uri]
+          assert_equal 'https://login.elixir-czech.org/oidc/', config[:issuer]
+        end
       end
     end
   end

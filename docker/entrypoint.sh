@@ -31,6 +31,10 @@ then
     bundle exec rake db:seed:openseek:default_openbis_endpoint
 fi
 
+# Build the sitemap
+echo "TRIGGER SITEMAP BUILD"
+bundle exec rake sitemap:create &
+
 # Start Rails
 echo "STARTING SEEK"
 bundle exec puma -C docker/puma.rb &
