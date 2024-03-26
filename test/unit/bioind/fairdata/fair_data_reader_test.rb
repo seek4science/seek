@@ -47,13 +47,13 @@ class FairDataReaderTest < ActiveSupport::TestCase
     path = "#{Rails.root}/test/fixtures/files/fairdatastation/demo.ttl"
 
     inv = BioInd::FairData::Reader.parse_graph(path).first
-    assert_empty inv.metadata_annotations
+    assert_empty inv.additional_metadata_annotations
 
     study = inv.studies.first
 
-    assert_equal 8, study.metadata_annotations.count
+    assert_equal 8, study.additional_metadata_annotations.count
     assert_includes study.annotations, ["http://fairbydesign.nl/ontology/center_name", "NIID"]
-    study.metadata_annotations.each do |annotation|
+    study.additional_metadata_annotations.each do |annotation|
       assert annotation[0].start_with?('http://fairbydesign.nl/ontology/'), "#{annotation[0]} is not expected"
     end
   end

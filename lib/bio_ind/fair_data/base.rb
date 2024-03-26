@@ -8,6 +8,7 @@ module BioInd
         @graph = graph
         @jerm = RDF::Vocabulary.new('http://jermontology.org/ontology/JERMOntology#')
         @schema = RDF::Vocabulary.new('http://schema.org/')
+        @fair = RDF::Vocabulary.new('http://fairbydesign.nl/ontology/')
         @children = []
       end
 
@@ -34,11 +35,9 @@ module BioInd
         end
       end
 
-      def metadata_annotations
+      def additional_metadata_annotations
         annotations.select do |annotation|
-          [@schema.title, @schema.description, @schema.identifier, @schema.contributor, @jerm.hasPart, RDF.type].detect do |skip|
-            annotation[0].start_with?(skip)
-          end.nil?
+          annotation[0].start_with?(@fair.to_s)
         end
       end
 
@@ -91,7 +90,7 @@ module BioInd
       def populate_extended_metadata(seek_resource)
         extended_metadata_type = seek_resource.extended_metadata.extended_metadata_type
         data = {}
-        metadata_annotations.each do |annotation|
+        additional_metadata_annotations.each do |annotation|
           property = annotation[0]
           value = annotation[1]
           attribute = extended_metadata_type.extended_metadata_attributes.where(property_type_id: property).first

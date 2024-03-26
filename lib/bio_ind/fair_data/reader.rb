@@ -57,7 +57,7 @@ module BioInd
       end
 
       def self.detect_extended_metadata(seek_entity, datastation_entity)
-        property_ids = datastation_entity.metadata_annotations.collect{|annotation| annotation[0]}
+        property_ids = datastation_entity.additional_metadata_annotations.collect{|annotation| annotation[0]}
 
         # collect and sort those with the most properties that match, eliminating any where no properties match
         candidates = ExtendedMetadataType.where(supported_type: seek_entity.class.name).includes(:extended_metadata_attributes).collect do |emt|
