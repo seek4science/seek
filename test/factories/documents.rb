@@ -39,6 +39,7 @@ FactoryBot.define do
     title { 'A Maximal Document' }
     description { 'The important report we did for ~important-milestone~' }
     discussion_links { [FactoryBot.build(:discussion_link, label:'Slack')] }
+    extended_metadata { FactoryBot.build(:role_multiple_extended_metadata)}
     policy { FactoryBot.create(:downloadable_public_policy) }
     assays { [FactoryBot.create(:public_assay)] }
     workflows {[FactoryBot.build(:workflow, policy: FactoryBot.create(:public_policy))]}

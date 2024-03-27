@@ -162,6 +162,11 @@ module Seek
         end
       end
 
+      convert :extended_attributes, rename: :extended_metadata_attributes do |value|
+        value["data"] = value.delete("attribute_map")
+        value
+      end
+      
       convert :tools, rename: :tools_attributes, only: :workflows do |value|
         biotools_client = BioTools::Client.new
         value.map do |t|

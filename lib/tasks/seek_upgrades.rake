@@ -20,6 +20,7 @@ namespace :seek do
     recognise_isa_json_compliant_items
     implement_assay_streams_for_isa_assays
     set_ls_login_legacy_mode
+    rename_custom_metadata_legacy_supported_type
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -232,6 +233,13 @@ namespace :seek do
         puts "Enabling LS Login legacy mode"
         Seek::Config.omniauth_elixir_aai_legacy_mode = true
       end
+    end
+  end
+
+  task(rename_custom_metadata_legacy_supported_type: [:environment]) do
+    if ExtendedMetadataType.where(supported_type: 'CustomMetadata').any?
+      puts "... Renaming ExtendedMetadata supported_type from Custom to ExtendedMetadata"
+      ExtendedMetadataType.where(supported_type: 'CustomMetadata').update_all(supported_type: 'ExtendedMetadata')
     end
   end
 
