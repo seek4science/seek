@@ -45,8 +45,8 @@ module DynamicTableHelper
     registered_sample_multi_attributes = sample_type.sample_attributes.select { |sa| sa.sample_attribute_type.base_type == Seek::Samples::BaseType::SEEK_SAMPLE_MULTI }
 
     sample_type.samples.map do |s|
+      sanitized_json_metadata = hide_unauthorized_inputs(JSON.parse(s.json_metadata), registered_sample_attributes, registered_sample_multi_attributes)
       if s.can_view?
-        sanitized_json_metadata = hide_unauthorized_inputs(JSON.parse(s.json_metadata), registered_sample_attributes, registered_sample_multi_attributes)
         { 'selected' => '', 'id' => s.id, 'uuid' => s.uuid }.merge!(sanitized_json_metadata)
       else
         { 'selected' => '', 'id' => '#HIDDEN', 'uuid' => '#HIDDEN' }.merge!(sanitized_json_metadata&.transform_values { '#HIDDEN' })
