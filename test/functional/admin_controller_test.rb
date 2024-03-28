@@ -236,6 +236,36 @@ class AdminControllerTest < ActionController::TestCase
     end
   end
 
+  test 'job queue table' do
+    sop = FactoryBot.create(:sop)
+    admin = FactoryBot.create(:admin)
+    login_as(admin)
+    RdfGenerationQueue.destroy_all
+    ReindexingQueue.destroy_all
+    AuthLookupUpdateQueue.destroy_all
+
+    with_config_value(:auth_lookup_enabled, true) do
+
+      assert RdfGenerationQueue.queue_enabled?
+      assert ReindexingQueue.queue_enabled?
+      assert AuthLookupUpdateQueue.queue_enabled?
+
+      RdfGenerationQueue.enqueue(sop)
+      ReindexingQueue.enqueue(sop)
+      AuthLookupUpdateQueue.enqueue(sop)
+    end
+
+    get :get_stats, xhr: true, params: { page: 'job_queue' }
+    assert_response :success
+
+    assert_select 'div.job-queue-table table' do
+      assert_select 'tbody > tr', count: 3
+      assert_select 'tbody > tr > td', text: 'RdfGenerationQueue'
+      assert_select 'tbody > tr > td', text: 'ReindexingQueue'
+      assert_select 'tbody > tr > td', text: 'AuthLookupUpdateQueue'
+    end
+  end
+
   test 'storage usage stats' do
     FactoryBot.create(:rightfield_datafile)
     FactoryBot.create(:rightfield_annotated_datafile)
