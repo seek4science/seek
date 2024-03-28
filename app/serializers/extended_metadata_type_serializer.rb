@@ -17,7 +17,8 @@ class ExtendedMetadataTypeSerializer < BaseSerializer
       "sample_attribute_type": get_sample_attribute_type(attribute),
       "required": attribute.required,
       "pos": attribute.pos,
-      "sample_controlled_vocab_id": attribute.sample_controlled_vocab_id.nil? ? nil : attribute.sample_controlled_vocab_id.to_s
+      "sample_controlled_vocab_id": attribute.sample_controlled_vocab_id.nil? ? nil : attribute.sample_controlled_vocab_id.to_s,
+      "linked_extended_metadata_type_id": attribute.linked_extended_metadata_type_id.nil? ? nil : attribute.linked_extended_metadata_type_id.to_s
     }
   end
 
