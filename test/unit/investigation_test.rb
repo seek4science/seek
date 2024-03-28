@@ -221,6 +221,10 @@ class InvestigationTest < ActiveSupport::TestCase
                    )
     )
     assert_equal ['James','25'].sort, item.extended_metadata_attribute_values_for_search.map(&:to_s).sort
+
+    #nested
+    item = FactoryBot.create(:investigation, extended_metadata: FactoryBot.create(:role_multiple_extended_metadata))
+    assert_equal ['alice@email.com','0012345','liddell','alice','wonder','land'].sort, item.extended_metadata_attribute_values_for_search.map(&:to_s).sort
   end
   
   test 'related sop ids' do
