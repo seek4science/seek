@@ -255,7 +255,6 @@ class AdminControllerTest < ActionController::TestCase
       AuthLookupUpdateQueue.enqueue(sop)
     end
 
-
     get :get_stats, xhr: true, params: { page: 'job_queue' }
     assert_response :success
 
