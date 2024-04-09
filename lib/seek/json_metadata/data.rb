@@ -37,7 +37,7 @@ module Seek
       # extracts all values from the data as a list, including from within nested structures
       def extract_all_values(data = self)
         data.values.collect do |value|
-          if value.is_a?(Data)
+          if value.is_a?(Seek::JSONMetadata::Data)
             extract_all_values(value)
           else
             value
