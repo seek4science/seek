@@ -24,7 +24,7 @@ class WorkflowCrateExtractor
           self.git_version.name = @crate['version'] if @crate['version'].present?
         end
       end
-      self.workflow ||= Workflow.new(workflow_class: workflow_class)
+      self.workflow ||= default_workflow
       self.git_version ||= workflow.git_version.tap do |gv|
         gv.set_default_git_repository
       end
@@ -44,10 +44,14 @@ class WorkflowCrateExtractor
       git_version.set_resource_attributes(workflow.attributes)
     end
 
-    workflow
+    workflow || default_workflow
   end
 
   private
+
+  def default_workflow
+    Workflow.new(workflow_class: workflow_class)
+  end
 
   def main_workflow_present?
     errors.add(:ro_crate, 'did not specify a main workflow.') unless @crate.main_workflow.present?
