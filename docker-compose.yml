@@ -14,7 +14,7 @@ services:
   seek: # The SEEK application
     #build: .
 
-    image: fairdom/seek::1.15-dev
+    image: fairdom/seek:1.15-dev
 
     container_name: seek
     command: docker/entrypoint.sh
