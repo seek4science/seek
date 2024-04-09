@@ -274,4 +274,19 @@ class Workflow < ApplicationRecord
       }
   )
 
+  def self.find_by_source_url(source_url)
+    joins(:source_link).where('asset_links.url' => source_url)
+  end
+
+  def self.find_existing_version(source_url, version_name)
+    workflows = joins(:source_link).where('asset_links.url' => source_url)
+    if workflows.length == 1
+      workflows.first.git_versions.where(name: version_name)
+    elsif workflows.empty?
+      'None :('
+    else
+      'Too many :('
+    end
+  end
+
 end

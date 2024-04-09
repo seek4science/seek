@@ -5,14 +5,26 @@ require 'seek/download_handling/http_streamer'
 class WorkflowCrateExtractor
   include ActiveModel::Model
 
-  attr_accessor :ro_crate, :workflow_class, :workflow, :git_version, :params
+  attr_accessor :ro_crate, :workflow_class, :workflow, :git_version, :params, :update_existing
 
   validate :resolve_crate
   validate :main_workflow_present?, if: -> { @crate.present? }
+  validate :source_url_present?, if: -> { update_existing }
+  validate :find_workflows_matching_id, if: -> { update_existing }
 
   def build
-    self.workflow ||= Workflow.new(workflow_class: workflow_class)
     if valid?
+      if update_existing && @existing_workflows.length == 1
+        self.workflow = @existing_workflows.first
+        if @crate['version'] && self.workflow.git_versions.map(&:name).include?(@crate['version'])
+          return self.workflow
+        else
+          self.workflow.latest_git_version.lock if self.workflow.latest_git_version.mutable?
+          self.git_version = self.workflow.latest_git_version.next_version(mutable: true)
+          self.git_version.name = @crate['version'] if @crate['version'].present?
+        end
+      end
+      self.workflow ||= Workflow.new(workflow_class: workflow_class)
       self.git_version ||= workflow.git_version.tap do |gv|
         gv.set_default_git_repository
       end
@@ -30,8 +42,6 @@ class WorkflowCrateExtractor
       workflow.provide_metadata(extractor.metadata)
       workflow.assign_attributes(params) if params.present?
       git_version.set_resource_attributes(workflow.attributes)
-
-      workflow
     end
 
     workflow
@@ -41,6 +51,18 @@ class WorkflowCrateExtractor
 
   def main_workflow_present?
     errors.add(:ro_crate, 'did not specify a main workflow.') unless @crate.main_workflow.present?
+  end
+
+  def source_url_present?
+    errors.add(:ro_crate, 'ID could not be determined.') unless @crate.source_url.present?
+  end
+
+  def find_workflows_matching_id
+    # Attempt to find existing workflow
+    @existing_workflows = Workflow.find_by_source_url(@crate.source_url)
+    if @existing_workflows.length > 1
+      errors.add(:ro_crate, "#{@existing_workflows.length} workflows found matching the given ID.")
+    end
   end
 
   def extract_crate
