@@ -6,6 +6,7 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
     login_as(admin.user)
     FactoryBot.create(:cwl_workflow_class) # Make sure the CWL class is present
     FactoryBot.create(:nextflow_workflow_class)
+    FactoryBot.create(:galaxy_workflow_class)
     @project = admin.person.projects.first
     @git_support = Seek::Config.git_support_enabled
     Seek::Config.git_support_enabled = true
@@ -46,11 +47,22 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
         }
 
         assert_response :success
-        assert_equal 2, assigns(:workflow).reload.version
-        assert_equal 'Nextflow', assigns(:workflow).workflow_class.title
-        assert_equal 'nf-core/ampliseq', assigns(:workflow).title
-        assert assigns(:workflow).git_version.total_size > 100
-        assert_equal 'main.nf', assigns(:workflow).ro_crate.main_workflow.id
+        workflow = assigns(:workflow).reload
+        old_version = workflow.find_version(1)
+        new_version = workflow.git_version
+
+        assert_equal 2, workflow.version
+        assert_equal 'Nextflow', workflow.workflow_class.title
+        assert_equal 'Nextflow', new_version.workflow_class.title
+        assert_equal 'Galaxy', old_version.workflow_class.title
+        assert_equal 'nf-core/ampliseq', workflow.title
+        assert_equal 'nf-core/ampliseq', new_version.title
+        assert_equal 'Concat two files', old_version.title
+        assert new_version.total_size > 100
+        assert_equal 'main.nf', workflow.main_workflow_path
+        assert_equal 'main.nf', new_version.main_workflow_path
+        assert_equal 'main.nf', workflow.ro_crate.main_workflow.id
+        assert_equal 'concat_two_files.ga', old_version.main_workflow_path
       end
     end
   end
