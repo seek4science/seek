@@ -105,11 +105,11 @@ module Seek
           end
         end
 
-          source_url = crate['isBasedOn'] || crate['url'] || crate.main_workflow['url']
-          if source_url
-            m.merge!(extract_source_metadata(ContentBlob.remote_content_handler_for(source_url)))
-            m[:source_link_url] ||= source_url # Use plain source URL if handler doesn't have something more appropriate
-          end
+        source_url = crate.source_url
+        if source_url
+          m.merge!(extract_source_metadata(ContentBlob.remote_content_handler_for(source_url)))
+          m[:source_link_url] ||= source_url # Use plain source URL if handler doesn't have something more appropriate
+        end
 
         m
       end

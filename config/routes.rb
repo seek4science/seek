@@ -527,6 +527,7 @@ SEEK::Application.routes.draw do
       post :create_from_ro_crate
       post :create_from_files
       post :create_from_git
+      post :submit
       get :provide_metadata
       get :annotate_repository
       post :create_metadata
