@@ -9,19 +9,19 @@ class WorkflowCrateExtractor
 
   validate :resolve_crate
   validate :main_workflow_present?, if: -> { @crate.present? }
-  validate :source_url_present?, if: -> { update_existing }
+  validate :source_url_and_version_present?, if: -> { update_existing }
   validate :find_workflows_matching_id, if: -> { update_existing }
 
   def build
     if valid?
       if update_existing && @existing_workflows.length == 1
         self.workflow = @existing_workflows.first
-        if @crate['version'] && self.workflow.git_versions.map(&:name).include?(@crate['version'])
+        if self.workflow.git_versions.map(&:name).include?(@crate['version'])
           return self.workflow
         else
           self.workflow.latest_git_version.lock if self.workflow.latest_git_version.mutable?
           self.git_version = self.workflow.latest_git_version.next_version(mutable: true)
-          self.git_version.name = @crate['version'] if @crate['version'].present?
+          self.git_version.name = @crate['version']
         end
       end
       self.workflow ||= default_workflow
@@ -57,8 +57,9 @@ class WorkflowCrateExtractor
     errors.add(:ro_crate, 'did not specify a main workflow.') unless @crate.main_workflow.present?
   end
 
-  def source_url_present?
+  def source_url_and_version_present?
     errors.add(:ro_crate, 'ID could not be determined.') unless @crate.source_url.present?
+    errors.add(:ro_crate, 'version could not be determined.') unless @crate['version'].present?
   end
 
   def find_workflows_matching_id
