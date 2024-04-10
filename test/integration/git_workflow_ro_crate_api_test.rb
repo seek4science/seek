@@ -165,6 +165,22 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test 'cannot submit RO-Crate without version' do
+    assert_no_difference('Workflow.count') do
+      assert_no_difference('Git::Version.count') do
+        post submit_workflows_path, params: {
+          ro_crate: fixture_file_upload('workflows/ro-crate-with-id-but-no-version.crate.zip'),
+          workflow: {
+            project_ids: [@project.id]
+          }
+        }
+
+        assert_response :unprocessable_entity
+        assert JSON.parse(@response.body)['errors'].any? { |e| e['detail'].include?('version could not be determined') }
+      end
+    end
+  end
+
   test 'can submit RO-Crate that adds a version to an existing workflow' do
     workflow = FactoryBot.create(:local_git_workflow, source_link_url: 'https://example.com/my-workflow', contributor: @person)
 
