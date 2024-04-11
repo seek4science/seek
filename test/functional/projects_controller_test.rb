@@ -5002,6 +5002,27 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'do not show related templates if isa_compliance disabled' do
+    template = FactoryBot.create(:template)
+    person = template.contributor
+    project = template.projects.first
+    login_as(person)
+    assert template.can_view?
+
+    with_config_value(:isa_json_compliance_enabled, true) do
+      get :show, params:{id: project.id}
+      assert_response :success
+      assert_select 'div#related-items li a[data-model-name=Template]', count: 1
+    end
+
+    with_config_value(:isa_json_compliance_enabled, false) do
+      get :show, params:{id: project.id}
+      assert_response :success
+      assert_select 'div#related-items li a[data-model-name=Template]', count: 0
+    end
+
+  end
+
   private
 
   def check_project(project)
