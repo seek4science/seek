@@ -4973,7 +4973,11 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as(person)
     assert project.has_member?(person)
     assert project.can_edit?
-    get :show, params: { id: project.id }
+
+    with_config_value :isa_json_compliance_enabled, true do
+      get :show, params: { id: project.id }
+    end
+
     assert_response :success
     params = { project_ids: [project.id] }
     directly_linked_types = [

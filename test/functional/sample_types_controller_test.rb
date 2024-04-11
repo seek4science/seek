@@ -710,8 +710,10 @@ class SampleTypesControllerTest < ActionController::TestCase
 
     login_as(person.user)
 
-    get :show, params: { id: sample_type.id }
-    assert_response :success
+    with_config_value :isa_json_compliance_enabled, true do
+      get :show, params: { id: sample_type.id }
+      assert_response :success
+    end
 
     assert_select 'div.related-items div#templates' do
       assert_select 'a[href=?]', template_path(template), text: template.title
