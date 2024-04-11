@@ -145,8 +145,12 @@ class Sample < ApplicationRecord
           sample['title'] = title if sample['id'] == id
         end
         metadata.values[p - 1] = item_linked_samples
-        s.json_metadata = metadata.to_json
-        s.save
+
+        # only update if changed, to prevent triggered jobs that could potentially create an infinate loop
+        if s.json_metadata != metadata.to_json
+          s.json_metadata = metadata.to_json
+          s.save
+        end
       end
     end
   end
