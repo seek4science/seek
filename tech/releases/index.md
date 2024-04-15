@@ -37,7 +37,7 @@ Release date: _March 2024_
 * Fix to LS Login authentication configuration
 * Support for generic OpenID Connect authentication to be configured
 * Extended Metadata write API, and documentation for both read and write.
-* Single Page view for visualising and creating ISA-JSON compliant experiments.
+* Single Page view for visualising experiments.
 * Usage of Sample Type Templates to help organise metadata in an ISA-JSON compliant manner.
 
 For a full list, see [closed issues for 1.15.0](https://github.com/seek4science/seek/milestone/19?closed=1)
