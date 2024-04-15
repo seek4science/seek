@@ -365,7 +365,7 @@ module Seek
           name: :elixir_aai,
           scope: [:openid, :email],
           response_type: 'code',
-          issuer: 'https://proxy.aai.lifescience-ri.eu/',
+          issuer: 'https://login.aai.lifescience-ri.eu/oidc/',
           discovery: true,
           client_options: {
             identifier: omniauth_elixir_aai_client_id,
