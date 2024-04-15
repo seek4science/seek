@@ -38,7 +38,7 @@ Release date: _March 2024_
 * Support for generic OpenID Connect authentication to be configured
 * Extended Metadata write API, and documentation for both read and write.
 * Single Page view for visualising experiments.
-* Usage of Sample Type Templates to help organise metadata in an ISA-JSON compliant manner.
+* Creation of ISA-JSON compliant experiments using Experiment Sample Templates.
 
 For a full list, see [closed issues for 1.15.0](https://github.com/seek4science/seek/milestone/19?closed=1)
 
