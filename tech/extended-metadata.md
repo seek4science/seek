@@ -36,8 +36,8 @@ Extended metadata will only be shown if defined within the database, which is cu
 Extended Metadata works in a very similar way to Samples, and shares a lot of the same code. Extended Metadata Types are defined, that describe a set of attributes with names
 and point to a SampleAttributeType to define the attribute type. 
 
-The Extended Metadata type is linked to a particular resource type in SEEK. Currently, it can be incorporated into the following types:
-`Collection`, `DataFile`, `Document`, `Event`, `Model`,`Presentation`,`Sop`, `Project`.
+The Extended Metadata type is linked to a particular resource type in SEEK. Currently, it can be incorporated into the following types: 
+ISA items (`Investigation`, `Study`, `Assay`), `Collection`, `DataFile`, `Document`, `Event`, `Model`,`Presentation`,`Sop`, `Project`.
 
 You can define the supported resource type as shown below:
 
@@ -256,6 +256,10 @@ You can find the complete example [here](https://github.com/seek4science/seek/bl
 You can place it under the `db/seeds` folder, then run the seed file using the command
 ```bundle exec rake db:seed:extended_study_metadata_example``` from the SEEK instance root path.
 
+## Manage Extended Metadata Types
 
+If you are instance administrator, in the admin area, you can disable Extended metadata types to prevent them from appearing as an option in the UI. Disabling them won't delete them, or where they've been used, and they can be re-enabled again here.
+
+If a type is disabled but has been used, for those cases it will no longer be shown when viewing those items. However, it will still be possible to edit the metadata for existing items and the metadata won't be deleted.
 
 
