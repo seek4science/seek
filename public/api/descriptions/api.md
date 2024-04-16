@@ -122,3 +122,5 @@ age, name, and data_of_birth. These could be shown, within its attributes, as:
 
 If you wish to create or update a study to make use of this extended metadata, the request payload would be described the same. 
 Upon creation or update there would be a validation check that the attributes are valid.
+
+The API supports listing all available Extended Metadata Types, and inspecting individual types by it's id. For more information see the [Extended Metadata Type definitions](api#tag/extendedMetadataTypes).
