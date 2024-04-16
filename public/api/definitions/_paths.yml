@@ -1103,7 +1103,7 @@
 /extended_metadata_types:
   get:
     operationId: listExtendedMetadataTypes
-    summary: List data files
+    summary: List extended metadata types
     description:
       $ref: ../descriptions/listExtendedMetadataTypes.md
     tags:
@@ -1139,7 +1139,7 @@
       $ref: ../descriptions/readExtendedMetadataType.md
     tags:
       - read
-      - extendedMetadataType
+      - extendedMetadataTypes
     responses:
       "200":
         description: OK
