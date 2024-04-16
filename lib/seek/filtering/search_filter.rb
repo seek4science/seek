@@ -5,8 +5,7 @@ module Seek
         q = query.join(' ')
         q = ActionController::Base.helpers.sanitize(q)
         q ||= ''
-        q = Seek::Search::SearchTermFilter.filter(q)
-        q = q.downcase
+        q = q.downcase.strip
         collection.with_search_query(q)
       end
 
