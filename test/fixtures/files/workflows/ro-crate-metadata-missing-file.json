@@ -1,0 +1,63 @@
+{
+  "@context": [
+    "https://w3id.org/ro/crate/1.1/context"
+  ],
+  "@graph": [
+    {
+      "@id": "ro-crate-metadata.json",
+      "@type": "CreativeWork",
+      "about": {
+        "@id": "./"
+      },
+      "conformsTo": {
+        "@id": "https://w3id.org/ro/crate/1.1"
+      }
+    },
+    {
+      "@id": "./",
+      "@type": "Dataset",
+      "name": "Concat two files",
+      "description": "Concats two files",
+      "license": "https://opensource.org/licenses/MIT",
+      "mainEntity": {
+        "@id": "concat_two_files.ga"
+      },
+      "hasPart": [
+        {
+          "@id": "concat_two_files.ga"
+        },
+        {
+          "@id": "this-file-does-not-exist"
+        }
+
+      ]
+    },
+    {
+      "@id": "concat_two_files.ga",
+      "@type": [
+        "File",
+        "SoftwareSourceCode",
+        "ComputationalWorkflow"
+      ],
+      "programmingLanguage": {
+        "@id": "#galaxy"
+      },
+      "name": "concat_two_files"
+    },
+    {
+      "@id": "this-file-does-not-exist",
+      "@type": "File"
+    },
+    {
+      "@id": "#galaxy",
+      "@type": "ComputerLanguage",
+      "name": "Galaxy",
+      "identifier": {
+        "@id": "https://galaxyproject.org/"
+      },
+      "url": {
+        "@id": "https://galaxyproject.org/"
+      }
+    }
+  ]
+}

@@ -20,8 +20,8 @@ class WorkflowsController < ApplicationController
   api_actions :index, :show, :create, :update, :destroy, :ro_crate, :create_version
 
   rescue_from ROCrate::ReadException do |e|
-    logger.error("Error whilst attempting to read RO-Crate metadata for #{@workflow&.id}.")
-    message = "Couldn't read RO-Crate metadata. Check the file is valid."
+    logger.error("Error whilst attempting to read RO-Crate metadata for Workflow #{@workflow&.id}: #{e.exception.class.name} #{e.message}")
+    message = "Couldn't read RO-Crate metadata - check the RO-Crate is valid: #{e.message}"
     respond_to do |format|
       format.html do
         flash[:error] = message
@@ -32,8 +32,8 @@ class WorkflowsController < ApplicationController
   end
 
   rescue_from ROCrate::WriteException do |e|
-    exception_notification(500, e) unless Rails.application.config.consider_all_requests_local
-    message = "Couldn't generate RO-Crate. Check the ro-crate-metadata.json file is valid."
+    logger.error("Error whilst attempting to generate RO-Crate for #{@workflow&.id}: #{e.exception.class.name} #{e.message}")
+    message = "Couldn't generate RO-Crate - check the ro-crate-metadata.json file is valid: #{e.message}"
     respond_to do |format|
       format.html do
         flash[:error] = message
