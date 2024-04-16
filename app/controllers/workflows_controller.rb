@@ -1,3 +1,5 @@
+require 'ro_crate'
+
 class WorkflowsController < ApplicationController
   include Seek::IndexPager
   include Seek::AssetsCommon
@@ -28,18 +30,6 @@ class WorkflowsController < ApplicationController
         redirect_to workflow_path(@workflow)
       end
       format.json { render json: { title: 'RO-Crate Read Error', detail: message }, status: :internal_server_error }
-    end
-  end
-
-  rescue_from ROCrate::WriteException do |e|
-    logger.error("Error whilst attempting to generate RO-Crate for #{@workflow&.id}: #{e.exception.class.name} #{e.message}")
-    message = "Couldn't generate RO-Crate - check the ro-crate-metadata.json file is valid: #{e.message}"
-    respond_to do |format|
-      format.html do
-        flash[:error] = message
-        redirect_to workflow_path(@workflow)
-      end
-      format.json { render json: { title: 'RO-Crate Write Error', detail: message }, status: :internal_server_error }
     end
   end
 
