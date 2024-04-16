@@ -867,6 +867,7 @@ anyType:
     - sops
     - studies
     - workflows
+    - extended_metadata_types
 assetType:
   type: string
   minLength: 1

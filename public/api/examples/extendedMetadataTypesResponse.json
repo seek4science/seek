@@ -1,0 +1,34 @@
+{
+  "data": [
+    {
+      "id": "231",
+      "type": "extended_metadata_types",
+      "attributes": {
+        "title": "A Min Extended Metadata Type"
+      },
+      "links": {
+        "self": "/extended_metadata_types/231"
+      }
+    },
+    {
+      "id": "232",
+      "type": "extended_metadata_types",
+      "attributes": {
+        "title": "A Max Extended Metadata Type"
+      },
+      "links": {
+        "self": "/extended_metadata_types/232"
+      }
+    }
+  ],
+  "jsonapi": {
+    "version": "1.0"
+  },
+  "links": {
+    "self": "/extended_metadata_types"
+  },
+  "meta": {
+    "base_url": "http://localhost:3000",
+    "api_version": "0.3"
+  }
+}
