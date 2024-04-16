@@ -8,6 +8,7 @@ class GitController < ApplicationController
   before_action :fetch_git_version
   before_action :get_tree, only: [:tree]
   before_action :get_blob, only: [:blob, :download, :raw]
+  before_action :check_fetched, only: [:download, :raw]
 
   user_content_actions :raw
 
@@ -254,6 +255,12 @@ class GitController < ApplicationController
                          activity_loggable: @parent_resource,
                          user_agent: request.env['HTTP_USER_AGENT'],
                          data: data)
+    end
+  end
+
+  def check_fetched
+    if @blob.remote? && !@blob.fetched?
+      render_git_error('This file is held externally.', status: 404)
     end
   end
 

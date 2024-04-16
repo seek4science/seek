@@ -39,7 +39,8 @@ class StudiesExtractorTest < ActiveSupport::TestCase
 
   test 'extract study correctly' do
     user_uuid = 'user_uuid'
-    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
+    extended_metadata_type = FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
+    assert_equal 'MIAPPE metadata v1.1', extended_metadata_type.title, 'must match the seed data title'
     studies_file = ContentBlob.new
     studies_file.tmp_io_object = File.open("#{Rails.root}/tmp/#{user_uuid}_studies_upload/#{@studies.first.name}")
     studies_file.original_filename = @studies.first.name.to_s
