@@ -473,6 +473,8 @@ collectionAttributes:
       $ref: "#/components/schemas/assetsCreatorsList"
     discussion_links:
       $ref: "#/components/schemas/assetLinkList"
+    extended_attributes:
+      $ref: "#/components/schemas/extendedMetadata"
   required:
     - title
     - license
@@ -1128,6 +1130,8 @@ assayPost:
               $ref: "#/components/schemas/policy"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPostList"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           required:
             - title
             - assay_class
@@ -1218,6 +1222,8 @@ assayPatch:
               $ref: "#/components/schemas/policy"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPatchList"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           additionalProperties: false
         relationships:
           type: object
@@ -1868,6 +1874,8 @@ investigationPost:
               $ref: "#/components/schemas/policy"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPostList"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           required:
             - title
           additionalProperties: false
@@ -1918,6 +1926,8 @@ investigationPatch:
               $ref: "#/components/schemas/policy"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPatchList"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           additionalProperties: false
         relationships:
           type: object
@@ -3230,6 +3240,8 @@ assayResponse:
               $ref: "#/components/schemas/assetLinkList"
             position:
               $ref: "#/components/schemas/nullableInteger"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           required:
             - title
             - assay_class
@@ -3330,8 +3342,6 @@ collectionResponse:
               $ref: "#/components/schemas/multipleReferences"
             items:
               $ref: "#/components/schemas/multipleReferences"
-            extended_attributes:
-              $ref: "#/components/schemas/extendedMetadata"
           required:
             - creators
             - submitter
@@ -3810,6 +3820,8 @@ investigationResponse:
               $ref: "#/components/schemas/assetLinkList"
             position:
               $ref: "#/components/schemas/nullableInteger"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           required:
             - title
           additionalProperties: false
