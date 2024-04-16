@@ -23,7 +23,7 @@ A response for an **Assay** such as that for a <a href="#create">**Create**</a>,
 * A singleton reference to the <a href="#investigations">**Investigation**</a> which the **Assay** is part of
 * References to the <a href="#projects">**Projects**</a> that indirectly contain the **Assay**
 
-
+**Assays** have support for [Extended Metadata](/api#section/Extended-Metadata)
 
 
 
