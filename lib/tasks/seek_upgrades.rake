@@ -125,8 +125,6 @@ namespace :seek do
           affected_samples << sample
         end
       end
-      #won't have been queued, as the policy has no associated assets yet when saved
-      #AuthLookupUpdateQueue.enqueue(affected_samples) if affected_samples.any?
     end
     puts "..... finished creating independent policies of #{affected_samples.count} extracted samples"
   ensure
@@ -134,7 +132,6 @@ namespace :seek do
     Policy.set_callback :commit, :after, :queue_rdf_generation_job
     Permission.set_callback :commit, :after, :queue_update_auth_table
     Permission.set_callback :commit, :after, :queue_rdf_generation_job
-
   end
 
   task(decouple_extracted_samples_projects: [:environment]) do
