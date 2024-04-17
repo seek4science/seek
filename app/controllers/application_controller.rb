@@ -578,9 +578,11 @@ class ApplicationController < ActionController::Base
     parent_id_param = request.path_parameters.keys.detect { |k| k.to_s.end_with?('_id') }
     if parent_id_param
       parent_type = parent_id_param.to_s.chomp('_id')
-      parent_class = safe_class_lookup(parent_type.camelize)
+      parent_class = safe_class_lookup(parent_type.camelize, raise: false)
       if parent_class
         @parent_resource = parent_class.find(params[parent_id_param])
+      else
+        error('Parent resource not recognized','Parent resource not recognized')
       end
     end
   end
