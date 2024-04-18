@@ -1,4 +1,8 @@
+
 <div id="my-items">
+  <div class='pull-right' id='buttons'>
+    <%= render partial:'batch_permission_changes_buttons' %>
+  </div>
   <%= render partial: "general/items_related_to", object: @person,
              locals: { limit: 50, title: "Items related to #{link_to(h(@person.name),@person)}".html_safe } %>
 </div>

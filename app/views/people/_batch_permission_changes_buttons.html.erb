@@ -1,0 +1,4 @@
+<% tooltip_text_sharing = "You can change the sharing policy and permissions for your items in batch. A preview of selected items will be given before you choose new permissions for them." %>
+<% tooltip_text_publishing = "Publish your owned items in one click. A preview will be given before publishing" %>
+<%= button_link_to "Batch permission changes", "publish", batch_sharing_permission_preview_person_path(@person), 'data-tooltip': tooltip(tooltip_text_sharing) -%>
+<%= button_link_to "Publish your items", "publish", batch_publishing_preview_person_path(@person), 'data-tooltip': tooltip(tooltip_text_publishing) -%>
