@@ -1,4 +1,4 @@
-module AttachmentFuExtension
+module AttachmentFuExtensions
   def uploaded_data=(file_data)
     unless self.class == HelpAttachment || self.class == HelpImage #FIXME: This check is an indication that this extension is applied too broadly, I think.
       upload_results = super(file_data)
@@ -25,5 +25,5 @@ module AttachmentFuExtension
 end
 
 Technoweenie::AttachmentFu::InstanceMethods.module_eval do
-  prepend AttachmentFuExtension
+  prepend AttachmentFuExtensions
 end

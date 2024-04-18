@@ -33,6 +33,9 @@ module SEEK
 
     config.eager_load_paths << Rails.root.join('lib')
 
+    # TODO: In Rails 7.1 use this and move the various extensions to lib/extensions
+    # config.autoload_lib(ignore: %w[extensions])
+
     # Configure sensitive parameters which will be filtered from the log file.
     config.filter_parameters += [:password,"rack.request.form_vars"]
 
