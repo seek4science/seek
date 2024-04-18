@@ -1,4 +1,4 @@
-<% if mine?(@person) -%>
+<% if @person.me? -%>
   <%= render partial:'batch_permission_changes_buttons' %>
   <% if @person.is_in_any_gatekept_projects? %>
     <%= button_link_to "Assets awaiting approval", "waiting", waiting_approval_assets_person_path(@person),
@@ -11,11 +11,11 @@
 <% end %>
 
 <%= item_actions_dropdown do %>
-  <% if (mine?(@person) || @person.can_edit?(current_user)) -%>
+  <% if @person.me? || @person.can_edit?(current_user) -%>
       <li>
         <%= image_tag_for_key('edit', edit_person_path(@person), "Edit Person Profile", nil, 'Edit Profile') -%>
       </li>
-      <% if mine?(@person) -%>
+      <% if @person.me? -%>
           <li>
             <%= image_tag_for_key "lock", url_for({controller: :users, action: :edit, id: @person.user}), "Manage Account", nil, "Manage Account" -%>
           </li>
