@@ -107,7 +107,14 @@ namespace :seek do
   task(decouple_extracted_samples_policies: [:environment]) do
     puts '..... creating independent policies for extracted samples (this can take a while if there are many samples) ...'
     affected_samples = []
+
+    Policy.skip_callback :commit, :after, :queue_update_auth_table
+    Policy.skip_callback :commit, :after, :queue_rdf_generation_job
+    Permission.skip_callback :commit, :after, :queue_update_auth_table
+    Permission.skip_callback :commit, :after, :queue_rdf_generation_job
+
     disable_authorization_checks do
+
       Sample.includes(:originating_data_file).find_each do |sample|
         # check if the sample was extracted from a datafile and their policies are linked
         if sample.extracted? && sample.policy_id == sample.originating_data_file&.policy_id
@@ -118,10 +125,13 @@ namespace :seek do
           affected_samples << sample
         end
       end
-      #won't have been queued, as the policy has no associated assets yet when saved
-      AuthLookupUpdateQueue.enqueue(affected_samples) if affected_samples.any?
     end
     puts "..... finished creating independent policies of #{affected_samples.count} extracted samples"
+  ensure
+    Policy.set_callback :commit, :after, :queue_update_auth_table
+    Policy.set_callback :commit, :after, :queue_rdf_generation_job
+    Permission.set_callback :commit, :after, :queue_update_auth_table
+    Permission.set_callback :commit, :after, :queue_rdf_generation_job
   end
 
   task(decouple_extracted_samples_projects: [:environment]) do
