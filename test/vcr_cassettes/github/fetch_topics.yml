@@ -1,0 +1,79 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://api.github.com/repos/crs4/sort-and-change-case-workflow/topics
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - application/vnd.github.mercy-preview+json
+      User-Agent:
+      - rest-client/2.1.0 (linux x86_64) ruby/3.1.4p223
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - api.github.com
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - GitHub.com
+      Date:
+      - Thu, 18 Apr 2024 12:11:53 GMT
+      Content-Type:
+      - application/json; charset=utf-8
+      Content-Length:
+      - '25'
+      Cache-Control:
+      - public, max-age=60, s-maxage=60
+      Vary:
+      - Accept, Accept-Encoding, Accept, X-Requested-With
+      Etag:
+      - '"4312be9f94d4167301a1aefc48875953a71d3a73d1f113765668ab9b0a8e962e"'
+      X-Github-Media-Type:
+      - github.mercy-preview; format=json
+      X-Github-Api-Version-Selected:
+      - '2022-11-28'
+      Access-Control-Expose-Headers:
+      - ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining,
+        X-RateLimit-Used, X-RateLimit-Resource, X-RateLimit-Reset, X-OAuth-Scopes,
+        X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type, X-GitHub-SSO,
+        X-GitHub-Request-Id, Deprecation, Sunset
+      Access-Control-Allow-Origin:
+      - "*"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubdomains; preload
+      X-Frame-Options:
+      - deny
+      X-Content-Type-Options:
+      - nosniff
+      X-Xss-Protection:
+      - '0'
+      Referrer-Policy:
+      - origin-when-cross-origin, strict-origin-when-cross-origin
+      Content-Security-Policy:
+      - default-src 'none'
+      X-Ratelimit-Limit:
+      - '60'
+      X-Ratelimit-Remaining:
+      - '48'
+      X-Ratelimit-Reset:
+      - '1713445012'
+      X-Ratelimit-Resource:
+      - core
+      X-Ratelimit-Used:
+      - '12'
+      Accept-Ranges:
+      - bytes
+      X-Github-Request-Id:
+      - 8624:33B0C5:33D1224:34EAAEF:66210E09
+    body:
+      encoding: UTF-8
+      string: '{"names":["sort","case"]}'
+    http_version: 
+  recorded_at: Thu, 18 Apr 2024 12:11:53 GMT
+recorded_with: VCR 2.9.3

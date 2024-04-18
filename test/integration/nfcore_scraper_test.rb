@@ -29,6 +29,7 @@ class NfcoreScraperTest < ActionDispatch::IntegrationTest
               assert_equal 'MIT', wf.license
               assert_equal 'nextflow.config', wf.main_workflow_path
               assert_equal '3.0', wf.git_version.name
+              assert_equal %w[rna rna-seq], wf.tags.sort
             end
           end
         end
