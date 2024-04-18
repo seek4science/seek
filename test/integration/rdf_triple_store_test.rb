@@ -299,7 +299,7 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
     q = @repository.query.select.where([data_file.rdf_resource, RDF.type, :o]).from(@private_graph)
     result = @repository.select(q)
     assert_equal 1, result.count
-    assert_equal Seek::Rdf::JermVocab.Data, result[0][:o].value
+    assert_equal Seek::Rdf::JERMVocab.Data, result[0][:o].value
 
     disable_authorization_checks do
       data_file.simulation_data=true
@@ -318,7 +318,7 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
     q = @repository.query.select.where([data_file.rdf_resource, RDF.type, :o]).from(@private_graph)
     result = @repository.select(q)
     assert_equal 1, result.count
-    assert_equal Seek::Rdf::JermVocab.Simulation_data, result[0][:o].value
+    assert_equal Seek::Rdf::JERMVocab.Simulation_data, result[0][:o].value
 
   end
 

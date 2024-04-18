@@ -19,7 +19,7 @@ module Seek
         end
 
         def values_for_property(property, type)
-          values_for_entity_uri(Seek::Rdf::JermVocab[property], type)
+          values_for_entity_uri(Seek::Rdf::JERMVocab[property], type)
         end
 
         def contains_rightfield_elements?

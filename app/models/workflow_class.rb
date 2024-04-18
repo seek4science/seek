@@ -13,7 +13,7 @@ class WorkflowClass < ApplicationRecord
   validate :extractor_valid?
 
   def extractor_class
-    extractor ? self.class.const_get("Seek::WorkflowExtractors::#{extractor.downcase.camelize}") : Seek::WorkflowExtractors::Base
+    extractor ? self.class.const_get("Seek::WorkflowExtractors::#{extractor}") : Seek::WorkflowExtractors::Base
   end
 
   def extractable?
@@ -123,7 +123,7 @@ class WorkflowClass < ApplicationRecord
   def extractor_valid?
     return if extractor.nil?
     begin
-      self.class.const_get("Seek::WorkflowExtractors::#{extractor.downcase.camelize}")
+      self.class.const_get("Seek::WorkflowExtractors::#{extractor}")
     rescue NameError
       errors.add(:extractor, "was not a valid format")
     end

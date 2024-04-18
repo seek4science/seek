@@ -142,7 +142,7 @@ module Seek
         info = {}
         case URI(@data_url).scheme
         when 'http', 'https'
-          handler = Seek::DownloadHandling::HttpHandler.new(@data_url)
+          handler = Seek::DownloadHandling::HTTPHandler.new(@data_url)
           info = handler.info
           if (info[:code] == 400 || 404) && blob_params[:override_url_check].present?
             flash.now[:notice] = 'The given URL is inaccessible but you can override the url validation.'
@@ -157,7 +157,7 @@ module Seek
             end
           end
         when 'ftp'
-          handler = Seek::DownloadHandling::FtpHandler.new(@data_url)
+          handler = Seek::DownloadHandling::FTPHandler.new(@data_url)
           info = handler.info
         end
 

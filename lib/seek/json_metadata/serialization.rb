@@ -1,5 +1,5 @@
 module Seek
-  module JsonMetadata
+  module JSONMetadata
     module Serialization
       extend ActiveSupport::Concern
 
@@ -14,7 +14,7 @@ module Seek
       end
 
       def data
-        @data ||= Seek::JsonMetadata::Data.new(metadata_type, json_metadata)
+        @data ||= Seek::JSONMetadata::Data.new(metadata_type, json_metadata)
       end
 
       def get_attribute_value(attr)

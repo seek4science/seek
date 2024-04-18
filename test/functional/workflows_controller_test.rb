@@ -552,7 +552,7 @@ class WorkflowsControllerTest < ActionController::TestCase
       }
     end
     assert_response :success
-    workflow_crate = RoCrate::WorkflowCrateReader.read_zip(assigns(:content_blob).path)
+    workflow_crate = ROCrate::WorkflowCrateReader.read_zip(assigns(:content_blob).path)
     crate_workflow = workflow_crate.main_workflow
     assert crate_workflow
     assert_equal 'file%20with%20spaces%20in%20name.txt', crate_workflow.id
@@ -567,7 +567,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert @response.header['Content-Length'].present?
     assert @response.header['Content-Length'].to_i > 5000 # Length is variable because the crate contains variable data
     Dir.mktmpdir do |dir|
-      crate = RoCrate::WorkflowCrateReader.read_zip(response.stream.to_path, target_dir: dir)
+      crate = ROCrate::WorkflowCrateReader.read_zip(response.stream.to_path, target_dir: dir)
       assert crate.main_workflow
     end
   end
@@ -581,7 +581,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert @response.header['Content-Length'].present?
     assert @response.header['Content-Length'].to_i > 5000 # Length is variable because the crate contains variable data
     Dir.mktmpdir do |dir|
-      crate = RoCrate::WorkflowCrateReader.read_zip(response.stream.to_path, target_dir: dir)
+      crate = ROCrate::WorkflowCrateReader.read_zip(response.stream.to_path, target_dir: dir)
       assert crate.main_workflow
     end
   end
@@ -595,7 +595,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert @response.header['Content-Length'].present?
     assert @response.header['Content-Length'].to_i > 2000 # Length is variable because the crate contains variable data
     Dir.mktmpdir do |dir|
-      crate = RoCrate::WorkflowCrateReader.read_zip(response.stream.to_path, target_dir: dir)
+      crate = ROCrate::WorkflowCrateReader.read_zip(response.stream.to_path, target_dir: dir)
       assert crate.main_workflow
     end
   end
@@ -615,7 +615,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert @response.header['Content-Length'].present?
     assert @response.header['Content-Length'].to_i > 500
     Dir.mktmpdir do |dir|
-      crate = RoCrate::WorkflowCrateReader.read_zip(response.stream.to_path, target_dir: dir)
+      crate = ROCrate::WorkflowCrateReader.read_zip(response.stream.to_path, target_dir: dir)
       assert crate.main_workflow
       assert_equal 'V1 title', crate.main_workflow['name']
       assert_equal 'V1 description', crate.main_workflow['description']
@@ -629,7 +629,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert @response.header['Content-Length'].present?
     assert @response.header['Content-Length'].to_i > 500
     Dir.mktmpdir do |dir|
-      crate = RoCrate::WorkflowCrateReader.read_zip(response.stream.to_path, target_dir: dir)
+      crate = ROCrate::WorkflowCrateReader.read_zip(response.stream.to_path, target_dir: dir)
       assert crate.main_workflow
       assert_equal 'V2 title', crate.main_workflow['name']
       assert_equal 'V2 description', crate.main_workflow['description']
@@ -647,7 +647,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert @response.header['Content-Length'].present?
     assert @response.header['Content-Length'].to_i > 5000 # Length is variable because the crate contains variable data
     Dir.mktmpdir do |dir|
-      crate = RoCrate::WorkflowCrateReader.read_zip(response.stream.to_path, target_dir: dir)
+      crate = ROCrate::WorkflowCrateReader.read_zip(response.stream.to_path, target_dir: dir)
       assert crate.main_workflow
     end
   end
@@ -681,7 +681,7 @@ class WorkflowsControllerTest < ActionController::TestCase
       }
     end
     assert_response :success
-    workflow_crate = RoCrate::WorkflowCrateReader.read_zip(assigns(:content_blob).path)
+    workflow_crate = ROCrate::WorkflowCrateReader.read_zip(assigns(:content_blob).path)
     crate_workflow = workflow_crate.main_workflow
     crate_cwl = workflow_crate.main_workflow_cwl
     assert_not_equal crate_workflow.id, crate_cwl.id
@@ -802,7 +802,7 @@ class WorkflowsControllerTest < ActionController::TestCase
       }
     end
     assert_response :success
-    workflow_crate = RoCrate::WorkflowCrateReader.read_zip(assigns(:content_blob).path)
+    workflow_crate = ROCrate::WorkflowCrateReader.read_zip(assigns(:content_blob).path)
     crate_workflow = workflow_crate.main_workflow
     assert crate_workflow
     assert_equal 'workflow.txt', crate_workflow.id

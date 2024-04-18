@@ -9,7 +9,7 @@ module Seek
     # A class to handle streaming remote content over HTTP.
     # Monitors the number of bytes downloading and terminates
     #  if it exceeds a given limit.
-    class HttpStreamer
+    class HTTPStreamer
       REDIRECT_LIMIT = 10
 
       def initialize(url, options = {})

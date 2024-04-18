@@ -3,7 +3,7 @@ require 'test_helper'
 class CffExtractionTest < ActiveSupport::TestCase
   test 'can extract metadata from complete CFF file' do
     cff = open_fixture_file('CITATION.cff')
-    extractor = Seek::WorkflowExtractors::Cff.new(cff)
+    extractor = Seek::WorkflowExtractors::CFF.new(cff)
 
     assert_nothing_raised do
       metadata = extractor.metadata

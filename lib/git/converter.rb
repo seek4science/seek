@@ -85,7 +85,7 @@ module Git
     def annotate_version(blob, git_version)
       if asset.is_a?(Workflow)
         if blob.original_filename.end_with?('crate.zip')
-          crate = RoCrate::WorkflowCrateReader.read(blob)
+          crate = ROCrate::WorkflowCrateReader.read(blob)
           main_workflow_path = crate.main_workflow&.id
           diagram_path = crate.main_workflow&.diagram&.id
           abstract_cwl_path = crate.main_workflow&.cwl_description&.id

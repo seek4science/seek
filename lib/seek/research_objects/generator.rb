@@ -76,7 +76,7 @@ module Seek
 
       # the current metadata handlers - JSON and RDF
       def metadata_handlers
-        [Seek::ResearchObjects::RdfMetadata.instance, Seek::ResearchObjects::JsonMetadata.instance]
+        [Seek::ResearchObjects::RdfMetadata.instance, Seek::ResearchObjects::JSONMetadata.instance]
       end
 
       # generates and stores the metadata for the item, using the handlers

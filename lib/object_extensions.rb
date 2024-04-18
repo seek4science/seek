@@ -1,4 +1,3 @@
-module ObjectExtensions; end
 class Object
   #instead of a and a.b and a.b.c and a.b.c.d?
   #try_block {a.b.c.d?}

@@ -1,5 +1,5 @@
 module Seek
-  module Isa
+  module ISA
     module TagType
       ALL_TYPES = %w(source source_characteristic sample sample_characteristic protocol other_material other_material_characteristic data_file data_file_comment parameter_value)
 

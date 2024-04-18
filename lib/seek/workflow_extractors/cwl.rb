@@ -3,7 +3,7 @@ require 'rest-client'
 
 module Seek
   module WorkflowExtractors
-    class Cwl < Base
+    class CWL < Base
       DIAGRAM_PATH = '/graph/%{format}'
       ABSTRACT_CWL_METADATA = {
           "@id" => "#cwl",

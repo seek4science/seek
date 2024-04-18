@@ -1,5 +1,5 @@
 class ExtendedMetadata < ApplicationRecord
-  include Seek::JsonMetadata::Serialization
+  include Seek::JSONMetadata::Serialization
 
   belongs_to :item, polymorphic: true
   belongs_to :extended_metadata_type, validate: true
@@ -14,7 +14,7 @@ class ExtendedMetadata < ApplicationRecord
 
   def extended_metadata_type=(type)
     super
-    @data = Seek::JsonMetadata::Data.new(type)
+    @data = Seek::JSONMetadata::Data.new(type)
     update_json_metadata
     type
   end

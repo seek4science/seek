@@ -69,7 +69,7 @@ module Legacy
 
     def legacy_handle_ro_crate_post(new_version = false)
       @workflow = Workflow.new unless new_version
-      extractor = Seek::WorkflowExtractors::RoCrate.new(params[:ro_crate])
+      extractor = Seek::WorkflowExtractors::ROCrate.new(params[:ro_crate])
 
       @workflow.assign_attributes(extractor.metadata.except(:errors, :warnings))
       @workflow.assign_attributes(workflow_params)

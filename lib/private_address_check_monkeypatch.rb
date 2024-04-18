@@ -5,7 +5,7 @@
 #
 #  # The problem was caused by attempting to connect before checking if the address is private, resulting in a different exception, that could also potentially be used to determine what services are running on the server
 #  FIXME: review this in the future to see if a new version of PrivateAddressCheck has been updated (I've set myself a reminder)
-module PrivateAddressCheckMonkeypatch; end
+
 unless TCPSocket.method_defined?(:___is_monkey_patched)
   TCPSocket.class_eval do
     alias_method :initialize_without_private_address_check2, :initialize

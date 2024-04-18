@@ -241,10 +241,10 @@ class UploadHandingTest < ActiveSupport::TestCase
   private
 
   def fetch_url_headers(url)
-    Seek::DownloadHandling::HttpHandler.new(url).info
+    Seek::DownloadHandling::HTTPHandler.new(url).info
   end
 
   def check_url_response_code(url)
-    Seek::DownloadHandling::HttpHandler.new(url, fallback_to_get: false).info[:code]
+    Seek::DownloadHandling::HTTPHandler.new(url, fallback_to_get: false).info[:code]
   end
 end

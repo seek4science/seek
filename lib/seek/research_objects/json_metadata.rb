@@ -3,7 +3,7 @@ require 'seek/license'
 module Seek
   module ResearchObjects
     # creates the JSON metadata content describing an item to be stored in a Research Object
-    class JsonMetadata < Metadata
+    class JSONMetadata < Metadata
       include Singleton
 
       CANDIDATE_PROPERTIES = %i[title description assay_type_uri technology_type_uri

@@ -1,7 +1,7 @@
 module Seek
   module Samples
     module AttributeHandlers
-      class CvListAttributeHandler < CvAttributeHandler
+      class CVListAttributeHandler < CVAttributeHandler
         def test_value(array_value)
           array_value.each do |value|
             unless allow_cv_free_text? || controlled_vocab.includes_term?(value)

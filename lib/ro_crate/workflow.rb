@@ -1,6 +1,6 @@
 require 'ro_crate'
 
-module RoCrate
+module ROCrate
   class Workflow < ::ROCrate::File
     properties(%w[image subjectOf programmingLanguage license])
 

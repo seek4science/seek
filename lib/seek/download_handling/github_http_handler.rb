@@ -7,7 +7,7 @@ require_relative './http_handler'
 
 module Seek
   module DownloadHandling
-    class GithubHttpHandler < Seek::DownloadHandling::HttpHandler
+    class GithubHTTPHandler < Seek::DownloadHandling::HTTPHandler
       attr_reader :github_info
 
       def initialize(url, fallback_to_get: true)

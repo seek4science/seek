@@ -1,5 +1,5 @@
 # reformat the authors
-module BioExtensions
+module BioMedlineExtensions
   def reference
     reference = super
     reference.published_date = published_date
@@ -91,7 +91,7 @@ class Author
 end
 
 Bio::MEDLINE.class_eval do
-  prepend BioExtensions
+  prepend BioMedlineExtensions
 end
 
 Bio::Reference.class_eval do

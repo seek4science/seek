@@ -1,6 +1,6 @@
 module Seek
   module WorkflowExtractors
-    class Knime < Base
+    class KNIME < Base
       def self.file_extensions
         ['knwf']
       end

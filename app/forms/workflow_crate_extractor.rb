@@ -38,7 +38,7 @@ class WorkflowCrateExtractor
       end
       git_version.add_files(files)
 
-      extractor = Seek::WorkflowExtractors::RoCrate.new(git_version)
+      extractor = Seek::WorkflowExtractors::ROCrate.new(git_version)
       workflow.provide_metadata(extractor.metadata)
       workflow.assign_attributes(params) if params.present?
       git_version.set_resource_attributes(workflow.attributes)
@@ -72,7 +72,7 @@ class WorkflowCrateExtractor
 
   def extract_crate
     begin
-      @crate = RoCrate::WorkflowCrateReader.read_zip(ro_crate[:data])
+      @crate = ROCrate::WorkflowCrateReader.read_zip(ro_crate[:data])
     rescue Zip::Error
       errors.add(:ro_crate, 'could not be extracted, please check it is a valid RO-Crate.')
     rescue ROCrate::ReadException => e

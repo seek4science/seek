@@ -1,7 +1,7 @@
 
 
 module Seek
-  module ActsAsIsa
+  module ActsAsISA
     def self.included(mod)
       mod.extend(ClassMethods)
     end
@@ -29,9 +29,9 @@ module Seek
 
         grouped_pagination
 
-        include Seek::ActsAsIsa::Relationships::Associations
+        include Seek::ActsAsISA::Relationships::Associations
 
-        include Seek::ActsAsIsa::InstanceMethods
+        include Seek::ActsAsISA::InstanceMethods
         include Seek::Stats::ActivityCounts
         include Seek::Search::CommonFields, Seek::Search::BackgroundReindexing
         include Seek::Subscribable
@@ -40,11 +40,11 @@ module Seek
         include Seek::ResearchObjects::Packaging
         has_many :programmes, ->{ distinct }, through: :projects
 
-        extend Seek::ActsAsIsa::SingletonMethods
+        extend Seek::ActsAsISA::SingletonMethods
       end
 
       def is_isa?
-        include?(Seek::ActsAsIsa::InstanceMethods)
+        include?(Seek::ActsAsISA::InstanceMethods)
       end
     end
 
@@ -59,7 +59,7 @@ module Seek
     end
 
     module InstanceMethods
-      include Seek::ActsAsIsa::Relationships::InstanceMethods
+      include Seek::ActsAsISA::Relationships::InstanceMethods
     end
   end
 end
