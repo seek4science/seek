@@ -619,7 +619,7 @@ class ConfigTest < ActiveSupport::TestCase
         refute Seek::Config.omniauth_elixir_aai_legacy_mode
         assert_equal '/seeks/seek1/auth/elixir_aai/callback', config[:callback_path]
         assert_equal 'http://localhost/seeks/seek1/auth/elixir_aai/callback', config[:client_options][:redirect_uri]
-        assert_equal 'https://proxy.aai.lifescience-ri.eu/',config[:issuer]
+        assert_equal 'https://login.aai.lifescience-ri.eu/oidc/',config[:issuer]
         with_config_value(:omniauth_elixir_aai_legacy_mode, true) do
           assert Seek::Config.omniauth_elixir_aai_legacy_mode
           config = Seek::Config.omniauth_elixir_aai_config

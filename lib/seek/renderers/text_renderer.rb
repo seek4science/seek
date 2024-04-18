@@ -6,7 +6,13 @@ module Seek
       end
 
       def render_content
-        "<pre>#{h(blob.read)}</pre>"
+        content = blob.read
+        if content.empty?
+          '<span class="subtle">No content to display</span>'
+        else
+          "<pre>#{h(content)}</pre>"
+        end
+
       end
 
       def render_standalone

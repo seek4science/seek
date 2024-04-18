@@ -142,7 +142,7 @@ FactoryBot.define do
   end
 
   factory(:study_extended_metadata_type_for_MIAPPE, class: ExtendedMetadataType) do
-    title { 'MIAPPE metadata' }
+    title { ExtendedMetadataType::MIAPPE_TITLE }
     supported_type { 'Study' }
     after(:build) do |a|
       a.extended_metadata_attributes << FactoryBot.create(:name_extended_metadata_attribute, title:'id')

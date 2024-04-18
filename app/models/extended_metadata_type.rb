@@ -13,6 +13,9 @@ class ExtendedMetadataType < ApplicationRecord
   scope :enabled, ->{ where(enabled: true) }
   scope :disabled, ->{ where(enabled: false) }
 
+  # built in type
+  MIAPPE_TITLE = 'MIAPPE metadata v1.1'.freeze
+
   def attribute_by_title(title)
     extended_metadata_attributes.where(title: title).first
   end
