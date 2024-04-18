@@ -3,7 +3,7 @@ FactoryBot.define do
   factory(:template_attribute) do
     sequence(:title) { |n| "Template attribute #{n}" }
     association :template, factory: :template
-    isa_tag_id { FactoryBot.create(:default_isa_tag).id }
+    isa_tag_id { nil }
   end
 
   factory(:apples_controlled_vocab_template_attribute, parent: :template_attribute) do

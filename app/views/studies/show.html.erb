@@ -71,15 +71,19 @@
 	<% if Seek::Config.isa_json_compliance_enabled && @study.is_isa_json_compliant?%>
 		<%= tab_pane('study_design') do %>
 			<%= render :partial=>"isa_studies/study_design", locals: { study: @study} -%>
-		<% end %>
+      <%= render partial: 'single_pages/change_batch_persmission_modal' %>
+      <%= render partial: 'single_pages/upload_excel_modal' %>
+    <% end %>
 	<% end %>
 
 </div>
 <script>
-  const isIsaCompliant = <%= @study.is_isa_json_compliant? %>
-  if (isIsaCompliant) {
-    var id = <%= @study.id %>;
-    var pid = <%= @study.projects.first.id %>;
-    var dynamicTableDataPath = '<%= Seek::Util.routes.dynamic_table_data_single_page_path(@study.projects.first.id) %>';
-  }
+    const projectDefaultPolicy = '<%= @study.projects.first.default_policy_id %>';
+    const isIsaCompliant =
+    <%= @study.is_isa_json_compliant? %>
+    if (isIsaCompliant) {
+        var id = <%= @study.id %>;
+        var pid = <%= @study.projects.first.id %>;
+        var dynamicTableDataPath = '<%= Seek::Util.routes.dynamic_table_data_single_page_path(@study.projects.first.id) %>';
+    }
 </script>

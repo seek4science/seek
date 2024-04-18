@@ -1,4 +1,15 @@
-<% return if ExtendedMetadataType.where(supported_type:resource.class.name).empty? %>
+<%
+  options = ExtendedMetadataType.enabled.where(supported_type:resource.class.name).to_a
+  if resource.extended_metadata && !resource.extended_metadata.enabled?
+    options << resource.extended_metadata.extended_metadata_type
+  end
+
+ return if options.empty?
+  options = options.collect do |extended_metadata_type|
+    title = extended_metadata_type.enabled? ? extended_metadata_type.title : "#{extended_metadata_type.title} (DISABLED)"
+    [title, extended_metadata_type.id]
+  end
+%>
 
 <%
   label ||= 'Extended Metadata'
@@ -7,8 +18,7 @@
 <div class="form-group">
   <%= f.fields_for(:extended_metadata,resource.extended_metadata || ExtendedMetadata.new) do |ff| %>
     <%= f.label label %>
-    <%= ff.collection_select(:extended_metadata_type_id,ExtendedMetadataType.where(supported_type:resource.class.name),
-                             :id, :title,
+    <%= ff.select(:extended_metadata_type_id, options,
                              {prompt:'Select'},
                              {class:"form-control", id:'extended_metadata_attributes_extended_metadata_type_id'}) %>
   <% end %>

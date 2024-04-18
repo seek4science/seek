@@ -1,6 +1,7 @@
 class AssetLink < ApplicationRecord
   DISCUSSION = 'discussion'.freeze
   SOURCE = 'source'.freeze
+  EXECUTION_INSTANCE = 'execution_instance'.freeze
   MISC_LINKS = 'misc'.freeze
 
   scope :discussion, -> { where(link_type: AssetLink::DISCUSSION) }

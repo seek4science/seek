@@ -58,7 +58,23 @@ module WorkflowExtraction
   delegate :inputs, :outputs, :steps, to: :structure
 
   def can_run?
-    can_download?(nil) && workflow_class_title == 'Galaxy' && Seek::Config.galaxy_instance_trs_import_url.present?
+    can_download?(nil) && workflow_class&.executable? && run_url.present?
+  end
+
+  def run_url
+    if workflow_class&.key == 'galaxy'
+      base = execution_instance_url || Seek::Config.galaxy_instance_default
+      return if base.nil?
+
+      parent_id = is_a_version? ? parent.id : id
+      url = URI(base) + 'workflows/trs_import'
+      params = {
+        trs_url: Seek::Util.routes.ga4gh_trs_v2_tool_version_url(parent_id, version_id: version),
+        run_form: true
+      }
+      url.query = URI.encode_www_form(params)
+      url.to_s
+    end
   end
 
   def diagram_exists?
@@ -210,17 +226,13 @@ module WorkflowExtraction
   end
 
   def ro_crate_zip
-    begin
-      ro_crate do |crate|
-        path = ro_crate_path
-        File.delete(path) if File.exist?(path)
-        ROCrate::Writer.new(crate).write_zip(path)
-      end
-
-      ro_crate_path
-    rescue StandardError => e
-      raise ::ROCrate::WriteException.new("Couldn't generate RO-Crate metadata.", e)
+    ro_crate do |crate|
+      path = ro_crate_path
+      File.delete(path) if File.exist?(path)
+      ROCrate::Writer.new(crate).write_zip(path)
     end
+
+    ro_crate_path
   end
 
   def ro_crate_identifier

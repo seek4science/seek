@@ -94,7 +94,6 @@ const handleSelect = (e) => {
       columns.unshift(...defaultCols);
 
       const columnDefs = [{
-          orderable: false,
           targets: options.readonly ? [0] : [0, 1]
         },
         {
@@ -105,6 +104,7 @@ const handleSelect = (e) => {
       ];
       const editor = this.editor;
       this.table = this.table.DataTable({
+        colReorder: true,
         columnDefs,
         columns,
         scrollX: "100%",
@@ -478,8 +478,8 @@ function handleCellUpdate(table, cell) {
   // If it is a new sample, then it has to be created
   const status = table.row(row).data()[sampleStatusIndex];
   if (status == rowStatus.empty) {
-    table.row(row).data()[sampleStatusIndex] = rowStatus.new;
-  } else if (status == "") {
+      table.row(row).data()[sampleStatusIndex] = rowStatus.new;
+  } else if (status == "" || status == null) {
     table.row(row).data()[sampleStatusIndex] = rowStatus.update;
   }
 }

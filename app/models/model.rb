@@ -30,7 +30,7 @@ class Model < ApplicationRecord
   has_many :model_images, inverse_of: :model
   belongs_to :model_image, inverse_of: :model
 
-  has_many :content_blobs, -> (r) { where('content_blobs.asset_version =?', r.version) }, :as => :asset, :foreign_key => :asset_id
+  has_many :content_blobs, -> (r) { where('content_blobs.asset_version =? AND deleted =?', r.version, false) }, :as => :asset, :foreign_key => :asset_id
 
   belongs_to :organism
   belongs_to :human_disease

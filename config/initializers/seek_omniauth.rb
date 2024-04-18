@@ -7,7 +7,7 @@ if Seek::Config.omniauth_enabled
     begin
       providers = Seek::Config.omniauth_providers
     rescue Settings::DecryptionError
-      providers = {}
+      providers = []
     end
 
     providers.each do |key, options|

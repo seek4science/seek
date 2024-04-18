@@ -47,7 +47,6 @@ module Seek
         validates :description, length: { maximum: 65_535 }, if: -> { respond_to?(:description) }
         validates :license, license:true, allow_blank: true, if: -> { respond_to?(:license) }
 
-
         include Seek::Stats::ActivityCounts
 
         include Seek::ActsAsAsset::ISA::Associations
@@ -61,6 +60,7 @@ module Seek
         include Seek::ActsAsAsset::InstanceMethods
         include Seek::Search::BackgroundReindexing
         include Seek::Subscribable
+        include Seek::ActsAsAsset::ContentBlobs::ClassMethods
         extend SingletonMethods
       end
 

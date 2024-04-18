@@ -663,7 +663,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     get :ro_crate, params: { id: workflow.id }
 
     assert_redirected_to workflow
-    assert flash[:error].include?("Couldn't generate RO-Crate")
+    assert flash[:error].include?('No @graph found in metadata!')
   end
 
   test 'create RO-Crate even with with duplicated filenames' do
@@ -1774,5 +1774,43 @@ class WorkflowsControllerTest < ActionController::TestCase
       assert_redirected_to root_path
       assert flash[:error].include?('disabled')
     end
+  end
+
+  test 'shows run button for galaxy workflows using default galaxy endpoint' do
+    workflow = FactoryBot.create(:existing_galaxy_ro_crate_workflow, policy: FactoryBot.create(:public_policy))
+
+    get :show, params: { id: workflow.id }
+
+    assert workflow.can_run?
+    assert_equal 'https://usegalaxy.eu', Seek::Config.galaxy_instance_default
+    trs_url = URI.encode_www_form_component("http://localhost:3000/ga4gh/trs/v2/tools/#{workflow.id}/versions/1")
+    assert_select 'a.btn[href=?]', "https://usegalaxy.eu/workflows/trs_import?trs_url=#{trs_url}&run_form=true",
+                  { text: 'Run on Galaxy' }
+  end
+
+  test 'shows run button for galaxy workflows using specified galaxy endpoint' do
+    workflow = FactoryBot.create(:existing_galaxy_ro_crate_workflow, policy: FactoryBot.create(:public_policy),
+                       execution_instance_url: 'https://galaxygalaxy.org/mygalaxy/')
+
+    get :show, params: { id: workflow.id }
+
+    assert workflow.can_run?
+    trs_url = URI.encode_www_form_component("http://localhost:3000/ga4gh/trs/v2/tools/#{workflow.id}/versions/1")
+    assert_select 'a.btn[href=?]', "https://galaxygalaxy.org/mygalaxy/workflows/trs_import?trs_url=#{trs_url}&run_form=true",
+                  { text: 'Run on Galaxy' }
+  end
+
+  test 'throws error when downloading RO-Crate with missing file' do
+    workflow = FactoryBot.create(:local_git_workflow, policy: FactoryBot.create(:public_policy))
+    gv = workflow.latest_git_version
+    disable_authorization_checks do
+      gv.add_file('ro-crate-metadata.json', File.open(File.join("#{Rails.root}/test/fixtures/files", 'workflows/ro-crate-metadata-missing-file.json')))
+      gv.save!
+    end
+
+    get :ro_crate, params: { id: workflow.id }
+
+    assert_redirected_to workflow
+    assert flash[:error].include?("not found in crate: this-file-does-not-exist")
   end
 end

@@ -71,7 +71,7 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal 'Fred Smith', sample.title
     assert_equal 'Fred Smith', sample.get_attribute_value('full name')
     assert_equal 22, sample.get_attribute_value(:age)
-    assert_equal '22.1', sample.get_attribute_value(:weight)
+    assert_equal 22.1, sample.get_attribute_value(:weight)
     assert_equal 'M13 9PL', sample.get_attribute_value(:postcode)
     assert_equal person, sample.contributor
     assert_equal [creator], sample.creators
@@ -95,7 +95,7 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal 'Fred Smith', sample.title
     assert_equal 'Fred Smith', sample.get_attribute_value('full name')
     assert_equal 22, sample.get_attribute_value(:age)
-    assert_equal '22.1', sample.get_attribute_value(:weight)
+    assert_equal 22.1, sample.get_attribute_value(:weight)
     assert_equal 'M13 9PL', sample.get_attribute_value(:postcode)
     assert_equal person, sample.contributor
     assert_equal [creator], sample.creators
@@ -1051,7 +1051,7 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal 'Fred Smith', sample1.title
     assert_equal 'Fred Smith', sample1.get_attribute_value('full name')
     assert_equal 22, sample1.get_attribute_value(:age)
-    assert_equal '22.1', sample1.get_attribute_value(:weight)
+    assert_equal 22.1, sample1.get_attribute_value(:weight)
     assert_equal 'M13 9PL', sample1.get_attribute_value(:postcode)
     assert_equal [assay], sample1.assays
 
@@ -1059,7 +1059,7 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal 'David Tailor', sample2.title
     assert_equal 'David Tailor', sample2.get_attribute_value('full name')
     assert_equal 33, sample2.get_attribute_value(:age)
-    assert_equal '33.1', sample2.get_attribute_value(:weight)
+    assert_equal 33.1, sample2.get_attribute_value(:weight)
     assert_equal 'M12 8PL', sample2.get_attribute_value(:postcode)
   end
 
@@ -1112,7 +1112,7 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal 'Alfred Marcus', first_updated_sample.get_attribute_value('full name')
     assert_equal 22, first_updated_sample.get_attribute_value(:age)
     assert_nil first_updated_sample.get_attribute_value(:postcode)
-    assert_equal '22.1', first_updated_sample.get_attribute_value(:weight)
+    assert_equal 22.1, first_updated_sample.get_attribute_value(:weight)
 
     last_updated_sample = samples[1]
     assert_equal type_id2, last_updated_sample.sample_type.id
@@ -1120,7 +1120,7 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal 'David Tailor', last_updated_sample.get_attribute_value('full name')
     assert_equal 33, last_updated_sample.get_attribute_value(:age)
     assert_nil last_updated_sample.get_attribute_value(:postcode)
-    assert_equal '33.1', last_updated_sample.get_attribute_value(:weight)
+    assert_equal 33.1, last_updated_sample.get_attribute_value(:weight)
   end
 
   test 'batch_delete' do

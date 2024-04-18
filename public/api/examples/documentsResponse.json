@@ -1,23 +1,23 @@
 {
   "data": [
     {
-      "id": "23",
-      "type": "documents",
-      "attributes": {
-        "title": "A Maximal Document"
-      },
-      "links": {
-        "self": "/documents/23"
-      }
-    },
-    {
-      "id": "22",
+      "id": "638",
       "type": "documents",
       "attributes": {
         "title": "A Minimal Document"
       },
       "links": {
-        "self": "/documents/22"
+        "self": "/documents/638"
+      }
+    },
+    {
+      "id": "639",
+      "type": "documents",
+      "attributes": {
+        "title": "A Maximal Document"
+      },
+      "links": {
+        "self": "/documents/639"
       }
     }
   ],

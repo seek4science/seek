@@ -131,6 +131,12 @@ def load_seek_testing_defaults!
       Settings.defaults[:omniauth_github_client_id] = 'abc'
       Settings.defaults[:omniauth_github_secret] = '456'
 
+      Settings.defaults[:omniauth_oidc_enabled] = true
+      Settings.defaults[:omniauth_oidc_name] = 'SEEK Testing OIDC'
+      Settings.defaults[:omniauth_oidc_issuer] = 'https://example.com/oidc/'
+      Settings.defaults[:omniauth_oidc_client_id] = 'def'
+      Settings.defaults[:omniauth_oidc_secret] = '789'
+
       Settings.defaults[:ga4gh_trs_api_enabled] = true
 
       Settings.defaults[:life_monitor_url] = 'https://localhost:8443'
@@ -139,5 +145,6 @@ def load_seek_testing_defaults!
       Settings.defaults[:git_support_enabled] = true
       Settings.defaults[:fair_signposting_enabled] = true
       Settings.defaults[:bio_tools_enabled] = true
+      Settings.defaults[:galaxy_instance_default] = 'https://usegalaxy.eu'
     end
 end

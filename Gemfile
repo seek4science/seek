@@ -59,7 +59,7 @@ gem 'rdf-virtuoso', '>= 0.2.0'
 gem 'terrapin'
 gem 'lograge'
 gem 'psych'
-gem 'stringio', '3.0.1' #locked to the default version for ruby 3.1
+gem 'stringio', '3.0.1.1' #locked to the default version for ruby 3.1
 gem 'validate_url'
 gem "attr_encrypted", "~> 3.0.0"
 gem 'libreconv'
@@ -134,7 +134,7 @@ gem 'request_store'
 
 gem 'bundler', '>= 1.8.4'
 
-gem 'ro-crate', '~> 0.5.1'
+gem 'ro-crate', '~> 0.5.2'
 
 gem 'rugged'
 gem 'i18n-js'
@@ -160,6 +160,8 @@ gem 'caxlsx_rails', '~> 0.6.2'
 gem 'net-ftp'
 
 gem 'licensee'
+
+gem "sitemap_generator", "~> 6.3"
 
 group :production do
   gem 'passenger'
@@ -205,5 +207,3 @@ group :test, :development do
   gem 'teaspoon'
   gem 'teaspoon-mocha'
 end
-
-gem "sitemap_generator", "~> 6.3"

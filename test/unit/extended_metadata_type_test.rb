@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class ExtendedMetadataTypeTest < ActiveSupport::TestCase
+
   test 'validation' do
     cmt = ExtendedMetadataType.new(title: 'test metadata', supported_type: 'Investigation')
     refute cmt.valid?
@@ -24,6 +25,26 @@ class ExtendedMetadataTypeTest < ActiveSupport::TestCase
 
     cmt.supported_type = 'Study'
     assert cmt.valid?
+
+    cmt.supported_type = 'ExtendedMetadata'
+    assert cmt.valid?
+
+    cmt.supported_type = 'Study'
+    cmt.enabled = false
+    assert cmt.valid?
+
+    # extended metadata, to be used as nested, cannot be disabled
+    cmt.supported_type = 'ExtendedMetadata'
+    refute cmt.valid?
+  end
+
+  test 'extended type?' do
+    emt = FactoryBot.create(:simple_investigation_extended_metadata_type)
+    refute emt.extended_type?
+    emt.supported_type = 'Study'
+    refute emt.extended_type?
+    emt.supported_type = 'ExtendedMetadata'
+    assert emt.extended_type?
   end
 
   test 'validates attribute titles are unique' do
@@ -68,5 +89,13 @@ class ExtendedMetadataTypeTest < ActiveSupport::TestCase
     end
     assert cmt.destroyed?
     assert_equal attributes, attributes.select(&:destroyed?)
+  end
+
+  test 'enabled' do
+    cmt = FactoryBot.create(:simple_investigation_extended_metadata_type)
+    cmt2 = FactoryBot.create(:simple_investigation_extended_metadata_type, enabled: false)
+
+    assert_equal [cmt,cmt2], ExtendedMetadataType.all.order(:id)
+    assert_equal [cmt], ExtendedMetadataType.enabled.order(:id)
   end
 end

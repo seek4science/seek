@@ -10,11 +10,20 @@ module Seek
     class GalaxyHTTPHandler < Seek::DownloadHandling::HTTPHandler
       attr_reader :galaxy_host, :workflow_id
 
-      def initialize(url, fallback_to_get: true)
-        uri = URI(url)
+      URL_PATTERNS = [
+        /(.+)\/api\/workflows\/([^\/]+)\/download\?format=json-download/, # Download
+        /(.+)\/workflows\/run\?id=([^&]+)/, # Run
+        /(.+)\/published\/workflow\?id=([^&]+)/, # View
+      ].freeze
 
-        @galaxy_host = URI(url.split(/\/workflows?\//).first + '/')
-        @workflow_id = CGI.parse(uri.query)['id'].first
+      def initialize(url, fallback_to_get: true)
+        URL_PATTERNS.each do |pattern|
+          matches = url.match(pattern)
+          if matches
+            @galaxy_host = matches[1].chomp('/') + '/'
+            @workflow_id = matches[2]
+          end
+        end
 
         super(download_url, fallback_to_get: fallback_to_get)
       end
@@ -26,21 +35,24 @@ module Seek
       end
 
       def display_url
-        URI.join(galaxy_host, "workflow/display_by_id?id=#{workflow_id}").to_s
+        URI.join(galaxy_host, "published/workflow?id=#{workflow_id}").to_s
       end
 
       def download_url
-        URI.join(galaxy_host, "workflow/export_to_file?id=#{workflow_id}").to_s
+        URI.join(galaxy_host, "api/workflows/#{workflow_id}/download?format=json-download").to_s
       end
 
-      # Note that the path is `/workflows/` (plural) here for some reason.
       def run_url
         URI.join(galaxy_host, "workflows/run?id=#{workflow_id}").to_s
       end
 
+      def execution_instance_url
+        galaxy_host.to_s
+      end
+
       def self.is_galaxy_workflow_url?(uri)
-        uri.hostname.include?('galaxy') && (uri.path.include?('/workflow/') || uri.path.include?('/workflows/')) &&
-          uri.query.present? && CGI.parse(uri.query)&.key?('id')
+        string_uri = uri.to_s
+        uri.hostname.include?('galaxy') && URL_PATTERNS.any? { |pattern| string_uri.match?(pattern) }
       end
     end
   end

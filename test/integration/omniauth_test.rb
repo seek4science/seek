@@ -2,6 +2,7 @@ require 'test_helper'
 
 class OmniauthTest < ActionDispatch::IntegrationTest
   include AuthenticatedTestHelper
+  include HtmlHelper
 
   fixtures :users, :people
 
@@ -40,6 +41,16 @@ class OmniauthTest < ActionDispatch::IntegrationTest
             'nickname' => 'new_github_user',
             'name' => 'New Githubuser',
             'email' => 'new_github_user@example.com'
+        }
+    })
+
+    @oidc_mock_auth = OmniAuth::AuthHash.new({
+        provider: 'oidc',
+        uid: 'google-auth2|357823572abcbde',
+        info: {
+            'nickname' => 'john_oidc',
+            'name' => 'New OIDC user',
+            'email' => 'new_oidc_user@example.com'
         }
     })
   end
@@ -227,6 +238,32 @@ class OmniauthTest < ActionDispatch::IntegrationTest
     assert_match(/You have successfully registered your account, but you need to create a profile/, flash[:notice])
   end
 
+  test 'should create and activate new OIDC user' do
+    OmniAuth.config.mock_auth[:oidc] = @oidc_mock_auth
+
+    assert_difference('User.count', 1) do
+      assert_difference('Identity.count', 1) do
+        post omniauth_authorize_path(:oidc)
+        follow_redirect! # OmniAuth callback
+        assert_redirected_to(/#{register_people_path}/)
+        follow_redirect! # New profile
+      end
+    end
+
+    assert_equal 'OIDC', assigns(:person).last_name
+    assert_equal 'New', assigns(:person).first_name
+    assert_equal 'new_oidc_user@example.com', assigns(:person).email
+    assert session[:user_id]
+    user = User.find_by_id(session[:user_id])
+    assert user
+    assert user.active?
+    assert_equal 1, user.identities.count
+    identity = user.identities.first
+    assert_equal 'oidc', identity.provider
+    assert_equal 'google-auth2|357823572abcbde', identity.uid
+    assert_match(/You have successfully registered your account, but you need to create a profile/, flash[:notice])
+  end
+
   test 'should not create new LDAP user if setting does not allow' do
     OmniAuth.config.mock_auth[:ldap] = @ldap_mock_auth
 
@@ -331,7 +368,23 @@ class OmniauthTest < ActionDispatch::IntegrationTest
         assert_redirected_to(omniauth_failure_path(strategy: 'ldap', message: 'invalid_credentials'))
         follow_redirect!
 
-        assert_equal "LDAP authentication failure (Invalid username/password?)", flash[:error]
+        assert_equal "LDAP authentication failure (Invalid username/password)", flash[:error]
+        assert_select '#ldap_login.active'
+        assert_select '#password_login.active', count: 0
+      end
+    end
+  end
+
+  test 'LDAP auth failure should redirect to login page and show generic error if message not recognized' do
+    OmniAuth.config.mock_auth[:ldap] = :blagjsdkgjsdfgi
+
+    assert_no_difference('User.count') do
+      assert_no_difference('Identity.count') do
+        post omniauth_callback_path(:ldap)
+        assert_redirected_to(omniauth_failure_path(strategy: 'ldap', message: 'blagjsdkgjsdfgi'))
+        follow_redirect!
+
+        assert_equal "LDAP authentication failure", flash[:error]
         assert_select '#ldap_login.active'
         assert_select '#password_login.active', count: 0
       end
@@ -348,10 +401,12 @@ class OmniauthTest < ActionDispatch::IntegrationTest
         assert_redirected_to(omniauth_failure_path(strategy: 'elixir_aai', message: 'invalid_credentials'))
         follow_redirect!
 
-        assert_equal "LS Login authentication failure (Invalid username/password?)", flash[:error]
+        assert_equal "LS Login authentication failure (Invalid username/password)", flash[:error]
         assert_select '#elixir_aai_login.active'
         assert_select '#ldap_login.active', count: 0
         assert_select '#password_login.active', count: 0
+        # Should override return_to, to avoid it redirecting back to the login form with garbled error message.
+        assert_select '#elixir_aai_login a[href=?]', omniauth_authorize_path(:elixir_aai, state: 'return_to:/')
       end
     end
   end

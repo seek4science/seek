@@ -37,20 +37,95 @@
   <%= admin_checkbox_setting(:omniauth_elixir_aai_enabled, 1, Seek::Config.omniauth_elixir_aai_enabled,
                              "#{t('login.elixir_aai')} authentication", "Enables use of #{t('login.elixir_aai')} for authentication.",
                              onchange: toggle_appear_javascript('omniauth_elixir_aai_settings')) %>
-  <div id="omniauth_elixir_aai_settings" class="additional_settings" style="<%= show_or_hide_block(Seek::Config.omniauth_elixir_aai_enabled) -%>;">
-    <%= admin_text_setting(:omniauth_elixir_aai_client_id, Seek::Config.omniauth_elixir_aai_client_id,
-                           "#{t('login.elixir_aai')} Client ID", "The client ID provided by #{t('login.elixir_aai')} for your installation.") %>
-    <%= admin_password_setting(:omniauth_elixir_aai_secret, Seek::Config.omniauth_elixir_aai_secret,
-                               "#{t('login.elixir_aai')} Secret", "The secret key provided by #{t('login.elixir_aai')} for your installation.") %>
+  <div id="omniauth_elixir_aai_settings" class="additional_settings row" style="<%= show_or_hide_block(Seek::Config.omniauth_elixir_aai_enabled) -%>;">
+    <div class="row">
+      <div class="col-sm-7">
+        <%= admin_text_setting(:omniauth_elixir_aai_client_id, Seek::Config.omniauth_elixir_aai_client_id,
+                               "#{t('login.elixir_aai')} Client ID", "The client ID provided by #{t('login.elixir_aai')} for your installation.") %>
+        <%= admin_password_setting(:omniauth_elixir_aai_secret, Seek::Config.omniauth_elixir_aai_secret,
+                                   "#{t('login.elixir_aai')} Secret", "The secret key provided by #{t('login.elixir_aai')} for your installation.") %>
+        <%= admin_checkbox_setting(:omniauth_elixir_aai_legacy_mode, 1, Seek::Config.omniauth_elixir_aai_legacy_mode,
+                                   "Use legacy configuration", "Use this if your client was registered prior to the transition from #{t('login.elixir_aai_legacy')} to #{t('login.elixir_aai')}.") %>
+      </div>
+      <div class="col-sm-5">
+        <%= panel('Client Info') do %>
+          <p class="help-block">
+            Provide this info to <%= t('login.elixir_aai') %> when registering your SEEK instance as a relying party.
+          </p>
+          <label>Redirect URI</label><br/>
+          <pre><%= omniauth_callback_url('elixir_aai') %></pre>
+          <br/>
+          <label>Grant type</label><br/>
+          <pre>authorization_code</pre>
+        <% end %>
+      </div>
+    </div>
   </div>
 
   <%= admin_checkbox_setting(:omniauth_github_enabled, 1, Seek::Config.omniauth_github_enabled,
                              "GitHub authentication", "Enables use of GitHub for authentication.",
                              onchange: toggle_appear_javascript('omniauth_github_settings')) %>
   <div id="omniauth_github_settings" class="additional_settings" style="<%= show_or_hide_block(Seek::Config.omniauth_github_enabled) -%>;">
-    <%= admin_text_setting(:omniauth_github_client_id, Seek::Config.omniauth_github_client_id,
-                           'GitHub Client ID', 'The client ID provided by GitHub for your installation.') %>
-    <%= admin_password_setting(:omniauth_github_secret, Seek::Config.omniauth_github_secret,
-                               'GitHub Secret', 'The secret key provided by GitHub for your installation.') %>
+    <div class="row">
+      <div class="col-sm-7">
+        <%= admin_text_setting(:omniauth_github_client_id, Seek::Config.omniauth_github_client_id,
+                               'GitHub Client ID', 'The client ID provided by GitHub for your installation.') %>
+        <%= admin_password_setting(:omniauth_github_secret, Seek::Config.omniauth_github_secret,
+                                   'GitHub Secret', 'The secret key provided by GitHub for your installation.') %>
+      </div>
+      <div class="col-sm-5">
+        <%= panel('Client Info') do %>
+          <p class="help-block">
+            Provide this info to GitHub when registering your SEEK instance as an OAuth App.
+          </p>
+          <label>Authorization callback URL</label><br/>
+          <pre><%= omniauth_callback_url('github') %></pre>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <%= admin_checkbox_setting(:omniauth_oidc_enabled, 1, Seek::Config.omniauth_oidc_enabled,
+                             "#{t('login.oidc')} authentication", "Enables use of a #{t('login.oidc')} provider for authentication.",
+                             onchange: toggle_appear_javascript('omniauth_oidc_settings')) %>
+  <div id="omniauth_oidc_settings" class="additional_settings" style="<%= show_or_hide_block(Seek::Config.omniauth_oidc_enabled) -%>;">
+    <div class="row">
+      <div class="col-sm-7">
+        <%= admin_text_setting(:omniauth_oidc_name, Seek::Config.omniauth_oidc_name,
+                               "#{t('login.oidc')} Name", "The name of this authentication method that will be displayed to users.") %>
+        <%= admin_file_setting(:omniauth_oidc_image,
+                               "#{t('login.oidc')} Login Image", "An image to use as the login button for #{t('login.oidc')}.") %>
+        <% if Seek::Config.omniauth_oidc_image_id && (oidc_image = Avatar.find_by_id(Seek::Config.omniauth_oidc_image_id)) %>
+          <div>
+            Current image:<br/>
+            <%= image_tag(oidc_image.public_asset_url) %>
+            <div class="checkbox">
+              <label>
+                <%= check_box_tag(:clear_omniauth_oidc_image, '1', false) %>
+                Remove image?
+              </label>
+            </div>
+          </div>
+        <% end %>
+        <%= admin_text_setting(:omniauth_oidc_issuer, Seek::Config.omniauth_oidc_issuer,
+                               "#{t('login.oidc')} URL", "The base URL of the #{t('login.oidc')} provider. It is expected that the discovery endpoint <code>/.well-known/openid-configuration</code> exists under this URL.") %>
+        <%= admin_text_setting(:omniauth_oidc_client_id, Seek::Config.omniauth_oidc_client_id,
+                               "#{t('login.oidc')} Client ID", "The client ID to use to authenticate with the #{t('login.oidc')} provider.") %>
+        <%= admin_password_setting(:omniauth_oidc_secret, Seek::Config.omniauth_oidc_secret,
+                                   "#{t('login.oidc')} Secret", "The secret to use to authenticate with the #{t('login.oidc')} provider.") %>
+      </div>
+      <div class="col-sm-5">
+        <%= panel('Client Info') do %>
+          <p class="help-block">
+            Provide this info to the <%= t('login.oidc') %> provider when registering your SEEK instance as a relying party.
+          </p>
+          <label>Redirect URI</label><br/>
+          <pre><%= omniauth_callback_url('oidc') %></pre>
+          <br/>
+          <label>Grant type</label><br/>
+          <pre>authorization_code</pre>
+        <% end %>
+      </div>
+    </div>
   </div>
 </div>

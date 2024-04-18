@@ -60,6 +60,10 @@ class SampleType < ApplicationRecord
 
   has_annotation_type :sample_type_tag, method_name: :tags
 
+  def level
+    isa_template&.level
+  end
+
   def previous_linked_sample_type
     sample_attributes.detect(&:input_attribute?)&.linked_sample_type
   end

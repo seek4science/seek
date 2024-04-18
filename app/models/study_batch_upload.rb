@@ -29,7 +29,7 @@ class StudyBatchUpload < ApplicationRecord
   def self.extract_studies_from_file(studies_file)
     studies = []
     parsed_sheet = Seek::Templates::StudiesReader.new(studies_file)
-    metadata_type = ExtendedMetadataType.where(title: 'MIAPPE metadata', supported_type: 'Study').last
+    metadata_type = ExtendedMetadataType.where(title: ExtendedMetadataType::MIAPPE_TITLE, supported_type: 'Study').last
     columns = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
     study_start_row_index = 4
     parsed_sheet.each_record(3, columns) do |index, data|

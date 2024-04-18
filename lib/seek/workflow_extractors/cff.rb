@@ -6,7 +6,7 @@ module Seek
       FILENAME = 'CITATION.cff'
 
       def initialize(io)
-        if io.respond_to?(:path)
+        if io.respond_to?(:path) && !io.is_a?(Git::Blob)
           @path = io.path
         else
           f = Tempfile.new('cff')

@@ -16,7 +16,7 @@ SEEK::Application.routes.draw do
         get 'tools' => 'tools#index'
         get 'tools/:id' => 'tools#show'
         get 'tools/:id/versions' => 'tool_versions#index'
-        get 'tools/:id/versions/:version_id' => 'tool_versions#show'
+        get 'tools/:id/versions/:version_id' => 'tool_versions#show', as: :tool_version
         get 'tools/:id/versions/:version_id/containerfile' => 'tool_versions#containerfile'
         get 'tools/:id/versions/:version_id/:type/descriptor(/*relative_path)' => 'tool_versions#descriptor', constraints: { relative_path: /.+/ }, format: false, as: :tool_versions_descriptor
         get 'tools/:id/versions/:version_id/:type/files' => 'tool_versions#files', format: false
@@ -206,6 +206,10 @@ SEEK::Application.routes.draw do
   resources :extended_metadata_types do
     collection do
       get :form_fields
+      get :administer
+    end
+    member do
+      put :administer_update
     end
   end
 
@@ -830,7 +834,7 @@ SEEK::Application.routes.draw do
   # Omniauth
   post '/auth/:provider' => 'sessions#create', as: :omniauth_authorize # For security, ONLY POST should be enabled on this route.
   match '/auth/:provider/callback' => 'sessions#create', as: :omniauth_callback, via: [:get, :post] # Callback routes need both GET and POST enabled.
-  match '/identities/auth/:provider/callback' => 'sessions#create', via: [:get, :post] # Needed for legacy support..
+  match '/identities/auth/:provider/callback' => 'sessions#create', as: :legacy_omniauth_callback, via: [:get, :post] # Needed for legacy support..
   get '/auth/failure' => 'sessions#omniauth_failure', as: :omniauth_failure
 
   get '/activate(/:activation_code)' => 'users#activate', as: :activate

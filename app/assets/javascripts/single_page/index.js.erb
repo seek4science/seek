@@ -316,6 +316,7 @@ async function handleUploadSubmit(formData){
       $j('#upload-excel').html(response);
     },
     error: function(err){
+        alert(`Failed to upload file!\nStatus: ${err.status}\nError: ${err.statusText}`);
       location.reload(); // Page needs reloading for the notice message to appear
     }
   });

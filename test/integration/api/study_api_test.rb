@@ -12,6 +12,7 @@ class StudyApiTest < ActionDispatch::IntegrationTest
     @publication = FactoryBot.create(:publication)
 
     @study = FactoryBot.create(:study, policy: FactoryBot.create(:public_policy), contributor: current_person)
+    @emt = FactoryBot.create(:simple_study_extended_metadata_type)
   end
 
   test 'should not delete a study with assays' do

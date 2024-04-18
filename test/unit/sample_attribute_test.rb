@@ -525,6 +525,15 @@ class SampleAttributeTest < ActiveSupport::TestCase
     refute third_incorrect_input_attribute.input_attribute?
   end
 
+  test 'inherited_from_template_attribute?' do
+    parent_attribute = FactoryBot.create(:template_attribute, title: 'Parent', isa_tag: nil, is_title: true, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type))
+    orphan_attribute = FactoryBot.create(:simple_string_sample_attribute, is_title: true, required: true, sample_type: FactoryBot.create(:simple_sample_type))
+    child_attribute = FactoryBot.create(:simple_string_sample_attribute, template_attribute_id: parent_attribute.id, required: true, is_title: true, sample_type: FactoryBot.create(:simple_sample_type))
+
+    refute orphan_attribute.inherited_from_template_attribute?
+    assert child_attribute.inherited_from_template_attribute?
+  end
+
   private
 
   def valid_value?(attribute, value)

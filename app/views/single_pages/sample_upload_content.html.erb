@@ -48,8 +48,8 @@
     </div>
   <% end %>
 
-  <%= submit_tag "Upload", data: {disable_with: 'Uploading ...'}, :class => 'btn btn-primary', onclick: "submitUpload()" if (@can_upload and any_samples_to_upload?)%>
-  <%= submit_tag "Cancel", data: {id: 'cancelModalUploadExcel'}, :class => 'btn btn-secondary', onclick: "closeModalForm()" %>
+  <%= submit_tag "Upload", id: 'upload-xlsx-content-btn', data: { disable_with: 'Uploading ...' }, class: 'btn btn-primary', onclick: "submitUpload()" if (@can_upload and any_samples_to_upload?) %>
+  <%= submit_tag "Cancel", id: 'close-upload-xlsx-modal-btn', data: { id: 'cancelModalUploadExcel' }, class: 'btn btn-secondary', onclick: "closeModalForm()" %>
   <%= image_tag('ajax-loader.gif', id: 'sample-upload-spinner', style: 'display: none') %>
 </div>
 
@@ -80,14 +80,24 @@
 
   async function makeSampleUploadAjaxCalls(newSamples, updatedSamples){
     $j('#sample-upload-spinner').show();
+    $j('#upload-xlsx-content-btn').prop('disabled', true);
+    $j('#close-upload-xlsx-modal-btn').prop('disabled', true);
+
     try{
       const postCall = await uploadAjaxCall("<%= batch_create_samples_path %>", "POST", { data: JSON.stringify(newSamples) });
       const putCall = await uploadAjaxCall("<%= batch_update_samples_path %>", "PUT", { data: JSON.stringify(updatedSamples) });
+        let errors = {newSamples: postCall.errors, updatedSamples: putCall.errors};
+        if (errors.newSamples.length > 0 || errors.updatedSamples.length > 0) {
+            throw new Error(JSON.stringify(errors));
+        }
       $j('#sample-upload-spinner').hide();
       closeModalForm();
       location.reload();
     } catch (error){
-      $j('#sample-upload-spinner').hide();
+        alert(`Error: ${error}`);
+        $j('#sample-upload-spinner').hide();
+        $j('#upload-xlsx-content-btn').prop('disabled', false);
+        $j('#close-upload-xlsx-modal-btn').prop('disabled', false);
     }
   }
 
@@ -132,7 +142,7 @@
         const inputIds = multiInputfields.map(is => is.title.split(" ").pop()).join(',');
         samplesObj[key] = inputIds;
       } else if (cvListFields.length > 0){
-        cvTerms = cvListFields.map(cvt => cvt.title)
+          let cvTerms = cvListFields.map(cvt => cvt.title)
         samplesObj[key] = cvTerms;
       } else if (seekSample.length > 0) {
         samplesObj[key] = seekSample[0].title
@@ -143,7 +153,7 @@
 
     const {id: objId, ...attrMap} = samplesObj;
 
-    attrMap["status"] = action;
+      attrMap["sampleUploadAction"] = action;
 
     if (action === "update"){
       return {

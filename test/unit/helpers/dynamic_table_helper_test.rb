@@ -79,4 +79,28 @@ class DynamicTableHelperTest < ActionView::TestCase
     sequence = link_sequence(type3)
     assert_equal sequence, [type3, type2, type1]
   end
+
+  test 'should display the data correctly independent of the order in the json metadata' do
+    person = FactoryBot.create(:person)
+    sample_type = FactoryBot.create(:isa_source_sample_type, contributor: person)
+    sample1 = FactoryBot.create(:isa_source, sample_type:, contributor: person)
+    sample_type.reload
+    rows_case1 = User.with_current_user(person.user) do
+      dt_data(sample_type)[:rows]
+    end
+    refute_nil rows_case1
+    sample1_metadata = [[nil, sample1.id, sample1.uuid].push(*JSON.parse(sample1.json_metadata).values)]
+    assert_equal sample1_metadata, rows_case1
+
+    sample_type.sample_attributes.first.update(pos: 2)
+    sample_type.sample_attributes.second.update(pos: 1)
+    sample_type.reload
+
+    rows_case2 = User.with_current_user(person.user) do
+      dt_data(sample_type)[:rows]
+    end
+    refute_equal rows_case2, sample1_metadata
+    assert_equal sample1_metadata[0][3], rows_case2[0][4]
+    assert_equal sample1_metadata[0][4], rows_case2[0][3]
+  end
 end

@@ -2,12 +2,12 @@
 
 <% if Seek::Config.project_single_page_enabled %>
 	<% if !displaying_single_page? %>
-		<span>
-      <%= button_link_to("Single Page", 'sop', single_page_path(id: item.projects.first.id, item_type: 'investigation', item_id: item.id)) -%>
+		<span title="<%= t("info_text.single_page") %>">
+      <%= button_link_to(t('single_page'), 'sop', single_page_path(id: item.projects.first.id, item_type: 'investigation', item_id: item.id)) -%>
     </span>
 	<% else %>
-		<span>
-      <%= button_link_to("Default View", 'sop', investigation_path(item.id)) -%>
+		<span title="<%= t('info_text.default_view') %>">
+      <%= button_link_to(t('default_view'), 'sop', investigation_path(item.id)) -%>
     </span>
 	<% end %>
 <% end -%>

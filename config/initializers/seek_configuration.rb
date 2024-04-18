@@ -237,6 +237,8 @@ def load_seek_config_defaults!
     password: '',
     bind_dn: ''
   }
+  Seek::Config.default :omniauth_oidc_enabled, false
+  Seek::Config.default :omniauth_oidc_name, 'OpenID Connect Provider'
 
   Seek::Config.default :openbis_enabled,false
   Seek::Config.default :openbis_download_limit, 2.gigabytes

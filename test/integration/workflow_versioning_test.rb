@@ -141,7 +141,7 @@ class WorkflowVersioningTest < ActionDispatch::IntegrationTest
 
     assert_equal 2, workflow.reload.versions.count
     assert_equal 732, workflow.find_version(1).content_blob.file_size
-    assert_equal 12349, workflow.find_version(2).content_blob.file_size
+    assert_equal 12287, workflow.find_version(2).content_blob.file_size
   end
 
   test 'new workflow version upload copes with workflow class change' do

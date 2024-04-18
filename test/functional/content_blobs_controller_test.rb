@@ -94,7 +94,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
   test 'examine url to galaxy instance works with the various workflow endpoints' do
     stub_request(:any, 'https://galaxy-instance.biz/banana/workflows/run?id=123').to_return(status: 200)
-    stub_request(:any, 'https://galaxy-instance.biz/banana/workflow/export_to_file?id=123').to_return(
+    stub_request(:any, 'https://galaxy-instance.biz/banana/api/workflows/123/download?format=json-download').to_return(
         body: File.new("#{Rails.root}/test/fixtures/files/workflows/1-PreProcessing.ga"),
         status: 200,
         headers: { 'Content-Length' => 40296,
@@ -109,14 +109,14 @@ class ContentBlobsControllerTest < ActionController::TestCase
       assert_equal 'galaxy', assigns(:type)
       assert_equal '123', assigns(:info)[:workflow_id]
       assert_equal 'https://galaxy-instance.biz/banana/', assigns(:info)[:galaxy_host].to_s
-      assert_equal 'https://galaxy-instance.biz/banana/workflow/display_by_id?id=123', assigns(:info)[:display_url]
+      assert_equal 'https://galaxy-instance.biz/banana/published/workflow?id=123', assigns(:info)[:display_url]
       assert_equal 40296, assigns(:info)[:file_size]
       assert_equal '1-PreProcessing.ga', assigns(:info)[:file_name]
     }
 
     suite.call('https://galaxy-instance.biz/banana/workflows/run?id=123')
-    suite.call('https://galaxy-instance.biz/banana/workflow/export_to_file?id=123')
-    suite.call('https://galaxy-instance.biz/banana/workflow/display_by_id?id=123')
+    suite.call('https://galaxy-instance.biz/banana/api/workflows/123/download?format=json-download')
+    suite.call('https://galaxy-instance.biz/banana/published/workflow?id=123')
   end
 
   test 'examine url does not crash when examining galaxy-like URL' do

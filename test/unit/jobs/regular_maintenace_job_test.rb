@@ -9,8 +9,8 @@ class RegularMaintenaceJobTest < ActiveSupport::TestCase
     assert_equal 4.hours, RegularMaintenanceJob::RUN_PERIOD
   end
 
-  test 'cleans content blobs' do
-    assert_equal 8.hours, RegularMaintenanceJob::BLOB_GRACE_PERIOD
+  test 'removes dangling content blobs' do
+    assert_equal 8.hours, RegularMaintenanceJob::REMOVE_DANGLING_BLOB_GRACE_PERIOD
     to_go, keep1, keep2, keep3, keep4 = nil
     travel_to(9.hours.ago) do
       to_go = FactoryBot.create(:content_blob)
@@ -32,6 +32,34 @@ class RegularMaintenaceJobTest < ActiveSupport::TestCase
     assert ContentBlob.exists?(keep2.id)
     assert ContentBlob.exists?(keep3.id)
     assert ContentBlob.exists?(keep4.id)
+  end
+
+  test 'remove deleted content blobs' do
+    assert_equal 24.hours, RegularMaintenanceJob::REMOVE_DELETED_BLOB_GRACE_PERIOD
+    to_go, to_keep1, to_keep2, to_keep3 = nil
+
+    travel_to(25.hours.ago) do
+      to_go = FactoryBot.create(:content_blob, deleted: true, asset_type:'Sop', asset_id: 99999)
+      to_keep1 = FactoryBot.create(:content_blob, asset_type:'Sop', asset_id: 99999)
+      to_keep2 = FactoryBot.create(:content_blob, deleted:true, asset: FactoryBot.create(:sop))
+    end
+    travel_to(23.hours.ago) do
+      to_keep3 = FactoryBot.create(:content_blob, deleted: true, asset: FactoryBot.create(:sop))
+    end
+
+    assert to_go.deleted?
+    assert to_keep2.deleted?
+    assert to_keep3.deleted?
+    refute to_keep1.deleted?
+
+    assert_difference('ContentBlob.count',-1) do
+      RegularMaintenanceJob.perform_now
+    end
+
+    refute ContentBlob.exists?(to_go.id)
+    assert ContentBlob.exists?(to_keep1.id)
+    assert ContentBlob.exists?(to_keep2.id)
+    assert ContentBlob.exists?(to_keep3.id)
   end
 
   test 'remove old unregistered users' do
