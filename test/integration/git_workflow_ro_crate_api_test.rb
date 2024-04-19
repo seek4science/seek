@@ -141,6 +141,7 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
 
         assert_response :success
         assert_equal 'Galaxy', assigns(:workflow).workflow_class.title
+        assert_equal '1.0.0', assigns(:workflow).git_version.name
         assert_equal 'sort-and-change-case', assigns(:workflow).title
         assert_equal 'https://example.com/my-workflow', assigns(:workflow).source_link_url
         assert assigns(:workflow).git_version.total_size > 100
