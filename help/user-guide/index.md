@@ -89,10 +89,9 @@ Capabilities
   - [Legacy Biosamples](legacy-biosamples.html)
 
 - [Samples in ISA-JSON compliant experiments](isa-json-compliant-experiment.html#samples-in-isa-json-compliant-experiment)
+  - [Creating Samples in ISA-JSON compliant Experiments](create-sample-isajson-compliant.html#creating-samples-isajson-compliant-experiments)
   - [Viewing samples in ISA-JSON compliant Experiments](create-sample-isajson-compliant.html#viewing-samples-isajson-compliant-experiments)
-  - [Create Study Sources](create-sample-isajson-compliant.html#create-study-sources)
-  - [Create Study Samples](create-sample-isajson-compliant.html#create-study-samples)
-  - [Create Assay Samples](create-sample-isajson-compliant.html#create-assay-samples)
+
 
 - [Browsing samples](browsing.html#browsing-samples)
   - [Browse samples by Sample Type](browsing.html#browse-samples-by-sample-type)

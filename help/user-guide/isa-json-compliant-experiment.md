@@ -64,9 +64,9 @@ Experiment Sample Templates can be [provided by the platform administrator](isaj
 See [Experiment Sample Templates](isajson-templates.html) for more information.
 
 
-# Samples in ISA-JSON compliant Experiments
+## Samples in ISA-JSON compliant Experiments
 
-In ISA-JSON compliant Experiments, samples must be created within a Sample Type derived from an Experiment Sample Template, associated with one ISA Study or one ISA Assay.
+In ISA-JSON compliant experiments, samples must be created within a Sample Type derived from an Experiment Sample Template, associated with one ISA Study or one ISA Assay.
 
 The "level" of the Experiment Sample Template applied to generate a Sample Type within an ISA Study or ISA Assay determines the type of samples that will be created. Specifically, 
 * ISA Study Source Template for Study Sources
@@ -74,30 +74,8 @@ The "level" of the Experiment Sample Template applied to generate a Sample Type 
 * ISA material output Assay Template for material samples
 * ISA data file Assay Template for digital data file samples
 
-## Types of samples in ISA-JSON compliant Experiments
+See [Working with Samples in ISA-JSON compliant Experiments](create-sample-isajson-compliant.html) for more information.
 
-Study Source(s)
-* Study Sources must be created within an ISA Study, using an Experiment Sample Template level "Study Source".
-* Each Study Source must be the input of at least one Study Sample (or more) in the same ISA Study.
-
-Study Sample(s)
-* Study Samples must be created within an ISA Study, using an Experiment Sample Template level "Study Sample".
-* Study Samples must be the outputs of a sampling protocol applied to ISA Study Sources, in the same Study.
-* Each Study Sample must be the output of at least one Source (or more), in the same ISA Study.
-
-Material output assay sample(s)
-* Assay material samples must be created within an ISA Assay, using an Experiment Sample Template level "Assay - material".
-* Assay material samples must be the outputs of a protocol applied to the inputs of the Assay.
-* Each Assay Sample must have at least one input (or more). Inputs can be: 
-  * Study Samples in the same ISA Study;
-  * Assay samples from one preceding Assay, in the same Assay Stream.
-
-Data file output assay sample(s)
-Same as for material output assay sample(s), but for assays specifically designed to produce data files.
-
-## Browsing samples by templates
-[Browsing samples by templates](browsing.html#browsing-samples-by-experiment-sample-templates)
-
-# ISA-JSON export
+## ISA-JSON export
 [Export Experiments as ISA-JSON](exporting-experiments-as-isajson.html)
 
