@@ -3,6 +3,8 @@ title: SEEK User Guide - Create Sample in ISA-JSON compliant Experiments
 layout: page
 ---
 
+
+
 # Viewing samples in ISA-JSON compliant Experiments
 Samples in ISA-JSON compliant Experiments can be visualised in the "design" tab (Study or Assay design). Samples are grouped in tables: Study Sources table, Study Samples table, Assay Samples table, Experiment overview.
 
@@ -11,7 +13,7 @@ Sources table and Samples table are interactive tables (dynamic tables) that all
 * Studies contain both Sources table and Samples table.
 * Assays contains only Samples table.
 
-## samples
+## Samples
 In Experiment View, you can also view Study Sources, Study Samples, and Assay Samples in a searchable table by selecting "samples (n)" from the tree view on the left sidebar. Samples cannot be created or edited via this view.
 
 ![dynamic table isa study source](/images/user-guide/isajson-compliance/dynamictable_isastudy_source.png){:.screenshot}

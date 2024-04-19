@@ -5,7 +5,12 @@
 
 # ISA-JSON compliant Experiment
 
-When using ISA-JSON compliant experiment to organise your Project, you structure your research according to the [ISA metadata framework](https://isa-specs.readthedocs.io/en/latest/isamodel.html), so that it can be exported as ISA-JSON. When referring to Investigation, Study, and Assay within an ISA-JSON compliant experiment, we use the terms ISA Investigation, ISA Study, and ISA Assay.
+When using ISA-JSON compliant experiments to organise your Project, you structure your research fully according to the [ISA metadata framework](https://isa-specs.readthedocs.io/en/latest/isamodel.html), so that it can be exported as ISA-JSON. When referring to Investigation, Study, and Assay within an ISA-JSON compliant experiment, we use the terms ISA Investigation, ISA Study, and ISA Assay to emphasize the additional information required.
+
+<div class="alert alert-info">
+Note that the ISA-JSON compliance feature must be enabled by the platform administrator. If you do not see the ISA-JSON compliance options in your Project, please contact your local instance administrator.
+</div>
+
 
 ## ISA Investigation
 
@@ -53,7 +58,7 @@ The outputs of an Assay can only be used as inputs by the next Assay in the same
 
 Experiment Sample Templates act as blueprints to create Sample Types within ISA Studies and ISA Assays. The same Experiment Sample Template can be applied multiple times to create Sample Types in different ISA Studies or ISA Assays.
 
-The ISA Study Sources, Samples and ISA Assay Samples tables are Sample Types associated with the ISA Study or ISA Assay and can only be accessed through the ISA Study or ISA Assay interface. The tables can only be created starting from an existing Experiment Sample Templates.
+The ISA Study Sources, Samples and ISA Assay Samples tables are Sample Types associated with the ISA Study or ISA Assay and can only be accessed through the ISA Study or ISA Assay interface. The tables can only be created starting from an existing Experiment Sample Template.
 
 ## Platform-wide and project specific Experiment Sample Templates
 
@@ -80,7 +85,7 @@ When the ISA-JSON compliance feature is enabled in the platform, it is possible 
 
 # Samples in ISA-JSON compliant Experiments
 
-In ISA-JSON compliant Experiments, samples must be created within a Sample Type derived from an Experiment Sample Template, associated with one ISA Studies or one ISA Assays.
+In ISA-JSON compliant Experiments, samples must be created within a Sample Type derived from an Experiment Sample Template, associated with one ISA Study or one ISA Assay.
 
 The "level" of the Experiment Sample Template applied to generate a Sample Type within an ISA Study or ISA Assay determines the type of samples that will be created. Specifically, 
 * ISA Study Source Template for Study Sources
@@ -112,6 +117,6 @@ Same as for material output assay sample(s), but for assays specifically designe
 ## Browsing samples by templates
 [Browsing samples by templates](browsing.html#browsing-samples-by-experiment-sample-templates)
 
-# ISA JSON export
+# ISA-JSON export
 [Export Experiments as ISA-JSON](exporting-experiments-as-isajson.html)
 
