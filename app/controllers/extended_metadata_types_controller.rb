@@ -1,6 +1,6 @@
 class ExtendedMetadataTypesController < ApplicationController
   respond_to :json
-  before_action :is_user_admin_auth, except: [:form_fields, :show]
+  before_action :is_user_admin_auth, except: [:form_fields, :show, :index]
   before_action :find_requested_item, only: [:administer_update, :show]
   include Seek::IndexPager
 
