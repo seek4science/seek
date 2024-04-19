@@ -54,34 +54,15 @@ The outputs of an Assay can only be used as inputs by the next Assay in the same
 * data files (e.g. files containing measurements, rawdata.fastq, processed data, reads.counts.txt).
 
 
-# Experiment Sample Templates
+## Experiment Sample Templates
 
-Experiment Sample Templates act as blueprints to create Sample Types within ISA Studies and ISA Assays. The same Experiment Sample Template can be applied multiple times to create Sample Types in different ISA Studies or ISA Assays.
-
-The ISA Study Sources, Samples and ISA Assay Samples tables are Sample Types associated with the ISA Study or ISA Assay and can only be accessed through the ISA Study or ISA Assay interface. The tables can only be created starting from an existing Experiment Sample Template.
-
-## Platform-wide and project specific Experiment Sample Templates
+[Experiment Sample Templates](isajson-templates.html) act as blueprints to create Sample Types within ISA Studies and ISA Assays and ensure that 
+the metadata collected conforms to community standards.
 
 Experiment Sample Templates can be [provided by the platform administrator](isajson-templates.html#for-system-administrator) or created by Project members based on an existing template. Templates provided by the platform administrator are platform-wide (or instance-wide) and visible to every registered user. Project-specific Experiment Sample Templates created by Project members are subject to sharing permissions.
 
-## Experiment Sample Template characteristics
+See [Experiment Sample Templates](isajson-templates.html) for more information.
 
-An Experiment Sample Template must have the following specifications.
-1. One ISA Level
-    * Study Source
-    * Study Sample
-    * Assay material
-    * Assay data file
-
-2. One Repository name or SEEK Project
-    * Repository or data archive (e.g. EBI databases)
-    * SEEK Project (Project specific templates)
-
-3. Organism: optional free text
-
-## ISA minimal starter template
-
-When the ISA-JSON compliance feature is enabled in the platform, it is possible to use the "ISA minimal starter template" as a starting point to create any Experiment Sample Template. One ISA minimal starter template for each ISA Level is provided with the feature.
 
 # Samples in ISA-JSON compliant Experiments
 
