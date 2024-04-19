@@ -76,6 +76,11 @@ The "level" of the Experiment Sample Template applied to generate a Sample Type 
 
 See [Working with Samples in ISA-JSON compliant Experiments](create-sample-isajson-compliant.html) for more information.
 
+## Designing ISA-JSON compliant Experiments
+
+See [Designing ISA-JSON compliant Experiments](designing-experiments-isajson-compliant.html) for a step-by-step description 
+of how to set up ISA-JSON compliant Experiments.
+
 ## ISA-JSON export
 [Export Experiments as ISA-JSON](exporting-experiments-as-isajson.html)
 
