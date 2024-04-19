@@ -4,6 +4,8 @@ class ExtendedMetadataTypeApiTest < ActionDispatch::IntegrationTest
   include ReadApiTestSuite
 
   def setup
-    user_login(FactoryBot.create(:admin))
+    person = FactoryBot.create(:person)
+    refute person.is_admin?
+    user_login(person)
   end
 end
