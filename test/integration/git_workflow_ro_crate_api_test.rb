@@ -150,6 +150,27 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test 'can submit RO-Crate with numeric ID' do
+    assert_difference('Workflow.count', 1) do
+      assert_difference('Git::Version.count', 1) do
+        post submit_workflows_path, params: {
+          ro_crate: fixture_file_upload('workflows/ro-crate-with-numeric-id.crate.zip'),
+          workflow: {
+            project_ids: [@project.id]
+          }
+        }
+
+        assert_response :success
+        assert_equal 'Galaxy', assigns(:workflow).workflow_class.title
+        assert_equal '3.2', assigns(:workflow).git_version.name
+        assert_equal 'sort-and-change-case', assigns(:workflow).title
+        assert_equal 'https://example.com/my-workflow', assigns(:workflow).source_link_url
+        assert assigns(:workflow).git_version.total_size > 100
+        assert_equal 'sort-and-change-case.ga', assigns(:workflow).ro_crate.main_workflow.id
+      end
+    end
+  end
+
   test 'cannot submit RO-Crate without ID' do
     assert_no_difference('Workflow.count') do
       assert_no_difference('Git::Version.count') do
@@ -161,7 +182,7 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
         }
 
         assert_response :unprocessable_entity
-        assert JSON.parse(@response.body)['errors'].any? { |e| e['detail'].include?('ID could not be determined') }
+        assert JSON.parse(@response.body)['errors'].any? { |e| e['detail'].include?('source URL could not be determined') }
       end
     end
   end
@@ -212,6 +233,28 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
       assert_no_difference('Git::Version.count') do
         post submit_workflows_path, params: {
           ro_crate: fixture_file_upload('workflows/ro-crate-with-id.crate.zip'),
+          workflow: {
+            project_ids: [@project.id]
+          }
+        }
+
+        assert_response :success
+        assert_equal 'Galaxy', assigns(:workflow).workflow_class.title
+        assert_equal 'Concat two files', assigns(:workflow).title
+        assert assigns(:workflow).git_version.total_size > 100
+        assert_equal 'concat_two_files.ga', assigns(:workflow).ro_crate.main_workflow.id
+      end
+    end
+  end
+
+  test 'duplicate numeric version ignored when submitting RO-Crate' do
+    workflow = FactoryBot.create(:local_git_workflow, source_link_url: 'https://example.com/my-workflow', contributor: @person)
+    workflow.git_version.update!(name: '3.2')
+
+    assert_no_difference('Workflow.count') do
+      assert_no_difference('Git::Version.count') do
+        post submit_workflows_path, params: {
+          ro_crate: fixture_file_upload('workflows/ro-crate-with-numeric-id.crate.zip'),
           workflow: {
             project_ids: [@project.id]
           }

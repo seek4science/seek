@@ -16,7 +16,7 @@ class WorkflowCrateExtractor
     if valid?
       if update_existing && @existing_workflows.length == 1
         self.workflow = @existing_workflows.first
-        if self.workflow.git_versions.map(&:name).include?(@crate['version'])
+        if self.workflow.git_versions.map(&:name).include?(@crate['version']&.to_s)
           return self.workflow
         else
           self.workflow.latest_git_version.lock if self.workflow.latest_git_version.mutable?
@@ -27,7 +27,7 @@ class WorkflowCrateExtractor
       self.git_version ||= workflow.git_version.tap do |gv|
         gv.set_default_git_repository
       end
-      self.git_version.name = @crate['version'] if @crate['version']
+      self.git_version.name = @crate['version'].to_s if @crate['version']
       git_version.main_workflow_path = URI.decode_www_form_component(@crate.main_workflow.id) if @crate.main_workflow && !@crate.main_workflow.remote?
       git_version.diagram_path = URI.decode_www_form_component(@crate.main_workflow.diagram.id) if @crate.main_workflow&.diagram && !@crate.main_workflow.diagram.remote?
       git_version.abstract_cwl_path = URI.decode_www_form_component(@crate.main_workflow.cwl_description.id) if @crate.main_workflow&.cwl_description && !@crate.main_workflow.cwl_description.remote?
@@ -58,7 +58,7 @@ class WorkflowCrateExtractor
   end
 
   def source_url_and_version_present?
-    errors.add(:ro_crate, 'ID could not be determined.') unless @crate.source_url.present?
+    errors.add(:ro_crate, 'source URL could not be determined.') unless @crate.source_url.present?
     errors.add(:ro_crate, 'version could not be determined.') unless @crate['version'].present?
   end
 
