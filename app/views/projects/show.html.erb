@@ -122,6 +122,10 @@
                                                                         url: storage_report_project_path(@project)} %>
         <% end %>
 
+        <% if @project.is_taggable? %>
+          <%= render :partial=>"assets/tags_box", :no_tags_message=>"Add tags (comma separated) ..." -%>
+        <% end -%>
+
       </div>
     </div>
 
