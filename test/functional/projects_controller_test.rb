@@ -4973,7 +4973,11 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as(person)
     assert project.has_member?(person)
     assert project.can_edit?
-    get :show, params: { id: project.id }
+
+    with_config_value :isa_json_compliance_enabled, true do
+      get :show, params: { id: project.id }
+    end
+
     assert_response :success
     params = { project_ids: [project.id] }
     directly_linked_types = [
@@ -5000,6 +5004,27 @@ class ProjectsControllerTest < ActionController::TestCase
         assert_select 'a[href=?]', Seek::Util.routes.polymorphic_path(type, action: :new, "#{type.name.underscore}": params)
       end
     end
+  end
+
+  test 'do not show related templates if isa_compliance disabled' do
+    template = FactoryBot.create(:template)
+    person = template.contributor
+    project = template.projects.first
+    login_as(person)
+    assert template.can_view?
+
+    with_config_value(:isa_json_compliance_enabled, true) do
+      get :show, params:{id: project.id}
+      assert_response :success
+      assert_select 'div#related-items li a[data-model-name=Template]', count: 1
+    end
+
+    with_config_value(:isa_json_compliance_enabled, false) do
+      get :show, params:{id: project.id}
+      assert_response :success
+      assert_select 'div#related-items li a[data-model-name=Template]', count: 0
+    end
+
   end
 
   private

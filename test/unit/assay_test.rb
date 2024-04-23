@@ -753,7 +753,7 @@ class AssayTest < ActiveSupport::TestCase
 
   test 'isa json compliance' do
     investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true)
-    isa_json_compliant_study = FactoryBot.create(:isa_json_compliant_study, investigation: )
+    isa_json_compliant_study = FactoryBot.create(:isa_json_compliant_study, investigation: investigation)
     assert isa_json_compliant_study.is_isa_json_compliant?
 
     default_assay = FactoryBot.create(:assay, study: isa_json_compliant_study)
@@ -777,7 +777,7 @@ class AssayTest < ActiveSupport::TestCase
 
   test 'previous linked sample type' do
     investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true)
-    isa_study = FactoryBot.create(:isa_json_compliant_study, investigation: )
+    isa_study = FactoryBot.create(:isa_json_compliant_study, investigation: investigation )
     def_study = FactoryBot.create(:study)
 
     assay_stream = FactoryBot.create(:assay_stream, study: isa_study)
@@ -789,7 +789,7 @@ class AssayTest < ActiveSupport::TestCase
     assert_nil def_assay.previous_linked_sample_type
 
     first_isa_assay = FactoryBot.create(:isa_json_compliant_assay,
-                                         assay_stream: ,
+                                         assay_stream: assay_stream ,
                                          study: isa_study)
     assert_equal first_isa_assay.previous_linked_sample_type, isa_study.sample_types.second
 
@@ -797,7 +797,7 @@ class AssayTest < ActiveSupport::TestCase
                                               linked_sample_type: first_isa_assay.sample_type)
     second_isa_assay = FactoryBot.create(:assay,
                                           study: isa_study,
-                                          assay_stream: ,
+                                          assay_stream: assay_stream ,
                                           sample_type: data_file_sample_type)
 
     assert_equal second_isa_assay.previous_linked_sample_type, first_isa_assay.sample_type
@@ -806,7 +806,7 @@ class AssayTest < ActiveSupport::TestCase
 
   test 'has_linked_child_assay?' do
     investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true)
-    isa_study = FactoryBot.create(:isa_json_compliant_study, investigation: )
+    isa_study = FactoryBot.create(:isa_json_compliant_study, investigation: investigation )
     def_study = FactoryBot.create(:study)
     def_assay = FactoryBot.create(:assay, study:def_study)
 
@@ -816,7 +816,7 @@ class AssayTest < ActiveSupport::TestCase
                                               linked_sample_type: first_isa_assay.sample_type)
     second_isa_assay = FactoryBot.create(:assay,
                                           study: isa_study,
-                                          assay_stream: ,
+                                          assay_stream: assay_stream ,
                                           sample_type: data_file_sample_type)
 
     assert assay_stream.has_linked_child_assay?
@@ -827,17 +827,17 @@ class AssayTest < ActiveSupport::TestCase
 
   test 'next_linked_child_assay' do
     investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true)
-    isa_study = FactoryBot.create(:isa_json_compliant_study, investigation: )
+    isa_study = FactoryBot.create(:isa_json_compliant_study, investigation: investigation )
     def_study = FactoryBot.create(:study)
     def_assay = FactoryBot.create(:assay, study:def_study)
 
     assay_stream = FactoryBot.create(:assay_stream, study: isa_study)
-    first_isa_assay = FactoryBot.create(:isa_json_compliant_assay, study: isa_study, assay_stream: )
+    first_isa_assay = FactoryBot.create(:isa_json_compliant_assay, study: isa_study, assay_stream: assay_stream )
     data_file_sample_type = FactoryBot.create(:isa_assay_data_file_sample_type,
                                               linked_sample_type: first_isa_assay.sample_type)
     second_isa_assay = FactoryBot.create(:assay,
                                           study: isa_study,
-                                          assay_stream: ,
+                                          assay_stream: assay_stream ,
                                           sample_type: data_file_sample_type)
 
     assert_equal assay_stream.first_assay_in_stream, first_isa_assay
