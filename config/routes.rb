@@ -351,6 +351,7 @@ SEEK::Application.routes.draw do
       get :guided_join
       get :import_from_fairdata_station
       post :submit_fairdata_station
+      post :update_annotations_ajax
     end
     resources :programmes, :people, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows, :data_files, :presentations,
               :publications, :events, :sample_types, :samples, :specimens, :strains, :search, :organisms, :human_diseases, :documents, :file_templates, :placeholders, :collections, :templates, only: [:index]
@@ -763,6 +764,7 @@ SEEK::Application.routes.draw do
   resources :single_pages do
     member do
       get :dynamic_table_data
+      post :update_annotations_ajax
     end
     collection do
       get :batch_sharing_permission_preview

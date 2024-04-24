@@ -27,5 +27,5 @@ A response for a **DataFile** such as that for a <a href="#create">**Create**</a
 * References to the <a href="#investigations">**Investigations**</a> associated with the **DataFile**
 * References to the <a href="#studies">**Studies**</a> associated with the **DataFile**
 
-
+**DataFiles** have support for [Extended Metadata](/api#section/Extended-Metadata)
 
