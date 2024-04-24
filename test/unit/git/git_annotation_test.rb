@@ -197,4 +197,26 @@ class GitAnnotationTest < ActiveSupport::TestCase
 
     assert_equal({}, wgv.reload.remote_sources)
   end
+
+  test 'dont save annotation before git version saved' do
+    workflow = FactoryBot.create(:local_git_workflow)
+    wgv = workflow.git_version
+    assert workflow.diagram_path
+    assert wgv.is_a?(Workflow::Git::Version)
+    disable_authorization_checks do
+      wgv.add_file('new_diagram.png', StringIO.new('blah'))
+      wgv.save!
+    end
+
+    new_version = workflow.git_versions.build
+    refute new_version.persisted?
+    assert_no_difference('Git::Annotation.count') do
+      refute new_version.diagram_annotation
+      new_version.diagram_path = 'new_diagram.png'
+      assert new_version.diagram_annotation
+      new_version.diagram_path = 'new_diagram.png'
+      refute new_version.diagram_annotation.persisted?
+      refute new_version.persisted?
+    end
+  end
 end
