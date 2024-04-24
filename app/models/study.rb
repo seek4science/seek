@@ -27,13 +27,19 @@ class Study < ApplicationRecord
 
   has_and_belongs_to_many :sample_types
 
-  validates :investigation, presence: { :message => "is blank or invalid" }
+  validates :investigation, presence: { :message => "is blank or invalid" }, projects: true
 
   enforce_authorization_on_association :investigation, :view
 
   %w[data_file model document].each do |type|
     has_many "#{type}_versions".to_sym, -> { distinct }, through: :assays
     has_many "related_#{type.pluralize}".to_sym, -> { distinct }, through: :assays, source: type.pluralize.to_sym
+  end
+
+  # the associated projects from the Investigation.
+  # Overrides the :through :investigation, as that relies on being saved to the database first, causing validation issues
+  def projects
+    investigation&.projects  || []
   end
 
   def assay_streams

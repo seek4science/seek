@@ -57,7 +57,7 @@ class Assay < ApplicationRecord
   validates_with TechnologyTypeUriValidator
   validates_presence_of :contributor
   validates_presence_of :assay_class
-  validates :study, presence: { message: 'must be selected and valid' }
+  validates :study, presence: { message: 'must be selected and valid' }, projects: true
 
   before_validation :default_assay_and_technology_type
 
@@ -67,6 +67,12 @@ class Assay < ApplicationRecord
   has_filter :assay_class, :assay_type, :technology_type
 
   enforce_authorization_on_association :study, :view
+
+  # the associated projects from the Investigation.
+  # Overrides the :through :study, as that relies on being saved to the database first, causing validation issues
+  def projects
+    study&.projects || []
+  end
 
   def is_assay_stream?
     assay_class&.is_assay_stream?
