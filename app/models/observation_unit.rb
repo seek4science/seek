@@ -1,0 +1,2 @@
+class ObservationUnit < ApplicationRecord
+end

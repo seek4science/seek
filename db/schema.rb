@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_03_11_113858) do
+ActiveRecord::Schema.define(version: 2024_04_24_141740) do
 
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
@@ -1194,6 +1194,19 @@ ActiveRecord::Schema.define(version: 2024_03_11_113858) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_oauth_sessions_on_user_id"
+  end
+
+  create_table "observation_units", force: :cascade do |t|
+    t.string "title"
+    t.string "description"
+    t.string "text"
+    t.string "identifier"
+    t.string "string"
+    t.string "organism_id"
+    t.string "extended_metadata_type_id"
+    t.string "integer"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "observed_variable_sets", force: :cascade do |t|

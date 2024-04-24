@@ -1,4 +1,5 @@
 SEEK::Application.routes.draw do
+  resources :observation_units
   resources :observed_variable_sets
   resources :observed_variables
   use_doorkeeper do
