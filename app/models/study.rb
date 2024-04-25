@@ -20,6 +20,7 @@ class Study < ApplicationRecord
 
   has_many :assay_sops, through: :assays, source: :sops
   has_many :sop_versions, through: :assays
+  has_many :observation_units
 
   has_one :external_asset, as: :seek_entity, dependent: :destroy
 

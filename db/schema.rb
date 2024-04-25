@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_04_24_153929) do
+ActiveRecord::Schema.define(version: 2024_04_25_090243) do
 
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
@@ -1210,6 +1210,7 @@ ActiveRecord::Schema.define(version: 2024_04_24_153929) do
     t.string "uuid"
     t.string "deleted_contributor"
     t.text "other_creators"
+    t.bigint "study_id"
   end
 
   create_table "observation_units_projects", id: false, force: :cascade do |t|
