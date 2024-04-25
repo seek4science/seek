@@ -6,7 +6,10 @@ class TemplatesControllerTest < ActionController::TestCase
   include GeneralAuthorizationTestCases
 
   setup do
-    Seek::Config.send('isa_json_compliance_enabled=', true)
+    @old_setting = Seek::Config.isa_json_compliance_enabled
+    Seek::Config.isa_json_compliance_enabled = true
+    Seek::Util.clear_cached
+
     FactoryBot.create(:person) # to prevent person being first person and therefore admin
     @person = FactoryBot.create(:project_administrator)
     @project = @person.projects.first
@@ -21,6 +24,11 @@ class TemplatesControllerTest < ActionController::TestCase
     @controlled_vocab_type = FactoryBot.create(:controlled_vocab_attribute_type)
     @controlled_vocab_list_type = FactoryBot.create(:cv_list_attribute_type)
     @default_isa_tag = FactoryBot.create(:default_isa_tag)
+  end
+
+  teardown do
+    Seek::Config.isa_json_compliance_enabled = @old_setting
+    Seek::Util.clear_cached
   end
 
   test 'should get new' do
