@@ -502,7 +502,7 @@ SEEK::Application.routes.draw do
     resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :collections, :workflows, :file_templates, :placeholders, only: [:index]
   end
 
-  resources :presentations, concerns: [:has_content_blobs, :publishable, :has_versions, :asset] do
+  resources :presentations, concerns: [:has_content_blobs, :publishable, :has_versions, :asset, :explorable_spreadsheet] do
     resources :people, :programmes, :projects, :publications, :events, :collections, :workflows, :investigations, :studies, :assays, only: [:index]
   end
 
