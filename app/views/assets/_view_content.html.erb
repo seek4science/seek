@@ -18,7 +18,7 @@
       <% url = polymorphic_path([asset, content_blob], action: 'view_content', code: params[:code]) %>
       <% options = { title: 'View contents of this file' } %>
     <% end %>
-  <% elsif !asset.is_a?(Model) && content_blob.is_supported_spreadsheet_format? %>
+  <% elsif asset.supports_spreadsheet_explore? && content_blob.is_supported_spreadsheet_format? %>
     <% if content_blob.is_extractable_spreadsheet? %>
       <% url = polymorphic_path([asset], action: 'explore', code: params[:code], version: asset_version) %>
       <% options = { title: 'Explore the contents of this file' } %>
