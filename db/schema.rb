@@ -1198,10 +1198,8 @@ ActiveRecord::Schema.define(version: 2024_04_25_090243) do
 
   create_table "observation_units", force: :cascade do |t|
     t.string "title"
-    t.string "description"
-    t.string "text"
+    t.text "description"
     t.string "identifier"
-    t.string "string"
     t.bigint "organism_id"
     t.bigint "extended_metadata_type_id"
     t.datetime "created_at", precision: 6, null: false
