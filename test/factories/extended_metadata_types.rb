@@ -137,6 +137,15 @@ FactoryBot.define do
     end
   end
 
+  factory(:simple_observation_unit_extended_metadata_type, class: ExtendedMetadataType) do
+    title { 'simple obs unit extended metadata type' }
+    supported_type { 'ObservationUnit' }
+    after(:build) do |a|
+      a.extended_metadata_attributes << FactoryBot.create(:name_extended_metadata_attribute, title:'name')
+      a.extended_metadata_attributes << FactoryBot.create(:name_extended_metadata_attribute, title:'strain')
+    end
+  end
+
 
   factory(:study_extended_metadata_type_with_clashes, class: ExtendedMetadataType) do
     title { 'study extended metadata type with clashes' }

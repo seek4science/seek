@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_04_24_141740) do
+ActiveRecord::Schema.define(version: 2024_04_24_153929) do
 
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
@@ -1202,11 +1202,21 @@ ActiveRecord::Schema.define(version: 2024_04_24_141740) do
     t.string "text"
     t.string "identifier"
     t.string "string"
-    t.string "organism_id"
-    t.string "extended_metadata_type_id"
-    t.string "integer"
+    t.bigint "organism_id"
+    t.bigint "extended_metadata_type_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.bigint "contributor_id"
+    t.string "uuid"
+    t.string "deleted_contributor"
+    t.text "other_creators"
+  end
+
+  create_table "observation_units_projects", id: false, force: :cascade do |t|
+    t.integer "project_id"
+    t.integer "observation_unit_id"
+    t.index ["observation_unit_id", "project_id"], name: "index_projects_obs_units_on_obs_unit_id_and_project_id"
+    t.index ["project_id"], name: "index_projects_obs_units_on_project_id"
   end
 
   create_table "observed_variable_sets", force: :cascade do |t|

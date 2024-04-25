@@ -6,9 +6,8 @@ class CreateObservationUnits < ActiveRecord::Migration[6.1]
       t.string :text
       t.string :identifier
       t.string :string
-      t.string :organism_id
-      t.string :extended_metadata_type_id
-      t.string :integer
+      t.bigint :organism_id
+      t.bigint :extended_metadata_type_id
 
       t.timestamps
     end
