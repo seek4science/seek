@@ -188,7 +188,7 @@ module Seek
         }
       when Study
         {
-          children: [:positioned_assays],
+          children: [:positioned_assays, :observation_units],
           related: [:publications, :sops],
           parents: [:investigation]
         }
@@ -218,6 +218,10 @@ module Seek
       when Event
         {
           parents: %i[presentations publications data_files documents]
+        }
+      when ObservationUnit
+        {
+          parents: %i[study]
         }
       else
         {}
