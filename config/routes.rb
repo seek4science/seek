@@ -1,5 +1,5 @@
 SEEK::Application.routes.draw do
-  resources :observation_units
+
   resources :observed_variable_sets
   resources :observed_variables
   use_doorkeeper do
@@ -798,6 +798,13 @@ SEEK::Application.routes.draw do
   get '/assay_types/', to: 'assay_types#show', as: 'assay_types'
   get '/modelling_analysis_types/', to: 'assay_types#show', as: 'modelling_analysis_types'
   get '/technology_types/', to: 'technology_types#show', as: 'technology_types'
+
+  ### OBSERVATION UNITS ###
+
+  resources :observation_units, only: [:show] do
+
+    resources :projects, :people, :programmes, :studies
+  end
 
   ### MISC MATCHES ###
   get '/search/' => 'search#index', as: :search

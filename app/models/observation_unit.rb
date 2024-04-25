@@ -2,6 +2,7 @@ class ObservationUnit < ApplicationRecord
 
   include Seek::Creators
   include Seek::ProjectAssociation
+  include Seek::Stats::ActivityCounts
 
   belongs_to :contributor, class_name: 'Person'
   belongs_to :study
@@ -11,6 +12,18 @@ class ObservationUnit < ApplicationRecord
 
   def contributors
     [contributor]
+  end
+
+  def is_in_isa_publishable?
+    false
+  end
+
+  def can_publish?
+    false
+  end
+
+  def related_people
+    (creators + contributors).compact.uniq
   end
 
 end
