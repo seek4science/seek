@@ -1,0 +1,16 @@
+<tr class="sample-cv-term" data-index="<%= index %>">
+  <td><%= text_field_tag "sample_controlled_vocab[sample_controlled_vocab_terms_attributes][#{index}][label]", term.label  %></td>
+  <td><%= text_field_tag "sample_controlled_vocab[sample_controlled_vocab_terms_attributes][#{index}][iri]", term.iri  %></td>
+  <td><%= text_field_tag "sample_controlled_vocab[sample_controlled_vocab_terms_attributes][#{index}][parent_iri]", term.parent_iri  %></td>
+  <td>
+    <div class="btn-group" data-toggle="buttons">
+      <%= hidden_field_tag "sample_controlled_vocab[sample_controlled_vocab_terms_attributes][#{index}][_destroy]", '0', :autocomplete => 'off' %>
+      <label class="btn btn-danger">
+        Remove
+        <%= check_box_tag "sample_controlled_vocab[sample_controlled_vocab_terms_attributes][#{index}][_destroy]", '1', false,
+                          :class => 'destroy-attribute', :autocomplete => 'off',id:"sample_controlled_vocab-checkbox[sample_controlled_vocab_terms_attributes][#{index}][_destroy]" %>
+      </label>
+    </div>
+
+  </td>
+</tr>

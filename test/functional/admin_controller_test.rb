@@ -227,12 +227,42 @@ class AdminControllerTest < ActionController::TestCase
     get :get_stats, xhr: true, params: { page: 'job_queue' }
     assert_response :success
 
-    assert_select 'p', text: 'Total delayed jobs waiting = 1'
+    assert_select 'h4', text: 'Total delayed jobs waiting = 1'
     assert_select 'tr' do
       assert_select 'td', text: /11th Sep 2010 at/, count: 1
       assert_select 'td', text: /12th Sep 2010 at/, count: 1
       assert_select 'td', text: /13th Sep 2010 at/, count: 1
       assert_select "td > span[class='none_text']", text: /No date defined/, count: 1
+    end
+  end
+
+  test 'job queue table' do
+    sop = FactoryBot.create(:sop)
+    admin = FactoryBot.create(:admin)
+    login_as(admin)
+    RdfGenerationQueue.destroy_all
+    ReindexingQueue.destroy_all
+    AuthLookupUpdateQueue.destroy_all
+
+    with_config_value(:auth_lookup_enabled, true) do
+
+      assert RdfGenerationQueue.queue_enabled?
+      assert ReindexingQueue.queue_enabled?
+      assert AuthLookupUpdateQueue.queue_enabled?
+
+      RdfGenerationQueue.enqueue(sop)
+      ReindexingQueue.enqueue(sop)
+      AuthLookupUpdateQueue.enqueue(sop)
+    end
+
+    get :get_stats, xhr: true, params: { page: 'job_queue' }
+    assert_response :success
+
+    assert_select 'div.job-queue-table table' do
+      assert_select 'tbody > tr', count: 3
+      assert_select 'tbody > tr > td', text: 'RdfGenerationQueue'
+      assert_select 'tbody > tr > td', text: 'ReindexingQueue'
+      assert_select 'tbody > tr > td', text: 'AuthLookupUpdateQueue'
     end
   end
 
@@ -345,7 +375,7 @@ class AdminControllerTest < ActionController::TestCase
 
   test 'snapshot and doi stats' do
     investigation = FactoryBot.create(:investigation, title: 'i1', description: 'not blank',
-                            policy: FactoryBot.create(:downloadable_public_policy))
+                            policy: FactoryBot.create(:downloadable_public_policy), creators: [FactoryBot.create(:person)])
     snapshot = investigation.create_snapshot
     snapshot.update_column(:doi, '10.5072/testytest')
     AssetDoiLog.create(asset_type: 'investigation',
@@ -595,4 +625,42 @@ class AdminControllerTest < ActionController::TestCase
     assert_nil Rails.cache.fetch('test-key')
   end
 
+  test 'set/update oidc image' do
+    refute Seek::Config.omniauth_oidc_image_id
+    assert_difference('Avatar.count', 1) do
+      post :update_features_enabled, params: { omniauth_oidc_image: fixture_file_upload('file_picture.png', 'image/png') }
+    end
+
+    id = Seek::Config.omniauth_oidc_image_id
+    assert id
+
+    assert_no_difference('Avatar.count') do
+      post :update_features_enabled, params: { omniauth_oidc_image: fixture_file_upload('file_picture.png', 'image/png') }
+    end
+
+    new_id = Seek::Config.omniauth_oidc_image_id
+    assert new_id
+    assert_not_equal id, new_id
+  end
+
+  test 'clear oidc image' do
+    assert_difference('Avatar.count') do
+      Seek::Config.omniauth_oidc_image = fixture_file_upload('file_picture.png', 'image/png')
+      refute_nil Seek::Config.omniauth_oidc_image_id
+    end
+
+    assert_difference('Avatar.count', -1) do
+      post :update_features_enabled, params: { clear_omniauth_oidc_image: '1' }
+    end
+  end
+
+  test 'clear oidc image does nothing if no image' do
+    assert_nil Seek::Config.omniauth_oidc_image_id
+
+    assert_no_difference('Avatar.count') do
+      post :update_features_enabled, params: { clear_omniauth_oidc_image: '1' }
+    end
+
+    assert flash[:error].blank?
+  end
 end

@@ -61,7 +61,8 @@
 				"Registered Sample List",
 				"Controlled Vocabulary",
 				"URI",
-				"Registered Data file"
+				"Registered Data file",
+				"ENA custom date"
 			]
 		},
 		"CVList": {

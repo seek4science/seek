@@ -245,6 +245,66 @@ class ModelsControllerTest < ActionController::TestCase
     assert_includes assay.models, assigns(:model)
   end
 
+  test 'create, update and show a model with extended metadata' do
+    cmt = FactoryBot.create(:simple_model_extended_metadata_type)
+
+    person = FactoryBot.create(:person)
+    login_as(person)
+
+    assert_difference('ActivityLog.count') do
+      assert_difference('Model.count') do
+        assert_difference('Model::Version.count') do
+          assert_difference('ContentBlob.count') do
+            assert_difference('ExtendedMetadata.count') do
+              post :create, params: { model: { title: 'Model', project_ids: [person.projects.first.id],
+                                                  extended_metadata_attributes:{ extended_metadata_type_id: cmt.id,
+                                                                                 data:{ 'age': 22,'name':'fred'}}},
+                                      content_blobs: [{ data: file_for_upload }], policy_attributes: valid_sharing
+              }
+            end
+          end
+        end
+      end
+    end
+
+
+    assert model = assigns(:model)
+    cm = model.extended_metadata
+    assert_equal cmt, cm.extended_metadata_type
+    assert_equal 'fred',cm.get_attribute_value('name')
+    assert_equal 22,cm.get_attribute_value('age')
+    assert_nil cm.get_attribute_value('date')
+
+
+    get :show, params: { id: model }
+    assert_response :success
+
+    assert_select 'div.extended_metadata',text:/fred/, count:1
+    assert_select 'div.extended_metadata',text:/22/, count:1
+
+    # test update
+    old_id = cm.id
+    assert_no_difference('Model.count') do
+      assert_no_difference('ExtendedMetadata.count') do
+        put :update, params: { id: model.id, model: { title: "new title",
+                                                            extended_metadata_attributes: { extended_metadata_type_id: cmt.id, id: cm.id,
+                                                                                            data: {
+                                                                                              "age": 20,
+                                                                                              "name": 'max'
+                                                                                            } }
+        }
+        }
+      end
+    end
+
+
+    assert new_model = assigns(:model)
+    assert_equal 'new title', new_model.title
+    assert_equal 'max', new_model.extended_metadata.get_attribute_value('name')
+    assert_equal 20, new_model.extended_metadata.get_attribute_value('age')
+    assert_equal old_id, new_model.extended_metadata.id
+  end
+
   test 'missing sharing should default to private' do
     with_config_value 'default_all_visitors_access_type', Policy::NO_ACCESS do
       assert_difference('Model.count', 1) do
@@ -1040,7 +1100,7 @@ class ModelsControllerTest < ActionController::TestCase
 
     get :show, params: { id: model }
 
-    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0'
+    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0 International'
   end
 
   test 'should display license for current version' do
@@ -1051,11 +1111,11 @@ class ModelsControllerTest < ActionController::TestCase
 
     get :show, params: { id: model, version: 1 }
     assert_response :success
-    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0'
+    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0 International'
 
     get :show, params: { id: model, version: modelv.version }
     assert_response :success
-    assert_select '.panel .panel-body a', text: 'CC0 1.0'
+    assert_select '.panel .panel-body a', text: 'Creative Commons Zero v1.0 Universal'
   end
 
   test 'should update license' do
@@ -1070,7 +1130,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_response :redirect
 
     get :show, params: { id: model }
-    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution Share-Alike 4.0'
+    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution Share Alike 4.0 International'
     assert_equal 'CC-BY-SA-4.0', assigns(:model).license
   end
 
@@ -1342,6 +1402,13 @@ class ModelsControllerTest < ActionController::TestCase
     assert_empty model.discussion_links
   end
 
+  test 'do not get index if feature disabled' do
+    with_config_value(:models_enabled, false) do
+      get :index
+      assert_redirected_to root_path
+      assert flash[:error].include?('disabled')
+    end
+  end
 
   private
 

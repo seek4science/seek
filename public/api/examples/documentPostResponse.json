@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "20",
+    "id": "636",
     "type": "documents",
     "attributes": {
       "policy": {
@@ -8,7 +8,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "221",
+              "id": "16368",
               "type": "projects"
             },
             "access": "edit"
@@ -18,6 +18,21 @@
       "discussion_links": [
 
       ],
+      "extended_attributes": {
+        "extended_metadata_type_id": "3006",
+        "attribute_map": {
+          "role_email": "alice@email.com",
+          "role_phone": "0012345",
+          "role_name": {
+            "first_name": "alice",
+            "last_name": "liddell"
+          },
+          "role_address": {
+            "street": "wonder",
+            "city": "land"
+          }
+        }
+      },
       "title": "A Maximal Document",
       "license": "CC-BY-4.0",
       "description": "This is the description",
@@ -30,14 +45,14 @@
         {
           "version": 1,
           "revision_comments": null,
-          "url": "http://localhost:3000/documents/20?version=1",
+          "url": "http://localhost:3000/documents/636?version=1",
           "doi": null
         }
       ],
       "version": 1,
       "revision_comments": null,
-      "created_at": "2022-06-07T14:12:54.000Z",
-      "updated_at": "2022-06-07T14:12:54.000Z",
+      "created_at": "2024-03-15T16:09:56.000Z",
+      "updated_at": "2024-03-15T16:09:56.000Z",
       "doi": null,
       "content_blobs": [
         {
@@ -46,16 +61,16 @@
           "md5sum": null,
           "sha1sum": null,
           "content_type": "application/pdf",
-          "link": "http://localhost:3000/documents/20/content_blobs/93",
+          "link": "http://localhost:3000/documents/636/content_blobs/2814",
           "size": null
         }
       ],
       "creators": [
         {
-          "profile": "/people/208",
+          "profile": "/people/13824",
           "family_name": "Last",
-          "given_name": "Person169",
-          "affiliation": "An Institution: 210",
+          "given_name": "Person59",
+          "affiliation": "An Institution: 80",
           "orcid": null
         }
       ],
@@ -65,7 +80,7 @@
       "creators": {
         "data": [
           {
-            "id": "208",
+            "id": "13824",
             "type": "people"
           }
         ]
@@ -73,7 +88,7 @@
       "submitter": {
         "data": [
           {
-            "id": "207",
+            "id": "13823",
             "type": "people"
           }
         ]
@@ -81,11 +96,11 @@
       "people": {
         "data": [
           {
-            "id": "207",
+            "id": "13823",
             "type": "people"
           },
           {
-            "id": "208",
+            "id": "13824",
             "type": "people"
           }
         ]
@@ -93,7 +108,7 @@
       "projects": {
         "data": [
           {
-            "id": "221",
+            "id": "16368",
             "type": "projects"
           }
         ]
@@ -101,7 +116,7 @@
       "investigations": {
         "data": [
           {
-            "id": "33",
+            "id": "4743",
             "type": "investigations"
           }
         ]
@@ -109,7 +124,7 @@
       "studies": {
         "data": [
           {
-            "id": "31",
+            "id": "3618",
             "type": "studies"
           }
         ]
@@ -117,7 +132,7 @@
       "assays": {
         "data": [
           {
-            "id": "29",
+            "id": "1900",
             "type": "assays"
           }
         ]
@@ -130,21 +145,21 @@
       "workflows": {
         "data": [
           {
-            "id": "9",
+            "id": "334",
             "type": "workflows"
           }
         ]
       }
     },
     "links": {
-      "self": "/documents/20?version=1"
+      "self": "/documents/636?version=1"
     },
     "meta": {
-      "created": "2022-06-07T14:12:54.000Z",
-      "modified": "2022-06-07T14:12:54.000Z",
+      "created": "2024-03-15T16:09:56.000Z",
+      "modified": "2024-03-15T16:09:56.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "d8c94ff0-c899-013a-0f7e-0a81884ed284"
+      "uuid": "63f3bb30-c514-013c-6432-7efdca78d793"
     }
   },
   "jsonapi": {

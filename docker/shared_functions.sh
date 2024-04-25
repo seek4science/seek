@@ -65,6 +65,12 @@ function setup_and_start_cron {
     echo "GENERATING CRONTAB"
     bundle exec whenever > /seek/seek.crontab
 
-    echo "STARTING SUPERCRONIC"
-    supercronic /seek/seek.crontab &
+    if [ -z $QUIET_SUPERCRONIC ]
+    then
+      echo "STARTING SUPERCRONIC"
+      supercronic /seek/seek.crontab &
+    else
+      echo "STARTING SUPERCRONIC (QUIET)"
+      supercronic -quiet /seek/seek.crontab &
+    fi
 }

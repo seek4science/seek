@@ -220,7 +220,7 @@ class WorkflowsControllerTest < ActionController::TestCase
 
     get :show, params: { id: workflow }
 
-    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0'
+    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0 International'
   end
 
   test 'should display license for current version' do
@@ -231,11 +231,11 @@ class WorkflowsControllerTest < ActionController::TestCase
 
     get :show, params: { id: workflow, version: 1 }
     assert_response :success
-    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0'
+    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0 International'
 
     get :show, params: { id: workflow, version: workflowv.version }
     assert_response :success
-    assert_select '.panel .panel-body a', text: 'CC0 1.0'
+    assert_select '.panel .panel-body a', text: 'Creative Commons Zero v1.0 Universal'
   end
 
   test 'should update license' do
@@ -250,7 +250,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_response :redirect
 
     get :show, params: { id: workflow }
-    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution Share-Alike 4.0'
+    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution Share Alike 4.0 International'
     assert_equal 'CC-BY-SA-4.0', assigns(:workflow).license
   end
 
@@ -463,6 +463,7 @@ class WorkflowsControllerTest < ActionController::TestCase
 
     assert_response :success
     assert_equal 'image/svg+xml', response.headers['Content-Type']
+    assert_equal ApplicationController::USER_SVG_CSP, @response.header['Content-Security-Policy']
     assert wf.diagram_exists?
   end
 
@@ -662,7 +663,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     get :ro_crate, params: { id: workflow.id }
 
     assert_redirected_to workflow
-    assert flash[:error].include?("Couldn't generate RO-Crate")
+    assert flash[:error].include?('No @graph found in metadata!')
   end
 
   test 'create RO-Crate even with with duplicated filenames' do
@@ -1765,5 +1766,51 @@ class WorkflowsControllerTest < ActionController::TestCase
     get :show, params: { id: wf }
 
     assert_select 'a.lifemonitor-status[href=?]', "https://app.lifemonitor.eu/workflow;uuid=#{wf.uuid}"
+  end
+
+  test 'do not get index if feature disabled' do
+    with_config_value(:workflows_enabled, false) do
+      get :index
+      assert_redirected_to root_path
+      assert flash[:error].include?('disabled')
+    end
+  end
+
+  test 'shows run button for galaxy workflows using default galaxy endpoint' do
+    workflow = FactoryBot.create(:existing_galaxy_ro_crate_workflow, policy: FactoryBot.create(:public_policy))
+
+    get :show, params: { id: workflow.id }
+
+    assert workflow.can_run?
+    assert_equal 'https://usegalaxy.eu', Seek::Config.galaxy_instance_default
+    trs_url = URI.encode_www_form_component("http://localhost:3000/ga4gh/trs/v2/tools/#{workflow.id}/versions/1")
+    assert_select 'a.btn[href=?]', "https://usegalaxy.eu/workflows/trs_import?trs_url=#{trs_url}&run_form=true",
+                  { text: 'Run on Galaxy' }
+  end
+
+  test 'shows run button for galaxy workflows using specified galaxy endpoint' do
+    workflow = FactoryBot.create(:existing_galaxy_ro_crate_workflow, policy: FactoryBot.create(:public_policy),
+                       execution_instance_url: 'https://galaxygalaxy.org/mygalaxy/')
+
+    get :show, params: { id: workflow.id }
+
+    assert workflow.can_run?
+    trs_url = URI.encode_www_form_component("http://localhost:3000/ga4gh/trs/v2/tools/#{workflow.id}/versions/1")
+    assert_select 'a.btn[href=?]', "https://galaxygalaxy.org/mygalaxy/workflows/trs_import?trs_url=#{trs_url}&run_form=true",
+                  { text: 'Run on Galaxy' }
+  end
+
+  test 'throws error when downloading RO-Crate with missing file' do
+    workflow = FactoryBot.create(:local_git_workflow, policy: FactoryBot.create(:public_policy))
+    gv = workflow.latest_git_version
+    disable_authorization_checks do
+      gv.add_file('ro-crate-metadata.json', File.open(File.join("#{Rails.root}/test/fixtures/files", 'workflows/ro-crate-metadata-missing-file.json')))
+      gv.save!
+    end
+
+    get :ro_crate, params: { id: workflow.id }
+
+    assert_redirected_to workflow
+    assert flash[:error].include?("not found in crate: this-file-does-not-exist")
   end
 end

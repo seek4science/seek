@@ -1,5 +1,10 @@
-<% study ||= nil %>
-<% sample_type = study&.sample_types&.first %>
+<%# Dynamic table with the source samples where users interact with sources %>
+
+<%
+  study ||= nil
+  sample_type = study&.sample_types&.first
+  project = study&.projects&.first
+%>
 
 <div style="padding:0 20px 20px 20px;">
     <div class="row">
@@ -11,26 +16,26 @@
 
 <%= render partial: 'isa_studies/buttons', locals:{ add_row: "SourceAddNewRow()", paste_cb:
 "SourcePasteFromClipboard()", delete: "SourceSetAsDeleted()", save: "SourceSave()",
-permissions: "loadBatchPermission('sourceDynamicTable',this)", exportToExcel: "sourceExportExcel()" } %>
+permissions: "loadBatchPermission('sourceDynamicTable',this)", exportToExcel: "sourceExportExcel()",
+uploadExcel: 'sourceUploadExcel()', sample_type_id: sample_type&.id} %>
 
 <% if sample_type %>
     <script>
     // TODO: Load data in a separeta script tag and remove it after DT is loaded
-        var sourceDynamicTable
-        let initialLoad = true;
+        let sourceMaterialInitialLoad = true;
         $j(document).ready(function () {
             $j('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
                 $j.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
             });
             let dt = <%= sanitize(dt_data(sample_type).to_json) %>
-            sourceDynamicTable = new $j.dynamicTable('#source-material-table')
+            window.sourceDynamicTable = new $j.dynamicTable('#source-material-table')
             const elem = $j("#btn_save_source")
             const options = {
                ajax:{
                     url: dynamicTableDataPath,
                     data: function(d) {
-                        if (initialLoad) {
-                            initialLoad = false;
+                        if (sourceMaterialInitialLoad) {
+                            sourceMaterialInitialLoad = false;
                             return;
                         }
                         d.sample_type_id = '<%=sample_type.id%>';
@@ -49,30 +54,43 @@ permissions: "loadBatchPermission('sourceDynamicTable',this)", exportToExcel: "s
                   $j(".dt-action").removeClass("disabled")
                 }
             }
-            sourceDynamicTable.init(dt.rows, dt.columns, options)
+            window.sourceDynamicTable.init(dt.rows, dt.columns, options)
             dt = []
 
             $j(".dataTables_scrollBody").css("min-height", "300px")
         });
 
         function SourcePasteFromClipboard(){
-            sourceDynamicTable.pasteFromClipboard()
+            window.sourceDynamicTable.pasteFromClipboard()
         }
 
         function SourceSave(){
-            sourceDynamicTable.save()
+            window.sourceDynamicTable.save()
         }
 
         function SourceSetAsDeleted(){
-            sourceDynamicTable.setAsDeleted()
+            window.sourceDynamicTable.setAsDeleted()
         }
 
         function SourceAddNewRow(){
-            sourceDynamicTable.newRow()
+            window.sourceDynamicTable.newRow()
         }
 
         function sourceExportExcel() {
             exportToExcel("source-material-table", '<%=study.id%>', null, '<%=sample_type.id%>');
+        }
+
+        function sourceUploadExcel(){
+          const file = $j('input[type="file"][id="file-<%=sample_type.id%>"]').toArray()[0].files[0];
+          if (!file) {
+            alert("File not found! Please select a file to upload.");
+            return
+          }
+          let formData = new FormData();
+          formData.append('file', file);
+          formData.append('sample_type_id', <%=sample_type&.id%>);
+          formData.append('project_id', <%=project&.id%>);
+          handleUploadSubmit(formData);
         }
 
     </script>

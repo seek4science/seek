@@ -30,7 +30,9 @@ module Scrapers
       unless project
         project = Project.new(attributes)
         disable_authorization_checks { project.save! }
-        bot = bot_account
+      end
+      bot = bot_account
+      unless project.has_member?(bot)
         bot.add_to_project_and_institution(project, bot_institution)
         bot.is_project_administrator = true, project
         disable_authorization_checks { bot.save! }

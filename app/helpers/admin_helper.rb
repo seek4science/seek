@@ -94,11 +94,11 @@ module AdminHelper
     end
   end
 
-  def admin_setting_block(title, description)
+  def admin_setting_block(title, description = nil)
     content_tag(:div, class: 'form-group') do
-      content_tag(:label, title) +
-        (description ? content_tag(:p, description.html_safe, class: 'help-block') : ''.html_safe) +
-        yield
+      concat content_tag(:label, title)
+      concat content_tag(:p, description.html_safe, class: 'help-block') if description
+      concat yield
     end
   end
 end

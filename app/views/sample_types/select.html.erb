@@ -3,7 +3,7 @@
   projects = Project.all.select{|p| p.sample_types.any? }
   your_projects = projects & current_user.person.projects
   other_projects = projects - your_projects
-	templates_enabled = Seek::Config.sample_type_template_enabled
+	templates_enabled = Seek::Config.isa_json_compliance_enabled
 %>
 
 <% # The Select page is the base browse page for sample     %>
@@ -63,7 +63,7 @@
 <script>
   var SampleTypeFilters={
     optionChanged:function() {
-      $j.ajax('<%= filter_for_select_sample_types_path %>', {
+      $j.ajax('<%= filter_for_select_sample_types_path(project_ids: params[:project_ids]) %>', {
             data: SampleTypeFilters.queryData(),
             success: function (html) {
               $j('#selected-sample-types').html(html);

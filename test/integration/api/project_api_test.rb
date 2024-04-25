@@ -14,6 +14,8 @@ class ProjectApiTest < ActionDispatch::IntegrationTest
     @institution = FactoryBot.create(:institution)
     @programme = FactoryBot.create(:programme)
     @organism = FactoryBot.create(:organism)
+    @emt = FactoryBot.create(:family_extended_metadata_type)
+
   end
 
   test 'normal user cannot create project' do

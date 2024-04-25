@@ -39,4 +39,26 @@ class InvestigationApiTest < ActionDispatch::IntegrationTest
       end
     end
   end
+
+  test 'extended metadata not shown if disabled' do
+    person = FactoryBot.create(:person)
+
+    emt = FactoryBot.create(:simple_study_extended_metadata_type)
+    investigation = FactoryBot.create(:investigation, extended_metadata: ExtendedMetadata.new(extended_metadata_type: emt, data: { name: 'John', age: 12 }), contributor: person)
+    user_login(person)
+
+    # first check it's present
+    get "/#{plural_name}/#{investigation.id}.json"
+    assert_response :success
+    json = JSON.parse(response.body)
+    assert_equal emt.id.to_s, json.dig('data','attributes','extended_attributes','extended_metadata_type_id')
+
+    # now without
+    emt.update_column(:enabled, false)
+    get "/#{plural_name}/#{investigation.id}.json"
+    assert_response :success
+    json = JSON.parse(response.body)
+    refute_nil attributes = json.dig('data','attributes')
+    refute attributes.key?('extended_attributes')
+  end
 end

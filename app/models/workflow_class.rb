@@ -20,6 +20,10 @@ class WorkflowClass < ApplicationRecord
     extractor.present?
   end
 
+  def executable?
+    key == 'galaxy'
+  end
+
   def self.extractable
     where.not(extractor: nil)
   end

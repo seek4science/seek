@@ -2,12 +2,7 @@ require 'ro_crate'
 
 module ROCrate
   class WorkflowCrate < ::ROCrate::Crate
-    PROFILE = {
-      '@id' => 'https://about.workflowhub.eu/Workflow-RO-Crate/',
-      '@type' => 'CreativeWork',
-      'name' => 'Workflow RO-Crate Profile',
-      'version' => '0.2.0'
-    }.freeze
+    PROFILE_REF = { '@id' => 'https://w3id.org/workflowhub/workflow-ro-crate/1.0' }.freeze
 
     include ActiveModel::Model
 
@@ -17,12 +12,11 @@ module ROCrate
 
     def initialize(*args)
       super.tap do
-        prof = add_contextual_entity(ROCrate::ContextualEntity.new(self, nil, PROFILE))
-        conforms = metadata['conformsTo']
+        conforms = self['conformsTo']
         if conforms.is_a?(Array)
-          metadata['conformsTo'] << prof.reference
+          self['conformsTo'] << PROFILE_REF
         else
-          metadata['conformsTo'] = [{ '@id' => ::ROCrate::Metadata::SPEC }, prof.reference]
+          self['conformsTo'] = [{ '@id' => ::ROCrate::Metadata::SPEC }, PROFILE_REF]
         end
       end
     end

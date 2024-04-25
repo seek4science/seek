@@ -27,6 +27,7 @@ class RenderersTest < ActiveSupport::TestCase
     assert_equal Seek::Renderers::NotebookRenderer, factory.renderer(FactoryBot.create(:jupyter_notebook_content_blob)).class
     assert_equal Seek::Renderers::TextRenderer, factory.renderer(FactoryBot.create(:txt_content_blob)).class
     assert_equal Seek::Renderers::ImageRenderer, factory.renderer(FactoryBot.create(:image_content_blob)).class
+    assert_equal Seek::Renderers::ImageRenderer, factory.renderer(FactoryBot.create(:svg_content_blob)).class
     assert_equal Seek::Renderers::BlankRenderer, factory.renderer(FactoryBot.create(:binary_content_blob)).class
   end
 
@@ -344,6 +345,15 @@ class RenderersTest < ActiveSupport::TestCase
     git_blob.rewind
     assert_equal "This is a txt format\n", renderer.render_standalone
 
+    @git.add_file('test.html', StringIO.new('<script>Danger!</script>'))
+    git_blob = @git.get_blob('test.html')
+    renderer = Seek::Renderers::TextRenderer.new(git_blob)
+    assert renderer.can_render?
+    assert_equal "<pre>&lt;script&gt;Danger!&lt;/script&gt;</pre>", renderer.render
+
+    git_blob.rewind
+    assert_equal "<script>Danger!</script>", renderer.render_standalone # Content-Security-Policy will prevent execution in standalone
+
     blob = FactoryBot.create(:csv_content_blob, asset: @asset)
     renderer = Seek::Renderers::TextRenderer.new(blob)
     assert renderer.can_render?
@@ -353,6 +363,12 @@ class RenderersTest < ActiveSupport::TestCase
     blob = FactoryBot.create(:image_content_blob, asset: @asset)
     renderer = Seek::Renderers::TextRenderer.new(blob)
     refute renderer.can_render?
+
+    @git.add_remote_file('empty', 'https://example.com/file', fetch: false)
+    git_blob = @git.get_blob('empty')
+    renderer = Seek::Renderers::TextRenderer.new(git_blob)
+    assert renderer.can_render?
+    assert_equal '<span class="subtle">No content to display</span>', renderer.render
   end
 
   test 'image renderer' do
@@ -378,9 +394,22 @@ class RenderersTest < ActiveSupport::TestCase
     assert_select 'iframe', count: 0
     assert_select '#navbar', count: 0
     assert_select 'img.git-image-preview'
+
     blob = FactoryBot.create(:txt_content_blob, asset: @asset)
     renderer = Seek::Renderers::ImageRenderer.new(blob)
     refute renderer.can_render?
+
+    @git.add_file('test.svg', open_fixture_file('transparent-fairdom-logo-square.svg'))
+    git_blob = @git.get_blob('test.svg')
+    renderer = Seek::Renderers::ImageRenderer.new(git_blob)
+    assert renderer.can_render?
+    @html = Nokogiri::HTML.parse(renderer.render)
+    assert_select 'img.git-image-preview'
+
+    @html = Nokogiri::HTML.parse(renderer.render_standalone)
+    assert_select 'iframe', count: 0
+    assert_select '#navbar', count: 0
+    assert_select 'img.git-image-preview'
   end
 
   def document_root_element

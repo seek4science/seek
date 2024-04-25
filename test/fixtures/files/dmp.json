@@ -1,0 +1,89 @@
+{
+    "dmp": {
+      "contact": {
+        "contact_id": {
+          "identifier": "test",
+          "type": "orcid"
+        },
+        "mbox": "user@test.com",
+        "name": "Test User"
+      },
+      "contributor": [
+        {
+          "contributor_id": {
+            "identifier": "test",
+            "type": "orcid"
+          },
+          "mbox": "user@test.com",
+          "name": "Test User",
+          "role": ["contact person", "data steward", "supervisor"]
+        },
+        {
+          "contributor_id": {
+            "identifier": "test",
+            "type": "orcid"
+          },
+          "mbox": "user2@test.com",
+          "name": "Another Test User",
+          "role": ["data steward"]
+        }
+      ],
+      "created": "2023-09-24T17:14:32Z",
+      "dataset": [
+        {
+          "dataset_id": {
+            "identifier": "a",
+            "type": "other"
+          },
+          "description": "a",
+          "distribution": [
+            {
+              "data_access": "open",
+              "license": [
+                {
+                  "license_ref": "https://creativecommons.org/publicdomain/zero/1.0/",
+                  "start_date": "2023-09-18"
+                }
+              ],
+              "title": "a"
+            }
+          ],
+          "personal_data": "yes",
+          "sensitive_data": "yes",
+          "title": "a"
+        }
+      ],
+      "description": "This maDMP has been created using Data Stewardship Wizard (DSW, ds-wizard.org) and is based on knowledge model Life Sciences DSW Knowledge Model (dsw:lifesciences:2.6.2). The questionnaire used for this DMP is identified by UUID \"04efb18f-5bb2-42fc-9ca4-3f4d28f2118f\" within https://dsw-test.elixir.no DSW instance.",
+      "dmp_id": {
+        "identifier": "https://dsw-test.elixir.no/questionnaires/04efb18f-5bb2-42fc-9ca4-3f4d28f2118f",
+        "type": "url"
+      },
+      "ethical_issues_description": "We will collect data connected to a person, i.e. \"personal data\".",
+      "ethical_issues_exist": "yes",
+      "language": "eng",
+      "modified": "2023-09-24T17:14:32Z",
+      "project": [
+        {
+          "description": "description",
+          "end": "2023-10-19",
+          "funding": [
+            {
+              "funder_id": {
+                "identifier": "test",
+                "type": "url"
+              },
+              "funding_status": "planned",
+              "grant_id": {
+                "identifier": "test",
+                "type": "other"
+              }
+            }
+          ],
+          "start": "2023-09-19",
+          "title": "The Project"
+        }
+      ],
+      "title": "The DMP"
+    }
+  }
+  

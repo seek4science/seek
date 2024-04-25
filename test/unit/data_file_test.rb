@@ -217,14 +217,14 @@ class DataFileTest < ActiveSupport::TestCase
     end
   end
 
-  test 'sample template?' do
+  test 'matching sample type?' do
     create_sample_attribute_type
 
     person = FactoryBot.create(:person)
 
     User.with_current_user(person.user) do
       data_file = FactoryBot.create :data_file, content_blob: FactoryBot.create(:sample_type_populated_template_content_blob), policy: FactoryBot.create(:public_policy)
-      refute data_file.sample_template?
+      refute data_file.matching_sample_type?
       assert_empty data_file.possible_sample_types
 
       sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id], contributor: person
@@ -232,14 +232,18 @@ class DataFileTest < ActiveSupport::TestCase
       sample_type.build_attributes_from_template
       disable_authorization_checks { sample_type.save! }
 
-      assert data_file.sample_template?
+      assert data_file.matching_sample_type?
       assert_includes data_file.possible_sample_types, sample_type
 
       #doesn't match
       data_file = FactoryBot.create :data_file, content_blob: FactoryBot.create(:small_test_spreadsheet_content_blob), policy: FactoryBot.create(:public_policy)
-      refute data_file.sample_template?
+      refute data_file.matching_sample_type?
       assert_empty data_file.possible_sample_types
 
+      # nil blob
+      data_file = FactoryBot.create :data_file, content_blob: nil, policy: FactoryBot.create(:public_policy)
+      refute data_file.matching_sample_type?
+      assert_empty data_file.possible_sample_types
     end
   end
 
@@ -249,7 +253,7 @@ class DataFileTest < ActiveSupport::TestCase
     person = FactoryBot.create(:person)
 
     data_file = FactoryBot.create :data_file, content_blob: FactoryBot.create(:sample_type_populated_template_content_blob), policy: FactoryBot.create(:public_policy)
-    refute data_file.sample_template?
+    refute data_file.matching_sample_type?
     assert_empty data_file.possible_sample_types
 
     #visible
@@ -275,6 +279,7 @@ class DataFileTest < ActiveSupport::TestCase
       refute_includes possible,sample_type2
     end
   end
+
 
   test 'factory test' do
     # sanity check that the updated factories work whilst fixing them, no harm leaving this test here
@@ -489,4 +494,25 @@ class DataFileTest < ActiveSupport::TestCase
     assert data_file.respond_to?(:data_format_annotations)
     assert data_file.respond_to?(:data_type_annotations)
   end
+
+  test 'related samples include extracted samples and samples linked in attributes' do
+    project = FactoryBot.create(:project)
+    df_no_samples = FactoryBot.create(:data_file) # No samples
+    df_extracted = FactoryBot.create(:data_file)  # Extracted samples
+    df_attributes = FactoryBot.create(:data_file) # Linked in sample's attributes only
+    df_ext_attr = FactoryBot.create(:data_file)   # Extracted samples and linked in sample's attributes
+    type = FactoryBot.create(:data_file_sample_type, project_ids: [project.id])
+    sample1 = Sample.new(sample_type: type, project_ids: [project.id], originating_data_file: df_extracted)
+    sample1.update(data: { 'data file': df_ext_attr.id })
+    sample1.save!
+    sample2 = Sample.new(sample_type: type, project_ids: [project.id], originating_data_file: df_ext_attr)
+    sample2.update(data: { 'data file': df_attributes.id })
+    sample2.save!
+
+    assert_equal [], df_no_samples.related_samples
+    assert_equal [sample1], df_extracted.related_samples
+    assert_equal [sample2].sort_by(&:id), df_attributes.related_samples
+    assert_equal [sample1, sample2].sort_by(&:id), df_ext_attr.related_samples.sort_by(&:id)
+  end
+
 end

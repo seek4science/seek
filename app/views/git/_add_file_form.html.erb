@@ -39,7 +39,7 @@
         </div>
 
         <div class="alert alert-info" role="alert" style="display: none;" data-role="seek-url-checker-msg-too-big">
-          This file exceeds <%= Seek::Config.application_name %>'s remote file size limit of
+          This file exceeds <%= Seek::Config.instance_name %>'s remote file size limit of
           <strong><%= number_to_human_size(Seek::Config.hard_max_cachable_size) -%></strong>
           and so only a link to the file will be stored.
         </div>

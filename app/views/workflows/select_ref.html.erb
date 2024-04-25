@@ -1,6 +1,7 @@
 <h1>Select Target</h1>
 
 <%= form_tag(polymorphic_path(@workflow.persisted? ? [:create_version_from_git, @workflow] : [:create_from_git, :workflows])) do %>
+  <%= hidden_field_tag "workflow[project_ids][]",@workflow.project_ids %>
   <%= hidden_field_tag "workflow[git_version_attributes][git_repository_id]", @workflow.git_version.git_repository.id %>
   <%= render partial: 'git_repositories/ref_form', locals: { name: "workflow[git_version_attributes][ref]",
                                                              git_repository:  @workflow.git_version.git_repository } %>

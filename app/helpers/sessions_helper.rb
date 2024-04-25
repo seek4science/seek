@@ -47,4 +47,25 @@ module SessionsHelper
   def show_github_login?
     Seek::Config.omniauth_github_enabled
   end
+
+  def show_oidc_login?
+    Seek::Config.omniauth_oidc_enabled
+  end
+
+  def omniauth_method_name(key)
+    name = nil
+    name = Seek::Config.omniauth_oidc_name if key == :oidc
+    name = t("login.#{key}") if name.blank?
+    name
+  end
+
+  def oidc_login_button(original_path)
+    text = "Sign in with #{Seek::Config.omniauth_oidc_name}"
+    link = omniauth_authorize_path(:oidc, state: "return_to:#{original_path}")
+    if Seek::Config.omniauth_oidc_image_id && (avatar = Avatar.find_by_id(Seek::Config.omniauth_oidc_image_id))
+      link_to(image_tag(avatar.public_asset_url, alt: text), link, method: :post)
+    else
+      button_link_to(text, 'lock', link, method: :post)
+    end
+  end
 end

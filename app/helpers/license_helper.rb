@@ -3,15 +3,23 @@ require 'seek/license'
 
 module LicenseHelper
   def license_select(name, selected = nil, opts = {})
-    select_tag(name, options_for_select(license_options(opts), selected), opts)
+    opts[:data] ||= {}
+    opts[:data]['seek-license-select'] ||= 'true'
+    opts[:multiple] = false
+
+    recommended = opts.delete(:recommended)
+    source = opts.delete(:source) || Seek::License.combined
+    if recommended
+      opts[:select_options] = grouped_options_for_select(grouped_license_options(source.values, recommended), selected)
+    else
+      opts[:select_options] = options_for_select(license_options(source.values), selected)
+    end
+
+    objects_input(name, [], opts)
   end
 
-  def grouped_license_select(name, selected = nil, opts = {})
-    select_tag(name, grouped_options_for_select(grouped_license_options(opts), selected), opts)
-  end
-
-  def describe_license(id, source = nil)
-    license = Seek::License.find(id, source)
+  def describe_license(id)
+    license = Seek::License.find(id)
     content = license_description_content(license)
 
     if !license || license.is_null_license?
@@ -67,50 +75,34 @@ module LicenseHelper
     end
   end
 
-  def license_values(opts = {})
-    opts.delete(:source) || Seek::License.open_definition[:all]
-  end
-
-  def license_options(opts = {})
-    license_values(opts).map { |value| [value['title'], value['id'], { 'data-url' => value['url'] }] }
-  end
-
-  def grouped_license_options(opts = {})
-    grouped_licenses = sort_grouped_licenses(group_licenses(opts))
-
-    grouped_licenses.each do |g, licenses|
-      licenses.map! { |value| [value['title'], value['id'], { 'data-url' => value['url'] }] }
-    end
-
-    grouped_licenses
-  end
-
-  def sort_grouped_licenses(licenses)
-    s = licenses.sort_by do |pair|
-      case pair[0]
-      when 'recommended'
-        0
-#      when 'Generic'
-#        2
+  def license_options(licenses)
+    licenses.map do |value|
+      [value['title'], value['id'], { 'data-url' => value['url'] }]
+    end.sort_by do |value|
+      if value[1] == Seek::License::NULL_LICENSE # Put null license first
+        '-'
       else
-        3
+        value[0] # Otherwise sort by title
       end
     end
-    s.each do |pair|
-      pair[0] = "#{t('licenses.' + pair[0])}"
-    end
-    s
   end
 
-  def group_licenses(opts)
-    recommended = opts.delete(:recommended)
-    license_values(opts).group_by do |l|
+  def grouped_license_options(licenses, recommended)
+    grouped_licenses = licenses.group_by do |l|
       if recommended&.include?(l['id'])
         'recommended'
       else
         'other'
       end
-    end.to_a
+    end
+
+    grouped_licenses.transform_values! do |l|
+      license_options(l)
+    end
+
+    # Transform into array to ensure recommended licenses come first
+    ['recommended', 'other'].map do |key|
+      [t("licenses.#{key}"), grouped_licenses[key] || []]
+    end
   end
-  
 end

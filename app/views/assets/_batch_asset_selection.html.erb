@@ -1,0 +1,108 @@
+<%
+  publishing ||= false
+  show_hide_blocked ||= false
+  show_permissions ||= false
+  show_managers ||= false
+-%>
+
+<div class="batch-selection-scope tabpanel" id="batch-asset-selection">
+  <%= render partial: 'assets/batch_selection/buttons', locals: {
+    text: "your items",
+    select_deselect_all: true,
+    collapse_expand: true,
+    show_hide_blocked: publishing,
+    show_hide_permissions: show_permissions
+  } %>
+
+  <ul class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="active">
+      <a href="#sorted_by_type" aria-controls="sorted_by_type" role="tab" data-toggle="tab">
+        Sort by type
+      </a>
+    </li>
+    <li role="presentation">
+      <a href="#sorted_by_isa" aria-controls="sorted_by_isa" role="tab" data-toggle="tab">
+        Sort by ISA
+      </a>
+    </li>
+  </ul>
+
+  <div class="tab-content batch-selection-collapse">
+    <div id="sorted_by_type" role="tabpanel" class="tab-pane active">
+      <% @assets.sort_by { |k, v| v.first.class.name }.each do |type, items| %>
+        <div id="<%= items.first.class.table_name %>" class="batch-selection-scope">
+          <h2><%= batch_selection_collapse_toggle -%> <%= text_for_resource items.first %>(s)</h2>
+          <div class="batch-selection-collapse">
+            <%= render partial: 'assets/batch_selection/buttons', locals: {
+              text: (text_for_resource items.first).downcase.pluralize,
+              show_hide_blocked: publishing,
+              select_deselect_all: true
+            } %>
+            <% items.each do |item| %>
+              <%= render partial: 'assets/batch_selection/asset_row',
+                         object: item,
+                         locals: { html_classes: 'publishing_options',
+                                   publishing: publishing,
+                                   show_permissions: show_permissions,
+                                   show_managers: show_managers
+                         } -%>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <div id="sorted_by_isa" role="tabpanel" class="tab-pane">
+      <% unless @assets_not_in_isa.empty? %>
+        <div id="items_not_in_isa" class="batch-selection-scope">
+          <h2><%= batch_selection_collapse_toggle -%> Items not in ISA</h2>
+          <div class="batch-selection-collapse">
+            <%= render partial: 'assets/batch_selection/buttons', locals: {
+              text: "items not in ISA",
+              show_hide_blocked: publishing,
+              select_deselect_all: true
+            } %>
+            <% @assets_not_in_isa.each do |item| %>
+              <%= render partial: 'assets/batch_selection/asset_row',
+                         object: item,
+                         locals: { html_classes: "publishing_options",
+                                   publishing: publishing,
+                                   show_permissions: show_permissions,
+                                   show_managers: show_managers
+                         } -%>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+
+      <% unless @investigations.empty? %>
+        <div id="items_in_isa" class="batch-selection-scope">
+          <h2><%= batch_selection_collapse_toggle-%> Items in ISA</h2>
+          <div class="batch-selection-collapse">
+            <%= render partial: 'assets/batch_selection/buttons', locals: {
+              text: "items in ISA",
+              select_deselect_all: true,
+              collapse_expand: true,
+              show_hide_blocked: show_hide_blocked
+            } %>
+            <div id="investigation_list">
+              <% @investigations.each do |inv| %>
+                <% collection = inv.assays.map(&:study).map(&:investigation).flatten.uniq %>
+                <% collection = inv.studies.map(&:investigation).flatten.uniq if collection.empty? %>
+                <% collection = [inv] if collection.empty?%>
+                <%= render partial: 'assets/batch_selection/asset_row',
+                           locals: { publishing: publishing,
+                                     show_permissions: show_permissions,
+                                     show_managers: show_managers,
+                                     show_children: true
+                           },
+                           collection: collection %>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+

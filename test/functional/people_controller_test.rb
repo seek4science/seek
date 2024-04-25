@@ -1039,6 +1039,12 @@ class PeopleControllerTest < ActionController::TestCase
       assert_select 'div.list_item_title  a[href=?]', data_file_path(other_data_file), text: /#{other_data_file.title}/, count: 0
       assert_select 'div.list_item_title  a[href=?]', project_path(other_project), text: /#{other_project.title}/, count: 0
     end
+
+    assert_select 'div#buttons' do
+      assert_select 'a[href=?]', batch_sharing_permission_preview_person_path(me),text: /Batch permission changes/
+      assert_select 'a[href=?]', batch_publishing_preview_person_path(me),text: /Publish your items/
+    end
+
   end
 
   test 'my items permissions' do

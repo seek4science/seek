@@ -43,6 +43,13 @@ FactoryBot.define do
       FileUtils.cp_r(File.join(Rails.root, 'test', 'fixtures', 'git', 'nf-core-rnaseq', '_git', '.'), File.join(r.local_path, '.git'))
     end
   end
+
+  factory(:nfcore_remote_repository, class: Git::Repository) do
+    after(:create) do |r|
+      FileUtils.cp_r(File.join(Rails.root, 'test', 'fixtures', 'git', 'nf-core-rnaseq', '_git', '.'), File.join(r.local_path, '.git'))
+    end
+    remote { "https://github.com/nf-core/rnaseq.git" }
+  end
   
   # GitVersions
   factory(:git_version, class: Git::Version) do

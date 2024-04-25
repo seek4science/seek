@@ -30,4 +30,5 @@ A response for a **Project** such as that for a <a href="#create">**Create**</a>
 * References to <a href="#presentations">**Presentations**</a> that belong to the <a href="#projects">**Project**</a>
 * References to <a href="#events">**Events**</a> that are held by or attended by the <a href="#projects">**Project**</a>
 
+**Projects** have support for [Extended Metadata](/api#section/Extended-Metadata)
 

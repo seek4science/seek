@@ -73,5 +73,6 @@ module SEEK
 
     config.active_record.belongs_to_required_by_default = false
     config.action_mailer.delivery_job = 'ActionMailer::MailDeliveryJob' # Can remove after updating defaults
+    config.action_mailer.preview_path = "#{Rails.root}/test/mailers/previews" # For some reason it is looking in spec/ by default
   end
 end

@@ -204,6 +204,8 @@ class PolicyBasedAuthTest < ActiveSupport::TestCase
         sop.update_lookup_table(user)
         assert_equal 1, Sop.lookup_count_for_user(user.id)
         assert sop.destroy
+        assert_equal 1, Sop.lookup_count_for_user(user.id)
+        AuthLookupDeleteJob.perform_now('Sop', sop.id)
         assert_equal 0, Sop.lookup_count_for_user(user.id)
       end
     end

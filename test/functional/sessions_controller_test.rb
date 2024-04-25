@@ -199,13 +199,21 @@ class SessionsControllerTest < ActionController::TestCase
       end
       with_config_value(:omniauth_ldap_enabled, true) do
         with_config_value(:omniauth_elixir_aai_enabled, false) do
-          get :new
-          assert_response :success
-          assert_select '#login-panel form', 2
-          assert_select '#ldap_login input[name="username"]', 1
-          assert_select '#ldap_login input[name="password"]', 1
-          assert_select '#elixir_aai_login a', 0
+          with_config_value(:omniauth_oidc_enabled, false) do
+            get :new
+            assert_response :success
+            assert_select '#login-panel form', 2
+            assert_select '#ldap_login input[name="username"]', 1
+            assert_select '#ldap_login input[name="password"]', 1
+            assert_select '#elixir_aai_login a', 0
+            assert_select '#oidc_login a', 0
+          end
         end
+      end
+      with_config_value(:omniauth_oidc_enabled, true) do
+        get :new
+        assert_response :success
+        assert_select '#oidc_login a', 1
       end
     end
   end
@@ -222,6 +230,21 @@ class SessionsControllerTest < ActionController::TestCase
 
     sha1_user.reload
     assert_equal User.sha256_encrypt(test_password, sha1_user.salt), sha1_user.crypted_password
+  end
+
+  test 'should show custom OIDC image if set' do
+    with_config_value(:omniauth_oidc_enabled, true) do
+      get :new
+
+      assert_select '#oidc_login a', text: 'Sign in with SEEK Testing OIDC'
+      assert_select '#oidc_login a img.icon'
+
+      Seek::Config.omniauth_oidc_image = fixture_file_upload('file_picture.png', 'image/png')
+      get :new
+
+      assert_select '#oidc_login a img.icon', count: 0
+      assert_select '#oidc_login a img[src=?]', Seek::Config.omniauth_oidc_image.public_asset_url
+    end
   end
 
   protected

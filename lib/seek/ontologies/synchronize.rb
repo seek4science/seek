@@ -99,7 +99,7 @@ module Seek
 
       def determine_assay_class_from_uri(uri)
         ontology_class = Seek::Ontologies::AssayTypeReader.instance.class_for_uri(uri)
-        ontology_class.nil? ? AssayClass.for_type('modelling') : AssayClass.for_type('experimental')
+        ontology_class.nil? ? AssayClass.modelling : AssayClass.experimental
       end
 
       def get_suggested_types_found_in_ontology(type)

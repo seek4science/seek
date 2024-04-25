@@ -15,11 +15,13 @@ class DataFile < ApplicationRecord
   # allow same titles, but only if these belong to different users
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a Data file with such title."
 
-  has_one :content_blob, ->(r) { where('content_blobs.asset_version =?', r.version) }, as: :asset, foreign_key: :asset_id
+  has_one :content_blob, ->(r) { where('content_blobs.asset_version =? AND deleted =?', r.version, false) }, as: :asset, foreign_key: :asset_id
   has_one :external_asset, as: :seek_entity, dependent: :destroy
 
   belongs_to :file_template
   has_many :extracted_samples, class_name: 'Sample', foreign_key: :originating_data_file_id
+  has_many :sample_resource_links, -> { where(resource_type: 'DataFile') }, class_name: 'SampleResourceLink', foreign_key: :resource_id
+  has_many :linked_samples, through: :sample_resource_links, source: :sample
 
   has_many :workflow_data_files, dependent: :destroy, autosave: true
   has_many :workflows, ->{ distinct }, through: :workflow_data_files
@@ -109,20 +111,20 @@ class DataFile < ApplicationRecord
     true
   end
 
-  # FIXME: bad name, its not whether it IS a template, but whether it originates from a template
-  def sample_template?
+  def matching_sample_type?
     return false if external_asset.is_a? OpenbisExternalAsset
+
     possible_sample_types.any?
-  rescue SysMODB::SpreadsheetExtractionException
-    false
   end
 
+  # returns all matching sample types
   def possible_sample_types(user = User.current_user)
-    content_blob.present? ? SampleType.sample_types_matching_content_blob(content_blob,user) : []
+    SampleType.sample_types_matching_content_blob(content_blob,user)
   end
+
 
   def related_samples
-    extracted_samples
+    extracted_samples + linked_samples
   end
 
   # Extracts samples using the given sample_type
@@ -150,7 +152,7 @@ class DataFile < ApplicationRecord
       sample.project_ids = project_ids
       sample.contributor = contributor
       sample.originating_data_file = self
-      sample.policy = policy
+      sample.policy = policy.deep_copy
       sample.save if sample.valid? && confirm
 
       extracted << sample

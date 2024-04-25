@@ -17,9 +17,11 @@
     <span class="glyphicon glyphicon-th-list"></span> Related items
   <% end %>
 
-	<% if Seek::Config.project_single_page_advanced_enabled && displaying_single_page? && resource %>
-		<%= tab(resource_name&.downcase + "_design") do %>
-			<span class="glyphicon glyphicon-th-list"></span> <%= resource.model_name.human %> design
+	<% if resource %>
+		<% if Seek::Config.isa_json_compliance_enabled && resource.is_isa_json_compliant? %>
+			<%= tab(resource_name&.downcase + "_design") do %>
+				<span class="glyphicon glyphicon-th-list"></span> <%= resource.model_name.human %> design
+			<% end %>
 		<% end %>
 	<% end %>
 </ul>

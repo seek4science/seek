@@ -7,28 +7,38 @@ require 'rake'
 
 class RegularMaintenanceJob < ApplicationJob
   RUN_PERIOD = 4.hours.freeze
-  BLOB_GRACE_PERIOD = 8.hours.freeze
+  REMOVE_DANGLING_BLOB_GRACE_PERIOD = 8.hours.freeze
+  REMOVE_DELETED_BLOB_GRACE_PERIOD = 24.hours.freeze
   REPO_GRACE_PERIOD = 8.hours.freeze
   USER_GRACE_PERIOD = 1.week.freeze
   MAX_ACTIVATION_EMAILS = 3
   RESEND_ACTIVATION_EMAIL_DELAY = 4.hours.freeze
 
   def perform
-    clean_content_blobs
+    remove_dangling_content_blobs
+    remove_deleted_content_blobs
     clean_git_repositories
     resend_activation_emails
     remove_unregistered_users
-    trim_session
     check_authlookup_consistency
   end
 
   private
 
-  # clean up dangling content blobs that are older than BLOB_GRACE_PERIOD and not associated with an asset
-  def clean_content_blobs
-    ContentBlob.where(asset: nil).where('created_at < ?', BLOB_GRACE_PERIOD.ago).select do |blob|
+  # clean up dangling content blobs that are older than REMOVE_DANGLING_BLOB_GRACE_PERIOD and not associated with an asset_id
+  def remove_dangling_content_blobs
+    ContentBlob.where(asset_id: nil).where('created_at < ?', REMOVE_DANGLING_BLOB_GRACE_PERIOD.ago).select do |blob|
       Rails.logger.info("Cleaning up content blob #{blob.id}")
       blob.reload
+      blob.destroy if blob.asset.nil?
+    end
+  end
+
+  def remove_deleted_content_blobs
+    ContentBlob.where(deleted: true).where('created_at < ?', REMOVE_DELETED_BLOB_GRACE_PERIOD.ago).select do |blob|
+      Rails.logger.info("Removing content blob #{blob.id} marked for deletion")
+
+      # play safe and only delete if asset has gone even if flagged for deletion
       blob.destroy if blob.asset.nil?
     end
   end
@@ -45,12 +55,6 @@ class RegularMaintenanceJob < ApplicationJob
   # longer ago than the USER_GRACE_PERIOD
   def remove_unregistered_users
     User.where(person: nil).where('created_at < ?', USER_GRACE_PERIOD.ago).destroy_all
-  end
-
-  # trims old sessions, using the db:sessions:trim task
-  def trim_session
-    Rails.application.load_tasks
-    Rake::Task['db:sessions:trim'].invoke
   end
 
   # resends an activation email, for unactivated users that haven't received an email since RESEND_ACTIVATION_EMAIL_DELAY

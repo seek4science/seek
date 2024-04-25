@@ -56,15 +56,6 @@ class PublicationsController < ApplicationController
     end
   end
 
-  # GET /publications/new
-  def new
-    @publication = Publication.new
-    @publication.parent_name = params[:parent_name]
-    respond_to do |format|
-      format.html # new.html.erb
-    end
-  end
-
   # GET /publications/1/edit
   def edit; end
 
@@ -141,18 +132,19 @@ class PublicationsController < ApplicationController
 
   def create_new_version comments
     if @publication.save_as_new_version(comments)
-      flash[:notice]="New full text uploaded #{@publication.version}"
+      flash[:notice]="The new full text has been successfully uploaded."
     else
-      flash[:error]="Unable to save new fulltext"
+      flash[:error]="The full text can not be saved."
     end
   end
 
   def soft_delete_fulltext
     # replace this version as a new empty version
-    if @publication.can_soft_delete_full_text?
+    if @publication.can_delete?
       # create an empty version
       respond_to do |format|
         create_new_version 'Soft delete'
+        flash[:notice] = 'The attached full text for the publication was successfully deleted.'
         format.html { redirect_to @publication }
       end
     else

@@ -8,14 +8,14 @@ require 'seek/download_handling/http_streamer'
 class GitWorkflowWizard
   include ActiveModel::Model
 
-  attr_reader :next_step, :workflow_class, :git_repository
+  attr_reader :next_step, :git_repository
 
-  attr_accessor :params, :workflow
+  attr_accessor :params, :workflow, :workflow_class
 
   def run
     if new_version?
       @next_step = :new_git_version
-      workflow_class = workflow.workflow_class
+      self.workflow_class = workflow.workflow_class
       current_version = workflow.git_version
       git_version = workflow.git_versions.build(params.delete(:git_version_attributes))
       unless git_version.remote? # It's a new local version, so just use next_version and finish the wizard
@@ -27,7 +27,7 @@ class GitWorkflowWizard
       end
     else
       @next_step = :new
-      self.workflow = Workflow.new
+      self.workflow = Workflow.new(workflow_class: self.workflow_class)
       current_version = nil
     end
 
@@ -61,7 +61,7 @@ class GitWorkflowWizard
         git_version.abstract_cwl_path ||= crate.main_workflow&.cwl_description&.id if crate.main_workflow&.cwl_description&.id
         git_version.diagram_path ||= crate.main_workflow&.diagram&.id if crate.main_workflow&.diagram&.id
 
-        workflow_class ||= WorkflowClass.match_from_metadata(crate&.main_workflow&.programming_language&.properties || {})
+        self.workflow_class ||= WorkflowClass.match_from_metadata(crate&.main_workflow&.programming_language&.properties || {})
       end
     end
 

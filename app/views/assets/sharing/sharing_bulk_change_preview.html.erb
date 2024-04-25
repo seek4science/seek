@@ -13,7 +13,7 @@
 
     <ul class="sharing_options">
       <% @items_for_sharing.each do |item| %>
-        <%= hidden_field_tag sharing_item_param(item), 1 %>
+        <%= hidden_field_tag publishing_item_param(item), 1 %>
         <li class="type_and_title">
           <%= text_for_resource item -%>: <%= link_to item.title, item -%>
           <% if  item.try(:is_downloadable?) %>

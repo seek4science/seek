@@ -2,7 +2,7 @@
  study ||= @study
  study.investigation = nil unless study.investigation.try(:can_edit?)
  investigations = investigations | [study.investigation] if study.investigation
- investigations = investigations.select &:can_edit?
+ investigations = investigations.select { |inv| inv.can_edit? && !inv.is_isa_json_compliant? }
  investigation_value=(study && study.investigation) ? study.investigation.id : 0
  investigation_options = [["Select an #{t('investigation')}..",0]]|investigations.collect{|t| [h(t.title),t.id]}
 %>

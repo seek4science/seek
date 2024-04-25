@@ -7,7 +7,7 @@ module Seek
     def instance_admins_name_fallback
       instance_name
     end
-    
+
     def instance_admins_link_fallback
       instance_link
     end
@@ -332,34 +332,52 @@ module Seek
       isa_enabled
     end
 
-    def omniauth_elixir_aai_config
-      # Cannot use url helpers here because routes are not loaded at this point :( -Finn
-      callback_path = 'identities/auth/elixir_aai/callback'
+    def templates_enabled
+      isa_json_compliance_enabled
+    end
 
-      {
-          callback_path: "#{Rails.application.config.relative_url_root}/#{callback_path}",
+    def omniauth_elixir_aai_config
+      if omniauth_elixir_aai_legacy_mode
+        {
+            callback_path: legacy_omniauth_callback_path('elixir_aai'),
+            name: :elixir_aai,
+            scope: [:openid, :email],
+            response_type: 'code',
+            issuer: 'https://login.elixir-czech.org/oidc/',
+            # I had an issue using discovery in the past, maybe it works now?
+            discovery: false,
+            send_nonce: true,
+            client_signing_alg: :RS256,
+            # The following is obtained from: https://login.elixir-czech.org/oidc/jwk
+            client_jwk_signing_key: '{"keys":[{"kty":"RSA","e":"AQAB","kid":"rsa1","alg":"RS256","n":"uVHPfUHVEzpgOnDNi3e2pVsbK1hsINsTy_1mMT7sxDyP-1eQSjzYsGSUJ3GHq9LhiVndpwV8y7Enjdj0purywtwk_D8z9IIN36RJAh1yhFfbyhLPEZlCDdzxas5Dku9k0GrxQuV6i30Mid8OgRQ2q3pmsks414Afy6xugC6u3inyjLzLPrhR0oRPTGdNMXJbGw4sVTjnh5AzTgX-GrQWBHSjI7rMTcvqbbl7M8OOhE3MQ_gfVLXwmwSIoKHODC0RO-XnVhqd7Qf0teS1JiILKYLl5FS_7Uy2ClVrAYd2T6X9DIr_JlpRkwSD899pq6PR9nhKguipJE0qUXxamdY9nw"}]}',
+            client_options: {
+                identifier: omniauth_elixir_aai_client_id,
+                secret: omniauth_elixir_aai_secret,
+                redirect_uri: legacy_omniauth_redirect_uri('elixir_aai'),
+                scheme: 'https',
+                host: 'login.elixir-czech.org',
+                port: 443,
+                authorization_endpoint: '/oidc/authorize',
+                token_endpoint: '/oidc/token',
+                userinfo_endpoint: '/oidc/userinfo',
+                jwks_uri: '/oidc/jwk',
+            }
+        }
+      else
+        {
+          callback_path: omniauth_callback_path('elixir_aai'),
           name: :elixir_aai,
           scope: [:openid, :email],
           response_type: 'code',
-          issuer: 'https://login.elixir-czech.org/oidc/',
-          discovery: false,
-          send_nonce: true,
-          client_signing_alg: :RS256,
-          # The following is obtained from: https://login.elixir-czech.org/oidc/jwk
-          client_jwk_signing_key: '{"keys":[{"kty":"RSA","e":"AQAB","kid":"rsa1","alg":"RS256","n":"uVHPfUHVEzpgOnDNi3e2pVsbK1hsINsTy_1mMT7sxDyP-1eQSjzYsGSUJ3GHq9LhiVndpwV8y7Enjdj0purywtwk_D8z9IIN36RJAh1yhFfbyhLPEZlCDdzxas5Dku9k0GrxQuV6i30Mid8OgRQ2q3pmsks414Afy6xugC6u3inyjLzLPrhR0oRPTGdNMXJbGw4sVTjnh5AzTgX-GrQWBHSjI7rMTcvqbbl7M8OOhE3MQ_gfVLXwmwSIoKHODC0RO-XnVhqd7Qf0teS1JiILKYLl5FS_7Uy2ClVrAYd2T6X9DIr_JlpRkwSD899pq6PR9nhKguipJE0qUXxamdY9nw"}]}',
+          issuer: 'https://login.aai.lifescience-ri.eu/oidc/',
+          discovery: true,
           client_options: {
-              identifier: omniauth_elixir_aai_client_id,
-              secret: omniauth_elixir_aai_secret,
-              redirect_uri: site_base_url.join(callback_path).to_s,
-              scheme: 'https',
-              host: 'login.elixir-czech.org',
-              port: 443,
-              authorization_endpoint: '/oidc/authorize',
-              token_endpoint: '/oidc/token',
-              userinfo_endpoint: '/oidc/userinfo',
-              jwks_uri: '/oidc/jwk',
+            identifier: omniauth_elixir_aai_client_id,
+            secret: omniauth_elixir_aai_secret,
+            redirect_uri: omniauth_redirect_uri('elixir_aai'),
           }
-      }
+        }
+      end
     end
 
     def omniauth_ldap_settings(field)
@@ -375,12 +393,61 @@ module Seek
       [omniauth_github_client_id, omniauth_github_secret, { scope: 'user:email' }]
     end
 
+    def omniauth_oidc_config
+      {
+        callback_path: omniauth_callback_path('oidc'),
+        issuer: omniauth_oidc_issuer,
+        name: :oidc,
+        response_type: 'code',
+        discovery: true,
+        client_options: {
+          identifier: omniauth_oidc_client_id,
+          secret: omniauth_oidc_secret,
+          redirect_uri: omniauth_redirect_uri('oidc')
+        }
+      }
+    end
+
+    def omniauth_oidc_image
+      Avatar.find_by_id(omniauth_oidc_image_id) if omniauth_oidc_image_id
+    end
+
+    def omniauth_oidc_image= file
+      return if file.blank?
+      current = omniauth_oidc_image
+      omniauth_oidc_image.destroy! if current
+      avatar = Avatar.new(original_filename: file.original_filename, image_file: file, skip_owner_validation: true)
+      avatar.save!
+      self.omniauth_oidc_image_id = avatar.id
+      avatar
+    end
+
     def omniauth_providers
-      providers = {}
-      providers[:ldap] = omniauth_ldap_config.merge(name: :ldap, form: SessionsController.action(:new)) if omniauth_ldap_enabled
-      providers[:openid_connect] = omniauth_elixir_aai_config if omniauth_elixir_aai_enabled
-      providers[:github] = omniauth_github_config if omniauth_github_enabled
+      providers = []
+      providers << [:ldap, omniauth_ldap_config.merge(name: :ldap, form: SessionsController.action(:new))] if omniauth_ldap_enabled
+      providers << [:github, omniauth_github_config] if omniauth_github_enabled
+      providers << [:openid_connect, omniauth_elixir_aai_config] if omniauth_elixir_aai_enabled
+      providers << [:openid_connect, omniauth_oidc_config] if omniauth_oidc_enabled
       providers
+    end
+
+    private
+
+    # Cannot use url helpers here because routes are not loaded at this point :( -Finn
+    def omniauth_callback_path(provider)
+      "#{Rails.application.config.relative_url_root}/auth/#{provider}/callback"
+    end
+
+    def legacy_omniauth_callback_path(provider)
+      "#{Rails.application.config.relative_url_root}/identities/auth/#{provider}/callback"
+    end
+
+    def omniauth_redirect_uri(provider)
+      site_base_url.join("auth/#{provider}/callback").to_s
+    end
+
+    def legacy_omniauth_redirect_uri(provider)
+      site_base_url.join("identities/auth/#{provider}/callback").to_s
     end
   end
 
@@ -527,6 +594,10 @@ module Seek
 
     read_project_setting_attributes.each do |method, opts|
       register_encrypted_setting(method) if opts && opts[:encrypt]
+    end
+
+    def self.analytics_enabled
+      google_analytics_enabled || piwik_analytics_enabled || custom_analytics_snippet_enabled
     end
 
     def self.schema_org_supported?

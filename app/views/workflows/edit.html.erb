@@ -18,6 +18,14 @@
       <%= f.text_area :description, rows: 5, class: 'form-control rich-text-edit' -%>
     </div>
 
+    <% if @workflow.workflow_class&.executable? %>
+      <div class="form-group">
+        <label>Galaxy Instance</label>
+        <%= f.text_field :execution_instance_url, placeholder: 'https://usegalaxy.eu/', class: 'form-control' -%>
+        <p class="help-block">The root URL of the Galaxy instance where this workflow originated from.</p>
+      </div>
+    <% end %>
+
     <div class="form-group">
       <label>Source</label>
       <%= f.text_field :source_link_url, placeholder: 'https://...', class: 'form-control' -%>

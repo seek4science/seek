@@ -38,6 +38,7 @@ module Seek
         acts_as_discussable
         grouped_pagination
         title_trimmer
+        has_extended_metadata
 
         attr_writer :original_filename, :content_type
 
@@ -45,7 +46,6 @@ module Seek
         validates :title, length: { maximum: 255 }, unless: -> { is_a?(Publication) }
         validates :description, length: { maximum: 65_535 }, if: -> { respond_to?(:description) }
         validates :license, license:true, allow_blank: true, if: -> { respond_to?(:license) }
-
 
         include Seek::Stats::ActivityCounts
 
@@ -60,6 +60,7 @@ module Seek
         include Seek::ActsAsAsset::InstanceMethods
         include Seek::Search::BackgroundReindexing
         include Seek::Subscribable
+        include Seek::ActsAsAsset::ContentBlobs::ClassMethods
         extend SingletonMethods
       end
 

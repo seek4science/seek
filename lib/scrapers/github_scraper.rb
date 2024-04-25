@@ -7,11 +7,7 @@ module Scrapers
   class GithubScraper
     attr_reader :output
 
-    GIT_DESTINATION = Rails.root.join('tmp', 'scrapers', 'git')
-    CRATE_DESTINATION = Rails.root.join('tmp', 'scrapers', 'crates')
-    CACHE_DESTINATION = Rails.root.join('tmp', 'scrapers', 'cache')
-
-    def initialize(organization, project, contributor, main_branch: 'master', debug: false, output: STDOUT)
+    def initialize(organization, project, contributor, main_branch: 'master', debug: false, output: STDOUT, only_latest: true)
       @organization = organization # The GitHub organization to scrape
       raise "Missing GitHub organization" unless @organization
       @project = project # The SEEK project who will own the resources
@@ -26,6 +22,7 @@ module Scrapers
         output.puts "Contributor: #{@contributor.title} (ID: #{@contributor.id}, user ID: #{@contributor.user.id})"
       end
       @output = output
+      @only_latest = only_latest
     end
 
     def scrape
@@ -68,53 +65,75 @@ module Scrapers
     def create_resources(repositories)
       repositories.map do |repo|
         output.puts "  Considering #{repo.remote.chomp('.git')}..."
-        latest_tag = `cd #{repo.git_base.path}/.. && git describe --tags --abbrev=0 remotes/origin/#{@main_branch}`.chomp
-        unless $?.success?
-          output.puts "    Error while getting latest tag - wrong branch name?"
-          next
-        end
-        wiz = GitWorkflowWizard.new(params: {
-          git_version_attributes: {
-            git_repository_id: repo.id,
-            ref: "refs/tags/#{latest_tag}",
-            name: latest_tag,
-            comment: "Updated to #{latest_tag}"
-          }
-        })
-        workflow = existing_resource(repo)
-        new_version = false
-        if workflow
-          new_version = true
-          wiz.workflow = workflow
-          unless workflow.git_versions.none? { |gv| gv.name == latest_tag }
-            output.puts "    Version #{latest_tag} already registered, doing nothing"
+        if @only_latest
+          tag = latest_tag(repo)
+          if tag.nil?
+            output.puts "    Error while getting latest tag - wrong branch name?"
             next
           end
-          output.puts "    New version detected! (#{latest_tag}), creating new version"
+          tags = [tag]
         else
-          output.puts "    Creating new workflow"
-        end
-
-        workflow = wiz.run
-        workflow.contributor = @contributor
-        workflow.projects = Array(@project)
-        workflow.policy = Policy.projects_policy(workflow.projects)
-        workflow.policy.access_type = Policy::ACCESSIBLE
-        workflow.source_link_url = repo.remote.chomp('.git')
-        if wiz.next_step == :provide_metadata
-          unless @debug
-            if new_version
-              workflow.git_version.resource_attributes = workflow.attributes
-              workflow.git_version.save
-            end
-            workflow.save
+          tags = repo.remote_refs[:tags]&.map { |t| t[:name] } || []
+          if tags.empty?
+            output.puts "    No tags found to register"
+            next
           end
-        else
-          workflow.valid?
         end
+        tags.map { |tag| create_resource(repo, tag) }
+      end.flatten.compact
+    end
 
-        workflow
-      end.compact
+    def create_resource(repo, tag)
+      wiz = workflow_wizard(repo, tag)
+      workflow = existing_resource(repo)
+      new_version = false
+      if workflow
+        new_version = true
+        wiz.workflow = workflow
+        unless workflow.git_versions.none? { |gv| gv.name == tag }
+          output.puts "    Version #{tag} already registered, doing nothing"
+          return nil
+        end
+        output.puts "    New version detected! (#{tag}), creating new version"
+      else
+        output.puts "    Creating new workflow"
+      end
+
+      workflow = wiz.run
+      workflow.contributor = @contributor
+      workflow.projects = Array(@project)
+      workflow.policy = Policy.projects_policy(workflow.projects)
+      workflow.policy.access_type = Policy::ACCESSIBLE
+      workflow.source_link_url = repo.remote.chomp('.git')
+      workflow.tags = topics(repo)
+      if wiz.next_step == :provide_metadata
+        unless @debug
+          if new_version
+            workflow.git_version.resource_attributes = workflow.attributes
+            workflow.git_version.save
+          end
+          workflow.save
+        end
+      else
+        workflow.valid?
+      end
+
+      workflow
+    end
+
+    def main_branch(repo)
+      @main_branch
+    end
+
+    def workflow_wizard(repo, tag)
+      GitWorkflowWizard.new(params: {
+        git_version_attributes: {
+          git_repository_id: repo.id,
+          ref: "refs/tags/#{tag}",
+          name: tag,
+          comment: "Updated to #{tag}"
+        }
+      })
     end
 
     # Get all the repositories in the given org from the GitHub API.
@@ -135,18 +154,26 @@ module Scrapers
       RestClient::Resource.new('https://api.github.com', {})
     end
 
-    def cache_path
-      ::File.join(CACHE_DESTINATION, @organization).tap { |x| FileUtils.mkdir_p(x) }
+    def topics(repo)
+      remote = repo.remote
+      @_topics_cache ||= {}
+      return @_topics_cache[remote] if @_topics_cache[remote]
+      remote_uri = URI(remote)
+      if remote_uri.hostname.include?('github.com')
+        user, repo, *_ = remote_uri.path.split('/')[1..-1]
+        repo = repo.split('.').first
+
+        @_topics_cache[remote] = JSON.parse(github["repos/#{user}/#{repo}/topics"].get(accept: 'application/vnd.github.mercy-preview+json').body)&.dig('names') || []
+      else
+        @_topics_cache[remote] = []
+      end
     end
 
-    def cached(name)
-      path = File.expand_path(File.join(cache_path, name.gsub('/', '-')))
-      if File.exist?(path)
-        File.read(path)
-      else
-        File.write(path, yield)
-        File.read(path)
-      end
+    def latest_tag(repo)
+      tag = `cd #{repo.git_base.path}/.. && git describe --tags --abbrev=0 remotes/origin/#{main_branch(repo)}`.chomp
+      return nil unless $?.success?
+
+      tag
     end
   end
 end

@@ -54,7 +54,7 @@ class SearchController < ApplicationController
     @search_query = ActionController::Base.helpers.sanitize(search_params[:q] || search_params[:search_query])
     @search = @search_query # used for logging, and logs the origin search query - see ApplicationController#log_event
     @search_query ||= ''
-    @search_query = Seek::Search::SearchTermFilter.filter @search_query
+    @search_query.strip!
     raise InvalidSearchException, 'Query string is empty or blank' if @search_query.blank?
   end
 

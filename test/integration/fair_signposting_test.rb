@@ -106,7 +106,7 @@ class FairSignpostingTest < ActionDispatch::IntegrationTest
   end
 
   test 'fair signposting for home' do
-    get root_path(p)
+    get root_path
 
     assert_response :success
     links = parse_link_header
@@ -133,7 +133,7 @@ class FairSignpostingTest < ActionDispatch::IntegrationTest
   end
 
   test 'fair signposting for privacy page' do
-    get privacy_home_path(p)
+    get privacy_home_path
 
     assert_response :success
     assert_nil response.headers['Link'], 'Should not have any signposting links'

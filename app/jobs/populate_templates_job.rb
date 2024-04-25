@@ -3,7 +3,7 @@ class PopulateTemplatesJob < ApplicationJob
   queue_with_priority 1
   queue_as QueueNames::TEMPLATES
   def perform
-    return unless Seek::Config.sample_type_template_enabled
+    return unless Seek::Config.isa_json_compliance_enabled
 
     Seek::IsaTemplates::TemplateExtractor.extract_templates
   end

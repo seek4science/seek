@@ -36,6 +36,10 @@ class Study < ApplicationRecord
     has_many "related_#{type.pluralize}".to_sym, -> { distinct }, through: :assays, source: type.pluralize.to_sym
   end
 
+  def assay_streams
+    assays.select(&:is_assay_stream?)
+  end
+
   def assets
     related_data_files + related_sops + related_models + related_publications + related_documents
   end
@@ -51,6 +55,10 @@ class Study < ApplicationRecord
       st.samples.map { |sts| st_samples.push sts }
     end
     st_samples
+  end
+
+  def is_isa_json_compliant?
+    investigation.is_isa_json_compliant? && sample_types.any?
   end
 
   def clone_with_associations

@@ -1,0 +1,56 @@
+
+Hi <%= @admins.collect{|o| o.name}.join(", ") -%>,
+
+<% if @programme %>
+
+  The <%= Seek::Config.instance_name %> user <%= "#{@requester.name} (#{person_url(@requester)})" %>, has requested a new <%= t('project')  %> is imported within your <%= t('programme') %>.
+
+  The <%= t('programme') %> is <%= "#{@programme.title} (#{programme_url(@programme)})" %>
+
+<% else %>
+
+  The <%= Seek::Config.instance_name %> user <%= "#{@requester.name} (#{person_url(@requester)})" %>, has requested a new <%= t('project')  %> is imported.
+
+<% end %>
+
+
+They provided the following details about the <%= t('project') %>
+  <%= t('project') %> title: '<%= @project.title %>'
+
+<% if @institution.id.nil? %>
+  <%
+    title = @institution.title.blank? ? 'No title provided' : @institution.title
+    web_page = @institution.web_page.blank? ? 'No web page provided' : @institution.web_page
+    country = @institution.country.blank? ? 'No country provided' : CountryCodes.country(@institution.country)
+
+  %>
+They provided the following details about their <%= t('institution') %>:
+  <%= t('institution') %> title: '<%= title %>'
+  <%= t('institution') %> web page: '<%= web_page %>'
+  <%= t('institution') %> country: '<%= country %>'
+<% else %>
+They indicated that they are associated with the existing <%= "#{@institution.title} (#{institution_url(@institution)})" %>
+<% end %>
+
+<% if Array(@people).length > 0 %>
+They provided the following details about the <%= t('people') %> associated with the project:
+  <% @people.each do |person| %>
+    Name: <%= person.first_name %>, Email: <%= person.email %>
+  <% end %>
+<% end %>
+These people will be associated with the project through the selected institution.
+
+<% unless @comments.blank? -%>
+<%=@requester.first_name.capitalize -%> also provided some additional details about the request:
+
+  "<%= sanitize(@comments) -%>"
+
+<% end -%>
+
+You can quickly accept or reject this request by going to <%= administer_import_project_request_projects_url(message_log_id:@message_log.id) %>.
+
+You can reply to <%= @requester.first_name.capitalize -%> by replying to this email.
+
+This is an automated email.
+
+- <%= Seek::Config.instance_admins_name %> Team

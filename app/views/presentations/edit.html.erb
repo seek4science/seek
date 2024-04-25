@@ -14,6 +14,9 @@
         <%= f.text_area :description, :class=>"form-control rich-text-edit", :rows => 5 -%>
       </div>
 
+      <%= render partial: 'extended_metadata/extended_metadata_type_selection', locals: { f: f, resource: @presentation } %>
+      <%= render partial: 'extended_metadata/extended_metadata_attribute_input', locals: { f: f, resource: @presentation } %>
+
       <%# only the owner should get to see this option (ability to reload defaults remain in 'edit' action, but project selector is disabled) -%>
       <% if @presentation.can_manage? -%>
           <%= render :partial => "projects/project_selector", :locals => { :resource => @presentation } -%>
