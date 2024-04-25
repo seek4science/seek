@@ -44,6 +44,11 @@ module BioInd
               assay.assay_assets.build(asset: df)
             end
           end
+          datastation_study.observation_units.each do |datastation_observation_unit|
+            observation_unit_attributes = datastation_observation_unit.seek_attributes.merge({contributor: contributor, study:study, projects: projects})
+            observation_unit = study.observation_units.build(observation_unit_attributes)
+            populate_extended_metadata(observation_unit, datastation_observation_unit)
+          end
         end
 
         return investigation

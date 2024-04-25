@@ -127,12 +127,14 @@ class FairDataReaderTest < ActiveSupport::TestCase
 
     investigation = BioInd::FairData::Reader.construct_isa(inv, contributor, [project])
     studies = investigation.studies.to_a
+    obs_units = studies.first.observation_units.to_a
     assays = studies.first.assays.to_a
     data_files = assays.first.assay_assets.to_a.collect(&:asset)
 
     assert_equal 1, studies.count
     assert_equal 9, assays.count
     assert_equal 2, data_files.count
+    assert_equal 2, obs_units.count
 
     assert investigation.valid?
     assert studies.first.valid?
@@ -145,18 +147,19 @@ class FairDataReaderTest < ActiveSupport::TestCase
 
     assert_difference('Investigation.count', 1) do
       assert_difference('Study.count', 1) do
-        assert_difference('Assay.count', 9) do
-          assert_difference('AssayAsset.count', 18) do
-            assert_difference('DataFile.count', 18) do
-              User.with_current_user(contributor.user) do
-                investigation.save!
+        assert_difference('ObservationUnit.count', 2) do
+          assert_difference('Assay.count', 9) do
+            assert_difference('AssayAsset.count', 18) do
+              assert_difference('DataFile.count', 18) do
+                User.with_current_user(contributor.user) do
+                  investigation.save!
+                end
               end
             end
           end
         end
       end
     end
-
   end
 
   test 'populate extended metadata' do
