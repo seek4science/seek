@@ -8,4 +8,9 @@ class ObservationUnit < ApplicationRecord
 
   has_extended_metadata
 
+
+  def contributors
+    [contributor]
+  end
+
 end
