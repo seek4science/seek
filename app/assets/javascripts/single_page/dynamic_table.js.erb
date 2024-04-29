@@ -578,7 +578,7 @@ function inputObjectsInput(column, data, options, url){
     }
   }).join("");
   if (options.readonly) {
-    return data.map((e) => `<span title="ID: ${e.id}" class="badge">${e.title}</span>`).join(" ");
+    return data.map((e) => `<span title="ID: ${e.id}" class="badge">${sanitizeData(e.title)}</span>`).join(" ");
   } else {
     const typeaheadTemplate = 'typeahead/single_pages_samples'
     const objectInputName = data.map((e) => e.id).join('-') + '-' + crypto.randomUUID();
@@ -610,16 +610,16 @@ function inputObjectsInput(column, data, options, url){
 }
 
 function cvListObjectsInput(column, data, options, url){
-  const existingOptions = data.map((e) => `<option selected="selected" value="${e}">${e}</option>`);
-  if (options.readonly) {
-    return data.map((e) => `<span title="ID: ${e}" class="badge">${e}</span>`).join(" ");
-  } else {
-    const typeaheadTemplate = 'typeahead/controlled_vocab_term';
-    const objectInputName = data.map((e) => e.title).join('-') + '-' + crypto.randomUUID();
-    const extraClass = '';
-    const titleText = '';
-    const allowNewItems = column.cv_allows_free_text;
-    setTimeout(ObjectsInput.init);
+  const existingOptions = data.map((e) => `<option selected="selected" value="${sanitizeData(e)}">${sanitizeData(e)}</option>`);
+    if (options.readonly) {
+        return data.map((e) => `<span title="ID: ${sanitizeData(e)}" class="badge">${sanitizeData(e)}</span>`).join(" ");
+    } else {
+        const typeaheadTemplate = 'typeahead/controlled_vocab_term';
+        const objectInputName = data.map((e) => sanitizeData(e)).join('-') + '-' + crypto.randomUUID();
+        const extraClass = '';
+        const titleText = '';
+        const allowNewItems = column.cv_allows_free_text;
+        setTimeout(ObjectsInput.init);
 
     return objectInputTemp
     .replace(/_NAME_/g, objectInputName)
