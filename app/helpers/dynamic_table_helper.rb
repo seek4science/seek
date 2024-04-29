@@ -107,7 +107,7 @@ module DynamicTableHelper
       cv_allows_free_text =  a.allow_cv_free_text
       attribute.merge!({ multi_link: true, linked_sample_type: a.linked_sample_type_id }) if is_seek_multi_sample
       attribute.merge!({ multi_link: false, linked_sample_type: a.linked_sample_type_id }) if is_seek_sample
-      attribute.merge!({is_cv_list: , cv_allows_free_text:}) if is_cv_list
+      attribute.merge!({ is_cv_list: true, cv_allows_free_text:}) if is_cv_list
       attribute
     end
     (dt_default_cols(sample_type.id.to_s) + attribs).flatten
@@ -159,7 +159,9 @@ module DynamicTableHelper
         attribute = { title: a.title, name: s.id.to_s, required: a.required, description: a.description,
                       is_title: a.is_title }
         condition = a.sample_attribute_type.base_type == Seek::Samples::BaseType::SEEK_SAMPLE_MULTI
+        is_cv_list = a.sample_attribute_type.base_type == Seek::Samples::BaseType::CV_LIST
         attribute.merge!({ multi_link: true, linked_sample_type: a.linked_sample_type.id }) if condition
+        attribute.merge!({ is_cv_list: true }) if is_cv_list
         attribute
       end.unshift({ title: 'id' }, {title: 'uuid'})
     end
