@@ -221,7 +221,8 @@ module Seek
         }
       when ObservationUnit
         {
-          parents: %i[study]
+          parents: %i[study],
+          aggregated_children: { samples: :samples }
         }
       else
         {}

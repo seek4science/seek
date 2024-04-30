@@ -681,7 +681,7 @@ SEEK::Application.routes.draw do
       post :query
     end
     resources :people, :programmes, :projects, :assays, :studies, :investigations, :data_files, :publications, :samples,
-              :sample_types, :strains, :organisms, :collections, only: [:index]
+              :sample_types, :strains, :organisms, :collections, :observation_units, only: [:index]
   end
 
   ### SAMPLE TYPES ###
@@ -803,7 +803,7 @@ SEEK::Application.routes.draw do
 
   resources :observation_units, only: [:show, :index] do
 
-    resources :projects, :people, :programmes, :studies
+    resources :projects, :people, :programmes, :studies, :samples, :assays
   end
 
   ### MISC MATCHES ###
