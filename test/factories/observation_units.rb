@@ -13,6 +13,7 @@ FactoryBot.define do
     assets_creators { [AssetsCreator.new(affiliation: 'University of Somewhere', creator: FactoryBot.create(:person, first_name: 'Some', last_name: 'One'))] }
     association :extended_metadata, factory: :simple_observation_unit_extended_metadata, strategy: :create
     association :study, factory: :study, strategy: :create
+    samples { build_list :sample, 3}
   end
 
 end

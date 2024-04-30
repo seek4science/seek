@@ -134,17 +134,20 @@ class FairDataReaderTest < ActiveSupport::TestCase
     contributor = FactoryBot.create(:person)
     project = contributor.projects.first
     FactoryBot.create(:experimental_assay_class)
+    FactoryBot.create(:fairdatastation_virtual_demo_sample_type)
 
     investigation = BioInd::FairData::Reader.construct_isa(inv, contributor, [project])
     studies = investigation.studies.to_a
     obs_units = studies.first.observation_units.to_a
     assays = studies.first.assays.to_a
     data_files = assays.first.assay_assets.to_a.collect(&:asset)
+    samples = obs_units.first.samples.to_a
 
     assert_equal 1, studies.count
     assert_equal 9, assays.count
     assert_equal 2, data_files.count
     assert_equal 2, obs_units.count
+    assert_equal 4, samples.count
 
     assert investigation.valid?
     assert studies.first.valid?
@@ -158,11 +161,13 @@ class FairDataReaderTest < ActiveSupport::TestCase
     assert_difference('Investigation.count', 1) do
       assert_difference('Study.count', 1) do
         assert_difference('ObservationUnit.count', 2) do
-          assert_difference('Assay.count', 9) do
-            assert_difference('AssayAsset.count', 18) do
-              assert_difference('DataFile.count', 18) do
-                User.with_current_user(contributor.user) do
-                  investigation.save!
+          assert_difference('Sample.count', 9) do
+            assert_difference('Assay.count', 9) do
+              assert_difference('AssayAsset.count', 18) do
+                assert_difference('DataFile.count', 18) do
+                  User.with_current_user(contributor.user) do
+                    investigation.save!
+                  end
                 end
               end
             end
@@ -180,6 +185,7 @@ class FairDataReaderTest < ActiveSupport::TestCase
     FactoryBot.create(:simple_assay_extended_metadata_type)
     FactoryBot.create(:simple_investigation_extended_metadata_type_with_description_and_label)
     FactoryBot.create(:experimental_assay_class)
+    FactoryBot.create(:fairdatastation_virtual_demo_sample_type)
 
     path = "#{Rails.root}/test/fixtures/files/fairdatastation/demo.ttl"
     inv = BioInd::FairData::Reader.parse_graph(path).first

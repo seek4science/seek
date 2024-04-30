@@ -213,4 +213,29 @@ FactoryBot.define do
       type.sample_attributes << FactoryBot.build(:sample_attribute, title: 'Data file comment 3', sample_attribute_type: FactoryBot.create(:controlled_vocab_attribute_type, title: 'Ontology'), isa_tag_id: FactoryBot.create(:data_file_comment_isa_tag).id, sample_controlled_vocab: FactoryBot.create(:efo_ontology), pid: 'pid:pid', sample_type: type, allow_cv_free_text: true)
     end
   end
+
+  # fair:host                    "Homo sapiens" ;
+  # fair:host_disease_stat       "HIV-1 negative" ;
+  # fair:marital_status          "Single" ;
+  # fair:occupation              "Trader" ;
+  # fair:sample_name             "13C" ;
+  # gbol:scientificName          "human gut metagenome" ;
+  # jerm:hasPart                 <http://fairbydesign.nl/ontology/inv_INV_DRP007092/stu_DRP007092/obs_HIV-1_negative/sam_DRS176881/asy_DRR243845> ;
+  # uniprot:organism             408170 ;
+
+  factory(:fairdatastation_virtual_demo_sample_type, parent: :sample_type) do
+    title { 'fair data station virtual demo'}
+    after(:build) do |type, eval|
+      type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Title', sample_type: type, is_title: true)
+      type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Description', sample_type: type)
+
+      type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Host', pid:'http://fairbydesign.nl/ontology/host', sample_type: type)
+      type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Host disease stat', pid:'http://fairbydesign.nl/ontology/host_disease_stat', sample_type: type)
+      type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Marital status', pid:'http://fairbydesign.nl/ontology/marital_status', sample_type: type)
+      type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Occupation', pid:'http://fairbydesign.nl/ontology/occupation', sample_type: type)
+      type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Scientific Name', pid:'http://gbol.life/0.1/scientificName', sample_type: type)
+      type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Organism', pid:'http://purl.uniprot.org/core/organism', sample_type: type)
+
+    end
+  end
 end

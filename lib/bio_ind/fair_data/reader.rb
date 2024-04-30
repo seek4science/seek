@@ -48,6 +48,13 @@ module BioInd
             observation_unit_attributes = datastation_observation_unit.seek_attributes.merge({contributor: contributor, study:study, projects: projects})
             observation_unit = study.observation_units.build(observation_unit_attributes)
             populate_extended_metadata(observation_unit, datastation_observation_unit)
+            datastation_observation_unit.samples.each do |datastation_sample|
+              sample = observation_unit.samples.build(title: 'fish', contributor: contributor, projects: projects)
+              populate_sample(sample, datastation_sample)
+              unless sample.valid?
+                pp sample.errors.full_messages
+              end
+            end
           end
         end
 
@@ -73,6 +80,18 @@ module BioInd
         end.sort_by{|x| x[0]}
 
         candidates.first&.last
+      end
+
+      def self.populate_sample(seek_sample, datastation_sample)
+        if sample_type = detect_sample_type(datastation_sample)
+          seek_sample.sample_type = sample_type
+          seek_sample.set_attribute_value('Title', datastation_sample.title)
+          seek_sample.set_attribute_value('Description', datastation_sample.description)
+        end
+      end
+
+      def self.detect_sample_type(datastation_sample)
+        SampleType.last
       end
 
     end
