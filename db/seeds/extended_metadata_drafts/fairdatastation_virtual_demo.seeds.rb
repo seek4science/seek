@@ -32,3 +32,16 @@ unless ExtendedMetadataType.where(title:'Fair Data Station Virtual Demo', suppor
   emt.save!
   puts 'Fair Data Station Virtual Demo for Assay'
 end
+
+unless ExtendedMetadataType.where(title:'Fair Data Station Indpensim', supported_type:'ObservationUnit').any?
+  emt = ExtendedMetadataType.new(title: 'Fair Data Station Indpensim', supported_type:'ObservationUnit')
+
+  emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'Brand', property_type_id:'http://fairbydesign.nl/ontology/brand', sample_attribute_type: SampleAttributeType.where(title:'String').first)
+  emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'Fermentation', property_type_id:'http://fairbydesign.nl/ontology/fermentation', sample_attribute_type: SampleAttributeType.where(title:'String').first)
+  emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'Volume', property_type_id:'http://fairbydesign.nl/ontology/volume', sample_attribute_type: SampleAttributeType.where(title:'String').first)
+  emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'Scientific Name', property_type_id:'http://gbol.life/0.1/scientificName', sample_attribute_type: SampleAttributeType.where(title:'String').first)
+  emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'Organism', property_type_id:'http://purl.uniprot.org/core/organism', sample_attribute_type: SampleAttributeType.where(title:'String').first)
+
+  emt.save!
+  puts 'Fair Data Station Indpensim for Observation Unit'
+end

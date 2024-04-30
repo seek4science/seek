@@ -464,5 +464,17 @@ FactoryBot.define do
     end
   end
 
+  factory(:fairdata_indpensim_obsv_unit_extended_metadata, class: ExtendedMetadataType) do
+    title {'Fair Data Station Obs Unit Indpensim'}
+    supported_type { 'ObservationUnit' }
+    after(:build) do |a|
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Brand', property_type_id:'http://fairbydesign.nl/ontology/brand')
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Fermentation', property_type_id:'http://fairbydesign.nl/ontology/fermentation')
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Volume', property_type_id:'http://fairbydesign.nl/ontology/volume')
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Scientific Name', property_type_id:'http://gbol.life/0.1/scientificName')
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Organism', property_type_id:'http://purl.uniprot.org/core/organism')
+    end
+  end
+
 end
 

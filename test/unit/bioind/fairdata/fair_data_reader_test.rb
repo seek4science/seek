@@ -209,4 +209,36 @@ class FairDataReaderTest < ActiveSupport::TestCase
     end
   end
 
+  test 'populate obsv unit extended metadata' do
+    ext_metadata_type = FactoryBot.create(:fairdata_indpensim_obsv_unit_extended_metadata)
+    FactoryBot.create(:experimental_assay_class)
+
+    path = "#{Rails.root}/test/fixtures/files/fairdatastation/indpensim.ttl"
+    inv = BioInd::FairData::Reader.parse_graph(path).first
+    contributor = FactoryBot.create(:person)
+    project = contributor.projects.first
+
+    investigation = BioInd::FairData::Reader.construct_isa(inv, contributor, [project])
+    assert_nil investigation.extended_metadata
+
+    assert_difference('ExtendedMetadata.count', 100) do
+      User.with_current_user(contributor.user) do
+        investigation.save!
+      end
+    end
+
+    assert_equal 1, investigation.studies.count
+    study = investigation.studies.first
+    assert_equal 100, study.observation_units.count
+    obvs_unit = study.observation_units.first
+    refute_nil obvs_unit.extended_metadata
+    assert_equal ext_metadata_type, obvs_unit.extended_metadata.extended_metadata_type
+
+    assert_equal 'FermentorX', obvs_unit.extended_metadata.get_attribute_value('Brand')
+    assert_equal 'batch', obvs_unit.extended_metadata.get_attribute_value('Fermentation')
+    assert_equal '100,000 litre', obvs_unit.extended_metadata.get_attribute_value('Volume')
+    # assert_equal 'Penicillium chrysogenum', obvs_unit.extended_metadata.get_attribute_value('Scientific Name')
+    # assert_equal '5076', obvs_unit.extended_metadata.get_attribute_value('Organism')
+  end
+
 end
