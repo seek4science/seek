@@ -37,7 +37,7 @@ class UtilTest < ActiveSupport::TestCase
   end
 
   test 'searchable types' do
-    expected = [Assay, Collection, DataFile, Document, Event, FileTemplate, HumanDisease, Institution, Investigation, Model, Organism, Person, Placeholder, Presentation, Programme, Project, Publication, Sample, SampleType, Sop, Strain, Study, Workflow, Template]
+    expected = [Assay, Collection, DataFile, Document, Event, FileTemplate, HumanDisease, Institution, Investigation, Model, ObservationUnit, Organism, Person, Placeholder, Presentation, Programme, Project, Publication, Sample, SampleType, Sop, Strain, Study, Workflow, Template]
 
     types = with_config_value :isa_json_compliance_enabled, true do
       Seek::Util.searchable_types

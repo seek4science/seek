@@ -5,6 +5,7 @@ class ObservationUnitsController < ApplicationController
   before_action :organisms_enabled?
   before_action :find_requested_item, :only=>[:show,:edit,:destroy, :update]
   before_action :login_required,:except=>[:show,:index]
+  before_action :find_assets, only: [:index]
 
   include Seek::IndexPager
 

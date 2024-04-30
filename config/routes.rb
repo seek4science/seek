@@ -801,7 +801,7 @@ SEEK::Application.routes.draw do
 
   ### OBSERVATION UNITS ###
 
-  resources :observation_units, only: [:show] do
+  resources :observation_units, only: [:show, :index] do
 
     resources :projects, :people, :programmes, :studies
   end

@@ -9,4 +9,10 @@ class ObservationUnitsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test 'index' do
+    unit = FactoryBot.create(:observation_unit)
+    get :index
+    assert_response :success
+  end
+
 end
