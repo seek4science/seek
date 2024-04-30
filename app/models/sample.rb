@@ -32,6 +32,8 @@ class Sample < ApplicationRecord
 
   has_many :linked_data_files, through: :sample_resource_links, source: :resource, source_type: 'DataFile'
 
+  belongs_to :observation_unit
+
   validates :projects, presence: true, projects: { self: true }
   validates :title, :sample_type, presence: true
 

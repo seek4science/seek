@@ -7,6 +7,7 @@ class ObservationUnit < ApplicationRecord
 
   belongs_to :contributor, class_name: 'Person'
   belongs_to :study
+  has_many :samples
 
   has_extended_metadata
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_04_25_090243) do
+ActiveRecord::Schema.define(version: 2024_04_30_132048) do
 
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
@@ -1822,6 +1822,7 @@ ActiveRecord::Schema.define(version: 2024_04_25_090243) do
     t.text "other_creators"
     t.integer "originating_data_file_id"
     t.string "deleted_contributor"
+    t.bigint "observation_unit_id"
   end
 
   create_table "saved_searches", id: :integer, force: :cascade do |t|
