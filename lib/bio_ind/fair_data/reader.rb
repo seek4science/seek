@@ -49,10 +49,12 @@ module BioInd
             observation_unit = study.observation_units.build(observation_unit_attributes)
             populate_extended_metadata(observation_unit, datastation_observation_unit)
             datastation_observation_unit.samples.each do |datastation_sample|
-              sample = observation_unit.samples.build(title: 'fish', contributor: contributor, projects: projects)
+              sample = ::Sample.new(contributor: contributor, projects: projects)
               populate_sample(sample, datastation_sample)
-              unless sample.valid?
-                pp sample.errors.full_messages
+              if sample.valid?
+                observation_unit.samples << sample
+              else
+                Rails.logger.error("Invalid sample during fair data station import #{sample.errors.full_messages.inspect}")
               end
             end
           end
@@ -85,13 +87,24 @@ module BioInd
       def self.populate_sample(seek_sample, datastation_sample)
         if sample_type = detect_sample_type(datastation_sample)
           seek_sample.sample_type = sample_type
+          datastation_sample.populate_seek_sample(seek_sample)
           seek_sample.set_attribute_value('Title', datastation_sample.title)
           seek_sample.set_attribute_value('Description', datastation_sample.description)
         end
       end
 
       def self.detect_sample_type(datastation_sample)
-        SampleType.last
+        property_ids = datastation_sample.additional_metadata_annotations.collect{|annotation| annotation[0]}
+
+        # collect and sort those with the most properties that match, eliminating any where no properties match
+        candidates = SampleType.all.collect do |sample_type|
+          ids = sample_type.sample_attributes.collect(&:pid)
+          score = (property_ids - ids).length
+          sample_type = nil if (property_ids & ids).empty?
+          [score, sample_type]
+        end.sort_by{|x| x[0]}
+
+        candidates.first&.last
       end
 
     end

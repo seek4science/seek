@@ -177,7 +177,7 @@ class FairDataReaderTest < ActiveSupport::TestCase
     end
   end
 
-  test 'populate extended metadata' do
+  test 'populate extended metadata and samples' do
     study_metadata_type = FactoryBot.create(:fairdata_virtual_demo_study_extended_metadata)
     FactoryBot.create(:study_extended_metadata_type)
     FactoryBot.create(:fairdata_virtual_demo_study_extended_metadata_partial)
@@ -185,7 +185,7 @@ class FairDataReaderTest < ActiveSupport::TestCase
     FactoryBot.create(:simple_assay_extended_metadata_type)
     FactoryBot.create(:simple_investigation_extended_metadata_type_with_description_and_label)
     FactoryBot.create(:experimental_assay_class)
-    FactoryBot.create(:fairdatastation_virtual_demo_sample_type)
+    sample_type = FactoryBot.create(:fairdatastation_virtual_demo_sample_type)
 
     path = "#{Rails.root}/test/fixtures/files/fairdatastation/demo.ttl"
     inv = BioInd::FairData::Reader.parse_graph(path).first
@@ -223,6 +223,19 @@ class FairDataReaderTest < ActiveSupport::TestCase
         study.save!
       end
     end
+
+    sample = study.observation_units.first.samples.first
+    refute_nil sample.sample_type
+    assert_equal sample_type, sample.sample_type
+    assert_equal 'sample DRS176892', sample.title
+    assert_equal 'Sample obtained from Single age 30 collected on 2017-09-13 from the human gut', sample.get_attribute_value('Description')
+    assert_equal 'Homo sapiens', sample.get_attribute_value('Host')
+    assert_equal 'HIV-1 positive', sample.get_attribute_value('Host disease stat')
+    assert_equal 'Single', sample.get_attribute_value('Marital status')
+    assert_equal 'Trader', sample.get_attribute_value('Occupation')
+    assert_equal 'human gut metagenome', sample.get_attribute_value('Scientific name')
+    assert_equal '408170', sample.get_attribute_value('Organism')
+
   end
 
   test 'populate obsv unit extended metadata' do
