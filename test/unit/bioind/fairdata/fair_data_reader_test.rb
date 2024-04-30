@@ -43,7 +43,7 @@ class FairDataReaderTest < ActiveSupport::TestCase
     assert_includes study.annotations, ["http://fairbydesign.nl/ontology/center_name", "NIID"]
   end
 
-  test 'metadata annotations' do
+  test 'additional metadata annotations' do
     path = "#{Rails.root}/test/fixtures/files/fairdatastation/demo.ttl"
 
     inv = BioInd::FairData::Reader.parse_graph(path).first
@@ -56,6 +56,16 @@ class FairDataReaderTest < ActiveSupport::TestCase
     study.additional_metadata_annotations.each do |annotation|
       assert annotation[0].start_with?('http://fairbydesign.nl/ontology/'), "#{annotation[0]} is not expected"
     end
+
+    # non fairbydesign annotations
+    path = "#{Rails.root}/test/fixtures/files/fairdatastation/indpensim.ttl"
+    inv = BioInd::FairData::Reader.parse_graph(path).first
+    obs_unit = inv.studies.first.observation_units.first
+    annotations = obs_unit.additional_metadata_annotations
+    assert_equal 5, annotations.count
+    pids = annotations.collect{|ann| ann[0]}
+    assert_includes pids, 'http://gbol.life/0.1/scientificName'
+    assert_includes pids, 'http://purl.uniprot.org/core/organism'
   end
 
   test 'study assays' do
@@ -237,8 +247,8 @@ class FairDataReaderTest < ActiveSupport::TestCase
     assert_equal 'FermentorX', obvs_unit.extended_metadata.get_attribute_value('Brand')
     assert_equal 'batch', obvs_unit.extended_metadata.get_attribute_value('Fermentation')
     assert_equal '100,000 litre', obvs_unit.extended_metadata.get_attribute_value('Volume')
-    # assert_equal 'Penicillium chrysogenum', obvs_unit.extended_metadata.get_attribute_value('Scientific Name')
-    # assert_equal '5076', obvs_unit.extended_metadata.get_attribute_value('Organism')
+    assert_equal 'Penicillium chrysogenum', obvs_unit.extended_metadata.get_attribute_value('Scientific Name')
+    assert_equal '5076', obvs_unit.extended_metadata.get_attribute_value('Organism')
   end
 
 end

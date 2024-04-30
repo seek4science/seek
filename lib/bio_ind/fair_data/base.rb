@@ -1,7 +1,7 @@
 module BioInd
   module FairData
     class Base
-      attr_reader :resource_uri, :graph, :children
+      attr_reader :resource_uri, :graph, :children, :core_annotations
 
       def initialize(resource_uri, graph)
         @resource_uri = resource_uri
@@ -10,6 +10,16 @@ module BioInd
         @schema = RDF::Vocabulary.new('http://schema.org/')
         @fair = RDF::Vocabulary.new('http://fairbydesign.nl/ontology/')
         @children = []
+        @core_annotations = [
+          @schema.contributor,
+          @schema.dataset,
+          @schema.description,
+          @schema.identifier,
+          @schema.name,
+          @schema.title,
+          RDF.type,
+          @jerm.hasPart
+        ]
       end
 
       def identifier
@@ -37,7 +47,7 @@ module BioInd
 
       def additional_metadata_annotations
         annotations.select do |annotation|
-          annotation[0].start_with?(@fair.to_s)
+          !core_annotations.include?(annotation[0])
         end
       end
 
