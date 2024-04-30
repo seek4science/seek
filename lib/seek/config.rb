@@ -111,7 +111,8 @@ module Seek
           config.ignored_exceptions = ['ActionDispatch::Http::Parameters::ParseError',
                                       'ActionController::InvalidAuthenticityToken',
                                       'ActionController::UnknownHttpMethod',
-                                      'ActionController::BadRequest'] | ExceptionNotifier.ignored_exceptions
+                                      'ActionController::BadRequest',
+                                      'ActionDispatch::Http::MimeNegotiation::InvalidType'] | ExceptionNotifier.ignored_exceptions
           config.error_grouping = error_grouping_enabled
           config.error_grouping_period = error_grouping_timeout
           config.error_grouping_cache = Rails.cache
