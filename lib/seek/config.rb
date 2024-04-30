@@ -111,7 +111,9 @@ module Seek
                                                 ignore_exceptions: ['ActionDispatch::Http::Parameters::ParseError',
                                                                     'ActionController::InvalidAuthenticityToken',
                                                                     'ActionController::UnknownHttpMethod',
-                                                                    'ActionController::BadRequest'] + ExceptionNotifier.ignored_exceptions,
+                                                                    'ActionController::BadRequest',
+                                                                    'ActionDispatch::Http::MimeNegotiation::InvalidType'
+                                                ] + ExceptionNotifier.ignored_exceptions,
                                                 email: {
                                                   sender_address: [noreply_sender],
                                                   email_prefix: "[ #{instance_name} ERROR ] ",
