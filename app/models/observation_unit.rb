@@ -8,6 +8,8 @@ class ObservationUnit < ApplicationRecord
   belongs_to :contributor, class_name: 'Person'
   belongs_to :study
   has_many :samples
+  has_many :observation_unit_assets
+  has_many :data_files, through: :observation_unit_assets, source: :asset, source_type: 'DataFile'
 
   has_extended_metadata
 

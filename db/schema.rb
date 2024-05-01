@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_04_30_132048) do
+ActiveRecord::Schema.define(version: 2024_05_01_142953) do
 
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
@@ -1194,6 +1194,14 @@ ActiveRecord::Schema.define(version: 2024_04_30_132048) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_oauth_sessions_on_user_id"
+  end
+
+  create_table "observation_unit_assets", id: false, force: :cascade do |t|
+    t.bigint "observation_unit_id"
+    t.string "asset_type"
+    t.bigint "asset_id"
+    t.index ["asset_type", "asset_id"], name: "index_observation_unit_assets_on_asset"
+    t.index ["observation_unit_id"], name: "index_observation_unit_assets_on_observation_unit_id"
   end
 
   create_table "observation_units", force: :cascade do |t|

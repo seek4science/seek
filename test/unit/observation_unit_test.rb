@@ -13,8 +13,8 @@ class ObservationUnitTest < ActiveSupport::TestCase
     refute_nil obs_unit.extended_metadata.extended_metadata_type
     refute_nil obs_unit.study
     refute_empty obs_unit.study.observation_units
-
     refute_empty obs_unit.samples
+    refute_empty obs_unit.data_files
   end
 
 end

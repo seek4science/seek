@@ -14,6 +14,7 @@ FactoryBot.define do
     association :extended_metadata, factory: :simple_observation_unit_extended_metadata, strategy: :create
     association :study, factory: :study, strategy: :create
     samples { build_list :sample, 3}
+    data_files { build_list :data_file, 3}
   end
 
 end

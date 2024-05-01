@@ -23,6 +23,9 @@ class DataFile < ApplicationRecord
   has_many :sample_resource_links, -> { where(resource_type: 'DataFile') }, class_name: 'SampleResourceLink', foreign_key: :resource_id
   has_many :linked_samples, through: :sample_resource_links, source: :sample
 
+  has_many :observation_unit_assets
+  has_many :observation_units, through: :observation_unit_assets
+
   has_many :workflow_data_files, dependent: :destroy, autosave: true
   has_many :workflows, ->{ distinct }, through: :workflow_data_files
 

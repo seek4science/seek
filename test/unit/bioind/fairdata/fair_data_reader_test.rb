@@ -272,6 +272,21 @@ class FairDataReaderTest < ActiveSupport::TestCase
 
   end
 
+  test 'observation_unit datasets created in construct_isa' do
+    path = "#{Rails.root}/test/fixtures/files/fairdatastation/indpensim.ttl"
+    inv = BioInd::FairData::Reader.parse_graph(path).first
+
+    contributor = FactoryBot.create(:person)
+    project = contributor.projects.first
+    FactoryBot.create(:experimental_assay_class)
+    FactoryBot.create(:fairdatastation_virtual_demo_sample_type)
+
+    investigation = BioInd::FairData::Reader.construct_isa(inv, contributor, [project])
+    assert_equal 100, investigation.studies.first.observation_units.to_a.count
+    observation_unit = investigation.studies.first.observation_units.first
+    assert_equal 1, observation_unit.data_files
+  end
+
   test 'populate obsv unit extended metadata' do
     ext_metadata_type = FactoryBot.create(:fairdata_indpensim_obsv_unit_extended_metadata)
     FactoryBot.create(:experimental_assay_class)
