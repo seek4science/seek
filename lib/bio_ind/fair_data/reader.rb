@@ -43,7 +43,9 @@ module BioInd
                 Rails.logger.error("Invalid sample during fair data station import #{sample.errors.full_messages.inspect}")
               end
               datastation_sample.assays.each do |datastation_assay|
-                assay_attributes = datastation_assay.seek_attributes.merge({contributor: contributor, study:study, assay_class: AssayClass.experimental, samples:[sample]})
+                samples = []
+                samples << sample if sample.valid?
+                assay_attributes = datastation_assay.seek_attributes.merge({contributor: contributor, study:study, assay_class: AssayClass.experimental, samples:samples})
                 assay = study.assays.build(assay_attributes)
                 populate_extended_metadata(assay, datastation_assay)
                 datastation_assay.datasets.each do |datastation_dataset|

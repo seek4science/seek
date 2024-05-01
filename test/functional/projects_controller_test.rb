@@ -5045,6 +5045,7 @@ class ProjectsControllerTest < ActionController::TestCase
   test 'populate from fairdata station ttl' do
 
     person = FactoryBot.create(:person)
+    FactoryBot.create(:fairdatastation_virtual_demo_sample_type)
     project = person.projects.first
     login_as(person)
 
@@ -5058,6 +5059,8 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_equal person, investigation.contributor
     assert_equal 1, investigation.studies.count
     assert_equal 9, investigation.studies.first.assays.count
+    assert_equal 2, investigation.studies.first.observation_units.count
+    assert_equal 4, investigation.studies.first.observation_units.first.samples.count
 
   end
 
