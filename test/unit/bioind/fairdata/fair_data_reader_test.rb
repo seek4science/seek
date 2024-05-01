@@ -252,6 +252,12 @@ class FairDataReaderTest < ActiveSupport::TestCase
     assert_equal 'METAGENOMIC', assay.extended_metadata.get_attribute_value('Library Source')
     assert_equal 'AMPLICON', assay.extended_metadata.get_attribute_value('Library Strategy')
 
+    study.assays.each do |assay|
+      assert assay.valid?, "invalid assay - #{assay.errors.full_messages}"
+    end
+    assert study.valid?, "invalid study - #{study.errors.full_messages}"
+    assert investigation.valid?, "invalid investigation - #{investigation.errors.full_messages}"
+
     assert_difference('ExtendedMetadata.count', 10) do
       User.with_current_user(contributor.user) do
         study.save!
@@ -289,6 +295,10 @@ class FairDataReaderTest < ActiveSupport::TestCase
     df = observation_unit.observation_unit_assets.first.asset
     assert_equal 'Dataset: IndPenSim_V3_Batch_1.csv.gz', df.title
     assert_equal 'file', df.description
+    assert_equal 'application/octet-stream', df.content_blob.content_type
+    assert df.content_blob.external_link?
+    assert df.content_blob.is_webpage?
+    assert df.content_blob.show_as_external_link?
 
     assert_difference('DataFile.count',96) do
       assert_difference('ObservationUnitAsset.count',96) do
