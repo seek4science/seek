@@ -17,6 +17,7 @@ module BioInd
           @schema.identifier,
           @schema.name,
           @schema.title,
+          @schema.contentUrl,
           RDF.type,
           @jerm.hasPart
         ]

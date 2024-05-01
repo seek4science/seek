@@ -34,6 +34,35 @@ class FairDataReaderTest < ActiveSupport::TestCase
     assert_equal 'DRR243856', assay.identifier
   end
 
+  test 'read indpensim' do
+    path = "#{Rails.root}/test/fixtures/files/fairdatastation/indpensim.ttl"
+
+    investigations = BioInd::FairData::Reader.parse_graph(path)
+    assert_equal 1, investigations.count
+    inv = investigations.first
+    assert_equal 'http://fairbydesign.nl/ontology/inv_indpensim', inv.resource_uri.to_s
+    assert_equal 'indpensim', inv.identifier
+
+    assert_equal 1, inv.studies.count
+    study = inv.studies.first
+    assert_equal 'http://fairbydesign.nl/ontology/inv_indpensim/stu_Penicillin_production', study.resource_uri.to_s
+    assert_equal 'Penicillin_production', study.identifier
+
+    assert_equal 100, study.observation_units.count
+    obs_unit = study.observation_units.first
+    assert_equal 'http://fairbydesign.nl/ontology/inv_indpensim/stu_Penicillin_production/obs_IndPenSim_V3_Batch_1',
+                 obs_unit.resource_uri.to_s
+    assert_equal 'IndPenSim_V3_Batch_1', obs_unit.identifier
+
+    assert_equal 0, obs_unit.samples.count
+    assert_equal 1, obs_unit.datasets.count
+    dataset = obs_unit.datasets.first
+    assert_equal 'https://data.yoda.wur.nl/research-bioindustry/Use%20cases/Simulation%20datasets/IndPenSim/IndPenSim_V3_Batch_1.csv.gz', dataset.resource_uri
+    assert_equal 'IndPenSim_V3_Batch_1.csv.gz', dataset.identifier
+    assert_equal 'file', dataset.description
+    assert_equal 'https://data.yoda.wur.nl/research-bioindustry/Use%20cases/Simulation%20datasets/IndPenSim/IndPenSim_V3_Batch_1.csv.gz', dataset.content_url
+  end
+
   test 'annotations' do
     path = "#{Rails.root}/test/fixtures/files/fairdatastation/demo.ttl"
 
@@ -120,6 +149,7 @@ class FairDataReaderTest < ActiveSupport::TestCase
     assert_equal ['http://fairbydesign.nl/data_sample/DRR243856_1.fastq.gz', 'http://fairbydesign.nl/data_sample/DRR243856_2.fastq.gz'], datasets.collect(&:resource_uri).collect(&:to_s).sort
     assert_equal ['DRR243856_1.fastq.gz', 'DRR243856_2.fastq.gz'], datasets.collect(&:identifier).sort
     assert_equal ['demultiplexed forward file', 'demultiplexed reverse file'], datasets.collect(&:description).sort
+    assert_equal ['http://fairbydesign.nl/data_sample/DRR243856_1.fastq.gz', 'http://fairbydesign.nl/data_sample/DRR243856_2.fastq.gz'], datasets.collect(&:content_url).collect(&:to_s).sort
 
     assert_equal 0, inv.datasets.count
     assert_equal 0, study.datasets.count
