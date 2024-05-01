@@ -111,12 +111,18 @@ module BioInd
       private
 
       def self.build_data_file(contributor, datastation_dataset, projects)
-        blob = ContentBlob.new(url: datastation_dataset.resource_uri.to_s, original_filename: datastation_dataset.identifier)
-        data_file_attributes = datastation_dataset.seek_attributes.merge({
-                                                                           contributor: contributor, projects: projects,
-                                                                           content_blob: blob
-                                                                         })
-        DataFile.new(data_file_attributes)
+        @_data_file_cache ||= {}
+        if @_data_file_cache[datastation_dataset.identifier]
+          @_data_file_cache[datastation_dataset.identifier]
+        else
+          blob = ContentBlob.new(url: datastation_dataset.resource_uri.to_s, original_filename: datastation_dataset.identifier)
+          data_file_attributes = datastation_dataset.seek_attributes.merge({
+                                                                             contributor: contributor, projects: projects,
+                                                                             content_blob: blob
+                                                                           })
+          @_data_file_cache[datastation_dataset.identifier] = DataFile.new(data_file_attributes)
+        end
+
       end
 
     end

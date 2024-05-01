@@ -284,7 +284,7 @@ class FairDataReaderTest < ActiveSupport::TestCase
     investigation = BioInd::FairData::Reader.construct_isa(inv, contributor, [project])
     assert_equal 100, investigation.studies.first.observation_units.to_a.count
     observation_unit = investigation.studies.first.observation_units.first
-    assert_equal 1, observation_unit.observation_unit_assets.select{|oua| oua.asset_type == 'DataFile'}.collect(&:asset).count
+    assert_equal 1, observation_unit.observation_unit_assets.find_all{|oua| oua.asset_type == 'DataFile'}.collect(&:asset).count
 
     df = observation_unit.observation_unit_assets.first.asset
     assert_equal 'Dataset: IndPenSim_V3_Batch_1.csv.gz', df.title
@@ -297,8 +297,6 @@ class FairDataReaderTest < ActiveSupport::TestCase
         }
       end
     end
-
-    pp DataFile.all.collect(&:title).inspect
   end
 
   test 'populate obsv unit extended metadata' do
