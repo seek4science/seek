@@ -30,20 +30,6 @@ module BioInd
           study_attributes = datastation_study.seek_attributes.merge({contributor: contributor, investigation: investigation})
           study = investigation.studies.build(study_attributes)
           populate_extended_metadata(study, datastation_study)
-          datastation_study.assays.each do |datastation_assay|
-            assay_attributes = datastation_assay.seek_attributes.merge({contributor: contributor, study:study, assay_class: AssayClass.experimental})
-            assay = study.assays.build(assay_attributes)
-            populate_extended_metadata(assay, datastation_assay)
-            datastation_assay.datasets.each do |datastation_dataset|
-              blob = ContentBlob.new(url: datastation_dataset.resource_uri.to_s, original_filename: datastation_dataset.identifier )
-              data_file_attributes = datastation_dataset.seek_attributes.merge({
-                                                                                 contributor: contributor, projects: projects,
-                                                                                 content_blob: blob
-                                                                               })
-              df = DataFile.new(data_file_attributes)
-              assay.assay_assets.build(asset: df)
-            end
-          end
           datastation_study.observation_units.each do |datastation_observation_unit|
             observation_unit_attributes = datastation_observation_unit.seek_attributes.merge({contributor: contributor, study:study, projects: projects})
             observation_unit = study.observation_units.build(observation_unit_attributes)
@@ -55,6 +41,20 @@ module BioInd
                 observation_unit.samples << sample
               else
                 Rails.logger.error("Invalid sample during fair data station import #{sample.errors.full_messages.inspect}")
+              end
+              datastation_sample.assays.each do |datastation_assay|
+                assay_attributes = datastation_assay.seek_attributes.merge({contributor: contributor, study:study, assay_class: AssayClass.experimental, samples:[sample]})
+                assay = study.assays.build(assay_attributes)
+                populate_extended_metadata(assay, datastation_assay)
+                datastation_assay.datasets.each do |datastation_dataset|
+                  blob = ContentBlob.new(url: datastation_dataset.resource_uri.to_s, original_filename: datastation_dataset.identifier )
+                  data_file_attributes = datastation_dataset.seek_attributes.merge({
+                                                                                     contributor: contributor, projects: projects,
+                                                                                     content_blob: blob
+                                                                                   })
+                  df = DataFile.new(data_file_attributes)
+                  assay.assay_assets.build(asset: df)
+                end
               end
             end
           end

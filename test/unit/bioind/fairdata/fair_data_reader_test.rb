@@ -140,8 +140,12 @@ class FairDataReaderTest < ActiveSupport::TestCase
     studies = investigation.studies.to_a
     obs_units = studies.first.observation_units.to_a
     assays = studies.first.assays.to_a
-    data_files = assays.first.assay_assets.to_a.collect(&:asset)
+    data_files = assays.first.assay_assets.to_a.collect(&:asset).select{|a| a.is_a?(DataFile)}
     samples = obs_units.first.samples.to_a
+
+    assay_samples = assays.collect{|a| a.samples.to_a}.flatten
+    assert_equal 9, assay_samples.count
+    assert_equal samples, (assay_samples & samples)
 
     assert_equal 1, studies.count
     assert_equal 9, assays.count
@@ -163,7 +167,7 @@ class FairDataReaderTest < ActiveSupport::TestCase
         assert_difference('ObservationUnit.count', 2) do
           assert_difference('Sample.count', 9) do
             assert_difference('Assay.count', 9) do
-              assert_difference('AssayAsset.count', 18) do
+              assert_difference('AssayAsset.count', 27) do
                 assert_difference('DataFile.count', 18) do
                   User.with_current_user(contributor.user) do
                     investigation.save!
