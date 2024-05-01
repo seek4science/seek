@@ -45,7 +45,30 @@ unless ExtendedMetadataType.where(title:'Fair Data Station Indpensim', supported
   emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'Organism', property_type_id:'http://purl.uniprot.org/core/organism', sample_attribute_type: string_attribute_type)
 
   emt.save!
-  puts 'Fair Data Station Indpensim for Observation Unit'
+  puts 'Fair Data Station Observation Unit for Indpensim'
+end
+
+unless ExtendedMetadataType.where(title:'Fair Data Station Pichia', supported_type:'ObservationUnit').any?
+  emt = ExtendedMetadataType.new(title: 'Fair Data Station Pichia', supported_type:'ObservationUnit',
+    extended_metadata_attributes_attributes: [
+      { title: 'Author', property_type_id: 'http://fairbydesign.nl/ontology/author', sample_attribute_type: string_attribute_type},
+      { title: 'Control action', property_type_id: 'http://fairbydesign.nl/ontology/control_action', sample_attribute_type: string_attribute_type},
+      { title: 'Control objective', property_type_id: 'http://fairbydesign.nl/ontology/control_objective', sample_attribute_type: string_attribute_type},
+      { title: 'Control type', property_type_id: 'http://fairbydesign.nl/ontology/control_type', sample_attribute_type: string_attribute_type},
+      { title: 'Date', property_type_id: 'http://fairbydesign.nl/ontology/date', sample_attribute_type: string_attribute_type},
+      { title: 'Operational mode', property_type_id: 'http://fairbydesign.nl/ontology/operational_mode', sample_attribute_type: string_attribute_type},
+      { title: 'Operational strategy', property_type_id: 'http://fairbydesign.nl/ontology/operational_strategy', sample_attribute_type: string_attribute_type},
+      { title: 'Promotor', property_type_id: 'http://fairbydesign.nl/ontology/promoter', sample_attribute_type: string_attribute_type},
+      { title: 'Protein', property_type_id: 'http://fairbydesign.nl/ontology/protein', sample_attribute_type: string_attribute_type},
+      { title: 'Published', property_type_id: 'http://fairbydesign.nl/ontology/published', sample_attribute_type: string_attribute_type},
+      { title: 'Strain', property_type_id: 'http://fairbydesign.nl/ontology/strain', sample_attribute_type: string_attribute_type},
+      { title: 'Substrate batch', property_type_id: 'http://fairbydesign.nl/ontology/substrate_batch', sample_attribute_type: string_attribute_type},
+      { title: 'Substrate fed batch', property_type_id: 'http://fairbydesign.nl/ontology/substrate_fed-batch', sample_attribute_type: string_attribute_type},
+      { title: 'Scientific name', property_type_id: 'http://gbol.life/0.1/scientificName', sample_attribute_type: string_attribute_type}
+    ]
+  )
+  emt.save!
+  puts 'Fair Data Station Observation Unit for Pichia'
 end
 
 virtual_demo_sample_type = SampleType.where(title: 'Fair Data Station Virtual Demo').first_or_initialize(
