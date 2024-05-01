@@ -105,23 +105,23 @@
       </div>
 
       <div class="col-md-3 col-sm-4">
-        <%= render :partial => "layouts/contribution_section_box_avatar", :locals => { :object => @project } -%>
+        <%= render partial: "layouts/contribution_section_box_avatar", locals: { object: @project } %>
 
-        <% if @project.is_discussable? -%>
-          <% if @project.discussion_links.select{|link| link.url.present?}.any?  %>
-            <%= render partial: 'assets/discussion_links_box', locals: {resource: @project } -%>
-          <% end -%>
-        <% end -%>
+        <% if @project.is_discussable? && @project.discussion_links.any? { |link| link.url.present? } %>
+          <%= render partial: "assets/discussion_links_box", locals: { resource: @project } %>
+        <% end %>
 
         <% if @project.controlled_vocab_annotations? %>
-          <%= render partial:'assets/controlled_vocab_annotations_properties_box', :locals => { :resource => @project } %>
+          <%= render partial: "assets/controlled_vocab_annotations_properties_box", locals: { resource: @project } %>
         <% end %>
 
         <% if @project.can_manage? %>
-          <%= render :partial => 'general/storage_usage_box', locals: { programme: @project,
-                                                                        url: storage_report_project_path(@project)} %>
+          <%= render partial: "general/storage_usage_box", locals: { programme: @project, url: storage_report_project_path(@project) } %>
         <% end %>
 
+        <% if @project.is_taggable? %>
+          <%= render partial: "assets/tags_box", locals: { resource: @project }, no_tags_message: "Add tags (comma separated) ..." %>
+        <% end %>
       </div>
     </div>
 

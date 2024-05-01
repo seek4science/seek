@@ -32,8 +32,6 @@ namespace :seek do
   desc('upgrades SEEK from the last released version to the latest released version')
   task(upgrade: [:environment]) do
     puts 'Starting upgrade ...'
-    puts '... trimming old session data ...'
-    Rake::Task['db:sessions:trim'].invoke
     puts '... migrating database ...'
     Rake::Task['db:migrate'].invoke
     Rake::Task['tmp:clear'].invoke

@@ -20,7 +20,6 @@ class RegularMaintenanceJob < ApplicationJob
     clean_git_repositories
     resend_activation_emails
     remove_unregistered_users
-    trim_session
     check_authlookup_consistency
   end
 
@@ -56,12 +55,6 @@ class RegularMaintenanceJob < ApplicationJob
   # longer ago than the USER_GRACE_PERIOD
   def remove_unregistered_users
     User.where(person: nil).where('created_at < ?', USER_GRACE_PERIOD.ago).destroy_all
-  end
-
-  # trims old sessions, using the db:sessions:trim task
-  def trim_session
-    Rails.application.load_tasks
-    Rake::Task['db:sessions:trim'].invoke
   end
 
   # resends an activation email, for unactivated users that haven't received an email since RESEND_ACTIVATION_EMAIL_DELAY
