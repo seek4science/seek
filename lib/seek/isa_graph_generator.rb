@@ -222,7 +222,7 @@ module Seek
       when ObservationUnit
         {
           parents: %i[study],
-          aggregated_children: { samples: :samples }
+          related: %i[samples data_files]
         }
       else
         {}

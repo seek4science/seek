@@ -502,7 +502,7 @@ SEEK::Application.routes.draw do
       get :retrieve_nels_sample_metadata
       get :has_matching_sample_type
     end
-    resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :collections, :workflows, :file_templates, :placeholders, only: [:index]
+    resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :collections, :workflows, :file_templates, :placeholders, :observation_units, only: [:index]
   end
 
   resources :presentations, concerns: [:has_content_blobs, :publishable, :has_versions, :asset, :explorable_spreadsheet] do
@@ -803,7 +803,7 @@ SEEK::Application.routes.draw do
 
   resources :observation_units, only: [:show, :index] do
 
-    resources :projects, :people, :programmes, :studies, :samples, :assays
+    resources :projects, :people, :programmes, :studies, :samples, :assays, :data_files
   end
 
   ### MISC MATCHES ###
