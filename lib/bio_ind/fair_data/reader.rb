@@ -33,6 +33,10 @@ module BioInd
           datastation_study.observation_units.each do |datastation_observation_unit|
             observation_unit_attributes = datastation_observation_unit.seek_attributes.merge({contributor: contributor, study:study, projects: projects})
             observation_unit = study.observation_units.build(observation_unit_attributes)
+            datastation_observation_unit.datasets.each do |datastation_dataset|
+              df = build_data_file(contributor, datastation_dataset, projects)
+              observation_unit.observation_unit_assets.build(asset: df)
+            end
             populate_extended_metadata(observation_unit, datastation_observation_unit)
             datastation_observation_unit.samples.each do |datastation_sample|
               sample = ::Sample.new(contributor: contributor, projects: projects)
@@ -49,12 +53,7 @@ module BioInd
                 assay = study.assays.build(assay_attributes)
                 populate_extended_metadata(assay, datastation_assay)
                 datastation_assay.datasets.each do |datastation_dataset|
-                  blob = ContentBlob.new(url: datastation_dataset.resource_uri.to_s, original_filename: datastation_dataset.identifier )
-                  data_file_attributes = datastation_dataset.seek_attributes.merge({
-                                                                                     contributor: contributor, projects: projects,
-                                                                                     content_blob: blob
-                                                                                   })
-                  df = DataFile.new(data_file_attributes)
+                  df = build_data_file(contributor, datastation_dataset, projects)
                   assay.assay_assets.build(asset: df)
                 end
               end
@@ -107,6 +106,17 @@ module BioInd
         end.sort_by{|x| x[0]}
 
         candidates.first&.last
+      end
+
+      private
+
+      def self.build_data_file(contributor, datastation_dataset, projects)
+        blob = ContentBlob.new(url: datastation_dataset.resource_uri.to_s, original_filename: datastation_dataset.identifier)
+        data_file_attributes = datastation_dataset.seek_attributes.merge({
+                                                                           contributor: contributor, projects: projects,
+                                                                           content_blob: blob
+                                                                         })
+        DataFile.new(data_file_attributes)
       end
 
     end
