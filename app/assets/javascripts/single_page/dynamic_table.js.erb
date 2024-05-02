@@ -190,7 +190,7 @@ const handleSelect = (e) => {
         $j.each(sampleTypes, (i, s) => {
           if (!isNaN(s)) {
             const colIdxs = this.table.columns(`${s}:name`)[0];
-            if (colIdxs.length) colIdxs.push(colIdxs[0] - 1);
+            if (colIdxs.length) colIdxs.push(colIdxs[0] - 1, colIdxs[0] - 2);
             this.table.column(function(idx, data, node) {
               if (colIdxs.includes(idx)) $j(node).addClass(`sp-variant-${i % 2}`);
             });
@@ -463,6 +463,7 @@ const handleSelect = (e) => {
   };
 })(jQuery);
 
+// Highlights the column if the attribute is a title
 function highlightTitleCol(table) {
   table.settings()[0].aoColumns.forEach((c, i) => {
     if (c.is_title) $j(table.column(i).nodes()).addClass("highlight");
