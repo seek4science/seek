@@ -5,7 +5,7 @@
 
 # Experiment View
 
-
+(Alias "Single Page")
 
 A Project and the associated Experiments (Investigation, Study, Assay) can be visualised in "Experiment View" by selecting the button “Experiment View” at the top right corner of the page.
 
