@@ -10,6 +10,7 @@ class AuthLookupMaintenaceJobTest < ActiveSupport::TestCase
     end
 
     User.destroy_all
+    AuthLookupUpdateQueue.destroy_all
   end
 
   test 'run period' do
@@ -94,7 +95,7 @@ class AuthLookupMaintenaceJobTest < ActiveSupport::TestCase
 
       refute Document.lookup_table_consistent?(p.user)
 
-      #gets immmediately updated for anonymous user
+      #gets immediately updated for anonymous user
       assert Document.lookup_table_consistent?(nil)
 
       refute AuthLookupUpdateQueue.any?
@@ -137,7 +138,7 @@ class AuthLookupMaintenaceJobTest < ActiveSupport::TestCase
 
       refute Document.lookup_table_consistent?(p.user)
 
-      #gets immmediately updated for anonymous user
+      #gets immediately updated for anonymous user
       assert Document.lookup_table_consistent?(nil)
 
       refute AuthLookupUpdateQueue.any?
@@ -161,6 +162,49 @@ class AuthLookupMaintenaceJobTest < ActiveSupport::TestCase
         end
       end
 
+    end
+  end
+
+  test 'checks each type' do
+    p = FactoryBot.create(:person)
+
+    with_config_value(:auth_lookup_enabled, true) do
+      assert AuthLookupUpdateQueue.queue_enabled?
+
+      doc = FactoryBot.create(:document)
+      sample = FactoryBot.create(:sample)
+      sop = FactoryBot.create(:sop)
+      with_config_value(:auth_lookup_update_batch_size, 20) do
+        AuthLookupUpdateJob.perform_now
+      end
+
+      assert Document.lookup_table_consistent?(p.user)
+      assert Sample.lookup_table_consistent?(p.user)
+      assert Sop.lookup_table_consistent?(p.user)
+
+      # delete a record
+      Document.lookup_class.where(user_id:p.user.id,asset_id:doc.id).last.delete
+      Sample.lookup_class.where(user_id:p.user.id,asset_id:sample.id).last.delete
+      Sop.lookup_class.where(user_id:p.user.id,asset_id:sop.id).last.delete
+
+      refute Document.lookup_table_consistent?(p.user)
+      refute Sample.lookup_table_consistent?(p.user)
+      refute Sop.lookup_table_consistent?(p.user)
+
+      #gets immediately updated for anonymous user
+      assert Document.lookup_table_consistent?(nil)
+      assert Sample.lookup_table_consistent?(nil)
+      assert Sop.lookup_table_consistent?(nil)
+
+      assert_enqueued_jobs(3) do
+        assert_difference('AuthLookupUpdateQueue.count',3) do
+          AuthLookupMaintenanceJob.perform_now
+        end
+      end
+
+      assert AuthLookupUpdateQueue.where(item: doc).any?
+      assert AuthLookupUpdateQueue.where(item: sample).any?
+      assert AuthLookupUpdateQueue.where(item: sop).any?
     end
   end
 
