@@ -110,6 +110,11 @@ class DataFile < ApplicationRecord
   def supports_spreadsheet_explore?
     true
   end
+  
+  def zipped_folder?
+    return false if external_asset.is_a? OpenbisExternalAsset
+    content_blob.is_unzippable_datafile?
+  end
 
   def matching_sample_type?
     return false if external_asset.is_a? OpenbisExternalAsset
@@ -231,4 +236,5 @@ class DataFile < ApplicationRecord
 
   has_task :sample_extraction
   has_task :sample_persistence
+  has_task :unzip
 end
