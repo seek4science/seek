@@ -65,4 +65,11 @@ module DataFilesHelper
     rescue Seek::DataFiles::FetchException
       return true # allows to try again
   end
+  
+  def show_unzip_folder_status?(data_file)
+    # there is permission and a task
+    return false unless data_file.can_manage? && data_file.unzip_task&.persisted?
+    # persistence isn't currently running or already taken place
+    return true
+  end
 end
