@@ -131,6 +131,28 @@ class DataFile < ApplicationRecord
   def related_samples
     extracted_samples + linked_samples
   end
+  def unzip(overwrite, tmp_dir, confirm=false)
+    unzip_folder = Zip::File.open(content_blob.filepath)
+    FileUtils.rm_r(tmp_dir) if File.exist?(tmp_dir)
+    Dir.mkdir(tmp_dir)
+    unzipped =[]
+    unzip_folder.entries.each do |file|
+      if file.ftype == :file
+        file_name = File.basename(file.name)
+        file.extract("#{tmp_dir}#{file_name}") unless File.exist? "#{tmp_dir}#{file_name}"
+        data_file_params = {
+          title: file_name,
+            license: license,
+            projects: projects,
+            description: '',
+            contributor_id: contributor.id,
+            zip_origin_id: self.id
+        }
+        unzipped << DataFile.new(data_file_params)
+      end
+    end
+    unzipped
+  end
 
   # Extracts samples using the given sample_type
   # Returns a list of extracted samples, including
