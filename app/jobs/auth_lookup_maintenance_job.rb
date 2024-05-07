@@ -14,6 +14,9 @@ class AuthLookupMaintenanceJob < ApplicationJob
     items_for_queue = [].to_set
     User.where.not(person_id: nil).to_a.push(nil).each do |user|
 
+      # skip if this user is queued up
+      next if AuthLookupUpdateQueue.where(item:user).any?
+
       # will only deal with 1 type per user per run
       found = Seek::Util.authorized_types.find do |type|
         !type.lookup_table_consistent?(user)

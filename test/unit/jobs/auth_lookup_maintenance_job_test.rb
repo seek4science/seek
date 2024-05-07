@@ -73,4 +73,54 @@ class AuthLookupMaintenaceJobTest < ActiveSupport::TestCase
 
   end
 
+  test 'skip if user in the queue' do
+    #ensure a consistent initial state
+    disable_authorization_checks do
+      Seek::Util.authorized_types.each(&:destroy_all)
+      Seek::Util.authorized_types.each(&:clear_lookup_table)
+    end
+
+    User.destroy_all
+    p = FactoryBot.create(:person)
+
+    with_config_value(:auth_lookup_enabled, true) do
+      assert AuthLookupUpdateQueue.queue_enabled?
+
+      doc1 = FactoryBot.create(:document)
+      AuthLookupUpdateJob.perform_now
+
+      assert Document.lookup_table_consistent?(p.user)
+
+      # delete a record
+      Document.lookup_class.where(user_id:p.user.id,asset_id:doc1.id).last.delete
+
+      refute Document.lookup_table_consistent?(p.user)
+
+      #gets immmediately updated for anonymous user
+      assert Document.lookup_table_consistent?(nil)
+
+      refute AuthLookupUpdateQueue.any?
+      AuthLookupUpdateQueue.create!(item: p.user)
+      assert AuthLookupUpdateQueue.any?
+
+      # nothing queued whilst user is queued
+      assert_no_enqueued_jobs do
+        assert_no_difference('AuthLookupUpdateQueue.count') do
+          AuthLookupMaintenanceJob.perform_now
+        end
+      end
+
+      AuthLookupUpdateQueue.destroy_all
+      refute AuthLookupUpdateQueue.any?
+
+      # queued after the user has been removed
+      assert_enqueued_jobs(1) do
+        assert_difference('AuthLookupUpdateQueue.count',1) do
+          AuthLookupMaintenanceJob.perform_now
+        end
+      end
+
+    end
+  end
+
 end
