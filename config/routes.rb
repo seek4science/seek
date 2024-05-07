@@ -499,6 +499,7 @@ SEEK::Application.routes.draw do
       get :retrieve_nels_sample_metadata
       get :has_matching_sample_type
       post :unzip
+      get :unzip_status
     end
     resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :collections, :workflows, :file_templates, :placeholders, only: [:index]
   end

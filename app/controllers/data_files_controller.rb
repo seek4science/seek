@@ -174,6 +174,13 @@ class DataFilesController < ApplicationController
     end
   end
 
+  def unzip_status
+    job_status = @data_file.unzip_task.status
+    respond_to do |format|
+      format.html { render partial: 'data_files/unzip_status', locals: { data_file: @data_file, job_status: job_status } }
+    end
+  end
+
   def extract_samples
     if params[:confirm]
       SampleDataPersistJob.new(@data_file, @sample_type, User.current_user, assay_ids: params["assay_ids"]).queue_job
