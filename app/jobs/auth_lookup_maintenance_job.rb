@@ -19,6 +19,9 @@ class AuthLookupMaintenanceJob < ApplicationJob
 
       # will only deal with 1 type per user per run
       found = Seek::Util.authorized_types.find do |type|
+        # skip if there are any queued items of this type
+        next if AuthLookupUpdateQueue.where(item_type:type.name).any?
+
         !type.lookup_table_consistent?(user)
       end
 
