@@ -538,6 +538,7 @@ SEEK::Application.routes.draw do
     member do
       get :diagram
       get :ro_crate
+      get :ro_crate_metadata
       get :new_version
       get :new_git_version
       post :create_version_metadata
