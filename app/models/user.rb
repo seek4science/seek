@@ -337,7 +337,7 @@ class User < ApplicationRecord
 
   def queue_update_auth_table
     if saved_changes.keys.include?("person_id")
-      AuthLookupUpdateQueue.enqueue(self)
+      AuthLookupUpdateQueue.enqueue(self, priority: 1)
     end
   end
 
