@@ -163,6 +163,16 @@ class DataFilesController < ApplicationController
       format.html
     end
   end
+  
+  def unzip
+
+      UnzipDataFileJob.new(@data_file).queue_job
+
+
+    respond_to do |format|
+      format.html { redirect_to @data_file }
+    end
+  end
 
   def extract_samples
     if params[:confirm]
