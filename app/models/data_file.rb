@@ -259,4 +259,5 @@ class DataFile < ApplicationRecord
   has_task :sample_extraction
   has_task :sample_persistence
   has_task :unzip
+  has_task :unzip_persistence
 end
