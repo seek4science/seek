@@ -12,6 +12,8 @@ The Experiment Sample Templates must be in .json format and comply to the expect
 
 ![experiment view](/images/user-guide/isajson-compliance/serveradmin-expsampletemplate-jsonupload.png){:.screenshot}
 
+JSON definitions of Experiment Sample Templates tailored for submission towards EBI repositories can be found in this [GitHub repository](https://github.com/ELIXIR-Belgium/ISA-merger).
+
 ## ISA minimal starter template
 When the ISA-JSON compliance feature is enabled in the platform, it is recommended to use the "ISA minimal starter template" as the starting point for creating any new Experiment Sample Template. One ISA minimal starter template is provided for each ISA Level with the feature.
 
