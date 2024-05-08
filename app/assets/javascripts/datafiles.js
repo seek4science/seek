@@ -13,7 +13,7 @@ Datafiles.initTable = function (selector, enableRowSelection, opts) {
     var options = $j.extend({}, opts, {
         "lengthMenu": [ 5, 10, 25, 50, 75, 100 ],
         "pageLength": 10,
-        dom: '<"row"<"col-sm-10"lr><"col-sm-2 text-right"B>><"samples-table-container"t>ip', // Needed to place the buttons
+        dom: '<"row"<"col-sm-10"lr><"col-sm-2 text-right"B>><"datafiles-table-container"t>ip', // Needed to place the buttons
         "columnDefs": [{
             "targets": [ 0, 1 ],
             "visible": false,
@@ -91,22 +91,22 @@ Datafiles.initTable = function (selector, enableRowSelection, opts) {
                 }
             });
         }
-        // SEEK sample columns
-        var seekSampleColumns = [];
+        // SEEK datafile columns
+        var seekDatafileColumns = [];
         $j('table thead th', selector).each(function (index, column) {
-            if(['SeekSample','SeekSampleMulti'].includes($j(column).data('columnType'))) {
-                seekSampleColumns.push(index);
+            if(['SeekDatafile','SeekDatafileMulti'].includes($j(column).data('columnType'))) {
+                seekDatafileColumns.push(index);
             }
         });
-        if(seekSampleColumns.length > 0) {
+        if(seekDatafileColumns.length > 0) {
             options["columnDefs"].push({
-                "targets": seekSampleColumns,
+                "targets": seekDatafileColumns,
                 "render": function (data, type, row) {
                     var values = Array.isArray(data) ? data : [data];
                     var result = $j.map(values, function(value, i) {
                         if(value && value.id) {
                             if (value.title)
-                                return '<a href="/samples/' + value.id + '">' + value.title + '</a>';
+                                return '<a href="/datafiles/' + value.id + '">' + value.title + '</a>';
                             else
                                 return '<span class="none_text">' + (value.id || value.title) + '</span>';
                         } else {
@@ -124,7 +124,7 @@ Datafiles.initTable = function (selector, enableRowSelection, opts) {
                 options["columnDefs"].push({
                     "targets": [index],
                     "render": function (data, type, row) {
-                        return '<a href="/samples/' + row.id + '">' + row.title + '</a>';
+                        return '<a href="/datafiles/' + row.id + '">' + row.title + '</a>';
                     }
                 });
             }
@@ -133,7 +133,7 @@ Datafiles.initTable = function (selector, enableRowSelection, opts) {
 
     if(enableRowSelection) {
         $j.extend(options, options, {
-            dom: '<"row"<"col-sm-6"l><"col-sm-6 text-right"B>>r<"samples-table-container"t>ip', // Needed to place the buttons
+            dom: '<"row"<"col-sm-6"l><"col-sm-6 text-right"B>>r<"datafiles-table-container"t>ip', // Needed to place the buttons
             buttons: [
             {
                 text: 'Select All',
@@ -173,7 +173,7 @@ Datafiles.initTable = function (selector, enableRowSelection, opts) {
         });
     });
 
-    $j('table tbody td.sample-field-error div', selector).popover({
+    $j('table tbody td.datafile-field-error div', selector).popover({
         html: true,
         placement: 'top',
         trigger: 'hover'
