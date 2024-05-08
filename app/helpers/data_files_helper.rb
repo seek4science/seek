@@ -70,6 +70,6 @@ module DataFilesHelper
     # there is permission and a task
     return false unless data_file.can_manage? && data_file.unzip_task&.persisted?
     # persistence isn't currently running or already taken place
-    return true
+    return !( data_file.unzip_persistence_task&.success? || data_file.unzip_persistence_task&.in_progress? )
   end
 end

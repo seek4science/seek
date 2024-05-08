@@ -12,6 +12,7 @@
         <%= render :partial => "data_files/sample_extraction_status", :locals => {:data_file => @data_file} %>
         <%= render :partial => "data_files/sample_persistence_status", :locals => {:data_file => @data_file} %>
         <%= render :partial => "data_files/unzip_status", :locals => {:data_file => @data_file} %>
+        <%= render :partial => "data_files/unzip_persistence_status", :locals => {:data_file => @data_file} %>
 
         <%= item_description @display_data_file.description -%>
 

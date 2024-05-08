@@ -185,6 +185,15 @@ class DataFilesController < ApplicationController
       format.html { render partial: 'data_files/unzip_status', locals: { data_file: @data_file, job_status: job_status } }
     end
   end
+
+  def unzip_persistence_status
+    job_status = @data_file.unzip_persistence_task.status
+
+    respond_to do |format|
+      format.html { render partial: 'data_files/unzip_persistence_status', locals: { data_file: @data_file, job_status: job_status, previous_status: params[:previous_status] } }
+    end
+  end
+
   def confirm_unzip
     @datafiles, @unused = Seek::DataFiles::Unzipper.new(@data_file).fetch.partition(&:valid?)
     respond_to do |format|
