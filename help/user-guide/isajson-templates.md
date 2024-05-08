@@ -24,21 +24,33 @@ An Experiment Sample Template must have the following specifications.
 3. Organism: optional free text
 
 
-## Platform-wide and project specific Experiment Sample Templates
+## Types of Experiment Sample Templates
 
-Experiment Sample Templates can be provided by the platform administrator by uploading a json file (see below). Alternatively, they can be created by Project members based on an existing template. Templates provided by the platform administrator are platform-wide (or instance-wide) and visible to every registered user. Project-specific Experiment Sample Templates created by Project members are subject to sharing permissions.
+There are two types of Experiment Sample Templates: platform-wide and project-specific.
 
+### Platform-wide Experiment Sample Templates
 
+Platform-wide Experiment Sample Templates
+* must be provided by the platform administrator by uploading a json file via the Server admin panel
+* are platform-wide (or instance-wide) and visible to every registered user
+* are not subjected to sharing permission nor associated to any project
 
-### Creating Experiment Sample Templates as a project member
+### Project-specific Experiment Sample Templates
 
-Project members have the capability to create Experiment Sample Templates for their laboratory or research project. These templates can be shared among Projects and Programmes on the platform via granular [sharing permissions](general-attributes.html#sharing), allowing other project members to utilize them for designing their experiments.
+Project-specific Experiment Sample Templates
+* can be created by project members
+* must be associated to specific project(s)
+* are subjected to sharing permissions
+
+## Creating Experiment Sample Templates as a project member
+
+Project members have the capability to create Experiment Sample Templates for their laboratory or research project, called "Project specific Experiment Sample Templates". These templates can be shared among Projects and Programmes on the platform via granular [sharing permissions](general-attributes.html#sharing), allowing other project members to utilize them for designing their experiments.
 
 
 1. From the header menu bar, select "Create" and then "Experiment Sample Templates" under the Experiments section.
 2. Fill out the mandatory and optional fields.
 3. Under "Template Information", click on the "Choose from existing templates" button.
-4. Choose the template to start from based on its [characteristics](isa-json-compliant-experiment.html#experiment-sample-template-characteristics). After selecting the parameters listed below, choose the templates you wish to use as a basis, and then click "Apply".
+4. Choose the template to start from: after selecting the parameters listed below, choose the templates you wish to use as a basis, and then click "Apply".
 * The repository you want your template to comply to (e.g. ENA, ArrayExpress or your institutional repository). Select "Project specific templates" if you want to use a template made for or by a specific Project.
 * The ISA Level you want your template to be applicable for.
 * The Organism.
@@ -48,17 +60,16 @@ Project members have the capability to create Experiment Sample Templates for th
 * For ISA tag, note that the following tags can only be present once in a template: source, sample, other_material, data_file, protocol. One of these tags is already present in existing templates, so select one of the following as ISA tags: source_characteristic, parameter_value, sample_characteristic, other_material_characteristic, data_file_comment.
 6. Select "Create".
 
+### ISA minimal starter templates
 
-### JSON upload via Server admin panel [FOR SYSTEM ADMINISTRATORS]
+Project members have the option to create project-specific Experiment Sample Templates using the "ISA minimal starter templates". These basic templates, which are not associated with any repository, contain only the minimal attributes necessary to comply with the ISA-JSON model, identified by ISA-tags. One ISA minimal starter template for each ISA Level is provided. When utilizing the ISA minimal starter templates, project members should edit and customize attributes such as name, description, PID, data type, and unit.
+
+## Creating Experiment Sample Templates as system administrator
+
+### JSON upload via Server admin panel
+
 If ISA-JSON compliance feature is enabled, an option appears in the Server admin panel to upload instance-wide Experiment Sample Templates, compliant to ISA-JSON schemas.
 
 The Experiment Sample Templates must be in .json format and comply to the expected specification.
 
 ![experiment view](/images/user-guide/isajson-compliance/serveradmin-expsampletemplate-jsonupload.png){:.screenshot}
-
-
-### ISA minimal starter template
-
-Additionally, when the ISA-JSON compliance feature is enabled in the platform, an "ISA minimal starter template" is available which can be used as a starting point to create any Experiment Sample Template. One ISA minimal starter template for each ISA Level is provided.
-
-<!--where to find them, specification-->
