@@ -60,7 +60,7 @@ module DataFilesHelper
   end
 
   def show_unzip_folder_button?(asset, display_asset)
-    return false unless ( asset.can_manage? && (display_asset.version == asset.version) && asset.zipped_folder?)
+    return false unless ( asset.can_manage? && (display_asset.version == asset.version) && asset.zipped_folder? && asset.unzipped_files.empty? )
     return ! ( asset.unzip_task&.in_progress? || ( asset.unzip_task&.success? && Seek::DataFiles::Unzipper.new(asset).fetch.present? ) )
     rescue Seek::DataFiles::FetchException
       return true # allows to try again
