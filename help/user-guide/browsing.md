@@ -29,6 +29,8 @@ The columns to be shown by the table view can be customised, adding/removing col
 You can browse Samples registered in SEEK by Sample Type or by Experiment Sample Templates.
 * From any page, click on Browse from the top navigation bar
 * Select Samples from the dropdown menu
+* To query by Experiment Sample Templates, click the button "Query by Experiment Sample Templates" on the top right of the screen
+* To filter by Sample Type, use the filter "Sample type" on the left side bar
 
 <div class="alert alert-info">
 Note that the ISA-JSON compliance feature must be enabled by the platform administrator for browsing by Experiment 
