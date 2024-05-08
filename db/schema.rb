@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_03_11_113858) do
+ActiveRecord::Schema.define(version: 2024_04_03_114645) do
 
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
@@ -425,6 +425,7 @@ ActiveRecord::Schema.define(version: 2024_03_11_113858) do
     t.boolean "simulation_data", default: false
     t.string "deleted_contributor"
     t.integer "file_template_id"
+    t.integer "zip_origin_id"
     t.index ["contributor_id"], name: "index_data_files_on_contributor"
   end
 
