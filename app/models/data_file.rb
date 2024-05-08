@@ -22,6 +22,9 @@ class DataFile < ApplicationRecord
   has_many :extracted_samples, class_name: 'Sample', foreign_key: :originating_data_file_id
   has_many :sample_resource_links, -> { where(resource_type: 'DataFile') }, class_name: 'SampleResourceLink', foreign_key: :resource_id
   has_many :linked_samples, through: :sample_resource_links, source: :sample
+  
+  has_many :unzipped_files, class_name: 'DataFile', foreign_key: :zip_origin_id
+  belongs_to :zip_origin, class_name: 'DataFile', optional: true
 
   has_many :workflow_data_files, dependent: :destroy, autosave: true
   has_many :workflows, ->{ distinct }, through: :workflow_data_files
@@ -131,6 +134,12 @@ class DataFile < ApplicationRecord
   def related_samples
     extracted_samples + linked_samples
   end
+
+  
+  def related_data_files
+    zip_origin.nil? ? unzipped_files : [zip_origin] + unzipped_files
+  end
+
   def unzip(overwrite, tmp_dir, confirm=false)
     unzip_folder = Zip::File.open(content_blob.filepath)
     FileUtils.rm_r(tmp_dir) if File.exist?(tmp_dir)
