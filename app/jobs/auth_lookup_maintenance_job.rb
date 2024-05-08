@@ -20,8 +20,9 @@ class AuthLookupMaintenanceJob < ApplicationJob
 
       User.where.not(person_id: nil).to_a.push(nil).each do |user|
 
-        # skip if this user is queued up
-        next if AuthLookupUpdateQueue.where(item: user).any?
+        # skip if this user or person is queued up
+        next if user && AuthLookupUpdateQueue.where(item: user).or(AuthLookupUpdateQueue.where(item: user.person)).any?
+
         next if type.lookup_table_consistent?(user)
 
         items_for_queue.merge(type.items_missing_from_authlookup(user))
