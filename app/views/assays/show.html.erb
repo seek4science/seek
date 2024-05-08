@@ -160,7 +160,7 @@
   <%= tab_pane('related-items') do %>
     <%= render partial: 'general/items_related_to', object: @assay %>
   <% end %>
-	<% if Seek::Config.isa_json_compliance_enabled && @assay.is_isa_json_compliant? %>
+	<% if Seek::Config.isa_json_compliance_enabled && @assay.is_isa_json_compliant? && !@assay.is_assay_stream? %>
 		<%= tab_pane('assay_design') do %>
 			<%= render :partial=>"isa_assays/assay_design", locals: { assay: @assay} -%>
       <%= render partial: 'single_pages/change_batch_persmission_modal' %>
