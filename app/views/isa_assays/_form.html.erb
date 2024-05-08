@@ -80,7 +80,11 @@
   <%= assay_fields.hidden_field :assay_stream_id, value: assay_stream_id -%>
   <%= assay_fields.hidden_field :assay_class_id, value: assay_class_id -%>
 
-  <% unless is_assay_stream %>
+  <% if is_assay_stream %>
+    <% if User.current_user  -%>
+      <%= render partial: 'assets/manage_specific_attributes', locals:{f:assay_fields} if show_form_manage_specific_attributes? %>
+    <% end %>
+  <% else %>
     <% if User.current_user  -%>
       <%= render partial: 'assets/manage_specific_attributes', locals:{f:assay_fields} if show_form_manage_specific_attributes? %>
       <%= assay_fields.fancy_multiselect(:sops, other_projects_checkbox: true, name: "isa_assay[assay][sop_ids]")%>
