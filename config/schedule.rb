@@ -47,6 +47,10 @@ every RegularMaintenanceJob::RUN_PERIOD, at: offset(1) do
   runner "RegularMaintenanceJob.perform_later"
 end
 
+every AuthLookupMaintenanceJob::RUN_PERIOD, at: offset(1) do
+  runner "AuthLookupMaintenanceJob.perform_later"
+end
+
 every LifeMonitorStatusJob::PERIOD, at: offset(2) do
   runner "LifeMonitorStatusJob.perform_later"
 end
