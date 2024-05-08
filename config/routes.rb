@@ -500,6 +500,8 @@ SEEK::Application.routes.draw do
       get :has_matching_sample_type
       post :unzip
       get :unzip_status
+      get :confirm_unzip
+      delete :cancel_unzip
     end
     resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :collections, :workflows, :file_templates, :placeholders, only: [:index]
   end

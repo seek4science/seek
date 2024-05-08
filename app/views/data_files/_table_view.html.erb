@@ -1,0 +1,34 @@
+<% link ||= false %>
+
+
+
+<div data-role="seek-association-candidate-list">
+  <div class="table-responsive">
+    <table class="table table-bordered datafiles-table" style="width: 100%">
+      <% [:thead, :tfoot].each do |section| %>
+          <%= content_tag(section) do %>
+              <tr>
+                <th>ID</th>
+                <th>Title</th>
+
+              </tr>
+          <% end %>
+      <% end %>
+      <tbody>
+      <% datafiles.each do |datafiles| %>
+          <%= content_tag(:tr) do %>
+              <td><%= datafiles.id %></td>
+              <td><%= datafiles.title %></td>
+          <% end %>
+
+      <% end %>
+      </tbody>
+    </table>
+  </div>
+  <% if datafiles.map { |s| s.errors.any? }.all? %>
+      <%= modal(id: 'datafiles-error-modal') do %>
+          <%= modal_header 'Errors' %>
+          <%= modal_body {} %>
+      <% end %>
+  <% end %>
+</div>

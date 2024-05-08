@@ -180,6 +180,21 @@ class DataFilesController < ApplicationController
       format.html { render partial: 'data_files/unzip_status', locals: { data_file: @data_file, job_status: job_status } }
     end
   end
+  def confirm_unzip
+    @datafiles, @unused = Seek::DataFiles::Unzipper.new(@data_file).fetch.partition(&:valid?)
+    respond_to do |format|
+      format.html
+    end
+  end
+
+  def cancel_unzip
+    Seek::DataFiles::Unzipper.new(@data_file).clear
+
+    respond_to do |format|
+      flash[:notice] = 'Unzip cancelled'
+      format.html { redirect_to @data_file }
+    end
+  end
 
   def extract_samples
     if params[:confirm]
