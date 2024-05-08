@@ -15,6 +15,44 @@ module Seek
           self.class.decode(cache { self.class.encode(@data_file.unzip(overwrite, tmp_file_path, confirm=false)) })
         end
   
+        # Persist the extracted datafiles to the database
+        def persist(user = User.current_user)
+          User.with_current_user(user) do
+            data_files = unzip.select(&:valid?) # Re-extracts samples if cache expired, otherwise returns the cached samples
+  
+            if data_files.any?
+              DataFile.transaction do
+                last_id = DataFile.last.try(:id) || 0
+
+                data_files.each do |data_file|
+                  data_file_content_blob = ContentBlob.new
+                  data_file_content_blob.tmp_io_object = File.open("#{tmp_file_path}#{data_file.title}")
+                  data_file_content_blob.original_filename = "#{data_file.title}"
+                  data_file_content_blob.save
+                  data_file.content_blob = data_file_content_blob
+                  data_file.policy = data_file.zip_origin.policy.deep_copy
+                  data_file.save
+                end
+  
+                project_ids = data_files.first.project_ids
+                contributor = data_files.first.contributor
+                # to get the created files. There is a very small potential of picking up files created from an overlapping process but it will just trigger some additional jobs
+                data_files = DataFile.where(title: data_files.collect(&:title), contributor: contributor).where(
+                  'id > ?', last_id
+                )
+                # makes sure linked resources are updated
+                data_files.each do |data_file|
+                  data_file.project_ids = project_ids
+                  data_file.run_callbacks(:validation) { false }
+                end
+                ReindexingQueue.enqueue(data_files)
+                AuthLookupUpdateQueue.enqueue(data_files)
+              end
+            end
+            FileUtils.rm_r(tmp_file_path)
+            data_files
+          end
+        end
   
         # Clear the temporarily-stored samples
         def clear
@@ -73,3 +111,4 @@ module Seek
       end
     end
   end
+  
