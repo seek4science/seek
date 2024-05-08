@@ -16,6 +16,7 @@ class DataFilesController < ApplicationController
   before_action :find_display_asset, only: [:show, :explore, :download]
   before_action :get_sample_type, only: :extract_samples
   before_action :check_already_extracted, only: :extract_samples
+  before_action :check_already_unzipped, only: :unzip
   before_action :forbid_new_version_if_samples, :only => :create_version
 
   before_action :oauth_client, only: :retrieve_nels_sample_metadata
@@ -508,6 +509,15 @@ class DataFilesController < ApplicationController
   def forbid_new_version_if_samples
     if @data_file.extracted_samples.any?
       flash[:error] = "Cannot upload a new version if samples have been extracted"
+      respond_to do |format|
+        format.html { redirect_to @data_file }
+      end
+    end
+  end
+
+  def check_already_unzipped
+    if @data_file.unzipped_files.any?
+      flash[:error] = 'Already unzipped this data file'
       respond_to do |format|
         format.html { redirect_to @data_file }
       end
