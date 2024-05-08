@@ -502,6 +502,7 @@ SEEK::Application.routes.draw do
       get :unzip_status
       get :confirm_unzip
       delete :cancel_unzip
+      get :unzip_persistence_status
     end
     resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :collections, :workflows, :file_templates, :placeholders, only: [:index]
   end

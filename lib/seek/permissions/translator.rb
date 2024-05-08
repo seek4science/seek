@@ -29,7 +29,7 @@ module Seek
         manage: Set.new(%i[
                           manage manage_update notification read_interaction write_interaction report_problem storage_report
                           select_sample_type extraction_status persistence_status extract_samples confirm_extraction cancel_extraction
-                          upload_fulltext upload_pdf soft_delete_fulltext has_matching_sample_type unzip unzip_status confirm_unzip cancel_unzip
+                          upload_fulltext upload_pdf soft_delete_fulltext has_matching_sample_type unzip unzip_status confirm_unzip unzip_persistence_status cancel_unzip
                         ]).freeze
       }.freeze
 
