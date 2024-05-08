@@ -60,9 +60,6 @@ class AuthLookupMaintenaceJobTest < ActiveSupport::TestCase
       refute Document.lookup_table_consistent?(p.user)
       refute Document.lookup_table_consistent?(p2.user)
 
-      #gets immmediately updated for anonymous user
-      assert Document.lookup_table_consistent?(nil)
-
       assert_enqueued_jobs(1) do
         assert_difference('AuthLookupUpdateQueue.count',1) do
           AuthLookupMaintenanceJob.perform_now
@@ -78,7 +75,32 @@ class AuthLookupMaintenaceJobTest < ActiveSupport::TestCase
 
   end
 
-  test 'skip if user in the queue' do
+  test 'test for anonymous user' do
+
+    with_config_value(:auth_lookup_enabled, true) do
+      assert AuthLookupUpdateQueue.queue_enabled?
+
+      doc = FactoryBot.create(:document)
+      AuthLookupUpdateJob.perform_now
+
+      assert Document.lookup_table_consistent?(nil)
+
+      # delete a record
+      Document.lookup_class.where(user_id:0,asset_id:doc.id).last.delete
+
+      refute Document.lookup_table_consistent?(nil)
+
+      # queued after the user has been removed
+      assert_enqueued_jobs(1) do
+        assert_difference('AuthLookupUpdateQueue.count',1) do
+          AuthLookupMaintenanceJob.perform_now
+        end
+      end
+
+    end
+  end
+
+  test 'skip if user or person in the queue' do
 
     p = FactoryBot.create(:person)
 
@@ -95,9 +117,6 @@ class AuthLookupMaintenaceJobTest < ActiveSupport::TestCase
 
       refute Document.lookup_table_consistent?(p.user)
 
-      #gets immediately updated for anonymous user
-      assert Document.lookup_table_consistent?(nil)
-
       refute AuthLookupUpdateQueue.any?
       AuthLookupUpdateQueue.create!(item: p.user)
       assert AuthLookupUpdateQueue.any?
@@ -110,7 +129,21 @@ class AuthLookupMaintenaceJobTest < ActiveSupport::TestCase
       end
 
       AuthLookupUpdateQueue.destroy_all
+      AuthLookupUpdateQueue.create!(item: p)
+      assert AuthLookupUpdateQueue.any?
+
+      # nothing queued whilst person is queued
+      assert_no_enqueued_jobs do
+        assert_no_difference('AuthLookupUpdateQueue.count') do
+          AuthLookupMaintenanceJob.perform_now
+        end
+      end
+
+      AuthLookupUpdateQueue.destroy_all
       refute AuthLookupUpdateQueue.any?
+      #add another item to make sure it's only checking for user/person
+      AuthLookupUpdateQueue.create!(item: FactoryBot.create(:sop))
+      assert AuthLookupUpdateQueue.any?
 
       # queued after the user has been removed
       assert_enqueued_jobs(1) do
@@ -137,9 +170,6 @@ class AuthLookupMaintenaceJobTest < ActiveSupport::TestCase
       Document.lookup_class.where(user_id:p.user.id,asset_id:doc1.id).last.delete
 
       refute Document.lookup_table_consistent?(p.user)
-
-      #gets immediately updated for anonymous user
-      assert Document.lookup_table_consistent?(nil)
 
       refute AuthLookupUpdateQueue.any?
       AuthLookupUpdateQueue.create!(item: doc1)
@@ -190,11 +220,6 @@ class AuthLookupMaintenaceJobTest < ActiveSupport::TestCase
       refute Document.lookup_table_consistent?(p.user)
       refute Sample.lookup_table_consistent?(p.user)
       refute Sop.lookup_table_consistent?(p.user)
-
-      #gets immediately updated for anonymous user
-      assert Document.lookup_table_consistent?(nil)
-      assert Sample.lookup_table_consistent?(nil)
-      assert Sop.lookup_table_consistent?(nil)
 
       assert_enqueued_jobs(3) do
         assert_difference('AuthLookupUpdateQueue.count',3) do
