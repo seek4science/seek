@@ -10,7 +10,7 @@ class UserAuthLookupUpdateJob < ApplicationJob
   end
 
   def perform(user, type, offset = 0)
-    type.constantize.offset(offset).limit(BATCH_SIZE).includes(policy: :permissions).find_each do |item|
+    type.constantize.offset(offset).limit(BATCH_SIZE).includes(policy: :permissions).each do |item|
       item.update_lookup_table(user)
     end
 
