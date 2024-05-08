@@ -9,7 +9,7 @@ layout: page
 
 Study Source(s)
 * Study Sources must be created within an ISA Study, using an Experiment Sample Template level "Study Source".
-* Each Study Source must be the input of at least one Study Sample (or more) in the same ISA Study.
+* Each Study Source should be the input of at least one Study Sample (or more) in the same ISA Study.
 
 Study Sample(s)
 * Study Samples must be created within an ISA Study, using an Experiment Sample Template level "Study Sample".
