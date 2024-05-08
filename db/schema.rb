@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_03_11_113858) do
+ActiveRecord::Schema.define(version: 2024_04_03_114645) do
 
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
@@ -425,6 +425,7 @@ ActiveRecord::Schema.define(version: 2024_03_11_113858) do
     t.boolean "simulation_data", default: false
     t.string "deleted_contributor"
     t.integer "file_template_id"
+    t.integer "zip_origin_id"
     t.index ["contributor_id"], name: "index_data_files_on_contributor"
   end
 
@@ -1751,10 +1752,19 @@ ActiveRecord::Schema.define(version: 2024_03_11_113858) do
     t.datetime "updated_at", null: false
     t.string "first_letter", limit: 1
     t.string "source_ontology"
+<<<<<<< HEAD
     t.string "ols_root_term_uris"
     t.string "short_name"
     t.string "key"
     t.integer "template_id"
+=======
+    t.string "ols_root_term_uri"
+    t.string "short_name"
+    t.string "key"
+    t.integer "template_id"
+    t.boolean "required"
+    t.boolean "custom_input", default: false
+>>>>>>> a9173fb24b (Add unzipped files as related datafiles)
   end
 
   create_table "sample_resource_links", id: :integer, force: :cascade do |t|
