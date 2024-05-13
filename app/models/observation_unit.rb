@@ -4,6 +4,7 @@ class ObservationUnit < ApplicationRecord
   include Seek::ProjectAssociation
   include Seek::Stats::ActivityCounts
   include Seek::Search::CommonFields, Seek::Search::BackgroundReindexing
+  include Seek::Rdf::RdfGeneration
 
   belongs_to :contributor, class_name: 'Person'
   belongs_to :study

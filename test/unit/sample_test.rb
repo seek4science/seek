@@ -1385,7 +1385,6 @@ class SampleTest < ActiveSupport::TestCase
   test 'to rdf' do
     sample = FactoryBot.create(:max_sample)
     rdf = sample.to_rdf
-    pp rdf
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count > 1
       assert_equal RDF::URI.new("http://localhost:3000/samples/#{sample.id}"), reader.statements.first.subject

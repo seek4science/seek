@@ -8,6 +8,10 @@ class SamplesControllerTest < ActionController::TestCase
   include GeneralAuthorizationTestCases
   include RdfTestCases
 
+  def rdf_test_object
+    FactoryBot.create(:max_sample, policy: FactoryBot.create(:public_policy))
+  end
+
   test 'index' do
     FactoryBot.create(:sample, policy: FactoryBot.create(:public_policy))
     get :index

@@ -97,7 +97,12 @@ module Seek
 
       # the URI for the type of this object, for example http://jermontology.org/ontology/JERMOntology#Study for a Study
       def rdf_type_uri
-        JERMVocab[rdf_type_entity_fragment]
+        case rdf_type_entity_fragment
+        when Symbol
+          JERMVocab[rdf_type_entity_fragment]
+        when String
+          RDF::URI(rdf_type_entity_fragment)
+        end
       end
 
       def rdf_type_entity_fragment

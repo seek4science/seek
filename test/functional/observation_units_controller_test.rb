@@ -3,6 +3,12 @@ require 'minitest/mock'
 
 class ObservationUnitsControllerTest < ActionController::TestCase
 
+  include RdfTestCases
+
+  def rdf_test_object
+    FactoryBot.create(:max_observation_unit)
+  end
+
   test 'show' do
     unit = FactoryBot.create(:max_observation_unit)
     get :show, params: { id: unit.id }

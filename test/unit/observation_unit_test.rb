@@ -17,4 +17,15 @@ class ObservationUnitTest < ActiveSupport::TestCase
     refute_empty obs_unit.data_files
   end
 
+
+  test 'to rdf' do
+    obs_unit = FactoryBot.create(:max_observation_unit)
+    rdf = obs_unit.to_rdf
+    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
+      assert reader.statements.count > 1
+      assert_equal RDF::URI.new("http://localhost:3000/observation_units/#{obs_unit.id}"), reader.statements.first.subject
+    end
+  end
+
+
 end
