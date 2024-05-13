@@ -84,7 +84,6 @@ def load_seek_config_defaults!
   Seek::Config.default :isa_enabled, true
   Seek::Config.default :models_enabled,true
   Seek::Config.default :organisms_enabled,true
-  Seek::Config.default :strains_enabled, true
   Seek::Config.default :programmes_enabled, false
   Seek::Config.default :presentations_enabled,true
   Seek::Config.default :publications_enabled,true
