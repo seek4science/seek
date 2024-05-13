@@ -29,6 +29,30 @@ class StudyTest < ActiveSupport::TestCase
     end
   end
 
+  test 'include extended metadata in rdf' do
+    object = FactoryBot.create(:study, description: 'My famous study',
+                               extended_metadata_attributes:{
+                                 extended_metadata_type: FactoryBot.create(:fairdata_virtual_demo_study_extended_metadata_partial),
+                                 data:{
+                                   'Alias':'the alias',
+                                   'Submission Alias':'the submission alias'
+                                 }
+                               })
+    rdf = object.to_rdf
+    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
+      assert reader.statements.count > 1
+      assert_equal RDF::URI.new("http://localhost:3000/studies/#{object.id}"), reader.statements.first.subject
+      statement = reader.statements.detect{|s| s.subject == RDF::URI.new("http://localhost:3000/studies/#{object.id}") && s.predicate == RDF::URI("http://fairbydesign.nl/ontology/alias")}
+      assert_equal RDF::Literal('the alias'), statement.object
+
+      statement = reader.statements.detect{|s| s.subject == RDF::URI.new("http://localhost:3000/studies/#{object.id}") && s.predicate == RDF::URI("http://fairbydesign.nl/ontology/submission_alias")}
+      assert_equal RDF::Literal('the submission alias'), statement.object
+
+      statement = reader.statements.detect{|s| s.subject == RDF::URI.new("http://localhost:3000/studies/#{object.id}") && s.predicate == RDF::URI("http://fairbydesign.nl/ontology/submission_lab_name")}
+      assert_equal RDF::Literal(''), statement.object
+    end
+  end
+
   # only authorized people can delete a study, and a study must have no assays
   test 'can delete' do
     project_member = FactoryBot.create(:person)
