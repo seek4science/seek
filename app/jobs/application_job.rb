@@ -59,6 +59,7 @@ class ApplicationJob < ActiveJob::Base
   end
 
   def report_exception(exception, message = nil, data = {})
+    data.merge!({job_class: self.class.name})
     message ||= "Error executing job for #{self.class.name}"
     Seek::Errors::ExceptionForwarder.send_notification(exception, data: data)
     Rails.logger.error(message)

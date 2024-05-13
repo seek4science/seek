@@ -19,6 +19,33 @@ const defaultCols = [{
   }
 }];
 
+// Sanitizes input data to prevent XSS attacks
+// https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html
+function sanitizeHTML(str) {
+    return str.replace(/[&<>"']/g, function(match) {
+        return {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#x27;'
+        }[match];
+    });
+}
+
+function sanitizeData(data) {
+    if (typeof data === 'string' && data !== "") {
+        return sanitizeHTML(data);
+    } else if(typeof data === 'array'){
+        return data.forEach((e) => {
+            sanitizeData(e);
+        });
+    } else {
+        // Handle other data types or nested objects/arrays if necessary
+        return data;
+    }
+}
+
 const objectInputTemp = '<input type="hidden" name="_NAME_[]" id="inpt-_NAME_" value="" autocomplete="off" />' +
   '<select name="_NAME_[]" id="select-_NAME_" class="form-control _EXTRACLASS_" title="_TITLE_" data-role="seek-objectsinput" ' +
   'data-tags-limit="100" _MULTIPLE?_ style="background-color: coral;" data-typeahead-template="_TYPEHEAD_"' +
@@ -59,12 +86,13 @@ const handleSelect = (e) => {
         }
 
         c["render"] = function(data_, type, full, meta) {
+          sanitizedData = sanitizeData(data_);
           if(c.linked_sample_type){
-            data = data_ && Array.isArray(data_) ? data_ : [data_];
+            data = sanitizedData && Array.isArray(sanitizedData) ? sanitizedData : [sanitizedData];
             data = data[0]?.id ? data : [];
             return inputObjectsInput(c, data, options, linkedSamplesUrl);
-          } else if(c.is_cv_list && data_ !== "#HIDDEN"){
-              data = data_ && Array.isArray(data_) ? data_ : [data_];
+          } else if(c.is_cv_list && sanitizedData !== "#HIDDEN"){
+              data = sanitizedData && Array.isArray(sanitizedData) ? sanitizedData : [sanitizedData];
               data = data.map((e) => {
                 if (e?.id){
                   return e.id
@@ -73,10 +101,10 @@ const handleSelect = (e) => {
                 }
               });
               return cvListObjectsInput(c, data, options, cvUrl);
-          } else if (data_ === "#HIDDEN") {
+          } else if (sanitizedData === "#HIDDEN") {
             return "<em><small>Hidden</small></em>";
           } else {
-            return data_;
+            return sanitizedData;
           }
         };
         c["createdCell"] = function(td, cellData, rowData, row, col) {
@@ -162,7 +190,7 @@ const handleSelect = (e) => {
         $j.each(sampleTypes, (i, s) => {
           if (!isNaN(s)) {
             const colIdxs = this.table.columns(`${s}:name`)[0];
-            if (colIdxs.length) colIdxs.push(colIdxs[0] - 1);
+            if (colIdxs.length) colIdxs.push(colIdxs[0] - 1, colIdxs[0] - 2);
             this.table.column(function(idx, data, node) {
               if (colIdxs.includes(idx)) $j(node).addClass(`sp-variant-${i % 2}`);
             });
@@ -435,6 +463,7 @@ const handleSelect = (e) => {
   };
 })(jQuery);
 
+// Highlights the column if the attribute is a title
 function highlightTitleCol(table) {
   table.settings()[0].aoColumns.forEach((c, i) => {
     if (c.is_title) $j(table.column(i).nodes()).addClass("highlight");
@@ -546,11 +575,11 @@ function inputObjectsInput(column, data, options, url){
     if (isHiddenInput) {
       return `<option selected="selected" title="ID: hidden" value="hidden">hidden</option>`
     } else {
-      return `<option selected="selected" title="ID: ${e.id}" value="${e.id}">${e.title}</option>`
+      return `<option selected="selected" title="ID: ${e.id}" value="${e.id}">${sanitizeData(e.title)}</option>`
     }
   }).join("");
   if (options.readonly) {
-    return data.map((e) => `<span title="ID: ${e.id}" class="badge">${e.title}</span>`).join(" ");
+    return data.map((e) => `<span title="ID: ${e.id}" class="badge">${sanitizeData(e.title)}</span>`).join(" ");
   } else {
     const typeaheadTemplate = 'typeahead/single_pages_samples'
     const objectInputName = data.map((e) => e.id).join('-') + '-' + crypto.randomUUID();
@@ -582,16 +611,16 @@ function inputObjectsInput(column, data, options, url){
 }
 
 function cvListObjectsInput(column, data, options, url){
-  const existingOptions = data.map((e) => `<option selected="selected" value="${e}">${e}</option>`);
-  if (options.readonly) {
-    return data.map((e) => `<span title="ID: ${e}" class="badge">${e}</span>`).join(" ");
-  } else {
-    const typeaheadTemplate = 'typeahead/controlled_vocab_term';
-    const objectInputName = data.map((e) => e.title).join('-') + '-' + crypto.randomUUID();
-    const extraClass = '';
-    const titleText = '';
-    const allowNewItems = column.cv_allows_free_text;
-    setTimeout(ObjectsInput.init);
+  const existingOptions = data.map((e) => `<option selected="selected" value="${sanitizeData(e)}">${sanitizeData(e)}</option>`);
+    if (options.readonly) {
+        return data.map((e) => `<span title="ID: ${sanitizeData(e)}" class="badge">${sanitizeData(e)}</span>`).join(" ");
+    } else {
+        const typeaheadTemplate = 'typeahead/controlled_vocab_term';
+        const objectInputName = data.map((e) => sanitizeData(e)).join('-') + '-' + crypto.randomUUID();
+        const extraClass = '';
+        const titleText = '';
+        const allowNewItems = column.cv_allows_free_text;
+        setTimeout(ObjectsInput.init);
 
     return objectInputTemp
     .replace(/_NAME_/g, objectInputName)
