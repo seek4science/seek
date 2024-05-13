@@ -112,16 +112,15 @@ namespace :seek do
     Permission.skip_callback :commit, :after, :queue_rdf_generation_job
 
     disable_authorization_checks do
-
       Sample.includes(:originating_data_file).in_batches(of: 250) do |batch|
         batch.each do |sample|
           # check if the sample was extracted from a datafile and their policies are linked
-          #if sample.extracted? && sample.policy_id == sample.originating_data_file&.policy_id
+          if sample.extracted? && sample.policy_id == sample.originating_data_file&.policy_id
             policy = sample.policy.deep_copy
-          #  policy.save
-          #  sample.update_column(:policy_id, policy.id)
+            policy.save
+            sample.update_column(:policy_id, policy.id)
             affected_samples << sample
-          #end
+          end
         end
         putc('.')
       end
@@ -136,27 +135,27 @@ namespace :seek do
 
   task(decouple_extracted_samples_projects: [:environment]) do
     puts '..... copying project ids for extracted samples...'
-    decoupled = 0
+    decoupled_count = 0
     hash_array = []
     disable_authorization_checks do
-      Sample.includes(:originating_data_file).in_batches(of: 250) do |batch|
+      Sample.includes(:originating_data_file).where.missing(:projects).in_batches(of: 250) do |batch|
         batch.each do |sample|
           # check if the sample was extracted from a datafile and their projects are linked
           if sample.extracted? && sample.project_ids.empty?
             sample.originating_data_file.project_ids.each do |project_id|
               hash_array << { project_id: project_id, sample_id: sample.id }
             end
-            decoupled += 1
+            decoupled_count += 1
           end
         end
         putc('.')
       end
       unless hash_array.empty?
         class ProjectsSample < ActiveRecord::Base; end;
-        #ProjectsSample.insert_all(hash_array)
+        ProjectsSample.insert_all(hash_array)
       end
     end
-    puts " ... finished copying project ids of #{decoupled.to_s} extracted samples"
+    puts " ... finished copying project ids of #{decoupled_count.to_s} extracted samples"
   end
 
   task(link_sample_datafile_attributes: [:environment]) do
