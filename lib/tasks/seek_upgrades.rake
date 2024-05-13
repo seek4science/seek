@@ -11,9 +11,6 @@ namespace :seek do
     decouple_extracted_samples_policies
     decouple_extracted_samples_projects
     link_sample_datafile_attributes
-    strip_sample_attribute_pids
-    rename_registered_sample_multiple_attribute_type
-    remove_ontology_attribute_type
     db:seed:007_sample_attribute_types
     db:seed:001_create_controlled_vocabs
     db:seed:017_minimal_starter_isa_templates
@@ -52,53 +49,6 @@ namespace :seek do
       puts 'Upgrade completed successfully'
     ensure
       Seek::Config.solr_enabled = solr
-    end
-  end
-
-  task(rename_registered_sample_multiple_attribute_type: [:environment]) do
-    attr = SampleAttributeType.find_by(title:'Registered Sample (multiple)')
-    if attr
-      puts "..... Renaming sample attribute type 'Registered Sample (multiple)' to 'Registered Sample List'."
-      attr.update_column(:title, 'Registered Sample List')
-    end
-  end
-
-  task(strip_sample_attribute_pids: [:environment]) do
-    puts '..... Stripping Sample Attribute PIds ...'
-    n = 0
-    SampleAttribute.where('pid is NOT NULL AND pid !=?','').each do |attribute|
-      new_pid = attribute.pid.strip
-      if attribute.pid != new_pid
-        attribute.update_column(:pid, new_pid)
-        n += 1
-      end
-    end
-    puts "..... Finished stripping #{n} Sample Attribute PIds."
-  end
-
-  task(remove_ontology_attribute_type: [:environment]) do
-    ontology_attr_type = SampleAttributeType.find_by(title:'Ontology')
-    cv_attr_type = SampleAttributeType.find_by(title:'Controlled Vocabulary')
-    if ontology_attr_type
-      puts '..... Removing the Ontology sample attribute type ...'
-      if cv_attr_type
-        if ontology_attr_type.sample_attributes.any?
-          puts "..... Moving #{ontology_attr_type.sample_attributes.count} sample attributes to Controlled Vocabulary"
-          ontology_attr_type.sample_attributes.each do |attr_type|
-            attr_type.update_column(:sample_attribute_type_id, cv_attr_type.id)
-          end
-        end
-        if ontology_attr_type.isa_template_attributes.any?
-          puts "..... Moving #{ontology_attr_type.isa_template_attributes.count} template attributes to Controlled Vocabulary"
-          ontology_attr_type.isa_template_attributes.each do |attr_type|
-            attr_type.update_column(:sample_attribute_type_id, cv_attr_type.id)
-          end
-        end
-
-        ontology_attr_type.destroy
-      else
-        puts '..... Target Controlled Vocabulary attribute type not found'
-      end
     end
   end
 
