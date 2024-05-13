@@ -190,4 +190,12 @@ class ApplicationRecord < ActiveRecord::Base
   def updated_last_by
     ActivityLog.where(activity_loggable:self, action:'update').last&.culprit&.person
   end
+
+  def supports_extended_metadata?
+    self.class.supports_extended_metadata?
+  end
+
+  def self.supports_extended_metadata?
+    reflect_on_association(:extended_metadata).present?
+  end
 end

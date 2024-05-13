@@ -29,6 +29,11 @@ class StudyTest < ActiveSupport::TestCase
     end
   end
 
+  test 'supports extended metadata?' do
+    assert Study.supports_extended_metadata?
+    assert Study.new.supports_extended_metadata?
+  end
+
   test 'include extended metadata in rdf' do
     object = FactoryBot.create(:study, description: 'My famous study',
                                extended_metadata_attributes:{

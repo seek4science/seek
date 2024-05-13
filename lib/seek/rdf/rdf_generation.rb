@@ -72,7 +72,7 @@ module Seek
       end
 
       def extended_metadata_triples(rdf_graph)
-        return rdf_graph unless extended_metadata&.extended_metadata_type
+        return rdf_graph unless supports_extended_metadata? && extended_metadata&.extended_metadata_type
         attributes = extended_metadata.extended_metadata_type.extended_metadata_attributes.select{|at| at.property_type_id.present?}
         resource = rdf_resource
         attributes.each do |attribute|
