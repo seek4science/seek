@@ -35,7 +35,8 @@ module Seek
           Study => :Study,
           Investigation => :Investigation,
           Publication => :Publication,
-          Strain => :Strain
+          Strain => :Strain,
+          Sample => :Sample
         }
       end
 

@@ -6,16 +6,7 @@ class SamplesControllerTest < ActionController::TestCase
   include SharingFormTestHelper
   include HtmlHelper
   include GeneralAuthorizationTestCases
-
-  test 'should return 406 when requesting RDF' do
-    login_as(FactoryBot.create(:user))
-    sample = FactoryBot.create :sample, contributor: User.current_user.person
-    assert sample.can_view?
-
-    get :show, params: { id: sample, format: :rdf }
-
-    assert_response :not_acceptable
-  end
+  include RdfTestCases
 
   test 'index' do
     FactoryBot.create(:sample, policy: FactoryBot.create(:public_policy))
@@ -1472,6 +1463,10 @@ class SamplesControllerTest < ActionController::TestCase
       assert_select 'span.subtle', text:/#{I18n.t('samples.allow_free_text_label_hint')}/, count: 0
     end
 
+  end
+
+  def rdf_test_object
+    FactoryBot.create(:max_sample, policy: FactoryBot.create(:public_policy))
   end
 
   private

@@ -1382,4 +1382,14 @@ class SampleTest < ActiveSupport::TestCase
     assert_equal [df1, df2, df3].sort_by(&:id), sample_ext_attr.related_data_files.sort_by(&:id)
   end
 
+  test 'to rdf' do
+    sample = FactoryBot.create(:max_sample)
+    rdf = sample.to_rdf
+    pp rdf
+    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
+      assert reader.statements.count > 1
+      assert_equal RDF::URI.new("http://localhost:3000/samples/#{sample.id}"), reader.statements.first.subject
+    end
+  end
+
 end

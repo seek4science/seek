@@ -62,6 +62,7 @@ Project,web_page,JERMVocab.webLink,l,URI.parse(item),compact
 Project,rdf_seek_id,JERMVocab.seekID,l,URI.parse(item),
 Publication,projects,JERMVocab.itemProducedBy,u,,
 Publication,assays,JERMVocab.isPartOf,u,,
+Sample,assays,JERMVocab.hasPart,u,,
 Sop,assays,JERMVocab.isPartOf,u,,
 Sop,projects,JERMVocab.itemProducedBy,u,,
 Sop,rdf_seek_id,JERMVocab.seekID,l,URI.parse(item),
