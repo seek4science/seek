@@ -21,25 +21,25 @@ module BioInd
         end
       end
 
-      def self.construct_isa(datastation_inv, contributor, projects)
-        inv_attributes = datastation_inv.seek_attributes.merge({contributor: contributor, projects: projects})
+      def self.construct_isa(datastation_inv, contributor, projects, policy)
+        inv_attributes = datastation_inv.seek_attributes.merge({contributor: contributor, projects: projects, policy:policy.deep_copy})
         investigation = ::Investigation.new(inv_attributes)
         populate_extended_metadata(investigation, datastation_inv)
 
         datastation_inv.studies.each do |datastation_study|
-          study_attributes = datastation_study.seek_attributes.merge({contributor: contributor, investigation: investigation})
+          study_attributes = datastation_study.seek_attributes.merge({contributor: contributor, investigation: investigation, policy:policy.deep_copy})
           study = investigation.studies.build(study_attributes)
           populate_extended_metadata(study, datastation_study)
           datastation_study.observation_units.each do |datastation_observation_unit|
             observation_unit_attributes = datastation_observation_unit.seek_attributes.merge({contributor: contributor, study:study, projects: projects})
             observation_unit = study.observation_units.build(observation_unit_attributes)
             datastation_observation_unit.datasets.each do |datastation_dataset|
-              df = build_data_file(contributor, datastation_dataset, projects)
+              df = build_data_file(contributor, datastation_dataset, projects, policy)
               observation_unit.observation_unit_assets.build(asset: df)
             end
             populate_extended_metadata(observation_unit, datastation_observation_unit)
             datastation_observation_unit.samples.each do |datastation_sample|
-              sample = ::Sample.new(contributor: contributor, projects: projects)
+              sample = ::Sample.new(contributor: contributor, projects: projects, policy:policy.deep_copy)
               populate_sample(sample, datastation_sample)
               if sample.valid?
                 observation_unit.samples << sample
@@ -49,11 +49,11 @@ module BioInd
               datastation_sample.assays.each do |datastation_assay|
                 samples = []
                 samples << sample if sample.valid?
-                assay_attributes = datastation_assay.seek_attributes.merge({contributor: contributor, study:study, assay_class: AssayClass.experimental, samples:samples})
+                assay_attributes = datastation_assay.seek_attributes.merge({contributor: contributor, study:study, assay_class: AssayClass.experimental, samples:samples, policy:policy.deep_copy})
                 assay = study.assays.build(assay_attributes)
                 populate_extended_metadata(assay, datastation_assay)
                 datastation_assay.datasets.each do |datastation_dataset|
-                  df = build_data_file(contributor, datastation_dataset, projects)
+                  df = build_data_file(contributor, datastation_dataset, projects, policy)
                   assay.assay_assets.build(asset: df)
                 end
               end
@@ -110,7 +110,7 @@ module BioInd
 
       private
 
-      def self.build_data_file(contributor, datastation_dataset, projects)
+      def self.build_data_file(contributor, datastation_dataset, projects, policy)
         # @_data_file_cache = {}
         # if @_data_file_cache[datastation_dataset.identifier]
         #   @_data_file_cache[datastation_dataset.identifier]
@@ -118,7 +118,7 @@ module BioInd
           blob = ContentBlob.new(url: datastation_dataset.content_url.to_s, original_filename: datastation_dataset.identifier, external_link: true, is_webpage: true, content_type: 'application/octet-stream')
           data_file_attributes = datastation_dataset.seek_attributes.merge({
                                                                              contributor: contributor, projects: projects,
-                                                                             content_blob: blob
+                                                                             content_blob: blob, policy: policy.deep_copy
                                                                            })
         DataFile.new(data_file_attributes)
         #   @_data_file_cache[datastation_dataset.identifier] = DataFile.new(data_file_attributes)

@@ -5047,20 +5047,47 @@ class ProjectsControllerTest < ActionController::TestCase
     person = FactoryBot.create(:person)
     FactoryBot.create(:fairdatastation_virtual_demo_sample_type)
     project = person.projects.first
+    another_person = FactoryBot.create(:person)
     login_as(person)
 
     ttl_file = fixture_file_upload('fairdatastation/demo.ttl')
 
-    post :submit_fairdata_station, params: {id: project, datastation_data: ttl_file}
+    post :submit_fairdata_station, params: {id: project, datastation_data: ttl_file,
+                                            policy_attributes:{
+                                              access_type: Policy::VISIBLE,
+                                              permissions_attributes: {
+                                                '0' => { contributor_type: 'Person', contributor_id: another_person.id, access_type: Policy::MANAGING
+                                                }
+                                              }
+                                            }
+    }
 
     assert investigation = assigns(:investigation)
     assert_redirected_to investigation
 
     assert_equal person, investigation.contributor
     assert_equal 1, investigation.studies.count
-    assert_equal 9, investigation.studies.first.assays.count
-    assert_equal 2, investigation.studies.first.observation_units.count
-    assert_equal 4, investigation.studies.first.observation_units.first.samples.count
+    study = investigation.studies.first
+    assert_equal 9, study.assays.count
+    assert_equal 2, study.observation_units.count
+    assert_equal 4, study.observation_units.first.samples.count
+
+    sample = study.observation_units.first.samples.first
+
+    assert_equal Policy::VISIBLE, investigation.policy.access_type
+    assert_equal 1, investigation.policy.permissions.count
+    assert_equal another_person, investigation.policy.permissions.first.contributor
+    assert_equal Policy::MANAGING, investigation.policy.permissions.first.access_type
+
+    assert_equal Policy::VISIBLE, study.policy.access_type
+    assert_equal 1, study.policy.permissions.count
+    assert_equal another_person, study.policy.permissions.first.contributor
+    assert_equal Policy::MANAGING, study.policy.permissions.first.access_type
+
+    assert_equal Policy::VISIBLE, sample.policy.access_type
+    assert_equal 1, sample.policy.permissions.count
+    assert_equal another_person, sample.policy.permissions.first.contributor
+    assert_equal Policy::MANAGING, sample.policy.permissions.first.access_type
 
   end
 

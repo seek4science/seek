@@ -5,6 +5,9 @@
   <label>FAIR Data Station TTL metadata file</label>
   <%= file_field_tag "datastation_data" -%>
 </div>
+
+  <%= render partial: 'sharing/permissions_table', locals: { object: @project, policy: (@project.default_policy || Policy.default), projects: [@project], downloadable:true } %>
+
 <div>
   <%= submit_tag("Submit", class:'btn btn-primary') %>
 </div>

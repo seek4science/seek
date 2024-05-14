@@ -198,8 +198,10 @@ class ProjectsController < ApplicationController
 
   def submit_fairdata_station
     path = params[:datastation_data].path
+    policy = Policy.new
+    policy.set_attributes_with_sharing(policy_params)
     datadata_inv = BioInd::FairData::Reader.parse_graph(path)
-    @investigation = BioInd::FairData::Reader.construct_isa(datadata_inv.first, current_person, [@project])
+    @investigation = BioInd::FairData::Reader.construct_isa(datadata_inv.first, current_person, [@project], policy)
     @investigation.save!
 
     respond_to do |format|

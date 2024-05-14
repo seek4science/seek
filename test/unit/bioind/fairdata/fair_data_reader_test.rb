@@ -160,13 +160,14 @@ class FairDataReaderTest < ActiveSupport::TestCase
   test 'construct seek isa' do
     path = "#{Rails.root}/test/fixtures/files/fairdatastation/demo.ttl"
     inv = BioInd::FairData::Reader.parse_graph(path).first
+    policy = FactoryBot.create(:public_policy)
 
     contributor = FactoryBot.create(:person)
     project = contributor.projects.first
     FactoryBot.create(:experimental_assay_class)
     FactoryBot.create(:fairdatastation_virtual_demo_sample_type)
 
-    investigation = BioInd::FairData::Reader.construct_isa(inv, contributor, [project])
+    investigation = BioInd::FairData::Reader.construct_isa(inv, contributor, [project], policy)
     studies = investigation.studies.to_a
     obs_units = studies.first.observation_units.to_a
     assays = studies.first.assays.to_a
@@ -182,6 +183,17 @@ class FairDataReaderTest < ActiveSupport::TestCase
     assert_equal 2, data_files.count
     assert_equal 2, obs_units.count
     assert_equal 4, samples.count
+
+    assert_equal Policy::MANAGING, investigation.policy.access_type
+    assert_equal Policy::MANAGING, studies.first.policy.access_type
+    assert_equal Policy::MANAGING, assays.first.policy.access_type
+    assert_equal Policy::MANAGING, samples.first.policy.access_type
+    assert_equal Policy::MANAGING, data_files.first.policy.access_type
+
+    refute_equal investigation.policy, studies.first.policy
+    refute_equal investigation.policy, assays.first.policy
+    refute_equal investigation.policy, samples.first.policy
+    refute_equal investigation.policy, data_files.first.policy
 
     assert investigation.valid?
     assert studies.first.valid?
