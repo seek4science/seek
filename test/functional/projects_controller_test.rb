@@ -5044,11 +5044,14 @@ class ProjectsControllerTest < ActionController::TestCase
 
   test 'show import_from_fairdata_station' do
     person = FactoryBot.create(:person)
+    refute person.is_admin?
     project = person.projects.first
     other_project = FactoryBot.create(:project)
 
+    logout
+
     get :import_from_fairdata_station, params: {id: project}
-    assert_redirected_to project_path(project)
+    assert_redirected_to login_path
 
     login_as(person)
     get :import_from_fairdata_station, params: {id: project}
