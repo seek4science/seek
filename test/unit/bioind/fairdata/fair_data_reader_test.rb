@@ -238,7 +238,7 @@ class FairDataReaderTest < ActiveSupport::TestCase
     contributor = FactoryBot.create(:person)
     project = contributor.projects.first
 
-    investigation = BioInd::FairData::Reader.construct_isa(inv, contributor, [project])
+    investigation = BioInd::FairData::Reader.construct_isa(inv, contributor, [project], Policy.default)
     assert_nil investigation.extended_metadata
 
     study = investigation.studies.first
@@ -299,7 +299,7 @@ class FairDataReaderTest < ActiveSupport::TestCase
     FactoryBot.create(:experimental_assay_class)
     FactoryBot.create(:fairdatastation_virtual_demo_sample_type)
 
-    investigation = BioInd::FairData::Reader.construct_isa(inv, contributor, [project])
+    investigation = BioInd::FairData::Reader.construct_isa(inv, contributor, [project], Policy.default)
     assert_equal 100, investigation.studies.first.observation_units.to_a.count
     observation_unit = investigation.studies.first.observation_units.first
     assert_equal 1, observation_unit.observation_unit_assets.find_all{|oua| oua.asset_type == 'DataFile'}.collect(&:asset).count
@@ -330,7 +330,7 @@ class FairDataReaderTest < ActiveSupport::TestCase
     contributor = FactoryBot.create(:person)
     project = contributor.projects.first
 
-    investigation = BioInd::FairData::Reader.construct_isa(inv, contributor, [project])
+    investigation = BioInd::FairData::Reader.construct_isa(inv, contributor, [project], Policy.default)
     assert_nil investigation.extended_metadata
 
     assert_difference('ExtendedMetadata.count', 100) do
