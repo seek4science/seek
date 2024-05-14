@@ -14,6 +14,7 @@ class ProjectsController < ApplicationController
                                         :administer_join_request, :respond_join_request,
                                         :administer_create_project_request, :respond_create_project_request,
                                         :administer_import_project_request, :respond_import_project_request,
+                                        :import_from_fairdata_station, :submit_fairdata_station,
                                         :project_join_requests, :project_creation_requests, :project_importation_requests, :typeahead]
 
   before_action :find_requested_item, only: %i[show admin edit update destroy admin_members
@@ -30,7 +31,7 @@ class ProjectsController < ApplicationController
   before_action :check_investigations_are_for_this_project, only: %i[update]
   before_action :administerable_by_user, only: %i[admin admin_members admin_member_roles destroy update_members storage_report administer_join_request respond_join_request populate populate_from_spreadsheet]
 
-  before_action :member_of_this_project, only: [:asset_report], unless: :admin_logged_in?
+  before_action :member_of_this_project, only: [:asset_report, :import_from_fairdata_station, :submit_fairdata_station], unless: :admin_logged_in?
 
   before_action :validate_message_log_for_join, only: [:administer_join_request, :respond_join_request]
   before_action :validate_message_log_for_create, only: [:administer_create_project_request, :respond_create_project_request]

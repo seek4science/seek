@@ -5042,6 +5042,22 @@ class ProjectsControllerTest < ActionController::TestCase
 
   end
 
+  test 'show import_from_fairdata_station' do
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+    other_project = FactoryBot.create(:project)
+
+    get :import_from_fairdata_station, params: {id: project}
+    assert_redirected_to project_path(project)
+
+    login_as(person)
+    get :import_from_fairdata_station, params: {id: project}
+    assert_response :success
+
+    get :import_from_fairdata_station, params: {id: other_project}
+    assert_redirected_to project_path(other_project)
+  end
+
   test 'populate from fairdata station ttl' do
 
     person = FactoryBot.create(:person)
