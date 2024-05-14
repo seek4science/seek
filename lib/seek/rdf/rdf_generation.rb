@@ -42,6 +42,7 @@ module Seek
         rdf_graph = generate_from_csv_definitions rdf_graph
         rdf_graph = additional_triples rdf_graph
         rdf_graph = extended_metadata_triples rdf_graph
+        rdf_graph = sample_metadata_triples(rdf_graph) if self.is_a?(Sample)
         rdf_graph
       end
 
@@ -77,6 +78,16 @@ module Seek
         resource = rdf_resource
         attributes.each do |attribute|
           rdf_graph << [resource, RDF::URI(attribute.property_type_id), RDF::Literal(extended_metadata.get_attribute_value(attribute))]
+        end
+        rdf_graph
+      end
+
+      def sample_metadata_triples(rdf_graph)
+
+        attributes = sample_type.sample_attributes.select{|at| at.pid.present?}
+        resource = rdf_resource
+        attributes.each do |attribute|
+          rdf_graph << [resource, RDF::URI(attribute.pid), RDF::Literal(get_attribute_value(attribute))]
         end
         rdf_graph
       end

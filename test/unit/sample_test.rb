@@ -1383,11 +1383,25 @@ class SampleTest < ActiveSupport::TestCase
   end
 
   test 'to rdf' do
-    sample = FactoryBot.create(:max_sample)
+    sample = FactoryBot.create(:sample, sample_type:FactoryBot.create(:fairdatastation_virtual_demo_sample_type),
+                               data:{
+                                 'Title':'the title',
+                                 'Description':'the description',
+                                 'Host':'the host',
+                                 'Occupation':'the occupation'
+                               })
     rdf = sample.to_rdf
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count > 1
       assert_equal RDF::URI.new("http://localhost:3000/samples/#{sample.id}"), reader.statements.first.subject
+      match = reader.statements.detect{|s| s.predicate == RDF.type}
+      assert_equal RDF::URI('http://jermontology.org/ontology/JERMOntology#Sample'), match.object
+      match = reader.statements.detect{|s| s.predicate == RDF::URI('http://fairbydesign.nl/ontology/host')}
+      assert_equal RDF::Literal('the host'), match.object
+      match = reader.statements.detect{|s| s.predicate == RDF::URI('http://fairbydesign.nl/ontology/occupation')}
+      assert_equal RDF::Literal('the occupation'), match.object
+      match = reader.statements.detect{|s| s.predicate == RDF::URI('http://fairbydesign.nl/ontology/marital_status')}
+      assert_equal RDF::Literal(''), match.object
     end
   end
 

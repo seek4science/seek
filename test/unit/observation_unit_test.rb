@@ -24,6 +24,8 @@ class ObservationUnitTest < ActiveSupport::TestCase
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count > 1
       assert_equal RDF::URI.new("http://localhost:3000/observation_units/#{obs_unit.id}"), reader.statements.first.subject
+      type = reader.statements.detect{|s| s.predicate == RDF.type}
+      assert_equal RDF::URI('http://purl.org/ppeo/PPEO.owl#observation_unit'), type.object
     end
   end
 
