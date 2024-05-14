@@ -5,14 +5,21 @@ layout: page
 
 # FAIRDOM-SEEK user documentation
 
+<div class="alert alert-info">
+Note that FAIRDOM-SEEK instances are highly customisable. Functionality such as e.g. the ISA structure, ISA-JSON compliant 
+experiments and the different asset types need to be enabled by an instance admin. 
+Therefore, some functionality described in this general user guide might not be available on your local instance. 
+Please contact your local instance admin for more information.
+</div>
+
 ## Profile
 - [Registering in SEEK](registering.html)
 - [Logging into SEEK](login.html)
-  - [Logging into SEEK via ELIXIR AAI](aai.html)
+  - [Logging into SEEK via LS Login](aai.html)
 - [Managing your account](managing-account.html)
   - [Managing your identities/alternative login methods](managing-identities.html)
 - [Editing your profile](editing-profile.html)
-- Favourites: drag and drop your favourite searchers.
+- Favourites: drag and drop your favourite searches.
 
 ## Yellow pages
 (aliases: Directory)
@@ -46,13 +53,13 @@ Capabilities
   - [Creating a Modelling analysis](generating-the-isa-structure.html#creating-a-modelling-analysis)
 - [ISA Overview Graph](isa-overview.html)
 
-- [Designing an ISA-JSON compliant experiment](designing-experiments-isajson-compliant.html)
-  - [Creating an ISA Investigation](designing-experiments-isajson-compliant.html#1-creating-an-isa-investigation)
-  - [Creating an ISA Study](designing-experiments-isajson-compliant.html#2-creating-an-isa-study)
-  - [Creating an ISA Assay](designing-experiments-isajson-compliant.html#5-creating-an-assay-stream)
 - [ISA-JSON compliant experiment](isa-json-compliant-experiment.html)
-- [Export experiments as ISA-JSON](exporting-experiments-as-isajson.html)
-- [Experiment Sample Templates](isa-json-compliant-experiment.html#experiment-sample-templates)
+  - [Designing an ISA-JSON compliant experiment](designing-experiments-isajson-compliant.html)
+    - [Creating an ISA Investigation](designing-experiments-isajson-compliant.html#1-creating-an-isa-investigation)
+    - [Creating an ISA Study](designing-experiments-isajson-compliant.html#2-creating-an-isa-study)
+    - [Creating an ISA Assay](designing-experiments-isajson-compliant.html#5-creating-an-assay-stream)
+  - [Export experiments as ISA-JSON](exporting-experiments-as-isajson.html)
+  - [Experiment Sample Templates](isa-json-compliant-experiment.html#experiment-sample-templates)
 
 - [Making an Investigation, Study or Assay citable](investigation-snapshots.html)
   - [Making public](investigation-snapshots.html#making-public)
@@ -82,10 +89,9 @@ Capabilities
   - [Legacy Biosamples](legacy-biosamples.html)
 
 - [Samples in ISA-JSON compliant experiments](isa-json-compliant-experiment.html#samples-in-isa-json-compliant-experiment)
+  - [Creating Samples in ISA-JSON compliant Experiments](create-sample-isajson-compliant.html#creating-samples-isajson-compliant-experiments)
   - [Viewing samples in ISA-JSON compliant Experiments](create-sample-isajson-compliant.html#viewing-samples-isajson-compliant-experiments)
-  - [Create Study Sources](create-sample-isajson-compliant.html#create-study-sources)
-  - [Create Study Samples](create-sample-isajson-compliant.html#create-study-samples)
-  - [Create Assay Samples](create-sample-isajson-compliant.html#create-assay-samples)
+
 
 - [Browsing samples](browsing.html#browsing-samples)
   - [Browse samples by Sample Type](browsing.html#browse-samples-by-sample-type)

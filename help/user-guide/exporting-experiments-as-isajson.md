@@ -4,7 +4,7 @@ layout: page
 ---
 
 # Exporting experiments in ISA-JSON format
-An ISA-JSON compliant Investigation containing Studies, Assays, SOPs and Samples can be exported as ISA-JSON format.
+An ISA-JSON compliant Investigation containing Studies, Assays, SOPs and Samples can be exported using the ISA-JSON format.
 
 To export experiments (Investigation, Study, Assay and related Samples) as ISA-JSON
 * Select the Investigation
