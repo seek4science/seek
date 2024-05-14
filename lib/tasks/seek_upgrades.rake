@@ -11,9 +11,6 @@ namespace :seek do
     decouple_extracted_samples_policies
     decouple_extracted_samples_projects
     link_sample_datafile_attributes
-    strip_sample_attribute_pids
-    rename_registered_sample_multiple_attribute_type
-    remove_ontology_attribute_type
     db:seed:007_sample_attribute_types
     db:seed:001_create_controlled_vocabs
     db:seed:017_minimal_starter_isa_templates
@@ -55,53 +52,6 @@ namespace :seek do
     end
   end
 
-  task(rename_registered_sample_multiple_attribute_type: [:environment]) do
-    attr = SampleAttributeType.find_by(title:'Registered Sample (multiple)')
-    if attr
-      puts "..... Renaming sample attribute type 'Registered Sample (multiple)' to 'Registered Sample List'."
-      attr.update_column(:title, 'Registered Sample List')
-    end
-  end
-
-  task(strip_sample_attribute_pids: [:environment]) do
-    puts '..... Stripping Sample Attribute PIds ...'
-    n = 0
-    SampleAttribute.where('pid is NOT NULL AND pid !=?','').each do |attribute|
-      new_pid = attribute.pid.strip
-      if attribute.pid != new_pid
-        attribute.update_column(:pid, new_pid)
-        n += 1
-      end
-    end
-    puts "..... Finished stripping #{n} Sample Attribute PIds."
-  end
-
-  task(remove_ontology_attribute_type: [:environment]) do
-    ontology_attr_type = SampleAttributeType.find_by(title:'Ontology')
-    cv_attr_type = SampleAttributeType.find_by(title:'Controlled Vocabulary')
-    if ontology_attr_type
-      puts '..... Removing the Ontology sample attribute type ...'
-      if cv_attr_type
-        if ontology_attr_type.sample_attributes.any?
-          puts "..... Moving #{ontology_attr_type.sample_attributes.count} sample attributes to Controlled Vocabulary"
-          ontology_attr_type.sample_attributes.each do |attr_type|
-            attr_type.update_column(:sample_attribute_type_id, cv_attr_type.id)
-          end
-        end
-        if ontology_attr_type.isa_template_attributes.any?
-          puts "..... Moving #{ontology_attr_type.isa_template_attributes.count} template attributes to Controlled Vocabulary"
-          ontology_attr_type.isa_template_attributes.each do |attr_type|
-            attr_type.update_column(:sample_attribute_type_id, cv_attr_type.id)
-          end
-        end
-
-        ontology_attr_type.destroy
-      else
-        puts '..... Target Controlled Vocabulary attribute type not found'
-      end
-    end
-  end
-
   task(decouple_extracted_samples_policies: [:environment]) do
     puts '..... creating independent policies for extracted samples (this can take a while if there are many samples) ...'
     affected_samples = []
@@ -112,16 +62,17 @@ namespace :seek do
     Permission.skip_callback :commit, :after, :queue_rdf_generation_job
 
     disable_authorization_checks do
-
-      Sample.includes(:originating_data_file).find_each do |sample|
-        # check if the sample was extracted from a datafile and their policies are linked
-        if sample.extracted? && sample.policy_id == sample.originating_data_file&.policy_id
-          policy = sample.policy.deep_copy
-          policy.save
-          sample.update_column(:policy_id, policy.id)
-          putc('.')
-          affected_samples << sample
+      Sample.includes(:originating_data_file).in_batches(of: 250) do |batch|
+        batch.each do |sample|
+          # check if the sample was extracted from a datafile and their policies are linked
+          if sample.extracted? && sample.policy_id == sample.originating_data_file&.policy_id
+            policy = sample.policy.deep_copy
+            policy.save
+            sample.update_column(:policy_id, policy.id)
+            affected_samples << sample
+          end
         end
+        putc('.')
       end
     end
     puts "..... finished creating independent policies of #{affected_samples.count} extracted samples"
@@ -134,24 +85,27 @@ namespace :seek do
 
   task(decouple_extracted_samples_projects: [:environment]) do
     puts '..... copying project ids for extracted samples...'
-    decoupled = 0
+    decoupled_count = 0
     hash_array = []
     disable_authorization_checks do
-      Sample.find_each do |sample|
-        # check if the sample was extracted from a datafile and their projects are linked
-        if sample.extracted? && sample.project_ids.empty?
-          sample.originating_data_file.project_ids.each do |project_id|
-            hash_array << { project_id: project_id, sample_id: sample.id }
+      Sample.includes(:originating_data_file).where.missing(:projects).in_batches(of: 250) do |batch|
+        batch.each do |sample|
+          # check if the sample was extracted from a datafile and their projects are linked
+          if sample.extracted? && sample.project_ids.empty?
+            sample.originating_data_file.project_ids.each do |project_id|
+              hash_array << { project_id: project_id, sample_id: sample.id }
+            end
+            decoupled_count += 1
           end
-          decoupled += 1
         end
+        putc('.')
       end
       unless hash_array.empty?
         class ProjectsSample < ActiveRecord::Base; end;
         ProjectsSample.insert_all(hash_array)
       end
     end
-    puts " ... finished copying project ids of #{decoupled.to_s} extracted samples"
+    puts " ... finished copying project ids of #{decoupled_count.to_s} extracted samples"
   end
 
   task(link_sample_datafile_attributes: [:environment]) do
