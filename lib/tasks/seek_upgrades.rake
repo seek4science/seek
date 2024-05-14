@@ -18,6 +18,7 @@ namespace :seek do
     implement_assay_streams_for_isa_assays
     set_ls_login_legacy_mode
     rename_custom_metadata_legacy_supported_type
+    seek_rdf:generate
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
