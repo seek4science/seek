@@ -112,7 +112,11 @@ module Seek
         when Symbol
           JERMVocab[rdf_type_entity_fragment]
         when String
-          RDF::URI(rdf_type_entity_fragment)
+          if rdf_type_entity_fragment =~ URI::ABS_URI
+            RDF::URI(rdf_type_entity_fragment)
+          else
+            JERMVocab[rdf_type_entity_fragment]
+          end
         end
       end
 
