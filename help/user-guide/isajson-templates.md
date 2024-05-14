@@ -35,6 +35,7 @@ Platform-wide Experiment Sample Templates
 * are platform-wide (or instance-wide) and visible to every registered user
 * are not subjected to sharing permission nor associated to any project
 
+
 ### Project-specific Experiment Sample Templates
 
 Project-specific Experiment Sample Templates
@@ -70,6 +71,7 @@ Project members have the option to create project-specific Experiment Sample Tem
 
 If ISA-JSON compliance feature is enabled, an option appears in the Server admin panel to upload instance-wide Experiment Sample Templates, compliant to ISA-JSON schemas.
 
-The Experiment Sample Templates must be in .json format and comply to the expected specification.
+The Experiment Sample Templates must be in .json format and comply to the expected specification. JSON definitions of Experiment Sample Templates tailored for submission towards EBI repositories can be found in this [GitHub repository](https://github.com/ELIXIR-Belgium/ISA-merger).
 
 ![experiment view](/images/user-guide/isajson-compliance/serveradmin-expsampletemplate-jsonupload.png){:.screenshot}
+
