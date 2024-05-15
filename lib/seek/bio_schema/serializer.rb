@@ -55,7 +55,7 @@ module Seek
       SUPPORTED_TYPES = [Person, Project, Event, DataFile, Organism, HumanDisease,
                          Seek::BioSchema::DataCatalogMockModel,
                          Document, Presentation, Workflow, Collection,
-                         Institution, Programme, Sample, AssetsCreator].freeze
+                         Institution, Programme, Sample, AssetsCreator, Publication, PublicationAuthor].freeze
 
       def resource_decorator
         @decorator ||= ResourceDecorators::Factory.instance.get(resource)
@@ -65,7 +65,14 @@ module Seek
         result = {}
         resource_decorator.attributes.each do |attr|
           if (value = attr.invoke(resource_decorator))
-            result[attr.property.to_s] = value
+            prop = attr.property.to_s
+            # If the same schema property is used by multiple attributes, combine them into an array
+            if result.key?(prop)
+              result[prop] = [result[prop]] unless result[prop].is_a?(Array)
+              result[prop] += Array(value)
+            else
+              result[prop] = value
+            end
           end
         end
         result

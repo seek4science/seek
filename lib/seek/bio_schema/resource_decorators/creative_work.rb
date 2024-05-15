@@ -5,7 +5,8 @@ module Seek
       class CreativeWork < Thing
         associated_items producer: :projects,
                          part_of: :collections,
-                         subject_of: :events
+                         event_refs: :events,
+                         publication_refs: :publications
 
         schema_mappings version: :version,
                         license: :license,
@@ -14,7 +15,8 @@ module Seek
                         created_at: :dateCreated,
                         updated_at: :dateModified,
                         content_type: :encodingFormat,
-                        subject_of: :subjectOf,
+                        event_refs: :subjectOf,
+                        publication_refs: :subjectOf,
                         part_of: :isPartOf,
 			 previous_version_url: :isBasedOn	
 
@@ -39,7 +41,6 @@ module Seek
 
           all
         end
-
 
         def previous_version_url
           return unless respond_to?(:previous_version) && resource.previous_version

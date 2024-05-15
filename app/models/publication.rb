@@ -4,6 +4,7 @@ class Publication < ApplicationRecord
   include Seek::Rdf::RdfGeneration
   include Seek::ActsAsHavingMiscLinks
   include PublicationsHelper
+  include Seek::BioSchema::Support
 
   alias_attribute :description, :abstract
 

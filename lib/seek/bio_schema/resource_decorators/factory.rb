@@ -13,7 +13,7 @@ module Seek
         def get(resource)
           type = resource.is_a_version? ? resource.parent.class : resource.class
           unless resource.schema_org_supported?
-            raise UnsupportedTypeException, "Bioschema not supported for #{type.name}"
+            raise UnsupportedTypeException, "Bioschemas generation not supported for #{type.name}"
           end
 
           decorator_class(type).new(resource)

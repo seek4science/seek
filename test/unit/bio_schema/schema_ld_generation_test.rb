@@ -33,6 +33,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
         { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/presentations', 'name' => 'Presentations' },
         { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/programmes', 'name' => 'Programmes' },
         { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/projects', 'name' => 'Projects' },
+        { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/publications', 'name' => 'Publications' },
         { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/samples', 'name' => 'Samples' },
         { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/workflows', 'name' => 'Workflows' }
       ],
@@ -98,6 +99,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                        presentations_enabled: false,
                        programmes_enabled: false,
                        samples_enabled: false,
+                       publications_enabled: false,
                        instance_description: 'a lovely project',
                        instance_keywords: 'a,  b, ,,c,d',
                        site_base_host: 'http://fairyhub.org') do
@@ -174,7 +176,9 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'identifier' => 'https://doi.org/10.10.10.10/test.1',
       'subjectOf' => [
         { '@type' => 'Event', '@id' => "http://localhost:3000/events/#{df.events.first.id}",
-          'name' => df.events.first.title }
+          'name' => df.events.first.title },
+        { '@type' => 'CreativeWork', '@id' => "http://localhost:3000/publications/#{df.publications.first.id}",
+          'name' => df.publications.first.title }
       ],
       'isPartOf' => [],
       'distribution' => {
@@ -232,7 +236,9 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'isPartOf' => [],
       'subjectOf' => [
         { '@type' => 'Event', '@id' => "http://localhost:3000/events/#{df.events.first.id}",
-          'name' => df.events.first.title }
+          'name' => df.events.first.title },
+        { '@type' => 'CreativeWork', '@id' => "http://localhost:3000/publications/#{df.publications.first.id}",
+          'name' => df.publications.first.title }
       ]
     }
 
@@ -281,7 +287,9 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'isPartOf' => [],
       'subjectOf' => [
         { '@type' => 'Event', '@id' => "http://localhost:3000/events/#{df.events.first.id}",
-          'name' => df.events.first.title }
+          'name' => df.events.first.title },
+        { '@type' => 'CreativeWork', '@id' => "http://localhost:3000/publications/#{df.publications.first.id}",
+          'name' => df.publications.first.title }
       ]
     }
 
@@ -492,6 +500,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       workflow.internals = workflow.extractor.metadata[:internals]
 
       workflow.add_annotations('wibble', 'tag', User.first)
+      workflow.publications << FactoryBot.create(:publication)
       disable_authorization_checks { workflow.save! }
       workflow
     end
@@ -538,6 +547,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
         'url' => { '@id' => 'https://www.commonwl.org/' }
       },
       'isPartOf' => [],
+      'subjectOf' => [
+        { '@type' => 'CreativeWork', '@id' => "http://localhost:3000/publications/#{workflow.publications.first.id}",
+          'name' => workflow.publications.first.title }
+      ],
       'input' => [
         {
           '@type' => 'FormalParameter',
@@ -644,6 +657,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'dateCreated' => @current_time.iso8601,
       'dateModified' => @current_time.iso8601,
       'isPartOf' => [],
+      'subjectOf' => [
+        { '@type' => 'CreativeWork', '@id' => "http://localhost:3000/publications/#{collection.publications.first.id}",
+          'name' => collection.publications.first.title }
+      ],
       'hasPart' => [
         { '@type' => 'DigitalDocument', '@id' => "http://localhost:3000/documents/#{doc1.id}",
           'name' => doc1.title.to_s },
@@ -791,7 +808,9 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       # 'identifier' => 'https://doi.org/10.10.10.10/test.1', # Should not have a DOI, since it was defined on the parent resource
       'subjectOf' => [
         { '@type' => 'Event', '@id' => "http://localhost:3000/events/#{df.events.first.id}",
-          'name' => df.events.first.title }
+          'name' => df.events.first.title },
+        { '@type' => 'CreativeWork', '@id' => "http://localhost:3000/publications/#{df.publications.first.id}",
+          'name' => df.publications.first.title }
       ],
       'distribution' => {
         '@type' => 'DataDownload',
@@ -830,7 +849,9 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'isBasedOn' => "http://localhost:3000/data_files/#{df.id}?version=1",
       'subjectOf' => [
         { '@type' => 'Event', '@id' => "http://localhost:3000/events/#{df.events.first.id}",
-          'name' => df.events.first.title }
+          'name' => df.events.first.title },
+        { '@type' => 'CreativeWork', '@id' => "http://localhost:3000/publications/#{df.publications.first.id}",
+          'name' => df.publications.first.title }
       ],
       'distribution' => {
         '@type' => 'DataDownload',
@@ -912,6 +933,53 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       json = JSON.parse(resource.to_schema_ld)
       assert_equal expected, json
     end
+  end
+
+  test 'publication' do
+    creator2 = FactoryBot.create(:person, first_name: 'Published', last_name: 'Author')
+    publication = travel_to(@current_time) do
+      publication = FactoryBot.create(:publication, title: 'This publication', abstract: 'yep', contributor: @person, projects: [@project])
+      disable_authorization_checks do
+        publication.publication_authors = [
+          FactoryBot.create(:publication_author, first_name: 'Xena', last_name: 'Warrior Princess'),
+          FactoryBot.create(:publication_author, person: creator2, last_name: creator2.last_name, first_name: creator2.first_name)
+        ]
+        publication.events << FactoryBot.build(:event, policy: FactoryBot.create(:public_policy))
+        publication.add_annotations('wibble', 'tag', User.first)
+        publication.save!
+      end
+      publication
+    end
+
+    expected = {
+      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@type' => 'CreativeWork',
+      '@id' => "http://localhost:3000/publications/#{publication.id}",
+      'description' => 'yep',
+      'name' => 'This publication',
+      'url' => "http://localhost:3000/publications/#{publication.id}",
+      'creator' => [
+        { '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Xena Warrior Princess')}", 'name' => 'Xena Warrior Princess' },
+        { '@type' => 'Person', '@id' => "http://localhost:3000/people/#{creator2.id}", 'name' => creator2.name }
+      ],
+      'producer' => [
+        { '@type' => %w[Project Organization], '@id' => "http://localhost:3000/projects/#{@project.id}",
+          'name' => @project.title }
+      ],
+      'dateCreated' => @current_time.iso8601,
+      'dateModified' => @current_time.iso8601,
+      'version' => 1,
+      'isPartOf' => [],
+      'subjectOf' => [
+        { '@type' => 'Event', '@id' => "http://localhost:3000/events/#{publication.events.first.id}",
+          'name' => publication.events.first.title }
+      ],
+      'keywords' => 'wibble'
+    }
+
+    json = JSON.parse(publication.to_schema_ld)
+    fine_json_comparison expected, json
+    assert_equal expected, json
   end
 
   private
