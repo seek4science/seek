@@ -20,6 +20,7 @@ class ObservationUnitTest < ActiveSupport::TestCase
 
   test 'to rdf' do
     obs_unit = FactoryBot.create(:max_observation_unit)
+    assert obs_unit.rdf_supported?
     rdf = obs_unit.to_rdf
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count > 1

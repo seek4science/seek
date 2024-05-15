@@ -117,11 +117,6 @@ class Sample < ApplicationRecord
     end
   end
 
-  # although it includes the RdfGeneration for some rdf support, it can't be considered to fully support it yet.
-  def rdf_supported?
-    false
-  end
-
   def related_organisms
     Organism.where(id: related_organism_ids)
   end

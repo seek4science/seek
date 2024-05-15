@@ -1390,6 +1390,7 @@ class SampleTest < ActiveSupport::TestCase
                                  'Host':'the host',
                                  'Occupation':'the occupation'
                                })
+    assert sample.rdf_supported?
     rdf = sample.to_rdf
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count > 1
