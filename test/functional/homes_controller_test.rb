@@ -727,6 +727,7 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test 'Show aliases in search options' do
+    original_load_path = I18n.load_path
     I18n.load_path += Dir[Rails.root.join('test', 'config', 'translation_override.en.yml')]
     I18n.backend.load_translations
     with_config_values({ isa_json_compliance_enabled: true, solr_enabled: true }) do
@@ -769,6 +770,8 @@ class HomesControllerTest < ActionController::TestCase
         assert_select 'option', text: 'Programmes', count: 0
       end
     end
+    I18n.load_path = original_load_path
+    I18n.backend.load_translations
   end
 
   test 'get dataset jsonld from index' do
