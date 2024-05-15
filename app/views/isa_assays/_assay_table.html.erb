@@ -16,11 +16,10 @@
 
 <% if valid_assay %>
     <script>
-        var assayDynamicTable
         let assayOverviewInitialLoad = true;
         $j(document).ready(function () {
             const dt = <%= sanitize(dt_aggregated(assay.study, assay).to_json) %>
-            assayDynamicTable = new $j.dynamicTable('#assay-table')
+            window.assayDynamicTable = new $j.dynamicTable('#assay-table')
             const ajax = {
                 url: dynamicTableDataPath,
                 data: function(d) {

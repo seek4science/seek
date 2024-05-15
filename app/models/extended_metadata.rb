@@ -22,4 +22,5 @@ class ExtendedMetadata < ApplicationRecord
   def attribute_class
     ExtendedMetadataAttribute
   end
+
 end

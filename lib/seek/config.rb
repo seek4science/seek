@@ -332,6 +332,14 @@ module Seek
       isa_enabled
     end
 
+    def templates_enabled
+      isa_json_compliance_enabled
+    end
+
+    def strains_enabled
+      organisms_enabled
+    end
+
     def omniauth_elixir_aai_config
       if omniauth_elixir_aai_legacy_mode
         {
@@ -365,7 +373,7 @@ module Seek
           name: :elixir_aai,
           scope: [:openid, :email],
           response_type: 'code',
-          issuer: 'https://proxy.aai.lifescience-ri.eu/',
+          issuer: 'https://login.aai.lifescience-ri.eu/oidc/',
           discovery: true,
           client_options: {
             identifier: omniauth_elixir_aai_client_id,

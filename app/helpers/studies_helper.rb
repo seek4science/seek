@@ -24,6 +24,6 @@ module StudiesHelper
   end
 
   def show_batch_miappe_button?
-    ExtendedMetadataType.where(supported_type: 'Study', title: 'MIAPPE metadata v1.1').any?
+    ExtendedMetadataType.where(supported_type: 'Study', title: ExtendedMetadataType::MIAPPE_TITLE, enabled: true).any?
   end
 end
