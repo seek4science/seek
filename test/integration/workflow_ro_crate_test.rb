@@ -8,6 +8,10 @@ class WorkflowRoCrateTest < ActionDispatch::IntegrationTest
     project = FactoryBot.create(:project, title: 'Cool Project')
     person = FactoryBot.create(:person, first_name: 'Xavier', last_name: 'Xavierson')
     workflow = FactoryBot.create(:generated_galaxy_ro_crate_workflow, projects: [project], creators: [person], other_creators: 'Jane Bloggs')
+    publication = FactoryBot.create(:publication, title: 'An Interesting Publication')
+    disable_authorization_checks do
+      workflow.publications << publication
+    end
     zip = workflow.ro_crate_zip
 
     crate = ROCrate::WorkflowCrateReader.read_zip(zip)
@@ -26,6 +30,11 @@ class WorkflowRoCrateTest < ActionDispatch::IntegrationTest
     cwl = crate.get('Genomics-1-PreProcessing_without_downloading_from_SRA.cwl')
     assert cwl
     assert_equal cwl, crate.main_workflow_cwl
+
+    pub_url = publication_url(publication)
+    assert_includes workflow['subjectOf'], pub_url
+    crate_pub = crate.get(pub_url)
+    assert_equal publication.title, crate_pub['name']
   end
 
   test 'include remotes in generated Workflow RO-Crate' do

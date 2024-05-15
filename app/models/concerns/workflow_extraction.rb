@@ -195,7 +195,13 @@ module WorkflowExtraction
 
   def merge_fields(crate_workflow, bioschemas_workflow)
     bioschemas_workflow.each do |key, value|
-      crate_workflow[key] = value unless crate_workflow[key]
+      # If the same schema property is used by multiple attributes, combine them into an array
+      if crate_workflow.properties.key?(key)
+        crate_workflow[key] = [crate_workflow[key]] unless crate_workflow[key].is_a?(Array)
+        crate_workflow[key] += Array(value)
+      else
+        crate_workflow[key] = value
+      end
     end
   end
 
