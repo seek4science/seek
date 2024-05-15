@@ -726,6 +726,51 @@ class HomesControllerTest < ActionController::TestCase
 
   end
 
+  test 'Show aliases in search options' do
+    I18n.load_path += Dir[Rails.root.join('test', 'config', 'translation_override.en.yml')]
+    I18n.backend.load_translations
+    with_config_values({ isa_json_compliance_enabled: true, solr_enabled: true }) do
+      get :index
+      assert_response :success
+      assert_select 'select#search_type' do
+        assert_select 'option', text: 'Investigation tests', count: 1
+        assert_select 'option', text: 'Study tests', count: 1
+        assert_select 'option', text: 'Assay tests', count: 1
+        assert_select 'option', text: 'Data file tests', count: 1
+        assert_select 'option', text: 'Document tests', count: 1
+        assert_select 'option', text: 'SOP_test', count: 1 # this is an exception, the alias is not in the translation file
+        assert_select 'option', text: 'Presentation tests', count: 1
+        assert_select 'option', text: 'Event tests', count: 1
+        assert_select 'option', text: 'Collection tests', count: 1
+        assert_select 'option', text: 'Sample tests', count: 1
+        assert_select 'option', text: 'Sample type tests', count: 1
+        assert_select 'option', text: 'Template tests', count: 1
+        assert_select 'option', text: 'Person tests', count: 1
+        assert_select 'option', text: 'Project tests', count: 1
+        assert_select 'option', text: 'Institution tests', count: 1
+        assert_select 'option', text: 'Programme tests', count: 1
+
+        # Making sure the default values are not shown
+        assert_select 'option', text: 'Investigations', count: 0
+        assert_select 'option', text: 'Studies', count: 0
+        assert_select 'option', text: 'Assays', count: 0
+        assert_select 'option', text: 'Data files', count: 0
+        assert_select 'option', text: 'Documents', count: 0
+        assert_select 'option', text: 'SOP', count: 0
+        assert_select 'option', text: 'Presentations', count: 0
+        assert_select 'option', text: 'Events', count: 0
+        assert_select 'option', text: 'Collections', count: 0
+        assert_select 'option', text: 'Samples', count: 0
+        assert_select 'option', text: 'Sample types', count: 0
+        assert_select 'option', text: 'Templates', count: 0
+        assert_select 'option', text: 'People', count: 0
+        assert_select 'option', text: 'Projects', count: 0
+        assert_select 'option', text: 'Institutions', count: 0
+        assert_select 'option', text: 'Programmes', count: 0
+      end
+    end
+  end
+
   test 'get dataset jsonld from index' do
     get :index, format: :jsonld
     assert_response :success
