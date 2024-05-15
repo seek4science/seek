@@ -15,13 +15,19 @@ support SEEK and the associated tools.
 **Always backup your SEEK data before starting to upgrade!!** - see the
 [Backup Guide](backups.html).
 
+**You should always upgrade between minor (1.X) versions incrementally**, i.e:
+
+1.12.x --> 1.13.x --> 1.14.x --> 1.15.x,
+
+rather than jumping directly between versions otherwise some upgrade steps may be missed.
+
 This guide assumes that SEEK has been installed following the [Installation
 Guide](install.html). It assumes it is a production server that is
 being updated, and that commands are run from the root directory of the SEEK
 application.
 
 
-## Identifying your version
+### Identifying your version
 
 The version of SEEK you are running is shown at the bottom left, within the
 footer, when viewing pages in SEEK.
@@ -34,24 +40,15 @@ You can also tell which version you have installed by looking at the
     patch: 2
 
 
-## Upgrading between patch versions (e.g. between 1.4.0 and 1.4.1) 
+### Upgrading between patch versions (e.g. between 1.14.0 and 1.14.1) 
 
 When upgrading between patch versions, it should only be necessary to run 
     
     bundle install
     bundle exec rake seek:upgrade 
 
-## Steps to upgrade from 1.13.x to 1.14.x
+## Steps to upgrade from 1.14.x to 1.15.x
 
-### Dependencies
-
-You will need to update Python to version 3.9
-
-    sudo apt install python3.9-dev python3.9-distutils
-
-you may remove 3.7 unless it is used for other applications. If unsure there is no harm leaving it installed
-
-    sudo apt remove python3.7-dev python3.7-distutils
 
 ### Set RAILS_ENV
 
@@ -73,18 +70,18 @@ from Github or via a downloaded tarball.
 If you have an existing installation linked to our GitHub, you can fetch the
 files with:
 
-    git pull
-    git checkout v1.14.2
+    git fetch
+    git checkout v1.15.0
 
 #### Updating using the tarball
 
 You can download the file from
-<https://github.com/seek4science/seek/archive/v1.14.2.tar.gz> You can
+<https://github.com/seek4science/seek/archive/v1.15.0.tar.gz> You can
 unpack this file using:
 
-    tar zxvf seek-1.14.2.tar.gz
+    tar zxvf seek-1.15.0.tar.gz
     mv seek seek-previous
-    mv seek-1.14.2 seek
+    mv seek-1.15.0 seek
     cd seek/
 
 and then copy across your existing filestore and database configuration file
@@ -117,7 +114,7 @@ content.
 
 **Please note** - during the upgrade the step _Updating session store_ can take a long time and appear that it has frozen, so please be patient. 
 
-    cd . #this is to allow RVM to pick up the ruby and gemset changes
+    cd . # this is to allow RVM to set the correct ruby version
     gem install bundler
     bundle install
     bundle exec rake seek:upgrade
@@ -133,6 +130,17 @@ SEEK requires some cron jobs for periodic background jobs to run. To update thes
 
     bundle exec rake seek:workers:start
  
+### Final notes
+
+If you encounter any problems with stringio, particularly when running with Passenger, just manually installing the gem
+with the explicit version as follows should fix it
+
+     gem install stringio --version 3.0.1.1
+
+Setting [PassengerPreloadBundler](https://www.phusionpassenger.com/docs/references/config_reference/apache/#passengerpreloadbundler) to _on_ may also fix the 
+problem. 
+
+
 ---
     
 ## Earlier upgrade notes

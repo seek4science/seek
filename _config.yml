@@ -1,7 +1,7 @@
 #baseurl: /seek
 
-current_seek_version: "1.14.2"
-current_docker_tag: "1.14"
+current_seek_version: "1.15.0"
+current_docker_tag: "1.15"
 
 plugins:
   - jekyll-sitemap

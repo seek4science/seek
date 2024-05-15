@@ -10,7 +10,7 @@ redirect_from: "/install.html"
 
 These steps describe how to install SEEK directly on the machine (_bare-metal_). 
 
-For how to install and run using Docker, which in many cases is simpler and quicker, please read the [Docker Compose guide](docker/docker-compose.html).
+Docker is also supported, which in many cases is simpler and quicker, please read the [Docker Compose guide](docker/docker-compose.html).
 
 If you have installed SEEK, please take a moment to fill out our very
 short,optional [SEEK Registration
@@ -29,8 +29,8 @@ describing Ruby on Rails can be found at https://rubyonrails.org/documentation
 SEEK is built upon Rails, and requires Ruby 3.1.
 
 We recommend that you run SEEK on a Linux system. This guide is based on an
-[Ubuntu (20.04 LTS)](https://releases.ubuntu.com/20.04/) system. However, running on other Linux distributions the
-main difference is the name of the required packages that have to be installed
+[Ubuntu (20.04 LTS)](https://releases.ubuntu.com/20.04/) system, but is also happily being run on Ubuntu 22.04 (24.04 is yet to be tested).
+When running on other Linux distributions the main difference is the name of the required packages that have to be installed
 for that distribution, other than that the steps will be the same. If you want
 to install on different distribution or version please visit [Other
 Distributions](other-distributions.html) and see if it is listed there.
