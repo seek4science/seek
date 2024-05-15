@@ -13,34 +13,49 @@ If you have any comments or feedback about a release, then please [Contact Us](/
 
 ## Version 1.15.0
 
-Release date: _March 2024_
+Release date: _May 2024_
+
+A major release that contains a number of improvements, upgrades and bug fixes, the hightlights including:
 
 * Licenses are now linked to SPDX identifiers, with support for more open source licences.
+* Improved Citation selector UI.
+  
 * A sitemap.xml is generated for public content.
-* Samples extracted from a template are now editable and have their won sharing policies and associated projects (previously bound to the tempalte datafile)
+  
+* Samples extracted from a template are now editable and have their won sharing policies and associated projects (previously bound to the source datafile)
 * Detect and warn of duplicate samples during extraction
 * Samples related to a DataFile are shown if linked together, as well as if the samples originated from the DataFile
 * Allowing free text for a Controlled Vocabulary sample attribute, which can be set as allowed for the attribute as part of a defined Sample Type.
-* Improved Citation selector UI.
-* Performace improvements to allow a Controlled Vocabulary to be populated from a large number of terms from an ontology
+
+* Performance improvements to allow a Controlled Vocabulary to be populated from a large number of terms from an ontology
 * Can define multiple root nodes from an ontology tree when populating a Controlled Vocabulary
+* Performance improvements when viewing Data files - checking for matching sample types has been improved and now happens asynchronously
+* Performance improvements when deleting items, especially large numbers of samples tied to a deleted DataFile
+* Improvements to the deletion of content-blobs (which describe the registered files) and protection against them being reused after deletion
+* Performance improvements of authorization caching related jobs, and adjusting the order they run to avoid unnecessary jobs being triggered
+
 * UI improvements when selecting Projects and Institutions for sharing permissions, making them searchable and easier to find in a long list
 * Configuration allowing Project requests to be automatically approved for site managed programmes.
 * Importing projects from a Data Management Plan that conforms to the RDA DMP Common Standard
-* Performance improvements when viewing Data files - checking for matching sample types has been improved and now happens asynchronously
-* UI improvments for nested Extended metadata
+
 * Magnify icon next to a file now supports Explore if it is an Excel file
-* Admin area that lists Extended Metadata definitions and allows them to be disabled
-* Performance improvements when deleting items, especially large numbers of samples tied to a deleted DataFile
-* Improvements to the deletion of content-blobs (which describe the registered files) and protection against them being reused after deletion
-* Docker compose now recommends MySQL 8
+* Fix to the mime type for Datafile being changed to zip if it is a spreadsheet and fails to be parsed when trying to Explore.  
+* Tagging projects
+
 * Fix to LS Login authentication configuration
 * Support for generic OpenID Connect authentication to be configured
+  
+* UI improvements for nested Extended metadata
 * Extended Metadata write API, and documentation for both read and write.
+* Admin area that lists Extended Metadata definitions and allows them to be disabled
+  
+* Search wild cards
+* Docker compose now recommends MySQL 8
 * Single Page view for visualising experiments.
 * Creation of ISA-JSON compliant experiments using Experiment Sample Templates.
 
-For a full list, see [closed issues for 1.15.0](https://github.com/seek4science/seek/milestone/19?closed=1)
+
+And much more, for a full list see [closed issues for 1.15.0](https://github.com/seek4science/seek/milestone/19?closed=1)
 
 ## Version 1.14.2
 
