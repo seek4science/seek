@@ -293,9 +293,12 @@ const applyTemplate = () => {
   const template_id_tag = $j(`#isa_study${suffix}template_parent_id`);
   if (template_id_tag) $j(template_id_tag).val(id);
 
+  // Removes the hidden from the new attribute button
+  $j(`${attribute_table} ${addAttributeRow}`).find('#add-attribute').removeClass("hidden");
+
   SampleTypes.recalculatePositions();
   SampleTypes.bindSortable();
-	$j(".sample-type-attribute-type").trigger("change", [false]);
+  $j(".sample-type-attribute-type").trigger("change", [false]);
 };
 
 // Shows the modal form
