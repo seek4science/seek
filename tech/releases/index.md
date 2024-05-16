@@ -17,42 +17,35 @@ Release date: _May 2024_
 
 A major release that contains a number of improvements, upgrades and bug fixes, the hightlights including:
 
-* Licenses are now linked to SPDX identifiers, with support for more open source licences.
-* Improved Citation selector UI.
-  
-* A sitemap.xml is generated for public content.
-  
-* Samples extracted from a template are now editable and have their won sharing policies and associated projects (previously bound to the source datafile)
-* Detect and warn of duplicate samples during extraction
-* Samples related to a DataFile are shown if linked together, as well as if the samples originated from the DataFile
-* Allowing free text for a Controlled Vocabulary sample attribute, which can be set as allowed for the attribute as part of a defined Sample Type.
-
-* Performance improvements to allow a Controlled Vocabulary to be populated from a large number of terms from an ontology
-* Can define multiple root nodes from an ontology tree when populating a Controlled Vocabulary
-* Performance improvements when viewing Data files - checking for matching sample types has been improved and now happens asynchronously
-* Performance improvements when deleting items, especially large numbers of samples tied to a deleted DataFile
-* Improvements to the deletion of content-blobs (which describe the registered files) and protection against them being reused after deletion
-* Performance improvements of authorization caching related jobs, and adjusting the order they run to avoid unnecessary jobs being triggered
-
-* UI improvements when selecting Projects and Institutions for sharing permissions, making them searchable and easier to find in a long list
-* Configuration allowing Project requests to be automatically approved for site managed programmes.
-* Importing projects from a Data Management Plan that conforms to the RDA DMP Common Standard
-
-* Magnify icon next to a file now supports Explore if it is an Excel file
-* Fix to the mime type for Datafile being changed to zip if it is a spreadsheet and fails to be parsed when trying to Explore.  
-* Tagging projects
-
-* Fix to LS Login authentication configuration
-* Support for generic OpenID Connect authentication to be configured
-  
-* UI improvements for nested Extended metadata
-* Extended Metadata write API, and documentation for both read and write.
-* Admin area that lists Extended Metadata definitions and allows them to be disabled
-  
-* Search wild cards
-* Docker compose now recommends MySQL 8
-* Single Page view for visualising experiments.
-* Creation of ISA-JSON compliant experiments using Experiment Sample Templates.
+* **Licenses** have now been updated to be linked to [SPDX license identifiers](https://spdx.org/licenses/), with support for more open source licences.
+* A **sitemap.xml** is generated for all public content, improving indexing by the main search engines, and support for Bioschemas scraping.
+* **Extracted Samples** originating from a Sample type template DataFile are now editable and have their own sharing policies and 
+  associated projects (previously these were bound to the source datafile).
+* **Duplicate Samples** that occur when extracted from a template are now detected and warning is given.
+* **Samples that link to a DataFile** through one of the Sample attributes are now shown as related items, and vice versa.
+* **Allowing free text for Controlled Vocabulary** sample attributes, which can be set as allowed for the attribute as part of a defined Sample Type.
+* **Controlled Vocabulary performance improvements**, both the user interface and backend, to allow one to be populated from a large number of terms from an ontology.
+* **Ontology based Controlled Vocabulary's** can now be populated from **multiple root nodes** of the ontology hierarchy.  
+* **Performance improvements when viewing Data files** - a check for matching sample types was previously slowing things down, this now happens less often and asynchronously.
+* **Performance improvements when deleting items**, especially large numbers of samples deleted at the same time as the source DataFile.
+* **Performance improvements** to several of the **background jobs** that run, and also optimisations to the order and priority that they run and number that get created.
+* Improvements to the deletion of content-blobs (which describe the registered files) and protection against them being reused after deletion.  
+* UI improvements for selecting Projects and Institutions for sharing permissions, making them searchable and easier to find in a long list.
+* **Automatic approval of Project requests** for the site-managed programme can now be set as a configuration option.
+* **[RDA Data Management Plan Common Standard](https://github.com/RDA-DMP-Common/RDA-DMP-Common-Standard) support**, which can now be used to populate a Project.
+* **Magnify icon** next to a file now supports **Explore** if it is an Excel file.
+* **Tagging of Projects**. As with many other types, Projects can now be tagged to make them more discoverable.
+* **Fix to LS Login** authentication configuration.
+* **Generic OpenID Connect** can now be be configured to use as an alternative authentication mechanism.
+* **Nested Extended metadata** has had some **UI improvements**, allowing sub sections to be expanded and collapsed and easier to differentiate.
+* **Extended Metadata read and write API** has been extended and documented, along with read API's for finding information about the Extended Metadata Types.
+* **Extended Metadata Type administration** has been added to the Admin pages, currently just allowing them to be disabled or enabled but with plans to extend this with other option in future releases.
+* **Wild cards in search queries** are now supported, supporting _'*'_ for a group of characters, and _'?'_ for a single character. e.g _'[?orwe*n](https://fairdomhub.org/institutions?filter%5Bquery%5D=%3Forwe%2An)'_ to match Norwegian.
+* **Mysql 8 is now the recommended database** to use, and our default Docker compose files have been updated and tested, together with testing switching existing installations. Mysql 5.7 had an issue with reusing primary keys after a crash, causing some problems in certain scenarios.
+* **More control over Docker logging** is now available as an option with environment variables, with the default and comment added to the Docker compose files.  
+* [DataHub](https://datahub.elixir-belgium.org/home/about) is now approaching its first production release, and this version includes two particular hightlights:
+    * **Single Page view** for visualising experiments.
+    * Creation of **ISA-JSON compliant experiments** using Experiment Sample Templates.
 
 
 And much more, for a full list see [closed issues for 1.15.0](https://github.com/seek4science/seek/milestone/19?closed=1)
