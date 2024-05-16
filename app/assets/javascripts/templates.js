@@ -222,6 +222,7 @@ const applyTemplate = () => {
   $j('#template_level').val(data.level);
   $j('#template_parent_id').val(data.template_id);
 
+  const appliedToSampleType = $j('#template_level')[0] === undefined || $j('#template_level')[0] === null;
   // Make sure default sorted attributes are added to the table
   Templates.table.order([9, "asc"]).draw();
   $j.each(Templates.table.rows().data(), (i, row) => {
@@ -239,24 +240,25 @@ const applyTemplate = () => {
         row[7] === "Registered Sample List" &&
         row[1].includes("Input") &&
         row[11] === null;
-    const isInherited = row[14] !== "undefined" || row[14] !== null;
     const isRequired = row[0] ? "checked" : "";
     newRow = $j(newRow.replace(/replace-me/g, index));
     $j(newRow).find('[data-attr="required"]').prop("checked", row[0]);
+    if (appliedToSampleType) $j(newRow).find('[data-attr="required"]').prop("disabled", true);
+    $j(newRow).find(".sample-type-is-title").prop("checked", row[8]);
+    if (appliedToSampleType) $j(newRow).find('.sample-type-is-title').prop("disabled", true);
     $j(newRow).find('[data-attr="title"]').val(row[1]);
-    $j(newRow).find('[data-attr="title"]').addClass("disabled");
+    if (appliedToSampleType) $j(newRow).find('[data-attr="title"]').addClass("disabled");
     $j(newRow).find('[data-attr="description"]').val(row[2]);
     $j(newRow).find('[data-attr="type"]').val(row[3]);
-    $j(newRow).find('[data-attr="type"]').addClass("disabled");
+    if (appliedToSampleType) $j(newRow).find('[data-attr="type"]').addClass("disabled");
     $j(newRow).find('[data-attr="cv_id"]').val(row[4]);
-    $j(newRow).find('[data-attr="cv_id"]').parent().addClass("disabled");
+    if (appliedToSampleType) $j(newRow).find('[data-attr="cv_id"]').parent().addClass("disabled");
     $j(newRow).find('[data-attr="allow_cv_free_text"]').prop("checked", row[5]);
-    $j(newRow)
-        .find('[data-attr="allow_cv_free_text"]')
-        .addClass("disabled");
+    if (appliedToSampleType) $j(newRow)
+                                .find('[data-attr="allow_cv_free_text"]')
+                                .addClass("disabled");
     $j(newRow).find('[data-attr="unit"]').val(row[6]);
-    $j(newRow).find('[data-attr="unit"]').addClass("disabled");
-    $j(newRow).find(".sample-type-is-title").prop("checked", row[8]);
+    if (appliedToSampleType)  $j(newRow).find('[data-attr="unit"]').addClass("disabled");
     $j(newRow).find('[data-attr="pid"]').val(row[9]);
     $j(newRow).find('[data-attr="isa_tag_id"]').val(row[11]);
     $j(newRow).find('[data-attr="isa_tag_title"]').val(row[11]);
