@@ -54,6 +54,7 @@ class ApplicationController < ActionController::Base
   def current_person
     current_user.try(:person)
   end
+  helper_method :current_person
 
   def partially_registered?
     redirect_to register_people_path if current_user && !current_user.registration_complete?

@@ -14,21 +14,14 @@
     possible_projects = Project.all
   else
     possible_projects = []
+    possible_projects |= current_person.current_projects
     if resource
-      if resource.respond_to?(:contributor) && resource.contributor
-        if allow_only_administered
-          possible_projects |= resource.contributor.current_projects.select{ |p| @current_user.person.is_project_administrator? p }
-        else
-          possible_projects |= resource.contributor.current_projects
-        end
-        else
-          possible_projects |= resource.projects
-      end
-    else
-      possible_projects |= @current_user.person.current_projects
+      possible_projects |= resource.projects
+      possible_projects |= resource.contributor.current_projects if resource.respond_to?(:contributor) && resource.contributor
     end
   end
 
+  possible_projects = possible_projects.select { |p| current_person.is_project_administrator? p } if allow_only_administered
   possible_projects = possible_projects - selected_projects
 
   possible_projects_json, selected_projects_json = [possible_projects, selected_projects].map do |projects|
