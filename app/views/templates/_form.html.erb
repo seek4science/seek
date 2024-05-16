@@ -15,7 +15,7 @@
         <%= f.text_area :description, class: "form-control rich-text-edit", rows: 5, id: "template-description" -%>
     </div>
 
-    <%= render partial: "projects/project_selector", locals: { resource: @template } -%>
+    <%= render partial: "projects/project_selector", locals: { resource: @template, allow_only_administered: true } -%>
 
     <%= render partial: 'assets/manage_specific_attributes', locals:{f:f} if show_form_manage_specific_attributes? %>
 
@@ -85,7 +85,7 @@
                     <% if @template.children.none? %>
                         <tr id="add-attribute-row">
                             <td colspan="6">
-                                <%= button_link_to('Add new attribute', 'add', '#', id: 'add-attribute') %>
+                                <%= button_link_to('Add new attribute', 'add', '#', id: 'add-attribute') if  @template.level %>
                             </td>
                         </tr>
                     <% end %>
