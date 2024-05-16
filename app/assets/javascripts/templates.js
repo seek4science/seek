@@ -267,7 +267,10 @@ const applyTemplate = () => {
         .addClass("disabled");
     $j(newRow).find('[data-attr="template_attribute_id"]').val(row[14]); // In case of a sample type
     $j(newRow).find('[data-attr="parent_attribute_id"]').val(row[14]); // In case of a template
-    if (isRequired) {
+
+    // Hide the remove button if the attribute is required and it is applied to a sample type.
+    // Template attributes should always be removeable
+    if (isRequired && appliedToSampleType) {
       $j(newRow).find('label.btn.btn-danger').addClass("hidden");
     }
 
