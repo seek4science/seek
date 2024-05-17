@@ -13,7 +13,7 @@ If you have any comments or feedback about a release, then please [Contact Us](/
 
 ## Version 1.15.0
 
-Release date: _May 2024_
+Release date: _17th May 2024_
 
 A major release that contains a number of improvements, upgrades and bug fixes, the hightlights including:
 
