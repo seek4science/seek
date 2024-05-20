@@ -87,18 +87,20 @@ namespace :seek do
 
   task(update_observation_unit_policies: [:environment]) do
     puts '..... creating observation unit policies ...'
-    affected_obs_units_count = 0
+    affected_obs_units = []
     ObservationUnit.where.missing(:policy).includes(:study).in_batches(of: 25) do |batch|
       batch.each do |obs_unit|
         policy = obs_unit.study.policy || Policy.default
         policy = policy.deep_copy
         policy.save
         obs_unit.update_column(:policy_id, policy.id)
-        affected_obs_units_count += 1
+        affected_obs_units << obs_unit
       end
       putc('.')
     end
-    puts "..... finished updating policies for #{affected_obs_units_count} observation units"
+    AuthLookupUpdateQueue.enqueue(affected_obs_units)
+    RdfGenerationQueue.enqueue(affected_obs_units)
+    puts "..... finished updating policies for #{affected_obs_units.count} observation units"
   end
 
   task(decouple_extracted_samples_projects: [:environment]) do
