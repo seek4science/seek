@@ -30,5 +30,24 @@ class ObservationUnitTest < ActiveSupport::TestCase
     end
   end
 
+  test 'policy' do
+    obs_unit = FactoryBot.create(:observation_unit)
+    contributor = obs_unit.contributor
+    person2 = FactoryBot.create(:person)
+    refute_nil obs_unit.policy
+
+    assert obs_unit.can_manage?(contributor)
+
+    obs_unit.policy = FactoryBot.create(:public_policy)
+    assert obs_unit.can_view?(nil)
+    assert obs_unit.can_view?(contributor)
+    assert obs_unit.can_view?(person2)
+
+    obs_unit.policy = FactoryBot.create(:private_policy)
+    refute obs_unit.can_view?(nil)
+    assert obs_unit.can_view?(contributor)
+    refute obs_unit.can_view?(person2)
+  end
+
 
 end

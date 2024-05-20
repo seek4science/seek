@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_05_01_142953) do
+ActiveRecord::Schema.define(version: 2024_05_20_103545) do
 
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
@@ -1204,6 +1204,18 @@ ActiveRecord::Schema.define(version: 2024_05_01_142953) do
     t.index ["observation_unit_id"], name: "index_observation_unit_assets_on_observation_unit_id"
   end
 
+  create_table "observation_unit_auth_lookup", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "asset_id"
+    t.boolean "can_view", default: false
+    t.boolean "can_manage", default: false
+    t.boolean "can_edit", default: false
+    t.boolean "can_download", default: false
+    t.boolean "can_delete", default: false
+    t.index ["user_id", "asset_id", "can_view"], name: "index_obs_unit_auth_lookup_user_id_asset_id"
+    t.index ["user_id", "can_view"], name: "index_obs_unit_auth_lookup_on_user_id_and_can_view"
+  end
+
   create_table "observation_units", force: :cascade do |t|
     t.string "title"
     t.text "description"
@@ -1217,6 +1229,8 @@ ActiveRecord::Schema.define(version: 2024_05_01_142953) do
     t.string "deleted_contributor"
     t.text "other_creators"
     t.bigint "study_id"
+    t.bigint "policy_id"
+    t.string "first_letter", limit: 1
   end
 
   create_table "observation_units_projects", id: false, force: :cascade do |t|

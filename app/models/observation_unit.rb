@@ -1,10 +1,12 @@
 class ObservationUnit < ApplicationRecord
 
-  include Seek::Creators
-  include Seek::ProjectAssociation
-  include Seek::Stats::ActivityCounts
-  include Seek::Search::CommonFields, Seek::Search::BackgroundReindexing
+  # include Seek::Creators
+  # include Seek::ProjectAssociation
+  # include Seek::Stats::ActivityCounts
+  # include Seek::Search::CommonFields, Seek::Search::BackgroundReindexing
   include Seek::Rdf::RdfGeneration
+
+  acts_as_asset
 
   belongs_to :contributor, class_name: 'Person'
   belongs_to :study
