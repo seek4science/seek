@@ -801,9 +801,9 @@ SEEK::Application.routes.draw do
 
   ### OBSERVATION UNITS ###
 
-  resources :observation_units, only: [:show, :index] do
+  resources :observation_units, concerns:[:asset] do
 
-    resources :projects, :people, :programmes, :studies, :samples, :assays, :data_files
+    resources :projects, :people, :programmes, :samples, :assays, :studies, :investigations, :data_files, :publications, :collections
   end
 
   ### MISC MATCHES ###
