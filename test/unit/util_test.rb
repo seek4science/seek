@@ -7,7 +7,7 @@ class UtilTest < ActiveSupport::TestCase
   end
 
   test 'creatable types' do
-    expected = [Collection, DataFile, Document, FileTemplate, Model, Placeholder, Presentation, Publication, Sample, Sop, Assay, Investigation, Study, Event, SampleType, Strain, Workflow, Template]
+    expected = [Collection, DataFile, Document, FileTemplate, Model, ObservationUnit, Placeholder, Presentation, Publication, Sample, Sop, Assay, Investigation, Study, Event, SampleType, Strain, Workflow, Template]
 
     types = with_config_value :isa_json_compliance_enabled, true do
       Seek::Util.user_creatable_types
@@ -21,7 +21,7 @@ class UtilTest < ActiveSupport::TestCase
   end
 
   test 'authorized types' do
-    expected = [Assay, Collection, DataFile, Document, Event, FileTemplate, Investigation, Model, Placeholder, Presentation, Publication, Sample, Sop, Strain, Study, Workflow, Template].map(&:name).sort
+    expected = [Assay, Collection, DataFile, Document, Event, FileTemplate, Investigation, Model, ObservationUnit, Placeholder, Presentation, Publication, Sample, Sop, Strain, Study, Workflow, Template].map(&:name).sort
 
     actual = with_config_value :isa_json_compliance_enabled, true do
       Seek::Util.authorized_types.map(&:name).sort
