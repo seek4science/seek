@@ -314,7 +314,7 @@ SEEK::Application.routes.draw do
       post :batch_sharing_permission_changed
     end
     resources :projects, :programmes, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows,
-              :data_files, :presentations, :publications, :documents, :events, :sample_types, :samples, :specimens,
+              :data_files, :observation_units, :presentations, :publications, :documents, :events, :sample_types, :samples, :specimens,
               :strains, :file_templates, :placeholders, :collections, :templates, only: [:index]
   end
 
@@ -354,7 +354,7 @@ SEEK::Application.routes.draw do
       post :submit_fairdata_station
       post :update_annotations_ajax
     end
-    resources :programmes, :people, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows, :data_files, :presentations,
+    resources :programmes, :people, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows, :data_files, :observation_units, :presentations,
               :publications, :events, :sample_types, :samples, :specimens, :strains, :search, :organisms, :human_diseases, :documents, :file_templates, :placeholders, :collections, :templates, only: [:index]
 
     resources :openbis_endpoints do
