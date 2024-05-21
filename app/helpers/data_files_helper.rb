@@ -3,6 +3,10 @@ module DataFilesHelper
     authorised_assets(DataFile, projects)
   end
 
+  def authorised_assay_assets(data_file)
+    data_file.assay_assets.where(assay_id: authorised_assays.collect(&:id))
+  end
+
   def split_into_two(ahash = {})
     return [{}, {}] if ahash.nil?
     return [ahash, {}] if ahash.length < 2
