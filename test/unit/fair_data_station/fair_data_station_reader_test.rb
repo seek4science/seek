@@ -4,7 +4,7 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
   test 'read demo' do
     path = "#{Rails.root}/test/fixtures/files/fairdatastation/demo.ttl"
 
-    investigations = Seek::FairDataStation::Reader.parse_graph(path)
+    investigations = Seek::FairDataStation::Reader.instance.parse_graph(path)
     assert_equal 1, investigations.count
     inv = investigations.first
     assert_equal 'http://fairbydesign.nl/ontology/inv_INV_DRP007092', inv.resource_uri.to_s
@@ -37,7 +37,7 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
   test 'read indpensim' do
     path = "#{Rails.root}/test/fixtures/files/fairdatastation/indpensim.ttl"
 
-    investigations = Seek::FairDataStation::Reader.parse_graph(path)
+    investigations = Seek::FairDataStation::Reader.instance.parse_graph(path)
     assert_equal 1, investigations.count
     inv = investigations.first
     assert_equal 'http://fairbydesign.nl/ontology/inv_indpensim', inv.resource_uri.to_s
@@ -66,7 +66,7 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
   test 'annotations' do
     path = "#{Rails.root}/test/fixtures/files/fairdatastation/demo.ttl"
 
-    study = Seek::FairDataStation::Reader.parse_graph(path).first.studies.first
+    study = Seek::FairDataStation::Reader.instance.parse_graph(path).first.studies.first
 
     assert_equal 14, study.annotations.count
     assert_includes study.annotations, ["http://fairbydesign.nl/ontology/center_name", "NIID"]
@@ -75,7 +75,7 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
   test 'additional metadata annotations' do
     path = "#{Rails.root}/test/fixtures/files/fairdatastation/demo.ttl"
 
-    inv = Seek::FairDataStation::Reader.parse_graph(path).first
+    inv = Seek::FairDataStation::Reader.instance.parse_graph(path).first
     assert_empty inv.additional_metadata_annotations
 
     study = inv.studies.first
@@ -88,7 +88,7 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
 
     # non fairbydesign annotations
     path = "#{Rails.root}/test/fixtures/files/fairdatastation/indpensim.ttl"
-    inv = Seek::FairDataStation::Reader.parse_graph(path).first
+    inv = Seek::FairDataStation::Reader.instance.parse_graph(path).first
     obs_unit = inv.studies.first.observation_units.first
     annotations = obs_unit.additional_metadata_annotations
     assert_equal 5, annotations.count
@@ -100,7 +100,7 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
   test 'study assays' do
     path = "#{Rails.root}/test/fixtures/files/fairdatastation/demo.ttl"
 
-    investigations = Seek::FairDataStation::Reader.parse_graph(path)
+    investigations = Seek::FairDataStation::Reader.instance.parse_graph(path)
     study = investigations.first.studies.first
     assert_equal 9, study.assays.count
     expected = %w[DRR243845 DRR243850 DRR243856 DRR243863 DRR243881 DRR243894 DRR243899 DRR243906
@@ -111,7 +111,7 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
   test 'titles and descriptions' do
     path = "#{Rails.root}/test/fixtures/files/fairdatastation/demo.ttl"
 
-    inv = Seek::FairDataStation::Reader.parse_graph(path).first
+    inv = Seek::FairDataStation::Reader.instance.parse_graph(path).first
     study = inv.studies.first
     obs_unit = study.observation_units.first
     sample = obs_unit.samples.first
@@ -138,7 +138,7 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
   test 'datasets' do
     path = "#{Rails.root}/test/fixtures/files/fairdatastation/demo.ttl"
 
-    inv = Seek::FairDataStation::Reader.parse_graph(path).first
+    inv = Seek::FairDataStation::Reader.instance.parse_graph(path).first
     study = inv.studies.first
     obs_unit = study.observation_units.first
     sample = obs_unit.samples.first
@@ -159,7 +159,7 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
 
   test 'construct seek isa' do
     path = "#{Rails.root}/test/fixtures/files/fairdatastation/demo.ttl"
-    inv = Seek::FairDataStation::Reader.parse_graph(path).first
+    inv = Seek::FairDataStation::Reader.instance.parse_graph(path).first
     policy = FactoryBot.create(:public_policy)
 
     contributor = FactoryBot.create(:person)
@@ -167,7 +167,7 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
     FactoryBot.create(:experimental_assay_class)
     FactoryBot.create(:fairdatastation_virtual_demo_sample_type)
 
-    investigation = Seek::FairDataStation::Reader.construct_isa(inv, contributor, [project], policy)
+    investigation = Seek::FairDataStation::Reader.instance.construct_isa(inv, contributor, [project], policy)
     studies = investigation.studies.to_a
     obs_units = studies.first.observation_units.to_a
     assays = studies.first.assays.to_a
@@ -236,11 +236,11 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
     sample_type = FactoryBot.create(:fairdatastation_virtual_demo_sample_type)
 
     path = "#{Rails.root}/test/fixtures/files/fairdatastation/demo.ttl"
-    inv = Seek::FairDataStation::Reader.parse_graph(path).first
+    inv = Seek::FairDataStation::Reader.instance.parse_graph(path).first
     contributor = FactoryBot.create(:person)
     project = contributor.projects.first
 
-    investigation = Seek::FairDataStation::Reader.construct_isa(inv, contributor, [project], Policy.default)
+    investigation = Seek::FairDataStation::Reader.instance.construct_isa(inv, contributor, [project], Policy.default)
     assert_nil investigation.extended_metadata
 
     study = investigation.studies.first
@@ -294,14 +294,14 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
 
   test 'observation_unit datasets created in construct_isa' do
     path = "#{Rails.root}/test/fixtures/files/fairdatastation/indpensim.ttl"
-    inv = Seek::FairDataStation::Reader.parse_graph(path).first
+    inv = Seek::FairDataStation::Reader.instance.parse_graph(path).first
 
     contributor = FactoryBot.create(:person)
     project = contributor.projects.first
     FactoryBot.create(:experimental_assay_class)
     FactoryBot.create(:fairdatastation_virtual_demo_sample_type)
 
-    investigation = Seek::FairDataStation::Reader.construct_isa(inv, contributor, [project], Policy.default)
+    investigation = Seek::FairDataStation::Reader.instance.construct_isa(inv, contributor, [project], Policy.default)
     assert_equal 100, investigation.studies.first.observation_units.to_a.count
     observation_unit = investigation.studies.first.observation_units.first
     assert_equal 1, observation_unit.observation_unit_assets.find_all{|oua| oua.asset_type == 'DataFile'}.collect(&:asset).count
@@ -328,11 +328,11 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
     FactoryBot.create(:experimental_assay_class)
 
     path = "#{Rails.root}/test/fixtures/files/fairdatastation/indpensim.ttl"
-    inv = Seek::FairDataStation::Reader.parse_graph(path).first
+    inv = Seek::FairDataStation::Reader.instance.parse_graph(path).first
     contributor = FactoryBot.create(:person)
     project = contributor.projects.first
 
-    investigation = Seek::FairDataStation::Reader.construct_isa(inv, contributor, [project], Policy.default)
+    investigation = Seek::FairDataStation::Reader.instance.construct_isa(inv, contributor, [project], Policy.default)
     assert_nil investigation.extended_metadata
 
     assert_difference('ExtendedMetadata.count', 100) do

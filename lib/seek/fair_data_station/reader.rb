@@ -5,7 +5,8 @@ require 'sparql/client'
 module Seek
   module FairDataStation
     class Reader
-      def self.parse_graph(path)
+      include Singleton
+      def parse_graph(path)
         graph = RDF::Graph.load(path, format: :ttl)
         sparql = SPARQL::Client.new(graph)
         jerm = RDF::Vocabulary.new('http://jermontology.org/ontology/JERMOntology#')
@@ -20,7 +21,7 @@ module Seek
         end
       end
 
-      def self.construct_isa(datastation_inv, contributor, projects, policy)
+      def construct_isa(datastation_inv, contributor, projects, policy)
         inv_attributes = datastation_inv.seek_attributes.merge({ contributor: contributor, projects: projects,
                                                                  policy: policy.deep_copy })
         investigation = ::Investigation.new(inv_attributes)
@@ -67,14 +68,14 @@ module Seek
         investigation
       end
 
-      def self.populate_extended_metadata(seek_entity, datastation_entity)
+      def populate_extended_metadata(seek_entity, datastation_entity)
         if emt = detect_extended_metadata(seek_entity, datastation_entity)
           seek_entity.extended_metadata = ExtendedMetadata.new(extended_metadata_type: emt)
           datastation_entity.populate_extended_metadata(seek_entity)
         end
       end
 
-      def self.detect_extended_metadata(seek_entity, datastation_entity)
+      def detect_extended_metadata(seek_entity, datastation_entity)
         property_ids = datastation_entity.additional_metadata_annotations.collect { |annotation| annotation[0] }
 
         # collect and sort those with the most properties that match, eliminating any where no properties match
@@ -90,7 +91,7 @@ module Seek
         candidates.first&.last
       end
 
-      def self.populate_sample(seek_sample, datastation_sample)
+      def populate_sample(seek_sample, datastation_sample)
         if sample_type = detect_sample_type(datastation_sample)
           seek_sample.sample_type = sample_type
           datastation_sample.populate_seek_sample(seek_sample)
@@ -99,7 +100,7 @@ module Seek
         end
       end
 
-      def self.detect_sample_type(datastation_sample)
+      def detect_sample_type(datastation_sample)
         property_ids = datastation_sample.additional_metadata_annotations.collect { |annotation| annotation[0] }
 
         # collect and sort those with the most properties that match, eliminating any where no properties match
@@ -113,7 +114,7 @@ module Seek
         candidates.first&.last
       end
 
-      def self.build_data_file(contributor, datastation_dataset, projects, policy)
+      def build_data_file(contributor, datastation_dataset, projects, policy)
         # @_data_file_cache = {}
         # if @_data_file_cache[datastation_dataset.identifier]
         #   @_data_file_cache[datastation_dataset.identifier]
