@@ -186,11 +186,13 @@ class FairDataReaderTest < ActiveSupport::TestCase
 
     assert_equal Policy::MANAGING, investigation.policy.access_type
     assert_equal Policy::MANAGING, studies.first.policy.access_type
+    assert_equal Policy::MANAGING, obs_units.first.policy.access_type
     assert_equal Policy::MANAGING, assays.first.policy.access_type
     assert_equal Policy::MANAGING, samples.first.policy.access_type
     assert_equal Policy::MANAGING, data_files.first.policy.access_type
 
     refute_equal investigation.policy, studies.first.policy
+    refute_equal investigation.policy, obs_units.first.policy
     refute_equal investigation.policy, assays.first.policy
     refute_equal investigation.policy, samples.first.policy
     refute_equal investigation.policy, data_files.first.policy

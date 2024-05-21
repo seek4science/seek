@@ -5091,7 +5091,12 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_equal 2, study.observation_units.count
     assert_equal 4, study.observation_units.first.samples.count
 
-    sample = study.observation_units.first.samples.first
+    obs_unit = study.observation_units.first
+    sample = obs_unit.samples.first
+
+    assert_equal person, study.contributor
+    assert_equal person, obs_unit.contributor
+    assert_equal person, sample.contributor
 
     assert_equal Policy::VISIBLE, investigation.policy.access_type
     assert_equal 1, investigation.policy.permissions.count
@@ -5102,6 +5107,11 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_equal 1, study.policy.permissions.count
     assert_equal another_person, study.policy.permissions.first.contributor
     assert_equal Policy::MANAGING, study.policy.permissions.first.access_type
+
+    assert_equal Policy::VISIBLE, obs_unit.policy.access_type
+    assert_equal 1, obs_unit.policy.permissions.count
+    assert_equal another_person, obs_unit.policy.permissions.first.contributor
+    assert_equal Policy::MANAGING, obs_unit.policy.permissions.first.access_type
 
     assert_equal Policy::VISIBLE, sample.policy.access_type
     assert_equal 1, sample.policy.permissions.count

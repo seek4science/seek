@@ -31,7 +31,7 @@ module BioInd
           study = investigation.studies.build(study_attributes)
           populate_extended_metadata(study, datastation_study)
           datastation_study.observation_units.each do |datastation_observation_unit|
-            observation_unit_attributes = datastation_observation_unit.seek_attributes.merge({contributor: contributor, study:study, projects: projects})
+            observation_unit_attributes = datastation_observation_unit.seek_attributes.merge({contributor: contributor, study:study, projects: projects, policy:policy.deep_copy})
             observation_unit = study.observation_units.build(observation_unit_attributes)
             datastation_observation_unit.datasets.each do |datastation_dataset|
               df = build_data_file(contributor, datastation_dataset, projects, policy)
