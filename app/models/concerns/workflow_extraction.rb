@@ -52,7 +52,7 @@ module WorkflowExtraction
   end
 
   def structure
-    WorkflowInternals::Structure.new(internals)
+    WorkflowInternals::Structure.new(internals, self)
   end
 
   delegate :inputs, :outputs, :steps, to: :structure

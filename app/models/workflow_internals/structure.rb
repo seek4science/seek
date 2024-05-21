@@ -1,9 +1,10 @@
 module WorkflowInternals
   class Structure
-    attr_reader :inputs, :outputs, :steps, :links
+    attr_reader :workflow, :inputs, :outputs, :steps, :links
 
-    def initialize(internals)
+    def initialize(internals, workflow = nil)
       @internals = internals
+      @workflow = workflow
 
       @inputs = (@internals[:inputs] || []).map do |i|
         Input.new(self, **i.symbolize_keys)

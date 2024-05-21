@@ -5,7 +5,7 @@ module Seek
       class Workflow < CreativeWork
         WORKFLOW_PROFILE = 'https://bioschemas.org/profiles/ComputationalWorkflow/1.0-RELEASE/'.freeze
 
-        FORMALPARAMETER_PROFILE = 'https://bioschemas.org/profiles/FormalParameter/1.0-RELEASE/'.freeze
+
 
         schema_mappings programming_language: :programmingLanguage,
                         inputs: :input,
@@ -35,11 +35,11 @@ module Seek
         end
 
         def inputs
-          formal_parameters(resource.inputs, 'inputs')
+          formal_parameters(resource.inputs)
         end
 
         def outputs
-          formal_parameters(resource.outputs, 'outputs')
+          formal_parameters(resource.outputs)
         end
 
         def license
@@ -52,20 +52,8 @@ module Seek
 
         private
 
-        def formal_parameters(properties, group_name)
-          wf_name = if title
-                      title.downcase.gsub(/[^0-9a-z]/i, '_')
-                    else
-                      'dummy'
-                    end
-          properties.collect do |property|
-            {
-              "@type": 'FormalParameter',
-              "@id": ROCrate::ContextualEntity.format_local_id("#{wf_name}-#{group_name}-#{property.id}"),
-              name: property.name || property.id,
-              "dct:conformsTo": FORMALPARAMETER_PROFILE
-            }
-          end
+        def formal_parameters(properties)
+          properties.map(&:ro_crate_metadata)
         end
       end
     end

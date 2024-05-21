@@ -14,5 +14,9 @@ module WorkflowInternals
     def inspect
       "#<#{self.class.name} id=\"#{id}\">"
     end
+
+    def workflow
+      structure.workflow
+    end
   end
 end
