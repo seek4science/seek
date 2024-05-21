@@ -14,9 +14,7 @@ module Seek
           property = annotation[0]
           value = annotation[1]
           attribute = sample_type.sample_attributes.where(pid: property).first
-          if attribute
-            data[attribute.title] = value
-          end
+          data[attribute.title] = value if attribute
         end
         seek_sample.data = data
       end

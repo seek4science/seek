@@ -9,3 +9,6 @@ Layout/LineLength:
 # Don't enforce frozen string literals
 Style/FrozenStringLiteralComment:
   Enabled: false
+
+Style/HashSyntax:
+  EnforcedShorthandSyntax: never

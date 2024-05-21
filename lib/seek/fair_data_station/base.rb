@@ -47,8 +47,8 @@ module Seek
       end
 
       def additional_metadata_annotations
-        annotations.select do |annotation|
-          !core_annotations.include?(annotation[0])
+        annotations.reject do |annotation|
+          core_annotations.include?(annotation[0])
         end
       end
 
@@ -95,7 +95,7 @@ module Seek
       end
 
       def seek_attributes
-        {title: title, description: description}
+        { title: title, description: description }
       end
 
       def populate_extended_metadata(seek_resource)
@@ -105,9 +105,7 @@ module Seek
           property = annotation[0]
           value = annotation[1]
           attribute = extended_metadata_type.extended_metadata_attributes.where(property_type_id: property).first
-          if attribute
-            data[attribute.title] = value
-          end
+          data[attribute.title] = value if attribute
         end
         seek_resource.extended_metadata.data = data
       end
