@@ -1,10 +1,10 @@
-module BioInd
-  module FairData
+module Seek
+  module FairDataStation
     class Sample < Base
       alias assays children
 
       def child_class
-        BioInd::FairData::Assay
+        Seek::FairDataStation::Assay
       end
 
       def populate_seek_sample(seek_sample)

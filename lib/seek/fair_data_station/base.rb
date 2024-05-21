@@ -1,5 +1,5 @@
-module BioInd
-  module FairData
+module Seek
+  module FairDataStation
     class Base
       attr_reader :resource_uri, :graph, :children, :core_annotations
 
@@ -81,7 +81,7 @@ module BioInd
           [resource_uri, @schema.dataset, :dataset]
         )
         query.execute.collect do |solution|
-          BioInd::FairData::DataSet.new(solution.dataset, graph)
+          Seek::FairDataStation::DataSet.new(solution.dataset, graph)
         end
       end
 

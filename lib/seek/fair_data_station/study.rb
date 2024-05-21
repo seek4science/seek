@@ -1,5 +1,5 @@
-module BioInd
-  module FairData
+module Seek
+  module FairDataStation
     class Study < Base
       alias observation_units children
 
@@ -8,7 +8,7 @@ module BioInd
       end
 
       def child_class
-        BioInd::FairData::ObservationUnit
+        Seek::FairDataStation::ObservationUnit
       end
     end
   end

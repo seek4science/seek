@@ -2,8 +2,8 @@ require 'rdf'
 require 'rdf/turtle'
 require 'sparql/client'
 
-module BioInd
-  module FairData
+module Seek
+  module FairDataStation
     class Reader
 
       def self.parse_graph(path)
@@ -15,7 +15,7 @@ module BioInd
           [:inv, RDF.type, jerm.[]('Investigation')]
         )
         query.execute.collect do |inv|
-          inv = BioInd::FairData::Investigation.new(inv.inv, graph)
+          inv = Seek::FairDataStation::Investigation.new(inv.inv, graph)
           inv.populate
           inv
         end

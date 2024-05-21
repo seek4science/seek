@@ -1,10 +1,10 @@
-module BioInd
-  module FairData
+module Seek
+  module FairDataStation
     class Investigation < Base
       alias studies children
 
       def child_class
-        BioInd::FairData::Study
+        Seek::FairDataStation::Study
       end
     end
   end

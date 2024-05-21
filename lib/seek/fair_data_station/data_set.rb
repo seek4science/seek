@@ -1,5 +1,5 @@
-module BioInd
-  module FairData
+module Seek
+  module FairDataStation
     class DataSet < Base
 
       def title

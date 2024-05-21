@@ -1,10 +1,10 @@
-module BioInd
-  module FairData
+module Seek
+  module FairDataStation
     class ObservationUnit < Base
       alias samples children
 
       def child_class
-        BioInd::FairData::Sample
+        Seek::FairDataStation::Sample
       end
     end
   end

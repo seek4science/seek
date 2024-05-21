@@ -1,5 +1,5 @@
-module BioInd
-  module FairData
+module Seek
+  module FairDataStation
     class Assay < Base
 
       def title
