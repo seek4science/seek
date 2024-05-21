@@ -202,7 +202,7 @@ class ProjectsController < ApplicationController
     policy = Policy.new
     policy.set_attributes_with_sharing(policy_params)
     datadata_inv = Seek::FairDataStation::Reader.instance.parse_graph(path)
-    @investigation = Seek::FairDataStation::Reader.instance.construct_isa(datadata_inv.first, current_person, [@project], policy)
+    @investigation = Seek::FairDataStation::Writer.instance.construct_isa(datadata_inv.first, current_person, [@project], policy)
     @investigation.save!
 
     respond_to do |format|
