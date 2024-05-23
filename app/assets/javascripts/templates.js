@@ -243,9 +243,9 @@ const applyTemplate = () => {
     const isRequired = row[0] ? "checked" : "";
     newRow = $j(newRow.replace(/replace-me/g, index));
     $j(newRow).find('[data-attr="required"]').prop("checked", row[0]);
-    if (appliedToSampleType) $j(newRow).find('[data-attr="required"]').prop("disabled", true);
+    if (appliedToSampleType) $j(newRow).find('[data-attr="required"]').addClass("disabled");
     $j(newRow).find(".sample-type-is-title").prop("checked", row[8]);
-    if (appliedToSampleType) $j(newRow).find('.sample-type-is-title').prop("disabled", true);
+    if (appliedToSampleType) $j(newRow).find('.sample-type-is-title').addClass("disabled");
     $j(newRow).find('[data-attr="title"]').val(row[1]);
     if (appliedToSampleType) $j(newRow).find('[data-attr="title"]').addClass("disabled");
     $j(newRow).find('[data-attr="description"]').val(row[2]);
