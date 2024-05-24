@@ -12,40 +12,38 @@ class IsaAssaysController < ApplicationController
     new_position =
       if params[:is_assay_stream] || params[:source_assay_id].nil? || (params[:source_assay_id] == params[:assay_stream_id])
         0
-     else
-       Assay.find(params[:source_assay_id]).position + 1
+      else
+        Assay.find(params[:source_assay_id]).position + 1
       end
 
     study = Study.find(params[:study_id])
     source_assay = Assay.find(params[:source_assay_id]) if params[:source_assay_id]
-
     input_sample_type_id =
-      if params[:is_assay_stream]
+      if params[:is_assay_stream] || source_assay.is_assay_stream?
         study.sample_types.second.id
       else
-        source_assay.previous_linked_sample_type.id if source_assay
+        source_assay&.sample_type&.id
       end
-
-    projects = []
 
     @isa_assay =
       if params[:is_assay_stream]
         IsaAssay.new({ assay: { assay_class_id: AssayClass.assay_stream.id,
                                 study_id: study.id,
                                 position: 0 },
-                       input_sample_type_id: input_sample_type_id})
+                       input_sample_type_id: })
       else
         IsaAssay.new({ assay: { assay_class_id: AssayClass.experimental.id,
                                 assay_stream_id: params[:assay_stream_id],
                                 study_id: study.id,
                                 position: new_position },
-                       input_sample_type_id: input_sample_type_id})
+                       input_sample_type_id: })
       end
+    respond_to(&:html)
   end
 
   def create
     if @isa_assay.save
-      flash[:notice] = "The #{t('isa_assay')} was succesfully created.<br/>".html_safe
+      flash[:notice] = "The #{t('isa_assay')} was successfully created.<br/>".html_safe
       respond_to do |format|
         format.html do
           redirect_to single_page_path(id: @isa_assay.assay.projects.first, item_type: 'assay',
@@ -62,16 +60,7 @@ class IsaAssaysController < ApplicationController
   end
 
   def edit
-    # let edit the assay if the sample_type is not authorized
-    if @isa_assay.assay.is_assay_stream?
-      @isa_assay.sample_type = nil
-    else
-      @isa_assay.sample_type = nil unless requested_item_authorized?(@isa_assay.sample_type)
-    end
-
-    respond_to do |format|
-      format.html
-    end
+    respond_to(&:html)
   end
 
   def update
@@ -86,6 +75,7 @@ class IsaAssaysController < ApplicationController
     end
 
     if @isa_assay.save
+      flash[:notice] = "The #{t('isa_assay')} was successfully updated.<br/>".html_safe
       redirect_to single_page_path(id: @isa_assay.assay.projects.first, item_type: 'assay',
                                    item_id: @isa_assay.assay.id)
     else
