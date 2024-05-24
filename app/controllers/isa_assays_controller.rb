@@ -199,20 +199,21 @@ class IsaAssaysController < ApplicationController
   end
 
   def find_requested_item
-    if params[:is_assay_stream]
-      @isa_assay = IsaAssay.new({ assay: { assay_class_id: AssayClass.assay_stream.id } })
-    else
-      @isa_assay = IsaAssay.new({ assay: { assay_class_id: AssayClass.experimental.id } })
-    end
+    @isa_assay = IsaAssay.new
     @isa_assay.populate(params[:id])
 
+    @isa_assay.errors.add(:assay, "The #{t('isa_assay')} was not found.") if @isa_assay.assay.nil?
+    @isa_assay.errors.add(:assay, "You are not authorized to edit this #{t('isa_assay')}.") unless requested_item_authorized?(@isa_assay.assay)
+
     # Should not deal with sample type if assay has assay_class assay stream
-    return if @isa_assay.assay.is_assay_stream?
+    unless @isa_assay.assay&.is_assay_stream?
+      @isa_assay.errors.add(:sample_type, 'Sample type not found.') if @isa_assay.sample_type.nil?
+      @isa_assay.errors.add(:sample_type, "You are not authorized to edit this assay's #{t('sample_type')}.") unless requested_item_authorized?(@isa_assay.sample_type)
+    end
 
-    if @isa_assay.sample_type.nil? || !requested_item_authorized?(@isa_assay.assay)
-      flash[:error] = "You are not authorized to edit this #{t('isa_assay')}"
-      flash[:error] = 'Resource not found.' if @isa_assay.sample_type.nil?
-
+    if @isa_assay.errors.any?
+      error_messages = @isa_assay.errors.full_messages.map { |msg| "<li>[#{t('isa_assay')}]: #{msg}</li>" }.join('')
+      flash[:error] = "<ul>#{error_messages}</ul>".html_safe
       redirect_to single_page_path(id: @isa_assay.assay.projects.first, item_type: 'assay',
                                    item_id: @isa_assay.assay)
     end
