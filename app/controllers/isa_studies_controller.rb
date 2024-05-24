@@ -6,7 +6,7 @@ class IsaStudiesController < ApplicationController
   before_action :find_requested_item, only: %i[edit update]
 
   def new
-    @isa_study = IsaStudy.new
+    @isa_study = IsaStudy.new({ study: { investigation_id: params[:investigation_id] } })
   end
 
   def create

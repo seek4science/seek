@@ -76,15 +76,6 @@
     }
 
     $j(document).ready(function () {
-      const urlSearchParams = new URLSearchParams(window.location.search);
-      const params = Object.fromEntries(urlSearchParams.entries());
-      const investigation_id = params["investigation_id"]
-      // Prevent setting the hidden field on redirect (query string parameters are missing)
-      if(investigation_id) {
-          $j("#isa_study_study_investigation_id").val(investigation_id);
-          $j("#study_investigation_id").val(investigation_id).change();
-      }
-
       if (templates.length > 0) {
         Templates.init($j('#template-attributes'));
       }
