@@ -9,20 +9,53 @@ class IsaAssaysController < ApplicationController
   after_action :rearrange_assay_positions_create_isa_assay, only: :create
 
   def new
-    if params[:is_assay_stream]
-      @isa_assay = IsaAssay.new({ assay: { assay_class_id: AssayClass.assay_stream.id } })
-    else
-      @isa_assay = IsaAssay.new({ assay: { assay_class_id: AssayClass.experimental.id } })
-    end
+    new_position =
+      if params[:is_assay_stream] || params[:source_assay_id].nil? || (params[:source_assay_id] == params[:assay_stream_id])
+        0
+     else
+       Assay.find(params[:source_assay_id]).position + 1
+      end
+
+    study = Study.find(params[:study_id])
+    source_assay = Assay.find(params[:source_assay_id]) if params[:source_assay_id]
+
+    input_sample_type_id =
+      if params[:is_assay_stream]
+        study.sample_types.second.id
+      else
+        source_assay.previous_linked_sample_type.id if source_assay
+      end
+
+    projects = []
+
+    @isa_assay =
+      if params[:is_assay_stream]
+        IsaAssay.new({ assay: { assay_class_id: AssayClass.assay_stream.id,
+                                study_id: study.id,
+                                position: 0 },
+                       input_sample_type_id: input_sample_type_id})
+      else
+        IsaAssay.new({ assay: { assay_class_id: AssayClass.experimental.id,
+                                assay_stream_id: params[:assay_stream_id],
+                                study_id: study.id,
+                                position: new_position },
+                       input_sample_type_id: input_sample_type_id})
+      end
   end
 
   def create
     if @isa_assay.save
-      redirect_to single_page_path(id: @isa_assay.assay.projects.first, item_type: 'assay',
-                                   item_id: @isa_assay.assay, notice: 'The ISA assay was created successfully!')
+      flash[:notice] = "The #{t('isa_assay')} was succesfully created.<br/>".html_safe
+      respond_to do |format|
+        format.html do
+          redirect_to single_page_path(id: @isa_assay.assay.projects.first, item_type: 'assay',
+                                       item_id: @isa_assay.assay)
+        end
+        format.json { render json: @isa_assay, include: [params[:include]] }
+      end
     else
       respond_to do |format|
-        format.html { render action: 'new' }
+        format.html { render action: 'new', status: :unprocessable_entity }
         format.json { render json: json_api_errors(@isa_assay), status: :unprocessable_entity }
       end
     end
