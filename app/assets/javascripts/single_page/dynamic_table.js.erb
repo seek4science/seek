@@ -90,7 +90,7 @@ const handleSelect = (e) => {
           if(c.linked_sample_type){
             data = sanitizedData && Array.isArray(sanitizedData) ? sanitizedData : [sanitizedData];
             data = data[0]?.id ? data : [];
-            return inputObjectsInput(c, data, options, linkedSamplesUrl);
+            return registeredSamplesObjectsInput(c, data, options, linkedSamplesUrl);
           } else if(c.is_cv_list && sanitizedData !== "#HIDDEN"){
               data = sanitizedData && Array.isArray(sanitizedData) ? sanitizedData : [sanitizedData];
               data = data.map((e) => {
@@ -569,7 +569,7 @@ function retrieveLinkedSamples(url){
   return linkedSamples;
 }
 
-function inputObjectsInput(column, data, options, url){
+function registeredSamplesObjectsInput(column, data, options, url){
   const existingOptions = data.map((e) => {
     isHiddenInput = (e.title == '#HIDDEN');
     if (isHiddenInput) {
@@ -583,7 +583,6 @@ function inputObjectsInput(column, data, options, url){
   } else {
     const typeaheadTemplate = 'typeahead/single_pages_samples'
     const objectInputName = data.map((e) => e.id).join('-') + '-' + crypto.randomUUID();
-
 
     const unLinkedSamples = data.reduce(function(filtered, sample) {
       if(!column.linkedSampleIds.includes(parseInt(sample.id)) && sample.title != '#HIDDEN'){
