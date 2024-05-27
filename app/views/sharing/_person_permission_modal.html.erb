@@ -1,7 +1,7 @@
 <%= button_link_to("Share with a #{t('person')}", 'add', '#', id: 'add-person-permission-button') %>
 
 <%= modal(id: 'add-person-permission-modal', size: 'm') do %>
-    <%= modal_header("Share with #{t('person').pluralize}") %>
+    <%= modal_header("Share with #{t('person').pluralize}", { no_close_btn: true }) %>
     <%= modal_body do %>
         <div class="form-group">
           <label>The following <%= t('person').pluralize %>...</label>
@@ -18,11 +18,18 @@
         </div>
     <% end %>
     <%= modal_footer do %>
-        <% link_to('Add', '#', id: 'permission-people-confirm', class: 'btn btn-primary pull-right') %>
+      <%= link_to('Add', '#', id: 'permission-people-confirm', class: 'btn btn-primary') %>
+      or
+      <%= link_to('Cancel', '#', id: 'cancel-people-permission-selection', class: 'btn btn-default') %>
     <% end %>
 <% end %>
 
 <script>
+    function reset_form(){
+        $j('select#permission-people-ids').val([]).change();
+        $j('#permission-people-access-type').val("<%= Policy::ACCESSIBLE %>").change();
+    }
+
     // Display person modal
     $j('#add-person-permission-button').click(function () {
         $j('#add-person-permission-modal').modal('show');
@@ -45,10 +52,15 @@
                 });
         });
         // Reset form
-        $j('select#permission-people-ids').val([]).change();
-        $j('#permission-people-access-type').val('<%= Policy::ACCESSIBLE %>').change();
+        reset_form();
 
         // Close this modal
         $j('#add-person-permission-modal').modal('hide');
     });
+
+    // Close modal when cancel button is clicked
+    $j('#cancel-people-permission-selection').on("click", function(e){
+      reset_form();
+      $j('#add-person-permission-modal').modal('hide')
+    })
 </script>

@@ -1,7 +1,7 @@
 <%= button_link_to("Share with a #{t('project')} / #{t('institution')}", 'add', '#', id: 'add-project-permission-button') %>
 
 <%= modal(id: 'add-project-permission-modal', size: 'm') do %>
-    <%= modal_header("Share with a #{t('project')} and/or #{t('institution')}") %>
+    <%= modal_header("Share with a #{t('project')} and/or #{t('institution')}", { no_close_btn: true }) %>
     <%= modal_body do %>
         <div class="form-group">
           <label>Members of...</label>
@@ -32,7 +32,9 @@
         </div>
     <% end %>
     <%= modal_footer do %>
-        <%= link_to('Add', '#', id: 'permission-project-confirm', class: 'btn btn-primary pull-right') %>
+      <%= link_to('Add', '#', id: 'permission-project-confirm', class: 'btn btn-primary') %>
+      or
+      <%= link_to('Cancel', '#', id: 'cancel-project-selection', class: 'btn btn-default') %>
     <% end %>
 <% end %>
 
@@ -77,10 +79,15 @@
       }
     }
 
-    // Close this modal
+    // Close this modal after clicking add button
     $j('#add-project-permission-modal').modal('hide');
 
     Sharing.addPermission(permission);
+  });
+
+  // Close modal when cancel button is clicked
+  $j('#cancel-project-selection').click(function () {
+    $j('#add-project-permission-modal').modal('hide');
   });
 
   // Update the institution list when a project is selected
