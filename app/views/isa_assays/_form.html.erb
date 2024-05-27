@@ -15,7 +15,7 @@
     <%= assay_fields.text_area :description, rows: 5, class: "form-control rich-text-edit" -%>
   </div>
 
-  # Show extended metadata is assay is of class assay_stream
+  <%# Show extended metadata is assay is of class assay_stream %>
   <% if is_assay_stream %>
     <%= render partial: 'extended_metadata/extended_metadata_type_selection', locals:{f:assay_fields, resource:@isa_assay.assay} %>
     <%= render partial: 'extended_metadata/extended_metadata_attribute_input', locals:{f:assay_fields,resource:@isa_assay.assay, parent_resource: "isa_assay"} %>

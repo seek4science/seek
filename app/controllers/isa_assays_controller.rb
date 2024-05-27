@@ -9,17 +9,19 @@ class IsaAssaysController < ApplicationController
   after_action :rearrange_assay_positions_create_isa_assay, only: :create
 
   def new
+    study = Study.find(params[:study_id])
     new_position =
-      if params[:is_assay_stream] || params[:source_assay_id].nil? || (params[:source_assay_id] == params[:assay_stream_id])
+      if params[:is_assay_stream] || params[:source_assay_id].nil? # If first assay is of class assay stream
+        study.assay_streams.any? ? study.assay_streams.map(&:position).max + 1 : 0
+      elsif params[:source_assay_id] == params[:assay_stream_id] # If first assay in the stream
         0
       else
         Assay.find(params[:source_assay_id]).position + 1
       end
 
-    study = Study.find(params[:study_id])
     source_assay = Assay.find(params[:source_assay_id]) if params[:source_assay_id]
     input_sample_type_id =
-      if params[:is_assay_stream] || source_assay.is_assay_stream?
+      if params[:is_assay_stream] || source_assay&.is_assay_stream?
         study.sample_types.second.id
       else
         source_assay&.sample_type&.id
@@ -29,7 +31,7 @@ class IsaAssaysController < ApplicationController
       if params[:is_assay_stream]
         IsaAssay.new({ assay: { assay_class_id: AssayClass.assay_stream.id,
                                 study_id: study.id,
-                                position: 0 },
+                                position: new_position },
                        input_sample_type_id: })
       else
         IsaAssay.new({ assay: { assay_class_id: AssayClass.experimental.id,
@@ -67,7 +69,7 @@ class IsaAssaysController < ApplicationController
     @isa_assay.assay.attributes = isa_assay_params[:assay]
 
     # update the sample_type
-    unless @isa_assay.assay.is_assay_stream?
+    unless @isa_assay&.assay&.is_assay_stream?
       if requested_item_authorized?(@isa_assay.sample_type)
         @isa_assay.sample_type.update(isa_assay_params[:sample_type])
         @isa_assay.sample_type.resolve_inconsistencies
@@ -202,13 +204,19 @@ class IsaAssaysController < ApplicationController
     @isa_assay = IsaAssay.new
     @isa_assay.populate(params[:id])
 
-    @isa_assay.errors.add(:assay, "The #{t('isa_assay')} was not found.") if @isa_assay.assay.nil?
-    @isa_assay.errors.add(:assay, "You are not authorized to edit this #{t('isa_assay')}.") unless requested_item_authorized?(@isa_assay.assay)
+    if @isa_assay.assay.nil?
+      @isa_assay.errors.add(:assay, "The #{t('isa_assay')} was not found.")
+    else
+      @isa_assay.errors.add(:assay, "You are not authorized to edit this #{t('isa_assay')}.") unless requested_item_authorized?(@isa_assay.assay)
+    end
 
     # Should not deal with sample type if assay has assay_class assay stream
     unless @isa_assay.assay&.is_assay_stream?
-      @isa_assay.errors.add(:sample_type, 'Sample type not found.') if @isa_assay.sample_type.nil?
-      @isa_assay.errors.add(:sample_type, "You are not authorized to edit this assay's #{t('sample_type')}.") unless requested_item_authorized?(@isa_assay.sample_type)
+      if @isa_assay.sample_type.nil?
+        @isa_assay.errors.add(:sample_type, 'Sample type not found.')
+      else
+        @isa_assay.errors.add(:sample_type, "You are not authorized to edit this assay's #{t('sample_type')}.") unless requested_item_authorized?(@isa_assay.sample_type)
+      end
     end
 
     if @isa_assay.errors.any?
