@@ -18,7 +18,7 @@
         </div>
     <% end %>
     <%= modal_footer do %>
-        <%= link_to('Add', '#', id: 'permission-people-confirm', class: 'btn btn-primary pull-right', 'data-dismiss' => 'modal') %>
+        <% link_to('Add', '#', id: 'permission-people-confirm', class: 'btn btn-primary pull-right') %>
     <% end %>
 <% end %>
 
@@ -44,9 +44,11 @@
                     access_type: parseInt($j('#permission-people-access-type').val())
                 });
         });
-
         // Reset form
         $j('select#permission-people-ids').val([]).change();
         $j('#permission-people-access-type').val('<%= Policy::ACCESSIBLE %>').change();
+
+        // Close this modal
+        $j('#add-person-permission-modal').modal('hide');
     });
 </script>

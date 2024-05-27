@@ -32,7 +32,7 @@
         </div>
     <% end %>
     <%= modal_footer do %>
-        <%= link_to('Add', '#', id: 'permission-project-confirm', class: 'btn btn-primary pull-right', 'data-dismiss' => 'modal') %>
+        <%= link_to('Add', '#', id: 'permission-project-confirm', class: 'btn btn-primary pull-right') %>
     <% end %>
 <% end %>
 
@@ -76,6 +76,9 @@
         return false;
       }
     }
+
+    // Close this modal
+    $j('#add-project-permission-modal').modal('hide');
 
     Sharing.addPermission(permission);
   });
