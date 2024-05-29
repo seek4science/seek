@@ -161,17 +161,10 @@ module BootstrapHelper
     end
   end
 
-  def modal_header(title, options = {})
-    # If no_close_btn is set to true, the modal will not have a close button.
-    # Useful for multiple shown modals.
-    no_close_btn = options[:no_close_btn] if options[:no_close_btn]
+  def modal_header(title, _options = {})
     content_tag(:div, class: 'modal-header') do
-      if no_close_btn
-        ''.html_safe
-      else
-        content_tag(:button, class: 'close', 'data-dismiss' => 'modal', 'aria-label' => 'Close' ) do
-          content_tag(:span, '&times;'.html_safe, 'aria-hidden' => 'true')
-        end
+      content_tag(:button, class: 'close', 'data-dismiss' => 'modal', 'aria-label' => 'Close') do
+        content_tag(:span, '&times;'.html_safe, 'aria-hidden' => 'true')
       end +
         content_tag(:h4, title, class: 'modal-title')
     end
