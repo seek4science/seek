@@ -9,43 +9,67 @@ class IsaAssaysController < ApplicationController
   after_action :rearrange_assay_positions_create_isa_assay, only: :create
 
   def new
-    if params[:is_assay_stream]
-      @isa_assay = IsaAssay.new({ assay: { assay_class_id: AssayClass.assay_stream.id } })
-    else
-      @isa_assay = IsaAssay.new({ assay: { assay_class_id: AssayClass.experimental.id } })
-    end
+    study = Study.find(params[:study_id])
+    new_position =
+      if params[:is_assay_stream] || params[:source_assay_id].nil? # If first assay is of class assay stream
+        study.assay_streams.any? ? study.assay_streams.map(&:position).max + 1 : 0
+      elsif params[:source_assay_id] == params[:assay_stream_id] # If first assay in the stream
+        0
+      else
+        Assay.find(params[:source_assay_id]).position + 1
+      end
+
+    source_assay = Assay.find(params[:source_assay_id]) if params[:source_assay_id]
+    input_sample_type_id =
+      if params[:is_assay_stream] || source_assay&.is_assay_stream?
+        study.sample_types.second.id
+      else
+        source_assay&.sample_type&.id
+      end
+
+    @isa_assay =
+      if params[:is_assay_stream]
+        IsaAssay.new({ assay: { assay_class_id: AssayClass.assay_stream.id,
+                                study_id: study.id,
+                                position: new_position },
+                       input_sample_type_id: })
+      else
+        IsaAssay.new({ assay: { assay_class_id: AssayClass.experimental.id,
+                                assay_stream_id: params[:assay_stream_id],
+                                study_id: study.id,
+                                position: new_position },
+                       input_sample_type_id: })
+      end
+    respond_to(&:html)
   end
 
   def create
     if @isa_assay.save
-      redirect_to single_page_path(id: @isa_assay.assay.projects.first, item_type: 'assay',
-                                   item_id: @isa_assay.assay, notice: 'The ISA assay was created successfully!')
+      flash[:notice] = "The #{t('isa_assay')} was successfully created.<br/>".html_safe
+      respond_to do |format|
+        format.html do
+          redirect_to single_page_path(id: @isa_assay.assay.projects.first, item_type: 'assay',
+                                       item_id: @isa_assay.assay)
+        end
+        format.json { render json: @isa_assay, include: [params[:include]] }
+      end
     else
       respond_to do |format|
-        format.html { render action: 'new' }
+        format.html { render action: 'new', status: :unprocessable_entity }
         format.json { render json: json_api_errors(@isa_assay), status: :unprocessable_entity }
       end
     end
   end
 
   def edit
-    # let edit the assay if the sample_type is not authorized
-    if @isa_assay.assay.is_assay_stream?
-      @isa_assay.sample_type = nil
-    else
-      @isa_assay.sample_type = nil unless requested_item_authorized?(@isa_assay.sample_type)
-    end
-
-    respond_to do |format|
-      format.html
-    end
+    respond_to(&:html)
   end
 
   def update
     @isa_assay.assay.attributes = isa_assay_params[:assay]
 
     # update the sample_type
-    unless @isa_assay.assay.is_assay_stream?
+    unless @isa_assay&.assay&.is_assay_stream?
       if requested_item_authorized?(@isa_assay.sample_type)
         @isa_assay.sample_type.update(isa_assay_params[:sample_type])
         @isa_assay.sample_type.resolve_inconsistencies
@@ -53,6 +77,7 @@ class IsaAssaysController < ApplicationController
     end
 
     if @isa_assay.save
+      flash[:notice] = "The #{t('isa_assay')} was successfully updated.<br/>".html_safe
       redirect_to single_page_path(id: @isa_assay.assay.projects.first, item_type: 'assay',
                                    item_id: @isa_assay.assay.id)
     else
@@ -176,20 +201,29 @@ class IsaAssaysController < ApplicationController
   end
 
   def find_requested_item
-    if params[:is_assay_stream]
-      @isa_assay = IsaAssay.new({ assay: { assay_class_id: AssayClass.assay_stream.id } })
-    else
-      @isa_assay = IsaAssay.new({ assay: { assay_class_id: AssayClass.experimental.id } })
-    end
+    @isa_assay = IsaAssay.new
     @isa_assay.populate(params[:id])
 
+    if @isa_assay.assay.nil?
+      @isa_assay.errors.add(:assay, "The #{t('isa_assay')} was not found.")
+    else
+      @isa_assay.errors.add(:assay, "You are not authorized to edit this #{t('isa_assay')}.") unless requested_item_authorized?(@isa_assay.assay)
+    end
+
     # Should not deal with sample type if assay has assay_class assay stream
-    return if @isa_assay.assay.is_assay_stream?
+    unless @isa_assay.assay&.is_assay_stream?
+      if @isa_assay.sample_type.nil?
+        @isa_assay.errors.add(:sample_type, 'Sample type not found.')
+      else
+        @isa_assay.errors.add(:sample_type, "You are not authorized to edit this assay's #{t('sample_type')}.") unless requested_item_authorized?(@isa_assay.sample_type)
+      end
+    end
 
-    if @isa_assay.sample_type.nil? || !requested_item_authorized?(@isa_assay.assay)
-      flash[:error] = "You are not authorized to edit this #{t('isa_assay')}"
-      flash[:error] = 'Resource not found.' if @isa_assay.sample_type.nil?
-
+    if @isa_assay.errors.any?
+      error_messages = @isa_assay.errors.map do |error|
+        "<li>[<b>#{error.attribute.to_s}</b>]: #{error.message}</li>"
+      end.join('')
+      flash[:error] = "<ul>#{error_messages}</ul>".html_safe
       redirect_to single_page_path(id: @isa_assay.assay.projects.first, item_type: 'assay',
                                    item_id: @isa_assay.assay)
     end
