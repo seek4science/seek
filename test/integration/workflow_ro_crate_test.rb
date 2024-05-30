@@ -55,11 +55,15 @@ class WorkflowRoCrateTest < ActionDispatch::IntegrationTest
     zip = workflow.ro_crate_zip
 
     crate = ROCrate::WorkflowCrateReader.read_zip(zip)
-    remote1 = crate.get('http://internet.internet/file')
+    remote1 = crate.get('blah.txt')
     assert remote1.is_a?(::ROCrate::File)
+    assert_equal 'http://internet.internet/file', remote1['contentUrl']
+    assert_equal 'little file', remote1.source.read
 
-    remote1 = crate.get('http://internet.internet/another_file')
-    assert remote1.is_a?(::ROCrate::File)
+    remote2 = crate.get('blah2.txt')
+    assert remote2.is_a?(::ROCrate::File)
+    assert_equal 'http://internet.internet/another_file', remote2['contentUrl']
+    assert_equal '', remote2.source.read # It's unfetched!
   end
 
   test 'generate Workflow RO-Crate for repository containing symlink' do

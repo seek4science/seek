@@ -130,8 +130,11 @@ module WorkflowExtraction
         crate.main_workflow.cwl_description = cwl_entity if crate.main_workflow
       end
 
+      # Add each remote file as a data entity with a `contentUrl` property pointing to the URL
       remotes.each do |path, url|
-        crate.add_external_file(url)
+        blob = git_version.get_blob(path)
+        entity = blob.to_crate_entity(crate, properties: { contentUrl: url })
+        crate.add_data_entity(entity)
       end
     else
       unless crate.main_workflow
