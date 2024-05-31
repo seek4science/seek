@@ -5,7 +5,6 @@ class SampleDataPersistJobTest < ActiveSupport::TestCase
     create_sample_attribute_type
     @person = FactoryBot.create(:project_administrator)
     User.with_current_user(@person.user) do
-
 	    @project_id = @person.projects.first.id
 
 	    @data_file = FactoryBot.create :data_file, content_blob: FactoryBot.create(:sample_type_populated_template_content_blob),
@@ -33,11 +32,15 @@ class SampleDataPersistJobTest < ActiveSupport::TestCase
   end
 
   test 'persists samples' do
+    @data_file.policy = FactoryBot.create(:public_policy)
+    disable_authorization_checks{@data_file.save!}
     assert_difference('Sample.count', 3) do
-      assert_difference('ReindexingQueue.count', 3) do
-        assert_difference('AuthLookupUpdateQueue.count', 3) do
-          with_config_value(:auth_lookup_enabled, true) do # needed to test added to queue
-            SampleDataPersistJob.perform_now(@data_file, @sample_type, @person.user)
+      assert_difference('Policy.count', 3) do
+        assert_difference('ReindexingQueue.count', 3) do
+          assert_difference('AuthLookupUpdateQueue.count', 3) do
+            with_config_value(:auth_lookup_enabled, true) do # needed to test added to queue
+              SampleDataPersistJob.perform_now(@data_file, @sample_type, @person.user)
+            end
           end
         end
       end
@@ -48,9 +51,14 @@ class SampleDataPersistJobTest < ActiveSupport::TestCase
     assert_equal Task::STATUS_DONE, @data_file.sample_persistence_task.status
 
     assert_equal 3, @data_file.extracted_samples.count
-    assert_equal @sample_type, @data_file.extracted_samples.first.sample_type
-    assert_equal @person, @data_file.extracted_samples.first.contributor
-    assert_equal [@project_id], @data_file.extracted_samples.first.project_ids
+
+    @data_file.extracted_samples.each do |sample|
+      assert_equal @sample_type, sample.sample_type
+      assert_equal @person, sample.contributor
+      assert_equal [@project_id], sample.project_ids
+      assert_equal @person, sample.contributor
+      assert_equal Policy::MANAGING, sample.policy.access_type
+    end
   end
 
   test 'persists samples and associate with assay' do
