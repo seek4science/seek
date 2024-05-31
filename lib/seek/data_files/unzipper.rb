@@ -82,7 +82,7 @@ module Seek
         end
 
         def cache(&block)
-          if File.exist?(cache_path)
+          if File.exist?(cache_path) & File.exist?(tmp_file_path)
             Marshal.load(File.binread(cache_path))
           elsif block_given?
             v = block.call
