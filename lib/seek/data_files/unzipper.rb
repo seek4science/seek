@@ -18,7 +18,7 @@ module Seek
         # Persist the extracted datafiles to the database
         def persist(user = User.current_user)
           User.with_current_user(user) do
-            data_files = unzip.select(&:valid?) # Re-extracts samples if cache expired, otherwise returns the cached samples
+            data_files = unzip.select(&:valid?) # Re-unzips datafiles if cache expired, otherwise returns the cached datafiles
   
             if data_files.any?
               DataFile.transaction do
@@ -54,13 +54,13 @@ module Seek
           end
         end
   
-        # Clear the temporarily-stored samples
+        # Clear the temporarily-stored datafiles
         def clear
           File.delete(cache_path) if File.exist?(cache_path)
           FileUtils.rm_r(tmp_file_path) if File.exist?(tmp_file_path)
         end
   
-        # Return the temporarily-stored samples if they exist (nil if not)
+        # Return the temporarily-stored datafiles if they exist (nil if not)
         def fetch
           self.class.decode(cache)
         rescue ArgumentError=>exception
