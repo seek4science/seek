@@ -170,7 +170,7 @@ class DataFilesController < ApplicationController
       UnzipDataFilePersistJob.new(@data_file, User.current_user, assay_ids: params["assay_ids"]).queue_job
       flash[:notice] = 'Started creating unzipped data files'
     else
-      @data_file.unzip_persistence_task.update(status: "cancelled") if @data_file.unzip_persistence_task&.success?
+      @data_file.unzip_persistence_task.destroy if @data_file.unzip_persistence_task&.success?
       UnzipDataFileJob.new(@data_file).queue_job
 
     end
