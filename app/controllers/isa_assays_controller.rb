@@ -5,8 +5,8 @@ class IsaAssaysController < ApplicationController
   before_action :set_up_instance_variable
   before_action :find_requested_item, only: %i[edit update]
   before_action :initialize_isa_assay, only: :create
-  before_action :fix_assay_linkage_for_new_assays, only: :create
   after_action :rearrange_assay_positions_create_isa_assay, only: :create
+  after_action :fix_assay_linkage_for_new_assays, only: :create
 
   def new
     study = Study.find(params[:study_id])
@@ -93,23 +93,18 @@ class IsaAssaysController < ApplicationController
   def fix_assay_linkage_for_new_assays
     return unless @isa_assay.assay.is_isa_json_compliant?
     return if @isa_assay.assay.is_assay_stream? # Should not fix anything when creating an assay stream
+    return unless @isa_assay.sample_type.present? # Just to be sure
 
     previous_sample_type = SampleType.find(params[:isa_assay][:input_sample_type_id])
-    previous_assay = previous_sample_type.assays.first
+    next_sample_types = previous_sample_type.next_linked_sample_types
+    next_sample_types.delete @isa_assay.sample_type
+    next_sample_type = next_sample_types.first
 
-    # In case an assay is inserted right at the beginning of an assay stream,
-    # the next assay is the current first one in the assay stream.
-    next_assay = previous_assay.nil? ? @isa_assay.assay.assay_stream.next_linked_child_assay : previous_assay.next_linked_child_assay
+    # In case an assay is inserted right at the end of an assay stream,
+    # there is no next sample type and also no linkage to fix
+    return if next_sample_type.nil?
 
-    # In case no next assay (an assay was appended to the end of the stream), assay linkage does not have to be fixed.
-    return unless next_assay
-
-    next_assay_input_attribute_id = next_assay.sample_type.sample_attributes.detect(&:input_attribute?).id
-    return unless next_assay_input_attribute_id
-
-    # Add link of next assay sample type to currently created assay sample type
-    updated_lsai = @isa_assay.assay.sample_type.linked_sample_attribute_ids.push(next_assay_input_attribute_id)
-    @isa_assay.assay.sample_type.update(linked_sample_attribute_ids: updated_lsai)
+    next_sample_type.sample_attributes.detect(&:input_attribute?).update_column(:linked_sample_type_id, @isa_assay.sample_type.id)
   end
 
   def rearrange_assay_positions_create_isa_assay

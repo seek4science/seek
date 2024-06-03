@@ -21,7 +21,7 @@ class IsaAssay
     if valid?
       if @assay.new_record? && !@assay.is_assay_stream?
         # connect the sample type multi link attribute to the last sample type of the assay's study
-        input_attribute = @sample_type.sample_attributes.detect(&:seek_sample_multi?)
+        input_attribute = @sample_type.sample_attributes.detect(&:input_attribute?)
         input_attribute.linked_sample_type_id = @input_sample_type_id
         title = SampleType.find(@input_sample_type_id).sample_attributes.detect(&:is_title).title
         input_attribute.title = "Input (#{title})"
