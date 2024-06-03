@@ -156,16 +156,16 @@ class SinglePagesControllerTest < ActionController::TestCase
                                                  sample_type_id: source_sample_type.id }
 
       response_data = JSON.parse(response.body)['uploadData']
-      assert_response :success
-
+      db_samples = response_data['dbSamples']
       updated_samples = response_data['updateSamples']
-      assert(updated_samples.size, 2)
-
       new_samples = response_data['newSamples']
-      assert(new_samples.size, 2)
-
       possible_duplicates = response_data['possibleDuplicates']
-      assert(possible_duplicates.size, 1)
+
+      assert_response :success
+      assert_equal db_samples.size, 5
+      assert_equal updated_samples.size, 2
+      assert_equal new_samples.size, 2
+      assert_equal possible_duplicates.size, 1
     end
   end
 
@@ -182,16 +182,14 @@ class SinglePagesControllerTest < ActionController::TestCase
                                                  sample_type_id: sample_collection_sample_type.id }
 
       response_data = JSON.parse(response.body)['uploadData']
-      assert_response :success
-
       updated_samples = response_data['updateSamples']
-      assert(updated_samples.size, 2)
-
       new_samples = response_data['newSamples']
-      assert(new_samples.size, 2)
-
       possible_duplicates = response_data['possibleDuplicates']
-      assert(possible_duplicates.size, 1)
+
+      assert_response :success
+      assert_equal updated_samples.size, 2
+      assert_equal new_samples.size, 2
+      assert_equal possible_duplicates.size, 1
     end
   end
 
@@ -208,16 +206,14 @@ class SinglePagesControllerTest < ActionController::TestCase
                                                  sample_type_id: assay_sample_type.id }
 
       response_data = JSON.parse(response.body)['uploadData']
-      assert_response :success
-
       updated_samples = response_data['updateSamples']
-      assert(updated_samples.size, 2)
-
       new_samples = response_data['newSamples']
-      assert(new_samples.size, 1)
-
       possible_duplicates = response_data['possibleDuplicates']
-      assert(possible_duplicates.size, 1)
+
+      assert_response :success
+      assert_equal updated_samples.size, 2
+      assert_equal new_samples.size, 1
+      assert_equal possible_duplicates.size, 1
     end
   end
 
@@ -236,16 +232,14 @@ class SinglePagesControllerTest < ActionController::TestCase
                                                  sample_type_id: source_sample_type.id }
 
       response_data = JSON.parse(response.body)['uploadData']
-      assert_response :success
-
       updated_samples = response_data['updateSamples']
-      assert(updated_samples.size, 0)
-
       unauthorized_samples = response_data['unauthorized_samples']
-      assert(unauthorized_samples.size, 2)
-
       new_samples = response_data['newSamples']
-      assert(new_samples.size, 2)
+
+      assert_response :success
+      assert_equal updated_samples.size, 0
+      assert_equal unauthorized_samples.size, 2
+      assert_equal new_samples.size, 2
 
       possible_duplicates = response_data['possibleDuplicates']
       assert(possible_duplicates.size, 1)
@@ -289,12 +283,12 @@ class SinglePagesControllerTest < ActionController::TestCase
       FactoryBot.create(
         :sample,
         id: 10_010 + n,
-        title: "source#{n}",
+        title: "source_#{n}",
         sample_type: source_sample_type,
         project_ids: [project.id],
         contributor: person,
         data: {
-          'Source Name': 'Source Name',
+          'Source Name': "Source #{n}",
           'Source Characteristic 1': 'Source Characteristic 1',
           'Source Characteristic 2':
             source_sample_type
