@@ -334,7 +334,7 @@ class SinglePagesController < ApplicationController
       is_changed = false
 
       db_sample.map do |k, v|
-        unless ees[k] == v
+        unless ees[k] == v || %w[id uuid].include?(k)
           is_changed = true
           break
         end
