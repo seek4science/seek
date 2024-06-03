@@ -540,7 +540,8 @@ class ApplicationController < ActionController::Base
     hash[:errors] = object.errors.map do |error|
       segments = error.attribute.to_s.split('.')
       attr = segments.first
-      if !['content_blobs', 'policy'].include?(attr) && object.class.reflect_on_association(attr)
+      if !['content_blobs', 'policy'].include?(attr) &&
+        object.class.respond_to?(:reflect_on_association) && object.class.reflect_on_association(attr)
         base = '/data/relationships'
       else
         base = '/data/attributes'
