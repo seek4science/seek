@@ -244,7 +244,7 @@ class SinglePagesController < ApplicationController
       next if sample_cells.all? { |cell| (cell&.value == '' || cell&.value.nil?) }
 
       sample_cells.map do |cell|
-        cell&.value
+        cell&.value unless cell&.value == ''
       end.drop(1)
     end.compact
 
