@@ -221,6 +221,37 @@ class SinglePagesControllerTest < ActionController::TestCase
     end
   end
 
+  test 'Should show permission conflicts for samples' do
+    with_config_value(:project_single_page_enabled, true) do
+      unauthorized_user = FactoryBot.create(:user)
+      login_as unauthorized_user
+      project, source_sample_type = setup_file_upload.values_at(
+        :project, :source_sample_type
+      )
+
+      file_path = 'upload_single_page/01_combo_update_sources_spreadsheet.xlsx'
+      file = fixture_file_upload(file_path, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+
+      post :upload_samples, as: :json, params: { file:, project_id: project.id,
+                                                 sample_type_id: source_sample_type.id }
+
+      response_data = JSON.parse(response.body)['uploadData']
+      assert_response :success
+
+      updated_samples = response_data['updateSamples']
+      assert(updated_samples.size, 0)
+
+      new_samples = response_data['unauthorized_samples']
+      assert(new_samples.size, 2)
+
+      new_samples = response_data['newSamples']
+      assert(new_samples.size, 2)
+
+      possible_duplicates = response_data['possibleDuplicates']
+      assert(possible_duplicates.size, 1)
+    end
+  end
+
   def setup_file_upload
     id_label = "#{Seek::Config.instance_name} id"
     person = @member.person
