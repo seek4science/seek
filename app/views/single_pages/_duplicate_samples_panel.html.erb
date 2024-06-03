@@ -1,8 +1,9 @@
 <% unless @possible_duplicates.nil? or @possible_duplicates.compact.none? %>
-  <%= folding_panel("Possible Duplicates <span id='duplicate-samples-counter' class='label label-danger'>#{@possible_duplicates.size}</span>", true, :id => "duplicate-samples-panel", :body_options => {:id => "duplicate-samples-panel-content"},
-                  :help_text => "These new samples have been matched to already existing samples.") do %>
+  <%= folding_panel("Possible Duplicates <span id='duplicate-samples-counter' class='label label-danger'>#{@possible_duplicates.size}</span>", true, :id => "duplicate-samples-panel", :body_options => { :id => "duplicate-samples-panel-content" },
+                    :help_text => "These new samples have been matched to already existing samples.") do %>
     <div class="table-responsive">
       <table id="duplicate-samples-table" class="table">
+        <thead>
         <tr>
           <th></th>
           <% for key in @possible_duplicates[0].keys %>
@@ -11,56 +12,64 @@
             <% end %>
           <% end %>
         </tr>
+        </thead>
+        <tbody>
         <% for dupl_sample in @possible_duplicates %>
-          <tr id='<%= "duplicate-sample-#{dupl_sample['duplicate']['id']}-1" %>' >
-            <td rowspan=2><button id=<%= "remove-#{dupl_sample['duplicate']['id']}" %> class="btn glyphicon glyphicon-trash danger" style="background-color:#d9534f;color:white;" onclick=<%= "removeSample('duplicate-sample-#{dupl_sample['duplicate']['id']}')" %>></button></td>
-          <% dupl_sample.map do |key, val| %>
-            <% val = '<new>' if key =='id' %>
-            <% unless %w[uuid duplicate].include?(key) %>
-              <% if @multiple_input_fields.include?(key)%>
-                <td>
-                  <% val.each do |sub_sample| %>
-                    <span class="badge", title='ID: <%= sub_sample['id'] %>' data-attr_type="seek-sample-multi"><%= sub_sample['title'] %></span>
-                  <% end %>
-                </td>
-              <% elsif @cv_list_fields.include?(key) %>
-                <td>
-                  <% val.each do |cv_term| %>
-                    <span class="label label-default", title='<%= cv_term %>' data-attr_type="cv-list"><%= cv_term %></span>
-                  <% end %>
-                </td>
-              <% elsif @registered_sample_fields.include?(key) %>
-                <td><span class="badge", title='<%= val['id'] %>' data-attr_type="seek-sample"><%= val['title'] %></span></td>
-              <% else %>
-                <td id='<%= "#{dupl_sample['duplicate']['id']}[#{key}]" %>' ><%= val %></td>
+          <tr id='<%= "duplicate-sample-#{dupl_sample['duplicate']['id']}-1" %>'>
+            <td rowspan=2>
+              <button id=<%= "remove-#{dupl_sample['duplicate']['id']}" %> class="btn glyphicon glyphicon-trash danger
+              " style="background-color:#d9534f;color:white;"
+              onclick=<%= "removeSample('duplicate-sample-#{dupl_sample['duplicate']['id']}')" %>></button></td>
+            <% dupl_sample.map do |key, val| %>
+              <% val = '<new>' if key == 'id' %>
+              <% unless %w[uuid duplicate].include?(key) %>
+                <% if @multiple_input_fields.include?(key) %>
+                  <td>
+                    <% val.each do |sub_sample| %>
+                      <span class="badge" , title='ID: <%= sub_sample['id'] %>' data-attr_type="seek-sample-multi"><%= sub_sample['title'] %></span>
+                    <% end %>
+                  </td>
+                <% elsif @cv_list_fields.include?(key) %>
+                  <td>
+                    <% val.each do |cv_term| %>
+                      <span class="label label-default" , title='<%= cv_term %>' data-attr_type="cv-list"><%= cv_term %></span>
+                    <% end %>
+                  </td>
+                <% elsif @registered_sample_fields.include?(key) %>
+                  <td>
+                    <span class="badge" , title='<%= val['id'] %>' data-attr_type="seek-sample"><%= val['title'] %></span>
+                  </td>
+                <% else %>
+                  <td id='<%= "#{dupl_sample['duplicate']['id']}[#{key}]" %>'><%= val %></td>
+                <% end %>
               <% end %>
             <% end %>
-          <% end %>
             <tr id='<%= "duplicate-sample-#{dupl_sample['duplicate']['id']}-2" %>' class="danger">
               <% dupl_sample['duplicate'].map do |key, val| %>
                 <% unless %w[uuid duplicate].include?(key) %>
-                  <% if @multiple_input_fields.include?(key)%>
+                  <% if @multiple_input_fields.include?(key) %>
                     <td>
                       <% val.each do |sub_sample| %>
-                        <span class="badge", title='ID: <%= sub_sample['id'] %>'><%= sub_sample['title'] %></span>
+                        <span class="badge" , title='ID: <%= sub_sample['id'] %>'><%= sub_sample['title'] %></span>
                       <% end %>
                     </td>
                   <% elsif @cv_list_fields.include?(key) %>
                     <td>
                       <% val.each do |cv_term| %>
-                        <span class="label label-default", title='<%= cv_term %>'><%= cv_term %></span>
+                        <span class="label label-default" , title='<%= cv_term %>'><%= cv_term %></span>
                       <% end %>
                     </td>
                   <% elsif @registered_sample_fields.include?(key) %>
-                    <td><span class="badge", title='<%= val['id'] %>'><%= val['title'] %></span></td>
+                    <td><span class="badge" , title='<%= val['id'] %>'><%= val['title'] %></span></td>
                   <% else %>
-                    <td><%= val%></td>
+                    <td><%= val %></td>
                   <% end %>
                 <% end %>
               <% end %>
             </tr>
-          </tr>
+            </tr>
         <% end %>
+        </tbody>
       </table>
     </div>
   <% end %>
