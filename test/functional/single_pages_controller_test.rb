@@ -166,6 +166,35 @@ class SinglePagesControllerTest < ActionController::TestCase
       assert_equal updated_samples.size, 2
       assert_equal new_samples.size, 2
       assert_equal possible_duplicates.size, 1
+
+      post :upload_samples, as: :html, params: { file:, project_id: project.id,
+                                                 sample_type_id: source_sample_type.id }
+
+      assert_response :success
+
+      assert_select 'table#create-samples-table', count: 1 do
+        assert_select "tbody tr", count: new_samples.size
+      end
+
+      assert_select 'table#update-samples-table', count: 1 do
+        update_sample_ids = updated_samples.map { |s| s['id'] }
+        update_sample_ids.map do |sample_id|
+          row_id_updated = "update-sample-#{sample_id}-updated"
+          assert_select "tr##{row_id_updated}", count: 1
+
+          row_id_original = "update-sample-#{sample_id}-original"
+          assert_select "tr##{row_id_original}", count: 1
+        end
+      end
+
+      assert_select 'table#duplicate-samples-table', count: 1 do
+        dup_sample_ids = possible_duplicates.map { |s| s['duplicate']['id'] }
+        dup_sample_ids.map do |sample_id|
+          row_id = "duplicate-sample-#{sample_id}"
+          assert_select "tr##{row_id}-1", count: 1
+          assert_select "tr##{row_id}-2", count: 1
+        end
+      end
     end
   end
 
@@ -190,6 +219,35 @@ class SinglePagesControllerTest < ActionController::TestCase
       assert_equal updated_samples.size, 2
       assert_equal new_samples.size, 2
       assert_equal possible_duplicates.size, 1
+
+      post :upload_samples, as: :html, params: { file:, project_id: project.id,
+                                                 sample_type_id: sample_collection_sample_type.id }
+
+      assert_response :success
+
+      assert_select 'table#create-samples-table', count: 1 do
+        assert_select "tbody tr", count: new_samples.size
+      end
+
+      assert_select 'table#update-samples-table', count: 1 do
+        update_sample_ids = updated_samples.map { |s| s['id'] }
+        update_sample_ids.map do |sample_id|
+          row_id_updated = "update-sample-#{sample_id}-updated"
+          assert_select "tr##{row_id_updated}", count: 1
+
+          row_id_original = "update-sample-#{sample_id}-original"
+          assert_select "tr##{row_id_original}", count: 1
+        end
+      end
+
+      assert_select 'table#duplicate-samples-table', count: 1 do
+        dup_sample_ids = possible_duplicates.map { |s| s['duplicate']['id'] }
+        dup_sample_ids.map do |sample_id|
+          row_id = "duplicate-sample-#{sample_id}"
+          assert_select "tr##{row_id}-1", count: 1
+          assert_select "tr##{row_id}-2", count: 1
+        end
+      end
     end
   end
 
@@ -214,6 +272,35 @@ class SinglePagesControllerTest < ActionController::TestCase
       assert_equal updated_samples.size, 2
       assert_equal new_samples.size, 1
       assert_equal possible_duplicates.size, 1
+
+      post :upload_samples, as: :html, params: { file:, project_id: project.id,
+                                                 sample_type_id: assay_sample_type.id }
+
+      assert_response :success
+
+      assert_select 'table#create-samples-table', count: 1 do
+        assert_select "tbody tr", count: new_samples.size
+      end
+
+      assert_select 'table#update-samples-table', count: 1 do
+        update_sample_ids = updated_samples.map { |s| s['id'] }
+        update_sample_ids.map do |sample_id|
+          row_id_updated = "update-sample-#{sample_id}-updated"
+          assert_select "tr##{row_id_updated}", count: 1
+
+          row_id_original = "update-sample-#{sample_id}-original"
+          assert_select "tr##{row_id_original}", count: 1
+        end
+      end
+
+      assert_select 'table#duplicate-samples-table', count: 1 do
+        dup_sample_ids = possible_duplicates.map { |s| s['duplicate']['id'] }
+        dup_sample_ids.map do |sample_id|
+          row_id = "duplicate-sample-#{sample_id}"
+          assert_select "tr##{row_id}-1", count: 1
+          assert_select "tr##{row_id}-2", count: 1
+        end
+      end
     end
   end
 
@@ -243,6 +330,25 @@ class SinglePagesControllerTest < ActionController::TestCase
 
       possible_duplicates = response_data['possibleDuplicates']
       assert(possible_duplicates.size, 1)
+
+      post :upload_samples, as: :html, params: { file:, project_id: project.id,
+                                                 sample_type_id: source_sample_type.id }
+
+      assert_response :success
+
+      assert_select 'table#create-samples-table', count: 1 do
+        assert_select "tbody tr", count: new_samples.size
+      end
+
+      assert_select 'table#update-samples-table', count: 0
+
+      assert_select 'table#unauthorized-samples-table', count: 1 do
+        unauthorized_sample_ids = unauthorized_samples.map { |s| s['id'] }
+        unauthorized_sample_ids.map do |sample_id|
+          row_id = "unauthorized-sample-#{sample_id}"
+            assert_select "tr##{row_id}", count: 1
+        end
+      end
     end
   end
 
