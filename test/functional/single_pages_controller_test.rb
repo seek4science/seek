@@ -241,8 +241,8 @@ class SinglePagesControllerTest < ActionController::TestCase
       updated_samples = response_data['updateSamples']
       assert(updated_samples.size, 0)
 
-      new_samples = response_data['unauthorized_samples']
-      assert(new_samples.size, 2)
+      unauthorized_samples = response_data['unauthorized_samples']
+      assert(unauthorized_samples.size, 2)
 
       new_samples = response_data['newSamples']
       assert(new_samples.size, 2)
