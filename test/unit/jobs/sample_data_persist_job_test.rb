@@ -32,14 +32,16 @@ class SampleDataPersistJobTest < ActiveSupport::TestCase
   end
 
   test 'persists samples' do
-    @data_file.policy = FactoryBot.create(:public_policy)
+    @data_file.policy = FactoryBot.create(:public_policy, permissions: [FactoryBot.create(:edit_permission)])
     disable_authorization_checks{@data_file.save!}
     assert_difference('Sample.count', 3) do
       assert_difference('Policy.count', 3) do
-        assert_difference('ReindexingQueue.count', 3) do
-          assert_difference('AuthLookupUpdateQueue.count', 3) do
-            with_config_value(:auth_lookup_enabled, true) do # needed to test added to queue
-              SampleDataPersistJob.perform_now(@data_file, @sample_type, @person.user)
+        assert_difference('Permission.count', 3) do
+          assert_difference('ReindexingQueue.count', 3) do
+            assert_difference('AuthLookupUpdateQueue.count', 3) do
+              with_config_value(:auth_lookup_enabled, true) do # needed to test added to queue
+                SampleDataPersistJob.perform_now(@data_file, @sample_type, @person.user)
+              end
             end
           end
         end
@@ -58,6 +60,8 @@ class SampleDataPersistJobTest < ActiveSupport::TestCase
       assert_equal [@project_id], sample.project_ids
       assert_equal @person, sample.contributor
       assert_equal Policy::MANAGING, sample.policy.access_type
+      assert_equal 1, sample.policy.permissions.count
+      assert_equal Policy::EDITING, sample.policy.permissions.first.access_type
     end
   end
 
