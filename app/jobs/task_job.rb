@@ -21,7 +21,6 @@ class TaskJob < ApplicationJob
   end
 
   def handle_error(exception)
-    raise exception
     task.update_attribute(:status, Task::STATUS_FAILED)
     task.update_attribute(:exception, exception.full_message)
     report_exception(exception, "Error occurred with a Task for Job: #{self.class.name}")
