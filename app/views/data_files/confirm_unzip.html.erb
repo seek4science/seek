@@ -1,4 +1,4 @@
-<% total = @datafiles.count%>
+<% total = @datafiles.count + @rejected_datafiles.count %>
 
 <% if total > 0 %>
     <div class="alert alert-info">
@@ -6,15 +6,45 @@
       Please review them, then click "Confirm" below to complete the process, or "Cancel Unzip" to cancel
       the extraction process.
     </div>
+        <div>
+      <ul class="nav nav-tabs" role="tablist">
+        <% if @datafiles.any? %>
+            <li role="presentation" class="active">
+              <a href="#accepted" aria-controls="home" role="tab" data-toggle="tab">
+                Accepted (<%= @datafiles.count -%>/<%= total %>)
+              </a>
+            </li>
+        <% end %>
+        <% if @rejected_datafiles.any? %>
+            <li role="presentation" class="<%= 'active' if @samples.none? -%>">
+              <a href="#rejected" aria-controls="profile" role="tab" data-toggle="tab">
+                Rejected (<%= @rejected_datafiles.count -%>/<%= total %>)
+              </a>
+            </li>
+        <% end %>
+      </ul>
+
     <div class="tab-content">
       <% if @datafiles.any? %>
-        <%= render partial: 'data_files/table_view', locals: { datafiles: @datafiles } %>
-        <script>
-          $j(document).ready(function () {
-            DataFiles.initTable($j('#accepted'));
-          });
-        </script>
+        <div role="tabpanel" class="tab-pane active" id="accepted">
+          <%= render partial: 'data_files/table_view', locals: { datafiles: @datafiles } %>
+          <script>
+            $j(document).ready(function () {
+              DataFiles.initTable($j('#accepted'));
+            });
+          </script>
+        </div>  
       <% end %>
+        <% if @rejected_datafiles.any? %>
+            <div role="tabpanel" class="tab-pane <%= 'active' if @datafiles.none? -%>" id="rejected">
+              <%= render partial: 'data_files/table_view', locals: { datafiles: @rejected_datafiles } %>
+              <script>
+                $j(document).ready(function () {
+                  DataFiles.initTable($j('#rejected'));
+                });
+              </script>
+            </div>
+        <% end %>
     </div>
 <% else %>
     <span class="none_text">No files were unzipped</span>
