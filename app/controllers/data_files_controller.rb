@@ -196,7 +196,7 @@ class DataFilesController < ApplicationController
   end
 
   def confirm_unzip
-    @datafiles, @unused = Seek::DataFiles::Unzipper.new(@data_file).fetch.partition(&:valid?)
+    @datafiles, @rejected_datafiles = Seek::DataFiles::Unzipper.new(@data_file).fetch.partition(&:valid?)
     respond_to do |format|
       format.html
     end
