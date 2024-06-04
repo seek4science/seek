@@ -54,7 +54,9 @@ class SampleDataPersistJobTest < ActiveSupport::TestCase
 
     assert_equal 3, @data_file.extracted_samples.count
 
-    @data_file.extracted_samples.each do |sample|
+    samples = @data_file.extracted_samples
+
+    samples.each do |sample|
       assert_equal @sample_type, sample.sample_type
       assert_equal @person, sample.contributor
       assert_equal [@project_id], sample.project_ids
@@ -63,6 +65,15 @@ class SampleDataPersistJobTest < ActiveSupport::TestCase
       assert_equal 1, sample.policy.permissions.count
       assert_equal Policy::EDITING, sample.policy.permissions.first.access_type
     end
+
+    #check the policy and permissions are all uniq and not referencing each other
+    refute_equal @data_file.policy_id, samples.first.policy_id
+    policy_ids = samples.collect { |s| s.policy.id }
+    permission_ids = samples.collect { |s| s.policy.permissions.first.id }
+    assert_equal 3, policy_ids.count
+    assert_equal policy_ids, policy_ids.uniq
+    assert_equal 3, permission_ids.count
+    assert_equal permission_ids, permission_ids.uniq
   end
 
   test 'persists samples and associate with assay' do
