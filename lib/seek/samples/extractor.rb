@@ -27,7 +27,7 @@ module Seek
               #copy policy and trigger callbacks
               samples.each do |sample|
                 policy = @data_file.policy.deep_copy
-                policy.save
+                policy.save(validate: false)
                 sample.policy = policy
                 sample.run_callbacks(:save) { false }
                 sample.run_callbacks(:create) { false }
