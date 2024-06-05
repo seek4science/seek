@@ -68,7 +68,7 @@ class SampleAttribute < ApplicationRecord
       URI.parse(pid).fragment || pid.gsub(/.*\//,'') || pid
     rescue URI::InvalidURIError
       # likely a space that managed to pass through earlier uri validation
-      fixed_pid = pid.gsub(' ','_')
+      fixed_pid = pid.gsub(' ','-')
       URI.parse(fixed_pid).fragment || fixed_pid.gsub(/.*\//,'') || fixed_pid
     end
 
