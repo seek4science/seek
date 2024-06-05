@@ -1,11 +1,10 @@
 <%
-   entity=controller_name.singularize
-   object=instance_variable_get("@#{entity}")
-   title||="Tags"
-   all_tags,all_item_tags = fetch_tags_for_item object
-   owner_item_tags = current_user ? object.annotations.with_attribute_name("tag").by_source("User",User.current_user.id).collect{|a| a.value}.uniq : []
-   create_tag_link_text = ((owner_item_tags.empty? ? "Add your tags" : "Update your tags") + ' <span class="caret"></span>').html_safe
-   existing_tags = owner_item_tags.map(&:text).uniq
+  title||="Tags"
+  all_tags,all_item_tags = fetch_tags_for_item resource
+  owner_item_tags = fetch_tags_for_item_owned_by_current_user resource
+
+  create_tag_link_text = ((owner_item_tags.empty? ? "Add your tags" : "Update your tags") + ' <span class="caret"></span>').html_safe
+  existing_tags = owner_item_tags.map(&:text).uniq
 %>
 <%= panel(title, :id => "tags_box", :help_text => "Tagging an item helps describe it and other people find it. You can contribute by applying your own tags to this item. The weight of a tag indicates how often it has been used.") do %>
   <div id='tag_cloud' class='tags_smaller'>

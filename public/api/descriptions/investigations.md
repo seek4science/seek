@@ -21,4 +21,4 @@ A response for an **Investigation** such as that for a <a href="#create">**Creat
 * References to <a href="#sops">**Sops**</a> that belong to the **Investigation**
 * References to <a href="#publications">**Publications**</a> that belong to the **Investigation**
 
-
+**Investigations** have support for [Extended Metadata](/api#section/Extended-Metadata)

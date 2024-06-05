@@ -302,7 +302,7 @@ class DocumentsControllerTest < ActionController::TestCase
     get :show, params: { id: doc }
     assert_response :success
     assert_select '#buttons' do
-      assert_select 'a[href=?]', explore_document_path(doc, version: doc.version), count: 1
+      assert_select 'a[href=?]', explore_document_path(doc, version: doc.version), text:'Explore', count: 1
       assert_select 'a.disabled', text: 'Explore', count: 0
     end
   end

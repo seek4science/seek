@@ -26,3 +26,5 @@ A response for a **Presentation** such as that for a <a href="#create">**Create*
 * A reference to the <a href="#people">**Person**</a> who submitted the **Presentation**
 * References to the <a href="#investigations">**Investigations**</a> associated with the **Presentation**
 * References to the <a href="#studies">**Studies**</a> associated with the **Presentation**
+
+**Presentations** have support for [Extended Metadata](/api#section/Extended-Metadata)

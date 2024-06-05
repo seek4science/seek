@@ -1,46 +1,6 @@
-<% assay = params[:isa_assay][:assay] if params.dig(:isa_assay, :assay) %>
-<% study = Study.find(params[:study_id] || assay[:study_id]) %>
-<% def first_assay_in_stream?
-    params[:source_assay_id].nil? || (params[:source_assay_id] == params[:assay_stream_id])
-   end
-%>
 <%
-  source_assay = Assay.find(params[:source_assay_id]) if params[:source_assay_id]
-  assay_stream_id = params[:assay_stream_id] if params[:assay_stream_id]
-
-  if @isa_assay.assay.new_record?
-    if params[:is_assay_stream]
-      assay_position = study.assay_streams.any? ? study.assay_streams.map(&:position).max + 1 : 0
-      assay_class_id = AssayClass.assay_stream.id
-      is_assay_stream = true
-    else
-      assay_position = first_assay_in_stream? ? 0 : source_assay.position + 1
-      assay_class_id = AssayClass.experimental.id
-      is_assay_stream = false
-    end
-  else
-    assay_position = @isa_assay.assay.position
-    assay_class_id = @isa_assay.assay.assay_class_id
-    is_assay_stream = @isa_assay.assay.is_assay_stream?
-  end
-
-  input_sample_type_id ||=
-    if is_assay_stream || source_assay&.assay_class&.is_assay_stream?
-      study.sample_types.second.id
-    else
-      source_assay.sample_type.id if source_assay
-    end
-
-  show_extended_metadata =
-    if is_assay_stream
-      true
-    elsif source_assay&.position&.zero? && !@isa_assay.assay.new_record?
-      true # Custom metadata should be shown in edit as well if assay position is 0.
-    else
-      false
-    end
+  is_assay_stream = @isa_assay.assay.is_assay_stream?
 %>
-
 <%= error_messages_for :isa_assay %>
 
 <%=  f.fields_for @isa_assay.assay do |assay_fields| %>
@@ -55,32 +15,34 @@
     <%= assay_fields.text_area :description, rows: 5, class: "form-control rich-text-edit" -%>
   </div>
 
-  <% if show_extended_metadata %>
+  <%# Show extended metadata is assay is of class assay_stream %>
+  <% if is_assay_stream %>
     <%= render partial: 'extended_metadata/extended_metadata_type_selection', locals:{f:assay_fields, resource:@isa_assay.assay} %>
     <%= render partial: 'extended_metadata/extended_metadata_attribute_input', locals:{f:assay_fields,resource:@isa_assay.assay, parent_resource: "isa_assay"} %>
   <% end %>
 
-  <div class="form-group hidden"  >
-    <label class="required"><%= t('study') -%></label>
-    <%= assay_study_selection('isa_assay[assay][study_id]',@isa_assay.assay.study) %>
-  </div>
+  <%= assay_fields.hidden_field :study_id %>
 
   <% if is_assay_stream %>
     <div class="form-group">
       <%= assay_fields.label "Assay position" -%><br/>
-      <%= assay_fields.number_field :position, rows: 5, class: "form-control", value: assay_position %>
+      <%= assay_fields.number_field :position, rows: 5, class: "form-control" %>
     </div>
   <% else %>
     <div class="hidden">
-      <%= assay_fields.hidden_field :position, value: assay_position -%>
+      <%= assay_fields.hidden_field :position -%>
     </div>
   <% end %>
 
 
-  <%= assay_fields.hidden_field :assay_stream_id, value: assay_stream_id -%>
-  <%= assay_fields.hidden_field :assay_class_id, value: assay_class_id -%>
+  <%= assay_fields.hidden_field :assay_stream_id -%>
+  <%= assay_fields.hidden_field :assay_class_id -%>
 
-  <% unless is_assay_stream %>
+  <% if is_assay_stream %>
+    <% if User.current_user  -%>
+      <%= render partial: 'assets/manage_specific_attributes', locals:{f:assay_fields} if show_form_manage_specific_attributes? %>
+    <% end %>
+  <% else %>
     <% if User.current_user  -%>
       <%= render partial: 'assets/manage_specific_attributes', locals:{f:assay_fields} if show_form_manage_specific_attributes? %>
       <%= assay_fields.fancy_multiselect(:sops, other_projects_checkbox: true, name: "isa_assay[assay][sop_ids]")%>
@@ -93,7 +55,7 @@
   <% end -%>
 <% end -%>
 
-<%= f.hidden_field :input_sample_type_id, value: input_sample_type_id  -%>
+<%= f.hidden_field :input_sample_type_id  -%>
 
 <% unless is_assay_stream %>
   <%= folding_panel("Define #{t(:sample_type)} for #{t(:assay)}") do %>
@@ -106,7 +68,8 @@
 
 <%= render partial: 'projects/implicit_project_selector', locals: { action: action,
                                                                     select_id: '#isa_assay_assay_study_id',
-                                                                    parents: Study.authorized_for('edit') } %>
+                                                                    parents: Study.authorized_for('edit'),
+                                                                    skip_on_page_load: true} %>
 
 
 <script>
@@ -119,14 +82,6 @@
     }
 
     $j(document).ready(function () {
-      const urlSearchParams = new URLSearchParams(window.location.search);
-      const params = Object.fromEntries(urlSearchParams.entries());
-      const study_id = params["study_id"]
-      $j("option:enabled", "#isa_assay_input_sample_type_id").prop('selected', true);
-      // Prevent setting the hidden field on redirect (query string parameters are missing)
-      if(study_id)
-        $j("#isa_assay_assay_study_id").val(study_id).change();
-
       Templates.init($j('#template-attributes'));
     });
 </script>

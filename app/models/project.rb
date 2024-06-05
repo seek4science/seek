@@ -2,6 +2,7 @@ class Project < ApplicationRecord
   include Seek::Annotatable
   include HasSettings
   include Seek::Roles::Scope
+  include Seek::Taggable
 
   acts_as_yellow_pages
   title_trimmer

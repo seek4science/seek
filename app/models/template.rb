@@ -24,8 +24,7 @@ class Template < ApplicationRecord
   end
 
   def self.can_create?
-    can = User.logged_in_and_member? && Seek::Config.samples_enabled
-    can && User.current_user.is_admin_or_project_administrator?
+    super && Seek::Config.samples_enabled && User.current_user.is_admin_or_project_administrator?
   end
 
   def resolve_inconsistencies

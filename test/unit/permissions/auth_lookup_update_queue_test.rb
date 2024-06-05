@@ -161,10 +161,17 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
     end
   end
 
-  test 'updates when a user registers' do
+  test 'updates when a user registers but not until associated with a person' do
+    person = FactoryBot.create(:person)
+    user = assert_no_difference('AuthLookupUpdateQueue.count') do
+      FactoryBot.create(:brand_new_user)
+    end
     assert_difference('AuthLookupUpdateQueue.count', 1) do
-      user = FactoryBot.create(:brand_new_user)
-      assert_equal user, AuthLookupUpdateQueue.order(:id).last.item
+      user.person = person
+      user.save!
+      q = AuthLookupUpdateQueue.order(:id).last
+      assert_equal user, q.item
+      assert_equal 1, q.priority
     end
   end
 

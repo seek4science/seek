@@ -1,0 +1,71 @@
+{
+  "data": {
+    "id": "<%= res.id %>",
+    "type": "extended_metadata_types",
+    "attributes": {
+      "title": "A Max Extended Metadata Type",
+      "supported_type": "Investigation",
+      "enabled": true,
+      "extended_metadata_attributes": [
+        {
+          "id": "<%= res.extended_metadata_attributes.first.id %>",
+          "title": "age",
+          "label": "Age",
+          "description": null,
+          "sample_attribute_type": {
+            "id": "<%= res.extended_metadata_attributes.first.sample_attribute_type_id %>",
+            "title": "<%= res.extended_metadata_attributes.first.sample_attribute_type.title %>",
+            "base_type": "Integer",
+            "regexp": ".*"
+          },
+          "required":false,
+          "pos":null,
+          "sample_controlled_vocab_id":null,
+          "linked_extended_metadata_type_id":null
+        },
+        {
+          "id": "<%= res.extended_metadata_attributes.second.id %>",
+          "title": "name",
+          "label": "Name",
+          "description": null,
+          "sample_attribute_type": {
+            "id": "<%= res.extended_metadata_attributes.second.sample_attribute_type_id %>",
+            "title": "<%= res.extended_metadata_attributes.second.sample_attribute_type.title %>",
+            "base_type": "String",
+            "regexp": ".*"
+          },
+          "required":true,
+          "pos":null,
+          "sample_controlled_vocab_id":null,
+          "linked_extended_metadata_type_id":null
+        },
+        {
+          "id": "<%= res.extended_metadata_attributes.last.id %>",
+          "title": "date",
+          "label": "Date",
+          "description": null,
+          "sample_attribute_type": {
+            "id": "<%= res.extended_metadata_attributes.last.sample_attribute_type_id %>",
+            "title": "<%= res.extended_metadata_attributes.last.sample_attribute_type.title %>",
+            "base_type": "DateTime",
+            "regexp": ".*"
+          },
+          "required":false,
+          "pos":null,
+          "sample_controlled_vocab_id":null,
+          "linked_extended_metadata_type_id":null
+        }
+      ]
+    },
+    "links": {
+      "self": "/extended_metadata_types/<%= res.id %>"
+    },
+    "meta": {
+      "api_version": "0.3",
+      "base_url": "http://localhost:3000"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

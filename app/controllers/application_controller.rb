@@ -42,6 +42,8 @@ class ApplicationController < ActionController::Base
   include FairSignposting
 
   helper :all
+  helper_method %i[current_person is_condensed_view page_and_sort_params controller_model
+                   displaying_single_page? display_isa_graph? safe_class_lookup]
 
   layout Seek::Config.main_layout
 
@@ -118,7 +120,7 @@ class ApplicationController < ActionController::Base
     params.permit(:page, :sort, :order, :view, :table_cols, permitted_filter_params)
   end
 
-  helper_method :page_and_sort_params
+
 
   def controller_model
     begin
@@ -127,7 +129,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  helper_method :controller_model
 
   def self.api_actions(*actions)
     @api_actions ||= []
@@ -233,7 +234,8 @@ class ApplicationController < ActionController::Base
           case privilege
           when :publish, :manage, :edit, :download, :delete
             if current_user.nil?
-              flash[:error] = "You are not authorized to #{privilege} this #{name.humanize}, you may need to login first."
+              flash[:error] =
+"You are not authorized to #{privilege} this #{name.humanize}, you may need to login first."
             else
               flash[:error] = "You are not authorized to #{privilege} this #{name.humanize}."
             end
@@ -289,14 +291,16 @@ class ApplicationController < ActionController::Base
 
   def render_unknown_attribute_error(e)
     respond_to do |format|
-      format.json { render json: { errors: [{ title: 'Unknown attribute', details: e.message }] }, status: :unprocessable_entity }
+      format.json {
+ render json: { errors: [{ title: 'Unknown attribute', details: e.message }] }, status: :unprocessable_entity }
       format.all { render plain: e.message, status: :unprocessable_entity }
     end
   end
 
   def render_not_implemented_error(e)
     respond_to do |format|
-      format.json { render json: { errors: [{ title: 'Not implemented', details: e.message }] }, status: :not_implemented }
+      format.json {
+ render json: { errors: [{ title: 'Not implemented', details: e.message }] }, status: :not_implemented }
       format.all { render plain: e.message, status: :not_implemented }
     end
   end
@@ -317,8 +321,6 @@ class ApplicationController < ActionController::Base
     return (params.has_key?(:view) && params[:view]!="default")||
       (!params.has_key?(:view) && session.has_key?(:view) && !session[:view].nil? && session[:view]!="default")
   end
-
-  helper_method :is_condensed_view
 
 
   def log_event
@@ -382,7 +384,8 @@ class ApplicationController < ActionController::Base
                              user_agent: user_agent,
                              data: activity_loggable.title)
         end
-      when *Seek::Util.authorized_types.map { |t| t.name.underscore.pluralize.split('/').last } + ["sample_types"] # TODO: Find a nicer way of doing this...
+      when *Seek::Util.authorized_types.map { |t|
+ t.name.underscore.pluralize.split('/').last } + ["sample_types"] # TODO: Find a nicer way of doing this...
         action = 'create' if action == 'create_metadata' || action == 'create_from_template'
         action = 'update' if action == 'create_version'
         action = 'inline_view' if action == 'explore'
@@ -530,7 +533,8 @@ class ApplicationController < ActionController::Base
     return unless request.format.rdf?
     unless Seek::Util.rdf_capable_types.include?(controller_model)
       respond_to do |format|
-        format.rdf { render plain: 'This resource does not support RDF', status: :not_acceptable, content_type: 'text/plain' }
+        format.rdf {
+ render plain: 'This resource does not support RDF', status: :not_acceptable, content_type: 'text/plain' }
       end
     end
   end
@@ -606,9 +610,11 @@ class ApplicationController < ActionController::Base
   def determine_extended_metadata_keys(asset = nil)
     keys = []
     if asset
-      type_id = params.dig(controller_name.singularize.to_sym, asset, :extended_metadata_attributes, :extended_metadata_type_id)
+      type_id = params.dig(controller_name.singularize.to_sym, asset, :extended_metadata_attributes,
+                           :extended_metadata_type_id)
     else
-      type_id = params.dig(controller_name.singularize.to_sym, :extended_metadata_attributes, :extended_metadata_type_id)
+      type_id = params.dig(controller_name.singularize.to_sym, :extended_metadata_attributes,
+                           :extended_metadata_type_id)
     end
     if type_id.present?
       metadata_type = ExtendedMetadataType.find(type_id)
@@ -650,13 +656,9 @@ class ApplicationController < ActionController::Base
     @single_page || false
   end
 
-  helper_method :displaying_single_page?
-
   def display_isa_graph?
     !displaying_single_page?
   end
-
-  helper_method :display_isa_graph?
 
 
   def creator_related_params
@@ -677,6 +679,4 @@ class ApplicationController < ActionController::Base
   def safe_class_lookup(class_name, raise: true)
     Seek::Util.lookup_class(class_name, raise: raise)
   end
-
-  helper_method :safe_class_lookup
 end

@@ -87,6 +87,9 @@ tags:
   - name: documents
     description:
       $ref: ../descriptions/documents.md
+  - name: extendedMetadataTypes
+    description:
+      $ref: ../descriptions/extendedMetadataTypes.md
   - name: models
     description:
       $ref: ../descriptions/models.md
@@ -158,6 +161,9 @@ x-tagGroups:
       - sampleTypes
       - samples
       - sampleAttributeTypes
+  - name: Extended Metadata Types
+    tags:
+      - extendedMetadataTypes
 components:
   securitySchemes:
     OAuth2:

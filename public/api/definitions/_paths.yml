@@ -1100,6 +1100,61 @@
         $ref: "#/components/responses/forbidden"
       "404":
         $ref: "#/components/responses/notFound"
+/extended_metadata_types:
+  get:
+    operationId: listExtendedMetadataTypes
+    summary: List extended metadata types
+    description:
+      $ref: ../descriptions/listExtendedMetadataTypes.md
+    tags:
+      - list
+      - extendedMetadataTypes
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/indexResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/extendedMetadataTypesResponse.json
+      "501":
+        $ref: "#/components/responses/notImplemented"
+
+"/extended_metadata_types/{id}":
+  parameters:
+    - name: id
+      in: path
+      required: true
+      description: The extended metadata type to fetch
+      schema:
+        type: integer
+      example: 1152
+  get:
+    operationId: readExtendedMetadataType
+    summary: Fetch an extended metadata type
+    description:
+      $ref: ../descriptions/readExtendedMetadataType.md
+    tags:
+      - read
+      - extendedMetadataTypes
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/extendedMetadataTypeResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/extendedMetadataTypeResponse.json
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
 /institutions:
   get:
     operationId: listInstitutions

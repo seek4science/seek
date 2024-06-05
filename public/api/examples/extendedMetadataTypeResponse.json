@@ -1,0 +1,71 @@
+{
+  "data": {
+    "id": "233",
+    "type": "extended_metadata_types",
+    "attributes": {
+      "title": "A Max Extended Metadata Type",
+      "supported_type": "Investigation",
+      "enabled": true,
+      "extended_metadata_attributes": [
+        {
+          "id": "502",
+          "title": "age",
+          "label": "Age",
+          "description": null,
+          "sample_attribute_type": {
+            "id": "539",
+            "title": "Integer attribute type 4",
+            "base_type": "Integer",
+            "regexp": ".*"
+          },
+          "required": false,
+          "pos": null,
+          "sample_controlled_vocab_id": null,
+          "linked_extended_metadata_type_id": null
+        },
+        {
+          "id": "503",
+          "title": "name",
+          "label": "Name",
+          "description": null,
+          "sample_attribute_type": {
+            "id": "540",
+            "title": "String attribute type 7",
+            "base_type": "String",
+            "regexp": ".*"
+          },
+          "required": true,
+          "pos": null,
+          "sample_controlled_vocab_id": null,
+          "linked_extended_metadata_type_id": null
+        },
+        {
+          "id": "504",
+          "title": "date",
+          "label": "Date",
+          "description": null,
+          "sample_attribute_type": {
+            "id": "541",
+            "title": "DateTime attribute type 4",
+            "base_type": "DateTime",
+            "regexp": ".*"
+          },
+          "required": false,
+          "pos": null,
+          "sample_controlled_vocab_id": null,
+          "linked_extended_metadata_type_id": null
+        }
+      ]
+    },
+    "links": {
+      "self": "/extended_metadata_types/233"
+    },
+    "meta": {
+      "api_version": "0.3",
+      "base_url": "http://localhost:3000"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

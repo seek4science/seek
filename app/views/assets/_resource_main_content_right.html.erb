@@ -21,26 +21,26 @@
 
 <% if resource.respond_to?(:snapshots)  %>
   <% if resource.latest_citable_resource %>
-    <%= render :partial => "assets/citation_box", locals: { doi: resource.latest_citable_resource.doi,
-                                                            snapshot: resource.latest_citable_resource }  %>
+    <%= render partial: "assets/citation_box", locals: { doi: resource.latest_citable_resource.doi,
+                                                         snapshot: resource.latest_citable_resource } %>
   <% elsif resource.can_manage? && Seek::Config.doi_minting_enabled %>
-    <%= render :partial => "assets/isa_citation_instructions", locals: { resource: resource } %>
+    <%= render partial: "assets/isa_citation_instructions", locals: { resource: resource } %>
   <% end %>
   <% if resource.snapshots.any? %>
-    <%= render :partial => "snapshots/snapshots", locals: { snapshots: resource.snapshots, resource: resource } %>
+    <%= render partial: "snapshots/snapshots", locals: { snapshots: resource.snapshots, resource: resource } %>
   <% end %>
 <% elsif versioned_resource.respond_to?(:doi) %>
   <% if versioned_resource.doi.present? %>
-    <%= render :partial => "assets/citation_box", locals: { doi: versioned_resource.doi } %>
+    <%= render partial: "assets/citation_box", locals: { doi: versioned_resource.doi } %>
   <% elsif versioned_resource.is_git_versioned? && versioned_resource.file_exists?(Seek::WorkflowExtractors::CFF::FILENAME) %>
-    <%= render :partial => "assets/citation_box", locals: { blob: versioned_resource.get_blob(Seek::WorkflowExtractors::CFF::FILENAME) } %>
+    <%= render partial: "assets/citation_box", locals: { blob: versioned_resource.get_blob(Seek::WorkflowExtractors::CFF::FILENAME) } %>
   <% elsif resource.can_manage? && Seek::Config.doi_minting_enabled && resource.supports_doi? %>
-    <%= render :partial => "assets/citation_instructions", locals: { resource: resource, versioned_resource: versioned_resource } %>
+    <%= render partial: "assets/citation_instructions", locals: { resource: resource, versioned_resource: versioned_resource } %>
   <% end %>
 <% end %>
 
 <% if Seek::Config.file_templates_enabled && resource.respond_to?(:file_template) && !resource.file_template.nil? %>
-  <%= render :partial => "assets/file_template_box", :locals => { :resource => resource } -%>
+  <%= render partial: "assets/file_template_box", locals: { resource: resource } %>
 <% end %>
 
 <% suffix = 'the Data file'
@@ -52,23 +52,23 @@
    %>
 
 <% if resource.respond_to?(:license) && !hide_license %>
-  <%= render :partial => "assets/license_box", :locals => { :resource => resource, :versioned_resource=> versioned_resource } -%>
+  <%= render partial: "assets/license_box", locals: { resource: resource, versioned_resource: versioned_resource } %>
 <% end %>
 
-<%= render :partial => "assets/usage_info_box",:locals => { :resource => resource } -%>
+<%= render partial: "assets/usage_info_box", locals: { resource: resource } %>
 
 <% if resource.controlled_vocab_annotations? %>
   <%= render partial:'assets/controlled_vocab_annotations_properties_box', :locals => { :resource => resource } -%>
 <% end %>
 
 <% if resource.class.is_taggable? %>
-    <%= render :partial=>"assets/tags_box", :no_tags_message=>"Add tags (comma separated) ..." -%>
+  <%= render partial: "assets/tags_box", locals: { resource: resource }, no_tags_message: "Add tags (comma separated) ..." %>
 <% end -%>
 
 <% if resource.respond_to? :attributions_objects -%>
-  <%= render :partial => "assets/resource_attributions_box",
-             :locals => { :resource => resource, :attributed_to => resource.attributions_objects,
-                          :truncate_to => truncate_length_for_boxes } -%>
+  <%= render partial: "assets/resource_attributions_box",
+             locals: { resource: resource, attributed_to: resource.attributions_objects,
+                       truncate_to: truncate_length_for_boxes } %>
 <% end -%>
 
 <% if resource.respond_to?(:collections) && resource.collections.any? -%>

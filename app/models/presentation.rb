@@ -35,4 +35,8 @@ class Presentation < ApplicationRecord
   def is_in_isa_publishable?
     true
   end
+
+  def supports_spreadsheet_explore?
+    true
+  end
 end

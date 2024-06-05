@@ -67,7 +67,7 @@ class User < ApplicationRecord
   delegate :is_admin_or_project_administrator?, to: :person, allow_nil: true
   delegate :is_programme_administrator?, to: :person, allow_nil: true
 
-  after_commit :queue_update_auth_table, on: :create
+  after_save_commit :queue_update_auth_table
 
   after_destroy :queue_auth_lookup_delete_job
 
@@ -336,7 +336,9 @@ class User < ApplicationRecord
   end
 
   def queue_update_auth_table
-    AuthLookupUpdateQueue.enqueue(self)
+    if saved_changes.keys.include?("person_id")
+      AuthLookupUpdateQueue.enqueue(self, priority: 1)
+    end
   end
 
   def queue_auth_lookup_delete_job

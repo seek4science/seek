@@ -7,7 +7,7 @@ class WorkflowsController < ApplicationController
   before_action :workflows_enabled?
   before_action :find_assets, only: [:index]
   before_action :find_and_authorize_requested_item, except: [:index, :new, :create, :preview, :update_annotations_ajax]
-  before_action :find_display_asset, only: [:show, :download, :diagram, :ro_crate, :edit_paths, :update_paths]
+  before_action :find_display_asset, only: [:show, :download, :diagram, :ro_crate, :ro_crate_metadata, :edit_paths, :update_paths]
   before_action :login_required, only: [:create, :create_version, :new_version,
                                         :create_from_files, :create_from_ro_crate,
                                         :create_metadata, :provide_metadata, :create_from_git, :create_version_from_git]
@@ -19,7 +19,7 @@ class WorkflowsController < ApplicationController
   include RoCrateHandling
   include Legacy::WorkflowSupport
 
-  api_actions :index, :show, :create, :update, :destroy, :ro_crate, :create_version
+  api_actions :index, :show, :create, :update, :destroy, :ro_crate, :ro_crate_metadata, :create_version
 
   rescue_from ROCrate::ReadException do |e|
     logger.error("Error whilst attempting to read RO-Crate metadata for Workflow #{@workflow&.id}: #{e.exception.class.name} #{e.message}")
@@ -256,6 +256,13 @@ class WorkflowsController < ApplicationController
   def ro_crate
     send_ro_crate(@display_workflow.ro_crate_zip,
                   "workflow-#{@workflow.id}-#{@display_workflow.version}.crate.zip")
+  end
+
+  def ro_crate_metadata
+    metadata = @display_workflow.ro_crate.metadata
+    json = metadata.generate
+    response.headers['Content-Length'] = json.length.to_s
+    send_data(json, filename: metadata.id, type: 'application/json', disposition: 'inline')
   end
 
   def edit_paths

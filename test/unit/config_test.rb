@@ -7,7 +7,7 @@ class ConfigTest < ActiveSupport::TestCase
     assert Seek::Config.events_enabled
   end
   test 'jerm_disabled' do
-    assert !Seek::Config.jerm_enabled
+    refute Seek::Config.jerm_enabled
   end
   test 'solr enabled' do
     assert Seek::Config.solr_enabled
@@ -628,6 +628,16 @@ class ConfigTest < ActiveSupport::TestCase
           assert_equal 'https://login.elixir-czech.org/oidc/', config[:issuer]
         end
       end
+    end
+  end
+
+  test 'templates enabled' do
+    with_config_value(:isa_json_compliance_enabled, false) do
+      refute Seek::Config.templates_enabled
+    end
+
+    with_config_value(:isa_json_compliance_enabled, true) do
+      assert Seek::Config.templates_enabled
     end
   end
 end

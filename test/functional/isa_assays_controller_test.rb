@@ -76,8 +76,7 @@ class IsaAssaysControllerTest < ActionController::TestCase
     end
     isa_assay = assigns(:isa_assay)
     assert_redirected_to controller: 'single_pages', action: 'show', id: isa_assay.assay.projects.first.id,
-                         params: { notice: 'The ISA assay was created successfully!',
-                                   item_type: 'assay', item_id: Assay.last.id }
+                         params: { item_type: 'assay', item_id: Assay.last.id }
 
     sample_types = SampleType.last(2)
     title = sample_types[0].sample_attributes.detect(&:is_title).title
@@ -139,7 +138,7 @@ class IsaAssaysControllerTest < ActionController::TestCase
     assay = FactoryBot.create(:assay, study:, contributor: person)
     put :update, params: { id: assay, isa_assay: { assay: { title: 'assay title' } } }
     assert_redirected_to single_page_path(id: project, item_type: 'assay', item_id: assay.id)
-    assert flash[:error].include?('Resource not found.')
+    assert flash[:error].include?('Sample type not found.')
 
     assay = FactoryBot.create(:assay, study:, sample_type: assay_type, contributor: person)
 
@@ -359,7 +358,7 @@ class IsaAssaysControllerTest < ActionController::TestCase
     end
 
     isa_assay = assigns(:isa_assay)
-    assert_redirected_to single_page_path(id: project, item_type: 'assay', item_id: isa_assay.assay.id, notice: 'The ISA assay was created successfully!')
+    assert_redirected_to single_page_path(id: project, item_type: 'assay', item_id: isa_assay.assay.id)
 
     assert_equal isa_assay.assay.sample_type.previous_linked_sample_type, study.sample_types.second
     assert_equal isa_assay.assay.next_linked_child_assay, end_assay
@@ -455,7 +454,7 @@ class IsaAssaysControllerTest < ActionController::TestCase
     end
 
     isa_assay = assigns(:isa_assay)
-    assert_redirected_to single_page_path(id: project, item_type: 'assay', item_id: isa_assay.assay.id, notice: 'The ISA assay was created successfully!')
+    assert_redirected_to single_page_path(id: project, item_type: 'assay', item_id: isa_assay.assay.id)
 
     assert_equal begin_assay.previous_linked_sample_type, study.sample_types.second
     assert_equal isa_assay.assay.sample_type.previous_linked_sample_type, begin_assay.sample_type
@@ -619,7 +618,7 @@ class IsaAssaysControllerTest < ActionController::TestCase
     # New assay stream should have position 1 and is of type 'number'
     assert_select 'input[type=number][value=1]#isa_assay_assay_position', count: 1
 
-    assay_stream2 = FactoryBot.create(:assay_stream, study: , contributor: person, position: 5)
+    FactoryBot.create(:assay_stream, study: , contributor: person, position: 5)
     get :new, params: { study_id: study.id, is_assay_stream: true }
     assert_response :success
     # New assay stream should have position 6 and is of type 'number'

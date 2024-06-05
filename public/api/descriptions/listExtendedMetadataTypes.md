@@ -1,0 +1,2 @@
+<a name="listExtendedMetadataTypes"></a>The **listExtendedMetadataTypes** operation returns a JSON object containing a list of all the
+<a href="#extendedMetadataTypes">**Extended Metadata Types**</a> to which the authenticated user has access.

@@ -15,7 +15,7 @@
         <%= f.text_area :description, class: "form-control rich-text-edit", rows: 5, id: "template-description" -%>
     </div>
 
-    <%= render partial: "projects/project_selector", locals: { resource: @template } -%>
+    <%= render partial: "projects/project_selector", locals: { resource: @template, allow_only_administered: true } -%>
 
     <%= render partial: 'assets/manage_specific_attributes', locals:{f:f} if show_form_manage_specific_attributes? %>
 
@@ -26,12 +26,6 @@
             <div class="form-group">
 
                 <h3>Template Information</h3>
-
-                <% if @template.new_record? %>
-                    <div class="form-group">
-                        <input type="button" value="Choose from existing templates" class="btn btn-primary" onClick="showTemplateModal()">
-                    </div>
-                <% end %>
 
                 <div class="form-group">
                     <%= f.label :level, 'ISA Level' %>
@@ -61,7 +55,13 @@
                 <b class="text-danger">To ensure compliance with the original template, please do not modify the existing ISA-tags and attributes in the form below. You can always add new attributes.</b>
             </div>
 
-            <table class="table" id="attribute-table">
+          <% if @template.new_record? %>
+            <div class="form-group">
+              <input type="button" value="Choose from existing templates" class="btn btn-primary" onClick="showTemplateModal()">
+            </div>
+          <% end %>
+
+          <table class="table" id="attribute-table">
                 <thead>
                     <tr>
                         <th width="5em">Order</th>
@@ -85,7 +85,7 @@
                     <% if @template.children.none? %>
                         <tr id="add-attribute-row">
                             <td colspan="6">
-                                <%= button_link_to('Add new attribute', 'add', '#', id: 'add-attribute') %>
+                                <%= button_link_to('Add new attribute', 'add', '#', id: 'add-attribute', class: @template.new_record? ? 'hidden' : '') %>
                             </td>
                         </tr>
                     <% end %>

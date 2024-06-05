@@ -1,7 +1,7 @@
 class SampleControlledVocabTerm < ApplicationRecord
   belongs_to :sample_controlled_vocab, inverse_of: :sample_controlled_vocab_terms
 
-  validates :label, presence: true, length: { maximum: 500 }
+  validates :label, presence: true, length: { maximum: 500 }, uniqueness: { scope: :sample_controlled_vocab_id }
 
   before_validation :truncate_label
 

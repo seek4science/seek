@@ -1,4 +1,4 @@
-<% editable = mine?(@avatar_owner_instance) || @avatar_owner_instance.can_edit?(current_user) -%>
+<% editable = @avatar_owner_instance.can_edit?(current_user) -%>
 
 <%
     item = @avatar_owner_instance.class.name.downcase

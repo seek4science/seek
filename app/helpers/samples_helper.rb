@@ -81,6 +81,8 @@ module SamplesHelper
       value = [value] unless value.is_a?(Array)
       value.compact.each do |v|
         id = v[:id]
+        next if id.blank? # Skip value if there is no ID
+
         title = v[:title]
         title = '<em>Hidden</em>' unless Sample.find(id).can_view?
         existing_objects << str.new(id, title)
@@ -379,5 +381,3 @@ module SamplesHelper
   end
 
 end
-
-

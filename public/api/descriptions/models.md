@@ -28,3 +28,5 @@ A response for a **Model** such as that for a <a href="#create">**Create**</a>, 
 * A reference to the <a href="#people">**Person**</a> who submitted the **Model**
 * References to the <a href="#investigations">**Investigations**</a> associated with the **Model**
 * References to the <a href="#studies">**Studies**</a> associated with the **Model**
+
+**Models** have support for [Extended Metadata](/api#section/Extended-Metadata)

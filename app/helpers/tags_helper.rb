@@ -20,6 +20,10 @@ module TagsHelper
     [all_tags, item_tags]
   end
 
+  def fetch_tags_for_item_owned_by_current_user (object)
+    current_user ? object.annotations.with_attribute_name("tag").by_source("User", User.current_user.id).collect { |a| a.value }.uniq : []
+  end
+
   def link_for_ann(tag, options = {})
     length = options[:truncate_length]
     length ||= 150

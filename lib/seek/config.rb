@@ -332,6 +332,14 @@ module Seek
       isa_enabled
     end
 
+    def templates_enabled
+      isa_json_compliance_enabled
+    end
+
+    def strains_enabled
+      organisms_enabled
+    end
+
     def omniauth_elixir_aai_config
       if omniauth_elixir_aai_legacy_mode
         {

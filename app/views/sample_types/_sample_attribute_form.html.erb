@@ -47,13 +47,13 @@
   <td class="text-center">
     <div class="checkbox-inline">
       <%= hidden_field_tag "#{field_name_prefix}[required]", '0' %>
-      <%= check_box_tag "#{field_name_prefix}[required]", '1', required, disabled: !allow_required, data: { attr: "required" } %>
+      <%= check_box_tag "#{field_name_prefix}[required]", '1', required, class: "#{ allow_required ? '' : 'disabled' }", data: { attr: "required" } %>
     </div>
   </td>
   <td class="text-center">
     <div class="checkbox-inline">
       <%= hidden_field_tag "#{field_name_prefix}[is_title]", '0' %>
-      <%= check_box_tag "#{field_name_prefix}[is_title]", '1', is_title, class:'sample-type-is-title',disabled: seek_sample_multi || !allow_required %>
+      <%= check_box_tag "#{field_name_prefix}[is_title]", '1', is_title, class: "sample-type-is-title #{ allow_required ? '' : 'disabled' }"%>
     </div>
   </td>
   <td>

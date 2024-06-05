@@ -90,3 +90,37 @@ A placeholder can then be satisfied by uploading a file to the location URI. For
 may be satisfied by uploading a file to http://fairdomhub.org/data_files/57/content_blobs/313 using the <a href="#uploadAssetContent">uploadAssetContent</a> operation
 
 The content of a resource may be downloaded by first *reading* the resource and then *downloading* the ContentBlobs from their URI.
+
+## Extended Metadata
+
+Some types support [Extended Metadata](https://docs.seek4science.org/tech/extended-metadata), which allows additional attributes to be defined according to an Extended Metadata Type.
+
+Types currently supported are <a href="#investigations">**Investigation**</a>, <a href="#studies">**Study**</a>, <a href="#assays">**Assay**</a>, 
+<a href="#dataFiles">**DataFile**</a>, <a href="#sops">**SOP**</a>, <a href="#presentations">**Presentation**</a>,
+<a href="#documents">**Document**</a>, <a href="#models">**Model**</a>,
+<a href="#events">**Event**</a>, <a href="#collections">**Collection**</a>, <a href="#projects">**Project**</a>
+
+The responses and requests for each of these types include an additional optional attribute _extended_attributes_ which describes
+
+* _extended_metadata_type_id_ - the id of the extended metadata type which can be used to find more details about what its attributes are.
+* _attribute_map_ - which is a map of key / value pairs where the key is the attribute name
+
+
+For example, a Study may have extended metadata, defined by an Extended Metadata Type with id 12, that has attributes for
+age, name, and date_of_birth. These could be shown, within its attributes, as:
+
+```
+"extended_attributes": {
+  "extended_metadata_type_id": "12",
+  "attribute_map": {
+    "age": 44,
+    "name": "Fred Bloggs",
+    "date_of_birth": "2024-01-01"
+  }
+}
+```
+
+If you wish to create or update a study to make use of this extended metadata, the request payload would be described the same. 
+Upon creation or update there would be a validation check that the attributes are valid.
+
+The API supports listing all available Extended Metadata Types, and inspecting an individual type by its id. For more information see the [Extended Metadata Type definitions](api#tag/extendedMetadataTypes).

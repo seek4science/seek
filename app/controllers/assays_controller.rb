@@ -171,15 +171,11 @@ class AssaysController < ApplicationController
     return unless @assay.is_isa_json_compliant?
     return unless @assay.has_linked_child_assay?
 
-    previous_assay_linked_st_id = @assay.previous_linked_sample_type&.id
+    previous_st = @assay.sample_type&.previous_linked_sample_type
+    next_st = @assay.sample_type&.next_linked_sample_types&.first
+    return unless previous_st && next_st
 
-    next_assay = @assay.next_linked_child_assay
-
-    next_assay_st_attr = next_assay.sample_type&.sample_attributes&.detect(&:input_attribute?)
-
-    return unless next_assay && previous_assay_linked_st_id && next_assay_st_attr
-
-    next_assay_st_attr.update(linked_sample_type_id: previous_assay_linked_st_id)
+    next_st.sample_attributes.detect(&:input_attribute?).update_column(:linked_sample_type_id, previous_st&.id)
   end
 
   def rearrange_assay_positions_at_destroy

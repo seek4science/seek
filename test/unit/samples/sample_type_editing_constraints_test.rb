@@ -87,13 +87,29 @@ class SampleTypeEditingConstraintsTest < ActiveSupport::TestCase
     assert c.allow_required?(:age)
     assert c.allow_required?('full name')
 
-    # accespts attribute
+    # accepts attribute
     attr = c.sample_type.sample_attributes.detect { |t| t.accessor_name == 'address' }
     refute_nil attr
     refute c.allow_required?(attr)
     attr = c.sample_type.sample_attributes.detect { |t| t.accessor_name == 'age' }
     refute_nil attr
     assert c.allow_required?(attr)
+
+    # should refute if inherited from a template
+    template = FactoryBot.create(:isa_source_template)
+    sample_type_from_template = create_sample_type_from_template(template, c.sample_type.projects.first, c.sample_type.contributor)
+    sample_type_from_template.sample_attributes << FactoryBot.create(:sample_attribute, title: 'Extra Source Characteristic', sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), required: false, isa_tag_id: FactoryBot.create(:source_characteristic_isa_tag).id, sample_type: sample_type_from_template)
+
+    c_inherited = Seek::Samples::SampleTypeEditingConstraints.new(sample_type_from_template)
+    sample_type_from_template.sample_attributes.each do |attr|
+      if attr.title == 'Extra Source Characteristic'
+        refute c_inherited.send(:inherited?, attr)
+        assert c_inherited.allow_required?(attr)
+      else
+        assert c_inherited.send(:inherited?, attr)
+        refute c_inherited.allow_required?(attr)
+      end
+    end
   end
 
   test 'allow_attribute_removal?' do

@@ -70,7 +70,7 @@
         </div>
       <% end %>
     </div>
-    <%= render :partial => "people/project_subscriptions", :locals => { :person => @person } if (mine?(@person) || current_user.try(:person).try(:is_admin?)) %>
+    <%= render :partial => "people/project_subscriptions", :locals => { :person => @person } if @person.me? || current_user.try(:person).try(:is_admin?) %>
 
   <% end %>
 

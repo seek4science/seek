@@ -26,6 +26,7 @@ A response for a **Document** such as that for a <a href="#create">**Create**</a
 * References to the <a href="#studies">**Studies**</a> associated with the **Document**
 * References to the <a href="#publications">**Publications**</a> associated with the **Document**
 
+**Documents** have support for [Extended Metadata](/api#section/Extended-Metadata)
 
 
 

@@ -1,12 +1,17 @@
 require 'test_helper'
 
 class TemplatesControllerTest < ActionController::TestCase
+  fixtures :isa_tags
+
   include AuthenticatedTestHelper
   include SharingFormTestHelper
   include GeneralAuthorizationTestCases
 
   setup do
-    Seek::Config.send('isa_json_compliance_enabled=', true)
+    @old_setting = Seek::Config.isa_json_compliance_enabled
+    Seek::Config.isa_json_compliance_enabled = true
+    Seek::Util.clear_cached
+
     FactoryBot.create(:person) # to prevent person being first person and therefore admin
     @person = FactoryBot.create(:project_administrator)
     @project = @person.projects.first
@@ -21,6 +26,11 @@ class TemplatesControllerTest < ActionController::TestCase
     @controlled_vocab_type = FactoryBot.create(:controlled_vocab_attribute_type)
     @controlled_vocab_list_type = FactoryBot.create(:cv_list_attribute_type)
     @default_isa_tag = FactoryBot.create(:default_isa_tag)
+  end
+
+  teardown do
+    Seek::Config.isa_json_compliance_enabled = @old_setting
+    Seek::Util.clear_cached
   end
 
   test 'should get new' do
@@ -611,6 +621,33 @@ class TemplatesControllerTest < ActionController::TestCase
       assert_response :redirect
       assert_redirected_to template_path(assigns(:template))
     end
+  end
+
+  test 'Should not see add new attribute button at template creation time' do
+    get :new
+    assert_response :success
+    assert_select 'a#add-attribute.hidden', text: /Add new attribute/, count: 1
+  end
+
+  test 'Should see add new attribute button at template edit time' do
+    my_template = FactoryBot.create(:isa_source_template, project_ids: @project_ids, contributor: @person)
+    get :edit, params: { id: my_template.id }
+    assert_response :success
+    assert_select 'a#add-attribute.hidden', text: /Add new attribute/, count: 0
+  end
+
+  test 'Should only be able link a new template to projects the current user is project admin of' do
+    project = FactoryBot.create(:project)
+    project_admin = FactoryBot.create(:project_administrator, project: project)
+    login_as(project_admin.user)
+    get :new
+    assert_response :success
+
+    # The project selector is a vue-component, which is not translated to html in the test environment
+    # Instead we check that the json data is present in 'project-selector-possibilities-json'
+    assert_select 'script#project-selector-possibilities-json', count: 1
+    options = "[{\"id\":#{project.id},\"text\":\"#{project.title}\"}]"
+    assert_select 'script#project-selector-possibilities-json', text: /#{options}/, count: 1
   end
 
   def create_template_from_parent_template(parent_template, person= @person, linked_sample_type= nil)

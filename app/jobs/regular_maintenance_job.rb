@@ -20,8 +20,6 @@ class RegularMaintenanceJob < ApplicationJob
     clean_git_repositories
     resend_activation_emails
     remove_unregistered_users
-    trim_session
-    check_authlookup_consistency
   end
 
   private
@@ -58,12 +56,6 @@ class RegularMaintenanceJob < ApplicationJob
     User.where(person: nil).where('created_at < ?', USER_GRACE_PERIOD.ago).destroy_all
   end
 
-  # trims old sessions, using the db:sessions:trim task
-  def trim_session
-    Rails.application.load_tasks
-    Rake::Task['db:sessions:trim'].invoke
-  end
-
   # resends an activation email, for unactivated users that haven't received an email since RESEND_ACTIVATION_EMAIL_DELAY
   # and a total maximum of MAX_ACTIVATION_EMAILS (which will include the first one)
   def resend_activation_emails
@@ -80,26 +72,4 @@ class RegularMaintenanceJob < ApplicationJob
     end
   end
 
-  # checks lookup_table_consistent? on each type for each user, and if not triggers a job to repopulate for that user
-  # if not already queued
-  def check_authlookup_consistency
-    found_types = [].to_set
-    items_for_queue = [].to_set
-    User.where.not(person_id: nil).to_a.push(nil).each do |user|
-
-      # will only deal with 1 type per user per run
-      found = Seek::Util.authorized_types.find do |type|
-        !type.lookup_table_consistent?(user)
-      end
-
-      next unless found.present?
-
-      found_types << found
-      missing = found.items_missing_from_authlookup(user)
-      items_for_queue.merge(missing)
-    end
-
-    found_types.each(&:remove_invalid_auth_lookup_entries)
-    AuthLookupUpdateQueue.enqueue(items_for_queue.to_a) unless items_for_queue.empty?
-  end
 end

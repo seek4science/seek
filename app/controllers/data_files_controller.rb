@@ -169,6 +169,7 @@ class DataFilesController < ApplicationController
       SampleDataPersistJob.new(@data_file, @sample_type, User.current_user, assay_ids: params["assay_ids"]).queue_job
       flash[:notice] = 'Started creating extracted samples'
     else
+      @data_file.sample_persistence_task.destroy if @data_file.sample_persistence_task&.success?
       SampleDataExtractionJob.new(@data_file, @sample_type).queue_job
     end
 

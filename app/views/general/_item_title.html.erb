@@ -37,7 +37,7 @@ gatekeeper_status_bar = item.is_asset? && item.can_manage? && (item.is_waiting_a
                 </ul>
               </div>
           <% else %>
-              <div class="version">Version <%= version -%></div>
+              <div class="version"><%= visible_versions.first&.name -%></div>
           <% end %>
       <% end %>
     </h1>

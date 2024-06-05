@@ -312,4 +312,12 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
     assert vocab.ontology_based?
   end
 
+  test 'should not allow to add term with same label' do
+    vocab = FactoryBot.create(:apples_sample_controlled_vocab)
+    vocab.sample_controlled_vocab_terms.create(label: 'Golden Delicious')
+    assert_raises ActiveRecord::RecordInvalid do
+      vocab.sample_controlled_vocab_terms.create!(label: 'Golden Delicious')
+    end
+  end
+
 end

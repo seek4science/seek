@@ -32,9 +32,8 @@ var ObjectsInput = {
 
             const template = $j(this).data('typeahead-template') || 'typeahead/hint';
             opts.templateResult = HandlebarsTemplates[template];
-            opts.escapeMarkup = function (m) {
-                return m;
-            }
+            opts.escapeMarkup = ObjectsInput.doNothing;
+            opts.templateSelection = ObjectsInput.escapeSelectionMarkup;
 
             if ($j(this).data('typeahead-query-url')) {
                 opts.ajax={
@@ -47,6 +46,12 @@ var ObjectsInput = {
                 opts
             );
         });
+    },
+    doNothing: function (m) {
+        return m;
+    },
+    escapeSelectionMarkup: function (m) {
+        return jQuery.fn.select2.defaults.defaults.escapeMarkup(m.text);
     }
 }
 $j(document).ready(function () {

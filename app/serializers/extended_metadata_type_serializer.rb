@@ -1,5 +1,5 @@
 class ExtendedMetadataTypeSerializer < BaseSerializer
-  attributes :title, :supported_type
+  attributes :title, :supported_type,:enabled
   attribute :extended_metadata_attributes
 
   def extended_metadata_attributes

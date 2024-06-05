@@ -3,7 +3,7 @@ require 'seek/external_search'
 module SearchHelper
 
   def search_type_options
-    [['All', '']] | Seek::Util.searchable_types.collect { |c| [(c.name.underscore.humanize == 'Sop' ? t('sop') : c.name.underscore.humanize.pluralize), c.name.underscore.pluralize] }
+    [['All', '']] | Seek::Util.searchable_types.collect { |c| [(c.name.underscore.humanize == 'Sop' ? t('sop') : t(c.name.underscore).humanize.pluralize), c.name.underscore.pluralize] }
   end
 
   def external_search_tooltip_text

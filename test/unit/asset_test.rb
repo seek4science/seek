@@ -121,7 +121,7 @@ class AssetTest < ActiveSupport::TestCase
     assert FactoryBot.create(:sop).supports_spreadsheet_explore?
     assert FactoryBot.create(:file_template).supports_spreadsheet_explore?
     refute FactoryBot.create(:model).supports_spreadsheet_explore?
-    refute FactoryBot.create(:presentation).supports_spreadsheet_explore?
+    assert FactoryBot.create(:presentation).supports_spreadsheet_explore?
     refute FactoryBot.create(:placeholder).supports_spreadsheet_explore?
     refute FactoryBot.create(:workflow).supports_spreadsheet_explore?
     refute FactoryBot.create(:publication).supports_spreadsheet_explore?
