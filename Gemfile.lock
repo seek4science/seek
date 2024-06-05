@@ -1030,7 +1030,7 @@ DEPENDENCIES
   my_responds_to_parent!
   mysql2
   net-ftp
-  nokogiri (~> 1.16.5)
+  nokogiri (~> 1.16)
   omniauth (~> 2.1.0)
   omniauth-github
   omniauth-rails_csrf_protection
