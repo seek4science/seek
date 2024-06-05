@@ -22,6 +22,14 @@ module Scrapers
       @nfcore_pipelines.dig(repo.remote, 'topics') || []
     end
 
+    def latest_tag(repo)
+      all_tags(repo).last
+    end
+
+    def all_tags(repo)
+      (@nfcore_pipelines.dig(repo.remote, 'releases') || []).sort_by { |t| Date.parse(t['published_at']) }.map { |t| t['tag_name'] } - ['dev']
+    end
+
     def workflow_wizard(repo, tag)
       GitWorkflowWizard.new(workflow_class: WorkflowClass.find_by_key('nextflow'),
         params: {
