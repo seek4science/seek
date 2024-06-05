@@ -337,7 +337,7 @@ class SampleAttributeTest < ActiveSupport::TestCase
     assert_equal 'title',attribute.short_pid
 
     attribute.pid = 'Source:bacterial culture'
-    assert_equal 'Source:bacterial_culture',attribute.short_pid
+    assert_equal 'Source:bacterial-culture',attribute.short_pid
 
     attribute = FactoryBot.create(:sample_sample_attribute, sample_type: FactoryBot.create(:simple_sample_type))
     assert_equal '', attribute.short_pid
