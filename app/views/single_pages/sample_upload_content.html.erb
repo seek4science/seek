@@ -9,7 +9,7 @@
 <div id="upload-summary">
 
   <%# General information panel %>
-  <%= render partial: 'general_panel' %>
+  <%= render partial: 'general_panel', locals: {errors: } %>
 
   <%# New Samples panel %>
   <%= render partial: 'new_samples_panel' %>
@@ -21,7 +21,7 @@
   <%= render partial: 'duplicate_samples_panel' %>
 
   <%# Panel for Sample with wrong permissions %>
-  <%= render partial: 'unauthorized_samples_panel' %>
+  <%= render partial: 'unauthorized_samples_panel', locals: {errors: } %>
 
   <div id='check-excel-upload-result'></div>
   <% unless @can_upload %>
