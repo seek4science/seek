@@ -30,7 +30,7 @@
           <%= render partial: 'data_files/table_view', locals: { datafiles: @datafiles } %>
           <script>
             $j(document).ready(function () {
-              DataFiles.initTable($j('#accepted'));
+              Datafiles.initTable($j('#accepted'));
             });
           </script>
         </div>  
@@ -40,7 +40,7 @@
               <%= render partial: 'data_files/table_view', locals: { datafiles: @rejected_datafiles } %>
               <script>
                 $j(document).ready(function () {
-                  DataFiles.initTable($j('#rejected'));
+                  Datafiles.initTable($j('#rejected'));
                 });
               </script>
             </div>
