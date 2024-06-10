@@ -70,11 +70,10 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
     assert_difference('SampleControlledVocab.count') do
       assert_difference('SampleControlledVocabTerm.count', 2) do
         post :create, params: { sample_controlled_vocab: { title: 'fish', description: 'About fish',
-                                                 sample_controlled_vocab_terms_attributes: {
-                                                   '0' => { label: 'goldfish', _destroy: '0' },
-                                                   '1' => { label: 'guppy', _destroy: '0' }
-                                                 }
-                    } }
+                                                           sample_controlled_vocab_terms_attributes: {
+                                                             '0' => { label: 'goldfish', _destroy: '0' },
+                                                             '1' => { label: 'guppy', _destroy: '0' }
+                                                           } } }
       end
     end
     assert cv = assigns(:sample_controlled_vocab)
@@ -89,11 +88,10 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
     assert_no_difference('SampleControlledVocab.count') do
       assert_no_difference('SampleControlledVocabTerm.count') do
         post :create, params: { sample_controlled_vocab: { title: 'fish', description: 'About fish',
-                                                 sample_controlled_vocab_terms_attributes: {
-                                                   '0' => { label: 'goldfish', _destroy: '0' },
-                                                   '1' => { label: 'guppy', _destroy: '0' }
-                                                 }
-                    } }
+                                                           sample_controlled_vocab_terms_attributes: {
+                                                             '0' => { label: 'goldfish', _destroy: '0' },
+                                                             '1' => { label: 'guppy', _destroy: '0' }
+                                                           } } }
       end
     end
     assert_response :redirect
@@ -105,11 +103,10 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
     assert_no_difference('SampleControlledVocab.count') do
       assert_no_difference('SampleControlledVocabTerm.count', 2) do
         post :create, params: { sample_controlled_vocab: { title: 'fish', description: 'About fish',
-                                                 sample_controlled_vocab_terms_attributes: {
-                                                   '0' => { label: 'goldfish', _destroy: '0' },
-                                                   '1' => { label: 'guppy', _destroy: '0' }
-                                                 }
-                    } }
+                                                           sample_controlled_vocab_terms_attributes: {
+                                                             '0' => { label: 'goldfish', _destroy: '0' },
+                                                             '1' => { label: 'guppy', _destroy: '0' }
+                                                           } } }
       end
     end
     assert_response :redirect
@@ -123,14 +120,16 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
     assert_no_difference('SampleControlledVocab.count') do
       assert_no_difference('SampleControlledVocabTerm.count') do
         put :update, params: { id: cv, sample_controlled_vocab: { title: 'the apples', description: 'About apples',
-                                                        sample_controlled_vocab_terms_attributes: {
-                                                          '0' => { label: 'Granny Smith', _destroy: '0', id: term_ids[0] },
-                                                          '1' => { _destroy: '1', id: term_ids[1] },
-                                                          '2' => { label: 'Bramley', _destroy: '0', id: term_ids[2] },
-                                                          '3' => { label: 'Cox', _destroy: '0', id: term_ids[3] },
-                                                          '4' => { label: 'Jazz', _destroy: '0' }
-                                                        }
-                    } }
+                                                                  sample_controlled_vocab_terms_attributes: {
+                                                                    '0' => { label: 'Granny Smith', _destroy: '0',
+                                                                             id: term_ids[0] },
+                                                                    '1' => { _destroy: '1', id: term_ids[1] },
+                                                                    '2' => { label: 'Bramley', _destroy: '0',
+                                                                             id: term_ids[2] },
+                                                                    '3' => { label: 'Cox', _destroy: '0',
+                                                                             id: term_ids[3] },
+                                                                    '4' => { label: 'Jazz', _destroy: '0' }
+                                                                  } } }
       end
     end
     assert cv = assigns(:sample_controlled_vocab)
@@ -147,14 +146,16 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
     assert_no_difference('SampleControlledVocab.count') do
       assert_no_difference('SampleControlledVocabTerm.count') do
         put :update, params: { id: cv, sample_controlled_vocab: { title: 'the apples', description: 'About apples',
-                                                        sample_controlled_vocab_terms_attributes: {
-                                                          '0' => { label: 'Granny Smith', _destroy: '0', id: term_ids[0] },
-                                                          '1' => { _destroy: '1', id: term_ids[1] },
-                                                          '2' => { label: 'Bramley', _destroy: '0', id: term_ids[2] },
-                                                          '3' => { label: 'Cox', _destroy: '0', id: term_ids[3] },
-                                                          '4' => { label: 'Jazz', _destroy: '0' }
-                                                        }
-                   } }
+                                                                  sample_controlled_vocab_terms_attributes: {
+                                                                    '0' => { label: 'Granny Smith', _destroy: '0',
+                                                                             id: term_ids[0] },
+                                                                    '1' => { _destroy: '1', id: term_ids[1] },
+                                                                    '2' => { label: 'Bramley', _destroy: '0',
+                                                                             id: term_ids[2] },
+                                                                    '3' => { label: 'Cox', _destroy: '0',
+                                                                             id: term_ids[3] },
+                                                                    '4' => { label: 'Jazz', _destroy: '0' }
+                                                                  } } }
       end
     end
     assert_response :redirect
@@ -294,12 +295,12 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
     login_as(person)
     cv = FactoryBot.create(:ontology_sample_controlled_vocab)
     assert cv.ontology_based?
-    get :edit, params:{id: cv.id}
+    get :edit, params:{ id: cv.id }
     assert_response :success
 
     assert_select 'table#new-terms' do
       # 3 hidden fields for each field, and an extra one for the remove button default
-      assert_select 'tr.sample-cv-term input[type=hidden]', count:cv.sample_controlled_vocab_terms.length * 4
+      assert_select 'tr.sample-cv-term input[type=hidden]', count:cv.sample_controlled_vocab_terms.length * 5
       assert_select 'div.disabled-cv-field', count: cv.sample_controlled_vocab_terms.length * 3
     end
 
@@ -310,7 +311,7 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
     login_as(person)
     cv = FactoryBot.create(:apples_sample_controlled_vocab)
     refute cv.ontology_based?
-    get :edit, params:{id: cv.id}
+    get :edit, params:{ id: cv.id }
     assert_response :success
 
     assert_select 'table#new-terms' do
@@ -329,8 +330,8 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
     login_as(person)
     VCR.use_cassette('ols/fetch_obo_bad_term') do
       get :fetch_ols_terms_html, params: { source_ontology_id: 'go',
-                                      root_uris: 'http://purl.obolibrary.org/obo/banana',
-                                      include_root_term: '1' }
+                                           root_uris: 'http://purl.obolibrary.org/obo/banana',
+                                           include_root_term: '1' }
 
       assert_response :unprocessable_entity
       assert_equal '404 Not Found', response.body
@@ -348,18 +349,29 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
 
     assert_response :success
     assert_select 'tr.sample-cv-term', count: 4
-    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_0_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090395'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_0_iri[value=?]',
+'http://purl.obolibrary.org/obo/GO_0090395'
     assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_0_parent_iri:not([value])'
-    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_0_label[value=?]','plant cell papilla'
-    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_1_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090397'
-    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_1_parent_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090395'
-    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_1_label[value=?]','stigma papilla'
-    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_2_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090396'
-    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_2_parent_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090395'
-    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_2_label[value=?]','leaf papilla'
-    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_3_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090705'
-    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_3_parent_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090395'
-    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_3_label[value=?]','trichome papilla'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_0_label[value=?]',
+'plant cell papilla'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_1_iri[value=?]',
+'http://purl.obolibrary.org/obo/GO_0090397'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_1_parent_iri[value=?]',
+'http://purl.obolibrary.org/obo/GO_0090395'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_1_label[value=?]',
+'stigma papilla'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_2_iri[value=?]',
+'http://purl.obolibrary.org/obo/GO_0090396'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_2_parent_iri[value=?]',
+'http://purl.obolibrary.org/obo/GO_0090395'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_2_label[value=?]',
+'leaf papilla'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_3_iri[value=?]',
+'http://purl.obolibrary.org/obo/GO_0090705'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_3_parent_iri[value=?]',
+'http://purl.obolibrary.org/obo/GO_0090395'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_3_label[value=?]',
+'trichome papilla'
   end
 
   test 'create with root uris' do
@@ -369,10 +381,11 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
         post :create, params: { sample_controlled_vocab: { title: 'plant_cell_papilla and haustorium', description: 'multiple root uris',
                                                            ols_root_term_uris: 'http://purl.obolibrary.org/obo/GO_0090395,   http://purl.obolibrary.org/obo/GO_0085035',
                                                            sample_controlled_vocab_terms_attributes: {
-                                                             '0' => { label: 'plant cell papilla', iri:'http://purl.obolibrary.org/obo/GO_0090395', parent_iri:'', _destroy: '0' },
-                                                             '1' => { label: 'haustorium', iri:'http://purl.obolibrary.org/obo/GO_0085035', parent_iri:'', _destroy: '0' }
-                                                           }
-        } }
+                                                             '0' => { label: 'plant cell papilla',
+                                                                      iri: 'http://purl.obolibrary.org/obo/GO_0090395', parent_iri:'', _destroy: '0' },
+                                                             '1' => { label: 'haustorium',
+                                                                      iri: 'http://purl.obolibrary.org/obo/GO_0085035', parent_iri:'', _destroy: '0' }
+                                                           } } }
       end
     end
     assert cv = assigns(:sample_controlled_vocab)
@@ -381,8 +394,10 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
     assert_equal 'multiple root uris', cv.description
     assert_equal 2, cv.sample_controlled_vocab_terms.count
     assert_equal ['plant cell papilla','haustorium'], cv.labels
-    assert_equal ['http://purl.obolibrary.org/obo/GO_0090395','http://purl.obolibrary.org/obo/GO_0085035'], cv.sample_controlled_vocab_terms.collect(&:iri)
-    assert_equal 'http://purl.obolibrary.org/obo/GO_0090395, http://purl.obolibrary.org/obo/GO_0085035', cv.ols_root_term_uris
+    assert_equal ['http://purl.obolibrary.org/obo/GO_0090395','http://purl.obolibrary.org/obo/GO_0085035'],
+cv.sample_controlled_vocab_terms.collect(&:iri)
+    assert_equal 'http://purl.obolibrary.org/obo/GO_0090395, http://purl.obolibrary.org/obo/GO_0085035',
+cv.ols_root_term_uris
   end
 
   test 'fetch ols terms as HTML with multiple root uris and root term included' do
@@ -398,25 +413,41 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
 
     assert_response :success
     assert_select 'tr.sample-cv-term', count: 6
-    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_0_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090395'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_0_iri[value=?]',
+'http://purl.obolibrary.org/obo/GO_0090395'
     assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_0_parent_iri:not([value])'
-    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_0_label[value=?]','plant cell papilla'
-    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_1_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090397'
-    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_1_parent_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090395'
-    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_1_label[value=?]','stigma papilla'
-    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_2_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090396'
-    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_2_parent_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090395'
-    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_2_label[value=?]','leaf papilla'
-    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_3_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090705'
-    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_3_parent_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090395'
-    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_3_label[value=?]','trichome papilla'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_0_label[value=?]',
+'plant cell papilla'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_1_iri[value=?]',
+'http://purl.obolibrary.org/obo/GO_0090397'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_1_parent_iri[value=?]',
+'http://purl.obolibrary.org/obo/GO_0090395'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_1_label[value=?]',
+'stigma papilla'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_2_iri[value=?]',
+'http://purl.obolibrary.org/obo/GO_0090396'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_2_parent_iri[value=?]',
+'http://purl.obolibrary.org/obo/GO_0090395'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_2_label[value=?]',
+'leaf papilla'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_3_iri[value=?]',
+'http://purl.obolibrary.org/obo/GO_0090705'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_3_parent_iri[value=?]',
+'http://purl.obolibrary.org/obo/GO_0090395'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_3_label[value=?]',
+'trichome papilla'
 
-    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_4_iri[value=?]','http://purl.obolibrary.org/obo/GO_0085035'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_4_iri[value=?]',
+'http://purl.obolibrary.org/obo/GO_0085035'
     assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_4_parent_iri:not([value])'
-    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_4_label[value=?]','haustorium'
-    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_5_iri[value=?]','http://purl.obolibrary.org/obo/GO_0085041'
-    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_5_parent_iri[value=?]','http://purl.obolibrary.org/obo/GO_0085035'
-    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_5_label[value=?]','arbuscule'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_4_label[value=?]',
+'haustorium'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_5_iri[value=?]',
+'http://purl.obolibrary.org/obo/GO_0085041'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_5_parent_iri[value=?]',
+'http://purl.obolibrary.org/obo/GO_0085035'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_5_label[value=?]',
+'arbuscule'
 
   end
 
@@ -434,19 +465,31 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
     assert_response :success
     assert_select 'tr.sample-cv-term', count: 4
 
-    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_0_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090397'
-    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_0_parent_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090395'
-    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_0_label[value=?]','stigma papilla'
-    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_1_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090396'
-    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_1_parent_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090395'
-    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_1_label[value=?]','leaf papilla'
-    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_2_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090705'
-    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_2_parent_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090395'
-    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_2_label[value=?]','trichome papilla'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_0_iri[value=?]',
+'http://purl.obolibrary.org/obo/GO_0090397'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_0_parent_iri[value=?]',
+'http://purl.obolibrary.org/obo/GO_0090395'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_0_label[value=?]',
+'stigma papilla'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_1_iri[value=?]',
+'http://purl.obolibrary.org/obo/GO_0090396'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_1_parent_iri[value=?]',
+'http://purl.obolibrary.org/obo/GO_0090395'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_1_label[value=?]',
+'leaf papilla'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_2_iri[value=?]',
+'http://purl.obolibrary.org/obo/GO_0090705'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_2_parent_iri[value=?]',
+'http://purl.obolibrary.org/obo/GO_0090395'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_2_label[value=?]',
+'trichome papilla'
 
-    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_3_iri[value=?]','http://purl.obolibrary.org/obo/GO_0085041'
-    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_3_parent_iri[value=?]','http://purl.obolibrary.org/obo/GO_0085035'
-    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_3_label[value=?]','arbuscule'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_3_iri[value=?]',
+'http://purl.obolibrary.org/obo/GO_0085041'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_3_parent_iri[value=?]',
+'http://purl.obolibrary.org/obo/GO_0085035'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_3_label[value=?]',
+'arbuscule'
 
   end
 
@@ -471,19 +514,28 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
     login_as(person)
     VCR.use_cassette('ols/fetch_obo_plant_cell_papilla') do
       get :fetch_ols_terms_html, params: { source_ontology_id: 'go',
-                                      root_uris: 'http://purl.obolibrary.org/obo/GO_0090395' }
+                                           root_uris: 'http://purl.obolibrary.org/obo/GO_0090395' }
     end
     assert_response :success
     assert_select 'tr.sample-cv-term', count: 3
-    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_0_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090397'
-    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_0_parent_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090395'
-    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_0_label[value=?]','stigma papilla'
-    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_1_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090396'
-    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_1_parent_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090395'
-    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_1_label[value=?]','leaf papilla'
-    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_2_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090705'
-    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_2_parent_iri[value=?]','http://purl.obolibrary.org/obo/GO_0090395'
-    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_2_label[value=?]','trichome papilla'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_0_iri[value=?]',
+'http://purl.obolibrary.org/obo/GO_0090397'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_0_parent_iri[value=?]',
+'http://purl.obolibrary.org/obo/GO_0090395'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_0_label[value=?]',
+'stigma papilla'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_1_iri[value=?]',
+'http://purl.obolibrary.org/obo/GO_0090396'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_1_parent_iri[value=?]',
+'http://purl.obolibrary.org/obo/GO_0090395'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_1_label[value=?]',
+'leaf papilla'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_2_iri[value=?]',
+'http://purl.obolibrary.org/obo/GO_0090705'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_2_parent_iri[value=?]',
+'http://purl.obolibrary.org/obo/GO_0090395'
+    assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_2_label[value=?]',
+'trichome papilla'
   end
 
   test 'can access typeahead with samples disabled' do
@@ -497,5 +549,30 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
       assert_equal 1, res.length
       assert_equal 'Sample collections', res.first['text']
     end
+  end
+
+  test 'should not duplicate terms when updating' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    cv = FactoryBot.create(:apples_sample_controlled_vocab)
+    term_ids = cv.sample_controlled_vocab_terms.map(&:id)
+
+    assert_no_difference('SampleControlledVocabTerm.count') do
+      put :update, params: { id: cv, sample_controlled_vocab: { title: 'the apples', description: 'About apples',
+                                                                sample_controlled_vocab_terms_attributes: {
+                                                                  '0' => { label: 'Granny Smith', _destroy: '0',
+                                                                           id: term_ids[0] },
+                                                                  '1' => { label: 'Red Delicious', _destroy: '0',
+                                                                           id: term_ids[1] },
+                                                                  '2' => { label: 'Bramley', _destroy: '0',
+                                                                           id: term_ids[2] },
+                                                                  '3' => { label: 'Cox', _destroy: '0',
+                                                                           id: term_ids[3] },
+                                                                  '4' => { label: 'Granny Smith', _destroy: '0' }
+                                                                } } }
+    end
+    assert_response :unprocessable_entity
+    assert_template :edit
+    assert flash[:error] = 'Validation failed: Labels have already been taken'
   end
 end

@@ -24,14 +24,18 @@ module Seek
 
           if samples.any?
             Sample.transaction do
+              #copy policy and trigger callbacks
               samples.each do |sample|
+                policy = @data_file.policy.deep_copy
+                policy.save(validate: false)
+                sample.policy = policy
                 sample.run_callbacks(:save) { false }
                 sample.run_callbacks(:create) { false }
               end
 
               last_id = Sample.last.try(:id) || 0
               sample_type = samples.first.sample_type
-	      project_ids = samples.first.project_ids
+	            project_ids = samples.first.project_ids
               Sample.import(samples, validate: false, batch_size: 2000)
               SampleTypeUpdateJob.new(sample_type, false).queue_job
 

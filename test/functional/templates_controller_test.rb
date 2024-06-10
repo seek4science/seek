@@ -623,6 +623,33 @@ class TemplatesControllerTest < ActionController::TestCase
     end
   end
 
+  test 'Should not see add new attribute button at template creation time' do
+    get :new
+    assert_response :success
+    assert_select 'a#add-attribute.hidden', text: /Add new attribute/, count: 1
+  end
+
+  test 'Should see add new attribute button at template edit time' do
+    my_template = FactoryBot.create(:isa_source_template, project_ids: @project_ids, contributor: @person)
+    get :edit, params: { id: my_template.id }
+    assert_response :success
+    assert_select 'a#add-attribute.hidden', text: /Add new attribute/, count: 0
+  end
+
+  test 'Should only be able link a new template to projects the current user is project admin of' do
+    project = FactoryBot.create(:project)
+    project_admin = FactoryBot.create(:project_administrator, project: project)
+    login_as(project_admin.user)
+    get :new
+    assert_response :success
+
+    # The project selector is a vue-component, which is not translated to html in the test environment
+    # Instead we check that the json data is present in 'project-selector-possibilities-json'
+    assert_select 'script#project-selector-possibilities-json', count: 1
+    options = "[{\"id\":#{project.id},\"text\":\"#{project.title}\"}]"
+    assert_select 'script#project-selector-possibilities-json', text: /#{options}/, count: 1
+  end
+
   def create_template_from_parent_template(parent_template, person= @person, linked_sample_type= nil)
     child_template_attributes = parent_template.template_attributes.map do |ta|
       FactoryBot.create(:template_attribute, parent_attribute_id: ta.id, title: ta.title, isa_tag_id: ta.isa_tag_id, sample_attribute_type: ta.sample_attribute_type, is_title: ta.is_title, required: ta.required, sample_controlled_vocab: ta.sample_controlled_vocab, pos: ta.pos)
