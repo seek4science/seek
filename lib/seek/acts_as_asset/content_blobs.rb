@@ -10,11 +10,6 @@ module Seek
       end
 
       module InstanceMethods
-
-        def contains_downloadable_items?
-          all_content_blobs.compact.any?(&:is_downloadable?)
-        end
-
         def all_content_blobs
           if self.respond_to?(:content_blobs)
             content_blobs

@@ -6,6 +6,7 @@ class SampleDataExtractionJobTest < ActiveSupport::TestCase
     create_sample_attribute_type
     @person = FactoryBot.create(:project_administrator)
     User.current_user = @person.user
+    @project_id = @person.projects.first.id
 
     @data_file = FactoryBot.create :data_file, content_blob: FactoryBot.create(:sample_type_populated_template_content_blob),
                          policy: FactoryBot.create(:private_policy), contributor: @person
@@ -20,6 +21,22 @@ class SampleDataExtractionJobTest < ActiveSupport::TestCase
     @sample_type.sample_attributes.first.sample_attribute_type = FactoryBot.create(:full_name_sample_attribute_type)
     @sample_type.sample_attributes[1].sample_attribute_type = FactoryBot.create(:datetime_sample_attribute_type)
     @sample_type.save!
+  end
+
+  test 'extracts samples' do
+    @data_file.policy = FactoryBot.create(:public_policy)
+    disable_authorization_checks{@data_file.save!}
+    job = SampleDataExtractionJob.new
+    assert_no_difference('Sample.count') do
+      job.perform(@data_file, @sample_type)
+    end
+    samples = job.extractor.fetch
+    assert_equal 4, samples.count
+    samples.each do |sample|
+      assert_equal @sample_type, sample.sample_type
+      assert_equal [@project_id], sample.project_ids
+      assert_equal @person, sample.contributor
+    end
   end
 
   test 'records exception' do

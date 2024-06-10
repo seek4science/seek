@@ -71,13 +71,13 @@ Kernel.class_eval do
   end
 
   def with_config_value(config, value)
-    Seek::Util.clear_cached if config.to_s.ends_with?('enabled')
+    Seek::Util.clear_cached
     oldval = Seek::Config.send(config)
     Seek::Config.send("#{config}=", value)
     yield
   ensure
     Seek::Config.send("#{config}=", oldval)
-    Seek::Util.clear_cached if config.to_s.ends_with?('enabled')
+    Seek::Util.clear_cached
   end
 
   def with_config_values(settings)

@@ -11,7 +11,7 @@ class SampleAttribute < ApplicationRecord
 
   auto_strip_attributes :pid
   validates :sample_type, presence: true
-  validates :pid, format: { with: URI::regexp, allow_blank: true, allow_nil: true, message: 'not a valid URI' }
+  validates :pid, format: { with: URI::ABS_URI, allow_blank: true, allow_nil: true, message: 'not a valid URI' }
   validate :validate_against_editing_constraints, if: -> { sample_type.present? }
 
   before_save :store_accessor_name
@@ -64,7 +64,14 @@ class SampleAttribute < ApplicationRecord
 
   def short_pid
     return '' unless pid.present?
-    URI.parse(pid).fragment || pid.gsub(/.*\//,'') || pid
+    begin
+      URI.parse(pid).fragment || pid.gsub(/.*\//,'') || pid
+    rescue URI::InvalidURIError
+      # likely a space that managed to pass through earlier uri validation
+      fixed_pid = pid.gsub(' ','-')
+      URI.parse(fixed_pid).fragment || fixed_pid.gsub(/.*\//,'') || fixed_pid
+    end
+
   end
 
   def linked_extended_metadata_type

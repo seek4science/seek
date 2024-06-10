@@ -78,12 +78,12 @@ class AssetTest < ActiveSupport::TestCase
     assert df.latest_version.contains_downloadable_items?
 
     df = FactoryBot.create :data_file, content_blob: FactoryBot.create(:content_blob, url: 'http://webpage.com', external_link: true)
-    assert !df.contains_downloadable_items?
-    assert !df.latest_version.contains_downloadable_items?
+    refute df.contains_downloadable_items?
+    refute df.latest_version.contains_downloadable_items?
 
     model = FactoryBot.create :model_with_urls
-    assert !model.contains_downloadable_items?
-    assert !model.latest_version.contains_downloadable_items?
+    refute model.contains_downloadable_items?
+    refute model.latest_version.contains_downloadable_items?
 
     model = FactoryBot.create :teusink_model
     assert model.contains_downloadable_items?
@@ -94,10 +94,10 @@ class AssetTest < ActiveSupport::TestCase
     assert model.latest_version.contains_downloadable_items?
 
     df = DataFile.new
-    assert !df.contains_downloadable_items?
+    refute df.contains_downloadable_items?
 
     model = Model.new
-    assert !model.contains_downloadable_items?
+    refute model.contains_downloadable_items?
 
     # test for versions
     model = FactoryBot.create :teusink_model
@@ -112,7 +112,14 @@ class AssetTest < ActiveSupport::TestCase
 
     assert_equal(2, model.versions.count)
     assert model.find_version(1).contains_downloadable_items?
-    assert !model.find_version(2).contains_downloadable_items?
+    refute model.find_version(2).contains_downloadable_items?
+
+    workflow = FactoryBot.create(:nfcore_git_workflow)
+    assert workflow.contains_downloadable_items?
+    assert workflow.git_version.contains_downloadable_items?
+
+    workflow = Workflow.new
+    refute workflow.contains_downloadable_items?
   end
 
   test 'supports_spreadsheet_explore?' do
