@@ -5,6 +5,7 @@ module Scrapers
 
     def list_repositories
       repos = JSON.parse(RestClient.get('https://nf-co.re/pipelines.json'))['remote_workflows']
+      repos.reject! { |r| r['archived'] || r['disabled'] }
       @nfcore_pipelines = {} # Store repo metadata from pipelines.json to fetch main branch name and topics later
       repos.each do |r|
         r['clone_url'] = "https://github.com/#{r['full_name']}.git"
