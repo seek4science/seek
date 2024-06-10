@@ -33,7 +33,7 @@
   <% if can_download_asset?(asset, params[:code]) -%>
     <% if asset.is_a?(Workflow) %>
       <% if display_asset.is_git_versioned? || asset.content_blob&.file_exists? %>
-        <%= button_link_to('Download RO Crate', 'ro_crate_file', ro_crate_workflow_path(asset, version: version, code: params[:code]),
+        <%= button_link_to('Download RO-Crate', 'ro_crate_file', ro_crate_workflow_path(asset, version: version, code: params[:code]),
                            'data-tooltip' => tooltip("The Workflow RO-Crate is a package containing the workflow definition, its metadata and supporting resources like test data")) %>
         <% if asset.can_run? %>
           <%= button_link_to("Run on Galaxy", 'run_galaxy', display_asset.run_url) %>

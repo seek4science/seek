@@ -1,15 +1,17 @@
 <% unless @unauthorized_samples.nil? or @unauthorized_samples.compact.none? %>
   <% @can_upload = false %>
   <% errors.append("There are unauthorized samples present in the spreadsheet.") %>
-  <%= folding_panel("Unauthorized Samples", false, :id => "unauthorized-samples-panel", :body_options => {:id => "unauthorized-samples-panel-content"},
-                :help_text => "Sample the current user does not have permission to edit them.") do %>
+  <%= folding_panel("Unauthorized Samples", false, :id => "unauthorized-samples-panel", :body_options => { :id => "unauthorized-samples-panel-content" },
+                    :help_text => "Sample the current user does not have permission to edit them.") do %>
     <div>
       <p>
-        <b>You don't have permission to edit the samples listed below. Please contact the submitter of these samples or revert the changes in the spreadsheet to its original values.</b>
+        <b>You don't have permission to edit the samples listed below. Please contact the submitter of these samples or
+          revert the changes in the spreadsheet to its original values.</b>
       </p>
     </div>
     <div class="table-responsive">
       <table id="unauthorized-samples-table" class="table">
+        <thead>
         <tr>
           <% for key in @unauthorized_samples[0].keys %>
             <% unless key == 'uuid' %>
@@ -17,6 +19,8 @@
             <% end %>
           <% end %>
         </tr>
+        </thead>
+        <tbody>
         <% for unauthorized_sample in @unauthorized_samples %>
           <tr id='<%= "unauthorized-sample-#{unauthorized_sample['id']}" %>' class="">
             <% unauthorized_sample.map do |key, val| %>
@@ -24,7 +28,7 @@
                 <% if @multiple_input_fields.include?(key) %>
                   <td>
                     <% val.each do |sub_sample| %>
-                      <span class="badge", title='ID: <%= sub_sample['id'] %>'><%= sub_sample['title'] %></span>
+                      <span class="badge" , title='ID: <%= sub_sample['id'] %>'><%= sub_sample['title'] %></span>
                     <% end %>
                   </td>
                 <% else %>
@@ -34,6 +38,7 @@
             <% end %>
           </tr>
         <% end %>
+        </tbody>
       </table>
     </div>
   <% end %>

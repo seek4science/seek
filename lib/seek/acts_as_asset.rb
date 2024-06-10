@@ -23,6 +23,10 @@ module Seek
       is_asset? && is_downloadable?
     end
 
+    def contains_downloadable_items?
+      respond_to?(:all_content_blobs) && all_content_blobs.compact.any?(&:is_downloadable?) || is_git_versioned?
+    end
+
     def have_misc_links?
       self.class.have_misc_links?
     end
