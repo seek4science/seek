@@ -140,7 +140,7 @@ class DataFile < ApplicationRecord
     zip_origin.nil? ? unzipped_files : [zip_origin] + unzipped_files
   end
 
-  def unzip(overwrite, tmp_dir, confirm=false)
+  def unzip(tmp_dir)
     unzip_folder = Zip::File.open(content_blob.filepath)
     FileUtils.rm_r(tmp_dir) if File.exist?(tmp_dir)
     Dir.mkdir(tmp_dir)

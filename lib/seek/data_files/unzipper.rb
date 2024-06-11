@@ -11,8 +11,8 @@ module Seek
         end
   
         # Unzip datafiles and store in the filesystem temporarily
-        def unzip(overwrite = false)
-          self.class.decode(cache { self.class.encode(@data_file.unzip(overwrite, tmp_file_path, confirm=false)) })
+        def unzip
+          self.class.decode(cache { self.class.encode(@data_file.unzip(tmp_file_path)) })
         end
   
         # Persist the extracted datafiles to the database
