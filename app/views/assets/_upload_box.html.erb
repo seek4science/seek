@@ -8,7 +8,7 @@
 <%= panel(title, id: id) do %>
   <div>
     <p>
-      You can register a <%= asset_name -%> by either directly uploading a file,
+      You can register a <%= asset_name -%> by either directly uploading a file<%= ' or zipped folder' if asset_name == 'Data file' %>,
       or registering a URL to a remote file or web page.
     </p>
   </div>
