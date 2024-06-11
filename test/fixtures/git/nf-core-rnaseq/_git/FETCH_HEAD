@@ -1,6 +1,1 @@
-88562f8745302ec159679369326c6db5e4bd6e3b	not-for-merge	branch 'TEMPLATE' of https://github.com/nf-core/rnaseq.git
-825345ea0c17b3962066a181fc5b5e405bfee5aa	not-for-merge	branch 'dev' of https://github.com/nf-core/rnaseq.git
-3643a94411b65f42bce5357c5015603099556ad9	not-for-merge	branch 'master' of https://github.com/nf-core/rnaseq.git
-ccfb140d0f21d144e65498edc098f89c0d66d961	not-for-merge	branch 'nf-core-template-merge-1.13.2' of https://github.com/nf-core/rnaseq.git
-88562f8745302ec159679369326c6db5e4bd6e3b	not-for-merge	branch 'nf-core-template-merge-1.13.3' of https://github.com/nf-core/rnaseq.git
-5681aa9012608ed67c67073ccee07b27586ee36a	not-for-merge	branch 'pytest-workflow' of https://github.com/nf-core/rnaseq.git
+b89fac32650aacc86fcda9ee77e00612a1d77066		branch 'master' of https://github.com/nf-core/rnaseq
