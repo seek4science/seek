@@ -2,10 +2,10 @@ class UnzipDataFileJob < TaskJob
     queue_as QueueNames::DATAFILES
   
     attr_reader :unzipper
-    def perform(data_file, overwrite: false)
+    def perform(data_file)
       @unzipper = Seek::DataFiles::Unzipper.new(data_file)
       @unzipper.clear
-      @unzipper.unzip(overwrite)
+      @unzipper.unzip
     end
   
     def task
