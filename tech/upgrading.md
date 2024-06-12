@@ -132,13 +132,17 @@ SEEK requires some cron jobs for periodic background jobs to run. To update thes
  
 ### Final notes
 
-If you encounter any problems with stringio, particularly when running with Passenger, just manually installing the gem
-with the explicit version as follows should fix it
+If you encounter any problems with loading gems (likely _stringio_ or _strscan_) when running with Passenger, add the following to your Apache configuration:
 
-     gem install stringio --version 3.0.1.1
+     PassengerPreloadBundler on
 
-Setting [PassengerPreloadBundler](https://www.phusionpassenger.com/docs/references/config_reference/apache/#passengerpreloadbundler) to _on_ may also fix the 
-problem. 
+more details at [PassengerPreloadBundler](https://www.phusionpassenger.com/docs/references/config_reference/apache/#passengerpreloadbundler)
+
+If using Nginx, the setting is 
+
+     passenger_preload_bundler on;
+
+more details at [passenger_preload_bundler](https://www.phusionpassenger.com/docs/references/config_reference/nginx/#passenger_preload_bundler)
 
 
 ---
