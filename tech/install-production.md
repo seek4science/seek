@@ -121,7 +121,8 @@ ServerName appropriately):
     <VirtualHost *:80>
       ServerName www.yourhost.com
 
-      PassengerRuby /usr/local/rvm/rubies/seek/bin/ruby
+      PassengerRuby /usr/share/rvm/gems/ruby-3.1.4/wrappers/ruby
+      PassengerPreloadBundler on  
 
       DocumentRoot /srv/rails/seek/public
        <Directory /srv/rails/seek/public>
@@ -140,7 +141,7 @@ ServerName appropriately):
        </LocationMatch>
     </VirtualHost>
 
-(Notice we are referencing our "seek" alias in the `PassengerRuby` directive.)
+(The path to the ruby in _PassengerRuby_ directive may different, and the version of ruby to use can be found in the `.ruby-version` file)
 
 The LocationMatch block tells Apache to serve up the assets (images, CSS,
 Javascript) with a long expiry time, leading to better performance since these
