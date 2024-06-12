@@ -1116,6 +1116,31 @@ class SampleTest < ActiveSupport::TestCase
 
   end
 
+  test 'sop sample' do
+    project = FactoryBot.create(:project)
+    sample_type = FactoryBot.create(:sop_sample_type, project_ids:[project.id])
+    sample = Sample.new(sample_type: sample_type, project_ids: [project.id])
+    sop = FactoryBot.create(:sop)
+
+    sample.update(data:{'sop':sop.id})
+    assert sample.valid?
+    sample.save!
+
+    sample.reload
+    expected = {id:sop.id,type:'Sop',title:sop.title}.with_indifferent_access
+    assert_equal expected, sample.get_attribute_value('sop')
+
+    sample = Sample.new(sample_type: sample_type, project_ids: [project.id])
+    sample.set_attribute_value('sop',sop.id)
+    assert sample.valid?
+    sample.save!
+
+    sample.reload
+    expected = {'id':sop.id,type:'Sop',title:sop.title}.with_indifferent_access
+    assert_equal expected, sample.get_attribute_value('sop')
+
+  end
+
   test 'multi linked sample validation' do
     patient = FactoryBot.create(:patient_sample, policy:FactoryBot.create(:public_policy))
     patient2 = FactoryBot.create(:patient_sample, sample_type:patient.sample_type, policy:FactoryBot.create(:public_policy) )

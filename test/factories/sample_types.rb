@@ -43,6 +43,13 @@ FactoryBot.define do
     end
   end
 
+  factory(:sop_sample_type, parent: :sample_type) do
+    title { 'DataFile type' }
+    after(:build) do |type|
+      type.sample_attributes << FactoryBot.build(:sop_sample_attribute, title:'sop', is_title: true, sample_type:type)
+    end
+  end
+
   factory(:optional_strain_sample_type, parent: :strain_sample_type) do
     after(:build) do |type|
       type.sample_attributes = [FactoryBot.build(:sample_attribute, template_column_index: 1, title: 'name', sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), required: true, is_title: true, sample_type: type),
