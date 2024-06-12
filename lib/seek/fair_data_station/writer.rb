@@ -4,44 +4,21 @@ module Seek
       include Singleton
 
       def construct_isa(datastation_inv, contributor, projects, policy)
-        inv_attributes = datastation_inv.seek_attributes.merge({ contributor: contributor, projects: projects,
-                                                                 policy: policy.deep_copy })
-        investigation = ::Investigation.new(inv_attributes)
-        populate_extended_metadata(investigation, datastation_inv)
+        investigation = build_investigation(datastation_inv, contributor, policy, projects)
 
         datastation_inv.studies.each do |datastation_study|
-          study_attributes = datastation_study.seek_attributes.merge({ contributor: contributor,
-                                                                       investigation: investigation, policy: policy.deep_copy })
-          study = investigation.studies.build(study_attributes)
-          populate_extended_metadata(study, datastation_study)
+          study = build_study(datastation_study, contributor, policy, investigation)
           datastation_study.observation_units.each do |datastation_observation_unit|
-            observation_unit_attributes = datastation_observation_unit.seek_attributes.merge({ contributor: contributor,
-                                                                                               study: study, projects: projects, policy: policy.deep_copy })
-            observation_unit = study.observation_units.build(observation_unit_attributes)
-            datastation_observation_unit.datasets.each do |datastation_dataset|
-              df = build_data_file(contributor, datastation_dataset, projects, policy)
-              observation_unit.observation_unit_assets.build(asset: df)
-            end
-            populate_extended_metadata(observation_unit, datastation_observation_unit)
+            observation_unit = build_observation_unit(datastation_observation_unit, contributor, policy, projects, study)
             datastation_observation_unit.samples.each do |datastation_sample|
-              sample = ::Sample.new(contributor: contributor, projects: projects, policy: policy.deep_copy)
-              populate_sample(sample, datastation_sample)
+              sample = build_sample(datastation_sample, contributor, policy, projects)
               if sample.valid?
                 observation_unit.samples << sample
               else
                 Rails.logger.error("Invalid sample during fair data station import #{sample.errors.full_messages.inspect}")
               end
               datastation_sample.assays.each do |datastation_assay|
-                samples = []
-                samples << sample if sample.valid?
-                assay_attributes = datastation_assay.seek_attributes.merge({ contributor: contributor, study: study,
-                                                                             assay_class: AssayClass.experimental, samples: samples, policy: policy.deep_copy })
-                assay = study.assays.build(assay_attributes)
-                populate_extended_metadata(assay, datastation_assay)
-                datastation_assay.datasets.each do |datastation_dataset|
-                  df = build_data_file(contributor, datastation_dataset, projects, policy)
-                  assay.assay_assets.build(asset: df)
-                end
+                build_assay(datastation_assay, contributor, policy, projects, sample, study)
               end
             end
           end
@@ -51,6 +28,54 @@ module Seek
       end
 
       private
+
+      def build_assay(datastation_assay, contributor, policy, projects, sample, study)
+        samples = []
+        samples << sample if sample.valid?
+        assay_attributes = datastation_assay.seek_attributes.merge({ contributor: contributor, study: study,
+                                                                     assay_class: AssayClass.experimental, samples: samples, policy: policy.deep_copy })
+        assay = study.assays.build(assay_attributes)
+        populate_extended_metadata(assay, datastation_assay)
+        datastation_assay.datasets.each do |datastation_dataset|
+          df = build_data_file(contributor, datastation_dataset, projects, policy)
+          assay.assay_assets.build(asset: df)
+        end
+        assay
+      end
+
+      def build_sample(datastation_sample, contributor, policy, projects)
+        sample = ::Sample.new(contributor: contributor, projects: projects, policy: policy.deep_copy)
+        populate_sample(sample, datastation_sample)
+        sample
+      end
+
+      def build_observation_unit(datastation_observation_unit, contributor, policy, projects, study)
+        observation_unit_attributes = datastation_observation_unit.seek_attributes.merge({ contributor: contributor,
+                                                                                           study: study, projects: projects, policy: policy.deep_copy })
+        observation_unit = study.observation_units.build(observation_unit_attributes)
+        datastation_observation_unit.datasets.each do |datastation_dataset|
+          df = build_data_file(contributor, datastation_dataset, projects, policy)
+          observation_unit.observation_unit_assets.build(asset: df)
+        end
+        populate_extended_metadata(observation_unit, datastation_observation_unit)
+        observation_unit
+      end
+
+      def build_study(datastation_study, contributor, policy, investigation)
+        study_attributes = datastation_study.seek_attributes.merge({ contributor: contributor,
+                                                                     investigation: investigation, policy: policy.deep_copy })
+        study = investigation.studies.build(study_attributes)
+        populate_extended_metadata(study, datastation_study)
+        study
+      end
+
+      def build_investigation(datastation_inv, contributor, policy, projects)
+        inv_attributes = datastation_inv.seek_attributes.merge({ contributor: contributor, projects: projects,
+                                                                 policy: policy.deep_copy })
+        investigation = ::Investigation.new(inv_attributes)
+        populate_extended_metadata(investigation, datastation_inv)
+        investigation
+      end
 
       def populate_extended_metadata(seek_entity, datastation_entity)
         if emt = detect_extended_metadata(seek_entity, datastation_entity)
