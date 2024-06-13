@@ -134,6 +134,8 @@ FactoryBot.define do
       type.sample_attributes << FactoryBot.build(:sample_attribute, title: 'weight', sample_attribute_type: FactoryBot.create(:float_sample_attribute_type), required: false, sample_type: type)
       type.sample_attributes << FactoryBot.build(:sample_attribute, title: 'age', sample_attribute_type: FactoryBot.create(:integer_sample_attribute_type), required: false, sample_type: type)
       type.sample_attributes << FactoryBot.build(:sample_attribute, title: 'bool', sample_attribute_type: FactoryBot.create(:boolean_sample_attribute_type), required: false, sample_type: type)
+      type.sample_attributes << FactoryBot.build(:sample_attribute, title: 'data file', sample_attribute_type: FactoryBot.create(:data_file_sample_attribute_type), required: false, sample_type: type)
+      type.sample_attributes << FactoryBot.build(:sample_attribute, title: 'sop', sample_attribute_type: FactoryBot.create(:sop_sample_attribute_type), required: false, sample_type: type)
     end
     after(:create) do |type|
       type.annotate_with(['tag1', 'tag2'], 'sample_type_tag', type.contributor)

@@ -837,6 +837,7 @@ sampleAttributeMap:
       - type: 'null'
       - type: number
       - type: boolean
+      - type: hash
 extendedMetadataAttributeMap:
   type: object
   additionalProperties: true
@@ -1055,6 +1056,7 @@ sampleAttributeBaseType:
     - CV
     - CVList
     - SeekDataFile
+    - SeekSop
     - SeekSampleMulti
 sampleAttributeTypeType:
   type: string

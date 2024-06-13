@@ -21,6 +21,16 @@ FactoryBot.define do
     association :sample_attribute_type, factory: :datetime_sample_attribute_type
   end
 
+  factory(:data_file_extended_metadata_attribute,class:ExtendedMetadataAttribute) do
+    title { 'data file' }
+    association :sample_attribute_type, factory: :data_file_sample_attribute_type
+  end
+
+  factory(:sop_extended_metadata_attribute,class:ExtendedMetadataAttribute) do
+    title { 'sop' }
+    association :sample_attribute_type, factory: :sop_sample_attribute_type
+  end
+
   factory(:min_extended_metadata_type,class: ExtendedMetadataType) do
     title { 'A Min Extended Metadata Type' }
     supported_type { 'Investigation' }
@@ -36,6 +46,8 @@ FactoryBot.define do
       a.extended_metadata_attributes << FactoryBot.create(:age_extended_metadata_attribute)
       a.extended_metadata_attributes << FactoryBot.create(:name_extended_metadata_attribute, required: true)
       a.extended_metadata_attributes << FactoryBot.create(:datetime_extended_metadata_attribute)
+      a.extended_metadata_attributes << FactoryBot.create(:data_file_extended_metadata_attribute)
+      a.extended_metadata_attributes << FactoryBot.create(:sop_extended_metadata_attribute)
     end
   end
 
