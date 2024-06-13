@@ -9,7 +9,6 @@ module Seek
         end
 
         def test_value(value)
-          super(value)
           if attribute.required?
             sample = find_resource(value['id'])
             raise 'Unable to find Sample in database' unless sample

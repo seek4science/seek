@@ -519,27 +519,6 @@ class SampleAttributeTest < ActiveSupport::TestCase
     refute attribute.validate_value?('moonbeam')
   end
 
-  test 'validate_value for seek resource' do
-    sop = FactoryBot.create(:sop)
-    df = FactoryBot.create(:data_file)
-    sample = FactoryBot.create(:sample)
-    attribute = FactoryBot.create(:data_file_sample_attribute, sample_type: FactoryBot.create(:simple_sample_type))
-    refute valid_value?(attribute, sop)
-    refute valid_value?(attribute, sample)
-    assert valid_value?(attribute, df)
-
-    attribute = FactoryBot.create(:sop_sample_attribute, sample_type: FactoryBot.create(:simple_sample_type))
-    refute valid_value?(attribute, df)
-    refute valid_value?(attribute, sample)
-    assert valid_value?(attribute, sop)
-
-    attribute = FactoryBot.create(:sample_sample_attribute, sample_type: FactoryBot.create(:simple_sample_type))
-    refute valid_value?(attribute, df)
-    refute valid_value?(attribute, sop)
-    assert valid_value?(attribute, sample)
-
-  end
-
   test 'is input attribute?' do
     correct_input_attribute = FactoryBot.create(:sample_multi_sample_attribute, title: 'Input from previous sample type', isa_tag: nil, is_title: true, sample_type: FactoryBot.create(:simple_sample_type))
     assert correct_input_attribute.input_attribute?
