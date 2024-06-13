@@ -31,6 +31,7 @@ class Sample < ApplicationRecord
   has_many :linking_samples, through: :reverse_sample_resource_links, source: :sample
 
   has_many :linked_data_files, through: :sample_resource_links, source: :resource, source_type: 'DataFile'
+  has_many :linked_sops, through: :sample_resource_links, source: :resource, source_type: 'Sop'
 
   belongs_to :observation_unit
 
@@ -68,6 +69,10 @@ class Sample < ApplicationRecord
     [originating_data_file].compact + linked_data_files
   end
 
+  def related_sops
+    linked_sops
+  end
+
   def related_samples
     Sample.where(id: related_sample_ids)
   end
@@ -87,6 +92,10 @@ class Sample < ApplicationRecord
 
   def referenced_data_files
     referenced_resources.select { |r| r.is_a?(DataFile) }
+  end
+
+  def referenced_sops
+    referenced_resources.select { |r| r.is_a?(Sop) }
   end
 
   def referenced_strains
@@ -206,6 +215,7 @@ class Sample < ApplicationRecord
     self.strains = referenced_strains
     self.linked_samples = referenced_samples
     self.linked_data_files = referenced_data_files
+    self.linked_sops = referenced_sops
   end
 
   def attribute_class

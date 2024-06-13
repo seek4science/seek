@@ -680,8 +680,9 @@ SEEK::Application.routes.draw do
       get :query_form
       post :query
     end
-    resources :people, :programmes, :projects, :assays, :studies, :investigations, :data_files, :publications, :samples,
-              :sample_types, :strains, :organisms, :collections, :observation_units, only: [:index]
+    resources :people, :programmes, :projects, :assays, :studies, :investigations, :data_files, :sops,
+              :publications, :samples, :sample_types, :strains, :organisms, :collections,
+              :observation_units, only: [:index]
   end
 
   ### SAMPLE TYPES ###

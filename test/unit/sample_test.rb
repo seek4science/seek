@@ -1407,6 +1407,30 @@ class SampleTest < ActiveSupport::TestCase
     assert_equal [df1, df2, df3].sort_by(&:id), sample_ext_attr.related_data_files.sort_by(&:id)
   end
 
+  test 'related sops includes sops in attributes' do
+    project = FactoryBot.create(:project)
+
+    sample_type = FactoryBot.create(:sop_sample_type, project_ids: [project.id])
+    sop_attr = FactoryBot.build(:sop_sample_attribute, title: 'sop 2', sample_type: sample_type)
+    sample_type.sample_attributes << sop_attr
+    sop1 = FactoryBot.create(:sop)
+    sop2 = FactoryBot.create(:sop)
+
+    # Sample with no linked sops
+    simple_type = FactoryBot.create(:simple_sample_type, project_ids: [project.id])
+    sample_no_sop = Sample.new(sample_type: simple_type, project_ids: [project.id])
+
+    # Sample with linked sops
+    sample_with_sops = Sample.new(sample_type: sample_type, project_ids: [project.id])
+    sample_with_sops.update(data: { 'sop': sop1.id })
+    sample_with_sops.update(data: { 'sop 2': sop2.id })
+    sample_with_sops.save!
+
+
+    assert_equal [], sample_no_sop.related_sops
+    assert_equal [sop1, sop2].sort_by(&:id), sample_with_sops.related_sops.sort_by(&:id)
+  end
+
   test 'to rdf' do
     sample = FactoryBot.create(:sample, sample_type:FactoryBot.create(:fairdatastation_virtual_demo_sample_type),
                                data:{
