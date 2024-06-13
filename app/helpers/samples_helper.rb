@@ -140,6 +140,8 @@ module SamplesHelper
         seek_sample_attribute_display(value)
       when Seek::Samples::BaseType::SEEK_DATA_FILE
         seek_data_file_attribute_display(value)
+      when Seek::Samples::BaseType::SEEK_SOP
+        seek_sop_attribute_display(value)
       when Seek::Samples::BaseType::CV
         seek_cv_attribute_display(value, attribute)
       when Seek::Samples::BaseType::CV_LIST
@@ -219,6 +221,10 @@ module SamplesHelper
 
   def seek_data_file_attribute_display(value)
     seek_resource_attribute_display(DataFile,value)
+  end
+
+  def seek_sop_attribute_display(value)
+    seek_resource_attribute_display(Sop,value)
   end
 
   def seek_resource_attribute_display(clz, value)
@@ -361,6 +367,10 @@ module SamplesHelper
       select_tag(element_name, options, include_blank: !attribute.required?, class: "form-control #{element_class}")
     when Seek::Samples::BaseType::SEEK_DATA_FILE
       options = options_from_collection_for_select(DataFile.authorized_for(:view), :id,
+                                                   :title, value.try(:[], 'id'))
+      select_tag(element_name, options, include_blank: !attribute.required?, class: "form-control #{element_class}")
+    when Seek::Samples::BaseType::SEEK_SOP
+      options = options_from_collection_for_select(Sop.authorized_for(:view), :id,
                                                    :title, value.try(:[], 'id'))
       select_tag(element_name, options, include_blank: !attribute.required?, class: "form-control #{element_class}")
     when Seek::Samples::BaseType::CV
