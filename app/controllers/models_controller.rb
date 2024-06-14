@@ -38,7 +38,7 @@ class ModelsController < ApplicationController
         @crn = JSON.parse(json)["crnJson"]
         @comparison_html = JSON.parse(json)["reportHtml"]
       rescue Exception => e
-        #raise e unless Rails.env.production?
+        raise e unless Rails.env.production?
         flash.now[:error]="there was an error trying to compare the two versions - #{e.message.gsub(/[\s\S]*STDERR:/,'')}"
       end
     else
