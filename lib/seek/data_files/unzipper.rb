@@ -70,19 +70,19 @@ module Seek
         private
   
         def cache_path
-          "#{Seek::Config.temporary_filestore_path}/#{cache_key}"
-        end
-  
-        def cache_key
-          "unzipped-datafiles-#{@data_file.id}"
+          "#{cache_key}-metadata"
         end
 
         def tmp_file_path
-          tmp_dir = "#{Rails.root}/tmp/#{cache_key}/"
+          "#{cache_key}-files/"
+        end
+  
+        def cache_key
+          "#{Seek::Config.temporary_filestore_path}/unzipped-datafiles-#{@data_file.id}"
         end
 
         def cache(&block)
-          if File.exist?(cache_path) & File.exist?(tmp_file_path)
+          if File.exist?(cache_path) & Dir.exist?(tmp_file_path)
             Marshal.load(File.binread(cache_path))
           elsif block_given?
             v = block.call
