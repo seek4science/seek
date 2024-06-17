@@ -25,10 +25,10 @@ class NfcoreScraperTest < ActionDispatch::IntegrationTest
               assert_equal bot, wf.contributor
               assert_equal [project], wf.projects
               assert_equal 'nf-core/rnaseq', wf.title
-              assert_equal 'Nextflow RNA-Seq analysis pipeline, part of the nf-core community.', wf.description
+              assert_equal 'RNA sequencing analysis pipeline for gene/isoform quantification and extensive quality control.', wf.description
               assert_equal 'MIT', wf.license
               assert_equal 'nextflow.config', wf.main_workflow_path
-              assert_equal '3.0', wf.git_version.name
+              assert_equal '3.13.2', wf.git_version.name
               assert_equal %w[rna rna-seq], wf.tags.sort
             end
           end
@@ -67,10 +67,10 @@ class NfcoreScraperTest < ActionDispatch::IntegrationTest
               assert_equal bot, wf.contributor
               assert_equal [project], wf.projects
               assert_equal 'nf-core/rnaseq', wf.title
-              assert_equal 'Nextflow RNA-Seq analysis pipeline, part of the nf-core community.', wf.description
+              assert_equal 'RNA sequencing analysis pipeline for gene/isoform quantification and extensive quality control.', wf.description
               assert_equal 'MIT', wf.license
               assert_equal 'nextflow.config', wf.main_workflow_path
-              assert_equal '3.0', wf.git_version.name
+              assert_equal '3.13.2', wf.git_version.name
             end
           end
         end
@@ -89,10 +89,10 @@ class NfcoreScraperTest < ActionDispatch::IntegrationTest
                                  contributor: bot,
                                  projects: [project],
                                  source_link_url: 'https://github.com/nf-core/rnaseq',
-                                 git_version_attributes: { name: '3.0',
+                                 git_version_attributes: { name: '3.13.2',
                                                            git_repository_id: repos.first.id,
-                                                           ref: 'refs/tags/3.0',
-                                                           commit: '3643a94',
+                                                           ref: 'refs/tags/3.13.2',
+                                                           commit: 'a10f41a',
                                                            main_workflow_path: 'nextflow.config',
                                                            mutable: false })
 
@@ -117,16 +117,18 @@ class NfcoreScraperTest < ActionDispatch::IntegrationTest
 
     repos = [FactoryBot.create(:nfcore_remote_repository)]
     # These are the available remote Git tags in the above repo:
-    tags = ['1.0', '1.1', '1.2', '1.3', '1.4', '1.4.1', '1.4.2', '2.0', '3.0']
+    tags = ['1.0', '1.1', '1.2', '1.3', '1.4', '1.4.1', '1.4.2', '2.0', '3.0', '3.1', '3.2', '3.3', '3.4', '3.5',
+            '3.6', '3.7', '3.8', '3.8.1', '3.9', '3.10', '3.10.1', '3.11.0', '3.11.1', '3.11.2', '3.12.0', '3.13.1',
+            '3.13.0', '3.13.2']
 
     existing = FactoryBot.create(:nfcore_git_workflow,
                                  contributor: bot,
                                  projects: [project],
                                  source_link_url: 'https://github.com/nf-core/rnaseq',
-                                 git_version_attributes: { name: '3.0',
+                                 git_version_attributes: { name: '1.0',
                                                            git_repository_id: repos.first.id,
-                                                           ref: 'refs/tags/3.0',
-                                                           commit: '3643a94',
+                                                           ref: 'refs/tags/1.0',
+                                                           commit: '44f1525',
                                                            main_workflow_path: 'nextflow.config',
                                                            mutable: false })
 
@@ -140,12 +142,21 @@ class NfcoreScraperTest < ActionDispatch::IntegrationTest
               refute scraped.empty?
 
               assert_equal tags.count, existing.reload.versions.count
-              assert_equal tags.sort, existing.versions.map(&:name).sort
+              assert_equal tags, existing.versions.sort_by(&:created_at).map(&:name)
             end
           end
         end
       end
     end
+  end
+
+  test 'does not list archived or disabled repositories' do
+    project = Scrapers::Util.bot_project(title: 'test')
+    bot = Scrapers::Util.bot_account
+    scraper = Scrapers::NfcoreScraper.new('test-123', project, bot, output: StringIO.new)
+    repos = scraper.send(:list_repositories)
+    assert_equal 1, repos.length
+    assert_includes repos.map { |r| r['name'] }, 'rnaseq'
   end
 
   private
