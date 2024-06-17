@@ -49,7 +49,6 @@ module Seek
                 AuthLookupUpdateQueue.enqueue(data_files)
               end
             end
-            FileUtils.rm_r(tmp_file_path)
             data_files
           end
         end
