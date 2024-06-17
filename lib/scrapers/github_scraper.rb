@@ -73,7 +73,7 @@ module Scrapers
           end
           tags = [tag]
         else
-          tags = repo.remote_refs[:tags]&.map { |t| t[:name] } || []
+          tags = all_tags(repo)
           if tags.empty?
             output.puts "    No tags found to register"
             next
@@ -174,6 +174,10 @@ module Scrapers
       return nil unless $?.success?
 
       tag
+    end
+
+    def all_tags(repo)
+      repo.remote_refs[:tags]&.map { |t| t[:name] } || []
     end
   end
 end
