@@ -504,7 +504,7 @@ SEEK::Application.routes.draw do
       delete :cancel_unzip
       get :unzip_persistence_status
     end
-    resources :people, :programmes, :projects, :investigations, :assays, :data_files, :samples, :studies, :publications, :events, :collections, :workflows, :file_templates, :placeholders, only: [:index]
+    resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :collections, :workflows, :file_templates, :placeholders, only: [:index]
   end
 
   resources :presentations, concerns: [:has_content_blobs, :publishable, :has_versions, :asset, :explorable_spreadsheet] do
