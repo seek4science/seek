@@ -26,12 +26,16 @@ module Seek
 
                 data_files.each do |data_file|
                   data_file_content_blob = ContentBlob.new
-                  data_file_content_blob.tmp_io_object = File.open("#{tmp_file_path}#{data_file.title}")
-                  data_file_content_blob.original_filename = "#{data_file.title}"
-                  data_file_content_blob.save
-                  data_file.content_blob = data_file_content_blob
-                  data_file.policy = data_file.zip_origin.policy.deep_copy
-                  data_file.save
+                  file_path = "#{tmp_file_path}#{data_file.title}"
+
+                  File.open(file_path) do |file|
+                    data_file_content_blob.tmp_io_object = file
+                    data_file_content_blob.original_filename = data_file.title.to_s
+                    data_file_content_blob.save
+                    data_file.content_blob = data_file_content_blob
+                    data_file.policy = data_file.zip_origin.policy.deep_copy
+                    data_file.save
+                  end
                 end
   
                 project_ids = data_files.first.project_ids
