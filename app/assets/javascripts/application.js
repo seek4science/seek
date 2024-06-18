@@ -78,5 +78,6 @@
 //= require licenses
 //= require svg-pan-zoom-3.6.1/svg-pan-zoom.min
 //= require copasi
-//= require copasijs.js
+//= require copasijs
+//= require plotly-2.27.0.min
 

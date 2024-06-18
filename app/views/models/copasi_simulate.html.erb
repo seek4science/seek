@@ -2,7 +2,6 @@
 <%= render :partial => "general/item_title",:locals=>{:item=>@model,:title_postfix=>" - Copasi #{t('model')} Simulation"} %>
 <% blob = (File.read(@display_model.content_blobs.first.filepath)).html_safe %>
 
-<script src='https://cdn.plot.ly/plotly-2.27.0.min.js'></script>
 <script>
     var copasi = null;
     createCpsModule().then(module => {
