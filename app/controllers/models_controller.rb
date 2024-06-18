@@ -12,6 +12,7 @@ class ModelsController < ApplicationController
   before_action :find_other_version, :only => [:compare_versions]
 
   include Seek::Jws::Simulator
+  include Seek::Copasi::Simulator
   include Seek::Publishing::PublishingCommon
 
   include Bives
