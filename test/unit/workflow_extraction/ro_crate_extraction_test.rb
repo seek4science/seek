@@ -38,6 +38,7 @@ class RoCrateExtractionTest < ActiveSupport::TestCase
   end
 
   test 'extracts both authors and creators from ro-crate' do
+    existing_person = FactoryBot.create(:person_not_in_project, orcid: 'https://orcid.org/0000-0002-1825-0097')
     wf = open_fixture_file('workflows/author_and_creator_test.crate.zip')
     extractor = Seek::WorkflowExtractors::ROCrate.new(wf)
     metadata = extractor.metadata
@@ -52,13 +53,15 @@ class RoCrateExtractionTest < ActiveSupport::TestCase
     assert_equal 'Smith', first[:family_name]
     assert_nil first[:affiliation]
     assert_nil first[:orcid]
+    assert_nil first[:creator_id]
     assert_equal 0, first[:pos]
 
     second = author_meta.detect { |a| a[:given_name] == 'Josiah' }
     assert second
     assert_equal 'Carberry', second[:family_name]
     assert_equal 'Cool University', second[:affiliation]
-    assert 'https://orcid.org/0000-0002-1825-0097', second[:orcid]
+    assert_equal 'https://orcid.org/0000-0002-1825-0097', second[:orcid]
+    assert_equal existing_person.id, second[:creator_id]
     assert_equal 1, second[:pos]
 
     third = author_meta.detect { |a| a[:given_name] == 'Bert' }
@@ -66,6 +69,7 @@ class RoCrateExtractionTest < ActiveSupport::TestCase
     assert_equal 'Droesbeke', third[:family_name]
     assert_nil third[:affiliation]
     assert_equal 'https://orcid.org/0000-0003-0522-5674', third[:orcid]
+    assert_nil third[:creator_id]
     assert_equal 2, third[:pos]
 
     fourth = author_meta.detect { |a| a[:given_name] == 'Mittens' }
@@ -73,6 +77,7 @@ class RoCrateExtractionTest < ActiveSupport::TestCase
     assert_equal 'Smith', fourth[:family_name]
     assert_nil fourth[:affiliation]
     assert_nil fourth[:orcid]
+    assert_nil fourth[:creator_id]
     assert_equal 3, fourth[:pos]
   end
 
