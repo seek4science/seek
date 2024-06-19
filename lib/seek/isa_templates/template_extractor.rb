@@ -6,6 +6,7 @@ module Seek
       def self.extract_templates
         `touch #{resultfile}`
         result = StringIO.new
+        @errors = []
 
         seed_isa_tags
 
@@ -14,7 +15,7 @@ module Seek
           project = Project.find_or_create_by(title: 'Default Project')
           directory = Seek::Config.append_filestore_path('source_types')
           directory_files = Dir.exist?(directory) ? Dir.glob("#{directory}/*.json") : []
-          raise '<ul><li>Make sure to upload files that have the ".json" extension.</li></ul>' if directory_files == []
+          @errors.append 'Make sure to upload files that have the ".json" extension.' if directory_files == []
 
           directory_files.each do |filename|
             puts filename
@@ -22,7 +23,7 @@ module Seek
 
             file = File.read(filename)
             res = check_json_file(file)
-            raise res if res.present?
+            @errors.append res if res.present?
 
             data_hash = JSON.parse(file)
             data_hash['data'].each do |item|
@@ -56,7 +57,7 @@ module Seek
                     begin
                       terms = client.all_descendants(attribute['ontology']['name'],
                                                      attribute['ontology']['rootTermURI'])
-                    rescue Exception => e
+                    rescue StandardError => e
                       scv.save(validate: false)
                       next
                     end
@@ -103,11 +104,13 @@ module Seek
               end
             end
           end
+          raise @errors.join(',') if @errors.present?
         end
         write_result(result.string)
-      rescue Exception => e
+      rescue StandardError => e
         puts e
         write_result("error(s): #{e}")
+        raise e
       ensure
         `rm -f #{lockfile}`
       end
@@ -159,7 +162,7 @@ module Seek
 
       def self.get_sample_attribute_type(title)
         sa = SampleAttributeType.find_by(title: title)
-        raise "Could not find a Sample Attribute named '#{title}'" if sa.nil?
+        @errors.append "Could not find a Sample Attribute named '#{title}'" if sa.nil?
 
         sa.id
       end
@@ -168,7 +171,7 @@ module Seek
         return nil if title.blank?
 
         it = IsaTag.find_by(title: title)
-        raise "Could not find an ISA Tag named '#{title}'" if it.nil?
+        @errors.append "Could not find an ISA Tag named '#{title}'" if it.nil?
 
         it.id
       end
