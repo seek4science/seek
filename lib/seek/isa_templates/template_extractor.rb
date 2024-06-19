@@ -107,7 +107,8 @@ module Seek
             File.delete(filename)
           end
         end
-        raise @errors.join(', ') if @errors.present?
+        raise "<ul>#{@errors.map { |e| "<li>#{e}</li>" }.join('')}</ul".html_safe if @errors.present?
+
         write_result(result.string)
       rescue StandardError => e
         puts e
