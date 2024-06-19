@@ -7,6 +7,13 @@ class PopulateTemplatesJobTest < ActiveSupport::TestCase
       FactoryBot.create(type)
     end
 
+    # Create the ISA Tags
+    %i[source_isa_tag sample_isa_tag protocol_isa_tag source_characteristic_isa_tag sample_characteristic_isa_tag 
+       other_material_isa_tag other_material_characteristic_isa_tag data_file_isa_tag parameter_value_isa_tag
+       data_file_comment_isa_tag default_isa_tag].map do |tag|
+      FactoryBot.create(tag)
+    end
+
     # Set isa_json_compliance_enabled to true
     Seek::Config.isa_json_compliance_enabled = true
   end
@@ -36,7 +43,8 @@ class PopulateTemplatesJobTest < ActiveSupport::TestCase
     FileUtils.cp(src, dest)
 
     assert_no_difference('Template.count') do
-      assert_raises(RuntimeError, '<ul><li>The property \'#/data/0/data/1/dataType\' value \"Invalid String attribute type 1\" did not match one of the following values: String attribute type 1, Sample multi attribute type 1 in schema file:///home/kepel/projects/seek/lib/seek/isa_templates/template_attributes_schema_test.json#</li><li>Could not find a Sample Attribute Type named \'Invalid String attribute type 1\'</li></ul>') do
+      assert_raises(RuntimeError, 
+'<ul><li>The property \'#/data/0/data/1/dataType\' value \"Invalid String attribute type 1\" did not match one of the following values: String attribute type 1, Sample multi attribute type 1 in schema file:///home/kepel/projects/seek/lib/seek/isa_templates/template_attributes_schema_test.json#</li><li>Could not find a Sample Attribute Type named \'Invalid String attribute type 1\'</li></ul>') do
         PopulateTemplatesJob.perform_now
       end
     end
