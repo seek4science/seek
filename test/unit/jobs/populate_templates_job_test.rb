@@ -15,7 +15,9 @@ class PopulateTemplatesJobTest < ActiveSupport::TestCase
 
     with_config_value(:isa_json_compliance_enabled, true) do
       assert_nothing_raised do
-        PopulateTemplatesJob.perform_now
+        assert_difference('Template.count', 4) do
+          PopulateTemplatesJob.perform_now
+        end
       end
     end
   end
