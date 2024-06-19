@@ -107,7 +107,7 @@ module Seek
             File.delete(filename)
           end
         end
-        raise @errors.join(',') if @errors.present?
+        raise @errors.join(', ') if @errors.present?
         write_result(result.string)
       rescue StandardError => e
         puts e
@@ -153,8 +153,14 @@ module Seek
       end
 
       def self.valid_isa_json?(json)
-        definitions_path =
-          File.join(Rails.root, 'lib', 'seek', 'isa_templates', 'template_schema.json')
+        # read the schema file depending on the environment
+        if Rails.env.test?
+          definitions_path =
+            File.join(Rails.root, 'lib', 'seek', 'isa_templates', 'template_schema_test.json')
+        else
+          definitions_path =
+            File.join(Rails.root, 'lib', 'seek', 'isa_templates', 'template_schema.json')
+        end
         if File.readable?(definitions_path)
           JSON::Validator.fully_validate_json(definitions_path, json)
         else
@@ -164,8 +170,9 @@ module Seek
 
       def self.get_sample_attribute_type(title)
         sa = SampleAttributeType.find_by(title: title)
-        @errors.append "Could not find a Sample Attribute named '#{title}'" if sa.nil?
+        @errors.append "Could not find a Sample Attribute Type named '#{title}'" if sa.nil?
 
+        return if sa.nil?
         sa.id
       end
 
