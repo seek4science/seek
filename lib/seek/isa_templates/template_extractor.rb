@@ -15,7 +15,7 @@ module Seek
           project = Project.find_or_create_by(title: 'Default Project')
           directory = Seek::Config.append_filestore_path('source_types')
           directory_files = Dir.exist?(directory) ? Dir.glob("#{directory}/*.json") : []
-          @errors.append 'Make sure to upload files that have the ".json" extension.' if directory_files == []
+          @errors.append '<li>Make sure to upload files that have the ".json" extension.</li>' if directory_files == []
 
           directory_files.each do |filename|
             next if File.extname(filename) != '.json'
@@ -107,7 +107,7 @@ module Seek
             File.delete(filename)
           end
         end
-        raise "<ul>#{@errors.map { |e| "<li>#{e}</li>" }.join('')}</ul>".html_safe if @errors.present?
+        raise "<ul>#{@errors.map { |e| "#{e}" }.join('')}</ul>".html_safe if @errors.present?
 
         write_result(result.string)
       rescue StandardError => e
@@ -170,7 +170,7 @@ module Seek
 
       def self.get_sample_attribute_type(title)
         sa = SampleAttributeType.find_by(title:)
-        @errors.append "Could not find a Sample Attribute Type named '#{title}'" if sa.nil?
+        @errors.append "<li>Could not find a Sample Attribute Type named '#{title}'</li>" if sa.nil?
 
         return if sa.nil?
 
@@ -181,7 +181,7 @@ module Seek
         return nil if title.blank?
 
         it = IsaTag.find_by(title:)
-        @errors.append "Could not find an ISA Tag named '#{title}'" if it.nil?
+        @errors.append "<li>Could not find an ISA Tag named '#{title}'</li>" if it.nil?
 
         it.id
       end
