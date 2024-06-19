@@ -155,13 +155,12 @@ module Seek
 
       def self.valid_isa_json?(json)
         # read the schema file depending on the environment
-        if Rails.env.test?
-          definitions_path =
-            File.join(Rails.root, 'lib', 'seek', 'isa_templates', 'template_schema_test.json')
-        else
-          definitions_path =
-            File.join(Rails.root, 'lib', 'seek', 'isa_templates', 'template_schema.json')
-        end
+        definitions_path = if Rails.env.test?
+                             File.join(Rails.root, 'lib', 'seek', 'isa_templates', 'template_schema_test.json')
+                           else
+                             File.join(Rails.root, 'lib', 'seek', 'isa_templates', 'template_schema.json')
+                           end
+
         if File.readable?(definitions_path)
           JSON::Validator.fully_validate_json(definitions_path, json)
         else
@@ -170,17 +169,18 @@ module Seek
       end
 
       def self.get_sample_attribute_type(title)
-        sa = SampleAttributeType.find_by(title: title)
+        sa = SampleAttributeType.find_by(title:)
         @errors.append "Could not find a Sample Attribute Type named '#{title}'" if sa.nil?
 
         return if sa.nil?
+
         sa.id
       end
 
       def self.get_isa_tag_id(title)
         return nil if title.blank?
 
-        it = IsaTag.find_by(title: title)
+        it = IsaTag.find_by(title:)
         @errors.append "Could not find an ISA Tag named '#{title}'" if it.nil?
 
         it.id
