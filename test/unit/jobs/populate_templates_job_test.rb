@@ -28,4 +28,17 @@ class PopulateTemplatesJobTest < ActiveSupport::TestCase
       end
     end
   end
+
+  test 'perform with invalid json' do
+    # Copy the JSON file to the source_types directory
+    src = Rails.root.join('test', 'fixtures', 'files', 'upload_json_sample_type_template', 'invalid_templates1.json')
+    dest = Seek::Config.append_filestore_path('source_types')
+    FileUtils.cp(src, dest)
+
+    assert_no_difference('Template.count') do
+      assert_raises(RuntimeError, '<ul><li>The property \'#/data/0/data/1/dataType\' value \"Invalid String attribute type 1\" did not match one of the following values: String attribute type 1, Sample multi attribute type 1 in schema file:///home/kepel/projects/seek/lib/seek/isa_templates/template_attributes_schema_test.json#</li><li>Could not find a Sample Attribute Type named \'Invalid String attribute type 1\'</li></ul>') do
+        PopulateTemplatesJob.perform_now
+      end
+    end
+  end
 end
