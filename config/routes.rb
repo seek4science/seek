@@ -498,8 +498,13 @@ SEEK::Application.routes.draw do
       post :retrieve_nels_sample_metadata
       get :retrieve_nels_sample_metadata
       get :has_matching_sample_type
+      post :unzip
+      get :unzip_status
+      get :confirm_unzip
+      delete :cancel_unzip
+      get :unzip_persistence_status
     end
-    resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :collections, :workflows, :file_templates, :placeholders, only: [:index]
+    resources :people, :programmes, :projects, :investigations, :assays, :data_files, :samples, :studies, :publications, :events, :collections, :workflows, :file_templates, :placeholders, only: [:index]
   end
 
   resources :presentations, concerns: [:has_content_blobs, :publishable, :has_versions, :asset, :explorable_spreadsheet] do

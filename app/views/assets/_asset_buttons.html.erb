@@ -27,6 +27,9 @@
       <%= render partial: 'data_files/extract_samples_button' %>
   <% end %>
 
+  <% if show_unzip_folder_button?(asset, display_asset) %>
+      <%= button_link_to('Unzip datafile', 'unzip_folder', unzip_data_file_path(@data_file), method: :post) %>
+  <% end %>
 <% end %>
 
 <% if asset.is_downloadable? -%>
