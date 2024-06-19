@@ -18,7 +18,6 @@ module Seek
           @errors.append 'Make sure to upload files that have the ".json" extension.' if directory_files == []
 
           directory_files.each do |filename|
-            puts filename
             next if File.extname(filename) != '.json'
 
             file = File.read(filename)
@@ -103,9 +102,12 @@ module Seek
                                                                           }))
               end
             end
+
+            # Remove the file after processing
+            File.delete(filename)
           end
-          raise @errors.join(',') if @errors.present?
         end
+        raise @errors.join(',') if @errors.present?
         write_result(result.string)
       rescue StandardError => e
         puts e
