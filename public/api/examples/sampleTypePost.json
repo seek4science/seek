@@ -8,7 +8,7 @@
         {
           "title": "full name",
           "sample_attribute_type": {
-            "title": "String attribute type 13"
+            "title": "String attribute type 510"
           },
           "required": true,
           "pos": 1,
@@ -21,7 +21,7 @@
       "projects": {
         "data": [
           {
-            "id": "938",
+            "id": "1022251394",
             "type": "projects"
           }
         ]
@@ -29,7 +29,7 @@
       "assays": {
         "data": [
           {
-            "id": "128",
+            "id": "1035386719",
             "type": "assays"
           }
         ]

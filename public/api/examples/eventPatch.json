@@ -1,7 +1,7 @@
 {
   "data": {
     "type": "events",
-    "id": "20",
+    "id": "1025618785",
     "attributes": {
       "title": "A Maximally Patched Event",
       "description": "A thing happening",
@@ -10,7 +10,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "459",
+              "id": "1022252557",
               "type": "projects"
             },
             "access": "edit"
@@ -28,7 +28,7 @@
       "projects": {
         "data": [
           {
-            "id": "459",
+            "id": "1022252557",
             "type": "projects"
           }
         ]
@@ -36,7 +36,7 @@
       "data_files": {
         "data": [
           {
-            "id": "28",
+            "id": "883654388",
             "type": "data_files"
           }
         ]
@@ -44,7 +44,7 @@
       "presentations": {
         "data": [
           {
-            "id": "20",
+            "id": "145",
             "type": "presentations"
           }
         ]
@@ -52,7 +52,7 @@
       "publications": {
         "data": [
           {
-            "id": "34",
+            "id": "330",
             "type": "publications"
           }
         ]

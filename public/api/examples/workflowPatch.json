@@ -1,7 +1,7 @@
 {
   "data": {
     "type": "workflows",
-    "id": "110",
+    "id": "179",
     "attributes": {
       "title": "A Maximally Patched Workflow",
       "description": "A workflow to do important stuff",
@@ -46,7 +46,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "409",
+              "id": "1022251551",
               "type": "projects"
             },
             "access": "edit"
@@ -58,7 +58,7 @@
       "creators": {
         "data": [
           {
-            "id": "400",
+            "id": "1039987481",
             "type": "people"
           }
         ]
@@ -66,7 +66,7 @@
       "projects": {
         "data": [
           {
-            "id": "409",
+            "id": "1022251551",
             "type": "projects"
           }
         ]
@@ -74,7 +74,7 @@
       "assays": {
         "data": [
           {
-            "id": "85",
+            "id": "1035386753",
             "type": "assays"
           }
         ]
@@ -82,7 +82,7 @@
       "publications": {
         "data": [
           {
-            "id": "85",
+            "id": "238",
             "type": "publications"
           }
         ]
@@ -90,7 +90,7 @@
       "presentations": {
         "data": [
           {
-            "id": "75",
+            "id": "114",
             "type": "presentations"
           }
         ]
@@ -98,7 +98,7 @@
       "data_files": {
         "data": [
           {
-            "id": "75",
+            "id": "883654352",
             "type": "data_files"
           }
         ]
@@ -106,7 +106,7 @@
       "documents": {
         "data": [
           {
-            "id": "75",
+            "id": "258",
             "type": "documents"
           }
         ]
@@ -114,7 +114,7 @@
       "sops": {
         "data": [
           {
-            "id": "75",
+            "id": "1055250472",
             "type": "sops"
           }
         ]

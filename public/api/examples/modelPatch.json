@@ -1,7 +1,7 @@
 {
   "data": {
     "type": "models",
-    "id": "153",
+    "id": "1004285585",
     "attributes": {
       "title": "A Maximally Patched Model",
       "description": "A simulation of a thing",
@@ -17,7 +17,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "995",
+              "id": "1022251932",
               "type": "projects"
             },
             "access": "edit"
@@ -29,7 +29,7 @@
       "environment": "JWS Online",
       "discussion_links": [
         {
-          "id": "81",
+          "id": "239",
           "url": "http://yahoo.com",
           "label": "Yahoo"
         },
@@ -43,7 +43,7 @@
       "creators": {
         "data": [
           {
-            "id": "916",
+            "id": "1039987854",
             "type": "people"
           }
         ]
@@ -51,7 +51,7 @@
       "organisms": {
         "data": [
           {
-            "id": "35",
+            "id": "627234331",
             "type": "organisms"
           }
         ]
@@ -59,7 +59,7 @@
       "projects": {
         "data": [
           {
-            "id": "995",
+            "id": "1022251932",
             "type": "projects"
           }
         ]
@@ -67,7 +67,7 @@
       "assays": {
         "data": [
           {
-            "id": "139",
+            "id": "1035386814",
             "type": "assays"
           }
         ]
@@ -75,7 +75,7 @@
       "publications": {
         "data": [
           {
-            "id": "83",
+            "id": "299",
             "type": "publications"
           }
         ]

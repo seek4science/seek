@@ -1,18 +1,18 @@
 {
   "data": {
-    "id": "22",
+    "id": "117",
     "type": "sample_types",
     "attributes": {
       "title": "A Maximal SampleType",
       "description": "A very new research",
       "sample_attributes": [
         {
-          "id": "35",
+          "id": "196",
           "title": "full_name",
           "description": "the persons full name",
           "pid": null,
           "sample_attribute_type": {
-            "id": "34",
+            "id": "860",
             "title": "Full name",
             "base_type": "String",
             "regexp": "[A-Z][a-z]+[ ][A-Z][a-z]+"
@@ -25,12 +25,12 @@
           "linked_sample_type_id": null
         },
         {
-          "id": "36",
+          "id": "197",
           "title": "address",
           "description": null,
           "pid": null,
           "sample_attribute_type": {
-            "id": "35",
+            "id": "861",
             "title": "Address",
             "base_type": "Text",
             "regexp": ".*"
@@ -43,12 +43,12 @@
           "linked_sample_type_id": null
         },
         {
-          "id": "37",
+          "id": "198",
           "title": "postcode",
           "description": null,
           "pid": "dc:postcode",
           "sample_attribute_type": {
-            "id": "36",
+            "id": "862",
             "title": "Post Code",
             "base_type": "String",
             "regexp": "^([A-PR-UWYZ0-9][A-HK-Y0-9][AEHMNPRTVXY0-9]?[ABEHMNPRVWXY0-9]? {1,2}[0-9][ABD-HJLN-UW-Z]{2}|GIR 0AA)$"
@@ -61,18 +61,126 @@
           "linked_sample_type_id": null
         },
         {
-          "id": "38",
+          "id": "199",
           "title": "CAPITAL key",
           "description": null,
           "pid": null,
           "sample_attribute_type": {
-            "id": "37",
+            "id": "863",
             "title": "String",
             "base_type": "String",
             "regexp": ".*"
           },
           "required": false,
           "pos": 4,
+          "unit": null,
+          "is_title": false,
+          "sample_controlled_vocab_id": null,
+          "linked_sample_type_id": null
+        },
+        {
+          "id": "200",
+          "title": "apple",
+          "description": null,
+          "pid": null,
+          "sample_attribute_type": {
+            "id": "864",
+            "title": "CV attribute type 14",
+            "base_type": "CV",
+            "regexp": ".*"
+          },
+          "required": false,
+          "pos": 5,
+          "unit": null,
+          "is_title": false,
+          "sample_controlled_vocab_id": "110",
+          "linked_sample_type_id": null
+        },
+        {
+          "id": "201",
+          "title": "apples",
+          "description": null,
+          "pid": null,
+          "sample_attribute_type": {
+            "id": "865",
+            "title": "CV List attribute type 4",
+            "base_type": "CVList",
+            "regexp": ".*"
+          },
+          "required": false,
+          "pos": 6,
+          "unit": null,
+          "is_title": false,
+          "sample_controlled_vocab_id": "111",
+          "linked_sample_type_id": null
+        },
+        {
+          "id": "202",
+          "title": "patients",
+          "description": null,
+          "pid": null,
+          "sample_attribute_type": {
+            "id": "874",
+            "title": "Sample multi attribute type 8",
+            "base_type": "SeekSampleMulti",
+            "regexp": ".*"
+          },
+          "required": false,
+          "pos": 7,
+          "unit": null,
+          "is_title": false,
+          "sample_controlled_vocab_id": null,
+          "linked_sample_type_id": "116"
+        },
+        {
+          "id": "203",
+          "title": "weight",
+          "description": null,
+          "pid": null,
+          "sample_attribute_type": {
+            "id": "871",
+            "title": "Float attribute type 4",
+            "base_type": "Float",
+            "regexp": ".*"
+          },
+          "required": false,
+          "pos": 8,
+          "unit": null,
+          "is_title": false,
+          "sample_controlled_vocab_id": null,
+          "linked_sample_type_id": null
+        },
+        {
+          "id": "204",
+          "title": "age",
+          "description": null,
+          "pid": null,
+          "sample_attribute_type": {
+            "id": "872",
+            "title": "Integer attribute type 47",
+            "base_type": "Integer",
+            "regexp": ".*"
+          },
+          "required": false,
+          "pos": 9,
+          "unit": null,
+          "is_title": false,
+          "sample_controlled_vocab_id": null,
+          "linked_sample_type_id": null
+        },
+        {
+          "id": "205",
+          "title": "bool",
+          "description": null,
+          "pid": null,
+          "sample_attribute_type": {
+            "id": "873",
+            "title": "Boolean attribute type 4",
+            "base_type": "Boolean",
+            "regexp": ".*"
+          },
+          "required": false,
+          "pos": 10,
           "unit": null,
           "is_title": false,
           "sample_controlled_vocab_id": null,
@@ -88,7 +196,7 @@
       "projects": {
         "data": [
           {
-            "id": "951",
+            "id": "1022251408",
             "type": "projects"
           }
         ]
@@ -101,7 +209,7 @@
       "submitter": {
         "data": [
           {
-            "id": "870",
+            "id": "1039987341",
             "type": "people"
           }
         ]
@@ -109,21 +217,21 @@
       "assays": {
         "data": [
           {
-            "id": "132",
+            "id": "1035386723",
             "type": "assays"
           }
         ]
       }
     },
     "links": {
-      "self": "/sample_types/22"
+      "self": "/sample_types/117"
     },
     "meta": {
-      "created": "2022-06-07T14:14:37.000Z",
-      "modified": "2022-06-07T14:14:37.000Z",
+      "created": "2024-06-20T12:36:23.000Z",
+      "modified": "2024-06-20T12:36:23.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "16537c20-c89a-013a-0f7e-0a81884ed284"
+      "uuid": "a0d6d860-112f-013d-1f9d-0a81884ed284"
     }
   },
   "jsonapi": {
