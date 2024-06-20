@@ -15,9 +15,14 @@ If you have any comments or feedback about a release, then please [Contact Us](/
 
 Release date: _20th June 2024_
 
-A patch release that includes some important bug fixes and improvements:
+A patch release that includes some important bug fixes and improvements, in particular:
 
-* 
+* Fixed samples missing from Batch permission changes if associated with a Assay.
+* Fix the available Assays shown when registering Samples that have been extracted from a Data file template.
+* Fixed controlled vocabulary terms being duplicated when performing edits.
+* Fix to correctly transfer Sample sharing policies from the originating Data file when extracted.
+* Fix to the page shown when starting to import a DMP
+* Various small Datahub and Single Page View fixes and improvements. 
 
 For a full list, see [closed issues for 1.15.1](https://github.com/seek4science/seek/milestone/22?closed=1)
 
