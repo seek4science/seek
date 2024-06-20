@@ -217,7 +217,7 @@ module AssetsHelper
   def open_with_copasi_js_button (asset)
 
     tooltip_text = "Simulate model in the browser with javascript library"
-    button_link_to 'Simulate Online', 'copasi', '#', class: '', onclick: 'simulate()', disabled: asset.download_disabled?, 'data-tooltip' => tooltip(tooltip_text)
+    button_link_to 'Simulate Online', 'copasi', '#', class: '', onclick: 'simulate()', disabled: @blob.nil?, 'data-tooltip' => tooltip(tooltip_text)
 
   end
 
@@ -229,7 +229,7 @@ module AssetsHelper
 
     tooltip_text_copasi_button = "Simulate the publicly accessible model in your local installed Copasi. "
 
-    button= button_link_to('Simulate in CopasiUI', 'copasi', copasi_download_path, class: '', disabled: asset.download_disabled?, 'data-tooltip' => tooltip(tooltip_text_copasi_button))
+    button= button_link_to('Simulate in CopasiUI', 'copasi', copasi_download_path, class: '', disabled: @blob.nil?, 'data-tooltip' => tooltip(tooltip_text_copasi_button))
 
     button
   end

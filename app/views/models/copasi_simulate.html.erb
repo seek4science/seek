@@ -1,6 +1,7 @@
 <% content_for(:buttons) { button_link_to("Back to #{t('model')}", 'back', model_path(@model,:version=>@display_model.version)) } %>
 <%= render :partial => "general/item_title",:locals=>{:item=>@model,:title_postfix=>" - Copasi #{t('model')} Simulation"} %>
-<% blob = (File.read(@display_model.content_blobs.first.filepath)).html_safe %>
+
+<!--https://copasijs.readthedocs.io/en/stable/api.html#javascript-->
 
 <script>
     var copasi = null;
@@ -11,36 +12,30 @@
 
 
     $j(document).ready(function () {
-
-        $j('#cps').val(`<%= blob %>`);
-
+        $j('#cps').val(`<%= @blob %>`);
     });
 
     function loadIntoCOPASI()
     {
-        var fileContent = `<%= blob %>`;
+        var info = copasi.loadModel(document.getElementById("cps").value);
 
-        // console.log("=================================1===========================");
-        // console.log(document.getElementById("cps").value);
-        // console.log("================================2============================");
-        // console.log(fileContent);
-        var info = copasi.loadModel(fileContent);
-        document.getElementById("modelName").innerHTML = "none";
+        document.getElementById("model_name").innerHTML = "none";
         if (info['status'] != "success") {
-            alert("Error loading model: " + info['messages']);
-            return;
+            document.getElementById("simulation_error").innerHTML = "Error loading model: " + info['messages'];
+            document.getElementById('simulation_error').hidden = false;
         }
-        document.getElementById("modelName").innerHTML = 'Model name: '+ info['model']['name'];
-        document.getElementById("copasi_Version").innerHTML = 'Copasi version: '+ copasi.version;
+        document.getElementById("model_name").innerHTML = 'Model name: '+ info['model']['name'];
+        document.getElementById("copasi_version").innerHTML = 'Copasi version: '+ copasi.version;
+        document.getElementById('simulation_info').hidden = false;
     }
 
 
     function simulate() {
 
         if (copasi == null) {
+            alert('There is a problem to load Copasi simulator.');
             return;
         }
-
         loadIntoCOPASI();
         runSimulation();
 
@@ -73,41 +68,26 @@
     }
 
 
-    function loadUrl() {
-        loadUrlFrom(document.getElementById("inputUrl").value);
-    };
-
-    function loadUrlFrom(url) {
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', url, true);
-        xhr.responseType = 'text';
-        xhr.onload = function () {
-            if (xhr.readyState === xhr.DONE) {
-                if (xhr.status === 200) {
-                    document.getElementById("cps").value = xhr.responseText;
-                }
-            }
-        };
-        xhr.send(null);
-    };
-
 </script>
 
 
 <div class="container-fluid">
 
-  <p class="lead">
-    <div id="modelName"></div>
-    <div id="copasi_Version"></div>
-  </p>
+  <div id="simulation_error" class="alert alert-danger" role="alert" hidden="">
+
+  </div>
+
+  <div id="simulation_info" class="alert alert-info" role="alert" hidden="">
+    <div id="model_name"></div>
+    <div id="copasi_version"></div>
+  </div>
 
   <div>
     <a class="btn btn-sm" data-toggle="collapse" href="#cps_form" role="button" aria-expanded="false"
-       aria-controls="cps_form">show cps</a>
+       aria-controls="cps_form">show model file</a>
     <a class="btn btn-sm" data-toggle="collapse" href="#yaml_form" role="button" aria-expanded="false"
        aria-controls="yaml_form">show yaml</a>
     <div class="form-group collapse show" id="cps_form">
-      <label for="cps">CPS Model:</label>
       <textarea id="cps" class="form-control" rows="150"></textarea>
     </div>
 
@@ -128,13 +108,13 @@
     </div>
   </div>
 
-<!--  <a class="btn btn-default" onclick="alert(copasi.version)">Get Version</a>-->
   <%= open_with_copasi_js_button @display_model %>
   <%= open_with_copasi_ui_button @display_model %>
 
 
   <div id="chart"></div>
   <div id="data" class="table collapse"></div>
+
 </div>
 
 </div>
