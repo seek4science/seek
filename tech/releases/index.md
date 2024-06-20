@@ -11,6 +11,16 @@ Please see [Getting FAIRDOM-SEEK](/get-seek.html) for details about installing S
 
 If you have any comments or feedback about a release, then please [Contact Us](/contacting-us.html)
 
+## Version 1.15.1
+
+Release date: _20th June 2024_
+
+A patch release that includes some important bug fixes and improvements:
+
+* 
+
+For a full list, see [closed issues for 1.15.1](https://github.com/seek4science/seek/milestone/22?closed=1)
+
 ## Version 1.15.0
 
 Release date: _17th May 2024_
