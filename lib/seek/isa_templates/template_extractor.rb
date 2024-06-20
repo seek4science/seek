@@ -4,7 +4,7 @@ module Seek
   module IsaTemplates
     module TemplateExtractor
       def self.extract_templates
-        `touch #{resultfile}`
+        FileUtils.touch(resultfile)
         result = StringIO.new
         seed_isa_tags
 
