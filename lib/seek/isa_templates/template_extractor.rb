@@ -12,10 +12,10 @@ module Seek
           client = Ebi::OlsClient.new
           project = Project.find_or_create_by(title: 'Default Project')
           directory = Seek::Config.append_filestore_path('source_types')
-          directory_files = Dir.exist?(directory) ? Dir.glob("#{directory}/*.json") : []
-          raise '<ul><li>Make sure to upload files that have the ".json" extension.</li></ul>' if directory_files == []
+          @directory_files = Dir.exist?(directory) ? Dir.glob("#{directory}/*.json") : []
+          raise '<ul><li>Make sure to upload files that have the ".json" extension.</li></ul>' if @directory_files == []
 
-          directory_files.each do |filename|
+          @directory_files.each do |filename|
             next if File.extname(filename) != '.json'
 
             @errors = []
@@ -36,6 +36,7 @@ module Seek
 
               template = Template.new(template_details.merge({ projects: [project], policy: Policy.public_policy }))
 
+              current_template_attributes = []
               item['data'].each_with_index do |attribute, j|
                 is_ontology = attribute['ontology'].present?
                 is_cv = attribute['CVList'].present?
@@ -86,37 +87,35 @@ module Seek
 
                 p scv.errors if (is_ontology || is_cv) && !scv.save(validate: false)
 
-                template_attribute_details = { title: attribute['name'] }
+                ta = TemplateAttribute.new(is_title: (attribute['title'] || 0),
+                                     isa_tag_id: get_isa_tag_id(attribute['isaTag']),
+                                     short_name: attribute['short_name'],
+                                     required: attribute['required'],
+                                     description: attribute['description'],
+                                     sample_controlled_vocab_id: scv&.id,
+                                     pid: attribute['pid'],
+                                     sample_attribute_type_id: get_sample_attribute_type(attribute['dataType']),
+                                     allow_cv_free_text: attribute['ontology'].present?,
+                                     title: attribute['name'])
 
-                TemplateAttribute.new(is_title: attribute['title'] || 0,
-                                         isa_tag_id: get_isa_tag_id(attribute['isaTag']),
-                                         short_name: attribute['short_name'],
-                                         required: attribute['required'],
-                                         description: attribute['description'],
-                                         sample_controlled_vocab_id: scv&.id,
-                                         pid: attribute['pid'],
-                                         sample_attribute_type_id: get_sample_attribute_type(attribute['dataType']),
-                                         allow_cv_free_text: attribute['ontology'].present?,
-                                         title: attribute['name'],
-                                         template:)
-
+                current_template_attributes.append ta
               end
+              template.template_attributes << current_template_attributes
               template.save! unless @errors.present?
             end
 
             # Remove the file after processing
-            File.delete(filename)
           end
         end
         raise "<ul>#{@errors.map { |e| "#{e}" }.join('')}</ul>".html_safe if @errors.present?
 
         write_result(result.string)
       rescue StandardError => e
-        puts e
         write_result("error(s): #{e}")
         raise e
       ensure
-        `rm -f #{lockfile}`
+        FileUtils.rm_f(lockfile)
+        FileUtils.rm_f(@directory_files) unless @directory_files.blank?
       end
 
       def self.init_template(metadata)
