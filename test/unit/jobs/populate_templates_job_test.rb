@@ -49,4 +49,18 @@ class PopulateTemplatesJobTest < ActiveSupport::TestCase
       end
     end
   end
+
+  test 'perform with json containing invalid ISA tag' do
+    # Copy the JSON file to the source_types directory
+    src = Rails.root.join('test', 'fixtures', 'files', 'upload_json_sample_type_template', 'invalid_isa_tag_templates.json')
+    dest = Seek::Config.append_filestore_path('source_types')
+    FileUtils.cp(src, dest)
+
+    assert_no_difference('Template.count') do
+      assert_raises(StandardError) do
+        PopulateTemplatesJob.perform_now
+      end
+    end
+  end
+
 end
