@@ -36,9 +36,9 @@ class PopulateTemplatesJobTest < ActiveSupport::TestCase
     end
   end
 
-  test 'perform with invalid json' do
+  test 'perform with json containing invalid sample attribute type' do
     # Copy the JSON file to the source_types directory
-    src = Rails.root.join('test', 'fixtures', 'files', 'upload_json_sample_type_template', 'invalid_templates1.json')
+    src = Rails.root.join('test', 'fixtures', 'files', 'upload_json_sample_type_template', 'invalid_attribute_type_templates.json')
     dest = Seek::Config.append_filestore_path('source_types')
     FileUtils.cp(src, dest)
 
