@@ -17,7 +17,7 @@ module Seek
 
         @blob = nil
 
-        content_blob = @display_model.content_blobs.first
+        content_blob = select_copasi_content_blob
 
         if content_blob.file_exists?
           @blob = (File.read(content_blob.file)).html_safe
@@ -40,7 +40,12 @@ module Seek
         if @blob.nil?
           flash.now[:error] = 'There is a problem to load the model file.'
         end
+      end
 
+      def select_copasi_content_blob
+        blob = @display_model.copasi_supported_content_blobs.first
+        raise 'Unable to find file to support Copasi Online' unless blob
+        blob
       end
 
       def find_display_asset_for_copasi
