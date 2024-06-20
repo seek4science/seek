@@ -19,7 +19,7 @@ A patch release that includes some important bug fixes and improvements, in part
 
 * Fixed samples missing from Batch permission changes if associated with a Assay.
 * Fix the available Assays shown when registering Samples that have been extracted from a Data file template.
-* Fixed controlled vocabulary terms being duplicated when performing edits.
+* Fixed Controlled Vocabulary terms being duplicated when performing edits.
 * Fix to correctly transfer Sample sharing policies from the originating Data file when extracted.
 * Fix to the page shown when starting to import a DMP
 * Various small Datahub and Single Page View fixes and improvements. 
