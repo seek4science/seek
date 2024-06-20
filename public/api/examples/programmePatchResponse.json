@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "1296",
+    "id": "42",
     "type": "programmes",
     "attributes": {
       "discussion_links": [
@@ -19,7 +19,7 @@
       "administrators": {
         "data": [
           {
-            "id": "5588",
+            "id": "301",
             "type": "people"
           }
         ]
@@ -27,7 +27,7 @@
       "people": {
         "data": [
           {
-            "id": "5588",
+            "id": "301",
             "type": "people"
           }
         ]
@@ -35,7 +35,7 @@
       "projects": {
         "data": [
           {
-            "id": "7653",
+            "id": "364",
             "type": "projects"
           }
         ]
@@ -107,14 +107,14 @@
       }
     },
     "links": {
-      "self": "/programmes/1296"
+      "self": "/programmes/42"
     },
     "meta": {
-      "created": "2023-03-28T14:57:01.000Z",
-      "modified": "2023-03-28T14:57:01.000Z",
+      "created": "2024-06-20T12:29:32.000Z",
+      "modified": "2024-06-20T12:29:32.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "b8016460-afa6-013b-c76a-2c91a17e7bb9"
+      "uuid": "abc65c50-112e-013d-1f9d-0a81884ed284"
     }
   },
   "jsonapi": {

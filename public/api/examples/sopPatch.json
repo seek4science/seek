@@ -1,7 +1,7 @@
 {
   "data": {
     "type": "sops",
-    "id": "16",
+    "id": "1055250535",
     "attributes": {
       "title": "A Maximally Patched SOP",
       "description": "Protocol",
@@ -17,7 +17,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "218",
+              "id": "1022253019",
               "type": "projects"
             },
             "access": "edit"
@@ -29,7 +29,7 @@
       "creators": {
         "data": [
           {
-            "id": "205",
+            "id": "1039988892",
             "type": "people"
           }
         ]
@@ -37,7 +37,7 @@
       "projects": {
         "data": [
           {
-            "id": "218",
+            "id": "1022253019",
             "type": "projects"
           }
         ]
@@ -45,7 +45,7 @@
       "assays": {
         "data": [
           {
-            "id": "28",
+            "id": "1035386971",
             "type": "assays"
           }
         ]
@@ -53,7 +53,7 @@
       "workflows": {
         "data": [
           {
-            "id": "8",
+            "id": "257",
             "type": "workflows"
           }
         ]

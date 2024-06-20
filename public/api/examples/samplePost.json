@@ -11,7 +11,10 @@
         "apples": [
           "Golden Delicious",
           "Granny Smith"
-        ]
+        ],
+        "weight": 3.7,
+        "age": 42,
+        "bool": true
       },
       "tags": [
         "tag1",
@@ -21,14 +24,14 @@
     "relationships": {
       "sample_type": {
         "data": {
-          "id": "2",
+          "id": "246",
           "type": "sample_types"
         }
       },
       "creators": {
         "data": [
           {
-            "id": "2",
+            "id": "1039988186",
             "type": "people"
           }
         ]
@@ -36,7 +39,7 @@
       "projects": {
         "data": [
           {
-            "id": "2",
+            "id": "1022252265",
             "type": "projects"
           }
         ]
@@ -44,7 +47,7 @@
       "assays": {
         "data": [
           {
-            "id": "2",
+            "id": "1035386870",
             "type": "assays"
           }
         ]

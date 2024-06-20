@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "233",
+    "id": "278",
     "type": "extended_metadata_types",
     "attributes": {
       "title": "A Max Extended Metadata Type",
@@ -8,13 +8,13 @@
       "enabled": true,
       "extended_metadata_attributes": [
         {
-          "id": "502",
+          "id": "652",
           "title": "age",
           "label": "Age",
           "description": null,
           "sample_attribute_type": {
-            "id": "539",
-            "title": "Integer attribute type 4",
+            "id": "765",
+            "title": "Integer attribute type 43",
             "base_type": "Integer",
             "regexp": ".*"
           },
@@ -24,13 +24,13 @@
           "linked_extended_metadata_type_id": null
         },
         {
-          "id": "503",
+          "id": "653",
           "title": "name",
           "label": "Name",
           "description": null,
           "sample_attribute_type": {
-            "id": "540",
-            "title": "String attribute type 7",
+            "id": "766",
+            "title": "String attribute type 483",
             "base_type": "String",
             "regexp": ".*"
           },
@@ -40,13 +40,13 @@
           "linked_extended_metadata_type_id": null
         },
         {
-          "id": "504",
+          "id": "654",
           "title": "date",
           "label": "Date",
           "description": null,
           "sample_attribute_type": {
-            "id": "541",
-            "title": "DateTime attribute type 4",
+            "id": "767",
+            "title": "DateTime attribute type 43",
             "base_type": "DateTime",
             "regexp": ".*"
           },
@@ -58,7 +58,7 @@
       ]
     },
     "links": {
-      "self": "/extended_metadata_types/233"
+      "self": "/extended_metadata_types/278"
     },
     "meta": {
       "api_version": "0.3",
