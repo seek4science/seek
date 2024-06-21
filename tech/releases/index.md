@@ -23,7 +23,7 @@ A patch release that includes some important bug fixes and improvements, in part
 * Fix to correctly transfer Sample sharing policies from the originating Data file when extracted.
 * Fix to the page shown when starting to import a DMP.
 * Better error handing and reporting when BiVeS model comparison fails.
-* Various small Datahub and Single Page View fixes and improvements. 
+* Various small fixes and improvements, regarding Experiment Sample Templates and the Single Page View. 
 
 For a full list, see [closed issues for 1.15.1](https://github.com/seek4science/seek/milestone/22?closed=1)
 
