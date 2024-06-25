@@ -2,6 +2,8 @@ require 'test_helper'
 
 class PopulateTemplatesJobTest < ActiveSupport::TestCase
   def setup
+    Seek::Util.clear_cached
+
     # Create the SampleAttributeTypes
     %i[string_sample_attribute_type sample_multi_sample_attribute_type].map do |type|
       FactoryBot.create(type)
@@ -19,6 +21,8 @@ class PopulateTemplatesJobTest < ActiveSupport::TestCase
   end
 
   def teardown
+    Seek::Util.clear_cached
+
     # Set isa_json_compliance_enabled back to false
     Seek::Config.isa_json_compliance_enabled = false
   end
