@@ -2160,6 +2160,25 @@ class AssaysControllerTest < ActionController::TestCase
     end
   end
 
+  test 'visibility of the propagate permissions button' do
+    with_config_value(:isa_json_compliance_enabled, true) do
+      person = FactoryBot.create(:person)
+      login_as(person)
+      investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, contributor: person)
+      study = FactoryBot.create(:isa_json_compliant_study, investigation: )
+      assay_stream = FactoryBot.create(:assay_stream, study: , contributor: person, position: 0)
+      experimental_assay = FactoryBot.create(:assay, contributor: person, study: , assay_stream:, position: 0)
+
+      get :manage, params: { id: assay_stream }
+      assert_response :success
+      assert_select 'input[type=checkbox][name=propagate_permissions]', count: 1
+
+      get :manage, params: { id: experimental_assay }
+      assert_response :success
+      assert_select 'input[type=checkbox][name=propagate_permissions]', count: 0
+    end
+  end
+
   test 'Should propagate assay stream permissions' do
     with_config_value(:isa_json_compliance_enabled, true) do
       person = FactoryBot.create(:person)
