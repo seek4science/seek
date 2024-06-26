@@ -83,10 +83,7 @@ module Seek
             end
           end
           orcid = obj['identifier'] || obj['@id']
-          if orcid.present? && orcid.include?('orcid.org')
-            author[:orcid] = orcid
-            author[:creator_id] = Person.select(:id).find_by_orcid(author[:orcid])&.id
-          end
+          author[:orcid] = orcid if orcid.present? && orcid.include?('orcid.org')
           author[:given_name] = given_name if given_name.present?
           author[:family_name] = family_name if family_name.present?
         end
