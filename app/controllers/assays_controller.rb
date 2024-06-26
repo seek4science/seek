@@ -163,7 +163,7 @@ class AssaysController < ApplicationController
   private
 
   def propagate_permissions_to_children
-    return unless params[:propagate_permissions]
+    return unless params[:propagate_permissions] == '1'
 
     # Should only propagate permissions to child assays if the assay is an assay stream
     return unless @assay.is_assay_stream?
