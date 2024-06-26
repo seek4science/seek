@@ -1,4 +1,8 @@
 class LifeMonitorSubmissionJob < ApplicationJob
+  retry_on RestClient::Exception, wait: 10.minutes, attempts: 3 do |exception|
+    handle_exception(exception)
+  end
+
   def perform(workflow_version)
     return unless Seek::Config.life_monitor_enabled
 

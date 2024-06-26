@@ -209,8 +209,32 @@ class WorkflowTest < ActiveSupport::TestCase
       VCR.use_cassette('life_monitor/get_token') do
         VCR.use_cassette('life_monitor/non_existing_workflow_get') do
           VCR.use_cassette('life_monitor/submit_workflow') do
-            assert_nothing_raised do
-              User.current_user = workflow.contributor.user
+            assert_enqueued_jobs(0, only: LifeMonitorSubmissionJob) do
+              assert_nothing_raised do
+                User.current_user = workflow.contributor.user
+                LifeMonitorSubmissionJob.perform_now(workflow.latest_version)
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+
+  test 'retries life monitor submission job if it fails' do
+    workflow = nil
+    with_config_value(:life_monitor_enabled, true) do
+      assert_enqueued_with(job: LifeMonitorSubmissionJob) do
+        workflow = FactoryBot.create(:workflow_with_tests, uuid: '86da0a30-d2cd-013a-a07d-000c29a94011',
+                                     policy: FactoryBot.create(:public_policy))
+        assert workflow.latest_version.has_tests?
+        assert workflow.can_download?(nil)
+      end
+
+      VCR.use_cassette('life_monitor/get_token') do
+        VCR.use_cassette('life_monitor/non_existing_workflow_get') do
+          VCR.use_cassette('life_monitor/submit_workflow_error') do
+            assert_enqueued_jobs(1, only: LifeMonitorSubmissionJob) do
               LifeMonitorSubmissionJob.perform_now(workflow.latest_version)
             end
           end

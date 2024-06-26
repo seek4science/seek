@@ -4,11 +4,7 @@ class ApplicationJob < ActiveJob::Base
   queue_with_priority  2
 
   rescue_from(Exception) do |exception|
-    unless exception.is_a?(ActiveJob::DeserializationError) &&
-           exception.cause.is_a?(ActiveRecord::RecordNotFound)
-      raise exception if Rails.env.test?
-      report_exception(exception)
-    end
+    handle_exception(exception)
   end
 
   # time limit for the whole job to run, after which a timeout exception will be raised
@@ -56,6 +52,12 @@ class ApplicationJob < ActiveJob::Base
     args[:priority] = priority if priority
 
     enqueue(args)
+  end
+
+  def handle_exception(exception)
+    return if exception.is_a?(ActiveJob::DeserializationError) && exception.cause.is_a?(ActiveRecord::RecordNotFound)
+    raise exception if Rails.env.test?
+    report_exception(exception)
   end
 
   def report_exception(exception, message = nil, data = {})

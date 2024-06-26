@@ -1,7 +1,9 @@
 class RemoteGitContentFetchingJob < ApplicationJob
   queue_as QueueNames::REMOTE_CONTENT
 
-  retry_on Seek::DownloadHandling::BadResponseCodeException, wait: 1.minute, attempts: 3
+  retry_on Seek::DownloadHandling::BadResponseCodeException, wait: 1.minute, attempts: 3 do |exception|
+    handle_exception(exception)
+  end
 
   def perform(git_version, path, _ = nil)
     disable_authorization_checks do
