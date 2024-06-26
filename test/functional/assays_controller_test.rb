@@ -2160,7 +2160,7 @@ class AssaysControllerTest < ActionController::TestCase
     end
   end
 
-  test 'assay stream permissions propagation' do
+  test 'Should propagate assay stream permissions' do
     with_config_value(:isa_json_compliance_enabled, true) do
       person = FactoryBot.create(:person)
       other_person = FactoryBot.create(:person)
@@ -2175,7 +2175,7 @@ class AssaysControllerTest < ActionController::TestCase
       login_as(person)
       refute unauthorized_child_assay.can_manage?
       refute authorized_child_assay.can_manage?(other_person)
-      patch :manage_update, params: { id: assay_stream, propagate_permissions: '1', assay: {creator_ids: [other_person.id]}, policy_attributes: {access_type: Policy::VISIBLE, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}}}
+      patch :manage_update, params: { id: assay_stream, propagate_permissions: '1', assay: {creator_ids: [other_person.id]}, policy_attributes: {access_type: Policy::NO_ACCESS, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}}}
 
       # assert the flash[:error] text. The permissions of the unauthorized assay should not be propagated
       assert flash[:error], "<ul><li>You do not have the necessary permissions to propagate permissions to #{t('assay').downcase} [#{unauthorized_child_assay.id}]: '#{unauthorized_child_assay.title}'</li></ul>"

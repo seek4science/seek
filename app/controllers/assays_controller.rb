@@ -19,7 +19,7 @@ class AssaysController < ApplicationController
   # => Rearrange positions
   after_action :rearrange_assay_positions_at_destroy, only: :destroy
 
-  before_action :propagate_permissions_to_children, only: :manage_update
+  after_action :propagate_permissions_to_children, only: :manage_update
 
   include Seek::Publishing::PublishingCommon
 
@@ -165,7 +165,8 @@ class AssaysController < ApplicationController
   def propagate_permissions_to_children
     return unless params[:propagate_permissions]
 
-    # flash[:error] = 'You do not have the necessary permissions to propagate permissions to children'
+    # Should only propagate permissions to child assays if the assay is an assay stream
+    return unless @assay.is_assay_stream?
 
     errors = []
     @assay.child_assays.map do |assay|
@@ -175,7 +176,10 @@ class AssaysController < ApplicationController
         next
       end
 
-      assay.update(assay_params)
+      current_assay_policy = assay.policy
+      # Clone the policy from the parent assay
+      assay.update(policy: @assay.policy.deep_copy)
+      current_assay_policy.destroy if current_assay_policy
       update_sharing_policies assay
     end
     # Add an error message to the flash
