@@ -82,7 +82,7 @@ module Seek
 
       def is_special_auth_code_required?
         # If the model is not publicly accessible but can be downloaded by the current user, the special auth code will be required.
-        Seek::Config.copasi_enabled && @display_model.is_copasi_supported? && @display_model.model.can_download? && !@model.public?
+        Seek::Config.copasi_enabled && @display_model.is_copasi_supported? && @model.can_download? && !@model.public?
       end
 
     end
