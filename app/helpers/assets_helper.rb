@@ -225,7 +225,7 @@ module AssetsHelper
 
     blob  =   @display_model.copasi_supported_content_blobs.first
 
-    auth_code = @model.special_auth_codes.where('code LIKE ?', 'copasi_%').first.code
+    auth_code = @model.special_auth_codes.where('code LIKE ?', 'copasi_%').first.code unless @model.public?
 
     download_path = polymorphic_path([@model, blob], action: :download, code:auth_code)
 
