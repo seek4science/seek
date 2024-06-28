@@ -274,4 +274,7 @@ class Workflow < ApplicationRecord
       }
   )
 
+  def self.find_by_source_url(source_url)
+    joins(:source_link).where('asset_links.url' => source_url)
+  end
 end

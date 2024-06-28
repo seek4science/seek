@@ -10,7 +10,8 @@ class WorkflowsController < ApplicationController
   before_action :find_display_asset, only: [:show, :download, :diagram, :ro_crate, :ro_crate_metadata, :edit_paths, :update_paths]
   before_action :login_required, only: [:create, :create_version, :new_version,
                                         :create_from_files, :create_from_ro_crate,
-                                        :create_metadata, :provide_metadata, :create_from_git, :create_version_from_git]
+                                        :create_metadata, :provide_metadata, :create_from_git, :create_version_from_git,
+                                        :submit]
   before_action :find_or_initialize_workflow, only: [:create_from_files, :create_from_ro_crate]
 
   include Seek::Publishing::PublishingCommon
@@ -307,6 +308,21 @@ class WorkflowsController < ApplicationController
     end
   end
 
+  def submit
+    @crate_extractor = WorkflowCrateExtractor.new(ro_crate: { data: params[:ro_crate] }, params: workflow_params, update_existing: true)
+
+    if @crate_extractor.valid?
+      @workflow = @crate_extractor.build
+      if @workflow.git_version.save && @workflow.save
+        render json: @workflow, include: json_api_include_param
+      else
+        render json: json_api_errors(@workflow), status: :unprocessable_entity
+      end
+    else
+      render json: json_api_errors(@crate_extractor), status: :unprocessable_entity
+    end
+  end
+
   private
 
   def handle_ro_crate_post(new_version = false)
@@ -321,7 +337,7 @@ class WorkflowsController < ApplicationController
       else
         @crate_extractor.workflow = @workflow
         @workflow.latest_git_version.lock if @workflow.latest_git_version.mutable?
-        @crate_extractor.git_version = @workflow.latest_git_version.next_version(mutable: true).tap(&:save)
+        @crate_extractor.git_version = @workflow.latest_git_version.next_version(mutable: true)
       end
     end
     @workflow = @crate_extractor.build
