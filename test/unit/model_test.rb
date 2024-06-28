@@ -96,6 +96,16 @@ class ModelTest < ActiveSupport::TestCase
     assert !model.is_jws_supported?
     assert !model.contains_jws_dat?
 
+
+    model = FactoryBot.create(:copasi_model)
+    assert model.is_copasi_supported?
+
+    model = FactoryBot.create(:teusink_model)
+    assert model.is_copasi_supported?
+
+    model = FactoryBot.create(:non_sbml_xml_model)
+    assert !model.is_copasi_supported?
+
     # should also be able to handle new versions
     model = FactoryBot.create(:non_sbml_xml_model)
     assert !model.contains_sbml?
