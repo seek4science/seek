@@ -85,25 +85,11 @@
   <div>
     <a class="btn btn-sm" data-toggle="collapse" href="#cps_form" role="button" aria-expanded="false"
        aria-controls="cps_form">show model file</a>
-    <a class="btn btn-sm" data-toggle="collapse" href="#yaml_form" role="button" aria-expanded="false"
-       aria-controls="yaml_form">show yaml</a>
     <div class="form-group collapse show" id="cps_form">
       <textarea id="cps" class="form-control" rows="150"></textarea>
     </div>
 
-    <div class="form-group collapse" id="yaml_form">
-      <label for="yaml">Processing: </label>
-      <small> Changes for processing in yaml for the problem:
-        <pre>{"problem":{"Duration": 100, "StepNumber": 100, "StepSize": 0.1}}</pre> or
-        <pre>{"method": {"name": "Stochastic (Gibson + Bruck)"}}</pre> or for changes of
-        initialvalues in the form of display names. So:
-        <ul>
-          <li><pre>[A]_0</pre> for initial concentration of species A</li>
-          <li><pre>Values[t].InitialValue</pre> for initial value of parameter t</li>
-          <li><pre>(r1).k</pre> for the value of k of reaction r1.</li>
-        </ul>
-        <pre>{"initial_values": {"[A]_0": 10.0, "Values[t].InitialValue": 0.1, "(r1).k": 0.1}}</pre>
-      </small>
+    <div class="form-group collapse" id="yaml_form" hidden="">
       <textarea id="yaml" class="form-control" rows="8">{}</textarea>
     </div>
   </div>
