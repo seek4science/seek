@@ -1,5 +1,5 @@
 <% if show_copasi_button? %>
-  <%= button_link_to("Simulate #{t('model')} on Copasi", 'copasi', copasi_simulate_model_path(:version => @display_model.version, :code => params[:code] ),:method=>:post) %>
+  <%= button_link_to("Simulate #{t('model')} on Copasi", 'copasi', copasi_simulate_model_path(:version => @display_model.version, :code => params[:code] ),:method=>:get) %>
 <% end %>
 
 <% if show_jws_simulate? %>
