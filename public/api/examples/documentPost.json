@@ -21,7 +21,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "16368",
+              "id": "1022252696",
               "type": "projects"
             },
             "access": "edit"
@@ -29,7 +29,7 @@
         ]
       },
       "extended_attributes": {
-        "extended_metadata_type_id": "3006",
+        "extended_metadata_type_id": "386",
         "attribute_map": {
           "role_email": "alice@email.com",
           "role_phone": "0012345",
@@ -48,7 +48,7 @@
       "creators": {
         "data": [
           {
-            "id": "13824",
+            "id": "1039988590",
             "type": "people"
           }
         ]
@@ -56,7 +56,7 @@
       "projects": {
         "data": [
           {
-            "id": "16368",
+            "id": "1022252696",
             "type": "projects"
           }
         ]
@@ -64,7 +64,7 @@
       "assays": {
         "data": [
           {
-            "id": "1900",
+            "id": "1035386910",
             "type": "assays"
           }
         ]
@@ -72,7 +72,7 @@
       "workflows": {
         "data": [
           {
-            "id": "334",
+            "id": "220",
             "type": "workflows"
           }
         ]

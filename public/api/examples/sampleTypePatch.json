@@ -1,15 +1,26 @@
 {
   "data": {
     "type": "sample_types",
+<<<<<<< HEAD
     "id": "1259",
+=======
+    "id": "118",
+>>>>>>> seek-1.15
     "attributes": {
       "title": "This is a new title.",
       "sample_attributes": [
         {
+<<<<<<< HEAD
           "id": "6149",
           "title": "This is a new attribute title",
           "sample_attribute_type": {
             "title": "String attribute type 30"
+=======
+          "id": "206",
+          "title": "This is a new attribute title",
+          "sample_attribute_type": {
+            "title": "String attribute type 513"
+>>>>>>> seek-1.15
           }
         }
       ],
@@ -21,7 +32,11 @@
       "projects": {
         "data": [
           {
+<<<<<<< HEAD
             "id": "1022258877",
+=======
+            "id": "1022251411",
+>>>>>>> seek-1.15
             "type": "projects"
           }
         ]
@@ -29,7 +44,11 @@
       "assays": {
         "data": [
           {
+<<<<<<< HEAD
             "id": "1035387750",
+=======
+            "id": "1035386724",
+>>>>>>> seek-1.15
             "type": "assays"
           }
         ]

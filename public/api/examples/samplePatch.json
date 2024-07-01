@@ -1,7 +1,7 @@
 {
   "data": {
     "type": "samples",
-    "id": "860",
+    "id": "3",
     "attributes": {
       "attribute_map": {
         "full_name": "Fred Bloggs",
@@ -25,7 +25,7 @@
       "projects": {
         "data": [
           {
-            "id": "1022258789",
+            "id": "2",
             "type": "projects"
           }
         ]

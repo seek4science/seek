@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "844",
+    "id": "4",
     "type": "samples",
     "attributes": {
       "policy": {
@@ -17,14 +17,14 @@
         "tag1",
         "tag2"
       ],
-      "created_at": "2024-06-13T15:11:21.000Z",
-      "updated_at": "2024-06-13T15:11:21.000Z",
+      "created_at": "2023-03-06T15:24:11.241Z",
+      "updated_at": "2023-03-06T15:24:11.220Z",
       "creators": [
         {
-          "profile": "/people/1039994265",
+          "profile": "/people/2",
           "family_name": "Last",
-          "given_name": "Person304",
-          "affiliation": "An Institution: 330",
+          "given_name": "Person284",
+          "affiliation": "An Institution: 309",
           "orcid": null
         }
       ],
@@ -51,7 +51,7 @@
       "creators": {
         "data": [
           {
-            "id": "1039994265",
+            "id": "2",
             "type": "people"
           }
         ]
@@ -59,21 +59,21 @@
       "submitter": {
         "data": [
           {
-            "id": "1039994265",
+            "id": "2",
             "type": "people"
           }
         ]
       },
       "sample_type": {
         "data": {
-          "id": "1190",
+          "id": "2",
           "type": "sample_types"
         }
       },
       "projects": {
         "data": [
           {
-            "id": "1022258734",
+            "id": "2",
             "type": "projects"
           }
         ]
@@ -86,7 +86,7 @@
       "investigations": {
         "data": [
           {
-            "id": "973656209",
+            "id": "2",
             "type": "investigations"
           }
         ]
@@ -94,7 +94,7 @@
       "studies": {
         "data": [
           {
-            "id": "1060386087",
+            "id": "2",
             "type": "studies"
           }
         ]
@@ -102,7 +102,7 @@
       "assays": {
         "data": [
           {
-            "id": "1035387711",
+            "id": "2",
             "type": "assays"
           }
         ]
@@ -110,21 +110,21 @@
       "people": {
         "data": [
           {
-            "id": "1039994265",
+            "id": "2",
             "type": "people"
           }
         ]
       }
     },
     "links": {
-      "self": "/samples/844"
+      "self": "/samples/4"
     },
     "meta": {
-      "created": "2024-06-13T15:11:21.000Z",
-      "modified": "2024-06-13T15:11:21.000Z",
+      "created": "2023-03-06T15:24:11.241Z",
+      "modified": "2023-03-06T15:24:11.220Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "1d9e2080-0bc5-013d-1f94-0a81884ed284"
+      "uuid": "de769a80-9e60-013b-15a0-0a81884ed284"
     }
   },
   "jsonapi": {

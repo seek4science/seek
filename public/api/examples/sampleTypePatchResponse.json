@@ -1,19 +1,32 @@
 {
   "data": {
+<<<<<<< HEAD
     "id": "1259",
+=======
+    "id": "118",
+>>>>>>> seek-1.15
     "type": "sample_types",
     "attributes": {
       "title": "This is a new title.",
       "description": null,
       "sample_attributes": [
         {
+<<<<<<< HEAD
           "id": "6149",
+=======
+          "id": "206",
+>>>>>>> seek-1.15
           "title": "This is a new attribute title",
           "description": null,
           "pid": null,
           "sample_attribute_type": {
+<<<<<<< HEAD
             "id": "8026",
             "title": "String attribute type 30",
+=======
+            "id": "875",
+            "title": "String attribute type 513",
+>>>>>>> seek-1.15
             "base_type": "String",
             "regexp": ".*"
           },
@@ -33,7 +46,11 @@
       "projects": {
         "data": [
           {
+<<<<<<< HEAD
             "id": "1022258877",
+=======
+            "id": "1022251411",
+>>>>>>> seek-1.15
             "type": "projects"
           }
         ]
@@ -46,7 +63,11 @@
       "submitter": {
         "data": [
           {
+<<<<<<< HEAD
             "id": "1039994408",
+=======
+            "id": "1039987344",
+>>>>>>> seek-1.15
             "type": "people"
           }
         ]
@@ -54,13 +75,18 @@
       "assays": {
         "data": [
           {
+<<<<<<< HEAD
             "id": "1035387750",
+=======
+            "id": "1035386724",
+>>>>>>> seek-1.15
             "type": "assays"
           }
         ]
       }
     },
     "links": {
+<<<<<<< HEAD
       "self": "/sample_types/1259"
     },
     "meta": {
@@ -69,6 +95,16 @@
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
       "uuid": "29638990-0bc5-013d-1f94-0a81884ed284"
+=======
+      "self": "/sample_types/118"
+    },
+    "meta": {
+      "created": "2024-06-20T12:36:24.000Z",
+      "modified": "2024-06-20T12:36:24.000Z",
+      "api_version": "0.3",
+      "base_url": "http://localhost:3000",
+      "uuid": "a100d230-112f-013d-1f9d-0a81884ed284"
+>>>>>>> seek-1.15
     }
   },
   "jsonapi": {

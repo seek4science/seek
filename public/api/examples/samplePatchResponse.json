@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "860",
+    "id": "3",
     "type": "samples",
     "attributes": {
       "policy": {
@@ -16,8 +16,8 @@
       "tags": [
 
       ],
-      "created_at": "2024-06-13T15:11:28.000Z",
-      "updated_at": "2024-06-13T15:11:29.000Z",
+      "created_at": "2023-03-06T15:24:15.832Z",
+      "updated_at": "2023-03-06T15:24:15.975Z",
       "creators": [
 
       ],
@@ -34,29 +34,16 @@
         ],
         "patients": [
           {
-            "id": 858,
+            "id": 1,
             "type": "Sample",
             "title": "Fred Bloggs"
           },
           {
-            "id": 859,
+            "id": 2,
             "type": "Sample",
             "title": "Fred Bloggs"
           }
-        ],
-        "weight": 3.7,
-        "age": 42,
-        "bool": true,
-        "data file": {
-          "id": 883654727,
-          "type": "DataFile",
-          "title": "This Data file"
-        },
-        "sop": {
-          "id": 1055250897,
-          "type": "Sop",
-          "title": "This Sop"
-        }
+        ]
       }
     },
     "relationships": {
@@ -68,21 +55,21 @@
       "submitter": {
         "data": [
           {
-            "id": "1039994320",
+            "id": "2",
             "type": "people"
           }
         ]
       },
       "sample_type": {
         "data": {
-          "id": "1211",
+          "id": "2",
           "type": "sample_types"
         }
       },
       "projects": {
         "data": [
           {
-            "id": "1022258789",
+            "id": "2",
             "type": "projects"
           }
         ]
@@ -113,21 +100,21 @@
       "people": {
         "data": [
           {
-            "id": "1039994320",
+            "id": "2",
             "type": "people"
           }
         ]
       }
     },
     "links": {
-      "self": "/samples/860"
+      "self": "/samples/3"
     },
     "meta": {
-      "created": "2024-06-13T15:11:28.000Z",
-      "modified": "2024-06-13T15:11:29.000Z",
+      "created": "2023-03-06T15:24:15.832Z",
+      "modified": "2023-03-06T15:24:15.975Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "220bf9c0-0bc5-013d-1f94-0a81884ed284"
+      "uuid": "e133a800-9e60-013b-15a0-0a81884ed284"
     }
   },
   "jsonapi": {
