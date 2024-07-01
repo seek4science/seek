@@ -20,37 +20,34 @@ module Seek
       # # If the content blob is not available locally, fetch a copy from the remote URL
       def select_model_file_for_simulation
 
-        @blob = nil
-
         content_blob = select_copasi_content_blob
 
-        if content_blob.file_exists?
-          @blob = (File.read(content_blob.file)).html_safe
+        if content_blob.nil?
+          flash.now[:error] = 'The selected version does not contain a format supported by COPASI.'
         else
-          blob_url = content_blob.url
-          begin
-            handler = ContentBlob.remote_content_handler_for(blob_url)
-            data = handler.fetch
-            @blob = (File.read(data)).html_safe
-            true
-          rescue Seek::DownloadHandling::BadResponseCodeException => e
-            flash.now[:error] = "URL could not be accessed: #{e.message}"
-            false
-          rescue StandardError => e
-            flash.now[:error] = 'There is a problem to load the model file.'
-            false
+          if content_blob.file_exists?
+            @blob = (File.read(content_blob.file)).html_safe
+          else
+            blob_url = content_blob.url
+            begin
+              handler = ContentBlob.remote_content_handler_for(blob_url)
+              data = handler.fetch
+              @blob = (File.read(data)).html_safe
+              true
+            rescue Seek::DownloadHandling::BadResponseCodeException => e
+              flash.now[:error] = "URL could not be accessed: #{e.message}"
+              false
+            rescue StandardError => e
+              flash.now[:error] = 'There is a problem to load the model file.'
+              false
+            end
           end
-        end
-
-        if @blob.nil?
-          flash.now[:error] = 'There is a problem to load the model file.'
         end
       end
 
       # select the first COPASI-compatible content_blob when multiple items are associated with the display model.
       def select_copasi_content_blob
         blob = @display_model.copasi_supported_content_blobs.first
-        raise 'Unable to find file to support Copasi Online' unless blob
         blob
       end
 
