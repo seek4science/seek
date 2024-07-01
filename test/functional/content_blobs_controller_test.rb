@@ -477,6 +477,31 @@ class ContentBlobsControllerTest < ActionController::TestCase
     csv = @response.body
     assert csv.include?(%(,"some stuff"))
 
+    get :show, params: { data_file_id: df.id, id: df.content_blob.id, format: 'csv', sheet:'2' }
+    assert_response :success
+
+    assert @response.media_type, 'text/csv'
+
+    csv = @response.body
+    assert csv.include?(%(,"hair colour"))
+
+  end
+
+  test 'can fetch excel content blob as csv with sheet name' do
+    df = FactoryBot.create(:data_file, content_blob: FactoryBot.create(:sample_type_populated_template_content_blob), policy: FactoryBot.create(:all_sysmo_downloadable_policy))
+
+    get :show, params: { data_file_id: df.id, id: df.content_blob.id, format: 'csv', sheet:'Samples' }
+    assert_response :success
+
+    assert @response.media_type, 'text/csv'
+
+    csv = @response.body
+    assert csv.include?(%(,"hair colour"))
+
+    assert_raises(RuntimeError) do
+      get :show, params: { data_file_id: df.id, id: df.content_blob.id, format: 'csv', sheet:'Not known sheet' }
+    end
+
   end
 
   test 'cannot fetch binary content blob as csv' do
