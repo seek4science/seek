@@ -509,9 +509,10 @@ class ContentBlobsControllerTest < ActionController::TestCase
     csv = @response.body
     assert csv.include?(%(,"hair colour"))
 
-    assert_raises(RuntimeError) do
-      get :show, params: { data_file_id: df.id, id: df.content_blob.id, format: 'csv', sheet:'Not known sheet' }
-    end
+
+    get :show, params: { data_file_id: df.id, id: df.content_blob.id, format: 'csv', sheet:'Not known sheet' }
+    assert_response :unprocessable_entity
+    assert_equal 'Unrecognised sheet name',@response.body
 
   end
 

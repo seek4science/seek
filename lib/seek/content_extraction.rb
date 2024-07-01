@@ -101,7 +101,7 @@ module Seek
           return sheet['index']
         end
       end
-      raise 'Unrecognised sheet name'
+      raise SysMODB::SpreadsheetExtractionException.new('Unrecognised sheet name')
     end
 
     # checks the type using mime magic, and updates if found to be different. This is to help cases where extraction

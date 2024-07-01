@@ -38,9 +38,13 @@ class ContentBlobsController < ApplicationController
     elsif @content_blob.is_csv?
         render plain: File.read(@content_blob.filepath, encoding: 'iso-8859-1'), layout: false, content_type: 'text/csv'
     elsif @content_blob.is_excel?
-        sheet = params[:sheet] || 1
-        trim = params[:trim] || false
+      sheet = params[:sheet] || 1
+      trim = params[:trim] || false
+      begin
         render plain: @content_blob.to_csv(sheet, trim), content_type: 'text/csv'
+      rescue SysMODB::SpreadsheetExtractionException => e
+        render plain: e.message.lines.first, content_type: 'text/csv', status: :unprocessable_entity
+      end
     else
         render plain: 'Unable to view contents of this data file,', content_type: 'text/csv', status: :not_acceptable
     end
