@@ -133,7 +133,7 @@ def load_seek_testing_defaults!
 
       Settings.defaults[:omniauth_oidc_enabled] = true
       Settings.defaults[:omniauth_oidc_name] = 'SEEK Testing OIDC'
-      Settings.defaults[:omniauth_oidc_issuer] = 'https://example.com/oidc/'
+      Settings.defaults[:omniauth_oidc_issuer] = 'https://example.com/oidc'
       Settings.defaults[:omniauth_oidc_client_id] = 'def'
       Settings.defaults[:omniauth_oidc_secret] = '789'
 
