@@ -487,6 +487,17 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
   end
 
+  test 'fetch excel content blob as xml' do
+    df = FactoryBot.create(:data_file, content_blob: FactoryBot.create(:sample_type_populated_template_content_blob), policy: FactoryBot.create(:all_sysmo_downloadable_policy))
+    get :show, params: { data_file_id: df.id, id: df.content_blob.id, format: 'xml' }
+    assert_response :success
+
+    assert @response.media_type, 'text/xml'
+    doc = LibXML::XML::Parser.string(@response.body).parse
+    doc.root.namespaces.default_prefix = 'ss'
+    assert_equal 3, doc.find('//ss:sheet').count
+  end
+
   test 'can fetch excel content blob as csv with sheet name' do
     df = FactoryBot.create(:data_file, content_blob: FactoryBot.create(:sample_type_populated_template_content_blob), policy: FactoryBot.create(:all_sysmo_downloadable_policy))
 

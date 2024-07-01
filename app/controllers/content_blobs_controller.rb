@@ -46,11 +46,23 @@ class ContentBlobsController < ApplicationController
     end
   end
 
+  def xml_data
+    if @content_blob.no_content?
+      render plain: 'No content, Content blob does not have content', content_type: 'text/xml', status: :not_found
+    elsif @content_blob.is_excel?
+
+      render plain: @content_blob.to_spreadsheet_xml, content_type: 'text/xml'
+    else
+      render plain: 'Unable to view contents of this data file,', content_type: 'text/xml', status: :not_acceptable
+    end
+  end
+
   def show
     respond_to do |format|
       format.json { render json: @content_blob, include: [params[:include]] }
       format.html { render plain: 'Format not supported', status: :not_acceptable }
       format.csv { csv_data }
+      format.xml { xml_data }
     end
   end
 
