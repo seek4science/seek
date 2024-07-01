@@ -1,23 +1,23 @@
 {
   "data": [
     {
-      "id": "398",
+      "id": "665",
       "type": "investigations",
       "attributes": {
-        "title": "Investigation320"
+        "title": "Investigation550"
       },
       "links": {
-        "self": "/investigations/398"
+        "self": "/investigations/665"
       }
     },
     {
-      "id": "392",
+      "id": "659",
       "type": "investigations",
       "attributes": {
         "title": "A Minimal Investigation"
       },
       "links": {
-        "self": "/investigations/392"
+        "self": "/investigations/659"
       }
     }
   ],

@@ -1,39 +1,23 @@
 {
   "data": [
     {
-<<<<<<< HEAD
-      "id": "767",
-=======
-      "id": "276",
->>>>>>> seek-1.15
+      "id": "75",
       "type": "extended_metadata_types",
       "attributes": {
         "title": "A Min Extended Metadata Type"
       },
       "links": {
-<<<<<<< HEAD
-        "self": "/extended_metadata_types/767"
+        "self": "/extended_metadata_types/75"
       }
     },
     {
-      "id": "768",
-=======
-        "self": "/extended_metadata_types/276"
-      }
-    },
-    {
-      "id": "277",
->>>>>>> seek-1.15
+      "id": "76",
       "type": "extended_metadata_types",
       "attributes": {
         "title": "A Max Extended Metadata Type"
       },
       "links": {
-<<<<<<< HEAD
-        "self": "/extended_metadata_types/768"
-=======
-        "self": "/extended_metadata_types/277"
->>>>>>> seek-1.15
+        "self": "/extended_metadata_types/76"
       }
     }
   ],

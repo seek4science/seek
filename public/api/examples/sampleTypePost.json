@@ -8,11 +8,7 @@
         {
           "title": "full name",
           "sample_attribute_type": {
-<<<<<<< HEAD
-            "title": "String attribute type 27"
-=======
-            "title": "String attribute type 510"
->>>>>>> seek-1.15
+            "title": "String attribute type 560"
           },
           "required": true,
           "pos": 1,
@@ -25,11 +21,7 @@
       "projects": {
         "data": [
           {
-<<<<<<< HEAD
-            "id": "1022258860",
-=======
-            "id": "1022251394",
->>>>>>> seek-1.15
+            "id": "3817",
             "type": "projects"
           }
         ]
@@ -37,11 +29,7 @@
       "assays": {
         "data": [
           {
-<<<<<<< HEAD
-            "id": "1035387745",
-=======
-            "id": "1035386719",
->>>>>>> seek-1.15
+            "id": "548",
             "type": "assays"
           }
         ]
