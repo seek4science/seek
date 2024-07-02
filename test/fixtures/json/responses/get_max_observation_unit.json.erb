@@ -11,6 +11,13 @@
       "title": "Max observation unit",
       "description": "the maximum one",
       "tags": [],
+      "extended_attributes": {
+        "extended_metadata_type_id":"<%= res.extended_metadata&.extended_metadata_type&.id %>",
+        "attribute_map":{
+          "name":"unit 1",
+          "strain":"strain 1"
+        }
+      },
       "created_at": "<%= res.created_at.as_json %>",
       "updated_at": "<%= res.updated_at.as_json %>",
       "creators": [
