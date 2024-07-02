@@ -6,6 +6,11 @@ FactoryBot.define do
     policy { FactoryBot.create(:public_policy) }
   end
 
+  factory(:min_observation_unit, parent: :observation_unit) do
+    title { 'A Minimal Observation Unit' }
+    description { nil }
+  end
+
   factory(:max_observation_unit, class: ObservationUnit) do
     title { 'Max observation unit'}
     description { 'the maximum one'}
