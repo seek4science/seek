@@ -131,11 +131,11 @@ module Seek
         RecommendedModelEnvironment.find_by_title(value).try(:id)
       end
 
-      convert :data_file_ids, rename: :data_files_attributes, except: [:events, :workflows] do |value|
+      convert :data_file_ids, rename: :data_files_attributes, except: [:events, :workflows, :observation_units] do |value|
         value.map { |i| { asset_id: i }.with_indifferent_access }
       end
 
-      convert :sample_ids, rename: :samples_attributes do |value|
+      convert :sample_ids, rename: :samples_attributes, except: [:observation_units] do |value|
         value.map { |i| { asset_id: i }.with_indifferent_access }
       end
 

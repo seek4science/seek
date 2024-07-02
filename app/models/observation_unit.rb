@@ -14,6 +14,8 @@ class ObservationUnit < ApplicationRecord
   has_many :observation_unit_assets, dependent: :destroy
   has_many :data_files, through: :observation_unit_assets, source: :asset, source_type: 'DataFile'
 
+  accepts_nested_attributes_for :data_files, allow_destroy: true
+
   has_extended_metadata
 
   def contributors

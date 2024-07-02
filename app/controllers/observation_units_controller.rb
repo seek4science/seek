@@ -9,7 +9,7 @@ class ObservationUnitsController < ApplicationController
   before_action :login_required,:except=>[:show,:index]
   before_action :find_assets, only: [:index]
 
-  #api_actions :index, :show
+  api_actions :index, :show, :create, :update, :destroy
 
   def show
     respond_to do |format|
@@ -18,6 +18,14 @@ class ObservationUnitsController < ApplicationController
       format.json {render json: @observation_unit, include: json_api_include_param}
     end
   end
+
+  # def create
+  #   @observation_unit = ObservationUnit.new(observation_unit_params)
+  #   @observation_unit.contributor = current_user
+  #   update_sharing_policies @assay
+  #   update_annotations(params[:tag_list], @assay)
+  #   update_relationships(@assay, params)
+  # end
 
   def update
     update_annotations(params[:tag_list], @observation_unit) if params.key?(:tag_list)
@@ -36,9 +44,18 @@ class ObservationUnitsController < ApplicationController
     end
   end
 
+  def create
+    item = initialize_asset
+    create_asset_and_respond(item)
+  end
+
   def observation_unit_params
     params.require(:observation_unit).permit(:title, :description, *creator_related_params, { project_ids: [] },
                                          { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
+                                         :study_id, { sample_ids: [] }, { data_file_ids: [] },
+                                         { discussion_links_attributes:[:id, :url, :label, :_destroy] },
                                          { extended_metadata_attributes: determine_extended_metadata_keys })
   end
+
+  alias_method :asset_params, :observation_unit_params
 end
