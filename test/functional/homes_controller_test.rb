@@ -806,4 +806,33 @@ class HomesControllerTest < ActionController::TestCase
     end
   end
 
+
+  test 'should show extended metadata type in the create menu only for admin' do
+
+    # log in as admin
+    login_as(:quentin)
+    get :index
+    assert_response :success
+    User.current_user
+    assert_select '#create-menu' do
+      assert_select 'li' do
+        assert_select 'a[href=?]', new_extended_metadata_type_path, text: 'Extended Metadata Type'
+      end
+    end
+
+    logout
+    get :index
+    assert_response :success
+    assert_select '#create-menu', count: 0
+
+    # log in as non admin
+    login_as(:aaron)
+    get :index
+    assert_response :success
+    assert_select '#user-menu' do
+      assert_select 'a[href=?]', new_extended_metadata_type_path, text: 'Extended Metadata Type', count: 0
+    end
+
+  end
+
 end

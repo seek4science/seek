@@ -23,6 +23,14 @@ class ExtendedMetadataTypesController < ApplicationController
     end
   end
 
+
+  def new
+    @extended_metadata_type = ExtendedMetadataType.new
+    respond_to do |format|
+      format.html
+    end
+  end
+
   def show
      respond_to do |format|
         format.json {render json: @extended_metadata_type}
