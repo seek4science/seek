@@ -858,6 +858,7 @@ anyType:
     - institutions
     - investigations
     - models
+    - observation_units
     - organisms
     - people
     - presentations

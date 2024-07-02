@@ -1,3 +1,7 @@
-class ObservationUnitSerializer < ActiveModel::Serializer
-  attributes :id, :title, :description, :text, :identifier, :string, :organism_id, :integer
+class ObservationUnitSerializer < ContributedResourceSerializer
+  has_many :people
+  has_many :projects
+  has_one :study
+  has_many :samples
+  has_many :data_files
 end

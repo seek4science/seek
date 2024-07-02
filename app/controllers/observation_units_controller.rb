@@ -15,7 +15,7 @@ class ObservationUnitsController < ApplicationController
     respond_to do |format|
       format.html
       format.rdf { render :template=>'rdf/show'}
-      format.json {render json: @observation_unit, include: [params[:include]]}
+      format.json {render json: @observation_unit, include: json_api_include_param}
     end
   end
 
