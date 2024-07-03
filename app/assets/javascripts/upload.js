@@ -93,7 +93,7 @@ $j(document).ready(function () {
         var result = field.find('[data-role="seek-url-checker-result"]');
         var copyDialog = $j('[data-role="seek-url-checker-msg-success"]', field);
         var tooBig = $j('[data-role="seek-url-checker-msg-too-big"]', field);
-        var addRemider = $j('[role="seek-url-checker-remind-to-add-file"]',field);
+        var addReminder = $j('[role="seek-url-checker-remind-to-add-file"]',field);
 
         var submitUrl = function () {
             result.html('').spinner('add');
@@ -113,7 +113,7 @@ $j(document).ready(function () {
                     checker.trigger('urlChecked', [info]);
                     if (info.allow_copy) {
                         copyDialog.show();
-                        addRemider.show();
+                        addReminder.show();
                     } else {
                         tooBig.show();
                     }
