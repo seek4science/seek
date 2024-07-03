@@ -10,6 +10,7 @@ class SampleTypesController < ApplicationController
   before_action :find_assets, only: [:index]
   before_action :auth_to_create, only: %i[new create]
   before_action :project_membership_required, only: %i[create new select filter_for_select]
+  before_action :check_isa_json_compliance, only: %i[edit update manage manage_update]
 
   before_action :authorize_requested_sample_type, except: %i[index new create]
 
@@ -114,30 +115,12 @@ class SampleTypesController < ApplicationController
     end
   end
 
-  def manage
+  def check_isa_json_compliance
+    @sample_type = SampleType.find(params[:id])
     if Seek::Config.isa_json_compliance_enabled && @sample_type.is_isa_json_compliant?
       flash[:error] = 'This sample type is ISA JSON compliant and cannot be managed.'
       redirect_to sample_types_path
     end
-
-    super
-  end
-
-  def manage_update
-    if Seek::Config.isa_json_compliance_enabled && @sample_type.is_isa_json_compliant?
-      respond_to do |format|
-        format.html do
-          flash[:error] = 'This sample type is ISA JSON compliant and cannot be managed.'
-          redirect_to sample_types_path
-        end
-        format.json do
-          render json: { error: 'This sample type is ISA JSON compliant and cannot be managed.' },
-                 status: :unprocessable_entity
-        end
-      end
-    end
-
-    super
   end
 
   def template_details
