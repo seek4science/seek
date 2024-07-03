@@ -106,12 +106,21 @@ class SampleTypesController < ApplicationController
         format.json { render json: @sample_type, include: [params[:include]] }
       else
         format.html do
-          redirect_to @sample_type, location: sample_types_path, 
+          redirect_to @sample_type, location: sample_types_path,
                                     notice: 'It was not possible to delete the sample type.'
         end
         format.json { render json: @sample_type.errors, status: :unprocessable_entity }
       end
     end
+  end
+
+  def manage
+    if Seek::Config.isa_json_compliance_enabled && @sample_type.is_isa_json_compliant?
+      flash[:error] = 'This sample type is ISA JSON compliant and cannot be managed.'
+      redirect_to sample_types_path
+    end
+
+    super
   end
 
   def template_details
