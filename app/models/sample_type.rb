@@ -26,6 +26,8 @@ class SampleType < ApplicationRecord
 
   acts_as_favouritable
 
+  acts_as_asset
+
   has_many :samples, inverse_of: :sample_type
 
   has_filter :contributor
@@ -40,6 +42,7 @@ class SampleType < ApplicationRecord
 
   has_many :assays
   has_and_belongs_to_many :studies
+  has_many :investigations, through: :studies
 
   scope :without_template, -> { where(template_id: nil) }
 
