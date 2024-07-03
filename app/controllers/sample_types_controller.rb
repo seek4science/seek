@@ -123,6 +123,23 @@ class SampleTypesController < ApplicationController
     super
   end
 
+  def manage_update
+    if Seek::Config.isa_json_compliance_enabled && @sample_type.is_isa_json_compliant?
+      respond_to do |format|
+        format.html do
+          flash[:error] = 'This sample type is ISA JSON compliant and cannot be managed.'
+          redirect_to sample_types_path
+        end
+        format.json do
+          render json: { error: 'This sample type is ISA JSON compliant and cannot be managed.' },
+                 status: :unprocessable_entity
+        end
+      end
+    end
+
+    super
+  end
+
   def template_details
     render partial: 'template'
   end
