@@ -21,6 +21,7 @@ namespace :seek do
     seek_rdf:generate
     update_observation_unit_policies
     fix_xlsx_marked_as_zip
+    add_policies_to_existing_sample_types
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -213,7 +214,7 @@ namespace :seek do
   task(set_ls_login_legacy_mode: [:environment]) do
     only_once('ls_login_legacy') do
       if Seek::Config.omniauth_elixir_aai_enabled
-        puts "Enabling LS Login legacy mode"
+        puts 'Enabling LS Login legacy mode'
         Seek::Config.omniauth_elixir_aai_legacy_mode = true
       end
     end
@@ -221,7 +222,7 @@ namespace :seek do
 
   task(rename_custom_metadata_legacy_supported_type: [:environment]) do
     if ExtendedMetadataType.where(supported_type: 'CustomMetadata').any?
-      puts "... Renaming ExtendedMetadata supported_type from Custom to ExtendedMetadata"
+      puts '... Renaming ExtendedMetadata supported_type from Custom to ExtendedMetadata'
       ExtendedMetadataType.where(supported_type: 'CustomMetadata').update_all(supported_type: 'ExtendedMetadata')
     end
   end
@@ -233,6 +234,36 @@ namespace :seek do
       blobs.update_all(content_type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
       puts "... fixed #{n} XLSX blobs with zip content type"
     end
+  end
+
+  task(add_policies_to_existing_sample_types: [:environment]) do
+    puts '... Adding policies to existing sample types'
+    counter = 0
+    disable_authorization_checks do
+      SampleType.includes(:projects, :assays, :studies).where(policy_id: nil).each do |st|
+        if st.is_isa_json_compliant?
+          st.update_column(:policy_id, st.assays.first.policy_id) if st.assays.any?
+          st.update_column(:policy_id, st.studies.first.policy_id) if st.studies.any?
+        else
+          project = st.projects.first
+          if project.use_default_policy
+            st.update_column(:policy_id, project.default_policy_id)
+          else
+            policy = Policy.new
+            policy.name = 'default policy'
+            policy.access_type = Policy::NO_ACCESS
+            policy.permissions << Permission.create(contributor_type: Permission::PERSON, contributor: st.contributor, access_type: Policy::MANAGING)
+            project.people.each do |person|
+              policy.permissions << Permission.create(contributor_type: Permission::PROJECT, contributor: person, access_type: Policy::VISIBLE)
+            end
+            policy.save
+            st.update_column(:policy_id, policy.id)
+          end
+        end
+        counter += 1
+      end
+    end
+    puts "...Added policies to #{counter} sample types"
   end
 
   private
