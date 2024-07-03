@@ -157,6 +157,12 @@ class ContentBlobsController < ApplicationController
                            "detail": "You are not authorized to download the asset linked to content_blob:#{params[:id]}" },
                    status: :forbidden
           end
+          format.csv do
+            render plain: 'Not authorized', status: :forbidden
+          end
+          format.xml do
+            render plain: 'Not authorized', status: :forbidden
+          end
         end
         return false
       end

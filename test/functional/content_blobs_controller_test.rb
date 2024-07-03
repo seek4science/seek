@@ -540,6 +540,26 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
   end
 
+  test 'cannot fetch viewable only excel as csv' do
+    df = FactoryBot.create(:data_file, content_blob: FactoryBot.create(:sample_type_populated_template_content_blob), policy: FactoryBot.create(:publicly_viewable_policy))
+    assert df.can_view?
+    refute df.can_download?
+    get :show, params: { data_file_id: df.id, id: df.content_blob.id, format: 'csv' }
+    assert_response :forbidden
+    assert_equal 'Not authorized', @response.body
+  end
+
+  test 'cannot fetch viewable only excel as xml' do
+    df = FactoryBot.create(:data_file, content_blob: FactoryBot.create(:sample_type_populated_template_content_blob), policy: FactoryBot.create(:publicly_viewable_policy))
+    assert df.can_view?
+    refute df.can_download?
+    get :show, params: { data_file_id: df.id, id: df.content_blob.id, format: 'xml' }
+    assert_response :forbidden
+    assert_equal 'Not authorized', @response.body
+  end
+
+
+
   test 'can view content of an image file' do
     df = FactoryBot.create(:data_file, policy: FactoryBot.create(:all_sysmo_downloadable_policy),
                              content_blob: FactoryBot.create(:image_content_blob))
