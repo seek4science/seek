@@ -696,29 +696,6 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_response :forbidden
   end
 
-  # test 'display sample type with related templates' do
-  #   person = FactoryBot.create(:person)
-  #
-  #   template = FactoryBot.create(:min_template, contributor: person, title:'related template')
-  #   template2 = FactoryBot.create(:min_template, contributor: person, title:'unrelated template')
-  #
-  #   # must be associated with a spreadsheet template
-  #   sample_type = FactoryBot.create(:strain_sample_type, isa_template: template, contributor: person)
-  #
-  #   assert_equal template, sample_type.isa_template
-  #   refute_nil sample_type.template
-  #
-  #   login_as(person.user)
-  #
-  #   get :show, params: { id: sample_type.id }
-  #   assert_response :success
-  #
-  #   assert_select 'div.related-items div#templates' do
-  #     assert_select 'a[href=?]', template_path(template), text: template.title
-  #     assert_select 'a[href=?]', template_path(template2), text: template2.title, count: 0
-  #   end
-  # end
-
   test 'filter sample types with template when advanced single page is enabled' do
     project = FactoryBot.create(:project)
     FactoryBot.create(:simple_sample_type, template_id: 1, projects: [project])
