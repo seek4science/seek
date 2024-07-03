@@ -30,7 +30,7 @@ class SampleTypesControllerTest < ActionController::TestCase
 
   test 'should create sample_type' do
     FactoryBot.create :annotation, attribute_name: 'sample_type_tag', source: @person.user,
-                         annotatable: FactoryBot.create(:simple_sample_type), value: 'golf'
+                                   annotatable: FactoryBot.create(:simple_sample_type), value: 'golf'
 
     assert_enqueued_with(job: SampleTemplateGeneratorJob) do
       assert_enqueued_with(job: SampleTypeUpdateJob) do
@@ -438,7 +438,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_select 'a#add-attribute', count: 1
 
     sample = FactoryBot.create(:patient_sample, contributor: @person,
-                                      sample_type: FactoryBot.create(:patient_sample_type, project_ids: @project_ids))
+                                                sample_type: FactoryBot.create(:patient_sample_type, project_ids: @project_ids))
     type = sample.sample_type
     refute_empty type.samples
     assert type.can_edit?
@@ -677,7 +677,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     sample = FactoryBot.create(:sample,
                      policy: FactoryBot.create(:private_policy,
                                      permissions: [FactoryBot.create(:permission, contributor: person,
-                                                                        access_type: Policy::VISIBLE)]))
+                                                                                  access_type: Policy::VISIBLE)]))
     sample_type = sample.sample_type
     login_as(person.user)
 
@@ -722,6 +722,27 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_response :unprocessable_entity
     assert_select 'div#error_explanation' do
       assert_select 'ul > li', text: 'Sample attributes title cannot be changed (the_title)'
+    end
+  end
+
+  test 'Should not be allowed to show the manage page of ISA-JSON compliant sample type' do
+    with_config_value(:isa_json_compliance_enabled, true) do
+      person = FactoryBot.create(:person)
+
+      investigation = FactoryBot.create(:investigation, contributor: person, policy: FactoryBot.create(:public_policy), is_isa_json_compliant: true)
+      study = FactoryBot.create(:isa_json_compliant_study, investigation: , contributor: person, policy: FactoryBot.create(:public_policy))
+      source_sample_type = study.sample_types.first
+
+      project_sample_type = FactoryBot.create(:simple_sample_type, projects: study.projects, contributor: person)
+
+      login_as(person)
+      assert source_sample_type.is_isa_json_compliant?
+      get :manage, params: { id: source_sample_type }
+      assert_redirected_to sample_types_path
+
+      refute project_sample_type.is_isa_json_compliant?
+      get :manage, params: { id: project_sample_type }
+      assert_response :success
     end
   end
 
