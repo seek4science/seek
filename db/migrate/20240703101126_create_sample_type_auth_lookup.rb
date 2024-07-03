@@ -1,6 +1,6 @@
 class CreateSampleTypeAuthLookup < ActiveRecord::Migration[6.1]
   def change
-    create_table :sample_type_auth_lookups do |t|
+    create_table :sample_type_auth_lookup do |t|
       t.integer :user_id
       t.integer :asset_id
       t.boolean :can_view,     :default => false
