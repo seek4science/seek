@@ -13,21 +13,21 @@
         "permissions": [
           {
             "resource": {
-              "id": "3846",
+              "id": "2498",
               "type": "people"
             },
             "access": "manage"
           },
           {
             "resource": {
-              "id": "4148",
+              "id": "2651",
               "type": "projects"
             },
             "access": "download"
           },
           {
             "resource": {
-              "id": "3925",
+              "id": "2574",
               "type": "institutions"
             },
             "access": "view"
@@ -35,7 +35,7 @@
         ]
       },
       "extended_attributes": {
-        "extended_metadata_type_id": "399",
+        "extended_metadata_type_id": "249",
         "attribute_map": {
           "dad": {
             "first_name": "john",
@@ -72,7 +72,7 @@
       "programmes": {
         "data": [
           {
-            "id": "96",
+            "id": "91",
             "type": "programmes"
           }
         ]
@@ -80,7 +80,7 @@
       "organisms": {
         "data": [
           {
-            "id": "142",
+            "id": "89",
             "type": "organisms"
           }
         ]

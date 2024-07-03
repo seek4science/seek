@@ -1,0 +1,38 @@
+{
+  "data": [
+    {
+      "id": "29",
+      "type": "observation_units",
+      "attributes": {
+        "title": "Max observation unit"
+      },
+      "links": {
+        "self": "/observation_units/29"
+      }
+    },
+    {
+      "id": "28",
+      "type": "observation_units",
+      "attributes": {
+        "title": "A Minimal Observation Unit"
+      },
+      "links": {
+        "self": "/observation_units/28"
+      }
+    }
+  ],
+  "jsonapi": {
+    "version": "1.0"
+  },
+  "links": {
+    "self": "/observation_units?page%5Bnumber%5D=1&page%5Bsize%5D=1000000",
+    "first": "/observation_units?page%5Bnumber%5D=1&page%5Bsize%5D=1000000",
+    "prev": null,
+    "next": null,
+    "last": "/observation_units?page%5Bnumber%5D=1&page%5Bsize%5D=1000000"
+  },
+  "meta": {
+    "base_url": "http://localhost:3000",
+    "api_version": "0.3"
+  }
+}

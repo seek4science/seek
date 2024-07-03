@@ -1,7 +1,7 @@
 {
   "data": {
     "type": "assays",
-    "id": "63",
+    "id": "484",
     "attributes": {
       "title": "A Maximal Assay",
       "assay_class": {
@@ -20,7 +20,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "313",
+              "id": "3910",
               "type": "projects"
             },
             "access": "manage"
@@ -34,14 +34,14 @@
     "relationships": {
       "study": {
         "data": {
-          "id": "85",
+          "id": "612",
           "type": "studies"
         }
       },
       "publications": {
         "data": [
           {
-            "id": "30",
+            "id": "327",
             "type": "publications"
           }
         ]
@@ -49,7 +49,7 @@
       "organisms": {
         "data": [
           {
-            "id": "30",
+            "id": "147",
             "type": "organisms"
           }
         ]
@@ -57,7 +57,7 @@
       "sops": {
         "data": [
           {
-            "id": "30",
+            "id": "215",
             "type": "sops"
           }
         ]
@@ -65,7 +65,7 @@
       "data_files": {
         "data": [
           {
-            "id": "30",
+            "id": "261",
             "type": "data_files"
           }
         ]
@@ -73,7 +73,7 @@
       "documents": {
         "data": [
           {
-            "id": "30",
+            "id": "248",
             "type": "documents"
           }
         ]
@@ -81,7 +81,7 @@
       "creators": {
         "data": [
           {
-            "id": "284",
+            "id": "3660",
             "type": "people"
           }
         ]

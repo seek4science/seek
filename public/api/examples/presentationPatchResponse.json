@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "82",
+    "id": "45",
     "type": "presentations",
     "attributes": {
       "policy": {
@@ -8,7 +8,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "2491",
+              "id": "549",
               "type": "projects"
             },
             "access": "edit"
@@ -31,30 +31,30 @@
         {
           "version": 1,
           "revision_comments": null,
-          "url": "http://localhost:3000/presentations/82?version=1"
+          "url": "http://localhost:3000/presentations/45?version=1"
         }
       ],
       "version": 1,
       "revision_comments": null,
-      "created_at": "2024-07-01T10:43:31.000Z",
-      "updated_at": "2024-07-01T10:43:32.000Z",
+      "created_at": "2024-07-03T13:44:51.000Z",
+      "updated_at": "2024-07-03T13:44:51.000Z",
       "content_blobs": [
         {
           "original_filename": "test.pdf",
           "url": null,
-          "md5sum": "25e31ad3c6eb5224985675b4d0659def",
-          "sha1sum": "4a593c8676bb068ebc54c602382b6c4d6d09b525",
+          "md5sum": "d579ba141a1dc76f9f17ad0dfde48db3",
+          "sha1sum": "fd4eda13fa8c2f82ee22b8b94219b53a90c1e62c",
           "content_type": "application/pdf",
-          "link": "http://localhost:3000/presentations/82/content_blobs/834",
-          "size": 10
+          "link": "http://localhost:3000/presentations/45/content_blobs/156",
+          "size": 9
         }
       ],
       "creators": [
         {
-          "profile": "/people/2406",
+          "profile": "/people/534",
           "family_name": "Last",
-          "given_name": "Person1996",
-          "affiliation": "An Institution: 2426",
+          "given_name": "Person435",
+          "affiliation": "An Institution: 534",
           "orcid": null
         }
       ],
@@ -64,7 +64,7 @@
       "creators": {
         "data": [
           {
-            "id": "2406",
+            "id": "534",
             "type": "people"
           }
         ]
@@ -72,7 +72,7 @@
       "submitter": {
         "data": [
           {
-            "id": "2405",
+            "id": "533",
             "type": "people"
           }
         ]
@@ -80,11 +80,11 @@
       "people": {
         "data": [
           {
-            "id": "2405",
+            "id": "533",
             "type": "people"
           },
           {
-            "id": "2406",
+            "id": "534",
             "type": "people"
           }
         ]
@@ -92,7 +92,7 @@
       "projects": {
         "data": [
           {
-            "id": "2491",
+            "id": "549",
             "type": "projects"
           }
         ]
@@ -115,7 +115,7 @@
       "publications": {
         "data": [
           {
-            "id": "193",
+            "id": "39",
             "type": "publications"
           }
         ]
@@ -123,7 +123,7 @@
       "events": {
         "data": [
           {
-            "id": "74",
+            "id": "35",
             "type": "events"
           }
         ]
@@ -131,21 +131,21 @@
       "workflows": {
         "data": [
           {
-            "id": "113",
+            "id": "35",
             "type": "workflows"
           }
         ]
       }
     },
     "links": {
-      "self": "/presentations/82?version=1"
+      "self": "/presentations/45?version=1"
     },
     "meta": {
-      "created": "2024-07-01T10:43:31.000Z",
-      "modified": "2024-07-01T10:43:32.000Z",
+      "created": "2024-07-03T13:44:51.000Z",
+      "modified": "2024-07-03T13:44:51.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "aeed8f50-19c4-013d-1fa4-0a81884ed284"
+      "uuid": "586c08b0-1b70-013d-1ffe-0a81884ed284"
     }
   },
   "jsonapi": {

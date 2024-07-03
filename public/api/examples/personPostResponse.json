@@ -1,15 +1,15 @@
 {
   "data": {
-    "id": "1231",
+    "id": "909",
     "type": "people",
     "attributes": {
       "avatar": null,
-      "title": "Post Person1231",
+      "title": "Post Person909",
       "description": "A person with all possible details",
       "first_name": "Post",
-      "last_name": "Person1231",
+      "last_name": "Person909",
       "orcid": "https://orcid.org/0000-0001-9842-9718",
-      "mbox_sha1sum": "7367d1135e102ed02fe1680c26125ccc544115c0",
+      "mbox_sha1sum": "a11e28781681b3cfa6c26cfbf596488e7eb7b180",
       "expertise": [
         "modeling",
         "programming"
@@ -94,14 +94,14 @@
       }
     },
     "links": {
-      "self": "/people/1231"
+      "self": "/people/909"
     },
     "meta": {
-      "created": "2024-07-01T10:41:01.000Z",
-      "modified": "2024-07-01T10:41:01.000Z",
+      "created": "2024-07-03T13:45:40.000Z",
+      "modified": "2024-07-03T13:45:40.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "551ed010-19c4-013d-1fa4-0a81884ed284"
+      "uuid": "75aa4410-1b70-013d-1ffe-0a81884ed284"
     }
   },
   "jsonapi": {

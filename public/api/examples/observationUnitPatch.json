@@ -1,0 +1,80 @@
+{
+  "data": {
+    "id": "32",
+    "type": "observation_units",
+    "attributes": {
+      "policy": {
+        "access": "no_access",
+        "permissions": [
+          {
+            "resource": {
+              "id": "3376",
+              "type": "projects"
+            },
+            "access": "edit"
+          }
+        ]
+      },
+      "title": "Max observation unit patched",
+      "description": "the maximum one patched",
+      "tags": [
+        "tag1",
+        "tag2",
+        "tag3"
+      ],
+      "extended_attributes": {
+        "extended_metadata_type_id": "347",
+        "attribute_map": {
+          "name": "unit 2",
+          "strain": "strain 2"
+        }
+      },
+      "discussion_links": [
+        {
+          "label": "Google",
+          "url": "http://google.com"
+        }
+      ]
+    },
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "3160",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "3376",
+            "type": "projects"
+          }
+        ]
+      },
+      "study": {
+        "data": {
+          "id": "527",
+          "type": "studies"
+        }
+      },
+      "samples": {
+        "data": [
+          {
+            "id": "81",
+            "type": "samples"
+          }
+        ]
+      },
+      "data_files": {
+        "data": [
+          {
+            "id": "219",
+            "type": "data_files"
+          }
+        ]
+      }
+    }
+  }
+}

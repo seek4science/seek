@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "118",
+    "id": "90",
     "type": "models",
     "attributes": {
       "policy": {
@@ -8,7 +8,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "1249",
+              "id": "799",
               "type": "projects"
             },
             "access": "edit"
@@ -17,12 +17,12 @@
       },
       "discussion_links": [
         {
-          "id": "91",
+          "id": "66",
           "label": "Yahoo",
           "url": "http://yahoo.com"
         },
         {
-          "id": "92",
+          "id": "67",
           "label": "fish",
           "url": "https://fish.com"
         }
@@ -40,14 +40,14 @@
         {
           "version": 1,
           "revision_comments": null,
-          "url": "http://localhost:3000/models/118?version=1",
+          "url": "http://localhost:3000/models/90?version=1",
           "doi": null
         }
       ],
       "version": 1,
       "revision_comments": null,
-      "created_at": "2024-07-01T10:40:53.000Z",
-      "updated_at": "2024-07-01T10:40:53.000Z",
+      "created_at": "2024-07-03T13:45:27.000Z",
+      "updated_at": "2024-07-03T13:45:27.000Z",
       "doi": null,
       "content_blobs": [
         {
@@ -56,16 +56,16 @@
           "md5sum": "6b9283ed4ca52a081398b715aaeb8113",
           "sha1sum": "454e4b6067f577b680bb8538772b12ebcdb6c4a4",
           "content_type": "application/xml",
-          "link": "http://localhost:3000/models/118/content_blobs/413",
+          "link": "http://localhost:3000/models/90/content_blobs/242",
           "size": 5933
         }
       ],
       "creators": [
         {
-          "profile": "/people/1152",
+          "profile": "/people/806",
           "family_name": "Last",
-          "given_name": "Person980",
-          "affiliation": "An Institution: 1154",
+          "given_name": "Person646",
+          "affiliation": "An Institution: 829",
           "orcid": null
         }
       ],
@@ -79,7 +79,7 @@
       "creators": {
         "data": [
           {
-            "id": "1152",
+            "id": "806",
             "type": "people"
           }
         ]
@@ -87,7 +87,7 @@
       "submitter": {
         "data": [
           {
-            "id": "1151",
+            "id": "805",
             "type": "people"
           }
         ]
@@ -95,7 +95,7 @@
       "organisms": {
         "data": [
           {
-            "id": "69",
+            "id": "35",
             "type": "organisms"
           }
         ]
@@ -103,11 +103,11 @@
       "people": {
         "data": [
           {
-            "id": "1151",
+            "id": "805",
             "type": "people"
           },
           {
-            "id": "1152",
+            "id": "806",
             "type": "people"
           }
         ]
@@ -115,7 +115,7 @@
       "projects": {
         "data": [
           {
-            "id": "1249",
+            "id": "799",
             "type": "projects"
           }
         ]
@@ -123,7 +123,7 @@
       "investigations": {
         "data": [
           {
-            "id": "220",
+            "id": "73",
             "type": "investigations"
           }
         ]
@@ -131,7 +131,7 @@
       "studies": {
         "data": [
           {
-            "id": "208",
+            "id": "69",
             "type": "studies"
           }
         ]
@@ -139,7 +139,7 @@
       "assays": {
         "data": [
           {
-            "id": "174",
+            "id": "65",
             "type": "assays"
           }
         ]
@@ -147,21 +147,21 @@
       "publications": {
         "data": [
           {
-            "id": "99",
+            "id": "70",
             "type": "publications"
           }
         ]
       }
     },
     "links": {
-      "self": "/models/118?version=1"
+      "self": "/models/90?version=1"
     },
     "meta": {
-      "created": "2024-07-01T10:40:53.000Z",
-      "modified": "2024-07-01T10:40:53.000Z",
+      "created": "2024-07-03T13:45:27.000Z",
+      "modified": "2024-07-03T13:45:27.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "505916a0-19c4-013d-1fa4-0a81884ed284"
+      "uuid": "6e07a350-1b70-013d-1ffe-0a81884ed284"
     }
   },
   "jsonapi": {

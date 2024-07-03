@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "77",
+    "id": "354",
     "type": "extended_metadata_types",
     "attributes": {
       "title": "A Max Extended Metadata Type",
@@ -8,13 +8,13 @@
       "enabled": true,
       "extended_metadata_attributes": [
         {
-          "id": "205",
+          "id": "848",
           "title": "age",
           "label": "Age",
-          "property_type_id": null,
+          "pid": null,
           "description": null,
           "sample_attribute_type": {
-            "id": "1211",
+            "id": "929",
             "title": "Integer attribute type 77",
             "base_type": "Integer",
             "regexp": ".*"
@@ -25,14 +25,14 @@
           "linked_extended_metadata_type_id": null
         },
         {
-          "id": "206",
+          "id": "849",
           "title": "name",
           "label": "Name",
-          "property_type_id": null,
+          "pid": null,
           "description": null,
           "sample_attribute_type": {
-            "id": "1212",
-            "title": "String attribute type 136",
+            "id": "930",
+            "title": "String attribute type 585",
             "base_type": "String",
             "regexp": ".*"
           },
@@ -42,14 +42,14 @@
           "linked_extended_metadata_type_id": null
         },
         {
-          "id": "207",
+          "id": "850",
           "title": "date",
           "label": "Date",
-          "property_type_id": null,
+          "pid": null,
           "description": null,
           "sample_attribute_type": {
-            "id": "1213",
-            "title": "DateTime attribute type 42",
+            "id": "931",
+            "title": "DateTime attribute type 77",
             "base_type": "DateTime",
             "regexp": ".*"
           },
@@ -59,14 +59,14 @@
           "linked_extended_metadata_type_id": null
         },
         {
-          "id": "208",
+          "id": "851",
           "title": "data file",
           "label": "Data file",
-          "property_type_id": null,
+          "pid": null,
           "description": null,
           "sample_attribute_type": {
-            "id": "1214",
-            "title": "Data file attribute type 39",
+            "id": "932",
+            "title": "Data file attribute type 4",
             "base_type": "SeekDataFile",
             "regexp": ".*"
           },
@@ -76,14 +76,14 @@
           "linked_extended_metadata_type_id": null
         },
         {
-          "id": "209",
+          "id": "852",
           "title": "sop",
           "label": "Sop",
-          "property_type_id": null,
+          "pid": null,
           "description": null,
           "sample_attribute_type": {
-            "id": "1215",
-            "title": "SOP attribute type 39",
+            "id": "933",
+            "title": "SOP attribute type 4",
             "base_type": "SeekSop",
             "regexp": ".*"
           },
@@ -95,7 +95,7 @@
       ]
     },
     "links": {
-      "self": "/extended_metadata_types/77"
+      "self": "/extended_metadata_types/354"
     },
     "meta": {
       "api_version": "0.3",

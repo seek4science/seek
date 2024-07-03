@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "88",
+    "id": "275",
     "type": "sample_controlled_vocabs",
     "attributes": {
       "title": "new title",
@@ -10,7 +10,7 @@
       "short_name": "new short name",
       "sample_controlled_vocab_terms_attributes": [
         {
-          "id": "297",
+          "id": "821",
           "label": "new term label",
           "iri": "new iri",
           "parent_iri": "new parent_iri"
@@ -21,18 +21,18 @@
       "sample_controlled_vocab_terms": {
         "data": [
           {
-            "id": "297",
+            "id": "821",
             "type": "sample_controlled_vocab_terms"
           }
         ]
       }
     },
     "links": {
-      "self": "/sample_controlled_vocabs/88"
+      "self": "/sample_controlled_vocabs/275"
     },
     "meta": {
-      "created": "2024-07-01T10:42:12.000Z",
-      "modified": "2024-07-01T10:42:12.000Z",
+      "created": "2024-07-03T13:53:27.000Z",
+      "modified": "2024-07-03T13:53:27.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000"
     }

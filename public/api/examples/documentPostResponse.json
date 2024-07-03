@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "275",
+    "id": "283",
     "type": "documents",
     "attributes": {
       "policy": {
@@ -8,7 +8,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "3724",
+              "id": "4626",
               "type": "projects"
             },
             "access": "edit"
@@ -19,7 +19,7 @@
 
       ],
       "extended_attributes": {
-        "extended_metadata_type_id": "286",
+        "extended_metadata_type_id": "432",
         "attribute_map": {
           "role_email": "alice@email.com",
           "role_phone": "0012345",
@@ -45,14 +45,14 @@
         {
           "version": 1,
           "revision_comments": null,
-          "url": "http://localhost:3000/documents/275?version=1",
+          "url": "http://localhost:3000/documents/283?version=1",
           "doi": null
         }
       ],
       "version": 1,
       "revision_comments": null,
-      "created_at": "2024-07-01T10:45:50.000Z",
-      "updated_at": "2024-07-01T10:45:50.000Z",
+      "created_at": "2024-07-03T13:54:10.000Z",
+      "updated_at": "2024-07-03T13:54:10.000Z",
       "doi": null,
       "content_blobs": [
         {
@@ -61,16 +61,16 @@
           "md5sum": null,
           "sha1sum": null,
           "content_type": "application/pdf",
-          "link": "http://localhost:3000/documents/275/content_blobs/1198",
+          "link": "http://localhost:3000/documents/283/content_blobs/1437",
           "size": null
         }
       ],
       "creators": [
         {
-          "profile": "/people/3507",
+          "profile": "/people/4366",
           "family_name": "Last",
-          "given_name": "Person2949",
-          "affiliation": "An Institution: 3552",
+          "given_name": "Person3630",
+          "affiliation": "An Institution: 4438",
           "orcid": null
         }
       ],
@@ -80,7 +80,7 @@
       "creators": {
         "data": [
           {
-            "id": "3507",
+            "id": "4366",
             "type": "people"
           }
         ]
@@ -88,7 +88,7 @@
       "submitter": {
         "data": [
           {
-            "id": "3506",
+            "id": "4365",
             "type": "people"
           }
         ]
@@ -96,11 +96,11 @@
       "people": {
         "data": [
           {
-            "id": "3506",
+            "id": "4365",
             "type": "people"
           },
           {
-            "id": "3507",
+            "id": "4366",
             "type": "people"
           }
         ]
@@ -108,7 +108,7 @@
       "projects": {
         "data": [
           {
-            "id": "3724",
+            "id": "4626",
             "type": "projects"
           }
         ]
@@ -116,7 +116,7 @@
       "investigations": {
         "data": [
           {
-            "id": "718",
+            "id": "844",
             "type": "investigations"
           }
         ]
@@ -124,7 +124,7 @@
       "studies": {
         "data": [
           {
-            "id": "620",
+            "id": "742",
             "type": "studies"
           }
         ]
@@ -132,7 +132,7 @@
       "assays": {
         "data": [
           {
-            "id": "517",
+            "id": "609",
             "type": "assays"
           }
         ]
@@ -145,21 +145,21 @@
       "workflows": {
         "data": [
           {
-            "id": "164",
+            "id": "201",
             "type": "workflows"
           }
         ]
       }
     },
     "links": {
-      "self": "/documents/275?version=1"
+      "self": "/documents/283?version=1"
     },
     "meta": {
-      "created": "2024-07-01T10:45:50.000Z",
-      "modified": "2024-07-01T10:45:50.000Z",
+      "created": "2024-07-03T13:54:10.000Z",
+      "modified": "2024-07-03T13:54:10.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "015b15f0-19c5-013d-1fa4-0a81884ed284"
+      "uuid": "a59bf550-1b71-013d-1ffe-0a81884ed284"
     }
   },
   "jsonapi": {

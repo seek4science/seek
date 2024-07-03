@@ -1,15 +1,15 @@
 {
   "data": {
     "type": "sample_types",
-    "id": "265",
+    "id": "303",
     "attributes": {
       "title": "This is a new title.",
       "sample_attributes": [
         {
-          "id": "1155",
+          "id": "1193",
           "title": "This is a new attribute title",
           "sample_attribute_type": {
-            "title": "String attribute type 563"
+            "title": "String attribute type 645"
           }
         }
       ],
@@ -21,7 +21,7 @@
       "projects": {
         "data": [
           {
-            "id": "3834",
+            "id": "4529",
             "type": "projects"
           }
         ]
@@ -29,7 +29,7 @@
       "assays": {
         "data": [
           {
-            "id": "553",
+            "id": "583",
             "type": "assays"
           }
         ]

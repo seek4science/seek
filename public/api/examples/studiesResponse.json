@@ -1,13 +1,13 @@
 {
   "data": [
     {
-      "id": "335",
+      "id": "487",
       "type": "studies",
       "attributes": {
-        "title": "Study311"
+        "title": "Study432"
       },
       "links": {
-        "self": "/studies/335"
+        "self": "/studies/487"
       }
     }
   ],
