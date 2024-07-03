@@ -76,12 +76,13 @@ class SampleType < ApplicationRecord
   end
 
   def is_isa_json_compliant?
-    studies.any? || assays.any?
+    (studies.any? || assays.any?) && investigations.all?(&:is_isa_json_compliant?) && isa_template
   end
 
   def validate_value?(attribute_name, value)
     attribute = sample_attributes.detect { |attr| attr.title == attribute_name }
     raise UnknownAttributeException, "Unknown attribute #{attribute_name}" unless attribute
+
     attribute.validate_value?(value)
   end
 
