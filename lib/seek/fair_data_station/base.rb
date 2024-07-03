@@ -104,7 +104,7 @@ module Seek
         additional_metadata_annotations.each do |annotation|
           property = annotation[0]
           value = annotation[1]
-          attribute = extended_metadata_type.extended_metadata_attributes.where(property_type_id: property).first
+          attribute = extended_metadata_type.extended_metadata_attributes.where(pid: property).first
           data[attribute.title] = value if attribute
         end
         seek_resource.extended_metadata.data = data

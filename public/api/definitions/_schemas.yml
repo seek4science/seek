@@ -4805,7 +4805,7 @@ extendedMetadataTypeExtendedMetadataAttributeResponse:
       $ref: "#/components/schemas/nonEmptyString"
     description:
       $ref: "#/components/schemas/nullableNonEmptyString"
-    property_type_id:
+    pid:
       $ref: "#/components/schemas/nullableNonEmptyString"
     sample_attribute_type:
       type: object

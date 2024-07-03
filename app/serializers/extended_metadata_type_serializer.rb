@@ -13,7 +13,7 @@ class ExtendedMetadataTypeSerializer < BaseSerializer
       "id": attribute.id.to_s,
       "title": attribute.title,
       "label": attribute.label,
-      "property_type_id": attribute.property_type_id,
+      "pid": attribute.pid,
       "description":attribute.description,
       "sample_attribute_type": get_sample_attribute_type(attribute),
       "required": attribute.required,

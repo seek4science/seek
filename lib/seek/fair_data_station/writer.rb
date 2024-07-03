@@ -89,7 +89,7 @@ module Seek
 
         # collect and sort those with the most properties that match, eliminating any where no properties match
         candidates = ExtendedMetadataType.where(supported_type: seek_entity.class.name).includes(:extended_metadata_attributes).collect do |emt|
-          ids = emt.extended_metadata_attributes.collect(&:property_type_id)
+          ids = emt.extended_metadata_attributes.collect(&:pid)
           score = (property_ids - ids).length
           emt = nil if (property_ids & ids).empty?
           [score, emt]
