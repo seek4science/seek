@@ -703,6 +703,7 @@ SEEK::Application.routes.draw do
     member do
       get :template_details
       get :batch_upload
+      post :update_annotations_ajax
     end
     resources :samples
     resources :content_blobs do
@@ -710,7 +711,7 @@ SEEK::Application.routes.draw do
         get :download
       end
     end
-    resources :projects, :programmes, :templates, :studies, :assays, only: [:index]
+    resources :investigations, :people, :publications, :projects, :programmes, :templates, :studies, :assays, only: [:index]
   end
 
   ### SAMPLE ATTRIBUTE TYPES ###
