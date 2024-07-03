@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_05_20_103545) do
+ActiveRecord::Schema.define(version: 2024_07_03_132257) do
 
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
@@ -638,7 +638,7 @@ ActiveRecord::Schema.define(version: 2024_05_20_103545) do
     t.string "label"
     t.integer "linked_extended_metadata_type_id"
     t.boolean "allow_cv_free_text", default: false
-    t.string "property_type_id"
+    t.string "pid"
     t.index ["extended_metadata_type_id"], name: "index_extended_metadata_attributes_on_extended_metadata_type_id"
     t.index ["sample_attribute_type_id"], name: "index_extended_metadata_attributes_on_sample_attribute_type_id"
     t.index ["sample_controlled_vocab_id"], name: "index_extended_metadata_attributes_on_sample_cv_id"
