@@ -694,7 +694,7 @@ SEEK::Application.routes.draw do
 
   ### SAMPLE TYPES ###
   #
-  resources :sample_types do
+  resources :sample_types, concerns: [:asset] do
     collection do
       post :create_from_template
       get :select

@@ -2,6 +2,7 @@ class SampleTypesController < ApplicationController
   respond_to :html, :json
   include Seek::UploadHandling::DataUpload
   include Seek::IndexPager
+  include Seek::AssetsCommon
 
   before_action :samples_enabled?
   before_action :find_sample_type, only: %i[show edit update destroy template_details batch_upload]
