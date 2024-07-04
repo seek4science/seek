@@ -1,0 +1,19 @@
+<%= form_for(@extended_metadata_type, html: { multipart: true }) do |f| %>
+    <%= f.error_messages %>
+
+    <div class="tab-content">
+
+      <% if @extended_metadata_type.new_record? %>
+            <div class="form-group">
+              <label class="required">File to upload</label>
+              <%= file_field_tag "content_blobs[][data]", { "data-batch-upload": false } -%>
+            </div>
+      <% end %>
+    </div>
+
+    <p class="actions">
+      <%= f.submit (@extended_metadata_type.new_record? ? 'Create' : 'Update'), class: 'btn btn-primary' %>
+      or
+      <%= cancel_button(@extended_metadata_type.new_record? ? administer_extended_metadata_types_path : extended_metadata_type_path(@extended_metadata_type)) %>
+    </p>
+<% end %>

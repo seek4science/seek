@@ -319,6 +319,7 @@ you can choose to have a %{project} linked to a site managed %{programme} instea
     template: "Templates are blueprints that can be reused and applied to Study and Assay for describing Samples. Templates must be associated with one or more Projects."
     organism: "An Organism is identified by an entry in the NCBI ontology. An Organism must be associated with one or more Projects in order to be registered in SEEK."
     file_template: "A File Template describes conforming DataFiles.For example, a File Template that is a Word document may describe conformant PNG images."
+    extended_metadata_type: "Some help texts for Extended Metadata type"
 
   cookies:
     notice: "%{instance_name} makes use of some necessary cookies to provide its core functionality."
