@@ -85,7 +85,11 @@
 
       <% if batch %>
         <div class="form-group">
-          <%= button_link_to 'Add', 'new', '#', 'data-role' => 'seek-upload-field-add-remote' %>
+
+          <div>
+            <div class='alert alert-warning' role='seek-url-checker-remind-to-add-file' style='display:none'>
+              Please click on "<b>Add</b>" button to confirm adding this Remote URL to <%= Seek::Config.instance_name %> !</div></div>
+            <%= button_link_to 'Add', 'new', '#', 'data-role' => 'seek-upload-field-add-remote' %>
         </div>
         <%= content_tag :script,
                         existing_objects.map { |o| { text: "#{o.url.blank? ? o.original_filename : o.url} (original)", id: o.id } }.to_json.html_safe,
