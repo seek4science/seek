@@ -4236,7 +4236,7 @@ class DataFilesControllerTest < ActionController::TestCase
                     creators: [someone],
                     contributor: FactoryBot.create(:person, first_name: 'Joe', last_name: 'Bloggs', orcid: 'https://orcid.org/0000-0002-1694-233X')
     ).latest_version
-    thing.assets_creators.create!(given_name: 'Phil', family_name: 'Collins', orcid: 'https://orcid.org/0000-0002-1694-233X')
+    thing.assets_creators.create!(given_name: 'Phil', family_name: 'Collins', orcid: 'https://orcid.org/0000-0001-9842-9718')
 
     get :show, params: { id: thing.parent.id, version: thing.version, format: :datacite_xml }
 
@@ -4252,7 +4252,7 @@ class DataFilesControllerTest < ActionController::TestCase
     phil = parsed.xpath("//xmlns:resource/xmlns:creators/xmlns:creator[xmlns:creatorName/text()='Collins, Phil']").first
     jane = parsed.xpath("//xmlns:resource/xmlns:creators/xmlns:creator[xmlns:creatorName/text()='Bloggs, Jane']").first
     assert_equal 'Collins, Phil', phil.xpath('./xmlns:creatorName').first.text
-    assert_equal 'https://orcid.org/0000-0002-1694-233X', phil.xpath('./xmlns:nameIdentifier').first.text
+    assert_equal 'https://orcid.org/0000-0001-9842-9718', phil.xpath('./xmlns:nameIdentifier').first.text
     assert_equal 'Bloggs, Jane', jane.xpath('./xmlns:creatorName').first.text
     assert_nil jane.xpath('./xmlns:nameIdentifier').first
     assert_equal 'ORCID', resource.xpath('./xmlns:creators/xmlns:creator/xmlns:nameIdentifier/@nameIdentifierScheme').first.text
