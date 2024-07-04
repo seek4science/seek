@@ -1,5 +1,6 @@
 class ExtendedMetadataTypesController < ApplicationController
   respond_to :json
+  skip_before_action :project_membership_required
   before_action :is_user_admin_auth, except: [:form_fields, :show, :index]
   before_action :find_requested_item, only: [:administer_update, :show]
   include Seek::IndexPager
@@ -49,7 +50,12 @@ class ExtendedMetadataTypesController < ApplicationController
                   api_version: ActiveModel::Serializer.config.api_version
                 }
        end
+       format.html
      end
+  end
+
+  def create
+    
   end
 
   def administer_update

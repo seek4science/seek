@@ -54,6 +54,8 @@ class ExtendedMetadataTypesControllerTest < ActionController::TestCase
     refute flash[:error]
     assert_select 'table tbody tr:not(.emt-partition-title)', count: 1
     assert_select 'table tbody tr:not(.emt-partition-title) td', text: emt.title
+    assert_select "a[href=?]", new_extended_metadata_type_path, text: 'Create Extended Metadata Type'
+
   end
 
   test 'administer table - disabled as text-secondary' do
@@ -81,6 +83,21 @@ class ExtendedMetadataTypesControllerTest < ActionController::TestCase
     get :administer
     assert_redirected_to :root
     assert flash[:error]
+    assert_equal 'Admin rights required', flash[:error]
   end
 
+  test 'can new as admin' do
+    person = FactoryBot.create(:admin)
+    login_as(person)
+    get :new
+    assert_response :success
+  end
+
+  test 'cannot new as non-admin' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    get :new
+    assert_redirected_to :root
+    assert_equal 'Admin rights required', flash[:error]
+  end
 end

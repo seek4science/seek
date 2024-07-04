@@ -4,6 +4,19 @@
   }
 </style>
 
+
+<div class="row">
+  <div class="col-md-3">
+    <%= link_to new_extended_metadata_type_path, class: "btn btn-primary", role: "button", "aria-label" => "Left Align" do %>
+      <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+      Create Extended Metadata Type
+    <% end %>
+  </div>
+</div>
+<br>
+
+<%#= link_to 'New', new_extended_metadata_type_path, class: 'btn btn-primary' %>
+
 <% nested, top_level = @extended_metadata_types.partition(&:extended_type?) %>
 
 <div class="alert alert-info">

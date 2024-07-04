@@ -64,9 +64,4 @@ class ExtendedMetadataType < ApplicationRecord
     disabled.select{|emt| emt.disabled_but_used?}
   end
 
-  def self.can_create?
-    User.admin_logged_in?
-  end
-
-
 end

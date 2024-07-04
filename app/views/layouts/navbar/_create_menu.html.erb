@@ -47,8 +47,7 @@
       ]) %>
 
       <%= render_menu_group(t('menu.vocabularies'), [
-          [t('human_disease'), new_human_disease_path, can_create_human_diseases?],
-          [t('extended_metadata_type'), new_extended_metadata_type_path, ExtendedMetadataType.can_create?]
+          [t('human_disease'), new_human_disease_path, can_create_human_diseases?]
       ]) %>
     <% else %>
       <li role="presentation" class="dropdown-header"><span style="color:red">You cannot add assets or other items until you are a member of a <%= t('project') %>.</span></li>
