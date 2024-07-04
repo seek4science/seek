@@ -50,7 +50,7 @@ module ROCrate
     end
 
     def test_suites
-      ((mentions || []) | (about || [])).select { |entity| entity.has_type?('TestSuite') }
+      (Array(mentions) | Array(about)).select { |entity| entity.has_type?('TestSuite') }
     end
 
     def find_entry(path)
