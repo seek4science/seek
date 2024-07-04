@@ -104,20 +104,6 @@ module Seek
       raise SysMODB::SpreadsheetExtractionException.new('Unrecognised sheet name')
     end
 
-    # checks the type using mime magic, and updates if found to be different. This is to help cases where extraction
-    # fails due to the mime type being incorrectly set
-    #
-    # @return boolean - the mime type was changed
-    def double_check_mime_type
-      suggested_type = mime_magic_content_type
-      if suggested_type && suggested_type != content_type
-        update_column(:content_type, suggested_type)
-        true
-      else
-        false
-      end
-    end
-
 
     # filters special characters, keeping alphanumeric characters, hyphen ('-'), underscore('_') and newlines
     def filter_text_content(content)
