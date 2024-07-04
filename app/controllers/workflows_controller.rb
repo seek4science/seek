@@ -28,7 +28,7 @@ class WorkflowsController < ApplicationController
     respond_to do |format|
       format.html do
         flash[:error] = message
-        redirect_to workflow_path(@workflow)
+        redirect_to @workflow&.persisted? ? workflow_path(@workflow) : workflows_path
       end
       format.json { render json: { title: 'RO-Crate Read Error', detail: message }, status: :internal_server_error }
     end
