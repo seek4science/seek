@@ -5,6 +5,7 @@ class ObservationUnitsController < ApplicationController
   include Seek::AssetsCommon
 
   before_action :organisms_enabled?
+  before_action :observation_units_enabled?
   before_action :find_and_authorize_requested_item, :except => [ :index, :new, :create, :preview,:update_annotations_ajax]
   before_action :login_required,:except=>[:show,:index]
   before_action :find_assets, only: [:index]
