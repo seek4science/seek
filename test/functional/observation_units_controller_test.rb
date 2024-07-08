@@ -100,4 +100,34 @@ class ObservationUnitsControllerTest < ActionController::TestCase
     assert_equal 'updated strain', obs_unit.extended_metadata.get_attribute_value('strain')
   end
 
+  test 'no access if fair data station disabled' do
+    unit = FactoryBot.create(:max_observation_unit)
+    login_as(unit.contributor)
+    with_config_value(:fair_data_station_enabled, false) do
+      get :show, params: { id: unit.id }
+      assert_redirected_to :root
+      refute_nil flash[:error]
+
+      get :index
+      assert_redirected_to :root
+      refute_nil flash[:error]
+
+      get :edit, params: { id: unit.id }
+      assert_redirected_to :root
+      refute_nil flash[:error]
+
+      get :manage, params: { id: unit.id }
+      assert_redirected_to :root
+      refute_nil flash[:error]
+
+      patch :update, params: { id: unit.id,
+                               observation_unit:{
+                                 title: 'updated title',
+                               }}
+      assert_redirected_to :root
+      refute_nil flash[:error]
+
+    end
+  end
+
 end

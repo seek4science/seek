@@ -5061,6 +5061,23 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_redirected_to project_path(other_project)
   end
 
+  test 'dont show import from fair data station if disabled' do
+    person = FactoryBot.create(:person)
+    refute person.is_admin?
+    project = person.projects.first
+    with_config_value(:fair_data_station_enabled, false) do
+      get :show, params: { id: project.id }
+      assert_response :success
+      assert_select '#item-admin-menu' do
+        assert_select 'li a[href=?]', import_from_fairdata_station_project_path(project), text:/Import from FAIRData Station/, count: 0
+      end
+
+      get :import_from_fairdata_station, params: { id: project.id }
+      assert_redirected_to :root
+      refute_nil flash[:error]
+    end
+  end
+
   test 'populate from fairdata station ttl' do
 
     person = FactoryBot.create(:person)
