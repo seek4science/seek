@@ -69,7 +69,6 @@ module Seek
         Docsplit.extract_text(pdf_filepath, output: converted_storage_directory) unless File.exist?(txt_filepath)
         File.read(txt_filepath)
       rescue Docsplit::ExtractionFailed => e
-        extract_text_from_pdf if double_check_mime_type
         Rails.logger.error("Problem with extracting text from pdf #{id} #{e}")
         ''
       end

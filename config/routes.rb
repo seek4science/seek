@@ -531,6 +531,7 @@ SEEK::Application.routes.draw do
       post :create_from_ro_crate
       post :create_from_files
       post :create_from_git
+      post :submit
       get :provide_metadata
       get :annotate_repository
       post :create_metadata
@@ -541,6 +542,7 @@ SEEK::Application.routes.draw do
     member do
       get :diagram
       get :ro_crate
+      get :ro_crate_metadata
       get :new_version
       get :new_git_version
       post :create_version_metadata

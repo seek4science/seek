@@ -11,6 +11,8 @@ class AssetsCreator < ApplicationRecord
   include Seek::OrcidSupport
   include Seek::BioSchema::Support
 
+  before_validation :associate_creator_from_orcid
+
   update_rdf_on_change :asset
 
   default_scope { order(:pos) }
@@ -74,4 +76,10 @@ class AssetsCreator < ApplicationRecord
     end
   end
 
+  private
+
+  def associate_creator_from_orcid
+    return if orcid.blank? || creator.present?
+    self.creator = Person.find_by_orcid(orcid)
+  end
 end

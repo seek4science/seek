@@ -100,7 +100,6 @@ class AdminController < ApplicationController
     Seek::Config.omniauth_oidc_image&.destroy! if params[:clear_omniauth_oidc_image] == '1'
     Seek::Config.omniauth_oidc_image = params[:omniauth_oidc_image]
 
-    params[:omniauth_oidc_issuer] = params[:omniauth_oidc_issuer].chomp('/') + '/' if params[:omniauth_oidc_issuer].present?
     Seek::Config.omniauth_oidc_issuer = params[:omniauth_oidc_issuer]
     Seek::Config.omniauth_oidc_client_id = params[:omniauth_oidc_client_id]
     Seek::Config.omniauth_oidc_secret = params[:omniauth_oidc_secret]
