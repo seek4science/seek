@@ -20,14 +20,6 @@ class ObservationUnitsController < ApplicationController
     end
   end
 
-  # def create
-  #   @observation_unit = ObservationUnit.new(observation_unit_params)
-  #   @observation_unit.contributor = current_user
-  #   update_sharing_policies @assay
-  #   update_annotations(params[:tag_list], @assay)
-  #   update_relationships(@assay, params)
-  # end
-
   def update
     update_annotations(params[:tag_list], @observation_unit) if params.key?(:tag_list)
     update_sharing_policies @observation_unit
