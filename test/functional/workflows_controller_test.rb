@@ -1800,6 +1800,30 @@ class WorkflowsControllerTest < ActionController::TestCase
                   { text: 'Run on Galaxy' }
   end
 
+  test 'redirects to galaxy instance when run attempted' do
+    workflow = FactoryBot.create(:existing_galaxy_ro_crate_workflow, policy: FactoryBot.create(:public_policy))
+    assert workflow.can_run?
+
+    assert_difference('workflow.run_count', 1) do
+      post :run, params: { id: workflow.id, version: workflow.version }
+
+      trs_url = URI.encode_www_form_component("http://localhost:3000/ga4gh/trs/v2/tools/#{workflow.id}/versions/1")
+      assert_redirected_to "https://usegalaxy.eu/workflows/trs_import?trs_url=#{trs_url}&run_form=true"
+    end
+  end
+
+  test 'does not log run if run action fails' do
+    workflow = FactoryBot.create(:cwl_workflow, policy: FactoryBot.create(:public_policy))
+    refute workflow.can_run?
+
+    assert_no_difference('workflow.run_count') do
+      post :run, params: { id: workflow.id, version: workflow.version }
+
+      assert_redirected_to root_url
+      assert flash[:error].include?('not supported')
+    end
+  end
+
   test 'throws error when downloading RO-Crate with missing file' do
     workflow = FactoryBot.create(:local_git_workflow, policy: FactoryBot.create(:public_policy))
     gv = workflow.latest_git_version
@@ -1894,6 +1918,28 @@ class WorkflowsControllerTest < ActionController::TestCase
 
     assert_redirected_to workflow
     assert_includes flash[:error], 'You are not authorized to download this Workflow'
+  end
+
+  test 'show run count for runnable workflow' do
+    workflow = FactoryBot.create(:existing_galaxy_ro_crate_workflow, policy: FactoryBot.create(:public_policy))
+
+    get :show, params: { id: workflow }
+
+    assert_select '#usage_count' do
+      assert_select 'strong', text: /Downloads/, count: 1
+      assert_select 'strong', text: /Runs/, count: 1
+    end
+  end
+
+  test 'do not show run count for non-runnable workflow' do
+    workflow = FactoryBot.create(:cwl_workflow, policy: FactoryBot.create(:public_policy))
+
+    get :show, params: { id: workflow }
+
+    assert_select '#usage_count' do
+      assert_select 'strong', text: /Downloads/, count: 1
+      assert_select 'strong', text: /Runs/, count: 0
+    end
   end
 end
 

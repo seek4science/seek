@@ -20,6 +20,10 @@ module Seek
         count_actions('show')
       end
 
+      def run_count
+        count_actions('run')
+      end
+
       private
 
       def count_actions(actions = nil)
