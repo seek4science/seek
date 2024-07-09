@@ -887,9 +887,23 @@ class WorkflowsControllerTest < ActionController::TestCase
       post :create_from_ro_crate, params: {
         ro_crate: { data: fixture_file_upload('workflows/no-main-workflow.crate.zip', 'application/zip') }
       }
+
+      assert_response :unprocessable_entity
     end
 
     assert assigns(:crate_extractor).errors.added?(:ro_crate, 'did not specify a main workflow.')
+  end
+
+  test 'RO-Crate with missing file reports error back to user' do
+    assert_no_difference('Git::Repository.count') do
+      post :create_from_ro_crate, params: {
+        ro_crate: { data: fixture_file_upload('workflows/missing-file.crate.zip', 'application/zip') }
+      }
+
+      assert_response :unprocessable_entity
+    end
+
+    assert assigns(:crate_extractor).errors.added?(:ro_crate, 'could not be read: Local Data Entity not found in crate: concat_two_files.ga')
   end
 
   test 'can get edit paths page' do
