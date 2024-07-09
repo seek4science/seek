@@ -76,7 +76,7 @@ class SampleType < ApplicationRecord
   end
 
   def is_isa_json_compliant?
-    (studies.any? || assays.any?) && investigations.all?(&:is_isa_json_compliant?) && isa_template
+    (studies.any? || assays.any?) && investigations.all?(&:is_isa_json_compliant?) && !isa_template.nil?
   end
 
   def validate_value?(attribute_name, value)
