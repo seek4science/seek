@@ -12,7 +12,7 @@ module Seek
           after_initialize :contributor_or_default_if_new
 
           # checks a policy exists, and if missing resorts to using a private policy
-          after_initialize :policy_or_default_if_new
+          before_validation :policy_or_default_if_new
 
           include Seek::ProjectAssociation unless method_defined? :projects
 
@@ -271,7 +271,11 @@ module Seek
       delegate :public?, to: :policy
 
       def default_policy
-        Policy.default
+        if projects.one? && projects.first.use_default_policy
+          projects.first.default_policy.deep_copy
+        else
+          Policy.default
+        end
       end
 
       def policy_or_default_if_new
