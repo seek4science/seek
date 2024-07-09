@@ -706,12 +706,7 @@ SEEK::Application.routes.draw do
       post :update_annotations_ajax
     end
     resources :samples
-    resources :content_blobs do
-      member do
-        get :download
-      end
-    end
-    resources :investigations, :people, :publications, :projects, :programmes, :templates, :studies, :assays, only: [:index]
+    resources :investigations, :people, :collections, :publications, :projects, :programmes, :templates, :studies, :assays, only: [:index]
   end
 
   ### SAMPLE ATTRIBUTE TYPES ###
