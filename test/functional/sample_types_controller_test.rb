@@ -11,7 +11,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     @project_ids = [@project.id]
     refute_nil @project
     login_as(@person)
-    @sample_type = FactoryBot.create(:simple_sample_type, project_ids: @project_ids)
+    @sample_type = FactoryBot.create(:simple_sample_type, project_ids: @project_ids, contributor: @person)
     @string_type = FactoryBot.create(:string_sample_attribute_type)
     @int_type = FactoryBot.create(:integer_sample_attribute_type)
     @controlled_vocab_type = FactoryBot.create(:controlled_vocab_attribute_type)
@@ -203,7 +203,7 @@ class SampleTypesControllerTest < ActionController::TestCase
   test 'should update sample_type' do
     sample_type = nil
     perform_enqueued_jobs(only: [SampleTemplateGeneratorJob, SampleTypeUpdateJob]) do
-      sample_type = FactoryBot.create(:patient_sample_type, project_ids: @project_ids)
+      sample_type = FactoryBot.create(:patient_sample_type, project_ids: @project_ids, contributor: @person)
     end
     assert_empty sample_type.tags
 
@@ -251,7 +251,7 @@ class SampleTypesControllerTest < ActionController::TestCase
   end
 
   test 'update changing from a CV attribute' do
-    sample_type = FactoryBot.create(:apples_controlled_vocab_sample_type, project_ids: @project_ids)
+    sample_type = FactoryBot.create(:apples_controlled_vocab_sample_type, project_ids: @project_ids, contributor: @person)
     assert sample_type.valid?
     assert sample_type.can_edit?
     assert_equal 1, sample_type.sample_attributes.count
@@ -278,7 +278,7 @@ class SampleTypesControllerTest < ActionController::TestCase
   end
 
   test 'update changing from a Sample Type attribute' do
-    sample_type = FactoryBot.create(:linked_sample_type, project_ids: @project_ids)
+    sample_type = FactoryBot.create(:linked_sample_type, project_ids: @project_ids, contributor: @person)
     assert sample_type.valid?
     assert sample_type.can_edit?
     assert_equal 2, sample_type.sample_attributes.count
@@ -411,7 +411,7 @@ class SampleTypesControllerTest < ActionController::TestCase
   end
 
   test 'should show link to sample type for linked attribute' do
-    linked_type = FactoryBot.create(:linked_sample_type, project_ids: @project_ids)
+    linked_type = FactoryBot.create(:linked_sample_type, project_ids: @project_ids, contributor: @person)
     linked_attribute = linked_type.sample_attributes.last
 
     assert linked_attribute.sample_attribute_type.seek_sample?
@@ -430,7 +430,7 @@ class SampleTypesControllerTest < ActionController::TestCase
   end
 
   test 'add attribute button' do
-    type = FactoryBot.create(:simple_sample_type, project_ids: @project_ids)
+    type = FactoryBot.create(:simple_sample_type, project_ids: @project_ids, contributor: @person)
     assert_empty type.samples
     login_as(@person)
     get :edit, params: { id: type.id }
@@ -438,7 +438,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_select 'a#add-attribute', count: 1
 
     sample = FactoryBot.create(:patient_sample, contributor: @person,
-                                                sample_type: FactoryBot.create(:patient_sample_type, project_ids: @project_ids))
+                                                sample_type: FactoryBot.create(:patient_sample_type, project_ids: @project_ids, contributor: @person))
     type = sample.sample_type
     refute_empty type.samples
     assert type.can_edit?
@@ -643,21 +643,26 @@ class SampleTypesControllerTest < ActionController::TestCase
 
   test 'only visible sample types are listed' do
     person = FactoryBot.create(:person)
-    st1 = FactoryBot.create(:simple_sample_type, projects: person.projects)
+    st1 = FactoryBot.create(:simple_sample_type, projects: person.projects, contributor: person)
     st2 = FactoryBot.create(:simple_sample_type)
     st3 = FactoryBot.create(:sample, policy: FactoryBot.create(:public_policy)).sample_type # type with a public sample associated
+    st4 = FactoryBot.create(:simple_sample_type, projects: person.projects, policy: FactoryBot.create(:public_policy))
     login_as(person.user)
 
     assert st1.can_view?
     refute st2.can_view?
-    assert st3.can_view?
+    # assert st3.can_view? # st3 is not visible anymore because sample types have their own permissions now.
+    refute st3.can_view?
+    assert st4.can_view?
 
     get :index
 
     assert_select 'div.list_items_container' do
       assert_select 'div.list_item_title a[href=?]', sample_type_path(st1)
       assert_select 'div.list_item_title a[href=?]', sample_type_path(st2), count: 0
-      assert_select 'div.list_item_title a[href=?]', sample_type_path(st3)
+      # assert_select 'div.list_item_title a[href=?]', sample_type_path(st3) # st3 is not visible anymore because sample types have their own permissions now.
+      assert_select 'div.list_item_title a[href=?]', sample_type_path(st3), count: 0
+      assert_select 'div.list_item_title a[href=?]', sample_type_path(st4)
     end
   end
 
@@ -675,9 +680,11 @@ class SampleTypesControllerTest < ActionController::TestCase
   test 'visible with referring sample' do
     person = FactoryBot.create(:person)
     sample = FactoryBot.create(:sample,
-                     policy: FactoryBot.create(:private_policy,
-                                     permissions: [FactoryBot.create(:permission, contributor: person,
-                                                                                  access_type: Policy::VISIBLE)]))
+                               policy: FactoryBot.create(:private_policy,
+                                                         permissions: [FactoryBot.create(:permission, contributor: person,
+                                                                                                      access_type: Policy::VISIBLE)]),
+                               sample_type: FactoryBot.create(:simple_sample_type, projects: person.projects)
+    )
     sample_type = sample.sample_type
     login_as(person.user)
 
