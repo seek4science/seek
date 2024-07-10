@@ -42,7 +42,6 @@ class SampleType < ApplicationRecord
 
   has_many :assays
   has_and_belongs_to_many :studies
-  has_many :investigations, through: :studies
 
   scope :without_template, -> { where(template_id: nil) }
 
@@ -62,6 +61,10 @@ class SampleType < ApplicationRecord
   grouped_pagination
 
   has_annotation_type :sample_type_tag, method_name: :tags
+
+  def related_investigations
+    (studies.map(&:investigation).compact << assays.map(&:investigation).compact).flatten.uniq
+  end
 
   def level
     isa_template&.level
