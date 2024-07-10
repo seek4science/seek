@@ -98,6 +98,47 @@ class IsaStudiesControllerTest < ActionController::TestCase
     end
   end
 
+  test 'Should create the same policies for the sample types' do
+    person = FactoryBot.create(:person_not_in_project)
+    second_person = FactoryBot.create(:person_not_in_project)
+    institution = FactoryBot.create(:institution)
+    project = FactoryBot.create(:project)
+    [person, second_person].each do |p|
+      p.add_to_project_and_institution(project, institution)
+      p.reload
+    end
+    investigation = FactoryBot.create(:investigation, projects: [project], contributor: person)
+
+    study_policy_attributes = { access_type: Policy::NO_ACCESS, permissions_attributes: {"1": { contributor_type: 'Person', contributor_id: person.id, access_type: Policy::MANAGING }, "2": { contributor_type: 'Person', contributor_id: second_person.id, access_type: Policy::VISIBLE }} }
+
+    study = FactoryBot.build(:study, investigation: investigation, contributor: person)
+    study_attributes = study.as_json
+
+    login_as person.user
+    post :create, params: { isa_study: { study: study_attributes, source_sample_type: source_attributes, sample_collection_sample_type: sample_collection_attributes }, policy_attributes: study_policy_attributes }
+    @isa_study = assigns(:isa_study)
+    assert_redirected_to single_page_path(id: @isa_study.study.projects.first, item_type: 'study', item_id: @isa_study.study)
+
+    # Check that the policies are the same
+    @isa_study.study.sample_types.each do |st|
+      assert_equal @isa_study.study.policy, st.policy
+    end
+
+    # person can manage the study and the sample types
+    assert @isa_study.study.can_manage?
+    assert @isa_study.source.can_manage?
+    assert @isa_study.sample_collection.can_manage?
+
+    # second_person can only view the study and the sample types
+    login_as second_person.user
+    assert @isa_study.study.can_view?(second_person.user)
+    refute @isa_study.study.can_manage?(second_person.user)
+    assert @isa_study.source.can_view?(second_person.user)
+    refute @isa_study.source.can_manage?(second_person.user)
+    assert @isa_study.sample_collection.can_view?(second_person.user)
+    refute @isa_study.sample_collection.can_manage?(second_person.user)
+  end
+
   private
 
   def sample_collection_attributes(projects=[])

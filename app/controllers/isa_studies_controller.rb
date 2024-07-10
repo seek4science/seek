@@ -11,6 +11,8 @@ class IsaStudiesController < ApplicationController
 
   def create
     @isa_study = IsaStudy.new(isa_study_params)
+    @isa_study.source.policy = @isa_study.study.policy
+    @isa_study.sample_collection.policy = @isa_study.study.policy
     update_sharing_policies @isa_study.study
     @isa_study.source.contributor = User.current_user.person
     @isa_study.sample_collection.contributor = User.current_user.person
@@ -42,6 +44,8 @@ class IsaStudiesController < ApplicationController
   def update
     # update the study
     @isa_study.study.attributes = isa_study_params[:study]
+    @isa_study.source.policy = @isa_study.study.policy
+    @isa_study.sample_collection.policy = @isa_study.study.policy
     update_sharing_policies @isa_study.study
     update_relationships(@isa_study.study, isa_study_params[:study])
 
