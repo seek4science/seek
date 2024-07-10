@@ -62,7 +62,9 @@ class SampleType < ApplicationRecord
 
   has_annotation_type :sample_type_tag, method_name: :tags
 
-  def related_investigations
+  def investigations
+    return [] if studies.empty? && assays.empty?
+
     (studies.map(&:investigation).compact << assays.map(&:investigation).compact).flatten.uniq
   end
 
@@ -79,7 +81,8 @@ class SampleType < ApplicationRecord
   end
 
   def is_isa_json_compliant?
-    (studies.any? || assays.any?) && investigations.all?(&:is_isa_json_compliant?) && !isa_template.nil?
+    has_only_isa_json_compliant_investigations = studies.map(&:investigation).compact.all?(&:is_isa_json_compliant?) || assays.map(&:investigation).compact.all?(&:is_isa_json_compliant?)
+    (studies.any? || assays.any?) && has_only_isa_json_compliant_investigations && !isa_template.nil?
   end
 
   def validate_value?(attribute_name, value)
@@ -141,14 +144,21 @@ class SampleType < ApplicationRecord
         end.nil?
     end
   end
-
+  def can_download?(user = User.current_user)
+    can_view?(user)
+  end
   def can_view?(user = User.current_user, referring_sample = nil, view_in_single_page = false)
     return false if Seek::Config.isa_json_compliance_enabled && template_id.present? && !view_in_single_page
 
-    can = referring_sample.nil? ? false : check_referring_sample_permission(user, referring_sample)
-    can || super(user)
+    referring_sample_permited = referring_sample.nil? ? false : check_referring_sample_permission(user, referring_sample)
+    project_membership = projects.map(&:people).flatten.include?(user&.person)
+    is_creator = creators.include?(user&.person)
+    referring_sample_permited || public_samples? || is_creator || project_membership || super(user)
   end
 
+  def can_edit?(user = User.current_user)
+    (user && projects.any? { |p| user&.person&.is_project_administrator?(p) }) || user&.is_admin? || super(user)
+  end
   def editing_constraints
     Seek::Samples::SampleTypeEditingConstraints.new(self)
   end
