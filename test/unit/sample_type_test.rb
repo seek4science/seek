@@ -158,30 +158,31 @@ class SampleTypeTest < ActiveSupport::TestCase
     end
 
     # can download if in project
-    person2 = FactoryBot.create(:person,project:@project)
-    st = FactoryBot.create(:simple_sample_type,projects:[@project])
-    assert_equal [@project],st.projects & @person.projects
-    assert st.can_download?(@person.user)
+    person = FactoryBot.create(:person, project: @project)
+    st2 = FactoryBot.create(:simple_sample_type, projects: [@project])
+    assert_equal [@project], st2.projects & @person.projects
+    assert [person, @person].all? { |p| st2.projects.map(&:people).flatten.include? p }
+    assert st2.can_download?(@person.user)
     User.with_current_user(@person.user) do
-      assert st.can_download?
+      assert st2.can_download?
     end
 
     # can download if it has a public sample
-    public_sample = FactoryBot.create(:sample,policy:FactoryBot.create(:public_policy))
-    private_sample = FactoryBot.create(:sample,policy:FactoryBot.create(:private_policy))
+    public_sample = FactoryBot.create(:sample, policy: FactoryBot.create(:public_policy))
+    private_sample = FactoryBot.create(:sample, policy: FactoryBot.create(:private_policy))
 
     assert public_sample.can_download?
-    st = public_sample.sample_type
-    assert st.can_download?
-    assert st.can_download?(@person.user)
-    assert_empty st.projects & @person.projects
+    st3 = public_sample.sample_type
+    assert st3.can_download?
+    assert st3.can_download?(@person.user)
+    assert_empty st3.projects & @person.projects
 
     refute private_sample.can_download?
-    st = private_sample.sample_type
-    refute st.can_download?
-    refute st.can_download?(@person.user)
-    refute st.can_download?(@person.user)
-    assert_empty st.projects & @person.projects
+    st4 = private_sample.sample_type
+    refute st4.can_download?
+    refute st4.can_download?(@person.user)
+    refute st4.can_download?(@person.user)
+    assert_empty st4.projects & @person.projects
   end
 
   test 'validate title and decription length' do
@@ -604,8 +605,8 @@ class SampleTypeTest < ActiveSupport::TestCase
 
       # member of other project, even if proj admin, cannot edit
       person = FactoryBot.create(:project_administrator)
-      sample_type = FactoryBot.create(:simple_sample_type,projects:[FactoryBot.create(:project)])
-      refute_equal person,sample_type.contributor
+      sample_type = FactoryBot.create(:simple_sample_type, projects: [FactoryBot.create(:project)])
+      refute_equal person, sample_type.contributor
       assert_empty sample_type.projects & person.projects
       refute sample_type.can_edit?(person.user)
       User.with_current_user(person.user) do
@@ -671,7 +672,7 @@ class SampleTypeTest < ActiveSupport::TestCase
     with_config_value :project_admin_sample_type_restriction, false do
       # project admin can delete
       person = FactoryBot.create(:project_administrator)
-      sample_type = FactoryBot.create(:simple_sample_type,projects:person.projects)
+      sample_type = FactoryBot.create(:simple_sample_type,projects:person.projects, policy: FactoryBot.create(:private_policy, permissions: [FactoryBot.create(:permission,contributor:person, access_type:Policy::EDITING)]))
       refute_equal person,sample_type.contributor
       assert sample_type.can_delete?(person.user)
       User.with_current_user(person.user) do
@@ -708,7 +709,7 @@ class SampleTypeTest < ActiveSupport::TestCase
 
       # seek admin can delete
       person = FactoryBot.create(:admin)
-      sample_type = FactoryBot.create(:simple_sample_type,projects:[FactoryBot.create(:project)])
+      sample_type = FactoryBot.create(:simple_sample_type,projects:[FactoryBot.create(:project)], policy: FactoryBot.create(:private_policy, permissions: [FactoryBot.create(:permission,contributor:person, access_type:Policy::EDITING)]))
       refute_equal person,sample_type.contributor
       assert_empty sample_type.projects & person.projects
       assert sample_type.can_delete?(person.user)
@@ -1097,24 +1098,32 @@ class SampleTypeTest < ActiveSupport::TestCase
   end
 
   test 'determin whether sample types are considered ISA-JSON compliant' do
-    assay_sample_type = FactoryBot.create(:patient_sample_type)
+
+    source_sample_type = FactoryBot.create(:isa_source_sample_type)
+    sample_collection_sample_type= FactoryBot.create(:isa_sample_collection_sample_type, linked_sample_type: source_sample_type)
+    assay_sample_type = FactoryBot.create(:isa_assay_material_sample_type, linked_sample_type: sample_collection_sample_type)
     refute assay_sample_type.is_isa_json_compliant?
 
     FactoryBot.create(:assay, sample_type: assay_sample_type)
     assert assay_sample_type.is_isa_json_compliant?
 
-    source_sample_type = FactoryBot.create(:patient_sample_type)
-    sample_collection_sample_type= FactoryBot.create(:patient_sample_type)
+    [source_sample_type, sample_collection_sample_type].each do |st|
+      refute st.is_isa_json_compliant?
+    end
+
+    study = FactoryBot.create(:study, sample_types: [source_sample_type, sample_collection_sample_type])
 
     [source_sample_type, sample_collection_sample_type].each do |st|
       refute st.is_isa_json_compliant?
     end
 
-    FactoryBot.create(:study, sample_types: [source_sample_type, sample_collection_sample_type])
+    FactoryBot.create(:investigation, is_isa_json_compliant: true, studies: [study])
 
     [source_sample_type, sample_collection_sample_type].each do |st|
+      st.reload
       assert st.is_isa_json_compliant?
     end
+
 
   end
 

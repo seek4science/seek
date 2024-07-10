@@ -651,8 +651,7 @@ class SampleTypesControllerTest < ActionController::TestCase
 
     assert st1.can_view?
     refute st2.can_view?
-    # assert st3.can_view? # st3 is not visible anymore because sample types have their own permissions now.
-    refute st3.can_view?
+    assert st3.can_view?
     assert st4.can_view?
 
     get :index
@@ -660,8 +659,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_select 'div.list_items_container' do
       assert_select 'div.list_item_title a[href=?]', sample_type_path(st1)
       assert_select 'div.list_item_title a[href=?]', sample_type_path(st2), count: 0
-      # assert_select 'div.list_item_title a[href=?]', sample_type_path(st3) # st3 is not visible anymore because sample types have their own permissions now.
-      assert_select 'div.list_item_title a[href=?]', sample_type_path(st3), count: 0
+      assert_select 'div.list_item_title a[href=?]', sample_type_path(st3)
       assert_select 'div.list_item_title a[href=?]', sample_type_path(st4)
     end
   end
@@ -682,8 +680,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     sample = FactoryBot.create(:sample,
                                policy: FactoryBot.create(:private_policy,
                                                          permissions: [FactoryBot.create(:permission, contributor: person,
-                                                                                                      access_type: Policy::VISIBLE)]),
-                               sample_type: FactoryBot.create(:simple_sample_type, projects: person.projects)
+                                                                                                      access_type: Policy::VISIBLE)])
     )
     sample_type = sample.sample_type
     login_as(person.user)
