@@ -64,6 +64,13 @@ class SampleTypesController < ApplicationController
     @sample_type = SampleType.new(sample_type_params)
     @sample_type.contributor = User.current_user.person
 
+    # Update sharing policies
+    update_sharing_policies(@sample_type)
+    # Update relationships
+    update_relationships(@sample_type, params)
+    # Update tags
+    update_annotations(params[:tag_list], @sample_type)
+
     # removes controlled vocabularies or linked seek samples where the type may differ
     @sample_type.resolve_inconsistencies
     @tab = 'manual'
@@ -85,6 +92,14 @@ class SampleTypesController < ApplicationController
 
     @sample_type.update(sample_type_params)
     @sample_type.resolve_inconsistencies
+
+    # Update sharing policies
+    update_sharing_policies(@sample_type)
+    # Update relationships
+    update_relationships(@sample_type, params)
+    # Update tags
+    update_annotations(params[:tag_list], @sample_type)
+
     respond_to do |format|
       if @sample_type.save
         format.html { redirect_to @sample_type, notice: 'Sample type was successfully updated.' }
