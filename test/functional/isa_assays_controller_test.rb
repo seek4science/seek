@@ -255,9 +255,9 @@ class IsaAssaysControllerTest < ActionController::TestCase
 
     ## Create an assay at the end of the stream
     end_assay_sample_type = FactoryBot.create(:isa_assay_material_sample_type,
-    linked_sample_type: study.sample_types.second,
-    projects: [project],
-    contributor: person)
+                                              linked_sample_type: study.sample_types.second,
+                                              projects: [project],
+                                              contributor: person)
     end_assay = FactoryBot.create(:assay, position: 0, contributor: person, study: , sample_type: end_assay_sample_type, assay_stream: )
 
     refute end_assay.is_assay_stream?
@@ -279,7 +279,7 @@ class IsaAssaysControllerTest < ActionController::TestCase
 
     intermediate_isa_assay_attributes1 = { assay: intermediate_assay_attributes1,
                                            input_sample_type_id: study.sample_types.second.id,
-                                           sample_type: material_assay_sample_type_attributes(projects.first, sample_collection_sample_type.id) }
+                                           sample_type: material_assay_sample_type_attributes(projects.first, study.sample_types.second.id) }
 
     assert_difference "Assay.count", 1 do
       assert_difference "SampleType.count", 1 do
