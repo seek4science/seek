@@ -5,7 +5,7 @@ module Seek
       module ClassMethods
         extend ActiveSupport::Concern
         included do
-          after_destroy :mark_deleted_content_blobs
+          after_destroy :mark_deleted_content_blobs, unless: -> { self.class == SampleType }
         end
       end
 
