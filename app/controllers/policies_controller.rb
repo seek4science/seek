@@ -63,7 +63,10 @@ class PoliciesController < ApplicationController
     resource_class = safe_class_lookup(params[:resource_name].camelize)
     resource = nil
     resource = resource_class.find_by_id(params[:resource_id]) if params[:resource_id]
-    resource ||= resource_class.new
+    if resource.nil?
+      resource = resource_class.new
+      resource.policy_or_default_if_new
+    end
     projects = Project.where(id: (params[:project_ids] || '').split(','))
     ucpi = updated_can_publish_immediately(resource, projects)
     policy = resource.policy.set_attributes_with_sharing(policy_params)
