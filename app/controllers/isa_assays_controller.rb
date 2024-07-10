@@ -44,6 +44,7 @@ class IsaAssaysController < ApplicationController
   end
 
   def create
+    @isa_assay.sample_type.policy = @isa_assay.assay.policy
     if @isa_assay.save
       flash[:notice] = "The #{t('isa_assay')} was successfully created.<br/>".html_safe
       respond_to do |format|
@@ -67,7 +68,7 @@ class IsaAssaysController < ApplicationController
 
   def update
     @isa_assay.assay.attributes = isa_assay_params[:assay]
-
+    @isa_assay.sample_type.policy = @isa_assay.assay.policy
     # update the sample_type
     unless @isa_assay&.assay&.is_assay_stream?
       if requested_item_authorized?(@isa_assay.sample_type)

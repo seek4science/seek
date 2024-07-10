@@ -559,6 +559,46 @@ class IsaAssaysControllerTest < ActionController::TestCase
     assert_select 'input[type=hidden][value=0]#isa_assay_assay_position', count: 1
 
   end
+
+  test 'Should create the same policies for the sample types' do
+    person = FactoryBot.create(:person_not_in_project)
+    second_person = FactoryBot.create(:person_not_in_project)
+    institution = FactoryBot.create(:institution)
+    project = FactoryBot.create(:project)
+    [person, second_person].each do |p|
+      p.add_to_project_and_institution(project, institution)
+      p.reload
+    end
+    investigation = FactoryBot.create(:investigation, projects: [project], contributor: person)
+
+    study = FactoryBot.create(:isa_json_compliant_study, contributor: person, investigation: )
+
+    assay_policy_attributes = { access_type: Policy::NO_ACCESS, permissions_attributes: {"1": { contributor_type: 'Person', contributor_id: person.id, access_type: Policy::MANAGING }, "2": { contributor_type: 'Person', contributor_id: second_person.id, access_type: Policy::VISIBLE }} }
+
+    assay_stream = FactoryBot.create(:assay_stream, study: , contributor: person, position: 0)
+    assay = FactoryBot.build(:assay, study: , contributor: person, assay_class: AssayClass.experimental, assay_stream: assay_stream, assay_type_uri: nil)
+    assay_attributes = assay.as_json.reject { |_, v| v.blank? }
+
+    login_as person.user
+    post :create, params: { isa_assay: { assay: assay_attributes, sample_type: material_assay_sample_type_attributes(project, study.sample_types.second.id), source_assay_id: assay_stream.id, input_sample_type_id: study.sample_types.second.id}, policy_attributes: assay_policy_attributes }
+    @isa_assay = assigns(:isa_assay)
+    assert_redirected_to single_page_path(id: @isa_assay.assay.projects.first, item_type: 'assay', item_id: @isa_assay.assay)
+
+    # Check that the policies are the same
+    assert_equal @isa_assay.assay.policy, @isa_assay.sample_type.policy
+
+    # person can manage the study and the sample types
+    assert @isa_assay.assay.can_manage?
+    assert @isa_assay.sample_type.can_manage?
+
+    # second_person can only view the study and the sample types
+    login_as second_person.user
+    assert @isa_assay.assay.can_view?(second_person.user)
+    refute @isa_assay.assay.can_manage?(second_person.user)
+    assert @isa_assay.sample_type.can_view?(second_person.user)
+    refute @isa_assay.sample_type.can_manage?(second_person.user)
+  end
+
   private
 
   def material_assay_sample_type_attributes(project, linked_sample_type_id='self')
