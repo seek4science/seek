@@ -1782,10 +1782,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     get :show, params: { id: workflow.id }
 
     assert workflow.can_run?
-    assert_equal 'https://usegalaxy.eu', Seek::Config.galaxy_instance_default
-    trs_url = URI.encode_www_form_component("http://localhost:3000/ga4gh/trs/v2/tools/#{workflow.id}/versions/1")
-    assert_select 'a.btn[href=?]', "https://usegalaxy.eu/workflows/trs_import?trs_url=#{trs_url}&run_form=true",
-                  { text: 'Run on Galaxy' }
+    assert_select 'a.btn[href=?]', run_workflow_path(workflow, version: workflow.version), { text: 'Run on Galaxy' }
   end
 
   test 'shows run button for galaxy workflows using specified galaxy endpoint' do
@@ -1795,12 +1792,10 @@ class WorkflowsControllerTest < ActionController::TestCase
     get :show, params: { id: workflow.id }
 
     assert workflow.can_run?
-    trs_url = URI.encode_www_form_component("http://localhost:3000/ga4gh/trs/v2/tools/#{workflow.id}/versions/1")
-    assert_select 'a.btn[href=?]', "https://galaxygalaxy.org/mygalaxy/workflows/trs_import?trs_url=#{trs_url}&run_form=true",
-                  { text: 'Run on Galaxy' }
+    assert_select 'a.btn[href=?]', run_workflow_path(workflow, version: workflow.version), { text: 'Run on Galaxy' }
   end
 
-  test 'redirects to galaxy instance when run attempted' do
+  test 'redirects to default galaxy instance when run attempted' do
     workflow = FactoryBot.create(:existing_galaxy_ro_crate_workflow, policy: FactoryBot.create(:public_policy))
     assert workflow.can_run?
 
@@ -1809,6 +1804,19 @@ class WorkflowsControllerTest < ActionController::TestCase
 
       trs_url = URI.encode_www_form_component("http://localhost:3000/ga4gh/trs/v2/tools/#{workflow.id}/versions/1")
       assert_redirected_to "https://usegalaxy.eu/workflows/trs_import?trs_url=#{trs_url}&run_form=true"
+    end
+  end
+
+  test 'redirects to specified galaxy instance when run attempted' do
+    workflow = FactoryBot.create(:existing_galaxy_ro_crate_workflow, policy: FactoryBot.create(:public_policy),
+                                 execution_instance_url: 'https://galaxygalaxy.org/mygalaxy/')
+    assert workflow.can_run?
+
+    assert_difference('workflow.run_count', 1) do
+      post :run, params: { id: workflow.id, version: workflow.version }
+
+      trs_url = URI.encode_www_form_component("http://localhost:3000/ga4gh/trs/v2/tools/#{workflow.id}/versions/1")
+      assert_redirected_to "https://galaxygalaxy.org/mygalaxy/workflows/trs_import?trs_url=#{trs_url}&run_form=true"
     end
   end
 
