@@ -559,18 +559,16 @@ class SopsControllerTest < ActionController::TestCase
   test 'the gatekeeper should have right to view the item when an item is requested to be published' do
     gatekeeper = FactoryBot.create(:asset_gatekeeper)
     @user.person.add_to_project_and_institution(gatekeeper.projects.first, FactoryBot.create(:institution))
-    post :create, params: { sop: { title: 'text sop', project_ids: gatekeeper.projects.collect(&:id) }, content_blobs: [{ data: picture_file }], policy_attributes: { access_type: Policy::NO_ACCESS } }
-    sop = assigns(:sop)
+    sop = FactoryBot.create(:sop, title: 'text sop', projects: gatekeeper.projects, policy: FactoryBot.create(:private_policy))
 
     login_as(gatekeeper)
     refute sop.can_view?
 
     login_as(sop.contributor)
     post :publish, params: { id: sop }
-    sop = assigns(:sop)
 
-    login_as(gatekeeper)
-    assert sop.can_view?
+    assert_redirected_to published_sop_path(sop, waiting_for_publish_items: ["Sop,#{sop.id}"])
+    assert sop.reload.can_view?(gatekeeper)
   end
 
   test "should show 'None' for other contributors if no contributors" do
