@@ -920,7 +920,7 @@ class WorkflowTest < ActiveSupport::TestCase
       assert_equal Policy::NO_ACCESS, policy.access_type
       assert_equal 1, policy.permissions.count
       assert_equal admin, policy.permissions.first.contributor
-      assert_equal Policy::MANAGING, policy.permissions.first.contributor
+      assert_equal Policy::MANAGING, policy.permissions.first.access_type
     end
   end
 end
