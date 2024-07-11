@@ -271,7 +271,7 @@ module Seek
       delegate :public?, to: :policy
 
       def default_policy
-        if projects.one? && projects.first.use_default_policy
+        if projects.one? && projects.first.use_default_policy && projects.first.default_policy
           projects.first.default_policy.deep_copy
         else
           Policy.default

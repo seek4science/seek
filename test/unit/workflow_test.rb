@@ -923,4 +923,21 @@ class WorkflowTest < ActiveSupport::TestCase
       assert_equal Policy::MANAGING, policy.permissions.first.access_type
     end
   end
+
+  test 'does not apply project default policy if it does not exist' do
+    admin = FactoryBot.create(:project_administrator)
+    project = admin.projects.first
+    disable_authorization_checks do
+      project.use_default_policy = true
+      project.save!
+    end
+    assert_nil project.default_policy
+
+    with_config_value(:default_all_visitors_access_type, Policy::ACCESSIBLE) do
+      workflow = FactoryBot.create(:workflow, projects: [project])
+      policy = workflow.policy
+      assert_equal Policy::ACCESSIBLE, policy.access_type
+      assert_equal 0, policy.permissions.count
+    end
+  end
 end
