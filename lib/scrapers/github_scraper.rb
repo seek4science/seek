@@ -102,8 +102,6 @@ module Scrapers
       workflow = wiz.run
       workflow.contributor = @contributor
       workflow.projects = Array(@project)
-      workflow.policy = Policy.projects_policy(workflow.projects)
-      workflow.policy.access_type = Policy::ACCESSIBLE
       workflow.source_link_url = repo.remote.chomp('.git')
       workflow.tags = topics(repo)
       if wiz.next_step == :provide_metadata

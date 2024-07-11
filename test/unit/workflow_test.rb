@@ -885,4 +885,42 @@ class WorkflowTest < ActiveSupport::TestCase
     # Not supported for non-galaxy currently
     assert_nil FactoryBot.create(:cwl_workflow, policy: FactoryBot.create(:public_policy)).run_url
   end
+
+  test 'applies instance default policy' do
+    admin = FactoryBot.create(:project_administrator)
+    project = admin.projects.first
+    disable_authorization_checks do
+      project.default_policy = FactoryBot.create(:private_policy)
+      project.use_default_policy = false
+      project.save!
+      project.default_policy.permissions << Permission.new(contributor: admin, access_type: Policy::MANAGING)
+    end
+
+    with_config_value(:default_all_visitors_access_type, Policy::ACCESSIBLE) do
+      workflow = FactoryBot.create(:workflow, projects: [project])
+      policy = workflow.policy
+      assert_equal Policy::ACCESSIBLE, policy.access_type
+      assert_equal 0, policy.permissions.count
+    end
+  end
+
+  test 'applies project default policy' do
+    admin = FactoryBot.create(:project_administrator)
+    project = admin.projects.first
+    disable_authorization_checks do
+      project.default_policy = FactoryBot.create(:private_policy)
+      project.use_default_policy = true
+      project.save!
+      project.default_policy.permissions << Permission.new(contributor: admin, access_type: Policy::MANAGING)
+    end
+
+    with_config_value(:default_all_visitors_access_type, Policy::ACCESSIBLE) do
+      workflow = FactoryBot.create(:workflow, projects: [project])
+      policy = workflow.policy
+      assert_equal Policy::NO_ACCESS, policy.access_type
+      assert_equal 1, policy.permissions.count
+      assert_equal admin, policy.permissions.first.contributor
+      assert_equal Policy::MANAGING, policy.permissions.first.contributor
+    end
+  end
 end

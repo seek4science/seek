@@ -288,6 +288,35 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test 'submitted workflow takes project default policy' do
+    project_admin = FactoryBot.create(:project_administrator)
+    disable_authorization_checks do
+      @project.default_policy = FactoryBot.create(:private_policy)
+      @project.default_policy.permissions << Permission.new(contributor: @project, access_type: Policy::EDITING)
+      @project.default_policy.permissions << Permission.new(contributor: project_admin, access_type: Policy::MANAGING)
+      @project.default_policy.save!
+      @project.use_default_policy = true
+      @project.save!
+    end
+
+    assert_difference('Workflow.count', 1) do
+      assert_difference('Git::Version.count', 1) do
+        post submit_workflows_path, params: {
+          ro_crate: fixture_file_upload('workflows/ro-crate-with-id.crate.zip'),
+          workflow: {
+            project_ids: [@project.id]
+          }
+        }
+
+        assert_response :success
+        assert_equal 'Galaxy', assigns(:workflow).workflow_class.title
+        policy = assigns(:workflow).policy
+        assert_equal 2, policy.permissions.count
+        assert policy.permissions.detect { |p| p.contributor == project_admin && p.access_type == Policy::MANAGING }
+        assert policy.permissions.detect { |p| p.contributor == @project && p.access_type == Policy::EDITING }
+      end
+    end
+  end
   private
 
   def login_as(user)

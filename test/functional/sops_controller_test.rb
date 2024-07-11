@@ -2094,6 +2094,56 @@ class SopsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'project default policy is applied if no policy params' do
+    admin = FactoryBot.create(:project_administrator)
+    project = admin.projects.first
+    person = FactoryBot.create(:person, project: project)
+    login_as(person)
+    disable_authorization_checks do
+      project.default_policy = FactoryBot.create(:private_policy)
+      project.use_default_policy = true
+      project.save!
+      project.default_policy.permissions << Permission.new(contributor: admin, access_type: Policy::MANAGING)
+    end
+
+    assert_difference('Sop.count', 1) do
+      post :create, params: { sop: { title: 'SOP', project_ids: [project.id] },
+                              content_blobs: [{ data: file_for_upload }] }
+    end
+
+    assert sop = assigns(:sop)
+    policy = sop.policy
+    assert_equal Policy::NO_ACCESS, policy.access_type
+    policy = sop.reload.policy
+    assert_equal 1, policy.permissions.count
+    assert_equal admin, policy.permissions.first.contributor
+    assert_equal Policy::MANAGING, policy.permissions.first.access_type
+  end
+
+  test 'policy params override project default policy' do
+    admin = FactoryBot.create(:project_administrator)
+    project = admin.projects.first
+    person = FactoryBot.create(:person, project: project)
+    login_as(person)
+    disable_authorization_checks do
+      project.default_policy = FactoryBot.create(:private_policy)
+      project.use_default_policy = true
+      project.save!
+      project.default_policy.permissions << Permission.new(contributor: admin, access_type: Policy::MANAGING)
+    end
+
+    assert_difference('Sop.count', 1) do
+      post :create, params: { sop: { title: 'SOP', project_ids: [project.id] },
+                              content_blobs: [{ data: file_for_upload }],
+                              policy_attributes: { access_type: Policy::VISIBLE } }
+    end
+
+    assert sop = assigns(:sop)
+    policy = sop.policy
+    assert_equal Policy::VISIBLE, policy.access_type
+    assert_equal 0, policy.permissions.count
+  end
+
   private
 
   def doi_citation_mock
