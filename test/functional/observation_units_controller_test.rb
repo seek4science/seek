@@ -15,12 +15,20 @@ class ObservationUnitsControllerTest < ActionController::TestCase
     unit = FactoryBot.create(:max_observation_unit)
     get :show, params: { id: unit.id }
     assert_response :success
+    assert_select 'div.contribution-header h1', text:/#{unit.title}/
+    assert_select 'div#overview' do
+      assert_select 'div#description', text:/#{unit.description}/
+      assert_select 'div#extended-metadata div', text:/Extended Metadata \(simple obs unit extended metadata type\)/
+    end
   end
 
   test 'index' do
     unit = FactoryBot.create(:max_observation_unit)
     get :index
     assert_response :success
+    assert_select 'div.list_item', count: 1 do
+      assert_select 'div.list_item_title', text:/#{unit.title}/
+    end
   end
 
   test 'edit' do

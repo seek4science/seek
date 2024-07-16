@@ -5075,6 +5075,7 @@ class ProjectsControllerTest < ActionController::TestCase
       get :import_from_fairdata_station, params: { id: project.id }
       assert_redirected_to :root
       refute_nil flash[:error]
+      assert_equal 'Fair data station are disabled', flash[:error]
     end
   end
 
