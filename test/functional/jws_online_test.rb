@@ -56,4 +56,15 @@ class JwsOnlineTest < ActionController::TestCase
     assert_redirected_to root_url
     assert flash[:error].include?('JWS Online-compatible')
   end
+
+  test 'do not log event before simulation is run' do
+    model = FactoryBot.create(:teusink_model, policy: FactoryBot.create(:public_policy))
+
+    assert_no_difference('model.run_count') do
+      get :simulate, params: { id: model.id, version: model.version } # `constraint_based` param is missing
+    end
+
+    assert_response :success
+    assert_select 'div', text: /JWS Online needs information.+/
+  end
 end

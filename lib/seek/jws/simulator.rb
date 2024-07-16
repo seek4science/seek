@@ -8,6 +8,7 @@ module Seek
         include Seek::ExternalServiceWrapper
         before_action :find_display_asset_for_jws, only: [:simulate]
         before_action :jws_enabled, only: [:simulate]
+        skip_after_action :log_event, if: -> (c) { c.action_name == 'simulate' && @constraint_based.nil? }
       end
 
       def simulate
