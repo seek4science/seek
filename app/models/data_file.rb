@@ -23,8 +23,7 @@ class DataFile < ApplicationRecord
   has_many :sample_resource_links, -> { where(resource_type: 'DataFile') }, class_name: 'SampleResourceLink', foreign_key: :resource_id
   has_many :linked_samples, through: :sample_resource_links, source: :sample
 
-  has_many :observation_unit_assets, dependent: :destroy, as: :asset, foreign_key: :asset_id, autosave: true, # change this to validate: true in the future
-    inverse_of: :asset
+  has_many :observation_unit_assets, dependent: :delete_all, as: :asset, foreign_key: :asset_id, autosave: true, inverse_of: :asset
   has_many :observation_units, through: :observation_unit_assets
 
   has_many :workflow_data_files, dependent: :destroy, autosave: true
