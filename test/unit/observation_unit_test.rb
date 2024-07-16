@@ -49,5 +49,23 @@ class ObservationUnitTest < ActiveSupport::TestCase
     refute obs_unit.can_view?(person2)
   end
 
+  test 'can destroy' do
+    obs_unit = FactoryBot.create(:max_observation_unit)
+    refute_empty obs_unit.data_files
+    assert_difference('ObservationUnit.count', -1) do
+      assert_difference('ObservationUnitAsset.count', -3) do
+        assert_difference('ExtendedMetadata.count', -1) do
+          assert_difference('AssetsCreator.count', -1) do
+            assert_difference('Policy.count', -1) do
+              User.with_current_user(obs_unit.contributor) do
+                obs_unit.destroy
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+
 
 end
