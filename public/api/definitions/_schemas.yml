@@ -173,7 +173,7 @@ extendedMetadata:
     extended_metadata_type_id:
       type: string
     attribute_map:
-      $ref: "#/components/schemas/extendedMetadataAttributeMap"
+      $ref: "#/components/schemas/attributeMap"
   required:
     - extended_metadata_type_id
     - attribute_map
@@ -828,16 +828,9 @@ projectMembersList:
       - person_id
       - institution_id
     additionalProperties: false
-sampleAttributeMap:
+attributeMap:
   type: object
-  additionalProperties:
-    anyOf:
-      - type: string
-      - type: array
-      - type: 'null'
-      - type: number
-      - type: boolean
-      - type: hash
+  additionalProperties: true
 extendedMetadataAttributeMap:
   type: object
   additionalProperties: true
@@ -2490,7 +2483,7 @@ samplePost:
             other_creators:
               $ref: "#/components/schemas/nullableOtherCreatorsString"
             attribute_map:
-              $ref: "#/components/schemas/sampleAttributeMap"
+              $ref: "#/components/schemas/attributeMap"
             policy:
               $ref: "#/components/schemas/policy"
             discussion_links:
@@ -2545,7 +2538,7 @@ samplePatch:
             other_creators:
               $ref: "#/components/schemas/nullableOtherCreatorsString"
             attribute_map:
-              $ref: "#/components/schemas/sampleAttributeMap"
+              $ref: "#/components/schemas/attributeMap"
             policy:
               $ref: "#/components/schemas/policy"
             discussion_links:
@@ -4567,7 +4560,7 @@ sampleResponse:
             other_creators:
               $ref: "#/components/schemas/nullableOtherCreatorsString"
             attribute_map:
-              $ref: "#/components/schemas/sampleAttributeMap"
+              $ref: "#/components/schemas/attributeMap"
             policy:
               $ref: "#/components/schemas/policy"
             creators:
