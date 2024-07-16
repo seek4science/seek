@@ -16,11 +16,11 @@
         </div>
 
         <%= render partial: 'extended_metadata/extended_metadata_attribute_values', locals: { resource: @observation_unit } %>
-        <%= render :partial=>"general/isa_graph", :locals => {:root_item => @observation_unit, :deep => true, :include_parents => true} %>
+        <%= render partial: "general/isa_graph", locals: {root_item: @observation_unit, deep: true, include_parents: true} %>
       </div>
 
       <div class="col-md-3 col-sm-4">
-        <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @observation_unit } %>
+        <%= render partial: "assets/resource_main_content_right",locals: { resource: @observation_unit } %>
       </div>
     </div>
   <% end %>
