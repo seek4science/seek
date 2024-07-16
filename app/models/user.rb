@@ -67,9 +67,9 @@ class User < ApplicationRecord
   delegate :is_admin_or_project_administrator?, to: :person, allow_nil: true
   delegate :is_programme_administrator?, to: :person, allow_nil: true
 
-  after_commit :queue_update_auth_table, on: :create
+  after_save_commit :queue_update_auth_table
 
-  after_destroy :remove_from_auth_tables
+  after_destroy :queue_auth_lookup_delete_job
 
   # related_#{type} are resources that user created
   RELATED_RESOURCE_TYPES = %i[data_files models sops events presentations publications].freeze
@@ -336,13 +336,13 @@ class User < ApplicationRecord
   end
 
   def queue_update_auth_table
-    AuthLookupUpdateQueue.enqueue(self)
+    if saved_changes.keys.include?("person_id")
+      AuthLookupUpdateQueue.enqueue(self, priority: 1)
+    end
   end
 
-  def remove_from_auth_tables
-    Seek::Util.authorized_types.each do |type|
-      type.lookup_class.where(user: id).in_batches(of:1000).delete_all
-    end
+  def queue_auth_lookup_delete_job
+    AuthLookupDeleteJob.perform_later(self.class.name, id)
   end
 
   def self.unique_login(original_login)

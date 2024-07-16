@@ -1,7 +1,7 @@
 <%
   label = 'Extended Metadata'
 %>
-<% if resource.respond_to?(:extended_metadata) && resource.extended_metadata %>
+<% if resource.respond_to?(:extended_metadata) && resource.extended_metadata&.enabled? %>
   <% metadata_type = resource.extended_metadata.extended_metadata_type  %>
   <div id="extended-metadata" class="panel panel-default">
     <div class="panel-heading panel-heading-button">

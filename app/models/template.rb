@@ -16,7 +16,7 @@ class Template < ApplicationRecord
   accepts_nested_attributes_for :template_attributes, allow_destroy: true
 
   def can_delete?(user = User.current_user)
-    super && sample_types.empty?
+    super && sample_types.empty? && children.none?
   end
 
   def can_edit?(user = User.current_user)
@@ -24,8 +24,7 @@ class Template < ApplicationRecord
   end
 
   def self.can_create?
-    can = User.logged_in_and_member? && Seek::Config.samples_enabled
-    can && User.current_user.is_admin_or_project_administrator?
+    super && Seek::Config.samples_enabled && User.current_user.is_admin_or_project_administrator?
   end
 
   def resolve_inconsistencies

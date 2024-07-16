@@ -1,0 +1,41 @@
+{
+	"data": [
+		{
+			"metadata": {
+				"name": "Source - Invalid template",
+				"group": "ISA Test",
+				"group_order": 1,
+				"temporary_name": "1_Source - Invalid template",
+				"version": "1.0.0",
+				"isa_config": "isaconfig-default_v2015-07-02/studySample.xml",
+				"isa_measurement_type": null,
+				"isa_technology_type": null,
+				"isa_protocol_type": null,
+				"repo_schema_id": "none",
+				"organism": "any",
+				"level": "study source"
+			},
+			"data": [
+				{
+					"iri": null,
+					"name": "Source Name",
+					"description": "Sources are considered as the starting biological material used in a study.",
+					"dataType": "String attribute type 1",
+					"title": true,
+					"required": true,
+					"isaTag": "invalid_source"
+				},
+				{
+					"iri": null,
+					"name": "Source Characteristic 1",
+					"description": "A characteristic of the source.",
+					"dataType": "String attribute type 1",
+					"required": true,
+					"ontology": null,
+					"CVList": null,
+					"isaTag": "source_characteristic"
+				}
+			]
+		}
+	]
+}

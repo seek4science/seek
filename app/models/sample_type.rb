@@ -60,6 +60,10 @@ class SampleType < ApplicationRecord
 
   has_annotation_type :sample_type_tag, method_name: :tags
 
+  def level
+    isa_template&.level
+  end
+
   def previous_linked_sample_type
     sample_attributes.detect(&:input_attribute?)&.linked_sample_type
   end
@@ -124,7 +128,13 @@ class SampleType < ApplicationRecord
   def can_edit?(user = User.current_user)
     return false if user.nil? || user.person.nil? || !Seek::Config.samples_enabled
     return true if user.is_admin?
-    contributor == user.person || projects.detect { |project| project.can_manage?(user) }.present?
+
+    # Make the ISA JSON compliant sample types editable when a user is a project member instead of a project admin
+    if is_isa_json_compliant?
+      contributor == user.person || projects.detect { |project| project.has_member? user.person }.present?
+    else
+      contributor == user.person || projects.detect { |project| project.can_manage?(user) }.present?
+    end
   end
 
   def can_delete?(user = User.current_user)

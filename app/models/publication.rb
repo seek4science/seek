@@ -45,7 +45,7 @@ class Publication < ApplicationRecord
   has_many :publication_authors, dependent: :destroy, autosave: true
   has_many :people, through: :publication_authors
 
-  has_one :content_blob, ->(r) { where('content_blobs.asset_version =?', r.version) }, as: :asset, foreign_key: :asset_id
+  has_one :content_blob, ->(r) { where('content_blobs.asset_version =? AND deleted=?', r.version, false) }, as: :asset, foreign_key: :asset_id
 
   explicit_versioning(:version_column => "version", sync_ignore_columns: ['license','other_creators']) do
     acts_as_versioned_resource
@@ -554,12 +554,6 @@ end
 
   def latest_citable_resource
     self
-  end
-
-  def can_soft_delete_full_text?(user = User.current_user)
-    return false if user.nil? || user.person.nil? || !Seek::Config.allow_publications_fulltext
-    return true if user.is_admin?
-    contributor == can_edit(user) || projects.detect { |project| project.can_manage?(user) }.present?
   end
 
   private

@@ -23,6 +23,10 @@ module Seek
       is_asset? && is_downloadable?
     end
 
+    def contains_downloadable_items?
+      respond_to?(:all_content_blobs) && all_content_blobs.compact.any?(&:is_downloadable?) || is_git_versioned?
+    end
+
     def have_misc_links?
       self.class.have_misc_links?
     end
@@ -47,7 +51,6 @@ module Seek
         validates :description, length: { maximum: 65_535 }, if: -> { respond_to?(:description) }
         validates :license, license:true, allow_blank: true, if: -> { respond_to?(:license) }
 
-
         include Seek::Stats::ActivityCounts
 
         include Seek::ActsAsAsset::ISA::Associations
@@ -61,6 +64,7 @@ module Seek
         include Seek::ActsAsAsset::InstanceMethods
         include Seek::Search::BackgroundReindexing
         include Seek::Subscribable
+        include Seek::ActsAsAsset::ContentBlobs::ClassMethods
         extend SingletonMethods
       end
 

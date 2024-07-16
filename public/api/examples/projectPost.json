@@ -13,26 +13,49 @@
         "permissions": [
           {
             "resource": {
-              "id": "249",
+              "id": "440",
               "type": "people"
             },
             "access": "manage"
           },
           {
             "resource": {
-              "id": "304",
+              "id": "559",
               "type": "projects"
             },
             "access": "download"
           },
           {
             "resource": {
-              "id": "273",
+              "id": "464",
               "type": "institutions"
             },
             "access": "view"
           }
         ]
+      },
+      "extended_attributes": {
+        "extended_metadata_type_id": "118",
+        "attribute_map": {
+          "dad": {
+            "first_name": "john",
+            "last_name": "liddell"
+          },
+          "mom": {
+            "first_name": "lily",
+            "last_name": "liddell"
+          },
+          "child": [
+            {
+              "first_name": "rabbit",
+              "last_name": "wonderland"
+            },
+            {
+              "first_name": "mad",
+              "last_name": "hatter"
+            }
+          ]
+        }
       },
       "topic_annotations": [
         {
@@ -49,7 +72,7 @@
       "programmes": {
         "data": [
           {
-            "id": "24",
+            "id": "66",
             "type": "programmes"
           }
         ]
@@ -57,7 +80,7 @@
       "organisms": {
         "data": [
           {
-            "id": "24",
+            "id": "28",
             "type": "organisms"
           }
         ]

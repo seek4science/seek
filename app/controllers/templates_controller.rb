@@ -94,7 +94,7 @@ class TemplatesController < ApplicationController
     dir = Seek::Config.append_filestore_path('source_types')
 
     if Dir.exist?(dir)
-      `rm #{dir}/*`
+      FileUtils.rm_f(Dir.glob("#{dir}/*"))
     else
       FileUtils.mkdir_p(dir)
     end
@@ -157,6 +157,7 @@ class TemplatesController < ApplicationController
                                        template_attributes_attributes: %i[id title pos required description
                                                                           sample_attribute_type_id isa_tag_id is_title
                                                                           sample_controlled_vocab_id pid
+                                                                          parent_attribute_id
                                                                           unit_id _destroy allow_cv_free_text
                                                                           linked_sample_type_id] })
   end
@@ -171,7 +172,7 @@ class TemplatesController < ApplicationController
     elsif File.exist?(resultfile)
       res = File.read(resultfile)
       @status = res
-      `rm #{resultfile}`
+      FileUtils.rm_f(resultfile)
     else
       @status = 'not_started'
     end
@@ -186,12 +187,12 @@ class TemplatesController < ApplicationController
   end
 
   def running!
-    `touch #{lockfile}`
+    FileUtils.touch(lockfile)
     set_status
   end
 
   def done!
-    `rm -f #{lockfile}`
+    FileUtils.rm_f(lockfile)
   end
 
   def running?

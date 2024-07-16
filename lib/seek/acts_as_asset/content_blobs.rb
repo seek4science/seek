@@ -2,11 +2,14 @@ module Seek
   module ActsAsAsset
     # Acts as Asset behaviour that relates to content
     module ContentBlobs
-      module InstanceMethods
-        def contains_downloadable_items?
-          all_content_blobs.compact.any?(&:is_downloadable?)
+      module ClassMethods
+        extend ActiveSupport::Concern
+        included do
+          after_destroy :mark_deleted_content_blobs
         end
+      end
 
+      module InstanceMethods
         def all_content_blobs
           if self.respond_to?(:content_blobs)
             content_blobs
@@ -44,6 +47,13 @@ module Seek
               end
             end
             self.save!
+          end
+        end
+
+        # flags that content blob has been deleted, after the associated asset has been destroyed
+        def mark_deleted_content_blobs
+          all_content_blobs.each do |cb|
+            cb.update_column(:deleted, true)
           end
         end
       end

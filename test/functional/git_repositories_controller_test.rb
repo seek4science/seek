@@ -51,12 +51,13 @@ class GitRepositoriesControllerTest < ActionController::TestCase
            "ref" => "refs/remotes/origin/symlink",
            "sha" => "728337a507db00b8b8ba9979330a4f53d6d43b18"}],
       "tags" =>
-        [{ "name" => "v0.01",
-           "ref" => "refs/tags/v0.01",
-           "sha" => "3f2c23e92da3ccbc89d7893b4af6039e66bdaaaf" },
-         { "name" => "v0.02",
+        [{ "name" => "v0.02",
            "ref" => "refs/tags/v0.02",
-           "sha" => "94ae9926a824ebe809a9e9103cbdb1d5c5f98608" }] }
+           "sha" => "94ae9926a824ebe809a9e9103cbdb1d5c5f98608" },
+         { "name" => "v0.01",
+           "ref" => "refs/tags/v0.01",
+           "sha" => "3f2c23e92da3ccbc89d7893b4af6039e66bdaaaf" }
+        ]}
 
     assert_equal expected, res
   end

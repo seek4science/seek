@@ -29,7 +29,7 @@ gatekeeper_status_bar = item.is_asset? && item.can_manage? && (item.is_waiting_a
                 <ul class="dropdown-menu" role="menu">
                   <% visible_versions.reverse.each do |v| %>
                       <li>
-                        <%= link_to({:version => v.version}, :method => request.request_method) do -%>
+                        <%= link_to({:version => v.version, :code => params[:code]}, :method => request.request_method) do -%>
                             <%= v.name %> <%= item.describe_version(v.version) -%><br/>
                         <% end %>
                       </li>
@@ -37,7 +37,7 @@ gatekeeper_status_bar = item.is_asset? && item.can_manage? && (item.is_waiting_a
                 </ul>
               </div>
           <% else %>
-              <div class="version">Version <%= version -%></div>
+              <div class="version"><%= visible_versions.first&.name -%></div>
           <% end %>
       <% end %>
     </h1>

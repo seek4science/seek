@@ -13,6 +13,7 @@ class DocumentApiTest < ActionDispatch::IntegrationTest
     @workflow = FactoryBot.create(:workflow, projects: [@project], contributor: current_person)
     @creator = FactoryBot.create(:person)
     @document = FactoryBot.create(:document, policy: FactoryBot.create(:public_policy), contributor: current_person, creators: [@creator])
+    @emt = FactoryBot.create(:role_multiple_extended_metadata_type)
   end
 
   test 'can add content to API-created document' do

@@ -12,6 +12,7 @@ FactoryBot.define do
     title { "A Maximal Project" }
     description { "A Taverna project" }
     discussion_links { [FactoryBot.build(:discussion_link, label:'Slack')] }
+    extended_metadata { FactoryBot.build(:family_extended_metadata)}
     web_page { "http://www.taverna.org.uk" }
     wiki_page { "http://www.mygrid.org.uk" }
     default_license { "Other (Open)" }

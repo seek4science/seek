@@ -77,12 +77,6 @@ module WorkflowsHelper
     end
   end
 
-  def run_workflow_url(workflow_version)
-    if workflow_version.workflow_class_title == 'Galaxy'
-      "#{Seek::Config.galaxy_instance_trs_import_url}&trs_id=#{workflow_version.parent.id}&trs_version=#{workflow_version.version}"
-    end
-  end
-
   def workflow_class_options_for_select(selected = nil)
     opts = WorkflowClass.order(:title).map do |c|
       extra = {}

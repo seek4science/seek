@@ -1,11 +1,34 @@
 {
   "data": {
-    "id": "1022257332",
+    "id": "561",
     "type": "projects",
     "attributes": {
       "discussion_links": [
 
       ],
+      "extended_attributes": {
+        "extended_metadata_type_id": "118",
+        "attribute_map": {
+          "dad": {
+            "first_name": "john",
+            "last_name": "liddell"
+          },
+          "mom": {
+            "first_name": "lily",
+            "last_name": "liddell"
+          },
+          "child": [
+            {
+              "first_name": "rabbit",
+              "last_name": "wonderland"
+            },
+            {
+              "first_name": "mad",
+              "last_name": "hatter"
+            }
+          ]
+        }
+      },
       "avatar": null,
       "title": "Post Project Max",
       "description": "A Taverna project",
@@ -19,21 +42,21 @@
         "permissions": [
           {
             "resource": {
-              "id": "1039992680",
+              "id": "440",
               "type": "people"
             },
             "access": "manage"
           },
           {
             "resource": {
-              "id": "1022257330",
+              "id": "559",
               "type": "projects"
             },
             "access": "download"
           },
           {
             "resource": {
-              "id": "980197239",
+              "id": "464",
               "type": "institutions"
             },
             "access": "view"
@@ -79,7 +102,7 @@
       "organisms": {
         "data": [
           {
-            "id": "627234426",
+            "id": "28",
             "type": "organisms"
           }
         ]
@@ -102,7 +125,7 @@
       "programmes": {
         "data": [
           {
-            "id": "151",
+            "id": "66",
             "type": "programmes"
           }
         ]
@@ -179,14 +202,14 @@
       }
     },
     "links": {
-      "self": "/projects/1022257332"
+      "self": "/projects/561"
     },
     "meta": {
-      "created": "2022-10-26T11:45:20.000Z",
-      "modified": "2022-10-26T11:45:20.000Z",
+      "created": "2024-06-20T12:29:54.000Z",
+      "modified": "2024-06-20T12:29:54.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "97d63130-3751-013b-356e-000c29a94011"
+      "uuid": "b87dd8d0-112e-013d-1f9d-0a81884ed284"
     }
   },
   "jsonapi": {

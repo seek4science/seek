@@ -29,9 +29,11 @@ class ScraperTest < ActiveSupport::TestCase
     assert_difference('Project.count', 1) do
       assert_difference('Person.count', 1) do
         assert_difference('Institution.count', 1) do
-          project = Scrapers::Util.bot_project(title: 'iwc')
-          assert_equal 'iwc', project.title
-          assert_includes project.people, Scrapers::Util.bot_account
+          assert_difference('GroupMembership.count', 1) do
+            project = Scrapers::Util.bot_project(title: 'iwc')
+            assert_equal 'iwc', project.title
+            assert_includes project.people, Scrapers::Util.bot_account
+          end
         end
       end
     end
@@ -39,8 +41,10 @@ class ScraperTest < ActiveSupport::TestCase
     assert_no_difference('Project.count') do
       assert_no_difference('Person.count') do
         assert_no_difference('Institution.count') do
-          project = Scrapers::Util.bot_project(title: 'iwc')
-          assert_equal 'iwc', project.title
+          assert_no_difference('GroupMembership.count') do
+            project = Scrapers::Util.bot_project(title: 'iwc')
+            assert_equal 'iwc', project.title
+          end
         end
       end
     end
@@ -48,9 +52,25 @@ class ScraperTest < ActiveSupport::TestCase
     assert_difference('Project.count', 1) do
       assert_no_difference('Person.count') do
         assert_no_difference('Institution.count') do
-          project = Scrapers::Util.bot_project(title: 'Another Project')
-          assert_equal 'Another Project', project.title
-          assert_includes project.people, Scrapers::Util.bot_account
+          assert_difference('GroupMembership.count', 1) do
+            project = Scrapers::Util.bot_project(title: 'Another Project')
+            assert_equal 'Another Project', project.title
+            assert_includes project.people, Scrapers::Util.bot_account
+          end
+        end
+      end
+    end
+
+    # Add to existing project
+    FactoryBot.create(:project, title: 'An existing project 123')
+    assert_no_difference('Project.count') do
+      assert_no_difference('Person.count') do
+        assert_no_difference('Institution.count') do
+          assert_difference('GroupMembership.count', 1) do
+            project = Scrapers::Util.bot_project(title: 'An existing project 123')
+            assert_equal 'An existing project 123', project.title
+            assert_includes project.people, Scrapers::Util.bot_account
+          end
         end
       end
     end

@@ -1,3 +1,5 @@
+require 'ro_crate'
+
 class WorkflowsController < ApplicationController
   include Seek::IndexPager
   include Seek::AssetsCommon
@@ -5,10 +7,11 @@ class WorkflowsController < ApplicationController
   before_action :workflows_enabled?
   before_action :find_assets, only: [:index]
   before_action :find_and_authorize_requested_item, except: [:index, :new, :create, :preview, :update_annotations_ajax]
-  before_action :find_display_asset, only: [:show, :download, :diagram, :ro_crate, :edit_paths, :update_paths]
+  before_action :find_display_asset, only: [:show, :download, :diagram, :ro_crate, :ro_crate_metadata, :edit_paths, :update_paths]
   before_action :login_required, only: [:create, :create_version, :new_version,
                                         :create_from_files, :create_from_ro_crate,
-                                        :create_metadata, :provide_metadata, :create_from_git, :create_version_from_git]
+                                        :create_metadata, :provide_metadata, :create_from_git, :create_version_from_git,
+                                        :submit]
   before_action :find_or_initialize_workflow, only: [:create_from_files, :create_from_ro_crate]
 
   include Seek::Publishing::PublishingCommon
@@ -17,29 +20,17 @@ class WorkflowsController < ApplicationController
   include RoCrateHandling
   include Legacy::WorkflowSupport
 
-  api_actions :index, :show, :create, :update, :destroy, :ro_crate, :create_version
+  api_actions :index, :show, :create, :update, :destroy, :ro_crate, :ro_crate_metadata, :create_version
 
   rescue_from ROCrate::ReadException do |e|
-    logger.error("Error whilst attempting to read RO-Crate metadata for #{@workflow&.id}.")
-    message = "Couldn't read RO-Crate metadata. Check the file is valid."
+    logger.error("Error whilst attempting to read RO-Crate metadata for Workflow #{@workflow&.id}: #{e.exception.class.name} #{e.message}")
+    message = "Couldn't read RO-Crate metadata - check the RO-Crate is valid: #{e.message}"
     respond_to do |format|
       format.html do
         flash[:error] = message
-        redirect_to workflow_path(@workflow)
+        redirect_to @workflow&.persisted? ? workflow_path(@workflow) : workflows_path
       end
       format.json { render json: { title: 'RO-Crate Read Error', detail: message }, status: :internal_server_error }
-    end
-  end
-
-  rescue_from ROCrate::WriteException do |e|
-    exception_notification(500, e) unless Rails.application.config.consider_all_requests_local
-    message = "Couldn't generate RO-Crate. Check the ro-crate-metadata.json file is valid."
-    respond_to do |format|
-      format.html do
-        flash[:error] = message
-        redirect_to workflow_path(@workflow)
-      end
-      format.json { render json: { title: 'RO-Crate Write Error', detail: message }, status: :internal_server_error }
     end
   end
 
@@ -268,6 +259,13 @@ class WorkflowsController < ApplicationController
                   "workflow-#{@workflow.id}-#{@display_workflow.version}.crate.zip")
   end
 
+  def ro_crate_metadata
+    metadata = @display_workflow.ro_crate.metadata
+    json = metadata.generate
+    response.headers['Content-Length'] = json.length.to_s
+    send_data(json, filename: metadata.id, type: 'application/json', disposition: 'inline')
+  end
+
   def edit_paths
 
   end
@@ -310,6 +308,21 @@ class WorkflowsController < ApplicationController
     end
   end
 
+  def submit
+    @crate_extractor = WorkflowCrateExtractor.new(ro_crate: { data: params[:ro_crate] }, params: workflow_params, update_existing: true)
+
+    if @crate_extractor.valid?
+      @workflow = @crate_extractor.build
+      if @workflow.git_version.save && @workflow.save
+        render json: @workflow, include: json_api_include_param
+      else
+        render json: json_api_errors(@workflow), status: :unprocessable_entity
+      end
+    else
+      render json: json_api_errors(@crate_extractor), status: :unprocessable_entity
+    end
+  end
+
   private
 
   def handle_ro_crate_post(new_version = false)
@@ -324,7 +337,7 @@ class WorkflowsController < ApplicationController
       else
         @crate_extractor.workflow = @workflow
         @workflow.latest_git_version.lock if @workflow.latest_git_version.mutable?
-        @crate_extractor.git_version = @workflow.latest_git_version.next_version(mutable: true).tap(&:save)
+        @crate_extractor.git_version = @workflow.latest_git_version.next_version(mutable: true)
       end
     end
     @workflow = @crate_extractor.build
@@ -355,7 +368,7 @@ class WorkflowsController < ApplicationController
                                      { creator_ids: [] }, { assay_assets_attributes: [:assay_id] },
                                      { publication_ids: [] }, { presentation_ids: [] }, { document_ids: [] }, { data_file_ids: [] }, { sop_ids: [] },
                                      { workflow_data_files_attributes:[:id, :data_file_id, :workflow_data_file_relationship_id, :_destroy] },
-                                     :internals, :maturity_level, :source_link_url,
+                                     :internals, :maturity_level, :source_link_url, :execution_instance_url,
                                      { topic_annotations: [] }, { operation_annotations: [] },
                                      { discussion_links_attributes: [:id, :url, :label, :_destroy] },
                                      { git_version_attributes: [:name, :comment, :ref, :commit, :root_path,

@@ -21,6 +21,24 @@ FactoryBot.define do
     association :sample_attribute_type, factory: :datetime_sample_attribute_type
   end
 
+  factory(:min_extended_metadata_type,class: ExtendedMetadataType) do
+    title { 'A Min Extended Metadata Type' }
+    supported_type { 'Investigation' }
+    after(:build) do |a|
+      a.extended_metadata_attributes << FactoryBot.create(:name_extended_metadata_attribute, required: true)
+    end
+  end
+
+  factory(:max_extended_metadata_type,class: ExtendedMetadataType) do
+    title { 'A Max Extended Metadata Type' }
+    supported_type { 'Investigation' }
+    after(:build) do |a|
+      a.extended_metadata_attributes << FactoryBot.create(:age_extended_metadata_attribute)
+      a.extended_metadata_attributes << FactoryBot.create(:name_extended_metadata_attribute, required: true)
+      a.extended_metadata_attributes << FactoryBot.create(:datetime_extended_metadata_attribute)
+    end
+  end
+
   factory(:study_extended_metadata_type_with_cv_and_cv_list_type, class: ExtendedMetadataType) do
     title { 'study extended metadata type with and list attributes' }
     supported_type { 'Study' }
@@ -142,7 +160,7 @@ FactoryBot.define do
   end
 
   factory(:study_extended_metadata_type_for_MIAPPE, class: ExtendedMetadataType) do
-    title { 'MIAPPE metadata' }
+    title { ExtendedMetadataType::MIAPPE_TITLE }
     supported_type { 'Study' }
     after(:build) do |a|
       a.extended_metadata_attributes << FactoryBot.create(:name_extended_metadata_attribute, title:'id')

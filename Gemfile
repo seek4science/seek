@@ -52,14 +52,14 @@ gem 'will_paginate', '~> 3.1'
 gem 'yaml_db'
 gem 'rails_autolink'
 gem 'rfc-822'
-gem 'nokogiri', '~> 1.16.2'
+gem 'nokogiri', '~> 1.16'
 #necessary for newer hashie dependency, original api_smith is no longer active
 gem 'api_smith', git: 'https://github.com/youroute/api_smith.git', ref: '1fb428cebc17b9afab25ac9f809bde87b0ec315b'
 gem 'rdf-virtuoso', '>= 0.2.0'
 gem 'terrapin'
 gem 'lograge'
 gem 'psych'
-gem 'stringio', '3.0.1' #locked to the default version for ruby 3.1
+gem 'stringio', '3.0.1.1' #locked to the default version for ruby 3.1
 gem 'validate_url'
 gem "attr_encrypted", "~> 3.0.0"
 gem 'libreconv'
@@ -134,7 +134,7 @@ gem 'request_store'
 
 gem 'bundler', '>= 1.8.4'
 
-gem 'ro-crate', '~> 0.5.1'
+gem 'ro-crate', '~> 0.5.2'
 
 gem 'rugged'
 gem 'i18n-js'
@@ -160,6 +160,8 @@ gem 'caxlsx_rails', '~> 0.6.2'
 gem 'net-ftp'
 
 gem 'licensee'
+
+gem "sitemap_generator", "~> 6.3"
 
 group :production do
   gem 'passenger'
@@ -205,5 +207,3 @@ group :test, :development do
   gem 'teaspoon'
   gem 'teaspoon-mocha'
 end
-
-gem "sitemap_generator", "~> 6.3"

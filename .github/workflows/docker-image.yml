@@ -6,11 +6,8 @@ on:
       - main
       - workflow
       - workflowhub
-      - seek-1.11
-      - seek-1.12
-      - seek-1.13
-      - master-ibisba-demonstrator
-      - ruby-3
+      - full-test-suite
+
   pull_request:
 
 jobs:
@@ -20,6 +17,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Build the Docker image
         run: docker build . --file Dockerfile --tag test-image:$(date +%s)

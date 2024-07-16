@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_02_06_132054) do
+ActiveRecord::Schema.define(version: 2024_04_03_114645) do
 
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
@@ -348,6 +348,7 @@ ActiveRecord::Schema.define(version: 2024_02_06_132054) do
     t.bigint "file_size"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.boolean "deleted", default: false
     t.index ["asset_id", "asset_type"], name: "index_content_blobs_on_asset_id_and_asset_type"
   end
 
@@ -424,6 +425,7 @@ ActiveRecord::Schema.define(version: 2024_02_06_132054) do
     t.boolean "simulation_data", default: false
     t.string "deleted_contributor"
     t.integer "file_template_id"
+    t.integer "zip_origin_id"
     t.index ["contributor_id"], name: "index_data_files_on_contributor"
   end
 
@@ -646,6 +648,7 @@ ActiveRecord::Schema.define(version: 2024_02_06_132054) do
     t.string "title"
     t.integer "contributor_id"
     t.text "supported_type"
+    t.boolean "enabled", default: true
   end
 
   create_table "external_assets", id: :integer, force: :cascade do |t|
@@ -1715,7 +1718,9 @@ ActiveRecord::Schema.define(version: 2024_02_06_132054) do
     t.text "description"
     t.integer "isa_tag_id"
     t.boolean "allow_cv_free_text", default: false
+    t.integer "template_attribute_id"
     t.index ["sample_type_id"], name: "index_sample_attributes_on_sample_type_id"
+    t.index ["template_attribute_id"], name: "index_sample_attributes_on_template_attribute_id"
     t.index ["unit_id"], name: "index_sample_attributes_on_unit_id"
   end
 
@@ -2101,6 +2106,8 @@ ActiveRecord::Schema.define(version: 2024_02_06_132054) do
     t.string "pid"
     t.boolean "allow_cv_free_text", default: false
     t.integer "linked_sample_type_id"
+    t.integer "parent_attribute_id"
+    t.index ["parent_attribute_id"], name: "index_template_attributes_on_parent_attribute_id"
     t.index ["template_id", "title"], name: "index_template_id_asset_id_title"
   end
 

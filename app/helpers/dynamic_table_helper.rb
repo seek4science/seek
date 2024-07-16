@@ -1,8 +1,19 @@
 module DynamicTableHelper
   def dt_data(sample_type)
-    rows = dt_rows(sample_type)
     columns = dt_cols(sample_type)
-    { columns: columns, rows: rows }
+    rows = dt_rows(sample_type)
+    row_values = get_rows_for_columns(rows, columns)
+    { columns:, rows: row_values }
+  end
+
+  # Gets the row values from the JSON metadata in the order that the columns are.
+  # Makes switching attribute positions possible without scrambling the JSON metadata
+  def get_rows_for_columns(rows, columns)
+    rows.map do |row|
+      columns.map do |col|
+        row[col[:title]]
+      end
+    end
   end
 
   def dt_aggregated(study, assay = nil)
@@ -14,7 +25,7 @@ module DynamicTableHelper
       end
     columns = dt_cumulative_cols(sample_types)
     rows = dt_cumulative_rows(sample_types, columns.length)
-    { columns: columns, rows: rows, sample_types: sample_types.map { |s| { title: s.title, id: s.id } } }
+    { columns:, rows:, sample_types: sample_types.map { |s| { title: s.title, id: s.id } } }
   end
 
   private
@@ -34,13 +45,11 @@ module DynamicTableHelper
     registered_sample_multi_attributes = sample_type.sample_attributes.select { |sa| sa.sample_attribute_type.base_type == Seek::Samples::BaseType::SEEK_SAMPLE_MULTI }
 
     sample_type.samples.map do |s|
+      sanitized_json_metadata = hide_unauthorized_inputs(JSON.parse(s.json_metadata), registered_sample_attributes, registered_sample_multi_attributes)
       if s.can_view?
-        sanitized_json_metadata = hide_unauthorized_inputs(JSON(s.json_metadata), registered_sample_attributes, registered_sample_multi_attributes)
-        ['', s.id, s.uuid] +
-          sanitized_json_metadata.values
+        { 'selected' => '', 'id' => s.id, 'uuid' => s.uuid }.merge!(sanitized_json_metadata)
       else
-        ['', '#HIDDEN', '#HIDDEN'] +
-          Array.new(JSON(s.json_metadata).length, '#HIDDEN')
+        { 'selected' => '', 'id' => '#HIDDEN', 'uuid' => '#HIDDEN' }.merge!(sanitized_json_metadata&.transform_values { '#HIDDEN' })
       end
     end
   end
@@ -92,20 +101,20 @@ module DynamicTableHelper
       attribute = { title: a.title, name: sample_type.id.to_s, required: a.required, description: a.description,
                     is_title: a.is_title }
       attribute.merge!({ cv_id: a.sample_controlled_vocab_id }) unless a.sample_controlled_vocab_id.blank?
-      is_seek_sample = a.sample_attribute_type.base_type == Seek::Samples::BaseType::SEEK_SAMPLE
-      is_seek_multi_sample = a.sample_attribute_type.base_type == Seek::Samples::BaseType::SEEK_SAMPLE_MULTI
-      is_cv_list = a.sample_attribute_type.base_type == Seek::Samples::BaseType::CV_LIST
+      is_seek_sample = a.sample_attribute_type.seek_sample?
+      is_seek_multi_sample = a.sample_attribute_type.seek_sample_multi?
+      is_cv_list = a.sample_attribute_type.seek_cv_list?
       cv_allows_free_text =  a.allow_cv_free_text
       attribute.merge!({ multi_link: true, linked_sample_type: a.linked_sample_type_id }) if is_seek_multi_sample
       attribute.merge!({ multi_link: false, linked_sample_type: a.linked_sample_type_id }) if is_seek_sample
-      attribute.merge!({is_cv_list: , cv_allows_free_text:}) if is_cv_list
+      attribute.merge!({ is_cv_list: true, cv_allows_free_text:}) if is_cv_list
       attribute
     end
     (dt_default_cols(sample_type.id.to_s) + attribs).flatten
   end
 
   def dt_default_cols(name)
-    [{ title: 'status', name: name, status: true }, { title: 'id', name: name }, { title: 'uuid', name: name }]
+    [{ title: 'status', name:, status: true }, { title: 'id', name: }, { title: 'uuid', name: }]
   end
 
   def dt_cumulative_rows(sample_types, col_count)
@@ -149,10 +158,14 @@ module DynamicTableHelper
       s.sample_attributes.map do |a|
         attribute = { title: a.title, name: s.id.to_s, required: a.required, description: a.description,
                       is_title: a.is_title }
-        condition = a.sample_attribute_type.base_type == Seek::Samples::BaseType::SEEK_SAMPLE_MULTI
-        attribute.merge!({ multi_link: true, linked_sample_type: a.linked_sample_type.id }) if condition
+        is_seek_sample_multi = a.sample_attribute_type.seek_sample_multi?
+        is_seek_sample = a.sample_attribute_type.seek_sample?
+        is_cv_list = a.sample_attribute_type.seek_cv_list?
+        attribute.merge!({ multi_link: true, linked_sample_type: a.linked_sample_type.id }) if is_seek_sample_multi
+        attribute.merge!({ multi_link: false, linked_sample_type: a.linked_sample_type.id }) if is_seek_sample
+        attribute.merge!({ is_cv_list: true }) if is_cv_list
         attribute
-      end.unshift({ title: 'id' }, {title: 'uuid'})
+      end.unshift({ title: 'id' }, { title: 'uuid' })
     end
   end
 end

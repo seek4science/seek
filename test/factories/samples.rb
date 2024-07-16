@@ -53,6 +53,9 @@ FactoryBot.define do
       sample.set_attribute_value(:apple,['Bramley'])
       sample.set_attribute_value(:apples, ['Granny Smith','Golden Delicious'])
       sample.set_attribute_value(:patients, [FactoryBot.create(:patient_sample).id.to_s, FactoryBot.create(:patient_sample).id.to_s])
+      sample.set_attribute_value(:weight, '3.7')
+      sample.set_attribute_value(:age, '42')
+      sample.set_attribute_value(:bool, true)
     end
   end
 

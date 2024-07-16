@@ -1,0 +1,50 @@
+<style>
+  td {
+      vertical-align: middle !important;
+  }
+</style>
+
+<% nested, top_level = @extended_metadata_types.partition(&:extended_type?) %>
+
+<div class="alert alert-info">
+  <p>
+    You can disable Extended metadata types to prevent them from appearing as an option in the UI.
+    Disabling them won't delete them, or where they've been used, and they can be re-enabled again here.
+  </p>
+
+  <p>
+    If a type is disabled but has been used, for those cases it will no longer be shown when viewing those items.
+    However, it will still be possible to edit the metadata for existing items and the metadata won't be deleted.
+  </p>
+</div>
+
+<% if ExtendedMetadataType.disabled_but_in_use.any? %>
+  <div class="alert alert-warning">
+    <p>
+      Extended metadata types that are in use have been disabled, and are high lighted below.
+    </p>
+    <p>
+      The existing metadata won't be lost but will be hidden and the metadata type unavailable for new items.
+    </p>
+  </div>
+<% end %>
+
+<table class='table table-hover'>
+  <thead>
+    <th>Internal Id</th>
+    <th>Title</th>
+    <th>Supported Type</th>
+    <th>Number of<br/> times used</th>
+    <th>Status</th>
+    <th/>
+  </thead>
+
+  <tbody>
+    <% top_level.each do |extended_metadata_type| %>
+      <%= render partial: 'extended_metadata_type_table_row', locals: { extended_metadata_type: extended_metadata_type } %>
+    <% end %>
+  </tbody>
+
+</table>
+
+

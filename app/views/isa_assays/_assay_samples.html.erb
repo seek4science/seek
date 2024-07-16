@@ -24,7 +24,7 @@
             $j('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
                 $j.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
             });
-            const dt = <%= sanitize(dt_data(sample_type).to_json) %>
+            const dt = <%= sanitize(dt_data(sample_type).to_json) %>;
             window.sampleDynamicTable = new $j.dynamicTable('#assay-samples-table');
             const elem = $j("#btn_save_assay_sample")
             const options = {

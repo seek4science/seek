@@ -10,12 +10,16 @@ module Git
     delegate :read, :rewind, to: :file
 
     attr_reader :git_version, :path
+    # Flag to decide if `read`ing this blob should eagerly fetch any remote content pointed to by this blob's `url`.
+    attr_accessor :fetch_remote
+
     alias_method :original_filename, :path
 
     def initialize(git_version, blob, path)
       @git_version = git_version
       @blob = blob
       @path = path
+      @fetch_remote = false
     end
 
     def annotations
@@ -26,7 +30,7 @@ module Git
       git_version.remote_sources[path]
     end
 
-    def file(fetch_remote: false)
+    def file(fetch_remote: @fetch_remote)
       @file ||= to_tempfile(fetch_remote: fetch_remote)
     end
 
@@ -34,7 +38,7 @@ module Git
       file_contents
     end
 
-    def file_contents(as_text: false, fetch_remote: false, &block)
+    def file_contents(as_text: false, fetch_remote: @fetch_remote, &block)
       if fetch_remote && remote? && !fetched?
         if block_given?
           block.call(remote_content)
@@ -92,11 +96,15 @@ module Git
 
     def remote_content
       return unless remote?
-      handler = ContentBlob.remote_content_handler_for(url)
+      handler = remote_content_handler
       return unless handler
       io = handler.fetch
       io.rewind
       io
+    end
+
+    def remote_content_handler
+      ContentBlob.remote_content_handler_for(url)
     end
 
     def cache_key
@@ -134,7 +142,7 @@ module Git
 
     private
 
-    def to_tempfile(fetch_remote: false)
+    def to_tempfile(fetch_remote: @fetch_remote)
       f = Tempfile.new(path)
       f.binmode if binary?
       f << file_contents(as_text: !binary?, fetch_remote: fetch_remote)

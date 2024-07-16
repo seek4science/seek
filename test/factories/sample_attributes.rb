@@ -50,7 +50,7 @@ FactoryBot.define do
   factory(:string_sample_attribute_with_description_and_pid, parent: :sample_attribute) do
     association :sample_attribute_type, factory: :string_sample_attribute_type
     description { "sample_attribute_description" }
-    pid { "sample_attribute:pid" }
+    pid { "sample-attribute:pid" }
     required { true }
   end
 end

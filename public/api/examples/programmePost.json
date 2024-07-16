@@ -15,7 +15,7 @@
       "projects": {
         "data": [
           {
-            "id": "7564",
+            "id": "275",
             "type": "projects"
           }
         ]
@@ -23,11 +23,11 @@
       "administrators": {
         "data": [
           {
-            "id": "5510",
+            "id": "223",
             "type": "people"
           },
           {
-            "id": "5511",
+            "id": "224",
             "type": "people"
           }
         ]

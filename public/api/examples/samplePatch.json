@@ -1,7 +1,7 @@
 {
   "data": {
     "type": "samples",
-    "id": "3",
+    "id": "193",
     "attributes": {
       "attribute_map": {
         "full_name": "Fred Bloggs",
@@ -12,7 +12,10 @@
         "apples": [
           "Golden Delicious",
           "Bramley"
-        ]
+        ],
+        "weight": 3.7,
+        "age": 42,
+        "bool": true
       },
       "tags": [
 
@@ -22,7 +25,7 @@
       "projects": {
         "data": [
           {
-            "id": "2",
+            "id": "1022252320",
             "type": "projects"
           }
         ]

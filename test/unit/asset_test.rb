@@ -78,12 +78,12 @@ class AssetTest < ActiveSupport::TestCase
     assert df.latest_version.contains_downloadable_items?
 
     df = FactoryBot.create :data_file, content_blob: FactoryBot.create(:content_blob, url: 'http://webpage.com', external_link: true)
-    assert !df.contains_downloadable_items?
-    assert !df.latest_version.contains_downloadable_items?
+    refute df.contains_downloadable_items?
+    refute df.latest_version.contains_downloadable_items?
 
     model = FactoryBot.create :model_with_urls
-    assert !model.contains_downloadable_items?
-    assert !model.latest_version.contains_downloadable_items?
+    refute model.contains_downloadable_items?
+    refute model.latest_version.contains_downloadable_items?
 
     model = FactoryBot.create :teusink_model
     assert model.contains_downloadable_items?
@@ -94,10 +94,10 @@ class AssetTest < ActiveSupport::TestCase
     assert model.latest_version.contains_downloadable_items?
 
     df = DataFile.new
-    assert !df.contains_downloadable_items?
+    refute df.contains_downloadable_items?
 
     model = Model.new
-    assert !model.contains_downloadable_items?
+    refute model.contains_downloadable_items?
 
     # test for versions
     model = FactoryBot.create :teusink_model
@@ -112,7 +112,14 @@ class AssetTest < ActiveSupport::TestCase
 
     assert_equal(2, model.versions.count)
     assert model.find_version(1).contains_downloadable_items?
-    assert !model.find_version(2).contains_downloadable_items?
+    refute model.find_version(2).contains_downloadable_items?
+
+    workflow = FactoryBot.create(:nfcore_git_workflow)
+    assert workflow.contains_downloadable_items?
+    assert workflow.git_version.contains_downloadable_items?
+
+    workflow = Workflow.new
+    refute workflow.contains_downloadable_items?
   end
 
   test 'supports_spreadsheet_explore?' do
@@ -121,7 +128,7 @@ class AssetTest < ActiveSupport::TestCase
     assert FactoryBot.create(:sop).supports_spreadsheet_explore?
     assert FactoryBot.create(:file_template).supports_spreadsheet_explore?
     refute FactoryBot.create(:model).supports_spreadsheet_explore?
-    refute FactoryBot.create(:presentation).supports_spreadsheet_explore?
+    assert FactoryBot.create(:presentation).supports_spreadsheet_explore?
     refute FactoryBot.create(:placeholder).supports_spreadsheet_explore?
     refute FactoryBot.create(:workflow).supports_spreadsheet_explore?
     refute FactoryBot.create(:publication).supports_spreadsheet_explore?
@@ -506,5 +513,60 @@ class AssetTest < ActiveSupport::TestCase
         assert_nil asset.updated_last_by
       end
     end
+  end
+
+  test 'content blobs flagged as deleted on destroy' do
+    [:data_file, :presentation, :sop, :document, :file_template, :workflow, :max_publication].each do |type|
+      asset = FactoryBot.create(type)
+      cb = asset.content_blob
+      refute cb.deleted?
+      refute_nil cb, "content blob nil for #{type}"
+      disable_authorization_checks do
+        asset.destroy
+      end
+      assert asset.destroyed?
+      cb.reload
+      assert cb.deleted?, "content blob not marked as deleted for #{type}"
+    end
+
+    [:max_model].each do |type|
+      asset = FactoryBot.create(type)
+      cbs = asset.content_blobs
+      cbs.each do |cb|
+        refute cb.deleted?
+      end
+      refute_empty cbs, "no content blobs for #{type}"
+      disable_authorization_checks do
+        asset.destroy
+      end
+      assert asset.destroyed?
+      cbs.each do |cb|
+        cb.reload
+        assert cb.deleted?, "content blob not marked as deleted for #{type}"
+      end
+    end
+  end
+
+  test 'delted content blob not included in associations' do
+    [:data_file, :presentation, :sop, :document, :file_template, :workflow, :max_publication].each do |type|
+      asset = FactoryBot.create(type)
+      cb = asset.content_blob
+      refute_nil cb, "content blob nil for #{type}"
+      cb.update_column(:deleted, true)
+      asset.reload
+      assert_nil asset.content_blob, "deleted content blob should not be returned for #{type}"
+    end
+
+    [:max_model].each do |type|
+      asset = FactoryBot.create(type)
+      cbs = asset.content_blobs
+      refute_empty cbs, "no content blobs present for #{type}"
+      cbs.each do |cb|
+        cb.update_column(:deleted, true)
+      end
+      asset.reload
+      assert_empty asset.content_blobs, "deleted content blobs should not be returned for #{type}"
+    end
+
   end
 end

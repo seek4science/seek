@@ -24,6 +24,7 @@ module Seek
       queues << QueueNames::SAMPLES if Seek::Config.samples_enabled
       queues << QueueNames::INDEXING if Seek::Config.solr_enabled
       queues << QueueNames::TEMPLATES if Seek::Config.isa_json_compliance_enabled
+      queues << QueueNames::DATAFILES if Seek::Config.data_files_enabled
       queues.each do |queue_name|
         commands << command(queue_name, 1, action)
       end

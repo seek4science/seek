@@ -6,6 +6,7 @@ module Git
     before_validation :assign_contributor
 
     validates :key, uniqueness: { scope: [:git_version_id, :path, :value] }
+    validates :git_version, presence: true
     validate :check_valid_path
 
     def assign_contributor

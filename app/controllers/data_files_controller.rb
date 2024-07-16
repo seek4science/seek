@@ -16,6 +16,7 @@ class DataFilesController < ApplicationController
   before_action :find_display_asset, only: [:show, :explore, :download]
   before_action :get_sample_type, only: :extract_samples
   before_action :check_already_extracted, only: :extract_samples
+  before_action :check_already_unzipped, only: :unzip
   before_action :forbid_new_version_if_samples, :only => :create_version
 
   before_action :oauth_client, only: :retrieve_nels_sample_metadata
@@ -38,7 +39,9 @@ class DataFilesController < ApplicationController
       redirect_to destroy_samples_confirm_data_file_path(@data_file)
     else
       if params[:destroy_extracted_samples] == '1'
-        @data_file.extracted_samples.destroy_all
+        @data_file.extracted_sample_ids.each_slice(500) do |ids|
+          SamplesBatchDeleteJob.perform_later(ids)
+        end
       end
       super
     end
@@ -161,12 +164,59 @@ class DataFilesController < ApplicationController
       format.html
     end
   end
+  
+  def unzip
+    if params[:confirm]
+      UnzipDataFilePersistJob.new(@data_file, User.current_user, assay_ids: params["assay_ids"]).queue_job
+      flash[:notice] = 'Started creating unzipped data files'
+    else
+      @data_file.unzip_persistence_task.destroy if @data_file.unzip_persistence_task&.success?
+      UnzipDataFileJob.new(@data_file).queue_job
+
+    end
+
+    respond_to do |format|
+      format.html { redirect_to @data_file }
+    end
+  end
+
+  def unzip_status
+    job_status = @data_file.unzip_task.status
+    respond_to do |format|
+      format.html { render partial: 'data_files/unzip_status', locals: { data_file: @data_file, job_status: job_status } }
+    end
+  end
+
+  def unzip_persistence_status
+    job_status = @data_file.unzip_persistence_task.status
+
+    respond_to do |format|
+      format.html { render partial: 'data_files/unzip_persistence_status', locals: { data_file: @data_file, job_status: job_status, previous_status: params[:previous_status] } }
+    end
+  end
+
+  def confirm_unzip
+    @datafiles, @rejected_datafiles = Seek::DataFiles::Unzipper.new(@data_file).fetch.partition(&:valid?)
+    respond_to do |format|
+      format.html
+    end
+  end
+
+  def cancel_unzip
+    Seek::DataFiles::Unzipper.new(@data_file).clear
+
+    respond_to do |format|
+      flash[:notice] = 'Unzip cancelled'
+      format.html { redirect_to @data_file }
+    end
+  end
 
   def extract_samples
     if params[:confirm]
       SampleDataPersistJob.new(@data_file, @sample_type, User.current_user, assay_ids: params["assay_ids"]).queue_job
       flash[:notice] = 'Started creating extracted samples'
     else
+      @data_file.sample_persistence_task.destroy if @data_file.sample_persistence_task&.success?
       SampleDataExtractionJob.new(@data_file, @sample_type).queue_job
     end
 
@@ -459,6 +509,15 @@ class DataFilesController < ApplicationController
   def forbid_new_version_if_samples
     if @data_file.extracted_samples.any?
       flash[:error] = "Cannot upload a new version if samples have been extracted"
+      respond_to do |format|
+        format.html { redirect_to @data_file }
+      end
+    end
+  end
+
+  def check_already_unzipped
+    if @data_file.unzipped_files.any?
+      flash[:error] = 'Already unzipped this data file'
       respond_to do |format|
         format.html { redirect_to @data_file }
       end

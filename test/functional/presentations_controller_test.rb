@@ -656,4 +656,21 @@ class PresentationsControllerTest < ActionController::TestCase
       assert flash[:error].include?('disabled')
     end
   end
+
+  test 'show explore button' do
+    presentation = FactoryBot.create(:small_test_spreadsheet_presentation)
+    login_as(presentation.contributor.user)
+    get :show, params: { id: presentation }
+    assert_response :success
+    assert_select '#buttons' do
+      assert_select 'a[href=?]', explore_presentation_path(presentation, version: presentation.version), text:'Explore', count: 1
+      assert_select 'a.disabled', text: 'Explore', count: 0
+    end
+  end
+
+  test 'explore latest version' do
+    presentation = FactoryBot.create :small_test_spreadsheet_presentation, policy: FactoryBot.create(:public_policy)
+    get :explore, params: { id: presentation }
+    assert_response :success
+  end
 end

@@ -1,9 +1,9 @@
 version: '3'
 services:
   db: # Database implementation, in this case MySQL
-    image: mysql:5.7
+    image: mysql:8.0
     container_name: seek-mysql
-    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --log-error-verbosity=1
     restart: always
     stop_grace_period: 1m30s
     env_file:
@@ -14,7 +14,7 @@ services:
   seek: # The SEEK application
     #build: .
 
-    image: fairdom/seek:main
+    image: fairdom/seek:1.15
 
     container_name: seek
     command: docker/entrypoint.sh
@@ -24,6 +24,7 @@ services:
       SOLR_PORT: 8983
       SOLR_HOST: solr
       NO_ENTRYPOINT_WORKERS: 1
+      RAILS_LOG_LEVEL: info # debug, info, warn, error or fatal
     env_file:
       - docker/db.env
     volumes:
@@ -41,7 +42,7 @@ services:
   seek_workers: # The SEEK delayed job workers
       #build: .
 
-      image: fairdom/seek:main
+      image: fairdom/seek:1.15
       container_name: seek-workers
       command: docker/start_workers.sh
       restart: always
@@ -49,6 +50,8 @@ services:
         RAILS_ENV: production
         SOLR_PORT: 8983
         SOLR_HOST: solr
+        RAILS_LOG_LEVEL: info # debug, info, warn, error or fatal
+        QUIET_SUPERCRONIC: 1 # remove to show supercronic activity logs
       env_file:
         - docker/db.env
       volumes:

@@ -363,6 +363,12 @@ class RenderersTest < ActiveSupport::TestCase
     blob = FactoryBot.create(:image_content_blob, asset: @asset)
     renderer = Seek::Renderers::TextRenderer.new(blob)
     refute renderer.can_render?
+
+    @git.add_remote_file('empty', 'https://example.com/file', fetch: false)
+    git_blob = @git.get_blob('empty')
+    renderer = Seek::Renderers::TextRenderer.new(git_blob)
+    assert renderer.can_render?
+    assert_equal '<span class="subtle">No content to display</span>', renderer.render
   end
 
   test 'image renderer' do

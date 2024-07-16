@@ -25,7 +25,7 @@ class ReindexingJob < BatchJob
   end
 
   def follow_on_job?
-    ReindexingQueue.any?
+    Seek::Config.solr_enabled && ReindexingQueue.any?
   end
 
   def timelimit

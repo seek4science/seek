@@ -14,13 +14,16 @@
 <% field_name_prefix = "template[template_attributes_attributes][#{index}]" %>
 <% seek_sample_multi = template_attribute.try(:seek_sample_multi?) %>
 <% is_title = template_attribute ? template_attribute.is_title : false %>
-<% isa_tag_options = IsaTag.all.map { |it| [it.title, it.id] } %>
+<% level = template&.level %>
+<% isa_tag_options = IsaTag.allowed_isa_tags_for_level(level).map { |it| [it.title, it.id] } %>
 <% isa_tag_id = template_attribute&.isa_tag_id %>
 <% isa_tag_title = template_attribute&.isa_tag&.title %>
-<% is_parent_attribute ||= false %>
 <% allow_cv_free_text = template_attribute&.allow_cv_free_text || false %>
+<% parent_attribute_id = template_attribute&.parent_attribute_id %>
+<% allow_isa_tag_change = template_attribute ? template_attribute&.allow_isa_tag_change? : true %>
+<% hide_seek_sample_multi = template_attribute&.input_attribute? %>
 
-<tr class="sample-attribute <%= 'success' if template_attribute.nil? -%>" data-index="<%= index-%>">
+<tr class="sample-attribute <%= 'success' if template_attribute.nil? -%><%='hidden' if hide_seek_sample_multi -%>" data-index="<%= index-%>">
   <th scope="row" class="attribute-position">
     <div class="btn btn-info attribute-handle">
       <span class="glyphicon glyphicon-sort" aria-hidden="true"></span>
@@ -100,7 +103,10 @@
   <td>
     <%= select_tag "#{field_name_prefix}[isa_tag_title]",
                     options_for_select(isa_tag_options, isa_tag_id),
-                    include_blank: true, class: 'form-control', data: {attr: "isa_tag_title"} %>
+                    include_blank: true,
+                    class: 'form-control',
+                    data: {attr: "isa_tag_title"},
+                    disabled: !allow_isa_tag_change %>
   </td>
 
   <td>
@@ -111,6 +117,7 @@
   <td>
     <div class="btn-group" data-toggle="buttons">
       <%= hidden_field_tag "#{field_name_prefix}[isa_tag_id]", isa_tag_id, data: { attr: "isa_tag_id" } %>
+      <%= hidden_field_tag "#{field_name_prefix}[parent_attribute_id]", parent_attribute_id, data: { attr: "parent_attribute_id" } %>
       <%= hidden_field_tag "#{field_name_prefix}[_destroy]", '0', autocomplete: 'off' %>
       <label class="btn btn-danger">
         Remove

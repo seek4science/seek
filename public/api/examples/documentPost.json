@@ -21,19 +21,34 @@
         "permissions": [
           {
             "resource": {
-              "id": "221",
+              "id": "1022252696",
               "type": "projects"
             },
             "access": "edit"
           }
         ]
+      },
+      "extended_attributes": {
+        "extended_metadata_type_id": "386",
+        "attribute_map": {
+          "role_email": "alice@email.com",
+          "role_phone": "0012345",
+          "role_name": {
+            "first_name": "alice",
+            "last_name": "liddell"
+          },
+          "role_address": {
+            "street": "wonder",
+            "city": "land"
+          }
+        }
       }
     },
     "relationships": {
       "creators": {
         "data": [
           {
-            "id": "208",
+            "id": "1039988590",
             "type": "people"
           }
         ]
@@ -41,7 +56,7 @@
       "projects": {
         "data": [
           {
-            "id": "221",
+            "id": "1022252696",
             "type": "projects"
           }
         ]
@@ -49,7 +64,7 @@
       "assays": {
         "data": [
           {
-            "id": "29",
+            "id": "1035386910",
             "type": "assays"
           }
         ]
@@ -57,7 +72,7 @@
       "workflows": {
         "data": [
           {
-            "id": "9",
+            "id": "220",
             "type": "workflows"
           }
         ]

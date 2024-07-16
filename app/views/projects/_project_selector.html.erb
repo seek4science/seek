@@ -6,6 +6,7 @@
 <%
   allow_nil ||= false
   allow_all ||= false
+  allow_only_administered ||= false
   resource ||= nil
 
   selected_projects = resource ? resource.projects : []
@@ -13,13 +14,14 @@
     possible_projects = Project.all
   else
     possible_projects = []
-    possible_projects |= User.current_user.person.current_projects
+    possible_projects |= current_person.current_projects
     if resource
       possible_projects |= resource.projects
       possible_projects |= resource.contributor.current_projects if resource.respond_to?(:contributor) && resource.contributor
     end
   end
 
+  possible_projects = possible_projects.select { |p| current_person.is_project_administrator? p } if allow_only_administered
   possible_projects = possible_projects - selected_projects
 
   possible_projects_json, selected_projects_json = [possible_projects, selected_projects].map do |projects|
@@ -119,16 +121,10 @@
 
   $j(document).ready(function () {
     // Auto select projects from params[:project_ids] or params[resource][:project_ids] if this is a new object
-    <% if resource && resource.new_record? %>
-      <% if params[:project_ids] %>
-        <% params[:project_ids].each do |project_id| %>
-          Sharing.projectsSelector.add(<%= project_id %>, true);
-        <% end %>
-      <% end %>
-      <% if params[controller_name.singularize] && params[controller_name.singularize][:project_ids] %>
-        <% params[controller_name.singularize][:project_ids].each do |project_id| %>
-          Sharing.projectsSelector.add(<%= project_id %>, true);
-        <% end %>
+    <% if resource&.new_record? %>
+      <% project_ids = (params[:project_ids] || params.dig(controller_name.singularize, :project_ids) || []).compact_blank %>
+      <% project_ids.each do |project_id| %>
+        Sharing.projectsSelector.add(<%= project_id %>, true);
       <% end %>
     <% end %>
     // Auto select project if there is only one
