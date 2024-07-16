@@ -36,7 +36,7 @@ fair:inv_INV_DRP007092
 <http://fairbydesign.nl/ontology/inv_INV_DRP007092/person/343732a9426f424e535356c966739de9>
         rdf:type           schema:Person ;
         schema:department  "AIDS Research Center" ;
-        schema:email       <mailto:pkofieparbie@nih.go.jp> ;
+        schema:email       <mailto:kparbie@nioid.org> ;
         schema:familyName  "Kofi Parbie" ;
         schema:givenName   "Prince Kofi Parbie" ;
         schema:memberOf    <http://m-unlock.nl/ontology/organization/National_Institute_of_Infectious_Diseases> .
