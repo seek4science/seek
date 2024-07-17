@@ -551,6 +551,7 @@ SEEK::Application.routes.draw do
       post :create_version_from_git
       get :edit_paths
       patch :update_paths
+      post :run
     end
     resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :sops, :collections, :presentations, :documents, :data_files, only: [:index]
   end
