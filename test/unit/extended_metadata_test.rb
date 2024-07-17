@@ -61,7 +61,7 @@ class ExtendedMetadataTest < ActiveSupport::TestCase
 
   test 'mass assign attribute with linked extended metadata' do
     cm = ExtendedMetadata.new(extended_metadata_type: FactoryBot.build(:role_extended_metadata_type), item: FactoryBot.create(:study))
-    pp   cm.update( data: {
+    cm.update( data: {
       "role_email":"alice@email.com",
       "role_phone":"0012345",
       "role_name": {
@@ -79,7 +79,7 @@ class ExtendedMetadataTest < ActiveSupport::TestCase
 
   test 'mass assign attribute with multi linked extended metadatas' do
     cm = ExtendedMetadata.new(extended_metadata_type: FactoryBot.build(:family_extended_metadata_type), item: FactoryBot.create(:study))
-    pp   cm.update( data: {
+    cm.update( data: {
       "dad":{"first_name":"tom", "last_name":"liddell"},
       "mom": { "first_name": "lily", "last_name": "liddell" },
       "child":{
@@ -197,7 +197,7 @@ class ExtendedMetadataTest < ActiveSupport::TestCase
 
   test 'mass assign attributes with the linked extended metadata' do
     cm = ExtendedMetadata.new(extended_metadata_type: FactoryBot.build(:family_extended_metadata_type), item: FactoryBot.create(:study))
-    pp   cm.update( data: {
+    cm.update( data: {
       "dad":{"first_name":"tom", "last_name":"liddell"},
       "mom": { "first_name": "lily", "last_name": "liddell" },
       "child":{

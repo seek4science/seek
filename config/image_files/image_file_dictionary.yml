@@ -172,6 +172,8 @@ extract_samples: 'famfamfam_silk/table_go.png'
 view_samples: 'famfamfam_silk/table.png'
 external_link: 'famfamfam_silk/arrow_right.png'
 
+unzip_folder: 'famfamfam_silk/folder_page_white.png'
+
 # avatars
 specimen_avatar: 'misc_icons/green_virus-64x64.png'
 strain_avatar: 'misc_icons/enterococcus_faecalis64-64.jpg'

@@ -559,18 +559,16 @@ class SopsControllerTest < ActionController::TestCase
   test 'the gatekeeper should have right to view the item when an item is requested to be published' do
     gatekeeper = FactoryBot.create(:asset_gatekeeper)
     @user.person.add_to_project_and_institution(gatekeeper.projects.first, FactoryBot.create(:institution))
-    post :create, params: { sop: { title: 'text sop', project_ids: gatekeeper.projects.collect(&:id) }, content_blobs: [{ data: picture_file }], policy_attributes: { access_type: Policy::NO_ACCESS } }
-    sop = assigns(:sop)
+    sop = FactoryBot.create(:sop, title: 'text sop', projects: gatekeeper.projects, policy: FactoryBot.create(:private_policy))
 
     login_as(gatekeeper)
     refute sop.can_view?
 
     login_as(sop.contributor)
     post :publish, params: { id: sop }
-    sop = assigns(:sop)
 
-    login_as(gatekeeper)
-    assert sop.can_view?
+    assert_redirected_to published_sop_path(sop, waiting_for_publish_items: ["Sop,#{sop.id}"])
+    assert sop.reload.can_view?(gatekeeper)
   end
 
   test "should show 'None' for other contributors if no contributors" do
@@ -2092,6 +2090,56 @@ class SopsControllerTest < ActionController::TestCase
       assert_redirected_to root_path
       assert flash[:error].include?('disabled')
     end
+  end
+
+  test 'project default policy is applied if no policy params' do
+    admin = FactoryBot.create(:project_administrator)
+    project = admin.projects.first
+    person = FactoryBot.create(:person, project: project)
+    login_as(person)
+    disable_authorization_checks do
+      project.default_policy = FactoryBot.create(:private_policy)
+      project.use_default_policy = true
+      project.save!
+      project.default_policy.permissions << Permission.new(contributor: admin, access_type: Policy::MANAGING)
+    end
+
+    assert_difference('Sop.count', 1) do
+      post :create, params: { sop: { title: 'SOP', project_ids: [project.id] },
+                              content_blobs: [{ data: file_for_upload }] }
+    end
+
+    assert sop = assigns(:sop)
+    policy = sop.policy
+    assert_equal Policy::NO_ACCESS, policy.access_type
+    policy = sop.reload.policy
+    assert_equal 1, policy.permissions.count
+    assert_equal admin, policy.permissions.first.contributor
+    assert_equal Policy::MANAGING, policy.permissions.first.access_type
+  end
+
+  test 'policy params override project default policy' do
+    admin = FactoryBot.create(:project_administrator)
+    project = admin.projects.first
+    person = FactoryBot.create(:person, project: project)
+    login_as(person)
+    disable_authorization_checks do
+      project.default_policy = FactoryBot.create(:private_policy)
+      project.use_default_policy = true
+      project.save!
+      project.default_policy.permissions << Permission.new(contributor: admin, access_type: Policy::MANAGING)
+    end
+
+    assert_difference('Sop.count', 1) do
+      post :create, params: { sop: { title: 'SOP', project_ids: [project.id] },
+                              content_blobs: [{ data: file_for_upload }],
+                              policy_attributes: { access_type: Policy::VISIBLE } }
+    end
+
+    assert sop = assigns(:sop)
+    policy = sop.policy
+    assert_equal Policy::VISIBLE, policy.access_type
+    assert_equal 0, policy.permissions.count
   end
 
   private

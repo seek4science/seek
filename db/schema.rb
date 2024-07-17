@@ -425,6 +425,7 @@ ActiveRecord::Schema.define(version: 2024_07_03_132257) do
     t.boolean "simulation_data", default: false
     t.string "deleted_contributor"
     t.integer "file_template_id"
+    t.integer "zip_origin_id"
     t.index ["contributor_id"], name: "index_data_files_on_contributor"
   end
 
