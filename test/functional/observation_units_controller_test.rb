@@ -108,6 +108,49 @@ class ObservationUnitsControllerTest < ActionController::TestCase
     assert_equal 'updated strain', obs_unit.extended_metadata.get_attribute_value('strain')
   end
 
+  test 'create' do
+    emt = FactoryBot.create(:simple_observation_unit_extended_metadata_type)
+    contributor = FactoryBot.create(:person)
+    project = contributor.projects.first
+    other_person = FactoryBot.create(:person)
+    creator = FactoryBot.create(:person)
+    login_as(contributor)
+
+    post :create, params: {  observation_unit:{
+                               title: 'new title',
+                               description: 'new description',
+                               creator_ids: [creator.id],
+                               project_ids: [project],
+                               extended_metadata_attributes: {
+                                 extended_metadata_type_id: emt.id,
+                                 data: {
+                                   name: 'new name',
+                                   strain: 'new strain'
+                                 }
+                               }
+                             },
+                             policy_attributes: {
+                               access_type: Policy::VISIBLE,
+                               permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}
+                               }
+                             }
+    }
+
+    assert_redirected_to obs_unit=assigns(:observation_unit)
+    assert_equal 'new title', obs_unit.title
+    assert_equal 'new description', obs_unit.description
+    assert_equal emt, obs_unit.extended_metadata.extended_metadata_type
+    assert_equal 'new name', obs_unit.extended_metadata.get_attribute_value('name')
+    assert_equal 'new strain', obs_unit.extended_metadata.get_attribute_value('strain')
+    assert_equal contributor, obs_unit.contributor
+    assert_equal [project],obs_unit.projects.sort_by(&:id)
+    assert_equal [creator],obs_unit.creators
+    assert_equal Policy::VISIBLE,obs_unit.policy.access_type
+    assert_equal 1,obs_unit.policy.permissions.count
+    assert_equal other_person,obs_unit.policy.permissions.first.contributor
+    assert_equal Policy::MANAGING,obs_unit.policy.permissions.first.access_type
+  end
+
   test 'no access if fair data station disabled' do
     unit = FactoryBot.create(:max_observation_unit)
     login_as(unit.contributor)
