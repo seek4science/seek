@@ -11,6 +11,17 @@ Please see [Getting FAIRDOM-SEEK](/get-seek.html) for details about installing S
 
 If you have any comments or feedback about a release, then please [Contact Us](/contacting-us.html)
 
+## Version 1.15.2
+
+Release date: _18th July 2024_
+
+A patch release with a couple of small fixes:
+
+* Fix to XLSX files incorrectly being detected and changed to a zip mime type in some cases when a processing error occurs.
+* Fix to losing the temporary access code in the URL when switching between versions or clicking on the "Back to Model" button.
+
+For a full list, see [closed issues for 1.15.2](https://github.com/seek4science/seek/milestone/25?closed=1)
+
 ## Version 1.15.1
 
 Release date: _20th June 2024_
