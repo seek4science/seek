@@ -28,6 +28,8 @@ def load_seek_testing_defaults!
       Settings.defaults[:programme_user_creation_enabled] = true
       Settings.defaults[:programmes_open_for_projects_enabled] = true
 
+      Settings.defaults[:fair_data_station_enabled] = true
+
       # Types
       Settings.defaults[:collections_enabled] = true
       Settings.defaults[:documents_enabled] = true

@@ -26,6 +26,9 @@ class DataFile < ApplicationRecord
   has_many :unzipped_files, class_name: 'DataFile', foreign_key: :zip_origin_id
   belongs_to :zip_origin, class_name: 'DataFile', optional: true
 
+  has_many :observation_unit_assets, dependent: :delete_all, as: :asset, foreign_key: :asset_id, autosave: true, inverse_of: :asset
+  has_many :observation_units, through: :observation_unit_assets
+
   has_many :workflow_data_files, dependent: :destroy, autosave: true
   has_many :workflows, ->{ distinct }, through: :workflow_data_files
 

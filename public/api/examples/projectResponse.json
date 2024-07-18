@@ -1,17 +1,17 @@
 {
   "data": {
-    "id": "642",
+    "id": "2734",
     "type": "projects",
     "attributes": {
       "discussion_links": [
         {
-          "id": "36",
+          "id": "206",
           "label": "Slack",
           "url": "http://www.slack.com/"
         }
       ],
       "extended_attributes": {
-        "extended_metadata_type_id": "135",
+        "extended_metadata_type_id": "266",
         "attribute_map": {
           "dad": {
             "first_name": "john",
@@ -33,7 +33,7 @@
           ]
         }
       },
-      "avatar": "/projects/642/avatars/8",
+      "avatar": "/projects/2734/avatars/37",
       "title": "A Maximal Project",
       "description": "A Taverna project",
       "web_page": "http://www.taverna.org.uk",
@@ -49,8 +49,8 @@
       },
       "members": [
         {
-          "person_id": "510",
-          "institution_id": "536"
+          "person_id": "2568",
+          "institution_id": "2646"
         }
       ],
       "use_default_policy": true,
@@ -99,7 +99,7 @@
       "people": {
         "data": [
           {
-            "id": "510",
+            "id": "2568",
             "type": "people"
           }
         ]
@@ -107,7 +107,7 @@
       "institutions": {
         "data": [
           {
-            "id": "536",
+            "id": "2646",
             "type": "institutions"
           }
         ]
@@ -115,7 +115,7 @@
       "programmes": {
         "data": [
           {
-            "id": "70",
+            "id": "95",
             "type": "programmes"
           }
         ]
@@ -123,7 +123,7 @@
       "investigations": {
         "data": [
           {
-            "id": "64",
+            "id": "444",
             "type": "investigations"
           }
         ]
@@ -131,7 +131,7 @@
       "studies": {
         "data": [
           {
-            "id": "56",
+            "id": "373",
             "type": "studies"
           }
         ]
@@ -139,7 +139,7 @@
       "assays": {
         "data": [
           {
-            "id": "48",
+            "id": "335",
             "type": "assays"
           }
         ]
@@ -147,7 +147,7 @@
       "data_files": {
         "data": [
           {
-            "id": "24",
+            "id": "172",
             "type": "data_files"
           }
         ]
@@ -165,7 +165,7 @@
       "models": {
         "data": [
           {
-            "id": "31",
+            "id": "199",
             "type": "models"
           }
         ]
@@ -173,7 +173,7 @@
       "sops": {
         "data": [
           {
-            "id": "24",
+            "id": "110",
             "type": "sops"
           }
         ]
@@ -181,7 +181,7 @@
       "publications": {
         "data": [
           {
-            "id": "16",
+            "id": "251",
             "type": "publications"
           }
         ]
@@ -189,7 +189,7 @@
       "presentations": {
         "data": [
           {
-            "id": "15",
+            "id": "130",
             "type": "presentations"
           }
         ]
@@ -197,7 +197,7 @@
       "events": {
         "data": [
           {
-            "id": "15",
+            "id": "161",
             "type": "events"
           }
         ]
@@ -205,7 +205,7 @@
       "documents": {
         "data": [
           {
-            "id": "16",
+            "id": "100",
             "type": "documents"
           }
         ]
@@ -213,7 +213,7 @@
       "workflows": {
         "data": [
           {
-            "id": "8",
+            "id": "139",
             "type": "workflows"
           }
         ]
@@ -221,21 +221,21 @@
       "collections": {
         "data": [
           {
-            "id": "8",
+            "id": "37",
             "type": "collections"
           }
         ]
       }
     },
     "links": {
-      "self": "/projects/642"
+      "self": "/projects/2734"
     },
     "meta": {
-      "created": "2024-06-20T12:30:03.000Z",
-      "modified": "2024-06-20T12:30:04.000Z",
+      "created": "2024-07-03T13:49:41.000Z",
+      "modified": "2024-07-03T13:49:41.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "be5ee920-112e-013d-1f9d-0a81884ed284"
+      "uuid": "05617600-1b71-013d-1ffe-0a81884ed284"
     }
   },
   "jsonapi": {

@@ -9,6 +9,11 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal 3, p.work_groups.size
   end
 
+  test 'supports extended metadata?' do
+    refute Person.supports_extended_metadata?
+    refute Person.new.supports_extended_metadata?
+  end
+
   test 'to_json_ld' do
     refute_nil JSON.parse(FactoryBot.create(:person).to_json_ld)
   end

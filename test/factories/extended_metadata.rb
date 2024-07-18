@@ -28,4 +28,13 @@ FactoryBot.define do
     end
   end
 
+  factory(:simple_observation_unit_extended_metadata, class: ExtendedMetadata) do
+    association :extended_metadata_type, factory: :simple_observation_unit_extended_metadata_type, strategy: :create
+    after(:build) do |em|
+      em.set_attribute_value(:name, "unit 1")
+      em.set_attribute_value(:strain, "strain 1")
+    end
+
+  end
+
 end

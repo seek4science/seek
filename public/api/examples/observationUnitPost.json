@@ -1,0 +1,72 @@
+{
+  "data": {
+    "type": "observation_units",
+    "attributes": {
+      "policy": {
+        "access": "manage",
+        "permissions": [
+
+        ]
+      },
+      "title": "Max observation unit",
+      "description": "the maximum one",
+      "tags": [
+        "tag1",
+        "tag2"
+      ],
+      "extended_attributes": {
+        "extended_metadata_type_id": "342",
+        "attribute_map": {
+          "name": "unit 1",
+          "strain": "strain 1"
+        }
+      },
+      "discussion_links": [
+        {
+          "label": "Google",
+          "url": "http://google.com"
+        }
+      ]
+    },
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "3123",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "3339",
+            "type": "projects"
+          }
+        ]
+      },
+      "study": {
+        "data": {
+          "id": "522",
+          "type": "studies"
+        }
+      },
+      "samples": {
+        "data": [
+          {
+            "id": "72",
+            "type": "samples"
+          }
+        ]
+      },
+      "data_files": {
+        "data": [
+          {
+            "id": "210",
+            "type": "data_files"
+          }
+        ]
+      }
+    }
+  }
+}

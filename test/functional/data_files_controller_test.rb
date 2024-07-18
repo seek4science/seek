@@ -614,6 +614,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_select '#usage_count' do
       assert_select 'strong', text: /Downloads/, count: 1
+      assert_select 'strong', text: /Runs/, count: 0
     end
   end
 

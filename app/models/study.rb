@@ -20,6 +20,7 @@ class Study < ApplicationRecord
 
   has_many :assay_sops, through: :assays, source: :sops
   has_many :sop_versions, through: :assays
+  has_many :observation_units
 
   has_one :external_asset, as: :seek_entity, dependent: :destroy
 
@@ -34,6 +35,12 @@ class Study < ApplicationRecord
   %w[data_file model document].each do |type|
     has_many "#{type}_versions".to_sym, -> { distinct }, through: :assays
     has_many "related_#{type.pluralize}".to_sym, -> { distinct }, through: :assays, source: type.pluralize.to_sym
+  end
+
+  # the associated projects from the Investigation.
+  # Overrides the :through :investigation, as that relies on being saved to the database first, causing validation issues
+  def projects
+    investigation&.projects  || []
   end
 
   def assay_streams

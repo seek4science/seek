@@ -52,6 +52,7 @@ en:
   placeholder: "Placeholder"
   collection: &collection "Collection"
 
+  observation_unit: &observation_unit "Observation Unit"
   sample: &sample "Sample"
   sample_type: &sample_type "Sample type"
   template: &template "Template"
@@ -176,6 +177,7 @@ en:
     collection: *collection
     presentation: *presentation
     event: *event
+    observation_unit: *observation_unit
     sample: *sample
     template: *template
     sample_type: *sample_type
@@ -199,6 +201,7 @@ en:
     collections: 'Collections'
     presentations: 'Presentations'
     events: 'Events'
+    observation_units: 'Observation Units'
     samples: 'Samples'
     templates: 'Templates'
     sample_types: 'Samples types'

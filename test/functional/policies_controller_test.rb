@@ -140,7 +140,7 @@ end
   test 'when creating an item, can not publish the item if associate to it the project which has gatekeeper' do
     gatekeeper = FactoryBot.create(:asset_gatekeeper)
     a_person = FactoryBot.create(:person)
-    sop = Sop.new
+    sop = FactoryBot.create(:sop, contributor: a_person)
 
     login_as(a_person.user)
     assert sop.can_manage?
@@ -151,7 +151,7 @@ end
 
   test 'when creating an item, can publish the item if associate to it the project which has no gatekeeper' do
     a_person = FactoryBot.create(:person)
-    sop = Sop.new
+    sop = FactoryBot.create(:sop, contributor: a_person)
 
     login_as(a_person.user)
     assert sop.can_manage?
@@ -189,7 +189,7 @@ end
 
   test 'can publish assay without study' do
     a_person = FactoryBot.create(:person)
-    assay = Assay.new
+    assay = FactoryBot.create(:assay, study: nil, contributor: a_person)
 
     login_as(a_person.user)
     assert assay.can_manage?
@@ -204,8 +204,7 @@ end
     a_person = FactoryBot.create(:person, project: gatekeeper.projects.first)
     inv = FactoryBot.create(:investigation, contributor: gatekeeper)
     study = FactoryBot.create(:study, investigation: inv, contributor: gatekeeper)
-    assay = Assay.new
-    assay.study = study
+    assay = FactoryBot.create(:assay, study: study, contributor: a_person)
 
     assert_equal assay.projects, gatekeeper.projects
     login_as(a_person.user)

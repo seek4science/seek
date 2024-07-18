@@ -5,6 +5,15 @@ class GithubScraperTest < ActionDispatch::IntegrationTest
   test 'can scrape a new workflow' do
     project = Scrapers::Util.bot_project(title: 'test')
     bot = Scrapers::Util.bot_account
+    project_admin = FactoryBot.create(:project_administrator)
+    disable_authorization_checks do
+      project.default_policy = FactoryBot.create(:private_policy)
+      project.default_policy.permissions << Permission.new(contributor: project, access_type: Policy::EDITING)
+      project.default_policy.permissions << Permission.new(contributor: project_admin, access_type: Policy::MANAGING)
+      project.default_policy.save!
+      project.use_default_policy = true
+      project.save!
+    end
     scraper = Scrapers::GithubScraper.new('test-123', project, bot, main_branch: 'master', output: StringIO.new)
 
     repos = [FactoryBot.create(:remote_workflow_ro_crate_repository, remote: 'https://github.com/crs4/sort-and-change-case-workflow.git')]
@@ -26,6 +35,10 @@ class GithubScraperTest < ActionDispatch::IntegrationTest
                   assert_equal 'sort-and-change-case.ga', wf.main_workflow_path
                   assert_equal 'v0.02', wf.git_version.name
                   assert_equal ['case', 'sort'], wf.tags.sort
+                  assert_equal Policy::NO_ACCESS, wf.policy.access_type
+                  assert_equal 2, wf.policy.permissions.count
+                  assert wf.policy.permissions.detect { |p| p.contributor == project_admin && p.access_type == Policy::MANAGING }
+                  assert wf.policy.permissions.detect { |p| p.contributor == project && p.access_type == Policy::EDITING }
                 end
               end
             end

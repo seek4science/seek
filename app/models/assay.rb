@@ -68,6 +68,12 @@ class Assay < ApplicationRecord
 
   enforce_authorization_on_association :study, :view
 
+  # the associated projects from the Investigation.
+  # Overrides the :through :study, as that relies on being saved to the database first, causing validation issues
+  def projects
+    study&.projects || []
+  end
+
   def is_assay_stream?
     assay_class&.is_assay_stream?
   end

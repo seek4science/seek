@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_04_03_114645) do
+ActiveRecord::Schema.define(version: 2024_07_03_132257) do
 
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
@@ -639,6 +639,7 @@ ActiveRecord::Schema.define(version: 2024_04_03_114645) do
     t.string "label"
     t.integer "linked_extended_metadata_type_id"
     t.boolean "allow_cv_free_text", default: false
+    t.string "pid"
     t.index ["extended_metadata_type_id"], name: "index_extended_metadata_attributes_on_extended_metadata_type_id"
     t.index ["sample_attribute_type_id"], name: "index_extended_metadata_attributes_on_sample_attribute_type_id"
     t.index ["sample_controlled_vocab_id"], name: "index_extended_metadata_attributes_on_sample_cv_id"
@@ -1194,6 +1195,50 @@ ActiveRecord::Schema.define(version: 2024_04_03_114645) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_oauth_sessions_on_user_id"
+  end
+
+  create_table "observation_unit_assets", id: false, force: :cascade do |t|
+    t.bigint "observation_unit_id"
+    t.string "asset_type"
+    t.bigint "asset_id"
+    t.index ["asset_type", "asset_id"], name: "index_observation_unit_assets_on_asset"
+    t.index ["observation_unit_id"], name: "index_observation_unit_assets_on_observation_unit_id"
+  end
+
+  create_table "observation_unit_auth_lookup", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "asset_id"
+    t.boolean "can_view", default: false
+    t.boolean "can_manage", default: false
+    t.boolean "can_edit", default: false
+    t.boolean "can_download", default: false
+    t.boolean "can_delete", default: false
+    t.index ["user_id", "asset_id", "can_view"], name: "index_obs_unit_auth_lookup_user_id_asset_id"
+    t.index ["user_id", "can_view"], name: "index_obs_unit_auth_lookup_on_user_id_and_can_view"
+  end
+
+  create_table "observation_units", force: :cascade do |t|
+    t.string "title"
+    t.text "description"
+    t.string "identifier"
+    t.bigint "organism_id"
+    t.bigint "extended_metadata_type_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.bigint "contributor_id"
+    t.string "uuid"
+    t.string "deleted_contributor"
+    t.text "other_creators"
+    t.bigint "study_id"
+    t.bigint "policy_id"
+    t.string "first_letter", limit: 1
+  end
+
+  create_table "observation_units_projects", id: false, force: :cascade do |t|
+    t.integer "project_id"
+    t.integer "observation_unit_id"
+    t.index ["observation_unit_id", "project_id"], name: "index_projects_obs_units_on_obs_unit_id_and_project_id"
+    t.index ["project_id"], name: "index_projects_obs_units_on_project_id"
   end
 
   create_table "observed_variable_sets", force: :cascade do |t|
@@ -1800,6 +1845,7 @@ ActiveRecord::Schema.define(version: 2024_04_03_114645) do
     t.text "other_creators"
     t.integer "originating_data_file_id"
     t.string "deleted_contributor"
+    t.bigint "observation_unit_id"
   end
 
   create_table "saved_searches", id: :integer, force: :cascade do |t|

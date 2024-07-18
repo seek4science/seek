@@ -71,6 +71,7 @@ class SamplesController < ApplicationController
     respond_to do |format|
       format.html
       format.json {render json: @sample, include: [params[:include]]}
+      format.rdf { render template: 'rdf/show' }
     end
   end
 

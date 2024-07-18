@@ -41,6 +41,8 @@ module Seek
         rdf_graph = describe_type(rdf_graph)
         rdf_graph = generate_from_csv_definitions rdf_graph
         rdf_graph = additional_triples rdf_graph
+        rdf_graph = extended_metadata_triples rdf_graph
+        rdf_graph = sample_metadata_triples(rdf_graph) if self.is_a?(Sample)
         rdf_graph
       end
 
@@ -66,6 +68,27 @@ module Seek
         if is_a?(Model) && contains_sbml?
           rdf_graph << [rdf_resource, JERMVocab.hasFormat, JERMVocab.SBML_format]
         end
+
+        rdf_graph
+      end
+
+      def extended_metadata_triples(rdf_graph)
+        return rdf_graph unless supports_extended_metadata? && extended_metadata&.extended_metadata_type
+        attributes = extended_metadata.extended_metadata_type.extended_metadata_attributes.select{|at| at.pid.present?}
+        resource = rdf_resource
+        attributes.each do |attribute|
+          rdf_graph << [resource, RDF::URI(attribute.pid), RDF::Literal(extended_metadata.get_attribute_value(attribute))]
+        end
+        rdf_graph
+      end
+
+      def sample_metadata_triples(rdf_graph)
+
+        attributes = sample_type.sample_attributes.select{|at| at.pid.present?}
+        resource = rdf_resource
+        attributes.each do |attribute|
+          rdf_graph << [resource, RDF::URI(attribute.pid), RDF::Literal(get_attribute_value(attribute))]
+        end
         rdf_graph
       end
 
@@ -85,7 +108,16 @@ module Seek
 
       # the URI for the type of this object, for example http://jermontology.org/ontology/JERMOntology#Study for a Study
       def rdf_type_uri
-        JERMVocab[rdf_type_entity_fragment]
+        case rdf_type_entity_fragment
+        when Symbol
+          JERMVocab[rdf_type_entity_fragment]
+        when String
+          if rdf_type_entity_fragment =~ URI::ABS_URI
+            RDF::URI(rdf_type_entity_fragment)
+          else
+            JERMVocab[rdf_type_entity_fragment]
+          end
+        end
       end
 
       def rdf_type_entity_fragment

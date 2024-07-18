@@ -53,4 +53,34 @@ class Investigation < ApplicationRecord
   def self.user_creatable?
     Seek::Config.investigations_enabled
   end
+
+  # utility method for cleaning up durng testing, not to be used in production code
+  def deep_destroy!
+    raise 'need to be admin' unless User.current_user&.is_admin?
+    disable_authorization_checks do
+      assays.each do |assay|
+        assay.samples.each do |sample|
+          sample.destroy
+        end
+        assay.data_files.each do |df|
+          df.destroy
+        end
+        assay.destroy
+      end
+      studies.each do |study|
+        study.observation_units.each do |obs_unit|
+          obs_unit.samples.each do |sample|
+            sample.destroy
+          end
+          obs_unit.data_files.each do |df|
+            df.destroy
+          end
+          obs_unit.destroy
+        end
+        study.destroy
+      end
+      destroy
+    end
+
+  end
 end
