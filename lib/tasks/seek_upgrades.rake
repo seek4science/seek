@@ -20,6 +20,7 @@ namespace :seek do
     rename_custom_metadata_legacy_supported_type
     seek_rdf:generate
     update_observation_unit_policies
+    fix_xlsx_marked_as_zip
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -222,6 +223,15 @@ namespace :seek do
     if ExtendedMetadataType.where(supported_type: 'CustomMetadata').any?
       puts "... Renaming ExtendedMetadata supported_type from Custom to ExtendedMetadata"
       ExtendedMetadataType.where(supported_type: 'CustomMetadata').update_all(supported_type: 'ExtendedMetadata')
+    end
+  end
+
+  task(fix_xlsx_marked_as_zip: [:environment]) do
+    blobs = ContentBlob.where('original_filename LIKE ?','%.xlsx').where(content_type: 'application/zip')
+    if blobs.any?
+      n = blobs.count
+      blobs.update_all(content_type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+      puts "... fixed #{n} XLSX blobs with zip content type"
     end
   end
 
