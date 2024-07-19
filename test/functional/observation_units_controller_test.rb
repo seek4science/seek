@@ -108,6 +108,14 @@ class ObservationUnitsControllerTest < ActionController::TestCase
     assert_equal 'updated strain', obs_unit.extended_metadata.get_attribute_value('strain')
   end
 
+  test 'new' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    get :new
+    assert_response :success
+    assert_select 'form.new_observation_unit'
+  end
+
   test 'create' do
     emt = FactoryBot.create(:simple_observation_unit_extended_metadata_type)
     contributor = FactoryBot.create(:person)
@@ -160,6 +168,10 @@ class ObservationUnitsControllerTest < ActionController::TestCase
       refute_nil flash[:error]
 
       get :index
+      assert_redirected_to :root
+      refute_nil flash[:error]
+
+      get :new
       assert_redirected_to :root
       refute_nil flash[:error]
 
