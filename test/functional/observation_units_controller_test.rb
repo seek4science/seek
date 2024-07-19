@@ -96,7 +96,9 @@ class ObservationUnitsControllerTest < ActionController::TestCase
                                    strain: 'updated strain'
                                  }
                                }
-                             }}
+                             },
+                             tag_list:'fish, soup',
+    }
 
     assert_redirected_to obs_unit
 
@@ -106,6 +108,7 @@ class ObservationUnitsControllerTest < ActionController::TestCase
     assert_equal emt, obs_unit.extended_metadata.extended_metadata_type
     assert_equal 'updated name', obs_unit.extended_metadata.get_attribute_value('name')
     assert_equal 'updated strain', obs_unit.extended_metadata.get_attribute_value('strain')
+    assert_equal %w[fish soup], obs_unit.tags.sort
   end
 
   test 'new' do
@@ -139,6 +142,7 @@ class ObservationUnitsControllerTest < ActionController::TestCase
                                  }
                                }
                              },
+                             tag_list:'fish, soup',
                              policy_attributes: {
                                access_type: Policy::VISIBLE,
                                permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}
@@ -152,6 +156,7 @@ class ObservationUnitsControllerTest < ActionController::TestCase
     assert_equal emt, obs_unit.extended_metadata.extended_metadata_type
     assert_equal 'new name', obs_unit.extended_metadata.get_attribute_value('name')
     assert_equal 'new strain', obs_unit.extended_metadata.get_attribute_value('strain')
+    assert_equal %w[fish soup], obs_unit.tags.sort
     assert_equal contributor, obs_unit.contributor
     assert_equal [project],obs_unit.projects.sort_by(&:id)
     assert_equal [creator],obs_unit.creators

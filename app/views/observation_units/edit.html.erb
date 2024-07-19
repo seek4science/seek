@@ -19,7 +19,7 @@
     <%= render partial: 'extended_metadata/extended_metadata_attribute_input', locals: { f: f, resource: @observation_unit } %>
 
 
-    <%= render partial: "assets/asset_form_bottom", locals: {show_publications:false, f: f}-%>
+    <%= render partial: "assets/asset_form_bottom", locals: {show_publications:false, attribution_enable: false, f: f}-%>
 
 
     <%= form_submit_buttons(@observation_unit) %>
