@@ -18,7 +18,7 @@
     <%= render partial: 'extended_metadata/extended_metadata_type_selection', locals: { f: f, resource: @observation_unit } %>
     <%= render partial: 'extended_metadata/extended_metadata_attribute_input', locals: { f: f, resource: @observation_unit } %>
 
-    <%= render :partial => "projects/project_selector", :locals => { :resource => @observation_unit } %>
+    <%= render partial: "projects/project_selector", locals: { resource: @observation_unit } %>
 
     <div class="form-group">
       <label class="required"><%= t('study') -%></label>
