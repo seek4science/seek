@@ -67,5 +67,22 @@ class ObservationUnitTest < ActiveSupport::TestCase
     end
   end
 
+  test 'validation' do
+    obs_unit = FactoryBot.build(:observation_unit)
+    assert obs_unit.valid?
+
+    obs_unit.title = ''
+    refute obs_unit.valid?
+
+    obs_unit = FactoryBot.build(:observation_unit)
+    obs_unit.study = nil
+    refute obs_unit.valid?
+
+    obs_unit = FactoryBot.build(:observation_unit)
+    obs_unit.projects = []
+    refute obs_unit.valid?
+
+  end
+
 
 end

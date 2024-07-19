@@ -4,10 +4,12 @@ FactoryBot.define do
     description { 'very simple obs unit'}
     with_project_contributor
     policy { FactoryBot.create(:public_policy) }
+    association :study, factory: :study, strategy: :create
   end
 
   factory(:min_observation_unit, parent: :observation_unit) do
     title { 'A Minimal Observation Unit' }
+    association :study, factory: :study, strategy: :create
     description { nil }
   end
 
