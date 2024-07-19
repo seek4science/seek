@@ -119,6 +119,7 @@ class ObservationUnitsControllerTest < ActionController::TestCase
   test 'create' do
     emt = FactoryBot.create(:simple_observation_unit_extended_metadata_type)
     contributor = FactoryBot.create(:person)
+    study = FactoryBot.create(:study, contributor: contributor)
     project = contributor.projects.first
     other_person = FactoryBot.create(:person)
     creator = FactoryBot.create(:person)
@@ -129,6 +130,7 @@ class ObservationUnitsControllerTest < ActionController::TestCase
                                description: 'new description',
                                creator_ids: [creator.id],
                                project_ids: [project],
+                               study_id: study,
                                extended_metadata_attributes: {
                                  extended_metadata_type_id: emt.id,
                                  data: {
