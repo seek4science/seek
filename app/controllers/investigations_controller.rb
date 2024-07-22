@@ -72,11 +72,6 @@ class InvestigationsController < ApplicationController
     headers["Content-Length"]=ro_file.size.to_s
   end
 
-  def new
-    @investigation = Investigation.new
-    @investigation.is_isa_json_compliant = Seek::Config.isa_json_compliance_enabled ? true : false
-    respond_to(&:html)
-  end
   def create
     @investigation = Investigation.new(investigation_params)
     update_sharing_policies @investigation
