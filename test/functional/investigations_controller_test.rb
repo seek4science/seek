@@ -1231,4 +1231,23 @@ class InvestigationsControllerTest < ActionController::TestCase
       assert_select 'input[type="checkbox"][checked="checked"]#investigation_is_isa_json_compliant', count: 1
     end
   end
+
+  test 'isa json compliance on edit page' do
+    current_user = FactoryBot.create(:user)
+
+    inv = FactoryBot.create(:investigation, contributor: current_user.person)
+    isa_json_inv = FactoryBot.create(:investigation, contributor: current_user.person, is_isa_json_compliant: true)
+
+    login_as(current_user)
+    with_config_values({isa_json_compliance_enabled: false, project_single_page_enabled: false}) do
+      get :edit, params: { id: inv }
+      assert_response :success
+      assert_select 'input[type="checkbox"][checked="checked"]#investigation_is_isa_json_compliant', count: 0
+
+      get :edit, params: { id: isa_json_inv }
+      assert_response :success
+      assert_select 'input[type="checkbox"][checked="checked"]#investigation_is_isa_json_compliant', count: 1
+
+    end
+  end
 end
