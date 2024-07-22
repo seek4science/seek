@@ -1,0 +1,80 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "supported_type": {
+      "type": "string"
+    },
+    "enabled": {
+      "type": "boolean"
+    },
+    "attributes": {
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "description": {
+              "type": "null"
+            },
+            "type": {
+              "type": "string"
+            },
+            "required": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "title",
+            "label",
+            "description",
+            "type",
+            "required"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "description": {
+              "type": "null"
+            },
+            "type": {
+              "type": "string"
+            },
+            "required": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "title",
+            "label",
+            "description",
+            "type",
+            "required"
+          ]
+        }
+      ]
+    }
+  },
+  "required": [
+    "title",
+    "supported_type",
+    "enabled",
+    "attributes"
+  ]
+}

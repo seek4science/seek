@@ -1,9 +1,10 @@
 class ExtendedMetadataTypesController < ApplicationController
-  respond_to :json
+  respond_to :json, :html
   skip_before_action :project_membership_required
   before_action :is_user_admin_auth, except: [:form_fields, :show, :index]
   before_action :find_requested_item, only: [:administer_update, :show]
   include Seek::IndexPager
+  include Seek::UploadHandling::DataUpload
 
   # generated for form, to display fields for selected metadata type
   def form_fields
@@ -25,18 +26,80 @@ class ExtendedMetadataTypesController < ApplicationController
   end
 
 
+
+
+  # def upload_file
+  #   uploaded_file = params[:emt_json_file]
+  #
+  #   dir = Seek::Config.append_filestore_path('source_types')
+  #
+  #   if Dir.exist?(dir)
+  #     `rm #{dir}/*`
+  #   else
+  #     FileUtils.mkdir_p(dir)
+  #   end
+  #
+  #   File.open(Rails.root.join(dir, uploaded_file.original_filename), 'wb') do |file|
+  #     file.write(uploaded_file.read)
+  #   end
+  #
+  #   return if running?
+  #
+  #   begin
+  #     running!
+  #     PopulateExtendedMetadataTypeJob.new.queue_job
+  #   rescue StandardError
+  #     done!
+  #   end
+  # end
+
+
+  def upload_file
+    dir = Seek::Config.append_filestore_path('uploaded_emt_files')
+    uploaded_file = params[:emt_json_file]
+    filepath = Rails.root.join(dir, uploaded_file.original_filename)
+    File.write(filepath, uploaded_file.read)
+
+    job = PopulateExtendedMetadataTypeJob.new(filepath.to_s).queue_job
+
+    session[:job_id] = job.provider_job_id
+    # Redirect or respond to indicate the job has been started
+    respond_to do |format|
+      format.html { redirect_to administer_extended_metadata_types_path, notice: 'Your extended metadata json file upload started.' }
+    end
+  end
+
+  def emt_populate_job_status
+    job = Delayed::Job.find_by(id: session[:job_id])
+    status = if job.nil?
+               session.delete(:job_id)
+               'completed'
+             else
+               'processing'
+             end
+
+    respond_to do |format|
+      format.json { render json: { status: status } }
+    end
+  end
+
   def new
-    @extended_metadata_type = ExtendedMetadataType.new
+    set_status
     respond_to do |format|
       format.html
     end
   end
 
   def show
-     respond_to do |format|
-        format.json {render json: @extended_metadata_type}
-      end
+    respond_to do |format|
+       format.json {render json: @extended_metadata_type}
+     end
   end
+
+  def task_status
+    render partial: 'result'
+  end
+
 
   def index
     @extended_metadata_types = ExtendedMetadataType.all.reject { |type| type.supported_type == 'ExtendedMetadata' }
@@ -52,11 +115,8 @@ class ExtendedMetadataTypesController < ApplicationController
        end
        format.html
      end
-  end
+    end
 
-  def create
-    
-  end
 
   def administer_update
     @extended_metadata_type.update(extended_metadata_type_params)
@@ -79,6 +139,50 @@ class ExtendedMetadataTypesController < ApplicationController
 
   def extended_metadata_type_params
     params.require(:extended_metadata_type).permit(:title, :enabled)
+  end
+
+
+  def find_emt
+    @extended_metadata_type = ExtendedMetadataType.find(params[:id])
+  end
+
+
+  def set_status
+    if File.exist?(lockfile)
+      @status = 'working'
+    elsif File.exist?(resultfile)
+  res = File.read(resultfile)
+  @status = res
+  `rm #{resultfile}`
+    else
+  @status = 'not_started'
+end
+  end
+
+
+
+
+
+  def lockfile
+    Rails.root.join(Seek::Config.temporary_filestore_path, 'populate_extended_metadata_type.lock')
+  end
+
+  def resultfile
+    Rails.root.join(Seek::Config.temporary_filestore_path, 'populate_extended_metadata_type.result')
+  end
+
+
+  def running!
+    `touch #{lockfile}`
+     set_status
+  end
+
+  def done!
+    `rm -f #{lockfile}`
+  end
+
+  def running?
+    File.exist?(lockfile)
   end
 
 end

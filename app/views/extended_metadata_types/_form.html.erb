@@ -1,19 +1,26 @@
-<%= form_for(@extended_metadata_type, html: { multipart: true }) do |f| %>
-    <%= f.error_messages %>
+<%= form_tag upload_file_extended_metadata_types_path, method: "post", id: "extended_metadata_type_upload_from", multipart: true do -%>
+  <%= folding_panel("JSON file", false, :body_options => {:id => 'add_extended_metadata_type_file_fold_content'},
+                    :help_text => "Here you can upload #{t('extended_metadata_type')} JSON file to populate the #{t('extended_metadata_type').pluralize()}.") do %>
 
-    <div class="tab-content">
-
-      <% if @extended_metadata_type.new_record? %>
-            <div class="form-group">
-              <label class="required">File to upload</label>
-              <%= file_field_tag "content_blobs[][data]", { "data-batch-upload": false } -%>
-            </div>
-      <% end %>
+    <div role="tabpanel" data-role="seek-upload-field">
+      <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="upload-field-tab active">
+          <a data-role="seek-upload-field-tab" data-tab-target="local-file" role="tab" data-toggle="tab">Local file</a>
+        </li>
+      </ul>
+      <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" data-role="seek-upload-field-tab-pane" data-tab-id="local-file">
+          <div class="form-group">
+            <%= file_field_tag "emt_json_file", :accept => 'application/json' -%>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <p class="actions">
-      <%= f.submit (@extended_metadata_type.new_record? ? 'Create' : 'Update'), class: 'btn btn-primary' %>
-      or
-      <%= cancel_button(@extended_metadata_type.new_record? ? administer_extended_metadata_types_path : extended_metadata_type_path(@extended_metadata_type)) %>
-    </p>
-<% end %>
+  <% end %>
+
+
+  <input value="Upload" type="submit" class="btn btn-primary" >
+  or
+  <%= cancel_button admin_path-%>
+<% end -%>

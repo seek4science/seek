@@ -61,3 +61,30 @@
 </table>
 
 
+<script>
+  alert(<%= session[:job_id] %>);
+    var jobIdPresent = <%= session[:job_id].present? ? 'true' : 'false' %>;
+    $j(document).ready(function() {
+        if (jobIdPresent) {
+            function checkJobStatus() {
+                $j.ajax({
+                    url: "<%= emt_populate_job_status_extended_metadata_types_path %>",
+                    dataType: "json",
+                    success: function(data) {
+                        if (data.status === 'completed') {
+                            // Update the UI to show the job is completed
+                            console.log("Completed...");
+                            // Stop checking the job status
+                            clearInterval(statusCheckInterval);
+                        } else {
+                            // Optionally update the UI to show the job is still processing
+                            console.log("Processing...");
+                        }
+                    }
+                });
+            }
+
+            var statusCheckInterval = setInterval(checkJobStatus, 5000); // Check every 5 seconds
+        }
+    });
+</script>
