@@ -171,18 +171,17 @@ module ApiTestHelper
 
   def user_login(person = FactoryBot.create(:person))
     @current_user = person.user
-    @read_application = FactoryBot.create(:oauth_application, scopes: 'read')
-    @write_application = FactoryBot.create(:oauth_application, scopes: 'write')
-    @read_access_token = FactoryBot.create(:oauth_access_token, scopes: 'read', application: @read_application, resource_owner_id: @current_user.id)
-    @write_access_token = FactoryBot.create(:oauth_access_token, scopes: 'write', application: @write_application, resource_owner_id: @current_user.id)
-  end
-
-  def write_access_auth
-    "Bearer #{@write_access_token.token}"
+    @api_application ||= FactoryBot.create(:oauth_application, scopes: 'read,write')
+    @read_access_token = FactoryBot.create(:oauth_access_token, scopes: 'read', application: @api_application, resource_owner_id: @current_user.id)
+    @write_access_token = FactoryBot.create(:oauth_access_token, scopes: 'write', application: @api_application, resource_owner_id: @current_user.id)
   end
 
   def read_access_auth
     "Bearer #{@read_access_token.token}"
+  end
+
+  def write_access_auth
+    "Bearer #{@write_access_token.token}"
   end
 
   def id
