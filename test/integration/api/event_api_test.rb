@@ -28,7 +28,7 @@ class EventApiTest < ActionDispatch::IntegrationTest
     to_post = load_template('post_bad_event.json.erb')
 
     assert_no_difference(-> { model.count }) do
-      post "/#{plural_name}.json", params: to_post
+      post collection_url, params: to_post, headers: { 'Authorization' => write_access_auth }
       #assert_response :unprocessable_entity
     end
 

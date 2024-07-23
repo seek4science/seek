@@ -4,6 +4,8 @@ class ExtendedMetadataTypesController < ApplicationController
   before_action :find_requested_item, only: [:administer_update, :show]
   include Seek::IndexPager
 
+  api_actions :index, :show
+
   # generated for form, to display fields for selected metadata type
   def form_fields
     id = params[:id]
