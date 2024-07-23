@@ -22,7 +22,7 @@ class ProjectApiTest < ActionDispatch::IntegrationTest
     user_login(FactoryBot.create(:person))
     body = api_max_post_body
     assert_no_difference('Project.count') do
-      post "/projects.json", params: body, as: :json
+      post collection_url, params: body, headers: { 'Authorization' => write_access_auth }
     end
   end
 
@@ -35,7 +35,7 @@ class ProjectApiTest < ActionDispatch::IntegrationTest
 
     assert_empty project.people
 
-    get project_path(project, format: :json)
+    get project_path(project, format: :json), headers: { 'Authorization' => read_access_auth }
 
     project_json = JSON.parse(@response.body)
 
@@ -45,7 +45,7 @@ class ProjectApiTest < ActionDispatch::IntegrationTest
       { person_id: "#{new_person3.id}", institution_id: "#{new_institution.id}" }
     ]
 
-    patch project_path(project, format: :json), params: project_json, as: :json
+    patch project_path(project, format: :json), as: :json, params: project_json, headers: { 'Authorization' => write_access_auth }
     assert_response :success
 
     people = project.reload.people.to_a
@@ -76,7 +76,7 @@ class ProjectApiTest < ActionDispatch::IntegrationTest
       }
     }
 
-    patch project_path(project, format: :json), params: to_patch, as: :json
+    patch project_path(project, format: :json), params: to_patch, headers: { 'Authorization' => write_access_auth }
     assert_response :success
 
     people = project.reload.people.to_a

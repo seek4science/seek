@@ -23,7 +23,7 @@ class InstitutionApiTest < ActionDispatch::IntegrationTest
     user_login(FactoryBot.create(:person))
     body = api_max_post_body
     assert_no_difference('Institution.count') do
-      post collection_url, params: body, as: :json
+      post collection_url, params: body, headers: { 'Authorization' => write_access_auth }
     end
   end
 end

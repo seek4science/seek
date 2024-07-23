@@ -16,6 +16,8 @@ class HumanDiseasesController < ApplicationController
   include Seek::ExternalServiceWrapper
   include Seek::IndexPager
 
+  api_actions :index, :show, :create, :update, :destroy
+
   def show
     respond_to do |format|
       format.html

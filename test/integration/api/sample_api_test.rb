@@ -114,7 +114,7 @@ class SampleApiTest < ActionDispatch::IntegrationTest
       }
     }
     assert_difference('Sample.count') do
-      post samples_path(format: :json), params: params, as: :json
+      post samples_path(format: :json), params: params, headers: { 'Authorization' => write_access_auth }
     end
     assert_response :success
     sample = Sample.last
@@ -162,7 +162,7 @@ class SampleApiTest < ActionDispatch::IntegrationTest
     }
 
     assert_difference('Sample.count') do
-      post samples_path(format: :json), params: params, as: :json
+      post samples_path(format: :json), params: params, headers: { 'Authorization' => write_access_auth }
     end
     assert_response :success
 
@@ -214,7 +214,7 @@ class SampleApiTest < ActionDispatch::IntegrationTest
     }
 
     assert_difference('Sample.count') do
-      post samples_path(format: :json), params: params, as: :json
+      post samples_path(format: :json), params: params, headers: { 'Authorization' => write_access_auth }
     end
     assert_response :success
 
@@ -280,7 +280,7 @@ class SampleApiTest < ActionDispatch::IntegrationTest
     assert_difference('Sample.count', 0) do
       assert_difference('AssayAsset.count', 0) do
         assert_difference('SampleType.count', 0) do
-          post "/samples/batch_create", as: :json, params: params
+          post "/samples/batch_create", as: :json, params: params, headers: { 'Authorization' => write_access_auth }
           assert_response :success
         end
       end
@@ -291,7 +291,7 @@ class SampleApiTest < ActionDispatch::IntegrationTest
     assert_difference('Sample.count', 2) do
       assert_difference('AssayAsset.count', 2) do
         assert_difference('SampleType.count', 0) do
-          post "/samples/batch_create", as: :json, params: params
+          post "/samples/batch_create", as: :json, params: params, headers: { 'Authorization' => write_access_auth }
           assert_response :success
         end
       end

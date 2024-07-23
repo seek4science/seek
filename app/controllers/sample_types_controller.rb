@@ -12,7 +12,7 @@ class SampleTypesController < ApplicationController
 
   before_action :authorize_requested_sample_type, except: [:index, :new, :create]
 
-  api_actions :index
+  api_actions :index, :show, :create, :update, :destroy
 
   # GET /sample_types/1  ,'sample_attributes','linked_sample_attributes'
   # GET /sample_types/1.json

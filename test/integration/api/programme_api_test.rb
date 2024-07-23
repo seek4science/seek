@@ -17,7 +17,7 @@ class ProgrammeApiTest < ActionDispatch::IntegrationTest
     user_login(a_person)
     body = api_max_post_body
     assert_difference('Programme.count') do
-      post "/programmes.json", params: body, as: :json
+      post collection_url, params: body, headers: { 'Authorization' => write_access_auth }
       assert_response :success
     end
   end
@@ -34,7 +34,7 @@ class ProgrammeApiTest < ActionDispatch::IntegrationTest
     body["data"]['attributes']['title'] = "Updated programme"
     #change_funding_codes_before_CU("min")
 
-    patch "/programmes/#{prog.id}.json", params: body, as: :json
+    patch member_url(prog), params: body, headers: { 'Authorization' => write_access_auth }
     assert_response :success
   end
 
@@ -47,7 +47,7 @@ class ProgrammeApiTest < ActionDispatch::IntegrationTest
 
     #programme has projects ==> cannot delete
     assert_no_difference('Programme.count', -1) do
-      delete "/programmes/#{prog.id}.json"
+      delete member_url(prog), headers: { 'Authorization' => write_access_auth }
       assert_response :forbidden
       validate_json response.body, '#/components/schemas/forbiddenResponse'
     end
@@ -56,11 +56,11 @@ class ProgrammeApiTest < ActionDispatch::IntegrationTest
     prog.projects = []
     prog.save!
     assert_difference('Programme.count', -1) do
-      delete "/programmes/#{prog.id}.json"
+      delete member_url(prog), headers: { 'Authorization' => write_access_auth }
       assert_response :success
     end
 
-    get "/programmes/#{prog.id}.json"
+    get member_url(prog), headers: { 'Authorization' => read_access_auth }
     assert_response :not_found
     validate_json response.body, '#/components/schemas/notFoundResponse'
   end
