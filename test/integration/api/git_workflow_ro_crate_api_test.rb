@@ -17,7 +17,7 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
     Seek::Config.git_support_enabled = @git_support
   end
 
-  test 'can post RO crate' do
+  test 'can post RO-Crate' do
     assert_difference('Workflow.count', 1) do
       post workflows_path, params: {
         ro_crate: fixture_file_upload('workflows/ro-crate-nf-core-ampliseq.crate.zip'),
@@ -48,11 +48,22 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
         }, headers: { 'Authorization' => write_access_auth }
 
         assert_response :success
-        assert_equal 2, assigns(:workflow).reload.version
-        assert_equal 'Nextflow', assigns(:workflow).workflow_class.title
-        assert_equal 'nf-core/ampliseq', assigns(:workflow).title
-        assert assigns(:workflow).git_version.total_size > 100
-        assert_equal 'main.nf', assigns(:workflow).ro_crate.main_workflow.id
+        workflow = assigns(:workflow).reload
+        old_version = workflow.find_version(1)
+        new_version = workflow.git_version
+
+        assert_equal 2, workflow.version
+        assert_equal 'Nextflow', workflow.workflow_class.title
+        assert_equal 'Nextflow', new_version.workflow_class.title
+        assert_equal 'Galaxy', old_version.workflow_class.title
+        assert_equal 'nf-core/ampliseq', workflow.title
+        assert_equal 'nf-core/ampliseq', new_version.title
+        assert_equal 'Concat two files', old_version.title
+        assert new_version.total_size > 100
+        assert_equal 'main.nf', workflow.main_workflow_path
+        assert_equal 'main.nf', new_version.main_workflow_path
+        assert_equal 'main.nf', workflow.ro_crate.main_workflow.id
+        assert_equal 'concat_two_files.ga', old_version.main_workflow_path
       end
     end
   end
@@ -71,12 +82,12 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
         }, headers: { 'Authorization' => write_access_auth }
 
         assert_response :unprocessable_entity
-        assert @response.body.include?('Cannot add RO-Crate to remote workflows')
+        assert JSON.parse(@response.body)['errors'].any? { |e| e['detail'].include?('Cannot add RO-Crate to remote workflows') }
       end
     end
   end
 
-  test 'cannot post RO crate with missing metadata' do
+  test 'cannot post RO-Crate with missing metadata' do
     assert_no_difference('Workflow.count') do
       post workflows_path, params: {
         ro_crate: fixture_file_upload('workflows/workflow-4-1.crate.zip'),
@@ -86,11 +97,11 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
       }, headers: { 'Authorization' => write_access_auth }
 
       assert_response :unprocessable_entity
-      assert @response.body.include?("can't be blank")
+      assert JSON.parse(@response.body)['errors'].any? { |e| e['detail'].include?("can't be blank") }
     end
   end
 
-  test 'can supplement metadata when posting RO crate' do
+  test 'can supplement metadata when posting RO-Crate' do
     assert_difference('Workflow.count', 1) do
       post workflows_path, params: {
         ro_crate: fixture_file_upload('workflows/workflow-4-1.crate.zip'),
@@ -289,6 +300,36 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
         }, headers: { 'Authorization' => read_access_auth }
 
         assert_response :forbidden
+      end
+    end
+  end
+
+  test 'submitted workflow takes project default policy' do
+    project_admin = FactoryBot.create(:project_administrator)
+    disable_authorization_checks do
+      @project.default_policy = FactoryBot.create(:private_policy)
+      @project.default_policy.permissions << Permission.new(contributor: @project, access_type: Policy::EDITING)
+      @project.default_policy.permissions << Permission.new(contributor: project_admin, access_type: Policy::MANAGING)
+      @project.default_policy.save!
+      @project.use_default_policy = true
+      @project.save!
+    end
+
+    assert_difference('Workflow.count', 1) do
+      assert_difference('Git::Version.count', 1) do
+        post submit_workflows_path, params: {
+          ro_crate: fixture_file_upload('workflows/ro-crate-with-id.crate.zip'),
+          workflow: {
+            project_ids: [@project.id]
+          }
+        }, headers: { 'Authorization' => write_access_auth }
+
+        assert_response :success
+        assert_equal 'Galaxy', assigns(:workflow).workflow_class.title
+        policy = assigns(:workflow).policy
+        assert_equal 2, policy.permissions.count
+        assert policy.permissions.detect { |p| p.contributor == project_admin && p.access_type == Policy::MANAGING }
+        assert policy.permissions.detect { |p| p.contributor == @project && p.access_type == Policy::EDITING }
       end
     end
   end
