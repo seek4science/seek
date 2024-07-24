@@ -159,14 +159,6 @@ class SampleTypeEditingConstraintsTest < ActiveSupport::TestCase
     refute c.send(:all_blank?, 'full name')
   end
 
-  test 'allow_new_attribute' do
-    # currently only allowed if there are not samples
-    c = Seek::Samples::SampleTypeEditingConstraints.new(sample_type_with_samples)
-    refute c.allow_new_attribute?
-    c = Seek::Samples::SampleTypeEditingConstraints.new(FactoryBot.create(:simple_sample_type))
-    assert c.allow_new_attribute?
-  end
-
   test 'allow editing isa tag' do
     person = FactoryBot.create(:person)
     project = person.projects.first

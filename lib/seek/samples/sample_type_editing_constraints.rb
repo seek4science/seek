@@ -49,11 +49,6 @@ module Seek
         end
       end
 
-      # whether a new attribtue can be created
-      def allow_new_attribute?
-        !samples?
-      end
-
       # whether the name of the attribute can be changed
       def allow_name_change?(attr)
         if attr.is_a?(SampleAttribute)
