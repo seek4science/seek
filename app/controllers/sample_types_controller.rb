@@ -204,6 +204,6 @@ class SampleTypesController < ApplicationController
   end
 
   def update_sample_json_metadata
-    UpdateSampleMetadataJob.perform_later(@sample_type)
+    UpdateSampleMetadataJob.perform_later(@sample_type) unless @sample_type.samples.blank?
   end
 end
