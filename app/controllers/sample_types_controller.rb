@@ -13,6 +13,7 @@ class SampleTypesController < ApplicationController
   before_action :auth_to_create, only: %i[new create]
   before_action :project_membership_required, only: %i[create new select filter_for_select]
 
+  after_action :update_sample_json_metadata, only: :update
 
   api_actions :index, :show, :create, :update, :destroy
 
@@ -200,5 +201,9 @@ class SampleTypesController < ApplicationController
       flash[:error] = "Cannot #{action_name} this sample type - There are #{count} samples using it."
       redirect_to @sample_type
     end
+  end
+
+  def update_sample_json_metadata
+    UpdateSampleMetadataJob.perform_later(@sample_type)
   end
 end
