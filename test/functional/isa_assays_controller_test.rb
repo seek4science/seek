@@ -560,7 +560,7 @@ class IsaAssaysControllerTest < ActionController::TestCase
 
   end
 
-  test 'Should create the same policies for the sample types' do
+  test 'Should create the same policies for the sample type' do
     person = FactoryBot.create(:person_not_in_project)
     second_person = FactoryBot.create(:person_not_in_project)
     institution = FactoryBot.create(:institution)

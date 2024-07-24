@@ -44,6 +44,7 @@ class IsaAssaysController < ApplicationController
   end
 
   def create
+    update_sharing_policies @isa_assay.assay
     @isa_assay.sample_type.policy = @isa_assay.assay.policy
     if @isa_assay.save
       flash[:notice] = "The #{t('isa_assay')} was successfully created.<br/>".html_safe
@@ -67,6 +68,7 @@ class IsaAssaysController < ApplicationController
   end
 
   def update
+    update_sharing_policies @isa_assay.assay
     @isa_assay.assay.attributes = isa_assay_params[:assay]
     @isa_assay.sample_type.policy = @isa_assay.assay.policy
     # update the sample_type
