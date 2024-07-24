@@ -20,6 +20,9 @@ module Seek
 
         samples.each do |sample|
           metadata = JSON.parse(sample.json_metadata)
+          # Skip this sample if the sample attributes are the same as the JSON metadata keys
+          next if metadata.keys == sample_attributes
+
           missing_attributes = sample_attributes - metadata.keys
           missing_attributes.map do |attr|
             metadata[attr] = nil
@@ -30,7 +33,7 @@ module Seek
             metadata.delete(attr)
           end
           # For now permission are skipped and all samples will be updated
-          Sample.find(sample.id).update_column(json_metadata, metadata.to_json)
+          sample.update_column(:json_metadata, metadata.to_json)
         end
       end
     end
