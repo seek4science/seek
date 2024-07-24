@@ -753,6 +753,28 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_select 'a', text: 'Manage Sample Type', count: 0
   end
 
+  test 'add new attribute to an existing sample type populated with samples' do
+    sample_type = FactoryBot.create(:simple_sample_type, project_ids: @project_ids, contributor: @person)
+    samples = (1..10).map do |i|
+      FactoryBot.create(:sample, contributor: @person, project_ids: @project_ids, sample_type:)
+    end
+    refute_empty sample_type.samples
+    login_as(@person)
+    get :edit, params: { id: sample_type.id }
+    assert_response :success
+    assert_select 'a#add-attribute', count: 1
+    assert_difference('SampleAttribute.count') do
+      put :update, params: { id: sample_type.id, sample_type: {
+        sample_attributes_attributes: {
+          '1': { title: 'new attribute', sample_attribute_type_id: @string_type.id }
+        }
+      } }
+    end
+    assert_redirected_to sample_type_path(sample_type)
+    sample_type.reload
+    assert_equal 'new attribute', sample_type.sample_attributes.last.title
+  end
+
   private
 
   def template_for_upload
