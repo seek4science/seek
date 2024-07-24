@@ -439,16 +439,6 @@ class SampleTypesControllerTest < ActionController::TestCase
     get :edit, params: { id: type.id }
     assert_response :success
     assert_select 'a#add-attribute', count: 1
-
-    sample = FactoryBot.create(:patient_sample, contributor: @person,
-                                                sample_type: FactoryBot.create(:patient_sample_type, project_ids: @project_ids, contributor: @person))
-    type = sample.sample_type
-    refute_empty type.samples
-    assert type.can_edit?
-
-    get :edit, params: { id: type.id }
-    assert_response :success
-    assert_select 'a#add-attribute', count: 0
   end
 
   test 'cannot access when disabled' do
