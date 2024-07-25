@@ -233,7 +233,7 @@ The type of attribute determines the syntax of acceptable values for the attribu
 * ISA-JSON compliant sample types: When creating ISA-JSON compliant ISA, a sample type is created alongside.
   The permissions for ISA-JSON compliant sample types differ from regular sample types:
 
-  | | ISA-JSON compliant sample type | Regular compliant sample type |
+  | | ISA-JSON compliant sample type | Regular sample type |
   |--|-------------------------------|-------------------------------|
   | View | Visible from the ISA, otherwise hidden to the users. | Visible if the user is a **Project member** or **the creator** of the sample type. If the sample type has **public samples**, it can be viewed publicly. |
   | Download template.xlsx | Not possible to download the template xlsx. Instead use the [batch download feature](help/user-guide/create-sample-isajson-compliant.html#via-upload-of-the-downloaded-dynamic-table) for downloading the the sample type with its samples. | The same rules are applied for downloading the template.xlsx as for viewing the sample type. |
