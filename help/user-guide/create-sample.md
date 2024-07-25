@@ -50,3 +50,13 @@ Once clicking the preview button you will be shown a table displaying the extrac
 will be shown (i.e ones that don't match the attribute constraints). If you are happy, you can proceed to add the samples, 
 or you may want to edit the datafile and upload as a new version before extracting the samples. 
 Once samples have been extracted you will not be able to upload a new version.
+
+**Note: Syntax for linking samples in the Template spreadsheet**
+
+If you want to link to other registered samples in a sample type, you need to specify the ID's of those sample in the template spreadsheet.
+
+![example for registered samples](../../images/user-guide/example_registered_sample.png)
+
+The ID can be retrieved from the url. Example:
+- **SEEK url:** https://www.example.com/samples/986
+- **Sample ID:** 986
