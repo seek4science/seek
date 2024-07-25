@@ -15,8 +15,6 @@
 </div>
 <br>
 
-<%#= link_to 'New', new_extended_metadata_type_path, class: 'btn btn-primary' %>
-
 <% nested, top_level = @extended_metadata_types.partition(&:extended_type?) %>
 
 <div class="alert alert-info">
@@ -64,27 +62,38 @@
 <script>
   alert(<%= session[:job_id] %>);
     var jobIdPresent = <%= session[:job_id].present? ? 'true' : 'false' %>;
+    //alert(<%#= session[:job_id] %>);
     $j(document).ready(function() {
-        if (jobIdPresent) {
-            function checkJobStatus() {
-                $j.ajax({
-                    url: "<%= emt_populate_job_status_extended_metadata_types_path %>",
-                    dataType: "json",
-                    success: function(data) {
-                        if (data.status === 'completed') {
-                            // Update the UI to show the job is completed
-                            console.log("Completed...");
-                            // Stop checking the job status
-                            clearInterval(statusCheckInterval);
-                        } else {
-                            // Optionally update the UI to show the job is still processing
-                            console.log("Processing...");
-                        }
-                    }
-                });
-            }
+        var noticeFlashDiv = $j("#notice_flash");
+        noticeFlashDiv.removeClass('alert-success').addClass('alert-warning').append('<div>Extraction Processing ... <%= image 'spinner' %></div>').show();
 
+        function updateJobStatusDisplay(status) {
+            if (status === 'completed') {
+                noticeFlashDiv.removeClass('alert-warning').addClass('alert-success');
+                noticeFlashDiv.html('Job completed, please reload the page!');
+                noticeFlashDiv.show();
+            }
+        }
+
+        function checkJobStatus() {
+            $j.ajax({
+                url: "<%= emt_populate_job_status_extended_metadata_types_path %>",
+                dataType: "json",
+                success: function(data) {
+                    updateJobStatusDisplay(data.status);
+                    if (data.status === 'completed') {
+                        console.log("Completed...");
+                        clearInterval(statusCheckInterval);
+                    } else {
+                        console.log("Processing...");
+                    }
+                }
+            });
+        }
+
+        if (jobIdPresent) {
             var statusCheckInterval = setInterval(checkJobStatus, 5000); // Check every 5 seconds
+            checkJobStatus(); // Check immediately on page load
         }
     });
 </script>

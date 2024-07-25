@@ -26,34 +26,6 @@ class ExtendedMetadataTypesController < ApplicationController
   end
 
 
-
-
-  # def upload_file
-  #   uploaded_file = params[:emt_json_file]
-  #
-  #   dir = Seek::Config.append_filestore_path('source_types')
-  #
-  #   if Dir.exist?(dir)
-  #     `rm #{dir}/*`
-  #   else
-  #     FileUtils.mkdir_p(dir)
-  #   end
-  #
-  #   File.open(Rails.root.join(dir, uploaded_file.original_filename), 'wb') do |file|
-  #     file.write(uploaded_file.read)
-  #   end
-  #
-  #   return if running?
-  #
-  #   begin
-  #     running!
-  #     PopulateExtendedMetadataTypeJob.new.queue_job
-  #   rescue StandardError
-  #     done!
-  #   end
-  # end
-
-
   def upload_file
     dir = Seek::Config.append_filestore_path('uploaded_emt_files')
     uploaded_file = params[:emt_json_file]
@@ -65,7 +37,9 @@ class ExtendedMetadataTypesController < ApplicationController
     session[:job_id] = job.provider_job_id
     # Redirect or respond to indicate the job has been started
     respond_to do |format|
-      format.html { redirect_to administer_extended_metadata_types_path, notice: 'Your extended metadata json file upload started.' }
+      format.html {
+ redirect_to administer_extended_metadata_types_path, 
+             notice: 'Your JSON file for extracting the extended metadata type has been uploaded. ' }
     end
   end
 
@@ -84,7 +58,6 @@ class ExtendedMetadataTypesController < ApplicationController
   end
 
   def new
-    set_status
     respond_to do |format|
       format.html
     end
@@ -146,43 +119,5 @@ class ExtendedMetadataTypesController < ApplicationController
     @extended_metadata_type = ExtendedMetadataType.find(params[:id])
   end
 
-
-  def set_status
-    if File.exist?(lockfile)
-      @status = 'working'
-    elsif File.exist?(resultfile)
-  res = File.read(resultfile)
-  @status = res
-  `rm #{resultfile}`
-    else
-  @status = 'not_started'
-end
-  end
-
-
-
-
-
-  def lockfile
-    Rails.root.join(Seek::Config.temporary_filestore_path, 'populate_extended_metadata_type.lock')
-  end
-
-  def resultfile
-    Rails.root.join(Seek::Config.temporary_filestore_path, 'populate_extended_metadata_type.result')
-  end
-
-
-  def running!
-    `touch #{lockfile}`
-     set_status
-  end
-
-  def done!
-    `rm -f #{lockfile}`
-  end
-
-  def running?
-    File.exist?(lockfile)
-  end
 
 end
