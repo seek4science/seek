@@ -230,6 +230,15 @@ The type of attribute determines the syntax of acceptable values for the attribu
 <!--From info icon:-->A Sample Type is a form with samples' attributes needed to describe and create samples in SEEK. A Sample Type must be associated with one or more Projects.
 * Spreadsheet template: to create a Sample Type in SEEK starting from an excel spreadsheet file. The name of the first sheet or tab must contain the word "sample". The Sample Type created based on the spreadsheet template has attributes based on the column heading in the first row of the first sheet.
 * Template.xlsx: to download a Sample Type registered in SEEK as an empty (without samples) spreadsheet "template.xlsx". Column heading and associated dropdown list will be downloaded as well.
+* ISA-JSON compliant sample types: When creating ISA-JSON compliant ISA, a sample type is created alongside.
+  The permissions for ISA-JSON compliant sample types differ from regular sample types:
+
+  | | ISA-JSON compliant sample type | Regular compliant sample type |
+  |--|-------------------------------|-------------------------------|
+  | View | Visible from the ISA, otherwise hidden to the users. | Visible if the user is a **Project member** or **the creator** of the sample type. If the sample type has **public samples**, it can be viewed publicly. |
+  | Download template.xlsx | Not possible to download the template xlsx. Instead use the [batch download feature](help/user-guide/create-sample-isajson-compliant.html#via-upload-of-the-downloaded-dynamic-table) for downloading the the sample type with its samples. | The same rules are applied for downloading the template.xlsx as for viewing the sample type. |
+  | Edit | **Instance administrators**, **contributors** and **project members** can edit an existing sample type.                        | **Instance administrators**, **contributors** and **project administrators** can edit an existing sample type. |
+  | Delete | The sample type must not have any **samples** and the user should have **editing permissions** to the sample type. | The sample type must not have any **samples** or any **linked sample types**, and the user should have **editing permissions** to the sample type. |
 
 ### Experiment Sample Templates
 <!--From info icon:-->Experiment Sample Templates are blueprints that can be reused and applied to Study and Assay for describing Samples within experiments compliant with the ISA framework (ISA-JSON compliant). Experiment Sample Templates must be associated with one or more Projects.
