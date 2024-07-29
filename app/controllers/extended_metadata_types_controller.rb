@@ -5,6 +5,7 @@ class ExtendedMetadataTypesController < ApplicationController
   before_action :find_requested_item, only: [:administer_update, :show]
   include Seek::IndexPager
   include Seek::UploadHandling::DataUpload
+  before_action :find_extended_metadata_type, only: [:show]
   after_action :log_event, only: [:emt_populate_job_status], if: -> { @status == 'completed' }
 
   # generated for form, to display fields for selected metadata type
@@ -67,6 +68,7 @@ class ExtendedMetadataTypesController < ApplicationController
   def show
     respond_to do |format|
        format.json {render json: @extended_metadata_type}
+       format.html
      end
   end
 
@@ -111,7 +113,7 @@ class ExtendedMetadataTypesController < ApplicationController
   end
 
 
-  def find_emt
+  def find_extended_metadata_type
     @extended_metadata_type = ExtendedMetadataType.find(params[:id])
   end
 
