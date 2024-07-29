@@ -16,6 +16,7 @@
 <br>
 
 <% nested, top_level = @extended_metadata_types.partition(&:extended_type?) %>
+<% top_level.sort_by! { |emt| -emt.id } %>
 
 <div class="alert alert-info">
   <p>
@@ -60,7 +61,7 @@
 
 
 <script>
-  alert(<%= session[:job_id] %>);
+
     var jobIdPresent = <%= session[:job_id].present? ? 'true' : 'false' %>;
     //alert(<%#= session[:job_id] %>);
     $j(document).ready(function() {
