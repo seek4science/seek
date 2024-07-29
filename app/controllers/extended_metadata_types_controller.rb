@@ -5,6 +5,7 @@ class ExtendedMetadataTypesController < ApplicationController
   before_action :find_requested_item, only: [:administer_update, :show]
   include Seek::IndexPager
   include Seek::UploadHandling::DataUpload
+  after_action :log_event, only: [:emt_populate_job_status], if: -> { @status == 'completed' }
 
   # generated for form, to display fields for selected metadata type
   def form_fields
@@ -45,7 +46,7 @@ class ExtendedMetadataTypesController < ApplicationController
 
   def emt_populate_job_status
     job = Delayed::Job.find_by(id: session[:job_id])
-    status = if job.nil?
+    @status = if job.nil?
                session.delete(:job_id)
                'completed'
              else
@@ -53,7 +54,7 @@ class ExtendedMetadataTypesController < ApplicationController
              end
 
     respond_to do |format|
-      format.json { render json: { status: status } }
+      format.json { render json: { status: @status } }
     end
   end
 
@@ -68,11 +69,6 @@ class ExtendedMetadataTypesController < ApplicationController
        format.json {render json: @extended_metadata_type}
      end
   end
-
-  def task_status
-    render partial: 'result'
-  end
-
 
   def index
     @extended_metadata_types = ExtendedMetadataType.all.reject { |type| type.supported_type == 'ExtendedMetadata' }
@@ -117,6 +113,18 @@ class ExtendedMetadataTypesController < ApplicationController
 
   def find_emt
     @extended_metadata_type = ExtendedMetadataType.find(params[:id])
+  end
+
+  def log_event
+    User.with_current_user current_user do
+      ActivityLog.create(action: 'create',
+                         culprit: current_user,
+                         controller_name:self.controller_name.downcase,
+                         # todo: if this is the correct way to get the newest created extended_metadata_type
+                         activity_loggable: ExtendedMetadataType.all.last
+                       )
+
+    end
   end
 
 
