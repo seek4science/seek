@@ -26,4 +26,14 @@ module StudiesHelper
   def show_batch_miappe_button?
     ExtendedMetadataType.where(supported_type: 'Study', title: ExtendedMetadataType::MIAPPE_TITLE, enabled: true).any?
   end
+
+  # the selection dropdown box for selecting the study for a resource, such as assay or observation unit
+  def resource_study_selection(element_name, current_study)
+    grouped_options = grouped_options_for_study_selection(current_study)
+    blank = current_study.blank? ? 'Not specified' : nil
+    disabled = current_study && !current_study.can_edit?
+    options = grouped_options_for_select(grouped_options, current_study.try(:id))
+    select_tag(element_name, options,
+               class: 'form-control', include_blank: blank, disabled: disabled).html_safe
+  end
 end

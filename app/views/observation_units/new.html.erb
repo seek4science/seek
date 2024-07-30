@@ -1,5 +1,5 @@
 
-<h1>Editing <%= t('observation_unit') %>: <%= link_to(h(@observation_unit.title), observation_unit_path(@observation_unit)) -%></h1>
+<h1>New <%= t('observation_unit') %></h1>
 
 <%= form_for(@observation_unit) do |f| %>
   <div class="asset_form">
@@ -18,6 +18,13 @@
     <%= render partial: 'extended_metadata/extended_metadata_type_selection', locals: { f: f, resource: @observation_unit } %>
     <%= render partial: 'extended_metadata/extended_metadata_attribute_input', locals: { f: f, resource: @observation_unit } %>
 
+    <%= render partial: "projects/project_selector", locals: { resource: @observation_unit } %>
+
+    <div class="form-group">
+      <label class="required"><%= t('study') -%></label>
+
+      <%= resource_study_selection('observation_unit[study_id]', @observation_unit.study) %>
+    </div>
 
     <%= render partial: "assets/asset_form_bottom", locals: {show_publications:false, attribution_enable: false, f: f}-%>
 

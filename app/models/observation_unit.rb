@@ -10,6 +10,8 @@ class ObservationUnit < ApplicationRecord
   has_many :observation_unit_assets, inverse_of: :observation_unit, dependent: :delete_all, autosave: true
   has_many :data_files, through: :observation_unit_assets, source: :asset, source_type: 'DataFile', inverse_of: :observation_units
 
+  validates :study,  presence: true
+
   accepts_nested_attributes_for :data_files, allow_destroy: true
 
   has_extended_metadata
