@@ -5,7 +5,7 @@
 
 %>
 <tr class="<%= row_cls %>">
-  <td><%= extended_metadata_type.id %></td>
+  <td><%= link_to extended_metadata_type.id, extended_metadata_type_path(extended_metadata_type) %></td>
   <td><%= extended_metadata_type.title %></td>
   <td><%= extended_metadata_type.supported_type %></td>
   <td><%= extended_metadata_type.extended_metadatas.count %></td>
