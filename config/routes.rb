@@ -208,7 +208,7 @@ SEEK::Application.routes.draw do
       get :form_fields
       get :administer
       post :upload_file
-      get :emt_populate_job_status
+      get :populate_job_status
     end
     member do
       put :administer_update

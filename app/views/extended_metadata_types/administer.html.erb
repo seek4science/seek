@@ -41,7 +41,7 @@
   </div>
 <% end %>
 
-<table class='table table-hover'>
+<table class='table table-hover' id='extended-metadata-table'>
   <thead>
     <th>Internal Id</th>
     <th>Title</th>
@@ -63,27 +63,41 @@
 <script>
 
     var jobIdPresent = <%= session[:job_id].present? ? 'true' : 'false' %>;
-    //alert(<%#= session[:job_id] %>);
+
     $j(document).ready(function() {
+
         var noticeFlashDiv = $j("#notice_flash");
         noticeFlashDiv.removeClass('alert-success').addClass('alert-warning').append('<div>Extraction Processing ... <%= image 'spinner' %></div>').show();
 
-        function updateJobStatusDisplay(status) {
-            if (status === 'completed') {
-                noticeFlashDiv.removeClass('alert-warning').addClass('alert-success');
-                noticeFlashDiv.html('Job completed, please reload the page!');
-                noticeFlashDiv.show();
-            }
+        var containerFluidDiv = $j("#content .container-fluid");
+
+        if ($j("#notice_flash").length === 0) {
+            containerFluidDiv.prepend('<div id="notice_flash" class="alert-success" role="alert"></div>');
+        }
+
+        if (sessionStorage.getItem('jobCompleted') === 'true') {
+            sessionStorage.removeItem('jobCompleted');
+            updateJobStatusDisplay();
+            addNewMarker();
+        }
+
+
+        function updateJobStatusDisplay() {
+            var noticeFlashDiv = $j("#notice_flash");
+            noticeFlashDiv.addClass('alert alert-success');
+            noticeFlashDiv.html('Job completed');
+            noticeFlashDiv.show();
         }
 
         function checkJobStatus() {
             $j.ajax({
-                url: "<%= emt_populate_job_status_extended_metadata_types_path %>",
+                url: "<%= populate_job_status_extended_metadata_types_path %>",
                 dataType: "json",
                 success: function(data) {
-                    updateJobStatusDisplay(data.status);
                     if (data.status === 'completed') {
                         console.log("Completed...");
+                        sessionStorage.setItem('jobCompleted', 'true');
+                        location.reload();
                         clearInterval(statusCheckInterval);
                     } else {
                         console.log("Processing...");
@@ -91,6 +105,14 @@
                 }
             });
         }
+
+        function addNewMarker() {
+            var table = $j("#extended-metadata-table");
+            var row = table.find("tbody tr:first");
+            row.find("td:first").append(' <sup style="color:red; font-weight:bold;  font-size: 12px">new</sup>');
+        }
+
+
 
         if (jobIdPresent) {
             var statusCheckInterval = setInterval(checkJobStatus, 5000); // Check every 5 seconds

@@ -45,7 +45,7 @@ class ExtendedMetadataTypesController < ApplicationController
     end
   end
 
-  def emt_populate_job_status
+  def populate_job_status
     job = Delayed::Job.find_by(id: session[:job_id])
     @status = if job.nil?
                session.delete(:job_id)
