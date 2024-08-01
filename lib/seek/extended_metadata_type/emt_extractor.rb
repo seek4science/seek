@@ -16,8 +16,12 @@ module Seek
         puts ":data_hash: #{data_hash}"
         puts "**********************************"
 
-        create_extended_metadata_type_from_json(data_hash)
-
+        begin
+          create_extended_metadata_type_from_json(data_hash)
+        rescue StandardError => e
+          puts "Error: #{e.message}"
+          raise e
+        end
 
       end
 
@@ -43,7 +47,9 @@ module Seek
         if emt.save
           puts "ExtendedMetadataType '#{emt.title}' created successfully."
         else
-          puts "Failed to create ExtendedMetadataType: #{emt.errors.full_messages.join(', ')}"
+          error_message = "Failed to create ExtendedMetadataType: #{emt.errors.full_messages.join(', ')}"
+          puts error_message
+          raise StandardError, error_message
         end
         puts "_______________________________________________"
       end
