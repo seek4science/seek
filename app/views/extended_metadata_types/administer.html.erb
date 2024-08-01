@@ -43,15 +43,18 @@
 
 <ul class="nav nav-tabs" role="tablist">
   <li class="nav-item active in">
-    <a class="nav-link" id="top-level-tab" data-toggle="tab" href="#top-level" role="tab" aria-controls="top-level" aria-selected="true">Top Level</a>
+    <a class="nav-link" id="top-level-tab" data-toggle="tab" href="#top-level-metadata-table" role="tab" aria-controls="top-level" aria-selected="true">Top Level</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" id="nested-tab" data-toggle="tab" href="#nested" role="tab" aria-controls="nested" aria-selected="false">Nested</a>
+    <a class="nav-link" id="nested-tab" data-toggle="tab" href="#nested-metadata-table" role="tab" aria-controls="nested" aria-selected="false">Nested</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="sample-controlled-vocabs-tab" data-toggle="tab" href="#sample_controlled_vocabs" role="tab" aria-controls="sample_controlled_vocabs" aria-selected="false">Sample Controlled Vocabs</a>
   </li>
 </ul>
 
 <div class="tab-content">
-  <div class="tab-pane fade active in" id="top-level" role="tabpanel" aria-labelledby="top-level-tab">
+  <div class="tab-pane fade active in" id="top-level-metadata-table" role="tabpanel" aria-labelledby="top-level-tab">
     <table class='table table-hover' id='top-level-metadata-table'>
       <thead>
       <th>Internal Id</th>
@@ -69,7 +72,7 @@
     </table>
   </div>
 
-  <div class="tab-pane fade" id="nested" role="tabpanel" aria-labelledby="nested-tab">
+  <div class="tab-pane fade" id="nested-metadata-table" role="tabpanel" aria-labelledby="nested-tab">
     <table class='table table-hover' id='nested-metadata-table'>
       <thead>
       <th>Internal Id</th>
@@ -86,8 +89,22 @@
       </tbody>
     </table>
   </div>
-</div>
 
+  <div class="tab-pane fade" id="sample_controlled_vocabs" role="tabpanel" aria-labelledby="sample-controlled-vocabs-tab">
+    <table class='table table-hover' id='sample_controlled_vocabs'>
+      <thead>
+      <th>Internal Id</th>
+      <th>Title</th>
+      <th/>
+      </thead>
+      <tbody>
+      <% SampleControlledVocab.all.each do |sample_controlled_vocab| %>
+        <%= render partial: 'sample_controlled_vocab_table_row', locals: { sample_controlled_vocab: sample_controlled_vocab } %>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
 
 
 <script>
