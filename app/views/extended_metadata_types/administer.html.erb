@@ -41,23 +41,53 @@
   </div>
 <% end %>
 
-<table class='table table-hover' id='extended-metadata-table'>
-  <thead>
-    <th>Internal Id</th>
-    <th>Title</th>
-    <th>Supported Type</th>
-    <th>Number of<br/> times used</th>
-    <th>Status</th>
-    <th/>
-  </thead>
+<ul class="nav nav-tabs" role="tablist">
+  <li class="nav-item active in">
+    <a class="nav-link" id="top-level-tab" data-toggle="tab" href="#top-level" role="tab" aria-controls="top-level" aria-selected="true">Top Level</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="nested-tab" data-toggle="tab" href="#nested" role="tab" aria-controls="nested" aria-selected="false">Nested</a>
+  </li>
+</ul>
 
-  <tbody>
-    <% top_level.each do |extended_metadata_type| %>
-      <%= render partial: 'extended_metadata_type_table_row', locals: { extended_metadata_type: extended_metadata_type } %>
-    <% end %>
-  </tbody>
+<div class="tab-content">
+  <div class="tab-pane fade active in" id="top-level" role="tabpanel" aria-labelledby="top-level-tab">
+    <table class='table table-hover' id='top-level-metadata-table'>
+      <thead>
+      <th>Internal Id</th>
+      <th>Title</th>
+      <th>Supported Type</th>
+      <th>Number of<br/> times used</th>
+      <th>Status</th>
+      <th/>
+      </thead>
+      <tbody>
+      <% top_level.each do |extended_metadata_type| %>
+        <%= render partial: 'extended_metadata_type_table_row', locals: { extended_metadata_type: extended_metadata_type } %>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
 
-</table>
+  <div class="tab-pane fade" id="nested" role="tabpanel" aria-labelledby="nested-tab">
+    <table class='table table-hover' id='nested-metadata-table'>
+      <thead>
+      <th>Internal Id</th>
+      <th>Title</th>
+      <th>Supported Type</th>
+      <th>Number of<br/> times used</th>
+      <th>Status</th>
+      <th/>
+      </thead>
+      <tbody>
+      <% nested.each do |extended_metadata_type| %>
+        <%= render partial: 'extended_metadata_type_table_row', locals: { extended_metadata_type: extended_metadata_type } %>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
 
 
 <script>

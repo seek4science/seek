@@ -7,7 +7,7 @@ var ExtendedMetadataType = {
     },
 
     addNewMarker: function() {
-        var table = $j("#extended-metadata-table");
+        var table = $j("#top-level-metadata-table");
         var row = table.find("tbody tr:first");
         row.find("td:first").append(' <sup style="color:red; font-weight:bold; font-size: 12px">new</sup>');
     },
