@@ -37,7 +37,7 @@ module Seek
             title: attr['title'],
             label: attr['label'],
             description: attr['description'],
-            sample_attribute_type: SampleAttributeType.where(title: attr['attribute_type']).first,
+            sample_attribute_type: SampleAttributeType.where(title: attr['type']).first,
             required: attr['required']
           )
         end
