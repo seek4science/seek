@@ -34,7 +34,9 @@ module Seek
 
         data['attributes'].each do |attr|
           sample_attribute_type = SampleAttributeType.find_by(title: attr['type'])
-          sample_controlled_vocab = sample_attribute_type.controlled_vocab? ? SampleControlledVocab.find(attr['ID']) : nil
+          sample_controlled_vocab = SampleControlledVocab.find(attr['ID']) if sample_attribute_type&.controlled_vocab?
+          linked_extended_metadata_type = ::ExtendedMetadataType.find(attr['ID']) if sample_attribute_type&.linked_extended_metadata?
+
 
           emt.extended_metadata_attributes.build(
             title: attr['title'],
@@ -42,6 +44,7 @@ module Seek
             description: attr['description'],
             sample_attribute_type: sample_attribute_type,
             sample_controlled_vocab: sample_controlled_vocab,
+            linked_extended_metadata_type: linked_extended_metadata_type,
             required: attr['required']
           )
         end
