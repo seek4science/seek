@@ -26,24 +26,26 @@ module Seek
       end
 
       def self.create_extended_metadata_type_from_json(data)
+        emt = ::ExtendedMetadataType.create(
+          title: data['title'],
+          supported_type: data['supported_type'],
+          enabled: data['enabled']
+        )
 
-        # Initialize a new ExtendedMetadataType with the title, supported_type, and enabled status from the JSON data
-        emt = ::ExtendedMetadataType.create(title: data['title'], supported_type: data['supported_type'], enabled: data['enabled'])
-
-        # Iterate over each attribute in the JSON data
         data['attributes'].each do |attr|
-          # Create a new ExtendedMetadataAttribute for each attribute in the JSON data
+          sample_attribute_type = SampleAttributeType.find_by(title: attr['type'])
+          sample_controlled_vocab = sample_attribute_type.controlled_vocab? ? SampleControlledVocab.find(attr['ID']) : nil
+
           emt.extended_metadata_attributes.build(
             title: attr['title'],
             label: attr['label'],
             description: attr['description'],
-            sample_attribute_type: SampleAttributeType.where(title: attr['type']).first,
+            sample_attribute_type: sample_attribute_type,
+            sample_controlled_vocab: sample_controlled_vocab,
             required: attr['required']
           )
         end
 
-        # Attempt to save the ExtendedMetadataType along with its associated attributes
-        puts "_______________________________________________"
         if emt.save
           puts "ExtendedMetadataType '#{emt.title}' created successfully."
         else
@@ -51,12 +53,7 @@ module Seek
           puts error_message
           raise StandardError, error_message
         end
-        puts "_______________________________________________"
       end
-
-
-
-
     end
   end
 end
