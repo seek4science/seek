@@ -1,0 +1,11 @@
+<%
+  file_path = Rails.root.join(Seek::Config.append_filestore_path('emt_files'), 'result.error')
+  file_exists = File.exist?(file_path)
+  file_has_content = file_exists && File.size?(file_path)
+
+  if file_has_content
+    @error_message = File.read(file_path)
+  end
+%>
+
+<pre id="emt-error-message" class="alert alert-danger" style="display: none;"><%= @error_message %></pre>

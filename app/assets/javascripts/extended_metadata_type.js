@@ -21,5 +21,10 @@ var ExtendedMetadataType = {
         if ($j("#notice_flash").length === 0) {
             containerFluidDiv.prepend('<div id="notice_flash" class="alert-success" role="alert"></div>');
         }
+    },
+
+    showErrorAndHideNotice: function() {
+        $j('#emt-error-message').css('display', 'block');
+        $j('#notice_flash').css('display', 'none');
     }
 };

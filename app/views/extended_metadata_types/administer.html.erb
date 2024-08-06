@@ -4,6 +4,8 @@
     }
 </style>
 
+<%= render partial: 'error_message' -%>
+
 <div class="row">
   <div class="col-md-3">
     <%= link_to new_extended_metadata_type_path, class: "btn btn-primary", role: "button", aria: { label: "Left Align" } do %>
@@ -14,7 +16,7 @@
 </div>
 <br>
 
-<%= render partial: 'tabs' -%>
+<%= render partial: 'emt-tabs' -%>
 
 <script>
     var jobIdPresent = <%= session[:job_id].present? ? 'true' : 'false' %>;
@@ -24,8 +26,13 @@
 
         if (sessionStorage.getItem('jobCompleted') === 'true') {
             sessionStorage.removeItem('jobCompleted');
-            ExtendedMetadataType.updateJobStatusDisplay();
-            ExtendedMetadataType.addNewMarker();
+
+            if (<%= @error_message.nil? %>) {
+                ExtendedMetadataType.updateJobStatusDisplay();
+                ExtendedMetadataType.addNewMarker();
+            } else {
+                ExtendedMetadataType.showErrorAndHideNotice();
+            }
         }
 
         function checkJobStatus() {
