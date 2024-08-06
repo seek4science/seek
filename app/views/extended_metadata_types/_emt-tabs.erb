@@ -3,14 +3,19 @@
 <% top_level.sort_by!(&:id).reverse! %>
 
 <div class="alert alert-info">
-  <p>
-    You can disable Extended metadata types to prevent them from appearing as an option in the UI.
-    Disabling them won't delete them, or where they've been used, and they can be re-enabled again here.
-  </p>
-  <p>
-    If a type is disabled but has been used, for those cases it will no longer be shown when viewing those items.
-    However, it will still be possible to edit the metadata for existing items and the metadata won't be deleted.
-  </p>
+  <ul>
+    <li>
+      You can disable Extended metadata types to prevent them from appearing as an option in the UI.
+      Disabling them won't delete them, or where they've been used, and they can be re-enabled again here.
+    </li>
+    <li>
+      If a type is disabled but has been used, for those cases it will no longer be shown when viewing those items.
+      However, it will still be possible to edit the metadata for existing items and the metadata won't be deleted.
+    </li>
+    <li>
+      The extended metadata type cannot be deleted if there are existing extended metadata instances based on it.
+    </li>
+  </ul>
 </div>
 
 <% if ExtendedMetadataType.disabled_but_in_use.any? %>
@@ -53,6 +58,7 @@
         <th>Number of<br/> times used</th>
         <th>Status</th>
         <th></th>
+        <th></th>
       </tr>
       </thead>
       <tbody>
@@ -72,6 +78,7 @@
         <th>Supported Type</th>
         <th>Number of<br/> times used</th>
         <th>Status</th>
+        <th></th>
         <th></th>
       </tr>
       </thead>

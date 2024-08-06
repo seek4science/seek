@@ -2,10 +2,9 @@ class ExtendedMetadataTypesController < ApplicationController
   respond_to :json, :html
   skip_before_action :project_membership_required
   before_action :is_user_admin_auth, except: [:form_fields, :show, :index]
-  before_action :find_requested_item, only: [:administer_update, :show]
+  before_action :find_requested_item, only: [:administer_update, :show, :destroy]
   include Seek::IndexPager
   include Seek::UploadHandling::DataUpload
-  before_action :find_extended_metadata_type, only: [:show]
   after_action :log_event, only: [:emt_populate_job_status], if: -> { @status == 'completed' }
 
   # generated for form, to display fields for selected metadata type
@@ -86,8 +85,18 @@ class ExtendedMetadataTypesController < ApplicationController
        end
        format.html
      end
-    end
+  end
 
+  def destroy
+    if @extended_metadata_type.destroy
+      flash[:notice] = 'Extended metadata type was successfully deleted.'
+    else
+      flash[:alert] = 'Failed to delete the extended metadata type.'
+    end
+    respond_to do |format|
+      format.html { redirect_to administer_extended_metadata_types_path }
+    end
+  end
 
   def administer_update
     @extended_metadata_type.update(extended_metadata_type_params)
@@ -110,11 +119,6 @@ class ExtendedMetadataTypesController < ApplicationController
 
   def extended_metadata_type_params
     params.require(:extended_metadata_type).permit(:title, :enabled)
-  end
-
-
-  def find_extended_metadata_type
-    @extended_metadata_type = ExtendedMetadataType.find(params[:id])
   end
 
   def log_event

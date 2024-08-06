@@ -22,4 +22,9 @@
       <% end %>
     <% end %>
   </td>
+  <td>
+    <%= form_for(extended_metadata_type, url: extended_metadata_type_path(extended_metadata_type), method: :delete, data: { confirm: 'Are you sure?' }) do |f| %>
+      <%= f.submit 'Delete', class: 'btn btn-danger', disabled: extended_metadata_type.extended_metadatas.present? %>
+    <% end %>
+  </td>
 </tr>
