@@ -29,7 +29,7 @@ class ExtendedMetadataTypesController < ApplicationController
 
 
   def upload_file
-    dir = Seek::Config.append_filestore_path('uploaded_emt_files')
+    dir = Seek::Config.append_filestore_path('emt_files')
     uploaded_file = params[:emt_json_file]
     filepath = Rails.root.join(dir, uploaded_file.original_filename)
     File.write(filepath, uploaded_file.read)

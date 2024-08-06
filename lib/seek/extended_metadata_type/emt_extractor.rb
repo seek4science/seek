@@ -4,26 +4,42 @@ module Seek
   module ExtendedMetadataType
     module EMTExtractor
       def self.extract_extended_metadata_type(filename)
+
+        `touch #{errorfile}`
+
         file = File.read(filename)
-
-        #todo check if the json file is valid later
-        #res = check_json_file(file)
-        #raise res if res.present?
-
         data_hash = JSON.parse(file)
+        res = valid_emt_json?(data_hash)
+
 
         puts "**********************************"
-        puts ":data_hash: #{data_hash}"
+        puts ":res: #{res}"
         puts "**********************************"
+
+        write_result(res) if res.present?
+
 
         begin
           create_extended_metadata_type_from_json(data_hash)
         rescue StandardError => e
-          puts "Error: #{e.message}"
-          raise e
+          write_result("error(s): #{e}")
         end
 
       end
+
+      def self.valid_emt_json?(json)
+        definitions_path =
+          File.join(Rails.root, 'lib', 'seek', 'extended_metadata_type', 'extended_metadata_type_schema.json')
+        if File.readable?(definitions_path)
+          schema= JSON.parse(File.read(definitions_path))
+          errors = JSON::Validator.fully_validate(schema, json)
+          puts "errors: #{errors}"
+        else
+          errors = ['The schema file is not readable!']
+        end
+        errors.join("\n\n")
+      end
+
 
       def self.create_extended_metadata_type_from_json(data)
         emt = ::ExtendedMetadataType.create(
@@ -40,8 +56,8 @@ module Seek
 
           emt.extended_metadata_attributes.build(
             title: attr['title'],
-            label: attr['label'],
-            description: attr['description'],
+            label: attr['label'].present? ? attr['label'] : nil,
+            description: attr['description'].present? ? attr['description'] : nil,
             sample_attribute_type: sample_attribute_type,
             sample_controlled_vocab: sample_controlled_vocab,
             linked_extended_metadata_type: linked_extended_metadata_type,
@@ -57,6 +73,15 @@ module Seek
           raise StandardError, error_message
         end
       end
+
+      def self.errorfile
+        Rails.root.join(Seek::Config.append_filestore_path('emt_files'), 'result.error')
+      end
+
+      def self.write_result(result)
+        File.open(errorfile, 'a') { |file| file.write("#{result}\n") }
+      end
+
     end
   end
 end

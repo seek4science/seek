@@ -12,11 +12,5 @@ class PopulateExtendedMetadataTypeJob < ApplicationJob
 
   after_perform do |job|
     puts "after_perform"
-    # Remove the directory after the job has been completed
-    dir = Seek::Config.append_filestore_path('uploaded_emt_files')
-    dir_path = Rails.root.join(dir)
-    if Dir.exist?(dir_path)
-      FileUtils.rm_rf(dir_path)
-    end
   end
 end
