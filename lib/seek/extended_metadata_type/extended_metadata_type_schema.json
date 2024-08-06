@@ -56,6 +56,9 @@
               },
               "label": {
                 "type": "string"
+              },
+              "pos": {
+                "type": "integer"
               }
             },
             "required": ["title", "type"],
@@ -85,6 +88,9 @@
                 "type": "string"
               },
               "ID": {
+                "type": "integer"
+              },
+              "pos": {
                 "type": "integer"
               }
             },
