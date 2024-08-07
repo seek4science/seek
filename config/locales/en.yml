@@ -16,6 +16,7 @@ en:
   investigation: &investigation "Investigation"
   study: &study "Study"
   assay: &assay "Assay"
+  observation_unit: &observation_unit "Observation Unit"
   assays:
     assay: "Assay"
     experimental_assay: "Experimental assay"
