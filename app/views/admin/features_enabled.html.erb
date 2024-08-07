@@ -58,7 +58,8 @@
 
   <%= admin_checkbox_setting(:isa_enabled, 1, Seek::Config.isa_enabled,
                              "ISA enabled", "Whether the ISA framework is enabled. The ISA framework allows users to create Investigations, Studies and Assays to organize their work.") %>
-
+  <%= admin_checkbox_setting(:observation_units_enabled, 1, Seek::Config.observation_units_enabled,
+                             "Observation Units enabled", "Whether the users can register Observation Units to organize their work.") %>
   <%= admin_checkbox_setting(:models_enabled, 1, Seek::Config.models_enabled,
                              "Models enabled", "Whether the users can register computational models in SEEK.") %>
 
