@@ -1,5 +1,9 @@
 var ExtendedMetadataType = {
     updateJobStatusDisplay: function() {
+        var containerFluidDiv = $j("#content .container-fluid");
+        if (!$j("#notice_flash").length) {
+            containerFluidDiv.prepend('<div id="notice_flash" class="alert-success" role="alert"></div>');
+        }
         var noticeFlashDiv = $j("#notice_flash");
         noticeFlashDiv.addClass('alert alert-success');
         noticeFlashDiv.html('Job completed !');
@@ -15,12 +19,6 @@ var ExtendedMetadataType = {
     initializeNoticeFlash: function() {
         var noticeFlashDiv = $j("#notice_flash");
         noticeFlashDiv.removeClass('alert-success').addClass('alert-warning').append('<div>Extraction Processing ... <img src="/assets/ajax-loader.gif"></div>').show();
-
-        var containerFluidDiv = $j("#content .container-fluid");
-
-        if ($j("#notice_flash").length === 0) {
-            containerFluidDiv.prepend('<div id="notice_flash" class="alert-success" role="alert"></div>');
-        }
     },
 
     showErrorAndHideNotice: function() {

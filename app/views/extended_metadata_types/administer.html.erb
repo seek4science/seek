@@ -19,11 +19,9 @@
 <%= render partial: 'emt-tabs' -%>
 
 <script>
-    var jobIdPresent = <%= session[:job_id].present? ? 'true' : 'false' %>;
+    var jobIdPresent = <%= session[:job_id].present? %>;
 
     $j(document).ready(function() {
-        ExtendedMetadataType.initializeNoticeFlash();
-
         if (sessionStorage.getItem('jobCompleted') === 'true') {
             sessionStorage.removeItem('jobCompleted');
 
@@ -53,6 +51,7 @@
         }
 
         if (jobIdPresent) {
+            ExtendedMetadataType.initializeNoticeFlash();
             var statusCheckInterval = setInterval(checkJobStatus, 5000);
             checkJobStatus();
         }
