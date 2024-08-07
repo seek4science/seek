@@ -82,6 +82,7 @@ def load_seek_config_defaults!
   Seek::Config.default :data_files_enabled,true
   Seek::Config.default :events_enabled,true
   Seek::Config.default :isa_enabled, true
+  Seek::Config.default :observation_units_enabled,true
   Seek::Config.default :models_enabled,true
   Seek::Config.default :organisms_enabled,true
   Seek::Config.default :programmes_enabled, false
