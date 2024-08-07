@@ -1,6 +1,5 @@
-<% nested, top_level = @extended_metadata_types.partition(&:extended_type?) %>
-<% nested.sort_by!(&:id).reverse! %>
-<% top_level.sort_by!(&:id).reverse! %>
+<% nested, top_level = @extended_metadata_types.partition(&:extended_type?).each{ |group| group.sort_by!(&:id).reverse! } %>
+
 
 <div class="alert alert-info">
   <ul>
@@ -14,6 +13,9 @@
     </li>
     <li>
       The extended metadata type cannot be deleted if there are existing extended metadata instances based on it.
+    </li>
+    <li>
+      The extended metadata type in the nested level can not be deleted if it has been linked by other extended metadata types.
     </li>
   </ul>
 </div>

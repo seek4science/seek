@@ -20,9 +20,6 @@ class ExtendedMetadataType < ApplicationRecord
     extended_metadata_attributes.where(title: title).first
   end
 
-  def attribute_by_method_name(method_name)
-    extended_metadata_attributes.detect { |attr| attr.method_name == method_name }
-  end
 
   def attributes_with_linked_extended_metadata_type
     extended_metadata_attributes.reject {|attr| attr.linked_extended_metadata_type.nil?}
@@ -30,6 +27,10 @@ class ExtendedMetadataType < ApplicationRecord
 
   def extended_type?
     supported_type == 'ExtendedMetadata'
+  end
+
+  def linked_by_other_metadata_attributes?
+    ExtendedMetadataAttribute.pluck(:linked_extended_metadata_type_id).compact.include?(id)
   end
 
   def supported_type_must_be_valid_type

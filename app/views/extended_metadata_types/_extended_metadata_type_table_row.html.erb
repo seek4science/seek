@@ -1,4 +1,7 @@
 <%
+  disabled = extended_metadata_type.extended_type? ?
+              extended_metadata_type.linked_by_other_metadata_attributes? :
+              extended_metadata_type.extended_metadatas.present?
   row_cls = ""
   row_cls << ' warning' if extended_metadata_type.disabled_but_used?
   row_cls << ' text-secondary' unless extended_metadata_type.enabled?
@@ -24,7 +27,7 @@
   </td>
   <td>
     <%= form_for(extended_metadata_type, url: extended_metadata_type_path(extended_metadata_type), method: :delete, data: { confirm: 'Are you sure?' }) do |f| %>
-      <%= f.submit 'Delete', class: 'btn btn-danger', disabled: extended_metadata_type.extended_metadatas.present? %>
+      <%= f.submit 'Delete', class: 'btn btn-danger', disabled: disabled %>
     <% end %>
   </td>
 </tr>
