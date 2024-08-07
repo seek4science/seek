@@ -28,6 +28,13 @@ class ExtendedMetadataTypesController < ApplicationController
 
 
   def upload_file
+
+    if params[:emt_json_file].nil?
+      flash[:error] = 'Please select a file to upload!'
+      redirect_to new_extended_metadata_type_path
+      return
+    end
+
     dir = Seek::Config.append_filestore_path('emt_files')
     uploaded_file = params[:emt_json_file]
     filepath = Rails.root.join(dir, uploaded_file.original_filename)
@@ -39,7 +46,7 @@ class ExtendedMetadataTypesController < ApplicationController
     # Redirect or respond to indicate the job has been started
     respond_to do |format|
       format.html {
- redirect_to administer_extended_metadata_types_path, 
+        redirect_to administer_extended_metadata_types_path,
              notice: 'Your JSON file for extracting the extended metadata type has been uploaded. ' }
     end
   end
