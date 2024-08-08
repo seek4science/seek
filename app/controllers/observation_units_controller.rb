@@ -41,8 +41,25 @@ class ObservationUnitsController < ApplicationController
   end
 
   def create
-    item = initialize_asset
-    create_asset_and_respond(item)
+    params[:observation_unit][:project_ids] = [params[:policy_attributes][:permissions_attributes]["0"][:contributor_id]]
+    @observation_unit = ObservationUnit.new(observation_unit_params)
+    @observation_unit.contributor = current_person
+    update_sharing_policies @observation_unit
+    update_annotations(params[:tag_list], @observation_unit)
+    update_relationships(@observation_unit, params)
+
+    if @observation_unit.save
+      respond_to do |format|
+        flash[:notice] = "#{t('observation_unit')} was successfully created."
+        format.html { redirect_to observation_unit_path(@observation_unit) }
+        format.json { render json: @observation_unit, include: [params[:include]] }
+      end
+    else
+      respond_to do |format|
+        format.html { render action: 'new', status: :unprocessable_entity }
+        format.json { render json: json_api_errors(@observation_unit), status: :unprocessable_entity }
+      end
+    end
   end
 
   def observation_unit_params
