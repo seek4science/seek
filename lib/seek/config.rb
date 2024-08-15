@@ -340,10 +340,6 @@ module Seek
       organisms_enabled
     end
 
-    def observation_units_enabled
-      fair_data_station_enabled
-    end
-
     def omniauth_elixir_aai_config
       if omniauth_elixir_aai_legacy_mode
         {
