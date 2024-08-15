@@ -25,6 +25,7 @@
   </div>
 
   <%= render partial: "assets/asset_form_bottom", locals: {show_publications:false, attribution_enable: false, f: f} %>
+  <%= f.fancy_multiselect :data_files, other_projects_checkbox: true %>
 
 
   <%= form_submit_buttons(@observation_unit) %>
