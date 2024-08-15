@@ -119,6 +119,7 @@ class ObservationUnitsControllerTest < ActionController::TestCase
 
   test 'new' do
     person = FactoryBot.create(:person)
+    FactoryBot.create(:study, contributor: person)
     login_as(person)
     get :new
     assert_response :success
