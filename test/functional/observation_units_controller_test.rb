@@ -36,6 +36,9 @@ class ObservationUnitsControllerTest < ActionController::TestCase
     login_as(unit.contributor)
     get :edit, params: { id: unit.id}
     assert_response :success
+    assert_select 'form.edit_observation_unit' do
+      assert_select 'div#project-selector', count: 0
+    end
   end
 
   test 'manage' do
@@ -43,6 +46,9 @@ class ObservationUnitsControllerTest < ActionController::TestCase
     login_as(unit.contributor)
     get :manage, params: { id: unit.id}
     assert_response :success
+    assert_select 'form.edit_observation_unit' do
+      assert_select 'div#project-selector'
+    end
   end
 
   test 'manage update' do
@@ -116,7 +122,9 @@ class ObservationUnitsControllerTest < ActionController::TestCase
     login_as(person)
     get :new
     assert_response :success
-    assert_select 'form.new_observation_unit'
+    assert_select 'form.new_observation_unit' do
+      assert_select 'div#project-selector'
+    end
   end
 
   test 'create' do
