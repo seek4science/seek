@@ -166,10 +166,10 @@ class ObservationUnitsControllerTest < ActionController::TestCase
     assert_equal Policy::MANAGING,obs_unit.policy.permissions.first.access_type
   end
 
-  test 'no access if fair data station disabled' do
+  test 'no access if observation units disabled' do
     unit = FactoryBot.create(:max_observation_unit)
     login_as(unit.contributor)
-    with_config_value(:fair_data_station_enabled, false) do
+    with_config_value(:observation_units_enabled, false) do
       get :show, params: { id: unit.id }
       assert_redirected_to :root
       refute_nil flash[:error]
