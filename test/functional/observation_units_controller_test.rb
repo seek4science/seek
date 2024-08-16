@@ -90,6 +90,7 @@ class ObservationUnitsControllerTest < ActionController::TestCase
     obs_unit = FactoryBot.create(:observation_unit)
     emt = FactoryBot.create(:simple_observation_unit_extended_metadata_type)
     datafile = FactoryBot.create(:data_file, contributor: obs_unit.contributor)
+    sample = FactoryBot.create(:sample, contributor: obs_unit.contributor)
     login_as(obs_unit.contributor)
 
     patch :update, params: { id: obs_unit,
@@ -97,6 +98,7 @@ class ObservationUnitsControllerTest < ActionController::TestCase
                                title: 'updated title',
                                description: 'updated description',
                                data_file_ids: [datafile.id],
+                               sample_ids: [sample.id],
                                extended_metadata_attributes: {
                                  extended_metadata_type_id: emt.id,
                                  data: {
@@ -118,6 +120,7 @@ class ObservationUnitsControllerTest < ActionController::TestCase
     assert_equal 'updated strain', obs_unit.extended_metadata.get_attribute_value('strain')
     assert_equal %w[fish soup], obs_unit.tags.sort
     assert_equal [datafile], obs_unit.data_files
+    assert_equal [sample], obs_unit.samples
   end
 
   test 'new' do
@@ -136,6 +139,7 @@ class ObservationUnitsControllerTest < ActionController::TestCase
     contributor = FactoryBot.create(:person)
     study = FactoryBot.create(:study, contributor: contributor)
     datafile = FactoryBot.create(:data_file, contributor: contributor)
+    sample = FactoryBot.create(:sample, contributor: contributor)
     project = contributor.projects.first
     other_person = FactoryBot.create(:person)
     creator = FactoryBot.create(:person)
@@ -147,6 +151,7 @@ class ObservationUnitsControllerTest < ActionController::TestCase
                                creator_ids: [creator.id],
                                project_ids: [project.id],
                                data_file_ids: [datafile.id],
+                               sample_ids: [sample.id],
                                study_id: study,
                                extended_metadata_attributes: {
                                  extended_metadata_type_id: emt.id,
@@ -175,6 +180,7 @@ class ObservationUnitsControllerTest < ActionController::TestCase
     assert_equal [project],obs_unit.projects
     assert_equal [creator],obs_unit.creators
     assert_equal [datafile],obs_unit.data_files
+    assert_equal [sample],obs_unit.samples
     assert_equal Policy::VISIBLE,obs_unit.policy.access_type
     assert_equal 1,obs_unit.policy.permissions.count
     assert_equal other_person,obs_unit.policy.permissions.first.contributor
