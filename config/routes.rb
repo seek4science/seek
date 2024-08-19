@@ -414,7 +414,6 @@ SEEK::Application.routes.draw do
   ### ISA ###
 
   resources :investigations, concerns: [:publishable, :has_snapshots, :isa] do
-    resources :people, :programmes, :projects, :assays, :studies, :models, :sops, :workflows, :data_files, :publications, :documents, only: [:index]
     member do
       get :export_isatab_json
       get :export_isa, action: :export_isa
@@ -422,6 +421,7 @@ SEEK::Application.routes.draw do
       get :order_studies
       patch :manage_update
     end
+    resources :people, :programmes, :projects, :assays, :studies, :models, :sops, :workflows, :data_files, :publications, :documents, :observation_units, only: [:index]
   end
 
   resources :studies, concerns: [:publishable, :has_snapshots, :isa] do
