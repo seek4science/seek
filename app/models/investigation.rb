@@ -14,15 +14,18 @@ class Investigation < ApplicationRecord
   belongs_to :assignee, class_name: 'Person'
 
   has_many :study_sops, through: :studies, source: :sops
-  has_many :assay_sops, through: :assays, source: :sops
+  has_many :assay_sops, -> { distinct }, through: :assays, source: :sops
   has_many :sop_versions, through: :studies
+  has_many :assay_data_files, -> { distinct }, through: :assays, source: :data_files
+  has_many :data_file_versions, -> { distinct }, through: :studies
   has_many :observation_units, through: :studies
+  has_many :observations_unit_data_files, -> { distinct }, through: :observation_units, source: :data_files
   
   def state_allows_delete?(*args)
     studies.empty? && super
   end
 
-  %w[data_file model document].each do |type|
+  %w[model document].each do |type|
     has_many "#{type}_versions".to_sym, -> { distinct }, through: :studies
     has_many "related_#{type.pluralize}".to_sym, -> { distinct }, through: :studies
   end
@@ -37,6 +40,10 @@ class Investigation < ApplicationRecord
     new_object.project_ids = project_ids
     new_object.publications = publications
     new_object
+  end
+
+  def related_data_file_ids
+    observations_unit_data_file_ids | assay_data_file_ids
   end
 
   def related_publication_ids
