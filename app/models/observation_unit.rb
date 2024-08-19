@@ -7,7 +7,7 @@ class ObservationUnit < ApplicationRecord
   belongs_to :contributor, class_name: 'Person'
   belongs_to :study
   has_many :samples
-  has_many :assays, through: :samples
+  has_many :assays, -> { distinct }, through: :samples
   has_many :observation_unit_assets, inverse_of: :observation_unit, dependent: :delete_all, autosave: true
   has_many :data_files, through: :observation_unit_assets, source: :asset, source_type: 'DataFile', inverse_of: :observation_units
 

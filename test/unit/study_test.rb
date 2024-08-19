@@ -266,4 +266,24 @@ class StudyTest < ActiveSupport::TestCase
     assert study.is_isa_json_compliant?
   end
 
+  test 'related data files' do
+    contributor = FactoryBot.create(:person)
+    df1 = FactoryBot.create(:data_file, contributor: contributor)
+    df2 = FactoryBot.create(:data_file, contributor: contributor)
+
+    # related just through an assay
+    assay = FactoryBot.create(:assay, data_files:[df1], contributor: contributor)
+    study = assay.study
+    assert_equal [df1], study.related_data_files
+
+    # related just through an observation unit
+    obs_unit = FactoryBot.create(:observation_unit, contributor: contributor, data_files: [df2])
+    assert_equal [df2], obs_unit.study.related_data_files
+
+    # related through both an assay and observation unit
+    obs_unit = FactoryBot.create(:observation_unit, contributor: contributor, data_files: [df2], study: study)
+    study.reload
+    assert_equal [df1, df2].sort, study.related_data_files.sort
+  end
+
 end
