@@ -84,5 +84,18 @@ class ObservationUnitTest < ActiveSupport::TestCase
 
   end
 
+  test 'assays, studies, investigations' do
+    contributor = FactoryBot.create(:person)
+    assay = FactoryBot.create(:experimental_assay, contributor: contributor)
+    study = assay.study
+    sample = FactoryBot.create(:sample, assays: [assay], contributor: contributor)
+    obs_unit = FactoryBot.create(:observation_unit, study: study, samples: [sample], contributor: contributor)
+
+    assert_equal [assay], sample.assays
+    assert_equal [assay], obs_unit.assays
+    assert_equal [study], obs_unit.studies
+    assert_equal [study.investigation], obs_unit.investigations
+
+  end
 
 end
