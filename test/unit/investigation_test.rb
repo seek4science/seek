@@ -236,4 +236,10 @@ class InvestigationTest < ActiveSupport::TestCase
     assert_equal investigation.related_sop_ids.sort, (study.sop_ids << assay_sop.id).sort
   end
 
+  test 'observation units' do
+    obs_unit = FactoryBot.create(:observation_unit)
+    investigation = obs_unit.study.investigation
+    assert_equal [obs_unit], investigation.observation_units
+  end
+
 end

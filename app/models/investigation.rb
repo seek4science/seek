@@ -16,6 +16,7 @@ class Investigation < ApplicationRecord
   has_many :study_sops, through: :studies, source: :sops
   has_many :assay_sops, through: :assays, source: :sops
   has_many :sop_versions, through: :studies
+  has_many :observation_units, through: :studies
   
   def state_allows_delete?(*args)
     studies.empty? && super
