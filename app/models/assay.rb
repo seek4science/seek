@@ -327,4 +327,8 @@ class Assay < ApplicationRecord
   def related_sop_ids
     sop_ids
   end
+
+  def related_data_file_ids
+    data_file_ids
+  end
 end
