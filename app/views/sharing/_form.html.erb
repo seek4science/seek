@@ -9,6 +9,7 @@
   else
     projects = []
   end
+  is_assay_stream = object.respond_to?("is_assay_stream?") ? object.is_assay_stream? : false
 %>
 
 <%= folding_panel('Sharing', false, id: 'sharing_form',
@@ -52,4 +53,12 @@
     <% end %>
 
     <%= render partial: 'sharing/permissions_table', locals: { object: object, policy: policy, projects: projects } %>
+  <% if is_assay_stream %>
+    <div>
+      <%= check_box_tag 'propagate_permissions' %>
+      <label>
+        <%= "Apply permissions to child #{t('assay').pluralize.downcase}?" %>
+      </label>
+    </div>
+  <% end %>
 <% end %>

@@ -73,7 +73,7 @@ module Scrapers
           end
           tags = [tag]
         else
-          tags = repo.remote_refs[:tags]&.map { |t| t[:name] } || []
+          tags = all_tags(repo)
           if tags.empty?
             output.puts "    No tags found to register"
             next
@@ -102,8 +102,6 @@ module Scrapers
       workflow = wiz.run
       workflow.contributor = @contributor
       workflow.projects = Array(@project)
-      workflow.policy = Policy.projects_policy(workflow.projects)
-      workflow.policy.access_type = Policy::ACCESSIBLE
       workflow.source_link_url = repo.remote.chomp('.git')
       workflow.tags = topics(repo)
       if wiz.next_step == :provide_metadata
@@ -174,6 +172,10 @@ module Scrapers
       return nil unless $?.success?
 
       tag
+    end
+
+    def all_tags(repo)
+      repo.remote_refs[:tags]&.map { |t| t[:name] } || []
     end
   end
 end

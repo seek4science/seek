@@ -1,8 +1,9 @@
 <% unless @update_samples.nil? or @update_samples.compact.none? %>
-  <%= folding_panel("Samples to Update <span id='update-samples-counter' class='label label-warning'>#{@update_samples.size}</span>", true, :id => "existing-samples-panel", :body_options => {:id => "existing-samples-panel-content"},
-  :help_text => "These samples were detected existing samples and will be updated.") do %>
+  <%= folding_panel("Samples to Update <span id='update-samples-counter' class='label label-warning'>#{@update_samples.size}</span>", true, :id => "existing-samples-panel", :body_options => { :id => "existing-samples-panel-content" },
+                    :help_text => "These samples were detected existing samples and will be updated.") do %>
     <div class="table-responsive">
       <table id="update-samples-table" class="table">
+        <thead>
         <tr>
           <th></th>
           <% for key in @update_samples[0].keys %>
@@ -11,38 +12,43 @@
             <% end %>
           <% end %>
         </tr>
+        </thead>
+        <tbody>
         <% for update_sample in @update_samples %>
-          <tr id='<%= "update-sample-#{update_sample['id']}-updated" %>' >
+          <tr id='<%= "update-sample-#{update_sample['id']}-updated" %>'>
             <% db_sample = @authorized_db_samples.select { |s| s['id'] == update_sample['id'] }.first %>
-            <td rowspan=2><button id=<%= "remove-#{update_sample['id']}" %> class="btn glyphicon glyphicon-trash danger" style="background-color:#d9534f;color:white;" onclick=<%= "removeSample('update-sample-#{update_sample['id']}')" %>></button></td>
+            <td rowspan=2>
+              <button id=<%= "remove-#{update_sample['id']}" %> class="btn glyphicon glyphicon-trash danger
+              " style="background-color:#d9534f;color:white;"
+              onclick=<%= "removeSample('update-sample-#{update_sample['id']}')" %>></button></td>
             <% update_sample.map do |key, val| %>
               <% unless key == 'uuid' %>
-                <% if @multiple_input_fields.include?(key)%>
-                  <td class='<%= (val != db_sample[key]) ? "warning" : "default" %>' id='<%= "update-sample-#{update_sample['id']}[#{key}]"%>' >
+                <% if @multiple_input_fields.include?(key) %>
+                  <td class='<%= (val != db_sample[key]) ? "warning" : "default" %>' id='<%= "update-sample-#{update_sample['id']}[#{key}]" %>'>
                     <% val.each do |sub_sample| %>
                       <span class="badge" title='ID: <%= sub_sample['id'] %>' data-attr_type="seek-sample-multi"><%= sub_sample['title'] %></span>
                     <% end %>
                   </td>
                 <% elsif @cv_list_fields.include?(key) %>
-                  <td class='<%= (val != db_sample[key]) ? "warning" : "default" %>' id='<%= "update-sample-#{update_sample['id']}[#{key}]"%>' >
+                  <td class='<%= (val != db_sample[key]) ? "warning" : "default" %>' id='<%= "update-sample-#{update_sample['id']}[#{key}]" %>'>
                     <% val.each do |cv_term| %>
                       <span class="label label-default" title='<%= cv_term %>' data-attr_type="cv-list"><%= cv_term %></span>
                     <% end %>
                   </td>
                 <% elsif @registered_sample_fields.include?(key) %>
-                  <td class='<%= (val != db_sample[key]) ? "warning" : "default" %>' id='<%= "update-sample-#{update_sample['id']}[#{key}]"%>'>
+                  <td class='<%= (val != db_sample[key]) ? "warning" : "default" %>' id='<%= "update-sample-#{update_sample['id']}[#{key}]" %>'>
                     <span class="badge" title='<%= val['id'] %>' data-attr_type="seek-sample"><%= val['title'] %></span>
                   </td>
                 <% else %>
-                  <td class='<%= (val != db_sample[key]) ? "warning" : "default" %>' id='<%= "update-sample-#{update_sample['id']}[#{key}]"%>' ><%= val %></td>
+                  <td class='<%= (val != db_sample[key]) ? "warning" : "default" %>' id='<%= "update-sample-#{update_sample['id']}[#{key}]" %>'><%= val %></td>
                 <% end %>
               <% end %>
             <% end %>
           </tr>
-          <tr id='<%= "update-sample-#{update_sample['id']}-original" %>' >
+          <tr id='<%= "update-sample-#{update_sample['id']}-original" %>'>
             <% db_sample.map do |key, val| %>
               <% unless key == 'uuid' %>
-                <% if @multiple_input_fields.include?(key)%>
+                <% if @multiple_input_fields.include?(key) %>
                   <td>
                     <% val.each do |sub_sample| %>
                       <span class="badge" title='ID: <%= sub_sample['id'] %>'><%= sub_sample['title'] %></span>
@@ -63,6 +69,7 @@
             <% end %>
           </tr>
         <% end %>
+        </tbody>
       </table>
     </div>
   <% end %>

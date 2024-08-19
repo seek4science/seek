@@ -44,13 +44,14 @@ module Git
                            refs[:branches] << h
                          end
 
-                         git_base.tags.each do |tag|
+                         git_base.tags.to_a.sort_by do |tag|
+                           tag.target.time
+                         end.reverse.each do |tag|
                            h = { name: tag.name, ref: tag.canonical_name, sha: tag.target.oid }
                            refs[:tags] << h
                          end
 
                          refs[:branches] = refs[:branches].sort_by { |x| [x[:default] ? 0 : 1, x[:name].downcase] }
-                         refs[:tags] = refs[:tags].sort_by { |x| x[:name] }
 
                          refs
                        end

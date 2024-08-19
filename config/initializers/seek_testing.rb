@@ -28,6 +28,8 @@ def load_seek_testing_defaults!
       Settings.defaults[:programme_user_creation_enabled] = true
       Settings.defaults[:programmes_open_for_projects_enabled] = true
 
+      Settings.defaults[:fair_data_station_enabled] = true
+
       # Types
       Settings.defaults[:collections_enabled] = true
       Settings.defaults[:documents_enabled] = true
@@ -133,7 +135,7 @@ def load_seek_testing_defaults!
 
       Settings.defaults[:omniauth_oidc_enabled] = true
       Settings.defaults[:omniauth_oidc_name] = 'SEEK Testing OIDC'
-      Settings.defaults[:omniauth_oidc_issuer] = 'https://example.com/oidc/'
+      Settings.defaults[:omniauth_oidc_issuer] = 'https://example.com/oidc'
       Settings.defaults[:omniauth_oidc_client_id] = 'def'
       Settings.defaults[:omniauth_oidc_secret] = '789'
 

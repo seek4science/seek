@@ -43,6 +43,13 @@ FactoryBot.define do
     end
   end
 
+  factory(:sop_sample_type, parent: :sample_type) do
+    title { 'DataFile type' }
+    after(:build) do |type|
+      type.sample_attributes << FactoryBot.build(:sop_sample_attribute, title:'sop', is_title: true, sample_type:type)
+    end
+  end
+
   factory(:optional_strain_sample_type, parent: :strain_sample_type) do
     after(:build) do |type|
       type.sample_attributes = [FactoryBot.build(:sample_attribute, template_column_index: 1, title: 'name', sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), required: true, is_title: true, sample_type: type),
@@ -127,6 +134,8 @@ FactoryBot.define do
       type.sample_attributes << FactoryBot.build(:sample_attribute, title: 'weight', sample_attribute_type: FactoryBot.create(:float_sample_attribute_type), required: false, sample_type: type)
       type.sample_attributes << FactoryBot.build(:sample_attribute, title: 'age', sample_attribute_type: FactoryBot.create(:integer_sample_attribute_type), required: false, sample_type: type)
       type.sample_attributes << FactoryBot.build(:sample_attribute, title: 'bool', sample_attribute_type: FactoryBot.create(:boolean_sample_attribute_type), required: false, sample_type: type)
+      type.sample_attributes << FactoryBot.build(:sample_attribute, title: 'data file', sample_attribute_type: FactoryBot.create(:data_file_sample_attribute_type), required: false, sample_type: type)
+      type.sample_attributes << FactoryBot.build(:sample_attribute, title: 'sop', sample_attribute_type: FactoryBot.create(:sop_sample_attribute_type), required: false, sample_type: type)
     end
     after(:create) do |type|
       type.annotate_with(['tag1', 'tag2'], 'sample_type_tag', type.contributor)
@@ -211,6 +220,22 @@ FactoryBot.define do
       type.sample_attributes << FactoryBot.build(:sample_attribute, title: 'Data file comment 1', sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), required: true, isa_tag_id: FactoryBot.create(:data_file_comment_isa_tag).id, sample_type: type)
       type.sample_attributes << FactoryBot.build(:sample_attribute, title: 'Data file comment 2', sample_attribute_type: FactoryBot.create(:controlled_vocab_attribute_type), isa_tag_id: FactoryBot.create(:data_file_comment_isa_tag).id, sample_controlled_vocab: FactoryBot.create(:apples_sample_controlled_vocab), sample_type: type)
       type.sample_attributes << FactoryBot.build(:sample_attribute, title: 'Data file comment 3', sample_attribute_type: FactoryBot.create(:controlled_vocab_attribute_type, title: 'Ontology'), isa_tag_id: FactoryBot.create(:data_file_comment_isa_tag).id, sample_controlled_vocab: FactoryBot.create(:efo_ontology), pid: 'pid:pid', sample_type: type, allow_cv_free_text: true)
+    end
+  end
+
+  factory(:fairdatastation_virtual_demo_sample_type, parent: :sample_type) do
+    title { 'fair data station virtual demo'}
+    after(:build) do |type, eval|
+      type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Title', sample_type: type, is_title: true)
+      type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Description', sample_type: type)
+
+      type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Host', pid:'http://fairbydesign.nl/ontology/host', sample_type: type)
+      type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Host disease stat', pid:'http://fairbydesign.nl/ontology/host_disease_stat', sample_type: type)
+      type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Marital status', pid:'http://fairbydesign.nl/ontology/marital_status', sample_type: type)
+      type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Occupation', pid:'http://fairbydesign.nl/ontology/occupation', sample_type: type)
+      type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Scientific name', pid:'http://gbol.life/0.1/scientificName', sample_type: type)
+      type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Organism', pid:'http://purl.uniprot.org/core/organism', sample_type: type)
+
     end
   end
 end

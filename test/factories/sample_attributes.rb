@@ -20,6 +20,11 @@ FactoryBot.define do
     association :sample_attribute_type, factory: :data_file_sample_attribute_type
     required { true }
   end
+
+  factory(:sop_sample_attribute, parent: :sample_attribute) do
+    association :sample_attribute_type, factory: :sop_sample_attribute_type
+    required { true }
+  end
   
   factory(:sample_sample_attribute, parent: :sample_attribute) do
     sequence(:title) { |n| "sample attribute #{n}" }
@@ -50,7 +55,7 @@ FactoryBot.define do
   factory(:string_sample_attribute_with_description_and_pid, parent: :sample_attribute) do
     association :sample_attribute_type, factory: :string_sample_attribute_type
     description { "sample_attribute_description" }
-    pid { "sample_attribute:pid" }
+    pid { "sample-attribute:pid" }
     required { true }
   end
 end

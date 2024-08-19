@@ -67,6 +67,9 @@ class SampleAttributeTest < ActiveSupport::TestCase
                                     sample_type: FactoryBot.create(:simple_sample_type)
     refute attribute.valid?
 
+    attribute.pid = 'Source:bacterial culture'
+    refute attribute.valid?
+
     attribute.pid = 'http://somewhere.org#fish'
     assert attribute.valid?
     attribute.pid = 'dc:fish'
@@ -332,6 +335,9 @@ class SampleAttributeTest < ActiveSupport::TestCase
 
     attribute = FactoryBot.create(:string_sample_attribute_with_description_and_pid, is_title: true, pid: 'http://pid.org/attr/title', sample_type: FactoryBot.create(:simple_sample_type))
     assert_equal 'title',attribute.short_pid
+
+    attribute.pid = 'Source:bacterial culture'
+    assert_equal 'Source:bacterial-culture',attribute.short_pid
 
     attribute = FactoryBot.create(:sample_sample_attribute, sample_type: FactoryBot.create(:simple_sample_type))
     assert_equal '', attribute.short_pid

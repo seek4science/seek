@@ -19,6 +19,8 @@ class AssaysController < ApplicationController
   # => Rearrange positions
   after_action :rearrange_assay_positions_at_destroy, only: :destroy
 
+  after_action :propagate_permissions_to_children, only: :manage_update
+
   include Seek::Publishing::PublishingCommon
 
   include Seek::IsaGraphExtensions
@@ -160,6 +162,30 @@ class AssaysController < ApplicationController
 
   private
 
+  def propagate_permissions_to_children
+    return unless params[:propagate_permissions] == '1'
+
+    # Should only propagate permissions to child assays if the assay is an assay stream
+    return unless @assay.is_assay_stream?
+
+    errors = []
+    @assay.child_assays.map do |assay|
+      unless assay.can_manage?
+        msg = "<li>You do not have the necessary permissions to propagate permissions to #{t('assay').downcase} [#{assay.id}]: '#{assay.title}'</li>"
+        errors.append(msg)
+        next
+      end
+
+      current_assay_policy = assay.policy
+      # Clone the policy from the parent assay
+      assay.update(policy: @assay.policy.deep_copy)
+      current_assay_policy.destroy if current_assay_policy
+      update_sharing_policies assay
+    end
+    # Add an error message to the flash
+    flash[:error] = "<ul>#{errors.join('')}</ul>".html_safe unless errors.empty?
+  end
+
   def delete_linked_sample_types
     return unless @assay.is_isa_json_compliant?
     return if @assay.sample_type.nil?
@@ -171,15 +197,11 @@ class AssaysController < ApplicationController
     return unless @assay.is_isa_json_compliant?
     return unless @assay.has_linked_child_assay?
 
-    previous_assay_linked_st_id = @assay.previous_linked_sample_type&.id
+    previous_st = @assay.sample_type&.previous_linked_sample_type
+    next_st = @assay.sample_type&.next_linked_sample_types&.first
+    return unless previous_st && next_st
 
-    next_assay = @assay.next_linked_child_assay
-
-    next_assay_st_attr = next_assay.sample_type&.sample_attributes&.detect(&:input_attribute?)
-
-    return unless next_assay && previous_assay_linked_st_id && next_assay_st_attr
-
-    next_assay_st_attr.update(linked_sample_type_id: previous_assay_linked_st_id)
+    next_st.sample_attributes.detect(&:input_attribute?).update_column(:linked_sample_type_id, previous_st&.id)
   end
 
   def rearrange_assay_positions_at_destroy
@@ -195,8 +217,7 @@ class AssaysController < ApplicationController
                                   { placeholders_attributes: %i[asset_id direction relationship_type_id] },
                                   { publication_ids: [] },
                                   { extended_metadata_attributes: determine_extended_metadata_keys },
-          { discussion_links_attributes:[:id, :url, :label, :_destroy] }
-                                  ).tap do |assay_params|
+                                  { discussion_links_attributes: %i[id url label _destroy] }).tap do |assay_params|
       assay_params[:document_ids].select! { |id| Document.find_by_id(id).try(:can_view?) } if assay_params.key?(:document_ids)
       assay_params[:sop_ids].select! { |id| Sop.find_by_id(id).try(:can_view?) } if assay_params.key?(:sop_ids)
       assay_params[:model_ids].select! { |id| Model.find_by_id(id).try(:can_view?) } if assay_params.key?(:model_ids)

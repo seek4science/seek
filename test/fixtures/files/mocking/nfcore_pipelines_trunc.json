@@ -1653,6 +1653,14 @@
           }
         }
       ]
+    },
+    {
+      "name": "archived",
+      "archived": true
+    },
+    {
+      "name": "disabled",
+      "disabled": true
     }
   ]
 }

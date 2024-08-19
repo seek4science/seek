@@ -48,7 +48,7 @@ uploadExcel||="studySampleUploadExcel()"
         if (res?.status == "unprocessable_entity"){
           alert(res?.error)
         } else {
-          $j('#change-batch-permission-modal').modal('show').focus();
+          $j('#change-batch-permission-modal').modal({backdrop: 'static', keyboard: false}).focus();
           $j('#change-batch-permission').html(res);
           ObjectsInput.init();
         }

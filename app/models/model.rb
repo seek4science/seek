@@ -111,6 +111,10 @@ class Model < ApplicationRecord
     end
   end
 
+  def can_run?
+    Seek::Config.jws_enabled && can_download? && is_jws_supported?
+  end
+
   private
 
   def check_for_sbml_format
