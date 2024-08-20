@@ -9,9 +9,11 @@ class ObservationUnit < ApplicationRecord
   has_many :related_assays, -> { distinct }, through: :samples, source: :assays
   has_many :observation_unit_assets, inverse_of: :observation_unit, dependent: :delete_all, autosave: true
   has_many :data_files, through: :observation_unit_assets, source: :asset, source_type: 'DataFile', inverse_of: :observation_units
+  has_many :assay_data_files, -> { distinct }, through: :related_assays, source: :data_files
+  has_many :assay_sops, -> { distinct }, through: :related_assays, source: :sops
+  has_many :assay_publications, -> { distinct }, through: :related_assays, source: :publications
 
-  acts_as_asset
-  undef_method :studies, :investigations # we don't want these from acts_as_asset
+  acts_as_isa
 
   validates :study,  presence: true
 
@@ -35,4 +37,15 @@ class ObservationUnit < ApplicationRecord
     (creators + contributors).compact.uniq
   end
 
+  def related_data_file_ids
+    data_file_ids | assay_data_file_ids
+  end
+
+  def related_sop_ids
+    assay_sop_ids
+  end
+
+  def related_publication_ids
+    assay_publication_ids
+  end
 end
