@@ -847,4 +847,15 @@ class AssayTest < ActiveSupport::TestCase
     assert_equal first_isa_assay.next_linked_child_assay, second_isa_assay
     assert_nil second_isa_assay.next_linked_child_assay
   end
+
+  test 'observation units' do
+    sample = FactoryBot.create(:sample)
+    assay = FactoryBot.create(:assay, samples: [sample], contributor: sample.contributor)
+    assert_empty assay.observation_units
+
+    obs_unit = FactoryBot.create(:observation_unit, samples:[sample], study: assay.study)
+    assay.reload
+    assert_equal [obs_unit], assay.observation_units
+  end
+
 end
