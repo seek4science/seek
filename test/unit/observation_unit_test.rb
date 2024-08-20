@@ -108,4 +108,20 @@ class ObservationUnitTest < ActiveSupport::TestCase
 
   end
 
+  test 'validate study matches with assay' do
+    obs_unit = FactoryBot.create(:observation_unit)
+    assert obs_unit.valid?
+
+    assay = FactoryBot.create(:experimental_assay, contributor: obs_unit.contributor)
+    sample = FactoryBot.create(:sample, assays: [assay], contributor: obs_unit.contributor)
+    refute_equal obs_unit.study, assay.study
+    obs_unit.samples << sample
+    refute obs_unit.valid?
+    assert_equal 'Study must match the associated assay', obs_unit.errors.full_messages.first
+
+    obs_unit = FactoryBot.create(:observation_unit, samples: [sample], study: assay.study, contributor: assay.contributor)
+    assert_equal obs_unit.study, assay.study
+    assert obs_unit.valid?
+  end
+
 end
