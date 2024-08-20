@@ -811,7 +811,7 @@ SEEK::Application.routes.draw do
 
   resources :observation_units, concerns:[:asset] do
 
-    resources :projects, :people, :programmes, :samples, :assays, :studies, :investigations, :data_files, :publications, :collections
+    resources :projects, :people, :programmes, :samples, :assays, :studies, :investigations, :data_files, :sops, :publications, :collections
   end
 
   ### MISC MATCHES ###
