@@ -286,4 +286,24 @@ class StudyTest < ActiveSupport::TestCase
     assert_equal [df1, df2].sort, study.related_data_files.sort
   end
 
+  test 'related samples' do
+    contributor = FactoryBot.create(:person)
+    sample1 = FactoryBot.create(:sample, contributor: contributor)
+    sample2 = FactoryBot.create(:sample, contributor: contributor)
+
+    # related just through an assay
+    assay = FactoryBot.create(:assay, samples: [sample1], contributor: contributor)
+    study = assay.study
+    assert_equal [sample1], study.related_samples
+
+    # related just through an observation unit
+    obs_unit = FactoryBot.create(:observation_unit, contributor: contributor, samples: [sample2])
+    assert_equal [sample2], obs_unit.study.related_samples
+
+    # related through both an assay and observation unit
+    obs_unit = FactoryBot.create(:observation_unit, contributor: contributor, samples:[sample2], study: study)
+    study.reload
+    assert_equal [sample1, sample2].sort, study.related_samples.sort
+  end
+
 end
