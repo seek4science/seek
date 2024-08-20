@@ -92,9 +92,19 @@ class ObservationUnitTest < ActiveSupport::TestCase
     obs_unit = FactoryBot.create(:observation_unit, study: study, samples: [sample], contributor: contributor)
 
     assert_equal [assay], sample.assays
-    assert_equal [assay], obs_unit.assays
-    assert_equal [study], obs_unit.studies
-    assert_equal [study.investigation], obs_unit.investigations
+    assert_equal [assay], obs_unit.related_assays
+    assert_equal study, obs_unit.study
+    assert_equal study.investigation, obs_unit.investigation
+
+    # observation unit without an assay
+    obs_unit = FactoryBot.create(:observation_unit, study: study)
+    assert_empty obs_unit.related_assays
+    assert_equal study, obs_unit.study
+    assert_equal study.investigation, obs_unit.investigation
+
+    # doesn't have these
+    refute obs_unit.respond_to?(:studies)
+    refute obs_unit.respond_to?(:investigations)
 
   end
 
