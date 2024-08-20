@@ -16,6 +16,7 @@ class ObservationUnit < ApplicationRecord
   acts_as_isa
 
   validates :study,  presence: true
+  validate :study_matches_assays_if_present
 
   accepts_nested_attributes_for :data_files, allow_destroy: true
 
@@ -47,5 +48,18 @@ class ObservationUnit < ApplicationRecord
 
   def related_publication_ids
     assay_publication_ids
+  end
+
+  private
+
+  def study_matches_assays_if_present
+    samples.each do |sample|
+      sample.assays.each do |assay|
+        if assay.study != study
+          errors.add(:study, 'must match the associated assay')
+          return false
+        end
+      end
+    end
   end
 end
