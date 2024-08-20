@@ -60,6 +60,7 @@ class Assay < ApplicationRecord
   validates_presence_of :contributor
   validates_presence_of :assay_class
   validates :study, presence: { message: 'must be selected and valid' }, projects: true
+  validate :study_matches_observation_units_if_present
 
   before_validation :default_assay_and_technology_type
 
@@ -302,6 +303,15 @@ class Assay < ApplicationRecord
   end
 
   private
+
+  def study_matches_observation_units_if_present
+    samples.each do |sample|
+        if sample.observation_unit && sample.observation_unit.study != study
+          errors.add(:study, 'must match the associated observation unit')
+          return false
+        end
+    end
+  end
 
   def set_assay_assets_for(type, attributes)
     type_assay_assets, other_assay_assets = assay_assets.partition { |aa| aa.asset_type == type }
