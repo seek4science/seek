@@ -305,11 +305,12 @@ class Assay < ApplicationRecord
   private
 
   def study_matches_observation_units_if_present
+    return if samples.empty?
     samples.each do |sample|
-        if sample.observation_unit && sample.observation_unit.study != study
+      if sample.observation_unit && sample.observation_unit.study != study
           errors.add(:study, 'must match the associated observation unit')
           return false
-        end
+      end
     end
   end
 

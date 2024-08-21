@@ -53,6 +53,7 @@ class ObservationUnit < ApplicationRecord
   private
 
   def study_matches_assays_if_present
+    return if samples.empty?
     samples.each do |sample|
       sample.assays.each do |assay|
         if assay.study != study
