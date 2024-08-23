@@ -1923,13 +1923,13 @@ class DataFilesControllerTest < ActionController::TestCase
   test "should not create cache job if setting disabled even if user requests 'make_local_copy'" do
     mock_http
     params = { data_file: {
-        title: 'Big File',
-        project_ids: [projects(:sysmo_project).id]
+      title: 'Big File',
+      project_ids: [projects(:sysmo_project).id]
     },
                content_blobs: [{
-                                   data_url: 'http://mockedlocation.com/big.txt',
-                                   original_filename: '',
-                                   make_local_copy: '1'
+                                 data_url: 'http://mockedlocation.com/big.txt',
+                                 original_filename: '',
+                                 make_local_copy: '1'
                                }],
                policy_attributes: valid_sharing }
     with_config_value(:cache_remote_files, false) do
@@ -1944,8 +1944,9 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_redirected_to data_file_path(assigns(:data_file))
       blob = assigns(:data_file).content_blob
       refute blob.external_link?
-      assert !blob.cachable?
-      assert !blob.url.blank?
+      refute blob.cachable?
+      refute blob.url.blank?
+      assert blob.make_local_copy?
       assert_equal 'big.txt', blob.original_filename
       assert_equal 'text/plain', blob.content_type
       assert_equal 5000, blob.file_size
@@ -1956,12 +1957,12 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'should not automatically create cache job for large file' do
     mock_http
     params = { data_file: {
-        title: 'Big File',
-        project_ids: [projects(:sysmo_project).id]
+      title: 'Big File',
+      project_ids: [projects(:sysmo_project).id]
     },
                content_blobs: [{
-                                   data_url: 'http://mockedlocation.com/big.txt',
-                                   make_local_copy: '0'
+                                 data_url: 'http://mockedlocation.com/big.txt',
+                                 make_local_copy: '0'
                                }],
                policy_attributes: valid_sharing }
 
@@ -1975,7 +1976,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_redirected_to data_file_path(assigns(:data_file))
     blob = assigns(:data_file).content_blob
-    refute blob.make_local_copy
+    refute blob.make_local_copy?
     refute blob.cachable?
     refute blob.url.blank?
     assert_equal 'big.txt', blob.original_filename
