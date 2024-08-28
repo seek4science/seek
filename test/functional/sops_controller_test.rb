@@ -644,8 +644,7 @@ class SopsControllerTest < ActionController::TestCase
     # Does not update policy
     assert_equal Policy::NO_ACCESS, sop.policy.access_type
     # Does add permissions
-    assert_equal other_person.id, policy.permissions.second.contributor_id
-    assert_equal Policy::MANAGING, policy.permissions.second.access_type
+    assert policy.permissions.detect { |p| p.contributor == other_person && p.access_type == Policy::MANAGING }
     assert_redirected_to sop
     # User knows - Flash indicates to user that it is in gatekeeper's hands
     assert_includes flash[:notice],("gatekeeper's approval list.")
@@ -673,8 +672,7 @@ class SopsControllerTest < ActionController::TestCase
     # Does not update policy
     assert_equal Policy::VISIBLE, sop.policy.access_type
     # Does add permissions
-    assert_equal other_person.id, policy.permissions.second.contributor_id
-    assert_equal Policy::MANAGING, policy.permissions.second.access_type
+    assert policy.permissions.detect { |p| p.contributor == other_person && p.access_type == Policy::MANAGING }
     assert_redirected_to sop
     # User knows - Flash indicates to user that it is in gatekeeper's hands
     assert_includes flash[:notice],("gatekeeper's approval list.")
