@@ -34,33 +34,33 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
     assert_equal 'DRR243856', assay.identifier
   end
 
-  test 'read indpensim' do
-    path = "#{Rails.root}/test/fixtures/files/fairdatastation/indpensim.ttl"
+  test 'read seek test case' do
+    path = "#{Rails.root}/test/fixtures/files/fairdatastation/seek-fair-data-station-test-case.ttl"
 
     investigations = Seek::FairDataStation::Reader.instance.parse_graph(path)
     assert_equal 1, investigations.count
     inv = investigations.first
-    assert_equal 'http://fairbydesign.nl/ontology/inv_indpensim', inv.resource_uri.to_s
-    assert_equal 'indpensim', inv.identifier
+    assert_equal 'http://fairbydesign.nl/ontology/inv_seek-test-investigation', inv.resource_uri.to_s
+    assert_equal 'seek-test-investigation', inv.identifier
 
-    assert_equal 1, inv.studies.count
-    study = inv.studies.first
-    assert_equal 'http://fairbydesign.nl/ontology/inv_indpensim/stu_Penicillin_production', study.resource_uri.to_s
-    assert_equal 'Penicillin_production', study.identifier
+    assert_equal 2, inv.studies.count
+    study = inv.studies.last
+    assert_equal 'http://fairbydesign.nl/ontology/inv_seek-test-investigation/stu_seek-test-study-2', study.resource_uri.to_s
+    assert_equal 'seek-test-study-2', study.identifier
 
-    assert_equal 100, study.observation_units.count
+    assert_equal 2, study.observation_units.count
     obs_unit = study.observation_units.first
-    assert_equal 'http://fairbydesign.nl/ontology/inv_indpensim/stu_Penicillin_production/obs_IndPenSim_V3_Batch_1',
+    assert_equal 'http://fairbydesign.nl/ontology/inv_seek-test-investigation/stu_seek-test-study-2/obs_seek-test-obs-unit-2',
                  obs_unit.resource_uri.to_s
-    assert_equal 'IndPenSim_V3_Batch_1', obs_unit.identifier
+    assert_equal 'seek-test-obs-unit-2', obs_unit.identifier
 
-    assert_equal 0, obs_unit.samples.count
+    assert_equal 2, obs_unit.samples.count
     assert_equal 1, obs_unit.datasets.count
     dataset = obs_unit.datasets.first
-    assert_equal 'https://data.yoda.wur.nl/research-bioindustry/Use%20cases/Simulation%20datasets/IndPenSim/IndPenSim_V3_Batch_1.csv.gz', dataset.resource_uri
-    assert_equal 'IndPenSim_V3_Batch_1.csv.gz', dataset.identifier
+    assert_equal 'http://fairbydesign.nl/data_sample/test-file-1.csv', dataset.resource_uri
+    assert_equal 'test-file-1.csv', dataset.identifier
     assert_equal 'file', dataset.description
-    assert_equal 'https://data.yoda.wur.nl/research-bioindustry/Use%20cases/Simulation%20datasets/IndPenSim/IndPenSim_V3_Batch_1.csv.gz', dataset.content_url
+    assert_equal 'http://fairbydesign.nl/data_sample/test-file-1.csv', dataset.content_url
   end
 
   test 'annotations' do
@@ -87,14 +87,21 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
     end
 
     # non fairbydesign annotations
-    path = "#{Rails.root}/test/fixtures/files/fairdatastation/indpensim.ttl"
+    path = "#{Rails.root}/test/fixtures/files/fairdatastation/seek-fair-data-station-test-case.ttl"
     inv = Seek::FairDataStation::Reader.instance.parse_graph(path).first
     obs_unit = inv.studies.first.observation_units.first
     annotations = obs_unit.additional_metadata_annotations
-    assert_equal 5, annotations.count
+    assert_equal 3, annotations.count
     pids = annotations.collect{|ann| ann[0]}
+    assert_includes pids, 'https://w3id.org/mixs/0000811'
+    sample = obs_unit.samples.first
+    annotations = sample.additional_metadata_annotations
+    assert_equal 4, annotations.count
+    pids = annotations.collect{|ann| ann[0]}
+    assert_includes pids, 'https://w3id.org/mixs/0000011'
     assert_includes pids, 'http://gbol.life/0.1/scientificName'
     assert_includes pids, 'http://purl.uniprot.org/core/organism'
+
   end
 
   test 'study assays' do

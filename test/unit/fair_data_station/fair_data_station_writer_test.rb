@@ -137,30 +137,41 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
 
   end
 
-  test 'observation_unit datasets created in construct_isa' do
-    path = "#{Rails.root}/test/fixtures/files/fairdatastation/indpensim.ttl"
+  test 'observation_unit and assay datasets created in construct_isa' do
+    path = "#{Rails.root}/test/fixtures/files/fairdatastation/seek-fair-data-station-test-case.ttl"
     inv = Seek::FairDataStation::Reader.instance.parse_graph(path).first
 
     contributor = FactoryBot.create(:person)
     project = contributor.projects.first
     FactoryBot.create(:experimental_assay_class)
-    FactoryBot.create(:fairdatastation_virtual_demo_sample_type)
+    FactoryBot.create(:fairdatastation_test_case_sample_type)
 
     investigation = Seek::FairDataStation::Writer.instance.construct_isa(inv, contributor, [project], Policy.default)
-    assert_equal 100, investigation.studies.first.observation_units.to_a.count
-    observation_unit = investigation.studies.first.observation_units.first
+    assert_equal 2, investigation.studies.last.observation_units.to_a.count
+    observation_unit = investigation.studies.last.observation_units.first
     assert_equal 1, observation_unit.observation_unit_assets.find_all{|oua| oua.asset_type == 'DataFile'}.collect(&:asset).count
 
-    df = observation_unit.observation_unit_assets.first.asset
-    assert_equal 'Dataset: IndPenSim_V3_Batch_1.csv.gz', df.title
+    df = observation_unit.observation_unit_assets.find_all{|oua| oua.asset_type == 'DataFile'}.first.asset
+    assert_equal 'Dataset: test-file-1.csv', df.title
     assert_equal 'file', df.description
     assert_equal 'application/octet-stream', df.content_blob.content_type
     assert df.content_blob.external_link?
     assert df.content_blob.is_webpage?
     assert df.content_blob.show_as_external_link?
 
-    assert_difference('DataFile.count',96) do
-      assert_difference('ObservationUnitAsset.count',96) do
+    assay = investigation.studies.last.assays.last
+    assert_equal 'Assay - seek-test-assay-6', assay.title
+    assert_equal 1, assay.assay_assets.find_all{|oua| oua.asset_type == 'DataFile'}.collect(&:asset).count
+    df = assay.assay_assets.find_all{|oua| oua.asset_type == 'DataFile'}.first.asset
+    assert_equal 'Dataset: test-file-3.csv', df.title
+    assert_equal 'file', df.description
+    assert_equal 'application/octet-stream', df.content_blob.content_type
+    assert df.content_blob.external_link?
+    assert df.content_blob.is_webpage?
+    assert df.content_blob.show_as_external_link?
+
+    assert_difference('DataFile.count',9) do
+      assert_difference('ObservationUnitAsset.count',3) do
         disable_authorization_checks {
           investigation.save!
         }
@@ -169,10 +180,10 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
   end
 
   test 'populate obsv unit extended metadata' do
-    ext_metadata_type = FactoryBot.create(:fairdata_indpensim_obsv_unit_extended_metadata)
+    ext_metadata_type = FactoryBot.create(:fairdata_test_case_obsv_unit_extended_metadata)
     FactoryBot.create(:experimental_assay_class)
 
-    path = "#{Rails.root}/test/fixtures/files/fairdatastation/indpensim.ttl"
+    path = "#{Rails.root}/test/fixtures/files/fairdatastation/seek-fair-data-station-test-case.ttl"
     inv = Seek::FairDataStation::Reader.instance.parse_graph(path).first
     contributor = FactoryBot.create(:person)
     project = contributor.projects.first
@@ -180,24 +191,22 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     investigation = Seek::FairDataStation::Writer.instance.construct_isa(inv, contributor, [project], Policy.default)
     assert_nil investigation.extended_metadata
 
-    assert_difference('ExtendedMetadata.count', 100) do
+    assert_difference('ExtendedMetadata.count', 3) do
       User.with_current_user(contributor.user) do
         investigation.save!
       end
     end
 
-    assert_equal 1, investigation.studies.count
+    assert_equal 2, investigation.studies.count
     study = investigation.studies.first
-    assert_equal 100, study.observation_units.count
+    assert_equal 1, study.observation_units.count
     obvs_unit = study.observation_units.first
     refute_nil obvs_unit.extended_metadata
     assert_equal ext_metadata_type, obvs_unit.extended_metadata.extended_metadata_type
 
-    assert_equal 'FermentorX', obvs_unit.extended_metadata.get_attribute_value('Brand')
-    assert_equal 'batch', obvs_unit.extended_metadata.get_attribute_value('Fermentation')
-    assert_equal '100,000 litre', obvs_unit.extended_metadata.get_attribute_value('Volume')
-    assert_equal 'Penicillium chrysogenum', obvs_unit.extended_metadata.get_attribute_value('Scientific Name')
-    assert_equal '5076', obvs_unit.extended_metadata.get_attribute_value('Organism')
+    assert_equal '1234g', obvs_unit.extended_metadata.get_attribute_value('Birth weight')
+    assert_equal 'male', obvs_unit.extended_metadata.get_attribute_value('Gender')
+    assert_equal '2020-01-10', obvs_unit.extended_metadata.get_attribute_value('Date of birth')
   end
 
 end
