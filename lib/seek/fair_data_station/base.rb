@@ -90,7 +90,7 @@ module Seek
       end
 
       def seek_attributes
-        { title: title, description: description }
+        { title: title, description: description, external_identifier: identifier }
       end
 
       def populate_extended_metadata(seek_resource)

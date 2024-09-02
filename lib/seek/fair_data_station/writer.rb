@@ -44,7 +44,8 @@ module Seek
       end
 
       def build_sample(datastation_sample, contributor, policy, projects)
-        sample = ::Sample.new(contributor: contributor, projects: projects, policy: policy.deep_copy)
+        sample_attributes = datastation_sample.seek_attributes.merge({contributor: contributor, projects: projects, policy: policy.deep_copy})
+        sample = ::Sample.new(sample_attributes)
         populate_sample(sample, datastation_sample)
         sample
       end
