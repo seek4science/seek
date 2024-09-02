@@ -10,6 +10,9 @@ class ObservationUnitsController < ApplicationController
   before_action :login_required,:except=>[:show,:index]
   before_action :find_assets, only: [:index]
 
+  include Seek::Publishing::PublishingCommon
+  include Seek::IsaGraphExtensions
+
   api_actions :index, :show, :create, :update, :destroy
 
   def show

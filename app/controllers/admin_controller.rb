@@ -121,6 +121,7 @@ class AdminController < ApplicationController
     Seek::Config.documents_enabled = string_to_boolean params[:documents_enabled]
     Seek::Config.events_enabled = string_to_boolean params[:events_enabled]
     Seek::Config.isa_enabled = string_to_boolean params[:isa_enabled]
+    Seek::Config.observation_units_enabled = string_to_boolean params[:observation_units_enabled]
     Seek::Config.models_enabled = string_to_boolean params[:models_enabled]
     Seek::Config.organisms_enabled = string_to_boolean params[:organisms_enabled]
     Seek::Config.programmes_enabled = string_to_boolean params[:programmes_enabled]

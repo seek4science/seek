@@ -340,10 +340,6 @@ module Seek
       organisms_enabled
     end
 
-    def observation_units_enabled
-      fair_data_station_enabled
-    end
-
     def omniauth_elixir_aai_config
       if omniauth_elixir_aai_legacy_mode
         {
@@ -622,7 +618,7 @@ module Seek
 
     def self.settings_cache
       RequestStore.fetch(:config_cache) do
-        Rails.cache.fetch(cache_key, expires_in: 1.week) do
+        cache_store.fetch(cache_key, expires_in: 1.week) do
           cache_setting = Thread.current[:use_settings_cache]
           begin
             hash = {}
@@ -637,11 +633,15 @@ module Seek
     end
 
     def self.clear_cache
-      Rails.cache.delete(cache_key)
+      cache_store.delete(cache_key)
     end
 
     def self.cache_key
       'seek_config'
+    end
+
+    def self.cache_store
+      Rails.application.config.settings_cache_store
     end
   end
 end
