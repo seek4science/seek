@@ -51,6 +51,13 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     pp data_files.first.errors unless data_files.first.valid?
     assert data_files.first.valid?
 
+    assert_equal 'INV_DRP007092', investigation.external_identifier
+    assert_equal 'DRP007092', studies.first.external_identifier
+    assert_equal 'DRR243856', assays.first.external_identifier
+    assert_equal 'DRR243856_1.fastq.gz', data_files.first.external_identifier
+    assert_equal 'HIV-1_positive', obs_units.first.external_identifier
+    assert_equal 'DRS176892', samples.first.external_identifier
+
     assert_difference('Investigation.count', 1) do
       assert_difference('Study.count', 1) do
         assert_difference('ObservationUnit.count', 2) do
