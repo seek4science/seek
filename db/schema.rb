@@ -315,6 +315,7 @@ ActiveRecord::Schema.define(version: 2024_09_02_125710) do
     t.datetime "updated_at", null: false
     t.bigint "avatar_id"
     t.string "deleted_contributor"
+    t.string "external_identifier", limit: 2048
     t.index ["avatar_id"], name: "index_collections_on_avatar_id"
     t.index ["contributor_id"], name: "index_collections_on_contributor_id"
     t.index ["policy_id"], name: "index_collections_on_policy_id"
@@ -1669,6 +1670,7 @@ ActiveRecord::Schema.define(version: 2024_09_02_125710) do
     t.integer "version", default: 1
     t.string "license"
     t.text "other_creators"
+    t.string "external_identifier", limit: 2048
     t.index ["contributor_id"], name: "index_publications_on_contributor"
   end
 
