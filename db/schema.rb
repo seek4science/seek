@@ -756,6 +756,7 @@ ActiveRecord::Schema.define(version: 2024_09_02_125710) do
     t.text "other_creators"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string "external_identifier", limit: 2048
     t.index ["policy_id"], name: "index_file_templates_on_policy_id"
   end
 
@@ -1374,6 +1375,7 @@ ActiveRecord::Schema.define(version: 2024_09_02_125710) do
     t.bigint "file_template_id"
     t.bigint "project_id"
     t.integer "data_file_id"
+    t.string "external_identifier", limit: 2048
     t.index ["contributor_id"], name: "index_ps_on_c"
     t.index ["file_template_id"], name: "index_placeholders_on_file_template_id"
     t.index ["policy_id"], name: "index_placeholders_on_policy_id"
@@ -1832,6 +1834,7 @@ ActiveRecord::Schema.define(version: 2024_09_02_125710) do
     t.string "deleted_contributor"
     t.integer "template_id"
     t.text "other_creators"
+    t.string "external_identifier", limit: 2048
   end
 
   create_table "sample_types_studies", force: :cascade do |t|
@@ -2205,6 +2208,7 @@ ActiveRecord::Schema.define(version: 2024_09_02_125710) do
     t.string "uuid"
     t.string "first_letter", limit: 1
     t.text "other_creators"
+    t.string "external_identifier", limit: 2048
     t.index ["title", "group"], name: "index_templates_title_group"
   end
 
