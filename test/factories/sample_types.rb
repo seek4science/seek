@@ -3,7 +3,6 @@ FactoryBot.define do
   factory(:sample_type) do
     sequence(:title) { |n| "SampleType #{n}" }
     with_project_contributor
-    #projects { [FactoryBot.build(:project)] }
   end
 
   factory(:patient_sample_type, parent: :sample_type) do

@@ -25,6 +25,7 @@ class SampleType < ApplicationRecord
   acts_as_uniquely_identifiable
 
   acts_as_favouritable
+  has_external_identifier # to be replaced with acts_as_asset when sharing permissions are adding in upcoming pull request
 
   has_many :samples, inverse_of: :sample_type
 

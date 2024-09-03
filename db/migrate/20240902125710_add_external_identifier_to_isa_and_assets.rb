@@ -14,5 +14,9 @@ class AddExternalIdentifierToIsaAndAssets < ActiveRecord::Migration[6.1]
     add_column :strains, :external_identifier, :string, limit: 2048
     add_column :publications, :external_identifier, :string, limit: 2048
     add_column :collections, :external_identifier, :string, limit: 2048
+    add_column :placeholders, :external_identifier, :string, limit: 2048
+    add_column :file_templates, :external_identifier, :string, limit: 2048
+    add_column :templates, :external_identifier, :string, limit: 2048
+    add_column :sample_types, :external_identifier, :string, limit: 2048
   end
 end
