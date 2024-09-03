@@ -1,9 +1,9 @@
 module Seek
   module FairDataStation
     class Writer
-      include Singleton
 
       def construct_isa(datastation_inv, contributor, projects, policy)
+        reset_data_file_cache
         investigation = build_investigation(datastation_inv, contributor, policy, projects)
 
         datastation_inv.studies.each do |datastation_study|
@@ -28,6 +28,10 @@ module Seek
       end
 
       private
+
+      def reset_data_file_cache
+        @data_file_cache = {}
+      end
 
       def build_assay(datastation_assay, contributor, policy, projects, sample, study)
         samples = []
@@ -125,19 +129,15 @@ module Seek
       end
 
       def build_data_file(contributor, datastation_dataset, projects, policy)
-        # @_data_file_cache = {}
-        # if @_data_file_cache[datastation_dataset.identifier]
-        #   @_data_file_cache[datastation_dataset.identifier]
-        # else
-        blob = ContentBlob.new(url: datastation_dataset.content_url.to_s,
-                               original_filename: datastation_dataset.identifier, external_link: true, is_webpage: true, content_type: 'application/octet-stream')
-        data_file_attributes = datastation_dataset.seek_attributes.merge({
-                                                                           contributor: contributor, projects: projects,
-                                                                           content_blob: blob, policy: policy.deep_copy
-                                                                         })
-        DataFile.new(data_file_attributes)
-        #   @_data_file_cache[datastation_dataset.identifier] = DataFile.new(data_file_attributes)
-        # end
+        @data_file_cache[datastation_dataset.identifier] ||= begin
+          blob = ContentBlob.new(url: datastation_dataset.content_url.to_s,
+                                 original_filename: datastation_dataset.identifier, external_link: true, is_webpage: true, content_type: 'application/octet-stream')
+          data_file_attributes = datastation_dataset.seek_attributes.merge({
+                                                                             contributor: contributor, projects: projects,
+                                                                             content_blob: blob, policy: policy.deep_copy
+                                                                           })
+          DataFile.new(data_file_attributes)
+        end
       end
     end
   end
