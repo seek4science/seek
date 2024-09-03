@@ -30,6 +30,7 @@ class HasExternalIdentifierTest < ActiveSupport::TestCase
       obj2 = FactoryBot.build(factory_name, contributor: contributor1, external_identifier: 'some id')
       assert_equal obj.projects, obj2.projects, "#{factory_name} projects should match"
       refute obj2.valid?, "#{factory_name} should not be valid"
+      assert_equal ['is not unique within the scope of the associated Projects'], obj2.errors[:external_identifier]
       obj2.external_identifier = 'some other id'
       assert obj2.valid?, "#{factory_name} should be valid"
       # same id, different project. Skip Study and Assay as they inherit project from Investigation
