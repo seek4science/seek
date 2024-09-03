@@ -5,7 +5,6 @@ require 'sparql/client'
 module Seek
   module FairDataStation
     class Reader
-      include Singleton
       def parse_graph(path)
         graph = RDF::Graph.load(path, format: :ttl)
         sparql = SPARQL::Client.new(graph)

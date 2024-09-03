@@ -4,7 +4,7 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
   test 'read demo' do
     path = "#{Rails.root}/test/fixtures/files/fairdatastation/demo.ttl"
 
-    investigations = Seek::FairDataStation::Reader.instance.parse_graph(path)
+    investigations = Seek::FairDataStation::Reader.new.parse_graph(path)
     assert_equal 1, investigations.count
     inv = investigations.first
     assert_equal 'http://fairbydesign.nl/ontology/inv_INV_DRP007092', inv.resource_uri.to_s
@@ -37,7 +37,7 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
   test 'read seek test case' do
     path = "#{Rails.root}/test/fixtures/files/fairdatastation/seek-fair-data-station-test-case.ttl"
 
-    investigations = Seek::FairDataStation::Reader.instance.parse_graph(path)
+    investigations = Seek::FairDataStation::Reader.new.parse_graph(path)
     assert_equal 1, investigations.count
     inv = investigations.first
     assert_equal 'http://fairbydesign.nl/ontology/inv_seek-test-investigation', inv.resource_uri.to_s
@@ -66,7 +66,7 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
   test 'annotations' do
     path = "#{Rails.root}/test/fixtures/files/fairdatastation/demo.ttl"
 
-    study = Seek::FairDataStation::Reader.instance.parse_graph(path).first.studies.first
+    study = Seek::FairDataStation::Reader.new.parse_graph(path).first.studies.first
 
     assert_equal 14, study.annotations.count
     assert_includes study.annotations, ["http://fairbydesign.nl/ontology/center_name", "NIID"]
@@ -75,7 +75,7 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
   test 'additional metadata annotations' do
     path = "#{Rails.root}/test/fixtures/files/fairdatastation/demo.ttl"
 
-    inv = Seek::FairDataStation::Reader.instance.parse_graph(path).first
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
     assert_empty inv.additional_metadata_annotations
 
     study = inv.studies.first
@@ -88,7 +88,7 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
 
     # non fairbydesign annotations
     path = "#{Rails.root}/test/fixtures/files/fairdatastation/seek-fair-data-station-test-case.ttl"
-    inv = Seek::FairDataStation::Reader.instance.parse_graph(path).first
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
     obs_unit = inv.studies.first.observation_units.first
     annotations = obs_unit.additional_metadata_annotations
     assert_equal 3, annotations.count
@@ -107,7 +107,7 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
   test 'study assays' do
     path = "#{Rails.root}/test/fixtures/files/fairdatastation/demo.ttl"
 
-    investigations = Seek::FairDataStation::Reader.instance.parse_graph(path)
+    investigations = Seek::FairDataStation::Reader.new.parse_graph(path)
     study = investigations.first.studies.first
     assert_equal 9, study.assays.count
     expected = %w[DRR243845 DRR243850 DRR243856 DRR243863 DRR243881 DRR243894 DRR243899 DRR243906
@@ -118,7 +118,7 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
   test 'titles and descriptions' do
     path = "#{Rails.root}/test/fixtures/files/fairdatastation/demo.ttl"
 
-    inv = Seek::FairDataStation::Reader.instance.parse_graph(path).first
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
     study = inv.studies.first
     obs_unit = study.observation_units.first
     sample = obs_unit.samples.first
@@ -145,7 +145,7 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
   test 'datasets' do
     path = "#{Rails.root}/test/fixtures/files/fairdatastation/demo.ttl"
 
-    inv = Seek::FairDataStation::Reader.instance.parse_graph(path).first
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
     study = inv.studies.first
     obs_unit = study.observation_units.first
     sample = obs_unit.samples.first

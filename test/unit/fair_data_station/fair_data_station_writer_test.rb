@@ -4,7 +4,7 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
 
   test 'construct seek isa' do
     path = "#{Rails.root}/test/fixtures/files/fairdatastation/demo.ttl"
-    inv = Seek::FairDataStation::Reader.instance.parse_graph(path).first
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
     policy = FactoryBot.create(:public_policy)
 
     contributor = FactoryBot.create(:person)
@@ -12,7 +12,7 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     FactoryBot.create(:experimental_assay_class)
     FactoryBot.create(:fairdatastation_virtual_demo_sample_type)
 
-    investigation = Seek::FairDataStation::Writer.instance.construct_isa(inv, contributor, [project], policy)
+    investigation = Seek::FairDataStation::Writer.new.construct_isa(inv, contributor, [project], policy)
     studies = investigation.studies.to_a
     obs_units = studies.first.observation_units.to_a
     assays = studies.first.assays.to_a
@@ -88,11 +88,11 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     sample_type = FactoryBot.create(:fairdatastation_virtual_demo_sample_type)
 
     path = "#{Rails.root}/test/fixtures/files/fairdatastation/demo.ttl"
-    inv = Seek::FairDataStation::Reader.instance.parse_graph(path).first
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
     contributor = FactoryBot.create(:person)
     project = contributor.projects.first
 
-    investigation = Seek::FairDataStation::Writer.instance.construct_isa(inv, contributor, [project], Policy.default)
+    investigation = Seek::FairDataStation::Writer.new.construct_isa(inv, contributor, [project], Policy.default)
     assert_nil investigation.extended_metadata
 
     study = investigation.studies.first
@@ -146,14 +146,14 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
 
   test 'observation_unit and assay datasets created in construct_isa' do
     path = "#{Rails.root}/test/fixtures/files/fairdatastation/seek-fair-data-station-test-case.ttl"
-    inv = Seek::FairDataStation::Reader.instance.parse_graph(path).first
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
 
     contributor = FactoryBot.create(:person)
     project = contributor.projects.first
     FactoryBot.create(:experimental_assay_class)
     FactoryBot.create(:fairdatastation_test_case_sample_type)
 
-    investigation = Seek::FairDataStation::Writer.instance.construct_isa(inv, contributor, [project], Policy.default)
+    investigation = Seek::FairDataStation::Writer.new.construct_isa(inv, contributor, [project], Policy.default)
     assert_equal 2, investigation.studies.last.observation_units.to_a.count
     observation_unit = investigation.studies.last.observation_units.first
     assert_equal 1, observation_unit.observation_unit_assets.find_all{|oua| oua.asset_type == 'DataFile'}.collect(&:asset).count
@@ -177,13 +177,22 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     assert df.content_blob.is_webpage?
     assert df.content_blob.show_as_external_link?
 
-    assert_difference('DataFile.count',9) do
+    assert_difference('DataFile.count',5) do
       assert_difference('ObservationUnitAsset.count',3) do
         disable_authorization_checks {
           investigation.save!
         }
       end
     end
+
+    # check dataset linked to multiple cases
+    df = DataFile.where(external_identifier: 'test-file-1.csv').first
+    assert_equal ['seek-test-obs-unit-1','seek-test-obs-unit-2'], df.observation_units.collect(&:external_identifier).sort
+    assert_equal ['seek-test-assay-1'], df.assays.collect(&:external_identifier).sort
+    df = DataFile.where(external_identifier: 'test-file-3.csv').first
+    assert_empty df.observation_units
+    assert_equal ['seek-test-assay-3', 'seek-test-assay-6'], df.assays.collect(&:external_identifier).sort
+
   end
 
   test 'populate obsv unit extended metadata' do
@@ -191,11 +200,11 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     FactoryBot.create(:experimental_assay_class)
 
     path = "#{Rails.root}/test/fixtures/files/fairdatastation/seek-fair-data-station-test-case.ttl"
-    inv = Seek::FairDataStation::Reader.instance.parse_graph(path).first
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
     contributor = FactoryBot.create(:person)
     project = contributor.projects.first
 
-    investigation = Seek::FairDataStation::Writer.instance.construct_isa(inv, contributor, [project], Policy.default)
+    investigation = Seek::FairDataStation::Writer.new.construct_isa(inv, contributor, [project], Policy.default)
     assert_nil investigation.extended_metadata
 
     assert_difference('ExtendedMetadata.count', 3) do
