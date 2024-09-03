@@ -1,13 +1,14 @@
 require 'test_helper'
 
 class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
+  include ApiTestHelper
+
   setup do
-    @person = FactoryBot.create(:person)
-    login_as(@person.user)
+    user_login
     FactoryBot.create(:cwl_workflow_class) # Make sure the CWL class is present
     FactoryBot.create(:nextflow_workflow_class)
     FactoryBot.create(:galaxy_workflow_class)
-    @project = @person.projects.first
+    @project = current_person.projects.first
     @git_support = Seek::Config.git_support_enabled
     Seek::Config.git_support_enabled = true
   end
@@ -23,7 +24,7 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
         workflow: {
           project_ids: [@project.id]
         }
-      }
+      }, headers: { 'Authorization' => write_access_auth }
 
       assert_response :success
       assert_equal 'Nextflow', assigns(:workflow).workflow_class.title
@@ -34,7 +35,7 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'can post RO-Crate as new version' do
-    workflow = FactoryBot.create(:local_git_workflow, policy: FactoryBot.create(:public_policy), contributor: @person)
+    workflow = FactoryBot.create(:local_git_workflow, policy: FactoryBot.create(:public_policy), contributor: current_person)
 
     assert_no_difference('Workflow.count') do
       assert_difference('Git::Version.count', 1) do
@@ -44,7 +45,7 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
             project_ids: [@project.id]
           },
           revision_comments: 'new ver'
-        }
+        }, headers: { 'Authorization' => write_access_auth }
 
         assert_response :success
         workflow = assigns(:workflow).reload
@@ -68,7 +69,7 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'cannot post RO-Crate as new version to remote git workflows' do
-    workflow = FactoryBot.create(:remote_git_workflow, policy: FactoryBot.create(:public_policy), contributor: @person)
+    workflow = FactoryBot.create(:remote_git_workflow, policy: FactoryBot.create(:public_policy), contributor: current_person)
 
     assert_no_difference('Workflow.count') do
       assert_no_difference('Git::Version.count') do
@@ -78,7 +79,7 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
             project_ids: [@project.id]
           },
           revision_comments: 'new ver'
-        }
+        }, headers: { 'Authorization' => write_access_auth }
 
         assert_response :unprocessable_entity
         assert JSON.parse(@response.body)['errors'].any? { |e| e['detail'].include?('Cannot add RO-Crate to remote workflows') }
@@ -93,7 +94,7 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
         workflow: {
           project_ids: [@project.id]
         }
-      }
+      }, headers: { 'Authorization' => write_access_auth }
 
       assert_response :unprocessable_entity
       assert JSON.parse(@response.body)['errors'].any? { |e| e['detail'].include?("can't be blank") }
@@ -108,7 +109,7 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
           title: 'Alternative title',
           project_ids: [@project.id]
         }
-      }
+      }, headers: { 'Authorization' => write_access_auth }
 
       assert_response :success
       assert_equal 'Alternative title', assigns(:workflow).title
@@ -122,7 +123,7 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
         workflow: {
           project_ids: [@project.id]
         }
-      }
+      }, headers: { 'Authorization' => write_access_auth }
 
       assert_response :success
       assert_equal 'MIT', assigns(:workflow).license
@@ -137,7 +138,7 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
           workflow: {
             project_ids: [@project.id]
           }
-        }
+        }, headers: { 'Authorization' => write_access_auth }
 
         assert_response :success
         assert_equal 'Galaxy', assigns(:workflow).workflow_class.title
@@ -158,7 +159,7 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
           workflow: {
             project_ids: [@project.id]
           }
-        }
+        }, headers: { 'Authorization' => write_access_auth }
 
         assert_response :success
         assert_equal 'Galaxy', assigns(:workflow).workflow_class.title
@@ -179,7 +180,7 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
           workflow: {
             project_ids: [@project.id]
           }
-        }
+        }, headers: { 'Authorization' => write_access_auth }
 
         assert_response :unprocessable_entity
         assert JSON.parse(@response.body)['errors'].any? { |e| e['detail'].include?('source URL could not be determined') }
@@ -195,7 +196,7 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
           workflow: {
             project_ids: [@project.id]
           }
-        }
+        }, headers: { 'Authorization' => write_access_auth }
 
         assert_response :unprocessable_entity
         assert JSON.parse(@response.body)['errors'].any? { |e| e['detail'].include?('version could not be determined') }
@@ -204,7 +205,7 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'can submit RO-Crate that adds a version to an existing workflow' do
-    workflow = FactoryBot.create(:local_git_workflow, source_link_url: 'https://example.com/my-workflow', contributor: @person)
+    workflow = FactoryBot.create(:local_git_workflow, source_link_url: 'https://example.com/my-workflow', contributor: current_person)
 
     assert_no_difference('Workflow.count') do
       assert_difference('Git::Version.count', 1) do
@@ -213,7 +214,7 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
           workflow: {
             project_ids: [@project.id]
           }
-        }
+        }, headers: { 'Authorization' => write_access_auth }
 
         assert_response :success
         assert_equal 'Galaxy', assigns(:workflow).workflow_class.title
@@ -226,8 +227,8 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'duplicate version ignored when submitting RO-Crate' do
-    workflow = FactoryBot.create(:local_git_workflow, source_link_url: 'https://example.com/my-workflow', contributor: @person)
-    workflow.git_version.update!(name: '1.0.0')
+    workflow = FactoryBot.create(:local_git_workflow, source_link_url: 'https://example.com/my-workflow', contributor: current_person)
+    disable_authorization_checks { workflow.git_version.update!(name: '1.0.0') }
 
     assert_no_difference('Workflow.count') do
       assert_no_difference('Git::Version.count') do
@@ -236,7 +237,7 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
           workflow: {
             project_ids: [@project.id]
           }
-        }
+        }, headers: { 'Authorization' => write_access_auth }
 
         assert_response :success
         assert_equal 'Galaxy', assigns(:workflow).workflow_class.title
@@ -248,8 +249,8 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'duplicate numeric version ignored when submitting RO-Crate' do
-    workflow = FactoryBot.create(:local_git_workflow, source_link_url: 'https://example.com/my-workflow', contributor: @person)
-    workflow.git_version.update!(name: '3.2')
+    workflow = FactoryBot.create(:local_git_workflow, source_link_url: 'https://example.com/my-workflow', contributor: current_person)
+    disable_authorization_checks { workflow.git_version.update!(name: '3.2') }
 
     assert_no_difference('Workflow.count') do
       assert_no_difference('Git::Version.count') do
@@ -258,7 +259,7 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
           workflow: {
             project_ids: [@project.id]
           }
-        }
+        }, headers: { 'Authorization' => write_access_auth }
 
         assert_response :success
         assert_equal 'Galaxy', assigns(:workflow).workflow_class.title
@@ -270,8 +271,8 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'cannot submit RO-Crate with ambiguous matching ID' do
-    workflow = FactoryBot.create(:local_git_workflow, source_link_url: 'https://example.com/my-workflow', contributor: @person)
-    workflow2 = FactoryBot.create(:local_git_workflow, source_link_url: 'https://example.com/my-workflow', contributor: @person)
+    workflow = FactoryBot.create(:local_git_workflow, source_link_url: 'https://example.com/my-workflow', contributor: current_person)
+    workflow2 = FactoryBot.create(:local_git_workflow, source_link_url: 'https://example.com/my-workflow', contributor: current_person)
 
     assert_no_difference('Workflow.count') do
       assert_no_difference('Git::Version.count') do
@@ -280,10 +281,25 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
           workflow: {
             project_ids: [@project.id]
           }
-        }
+        }, headers: { 'Authorization' => write_access_auth }
 
         assert_response :unprocessable_entity
         assert JSON.parse(@response.body)['errors'].any? { |e| e['detail'].include?('2 workflows found matching the given ID.') }
+      end
+    end
+  end
+
+  test 'cannot submit RO-Crate with read-only token' do
+    assert_no_difference('Workflow.count') do
+      assert_no_difference('Git::Version.count') do
+        post submit_workflows_path, as: :json, params: {
+          ro_crate: fixture_file_upload('workflows/ro-crate-with-id.crate.zip'),
+          workflow: {
+            project_ids: [@project.id]
+          }
+        }, headers: { 'Authorization' => read_access_auth }
+
+        assert_response :forbidden
       end
     end
   end
@@ -306,7 +322,7 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
           workflow: {
             project_ids: [@project.id]
           }
-        }
+        }, headers: { 'Authorization' => write_access_auth }
 
         assert_response :success
         assert_equal 'Galaxy', assigns(:workflow).workflow_class.title
@@ -316,11 +332,5 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
         assert policy.permissions.detect { |p| p.contributor == @project && p.access_type == Policy::EDITING }
       end
     end
-  end
-  private
-
-  def login_as(user)
-    User.current_user = user
-    post '/session', params: { login: user.login, password: generate_user_password }
   end
 end
