@@ -25,7 +25,7 @@ module HasExternalIdentifier
       if matches.any?
         matches.each do |match|
           if (match.projects & projects).any?
-            errors.add(:external_identifier, 'is not unique within the scope of the associated projects')
+            errors.add(:external_identifier, "is not unique within the scope of the associated #{I18n.t('project').pluralize}")
             return false
           end
         end
