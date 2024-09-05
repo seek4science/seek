@@ -225,8 +225,16 @@ class SamplesController < ApplicationController
       Template.find(params[:template_id]).sample_types.map(&:samples).flatten : []
 
     if params[:template_attribute_id].present? && params[:template_attribute_value].present?
-      attribute_title = TemplateAttribute.find(params[:template_attribute_id]).title
-      @result = @result.select { |s| s.get_attribute_value(attribute_title)&.include?(params[:template_attribute_value]) }
+      attribute = TemplateAttribute.find(params[:template_attribute_id])
+      attribute_title = attribute.title
+      @result = @result.select do |s|
+        if attribute.sample_attribute_type.seek_sample_multi?
+          attr_value = s.get_attribute_value(attribute_title)
+          attr_value&.any? { |v| v[:title].include?(params[:template_attribute_value]) }
+        else
+          s.get_attribute_value(attribute_title)&.include?(params[:template_attribute_value])
+        end
+      end
     end
 
     if params[:input_template_id].present? # linked
