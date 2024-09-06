@@ -332,6 +332,16 @@ class SamplesController < ApplicationController
     end
   end
 
+  # Filters linked samples based on the provided options and template attribute title.
+  #
+  # @param samples [Array<Sample>] the list of samples to filter
+  # @param link [Symbol] the method to call on each sample to get the linked samples (:linked_samples or :linking_samples)
+  # @param options [Hash] the options for filtering
+  # @option options [Integer] :template_id the ID of the template to filter by
+  # @option options [String] :attribute_value the value of the attribute to filter by
+  # @option options [Integer] :attribute_id the ID of the attribute to filter by
+  # @param template_attribute_title [String] the title of the template attribute to filter by
+  # @return [Array<Sample>] the filtered list of samples
   def filter_linked_samples(samples, link, options, template_attribute_title)
     samples.select do |s|
       s.send(link).any? do |x|
