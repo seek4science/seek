@@ -346,7 +346,7 @@ class SamplesController < ApplicationController
     samples.select do |s|
       s.send(link).any? do |x|
         selected = x.sample_type.template_id == options[:template_id].to_i
-        selected = x.get_attribute_value(template_attribute_title)&.include?(options[:attribute_value]) if template_attribute_title.present? && selected
+        selected = x.get_attribute_value(template_attribute_title)&.downcase&.include?(options[:attribute_value]&.downcase) if template_attribute_title.present? && selected
         selected || filter_linked_samples([x], link, options, template_attribute_title).present?
       end
     end
