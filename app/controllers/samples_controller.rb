@@ -238,7 +238,7 @@ class SamplesController < ApplicationController
           attr_value = s.get_attribute_value(sample_attribute_title)
           attr_value&.any? { |v| v.downcase.include?(attribute_filter_value) }
         else
-          s.get_attribute_value(sample_attribute_title)&.include?(attribute_filter_value)
+          s.get_attribute_value(sample_attribute_title)&.downcase&.include?(attribute_filter_value)
         end
       end
     end
