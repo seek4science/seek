@@ -1275,11 +1275,14 @@ class SamplesControllerTest < ActionController::TestCase
       template2 = FactoryBot.create(:isa_sample_collection_template)
       template3 = FactoryBot.create(:isa_assay_material_template)
 
-      type1 = FactoryBot.create(:isa_source_sample_type, contributor: person, project_ids: [project.id], isa_template: template1)
-      type2 = FactoryBot.create(:isa_sample_collection_sample_type, contributor: person, project_ids: [project.id],
-                                                          isa_template: template2, linked_sample_type: type1)
-      type3 = FactoryBot.create(:isa_assay_material_sample_type, contributor: person, project_ids: [project.id], isa_template: template3,
-                                              linked_sample_type: type2)
+      type1 = FactoryBot.create(:simple_sample_type, contributor: person, project_ids: [project.id], title: 'Source sample type', template_id: template1.id)
+      type1.create_sample_attributes_from_isa_template(template1)
+
+      type2 = FactoryBot.create(:simple_sample_type, contributor: person, project_ids: [project.id], title: 'Sample collection sample type', template_id: template2.id)
+      type2.create_sample_attributes_from_isa_template(template2, type1)
+
+      type3 = FactoryBot.create(:simple_sample_type, contributor: person, project_ids: [project.id], title: 'Assay material sample type', template_id: template3.id)
+      type3.create_sample_attributes_from_isa_template(template3, type2)
 
       sample1 = FactoryBot.create :sample, title: 'sample1', sample_type: type1, project_ids: [project.id], contributor: person,
                                  data: { 'Source Name': 'Source Name', 'Source Characteristic 1': 'Source Characteristic 1', 'Source Characteristic 2': "Cox's Orange Pippin" }
@@ -1487,6 +1490,5 @@ class SamplesControllerTest < ActionController::TestCase
     sample.save!
     sample
   end
-
 
 end
