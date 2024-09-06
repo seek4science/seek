@@ -1360,6 +1360,48 @@ class SamplesControllerTest < ActionController::TestCase
       assert_response :success
       assert result = assigns(:result)
       assert_equal 1, result.length
+
+      # Simple query on 'Input' attribute (SEEK_SAMPLE_MULTI type)
+      post :query, xhr: true, params: {
+        project_ids: [project.id],
+        template_id: template2.id,
+        template_attribute_id: template2.template_attributes.detect(&:input_attribute?)&.id,
+        template_attribute_value: 'source'
+      }
+
+      assert_response :success
+      result = assigns(:result)
+      assert_equal result.length, 1
+
+      # parent query on 'Input' attribute (SEEK_SAMPLE_MULTI type)
+      post :query, xhr: true, params: {
+        project_ids: [project.id],
+        template_id: template3.id,
+        template_attribute_id: template3.template_attributes.second.id,
+        template_attribute_value: 'Protocol',
+        input_template_id: template2.id,
+        input_attribute_id: template2.template_attributes.detect(&:input_attribute?)&.id,
+        input_attribute_value: "source"
+      }
+
+      assert_response :success
+      result = assigns(:result)
+      assert_equal result.length, 1
+
+      # Grandchild query on 'Input' attribute (SEEK_SAMPLE_MULTI type)
+      post :query, xhr: true, params: {
+        project_ids: [project.id],
+        template_id: template1.id,
+        template_attribute_id: template1.template_attributes.third.id,
+        template_attribute_value: "x's",
+        output_template_id: template3.id,
+        output_attribute_id: template3.template_attributes.detect(&:input_attribute?)&.id,
+        output_attribute_value: 'sample'
+      }
+
+      assert_response :success
+      result = assigns(:result)
+      assert_equal result.length, 1
     end
   end
 

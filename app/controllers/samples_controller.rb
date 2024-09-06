@@ -249,7 +249,7 @@ class SamplesController < ApplicationController
       @result = filter_linked_samples(@result, :linked_samples,
                                       { attribute_id: params[:input_attribute_id],
           attribute_value: params[:input_attribute_value],
-          template_id: params[:input_template_id] }, input_template_attribute&.title)
+          template_id: params[:input_template_id] }, input_template_attribute)
     end
 
     if params[:output_template_id].present? # linking
@@ -258,7 +258,7 @@ class SamplesController < ApplicationController
       @result = filter_linked_samples(@result, :linking_samples,
                                       { attribute_id: params[:output_attribute_id],
           attribute_value: params[:output_attribute_value],
-          template_id: params[:output_template_id] }, output_template_attribute&.title)
+          template_id: params[:output_template_id] }, output_template_attribute)
     end
 
     @result = @result.select { |s| (project_ids & s.project_ids).any? } if project_ids.present?
@@ -342,12 +342,21 @@ class SamplesController < ApplicationController
   # @option options [Integer] :attribute_id the ID of the attribute to filter by
   # @param template_attribute_title [String] the title of the template attribute to filter by
   # @return [Array<Sample>] the filtered list of samples
-  def filter_linked_samples(samples, link, options, template_attribute_title)
+  def filter_linked_samples(samples, link, options, template_attribute)
+    template_attribute_title = template_attribute&.title
     samples.select do |s|
       s.send(link).any? do |x|
         selected = x.sample_type.template_id == options[:template_id].to_i
-        selected = x.get_attribute_value(template_attribute_title)&.downcase&.include?(options[:attribute_value]&.downcase) if template_attribute_title.present? && selected
-        selected || filter_linked_samples([x], link, options, template_attribute_title).present?
+        if template_attribute.sample_attribute_type.seek_sample_multi?
+          selected = x.get_attribute_value(template_attribute_title)&.any? { |v| v[:title].downcase.include?(options[:attribute_value]) } if template_attribute.present? && selected
+        elsif  template_attribute.sample_attribute_type.seek_sample?
+          selected = x.get_attribute_value(template_attribute_title)&[:title].downcase&.include?(options[:attribute_value]) if template_attribute.present? && selected
+        elsif template_attribute.sample_attribute_type.seek_cv_list?
+          selected = x.get_attribute_value(template_attribute_title)&.any? { |v| v.downcase.include?(options[:attribute_value]) } if template_attribute.present? && selected
+        else
+          selected = x.get_attribute_value(template_attribute_title)&.downcase&.include?(options[:attribute_value]&.downcase) if template_attribute.present? && selected
+        end
+        selected || filter_linked_samples([x], link, options, template_attribute).present?
       end
     end
   end
