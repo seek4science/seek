@@ -244,21 +244,21 @@ class SamplesController < ApplicationController
     end
 
     if params[:input_template_id].present? # linked
-      title =
-        TemplateAttribute.find(params[:input_attribute_id]).title if params[:input_attribute_id].present?
-      @result = find_samples(@result, :linked_samples,
-        { attribute_id: params[:input_attribute_id],
+      input_template_attribute =
+        TemplateAttribute.find(params[:input_attribute_id])
+      @result = filter_linked_samples(@result, :linked_samples,
+                                      { attribute_id: params[:input_attribute_id],
           attribute_value: params[:input_attribute_value],
-          template_id: params[:input_template_id] }, title)
+          template_id: params[:input_template_id] }, input_template_attribute&.title)
     end
 
     if params[:output_template_id].present? # linking
-      title =
-        TemplateAttribute.find(params[:output_attribute_id]).title if params[:output_attribute_id].present?
-      @result = find_samples(@result, :linking_samples,
-        { attribute_id: params[:output_attribute_id],
+      output_template_attribute =
+        TemplateAttribute.find(params[:output_attribute_id])
+      @result = filter_linked_samples(@result, :linking_samples,
+                                      { attribute_id: params[:output_attribute_id],
           attribute_value: params[:output_attribute_value],
-          template_id: params[:output_template_id] }, title)
+          template_id: params[:output_template_id] }, output_template_attribute&.title)
     end
 
     @result = @result.select { |s| (project_ids & s.project_ids).any? } if project_ids.present?
@@ -332,16 +332,15 @@ class SamplesController < ApplicationController
     end
   end
 
-  def find_samples(samples, link, options, title)
+  def filter_linked_samples(samples, link, options, template_attribute_title)
     samples.select do |s|
       s.send(link).any? do |x|
         selected = x.sample_type.template_id == options[:template_id].to_i
-        selected = x.get_attribute_value(title)&.include?(options[:attribute_value]) if title.present? && selected
-        selected || find_samples([x], link, options, title).present?
+        selected = x.get_attribute_value(template_attribute_title)&.include?(options[:attribute_value]) if template_attribute_title.present? && selected
+        selected || filter_linked_samples([x], link, options, template_attribute_title).present?
       end
     end
   end
-
   def templates_enabled?
     unless Seek::Config.isa_json_compliance_enabled
       flash[:error] = 'Not available'
