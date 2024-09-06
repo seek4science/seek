@@ -1313,6 +1313,24 @@ class SamplesControllerTest < ActionController::TestCase
       assert result = assigns(:result)
       assert_equal 1, result.length
 
+      # Do the same query but with random casing to check if case-insensitive
+      post :query, xhr: true, params: {
+        project_ids: [project.id],
+        template_id: template2.id,
+        template_attribute_id: template2.template_attributes.second.id,
+        template_attribute_value: 'ColLecTion',
+        input_template_id: template1.id,
+        input_attribute_id: template1.template_attributes.third.id,
+        input_attribute_value: "x's",
+        output_template_id: template3.id,
+        output_attribute_id: template3.template_attributes.second.id,
+        output_attribute_value: '1'
+      }
+
+      assert_response :success
+      assert result = assigns(:result)
+      assert_equal 1, result.length
+
       # Query for sample's grandparents
       post :query, xhr: true, params: {
         project_ids: [project.id],
