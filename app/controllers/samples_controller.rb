@@ -220,7 +220,7 @@ class SamplesController < ApplicationController
 
   def query
     project_ids = params[:project_ids]&.map(&:to_i)
-    attribute_filter_value = params[:template_attribute_value].downcase
+    attribute_filter_value = params[:template_attribute_value]&.downcase
     @result = params[:template_id].present? ?
       Template.find(params[:template_id]).sample_types.map(&:samples).flatten : []
 
@@ -229,12 +229,12 @@ class SamplesController < ApplicationController
       @result = @result.select do |s|
         sample_attribute = s.sample_type.sample_attributes.detect { |sa| template_attribute.sample_attributes.include? sa }
         sample_attribute_title = sample_attribute&.title
-        if sample_attribute.sample_attribute_type.seek_sample_multi?
+        if sample_attribute&.sample_attribute_type&.seek_sample_multi?
           attr_value = s.get_attribute_value(sample_attribute_title)
           attr_value&.any? { |v| v[:title].downcase.include?(attribute_filter_value) }
-        elsif sample_attribute.sample_attribute_type.seek_sample?
+        elsif sample_attribute&.sample_attribute_type&.seek_sample?
           s.get_attribute_value(sample_attribute_title)[:title]&.downcase&.include?(attribute_filter_value)
-        elsif sample_attribute.sample_attribute_type.seek_cv_list?
+        elsif sample_attribute&.sample_attribute_type&.seek_cv_list?
           attr_value = s.get_attribute_value(sample_attribute_title)
           attr_value&.any? { |v| v.downcase.include?(attribute_filter_value) }
         else
