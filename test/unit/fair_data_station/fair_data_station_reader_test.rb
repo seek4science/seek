@@ -45,7 +45,8 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
 
     assert_equal 2, inv.studies.count
     study = inv.studies.last
-    assert_equal 'http://fairbydesign.nl/ontology/inv_seek-test-investigation/stu_seek-test-study-2', study.resource_uri.to_s
+    assert_equal 'http://fairbydesign.nl/ontology/inv_seek-test-investigation/stu_seek-test-study-2',
+                 study.resource_uri.to_s
     assert_equal 'seek-test-study-2', study.identifier
 
     assert_equal 2, study.observation_units.count
@@ -69,7 +70,7 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
     study = Seek::FairDataStation::Reader.new.parse_graph(path).first.studies.first
 
     assert_equal 14, study.annotations.count
-    assert_includes study.annotations, ["http://fairbydesign.nl/ontology/center_name", "NIID"]
+    assert_includes study.annotations, ['http://fairbydesign.nl/ontology/center_name', 'NIID']
   end
 
   test 'additional metadata annotations' do
@@ -81,7 +82,7 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
     study = inv.studies.first
 
     assert_equal 8, study.additional_metadata_annotations.count
-    assert_includes study.annotations, ["http://fairbydesign.nl/ontology/center_name", "NIID"]
+    assert_includes study.annotations, ['http://fairbydesign.nl/ontology/center_name', 'NIID']
     study.additional_metadata_annotations.each do |annotation|
       assert annotation[0].start_with?('http://fairbydesign.nl/ontology/'), "#{annotation[0]} is not expected"
     end
@@ -92,16 +93,15 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
     obs_unit = inv.studies.first.observation_units.first
     annotations = obs_unit.additional_metadata_annotations
     assert_equal 3, annotations.count
-    pids = annotations.collect{|ann| ann[0]}
+    pids = annotations.collect { |ann| ann[0] }
     assert_includes pids, 'https://w3id.org/mixs/0000811'
     sample = obs_unit.samples.first
     annotations = sample.additional_metadata_annotations
     assert_equal 4, annotations.count
-    pids = annotations.collect{|ann| ann[0]}
+    pids = annotations.collect { |ann| ann[0] }
     assert_includes pids, 'https://w3id.org/mixs/0000011'
     assert_includes pids, 'http://gbol.life/0.1/scientificName'
     assert_includes pids, 'http://purl.uniprot.org/core/organism'
-
   end
 
   test 'study assays' do
@@ -153,10 +153,12 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
 
     datasets = assay.datasets
     assert_equal 2, datasets.count
-    assert_equal ['http://fairbydesign.nl/data_sample/DRR243856_1.fastq.gz', 'http://fairbydesign.nl/data_sample/DRR243856_2.fastq.gz'], datasets.collect(&:resource_uri).collect(&:to_s).sort
+    assert_equal ['http://fairbydesign.nl/data_sample/DRR243856_1.fastq.gz', 'http://fairbydesign.nl/data_sample/DRR243856_2.fastq.gz'],
+                 datasets.collect(&:resource_uri).collect(&:to_s).sort
     assert_equal ['DRR243856_1.fastq.gz', 'DRR243856_2.fastq.gz'], datasets.collect(&:identifier).sort
     assert_equal ['demultiplexed forward file', 'demultiplexed reverse file'], datasets.collect(&:description).sort
-    assert_equal ['http://fairbydesign.nl/data_sample/DRR243856_1.fastq.gz', 'http://fairbydesign.nl/data_sample/DRR243856_2.fastq.gz'], datasets.collect(&:content_url).collect(&:to_s).sort
+    assert_equal ['http://fairbydesign.nl/data_sample/DRR243856_1.fastq.gz', 'http://fairbydesign.nl/data_sample/DRR243856_2.fastq.gz'],
+                 datasets.collect(&:content_url).collect(&:to_s).sort
 
     assert_equal 0, inv.datasets.count
     assert_equal 0, study.datasets.count

@@ -1,7 +1,6 @@
 module Seek
   module FairDataStation
     class Writer
-
       def construct_isa(datastation_inv, contributor, projects, policy)
         reset_data_file_cache
         investigation = build_investigation(datastation_inv, contributor, policy, projects)
@@ -9,7 +8,8 @@ module Seek
         datastation_inv.studies.each do |datastation_study|
           study = build_study(datastation_study, contributor, policy, investigation)
           datastation_study.observation_units.each do |datastation_observation_unit|
-            observation_unit = build_observation_unit(datastation_observation_unit, contributor, policy, projects, study)
+            observation_unit = build_observation_unit(datastation_observation_unit, contributor, policy, projects,
+                                                      study)
             datastation_observation_unit.samples.each do |datastation_sample|
               sample = build_sample(datastation_sample, contributor, policy, projects)
               if sample.valid?
@@ -48,7 +48,8 @@ module Seek
       end
 
       def build_sample(datastation_sample, contributor, policy, projects)
-        sample_attributes = datastation_sample.seek_attributes.merge({contributor: contributor, projects: projects, policy: policy.deep_copy})
+        sample_attributes = datastation_sample.seek_attributes.merge({ contributor: contributor, projects: projects,
+                                                                       policy: policy.deep_copy })
         sample = ::Sample.new(sample_attributes)
         populate_sample(sample, datastation_sample)
         sample

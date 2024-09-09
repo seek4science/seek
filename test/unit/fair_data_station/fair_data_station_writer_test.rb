@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class FairDataStationWriterTest < ActiveSupport::TestCase
-
   test 'construct seek isa' do
     path = "#{Rails.root}/test/fixtures/files/fairdatastation/demo.ttl"
     inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
@@ -16,10 +15,10 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     studies = investigation.studies.to_a
     obs_units = studies.first.observation_units.to_a
     assays = studies.first.assays.to_a
-    data_files = assays.first.assay_assets.to_a.collect(&:asset).select{|a| a.is_a?(DataFile)}
+    data_files = assays.first.assay_assets.to_a.collect(&:asset).select { |a| a.is_a?(DataFile) }
     samples = obs_units.first.samples.to_a
 
-    assay_samples = assays.collect{|a| a.samples.to_a}.flatten
+    assay_samples = assays.collect { |a| a.samples.to_a }.flatten
     assert_equal 9, assay_samples.count
     assert_equal samples, (assay_samples & samples)
 
@@ -134,14 +133,14 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     refute_nil sample.sample_type
     assert_equal sample_type, sample.sample_type
     assert_equal 'sample DRS176892', sample.title
-    assert_equal 'Sample obtained from Single age 30 collected on 2017-09-13 from the human gut', sample.get_attribute_value('Description')
+    assert_equal 'Sample obtained from Single age 30 collected on 2017-09-13 from the human gut',
+                 sample.get_attribute_value('Description')
     assert_equal 'Homo sapiens', sample.get_attribute_value('Host')
     assert_equal 'HIV-1 positive', sample.get_attribute_value('Host disease stat')
     assert_equal 'Single', sample.get_attribute_value('Marital status')
     assert_equal 'Trader', sample.get_attribute_value('Occupation')
     assert_equal 'human gut metagenome', sample.get_attribute_value('Scientific name')
     assert_equal '408170', sample.get_attribute_value('Organism')
-
   end
 
   test 'observation_unit and assay datasets created in construct_isa' do
@@ -156,9 +155,11 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     investigation = Seek::FairDataStation::Writer.new.construct_isa(inv, contributor, [project], Policy.default)
     assert_equal 2, investigation.studies.last.observation_units.to_a.count
     observation_unit = investigation.studies.last.observation_units.first
-    assert_equal 1, observation_unit.observation_unit_assets.find_all{|oua| oua.asset_type == 'DataFile'}.collect(&:asset).count
+    assert_equal 1, observation_unit.observation_unit_assets.find_all { |oua|
+                      oua.asset_type == 'DataFile'
+                    }.collect(&:asset).count
 
-    df = observation_unit.observation_unit_assets.find_all{|oua| oua.asset_type == 'DataFile'}.first.asset
+    df = observation_unit.observation_unit_assets.find_all { |oua| oua.asset_type == 'DataFile' }.first.asset
     assert_equal 'Dataset: test-file-1.csv', df.title
     assert_equal 'file', df.description
     assert_equal 'application/octet-stream', df.content_blob.content_type
@@ -168,8 +169,8 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
 
     assay = investigation.studies.last.assays.last
     assert_equal 'Assay - seek-test-assay-6', assay.title
-    assert_equal 1, assay.assay_assets.find_all{|oua| oua.asset_type == 'DataFile'}.collect(&:asset).count
-    df = assay.assay_assets.find_all{|oua| oua.asset_type == 'DataFile'}.first.asset
+    assert_equal 1, assay.assay_assets.find_all { |oua| oua.asset_type == 'DataFile' }.collect(&:asset).count
+    df = assay.assay_assets.find_all { |oua| oua.asset_type == 'DataFile' }.first.asset
     assert_equal 'Dataset: test-file-3.csv', df.title
     assert_equal 'file', df.description
     assert_equal 'application/octet-stream', df.content_blob.content_type
@@ -177,22 +178,22 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     assert df.content_blob.is_webpage?
     assert df.content_blob.show_as_external_link?
 
-    assert_difference('DataFile.count',5) do
-      assert_difference('ObservationUnitAsset.count',3) do
-        disable_authorization_checks {
+    assert_difference('DataFile.count', 5) do
+      assert_difference('ObservationUnitAsset.count', 3) do
+        disable_authorization_checks do
           investigation.save!
-        }
+        end
       end
     end
 
     # check dataset linked to multiple cases
     df = DataFile.where(external_identifier: 'test-file-1.csv').first
-    assert_equal ['seek-test-obs-unit-1','seek-test-obs-unit-2'], df.observation_units.collect(&:external_identifier).sort
+    assert_equal %w[seek-test-obs-unit-1 seek-test-obs-unit-2],
+                 df.observation_units.collect(&:external_identifier).sort
     assert_equal ['seek-test-assay-1'], df.assays.collect(&:external_identifier).sort
     df = DataFile.where(external_identifier: 'test-file-3.csv').first
     assert_empty df.observation_units
-    assert_equal ['seek-test-assay-3', 'seek-test-assay-6'], df.assays.collect(&:external_identifier).sort
-
+    assert_equal %w[seek-test-assay-3 seek-test-assay-6], df.assays.collect(&:external_identifier).sort
   end
 
   test 'populate obsv unit extended metadata' do
@@ -224,5 +225,4 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     assert_equal 'male', obvs_unit.extended_metadata.get_attribute_value('Gender')
     assert_equal '2020-01-10', obvs_unit.extended_metadata.get_attribute_value('Date of birth')
   end
-
 end
