@@ -1275,11 +1275,14 @@ class SamplesControllerTest < ActionController::TestCase
       template2 = FactoryBot.create(:isa_sample_collection_template)
       template3 = FactoryBot.create(:isa_assay_material_template)
 
-      type1 = FactoryBot.create(:isa_source_sample_type, contributor: person, project_ids: [project.id], isa_template: template1)
-      type2 = FactoryBot.create(:isa_sample_collection_sample_type, contributor: person, project_ids: [project.id],
-                                                          isa_template: template2, linked_sample_type: type1)
-      type3 = FactoryBot.create(:isa_assay_material_sample_type, contributor: person, project_ids: [project.id], isa_template: template3,
-                                              linked_sample_type: type2)
+      type1 = FactoryBot.create(:simple_sample_type, contributor: person, project_ids: [project.id], title: 'Source sample type', template_id: template1.id)
+      type1.create_sample_attributes_from_isa_template(template1)
+
+      type2 = FactoryBot.create(:simple_sample_type, contributor: person, project_ids: [project.id], title: 'Sample collection sample type', template_id: template2.id)
+      type2.create_sample_attributes_from_isa_template(template2, type1)
+
+      type3 = FactoryBot.create(:simple_sample_type, contributor: person, project_ids: [project.id], title: 'Assay material sample type', template_id: template3.id)
+      type3.create_sample_attributes_from_isa_template(template3, type2)
 
       sample1 = FactoryBot.create :sample, title: 'sample1', sample_type: type1, project_ids: [project.id], contributor: person,
                                  data: { 'Source Name': 'Source Name', 'Source Characteristic 1': 'Source Characteristic 1', 'Source Characteristic 2': "Cox's Orange Pippin" }
@@ -1287,7 +1290,8 @@ class SamplesControllerTest < ActionController::TestCase
       sample2 = FactoryBot.create :sample, title: 'sample2', sample_type: type2, project_ids: [project.id], contributor: person,
                                  data: { Input: [sample1.id], 'sample collection': 'sample collection', 'sample collection parameter value 1': 'sample collection parameter value 1', 'Sample Name': 'sample name', 'sample characteristic 1': 'sample characteristic 1' }
 
-      sample3 = FactoryBot.create :sample, title: 'sample3', sample_type: type3, project_ids: [project.id], contributor: person,
+      # sample3
+      FactoryBot.create :sample, title: 'sample3', sample_type: type3, project_ids: [project.id], contributor: person,
                                  data: { Input: [sample2.id], 'Protocol Assay 1': 'Protocol Assay 1', 'Assay 1 parameter value 1': 'Assay 1 parameter value 1', 'Extract Name': 'Extract Name', 'other material characteristic 1': 'other material characteristic 1' }
 
 
@@ -1297,6 +1301,24 @@ class SamplesControllerTest < ActionController::TestCase
         template_id: template2.id,
         template_attribute_id: template2.template_attributes.second.id,
         template_attribute_value: 'collection',
+        input_template_id: template1.id,
+        input_attribute_id: template1.template_attributes.third.id,
+        input_attribute_value: "x's",
+        output_template_id: template3.id,
+        output_attribute_id: template3.template_attributes.second.id,
+        output_attribute_value: '1'
+      }
+
+      assert_response :success
+      assert result = assigns(:result)
+      assert_equal 1, result.length
+
+      # Do the same query but with random casing to check if case-insensitive
+      post :query, xhr: true, params: {
+        project_ids: [project.id],
+        template_id: template2.id,
+        template_attribute_id: template2.template_attributes.second.id,
+        template_attribute_value: 'ColLecTion',
         input_template_id: template1.id,
         input_attribute_id: template1.template_attributes.third.id,
         input_attribute_value: "x's",
@@ -1338,6 +1360,48 @@ class SamplesControllerTest < ActionController::TestCase
       assert_response :success
       assert result = assigns(:result)
       assert_equal 1, result.length
+
+      # Simple query on 'Input' attribute (SEEK_SAMPLE_MULTI type)
+      post :query, xhr: true, params: {
+        project_ids: [project.id],
+        template_id: template2.id,
+        template_attribute_id: template2.template_attributes.detect(&:input_attribute?)&.id,
+        template_attribute_value: 'source'
+      }
+
+      assert_response :success
+      result = assigns(:result)
+      assert_equal result.length, 1
+
+      # parent query on 'Input' attribute (SEEK_SAMPLE_MULTI type)
+      post :query, xhr: true, params: {
+        project_ids: [project.id],
+        template_id: template3.id,
+        template_attribute_id: template3.template_attributes.second.id,
+        template_attribute_value: 'Protocol',
+        input_template_id: template2.id,
+        input_attribute_id: template2.template_attributes.detect(&:input_attribute?)&.id,
+        input_attribute_value: "source"
+      }
+
+      assert_response :success
+      result = assigns(:result)
+      assert_equal result.length, 1
+
+      # Grandchild query on 'Input' attribute (SEEK_SAMPLE_MULTI type)
+      post :query, xhr: true, params: {
+        project_ids: [project.id],
+        template_id: template1.id,
+        template_attribute_id: template1.template_attributes.third.id,
+        template_attribute_value: "x's",
+        output_template_id: template3.id,
+        output_attribute_id: template3.template_attributes.detect(&:input_attribute?)&.id,
+        output_attribute_value: 'sample'
+      }
+
+      assert_response :success
+      result = assigns(:result)
+      assert_equal result.length, 1
     end
   end
 
@@ -1487,6 +1551,5 @@ class SamplesControllerTest < ActionController::TestCase
     sample.save!
     sample
   end
-
 
 end
