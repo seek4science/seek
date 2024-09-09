@@ -343,6 +343,8 @@ class SamplesController < ApplicationController
   # @param template_attribute_title [String] the title of the template attribute to filter by
   # @return [Array<Sample>] the filtered list of samples
   def filter_linked_samples(samples, link, options, template_attribute)
+    raise ArgumentError, "Invalid linking method provided. '#{link.to_s}' is not allowed!" unless %i[linked_samples linking_samples].include? link
+
     template_attribute_title = template_attribute&.title
     samples.select do |s|
       s.send(link).any? do |x|
