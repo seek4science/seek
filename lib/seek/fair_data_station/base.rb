@@ -37,8 +37,6 @@ module Seek
 
       def annotations
         @_cached_annotations ||= query_annotations
-
-
       end
 
       def additional_metadata_annotations
