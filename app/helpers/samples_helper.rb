@@ -1,4 +1,6 @@
 module SamplesHelper
+  include Seek::UrlValidation
+
   def sample_form_field_for_attribute(attribute, resource)
     element_class = "sample_attribute_#{attribute.sample_attribute_type.base_type.downcase}"
     element_name = "sample[data][#{attribute.title}]"
@@ -143,7 +145,9 @@ module SamplesHelper
       when Seek::Samples::BaseType::CV
         seek_cv_attribute_display(value, attribute)
       when Seek::Samples::BaseType::CV_LIST
-        value.each{|v| seek_cv_attribute_display(v, attribute) }.join(', ')
+        value.map do |v|
+          seek_cv_attribute_display(v, attribute)
+        end.join(', ').html_safe
       when Seek::Samples::BaseType::LINKED_EXTENDED_METADATA
         linked_extended_metadata_attribute_display(value, attribute)
       when Seek::Samples::BaseType::LINKED_EXTENDED_METADATA_MULTI
@@ -172,11 +176,11 @@ module SamplesHelper
 
   def seek_cv_attribute_display(value, attribute)
     term = attribute.sample_controlled_vocab.sample_controlled_vocab_terms.where(label:value).last
-    content = value
-    if term && term.iri.present?
-      content << " (#{term.iri}) "
+    if term && term.iri.present? && valid_url?(term.iri)
+      link_to(term.label, term.iri, target: :_blank)
+    else
+      term.label
     end
-    content
   end
 
   def linked_extended_metadata_attribute_display(value, attribute)
