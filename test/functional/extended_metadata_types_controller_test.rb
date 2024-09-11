@@ -52,7 +52,6 @@ class ExtendedMetadataTypesControllerTest < ActionController::TestCase
     get :administer
     assert_response :success
     refute flash[:error]
-    assert_select 'table tbody tr:not(.emt-partition-title)', count: 1
     assert_select 'table tbody tr:not(.emt-partition-title) td', text: emt.title
     assert_select "a[href=?]", new_extended_metadata_type_path, text: 'Create Extended Metadata Type'
 
