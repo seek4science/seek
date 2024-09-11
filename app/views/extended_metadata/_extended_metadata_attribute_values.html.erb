@@ -36,4 +36,13 @@
             panelcollaps.removeClass('in');
         };
     });
+
+
+    $j(document).ready(function() {
+        $j('.term-label').on('click', function() {
+            const termIRI  = $j(this).next('.term-iri');
+            termIRI.toggleClass('visible');
+        });
+    });
+
 </script>

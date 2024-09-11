@@ -1,6 +1,4 @@
 module SamplesHelper
-  include Seek::UrlValidation
-
   def sample_form_field_for_attribute(attribute, resource)
     element_class = "sample_attribute_#{attribute.sample_attribute_type.base_type.downcase}"
     element_name = "sample[data][#{attribute.title}]"
@@ -175,9 +173,12 @@ module SamplesHelper
   end
 
   def seek_cv_attribute_display(value, attribute)
-    term = attribute.sample_controlled_vocab.sample_controlled_vocab_terms.where(label:value).last
-    if term && term.iri.present? && valid_url?(term.iri)
-      link_to(term.label, term.iri, target: :_blank)
+    term = attribute.sample_controlled_vocab.sample_controlled_vocab_terms.where(label: value).last
+    if term && term.iri.present?
+      iri_content = term.iri.match?(/^http/) ? link_to(term.iri, term.iri, target: '_blank') : term.iri
+      label_tag = content_tag(:label, term.label, class: 'term-label')
+      iri_tag = content_tag(:label, iri_content, class: 'term-iri badge')
+      "#{label_tag}#{iri_tag}".html_safe
     else
       term.label
     end
