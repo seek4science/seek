@@ -1,25 +1,5 @@
 <% nested, top_level = @extended_metadata_types.partition(&:extended_type?).each{ |group| group.sort_by!(&:id).reverse! } %>
 
-
-<div class="alert alert-info">
-  <ul>
-    <li>
-      You can disable Extended metadata types to prevent them from appearing as an option in the UI.
-      Disabling them won't delete them, or where they've been used, and they can be re-enabled again here.
-    </li>
-    <li>
-      If a type is disabled but has been used, for those cases it will no longer be shown when viewing those items.
-      However, it will still be possible to edit the metadata for existing items and the metadata won't be deleted.
-    </li>
-    <li>
-      The Extended metadata type in the top level can not be deleted if there are existing Extended metadata instances based on it.
-    </li>
-    <li>
-      The Extended metadata type in the nested level can not be deleted if it has been linked by other Extended metadata types.
-    </li>
-  </ul>
-</div>
-
 <% if ExtendedMetadataType.disabled_but_in_use.any? %>
   <div class="alert alert-warning">
     <p>
@@ -43,14 +23,34 @@
     </a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" id="sample-controlled-vocabs-tab" data-toggle="tab" href="#sample_controlled_vocabs" role="tab" aria-controls="sample_controlled_vocabs" aria-selected="false" data-tooltip="Explain how to use Controlled Vocabs">
+    <a class="nav-link" id="sample-controlled-vocabs-tab" data-toggle="tab" href="#sample-controlled-vocabs" role="tab" aria-controls="sample-controlled-vocabs" aria-selected="false" data-tooltip="Explain how to use Controlled Vocabs">
       <span class="help_icon"></span>Controlled Vocabs
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="sample-attribute-types-tab" data-toggle="tab" href="#sample-attribute-types" role="tab" aria-controls="sample-attribute-types" aria-selected="false" data-tooltip="Explain the list of Extended Attribute Types">
+      <span class="help_icon"></span>Extended Attribute Types
     </a>
   </li>
 </ul>
 
 <div class="tab-content">
   <div class="tab-pane fade active in" id="top-level-metadata-table" role="tabpanel" aria-labelledby="top-level-tab">
+    <div class="alert alert-info">
+      <ul>
+        <li>
+          You can disable Extended metadata types to prevent them from appearing as an option in the UI.
+          Disabling them won't delete them, or where they've been used, and they can be re-enabled again here.
+        </li>
+        <li>
+          If a type is disabled but has been used, for those cases it will no longer be shown when viewing those items.
+          However, it will still be possible to edit the metadata for existing items and the metadata won't be deleted.
+        </li>
+        <li>
+          The Extended metadata type in the top level can not be deleted if there are existing Extended metadata instances based on it.
+        </li>
+      </ul>
+    </div>
     <table class='table table-hover'>
       <thead>
       <tr>
@@ -72,6 +72,11 @@
   </div>
 
   <div class="tab-pane fade" id="nested-metadata-table" role="tabpanel" aria-labelledby="nested-tab">
+    <div class="alert alert-info">
+      The Extended metadata type in the nested level can not be deleted if it has been linked by other Extended metadata types.
+    </div>
+    <div>
+    </div>
     <table class='table table-hover'>
       <thead>
       <tr>
@@ -92,7 +97,7 @@
     </table>
   </div>
 
-  <div class="tab-pane fade" id="sample_controlled_vocabs" role="tabpanel" aria-labelledby="sample-controlled-vocabs-tab">
+  <div class="tab-pane fade" id="sample-controlled-vocabs" role="tabpanel" aria-labelledby="sample-controlled-vocabs-tab">
     <div class="row" style="padding: 10px 0px">
       <div class="col-md-3">
         <%= link_to new_sample_controlled_vocab_path, class: "btn btn-primary", role: "button", aria: { label: "Left Align" } do %>
@@ -106,12 +111,31 @@
       <tr>
         <th>Internal Id</th>
         <th>Title</th>
-        <th></th>
       </tr>
       </thead>
       <tbody>
       <% SampleControlledVocab.all.each do |sample_controlled_vocab| %>
         <%= render partial: 'sample_controlled_vocab_table_row', locals: { sample_controlled_vocab: sample_controlled_vocab } %>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="tab-pane fade" id="sample-attribute-types" role="tabpanel" aria-labelledby="sample-attribute-types-tab">
+    <div class="alert alert-info">
+       The Base Type of extended attribute types in the list can be used to define the attributes for the extended metadata type.
+    </div>
+    <table class='table table-hover'>
+      <thead>
+      <tr>
+        <th>Internal Id</th>
+        <th>Title</th>
+        <th>Base Type</th>
+      </tr>
+      </thead>
+      <tbody>
+      <% SampleAttributeType.all.each do |sample_attribute_type| %>
+        <%= render partial: 'sample_attribute_type_table_row', locals: { sample_attribute_type: sample_attribute_type } %>
       <% end %>
       </tbody>
     </table>
