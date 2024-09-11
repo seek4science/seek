@@ -28,8 +28,7 @@ class ExtendedMetadataTypesController < ApplicationController
 
 
   def upload_file
-
-    if params[:emt_json_file].nil?
+    if params[:emt_json_file].blank?
       flash[:error] = 'Please select a file to upload!'
       redirect_to new_extended_metadata_type_path
       return

@@ -99,4 +99,27 @@ class ExtendedMetadataTypesControllerTest < ActionController::TestCase
     assert_redirected_to :root
     assert_equal 'Admin rights required', flash[:error]
   end
+
+  test 'upload file successfully' do
+    person = FactoryBot.create(:admin)
+    login_as(person)
+
+    file = fixture_file_upload('extended_metadata_type/valid_emt.json', 'application/json')
+    post :upload_file, params: { emt_json_file: file }
+
+    assert_redirected_to administer_extended_metadata_types_path
+    assert_equal 'Your JSON file for extracting the extended metadata type has been uploaded. ', flash[:notice]
+  end
+
+  test 'upload file with no file selected' do
+    person = FactoryBot.create(:admin)
+    login_as(person)
+
+    post :upload_file, params: { emt_json_file: nil }
+
+    assert_redirected_to new_extended_metadata_type_path
+    assert_equal 'Please select a file to upload!', flash[:error]
+  end
+
+
 end

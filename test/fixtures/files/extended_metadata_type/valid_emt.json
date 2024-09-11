@@ -1,0 +1,18 @@
+{
+  "title": "person",
+  "supported_type": "ExtendedMetadata",
+  "enabled": true,
+  "attributes": [
+    {
+      "title": "first_name",
+      "type": "String"
+    },
+    {
+      "title": "last_name",
+      "label": "Last name",
+      "description": null,
+      "type": "String",
+      "required": false
+    }
+  ]
+}
