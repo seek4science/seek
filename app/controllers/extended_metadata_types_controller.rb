@@ -121,10 +121,21 @@ class ExtendedMetadataTypesController < ApplicationController
   private
 
   def emt_folder
-    dir = Rails.root.join('filestore', 'emt_files')
-    # if checking dir exists, delete it
-    FileUtils.rm_rf(dir) if File.directory?(dir)
+    clear
+    prepare
+  end
+
+  def clear
+    FileUtils.rm_rf(emt_path) if File.directory?(emt_path)
+  end
+
+  def prepare
     Seek::Config.append_filestore_path('emt_files')
+  end
+
+
+  def emt_path
+    Rails.root.join('filestore', 'emt_files')
   end
 
   def extended_metadata_type_params
