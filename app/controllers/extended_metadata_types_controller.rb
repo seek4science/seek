@@ -34,9 +34,8 @@ class ExtendedMetadataTypesController < ApplicationController
       return
     end
 
-    dir = Seek::Config.append_filestore_path('emt_files')
     uploaded_file = params[:emt_json_file]
-    filepath = Rails.root.join(dir, uploaded_file.original_filename)
+    filepath = Rails.root.join(emt_folder, uploaded_file.original_filename)
     File.write(filepath, uploaded_file.read)
 
     job = PopulateExtendedMetadataTypeJob.new(filepath.to_s).queue_job
@@ -106,9 +105,7 @@ class ExtendedMetadataTypesController < ApplicationController
 
   def administer_update
     @extended_metadata_type.update(extended_metadata_type_params)
-    unless @extended_metadata_type.save
-      flash[:error] = "Unable to save"
-    end
+    flash[:error] = "Unable to save" unless @extended_metadata_type.save
     respond_to do |format|
       format.html { redirect_to administer_extended_metadata_types_path }
     end
@@ -122,6 +119,13 @@ class ExtendedMetadataTypesController < ApplicationController
   end
 
   private
+
+  def emt_folder
+    dir = Rails.root.join('filestore', 'emt_files')
+    # if checking dir exists, delete it
+    FileUtils.rm_rf(dir) if File.directory?(dir)
+    Seek::Config.append_filestore_path('emt_files')
+  end
 
   def extended_metadata_type_params
     params.require(:extended_metadata_type).permit(:title, :enabled)
