@@ -42,13 +42,25 @@
               "type": {
                 "type": "string",
                 "enum": [
-                  "String",
-                  "Text",
-                  "Date",
                   "Date time",
-                  "Integer",
+                  "Date",
                   "Real number",
-                  "Boolean"
+                  "Integer",
+                  "Web link",
+                  "Email address",
+                  "Text",
+                  "String",
+                  "ChEBI",
+                  "ECN",
+                  "MetaNetX chemical",
+                  "MetaNetX reaction",
+                  "MetaNetX compartment",
+                  "InChI",
+                  "ENA custom date",
+                  "Boolean",
+                  "URI",
+                  "DOI",
+                  "NCBI ID"
                 ]
               },
               "description": {
@@ -75,8 +87,12 @@
               "type": {
                 "type": "string",
                 "enum": [
+                  "Registered Strain",
+                  "Registered Sample",
+                  "Registered Sample List",
                   "Controlled Vocabulary",
                   "Controlled Vocabulary List",
+                  "Registered Data file",
                   "Linked Extended Metadata",
                   "Linked Extended Metadata (multiple)"
                 ]
