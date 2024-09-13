@@ -55,13 +55,14 @@ class ExtendedMetadataTypesController < ApplicationController
     if job.nil?
       @status = 'completed'
       @id = read_new_item_id
+      @supported_type = ExtendedMetadataType.find(@id).supported_type if @id.present?
       session.delete(:job_id)
     else
       @status = 'processing'
     end
 
     respond_to do |format|
-      format.json { render json: { status: @status, id: @id } }
+      format.json { render json: { status: @status, id: @id, supported_type: @supported_type } }
     end
   end
 
@@ -138,7 +139,6 @@ end
                          controller_name:self.controller_name.downcase,
                          activity_loggable: ExtendedMetadataType.find(@id)
                        )
-
     end
   end
 
