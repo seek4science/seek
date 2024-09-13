@@ -11,6 +11,11 @@ class PopulateExtendedMetadataTypeJob < ApplicationJob
   end
 
   after_perform do |job|
-    puts "after_perform"
+    # clean up the filestore
+    dir = Rails.root.join('filestore', 'emt_files')
+    json_files = Dir.glob(File.join(dir, '**', '*.json'))
+    json_files.each do |file|
+      File.delete(file)
+    end
   end
 end

@@ -5,24 +5,22 @@ module Seek
     module EMTExtractor
       def self.extract_extended_metadata_type(filename)
 
+        clear
+
         `touch #{errorfile}`
+        `touch #{emtfile}`
 
         file = File.read(filename)
         data_hash = JSON.parse(file)
         res = valid_emt_json?(data_hash)
 
-
-        puts "**********************************"
-        puts ":res: #{res}"
-        puts "**********************************"
-
-        write_result(res) if res.present?
+        write_result(errorfile,res) if res.present?
 
 
         begin
           create_extended_metadata_type_from_json(data_hash)
         rescue StandardError => e
-          write_result("error(s): #{e}")
+          write_result(errorfile,"error(s): #{e}")
         end
 
       end
@@ -37,7 +35,7 @@ module Seek
         else
           errors = ['The schema file is not readable!']
         end
-        errors.join("\n\n")
+         errors.join("\n\n")
       end
 
 
@@ -67,6 +65,7 @@ module Seek
 
         if emt.save
           puts "ExtendedMetadataType '#{emt.title}' created successfully."
+          write_result(emtfile,"#{emt.id}")
         else
           error_message = "Failed to create ExtendedMetadataType: #{emt.errors.full_messages.join(', ')}"
           puts error_message
@@ -74,12 +73,27 @@ module Seek
         end
       end
 
+      private
+
       def self.errorfile
         Rails.root.join(Seek::Config.append_filestore_path('emt_files'), 'result.error')
       end
+      def self.emtfile
+        Rails.root.join(Seek::Config.append_filestore_path('emt_files'), 'result.id')
+      end
 
-      def self.write_result(result)
-        File.open(errorfile, 'a') { |file| file.write("#{result}\n") }
+      def self.write_result(file, result)
+        File.open(file, 'a') { |file| file.write("#{result}\n") }
+      end
+
+      def self.clear
+
+        file_path = Rails.root.join('filestore', 'emt_files', 'result.id')
+        File.delete(file_path) if File.exist?(file_path)
+
+        file_path = Rails.root.join('filestore', 'emt_files', 'result.error')
+        File.delete(file_path) if File.exist?(file_path)
+
       end
 
     end

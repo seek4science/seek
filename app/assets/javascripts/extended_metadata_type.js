@@ -10,7 +10,8 @@ var ExtendedMetadataType = {
         noticeFlashDiv.show();
     },
 
-    addNewMarker: function() {
+    addNewMarker: function(id) {
+        alert(id);
         var table = $j("#top-level-metadata-table");
         var row = table.find("tbody tr:first");
         row.find("td:first").append(' <sup style="color:red; font-weight:bold; font-size: 12px">new</sup>');

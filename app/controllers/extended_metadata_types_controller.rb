@@ -5,7 +5,7 @@ class ExtendedMetadataTypesController < ApplicationController
   before_action :find_requested_item, only: [:administer_update, :show, :destroy]
   include Seek::IndexPager
   include Seek::UploadHandling::DataUpload
-  after_action :log_event, only: [:emt_populate_job_status], if: -> { @status == 'completed' }
+  after_action :log_event, only: [:populate_job_status], if: -> { @status == 'completed' && @id.present? }
 
   # generated for form, to display fields for selected metadata type
   def form_fields
@@ -35,7 +35,7 @@ class ExtendedMetadataTypesController < ApplicationController
     end
 
     uploaded_file = params[:emt_json_file]
-    filepath = Rails.root.join(emt_folder, uploaded_file.original_filename)
+    filepath = Rails.root.join(emt_path, uploaded_file.original_filename)
     File.write(filepath, uploaded_file.read)
 
     job = PopulateExtendedMetadataTypeJob.new(filepath.to_s).queue_job
@@ -51,15 +51,17 @@ class ExtendedMetadataTypesController < ApplicationController
 
   def populate_job_status
     job = Delayed::Job.find_by(id: session[:job_id])
-    @status = if job.nil?
-               session.delete(:job_id)
-               'completed'
-             else
-               'processing'
-             end
+
+    if job.nil?
+      @status = 'completed'
+      @id = read_new_item_id
+      session.delete(:job_id)
+    else
+      @status = 'processing'
+    end
 
     respond_to do |format|
-      format.json { render json: { status: @status } }
+      format.json { render json: { status: @status, id: @id } }
     end
   end
 
@@ -120,23 +122,10 @@ class ExtendedMetadataTypesController < ApplicationController
 
   private
 
-  def emt_folder
-    clear
-    prepare
-  end
-
-  def clear
-    FileUtils.rm_rf(emt_path) if File.directory?(emt_path)
-  end
-
-  def prepare
-    Seek::Config.append_filestore_path('emt_files')
-  end
-
 
   def emt_path
-    Rails.root.join('filestore', 'emt_files')
-  end
+  Seek::Config.append_filestore_path('emt_files')
+end
 
   def extended_metadata_type_params
     params.require(:extended_metadata_type).permit(:title, :enabled)
@@ -147,12 +136,16 @@ class ExtendedMetadataTypesController < ApplicationController
       ActivityLog.create(action: 'create',
                          culprit: current_user,
                          controller_name:self.controller_name.downcase,
-                         # todo: if this is the correct way to get the newest created extended_metadata_type
-                         activity_loggable: ExtendedMetadataType.all.last
+                         activity_loggable: ExtendedMetadataType.find(@id)
                        )
 
     end
   end
 
-
+  def read_new_item_id
+    file_path = Rails.root.join('filestore', 'emt_files', 'result.id')
+    if File.exist?(file_path) && File.size?(file_path)
+      File.read(file_path)
+    end
+  end
 end
