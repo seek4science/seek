@@ -104,3 +104,8 @@ var SampleTypes = {
     }
 
 };
+
+
+$j(document).ready(function() {
+    $j('.term-label').on('click', SampleTypes.expandIRI);
+});

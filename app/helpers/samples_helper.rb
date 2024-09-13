@@ -175,7 +175,7 @@ module SamplesHelper
   def seek_cv_attribute_display(value, attribute)
     term = attribute.sample_controlled_vocab.sample_controlled_vocab_terms.where(label: value).last
     if term && term.iri.present?
-      iri_content = term.iri.match?(/^http/) ? link_to(term.iri, term.iri, target: '_blank') : term.iri
+      iri_content = term.iri.match?(/^https?:\/\//) ? link_to(term.iri, term.iri, target: '_blank') : term.iri
       label_tag = content_tag(:label, term.label, class: 'term-label')
       iri_tag = content_tag(:label, iri_content, class: 'term-iri badge')
       "#{label_tag}#{iri_tag}".html_safe
