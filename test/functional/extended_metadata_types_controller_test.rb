@@ -104,7 +104,7 @@ class ExtendedMetadataTypesControllerTest < ActionController::TestCase
     person = FactoryBot.create(:admin)
     login_as(person)
 
-    file = fixture_file_upload('extended_metadata_type/valid_emt.json', 'application/json')
+    file = fixture_file_upload('extended_metadata_type/valid_simple_emt.json', 'application/json')
     post :upload_file, params: { emt_json_file: file }
 
     assert_redirected_to administer_extended_metadata_types_path
