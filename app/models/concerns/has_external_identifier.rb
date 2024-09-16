@@ -16,6 +16,12 @@ module HasExternalIdentifier
         end
       end
     end
+
+    def by_external_identifier(external_identifier, projects)
+      # TODO include projects, and write tests
+      self.where(external_identifier: external_identifier).first
+    end
+
   end
 
   module InstanceMethods

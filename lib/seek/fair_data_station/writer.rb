@@ -3,22 +3,22 @@ module Seek
     class Writer
       def construct_isa(datastation_inv, contributor, projects, policy)
         reset_data_file_cache
-        investigation = build_investigation(datastation_inv, contributor, policy, projects)
+        investigation = build_investigation(datastation_inv, contributor, projects, policy)
 
         datastation_inv.studies.each do |datastation_study|
           study = build_study(datastation_study, contributor, policy, investigation)
           datastation_study.observation_units.each do |datastation_observation_unit|
-            observation_unit = build_observation_unit(datastation_observation_unit, contributor, policy, projects,
+            observation_unit = build_observation_unit(datastation_observation_unit, contributor, projects, policy,
                                                       study)
             datastation_observation_unit.samples.each do |datastation_sample|
-              sample = build_sample(datastation_sample, contributor, policy, projects)
+              sample = build_sample(datastation_sample, contributor, projects, policy)
               if sample.valid?
                 observation_unit.samples << sample
               else
                 Rails.logger.error("Invalid sample during fair data station import #{sample.errors.full_messages.inspect}")
               end
               datastation_sample.assays.each do |datastation_assay|
-                build_assay(datastation_assay, contributor, policy, projects, sample, study)
+                build_assay(datastation_assay, contributor, projects, policy, sample, study)
               end
             end
           end
@@ -28,6 +28,12 @@ module Seek
       end
 
       def update_isa(investigation, datastation_inv, contributor, projects, policy)
+        reset_data_file_cache
+        update_investigation(investigation, datastation_inv, contributor, projects, policy)
+        datastation_inv.studies.each do |datastation_study|
+          study = update_or_build_study(datastation_study, contributor, projects, policy, investigation)
+        end
+
         investigation
       end
 
@@ -37,7 +43,7 @@ module Seek
         @data_file_cache = {}
       end
 
-      def build_assay(datastation_assay, contributor, policy, projects, sample, study)
+      def build_assay(datastation_assay, contributor, projects, policy, sample, study)
         samples = []
         samples << sample if sample.valid?
         assay_attributes = datastation_assay.seek_attributes.merge({ contributor: contributor, study: study,
@@ -51,7 +57,7 @@ module Seek
         assay
       end
 
-      def build_sample(datastation_sample, contributor, policy, projects)
+      def build_sample(datastation_sample, contributor, projects, policy)
         sample_attributes = datastation_sample.seek_attributes.merge({ contributor: contributor, projects: projects,
                                                                        policy: policy.deep_copy })
         sample = ::Sample.new(sample_attributes)
@@ -59,7 +65,7 @@ module Seek
         sample
       end
 
-      def build_observation_unit(datastation_observation_unit, contributor, policy, projects, study)
+      def build_observation_unit(datastation_observation_unit, contributor, projects, policy, study)
         observation_unit_attributes = datastation_observation_unit.seek_attributes.merge({ contributor: contributor,
                                                                                            study: study, projects: projects, policy: policy.deep_copy })
         observation_unit = study.observation_units.build(observation_unit_attributes)
@@ -79,7 +85,7 @@ module Seek
         study
       end
 
-      def build_investigation(datastation_inv, contributor, policy, projects)
+      def build_investigation(datastation_inv, contributor, projects, policy)
         inv_attributes = datastation_inv.seek_attributes.merge({ contributor: contributor, projects: projects,
                                                                  policy: policy.deep_copy })
         investigation = ::Investigation.new(inv_attributes)
@@ -87,11 +93,40 @@ module Seek
         investigation
       end
 
+      def update_investigation(investigation, datastation_inv, contributor, projects, policy)
+        inv_attributes = datastation_inv.seek_attributes
+        investigation.update(inv_attributes)
+        update_extended_metadata(investigation, datastation_inv)
+        investigation
+      end
+
+      def update_study(study, datastation_study, contributor, projects, policy)
+        study_attributes = datastation_study.seek_attributes
+        study.update(study_attributes)
+        update_extended_metadata(study, datastation_study)
+        study
+      end
+
+      def update_or_build_study(datastation_study, contributor, projects, policy, investigation)
+        study = ::Study.by_external_identifier(datastation_study.external_id, projects)
+        if study
+          update_study(study, datastation_study, contributor, projects, policy)
+          investigation.studies << study
+        else
+          study = build_study(datastation_study, contributor, policy, investigation)
+        end
+        study
+      end
+
       def populate_extended_metadata(seek_entity, datastation_entity)
         if emt = detect_extended_metadata(seek_entity, datastation_entity)
           seek_entity.extended_metadata = ExtendedMetadata.new(extended_metadata_type: emt)
-          datastation_entity.populate_extended_metadata(seek_entity)
+          update_extended_metadata(seek_entity, datastation_entity)
         end
+      end
+
+      def update_extended_metadata(seek_entity, datastation_entity)
+        datastation_entity.populate_extended_metadata(seek_entity)
       end
 
       def detect_extended_metadata(seek_entity, datastation_entity)
