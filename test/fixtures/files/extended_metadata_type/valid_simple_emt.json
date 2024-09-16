@@ -5,14 +5,14 @@
   "attributes": [
     {
       "title": "first_name",
-      "type": "String"
+      "type": "String",
+      "required": true
     },
     {
       "title": "last_name",
-      "label": "Last name",
-      "description": null,
+      "label": "Last Name",
       "type": "String",
-      "required": false
+      "required": true
     }
   ]
 }
