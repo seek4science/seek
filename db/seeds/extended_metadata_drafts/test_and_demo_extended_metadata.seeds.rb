@@ -12,3 +12,6 @@ unless ExtendedMetadataType.where(title:'Test linking registered resources', sup
   emt.save!
   puts 'Test linking registered resources'
 end
+
+
+# fair data station simple seek test case

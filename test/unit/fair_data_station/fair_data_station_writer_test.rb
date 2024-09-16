@@ -225,4 +225,82 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     assert_equal 'male', obvs_unit.extended_metadata.get_attribute_value('Gender')
     assert_equal '2020-01-10', obvs_unit.extended_metadata.get_attribute_value('Date of birth')
   end
+
+  test 'update isa' do
+    investigation = setup_test_case_investigation
+    policy = investigation.policy
+    projects = investigation.projects
+    contributor = investigation.contributor
+
+    path = "#{Rails.root}/test/fixtures/files/fairdatastation/seek-fair-data-station-modified-test-case.ttl"
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+
+    investigation = Seek::FairDataStation::Writer.new.update_isa(investigation, inv, contributor, projects, policy)
+
+    # on save check, 0 investigation created, 1 study created, 1 obs unit, 1 sample, 1 assay, 3 data file, 4 extended metadata
+
+    assert_difference("Investigation.count", 0) do
+      assert_difference("Study.count", 1) do
+        assert_difference("ObservationUnit.count", 1) do
+          assert_difference("Sample.count", 1) do
+            assert_difference("Assay.count", 1) do
+              assert_difference("DataFile.count", 3) do
+                assert_difference("ExtendedMetadata.count", 4) do
+                  investigation.save!
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+
+    # check:
+    #   investigation title has been modified
+
+    # check:
+    #   seek-test-study-1 experimental site name changed
+    #   seek-test-study-2 description modified
+    #   seek-test-study-3 created as a new study
+
+    # check:
+    #   seek-test-obs-unit-1 host sex modified
+    #   seek-test-obs-unit-1 now linked to new test-file-7.csv
+    #   seek-test-obs-unit-3 name changed
+    #   seek-test-obs-unit-4 created, linked to seek-test-study-3, along with new test-file-7.csv
+
+    # check:
+    #   seek-test-sample-1 name changed
+    #   seek-test-sample-2 biosafety changed
+    #   seek-test-sample-3 ncbi changed
+    #   seek-test-sample-5 description changed
+    #   seek-test-sample-6 created, linked to seek-test-obs-unit-4
+
+    # check:
+    #   seek-test-assay-1 description changed
+    #   seek-test-assay-1 now linked to test-file-6.csv
+    #   seek-test-assay-6 created, along with new test-file-8.csv data file
+  end
+
+  private
+
+  def setup_test_case_investigation
+    FactoryBot.create(:fairdata_test_case_investigation_extended_metadata)
+    FactoryBot.create(:fairdata_test_case_study_extended_metadata)
+    FactoryBot.create(:fairdata_test_case_obsv_unit_extended_metadata)
+    FactoryBot.create(:fairdata_test_case_assay_extended_metadata)
+    FactoryBot.create(:fairdatastation_test_case_sample_type)
+
+    contributor = FactoryBot.create(:person)
+    project = contributor.projects.first
+    policy = FactoryBot.create(:public_policy)
+    path = "#{Rails.root}/test/fixtures/files/fairdatastation/seek-fair-data-station-test-case.ttl"
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+    investigation = Seek::FairDataStation::Writer.new.construct_isa(inv, contributor, [project], policy)
+    assert_difference('Investigation.count', 1) do
+      investigation.save!
+    end
+    assert_equal 'seek-test-investigation', investigation.external_identifier
+    investigation
+  end
 end

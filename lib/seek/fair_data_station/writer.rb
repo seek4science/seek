@@ -27,6 +27,10 @@ module Seek
         investigation
       end
 
+      def update_isa(investigation, datastation_inv, contributor, projects, policy)
+        investigation
+      end
+
       private
 
       def reset_data_file_cache
