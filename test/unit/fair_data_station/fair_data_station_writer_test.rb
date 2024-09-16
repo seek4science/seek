@@ -241,7 +241,7 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
 
     assert_difference("Investigation.count", 0) do
       assert_difference("Study.count", 1) do
-        # assert_difference("ObservationUnit.count", 1) do
+         assert_difference("ObservationUnit.count", 1) do
         #   assert_difference("Sample.count", 1) do
         #     assert_difference("Assay.count", 1) do
         #       assert_difference("DataFile.count", 3) do
@@ -251,7 +251,7 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
         #       end
         #     end
         #   end
-        # end
+         end
       end
     end
 
@@ -279,6 +279,15 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     #   seek-test-obs-unit-1 now linked to new test-file-7.csv
     #   seek-test-obs-unit-3 name changed
     #   seek-test-obs-unit-4 created, linked to seek-test-study-3, along with new test-file-7.csv
+    assert_equal 1, study.observation_units.count
+    obs_unit = ObservationUnit.where(external_identifier: 'seek-test-obs-unit-1').first
+    assert_equal 'female', obs_unit.extended_metadata.get_attribute_value('Gender')
+    obs_unit = ObservationUnit.where(external_identifier: 'seek-test-obs-unit-3').first
+    assert_equal 'test obs unit 3 - changed', obs_unit.title
+    obs_unit = ObservationUnit.where(external_identifier: 'seek-test-obs-unit-4').first
+    assert_equal 'testing testing testing testing testing testing testing testing testing testing obs unit 4', obs_unit.description
+    assert_equal '1005g', obs_unit.extended_metadata.get_attribute_value('Birth weight')
+
 
     # check:
     #   seek-test-sample-1 name changed
