@@ -29,7 +29,7 @@ module Seek
 
       def update_isa(investigation, datastation_inv, contributor, projects, policy)
         reset_data_file_cache
-        update_investigation(investigation, datastation_inv, contributor, projects, policy)
+        update_entity(investigation, datastation_inv, contributor, projects, policy)
         datastation_inv.studies.each do |datastation_study|
           study = update_or_build_study(datastation_study, contributor, projects, policy, investigation)
         end
@@ -93,24 +93,17 @@ module Seek
         investigation
       end
 
-      def update_investigation(investigation, datastation_inv, contributor, projects, policy)
-        inv_attributes = datastation_inv.seek_attributes
-        investigation.update(inv_attributes)
-        update_extended_metadata(investigation, datastation_inv)
-        investigation
-      end
-
-      def update_study(study, datastation_study, contributor, projects, policy)
-        study_attributes = datastation_study.seek_attributes
-        study.update(study_attributes)
-        update_extended_metadata(study, datastation_study)
-        study
+      def update_entity(seek_entity, datastation_entity, contributor, projects, policy)
+        attributes = datastation_entity.seek_attributes
+        seek_entity.update(attributes)
+        update_extended_metadata(seek_entity, datastation_entity)
+        seek_entity
       end
 
       def update_or_build_study(datastation_study, contributor, projects, policy, investigation)
         study = ::Study.by_external_identifier(datastation_study.external_id, projects)
         if study
-          update_study(study, datastation_study, contributor, projects, policy)
+          update_entity(study, datastation_study, contributor, projects, policy)
           investigation.studies << study
         else
           study = build_study(datastation_study, contributor, policy, investigation)
