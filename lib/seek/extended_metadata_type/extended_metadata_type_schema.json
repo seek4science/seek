@@ -102,7 +102,7 @@
                 "type": "string"
               },
               "ID": {
-                "type": "integer"
+                "type": ["integer", "string"]
               },
               "pos": {
                 "type": "integer"

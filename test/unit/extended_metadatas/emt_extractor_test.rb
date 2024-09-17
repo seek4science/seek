@@ -29,6 +29,10 @@ class EmtExtractorTest < ActiveSupport::TestCase
     assert_equal SampleAttributeType.find_by(title: 'String'), attr2.sample_attribute_type
     assert attr2.required
 
+    errorfile = Rails.root.join(Seek::Config.append_filestore_path('emt_files'), 'result.error')
+    assert File.exist?(errorfile)
+    assert_equal '', File.read(errorfile)
+
   end
 
   test 'creates extended metadata type with linked attributes from valid json file' do
@@ -72,6 +76,12 @@ class EmtExtractorTest < ActiveSupport::TestCase
       assert_equal SampleAttributeType.find_by(title: 'Linked Extended Metadata (multiple)'), child_attr.sample_attribute_type
       refute child_attr.required
     end
+
+    errorfile = Rails.root.join(Seek::Config.append_filestore_path('emt_files'), 'result.error')
+    assert File.exist?(errorfile)
+    assert_equal '', File.read(errorfile)
+
+
   end
 
   test 'creates extended metadata type with controlled vocab attributes from valid json file' do
@@ -104,9 +114,15 @@ class EmtExtractorTest < ActiveSupport::TestCase
 
       assert_equal topic_cv, topics_attr.sample_controlled_vocab
       assert_equal 4, topics_attr.sample_controlled_vocab.sample_controlled_vocab_terms.count
-
     end
 
+    errorfile = Rails.root.join(Seek::Config.append_filestore_path('emt_files'), 'result.error')
+    assert File.exist?(errorfile)
+    assert_equal '', File.read(errorfile)
+
   end
-end
+
+
+  end
+
 
