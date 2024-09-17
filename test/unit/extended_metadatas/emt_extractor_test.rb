@@ -119,10 +119,43 @@ class EmtExtractorTest < ActiveSupport::TestCase
     errorfile = Rails.root.join(Seek::Config.append_filestore_path('emt_files'), 'result.error')
     assert File.exist?(errorfile)
     assert_equal '', File.read(errorfile)
+  end
+
+
+  test 'handles invalid json file with wrong attr type' do
+    invalid_emt_file = open_fixture_file('extended_metadata_type/invalid_emt_with_wrong_type.json')
+
+    assert_no_difference('ExtendedMetadataType.count') do
+      Seek::ExtendedMetadataType::EMTExtractor.extract_extended_metadata_type(invalid_emt_file)
+    end
+
+    errorfile = Rails.root.join(Seek::Config.append_filestore_path('emt_files'), 'result.error')
+    assert File.exist?(errorfile)
+
+
+    error_message = "The property '#/attributes/0/type' value \"String1\" did not match one of the following values: Date time, Date, Real number, Integer, Web link, Email address, Text, String, ChEBI, ECN, MetaNetX chemical, MetaNetX reaction, MetaNetX compartment, InChI, ENA custom date, Boolean, URI, DOI, NCBI ID, Registered Strain, Registered Data file"
+    assert_includes File.read(errorfile), error_message
 
   end
 
 
+  test 'handles invalid json file with wrong id' do
+    invalid_emt_file = open_fixture_file('extended_metadata_type/invalid_emt_with_wrong_id.json')
+
+    assert_no_difference('ExtendedMetadataType.count') do
+      Seek::ExtendedMetadataType::EMTExtractor.extract_extended_metadata_type(invalid_emt_file)
+    end
+
+    errorfile = Rails.root.join(Seek::Config.append_filestore_path('emt_files'), 'result.error')
+    assert File.exist?(errorfile)
+
+
+    error_message = "Couldn't find SampleControlledVocab with 'id'=-1"
+    assert_includes File.read(errorfile), error_message
+
   end
+
+
+end
 
 
