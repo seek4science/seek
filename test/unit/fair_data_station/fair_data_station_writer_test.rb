@@ -237,19 +237,19 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
 
     investigation = Seek::FairDataStation::Writer.new.update_isa(investigation, inv, contributor, projects, policy)
 
-    # on save check, 0 investigation created, 1 study created, 1 obs unit, 1 sample, 1 assay, 3 data file, 4 extended metadata
+    # on save check, 0 investigation created, 1 study created, 1 obs unit, 1 sample, 1 assay, 3 data file, 3 extended metadata
 
     assert_difference("Investigation.count", 0) do
       assert_difference("Study.count", 1) do
          assert_difference("ObservationUnit.count", 1) do
            assert_difference("Sample.count", 1) do
-        #     assert_difference("Assay.count", 1) do
+             assert_difference("Assay.count", 1) do
         #       assert_difference("DataFile.count", 3) do
-        #         assert_difference("ExtendedMetadata.count", 4) do
+                 assert_difference("ExtendedMetadata.count", 3) do
                   investigation.save!
-        #         end
+                 end
         #       end
-        #     end
+             end
            end
          end
       end
@@ -314,7 +314,18 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     # check:
     #   seek-test-assay-1 description changed
     #   seek-test-assay-1 now linked to test-file-6.csv
-    #   seek-test-assay-6 created, along with new test-file-8.csv data file
+    #   seek-test-assay-6 facility changed
+    #   seek-test-assay-7 created, along with new test-file-8.csv data file
+    assay = Assay.where(external_identifier: 'seek-test-assay-1').first
+    assert_equal 'testing testing testing testing testing testing testing testing testing testing assay 1 - changed', assay.description
+    assay = Assay.where(external_identifier: 'seek-test-assay-6').first
+    assert_equal 'test facility - changed', assay.extended_metadata.get_attribute_value('Facility')
+    assay = Assay.where(external_identifier: 'seek-test-assay-7').first
+    assert_equal 'testing testing testing testing testing testing testing testing testing testing assay 7', assay.description
+    assert_equal 'new test facility', assay.extended_metadata.get_attribute_value('Facility')
+    assert_equal 1, assay.samples.count
+    assert_equal 'seek-test-sample-6', assay.samples.first.external_identifier
+
   end
 
   private

@@ -36,6 +36,9 @@ module Seek
             observation_unit = update_or_build_observation_unit(datastation_observation_unit, contributor, projects, policy, study)
             datastation_observation_unit.samples.each do |datastation_sample|
               sample = update_or_build_sample(datastation_sample, contributor, projects, policy, observation_unit)
+              datastation_sample.assays.each do |datastation_assay|
+                update_or_build_assay(datastation_assay, contributor, projects, policy, sample, study)
+              end
             end
           end
         end
@@ -144,6 +147,17 @@ module Seek
         end
         observation_unit.samples << sample
         sample
+      end
+
+      def update_or_build_assay(datastation_assay, contributor, projects, policy, sample, study)
+        assay = ::Assay.by_external_identifier(datastation_assay.external_id, projects)
+        if assay
+          update_entity(assay, datastation_assay, contributor, projects, policy)
+          study.assays << assay
+        else
+          assay = build_assay(datastation_assay, contributor, projects, policy, sample, study)
+        end
+        study
       end
 
       def populate_extended_metadata(seek_entity, datastation_entity)
