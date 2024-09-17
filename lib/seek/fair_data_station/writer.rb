@@ -34,6 +34,9 @@ module Seek
           study = update_or_build_study(datastation_study, contributor, projects, policy, investigation)
           datastation_study.observation_units.each do |datastation_observation_unit|
             observation_unit = update_or_build_observation_unit(datastation_observation_unit, contributor, projects, policy, study)
+            datastation_observation_unit.samples.each do |datastation_sample|
+              sample = update_or_build_sample(datastation_sample, contributor, projects, policy, observation_unit)
+            end
           end
         end
 
@@ -103,6 +106,13 @@ module Seek
         seek_entity
       end
 
+      def update_sample(seek_sample, datastation_sample, contributor, projects, policy)
+        sample_attributes = datastation_sample.seek_attributes
+        seek_sample.update(sample_attributes)
+        populate_sample(seek_sample, datastation_sample)
+        seek_sample
+      end
+
       def update_or_build_study(datastation_study, contributor, projects, policy, investigation)
         study = ::Study.by_external_identifier(datastation_study.external_id, projects)
         if study
@@ -123,6 +133,17 @@ module Seek
           observation_unit = build_observation_unit(datastation_observation_unit, contributor, projects, policy, study)
         end
         observation_unit
+      end
+
+      def update_or_build_sample(datastation_sample, contributor, projects, policy, observation_unit)
+        sample = ::Sample.by_external_identifier(datastation_sample.external_id, projects)
+        if sample
+          update_sample(sample, datastation_sample, contributor, projects, policy)
+        else
+          sample = build_sample(datastation_sample, contributor, projects, policy)
+        end
+        observation_unit.samples << sample
+        sample
       end
 
       def populate_extended_metadata(seek_entity, datastation_entity)

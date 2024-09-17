@@ -242,7 +242,7 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     assert_difference("Investigation.count", 0) do
       assert_difference("Study.count", 1) do
          assert_difference("ObservationUnit.count", 1) do
-        #   assert_difference("Sample.count", 1) do
+           assert_difference("Sample.count", 1) do
         #     assert_difference("Assay.count", 1) do
         #       assert_difference("DataFile.count", 3) do
         #         assert_difference("ExtendedMetadata.count", 4) do
@@ -250,7 +250,7 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
         #         end
         #       end
         #     end
-        #   end
+           end
          end
       end
     end
@@ -276,7 +276,7 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
 
     # check:
     #   seek-test-obs-unit-1 host sex modified
-    #   seek-test-obs-unit-1 now linked to new test-file-7.csv
+    #   seek-test-obs-unit-1 now linked to test-file-6.csv, and no longer linked to test-file-1.csv
     #   seek-test-obs-unit-3 name changed
     #   seek-test-obs-unit-4 created, linked to seek-test-study-3, along with new test-file-7.csv
     assert_equal 1, study.observation_units.count
@@ -287,6 +287,7 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     obs_unit = ObservationUnit.where(external_identifier: 'seek-test-obs-unit-4').first
     assert_equal 'testing testing testing testing testing testing testing testing testing testing obs unit 4', obs_unit.description
     assert_equal '1005g', obs_unit.extended_metadata.get_attribute_value('Birth weight')
+    assert_equal 'seek-test-study-3', obs_unit.study.external_identifier
 
 
     # check:
@@ -295,6 +296,20 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     #   seek-test-sample-3 ncbi changed
     #   seek-test-sample-5 description changed
     #   seek-test-sample-6 created, linked to seek-test-obs-unit-4
+    sample = Sample.where(external_identifier: 'seek-test-sample-1').first
+    assert_equal 'test seek sample 1 - changed', sample.title
+    sample = Sample.where(external_identifier: 'seek-test-sample-2').first
+    assert_equal '2', sample.get_attribute_value('Bio safety level')
+    assert_equal '2024-08-20', sample.get_attribute_value('Collection date')
+    sample = Sample.where(external_identifier: 'seek-test-sample-3').first
+    assert_equal '123460', sample.get_attribute_value('Organism ncbi id')
+    sample = Sample.where(external_identifier: 'seek-test-sample-5').first
+    assert_equal 'testing testing testing testing testing testing testing testing testing testing sample 5 - changed', sample.get_attribute_value('Description')
+    sample = Sample.where(external_identifier: 'seek-test-sample-6').first
+    assert_equal 'seek-test-obs-unit-4', sample.observation_unit.external_identifier
+    assert_equal 'goat', sample.get_attribute_value('Scientific name')
+    assert_equal 'test seek sample 6', sample.title
+
 
     # check:
     #   seek-test-assay-1 description changed
