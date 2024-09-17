@@ -235,20 +235,26 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     path = "#{Rails.root}/test/fixtures/files/fairdatastation/seek-fair-data-station-modified-test-case.ttl"
     inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
 
-    investigation = Seek::FairDataStation::Writer.new.update_isa(investigation, inv, contributor, projects, policy)
+    #assert_no_difference('DataFile.count') do
+      investigation = Seek::FairDataStation::Writer.new.update_isa(investigation, inv, contributor, projects, policy)
+    #end
 
     # on save check, 0 investigation created, 1 study created, 1 obs unit, 1 sample, 1 assay, 3 data file, 3 extended metadata
 
-    assert_difference("Investigation.count", 0) do
+    assert_no_difference("Investigation.count") do
       assert_difference("Study.count", 1) do
          assert_difference("ObservationUnit.count", 1) do
            assert_difference("Sample.count", 1) do
              assert_difference("Assay.count", 1) do
-        #       assert_difference("DataFile.count", 3) do
-                 assert_difference("ExtendedMetadata.count", 3) do
-                  investigation.save!
+               #assert_difference("DataFile.count", 3) do
+                 assert_difference("ObservationUnitAsset.count", 1) do
+                   assert_difference("AssayAsset.count", 2) do # 1 for new df, the other is for the sample
+                     assert_difference("ExtendedMetadata.count", 3) do
+                       investigation.save!
+                     end
+                   end
                  end
-        #       end
+               #end
              end
            end
          end
@@ -282,12 +288,14 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     assert_equal 1, study.observation_units.count
     obs_unit = ObservationUnit.where(external_identifier: 'seek-test-obs-unit-1').first
     assert_equal 'female', obs_unit.extended_metadata.get_attribute_value('Gender')
+    assert_equal ['test-file-6.csv'], obs_unit.data_files.collect(&:external_identifier)
     obs_unit = ObservationUnit.where(external_identifier: 'seek-test-obs-unit-3').first
     assert_equal 'test obs unit 3 - changed', obs_unit.title
     obs_unit = ObservationUnit.where(external_identifier: 'seek-test-obs-unit-4').first
     assert_equal 'testing testing testing testing testing testing testing testing testing testing obs unit 4', obs_unit.description
     assert_equal '1005g', obs_unit.extended_metadata.get_attribute_value('Birth weight')
     assert_equal 'seek-test-study-3', obs_unit.study.external_identifier
+    assert_equal ['test-file-7.csv'], obs_unit.data_files.collect(&:external_identifier)
 
 
     # check:
@@ -318,6 +326,7 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     #   seek-test-assay-7 created, along with new test-file-8.csv data file
     assay = Assay.where(external_identifier: 'seek-test-assay-1').first
     assert_equal 'testing testing testing testing testing testing testing testing testing testing assay 1 - changed', assay.description
+    assert_equal ['test-file-6.csv'], assay.data_files.collect(&:external_identifier)
     assay = Assay.where(external_identifier: 'seek-test-assay-6').first
     assert_equal 'test facility - changed', assay.extended_metadata.get_attribute_value('Facility')
     assay = Assay.where(external_identifier: 'seek-test-assay-7').first
@@ -325,6 +334,7 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     assert_equal 'new test facility', assay.extended_metadata.get_attribute_value('Facility')
     assert_equal 1, assay.samples.count
     assert_equal 'seek-test-sample-6', assay.samples.first.external_identifier
+    assert_equal ['test-file-8.csv'], assay.data_files.collect(&:external_identifier)
 
   end
 
@@ -336,6 +346,7 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     FactoryBot.create(:fairdata_test_case_obsv_unit_extended_metadata)
     FactoryBot.create(:fairdata_test_case_assay_extended_metadata)
     FactoryBot.create(:fairdatastation_test_case_sample_type)
+    FactoryBot.create(:experimental_assay_class)
 
     contributor = FactoryBot.create(:person)
     project = contributor.projects.first

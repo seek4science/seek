@@ -28,7 +28,7 @@ module Seek
       end
 
       def update_isa(investigation, datastation_inv, contributor, projects, policy)
-        reset_data_file_cache
+        preload_data_file_cache(investigation.related_data_files)
         update_entity(investigation, datastation_inv, contributor, projects, policy)
         datastation_inv.studies.each do |datastation_study|
           study = update_or_build_study(datastation_study, contributor, projects, policy, investigation)
@@ -50,6 +50,13 @@ module Seek
 
       def reset_data_file_cache
         @data_file_cache = {}
+      end
+
+      def preload_data_file_cache(data_files)
+        reset_data_file_cache
+        data_files.each do |data_file|
+          @data_file_cache[data_file.external_identifier] = data_file
+        end
       end
 
       def build_assay(datastation_assay, contributor, projects, policy, sample, study)
@@ -131,6 +138,11 @@ module Seek
         observation_unit = ::ObservationUnit.by_external_identifier(datastation_observation_unit.external_id, projects)
         if observation_unit
           update_entity(observation_unit, datastation_observation_unit, contributor, projects, policy)
+          observation_unit.observation_unit_assets.clear
+          datastation_observation_unit.datasets.each do |datastation_dataset|
+            df = build_data_file(contributor, datastation_dataset, projects, policy)
+            observation_unit.observation_unit_assets.build(asset: df)
+          end
           study.observation_units << observation_unit
         else
           observation_unit = build_observation_unit(datastation_observation_unit, contributor, projects, policy, study)
@@ -153,6 +165,11 @@ module Seek
         assay = ::Assay.by_external_identifier(datastation_assay.external_id, projects)
         if assay
           update_entity(assay, datastation_assay, contributor, projects, policy)
+          assay.assay_assets.clear
+          datastation_assay.datasets.each do |datastation_dataset|
+            df = build_data_file(contributor, datastation_dataset, projects, policy)
+            assay.assay_assets.build(asset: df)
+          end
           study.assays << assay
         else
           assay = build_assay(datastation_assay, contributor, projects, policy, sample, study)
@@ -211,7 +228,7 @@ module Seek
       end
 
       def build_data_file(contributor, datastation_dataset, projects, policy)
-        @data_file_cache[datastation_dataset.identifier] ||= begin
+        @data_file_cache[datastation_dataset.external_id] ||= begin
           blob = ContentBlob.new(url: datastation_dataset.content_url.to_s,
                                  original_filename: datastation_dataset.identifier, external_link: true, is_webpage: true, content_type: 'application/octet-stream')
           data_file_attributes = datastation_dataset.seek_attributes.merge({
