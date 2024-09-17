@@ -39,7 +39,7 @@ class Assay < ApplicationRecord
   has_many :tissue_and_cell_types, through: :assay_organisms
 
   before_save { assay_assets.each(&:set_version) }
-  has_many :assay_assets, dependent: :destroy, inverse_of: :assay, autosave: true
+  has_many :assay_assets, dependent: :destroy, inverse_of: :assay
 
   has_many :data_files, through: :assay_assets, source: :asset, source_type: 'DataFile', inverse_of: :assays
   has_many :placeholders, through: :assay_assets, source: :asset, source_type: 'Placeholder', inverse_of: :assays

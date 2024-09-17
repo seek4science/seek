@@ -7,7 +7,7 @@ class ObservationUnit < ApplicationRecord
   has_one :investigation, through: :study
   has_many :samples
   has_many :related_assays, -> { distinct }, through: :samples, source: :assays
-  has_many :observation_unit_assets, inverse_of: :observation_unit, dependent: :delete_all, autosave: true
+  has_many :observation_unit_assets, inverse_of: :observation_unit, dependent: :delete_all
   has_many :data_files, through: :observation_unit_assets, source: :asset, source_type: 'DataFile', inverse_of: :observation_units
   has_many :assay_data_files, -> { distinct }, through: :related_assays, source: :data_files
   has_many :assay_sops, -> { distinct }, through: :related_assays, source: :sops
