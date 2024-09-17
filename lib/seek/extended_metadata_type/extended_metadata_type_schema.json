@@ -60,7 +60,9 @@
                   "Boolean",
                   "URI",
                   "DOI",
-                  "NCBI ID"
+                  "NCBI ID",
+                  "Registered Strain",
+                  "Registered Data file"
                 ]
               },
               "description": {
@@ -87,12 +89,8 @@
               "type": {
                 "type": "string",
                 "enum": [
-                  "Registered Strain",
-                  "Registered Sample",
-                  "Registered Sample List",
                   "Controlled Vocabulary",
                   "Controlled Vocabulary List",
-                  "Registered Data file",
                   "Linked Extended Metadata",
                   "Linked Extended Metadata (multiple)"
                 ]
