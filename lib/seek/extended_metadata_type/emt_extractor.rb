@@ -11,7 +11,14 @@ module Seek
         `touch #{emtfile}`
 
         file = File.read(filename)
-        data_hash = JSON.parse(file)
+
+        begin
+          data_hash = JSON.parse(file)
+        rescue JSON::ParserError => e
+          write_result(errorfile,"Failed to parse JSON: #{e}")
+        end
+
+
         res = valid_emt_json?(data_hash)
 
         write_result(errorfile,res) if res.present?
@@ -31,7 +38,7 @@ module Seek
         if File.readable?(definitions_path)
           schema= JSON.parse(File.read(definitions_path))
           errors = JSON::Validator.fully_validate(schema, json)
-          puts "errors: #{errors}"
+          #puts "errors: #{errors}"
         else
           errors = ['The schema file is not readable!']
         end
