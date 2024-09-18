@@ -11,12 +11,7 @@ module Seek
             observation_unit = build_observation_unit(datastation_observation_unit, contributor, projects, policy,
                                                       study)
             datastation_observation_unit.samples.each do |datastation_sample|
-              sample = build_sample(datastation_sample, contributor, projects, policy)
-              if sample.valid?
-                observation_unit.samples << sample
-              else
-                Rails.logger.error("Invalid sample during fair data station import #{sample.errors.full_messages.inspect}")
-              end
+              sample = build_sample(datastation_sample, contributor, projects, policy, observation_unit)
               datastation_sample.assays.each do |datastation_assay|
                 build_assay(datastation_assay, contributor, projects, policy, sample, study)
               end
@@ -73,10 +68,10 @@ module Seek
         assay
       end
 
-      def build_sample(datastation_sample, contributor, projects, policy)
+      def build_sample(datastation_sample, contributor, projects, policy, observation_unit)
         sample_attributes = datastation_sample.seek_attributes.merge({ contributor: contributor, projects: projects,
                                                                        policy: policy.deep_copy })
-        sample = ::Sample.new(sample_attributes)
+        sample = observation_unit.samples.build(sample_attributes)
         populate_sample(sample, datastation_sample)
         sample
       end
@@ -111,14 +106,14 @@ module Seek
 
       def update_entity(seek_entity, datastation_entity, contributor, projects, policy)
         attributes = datastation_entity.seek_attributes
-        seek_entity.update(attributes)
+        seek_entity.assign_attributes(attributes)
         update_extended_metadata(seek_entity, datastation_entity)
         seek_entity
       end
 
       def update_sample(seek_sample, datastation_sample, contributor, projects, policy)
         sample_attributes = datastation_sample.seek_attributes
-        seek_sample.update(sample_attributes)
+        seek_sample.assign_attributes(sample_attributes)
         populate_sample(seek_sample, datastation_sample)
         seek_sample
       end
@@ -154,10 +149,10 @@ module Seek
         sample = ::Sample.by_external_identifier(datastation_sample.external_id, projects)
         if sample
           update_sample(sample, datastation_sample, contributor, projects, policy)
+          observation_unit.samples << sample
         else
-          sample = build_sample(datastation_sample, contributor, projects, policy)
+          sample = build_sample(datastation_sample, contributor, projects, policy, observation_unit)
         end
-        observation_unit.samples << sample
         sample
       end
 

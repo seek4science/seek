@@ -198,6 +198,7 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
 
   test 'populate obsv unit extended metadata' do
     ext_metadata_type = FactoryBot.create(:fairdata_test_case_obsv_unit_extended_metadata)
+    FactoryBot.create(:fairdatastation_test_case_sample_type)
     FactoryBot.create(:experimental_assay_class)
 
     path = "#{Rails.root}/test/fixtures/files/fairdatastation/seek-fair-data-station-test-case.ttl"

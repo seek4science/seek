@@ -17,9 +17,12 @@ module HasExternalIdentifier
       end
     end
 
+    # returns an item where :external_identifier and any of the projects match
     def by_external_identifier(external_identifier, projects)
-      # TODO include projects, and write tests
-      self.where(external_identifier: external_identifier).first
+      self.where(external_identifier: external_identifier).each do |item|
+        return item if (item.projects & projects).any?
+      end
+      nil
     end
 
   end
