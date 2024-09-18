@@ -247,7 +247,10 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
                  assert_difference("ObservationUnitAsset.count", 1) do
                    assert_difference("AssayAsset.count", 2) do # 1 for new df, the other is for the sample
                      assert_difference("ExtendedMetadata.count", 3) do
-                       investigation = Seek::FairDataStation::Writer.new.update_isa(investigation, inv, contributor, projects, policy)
+                       #FIXME: ideally should be zero, but 1 is being created by a save when observation_unit pass to the study.observation_units association
+                       assert_difference("DataFile.count", 1) do
+                         investigation = Seek::FairDataStation::Writer.new.update_isa(investigation, inv, contributor, projects, policy)
+                       end
                        investigation.save!
                      end
                    end
