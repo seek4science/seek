@@ -160,14 +160,14 @@ module Seek
         assay = ::Assay.by_external_identifier(datastation_assay.external_id, projects)
         if assay
           update_entity(assay, datastation_assay, contributor, projects, policy)
-          assay.assay_assets.clear
+          assay.assay_assets.where(asset_type:'DataFile').delete_all
           datastation_assay.datasets.each do |datastation_dataset|
             df = build_data_file(contributor, datastation_dataset, projects, policy)
             assay.assay_assets.build(asset: df)
           end
           study.assays << assay
         else
-          assay = build_assay(datastation_assay, contributor, projects, policy, sample, study)
+          build_assay(datastation_assay, contributor, projects, policy, sample, study)
         end
         study
       end

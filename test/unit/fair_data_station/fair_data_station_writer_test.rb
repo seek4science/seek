@@ -236,10 +236,6 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     path = "#{Rails.root}/test/fixtures/files/fairdatastation/seek-fair-data-station-modified-test-case.ttl"
     inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
 
-    #assert_no_difference('DataFile.count') do
-      investigation = Seek::FairDataStation::Writer.new.update_isa(investigation, inv, contributor, projects, policy)
-    #end
-
     # on save check, 0 investigation created, 1 study created, 1 obs unit, 1 sample, 1 assay, 3 data file, 3 extended metadata
 
     assert_no_difference("Investigation.count") do
@@ -247,15 +243,16 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
          assert_difference("ObservationUnit.count", 1) do
            assert_difference("Sample.count", 1) do
              assert_difference("Assay.count", 1) do
-               #assert_difference("DataFile.count", 3) do
+               assert_difference("DataFile.count", 3) do
                  assert_difference("ObservationUnitAsset.count", 1) do
                    assert_difference("AssayAsset.count", 2) do # 1 for new df, the other is for the sample
                      assert_difference("ExtendedMetadata.count", 3) do
+                       investigation = Seek::FairDataStation::Writer.new.update_isa(investigation, inv, contributor, projects, policy)
                        investigation.save!
                      end
                    end
                  end
-               #end
+               end
              end
            end
          end
@@ -328,14 +325,17 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     assay = Assay.where(external_identifier: 'seek-test-assay-1').first
     assert_equal 'testing testing testing testing testing testing testing testing testing testing assay 1 - changed', assay.description
     assert_equal ['test-file-6.csv'], assay.data_files.collect(&:external_identifier)
+    assert_equal ['seek-test-sample-1'], assay.samples.collect(&:external_identifier)
     assay = Assay.where(external_identifier: 'seek-test-assay-6').first
     assert_equal 'test facility - changed', assay.extended_metadata.get_attribute_value('Facility')
+    assert_equal ['seek-test-sample-5'], assay.samples.collect(&:external_identifier)
     assay = Assay.where(external_identifier: 'seek-test-assay-7').first
     assert_equal 'testing testing testing testing testing testing testing testing testing testing assay 7', assay.description
     assert_equal 'new test facility', assay.extended_metadata.get_attribute_value('Facility')
     assert_equal 1, assay.samples.count
     assert_equal 'seek-test-sample-6', assay.samples.first.external_identifier
     assert_equal ['test-file-8.csv'], assay.data_files.collect(&:external_identifier)
+
 
   end
 
