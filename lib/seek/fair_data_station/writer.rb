@@ -122,6 +122,7 @@ module Seek
         study = ::Study.by_external_identifier(datastation_study.external_id, projects)
         if study
           update_entity(study, datastation_study, contributor, projects, policy)
+          study.observation_units = []
           investigation.studies << study
         else
           study = build_study(datastation_study, contributor, policy, investigation)
@@ -133,11 +134,13 @@ module Seek
         observation_unit = ::ObservationUnit.by_external_identifier(datastation_observation_unit.external_id, projects)
         if observation_unit
           update_entity(observation_unit, datastation_observation_unit, contributor, projects, policy)
-          observation_unit.observation_unit_assets.clear
+          observation_unit.study = study
+          observation_unit.observation_unit_assets.delete_all
           datastation_observation_unit.datasets.each do |datastation_dataset|
             df = build_data_file(contributor, datastation_dataset, projects, policy)
             observation_unit.observation_unit_assets.build(asset: df)
           end
+          observation_unit.samples = []
           study.observation_units << observation_unit
         else
           observation_unit = build_observation_unit(datastation_observation_unit, contributor, projects, policy, study)
@@ -149,6 +152,8 @@ module Seek
         sample = ::Sample.by_external_identifier(datastation_sample.external_id, projects)
         if sample
           update_sample(sample, datastation_sample, contributor, projects, policy)
+          sample.observation_unit = observation_unit
+          sample.assays = []
           observation_unit.samples << sample
         else
           sample = build_sample(datastation_sample, contributor, projects, policy, observation_unit)
@@ -160,6 +165,7 @@ module Seek
         assay = ::Assay.by_external_identifier(datastation_assay.external_id, projects)
         if assay
           update_entity(assay, datastation_assay, contributor, projects, policy)
+          assay.samples = [sample]
           assay.assay_assets.where(asset_type:'DataFile').delete_all
           datastation_assay.datasets.each do |datastation_dataset|
             df = build_data_file(contributor, datastation_dataset, projects, policy)

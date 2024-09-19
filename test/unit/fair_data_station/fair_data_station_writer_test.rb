@@ -339,7 +339,67 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     assert_equal 'seek-test-sample-6', assay.samples.first.external_identifier
     assert_equal ['test-file-8.csv'], assay.data_files.collect(&:external_identifier)
 
+  end
 
+  test 'update isa with things moving' do
+    investigation = setup_test_case_investigation
+    policy = investigation.policy
+    projects = investigation.projects
+    contributor = investigation.contributor
+
+    path = "#{Rails.root}/test/fixtures/files/fairdatastation/seek-fair-data-station-moves-test-case.ttl"
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+
+    assert_no_difference("Investigation.count") do
+      assert_no_difference("Study.count") do
+        assert_no_difference("ObservationUnit.count") do
+          assert_no_difference("Sample.count") do
+            assert_no_difference("Assay.count") do
+              assert_no_difference("DataFile.count") do
+                assert_no_difference("ObservationUnitAsset.count") do
+                  assert_no_difference("AssayAsset.count") do
+                    assert_no_difference("ExtendedMetadata.count") do
+                      investigation = Seek::FairDataStation::Writer.new.update_isa(investigation, inv, contributor, projects, policy)
+                      investigation.save!
+                    end
+                  end
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+
+    investigation.reload
+
+    # check
+    #   seek-test-obs-unit-3 has moved to seek-test-study-1
+    #   seek-test-sample-3 has moved to seek-test-obs-unit-1
+    #   seek-test-sample-5 has moved to seek-test-obs-unit-2
+    #   seek-test-assay-4 has moved to seek-test-sample-3 and therefore also seek-test-study-1
+    #   seek-test-assay-6 has moved to seek-test-sample-4 and therefore also seek-test-study-1
+    #   in each case also check their children are as expected, including items that haven't moved
+    obs_unit = ObservationUnit.where(external_identifier: 'seek-test-obs-unit-3').first
+    assert_equal 'seek-test-study-1', obs_unit.study.external_identifier
+    assert_equal ['seek-test-sample-4'], obs_unit.samples.collect(&:external_identifier)
+
+    sample = Sample.where(external_identifier: 'seek-test-sample-3').first
+    assert_equal 'seek-test-obs-unit-1', sample.observation_unit.external_identifier
+    assert_equal ['seek-test-assay-3', 'seek-test-assay-4'], sample.assays.collect(&:external_identifier).sort
+    sample = Sample.where(external_identifier: 'seek-test-sample-5').first
+    assert_equal 'seek-test-obs-unit-2', sample.observation_unit.external_identifier
+    assert_equal ['seek-test-assay-5'], sample.assays.collect(&:external_identifier)
+
+    assay = Assay.where(external_identifier: 'seek-test-assay-4').first
+    assert_equal 1, assay.samples.count
+    assert_equal 'seek-test-sample-3', assay.samples.first.external_identifier
+    assert_equal 'seek-test-study-1', assay.study.external_identifier
+
+    assay = Assay.where(external_identifier: 'seek-test-assay-6').first
+    assert_equal 1, assay.samples.count
+    assert_equal 'seek-test-sample-4', assay.samples.first.external_identifier
+    assert_equal 'seek-test-study-1', assay.study.external_identifier
   end
 
   private
