@@ -28,7 +28,8 @@ module Seek
         datastation_inv.studies.each do |datastation_study|
           study = update_or_build_study(datastation_study, contributor, projects, policy, investigation)
           datastation_study.observation_units.each do |datastation_observation_unit|
-            observation_unit = update_or_build_observation_unit(datastation_observation_unit, contributor, projects, policy, study)
+            observation_unit = update_or_build_observation_unit(datastation_observation_unit, contributor, projects,
+                                                                policy, study)
             datastation_observation_unit.samples.each do |datastation_sample|
               sample = update_or_build_sample(datastation_sample, contributor, projects, policy, observation_unit)
               datastation_sample.assays.each do |datastation_assay|
@@ -104,14 +105,14 @@ module Seek
         investigation
       end
 
-      def update_entity(seek_entity, datastation_entity, contributor, projects, policy)
+      def update_entity(seek_entity, datastation_entity, _contributor, _projects, _policy)
         attributes = datastation_entity.seek_attributes
         seek_entity.assign_attributes(attributes)
         update_extended_metadata(seek_entity, datastation_entity)
         seek_entity
       end
 
-      def update_sample(seek_sample, datastation_sample, contributor, projects, policy)
+      def update_sample(seek_sample, datastation_sample, _contributor, _projects, _policy)
         sample_attributes = datastation_sample.seek_attributes
         seek_sample.assign_attributes(sample_attributes)
         populate_sample(seek_sample, datastation_sample)
@@ -166,7 +167,7 @@ module Seek
         if assay
           update_entity(assay, datastation_assay, contributor, projects, policy)
           assay.samples = [sample]
-          assay.assay_assets.where(asset_type:'DataFile').delete_all
+          assay.assay_assets.where(asset_type: 'DataFile').delete_all
           datastation_assay.datasets.each do |datastation_dataset|
             df = build_data_file(contributor, datastation_dataset, projects, policy)
             assay.assay_assets.build(asset: df)

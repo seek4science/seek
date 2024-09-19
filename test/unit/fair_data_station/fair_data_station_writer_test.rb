@@ -238,27 +238,28 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
 
     # on save check, 0 investigation created, 1 study created, 1 obs unit, 1 sample, 1 assay, 3 data file, 3 extended metadata
 
-    assert_no_difference("Investigation.count") do
-      assert_difference("Study.count", 1) do
-         assert_difference("ObservationUnit.count", 1) do
-           assert_difference("Sample.count", 1) do
-             assert_difference("Assay.count", 1) do
-               assert_difference("DataFile.count", 3) do
-                 assert_difference("ObservationUnitAsset.count", 1) do
-                   assert_difference("AssayAsset.count", 2) do # 1 for new df, the other is for the sample
-                     assert_difference("ExtendedMetadata.count", 3) do
-                       #FIXME: ideally should be zero, but 1 is being created by a save when observation_unit pass to the study.observation_units association
-                       assert_difference("DataFile.count", 1) do
-                         investigation = Seek::FairDataStation::Writer.new.update_isa(investigation, inv, contributor, projects, policy)
-                       end
-                       investigation.save!
-                     end
-                   end
-                 end
-               end
-             end
-           end
-         end
+    assert_no_difference('Investigation.count') do
+      assert_difference('Study.count', 1) do
+        assert_difference('ObservationUnit.count', 1) do
+          assert_difference('Sample.count', 1) do
+            assert_difference('Assay.count', 1) do
+              assert_difference('DataFile.count', 3) do
+                assert_difference('ObservationUnitAsset.count', 1) do
+                  assert_difference('AssayAsset.count', 2) do # 1 for new df, the other is for the sample
+                    assert_difference('ExtendedMetadata.count', 3) do
+                      # FIXME: ideally should be zero, but 1 is being created by a save when observation_unit pass to the study.observation_units association
+                      assert_difference('DataFile.count', 1) do
+                        investigation = Seek::FairDataStation::Writer.new.update_isa(investigation, inv, contributor,
+                                                                                     projects, policy)
+                      end
+                      investigation.save!
+                    end
+                  end
+                end
+              end
+            end
+          end
+        end
       end
     end
 
@@ -276,10 +277,11 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     study = investigation.studies.where(external_identifier: 'seek-test-study-1').first
     assert_equal 'manchester test site - changed', study.extended_metadata.get_attribute_value('Experimental site name')
     study = investigation.studies.where(external_identifier: 'seek-test-study-2').first
-    assert_equal 'testing testing testing testing testing testing testing testing testing testing study 2 - changed', study.description
+    assert_equal 'testing testing testing testing testing testing testing testing testing testing study 2 - changed',
+                 study.description
     study = investigation.studies.where(external_identifier: 'seek-test-study-3').first
     assert_equal 'test study 3', study.title
-    assert_equal 'birmingham-test-site',study.extended_metadata.get_attribute_value('Experimental site name')
+    assert_equal 'birmingham-test-site', study.extended_metadata.get_attribute_value('Experimental site name')
 
     # check:
     #   seek-test-obs-unit-1 host sex modified
@@ -293,11 +295,11 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     obs_unit = ObservationUnit.where(external_identifier: 'seek-test-obs-unit-3').first
     assert_equal 'test obs unit 3 - changed', obs_unit.title
     obs_unit = ObservationUnit.where(external_identifier: 'seek-test-obs-unit-4').first
-    assert_equal 'testing testing testing testing testing testing testing testing testing testing obs unit 4', obs_unit.description
+    assert_equal 'testing testing testing testing testing testing testing testing testing testing obs unit 4',
+                 obs_unit.description
     assert_equal '1005g', obs_unit.extended_metadata.get_attribute_value('Birth weight')
     assert_equal 'seek-test-study-3', obs_unit.study.external_identifier
     assert_equal ['test-file-7.csv'], obs_unit.data_files.collect(&:external_identifier)
-
 
     # check:
     #   seek-test-sample-1 name changed
@@ -313,12 +315,12 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     sample = Sample.where(external_identifier: 'seek-test-sample-3').first
     assert_equal '123460', sample.get_attribute_value('Organism ncbi id')
     sample = Sample.where(external_identifier: 'seek-test-sample-5').first
-    assert_equal 'testing testing testing testing testing testing testing testing testing testing sample 5 - changed', sample.get_attribute_value('Description')
+    assert_equal 'testing testing testing testing testing testing testing testing testing testing sample 5 - changed',
+                 sample.get_attribute_value('Description')
     sample = Sample.where(external_identifier: 'seek-test-sample-6').first
     assert_equal 'seek-test-obs-unit-4', sample.observation_unit.external_identifier
     assert_equal 'goat', sample.get_attribute_value('Scientific name')
     assert_equal 'test seek sample 6', sample.title
-
 
     # check:
     #   seek-test-assay-1 description changed
@@ -326,19 +328,20 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     #   seek-test-assay-6 facility changed
     #   seek-test-assay-7 created, along with new test-file-8.csv data file
     assay = Assay.where(external_identifier: 'seek-test-assay-1').first
-    assert_equal 'testing testing testing testing testing testing testing testing testing testing assay 1 - changed', assay.description
+    assert_equal 'testing testing testing testing testing testing testing testing testing testing assay 1 - changed',
+                 assay.description
     assert_equal ['test-file-6.csv'], assay.data_files.collect(&:external_identifier)
     assert_equal ['seek-test-sample-1'], assay.samples.collect(&:external_identifier)
     assay = Assay.where(external_identifier: 'seek-test-assay-6').first
     assert_equal 'test facility - changed', assay.extended_metadata.get_attribute_value('Facility')
     assert_equal ['seek-test-sample-5'], assay.samples.collect(&:external_identifier)
     assay = Assay.where(external_identifier: 'seek-test-assay-7').first
-    assert_equal 'testing testing testing testing testing testing testing testing testing testing assay 7', assay.description
+    assert_equal 'testing testing testing testing testing testing testing testing testing testing assay 7',
+                 assay.description
     assert_equal 'new test facility', assay.extended_metadata.get_attribute_value('Facility')
     assert_equal 1, assay.samples.count
     assert_equal 'seek-test-sample-6', assay.samples.first.external_identifier
     assert_equal ['test-file-8.csv'], assay.data_files.collect(&:external_identifier)
-
   end
 
   test 'update isa with things moving' do
@@ -350,16 +353,17 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     path = "#{Rails.root}/test/fixtures/files/fairdatastation/seek-fair-data-station-moves-test-case.ttl"
     inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
 
-    assert_no_difference("Investigation.count") do
-      assert_no_difference("Study.count") do
-        assert_no_difference("ObservationUnit.count") do
-          assert_no_difference("Sample.count") do
-            assert_no_difference("Assay.count") do
-              assert_no_difference("DataFile.count") do
-                assert_no_difference("ObservationUnitAsset.count") do
-                  assert_no_difference("AssayAsset.count") do
-                    assert_no_difference("ExtendedMetadata.count") do
-                      investigation = Seek::FairDataStation::Writer.new.update_isa(investigation, inv, contributor, projects, policy)
+    assert_no_difference('Investigation.count') do
+      assert_no_difference('Study.count') do
+        assert_no_difference('ObservationUnit.count') do
+          assert_no_difference('Sample.count') do
+            assert_no_difference('Assay.count') do
+              assert_no_difference('DataFile.count') do
+                assert_no_difference('ObservationUnitAsset.count') do
+                  assert_no_difference('AssayAsset.count') do
+                    assert_no_difference('ExtendedMetadata.count') do
+                      investigation = Seek::FairDataStation::Writer.new.update_isa(investigation, inv, contributor,
+                                                                                   projects, policy)
                       investigation.save!
                     end
                   end
@@ -386,7 +390,7 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
 
     sample = Sample.where(external_identifier: 'seek-test-sample-3').first
     assert_equal 'seek-test-obs-unit-1', sample.observation_unit.external_identifier
-    assert_equal ['seek-test-assay-3', 'seek-test-assay-4'], sample.assays.collect(&:external_identifier).sort
+    assert_equal %w[seek-test-assay-3 seek-test-assay-4], sample.assays.collect(&:external_identifier).sort
     sample = Sample.where(external_identifier: 'seek-test-sample-5').first
     assert_equal 'seek-test-obs-unit-2', sample.observation_unit.external_identifier
     assert_equal ['seek-test-assay-5'], sample.assays.collect(&:external_identifier)
