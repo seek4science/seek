@@ -29,8 +29,12 @@ class ExtendedMetadataType < ApplicationRecord
     supported_type == 'ExtendedMetadata'
   end
 
-  def linked_by_other_metadata_attributes?
+  def linked_by_metadata_attributes?
     ExtendedMetadataAttribute.pluck(:linked_extended_metadata_type_id).compact.include?(id)
+  end
+
+  def linked_metadata_attributes
+    ExtendedMetadataAttribute.where(linked_extended_metadata_type_id: id)
   end
 
   def supported_type_must_be_valid_type
