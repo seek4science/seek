@@ -160,8 +160,8 @@ class ExtendedMetadataTypesControllerTest < ActionController::TestCase
     end
 
     assert_select 'div#sample-controlled-vocabs tbody tr' do
-      assert_select 'td', text: 'apples controlled vocab 1'
-      assert_select 'td', text: 'apples controlled vocab 2'
+      assert_select 'td', text: SampleControlledVocab.first.title
+      assert_select 'td', text: SampleControlledVocab.last.title
     end
 
   end
