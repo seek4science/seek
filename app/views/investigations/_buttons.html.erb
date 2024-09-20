@@ -47,5 +47,11 @@
 
   <%= order_icon(item, current_user, order_studies_investigation_path(item), item.studies, 'study') -%>
 
+	<% if Seek::Config.fair_data_station_enabled && item.can_manage? %>
+		<li>
+			<%= image_tag_for_key('import', update_from_fairdata_station_investigation_path(item), "Update from FAIRData Station", nil, "Update from FAIRData Station") -%>
+		</li>
+	<% end %>
+
   <%= delete_icon item, current_user -%>
 <% end -%>

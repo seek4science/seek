@@ -6,7 +6,7 @@ class InvestigationsController < ApplicationController
 
   before_action :investigations_enabled?
   before_action :find_assets, :only=>[:index]
-  before_action :find_and_authorize_requested_item,:only=>[:edit, :manage, :update, :manage_update, :destroy, :show,:new_object_based_on_existing_one]
+  before_action :find_and_authorize_requested_item,:only=>[:edit, :manage, :update, :manage_update, :destroy, :show, :update_from_fairdata_station, :submit_fairdata_station, :new_object_based_on_existing_one]
 
   #project_membership_required_appended is an alias to project_membership_required, but is necesary to include the actions
   #defined in the application controller
@@ -32,6 +32,18 @@ class InvestigationsController < ApplicationController
       redirect_to @existing_investigation
     end
 
+  end
+
+  def submit_fairdata_station
+    path = params[:datastation_data].path
+    datastation_inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+    raise 'identifiers dont match' if datastation_inv.external_id != @investigation.external_identifier
+    @investigation = Seek::FairDataStation::Writer.new.update_isa(@investigation, datastation_inv, current_person, @investigation.projects, @investigation.policy)
+    @investigation.save!
+
+    respond_to do |format|
+      format.html { redirect_to(@investigation) }
+    end
   end
 
   def export_isatab_json

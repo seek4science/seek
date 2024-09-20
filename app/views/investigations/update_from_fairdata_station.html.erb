@@ -1,0 +1,14 @@
+<%= render :partial => "general/page_title",:locals=>{:title=>"Update from FAIRData Station for #{ t('investigation') } #{link_to(@investigation.title, @investigation)}".html_safe} %>
+
+<%= form_tag submit_fairdata_station_investigation_path(@investigation), multipart: true do %>
+
+  <%= panel('FAIR Data Station turtle (ttl) metadata file') do %>
+
+    <%= file_field_tag "datastation_data", accept: '.ttl' -%>
+
+  <% end %>
+
+  <div>
+    <%= submit_tag("Submit", class: 'btn btn-primary') %>
+  </div>
+<% end %>
