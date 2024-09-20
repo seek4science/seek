@@ -139,7 +139,7 @@ class ExtendedMetadataTypesControllerTest < ActionController::TestCase
       assert_select 'li a[href=?]', '#top-level-metadata-table', text: 'Top Level'
       assert_select 'li a[href=?]', '#nested-metadata-table', text: 'Nested Level'
       assert_select 'li a[href=?]', '#sample-controlled-vocabs', text: 'Controlled Vocabs'
-      assert_select 'li a[href=?]', '#sample-attribute-types', text: 'Extended Attribute Types'
+      assert_select 'li a[href=?]', '#sample-attribute-types', text: 'Extended Metadata Attribute Types'
     end
 
 
