@@ -1281,6 +1281,27 @@ class InvestigationsControllerTest < ActionController::TestCase
       assert_response :success
       assert_select 'li a[href=?]', update_from_fairdata_station_investigation_path(inv), text:'Update from FAIRData Station', count: 0
     end
+  end
+
+  test 'update from fairdata station' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    inv = FactoryBot.create(:investigation, external_identifier:'test-inv-identifier', contributor: person)
+    inv2 = FactoryBot.create(:investigation, external_identifier:'test-inv-identifier2', contributor: FactoryBot.create(:person), policy: FactoryBot.create(:editing_public_policy))
+    with_config_value(:fair_data_station_enabled, true) do
+      get :update_from_fairdata_station, params: { id: inv }
+      assert_response :success
+
+      get :update_from_fairdata_station, params: { id: inv2 }
+      assert_redirected_to inv2
+      assert_match /You are not authorized to manage this Investigation/, flash[:error]
+    end
+
+    with_config_value(:fair_data_station_enabled, false) do
+      get :update_from_fairdata_station, params: { id: inv }
+      assert_redirected_to :root
+      assert_match /Fair data station are disabled/, flash[:error]
+    end
 
   end
 end
