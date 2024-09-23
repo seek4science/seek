@@ -145,7 +145,9 @@ module SamplesHelper
       when Seek::Samples::BaseType::CV
         seek_cv_attribute_display(value, attribute)
       when Seek::Samples::BaseType::CV_LIST
-        value.each{|v| seek_cv_attribute_display(v, attribute) }.join(', ')
+        value.map do |v|
+          seek_cv_attribute_display(v, attribute)
+        end.join(', ').html_safe
       when Seek::Samples::BaseType::LINKED_EXTENDED_METADATA
         linked_extended_metadata_attribute_display(value, attribute)
       when Seek::Samples::BaseType::LINKED_EXTENDED_METADATA_MULTI
@@ -173,12 +175,15 @@ module SamplesHelper
   end
 
   def seek_cv_attribute_display(value, attribute)
-    term = attribute.sample_controlled_vocab.sample_controlled_vocab_terms.where(label:value).last
-    content = value
+    term = attribute.sample_controlled_vocab.sample_controlled_vocab_terms.where(label: value).last
     if term && term.iri.present?
-      content << " (#{term.iri}) "
+      iri_content = term.iri.match?(/^https?:\/\//) ? link_to(term.iri, term.iri, target: '_blank') : term.iri
+      label_tag = content_tag(:label, term.label, class: 'term-label')
+      iri_tag = content_tag(:label, iri_content, class: 'term-iri badge')
+      "#{label_tag}#{iri_tag}".html_safe
+    else
+      term.label
     end
-    content
   end
 
   def linked_extended_metadata_attribute_display(value, attribute)
