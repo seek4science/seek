@@ -1302,6 +1302,89 @@ class InvestigationsControllerTest < ActionController::TestCase
       assert_redirected_to :root
       assert_match /Fair data station are disabled/, flash[:error]
     end
+  end
 
+  test 'submit from fair data station' do
+    investigation = setup_test_case_investigation
+    login_as(investigation.contributor)
+    ttl_file = fixture_file_upload('fairdatastation/seek-fair-data-station-modified-test-case.ttl')
+
+    assert_no_difference('Investigation.count') do
+      assert_difference('Study.count', 1) do
+        assert_difference('ObservationUnit.count', 1) do
+          assert_difference('Sample.count', 1) do
+            assert_difference('Assay.count', 1) do
+              post :submit_fairdata_station, params: {id: investigation, datastation_data: ttl_file }
+              assert_redirected_to investigation
+            end
+          end
+        end
+      end
+    end
+  end
+
+  test 'submit from fair data station no permission or disabled' do
+    investigation = setup_test_case_investigation
+    investigation.update(policy: FactoryBot.create(:editing_public_policy))
+    login_as(FactoryBot.create(:person))
+    assert investigation.can_edit?
+    refute investigation.can_manage?
+    ttl_file = fixture_file_upload('fairdatastation/seek-fair-data-station-modified-test-case.ttl')
+
+    assert_no_difference('Investigation.count') do
+      assert_no_difference('Study.count') do
+        assert_no_difference('ObservationUnit.count') do
+          assert_no_difference('Sample.count') do
+            assert_no_difference('Assay.count') do
+              post :submit_fairdata_station, params: {id: investigation, datastation_data: ttl_file }
+              assert_redirected_to investigation
+              assert_match /You are not authorized to manage this Investigation/, flash[:error]
+            end
+          end
+        end
+      end
+    end
+
+    login_as(investigation.contributor)
+    assert investigation.can_manage?
+
+    assert_no_difference('Investigation.count') do
+      assert_no_difference('Study.count') do
+        assert_no_difference('ObservationUnit.count') do
+          assert_no_difference('Sample.count') do
+            assert_no_difference('Assay.count') do
+              with_config_value(:fair_data_station_enabled, false) do
+                post :submit_fairdata_station, params: {id: investigation, datastation_data: ttl_file }
+                assert_redirected_to :root
+                assert_match /Fair data station are disabled/, flash[:error]
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+
+  private
+
+  def setup_test_case_investigation
+    FactoryBot.create(:fairdata_test_case_investigation_extended_metadata)
+    FactoryBot.create(:fairdata_test_case_study_extended_metadata)
+    FactoryBot.create(:fairdata_test_case_obsv_unit_extended_metadata)
+    FactoryBot.create(:fairdata_test_case_assay_extended_metadata)
+    FactoryBot.create(:fairdatastation_test_case_sample_type)
+    FactoryBot.create(:experimental_assay_class)
+
+    contributor = FactoryBot.create(:person)
+    project = contributor.projects.first
+    policy = FactoryBot.create(:public_policy)
+    path = "#{Rails.root}/test/fixtures/files/fairdatastation/seek-fair-data-station-test-case.ttl"
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+    investigation = Seek::FairDataStation::Writer.new.construct_isa(inv, contributor, [project], policy)
+    assert_difference('Investigation.count', 1) do
+      investigation.save!
+    end
+    assert_equal 'seek-test-investigation', investigation.external_identifier
+    investigation
   end
 end
