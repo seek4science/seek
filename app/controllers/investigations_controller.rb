@@ -38,13 +38,20 @@ class InvestigationsController < ApplicationController
   def submit_fairdata_station
     path = params[:datastation_data].path
     datastation_inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
-    raise 'identifiers dont match' if datastation_inv.external_id != @investigation.external_identifier
-    @investigation = Seek::FairDataStation::Writer.new.update_isa(@investigation, datastation_inv, current_person, @investigation.projects, @investigation.policy)
-    @investigation.save!
-
-    respond_to do |format|
-      format.html { redirect_to(@investigation) }
+    if datastation_inv.external_id != @investigation.external_identifier
+      flash[:error] = "This #{t('investigation')} does not match the identifier provided in the FAIR Data Station metadata"
+      respond_to do |format|
+        format.html { render action: :update_from_fairdata_station, status: :unprocessable_entity }
+      end
+    else
+      @investigation = Seek::FairDataStation::Writer.new.update_isa(@investigation, datastation_inv, current_person, @investigation.projects, @investigation.policy)
+      @investigation.save!
+      respond_to do |format|
+        format.html { redirect_to(@investigation) }
+      end
     end
+
+
   end
 
   def export_isatab_json

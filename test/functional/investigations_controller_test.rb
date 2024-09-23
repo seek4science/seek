@@ -1365,6 +1365,28 @@ class InvestigationsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'submit from fair data station external id mis match' do
+    investigation = setup_test_case_investigation
+    investigation.update(external_identifier: 'some-other-id')
+    login_as(investigation.contributor)
+    ttl_file = fixture_file_upload('fairdatastation/seek-fair-data-station-modified-test-case.ttl')
+
+    assert_no_difference('Investigation.count') do
+      assert_no_difference('Study.count') do
+        assert_no_difference('ObservationUnit.count') do
+          assert_no_difference('Sample.count') do
+            assert_no_difference('Assay.count') do
+              post :submit_fairdata_station, params: {id: investigation, datastation_data: ttl_file }
+              assert_response :unprocessable_entity
+              assert_match /This Investigation does not match the identifier provided in the FAIR Data Station metadata/, flash[:error]
+              assert_select 'div#error_flash', text: /This Investigation does not match the identifier provided in the FAIR Data Station metadata/
+            end
+          end
+        end
+      end
+    end
+  end
+
   private
 
   def setup_test_case_investigation
