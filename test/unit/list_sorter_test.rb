@@ -152,12 +152,12 @@ class ListSorterTest < ActiveSupport::TestCase
   end
 
   test 'sort by views' do
-    d1 = FactoryBot.create(:document, title: 'document a', policy: FactoryBot.create(:publicly_viewable_policy))
-    d2 = FactoryBot.create(:document, title: 'document b', policy: FactoryBot.create(:publicly_viewable_policy))
-    d3 = FactoryBot.create(:document, title: 'document c', policy: FactoryBot.create(:publicly_viewable_policy))
-    d4 = FactoryBot.create(:document, title: 'document d', policy: FactoryBot.create(:publicly_viewable_policy))
-    d5 = FactoryBot.create(:document, title: 'document e', policy: FactoryBot.create(:publicly_viewable_policy))
-    d6 = FactoryBot.create(:document, title: 'document f', policy: FactoryBot.create(:publicly_viewable_policy))
+    d1 = FactoryBot.create(:document, title: 'document 1', policy: FactoryBot.create(:publicly_viewable_policy))
+    d2 = FactoryBot.create(:document, title: 'document 2', policy: FactoryBot.create(:publicly_viewable_policy))
+    d3 = FactoryBot.create(:document, title: 'document 3', policy: FactoryBot.create(:publicly_viewable_policy))
+    d4 = FactoryBot.create(:document, title: 'document 4', policy: FactoryBot.create(:publicly_viewable_policy))
+    d5 = FactoryBot.create(:document, title: 'document 5', policy: FactoryBot.create(:publicly_viewable_policy))
+    d6 = FactoryBot.create(:document, title: 'document 6', policy: FactoryBot.create(:publicly_viewable_policy))
     FactoryBot.create(:activity_log, action: 'show', activity_loggable: d4, created_at: 10.minutes.ago)
     FactoryBot.create(:activity_log, action: 'show', activity_loggable: d4, created_at: 9.minutes.ago)
     FactoryBot.create(:activity_log, action: 'show', activity_loggable: d4, created_at: 8.minutes.ago)
@@ -170,10 +170,10 @@ class ListSorterTest < ActiveSupport::TestCase
     views_ordered = [d4, d3, d6, d5, d1, d2]
     # Tests enum strategy
     docs = [d1, d2, d3, d4, d5, d6]
-    assert_equal views_ordered, Seek::ListSorter.sort_by_order(docs, '--views_desc')
+    assert_equal views_ordered.collect(&:title), Seek::ListSorter.sort_by_order(docs, '--views_desc').collect(&:title)
     # Tests relation strategy
     docs = Document.all
-    assert_equal views_ordered, Seek::ListSorter.sort_by_order(docs, '--views_desc')
+    assert_equal views_ordered.collect(&:title), Seek::ListSorter.sort_by_order(docs, '--views_desc').collect(&:title)
   end
 
   test 'complex sorting' do
