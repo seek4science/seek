@@ -406,6 +406,24 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     assert_equal 'seek-test-study-1', assay.study.external_identifier
   end
 
+  test 'update_isa id mis match' do
+    investigation = setup_test_case_investigation
+    policy = investigation.policy
+    projects = investigation.projects
+    contributor = investigation.contributor
+
+    path = "#{Rails.root}/test/fixtures/files/fairdatastation/demo.ttl"
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+
+    refute_equal investigation.external_identifier, inv.external_id
+
+    assert_raises(Seek::FairDataStation::ExternalIdMismatchException) do
+      investigation = Seek::FairDataStation::Writer.new.update_isa(investigation, inv, contributor,
+                                                                   projects, policy)
+    end
+
+  end
+
   private
 
   def setup_test_case_investigation

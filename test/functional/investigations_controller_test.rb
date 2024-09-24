@@ -1378,8 +1378,8 @@ class InvestigationsControllerTest < ActionController::TestCase
             assert_no_difference('Assay.count') do
               post :submit_fairdata_station, params: {id: investigation, datastation_data: ttl_file }
               assert_response :unprocessable_entity
-              assert_match /This Investigation does not match the identifier provided in the FAIR Data Station metadata/, flash[:error]
-              assert_select 'div#error_flash', text: /This Investigation does not match the identifier provided in the FAIR Data Station metadata/
+              assert_match /Investigation external identifiers do not match/, flash[:error]
+              assert_select 'div#error_flash', text: /Investigation external identifiers do not match/
             end
           end
         end

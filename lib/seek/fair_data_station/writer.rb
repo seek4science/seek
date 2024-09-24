@@ -1,5 +1,6 @@
 module Seek
   module FairDataStation
+    class ExternalIdMismatchException < RuntimeError; end;
     class Writer
       def construct_isa(datastation_inv, contributor, projects, policy)
         reset_data_file_cache
@@ -23,6 +24,10 @@ module Seek
       end
 
       def update_isa(investigation, datastation_inv, contributor, projects, policy)
+        unless investigation.external_identifier == datastation_inv.external_id
+          raise ExternalIdMismatchException.new('Investigation external identifiers do not match')
+        end
+
         preload_data_file_cache(investigation.related_data_files)
         update_entity(investigation, datastation_inv, contributor, projects, policy)
         datastation_inv.studies.each do |datastation_study|

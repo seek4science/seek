@@ -37,23 +37,18 @@ class InvestigationsController < ApplicationController
 
   def submit_fairdata_station
     path = params[:datastation_data].path
-    datastation_inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
-    error = false
-    if datastation_inv.external_id != @investigation.external_identifier
-      flash[:error] = "This #{t('investigation')} does not match the identifier provided in the FAIR Data Station metadata"
-      error = true
-    else
-      begin
-        Investigation.transaction do
-          @investigation = Seek::FairDataStation::Writer.new.update_isa(@investigation, datastation_inv, current_person, @investigation.projects, @investigation.policy)
-          @investigation.save!
-        end
-      rescue ActiveRecord::RecordInvalid => e
-        flash[:error] = e.message
-        error = true
+    data_station_inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+
+    begin
+      Investigation.transaction do
+        @investigation = Seek::FairDataStation::Writer.new.update_isa(@investigation, data_station_inv, current_person, @investigation.projects, @investigation.policy)
+        @investigation.save!
       end
+    rescue ActiveRecord::RecordInvalid, Seek::FairDataStation::ExternalIdMismatchException => e
+      flash[:error] = e.message
     end
-    if error
+
+    if flash[:error].present?
       respond_to do |format|
         format.html { render action: :update_from_fairdata_station, status: :unprocessable_entity }
       end
