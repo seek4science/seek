@@ -1,23 +1,23 @@
 {
   "data": [
     {
-      "id": "5",
+      "id": "96",
       "type": "collections",
       "attributes": {
         "title": "A Maximal Collection"
       },
       "links": {
-        "self": "/collections/5"
+        "self": "/collections/96"
       }
     },
     {
-      "id": "4",
+      "id": "95",
       "type": "collections",
       "attributes": {
         "title": "A Minimal Collection"
       },
       "links": {
-        "self": "/collections/4"
+        "self": "/collections/95"
       }
     }
   ],

@@ -4,25 +4,24 @@ module Seek
   module IsaTemplates
     module TemplateExtractor
       def self.extract_templates
-        `touch #{resultfile}`
+        FileUtils.touch(resultfile)
         result = StringIO.new
-
         seed_isa_tags
 
         disable_authorization_checks do
           client = Ebi::OlsClient.new
           project = Project.find_or_create_by(title: 'Default Project')
           directory = Seek::Config.append_filestore_path('source_types')
-          directory_files = Dir.exist?(directory) ? Dir.glob("#{directory}/*.json") : []
-          raise '<ul><li>Make sure to upload files that have the ".json" extension.</li></ul>' if directory_files == []
+          @directory_files = Dir.exist?(directory) ? Dir.glob("#{directory}/*.json") : []
+          raise '<ul><li>Make sure to upload files that have the ".json" extension.</li></ul>' if @directory_files == []
 
-          directory_files.each do |filename|
-            puts filename
+          @directory_files.each do |filename|
             next if File.extname(filename) != '.json'
 
+            @errors = []
             file = File.read(filename)
             res = check_json_file(file)
-            raise res if res.present?
+            @errors.append res if res.present?
 
             data_hash = JSON.parse(file)
             data_hash['data'].each do |item|
@@ -35,8 +34,9 @@ module Seek
                 result << add_log(template_details, 'Created')
               end
 
-              template = Template.create(template_details.merge({ projects: [project], policy: Policy.public_policy }))
+              template = Template.new(template_details.merge({ projects: [project], policy: Policy.public_policy }))
 
+              current_template_attributes = []
               item['data'].each_with_index do |attribute, j|
                 is_ontology = attribute['ontology'].present?
                 is_cv = attribute['CVList'].present?
@@ -56,7 +56,7 @@ module Seek
                     begin
                       terms = client.all_descendants(attribute['ontology']['name'],
                                                      attribute['ontology']['rootTermURI'])
-                    rescue Exception => e
+                    rescue StandardError => e
                       scv.save(validate: false)
                       next
                     end
@@ -87,29 +87,35 @@ module Seek
 
                 p scv.errors if (is_ontology || is_cv) && !scv.save(validate: false)
 
-                template_attribute_details = { title: attribute['name'], template_id: template.id }
+                ta = TemplateAttribute.new(is_title: (attribute['title'] || 0),
+                                     isa_tag_id: get_isa_tag_id(attribute['isaTag']),
+                                     short_name: attribute['short_name'],
+                                     required: attribute['required'],
+                                     description: attribute['description'],
+                                     sample_controlled_vocab_id: scv&.id,
+                                     pid: attribute['pid'],
+                                     sample_attribute_type_id: get_sample_attribute_type(attribute['dataType']),
+                                     allow_cv_free_text: attribute['ontology'].present?,
+                                     title: attribute['name'])
 
-                TemplateAttribute.create(template_attribute_details.merge({
-                                                                            is_title: attribute['title'] || 0,
-                                                                            isa_tag_id: get_isa_tag_id(attribute['isaTag']),
-                                                                            short_name: attribute['short_name'],
-                                                                            required: attribute['required'],
-                                                                            description: attribute['description'],
-                                                                            sample_controlled_vocab_id: scv&.id,
-                                                                            pid: attribute['pid'],
-                                                                            sample_attribute_type_id: get_sample_attribute_type(attribute['dataType']),
-                                                                            allow_cv_free_text: attribute['ontology'].present?
-                                                                          }))
+                current_template_attributes.append ta
               end
+              template.template_attributes << current_template_attributes
+              template.save! unless @errors.present?
             end
+
+            # Remove the file after processing
           end
         end
+        raise "<ul>#{@errors.map { |e| "#{e}" }.join('')}</ul>".html_safe if @errors.present?
+
         write_result(result.string)
-      rescue Exception => e
-        puts e
+      rescue StandardError => e
         write_result("error(s): #{e}")
+        raise e
       ensure
-        `rm -f #{lockfile}`
+        FileUtils.rm_f(lockfile)
+        FileUtils.rm_f(@directory_files) unless @directory_files.blank?
       end
 
       def self.init_template(metadata)
@@ -148,8 +154,13 @@ module Seek
       end
 
       def self.valid_isa_json?(json)
-        definitions_path =
-          File.join(Rails.root, 'lib', 'seek', 'isa_templates', 'template_schema.json')
+        # read the schema file depending on the environment
+        definitions_path = if Rails.env.test?
+                             File.join(Rails.root, 'lib', 'seek', 'isa_templates', 'template_schema_test.json')
+                           else
+                             File.join(Rails.root, 'lib', 'seek', 'isa_templates', 'template_schema.json')
+                           end
+
         if File.readable?(definitions_path)
           JSON::Validator.fully_validate_json(definitions_path, json)
         else
@@ -158,8 +169,10 @@ module Seek
       end
 
       def self.get_sample_attribute_type(title)
-        sa = SampleAttributeType.find_by(title: title)
-        raise "Could not find a Sample Attribute named '#{title}'" if sa.nil?
+        sa = SampleAttributeType.find_by(title:)
+        @errors.append "<li>Could not find a Sample Attribute Type named '#{title}'</li>" if sa.nil?
+
+        return if sa.nil?
 
         sa.id
       end
@@ -167,8 +180,8 @@ module Seek
       def self.get_isa_tag_id(title)
         return nil if title.blank?
 
-        it = IsaTag.find_by(title: title)
-        raise "Could not find an ISA Tag named '#{title}'" if it.nil?
+        it = IsaTag.find_by(title:)
+        @errors.append "<li>Could not find an ISA Tag named '#{title}'</li>" if it.nil?
 
         it.id
       end

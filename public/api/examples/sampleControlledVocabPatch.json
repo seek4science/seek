@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "18",
+    "id": "303",
     "type": "sample_controlled_vocabs",
     "attributes": {
       "title": "new title",
@@ -10,7 +10,7 @@
       "short_name": "new short name",
       "sample_controlled_vocab_terms_attributes": [
         {
-          "id": "17",
+          "id": "931",
           "label": "new term label",
           "iri": "new iri",
           "parent_iri": "new parent_iri"

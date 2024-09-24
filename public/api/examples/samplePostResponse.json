@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "4",
+    "id": "177",
     "type": "samples",
     "attributes": {
       "policy": {
@@ -17,14 +17,14 @@
         "tag1",
         "tag2"
       ],
-      "created_at": "2023-03-06T15:24:11.241Z",
-      "updated_at": "2023-03-06T15:24:11.220Z",
+      "created_at": "2024-06-20T12:38:26.000Z",
+      "updated_at": "2024-06-20T12:38:26.000Z",
       "creators": [
         {
-          "profile": "/people/2",
+          "profile": "/people/1039988186",
           "family_name": "Last",
-          "given_name": "Person284",
-          "affiliation": "An Institution: 309",
+          "given_name": "Person3114",
+          "affiliation": "An Institution: 3846",
           "orcid": null
         }
       ],
@@ -39,14 +39,17 @@
           "Golden Delicious",
           "Granny Smith"
         ],
-        "patients": null
+        "patients": null,
+        "weight": 3.7,
+        "age": 42,
+        "bool": true
       }
     },
     "relationships": {
       "creators": {
         "data": [
           {
-            "id": "2",
+            "id": "1039988186",
             "type": "people"
           }
         ]
@@ -54,21 +57,21 @@
       "submitter": {
         "data": [
           {
-            "id": "2",
+            "id": "1039988186",
             "type": "people"
           }
         ]
       },
       "sample_type": {
         "data": {
-          "id": "2",
+          "id": "246",
           "type": "sample_types"
         }
       },
       "projects": {
         "data": [
           {
-            "id": "2",
+            "id": "1022252265",
             "type": "projects"
           }
         ]
@@ -81,7 +84,7 @@
       "investigations": {
         "data": [
           {
-            "id": "2",
+            "id": "973655094",
             "type": "investigations"
           }
         ]
@@ -89,7 +92,7 @@
       "studies": {
         "data": [
           {
-            "id": "2",
+            "id": "1060385125",
             "type": "studies"
           }
         ]
@@ -97,7 +100,7 @@
       "assays": {
         "data": [
           {
-            "id": "2",
+            "id": "1035386870",
             "type": "assays"
           }
         ]
@@ -105,21 +108,21 @@
       "people": {
         "data": [
           {
-            "id": "2",
+            "id": "1039988186",
             "type": "people"
           }
         ]
       }
     },
     "links": {
-      "self": "/samples/4"
+      "self": "/samples/177"
     },
     "meta": {
-      "created": "2023-03-06T15:24:11.241Z",
-      "modified": "2023-03-06T15:24:11.220Z",
+      "created": "2024-06-20T12:38:26.000Z",
+      "modified": "2024-06-20T12:38:26.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "de769a80-9e60-013b-15a0-0a81884ed284"
+      "uuid": "e9ee4c30-112f-013d-1f9d-0a81884ed284"
     }
   },
   "jsonapi": {

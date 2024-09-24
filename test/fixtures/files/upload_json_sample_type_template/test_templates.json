@@ -1,0 +1,236 @@
+{
+	"data": [
+		{
+			"metadata": {
+				"name": "Source - ISA Test template",
+				"group": "ISA Test",
+				"group_order": 1,
+				"temporary_name": "1_Source - ISA Test template",
+				"version": "1.0.0",
+				"isa_config": "isaconfig-default_v2015-07-02/studySample.xml",
+				"isa_measurement_type": null,
+				"isa_technology_type": null,
+				"isa_protocol_type": null,
+				"repo_schema_id": "none",
+				"organism": "any",
+				"level": "study source"
+			},
+			"data": [
+				{
+					"iri": null,
+					"name": "Source Name",
+					"description": "Sources are considered as the starting biological material used in a study.",
+					"dataType": "String attribute type 1",
+					"title": true,
+					"required": true,
+					"isaTag": "source"
+				},
+				{
+					"iri": null,
+					"name": "Source Characteristic 1",
+					"description": "A characteristic of the source.",
+					"dataType": "String attribute type 1",
+					"required": true,
+					"ontology": null,
+					"CVList": null,
+					"isaTag": "source_characteristic"
+				}
+			]
+		},
+		{
+			"metadata": {
+				"name": "Sample - ISA Test template",
+				"group": "ISA Test",
+				"group_order": 2,
+				"temporary_name": "2_Sample - ISA Test template",
+				"version": "1.0.0",
+				"isa_config": "isaconfig-default_v2015-07-02/studySample.xml",
+				"isa_measurement_type": "Sample",
+				"isa_technology_type": null,
+				"isa_protocol_type": "protocol with samples as outputs",
+				"repo_schema_id": "none",
+				"organism": "any",
+				"level": "study sample"
+			},
+			"data": [
+				{
+					"iri": null,
+					"name": "Input",
+					"description": "Registered Samples in the platform used as input for this protocol.",
+					"dataType": "Sample multi attribute type 1",
+					"required": true,
+					"isaTag": null
+				},
+				{
+					"iri": null,
+					"name": "Name of a protocol with samples as outputs",
+					"description": "Type of experimental step that generates samples as outputs from the study sources.",
+					"dataType": "String attribute type 1",
+					"required": true,
+					"ontology": null,
+					"CVList": null,
+					"isaTag": "protocol"
+				},
+				{
+					"iri": null,
+					"name": "Name of protocol parameter 1",
+					"description": "A parameter for the protocol.",
+					"dataType": "String attribute type 1",
+					"required": true,
+					"ontology": null,
+					"CVList": null,
+					"isaTag": "parameter_value"
+				},
+				{
+					"iri": null,
+					"name": "Sample Name",
+					"description": "Samples are considered as biological material sampled from sources and used in the study.",
+					"dataType": "String attribute type 1",
+					"title": true,
+					"required": true,
+					"isaTag": "sample"
+				},
+				{
+					"iri": null,
+					"name": "Sample Characteristic 1",
+					"description": "A characteristic of the sample.",
+					"dataType": "String attribute type 1",
+					"required": true,
+					"ontology": null,
+					"CVList": null,
+					"isaTag": "sample_characteristic"
+				}
+			]
+		},
+		{
+			"metadata": {
+				"name": "Material output assay - ISA Test template",
+				"group": "ISA Test",
+				"group_order": 3,
+				"temporary_name": "3_Material output assay - ISA Test template",
+				"version": "1.0.0",
+				"isa_config": "none",
+				"isa_measurement_type": "any",
+				"isa_technology_type": "any",
+				"isa_protocol_type": "protocol with material output",
+				"repo_schema_id": "none",
+				"organism": "any",
+				"level": "assay - material"
+			},
+			"data": [
+				{
+					"iri": null,
+					"name": "Input",
+					"description": "Registered Samples in the platform used as input for this protocol.",
+					"dataType": "Sample multi attribute type 1",
+					"required": true,
+					"isaTag": null
+				},
+				{
+					"iri": null,
+					"name": "Name of a protocol with material output",
+					"description": "Type of assay or experimental step performed that generates a material output.",
+					"dataType": "String attribute type 1",
+					"required": true,
+					"ontology": null,
+					"CVList": null,
+					"isaTag": "protocol"
+				},
+				{
+					"iri": null,
+					"name": "Name of protocol parameter 1",
+					"description": "A parameter for the protocol.",
+					"dataType": "String attribute type 1",
+					"required": true,
+					"ontology": null,
+					"CVList": null,
+					"isaTag": "parameter_value"
+				},
+				{
+					"iri": null,
+					"name": "Output material Name",
+					"description": "Name of the major material output resulting from the application of the protocol.",
+					"dataType": "String attribute type 1",
+					"title": true,
+					"required": true,
+					"isaTag": "other_material"
+				},
+				{
+					"iri": null,
+					"name": "Output material characteristic 1",
+					"description": "Characteristic 1 of the output material.",
+					"dataType": "String attribute type 1",
+					"required": true,
+					"ontology": null,
+					"CVList": null,
+					"isaTag": "other_material_characteristic"
+				}
+			]
+		},
+		{
+			"metadata": {
+				"name": "Data file output assay - ISA Test template",
+				"group": "ISA Test",
+				"group_order": 4,
+				"temporary_name": "4_Data file output assay - ISA Test template",
+				"version": "1.0.0",
+				"isa_config": "none",
+				"isa_measurement_type": "any",
+				"isa_technology_type": "any",
+				"isa_protocol_type": "protocol with data file output",
+				"repo_schema_id": "none",
+				"organism": "any",
+				"level": "assay - data file"
+			},
+			"data": [
+				{
+					"iri": null,
+					"name": "Input",
+					"description": "Registered Samples in the platform used as input for this protocol.",
+					"dataType": "Sample multi attribute type 1",
+					"required": true,
+					"isaTag": null
+				},
+				{
+					"iri": null,
+					"name": "Name of a protocol with data file output",
+					"description": "Type of assay or experimental step performed that generates a data file output.",
+					"dataType": "String attribute type 1",
+					"required": true,
+					"ontology": null,
+					"CVList": null,
+					"isaTag": "protocol"
+				},
+				{
+					"iri": null,
+					"name": "Name of protocol parameter 1",
+					"description": "A parameter for the protocol.",
+					"dataType": "String attribute type 1",
+					"required": true,
+					"ontology": null,
+					"CVList": null,
+					"isaTag": "data_file_comment"
+				},
+				{
+					"iri": null,
+					"name": "Data file Name",
+					"description": "Name of the major data file output resulting from the application of the protocol.",
+					"dataType": "String attribute type 1",
+					"title": true,
+					"required": true,
+					"isaTag": "data_file"
+				},
+				{
+					"iri": null,
+					"name": "Data file characteristic 1",
+					"description": "Characteristic 1 of the data file output.",
+					"dataType": "String attribute type 1",
+					"required": true,
+					"ontology": null,
+					"CVList": null,
+					"isaTag": "data_file_comment"
+				}
+			]
+		}
+	]
+}
