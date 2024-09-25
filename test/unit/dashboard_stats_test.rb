@@ -55,14 +55,17 @@ class DashboardStatsTest < ActiveSupport::TestCase
     programme = FactoryBot.create(:min_programme)
     project = FactoryBot.create(:project, programme: programme)
     person = FactoryBot.create(:person, project: project)
-    programme.reload # To refresh the `projects` association
 
     assets = [:data_file, :sop, :model, :publication, :presentation, :document, :workflow, :collection].map do |type|
+      type.to_s.classify.constantize.delete_all
       FactoryBot.create(type, projects: [project], contributor: person)
     end
 
+    Investigation.delete_all
     investigation = FactoryBot.create(:investigation, projects: [project], contributor: person)
+    Study.delete_all
     study = FactoryBot.create(:study, investigation: investigation, contributor: person)
+    Assay.delete_all
     assay = FactoryBot.create(:assay, study: study, contributor: person)
 
     assets + [investigation, study, assay]
@@ -72,8 +75,9 @@ class DashboardStatsTest < ActiveSupport::TestCase
     end
 
     instance_stats = Seek::Stats::DashboardStats.new
-    project_stats = Seek::Stats::ProjectDashboardStats.new(project)
-    programme_stats = Seek::Stats::ProgrammeDashboardStats.new(programme)
+    # Reload to refresh associations
+    project_stats = Seek::Stats::ProjectDashboardStats.new(project.reload)
+    programme_stats = Seek::Stats::ProgrammeDashboardStats.new(programme.reload)
 
     opts = [2.days.ago, 2.days.from_now, 'month']
     types = [DataFile, Sop, Model, Publication, Presentation, Document, Workflow, Collection, Investigation, Study, Assay]
