@@ -68,12 +68,6 @@ class DashboardStatsTest < ActiveSupport::TestCase
     Assay.delete_all
     assay = FactoryBot.create(:assay, study: study, contributor: person)
 
-    assets + [investigation, study, assay]
-
-    assets.each do |asset|
-      FactoryBot.create(:activity_log, action: 'create', activity_loggable: asset, culprit: person)
-    end
-
     instance_stats = Seek::Stats::DashboardStats.new
     # Reload to refresh associations
     project_stats = Seek::Stats::ProjectDashboardStats.new(project.reload)
@@ -91,13 +85,13 @@ class DashboardStatsTest < ActiveSupport::TestCase
     c = programme_stats.contributions(*opts)
     (types + [Project]).each do |t|
       assert c[:datasets].key?(t), "#{t.name} missing from programme contributions stats"
-      assert_equal [1], c[:datasets][t], "#{t.name} unexpected number in instance contributions stats"
+      assert_equal [1], c[:datasets][t], "#{t.name} unexpected number in programme contributions stats"
     end
 
     c = project_stats.contributions(*opts)
     types.each do |t|
       assert c[:datasets].key?(t), "#{t.name} missing from project contributions stats"
-      assert_equal [1], c[:datasets][t], "#{t.name} unexpected number in instance contributions stats"
+      assert_equal [1], c[:datasets][t], "#{t.name} unexpected number in project contributions stats"
     end
   end
 end
