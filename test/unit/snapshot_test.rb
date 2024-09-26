@@ -43,6 +43,13 @@ class SnapshotTest < ActiveSupport::TestCase
     assert_equal 'My description', s1.description
   end
 
+  test 'zenodo metadata uses resource title and description' do
+    s1 = @investigation.create_snapshot(title: 'My snapshot title', description: 'My description')
+    zm = s1.zenodo_metadata
+    assert_equal 'i1', zm[:title]
+    assert_equal 'not blank', zm[:description]
+  end
+
   test 'sha1 and md5 checksum' do
     s1 = @investigation.create_snapshot
     refute_nil s1.md5sum
