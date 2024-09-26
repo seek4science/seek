@@ -61,11 +61,9 @@ class HomesHelperTest < ActionView::TestCase
   test 'should handle snapshots for download and recently added' do
     person = FactoryBot.create(:person)
     snapshot1 = FactoryBot.create(:investigation, policy: FactoryBot.create(:publicly_viewable_policy),
-                                                  contributor: person, creators: [person]).create_snapshot
-    snapshot1.update_attribute(:title, 'My snapshot')
+                                                  contributor: person, creators: [person]).create_snapshot(title: 'My snapshot')
     snapshot2 = FactoryBot.create(:assay, policy: FactoryBot.create(:publicly_viewable_policy),
-                                          contributor: person, creators: [person]).create_snapshot
-    snapshot2.update_attribute(:title, 'My other snapshot')
+                                          contributor: person, creators: [person]).create_snapshot(title: 'My other snapshot')
     FactoryBot.create(:activity_log, action: 'create', activity_loggable: snapshot1, created_at: 1.day.ago, culprit: person.user)
     FactoryBot.create(:activity_log, action: 'download', activity_loggable: snapshot2, created_at: 1.day.ago, culprit: person.user)
 
@@ -74,8 +72,6 @@ class HomesHelperTest < ActionView::TestCase
 
     assert_equal 1, added_hash.count
     added = added_hash.first
-    pp added_hash
-    pp added
     assert_equal 'Snapshot', added[:type]
     assert_equal snapshot1.title.to_s, added[:title]
     assert_equal investigation_snapshot_path(snapshot1.resource, snapshot1), added[:url]
