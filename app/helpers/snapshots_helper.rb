@@ -19,8 +19,8 @@ module SnapshotsHelper
   end
 
   def snapshot_display_name(snapshot)
-    display_name = "Snapshot #{snapshot.snapshot_number}"
-    display_name = snapshot.title unless snapshot.title.nil? || snapshot.title == ''
-    display_name
+    return snapshot.title if snapshot.title.present?
+    return "Snapshot #{snapshot.snapshot_number}" if snapshot.persisted?
+    "Snapshot #{snapshot.potential_snapshot_number}"
   end
 end
