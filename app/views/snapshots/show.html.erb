@@ -32,12 +32,12 @@
     <p><strong>Created at:</strong> <%= date_as_string(@snapshot.created_at, true) %></p>
 
     <%= panel('Resource') do %>
-      <%= render :partial => "general/item_title", :locals => {:item=>@resource, :title=>@snapshot.metadata['title']} %>
+      <%= render partial: 'general/item_title', locals: { item: @resource, title: @snapshot.metadata['title'] } %>
       <%= item_description @snapshot.metadata['description'] -%>
     <% end %>
 
     <%= panel('Contents') do %>
-        <%= render :partial => 'tree', locals: { resource: @snapshot.metadata, top: true } %>
+        <%= render partial: 'tree', locals: { resource: @snapshot.metadata, top: true } %>
     <% end %>
 
     <%= panel('Fingerprints') do %>
