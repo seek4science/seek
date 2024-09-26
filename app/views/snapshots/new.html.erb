@@ -1,7 +1,5 @@
 <%= render :partial => "general/page_title", :locals => { :title => 'Snapshot Preview' } %>
-<% items = Seek::ResearchObjects::Generator.new(@parent_resource).gather_entries(true).group_by(&:permitted_for_research_object?) %>
-<% included_items = items[true] || [] %>
-<% excluded_items = items[false] || [] %>
+<% included_items, excluded_items = Seek::ResearchObjects::Generator.new(@parent_resource).included_items %>
 
 <% included_text = capture do %>
     The following public resources will be included in the snapshot.
