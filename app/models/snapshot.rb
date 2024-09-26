@@ -33,22 +33,6 @@ class Snapshot < ApplicationRecord
     @ro_metadata ||= parse_metadata
   end
 
-  def title
-    if content_blob.present?
-      super
-    else
-      'incomplete snapshot'
-    end
-  end
-
-  def description
-    if content_blob.present?
-      super
-    else
-      'The snapshot currently has no content, and could still be being generated.'
-    end
-  end
-
   def contributor
     Person.find(metadata['contributor']['uri'].match(/people\/([1-9][0-9]*)/)[1])
   end
@@ -97,10 +81,21 @@ class Snapshot < ApplicationRecord
       (resource.created_at + (Seek::Config.time_lock_doi_for || 0).to_i.days) <= Time.now
   end
 
+  def zenodo_metadata
+    super.tap do |zm|
+      zm[:title] = metadata['title']
+      zm[:description] = metadata['description']
+    end
+  end
+
+  def potential_snapshot_number
+    (resource.snapshots.maximum(:snapshot_number) || 0) + 1
+  end
+
   private
 
   def set_snapshot_number
-    self.snapshot_number ||= (resource.snapshots.maximum(:snapshot_number) || 0) + 1
+    self.snapshot_number ||= potential_snapshot_number
   end
 
   def doi_target_url
