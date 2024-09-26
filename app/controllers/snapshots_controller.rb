@@ -8,6 +8,8 @@ class SnapshotsController < ApplicationController
   before_action :check_resource_permitted_for_ro, only: [:new, :create]
   before_action :find_snapshot, only: [:show, :edit, :update, :mint_doi_confirm, :mint_doi, :download, :export_preview, :export_submit, :destroy]
   before_action :doi_minting_enabled?, only: [:mint_doi_confirm, :mint_doi]
+  before_action :check_doi, only: [:edit, :update, :destroy]
+
   before_action :zenodo_oauth_client
   before_action :zenodo_oauth_session, only: [:export_submit]
 
@@ -15,14 +17,12 @@ class SnapshotsController < ApplicationController
   include Seek::ExternalServiceWrapper
 
   def create
-    @snapshot = @parent_resource.create_snapshot
-    if @snapshot
-      @snapshot.update(snapshot_params)
+    @snapshot = @parent_resource.create_snapshot(snapshot_params)
+    if @snapshot&.valid?
       flash[:notice] = "Snapshot created"
       redirect_to polymorphic_path([@parent_resource, @snapshot])
     else
-      flash[:error] = @parent_resource.errors.full_messages.join(', ')
-      redirect_to polymorphic_path(@parent_resource)
+      render :new, status: :unprocessable_entity
     end
   end
 
@@ -42,20 +42,15 @@ class SnapshotsController < ApplicationController
   end
 
   def edit
-    if @snapshot.has_doi?
-      flash[:error] = "You cannot modify a snapshot that has a DOI."
-      redirect_to polymorphic_path([@resource, @snapshot])
-    end
   end
 
   def update
-    if @snapshot.has_doi?
-      flash[:error] = "You cannot modify a snapshot that has a DOI."
-    else
-      @snapshot.update(snapshot_params)
+    if @snapshot.update(snapshot_params)
       flash[:notice] = "Snapshot updated"
+      redirect_to polymorphic_path([@parent_resource, @snapshot])
+    else
+      render :edit, status: :unprocessable_entity
     end
-    redirect_to polymorphic_path([@resource, @snapshot])
   end
 
   def download
@@ -98,13 +93,12 @@ class SnapshotsController < ApplicationController
   end
 
   def destroy
-    if @snapshot.has_doi?
-      flash[:error] = "You cannot delete a snapshot that has a DOI."
-      redirect_to polymorphic_path([@parent_resource, @snapshot])
-    else
-      @snapshot.destroy
+    if @snapshot.destroy
       flash[:notice] = "Snapshot successfully deleted"
       redirect_to polymorphic_path(@parent_resource)
+    else
+      flash[:error] = @snapshot.errors.full_messages
+      redirect_to polymorphic_path([@parent_resource, @snapshot])
     end
   end
 
@@ -139,11 +133,18 @@ class SnapshotsController < ApplicationController
     end
   end
 
+  def check_doi
+    if @snapshot.has_doi?
+      flash[:error] = "You cannot #{action_name} a snapshot that has a DOI."
+      redirect_to polymorphic_path([@parent_resource, @snapshot])
+    end
+  end
+
   def metadata_params
     params.require(:metadata).permit(:access_right, :license, :embargo_date, :access_conditions, creators: [:name]).delete_if { |k,v| v.blank? }
   end
 
   def snapshot_params
-    params.require(:snapshot).permit(:title, :description)
+    params.fetch(:snapshot, {}).permit(:title, :description)
   end
 end

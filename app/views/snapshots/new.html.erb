@@ -38,9 +38,9 @@
       </div>
   <% end %>
 </div>
-<div class="asset_form">
-  <%= form_for [@parent_resource, @parent_resource.snapshots.build] do |f| -%>
-    <%= render :partial => "form", :locals => { :f => f, :action=>:new } -%>
+<div class="asset_form" id="snapshot-metadata">
+  <%= form_for([@parent_resource, @parent_resource.snapshots.build], url: polymorphic_path([@parent_resource, :snapshots], anchor: 'snapshot-metadata')) do |f| -%>
+    <%= render partial: 'form', locals: { f: f, action: :new } -%>
 
     <%= image_tag_for_key('publish', polymorphic_path(@parent_resource, :action => :check_related_items), nil, {:method=>:post,:class => 'btn btn-default'}, "Publish full #{t(@parent_resource.class.name.downcase)}") if excluded_items.any? %>
 

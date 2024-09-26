@@ -27,8 +27,6 @@ class SnapshotsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-
-
   test "can't get snapshot preview if no manage permissions" do
     user = FactoryBot.create(:user)
     investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:publicly_viewable_policy),
@@ -114,8 +112,9 @@ class SnapshotsControllerTest < ActionController::TestCase
   end
 
   test 'snapshot title saved correctly' do
-    user = Factory(:user)
-    investigation = Factory(:investigation, policy: Factory(:publicly_viewable_policy), contributor: user.person)
+    user = FactoryBot.create(:user)
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:publicly_viewable_policy),
+                                      contributor: user.person, creators: [FactoryBot.create(:user).person])
     login_as(user)
     assert_difference('Snapshot.count') do
       post :create, params: { investigation_id: investigation, 
@@ -126,18 +125,21 @@ class SnapshotsControllerTest < ActionController::TestCase
   end
 
   test 'snapshot title and description correctly displayed' do
-    user = Factory(:user)
-    investigation = Factory(:investigation, policy: Factory(:publicly_viewable_policy), contributor: user.person,
-                            description: 'Not a snapshot', title: 'My Investigation')
+    user = FactoryBot.create(:user)
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:publicly_viewable_policy),
+                                      contributor: user.person, creators: [FactoryBot.create(:user).person],
+                                      description: 'Not a snapshot', title: 'My Investigation')
     login_as(user)
-    post :create, params: { investigation_id: investigation,
-                            snapshot: { title: 'My first snapshot', description: 'Some info' } }
-    post :create, params: { investigation_id: investigation,
-                            snapshot: { title: 'My second snapshot', description: 'Other info' } }
-    post :create, params: { investigation_id: investigation, snapshot: empty_snapshot }
+
+    assert_difference('Snapshot.count', 3) do
+      investigation.create_snapshot(title: 'My first snapshot', description: 'Some info')
+      investigation.create_snapshot(title: 'My second snapshot', description: 'Other info')
+      investigation.create_snapshot
+    end
 
     get :show, params: { investigation_id: investigation, id: 1 }
     assert_response :success
+
     assert_select 'h1', 'My first snapshot'
     assert_select 'div#description', 'Some info'
     assert_select 'div#snapshots' do
@@ -146,16 +148,23 @@ class SnapshotsControllerTest < ActionController::TestCase
       assert_select 'a[data-tooltip=?]', 'Other info'
       assert_select 'a[href=?]', investigation_snapshot_path(investigation, 3), text: 'Snapshot 3'
     end
+
+    get :show, params: { investigation_id: investigation, id: 3 }
+    assert_response :success
+    assert_select 'h1', 'Snapshot 3'
   end
 
   test 'snapshot shows captured state' do
-    user = Factory(:user)
-    investigation = Factory(:investigation, policy: Factory(:publicly_viewable_policy), contributor: user.person,
-                            title: 'Old Title', description: 'Old description')
+    user = FactoryBot.create(:user)
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:publicly_viewable_policy),
+                                      contributor: user.person, creators: [FactoryBot.create(:user).person],
+                                      title: 'Old Title', description: 'Old description')
     login_as(user)
-    post :create, params: { investigation_id: investigation,
-                            snapshot: { title: 'My snapshot', description: 'Snapshot info' } }
-    investigation.update(title: 'New title', description: 'New description')
+    assert_difference('Snapshot.count') do
+      post :create, params: { investigation_id: investigation,
+                              snapshot: { title: 'My snapshot', description: 'Snapshot info' } }
+    end
+    investigation.update!(title: 'New title', description: 'New description')
     get :show, params: { investigation_id: investigation, id: 1 }
     assert_response :success
     assert_select 'h1', 'My snapshot'
@@ -219,8 +228,8 @@ class SnapshotsControllerTest < ActionController::TestCase
       assert_no_difference('Snapshot.count') do
         post :create, params: { "#{type}_id": snap.id }
       end
-      assert_redirected_to Seek::Util.routes.polymorphic_path(snap)
-      assert flash[:error].include?('creator is required')
+      assert_response :unprocessable_entity
+      assert assigns(:snapshot).errors.full_messages.any? { |e| e.include?('creator is required') }
     end
   end
 
@@ -273,7 +282,7 @@ class SnapshotsControllerTest < ActionController::TestCase
 
   test 'edit button not shown for unauthorized users' do
     create_investigation_snapshot
-    login_as(Factory(:user))
+    login_as(FactoryBot.create(:user))
     get :show, params: { investigation_id: @investigation, id: @snapshot.snapshot_number }
     assert_select 'a', text: 'Edit', count: 0
   end
@@ -296,7 +305,7 @@ class SnapshotsControllerTest < ActionController::TestCase
 
   test "unauthorized user can't edit snapshot" do
     create_investigation_snapshot
-    login_as(Factory(:user))
+    login_as(FactoryBot.create(:user))
     get :edit, params: { investigation_id: @investigation, id: @snapshot.snapshot_number }
     assert_redirected_to investigation_path(@investigation)
     assert flash[:error]
@@ -309,7 +318,7 @@ class SnapshotsControllerTest < ActionController::TestCase
     @snapshot.save
     get :edit, params: { investigation_id: @investigation, id: @snapshot.snapshot_number }
     assert_redirected_to investigation_snapshot_path(@investigation, @snapshot)
-    assert flash[:error].include?('DOI')
+    assert flash[:error].include?('edit a snapshot that has a DOI')
   end
 
   test 'authorized users can update snapshot' do
@@ -325,7 +334,7 @@ class SnapshotsControllerTest < ActionController::TestCase
 
   test "unauthorized users can't update snapshot" do
     create_investigation_snapshot
-    login_as(Factory(:user))
+    login_as(FactoryBot.create(:user))
     put :update, params: { investigation_id: @investigation, id: @snapshot.snapshot_number,
                            snapshot: { title: 'My mod snapshot', description: 'Snapshot mod info' } }
     assert_redirected_to investigation_path(@investigation)
@@ -340,7 +349,7 @@ class SnapshotsControllerTest < ActionController::TestCase
     put :update, params: { investigation_id: @investigation, id: @snapshot.snapshot_number,
                            snapshot: { title: 'My mod snapshot', description: 'Snapshot mod info' } }
     assert_redirected_to investigation_snapshot_path(@investigation, @snapshot)
-    assert flash[:error].include?('DOI')
+    assert flash[:error].include?('update a snapshot that has a DOI')
   end
 
   test 'can get confirmation when minting DOI for snapshot' do
@@ -656,7 +665,7 @@ class SnapshotsControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to investigation_snapshot_path(@investigation, @snapshot)
-    assert flash[:error].include?('DOI')
+    assert flash[:error].include?('destroy a snapshot that has a DOI')
   end
 
   test "can't delete snapshot without permission" do
