@@ -15,6 +15,7 @@ class Snapshot < ApplicationRecord
 
   delegate :md5sum, :sha1sum, to: :content_blob
 
+  validate :resource_creators_present?, on: :create
   validates :snapshot_number, uniqueness: { scope: %i[resource_type resource_id] }
 
   acts_as_doi_mintable(proxy: :resource, general_type: 'Collection')
@@ -109,5 +110,11 @@ class Snapshot < ApplicationRecord
   # Need to re-index the parent model to update its' "doi" field
   def reindex_parent_resource
     ReindexingQueue.enqueue(resource) if saved_change_to_doi?
+  end
+
+  def resource_creators_present?
+    if resource.creators.empty?
+      errors.add(:base, "At least one creator is required. To add, go to Actions -> Manage #{resource.class.model_name.human}.")
+    end
   end
 end

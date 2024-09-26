@@ -38,9 +38,7 @@ class SnapshotTest < ActiveSupport::TestCase
   end
 
   test 'snapshot title and description correctly set' do
-    s1 = @investigation.create_snapshot
-    s1.update_attribute(:title, 'My snapshot title')
-    s1.update_attribute(:description, 'My description')
+    s1 = @investigation.create_snapshot(title: 'My snapshot title', description: 'My description')
     assert_equal 'My snapshot title', s1.title
     assert_equal 'My description', s1.description
   end
@@ -332,6 +330,26 @@ class SnapshotTest < ActiveSupport::TestCase
         snapshot = @assay.create_snapshot
       end
     end
+  end
+
+  test 'validates resource has creators on snapshot creation' do
+    i = FactoryBot.create(:investigation)
+    assert i.creators.empty?
+    snap = i.create_snapshot
+    refute snap.valid?
+    assert snap.errors.added?(:base, 'At least one creator is required. To add, go to Actions -> Manage Investigation.')
+  end
+
+  test 'does not validate resource has creators on snapshot update' do
+    snap = @investigation.create_snapshot
+    assert snap.valid?
+
+    disable_authorization_checks do
+      @investigation.creators = []
+    end
+
+    assert @investigation.reload.creators.empty?
+    assert snap.valid?
   end
 
   private
