@@ -245,23 +245,28 @@ namespace :seek do
           st.update_column(:policy_id, st.assays.first.policy_id) if st.assays.any?
           st.update_column(:policy_id, st.studies.first.policy_id) if st.studies.any?
         else
-          project = st.projects.first
-          if project.use_default_policy
-            st.update_column(:policy_id, project.default_policy_id)
+          policy = Policy.new
+          policy.name = 'default policy'
+
+          # Visible if linked to public samples
+          if st.samples.any? { |sample| sample.is_published? }
+            policy.access_type = Policy::VISIBLE
           else
-            policy = Policy.new
-            policy.name = 'default policy'
             policy.access_type = Policy::NO_ACCESS
-            project.people.each do |person|
-              unless person == st.contributor
-                policy.permissions << Permission.create(contributor_type: Permission::PROJECT, contributor: person,
-                                                        access_type: Policy::VISIBLE)
-              end
-            end
-            policy.save
-            st.update_column(:policy_id, policy.id)
           end
-        end
+          # Visible to each project
+          st.projects.map do |project|
+            policy.permissions << Permission.new(contributor_type: Permission::PROJECT, contributor_id: project.id, access_type: Policy::VISIBLE)
+          end
+          # Project admins can manage
+          project_admins = st.projects.map(&:project_administrators).flatten
+          project_admins.map do |admin|
+            policy.permissions << Permission.new(contributor_type: Permission::PERSON, contributor_id: admin.id, access_type: Policy::MANAGE)
+          end
+
+          policy.save
+          st.update_column(:policy_id, policy.id)
+       end
         counter += 1
       end
     end
