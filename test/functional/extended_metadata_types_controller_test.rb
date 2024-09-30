@@ -167,4 +167,26 @@ class ExtendedMetadataTypesControllerTest < ActionController::TestCase
   end
 
 
+
+  test 'get populate job status' do
+    person = FactoryBot.create(:admin)
+    login_as(person)
+
+    file = fixture_file_upload('extended_metadata_type/valid_simple_emt.json', 'application/json')
+
+    assert_enqueued_jobs(1, only: PopulateExtendedMetadataTypeJob) do
+      assert_enqueued_with(job: PopulateExtendedMetadataTypeJob) do
+        post :upload_file, params: { emt_json_file: file }
+      end
+    end
+
+    PopulateExtendedMetadataTypeJob.perform_now(file.path)
+
+    get :populate_job_status, format: :json
+    assert_response :success
+    res = JSON.parse(response.body)
+    assert_equal 'completed', res['status']
+
+  end
+
 end
