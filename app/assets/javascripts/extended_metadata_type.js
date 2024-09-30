@@ -12,8 +12,6 @@ var ExtendedMetadataType = {
 
     addNewMarker: function(new_id, type) {
         var isNested = (type === "ExtendedMetadata");
-
-        alert(new_id)
         $j("#nested-tab, #nested-tab").parent().toggleClass("active", isNested);
         $j("#nested-metadata-table").toggleClass("active in", isNested);
         $j("#top-level-tab, #top-level-tab").parent().toggleClass("active", !isNested);
