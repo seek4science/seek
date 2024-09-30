@@ -678,31 +678,6 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_select 'h2.forbidden', text: /The Sample type is not visible to you/
   end
 
-  test 'visible with referring sample' do
-    person = FactoryBot.create(:person)
-    sample = FactoryBot.create(:sample,
-                               policy: FactoryBot.create(:private_policy,
-                                                         permissions: [FactoryBot.create(:permission, contributor: person,
-                                                                                                      access_type: Policy::VISIBLE)])
-                              )
-    sample_type = sample.sample_type
-    login_as(person.user)
-
-    assert sample.can_view?
-    refute sample_type.can_view?
-    assert sample_type.can_view?(person.user, sample)
-
-    get :show, params: { id: sample_type.id }
-    assert_response :forbidden
-
-    get :show, params: { id: sample_type.id, referring_sample_id: sample.id }
-    assert_response :success
-
-    # sample type must match
-    get :show, params: { id: FactoryBot.create(:simple_sample_type).id, referring_sample_id: sample.id }
-    assert_response :forbidden
-  end
-
   test 'filter sample types with template when advanced single page is enabled' do
     project = FactoryBot.create(:project)
     FactoryBot.create(:simple_sample_type, template_id: 1, projects: [project])

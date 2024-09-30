@@ -12,7 +12,7 @@ class SampleTypesController < ApplicationController
   before_action :project_membership_required, only: %i[create new select filter_for_select]
   before_action :check_isa_json_compliance, only: %i[edit update manage manage_update]
 
-  before_action :authorize_requested_sample_type, except: %i[index new create]
+  before_action :find_and_authorize_requested_item, except: %i[index new create]
 
   api_actions :index
 
@@ -213,20 +213,6 @@ class SampleTypesController < ApplicationController
   def find_sample_type
     scope = Seek::Config.isa_json_compliance_enabled ? SampleType.without_template : SampleType
     @sample_type = scope.find(params[:id])
-  end
-
-  # intercepts the standard 'find_and_authorize_requested_item' for additional special check for a referring_sample_id
-  def authorize_requested_sample_type
-    privilege = Seek::Permissions::Translator.translate(action_name)
-    return if privilege.nil?
-
-    if privilege == :view && params[:referring_sample_id].present?
-      @sample_type.can_view?(User.current_user,
-                             Sample.find_by_id(params[:referring_sample_id])) || find_and_authorize_requested_item
-    else
-      find_and_authorize_requested_item
-    end
-
   end
 
   def check_no_created_samples
