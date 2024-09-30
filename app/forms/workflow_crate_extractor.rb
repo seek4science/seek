@@ -75,6 +75,8 @@ class WorkflowCrateExtractor
       @crate = ROCrate::WorkflowCrateReader.read_zip(ro_crate[:data])
     rescue Zip::Error
       errors.add(:ro_crate, 'could not be extracted, please check it is a valid RO-Crate.')
+    rescue ROCrate::ReadException => e
+      errors.add(:ro_crate, "could not be read: #{e.message}")
     end
   end
 

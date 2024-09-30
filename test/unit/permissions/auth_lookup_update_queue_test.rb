@@ -135,9 +135,34 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
     end
   end
 
+  test 'updates to queue for observation unit' do
+    user = FactoryBot.create :user
+    observation_unit = nil
+    study = FactoryBot.create(:study, contributor: user.person)
+    assert_difference('AuthLookupUpdateQueue.count', 1) do
+      observation_unit = FactoryBot.create :observation_unit, contributor: user.person, policy: FactoryBot.create(:private_policy), study: study
+    end
+    assert_equal observation_unit, AuthLookupUpdateQueue.order(:id).last.item
+
+    AuthLookupUpdateQueue.destroy_all
+    observation_unit.policy.access_type = Policy::VISIBLE
+
+    assert_difference('AuthLookupUpdateQueue.count', 1) do
+      observation_unit.policy.save
+    end
+    assert_equal observation_unit, AuthLookupUpdateQueue.order(:id).last.item
+    AuthLookupUpdateQueue.destroy_all
+    observation_unit.title = Time.now.to_s
+    assert_no_difference('AuthLookupUpdateQueue.count') do
+      disable_authorization_checks do
+        observation_unit.save!
+      end
+    end
+  end
+
   test 'updates for remaining authorized assets' do
     user = FactoryBot.create :user
-    types = Seek::Util.authorized_types - [Sop, Assay, Study, Sample]
+    types = Seek::Util.authorized_types - [Sop, Assay, Study, Sample, ObservationUnit]
     types.each do |type|
       entity = nil
       assert_difference('AuthLookupUpdateQueue.count', 1, "unexpected count for created type #{type.name}") do

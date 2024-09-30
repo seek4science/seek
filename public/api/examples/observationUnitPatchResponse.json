@@ -1,0 +1,126 @@
+{
+  "data": {
+    "id": "32",
+    "type": "observation_units",
+    "attributes": {
+      "policy": {
+        "access": "no_access",
+        "permissions": [
+          {
+            "resource": {
+              "id": "3376",
+              "type": "projects"
+            },
+            "access": "edit"
+          }
+        ]
+      },
+      "discussion_links": [
+        {
+          "id": "240",
+          "label": "Google",
+          "url": "http://google.com"
+        }
+      ],
+      "extended_attributes": {
+        "extended_metadata_type_id": "347",
+        "attribute_map": {
+          "name": "unit 2",
+          "strain": "strain 2"
+        }
+      },
+      "title": "Max observation unit patched",
+      "description": "the maximum one patched",
+      "tags": [
+        "tag1",
+        "tag2",
+        "tag3"
+      ],
+      "created_at": "2024-07-03T13:51:11.509Z",
+      "updated_at": "2024-07-03T13:51:11.589Z",
+      "creators": [
+        {
+          "profile": "/people/3160",
+          "family_name": "Last",
+          "given_name": "Person2613",
+          "affiliation": "An Institution: 3231",
+          "orcid": null
+        }
+      ],
+      "other_creators": null
+    },
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "3160",
+            "type": "people"
+          }
+        ]
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "3159",
+            "type": "people"
+          }
+        ]
+      },
+      "people": {
+        "data": [
+          {
+            "id": "3160",
+            "type": "people"
+          },
+          {
+            "id": "3159",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "3376",
+            "type": "projects"
+          }
+        ]
+      },
+      "study": {
+        "data": {
+          "id": "527",
+          "type": "studies"
+        }
+      },
+      "samples": {
+        "data": [
+          {
+            "id": "81",
+            "type": "samples"
+          }
+        ]
+      },
+      "data_files": {
+        "data": [
+          {
+            "id": "219",
+            "type": "data_files"
+          }
+        ]
+      }
+    },
+    "links": {
+      "self": "/observation_units/32"
+    },
+    "meta": {
+      "created": "2024-07-03T13:51:11.509Z",
+      "modified": "2024-07-03T13:51:11.589Z",
+      "api_version": "0.3",
+      "base_url": "http://localhost:3000",
+      "uuid": "3b090880-1b71-013d-1ffe-0a81884ed284"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

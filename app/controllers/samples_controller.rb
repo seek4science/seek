@@ -15,6 +15,8 @@ class SamplesController < ApplicationController
   include Seek::IsaGraphExtensions
   include Seek::Publishing::PublishingCommon
 
+  api_actions :index, :show, :create, :update, :destroy, :batch_create
+
   def index
     # There must be better ways of coding this
     if @data_file || @sample_type
@@ -71,6 +73,7 @@ class SamplesController < ApplicationController
     respond_to do |format|
       format.html
       format.json {render json: @sample, include: [params[:include]]}
+      format.rdf { render template: 'rdf/show' }
     end
   end
 

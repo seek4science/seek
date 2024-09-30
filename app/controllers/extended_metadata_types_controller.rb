@@ -7,6 +7,8 @@ class ExtendedMetadataTypesController < ApplicationController
   include Seek::UploadHandling::DataUpload
   after_action :log_event, only: [:populate_job_status], if: -> { @status == 'completed' && @id.present? }
 
+  api_actions :index, :show
+
   # generated for form, to display fields for selected metadata type
   def form_fields
     id = params[:id]

@@ -29,6 +29,8 @@
 <% isa_tag_id = sample_attribute&.isa_tag_id %>
 <% template_attribute_id = sample_attribute&.template_attribute_id if display_isa_tag %>
 <% allow_isa_tag_change = constraints.allow_isa_tag_change?(sample_attribute) if display_isa_tag %>
+<% required_title_text = allow_required ? nil : "You are not allowed to make this attribute required.\nSome samples have no value for this attribute." %>
+<% is_title_title_text = allow_required ? nil : "You are not allowed to change this attribute's title field.\nSome samples have no value for this attribute." %>
 
 <tr class="sample-attribute <%= 'success' if sample_attribute.nil? -%><%='hidden' if hide_seek_sample_multi -%>" data-index="<%= index-%>">
   <th scope="row" class="attribute-position">
@@ -44,13 +46,13 @@
                        placeholder: 'Attribute name', disabled: !allow_name_change, data: { attr: "title" } %>
   </td>
 
-  <td class="text-center">
+  <td class="text-center" title="<%= required_title_text %>">
     <div class="checkbox-inline">
       <%= hidden_field_tag "#{field_name_prefix}[required]", '0' %>
       <%= check_box_tag "#{field_name_prefix}[required]", '1', required, class: "#{ allow_required ? '' : 'disabled' }", data: { attr: "required" } %>
     </div>
   </td>
-  <td class="text-center">
+  <td class="text-center" title="<%= is_title_title_text %>">
     <div class="checkbox-inline">
       <%= hidden_field_tag "#{field_name_prefix}[is_title]", '0' %>
       <%= check_box_tag "#{field_name_prefix}[is_title]", '1', is_title, class: "sample-type-is-title #{ allow_required ? '' : 'disabled' }"%>

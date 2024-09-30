@@ -21,9 +21,8 @@ FactoryBot.define do
   # Publication
   factory(:publication) do
     sequence(:title) { |n| "A Publication #{n}" }
+    with_project_contributor
     sequence(:pubmed_id) { |n| n }
-    projects { [FactoryBot.create(:project)] }
-    association :contributor, factory: :person, strategy: :create
     association :publication_type, factory: :journal
   end
   

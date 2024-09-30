@@ -18,6 +18,8 @@ namespace :seek do
     implement_assay_streams_for_isa_assays
     set_ls_login_legacy_mode
     rename_custom_metadata_legacy_supported_type
+    seek_rdf:generate
+    update_observation_unit_policies
     fix_xlsx_marked_as_zip
   ]
 
@@ -82,6 +84,24 @@ namespace :seek do
     Policy.set_callback :commit, :after, :queue_rdf_generation_job
     Permission.set_callback :commit, :after, :queue_update_auth_table
     Permission.set_callback :commit, :after, :queue_rdf_generation_job
+  end
+
+  task(update_observation_unit_policies: [:environment]) do
+    puts '..... creating observation unit policies ...'
+    affected_obs_units = []
+    ObservationUnit.where.missing(:policy).includes(:study).in_batches(of: 25) do |batch|
+      batch.each do |obs_unit|
+        policy = obs_unit.study.policy || Policy.default
+        policy = policy.deep_copy
+        policy.save
+        obs_unit.update_column(:policy_id, policy.id)
+        affected_obs_units << obs_unit
+      end
+      putc('.')
+    end
+    AuthLookupUpdateQueue.enqueue(affected_obs_units)
+    RdfGenerationQueue.enqueue(affected_obs_units)
+    puts "..... finished updating policies for #{affected_obs_units.count} observation units"
   end
 
   task(decouple_extracted_samples_projects: [:environment]) do

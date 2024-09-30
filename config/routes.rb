@@ -315,7 +315,7 @@ SEEK::Application.routes.draw do
       post :batch_sharing_permission_changed
     end
     resources :projects, :programmes, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows,
-              :data_files, :presentations, :publications, :documents, :events, :sample_types, :samples, :specimens,
+              :data_files, :observation_units, :presentations, :publications, :documents, :events, :sample_types, :samples, :specimens,
               :strains, :file_templates, :placeholders, :collections, :templates, only: [:index]
   end
 
@@ -351,9 +351,11 @@ SEEK::Application.routes.draw do
       get :administer_join_request
       post :respond_join_request
       get :guided_join
+      get :import_from_fairdata_station
+      post :submit_fairdata_station
       post :update_annotations_ajax
     end
-    resources :programmes, :people, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows, :data_files, :presentations,
+    resources :programmes, :people, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows, :data_files, :observation_units, :presentations,
               :publications, :events, :sample_types, :samples, :specimens, :strains, :search, :organisms, :human_diseases, :documents, :file_templates, :placeholders, :collections, :templates, only: [:index]
 
     resources :openbis_endpoints do
@@ -414,7 +416,6 @@ SEEK::Application.routes.draw do
   ### ISA ###
 
   resources :investigations, concerns: [:publishable, :has_snapshots, :isa] do
-    resources :people, :programmes, :projects, :assays, :studies, :models, :sops, :workflows, :data_files, :publications, :documents, only: [:index]
     member do
       get :export_isatab_json
       get :export_isa, action: :export_isa
@@ -422,6 +423,7 @@ SEEK::Application.routes.draw do
       get :order_studies
       patch :manage_update
     end
+    resources :people, :programmes, :projects, :assays, :studies, :models, :sops, :workflows, :data_files, :publications, :documents, :observation_units, :samples, only: [:index]
   end
 
   resources :studies, concerns: [:publishable, :has_snapshots, :isa] do
@@ -454,7 +456,7 @@ SEEK::Application.routes.draw do
       get :order_assays
       patch :manage_update
     end
-    resources :people, :programmes, :projects, :sample_types, :assays, :investigations, :models, :sops, :workflows, :data_files, :publications, :documents, only: [:index]
+    resources :people, :programmes, :projects, :sample_types, :samples, :assays, :investigations, :models, :sops, :workflows, :data_files, :publications, :documents, :observation_units, only: [:index]
   end
 
   resources :assays, concerns: [:publishable, :has_snapshots, :isa] do
@@ -466,7 +468,7 @@ SEEK::Application.routes.draw do
         post :register
       end
     end
-    resources :people, :programmes, :projects, :investigations, :sample_types, :samples, :studies, :models, :sops, :workflows, :data_files, :publications, :documents, :strains, :organisms, :human_diseases, :placeholders, only: [:index]
+    resources :people, :programmes, :projects, :investigations, :sample_types, :samples, :studies, :models, :sops, :workflows, :data_files, :publications, :documents, :strains, :organisms, :human_diseases, :observation_units, :placeholders, only: [:index]
   end
 
   # to be removed as STI does not work in too many places
@@ -500,8 +502,13 @@ SEEK::Application.routes.draw do
       post :retrieve_nels_sample_metadata
       get :retrieve_nels_sample_metadata
       get :has_matching_sample_type
+      post :unzip
+      get :unzip_status
+      get :confirm_unzip
+      delete :cancel_unzip
+      get :unzip_persistence_status
     end
-    resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :collections, :workflows, :file_templates, :placeholders, only: [:index]
+    resources :people, :programmes, :projects, :investigations, :assays, :data_files, :samples, :studies, :publications, :events, :collections, :workflows, :file_templates, :placeholders, :observation_units, only: [:index]
   end
 
   resources :presentations, concerns: [:has_content_blobs, :publishable, :has_versions, :asset, :explorable_spreadsheet] do
@@ -548,6 +555,7 @@ SEEK::Application.routes.draw do
       post :create_version_from_git
       get :edit_paths
       patch :update_paths
+      post :run
     end
     resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :sops, :collections, :presentations, :documents, :data_files, only: [:index]
   end
@@ -681,8 +689,9 @@ SEEK::Application.routes.draw do
       get :query_form
       post :query
     end
-    resources :people, :programmes, :projects, :assays, :studies, :investigations, :data_files, :publications, :samples,
-              :sample_types, :strains, :organisms, :collections, only: [:index]
+    resources :people, :programmes, :projects, :assays, :studies, :investigations, :data_files, :sops,
+              :publications, :samples, :sample_types, :strains, :organisms, :collections,
+              :observation_units, only: [:index]
   end
 
   ### SAMPLE TYPES ###
@@ -799,6 +808,13 @@ SEEK::Application.routes.draw do
   get '/assay_types/', to: 'assay_types#show', as: 'assay_types'
   get '/modelling_analysis_types/', to: 'assay_types#show', as: 'modelling_analysis_types'
   get '/technology_types/', to: 'technology_types#show', as: 'technology_types'
+
+  ### OBSERVATION UNITS ###
+
+  resources :observation_units, concerns:[:asset] do
+
+    resources :projects, :people, :programmes, :samples, :assays, :studies, :investigations, :data_files, :sops, :publications, :collections
+  end
 
   ### MISC MATCHES ###
   get '/search/' => 'search#index', as: :search

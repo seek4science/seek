@@ -28,6 +28,8 @@ def load_seek_testing_defaults!
       Settings.defaults[:programme_user_creation_enabled] = true
       Settings.defaults[:programmes_open_for_projects_enabled] = true
 
+      Settings.defaults[:fair_data_station_enabled] = true
+
       # Types
       Settings.defaults[:collections_enabled] = true
       Settings.defaults[:documents_enabled] = true
@@ -35,6 +37,7 @@ def load_seek_testing_defaults!
       Settings.defaults[:file_templates_enabled] = true
       Settings.defaults[:human_diseases_enabled] = true
       Settings.defaults[:isa_enabled] = true
+      Settings.defaults[:observation_units_enabled] = true
       Settings.defaults[:models_enabled] = true
       Settings.defaults[:organisms_enabled] = true
       Settings.defaults[:programmes_enabled] = true

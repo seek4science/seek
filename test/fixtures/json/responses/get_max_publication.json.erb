@@ -6,6 +6,20 @@
       "policy": {
         "access": "download",
         "permissions": [
+          {
+            "resource": {
+              "id": "<%= res.seek_authors.first.person_id %>",
+              "type": "people"
+            },
+            "access": "manage"
+          },
+          {
+            "resource": {
+              "id": "<%= current_person.id %>",
+              "type": "people"
+            },
+            "access": "manage"
+          }
         ]
       },
       "discussion_links": [

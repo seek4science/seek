@@ -88,5 +88,8 @@ class SampleAttributeType < ApplicationRecord
     base_type == Seek::Samples::BaseType::SEEK_DATA_FILE
   end
 
+  def seek_sop?
+    base_type == Seek::Samples::BaseType::SEEK_SOP
+  end
 
 end

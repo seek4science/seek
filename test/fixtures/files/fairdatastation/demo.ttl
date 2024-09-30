@@ -1,0 +1,877 @@
+@prefix base:     <http://fairbydesign.nl/ontology> .
+@prefix bibo:     <http://purl.org/ontology/bibo/> .
+@prefix dc:       <http://purl.org/dc/terms/> .
+@prefix dcmitype: <http://purl.org/dc/dcmitype/> .
+@prefix empusa:   <http://empusa.org/0.1/> .
+@prefix fair:     <http://fairbydesign.nl/ontology/> .
+@prefix foaf:     <http://xmlns.com/foaf/0.1/> .
+@prefix gbol:     <http://gbol.life/0.1/> .
+@prefix jerm:     <http://jermontology.org/ontology/JERMOntology#> .
+@prefix mixs:     <https://w3id.org/gensc.org/terms/> .
+@prefix owl:      <http://www.w3.org/2002/07/owl#> .
+@prefix ppeo:     <http://purl.org/ppeo/PPEO.owl#> .
+@prefix prov:     <http://www.w3.org/ns/prov#> .
+@prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sample:   <http://fairbydesign.nl/sample/> .
+@prefix schema:   <http://schema.org/> .
+@prefix sschema:  <https://schema.org/> .
+@prefix uniprot:  <http://purl.uniprot.org/core/> .
+@prefix unlock:   <http://m-unlock.nl/ontology/> .
+@prefix void:     <http://m-unlock.nl/ontology/> .
+@prefix wd:       <http://www.wikidata.org/wiki/> .
+@prefix wdt:      <http://www.wikidata.org/wiki/Property:> .
+@prefix wv:       <http://vocab.org/waiver/terms/norms> .
+@prefix xml:      <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
+
+fair:inv_INV_DRP007092
+        rdf:type            jerm:Investigation ;
+        jerm:hasPart        <http://fairbydesign.nl/ontology/inv_INV_DRP007092/stu_DRP007092> ;
+        schema:contributor  <http://fairbydesign.nl/ontology/inv_INV_DRP007092/person/343732a9426f424e535356c966739de9> ;
+        schema:description  "Exploration of HIV-1 infected individuals in Ghana" ;
+        schema:identifier   "INV_DRP007092" ;
+        schema:title        "HIV-1 infected individuals in Ghana" .
+
+<http://fairbydesign.nl/ontology/inv_INV_DRP007092/person/343732a9426f424e535356c966739de9>
+        rdf:type           schema:Person ;
+        schema:department  "AIDS Research Center" ;
+        schema:email       <mailto:kparbie@nioid.org> ;
+        schema:familyName  "Kofi Parbie" ;
+        schema:givenName   "Prince Kofi Parbie" ;
+        schema:memberOf    <http://m-unlock.nl/ontology/organization/National_Institute_of_Infectious_Diseases> .
+
+<http://m-unlock.nl/ontology/organization/National_Institute_of_Infectious_Diseases>
+        rdf:type          schema:Organization ;
+        schema:legalName  "National Institute of Infectious Diseases" .
+
+schema:identifier  rdf:type   rdf:Property ;
+        rdfs:label            "investigation identifier" ;
+        schema:description    "Identifier corresponding to the investigation" ;
+        schema:valuePattern   "^[a-zA-Z0-9-_]*${5,25}" ;
+        schema:valueRequired  true .
+
+schema:description  rdf:type  rdf:Property ;
+        rdfs:label            "investigation description" ;
+        schema:description    "Description of the investigation" ;
+        schema:valuePattern   ".*{50,}" ;
+        schema:valueRequired  true .
+
+schema:title  rdf:type        rdf:Property ;
+        rdfs:label            "investigation title" ;
+        schema:description    "Title describing the investigation" ;
+        schema:valuePattern   ".*{10,}" ;
+        schema:valueRequired  true .
+
+<http://fairbydesign.nl/ontology/inv_INV_DRP007092/stu_DRP007092>
+        rdf:type                     jerm:Study ;
+        fair:alias                   "DRP007092" ;
+        fair:center_name             "NIID" ;
+        fair:center_project_name     "human gut metagenome" ;
+        fair:external_ids            "PRJDB10485" ;
+        fair:submission_accession    "DRA010770" ;
+        fair:submission_alias        "DRA010770" ;
+        fair:submission_center_name  "NIID" ;
+        fair:submission_lab_name     "AIDS Research Center2022-8-31" ;
+        jerm:hasPart                 <http://fairbydesign.nl/ontology/inv_INV_DRP007092/stu_DRP007092/obs_HIV-1_positive> , <http://fairbydesign.nl/ontology/inv_INV_DRP007092/stu_DRP007092/obs_HIV-1_negative> ;
+        schema:description           "This project is to analyze the dysbiosis of fecal microbiome in HIV-1 infected individuals in Ghana. Gut microbiome dysbiosis has been correlated to the progression of non-AIDS diseases such as cardiovascular and metabolic disorders. Because the microbiome composition is different among races and countries, analyses of the composition in different regions is important to understand the pathogenesis unique to specific regions. In the present study, we examined fecal microbiome compositions in HIV-1 infected individuals in Ghana. In a cross-sectional case-control study, age- and gender-matched HIV-1 infected Ghanaian adults (HIV-1 [+]; n = 55) and seronegative controls (HIV-1 [-]; n = 55) were enrolled. Alpha diversity of fecal microbiome in HIV-1 (+) was significantly reduced compared to HIV-1 (-) and associated with CD4 counts. HIV-1 (+) showed reduction in varieties of bacteria including most abundant Faecalibacterium but enrichment of Proteobacteria. It should be noted that Ghanaian HIV-1 (+) exhibited enrichment of Dorea and Blautia, whose depletion has been reported in HIV-1 infected in most of other cohorts. Prevotella has been indicated to be enriched in HIV-1-infected MSM (men having sex with men) but was depleted in HIV-1 (+) of our cohort. The present study revealed the characteristic of dysbiotic fecal microbiome in HIV-1 infected Ghanaians, a representative of West African populations." ;
+        schema:identifier            "DRP007092" ;
+        schema:title                 "Dysbiotic fecal microbiome in HIV-1 infected individuals in Ghana" .
+
+fair:external_ids  rdf:type  rdf:Property ;
+        rdfs:label           "external ids" ;
+        schema:valuePattern  ".+" .
+
+fair:center_project_name
+        rdf:type             rdf:Property ;
+        rdfs:label           "center project name" ;
+        schema:valuePattern  ".+" .
+
+fair:center_name  rdf:type   rdf:Property ;
+        rdfs:label           "center name" ;
+        schema:valuePattern  ".+" .
+
+fair:alias  rdf:type         rdf:Property ;
+        rdfs:label           "alias" ;
+        schema:valuePattern  ".+" .
+
+fair:submission_accession
+        rdf:type             rdf:Property ;
+        rdfs:label           "submission accession" ;
+        schema:valuePattern  ".+" .
+
+fair:submission_alias
+        rdf:type             rdf:Property ;
+        rdfs:label           "submission alias" ;
+        schema:valuePattern  ".+" .
+
+fair:submission_center_name
+        rdf:type             rdf:Property ;
+        rdfs:label           "submission center name" ;
+        schema:valuePattern  ".+" .
+
+fair:submission_lab_name
+        rdf:type             rdf:Property ;
+        rdfs:label           "submission lab name" ;
+        schema:valuePattern  ".+" .
+
+<http://fairbydesign.nl/ontology/inv_INV_DRP007092/stu_DRP007092/obs_HIV-1_positive>
+        rdf:type            ppeo:observation_unit ;
+        jerm:hasPart        <http://fairbydesign.nl/ontology/inv_INV_DRP007092/stu_DRP007092/obs_HIV-1_positive/sam_DRS176892> , <http://fairbydesign.nl/ontology/inv_INV_DRP007092/stu_DRP007092/obs_HIV-1_positive/sam_DRS176886> , <http://fairbydesign.nl/ontology/inv_INV_DRP007092/stu_DRP007092/obs_HIV-1_positive/sam_DRS176930> , <http://fairbydesign.nl/ontology/inv_INV_DRP007092/stu_DRP007092/obs_HIV-1_positive/sam_DRS176942> ;
+        schema:description  "HIV-1 infected individuals routinely attending an HIV/AIDS clinic in Ghana, were enrolled into the study. They were identified to reside in 7 communities in the Eastern Region of Ghana." ;
+        schema:identifier   "HIV-1_positive" ;
+        schema:name         "HIV-1 infected" .
+
+schema:name  rdf:type         rdf:Property ;
+        rdfs:label            "observation unit name" ;
+        schema:description    "Name of the entity being observed" ;
+        schema:valuePattern   ".*{10,}" ;
+        schema:valueRequired  true .
+
+<http://fairbydesign.nl/ontology/inv_INV_DRP007092/stu_DRP007092/obs_HIV-1_negative>
+        rdf:type            ppeo:observation_unit ;
+        jerm:hasPart        <http://fairbydesign.nl/ontology/inv_INV_DRP007092/stu_DRP007092/obs_HIV-1_negative/sam_DRS176881> , <http://fairbydesign.nl/ontology/inv_INV_DRP007092/stu_DRP007092/obs_HIV-1_negative/sam_DRS176899> , <http://fairbydesign.nl/ontology/inv_INV_DRP007092/stu_DRP007092/obs_HIV-1_negative/sam_DRS176917> , <http://fairbydesign.nl/ontology/inv_INV_DRP007092/stu_DRP007092/obs_HIV-1_negative/sam_DRS176935> , <http://fairbydesign.nl/ontology/inv_INV_DRP007092/stu_DRP007092/obs_HIV-1_negative/sam_DRS176960> ;
+        schema:description  "HIV-1 seronegative individuals were recruited during a community health screening in these communities. Seronegative individuals matched by age (± 2 years), gender and community of residence were enrolled as controls." ;
+        schema:identifier   "HIV-1_negative" ;
+        schema:name         "seronegative controls" .
+
+<http://fairbydesign.nl/ontology/inv_INV_DRP007092/stu_DRP007092/obs_HIV-1_negative/sam_DRS176881>
+        rdf:type                     jerm:Sample ;
+        fair:art_drugs_current       "Control" ;
+        fair:art_status_at_baseline  "Control" ;
+        fair:biosafety_level         3 ;
+        fair:geo_loc_name            "Ghana:Koforidua" ;
+        fair:hiv_risk_exposure       "Heterosexual" ;
+        fair:host                    "Homo sapiens" ;
+        fair:host_disease_stat       "HIV-1 negative" ;
+        fair:marital_status          "Single" ;
+        fair:occupation              "Trader" ;
+        fair:sample_name             "13C" ;
+        gbol:scientificName          "human gut metagenome" ;
+        jerm:hasPart                 <http://fairbydesign.nl/ontology/inv_INV_DRP007092/stu_DRP007092/obs_HIV-1_negative/sam_DRS176881/asy_DRR243845> ;
+        uniprot:organism             408170 ;
+        schema:description           "Sample obtained from Single age 30 collected on 2017-12-15 from the human gut" ;
+        schema:identifier            "DRS176881" ;
+        schema:name                  "sample DRS176881" ;
+        <https://w3id.org/mixs/terms/0000009_lat>
+                "6.100334"^^xsd:double ;
+        <https://w3id.org/mixs/terms/0000009_lon>
+                "-0.2614572"^^xsd:double ;
+        <https://w3id.org/mixs/terms/0000011>
+                "2017-12-15"^^xsd:date ;
+        <https://w3id.org/mixs/terms/0000255>
+                "30 years" .
+
+uniprot:organism  rdf:type    rdf:Property ;
+        rdfs:label            "ncbi taxonomy id" ;
+        schema:description    "Taxonomic identifier of the sample according to https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi for example use 2582415 for a blank sample or 1510822 for pig metagenome" ;
+        schema:valuePattern   "\\d+" ;
+        schema:valueRequired  true .
+
+gbol:scientificName  rdf:type  rdf:Property ;
+        rdfs:label            "scientific name" ;
+        schema:description    "Name of the organism" ;
+        schema:valuePattern   ".*" ;
+        schema:valueRequired  true .
+
+fair:biosafety_level  rdf:type  rdf:Property ;
+        rdfs:label            "biosafety level" ;
+        schema:description    "Biosafety level of the corresponding sample" ;
+        schema:valuePattern   "(1|2|3|4|unknown)" ;
+        schema:valueRequired  true .
+
+<https://w3id.org/mixs/terms/0000011>
+        rdf:type              rdf:Property ;
+        rdfs:label            "collection date" ;
+        schema:description    "The date of sampling, either as an instance (single point in time) or interval. In case no exact time is available, the date/time can be right truncated i.e. all of these are valid ISO8601 compliant times: 2008-01-23T19:23:10+00:00; 2008-01-23T19:23:10; 2008-01-23; 2008-01; 2008." ;
+        schema:valuePattern   ".+" ;
+        schema:valueRequired  false .
+
+fair:geo_loc_name  rdf:type  rdf:Property ;
+        rdfs:label           "geo_loc_name" ;
+        schema:valuePattern  ".+" .
+
+<https://w3id.org/mixs/terms/0000009_lat>
+        rdf:type              rdf:Property ;
+        rdfs:label            "geographic location (latitude)" ;
+        schema:description    "The geographical origin of the sample as defined by latitude. The values should be reported in decimal degrees and in WGS84 system" ;
+        schema:valuePattern   "(^^(\\-|\\+)?(\\d+)(\\.\\d+)?.?[0-9]{0,8}$)|(^not collected$)|(^not provided$)|(^restricted access$)" ;
+        schema:valueRequired  false .
+
+<https://w3id.org/mixs/terms/0000009_lon>
+        rdf:type              rdf:Property ;
+        rdfs:label            "geographic location (longitude)" ;
+        schema:description    "The geographical origin of the sample as defined by longitude. The values should be reported in decimal degrees and in WGS84 system" ;
+        schema:valuePattern   "(^^(\\-|\\+)?(\\d+)(\\.\\d+)?.?[0-9]{0,8}$)|(^not collected$)|(^not provided$)|(^restricted access$)" ;
+        schema:valueRequired  false .
+
+fair:host  rdf:type          rdf:Property ;
+        rdfs:label           "host" ;
+        schema:valuePattern  ".+" .
+
+fair:host_disease_stat
+        rdf:type             rdf:Property ;
+        rdfs:label           "host_disease_stat" ;
+        schema:valuePattern  ".+" .
+
+fair:occupation  rdf:type    rdf:Property ;
+        rdfs:label           "occupation" ;
+        schema:valuePattern  ".+" .
+
+fair:sample_name  rdf:type   rdf:Property ;
+        rdfs:label           "sample_name" ;
+        schema:valuePattern  ".+" .
+
+fair:art_drugs_current
+        rdf:type             rdf:Property ;
+        rdfs:label           "art_drugs_current" ;
+        schema:valuePattern  ".+" .
+
+fair:art_status_at_baseline
+        rdf:type             rdf:Property ;
+        rdfs:label           "art_status_at_baseline" ;
+        schema:valuePattern  ".+" .
+
+fair:hiv_risk_exposure
+        rdf:type             rdf:Property ;
+        rdfs:label           "hiv_risk_exposure" ;
+        schema:valuePattern  ".+" .
+
+fair:marital_status  rdf:type  rdf:Property ;
+        rdfs:label           "marital_status" ;
+        schema:valuePattern  ".+" .
+
+<https://w3id.org/mixs/terms/0000255>
+        rdf:type              rdf:Property ;
+        rdfs:label            "host age" ;
+        schema:description    "age of host at the time of sampling; relevant scale depends on species and study, e.g. could be seconds for amoebae or centuries for trees" ;
+        schema:unitCode       "centuries|days|decades|hours|minutes|months|seconds|weeks|years" ;
+        schema:valuePattern   "^(\\-|\\+)?(\\d+)(\\.\\d+)? ?(centuries|days|decades|hours|minutes|months|seconds|weeks|years)" ;
+        schema:valueRequired  false .
+
+<http://fairbydesign.nl/ontology/inv_INV_DRP007092/stu_DRP007092/obs_HIV-1_positive/sam_DRS176892>
+        rdf:type                     jerm:Sample ;
+        fair:art_drugs_current       "TDF/3TC/NVP" ;
+        fair:art_duration_at_baseline_months
+                55 ;
+        fair:art_start_date          "2013-02-06" ;
+        fair:art_status_at_baseline  "ART" ;
+        fair:biosafety_level         3 ;
+        fair:cd4_count_cells_ul      286 ;
+        fair:cd8_count_cells_ul      1139 ;
+        fair:co-trimoxazole_duration_mths
+                48 ;
+        fair:geo_loc_name            "Ghana:Suhum" ;
+        fair:hiv_risk_exposure       "Heterosexual" ;
+        fair:host                    "Homo sapiens" ;
+        fair:host_disease_stat       "HIV-1 positive" ;
+        fair:log_vl                  "4.655848867"^^xsd:double ;
+        fair:marital_status          "Single" ;
+        fair:occupation              "Trader" ;
+        fair:sample_name             "19P" ;
+        fair:viral_load_copies_ml    45274 ;
+        gbol:scientificName          "human gut metagenome" ;
+        jerm:hasPart                 <http://fairbydesign.nl/ontology/inv_INV_DRP007092/stu_DRP007092/obs_HIV-1_positive/sam_DRS176892/asy_DRR243856> ;
+        uniprot:organism             408170 ;
+        schema:description           "Sample obtained from Single age 30 collected on 2017-09-13 from the human gut" ;
+        schema:identifier            "DRS176892" ;
+        schema:name                  "sample DRS176892" ;
+        <https://w3id.org/mixs/terms/0000009_lat>
+                "6.035885"^^xsd:double ;
+        <https://w3id.org/mixs/terms/0000009_lon>
+                "-0.4552751"^^xsd:double ;
+        <https://w3id.org/mixs/terms/0000011>
+                "2017-09-13"^^xsd:date ;
+        <https://w3id.org/mixs/terms/0000255>
+                "30 years" .
+
+fair:art_duration_at_baseline_months
+        rdf:type             rdf:Property ;
+        rdfs:label           "art_duration_at baseline_months" ;
+        schema:valuePattern  ".+" .
+
+fair:art_start_date  rdf:type  rdf:Property ;
+        rdfs:label           "art_start_date" ;
+        schema:valuePattern  ".+" .
+
+fair:cd4_count_cells_ul
+        rdf:type             rdf:Property ;
+        rdfs:label           "cd4_count(cells/ul)" ;
+        schema:valuePattern  ".+" .
+
+fair:cd8_count_cells_ul
+        rdf:type             rdf:Property ;
+        rdfs:label           "cd8_count(cells/ul)" ;
+        schema:valuePattern  ".+" .
+
+fair:co-trimoxazole_duration_mths
+        rdf:type             rdf:Property ;
+        rdfs:label           "co-trimoxazole duration (mths)" ;
+        schema:valuePattern  ".+" .
+
+fair:viral_load_copies_ml
+        rdf:type             rdf:Property ;
+        rdfs:label           "viral_load (copies/ml)" ;
+        schema:valuePattern  ".+" .
+
+fair:log_vl  rdf:type        rdf:Property ;
+        rdfs:label           "log vl" ;
+        schema:valuePattern  ".+" .
+
+<http://fairbydesign.nl/ontology/inv_INV_DRP007092/stu_DRP007092/obs_HIV-1_positive/sam_DRS176886>
+        rdf:type                     jerm:Sample ;
+        fair:art_drugs_current       "AZT/3TC/NVP" ;
+        fair:art_duration_at_baseline_months
+                86 ;
+        fair:art_start_date          "2010-06-23" ;
+        fair:art_status_at_baseline  "ART" ;
+        fair:biosafety_level         3 ;
+        fair:cd4_count_cells_ul      1384 ;
+        fair:cd8_count_cells_ul      2467 ;
+        fair:co-trimoxazole_duration_mths
+                144 ;
+        fair:geo_loc_name            "Ghana:Koforidua" ;
+        fair:hiv_risk_exposure       "Heterosexual" ;
+        fair:host                    "Homo sapiens" ;
+        fair:host_disease_stat       "HIV-1 positive" ;
+        fair:log_vl                  "2.551449998"^^xsd:double ;
+        fair:marital_status          "Single" ;
+        fair:occupation              "Driver" ;
+        fair:sample_name             "15P" ;
+        fair:viral_load_copies_ml    356 ;
+        gbol:scientificName          "human gut metagenome" ;
+        jerm:hasPart                 <http://fairbydesign.nl/ontology/inv_INV_DRP007092/stu_DRP007092/obs_HIV-1_positive/sam_DRS176886/asy_DRR243850> ;
+        uniprot:organism             408170 ;
+        schema:description           "Sample obtained from Single age 56 collected on 2017-09-13 from the human gut" ;
+        schema:identifier            "DRS176886" ;
+        schema:name                  "sample DRS176886" ;
+        <https://w3id.org/mixs/terms/0000009_lat>
+                "6.100334"^^xsd:double ;
+        <https://w3id.org/mixs/terms/0000009_lon>
+                "-0.2614572"^^xsd:double ;
+        <https://w3id.org/mixs/terms/0000011>
+                "2017-09-13"^^xsd:date ;
+        <https://w3id.org/mixs/terms/0000255>
+                "56 years" .
+
+<http://fairbydesign.nl/ontology/inv_INV_DRP007092/stu_DRP007092/obs_HIV-1_positive/sam_DRS176930>
+        rdf:type                     jerm:Sample ;
+        fair:art_drugs_current       "TDF/3TC/EFV" ;
+        fair:art_duration_at_baseline_months
+                144 ;
+        fair:art_start_date          "2005-08-25" ;
+        fair:art_status_at_baseline  "ART" ;
+        fair:biosafety_level         3 ;
+        fair:cd4_count_cells_ul      222 ;
+        fair:cd8_count_cells_ul      1130 ;
+        fair:co-trimoxazole_duration_mths
+                144 ;
+        fair:geo_loc_name            "Ghana:Koforidua" ;
+        fair:hiv_risk_exposure       "Maternal-Fetal" ;
+        fair:host                    "Homo sapiens" ;
+        fair:host_disease_stat       "HIV-1 positive" ;
+        fair:log_vl                  "4.581926914"^^xsd:double ;
+        fair:marital_status          "Widowed" ;
+        fair:occupation              "Trader" ;
+        fair:sample_name             "HG-17-041P" ;
+        fair:viral_load_copies_ml    38188 ;
+        gbol:scientificName          "human gut metagenome" ;
+        jerm:hasPart                 <http://fairbydesign.nl/ontology/inv_INV_DRP007092/stu_DRP007092/obs_HIV-1_positive/sam_DRS176930/asy_DRR243894> ;
+        uniprot:organism             408170 ;
+        schema:description           "Sample obtained from Widowed age 48 collected on 2017-09-20 from the human gut" ;
+        schema:identifier            "DRS176930" ;
+        schema:name                  "sample DRS176930" ;
+        <https://w3id.org/mixs/terms/0000009_lat>
+                "6.100334"^^xsd:double ;
+        <https://w3id.org/mixs/terms/0000009_lon>
+                "-0.2614572"^^xsd:double ;
+        <https://w3id.org/mixs/terms/0000011>
+                "2017-09-20"^^xsd:date ;
+        <https://w3id.org/mixs/terms/0000255>
+                "48 years" .
+
+<http://fairbydesign.nl/ontology/inv_INV_DRP007092/stu_DRP007092/obs_HIV-1_negative/sam_DRS176899>
+        rdf:type                     jerm:Sample ;
+        fair:art_drugs_current       "Control" ;
+        fair:art_status_at_baseline  "Control" ;
+        fair:biosafety_level         3 ;
+        fair:geo_loc_name            "Ghana:Jumapo" ;
+        fair:hiv_risk_exposure       "Blood Trans" ;
+        fair:host                    "Homo sapiens" ;
+        fair:host_disease_stat       "HIV-1 negative" ;
+        fair:marital_status          "Married" ;
+        fair:occupation              "Farmer" ;
+        fair:sample_name             "26A" ;
+        gbol:scientificName          "human gut metagenome" ;
+        jerm:hasPart                 <http://fairbydesign.nl/ontology/inv_INV_DRP007092/stu_DRP007092/obs_HIV-1_negative/sam_DRS176899/asy_DRR243863> ;
+        uniprot:organism             408170 ;
+        schema:description           "Sample obtained from Married age 51 collected on 2018-09-01 from the human gut" ;
+        schema:identifier            "DRS176899" ;
+        schema:name                  "sample DRS176899" ;
+        <https://w3id.org/mixs/terms/0000009_lat>
+                "6.1595115"^^xsd:double ;
+        <https://w3id.org/mixs/terms/0000009_lon>
+                "-0.2980853"^^xsd:double ;
+        <https://w3id.org/mixs/terms/0000011>
+                "2018-09-01"^^xsd:date ;
+        <https://w3id.org/mixs/terms/0000255>
+                "51 years" .
+
+<http://fairbydesign.nl/ontology/inv_INV_DRP007092/stu_DRP007092/obs_HIV-1_negative/sam_DRS176917>
+        rdf:type                     jerm:Sample ;
+        fair:art_drugs_current       "Control" ;
+        fair:art_status_at_baseline  "Control" ;
+        fair:biosafety_level         3 ;
+        fair:geo_loc_name            "Ghana:Koforidua" ;
+        fair:hiv_risk_exposure       "Heterosexual" ;
+        fair:host                    "Homo sapiens" ;
+        fair:host_disease_stat       "HIV-1 negative" ;
+        fair:marital_status          "Widowed" ;
+        fair:occupation              "Trader" ;
+        fair:sample_name             "35C" ;
+        gbol:scientificName          "human gut metagenome" ;
+        jerm:hasPart                 <http://fairbydesign.nl/ontology/inv_INV_DRP007092/stu_DRP007092/obs_HIV-1_negative/sam_DRS176917/asy_DRR243881> ;
+        uniprot:organism             408170 ;
+        schema:description           "Sample obtained from Widowed age 65 collected on 2017-12-14 from the human gut" ;
+        schema:identifier            "DRS176917" ;
+        schema:name                  "sample DRS176917" ;
+        <https://w3id.org/mixs/terms/0000009_lat>
+                "6.100334"^^xsd:double ;
+        <https://w3id.org/mixs/terms/0000009_lon>
+                "-0.2614572"^^xsd:double ;
+        <https://w3id.org/mixs/terms/0000011>
+                "2017-12-14"^^xsd:date ;
+        <https://w3id.org/mixs/terms/0000255>
+                "65 years" .
+
+<http://fairbydesign.nl/ontology/inv_INV_DRP007092/stu_DRP007092/obs_HIV-1_negative/sam_DRS176935>
+        rdf:type                     jerm:Sample ;
+        fair:art_drugs_current       "Control" ;
+        fair:art_status_at_baseline  "Control" ;
+        fair:biosafety_level         3 ;
+        fair:geo_loc_name            "Ghana:Koforidua" ;
+        fair:hiv_risk_exposure       "Heterosexual" ;
+        fair:host                    "Homo sapiens" ;
+        fair:host_disease_stat       "HIV-1 negative" ;
+        fair:marital_status          "Widowed" ;
+        fair:occupation              "Baker" ;
+        fair:sample_name             "HG-17-044A" ;
+        gbol:scientificName          "human gut metagenome" ;
+        jerm:hasPart                 <http://fairbydesign.nl/ontology/inv_INV_DRP007092/stu_DRP007092/obs_HIV-1_negative/sam_DRS176935/asy_DRR243899> ;
+        uniprot:organism             408170 ;
+        schema:description           "Sample obtained from Widowed age 33 collected on 2017-12-18 from the human gut" ;
+        schema:identifier            "DRS176935" ;
+        schema:name                  "sample DRS176935" ;
+        <https://w3id.org/mixs/terms/0000009_lat>
+                "6.100334"^^xsd:double ;
+        <https://w3id.org/mixs/terms/0000009_lon>
+                "-0.2614572"^^xsd:double ;
+        <https://w3id.org/mixs/terms/0000011>
+                "2017-12-18"^^xsd:date ;
+        <https://w3id.org/mixs/terms/0000255>
+                "33 years" .
+
+<http://fairbydesign.nl/ontology/inv_INV_DRP007092/stu_DRP007092/obs_HIV-1_negative/sam_DRS176960>
+        rdf:type                     jerm:Sample ;
+        fair:art_drugs_current       "Control" ;
+        fair:art_status_at_baseline  "Control" ;
+        fair:biosafety_level         3 ;
+        fair:geo_loc_name            "Ghana:Suhum" ;
+        fair:hiv_risk_exposure       "Heterosexual" ;
+        fair:host                    "Homo sapiens" ;
+        fair:host_disease_stat       "HIV-1 negative" ;
+        fair:marital_status          "Widowed" ;
+        fair:occupation              "Trader" ;
+        fair:sample_name             "59C" ;
+        gbol:scientificName          "human gut metagenome" ;
+        jerm:hasPart                 <http://fairbydesign.nl/ontology/inv_INV_DRP007092/stu_DRP007092/obs_HIV-1_negative/sam_DRS176960/asy_DRR243924> ;
+        uniprot:organism             408170 ;
+        schema:description           "Sample obtained from Widowed age 66 collected on 2018-01-30 from the human gut" ;
+        schema:identifier            "DRS176960" ;
+        schema:name                  "sample DRS176960" ;
+        <https://w3id.org/mixs/terms/0000009_lat>
+                "6.035885"^^xsd:double ;
+        <https://w3id.org/mixs/terms/0000009_lon>
+                "-0.4552751"^^xsd:double ;
+        <https://w3id.org/mixs/terms/0000011>
+                "2018-01-30"^^xsd:date ;
+        <https://w3id.org/mixs/terms/0000255>
+                "66 years" .
+
+<http://fairbydesign.nl/ontology/inv_INV_DRP007092/stu_DRP007092/obs_HIV-1_positive/sam_DRS176942>
+        rdf:type                     jerm:Sample ;
+        fair:art_drugs_current       "AZT/3TC/EFV" ;
+        fair:art_duration_at_baseline_months
+                129 ;
+        fair:art_start_date          "2006-11-22" ;
+        fair:art_status_at_baseline  "ART" ;
+        fair:biosafety_level         3 ;
+        fair:cd4_count_cells_ul      571 ;
+        fair:cd8_count_cells_ul      2614 ;
+        fair:co-trimoxazole_duration_mths
+                132 ;
+        fair:geo_loc_name            "Ghana:Suhum" ;
+        fair:host                    "Homo sapiens" ;
+        fair:host_disease_stat       "HIV-1 positive" ;
+        fair:marital_status          "Married" ;
+        fair:occupation              "Unemployed" ;
+        fair:sample_name             "50P" ;
+        fair:viral_load_copies_ml    "Undetectable" ;
+        gbol:scientificName          "human gut metagenome" ;
+        jerm:hasPart                 <http://fairbydesign.nl/ontology/inv_INV_DRP007092/stu_DRP007092/obs_HIV-1_positive/sam_DRS176942/asy_DRR243906> ;
+        uniprot:organism             408170 ;
+        schema:description           "Sample obtained from Married age 50 collected on 2017-09-19 from the human gut" ;
+        schema:identifier            "DRS176942" ;
+        schema:name                  "sample DRS176942" ;
+        <https://w3id.org/mixs/terms/0000009_lat>
+                "6.035885"^^xsd:double ;
+        <https://w3id.org/mixs/terms/0000009_lon>
+                "-0.4552751"^^xsd:double ;
+        <https://w3id.org/mixs/terms/0000011>
+                "2017-09-19"^^xsd:date ;
+        <https://w3id.org/mixs/terms/0000255>
+                "50 years" .
+
+<http://fairbydesign.nl/ontology/inv_INV_DRP007092/stu_DRP007092/obs_HIV-1_negative/sam_DRS176881/asy_DRR243845>
+        rdf:type                 jerm:Assay ;
+        fair:facility            "NMIMR" ;
+        fair:forwardPrimer       "CCTACGGGNGGCWGCAG" ;
+        fair:instrument_model    "Illumina MiSeq" ;
+        fair:library_selection   "PCR" ;
+        fair:library_source      "METAGENOMIC" ;
+        fair:library_strategy    "AMPLICON" ;
+        fair:packageName         "Amplicon demultiplexed" ;
+        fair:platform            "ILLUMINA" ;
+        fair:primerNames         "341F/785R" ;
+        fair:protocol            "MiSeq Reagent Kit v3 (600-cycle) with a 20% PhiX (Illumina) spike-in" ;
+        fair:reversePrimer       "GACTACHVGGGTATCTAATCC" ;
+        fair:target_subfragment  "V3-V4" ;
+        schema:dataset           <http://fairbydesign.nl/data_sample/DRR243845_1.fastq.gz> , <http://fairbydesign.nl/data_sample/DRR243845_2.fastq.gz> ;
+        schema:dateCreated       "2019-02-05"^^xsd:date ;
+        schema:description       "Illumina MiSeq paired end sequencing of SAMD00244440" ;
+        schema:identifier        "DRR243845" .
+
+fair:protocol  rdf:type       rdf:Property ;
+        rdfs:label            "protocol" ;
+        schema:description    "The protocol used for preparation or isolation (name or url) used to create the assay" ;
+        schema:valuePattern   ".*" ;
+        schema:valueRequired  true .
+
+fair:facility  rdf:type       rdf:Property ;
+        rdfs:label            "facility" ;
+        schema:description    "The facility that was used for generating the data" ;
+        schema:valuePattern   ".*" ;
+        schema:valueRequired  true .
+
+schema:dateCreated  rdf:type  rdf:Property ;
+        rdfs:label            "assay date" ;
+        schema:description    "The date when the data generation took place" ;
+        schema:valuePattern   ".+" ;
+        schema:valueRequired  true .
+
+<http://fairbydesign.nl/data_sample/DRR243845_1.fastq.gz>
+        rdf:type            jerm:Data_sample ;
+        schema:description  "demultiplexed forward file" ;
+        schema:identifier   "DRR243845_1.fastq.gz" .
+
+fair:file  rdf:type           rdf:Property ;
+        rdfs:label            "demultiplexed forward file" ;
+        schema:description    "File path or name of the forward reads when working with demultiplexed reads" ;
+        schema:unitCode       ".fq.gz|.fastq.gz|fastq.bz2|fq.bz2" ;
+        schema:valuePattern   ".* ?(.fq.gz|.fastq.gz|fastq.bz2|fq.bz2)" ;
+        schema:valueRequired  true .
+
+<http://fairbydesign.nl/data_sample/DRR243845_2.fastq.gz>
+        rdf:type            jerm:Data_sample ;
+        schema:description  "demultiplexed reverse file" ;
+        schema:identifier   "DRR243845_2.fastq.gz" .
+
+fair:forwardPrimer  rdf:type  rdf:Property ;
+        rdfs:label            "forward primer" ;
+        schema:description    "The forward primer" ;
+        schema:valuePattern   "[ACGTUWSMKRYBDHVN]+" ;
+        schema:valueRequired  true .
+
+fair:reversePrimer  rdf:type  rdf:Property ;
+        rdfs:label            "reverse primer" ;
+        schema:description    "The reverse primer used" ;
+        schema:valuePattern   "[ACGTUWSMKRYBDHVN]+" ;
+        schema:valueRequired  false .
+
+fair:primerNames  rdf:type    rdf:Property ;
+        rdfs:label            "primer names" ;
+        schema:description    "The primer names corresponding to the primers used" ;
+        schema:valuePattern   ".*" ;
+        schema:valueRequired  true .
+
+fair:target_subfragment
+        rdf:type              rdf:Property ;
+        rdfs:label            "target subfragment" ;
+        schema:description    "Name of subfragment of a gene or locus (e.g. V3-4, V4, V6, V9, ITS). Important to e.g. identify special regions on marker genes like V6 on 16S rRNA" ;
+        schema:valuePattern   ".*" ;
+        schema:valueRequired  true .
+
+fair:platform  rdf:type       rdf:Property ;
+        rdfs:label            "platform" ;
+        schema:description    "The platform that was used for generating the data (Source: https://ena-docs.readthedocs.io/en/latest/submit/reads/webin-cli.html#permitted-values-for-platform)" ;
+        schema:valuePattern   "(LS454|ILLUMINA|PACBIO_SMRT|ION_TORRENT|CAPILLARY|OXFORD_NANOPORE|BGISEQ|DNBSEQ)" ;
+        schema:valueRequired  true .
+
+fair:instrument_model
+        rdf:type              rdf:Property ;
+        rdfs:label            "instrument model" ;
+        schema:description    "The instrument model that was used for generating the data (Source: https://ena-docs.readthedocs.io/en/latest/submit/reads/webin-cli.html#permitted-values-for-instrument)" ;
+        schema:valuePattern   "(454 GS|454 GS 20|454 GS FLX|454 GS FLX+|454 GS FLX Titanium|454 GS Junior|HiSeq X Five|HiSeq X Ten|Illumina Genome Analyzer|Illumina Genome Analyzer II|Illumina Genome Analyzer IIx|Illumina HiScanSQ|Illumina HiSeq 1000|Illumina HiSeq 1500|Illumina HiSeq 2000|Illumina HiSeq 2500|Illumina HiSeq 3000|Illumina HiSeq 4000|Illumina iSeq 100|Illumina MiSeq|Illumina MiniSeq|Illumina NovaSeq 6000|NextSeq 500|NextSeq 550|PacBio RS|PacBio RS II|Sequel|Ion Torrent PGM|Ion Torrent Proton|Ion Torrent S5|Ion Torrent S5 XL|AB 3730xL Genetic Analyzer|AB 3730 Genetic Analyzer|AB 3500xL Genetic Analyzer|AB 3500 Genetic Analyzer|AB 3130xL Genetic Analyzer|AB 3130 Genetic Analyzer|AB 310 Genetic Analyzer|MinION|GridION|PromethION|BGISEQ-500|DNBSEQ-T7|DNBSEQ-G400|DNBSEQ-G50|DNBSEQ-G400 FAST|unspecified)" ;
+        schema:valueRequired  true .
+
+fair:library_source  rdf:type  rdf:Property ;
+        rdfs:label            "library source" ;
+        schema:description    "Source ENA" ;
+        schema:valuePattern   "(GENOMIC|GENOMIC_SINGLE_CELL|TRANSCRIPTOMIC|TRANSCRIPTOMIC_SINGLE_CELL|METAGENOMIC|METATRANSCRIPTOMIC|SYNTHETIC|VIRAL_RNA|OTHER)" ;
+        schema:valueRequired  true .
+
+fair:library_selection
+        rdf:type              rdf:Property ;
+        rdfs:label            "library selection" ;
+        schema:description    "Source ENA" ;
+        schema:valuePattern   "(RANDOM|PCR|RANDOM_PCR|RT-PCR|HMPR|MF|repeat_fractionation|size_fractionation|MSLL|cDNA|cDNA_randomPriming|cDNA_oligo_dT|PolyA|Oligo-dT|Inverse_rRNA|Inverse_rRNA_selection|ChIP|ChIP-Seq|MNase|DNase|Hybrid_Selection|Reduced_Representation|Restriction_Digest|5-methylcytidine_antibody|MBD2_protein_methyl-CpG_binding_domain|CAGE|RACE|MDA|padlock_probes_capture_method|other|unspecified)" ;
+        schema:valueRequired  true .
+
+fair:library_strategy
+        rdf:type              rdf:Property ;
+        rdfs:label            "library strategy" ;
+        schema:description    "Source ENA" ;
+        schema:valuePattern   "(WGS|WGA|WXS|RNA-Seq|ssRNA-seq|miRNA-Seq|ncRNA-Seq|FL-cDNA|EST|Hi-C|ATAC-seq|WCS|RAD-Seq|CLONE|POOLCLONE|AMPLICON|CLONEEND|FINISHING|ChIP-Seq|MNase-Seq|DNase-Hypersensitivity|Bisulfite-Seq|CTS|MRE-Seq|MeDIP-Seq|MBD-Seq|Tn-Seq|VALIDATION|FAIRE-seq|SELEX|RIP-Seq|ChIA-PET|Synthetic-Long-Read|Targeted-Capture|Tethered_Chromatin_Conformation_Capture|OTHER)" ;
+        schema:valueRequired  true .
+
+<http://fairbydesign.nl/ontology/inv_INV_DRP007092/stu_DRP007092/obs_HIV-1_positive/sam_DRS176892/asy_DRR243856>
+        rdf:type                 jerm:Assay ;
+        fair:facility            "NMIMR" ;
+        fair:forwardPrimer       "CCTACGGGNGGCWGCAG" ;
+        fair:instrument_model    "Illumina MiSeq" ;
+        fair:library_selection   "PCR" ;
+        fair:library_source      "METAGENOMIC" ;
+        fair:library_strategy    "AMPLICON" ;
+        fair:packageName         "Amplicon demultiplexed" ;
+        fair:platform            "ILLUMINA" ;
+        fair:primerNames         "341F/785R" ;
+        fair:protocol            "MiSeq Reagent Kit v3 (600-cycle) with a 20% PhiX (Illumina) spike-in" ;
+        fair:reversePrimer       "GACTACHVGGGTATCTAATCC" ;
+        fair:target_subfragment  "V3-V4" ;
+        schema:dataset           <http://fairbydesign.nl/data_sample/DRR243856_1.fastq.gz> , <http://fairbydesign.nl/data_sample/DRR243856_2.fastq.gz> ;
+        schema:dateCreated       "2019-02-05"^^xsd:date ;
+        schema:description       "Illumina MiSeq paired end sequencing of SAMD00244451" ;
+        schema:identifier        "DRR243856" .
+
+<http://fairbydesign.nl/data_sample/DRR243856_1.fastq.gz>
+        rdf:type            jerm:Data_sample ;
+        schema:description  "demultiplexed forward file" ;
+        schema:identifier   "DRR243856_1.fastq.gz" .
+
+<http://fairbydesign.nl/data_sample/DRR243856_2.fastq.gz>
+        rdf:type            jerm:Data_sample ;
+        schema:description  "demultiplexed reverse file" ;
+        schema:identifier   "DRR243856_2.fastq.gz" .
+
+<http://fairbydesign.nl/ontology/inv_INV_DRP007092/stu_DRP007092/obs_HIV-1_positive/sam_DRS176886/asy_DRR243850>
+        rdf:type                 jerm:Assay ;
+        fair:facility            "NMIMR" ;
+        fair:forwardPrimer       "CCTACGGGNGGCWGCAG" ;
+        fair:instrument_model    "Illumina MiSeq" ;
+        fair:library_selection   "PCR" ;
+        fair:library_source      "METAGENOMIC" ;
+        fair:library_strategy    "AMPLICON" ;
+        fair:packageName         "Amplicon demultiplexed" ;
+        fair:platform            "ILLUMINA" ;
+        fair:primerNames         "341F/785R" ;
+        fair:protocol            "MiSeq Reagent Kit v3 (600-cycle) with a 20% PhiX (Illumina) spike-in" ;
+        fair:reversePrimer       "GACTACHVGGGTATCTAATCC" ;
+        fair:target_subfragment  "V3-V4" ;
+        schema:dataset           <http://fairbydesign.nl/data_sample/DRR243850_1.fastq.gz> , <http://fairbydesign.nl/data_sample/DRR243850_2.fastq.gz> ;
+        schema:dateCreated       "2019-02-05"^^xsd:date ;
+        schema:description       "Illumina MiSeq paired end sequencing of SAMD00244445" ;
+        schema:identifier        "DRR243850" .
+
+<http://fairbydesign.nl/data_sample/DRR243850_1.fastq.gz>
+        rdf:type            jerm:Data_sample ;
+        schema:description  "demultiplexed forward file" ;
+        schema:identifier   "DRR243850_1.fastq.gz" .
+
+<http://fairbydesign.nl/data_sample/DRR243850_2.fastq.gz>
+        rdf:type            jerm:Data_sample ;
+        schema:description  "demultiplexed reverse file" ;
+        schema:identifier   "DRR243850_2.fastq.gz" .
+
+<http://fairbydesign.nl/ontology/inv_INV_DRP007092/stu_DRP007092/obs_HIV-1_positive/sam_DRS176930/asy_DRR243894>
+        rdf:type                 jerm:Assay ;
+        fair:facility            "NMIMR" ;
+        fair:forwardPrimer       "CCTACGGGNGGCWGCAG" ;
+        fair:instrument_model    "Illumina MiSeq" ;
+        fair:library_selection   "PCR" ;
+        fair:library_source      "METAGENOMIC" ;
+        fair:library_strategy    "AMPLICON" ;
+        fair:packageName         "Amplicon demultiplexed" ;
+        fair:platform            "ILLUMINA" ;
+        fair:primerNames         "341F/785R" ;
+        fair:protocol            "MiSeq Reagent Kit v3 (600-cycle) with a 20% PhiX (Illumina) spike-in" ;
+        fair:reversePrimer       "GACTACHVGGGTATCTAATCC" ;
+        fair:target_subfragment  "V3-V4" ;
+        schema:dataset           <http://fairbydesign.nl/data_sample/DRR243894_1.fastq.gz> , <http://fairbydesign.nl/data_sample/DRR243894_2.fastq.gz> ;
+        schema:dateCreated       "2019-02-05"^^xsd:date ;
+        schema:description       "Illumina MiSeq paired end sequencing of SAMD00244489" ;
+        schema:identifier        "DRR243894" .
+
+<http://fairbydesign.nl/data_sample/DRR243894_1.fastq.gz>
+        rdf:type            jerm:Data_sample ;
+        schema:description  "demultiplexed forward file" ;
+        schema:identifier   "DRR243894_1.fastq.gz" .
+
+<http://fairbydesign.nl/data_sample/DRR243894_2.fastq.gz>
+        rdf:type            jerm:Data_sample ;
+        schema:description  "demultiplexed reverse file" ;
+        schema:identifier   "DRR243894_2.fastq.gz" .
+
+<http://fairbydesign.nl/ontology/inv_INV_DRP007092/stu_DRP007092/obs_HIV-1_negative/sam_DRS176899/asy_DRR243863>
+        rdf:type                 jerm:Assay ;
+        fair:facility            "NMIMR" ;
+        fair:forwardPrimer       "CCTACGGGNGGCWGCAG" ;
+        fair:instrument_model    "Illumina MiSeq" ;
+        fair:library_selection   "PCR" ;
+        fair:library_source      "METAGENOMIC" ;
+        fair:library_strategy    "AMPLICON" ;
+        fair:packageName         "Amplicon demultiplexed" ;
+        fair:platform            "ILLUMINA" ;
+        fair:primerNames         "341F/785R" ;
+        fair:protocol            "MiSeq Reagent Kit v3 (600-cycle) with a 20% PhiX (Illumina) spike-in" ;
+        fair:reversePrimer       "GACTACHVGGGTATCTAATCC" ;
+        fair:target_subfragment  "V3-V4" ;
+        schema:dataset           <http://fairbydesign.nl/data_sample/DRR243863_1.fastq.gz> , <http://fairbydesign.nl/data_sample/DRR243863_2.fastq.gz> ;
+        schema:dateCreated       "2019-02-05"^^xsd:date ;
+        schema:description       "Illumina MiSeq paired end sequencing of SAMD00244458" ;
+        schema:identifier        "DRR243863" .
+
+<http://fairbydesign.nl/data_sample/DRR243863_1.fastq.gz>
+        rdf:type            jerm:Data_sample ;
+        schema:description  "demultiplexed forward file" ;
+        schema:identifier   "DRR243863_1.fastq.gz" .
+
+<http://fairbydesign.nl/data_sample/DRR243863_2.fastq.gz>
+        rdf:type            jerm:Data_sample ;
+        schema:description  "demultiplexed reverse file" ;
+        schema:identifier   "DRR243863_2.fastq.gz" .
+
+<http://fairbydesign.nl/ontology/inv_INV_DRP007092/stu_DRP007092/obs_HIV-1_negative/sam_DRS176917/asy_DRR243881>
+        rdf:type                 jerm:Assay ;
+        fair:facility            "NMIMR" ;
+        fair:forwardPrimer       "CCTACGGGNGGCWGCAG" ;
+        fair:instrument_model    "Illumina MiSeq" ;
+        fair:library_selection   "PCR" ;
+        fair:library_source      "METAGENOMIC" ;
+        fair:library_strategy    "AMPLICON" ;
+        fair:packageName         "Amplicon demultiplexed" ;
+        fair:platform            "ILLUMINA" ;
+        fair:primerNames         "341F/785R" ;
+        fair:protocol            "MiSeq Reagent Kit v3 (600-cycle) with a 20% PhiX (Illumina) spike-in" ;
+        fair:reversePrimer       "GACTACHVGGGTATCTAATCC" ;
+        fair:target_subfragment  "V3-V4" ;
+        schema:dataset           <http://fairbydesign.nl/data_sample/DRR243881_1.fastq.gz> , <http://fairbydesign.nl/data_sample/DRR243881_2.fastq.gz> ;
+        schema:dateCreated       "2019-02-05"^^xsd:date ;
+        schema:description       "Illumina MiSeq paired end sequencing of SAMD00244476" ;
+        schema:identifier        "DRR243881" .
+
+<http://fairbydesign.nl/data_sample/DRR243881_1.fastq.gz>
+        rdf:type            jerm:Data_sample ;
+        schema:description  "demultiplexed forward file" ;
+        schema:identifier   "DRR243881_1.fastq.gz" .
+
+<http://fairbydesign.nl/data_sample/DRR243881_2.fastq.gz>
+        rdf:type            jerm:Data_sample ;
+        schema:description  "demultiplexed reverse file" ;
+        schema:identifier   "DRR243881_2.fastq.gz" .
+
+<http://fairbydesign.nl/ontology/inv_INV_DRP007092/stu_DRP007092/obs_HIV-1_negative/sam_DRS176935/asy_DRR243899>
+        rdf:type                 jerm:Assay ;
+        fair:facility            "NMIMR" ;
+        fair:forwardPrimer       "CCTACGGGNGGCWGCAG" ;
+        fair:instrument_model    "Illumina MiSeq" ;
+        fair:library_selection   "PCR" ;
+        fair:library_source      "METAGENOMIC" ;
+        fair:library_strategy    "AMPLICON" ;
+        fair:packageName         "Amplicon demultiplexed" ;
+        fair:platform            "ILLUMINA" ;
+        fair:primerNames         "341F/785R" ;
+        fair:protocol            "MiSeq Reagent Kit v3 (600-cycle) with a 20% PhiX (Illumina) spike-in" ;
+        fair:reversePrimer       "GACTACHVGGGTATCTAATCC" ;
+        fair:target_subfragment  "V3-V4" ;
+        schema:dataset           <http://fairbydesign.nl/data_sample/DRR243899_1.fastq.gz> , <http://fairbydesign.nl/data_sample/DRR243899_2.fastq.gz> ;
+        schema:dateCreated       "2019-02-05"^^xsd:date ;
+        schema:description       "Illumina MiSeq paired end sequencing of SAMD00244494" ;
+        schema:identifier        "DRR243899" .
+
+<http://fairbydesign.nl/data_sample/DRR243899_1.fastq.gz>
+        rdf:type            jerm:Data_sample ;
+        schema:description  "demultiplexed forward file" ;
+        schema:identifier   "DRR243899_1.fastq.gz" .
+
+<http://fairbydesign.nl/data_sample/DRR243899_2.fastq.gz>
+        rdf:type            jerm:Data_sample ;
+        schema:description  "demultiplexed reverse file" ;
+        schema:identifier   "DRR243899_2.fastq.gz" .
+
+<http://fairbydesign.nl/ontology/inv_INV_DRP007092/stu_DRP007092/obs_HIV-1_negative/sam_DRS176960/asy_DRR243924>
+        rdf:type                 jerm:Assay ;
+        fair:facility            "NMIMR" ;
+        fair:forwardPrimer       "CCTACGGGNGGCWGCAG" ;
+        fair:instrument_model    "Illumina MiSeq" ;
+        fair:library_selection   "PCR" ;
+        fair:library_source      "METAGENOMIC" ;
+        fair:library_strategy    "AMPLICON" ;
+        fair:packageName         "Amplicon demultiplexed" ;
+        fair:platform            "ILLUMINA" ;
+        fair:primerNames         "341F/785R" ;
+        fair:protocol            "MiSeq Reagent Kit v3 (600-cycle) with a 20% PhiX (Illumina) spike-in" ;
+        fair:reversePrimer       "GACTACHVGGGTATCTAATCC" ;
+        fair:target_subfragment  "V3-V4" ;
+        schema:dataset           <http://fairbydesign.nl/data_sample/DRR243924_1.fastq.gz> , <http://fairbydesign.nl/data_sample/DRR243924_2.fastq.gz> ;
+        schema:dateCreated       "2019-02-05"^^xsd:date ;
+        schema:description       "Illumina MiSeq paired end sequencing of SAMD00244519" ;
+        schema:identifier        "DRR243924" .
+
+<http://fairbydesign.nl/data_sample/DRR243924_1.fastq.gz>
+        rdf:type            jerm:Data_sample ;
+        schema:description  "demultiplexed forward file" ;
+        schema:identifier   "DRR243924_1.fastq.gz" .
+
+<http://fairbydesign.nl/data_sample/DRR243924_2.fastq.gz>
+        rdf:type            jerm:Data_sample ;
+        schema:description  "demultiplexed reverse file" ;
+        schema:identifier   "DRR243924_2.fastq.gz" .
+
+<http://fairbydesign.nl/ontology/inv_INV_DRP007092/stu_DRP007092/obs_HIV-1_positive/sam_DRS176942/asy_DRR243906>
+        rdf:type                 jerm:Assay ;
+        fair:facility            "NMIMR" ;
+        fair:forwardPrimer       "CCTACGGGNGGCWGCAG" ;
+        fair:instrument_model    "Illumina MiSeq" ;
+        fair:library_selection   "PCR" ;
+        fair:library_source      "METAGENOMIC" ;
+        fair:library_strategy    "AMPLICON" ;
+        fair:packageName         "Amplicon demultiplexed" ;
+        fair:platform            "ILLUMINA" ;
+        fair:primerNames         "341F/785R" ;
+        fair:protocol            "MiSeq Reagent Kit v3 (600-cycle) with a 20% PhiX (Illumina) spike-in" ;
+        fair:reversePrimer       "GACTACHVGGGTATCTAATCC" ;
+        fair:target_subfragment  "V3-V4" ;
+        schema:dataset           <http://fairbydesign.nl/data_sample/DRR243906_1.fastq.gz> , <http://fairbydesign.nl/data_sample/DRR243906_2.fastq.gz> ;
+        schema:dateCreated       "2019-02-05"^^xsd:date ;
+        schema:description       "Illumina MiSeq paired end sequencing of SAMD00244501" ;
+        schema:identifier        "DRR243906" .
+
+<http://fairbydesign.nl/data_sample/DRR243906_1.fastq.gz>
+        rdf:type            jerm:Data_sample ;
+        schema:description  "demultiplexed forward file" ;
+        schema:identifier   "DRR243906_1.fastq.gz" .
+
+<http://fairbydesign.nl/data_sample/DRR243906_2.fastq.gz>
+        rdf:type            jerm:Data_sample ;
+        schema:description  "demultiplexed reverse file" ;
+        schema:identifier   "DRR243906_2.fastq.gz" .

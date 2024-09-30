@@ -1,0 +1,31 @@
+<%= render partial: 'general/item_title', locals: { item: @observation_unit, buttons_partial: 'assets/asset_buttons' } %>
+
+
+<%= render partial: 'general/show_page_tab_definitions' %>
+
+<div class="tab-content">
+  <%= tab_pane('overview') do %>
+    <div class="row">
+      <div class="col-md-9 col-sm-8 box_about_actor">
+        <%= item_description @observation_unit.description -%>
+
+        <div class="row">
+          <div class="col-md-6">
+            <%= persistent_resource_id(@observation_unit) %>
+          </div>
+        </div>
+
+        <%= render partial: 'extended_metadata/extended_metadata_attribute_values', locals: { resource: @observation_unit } %>
+        <%= render partial: "general/isa_graph", locals: {root_item: @observation_unit, deep: true, include_parents: true} %>
+      </div>
+
+      <div class="col-md-3 col-sm-4">
+        <%= render partial: "assets/resource_main_content_right",locals: { resource: @observation_unit } %>
+      </div>
+    </div>
+  <% end %>
+
+  <%= tab_pane('related-items') do %>
+    <%= render partial: 'general/items_related_to', object: @observation_unit %>
+  <% end %>
+</div>

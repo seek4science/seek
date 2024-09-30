@@ -50,6 +50,7 @@
 //= require DataTables-1.11.3/buttons.html5
 //= require DataTables-1.11.3/autoFill.bootstrap
 //= require samples
+//= require datafiles
 //= require jstree
 //= require clipboard
 //= require openbis

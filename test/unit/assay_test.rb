@@ -847,4 +847,32 @@ class AssayTest < ActiveSupport::TestCase
     assert_equal first_isa_assay.next_linked_child_assay, second_isa_assay
     assert_nil second_isa_assay.next_linked_child_assay
   end
+
+  test 'observation units' do
+    sample = FactoryBot.create(:sample)
+    assay = FactoryBot.create(:assay, samples: [sample], contributor: sample.contributor)
+    assert_empty assay.observation_units
+
+    obs_unit = FactoryBot.create(:observation_unit, samples:[sample], study: assay.study)
+    assay.reload
+    assert_equal [obs_unit], assay.observation_units
+  end
+
+  test 'validate study matches with observation variables' do
+    contributor = FactoryBot.create(:person)
+    assay = FactoryBot.create(:assay, contributor: contributor)
+    assert assay.valid?
+
+    obs_unit = FactoryBot.create(:observation_unit, contributor: contributor, study: FactoryBot.create(:study, contributor: contributor))
+    sample = FactoryBot.create(:sample, observation_unit:obs_unit, contributor: contributor)
+    assay = FactoryBot.build(:assay, samples: [sample], contributor: contributor)
+    refute_equal assay.study, obs_unit.study
+    refute assay.valid?
+    assert_equal 'Study must match the associated observation unit', assay.errors.full_messages.first
+
+    assay = FactoryBot.build(:assay, samples: [sample], study: obs_unit.study, contributor: contributor)
+    assert_equal assay.study, obs_unit.study
+    assert assay.valid?
+  end
+
 end

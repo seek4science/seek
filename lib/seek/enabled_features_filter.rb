@@ -4,7 +4,8 @@ module Seek
                   nels openbis organisms human_diseases programmes publications samples
                   studies investigations documents workflows collections observed_variables 
 									observed_variable_sets project_single_page isa_json_compliance
-                  data_files sops presentations file_templates placeholders].freeze
+                  data_files sops presentations file_templates placeholders observation_units
+                  fair_data_station].freeze
 
     def feature_enabled?(feature)
       feature = feature.to_s

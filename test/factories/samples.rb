@@ -56,6 +56,8 @@ FactoryBot.define do
       sample.set_attribute_value(:weight, '3.7')
       sample.set_attribute_value(:age, '42')
       sample.set_attribute_value(:bool, true)
+      sample.set_attribute_value('data file', FactoryBot.create(:data_file, title: 'This Data file', contributor: sample.contributor).id)
+      sample.set_attribute_value('sop', FactoryBot.create(:sop, contributor: sample.contributor).id)
     end
   end
 
