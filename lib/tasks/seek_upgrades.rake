@@ -252,8 +252,6 @@ namespace :seek do
             policy = Policy.new
             policy.name = 'default policy'
             policy.access_type = Policy::NO_ACCESS
-            policy.permissions << Permission.create(contributor_type: Permission::PERSON, contributor: st.contributor,
-                                                    access_type: Policy::MANAGING)
             project.people.each do |person|
               unless person == st.contributor
                 policy.permissions << Permission.create(contributor_type: Permission::PROJECT, contributor: person,
