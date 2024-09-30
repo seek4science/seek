@@ -13,22 +13,22 @@
 
 <ul class="nav nav-tabs" role="tablist">
   <li class="nav-item active in">
-    <a class="nav-link" id="top-level-tab" data-toggle="tab" href="#top-level-metadata-table" role="tab" aria-controls="top-level" aria-selected="true" data-tooltip="Explain the top level">
+    <a class="nav-link" id="top-level-tab" data-toggle="tab" href="#top-level-metadata-table" role="tab" aria-controls="top-level" aria-selected="true" data-tooltip="This tab displays all top-level extended metadata types.">
       <span class="help_icon"></span>Top Level
     </a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" id="nested-tab" data-toggle="tab" href="#nested-metadata-table" role="tab" aria-controls="nested" aria-selected="false" data-tooltip="Explain how to use nested type">
+    <a class="nav-link" id="nested-tab" data-toggle="tab" href="#nested-metadata-table" role="tab" aria-controls="nested" aria-selected="false" data-tooltip="This tab lists all extended metadata types with the supported type ExtendedMetadata.">
       <span class="help_icon"></span>Nested Level
     </a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" id="sample-controlled-vocabs-tab" data-toggle="tab" href="#sample-controlled-vocabs" role="tab" aria-controls="sample-controlled-vocabs" aria-selected="false" data-tooltip="Explain how to use Controlled Vocabs">
+    <a class="nav-link" id="sample-controlled-vocabs-tab" data-toggle="tab" href="#sample-controlled-vocabs" role="tab" aria-controls="sample-controlled-vocabs" aria-selected="false" data-tooltip="This tab lists all the controlled vocabularies (CV) available in SEEK">
       <span class="help_icon"></span>Controlled Vocabs
     </a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" id="sample-attribute-types-tab" data-toggle="tab" href="#sample-attribute-types" role="tab" aria-controls="sample-attribute-types" aria-selected="false" data-tooltip="Explain the list of Extended Attribute Types">
+    <a class="nav-link" id="sample-attribute-types-tab" data-toggle="tab" href="#sample-attribute-types" role="tab" aria-controls="sample-attribute-types" aria-selected="false" data-tooltip="This tab provides a list of all supported extended metadata attribute types.">
       <span class="help_icon"></span>Extended Metadata Attribute Types
     </a>
   </li>
@@ -38,6 +38,10 @@
   <div class="tab-pane fade active in" id="top-level-metadata-table" role="tabpanel" aria-labelledby="top-level-tab">
     <div class="alert alert-info">
       <ul>
+        <li>
+          You can add extended metadata to the following SEEK resource types:  <strong>Investigation</strong>, <strong>Study</strong>, <strong>Assay</strong>, <strong>Collection</strong>, <strong>DataFile</strong>, <strong>Document</strong>, <strong>Event</strong>, <strong>Model</strong>, <strong>Presentation</strong>, <strong>Sop</strong>, and <strong>Project</strong>.
+          These will be the supported resource types when defining an extended metadata type.
+        </li>
         <li>
           You can disable Extended metadata types to prevent them from appearing as an option in the UI.
           Disabling them won't delete them, or where they've been used, and they can be re-enabled again here.
@@ -73,7 +77,14 @@
 
   <div class="tab-pane fade" id="nested-metadata-table" role="tabpanel" aria-labelledby="nested-tab">
     <div class="alert alert-info">
-      The Extended metadata type in the nested level can not be deleted if it has been linked by other Extended metadata types.
+      <ul>
+        <li>
+          Nested-level metadata types are primarily used to define attributes like <strong>Linked Extended Metadata</strong> or <strong>Linked Extended Metadata (Multiple)</strong>, allowing for deeper, more flexible relationships between metadata.
+        </li>
+        <li>
+          The Extended metadata type in the nested level cannot be deleted if it has been linked by other Extended metadata types.
+        </li>
+      </ul>
     </div>
     <div>
     </div>
@@ -98,6 +109,8 @@
   </div>
 
   <div class="tab-pane fade" id="sample-controlled-vocabs" role="tabpanel" aria-labelledby="sample-controlled-vocabs-tab">
+    <div class="alert alert-info">
+      The <strong>Internal ID</strong> of a controlled vocabulary is important when defining attributes such as <strong>Controlled Vocabulary</strong> or <strong>Controlled Vocabulary List</strong>.    </div>
     <div class="row" style="padding: 10px 0px">
       <div class="col-md-3">
         <%= link_to new_sample_controlled_vocab_path, class: "btn btn-primary", role: "button", aria: { label: "Left Align" } do %>
@@ -109,7 +122,7 @@
     <table class='table table-hover'>
       <thead>
       <tr>
-        <th>Internal Id</th>
+        <th>Internal ID</th>
         <th>Title</th>
       </tr>
       </thead>
@@ -123,7 +136,7 @@
 
   <div class="tab-pane fade" id="sample-attribute-types" role="tabpanel" aria-labelledby="sample-attribute-types-tab">
     <div class="alert alert-info">
-       The Base Type of extended attribute types in the list can be used to define the attributes for the extended metadata type.
+      The <strong>Title</strong> of extended attribute types in the list can be used to define the attributes for the extended metadata type.
     </div>
     <table class='table table-hover'>
       <thead>

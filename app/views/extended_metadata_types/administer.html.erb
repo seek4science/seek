@@ -8,13 +8,10 @@
     <% end %>
   </div>
 </div>
-<div>
-  For more information, please visit our
-  <%= link_to 'Extended Metadata Help Page', 'https://docs.seek4science.org/tech/extended-metadata.html', target: '_blank' %>.
-</div>
-<br>
 
-<%= render partial: 'emt-tabs' -%>
+<%= render partial: 'help_info' -%>
+
+<%= render partial: 'emt_tabs' -%>
 
 <script>
     var jobIdPresent = <%= session[:job_id].present? %>;
