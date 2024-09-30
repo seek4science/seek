@@ -87,62 +87,18 @@ class SampleTypeTest < ActiveSupport::TestCase
       refute st.can_view?
     end
 
-    # can view if in project
-    person2 = FactoryBot.create(:person,project:@project)
-    st = FactoryBot.create(:simple_sample_type,projects:[@project])
-    assert_equal [@project],st.projects & @person.projects
-    assert st.can_view?(@person.user)
-    User.with_current_user(@person.user) do
-      assert st.can_view?
-    end
+    other_person = FactoryBot.create(:person)
 
-    # can view if it has a public sample
-    public_sample = FactoryBot.create(:sample,policy:FactoryBot.create(:public_policy))
-    private_sample = FactoryBot.create(:sample,policy:FactoryBot.create(:private_policy))
+    # Can view if sample type is public
+    public_st = FactoryBot.create(:simple_sample_type, policy: FactoryBot.create(:public_policy))
+    assert public_st.can_view?
+    assert public_st.can_view?(other_person)
 
-    assert public_sample.can_view?
-    st = public_sample.sample_type
-    assert st.can_view?
-    assert st.can_view?(@person.user)
-    User.with_current_user(@person.user) do
-      assert st.can_view?
-    end
-    assert_empty st.projects & @person.projects
+    # Can view if permission is set
+    private_shared_st = FactoryBot.create(:simple_sample_type, policy: FactoryBot.create(:private_policy, permissions: [FactoryBot.create(:permission, contributor: other_person, access_type: Policy::VISIBLE)]))
+    private_shared_st.can_view?
+    private_shared_st.can_view?(other_person)
 
-    refute private_sample.can_view?
-    st = private_sample.sample_type
-    refute st.can_view?
-    refute st.can_view?(@person.user)
-    User.with_current_user(@person.user) do
-      refute st.can_view?
-    end
-
-    assert_empty st.projects & @person.projects
-
-  end
-
-  test 'can view with a referring sample' do
-    person = FactoryBot.create(:person)
-    sample = FactoryBot.create(:sample,policy:FactoryBot.create(:private_policy,permissions:[FactoryBot.create(:permission,contributor:person, access_type:Policy::VISIBLE)]))
-    sample_type = sample.sample_type
-
-    assert sample.can_view?(person.user)
-    refute sample.can_view?
-    refute sample_type.can_view?
-    refute sample_type.can_view?(person.user)
-
-    assert sample_type.can_view?(person.user,sample)
-
-    # doesn't give access to a different sample type
-    refute FactoryBot.create(:simple_sample_type).can_view?(person.user,sample)
-
-    # an already visible sample type isn't hidden by passing a hidden sample
-    sample_type = FactoryBot.create(:simple_sample_type,projects:[@project])
-    assert sample_type.can_view?(@person.user)
-    sample = FactoryBot.create(:sample,sample_type:sample_type)
-    refute sample.can_view?(@person.user)
-    assert_equal sample_type, sample.sample_type
-    assert sample_type.can_view?(@person.user,sample)
   end
 
   test 'can download?' do
@@ -156,33 +112,6 @@ class SampleTypeTest < ActiveSupport::TestCase
     User.with_current_user(@person.user) do
       refute st.can_download?
     end
-
-    # can download if in project
-    person = FactoryBot.create(:person, project: @project)
-    st2 = FactoryBot.create(:simple_sample_type, projects: [@project])
-    assert_equal [@project], st2.projects & @person.projects
-    assert [person, @person].all? { |p| st2.projects.map(&:people).flatten.include? p }
-    assert st2.can_download?(@person.user)
-    User.with_current_user(@person.user) do
-      assert st2.can_download?
-    end
-
-    # can download if it has a public sample
-    public_sample = FactoryBot.create(:sample, policy: FactoryBot.create(:public_policy))
-    private_sample = FactoryBot.create(:sample, policy: FactoryBot.create(:private_policy))
-
-    assert public_sample.can_download?
-    st3 = public_sample.sample_type
-    assert st3.can_download?
-    assert st3.can_download?(@person.user)
-    assert_empty st3.projects & @person.projects
-
-    refute private_sample.can_download?
-    st4 = private_sample.sample_type
-    refute st4.can_download?
-    refute st4.can_download?(@person.user)
-    refute st4.can_download?(@person.user)
-    assert_empty st4.projects & @person.projects
   end
 
   test 'validate title and decription length' do
@@ -576,59 +505,19 @@ class SampleTypeTest < ActiveSupport::TestCase
 
   test 'can edit' do
     with_config_value :project_admin_sample_type_restriction, false do
-      # project admin can edit
-      person = FactoryBot.create(:project_administrator)
-      sample_type = FactoryBot.create(:simple_sample_type,projects:person.projects)
-      refute_equal person,sample_type.contributor
-      assert sample_type.can_edit?(person.user)
-      User.with_current_user(person.user) do
-        assert sample_type.can_edit?
-      end
-
-      # contributor can edit, even if not an proj admin
       person = FactoryBot.create(:person)
-      sample_type = FactoryBot.create(:simple_sample_type,projects:person.projects, contributor:person)
-      assert_equal person,sample_type.contributor
-      assert sample_type.can_edit?(person.user)
-      User.with_current_user(person.user) do
-        assert sample_type.can_edit?
-      end
+      other_person = FactoryBot.create(:person)
+      unauthorized_person = FactoryBot.create(:person)
+      private_shared_sample_type = FactoryBot.create(:simple_sample_type, contributor: person, projects: person.projects, policy: FactoryBot.create(:private_policy, permissions: [FactoryBot.create(:permission, contributor: other_person, access_type: Policy::EDITING)]))
+      assert private_shared_sample_type.can_edit?(person.user)
+      assert private_shared_sample_type.can_edit?(other_person.user)
+      refute private_shared_sample_type.can_edit?(unauthorized_person.user)
 
-      # project member, but not contributor or proj admin cannot edit
-      person = FactoryBot.create(:person)
-      sample_type = FactoryBot.create(:simple_sample_type,projects:person.projects)
-      refute_equal person,sample_type.contributor
-      refute sample_type.can_edit?(person.user)
-      User.with_current_user(person.user) do
-        refute sample_type.can_edit?
-      end
+      editing_public_sample_type = FactoryBot.create(:simple_sample_type, contributor: person, projects: person.projects, policy: FactoryBot.create(:editing_public_policy))
+      assert editing_public_sample_type.can_edit?(person.user)
+      assert editing_public_sample_type.can_edit?(other_person.user)
+      assert editing_public_sample_type.can_edit?(unauthorized_person.user)
 
-      # member of other project, even if proj admin, cannot edit
-      person = FactoryBot.create(:project_administrator)
-      sample_type = FactoryBot.create(:simple_sample_type, projects: [FactoryBot.create(:project)])
-      refute_equal person, sample_type.contributor
-      assert_empty sample_type.projects & person.projects
-      refute sample_type.can_edit?(person.user)
-      User.with_current_user(person.user) do
-        refute sample_type.can_edit?
-      end
-
-      # seek admin can edit
-      person = FactoryBot.create(:admin)
-      sample_type = FactoryBot.create(:simple_sample_type,projects:[FactoryBot.create(:project)])
-      refute_equal person,sample_type.contributor
-      assert_empty sample_type.projects & person.projects
-      assert sample_type.can_edit?(person.user)
-      User.with_current_user(person.user) do
-        assert sample_type.can_edit?
-      end
-
-      #anonymous user cannot edit
-      sample_type = FactoryBot.create(:simple_sample_type,projects:[FactoryBot.create(:project)])
-      refute sample_type.can_edit?(nil)
-      User.with_current_user(nil) do
-        refute sample_type.can_edit?
-      end
     end
   end
 

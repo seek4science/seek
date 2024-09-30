@@ -648,14 +648,12 @@ class SampleTypesControllerTest < ActionController::TestCase
     person = FactoryBot.create(:person)
     st1 = FactoryBot.create(:simple_sample_type, projects: person.projects, contributor: person)
     st2 = FactoryBot.create(:simple_sample_type)
-    st3 = FactoryBot.create(:sample, policy: FactoryBot.create(:public_policy)).sample_type # type with a public sample associated
-    st4 = FactoryBot.create(:simple_sample_type, projects: person.projects, policy: FactoryBot.create(:public_policy))
+    st3 = FactoryBot.create(:simple_sample_type, projects: person.projects, policy: FactoryBot.create(:public_policy))
     login_as(person.user)
 
     assert st1.can_view?
     refute st2.can_view?
     assert st3.can_view?
-    assert st4.can_view?
 
     get :index
 
@@ -663,7 +661,6 @@ class SampleTypesControllerTest < ActionController::TestCase
       assert_select 'div.list_item_title a[href=?]', sample_type_path(st1)
       assert_select 'div.list_item_title a[href=?]', sample_type_path(st2), count: 0
       assert_select 'div.list_item_title a[href=?]', sample_type_path(st3)
-      assert_select 'div.list_item_title a[href=?]', sample_type_path(st4)
     end
   end
 
