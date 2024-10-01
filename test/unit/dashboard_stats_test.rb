@@ -1,6 +1,15 @@
 require 'test_helper'
-
+require 'timecop'
 class DashboardStatsTest < ActiveSupport::TestCase
+
+  setup do
+    Timecop.freeze(Time.local(2024, 9, 15, 12, 0, 0))
+  end
+
+  teardown do
+    Timecop.return
+  end
+
   test 'clear cache' do
     suffixes = %w[activity contributions all_asset_accessibility contributor_activity]
     # admin

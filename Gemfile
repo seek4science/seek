@@ -199,6 +199,7 @@ group :test do
   gem 'whenever-test'
   # Easy installation and use of web drivers to run system tests with browsers
   gem 'webdrivers'
+  gem 'timecop', '~> 0.9.10'
 end
 
 group :test, :development do
