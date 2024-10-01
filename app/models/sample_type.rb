@@ -67,6 +67,7 @@ class SampleType < ApplicationRecord
     return [] if studies.empty? && assays.empty?
 
     (studies.map(&:investigation).compact << assays.map(&:investigation).compact).flatten.uniq
+  end
 
   # Creates sample attributes from an ISA template.
   # @param template [Template] The ISA template to create sample attributes from.
@@ -90,7 +91,6 @@ class SampleType < ApplicationRecord
         template_attribute_id: temp_attr.id
       )
     end
-
   end
 
   def level
