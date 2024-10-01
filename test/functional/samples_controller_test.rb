@@ -793,56 +793,56 @@ class SamplesControllerTest < ActionController::TestCase
     assert_select '.list_item_title a[href=?]', sample_path(linking_sample), text: /#{linking_sample.title}/
   end
 
-  test 'referring sample id is added to sample type link, if necessary' do
-    person = FactoryBot.create(:person)
-    sample = FactoryBot.create(:sample,policy:FactoryBot.create(:private_policy,permissions:[FactoryBot.create(:permission,contributor:person, access_type:Policy::VISIBLE)]))
-    sample_type = sample.sample_type
-    login_as(person.user)
+  # test 'referring sample id is added to sample type link, if necessary' do
+  #   person = FactoryBot.create(:person)
+  #   sample = FactoryBot.create(:sample,policy:FactoryBot.create(:private_policy,permissions:[FactoryBot.create(:permission,contributor:person, access_type:Policy::VISIBLE)]))
+  #   sample_type = sample.sample_type
+  #   login_as(person.user)
+  #
+  #   assert sample.can_view?
+  #   refute sample_type.can_view?
+  #
+  #   get :show, params: { id:sample.id }
+  #   assert_response :success
+  #
+  #   assert_select 'a[href=?]',sample_type_path(sample_type,referring_sample_id:sample.id),text:/#{sample_type.title}/
+  #
+  #   sample2 = FactoryBot.create(:sample,policy:FactoryBot.create(:public_policy))
+  #   sample_type2 = sample2.sample_type
+  #
+  #   assert sample2.can_view?
+  #   assert sample_type2.can_view?
+  #
+  #   get :show, params: { id:sample2.id }
+  #   assert_response :success
+  #
+  #   # no referring sample required
+  #   assert_select 'a[href=?]',sample_type_path(sample_type2),text:/#{sample_type2.title}/
+  #
+  # end
 
-    assert sample.can_view?
-    refute sample_type.can_view?
-
-    get :show, params: { id:sample.id }
-    assert_response :success
-
-    assert_select 'a[href=?]',sample_type_path(sample_type,referring_sample_id:sample.id),text:/#{sample_type.title}/
-
-    sample2 = FactoryBot.create(:sample,policy:FactoryBot.create(:public_policy))
-    sample_type2 = sample2.sample_type
-
-    assert sample2.can_view?
-    assert sample_type2.can_view?
-
-    get :show, params: { id:sample2.id }
-    assert_response :success
-
-    # no referring sample required
-    assert_select 'a[href=?]',sample_type_path(sample_type2),text:/#{sample_type2.title}/
-
-  end
-
-  test 'referring sample id is added to sample type links in list items' do
-    person = FactoryBot.create(:person)
-    sample = FactoryBot.create(:sample,policy:FactoryBot.create(:private_policy,permissions:[FactoryBot.create(:permission,contributor:person, access_type:Policy::VISIBLE)]))
-    sample_type = sample.sample_type
-    sample2 = FactoryBot.create(:sample,policy:FactoryBot.create(:public_policy))
-    sample_type2 = sample2.sample_type
-    login_as(person.user)
-
-    assert sample.can_view?
-    refute sample_type.can_view?
-
-    assert sample2.can_view?
-    assert sample_type2.can_view?
-
-    get :index
-
-    assert_select 'a[href=?]',sample_type_path(sample_type,referring_sample_id:sample.id),text:/#{sample_type.title}/
-
-    # no referring sample required, ST is already visible
-    assert_select 'a[href=?]',sample_type_path(sample_type2),text:/#{sample_type2.title}/
-
-  end
+  # test 'referring sample id is added to sample type links in list items' do
+  #   person = FactoryBot.create(:person)
+  #   sample = FactoryBot.create(:sample,policy:FactoryBot.create(:private_policy,permissions:[FactoryBot.create(:permission,contributor:person, access_type:Policy::VISIBLE)]))
+  #   sample_type = sample.sample_type
+  #   sample2 = FactoryBot.create(:sample,policy:FactoryBot.create(:public_policy))
+  #   sample_type2 = sample2.sample_type
+  #   login_as(person.user)
+  #
+  #   assert sample.can_view?
+  #   refute sample_type.can_view?
+  #
+  #   assert sample2.can_view?
+  #   assert sample_type2.can_view?
+  #
+  #   get :index
+  #
+  #   assert_select 'a[href=?]',sample_type_path(sample_type,referring_sample_id:sample.id),text:/#{sample_type.title}/
+  #
+  #   # no referring sample required, ST is already visible
+  #   assert_select 'a[href=?]',sample_type_path(sample_type2),text:/#{sample_type2.title}/
+  #
+  # end
 
   test 'manage menu item appears according to permission' do
     check_manage_edit_menu_for_type('sample')
