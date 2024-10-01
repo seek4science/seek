@@ -19,8 +19,13 @@ class Study < ApplicationRecord
   has_many :assay_publications, through: :assays, source: :publications
 
   has_many :assay_sops, through: :assays, source: :sops
-  has_many :sop_versions, through: :assays
+  has_many :sop_versions, -> { distinct }, through: :assays
+  has_many :assay_data_files, -> { distinct }, through: :assays, source: :data_files
+  has_many :data_file_versions, -> { distinct }, through: :assays
+  has_many :assay_samples, -> { distinct }, through: :assays, source: :samples
   has_many :observation_units
+  has_many :observations_unit_data_files, -> { distinct }, through: :observation_units, source: :data_files
+  has_many :observations_unit_samples, -> { distinct }, through: :observation_units, source: :samples
 
   has_one :external_asset, as: :seek_entity, dependent: :destroy
 
@@ -32,11 +37,6 @@ class Study < ApplicationRecord
 
   enforce_authorization_on_association :investigation, :view
 
-  %w[data_file model document].each do |type|
-    has_many "#{type}_versions".to_sym, -> { distinct }, through: :assays
-    has_many "related_#{type.pluralize}".to_sym, -> { distinct }, through: :assays, source: type.pluralize.to_sym
-  end
-
   # the associated projects from the Investigation.
   # Overrides the :through :investigation, as that relies on being saved to the database first, causing validation issues
   def projects
@@ -45,10 +45,6 @@ class Study < ApplicationRecord
 
   def assay_streams
     assays.select(&:is_assay_stream?)
-  end
-
-  def assets
-    related_data_files + related_sops + related_models + related_publications + related_documents
   end
 
   def state_allows_delete? *args
@@ -81,6 +77,28 @@ class Study < ApplicationRecord
 
   def self.filter_by_projects(projects)
     joins(:projects).where(investigations: {investigations_projects: {project_id: projects}})
+  end
+
+  %w[model document].each do |type|
+    has_many "#{type}_versions".to_sym, -> { distinct }, through: :assays
+    has_many "related_#{type.pluralize}".to_sym, -> { distinct }, through: :assays, source: type.pluralize.to_sym
+  end
+
+  # related
+
+  def assets
+    related_data_files + related_sops + related_models + related_publications + related_documents
+  end
+  def related_data_file_ids
+    observations_unit_data_file_ids | assay_data_file_ids
+  end
+
+  def related_sample_ids
+    observations_unit_sample_ids | assay_sample_ids
+  end
+
+  def related_samples
+    Sample.where(id: related_sample_ids)
   end
 
   def related_publication_ids

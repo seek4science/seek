@@ -7,6 +7,10 @@ module Seek
         Seek::FairDataStation::Assay
       end
 
+      def seek_attributes
+        super.except(:title, :description)
+      end
+
       def populate_seek_sample(seek_sample)
         sample_type = seek_sample.sample_type
         data = {}

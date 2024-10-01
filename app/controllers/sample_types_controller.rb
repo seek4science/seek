@@ -14,7 +14,7 @@ class SampleTypesController < ApplicationController
 
   before_action :find_and_authorize_requested_item, except: %i[index new create]
 
-  api_actions :index
+  api_actions :index, :show, :create, :update, :destroy
 
   # GET /sample_types/1  ,'sample_attributes','linked_sample_attributes'
   # GET /sample_types/1.json

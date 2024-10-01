@@ -17,6 +17,7 @@ module Seek
         acts_as_uniquely_identifiable
         acts_as_discussable
         has_extended_metadata
+        has_external_identifier
 
         title_trimmer
 

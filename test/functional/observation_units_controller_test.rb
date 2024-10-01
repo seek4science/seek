@@ -36,6 +36,9 @@ class ObservationUnitsControllerTest < ActionController::TestCase
     login_as(unit.contributor)
     get :edit, params: { id: unit.id}
     assert_response :success
+    assert_select 'form.edit_observation_unit' do
+      assert_select 'div#project-selector', count: 0
+    end
   end
 
   test 'manage' do
@@ -43,6 +46,9 @@ class ObservationUnitsControllerTest < ActionController::TestCase
     login_as(unit.contributor)
     get :manage, params: { id: unit.id}
     assert_response :success
+    assert_select 'form.edit_observation_unit' do
+      assert_select 'div#project-selector'
+    end
   end
 
   test 'manage update' do
@@ -83,12 +89,16 @@ class ObservationUnitsControllerTest < ActionController::TestCase
   test 'update' do
     obs_unit = FactoryBot.create(:observation_unit)
     emt = FactoryBot.create(:simple_observation_unit_extended_metadata_type)
+    datafile = FactoryBot.create(:data_file, contributor: obs_unit.contributor)
+    sample = FactoryBot.create(:sample, contributor: obs_unit.contributor)
     login_as(obs_unit.contributor)
 
     patch :update, params: { id: obs_unit,
                              observation_unit:{
                                title: 'updated title',
                                description: 'updated description',
+                               data_file_ids: [datafile.id],
+                               sample_ids: [sample.id],
                                extended_metadata_attributes: {
                                  extended_metadata_type_id: emt.id,
                                  data: {
@@ -96,7 +106,9 @@ class ObservationUnitsControllerTest < ActionController::TestCase
                                    strain: 'updated strain'
                                  }
                                }
-                             }}
+                             },
+                             tag_list:'fish, soup',
+    }
 
     assert_redirected_to obs_unit
 
@@ -106,17 +118,88 @@ class ObservationUnitsControllerTest < ActionController::TestCase
     assert_equal emt, obs_unit.extended_metadata.extended_metadata_type
     assert_equal 'updated name', obs_unit.extended_metadata.get_attribute_value('name')
     assert_equal 'updated strain', obs_unit.extended_metadata.get_attribute_value('strain')
+    assert_equal %w[fish soup], obs_unit.tags.sort
+    assert_equal [datafile], obs_unit.data_files
+    assert_equal [sample], obs_unit.samples
   end
 
-  test 'no access if fair data station disabled' do
+  test 'new' do
+    person = FactoryBot.create(:person)
+    FactoryBot.create(:study, contributor: person)
+    login_as(person)
+    get :new
+    assert_response :success
+    assert_select 'form.new_observation_unit' do
+      assert_select 'div#project-selector'
+    end
+  end
+
+  test 'create' do
+    emt = FactoryBot.create(:simple_observation_unit_extended_metadata_type)
+    contributor = FactoryBot.create(:person)
+    study = FactoryBot.create(:study, contributor: contributor)
+    datafile = FactoryBot.create(:data_file, contributor: contributor)
+    sample = FactoryBot.create(:sample, contributor: contributor)
+    project = contributor.projects.first
+    other_person = FactoryBot.create(:person)
+    creator = FactoryBot.create(:person)
+    login_as(contributor)
+
+    post :create, params: {  observation_unit:{
+                               title: 'new title',
+                               description: 'new description',
+                               creator_ids: [creator.id],
+                               project_ids: [project.id],
+                               data_file_ids: [datafile.id],
+                               sample_ids: [sample.id],
+                               study_id: study,
+                               extended_metadata_attributes: {
+                                 extended_metadata_type_id: emt.id,
+                                 data: {
+                                   name: 'new name',
+                                   strain: 'new strain'
+                                 }
+                               }
+                             },
+                             tag_list:'fish, soup',
+                             policy_attributes: {
+                               access_type: Policy::VISIBLE,
+                               permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}
+                               }
+                             }
+    }
+
+    assert_redirected_to obs_unit=assigns(:observation_unit)
+    assert_equal 'new title', obs_unit.title
+    assert_equal 'new description', obs_unit.description
+    assert_equal emt, obs_unit.extended_metadata.extended_metadata_type
+    assert_equal 'new name', obs_unit.extended_metadata.get_attribute_value('name')
+    assert_equal 'new strain', obs_unit.extended_metadata.get_attribute_value('strain')
+    assert_equal %w[fish soup], obs_unit.tags.sort
+    assert_equal contributor, obs_unit.contributor
+    assert_equal [project],obs_unit.projects
+    assert_equal [creator],obs_unit.creators
+    assert_equal [datafile],obs_unit.data_files
+    assert_equal [sample],obs_unit.samples
+    assert_equal Policy::VISIBLE,obs_unit.policy.access_type
+    assert_equal 1,obs_unit.policy.permissions.count
+    assert_equal other_person,obs_unit.policy.permissions.first.contributor
+    assert_equal Policy::MANAGING,obs_unit.policy.permissions.first.access_type
+  end
+
+  test 'no access if observation units disabled' do
     unit = FactoryBot.create(:max_observation_unit)
     login_as(unit.contributor)
-    with_config_value(:fair_data_station_enabled, false) do
+    with_config_value(:observation_units_enabled, false) do
       get :show, params: { id: unit.id }
       assert_redirected_to :root
       refute_nil flash[:error]
 
       get :index
+      assert_redirected_to :root
+      refute_nil flash[:error]
+
+      get :new
       assert_redirected_to :root
       refute_nil flash[:error]
 

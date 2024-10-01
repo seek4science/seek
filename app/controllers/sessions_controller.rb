@@ -66,16 +66,7 @@ class SessionsController < ApplicationController
   def destroy
     logout_user
     flash[:notice] = 'You have been logged out.'
-
-    begin
-      if request.env['HTTP_REFERER'].try(:normalize_trailing_slash) == search_url.normalize_trailing_slash
-        redirect_to :root
-      else
-        redirect_back(fallback_location: root_path)
-      end
-    rescue RedirectBackError
-      redirect controller: :homes, action: :index
-    end
+    redirect_to :root
   end
 
   protected

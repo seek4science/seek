@@ -3,7 +3,6 @@ FactoryBot.define do
   factory(:sample_type) do
     sequence(:title) { |n| "SampleType #{n}" }
     with_project_contributor
-    #projects { [FactoryBot.build(:project)] }
   end
 
   factory(:patient_sample_type, parent: :sample_type) do
@@ -240,6 +239,19 @@ FactoryBot.define do
       type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Scientific name', pid:'http://gbol.life/0.1/scientificName', sample_type: type)
       type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Organism', pid:'http://purl.uniprot.org/core/organism', sample_type: type)
 
+    end
+  end
+
+  factory(:fairdatastation_test_case_sample_type, parent: :sample_type) do
+    title { 'fair data station test case'}
+    after(:build) do |type, eval|
+      type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Title', sample_type: type, is_title: true)
+      type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Description', sample_type: type)
+
+      type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Bio safety level', pid:'http://fairbydesign.nl/ontology/biosafety_level', sample_type: type)
+      type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Scientific name', pid:'http://gbol.life/0.1/scientificName', sample_type: type)
+      type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Organism ncbi id', pid:'http://purl.uniprot.org/core/organism', sample_type: type)
+      type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Collection date', pid:'https://w3id.org/mixs/0000011', sample_type: type)
     end
   end
 end

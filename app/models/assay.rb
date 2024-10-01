@@ -47,6 +47,8 @@ class Assay < ApplicationRecord
   has_many :models, through: :assay_assets, source: :asset, source_type: 'Model', inverse_of: :assays
   has_many :samples, through: :assay_assets, source: :asset, source_type: 'Sample', inverse_of: :assays
   has_many :documents, through: :assay_assets, source: :asset, source_type: 'Document', inverse_of: :assays
+  has_many :observation_units, through: :samples
+
 
   has_one :investigation, through: :study
   has_one :external_asset, as: :seek_entity, dependent: :destroy
@@ -58,6 +60,7 @@ class Assay < ApplicationRecord
   validates_presence_of :contributor
   validates_presence_of :assay_class
   validates :study, presence: { message: 'must be selected and valid' }, projects: true
+  validate :study_matches_observation_units_if_present
 
   before_validation :default_assay_and_technology_type
 
@@ -301,6 +304,16 @@ class Assay < ApplicationRecord
 
   private
 
+  def study_matches_observation_units_if_present
+    return if samples.empty?
+    samples.each do |sample|
+      if sample.observation_unit && sample.observation_unit.study != study
+          errors.add(:study, 'must match the associated observation unit')
+          return false
+      end
+    end
+  end
+
   def set_assay_assets_for(type, attributes)
     type_assay_assets, other_assay_assets = assay_assets.partition { |aa| aa.asset_type == type }
     new_type_assay_assets = []
@@ -326,5 +339,9 @@ class Assay < ApplicationRecord
 
   def related_sop_ids
     sop_ids
+  end
+
+  def related_data_file_ids
+    data_file_ids
   end
 end

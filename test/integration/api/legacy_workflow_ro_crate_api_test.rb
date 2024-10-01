@@ -1,12 +1,13 @@
 require 'test_helper'
 
 class LegacyWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
+  include ApiTestHelper
+
   setup do
-    admin = FactoryBot.create(:admin)
-    login_as(admin.user)
+    user_login
     FactoryBot.create(:cwl_workflow_class) # Make sure the CWL class is present
     FactoryBot.create(:nextflow_workflow_class)
-    @project = admin.person.projects.first
+    @project = current_person.projects.first
     @git_support = Seek::Config.git_support_enabled
     Seek::Config.git_support_enabled = false
   end
@@ -22,7 +23,7 @@ class LegacyWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
         workflow: {
           project_ids: [@project.id]
         }
-      }
+      }, headers: { 'Authorization' => write_access_auth }
 
       assert_response :success
       assert_equal 'Nextflow', assigns(:workflow).workflow_class.title
@@ -33,7 +34,7 @@ class LegacyWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'can post RO crate as new version' do
-    workflow = FactoryBot.create(:workflow, policy: FactoryBot.create(:public_policy), contributor: @current_person)
+    workflow = FactoryBot.create(:workflow, policy: FactoryBot.create(:public_policy), contributor: current_person)
 
     assert_no_difference('Workflow.count') do
       assert_difference('Workflow::Version.count', 1) do
@@ -43,7 +44,7 @@ class LegacyWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
             project_ids: [@project.id]
           },
           revision_comments: 'new ver'
-        }
+        }, headers: { 'Authorization' => write_access_auth }
 
         assert_response :success
         assert_equal 2, assigns(:workflow).reload.version
@@ -62,7 +63,7 @@ class LegacyWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
         workflow: {
           project_ids: [@project.id]
         }
-      }
+      }, headers: { 'Authorization' => write_access_auth }
 
       assert_response :unprocessable_entity
       assert @response.body.include?("can't be blank")
@@ -77,7 +78,7 @@ class LegacyWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
           title: 'Alternative title',
           project_ids: [@project.id]
         }
-      }
+      }, headers: { 'Authorization' => write_access_auth }
 
       assert_response :success
       assert_equal 'Alternative title', assigns(:workflow).title
@@ -86,8 +87,11 @@ class LegacyWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
 
   private
 
-  def login_as(user)
-    User.current_user = user
-    post '/session', params: { login: user.login, password: generate_user_password }
+  def write_access_auth
+    "Bearer #{@write_access_token.token}"
+  end
+
+  def read_access_auth
+    "Bearer #{@read_access_token.token}"
   end
 end

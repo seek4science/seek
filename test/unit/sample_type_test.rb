@@ -1036,6 +1036,25 @@ class SampleTypeTest < ActiveSupport::TestCase
     assert third_sample_type.next_linked_sample_types.blank?
   end
 
+  test 'create sample attributes from isa template' do
+    template1 = FactoryBot.create(:isa_source_template)
+    template2 = FactoryBot.create(:isa_sample_collection_template)
+
+    sample_type1 = FactoryBot.create(:simple_sample_type, title: 'Sample Type 1', project_ids: @project_ids, contributor: @person, template_id: template1.id)
+    sample_type1.create_sample_attributes_from_isa_template(template1)
+    assert sample_type1.valid?
+    sample_type1.sample_attributes.map do |sa|
+      assert template1.template_attributes.map(&:id).include? sa.template_attribute_id
+    end
+
+    sample_type2 = FactoryBot.create(:simple_sample_type, title: 'Sample Type 2', project_ids: @project_ids, contributor: @person, template_id: template2.id)
+    sample_type2.create_sample_attributes_from_isa_template(template2, sample_type1)
+    assert sample_type2.valid?
+    sample_type2.sample_attributes.map do |sa|
+      assert template2.template_attributes.map(&:id).include? sa.template_attribute_id
+    end
+  end
+
   private
 
   # sample type with 3 samples

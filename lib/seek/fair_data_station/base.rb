@@ -37,8 +37,6 @@ module Seek
 
       def annotations
         @_cached_annotations ||= query_annotations
-
-
       end
 
       def additional_metadata_annotations
@@ -90,7 +88,7 @@ module Seek
       end
 
       def seek_attributes
-        { title: title, description: description }
+        { title: title, description: description, external_identifier: identifier }
       end
 
       def populate_extended_metadata(seek_resource)

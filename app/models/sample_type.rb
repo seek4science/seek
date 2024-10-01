@@ -25,6 +25,7 @@ class SampleType < ApplicationRecord
   acts_as_uniquely_identifiable
 
   acts_as_favouritable
+  has_external_identifier # to be replaced with acts_as_asset when sharing permissions are adding in upcoming pull request
 
   acts_as_asset
 
@@ -66,6 +67,30 @@ class SampleType < ApplicationRecord
     return [] if studies.empty? && assays.empty?
 
     (studies.map(&:investigation).compact << assays.map(&:investigation).compact).flatten.uniq
+
+  # Creates sample attributes from an ISA template.
+  # @param template [Template] The ISA template to create sample attributes from.
+  # @param linked_sample_type [SampleType, nil] The linked sample type, if any.
+  def create_sample_attributes_from_isa_template(template, linked_sample_type = nil)
+    self.sample_attributes = template.template_attributes.map do |temp_attr|
+      has_seek_samples = temp_attr.sample_attribute_type.seek_sample? || temp_attr.sample_attribute_type.seek_sample_multi?
+      has_linked_st = linked_sample_type && has_seek_samples
+
+      SampleAttribute.new(
+        title: temp_attr.title,
+        description: temp_attr.description,
+        sample_attribute_type_id: temp_attr.sample_attribute_type_id,
+        required: temp_attr.required,
+        unit_id: temp_attr.unit_id,
+        is_title: temp_attr.is_title,
+        sample_controlled_vocab_id: temp_attr.sample_controlled_vocab_id,
+        linked_sample_type_id: has_linked_st ? linked_sample_type&.id : nil,
+        isa_tag_id: temp_attr.isa_tag_id,
+        allow_cv_free_text: temp_attr.allow_cv_free_text,
+        template_attribute_id: temp_attr.id
+      )
+    end
+
   end
 
   def level

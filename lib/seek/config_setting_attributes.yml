@@ -205,6 +205,7 @@ data_files_enabled:
 documents_enabled:
 events_enabled:
 isa_enabled:
+observation_units_enabled:
 models_enabled:
 organisms_enabled:
 programmes_enabled:
