@@ -892,7 +892,6 @@ GEM
     tilt (2.0.10)
     time (0.2.2)
       date
-    timecop (0.9.10)
     timeout (0.4.1)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
@@ -1096,7 +1095,6 @@ DEPENDENCIES
   terrapin
   terser (~> 1.1, >= 1.1.1)
   test-prof
-  timecop (~> 0.9.10)
   unicorn-rails
   uuid (~> 2.3)
   validate_url
