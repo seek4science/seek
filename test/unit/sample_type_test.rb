@@ -454,13 +454,13 @@ class SampleTypeTest < ActiveSupport::TestCase
         sample_type.save!
         blob = sample_type.content_blob
 
-        assert_difference('ContentBlob.count', -1) do
-          assert_difference('SampleType.count', -1) do
-            sample_type.destroy
-          end
+        refute blob.deleted?
+
+        assert_difference('SampleType.count', -1) do
+          sample_type.destroy
         end
 
-        assert blob.destroyed?
+        assert blob.deleted?
       end
     end
   end
