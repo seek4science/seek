@@ -1,6 +1,14 @@
 require 'test_helper'
 
 class DashboardStatsTest < ActiveSupport::TestCase
+  def setup
+    travel_to Time.zone.local(2024, 9, 15, 12, 0, 0)
+  end
+
+  def teardown
+    Time.current
+  end
+
   test 'clear cache' do
     suffixes = %w[activity contributions all_asset_accessibility contributor_activity]
     # admin
