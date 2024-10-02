@@ -190,7 +190,7 @@ module Seek
                 f << (value.is_a?(String) ? { 'type' => value } : value).merge('name' => name)
               end
             end
-            t['fields'] = f.map { |fi| normalise_type(fi['type'], tabs + ' ') }
+            t['fields'] = f.flat_map { |fi| normalise_type(fi['type'], tabs + ' ') }
           end
 
           t
