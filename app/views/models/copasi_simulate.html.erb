@@ -15,10 +15,16 @@
         $j('#cps').val(`<%= @blob %>`);
     });
 
+    function automaticChanged() {
+        var autoStepSize = document.getElementById("autoStepSize").checked;
+        document.getElementById("numPoints").disabled = autoStepSize;
+        //console.log("autoStepSize: " + autoStepSize);
+    }
+
     function loadIntoCOPASI()
     {
         var info = copasi.loadModel(document.getElementById("cps").value);
-
+        //console.log(info);
         document.getElementById("model_name").innerHTML = "none";
         if (info['status'] != "success") {
             document.getElementById("simulation_error").innerHTML = "Error loading model: " + info['messages'];
@@ -44,13 +50,45 @@
 
     function runSimulation() {
 
-        document.getElementById("data").innerHTML = "";
-        document.getElementById("chart").innerHTML = "";
+        var autoStepSize = document.getElementById("autoStepSize").checked;
+        var timeStart = parseFloat(document.getElementById("startTime").value);
+        var timeEnd = parseFloat(document.getElementById("endTime").value);
 
-        var result = copasi.simulateYaml(document.getElementById("yaml").value);
+        // console.log("timeStart: " + timeStart);
+        // console.log("timeEnd: " + timeEnd);
+        // console.log("autoStepSize: " + autoStepSize);
+
+        if (autoStepSize) {
+            var result = copasi.simulateYaml({
+                "problem": {
+                    "AutomaticStepSize": true,
+                    "Duration": timeEnd,
+                    "OutputStartTime": timeStart
+                }
+            });
+            loadPlotFromResult(result);
+            return;
+        }
+
+        var numPoints = parseInt(document.getElementById("numPoints").value);
+        var result = copasi.simulateEx(timeStart, timeEnd, numPoints);
+
+        // console.log("result: " + result);
+
+        loadPlotFromResult(result);
+    }
+
+    function loadPlotFromResult(result) {
+
+        if (typeof result === 'string') {
+            result = JSON.parse(result);
+        }
+
+        clearResults();
 
         // dump data
         document.getElementById("data").innerHTML = JSON.stringify(result);
+        //console.log("result2: " + result);
 
         // use highcharts to display data
         var data = [];
@@ -65,6 +103,11 @@
         }
 
         Plotly.newPlot('chart', data);
+    }
+
+    function clearResults() {
+        document.getElementById("data").innerHTML = "";
+        document.getElementById("chart").innerHTML = "";
     }
 
 
@@ -94,13 +137,45 @@
     </div>
   </div>
 
-  <%= open_with_copasi_js_button %>
-  <%= open_with_copasi_ui_button %>
-
 
   <div id="chart"></div>
   <div id="data" class="table collapse"></div>
 
+
+
+  <div class="panel panel-default">
+    <div class="panel-body">
+      <div class="row">
+        <div class="col-sm-2">
+          <label for="startTime">Start Time:</label>
+          <input type="number" class="form-control" id="startTime" placeholder="Enter start time" value="0">
+        </div>
+        <div class="col-sm-2">
+          <label for="endTime">End Time:</label>
+          <input type="number" class="form-control" id="endTime" placeholder="Enter end time" value="10">
+        </div>
+        <div class="col-sm-2">
+          <label for="numPoints">Number of Points:</label>
+          <input type="number" class="form-control" id="numPoints" placeholder="Enter number of points" value="101">
+        </div>
+
+        <div class="col-sm-3">
+          <label for="simulate_js"> &nbsp;</label>
+          <%= open_with_copasi_js_button %>
+        </div>
+        <div class="col-sm-3">
+          <label for="simulate_ui"> &nbsp;</label>
+          <%= open_with_copasi_ui_button %>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-3">
+          <label for="autoStepSize">Automatic Step Size:</label>
+          <input type="checkbox" onclick="automaticChanged()" id="autoStepSize">
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 </div>
