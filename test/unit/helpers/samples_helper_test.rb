@@ -89,10 +89,10 @@ class SamplesHelperTest < ActionView::TestCase
       cv_attribute = FactoryBot.create(:apples_controlled_vocab_attribute,
                                        sample_type: FactoryBot.create(:simple_sample_type),
                                        allow_cv_free_text: true)
-      existing_cv_term = cv_attribute.sample_controlled_vocab.sample_controlled_vocab_terms.first.label
+      existing_cv_term = cv_attribute.sample_controlled_vocab.sample_controlled_vocab_terms.first
       free_text = 'new term'
 
-      [existing_cv_term, free_text].each do |value|
+      [existing_cv_term.label, free_text].each do |value|
         assert_nothing_raised do
           display = display_attribute_value(value, cv_attribute)
           assert_equal value, display
@@ -102,12 +102,13 @@ class SamplesHelperTest < ActionView::TestCase
                                              sample_type: cv_attribute.sample_type,
                                              allow_cv_free_text: true)
 
-      existing_ontology_term = ontology_attribute.sample_controlled_vocab.sample_controlled_vocab_terms.first.label
+      existing_ontology_term = ontology_attribute.sample_controlled_vocab.sample_controlled_vocab_terms.first
 
-      [existing_ontology_term, free_text].each do |value|
-        display = display_attribute_value(value, ontology_attribute)
-        assert display.include? value
-      end
+      display_existing_ontology_term = display_attribute_value(existing_ontology_term.label, ontology_attribute)
+      assert_equal "<label class=\"term-label\">#{existing_ontology_term.label}</label><label class=\"term-iri badge\"><a target=\"_blank\" href=\"#{existing_ontology_term.iri}\">#{existing_ontology_term.iri}</a></label>", display_existing_ontology_term
+
+      display_free_text = display_attribute_value(free_text, ontology_attribute)
+      assert_equal free_text, display_free_text
     end
   end
 
@@ -131,13 +132,14 @@ class SamplesHelperTest < ActionView::TestCase
                                                   sample_type: cv_list_attribute.sample_type,
                                                   allow_cv_free_text: true)
 
-      existing_ontology_list = [ontology_list_attribute.sample_controlled_vocab.sample_controlled_vocab_terms.first.label,
-                                ontology_list_attribute.sample_controlled_vocab.sample_controlled_vocab_terms.second.label]
+      existing_ontology_list = [ontology_list_attribute.sample_controlled_vocab.sample_controlled_vocab_terms.first,
+                                ontology_list_attribute.sample_controlled_vocab.sample_controlled_vocab_terms.second]
 
-      [existing_ontology_list, mixed_list].each do |value|
-        display = display_attribute_value(value, ontology_list_attribute)
-        assert(value.all? { |v| display.include? v })
-      end
+      ontology_list_display = display_attribute_value(existing_ontology_list.map(&:label), ontology_list_attribute)
+      result = existing_ontology_list.map do |value|
+        "<label class=\"term-label\">#{value.label}</label><label class=\"term-iri badge\"><a target=\"_blank\" href=\"#{value.iri}\">#{value.iri}</a></label>"
+      end.join(', ')
+      assert_equal result, ontology_list_display
     end
   end
 end
