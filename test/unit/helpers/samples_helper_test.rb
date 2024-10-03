@@ -82,4 +82,39 @@ class SamplesHelperTest < ActionView::TestCase
       refute attempt_to_show_extract_samples_button?(data_file, data_file.latest_version)
     end
   end
+
+  test 'cv attribute display with free text' do
+    person = FactoryBot.create(:person)
+    User.with_current_user(person.user) do
+      attribute = FactoryBot.create(:apples_controlled_vocab_attribute,
+                                    sample_type: FactoryBot.create(:simple_sample_type),
+                                    allow_cv_free_text:true)
+      existing_term = attribute.sample_controlled_vocab.sample_controlled_vocab_terms.first.label
+      free_text = 'new term'
+
+      [existing_term, free_text].each do |value|
+        assert_nothing_raised do
+          display_attribute_value(value, attribute)
+        end
+      end
+    end
+  end
+
+  test 'cv list attribute display with free text' do
+    person = FactoryBot.create(:person)
+    User.with_current_user(person.user) do
+      attribute = FactoryBot.create(:apples_list_controlled_vocab_attribute,
+                                    sample_type: FactoryBot.create(:simple_sample_type),
+                                    allow_cv_free_text:true)
+      existing_list = [attribute.sample_controlled_vocab.sample_controlled_vocab_terms.first.label,
+                       attribute.sample_controlled_vocab.sample_controlled_vocab_terms.second.label]
+      mixed_list = [existing_list[0], 'new term']
+
+      [existing_list, mixed_list].each do |value|
+        assert_nothing_raised do
+          display_attribute_value(value, attribute)
+        end
+      end
+    end
+  end
 end
