@@ -106,6 +106,20 @@ class EmtExtractorTest < ActiveSupport::TestCase
   end
 
 
+  test 'handles invalid json file' do
+    invalid_emt_file = fixture_file_upload('extended_metadata_type/invalid_json.json')
+
+    assert_no_difference('ExtendedMetadataType.count') do
+
+      error = assert_raises(StandardError) do
+        Seek::ExtendedMetadataType::EMTExtractor.extract_extended_metadata_type(invalid_emt_file)
+      end
+
+      assert_match /Failed to parse JSON file: 784: unexpected token at/, error.message
+    end
+  end
+
+
   test 'handles invalid json file with wrong attr type' do
     invalid_emt_file = fixture_file_upload('extended_metadata_type/invalid_emt_with_wrong_type.json')
 
