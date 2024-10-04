@@ -1,7 +1,8 @@
 class ExtendedMetadataTypesController < ApplicationController
-  respond_to :json
+  respond_to :json, :html
+  skip_before_action :project_membership_required
   before_action :is_user_admin_auth, except: [:form_fields, :show, :index]
-  before_action :find_requested_item, only: [:administer_update, :show]
+  before_action :find_requested_item, only: [:administer_update, :show, :destroy]
   include Seek::IndexPager
 
   api_actions :index, :show
@@ -25,10 +26,38 @@ class ExtendedMetadataTypesController < ApplicationController
     end
   end
 
-  def show
-     respond_to do |format|
-        format.json {render json: @extended_metadata_type}
+  def create
+
+    @extended_metadata_type = ExtendedMetadataType.new
+
+    if params[:emt_json_file].blank?
+      flash[:error] = 'Please select a file to upload!'
+      redirect_to new_extended_metadata_type_path
+    else
+      uploaded_file = params[:emt_json_file]
+      begin
+        Seek::ExtendedMetadataType::EMTExtractor.extract_extended_metadata_type(uploaded_file)
+        flash[:notice] = 'Extended metadata type was successfully created.'
+        redirect_to administer_extended_metadata_types_path
+      rescue StandardError => e
+        flash[:error] = "#{e.message}"
+        redirect_to new_extended_metadata_type_path
       end
+    end
+  end
+
+
+  def new
+    respond_to do |format|
+      format.html
+    end
+  end
+
+  def show
+    respond_to do |format|
+      format.json {render json: @extended_metadata_type}
+      format.html
+    end
   end
 
   def index

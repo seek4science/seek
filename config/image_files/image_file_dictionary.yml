@@ -233,6 +233,7 @@ collection: 'avatars/avatar-collection.png'
 collection_avatar: 'avatars/avatar-collection.png'
 run_galaxy: 'run_galaxy.png'
 folder_avatar: 'avatars/avatar-folder.png'
+extended_metadata_type_avatar: 'avatars/avatar-extended_metadata_type.png'
 
 # roles
 project_administrator: 'roles/role-project-admin.png'

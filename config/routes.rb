@@ -207,6 +207,7 @@ SEEK::Application.routes.draw do
     collection do
       get :form_fields
       get :administer
+      post :create
     end
     member do
       put :administer_update

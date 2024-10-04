@@ -1,0 +1,26 @@
+<%= form_tag extended_metadata_types_path, method: "post", id: "extended_metadata_type_upload_from", multipart: true do -%>
+  <%= folding_panel("JSON file", false, :body_options => {:id => 'add_extended_metadata_type_file_fold_content'},
+                    :help_text => "Here you can upload #{t('extended_metadata_type')} JSON file to populate the #{t('extended_metadata_type').pluralize()}.") do %>
+
+    <div role="tabpanel" data-role="seek-upload-field">
+      <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="upload-field-tab active">
+          <a data-role="seek-upload-field-tab" data-tab-target="local-file" role="tab" data-toggle="tab">Local file</a>
+        </li>
+      </ul>
+      <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" data-role="seek-upload-field-tab-pane" data-tab-id="local-file">
+          <div class="form-group">
+            <%= file_field_tag "emt_json_file", :accept => 'application/json' -%>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  <% end %>
+
+
+  <input value="Upload" type="submit" class="btn btn-primary" >
+  or
+  <%= cancel_button admin_path-%>
+<% end -%>
