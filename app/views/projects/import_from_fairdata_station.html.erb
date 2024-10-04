@@ -1,4 +1,4 @@
-<%= render :partial => "general/page_title",:locals=>{:title=>"Import ISA from FAIRData Station for #{ t('Project') } #{link_to(@project.title, @project)}".html_safe} %>
+<%= render :partial => "general/page_title",:locals=>{:title=>"Import ISA from FAIR Data Station for #{ t('Project') } #{link_to(@project.title, @project)}".html_safe} %>
 
 <% if @existing_investigation %>
   <%= panel("#{image("warning")} Existing #{t('investigation')}", id: 'existing-investigation') do %>

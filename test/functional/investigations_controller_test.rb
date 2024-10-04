@@ -1265,21 +1265,21 @@ class InvestigationsControllerTest < ActionController::TestCase
     with_config_value(:fair_data_station_enabled, true) do
       get :show, params: { id: inv }
       assert_response :success
-      assert_select 'li a[href=?]', update_from_fairdata_station_investigation_path(inv), text:'Update from FAIRData Station', count: 1
+      assert_select 'li a[href=?]', update_from_fairdata_station_investigation_path(inv), text:'Update from FAIR Data Station', count: 1
 
       get :show, params: { id: inv2 }
       assert_response :success
-      assert_select 'li a[href=?]', update_from_fairdata_station_investigation_path(inv2), text:'Update from FAIRData Station', count: 0
+      assert_select 'li a[href=?]', update_from_fairdata_station_investigation_path(inv2), text:'Update from FAIR Data Station', count: 0
 
       get :show, params: { id: inv3 }
       assert_response :success
-      assert_select 'li a[href=?]', update_from_fairdata_station_investigation_path(inv3), text:'Update from FAIRData Station', count: 0
+      assert_select 'li a[href=?]', update_from_fairdata_station_investigation_path(inv3), text:'Update from FAIR Data Station', count: 0
     end
 
     with_config_value(:fair_data_station_enabled, false) do
       get :show, params: { id: inv }
       assert_response :success
-      assert_select 'li a[href=?]', update_from_fairdata_station_investigation_path(inv), text:'Update from FAIRData Station', count: 0
+      assert_select 'li a[href=?]', update_from_fairdata_station_investigation_path(inv), text:'Update from FAIR Data Station', count: 0
     end
   end
 

@@ -1,4 +1,4 @@
-<%= render :partial => "general/page_title",:locals=>{:title=>"Update from FAIRData Station for #{ t('investigation') } #{link_to(@investigation.title, @investigation)}".html_safe} %>
+<%= render :partial => "general/page_title",:locals=>{:title=>"Update from FAIR Data Station for #{ t('investigation') } #{link_to(@investigation.title, @investigation)}".html_safe} %>
 
 <%= form_tag submit_fairdata_station_investigation_path(@investigation), multipart: true do %>
 
