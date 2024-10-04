@@ -1,5 +1,25 @@
 <%= render :partial => "general/page_title",:locals=>{:title=>"Import ISA from FAIRData Station for #{ t('Project') } #{link_to(@project.title, @project)}".html_safe} %>
 
+<% if @existing_investigation %>
+  <%= panel("#{image("warning")} Existing #{t('investigation')}", id: 'existing-investigation') do %>
+
+    <p>
+      A matching <%= t('investigation') %> already
+      exists: <%= link_to(@existing_investigation.title, @existing_investigation) %>
+    </p>
+    <p>
+      You can update this <%= t('investigation') %> by going
+      to <%= link_to('Update from FAIR Data Station', update_from_fairdata_station_investigation_path(@existing_investigation)) %>
+    </p>
+
+  <% end %>
+
+  <p>
+    Otherwise you can try importing a different file ...
+  </p>
+
+<% end %>
+
 <%= form_tag submit_fairdata_station_project_path(@project), multipart: true do %>
 
   <%= panel('FAIR Data Station turtle (ttl) metadata file') do %>
@@ -25,3 +45,4 @@
     <%= submit_tag("Submit", class: 'btn btn-primary') %>
   </div>
 <% end %>
+

@@ -5079,7 +5079,7 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'populate from fairdata station ttl' do
+  test 'import from fairdata station ttl' do
 
     person = FactoryBot.create(:person)
     FactoryBot.create(:fairdatastation_virtual_demo_sample_type)
@@ -5135,6 +5135,37 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_equal 1, sample.policy.permissions.count
     assert_equal another_person, sample.policy.permissions.first.contributor
     assert_equal Policy::MANAGING, sample.policy.permissions.first.access_type
+
+  end
+
+  test 'import from fairdata station ttl existing external id' do
+    person = FactoryBot.create(:person)
+    FactoryBot.create(:fairdatastation_virtual_demo_sample_type)
+    project = person.projects.first
+    another_person = FactoryBot.create(:person)
+    login_as(person)
+
+    investigation = FactoryBot.create(:investigation, external_identifier: 'seek-test-investigation', projects:[project], contributor: person)
+
+
+    ttl_file = fixture_file_upload('fairdatastation/seek-fair-data-station-test-case.ttl')
+    assert_no_difference('Investigation.count') do
+      post :submit_fairdata_station, params: {id: project, datastation_data: ttl_file,
+                                              policy_attributes:{
+                                                access_type: Policy::VISIBLE,
+                                                permissions_attributes: {
+                                                  '0' => { contributor_type: 'Person', contributor_id: another_person.id, access_type: Policy::MANAGING
+                                                  }
+                                                }
+                                              }
+      }
+    end
+    assert_response :unprocessable_entity
+    assert_match /An Investigation with that external identifier already exists for this Project/, flash[:error]
+    assert_select 'div#existing-investigation.panel' do
+      assert_select 'a[href=?]', investigation_path(investigation), text:investigation.title
+      assert_select 'a[href=?]', update_from_fairdata_station_investigation_path(investigation)
+    end
 
   end
 
