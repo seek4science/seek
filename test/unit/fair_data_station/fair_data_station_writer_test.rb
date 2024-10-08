@@ -2,7 +2,7 @@ require 'test_helper'
 
 class FairDataStationWriterTest < ActiveSupport::TestCase
   test 'construct seek isa' do
-    path = "#{Rails.root}/test/fixtures/files/fairdatastation/demo.ttl"
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/demo.ttl"
     inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
     policy = FactoryBot.create(:public_policy)
 
@@ -86,7 +86,7 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     FactoryBot.create(:experimental_assay_class)
     sample_type = FactoryBot.create(:fairdatastation_virtual_demo_sample_type)
 
-    path = "#{Rails.root}/test/fixtures/files/fairdatastation/demo.ttl"
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/demo.ttl"
     inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
     contributor = FactoryBot.create(:person)
     project = contributor.projects.first
@@ -144,7 +144,7 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
   end
 
   test 'observation_unit and assay datasets created in construct_isa' do
-    path = "#{Rails.root}/test/fixtures/files/fairdatastation/seek-fair-data-station-test-case.ttl"
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case.ttl"
     inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
 
     contributor = FactoryBot.create(:person)
@@ -201,7 +201,7 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     FactoryBot.create(:fairdatastation_test_case_sample_type)
     FactoryBot.create(:experimental_assay_class)
 
-    path = "#{Rails.root}/test/fixtures/files/fairdatastation/seek-fair-data-station-test-case.ttl"
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case.ttl"
     inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
     contributor = FactoryBot.create(:person)
     project = contributor.projects.first
@@ -233,7 +233,7 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     projects = investigation.projects
     contributor = investigation.contributor
 
-    path = "#{Rails.root}/test/fixtures/files/fairdatastation/seek-fair-data-station-modified-test-case.ttl"
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-modified-test-case.ttl"
     inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
 
     # on save check, 0 investigation created, 1 study created, 1 obs unit, 1 sample, 1 assay, 3 data file, 3 extended metadata
@@ -350,7 +350,7 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     projects = investigation.projects
     contributor = investigation.contributor
 
-    path = "#{Rails.root}/test/fixtures/files/fairdatastation/seek-fair-data-station-moves-test-case.ttl"
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-moves-test-case.ttl"
     inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
 
     assert_no_difference('Investigation.count') do
@@ -412,7 +412,7 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     projects = investigation.projects
     contributor = investigation.contributor
 
-    path = "#{Rails.root}/test/fixtures/files/fairdatastation/demo.ttl"
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/demo.ttl"
     inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
 
     refute_equal investigation.external_identifier, inv.external_id
@@ -437,7 +437,7 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     contributor = FactoryBot.create(:person)
     project = contributor.projects.first
     policy = FactoryBot.create(:public_policy)
-    path = "#{Rails.root}/test/fixtures/files/fairdatastation/seek-fair-data-station-test-case.ttl"
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case.ttl"
     inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
     investigation = Seek::FairDataStation::Writer.new.construct_isa(inv, contributor, [project], policy)
     assert_difference('Investigation.count', 1) do

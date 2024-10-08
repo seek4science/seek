@@ -1307,7 +1307,7 @@ class InvestigationsControllerTest < ActionController::TestCase
   test 'submit from fair data station' do
     investigation = setup_test_case_investigation
     login_as(investigation.contributor)
-    ttl_file = fixture_file_upload('fairdatastation/seek-fair-data-station-modified-test-case.ttl')
+    ttl_file = fixture_file_upload('fair_data_station/seek-fair-data-station-modified-test-case.ttl')
 
     assert_no_difference('Investigation.count') do
       assert_difference('Study.count', 1) do
@@ -1329,7 +1329,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     login_as(FactoryBot.create(:person))
     assert investigation.can_edit?
     refute investigation.can_manage?
-    ttl_file = fixture_file_upload('fairdatastation/seek-fair-data-station-modified-test-case.ttl')
+    ttl_file = fixture_file_upload('fair_data_station/seek-fair-data-station-modified-test-case.ttl')
 
     assert_no_difference('Investigation.count') do
       assert_no_difference('Study.count') do
@@ -1369,7 +1369,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     investigation = setup_test_case_investigation
     investigation.update(external_identifier: 'some-other-id')
     login_as(investigation.contributor)
-    ttl_file = fixture_file_upload('fairdatastation/seek-fair-data-station-modified-test-case.ttl')
+    ttl_file = fixture_file_upload('fair_data_station/seek-fair-data-station-modified-test-case.ttl')
 
     assert_no_difference('Investigation.count') do
       assert_no_difference('Study.count') do
@@ -1390,7 +1390,7 @@ class InvestigationsControllerTest < ActionController::TestCase
   test 'submit from fair data station invalid metadata' do
     investigation = setup_test_case_investigation
     login_as(investigation.contributor)
-    ttl_file = fixture_file_upload('fairdatastation/seek-fair-data-station-invalid-test-case.ttl')
+    ttl_file = fixture_file_upload('fair_data_station/seek-fair-data-station-invalid-test-case.ttl')
 
     assert_no_difference('Investigation.count') do
       assert_no_difference('Study.count') do
@@ -1427,7 +1427,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     contributor = FactoryBot.create(:person)
     project = contributor.projects.first
     policy = FactoryBot.create(:public_policy)
-    path = "#{Rails.root}/test/fixtures/files/fairdatastation/seek-fair-data-station-test-case.ttl"
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case.ttl"
     inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
     investigation = Seek::FairDataStation::Writer.new.construct_isa(inv, contributor, [project], policy)
     assert_difference('Investigation.count', 1) do

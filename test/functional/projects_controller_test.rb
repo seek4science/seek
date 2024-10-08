@@ -5087,7 +5087,7 @@ class ProjectsControllerTest < ActionController::TestCase
     another_person = FactoryBot.create(:person)
     login_as(person)
 
-    ttl_file = fixture_file_upload('fairdatastation/demo.ttl')
+    ttl_file = fixture_file_upload('fair_data_station/demo.ttl')
 
     post :submit_fairdata_station, params: {id: project, datastation_data: ttl_file,
                                             policy_attributes:{
@@ -5148,7 +5148,7 @@ class ProjectsControllerTest < ActionController::TestCase
     investigation = FactoryBot.create(:investigation, external_identifier: 'seek-test-investigation', projects:[project], contributor: person)
 
 
-    ttl_file = fixture_file_upload('fairdatastation/seek-fair-data-station-test-case.ttl')
+    ttl_file = fixture_file_upload('fair_data_station/seek-fair-data-station-test-case.ttl')
     assert_no_difference('Investigation.count') do
       post :submit_fairdata_station, params: {id: project, datastation_data: ttl_file,
                                               policy_attributes:{
