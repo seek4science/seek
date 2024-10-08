@@ -45,7 +45,7 @@ class InvestigationsController < ApplicationController
         @investigation.save!
       end
     rescue ActiveRecord::RecordInvalid, Seek::FairDataStation::ExternalIdMismatchException => e
-      flash[:error] = e.message
+      flash.now[:error] = e.message
     end
 
     if flash[:error].present?
