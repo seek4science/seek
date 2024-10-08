@@ -35,7 +35,7 @@ module Seek
       end
 
       def self.create_extended_metadata_type_from_json(data)
-        @extended_metadata_type = ::ExtendedMetadataType.create(
+        emt = ::ExtendedMetadataType.create(
           title: data['title'],
           supported_type: data['supported_type'],
           enabled: data['enabled']
@@ -47,7 +47,7 @@ module Seek
           linked_extended_metadata_type = ::ExtendedMetadataType.find(attr['ID']) if sample_attribute_type&.linked_extended_metadata_or_multi?
 
 
-          @extended_metadata_type.extended_metadata_attributes.build(
+          emt.extended_metadata_attributes.build(
             title: attr['title'],
             label: attr['label'].present? ? attr['label'] : nil,
             description: attr['description'].present? ? attr['description'] : nil,
@@ -58,7 +58,7 @@ module Seek
           )
         end
 
-        @extended_metadata_type.save!
+        emt
 
       end
 

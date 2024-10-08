@@ -4,6 +4,7 @@ class ExtendedMetadataTypesController < ApplicationController
   before_action :is_user_admin_auth, except: [:form_fields, :show, :index]
   before_action :find_requested_item, only: [:administer_update, :show, :destroy]
   include Seek::IndexPager
+  after_action :log_event, only: [:create, :destroy]
 
   api_actions :index, :show
 
@@ -28,22 +29,24 @@ class ExtendedMetadataTypesController < ApplicationController
 
   def create
 
-    @extended_metadata_type = ExtendedMetadataType.new
-
     if params[:emt_json_file].blank?
       flash[:error] = 'Please select a file to upload!'
-      redirect_to new_extended_metadata_type_path
-    else
-      uploaded_file = params[:emt_json_file]
-      begin
-        Seek::ExtendedMetadataType::EMTExtractor.extract_extended_metadata_type(uploaded_file)
-        flash[:notice] = 'Extended metadata type was successfully created.'
-        redirect_to administer_extended_metadata_types_path
-      rescue StandardError => e
-        flash[:error] = "#{e.message}"
-        redirect_to new_extended_metadata_type_path
-      end
+      redirect_to new_extended_metadata_type_path and return
     end
+
+    uploaded_file = params[:emt_json_file]
+    @extended_metadata_type = Seek::ExtendedMetadataType::EMTExtractor.extract_extended_metadata_type(uploaded_file)
+
+    if @extended_metadata_type.save
+      flash[:notice] = 'Extended metadata type was successfully created.'
+      redirect_to administer_extended_metadata_types_path
+    else
+      flash[:error] = 'Failed to save the extended metadata type'
+      redirect_to new_extended_metadata_type_path
+    end
+  rescue StandardError => e
+    flash[:error] = e.message
+    redirect_to new_extended_metadata_type_path
   end
 
 
@@ -118,14 +121,17 @@ class ExtendedMetadataTypesController < ApplicationController
     params.require(:extended_metadata_type).permit(:title, :enabled)
   end
 
-  # def log_event
-  #   User.with_current_user current_user do
-  #     ActivityLog.create(action: 'create',
-  #                        culprit: current_user,
-  #                        controller_name:self.controller_name.downcase,
-  #                        activity_loggable: ExtendedMetadataType.find(@id)
-  #                      )
-  #   end
-  # end
+  def log_event
+
+    return if object_invalid_or_unsaved?(@extended_metadata_type)
+
+    ActivityLog.create(action: action_name.downcase,
+                       culprit: current_user,
+                       controller_name: self.controller_name.downcase,
+                       activity_loggable: object_for_request,
+                        data: object_for_request.title,
+                        user_agent: request.env['HTTP_USER_AGENT'])
+
+  end
 
 end

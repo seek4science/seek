@@ -224,4 +224,28 @@ class ExtendedMetadataTypesControllerTest < ActionController::TestCase
 
   end
 
+  test 'activity logging' do
+
+    person = FactoryBot.create(:admin)
+    login_as(person)
+
+    file = fixture_file_upload('extended_metadata_type/valid_simple_emt.json', 'application/json')
+
+    assert_difference('ActivityLog.count') do
+      post :create, params: { emt_json_file: file }
+    end
+
+    emt = assigns(:extended_metadata_type)
+    
+    log = ActivityLog.last
+    assert_equal emt, log.activity_loggable
+    assert_equal 'create', log.action
+    assert_equal person.user, log.culprit
+
+    assert_difference('ActivityLog.count') do
+      delete :destroy, params: { id: emt.id }
+    end
+
+  end
+
 end
