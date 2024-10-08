@@ -275,9 +275,9 @@ module SamplesHelper
     return nil if Seek::Config.isa_json_compliance_enabled && !sample.sample_type.template_id.nil?
 
     if (sample.sample_type.can_view?(user))
-      link_to sample.sample_type.title,sample.sample_type
+      link_to sample.sample_type.title, sample.sample_type
     else
-      link_to sample.sample_type.title,sample_type_path(sample.sample_type, referring_sample_id:sample.id)
+      link_to sample.sample_type.title, sample_type_path(sample.sample_type, referring_sample_id: sample.id)
     end
   end
 

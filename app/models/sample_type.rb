@@ -189,7 +189,7 @@ class SampleType < ApplicationRecord
     referring_sample.try(:sample_type) == self && referring_sample.can_view?(user)
   end
 
-  # whether it is assocaited with any public samples
+  # whether it is associated with any public samples
   def public_samples?
     samples.joins(:policy).where('policies.access_type >= ?', Policy::VISIBLE).any?
   end
