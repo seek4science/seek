@@ -75,6 +75,19 @@ class ExtendedMetadataTypesController < ApplicationController
      end
   end
 
+  def destroy
+    unless  @extended_metadata_type.extended_metadatas.present?
+      if @extended_metadata_type.destroy
+        flash[:notice] = 'Extended metadata type was successfully deleted.'
+      else
+        flash[:alert] = 'Failed to delete the extended metadata type.'
+      end
+      respond_to do |format|
+        format.html { redirect_to administer_extended_metadata_types_path }
+      end
+    end
+  end
+
   def administer_update
     @extended_metadata_type.update(extended_metadata_type_params)
     unless @extended_metadata_type.save
@@ -97,5 +110,15 @@ class ExtendedMetadataTypesController < ApplicationController
   def extended_metadata_type_params
     params.require(:extended_metadata_type).permit(:title, :enabled)
   end
+
+  # def log_event
+  #   User.with_current_user current_user do
+  #     ActivityLog.create(action: 'create',
+  #                        culprit: current_user,
+  #                        controller_name:self.controller_name.downcase,
+  #                        activity_loggable: ExtendedMetadataType.find(@id)
+  #                      )
+  #   end
+  # end
 
 end

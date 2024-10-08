@@ -176,4 +176,32 @@ class ExtendedMetadataTypesControllerTest < ActionController::TestCase
 
   end
 
+
+
+  test 'successfully deletes extended metadata type' do
+    emt = FactoryBot.create(:simple_investigation_extended_metadata_type)
+    person = FactoryBot.create(:admin)
+    login_as(person)
+
+    assert_difference('ExtendedMetadataType.count', -1) do
+      delete :destroy, params: { id: emt.id }
+    end
+
+    assert_redirected_to administer_extended_metadata_types_path
+    assert_equal 'Extended metadata type was successfully deleted.', flash[:notice]
+  end
+
+  test 'fails to delete extended metadata type' do
+    em = FactoryBot.create(:simple_extended_metadata)
+    emt = em.extended_metadata_type
+
+    person = FactoryBot.create(:admin)
+    login_as(person)
+
+    assert_no_difference('ExtendedMetadataType.count') do
+      delete :destroy, params: { id: emt.id }
+    end
+
+  end
+
 end
