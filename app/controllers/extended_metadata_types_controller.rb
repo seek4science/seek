@@ -76,16 +76,23 @@ class ExtendedMetadataTypesController < ApplicationController
   end
 
   def destroy
-    unless  @extended_metadata_type.extended_metadatas.present?
-      if @extended_metadata_type.destroy
-        flash[:notice] = 'Extended metadata type was successfully deleted.'
-      else
-        flash[:alert] = 'Failed to delete the extended metadata type.'
-      end
-      respond_to do |format|
-        format.html { redirect_to administer_extended_metadata_types_path }
-      end
+
+    # if a nested metadata type is linked by other metadata types
+    return if @extended_metadata_type.linked_by_metadata_attributes?
+
+    # if a top level metadata type has been used to create metadatas
+    return if @extended_metadata_type.extended_metadatas.present?
+
+    if @extended_metadata_type.destroy
+      flash[:notice] = 'Extended metadata type was successfully deleted.'
+    else
+      flash[:alert] = 'Failed to delete the extended metadata type.'
     end
+
+    respond_to do |format|
+      format.html { redirect_to administer_extended_metadata_types_path }
+    end
+
   end
 
   def administer_update

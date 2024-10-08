@@ -191,7 +191,7 @@ class ExtendedMetadataTypesControllerTest < ActionController::TestCase
     assert_equal 'Extended metadata type was successfully deleted.', flash[:notice]
   end
 
-  test 'fails to delete extended metadata type' do
+  test 'can not delete extended metadata type if there are the existing extended metadata instances based on it' do
     em = FactoryBot.create(:simple_extended_metadata)
     emt = em.extended_metadata_type
 
@@ -200,6 +200,26 @@ class ExtendedMetadataTypesControllerTest < ActionController::TestCase
 
     assert_no_difference('ExtendedMetadataType.count') do
       delete :destroy, params: { id: emt.id }
+    end
+  end
+
+
+  test 'can not delete the nested extended metadata type if it has been linked by other Extended metadata types' do
+
+    em = FactoryBot.create(:family_extended_metadata)
+    emt = em.extended_metadata_type
+
+    person = FactoryBot.create(:admin)
+    login_as(person)
+
+    assert_no_difference('ExtendedMetadataType.count') do
+      delete :destroy, params: { id: emt.id }
+    end
+
+    nested_emt = emt.metadata_attributes.find(&:linked_extended_metadata_or_multi?).linked_extended_metadata_type
+
+    assert_no_difference('ExtendedMetadataType.count') do
+      delete :destroy, params: { id: nested_emt.id }
     end
 
   end
