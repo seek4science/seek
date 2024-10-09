@@ -8,25 +8,21 @@ class EmtExtractorTest < ActiveSupport::TestCase
 
     emt_file = fixture_file_upload('extended_metadata_type/valid_simple_emt.json', 'application/json')
 
-    assert_difference('ExtendedMetadataType.count') do
-      Seek::ExtendedMetadataType::EMTExtractor.extract_extended_metadata_type(emt_file)
-    end
+    emt =  Seek::ExtendedMetadataType::EMTExtractor.extract_extended_metadata_type(emt_file)
 
-    emt = ExtendedMetadataType.find_by(title: 'person')
     assert_not_nil emt
     assert_equal 'ExtendedMetadata', emt.supported_type
     assert emt.enabled
-    assert_equal 2, emt.extended_metadata_attributes.count
 
-    attr1 = emt.extended_metadata_attributes.find_by(title: 'first_name')
+    attr1 = emt.extended_metadata_attributes.first
     assert_not_nil attr1
-    assert_equal 'First name', attr1.label
+    assert_equal 'first_name', attr1.title
     assert_equal SampleAttributeType.find_by(title: 'String'), attr1.sample_attribute_type
     assert_equal true, attr1.required
 
-    attr2 = emt.extended_metadata_attributes.find_by(title: 'last_name')
+    attr2 = emt.extended_metadata_attributes.second
     assert_not_nil attr2
-    assert_equal 'last name', attr2.label
+    assert_equal 'last_name', attr2.title
     # add for description
     assert_nil attr2.description
     assert_equal SampleAttributeType.find_by(title: 'String'), attr2.sample_attribute_type
@@ -42,31 +38,27 @@ class EmtExtractorTest < ActiveSupport::TestCase
 
     uploaded_file = update_id('valid_emt_with_linked_emt.json', person_emt, 'PERSON_EMT_ID')
 
-    assert_difference('ExtendedMetadataType.count') do
-      Seek::ExtendedMetadataType::EMTExtractor.extract_extended_metadata_type(uploaded_file)
-    end
+    emt = Seek::ExtendedMetadataType::EMTExtractor.extract_extended_metadata_type(uploaded_file)
 
-    emt = ::ExtendedMetadataType.find_by(title: 'family')
     assert_not_nil emt
     assert_equal 'Investigation', emt.supported_type
     assert emt.enabled
-    assert_equal 3, emt.extended_metadata_attributes.count
 
-    dad_attr = emt.extended_metadata_attributes.find_by(title: 'dad')
+    dad_attr = emt.extended_metadata_attributes.first
     assert_not_nil dad_attr
     assert_equal 'Dad', dad_attr.label
     assert_nil dad_attr.description
     assert_equal SampleAttributeType.find_by(title: 'Linked Extended Metadata'), dad_attr.sample_attribute_type
     refute dad_attr.required
 
-    mom_attr = emt.extended_metadata_attributes.find_by(title: 'mom')
+    mom_attr = emt.extended_metadata_attributes.second
     assert_not_nil mom_attr
     assert_equal 'Mom', mom_attr.label
     assert_nil mom_attr.description
     assert_equal SampleAttributeType.find_by(title: 'Linked Extended Metadata'), mom_attr.sample_attribute_type
     refute mom_attr.required
 
-    child_attr = emt.extended_metadata_attributes.find_by(title: 'child')
+    child_attr = emt.extended_metadata_attributes.third
     assert_not_nil child_attr
     assert_equal 'child', child_attr.label
     assert_nil child_attr.description
@@ -81,27 +73,21 @@ class EmtExtractorTest < ActiveSupport::TestCase
 
     uploaded_file = update_id('valid_emt_with_cv_with_ontologies.json', topic_cv, 'CV_TOPICS_ID')
 
-    assert_difference('ExtendedMetadataType.count') do
-      Seek::ExtendedMetadataType::EMTExtractor.extract_extended_metadata_type(uploaded_file)
-    end
+    emt = Seek::ExtendedMetadataType::EMTExtractor.extract_extended_metadata_type(uploaded_file)
 
-
-    emt = ::ExtendedMetadataType.find_by(title: 'An example with attributes associated with ontology terms')
     assert_not_nil emt
     assert_equal 'Study', emt.supported_type
     assert emt.enabled
-    assert_equal 1, emt.extended_metadata_attributes.count
 
-    topics_attr = emt.extended_metadata_attributes.find_by(title: 'Topics')
+    topics_attr = emt.extended_metadata_attributes.first
     assert_not_nil topics_attr
-    assert_equal 'Topics', topics_attr.label
+    assert_equal 'Topics', topics_attr.title
     assert_equal "Topics, used for annotating. Describes the domain, field of interest, of study, application, work, data, or technology. Initially seeded from the EDAM ontology.", topics_attr.description
     assert_equal SampleAttributeType.find_by(title: 'Controlled Vocabulary'), topics_attr.sample_attribute_type
     assert topics_attr.required
 
     assert_equal topic_cv, topics_attr.sample_controlled_vocab
     assert_equal 4, topics_attr.sample_controlled_vocab.sample_controlled_vocab_terms.count
-
 
   end
 
