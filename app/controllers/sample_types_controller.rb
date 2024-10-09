@@ -5,14 +5,14 @@ class SampleTypesController < ApplicationController
   include Seek::AssetsCommon
 
   before_action :samples_enabled?
-  before_action :find_sample_type, only: %i[show edit update destroy template_details batch_upload]
+  before_action :check_isa_json_compliance, only: %i[edit update manage manage_update]
+  before_action :find_and_authorize_requested_item, except: %i[create batch_upload destroy index new template_details]
+  before_action :find_sample_type, only: %i[batch_upload destroy template_details]
   before_action :check_no_created_samples, only: [:destroy]
   before_action :find_assets, only: [:index]
   before_action :auth_to_create, only: %i[new create]
   before_action :project_membership_required, only: %i[create new select filter_for_select]
-  before_action :check_isa_json_compliance, only: %i[edit update manage manage_update]
 
-  before_action :find_and_authorize_requested_item, except: %i[index new create]
 
   api_actions :index, :show, :create, :update, :destroy
 
