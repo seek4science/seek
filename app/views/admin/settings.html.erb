@@ -40,7 +40,7 @@
 
     <%= admin_text_setting(:sandbox_instance_url, Seek::Config.sandbox_instance_url,
                            'Sandbox instance URL', "A URL of an instance of SEEK to be used for testing/development. Users will be directed here if they attempt to create a #{t('project')} or #{t('programme')} with a name including \"test\".") %>
-    <%= admin_text_setting(:sandbox_instance_name, Seek::Config.sandbox_instance_url,
+    <%= admin_text_setting(:sandbox_instance_name, Seek::Config.sandbox_instance_name,
                            'Sandbox instance name', "The name of the testing/sandbox instance.") %>
     <h2>Policy and license settings</h2>
     <%= access_type_options = [Policy::PRIVATE, Policy::VISIBLE, Policy::ACCESSIBLE]
