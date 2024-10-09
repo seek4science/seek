@@ -116,8 +116,8 @@ class ExtendedMetadataTypesControllerTest < ActionController::TestCase
     assert_difference('ExtendedMetadataType.count') do
       post :create, params: { emt_json_file: file }
     end
-
-    assert_redirected_to administer_extended_metadata_types_path
+    emt = assigns(:extended_metadata_type)
+    assert_redirected_to administer_extended_metadata_types_path(emt: emt.id)
     assert_equal 'Extended metadata type was successfully created.', flash[:notice]
   end
 

@@ -39,7 +39,7 @@ class ExtendedMetadataTypesController < ApplicationController
 
     if @extended_metadata_type.save
       flash[:notice] = 'Extended metadata type was successfully created.'
-      redirect_to administer_extended_metadata_types_path
+       redirect_to administer_extended_metadata_types_path(emt: @extended_metadata_type.id)
     else
       flash[:error] = 'Failed to save the extended metadata type'
       redirect_to new_extended_metadata_type_path
@@ -109,6 +109,9 @@ class ExtendedMetadataTypesController < ApplicationController
   end
 
   def administer
+    if params[:emt]
+      @extended_metadata_type = ExtendedMetadataType.find(params[:emt])
+    end
     @extended_metadata_types = ExtendedMetadataType.order(:supported_type)
     respond_to do |format|
       format.html

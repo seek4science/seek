@@ -1,5 +1,3 @@
-<%= render partial: 'error_message' -%>
-
 <div class="row">
   <div class="col-md-3">
     <%= link_to new_extended_metadata_type_path, class: "btn btn-primary", role: "button", aria: { label: "Left Align" } do %>
@@ -13,3 +11,11 @@
 
 <%= render partial: 'emt_tabs' -%>
 
+<script>
+    $j(document).ready(function() {
+
+        <% if @extended_metadata_type.present? %>
+             ExtendedMetadataType.addNewMarker(<%= @extended_metadata_type.id.to_json %>,<%= @extended_metadata_type.supported_type.to_json.html_safe %>);
+        <% end %>
+    });
+</script>
