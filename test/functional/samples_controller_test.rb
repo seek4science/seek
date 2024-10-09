@@ -811,7 +811,7 @@ class SamplesControllerTest < ActionController::TestCase
     assert_select '.list_item_title a[href=?]', sample_path(linking_sample), text: /#{linking_sample.title}/
   end
 
-  test 'referring sample id is added to sample type link, if necessary' do
+  test 'Referring samples show linked sample type if permitted in show page' do
     person = FactoryBot.create(:person)
     sample = FactoryBot.create(:sample,
                                policy: FactoryBot.create(:private_policy,
@@ -827,7 +827,8 @@ class SamplesControllerTest < ActionController::TestCase
     get :show, params: { id:sample.id }
     assert_response :success
 
-    assert_select 'a[href=?]', sample_type_path(sample_type, referring_sample_id: sample.id), text: /#{sample_type.title}/
+    # Referring samples don't show the link to the sample type because the sample type is not visible
+    assert_select 'a[href=?]', sample_type_path(sample_type), text: /#{sample_type.title}/, count: 0
 
     sample2 = FactoryBot.create(:sample, policy: FactoryBot.create(:public_policy))
     sample_type2 = sample2.sample_type
@@ -839,12 +840,12 @@ class SamplesControllerTest < ActionController::TestCase
     get :show, params: { id: sample2.id }
     assert_response :success
 
-    # no referring sample required
+    # Referring sample shows the link to the sample type because the sample type is visible
     assert_select 'a[href=?]', sample_type_path(sample_type2), text: /#{sample_type2.title}/
 
   end
 
-  test 'referring sample id is added to sample type links in list items' do
+  test 'referring samples shows the linked sample type links in list items' do
     person = FactoryBot.create(:person)
     sample = FactoryBot.create(:sample,
                                policy: FactoryBot.create(:private_policy,
@@ -865,9 +866,10 @@ class SamplesControllerTest < ActionController::TestCase
 
     get :index
 
-    assert_select 'a[href=?]', sample_type_path(sample_type, referring_sample_id: sample.id), text: /#{sample_type.title}/
+    # Since the Sample Type is not visible, the link is not rendered
+    assert_select 'a[href=?]', sample_type_path(sample_type), text: /#{sample_type.title}/, count: 0
 
-    # no referring sample required, ST is already visible
+    # The Sample Type is visible, so the link is rendered
     assert_select 'a[href=?]', sample_type_path(sample_type2), text: /#{sample_type2.title}/
 
   end
