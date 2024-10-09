@@ -274,11 +274,7 @@ module SamplesHelper
   def sample_type_link(sample, user=User.current_user)
     return nil if Seek::Config.isa_json_compliance_enabled && !sample.sample_type.template_id.nil?
 
-    if (sample.sample_type.can_view?(user))
-      link_to sample.sample_type.title, sample.sample_type
-    else
-      link_to sample.sample_type.title, sample_type_path(sample.sample_type, referring_sample_id: sample.id)
-    end
+    link_to sample.sample_type.title, sample.sample_type if sample.sample_type.can_view?(user)
   end
 
   def sample_type_list_item_attribute(attribute, sample)
