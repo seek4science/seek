@@ -1,137 +1,13 @@
 <% content_for(:buttons) { button_link_to("Back to #{t('model')}", 'back', model_path(:version=>@display_model.version, :code=>params[:code])) } %>
 <%= render :partial => "general/item_title",:locals=>{:item=>@model,:title_postfix=>" - Copasi #{t('model')} Simulation"} %>
 
-<!--https://copasijs.readthedocs.io/en/stable/api.html#javascript-->
-
-<script>
-    var copasi = null;
-    createCpsModule().then(module => {
-        copasi = new COPASI(module);
-        console.log(copasi.version);
-    });
-
-
-    $j(document).ready(function () {
-        $j('#cps').val(`<%= @blob %>`);
-    });
-
-    function automaticChanged() {
-        var autoStepSize = document.getElementById("autoStepSize").checked;
-        document.getElementById("numPoints").disabled = autoStepSize;
-        //console.log("autoStepSize: " + autoStepSize);
-    }
-
-    function loadIntoCOPASI()
-    {
-        var info = copasi.loadModel(document.getElementById("cps").value);
-        //console.log(info);
-        document.getElementById("model_name").innerHTML = "none";
-        if (info['status'] != "success") {
-            document.getElementById("simulation_error").innerHTML = "Error loading model: " + info['messages'];
-            document.getElementById('simulation_error').hidden = false;
-        }
-        document.getElementById("model_name").innerHTML = 'Model name: '+ info['model']['name'];
-        document.getElementById("copasi_version").innerHTML = 'Copasi version: '+ copasi.version;
-        document.getElementById('simulation_info').hidden = false;
-    }
-
-
-    function simulate() {
-
-        if (copasi == null) {
-            alert('There is a problem to load Copasi simulator.');
-            return;
-        }
-        loadIntoCOPASI();
-        runSimulation();
-
-    }
-
-
-    function runSimulation() {
-
-        var autoStepSize = document.getElementById("autoStepSize").checked;
-        var timeStart = parseFloat(document.getElementById("startTime").value);
-        var timeEnd = parseFloat(document.getElementById("endTime").value);
-
-        // console.log("timeStart: " + timeStart);
-        // console.log("timeEnd: " + timeEnd);
-        // console.log("autoStepSize: " + autoStepSize);
-
-        if (autoStepSize) {
-            var result = copasi.simulateYaml({
-                "problem": {
-                    "AutomaticStepSize": true,
-                    "Duration": timeEnd,
-                    "OutputStartTime": timeStart
-                }
-            });
-            loadPlotFromResult(result);
-            return;
-        }
-
-        var numPoints = parseInt(document.getElementById("numPoints").value);
-        var result = copasi.simulateEx(timeStart, timeEnd, numPoints);
-
-        // console.log("result: " + result);
-
-        loadPlotFromResult(result);
-    }
-
-    function loadPlotFromResult(result) {
-
-        if (typeof result === 'string') {
-            result = JSON.parse(result);
-        }
-
-        clearResults();
-
-        // dump data
-        document.getElementById("data").innerHTML = JSON.stringify(result);
-        //console.log("result2: " + JSON.stringify(result));
-
-        // use highcharts to display data
-        var data = [];
-        for (var i = 1; i < result.num_variables; i++) {
-            data.push({
-                name: result.columns[i][0],
-                x: result.columns[0],
-                y: result.columns[i],
-                type: "scatter",
-                name: result.titles[i]
-            });
-        }
-
-        Plotly.newPlot('chart', data);
-    }
-
-    function clearResults() {
-        document.getElementById("data").innerHTML = "";
-        document.getElementById("chart").innerHTML = "";
-    }
-
-
-</script>
-
-
 <div class="container-fluid">
-
-  <div id="simulation_error" class="alert alert-danger" role="alert" hidden="">
-
-  </div>
-
+  <div id="simulation_error" class="alert alert-danger" role="alert" hidden=""></div>
   <div id="simulation_info" class="alert alert-info" role="alert" hidden="">
     <div id="model_name"></div>
     <div id="copasi_version"></div>
   </div>
-
-
-
-
   <div id="chart"></div>
-
-
-
   <div class="panel panel-default">
     <div class="panel-body">
       <div class="row">
@@ -147,7 +23,6 @@
           <label for="numPoints">Number of Points:</label>
           <input type="number" class="form-control" id="numPoints" placeholder="Enter number of points" value="101">
         </div>
-
         <div class="col-sm-3">
           <label for="simulate_js"> &nbsp;</label>
           <%= open_with_copasi_js_button %>
@@ -165,49 +40,6 @@
       </div>
     </div>
   </div>
-
-
-<!--  <div>-->
-<!--    <a class="btn btn-sm" data-toggle="collapse" href="#cps_form" role="button" aria-expanded="false" aria-controls="cps_form">show cps</a>-->
-<!--    <a class="btn btn-sm" data-toggle="collapse" href="#yaml_form" role="button" aria-expanded="false" aria-controls="yaml_form">show yaml</a>-->
-<!--    <a class="btn btn-sm" data-toggle="collapse" href="#data_form" role="button" aria-expanded="false" aria-controls="data_form">show data</a>-->
-
-
-<!--    <div class="form-group collapse" id="cps_form">-->
-<!--      <label for="cps">CPS Model:</label>-->
-<!--      <textarea id="cps" class="form-control" rows="150"></textarea>-->
-<!--    </div>-->
-
-<!--    <div class="form-group collapse" id="yaml_form">-->
-<!--      <label for="yaml">Processing: </label>-->
-<!--      <small> Changes for processing in yaml for the problem:-->
-<!--        <pre>{"problem":{"Duration": 100, "StepNumber": 100, "StepSize": 0.1}}</pre> or-->
-<!--        <pre>{"method": {"name": "Stochastic (Gibson + Bruck)"}}</pre> or for changes of-->
-<!--        initialvalues in the form of display names. So:-->
-<!--        <ul>-->
-<!--          <li>-->
-<!--            <pre>[A]_0</pre> for initial concentration of species A-->
-<!--          </li>-->
-<!--          <li>-->
-<!--            <pre>Values[t].InitialValue</pre> for initial value of parameter t-->
-<!--          </li>-->
-<!--          <li>-->
-<!--            <pre>(r1).k</pre> for the value of k of reaction r1.-->
-<!--          </li>-->
-<!--        </ul>-->
-<!--        <pre>{"initial_values": {"[A]_0": 10.0, "Values[t].InitialValue": 0.1, "(r1).k": 0.1}}</pre>-->
-<!--      </small>-->
-<!--      <textarea id="yaml" class="form-control" rows="8">{}</textarea>-->
-<!--    </div>-->
-
-<!--    <div class="form-group collapse" id="data_form">-->
-<!--      <label for="data">Data Yaml:</label>-->
-<!--      <textarea id="data" class="form-control" rows="8"></textarea>-->
-<!--    </div>-->
-<!--  </div>-->
-
-
-
   <div>
     <ul class="nav nav-tabs" role="tablist">
       <li class="nav-item">
@@ -220,7 +52,6 @@
         <a class="nav-link" data-toggle="tab" href="#data_form" role="tab" aria-controls="data_form">Data</a>
       </li>
     </ul>
-
     <div class="tab-content">
       <div class="tab-pane fade show active" id="cps_form" role="tabpanel">
         <div class="form-group">
@@ -228,7 +59,6 @@
           <textarea id="cps" class="form-control" rows="150"></textarea>
         </div>
       </div>
-
       <div class="tab-pane fade" id="yaml_form" role="tabpanel">
         <div class="form-group">
           <label for="yaml">Processing: </label>
@@ -252,7 +82,6 @@
           <textarea id="yaml" class="form-control" rows="8">{}</textarea>
         </div>
       </div>
-
       <div class="tab-pane fade" id="data_form" role="tabpanel">
         <div class="form-group">
           <label for="data">Data Yaml:</label>
@@ -261,9 +90,15 @@
       </div>
     </div>
   </div>
-
-
-
 </div>
 
-</div>
+<script>
+    $j(document).ready(function () {
+        createCpsModule().then(module => {
+            copasi = new COPASI(module);
+            console.log(copasi.version);
+        });
+
+        $j('#cps').val(`<%= @blob %>`);
+    });
+</script>
