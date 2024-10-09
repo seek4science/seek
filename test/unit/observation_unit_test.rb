@@ -84,5 +84,44 @@ class ObservationUnitTest < ActiveSupport::TestCase
 
   end
 
+  test 'assays, studies, investigations' do
+    contributor = FactoryBot.create(:person)
+    assay = FactoryBot.create(:experimental_assay, contributor: contributor)
+    study = assay.study
+    sample = FactoryBot.create(:sample, assays: [assay], contributor: contributor)
+    obs_unit = FactoryBot.create(:observation_unit, study: study, samples: [sample], contributor: contributor)
+
+    assert_equal [assay], sample.assays
+    assert_equal [assay], obs_unit.related_assays
+    assert_equal study, obs_unit.study
+    assert_equal study.investigation, obs_unit.investigation
+
+    # observation unit without an assay
+    obs_unit = FactoryBot.create(:observation_unit, study: study)
+    assert_empty obs_unit.related_assays
+    assert_equal study, obs_unit.study
+    assert_equal study.investigation, obs_unit.investigation
+
+    # doesn't have these
+    refute obs_unit.respond_to?(:studies)
+    refute obs_unit.respond_to?(:investigations)
+
+  end
+
+  test 'validate study matches with assay' do
+    obs_unit = FactoryBot.create(:observation_unit)
+    assert obs_unit.valid?
+
+    assay = FactoryBot.create(:experimental_assay, contributor: obs_unit.contributor)
+    sample = FactoryBot.create(:sample, assays: [assay], contributor: obs_unit.contributor)
+    refute_equal obs_unit.study, assay.study
+    obs_unit.samples << sample
+    refute obs_unit.valid?
+    assert_equal 'Study must match the associated assay', obs_unit.errors.full_messages.first
+
+    obs_unit = FactoryBot.create(:observation_unit, samples: [sample], study: assay.study, contributor: assay.contributor)
+    assert_equal obs_unit.study, assay.study
+    assert obs_unit.valid?
+  end
 
 end

@@ -26,6 +26,7 @@ class ApplicationRecord < ActiveRecord::Base
   include Seek::RelatedItems
   include HasTasks
   include HasControlledVocabularyAnnotations
+  include HasExternalIdentifier
 
   include Annotations::Acts::Annotatable
   include Annotations::Acts::AnnotationSource

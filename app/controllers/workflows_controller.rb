@@ -21,7 +21,7 @@ class WorkflowsController < ApplicationController
   include RoCrateHandling
   include Legacy::WorkflowSupport
 
-  api_actions :index, :show, :create, :update, :destroy, :ro_crate, :ro_crate_metadata, :create_version
+  api_actions :index, :show, :create, :update, :destroy, :ro_crate, :ro_crate_metadata, :create_version, :submit
 
   rescue_from ROCrate::ReadException do |e|
     logger.error("Error whilst attempting to read RO-Crate metadata for Workflow #{@workflow&.id}: #{e.exception.class.name} #{e.message}")

@@ -3,8 +3,16 @@
     "type": "observation_units",
     "attributes": {
       "policy": {
-        "access": "manage",
-        "permissions": []
+        "access": "download",
+        "permissions": [
+          {
+            "resource": {
+              "id": "<%= @project.id %>",
+              "type": "projects"
+            },
+            "access": "edit"
+          }
+        ]
       },
       "title": "Max observation unit",
       "description": "the maximum one",
