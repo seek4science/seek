@@ -15,7 +15,7 @@
     $j(document).ready(function() {
 
         <% if @extended_metadata_type.present? %>
-             ExtendedMetadataType.addNewMarker(<%= @extended_metadata_type.id.to_json %>,<%= @extended_metadata_type.supported_type.to_json.html_safe %>);
+             ExtendedMetadataType.addNewMarker('<%= @extended_metadata_type.id %>','<%= @extended_metadata_type.supported_type %>');
         <% end %>
     });
 </script>
