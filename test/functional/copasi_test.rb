@@ -103,6 +103,29 @@ class CopasiTest < ActionController::TestCase
         get :copasi_simulate, params: { id: model.id, version: model.version }
       end
     end
+  end
+
+  test 'simulate copasi when model is private' do
+    Seek::Config.copasi_enabled = true
+
+    # no login, no access right for the private model
+    model = FactoryBot.create(:copasi_model, policy: FactoryBot.create(:private_policy))
+    get :copasi_simulate, params: { id: model.id, version: model.version }
+    assert_select 'h2', text: /The Model is not visible to you./
+
+    # login as another user, no access right for the private model
+    person = FactoryBot.create(:person)
+    login_as(person)
+    get :copasi_simulate, params: { id: model.id, version: model.version }
+    assert_select 'h2', text: /The Model is not visible to you./
+
+    # the access right granted by the model owner, the another user can simulate the model
+    login_as(model.contributor.user)
+    model.policy.permissions << FactoryBot.create(:permission, contributor:person, access_type:Policy::ACCESSIBLE)
+    get :copasi_simulate, params: { id: model.id, version: model.version }
+    assert_response :success
+
+    assert_select 'a[onclick="simulate()"]', text: 'Simulate Online'
 
   end
 
