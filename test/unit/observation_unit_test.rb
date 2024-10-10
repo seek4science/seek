@@ -77,11 +77,6 @@ class ObservationUnitTest < ActiveSupport::TestCase
     obs_unit = FactoryBot.build(:observation_unit)
     obs_unit.study = nil
     refute obs_unit.valid?
-
-    obs_unit = FactoryBot.build(:observation_unit)
-    obs_unit.projects = []
-    refute obs_unit.valid?
-
   end
 
   test 'assays, studies, investigations' do

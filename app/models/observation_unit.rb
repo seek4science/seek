@@ -5,6 +5,7 @@ class ObservationUnit < ApplicationRecord
   belongs_to :contributor, class_name: 'Person'
   belongs_to :study
   has_one :investigation, through: :study
+  has_many :projects, through: :study
   has_many :samples
   has_many :related_assays, -> { distinct }, through: :samples, source: :assays
   has_many :observation_unit_assets, inverse_of: :observation_unit, dependent: :delete_all, autosave: true
