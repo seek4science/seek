@@ -1,8 +1,9 @@
 <% unless @new_samples.nil? or @new_samples.compact.none? %>
-  <%= folding_panel("New Samples <span id='new-samples-counter' class='label label-primary'>#{@new_samples.size}</span>", true, :id => "new-samples-panel", :body_options => {:id => "new-samples-panel-content"},
-  :help_text => "These samples have been detected as new samples and will be created.") do %>
+  <%= folding_panel("New Samples <span id='new-samples-counter' class='label label-primary'>#{@new_samples.size}</span>", true, :id => "new-samples-panel", :body_options => { :id => "new-samples-panel-content" },
+                    :help_text => "These samples have been detected as new samples and will be created.") do %>
     <div class="table-responsive">
       <table id="create-samples-table" class="table">
+        <thead>
         <tr>
           <th></th>
           <% for key in @new_samples[0].keys %>
@@ -11,36 +12,42 @@
             <% end %>
           <% end %>
         </tr>
+        </thead>
+        <tbody>
         <% for new_sample in @new_samples %>
           <% new_sample_id = UUID.generate %>
           <tr id='<%= "new-sample-#{new_sample_id}" %>'>
-            <td><button id=<%= "remove-#{new_sample_id}" %> class="btn glyphicon glyphicon-trash danger" style="background-color:#d9534f;color:white;" onclick=<%= "removeSample('new-sample-#{new_sample_id}')" %>></button></td>
-              <% new_sample.map do |key, val| %>
-                <% val = '<new>' if key =='id' %>
+            <td>
+              <button id=<%= "remove-#{new_sample_id}" %> class="btn glyphicon glyphicon-trash danger
+              " style="background-color:#d9534f;color:white;"
+              onclick=<%= "removeSample('new-sample-#{new_sample_id}')" %>></button></td>
+            <% new_sample.map do |key, val| %>
+              <% val = '<new>' if key == 'id' %>
               <% unless key == 'uuid' %>
-                <% if @multiple_input_fields.include?(key)%>
-                  <td id='<%= "new-sample-#{new_sample_id}[#{key}]" %>' >
+                <% if @multiple_input_fields.include?(key) %>
+                  <td id='<%= "new-sample-#{new_sample_id}[#{key}]" %>'>
                     <% val.each do |sub_sample| %>
-                      <span class="badge", title='ID: <%= sub_sample['id'] %>' data-attr_type="seek-sample-multi"><%= sub_sample['title'] %></span>
+                      <span class="badge" , title='ID: <%= sub_sample['id'] %>' data-attr_type="seek-sample-multi"><%= sub_sample['title'] %></span>
                     <% end %>
                   </td>
                 <% elsif @cv_list_fields.include?(key) %>
-                  <td id='<%= "new-sample-#{new_sample_id}[#{key}]" %>' >
+                  <td id='<%= "new-sample-#{new_sample_id}[#{key}]" %>'>
                     <% val.each do |cv_term| %>
-                      <span class="label label-default", title='<%= cv_term %>' data-attr_type="cv-list"><%= cv_term %></span>
+                      <span class="label label-default" , title='<%= cv_term %>' data-attr_type="cv-list"><%= cv_term %></span>
                     <% end %>
                   </td>
                 <% elsif @registered_sample_fields.include?(key) %>
-                  <td id='<%= "new-sample-#{new_sample_id}[#{key}]" %>' >
-                    <span class="badge", title='<%= val['id'] %>' data-attr_type="seek-sample"><%= val['title'] %></span>
+                  <td id='<%= "new-sample-#{new_sample_id}[#{key}]" %>'>
+                    <span class="badge" , title='<%= val['id'] %>' data-attr_type="seek-sample"><%= val['title'] %></span>
                   </td>
                 <% else %>
-                  <td id='<%= "new-sample-#{new_sample_id}[#{key}]" %>' ><%= val %></td>
+                  <td id='<%= "new-sample-#{new_sample_id}[#{key}]" %>'><%= val %></td>
                 <% end %>
               <% end %>
             <% end %>
           </tr>
         <% end %>
+        </tbody>
       </table>
     </div>
   <% end %>

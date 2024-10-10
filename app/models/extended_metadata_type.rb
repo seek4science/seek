@@ -10,8 +10,13 @@ class ExtendedMetadataType < ApplicationRecord
 
   alias_method :metadata_attributes, :extended_metadata_attributes
 
+  accepts_nested_attributes_for :extended_metadata_attributes, allow_destroy: true
+
   scope :enabled, ->{ where(enabled: true) }
   scope :disabled, ->{ where(enabled: false) }
+
+  # built in type
+  MIAPPE_TITLE = 'MIAPPE metadata v1.1'.freeze
 
   def attribute_by_title(title)
     extended_metadata_attributes.where(title: title).first

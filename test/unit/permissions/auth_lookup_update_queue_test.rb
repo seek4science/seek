@@ -113,7 +113,7 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
   test 'updates to queue for sample' do
     user = FactoryBot.create :user
     sample = nil
-    assert_difference('AuthLookupUpdateQueue.count', 1) do
+    assert_difference('AuthLookupUpdateQueue.count', 2) do
       sample = FactoryBot.create :sample, contributor: user.person, policy: FactoryBot.create(:private_policy),
                        sample_type:FactoryBot.create(:simple_sample_type,contributor:user.person)
     end
@@ -135,13 +135,39 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
     end
   end
 
+  test 'updates to queue for observation unit' do
+    user = FactoryBot.create :user
+    observation_unit = nil
+    study = FactoryBot.create(:study, contributor: user.person)
+    assert_difference('AuthLookupUpdateQueue.count', 1) do
+      observation_unit = FactoryBot.create :observation_unit, contributor: user.person, policy: FactoryBot.create(:private_policy), study: study
+    end
+    assert_equal observation_unit, AuthLookupUpdateQueue.order(:id).last.item
+
+    AuthLookupUpdateQueue.destroy_all
+    observation_unit.policy.access_type = Policy::VISIBLE
+
+    assert_difference('AuthLookupUpdateQueue.count', 1) do
+      observation_unit.policy.save
+    end
+    assert_equal observation_unit, AuthLookupUpdateQueue.order(:id).last.item
+    AuthLookupUpdateQueue.destroy_all
+    observation_unit.title = Time.now.to_s
+    assert_no_difference('AuthLookupUpdateQueue.count') do
+      disable_authorization_checks do
+        observation_unit.save!
+      end
+    end
+  end
+
   test 'updates for remaining authorized assets' do
     user = FactoryBot.create :user
-    types = Seek::Util.authorized_types - [Sop, Assay, Study, Sample]
+    types = Seek::Util.authorized_types - [Sop, Assay, Study, Sample, ObservationUnit]
     types.each do |type|
       entity = nil
       assert_difference('AuthLookupUpdateQueue.count', 1, "unexpected count for created type #{type.name}") do
-        entity = FactoryBot.create type.name.underscore.to_sym, contributor: user.person, policy: FactoryBot.create(:private_policy)
+        factory_name = type.is_a?(SampleType.class) ? :simple_sample_type : type.name.underscore.to_sym
+        entity = FactoryBot.create factory_name, contributor: user.person, policy: FactoryBot.create(:private_policy)
       end
       assert_equal entity, AuthLookupUpdateQueue.order(:id).last.item
       AuthLookupUpdateQueue.destroy_all
@@ -161,10 +187,17 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
     end
   end
 
-  test 'updates when a user registers' do
+  test 'updates when a user registers but not until associated with a person' do
+    person = FactoryBot.create(:person)
+    user = assert_no_difference('AuthLookupUpdateQueue.count') do
+      FactoryBot.create(:brand_new_user)
+    end
     assert_difference('AuthLookupUpdateQueue.count', 1) do
-      user = FactoryBot.create(:brand_new_user)
-      assert_equal user, AuthLookupUpdateQueue.order(:id).last.item
+      user.person = person
+      user.save!
+      q = AuthLookupUpdateQueue.order(:id).last
+      assert_equal user, q.item
+      assert_equal 1, q.priority
     end
   end
 

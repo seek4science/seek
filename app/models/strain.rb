@@ -10,6 +10,7 @@ class Strain < ApplicationRecord
   acts_as_authorized
   acts_as_uniquely_identifiable
   acts_as_favouritable
+  has_external_identifier
 
   include Seek::Taggable
   grouped_pagination

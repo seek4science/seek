@@ -1,6 +1,7 @@
 <%
   logging_start_date ||= nil
   show_downloads = resource.respond_to?(:contains_downloadable_items?) && resource.contains_downloadable_items?
+  show_runs = resource.respond_to?(:can_run?) && resource.can_run?
 %>
 
 <%= panel("Activity") do %>
@@ -10,6 +11,10 @@
     <% if show_downloads -%>
       <span style="width: 2em">&nbsp;</span>
       <strong>Downloads:</strong> <%= resource.download_count -%>
+    <% end -%>
+    <% if show_runs -%>
+      <span style="width: 2em">&nbsp;</span>
+      <strong>Runs:</strong> <%= resource.run_count -%>
     <% end -%>
   </p>
 

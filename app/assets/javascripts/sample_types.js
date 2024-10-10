@@ -96,6 +96,16 @@ var SampleTypes = {
         else {
             seek_sample_element.hide();
         }
+    },
+
+    expandIRI: function () {
+        var termIRI = $j(this).next('.term-iri');
+        termIRI.toggleClass('visible');
     }
 
 };
+
+
+$j(document).ready(function() {
+    $j('.term-label').on('click', SampleTypes.expandIRI);
+});

@@ -8,6 +8,7 @@
 %>
 <tr class="<%= row_class %>" data-index="<%= index %>">
   <td>
+    <%= hidden_field_tag "sample_controlled_vocab[sample_controlled_vocab_terms_attributes][#{index}][id]", term.id %>
     <%= hidden_field_tag "sample_controlled_vocab[sample_controlled_vocab_terms_attributes][#{index}][label]", term.label  %>
     <div class='disabled-cv-field form-control'><%= term.label %></div>
   </td>

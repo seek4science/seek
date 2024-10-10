@@ -347,6 +347,10 @@ div.renderer {
   color: if(lightness($text-color) > 50, darken($text-color, 20%), lighten($text-color, 30%));
 }
 
+.select2-results__option--highlighted .subtle {
+  color: unset;
+}
+
 span.truncated-name {
   display: inline-block;
   overflow: hidden;

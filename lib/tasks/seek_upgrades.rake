@@ -11,9 +11,6 @@ namespace :seek do
     decouple_extracted_samples_policies
     decouple_extracted_samples_projects
     link_sample_datafile_attributes
-    strip_sample_attribute_pids
-    rename_registered_sample_multiple_attribute_type
-    remove_ontology_attribute_type
     db:seed:007_sample_attribute_types
     db:seed:001_create_controlled_vocabs
     db:seed:017_minimal_starter_isa_templates
@@ -21,6 +18,10 @@ namespace :seek do
     implement_assay_streams_for_isa_assays
     set_ls_login_legacy_mode
     rename_custom_metadata_legacy_supported_type
+    seek_rdf:generate
+    update_observation_unit_policies
+    fix_xlsx_marked_as_zip
+    add_policies_to_existing_sample_types
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -32,8 +33,6 @@ namespace :seek do
   desc('upgrades SEEK from the last released version to the latest released version')
   task(upgrade: [:environment]) do
     puts 'Starting upgrade ...'
-    puts '... trimming old session data ...'
-    Rake::Task['db:sessions:trim'].invoke
     puts '... migrating database ...'
     Rake::Task['db:migrate'].invoke
     Rake::Task['tmp:clear'].invoke
@@ -57,93 +56,78 @@ namespace :seek do
     end
   end
 
-  task(rename_registered_sample_multiple_attribute_type: [:environment]) do
-    attr = SampleAttributeType.find_by(title:'Registered Sample (multiple)')
-    if attr
-      puts "..... Renaming sample attribute type 'Registered Sample (multiple)' to 'Registered Sample List'."
-      attr.update_column(:title, 'Registered Sample List')
-    end
-  end
-
-  task(strip_sample_attribute_pids: [:environment]) do
-    puts '..... Stripping Sample Attribute PIds ...'
-    n = 0
-    SampleAttribute.where('pid is NOT NULL AND pid !=?','').each do |attribute|
-      new_pid = attribute.pid.strip
-      if attribute.pid != new_pid
-        attribute.update_column(:pid, new_pid)
-        n += 1
-      end
-    end
-    puts "..... Finished stripping #{n} Sample Attribute PIds."
-  end
-
-  task(remove_ontology_attribute_type: [:environment]) do
-    ontology_attr_type = SampleAttributeType.find_by(title:'Ontology')
-    cv_attr_type = SampleAttributeType.find_by(title:'Controlled Vocabulary')
-    if ontology_attr_type
-      puts '..... Removing the Ontology sample attribute type ...'
-      if cv_attr_type
-        if ontology_attr_type.sample_attributes.any?
-          puts "..... Moving #{ontology_attr_type.sample_attributes.count} sample attributes to Controlled Vocabulary"
-          ontology_attr_type.sample_attributes.each do |attr_type|
-            attr_type.update_column(:sample_attribute_type_id, cv_attr_type.id)
-          end
-        end
-        if ontology_attr_type.isa_template_attributes.any?
-          puts "..... Moving #{ontology_attr_type.isa_template_attributes.count} template attributes to Controlled Vocabulary"
-          ontology_attr_type.isa_template_attributes.each do |attr_type|
-            attr_type.update_column(:sample_attribute_type_id, cv_attr_type.id)
-          end
-        end
-
-        ontology_attr_type.destroy
-      else
-        puts '..... Target Controlled Vocabulary attribute type not found'
-      end
-    end
-  end
-
   task(decouple_extracted_samples_policies: [:environment]) do
     puts '..... creating independent policies for extracted samples (this can take a while if there are many samples) ...'
     affected_samples = []
+
+    Policy.skip_callback :commit, :after, :queue_update_auth_table
+    Policy.skip_callback :commit, :after, :queue_rdf_generation_job
+    Permission.skip_callback :commit, :after, :queue_update_auth_table
+    Permission.skip_callback :commit, :after, :queue_rdf_generation_job
+
     disable_authorization_checks do
-      Sample.includes(:originating_data_file).find_each do |sample|
-        # check if the sample was extracted from a datafile and their policies are linked
-        if sample.extracted? && sample.policy_id == sample.originating_data_file&.policy_id
-          policy = sample.policy.deep_copy
-          policy.save
-          sample.update_column(:policy_id, policy.id)
-          putc('.')
-          affected_samples << sample
+      Sample.includes(:originating_data_file).in_batches(of: 250) do |batch|
+        batch.each do |sample|
+          # check if the sample was extracted from a datafile and their policies are linked
+          if sample.extracted? && sample.policy_id == sample.originating_data_file&.policy_id
+            policy = sample.policy.deep_copy
+            policy.save
+            sample.update_column(:policy_id, policy.id)
+            affected_samples << sample
+          end
         end
+        putc('.')
       end
-      #won't have been queued, as the policy has no associated assets yet when saved
-      AuthLookupUpdateQueue.enqueue(affected_samples) if affected_samples.any?
     end
     puts "..... finished creating independent policies of #{affected_samples.count} extracted samples"
+  ensure
+    Policy.set_callback :commit, :after, :queue_update_auth_table
+    Policy.set_callback :commit, :after, :queue_rdf_generation_job
+    Permission.set_callback :commit, :after, :queue_update_auth_table
+    Permission.set_callback :commit, :after, :queue_rdf_generation_job
+  end
+
+  task(update_observation_unit_policies: [:environment]) do
+    puts '..... creating observation unit policies ...'
+    affected_obs_units = []
+    ObservationUnit.where.missing(:policy).includes(:study).in_batches(of: 25) do |batch|
+      batch.each do |obs_unit|
+        policy = obs_unit.study.policy || Policy.default
+        policy = policy.deep_copy
+        policy.save
+        obs_unit.update_column(:policy_id, policy.id)
+        affected_obs_units << obs_unit
+      end
+      putc('.')
+    end
+    AuthLookupUpdateQueue.enqueue(affected_obs_units)
+    RdfGenerationQueue.enqueue(affected_obs_units)
+    puts "..... finished updating policies for #{affected_obs_units.count} observation units"
   end
 
   task(decouple_extracted_samples_projects: [:environment]) do
     puts '..... copying project ids for extracted samples...'
-    decoupled = 0
+    decoupled_count = 0
     hash_array = []
     disable_authorization_checks do
-      Sample.find_each do |sample|
-        # check if the sample was extracted from a datafile and their projects are linked
-        if sample.extracted? && sample.project_ids.empty?
-          sample.originating_data_file.project_ids.each do |project_id|
-            hash_array << { project_id: project_id, sample_id: sample.id }
+      Sample.includes(:originating_data_file).where.missing(:projects).in_batches(of: 250) do |batch|
+        batch.each do |sample|
+          # check if the sample was extracted from a datafile and their projects are linked
+          if sample.extracted? && sample.project_ids.empty?
+            sample.originating_data_file.project_ids.each do |project_id|
+              hash_array << { project_id: project_id, sample_id: sample.id }
+            end
+            decoupled_count += 1
           end
-          decoupled += 1
         end
+        putc('.')
       end
       unless hash_array.empty?
         class ProjectsSample < ActiveRecord::Base; end;
         ProjectsSample.insert_all(hash_array)
       end
     end
-    puts " ... finished copying project ids of #{decoupled.to_s} extracted samples"
+    puts " ... finished copying project ids of #{decoupled_count.to_s} extracted samples"
   end
 
   task(link_sample_datafile_attributes: [:environment]) do
@@ -230,7 +214,7 @@ namespace :seek do
   task(set_ls_login_legacy_mode: [:environment]) do
     only_once('ls_login_legacy') do
       if Seek::Config.omniauth_elixir_aai_enabled
-        puts "Enabling LS Login legacy mode"
+        puts 'Enabling LS Login legacy mode'
         Seek::Config.omniauth_elixir_aai_legacy_mode = true
       end
     end
@@ -238,9 +222,55 @@ namespace :seek do
 
   task(rename_custom_metadata_legacy_supported_type: [:environment]) do
     if ExtendedMetadataType.where(supported_type: 'CustomMetadata').any?
-      puts "... Renaming ExtendedMetadata supported_type from Custom to ExtendedMetadata"
+      puts '... Renaming ExtendedMetadata supported_type from Custom to ExtendedMetadata'
       ExtendedMetadataType.where(supported_type: 'CustomMetadata').update_all(supported_type: 'ExtendedMetadata')
     end
+  end
+
+  task(fix_xlsx_marked_as_zip: [:environment]) do
+    blobs = ContentBlob.where('original_filename LIKE ?','%.xlsx').where(content_type: 'application/zip')
+    if blobs.any?
+      n = blobs.count
+      blobs.update_all(content_type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+      puts "... fixed #{n} XLSX blobs with zip content type"
+    end
+  end
+
+  task(add_policies_to_existing_sample_types: [:environment]) do
+    puts '... Adding policies to existing sample types'
+    counter = 0
+    disable_authorization_checks do
+      SampleType.includes(:projects, :assays, :studies).where(policy_id: nil).each do |st|
+        if st.is_isa_json_compliant?
+          st.update_column(:policy_id, st.assays.first.policy_id) if st.assays.any?
+          st.update_column(:policy_id, st.studies.first.policy_id) if st.studies.any?
+        else
+          policy = Policy.new
+          policy.name = 'default policy'
+
+          # Visible if linked to public samples
+          if st.samples.any? { |sample| sample.is_published? }
+            policy.access_type = Policy::VISIBLE
+          else
+            policy.access_type = Policy::NO_ACCESS
+          end
+          # Visible to each project
+          st.projects.map do |project|
+            policy.permissions << Permission.new(contributor_type: Permission::PROJECT, contributor_id: project.id, access_type: Policy::VISIBLE)
+          end
+          # Project admins can manage
+          project_admins = st.projects.map(&:project_administrators).flatten
+          project_admins.map do |admin|
+            policy.permissions << Permission.new(contributor_type: Permission::PERSON, contributor_id: admin.id, access_type: Policy::MANAGE)
+          end
+
+          policy.save
+          st.update_column(:policy_id, policy.id)
+       end
+        counter += 1
+      end
+    end
+    puts "...Added policies to #{counter} sample types"
   end
 
   private

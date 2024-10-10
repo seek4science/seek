@@ -1,0 +1,108 @@
+{
+  "data": {
+    "id": "354",
+    "type": "extended_metadata_types",
+    "attributes": {
+      "title": "A Max Extended Metadata Type",
+      "supported_type": "Investigation",
+      "enabled": true,
+      "extended_metadata_attributes": [
+        {
+          "id": "848",
+          "title": "age",
+          "label": "Age",
+          "pid": null,
+          "description": null,
+          "sample_attribute_type": {
+            "id": "929",
+            "title": "Integer attribute type 77",
+            "base_type": "Integer",
+            "regexp": ".*"
+          },
+          "required": false,
+          "pos": null,
+          "sample_controlled_vocab_id": null,
+          "linked_extended_metadata_type_id": null
+        },
+        {
+          "id": "849",
+          "title": "name",
+          "label": "Name",
+          "pid": null,
+          "description": null,
+          "sample_attribute_type": {
+            "id": "930",
+            "title": "String attribute type 585",
+            "base_type": "String",
+            "regexp": ".*"
+          },
+          "required": true,
+          "pos": null,
+          "sample_controlled_vocab_id": null,
+          "linked_extended_metadata_type_id": null
+        },
+        {
+          "id": "850",
+          "title": "date",
+          "label": "Date",
+          "pid": null,
+          "description": null,
+          "sample_attribute_type": {
+            "id": "931",
+            "title": "DateTime attribute type 77",
+            "base_type": "DateTime",
+            "regexp": ".*"
+          },
+          "required": false,
+          "pos": null,
+          "sample_controlled_vocab_id": null,
+          "linked_extended_metadata_type_id": null
+        },
+        {
+          "id": "851",
+          "title": "data file",
+          "label": "Data file",
+          "pid": null,
+          "description": null,
+          "sample_attribute_type": {
+            "id": "932",
+            "title": "Data file attribute type 4",
+            "base_type": "SeekDataFile",
+            "regexp": ".*"
+          },
+          "required": false,
+          "pos": null,
+          "sample_controlled_vocab_id": null,
+          "linked_extended_metadata_type_id": null
+        },
+        {
+          "id": "852",
+          "title": "sop",
+          "label": "Sop",
+          "pid": null,
+          "description": null,
+          "sample_attribute_type": {
+            "id": "933",
+            "title": "SOP attribute type 4",
+            "base_type": "SeekSop",
+            "regexp": ".*"
+          },
+          "required": false,
+          "pos": null,
+          "sample_controlled_vocab_id": null,
+          "linked_extended_metadata_type_id": null
+        }
+      ]
+    },
+    "links": {
+      "self": "/extended_metadata_types/354"
+    },
+    "meta": {
+      "api_version": "0.3",
+      "base_url": "http://localhost:3000"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

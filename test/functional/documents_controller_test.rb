@@ -302,7 +302,7 @@ class DocumentsControllerTest < ActionController::TestCase
     get :show, params: { id: doc }
     assert_response :success
     assert_select '#buttons' do
-      assert_select 'a[href=?]', explore_document_path(doc, version: doc.version), count: 1
+      assert_select 'a[href=?]', explore_document_path(doc, version: doc.version), text:'Explore', count: 1
       assert_select 'a.disabled', text: 'Explore', count: 0
     end
   end
@@ -1457,6 +1457,28 @@ class DocumentsControllerTest < ActionController::TestCase
       get :index
       assert_redirected_to root_path
       assert flash[:error].include?('disabled')
+    end
+  end
+
+  test 'get index filtered by parent' do
+    programme = FactoryBot.create(:programme)
+    project = FactoryBot.create(:project, programme: programme)
+    document = FactoryBot.create(:public_document, projects: [project])
+    with_config_value(:programmes_enabled, true) do
+      get :index, params: { programme_id: programme.id }
+      assert_response :success
+      assert_includes assigns(:documents), document
+    end
+  end
+
+  test 'do not get index filtered by parent if parent feature disabled' do
+    programme = FactoryBot.create(:programme)
+    project = FactoryBot.create(:project, programme: programme)
+    document = FactoryBot.create(:public_document, projects: [project])
+    with_config_value(:programmes_enabled, false) do
+      get :index, params: { programme_id: programme.id }
+      assert_redirected_to root_path
+      assert flash[:error].include?('Parent resource not recognized')
     end
   end
 

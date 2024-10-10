@@ -6,12 +6,14 @@ class IsaStudiesController < ApplicationController
   before_action :find_requested_item, only: %i[edit update]
 
   def new
-    @isa_study = IsaStudy.new
+    @isa_study = IsaStudy.new({ study: { investigation_id: params[:investigation_id] } })
   end
 
   def create
     @isa_study = IsaStudy.new(isa_study_params)
     update_sharing_policies @isa_study.study
+    @isa_study.source.policy = @isa_study.study.policy
+    @isa_study.sample_collection.policy = @isa_study.study.policy
     @isa_study.source.contributor = User.current_user.person
     @isa_study.sample_collection.contributor = User.current_user.person
     @isa_study.study.sample_types = [@isa_study.source, @isa_study.sample_collection]
@@ -36,18 +38,15 @@ class IsaStudiesController < ApplicationController
   end
 
   def edit
-    @isa_study.source = nil unless requested_item_authorized?(@isa_study.source)
-    @isa_study.sample_collection = nil unless requested_item_authorized?(@isa_study.sample_collection)
-
-    respond_to do |format|
-      format.html
-    end
+    respond_to(&:html)
   end
 
   def update
     # update the study
     @isa_study.study.attributes = isa_study_params[:study]
     update_sharing_policies @isa_study.study
+    @isa_study.source.policy = @isa_study.study.policy
+    @isa_study.sample_collection.policy = @isa_study.study.policy
     update_relationships(@isa_study.study, isa_study_params[:study])
 
     # update the source
@@ -132,8 +131,20 @@ class IsaStudiesController < ApplicationController
   def find_requested_item
     @isa_study = IsaStudy.new
     @isa_study.populate(params[:id])
-    unless requested_item_authorized?(@isa_study.study)
-      flash[:error] = "You are not authorized to edit this #{t('isa_study')}"
+
+    @isa_study.errors.add(:study, "The #{t('isa_study')} was not found.") if @isa_study.study.nil?
+    @isa_study.errors.add(:study, "You are not authorized to edit this #{t('isa_study')}.") unless requested_item_authorized?(@isa_study.study)
+
+    @isa_study.errors.add(:sample_type, "'Study source' #{t('sample_type')} not found.") if @isa_study.source.nil?
+    @isa_study.errors.add(:sample_type, "You are not authorized to edit the 'study source' #{t('sample_type')}.") unless requested_item_authorized?(@isa_study.source)
+    @isa_study.errors.add(:sample_type, "'Study sample' #{t('sample_type')} not found.") if @isa_study.sample_collection.nil?
+    @isa_study.errors.add(:sample_type, "You are not authorized to edit the 'study sample' #{t('sample_type')}.") unless requested_item_authorized?(@isa_study.sample_collection)
+
+    if @isa_study.errors.any?
+      error_messages = @isa_study.errors.map do |error|
+        "<li>[<b>#{error.attribute.to_s}</b>]: #{error.message}</li>"
+      end.join('')
+      flash[:error] = "<ul>#{error_messages}</ul>".html_safe
       redirect_to single_page_path(id: @isa_study.study.projects.first, item_type: 'study',
                                    item_id: @isa_study.study)
     end

@@ -26,3 +26,4 @@ A response for a **SOP** such as that for a <a href="#create">**Create**</a>, <a
 * References to the <a href="#studies">**Studies**</a> associated with the **SOP**
 * References to the <a href="#publications">**Publications**</a> associated with the **SOP**
 
+**SOPs** have support for [Extended Metadata](/api#section/Extended-Metadata)

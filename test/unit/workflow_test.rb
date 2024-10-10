@@ -501,6 +501,24 @@ class WorkflowTest < ActiveSupport::TestCase
     assert_equal 31, v.outputs.length
   end
 
+  test 'setting main workflow path for first time refreshes internals structure' do
+    workflow = FactoryBot.create(:annotationless_local_git_workflow)
+    v = workflow.git_version
+
+    assert_nil v.main_workflow_path
+
+    disable_authorization_checks do
+      v.main_workflow_path = 'concat_two_files.ga'
+      assert v.main_workflow_path_changed?
+      v.save!
+    end
+
+    assert_equal 'concat_two_files.ga', v.main_workflow_path
+    assert_equal 2, v.inputs.length
+    assert_equal 1, v.steps.length
+    assert_equal 1, v.outputs.length
+  end
+
   test 'changing diagram path clears the cached diagram' do
     workflow = FactoryBot.create(:local_git_workflow)
     v = workflow.git_version
@@ -884,5 +902,60 @@ class WorkflowTest < ActiveSupport::TestCase
 
     # Not supported for non-galaxy currently
     assert_nil FactoryBot.create(:cwl_workflow, policy: FactoryBot.create(:public_policy)).run_url
+  end
+
+  test 'applies instance default policy' do
+    admin = FactoryBot.create(:project_administrator)
+    project = admin.projects.first
+    disable_authorization_checks do
+      project.default_policy = FactoryBot.create(:private_policy)
+      project.use_default_policy = false
+      project.save!
+      project.default_policy.permissions << Permission.new(contributor: admin, access_type: Policy::MANAGING)
+    end
+
+    with_config_value(:default_all_visitors_access_type, Policy::ACCESSIBLE) do
+      workflow = FactoryBot.create(:workflow, projects: [project])
+      policy = workflow.policy
+      assert_equal Policy::ACCESSIBLE, policy.access_type
+      assert_equal 0, policy.permissions.count
+    end
+  end
+
+  test 'applies project default policy' do
+    admin = FactoryBot.create(:project_administrator)
+    project = admin.projects.first
+    disable_authorization_checks do
+      project.default_policy = FactoryBot.create(:private_policy)
+      project.use_default_policy = true
+      project.save!
+      project.default_policy.permissions << Permission.new(contributor: admin, access_type: Policy::MANAGING)
+    end
+
+    with_config_value(:default_all_visitors_access_type, Policy::ACCESSIBLE) do
+      workflow = FactoryBot.create(:workflow, projects: [project])
+      policy = workflow.policy
+      assert_equal Policy::NO_ACCESS, policy.access_type
+      assert_equal 1, policy.permissions.count
+      assert_equal admin, policy.permissions.first.contributor
+      assert_equal Policy::MANAGING, policy.permissions.first.access_type
+    end
+  end
+
+  test 'does not apply project default policy if it does not exist' do
+    admin = FactoryBot.create(:project_administrator)
+    project = admin.projects.first
+    disable_authorization_checks do
+      project.use_default_policy = true
+      project.save!
+    end
+    assert_nil project.default_policy
+
+    with_config_value(:default_all_visitors_access_type, Policy::ACCESSIBLE) do
+      workflow = FactoryBot.create(:workflow, projects: [project])
+      policy = workflow.policy
+      assert_equal Policy::ACCESSIBLE, policy.access_type
+      assert_equal 0, policy.permissions.count
+    end
   end
 end

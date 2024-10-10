@@ -332,6 +332,14 @@ module Seek
       isa_enabled
     end
 
+    def templates_enabled
+      isa_json_compliance_enabled
+    end
+
+    def strains_enabled
+      organisms_enabled
+    end
+
     def omniauth_elixir_aai_config
       if omniauth_elixir_aai_legacy_mode
         {
@@ -365,7 +373,7 @@ module Seek
           name: :elixir_aai,
           scope: [:openid, :email],
           response_type: 'code',
-          issuer: 'https://proxy.aai.lifescience-ri.eu/',
+          issuer: 'https://login.aai.lifescience-ri.eu/oidc/',
           discovery: true,
           client_options: {
             identifier: omniauth_elixir_aai_client_id,
@@ -610,7 +618,7 @@ module Seek
 
     def self.settings_cache
       RequestStore.fetch(:config_cache) do
-        Rails.cache.fetch(cache_key, expires_in: 1.week) do
+        cache_store.fetch(cache_key, expires_in: 1.week) do
           cache_setting = Thread.current[:use_settings_cache]
           begin
             hash = {}
@@ -625,11 +633,16 @@ module Seek
     end
 
     def self.clear_cache
-      Rails.cache.delete(cache_key)
+      RequestStore.delete(:config_cache)
+      cache_store.delete(cache_key)
     end
 
     def self.cache_key
       'seek_config'
+    end
+
+    def self.cache_store
+      Rails.application.config.settings_cache_store
     end
   end
 end

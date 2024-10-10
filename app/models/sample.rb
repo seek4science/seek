@@ -31,6 +31,9 @@ class Sample < ApplicationRecord
   has_many :linking_samples, through: :reverse_sample_resource_links, source: :sample
 
   has_many :linked_data_files, through: :sample_resource_links, source: :resource, source_type: 'DataFile'
+  has_many :linked_sops, through: :sample_resource_links, source: :resource, source_type: 'Sop'
+
+  belongs_to :observation_unit
 
   validates :projects, presence: true, projects: { self: true }
   validates :title, :sample_type, presence: true
@@ -66,6 +69,10 @@ class Sample < ApplicationRecord
     [originating_data_file].compact + linked_data_files
   end
 
+  def related_sops
+    linked_sops
+  end
+
   def related_samples
     Sample.where(id: related_sample_ids)
   end
@@ -85,6 +92,10 @@ class Sample < ApplicationRecord
 
   def referenced_data_files
     referenced_resources.select { |r| r.is_a?(DataFile) }
+  end
+
+  def referenced_sops
+    referenced_resources.select { |r| r.is_a?(Sop) }
   end
 
   def referenced_strains
@@ -115,11 +126,6 @@ class Sample < ApplicationRecord
     end
   end
 
-  # although it includes the RdfGeneration for some rdf support, it can't be considered to fully support it yet.
-  def rdf_supported?
-    false
-  end
-
   def related_organisms
     Organism.where(id: related_organism_ids)
   end
@@ -145,8 +151,12 @@ class Sample < ApplicationRecord
           sample['title'] = title if sample['id'] == id
         end
         metadata.values[p - 1] = item_linked_samples
-        s.json_metadata = metadata.to_json
-        s.save
+
+        # only update if changed, to prevent triggered jobs that could potentially create an infinate loop
+        if s.json_metadata != metadata.to_json
+          s.json_metadata = metadata.to_json
+          s.save
+        end
       end
     end
   end
@@ -205,6 +215,7 @@ class Sample < ApplicationRecord
     self.strains = referenced_strains
     self.linked_samples = referenced_samples
     self.linked_data_files = referenced_data_files
+    self.linked_sops = referenced_sops
   end
 
   def attribute_class

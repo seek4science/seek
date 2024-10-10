@@ -7,9 +7,11 @@ class UtilTest < ActiveSupport::TestCase
   end
 
   test 'creatable types' do
-    types = Seek::Util.user_creatable_types
-    # How to enable Placeholder?
-    expected = [Collection, DataFile, Document, FileTemplate, Model, Placeholder, Presentation, Publication, Sample, Sop, Assay, Investigation, Study, Event, SampleType, Strain, Workflow, Template]
+    expected = [Collection, DataFile, Document, FileTemplate, Model, ObservationUnit, Placeholder, Presentation, Publication, Sample, Sop, Assay, Investigation, Study, Event, SampleType, Strain, Workflow, Template]
+
+    types = with_config_value :isa_json_compliance_enabled, true do
+      Seek::Util.user_creatable_types
+    end
 
     # first as strings for more readable failed assertion message
     assert_equal expected.map(&:to_s).sort, types.map(&:to_s).sort
@@ -19,21 +21,27 @@ class UtilTest < ActiveSupport::TestCase
   end
 
   test 'authorized types' do
-    # How to enable Placeholder?
-    expected = [Assay, Collection, DataFile, Document, Event, FileTemplate, Investigation, Model, Placeholder, Presentation, Publication, Sample, Sop, Strain, Study, Workflow, Template].map(&:name).sort
-    actual = Seek::Util.authorized_types.map(&:name).sort
+    expected = [Assay, Collection, DataFile, Document, Event, FileTemplate, Investigation, Model, ObservationUnit, Placeholder, Presentation, Publication, Sample, Sop, Strain, Study, Workflow, Template, SampleType].map(&:name).sort
+
+    actual = with_config_value :isa_json_compliance_enabled, true do
+      Seek::Util.authorized_types.map(&:name).sort
+    end
+
     assert_equal expected, actual
   end
 
   test 'rdf capable types' do
     types = Seek::Util.rdf_capable_types
-    expected = %w[Assay DataFile Investigation Model Organism Person Programme Project Publication Sop Strain Study]
+    expected = %w[Assay DataFile Investigation Model ObservationUnit Organism Person Programme Project Publication Sample Sop Strain Study]
     assert_equal expected, types.collect(&:name).sort
   end
 
   test 'searchable types' do
-    types = Seek::Util.searchable_types
-    expected = [Assay, Collection, DataFile, Document, Event, FileTemplate, HumanDisease, Institution, Investigation, Model, Organism, Person, Placeholder, Presentation, Programme, Project, Publication, Sample, SampleType, Sop, Strain, Study, Workflow, Template]
+    expected = [Assay, Collection, DataFile, Document, Event, FileTemplate, HumanDisease, Institution, Investigation, Model, ObservationUnit, Organism, Person, Placeholder, Presentation, Programme, Project, Publication, Sample, SampleType, Sop, Strain, Study, Workflow, Template]
+
+    types = with_config_value :isa_json_compliance_enabled, true do
+      Seek::Util.searchable_types
+    end
 
     # first as strings for more readable failed assertion message
     assert_equal expected.map(&:to_s).sort, types.map(&:to_s).sort
@@ -42,16 +50,26 @@ class UtilTest < ActiveSupport::TestCase
     assert_equal expected.sort_by(&:to_s), types.sort_by(&:to_s)
 
     with_config_value :events_enabled, false do
-      Seek::Util.clear_cached
-      types = Seek::Util.searchable_types
-      assert_equal (expected - [Event]).map(&:to_s).sort, types.map(&:to_s).sort
+      with_config_value :isa_json_compliance_enabled, true do
+        Seek::Util.clear_cached
+        types = Seek::Util.searchable_types
+        assert_equal (expected - [Event]).map(&:to_s).sort, types.map(&:to_s).sort
+      end
     end
 
     with_config_value :programmes_enabled, false do
-      Seek::Util.clear_cached
-      types = Seek::Util.searchable_types
-     assert_equal (expected - [Programme]).map(&:to_s).sort, types.map(&:to_s).sort
+      with_config_value :isa_json_compliance_enabled, true do
+        Seek::Util.clear_cached
+        types = Seek::Util.searchable_types
+        assert_equal (expected - [Programme]).map(&:to_s).sort, types.map(&:to_s).sort
+      end
     end
+
+    with_config_value :isa_json_compliance_enabled, false do
+      types = Seek::Util.searchable_types
+      assert_equal (expected - [Template]).map(&:to_s).sort, types.map(&:to_s).sort
+    end
+
   end
 
   test 'multi-file assets' do

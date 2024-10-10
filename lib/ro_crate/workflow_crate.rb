@@ -50,11 +50,16 @@ module ROCrate
     end
 
     def test_suites
-      ((mentions || []) | (about || [])).select { |entity| entity.has_type?('TestSuite') }
+      (Array(mentions) | Array(about)).select { |entity| entity.has_type?('TestSuite') }
     end
 
     def find_entry(path)
       entries[path]
+    end
+
+    def source_url
+      url = id if id.start_with?('http')
+      url || self['isBasedOn'] || self['url'] || self.main_workflow['url']
     end
   end
 end

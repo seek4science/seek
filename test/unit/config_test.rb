@@ -7,7 +7,7 @@ class ConfigTest < ActiveSupport::TestCase
     assert Seek::Config.events_enabled
   end
   test 'jerm_disabled' do
-    assert !Seek::Config.jerm_enabled
+    refute Seek::Config.jerm_enabled
   end
   test 'solr enabled' do
     assert Seek::Config.solr_enabled
@@ -619,7 +619,7 @@ class ConfigTest < ActiveSupport::TestCase
         refute Seek::Config.omniauth_elixir_aai_legacy_mode
         assert_equal '/seeks/seek1/auth/elixir_aai/callback', config[:callback_path]
         assert_equal 'http://localhost/seeks/seek1/auth/elixir_aai/callback', config[:client_options][:redirect_uri]
-        assert_equal 'https://proxy.aai.lifescience-ri.eu/',config[:issuer]
+        assert_equal 'https://login.aai.lifescience-ri.eu/oidc/',config[:issuer]
         with_config_value(:omniauth_elixir_aai_legacy_mode, true) do
           assert Seek::Config.omniauth_elixir_aai_legacy_mode
           config = Seek::Config.omniauth_elixir_aai_config
@@ -628,6 +628,16 @@ class ConfigTest < ActiveSupport::TestCase
           assert_equal 'https://login.elixir-czech.org/oidc/', config[:issuer]
         end
       end
+    end
+  end
+
+  test 'templates enabled' do
+    with_config_value(:isa_json_compliance_enabled, false) do
+      refute Seek::Config.templates_enabled
+    end
+
+    with_config_value(:isa_json_compliance_enabled, true) do
+      assert Seek::Config.templates_enabled
     end
   end
 end

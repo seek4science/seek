@@ -73,7 +73,7 @@ module Scrapers
           end
           tags = [tag]
         else
-          tags = repo.remote_refs[:tags]&.map { |t| t[:name] } || []
+          tags = all_tags(repo)
           if tags.empty?
             output.puts "    No tags found to register"
             next
@@ -102,9 +102,8 @@ module Scrapers
       workflow = wiz.run
       workflow.contributor = @contributor
       workflow.projects = Array(@project)
-      workflow.policy = Policy.projects_policy(workflow.projects)
-      workflow.policy.access_type = Policy::ACCESSIBLE
       workflow.source_link_url = repo.remote.chomp('.git')
+      workflow.tags = topics(repo)
       if wiz.next_step == :provide_metadata
         unless @debug
           if new_version
@@ -153,11 +152,30 @@ module Scrapers
       RestClient::Resource.new('https://api.github.com', {})
     end
 
+    def topics(repo)
+      remote = repo.remote
+      @_topics_cache ||= {}
+      return @_topics_cache[remote] if @_topics_cache[remote]
+      remote_uri = URI(remote)
+      if remote_uri.hostname.include?('github.com')
+        user, repo, *_ = remote_uri.path.split('/')[1..-1]
+        repo = repo.split('.').first
+
+        @_topics_cache[remote] = JSON.parse(github["repos/#{user}/#{repo}/topics"].get(accept: 'application/vnd.github.mercy-preview+json').body)&.dig('names') || []
+      else
+        @_topics_cache[remote] = []
+      end
+    end
+
     def latest_tag(repo)
       tag = `cd #{repo.git_base.path}/.. && git describe --tags --abbrev=0 remotes/origin/#{main_branch(repo)}`.chomp
       return nil unless $?.success?
 
       tag
+    end
+
+    def all_tags(repo)
+      repo.remote_refs[:tags]&.map { |t| t[:name] } || []
     end
   end
 end

@@ -1,4 +1,4 @@
-<% content_for(:buttons) { button_link_to("Back to #{t('model')}", 'back', model_path(@model,:version=>@display_model.version)) } %>
+<% content_for(:buttons) { button_link_to("Back to #{t('model')}", 'back', model_path(@model,:version=>@display_model.version, :code=>params[:code])) } %>
 
 <%= render :partial => "general/item_title",:locals=>{:item=>@model,:title_postfix=>" - JWS Online #{t('model')} Simulation"} %>
 

@@ -2,6 +2,7 @@ class Project < ApplicationRecord
   include Seek::Annotatable
   include HasSettings
   include Seek::Roles::Scope
+  include Seek::Taggable
 
   acts_as_yellow_pages
   title_trimmer
@@ -16,6 +17,7 @@ class Project < ApplicationRecord
   has_and_belongs_to_many :workflows
   has_and_belongs_to_many :publications
   has_and_belongs_to_many :events
+  has_and_belongs_to_many :observation_units
   has_and_belongs_to_many :presentations
   has_and_belongs_to_many :strains
   has_and_belongs_to_many :samples

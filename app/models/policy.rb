@@ -124,8 +124,9 @@ class Policy < ApplicationRecord
         end
 
         # Set attributes on the policy's permissions
+        current_permissions = policy.permissions
+        new_permissions = []
         if policy_params[:permissions_attributes]
-          current_permissions = policy.permissions
           new_permissions = policy_params[:permissions_attributes].values.map do |perm_params|
             # See if a permission already exists with that contributor
             permission = current_permissions.detect do |p|
@@ -136,10 +137,9 @@ class Policy < ApplicationRecord
 
             permission.tap { |p| p.assign_attributes(perm_params) }
           end
-
-          # Get the unused permissions and mark them for destruction (after policy is saved)
-          (current_permissions - new_permissions).each(&:mark_for_destruction)
         end
+        # Get the unused permissions and mark them for destruction (after policy is saved)
+        (current_permissions - new_permissions).each(&:mark_for_destruction)
       end
     end
   end

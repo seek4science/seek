@@ -16,6 +16,7 @@ en:
   investigation: &investigation "Investigation"
   study: &study "Study"
   assay: &assay "Assay"
+  observation_unit: &observation_unit "Observation Unit"
   assays:
     assay: "Assay"
     experimental_assay: "Experimental assay"
@@ -52,6 +53,7 @@ en:
   placeholder: "Placeholder"
   collection: &collection "Collection"
 
+  observation_unit: &observation_unit "Observation Unit"
   sample: &sample "Sample"
   sample_type: &sample_type "Sample type"
   template: &template "Template"
@@ -176,6 +178,7 @@ en:
     collection: *collection
     presentation: *presentation
     event: *event
+    observation_unit: *observation_unit
     sample: *sample
     template: *template
     sample_type: *sample_type
@@ -199,6 +202,7 @@ en:
     collections: 'Collections'
     presentations: 'Presentations'
     events: 'Events'
+    observation_units: 'Observation Units'
     samples: 'Samples'
     templates: 'Templates'
     sample_types: 'Samples types'
@@ -336,3 +340,7 @@ you can choose to have a %{project} linked to a site managed %{programme} instea
       all: Allow all cookies
       embedding: Allow necessary cookies and embedded content
       necessary: Allow only necessary cookies
+
+  tooltips:
+    batch_permission_changes_button: "You can change the sharing policy and permissions for your items as a batch. A preview of selected items will be given before you choose new permissions for them."
+    publish_your_items_button: "Publish your owned items as a batch. A preview will be given before publishing"

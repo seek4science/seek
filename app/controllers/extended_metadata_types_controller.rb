@@ -1,9 +1,10 @@
 class ExtendedMetadataTypesController < ApplicationController
-
-
-  before_action :is_user_admin_auth, except: [:form_fields, :show]
+  respond_to :json
+  before_action :is_user_admin_auth, except: [:form_fields, :show, :index]
   before_action :find_requested_item, only: [:administer_update, :show]
+  include Seek::IndexPager
 
+  api_actions :index, :show
 
   # generated for form, to display fields for selected metadata type
   def form_fields
@@ -28,6 +29,21 @@ class ExtendedMetadataTypesController < ApplicationController
      respond_to do |format|
         format.json {render json: @extended_metadata_type}
       end
+  end
+
+  def index
+    @extended_metadata_types = ExtendedMetadataType.all.reject { |type| type.supported_type == 'ExtendedMetadata' }
+    respond_to do |format|
+       format.json do
+         render json:  @extended_metadata_types,
+                each_serializer: SkeletonSerializer,
+                links: json_api_links,
+                meta: {
+                  base_url: Seek::Config.site_base_host,
+                  api_version: ActiveModel::Serializer.config.api_version
+                }
+       end
+     end
   end
 
   def administer_update

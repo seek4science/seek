@@ -10,7 +10,10 @@ class StudiesHelperTest < ActionView::TestCase
     FactoryBot.create(:study_extended_metadata_type_for_MIAPPE, title: 'Not MIAPPE')
     refute show_batch_miappe_button?
 
-    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE, title: 'MIAPPE metadata v1.1')
+    type = FactoryBot.create(:study_extended_metadata_type_for_MIAPPE, title: 'MIAPPE metadata v1.1')
     assert show_batch_miappe_button?
+
+    type.update_column(:enabled, false)
+    refute show_batch_miappe_button?
   end
 end
