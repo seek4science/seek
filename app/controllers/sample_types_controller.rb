@@ -111,14 +111,6 @@ class SampleTypesController < ApplicationController
     end
   end
 
-  def check_isa_json_compliance
-    @sample_type ||= SampleType.find(params[:id])
-    if Seek::Config.isa_json_compliance_enabled && @sample_type.is_isa_json_compliant?
-      flash[:error] = 'This sample type is ISA JSON compliant and cannot be managed.'
-      redirect_to sample_types_path
-    end
-  end
-
   def template_details
     render partial: 'template'
   end
@@ -189,7 +181,13 @@ class SampleTypesController < ApplicationController
     @sample_type.build_attributes_from_template
   end
 
-  private
+  def check_isa_json_compliance
+    @sample_type ||= SampleType.find(params[:id])
+    return unless Seek::Config.isa_json_compliance_enabled && @sample_type.is_isa_json_compliant?
+
+    flash[:error] = 'This sample type is ISA JSON compliant and cannot be managed.'
+    redirect_to sample_types_path
+  end
 
   def find_sample_type
     scope = Seek::Config.isa_json_compliance_enabled ? SampleType.without_template : SampleType
