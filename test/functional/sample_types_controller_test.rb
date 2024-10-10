@@ -755,8 +755,8 @@ class SampleTypesControllerTest < ActionController::TestCase
 
   test 'add new attribute to an existing sample type populated with samples' do
     sample_type = FactoryBot.create(:simple_sample_type, project_ids: @project_ids, contributor: @person)
-    samples = (1..10).map do |i|
-      FactoryBot.create(:sample, contributor: @person, project_ids: @project_ids, sample_type:)
+    (1..10).map do |_i|
+      FactoryBot.create(:sample, contributor: @person, project_ids: @project_ids, sample_type: sample_type)
     end
     refute_empty sample_type.samples
     login_as(@person)
