@@ -4,7 +4,9 @@ FactoryBot.define do
     description { 'very simple obs unit'}
     policy { FactoryBot.create(:public_policy) }
     association :contributor, factory: :person, strategy: :create
-    association :study, factory: :study, strategy: :create
+    after(:build) do |a|
+      a.study ||= FactoryBot.create(:study, contributor: a.contributor)
+    end
   end
 
   factory(:min_observation_unit, parent: :observation_unit) do
@@ -21,7 +23,9 @@ FactoryBot.define do
     assets_creators { [AssetsCreator.new(affiliation: 'University of Somewhere', creator: FactoryBot.create(:person, first_name: 'Some', last_name: 'One'))] }
     association :contributor, factory: :person, strategy: :create
     association :extended_metadata, factory: :simple_observation_unit_extended_metadata, strategy: :create
-    association :study, factory: :study, strategy: :create
+    after(:build) do |a|
+      a.study ||= FactoryBot.create(:study, contributor: a.contributor)
+    end
     samples { build_list :sample, 3}
     data_files { build_list :data_file, 3}
   end

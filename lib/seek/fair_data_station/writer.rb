@@ -8,8 +8,7 @@ module Seek
         datastation_inv.studies.each do |datastation_study|
           study = build_study(datastation_study, contributor, policy, investigation)
           datastation_study.observation_units.each do |datastation_observation_unit|
-            observation_unit = build_observation_unit(datastation_observation_unit, contributor, policy, projects,
-                                                      study)
+            observation_unit = build_observation_unit(datastation_observation_unit, contributor, policy, study)
             datastation_observation_unit.samples.each do |datastation_sample|
               sample = build_sample(datastation_sample, contributor, policy, projects)
               if sample.valid?
@@ -55,12 +54,12 @@ module Seek
         sample
       end
 
-      def build_observation_unit(datastation_observation_unit, contributor, policy, projects, study)
+      def build_observation_unit(datastation_observation_unit, contributor, policy, study)
         observation_unit_attributes = datastation_observation_unit.seek_attributes.merge({ contributor: contributor,
-                                                                                           study: study, projects: projects, policy: policy.deep_copy })
+                                                                                           study: study, policy: policy.deep_copy })
         observation_unit = study.observation_units.build(observation_unit_attributes)
         datastation_observation_unit.datasets.each do |datastation_dataset|
-          df = build_data_file(contributor, datastation_dataset, projects, policy)
+          df = build_data_file(contributor, datastation_dataset, study.projects, policy)
           observation_unit.observation_unit_assets.build(asset: df)
         end
         populate_extended_metadata(observation_unit, datastation_observation_unit)

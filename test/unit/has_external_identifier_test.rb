@@ -33,8 +33,8 @@ class HasExternalIdentifierTest < ActiveSupport::TestCase
       assert_equal ['is not unique within the scope of the associated Projects'], obj2.errors[:external_identifier]
       obj2.external_identifier = 'some other id'
       assert obj2.valid?, "#{factory_name} should be valid"
-      # same id, different project. Skip Study and Assay as they inherit project from Investigation
-      unless [:study, :assay].include?(factory_name)
+      # same id, different project. Skip Study, ObservationUnit and Assay as they inherit project from Investigation
+      unless [:study, :observation_unit, :assay].include?(factory_name)
         obj3 = FactoryBot.build(factory_name, contributor: contributor2, external_identifier: 'some id', projects: [project2])
         assert obj3.valid?, "#{factory_name} should be valid"
       end
