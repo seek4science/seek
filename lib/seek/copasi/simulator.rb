@@ -6,6 +6,7 @@ module Seek
       included do
         before_action :find_model, :find_display_asset_for_copasi, :select_model_file_for_simulation, only: [:copasi_simulate]
         before_action :fetch_special_auth_code, if: -> { is_special_auth_code_required? }, only: [:copasi_simulate]
+        before_action :copasi_enabled, only: [:copasi_simulate]
       end
 
       def copasi_simulate
