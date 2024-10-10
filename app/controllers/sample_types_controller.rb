@@ -5,10 +5,10 @@ class SampleTypesController < ApplicationController
   include Seek::AssetsCommon
 
   before_action :samples_enabled?
-  before_action :check_isa_json_compliance, only: %i[edit update manage manage_update]
-  before_action :find_and_authorize_requested_item, except: %i[create batch_upload destroy index new template_details]
-  before_action :find_sample_type, only: %i[batch_upload destroy template_details]
   before_action :check_no_created_samples, only: [:destroy]
+  before_action :check_isa_json_compliance, only: %i[edit update manage manage_update]
+  before_action :find_and_authorize_requested_item, except: %i[create batch_upload index new template_details]
+  before_action :find_sample_type, only: %i[batch_upload template_details]
   before_action :find_assets, only: [:index]
   before_action :auth_to_create, only: %i[new create]
   before_action :project_membership_required, only: %i[create new select filter_for_select]
@@ -112,7 +112,7 @@ class SampleTypesController < ApplicationController
   end
 
   def check_isa_json_compliance
-    @sample_type = SampleType.find(params[:id])
+    @sample_type ||= SampleType.find(params[:id])
     if Seek::Config.isa_json_compliance_enabled && @sample_type.is_isa_json_compliant?
       flash[:error] = 'This sample type is ISA JSON compliant and cannot be managed.'
       redirect_to sample_types_path
@@ -197,6 +197,7 @@ class SampleTypesController < ApplicationController
   end
 
   def check_no_created_samples
+    @sample_type ||= SampleType.find(params[:id])
     if (count = @sample_type.samples.count).positive?
       flash[:error] = "Cannot #{action_name} this sample type - There are #{count} samples using it."
       redirect_to @sample_type
