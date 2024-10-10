@@ -56,7 +56,11 @@ class CopasiTest < ActionController::TestCase
 
     Seek::Config.copasi_enabled = true
     model = FactoryBot.create(:copasi_model, policy: FactoryBot.create(:public_policy))
-    get :copasi_simulate, params: { id: model.id, version: model.version }
+
+    assert_difference('model.run_count', 1) do
+      get :copasi_simulate, params: { id: model.id, version: model.version }
+    end
+
     assert_response :success
 
     assert_equal [], model.special_auth_codes.reload
@@ -110,19 +114,28 @@ class CopasiTest < ActionController::TestCase
 
     # no login, no access right for the private model
     model = FactoryBot.create(:copasi_model, policy: FactoryBot.create(:private_policy))
-    get :copasi_simulate, params: { id: model.id, version: model.version }
+
+    assert_no_difference('model.run_count') do
+      get :copasi_simulate, params: { id: model.id, version: model.version }
+    end
+
     assert_select 'h2', text: /The Model is not visible to you./
 
     # login as another user, no access right for the private model
     person = FactoryBot.create(:person)
     login_as(person)
-    get :copasi_simulate, params: { id: model.id, version: model.version }
+
+    assert_no_difference('model.run_count') do
+      get :copasi_simulate, params: { id: model.id, version: model.version }
+    end
     assert_select 'h2', text: /The Model is not visible to you./
 
     # the access right granted by the model owner, the another user can simulate the model
     login_as(model.contributor.user)
     model.policy.permissions << FactoryBot.create(:permission, contributor:person, access_type:Policy::ACCESSIBLE)
-    get :copasi_simulate, params: { id: model.id, version: model.version }
+    assert_difference('model.run_count', 1) do
+      get :copasi_simulate, params: { id: model.id, version: model.version }
+    end
     assert_response :success
 
     assert_select 'a[onclick="simulate()"]', text: 'Simulate Online'
@@ -163,4 +176,30 @@ class CopasiTest < ActionController::TestCase
 
     end
   end
+
+
+  test 'show run count for runnable copasi model' do
+    Seek::Config.copasi_enabled = true
+    model = FactoryBot.create(:copasi_model, policy: FactoryBot.create(:public_policy))
+    get :show, params: { id: model }
+
+    assert_select '#usage_count' do
+      assert_select 'strong', text: /Downloads/, count: 1
+      assert_select 'strong', text: /Runs:/, count: 1
+    end
+  end
+
+  test 'do not show run count for non-runnable copasi model' do
+
+    model = FactoryBot.create(:non_sbml_xml_model, policy: FactoryBot.create(:public_policy))
+    get :show, params: { id: model }
+    assert_response :success
+
+    assert_select '#usage_count' do
+      assert_select 'strong', text: /Downloads/, count: 1
+      assert_select 'strong', text: /Runs:/, count: 0
+    end
+  end
+
+
 end
