@@ -351,6 +351,7 @@ ActiveRecord::Schema.define(version: 2024_09_02_125710) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean "deleted", default: false
+    t.boolean "make_local_copy", default: false
     t.index ["asset_id", "asset_type"], name: "index_content_blobs_on_asset_id_and_asset_type"
   end
 
