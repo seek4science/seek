@@ -52,17 +52,12 @@ class ObservationUnitsControllerTest < ActionController::TestCase
   end
 
   test 'manage update' do
-    proj1=FactoryBot.create(:project)
-    proj2=FactoryBot.create(:project)
-    person = FactoryBot.create(:person,project:proj1)
+    person = FactoryBot.create(:person)
     other_person = FactoryBot.create(:person)
-    person.add_to_project_and_institution(proj2,person.institutions.first)
-    person.save!
-    other_creator = FactoryBot.create(:person,project:proj1)
-    other_creator.add_to_project_and_institution(proj2,other_creator.institutions.first)
-    other_creator.save!
+    other_study = FactoryBot.create(:study, contributor:person)
+    other_creator = FactoryBot.create(:person)
 
-    obs_unit = FactoryBot.create(:observation_unit, contributor:person, projects:[proj1], policy:FactoryBot.create(:private_policy))
+    obs_unit = FactoryBot.create(:observation_unit, contributor:person, policy:FactoryBot.create(:private_policy))
 
     login_as(person)
     assert obs_unit.can_manage?
@@ -70,7 +65,7 @@ class ObservationUnitsControllerTest < ActionController::TestCase
     patch :manage_update, params: {id: obs_unit,
                                    observation_unit: {
                                      creator_ids: [other_creator.id],
-                                     project_ids: [proj1.id, proj2.id]
+                                     study_id: other_study.id,
                                    },
                                    policy_attributes: {access_type: Policy::VISIBLE, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}
                                    }}
@@ -78,12 +73,12 @@ class ObservationUnitsControllerTest < ActionController::TestCase
     assert_redirected_to obs_unit
 
     obs_unit.reload
-    assert_equal [proj1,proj2],obs_unit.projects.sort_by(&:id)
-    assert_equal [other_creator],obs_unit.creators
-    assert_equal Policy::VISIBLE,obs_unit.policy.access_type
-    assert_equal 1,obs_unit.policy.permissions.count
-    assert_equal other_person,obs_unit.policy.permissions.first.contributor
-    assert_equal Policy::MANAGING,obs_unit.policy.permissions.first.access_type
+    assert_equal other_study, obs_unit.study
+    assert_equal [other_creator], obs_unit.creators
+    assert_equal Policy::VISIBLE, obs_unit.policy.access_type
+    assert_equal 1, obs_unit.policy.permissions.count
+    assert_equal other_person, obs_unit.policy.permissions.first.contributor
+    assert_equal Policy::MANAGING, obs_unit.policy.permissions.first.access_type
   end
 
   test 'update' do
@@ -140,7 +135,6 @@ class ObservationUnitsControllerTest < ActionController::TestCase
     study = FactoryBot.create(:study, contributor: contributor)
     datafile = FactoryBot.create(:data_file, contributor: contributor)
     sample = FactoryBot.create(:sample, contributor: contributor)
-    project = contributor.projects.first
     other_person = FactoryBot.create(:person)
     creator = FactoryBot.create(:person)
     login_as(contributor)
@@ -149,7 +143,6 @@ class ObservationUnitsControllerTest < ActionController::TestCase
                                title: 'new title',
                                description: 'new description',
                                creator_ids: [creator.id],
-                               project_ids: [project.id],
                                data_file_ids: [datafile.id],
                                sample_ids: [sample.id],
                                study_id: study,
@@ -177,14 +170,14 @@ class ObservationUnitsControllerTest < ActionController::TestCase
     assert_equal 'new strain', obs_unit.extended_metadata.get_attribute_value('strain')
     assert_equal %w[fish soup], obs_unit.tags.sort
     assert_equal contributor, obs_unit.contributor
-    assert_equal [project],obs_unit.projects
-    assert_equal [creator],obs_unit.creators
-    assert_equal [datafile],obs_unit.data_files
-    assert_equal [sample],obs_unit.samples
-    assert_equal Policy::VISIBLE,obs_unit.policy.access_type
+    assert_equal study.projects, obs_unit.projects
+    assert_equal [creator], obs_unit.creators
+    assert_equal [datafile], obs_unit.data_files
+    assert_equal [sample], obs_unit.samples
+    assert_equal Policy::VISIBLE, obs_unit.policy.access_type
     assert_equal 1,obs_unit.policy.permissions.count
-    assert_equal other_person,obs_unit.policy.permissions.first.contributor
-    assert_equal Policy::MANAGING,obs_unit.policy.permissions.first.access_type
+    assert_equal other_person, obs_unit.policy.permissions.first.contributor
+    assert_equal Policy::MANAGING, obs_unit.policy.permissions.first.access_type
   end
 
   test 'no access if observation units disabled' do
