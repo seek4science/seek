@@ -113,7 +113,7 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
   test 'updates to queue for sample' do
     user = FactoryBot.create :user
     sample = nil
-    assert_difference('AuthLookupUpdateQueue.count', 1) do
+    assert_difference('AuthLookupUpdateQueue.count', 2) do
       sample = FactoryBot.create :sample, contributor: user.person, policy: FactoryBot.create(:private_policy),
                        sample_type:FactoryBot.create(:simple_sample_type,contributor:user.person)
     end
@@ -166,7 +166,8 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
     types.each do |type|
       entity = nil
       assert_difference('AuthLookupUpdateQueue.count', 1, "unexpected count for created type #{type.name}") do
-        entity = FactoryBot.create type.name.underscore.to_sym, contributor: user.person, policy: FactoryBot.create(:private_policy)
+        factory_name = type.is_a?(SampleType.class) ? :simple_sample_type : type.name.underscore.to_sym
+        entity = FactoryBot.create factory_name, contributor: user.person, policy: FactoryBot.create(:private_policy)
       end
       assert_equal entity, AuthLookupUpdateQueue.order(:id).last.item
       AuthLookupUpdateQueue.destroy_all

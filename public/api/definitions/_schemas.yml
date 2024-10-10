@@ -2586,6 +2586,10 @@ sampleTypePost:
               $ref: "#/components/schemas/nonEmptyString"
             description:
               $ref: "#/components/schemas/nullableNonEmptyString"
+            policy:
+              $ref: "#/components/schemas/policy"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkPostList"
             sample_attributes:
               type: array
               minItems: 1
@@ -2633,6 +2637,10 @@ sampleTypePatch:
               $ref: "#/components/schemas/nonEmptyString"
             description:
               $ref: "#/components/schemas/nullableNonEmptyString"
+            policy:
+              $ref: "#/components/schemas/policy"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkPostList"
             sample_attributes:
               type: array
               minItems: 1
@@ -4642,6 +4650,10 @@ sampleTypeResponse:
               $ref: "#/components/schemas/nonEmptyString"
             description:
               $ref: "#/components/schemas/nullableNonEmptyString"
+            policy:
+              $ref: "#/components/schemas/policy"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkPostList"
             sample_attributes:
               $ref: "#/components/schemas/sampleTypeSampleAttributesResponse"
             tags:
