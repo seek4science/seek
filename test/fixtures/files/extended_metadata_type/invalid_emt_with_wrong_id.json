@@ -1,0 +1,27 @@
+{
+  "title": "study metadata demo",
+  "supported_type": "Study",
+  "enabled": true,
+  "attributes": [
+    {
+      "title": "resource_type_general",
+      "label": "Resource type general",
+      "description": "resource type general",
+      "type": "Controlled Vocabulary",
+      "required": true,
+      "pos": 1,
+      "ID": -1
+    },
+    {
+      "title": "resource_study_country",
+      "label": "Study country",
+      "description": "study country",
+      "type": "Controlled Vocabulary List",
+      "required": true,
+      "pos": 2,
+      "ID": -1
+    }
+  ]
+}
+
+

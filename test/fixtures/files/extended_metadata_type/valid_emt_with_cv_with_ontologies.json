@@ -1,0 +1,15 @@
+{
+  "title": "An example with attributes associated with ontology terms",
+  "supported_type": "Study",
+  "enabled": true,
+  "attributes": [
+    {
+      "title": "Topics",
+      "description": "Topics, used for annotating. Describes the domain, field of interest, of study, application, work, data, or technology. Initially seeded from the EDAM ontology.",
+      "type": "Controlled Vocabulary",
+      "required": true,
+      "pos": 1,
+      "ID": "CV_TOPICS_ID"
+    }
+  ]
+}

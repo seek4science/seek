@@ -1,15 +1,27 @@
 <%
+
+  disabled = extended_metadata_type.extended_type? ?
+               extended_metadata_type.linked_by_metadata_attributes? :
+               extended_metadata_type.extended_metadatas.present?
+
+  linked = extended_metadata_type.extended_type? ?
+                   extended_metadata_type.linked_metadata_attributes :
+                   extended_metadata_type.extended_metadatas
+
+
   row_cls = ""
   row_cls << ' warning' if extended_metadata_type.disabled_but_used?
   row_cls << ' text-secondary' unless extended_metadata_type.enabled?
 
 %>
 <tr class="<%= row_cls %>">
-  <td><%= extended_metadata_type.id %></td>
+  <td id="<%= extended_metadata_type.id %>"><%= link_to extended_metadata_type.id, extended_metadata_type_path(extended_metadata_type, format: :json) %></td>
   <td><%= extended_metadata_type.title %></td>
   <td><%= extended_metadata_type.supported_type %></td>
-  <td><%= extended_metadata_type.extended_metadatas.count %></td>
-  <td><%= extended_metadata_type.enabled? ? 'Enabled' : 'Disabled' %></td>
+  <td><%= linked.count %></td>
+  <% unless extended_metadata_type.extended_type? %>
+    <td><%= extended_metadata_type.enabled? ? 'Enabled' : 'Disabled' %></td>
+  <% end %>
   <td>
     <% unless extended_metadata_type.extended_type? %>
       <%= form_for(extended_metadata_type, url: administer_update_extended_metadata_type_path(extended_metadata_type), method: :put) do |f| %>
@@ -20,6 +32,11 @@
           <%= f.submit 'Enable', class:'btn btn-primary' %>
         <% end %>
       <% end %>
+    <% end %>
+  </td>
+  <td>
+    <%= form_for(extended_metadata_type, url: extended_metadata_type_path(extended_metadata_type), method: :delete, data: { confirm: 'Are you sure?' }) do |f| %>
+      <%= f.submit 'Delete', class: 'btn btn-danger', disabled: disabled %>
     <% end %>
   </td>
 </tr>

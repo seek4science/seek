@@ -1,0 +1,32 @@
+{
+  "title": "family",
+  "supported_type": "Investigation",
+  "enabled": true,
+  "attributes": [
+    {
+      "title": "dad",
+      "label": "Dad",
+      "description": null,
+      "type": "Linked Extended Metadata",
+      "required": false,
+      "ID": "PERSON_EMT_ID"
+    },
+    {
+      "title": "mom",
+      "label": "Mom",
+      "description": null,
+      "type": "Linked Extended Metadata",
+      "required": false,
+      "ID": "PERSON_EMT_ID"
+    },
+    {
+      "title": "child",
+      "label": "child",
+      "description": null,
+      "type": "Linked Extended Metadata (multiple)",
+      "required": false,
+      "ID": "PERSON_EMT_ID"
+    }
+  ]
+}
+

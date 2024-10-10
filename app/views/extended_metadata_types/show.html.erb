@@ -1,0 +1,19 @@
+<%= render partial: 'general/item_title', locals: { item: @extended_metadata_type, buttons_partial: 'buttons' } %>
+
+<%= render partial: 'general/show_page_tab_definitions' %>
+
+<div class="tab-content">
+  <%= tab_pane('overview') do %>
+    <div class="col-md-9 col-sm-8 box_about_actor">
+
+
+      <h2>Attributes</h2>
+      <%=   @extended_metadata_type.inspect %>
+
+    </div>
+
+  <% end %>
+  <%= tab_pane('related-items') do %>
+    <%= render partial: 'general/items_related_to', object: @extended_metadata_type %>
+  <% end %>
+</div>

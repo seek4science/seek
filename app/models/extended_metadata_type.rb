@@ -34,6 +34,14 @@ class ExtendedMetadataType < ApplicationRecord
     supported_type == 'ExtendedMetadata'
   end
 
+  def linked_by_metadata_attributes?
+    ExtendedMetadataAttribute.pluck(:linked_extended_metadata_type_id).compact.include?(id)
+  end
+
+  def linked_metadata_attributes
+    ExtendedMetadataAttribute.where(linked_extended_metadata_type_id: id)
+  end
+
   def supported_type_must_be_valid_type
     return if supported_type.blank? # already convered by presence validation
     unless Seek::Util.lookup_class(supported_type, raise: false)
@@ -65,8 +73,5 @@ class ExtendedMetadataType < ApplicationRecord
   def self.disabled_but_in_use
     disabled.select{|emt| emt.disabled_but_used?}
   end
-
-
-
 
 end
