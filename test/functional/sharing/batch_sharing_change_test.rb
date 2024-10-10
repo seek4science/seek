@@ -270,7 +270,11 @@ class BatchSharingChangeTest < ActionController::TestCase
   def bulk_create_sharing_assets
     authorized_types = Seek::Util.authorized_types
     authorized_types.collect do |klass|
-      FactoryBot.create(klass.name.underscore.to_sym, contributor: User.current_user.person)
+      if klass == SampleType
+        FactoryBot.create(:min_sample_type, contributor: User.current_user.person)
+      else
+        FactoryBot.create(klass.name.underscore.to_sym, contributor: User.current_user.person)
+      end
     end
   end
 

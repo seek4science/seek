@@ -183,7 +183,7 @@ class CollectionTest < ActiveSupport::TestCase
 
     types = Seek::Util.persistent_classes.select { |c| !%w[Project Programme Collection].include?(c.name) && c.method_defined?(:collections) }
     types.each do |type|
-      opts = [type.name.underscore.to_sym]
+      opts = type.is_a?(SampleType.class) ? [:simple_sample_type] : [type.name.underscore.to_sym]
       opts << { policy: FactoryBot.create(:public_policy) } if type.method_defined?(:policy)
       asset = FactoryBot.create(*opts)
       assert_difference('CollectionItem.count', 1, "#{type.name} could not be added to collection") do
