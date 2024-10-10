@@ -111,25 +111,6 @@ class SampleTypesController < ApplicationController
     end
   end
 
-  # DELETE /sample_types/1
-  # DELETE /sample_types/1.json
-  def destroy
-    respond_to do |format|
-      if @sample_type.can_delete? && @sample_type.destroy
-        format.html do
-          redirect_to @sample_type, location: sample_types_path, notice: 'Sample type was successfully deleted.'
-        end
-        format.json { render json: @sample_type, include: [params[:include]] }
-      else
-        format.html do
-          redirect_to @sample_type, location: sample_types_path,
-                                    notice: 'It was not possible to delete the sample type.'
-        end
-        format.json { render json: @sample_type.errors, status: :unprocessable_entity }
-      end
-    end
-  end
-
   def check_isa_json_compliance
     @sample_type = SampleType.find(params[:id])
     if Seek::Config.isa_json_compliance_enabled && @sample_type.is_isa_json_compliant?
