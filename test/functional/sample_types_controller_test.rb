@@ -207,7 +207,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     end
     assert_empty sample_type.tags
 
-    golf = FactoryBot.create :tag, source: @person.user, annotatable: FactoryBot.create(:simple_sample_type), 
+    golf = FactoryBot.create :tag, source: @person.user, annotatable: FactoryBot.create(:simple_sample_type),
                                    value: 'golf'
 
     sample_attributes_fields = sample_type.sample_attributes.map do |attribute|
@@ -252,7 +252,7 @@ class SampleTypesControllerTest < ActionController::TestCase
   end
 
   test 'update changing from a CV attribute' do
-    sample_type = FactoryBot.create(:apples_controlled_vocab_sample_type, project_ids: @project_ids, 
+    sample_type = FactoryBot.create(:apples_controlled_vocab_sample_type, project_ids: @project_ids,
                                                                           contributor: @person)
     assert sample_type.valid?
     assert sample_type.can_edit?
@@ -315,7 +315,7 @@ class SampleTypesControllerTest < ActionController::TestCase
   end
 
   test 'other project member cannot update sample type' do
-    sample_type = FactoryBot.create(:patient_sample_type, project_ids: [FactoryBot.create(:project).id], 
+    sample_type = FactoryBot.create(:patient_sample_type, project_ids: [FactoryBot.create(:project).id],
                                                           title: 'should not change')
     refute sample_type.can_edit?
 
@@ -708,9 +708,9 @@ class SampleTypesControllerTest < ActionController::TestCase
     with_config_value(:isa_json_compliance_enabled, true) do
       person = FactoryBot.create(:person)
 
-      investigation = FactoryBot.create(:investigation, contributor: person, policy: FactoryBot.create(:public_policy), 
+      investigation = FactoryBot.create(:investigation, contributor: person, policy: FactoryBot.create(:public_policy),
                                                         is_isa_json_compliant: true)
-      study = FactoryBot.create(:isa_json_compliant_study, investigation: , contributor: person, 
+      study = FactoryBot.create(:isa_json_compliant_study, investigation: investigation , contributor: person,
                                                            policy: FactoryBot.create(:public_policy))
       source_sample_type = study.sample_types.first
 
@@ -719,7 +719,7 @@ class SampleTypesControllerTest < ActionController::TestCase
       login_as(person)
       assert source_sample_type.is_isa_json_compliant?
       get :manage, params: { id: source_sample_type }
-      assert_redirected_to sample_types_path
+      assert_redirected_to sample_type_path
 
       refute project_sample_type.is_isa_json_compliant?
       get :manage, params: { id: project_sample_type }
