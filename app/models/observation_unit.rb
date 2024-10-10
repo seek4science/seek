@@ -16,7 +16,7 @@ class ObservationUnit < ApplicationRecord
 
   acts_as_isa
 
-  validates :study,  presence: true
+  validates :study,  presence: true, projects: true
   validate :study_matches_assays_if_present
 
   accepts_nested_attributes_for :data_files, allow_destroy: true
