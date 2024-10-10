@@ -225,9 +225,9 @@ module AssetsHelper
 
     blob  =   @display_model.copasi_supported_content_blobs.first
 
-    auth_code = @model.special_auth_codes.where('code LIKE ?', 'copasi_%').first.code unless @model.public?
+    auth_code = @model.special_auth_codes.where('code LIKE ?', 'copasi_%').first.code unless @model.can_download?(nil)
 
-    download_path = polymorphic_path([@model, blob], action: :download, code:auth_code)
+    download_path = polymorphic_path([@model, blob], action: :download, code: auth_code)
 
     copasi_download_path =  "copasi://process?downloadUrl=http://"+request.host_with_port+download_path+"&activate=Time%20Course&createPlot=Concentrations%2C%20Volumes%2C%20and%20Global%20Quantity%20Values&runTask=Time-Course"
 

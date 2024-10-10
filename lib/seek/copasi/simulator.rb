@@ -6,7 +6,6 @@ module Seek
       included do
         before_action :find_model, :find_display_asset_for_copasi, :select_model_file_for_simulation, only: [:copasi_simulate]
         before_action :fetch_special_auth_code, if: -> { is_special_auth_code_required? }, only: [:copasi_simulate]
-
       end
 
       def copasi_simulate
@@ -56,21 +55,6 @@ module Seek
       end
 
 
-      # fetches or generates a special auth code with a "copasi_" prefix, which is used by COPASI desk application to load the non public model 
-      def fetch_special_auth_code
-        copasi_codes = special_auth_codes_with_copasi_prefix
-
-        if copasi_codes.empty?
-          # Generate a special auth code for a day
-          auth_code = SpecialAuthCode.new(expiration_date: Time.now + 1.day)
-          auth_code.update(code: "copasi_#{auth_code.code}")
-          @model.special_auth_codes << auth_code
-          auth_code # Ensure the new auth code is returned
-        else
-          copasi_codes.first
-        end
-      end
-
       private
 
       def special_auth_codes_with_copasi_prefix
@@ -79,7 +63,17 @@ module Seek
 
       def is_special_auth_code_required?
         # If the model is not publicly accessible but can be downloaded by the current user, the special auth code will be required.
-        Seek::Config.copasi_enabled && @display_model.is_copasi_supported? && @model.can_download? && !@model.public?
+        Seek::Config.copasi_enabled && @display_model.is_copasi_supported? && @model.can_download?(current_user) && !@model.can_download?(nil)
+      end
+
+      # fetches or generates a special auth code with a "copasi_" prefix, which is used by COPASI desk application to load the non public model
+      def fetch_special_auth_code
+        copasi_codes = special_auth_codes_with_copasi_prefix
+        return copasi_codes.first unless copasi_codes.empty?
+
+        auth_code = SpecialAuthCode.create(expiration_date: Time.now + 1.day, code: "copasi_#{SecureRandom.hex(10)}")
+        @model.special_auth_codes << auth_code
+        auth_code
       end
 
     end

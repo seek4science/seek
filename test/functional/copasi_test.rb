@@ -8,11 +8,11 @@ class CopasiTest < ActionController::TestCase
   test 'simulate model on copasi button visibility' do
 
     # if copasi is not enabled, the button is hidden
+    Seek::Config.copasi_enabled = false
     model = FactoryBot.create(:copasi_model, policy: FactoryBot.create(:public_policy))
     get :show, params: { id: model }
     assert_response :success
     assert_select 'a[href=?]', copasi_simulate_model_path(model, version: 1), text: 'Simulate Model on Copasi', count:0
-
 
     # if copasi is enabled, the button is visible
     Seek::Config.copasi_enabled = true
@@ -29,7 +29,6 @@ class CopasiTest < ActionController::TestCase
     get :show, params: { id: model }
     assert_response :success
     assert_select 'a[href=?]', copasi_simulate_model_path(model, version: 1), text: 'Simulate Model on Copasi'
-
 
     # for another user, the button is hidden
     person = FactoryBot.create(:person)
@@ -60,10 +59,11 @@ class CopasiTest < ActionController::TestCase
     get :copasi_simulate, params: { id: model.id, version: model.version }
     assert_response :success
 
+    assert_equal [], model.special_auth_codes.reload
+
     assert_select 'h1', text: /#{model.title} - Copasi Model Simulation/
     assert_select 'a[onclick="simulate()"]', text: 'Simulate Online'
 
-    # Assert the presence of the <a> tag with the specific href attribute and text
     expected_href = "copasi://process?downloadUrl=http://#{request.host_with_port}/models/#{model.id}/content_blobs/#{model.content_blobs.first.id}/download&activate=Time%20Course&createPlot=Concentrations%2C%20Volumes%2C%20and%20Global%20Quantity%20Values&runTask=Time-Course"
     assert_select 'a[href=?]', expected_href, text: 'Simulate in CopasiUI'
 
@@ -83,18 +83,26 @@ class CopasiTest < ActionController::TestCase
     assert_response :success
 
     auth_code = CGI.escape(model.special_auth_codes.first.code)
-    assert_match /^copasi_/, model.special_auth_codes.first.code
+    assert_match /^copasi_/, auth_code
 
     assert_select 'h1', text: /#{model.title} - Copasi Model Simulation/
     assert_select 'a[onclick="simulate()"]', text: 'Simulate Online'
     assert_select 'a[href*=?]', auth_code, text: 'Simulate in CopasiUI'
 
+    # the copasi code will expire in 1 day
     assert_no_difference('SpecialAuthCode.count') do
       get :copasi_simulate, params: { id: model.id, version: model.version }
     end
 
     assert_select 'a[onclick="simulate()"]', text: 'Simulate Online'
     assert_select 'a[href*=?]', auth_code, text: 'Simulate in CopasiUI'
+
+    # new copasi code will be generated after 1 day
+    travel_to(Time.now + 1.day) do
+      assert_difference('SpecialAuthCode.count') do
+        get :copasi_simulate, params: { id: model.id, version: model.version }
+      end
+    end
 
   end
 
