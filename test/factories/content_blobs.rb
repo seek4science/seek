@@ -477,4 +477,10 @@ FactoryBot.define do
     original_filename { 'transparent-fairdom-logo-square.svg' }
     data { File.new("#{Rails.root}/test/fixtures/files/transparent-fairdom-logo-square.svg", 'rb').read }
   end
+
+  factory(:copasi_content_blob, parent: :content_blob) do
+    content_type { 'application/xml' }
+    original_filename { 'brusselator.cps' }
+    data { File.new("#{Rails.root}/test/fixtures/files/brusselator.cps", 'rb').read }
+  end
 end

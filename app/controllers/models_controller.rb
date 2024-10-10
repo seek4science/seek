@@ -12,6 +12,7 @@ class ModelsController < ApplicationController
   before_action :find_other_version, :only => [:compare_versions]
 
   include Seek::Jws::Simulator
+  include Seek::Copasi::Simulator
   include Seek::Publishing::PublishingCommon
 
   include Bives
@@ -123,6 +124,16 @@ class ModelsController < ApplicationController
     unless Seek::Config.jws_enabled
       respond_to do |format|
         flash[:error] = "Interaction with JWS Online is currently disabled"
+        format.html { redirect_to model_path(@model, :version => @display_model.version) }
+      end
+      return false
+    end
+  end
+
+  def copasi_enabled
+    unless Seek::Config.copasi_enabled
+      respond_to do |format|
+        flash[:error] = "Interaction with Copasi Online is currently disabled"
         format.html { redirect_to model_path(@model, :version => @display_model.version) }
       end
       return false

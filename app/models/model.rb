@@ -112,7 +112,15 @@ class Model < ApplicationRecord
   end
 
   def can_run?
+    can_run_jws? || can_run_copasi?
+  end
+
+  def can_run_jws?
     Seek::Config.jws_enabled && can_download? && is_jws_supported?
+  end
+
+  def can_run_copasi?
+    Seek::Config.copasi_enabled && can_download? && is_copasi_supported?
   end
 
   private
