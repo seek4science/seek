@@ -7,7 +7,7 @@ module Seek
       included do
         after_save :queue_template_generation, :queue_sample_type_update_job
         validate :validate_template_file
-        has_one :content_blob, as: :asset, dependent: :destroy
+        has_one :content_blob, as: :asset
         alias_method :template, :content_blob
         has_task :template_generation
         extend ClassMethods

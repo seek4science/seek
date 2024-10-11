@@ -11,7 +11,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     @project_ids = [@project.id]
     refute_nil @project
     login_as(@person)
-    @sample_type = FactoryBot.create(:simple_sample_type, project_ids: @project_ids)
+    @sample_type = FactoryBot.create(:simple_sample_type, project_ids: @project_ids, contributor: @person)
     @string_type = FactoryBot.create(:string_sample_attribute_type)
     @int_type = FactoryBot.create(:integer_sample_attribute_type)
     @controlled_vocab_type = FactoryBot.create(:controlled_vocab_attribute_type)
@@ -30,7 +30,7 @@ class SampleTypesControllerTest < ActionController::TestCase
 
   test 'should create sample_type' do
     FactoryBot.create :annotation, attribute_name: 'sample_type_tag', source: @person.user,
-                         annotatable: FactoryBot.create(:simple_sample_type), value: 'golf'
+                                   annotatable: FactoryBot.create(:simple_sample_type), value: 'golf'
 
     assert_enqueued_with(job: SampleTemplateGeneratorJob) do
       assert_enqueued_with(job: SampleTypeUpdateJob) do
@@ -203,11 +203,12 @@ class SampleTypesControllerTest < ActionController::TestCase
   test 'should update sample_type' do
     sample_type = nil
     perform_enqueued_jobs(only: [SampleTemplateGeneratorJob, SampleTypeUpdateJob]) do
-      sample_type = FactoryBot.create(:patient_sample_type, project_ids: @project_ids)
+      sample_type = FactoryBot.create(:patient_sample_type, project_ids: @project_ids, contributor: @person)
     end
     assert_empty sample_type.tags
 
-    golf = FactoryBot.create :tag, source: @person.user, annotatable: FactoryBot.create(:simple_sample_type), value: 'golf'
+    golf = FactoryBot.create :tag, source: @person.user, annotatable: FactoryBot.create(:simple_sample_type),
+                                   value: 'golf'
 
     sample_attributes_fields = sample_type.sample_attributes.map do |attribute|
       { pos: attribute.pos, title: attribute.title,
@@ -251,7 +252,8 @@ class SampleTypesControllerTest < ActionController::TestCase
   end
 
   test 'update changing from a CV attribute' do
-    sample_type = FactoryBot.create(:apples_controlled_vocab_sample_type, project_ids: @project_ids)
+    sample_type = FactoryBot.create(:apples_controlled_vocab_sample_type, project_ids: @project_ids,
+                                                                          contributor: @person)
     assert sample_type.valid?
     assert sample_type.can_edit?
     assert_equal 1, sample_type.sample_attributes.count
@@ -278,7 +280,7 @@ class SampleTypesControllerTest < ActionController::TestCase
   end
 
   test 'update changing from a Sample Type attribute' do
-    sample_type = FactoryBot.create(:linked_sample_type, project_ids: @project_ids)
+    sample_type = FactoryBot.create(:linked_sample_type, project_ids: @project_ids, contributor: @person)
     assert sample_type.valid?
     assert sample_type.can_edit?
     assert_equal 2, sample_type.sample_attributes.count
@@ -313,7 +315,8 @@ class SampleTypesControllerTest < ActionController::TestCase
   end
 
   test 'other project member cannot update sample type' do
-    sample_type = FactoryBot.create(:patient_sample_type, project_ids: [FactoryBot.create(:project).id], title: 'should not change')
+    sample_type = FactoryBot.create(:patient_sample_type, project_ids: [FactoryBot.create(:project).id],
+                                                          title: 'should not change')
     refute sample_type.can_edit?
 
     assert_no_difference('ActivityLog.count') do
@@ -411,7 +414,7 @@ class SampleTypesControllerTest < ActionController::TestCase
   end
 
   test 'should show link to sample type for linked attribute' do
-    linked_type = FactoryBot.create(:linked_sample_type, project_ids: @project_ids)
+    linked_type = FactoryBot.create(:linked_sample_type, project_ids: @project_ids, contributor: @person)
     linked_attribute = linked_type.sample_attributes.last
 
     assert linked_attribute.sample_attribute_type.seek_sample?
@@ -430,7 +433,7 @@ class SampleTypesControllerTest < ActionController::TestCase
   end
 
   test 'add attribute button' do
-    type = FactoryBot.create(:simple_sample_type, project_ids: @project_ids)
+    type = FactoryBot.create(:simple_sample_type, project_ids: @project_ids, contributor: @person)
     assert_empty type.samples
     login_as(@person)
     get :edit, params: { id: type.id }
@@ -438,7 +441,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_select 'a#add-attribute', count: 1
 
     sample = FactoryBot.create(:patient_sample, contributor: @person,
-                                      sample_type: FactoryBot.create(:patient_sample_type, project_ids: @project_ids))
+                                                sample_type: FactoryBot.create(:patient_sample_type, project_ids: @project_ids, contributor: @person))
     type = sample.sample_type
     refute_empty type.samples
     assert type.can_edit?
@@ -643,9 +646,9 @@ class SampleTypesControllerTest < ActionController::TestCase
 
   test 'only visible sample types are listed' do
     person = FactoryBot.create(:person)
-    st1 = FactoryBot.create(:simple_sample_type, projects: person.projects)
+    st1 = FactoryBot.create(:simple_sample_type, projects: person.projects, contributor: person)
     st2 = FactoryBot.create(:simple_sample_type)
-    st3 = FactoryBot.create(:sample, policy: FactoryBot.create(:public_policy)).sample_type # type with a public sample associated
+    st3 = FactoryBot.create(:simple_sample_type, projects: person.projects, policy: FactoryBot.create(:public_policy))
     login_as(person.user)
 
     assert st1.can_view?
@@ -671,53 +674,6 @@ class SampleTypesControllerTest < ActionController::TestCase
 
     assert_select 'h2.forbidden', text: /The Sample type is not visible to you/
   end
-
-  test 'visible with referring sample' do
-    person = FactoryBot.create(:person)
-    sample = FactoryBot.create(:sample,
-                     policy: FactoryBot.create(:private_policy,
-                                     permissions: [FactoryBot.create(:permission, contributor: person,
-                                                                        access_type: Policy::VISIBLE)]))
-    sample_type = sample.sample_type
-    login_as(person.user)
-
-    assert sample.can_view?
-    refute sample_type.can_view?
-    assert sample_type.can_view?(person.user, sample)
-
-    get :show, params: { id: sample_type.id }
-    assert_response :forbidden
-
-    get :show, params: { id: sample_type.id, referring_sample_id: sample.id }
-    assert_response :success
-
-    # sample type must match
-    get :show, params: { id: FactoryBot.create(:simple_sample_type).id, referring_sample_id: sample.id }
-    assert_response :forbidden
-  end
-
-  # test 'display sample type with related templates' do
-  #   person = FactoryBot.create(:person)
-  #
-  #   template = FactoryBot.create(:min_template, contributor: person, title:'related template')
-  #   template2 = FactoryBot.create(:min_template, contributor: person, title:'unrelated template')
-  #
-  #   # must be associated with a spreadsheet template
-  #   sample_type = FactoryBot.create(:strain_sample_type, isa_template: template, contributor: person)
-  #
-  #   assert_equal template, sample_type.isa_template
-  #   refute_nil sample_type.template
-  #
-  #   login_as(person.user)
-  #
-  #   get :show, params: { id: sample_type.id }
-  #   assert_response :success
-  #
-  #   assert_select 'div.related-items div#templates' do
-  #     assert_select 'a[href=?]', template_path(template), text: template.title
-  #     assert_select 'a[href=?]', template_path(template2), text: template2.title, count: 0
-  #   end
-  # end
 
   test 'filter sample types with template when advanced single page is enabled' do
     project = FactoryBot.create(:project)
@@ -746,6 +702,65 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_select 'div#error_explanation' do
       assert_select 'ul > li', text: 'Sample attributes title cannot be changed (the_title)'
     end
+  end
+
+  test 'Should not be allowed to show the manage page of ISA-JSON compliant sample type' do
+    with_config_value(:isa_json_compliance_enabled, true) do
+      person = FactoryBot.create(:person)
+
+      investigation = FactoryBot.create(:investigation, contributor: person, policy: FactoryBot.create(:public_policy),
+                                                        is_isa_json_compliant: true)
+      study = FactoryBot.create(:isa_json_compliant_study, investigation: investigation , contributor: person,
+                                                           policy: FactoryBot.create(:public_policy))
+      source_sample_type = study.sample_types.first
+
+      project_sample_type = FactoryBot.create(:simple_sample_type, projects: study.projects, contributor: person)
+
+      login_as(person)
+      assert source_sample_type.is_isa_json_compliant?
+      get :manage, params: { id: source_sample_type }
+      assert_redirected_to sample_type_path
+
+      refute project_sample_type.is_isa_json_compliant?
+      get :manage, params: { id: project_sample_type }
+      assert_response :success
+    end
+  end
+
+  test 'Should be able to manage if permitted' do
+    creator = FactoryBot.create(:person)
+    authorized_person = FactoryBot.create(:person)
+    unauthorized_person = FactoryBot.create(:person)
+    sample_type = FactoryBot.create(:simple_sample_type, projects: creator.projects, contributor: creator,
+                                                         policy: FactoryBot.create(:private_policy,
+                                                                                   permissions: [FactoryBot.create(:permission, contributor: authorized_person, access_type: Policy::MANAGING),
+                                                                                                 FactoryBot.create(:permission, contributor: unauthorized_person, access_type: Policy::EDITING)])
+    )
+    assert sample_type.can_manage?(creator)
+    assert sample_type.can_manage?(authorized_person)
+    refute sample_type.can_manage?(unauthorized_person)
+
+    login_as(creator)
+    get :manage, params: { id: sample_type }
+    assert_response :success
+    get :show, params: { id: sample_type }
+    assert_response :success
+    assert_select 'a', text: 'Manage Sample Type'
+
+    login_as(authorized_person)
+    get :manage, params: { id: sample_type }
+    assert_response :success
+    get :show, params: { id: sample_type }
+    assert_response :success
+    assert_select 'a', text: 'Manage Sample Type'
+
+    login_as(unauthorized_person)
+    get :manage, params: { id: sample_type }
+    assert_redirected_to sample_type_path(sample_type)
+    assert_equal flash[:error], 'You are not authorized to manage this Sample type.'
+    get :show, params: { id: sample_type }
+    assert_response :success
+    assert_select 'a', text: 'Manage Sample Type', count: 0
   end
 
   private
