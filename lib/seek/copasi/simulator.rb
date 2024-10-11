@@ -2,7 +2,7 @@ module Seek
   module Copasi
     module Simulator
       extend ActiveSupport::Concern
-
+      include ERB::Util
       included do
         before_action :find_model, :find_display_asset_for_copasi, :select_model_file_for_simulation, only: [:copasi_simulate]
         before_action :fetch_special_auth_code, if: -> { is_special_auth_code_required? }, only: [:copasi_simulate]
@@ -26,13 +26,13 @@ module Seek
           flash.now[:error] = 'The selected version does not contain a format supported by COPASI.'
         else
           if content_blob.file_exists?
-            @blob = (File.read(content_blob.file)).html_safe
+            @blob = (File.read(content_blob.file))
           else
             blob_url = content_blob.url
             begin
               handler = ContentBlob.remote_content_handler_for(blob_url)
               data = handler.fetch
-              @blob = (File.read(data)).html_safe
+              @blob = (File.read(data))
               true
             rescue Seek::DownloadHandling::BadResponseCodeException => e
               flash.now[:error] = "URL could not be accessed: #{e.message}"
