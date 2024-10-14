@@ -261,7 +261,7 @@ namespace :seek do
           # Project admins can manage
           project_admins = st.projects.map(&:project_administrators).flatten
           project_admins.map do |admin|
-            policy.permissions << Permission.new(contributor_type: Permission::PERSON, contributor_id: admin.id, access_type: Policy::MANAGE)
+            policy.permissions << Permission.new(contributor_type: Permission::PERSON, contributor_id: admin.id, access_type: Policy::MANAGING)
           end
 
           policy.save
