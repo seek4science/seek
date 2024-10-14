@@ -1,7 +1,7 @@
 <%
 
   disabled = extended_metadata_type.extended_type? ?
-               extended_metadata_type.linked_by_metadata_attributes? :
+               extended_metadata_type.linked_metadata_attributes.any? :
                extended_metadata_type.extended_metadatas.present?
 
   linked = extended_metadata_type.extended_type? ?

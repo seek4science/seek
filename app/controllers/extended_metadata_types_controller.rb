@@ -81,7 +81,7 @@ class ExtendedMetadataTypesController < ApplicationController
   def destroy
 
     # if a nested metadata type is linked by other metadata types
-    return if @extended_metadata_type.linked_by_metadata_attributes?
+    return if @extended_metadata_type.linked_metadata_attributes.any?
 
     # if a top level metadata type has been used to create metadatas
     return if @extended_metadata_type.extended_metadatas.present?
