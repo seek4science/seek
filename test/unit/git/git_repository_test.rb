@@ -55,4 +55,34 @@ class GitRepositoryTest < ActiveSupport::TestCase
     assert_includes repositories, redundant
     assert_not_includes repositories, not_redundant
   end
+
+  test 'remote_refs' do
+    repo = FactoryBot.create(:nfcore_remote_repository)
+    refs = repo.remote_refs
+    branches = refs[:branches]
+    tags = refs[:tags]
+
+    assert_equal %w[master arm change_testing_logic dev document_fastp_sampling feat/implement-ci-nf-tests
+                        fix_bbsplit_config fix_gtf_unzip fix_salmon_args improve_rseqc_strandedness lpantano_patch_561
+                        nf-core-template-merge-1.13 nf-core-template-merge-1.13.1 nf-core-template-merge-1.13.2
+                        nf-core-template-merge-1.13.3 nf-test-cicd optimized-resources pytest-workflow TEMPLATE
+                        update_default_pipeline_test], branches.map { |b| b[:name] },
+                 'Branches should be sorted with the default branch first, and then alphabetically ascending'
+
+    assert_equal %w[3.14.0 3.13.2 3.13.1 3.13.0 3.12.0 3.11.2 3.11.1 3.11.0 3.10.1 3.10 3.9 3.8.1 3.8 3.7 3.6 3.5
+                        3.4 3.3 3.2 3.1 3.0 2.0 1.4.2 1.4.1 1.4 1.3 1.2 1.1 1.0], tags.map { |t| t[:name] },
+                 'Tags should be sorted newest -> oldest'
+
+    main = branches[0]
+    assert_equal 'master', main[:name]
+    assert_equal 'refs/remotes/origin/master', main[:ref]
+    assert_equal 'b89fac32650aacc86fcda9ee77e00612a1d77066', main[:sha]
+    assert_equal '2024-01-08 17:22:19 +0000', main[:time].to_s
+
+    three_twelve = tags.detect { |t| t[:name] == '3.12.0' }
+    assert_equal '3.12.0', three_twelve[:name]
+    assert_equal 'refs/tags/3.12.0', three_twelve[:ref]
+    assert_equal '3bec2331cac2b5ff88a1dc71a21fab6529b57a0f', three_twelve[:sha]
+    assert_equal '2023-06-02 16:37:43 +0100', three_twelve[:time].to_s
+  end
 end

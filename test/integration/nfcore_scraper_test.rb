@@ -11,7 +11,7 @@ class NfcoreScraperTest < ActionDispatch::IntegrationTest
   test 'can scrape a new workflow' do
     project = Scrapers::Util.bot_project(title: 'test')
     bot = Scrapers::Util.bot_account
-    scraper = Scrapers::NfcoreScraper.new('test-123', project, bot, output: StringIO.new)
+    scraper = Scrapers::NfcoreScraper.new(project, bot, organization: 'test-123', output: StringIO.new)
 
     repos = [FactoryBot.create(:nfcore_remote_repository)]
 
@@ -40,7 +40,7 @@ class NfcoreScraperTest < ActionDispatch::IntegrationTest
   test 'can scrape a new version of a workflow' do
     project = Scrapers::Util.bot_project(title: 'test')
     bot = Scrapers::Util.bot_account
-    scraper = Scrapers::NfcoreScraper.new('test-123', project, bot, output: StringIO.new)
+    scraper = Scrapers::NfcoreScraper.new(project, bot, organization: 'test-123', output: StringIO.new)
 
     repos = [FactoryBot.create(:nfcore_remote_repository)]
 
@@ -81,7 +81,7 @@ class NfcoreScraperTest < ActionDispatch::IntegrationTest
   test 'does not register duplicates' do
     project = Scrapers::Util.bot_project(title: 'test')
     bot = Scrapers::Util.bot_account
-    scraper = Scrapers::NfcoreScraper.new('test-123', project, bot, output: StringIO.new)
+    scraper = Scrapers::NfcoreScraper.new(project, bot, organization: 'test-123', output: StringIO.new)
 
     repos = [FactoryBot.create(:nfcore_remote_repository)]
 
@@ -113,7 +113,7 @@ class NfcoreScraperTest < ActionDispatch::IntegrationTest
   test 'can scrape all tags (and skips duplicates)' do
     project = Scrapers::Util.bot_project(title: 'test')
     bot = Scrapers::Util.bot_account
-    scraper = Scrapers::NfcoreScraper.new('test-123', project, bot, output: StringIO.new, only_latest: false)
+    scraper = Scrapers::NfcoreScraper.new(project, bot, organization: 'test-123', output: StringIO.new, only_latest: false)
 
     repos = [FactoryBot.create(:nfcore_remote_repository)]
     # These are the available remote Git tags in the above repo:
@@ -153,7 +153,7 @@ class NfcoreScraperTest < ActionDispatch::IntegrationTest
   test 'does not list archived or disabled repositories' do
     project = Scrapers::Util.bot_project(title: 'test')
     bot = Scrapers::Util.bot_account
-    scraper = Scrapers::NfcoreScraper.new('test-123', project, bot, output: StringIO.new)
+    scraper = Scrapers::NfcoreScraper.new(project, bot, organization: 'test-123', output: StringIO.new)
     repos = scraper.send(:list_repositories)
     assert_equal 1, repos.length
     assert_includes repos.map { |r| r['name'] }, 'rnaseq'
