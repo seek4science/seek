@@ -201,4 +201,12 @@ class UtilTest < ActiveSupport::TestCase
     end
     assert_includes exception.message, 'not an appropriate class'
   end
+
+  test 'extended_metadata_supported_types returns correct models' do
+    # Get the result from the method
+    supported_types = Seek::Util.extended_metadata_supported_types
+    expected_types = %w[Assay Collection DataFile Document Event Investigation Model ObservationUnit Presentation Project Sop Study]
+    assert_equal expected_types.sort, supported_types.sort
+  end
+
 end

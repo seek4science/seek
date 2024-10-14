@@ -180,5 +180,11 @@ module Seek
       types.select(&:feature_enabled?)
     end
 
+    def self.extended_metadata_supported_types
+      ActiveRecord::Base.descendants.select do |model|
+        model.respond_to?(:supports_extended_metadata?) && model.supports_extended_metadata?
+      end.map(&:name)
+    end
+
   end
 end
