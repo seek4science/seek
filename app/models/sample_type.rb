@@ -288,5 +288,9 @@ class SampleType < ApplicationRecord
     end
   end
 
+  def self.supports_extended_metadata?
+    false
+  end
+
   class UnknownAttributeException < RuntimeError; end
 end
