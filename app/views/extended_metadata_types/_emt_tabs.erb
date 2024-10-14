@@ -23,7 +23,7 @@
     </a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" id="sample-controlled-vocabs-tab" data-toggle="tab" href="#sample-controlled-vocabs" role="tab" aria-controls="sample-controlled-vocabs" aria-selected="false" data-tooltip="This tab lists all the controlled vocabularies (CV) available in SEEK">
+    <a class="nav-link" id="sample-controlled-vocabs-tab" data-toggle="tab" href="#sample-controlled-vocabs" role="tab" aria-controls="sample-controlled-vocabs" aria-selected="false" data-tooltip="This tab lists all the controlled vocabularies (CV) available in <%= Seek::Config.instance_name %>">
       <span class="help_icon"></span>Controlled Vocabs
     </a>
   </li>
@@ -39,7 +39,7 @@
     <div class="alert alert-info">
       <ul>
         <li>
-          You can add extended metadata to the following SEEK resource types:  <strong>Investigation</strong>, <strong>Study</strong>, <strong>Assay</strong>, <strong>Collection</strong>, <strong>DataFile</strong>, <strong>Document</strong>, <strong>Event</strong>, <strong>Model</strong>, <strong>Presentation</strong>, <strong>Sop</strong>, and <strong>Project</strong>.
+          You can add extended metadata to the following <%= Seek::Config.instance_name %> resource types: <%= Seek::Util.extended_metadata_supported_types.map { |word| "<strong>#{word}</strong>"}.join(', ').html_safe %>.
           These will be the supported resource types when defining an extended metadata type.
         </li>
         <li>
