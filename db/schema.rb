@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_07_03_132257) do
+ActiveRecord::Schema.define(version: 2024_09_02_125710) do
 
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
@@ -190,6 +190,7 @@ ActiveRecord::Schema.define(version: 2024_07_03_132257) do
     t.integer "sample_type_id"
     t.integer "position"
     t.integer "assay_stream_id"
+    t.string "external_identifier", limit: 2048
     t.index ["assay_stream_id"], name: "index_assays_on_assay_stream_id"
     t.index ["sample_type_id"], name: "index_assays_on_sample_type_id"
   end
@@ -314,6 +315,7 @@ ActiveRecord::Schema.define(version: 2024_07_03_132257) do
     t.datetime "updated_at", null: false
     t.bigint "avatar_id"
     t.string "deleted_contributor"
+    t.string "external_identifier", limit: 2048
     t.index ["avatar_id"], name: "index_collections_on_avatar_id"
     t.index ["contributor_id"], name: "index_collections_on_contributor_id"
     t.index ["policy_id"], name: "index_collections_on_policy_id"
@@ -426,6 +428,7 @@ ActiveRecord::Schema.define(version: 2024_07_03_132257) do
     t.string "deleted_contributor"
     t.integer "file_template_id"
     t.integer "zip_origin_id"
+    t.string "external_identifier", limit: 2048
     t.index ["contributor_id"], name: "index_data_files_on_contributor"
   end
 
@@ -526,6 +529,7 @@ ActiveRecord::Schema.define(version: 2024_07_03_132257) do
     t.datetime "updated_at"
     t.text "other_creators"
     t.string "deleted_contributor"
+    t.string "external_identifier", limit: 2048
     t.index ["contributor_id"], name: "index_documents_on_contributor"
   end
 
@@ -752,6 +756,7 @@ ActiveRecord::Schema.define(version: 2024_07_03_132257) do
     t.text "other_creators"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string "external_identifier", limit: 2048
     t.index ["policy_id"], name: "index_file_templates_on_policy_id"
   end
 
@@ -947,6 +952,7 @@ ActiveRecord::Schema.define(version: 2024_07_03_132257) do
     t.string "deleted_contributor"
     t.integer "position"
     t.boolean "is_isa_json_compliant"
+    t.string "external_identifier", limit: 2048
   end
 
   create_table "investigations_projects", id: false, force: :cascade do |t|
@@ -1087,6 +1093,7 @@ ActiveRecord::Schema.define(version: 2024_07_03_132257) do
     t.string "license"
     t.string "deleted_contributor"
     t.integer "human_disease_id"
+    t.string "external_identifier", limit: 2048
     t.index ["contributor_id"], name: "index_models_on_contributor"
   end
 
@@ -1232,6 +1239,7 @@ ActiveRecord::Schema.define(version: 2024_07_03_132257) do
     t.bigint "study_id"
     t.bigint "policy_id"
     t.string "first_letter", limit: 1
+    t.string "external_identifier", limit: 2048
   end
 
   create_table "observation_units_projects", id: false, force: :cascade do |t|
@@ -1367,6 +1375,7 @@ ActiveRecord::Schema.define(version: 2024_07_03_132257) do
     t.bigint "file_template_id"
     t.bigint "project_id"
     t.integer "data_file_id"
+    t.string "external_identifier", limit: 2048
     t.index ["contributor_id"], name: "index_ps_on_c"
     t.index ["file_template_id"], name: "index_placeholders_on_file_template_id"
     t.index ["policy_id"], name: "index_placeholders_on_policy_id"
@@ -1439,6 +1448,7 @@ ActiveRecord::Schema.define(version: 2024_07_03_132257) do
     t.integer "policy_id"
     t.string "license"
     t.string "deleted_contributor"
+    t.string "external_identifier", limit: 2048
   end
 
   create_table "presentations_projects", id: false, force: :cascade do |t|
@@ -1662,6 +1672,7 @@ ActiveRecord::Schema.define(version: 2024_07_03_132257) do
     t.integer "version", default: 1
     t.string "license"
     t.text "other_creators"
+    t.string "external_identifier", limit: 2048
     t.index ["contributor_id"], name: "index_publications_on_contributor"
   end
 
@@ -1811,6 +1822,32 @@ ActiveRecord::Schema.define(version: 2024_07_03_132257) do
     t.index ["sample_id"], name: "index_sample_resource_links_on_sample_id"
   end
 
+  create_table "sample_type_auth_lookup", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "asset_id"
+    t.boolean "can_view", default: false
+    t.boolean "can_manage", default: false
+    t.boolean "can_edit", default: false
+    t.boolean "can_download", default: false
+    t.boolean "can_delete", default: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["user_id", "asset_id", "can_view"], name: "index_sample_type_user_id_asset_id_can_view"
+    t.index ["user_id", "can_view"], name: "index_sample_type_auth_lookup_on_user_id_and_can_view"
+  end
+
+  create_table "sample_type_auth_lookups", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "asset_id"
+    t.boolean "can_view", default: false
+    t.boolean "can_manage", default: false
+    t.boolean "can_edit", default: false
+    t.boolean "can_download", default: false
+    t.boolean "can_delete", default: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
   create_table "sample_types", id: :integer, force: :cascade do |t|
     t.string "title"
     t.string "uuid"
@@ -1823,6 +1860,8 @@ ActiveRecord::Schema.define(version: 2024_07_03_132257) do
     t.string "deleted_contributor"
     t.integer "template_id"
     t.text "other_creators"
+    t.integer "policy_id"
+    t.string "external_identifier", limit: 2048
   end
 
   create_table "sample_types_studies", force: :cascade do |t|
@@ -1846,6 +1885,7 @@ ActiveRecord::Schema.define(version: 2024_07_03_132257) do
     t.integer "originating_data_file_id"
     t.string "deleted_contributor"
     t.bigint "observation_unit_id"
+    t.string "external_identifier", limit: 2048
   end
 
   create_table "saved_searches", id: :integer, force: :cascade do |t|
@@ -1957,6 +1997,7 @@ ActiveRecord::Schema.define(version: 2024_07_03_132257) do
     t.string "doi"
     t.string "license"
     t.string "deleted_contributor"
+    t.string "external_identifier", limit: 2048
     t.index ["contributor_id"], name: "index_sops_on_contributor"
   end
 
@@ -2016,6 +2057,7 @@ ActiveRecord::Schema.define(version: 2024_07_03_132257) do
     t.string "uuid"
     t.string "first_letter"
     t.string "deleted_contributor"
+    t.string "external_identifier", limit: 2048
   end
 
   create_table "studied_factor_links", id: :integer, force: :cascade do |t|
@@ -2055,6 +2097,7 @@ ActiveRecord::Schema.define(version: 2024_07_03_132257) do
     t.text "other_creators"
     t.string "deleted_contributor"
     t.integer "position"
+    t.string "external_identifier", limit: 2048
   end
 
   create_table "study_auth_lookup", force: :cascade do |t|
@@ -2192,6 +2235,7 @@ ActiveRecord::Schema.define(version: 2024_07_03_132257) do
     t.string "uuid"
     t.string "first_letter", limit: 1
     t.text "other_creators"
+    t.string "external_identifier", limit: 2048
     t.index ["title", "group"], name: "index_templates_title_group"
   end
 
@@ -2330,6 +2374,7 @@ ActiveRecord::Schema.define(version: 2024_07_03_132257) do
     t.integer "workflow_class_id"
     t.integer "maturity_level"
     t.integer "test_status"
+    t.string "external_identifier", limit: 2048
     t.index ["contributor_id"], name: "index_workflows_on_contributor"
   end
 

@@ -984,6 +984,22 @@ class WorkflowsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'updating main workflow path to blank path does not cause error' do
+    workflow = FactoryBot.create(:local_git_workflow)
+    login_as(workflow.contributor)
+
+    assert_equal 'concat_two_files.ga', workflow.main_workflow_path
+    assert_equal 'concat_two_files.ga', workflow.latest_git_version.main_workflow_path
+    assert_difference('Git::Annotation.count', -1) do
+      patch :update_paths, params: { id: workflow.id,
+                                     git_version: { main_workflow_path: '' },
+                                     workflow: { title: workflow.title } } # workflow is required in params...
+
+      assert_redirected_to workflow_path(workflow)
+      assert_nil assigns(:workflow).main_workflow_path
+    end
+  end
+
   test 'can update paths and extract metadata' do
     workflow = FactoryBot.create(:git_version).resource
     login_as(workflow.contributor)

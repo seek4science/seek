@@ -4,7 +4,7 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
   test 'read demo' do
     path = "#{Rails.root}/test/fixtures/files/fairdatastation/demo.ttl"
 
-    investigations = Seek::FairDataStation::Reader.instance.parse_graph(path)
+    investigations = Seek::FairDataStation::Reader.new.parse_graph(path)
     assert_equal 1, investigations.count
     inv = investigations.first
     assert_equal 'http://fairbydesign.nl/ontology/inv_INV_DRP007092', inv.resource_uri.to_s
@@ -34,65 +34,72 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
     assert_equal 'DRR243856', assay.identifier
   end
 
-  test 'read indpensim' do
-    path = "#{Rails.root}/test/fixtures/files/fairdatastation/indpensim.ttl"
+  test 'read seek test case' do
+    path = "#{Rails.root}/test/fixtures/files/fairdatastation/seek-fair-data-station-test-case.ttl"
 
-    investigations = Seek::FairDataStation::Reader.instance.parse_graph(path)
+    investigations = Seek::FairDataStation::Reader.new.parse_graph(path)
     assert_equal 1, investigations.count
     inv = investigations.first
-    assert_equal 'http://fairbydesign.nl/ontology/inv_indpensim', inv.resource_uri.to_s
-    assert_equal 'indpensim', inv.identifier
+    assert_equal 'http://fairbydesign.nl/ontology/inv_seek-test-investigation', inv.resource_uri.to_s
+    assert_equal 'seek-test-investigation', inv.identifier
 
-    assert_equal 1, inv.studies.count
-    study = inv.studies.first
-    assert_equal 'http://fairbydesign.nl/ontology/inv_indpensim/stu_Penicillin_production', study.resource_uri.to_s
-    assert_equal 'Penicillin_production', study.identifier
+    assert_equal 2, inv.studies.count
+    study = inv.studies.last
+    assert_equal 'http://fairbydesign.nl/ontology/inv_seek-test-investigation/stu_seek-test-study-2',
+                 study.resource_uri.to_s
+    assert_equal 'seek-test-study-2', study.identifier
 
-    assert_equal 100, study.observation_units.count
+    assert_equal 2, study.observation_units.count
     obs_unit = study.observation_units.first
-    assert_equal 'http://fairbydesign.nl/ontology/inv_indpensim/stu_Penicillin_production/obs_IndPenSim_V3_Batch_1',
+    assert_equal 'http://fairbydesign.nl/ontology/inv_seek-test-investigation/stu_seek-test-study-2/obs_seek-test-obs-unit-2',
                  obs_unit.resource_uri.to_s
-    assert_equal 'IndPenSim_V3_Batch_1', obs_unit.identifier
+    assert_equal 'seek-test-obs-unit-2', obs_unit.identifier
 
-    assert_equal 0, obs_unit.samples.count
+    assert_equal 2, obs_unit.samples.count
     assert_equal 1, obs_unit.datasets.count
     dataset = obs_unit.datasets.first
-    assert_equal 'https://data.yoda.wur.nl/research-bioindustry/Use%20cases/Simulation%20datasets/IndPenSim/IndPenSim_V3_Batch_1.csv.gz', dataset.resource_uri
-    assert_equal 'IndPenSim_V3_Batch_1.csv.gz', dataset.identifier
+    assert_equal 'http://fairbydesign.nl/data_sample/test-file-1.csv', dataset.resource_uri
+    assert_equal 'test-file-1.csv', dataset.identifier
     assert_equal 'file', dataset.description
-    assert_equal 'https://data.yoda.wur.nl/research-bioindustry/Use%20cases/Simulation%20datasets/IndPenSim/IndPenSim_V3_Batch_1.csv.gz', dataset.content_url
+    assert_equal 'http://fairbydesign.nl/data_sample/test-file-1.csv', dataset.content_url
   end
 
   test 'annotations' do
     path = "#{Rails.root}/test/fixtures/files/fairdatastation/demo.ttl"
 
-    study = Seek::FairDataStation::Reader.instance.parse_graph(path).first.studies.first
+    study = Seek::FairDataStation::Reader.new.parse_graph(path).first.studies.first
 
     assert_equal 14, study.annotations.count
-    assert_includes study.annotations, ["http://fairbydesign.nl/ontology/center_name", "NIID"]
+    assert_includes study.annotations, ['http://fairbydesign.nl/ontology/center_name', 'NIID']
   end
 
   test 'additional metadata annotations' do
     path = "#{Rails.root}/test/fixtures/files/fairdatastation/demo.ttl"
 
-    inv = Seek::FairDataStation::Reader.instance.parse_graph(path).first
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
     assert_empty inv.additional_metadata_annotations
 
     study = inv.studies.first
 
     assert_equal 8, study.additional_metadata_annotations.count
-    assert_includes study.annotations, ["http://fairbydesign.nl/ontology/center_name", "NIID"]
+    assert_includes study.annotations, ['http://fairbydesign.nl/ontology/center_name', 'NIID']
     study.additional_metadata_annotations.each do |annotation|
       assert annotation[0].start_with?('http://fairbydesign.nl/ontology/'), "#{annotation[0]} is not expected"
     end
 
     # non fairbydesign annotations
-    path = "#{Rails.root}/test/fixtures/files/fairdatastation/indpensim.ttl"
-    inv = Seek::FairDataStation::Reader.instance.parse_graph(path).first
+    path = "#{Rails.root}/test/fixtures/files/fairdatastation/seek-fair-data-station-test-case.ttl"
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
     obs_unit = inv.studies.first.observation_units.first
     annotations = obs_unit.additional_metadata_annotations
-    assert_equal 5, annotations.count
-    pids = annotations.collect{|ann| ann[0]}
+    assert_equal 3, annotations.count
+    pids = annotations.collect { |ann| ann[0] }
+    assert_includes pids, 'https://w3id.org/mixs/0000811'
+    sample = obs_unit.samples.first
+    annotations = sample.additional_metadata_annotations
+    assert_equal 4, annotations.count
+    pids = annotations.collect { |ann| ann[0] }
+    assert_includes pids, 'https://w3id.org/mixs/0000011'
     assert_includes pids, 'http://gbol.life/0.1/scientificName'
     assert_includes pids, 'http://purl.uniprot.org/core/organism'
   end
@@ -100,7 +107,7 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
   test 'study assays' do
     path = "#{Rails.root}/test/fixtures/files/fairdatastation/demo.ttl"
 
-    investigations = Seek::FairDataStation::Reader.instance.parse_graph(path)
+    investigations = Seek::FairDataStation::Reader.new.parse_graph(path)
     study = investigations.first.studies.first
     assert_equal 9, study.assays.count
     expected = %w[DRR243845 DRR243850 DRR243856 DRR243863 DRR243881 DRR243894 DRR243899 DRR243906
@@ -111,7 +118,7 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
   test 'titles and descriptions' do
     path = "#{Rails.root}/test/fixtures/files/fairdatastation/demo.ttl"
 
-    inv = Seek::FairDataStation::Reader.instance.parse_graph(path).first
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
     study = inv.studies.first
     obs_unit = study.observation_units.first
     sample = obs_unit.samples.first
@@ -138,7 +145,7 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
   test 'datasets' do
     path = "#{Rails.root}/test/fixtures/files/fairdatastation/demo.ttl"
 
-    inv = Seek::FairDataStation::Reader.instance.parse_graph(path).first
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
     study = inv.studies.first
     obs_unit = study.observation_units.first
     sample = obs_unit.samples.first
@@ -146,10 +153,12 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
 
     datasets = assay.datasets
     assert_equal 2, datasets.count
-    assert_equal ['http://fairbydesign.nl/data_sample/DRR243856_1.fastq.gz', 'http://fairbydesign.nl/data_sample/DRR243856_2.fastq.gz'], datasets.collect(&:resource_uri).collect(&:to_s).sort
+    assert_equal ['http://fairbydesign.nl/data_sample/DRR243856_1.fastq.gz', 'http://fairbydesign.nl/data_sample/DRR243856_2.fastq.gz'],
+                 datasets.collect(&:resource_uri).collect(&:to_s).sort
     assert_equal ['DRR243856_1.fastq.gz', 'DRR243856_2.fastq.gz'], datasets.collect(&:identifier).sort
     assert_equal ['demultiplexed forward file', 'demultiplexed reverse file'], datasets.collect(&:description).sort
-    assert_equal ['http://fairbydesign.nl/data_sample/DRR243856_1.fastq.gz', 'http://fairbydesign.nl/data_sample/DRR243856_2.fastq.gz'], datasets.collect(&:content_url).collect(&:to_s).sort
+    assert_equal ['http://fairbydesign.nl/data_sample/DRR243856_1.fastq.gz', 'http://fairbydesign.nl/data_sample/DRR243856_2.fastq.gz'],
+                 datasets.collect(&:content_url).collect(&:to_s).sort
 
     assert_equal 0, inv.datasets.count
     assert_equal 0, study.datasets.count

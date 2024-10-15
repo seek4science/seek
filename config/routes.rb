@@ -414,7 +414,6 @@ SEEK::Application.routes.draw do
   ### ISA ###
 
   resources :investigations, concerns: [:publishable, :has_snapshots, :isa] do
-    resources :people, :programmes, :projects, :assays, :studies, :models, :sops, :workflows, :data_files, :publications, :documents, only: [:index]
     member do
       get :export_isatab_json
       get :export_isa, action: :export_isa
@@ -422,6 +421,7 @@ SEEK::Application.routes.draw do
       get :order_studies
       patch :manage_update
     end
+    resources :people, :programmes, :projects, :assays, :studies, :models, :sops, :workflows, :data_files, :publications, :documents, :observation_units, :samples, only: [:index]
   end
 
   resources :studies, concerns: [:publishable, :has_snapshots, :isa] do
@@ -454,7 +454,7 @@ SEEK::Application.routes.draw do
       get :order_assays
       patch :manage_update
     end
-    resources :people, :programmes, :projects, :sample_types, :assays, :investigations, :models, :sops, :workflows, :data_files, :publications, :documents, :observation_units, only: [:index]
+    resources :people, :programmes, :projects, :sample_types, :samples, :assays, :investigations, :models, :sops, :workflows, :data_files, :publications, :documents, :observation_units, only: [:index]
   end
 
   resources :assays, concerns: [:publishable, :has_snapshots, :isa] do
@@ -466,7 +466,7 @@ SEEK::Application.routes.draw do
         post :register
       end
     end
-    resources :people, :programmes, :projects, :investigations, :sample_types, :samples, :studies, :models, :sops, :workflows, :data_files, :publications, :documents, :strains, :organisms, :human_diseases, :placeholders, only: [:index]
+    resources :people, :programmes, :projects, :investigations, :sample_types, :samples, :studies, :models, :sops, :workflows, :data_files, :publications, :documents, :strains, :organisms, :human_diseases, :observation_units, :placeholders, only: [:index]
   end
 
   # to be removed as STI does not work in too many places
@@ -694,7 +694,7 @@ SEEK::Application.routes.draw do
 
   ### SAMPLE TYPES ###
   #
-  resources :sample_types do
+  resources :sample_types, concerns: %i[asset has_content_blobs] do
     collection do
       post :create_from_template
       get :select
@@ -703,14 +703,10 @@ SEEK::Application.routes.draw do
     member do
       get :template_details
       get :batch_upload
+      post :update_annotations_ajax
     end
     resources :samples
-    resources :content_blobs do
-      member do
-        get :download
-      end
-    end
-    resources :projects, :programmes, :templates, :studies, :assays, only: [:index]
+    resources :investigations, :people, :collections, :publications, :projects, :programmes, :templates, :studies, :assays, only: [:index]
   end
 
   ### SAMPLE ATTRIBUTE TYPES ###
@@ -811,7 +807,7 @@ SEEK::Application.routes.draw do
 
   resources :observation_units, concerns:[:asset] do
 
-    resources :projects, :people, :programmes, :samples, :assays, :studies, :investigations, :data_files, :publications, :collections
+    resources :projects, :people, :programmes, :samples, :assays, :studies, :investigations, :data_files, :sops, :publications, :collections
   end
 
   ### MISC MATCHES ###

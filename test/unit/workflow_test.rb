@@ -501,6 +501,24 @@ class WorkflowTest < ActiveSupport::TestCase
     assert_equal 31, v.outputs.length
   end
 
+  test 'setting main workflow path for first time refreshes internals structure' do
+    workflow = FactoryBot.create(:annotationless_local_git_workflow)
+    v = workflow.git_version
+
+    assert_nil v.main_workflow_path
+
+    disable_authorization_checks do
+      v.main_workflow_path = 'concat_two_files.ga'
+      assert v.main_workflow_path_changed?
+      v.save!
+    end
+
+    assert_equal 'concat_two_files.ga', v.main_workflow_path
+    assert_equal 2, v.inputs.length
+    assert_equal 1, v.steps.length
+    assert_equal 1, v.outputs.length
+  end
+
   test 'changing diagram path clears the cached diagram' do
     workflow = FactoryBot.create(:local_git_workflow)
     v = workflow.git_version

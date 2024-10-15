@@ -351,6 +351,8 @@ class AdminController < ApplicationController
     Seek::Config.metadata_license = params[:metadata_license]
     Seek::Config.recommended_data_licenses = params[:recommended_data_licenses]&.compact_blank
     Seek::Config.recommended_software_licenses = params[:recommended_software_licenses]&.compact_blank
+    Seek::Config.sandbox_instance_url = params[:sandbox_instance_url]
+    Seek::Config.sandbox_instance_name = params[:sandbox_instance_name]
     update_flag = (pubmed_email == '' || pubmed_email_valid) && (crossref_email == '' || crossref_email_valid)
     update_redirect_to update_flag, 'settings'
   end

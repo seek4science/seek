@@ -1,15 +1,15 @@
 module Seek
   module FairDataStation
     class Writer
-      include Singleton
-
       def construct_isa(datastation_inv, contributor, projects, policy)
+        reset_data_file_cache
         investigation = build_investigation(datastation_inv, contributor, policy, projects)
 
         datastation_inv.studies.each do |datastation_study|
           study = build_study(datastation_study, contributor, policy, investigation)
           datastation_study.observation_units.each do |datastation_observation_unit|
-            observation_unit = build_observation_unit(datastation_observation_unit, contributor, policy, projects, study)
+            observation_unit = build_observation_unit(datastation_observation_unit, contributor, policy, projects,
+                                                      study)
             datastation_observation_unit.samples.each do |datastation_sample|
               sample = build_sample(datastation_sample, contributor, policy, projects)
               if sample.valid?
@@ -29,6 +29,10 @@ module Seek
 
       private
 
+      def reset_data_file_cache
+        @data_file_cache = {}
+      end
+
       def build_assay(datastation_assay, contributor, policy, projects, sample, study)
         samples = []
         samples << sample if sample.valid?
@@ -44,7 +48,9 @@ module Seek
       end
 
       def build_sample(datastation_sample, contributor, policy, projects)
-        sample = ::Sample.new(contributor: contributor, projects: projects, policy: policy.deep_copy)
+        sample_attributes = datastation_sample.seek_attributes.merge({ contributor: contributor, projects: projects,
+                                                                       policy: policy.deep_copy })
+        sample = ::Sample.new(sample_attributes)
         populate_sample(sample, datastation_sample)
         sample
       end
@@ -124,19 +130,15 @@ module Seek
       end
 
       def build_data_file(contributor, datastation_dataset, projects, policy)
-        # @_data_file_cache = {}
-        # if @_data_file_cache[datastation_dataset.identifier]
-        #   @_data_file_cache[datastation_dataset.identifier]
-        # else
-        blob = ContentBlob.new(url: datastation_dataset.content_url.to_s,
-                               original_filename: datastation_dataset.identifier, external_link: true, is_webpage: true, content_type: 'application/octet-stream')
-        data_file_attributes = datastation_dataset.seek_attributes.merge({
-                                                                           contributor: contributor, projects: projects,
-                                                                           content_blob: blob, policy: policy.deep_copy
-                                                                         })
-        DataFile.new(data_file_attributes)
-        #   @_data_file_cache[datastation_dataset.identifier] = DataFile.new(data_file_attributes)
-        # end
+        @data_file_cache[datastation_dataset.identifier] ||= begin
+          blob = ContentBlob.new(url: datastation_dataset.content_url.to_s,
+                                 original_filename: datastation_dataset.identifier, external_link: true, is_webpage: true, content_type: 'application/octet-stream')
+          data_file_attributes = datastation_dataset.seek_attributes.merge({
+                                                                             contributor: contributor, projects: projects,
+                                                                             content_blob: blob, policy: policy.deep_copy
+                                                                           })
+          DataFile.new(data_file_attributes)
+        end
       end
     end
   end

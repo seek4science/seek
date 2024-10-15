@@ -21,7 +21,7 @@ class UtilTest < ActiveSupport::TestCase
   end
 
   test 'authorized types' do
-    expected = [Assay, Collection, DataFile, Document, Event, FileTemplate, Investigation, Model, ObservationUnit, Placeholder, Presentation, Publication, Sample, Sop, Strain, Study, Workflow, Template].map(&:name).sort
+    expected = [Assay, Collection, DataFile, Document, Event, FileTemplate, Investigation, Model, ObservationUnit, Placeholder, Presentation, Publication, Sample, Sop, Strain, Study, Workflow, Template, SampleType].map(&:name).sort
 
     actual = with_config_value :isa_json_compliance_enabled, true do
       Seek::Util.authorized_types.map(&:name).sort

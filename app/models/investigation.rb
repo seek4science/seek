@@ -14,20 +14,16 @@ class Investigation < ApplicationRecord
   belongs_to :assignee, class_name: 'Person'
 
   has_many :study_sops, through: :studies, source: :sops
-  has_many :assay_sops, through: :assays, source: :sops
+  has_many :assay_sops, -> { distinct }, through: :assays, source: :sops
   has_many :sop_versions, through: :studies
-  
+  has_many :assay_data_files, -> { distinct }, through: :assays, source: :data_files
+  has_many :data_file_versions, -> { distinct }, through: :studies
+  has_many :assay_samples, -> { distinct }, through: :assays, source: :samples
+  has_many :observation_units, through: :studies
+  has_many :observations_unit_data_files, -> { distinct }, through: :observation_units, source: :data_files
+  has_many :observations_unit_samples, -> { distinct }, through: :observation_units, source: :samples
   def state_allows_delete?(*args)
     studies.empty? && super
-  end
-
-  %w[data_file model document].each do |type|
-    has_many "#{type}_versions".to_sym, -> { distinct }, through: :studies
-    has_many "related_#{type.pluralize}".to_sym, -> { distinct }, through: :studies
-  end
-
-  def assets
-    related_data_files + related_sops + related_models + related_publications + related_documents
   end
 
   def clone_with_associations
@@ -38,12 +34,34 @@ class Investigation < ApplicationRecord
     new_object
   end
 
+  # related
+  def assets
+    related_data_files + related_sops + related_models + related_publications + related_documents
+  end
+
+  %w[model document].each do |type|
+    has_many "#{type}_versions".to_sym, -> { distinct }, through: :studies
+    has_many "related_#{type.pluralize}".to_sym, -> { distinct }, through: :studies
+  end
+
+  def related_data_file_ids
+    observations_unit_data_file_ids | assay_data_file_ids
+  end
+
   def related_publication_ids
     publication_ids | study_publication_ids | assay_publication_ids
   end
 
   def related_sop_ids
     study_sop_ids | assay_sop_ids
+  end
+
+  def related_sample_ids
+    observations_unit_sample_ids | assay_sample_ids
+  end
+
+  def related_samples
+    Sample.where(id: related_sample_ids)
   end
 
   def positioned_studies
