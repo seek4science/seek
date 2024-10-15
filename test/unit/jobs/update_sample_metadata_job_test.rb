@@ -21,4 +21,19 @@ class UpdateSampleMetadataJobTest < ActiveSupport::TestCase
       UpdateSampleMetadataJob.new.perform(@sample_type)
     end
   end
+
+  test 'Check sample metadata after performing the job' do
+    User.with_current_user(@person.user) do
+      assert_equal @sample_type.sample_attributes.first.title, 'the_title'
+      @sample_type.sample_attributes.first.update!(title: 'new title')
+      assert_equal @sample_type.sample_attributes.first.title, 'new title'
+      refute_equal @sample_type.sample_attributes.first.title, 'the_title'
+      UpdateSampleMetadataJob.new.perform(@sample_type)
+      @sample_type.samples.each do |sample|
+        json_metadata = JSON.parse sample.json_metadata
+        assert json_metadata.keys.include?('new title')
+        refute json_metadata.keys.include?('the_title')
+      end
+    end
+  end
 end
