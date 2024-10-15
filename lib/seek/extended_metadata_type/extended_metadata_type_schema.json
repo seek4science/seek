@@ -6,21 +6,7 @@
       "type": "string"
     },
     "supported_type": {
-      "type": "string",
-      "enum": [
-        "Investigation",
-        "Study",
-        "Assay",
-        "Collection",
-        "DataFile",
-        "Document",
-        "Event",
-        "Model",
-        "Presentation",
-        "Sop",
-        "Project",
-        "ExtendedMetadata"
-      ]
+      "type": "string"
     },
     "enabled": {
       "type": "boolean"
