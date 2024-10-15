@@ -677,6 +677,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     end
   end
 
+  # TODO: This test fails now because the sample type is not immutable anymore.
   test 'validates changes against editing constraints' do
     @sample_type.samples.create!(data: { the_title: 'yes' }, sample_type: @sample_type, project_ids: @project_ids)
 
