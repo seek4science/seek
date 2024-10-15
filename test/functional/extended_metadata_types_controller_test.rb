@@ -131,6 +131,21 @@ class ExtendedMetadataTypesControllerTest < ActionController::TestCase
     assert_equal 'Please select a file to upload!', flash[:error]
   end
 
+  test 'should not create when the resource doesnt support extended metadata' do
+    person = FactoryBot.create(:admin)
+    login_as(person)
+
+    file = fixture_file_upload('extended_metadata_type/invalid_supported_type_emt.json', 'application/json')
+
+    assert_no_difference('ExtendedMetadataType.count') do
+      post :create, params: { emt_json_file: file }
+    end
+
+    assert_match(/\"Publication\" did not match one of the following values/, flash[:error])
+
+  end
+
+
   test 'can display extended metadata types' do
     person = FactoryBot.create(:admin)
     login_as(person)

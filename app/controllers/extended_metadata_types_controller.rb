@@ -41,7 +41,7 @@ class ExtendedMetadataTypesController < ApplicationController
       flash[:notice] = 'Extended metadata type was successfully created.'
        redirect_to administer_extended_metadata_types_path(emt: @extended_metadata_type.id)
     else
-      flash[:error] = 'Failed to save the extended metadata type'
+      flash[:error] = @extended_metadata_type.errors.full_messages.join(', ')
       redirect_to new_extended_metadata_type_path
     end
   rescue StandardError => e

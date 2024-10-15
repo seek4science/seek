@@ -209,8 +209,7 @@ Model, ObservationUnit, Organism, Person, Placeholder, Presentation, Programme, 
   test 'extended_metadata_supported_types returns correct models' do
     # Get the result from the method
     supported_types = Seek::Util.extended_metadata_supported_types
-    expected_types = %w[Assay Collection DataFile Document Event ExtendedMetadata Investigation Model ObservationUnit Presentation
-Project Sop Study]
+    expected_types = %w[Assay Collection DataFile Document Event ExtendedMetadata Investigation Model ObservationUnit Presentation Project Sop Study]
     assert_equal expected_types.sort, supported_types.sort
   end
 
