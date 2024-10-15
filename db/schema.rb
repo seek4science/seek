@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_09_02_125710) do
+ActiveRecord::Schema.define(version: 2024_10_15_093333) do
 
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
@@ -1240,13 +1240,6 @@ ActiveRecord::Schema.define(version: 2024_09_02_125710) do
     t.bigint "policy_id"
     t.string "first_letter", limit: 1
     t.string "external_identifier", limit: 2048
-  end
-
-  create_table "observation_units_projects", id: false, force: :cascade do |t|
-    t.integer "project_id"
-    t.integer "observation_unit_id"
-    t.index ["observation_unit_id", "project_id"], name: "index_projects_obs_units_on_obs_unit_id_and_project_id"
-    t.index ["project_id"], name: "index_projects_obs_units_on_project_id"
   end
 
   create_table "observed_variable_sets", force: :cascade do |t|
