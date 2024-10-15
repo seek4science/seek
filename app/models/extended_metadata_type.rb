@@ -60,8 +60,12 @@ class ExtendedMetadataType < ApplicationRecord
   end
 
   def supports_extended_metadata
-    unless self.supported_type.constantize.supports_extended_metadata?
-      errors.add(:supported_type, "#{self.supported_type} does not support extended metadata!")
+    begin
+      unless self.supported_type.constantize.supports_extended_metadata?
+        errors.add(:supported_type, "#{self.supported_type} does not support extended metadata!")
+      end
+    rescue NameError
+      errors.add(:supported_type, "#{self.supported_type} is not a valid support type!")
     end
   end
 
