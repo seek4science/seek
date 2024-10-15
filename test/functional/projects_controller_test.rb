@@ -5079,6 +5079,38 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'dont show import from fair data station if obs units disabled' do
+    person = FactoryBot.create(:person)
+    refute person.is_admin?
+    project = person.projects.first
+    with_config_value(:observation_units_enabled, false) do
+      get :show, params: { id: project.id }
+      assert_response :success
+      # menu item still shown but will be an error message when clicking it
+      assert_select '#item-admin-menu' do
+        assert_select 'li a[href=?]', import_from_fairdata_station_project_path(project), text:/Import from FAIRData Station/, count: 1
+      end
+
+      get :import_from_fairdata_station, params: { id: project.id }
+      assert_redirected_to :root
+      refute_nil flash[:error]
+      assert_equal 'Observation units are disabled', flash[:error]
+    end
+    with_config_value(:isa_enabled, false) do
+      get :show, params: { id: project.id }
+      assert_response :success
+      # menu item still shown but will be an error message when clicking it
+      assert_select '#item-admin-menu' do
+        assert_select 'li a[href=?]', import_from_fairdata_station_project_path(project), text:/Import from FAIRData Station/, count: 1
+      end
+
+      get :import_from_fairdata_station, params: { id: project.id }
+      assert_redirected_to :root
+      refute_nil flash[:error]
+      assert_equal 'Investigations are disabled', flash[:error]
+    end
+  end
+
   test 'populate from fairdata station ttl' do
 
     person = FactoryBot.create(:person)
