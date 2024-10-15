@@ -7,7 +7,8 @@ class UtilTest < ActiveSupport::TestCase
   end
 
   test 'creatable types' do
-    expected = [Collection, DataFile, Document, FileTemplate, Model, ObservationUnit, Placeholder, Presentation, Publication, Sample, Sop, Assay, Investigation, Study, Event, SampleType, Strain, Workflow, Template]
+    expected = [Collection, DataFile, Document, FileTemplate, Model, ObservationUnit, Placeholder, Presentation, 
+Publication, Sample, Sop, Assay, Investigation, Study, Event, SampleType, Strain, Workflow, Template]
 
     types = with_config_value :isa_json_compliance_enabled, true do
       Seek::Util.user_creatable_types
@@ -21,7 +22,8 @@ class UtilTest < ActiveSupport::TestCase
   end
 
   test 'authorized types' do
-    expected = [Assay, Collection, DataFile, Document, Event, FileTemplate, Investigation, Model, ObservationUnit, Placeholder, Presentation, Publication, Sample, Sop, Strain, Study, Workflow, Template].map(&:name).sort
+    expected = [Assay, Collection, DataFile, Document, Event, FileTemplate, Investigation, Model, ObservationUnit, 
+Placeholder, Presentation, Publication, Sample, Sop, Strain, Study, Workflow, Template].map(&:name).sort
 
     actual = with_config_value :isa_json_compliance_enabled, true do
       Seek::Util.authorized_types.map(&:name).sort
@@ -32,12 +34,14 @@ class UtilTest < ActiveSupport::TestCase
 
   test 'rdf capable types' do
     types = Seek::Util.rdf_capable_types
-    expected = %w[Assay DataFile Investigation Model ObservationUnit Organism Person Programme Project Publication Sample Sop Strain Study]
+    expected = %w[Assay DataFile Investigation Model ObservationUnit Organism Person Programme Project Publication 
+Sample Sop Strain Study]
     assert_equal expected, types.collect(&:name).sort
   end
 
   test 'searchable types' do
-    expected = [Assay, Collection, DataFile, Document, Event, FileTemplate, HumanDisease, Institution, Investigation, Model, ObservationUnit, Organism, Person, Placeholder, Presentation, Programme, Project, Publication, Sample, SampleType, Sop, Strain, Study, Workflow, Template]
+    expected = [Assay, Collection, DataFile, Document, Event, FileTemplate, HumanDisease, Institution, Investigation, 
+Model, ObservationUnit, Organism, Person, Placeholder, Presentation, Programme, Project, Publication, Sample, SampleType, Sop, Strain, Study, Workflow, Template]
 
     types = with_config_value :isa_json_compliance_enabled, true do
       Seek::Util.searchable_types
@@ -205,7 +209,8 @@ class UtilTest < ActiveSupport::TestCase
   test 'extended_metadata_supported_types returns correct models' do
     # Get the result from the method
     supported_types = Seek::Util.extended_metadata_supported_types
-    expected_types = %w[Assay Collection DataFile Document Event Investigation Model ObservationUnit Presentation Project Sop Study]
+    expected_types = %w[Assay Collection DataFile Document Event ExtendedMetadata Investigation Model ObservationUnit Presentation
+Project Sop Study]
     assert_equal expected_types.sort, supported_types.sort
   end
 
