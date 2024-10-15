@@ -34,6 +34,12 @@ module Seek
 
       end
 
+      def self.validate_attribute_type(type)
+        unless SampleAttributeType.where(title: type).present?
+          raise StandardError, "The attribute type '#{type}' does not exist."
+        end
+      end
+
       def self.create_extended_metadata_type_from_json(data)
         emt = ::ExtendedMetadataType.create(
           title: data['title'],
@@ -42,8 +48,11 @@ module Seek
         )
 
         data['attributes'].each do |attr|
+
+          validate_attribute_type(attr['type'])
+
           sample_attribute_type = SampleAttributeType.find_by(title: attr['type'])
-          sample_controlled_vocab = SampleControlledVocab.find(attr['ID']) if sample_attribute_type&.controlled_vocab?
+          sample_controlled_vocab = SampleControlledVocab.find(attr['ID']) if sample_attribute_type &.controlled_vocab?
           linked_extended_metadata_type = ::ExtendedMetadataType.find(attr['ID']) if sample_attribute_type&.linked_extended_metadata_or_multi?
 
 
@@ -57,12 +66,8 @@ module Seek
             required: attr['required'].present? ? attr['required'] : false
           )
         end
-
         emt
-
       end
-
-
     end
   end
 end
