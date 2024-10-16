@@ -13,5 +13,6 @@ SEEK::Application.configure do
     inflect.acronym "ROCrate"
     inflect.acronym "CWL"
     inflect.acronym "KNIME"
+    inflect.acronym "CFF"
   end
 end
