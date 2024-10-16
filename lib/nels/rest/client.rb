@@ -26,7 +26,7 @@ module Nels
       end
 
       def projects
-        perform('sbi/projects', :get)
+        perform('seek/sbi/projects', :get)
       end
 
       def project(project_id)
