@@ -45,9 +45,11 @@ module PeopleHelper
   # Return whether or not to hide contact details from this user
   # Current decided by Seek::Config.hide_details_enabled or
   # is hidden if the current person doesn't share the same programme as the person being viewed
+  # User that can edit, the sys admins, can see the details unless hide_details_enabled is set
   def hide_contact_details?(displayed_person_or_project)
     return true if Seek::Config.hide_details_enabled || !logged_in?
-    !current_user.person.shares_project_or_programme?(displayed_person_or_project)
+
+    !(displayed_person_or_project.can_edit? || current_user.person.shares_project_or_programme?(displayed_person_or_project))
   end
 
   def filter_items_not_in_ISA (all_related_items)

@@ -633,6 +633,7 @@ module Seek
     end
 
     def self.clear_cache
+      RequestStore.delete(:config_cache)
       cache_store.delete(cache_key)
     end
 

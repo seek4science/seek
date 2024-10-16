@@ -695,7 +695,7 @@ SEEK::Application.routes.draw do
 
   ### SAMPLE TYPES ###
   #
-  resources :sample_types do
+  resources :sample_types, concerns: %i[asset has_content_blobs] do
     collection do
       post :create_from_template
       get :select
@@ -704,14 +704,10 @@ SEEK::Application.routes.draw do
     member do
       get :template_details
       get :batch_upload
+      post :update_annotations_ajax
     end
     resources :samples
-    resources :content_blobs do
-      member do
-        get :download
-      end
-    end
-    resources :projects, :programmes, :templates, :studies, :assays, only: [:index]
+    resources :investigations, :people, :collections, :publications, :projects, :programmes, :templates, :studies, :assays, only: [:index]
   end
 
   ### SAMPLE ATTRIBUTE TYPES ###
