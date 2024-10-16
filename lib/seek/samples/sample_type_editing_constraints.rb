@@ -53,12 +53,11 @@ module Seek
       def allow_name_change?(attr)
         if attr.is_a?(SampleAttribute)
           return true if attr.new_record?
-          return false if inherited?(attr)
 
           attr = attr.accessor_name
         end
         if attr
-          !samples?
+          samples.all?(&:can_edit?)
         else
           true
         end
