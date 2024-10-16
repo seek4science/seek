@@ -5079,7 +5079,7 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'dont show import from fair data station if obs units disabled' do
+  test 'dont show import from fair data station if obs units or isa disabled' do
     person = FactoryBot.create(:person)
     refute person.is_admin?
     project = person.projects.first
