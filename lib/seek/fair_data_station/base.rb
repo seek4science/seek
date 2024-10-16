@@ -87,8 +87,12 @@ module Seek
         query.execute.collect(&:child)
       end
 
+      def external_id
+        identifier
+      end
+
       def seek_attributes
-        { title: title, description: description, external_identifier: identifier }
+        { title: title, description: description, external_identifier: external_id }
       end
 
       def populate_extended_metadata(seek_resource)
