@@ -958,4 +958,15 @@ class WorkflowTest < ActiveSupport::TestCase
       assert_equal 0, policy.permissions.count
     end
   end
+
+  test 'sets datePublished in RO-Crate metadata' do
+    time = Time.zone.local(2024, 9, 15, 12, 0, 0)
+    travel_to(time) do
+      assert_equal time, FactoryBot.create(:cwl_workflow).ro_crate['datePublished'],
+                   'Should set datePublished to current time'
+    end
+
+    assert_equal '2021-03-31 15:01:47 UTC', FactoryBot.create(:remote_git_workflow).ro_crate['datePublished'].utc.to_s,
+                 'Should set datePublished to time of git commit'
+  end
 end
