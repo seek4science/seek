@@ -1,6 +1,6 @@
 {
   "title": "publication",
-  "supported_type": "Journal",
+  "supported_type": "Publication",
   "enabled": true,
   "attributes": [
     {

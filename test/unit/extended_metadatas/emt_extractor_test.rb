@@ -115,7 +115,7 @@ class EmtExtractorTest < ActiveSupport::TestCase
         Seek::ExtendedMetadataType::EMTExtractor.extract_extended_metadata_type(invalid_emt_file)
       end
 
-      assert_match /Invalid JSON file: The property '#\/attributes\/0' of type object did not match any of the required schemas/, error.message
+      assert_equal "The attribute type 'String1' does not exist.", error.message
     end
   end
 

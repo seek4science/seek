@@ -135,14 +135,27 @@ class ExtendedMetadataTypesControllerTest < ActionController::TestCase
     person = FactoryBot.create(:admin)
     login_as(person)
 
+    file = fixture_file_upload('extended_metadata_type/invalid_not_supported_type_emt.json', 'application/json')
+
+    assert_no_difference('ExtendedMetadataType.count') do
+      post :create, params: { emt_json_file: file }
+    end
+
+    assert_equal "Supported type  'Publication' does not support extended metadata!", flash[:error]
+
+  end
+
+  test 'should not create when the supported type is invalid' do
+    person = FactoryBot.create(:admin)
+    login_as(person)
+
     file = fixture_file_upload('extended_metadata_type/invalid_supported_type_emt.json', 'application/json')
 
     assert_no_difference('ExtendedMetadataType.count') do
       post :create, params: { emt_json_file: file }
     end
 
-    assert_match(/\"Publication\" did not match one of the following values/, flash[:error])
-
+    assert_equal "Supported type 'Journal' is not a valid support type!", flash[:error]
   end
 
 
