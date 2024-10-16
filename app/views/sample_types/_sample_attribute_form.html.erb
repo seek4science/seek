@@ -31,6 +31,7 @@
 <% allow_isa_tag_change = constraints.allow_isa_tag_change?(sample_attribute) if display_isa_tag %>
 <% required_title_text = allow_required ? nil : "You are not allowed to make this attribute required.\nSome samples have no value for this attribute." %>
 <% is_title_title_text = allow_required ? nil : "You are not allowed to change this attribute's title field.\nSome samples have no value for this attribute." %>
+<% change_name_text = allow_name_change ? nil : "You are not allowed to change the name of this attribute.\nYou need at least editing permission to all samples in this sample type." %>
 
 <tr class="sample-attribute <%= 'success' if sample_attribute.nil? -%><%='hidden' if hide_seek_sample_multi -%>" data-index="<%= index-%>">
   <th scope="row" class="attribute-position">
@@ -42,7 +43,7 @@
   </th>
   <td>
 
-    <%= text_field_tag "#{field_name_prefix}[title]", title, class: 'form-control',
+    <%= text_field_tag "#{field_name_prefix}[title]", title, class: 'form-control', title: change_name_text,
                        placeholder: 'Attribute name', disabled: !allow_name_change, data: { attr: "title" } %>
   </td>
 
