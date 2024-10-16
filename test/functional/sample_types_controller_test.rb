@@ -677,10 +677,21 @@ class SampleTypesControllerTest < ActionController::TestCase
     end
   end
 
-  # TODO: This test fails now because the sample type is not immutable anymore.
   test 'validates changes against editing constraints' do
-    @sample_type.samples.create!(data: { the_title: 'yes' }, sample_type: @sample_type, project_ids: @project_ids)
+    other_person = FactoryBot.create(:person)
+    other_person.add_to_project_and_institution(@project, @person.institutions.first)
+    @sample_type.samples.create!(data: { the_title: 'Just look at me!' }, sample_type: @sample_type,
+                                 project_ids: @project_ids, policy: FactoryBot.create(:private_policy))
 
+    login_as other_person
+
+    @sample_type.samples.create!(data: { the_title: 'Don\'t look at me!' }, sample_type: @sample_type,
+                                 project_ids: @project_ids, policy: FactoryBot.create(:private_policy))
+
+    login_as @person
+    get :edit, params: { id: @sample_type }
+    assert_response :success
+    assert_select 'input#sample_type_sample_attributes_attributes_0_title[disabled=?]', 'disabled'
     assert_no_difference('ActivityLog.count') do
       put :update, params: { id: @sample_type, sample_type: {
         sample_attributes_attributes: {
