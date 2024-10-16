@@ -1,21 +1,21 @@
 <% if show_copasi_button? %>
-  <%= button_link_to("Simulate #{t('model')} on Copasi", 'copasi', copasi_simulate_model_path(:version => @display_model.version, :code => params[:code] ),:method=>:get) %>
+  <%= button_link_to("Simulate #{t('model')} on Copasi", 'copasi', copasi_simulate_model_path(version: @display_model.version, code: params[:code]),method: :get) %>
 <% end %>
 
 <% if show_jws_simulate? %>
     <%= button_link_to("Simulate #{t('model')} on JWS", 'execute',
-                       simulate_model_path(item, :version => @display_model.version, :code => params[:code]), :method=>:post,:title => "Simulate #{t('model')} on JWS") %>
+                       simulate_model_path(item, version: @display_model.version, code: params[:code]), method: :post, title: "Simulate #{t('model')} on JWS") %>
 <% end %>
 
 <% if Seek::Config.sycamore_enabled && @display_model.contains_sbml? %>
     <% excutable_content_blob =  @display_model.content_blobs.detect{|cb| cb.is_sbml?}
        if excutable_content_blob.is_in_simulatable_size_limit? && can_download_asset?(@model, params[:code]) -%>
-        <%= form_tag("http://sycamore.eml.org/sycamore/submission.jsp", :id => 'sycamore-form', :target => '_blank') do -%>
+        <%= form_tag("http://sycamore.eml.org/sycamore/submission.jsp", id: 'sycamore-form', target: '_blank') do -%>
             <%= hidden_field_tag 'sbml_model' -%>
             <%= hidden_field_tag 'sender', 'seek' -%>
-            <%= button_link_to "Simulate #{t('model')} on Sycamore", 'execute', url_for(:action => 'submit_to_sycamore', :id => @model.id, :version => @display_model.version), :remote => true, :method => :post -%>
+            <%= button_link_to "Simulate #{t('model')} on Sycamore", 'execute', url_for(action: 'submit_to_sycamore', id: @model.id, version: @display_model.version), remote: true, method: :post -%>
         <% end -%>
     <% end -%>
 <% end %>
 
-<%= render :partial => 'assets/asset_buttons', :locals => {:asset => item, :version => version} -%>
+<%= render partial: 'assets/asset_buttons', locals: {asset: item, version: version} -%>
