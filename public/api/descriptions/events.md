@@ -19,3 +19,5 @@ An **Event** has the following associated information:
 A response for an **Event** such as that for a <a href="#create">**Create**</a>, <a href="#read">**Read**</a> or <a href="#update">**Update**</a> includes the additional information
 
 * Reference to the <a href="#people">**Person**</a> who submitted the **Event**
+
+**Events** have support for [Extended Metadata](/api#section/Extended-Metadata)

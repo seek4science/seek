@@ -6,6 +6,7 @@
 <%
   allow_nil ||= false
   allow_all ||= false
+  allow_only_administered ||= false
   resource ||= nil
 
   selected_projects = resource ? resource.projects : []
@@ -13,13 +14,14 @@
     possible_projects = Project.all
   else
     possible_projects = []
-    possible_projects |= User.current_user.person.current_projects
+    possible_projects |= current_person.current_projects
     if resource
       possible_projects |= resource.projects
       possible_projects |= resource.contributor.current_projects if resource.respond_to?(:contributor) && resource.contributor
     end
   end
 
+  possible_projects = possible_projects.select { |p| current_person.is_project_administrator? p } if allow_only_administered
   possible_projects = possible_projects - selected_projects
 
   possible_projects_json, selected_projects_json = [possible_projects, selected_projects].map do |projects|

@@ -169,23 +169,28 @@ module PolicyHelper
     end
 
     option = { target: :_blank }
+    text = ''.html_safe # Open safe buffer
     case type
     when 'Person'
-      text = "#{contributor.first_name} #{contributor.last_name}"
-      text = link_to(h(text), contributor, option).html_safe if link
+      text += "#{contributor.first_name} #{contributor.last_name}"
+      text += link_to(text, contributor, option).html_safe if link
     when 'WorkGroup'
       institution = contributor.institution
       project = contributor.project
       if link
-        text = "#{member_prefix ? 'Members of ' : ''}#{link_to(h(project.title), project, option)} @ #{link_to(h(institution.title), institution, option)}".html_safe
+        text += 'Members of ' if member_prefix
+        text += link_to(project.title, project, option)
+        text += ' @ '
+        text += link_to(institution.title, institution, option)
       else
-        text = "#{member_prefix ? 'Members of ' : ''}#{project.title} @ #{institution.title}"
+        text += "#{member_prefix ? 'Members of ' : ''}#{project.title} @ #{institution.title}"
       end
     else
       if link
-        text = "#{member_prefix ? 'Members of ' : ''}#{link_to(h(contributor.title), contributor, option)}".html_safe
+        text += 'Members of' if member_prefix
+        text += link_to(contributor.title, project, option)
       else
-        text = "#{member_prefix ? 'Members of ' : ''}#{contributor.title}"
+        text += "#{member_prefix ? 'Members of ' : ''}#{contributor.title}"
       end
     end
 

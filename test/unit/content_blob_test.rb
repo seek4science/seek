@@ -900,61 +900,6 @@ class ContentBlobTest < ActiveSupport::TestCase
     refute File.exist?(txt_path)
   end
 
-  test 'fix mime type after failed csv extraction' do
-    blob = FactoryBot.create(:image_content_blob, content_type:'application/excel', original_filename:'image.xls')
-    assert blob.is_excel?
-
-    text = blob.to_csv
-
-    assert text.blank?
-
-    blob.reload
-
-    refute blob.is_excel?
-    assert_equal 'image/png',blob.content_type
-  end
-
-  test 'fix mime type after failed pdf contents for search' do
-    blob = FactoryBot.create(:image_content_blob, content_type: 'application/msword', original_filename: 'image.doc')
-    assert blob.is_pdf_convertable?
-
-    assert_empty blob.pdf_contents_for_search
-
-    blob.reload
-
-    refute blob.is_pdf_convertable?
-    assert_equal 'image/png', blob.content_type
-
-    # incorrectly described as pdf
-    blob = FactoryBot.create(:image_content_blob, content_type: 'application/pdf', original_filename: 'image.pdf')
-
-    assert_empty blob.pdf_contents_for_search
-
-    blob.reload
-
-    refute blob.is_pdf_convertable?
-    assert_equal 'image/png', blob.content_type
-
-    # handles when the file is actually broken, rather than failing due to the mime type
-    blob = FactoryBot.create(:broken_pdf_content_blob)
-    assert_empty blob.pdf_contents_for_search
-    assert_equal 'application/pdf', blob.content_type
-  end
-
-  test 'fix mime type after spreadsheet xml fail' do
-    blob = FactoryBot.create(:image_content_blob, content_type:'application/msexcel', original_filename:'image.xls')
-    assert blob.is_extractable_spreadsheet?
-
-    assert_raises(SysMODB::SpreadsheetExtractionException) do
-      blob.to_spreadsheet_xml
-    end
-
-    blob.reload
-
-    refute blob.is_extractable_spreadsheet?
-    assert_equal 'image/png',blob.content_type
-  end
-
   test 'tmp_io_objects in tmp dir are deleted' do
     file = Tempfile.new('testing-content-blob')
     file.write('test test test')

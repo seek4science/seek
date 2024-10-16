@@ -40,8 +40,12 @@ class StudiesController < ApplicationController
 
   def edit
     @study = Study.find(params[:id])
-    respond_to do |format|
-      format.html
+    if @study.is_isa_json_compliant?
+      redirect_to edit_isa_study_path(@study)
+    else
+      respond_to do |format|
+        format.html
+      end
     end
   end
 

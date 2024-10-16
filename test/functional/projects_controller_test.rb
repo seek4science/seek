@@ -154,8 +154,8 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_no_difference('Project.count') do
       assert_no_difference('ExtendedMetadata.count') do
         put :update, params: { id: project.id, project: { title: "new title",
-                                                      extended_metadata_attributes: { extended_metadata_type_id: cmt.id, id: cm.id,
-                                                                                      data: {
+                                                          extended_metadata_attributes: { extended_metadata_type_id: cmt.id, id: cm.id,
+                                                                                          data: {
                                                                                         "age": 20,
                                                                                         "name": 'max'
                                                                                       } }
@@ -208,6 +208,21 @@ class ProjectsControllerTest < ActionController::TestCase
     refute_nil project
     assert_empty project.programmes
   end
+
+  test 'update project with tags' do
+    proj_admin = FactoryBot.create(:project_administrator)
+    login_as(proj_admin)
+    project = proj_admin.projects.first
+
+    post :update_annotations_ajax, xhr: true, params: { id: project, tag_list: %w[alice rabbit] }
+    project.reload
+    assert_equal %w[alice rabbit], project.tags
+
+    project.annotate_with('dodo', 'tag', proj_admin)
+    project.save!
+    assert_equal ['dodo'], project.tags
+  end
+
 
   test 'cannot create project with programme if not administrator of programme' do
     person = FactoryBot.create(:programme_administrator)
@@ -1207,7 +1222,7 @@ class ProjectsControllerTest < ActionController::TestCase
     new_person2 = FactoryBot.create(:person)
     new_person3 = FactoryBot.create(:person)
 
-    put :update, params: { id:project.id, project: { members: [{ 'person_id' => "#{new_person.id}", 'institution_id' => "#{new_institution.id}" },
+    put :update, params: { id: project.id, project: { members: [{ 'person_id' => "#{new_person.id}", 'institution_id' => "#{new_institution.id}" },
                                                                           { 'person_id' => "#{new_person2.id}", 'institution_id' => "#{new_institution.id}" },
                                                                           { 'person_id' => "#{new_person3.id}", 'institution_id' => "#{new_institution.id}" }] } }
 
@@ -1287,7 +1302,7 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_no_enqueued_jobs only: ProjectLeavingJob do
       assert_no_difference('GroupMembership.count') do
         post :update_members, params: { id: project, memberships_to_flag: { group_membership.id.to_s => { time_left_at: 1.day.ago },
-                                    former_group_membership.id.to_s => { time_left_at: '' } } }
+                                                                            former_group_membership.id.to_s => { time_left_at: '' } } }
         assert_redirected_to project_path(project)
         assert_nil flash[:error]
         refute_nil flash[:notice]
@@ -1601,8 +1616,8 @@ class ProjectsControllerTest < ActionController::TestCase
     person = FactoryBot.create(:person, group_memberships: [group_membership])
 
     data_file = FactoryBot.create(:data_file, projects: [project], contributor: person,
-                        policy: FactoryBot.create(:policy, access_type: Policy::NO_ACCESS,
-                                        permissions: [FactoryBot.create(:permission,
+                                              policy: FactoryBot.create(:policy, access_type: Policy::NO_ACCESS,
+                                                                                 permissions: [FactoryBot.create(:permission,
                                                               contributor: project,
                                                               access_type: Policy::VISIBLE)]))
     refute data_file.can_delete?(proj_admin)
@@ -1900,10 +1915,10 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as(person)
     params = {
       project_ids: ['', project.id],
-        institution:{
+      institution: {
             id: ['', institution.id]
         },
-        comments: 'some comments'
+      comments: 'some comments'
     }
     assert_enqueued_emails(1) do
       assert_difference('ProjectMembershipMessageLog.count') do
@@ -1928,10 +1943,10 @@ class ProjectsControllerTest < ActionController::TestCase
 
     institution_params = {
         id: ['fish'],
-        title:'fish',
-        city:'Sheffield',
-        country:'GB',
-        web_page:'http://google.com'
+        title: 'fish',
+        city: 'Sheffield',
+        country: 'GB',
+        web_page: 'http://google.com'
     }
     params = {
         project_ids: [project.id],
@@ -1965,10 +1980,10 @@ class ProjectsControllerTest < ActionController::TestCase
 
     institution_params = {
       id: ['fish'],
-      title:'fish',
-      city:'Sheffield',
-      country:'GB',
-      web_page:'http://google.com'
+      title: 'fish',
+      city: 'Sheffield',
+      country: 'GB',
+      web_page: 'http://google.com'
     }
     params = {
       project_ids: ['', project1.id, project2.id],
@@ -2503,9 +2518,9 @@ class ProjectsControllerTest < ActionController::TestCase
     with_config_value(:managed_programme_id, programme.id) do
       params = {
         project: {dmp: fixture_file_upload('dmp.json', 'application/json')},
-          institution: {id: ['the inst'], title: 'the inst', web_page: 'the page', city: 'London', country: 'GB'},
-          programme_id: '',
-          programme: {title: 'the prog'}
+        institution: {id: ['the inst'], title: 'the inst', web_page: 'the page', city: 'London', country: 'GB'},
+        programme_id: '',
+        programme: {title: 'the prog'}
       }
       assert_enqueued_emails(1) do
         assert_difference('ProjectImportationMessageLog.count') do
@@ -2644,8 +2659,8 @@ class ProjectsControllerTest < ActionController::TestCase
     params = {
         message_log_id: log.id,
         accept_request: '1',
-        institution:{id:institution.id},
-        id:project.id
+        institution: {id:institution.id},
+        id: project.id
     }
 
     assert_enqueued_emails(2) do
@@ -2679,8 +2694,8 @@ class ProjectsControllerTest < ActionController::TestCase
     params = {
         message_log_id: log.id,
         accept_request: '1',
-        institution:{id:institution.id},
-        id:project.id
+        institution: {id:institution.id},
+        id: project.id
     }
 
     assert_enqueued_emails(0) do
@@ -2703,8 +2718,8 @@ class ProjectsControllerTest < ActionController::TestCase
     project = person.projects.first
     sender = FactoryBot.create(:person)
     institution = Institution.new({
-                                      title:'institution',
-                                   country:'DE'
+                                      title: 'institution',
+                                      country: 'DE'
                                   })
     log = ProjectMembershipMessageLog.log_request(sender:sender, project:project, institution:institution, comments:'some comments')
     login_as(person)
@@ -2712,11 +2727,11 @@ class ProjectsControllerTest < ActionController::TestCase
     params = {
         message_log_id: log.id,
         accept_request: '1',
-        institution:{
-                     title:'institution',
-                     country:'FR' # admin may have corrected this from DE
+        institution: {
+                     title: 'institution',
+                     country: 'FR' # admin may have corrected this from DE
         },
-        id:project.id
+        id: project.id
     }
 
     assert_enqueued_emails(2) do
@@ -2746,8 +2761,8 @@ class ProjectsControllerTest < ActionController::TestCase
     project = person.projects.first
     sender = FactoryBot.create(:person)
     institution = Institution.new({
-                                      title:'institution',
-                                      country:'DE'
+                                      title: 'institution',
+                                      country: 'DE'
                                   })
     log = ProjectMembershipMessageLog.log_request(sender:sender, project:project, institution:institution, comments:'some comments')
     login_as(person)
@@ -2755,10 +2770,10 @@ class ProjectsControllerTest < ActionController::TestCase
     params = {
         message_log_id: log.id,
         accept_request: '1',
-        institution:{
-            title:'',
+        institution: {
+            title: '',
         },
-        id:project.id
+        id: project.id
     }
 
     assert_enqueued_emails(0) do
@@ -2789,7 +2804,7 @@ class ProjectsControllerTest < ActionController::TestCase
         message_log_id: log.id,
         reject_details: 'bad request',
         institution: { id:institution.id },
-        id:project.id
+        id: project.id
     }
 
     assert_enqueued_emails(2) do
@@ -2977,19 +2992,19 @@ class ProjectsControllerTest < ActionController::TestCase
     requester = FactoryBot.create(:person)
     log = ProjectCreationMessageLog.log_request(sender:requester, programme:programme, project:project, institution:institution)
     params = {
-        message_log_id:log.id,
+        message_log_id: log.id,
         accept_request: '1',
-        project:{
-            title:'new project updated',
-            web_page:'http://proj.org'
+        project: {
+            title: 'new project updated',
+            web_page: 'http://proj.org'
         },
-        programme:{
-            title:'new programme updated'
+        programme: {
+            title: 'new programme updated'
         },
-        institution:{
-            title:'new institution updated',
-            city:'Paris',
-            country:'FR'
+        institution: {
+            title: 'new institution updated',
+            city: 'Paris',
+            country: 'FR'
         }
     }
 
@@ -3044,19 +3059,19 @@ class ProjectsControllerTest < ActionController::TestCase
     requester = FactoryBot.create(:person)
     log = ProjectCreationMessageLog.log_request(sender:requester, programme:programme, project:project, institution:institution)
     params = {
-        message_log_id:log.id,
+        message_log_id: log.id,
         accept_request: '1',
-        project:{
-            title:'new project updated',
-            web_page:'http://proj.org'
+        project: {
+            title: 'new project updated',
+            web_page: 'http://proj.org'
         },
-        programme:{
-            title:'new programme updated'
+        programme: {
+            title: 'new programme updated'
         },
-        institution:{
-            title:'new institution updated',
-            city:'Paris',
-            country:'FR'
+        institution: {
+            title: 'new institution updated',
+            city: 'Paris',
+            country: 'FR'
         }
     }
 
@@ -3087,19 +3102,19 @@ class ProjectsControllerTest < ActionController::TestCase
     institution = Institution.new({title:'institution', country:'DE'})
     log = ProjectCreationMessageLog.log_request(sender: person, programme:programme, project:project, institution:institution)
     params = {
-      message_log_id:log.id,
+      message_log_id: log.id,
       accept_request: '1',
-      project:{
-        title:'new project',
-        web_page:'http://proj.org'
+      project: {
+        title: 'new project',
+        web_page: 'http://proj.org'
       },
-      programme:{
+      programme: {
         id: programme.id
       },
-      institution:{
-        title:'new institution',
-        city:'Paris',
-        country:'FR'
+      institution: {
+        title: 'new institution',
+        city: 'Paris',
+        country: 'FR'
       }
     }
 
@@ -3148,19 +3163,19 @@ class ProjectsControllerTest < ActionController::TestCase
     institution = Institution.new({title:'institution', country:'DE'})
     log = ProjectCreationMessageLog.log_request(sender: person, programme:programme, project:project, institution:institution)
     params = {
-      message_log_id:log.id,
+      message_log_id: log.id,
       accept_request: '1',
-      project:{
-        title:'new project',
-        web_page:'http://proj.org'
+      project: {
+        title: 'new project',
+        web_page: 'http://proj.org'
       },
-      programme:{
+      programme: {
         id: programme.id
       },
-      institution:{
-        title:'new institution',
-        city:'Paris',
-        country:'FR'
+      institution: {
+        title: 'new institution',
+        city: 'Paris',
+        country: 'FR'
       }
     }
 
@@ -3197,18 +3212,18 @@ class ProjectsControllerTest < ActionController::TestCase
     requester = FactoryBot.create(:person)
     log = ProjectCreationMessageLog.log_request(sender:requester, programme:programme, project:project, institution:institution)
     params = {
-        message_log_id:log.id,
+        message_log_id: log.id,
         accept_request: '1',
-        project:{
-            title:''
+        project: {
+            title: ''
         },
-        programme:{
-            title:'new programme updated'
+        programme: {
+            title: 'new programme updated'
         },
-        institution:{
-            title:'new institution updated',
-            city:'Paris',
-            country:'FR'
+        institution: {
+            title: 'new institution updated',
+            city: 'Paris',
+            country: 'FR'
         }
     }
 
@@ -3242,18 +3257,18 @@ class ProjectsControllerTest < ActionController::TestCase
     requester = FactoryBot.create(:person)
     log = ProjectCreationMessageLog.log_request(sender:requester, programme:programme, project:project, institution:institution)
     params = {
-        message_log_id:log.id,
+        message_log_id: log.id,
         accept_request: '1',
-        project:{
-            title:'a valid project'
+        project: {
+            title: 'a valid project'
         },
-        programme:{
-            title:''
+        programme: {
+            title: ''
         },
-        institution:{
-            title:duplicate_institution.title,
-            city:'Paris',
-            country:'FR'
+        institution: {
+            title: duplicate_institution.title,
+            city: 'Paris',
+            country: 'FR'
         }
     }
 
@@ -3286,17 +3301,17 @@ class ProjectsControllerTest < ActionController::TestCase
     requester = FactoryBot.create(:person)
     log = ProjectCreationMessageLog.log_request(sender:requester, programme:programme, project:project, institution:institution)
     params = {
-        message_log_id:log.id,
+        message_log_id: log.id,
         accept_request: '1',
-        project:{
-            title:'new project',
-            web_page:'http://proj.org'
+        project: {
+            title: 'new project',
+            web_page: 'http://proj.org'
         },
-        programme:{
-            id:programme.id
+        programme: {
+            id: programme.id
         },
-        institution:{
-            id:institution.id
+        institution: {
+            id: institution.id
         }
     }
 
@@ -3340,17 +3355,17 @@ class ProjectsControllerTest < ActionController::TestCase
     log = ProjectCreationMessageLog.log_request(sender:requester, programme:programme, project:project, institution:institution)
     assert log.sent_by_self?
     params = {
-      message_log_id:log.id,
+      message_log_id: log.id,
       accept_request: '1',
-      project:{
-        title:'new project',
-        web_page:'http://proj.org'
+      project: {
+        title: 'new project',
+        web_page: 'http://proj.org'
       },
-      programme:{
-        id:programme.id
+      programme: {
+        id: programme.id
       },
-      institution:{
-        id:institution.id
+      institution: {
+        id: institution.id
       }
     }
 
@@ -3391,16 +3406,16 @@ class ProjectsControllerTest < ActionController::TestCase
     log = ProjectCreationMessageLog.log_request(sender:requester, programme:programme, project:project, institution:institution)
     assert log.sent_by_self?
     params = {
-      message_log_id:log.id,
-      project:{
-        title:'new project',
-        web_page:'http://proj.org'
+      message_log_id: log.id,
+      project: {
+        title: 'new project',
+        web_page: 'http://proj.org'
       },
-      programme:{
-        id:programme.id
+      programme: {
+        id: programme.id
       },
-      institution:{
-        id:institution.id
+      institution: {
+        id: institution.id
       }
     }
 
@@ -3432,16 +3447,16 @@ class ProjectsControllerTest < ActionController::TestCase
     log = ProjectCreationMessageLog.log_request(sender: requester, programme: programme, project: project, institution: institution)
     refute log.sent_by_self?
     params = {
-      message_log_id:log.id,
-      project:{
-        title:'new project',
-        web_page:'http://proj.org'
+      message_log_id: log.id,
+      project: {
+        title: 'new project',
+        web_page: 'http://proj.org'
       },
-      programme:{
-        id:programme.id
+      programme: {
+        id: programme.id
       },
-      institution:{
-        id:institution.id
+      institution: {
+        id: institution.id
       },
       delete_request: '1'
     }
@@ -3475,16 +3490,16 @@ class ProjectsControllerTest < ActionController::TestCase
     refute log.sent_by_self?
     refute programme.can_manage?
     params = {
-      message_log_id:log.id,
-      project:{
-        title:'new project',
-        web_page:'http://proj.org'
+      message_log_id: log.id,
+      project: {
+        title: 'new project',
+        web_page: 'http://proj.org'
       },
-      programme:{
-        id:programme.id
+      programme: {
+        id: programme.id
       },
-      institution:{
-        id:institution.id
+      institution: {
+        id: institution.id
       },
       delete_request: '1'
     }
@@ -3517,17 +3532,17 @@ class ProjectsControllerTest < ActionController::TestCase
     requester = FactoryBot.create(:person)
     log = ProjectCreationMessageLog.log_request(sender:requester, programme:programme, project:project, institution:institution)
     params = {
-        message_log_id:log.id,
+        message_log_id: log.id,
         accept_request: '1',
-        project:{
-            title:'new project',
-            web_page:'http://proj.org'
+        project: {
+            title: 'new project',
+            web_page: 'http://proj.org'
         },
-        programme:{
-            id:programme.id
+        programme: {
+            id: programme.id
         },
-        institution:{
-            id:institution.id
+        institution: {
+            id: institution.id
         }
     }
 
@@ -3561,17 +3576,17 @@ class ProjectsControllerTest < ActionController::TestCase
     requester = FactoryBot.create(:person)
     log = ProjectCreationMessageLog.log_request(sender:requester, programme:programme, project:project, institution:institution)
     params = {
-        message_log_id:log.id,
-        reject_details:'not very good',
-        project:{
-            title:'new project',
-            web_page:'http://proj.org'
+        message_log_id: log.id,
+        reject_details: 'not very good',
+        project: {
+            title: 'new project',
+            web_page: 'http://proj.org'
         },
-        programme:{
-            id:programme.id
+        programme: {
+            id: programme.id
         },
-        institution:{
-            id:institution.id
+        institution: {
+            id: institution.id
         }
     }
 
@@ -3606,16 +3621,16 @@ class ProjectsControllerTest < ActionController::TestCase
     requester = FactoryBot.create(:person)
     log = ProjectCreationMessageLog.log_request(sender:requester, project:project, institution:institution)
     params = {
-      message_log_id:log.id,
+      message_log_id: log.id,
       accept_request: '1',
-      project:{
-        title:'new project updated',
-        web_page:'http://proj.org'
+      project: {
+        title: 'new project updated',
+        web_page: 'http://proj.org'
       },
-      institution:{
-        title:'new institution updated',
-        city:'Paris',
-        country:'FR'
+      institution: {
+        title: 'new institution updated',
+        city: 'Paris',
+        country: 'FR'
       }
     }
 
@@ -3769,19 +3784,19 @@ class ProjectsControllerTest < ActionController::TestCase
     requester = FactoryBot.create(:person)
     log = ProjectImportationMessageLog.log_request(sender:requester, programme:programme, project:project, institution:institution, people:people)
     params = {
-        message_log_id:log.id,
+        message_log_id: log.id,
         accept_request: '1',
-        project:{
-            title:'new project updated',
-            web_page:'http://proj.org'
+        project: {
+            title: 'new project updated',
+            web_page: 'http://proj.org'
         },
-        programme:{
-            title:'new programme updated'
+        programme: {
+            title: 'new programme updated'
         },
-        institution:{
-            title:'new institution updated',
-            city:'Paris',
-            country:'FR'
+        institution: {
+            title: 'new institution updated',
+            city: 'Paris',
+            country: 'FR'
         },
         people: people.map { |p| {first_name: p.first_name, last_name: p.last_name, email: p.email} }
     }
@@ -3840,19 +3855,19 @@ class ProjectsControllerTest < ActionController::TestCase
     requester = FactoryBot.create(:person)
     log = ProjectImportationMessageLog.log_request(sender:requester, programme:programme, project:project, institution:institution, people:people)
     params = {
-        message_log_id:log.id,
+        message_log_id: log.id,
         accept_request: '1',
-        project:{
-            title:'new project updated',
-            web_page:'http://proj.org'
+        project: {
+            title: 'new project updated',
+            web_page: 'http://proj.org'
         },
-        programme:{
-            title:'new programme updated'
+        programme: {
+            title: 'new programme updated'
         },
-        institution:{
-            title:'new institution updated',
-            city:'Paris',
-            country:'FR'
+        institution: {
+            title: 'new institution updated',
+            city: 'Paris',
+            country: 'FR'
         },
         people: people.map { |p| {first_name: p.first_name, last_name: p.last_name, email: p.email} }
     }
@@ -3885,19 +3900,19 @@ class ProjectsControllerTest < ActionController::TestCase
     people = FactoryBot.create_list(:person, 3)
     log = ProjectImportationMessageLog.log_request(sender: person, programme:programme, project:project, institution:institution, people:people)
     params = {
-      message_log_id:log.id,
+      message_log_id: log.id,
       accept_request: '1',
-      project:{
-        title:'new project',
-        web_page:'http://proj.org'
+      project: {
+        title: 'new project',
+        web_page: 'http://proj.org'
       },
-      programme:{
+      programme: {
         id: programme.id
       },
-      institution:{
-        title:'new institution',
-        city:'Paris',
-        country:'FR'
+      institution: {
+        title: 'new institution',
+        city: 'Paris',
+        country: 'FR'
       },
       people: people.map { |p| {first_name: p.first_name, last_name: p.last_name, email: p.email} }
     }
@@ -3936,18 +3951,18 @@ class ProjectsControllerTest < ActionController::TestCase
     requester = FactoryBot.create(:person)
     log = ProjectImportationMessageLog.log_request(sender:requester, programme:programme, project:project, institution:institution, people:people)
     params = {
-        message_log_id:log.id,
+        message_log_id: log.id,
         accept_request: '1',
-        project:{
-            title:''
+        project: {
+            title: ''
         },
-        programme:{
-            title:'new programme updated'
+        programme: {
+            title: 'new programme updated'
         },
-        institution:{
-            title:'new institution updated',
-            city:'Paris',
-            country:'FR'
+        institution: {
+            title: 'new institution updated',
+            city: 'Paris',
+            country: 'FR'
         },
         people: people.map { |p| {first_name: p.first_name, last_name: p.last_name, email: p.email} }
     }
@@ -3983,18 +3998,18 @@ class ProjectsControllerTest < ActionController::TestCase
     requester = FactoryBot.create(:person)
     log = ProjectImportationMessageLog.log_request(sender:requester, programme:programme, project:project, institution:institution, people:people)
     params = {
-        message_log_id:log.id,
+        message_log_id: log.id,
         accept_request: '1',
-        project:{
-            title:'a valid project'
+        project: {
+            title: 'a valid project'
         },
-        programme:{
-            title:''
+        programme: {
+            title: ''
         },
-        institution:{
-            title:duplicate_institution.title,
-            city:'Paris',
-            country:'FR'
+        institution: {
+            title: duplicate_institution.title,
+            city: 'Paris',
+            country: 'FR'
         },
         people: people.map { |p| {first_name: p.first_name, last_name: p.last_name, email: p.email} }
     }
@@ -4029,17 +4044,17 @@ class ProjectsControllerTest < ActionController::TestCase
     requester = FactoryBot.create(:person)
     log = ProjectImportationMessageLog.log_request(sender:requester, programme:programme, project:project, institution:institution, people:people)
     params = {
-        message_log_id:log.id,
+        message_log_id: log.id,
         accept_request: '1',
-        project:{
-            title:'new project',
-            web_page:'http://proj.org'
+        project: {
+            title: 'new project',
+            web_page: 'http://proj.org'
         },
-        programme:{
-            id:programme.id
+        programme: {
+            id: programme.id
         },
-        institution:{
-            id:institution.id
+        institution: {
+            id: institution.id
         },
         people: people.map { |p| {first_name: p.first_name, last_name: p.last_name, email: p.email} }
     }
@@ -4087,17 +4102,17 @@ class ProjectsControllerTest < ActionController::TestCase
     log = ProjectImportationMessageLog.log_request(sender:requester, programme:programme, project:project, institution:institution, people:people)
     assert log.sent_by_self?
     params = {
-      message_log_id:log.id,
+      message_log_id: log.id,
       accept_request: '1',
-      project:{
-        title:'new project',
-        web_page:'http://proj.org'
+      project: {
+        title: 'new project',
+        web_page: 'http://proj.org'
       },
-      programme:{
-        id:programme.id
+      programme: {
+        id: programme.id
       },
-      institution:{
-        id:institution.id
+      institution: {
+        id: institution.id
       },
       people: people.map { |p| {first_name: p.first_name, last_name: p.last_name, email: p.email} }
     }
@@ -4142,16 +4157,16 @@ class ProjectsControllerTest < ActionController::TestCase
     log = ProjectImportationMessageLog.log_request(sender:requester, programme:programme, project:project, institution:institution, people:people)
     assert log.sent_by_self?
     params = {
-      message_log_id:log.id,
-      project:{
-        title:'new project',
-        web_page:'http://proj.org'
+      message_log_id: log.id,
+      project: {
+        title: 'new project',
+        web_page: 'http://proj.org'
       },
-      programme:{
-        id:programme.id
+      programme: {
+        id: programme.id
       },
-      institution:{
-        id:institution.id
+      institution: {
+        id: institution.id
       },
       people: people.map { |p| {first_name: p.first_name, last_name: p.last_name, email: p.email} }
     }
@@ -4185,16 +4200,16 @@ class ProjectsControllerTest < ActionController::TestCase
     log = ProjectImportationMessageLog.log_request(sender: requester, programme: programme, project: project, institution: institution, people: people)
     refute log.sent_by_self?
     params = {
-      message_log_id:log.id,
-      project:{
-        title:'new project',
-        web_page:'http://proj.org'
+      message_log_id: log.id,
+      project: {
+        title: 'new project',
+        web_page: 'http://proj.org'
       },
-      programme:{
-        id:programme.id
+      programme: {
+        id: programme.id
       },
-      institution:{
-        id:institution.id
+      institution: {
+        id: institution.id
       },
       people: people.map { |p| {first_name: p.first_name, last_name: p.last_name, email: p.email} },
       delete_request: '1'
@@ -4230,16 +4245,16 @@ class ProjectsControllerTest < ActionController::TestCase
     refute log.sent_by_self?
     refute programme.can_manage?
     params = {
-      message_log_id:log.id,
-      project:{
-        title:'new project',
-        web_page:'http://proj.org'
+      message_log_id: log.id,
+      project: {
+        title: 'new project',
+        web_page: 'http://proj.org'
       },
-      programme:{
-        id:programme.id
+      programme: {
+        id: programme.id
       },
-      institution:{
-        id:institution.id
+      institution: {
+        id: institution.id
       },
       people: people.map { |p| {first_name: p.first_name, last_name: p.last_name, email: p.email} },
       delete_request: '1'
@@ -4274,17 +4289,17 @@ class ProjectsControllerTest < ActionController::TestCase
     requester = FactoryBot.create(:person)
     log = ProjectImportationMessageLog.log_request(sender:requester, programme:programme, project:project, institution:institution, people:people)
     params = {
-        message_log_id:log.id,
+        message_log_id: log.id,
         accept_request: '1',
-        project:{
-            title:'new project',
-            web_page:'http://proj.org'
+        project: {
+            title: 'new project',
+            web_page: 'http://proj.org'
         },
-        programme:{
-            id:programme.id
+        programme: {
+            id: programme.id
         },
-        institution:{
-            id:institution.id
+        institution: {
+            id: institution.id
         },
         people: people.map { |p| {first_name: p.first_name, last_name: p.last_name, email: p.email} }
     }
@@ -4320,17 +4335,17 @@ class ProjectsControllerTest < ActionController::TestCase
     requester = FactoryBot.create(:person)
     log = ProjectImportationMessageLog.log_request(sender:requester, programme:programme, project:project, institution:institution, people:people)
     params = {
-        message_log_id:log.id,
-        reject_details:'not very good',
-        project:{
-            title:'new project',
-            web_page:'http://proj.org'
+        message_log_id: log.id,
+        reject_details: 'not very good',
+        project: {
+            title: 'new project',
+            web_page: 'http://proj.org'
         },
-        programme:{
-            id:programme.id
+        programme: {
+            id: programme.id
         },
-        institution:{
-            id:institution.id
+        institution: {
+            id: institution.id
         },
         people: people.map { |p| {first_name: p.first_name, last_name: p.last_name, email: p.email} }
     }
@@ -4367,16 +4382,16 @@ class ProjectsControllerTest < ActionController::TestCase
     requester = FactoryBot.create(:person)
     log = ProjectImportationMessageLog.log_request(sender:requester, project:project, institution:institution, people:people)
     params = {
-      message_log_id:log.id,
+      message_log_id: log.id,
       accept_request: '1',
-      project:{
-        title:'new project updated',
-        web_page:'http://proj.org'
+      project: {
+        title: 'new project updated',
+        web_page: 'http://proj.org'
       },
-      institution:{
-        title:'new institution updated',
-        city:'Paris',
-        country:'FR'
+      institution: {
+        title: 'new institution updated',
+        city: 'Paris',
+        country: 'FR'
       },
       people: people.map { |p| {first_name: p.first_name, last_name: p.last_name, email: p.email} }
     }
@@ -4623,7 +4638,7 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_difference('AssetLink.discussion.count') do
       assert_difference('Project.count') do
         post :create, params: { project: { title: 'test',
-                                          discussion_links_attributes: [{url: "http://www.slack.com/"}]}}
+                                           discussion_links_attributes: [{url: "http://www.slack.com/"}]}}
       end
     end
     project = assigns(:project)
@@ -4973,7 +4988,11 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as(person)
     assert project.has_member?(person)
     assert project.can_edit?
-    get :show, params: { id: project.id }
+
+    with_config_value :isa_json_compliance_enabled, true do
+      get :show, params: { id: project.id }
+    end
+
     assert_response :success
     params = { project_ids: [project.id] }
     directly_linked_types = [
@@ -5000,6 +5019,27 @@ class ProjectsControllerTest < ActionController::TestCase
         assert_select 'a[href=?]', Seek::Util.routes.polymorphic_path(type, action: :new, "#{type.name.underscore}": params)
       end
     end
+  end
+
+  test 'do not show related templates if isa_compliance disabled' do
+    template = FactoryBot.create(:template)
+    person = template.contributor
+    project = template.projects.first
+    login_as(person)
+    assert template.can_view?
+
+    with_config_value(:isa_json_compliance_enabled, true) do
+      get :show, params:{id: project.id}
+      assert_response :success
+      assert_select 'div#related-items li a[data-model-name=Template]', count: 1
+    end
+
+    with_config_value(:isa_json_compliance_enabled, false) do
+      get :show, params:{id: project.id}
+      assert_response :success
+      assert_select 'div#related-items li a[data-model-name=Template]', count: 0
+    end
+
   end
 
   private

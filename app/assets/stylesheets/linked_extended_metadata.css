@@ -1,3 +1,21 @@
+.term-label {
+    font-weight: normal;
+    text-decoration: underline;
+}
+
+.term-iri {
+    display: none;
+    background-color: rgba(177, 183, 187, 0.47);
+    color: black;
+    font-weight: normal;
+}
+
+.term-iri.visible {
+    display: inline;
+    opacity: 1;
+    margin-left: 10px;
+}
+
 .linked_extended_metdata .panel-default .panel-heading {
     font-weight: bold;
     color: #333;

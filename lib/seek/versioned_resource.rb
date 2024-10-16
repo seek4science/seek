@@ -59,12 +59,6 @@ module Seek #:nodoc:
         end
       end
 
-      # assumes all versioned resources are also taggable
-
-      def contains_downloadable_items?
-        all_content_blobs.compact.any?(&:is_downloadable?)
-      end
-
       def all_content_blobs
         blobs = []
         blobs << content_blob if respond_to?(:content_blob)

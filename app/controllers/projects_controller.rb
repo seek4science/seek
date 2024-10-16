@@ -8,6 +8,7 @@ class ProjectsController < ApplicationController
   include CommonSweepers
   include Seek::DestroyHandling
   include Seek::Projects::Population
+  include Seek::AnnotationCommon
 
   before_action :login_required, only: [:guided_join, :guided_create, :guided_import, :request_join, :request_create, :request_import,
                                         :administer_join_request, :respond_join_request,

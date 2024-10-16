@@ -1,0 +1,42 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema",
+	"title": "ISA template schema",
+	"description": "JSON-schema representing an ISA template in DataHub",
+	"type": "object",
+	"properties": {
+		"data": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"properties": {
+					"metadata": {
+						"type": "object",
+						"properties": {
+							"name": { "type": "string" },
+							"group": { "type": "string" },
+							"group_order": { "type": "number" },
+							"temporary_name": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+							"version": { "anyOf": [{ "type": "string" }, { "type": "number" }] },
+							"isa_config": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+							"isa_measurement_type": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+							"isa_technology_type": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+							"isa_protocol_type": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+							"repo_schema_id": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+							"organism": { "type": "string" },
+							"level": { "type": "string" }
+						},
+						"additionalProperties": false
+					},
+					"data": {
+						"type": "array",
+						"items": {
+							"$ref": "template_attributes_schema_test.json#"
+						}
+					}
+				},
+				"additionalProperties": false
+			}
+		}
+	},
+	"additionalProperties": false
+}

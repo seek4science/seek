@@ -349,6 +349,7 @@ SEEK::Application.routes.draw do
       get :administer_join_request
       post :respond_join_request
       get :guided_join
+      post :update_annotations_ajax
     end
     resources :programmes, :people, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows, :data_files, :presentations,
               :publications, :events, :sample_types, :samples, :specimens, :strains, :search, :organisms, :human_diseases, :documents, :file_templates, :placeholders, :collections, :templates, only: [:index]
@@ -513,7 +514,7 @@ SEEK::Application.routes.draw do
     resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :collections, :workflows, :file_templates, :placeholders, only: [:index]
   end
 
-  resources :presentations, concerns: [:has_content_blobs, :publishable, :has_versions, :asset] do
+  resources :presentations, concerns: [:has_content_blobs, :publishable, :has_versions, :asset, :explorable_spreadsheet] do
     resources :people, :programmes, :projects, :publications, :events, :collections, :workflows, :investigations, :studies, :assays, only: [:index]
   end
 
@@ -773,6 +774,7 @@ SEEK::Application.routes.draw do
   resources :single_pages do
     member do
       get :dynamic_table_data
+      post :update_annotations_ajax
     end
     collection do
       get :batch_sharing_permission_preview

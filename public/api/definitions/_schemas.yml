@@ -473,6 +473,8 @@ collectionAttributes:
       $ref: "#/components/schemas/assetsCreatorsList"
     discussion_links:
       $ref: "#/components/schemas/assetLinkList"
+    extended_attributes:
+      $ref: "#/components/schemas/extendedMetadata"
   required:
     - title
     - license
@@ -867,6 +869,7 @@ anyType:
     - sops
     - studies
     - workflows
+    - extended_metadata_types
 assetType:
   type: string
   minLength: 1
@@ -1128,6 +1131,8 @@ assayPost:
               $ref: "#/components/schemas/policy"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPostList"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           required:
             - title
             - assay_class
@@ -1218,6 +1223,8 @@ assayPatch:
               $ref: "#/components/schemas/policy"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPatchList"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           additionalProperties: false
         relationships:
           type: object
@@ -1868,6 +1875,8 @@ investigationPost:
               $ref: "#/components/schemas/policy"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPostList"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           required:
             - title
           additionalProperties: false
@@ -1918,6 +1927,8 @@ investigationPatch:
               $ref: "#/components/schemas/policy"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPatchList"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           additionalProperties: false
         relationships:
           type: object
@@ -3230,6 +3241,8 @@ assayResponse:
               $ref: "#/components/schemas/assetLinkList"
             position:
               $ref: "#/components/schemas/nullableInteger"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           required:
             - title
             - assay_class
@@ -3330,8 +3343,6 @@ collectionResponse:
               $ref: "#/components/schemas/multipleReferences"
             items:
               $ref: "#/components/schemas/multipleReferences"
-            extended_attributes:
-              $ref: "#/components/schemas/extendedMetadata"
           required:
             - creators
             - submitter
@@ -3810,6 +3821,8 @@ investigationResponse:
               $ref: "#/components/schemas/assetLinkList"
             position:
               $ref: "#/components/schemas/nullableInteger"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           required:
             - title
           additionalProperties: false
@@ -4719,6 +4732,100 @@ sampleTypeSampleAttributeResponse:
   required:
     - title
     - sample_attribute_type
+  additionalProperties: false
+extendedMetadataTypeResponse:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/nonEmptyString"
+        attributes:
+          type: object
+          properties:
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            supported_type:
+              $ref: "#/components/schemas/nonEmptyString"
+            enabled:
+              type: boolean
+            extended_metadata_attributes:
+              $ref: "#/components/schemas/extendedMetadataTypeExtendedMetadataAttributesResponse"
+          required:
+            - title
+            - supported_type
+            - enabled
+            - extended_metadata_attributes
+        links:
+          $ref: "#/components/schemas/links"
+        meta:
+          type: object
+          properties:
+            base_url:
+              $ref: "#/components/schemas/uriString"
+            api_version:
+              $ref: "#/components/schemas/nonEmptyString"
+          required:
+            - base_url
+            - api_version
+          additionalProperties: false
+      required:
+        - id
+        - type
+        - attributes
+        - links
+        - meta
+      additionalProperties: false
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+  required:
+      - data
+      - jsonapi
+  additionalProperties: false
+extendedMetadataTypeExtendedMetadataAttributesResponse:
+  type: array
+  minItems: 1
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/extendedMetadataTypeExtendedMetadataAttributeResponse"
+extendedMetadataTypeExtendedMetadataAttributeResponse:
+  type: object
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    title:
+      $ref: "#/components/schemas/nonEmptyString"
+    label:
+      $ref: "#/components/schemas/nonEmptyString"
+    description:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    sample_attribute_type:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        title:
+          $ref: "#/components/schemas/nonEmptyString"
+        base_type:
+          $ref: "#/components/schemas/sampleAttributeBaseType"
+        regexp:
+          $ref: "#/components/schemas/nonEmptyString"
+    required:
+      type: boolean
+    pos:
+      $ref: "#/components/schemas/nullableInteger"
+    sample_controlled_vocab_id:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    linked_extended_metadata_type_id:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+  required:
+    - id
+    - title
+    - sample_attribute_type
+    - required
   additionalProperties: false
 searchResponse:
   type: object

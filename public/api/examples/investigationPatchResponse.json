@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "127",
+    "id": "425",
     "type": "investigations",
     "attributes": {
       "policy": {
@@ -8,14 +8,14 @@
         "permissions": [
           {
             "resource": {
-              "id": "644",
+              "id": "2199",
               "type": "projects"
             },
             "access": "manage"
           },
           {
             "resource": {
-              "id": "675",
+              "id": "2234",
               "type": "projects"
             },
             "access": "manage"
@@ -34,10 +34,10 @@
       "position": null,
       "creators": [
         {
-          "profile": "/people/588",
+          "profile": "/people/1908",
           "family_name": "Last",
-          "given_name": "Person493",
-          "affiliation": "An Institution: 593, An Institution: 622",
+          "given_name": "Person1608",
+          "affiliation": "An Institution: 1959, An Institution: 1992",
           "orcid": null
         }
       ]
@@ -46,7 +46,7 @@
       "creators": {
         "data": [
           {
-            "id": "588",
+            "id": "1908",
             "type": "people"
           }
         ]
@@ -54,7 +54,7 @@
       "submitter": {
         "data": [
           {
-            "id": "588",
+            "id": "1908",
             "type": "people"
           }
         ]
@@ -62,7 +62,7 @@
       "people": {
         "data": [
           {
-            "id": "588",
+            "id": "1908",
             "type": "people"
           }
         ]
@@ -70,11 +70,11 @@
       "projects": {
         "data": [
           {
-            "id": "644",
+            "id": "2199",
             "type": "projects"
           },
           {
-            "id": "675",
+            "id": "2234",
             "type": "projects"
           }
         ]
@@ -107,7 +107,7 @@
       "publications": {
         "data": [
           {
-            "id": "54",
+            "id": "126",
             "type": "publications"
           }
         ]
@@ -119,14 +119,14 @@
       }
     },
     "links": {
-      "self": "/investigations/127"
+      "self": "/investigations/425"
     },
     "meta": {
-      "created": "2022-06-07T14:14:00.000Z",
-      "modified": "2022-06-07T14:14:00.000Z",
+      "created": "2024-06-20T12:33:50.000Z",
+      "modified": "2024-06-20T12:33:50.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "0018a560-c89a-013a-0f7e-0a81884ed284"
+      "uuid": "451e5cd0-112f-013d-1f9d-0a81884ed284"
     }
   },
   "jsonapi": {

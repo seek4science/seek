@@ -47,7 +47,7 @@ class SinglePagesController < ApplicationController
   rescue Exception => e
     render json: { status: :unprocessable_entity, error: e.message }
   end
-  
+
   def download_samples_excel
     sample_ids, sample_type_id, study_id, assay_id = Rails.cache.read(params[:uuid]).values_at(:sample_ids, :sample_type_id,
                                                                                                :study_id, :assay_id)
@@ -94,7 +94,10 @@ class SinglePagesController < ApplicationController
   rescue StandardError => e
     flash[:error] = e.message
     respond_to do |format|
-      format.html { redirect_to single_page_path(@project.id) }
+      format.html do
+        redirect_to single_page_path(id: @project.id, item_type: @assay.nil? ? 'study' : 'assay',
+                                     item_id: @assay.nil? ? @study.id : @assay.id)
+      end
       format.json do
         render json: { parameters: { sample_ids:, sample_type_id:, study_id: }, errors: e }, status: :bad_request
       end
@@ -244,7 +247,7 @@ class SinglePagesController < ApplicationController
       next if sample_cells.all? { |cell| (cell&.value == '' || cell&.value.nil?) }
 
       sample_cells.map do |cell|
-        cell&.value
+        cell&.value unless cell&.value == ''
       end.drop(1)
     end.compact
 
@@ -334,7 +337,7 @@ class SinglePagesController < ApplicationController
       is_changed = false
 
       db_sample.map do |k, v|
-        unless ees[k] == v
+        unless ees[k] == v || %w[id uuid].include?(k)
           is_changed = true
           break
         end

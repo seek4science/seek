@@ -47,6 +47,10 @@ every RegularMaintenanceJob::RUN_PERIOD, at: offset(1) do
   runner "RegularMaintenanceJob.perform_later"
 end
 
+every AuthLookupMaintenanceJob::RUN_PERIOD, at: offset(1) do
+  runner "AuthLookupMaintenanceJob.perform_later"
+end
+
 every LifeMonitorStatusJob::PERIOD, at: offset(2) do
   runner "LifeMonitorStatusJob.perform_later"
 end
@@ -81,4 +85,9 @@ if Seek::Docker.using_docker?
   every 10.minutes do
     command "sh /seek/script/kill-long-running-soffice.sh"
   end
+end
+
+# trim sessions
+every 1.day, at: '1:15 am' do
+  rake 'db:sessions:trim'
 end
