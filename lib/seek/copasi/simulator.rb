@@ -55,6 +55,15 @@ module Seek
         find_display_asset
       end
 
+      def copasi_enabled
+        unless Seek::Config.copasi_enabled
+          respond_to do |format|
+            flash[:error] = "Interaction with Copasi Online is currently disabled"
+            format.html { redirect_to model_path(@model, :version => @display_model.version) }
+          end
+          return false
+        end
+      end
 
       private
 

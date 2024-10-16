@@ -130,16 +130,6 @@ class ModelsController < ApplicationController
     end
   end
 
-  def copasi_enabled
-    unless Seek::Config.copasi_enabled
-      respond_to do |format|
-        flash[:error] = "Interaction with Copasi Online is currently disabled"
-        format.html { redirect_to model_path(@model, :version => @display_model.version) }
-      end
-      return false
-    end
-  end
-
   def build_model_image model_object, params_model_image
     # the creation of the new Avatar instance needs to have only one parameter - therefore, the rest should be set separately
     @model_image = model_object.build_model_image(params_model_image.merge(
