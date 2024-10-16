@@ -31,7 +31,7 @@ class ModelTypeHandlingTest < ActiveSupport::TestCase
   end
 
 
-  def test_copasi_content_blops
+  def test_copasi_content_blobs
     model = FactoryBot.create :model, content_blobs: [FactoryBot.create(:teusink_model_content_blob), FactoryBot.create(:copasi_content_blob)]
     assert_equal 2, model.content_blobs.size
     assert_equal 1, model.sbml_content_blobs.size
