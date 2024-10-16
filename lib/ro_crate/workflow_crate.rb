@@ -11,13 +11,13 @@ module ROCrate
     properties(%w[mainEntity mentions about])
 
     def initialize(*args)
-      super.tap do
-        conforms = self['conformsTo']
-        if conforms.is_a?(Array)
-          self['conformsTo'] << PROFILE_REF
-        else
-          self['conformsTo'] = [{ '@id' => ::ROCrate::Metadata::SPEC }, PROFILE_REF]
-        end
+      super
+
+      conforms = metadata['conformsTo']
+      if conforms.is_a?(Array)
+        metadata['conformsTo'] << PROFILE_REF
+      else
+        metadata['conformsTo'] = [{ '@id' => ::ROCrate::Metadata::SPEC }, PROFILE_REF]
       end
     end
 
