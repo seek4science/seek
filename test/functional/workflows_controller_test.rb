@@ -887,9 +887,23 @@ class WorkflowsControllerTest < ActionController::TestCase
       post :create_from_ro_crate, params: {
         ro_crate: { data: fixture_file_upload('workflows/no-main-workflow.crate.zip', 'application/zip') }
       }
+
+      assert_response :unprocessable_entity
     end
 
     assert assigns(:crate_extractor).errors.added?(:ro_crate, 'did not specify a main workflow.')
+  end
+
+  test 'RO-Crate with missing file reports error back to user' do
+    assert_no_difference('Git::Repository.count') do
+      post :create_from_ro_crate, params: {
+        ro_crate: { data: fixture_file_upload('workflows/missing-file.crate.zip', 'application/zip') }
+      }
+
+      assert_response :unprocessable_entity
+    end
+
+    assert assigns(:crate_extractor).errors.added?(:ro_crate, 'could not be read: Local Data Entity not found in crate: concat_two_files.ga')
   end
 
   test 'can get edit paths page' do
@@ -967,6 +981,22 @@ class WorkflowsControllerTest < ActionController::TestCase
       workflow.reload
       assert_nil workflow.main_workflow_path
       assert_nil workflow.latest_git_version.main_workflow_path
+    end
+  end
+
+  test 'updating main workflow path to blank path does not cause error' do
+    workflow = FactoryBot.create(:local_git_workflow)
+    login_as(workflow.contributor)
+
+    assert_equal 'concat_two_files.ga', workflow.main_workflow_path
+    assert_equal 'concat_two_files.ga', workflow.latest_git_version.main_workflow_path
+    assert_difference('Git::Annotation.count', -1) do
+      patch :update_paths, params: { id: workflow.id,
+                                     git_version: { main_workflow_path: '' },
+                                     workflow: { title: workflow.title } } # workflow is required in params...
+
+      assert_redirected_to workflow_path(workflow)
+      assert_nil assigns(:workflow).main_workflow_path
     end
   end
 
@@ -1782,10 +1812,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     get :show, params: { id: workflow.id }
 
     assert workflow.can_run?
-    assert_equal 'https://usegalaxy.eu', Seek::Config.galaxy_instance_default
-    trs_url = URI.encode_www_form_component("http://localhost:3000/ga4gh/trs/v2/tools/#{workflow.id}/versions/1")
-    assert_select 'a.btn[href=?]', "https://usegalaxy.eu/workflows/trs_import?trs_url=#{trs_url}&run_form=true",
-                  { text: 'Run on Galaxy' }
+    assert_select 'a.btn[href=?]', run_workflow_path(workflow, version: workflow.version), { text: 'Run on Galaxy' }
   end
 
   test 'shows run button for galaxy workflows using specified galaxy endpoint' do
@@ -1795,9 +1822,44 @@ class WorkflowsControllerTest < ActionController::TestCase
     get :show, params: { id: workflow.id }
 
     assert workflow.can_run?
-    trs_url = URI.encode_www_form_component("http://localhost:3000/ga4gh/trs/v2/tools/#{workflow.id}/versions/1")
-    assert_select 'a.btn[href=?]', "https://galaxygalaxy.org/mygalaxy/workflows/trs_import?trs_url=#{trs_url}&run_form=true",
-                  { text: 'Run on Galaxy' }
+    assert_select 'a.btn[href=?]', run_workflow_path(workflow, version: workflow.version), { text: 'Run on Galaxy' }
+  end
+
+  test 'redirects to default galaxy instance when run attempted' do
+    workflow = FactoryBot.create(:existing_galaxy_ro_crate_workflow, policy: FactoryBot.create(:public_policy))
+    assert workflow.can_run?
+
+    assert_difference('workflow.run_count', 1) do
+      post :run, params: { id: workflow.id, version: workflow.version }
+
+      trs_url = URI.encode_www_form_component("http://localhost:3000/ga4gh/trs/v2/tools/#{workflow.id}/versions/1")
+      assert_redirected_to "https://usegalaxy.eu/workflows/trs_import?trs_url=#{trs_url}&run_form=true"
+    end
+  end
+
+  test 'redirects to specified galaxy instance when run attempted' do
+    workflow = FactoryBot.create(:existing_galaxy_ro_crate_workflow, policy: FactoryBot.create(:public_policy),
+                                 execution_instance_url: 'https://galaxygalaxy.org/mygalaxy/')
+    assert workflow.can_run?
+
+    assert_difference('workflow.run_count', 1) do
+      post :run, params: { id: workflow.id, version: workflow.version }
+
+      trs_url = URI.encode_www_form_component("http://localhost:3000/ga4gh/trs/v2/tools/#{workflow.id}/versions/1")
+      assert_redirected_to "https://galaxygalaxy.org/mygalaxy/workflows/trs_import?trs_url=#{trs_url}&run_form=true"
+    end
+  end
+
+  test 'does not log run if run action fails' do
+    workflow = FactoryBot.create(:cwl_workflow, policy: FactoryBot.create(:public_policy))
+    refute workflow.can_run?
+
+    assert_no_difference('workflow.run_count') do
+      post :run, params: { id: workflow.id, version: workflow.version }
+
+      assert_redirected_to root_url
+      assert flash[:error].include?('not supported')
+    end
   end
 
   test 'throws error when downloading RO-Crate with missing file' do
@@ -1813,4 +1875,109 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_redirected_to workflow
     assert flash[:error].include?("not found in crate: this-file-does-not-exist")
   end
+
+  test 'gets generated RO-Crate metadata' do
+    workflow = FactoryBot.create(:local_git_workflow, policy: FactoryBot.create(:public_policy))
+    refute workflow.git_version.get_blob('ro-crate-metadata.json')
+    assert workflow.is_git_versioned?
+
+    get :ro_crate_metadata, params: { id: workflow.id }
+
+    assert_response :success
+    assert @response.header['Content-Length'].present?
+    assert @response.header['Content-Length'].to_i > 100
+    j = JSON.parse(@response.body)
+    assert(j['@graph'].any? { |n| n['@id'] == 'ro-crate-metadata.json' })
+  end
+
+  test 'gets stored RO-Crate metadata' do
+    workflow = FactoryBot.create(:ro_crate_git_workflow, policy: FactoryBot.create(:public_policy))
+    assert workflow.git_version.get_blob('ro-crate-metadata.json')
+    assert workflow.is_git_versioned?
+
+    get :ro_crate_metadata, params: { id: workflow.id }
+
+    assert_response :success
+    assert @response.header['Content-Length'].present?
+    assert @response.header['Content-Length'].to_i > 100
+    j = JSON.parse(@response.body)
+    assert(j['@graph'].any? { |n| n['@id'] == 'ro-crate-metadata.json' })
+  end
+
+  test 'gets generated RO-Crate metadata for non-git workflow' do
+    workflow = FactoryBot.create(:workflow, policy: FactoryBot.create(:public_policy))
+    refute workflow.is_git_versioned?
+
+    get :ro_crate_metadata, params: { id: workflow.id }
+
+    assert_response :success
+    assert @response.header['Content-Length'].present?
+    assert @response.header['Content-Length'].to_i > 100
+    j = JSON.parse(@response.body)
+    assert(j['@graph'].any? { |n| n['@id'] == 'ro-crate-metadata.json' })
+  end
+
+  test 'gets RO-Crate metadata for specific version' do
+    workflow = FactoryBot.create(:local_ro_crate_git_workflow, policy: FactoryBot.create(:public_policy))
+    md = workflow.git_version.get_blob('ro-crate-metadata.json')
+    assert md
+    assert workflow.is_git_versioned?
+    assert_equal 1, workflow.version
+    disable_authorization_checks do
+      workflow.git_version.next_version(mutable: true).save!
+      gv = workflow.reload.latest_git_version
+      assert_equal 2, gv.version
+      assert_equal 2, workflow.version
+      json = md.read
+      json.gsub!('test1_1', 'test9_9')
+      gv.add_file('ro-crate-metadata.json', StringIO.new(json))
+      gv.save!
+    end
+
+    get :ro_crate_metadata, params: { id: workflow.id, version: 1 }
+
+    assert_response :success
+    assert response.body.include?('test1_1')
+    refute response.body.include?('test9_9')
+
+    get :ro_crate_metadata, params: { id: workflow.id, version: 2 }
+
+    assert_response :success
+    refute response.body.include?('test1_1')
+    assert response.body.include?('test9_9')
+  end
+
+  test 'does not get RO-Crate metadata if no download permission' do
+    workflow = FactoryBot.create(:existing_galaxy_ro_crate_workflow, policy: FactoryBot.create(:publicly_viewable_policy))
+    assert workflow.can_view?
+    refute workflow.can_download?
+
+    get :ro_crate_metadata, params: { id: workflow.id }
+
+    assert_redirected_to workflow
+    assert_includes flash[:error], 'You are not authorized to download this Workflow'
+  end
+
+  test 'show run count for runnable workflow' do
+    workflow = FactoryBot.create(:existing_galaxy_ro_crate_workflow, policy: FactoryBot.create(:public_policy))
+
+    get :show, params: { id: workflow }
+
+    assert_select '#usage_count' do
+      assert_select 'strong', text: /Downloads/, count: 1
+      assert_select 'strong', text: /Runs/, count: 1
+    end
+  end
+
+  test 'do not show run count for non-runnable workflow' do
+    workflow = FactoryBot.create(:cwl_workflow, policy: FactoryBot.create(:public_policy))
+
+    get :show, params: { id: workflow }
+
+    assert_select '#usage_count' do
+      assert_select 'strong', text: /Downloads/, count: 1
+      assert_select 'strong', text: /Runs/, count: 0
+    end
+  end
 end
+

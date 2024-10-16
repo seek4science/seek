@@ -1116,6 +1116,31 @@ class SampleTest < ActiveSupport::TestCase
 
   end
 
+  test 'sop sample' do
+    project = FactoryBot.create(:project)
+    sample_type = FactoryBot.create(:sop_sample_type, project_ids:[project.id])
+    sample = Sample.new(sample_type: sample_type, project_ids: [project.id])
+    sop = FactoryBot.create(:sop)
+
+    sample.update(data:{'sop':sop.id})
+    assert sample.valid?
+    sample.save!
+
+    sample.reload
+    expected = {id:sop.id,type:'Sop',title:sop.title}.with_indifferent_access
+    assert_equal expected, sample.get_attribute_value('sop')
+
+    sample = Sample.new(sample_type: sample_type, project_ids: [project.id])
+    sample.set_attribute_value('sop',sop.id)
+    assert sample.valid?
+    sample.save!
+
+    sample.reload
+    expected = {'id':sop.id,type:'Sop',title:sop.title}.with_indifferent_access
+    assert_equal expected, sample.get_attribute_value('sop')
+
+  end
+
   test 'multi linked sample validation' do
     patient = FactoryBot.create(:patient_sample, policy:FactoryBot.create(:public_policy))
     patient2 = FactoryBot.create(:patient_sample, sample_type:patient.sample_type, policy:FactoryBot.create(:public_policy) )
@@ -1380,6 +1405,54 @@ class SampleTest < ActiveSupport::TestCase
     assert_equal [df3], sample_extracted.related_data_files
     assert_equal [df1, df2].sort_by(&:id), sample_attributes.related_data_files.sort_by(&:id)
     assert_equal [df1, df2, df3].sort_by(&:id), sample_ext_attr.related_data_files.sort_by(&:id)
+  end
+
+  test 'related sops includes sops in attributes' do
+    project = FactoryBot.create(:project)
+
+    sample_type = FactoryBot.create(:sop_sample_type, project_ids: [project.id])
+    sop_attr = FactoryBot.build(:sop_sample_attribute, title: 'sop 2', sample_type: sample_type)
+    sample_type.sample_attributes << sop_attr
+    sop1 = FactoryBot.create(:sop)
+    sop2 = FactoryBot.create(:sop)
+
+    # Sample with no linked sops
+    simple_type = FactoryBot.create(:simple_sample_type, project_ids: [project.id])
+    sample_no_sop = Sample.new(sample_type: simple_type, project_ids: [project.id])
+
+    # Sample with linked sops
+    sample_with_sops = Sample.new(sample_type: sample_type, project_ids: [project.id])
+    sample_with_sops.update(data: { 'sop': sop1.id })
+    sample_with_sops.update(data: { 'sop 2': sop2.id })
+    sample_with_sops.save!
+
+
+    assert_equal [], sample_no_sop.related_sops
+    assert_equal [sop1, sop2].sort_by(&:id), sample_with_sops.related_sops.sort_by(&:id)
+  end
+
+  test 'to rdf' do
+    sample = FactoryBot.create(:sample, sample_type:FactoryBot.create(:fairdatastation_virtual_demo_sample_type),
+                               data:{
+                                 'Title':'the title',
+                                 'Description':'the description',
+                                 'Host':'the host',
+                                 'Occupation':'the occupation'
+                               })
+    assert sample.rdf_supported?
+    rdf = sample.to_rdf
+    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
+      assert reader.statements.count > 1
+      assert_equal RDF::URI.new("http://localhost:3000/samples/#{sample.id}"), reader.statements.first.subject
+      match = reader.statements.detect{|s| s.predicate == RDF.type}
+      assert_equal RDF::URI('http://jermontology.org/ontology/JERMOntology#Sample'), match.object
+      match = reader.statements.detect{|s| s.predicate == RDF::URI('http://fairbydesign.nl/ontology/host')}
+      assert_equal RDF::Literal('the host'), match.object
+      match = reader.statements.detect{|s| s.predicate == RDF::URI('http://fairbydesign.nl/ontology/occupation')}
+      assert_equal RDF::Literal('the occupation'), match.object
+      match = reader.statements.detect{|s| s.predicate == RDF::URI('http://fairbydesign.nl/ontology/marital_status')}
+      assert_equal RDF::Literal(''), match.object
+    end
   end
 
 end

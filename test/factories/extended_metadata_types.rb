@@ -21,6 +21,16 @@ FactoryBot.define do
     association :sample_attribute_type, factory: :datetime_sample_attribute_type
   end
 
+  factory(:data_file_extended_metadata_attribute,class:ExtendedMetadataAttribute) do
+    title { 'data file' }
+    association :sample_attribute_type, factory: :data_file_sample_attribute_type
+  end
+
+  factory(:sop_extended_metadata_attribute,class:ExtendedMetadataAttribute) do
+    title { 'sop' }
+    association :sample_attribute_type, factory: :sop_sample_attribute_type
+  end
+
   factory(:min_extended_metadata_type,class: ExtendedMetadataType) do
     title { 'A Min Extended Metadata Type' }
     supported_type { 'Investigation' }
@@ -36,6 +46,8 @@ FactoryBot.define do
       a.extended_metadata_attributes << FactoryBot.create(:age_extended_metadata_attribute)
       a.extended_metadata_attributes << FactoryBot.create(:name_extended_metadata_attribute, required: true)
       a.extended_metadata_attributes << FactoryBot.create(:datetime_extended_metadata_attribute)
+      a.extended_metadata_attributes << FactoryBot.create(:data_file_extended_metadata_attribute)
+      a.extended_metadata_attributes << FactoryBot.create(:sop_extended_metadata_attribute)
     end
   end
 
@@ -134,6 +146,15 @@ FactoryBot.define do
     after(:build) do |a|
       a.extended_metadata_attributes << FactoryBot.create(:name_extended_metadata_attribute, title:'full name')
       a.extended_metadata_attributes << FactoryBot.create(:name_extended_metadata_attribute, title:'full address')
+    end
+  end
+
+  factory(:simple_observation_unit_extended_metadata_type, class: ExtendedMetadataType) do
+    title { 'simple obs unit extended metadata type' }
+    supported_type { 'ObservationUnit' }
+    after(:build) do |a|
+      a.extended_metadata_attributes << FactoryBot.create(:name_extended_metadata_attribute, title:'name')
+      a.extended_metadata_attributes << FactoryBot.create(:name_extended_metadata_attribute, title:'strain')
     end
   end
 
@@ -403,6 +424,8 @@ FactoryBot.define do
     association :linked_extended_metadata_type, factory: :study_sites_extended_metadata_type
   end
 
+
+
   factory(:study_extended_metadata_type,class:ExtendedMetadataType) do
     title { 'study_model' }
     supported_type { 'Study' }
@@ -411,6 +434,97 @@ FactoryBot.define do
       a.extended_metadata_attributes << FactoryBot.create(:study_sites_linked_extended_metadata_attribute_multi_attribute)
     end
   end
+
+  factory(:extended_metadata_attribute, class:ExtendedMetadataAttribute) do
+
+  end
+
+  factory(:fairdata_virtual_demo_study_extended_metadata, class: ExtendedMetadataType) do
+    title {'Fair Data Station Virtual Demo'}
+    supported_type { 'Study' }
+    after(:build) do |a|
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Alias', pid:'http://fairbydesign.nl/ontology/alias')
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Centre Name', pid:'http://fairbydesign.nl/ontology/center_name')
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Centre Project Name', pid:'http://fairbydesign.nl/ontology/center_project_name')
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'External Ids', pid:'http://fairbydesign.nl/ontology/external_ids')
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Submission Accession', pid:'http://fairbydesign.nl/ontology/submission_accession')
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Submission Alias', pid:'http://fairbydesign.nl/ontology/submission_alias')
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Submission Lab Name', pid:'http://fairbydesign.nl/ontology/submission_lab_name')
+    end
+  end
+
+  factory(:fairdata_virtual_demo_study_extended_metadata_partial, class: ExtendedMetadataType) do
+    title {'Fair Data Station Virtual Demo'}
+    supported_type { 'Study' }
+    after(:build) do |a|
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Alias', pid:'http://fairbydesign.nl/ontology/alias')
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Submission Alias', pid:'http://fairbydesign.nl/ontology/submission_alias')
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Submission Lab Name', pid:'http://fairbydesign.nl/ontology/submission_lab_name')
+    end
+  end
+
+  factory(:fairdata_virtual_demo_assay_extended_metadata, class: ExtendedMetadataType) do
+    title {'Fair Data Station Virtual Demo'}
+    supported_type { 'Assay' }
+    after(:build) do |a|
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Facility', pid:'http://fairbydesign.nl/ontology/facility')
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Forward Primer', pid:'http://fairbydesign.nl/ontology/forwardPrimer')
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Instrument Model', pid:'http://fairbydesign.nl/ontology/instrument_model')
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Library Selection', pid:'http://fairbydesign.nl/ontology/library_selection')
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Library Source', pid:'http://fairbydesign.nl/ontology/library_source')
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Library Strategy', pid:'http://fairbydesign.nl/ontology/library_strategy')
+    end
+  end
+
+  factory(:fairdata_indpensim_obsv_unit_extended_metadata, class: ExtendedMetadataType) do
+    title {'Fair Data Station Obs Unit Indpensim'}
+    supported_type { 'ObservationUnit' }
+    after(:build) do |a|
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Brand', pid:'http://fairbydesign.nl/ontology/brand')
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Fermentation', pid:'http://fairbydesign.nl/ontology/fermentation')
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Volume', pid:'http://fairbydesign.nl/ontology/volume')
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Scientific Name', pid:'http://gbol.life/0.1/scientificName')
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Organism', pid:'http://purl.uniprot.org/core/organism')
+    end
+  end
+
+  factory(:fairdata_test_case_investigation_extended_metadata, class: ExtendedMetadataType) do
+    title {'Fair Data Station Investigation Test Case'}
+    supported_type { 'Investigation' }
+    after(:build) do |a|
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Associated publication', pid:'http://fairbydesign.nl/ontology/associated_publication')
+    end
+  end
+
+  factory(:fairdata_test_case_study_extended_metadata, class: ExtendedMetadataType) do
+    title {'Fair Data Station Study Test Case'}
+    supported_type { 'Study' }
+    after(:build) do |a|
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'End date of Study', pid:'http://fairbydesign.nl/ontology/end_date_of_study')
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Start date of Study', pid:'http://fairbydesign.nl/ontology/start_date_of_study')
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Experimental test site', pid:'http://fairbydesign.nl/ontology/experimental_site_name')
+    end
+  end
+
+  factory(:fairdata_test_case_obsv_unit_extended_metadata, class: ExtendedMetadataType) do
+    title {'Fair Data Station Obs Unit Test Case'}
+    supported_type { 'ObservationUnit' }
+    after(:build) do |a|
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Birth weight', pid:'http://fairbydesign.nl/ontology/birth_weight')
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Date of birth', pid:'http://fairbydesign.nl/ontology/date_of_birth')
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Gender', pid:'https://w3id.org/mixs/0000811')
+    end
+  end
+
+  factory(:fairdata_test_case_assay_extended_metadata, class: ExtendedMetadataType) do
+    title {'Fair Data Station Assay Test Case'}
+    supported_type { 'Assay' }
+    after(:build) do |a|
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Facility', pid:'http://fairbydesign.nl/ontology/facility')
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Protocol', pid:'http://fairbydesign.nl/ontology/protocol')
+    end
+  end
+
 
 end
 

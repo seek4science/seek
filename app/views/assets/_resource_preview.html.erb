@@ -11,7 +11,7 @@
     
     <%= list_item_contributors resource -%>
     
-    <%= list_item_simple_list resource.creators, t('contributor').capitalize -%>
+    <%= list_item_simple_list resource.creators, t('creator').capitalize.pluralize -%>
     
     <%= list_item_description resource.description -%>
   </div>

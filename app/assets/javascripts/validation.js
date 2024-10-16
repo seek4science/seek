@@ -66,5 +66,5 @@ function validateUploadNewVersion() {
 
 function createOrUpdateResource(resourceName) {
     // Disabling the button is handled automatically
-    $j('#' + resourceName + '_submit_btn').form().submit();
+    $j('form:has(#' + resourceName + '_submit_btn)').submit();
 }

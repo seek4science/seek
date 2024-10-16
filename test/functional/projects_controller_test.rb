@@ -4165,8 +4165,8 @@ class ProjectsControllerTest < ActionController::TestCase
       programme: {
         id: programme.id
       },
-      institution: {
-        id: institution.id
+      institution:{
+        id:institution.id
       },
       people: people.map { |p| {first_name: p.first_name, last_name: p.last_name, email: p.email} }
     }
@@ -5039,6 +5039,102 @@ class ProjectsControllerTest < ActionController::TestCase
       assert_response :success
       assert_select 'div#related-items li a[data-model-name=Template]', count: 0
     end
+
+  end
+
+  test 'show import_from_fairdata_station' do
+    person = FactoryBot.create(:person)
+    refute person.is_admin?
+    project = person.projects.first
+    other_project = FactoryBot.create(:project)
+
+    logout
+
+    get :import_from_fairdata_station, params: {id: project}
+    assert_redirected_to login_path
+
+    login_as(person)
+    get :import_from_fairdata_station, params: {id: project}
+    assert_response :success
+
+    get :import_from_fairdata_station, params: {id: other_project}
+    assert_redirected_to project_path(other_project)
+  end
+
+  test 'dont show import from fair data station if disabled' do
+    person = FactoryBot.create(:person)
+    refute person.is_admin?
+    project = person.projects.first
+    with_config_value(:fair_data_station_enabled, false) do
+      get :show, params: { id: project.id }
+      assert_response :success
+      assert_select '#item-admin-menu' do
+        assert_select 'li a[href=?]', import_from_fairdata_station_project_path(project), text:/Import from FAIRData Station/, count: 0
+      end
+
+      get :import_from_fairdata_station, params: { id: project.id }
+      assert_redirected_to :root
+      refute_nil flash[:error]
+      assert_equal 'Fair data station are disabled', flash[:error]
+    end
+  end
+
+  test 'populate from fairdata station ttl' do
+
+    person = FactoryBot.create(:person)
+    FactoryBot.create(:fairdatastation_virtual_demo_sample_type)
+    project = person.projects.first
+    another_person = FactoryBot.create(:person)
+    login_as(person)
+
+    ttl_file = fixture_file_upload('fairdatastation/demo.ttl')
+
+    post :submit_fairdata_station, params: {id: project, datastation_data: ttl_file,
+                                            policy_attributes:{
+                                              access_type: Policy::VISIBLE,
+                                              permissions_attributes: {
+                                                '0' => { contributor_type: 'Person', contributor_id: another_person.id, access_type: Policy::MANAGING
+                                                }
+                                              }
+                                            }
+    }
+
+    assert investigation = assigns(:investigation)
+    assert_redirected_to investigation
+
+    assert_equal person, investigation.contributor
+    assert_equal 1, investigation.studies.count
+    study = investigation.studies.first
+    assert_equal 9, study.assays.count
+    assert_equal 2, study.observation_units.count
+    assert_equal 4, study.observation_units.first.samples.count
+
+    obs_unit = study.observation_units.first
+    sample = obs_unit.samples.first
+
+    assert_equal person, study.contributor
+    assert_equal person, obs_unit.contributor
+    assert_equal person, sample.contributor
+
+    assert_equal Policy::VISIBLE, investigation.policy.access_type
+    assert_equal 1, investigation.policy.permissions.count
+    assert_equal another_person, investigation.policy.permissions.first.contributor
+    assert_equal Policy::MANAGING, investigation.policy.permissions.first.access_type
+
+    assert_equal Policy::VISIBLE, study.policy.access_type
+    assert_equal 1, study.policy.permissions.count
+    assert_equal another_person, study.policy.permissions.first.contributor
+    assert_equal Policy::MANAGING, study.policy.permissions.first.access_type
+
+    assert_equal Policy::VISIBLE, obs_unit.policy.access_type
+    assert_equal 1, obs_unit.policy.permissions.count
+    assert_equal another_person, obs_unit.policy.permissions.first.contributor
+    assert_equal Policy::MANAGING, obs_unit.policy.permissions.first.access_type
+
+    assert_equal Policy::VISIBLE, sample.policy.access_type
+    assert_equal 1, sample.policy.permissions.count
+    assert_equal another_person, sample.policy.permissions.first.contributor
+    assert_equal Policy::MANAGING, sample.policy.permissions.first.access_type
 
   end
 

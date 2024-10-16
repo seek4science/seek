@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "307",
+    "id": "288",
     "type": "documents",
     "attributes": {
       "policy": {
@@ -11,13 +11,13 @@
       },
       "discussion_links": [
         {
-          "id": "244",
+          "id": "261",
           "label": "Slack",
           "url": "http://www.slack.com/"
         }
       ],
       "extended_attributes": {
-        "extended_metadata_type_id": "398",
+        "extended_metadata_type_id": "444",
         "attribute_map": {
           "role_email": "alice@email.com",
           "role_phone": "0012345",
@@ -46,14 +46,14 @@
         {
           "version": 1,
           "revision_comments": null,
-          "url": "http://localhost:3000/documents/307?version=1",
+          "url": "http://localhost:3000/documents/288?version=1",
           "doi": null
         }
       ],
       "version": 1,
       "revision_comments": null,
-      "created_at": "2024-06-20T12:39:26.000Z",
-      "updated_at": "2024-06-20T12:39:26.000Z",
+      "created_at": "2024-07-03T13:54:13.000Z",
+      "updated_at": "2024-07-03T13:54:13.000Z",
       "doi": null,
       "content_blobs": [
         {
@@ -62,13 +62,13 @@
           "md5sum": "726de0a3f94d65056b909b9736e10349",
           "sha1sum": "fbcc0dee4b5415de4c82ef5b137d8231fec1331b",
           "content_type": "application/pdf",
-          "link": "http://localhost:3000/documents/307/content_blobs/1050453211",
+          "link": "http://localhost:3000/documents/288/content_blobs/1446",
           "size": 8
         }
       ],
       "creators": [
         {
-          "profile": "/people/1039988614",
+          "profile": "/people/4390",
           "family_name": "One",
           "given_name": "Some",
           "affiliation": "University of Somewhere",
@@ -81,7 +81,7 @@
       "creators": {
         "data": [
           {
-            "id": "1039988614",
+            "id": "4390",
             "type": "people"
           }
         ]
@@ -89,7 +89,7 @@
       "submitter": {
         "data": [
           {
-            "id": "1039988615",
+            "id": "4391",
             "type": "people"
           }
         ]
@@ -97,11 +97,11 @@
       "people": {
         "data": [
           {
-            "id": "1039988614",
+            "id": "4390",
             "type": "people"
           },
           {
-            "id": "1039988615",
+            "id": "4391",
             "type": "people"
           }
         ]
@@ -109,7 +109,7 @@
       "projects": {
         "data": [
           {
-            "id": "1022252724",
+            "id": "4654",
             "type": "projects"
           }
         ]
@@ -117,7 +117,7 @@
       "investigations": {
         "data": [
           {
-            "id": "973655138",
+            "id": "848",
             "type": "investigations"
           }
         ]
@@ -125,7 +125,7 @@
       "studies": {
         "data": [
           {
-            "id": "1060385169",
+            "id": "746",
             "type": "studies"
           }
         ]
@@ -133,7 +133,7 @@
       "assays": {
         "data": [
           {
-            "id": "1035386914",
+            "id": "613",
             "type": "assays"
           }
         ]
@@ -141,7 +141,7 @@
       "publications": {
         "data": [
           {
-            "id": "334",
+            "id": "345",
             "type": "publications"
           }
         ]
@@ -149,21 +149,21 @@
       "workflows": {
         "data": [
           {
-            "id": "224",
+            "id": "205",
             "type": "workflows"
           }
         ]
       }
     },
     "links": {
-      "self": "/documents/307?version=1"
+      "self": "/documents/288?version=1"
     },
     "meta": {
-      "created": "2024-06-20T12:39:26.000Z",
-      "modified": "2024-06-20T12:39:26.000Z",
+      "created": "2024-07-03T13:54:13.000Z",
+      "modified": "2024-07-03T13:54:13.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "0d79a100-1130-013d-1f9d-0a81884ed284"
+      "uuid": "a78dc290-1b71-013d-1ffe-0a81884ed284"
     }
   },
   "jsonapi": {

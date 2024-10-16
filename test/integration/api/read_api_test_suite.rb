@@ -62,13 +62,13 @@ module ReadApiTestSuite
     res = private_resource
 
     user_login(FactoryBot.create(:person))
-    get member_url(res), as: :json
+    get member_url(res), headers: { 'Authorization' => read_access_auth }
     assert_response :forbidden
     validate_json response.body, '#/components/schemas/forbiddenResponse'
   end
 
   test 'getting resource with non-existent ID should throw error' do
-    get member_url(MissingItem.new(model)), as: :json
+    get member_url(MissingItem.new(model)), headers: { 'Authorization' => read_access_auth }
     assert_response :not_found
     validate_json response.body, '#/components/schemas/notFoundResponse'
   end
@@ -78,7 +78,7 @@ module ReadApiTestSuite
 
     res = FactoryBot.create("max_#{singular_name}".to_sym)
     user_login(res.contributor) if res.respond_to?(:contributor)
-    get member_url(res), as: :json
+    get member_url(res), headers: { 'Authorization' => read_access_auth }
     assert_response :success
 
     write_examples(JSON.pretty_generate(JSON.parse(response.body)), "#{singular_name.camelize(:lower)}Response.json")
@@ -91,7 +91,7 @@ module ReadApiTestSuite
     FactoryBot.create("min_#{singular_name}".to_sym)
     FactoryBot.create("max_#{singular_name}".to_sym)
 
-    get collection_url, as: :json
+    get collection_url, headers: { 'Authorization' => read_access_auth }
 
     if response.code.to_i == 200
       write_examples(JSON.pretty_generate(JSON.parse(response.body)), "#{plural_name.camelize(:lower)}Response.json")

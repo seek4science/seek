@@ -63,6 +63,11 @@ FactoryBot.define do
     sequence(:title) { |n| "Data file attribute type #{n}" }
     base_type { Seek::Samples::BaseType::SEEK_DATA_FILE }
   end
+
+  factory(:sop_sample_attribute_type, class: SampleAttributeType) do
+    sequence(:title) { |n| "SOP attribute type #{n}" }
+    base_type { Seek::Samples::BaseType::SEEK_SOP }
+  end
   
   # very simple persons name, must be 2 words, first and second word starting with capital with all letters
   factory(:full_name_sample_attribute_type, parent: :string_sample_attribute_type) do

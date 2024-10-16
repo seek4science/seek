@@ -5,17 +5,29 @@ require 'seek/download_handling/http_streamer'
 class WorkflowCrateExtractor
   include ActiveModel::Model
 
-  attr_accessor :ro_crate, :workflow_class, :workflow, :git_version, :params
+  attr_accessor :ro_crate, :workflow_class, :workflow, :git_version, :params, :update_existing
 
   validate :resolve_crate
   validate :main_workflow_present?, if: -> { @crate.present? }
+  validate :source_url_and_version_present?, if: -> { update_existing }
+  validate :find_workflows_matching_id, if: -> { update_existing }
 
   def build
-    self.workflow ||= Workflow.new(workflow_class: workflow_class)
     if valid?
+      if update_existing && @existing_workflows.length == 1
+        self.workflow = @existing_workflows.first
+        if self.workflow.git_versions.map(&:name).include?(@crate['version']&.to_s)
+          return self.workflow
+        else
+          self.workflow.latest_git_version.lock if self.workflow.latest_git_version.mutable?
+          self.git_version = self.workflow.latest_git_version.next_version(mutable: true)
+        end
+      end
+      self.workflow ||= default_workflow
       self.git_version ||= workflow.git_version.tap do |gv|
         gv.set_default_git_repository
       end
+      self.git_version.name = @crate['version'].to_s if @crate['version']
       git_version.main_workflow_path = URI.decode_www_form_component(@crate.main_workflow.id) if @crate.main_workflow && !@crate.main_workflow.remote?
       git_version.diagram_path = URI.decode_www_form_component(@crate.main_workflow.diagram.id) if @crate.main_workflow&.diagram && !@crate.main_workflow.diagram.remote?
       git_version.abstract_cwl_path = URI.decode_www_form_component(@crate.main_workflow.cwl_description.id) if @crate.main_workflow&.cwl_description && !@crate.main_workflow.cwl_description.remote?
@@ -30,17 +42,32 @@ class WorkflowCrateExtractor
       workflow.provide_metadata(extractor.metadata)
       workflow.assign_attributes(params) if params.present?
       git_version.set_resource_attributes(workflow.attributes)
-
-      workflow
     end
 
-    workflow
+    workflow || default_workflow
   end
 
   private
 
+  def default_workflow
+    Workflow.new(workflow_class: workflow_class)
+  end
+
   def main_workflow_present?
     errors.add(:ro_crate, 'did not specify a main workflow.') unless @crate.main_workflow.present?
+  end
+
+  def source_url_and_version_present?
+    errors.add(:ro_crate, 'source URL could not be determined.') unless @crate.source_url.present?
+    errors.add(:ro_crate, 'version could not be determined.') unless @crate['version'].present?
+  end
+
+  def find_workflows_matching_id
+    # Attempt to find existing workflow
+    @existing_workflows = Workflow.find_by_source_url(@crate.source_url)
+    if @existing_workflows.length > 1
+      errors.add(:ro_crate, "#{@existing_workflows.length} workflows found matching the given ID.")
+    end
   end
 
   def extract_crate
@@ -48,6 +75,8 @@ class WorkflowCrateExtractor
       @crate = ROCrate::WorkflowCrateReader.read_zip(ro_crate[:data])
     rescue Zip::Error
       errors.add(:ro_crate, 'could not be extracted, please check it is a valid RO-Crate.')
+    rescue ROCrate::ReadException => e
+      errors.add(:ro_crate, "could not be read: #{e.message}")
     end
   end
 

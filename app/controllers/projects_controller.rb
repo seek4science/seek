@@ -10,16 +10,20 @@ class ProjectsController < ApplicationController
   include Seek::Projects::Population
   include Seek::AnnotationCommon
 
+  before_action :fair_data_station_enabled?, only:[:import_from_fairdata_station, :submit_fairdata_station]
+
   before_action :login_required, only: [:guided_join, :guided_create, :guided_import, :request_join, :request_create, :request_import,
                                         :administer_join_request, :respond_join_request,
                                         :administer_create_project_request, :respond_create_project_request,
                                         :administer_import_project_request, :respond_import_project_request,
+                                        :import_from_fairdata_station, :submit_fairdata_station,
                                         :project_join_requests, :project_creation_requests, :project_importation_requests, :typeahead]
 
   before_action :find_requested_item, only: %i[show admin edit update destroy admin_members
                                                asset_report populate populate_from_spreadsheet
                                                admin_member_roles update_members storage_report
-                                               overview administer_join_request respond_join_request]
+                                               overview administer_join_request respond_join_request
+                                               import_from_fairdata_station submit_fairdata_station]
 
   before_action :has_spreadsheets, only: %i[:populate populate_from_spreadsheet]
 
@@ -29,7 +33,7 @@ class ProjectsController < ApplicationController
   before_action :check_investigations_are_for_this_project, only: %i[update]
   before_action :administerable_by_user, only: %i[admin admin_members admin_member_roles destroy update_members storage_report administer_join_request respond_join_request populate populate_from_spreadsheet]
 
-  before_action :member_of_this_project, only: [:asset_report], unless: :admin_logged_in?
+  before_action :member_of_this_project, only: [:asset_report, :import_from_fairdata_station, :submit_fairdata_station], unless: :admin_logged_in?
 
   before_action :validate_message_log_for_join, only: [:administer_join_request, :respond_join_request]
   before_action :validate_message_log_for_create, only: [:administer_create_project_request, :respond_create_project_request]
@@ -192,6 +196,19 @@ class ProjectsController < ApplicationController
     flash.now[:notice]="Thank you, your request to join has been sent"
     respond_to do |format|
       format.html
+    end
+  end
+
+  def submit_fairdata_station
+    path = params[:datastation_data].path
+    policy = Policy.new
+    policy.set_attributes_with_sharing(policy_params)
+    datadata_inv = Seek::FairDataStation::Reader.new.parse_graph(path)
+    @investigation = Seek::FairDataStation::Writer.new.construct_isa(datadata_inv.first, current_person, [@project], policy)
+    @investigation.save!
+
+    respond_to do |format|
+      format.html { redirect_to(@investigation) }
     end
   end
 

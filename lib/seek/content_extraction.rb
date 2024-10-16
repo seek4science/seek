@@ -77,6 +77,7 @@ module Seek
 
     def to_csv(sheet = 1, trim = false)
       return '' unless is_excel?
+      sheet = resolve_sheet_name_to_index(sheet) if (sheet && !sheet.to_s.match(/\A[0-9]*\z/))
       spreadsheet_to_csv(filepath, sheet, trim, Seek::Config.jvm_memory_allocation)
     end
 
@@ -89,6 +90,19 @@ module Seek
     end
 
     private
+
+    def resolve_sheet_name_to_index(sheet_name)
+
+      doc = LibXML::XML::Parser.string(to_spreadsheet_xml).parse
+      doc.root.namespaces.default_prefix = 'ss'
+      doc.find('//ss:sheet').each do |sheet|
+        if sheet['name'] == sheet_name
+          return sheet['index']
+        end
+      end
+      raise SysMODB::SpreadsheetExtractionException.new('Unrecognised sheet name')
+    end
+
 
     # filters special characters, keeping alphanumeric characters, hyphen ('-'), underscore('_') and newlines
     def filter_text_content(content)

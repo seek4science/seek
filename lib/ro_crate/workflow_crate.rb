@@ -56,5 +56,10 @@ module ROCrate
     def find_entry(path)
       entries[path]
     end
+
+    def source_url
+      url = id if id.start_with?('http')
+      url || self['isBasedOn'] || self['url'] || self.main_workflow['url']
+    end
   end
 end

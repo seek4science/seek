@@ -48,6 +48,15 @@ class DynamicTableHelperTest < ActionView::TestCase
       assert_equal columns_count, dt[:columns].length
       dt[:rows].each { |r| assert_equal columns_count, r.length }
 
+      unless (dt[:rows][0].any? { |x| x == '' }) || (dt[:rows][1].any? { |x| x == '' }) || (dt[:rows][2].any? { |x| x == '' })
+        puts
+        puts "Flaky test debug:"
+        puts
+        puts dt.inspect
+        puts
+        pp study.sample_types
+      end
+
       assert_equal false, (dt[:rows][0].any? { |x| x == '' })
       assert_equal false, (dt[:rows][1].any? { |x| x == '' })
       assert_equal true, (dt[:rows][2].any? { |x| x == '' })

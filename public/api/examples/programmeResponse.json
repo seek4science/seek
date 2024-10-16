@@ -23,7 +23,7 @@
       "administrators": {
         "data": [
           {
-            "id": "298",
+            "id": "213",
             "type": "people"
           }
         ]
@@ -31,11 +31,11 @@
       "people": {
         "data": [
           {
-            "id": "297",
+            "id": "212",
             "type": "people"
           },
           {
-            "id": "298",
+            "id": "213",
             "type": "people"
           }
         ]
@@ -43,7 +43,7 @@
       "projects": {
         "data": [
           {
-            "id": "359",
+            "id": "274",
             "type": "projects"
           }
         ]
@@ -51,7 +51,7 @@
       "institutions": {
         "data": [
           {
-            "id": "297",
+            "id": "212",
             "type": "institutions"
           }
         ]
@@ -83,7 +83,7 @@
       "data_files": {
         "data": [
           {
-            "id": "16",
+            "id": "8",
             "type": "data_files"
           }
         ]
@@ -91,7 +91,7 @@
       "models": {
         "data": [
           {
-            "id": "19",
+            "id": "12",
             "type": "models"
           }
         ]
@@ -99,7 +99,7 @@
       "sops": {
         "data": [
           {
-            "id": "16",
+            "id": "8",
             "type": "sops"
           }
         ]
@@ -115,7 +115,7 @@
       "presentations": {
         "data": [
           {
-            "id": "11",
+            "id": "4",
             "type": "presentations"
           }
         ]
@@ -123,7 +123,7 @@
       "events": {
         "data": [
           {
-            "id": "11",
+            "id": "4",
             "type": "events"
           }
         ]
@@ -154,11 +154,11 @@
       "self": "/programmes/41"
     },
     "meta": {
-      "created": "2024-06-20T12:29:32.000Z",
-      "modified": "2024-06-20T12:29:32.000Z",
+      "created": "2024-07-03T13:44:14.000Z",
+      "modified": "2024-07-03T13:44:14.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "ab8c34d0-112e-013d-1f9d-0a81884ed284"
+      "uuid": "424c49e0-1b70-013d-1ffe-0a81884ed284"
     }
   },
   "jsonapi": {
