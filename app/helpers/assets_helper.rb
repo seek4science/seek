@@ -231,7 +231,7 @@ module AssetsHelper
 
     copasi_download_path =  "copasi://process?downloadUrl=http://"+request.host_with_port+download_path+"&activate=Time%20Course&createPlot=Concentrations%2C%20Volumes%2C%20and%20Global%20Quantity%20Values&runTask=Time-Course"
 
-    tooltip_text_copasi_button = "Simulate the publicly accessible model in your local installed Copasi. "
+    tooltip_text_copasi_button = "Simulate your model locally using desk application CopasiUI."
 
     button= button_link_to('Simulate in CopasiUI', 'copasi', copasi_download_path, class: 'btn btn-primary btn-block', disabled: @blob.nil?, 'data-tooltip' => tooltip(tooltip_text_copasi_button))
 
