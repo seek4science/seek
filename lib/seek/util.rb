@@ -181,10 +181,9 @@ module Seek
     end
 
     def self.extended_metadata_supported_types
-      ActiveRecord::Base.descendants.select do |model|
-        model.respond_to?(:supports_extended_metadata?) && model.supports_extended_metadata?
-      end.map(&:name)
+      cache('extended_metadata_supported_types') do
+        persistent_classes.select { |c| c.respond_to?(:supports_extended_metadata?) && c.supports_extended_metadata? }.sort_by(&:name)
+      end
     end
-
   end
 end

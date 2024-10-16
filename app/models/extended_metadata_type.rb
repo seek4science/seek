@@ -54,7 +54,7 @@ class ExtendedMetadataType < ApplicationRecord
 
   def supports_extended_metadata
     begin
-      unless self.supported_type.constantize.supports_extended_metadata?
+      unless Seek::Util.lookup_class(self.supported_type).supports_extended_metadata?
         errors.add(:supported_type, " '#{self.supported_type}' does not support extended metadata!")
       end
     rescue NameError
