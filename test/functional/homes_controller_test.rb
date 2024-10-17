@@ -260,9 +260,9 @@ class HomesControllerTest < ActionController::TestCase
   test 'recently added and download should include snapshot' do
     person = FactoryBot.create(:person)
     snapshot1 = FactoryBot.create(:investigation, policy: FactoryBot.create(:publicly_viewable_policy),
-                                  title: 'inv with snap', contributor: person, creators: [person]).create_snapshot
+                                  title: 'inv with snap', contributor: person, creators: [person]).create_snapshot(title: 'My snapshot')
     snapshot2 = FactoryBot.create(:assay, policy: FactoryBot.create(:publicly_viewable_policy),
-                                  title: 'assay with snap', contributor: person, creators: [person]).create_snapshot
+                                  title: 'assay with snap', contributor: person, creators: [person]).create_snapshot(title: 'My other snapshot')
     assert_difference 'ActivityLog.count', 2 do
       FactoryBot.create(:activity_log, action: 'create', activity_loggable: snapshot1, created_at: 1.day.ago, culprit: person.user)
       FactoryBot.create(:activity_log, action: 'download', activity_loggable: snapshot2, created_at: 1.day.ago, culprit: person.user)
@@ -270,7 +270,7 @@ class HomesControllerTest < ActionController::TestCase
 
     get :index
     assert_response :success
-    assert_select 'div#recently_added ul>li>a[href=?]', investigation_snapshot_path(snapshot1.resource, snapshot1), text: /inv with snap/
+    assert_select 'div#recently_added ul>li>a[href=?]', investigation_snapshot_path(snapshot1.resource, snapshot1), text: /My snapshot/
   end
 
   test 'should show headline announcement' do
@@ -378,7 +378,7 @@ class HomesControllerTest < ActionController::TestCase
     sop = FactoryBot.create :sop, title: 'A new sop', contributor: person, policy: FactoryBot.create(:public_policy)
     assay = FactoryBot.create :assay, title: 'A new assay', contributor: person,
                               policy: FactoryBot.create(:public_policy), creators: [person]
-    snapshot = assay.create_snapshot
+    snapshot = assay.create_snapshot(title: 'My snapshot')
 
     FactoryBot.create :activity_log, activity_loggable: df, controller_name: 'data_files', culprit: person.user
     FactoryBot.create :activity_log, activity_loggable: sop, controller_name: 'sops', culprit: person.user
@@ -392,7 +392,7 @@ class HomesControllerTest < ActionController::TestCase
     assert_select 'div#my-recent-contributions ul>li a[href=?]', data_file_path(df), text: /A new data file/
     assert_select 'div#my-recent-contributions ul li a[href=?]', sop_path(sop), text: /A new sop/
     assert_select 'div#my-recent-contributions ul li a[href=?]', assay_path(assay), text: /A new assay/
-    assert_select 'div#my-recent-contributions ul li a[href=?]', assay_snapshot_path(assay, snapshot), text: /A new assay/
+    assert_select 'div#my-recent-contributions ul li a[href=?]', assay_snapshot_path(assay, snapshot), text: /My snapshot/
 
     sop.update(title: 'An old sop')
     FactoryBot.create :activity_log, activity_loggable: sop, controller_name: 'assays', culprit: person.user, action: 'update'
@@ -403,7 +403,7 @@ class HomesControllerTest < ActionController::TestCase
     assert_select 'div#my-recent-contributions ul>li a[href=?]', sop_path(sop), text: /An old sop/
     assert_select 'div#my-recent-contributions ul li a[href=?]', data_file_path(df), text: /A new data file/
     assert_select 'div#my-recent-contributions ul li a[href=?]', assay_path(assay), text: /A new assay/
-    assert_select 'div#my-recent-contributions ul li a[href=?]', assay_snapshot_path(assay, snapshot), text: /A new assay/
+    assert_select 'div#my-recent-contributions ul li a[href=?]', assay_snapshot_path(assay, snapshot), text: /My snapshot/
     assert_select 'div#my-recent-contributions ul li a[href=?]', sop_path(sop), text: /A new sop/, count: 0
   end
 
