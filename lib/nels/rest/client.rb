@@ -81,7 +81,7 @@ module Nels
 
       def upload_metadata(project_id, dataset_id, subtype_name, file_path)
         upload_url = "#{base}/v2/seek/sbi/projects/#{project_id}/datasets/#{dataset_id}/#{subtype_name}/metadata"
-        RestClient.post(upload_url, { file: File.new(file_path, 'rb') }, { accept: '*/*' })
+        RestClient.post(upload_url, { file: File.new(file_path, 'rb') }, { accept: '*/*', Authorization: "Bearer #{@access_token}" })
       end
 
       def delete_metadata(project_id, dataset_id, subtype_name, _file_path)
