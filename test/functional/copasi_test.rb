@@ -119,7 +119,9 @@ class CopasiTest < ActionController::TestCase
       get :copasi_simulate, params: { id: model.id, version: model.version }
     end
 
-    assert_select 'h2', text: /The Model is not visible to you./
+    assert_redirected_to model_path(model)
+    assert_select 'body', text: 'You are being redirected.'
+    assert_select 'a[href=?]', request.base_url+model_path(model), text: 'redirected'
 
     # login as another user, no access right for the private model
     person = FactoryBot.create(:person)
@@ -128,7 +130,10 @@ class CopasiTest < ActionController::TestCase
     assert_no_difference('model.run_count') do
       get :copasi_simulate, params: { id: model.id, version: model.version }
     end
-    assert_select 'h2', text: /The Model is not visible to you./
+
+    assert_redirected_to model_path(model)
+    assert_select 'body', text: 'You are being redirected.'
+    assert_select 'a[href=?]', request.base_url+model_path(model), text: 'redirected'
 
     # the access right granted by the model owner, the another user can simulate the model
     login_as(model.contributor.user)
