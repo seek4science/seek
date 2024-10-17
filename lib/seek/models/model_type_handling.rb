@@ -30,6 +30,10 @@ module Seek
         model.content_blobs.select { |cb| cb.is_jws_dat? || cb.is_sbml? }
       end
 
+      def copasi_supported_content_blobs(model = self)
+        model.content_blobs.select { |cb| cb.is_copasi? || cb.is_sbml? }
+      end
+
       def is_jws_supported?(model = self)
         !model.content_blobs.detect { |cb| cb.is_jws_dat? || cb.is_sbml? }.nil?
       end

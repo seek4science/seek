@@ -30,6 +30,16 @@ class ModelTypeHandlingTest < ActiveSupport::TestCase
     assert model.sbml_content_blobs.first.is_sbml?
   end
 
+
+  def test_copasi_content_blobs
+    model = FactoryBot.create :model, content_blobs: [FactoryBot.create(:teusink_model_content_blob), FactoryBot.create(:copasi_content_blob)]
+    assert_equal 2, model.content_blobs.size
+    assert_equal 1, model.sbml_content_blobs.size
+    assert_equal 2, model.copasi_supported_content_blobs.size
+    assert model.content_blobs.first.is_sbml?
+    assert model.content_blobs.last.is_copasi?
+  end
+
   def test_contains_jws_dat
     model = FactoryBot.create :teusink_jws_model
     assert !contains_sbml?(model)
