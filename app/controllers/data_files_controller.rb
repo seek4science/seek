@@ -532,6 +532,7 @@ class DataFilesController < ApplicationController
                                       { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                       { assay_assets_attributes: [:assay_id, :relationship_type_id] },
                                       { creator_ids: [] }, { assay_assets_attributes: [:assay_id, :relationship_type_id] },
+                                      { observation_unit_assets_attributes: [:observation_unit_id] },
                                       :file_template_id,
                                       { data_format_annotations: [] }, { data_type_annotations: [] },
                                       { publication_ids: [] }, { workflow_ids: [] },

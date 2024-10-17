@@ -3676,6 +3676,60 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :unprocessable_entity
   end
 
+  test 'update with link to editable observation unit' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    data_file = FactoryBot.create(:data_file,contributor:person,projects:person.projects)
+    assert data_file.can_edit?
+    obs_unit = FactoryBot.create(:observation_unit, contributor: person)
+    bad_obs_unit = FactoryBot.create(:observation_unit, policy: FactoryBot.create(:private_policy))
+    assert obs_unit.can_edit?
+    refute bad_obs_unit.can_edit?
+
+    assert_difference('ObservationUnitAsset.count') do
+      put :update, params: { id: data_file.id, data_file: { title: data_file.title, observation_unit_assets_attributes: [{ observation_unit_id: obs_unit.id }] } }
+    end
+    data_file.reload
+    assert_equal [obs_unit], data_file.observation_units
+
+    assert_no_difference('ObservationUnitAsset.count') do
+      put :update, params: { id: data_file.id, data_file: { title: data_file.title, observation_unit_assets_attributes: [{ observation_unit_id: bad_obs_unit.id }] } }
+    end
+    data_file.reload
+    assert_equal [obs_unit], data_file.observation_units
+
+  end
+
+  test 'create with link to editable observation unit' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    obs_unit = FactoryBot.create(:observation_unit, contributor: person)
+    bad_obs_unit = FactoryBot.create(:observation_unit, policy: FactoryBot.create(:private_policy))
+    assert obs_unit.can_edit?
+    refute bad_obs_unit.can_edit?
+
+    data_file, blob = valid_data_file
+
+    assert_difference('ObservationUnitAsset.count') do
+      assert_difference('DataFile.count') do
+        post :create, params: { data_file: data_file.merge(observation_unit_assets_attributes: [{ observation_unit_id: obs_unit.id }]), content_blobs: [blob], policy_attributes: valid_sharing }
+        assert_redirected_to data_file_path(assigns(:data_file))
+      end
+    end
+
+    data_file = assigns(:data_file)
+    assert_equal [obs_unit], data_file.observation_units
+
+    data_file, blob = valid_data_file
+    assert_no_difference('ObservationUnitAsset.count') do
+      assert_no_difference('DataFile.count') do
+        post :create, params: { data_file: data_file.merge(observation_unit_assets_attributes: [{ observation_unit_id: bad_obs_unit.id }]), content_blobs: [blob], policy_attributes: valid_sharing }
+      end
+    end
+    data_file = assigns(:data_file)
+    assert_equal [], data_file.observation_units
+  end
+
   test 'when updating, assay linked to must be editable' do
     person = FactoryBot.create(:person)
     login_as(person)
