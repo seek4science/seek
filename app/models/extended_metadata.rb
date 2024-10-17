@@ -23,4 +23,8 @@ class ExtendedMetadata < ApplicationRecord
     ExtendedMetadataAttribute
   end
 
+  def self.supports_extended_metadata?
+    true
+  end
+
 end

@@ -111,4 +111,9 @@ class Template < ApplicationRecord
       []
     end
   end
+
+  def self.supports_extended_metadata?
+    false
+  end
+
 end
