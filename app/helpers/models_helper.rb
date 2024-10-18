@@ -40,6 +40,6 @@ module ModelsHelper
   end
 
   def show_copasi_button?
-    Seek::Config.copasi_enabled && (@display_model.policy.access_type == Policy::ALL_USERS) && @display_model.is_copasi_supported?
+    Seek::Config.copasi_enabled && @display_model.is_copasi_supported? && @display_model.is_downloadable? && @display_model.can_download?(current_user)
   end
 end
