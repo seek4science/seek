@@ -11,6 +11,8 @@ class ProjectsController < ApplicationController
   include Seek::AnnotationCommon
 
   before_action :fair_data_station_enabled?, only:[:import_from_fairdata_station, :submit_fairdata_station]
+  before_action :observation_units_enabled?, only:[:import_from_fairdata_station, :submit_fairdata_station]
+  before_action :investigations_enabled?, only:[:import_from_fairdata_station, :submit_fairdata_station]
 
   before_action :login_required, only: [:guided_join, :guided_create, :guided_import, :request_join, :request_create, :request_import,
                                         :administer_join_request, :respond_join_request,

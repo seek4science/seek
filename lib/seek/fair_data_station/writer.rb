@@ -199,7 +199,7 @@ module Seek
         property_ids = datastation_entity.additional_metadata_annotations.collect { |annotation| annotation[0] }
 
         # collect and sort those with the most properties that match, eliminating any where no properties match
-        candidates = ExtendedMetadataType.where(supported_type: seek_entity.class.name).includes(:extended_metadata_attributes).collect do |emt|
+        candidates = ::ExtendedMetadataType.where(supported_type: seek_entity.class.name).includes(:extended_metadata_attributes).collect do |emt|
           ids = emt.extended_metadata_attributes.collect(&:pid)
           score = (property_ids - ids).length
           emt = nil if (property_ids & ids).empty?

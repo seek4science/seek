@@ -4,9 +4,9 @@ class ExtendedMetadataType < ApplicationRecord
   validates :title, presence: true
   validates :extended_metadata_attributes, presence: true
   validates :supported_type, presence: true
-  validate :supported_type_must_be_valid_type
   validate :unique_titles_for_extended_metadata_attributes
   validate :cannot_disable_nested_extended_metadata
+  validate :supports_extended_metadata
 
   alias_method :metadata_attributes, :extended_metadata_attributes
 
@@ -34,12 +34,10 @@ class ExtendedMetadataType < ApplicationRecord
     supported_type == 'ExtendedMetadata'
   end
 
-  def supported_type_must_be_valid_type
-    return if supported_type.blank? # already convered by presence validation
-    unless Seek::Util.lookup_class(supported_type, raise: false)
-      errors.add(:supported_type, 'is not a type that can supported extended metadata')
-    end
+  def linked_metadata_attributes
+    ExtendedMetadataAttribute.where(linked_extended_metadata_type_id: id)
   end
+
 
   def unique_titles_for_extended_metadata_attributes
     titles = extended_metadata_attributes.collect(&:title)
@@ -54,6 +52,16 @@ class ExtendedMetadataType < ApplicationRecord
     end
   end
 
+  def supports_extended_metadata
+    begin
+      unless Seek::Util.lookup_class(self.supported_type).supports_extended_metadata?
+        errors.add(:supported_type, " '#{self.supported_type}' does not support extended metadata!")
+      end
+    rescue NameError
+      errors.add(:supported_type, "'#{self.supported_type}' is not a valid support type!")
+    end
+  end
+
   def usage
     extended_metadatas.count
   end
@@ -65,8 +73,5 @@ class ExtendedMetadataType < ApplicationRecord
   def self.disabled_but_in_use
     disabled.select{|emt| emt.disabled_but_used?}
   end
-
-
-
 
 end
