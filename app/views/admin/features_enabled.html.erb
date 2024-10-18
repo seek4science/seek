@@ -57,9 +57,14 @@
                              "#{t('event').pluralize} enabled","Whether the #{t('event').pluralize} are displayed and can be added.") %>
 
   <%= admin_checkbox_setting(:isa_enabled, 1, Seek::Config.isa_enabled,
-                             "ISA enabled", "Whether the ISA framework is enabled. The ISA framework allows users to create Investigations, Studies and Assays to organize their work.") %>
-  <%= admin_checkbox_setting(:observation_units_enabled, 1, Seek::Config.observation_units_enabled,
-                             "Observation Units enabled", "Whether the users can register Observation Units to organize their work.") %>
+                             "ISA enabled", "Whether the ISA framework is enabled. The ISA framework allows users to create Investigations, Studies and Assays to organize their work.",
+                             onchange: toggle_appear_javascript('isa_details')) %>
+  <div id="isa_details" class="additional_settings" style="<%= show_or_hide_block Seek::Config.isa_enabled -%>">
+    <%= admin_checkbox_setting(:observation_units_enabled, 1, Seek::Config.observation_units_enabled,
+                               "Observation Units enabled", "Whether the users can register Observation Units to organize their work. Requires ISA enabled to function correctly.") %>
+    <%= admin_checkbox_setting(:fair_data_station_enabled, 1, Seek::Config.fair_data_station_enabled,
+                               "FAIR Data Station enabled", "Whether the users can import or update using metadata from FAIR Data Station. Requires ISA and Observation Units to be enabled to function correctly") %>
+  </div>
   <%= admin_checkbox_setting(:models_enabled, 1, Seek::Config.models_enabled,
                              "Models enabled", "Whether the users can register computational models in SEEK.") %>
 

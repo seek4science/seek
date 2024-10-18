@@ -2099,4 +2099,16 @@ class StudiesControllerTest < ActionController::TestCase
       assert_select 'a', text: /Add new #{I18n.t('assay')}/i, count: 0
     end
   end
+
+  test 'should redirect isa json compliant study to isa study edit page' do
+    with_config_value(:isa_json_compliance_enabled, true) do
+      person = FactoryBot.create(:person)
+      login_as(person)
+      investigation = FactoryBot.create(:investigation, contributor: person, is_isa_json_compliant: true)
+      study = FactoryBot.create(:isa_json_compliant_study, contributor: person, investigation: investigation)
+
+      get :edit, params: { id: study }
+      assert_redirected_to edit_isa_study_path(study)
+    end
+  end
 end

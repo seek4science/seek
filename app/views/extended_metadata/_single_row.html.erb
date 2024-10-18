@@ -15,7 +15,7 @@
       <div class="form-group single-attr-row">
         <% attr_element_name = "#{element_name}[#{index}][#{attr.title}]" %>
         <%= attribute_form_element(attr, value ? value[attr.title] : nil, attr_element_name, element_class) %>
-        <% unless attribute.description.nil? %>
+        <% unless attr.description.nil? %>
           <%= extended_metadata_attribute_description(attr.description) %>
         <% end %>
       </div>

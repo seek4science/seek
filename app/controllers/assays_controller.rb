@@ -86,7 +86,11 @@ class AssaysController < ApplicationController
   end
 
   def edit
-    respond_to(&:html)
+    if @assay.is_isa_json_compliant?
+      redirect_to edit_isa_assay_path(@assay)
+    else
+      respond_to(&:html)
+    end
   end
 
   def create

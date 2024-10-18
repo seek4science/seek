@@ -65,6 +65,10 @@ class Sample < ApplicationRecord
     User.logged_in_and_member? && Seek::Config.samples_enabled
   end
 
+  def self.supports_extended_metadata?
+    false
+  end
+
   def related_data_files
     [originating_data_file].compact + linked_data_files
   end
