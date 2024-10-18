@@ -11,6 +11,8 @@ class ProjectsController < ApplicationController
   include Seek::AnnotationCommon
 
   before_action :fair_data_station_enabled?, only:[:import_from_fairdata_station, :submit_fairdata_station]
+  before_action :observation_units_enabled?, only:[:import_from_fairdata_station, :submit_fairdata_station]
+  before_action :investigations_enabled?, only:[:import_from_fairdata_station, :submit_fairdata_station]
 
   before_action :login_required, only: [:guided_join, :guided_create, :guided_import, :request_join, :request_create, :request_import,
                                         :administer_join_request, :respond_join_request,
@@ -203,13 +205,23 @@ class ProjectsController < ApplicationController
     path = params[:datastation_data].path
     policy = Policy.new
     policy.set_attributes_with_sharing(policy_params)
-    datadata_inv = Seek::FairDataStation::Reader.new.parse_graph(path)
-    @investigation = Seek::FairDataStation::Writer.new.construct_isa(datadata_inv.first, current_person, [@project], policy)
-    @investigation.save!
+    fair_data_station_inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+    @existing_investigation = Investigation.by_external_identifier(fair_data_station_inv.external_id,[@project])
 
-    respond_to do |format|
-      format.html { redirect_to(@investigation) }
+    if @existing_investigation
+      flash.now[:error] = "An #{t('investigation')} with that external identifier already exists for this #{t('project')}"
+      respond_to do |format|
+        format.html { render action: :import_from_fairdata_station, status: :unprocessable_entity }
+      end
+    else
+      @investigation = Seek::FairDataStation::Writer.new.construct_isa(fair_data_station_inv, current_person, [@project], policy)
+      @investigation.save!
+
+      respond_to do |format|
+        format.html { redirect_to(@investigation) }
+      end
     end
+
   end
 
   def request_create

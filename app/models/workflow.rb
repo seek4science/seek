@@ -211,6 +211,10 @@ class Workflow < ApplicationRecord
     false
   end
 
+  def self.supports_extended_metadata?
+    false
+  end
+
   MATURITY_LEVELS = {
       0 => :work_in_progress,
       1 => :released,
