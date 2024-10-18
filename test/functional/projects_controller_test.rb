@@ -5088,7 +5088,7 @@ class ProjectsControllerTest < ActionController::TestCase
       assert_response :success
       # menu item still shown but will be an error message when clicking it
       assert_select '#item-admin-menu' do
-        assert_select 'li a[href=?]', import_from_fairdata_station_project_path(project), text:/Import from FAIRData Station/, count: 1
+        assert_select 'li a[href=?]', import_from_fairdata_station_project_path(project), text:/Import from FAIR Data Station/, count: 1
       end
 
       get :import_from_fairdata_station, params: { id: project.id }
@@ -5101,7 +5101,7 @@ class ProjectsControllerTest < ActionController::TestCase
       assert_response :success
       # menu item still shown but will be an error message when clicking it
       assert_select '#item-admin-menu' do
-        assert_select 'li a[href=?]', import_from_fairdata_station_project_path(project), text:/Import from FAIRData Station/, count: 1
+        assert_select 'li a[href=?]', import_from_fairdata_station_project_path(project), text:/Import from FAIR Data Station/, count: 1
       end
 
       get :import_from_fairdata_station, params: { id: project.id }
