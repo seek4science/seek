@@ -21,7 +21,7 @@ module Seek
       # if attr is nil, indicates a new attribute. required is not allowed if there are already samples
       def allow_required?(attr)
         if attr.is_a?(SampleAttribute)
-          return true if attr.new_record?
+          return true if attr.new_record? && @sample_type.new_record?
           return false if inherited?(attr)
 
           attr = attr.accessor_name

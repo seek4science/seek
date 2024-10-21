@@ -775,16 +775,28 @@ class SampleTypesControllerTest < ActionController::TestCase
     get :edit, params: { id: sample_type.id }
     assert_response :success
     assert_select 'a#add-attribute', count: 1
-    assert_difference('SampleAttribute.count') do
-      put :update, params: { id: sample_type.id, sample_type: {
+
+    # Should be able to add an optional new attribute to a sample type with samples
+    assert_difference('SampleAttribute.count', 1) do
+      patch :update, params: { id: sample_type.id, sample_type: {
         sample_attributes_attributes: {
-          '1': { title: 'new attribute', sample_attribute_type_id: @string_type.id }
+          '1': { title: 'new optional attribute', sample_attribute_type_id: @string_type.id, required: '0' }
         }
       } }
     end
     assert_redirected_to sample_type_path(sample_type)
     sample_type.reload
-    assert_equal 'new attribute', sample_type.sample_attributes.last.title
+    assert_equal 'new optional attribute', sample_type.sample_attributes.last.title
+
+    # Should not be able to add a mandatory new attribute to a sample type with samples
+    assert_no_difference('SampleAttribute.count') do
+      patch :update, params: { id: sample_type.id, sample_type: {
+        sample_attributes_attributes: {
+          '2': { title: 'new mandatory attribute', sample_attribute_type_id: @string_type.id, required: '1' }
+        }
+      } }
+    end
+
   end
 
   test 'change attribute name' do
