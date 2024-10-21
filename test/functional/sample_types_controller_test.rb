@@ -787,6 +787,79 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_equal 'new attribute', sample_type.sample_attributes.last.title
   end
 
+  test 'change attribute name' do
+    other_person = FactoryBot.create(:person)
+    st_policy = FactoryBot.create(:private_policy, 
+                                  permissions: [FactoryBot.create(:manage_permission, contributor: other_person)])
+    sample_type = FactoryBot.create(:simple_sample_type, project_ids: @project_ids, contributor: @person, 
+                                                         policy_id: st_policy.id)
+    sample_type.sample_attributes << FactoryBot.create(:sample_attribute, title: 'new title', 
+                                                                          sample_attribute_type: @string_type, is_title: false, sample_type: sample_type)
+    assert_equal sample_type.sample_attributes.last.title, 'new title'
+    login_as(@person)
+
+    # Scenario 1: Sample type does not have any samples
+    # @person can change the attribute title
+    get :edit, params: { id: sample_type.id }
+    assert_response :success
+    assert_select 'tr.sample-attribute:has(input[data-attr="title"][value=?])', 'new title' do |tr|
+      assert_select tr, 'input[data-attr="title"]' do |input|
+        assert_select input, '[disabled]', count: 0
+        assert_select input, '[title]', count: 0
+      end
+    end
+
+    # Scenario 2: Sample type has samples and @person has permission to edit all samples
+    # @person can change the attribute title
+    (1..10).map do |i|
+      editing_policy = FactoryBot.create(:private_policy,
+                                         permissions: [FactoryBot.create(:edit_permission, contributor: @person),
+                                                       FactoryBot.create(:manage_permission, contributor: other_person)])
+      FactoryBot.create(:sample, data: { 'new title': "new title sample #{i}" },
+                                 contributor: other_person, project_ids: @project_ids, sample_type: sample_type,
+                                 policy_id: editing_policy.id)
+    end
+    sample_type.reload
+    get :edit, params: { id: sample_type.id }
+    assert_response :success
+    assert_equal sample_type.samples.count, 10
+    assert(sample_type.samples.all? { |sample| sample.can_edit?(@person) })
+
+    assert_select 'tr.sample-attribute:has(input[data-attr="title"][value=?])', 'new title' do |tr|
+      assert_select tr, 'input[data-attr="title"]' do |input|
+        assert_select input, '[disabled]', count: 0
+        assert_select input, '[title]', count: 0
+      end
+    end
+
+
+    # Scenario 3: Sample type has samples but @person does not have permission to edit all samples
+    # @person cannot change the attribute title
+    (1..10).map do |i|
+      viewing_policy = FactoryBot.create(:private_policy,
+                                         permissions: [FactoryBot.create(:permission, contributor: @person),
+                                                       FactoryBot.create(:manage_permission, contributor: other_person)])
+      FactoryBot.create(:sample, data: { 'new title': "new title sample #{i}" },
+                                 contributor: other_person,
+                                 project_ids: @project_ids, sample_type: sample_type, policy_id: viewing_policy.id)
+    end
+
+    sample_type.reload
+    get :edit, params: { id: sample_type.id }
+    assert_response :success
+    assert_equal sample_type.samples.count, 20
+    refute(sample_type.samples.all? { |sample| sample.can_edit?(@person) })
+
+    assert_select 'tr.sample-attribute:has(input[data-attr="title"][value=?])', 'new title' do |tr|
+      assert_select tr, 'input[data-attr="title"]' do |input|
+        assert_equal input.attr('disabled').text, 'disabled'
+        assert_equal input.attr('title').text,
+                     "You are not allowed to change the name of this attribute.\nYou need at least editing permission to all samples in this sample type."
+      end
+    end
+
+  end
+
   private
 
   def template_for_upload
