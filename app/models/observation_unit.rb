@@ -23,6 +23,12 @@ class ObservationUnit < ApplicationRecord
 
   has_extended_metadata
 
+  # the associated projects from the Investigation.
+  # Overrides the :through :study, as that relies on being saved to the database first, causing validation issues
+  def projects
+    study&.projects || []
+  end
+
   def contributors
     [contributor]
   end

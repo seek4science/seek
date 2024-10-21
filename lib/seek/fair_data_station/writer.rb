@@ -28,12 +28,11 @@ module Seek
         end
 
         preload_data_file_cache(investigation.related_data_files)
-        update_entity(investigation, datastation_inv, contributor, projects, policy)
+        update_entity(investigation, datastation_inv)
         datastation_inv.studies.each do |datastation_study|
           study = update_or_build_study(datastation_study, contributor, projects, policy, investigation)
           datastation_study.observation_units.each do |datastation_observation_unit|
-            observation_unit = update_or_build_observation_unit(datastation_observation_unit, contributor, projects,
-                                                                policy, study)
+            observation_unit = update_or_build_observation_unit(datastation_observation_unit, contributor, policy, study)
             datastation_observation_unit.samples.each do |datastation_sample|
               sample = update_or_build_sample(datastation_sample, contributor, projects, policy, observation_unit)
               datastation_sample.assays.each do |datastation_assay|
@@ -83,7 +82,7 @@ module Seek
 
       def build_observation_unit(datastation_observation_unit, contributor, policy, study)
         observation_unit_attributes = datastation_observation_unit.seek_attributes.merge({ contributor: contributor,
-                                                                                           study: study, projects: projects, policy: policy.deep_copy })
+                                                                                           study: study, policy: policy.deep_copy })
         observation_unit = study.observation_units.build(observation_unit_attributes)
         datastation_observation_unit.datasets.each do |datastation_dataset|
           df = build_data_file(contributor, datastation_dataset, study.projects, policy)
@@ -109,7 +108,7 @@ module Seek
         investigation
       end
 
-      def update_entity(seek_entity, datastation_entity, _contributor, _projects, _policy)
+      def update_entity(seek_entity, datastation_entity)
         attributes = datastation_entity.seek_attributes
         seek_entity.assign_attributes(attributes)
         update_extended_metadata(seek_entity, datastation_entity)
@@ -126,7 +125,7 @@ module Seek
       def update_or_build_study(datastation_study, contributor, projects, policy, investigation)
         study = ::Study.by_external_identifier(datastation_study.external_id, projects)
         if study
-          update_entity(study, datastation_study, contributor, projects, policy)
+          update_entity(study, datastation_study)
           study.observation_units = []
           investigation.studies << study
         else
@@ -135,20 +134,20 @@ module Seek
         study
       end
 
-      def update_or_build_observation_unit(datastation_observation_unit, contributor, projects, policy, study)
-        observation_unit = ::ObservationUnit.by_external_identifier(datastation_observation_unit.external_id, projects)
+      def update_or_build_observation_unit(datastation_observation_unit, contributor, policy, study)
+        observation_unit = ::ObservationUnit.by_external_identifier(datastation_observation_unit.external_id, study.projects)
         if observation_unit
-          update_entity(observation_unit, datastation_observation_unit, contributor, projects, policy)
+          update_entity(observation_unit, datastation_observation_unit)
           observation_unit.study = study
           observation_unit.observation_unit_assets.delete_all
           datastation_observation_unit.datasets.each do |datastation_dataset|
-            df = build_data_file(contributor, datastation_dataset, projects, policy)
+            df = build_data_file(contributor, datastation_dataset, study.projects, policy)
             observation_unit.observation_unit_assets.build(asset: df)
           end
           observation_unit.samples = []
           study.observation_units << observation_unit
         else
-          observation_unit = build_observation_unit(datastation_observation_unit, contributor, projects, policy, study)
+          observation_unit = build_observation_unit(datastation_observation_unit, contributor, policy, study)
         end
         observation_unit
       end
@@ -169,7 +168,7 @@ module Seek
       def update_or_build_assay(datastation_assay, contributor, projects, policy, sample, study)
         assay = ::Assay.by_external_identifier(datastation_assay.external_id, projects)
         if assay
-          update_entity(assay, datastation_assay, contributor, projects, policy)
+          update_entity(assay, datastation_assay)
           assay.samples = [sample]
           assay.assay_assets.where(asset_type: 'DataFile').delete_all
           datastation_assay.datasets.each do |datastation_dataset|
