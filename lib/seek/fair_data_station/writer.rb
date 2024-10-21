@@ -126,7 +126,6 @@ module Seek
         study = ::Study.by_external_identifier(datastation_study.external_id, projects)
         if study
           update_entity(study, datastation_study)
-          study.observation_units = []
           investigation.studies << study
         else
           study = build_study(datastation_study, contributor, policy, investigation)
