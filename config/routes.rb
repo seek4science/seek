@@ -207,6 +207,7 @@ SEEK::Application.routes.draw do
     collection do
       get :form_fields
       get :administer
+      post :create
     end
     member do
       put :administer_update
@@ -420,6 +421,8 @@ SEEK::Application.routes.draw do
       get :manage
       get :order_studies
       patch :manage_update
+      get :update_from_fairdata_station
+      post :submit_fairdata_station
     end
     resources :people, :programmes, :projects, :assays, :studies, :models, :sops, :workflows, :data_files, :publications, :documents, :observation_units, :samples, only: [:index]
   end
@@ -521,6 +524,7 @@ SEEK::Application.routes.draw do
       post :execute
       get :simulate
       post :simulate
+      get :copasi_simulate
     end
     resources :model_images, only: [:show]
     resources :people, :programmes, :projects, :investigations, :assays, :studies, :publications, :events, :collections, :organisms, :human_diseases, only: [:index]
@@ -694,7 +698,7 @@ SEEK::Application.routes.draw do
 
   ### SAMPLE TYPES ###
   #
-  resources :sample_types do
+  resources :sample_types, concerns: %i[asset has_content_blobs] do
     collection do
       post :create_from_template
       get :select
@@ -703,14 +707,10 @@ SEEK::Application.routes.draw do
     member do
       get :template_details
       get :batch_upload
+      post :update_annotations_ajax
     end
     resources :samples
-    resources :content_blobs do
-      member do
-        get :download
-      end
-    end
-    resources :projects, :programmes, :templates, :studies, :assays, only: [:index]
+    resources :investigations, :people, :collections, :publications, :projects, :programmes, :templates, :studies, :assays, only: [:index]
   end
 
   ### SAMPLE ATTRIBUTE TYPES ###

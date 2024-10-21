@@ -12,7 +12,7 @@ module Seek
         download: Set.new(%i[
                             download named_download launch submit_job data execute plot explore
                             download_log download_results input output download_output download_input
-                            view_result compare_versions simulate diagram ro_crate ro_crate_metadata run
+                            view_result compare_versions simulate copasi_simulate diagram ro_crate ro_crate_metadata run
                           ]).freeze,
 
         edit: Set.new(%i[
@@ -30,6 +30,7 @@ module Seek
                           manage manage_update notification read_interaction write_interaction report_problem storage_report
                           select_sample_type extraction_status persistence_status extract_samples confirm_extraction cancel_extraction
                           upload_fulltext upload_pdf soft_delete_fulltext has_matching_sample_type unzip unzip_status confirm_unzip unzip_persistence_status cancel_unzip
+                          update_from_fairdata_station submit_fairdata_station
                         ]).freeze
       }.freeze
 

@@ -27,6 +27,8 @@ class SampleType < ApplicationRecord
   acts_as_favouritable
   has_external_identifier # to be replaced with acts_as_asset when sharing permissions are adding in upcoming pull request
 
+  acts_as_asset
+
   has_many :samples, inverse_of: :sample_type
 
   has_filter :contributor
@@ -60,6 +62,12 @@ class SampleType < ApplicationRecord
   grouped_pagination
 
   has_annotation_type :sample_type_tag, method_name: :tags
+
+  def investigations
+    return [] if studies.empty? && assays.empty?
+
+    (studies.map(&:investigation).compact << assays.map(&:investigation).compact).flatten.uniq
+  end
 
   # Creates sample attributes from an ISA template.
   # @param template [Template] The ISA template to create sample attributes from.
@@ -98,12 +106,14 @@ class SampleType < ApplicationRecord
   end
 
   def is_isa_json_compliant?
-    studies.any? || assays.any?
+    has_only_isa_json_compliant_investigations = studies.map(&:investigation).compact.all?(&:is_isa_json_compliant?) || assays.map(&:investigation).compact.all?(&:is_isa_json_compliant?)
+    (studies.any? || assays.any?) && has_only_isa_json_compliant_investigations && !isa_template.nil?
   end
 
   def validate_value?(attribute_name, value)
     attribute = sample_attributes.detect { |attr| attr.title == attribute_name }
     raise UnknownAttributeException, "Unknown attribute #{attribute_name}" unless attribute
+
     attribute.validate_value?(value)
   end
 
@@ -137,10 +147,6 @@ class SampleType < ApplicationRecord
     resolve_seek_samples_inconsistencies
   end
 
-  def can_download?(user = User.current_user)
-    can_view?(user)
-  end
-
   def self.user_creatable?
     Sample.user_creatable?
   end
@@ -148,18 +154,6 @@ class SampleType < ApplicationRecord
   def self.can_create?
     can = User.logged_in_and_member? && Seek::Config.samples_enabled
     can && (!Seek::Config.project_admin_sample_type_restriction || User.current_user.is_admin_or_project_administrator?)
-  end
-
-  def can_edit?(user = User.current_user)
-    return false if user.nil? || user.person.nil? || !Seek::Config.samples_enabled
-    return true if user.is_admin?
-
-    # Make the ISA JSON compliant sample types editable when a user is a project member instead of a project admin
-    if is_isa_json_compliant?
-      contributor == user.person || projects.detect { |project| project.has_member? user.person }.present?
-    else
-      contributor == user.person || projects.detect { |project| project.can_manage?(user) }.present?
-    end
   end
 
   def can_delete?(user = User.current_user)
@@ -174,14 +168,6 @@ class SampleType < ApplicationRecord
             attr.sample_type != self
         end.nil?
     end
-  end
-
-  def can_view?(user = User.current_user, referring_sample = nil, view_in_single_page = false)
-    return false if Seek::Config.isa_json_compliance_enabled && template_id.present? && !view_in_single_page
-
-    project_membership = user&.person && (user.person.projects & projects).any?
-    is_creator = creators.include?(user&.person)
-    project_membership || public_samples? || is_creator || check_referring_sample_permission(user, referring_sample)
   end
 
   def editing_constraints
@@ -203,7 +189,7 @@ class SampleType < ApplicationRecord
     referring_sample.try(:sample_type) == self && referring_sample.can_view?(user)
   end
 
-  # whether it is assocaited with any public samples
+  # whether it is associated with any public samples
   def public_samples?
     samples.joins(:policy).where('policies.access_type >= ?', Policy::VISIBLE).any?
   end
@@ -286,6 +272,10 @@ class SampleType < ApplicationRecord
     if is_title_seek_sample_multi
       errors.add(:sample_attributes, "Attribute type of #{base_type.underscore.humanize} can not be selected as the sample type title.")
     end
+  end
+
+  def self.supports_extended_metadata?
+    false
   end
 
   class UnknownAttributeException < RuntimeError; end

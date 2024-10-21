@@ -1,0 +1,83 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "supported_type": {
+      "type": "string"
+    },
+    "enabled": {
+      "type": "boolean"
+    },
+    "attributes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "oneOf": [
+          {
+            "properties": {
+              "title": {
+                "type": "string"
+              },
+              "required": {
+                "type": "boolean"
+              },
+              "type": {
+                "type": "string"
+              },
+              "description": {
+                "type": ["string", "null"]
+              },
+              "label": {
+                "type": "string"
+              },
+              "pos": {
+                "type": "integer"
+              }
+            },
+            "required": ["title", "type"],
+            "additionalProperties": false
+          },
+          {
+            "properties": {
+              "title": {
+                "type": "string"
+              },
+              "required": {
+                "type": "boolean"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "Controlled Vocabulary",
+                  "Controlled Vocabulary List",
+                  "Linked Extended Metadata",
+                  "Linked Extended Metadata (multiple)"
+                ]
+              },
+              "description": {
+                "type": ["string", "null"]
+              },
+              "label": {
+                "type": "string"
+              },
+              "ID": {
+                "type": ["integer", "string"]
+              },
+              "pos": {
+                "type": "integer"
+              }
+            },
+            "required": ["title", "type", "ID"],
+            "additionalProperties": false
+          }
+        ]
+      }
+    }
+  },
+  "required": ["title", "supported_type", "enabled", "attributes"],
+  "additionalProperties": false
+}
