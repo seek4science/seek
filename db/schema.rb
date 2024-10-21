@@ -1837,18 +1837,6 @@ ActiveRecord::Schema.define(version: 2024_09_02_125710) do
     t.index ["user_id", "can_view"], name: "index_sample_type_auth_lookup_on_user_id_and_can_view"
   end
 
-  create_table "sample_type_auth_lookups", force: :cascade do |t|
-    t.integer "user_id"
-    t.integer "asset_id"
-    t.boolean "can_view", default: false
-    t.boolean "can_manage", default: false
-    t.boolean "can_edit", default: false
-    t.boolean "can_download", default: false
-    t.boolean "can_delete", default: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-  end
-
   create_table "sample_types", id: :integer, force: :cascade do |t|
     t.string "title"
     t.string "uuid"
