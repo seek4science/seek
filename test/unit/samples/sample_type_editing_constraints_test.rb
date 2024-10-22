@@ -32,7 +32,8 @@ class SampleTypeEditingConstraintsTest < ActiveSupport::TestCase
       attr = c.sample_type.sample_attributes.detect { |t| t.accessor_name == 'address' }
       refute_nil attr
       refute c.allow_name_change?(attr)
-      assert c.allow_name_change?(nil)
+      # Not OK if attribute = nil and the sample type has samples
+      refute c.allow_name_change?(nil)
 
       # OK if there are no samples
       st2 = FactoryBot.create(:simple_sample_type)
@@ -41,6 +42,7 @@ class SampleTypeEditingConstraintsTest < ActiveSupport::TestCase
       attr = c.sample_type.sample_attributes.detect { |t| t.accessor_name == 'the_title' }
       refute_nil attr
       assert c.allow_name_change?(attr)
+      # OK if attribute = nil and the sample type has no samples
       assert c.allow_name_change?(nil)
 
       # OK if user has editing permission over all samples
@@ -51,7 +53,8 @@ class SampleTypeEditingConstraintsTest < ActiveSupport::TestCase
       attr = c.sample_type.sample_attributes.detect { |t| t.accessor_name == 'address' }
       refute_nil attr
       assert c.allow_name_change?(attr)
-      assert c.allow_name_change?(nil)
+      # Not OK if attribute = nil and the sample type has samples
+      refute c.allow_name_change?(nil)
     end
   end
 
