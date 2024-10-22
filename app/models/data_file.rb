@@ -28,7 +28,6 @@ class DataFile < ApplicationRecord
 
   has_many :observation_unit_assets, dependent: :delete_all, as: :asset, foreign_key: :asset_id, autosave: true, inverse_of: :asset
   has_many :observation_units, through: :observation_unit_assets
-  accepts_nested_attributes_for :observation_unit_assets, allow_destroy: true
 
   has_many :workflow_data_files, dependent: :destroy, autosave: true
   has_many :workflows, ->{ distinct }, through: :workflow_data_files

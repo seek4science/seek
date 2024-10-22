@@ -3687,13 +3687,15 @@ class DataFilesControllerTest < ActionController::TestCase
     refute bad_obs_unit.can_edit?
 
     assert_difference('ObservationUnitAsset.count') do
-      put :update, params: { id: data_file.id, data_file: { title: data_file.title, observation_unit_assets_attributes: [{ observation_unit_id: obs_unit.id }] } }
+      put :update, params: { id: data_file.id, data_file: { title: data_file.title, observation_unit_ids:[obs_unit.id] } }
     end
     data_file.reload
     assert_equal [obs_unit], data_file.observation_units
 
     assert_no_difference('ObservationUnitAsset.count') do
-      put :update, params: { id: data_file.id, data_file: { title: data_file.title, observation_unit_assets_attributes: [{ observation_unit_id: bad_obs_unit.id }] } }
+      assert_raises(ActiveRecord::RecordNotSaved) do
+        put :update, params: { id: data_file.id, data_file: { title: data_file.title, observation_unit_ids:[bad_obs_unit.id] } }
+      end
     end
     data_file.reload
     assert_equal [obs_unit], data_file.observation_units
@@ -3712,7 +3714,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_difference('ObservationUnitAsset.count') do
       assert_difference('DataFile.count') do
-        post :create, params: { data_file: data_file.merge(observation_unit_assets_attributes: [{ observation_unit_id: obs_unit.id }]), content_blobs: [blob], policy_attributes: valid_sharing }
+        post :create, params: { data_file: data_file.merge(observation_unit_ids:[obs_unit.id]), content_blobs: [blob], policy_attributes: valid_sharing }
         assert_redirected_to data_file_path(assigns(:data_file))
       end
     end
@@ -3723,11 +3725,9 @@ class DataFilesControllerTest < ActionController::TestCase
     data_file, blob = valid_data_file
     assert_no_difference('ObservationUnitAsset.count') do
       assert_no_difference('DataFile.count') do
-        post :create, params: { data_file: data_file.merge(observation_unit_assets_attributes: [{ observation_unit_id: bad_obs_unit.id }]), content_blobs: [blob], policy_attributes: valid_sharing }
+        post :create, params: { data_file: data_file.merge(observation_unit_ids:[bad_obs_unit.id]), content_blobs: [blob], policy_attributes: valid_sharing }
       end
     end
-    data_file = assigns(:data_file)
-    assert_equal [], data_file.observation_units
   end
 
   test 'when updating, assay linked to must be editable' do
