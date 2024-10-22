@@ -27,7 +27,7 @@ module Seek
           attr = attr.accessor_name
         end
 
-        return false unless attr
+        return !samples? unless attr
         return !blanks?(attr) if samples?
 
         true
@@ -56,7 +56,7 @@ module Seek
 
           attr = attr.accessor_name
         end
-        return false unless attr
+        return !samples? unless attr
         return samples.all?(&:can_edit?) if samples?
 
         true
