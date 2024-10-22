@@ -156,6 +156,7 @@ module Seek
         if sample
           update_sample(sample, datastation_sample, contributor, projects, policy)
           sample.observation_unit = observation_unit
+          sample.assays = []
           observation_unit.samples << sample
         else
           sample = build_sample(datastation_sample, contributor, projects, policy, observation_unit)
