@@ -26,11 +26,11 @@ module Seek
 
           attr = attr.accessor_name
         end
-        if attr
-          !blanks?(attr)
-        else
-          !samples?
-        end
+
+        return false unless attr
+        return !blanks?(attr) if samples?
+
+        true
       end
 
       # an attribute could be removed if all are currently blank
@@ -56,11 +56,10 @@ module Seek
 
           attr = attr.accessor_name
         end
-        if attr
-          samples.all?(&:can_edit?)
-        else
-          true
-        end
+        return false unless attr
+        return samples.all?(&:can_edit?) if samples?
+
+        true
       end
 
       # whether the type for the attribute can be changed
