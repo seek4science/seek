@@ -97,7 +97,8 @@ class SampleAttribute < ApplicationRecord
 
   def validate_against_editing_constraints
     c = sample_type.editing_constraints
-    error_message = "cannot be changed (#{title_was})" # Use pre-change title in error message.
+    attr_title = self.new_record? ? title : title_was
+    error_message = "cannot be changed (#{attr_title})" # Use pre-change title in error message.
 
     errors.add(:title, error_message) if title_changed? && !c.allow_name_change?(self)
 
