@@ -26,8 +26,8 @@ module FancyMultiselectHelper
       # get 'view' from :can_view?
       access = required_access.to_s.split('_').last.delete('?')
       association_class = options.delete(:association_class) || reflection.klass
-      options[:unscoped_possibilities] = authorised_assets(association_class, nil, access) if options[:other_projects_checkbox]
-      options[:possibilities] = authorised_assets(association_class, current_user.person.projects, access) unless options[:possibilities]
+      options[:unscoped_possibilities] ||= authorised_assets(association_class, nil, access) if options[:other_projects_checkbox]
+      options[:possibilities] ||= authorised_assets(association_class, current_user.person.projects, access)
       if options[:sort_by]
         attr = options[:sort_by]
         options[:possibilities] = options[:possibilities].sort_by(&attr)

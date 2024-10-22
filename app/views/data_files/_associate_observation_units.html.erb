@@ -1,1 +1,6 @@
-<%= f.fancy_multiselect(:observation_units, other_projects_checkbox: true) %>
+<%
+  possibilities = authorised_assets(ObservationUnit, current_person.projects, :edit)
+  unscoped_possibilities = authorised_assets(ObservationUnit, nil, :edit)
+%>
+
+<%= f.fancy_multiselect(:observation_units, other_projects_checkbox: true, possibilities: possibilities, unscoped_possibilities: unscoped_possibilities ) %>

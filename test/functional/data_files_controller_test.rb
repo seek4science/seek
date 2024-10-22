@@ -3676,6 +3676,52 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :unprocessable_entity
   end
 
+  test 'only editable observation units listed as options' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    df = FactoryBot.create(:data_file, contributor: person)
+    obs_unit1 = FactoryBot.create(:observation_unit, contributor: person, projects: person.projects)
+    obs_unit2 = FactoryBot.create(:observation_unit, policy: FactoryBot.create(:public_policy), projects: person.projects)
+    obs_unit3 = FactoryBot.create(:observation_unit, policy: FactoryBot.create(:publicly_viewable_policy), projects: person.projects)
+    obs_unit4 = FactoryBot.create(:observation_unit, policy: FactoryBot.create(:downloadable_public_policy), projects: person.projects)
+    obs_unit5 = FactoryBot.create(:observation_unit, policy: FactoryBot.create(:private_policy), projects: person.projects)
+
+    #different projects
+    obs_unit6 = FactoryBot.create(:observation_unit, policy: FactoryBot.create(:public_policy))
+    obs_unit7 = FactoryBot.create(:observation_unit, policy: FactoryBot.create(:publicly_viewable_policy))
+    obs_unit8 = FactoryBot.create(:observation_unit, policy: FactoryBot.create(:private_policy))
+
+    assert obs_unit1.can_edit?
+    assert obs_unit2.can_edit?
+    refute obs_unit3.can_edit?
+    refute obs_unit4.can_edit?
+    assert obs_unit4.can_download?
+    refute obs_unit5.can_edit?
+    assert obs_unit6.can_edit?
+    refute obs_unit7.can_edit?
+    refute obs_unit8.can_edit?
+
+    get :edit, params: { id: df.id }
+    assert_response :success
+
+    assert_select '#possible_data_file_observation_unit_ids' do
+      assert_select 'option[value=?]', obs_unit1.id
+      assert_select 'option[value=?]', obs_unit2.id
+      assert_select 'option[value=?]', obs_unit3.id, count: 0
+      assert_select 'option[value=?]', obs_unit4.id, count: 0
+      assert_select 'option[value=?]', obs_unit5.id, count: 0
+      assert_select 'option[value=?]', obs_unit6.id, count: 0
+      assert_select 'option[value=?]', obs_unit7.id, count: 0
+      assert_select 'option[value=?]', obs_unit8.id, count: 0
+    end
+
+    assert_select 'select[data-associations-list-id="data_file_observation_unit_ids"]' do
+      assert_select 'option[value=?]', obs_unit6.id
+      assert_select 'option[value=?]', obs_unit7.id, count: 0
+      assert_select 'option[value=?]', obs_unit8.id, count: 0
+    end
+  end
+
   test 'update with link to editable observation unit' do
     person = FactoryBot.create(:person)
     login_as(person)
