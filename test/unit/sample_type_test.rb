@@ -901,10 +901,18 @@ class SampleTypeTest < ActiveSupport::TestCase
 
     assert sample_type.valid?
 
-    # Adding attribute
-    sample_type.sample_attributes.build(title: 'test 123')
+    # Adding optional attribute
+    sample_type.sample_attributes.build(title: 'optional test 123', sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), required: false, is_title: false, linked_sample_type: nil)
+    assert sample_type.valid?
+    assert sample_type.errors.none?
+
+    sample_type.reload
+    assert sample_type.valid?
+
+    # Adding mandatory attribute
+    sample_type.sample_attributes.build(title: 'mandatory test 123', sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), required: true, is_title: false, linked_sample_type: nil)
     refute sample_type.valid?
-    assert sample_type.errors.added?(:sample_attributes, 'cannot be added, new attributes are not allowed (test 123)')
+    assert sample_type.errors.added?(:'sample_attributes.required', 'cannot be changed (mandatory test 123)')
 
     sample_type.reload
     assert sample_type.valid?
