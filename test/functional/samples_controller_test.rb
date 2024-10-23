@@ -7,6 +7,15 @@ class SamplesControllerTest < ActionController::TestCase
   include HtmlHelper
   include GeneralAuthorizationTestCases
 
+  def setup
+    @source_characteristic_isa_tag = FactoryBot.create(:source_characteristic_isa_tag)
+    @sample_characteristic_isa_tag = FactoryBot.create(:sample_characteristic_isa_tag)
+    @other_material_characteristic_isa_tag = FactoryBot.create(:other_material_characteristic_isa_tag)
+    Seek::Samples::BaseType::ALL_TYPES.each do |type|
+      FactoryBot.create(:string_sample_attribute_type, title: "#{type} attibute type", base_type: type)
+    end
+  end
+
   test 'should return 406 when requesting RDF' do
     login_as(FactoryBot.create(:user))
     sample = FactoryBot.create :sample, contributor: User.current_user.person
@@ -1264,25 +1273,10 @@ class SamplesControllerTest < ActionController::TestCase
 
   end
 
-  test 'should return max query result' do
+  test 'query samples by template attributes for \'seek sample\' type' do
     with_config_value(:isa_json_compliance_enabled, true) do
-      person = FactoryBot.create(:person)
-      project = FactoryBot.create(:project)
-
+      person, project, template1, template2, template3, type1, type2, type3 = template_query_setup.values_at(:person, :project, :begin_template, :middle_template, :end_template, :begin_type, :middle_type, :end_type)
       login_as(person)
-
-      template1 = FactoryBot.create(:isa_source_template)
-      template2 = FactoryBot.create(:isa_sample_collection_template)
-      template3 = FactoryBot.create(:isa_assay_material_template)
-
-      type1 = FactoryBot.create(:simple_sample_type, contributor: person, project_ids: [project.id], title: 'Source sample type', template_id: template1.id)
-      type1.create_sample_attributes_from_isa_template(template1)
-
-      type2 = FactoryBot.create(:simple_sample_type, contributor: person, project_ids: [project.id], title: 'Sample collection sample type', template_id: template2.id)
-      type2.create_sample_attributes_from_isa_template(template2, type1)
-
-      type3 = FactoryBot.create(:simple_sample_type, contributor: person, project_ids: [project.id], title: 'Assay material sample type', template_id: template3.id)
-      type3.create_sample_attributes_from_isa_template(template3, type2)
 
       sample1 = FactoryBot.create :sample, title: 'sample1', sample_type: type1, project_ids: [project.id], contributor: person,
                                  data: { 'Source Name': 'Source Name', 'Source Characteristic 1': 'Source Characteristic 1', 'Source Characteristic 2': "Cox's Orange Pippin" }
@@ -1550,6 +1544,47 @@ class SamplesControllerTest < ActionController::TestCase
     sample.set_attribute_value(:age, 22)
     sample.save!
     sample
+  end
+
+  # Setup for querying by template attribute values with optional test attribute type validation.
+  # If a test attribute type is provided, it will create it will add to each template and sample type a new attribute
+  # with the provided sample attribute type.
+  #
+  # @param [String, nil] test_attribute_type The type of the test attribute to validate against. If nil, no validation is performed.
+  # @raise [RuntimeError] If the provided test attribute type is invalid but not nil.
+  # @return [Hash] A hash containing the created templates and sample types.
+  def template_query_setup(test_attribute_type = nil)
+    unless Seek::Samples::BaseType::ALL_TYPES.include?(test_attribute_type) || test_attribute_type.nil?
+      raise "Invalid test attribute type: #{test_attribute_type}"
+    end
+
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+
+    begin_template = FactoryBot.create(:isa_source_template)
+    if test_attribute_type
+      begin_template.template_attributes << FactoryBot.create(:template_attribute, title: "#{test_attribute_type} attribute 1", sample_attribute_type: SampleAttributeType.find_by(base_type: test_attribute_type), isa_tag: @source_characteristic_isa_tag)
+    end
+    middle_template = FactoryBot.create(:isa_sample_collection_template)
+    if test_attribute_type
+      middle_template.template_attributes << FactoryBot.create(:template_attribute, title: "#{test_attribute_type} attribute 2", sample_attribute_type: SampleAttributeType.find_by(base_type: test_attribute_type), isa_tag: @sample_characteristic_isa_tag)
+    end
+    end_template = FactoryBot.create(:isa_assay_material_template)
+    if test_attribute_type
+      end_template.template_attributes << FactoryBot.create(:template_attribute, title: "#{test_attribute_type} attribute 3", sample_attribute_type: SampleAttributeType.find_by(base_type: test_attribute_type), isa_tag: @other_material_characteristic_isa_tag)
+    end
+
+    begin_type = FactoryBot.create(:simple_sample_type, contributor: person, project_ids: [project.id], title: 'Source sample type', template_id: begin_template.id)
+    begin_type.create_sample_attributes_from_isa_template(begin_template)
+
+    middle_type = FactoryBot.create(:simple_sample_type, contributor: person, project_ids: [project.id], title: 'Sample collection sample type', template_id: middle_template.id)
+    middle_type.create_sample_attributes_from_isa_template(middle_template, begin_type)
+
+    end_type = FactoryBot.create(:simple_sample_type, contributor: person, project_ids: [project.id], title: 'Assay material sample type', template_id: end_template.id)
+    end_type.create_sample_attributes_from_isa_template(end_template, middle_type)
+
+
+    { person:, project:, begin_template:, middle_template:, end_template:, begin_type:, middle_type:, end_type: }
   end
 
 end
