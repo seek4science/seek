@@ -243,7 +243,7 @@ class SamplesControllerTest < ActionController::TestCase
     assert_nil flash[:error]
   end
 
-  test "warn on first edit if extracted from a data file" do
+  test 'warn on first edit if extracted from a data file' do
     person = FactoryBot.create(:person)
     sample = FactoryBot.create(:sample_from_file, contributor: person)
     login_as(person)
@@ -253,14 +253,14 @@ class SamplesControllerTest < ActionController::TestCase
     assert_not_nil flash[:error]
   end
 
-  test "source data datafile taged as invalid after edit" do
+  test 'source data datafile taged as invalid after edit' do
     person = FactoryBot.create(:person)
     sample = FactoryBot.create(:sample_from_file, contributor: person)
     login_as(person)
 
-    put :update, params: { id: sample.id, sample: { data: { "name": "Modified Sample" } } }
+    put :update, params: { id: sample.id, sample: { data: { "name": 'Modified Sample' } } }
     sample.reload
-    assert_equal "Modified Sample", sample.title
+    assert_equal 'Modified Sample', sample.title
     assert sample.edit_count.positive?
 
     get :show, params: { id: sample.id }
@@ -268,14 +268,14 @@ class SamplesControllerTest < ActionController::TestCase
     assert_select 'span.label-danger', text: /No longer valid/, count: 1
   end
 
-  test "no longer warn if sample extracted from a data file has already been edited" do
+  test 'no longer warn if sample extracted from a data file has already been edited' do
     person = FactoryBot.create(:person)
     sample = FactoryBot.create(:sample_from_file, contributor: person)
     login_as(person)
 
-    put :update, params: { id: sample.id, sample: { data: { "name": "Modified Sample" } } }
+    put :update, params: { id: sample.id, sample: { data: { "name": 'Modified Sample' } } }
     sample.reload
-    assert_equal "Modified Sample", sample.title
+    assert_equal 'Modified Sample', sample.title
     assert sample.edit_count.positive?
 
     get :edit, params: { id: sample.id }
@@ -779,8 +779,8 @@ class SamplesControllerTest < ActionController::TestCase
 
     assert_response :success
 
-    assert_select 'div.related-items #resources-shown-count a[href=?]', sample_samples_path(sample), text: "2 Samples"
-    assert_select 'div.related-items #advanced-search-link a[href=?]', sample_samples_path(sample), text: "Advanced Samples list for this Sample with search and filtering"
+    assert_select 'div.related-items #resources-shown-count a[href=?]', sample_samples_path(sample), text: '2 Samples'
+    assert_select 'div.related-items #advanced-search-link a[href=?]', sample_samples_path(sample), text: 'Advanced Samples list for this Sample with search and filtering'
   end
 
   test 'related samples index page works correctly' do
@@ -996,7 +996,7 @@ class SamplesControllerTest < ActionController::TestCase
     sample =  {sample_type_id: type.id,
                data: { 'full name': 'Fred Smith', age: '22', weight: '22.1', postcode: 'M13 9PL' },
                project_ids: [person.projects.first.id],
-               discussion_links_attributes:[{url: "http://www.slack.com/"}]}
+               discussion_links_attributes:[{url: 'http://www.slack.com/'}]}
     assert_difference('AssetLink.discussion.count') do
       assert_difference('Sample.count') do
           post :create, params: {sample: sample,  policy_attributes: { access_type: Policy::VISIBLE }}
@@ -1023,7 +1023,7 @@ class SamplesControllerTest < ActionController::TestCase
     assert_nil sample.discussion_links.first
     assert_difference('AssetLink.discussion.count') do
       assert_difference('ActivityLog.count') do
-        put :update, params: { id: sample.id, sample: { discussion_links_attributes:[{url: "http://www.slack.com/"}] } }
+        put :update, params: { id: sample.id, sample: { discussion_links_attributes:[{url: 'http://www.slack.com/'}] } }
       end
     end
     assert_redirected_to sample_path(assigns(:sample))
@@ -1038,15 +1038,15 @@ class SamplesControllerTest < ActionController::TestCase
     assert_difference('Sample.count', 2) do
       assert_difference('AssayAsset.count', 1) do
           post :batch_create, params: { data: [
-            { ex_id: "1", data: { type: "samples",
+            { ex_id: '1', data: { type: 'samples',
                                   attributes: { attribute_map: { "full name": 'Fred Smith', "age": '22', "weight": '22.1', "postcode": 'M13 9PL' } },
                                   relationships: { assays: { data: [{ id: assay.id, type: 'assays' }] },
-                                                    projects: { data: [{ id: person.projects.first.id, type: "projects" }] },
-                                                    sample_type: { data: { id: type.id, type: "sample_types" } } } } },
-            { ex_id: "2", data: { type: "samples",
+                                                    projects: { data: [{ id: person.projects.first.id, type: 'projects' }] },
+                                                    sample_type: { data: { id: type.id, type: 'sample_types' } } } } },
+            { ex_id: '2', data: { type: 'samples',
                                   attributes: { attribute_map: { "full name": 'David Tailor', "age": '33', "weight": '33.1', "postcode": 'M12 8PL' } },
-                                  relationships: { projects: { data: [{ id: person.projects.first.id, type: "projects" }] },
-                                                    sample_type: { data: { id: type.id, type: "sample_types" } } } } }] }
+                                  relationships: { projects: { data: [{ id: person.projects.first.id, type: 'projects' }] },
+                                                    sample_type: { data: { id: type.id, type: 'sample_types' } } } } }] }
       end
     end
 
@@ -1079,17 +1079,17 @@ class SamplesControllerTest < ActionController::TestCase
     type = FactoryBot.create(:patient_sample_type)
     assert_difference('Sample.count', 0) do
         post :batch_create, params: {data:[
-        {ex_id: "1",data:{type: "samples", attributes:{attribute_map:{"full name": 'Fred Smith', "age": '22', "weight": '22.1' ,"postcode": 'M13 9PL'}},
-        tags: nil,relationships:{projects:{data:[{id: person.projects.first.id, type: "projects"}]},
-        sample_type:{ data:{id: type.id, type: "sample_types"}}}}},
-        {ex_id: "2", data:{type: "samples",attributes:{attribute_map:{"wrong attribute": 'David Tailor', "age": '33', "weight": '33.1' ,"postcode": 'M12 8PL'}},
-        tags: nil,relationships:{projects:{data:[{id: person.projects.first.id, type: "projects"}]},
-        sample_type:{data:{id: type.id, type: "sample_types"}}}}}]}
+        {ex_id: '1',data:{type: 'samples', attributes:{attribute_map:{"full name": 'Fred Smith', "age": '22', "weight": '22.1' ,"postcode": 'M13 9PL'}},
+        tags: nil,relationships:{projects:{data:[{id: person.projects.first.id, type: 'projects'}]},
+        sample_type:{ data:{id: type.id, type: 'sample_types'}}}}},
+        {ex_id: '2', data:{type: 'samples',attributes:{attribute_map:{"wrong attribute": 'David Tailor', "age": '33', "weight": '33.1' ,"postcode": 'M12 8PL'}},
+        tags: nil,relationships:{projects:{data:[{id: person.projects.first.id, type: 'projects'}]},
+        sample_type:{data:{id: type.id, type: 'sample_types'}}}}}]}
     end
 
     json_response = JSON.parse(response.body)
-    assert_equal 1, json_response["errors"].length
-    assert_equal "2", json_response["errors"][0]["ex_id"].to_s
+    assert_equal 1, json_response['errors'].length
+    assert_equal '2', json_response['errors'][0]['ex_id'].to_s
   end
 
 
@@ -1104,8 +1104,8 @@ class SamplesControllerTest < ActionController::TestCase
 
     assert_no_difference('Sample.count') do
       put :batch_update, params: {data:[
-        {id: sample1.id, data:{type: "samples", attributes:{ attribute_map:{ "full name": 'Alfred Marcus', "age": '22', "weight": '22.1' }, creator_ids: [creator.id]}}},
-        {id: sample2.id, data:{type: "samples", attributes:{ attribute_map:{ "full name": 'David Tailor', "age": '33', "weight": '33.1' }, creator_ids: [creator.id]}}}]}
+        {id: sample1.id, data:{type: 'samples', attributes:{ attribute_map:{ "full name": 'Alfred Marcus', "age": '22', "weight": '22.1' }, creator_ids: [creator.id]}}},
+        {id: sample2.id, data:{type: 'samples', attributes:{ attribute_map:{ "full name": 'David Tailor', "age": '33', "weight": '33.1' }, creator_ids: [creator.id]}}}]}
       assert_equal [creator], sample1.creators
     end
 
