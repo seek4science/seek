@@ -262,9 +262,7 @@ class SamplesController < ApplicationController
 
   def query_form
     @result = []
-    respond_to do |format|
-      format.html
-    end
+    respond_to(&:html)
   end
 
   private
@@ -364,6 +362,9 @@ def match_attribute_value(selected_sample, x_attribute, attribute_filter_value)
     attr_value = selected_sample.get_attribute_value(x_attribute_title)
     result = attr_value&.any? { |v| v&.to_s&.downcase&.include?(attribute_filter_value) }
   else
+    if x_attribute&.sample_attribute_type&.base_type == Seek::Samples::BaseType::FLOAT
+      attribute_filter_value = attribute_filter_value.gsub(',', '.')
+    end
     result = selected_sample.get_attribute_value(x_attribute_title)&.to_s&.downcase&.include?(attribute_filter_value)
   end
   result
