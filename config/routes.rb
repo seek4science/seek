@@ -524,6 +524,7 @@ SEEK::Application.routes.draw do
       post :execute
       get :simulate
       post :simulate
+      get :copasi_simulate
     end
     resources :model_images, only: [:show]
     resources :people, :programmes, :projects, :investigations, :assays, :studies, :publications, :events, :collections, :organisms, :human_diseases, only: [:index]

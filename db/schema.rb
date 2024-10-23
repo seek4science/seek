@@ -351,6 +351,7 @@ ActiveRecord::Schema.define(version: 2024_10_15_093333) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean "deleted", default: false
+    t.boolean "make_local_copy", default: false
     t.index ["asset_id", "asset_type"], name: "index_content_blobs_on_asset_id_and_asset_type"
   end
 
@@ -1827,18 +1828,6 @@ ActiveRecord::Schema.define(version: 2024_10_15_093333) do
     t.datetime "updated_at", precision: 6, null: false
     t.index ["user_id", "asset_id", "can_view"], name: "index_sample_type_user_id_asset_id_can_view"
     t.index ["user_id", "can_view"], name: "index_sample_type_auth_lookup_on_user_id_and_can_view"
-  end
-
-  create_table "sample_type_auth_lookups", force: :cascade do |t|
-    t.integer "user_id"
-    t.integer "asset_id"
-    t.boolean "can_view", default: false
-    t.boolean "can_manage", default: false
-    t.boolean "can_edit", default: false
-    t.boolean "can_download", default: false
-    t.boolean "can_delete", default: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "sample_types", id: :integer, force: :cascade do |t|
