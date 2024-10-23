@@ -1712,28 +1712,37 @@ class SamplesControllerTest < ActionController::TestCase
   # If a test attribute type is provided, it will create it will add to each template and sample type a new attribute
   # with the provided sample attribute type.
   #
-  # @param [String, nil] test_attribute_type The type of the test attribute to validate against. If nil, no validation is performed.
+  # @param [String, nil] test_attribute_types The type of the test attribute to validate against. If nil, no validation is performed.
   # @raise [RuntimeError] If the provided test attribute type is invalid but not nil.
   # @return [Hash] A hash containing the created templates and sample types.
-  def template_query_setup(test_attribute_type = nil)
-    unless Seek::Samples::BaseType::ALL_TYPES.include?(test_attribute_type) || test_attribute_type.nil?
-      raise "Invalid test attribute type: #{test_attribute_type}"
+  def template_query_setup(test_attribute_types = [])
+    test_attribute_types = [test_attribute_types] unless test_attribute_types.is_a?(Array)
+    unless test_attribute_types.all? { |tat| Seek::Samples::BaseType::ALL_TYPES.include? (tat) } || test_attribute_types.blank?
+      raise "Invalid test attribute type: #{test_attribute_types}"
     end
 
     person = FactoryBot.create(:person)
     project = person.projects.first
 
     begin_template = FactoryBot.create(:isa_source_template)
-    if test_attribute_type
-      begin_template.template_attributes << FactoryBot.create(:template_attribute, title: "#{test_attribute_type} attribute 1", sample_attribute_type: SampleAttributeType.find_by(base_type: test_attribute_type), isa_tag: @source_characteristic_isa_tag)
+    unless test_attribute_types.blank?
+      test_attribute_types.each do |tat|
+        begin_template.template_attributes << FactoryBot.create(:template_attribute, title: "#{tat} attribute 1", sample_attribute_type: SampleAttributeType.find_by(base_type: tat), isa_tag: @source_characteristic_isa_tag)
+      end
     end
+
     middle_template = FactoryBot.create(:isa_sample_collection_template)
-    if test_attribute_type
-      middle_template.template_attributes << FactoryBot.create(:template_attribute, title: "#{test_attribute_type} attribute 2", sample_attribute_type: SampleAttributeType.find_by(base_type: test_attribute_type), isa_tag: @sample_characteristic_isa_tag)
+    unless test_attribute_types.blank?
+      test_attribute_types.each do |tat|
+        middle_template.template_attributes << FactoryBot.create(:template_attribute, title: "#{tat} attribute 2", sample_attribute_type: SampleAttributeType.find_by(base_type: tat), isa_tag: @sample_characteristic_isa_tag)
+      end
     end
+
     end_template = FactoryBot.create(:isa_assay_material_template)
-    if test_attribute_type
-      end_template.template_attributes << FactoryBot.create(:template_attribute, title: "#{test_attribute_type} attribute 3", sample_attribute_type: SampleAttributeType.find_by(base_type: test_attribute_type), isa_tag: @other_material_characteristic_isa_tag)
+    unless test_attribute_types.blank?
+      test_attribute_types.each do |tat|
+        end_template.template_attributes << FactoryBot.create(:template_attribute, title: "#{tat} attribute 3", sample_attribute_type: SampleAttributeType.find_by(base_type: tat), isa_tag: @other_material_characteristic_isa_tag)
+      end
     end
 
     begin_type = FactoryBot.create(:simple_sample_type, contributor: person, project_ids: [project.id], title: 'Source sample type', template_id: begin_template.id)
@@ -1748,5 +1757,4 @@ class SamplesControllerTest < ActionController::TestCase
 
     { person:, project:, begin_template:, middle_template:, end_template:, begin_type:, middle_type:, end_type: }
   end
-
 end
