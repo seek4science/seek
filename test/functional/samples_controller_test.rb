@@ -1399,6 +1399,168 @@ class SamplesControllerTest < ActionController::TestCase
     end
   end
 
+  test 'query samples by template attributes for \'boolean\' type' do
+    with_config_value(:isa_json_compliance_enabled, true) do
+      person, project, template1, template2, template3, type1, type2, type3 = template_query_setup(Seek::Samples::BaseType::BOOLEAN).values_at(:person, :project, :begin_template, :middle_template, :end_template, :begin_type, :middle_type, :end_type)
+
+      login_as(person)
+
+      sources, samples, extracts = [], [], []
+
+      (1...11).each do |i|
+        source = FactoryBot.create :sample, title: "Source #{i}", project_ids: [project.id], contributor: person, sample_type: type1,
+                                    data: { 'Source Name': "Source #{i}", 'Source Characteristic 1': 'Source Characteristic 1', 'Source Characteristic 2': "Cox's Orange Pippin", 'Boolean attribute 1': i%2 == 0 ? true : false }
+        sample = FactoryBot.create :sample, title: "Sample #{i}", project_ids: [project.id], contributor: person, sample_type: type2,
+                                    data: { Input: [source.id], 'sample collection': 'sample 1', 'sample collection parameter value 1': 'sample collection parameter value 1', 'Sample Name': "Sample #{i}", 'sample characteristic 1': 'sample characteristic 1', 'Boolean attribute 2': i%3 == 0 ? true : false }
+        extract = FactoryBot.create :sample, title: "Extract #{i}", project_ids: [project.id], contributor: person, sample_type: type3,
+                          data: { Input: [sample.id], 'Protocol Assay 1': 'Protocol Assay 1', 'Assay 1 parameter value 1': 'Assay 1 parameter value 1', 'Extract Name': "Extract #{i}", 'other material characteristic 1': 'other material characteristic 1', 'Boolean attribute 3': i%5 == 0 ? true : false }
+
+        sources.append source
+        samples.append sample
+        extracts.append extract
+      end
+      ##################################################
+      # test query for samples of current template
+      ##################################################
+      # test query for boolean attribute 1
+      # Should return nothing with true value
+      # Filter value just random text, no boolean
+      post :query, xhr: true, params: {
+        project_ids: [project.id],
+        template_id: template1.id,
+        template_attribute_id: template1.template_attributes.detect { |ta| ta&.sample_attribute_type&.base_type == Seek::Samples::BaseType::BOOLEAN }&.id,
+        template_attribute_value: 'Myrndon%^&*strnG'
+      }
+
+      assert_response :success
+      assert result = assigns(:result)
+      assert_equal result.length, 0
+
+      # test query for boolean attribute 1
+      # Should return 5 sources with true value
+      # Filter value all downcase
+      post :query, xhr: true, params: {
+        project_ids: [project.id],
+        template_id: template1.id,
+        template_attribute_id: template1.template_attributes.detect { |ta| ta&.sample_attribute_type&.base_type == Seek::Samples::BaseType::BOOLEAN }&.id,
+        template_attribute_value: 'true'
+      }
+
+      assert_response :success
+      assert result = assigns(:result)
+      assert_equal result.length, 5
+
+      # test query for boolean attribute 1
+      # Should return 3 samples with true value
+      # Filter value mixed up- and downcase
+      post :query, xhr: true, params: {
+        project_ids: [project.id],
+        template_id: template2.id,
+        template_attribute_id: template2.template_attributes.detect { |ta| ta&.sample_attribute_type&.base_type == Seek::Samples::BaseType::BOOLEAN }&.id,
+        template_attribute_value: 'TrUe'
+      }
+
+      assert_response :success
+      assert result = assigns(:result)
+      assert_equal result.length, 3
+
+      # test query for boolean attribute 1
+      # Should return 2 extracts with true value
+      # Filter value all upcase
+      post :query, xhr: true, params: {
+        project_ids: [project.id],
+        template_id: template3.id,
+        template_attribute_id: template3.template_attributes.detect { |ta| ta&.sample_attribute_type&.base_type == Seek::Samples::BaseType::BOOLEAN }&.id,
+        template_attribute_value: 'TRUE'
+      }
+
+      assert_response :success
+      assert result = assigns(:result)
+      assert_equal result.length, 2
+
+      ##################################################
+      # test query for (grand)children of current template
+      ##################################################
+      # test query for boolean attribute 1 and boolean attribute 3 as output
+      # Should return 5 sources with true value
+      # And filter down to 1 extract with true value
+      # Filter value all downcase
+      post :query, xhr: true, params: {
+        project_ids: [project.id],
+        template_id: template1.id,
+        template_attribute_id: template1.template_attributes.detect { |ta| ta&.sample_attribute_type&.base_type == Seek::Samples::BaseType::BOOLEAN }&.id,
+        template_attribute_value: 'true',
+        output_template_id: template3.id,
+        output_attribute_id: template3.template_attributes.detect { |ta| ta&.sample_attribute_type&.base_type == Seek::Samples::BaseType::BOOLEAN }&.id,
+        output_attribute_value: 'trUe'
+      }
+
+      assert_response :success
+      assert result = assigns(:result)
+      assert_equal result.length, 1
+      assert_equal result, [sources[9]]
+
+      # test query for boolean attribute 1 and boolean attribute 2 as output
+      # Should return 5 sources with true value
+      # And filter down to 1 extract with true value
+      # Filter value all downcase
+      post :query, xhr: true, params: {
+        project_ids: [project.id],
+        template_id: template1.id,
+        template_attribute_id: template1.template_attributes.detect { |ta| ta&.sample_attribute_type&.base_type == Seek::Samples::BaseType::BOOLEAN }&.id,
+        template_attribute_value: 'true',
+        output_template_id: template2.id,
+        output_attribute_id: template2.template_attributes.detect { |ta| ta&.sample_attribute_type&.base_type == Seek::Samples::BaseType::BOOLEAN }&.id,
+        output_attribute_value: 'trUe'
+      }
+
+      assert_response :success
+      assert result = assigns(:result)
+      assert_equal result.length, 1
+      assert_equal result, [sources[5]]
+
+      ##################################################
+      # test query for (grand)parents of current template
+      ##################################################
+      # test query for boolean attribute 2 and boolean attribute 1 as input
+      # Should return 1 sample with true value
+      # Filter value all downcase
+      post :query, xhr: true, params: {
+        project_ids: [project.id],
+        template_id: template2.id,
+        template_attribute_id: template2.template_attributes.detect { |ta| ta&.sample_attribute_type&.base_type == Seek::Samples::BaseType::BOOLEAN }&.id,
+        template_attribute_value: "tRue",
+        input_template_id: template1.id,
+        input_attribute_id: template1.template_attributes.detect { |ta| ta&.sample_attribute_type&.base_type == Seek::Samples::BaseType::BOOLEAN }&.id,
+        input_attribute_value: "TruE"
+      }
+
+      assert_response :success
+      result = assigns(:result)
+      assert_equal result.length, 1
+      assert_equal result, [samples[5]]
+
+      # test query for boolean attribute 3 and boolean attribute 1 as input
+      # Should return 1 sample with true value
+      # Filter value all downcase
+      post :query, xhr: true, params: {
+        project_ids: [project.id],
+        template_id: template3.id,
+        template_attribute_id: template3.template_attributes.detect { |ta| ta&.sample_attribute_type&.base_type == Seek::Samples::BaseType::BOOLEAN }&.id,
+        template_attribute_value: "tRue",
+        input_template_id: template1.id,
+        input_attribute_id: template1.template_attributes.detect { |ta| ta&.sample_attribute_type&.base_type == Seek::Samples::BaseType::BOOLEAN }&.id,
+        input_attribute_value: "TruE"
+      }
+
+      assert_response :success
+      result = assigns(:result)
+      assert_equal result.length, 1
+      assert_equal result, [extracts[9]]
+
+    end
+  end
+
   test 'form hides private linked multi samples' do
     person = FactoryBot.create(:person)
     login_as(person)
