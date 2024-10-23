@@ -220,7 +220,7 @@ class SamplesController < ApplicationController
 
   def query
     project_ids = params[:project_ids]&.map(&:to_i)
-    attribute_filter_value = params[:template_attribute_value]&.downcase
+    attribute_filter_value = params[:template_attribute_value]
     @result = params[:template_id].present? ?
       Template.find(params[:template_id]).sample_types.map(&:samples).flatten : []
 
@@ -228,18 +228,7 @@ class SamplesController < ApplicationController
       template_attribute = TemplateAttribute.find(params[:template_attribute_id])
       @result = @result.select do |s|
         sample_attribute = s.sample_type.sample_attributes.detect { |sa| template_attribute.sample_attributes.include? sa }
-        sample_attribute_title = sample_attribute&.title
-        if sample_attribute&.sample_attribute_type&.seek_sample_multi?
-          attr_value = s.get_attribute_value(sample_attribute_title)
-          attr_value&.any? { |v| v[:title].downcase.include?(attribute_filter_value) }
-        elsif sample_attribute&.sample_attribute_type&.seek_sample?
-          s.get_attribute_value(sample_attribute_title)[:title]&.downcase&.include?(attribute_filter_value)
-        elsif sample_attribute&.sample_attribute_type&.seek_cv_list?
-          attr_value = s.get_attribute_value(sample_attribute_title)
-          attr_value&.any? { |v| v.downcase.include?(attribute_filter_value) }
-        else
-          s.get_attribute_value(sample_attribute_title)&.downcase&.include?(attribute_filter_value)
-        end
+        match_attribute_value(s, sample_attribute, attribute_filter_value)
       end
     end
 
@@ -343,21 +332,14 @@ class SamplesController < ApplicationController
   # @param template_attribute_title [String] the title of the template attribute to filter by
   # @return [Array<Sample>] the filtered list of samples
   def filter_linked_samples(samples, link, options, template_attribute)
-    raise ArgumentError, "Invalid linking method provided. '#{link.to_s}' is not allowed!" unless %i[linked_samples linking_samples].include? link
+    unless %i[linked_samples linking_samples].include? link
+      raise ArgumentError, "Invalid linking method provided. '#{link}' is not allowed!"
+    end
 
-    template_attribute_title = template_attribute&.title
+    # template_attribute_title = template_attribute&.title
     samples.select do |s|
       s.send(link).any? do |x|
-        selected = x.sample_type.template_id == options[:template_id].to_i
-        if template_attribute.sample_attribute_type.seek_sample_multi?
-          selected = x.get_attribute_value(template_attribute_title)&.any? { |v| v[:title].downcase.include?(options[:attribute_value]) } if template_attribute.present? && selected
-        elsif  template_attribute.sample_attribute_type.seek_sample?
-          selected = x.get_attribute_value(template_attribute_title)&[:title].downcase&.include?(options[:attribute_value]) if template_attribute.present? && selected
-        elsif template_attribute.sample_attribute_type.seek_cv_list?
-          selected = x.get_attribute_value(template_attribute_title)&.any? { |v| v.downcase.include?(options[:attribute_value]) } if template_attribute.present? && selected
-        else
-          selected = x.get_attribute_value(template_attribute_title)&.downcase&.include?(options[:attribute_value]&.downcase) if template_attribute.present? && selected
-        end
+        selected = match_attribute_value(x, template_attribute, options[:attribute_value])
         selected || filter_linked_samples([x], link, options, template_attribute).present?
       end
     end
@@ -368,4 +350,21 @@ class SamplesController < ApplicationController
       redirect_to select_sample_types_path
     end
   end
+end
+
+def match_attribute_value(selected_sample, x_attribute, attribute_filter_value)
+  x_attribute_title = x_attribute&.title
+  attribute_filter_value = attribute_filter_value&.to_s&.downcase
+  if x_attribute&.sample_attribute_type&.seek_sample_multi?
+    attr_value = selected_sample.get_attribute_value(x_attribute_title)
+    result = attr_value&.any? { |v| v[:title]&.to_s&.downcase&.include?(attribute_filter_value) }
+  elsif x_attribute&.sample_attribute_type&.seek_sample?
+    result = selected_sample.get_attribute_value(x_attribute_title)[:title]&.to_s&.downcase&.include?(attribute_filter_value)
+  elsif x_attribute&.sample_attribute_type&.seek_cv_list?
+    attr_value = selected_sample.get_attribute_value(x_attribute_title)
+    result = attr_value&.any? { |v| v&.to_s&.downcase&.include?(attribute_filter_value) }
+  else
+    result = selected_sample.get_attribute_value(x_attribute_title)&.to_s&.downcase&.include?(attribute_filter_value)
+  end
+  result
 end
