@@ -49,19 +49,6 @@ module Seek
         end
       end
 
-      # whether the name of the attribute can be changed
-      def allow_name_change?(attr)
-        if attr.is_a?(SampleAttribute)
-          return true if attr.new_record?
-
-          attr = attr.accessor_name
-        end
-        return !samples? unless attr
-        return samples.all?(&:can_edit?) if samples?
-
-        true
-      end
-
       # whether the type for the attribute can be changed
       def allow_type_change?(attr)
         if attr.is_a?(SampleAttribute)

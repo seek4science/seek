@@ -20,44 +20,6 @@ class SampleTypeEditingConstraintsTest < ActiveSupport::TestCase
     refute c.samples?
   end
 
-  test 'allow title change?' do
-    person = FactoryBot.create(:person)
-
-    User.with_current_user(person.user) do
-      # Not OK if te user doesn't have editing permission over all samples
-      st1 = sample_type_with_samples
-      refute st1.samples.all?(&:can_edit?)
-      c = Seek::Samples::SampleTypeEditingConstraints.new(st1)
-      refute c.allow_name_change?(:address)
-      attr = c.sample_type.sample_attributes.detect { |t| t.accessor_name == 'address' }
-      refute_nil attr
-      refute c.allow_name_change?(attr)
-      # Not OK if attribute = nil and the sample type has samples
-      refute c.allow_name_change?(nil)
-
-      # OK if there are no samples
-      st2 = FactoryBot.create(:simple_sample_type)
-      c = Seek::Samples::SampleTypeEditingConstraints.new(st2)
-      assert c.allow_name_change?(:the_title)
-      attr = c.sample_type.sample_attributes.detect { |t| t.accessor_name == 'the_title' }
-      refute_nil attr
-      assert c.allow_name_change?(attr)
-      # OK if attribute = nil and the sample type has no samples
-      assert c.allow_name_change?(nil)
-
-      # OK if user has editing permission over all samples
-      st3 = sample_type_with_samples(person)
-      assert st3.samples.all?(&:can_edit?)
-      c = Seek::Samples::SampleTypeEditingConstraints.new(st3)
-      assert c.allow_name_change?(:address)
-      attr = c.sample_type.sample_attributes.detect { |t| t.accessor_name == 'address' }
-      refute_nil attr
-      assert c.allow_name_change?(attr)
-      # Not OK if attribute = nil and the sample type has samples
-      refute c.allow_name_change?(nil)
-    end
-  end
-
   test 'allow type change?' do
     c = Seek::Samples::SampleTypeEditingConstraints.new(sample_type_with_samples)
     refute c.allow_type_change?(:address)

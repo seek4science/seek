@@ -925,14 +925,6 @@ class SampleTypeTest < ActiveSupport::TestCase
     sample_type.reload
     assert sample_type.valid?
 
-    # Changing attribute title
-    sample_type.sample_attributes.last.title = 'banana'
-    refute sample_type.valid?
-    assert sample_type.errors.added?(:'sample_attributes.title', 'cannot be changed (patient)')
-
-    sample_type.reload
-    assert sample_type.valid?
-
     # Changing "required" attribute
     User.with_current_user(@person.user) do
       sample_type.samples.create!(data: { title: 'Lib-5', patient: nil }, sample_type: sample_type,

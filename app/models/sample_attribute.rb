@@ -100,8 +100,6 @@ class SampleAttribute < ApplicationRecord
     attr_title = self.new_record? ? title : title_was
     error_message = "cannot be changed (#{attr_title})" # Use pre-change title in error message.
 
-    errors.add(:title, error_message) if title_changed? && !c.allow_name_change?(self)
-
     unless c.allow_required?(self)
       errors.add(:is_title, error_message) if is_title_changed?
       errors.add(:required, error_message) if required_changed?
