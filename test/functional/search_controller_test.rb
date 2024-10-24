@@ -155,6 +155,50 @@ class SearchControllerTest < ActionController::TestCase
     assert_select 'a[href="#test-123"]', count: 0
   end
 
+
+  test 'hyphen and unicode hyphen are treated equally in search' do
+
+    # Create a document with a title that contains a regular hyphen (-)
+    FactoryBot.create(:public_document, title: "Thy\u20101")
+
+    # Simulate Solr returning results for the search query
+    Document.stub(:solr_cache, -> (q) { Document.pluck(:id).last(1) }) do
+      # Test the search with a regular hyphen
+      get :index, params: { q: 'Thy-1' }
+    end
+
+    assert_equal "1 item matched '<b>Thy-1</b>' within their title or content.", flash[:notice]
+
+    # Test the search with a regular hyphen
+    Document.stub(:solr_cache, -> (q) { Document.pluck(:id).last(1) }) do
+      get :index, params: { q: "Thy\u20101" } # Use the Unicode hyphen here
+    end
+
+    assert_equal "1 item matched '<b>Thy\u20101</b>' within their title or content.", flash[:notice]
+
+    # Create a document with a title that contains a regular hyphen (-)
+    FactoryBot.create(:public_document, title: "Thy-1")
+
+    # Simulate Solr returning results for the search query
+    Document.stub(:solr_cache, -> (q) { Document.pluck(:id).last(1) }) do
+      # Test the search with a regular hyphen
+      get :index, params: { q: 'Thy-1' }
+    end
+
+    assert_equal "1 item matched '<b>Thy-1</b>' within their title or content.", flash[:notice]
+
+    # Test the search with a regular hyphen
+    Document.stub(:solr_cache, -> (q) { Document.pluck(:id).last(1) }) do
+      get :index, params: { q: "Thy\u20101" } # Use the Unicode hyphen here
+    end
+
+    assert_equal "1 item matched '<b>Thy\u20101</b>' within their title or content.", flash[:notice]
+
+  end
+
+
+
+
   test 'link for more results' do
     FactoryBot.create_list(:public_document, 5)
     with_config_value(:search_results_limit, 2) do
@@ -178,6 +222,7 @@ class SearchControllerTest < ActionController::TestCase
     assert_select '#more-results', count: 0
 
   end
+
 
   test 'remember external search' do
     FactoryBot.create(:model, policy: FactoryBot.create(:public_policy))
