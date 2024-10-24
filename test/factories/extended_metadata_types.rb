@@ -502,7 +502,7 @@ FactoryBot.define do
     after(:build) do |a|
       a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'End date of Study', pid:'http://fairbydesign.nl/ontology/end_date_of_study')
       a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Start date of Study', pid:'http://fairbydesign.nl/ontology/start_date_of_study')
-      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Experimental test site', pid:'http://fairbydesign.nl/ontology/experimental_site_name')
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Experimental site name', pid:'http://fairbydesign.nl/ontology/experimental_site_name')
     end
   end
 

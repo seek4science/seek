@@ -52,10 +52,11 @@ class BatchSharingChangeTest < ActionController::TestCase
     assert !o_study.can_manage?
     assert !o_inv.can_manage?
 
-    # Items that can be changed should be 1 of each except events(+1), investigations(+2), studies(+1) and datafiles(+1)
-    related_items_count = Seek::Util.authorized_types.length + 5
+    # Items that can be changed should be 1 of each except events(+1), investigations(+3), studies(+2) and datafiles(+1)
+    related_items_count = Seek::Util.authorized_types.length + 7
 
     get :batch_sharing_permission_preview, params: { id: person.id }
+
     assert_response :success
     assert_select 'h1', text: /items related to/, count: 1 do
       assert_select 'a[href=?]', "/people/#{person.id}", text: /#{person.name}/, count: 1

@@ -205,13 +205,23 @@ class ProjectsController < ApplicationController
     path = params[:datastation_data].path
     policy = Policy.new
     policy.set_attributes_with_sharing(policy_params)
-    datadata_inv = Seek::FairDataStation::Reader.new.parse_graph(path)
-    @investigation = Seek::FairDataStation::Writer.new.construct_isa(datadata_inv.first, current_person, [@project], policy)
-    @investigation.save!
+    fair_data_station_inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+    @existing_investigation = Investigation.by_external_identifier(fair_data_station_inv.external_id,[@project])
 
-    respond_to do |format|
-      format.html { redirect_to(@investigation) }
+    if @existing_investigation
+      flash.now[:error] = "An #{t('investigation')} with that external identifier already exists for this #{t('project')}"
+      respond_to do |format|
+        format.html { render action: :import_from_fairdata_station, status: :unprocessable_entity }
+      end
+    else
+      @investigation = Seek::FairDataStation::Writer.new.construct_isa(fair_data_station_inv, current_person, [@project], policy)
+      @investigation.save!
+
+      respond_to do |format|
+        format.html { redirect_to(@investigation) }
+      end
     end
+
   end
 
   def request_create

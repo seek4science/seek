@@ -214,15 +214,26 @@ module AssetsHelper
     end
   end
 
-  def open_with_copasi_button (asset)
+  def open_with_copasi_js_button
 
-    files =   asset.content_blobs
-    download_path = polymorphic_path([files.first.asset, files.first], action: :download, code: params[:code])
+    tooltip_text = "Simulate model in the browser with javascript library"
+    button_link_to 'Simulate Online', 'copasi', '#', class: 'btn btn-primary btn-block', onclick: 'simulate()', disabled: @blob.nil?, 'data-tooltip' => tooltip(tooltip_text)
+
+  end
+
+  def open_with_copasi_ui_button
+
+    blob  =   @display_model.copasi_supported_content_blobs.first
+
+    auth_code = @model.special_auth_codes.where('code LIKE ?', 'copasi_%').first.code unless @model.can_download?(nil)
+
+    download_path = polymorphic_path([@model, blob], action: :download, code: auth_code)
+
     copasi_download_path =  "copasi://process?downloadUrl=http://"+request.host_with_port+download_path+"&activate=Time%20Course&createPlot=Concentrations%2C%20Volumes%2C%20and%20Global%20Quantity%20Values&runTask=Time-Course"
 
-    tooltip_text_copasi_button = "Simulate the publicly accessible model in your local installed Copasi. "
+    tooltip_text_copasi_button = "Simulate your model locally using desk application CopasiUI."
 
-    button= button_link_to('Simulate Model in Copasi', 'copasi', copasi_download_path, class: 'btn btn-default', disabled: asset.download_disabled?, 'data-tooltip' => tooltip(tooltip_text_copasi_button))
+    button= button_link_to('Simulate in CopasiUI', 'copasi', copasi_download_path, class: 'btn btn-primary btn-block', disabled: @blob.nil?, 'data-tooltip' => tooltip(tooltip_text_copasi_button))
 
     button
   end
