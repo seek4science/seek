@@ -21,16 +21,16 @@ module Seek
       # if attr is nil, indicates a new attribute. required is not allowed if there are already samples
       def allow_required?(attr)
         if attr.is_a?(SampleAttribute)
-          return true if attr.new_record?
+          return true if attr.new_record? && @sample_type.new_record?
           return false if inherited?(attr)
 
           attr = attr.accessor_name
         end
-        if attr
-          !blanks?(attr)
-        else
-          !samples?
-        end
+
+        return !samples? unless attr
+        return !blanks?(attr) if samples?
+
+        true
       end
 
       # an attribute could be removed if all are currently blank
@@ -49,24 +49,17 @@ module Seek
         end
       end
 
-      # whether a new attribtue can be created
-      def allow_new_attribute?
-        !samples?
-      end
-
       # whether the name of the attribute can be changed
       def allow_name_change?(attr)
         if attr.is_a?(SampleAttribute)
           return true if attr.new_record?
-          return false if inherited?(attr)
 
           attr = attr.accessor_name
         end
-        if attr
-          !samples?
-        else
-          true
-        end
+        return !samples? unless attr
+        return samples.all?(&:can_edit?) if samples?
+
+        true
       end
 
       # whether the type for the attribute can be changed

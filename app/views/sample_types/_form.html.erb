@@ -49,7 +49,7 @@
                                                                            display_isa_tag: false } %>
           <% end %>
 
-          <% unless @sample_type.uploaded_template? || !@sample_type.editing_constraints.allow_new_attribute? %>
+          <% unless @sample_type.uploaded_template? %>
               <tr id="add-attribute-row">
                 <td colspan="6">
                   <%= button_link_to('Add new attribute', 'add', '#', id: 'add-attribute') %>

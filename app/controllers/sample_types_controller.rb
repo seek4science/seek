@@ -12,7 +12,9 @@ class SampleTypesController < ApplicationController
   before_action :find_assets, only: [:index]
   before_action :auth_to_create, only: %i[new create]
   before_action :project_membership_required, only: %i[create new select filter_for_select]
+  before_action :old_attributes, only: %i[update]
 
+  after_action :update_sample_json_metadata, only: :update
 
   api_actions :index, :show, :create, :update, :destroy
 
@@ -200,5 +202,25 @@ class SampleTypesController < ApplicationController
       flash[:error] = "Cannot #{action_name} this sample type - There are #{count} samples using it."
       redirect_to @sample_type
     end
+  end
+
+  def old_attributes
+    return if @sample_type.sample_attributes.blank?
+
+    @old_sample_type_attributes = @sample_type.sample_attributes.map { |attr| { id: attr.id, title: attr.title } }
+  end
+
+  def update_sample_json_metadata
+    return if @sample_type.samples.blank? || @old_sample_type_attributes.blank?
+
+    attribute_changes = @sample_type.sample_attributes.map do |attr|
+      old_attr = @old_sample_type_attributes.detect { |oa| oa[:id] == attr.id }
+      next if old_attr.nil?
+
+      { id: attr.id, old_title: old_attr[:title], new_title: attr.title } unless old_attr[:title] == attr.title
+    end.compact
+    return if attribute_changes.blank?
+
+    UpdateSampleMetadataJob.perform_later(@sample_type, attribute_changes, @current_user)
   end
 end

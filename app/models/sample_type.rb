@@ -244,10 +244,6 @@ class SampleType < ApplicationRecord
       if a.marked_for_destruction? && !c.allow_attribute_removal?(a)
         errors.add(:sample_attributes, "cannot be removed, there are existing samples using this attribute (#{a.title})")
       end
-
-      if a.new_record? && !c.allow_new_attribute?
-        errors.add(:sample_attributes, "cannot be added, new attributes are not allowed (#{a.title})")
-      end
     end
   end
 
