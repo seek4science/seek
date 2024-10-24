@@ -388,12 +388,20 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     assert_equal 'seek-test-study-1', obs_unit.study.external_identifier
     assert_equal ['seek-test-sample-4'], obs_unit.samples.collect(&:external_identifier)
 
+    study = Study.where(external_identifier: 'seek-test-study-1').first
+    assert_equal ['seek-test-obs-unit-1','seek-test-obs-unit-3'], study.observation_units.collect(&:external_identifier).sort
+    study = Study.where(external_identifier: 'seek-test-study-2').first
+    assert_equal ['seek-test-obs-unit-2'], study.observation_units.collect(&:external_identifier).sort
+
     sample = Sample.where(external_identifier: 'seek-test-sample-3').first
     assert_equal 'seek-test-obs-unit-1', sample.observation_unit.external_identifier
     assert_equal %w[seek-test-assay-3 seek-test-assay-4], sample.assays.collect(&:external_identifier).sort
     sample = Sample.where(external_identifier: 'seek-test-sample-5').first
     assert_equal 'seek-test-obs-unit-2', sample.observation_unit.external_identifier
     assert_equal ['seek-test-assay-5'], sample.assays.collect(&:external_identifier)
+    sample = Sample.where(external_identifier: 'seek-test-sample-4').first
+    assert_equal 'seek-test-obs-unit-3', sample.observation_unit.external_identifier
+    assert_equal ['seek-test-assay-6'], sample.assays.collect(&:external_identifier)
 
     assay = Assay.where(external_identifier: 'seek-test-assay-4').first
     assert_equal 1, assay.samples.count

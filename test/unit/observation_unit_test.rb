@@ -77,11 +77,6 @@ class ObservationUnitTest < ActiveSupport::TestCase
     obs_unit = FactoryBot.build(:observation_unit)
     obs_unit.study = nil
     refute obs_unit.valid?
-
-    obs_unit = FactoryBot.build(:observation_unit)
-    obs_unit.projects = []
-    refute obs_unit.valid?
-
   end
 
   test 'assays, studies, investigations' do
@@ -122,6 +117,29 @@ class ObservationUnitTest < ActiveSupport::TestCase
     obs_unit = FactoryBot.create(:observation_unit, samples: [sample], study: assay.study, contributor: assay.contributor)
     assert_equal obs_unit.study, assay.study
     assert obs_unit.valid?
+  end
+
+  test 'must be member of study project' do
+    person = FactoryBot.create(:person)
+    other_person = FactoryBot.create(:person)
+    project = person.projects.first
+    inv = FactoryBot.create(:investigation, projects:[project])
+    study = FactoryBot.create(:study, investigation: inv, contributor: person, policy: FactoryBot.create(:public_policy))
+    obs_unit = FactoryBot.build(:observation_unit, study: study)
+    User.with_current_user(person.user) do
+      assert obs_unit.valid?
+      assert obs_unit.save
+    end
+
+    obs_unit = FactoryBot.build(:observation_unit, study: study)
+    User.with_current_user(other_person.user) do
+      refute obs_unit.valid?
+      refute obs_unit.save
+    end
+
+
+
+
   end
 
 end
