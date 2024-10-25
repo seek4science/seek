@@ -227,7 +227,9 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'edit' do
-    login_as(FactoryBot.create(:person))
+    person = FactoryBot.create(:person)
+    login_as(person)
+    FactoryBot.create(:observation_unit, contributor: person)
 
     get :edit, params: { id: populated_patient_sample.id }
 

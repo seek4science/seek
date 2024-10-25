@@ -1,0 +1,3 @@
+<%= folding_panel(t('observation_unit'), resource.observation_unit.present?) do %>
+  <%= observation_unit_selector('sample[observation_unit_id]', resource.observation_unit) %>
+<% end %>
