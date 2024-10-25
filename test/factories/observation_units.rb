@@ -5,7 +5,7 @@ FactoryBot.define do
     policy { FactoryBot.create(:public_policy) }
     association :contributor, factory: :person, strategy: :create
     after(:build) do |a|
-      a.study = FactoryBot.create(:study, contributor: a.contributor) if a.study.nil?
+      a.study ||= FactoryBot.create(:study, contributor: a.contributor)
     end
   end
 
