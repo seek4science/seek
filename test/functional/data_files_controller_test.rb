@@ -3681,16 +3681,27 @@ class DataFilesControllerTest < ActionController::TestCase
     person = FactoryBot.create(:person)
     login_as(person)
     df = FactoryBot.create(:data_file, contributor: person)
-    obs_unit1 = FactoryBot.create(:observation_unit, contributor: person, projects: person.projects)
-    obs_unit2 = FactoryBot.create(:observation_unit, policy: FactoryBot.create(:public_policy), projects: person.projects)
-    obs_unit3 = FactoryBot.create(:observation_unit, policy: FactoryBot.create(:publicly_viewable_policy), projects: person.projects)
-    obs_unit4 = FactoryBot.create(:observation_unit, policy: FactoryBot.create(:downloadable_public_policy), projects: person.projects)
-    obs_unit5 = FactoryBot.create(:observation_unit, policy: FactoryBot.create(:private_policy), projects: person.projects)
+    study = FactoryBot.create(:study, investigation: FactoryBot.create(:investigation, projects:person.projects))
+    obs_unit1 = FactoryBot.create(:observation_unit, contributor: person, study:study)
+    obs_unit2 = FactoryBot.create(:observation_unit, policy: FactoryBot.create(:public_policy), study:study)
+    obs_unit3 = FactoryBot.create(:observation_unit, policy: FactoryBot.create(:publicly_viewable_policy), study:study)
+    obs_unit4 = FactoryBot.create(:observation_unit, policy: FactoryBot.create(:downloadable_public_policy), study:study)
+    obs_unit5 = FactoryBot.create(:observation_unit, policy: FactoryBot.create(:private_policy), study:study)
+
+    assert_equal person.projects, obs_unit1.projects
+    assert_equal person.projects, obs_unit2.projects
+    assert_equal person.projects, obs_unit3.projects
+    assert_equal person.projects, obs_unit4.projects
+    assert_equal person.projects, obs_unit5.projects
 
     #different projects
     obs_unit6 = FactoryBot.create(:observation_unit, policy: FactoryBot.create(:public_policy))
     obs_unit7 = FactoryBot.create(:observation_unit, policy: FactoryBot.create(:publicly_viewable_policy))
     obs_unit8 = FactoryBot.create(:observation_unit, policy: FactoryBot.create(:private_policy))
+
+    refute_equal person.projects, obs_unit6.projects
+    refute_equal person.projects, obs_unit7.projects
+    refute_equal person.projects, obs_unit8.projects
 
     assert obs_unit1.can_edit?
     assert obs_unit2.can_edit?
