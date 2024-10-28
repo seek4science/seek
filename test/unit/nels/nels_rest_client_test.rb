@@ -43,8 +43,8 @@ class NelsRestClientTest < ActiveSupport::TestCase
       res = @rest_client.datasets(@project_id)
 
       assert_equal 2, res.count
-      refute res[0]['isLocked']
-      assert res[1]['isLocked']
+      refute res[0]['islocked']
+      assert res[1]['islocked']
       dataset = res.detect { |d| d['id'] == @dataset_id }
       assert_equal 'Illumina-sequencing-dataset', dataset['name']
       assert_equal 'Illumina_seq_data', dataset['type']
@@ -57,7 +57,7 @@ class NelsRestClientTest < ActiveSupport::TestCase
 
       assert_equal @dataset_id, res['id']
       assert_equal 2, res['subtypes'].count
-      refute res['isLocked']
+      refute res['islocked']
       subtype = res['subtypes'].detect { |s| s['type'] == @subtype }
       assert_equal 0, subtype['size']
     end
@@ -67,7 +67,7 @@ class NelsRestClientTest < ActiveSupport::TestCase
     VCR.use_cassette('nels/get_locked_dataset') do
       res = @rest_client.dataset(@project_id, @dataset_id)
       assert_equal @dataset_id, res['id']
-      assert res['isLocked']
+      assert res['islocked']
     end
   end
 
