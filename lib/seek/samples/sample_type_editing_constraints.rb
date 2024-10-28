@@ -49,6 +49,12 @@ module Seek
         end
       end
 
+      # This method was left in so it can be changed in the future
+      # Currently, it always returns true
+      # see https://github.com/seek4science/seek/pull/2032#discussion_r1813137258
+      def allow_new_attribute?
+        true
+      end
       # whether the type for the attribute can be changed
       def allow_type_change?(attr)
         if attr.is_a?(SampleAttribute)
