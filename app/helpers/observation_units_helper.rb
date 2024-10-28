@@ -4,9 +4,9 @@ module ObservationUnitsHelper
     opts[:data] ||= {}
     opts[:multiple] = false
     grouped_options = grouped_observation_unit_options
-    opts[:select_options] = grouped_options_for_select(grouped_options, selected)
+    opts[:select_options] = grouped_options_for_select(grouped_options, selected&.id)
 
-    objects_input(name, [selected&.id], opts)
+    objects_input(name, [], opts)
   end
 
   private
