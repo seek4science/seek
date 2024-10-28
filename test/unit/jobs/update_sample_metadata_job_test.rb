@@ -18,7 +18,7 @@ class UpdateSampleMetadataJobTest < ActiveSupport::TestCase
 
   test 'perform' do
     User.with_current_user(@person.user) do
-      UpdateSampleMetadataJob.new.perform(@sample_type, [], @person.user)
+      UpdateSampleMetadataJob.new.perform(@sample_type, @person.user, [])
     end
   end
 
@@ -28,7 +28,8 @@ class UpdateSampleMetadataJobTest < ActiveSupport::TestCase
       attribute_change_maps = [{id: @sample_type.sample_attributes.first.id, old_title: 'the_title', new_title: 'new title' }]
       assert_equal @sample_type.sample_attributes.first.title, 'new title'
       refute_equal @sample_type.sample_attributes.first.title, 'the_title'
-      UpdateSampleMetadataJob.new.perform(@sample_type, attribute_change_maps, @person.user)
+      UpdateSampleMetadataJob.perform_now(@sample_type, @person.user, attribute_change_maps)
+      @sample_type.reload
       @sample_type.samples.each do |sample|
         json_metadata = JSON.parse sample.json_metadata
         assert json_metadata.keys.include?('new title')

@@ -7,17 +7,17 @@ module Seek
 
     # Class to handle the updating of sample metadata after updating Sample type
     class SampleMetadataUpdater
-      def initialize(sample_type, attribute_changes, user)
-        @sample_type = sample_type
-        @attribute_change_maps = attribute_changes
+      def initialize(samples, user, attribute_changes)
+        @samples = samples
         @user = user
+        @attribute_change_maps = attribute_changes
       end
 
       def update_metadata
-        return if @attribute_change_maps.blank? || @sample_type.samples.blank? || @sample_type.nil? || @user.nil?
+        return if @attribute_change_maps.blank? || @samples.blank? || @user.nil?
 
         User.with_current_user(@user) do
-          @sample_type.samples.each do |sample|
+          @samples.each do |sample|
             metadata = JSON.parse(sample.json_metadata)
             # Update the metadata keys with the new attribute titles
             @attribute_change_maps.each do |change|
