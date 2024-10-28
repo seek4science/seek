@@ -3,6 +3,7 @@ module ObservationUnitsHelper
   def observation_unit_selector(name, selected = nil, opts = {})
     opts[:data] ||= {}
     opts[:multiple] = false
+    opts[:allow_clear] = true
     grouped_options = grouped_observation_unit_options
     opts[:select_options] = grouped_options_for_select(grouped_options, selected&.id)
 
