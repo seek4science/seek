@@ -5,8 +5,13 @@ class UpdateSampleMetadataJob < ApplicationJob
   queue_as QueueNames::SAMPLES
 
   def perform(sample_type, user, attribute_changes = [])
-    sample_type.samples.in_batches(of: 1000) do |samples|
-      Seek::Samples::SampleMetadataUpdater.new(samples, user, attribute_changes).update_metadata
+    begin
+      Rails.cache.write("sample_type_lock_#{sample_type.id}", true, expires_in: 1.hour)
+      sample_type.lock.samples.in_batches(of: 1000) do |samples|
+        Seek::Samples::SampleMetadataUpdater.new(samples, user, attribute_changes).update_metadata
+      end
     end
+  ensure
+    Rails.cache.delete("sample_type_lock_#{sample_type.id}")
   end
 end
