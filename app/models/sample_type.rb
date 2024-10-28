@@ -54,7 +54,8 @@ class SampleType < ApplicationRecord
            :validate_attribute_title_unique,
            :validate_attribute_accessor_names_unique,
            :validate_title_is_not_type_of_seek_sample_multi,
-           :validate_against_editing_constraints
+           :validate_against_editing_constraints,
+           :validate_sample_type_is_not_locked
   validates :projects, presence: true, projects: { self: true }
 
   accepts_nested_attributes_for :sample_attributes, allow_destroy: true
@@ -108,6 +109,10 @@ class SampleType < ApplicationRecord
   def is_isa_json_compliant?
     has_only_isa_json_compliant_investigations = studies.map(&:investigation).compact.all?(&:is_isa_json_compliant?) || assays.map(&:investigation).compact.all?(&:is_isa_json_compliant?)
     (studies.any? || assays.any?) && has_only_isa_json_compliant_investigations && !isa_template.nil?
+  end
+
+  def locked?
+    Rails.cache.fetch("sample_type_lock_#{id}").present?
   end
 
   def validate_value?(attribute_name, value)
@@ -245,6 +250,10 @@ class SampleType < ApplicationRecord
         errors.add(:sample_attributes, "cannot be removed, there are existing samples using this attribute (#{a.title})")
       end
     end
+  end
+
+  def validate_sample_type_is_not_locked
+    errors.add(:base, 'This sample type is locked and cannot be edited right now.') if locked?
   end
 
   def attribute_search_terms

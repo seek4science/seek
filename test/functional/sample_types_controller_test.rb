@@ -5,6 +5,7 @@ class SampleTypesControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
 
   setup do
+    Rails.cache.clear
     FactoryBot.create(:person) # to prevent person being first person and therefore admin
     @person = FactoryBot.create(:project_administrator)
     @project = @person.projects.first
@@ -15,6 +16,10 @@ class SampleTypesControllerTest < ActionController::TestCase
     @string_type = FactoryBot.create(:string_sample_attribute_type)
     @int_type = FactoryBot.create(:integer_sample_attribute_type)
     @controlled_vocab_type = FactoryBot.create(:controlled_vocab_attribute_type)
+  end
+
+  teardown do
+    Rails.cache.clear
   end
 
   test 'should get index' do
@@ -769,6 +774,87 @@ class SampleTypesControllerTest < ActionController::TestCase
       } }
     end
 
+  end
+
+  test 'check if sample type is locked' do
+    sys_admin = FactoryBot.create(:admin)
+
+    # Add managing permission to the instance admin
+    @sample_type.policy.permissions << FactoryBot.create(:permission, contributor: sys_admin, access_type: Policy::MANAGING)
+    refute @sample_type.locked?
+
+    login_as(@person)
+
+    %i[edit manage].each do |action|
+      get action, params: { id: @sample_type.id }
+      assert_nil flash[:error]
+      assert_response :success
+    end
+
+    # Locking the sample type
+    Rails.cache.write("sample_type_lock_#{@sample_type.id}", true)
+    assert @sample_type.locked?
+
+    %i[edit manage].each do |action|
+      get action, params: { id: @sample_type.id }
+      assert_redirected_to sample_type_path(@sample_type)
+      assert_equal flash[:error], 'This sample type is locked and cannot be edited right now.'
+    end
+
+    login_as(sys_admin)
+    %i[edit manage].each do |action|
+      get action, params: { id: @sample_type.id }
+      assert_nil flash[:error]
+      assert_response :success
+    end
+  end
+
+  test 'update a locked sample type' do
+    sys_admin = FactoryBot.create(:admin)
+    other_person = FactoryBot.create(:person)
+    sample_type = FactoryBot.create(:simple_sample_type, project_ids: @project_ids, contributor: @person)
+    sample_type.policy.permissions << FactoryBot.create(:permission, contributor: sys_admin, access_type: Policy::MANAGING)
+    sample_type.policy.permissions << FactoryBot.create(:permission, contributor: other_person, access_type: Policy::MANAGING)
+
+    (1..10).map do |_i|
+      FactoryBot.create(:sample, contributor: @person, project_ids: @project_ids, sample_type: sample_type)
+    end
+
+    login_as(@person)
+
+    refute @sample_type.locked?
+
+    patch :update, params: { id: sample_type.id, sample_type: {
+      sample_attributes_attributes: {
+        '0': { id: sample_type.sample_attributes.detect(&:is_title), title: 'new title' }
+      }
+    } }
+    assert_redirected_to sample_type_path(sample_type)
+    assert sample_type.locked?
+
+    login_as(other_person)
+
+    patch :update, params: { id: sample_type.id, sample_type: {
+      sample_attributes_attributes: {
+        '0': { id: sample_type.sample_attributes.detect(&:is_title), title: 'new title' }
+      }
+    } }
+    sample_type.errors.added?(:base, 'This sample type is locked and cannot be edited right now.')
+
+    assert_redirected_to sample_type_path(sample_type)
+    assert(sample_type.locked?)
+    assert_equal flash[:error], 'This sample type is locked and cannot be edited right now.'
+
+    login_as(sys_admin)
+    patch :update, params: { id: sample_type.id, sample_type: {
+      sample_attributes_attributes: {
+        '0': { id: sample_type.sample_attributes.detect(&:is_title), title: 'new title' }
+      }
+    } }
+
+    assert(sample_type.locked?)
+    sample_type.errors.added?(:base, 'This sample type is locked and cannot be edited right now.')
+    assert_nil flash[:error]
   end
 
   private

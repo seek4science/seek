@@ -29,6 +29,7 @@ class UpdateSampleMetadataJobTest < ActiveSupport::TestCase
       assert_equal @sample_type.sample_attributes.first.title, 'new title'
       refute_equal @sample_type.sample_attributes.first.title, 'the_title'
       UpdateSampleMetadataJob.perform_now(@sample_type, @person.user, attribute_change_maps)
+      refute Rails.cache.fetch("sample_type_lock_#{@sample_type.id}")
       @sample_type.reload
       @sample_type.samples.each do |sample|
         json_metadata = JSON.parse sample.json_metadata

@@ -6,6 +6,11 @@ class SampleTypeTest < ActiveSupport::TestCase
     @person = FactoryBot.create(:person)
     @project = @person.projects.first
     @project_ids = [@project.id]
+    Rails.cache.clear
+  end
+
+  def teardown
+    Rails.cache.clear
   end
 
   test 'validation' do
@@ -1053,6 +1058,15 @@ class SampleTypeTest < ActiveSupport::TestCase
     sample_type2.sample_attributes.map do |sa|
       assert template2.template_attributes.map(&:id).include? sa.template_attribute_id
     end
+  end
+
+  test 'sample type is locked?' do
+    sample_type = FactoryBot.create(:simple_sample_type, project_ids: @project_ids, contributor: @person)
+    refute sample_type.locked?
+    Rails.cache.write("sample_type_lock_#{sample_type.id}", true)
+    assert sample_type.locked?
+    refute sample_type.valid?
+    assert sample_type.errors.added?(:base, 'This sample type is locked and cannot be edited right now.')
   end
 
   private

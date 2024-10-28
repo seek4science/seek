@@ -15,6 +15,7 @@ module Seek
 
       def update_metadata
         return if @attribute_change_maps.blank? || @sample_type.blank? || @user.nil? || @sample_type.samples.blank?
+        return unless @sample_type.locked?
 
         begin
           User.with_current_user(@user) do
