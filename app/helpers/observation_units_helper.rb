@@ -19,7 +19,6 @@ module ObservationUnitsHelper
       title = study&.can_view? ? study.title : "Hidden #{t('study')}"
       [title, grouped[study].collect{|obs_unit| [obs_unit.title, obs_unit.id]}]
     end
-
   end
 
 end
