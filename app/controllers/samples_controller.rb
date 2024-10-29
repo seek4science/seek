@@ -334,7 +334,6 @@ class SamplesController < ApplicationController
       raise ArgumentError, "Invalid linking method provided. '#{link}' is not allowed!"
     end
 
-    # template_attribute_title = template_attribute&.title
     samples.select do |s|
       s.send(link).any? do |x|
         selected = match_attribute_value(x, template_attribute, options[:attribute_value])

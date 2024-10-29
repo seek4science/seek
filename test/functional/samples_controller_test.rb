@@ -7,15 +7,6 @@ class SamplesControllerTest < ActionController::TestCase
   include HtmlHelper
   include GeneralAuthorizationTestCases
 
-  def setup
-    @source_characteristic_isa_tag = FactoryBot.create(:source_characteristic_isa_tag)
-    @sample_characteristic_isa_tag = FactoryBot.create(:sample_characteristic_isa_tag)
-    @other_material_characteristic_isa_tag = FactoryBot.create(:other_material_characteristic_isa_tag)
-    Seek::Samples::BaseType::ALL_TYPES.each do |type|
-      FactoryBot.create(:string_sample_attribute_type, title: "#{type} attibute type", base_type: type)
-    end
-  end
-
   test 'should return 406 when requesting RDF' do
     login_as(FactoryBot.create(:user))
     sample = FactoryBot.create :sample, contributor: User.current_user.person
@@ -1274,6 +1265,7 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'query samples by template attributes for \'seek sample\' type' do
+    setup_est_query
     with_config_value(:isa_json_compliance_enabled, true) do
       person, project, template1, template2, template3, type1, type2, type3 = template_query_setup.values_at(:person, :project, :begin_template, :middle_template, :end_template, :begin_type, :middle_type, :end_type)
       login_as(person)
@@ -1400,6 +1392,7 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'query samples by template attributes for \'boolean\' type' do
+    setup_est_query
     with_config_value(:isa_json_compliance_enabled, true) do
       person, project, template1, template2, template3, type1, type2, type3 = template_query_setup(Seek::Samples::BaseType::BOOLEAN).values_at(:person, :project, :begin_template, :middle_template, :end_template, :begin_type, :middle_type, :end_type)
 
@@ -1559,6 +1552,7 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'query samples by template attributes for numeric types' do
+    setup_est_query
     # Numeric types
     # Integer
     # Float
@@ -1810,6 +1804,15 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   private
+
+  def setup_est_query
+    @source_characteristic_isa_tag = FactoryBot.create(:source_characteristic_isa_tag)
+    @sample_characteristic_isa_tag = FactoryBot.create(:sample_characteristic_isa_tag)
+    @other_material_characteristic_isa_tag = FactoryBot.create(:other_material_characteristic_isa_tag)
+    Seek::Samples::BaseType::ALL_TYPES.each do |type|
+      FactoryBot.create(:string_sample_attribute_type, title: "#{type} attibute type", base_type: type)
+    end
+  end
 
   def populated_patient_sample
     person = FactoryBot.create(:person)
