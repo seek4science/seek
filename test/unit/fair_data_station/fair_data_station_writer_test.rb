@@ -460,8 +460,8 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     expected = HashWithIndifferentAccess.new({
       'Experimental site name':'manchester test site',
       'study date details': {
-        'End date of Study': '8/8/2024',
-        'Start date of Study': '8/1/2024'
+        'End date of Study': '2024-08-08',
+        'Start date of Study': '2024-08-01'
       }
     })
 
@@ -474,8 +474,8 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     expected = HashWithIndifferentAccess.new({
                                                'Experimental site name':'manchester test site',
                                                'study date details': {
-                                                 'End date of Study': '8/18/2024',
-                                                 'Start date of Study': '8/10/2024'
+                                                 'End date of Study': '2024-08-18',
+                                                 'Start date of Study': '2024-08-10'
                                                }
                                              })
 
@@ -490,7 +490,7 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
                                                'Gender':'female',
                                                'obs_unit_birth_details': {
                                                  'Birth weight': '1235g',
-                                                 'Date of birth': '1/11/2020'
+                                                 'Date of birth': '2020-01-11'
                                                }
                                              })
     assert_equal expected, obs_unit.extended_metadata.data
