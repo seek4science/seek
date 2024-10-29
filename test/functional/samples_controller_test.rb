@@ -1594,7 +1594,10 @@ class SamplesControllerTest < ActionController::TestCase
     get :new, params: { sample_type_id: sample_type.id }
     assert_response :success
 
-    assert_select 'input[type=submit][disabled=disabled]', count: 1
+    sample_type.set_lock
+    get :new, params: { sample_type_id: sample_type.id }
+    assert_redirected_to sample_types_path(sample_type)
+    assert_equal flash[:error], 'This sample type is locked. You cannot edit the sample.'
   end
 
   def rdf_test_object
