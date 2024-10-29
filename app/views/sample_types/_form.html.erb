@@ -1,11 +1,5 @@
 <% tab ||= 'manual' %>
 
-<% if @sample_type.locked? %>
-    <div id="locked-sample-type-warning" class="alert alert-danger">
-        <strong>Warning!</strong> This sample type is locked and should not be edited.
-    </div>
-<% end %>
-
 <span id='modal-dialogues'>
     <%= sample_controlled_vocab_model_dialog('cv-modal') %>
 </span>
