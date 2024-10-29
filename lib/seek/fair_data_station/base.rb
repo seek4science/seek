@@ -115,8 +115,13 @@ module Seek
         else
           linked_attributes = extended_metadata_type.attributes_with_linked_extended_metadata_type
           linked_attributes.each do |linked_attribute|
-            nested_data = data[linked_attribute.accessor_name] || {}
-            data[linked_attribute.accessor_name] = populate_seek_extended_metadata_for_property(linked_attribute.linked_extended_metadata_type, property_id, value, nested_data)
+
+            result = populate_seek_extended_metadata_for_property(linked_attribute.linked_extended_metadata_type, { }, property_id, value)
+            unless result.empty?
+              data[linked_attribute.accessor_name] ||= {}
+              data[linked_attribute.accessor_name].merge!(result)
+              break
+            end
           end
         end
 
