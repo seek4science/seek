@@ -234,7 +234,7 @@ class SamplesControllerTest < ActionController::TestCase
     assert_nil flash[:error]
   end
 
-  test "warn on first edit if extracted from a data file" do
+  test 'warn on first edit if extracted from a data file' do
     person = FactoryBot.create(:person)
     sample = FactoryBot.create(:sample_from_file, contributor: person)
     login_as(person)
@@ -244,14 +244,14 @@ class SamplesControllerTest < ActionController::TestCase
     assert_not_nil flash[:error]
   end
 
-  test "source data datafile taged as invalid after edit" do
+  test 'source data datafile taged as invalid after edit' do
     person = FactoryBot.create(:person)
     sample = FactoryBot.create(:sample_from_file, contributor: person)
     login_as(person)
 
-    put :update, params: { id: sample.id, sample: { data: { "name": "Modified Sample" } } }
+    put :update, params: { id: sample.id, sample: { data: { "name": 'Modified Sample' } } }
     sample.reload
-    assert_equal "Modified Sample", sample.title
+    assert_equal 'Modified Sample', sample.title
     assert sample.edit_count.positive?
 
     get :show, params: { id: sample.id }
@@ -259,14 +259,14 @@ class SamplesControllerTest < ActionController::TestCase
     assert_select 'span.label-danger', text: /No longer valid/, count: 1
   end
 
-  test "no longer warn if sample extracted from a data file has already been edited" do
+  test 'no longer warn if sample extracted from a data file has already been edited' do
     person = FactoryBot.create(:person)
     sample = FactoryBot.create(:sample_from_file, contributor: person)
     login_as(person)
 
-    put :update, params: { id: sample.id, sample: { data: { "name": "Modified Sample" } } }
+    put :update, params: { id: sample.id, sample: { data: { "name": 'Modified Sample' } } }
     sample.reload
-    assert_equal "Modified Sample", sample.title
+    assert_equal 'Modified Sample', sample.title
     assert sample.edit_count.positive?
 
     get :edit, params: { id: sample.id }
@@ -770,8 +770,8 @@ class SamplesControllerTest < ActionController::TestCase
 
     assert_response :success
 
-    assert_select 'div.related-items #resources-shown-count a[href=?]', sample_samples_path(sample), text: "2 Samples"
-    assert_select 'div.related-items #advanced-search-link a[href=?]', sample_samples_path(sample), text: "Advanced Samples list for this Sample with search and filtering"
+    assert_select 'div.related-items #resources-shown-count a[href=?]', sample_samples_path(sample), text: '2 Samples'
+    assert_select 'div.related-items #advanced-search-link a[href=?]', sample_samples_path(sample), text: 'Advanced Samples list for this Sample with search and filtering'
   end
 
   test 'related samples index page works correctly' do
@@ -987,7 +987,7 @@ class SamplesControllerTest < ActionController::TestCase
     sample =  {sample_type_id: type.id,
                data: { 'full name': 'Fred Smith', age: '22', weight: '22.1', postcode: 'M13 9PL' },
                project_ids: [person.projects.first.id],
-               discussion_links_attributes:[{url: "http://www.slack.com/"}]}
+               discussion_links_attributes:[{url: 'http://www.slack.com/'}]}
     assert_difference('AssetLink.discussion.count') do
       assert_difference('Sample.count') do
           post :create, params: {sample: sample,  policy_attributes: { access_type: Policy::VISIBLE }}
@@ -1014,7 +1014,7 @@ class SamplesControllerTest < ActionController::TestCase
     assert_nil sample.discussion_links.first
     assert_difference('AssetLink.discussion.count') do
       assert_difference('ActivityLog.count') do
-        put :update, params: { id: sample.id, sample: { discussion_links_attributes:[{url: "http://www.slack.com/"}] } }
+        put :update, params: { id: sample.id, sample: { discussion_links_attributes:[{url: 'http://www.slack.com/'}] } }
       end
     end
     assert_redirected_to sample_path(assigns(:sample))
@@ -1029,15 +1029,15 @@ class SamplesControllerTest < ActionController::TestCase
     assert_difference('Sample.count', 2) do
       assert_difference('AssayAsset.count', 1) do
           post :batch_create, params: { data: [
-            { ex_id: "1", data: { type: "samples",
+            { ex_id: '1', data: { type: 'samples',
                                   attributes: { attribute_map: { "full name": 'Fred Smith', "age": '22', "weight": '22.1', "postcode": 'M13 9PL' } },
                                   relationships: { assays: { data: [{ id: assay.id, type: 'assays' }] },
-                                                    projects: { data: [{ id: person.projects.first.id, type: "projects" }] },
-                                                    sample_type: { data: { id: type.id, type: "sample_types" } } } } },
-            { ex_id: "2", data: { type: "samples",
+                                                    projects: { data: [{ id: person.projects.first.id, type: 'projects' }] },
+                                                    sample_type: { data: { id: type.id, type: 'sample_types' } } } } },
+            { ex_id: '2', data: { type: 'samples',
                                   attributes: { attribute_map: { "full name": 'David Tailor', "age": '33', "weight": '33.1', "postcode": 'M12 8PL' } },
-                                  relationships: { projects: { data: [{ id: person.projects.first.id, type: "projects" }] },
-                                                    sample_type: { data: { id: type.id, type: "sample_types" } } } } }] }
+                                  relationships: { projects: { data: [{ id: person.projects.first.id, type: 'projects' }] },
+                                                    sample_type: { data: { id: type.id, type: 'sample_types' } } } } }] }
       end
     end
 
@@ -1070,17 +1070,17 @@ class SamplesControllerTest < ActionController::TestCase
     type = FactoryBot.create(:patient_sample_type)
     assert_difference('Sample.count', 0) do
         post :batch_create, params: {data:[
-        {ex_id: "1",data:{type: "samples", attributes:{attribute_map:{"full name": 'Fred Smith', "age": '22', "weight": '22.1' ,"postcode": 'M13 9PL'}},
-        tags: nil,relationships:{projects:{data:[{id: person.projects.first.id, type: "projects"}]},
-        sample_type:{ data:{id: type.id, type: "sample_types"}}}}},
-        {ex_id: "2", data:{type: "samples",attributes:{attribute_map:{"wrong attribute": 'David Tailor', "age": '33', "weight": '33.1' ,"postcode": 'M12 8PL'}},
-        tags: nil,relationships:{projects:{data:[{id: person.projects.first.id, type: "projects"}]},
-        sample_type:{data:{id: type.id, type: "sample_types"}}}}}]}
+        {ex_id: '1',data:{type: 'samples', attributes:{attribute_map:{"full name": 'Fred Smith', "age": '22', "weight": '22.1' ,"postcode": 'M13 9PL'}},
+        tags: nil,relationships:{projects:{data:[{id: person.projects.first.id, type: 'projects'}]},
+        sample_type:{ data:{id: type.id, type: 'sample_types'}}}}},
+        {ex_id: '2', data:{type: 'samples',attributes:{attribute_map:{"wrong attribute": 'David Tailor', "age": '33', "weight": '33.1' ,"postcode": 'M12 8PL'}},
+        tags: nil,relationships:{projects:{data:[{id: person.projects.first.id, type: 'projects'}]},
+        sample_type:{data:{id: type.id, type: 'sample_types'}}}}}]}
     end
 
     json_response = JSON.parse(response.body)
-    assert_equal 1, json_response["errors"].length
-    assert_equal "2", json_response["errors"][0]["ex_id"].to_s
+    assert_equal 1, json_response['errors'].length
+    assert_equal '2', json_response['errors'][0]['ex_id'].to_s
   end
 
 
@@ -1095,8 +1095,8 @@ class SamplesControllerTest < ActionController::TestCase
 
     assert_no_difference('Sample.count') do
       put :batch_update, params: {data:[
-        {id: sample1.id, data:{type: "samples", attributes:{ attribute_map:{ "full name": 'Alfred Marcus', "age": '22', "weight": '22.1' }, creator_ids: [creator.id]}}},
-        {id: sample2.id, data:{type: "samples", attributes:{ attribute_map:{ "full name": 'David Tailor', "age": '33', "weight": '33.1' }, creator_ids: [creator.id]}}}]}
+        {id: sample1.id, data:{type: 'samples', attributes:{ attribute_map:{ "full name": 'Alfred Marcus', "age": '22', "weight": '22.1' }, creator_ids: [creator.id]}}},
+        {id: sample2.id, data:{type: 'samples', attributes:{ attribute_map:{ "full name": 'David Tailor', "age": '33', "weight": '33.1' }, creator_ids: [creator.id]}}}]}
       assert_equal [creator], sample1.creators
     end
 
@@ -1264,25 +1264,11 @@ class SamplesControllerTest < ActionController::TestCase
 
   end
 
-  test 'should return max query result' do
+  test 'query samples by template attributes for \'seek sample\' type' do
+    setup_est_query
     with_config_value(:isa_json_compliance_enabled, true) do
-      person = FactoryBot.create(:person)
-      project = FactoryBot.create(:project)
-
+      person, project, template1, template2, template3, type1, type2, type3 = template_query_setup.values_at(:person, :project, :begin_template, :middle_template, :end_template, :begin_type, :middle_type, :end_type)
       login_as(person)
-
-      template1 = FactoryBot.create(:isa_source_template)
-      template2 = FactoryBot.create(:isa_sample_collection_template)
-      template3 = FactoryBot.create(:isa_assay_material_template)
-
-      type1 = FactoryBot.create(:simple_sample_type, contributor: person, project_ids: [project.id], title: 'Source sample type', template_id: template1.id)
-      type1.create_sample_attributes_from_isa_template(template1)
-
-      type2 = FactoryBot.create(:simple_sample_type, contributor: person, project_ids: [project.id], title: 'Sample collection sample type', template_id: template2.id)
-      type2.create_sample_attributes_from_isa_template(template2, type1)
-
-      type3 = FactoryBot.create(:simple_sample_type, contributor: person, project_ids: [project.id], title: 'Assay material sample type', template_id: template3.id)
-      type3.create_sample_attributes_from_isa_template(template3, type2)
 
       sample1 = FactoryBot.create :sample, title: 'sample1', sample_type: type1, project_ids: [project.id], contributor: person,
                                  data: { 'Source Name': 'Source Name', 'Source Characteristic 1': 'Source Characteristic 1', 'Source Characteristic 2': "Cox's Orange Pippin" }
@@ -1381,7 +1367,7 @@ class SamplesControllerTest < ActionController::TestCase
         template_attribute_value: 'Protocol',
         input_template_id: template2.id,
         input_attribute_id: template2.template_attributes.detect(&:input_attribute?)&.id,
-        input_attribute_value: "source"
+        input_attribute_value: 'source'
       }
 
       assert_response :success
@@ -1402,6 +1388,285 @@ class SamplesControllerTest < ActionController::TestCase
       assert_response :success
       result = assigns(:result)
       assert_equal result.length, 1
+    end
+  end
+
+  test 'query samples by template attributes for \'boolean\' type' do
+    setup_est_query
+    with_config_value(:isa_json_compliance_enabled, true) do
+      person, project, template1, template2, template3, type1, type2, type3 = template_query_setup(Seek::Samples::BaseType::BOOLEAN).values_at(:person, :project, :begin_template, :middle_template, :end_template, :begin_type, :middle_type, :end_type)
+
+      login_as(person)
+
+      sources, samples, extracts = [], [], []
+
+      (1...11).each do |i|
+        source = FactoryBot.create :sample, title: "Source #{i}", project_ids: [project.id], contributor: person, sample_type: type1,
+                                    data: { 'Source Name': "Source #{i}", 'Source Characteristic 1': 'Source Characteristic 1', 'Source Characteristic 2': "Cox's Orange Pippin", 'Boolean attribute 1': i%2 == 0 ? true : false }
+        sample = FactoryBot.create :sample, title: "Sample #{i}", project_ids: [project.id], contributor: person, sample_type: type2,
+                                    data: { Input: [source.id], 'sample collection': 'sample 1', 'sample collection parameter value 1': 'sample collection parameter value 1', 'Sample Name': "Sample #{i}", 'sample characteristic 1': 'sample characteristic 1', 'Boolean attribute 2': i%3 == 0 ? true : false }
+        extract = FactoryBot.create :sample, title: "Extract #{i}", project_ids: [project.id], contributor: person, sample_type: type3,
+                          data: { Input: [sample.id], 'Protocol Assay 1': 'Protocol Assay 1', 'Assay 1 parameter value 1': 'Assay 1 parameter value 1', 'Extract Name': "Extract #{i}", 'other material characteristic 1': 'other material characteristic 1', 'Boolean attribute 3': i%5 == 0 ? true : false }
+
+        sources.append source
+        samples.append sample
+        extracts.append extract
+      end
+      ##################################################
+      # test query for samples of current template
+      ##################################################
+      # test query for boolean attribute 1
+      # Should return nothing with true value
+      # Filter value just random text, no boolean
+      post :query, xhr: true, params: {
+        project_ids: [project.id],
+        template_id: template1.id,
+        template_attribute_id: template1.template_attributes.detect { |ta| ta&.sample_attribute_type&.base_type == Seek::Samples::BaseType::BOOLEAN }&.id,
+        template_attribute_value: 'Myrndon%^&*strnG'
+      }
+
+      assert_response :success
+      assert result = assigns(:result)
+      assert_equal result.length, 0
+
+      # test query for boolean attribute 1
+      # Should return 5 sources with true value
+      # Filter value all downcase
+      post :query, xhr: true, params: {
+        project_ids: [project.id],
+        template_id: template1.id,
+        template_attribute_id: template1.template_attributes.detect { |ta| ta&.sample_attribute_type&.base_type == Seek::Samples::BaseType::BOOLEAN }&.id,
+        template_attribute_value: 'true'
+      }
+
+      assert_response :success
+      assert result = assigns(:result)
+      assert_equal result.length, 5
+
+      # test query for boolean attribute 1
+      # Should return 3 samples with true value
+      # Filter value mixed up- and downcase
+      post :query, xhr: true, params: {
+        project_ids: [project.id],
+        template_id: template2.id,
+        template_attribute_id: template2.template_attributes.detect { |ta| ta&.sample_attribute_type&.base_type == Seek::Samples::BaseType::BOOLEAN }&.id,
+        template_attribute_value: 'TrUe'
+      }
+
+      assert_response :success
+      assert result = assigns(:result)
+      assert_equal result.length, 3
+
+      # test query for boolean attribute 1
+      # Should return 2 extracts with true value
+      # Filter value all upcase
+      post :query, xhr: true, params: {
+        project_ids: [project.id],
+        template_id: template3.id,
+        template_attribute_id: template3.template_attributes.detect { |ta| ta&.sample_attribute_type&.base_type == Seek::Samples::BaseType::BOOLEAN }&.id,
+        template_attribute_value: 'TRUE'
+      }
+
+      assert_response :success
+      assert result = assigns(:result)
+      assert_equal result.length, 2
+
+      ##################################################
+      # test query for (grand)children of current template
+      ##################################################
+      # test query for boolean attribute 1 and boolean attribute 3 as output
+      # Should return 5 sources with true value
+      # And filter down to 1 extract with true value
+      post :query, xhr: true, params: {
+        project_ids: [project.id],
+        template_id: template1.id,
+        template_attribute_id: template1.template_attributes.detect { |ta| ta&.sample_attribute_type&.base_type == Seek::Samples::BaseType::BOOLEAN }&.id,
+        template_attribute_value: 'true',
+        output_template_id: template3.id,
+        output_attribute_id: template3.template_attributes.detect { |ta| ta&.sample_attribute_type&.base_type == Seek::Samples::BaseType::BOOLEAN }&.id,
+        output_attribute_value: 'trUe'
+      }
+
+      assert_response :success
+      assert result = assigns(:result)
+      assert_equal result.length, 1
+      assert_equal result, [sources[9]]
+
+      # test query for boolean attribute 1 and boolean attribute 2 as output
+      # Should return 5 sources with true value
+      # And filter down to 1 extract with true value
+      post :query, xhr: true, params: {
+        project_ids: [project.id],
+        template_id: template1.id,
+        template_attribute_id: template1.template_attributes.detect { |ta| ta&.sample_attribute_type&.base_type == Seek::Samples::BaseType::BOOLEAN }&.id,
+        template_attribute_value: 'true',
+        output_template_id: template2.id,
+        output_attribute_id: template2.template_attributes.detect { |ta| ta&.sample_attribute_type&.base_type == Seek::Samples::BaseType::BOOLEAN }&.id,
+        output_attribute_value: 'trUe'
+      }
+
+      assert_response :success
+      assert result = assigns(:result)
+      assert_equal result.length, 1
+      assert_equal result, [sources[5]]
+
+      ##################################################
+      # test query for (grand)parents of current template
+      ##################################################
+      # test query for boolean attribute 2 and boolean attribute 1 as input
+      # Should return 1 sample with true value
+      post :query, xhr: true, params: {
+        project_ids: [project.id],
+        template_id: template2.id,
+        template_attribute_id: template2.template_attributes.detect { |ta| ta&.sample_attribute_type&.base_type == Seek::Samples::BaseType::BOOLEAN }&.id,
+        template_attribute_value: 'tRue',
+        input_template_id: template1.id,
+        input_attribute_id: template1.template_attributes.detect { |ta| ta&.sample_attribute_type&.base_type == Seek::Samples::BaseType::BOOLEAN }&.id,
+        input_attribute_value: 'TruE'
+      }
+
+      assert_response :success
+      result = assigns(:result)
+      assert_equal result.length, 1
+      assert_equal result, [samples[5]]
+
+      # test query for boolean attribute 3 and boolean attribute 1 as input
+      # Should return 1 sample with true value
+      # Filter value all downcase
+      post :query, xhr: true, params: {
+        project_ids: [project.id],
+        template_id: template3.id,
+        template_attribute_id: template3.template_attributes.detect { |ta| ta&.sample_attribute_type&.base_type == Seek::Samples::BaseType::BOOLEAN }&.id,
+        template_attribute_value: 'tRue',
+        input_template_id: template1.id,
+        input_attribute_id: template1.template_attributes.detect { |ta| ta&.sample_attribute_type&.base_type == Seek::Samples::BaseType::BOOLEAN }&.id,
+        input_attribute_value: 'TruE'
+      }
+
+      assert_response :success
+      result = assigns(:result)
+      assert_equal result.length, 1
+      assert_equal result, [extracts[9]]
+
+    end
+  end
+
+  test 'query samples by template attributes for numeric types' do
+    setup_est_query
+    # Numeric types
+    # Integer
+    # Float
+    with_config_value(:isa_json_compliance_enabled, true) do
+      number_attribute_types = [Seek::Samples::BaseType::INTEGER, Seek::Samples::BaseType::FLOAT]
+      person, project, template1, template2, template3, type1, type2, type3 = template_query_setup(number_attribute_types).values_at(:person, :project, :begin_template, :middle_template, :end_template, :begin_type, :middle_type, :end_type)
+
+      login_as(person)
+
+      sources, samples, extracts = [], [], []
+
+      (1...11).each do |i|
+        source = FactoryBot.create :sample, title: "Source #{i}", project_ids: [project.id], contributor: person, sample_type: type1,
+                                   data: { 'Source Name': "Source #{i}", 'Source Characteristic 1': 'Source Characteristic 1', 'Source Characteristic 2': "Cox's Orange Pippin", 'Integer attribute 1': i, 'Float attribute 1': i.to_f }
+        sample = FactoryBot.create :sample, title: "Sample #{i}", project_ids: [project.id], contributor: person, sample_type: type2,
+                                   data: { Input: [source.id], 'sample collection': 'sample 1', 'sample collection parameter value 1': 'sample collection parameter value 1', 'Sample Name': "Sample #{i}", 'sample characteristic 1': 'sample characteristic 1', 'Integer attribute 2': i*9, 'Float attribute 2': i.to_f * 0.9 }
+        extract = FactoryBot.create :sample, title: "Extract #{i}", project_ids: [project.id], contributor: person, sample_type: type3,
+                                    data: { Input: [sample.id], 'Protocol Assay 1': 'Protocol Assay 1', 'Assay 1 parameter value 1': 'Assay 1 parameter value 1', 'Extract Name': "Extract #{i}", 'other material characteristic 1': 'other material characteristic 1', 'Integer attribute 3': i*11, 'Float attribute 3': i.to_f*1.1 }
+
+        sources.append source
+        samples.append sample
+        extracts.append extract
+      end
+      ##################################################
+      # test query for samples of current template
+      ##################################################
+      # test query for number attribute 1
+      # Should return nothing
+      # Filter value just random text, no numbers
+      number_attribute_types.each do |number_attribute_type|
+        post :query, xhr: true, params: {
+          project_ids: [project.id],
+          template_id: template1.id,
+          template_attribute_id: template1.template_attributes.detect { |ta| ta&.sample_attribute_type&.base_type == number_attribute_type }&.id,
+          template_attribute_value: 'Myrndon%^&*strnG'
+        }
+
+        assert_response :success
+        assert result = assigns(:result)
+        assert_equal result.length, 0
+      end
+
+      # test query for number attribute 1
+      # Should return 1 result
+      # Filter value 5
+      number_attribute_types.each do |number_attribute_type|
+        post :query, xhr: true, params: {
+          project_ids: [project.id],
+          template_id: template1.id,
+          template_attribute_id: template1.template_attributes.detect { |ta| ta&.sample_attribute_type&.base_type == number_attribute_type }&.id,
+          template_attribute_value: '5'
+        }
+
+        assert_response :success
+        assert result = assigns(:result)
+        assert_equal result.length, 1
+      end
+      ##################################################
+      # test query for (grand)children of current template
+      ##################################################
+      # test query for number attribute 1 and number attribute 3 as output
+      # Filter value 5.5
+      post :query, xhr: true, params: {
+        project_ids: [project.id],
+        template_id: template1.id,
+        template_attribute_id: template1.template_attributes.detect { |ta| ta&.sample_attribute_type&.base_type == number_attribute_types[0] }&.id,
+        template_attribute_value: '5',
+        output_template_id: template3.id,
+        output_attribute_id: template3.template_attributes.detect { |ta| ta&.sample_attribute_type&.base_type == number_attribute_types[1] }&.id,
+        output_attribute_value: '5.5'
+      }
+
+      assert_response :success
+      assert result = assigns(:result)
+      assert_equal result.length, 1
+      assert_equal result, [sources[4]]
+
+      # test query for number attribute 1 and number attribute 3 as output
+      # Filter value 5,5
+      post :query, xhr: true, params: {
+        project_ids: [project.id],
+        template_id: template1.id,
+        template_attribute_id: template1.template_attributes.detect { |ta| ta&.sample_attribute_type&.base_type == number_attribute_types[0] }&.id,
+        template_attribute_value: '5',
+        output_template_id: template3.id,
+        output_attribute_id: template3.template_attributes.detect { |ta| ta&.sample_attribute_type&.base_type == number_attribute_types[1] }&.id,
+        output_attribute_value: '5,5'
+      }
+
+      assert_response :success
+      assert result = assigns(:result)
+      assert_equal result.length, 1
+      assert_equal result, [sources[4]]
+
+      ##################################################
+      # test query for (grand)parents of current template
+      ##################################################
+      # test query for number attribute 2 and number attribute 1 as input
+      # Should return 1 sample with true value
+      post :query, xhr: true, params: {
+        project_ids: [project.id],
+        template_id: template2.id,
+        template_attribute_id: template2.template_attributes.detect { |ta| ta&.sample_attribute_type&.base_type == number_attribute_types[1] }&.id,
+        template_attribute_value: '3.6',
+        input_template_id: template1.id,
+        input_attribute_id: template1.template_attributes.detect { |ta| ta&.sample_attribute_type&.base_type == number_attribute_types[0] }&.id,
+        input_attribute_value: '4'
+      }
+
+      assert_response :success
+      result = assigns(:result)
+      assert_equal result.length, 1
+      assert_equal result, [samples[3]]
+
     end
   end
 
@@ -1540,6 +1805,15 @@ class SamplesControllerTest < ActionController::TestCase
 
   private
 
+  def setup_est_query
+    @source_characteristic_isa_tag = FactoryBot.create(:source_characteristic_isa_tag)
+    @sample_characteristic_isa_tag = FactoryBot.create(:sample_characteristic_isa_tag)
+    @other_material_characteristic_isa_tag = FactoryBot.create(:other_material_characteristic_isa_tag)
+    Seek::Samples::BaseType::ALL_TYPES.each do |type|
+      FactoryBot.create(:string_sample_attribute_type, title: "#{type} attibute type", base_type: type)
+    end
+  end
+
   def populated_patient_sample
     person = FactoryBot.create(:person)
     sample = Sample.new title: 'My Sample', policy: FactoryBot.create(:public_policy),
@@ -1552,4 +1826,53 @@ class SamplesControllerTest < ActionController::TestCase
     sample
   end
 
+  # Setup for querying by template attribute values with optional test attribute type validation.
+  # If a test attribute type is provided, it will create it will add to each template and sample type a new attribute
+  # with the provided sample attribute type.
+  #
+  # @param [String, nil] test_attribute_types The type of the test attribute to validate against. If nil, no validation is performed.
+  # @raise [RuntimeError] If the provided test attribute type is invalid but not nil.
+  # @return [Hash] A hash containing the created templates and sample types.
+  def template_query_setup(test_attribute_types = [])
+    test_attribute_types = [test_attribute_types] unless test_attribute_types.is_a?(Array)
+    unless test_attribute_types.all? { |tat| Seek::Samples::BaseType::ALL_TYPES.include? (tat) } || test_attribute_types.blank?
+      raise "Invalid test attribute type: #{test_attribute_types}"
+    end
+
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+
+    begin_template = FactoryBot.create(:isa_source_template)
+    unless test_attribute_types.blank?
+      test_attribute_types.each do |tat|
+        begin_template.template_attributes << FactoryBot.create(:template_attribute, title: "#{tat} attribute 1", sample_attribute_type: SampleAttributeType.find_by(base_type: tat), isa_tag: @source_characteristic_isa_tag)
+      end
+    end
+
+    middle_template = FactoryBot.create(:isa_sample_collection_template)
+    unless test_attribute_types.blank?
+      test_attribute_types.each do |tat|
+        middle_template.template_attributes << FactoryBot.create(:template_attribute, title: "#{tat} attribute 2", sample_attribute_type: SampleAttributeType.find_by(base_type: tat), isa_tag: @sample_characteristic_isa_tag)
+      end
+    end
+
+    end_template = FactoryBot.create(:isa_assay_material_template)
+    unless test_attribute_types.blank?
+      test_attribute_types.each do |tat|
+        end_template.template_attributes << FactoryBot.create(:template_attribute, title: "#{tat} attribute 3", sample_attribute_type: SampleAttributeType.find_by(base_type: tat), isa_tag: @other_material_characteristic_isa_tag)
+      end
+    end
+
+    begin_type = FactoryBot.create(:simple_sample_type, contributor: person, project_ids: [project.id], title: 'Source sample type', template_id: begin_template.id)
+    begin_type.create_sample_attributes_from_isa_template(begin_template)
+
+    middle_type = FactoryBot.create(:simple_sample_type, contributor: person, project_ids: [project.id], title: 'Sample collection sample type', template_id: middle_template.id)
+    middle_type.create_sample_attributes_from_isa_template(middle_template, begin_type)
+
+    end_type = FactoryBot.create(:simple_sample_type, contributor: person, project_ids: [project.id], title: 'Assay material sample type', template_id: end_template.id)
+    end_type.create_sample_attributes_from_isa_template(end_template, middle_type)
+
+
+    { person:, project:, begin_template:, middle_template:, end_template:, begin_type:, middle_type:, end_type: }
+  end
 end
