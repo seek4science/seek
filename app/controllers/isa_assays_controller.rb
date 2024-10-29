@@ -45,7 +45,7 @@ class IsaAssaysController < ApplicationController
 
   def create
     update_sharing_policies @isa_assay.assay
-    @isa_assay.sample_type.policy = @isa_assay.assay.policy
+    @isa_assay.sample_type.policy = @isa_assay.assay.policy unless @isa_assay.assay.is_assay_stream?
     if @isa_assay.save
       flash[:notice] = "The #{t('isa_assay')} was successfully created.<br/>".html_safe
       respond_to do |format|
