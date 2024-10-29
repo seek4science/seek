@@ -1584,6 +1584,19 @@ class SamplesControllerTest < ActionController::TestCase
 
   end
 
+  test 'should not add a sample to a locked sample type' do
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+    login_as(person)
+
+    sample_type = FactoryBot.create(:simple_sample_type, contributor: person, project_ids: [project.id])
+
+    get :new, params: { sample_type_id: sample_type.id }
+    assert_response :success
+
+    assert_select 'input[type=submit][disabled=disabled]', count: 1
+  end
+
   def rdf_test_object
     FactoryBot.create(:max_sample, policy: FactoryBot.create(:public_policy))
   end

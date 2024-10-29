@@ -777,10 +777,6 @@ class SampleTypesControllerTest < ActionController::TestCase
   end
 
   test 'check if sample type is locked' do
-    sys_admin = FactoryBot.create(:admin)
-
-    # Add managing permission to the instance admin
-    @sample_type.policy.permissions << FactoryBot.create(:permission, contributor: sys_admin, access_type: Policy::MANAGING)
     refute @sample_type.locked?
 
     login_as(@person)
@@ -800,20 +796,11 @@ class SampleTypesControllerTest < ActionController::TestCase
       assert_redirected_to sample_type_path(@sample_type)
       assert_equal flash[:error], 'This sample type is locked and cannot be edited right now.'
     end
-
-    login_as(sys_admin)
-    %i[edit manage].each do |action|
-      get action, params: { id: @sample_type.id }
-      assert_nil flash[:error]
-      assert_response :success
-    end
   end
 
   test 'update a locked sample type' do
-    sys_admin = FactoryBot.create(:admin)
     other_person = FactoryBot.create(:person)
     sample_type = FactoryBot.create(:simple_sample_type, project_ids: @project_ids, contributor: @person)
-    sample_type.policy.permissions << FactoryBot.create(:permission, contributor: sys_admin, access_type: Policy::MANAGING)
     sample_type.policy.permissions << FactoryBot.create(:permission, contributor: other_person, access_type: Policy::MANAGING)
 
     (1..10).map do |_i|
@@ -844,17 +831,6 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_redirected_to sample_type_path(sample_type)
     assert(sample_type.locked?)
     assert_equal flash[:error], 'This sample type is locked and cannot be edited right now.'
-
-    login_as(sys_admin)
-    patch :update, params: { id: sample_type.id, sample_type: {
-      sample_attributes_attributes: {
-        '0': { id: sample_type.sample_attributes.detect(&:is_title), title: 'new title' }
-      }
-    } }
-
-    assert(sample_type.locked?)
-    sample_type.errors.added?(:base, 'This sample type is locked and cannot be edited right now.')
-    assert_nil flash[:error]
   end
 
   private

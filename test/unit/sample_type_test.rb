@@ -1069,6 +1069,19 @@ class SampleTypeTest < ActiveSupport::TestCase
     assert sample_type.errors.added?(:base, 'This sample type is locked and cannot be edited right now.')
   end
 
+  test 'update locked sample type' do
+    sample_type = FactoryBot.create(:simple_sample_type, project_ids: @project_ids, contributor: @person)
+    (1..10).each do |i|
+      FactoryBot.create(:sample, sample_type: sample_type, project_ids: @project_ids, title: "Sample #{i}")
+    end
+    sample_type.with_lock do
+      # sample_type.samples << FactoryBot.create(:sample, sample_type: sample_type, project_ids: @project_ids, title: 'Sample 11')
+      # sample_type.title = 'Updated title'
+      sample_type.sample_attributes.first.title = 'Updated title'
+      sample_type.save!
+    end
+  end
+
   private
 
   # sample type with 3 samples

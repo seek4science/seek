@@ -8,6 +8,7 @@ class SamplesController < ApplicationController
   before_action :samples_enabled?
   before_action :find_index_assets, only: :index
   before_action :find_and_authorize_requested_item, except: [:index, :new, :create, :preview]
+  before_action :check_if_locked_sample_type, only: [:edit, :new]
   before_action :templates_enabled?, only: [:query, :query_form]
 
   before_action :auth_to_create, only: %i[new create batch_create]
@@ -370,5 +371,15 @@ class SamplesController < ApplicationController
       flash[:error] = 'Not available'
       redirect_to select_sample_types_path
     end
+  end
+
+  def check_if_locked_sample_type
+    return unless params[:sample_type_id]
+
+    sample_type = SampleType.find(params[:sample_type_id])
+    return unless sample_type&.locked?
+
+    flash[:error] = 'This sample type is locked. You cannot edit the sample.'
+    redirect_to sample_types_path(sample_type)
   end
 end

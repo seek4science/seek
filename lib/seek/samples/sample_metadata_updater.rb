@@ -21,14 +21,12 @@ module Seek
           @sample_type.with_lock do
             @sample_type.samples.in_batches(of: 1000).each do |batch|
               batch.each do |sample|
-                sample.with_lock do
-                  metadata = JSON.parse(sample.json_metadata)
-                  # Update the metadata keys with the new attribute titles
-                  @attribute_change_maps.each do |change|
-                    metadata[change[:new_title]] = metadata.delete(change[:old_title])
-                  end
-                  sample.update_column(:json_metadata, metadata.to_json)
+                metadata = JSON.parse(sample.json_metadata)
+                # Update the metadata keys with the new attribute titles
+                @attribute_change_maps.each do |change|
+                  metadata[change[:new_title]] = metadata.delete(change[:old_title])
                 end
+                sample.update_column(:json_metadata, metadata.to_json)
               end
             end
           end

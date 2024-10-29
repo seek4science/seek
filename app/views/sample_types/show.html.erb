@@ -1,7 +1,7 @@
 <%= render partial: 'general/item_title', locals: { item: @sample_type, buttons_partial: 'buttons' } %>
 <% if @sample_type.locked? %>
   <div id="locked-sample-type-warning" class="alert alert-danger">
-    <strong>Warning!</strong> This sample type is locked and should not be edited.
+    <strong>Warning!</strong> This sample type is being edited by a background process and cannot be edited right now.
   </div>
 <% end %>
 <%= render partial: 'general/show_page_tab_definitions' %>
