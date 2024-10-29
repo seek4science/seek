@@ -792,7 +792,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     end
 
     # Locking the sample type
-    Rails.cache.write("sample_type_lock_#{@sample_type.id}", true)
+    @sample_type.set_lock
     assert @sample_type.locked?
 
     %i[edit manage].each do |action|
