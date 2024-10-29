@@ -6,10 +6,10 @@ class SampleTypesController < ApplicationController
 
   before_action :samples_enabled?
   before_action :check_no_created_samples, only: [:destroy]
+  before_action :check_if_locked, only: %i[edit manage manage_update update]
   before_action :find_and_authorize_requested_item, except: %i[create batch_upload index new template_details]
   before_action :find_sample_type, only: %i[batch_upload template_details]
   before_action :check_isa_json_compliance, only: %i[edit update manage manage_update]
-  before_action :check_if_locked, only: %i[edit manage update manage_update]
   before_action :find_assets, only: [:index]
   before_action :auth_to_create, only: %i[new create]
   before_action :project_membership_required, only: %i[create new select filter_for_select]
@@ -222,12 +222,12 @@ class SampleTypesController < ApplicationController
     end.compact
     return if attribute_changes.blank?
 
-    UpdateSampleMetadataJob.perform_later(@sample_type, attribute_changes, @current_user)
+    UpdateSampleMetadataJob.perform_later(@sample_type, @current_user, attribute_changes)
   end
 
   def check_if_locked
-    return unless @sample_type.locked?
-    return if @current_user&.is_admin?
+    @sample_type ||= SampleType.find(params[:id])
+    return unless @sample_type&.locked?
 
     error_message = 'This sample type is locked and cannot be edited right now.'
     flash[:error] = error_message
