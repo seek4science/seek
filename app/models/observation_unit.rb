@@ -57,6 +57,10 @@ class ObservationUnit < ApplicationRecord
     assay_publication_ids
   end
 
+  def self.filter_by_projects(projects)
+    joins(:projects).where(investigations: {investigations_projects: {project_id: projects}})
+  end
+
   private
 
   def study_matches_assays_if_present

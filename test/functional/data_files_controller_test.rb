@@ -3677,6 +3677,117 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :unprocessable_entity
   end
 
+  test 'only editable observation units listed as options' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    df = FactoryBot.create(:data_file, contributor: person)
+    study = FactoryBot.create(:study, investigation: FactoryBot.create(:investigation, projects:person.projects))
+    obs_unit1 = FactoryBot.create(:observation_unit, contributor: person, study:study)
+    obs_unit2 = FactoryBot.create(:observation_unit, policy: FactoryBot.create(:public_policy), study:study)
+    obs_unit3 = FactoryBot.create(:observation_unit, policy: FactoryBot.create(:publicly_viewable_policy), study:study)
+    obs_unit4 = FactoryBot.create(:observation_unit, policy: FactoryBot.create(:downloadable_public_policy), study:study)
+    obs_unit5 = FactoryBot.create(:observation_unit, policy: FactoryBot.create(:private_policy), study:study)
+
+    assert_equal person.projects, obs_unit1.projects
+    assert_equal person.projects, obs_unit2.projects
+    assert_equal person.projects, obs_unit3.projects
+    assert_equal person.projects, obs_unit4.projects
+    assert_equal person.projects, obs_unit5.projects
+
+    #different projects
+    obs_unit6 = FactoryBot.create(:observation_unit, policy: FactoryBot.create(:public_policy))
+    obs_unit7 = FactoryBot.create(:observation_unit, policy: FactoryBot.create(:publicly_viewable_policy))
+    obs_unit8 = FactoryBot.create(:observation_unit, policy: FactoryBot.create(:private_policy))
+
+    refute_equal person.projects, obs_unit6.projects
+    refute_equal person.projects, obs_unit7.projects
+    refute_equal person.projects, obs_unit8.projects
+
+    assert obs_unit1.can_edit?
+    assert obs_unit2.can_edit?
+    refute obs_unit3.can_edit?
+    refute obs_unit4.can_edit?
+    assert obs_unit4.can_download?
+    refute obs_unit5.can_edit?
+    assert obs_unit6.can_edit?
+    refute obs_unit7.can_edit?
+    refute obs_unit8.can_edit?
+
+    get :edit, params: { id: df.id }
+    assert_response :success
+
+    assert_select '#possible_data_file_observation_unit_ids' do
+      assert_select 'option[value=?]', obs_unit1.id
+      assert_select 'option[value=?]', obs_unit2.id
+      assert_select 'option[value=?]', obs_unit3.id, count: 0
+      assert_select 'option[value=?]', obs_unit4.id, count: 0
+      assert_select 'option[value=?]', obs_unit5.id, count: 0
+      assert_select 'option[value=?]', obs_unit6.id, count: 0
+      assert_select 'option[value=?]', obs_unit7.id, count: 0
+      assert_select 'option[value=?]', obs_unit8.id, count: 0
+    end
+
+    assert_select 'select[data-associations-list-id="data_file_observation_unit_ids"]' do
+      assert_select 'option[value=?]', obs_unit6.id
+      assert_select 'option[value=?]', obs_unit7.id, count: 0
+      assert_select 'option[value=?]', obs_unit8.id, count: 0
+    end
+  end
+
+  test 'update with link to editable observation unit' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    data_file = FactoryBot.create(:data_file,contributor:person,projects:person.projects)
+    assert data_file.can_edit?
+    obs_unit = FactoryBot.create(:observation_unit, contributor: person)
+    bad_obs_unit = FactoryBot.create(:observation_unit, policy: FactoryBot.create(:private_policy))
+    assert obs_unit.can_edit?
+    refute bad_obs_unit.can_edit?
+
+    assert_difference('ObservationUnitAsset.count') do
+      put :update, params: { id: data_file.id, data_file: { title: data_file.title, observation_unit_ids:[obs_unit.id] } }
+    end
+    data_file.reload
+    assert_equal [obs_unit], data_file.observation_units
+
+    assert_no_difference('ObservationUnitAsset.count') do
+      assert_raises(ActiveRecord::RecordNotSaved) do
+        put :update, params: { id: data_file.id, data_file: { title: data_file.title, observation_unit_ids:[bad_obs_unit.id] } }
+      end
+    end
+    data_file.reload
+    assert_equal [obs_unit], data_file.observation_units
+
+  end
+
+  test 'create with link to editable observation unit' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    obs_unit = FactoryBot.create(:observation_unit, contributor: person)
+    bad_obs_unit = FactoryBot.create(:observation_unit, policy: FactoryBot.create(:private_policy))
+    assert obs_unit.can_edit?
+    refute bad_obs_unit.can_edit?
+
+    data_file, blob = valid_data_file
+
+    assert_difference('ObservationUnitAsset.count') do
+      assert_difference('DataFile.count') do
+        post :create, params: { data_file: data_file.merge(observation_unit_ids:[obs_unit.id]), content_blobs: [blob], policy_attributes: valid_sharing }
+        assert_redirected_to data_file_path(assigns(:data_file))
+      end
+    end
+
+    data_file = assigns(:data_file)
+    assert_equal [obs_unit], data_file.observation_units
+
+    data_file, blob = valid_data_file
+    assert_no_difference('ObservationUnitAsset.count') do
+      assert_no_difference('DataFile.count') do
+        post :create, params: { data_file: data_file.merge(observation_unit_ids:[bad_obs_unit.id]), content_blobs: [blob], policy_attributes: valid_sharing }
+      end
+    end
+  end
+
   test 'when updating, assay linked to must be editable' do
     person = FactoryBot.create(:person)
     login_as(person)
