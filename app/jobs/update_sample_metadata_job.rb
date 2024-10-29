@@ -4,20 +4,21 @@ class UpdateSampleMetadataJob < ApplicationJob
   queue_with_priority 1
   queue_as QueueNames::SAMPLES
 
-  def perform(sample_type, user, attribute_changes = [])
-    Rails.cache.write("sample_type_lock_#{sample_type.id}", true, expires_in: 1.hour)
+  attr_accessor :sample_type, :user, :attribute_changes
 
-    Seek::Samples::SampleMetadataUpdater.new(sample_type, user, attribute_changes).update_metadata
+  before_enqueue do |job|
+    SampleType.find(job.arguments[0].id).set_lock
   end
 
-  def perform_with_error(sample_type, user, attribute_changes = [])
-    begin
-      Rails.cache.write("sample_type_lock_#{sample_type.id}", true, expires_in: 1.hour)
-      sample_type.lock.samples.in_batches(of: 1000) do |samples|
-        Seek::Samples::SampleMetadataUpdater.new(samples, user, attribute_changes).raise_sample_metadata_update_exception
-      end
-    end
-  ensure
-    Rails.cache.delete("sample_type_lock_#{sample_type.id}")
+  before_perform do |job|
+    SampleType.find(job.arguments[0].id).set_lock
+  end
+
+  def perform(sample_type, user, attribute_changes = [])
+    @sample_type = sample_type
+    @user = user
+    @attribute_changes = attribute_changes
+
+    Seek::Samples::SampleMetadataUpdater.new(@sample_type, @user, @attribute_changes).update_metadata
   end
 end

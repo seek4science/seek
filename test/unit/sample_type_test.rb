@@ -1063,7 +1063,7 @@ class SampleTypeTest < ActiveSupport::TestCase
   test 'sample type is locked?' do
     sample_type = FactoryBot.create(:simple_sample_type, project_ids: @project_ids, contributor: @person)
     refute sample_type.locked?
-    Rails.cache.write("sample_type_lock_#{sample_type.id}", true)
+    sample_type.set_lock
     assert sample_type.locked?
     refute sample_type.valid?
     assert sample_type.errors.added?(:base, 'This sample type is locked and cannot be edited right now.')

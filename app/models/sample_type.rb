@@ -115,6 +115,10 @@ class SampleType < ApplicationRecord
     Rails.cache.fetch("sample_type_lock_#{id}").present?
   end
 
+  def set_lock
+    Rails.cache.write("sample_type_lock_#{id}", true, expires_in: 1.hour)
+  end
+
   def validate_value?(attribute_name, value)
     attribute = sample_attributes.detect { |attr| attr.title == attribute_name }
     raise UnknownAttributeException, "Unknown attribute #{attribute_name}" unless attribute
