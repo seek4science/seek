@@ -260,12 +260,16 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
                 assert_difference('ObservationUnitAsset.count', 1) do
                   assert_difference('AssayAsset.count', 2) do # 1 for new df, the other is for the sample
                     assert_difference('ExtendedMetadata.count', 3) do
-                      # FIXME: ideally should be zero, but 1 is being created by a save when observation_unit pass to the study.observation_units association
-                      assert_difference('DataFile.count', 1) do
-                        investigation = Seek::FairDataStation::Writer.new.update_isa(investigation, inv, contributor,
-                                                                                     projects, policy)
+                      assert_difference('ActivityLog.count', 24) do
+                        assert_difference("ActivityLog.where(action:'create').count", 7) do
+                          # FIXME: ideally should be zero, but 1 is being created by a save when observation_unit pass to the study.observation_units association
+                          assert_difference('DataFile.count', 1) do
+                            investigation = Seek::FairDataStation::Writer.new.update_isa(investigation, inv, contributor,
+                                                                                         projects, policy)
+                          end
+                          investigation.save!
+                        end
                       end
-                      investigation.save!
                     end
                   end
                 end
@@ -275,8 +279,15 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
         end
       end
     end
+    ActivityLog.last(24).each do |log|
+      assert_includes ['create', 'update'], log.action
+      assert_equal contributor, log.culprit
+      assert_equal 'fair data station import', log.data
+    end
 
     investigation.reload
+    assert_equal 2, investigation.activity_logs.count
+    assert_equal 'update', investigation.activity_logs.last.action
 
     # check:
     #   investigation title has been modified
@@ -289,12 +300,20 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     assert_equal 3, investigation.studies.count
     study = investigation.studies.where(external_identifier: 'seek-test-study-1').first
     assert_equal 'manchester test site - changed', study.extended_metadata.get_attribute_value('Experimental site name')
+    assert_equal 2, study.activity_logs.count
+    assert_equal 'update', study.activity_logs.last.action
+
     study = investigation.studies.where(external_identifier: 'seek-test-study-2').first
     assert_equal 'testing testing testing testing testing testing testing testing testing testing study 2 - changed',
                  study.description
+    assert_equal 2, study.activity_logs.count
+    assert_equal 'update', study.activity_logs.last.action
+
     study = investigation.studies.where(external_identifier: 'seek-test-study-3').first
     assert_equal 'test study 3', study.title
     assert_equal 'birmingham-test-site', study.extended_metadata.get_attribute_value('Experimental site name')
+    assert_equal 1, study.activity_logs.count
+    assert_equal 'create', study.activity_logs.last.action
 
     # check:
     #   seek-test-obs-unit-1 host sex modified
@@ -305,14 +324,22 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     obs_unit = ObservationUnit.where(external_identifier: 'seek-test-obs-unit-1').first
     assert_equal 'female', obs_unit.extended_metadata.get_attribute_value('Gender')
     assert_equal ['test-file-6.csv'], obs_unit.data_files.collect(&:external_identifier)
+    assert_equal 2, obs_unit.activity_logs.count
+    assert_equal 'update', obs_unit.activity_logs.last.action
+
     obs_unit = ObservationUnit.where(external_identifier: 'seek-test-obs-unit-3').first
     assert_equal 'test obs unit 3 - changed', obs_unit.title
+    assert_equal 2, obs_unit.activity_logs.count
+    assert_equal 'update', obs_unit.activity_logs.last.action
+
     obs_unit = ObservationUnit.where(external_identifier: 'seek-test-obs-unit-4').first
     assert_equal 'testing testing testing testing testing testing testing testing testing testing obs unit 4',
                  obs_unit.description
     assert_equal '1005g', obs_unit.extended_metadata.get_attribute_value('Birth weight')
     assert_equal 'seek-test-study-3', obs_unit.study.external_identifier
     assert_equal ['test-file-7.csv'], obs_unit.data_files.collect(&:external_identifier)
+    assert_equal 1, obs_unit.activity_logs.count
+    assert_equal 'create', obs_unit.activity_logs.last.action
 
     # check:
     #   seek-test-sample-1 name changed
@@ -375,9 +402,13 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
                 assert_no_difference('ObservationUnitAsset.count') do
                   assert_no_difference('AssayAsset.count') do
                     assert_no_difference('ExtendedMetadata.count') do
-                      investigation = Seek::FairDataStation::Writer.new.update_isa(investigation, inv, contributor,
-                                                                                   projects, policy)
-                      investigation.save!
+                      assert_difference('ActivityLog.count', 17) do
+                        assert_no_difference("ActivityLog.where(action:'create').count") do
+                          investigation = Seek::FairDataStation::Writer.new.update_isa(investigation, inv, contributor,
+                                                                                       projects, policy)
+                          investigation.save!
+                        end
+                      end
                     end
                   end
                 end
@@ -387,6 +418,13 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
         end
       end
     end
+
+    ActivityLog.last(17).each do |log|
+      assert_equal 'update', log.action
+      assert_equal contributor, log.culprit
+      assert_equal 'fair data station import', log.data
+    end
+
 
     investigation.reload
 

@@ -117,6 +117,7 @@ module Seek
         attributes = datastation_entity.seek_attributes
         seek_entity.assign_attributes(attributes)
         update_extended_metadata(seek_entity, datastation_entity)
+        record_activity(seek_entity, seek_entity.contributor, 'update')
         seek_entity
       end
 
@@ -124,6 +125,7 @@ module Seek
         sample_attributes = datastation_sample.seek_attributes
         seek_sample.assign_attributes(sample_attributes)
         populate_sample(seek_sample, datastation_sample)
+        record_activity(seek_sample, seek_sample.contributor, 'update')
         seek_sample
       end
 
