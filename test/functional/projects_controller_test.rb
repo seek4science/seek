@@ -5121,15 +5121,17 @@ class ProjectsControllerTest < ActionController::TestCase
 
     ttl_file = fixture_file_upload('fair_data_station/demo.ttl')
 
-    post :submit_fairdata_station, params: {id: project, datastation_data: ttl_file,
-                                            policy_attributes:{
-                                              access_type: Policy::VISIBLE,
-                                              permissions_attributes: {
-                                                '0' => { contributor_type: 'Person', contributor_id: another_person.id, access_type: Policy::MANAGING
-                                                }
-                                              }
-                                            }
-    }
+    assert_difference('ActivityLog.count',40) do
+      post :submit_fairdata_station, params: { id: project, datastation_data: ttl_file,
+                                               policy_attributes: {
+                                                 access_type: Policy::VISIBLE,
+                                                 permissions_attributes: {
+                                                   '0' => { contributor_type: 'Person', contributor_id: another_person.id, access_type: Policy::MANAGING
+                                                   }
+                                                 }
+                                               }
+      }
+    end
 
     assert investigation = assigns(:investigation)
     assert_redirected_to investigation
