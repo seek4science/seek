@@ -64,8 +64,10 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
             assert_difference('Assay.count', 9) do
               assert_difference('AssayAsset.count', 27) do
                 assert_difference('DataFile.count', 18) do
-                  User.with_current_user(contributor.user) do
-                    investigation.save!
+                  assert_difference('ActivityLog.count', 40) do
+                    User.with_current_user(contributor.user) do
+                      investigation.save!
+                    end
                   end
                 end
               end
@@ -74,6 +76,17 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
         end
       end
     end
+    (logs = ActivityLog.last(40)).each do |log|
+      assert_equal 'create', log.action
+      assert_equal contributor, log.culprit
+      assert_equal 'fair data station import', log.data
+    end
+    investigation.reload
+    assert_equal 1, investigation.activity_logs.count
+    assert_includes logs, investigation.activity_logs.first
+    study = investigation.studies.first
+    assert_equal 1, study.activity_logs.count
+    assert_includes logs, study.activity_logs.first
   end
 
   test 'populate extended metadata and samples' do

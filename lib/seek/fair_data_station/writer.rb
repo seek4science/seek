@@ -65,6 +65,7 @@ module Seek
                                                                      assay_class: AssayClass.experimental, samples: samples, policy: policy.deep_copy })
         assay = study.assays.build(assay_attributes)
         populate_extended_metadata(assay, datastation_assay)
+        record_activity(assay, contributor, 'create')
         datastation_assay.datasets.each do |datastation_dataset|
           df = build_data_file(contributor, datastation_dataset, projects, policy)
           assay.assay_assets.build(asset: df)
@@ -77,6 +78,7 @@ module Seek
                                                                        policy: policy.deep_copy })
         sample = observation_unit.samples.build(sample_attributes)
         populate_sample(sample, datastation_sample)
+        record_activity(sample, contributor, 'create')
         sample
       end
 
@@ -89,6 +91,7 @@ module Seek
           observation_unit.observation_unit_assets.build(asset: df)
         end
         populate_extended_metadata(observation_unit, datastation_observation_unit)
+        record_activity(observation_unit, contributor, 'create')
         observation_unit
       end
 
@@ -97,6 +100,7 @@ module Seek
                                                                      investigation: investigation, policy: policy.deep_copy })
         study = investigation.studies.build(study_attributes)
         populate_extended_metadata(study, datastation_study)
+        record_activity(study, contributor, 'create')
         study
       end
 
@@ -105,6 +109,7 @@ module Seek
                                                                  policy: policy.deep_copy })
         investigation = ::Investigation.new(inv_attributes)
         populate_extended_metadata(investigation, datastation_inv)
+        record_activity(investigation, contributor, 'create')
         investigation
       end
 
@@ -239,8 +244,14 @@ module Seek
                                                                              contributor: contributor, projects: projects,
                                                                              content_blob: blob, policy: policy.deep_copy
                                                                            })
-          DataFile.new(data_file_attributes)
+          data_file = DataFile.new(data_file_attributes)
+          record_activity(data_file, contributor, 'create')
+          data_file
         end
+      end
+
+      def record_activity(item, culprit, action)
+        item.activity_logs.build(culprit: culprit, action: action, data: 'fair data station import')
       end
     end
   end
