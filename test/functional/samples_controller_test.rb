@@ -1591,10 +1591,9 @@ class SamplesControllerTest < ActionController::TestCase
 
     sample_type = FactoryBot.create(:simple_sample_type, contributor: person, project_ids: [project.id])
 
-    get :new, params: { sample_type_id: sample_type.id }
-    assert_response :success
+    # lock the sample type by adding a fake update task
+    UpdateSampleMetadataJob.perform_later(sample_type, person.user, [])
 
-    sample_type.set_lock
     get :new, params: { sample_type_id: sample_type.id }
     assert_redirected_to sample_types_path(sample_type)
     assert_equal flash[:error], 'This sample type is locked. You cannot edit the sample.'

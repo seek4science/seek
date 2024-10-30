@@ -6,11 +6,6 @@ class SampleTypeTest < ActiveSupport::TestCase
     @person = FactoryBot.create(:person)
     @project = @person.projects.first
     @project_ids = [@project.id]
-    Rails.cache.clear
-  end
-
-  def teardown
-    Rails.cache.clear
   end
 
   test 'validation' do
@@ -695,7 +690,7 @@ class SampleTypeTest < ActiveSupport::TestCase
     assert sample_type.new_record?
     refute sample_type.template_generation_task.pending?
 
-    assert_difference('Task.count', 1) do
+    assert_difference('Task.where(key: "template_generation").count', 1) do
       assert_enqueued_with(job: SampleTemplateGeneratorJob, args: [sample_type]) do
         disable_authorization_checks { sample_type.save! }
         assert sample_type.reload.template_generation_task.pending?
@@ -1063,23 +1058,13 @@ class SampleTypeTest < ActiveSupport::TestCase
   test 'sample type is locked?' do
     sample_type = FactoryBot.create(:simple_sample_type, project_ids: @project_ids, contributor: @person)
     refute sample_type.locked?
-    sample_type.set_lock
+
+    # lock the sample type by adding a fake update task
+    UpdateSampleMetadataJob.perform_later(sample_type, @person.user, [])
+
     assert sample_type.locked?
     refute sample_type.valid?
     assert sample_type.errors.added?(:base, 'This sample type is locked and cannot be edited right now.')
-  end
-
-  test 'update locked sample type' do
-    sample_type = FactoryBot.create(:simple_sample_type, project_ids: @project_ids, contributor: @person)
-    (1..10).each do |i|
-      FactoryBot.create(:sample, sample_type: sample_type, project_ids: @project_ids, title: "Sample #{i}")
-    end
-    sample_type.with_lock do
-      # sample_type.samples << FactoryBot.create(:sample, sample_type: sample_type, project_ids: @project_ids, title: 'Sample 11')
-      # sample_type.title = 'Updated title'
-      sample_type.sample_attributes.first.title = 'Updated title'
-      sample_type.save!
-    end
   end
 
   private

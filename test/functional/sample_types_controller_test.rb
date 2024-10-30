@@ -41,7 +41,7 @@ class SampleTypesControllerTest < ActionController::TestCase
       assert_enqueued_with(job: SampleTypeUpdateJob) do
         assert_difference('ActivityLog.count') do
           assert_difference('SampleType.count') do
-            assert_difference('Task.count') do
+            assert_difference('Task.where(key: "template_generation").count') do
               post :create, params: { sample_type: { title: 'Hello!',
                                                      project_ids: @project_ids,
                                                      description: 'The description!!',
@@ -787,8 +787,8 @@ class SampleTypesControllerTest < ActionController::TestCase
       assert_response :success
     end
 
-    # Locking the sample type
-    @sample_type.set_lock
+    # lock the sample type by adding a fake update task
+    UpdateSampleMetadataJob.perform_later(@sample_type, @person.user, [])
     assert @sample_type.locked?
 
     %i[edit manage].each do |action|

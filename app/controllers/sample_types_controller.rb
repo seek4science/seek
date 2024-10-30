@@ -227,6 +227,7 @@ class SampleTypesController < ApplicationController
 
   def check_if_locked
     @sample_type ||= SampleType.find(params[:id])
+    @sample_type.reload
     return unless @sample_type&.locked?
 
     error_message = 'This sample type is locked and cannot be edited right now.'
