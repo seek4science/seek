@@ -816,7 +816,9 @@ class SampleTypesControllerTest < ActionController::TestCase
         '0': { id: sample_type.sample_attributes.detect(&:is_title), title: 'new title' }
       }
     } }
+    assert_nil flash[:error]
     assert_redirected_to sample_type_path(sample_type)
+    sample_type.reload
     assert sample_type.locked?
 
     login_as(other_person)
@@ -826,6 +828,7 @@ class SampleTypesControllerTest < ActionController::TestCase
         '0': { id: sample_type.sample_attributes.detect(&:is_title), title: 'new title' }
       }
     } }
+    sample_type.reload
     sample_type.errors.added?(:base, 'This sample type is locked and cannot be edited right now.')
 
     assert_redirected_to sample_type_path(sample_type)
