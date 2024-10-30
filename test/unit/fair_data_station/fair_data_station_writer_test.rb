@@ -496,6 +496,44 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     assert_equal expected, obs_unit.extended_metadata.data
   end
 
+  test 'construct with deep nested extended metadata' do
+    FactoryBot.create(:fairdata_test_case_investigation_extended_metadata)
+    study_emt = FactoryBot.create(:fairdata_test_case_deep_nested_study_extended_metadata)
+    obs_unit_emt = FactoryBot.create(:fairdata_test_case_obsv_unit_extended_metadata)
+    FactoryBot.create(:fairdata_test_case_assay_extended_metadata)
+    FactoryBot.create(:fairdatastation_test_case_sample_type)
+    FactoryBot.create(:experimental_assay_class)
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case.ttl"
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+    contributor = FactoryBot.create(:person)
+
+    investigation = Seek::FairDataStation::Writer.new.construct_isa(inv, contributor, contributor.projects, Policy.default)
+    assert investigation.valid?
+
+    assert_difference('ExtendedMetadata.count', 12) do
+      User.with_current_user(contributor.user) do
+        investigation.save!
+      end
+    end
+
+    assert_equal 2, investigation.studies.count
+    study = investigation.studies.first
+    assert_equal study_emt, study.extended_metadata.extended_metadata_type
+    assert_equal 'test study 1', study.title
+
+    expected = HashWithIndifferentAccess.new({
+                                               'Experimental site name':'manchester test site',
+                                               'child': {
+                                                 'End date of Study': '2024-08-08',
+                                                 'grandchild': {
+                                                   'Start date of Study': '2024-08-01'
+                                                 }
+                                               }
+                                             })
+
+    assert_equal expected, study.extended_metadata.data
+  end
+
   private
 
   def setup_test_case_investigation

@@ -562,5 +562,33 @@ FactoryBot.define do
                                                           linked_extended_metadata_type: FactoryBot.create(:nested_obs_unit_birth_details_extended_metadata_type))
     end
   end
+
+  factory(:deep_nested_study_grandchild_extended_metadata_type,class:ExtendedMetadataType) do
+    title { 'deep nested study grandchild' }
+    supported_type { 'ExtendedMetadata' }
+    after(:build) do |a|
+      a.extended_metadata_attributes << a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Start date of Study', pid:'http://fairbydesign.nl/ontology/start_date_of_study')
+    end
+  end
+
+  factory(:deep_nested_study_child_extended_metadata_type,class:ExtendedMetadataType) do
+    title { 'deep nested study child' }
+    supported_type { 'ExtendedMetadata' }
+    after(:build) do |a|
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'End date of Study', pid:'http://fairbydesign.nl/ontology/end_date_of_study')
+      a.extended_metadata_attributes << FactoryBot.create(:extended_metadata_attribute, title:'grandchild', sample_attribute_type: FactoryBot.create(:extended_metadata_sample_attribute_type),
+                                                          linked_extended_metadata_type: FactoryBot.create(:deep_nested_study_grandchild_extended_metadata_type))
+    end
+  end
+
+  factory(:fairdata_test_case_deep_nested_study_extended_metadata, class: ExtendedMetadataType) do
+    title {'Fair Data Station Deep Nested Study Test Case'}
+    supported_type { 'Study' }
+    after(:build) do |a|
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Experimental site name', pid:'http://fairbydesign.nl/ontology/experimental_site_name')
+      a.extended_metadata_attributes << FactoryBot.create(:extended_metadata_attribute, title:'child', sample_attribute_type: FactoryBot.create(:extended_metadata_sample_attribute_type),
+                                                          linked_extended_metadata_type: FactoryBot.create(:deep_nested_study_child_extended_metadata_type))
+    end
+  end
 end
 
