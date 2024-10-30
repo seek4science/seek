@@ -64,6 +64,7 @@ class SampleType < ApplicationRecord
 
   has_annotation_type :sample_type_tag, method_name: :tags
 
+  has_task :sample_metadata_update
   def investigations
     return [] if studies.empty? && assays.empty?
 
@@ -112,11 +113,7 @@ class SampleType < ApplicationRecord
   end
 
   def locked?
-    Rails.cache.fetch("sample_type_lock_#{id}").present?
-  end
-
-  def set_lock
-    Rails.cache.write("sample_type_lock_#{id}", true, expires_in: 1.hour)
+    sample_metadata_update_task&.in_progress?
   end
 
   def validate_value?(attribute_name, value)

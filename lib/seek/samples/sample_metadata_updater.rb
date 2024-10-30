@@ -29,9 +29,6 @@ module Seek
             end
           end
         end
-
-      ensure
-        Rails.cache.delete("sample_type_lock_#{@sample_type.id}")
       end
 
       def raise_sample_metadata_update_exception
