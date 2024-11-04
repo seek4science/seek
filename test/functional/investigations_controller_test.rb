@@ -1314,7 +1314,7 @@ class InvestigationsControllerTest < ActionController::TestCase
         assert_difference('ObservationUnit.count', 1) do
           assert_difference('Sample.count', 1) do
             assert_difference('Assay.count', 1) do
-              assert_difference('ActivityLog.count',24) do
+              assert_difference('ActivityLog.count',18) do
                 post :submit_fairdata_station, params: {id: investigation, datastation_data: ttl_file }
                 assert_redirected_to investigation
               end

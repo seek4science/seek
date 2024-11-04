@@ -117,15 +117,19 @@ module Seek
         attributes = datastation_entity.seek_attributes
         seek_entity.assign_attributes(attributes)
         update_extended_metadata(seek_entity, datastation_entity)
-        record_activity(seek_entity, seek_entity.contributor, 'update')
+        if seek_entity.changed? || seek_entity.extended_metadata&.changed?
+          record_activity(seek_entity, seek_entity.contributor, 'update')
+        end
         seek_entity
       end
 
-      def update_sample(seek_sample, datastation_sample, _contributor, _projects, _policy)
+      def update_sample(seek_sample, datastation_sample)
         sample_attributes = datastation_sample.seek_attributes
         seek_sample.assign_attributes(sample_attributes)
-        populate_sample(seek_sample, datastation_sample)
-        record_activity(seek_sample, seek_sample.contributor, 'update')
+        update_sample_metadata(seek_sample, datastation_sample)
+        if seek_sample.changed?
+          record_activity(seek_sample, seek_sample.contributor, 'update')
+        end
         seek_sample
       end
 
@@ -161,7 +165,7 @@ module Seek
       def update_or_build_sample(datastation_sample, contributor, projects, policy, observation_unit)
         sample = ::Sample.by_external_identifier(datastation_sample.external_id, projects)
         if sample
-          update_sample(sample, datastation_sample, contributor, projects, policy)
+          update_sample(sample, datastation_sample)
           sample.observation_unit = observation_unit
           sample.assays = []
           observation_unit.samples << sample
@@ -199,6 +203,10 @@ module Seek
         datastation_entity.populate_extended_metadata(seek_entity)
       end
 
+      def update_sample_metadata(seek_sample, datastation_sample)
+        datastation_sample.populate_seek_sample(seek_sample)
+      end
+
       def detect_extended_metadata(seek_entity, datastation_entity)
         property_ids = datastation_entity.additional_metadata_annotations.collect { |annotation| annotation[0] }
 
@@ -218,9 +226,7 @@ module Seek
       def populate_sample(seek_sample, datastation_sample)
         if sample_type = detect_sample_type(datastation_sample)
           seek_sample.sample_type = sample_type
-          datastation_sample.populate_seek_sample(seek_sample)
-          seek_sample.set_attribute_value('Title', datastation_sample.title)
-          seek_sample.set_attribute_value('Description', datastation_sample.description)
+          update_sample_metadata(seek_sample, datastation_sample)
         end
       end
 

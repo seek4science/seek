@@ -260,7 +260,7 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
                 assert_difference('ObservationUnitAsset.count', 1) do
                   assert_difference('AssayAsset.count', 2) do # 1 for new df, the other is for the sample
                     assert_difference('ExtendedMetadata.count', 3) do
-                      assert_difference('ActivityLog.count', 24) do
+                      assert_difference('ActivityLog.count', 18) do
                         assert_difference("ActivityLog.where(action:'create').count", 7) do
                           # FIXME: ideally should be zero, but 1 is being created by a save when observation_unit pass to the study.observation_units association
                           assert_difference('DataFile.count', 1) do
@@ -279,7 +279,8 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
         end
       end
     end
-    ActivityLog.last(24).each do |log|
+
+    ActivityLog.last(18).each do |log|
       assert_includes ['create', 'update'], log.action
       assert_equal contributor, log.culprit
       assert_equal 'fair data station import', log.data
@@ -327,6 +328,11 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     assert_equal 2, obs_unit.activity_logs.count
     assert_equal 'update', obs_unit.activity_logs.last.action
 
+    # check no new activity logs, as unchanged
+    obs_unit = ObservationUnit.where(external_identifier: 'seek-test-obs-unit-2').first
+    assert_equal 1, obs_unit.activity_logs.count
+    assert_equal 'create', obs_unit.activity_logs.last.action
+
     obs_unit = ObservationUnit.where(external_identifier: 'seek-test-obs-unit-3').first
     assert_equal 'test obs unit 3 - changed', obs_unit.title
     assert_equal 2, obs_unit.activity_logs.count
@@ -361,6 +367,11 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     assert_equal 'seek-test-obs-unit-4', sample.observation_unit.external_identifier
     assert_equal 'goat', sample.get_attribute_value('Scientific name')
     assert_equal 'test seek sample 6', sample.title
+
+    # check for no new activity logs
+    sample = Sample.where(external_identifier: 'seek-test-sample-4').first
+    assert_equal 1, sample.activity_logs.count
+    assert_equal 'create', sample.activity_logs.last.action
 
     # check:
     #   seek-test-assay-1 description changed
@@ -402,7 +413,7 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
                 assert_no_difference('ObservationUnitAsset.count') do
                   assert_no_difference('AssayAsset.count') do
                     assert_no_difference('ExtendedMetadata.count') do
-                      assert_difference('ActivityLog.count', 17) do
+                      assert_no_difference('ActivityLog.count') do
                         assert_no_difference("ActivityLog.where(action:'create').count") do
                           investigation = Seek::FairDataStation::Writer.new.update_isa(investigation, inv, contributor,
                                                                                        projects, policy)
@@ -418,13 +429,6 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
         end
       end
     end
-
-    ActivityLog.last(17).each do |log|
-      assert_equal 'update', log.action
-      assert_equal contributor, log.culprit
-      assert_equal 'fair data station import', log.data
-    end
-
 
     investigation.reload
 
