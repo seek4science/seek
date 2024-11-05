@@ -13,7 +13,7 @@
 <p>
   <label>Associated Dataset:</label>
   <%= link_to(@dataset['name'], '#', {'data-role':'nels-tree-node-link', 'data-tree-node-id':"dataset#{@dataset['id']}"}) %>
-  <%= nels_locked_dataset_icon if @dataset['islocked'] %>
+  <%= nels_locked_dataset_icon if is_nels_dataset_locked?(@dataset, @project) %>
 </p>
 
 <style>
@@ -24,7 +24,7 @@ table, th, td {
 </style>
 
 <p>
-  <% disabled_reason = 'The Dataset is locked' if @dataset['islocked'] %>
+  <% disabled_reason = 'The Dataset is locked' if is_nels_dataset_locked?(@dataset, @project) %>
   <%= button_link_to('Upload a file', 'arrow_up', nil, { id: :upload_file, class: :upload_file, disabled_reason:disabled_reason } ) %>
   <%= button_link_to('Create a folder', 'add', nil, { id: :create_folder, class: :create_folder, disabled_reason:disabled_reason } ) %>
   <%= button_link_to('Add metadata', 'add', nil, { id: :add_metadata, 'data-project-id':@project_id, 'data-dataset-id':@dataset_id, 'data-subtype-name':@subtype_name, class: :add_metadata } ) %>

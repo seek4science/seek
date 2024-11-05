@@ -2,7 +2,7 @@ json.array! @datasets do |dataset|
   json.id "dataset#{dataset['id']}"
   json.text dataset['name']
   json.parent "project#{params[:id]}"
-  json.icon dataset['islocked'] ? nels_locked_dataset_glyph : nels_dataset_glyph
+  json.icon is_nels_dataset_locked?(dataset, @project) ? nels_locked_dataset_glyph : nels_dataset_glyph
   json.data do
     json.id dataset['id']
     json.assay_id params[:assay_id]

@@ -28,7 +28,7 @@
 
   <li>
     <%= link_to(dataset['name'], '#', {'data-role':'nels-tree-node-link', 'data-tree-node-id':"dataset#{dataset['id']}"}) %>
-    <%= nels_locked_dataset_icon if dataset['islocked'] %>
+    <%= nels_locked_dataset_icon if is_nels_dataset_locked?(dataset, @project) %>
     <ul>
       <li><label>Description:</label><%= dataset['description'] %></li>
       <li><label>Type:</label><%= dataset['type'] %></li>

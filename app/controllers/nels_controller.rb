@@ -168,6 +168,7 @@ class NelsController < ApplicationController
 
   def datasets
     @datasets = rest_client.datasets(params[:id].to_i)
+    @project = rest_client.project(params[:id].to_i)
     respond_to do |format|
       format.json
     end

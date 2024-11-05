@@ -35,6 +35,10 @@ module NelsHelper
     content_tag(:span, '', class: nels_locked_dataset_glyph).html_safe
   end
 
+  def is_nels_dataset_locked?(dataset, project)
+    dataset['islocked'] || project['membership_type']==4
+  end
+
   def subtype_path_breadcrumbs(subtype_path, full_path, project_id, dataset_id, subtype_name)
     current_path = full_path.chomp(subtype_path).chomp('/')
     root_link = link_to('<root>', '#', class:'nels-folder', 'data-path':current_path, 'data-project-id':project_id, 'data-dataset-id':dataset_id, 'data-subtype':subtype_name)

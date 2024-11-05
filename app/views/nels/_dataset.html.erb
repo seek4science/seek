@@ -3,7 +3,7 @@
   <span class="<%= nels_dataset_glyph %>"/>
   &nbsp;
   Dataset: <%= @dataset['name'] -%>
-  <%= nels_locked_dataset_icon if @dataset['islocked'] %>
+  <%= nels_locked_dataset_icon if is_nels_dataset_locked?(@dataset, @project) %>
   <br/>
   <small><%= @dataset['type'] -%></small>
 </h2>

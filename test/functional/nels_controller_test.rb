@@ -107,7 +107,9 @@ class NelsControllerTest < ActionController::TestCase
 
   test 'can load datasets' do
     VCR.use_cassette('nels/get_datasets') do
-      get :datasets, params: { assay_id: @assay.id, format: :json, id: @project_id }
+      VCR.use_cassette('nels/get_project') do
+        get :datasets, params: { assay_id: @assay.id, format: :json, id: @project_id }
+      end
     end
 
     assert_response :success
