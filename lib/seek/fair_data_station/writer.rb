@@ -1,6 +1,7 @@
 module Seek
   module FairDataStation
-    class ExternalIdMismatchException < RuntimeError; end;
+    class ExternalIdMismatchException < RuntimeError; end
+
     class Writer
       def construct_isa(datastation_inv, contributor, projects, policy)
         reset_data_file_cache
@@ -24,7 +25,7 @@ module Seek
 
       def update_isa(investigation, datastation_inv, contributor, projects, policy)
         unless investigation.external_identifier == datastation_inv.external_id
-          raise ExternalIdMismatchException.new('Investigation external identifiers do not match')
+          raise ExternalIdMismatchException, 'Investigation external identifiers do not match'
         end
 
         preload_data_file_cache(investigation.related_data_files)
@@ -32,7 +33,8 @@ module Seek
         datastation_inv.studies.each do |datastation_study|
           study = update_or_build_study(datastation_study, contributor, projects, policy, investigation)
           datastation_study.observation_units.each do |datastation_observation_unit|
-            observation_unit = update_or_build_observation_unit(datastation_observation_unit, contributor, policy, study)
+            observation_unit = update_or_build_observation_unit(datastation_observation_unit, contributor, policy,
+                                                                study)
             datastation_observation_unit.samples.each do |datastation_sample|
               sample = update_or_build_sample(datastation_sample, contributor, projects, policy, observation_unit)
               datastation_sample.assays.each do |datastation_assay|
@@ -117,9 +119,7 @@ module Seek
         attributes = datastation_entity.seek_attributes
         seek_entity.assign_attributes(attributes)
         update_extended_metadata(seek_entity, datastation_entity)
-        if seek_entity.changed? || seek_entity.extended_metadata&.changed?
-          record_activity(seek_entity, seek_entity.contributor, 'update')
-        end
+        record_update_activity_if_changed(seek_entity, seek_entity.contributor)
         seek_entity
       end
 
@@ -127,9 +127,7 @@ module Seek
         sample_attributes = datastation_sample.seek_attributes
         seek_sample.assign_attributes(sample_attributes)
         update_sample_metadata(seek_sample, datastation_sample)
-        if seek_sample.changed?
-          record_activity(seek_sample, seek_sample.contributor, 'update')
-        end
+        record_update_activity_if_changed(seek_sample, seek_sample.contributor)
         seek_sample
       end
 
@@ -145,7 +143,8 @@ module Seek
       end
 
       def update_or_build_observation_unit(datastation_observation_unit, contributor, policy, study)
-        observation_unit = ::ObservationUnit.by_external_identifier(datastation_observation_unit.external_id, study.projects)
+        observation_unit = ::ObservationUnit.by_external_identifier(datastation_observation_unit.external_id,
+                                                                    study.projects)
         if observation_unit
           update_entity(observation_unit, datastation_observation_unit)
           observation_unit.study = study
@@ -258,8 +257,21 @@ module Seek
         end
       end
 
-      def record_activity(item, culprit, action)
-        item.activity_logs.build(culprit: culprit, action: action, data: 'fair data station import')
+      def record_activity(seek_entity, culprit, action)
+        seek_entity.activity_logs.build(culprit: culprit, action: action, data: 'fair data station import')
+      end
+
+      def record_update_activity_if_changed(seek_entity, culprit)
+        return unless seek_entity_changed?(seek_entity)
+
+        record_activity(seek_entity, culprit, 'update')
+      end
+
+      def seek_entity_changed?(seek_entity)
+        return true if seek_entity.changed?
+        return true if seek_entity.respond_to?(:extended_metadata) && seek_entity.extended_metadata&.changed?
+
+        false
       end
     end
   end

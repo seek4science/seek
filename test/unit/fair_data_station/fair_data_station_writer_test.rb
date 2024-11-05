@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class FairDataStationWriterTest < ActiveSupport::TestCase
+
   test 'construct seek isa' do
     path = "#{Rails.root}/test/fixtures/files/fair_data_station/demo.ttl"
     inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
