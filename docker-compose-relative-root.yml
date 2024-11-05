@@ -1,4 +1,3 @@
-version: '3'
 services:
   db: # Database implementation, in this case MySQL
     image: mysql:8.0

@@ -207,6 +207,7 @@ SEEK::Application.routes.draw do
     collection do
       get :form_fields
       get :administer
+      post :create
     end
     member do
       put :administer_update
@@ -420,6 +421,8 @@ SEEK::Application.routes.draw do
       get :manage
       get :order_studies
       patch :manage_update
+      get :update_from_fairdata_station
+      post :submit_fairdata_station
     end
     resources :people, :programmes, :projects, :assays, :studies, :models, :sops, :workflows, :data_files, :publications, :documents, :observation_units, :samples, only: [:index]
   end
@@ -533,6 +536,7 @@ SEEK::Application.routes.draw do
       post :execute
       get :simulate
       post :simulate
+      get :copasi_simulate
     end
     resources :model_images, only: [:show]
     resources :people, :programmes, :projects, :investigations, :assays, :studies, :publications, :events, :collections, :organisms, :human_diseases, only: [:index]

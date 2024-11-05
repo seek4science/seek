@@ -82,7 +82,7 @@ def load_seek_config_defaults!
   Seek::Config.default :data_files_enabled,true
   Seek::Config.default :events_enabled,true
   Seek::Config.default :isa_enabled, true
-  Seek::Config.default :observation_units_enabled,true
+  Seek::Config.default :observation_units_enabled, false
   Seek::Config.default :models_enabled,true
   Seek::Config.default :organisms_enabled,true
   Seek::Config.default :programmes_enabled, false
@@ -267,6 +267,23 @@ def load_seek_config_defaults!
   Seek::Config.default :life_monitor_ui_url, 'https://app.lifemonitor.eu/'
   Seek::Config.default :git_support_enabled, false
   Seek::Config.default :bio_tools_enabled, false
+  Seek::Config.default :scraper_config, [
+    {
+      project_title: 'iwc',
+      class: 'IwcScraper',
+      options: {
+        organization: 'iwc-workflows',
+        main_branch: 'main'
+      }
+    },
+    {
+      project_title: 'nf-core',
+      class: 'NfcoreScraper',
+      options: {
+        organization: 'nf-core'
+      }
+    }
+  ]
 
   load_seek_testing_defaults! if Rails.env.test?
 end

@@ -297,7 +297,7 @@ class SamplesController < ApplicationController
         end
       end
     end
-    parameters.require(:sample).permit(:sample_type_id, *creator_related_params,
+    parameters.require(:sample).permit(:sample_type_id, *creator_related_params, :observation_unit_id,
                               { project_ids: [] }, { data: sample_type_param_keys },
                               { assay_assets_attributes: [:assay_id] },
                               { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },

@@ -534,7 +534,7 @@ class DataFilesController < ApplicationController
                                       { creator_ids: [] }, { assay_assets_attributes: [:assay_id, :relationship_type_id] },
                                       :file_template_id,
                                       { data_format_annotations: [] }, { data_type_annotations: [] },
-                                      { publication_ids: [] }, { workflow_ids: [] },
+                                      { publication_ids: [] }, { workflow_ids: [] },{ observation_unit_ids: [] },
                                       { extended_metadata_attributes: determine_extended_metadata_keys },
                                       { workflow_data_files_attributes:[:id, :workflow_id, :workflow_data_file_relationship_id, :_destroy] },
                                       discussion_links_attributes:[:id, :url, :label, :_destroy])

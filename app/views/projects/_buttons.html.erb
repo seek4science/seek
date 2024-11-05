@@ -65,14 +65,16 @@
       <%= order_icon(item,current_user, order_investigations_project_path(item), item.investigations, 'investigation') %>
     <% end %>
 
+    <% if Seek::Config.fair_data_station_enabled %>
+      <li>
+        <%= image_tag_for_key('import', import_from_fairdata_station_project_path(item), "Import from FAIR Data Station", nil, "Import from FAIR Data Station") -%>
+      </li>
+    <% end %>
+
     <% if admin_logged_in? || item.can_manage? -%>
       <%= delete_icon(item,current_user,"Any members will also be removed from the #{t('project')}, are you sure?") %>
     <% end -%>
-    <% if Seek::Config.fair_data_station_enabled %>
-      <li>
-        <%= image_tag_for_key('import', import_from_fairdata_station_project_path(item), "Import from FAIRData Station", nil, "Import from FAIRData Station") -%>
-      </li>
-    <% end %>
+
 
   <% end -%>
 <% end -%>

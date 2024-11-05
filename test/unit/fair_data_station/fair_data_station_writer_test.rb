@@ -2,7 +2,7 @@ require 'test_helper'
 
 class FairDataStationWriterTest < ActiveSupport::TestCase
   test 'construct seek isa' do
-    path = "#{Rails.root}/test/fixtures/files/fairdatastation/demo.ttl"
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/demo.ttl"
     inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
     policy = FactoryBot.create(:public_policy)
 
@@ -86,7 +86,7 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     FactoryBot.create(:experimental_assay_class)
     sample_type = FactoryBot.create(:fairdatastation_virtual_demo_sample_type)
 
-    path = "#{Rails.root}/test/fixtures/files/fairdatastation/demo.ttl"
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/demo.ttl"
     inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
     contributor = FactoryBot.create(:person)
     project = contributor.projects.first
@@ -144,7 +144,7 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
   end
 
   test 'observation_unit and assay datasets created in construct_isa' do
-    path = "#{Rails.root}/test/fixtures/files/fairdatastation/seek-fair-data-station-test-case.ttl"
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case.ttl"
     inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
 
     contributor = FactoryBot.create(:person)
@@ -198,9 +198,10 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
 
   test 'populate obsv unit extended metadata' do
     ext_metadata_type = FactoryBot.create(:fairdata_test_case_obsv_unit_extended_metadata)
+    FactoryBot.create(:fairdatastation_test_case_sample_type)
     FactoryBot.create(:experimental_assay_class)
 
-    path = "#{Rails.root}/test/fixtures/files/fairdatastation/seek-fair-data-station-test-case.ttl"
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case.ttl"
     inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
     contributor = FactoryBot.create(:person)
     project = contributor.projects.first
@@ -224,5 +225,233 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     assert_equal '1234g', obvs_unit.extended_metadata.get_attribute_value('Birth weight')
     assert_equal 'male', obvs_unit.extended_metadata.get_attribute_value('Gender')
     assert_equal '2020-01-10', obvs_unit.extended_metadata.get_attribute_value('Date of birth')
+  end
+
+  test 'update isa' do
+    investigation = setup_test_case_investigation
+    policy = investigation.policy
+    projects = investigation.projects
+    contributor = investigation.contributor
+
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-modified-test-case.ttl"
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+
+    # on save check, 0 investigation created, 1 study created, 1 obs unit, 1 sample, 1 assay, 3 data file, 3 extended metadata
+
+    assert_no_difference('Investigation.count') do
+      assert_difference('Study.count', 1) do
+        assert_difference('ObservationUnit.count', 1) do
+          assert_difference('Sample.count', 1) do
+            assert_difference('Assay.count', 1) do
+              assert_difference('DataFile.count', 3) do
+                assert_difference('ObservationUnitAsset.count', 1) do
+                  assert_difference('AssayAsset.count', 2) do # 1 for new df, the other is for the sample
+                    assert_difference('ExtendedMetadata.count', 3) do
+                      # FIXME: ideally should be zero, but 1 is being created by a save when observation_unit pass to the study.observation_units association
+                      assert_difference('DataFile.count', 1) do
+                        investigation = Seek::FairDataStation::Writer.new.update_isa(investigation, inv, contributor,
+                                                                                     projects, policy)
+                      end
+                      investigation.save!
+                    end
+                  end
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+
+    investigation.reload
+
+    # check:
+    #   investigation title has been modified
+    assert_equal 'An Investigation for a SEEK test case - changed', investigation.title
+
+    # check:
+    #   seek-test-study-1 experimental site name changed
+    #   seek-test-study-2 description modified
+    #   seek-test-study-3 created as a new study
+    assert_equal 3, investigation.studies.count
+    study = investigation.studies.where(external_identifier: 'seek-test-study-1').first
+    assert_equal 'manchester test site - changed', study.extended_metadata.get_attribute_value('Experimental site name')
+    study = investigation.studies.where(external_identifier: 'seek-test-study-2').first
+    assert_equal 'testing testing testing testing testing testing testing testing testing testing study 2 - changed',
+                 study.description
+    study = investigation.studies.where(external_identifier: 'seek-test-study-3').first
+    assert_equal 'test study 3', study.title
+    assert_equal 'birmingham-test-site', study.extended_metadata.get_attribute_value('Experimental site name')
+
+    # check:
+    #   seek-test-obs-unit-1 host sex modified
+    #   seek-test-obs-unit-1 now linked to test-file-6.csv, and no longer linked to test-file-1.csv
+    #   seek-test-obs-unit-3 name changed
+    #   seek-test-obs-unit-4 created, linked to seek-test-study-3, along with new test-file-7.csv
+    assert_equal 1, study.observation_units.count
+    obs_unit = ObservationUnit.where(external_identifier: 'seek-test-obs-unit-1').first
+    assert_equal 'female', obs_unit.extended_metadata.get_attribute_value('Gender')
+    assert_equal ['test-file-6.csv'], obs_unit.data_files.collect(&:external_identifier)
+    obs_unit = ObservationUnit.where(external_identifier: 'seek-test-obs-unit-3').first
+    assert_equal 'test obs unit 3 - changed', obs_unit.title
+    obs_unit = ObservationUnit.where(external_identifier: 'seek-test-obs-unit-4').first
+    assert_equal 'testing testing testing testing testing testing testing testing testing testing obs unit 4',
+                 obs_unit.description
+    assert_equal '1005g', obs_unit.extended_metadata.get_attribute_value('Birth weight')
+    assert_equal 'seek-test-study-3', obs_unit.study.external_identifier
+    assert_equal ['test-file-7.csv'], obs_unit.data_files.collect(&:external_identifier)
+
+    # check:
+    #   seek-test-sample-1 name changed
+    #   seek-test-sample-2 biosafety changed
+    #   seek-test-sample-3 ncbi changed
+    #   seek-test-sample-5 description changed
+    #   seek-test-sample-6 created, linked to seek-test-obs-unit-4
+    sample = Sample.where(external_identifier: 'seek-test-sample-1').first
+    assert_equal 'test seek sample 1 - changed', sample.title
+    sample = Sample.where(external_identifier: 'seek-test-sample-2').first
+    assert_equal '2', sample.get_attribute_value('Bio safety level')
+    assert_equal '2024-08-20', sample.get_attribute_value('Collection date')
+    sample = Sample.where(external_identifier: 'seek-test-sample-3').first
+    assert_equal '123460', sample.get_attribute_value('Organism ncbi id')
+    sample = Sample.where(external_identifier: 'seek-test-sample-5').first
+    assert_equal 'testing testing testing testing testing testing testing testing testing testing sample 5 - changed',
+                 sample.get_attribute_value('Description')
+    sample = Sample.where(external_identifier: 'seek-test-sample-6').first
+    assert_equal 'seek-test-obs-unit-4', sample.observation_unit.external_identifier
+    assert_equal 'goat', sample.get_attribute_value('Scientific name')
+    assert_equal 'test seek sample 6', sample.title
+
+    # check:
+    #   seek-test-assay-1 description changed
+    #   seek-test-assay-1 now linked to test-file-6.csv
+    #   seek-test-assay-6 facility changed
+    #   seek-test-assay-7 created, along with new test-file-8.csv data file
+    assay = Assay.where(external_identifier: 'seek-test-assay-1').first
+    assert_equal 'testing testing testing testing testing testing testing testing testing testing assay 1 - changed',
+                 assay.description
+    assert_equal ['test-file-6.csv'], assay.data_files.collect(&:external_identifier)
+    assert_equal ['seek-test-sample-1'], assay.samples.collect(&:external_identifier)
+    assay = Assay.where(external_identifier: 'seek-test-assay-6').first
+    assert_equal 'test facility - changed', assay.extended_metadata.get_attribute_value('Facility')
+    assert_equal ['seek-test-sample-5'], assay.samples.collect(&:external_identifier)
+    assay = Assay.where(external_identifier: 'seek-test-assay-7').first
+    assert_equal 'testing testing testing testing testing testing testing testing testing testing assay 7',
+                 assay.description
+    assert_equal 'new test facility', assay.extended_metadata.get_attribute_value('Facility')
+    assert_equal 1, assay.samples.count
+    assert_equal 'seek-test-sample-6', assay.samples.first.external_identifier
+    assert_equal ['test-file-8.csv'], assay.data_files.collect(&:external_identifier)
+  end
+
+  test 'update isa with things moving' do
+    investigation = setup_test_case_investigation
+    policy = investigation.policy
+    projects = investigation.projects
+    contributor = investigation.contributor
+
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-moves-test-case.ttl"
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+
+    assert_no_difference('Investigation.count') do
+      assert_no_difference('Study.count') do
+        assert_no_difference('ObservationUnit.count') do
+          assert_no_difference('Sample.count') do
+            assert_no_difference('Assay.count') do
+              assert_no_difference('DataFile.count') do
+                assert_no_difference('ObservationUnitAsset.count') do
+                  assert_no_difference('AssayAsset.count') do
+                    assert_no_difference('ExtendedMetadata.count') do
+                      investigation = Seek::FairDataStation::Writer.new.update_isa(investigation, inv, contributor,
+                                                                                   projects, policy)
+                      investigation.save!
+                    end
+                  end
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+
+    investigation.reload
+
+    # check
+    #   seek-test-obs-unit-3 has moved to seek-test-study-1
+    #   seek-test-sample-3 has moved to seek-test-obs-unit-1
+    #   seek-test-sample-5 has moved to seek-test-obs-unit-2
+    #   seek-test-assay-4 has moved to seek-test-sample-3 and therefore also seek-test-study-1
+    #   seek-test-assay-6 has moved to seek-test-sample-4 and therefore also seek-test-study-1
+    #   in each case also check their children are as expected, including items that haven't moved
+    obs_unit = ObservationUnit.where(external_identifier: 'seek-test-obs-unit-3').first
+    assert_equal 'seek-test-study-1', obs_unit.study.external_identifier
+    assert_equal ['seek-test-sample-4'], obs_unit.samples.collect(&:external_identifier)
+
+    study = Study.where(external_identifier: 'seek-test-study-1').first
+    assert_equal ['seek-test-obs-unit-1','seek-test-obs-unit-3'], study.observation_units.collect(&:external_identifier).sort
+    study = Study.where(external_identifier: 'seek-test-study-2').first
+    assert_equal ['seek-test-obs-unit-2'], study.observation_units.collect(&:external_identifier).sort
+
+    sample = Sample.where(external_identifier: 'seek-test-sample-3').first
+    assert_equal 'seek-test-obs-unit-1', sample.observation_unit.external_identifier
+    assert_equal %w[seek-test-assay-3 seek-test-assay-4], sample.assays.collect(&:external_identifier).sort
+    sample = Sample.where(external_identifier: 'seek-test-sample-5').first
+    assert_equal 'seek-test-obs-unit-2', sample.observation_unit.external_identifier
+    assert_equal ['seek-test-assay-5'], sample.assays.collect(&:external_identifier)
+    sample = Sample.where(external_identifier: 'seek-test-sample-4').first
+    assert_equal 'seek-test-obs-unit-3', sample.observation_unit.external_identifier
+    assert_equal ['seek-test-assay-6'], sample.assays.collect(&:external_identifier)
+
+    assay = Assay.where(external_identifier: 'seek-test-assay-4').first
+    assert_equal 1, assay.samples.count
+    assert_equal 'seek-test-sample-3', assay.samples.first.external_identifier
+    assert_equal 'seek-test-study-1', assay.study.external_identifier
+
+    assay = Assay.where(external_identifier: 'seek-test-assay-6').first
+    assert_equal 1, assay.samples.count
+    assert_equal 'seek-test-sample-4', assay.samples.first.external_identifier
+    assert_equal 'seek-test-study-1', assay.study.external_identifier
+  end
+
+  test 'update_isa id mis match' do
+    investigation = setup_test_case_investigation
+    policy = investigation.policy
+    projects = investigation.projects
+    contributor = investigation.contributor
+
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/demo.ttl"
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+
+    refute_equal investigation.external_identifier, inv.external_id
+
+    assert_raises(Seek::FairDataStation::ExternalIdMismatchException) do
+      investigation = Seek::FairDataStation::Writer.new.update_isa(investigation, inv, contributor,
+                                                                   projects, policy)
+    end
+
+  end
+
+  private
+
+  def setup_test_case_investigation
+    FactoryBot.create(:fairdata_test_case_investigation_extended_metadata)
+    FactoryBot.create(:fairdata_test_case_study_extended_metadata)
+    FactoryBot.create(:fairdata_test_case_obsv_unit_extended_metadata)
+    FactoryBot.create(:fairdata_test_case_assay_extended_metadata)
+    FactoryBot.create(:fairdatastation_test_case_sample_type)
+    FactoryBot.create(:experimental_assay_class)
+
+    contributor = FactoryBot.create(:person)
+    project = contributor.projects.first
+    policy = FactoryBot.create(:public_policy)
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case.ttl"
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+    investigation = Seek::FairDataStation::Writer.new.construct_isa(inv, contributor, [project], policy)
+    assert_difference('Investigation.count', 1) do
+      investigation.save!
+    end
+    assert_equal 'seek-test-investigation', investigation.external_identifier
+    investigation
   end
 end
