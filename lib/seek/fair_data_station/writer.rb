@@ -29,7 +29,7 @@ module Seek
         end
 
         preload_data_file_cache(investigation.related_data_files)
-        update_entity(investigation, datastation_inv)
+        update_entity(investigation, datastation_inv, contributor)
         datastation_inv.studies.each do |datastation_study|
           study = update_or_build_study(datastation_study, contributor, projects, policy, investigation)
           datastation_study.observation_units.each do |datastation_observation_unit|
@@ -115,26 +115,26 @@ module Seek
         investigation
       end
 
-      def update_entity(seek_entity, datastation_entity)
+      def update_entity(seek_entity, datastation_entity, contributor)
         attributes = datastation_entity.seek_attributes
         seek_entity.assign_attributes(attributes)
         update_extended_metadata(seek_entity, datastation_entity)
-        record_update_activity_if_changed(seek_entity, seek_entity.contributor)
+        record_update_activity_if_changed(seek_entity, contributor)
         seek_entity
       end
 
-      def update_sample(seek_sample, datastation_sample)
+      def update_sample(seek_sample, datastation_sample, contributor)
         sample_attributes = datastation_sample.seek_attributes
         seek_sample.assign_attributes(sample_attributes)
         update_sample_metadata(seek_sample, datastation_sample)
-        record_update_activity_if_changed(seek_sample, seek_sample.contributor)
+        record_update_activity_if_changed(seek_sample, contributor)
         seek_sample
       end
 
       def update_or_build_study(datastation_study, contributor, projects, policy, investigation)
         study = ::Study.by_external_identifier(datastation_study.external_id, projects)
         if study
-          update_entity(study, datastation_study)
+          update_entity(study, datastation_study, contributor)
           investigation.studies << study
         else
           study = build_study(datastation_study, contributor, policy, investigation)
@@ -146,7 +146,7 @@ module Seek
         observation_unit = ::ObservationUnit.by_external_identifier(datastation_observation_unit.external_id,
                                                                     study.projects)
         if observation_unit
-          update_entity(observation_unit, datastation_observation_unit)
+          update_entity(observation_unit, datastation_observation_unit, contributor)
           observation_unit.study = study
           observation_unit.observation_unit_assets.delete_all
           datastation_observation_unit.datasets.each do |datastation_dataset|
@@ -164,7 +164,7 @@ module Seek
       def update_or_build_sample(datastation_sample, contributor, projects, policy, observation_unit)
         sample = ::Sample.by_external_identifier(datastation_sample.external_id, projects)
         if sample
-          update_sample(sample, datastation_sample)
+          update_sample(sample, datastation_sample, contributor)
           sample.observation_unit = observation_unit
           sample.assays = []
           observation_unit.samples << sample
@@ -177,7 +177,7 @@ module Seek
       def update_or_build_assay(datastation_assay, contributor, projects, policy, sample, study)
         assay = ::Assay.by_external_identifier(datastation_assay.external_id, projects)
         if assay
-          update_entity(assay, datastation_assay)
+          update_entity(assay, datastation_assay, contributor)
           assay.samples = [sample]
           assay.assay_assets.where(asset_type: 'DataFile').delete_all
           datastation_assay.datasets.each do |datastation_dataset|
@@ -192,7 +192,7 @@ module Seek
       end
 
       def populate_extended_metadata(seek_entity, datastation_entity)
-        if emt = detect_extended_metadata(seek_entity, datastation_entity)
+        if (emt = detect_extended_metadata(seek_entity, datastation_entity))
           seek_entity.extended_metadata = ExtendedMetadata.new(extended_metadata_type: emt)
           update_extended_metadata(seek_entity, datastation_entity)
         end
@@ -223,7 +223,7 @@ module Seek
       end
 
       def populate_sample(seek_sample, datastation_sample)
-        if sample_type = detect_sample_type(datastation_sample)
+        if (sample_type = detect_sample_type(datastation_sample))
           seek_sample.sample_type = sample_type
           update_sample_metadata(seek_sample, datastation_sample)
         end
