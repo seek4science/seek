@@ -99,15 +99,34 @@ module Seek
         extended_metadata_type = seek_resource.extended_metadata.extended_metadata_type
         data = {}
         additional_metadata_annotations.each do |annotation|
-          property = annotation[0]
+          property_id = annotation[0]
           value = annotation[1]
-          attribute = extended_metadata_type.extended_metadata_attributes.where(pid: property).first
-          data[attribute.title] = value if attribute
+          data = populate_seek_extended_metadata_for_property(extended_metadata_type, data, property_id, value)
         end
         seek_resource.extended_metadata.data = data
       end
 
       private
+
+      def populate_seek_extended_metadata_for_property(extended_metadata_type, data, property_id, value)
+        attribute = extended_metadata_type.extended_metadata_attributes.where(pid: property_id).first
+        if attribute
+          data[attribute.accessor_name] = value
+        else
+          linked_attributes = extended_metadata_type.attributes_with_linked_extended_metadata_type
+          linked_attributes.each do |linked_attribute|
+
+            result = populate_seek_extended_metadata_for_property(linked_attribute.linked_extended_metadata_type, { }, property_id, value)
+            unless result.empty?
+              data[linked_attribute.accessor_name] ||= {}
+              data[linked_attribute.accessor_name].merge!(result)
+              break
+            end
+          end
+        end
+
+        return data
+      end
 
       def query_annotations
         sparql = SPARQL::Client.new(graph)

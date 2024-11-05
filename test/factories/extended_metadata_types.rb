@@ -525,6 +525,70 @@ FactoryBot.define do
     end
   end
 
+  factory(:nested_study_date_details_extended_metadata_type,class:ExtendedMetadataType) do
+    title { 'study date details' }
+    supported_type { 'ExtendedMetadata' }
+    after(:build) do |a|
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'End date of Study', pid:'http://fairbydesign.nl/ontology/end_date_of_study')
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Start date of Study', pid:'http://fairbydesign.nl/ontology/start_date_of_study')
+    end
+  end
 
+  factory(:fairdata_test_case_nested_study_extended_metadata, class: ExtendedMetadataType) do
+    title {'Fair Data Station Nested Study Test Case'}
+    supported_type { 'Study' }
+    after(:build) do |a|
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Experimental site name', pid:'http://fairbydesign.nl/ontology/experimental_site_name')
+      a.extended_metadata_attributes << FactoryBot.create(:extended_metadata_attribute, title:'study date details', sample_attribute_type: FactoryBot.create(:extended_metadata_sample_attribute_type),
+      linked_extended_metadata_type: FactoryBot.create(:nested_study_date_details_extended_metadata_type))
+    end
+  end
+
+  factory(:nested_obs_unit_birth_details_extended_metadata_type,class:ExtendedMetadataType) do
+    title { 'obs unit birth details' }
+    supported_type { 'ExtendedMetadata' }
+    after(:build) do |a|
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Birth weight', pid:'http://fairbydesign.nl/ontology/birth_weight')
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Date of birth', pid:'http://fairbydesign.nl/ontology/date_of_birth')
+    end
+  end
+
+  factory(:fairdata_test_case_nested_obsv_unit_extended_metadata, class: ExtendedMetadataType) do
+    title {'Fair Data Station Nested Obs Unit Test Case'}
+    supported_type { 'ObservationUnit' }
+    after(:build) do |a|
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Gender', pid:'https://w3id.org/mixs/0000811')
+      a.extended_metadata_attributes << FactoryBot.create(:extended_metadata_attribute, title:'obs_unit_birth_details', sample_attribute_type: FactoryBot.create(:extended_metadata_sample_attribute_type),
+                                                          linked_extended_metadata_type: FactoryBot.create(:nested_obs_unit_birth_details_extended_metadata_type))
+    end
+  end
+
+  factory(:deep_nested_study_grandchild_extended_metadata_type,class:ExtendedMetadataType) do
+    title { 'deep nested study grandchild' }
+    supported_type { 'ExtendedMetadata' }
+    after(:build) do |a|
+      a.extended_metadata_attributes << a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Start date of Study', pid:'http://fairbydesign.nl/ontology/start_date_of_study')
+    end
+  end
+
+  factory(:deep_nested_study_child_extended_metadata_type,class:ExtendedMetadataType) do
+    title { 'deep nested study child' }
+    supported_type { 'ExtendedMetadata' }
+    after(:build) do |a|
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'End date of Study', pid:'http://fairbydesign.nl/ontology/end_date_of_study')
+      a.extended_metadata_attributes << FactoryBot.create(:extended_metadata_attribute, title:'grandchild', sample_attribute_type: FactoryBot.create(:extended_metadata_sample_attribute_type),
+                                                          linked_extended_metadata_type: FactoryBot.create(:deep_nested_study_grandchild_extended_metadata_type))
+    end
+  end
+
+  factory(:fairdata_test_case_deep_nested_study_extended_metadata, class: ExtendedMetadataType) do
+    title {'Fair Data Station Deep Nested Study Test Case'}
+    supported_type { 'Study' }
+    after(:build) do |a|
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Experimental site name', pid:'http://fairbydesign.nl/ontology/experimental_site_name')
+      a.extended_metadata_attributes << FactoryBot.create(:extended_metadata_attribute, title:'child', sample_attribute_type: FactoryBot.create(:extended_metadata_sample_attribute_type),
+                                                          linked_extended_metadata_type: FactoryBot.create(:deep_nested_study_child_extended_metadata_type))
+    end
+  end
 end
 
