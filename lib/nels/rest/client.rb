@@ -30,7 +30,7 @@ module Nels
       end
 
       def project(project_id)
-        perform("sbi/projects/#{project_id}", :get)
+        perform("v2/sbi/projects/#{project_id}", :get)
       end
 
       def datasets(project_id)

@@ -32,9 +32,10 @@ class NelsRestClientTest < ActiveSupport::TestCase
     VCR.use_cassette('nels/get_project') do
       res = @rest_client.project(@project_id)
 
-      assert_equal 21, res.count
+      assert_equal 20, res.count
       assert_equal @project_id, res['id']
       assert_equal 'seek_pilot1', res['name']
+      assert_equal 4, res['membership_type']
     end
   end
 
