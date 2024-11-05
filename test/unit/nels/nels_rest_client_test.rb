@@ -35,7 +35,7 @@ class NelsRestClientTest < ActiveSupport::TestCase
       assert_equal 20, res.count
       assert_equal @project_id, res['id']
       assert_equal 'seek_pilot1', res['name']
-      assert_equal 4, res['membership_type']
+      assert_equal 3, res['membership_type']
     end
   end
 

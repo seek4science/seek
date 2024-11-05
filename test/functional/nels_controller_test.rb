@@ -145,9 +145,9 @@ class NelsControllerTest < ActionController::TestCase
   end
 
   test 'get subtype in locked dataset' do
-    VCR.use_cassette('nels/get_locked_dataset') do
+    VCR.use_cassette('nels/get_dataset') do
       VCR.use_cassette('nels/check_metadata_exists') do
-        VCR.use_cassette('nels/get_project') do
+        VCR.use_cassette('nels/get_locked_project') do
           VCR.use_cassette('nels/sbi_storage_list') do
             get :subtype,
                 params: { project_id: @project_id, dataset_id: @dataset_id, subtype: 'reads',
