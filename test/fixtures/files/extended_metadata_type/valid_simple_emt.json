@@ -12,7 +12,8 @@
       "title": "last_name",
       "label": "last name",
       "description": null,
-      "type": "String"
+      "type": "String",
+      "pid": "http://schema.org/family_name"
     }
   ]
 }

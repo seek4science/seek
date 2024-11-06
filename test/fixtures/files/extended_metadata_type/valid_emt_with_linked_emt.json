@@ -9,6 +9,7 @@
       "description": null,
       "type": "Linked Extended Metadata",
       "required": false,
+      "pid": "https://somevocab.org/father",
       "ID": "PERSON_EMT_ID"
     },
     {

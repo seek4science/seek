@@ -19,6 +19,7 @@ class EmtExtractorTest < ActiveSupport::TestCase
     assert_equal 'first_name', attr1.title
     assert_equal SampleAttributeType.find_by(title: 'String'), attr1.sample_attribute_type
     assert_equal true, attr1.required
+    assert_nil attr1.pid
 
     attr2 = emt.extended_metadata_attributes.second
     assert_not_nil attr2
@@ -27,6 +28,7 @@ class EmtExtractorTest < ActiveSupport::TestCase
     assert_nil attr2.description
     assert_equal SampleAttributeType.find_by(title: 'String'), attr2.sample_attribute_type
     assert_equal false, attr2.required
+    assert_equal "http://schema.org/family_name", attr2.pid
 
   end
 
@@ -50,6 +52,7 @@ class EmtExtractorTest < ActiveSupport::TestCase
     assert_nil dad_attr.description
     assert_equal SampleAttributeType.find_by(title: 'Linked Extended Metadata'), dad_attr.sample_attribute_type
     refute dad_attr.required
+    assert_equal "https://somevocab.org/father", dad_attr.pid
 
     mom_attr = emt.extended_metadata_attributes.second
     assert_not_nil mom_attr
@@ -85,6 +88,7 @@ class EmtExtractorTest < ActiveSupport::TestCase
     assert_equal "Topics, used for annotating. Describes the domain, field of interest, of study, application, work, data, or technology. Initially seeded from the EDAM ontology.", topics_attr.description
     assert_equal SampleAttributeType.find_by(title: 'Controlled Vocabulary'), topics_attr.sample_attribute_type
     assert topics_attr.required
+    assert_equal 'http://edamontology.org/topic_0003', topics_attr.pid
 
     assert_equal topic_cv, topics_attr.sample_controlled_vocab
     assert_equal 4, topics_attr.sample_controlled_vocab.sample_controlled_vocab_terms.count
