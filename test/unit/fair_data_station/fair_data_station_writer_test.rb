@@ -415,11 +415,9 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
                   assert_no_difference('AssayAsset.count') do
                     assert_no_difference('ExtendedMetadata.count') do
                       assert_no_difference('ActivityLog.count') do
-                        assert_no_difference("ActivityLog.where(action:'create').count") do
-                          investigation = Seek::FairDataStation::Writer.new.update_isa(investigation, inv, contributor,
-                                                                                       projects, policy)
-                          investigation.save!
-                        end
+                        investigation = Seek::FairDataStation::Writer.new.update_isa(investigation, inv, contributor,
+                                                                                     projects, policy)
+                        investigation.save!
                       end
                     end
                   end
