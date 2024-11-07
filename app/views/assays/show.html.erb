@@ -25,7 +25,7 @@
                 <%= @assay.assay_class.title -%>
               </p>
             <% end %>
-            <% if @assay.contributor.can_view? %>
+            <% if @assay.contributor&.can_view? %>
               <p class="id">
                 <label>
                   <%= t('contributor').capitalize -%>:
