@@ -30,6 +30,7 @@ Rails.application.configure do
   #   config.cache_store = :null_store
   # end
   config.cache_store = :file_store, "#{Rails.root}/tmp/cache/dev-cache"
+  config.settings_cache_store = ActiveSupport::Cache::FileStore.new("#{Rails.root}/tmp/cache/dev-cache/settings-dev-cache")
 
   config.public_file_server.enabled = true
 
