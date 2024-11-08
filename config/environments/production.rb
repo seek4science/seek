@@ -57,7 +57,7 @@ Rails.application.configure do
 
   # Use a different cache store in production.
   config.cache_store = :file_store, "#{Rails.root}/tmp/cache"
-  config.settings_cache_store = ActiveSupport::Cache::FileStore.new("#{Rails.root}/tmp/cache/settings-dev-cache")
+  config.settings_cache_store = ActiveSupport::Cache::FileStore.new("#{Rails.root}/tmp/cache/settings-cache")
 
   # Use a real queuing backend for Active Job (and separate queues per environment).
   # config.active_job.queue_adapter     = :resque
