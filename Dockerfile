@@ -2,7 +2,7 @@ FROM ruby:3.1-slim-bullseye
 
 LABEL maintainer="Stuart Owen <orcid.org/0000-0003-2130-0865>, Finn Bacall"
 ARG SOURCE_COMMIT
-ENV APP_DIR /seek
+ENV APP_DIR=/seek
 ENV RAILS_ENV=production
 
 # need to set the locale, otherwise some gems file to install
