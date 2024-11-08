@@ -89,7 +89,7 @@ class AdminControllerTest < ActionController::TestCase
       with_config_value(:smtp, { address: '255.255.255.255', 'address' => '0.0.0.0' }) do
         assert_equal 'Hash', Seek::Config.smtp.class.name
 
-        post :update_features_enabled, params: { email_enabled: '1', address: '127.0.0.1', port: '25', domain: 'email.example.com', authentication: 'plain', smtp_user_name: '', smtp_password: '', enable_starttls_auto: '1' }
+        post :update_features_enabled, params: { email_enabled: '1', address: '127.0.0.1', port: '25', domain: 'email.example.com', authentication: 'plain', smtp_user_name: 'fred', smtp_password: 'bbb', enable_starttls_auto: '1' }
 
         assert_equal 'ActiveSupport::HashWithIndifferentAccess', Seek::Config.smtp.class.name
         assert Seek::Config.email_enabled
@@ -99,9 +99,28 @@ class AdminControllerTest < ActionController::TestCase
         assert_equal '25', mailer_settings[:port]
         assert_equal 'email.example.com', mailer_settings[:domain]
         assert_equal 'plain', mailer_settings[:authentication]
-        assert_nil mailer_settings[:user_name]
-        assert_nil mailer_settings[:password]
+        assert_equal 'fred', mailer_settings[:user_name]
+        assert_equal 'bbb', mailer_settings[:password]
         assert mailer_settings[:enable_starttls_auto]
+      end
+    end
+  end
+
+  test 'update SMTP settings nil authentication details removed' do
+    with_config_value(:email_enabled, false) do
+      with_config_value(:smtp, { address: '255.255.255.255', 'address' => '0.0.0.0' }) do
+        assert_equal 'Hash', Seek::Config.smtp.class.name
+
+        post :update_features_enabled, params: { email_enabled: '1', address: '127.0.0.1', port: '25', domain: 'email.example.com', authentication: '', smtp_user_name: '', smtp_password: '', enable_starttls_auto: '0' }
+
+        mailer_settings = ActionMailer::Base.smtp_settings
+        assert_equal '127.0.0.1', mailer_settings[:address]
+        assert_equal '25', mailer_settings[:port]
+        assert_equal 'email.example.com', mailer_settings[:domain]
+        refute mailer_settings[:enable_starttls_auto]
+        refute mailer_settings.has_key?(:authentication)
+        refute mailer_settings.has_key?(:user_name)
+        refute mailer_settings.has_key?(:password)
       end
     end
   end

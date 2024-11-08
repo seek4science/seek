@@ -45,7 +45,7 @@ module Seek
         new_hash[key.to_sym] = smtp_hash[key]
       end
 
-      ActionMailer::Base.smtp_settings = new_hash
+      ActionMailer::Base.smtp_settings = new_hash.compact
     end
 
     def bioportal_api_key_propagate
