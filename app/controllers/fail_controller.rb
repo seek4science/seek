@@ -13,13 +13,13 @@ class FailController < ApplicationController
         x = nil
         x.hello_world
       when "406"
-        raise ActionController::UnknownController
+        raise ActionController::UnknownFormat
       when "503"
         raise RSolr::Error::ConnectionRefused
     end
     
     respond_to do |format|
-      format.html # index.html.erb
+      format.html { render plain: 'please use the http_code parameter, with a value of 404, 406, 500 or 503' }
     end
   end
   
