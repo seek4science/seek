@@ -20,7 +20,7 @@ class DataFile < ApplicationRecord
 
   belongs_to :file_template
   has_many :extracted_samples, class_name: 'Sample', foreign_key: :originating_data_file_id
-  has_many :sample_resource_links, -> { where(resource_type: 'DataFile') }, class_name: 'SampleResourceLink', foreign_key: :resource_id
+  has_many :sample_resource_links, -> { where(resource_type: 'DataFile') }, foreign_key: :resource_id
   has_many :linked_samples, through: :sample_resource_links, source: :sample
   
   has_many :unzipped_files, class_name: 'DataFile', foreign_key: :zip_origin_id
