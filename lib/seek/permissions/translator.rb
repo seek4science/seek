@@ -6,7 +6,7 @@ module Seek
         view: Set.new(%i[
                         view show index search favourite favourite_delete comment comment_delete comments
                         comments_timeline rate tag items statistics tag_suggestions preview runs
-                        new_object_based_on_existing_one samples_table current diagram
+                        new_object_based_on_existing_one extracted_samples extracted_samples_table current diagram
                       ]).freeze,
 
         download: Set.new(%i[
