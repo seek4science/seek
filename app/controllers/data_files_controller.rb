@@ -152,18 +152,6 @@ class DataFilesController < ApplicationController
     end
   end
 
-  def extracted_samples_table
-    respond_to do |format|
-      format.html do
-        render(partial: 'samples/table_view', locals: {
-                 samples: @data_file.extracted_samples.includes(:sample_type),
-                 source_url: extracted_samples_table_data_file_path(@data_file)
-               })
-      end
-      format.json { @samples = @data_file.extracted_samples.select([:id, :title, :json_metadata]) }
-    end
-  end
-
   def select_sample_type
     @possible_sample_types = @data_file.possible_sample_types
 
