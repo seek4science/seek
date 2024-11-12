@@ -492,7 +492,8 @@ SEEK::Application.routes.draw do
       post :create_metadata
     end
     member do
-      get :samples_table
+      get :extracted_samples_table
+      get :extracted_samples
       get :select_sample_type
       get :confirm_extraction
       get :extraction_status
