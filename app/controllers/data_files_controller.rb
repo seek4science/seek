@@ -146,7 +146,7 @@ class DataFilesController < ApplicationController
   end
 
   def extracted_samples
-    @samples = @data_file.extracted_samples.includes(:sample_type)
+    @samples = @data_file.extracted_samples.includes(:sample_type).authorized_for(:view)
     respond_to do |format|
       format.html
     end

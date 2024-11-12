@@ -2407,6 +2407,46 @@ class DataFilesControllerTest < ActionController::TestCase
     sample_type = FactoryBot.create(:simple_sample_type)
     3.times do
       FactoryBot.create(:sample, sample_type: sample_type, contributor: data_file.contributor, policy: FactoryBot.create(:private_policy),
+                        originating_data_file: data_file)
+    end
+
+    get :samples_table, params: { format: :json, id: data_file.id }
+
+    assert_response :forbidden
+  end
+
+  test 'should get table view for extracted samples' do
+    data_file = FactoryBot.create(:data_file, policy: FactoryBot.create(:public_policy))
+    sample_type = FactoryBot.create(:simple_sample_type)
+    private_samples = 2.times.collect do # private
+      FactoryBot.create(:sample, sample_type: sample_type, contributor: data_file.contributor, policy: FactoryBot.create(:private_policy),
+                        originating_data_file: data_file)
+    end
+    public_samples = 2.times.collect do # public
+      FactoryBot.create(:sample, sample_type: sample_type, contributor: data_file.contributor, policy: FactoryBot.create(:public_policy),
+                        originating_data_file: data_file)
+    end
+
+    login_as(FactoryBot.create(:person))
+
+    get :extracted_samples, params: { id: data_file.id }
+
+    assert_response :success
+    # dont show private samples
+    assert_select '#samples-table tbody tr', count: 2 do
+      assert_select 'td', text: public_samples.first.title
+      assert_select 'td', text: public_samples.last.title
+      assert_select 'td', text: private_samples.first.title, count: 0
+      assert_select 'td', text: private_samples.last.title, count: 0
+    end
+    assert_select '#samples-table thead th', count: 3
+  end
+
+  test 'should not get table view for private data file if unauthorized' do
+    data_file = FactoryBot.create(:data_file, policy: FactoryBot.create(:private_policy))
+    sample_type = FactoryBot.create(:simple_sample_type)
+    3.times do
+      FactoryBot.create(:sample, sample_type: sample_type, contributor: data_file.contributor, policy: FactoryBot.create(:private_policy),
               originating_data_file: data_file)
     end
 
@@ -2519,7 +2559,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
     assert_select '#sample-persistence-status' do
       assert_select '.alert-success', text:/Sample creation complete/
-      assert_select '.alert-success a[href=?]', data_file_samples_path(df), text: /View Created Samples/
+      assert_select '.alert-success a[href=?]', extracted_samples_data_file_path(df), text: /View Created Samples/
     end
 
     df.sample_persistence_task.update_attribute(:status, Task::STATUS_DONE)

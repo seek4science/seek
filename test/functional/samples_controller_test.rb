@@ -577,24 +577,6 @@ class SamplesControllerTest < ActionController::TestCase
     refute_includes samples, sample2
   end
 
-  test 'should get table view for data file' do
-    data_file = FactoryBot.create(:data_file, policy: FactoryBot.create(:private_policy))
-    sample_type = FactoryBot.create(:simple_sample_type)
-    3.times do # public
-      FactoryBot.create(:sample, sample_type: sample_type, contributor: data_file.contributor, policy: FactoryBot.create(:private_policy),
-                                 originating_data_file: data_file)
-    end
-
-    login_as(data_file.contributor)
-
-    get :index, params: { data_file_id: data_file.id }
-
-    assert_response :success
-    # Empty table - content is loaded asynchronously (see data_files_controller_test.rb)
-    assert_select '#samples-table tbody tr', count: 0
-    assert_select '#samples-table thead th', count: 3
-  end
-
   test 'should get table view for sample type' do
     person = FactoryBot.create(:person)
     sample_type = FactoryBot.create(:simple_sample_type)
