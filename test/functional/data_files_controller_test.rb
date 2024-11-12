@@ -2394,7 +2394,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
     login_as(data_file.contributor)
 
-    get :samples_table, params: { format: :json, id: data_file.id }
+    get :extracted_samples_table, params: { format: :json, id: data_file.id }
 
     assert_response :success
 
@@ -2410,7 +2410,7 @@ class DataFilesControllerTest < ActionController::TestCase
                         originating_data_file: data_file)
     end
 
-    get :samples_table, params: { format: :json, id: data_file.id }
+    get :extracted_samples_table, params: { format: :json, id: data_file.id }
 
     assert_response :forbidden
   end
@@ -2440,19 +2440,6 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_select 'td', text: private_samples.last.title, count: 0
     end
     assert_select '#samples-table thead th', count: 3
-  end
-
-  test 'should not get table view for private data file if unauthorized' do
-    data_file = FactoryBot.create(:data_file, policy: FactoryBot.create(:private_policy))
-    sample_type = FactoryBot.create(:simple_sample_type)
-    3.times do
-      FactoryBot.create(:sample, sample_type: sample_type, contributor: data_file.contributor, policy: FactoryBot.create(:private_policy),
-              originating_data_file: data_file)
-    end
-
-    get :samples_table, params: { format: :json, id: data_file.id }
-
-    assert_response :forbidden
   end
 
   test "can't extract from data file if no permissions" do
