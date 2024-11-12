@@ -313,18 +313,7 @@ class SamplesController < ApplicationController
   end
 
   def find_index_assets
-    if params[:data_file_id]
-      @data_file = DataFile.find(params[:data_file_id])
-
-      unless @data_file.can_view?
-        flash[:error] = 'You are not authorize to view samples from this data file'
-        respond_to do |format|
-          format.html { redirect_to data_file_path(@data_file) }
-        end
-      end
-
-      @samples = @data_file.extracted_samples.includes(sample_type: :sample_attributes).authorized_for('view')
-    elsif params[:sample_type_id]
+    if params[:sample_type_id]
       @sample_type = SampleType.includes(:sample_attributes).find(params[:sample_type_id])
       @samples = @sample_type.samples.authorized_for('view')
     elsif params[:template_id]
