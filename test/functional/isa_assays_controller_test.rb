@@ -49,7 +49,7 @@ class IsaAssaysControllerTest < ActionController::TestCase
                                                       position: 0, policy_attributes: },
                                              input_sample_type_id: sample_collection_sample_type.id,
                                              sample_type: material_assay_sample_type_attributes(projects.first, sample_collection_sample_type.id)
-        }}
+        } }
       end
     end
     isa_assay = assigns(:isa_assay)
@@ -64,6 +64,29 @@ class IsaAssaysControllerTest < ActionController::TestCase
 
     assert_equal [this_person, other_creator], isa_assay.assay.creators
     assert_equal 'other collaborators', isa_assay.assay.other_creators
+  end
+
+  test 'should create an assay stream' do
+    projects = User.current_user.person.projects
+    inv = FactoryBot.create(:investigation, projects:, contributor: User.current_user.person)
+    study = FactoryBot.create(:study, investigation_id: inv.id, contributor: User.current_user.person)
+
+
+    policy_attributes = { access_type: Policy::ACCESSIBLE,
+                          permissions_attributes: project_permissions([projects.first], Policy::ACCESSIBLE) }
+
+    assert_difference('Assay.count', 1) do
+      post :create, params: { isa_assay: { assay: { title: 'test stream', study_id: study.id,
+                                                    sop_ids: [FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy)).id],
+                                                    creator_ids: [User.current_user.person.id],
+                                                    other_creators: 'other collaborators',
+                                                    assay_class_id: AssayClass.assay_stream.id,
+                                                    projects: projects.first,
+                                                    policy_attributes: policy_attributes
+      } } }
+
+      assert_redirected_to single_page_path(id: projects.first.id, item_type: 'assay', item_id: Assay.last.id)
+    end
   end
 
   test 'author form partial uses correct nested param attributes' do
@@ -189,7 +212,7 @@ class IsaAssaysControllerTest < ActionController::TestCase
 
     login_as(person)
 
-    get :new, params: {study_id: study.id, is_assay_stream: true}
+    get :new, params: { study_id: study.id, is_assay_stream: true }
     assert_response :success
 
     assert_select 'div#add_sops_form', text: /SOPs/i, count: 0
@@ -217,7 +240,7 @@ class IsaAssaysControllerTest < ActionController::TestCase
 
     login_as(person)
 
-    get :new, params: {study_id: study.id, assay_stream_id: assay_stream.id, source_assay_id: assay_stream.id}
+    get :new, params: { study_id: study.id, assay_stream_id: assay_stream.id, source_assay_id: assay_stream.id }
     assert_response :success
 
     assert_select 'div#add_sops_form', text: /SOPs/i, count: 1
@@ -274,7 +297,7 @@ class IsaAssaysControllerTest < ActionController::TestCase
                                       assay_class_id: AssayClass.experimental.id,
                                       creator_ids: [person.id],
                                       policy_attributes: ,
-                                      assay_stream_id: assay_stream.id, position: 0}
+                                      assay_stream_id: assay_stream.id, position: 0 }
 
 
     intermediate_isa_assay_attributes1 = { assay: intermediate_assay_attributes1,
@@ -343,7 +366,7 @@ class IsaAssaysControllerTest < ActionController::TestCase
                                       assay_class_id: AssayClass.experimental.id,
                                       creator_ids: [person.id],
                                       policy_attributes: ,
-                                      assay_stream_id: assay_stream.id}
+                                      assay_stream_id: assay_stream.id }
 
     intermediate_assay_sample_type_attributes2 = { title: "Intermediate Assay Sample type 2",
                                                     project_ids: [project.id],
@@ -489,7 +512,7 @@ class IsaAssaysControllerTest < ActionController::TestCase
                                       assay_class_id: AssayClass.experimental.id,
                                       creator_ids: [person.id],
                                       policy_attributes: ,
-                                      assay_stream_id: assay_stream.id}
+                                      assay_stream_id: assay_stream.id }
 
     intermediate_assay_sample_type_attributes3 = { title: "Intermediate Assay Sample type 3",
                                                     project_ids: [project.id],
@@ -554,7 +577,7 @@ class IsaAssaysControllerTest < ActionController::TestCase
     # New assay stream should have position 6 and is of type 'number'
     assert_select 'input[type=number][value=6]#isa_assay_assay_position', count: 1
 
-    get :new, params: {study_id: study.id, assay_stream_id: assay_stream1.id, source_assay_id: assay_stream1.id}
+    get :new, params: { study_id: study.id, assay_stream_id: assay_stream1.id, source_assay_id: assay_stream1.id }
     # New assay should have position 0 and is of type 'hidden'
     assert_select 'input[type=hidden][value=0]#isa_assay_assay_position', count: 1
 
@@ -573,14 +596,14 @@ class IsaAssaysControllerTest < ActionController::TestCase
 
     study = FactoryBot.create(:isa_json_compliant_study, contributor: person, investigation: )
 
-    assay_policy_attributes = { access_type: Policy::NO_ACCESS, permissions_attributes: {"1": { contributor_type: 'Person', contributor_id: person.id, access_type: Policy::MANAGING }, "2": { contributor_type: 'Person', contributor_id: second_person.id, access_type: Policy::VISIBLE }} }
+    assay_policy_attributes = { access_type: Policy::NO_ACCESS, permissions_attributes: { "1": { contributor_type: 'Person', contributor_id: person.id, access_type: Policy::MANAGING }, "2": { contributor_type: 'Person', contributor_id: second_person.id, access_type: Policy::VISIBLE } } }
 
     assay_stream = FactoryBot.create(:assay_stream, study: , contributor: person, position: 0)
     assay = FactoryBot.build(:assay, study: , contributor: person, assay_class: AssayClass.experimental, assay_stream: assay_stream, assay_type_uri: nil)
     assay_attributes = assay.as_json.reject { |_, v| v.blank? }
 
     login_as person.user
-    post :create, params: { isa_assay: { assay: assay_attributes, sample_type: material_assay_sample_type_attributes(project, study.sample_types.second.id), source_assay_id: assay_stream.id, input_sample_type_id: study.sample_types.second.id}, policy_attributes: assay_policy_attributes }
+    post :create, params: { isa_assay: { assay: assay_attributes, sample_type: material_assay_sample_type_attributes(project, study.sample_types.second.id), source_assay_id: assay_stream.id, input_sample_type_id: study.sample_types.second.id }, policy_attributes: assay_policy_attributes }
     @isa_assay = assigns(:isa_assay)
     assert_redirected_to single_page_path(id: @isa_assay.assay.projects.first, item_type: 'assay', item_id: @isa_assay.assay)
 

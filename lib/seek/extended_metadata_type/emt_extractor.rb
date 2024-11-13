@@ -63,7 +63,8 @@ module Seek
             sample_attribute_type: sample_attribute_type,
             sample_controlled_vocab: sample_controlled_vocab,
             linked_extended_metadata_type: linked_extended_metadata_type,
-            required: attr['required'].present? ? attr['required'] : false
+            required: attr['required'].present? ? attr['required'] : false,
+            pid: attr['pid'].present? ? attr['pid'] : nil
           )
         end
         emt

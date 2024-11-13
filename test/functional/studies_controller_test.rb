@@ -2111,4 +2111,16 @@ class StudiesControllerTest < ActionController::TestCase
       assert_redirected_to edit_isa_study_path(study)
     end
   end
+
+  test 'can show and edit with deleted contributor' do
+    study = FactoryBot.create(:study, deleted_contributor:'Person:99', policy: FactoryBot.create(:public_policy))
+    study.update_column(:contributor_id, nil)
+    assert study.can_view?
+    assert study.can_edit?
+    assert_nil study.contributor
+    get :show, params: { id: study.id }
+    assert_response :success
+    get :edit, params: { id: study.id }
+    assert_response :success
+  end
 end

@@ -343,4 +343,27 @@ class SopTest < ActiveSupport::TestCase
     refute v3.can_change_visibility?
   end
 
+  test 'related samples' do
+    project = FactoryBot.create(:project)
+
+    sample_type = FactoryBot.create(:sop_sample_type, project_ids: [project.id])
+    sop_attr = FactoryBot.build(:sop_sample_attribute, title: 'sop 2', sample_type: sample_type)
+    sample_type.sample_attributes << sop_attr
+    sop = FactoryBot.create(:sop)
+    another_sop = FactoryBot.create(:sop)
+    sop_without_samples = FactoryBot.create(:sop)
+
+    sample1 = Sample.new(sample_type: sample_type, project_ids: [project.id])
+    sample1.update(data: { 'sop': sop.id })
+    sample1.update(data: { 'sop 2': another_sop.id })
+    sample1.save!
+    sample2 = Sample.new(sample_type: sample_type, project_ids: [project.id])
+    sample2.update(data: { 'sop': another_sop.id })
+    sample2.update(data: { 'sop 2': sop.id })
+    sample2.save!
+
+    assert_empty sop_without_samples.related_samples
+    assert_equal [sample1, sample2].sort_by(&:id), sop.related_samples.sort_by(&:id)
+  end
+
 end

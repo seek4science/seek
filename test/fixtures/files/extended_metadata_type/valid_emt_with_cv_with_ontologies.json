@@ -9,6 +9,7 @@
       "type": "Controlled Vocabulary",
       "required": true,
       "pos": 1,
+      "pid": "http://edamontology.org/topic_0003",
       "ID": "CV_TOPICS_ID"
     }
   ]
