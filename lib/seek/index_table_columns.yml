@@ -111,3 +111,7 @@ columns:
     default: [ web_page ]
     additional_allowed: [ start_date, end_date, topic_annotation_values ]
 
+  sample:
+    required: [ ]
+    default: [ sample_type ]
+    additional_allowed: [ ]
