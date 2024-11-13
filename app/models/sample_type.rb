@@ -162,18 +162,19 @@ class SampleType < ApplicationRecord
     can && (!Seek::Config.project_admin_sample_type_restriction || User.current_user.is_admin_or_project_administrator?)
   end
 
-  def can_edit?(user = User.current_user)
+  def state_allows_edit?(*args)
     super && !locked?
   end
 
-  def can_manage?(user = User.current_user)
+  def state_allows_manage?(*args)
+    super && !locked?
+  end
+
+  def state_allows_delete?(*args)
     super && !locked?
   end
 
   def can_delete?(user = User.current_user)
-    # Should not be able to delete a sample type if it is locked
-    return false if locked?
-
     # Users should be able to delete an ISA JSON compliant sample type that has linked sample attributes,
     # as long as it's ISA JSON compliant.
     if is_isa_json_compliant?
