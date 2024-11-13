@@ -4,6 +4,10 @@ class UpdateSampleMetadataJob < TaskJob
   queue_with_priority 1
   queue_as QueueNames::SAMPLES
 
+  after_perform do |job|
+    SampleTypeUpdateJob.perform_later(job.arguments.first, true)
+  end
+
   def perform(sample_type, user, attribute_changes = [])
     @sample_type = sample_type
     @user = user

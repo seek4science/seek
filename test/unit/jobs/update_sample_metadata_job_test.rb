@@ -10,16 +10,12 @@ class UpdateSampleMetadataJobTest < ActiveSupport::TestCase
     (1..10).each do |_i|
       FactoryBot.create(:sample, sample_type: @sample_type, contributor: @person)
     end
-    Rails.cache.clear
-  end
-
-  def teardown
-    Rails.cache.clear
   end
 
   test 'perform' do
     User.with_current_user(@person.user) do
       UpdateSampleMetadataJob.perform_now(@sample_type, @person.user, [])
+      assert_enqueued_with(job: SampleTypeUpdateJob, args: [@sample_type, true])
     end
   end
 
@@ -58,6 +54,9 @@ class UpdateSampleMetadataJobTest < ActiveSupport::TestCase
   end
 
   test 'perform with unexpected error' do
+    # Clears the queue of all jobs
+    # Queue has already multiple SampleTypeUpdateJob jobs from the setup
+    clear_enqueued_jobs
     job = UpdateSampleMetadataJob.new(@sample_type, @person.user, 'bad_attribute_change_map')
     assert_enqueued_with(job: UpdateSampleMetadataJob, args: [@sample_type, @person.user, 'bad_attribute_change_map']) do
       job.enqueue
@@ -66,9 +65,10 @@ class UpdateSampleMetadataJobTest < ActiveSupport::TestCase
 
     perform_enqueued_jobs do
       job.perform_now
-    rescue StandardError
-      # The sample type should be unlocked even if an error occurs
-      refute @sample_type.locked?
     end
+    # The sample type should be unlocked even if an error occurs
+    refute @sample_type.locked?
+    # SampleTypeUpdateJob should not be enqueued when an error occurs
+    assert_no_enqueued_jobs only: SampleTypeUpdateJob
   end
 end
