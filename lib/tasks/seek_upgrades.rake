@@ -9,7 +9,7 @@ namespace :seek do
   task upgrade_version_tasks: %i[
     environment
     db:seed:007_sample_attribute_types
-    seek_rdf:generate
+    update_rdf
     update_observation_unit_policies
     fix_xlsx_marked_as_zip
     add_policies_to_existing_sample_types
@@ -44,6 +44,22 @@ namespace :seek do
       puts 'Upgrade completed successfully'
     ensure
       Seek::Config.solr_enabled = solr
+    end
+  end
+
+  # if rdf repository enabled then generate jobs, otherwise just clear the cache. Only runs once
+  task(update_rdf: [:environment]) do
+    only_once('seek:update_rdf 1.16.0') do
+      if Seek::Rdf::RdfRepository.instance&.configured?
+        puts '... triggering rdf generation jobs'
+        Rake::Task['seek_rdf:generate'].invoke
+      else
+        path = Seek::Config.rdf_filestore_path
+        unless Dir.empty?(path)
+          puts "... clearing rdf cache at #{path}"
+          FileUtils.rm_rf(path, secure: true)
+        end
+      end
     end
   end
 
@@ -104,7 +120,8 @@ namespace :seek do
 
           policy.save
           st.update_column(:policy_id, policy.id)
-       end
+        end
+        putc('.')
         counter += 1
       end
     end
