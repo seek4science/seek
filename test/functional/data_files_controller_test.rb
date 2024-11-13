@@ -2386,20 +2386,25 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test 'should get table view for data file' do
-    data_file = FactoryBot.create(:data_file, policy: FactoryBot.create(:private_policy))
+    data_file = FactoryBot.create(:data_file, policy: FactoryBot.create(:public_policy))
     sample_type = FactoryBot.create(:simple_sample_type)
     3.times do
-      FactoryBot.create(:sample, sample_type: sample_type, contributor: data_file.contributor, policy: FactoryBot.create(:private_policy),
+      FactoryBot.create(:sample, sample_type: sample_type, contributor: data_file.contributor, policy: FactoryBot.create(:public_policy),
               originating_data_file: data_file)
     end
-    login_as(data_file.contributor)
+    private_sample = FactoryBot.create(:sample, sample_type: sample_type, contributor: data_file.contributor, policy: FactoryBot.create(:private_policy),
+                                       originating_data_file: data_file)
+    login_as(FactoryBot.create(:person))
 
     get :extracted_samples_table, params: { format: :json, id: data_file.id }
 
     assert_response :success
 
     json = JSON.parse(@response.body)
+    # should not include the private sample
     assert_equal 3, json['data'].length
+    assert_not_includes json['data'].collect{|d| d['id']}, private_sample.id
+
   end
 
   test 'should not get table view for private data file if unauthorized' do
