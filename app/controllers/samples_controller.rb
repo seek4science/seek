@@ -8,7 +8,7 @@ class SamplesController < ApplicationController
   before_action :samples_enabled?
   before_action :find_index_assets, only: :index
   before_action :find_and_authorize_requested_item, except: [:index, :new, :create, :preview]
-  before_action :check_if_locked_sample_type, only: [:edit, :new]
+  before_action :check_if_locked_sample_type, only: %i[edit new create update]
   before_action :templates_enabled?, only: [:query, :query_form]
 
   before_action :auth_to_create, only: %i[new create batch_create]

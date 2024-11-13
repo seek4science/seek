@@ -5,7 +5,6 @@ class SampleTypesControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
 
   setup do
-    Rails.cache.clear
     FactoryBot.create(:person) # to prevent person being first person and therefore admin
     @person = FactoryBot.create(:project_administrator)
     @project = @person.projects.first

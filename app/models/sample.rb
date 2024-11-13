@@ -40,7 +40,7 @@ class Sample < ApplicationRecord
 
   validates_with SampleAttributeValidator
   validate :validate_added_linked_sample_permissions
-  validate :check_if_locked_sample_type, on: :create
+  validate :check_if_locked_sample_type, on: %i[create update]
 
   before_validation :set_title_to_title_attribute_value
   before_validation :update_sample_resource_links
