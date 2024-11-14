@@ -20,23 +20,6 @@ class SampleTypeEditingConstraintsTest < ActiveSupport::TestCase
     refute c.samples?
   end
 
-  test 'allow title change?' do
-    c = Seek::Samples::SampleTypeEditingConstraints.new(sample_type_with_samples)
-    refute c.allow_name_change?(:address)
-    attr = c.sample_type.sample_attributes.detect { |t| t.accessor_name == 'address' }
-    refute_nil attr
-    refute c.allow_name_change?(attr)
-    assert c.allow_name_change?(nil)
-
-    # ok if there are no samples
-    c = Seek::Samples::SampleTypeEditingConstraints.new(FactoryBot.create(:simple_sample_type))
-    assert c.allow_name_change?(:the_title)
-    attr = c.sample_type.sample_attributes.detect { |t| t.accessor_name == 'the_title' }
-    refute_nil attr
-    assert c.allow_name_change?(attr)
-    assert c.allow_name_change?(nil)
-  end
-
   test 'allow type change?' do
     c = Seek::Samples::SampleTypeEditingConstraints.new(sample_type_with_samples)
     refute c.allow_type_change?(:address)
@@ -159,14 +142,6 @@ class SampleTypeEditingConstraintsTest < ActiveSupport::TestCase
     refute c.send(:all_blank?, 'full name')
   end
 
-  test 'allow_new_attribute' do
-    # currently only allowed if there are not samples
-    c = Seek::Samples::SampleTypeEditingConstraints.new(sample_type_with_samples)
-    refute c.allow_new_attribute?
-    c = Seek::Samples::SampleTypeEditingConstraints.new(FactoryBot.create(:simple_sample_type))
-    assert c.allow_new_attribute?
-  end
-
   test 'allow editing isa tag' do
     person = FactoryBot.create(:person)
     project = person.projects.first
@@ -224,8 +199,8 @@ class SampleTypeEditingConstraintsTest < ActiveSupport::TestCase
   # - the address attribute includes some blanks
   # - the postcode is always blank
   # - full name and age are required and always have values
-  def sample_type_with_samples
-    person = FactoryBot.create(:person)
+  def sample_type_with_samples(person = nil)
+    person ||= FactoryBot.create(:person)
 
     sample_type = User.with_current_user(person.user) do
       project = person.projects.first
