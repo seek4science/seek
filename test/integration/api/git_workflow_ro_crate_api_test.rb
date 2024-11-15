@@ -333,4 +333,23 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
       end
     end
   end
+
+  test 'cannot submit RO-Crate to project without membership' do
+    project = FactoryBot.create(:project)
+    assert_no_difference('Workflow.count', 1) do
+      assert_no_difference('Git::Version.count', 1) do
+        post submit_workflows_path, params: {
+          ro_crate: fixture_file_upload('workflows/ro-crate-with-id.crate.zip'),
+          workflow: {
+            project_ids: [project.id]
+          }
+        }, headers: { 'Authorization' => write_access_auth }
+
+        assert_response :unprocessable_entity
+        h = JSON.parse(response.body)
+        errors = h["errors"]
+        assert errors.first['detail'].include?('member of')
+      end
+    end
+  end
 end
