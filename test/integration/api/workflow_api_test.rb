@@ -56,7 +56,7 @@ class WorkflowApiTest < ActionDispatch::IntegrationTest
     VCR.use_cassette('bio_tools/fetch_galaxy_tool_names') do
       template = load_template('post_tooled_workflow.json.erb')
 
-      post '/workflows.json', params: template, headers: { 'Authorization' => write_access_auth }
+      post '/workflows.json', params: template, as: :json, headers: { 'Authorization' => write_access_auth }
       assert_response :success
 
       validate_json response.body, "#/components/schemas/#{singular_name.camelize(:lower)}Response"
