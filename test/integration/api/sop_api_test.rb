@@ -69,7 +69,7 @@ class SopApiTest < ActionDispatch::IntegrationTest
       }
     }
 
-    patch sop_path(sop, format: :json), params: to_patch, headers: { 'Authorization' => write_access_auth }
+    patch sop_path(sop, format: :json), params: to_patch, as: :json, headers: { 'Authorization' => write_access_auth }
     assert_response :success
 
     updated_policy = JSON.parse(@response.body)['data']['attributes']['policy']
