@@ -125,6 +125,7 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     assert_equal assay_metadata_type, assay.extended_metadata.extended_metadata_type
 
     assert_equal 'NMIMR', assay.extended_metadata.get_attribute_value('Facility')
+    assert_equal 'MiSeq Reagent Kit v3 (600-cycle) with a 20% PhiX (Illumina) spike-in', assay.extended_metadata.get_attribute_value('Protocol')
     assert_equal 'CCTACGGGNGGCWGCAG', assay.extended_metadata.get_attribute_value('Forward Primer')
     assert_equal 'Illumina MiSeq', assay.extended_metadata.get_attribute_value('Instrument Model')
     assert_equal 'PCR', assay.extended_metadata.get_attribute_value('Library Selection')
@@ -683,6 +684,38 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
                                              })
     assert_equal expected, obs_unit.extended_metadata.data
 
+  end
+
+  test 'detect extended metadata type' do
+    virtual_demo_assay = FactoryBot.create(:fairdata_virtual_demo_assay_extended_metadata)
+    seek_test_case_assay = FactoryBot.create(:fairdata_test_case_assay_extended_metadata)
+    FactoryBot.create(:simple_assay_extended_metadata_type)
+    FactoryBot.create(:fairdata_test_case_obsv_unit_extended_metadata)
+    FactoryBot.create(:simple_observation_unit_extended_metadata_type)
+    writer = Seek::FairDataStation::Writer.new
+
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case.ttl"
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+    assay = inv.studies.first.assays.first
+    seek_assay = ::Assay.new
+    detected_type = writer.send(:detect_extended_metadata_type, seek_assay, assay)
+    assert_equal seek_test_case_assay, detected_type
+
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/demo.ttl"
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+    assay = inv.studies.first.assays.first
+    detected_type = writer.send(:detect_extended_metadata_type, seek_assay, assay)
+    assert_equal virtual_demo_assay, detected_type
+
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/indpensim.ttl"
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+    obs_unit = inv.studies.first.observation_units.first
+    detected_type = writer.send(:detect_extended_metadata_type, ::ObservationUnit.new, obs_unit)
+    assert_nil detected_type
+
+    inpensim_obs_unit = FactoryBot.create(:fairdata_indpensim_obsv_unit_extended_metadata)
+    detected_type = writer.send(:detect_extended_metadata_type, ::ObservationUnit.new, obs_unit)
+    assert_equal inpensim_obs_unit, detected_type
   end
 
   private
