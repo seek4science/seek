@@ -8,13 +8,13 @@
       "enabled": true,
       "extended_metadata_attributes": [
         {
-          "id": "<%= res.extended_metadata_attributes.first.id %>",
+          "id": "<%= res.extended_metadata_attributes[0].id %>",
           "title": "age",
           "label": "Age",
           "description": null,
           "sample_attribute_type": {
-            "id": "<%= res.extended_metadata_attributes.first.sample_attribute_type_id %>",
-            "title": "<%= res.extended_metadata_attributes.first.sample_attribute_type.title %>",
+            "id": "<%= res.extended_metadata_attributes[0].sample_attribute_type_id %>",
+            "title": "<%= res.extended_metadata_attributes[0].sample_attribute_type.title %>",
             "base_type": "Integer",
             "regexp": ".*"
           },
@@ -24,13 +24,13 @@
           "linked_extended_metadata_type_id":null
         },
         {
-          "id": "<%= res.extended_metadata_attributes.second.id %>",
+          "id": "<%= res.extended_metadata_attributes[1].id %>",
           "title": "name",
           "label": "Name",
           "description": null,
           "sample_attribute_type": {
-            "id": "<%= res.extended_metadata_attributes.second.sample_attribute_type_id %>",
-            "title": "<%= res.extended_metadata_attributes.second.sample_attribute_type.title %>",
+            "id": "<%= res.extended_metadata_attributes[1].sample_attribute_type_id %>",
+            "title": "<%= res.extended_metadata_attributes[1].sample_attribute_type.title %>",
             "base_type": "String",
             "regexp": ".*"
           },
@@ -40,13 +40,13 @@
           "linked_extended_metadata_type_id":null
         },
         {
-          "id": "<%= res.extended_metadata_attributes.last.id %>",
+          "id": "<%= res.extended_metadata_attributes[2].id %>",
           "title": "date",
           "label": "Date",
           "description": null,
           "sample_attribute_type": {
-            "id": "<%= res.extended_metadata_attributes.last.sample_attribute_type_id %>",
-            "title": "<%= res.extended_metadata_attributes.last.sample_attribute_type.title %>",
+            "id": "<%= res.extended_metadata_attributes[2].sample_attribute_type_id %>",
+            "title": "<%= res.extended_metadata_attributes[2].sample_attribute_type.title %>",
             "base_type": "DateTime",
             "regexp": ".*"
           },
@@ -54,6 +54,30 @@
           "pos":null,
           "sample_controlled_vocab_id":null,
           "linked_extended_metadata_type_id":null
+        },
+        {
+          "id": "<%= res.extended_metadata_attributes[3].id %>",
+          "title": "data file",
+          "description": null,
+          "pid": null,
+          "sample_attribute_type": {
+            "id": "<%= res.extended_metadata_attributes[3].sample_attribute_type_id %>",
+            "title": "<%= res.extended_metadata_attributes[3].sample_attribute_type.title %>",
+            "base_type": "SeekDataFile",
+            "regexp": ".*"
+          }
+        },
+        {
+          "id": "<%= res.extended_metadata_attributes[4].id %>",
+          "title": "sop",
+          "description": null,
+          "pid": null,
+          "sample_attribute_type": {
+            "id": "<%= res.extended_metadata_attributes[4].sample_attribute_type_id %>",
+            "title": "<%= res.extended_metadata_attributes[4].sample_attribute_type.title %>",
+            "base_type": "SeekSop",
+            "regexp": ".*"
+          }
         }
       ]
     },

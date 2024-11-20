@@ -59,7 +59,7 @@ module Seek
       # FIXME: hard-coded extra types - are are these items now user_creatable?
       # FIXME: remove the reliance on user-creatable, partly by respond_to?(:reindex) but also take into account if it has been enabled or not
       #- could add a searchable? method
-      extras = [Person, Programme, Project, Institution, Organism, HumanDisease]
+      extras = [Person, Programme, Project, Institution, Organism, HumanDisease, ObservationUnit]
       cache('searchable_types') { filter_disabled(user_creatable_types | extras).sort_by(&:name) }
     end
 
@@ -180,5 +180,10 @@ module Seek
       types.select(&:feature_enabled?)
     end
 
+    def self.extended_metadata_supported_types
+      cache('extended_metadata_supported_types') do
+        persistent_classes.select { |c| c.respond_to?(:supports_extended_metadata?) && c.supports_extended_metadata? }.sort_by(&:name)
+      end
+    end
   end
 end

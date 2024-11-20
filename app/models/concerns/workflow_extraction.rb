@@ -273,7 +273,9 @@ module WorkflowExtraction
       end
 
       if exist
-        exist.update_attribute(:path, path)
+        exist.path = path
+        exist.save(validate: false) if exist.persisted?
+        exist
       else
         git_version.git_annotations.build(key: s_type, path: path)
       end

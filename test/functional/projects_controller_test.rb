@@ -4165,8 +4165,8 @@ class ProjectsControllerTest < ActionController::TestCase
       programme: {
         id: programme.id
       },
-      institution: {
-        id: institution.id
+      institution:{
+        id:institution.id
       },
       people: people.map { |p| {first_name: p.first_name, last_name: p.last_name, email: p.email} }
     }
@@ -5038,6 +5038,167 @@ class ProjectsControllerTest < ActionController::TestCase
       get :show, params:{id: project.id}
       assert_response :success
       assert_select 'div#related-items li a[data-model-name=Template]', count: 0
+    end
+
+  end
+
+  test 'show import_from_fairdata_station' do
+    person = FactoryBot.create(:person)
+    refute person.is_admin?
+    project = person.projects.first
+    other_project = FactoryBot.create(:project)
+
+    logout
+
+    get :import_from_fairdata_station, params: {id: project}
+    assert_redirected_to login_path
+
+    login_as(person)
+    get :import_from_fairdata_station, params: {id: project}
+    assert_response :success
+
+    get :import_from_fairdata_station, params: {id: other_project}
+    assert_redirected_to project_path(other_project)
+  end
+
+  test 'dont show import from fair data station if disabled' do
+    person = FactoryBot.create(:person)
+    refute person.is_admin?
+    project = person.projects.first
+    with_config_value(:fair_data_station_enabled, false) do
+      get :show, params: { id: project.id }
+      assert_response :success
+      assert_select '#item-admin-menu' do
+        assert_select 'li a[href=?]', import_from_fairdata_station_project_path(project), text:/Import from FAIRData Station/, count: 0
+      end
+
+      get :import_from_fairdata_station, params: { id: project.id }
+      assert_redirected_to :root
+      refute_nil flash[:error]
+      assert_equal 'Fair data station are disabled', flash[:error]
+    end
+  end
+
+  test 'dont show import from fair data station if obs units or isa disabled' do
+    person = FactoryBot.create(:person)
+    refute person.is_admin?
+    project = person.projects.first
+    with_config_value(:observation_units_enabled, false) do
+      get :show, params: { id: project.id }
+      assert_response :success
+      # menu item still shown but will be an error message when clicking it
+      assert_select '#item-admin-menu' do
+        assert_select 'li a[href=?]', import_from_fairdata_station_project_path(project), text:/Import from FAIR Data Station/, count: 1
+      end
+
+      get :import_from_fairdata_station, params: { id: project.id }
+      assert_redirected_to :root
+      refute_nil flash[:error]
+      assert_equal 'Observation units are disabled', flash[:error]
+    end
+    with_config_value(:isa_enabled, false) do
+      get :show, params: { id: project.id }
+      assert_response :success
+      # menu item still shown but will be an error message when clicking it
+      assert_select '#item-admin-menu' do
+        assert_select 'li a[href=?]', import_from_fairdata_station_project_path(project), text:/Import from FAIR Data Station/, count: 1
+      end
+
+      get :import_from_fairdata_station, params: { id: project.id }
+      assert_redirected_to :root
+      refute_nil flash[:error]
+      assert_equal 'Investigations are disabled', flash[:error]
+    end
+  end
+
+  test 'import from fairdata station ttl' do
+
+    person = FactoryBot.create(:person)
+    FactoryBot.create(:fairdatastation_virtual_demo_sample_type)
+    project = person.projects.first
+    another_person = FactoryBot.create(:person)
+    login_as(person)
+
+    ttl_file = fixture_file_upload('fair_data_station/demo.ttl')
+
+    assert_difference('ActivityLog.count',40) do
+      post :submit_fairdata_station, params: { id: project, datastation_data: ttl_file,
+                                               policy_attributes: {
+                                                 access_type: Policy::VISIBLE,
+                                                 permissions_attributes: {
+                                                   '0' => { contributor_type: 'Person', contributor_id: another_person.id, access_type: Policy::MANAGING
+                                                   }
+                                                 }
+                                               }
+      }
+    end
+
+    assert investigation = assigns(:investigation)
+    assert_redirected_to investigation
+
+    assert_equal person, investigation.contributor
+    assert_equal 1, investigation.studies.count
+    study = investigation.studies.first
+    assert_equal 9, study.assays.count
+    assert_equal 2, study.observation_units.count
+    assert_equal 4, study.observation_units.first.samples.count
+
+    obs_unit = study.observation_units.first
+    sample = obs_unit.samples.first
+
+    assert_equal person, study.contributor
+    assert_equal person, obs_unit.contributor
+    assert_equal person, sample.contributor
+
+    assert_equal Policy::VISIBLE, investigation.policy.access_type
+    assert_equal 1, investigation.policy.permissions.count
+    assert_equal another_person, investigation.policy.permissions.first.contributor
+    assert_equal Policy::MANAGING, investigation.policy.permissions.first.access_type
+
+    assert_equal Policy::VISIBLE, study.policy.access_type
+    assert_equal 1, study.policy.permissions.count
+    assert_equal another_person, study.policy.permissions.first.contributor
+    assert_equal Policy::MANAGING, study.policy.permissions.first.access_type
+
+    assert_equal Policy::VISIBLE, obs_unit.policy.access_type
+    assert_equal 1, obs_unit.policy.permissions.count
+    assert_equal another_person, obs_unit.policy.permissions.first.contributor
+    assert_equal Policy::MANAGING, obs_unit.policy.permissions.first.access_type
+
+    assert_equal Policy::VISIBLE, sample.policy.access_type
+    assert_equal 1, sample.policy.permissions.count
+    assert_equal another_person, sample.policy.permissions.first.contributor
+    assert_equal Policy::MANAGING, sample.policy.permissions.first.access_type
+
+  end
+
+  test 'import from fairdata station ttl existing external id' do
+    person = FactoryBot.create(:person)
+    FactoryBot.create(:fairdatastation_virtual_demo_sample_type)
+    project = person.projects.first
+    another_person = FactoryBot.create(:person)
+    login_as(person)
+
+    investigation = FactoryBot.create(:investigation, external_identifier: 'seek-test-investigation', projects:[project], contributor: person)
+
+
+    ttl_file = fixture_file_upload('fair_data_station/seek-fair-data-station-test-case.ttl')
+    assert_no_difference('Investigation.count') do
+      post :submit_fairdata_station, params: {id: project, datastation_data: ttl_file,
+                                              policy_attributes:{
+                                                access_type: Policy::VISIBLE,
+                                                permissions_attributes: {
+                                                  '0' => { contributor_type: 'Person', contributor_id: another_person.id, access_type: Policy::MANAGING
+                                                  }
+                                                }
+                                              }
+      }
+    end
+    assert_response :unprocessable_entity
+    assert_match /An Investigation with that external identifier already exists for this Project/, flash[:error]
+    assert_select 'div#existing-investigation.panel' do
+      assert_select 'a[href=?]', investigation_path(investigation), text:investigation.title
+      assert_select 'a[href=?]', update_from_fairdata_station_investigation_path(investigation)
     end
 
   end

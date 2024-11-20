@@ -50,6 +50,7 @@
 //= require DataTables-1.11.3/buttons.html5
 //= require DataTables-1.11.3/autoFill.bootstrap
 //= require samples
+//= require datafiles
 //= require jstree
 //= require clipboard
 //= require openbis
@@ -77,3 +78,9 @@
 //= require select2.full.min
 //= require licenses
 //= require svg-pan-zoom-3.6.1/svg-pan-zoom.min
+//= require copasi/copasi
+//= require copasi/copasijs
+//= require copasi/copasi_simulation
+//= require plotly-2.27.0.min
+//= require extended_metadata_type
+

@@ -43,6 +43,7 @@ module Seek
         grouped_pagination
         title_trimmer
         has_extended_metadata
+        has_external_identifier
 
         attr_writer :original_filename, :content_type
 

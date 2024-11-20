@@ -1,0 +1,111 @@
+{
+  "data": {
+    "id": "<%= res.id %>",
+    "type": "observation_units",
+    "attributes": {
+      "policy": {
+        "access": "manage",
+        "permissions": []
+      },
+      "discussion_links": [],
+      "title": "Max observation unit",
+      "description": "the maximum one",
+      "tags": [],
+      "extended_attributes": {
+        "extended_metadata_type_id":"<%= res.extended_metadata&.extended_metadata_type&.id %>",
+        "attribute_map":{
+          "name":"unit 1",
+          "strain":"strain 1"
+        }
+      },
+      "created_at": "<%= res.created_at.as_json %>",
+      "updated_at": "<%= res.updated_at.as_json %>",
+      "creators": [
+        {
+          "profile": "/people/<%= res.creators.first.id %>",
+          "family_name": "One",
+          "given_name": "Some",
+          "affiliation": "University of Somewhere",
+          "orcid": null
+        }
+      ],
+      "other_creators": "Blogs, Joe"
+    },
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "<%= res.creators.first.id %>",
+            "type": "people"
+          }
+        ]
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "<%= current_person.id %>",
+            "type": "people"
+          }
+        ]
+      },
+      "people": {
+        "data": [
+          {
+            "id": "<%= res.creators.first.id %>",
+            "type": "people"
+          },
+          {
+            "id": "<%= current_person.id %>",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "<%= res.projects.first.id %>",
+            "type": "projects"
+          }
+        ]
+      },
+      "study": {
+        "data": {
+          "id": "<%= res.study.id %>",
+          "type": "studies"
+        }
+      },
+      "samples": {
+        "data": [
+          {
+            "id": "<%= res.samples[0].id %>",
+            "type": "samples"
+          },
+          {
+            "id": "<%= res.samples[1].id %>",
+            "type": "samples"
+          },
+          {
+            "id": "<%= res.samples[2].id %>",
+            "type": "samples"
+          }
+        ]
+      },
+      "data_files": {
+        "data": []
+      }
+    },
+    "links": {
+      "self": "/observation_units/<%= res.id %>"
+    },
+    "meta": {
+      "created": "<%= res.created_at.as_json %>",
+      "modified": "<%= res.updated_at.as_json %>",
+      "api_version": "0.3",
+      "base_url": "http://localhost:3000",
+      "uuid": "<%= res.uuid %>"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

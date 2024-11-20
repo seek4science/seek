@@ -31,12 +31,16 @@ class Sample < ApplicationRecord
   has_many :linking_samples, through: :reverse_sample_resource_links, source: :sample
 
   has_many :linked_data_files, through: :sample_resource_links, source: :resource, source_type: 'DataFile'
+  has_many :linked_sops, through: :sample_resource_links, source: :resource, source_type: 'Sop'
+
+  belongs_to :observation_unit
 
   validates :projects, presence: true, projects: { self: true }
   validates :title, :sample_type, presence: true
 
   validates_with SampleAttributeValidator
   validate :validate_added_linked_sample_permissions
+  validate :check_if_locked_sample_type, on: %i[create update]
 
   before_validation :set_title_to_title_attribute_value
   before_validation :update_sample_resource_links
@@ -62,8 +66,16 @@ class Sample < ApplicationRecord
     User.logged_in_and_member? && Seek::Config.samples_enabled
   end
 
+  def self.supports_extended_metadata?
+    false
+  end
+
   def related_data_files
     [originating_data_file].compact + linked_data_files
+  end
+
+  def related_sops
+    linked_sops
   end
 
   def related_samples
@@ -85,6 +97,10 @@ class Sample < ApplicationRecord
 
   def referenced_data_files
     referenced_resources.select { |r| r.is_a?(DataFile) }
+  end
+
+  def referenced_sops
+    referenced_resources.select { |r| r.is_a?(Sop) }
   end
 
   def referenced_strains
@@ -113,11 +129,6 @@ class Sample < ApplicationRecord
         value.to_s
       end
     end
-  end
-
-  # although it includes the RdfGeneration for some rdf support, it can't be considered to fully support it yet.
-  def rdf_supported?
-    false
   end
 
   def related_organisms
@@ -209,6 +220,7 @@ class Sample < ApplicationRecord
     self.strains = referenced_strains
     self.linked_samples = referenced_samples
     self.linked_data_files = referenced_data_files
+    self.linked_sops = referenced_sops
   end
 
   def attribute_class
@@ -230,12 +242,12 @@ class Sample < ApplicationRecord
     return if $authorization_checks_disabled
     return if linked_samples.empty?
     previous_linked_samples = []
-    unless new_record?
-      previous_linked_samples = Sample.find(id).referenced_samples
-    end
+    previous_linked_samples = Sample.find(id).referenced_samples unless new_record?
     additions = linked_samples - previous_linked_samples
-    if additions.detect { |sample| !sample.can_view? }
-      errors.add(:linked_samples, 'includes a new private sample')
-    end
+    errors.add(:linked_samples, 'includes a new private sample') if additions.detect { |sample| !sample.can_view? }
+  end
+
+  def check_if_locked_sample_type
+    errors.add(:sample_type, 'is locked') if sample_type&.locked?
   end
 end

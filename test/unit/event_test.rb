@@ -20,9 +20,11 @@ class EventTest < ActiveSupport::TestCase
   test 'publication association' do
     assert @event.publications.empty?
     publication = FactoryBot.create(:publication)
-    @event.publications << publication
-    assert @event.valid?
-    assert @event.save
+    disable_authorization_checks do
+      @event.publications << publication
+      assert @event.valid?
+      assert @event.save
+    end
     assert_equal 1, @event.publications.count
   end
 

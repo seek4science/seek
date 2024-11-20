@@ -1,11 +1,11 @@
 <div class="row">
   <div class="col-md-8 col-md-push-2">
     <%= panel("Confirmation") do %>
-        <%= form_tag(polymorphic_path([@resource, @snapshot], :action => 'export'), method: :post) do %>
+        <%= form_tag(polymorphic_path([@parent_resource, @snapshot], :action => 'export'), method: :post) do %>
             <%= image_tag('logos/zenodo.png', :class => 'zenodo-publish') %>
             <p>
               You are about to publish:
-              <strong><%= @resource.title %></strong> to Zenodo. <br/>
+              <strong><%= @parent_resource.title %></strong> to Zenodo. <br/>
               Please fill out some additional metadata required by Zenodo before submitting.
             </p>
 
@@ -77,7 +77,7 @@
 
             <p class="text-center">
               <%= submit_tag 'Publish', :class => 'btn btn-primary' %>
-              <%= cancel_button(polymorphic_path(@resource)) %>
+              <%= cancel_button(polymorphic_path(@parent_resource)) %>
             </p>
         <% end %>
     <% end %>

@@ -100,7 +100,6 @@ class AdminController < ApplicationController
     Seek::Config.omniauth_oidc_image&.destroy! if params[:clear_omniauth_oidc_image] == '1'
     Seek::Config.omniauth_oidc_image = params[:omniauth_oidc_image]
 
-    params[:omniauth_oidc_issuer] = params[:omniauth_oidc_issuer].chomp('/') + '/' if params[:omniauth_oidc_issuer].present?
     Seek::Config.omniauth_oidc_issuer = params[:omniauth_oidc_issuer]
     Seek::Config.omniauth_oidc_client_id = params[:omniauth_oidc_client_id]
     Seek::Config.omniauth_oidc_secret = params[:omniauth_oidc_secret]
@@ -122,6 +121,8 @@ class AdminController < ApplicationController
     Seek::Config.documents_enabled = string_to_boolean params[:documents_enabled]
     Seek::Config.events_enabled = string_to_boolean params[:events_enabled]
     Seek::Config.isa_enabled = string_to_boolean params[:isa_enabled]
+    Seek::Config.observation_units_enabled = string_to_boolean params[:observation_units_enabled]
+    Seek::Config.fair_data_station_enabled = string_to_boolean params[:fair_data_station_enabled]
     Seek::Config.models_enabled = string_to_boolean params[:models_enabled]
     Seek::Config.organisms_enabled = string_to_boolean params[:organisms_enabled]
     Seek::Config.programmes_enabled = string_to_boolean params[:programmes_enabled]
@@ -351,6 +352,8 @@ class AdminController < ApplicationController
     Seek::Config.metadata_license = params[:metadata_license]
     Seek::Config.recommended_data_licenses = params[:recommended_data_licenses]&.compact_blank
     Seek::Config.recommended_software_licenses = params[:recommended_software_licenses]&.compact_blank
+    Seek::Config.sandbox_instance_url = params[:sandbox_instance_url]
+    Seek::Config.sandbox_instance_name = params[:sandbox_instance_name]
     update_flag = (pubmed_email == '' || pubmed_email_valid) && (crossref_email == '' || crossref_email_valid)
     update_redirect_to update_flag, 'settings'
   end
@@ -536,11 +539,11 @@ class AdminController < ApplicationController
     smtp_hash_new = { address: params[:address],
                       enable_starttls_auto: params[:enable_starttls_auto] == '1',
                       domain: params[:domain],
-                      authentication: params[:authentication],
-                      user_name: (params[:smtp_user_name].blank? ? nil : params[:smtp_user_name]),
-                      password: (params[:smtp_password].blank? ? nil : params[:smtp_password]) }
+                      authentication: params[:authentication].presence,
+                      user_name: params[:smtp_user_name].presence,
+                      password: params[:smtp_password].presence }
     smtp_hash_new[:port] = params[:port] if only_integer params[:port], 'port'
-    ActionMailer::Base.smtp_settings = smtp_hash_new
+    ActionMailer::Base.smtp_settings = smtp_hash_new.compact
     raise_delivery_errors_setting = ActionMailer::Base.raise_delivery_errors
     ActionMailer::Base.raise_delivery_errors = true
     begin

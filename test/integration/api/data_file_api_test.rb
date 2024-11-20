@@ -27,7 +27,10 @@ class DataFileApiTest < ActionDispatch::IntegrationTest
     assert df.can_edit?(@current_user)
 
     original_md5 = df.content_blob.md5sum
-    put data_file_content_blob_path(df, df.content_blob), headers: { 'Accept' => 'application/json', 'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf')) }
+    put data_file_content_blob_path(df, df.content_blob), as: :json, headers: {
+      'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf')),
+      'Authorization' => write_access_auth
+    }
 
     assert_response :success
     blob = df.content_blob.reload
@@ -43,7 +46,10 @@ class DataFileApiTest < ActionDispatch::IntegrationTest
     assert df.can_download?(@current_user)
     assert df.can_edit?(@current_user)
 
-    put data_file_content_blob_path(df, df.content_blob), params: { file: fixture_file_upload('txt_test.txt', 'text/plain') }, headers: { 'Accept' => 'application/json' }
+    put data_file_content_blob_path(df, df.content_blob),
+        params: { file: fixture_file_upload('txt_test.txt', 'text/plain') },
+        headers: { 'Accept' => 'application/json',
+                   'Authorization' => write_access_auth }
 
     assert_response :success
     blob = df.content_blob.reload
@@ -58,7 +64,11 @@ class DataFileApiTest < ActionDispatch::IntegrationTest
     assert df.can_download?(@current_user)
     refute df.can_edit?(@current_user)
 
-    put data_file_content_blob_path(df, df.content_blob), headers: { 'Accept' => 'application/json', 'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf')) }
+    put data_file_content_blob_path(df, df.content_blob), as: :json,
+        headers: {
+          'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf')),
+          'Authorization' => write_access_auth
+        }
 
     assert_response :forbidden
     validate_json response.body, '#/components/schemas/forbiddenResponse'
@@ -75,7 +85,10 @@ class DataFileApiTest < ActionDispatch::IntegrationTest
     assert df.can_edit?(@current_user)
 
     original_md5 = df.content_blob.md5sum
-    put data_file_content_blob_path(df, df.content_blob), headers: { 'Accept' => 'application/json', 'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'another_pdf_file.pdf')) }
+    put data_file_content_blob_path(df, df.content_blob), as: :json, headers: {
+      'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'another_pdf_file.pdf')),
+      'Authorization' => write_access_auth
+    }
 
     assert_response :bad_request
     validate_json response.body, '#/components/schemas/badRequestResponse'
@@ -98,7 +111,7 @@ class DataFileApiTest < ActionDispatch::IntegrationTest
     to_post = load_template('post_bad_data_file.json.erb')
 
     assert_no_difference(-> { model.count }) do
-      post "/#{plural_name}.json", params: to_post
+      post collection_url, params: to_post, headers: { 'Authorization' => write_access_auth }
       assert_response :unprocessable_entity
       validate_json response.body, '#/components/schemas/unprocessableEntityResponse'
     end
@@ -122,7 +135,7 @@ class DataFileApiTest < ActionDispatch::IntegrationTest
 
     with_config_value(:max_all_visitors_access_type, Policy::VISIBLE) do
       assert_no_difference(-> { model.count }) do
-        post "/#{plural_name}.json", params: to_post
+        post collection_url, params: to_post, as: :json, headers: { 'Authorization' => write_access_auth }
         assert_response :unprocessable_entity
         validate_json response.body, '#/components/schemas/unprocessableEntityResponse'
       end

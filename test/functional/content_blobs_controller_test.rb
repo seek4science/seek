@@ -477,6 +477,43 @@ class ContentBlobsControllerTest < ActionController::TestCase
     csv = @response.body
     assert csv.include?(%(,"some stuff"))
 
+    get :show, params: { data_file_id: df.id, id: df.content_blob.id, format: 'csv', sheet:'2' }
+    assert_response :success
+
+    assert @response.media_type, 'text/csv'
+
+    csv = @response.body
+    assert csv.include?(%(,"hair colour"))
+
+  end
+
+  test 'fetch excel content blob as xml' do
+    df = FactoryBot.create(:data_file, content_blob: FactoryBot.create(:sample_type_populated_template_content_blob), policy: FactoryBot.create(:all_sysmo_downloadable_policy))
+    get :show, params: { data_file_id: df.id, id: df.content_blob.id, format: 'xml' }
+    assert_response :success
+
+    assert @response.media_type, 'text/xml'
+    doc = LibXML::XML::Parser.string(@response.body).parse
+    doc.root.namespaces.default_prefix = 'ss'
+    assert_equal 3, doc.find('//ss:sheet').count
+  end
+
+  test 'can fetch excel content blob as csv with sheet name' do
+    df = FactoryBot.create(:data_file, content_blob: FactoryBot.create(:sample_type_populated_template_content_blob), policy: FactoryBot.create(:all_sysmo_downloadable_policy))
+
+    get :show, params: { data_file_id: df.id, id: df.content_blob.id, format: 'csv', sheet:'Samples' }
+    assert_response :success
+
+    assert @response.media_type, 'text/csv'
+
+    csv = @response.body
+    assert csv.include?(%(,"hair colour"))
+
+
+    get :show, params: { data_file_id: df.id, id: df.content_blob.id, format: 'csv', sheet:'Not known sheet' }
+    assert_response :unprocessable_entity
+    assert_equal 'Unrecognised sheet name',@response.body
+
   end
 
   test 'cannot fetch binary content blob as csv' do
@@ -502,6 +539,26 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert csv.include?(%(No content))
 
   end
+
+  test 'cannot fetch viewable only excel as csv' do
+    df = FactoryBot.create(:data_file, content_blob: FactoryBot.create(:sample_type_populated_template_content_blob), policy: FactoryBot.create(:publicly_viewable_policy))
+    assert df.can_view?
+    refute df.can_download?
+    get :show, params: { data_file_id: df.id, id: df.content_blob.id, format: 'csv' }
+    assert_response :forbidden
+    assert_equal 'Not authorized', @response.body
+  end
+
+  test 'cannot fetch viewable only excel as xml' do
+    df = FactoryBot.create(:data_file, content_blob: FactoryBot.create(:sample_type_populated_template_content_blob), policy: FactoryBot.create(:publicly_viewable_policy))
+    assert df.can_view?
+    refute df.can_download?
+    get :show, params: { data_file_id: df.id, id: df.content_blob.id, format: 'xml' }
+    assert_response :forbidden
+    assert_equal 'Not authorized', @response.body
+  end
+
+
 
   test 'can view content of an image file' do
     df = FactoryBot.create(:data_file, policy: FactoryBot.create(:all_sysmo_downloadable_policy),

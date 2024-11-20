@@ -31,7 +31,17 @@
         ],
         "weight": 3.7,
         "age": 42,
-        "bool": true
+        "bool": true,
+        "data file": {
+          "type": "DataFile",
+          "title": "This Data file",
+          "id": <%= res.get_attribute_value('data file')['id'] %>
+        },
+        "sop": {
+          "type": "Sop",
+          "title": "This Sop",
+          "id": <%= res.get_attribute_value(:sop)['id'] %>
+        }
       },
       "policy": {
         "access": "no_access",
@@ -67,6 +77,10 @@
       },
       "data_files": {
         "data": [
+          {
+            "id": "<%= res.linked_data_files.first.id %>",
+            "type": "data_files"
+          }
         ]
       },
       "assays": {

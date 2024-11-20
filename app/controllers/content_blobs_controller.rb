@@ -38,11 +38,26 @@ class ContentBlobsController < ApplicationController
     elsif @content_blob.is_csv?
         render plain: File.read(@content_blob.filepath, encoding: 'iso-8859-1'), layout: false, content_type: 'text/csv'
     elsif @content_blob.is_excel?
-        sheet = params[:sheet] || 1
-        trim = params[:trim] || false
+      sheet = params[:sheet] || 1
+      trim = params[:trim] || false
+      begin
         render plain: @content_blob.to_csv(sheet, trim), content_type: 'text/csv'
+      rescue SysMODB::SpreadsheetExtractionException => e
+        render plain: e.message.lines.first, content_type: 'text/csv', status: :unprocessable_entity
+      end
     else
         render plain: 'Unable to view contents of this data file,', content_type: 'text/csv', status: :not_acceptable
+    end
+  end
+
+  def xml_data
+    if @content_blob.no_content?
+      render plain: 'No content, Content blob does not have content', content_type: 'text/xml', status: :not_found
+    elsif @content_blob.is_excel?
+
+      render plain: @content_blob.to_spreadsheet_xml, content_type: 'text/xml'
+    else
+      render plain: 'Unable to view contents of this data file,', content_type: 'text/xml', status: :not_acceptable
     end
   end
 
@@ -51,6 +66,7 @@ class ContentBlobsController < ApplicationController
       format.json { render json: @content_blob, include: [params[:include]] }
       format.html { render plain: 'Format not supported', status: :not_acceptable }
       format.csv { csv_data }
+      format.xml { xml_data }
     end
   end
 
@@ -140,6 +156,12 @@ class ContentBlobsController < ApplicationController
             render json: { "title": 'Forbidden',
                            "detail": "You are not authorized to download the asset linked to content_blob:#{params[:id]}" },
                    status: :forbidden
+          end
+          format.csv do
+            render plain: 'Not authorized', status: :forbidden
+          end
+          format.xml do
+            render plain: 'Not authorized', status: :forbidden
           end
         end
         return false

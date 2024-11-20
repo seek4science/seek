@@ -58,4 +58,18 @@ module DataFilesHelper
     return if message.blank?
     render partial: 'data_files/multi-steps/exception_message', object: message
   end
+
+  def show_unzip_folder_button?(asset, display_asset)
+    return false unless ( asset.can_manage? && (display_asset.version == asset.version) && asset.zipped_folder? && asset.unzipped_files.empty? )
+    return ! ( asset.unzip_task&.in_progress? || ( asset.unzip_task&.success? && Seek::DataFiles::Unzipper.new(asset).fetch.present? ) )
+    rescue Seek::DataFiles::FetchException
+      return true # allows to try again
+  end
+  
+  def show_unzip_folder_status?(data_file)
+    # there is permission and a task
+    return false unless data_file.can_manage? && data_file.unzip_task&.persisted?
+    # persistence isn't currently running or already taken place
+    return !( data_file.unzip_persistence_task&.success? || data_file.unzip_persistence_task&.in_progress? )
+  end
 end

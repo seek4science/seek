@@ -11,11 +11,16 @@ var ObjectsInput = {
             const opts = {
                 placeholder: 'Search ...',
                 theme: "bootstrap",
-                width: '100%'
+                width: '100%',
+                allowClear: false
             };
 
             if ($j(this).data('placeholder')) {
                 opts.placeholder = $j(this).data('placeholder');
+            }
+
+            if ($j(this).data('allow-clear')) {
+                opts.allowClear = $j(this).data('allow-clear');
             }
 
             if ($j(this).data('tags-limit')) {

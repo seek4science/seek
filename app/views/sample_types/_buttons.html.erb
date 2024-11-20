@@ -4,7 +4,7 @@
     <%= button_link_to("View samples", 'view_samples', sample_type_samples_path(sample_type)) %>
 <% end %>
 
-<% if Sample.can_create? %>
+<% if Sample.can_create? && !sample_type.locked? %>
     <%= button_link_to("Create sample", 'new', new_sample_path(sample_type_id:sample_type.id)) %>
 <% end %>
 
@@ -15,6 +15,9 @@
     <% end -%>
     <% if sample_type.can_delete? %>
         <%= delete_icon(sample_type, current_user) %>
+    <% end %>
+    <% if sample_type.can_manage? %>
+        <li><%= image_tag_for_key('manage', manage_sample_type_path(sample_type), nil, nil, "Manage Sample Type") -%></li>
     <% end %>
 
 <% end %>

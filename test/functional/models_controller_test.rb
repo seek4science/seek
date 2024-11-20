@@ -1410,6 +1410,28 @@ class ModelsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'show run count for simulatable model' do
+    model = FactoryBot.create(:teusink_model, policy: FactoryBot.create(:public_policy))
+
+    get :show, params: { id: model }
+
+    assert_select '#usage_count' do
+      assert_select 'strong', text: /Downloads/, count: 1
+      assert_select 'strong', text: /Runs/, count: 1
+    end
+  end
+
+  test 'do not show run count for non-simulatable model' do
+    model = FactoryBot.create(:non_sbml_xml_model, policy: FactoryBot.create(:public_policy))
+
+    get :show, params: { id: model }
+
+    assert_select '#usage_count' do
+      assert_select 'strong', text: /Downloads/, count: 1
+      assert_select 'strong', text: /Runs/, count: 0
+    end
+  end
+
   private
 
   def valid_model

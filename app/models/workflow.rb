@@ -44,7 +44,7 @@ class Workflow < ApplicationRecord
 
     acts_as_doi_mintable(proxy: :parent, general_type: 'Workflow')
 
-    before_save :refresh_internals, if: -> { main_workflow_path_changed? && !main_workflow_blob.empty? }
+    before_save :refresh_internals, if: -> { main_workflow_path_changed? && main_workflow_blob && !main_workflow_blob.empty? }
     after_save :clear_cached_diagram, if: -> { diagram_path_changed? }
     after_commit :submit_to_life_monitor, on: [:create, :update], if: :should_submit_to_life_monitor?
     after_commit :sync_test_status, on: [:create, :update]
@@ -211,6 +211,10 @@ class Workflow < ApplicationRecord
     false
   end
 
+  def self.supports_extended_metadata?
+    false
+  end
+
   MATURITY_LEVELS = {
       0 => :work_in_progress,
       1 => :released,
@@ -274,4 +278,7 @@ class Workflow < ApplicationRecord
       }
   )
 
+  def self.find_by_source_url(source_url)
+    joins(:source_link).where('asset_links.url' => source_url)
+  end
 end

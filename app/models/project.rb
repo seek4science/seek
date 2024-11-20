@@ -11,6 +11,7 @@ class Project < ApplicationRecord
   has_and_belongs_to_many :investigations
   has_many :studies, through: :investigations
   has_many :assays, through: :studies
+  has_many :observation_units, through: :studies
   has_and_belongs_to_many :data_files
   has_and_belongs_to_many :models
   has_and_belongs_to_many :sops

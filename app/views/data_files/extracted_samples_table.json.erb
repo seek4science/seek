@@ -1,0 +1,8 @@
+{
+  "data": [
+  <% @samples.each_with_index do |sample, i| -%>
+    { "id": <%= sample.id -%>, "title": "<%= sample.title -%>", "data": <%= raw sample.json_metadata -%> }
+    <% unless i == @samples.length - 1 -%>,<% end -%>
+  <% end -%>
+  ]
+}

@@ -1,13 +1,13 @@
 {
   "data": {
-    "id": "561",
+    "id": "2246",
     "type": "projects",
     "attributes": {
       "discussion_links": [
 
       ],
       "extended_attributes": {
-        "extended_metadata_type_id": "118",
+        "extended_metadata_type_id": "144",
         "attribute_map": {
           "dad": {
             "first_name": "john",
@@ -42,21 +42,21 @@
         "permissions": [
           {
             "resource": {
-              "id": "440",
+              "id": "2307",
               "type": "people"
             },
             "access": "manage"
           },
           {
             "resource": {
-              "id": "559",
+              "id": "2244",
               "type": "projects"
             },
             "access": "download"
           },
           {
             "resource": {
-              "id": "464",
+              "id": "2359",
               "type": "institutions"
             },
             "access": "view"
@@ -102,7 +102,7 @@
       "organisms": {
         "data": [
           {
-            "id": "28",
+            "id": "59",
             "type": "organisms"
           }
         ]
@@ -202,14 +202,14 @@
       }
     },
     "links": {
-      "self": "/projects/561"
+      "self": "/projects/2246"
     },
     "meta": {
-      "created": "2024-06-20T12:29:54.000Z",
-      "modified": "2024-06-20T12:29:54.000Z",
+      "created": "2024-11-20T10:16:10.000Z",
+      "modified": "2024-11-20T10:16:10.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "b87dd8d0-112e-013d-1f9d-0a81884ed284"
+      "uuid": "637ad720-8956-013d-24a2-0a81884ed284"
     }
   },
   "jsonapi": {

@@ -68,6 +68,10 @@ class SampleAttributeType < ApplicationRecord
     base_type == Seek::Samples::BaseType::LINKED_EXTENDED_METADATA_MULTI
   end
 
+  def linked_extended_metadata_or_multi?
+    [Seek::Samples::BaseType::LINKED_EXTENDED_METADATA, Seek::Samples::BaseType::LINKED_EXTENDED_METADATA_MULTI].include?(base_type)
+  end
+
   def seek_sample?
     base_type == Seek::Samples::BaseType::SEEK_SAMPLE
   end
@@ -84,5 +88,8 @@ class SampleAttributeType < ApplicationRecord
     base_type == Seek::Samples::BaseType::SEEK_DATA_FILE
   end
 
+  def seek_sop?
+    base_type == Seek::Samples::BaseType::SEEK_SOP
+  end
 
 end

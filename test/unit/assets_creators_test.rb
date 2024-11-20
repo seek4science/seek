@@ -173,4 +173,32 @@ class AssetsCreatorsTest < ActiveSupport::TestCase
       end
     end
   end
+
+  test 'automatically links to creator based on orcid' do
+    explicitly_linked_person = FactoryBot.create(:person, first_name: 'Link', orcid: 'https://orcid.org/0000-0002-5111-7263')
+    orcid_linked_person = FactoryBot.create(:person_not_in_project, first_name: 'Orc', orcid: 'https://orcid.org/0000-0002-1825-0097')
+    should_not_be_linked = FactoryBot.create(:person_not_in_project, orcid: 'https://orcid.org/0000-0001-9842-9718')
+
+    sop = FactoryBot.create(:sop)
+
+    disable_authorization_checks do
+      assert_difference('AssetsCreator.count', 2) do
+        sop.update(assets_creators_attributes: {
+          '4634' => {
+            orcid: 'https://orcid.org/0000-0001-9842-9718',
+            creator_id: explicitly_linked_person.id
+          },
+          '123' => {
+            orcid: 'https://orcid.org/0000-0002-1825-0097'
+          }
+        })
+
+        ac = sop.reload.assets_creators.to_a
+        assert_equal 2, ac.length
+        assert_equal orcid_linked_person, ac.detect { |a| a.given_name == 'Orc' }.creator
+        assert_equal explicitly_linked_person, ac.detect { |a| a.given_name == 'Link' }.creator,
+                     'If creator is explicitly set, it should not attempt to link a different creator via orcid'
+      end
+    end
+  end
 end

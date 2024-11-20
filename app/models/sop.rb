@@ -12,8 +12,9 @@ class Sop < ApplicationRecord
 
   #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
   has_one :content_blob, -> (r) { where('content_blobs.asset_version =? AND deleted=?', r.version, false) }, :as => :asset, :foreign_key => :asset_id
-
   has_and_belongs_to_many :workflows
+  has_many :sample_resource_links, -> { where(resource_type: 'Sop') }, foreign_key: :resource_id
+  has_many :linked_samples, through: :sample_resource_links, source: :sample
 
   has_filter assay_type: Seek::Filtering::Filter.new(
       value_field: 'assays.assay_type_uri',
@@ -48,6 +49,10 @@ class Sop < ApplicationRecord
 
   def use_mime_type_for_avatar?
     true
+  end
+
+  def related_samples
+    linked_samples
   end
 
 end

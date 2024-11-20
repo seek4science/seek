@@ -18,7 +18,7 @@ class StudyApiTest < ActionDispatch::IntegrationTest
   test 'should not delete a study with assays' do
     study = FactoryBot.create(:max_study, policy: FactoryBot.create(:public_policy))
     assert_no_difference('Study.count') do
-      delete "/#{plural_name}/#{study.id}.json"
+      delete member_url(study), headers: { 'Authorization' => write_access_auth }
       assert_response :forbidden
       validate_json response.body, '#/components/schemas/forbiddenResponse'
     end
@@ -34,7 +34,7 @@ class StudyApiTest < ActionDispatch::IntegrationTest
 
     assert_difference('Subscription.count', -2) do
       assert_difference('Study.count', -1) do
-        delete "/#{plural_name}/#{study.id}.json"
+        delete member_url(study), headers: { 'Authorization' => write_access_auth }
         assert_response :success
       end
     end
@@ -51,7 +51,7 @@ class StudyApiTest < ActionDispatch::IntegrationTest
                                     permissions: [FactoryBot.create(:permission, contributor: proj, access_type: Policy::MANAGING)]))
 
     assert_difference('Study.count', -1) do
-      delete "/#{plural_name}/#{study.id}.json"
+      delete member_url(study), headers: { 'Authorization' => write_access_auth }
       assert_response :success
     end
   end

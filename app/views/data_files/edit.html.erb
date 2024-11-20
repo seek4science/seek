@@ -42,6 +42,8 @@
 
       <%= render :partial => "assays/associate_assays", :locals=>{:resource => @data_file} -%>
 
+      <%= render partial: 'associate_observation_units', locals: {f: f, resource: @data_file} if Seek::Config.observation_units_enabled %>
+
       <%= f.fancy_multiselect :events, { other_projects_checkbox: true, sort_by: :start_date } if Seek::Config.events_enabled %>
 
       <%= render partial: 'associate_workflow', locals: {:f=>f, :resource => @data_file } if Seek::Config.workflows_enabled %>

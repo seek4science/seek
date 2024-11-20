@@ -30,7 +30,7 @@ class AssayApiTest < ActionDispatch::IntegrationTest
     user_login(person)
     assert_no_difference('ActivityLog.count') do
       assert_no_difference('Assay.count') do
-        delete "/#{plural_name}/#{a.id}.json"
+        delete member_url(a), headers: { 'Authorization' => write_access_auth }
         assert_response :forbidden
         validate_json response.body, '#/components/schemas/forbiddenResponse'
       end
@@ -48,7 +48,7 @@ class AssayApiTest < ActionDispatch::IntegrationTest
                                     permissions: [FactoryBot.create(:permission, contributor: proj, access_type: Policy::MANAGING)]))
 
     assert_difference('Assay.count', -1) do
-      delete "/#{plural_name}/#{assay.id}.json"
+      delete member_url(assay), headers: { 'Authorization' => write_access_auth }
       assert_response :success
     end
   end
@@ -63,7 +63,7 @@ class AssayApiTest < ActionDispatch::IntegrationTest
 
     assert_difference('Subscription.count', -2) do
       assert_difference('Assay.count', -1) do
-        delete "/#{plural_name}/#{assay.id}.json"
+        delete member_url(assay), headers: { 'Authorization' => write_access_auth }
         assert_response :success
       end
     end

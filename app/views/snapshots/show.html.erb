@@ -55,9 +55,9 @@
   </div>
   <div class="col-md-3 col-sm-4">
     <%= render partial: 'assets/citation_box', locals: { doi: @snapshot.doi } unless @snapshot.doi.blank? %>
-    <%= render partial: 'snapshots/snapshots', locals: { snapshots: @resource.snapshots,
+    <%= render partial: 'snapshots/snapshots', locals: { snapshots: @parent_resource.snapshots,
                                                          selected: @snapshot,
-                                                         resource: @resource } %>
+                                                         resource: @parent_resource } %>
     <%#logging for snapshots didnt start until ~september (dates will vary depending on update time, but is to give a rough indication only) %>
     <%= render partial: 'assets/usage_info_box', locals: { resource: @snapshot,
                                                            logging_start_date: Date.parse('01-09-2018')  }

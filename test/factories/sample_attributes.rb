@@ -20,6 +20,11 @@ FactoryBot.define do
     association :sample_attribute_type, factory: :data_file_sample_attribute_type
     required { true }
   end
+
+  factory(:sop_sample_attribute, parent: :sample_attribute) do
+    association :sample_attribute_type, factory: :sop_sample_attribute_type
+    required { true }
+  end
   
   factory(:sample_sample_attribute, parent: :sample_attribute) do
     sequence(:title) { |n| "sample attribute #{n}" }
@@ -43,6 +48,22 @@ FactoryBot.define do
     sequence(:title) { |n| "apples list controlled vocab attribute #{n}" }
     after(:build) do |type|
       type.sample_controlled_vocab = FactoryBot.build(:apples_sample_controlled_vocab)
+      type.sample_attribute_type = FactoryBot.create(:cv_list_attribute_type)
+    end
+  end
+
+  factory(:topics_controlled_vocab_attribute, parent: :sample_attribute) do
+    sequence(:title) { |n| "topics controlled vocab attribute #{n}" }
+    after(:build) do |type|
+      type.sample_controlled_vocab = FactoryBot.build(:topics_controlled_vocab)
+      type.sample_attribute_type = FactoryBot.create(:controlled_vocab_attribute_type)
+    end
+  end
+
+  factory(:topics_list_controlled_vocab_attribute, parent: :sample_attribute) do
+    sequence(:title) { |n| "topics list controlled vocab attribute #{n}" }
+    after(:build) do |type|
+      type.sample_controlled_vocab = FactoryBot.build(:topics_controlled_vocab)
       type.sample_attribute_type = FactoryBot.create(:cv_list_attribute_type)
     end
   end

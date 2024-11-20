@@ -92,6 +92,23 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
     refute type.seek_data_file?
     type = FactoryBot.create(:controlled_vocab_attribute_type)
     refute type.seek_data_file?
+    type = FactoryBot.create(:sop_sample_attribute_type)
+    refute type.seek_data_file?
+  end
+
+  test 'is_seek_sop?' do
+    type = FactoryBot.create(:sop_sample_attribute_type)
+    assert type.seek_sop?
+    type = FactoryBot.create(:data_file_sample_attribute_type)
+    refute type.seek_sop?
+    type = FactoryBot.create(:sample_sample_attribute_type)
+    refute type.seek_sop?
+    type = FactoryBot.create(:text_sample_attribute_type)
+    refute type.seek_sop?
+    type = FactoryBot.create(:boolean_sample_attribute_type)
+    refute type.seek_sop?
+    type = FactoryBot.create(:controlled_vocab_attribute_type)
+    refute type.seek_sop?
   end
 
   test 'isa_template_attributes' do

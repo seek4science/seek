@@ -140,10 +140,14 @@ module SamplesHelper
         seek_sample_attribute_display(value)
       when Seek::Samples::BaseType::SEEK_DATA_FILE
         seek_data_file_attribute_display(value)
+      when Seek::Samples::BaseType::SEEK_SOP
+        seek_sop_attribute_display(value)
       when Seek::Samples::BaseType::CV
         seek_cv_attribute_display(value, attribute)
       when Seek::Samples::BaseType::CV_LIST
-        value.each{|v| seek_cv_attribute_display(v, attribute) }.join(', ')
+        value.map do |v|
+          seek_cv_attribute_display(v, attribute)
+        end.join(', ').html_safe
       when Seek::Samples::BaseType::LINKED_EXTENDED_METADATA
         linked_extended_metadata_attribute_display(value, attribute)
       when Seek::Samples::BaseType::LINKED_EXTENDED_METADATA_MULTI
@@ -171,12 +175,17 @@ module SamplesHelper
   end
 
   def seek_cv_attribute_display(value, attribute)
-    term = attribute.sample_controlled_vocab.sample_controlled_vocab_terms.where(label:value).last
-    content = value
+    term = attribute.sample_controlled_vocab.sample_controlled_vocab_terms.where(label: value).last
     if term && term.iri.present?
-      content << " (#{term.iri}) "
+      iri_content = term.iri.match?(/^https?:\/\//) ? link_to(term.iri, term.iri, target: '_blank') : term.iri
+      label_tag = content_tag(:label, term.label, class: 'term-label')
+      iri_tag = content_tag(:label, iri_content, class: 'term-iri badge')
+      "#{label_tag}#{iri_tag}".html_safe
+    elsif term.nil? && attribute.allow_cv_free_text?
+      value
+    else
+      term&.label
     end
-    content
   end
 
   def linked_extended_metadata_attribute_display(value, attribute)
@@ -221,6 +230,10 @@ module SamplesHelper
     seek_resource_attribute_display(DataFile,value)
   end
 
+  def seek_sop_attribute_display(value)
+    seek_resource_attribute_display(Sop,value)
+  end
+
   def seek_resource_attribute_display(clz, value)
     item = clz.find_by_id(value['id'])
     if item
@@ -263,11 +276,7 @@ module SamplesHelper
   def sample_type_link(sample, user=User.current_user)
     return nil if Seek::Config.isa_json_compliance_enabled && !sample.sample_type.template_id.nil?
 
-    if (sample.sample_type.can_view?(user))
-      link_to sample.sample_type.title,sample.sample_type
-    else
-      link_to sample.sample_type.title,sample_type_path(sample.sample_type, referring_sample_id:sample.id)
-    end
+    link_to sample.sample_type.title, sample.sample_type if sample.sample_type.can_view?(user)
   end
 
   def sample_type_list_item_attribute(attribute, sample)
@@ -361,6 +370,10 @@ module SamplesHelper
       select_tag(element_name, options, include_blank: !attribute.required?, class: "form-control #{element_class}")
     when Seek::Samples::BaseType::SEEK_DATA_FILE
       options = options_from_collection_for_select(DataFile.authorized_for(:view), :id,
+                                                   :title, value.try(:[], 'id'))
+      select_tag(element_name, options, include_blank: !attribute.required?, class: "form-control #{element_class}")
+    when Seek::Samples::BaseType::SEEK_SOP
+      options = options_from_collection_for_select(Sop.authorized_for(:view), :id,
                                                    :title, value.try(:[], 'id'))
       select_tag(element_name, options, include_blank: !attribute.required?, class: "form-control #{element_class}")
     when Seek::Samples::BaseType::CV

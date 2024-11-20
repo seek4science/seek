@@ -1,4 +1,4 @@
-<% if @data_file || @sample_type || @template %>
+<% if @sample_type || @template %>
   <% if @sample_type %>
     <% unless Seek::Config.project_single_page_enabled %>
       <p> Showing for Sample Type: <%= link_to @sample_type.title,@sample_type %> </p>
@@ -12,11 +12,7 @@
   <% end %>
   <% if @samples.any? %>
       <div id="samples-table">
-        <% if @data_file %>
-            <%= render partial: "samples/table_view", locals: { samples: @samples, link: true, source_url: samples_table_data_file_path(@data_file) }%>
-        <% else %>
-            <%= render partial: "samples/table_view", locals: { samples: @samples, link: true }%>
-        <% end %>
+        <%= render partial: "samples/table_view", locals: { samples: @samples, link: true }%>
       </div>
       <script>
         $j(document).ready(function () {

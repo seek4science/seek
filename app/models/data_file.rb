@@ -20,8 +20,14 @@ class DataFile < ApplicationRecord
 
   belongs_to :file_template
   has_many :extracted_samples, class_name: 'Sample', foreign_key: :originating_data_file_id
-  has_many :sample_resource_links, -> { where(resource_type: 'DataFile') }, class_name: 'SampleResourceLink', foreign_key: :resource_id
+  has_many :sample_resource_links, -> { where(resource_type: 'DataFile') }, foreign_key: :resource_id
   has_many :linked_samples, through: :sample_resource_links, source: :sample
+  
+  has_many :unzipped_files, class_name: 'DataFile', foreign_key: :zip_origin_id
+  belongs_to :zip_origin, class_name: 'DataFile', optional: true
+
+  has_many :observation_unit_assets, dependent: :delete_all, as: :asset, foreign_key: :asset_id, autosave: true, inverse_of: :asset
+  has_many :observation_units, through: :observation_unit_assets
 
   has_many :workflow_data_files, dependent: :destroy, autosave: true
   has_many :workflows, ->{ distinct }, through: :workflow_data_files
@@ -110,6 +116,11 @@ class DataFile < ApplicationRecord
   def supports_spreadsheet_explore?
     true
   end
+  
+  def zipped_folder?
+    return false if external_asset.is_a? OpenbisExternalAsset
+    content_blob.is_unzippable_datafile?
+  end
 
   def matching_sample_type?
     return false if external_asset.is_a? OpenbisExternalAsset
@@ -125,6 +136,34 @@ class DataFile < ApplicationRecord
 
   def related_samples
     extracted_samples + linked_samples
+  end
+
+  
+  def related_data_files
+    zip_origin.nil? ? unzipped_files : [zip_origin] + unzipped_files
+  end
+
+  def unzip(tmp_dir)
+    unzip_folder = Zip::File.open(content_blob.filepath)
+    FileUtils.rm_r(tmp_dir) if File.exist?(tmp_dir)
+    Dir.mkdir(tmp_dir)
+    unzipped =[]
+    unzip_folder.entries.each do |file|
+      if file.ftype == :file
+        file_name = File.basename(file.name)
+        file.extract("#{tmp_dir}#{file_name}") unless File.exist? "#{tmp_dir}#{file_name}"
+        data_file_params = {
+          title: file_name,
+            license: license,
+            projects: projects,
+            description: '',
+            contributor_id: contributor.id,
+            zip_origin_id: self.id
+        }
+        unzipped << DataFile.new(data_file_params)
+      end
+    end
+    unzipped
   end
 
   # Extracts samples using the given sample_type
@@ -231,4 +270,6 @@ class DataFile < ApplicationRecord
 
   has_task :sample_extraction
   has_task :sample_persistence
+  has_task :unzip
+  has_task :unzip_persistence
 end
