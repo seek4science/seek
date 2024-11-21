@@ -26,4 +26,20 @@ class EnhancedMailDeliveryJobTest < ActiveSupport::TestCase
       assert site_base_host_propagate_called
     end
   end
+
+  test 'perform with email disabled' do
+    with_config_value(:email_enabled, true) do
+      assert_enqueued_jobs(1, only: EnhancedMailDeliveryJob, queue: QueueNames::MAILERS) do
+        Mailer.test_email('fred@email.com').deliver_later
+      end
+    end
+
+    with_config_value(:email_enabled, false) do
+      assert_emails 0 do
+        assert_performed_jobs(1, only: EnhancedMailDeliveryJob) do
+          Mailer.test_email('fred@email.com').deliver_later
+        end
+      end
+    end
+  end
 end
