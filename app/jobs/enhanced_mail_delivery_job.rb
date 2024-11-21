@@ -7,4 +7,10 @@ class EnhancedMailDeliveryJob < ActionMailer::MailDeliveryJob
     Seek::Config.smtp_propagate
     Seek::Config.site_base_host_propagate
   end
+
+  around_perform do |_job, block|
+    if Seek::Config.email_enabled
+      block.call
+    end
+  end
 end
