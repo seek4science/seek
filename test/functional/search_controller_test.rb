@@ -158,10 +158,10 @@ class SearchControllerTest < ActionController::TestCase
 
   test 'hyphen and unicode hyphen are treated equally in search' do
 
-    # Create a document with a title that contains a regular hyphen (-)
+    # Create a document with a title that contains a Unicode hyphen (-)
     FactoryBot.create(:public_document, title: "Thy\u20101")
 
-    # Simulate Solr returning results for the search query
+    #Test the search with a regular hyphen
     Document.stub(:solr_cache, -> (q) { Document.pluck(:id).last(1) }) do
       # Test the search with a regular hyphen
       get :index, params: { q: 'Thy-1' }
@@ -169,17 +169,25 @@ class SearchControllerTest < ActionController::TestCase
 
     assert_equal "1 item matched '<b>Thy-1</b>' within their title or content.", flash[:notice]
 
-    # Test the search with a regular hyphen
+    # Test the search with a \u2010 hyphen
     Document.stub(:solr_cache, -> (q) { Document.pluck(:id).last(1) }) do
-      get :index, params: { q: "Thy\u20101" } # Use the Unicode hyphen here
+      get :index, params: { q: "Thy\u20101" }
     end
 
     assert_equal "1 item matched '<b>Thy\u20101</b>' within their title or content.", flash[:notice]
 
+    # Test the search with a \u2014 hyphen
+    Document.stub(:solr_cache, -> (q) { Document.pluck(:id).last(1) }) do
+      get :index, params: { q: "Thy\u20141" }
+    end
+
+    assert_equal "1 item matched '<b>Thy\u20141</b>' within their title or content.", flash[:notice]
+
+
     # Create a document with a title that contains a regular hyphen (-)
     FactoryBot.create(:public_document, title: "Thy-1")
 
-    # Simulate Solr returning results for the search query
+    #Test the search with a regular hyphen
     Document.stub(:solr_cache, -> (q) { Document.pluck(:id).last(1) }) do
       # Test the search with a regular hyphen
       get :index, params: { q: 'Thy-1' }
@@ -187,9 +195,9 @@ class SearchControllerTest < ActionController::TestCase
 
     assert_equal "1 item matched '<b>Thy-1</b>' within their title or content.", flash[:notice]
 
-    # Test the search with a regular hyphen
+    # Test the search with a \u20101 hyphen
     Document.stub(:solr_cache, -> (q) { Document.pluck(:id).last(1) }) do
-      get :index, params: { q: "Thy\u20101" } # Use the Unicode hyphen here
+      get :index, params: { q: "Thy\u20101" }
     end
 
     assert_equal "1 item matched '<b>Thy\u20101</b>' within their title or content.", flash[:notice]
