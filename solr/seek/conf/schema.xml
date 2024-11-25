@@ -61,7 +61,6 @@
     <!-- *** This fieldType is used by Sunspot! *** -->
     <fieldType name="text" class="solr.TextField" omitNorms="false">
       <analyzer type="index">
-        <charFilter class="solr.MappingCharFilterFactory" mapping="mapping-hyphen.txt"/>
         <charFilter class="solr.MappingCharFilterFactory" mapping="mapping-ISOLatin1Accent.txt"/>
         <charFilter class="solr.MappingCharFilterFactory" mapping="mapping-FoldToASCII.txt"/>
         <tokenizer class="solr.WhitespaceTokenizerFactory"/>
@@ -69,7 +68,6 @@
         <filter class="solr.EdgeNGramFilterFactory" minGramSize="2" maxGramSize="50"/>
       </analyzer>
       <analyzer type="query">
-        <charFilter class="solr.MappingCharFilterFactory" mapping="mapping-hyphen.txt"/>
         <charFilter class="solr.MappingCharFilterFactory" mapping="mapping-ISOLatin1Accent.txt"/>
         <charFilter class="solr.MappingCharFilterFactory" mapping="mapping-FoldToASCII.txt"/>
         <tokenizer class="solr.WhitespaceTokenizerFactory"/>
