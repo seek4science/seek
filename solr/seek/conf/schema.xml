@@ -62,6 +62,7 @@
     <fieldType name="text" class="solr.TextField" omitNorms="false">
       <analyzer type="index">
         <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+        <filter class="solr.ASCIIFoldingFilterFactory" preserveOriginal="true" />
         <filter class="solr.LowerCaseFilterFactory"/>        
         <filter class="solr.EdgeNGramFilterFactory" minGramSize="2" maxGramSize="50"/>
       </analyzer>
