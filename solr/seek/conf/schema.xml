@@ -68,7 +68,6 @@
       </analyzer>
       <analyzer type="query">
         <tokenizer class="solr.WhitespaceTokenizerFactory"/>
-        <filter class="solr.ASCIIFoldingFilterFactory" preserveOriginal="true" />
         <filter class="solr.LowerCaseFilterFactory"/>        
       </analyzer>
     </fieldType>
