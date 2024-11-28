@@ -1,24 +1,44 @@
 module Seek
   module FairDataStation
+    class ExternalIdMismatchException < RuntimeError; end
+
     class Writer
       def construct_isa(datastation_inv, contributor, projects, policy)
         reset_data_file_cache
-        investigation = build_investigation(datastation_inv, contributor, policy, projects)
+        investigation = build_investigation(datastation_inv, contributor, projects, policy)
 
         datastation_inv.studies.each do |datastation_study|
           study = build_study(datastation_study, contributor, policy, investigation)
           datastation_study.observation_units.each do |datastation_observation_unit|
-            observation_unit = build_observation_unit(datastation_observation_unit, contributor, policy, projects,
-                                                      study)
+            observation_unit = build_observation_unit(datastation_observation_unit, contributor, policy, study)
             datastation_observation_unit.samples.each do |datastation_sample|
-              sample = build_sample(datastation_sample, contributor, policy, projects)
-              if sample.valid?
-                observation_unit.samples << sample
-              else
-                Rails.logger.error("Invalid sample during fair data station import #{sample.errors.full_messages.inspect}")
-              end
+              sample = build_sample(datastation_sample, contributor, projects, policy, observation_unit)
               datastation_sample.assays.each do |datastation_assay|
-                build_assay(datastation_assay, contributor, policy, projects, sample, study)
+                build_assay(datastation_assay, contributor, projects, policy, sample, study)
+              end
+            end
+          end
+        end
+
+        investigation
+      end
+
+      def update_isa(investigation, datastation_inv, contributor, projects, policy)
+        unless investigation.external_identifier == datastation_inv.external_id
+          raise ExternalIdMismatchException, 'Investigation external identifiers do not match'
+        end
+
+        preload_data_file_cache(investigation.related_data_files)
+        update_entity(investigation, datastation_inv, contributor)
+        datastation_inv.studies.each do |datastation_study|
+          study = update_or_build_study(datastation_study, contributor, projects, policy, investigation)
+          datastation_study.observation_units.each do |datastation_observation_unit|
+            observation_unit = update_or_build_observation_unit(datastation_observation_unit, contributor, policy,
+                                                                study)
+            datastation_observation_unit.samples.each do |datastation_sample|
+              sample = update_or_build_sample(datastation_sample, contributor, projects, policy, observation_unit)
+              datastation_sample.assays.each do |datastation_assay|
+                update_or_build_assay(datastation_assay, contributor, projects, policy, sample, study)
               end
             end
           end
@@ -33,13 +53,21 @@ module Seek
         @data_file_cache = {}
       end
 
-      def build_assay(datastation_assay, contributor, policy, projects, sample, study)
+      def preload_data_file_cache(data_files)
+        reset_data_file_cache
+        data_files.each do |data_file|
+          @data_file_cache[data_file.external_identifier] = data_file
+        end
+      end
+
+      def build_assay(datastation_assay, contributor, projects, policy, sample, study)
         samples = []
         samples << sample if sample.valid?
         assay_attributes = datastation_assay.seek_attributes.merge({ contributor: contributor, study: study,
                                                                      assay_class: AssayClass.experimental, samples: samples, policy: policy.deep_copy })
         assay = study.assays.build(assay_attributes)
         populate_extended_metadata(assay, datastation_assay)
+        record_activity(assay, contributor, 'create')
         datastation_assay.datasets.each do |datastation_dataset|
           df = build_data_file(contributor, datastation_dataset, projects, policy)
           assay.assay_assets.build(asset: df)
@@ -47,23 +75,25 @@ module Seek
         assay
       end
 
-      def build_sample(datastation_sample, contributor, policy, projects)
+      def build_sample(datastation_sample, contributor, projects, policy, observation_unit)
         sample_attributes = datastation_sample.seek_attributes.merge({ contributor: contributor, projects: projects,
                                                                        policy: policy.deep_copy })
-        sample = ::Sample.new(sample_attributes)
+        sample = observation_unit.samples.build(sample_attributes)
         populate_sample(sample, datastation_sample)
+        record_activity(sample, contributor, 'create')
         sample
       end
 
-      def build_observation_unit(datastation_observation_unit, contributor, policy, projects, study)
+      def build_observation_unit(datastation_observation_unit, contributor, policy, study)
         observation_unit_attributes = datastation_observation_unit.seek_attributes.merge({ contributor: contributor,
-                                                                                           study: study, projects: projects, policy: policy.deep_copy })
+                                                                                           study: study, policy: policy.deep_copy })
         observation_unit = study.observation_units.build(observation_unit_attributes)
         datastation_observation_unit.datasets.each do |datastation_dataset|
-          df = build_data_file(contributor, datastation_dataset, projects, policy)
+          df = build_data_file(contributor, datastation_dataset, study.projects, policy)
           observation_unit.observation_unit_assets.build(asset: df)
         end
         populate_extended_metadata(observation_unit, datastation_observation_unit)
+        record_activity(observation_unit, contributor, 'create')
         observation_unit
       end
 
@@ -72,46 +102,143 @@ module Seek
                                                                      investigation: investigation, policy: policy.deep_copy })
         study = investigation.studies.build(study_attributes)
         populate_extended_metadata(study, datastation_study)
+        record_activity(study, contributor, 'create')
         study
       end
 
-      def build_investigation(datastation_inv, contributor, policy, projects)
+      def build_investigation(datastation_inv, contributor, projects, policy)
         inv_attributes = datastation_inv.seek_attributes.merge({ contributor: contributor, projects: projects,
                                                                  policy: policy.deep_copy })
         investigation = ::Investigation.new(inv_attributes)
         populate_extended_metadata(investigation, datastation_inv)
+        record_activity(investigation, contributor, 'create')
         investigation
       end
 
+      def update_entity(seek_entity, datastation_entity, contributor)
+        attributes = datastation_entity.seek_attributes
+        seek_entity.assign_attributes(attributes)
+        update_extended_metadata(seek_entity, datastation_entity)
+        record_update_activity_if_changed(seek_entity, contributor)
+        seek_entity
+      end
+
+      def update_sample(seek_sample, datastation_sample, contributor)
+        sample_attributes = datastation_sample.seek_attributes
+        seek_sample.assign_attributes(sample_attributes)
+        update_sample_metadata(seek_sample, datastation_sample)
+        record_update_activity_if_changed(seek_sample, contributor)
+        seek_sample
+      end
+
+      def update_or_build_study(datastation_study, contributor, projects, policy, investigation)
+        study = ::Study.by_external_identifier(datastation_study.external_id, projects)
+        if study
+          update_entity(study, datastation_study, contributor)
+          investigation.studies << study
+        else
+          study = build_study(datastation_study, contributor, policy, investigation)
+        end
+        study
+      end
+
+      def update_or_build_observation_unit(datastation_observation_unit, contributor, policy, study)
+        observation_unit = ::ObservationUnit.by_external_identifier(datastation_observation_unit.external_id,
+                                                                    study.projects)
+        if observation_unit
+          update_entity(observation_unit, datastation_observation_unit, contributor)
+          observation_unit.study = study
+          observation_unit.observation_unit_assets.delete_all
+          datastation_observation_unit.datasets.each do |datastation_dataset|
+            df = build_data_file(contributor, datastation_dataset, study.projects, policy)
+            observation_unit.observation_unit_assets.build(asset: df)
+          end
+          observation_unit.samples = []
+          study.observation_units << observation_unit
+        else
+          observation_unit = build_observation_unit(datastation_observation_unit, contributor, policy, study)
+        end
+        observation_unit
+      end
+
+      def update_or_build_sample(datastation_sample, contributor, projects, policy, observation_unit)
+        sample = ::Sample.by_external_identifier(datastation_sample.external_id, projects)
+        if sample
+          update_sample(sample, datastation_sample, contributor)
+          sample.observation_unit = observation_unit
+          sample.assays = []
+          observation_unit.samples << sample
+        else
+          sample = build_sample(datastation_sample, contributor, projects, policy, observation_unit)
+        end
+        sample
+      end
+
+      def update_or_build_assay(datastation_assay, contributor, projects, policy, sample, study)
+        assay = ::Assay.by_external_identifier(datastation_assay.external_id, projects)
+        if assay
+          update_entity(assay, datastation_assay, contributor)
+          assay.samples = [sample]
+          assay.assay_assets.where(asset_type: 'DataFile').delete_all
+          datastation_assay.datasets.each do |datastation_dataset|
+            df = build_data_file(contributor, datastation_dataset, projects, policy)
+            assay.assay_assets.build(asset: df)
+          end
+          study.assays << assay
+        else
+          build_assay(datastation_assay, contributor, projects, policy, sample, study)
+        end
+        study
+      end
+
       def populate_extended_metadata(seek_entity, datastation_entity)
-        if emt = detect_extended_metadata(seek_entity, datastation_entity)
+        if (emt = detect_extended_metadata_type(seek_entity, datastation_entity))
           seek_entity.extended_metadata = ExtendedMetadata.new(extended_metadata_type: emt)
-          datastation_entity.populate_extended_metadata(seek_entity)
+          update_extended_metadata(seek_entity, datastation_entity)
         end
       end
 
-      def detect_extended_metadata(seek_entity, datastation_entity)
+      def update_extended_metadata(seek_entity, datastation_entity)
+        datastation_entity.populate_extended_metadata(seek_entity)
+      end
+
+      def update_sample_metadata(seek_sample, datastation_sample)
+        datastation_sample.populate_seek_sample(seek_sample)
+      end	
+
+      def detect_extended_metadata_type(seek_entity, datastation_entity)
         property_ids = datastation_entity.additional_metadata_annotations.collect { |annotation| annotation[0] }
 
         # collect and sort those with the most properties that match, eliminating any where no properties match
-        candidates = ExtendedMetadataType.where(supported_type: seek_entity.class.name).includes(:extended_metadata_attributes).collect do |emt|
-          ids = emt.extended_metadata_attributes.collect(&:pid)
-          score = (property_ids - ids).length
-          emt = nil if (property_ids & ids).empty?
-          [score, emt]
+        candidates = ::ExtendedMetadataType.where(supported_type: seek_entity.class.name).includes(:extended_metadata_attributes).collect do |emt|
+          extended_metadata_property_ids = collect_extended_metadata_type_attibute_pids(emt)
+          intersection = (property_ids & extended_metadata_property_ids)
+          difference = (property_ids | extended_metadata_property_ids) - intersection
+          emt = nil if intersection.length.zero?
+          [intersection.length, difference.length, emt]
         end.sort_by do |x|
-          x[0]
+          # order by the number of properties matched coming top, but downgraded by the number of differences
+          [-x[0], x[1]]
         end
 
         candidates.first&.last
       end
 
+      def collect_extended_metadata_type_attibute_pids(extended_metadata_type)
+        pids = extended_metadata_type.extended_metadata_attributes.collect do |attr|
+          if attr.linked_extended_metadata_type
+            collect_extended_metadata_type_attibute_pids(attr.linked_extended_metadata_type)
+          else
+            attr.pid
+          end
+        end
+        pids.flatten
+      end
+
       def populate_sample(seek_sample, datastation_sample)
-        if sample_type = detect_sample_type(datastation_sample)
+        if (sample_type = detect_sample_type(datastation_sample))
           seek_sample.sample_type = sample_type
-          datastation_sample.populate_seek_sample(seek_sample)
-          seek_sample.set_attribute_value('Title', datastation_sample.title)
-          seek_sample.set_attribute_value('Description', datastation_sample.description)
+          update_sample_metadata(seek_sample, datastation_sample)
         end
       end
 
@@ -130,15 +257,34 @@ module Seek
       end
 
       def build_data_file(contributor, datastation_dataset, projects, policy)
-        @data_file_cache[datastation_dataset.identifier] ||= begin
+        @data_file_cache[datastation_dataset.external_id] ||= begin
           blob = ContentBlob.new(url: datastation_dataset.content_url.to_s,
                                  original_filename: datastation_dataset.identifier, external_link: true, is_webpage: true, content_type: 'application/octet-stream')
           data_file_attributes = datastation_dataset.seek_attributes.merge({
                                                                              contributor: contributor, projects: projects,
                                                                              content_blob: blob, policy: policy.deep_copy
                                                                            })
-          DataFile.new(data_file_attributes)
+          data_file = DataFile.new(data_file_attributes)
+          record_activity(data_file, contributor, 'create')
+          data_file
         end
+      end
+
+      def record_activity(seek_entity, culprit, action)
+        seek_entity.activity_logs.build(culprit: culprit, action: action, data: 'fair data station import')
+      end
+
+      def record_update_activity_if_changed(seek_entity, culprit)
+        return unless seek_entity_changed?(seek_entity)
+
+        record_activity(seek_entity, culprit, 'update')
+      end
+
+      def seek_entity_changed?(seek_entity)
+        return true if seek_entity.changed?
+        return true if seek_entity.respond_to?(:extended_metadata) && seek_entity.extended_metadata&.changed?
+
+        false
       end
     end
   end

@@ -126,6 +126,7 @@ module BootstrapHelper
     options['data-tags-limit'] = options.delete(:limit) if options[:limit]
     options['data-allow-new-items'] = options.delete(:allow_new) if options[:allow_new]
     options['data-placeholder'] = options.delete(:placeholder) if options[:placeholder]
+    options['data-allow-clear'] = options.delete(:allow_clear) if options[:allow_clear]
     options[:include_blank] = ''
     options[:multiple] = true unless options.key?(:multiple)
     options[:name] = "#{element_name}#{options[:multiple] ? '[]': ''}" unless options.key?(:name)

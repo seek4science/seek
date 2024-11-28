@@ -391,6 +391,7 @@ class ApplicationController < ActionController::Base
         action = 'inline_view' if action == 'explore'
         action = 'download' if action == 'ro_crate'
         action = 'run' if action == 'simulate'
+        action = 'run' if action == 'copasi_simulate'
         if %w(show create update destroy download inline_view run).include?(action)
           check_log_exists(action, controller_name, object)
           ActivityLog.create(action: action,
@@ -526,7 +527,7 @@ class ApplicationController < ActionController::Base
   end
 
   def json_api_request?
-    request.format.json?
+    request.format.json? || ( request.content_type && Mime::Type.lookup(request.content_type)&.json? )
   end
 
   # filter that responds with :not_acceptable if request rdf for non rdf capable resource

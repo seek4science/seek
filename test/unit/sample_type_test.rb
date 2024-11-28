@@ -690,7 +690,7 @@ class SampleTypeTest < ActiveSupport::TestCase
     assert sample_type.new_record?
     refute sample_type.template_generation_task.pending?
 
-    assert_difference('Task.count', 1) do
+    assert_difference('Task.where(key: "template_generation").count', 1) do
       assert_enqueued_with(job: SampleTemplateGeneratorJob, args: [sample_type]) do
         disable_authorization_checks { sample_type.save! }
         assert sample_type.reload.template_generation_task.pending?
@@ -901,10 +901,18 @@ class SampleTypeTest < ActiveSupport::TestCase
 
     assert sample_type.valid?
 
-    # Adding attribute
-    sample_type.sample_attributes.build(title: 'test 123')
+    # Adding optional attribute
+    sample_type.sample_attributes.build(title: 'optional test 123', sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), required: false, is_title: false, linked_sample_type: nil)
+    assert sample_type.valid?
+    assert sample_type.errors.none?
+
+    sample_type.reload
+    assert sample_type.valid?
+
+    # Adding mandatory attribute
+    sample_type.sample_attributes.build(title: 'mandatory test 123', sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), required: true, is_title: false, linked_sample_type: nil)
     refute sample_type.valid?
-    assert sample_type.errors.added?(:sample_attributes, 'cannot be added, new attributes are not allowed (test 123)')
+    assert sample_type.errors.added?(:'sample_attributes.required', 'cannot be changed (mandatory test 123)')
 
     sample_type.reload
     assert sample_type.valid?
@@ -913,14 +921,6 @@ class SampleTypeTest < ActiveSupport::TestCase
     sample_type.sample_attributes_attributes = { id: sample_type.sample_attributes.last.id, _destroy: '1' }
     refute sample_type.valid?
     assert sample_type.errors.added?(:sample_attributes, 'cannot be removed, there are existing samples using this attribute (patient)')
-
-    sample_type.reload
-    assert sample_type.valid?
-
-    # Changing attribute title
-    sample_type.sample_attributes.last.title = 'banana'
-    refute sample_type.valid?
-    assert sample_type.errors.added?(:'sample_attributes.title', 'cannot be changed (patient)')
 
     sample_type.reload
     assert sample_type.valid?
@@ -1053,6 +1053,18 @@ class SampleTypeTest < ActiveSupport::TestCase
     sample_type2.sample_attributes.map do |sa|
       assert template2.template_attributes.map(&:id).include? sa.template_attribute_id
     end
+  end
+
+  test 'sample type is locked?' do
+    sample_type = FactoryBot.create(:simple_sample_type, project_ids: @project_ids, contributor: @person)
+    refute sample_type.locked?
+
+    # lock the sample type by adding a fake update task
+    UpdateSampleMetadataJob.perform_later(sample_type, @person.user, [])
+
+    assert sample_type.locked?
+    refute sample_type.valid?
+    assert sample_type.errors.added?(:base, 'This sample type is locked and cannot be edited right now.')
   end
 
   private

@@ -20,7 +20,7 @@
   <% end %>
 
   <% if asset.extracted_samples.any? %>
-    <%= button_link_to("View samples", 'view_samples', data_file_samples_path(asset)) %>
+    <%= button_link_to("View extracted samples", 'view_samples', extracted_samples_data_file_path(asset)) %>
   <% end %>
 
   <% if attempt_to_show_extract_samples_button?(asset, display_asset) %>

@@ -181,8 +181,10 @@ module SamplesHelper
       label_tag = content_tag(:label, term.label, class: 'term-label')
       iri_tag = content_tag(:label, iri_content, class: 'term-iri badge')
       "#{label_tag}#{iri_tag}".html_safe
+    elsif term.nil? && attribute.allow_cv_free_text?
+      value
     else
-      term.label
+      term&.label
     end
   end
 

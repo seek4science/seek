@@ -1,0 +1,8 @@
+<!-- currently hide the registered sample list and registered sample from the table, as they are not possible to link to an extended metadata type -->
+<% unless sample_attribute_type.title.in?(['Registered Sample List', 'Registered Sample']) %>
+  <tr>
+    <td><%= sample_attribute_type.id %></td>
+    <td><%= sample_attribute_type.title %></td>
+    <td><%= sample_attribute_type.base_type %></td>
+  </tr>
+<% end %>

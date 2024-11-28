@@ -39,19 +39,18 @@ module Git
                            next unless branch.remote?
                            # TODO: Fix the default branch check. Does not seem to be a way to do in Rugged.
                            name = branch.name.sub(/\A#{branch.remote_name}\//, '')
-                           h = { name: name, ref: branch.canonical_name, sha: branch.target.oid }
+                           h = { name: name, ref: branch.canonical_name, sha: branch.target.oid, time: branch.target.time }
                            h[:default] = true if ['main', 'master', 'develop'].include?(name)
                            refs[:branches] << h
                          end
 
-                         git_base.tags.to_a.sort_by do |tag|
-                           tag.target.time
-                         end.reverse.each do |tag|
-                           h = { name: tag.name, ref: tag.canonical_name, sha: tag.target.oid }
+                         git_base.tags.each do |tag|
+                           h = { name: tag.name, ref: tag.canonical_name, sha: tag.target.oid, time: tag.target.time }
                            refs[:tags] << h
                          end
 
                          refs[:branches] = refs[:branches].sort_by { |x| [x[:default] ? 0 : 1, x[:name].downcase] }
+                         refs[:tags] = refs[:tags].sort_by { |x| -x[:time].to_i }
 
                          refs
                        end

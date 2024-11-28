@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "73",
+    "id": "48",
     "type": "collections",
     "attributes": {
       "policy": {
@@ -11,7 +11,7 @@
       },
       "discussion_links": [
         {
-          "id": "244",
+          "id": "138",
           "label": "Slack",
           "url": "http://www.slack.com/"
         }
@@ -26,11 +26,11 @@
         "Collection-tag4",
         "Collection-tag5"
       ],
-      "created_at": "2024-07-03T13:51:28.000Z",
-      "updated_at": "2024-07-03T13:51:29.000Z",
+      "created_at": "2024-11-20T10:18:40.000Z",
+      "updated_at": "2024-11-20T10:18:41.000Z",
       "creators": [
         {
-          "profile": "/people/3284",
+          "profile": "/people/3382",
           "family_name": "One",
           "given_name": "Some",
           "affiliation": "University of Somewhere",
@@ -43,7 +43,7 @@
       "creators": {
         "data": [
           {
-            "id": "3284",
+            "id": "3382",
             "type": "people"
           }
         ]
@@ -51,7 +51,7 @@
       "submitter": {
         "data": [
           {
-            "id": "3285",
+            "id": "3383",
             "type": "people"
           }
         ]
@@ -59,11 +59,11 @@
       "people": {
         "data": [
           {
-            "id": "3284",
+            "id": "3382",
             "type": "people"
           },
           {
-            "id": "3285",
+            "id": "3383",
             "type": "people"
           }
         ]
@@ -71,7 +71,7 @@
       "projects": {
         "data": [
           {
-            "id": "3506",
+            "id": "3257",
             "type": "projects"
           }
         ]
@@ -79,7 +79,7 @@
       "publications": {
         "data": [
           {
-            "id": "297",
+            "id": "217",
             "type": "publications"
           }
         ]
@@ -114,15 +114,15 @@
       }
     },
     "links": {
-      "self": "/collections/73",
-      "items": "/collections/73/items"
+      "self": "/collections/48",
+      "items": "/collections/48/items"
     },
     "meta": {
-      "created": "2024-07-03T13:51:28.000Z",
-      "modified": "2024-07-03T13:51:29.000Z",
+      "created": "2024-11-20T10:18:40.000Z",
+      "modified": "2024-11-20T10:18:41.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "455bbbd0-1b71-013d-1ffe-0a81884ed284"
+      "uuid": "bcb00a20-8956-013d-24a2-0a81884ed284"
     }
   },
   "included": [
@@ -136,13 +136,13 @@
       "relationships": {
         "collection": {
           "data": {
-            "id": "73",
+            "id": "48",
             "type": "collections"
           }
         },
         "asset": {
           "data": {
-            "id": "164",
+            "id": "134",
             "type": "documents"
           },
           "meta": {
@@ -151,11 +151,11 @@
         }
       },
       "links": {
-        "self": "/collections/73/items/19"
+        "self": "/collections/48/items/19"
       },
       "meta": {
-        "created": "2024-07-03T13:51:28.000Z",
-        "modified": "2024-07-03T13:51:28.000Z",
+        "created": "2024-11-20T10:18:40.000Z",
+        "modified": "2024-11-20T10:18:40.000Z",
         "api_version": "0.3",
         "base_url": "http://localhost:3000"
       }
@@ -170,17 +170,17 @@
       "relationships": {
         "collection": {
           "data": {
-            "id": "73",
+            "id": "48",
             "type": "collections"
           }
         }
       },
       "links": {
-        "self": "/collections/73/items/20"
+        "self": "/collections/48/items/20"
       },
       "meta": {
-        "created": "2024-07-03T13:51:29.000Z",
-        "modified": "2024-07-03T13:51:29.000Z",
+        "created": "2024-11-20T10:18:40.000Z",
+        "modified": "2024-11-20T10:18:40.000Z",
         "api_version": "0.3",
         "base_url": "http://localhost:3000"
       }
@@ -195,13 +195,13 @@
       "relationships": {
         "collection": {
           "data": {
-            "id": "73",
+            "id": "48",
             "type": "collections"
           }
         },
         "asset": {
           "data": {
-            "id": "163",
+            "id": "166",
             "type": "sops"
           },
           "meta": {
@@ -210,11 +210,11 @@
         }
       },
       "links": {
-        "self": "/collections/73/items/21"
+        "self": "/collections/48/items/21"
       },
       "meta": {
-        "created": "2024-07-03T13:51:29.000Z",
-        "modified": "2024-07-03T13:51:29.000Z",
+        "created": "2024-11-20T10:18:40.000Z",
+        "modified": "2024-11-20T10:18:40.000Z",
         "api_version": "0.3",
         "base_url": "http://localhost:3000"
       }
@@ -229,13 +229,13 @@
       "relationships": {
         "collection": {
           "data": {
-            "id": "73",
+            "id": "48",
             "type": "collections"
           }
         },
         "asset": {
           "data": {
-            "id": "229",
+            "id": "231",
             "type": "data_files"
           },
           "meta": {
@@ -244,11 +244,11 @@
         }
       },
       "links": {
-        "self": "/collections/73/items/22"
+        "self": "/collections/48/items/22"
       },
       "meta": {
-        "created": "2024-07-03T13:51:29.000Z",
-        "modified": "2024-07-03T13:51:29.000Z",
+        "created": "2024-11-20T10:18:41.000Z",
+        "modified": "2024-11-20T10:18:41.000Z",
         "api_version": "0.3",
         "base_url": "http://localhost:3000"
       }
@@ -263,13 +263,13 @@
       "relationships": {
         "collection": {
           "data": {
-            "id": "73",
+            "id": "48",
             "type": "collections"
           }
         },
         "asset": {
           "data": {
-            "id": "230",
+            "id": "232",
             "type": "data_files"
           },
           "meta": {
@@ -278,11 +278,11 @@
         }
       },
       "links": {
-        "self": "/collections/73/items/23"
+        "self": "/collections/48/items/23"
       },
       "meta": {
-        "created": "2024-07-03T13:51:29.000Z",
-        "modified": "2024-07-03T13:51:29.000Z",
+        "created": "2024-11-20T10:18:41.000Z",
+        "modified": "2024-11-20T10:18:41.000Z",
         "api_version": "0.3",
         "base_url": "http://localhost:3000"
       }
@@ -297,17 +297,17 @@
       "relationships": {
         "collection": {
           "data": {
-            "id": "73",
+            "id": "48",
             "type": "collections"
           }
         }
       },
       "links": {
-        "self": "/collections/73/items/24"
+        "self": "/collections/48/items/24"
       },
       "meta": {
-        "created": "2024-07-03T13:51:29.000Z",
-        "modified": "2024-07-03T13:51:29.000Z",
+        "created": "2024-11-20T10:18:41.000Z",
+        "modified": "2024-11-20T10:18:41.000Z",
         "api_version": "0.3",
         "base_url": "http://localhost:3000"
       }

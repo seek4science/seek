@@ -2179,6 +2179,22 @@ class AssaysControllerTest < ActionController::TestCase
     end
   end
 
+  test 'should redirect isa json compliant assay to isa assay edit page' do
+    with_config_value(:isa_json_compliance_enabled, true) do
+      person = FactoryBot.create(:person)
+      project = person.projects.first
+      login_as(person)
+      investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, contributor: person)
+      study = FactoryBot.create(:isa_json_compliant_study, investigation: investigation )
+      assay_stream = FactoryBot.create(:assay_stream, study: study, contributor: person)
+      assay_sample_type = FactoryBot.create(:isa_assay_material_sample_type, linked_sample_type: study.sample_types.second, projects: [project], contributor: person)
+      assay = FactoryBot.create(:assay, contributor: person, study: study, assay_stream:, sample_type: assay_sample_type)
+
+      get :edit, params: { id: assay  }
+      assert_redirected_to edit_isa_assay_path(assay)
+    end
+  end
+
   test 'Should propagate assay stream permissions' do
     with_config_value(:isa_json_compliance_enabled, true) do
       person = FactoryBot.create(:person)
@@ -2259,6 +2275,18 @@ class AssaysControllerTest < ActionController::TestCase
       refute authorized_child_assay.can_manage?(other_person)
 
     end
+  end
+
+  test 'can show and edit with deleted contributor' do
+    assay = FactoryBot.create(:assay, deleted_contributor:'Person:99', policy: FactoryBot.create(:public_policy))
+    assay.update_column(:contributor_id, nil)
+    assert assay.can_view?
+    assert assay.can_edit?
+    assert_nil assay.contributor
+    get :show, params: { id: assay.id }
+    assert_response :success
+    get :edit, params: { id: assay.id }
+    assert_response :success
   end
 
 end

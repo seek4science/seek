@@ -4,7 +4,7 @@
     <%= button_link_to("View samples", 'view_samples', sample_type_samples_path(sample_type)) %>
 <% end %>
 
-<% if Sample.can_create? %>
+<% if Sample.can_create? && !sample_type.locked? %>
     <%= button_link_to("Create sample", 'new', new_sample_path(sample_type_id:sample_type.id)) %>
 <% end %>
 
