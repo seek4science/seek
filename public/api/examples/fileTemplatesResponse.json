@@ -1,16 +1,6 @@
 {
   "data": [
     {
-      "id": "38",
-      "type": "file_templates",
-      "attributes": {
-        "title": "A Maximal FileTemplate"
-      },
-      "links": {
-        "self": "/file_templates/38"
-      }
-    },
-    {
       "id": "37",
       "type": "file_templates",
       "attributes": {
@@ -18,6 +8,16 @@
       },
       "links": {
         "self": "/file_templates/37"
+      }
+    },
+    {
+      "id": "38",
+      "type": "file_templates",
+      "attributes": {
+        "title": "A Maximal FileTemplate"
+      },
+      "links": {
+        "self": "/file_templates/38"
       }
     }
   ],

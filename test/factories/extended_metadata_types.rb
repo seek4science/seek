@@ -468,6 +468,7 @@ FactoryBot.define do
     supported_type { 'Assay' }
     after(:build) do |a|
       a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Facility', pid:'http://fairbydesign.nl/ontology/facility')
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Protocol', pid:'http://fairbydesign.nl/ontology/protocol')
       a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Forward Primer', pid:'http://fairbydesign.nl/ontology/forwardPrimer')
       a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Instrument Model', pid:'http://fairbydesign.nl/ontology/instrument_model')
       a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Library Selection', pid:'http://fairbydesign.nl/ontology/library_selection')
