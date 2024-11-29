@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "25",
+    "id": "307",
     "type": "documents",
     "attributes": {
       "policy": {
@@ -11,11 +11,26 @@
       },
       "discussion_links": [
         {
-          "id": "16",
+          "id": "244",
           "label": "Slack",
           "url": "http://www.slack.com/"
         }
       ],
+      "extended_attributes": {
+        "extended_metadata_type_id": "398",
+        "attribute_map": {
+          "role_email": "alice@email.com",
+          "role_phone": "0012345",
+          "role_name": {
+            "first_name": "alice",
+            "last_name": "liddell"
+          },
+          "role_address": {
+            "street": "wonder",
+            "city": "land"
+          }
+        }
+      },
       "title": "A Maximal Document",
       "license": null,
       "description": "The important report we did for ~important-milestone~",
@@ -31,14 +46,14 @@
         {
           "version": 1,
           "revision_comments": null,
-          "url": "http://localhost:3000/documents/25?version=1",
+          "url": "http://localhost:3000/documents/307?version=1",
           "doi": null
         }
       ],
       "version": 1,
       "revision_comments": null,
-      "created_at": "2022-06-07T14:12:57.000Z",
-      "updated_at": "2022-06-07T14:12:57.000Z",
+      "created_at": "2024-06-20T12:39:26.000Z",
+      "updated_at": "2024-06-20T12:39:26.000Z",
       "doi": null,
       "content_blobs": [
         {
@@ -47,13 +62,13 @@
           "md5sum": "726de0a3f94d65056b909b9736e10349",
           "sha1sum": "fbcc0dee4b5415de4c82ef5b137d8231fec1331b",
           "content_type": "application/pdf",
-          "link": "http://localhost:3000/documents/25/content_blobs/104",
+          "link": "http://localhost:3000/documents/307/content_blobs/1050453211",
           "size": 8
         }
       ],
       "creators": [
         {
-          "profile": "/people/232",
+          "profile": "/people/1039988614",
           "family_name": "One",
           "given_name": "Some",
           "affiliation": "University of Somewhere",
@@ -66,7 +81,7 @@
       "creators": {
         "data": [
           {
-            "id": "232",
+            "id": "1039988614",
             "type": "people"
           }
         ]
@@ -74,7 +89,7 @@
       "submitter": {
         "data": [
           {
-            "id": "233",
+            "id": "1039988615",
             "type": "people"
           }
         ]
@@ -82,11 +97,11 @@
       "people": {
         "data": [
           {
-            "id": "232",
+            "id": "1039988614",
             "type": "people"
           },
           {
-            "id": "233",
+            "id": "1039988615",
             "type": "people"
           }
         ]
@@ -94,7 +109,7 @@
       "projects": {
         "data": [
           {
-            "id": "249",
+            "id": "1022252724",
             "type": "projects"
           }
         ]
@@ -102,7 +117,7 @@
       "investigations": {
         "data": [
           {
-            "id": "37",
+            "id": "973655138",
             "type": "investigations"
           }
         ]
@@ -110,7 +125,7 @@
       "studies": {
         "data": [
           {
-            "id": "35",
+            "id": "1060385169",
             "type": "studies"
           }
         ]
@@ -118,7 +133,7 @@
       "assays": {
         "data": [
           {
-            "id": "33",
+            "id": "1035386914",
             "type": "assays"
           }
         ]
@@ -126,7 +141,7 @@
       "publications": {
         "data": [
           {
-            "id": "12",
+            "id": "334",
             "type": "publications"
           }
         ]
@@ -134,21 +149,21 @@
       "workflows": {
         "data": [
           {
-            "id": "13",
+            "id": "224",
             "type": "workflows"
           }
         ]
       }
     },
     "links": {
-      "self": "/documents/25?version=1"
+      "self": "/documents/307?version=1"
     },
     "meta": {
-      "created": "2022-06-07T14:12:57.000Z",
-      "modified": "2022-06-07T14:12:57.000Z",
+      "created": "2024-06-20T12:39:26.000Z",
+      "modified": "2024-06-20T12:39:26.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "dae798f0-c899-013a-0f7e-0a81884ed284"
+      "uuid": "0d79a100-1130-013d-1f9d-0a81884ed284"
     }
   },
   "jsonapi": {

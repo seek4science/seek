@@ -40,10 +40,11 @@ class SamplesController < ApplicationController
 
   def new
     if params[:sample_type_id]
-      @sample = Sample.new(sample_type_id: params[:sample_type_id])
+      @sample = Sample.new(sample_type_id: params[:sample_type_id], project_ids: params[:project_ids])
       respond_with(@sample)
     else
-      redirect_to select_sample_types_path(act: :create)
+      project_ids_param = params[:sample] ? params[:sample][:project_ids] : {}
+      redirect_to select_sample_types_path(act: :create, project_ids: project_ids_param)
     end
   end
 
@@ -75,6 +76,11 @@ class SamplesController < ApplicationController
 
   def edit
     @sample = Sample.find(params[:id])
+    if !@sample.originating_data_file.nil? && @sample.edit_count.zero?
+      flash.now[:error] = '<strong>Warning:</strong> This sample was extracted from a datafile.
+                           If you edit the sample, it will no longer correspond to the original source data.<br/>
+                           Unless you cancel, a label will be added to the sample\'s source field to indicate it is no longer valid.'.html_safe
+    end
     respond_with(@sample)
   end
 
@@ -214,31 +220,34 @@ class SamplesController < ApplicationController
 
   def query
     project_ids = params[:project_ids]&.map(&:to_i)
-
+    attribute_filter_value = params[:template_attribute_value]
     @result = params[:template_id].present? ?
       Template.find(params[:template_id]).sample_types.map(&:samples).flatten : []
 
-    if params[:template_attribute_id].present? && params[:template_attribute_value].present?
-      attribute_title = TemplateAttribute.find(params[:template_attribute_id]).title
-      @result = @result.select { |s| s.get_attribute_value(attribute_title)&.include?(params[:template_attribute_value]) }
+    if params[:template_attribute_id].present? && attribute_filter_value.present?
+      template_attribute = TemplateAttribute.find(params[:template_attribute_id])
+      @result = @result.select do |s|
+        sample_attribute = s.sample_type.sample_attributes.detect { |sa| template_attribute.sample_attributes.include? sa }
+        match_attribute_value(s, sample_attribute, attribute_filter_value)
+      end
     end
 
     if params[:input_template_id].present? # linked
-      title =
-        TemplateAttribute.find(params[:input_attribute_id]).title if params[:input_attribute_id].present?
-      @result = find_samples(@result, :linked_samples,
-        { attribute_id: params[:input_attribute_id],
+      input_template_attribute =
+        TemplateAttribute.find(params[:input_attribute_id])
+      @result = filter_linked_samples(@result, :linked_samples,
+                                      { attribute_id: params[:input_attribute_id],
           attribute_value: params[:input_attribute_value],
-          template_id: params[:input_template_id] }, title)
+          template_id: params[:input_template_id] }, input_template_attribute)
     end
 
     if params[:output_template_id].present? # linking
-      title =
-        TemplateAttribute.find(params[:output_attribute_id]).title if params[:output_attribute_id].present?
-      @result = find_samples(@result, :linking_samples,
-        { attribute_id: params[:output_attribute_id],
+      output_template_attribute =
+        TemplateAttribute.find(params[:output_attribute_id])
+      @result = filter_linked_samples(@result, :linking_samples,
+                                      { attribute_id: params[:output_attribute_id],
           attribute_value: params[:output_attribute_value],
-          template_id: params[:output_template_id] }, title)
+          template_id: params[:output_template_id] }, output_template_attribute)
     end
 
     @result = @result.select { |s| (project_ids & s.project_ids).any? } if project_ids.present?
@@ -253,9 +262,7 @@ class SamplesController < ApplicationController
 
   def query_form
     @result = []
-    respond_to do |format|
-      format.html
-    end
+    respond_to(&:html)
   end
 
   private
@@ -312,20 +319,52 @@ class SamplesController < ApplicationController
     end
   end
 
-  def find_samples(samples, link, options, title)
+  # Filters linked samples based on the provided options and template attribute title.
+  #
+  # @param samples [Array<Sample>] the list of samples to filter
+  # @param link [Symbol] the method to call on each sample to get the linked samples (:linked_samples or :linking_samples)
+  # @param options [Hash] the options for filtering
+  # @option options [Integer] :template_id the ID of the template to filter by
+  # @option options [String] :attribute_value the value of the attribute to filter by
+  # @option options [Integer] :attribute_id the ID of the attribute to filter by
+  # @param template_attribute_title [String] the title of the template attribute to filter by
+  # @return [Array<Sample>] the filtered list of samples
+  def filter_linked_samples(samples, link, options, template_attribute)
+    unless %i[linked_samples linking_samples].include? link
+      raise ArgumentError, "Invalid linking method provided. '#{link}' is not allowed!"
+    end
+
     samples.select do |s|
       s.send(link).any? do |x|
-        selected = x.sample_type.template_id == options[:template_id].to_i
-        selected = x.get_attribute_value(title)&.include?(options[:attribute_value]) if title.present? && selected
-        selected || find_samples([x], link, options, title).present?
+        selected = match_attribute_value(x, template_attribute, options[:attribute_value])
+        selected || filter_linked_samples([x], link, options, template_attribute).present?
       end
     end
   end
-
   def templates_enabled?
-    unless Seek::Config.sample_type_template_enabled
+    unless Seek::Config.isa_json_compliance_enabled
       flash[:error] = 'Not available'
       redirect_to select_sample_types_path
     end
   end
+end
+
+def match_attribute_value(selected_sample, x_attribute, attribute_filter_value)
+  x_attribute_title = x_attribute&.title
+  attribute_filter_value = attribute_filter_value&.to_s&.downcase
+  if x_attribute&.sample_attribute_type&.seek_sample_multi?
+    attr_value = selected_sample.get_attribute_value(x_attribute_title)
+    result = attr_value&.any? { |v| v[:title]&.to_s&.downcase&.include?(attribute_filter_value) }
+  elsif x_attribute&.sample_attribute_type&.seek_sample?
+    result = selected_sample.get_attribute_value(x_attribute_title)[:title]&.to_s&.downcase&.include?(attribute_filter_value)
+  elsif x_attribute&.sample_attribute_type&.seek_cv_list?
+    attr_value = selected_sample.get_attribute_value(x_attribute_title)
+    result = attr_value&.any? { |v| v&.to_s&.downcase&.include?(attribute_filter_value) }
+  else
+    if x_attribute&.sample_attribute_type&.base_type == Seek::Samples::BaseType::FLOAT
+      attribute_filter_value = attribute_filter_value.gsub(',', '.')
+    end
+    result = selected_sample.get_attribute_value(x_attribute_title)&.to_s&.downcase&.include?(attribute_filter_value)
+  end
+  result
 end

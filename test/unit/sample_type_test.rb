@@ -253,37 +253,41 @@ class SampleTypeTest < ActiveSupport::TestCase
   end
 
   # thorough tests of a fairly complex factory, as it will be used in a lot of other tests
-  test 'patient sample type factory test' do
+  test 'patient sample type factory sanity test' do
     name_type = FactoryBot.create(:full_name_sample_attribute_type)
-    assert name_type.validate_value?('George Bush')
-    refute name_type.validate_value?('george bush')
-    refute name_type.validate_value?('GEorge Bush')
-    refute name_type.validate_value?('George BUsh')
-    refute name_type.validate_value?('G(eorge Bush')
-    refute name_type.validate_value?('George B2ush')
-    refute name_type.validate_value?('George')
+    attribute = FactoryBot.create(:sample_attribute, is_title: true, sample_attribute_type: name_type, sample_type: FactoryBot.create(:simple_sample_type))
+    assert attribute.validate_value?('George Bush')
+    refute attribute.validate_value?('george bush')
+    refute attribute.validate_value?('GEorge Bush')
+    refute attribute.validate_value?('George BUsh')
+    refute attribute.validate_value?('G(eorge Bush')
+    refute attribute.validate_value?('George B2ush')
+    refute attribute.validate_value?('George')
 
     age_type = FactoryBot.create(:age_sample_attribute_type)
-    assert age_type.validate_value?(22)
-    assert age_type.validate_value?('97')
-    refute age_type.validate_value?(-6)
-    refute age_type.validate_value?('six')
+    attribute.sample_attribute_type = age_type
+    assert attribute.validate_value?(22)
+    assert attribute.validate_value?('97')
+    refute attribute.validate_value?(-6)
+    refute attribute.validate_value?('six')
 
     weight_type = FactoryBot.create(:weight_sample_attribute_type)
-    assert weight_type.validate_value?(22.223)
-    assert weight_type.validate_value?('97.332')
-    refute weight_type.validate_value?('97.332.44')
-    refute weight_type.validate_value?(-6)
-    refute weight_type.validate_value?(-6.4)
-    refute weight_type.validate_value?('-6.4')
-    refute weight_type.validate_value?('six')
+    attribute.sample_attribute_type = weight_type
+    assert attribute.validate_value?(22.223)
+    assert attribute.validate_value?('97.332')
+    refute attribute.validate_value?('97.332.44')
+    refute attribute.validate_value?(-6)
+    refute attribute.validate_value?(-6.4)
+    refute attribute.validate_value?('-6.4')
+    refute attribute.validate_value?('six')
 
     post_code = FactoryBot.create(:postcode_sample_attribute_type)
-    assert post_code.validate_value?('M13 9PL')
-    assert post_code.validate_value?('M12 7PL')
-    refute post_code.validate_value?('12 PL')
-    refute post_code.validate_value?('m12 7pl')
-    refute post_code.validate_value?('bob')
+    attribute.sample_attribute_type = post_code
+    assert attribute.validate_value?('M13 9PL')
+    assert attribute.validate_value?('M12 7PL')
+    refute attribute.validate_value?('12 PL')
+    refute attribute.validate_value?('m12 7pl')
+    refute attribute.validate_value?('bob')
 
     type = FactoryBot.create(:patient_sample_type)
     assert_equal 'Patient data', type.title
@@ -1090,6 +1094,67 @@ class SampleTypeTest < ActiveSupport::TestCase
     attr.unit = FactoryBot.create(:unit)
     refute sample_type.valid?
     assert sample_type.errors.added?(:'sample_attributes.unit', 'cannot be changed (weight)')
+  end
+
+  test 'determin whether sample types are considered ISA-JSON compliant' do
+    assay_sample_type = FactoryBot.create(:patient_sample_type)
+    refute assay_sample_type.is_isa_json_compliant?
+
+    FactoryBot.create(:assay, sample_type: assay_sample_type)
+    assert assay_sample_type.is_isa_json_compliant?
+
+    source_sample_type = FactoryBot.create(:patient_sample_type)
+    sample_collection_sample_type= FactoryBot.create(:patient_sample_type)
+
+    [source_sample_type, sample_collection_sample_type].each do |st|
+      refute st.is_isa_json_compliant?
+    end
+
+    FactoryBot.create(:study, sample_types: [source_sample_type, sample_collection_sample_type])
+
+    [source_sample_type, sample_collection_sample_type].each do |st|
+      assert st.is_isa_json_compliant?
+    end
+
+  end
+
+  test 'previous linked sample type' do
+    first_sample_type = FactoryBot.create(:isa_source_sample_type)
+    second_sample_type = FactoryBot.create(:isa_sample_collection_sample_type, linked_sample_type: first_sample_type)
+    third_sample_type = FactoryBot.create(:isa_assay_material_sample_type, linked_sample_type: second_sample_type)
+
+    assert_equal second_sample_type.previous_linked_sample_type, first_sample_type
+    refute_equal third_sample_type.previous_linked_sample_type, first_sample_type
+    refute_equal first_sample_type.previous_linked_sample_type, second_sample_type
+  end
+
+  test 'next linked sample types' do
+    first_sample_type = FactoryBot.create(:isa_source_sample_type)
+    second_sample_type = FactoryBot.create(:isa_sample_collection_sample_type, linked_sample_type: first_sample_type)
+    third_sample_type = FactoryBot.create(:isa_assay_material_sample_type, linked_sample_type: second_sample_type)
+
+    assert_equal first_sample_type.next_linked_sample_types, [second_sample_type]
+    assert_equal second_sample_type.next_linked_sample_types, [third_sample_type]
+    assert third_sample_type.next_linked_sample_types.blank?
+  end
+
+  test 'create sample attributes from isa template' do
+    template1 = FactoryBot.create(:isa_source_template)
+    template2 = FactoryBot.create(:isa_sample_collection_template)
+
+    sample_type1 = FactoryBot.create(:simple_sample_type, title: 'Sample Type 1', project_ids: @project_ids, contributor: @person, template_id: template1.id)
+    sample_type1.create_sample_attributes_from_isa_template(template1)
+    assert sample_type1.valid?
+    sample_type1.sample_attributes.map do |sa|
+      assert template1.template_attributes.map(&:id).include? sa.template_attribute_id
+    end
+
+    sample_type2 = FactoryBot.create(:simple_sample_type, title: 'Sample Type 2', project_ids: @project_ids, contributor: @person, template_id: template2.id)
+    sample_type2.create_sample_attributes_from_isa_template(template2, sample_type1)
+    assert sample_type2.valid?
+    sample_type2.sample_attributes.map do |sa|
+      assert template2.template_attributes.map(&:id).include? sa.template_attribute_id
+    end
   end
 
   private

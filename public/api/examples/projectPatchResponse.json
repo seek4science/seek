@@ -1,11 +1,34 @@
 {
   "data": {
-    "id": "1022257417",
+    "id": "646",
     "type": "projects",
     "attributes": {
       "discussion_links": [
 
       ],
+      "extended_attributes": {
+        "extended_metadata_type_id": "140",
+        "attribute_map": {
+          "dad": {
+            "first_name": "john",
+            "last_name": "liddell"
+          },
+          "mom": {
+            "first_name": "lily",
+            "last_name": "liddell"
+          },
+          "child": [
+            {
+              "first_name": "rabbit",
+              "last_name": "wonderland"
+            },
+            {
+              "first_name": "mad",
+              "last_name": "hatter"
+            }
+          ]
+        }
+      },
       "avatar": null,
       "title": "Updated Project",
       "description": "with a new description!",
@@ -19,21 +42,21 @@
         "permissions": [
           {
             "resource": {
-              "id": "1039992753",
+              "id": "513",
               "type": "people"
             },
             "access": "manage"
           },
           {
             "resource": {
-              "id": "1022257417",
+              "id": "646",
               "type": "projects"
             },
             "access": "download"
           },
           {
             "resource": {
-              "id": "980197315",
+              "id": "540",
               "type": "institutions"
             },
             "access": "view"
@@ -79,7 +102,7 @@
       "organisms": {
         "data": [
           {
-            "id": "627234431",
+            "id": "33",
             "type": "organisms"
           }
         ]
@@ -102,7 +125,7 @@
       "programmes": {
         "data": [
           {
-            "id": "156",
+            "id": "71",
             "type": "programmes"
           }
         ]
@@ -179,14 +202,14 @@
       }
     },
     "links": {
-      "self": "/projects/1022257417"
+      "self": "/projects/646"
     },
     "meta": {
-      "created": "2022-10-26T11:45:28.000Z",
-      "modified": "2022-10-26T11:45:28.000Z",
+      "created": "2024-06-20T12:30:04.000Z",
+      "modified": "2024-06-20T12:30:04.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "9ca85d90-3751-013b-356e-000c29a94011"
+      "uuid": "bea4ec10-112e-013d-1f9d-0a81884ed284"
     }
   },
   "jsonapi": {

@@ -1,3 +1,5 @@
+require 'ro_crate'
+
 class WorkflowsController < ApplicationController
   include Seek::IndexPager
   include Seek::AssetsCommon
@@ -18,29 +20,16 @@ class WorkflowsController < ApplicationController
   include Legacy::WorkflowSupport
 
   api_actions :index, :show, :create, :update, :destroy, :ro_crate, :create_version
-  user_content_actions :diagram
 
   rescue_from ROCrate::ReadException do |e|
-    logger.error("Error whilst attempting to read RO-Crate metadata for #{@workflow&.id}.")
-    message = "Couldn't read RO-Crate metadata. Check the file is valid."
+    logger.error("Error whilst attempting to read RO-Crate metadata for Workflow #{@workflow&.id}: #{e.exception.class.name} #{e.message}")
+    message = "Couldn't read RO-Crate metadata - check the RO-Crate is valid: #{e.message}"
     respond_to do |format|
       format.html do
         flash[:error] = message
         redirect_to workflow_path(@workflow)
       end
       format.json { render json: { title: 'RO-Crate Read Error', detail: message }, status: :internal_server_error }
-    end
-  end
-
-  rescue_from ROCrate::WriteException do |e|
-    exception_notification(500, e) unless Rails.application.config.consider_all_requests_local
-    message = "Couldn't generate RO-Crate. Check the ro-crate-metadata.json file is valid."
-    respond_to do |format|
-      format.html do
-        flash[:error] = message
-        redirect_to workflow_path(@workflow)
-      end
-      format.json { render json: { title: 'RO-Crate Write Error', detail: message }, status: :internal_server_error }
     end
   end
 
@@ -104,7 +93,8 @@ class WorkflowsController < ApplicationController
 
   # Takes a single RO-Crate zip file
   def create_from_ro_crate
-    @crate_extractor = WorkflowCrateExtractor.new(ro_crate_extractor_params)
+    @crate_extractor = WorkflowCrateExtractor.new(ro_crate_extractor_params.merge(
+      params: params.key?(:workflow) ? workflow_params : {}))
     @workflow = @crate_extractor.build
 
     respond_to do |format|
@@ -249,6 +239,7 @@ class WorkflowsController < ApplicationController
   def diagram
     @diagram = @display_workflow.diagram
     if @diagram
+      response.set_header('Content-Security-Policy', USER_SVG_CSP)
       send_file(@diagram.path,
                 filename: @diagram.filename,
                 type: @diagram.content_type,
@@ -354,7 +345,7 @@ class WorkflowsController < ApplicationController
                                      { creator_ids: [] }, { assay_assets_attributes: [:assay_id] },
                                      { publication_ids: [] }, { presentation_ids: [] }, { document_ids: [] }, { data_file_ids: [] }, { sop_ids: [] },
                                      { workflow_data_files_attributes:[:id, :data_file_id, :workflow_data_file_relationship_id, :_destroy] },
-                                     :internals, :maturity_level, :source_link_url,
+                                     :internals, :maturity_level, :source_link_url, :execution_instance_url,
                                      { topic_annotations: [] }, { operation_annotations: [] },
                                      { discussion_links_attributes: [:id, :url, :label, :_destroy] },
                                      { git_version_attributes: [:name, :comment, :ref, :commit, :root_path,
@@ -370,7 +361,8 @@ class WorkflowsController < ApplicationController
   def ro_crate_params
     params.require(:ro_crate).permit({ main_workflow: [:data, :data_url, :make_local_copy] },
                                      { abstract_cwl: [:data, :data_url, :make_local_copy] },
-                                     { diagram: [:data, :data_url, :make_local_copy] })
+                                     { diagram: [:data, :data_url, :make_local_copy] }).merge(
+      params.fetch(:workflow, {}).permit(project_ids: []))
   end
 
   def ro_crate_extractor_params

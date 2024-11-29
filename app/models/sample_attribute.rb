@@ -7,10 +7,11 @@ class SampleAttribute < ApplicationRecord
   belongs_to :linked_sample_type, class_name: 'SampleType'
 
   belongs_to :isa_tag
+  belongs_to :template_attribute, class_name: 'TemplateAttribute', foreign_key: 'template_id'
 
   auto_strip_attributes :pid
   validates :sample_type, presence: true
-  validates :pid, format: { with: URI::regexp, allow_blank: true, allow_nil: true, message: 'not a valid URI' }
+  validates :pid, format: { with: URI::ABS_URI, allow_blank: true, allow_nil: true, message: 'not a valid URI' }
   validate :validate_against_editing_constraints, if: -> { sample_type.present? }
 
   before_save :store_accessor_name
@@ -24,6 +25,14 @@ class SampleAttribute < ApplicationRecord
 
   # whether this attribute is tied to a controlled vocab which is based on an ontology
   delegate :ontology_based?, to: :sample_controlled_vocab, allow_nil: true
+
+  def input_attribute?
+    isa_tag.nil? && title&.downcase&.include?('input') && seek_sample_multi?
+  end
+
+  def inherited_from_template_attribute?
+    template_attribute_id.present?
+  end
 
   def title=(title)
     super
@@ -55,10 +64,17 @@ class SampleAttribute < ApplicationRecord
 
   def short_pid
     return '' unless pid.present?
-    URI.parse(pid).fragment || pid.gsub(/.*\//,'') || pid
+    begin
+      URI.parse(pid).fragment || pid.gsub(/.*\//,'') || pid
+    rescue URI::InvalidURIError
+      # likely a space that managed to pass through earlier uri validation
+      fixed_pid = pid.gsub(' ','-')
+      URI.parse(fixed_pid).fragment || fixed_pid.gsub(/.*\//,'') || fixed_pid
+    end
+
   end
 
-  def linked_custom_metadata_type
+  def linked_extended_metadata_type
     nil
   end
 

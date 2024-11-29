@@ -175,6 +175,9 @@ function digValue(object, path) {
             elements.removeClass(cssClass)
         }, 1100);
     };
+
+    // Fixes select2 in modals: https://github.com/select2/select2/issues/1436
+    $j.fn.modal.Constructor.prototype.enforceFocus = function () {};
 }(jQuery));
 
 $j(document).ready(function () {
@@ -399,6 +402,23 @@ $j(document).ready(function () {
     $j('#sidebar-toggle').click(Sidebar.toggle);
     $j('#sidebar-close').click(Sidebar.toggle);
     $j(document).on('click', '.sidebar-backdrop', Sidebar.toggle);
+
+    Licenses.init();
+
+    $j('.svg-pan-zoom').each(function () {
+        // Does not seem to work using jQuery load event, so doing it vanilla way
+        this.addEventListener('load', function () {
+            svgPanZoom(this, {
+                zoomEnabled: true,
+                dblClickZoomEnabled: true,
+                mouseWheelZoomEnabled: false,
+                controlIconsEnabled: true,
+                contain: false,
+                fit: true
+            });
+        });
+    });
 });
+
 
 var URL_ROOT = '<%= Rails.application.config.relative_url_root %>';

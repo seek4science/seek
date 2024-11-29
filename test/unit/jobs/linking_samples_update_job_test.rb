@@ -2,6 +2,7 @@ require 'test_helper'
 
 class LinkingSamplesUpdateJobTest < ActiveSupport::TestCase
   def setup
+    @person = FactoryBot.create(:person)
     create_linked_samples
   end
 
@@ -17,9 +18,31 @@ class LinkingSamplesUpdateJobTest < ActiveSupport::TestCase
     end
   end
 
+  test 'only trigger further jobs if the metadata changes' do
+    sample = Sample.first
+    sample.set_attribute_value('full name', 'Ali Mohammadi')
+    disable_authorization_checks { sample.save! }
+    assert_enqueued_jobs 2, only: LinkingSamplesUpdateJob do
+      LinkingSamplesUpdateJob.perform_now(sample)
+    end
+
+    sample.set_attribute_value('full name', 'Ali Mohammadi')
+    disable_authorization_checks { sample.save! }
+    assert_enqueued_jobs 0, only: LinkingSamplesUpdateJob do
+      LinkingSamplesUpdateJob.perform_now(sample)
+    end
+
+    sample.set_attribute_value('full name', 'Fred Flintstone')
+    disable_authorization_checks { sample.save! }
+    assert_enqueued_jobs 2, only: LinkingSamplesUpdateJob do
+      LinkingSamplesUpdateJob.perform_now(sample)
+    end
+  end
+
+
   def create_linked_samples
-    person = FactoryBot.create(:person)
-    project = person.projects.first
+
+    project = @person.projects.first
 
     main_sample = FactoryBot.create(:patient_sample)
     sample_type = main_sample.sample_type
@@ -38,4 +61,5 @@ class LinkingSamplesUpdateJobTest < ActiveSupport::TestCase
     linked_sample2.set_attribute_value(:patient, [main_sample.id])
     disable_authorization_checks { linked_sample2.save! }
   end
+
 end

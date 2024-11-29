@@ -6,6 +6,7 @@ require 'authenticated_system'
 
 class ApplicationController < ActionController::Base
   USER_CONTENT_CSP = "default-src 'self'"
+  USER_SVG_CSP = "#{USER_CONTENT_CSP}; style-src 'unsafe-inline';"
 
   include Seek::Errors::ControllerErrorHandling
   include Seek::EnabledFeaturesFilter
@@ -41,6 +42,8 @@ class ApplicationController < ActionController::Base
   include FairSignposting
 
   helper :all
+  helper_method %i[current_person is_condensed_view page_and_sort_params controller_model
+                   displaying_single_page? display_isa_graph? safe_class_lookup]
 
   layout Seek::Config.main_layout
 
@@ -117,7 +120,7 @@ class ApplicationController < ActionController::Base
     params.permit(:page, :sort, :order, :view, :table_cols, permitted_filter_params)
   end
 
-  helper_method :page_and_sort_params
+
 
   def controller_model
     begin
@@ -126,14 +129,17 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  helper_method :controller_model
 
   def self.api_actions(*actions)
-    @api_actions ||= (superclass.respond_to?(:api_actions) ? superclass.api_actions.dup : []) + actions.map(&:to_sym)
+    @api_actions ||= []
+    @api_actions |= actions.map(&:to_sym)
+    @api_actions
   end
 
   def self.user_content_actions(*actions)
-    @user_content_actions ||= (superclass.respond_to?(:user_content_actions) ? superclass.user_content_actions.dup : []) + actions.map(&:to_sym)
+    @user_content_actions ||= []
+    @user_content_actions |= actions.map(&:to_sym)
+    @user_content_actions
   end
 
   private
@@ -228,7 +234,8 @@ class ApplicationController < ActionController::Base
           case privilege
           when :publish, :manage, :edit, :download, :delete
             if current_user.nil?
-              flash[:error] = "You are not authorized to #{privilege} this #{name.humanize}, you may need to login first."
+              flash[:error] =
+"You are not authorized to #{privilege} this #{name.humanize}, you may need to login first."
             else
               flash[:error] = "You are not authorized to #{privilege} this #{name.humanize}."
             end
@@ -284,14 +291,16 @@ class ApplicationController < ActionController::Base
 
   def render_unknown_attribute_error(e)
     respond_to do |format|
-      format.json { render json: { errors: [{ title: 'Unknown attribute', details: e.message }] }, status: :unprocessable_entity }
+      format.json {
+ render json: { errors: [{ title: 'Unknown attribute', details: e.message }] }, status: :unprocessable_entity }
       format.all { render plain: e.message, status: :unprocessable_entity }
     end
   end
 
   def render_not_implemented_error(e)
     respond_to do |format|
-      format.json { render json: { errors: [{ title: 'Not implemented', details: e.message }] }, status: :not_implemented }
+      format.json {
+ render json: { errors: [{ title: 'Not implemented', details: e.message }] }, status: :not_implemented }
       format.all { render plain: e.message, status: :not_implemented }
     end
   end
@@ -312,8 +321,6 @@ class ApplicationController < ActionController::Base
     return (params.has_key?(:view) && params[:view]!="default")||
       (!params.has_key?(:view) && session.has_key?(:view) && !session[:view].nil? && session[:view]!="default")
   end
-
-  helper_method :is_condensed_view
 
 
   def log_event
@@ -377,7 +384,8 @@ class ApplicationController < ActionController::Base
                              user_agent: user_agent,
                              data: activity_loggable.title)
         end
-      when *Seek::Util.authorized_types.map { |t| t.name.underscore.pluralize.split('/').last } + ["sample_types"] # TODO: Find a nicer way of doing this...
+      when *Seek::Util.authorized_types.map { |t|
+ t.name.underscore.pluralize.split('/').last } + ["sample_types"] # TODO: Find a nicer way of doing this...
         action = 'create' if action == 'create_metadata' || action == 'create_from_template'
         action = 'update' if action == 'create_version'
         action = 'inline_view' if action == 'explore'
@@ -525,7 +533,8 @@ class ApplicationController < ActionController::Base
     return unless request.format.rdf?
     unless Seek::Util.rdf_capable_types.include?(controller_model)
       respond_to do |format|
-        format.rdf { render plain: 'This resource does not support RDF', status: :not_acceptable, content_type: 'text/plain' }
+        format.rdf {
+ render plain: 'This resource does not support RDF', status: :not_acceptable, content_type: 'text/plain' }
       end
     end
   end
@@ -573,9 +582,11 @@ class ApplicationController < ActionController::Base
     parent_id_param = request.path_parameters.keys.detect { |k| k.to_s.end_with?('_id') }
     if parent_id_param
       parent_type = parent_id_param.to_s.chomp('_id')
-      parent_class = safe_class_lookup(parent_type.camelize)
+      parent_class = safe_class_lookup(parent_type.camelize, raise: false)
       if parent_class
         @parent_resource = parent_class.find(params[parent_id_param])
+      else
+        error('Parent resource not recognized','Parent resource not recognized')
       end
     end
   end
@@ -596,25 +607,31 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def determine_custom_metadata_keys
+  def determine_extended_metadata_keys(asset = nil)
     keys = []
-    type_id = params.dig(controller_name.singularize.to_sym, :custom_metadata_attributes, :custom_metadata_type_id)
+    if asset
+      type_id = params.dig(controller_name.singularize.to_sym, asset, :extended_metadata_attributes,
+                           :extended_metadata_type_id)
+    else
+      type_id = params.dig(controller_name.singularize.to_sym, :extended_metadata_attributes,
+                           :extended_metadata_type_id)
+    end
     if type_id.present?
-      metadata_type = CustomMetadataType.find(type_id)
-      keys = [:custom_metadata_type_id, :id, data: recursive_determine_custom_metadata_keys(metadata_type)]
+      metadata_type = ExtendedMetadataType.find(type_id)
+      keys = [:extended_metadata_type_id, :id, data: recursive_determine_extended_metadata_keys(metadata_type)]
     end
     keys
   end
 
-  def recursive_determine_custom_metadata_keys(metadata_type)
+  def recursive_determine_extended_metadata_keys(metadata_type)
     keys = []
-    metadata_type.custom_metadata_attributes.each do |attr|
+    metadata_type.extended_metadata_attributes.each do |attr|
       key = attr.title.to_sym
       if attr.sample_attribute_type.controlled_vocab? || attr.sample_attribute_type.seek_sample_multi? || attr.sample_attribute_type.seek_sample?
         keys << key
         keys << { key => [] }
-      elsif attr.linked_custom_metadata? || attr.linked_custom_metadata_multi?
-        keys << { key => recursive_determine_custom_metadata_keys(attr.linked_custom_metadata_type) }
+      elsif attr.linked_extended_metadata? || attr.linked_extended_metadata_multi?
+        keys << { key => recursive_determine_extended_metadata_keys(attr.linked_extended_metadata_type) }
       else
         keys << key
       end
@@ -639,13 +656,9 @@ class ApplicationController < ActionController::Base
     @single_page || false
   end
 
-  helper_method :displaying_single_page?
-
   def display_isa_graph?
     !displaying_single_page?
   end
-
-  helper_method :display_isa_graph?
 
 
   def creator_related_params
@@ -666,6 +679,4 @@ class ApplicationController < ActionController::Base
   def safe_class_lookup(class_name, raise: true)
     Seek::Util.lookup_class(class_name, raise: raise)
   end
-
-  helper_method :safe_class_lookup
 end

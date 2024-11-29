@@ -56,15 +56,6 @@ class PublicationsController < ApplicationController
     end
   end
 
-  # GET /publications/new
-  def new
-    @publication = Publication.new
-    @publication.parent_name = params[:parent_name]
-    respond_to do |format|
-      format.html # new.html.erb
-    end
-  end
-
   # GET /publications/1/edit
   def edit; end
 

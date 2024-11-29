@@ -22,6 +22,8 @@
             <%= render :partial => "assets/asset_doi", :locals => {:displayed_resource=>@display_document} %>
           </div>
         </div>
+
+        <%= render partial: 'extended_metadata/extended_metadata_attribute_values', locals: { resource: @document } %>
         <%= render :partial=>"general/isa_graph", :locals => {:root_item => @document, :deep => true, :include_parents => true} %>
       </div>
 

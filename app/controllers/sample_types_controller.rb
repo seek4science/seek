@@ -28,7 +28,8 @@ class SampleTypesController < ApplicationController
   def new
     @tab = 'manual'
 
-    @sample_type = SampleType.new
+    attr = params["sample_type"] ? sample_type_params : {}
+    @sample_type = SampleType.new(attr)
     @sample_type.sample_attributes.build(is_title: true, required: true) # Initial attribute
 
     respond_with(@sample_type)
@@ -118,7 +119,7 @@ class SampleTypesController < ApplicationController
 
   # used for ajax call to get the filtered sample types for selection
   def filter_for_select
-    scope = Seek::Config.project_single_page_advanced_enabled ? SampleType.without_template : SampleType
+    scope = Seek::Config.isa_json_compliance_enabled ? SampleType.without_template : SampleType
     @sample_types = scope.joins(:projects).where('projects.id' => params[:projects]).distinct.to_a
     unless params[:tags].blank?
       @sample_types.select! do |sample_type|
@@ -164,7 +165,7 @@ class SampleTypesController < ApplicationController
                                           sample_attributes_attributes: [:id, :title, :pos, :required, :is_title,
                                                                          :description, :pid, :sample_attribute_type_id,
                                                                          :sample_controlled_vocab_id, :isa_tag_id,
-                                                                         :linked_sample_type_id,
+                                                                         :allow_cv_free_text, :linked_sample_type_id,
                                                                          :unit_id, :_destroy] }, :assay_ids => [])
   end
 
@@ -181,7 +182,7 @@ class SampleTypesController < ApplicationController
   private
 
   def find_sample_type
-    scope = Seek::Config.project_single_page_advanced_enabled ? SampleType.without_template : SampleType
+    scope = Seek::Config.isa_json_compliance_enabled ? SampleType.without_template : SampleType
     @sample_type = scope.find(params[:id])
   end
 

@@ -91,6 +91,7 @@ module AssaysHelper
   # this includes the editable studies, plus the current associated study if it is not already included (i.e not edtiable)
   def selectable_studies_mapped_to_investigation(current_study)
     studies = Study.authorized_for('edit').to_a
+    studies.select!{ |study| !study.is_isa_json_compliant? } unless displaying_single_page?
     studies << current_study if current_study && !current_study.can_edit?
     investigation_map = {}
     studies.each do |study|

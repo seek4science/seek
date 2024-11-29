@@ -30,6 +30,15 @@ class DataFilesControllerTest < ActionController::TestCase
 
   end
 
+  test 'get data file redirects if feature disabled' do
+    df = FactoryBot.create(:data_file, policy: FactoryBot.create(:public_policy))
+    with_config_value(:data_files_enabled, false) do
+      get :show, params: { id: df }
+      assert_redirected_to root_path
+      assert_equal 'Data files are disabled', flash[:error]
+    end
+  end
+
   test 'json link includes version' do
     df = FactoryBot.create(:data_file, policy: FactoryBot.create(:public_policy))
 
@@ -608,7 +617,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
   end
 
-  test 'show explore button' do
+  test 'show explore button and magnify icon' do
     df = FactoryBot.create(:small_test_spreadsheet_datafile)
     login_as(df.contributor.user)
     get :show, params: { id: df }
@@ -617,9 +626,12 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_select 'a[href=?]', explore_data_file_path(df, version: df.version), count: 1
       assert_select 'a.disabled', text: 'Explore', count: 0
     end
+    assert_select 'div.fileinfo span.filename' do
+      assert_select 'a[href=?][title=?]', explore_data_file_path(df, version: df.version), 'Explore the contents of this file', count: 1
+    end
   end
 
-  test 'show explore button for csv file' do
+  test 'show explore button  and magnify icon for csv file' do
     df = FactoryBot.create(:csv_spreadsheet_datafile)
     login_as(df.contributor.user)
     get :show, params: { id: df }
@@ -627,6 +639,9 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select '#buttons' do
       assert_select 'a[href=?]', explore_data_file_path(df, version: df.version), count: 1
       assert_select 'a.disabled', text: 'Explore', count: 0
+    end
+    assert_select 'div.fileinfo span.filename' do
+      assert_select 'a[href=?][title=?]', explore_data_file_path(df, version: df.version), 'Explore the contents of this file', count: 1
     end
   end
 
@@ -642,9 +657,12 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_select 'a[href=?]', explore_data_file_path(df, version: df.version), count: 0
       assert_select 'a', text: 'Explore', count: 0
     end
+    assert_select 'div.fileinfo span.filename' do
+      assert_select 'a[href=?][title=?]', explore_data_file_path(df, version: df.version), 'Explore the contents of this file', count: 0
+    end
   end
 
-  test 'show disabled explore button if spreadsheet too big' do
+  test 'show disabled explore button and magnify icon if spreadsheet too big' do
     df = FactoryBot.create(:small_test_spreadsheet_datafile)
     login_as(df.contributor.user)
     with_config_value(:max_extractable_spreadsheet_size, 0) do
@@ -654,6 +672,10 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select '#buttons' do
       assert_select 'a[href=?]', explore_data_file_path(df, version: df.version), count: 0
       assert_select 'a.disabled', text: 'Explore', count: 1
+    end
+    assert_select 'div.fileinfo span.filename' do
+      assert_select 'a[href=?][title=?]', explore_data_file_path(df, version: df.version), 'Explore the contents of this file', count: 0
+      assert_select 'span > a.disabled > img', count: 1
     end
   end
 
@@ -1759,6 +1781,16 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal df.version, json['data']['attributes']['version']
   end
 
+  test 'get data_file as json returns error if feature disabled' do
+    df = FactoryBot.create(:data_file, policy: FactoryBot.create(:public_policy))
+    with_config_value(:data_files_enabled, false) do
+      get :show, params: { id: df, format: 'json' }
+      assert_response :unprocessable_entity
+      json = JSON.parse(response.body)
+      assert_equal 'Data files are disabled', json['title']
+    end
+  end
+
   test 'landing page for hidden private_item' do
     df = FactoryBot.create(:data_file, policy: FactoryBot.create(:private_policy), title: 'fish flop', description: 'testing json description')
     assert !df.can_view?
@@ -2165,7 +2197,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     get :show, params: { id: df }
 
-    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0'
+    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0 International'
   end
 
   test 'should display license for current version' do
@@ -2176,11 +2208,11 @@ class DataFilesControllerTest < ActionController::TestCase
 
     get :show, params: { id: df, version: 1 }
     assert_response :success
-    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0'
+    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0 International'
 
     get :show, params: { id: df, version: dfv.version }
     assert_response :success
-    assert_select '.panel .panel-body a', text: 'CC0 1.0'
+    assert_select '.panel .panel-body a', text: 'Creative Commons Zero v1.0 Universal'
   end
 
   test 'should update license' do
@@ -2194,7 +2226,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :redirect
 
     get :show, params: { id: df }
-    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution Share-Alike 4.0'
+    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution Share Alike 4.0 International'
     assert_equal 'CC-BY-SA-4.0', assigns(:data_file).license
   end
 
@@ -2203,7 +2235,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     get :edit, params: { id: df }
     assert_response :success
-    assert_select '#license-select option[selected=?]', 'selected', text: 'Creative Commons Attribution Share-Alike 4.0'
+    assert_select '#license-select option[selected=?]', 'selected', text: 'Creative Commons Attribution Share Alike 4.0 International'
 
     df2 = FactoryBot.create :data_file, license: nil, policy: FactoryBot.create(:public_policy)
 
@@ -2213,7 +2245,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     register_content_blob
     assert_response :success
-    assert_select '#license-select option[selected=?]', 'selected', text: 'Creative Commons Attribution 4.0'
+    assert_select '#license-select option[selected=?]', 'selected', text: 'Creative Commons Attribution 4.0 International'
   end
 
   test 'can disambiguate sample type' do
@@ -2223,7 +2255,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     data_file = FactoryBot.create :data_file, content_blob: FactoryBot.create(:sample_type_populated_template_content_blob),
                         policy: FactoryBot.create(:private_policy), contributor: person
-    refute data_file.sample_template?
+    refute data_file.matching_sample_type?
     assert_empty data_file.possible_sample_types
 
     sample_type = SampleType.new title: 'visible1', uploaded_template: true, project_ids: [person.projects.first.id], contributor: person
@@ -2293,7 +2325,6 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select 'a', text: /fish/
   end
 
-
   test 'filtering using other fields in association form' do
     person = FactoryBot.create(:person)
     project1 = person.projects.first
@@ -2327,6 +2358,14 @@ class DataFilesControllerTest < ActionController::TestCase
     get :filter, params: { filter: 'datax', simulation_data: 'true' }
     assert response.body.blank?
     assert_response :success
+  end
+
+  test 'filtering returns error message if feature disabled' do
+    with_config_value(:data_files_enabled, false) do
+      get :filter, xhr: true, params: { filter: 'hello?' }
+      assert_response :unprocessable_entity
+      assert_select 'div.alert-danger', text: /Data files are disabled/
+    end
   end
 
   test 'programme data files through nested routing' do
@@ -2381,7 +2420,7 @@ class DataFilesControllerTest < ActionController::TestCase
     login_as(person)
 
     data_file = FactoryBot.create :data_file, content_blob: FactoryBot.create(:sample_type_populated_template_content_blob), policy: FactoryBot.create(:private_policy), contributor: person
-    refute data_file.sample_template?
+    refute data_file.matching_sample_type?
     assert_empty data_file.possible_sample_types
 
     sample_type = SampleType.new title: 'from template', project_ids: [person.projects.first.id], contributor: person
@@ -2409,7 +2448,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     data_file = FactoryBot.create :data_file, content_blob: FactoryBot.create(:sample_type_populated_template_content_blob),
                         policy: FactoryBot.create(:private_policy), contributor: person
-    refute data_file.sample_template?
+    refute data_file.matching_sample_type?
     assert_empty data_file.possible_sample_types
 
     sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id], contributor: person
@@ -2560,7 +2599,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     data_file = FactoryBot.create :data_file, content_blob: FactoryBot.create(:sample_type_populated_template_content_blob),
                         policy: FactoryBot.create(:private_policy), contributor: person
-    refute data_file.sample_template?
+    refute data_file.matching_sample_type?
     assert_empty data_file.possible_sample_types
 
     # First matching type
@@ -2588,6 +2627,52 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_redirected_to select_sample_type_data_file_path(data_file) # Test for this is in data_files_controller_test
   end
 
+  test 'has matching sample type ajax call' do
+    create_sample_attribute_type
+    person = FactoryBot.create(:project_administrator)
+    login_as(person)
+
+    data_file = FactoryBot.create :data_file, content_blob: FactoryBot.create(:sample_type_populated_template_content_blob),
+                                  policy: FactoryBot.create(:private_policy), contributor: person
+
+    sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id], contributor: person
+    sample_type.content_blob = FactoryBot.create(:sample_type_template_content_blob)
+    sample_type.build_attributes_from_template
+    sample_type.save!
+
+    assert data_file.matching_sample_type?
+    assert data_file.can_manage?
+
+    get :has_matching_sample_type, params: { id: data_file.id }, format: :json
+    assert_response :success
+
+    parsed_response = JSON.parse(@response.body)
+    assert parsed_response['result']
+
+    # no match
+
+    data_file2 = FactoryBot.create :data_file, content_blob: FactoryBot.create(:study_template_content_blob),
+                                  policy: FactoryBot.create(:private_policy), contributor: person
+
+    refute data_file2.matching_sample_type?
+    assert data_file2.can_manage?
+
+    get :has_matching_sample_type, params: { id: data_file2.id }, format: :json
+    assert_response :success
+
+    parsed_response = JSON.parse(@response.body)
+    refute parsed_response['result']
+
+    # not authorised
+
+    logout
+
+    refute data_file.can_manage?
+
+    get :has_matching_sample_type, params: { id: data_file.id }, format: :json
+    assert_response :forbidden
+  end
+
   test 'show data file with "extract samples" button' do
     create_sample_attribute_type
     person = FactoryBot.create(:project_administrator)
@@ -2595,7 +2680,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     data_file = FactoryBot.create :data_file, content_blob: FactoryBot.create(:sample_type_populated_template_content_blob),
                         policy: FactoryBot.create(:private_policy), contributor: person
-    refute data_file.sample_template?
+    refute data_file.matching_sample_type?
     assert_empty data_file.possible_sample_types
 
     sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id], contributor: person
@@ -2615,7 +2700,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     data_file = FactoryBot.create :data_file, content_blob: FactoryBot.create(:sample_type_populated_template_content_blob),
                         policy: FactoryBot.create(:private_policy), contributor: person
-    refute data_file.sample_template?
+    refute data_file.matching_sample_type?
     assert_empty data_file.possible_sample_types
 
     sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id], contributor: person
@@ -2637,7 +2722,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     data_file = FactoryBot.create :data_file, content_blob: FactoryBot.create(:sample_type_populated_template_content_blob),
                         policy: FactoryBot.create(:private_policy), contributor: person
-    refute data_file.sample_template?
+    refute data_file.matching_sample_type?
     assert_empty data_file.possible_sample_types
 
     sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id], contributor: person
@@ -2660,7 +2745,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     data_file = FactoryBot.create :data_file, content_blob: FactoryBot.create(:sample_type_populated_template_content_blob),
                         policy: FactoryBot.create(:private_policy), contributor: person
-    refute data_file.sample_template?
+    refute data_file.matching_sample_type?
     assert_empty data_file.possible_sample_types
 
     sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id], contributor: person
@@ -2692,7 +2777,7 @@ class DataFilesControllerTest < ActionController::TestCase
     data_file = FactoryBot.create :data_file, content_blob: FactoryBot.create(:sample_type_populated_template_content_blob),
                         policy: FactoryBot.create(:private_policy),
                         contributor: person
-    refute data_file.sample_template?
+    refute data_file.matching_sample_type?
     assert_empty data_file.possible_sample_types
 
     sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id], contributor: person
@@ -2743,11 +2828,12 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal visible, assigns(:visible_count)
   end
 
-  test 'delete with data file with extracted samples' do
+  test 'delete data file and extracted samples' do
     login_as(FactoryBot.create(:person))
-    df = nil
 
     df = data_file_with_extracted_samples
+    sample = df.extracted_samples.first
+    sample_ids = df.extracted_sample_ids
 
     assert_no_difference('DataFile.count') do
       delete :destroy, params: { id: df.id }
@@ -2755,18 +2841,42 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_redirected_to destroy_samples_confirm_data_file_path(df)
 
     assert_difference('DataFile.count', -1) do
-      assert_difference('Sample.count', -4) do
-        delete :destroy, params: { id: df.id, destroy_extracted_samples: '1' }
+      assert_no_difference('Sample.count') do
+        assert_enqueued_jobs(1, only: AuthLookupDeleteJob) do
+          assert_enqueued_with(job: AuthLookupDeleteJob, args: ['DataFile', df.id]) do
+            assert_enqueued_jobs(1, only: SamplesBatchDeleteJob) do
+              assert_enqueued_with(job: SamplesBatchDeleteJob, args: [sample_ids]) do
+                delete :destroy, params: { id: df.id, destroy_extracted_samples: '1' }
+              end
+            end
+          end
+        end
       end
     end
 
     assert_redirected_to data_files_path
+  end
+
+  test 'delete data file but not extracted samples' do
+    login_as(FactoryBot.create(:person))
 
     df = data_file_with_extracted_samples
+    sample = df.extracted_samples.first
+
+    assert_no_difference('DataFile.count') do
+      delete :destroy, params: { id: df.id }
+    end
+    assert_redirected_to destroy_samples_confirm_data_file_path(df)
 
     assert_difference('DataFile.count', -1) do
       assert_no_difference('Sample.count') do
-        delete :destroy, params: { id: df.id, destroy_extracted_samples: '0' }
+        assert_enqueued_jobs(1, only: AuthLookupDeleteJob) do
+          assert_enqueued_with(job: AuthLookupDeleteJob, args: ['DataFile', df.id]) do
+            assert_no_enqueued_jobs(only: SamplesBatchDeleteJob) do
+              delete :destroy, params: { id: df.id, destroy_extracted_samples: '0' }
+            end
+          end
+        end
       end
     end
 
@@ -3373,6 +3483,74 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal [sop], assay.sops
   end
 
+  test 'create, update and show a data file with extended metadata' do
+    cmt = FactoryBot.create(:simple_data_file_extended_metadata_type)
+
+    person = FactoryBot.create(:person)
+    login_as(person)
+    blob = FactoryBot.create(:content_blob)
+    session[:uploaded_content_blob_id] = blob.id
+    project = person.projects.last
+    params = { data_file: {
+      title: 'Small File',
+      project_ids: [project.id],
+      extended_metadata_attributes:{ extended_metadata_type_id: cmt.id,
+                                     data:{ 'age': 22,'name':'fred'}}
+    }, tag_list:'fish, soup',
+               policy_attributes: valid_sharing,
+               content_blob_id: blob.id.to_s,
+               assay_ids: [] }
+
+
+
+    assert_difference('ActivityLog.count') do
+      assert_difference('DataFile.count') do
+        assert_no_difference('Assay.count') do
+          assert_no_difference('AssayAsset.count') do
+            assert_difference('ExtendedMetadata.count') do
+              post :create_metadata, params: params
+            end
+          end
+        end
+      end
+    end
+
+    assert (df = assigns(:data_file))
+
+    cm = df.extended_metadata
+    assert_equal cmt, cm.extended_metadata_type
+    assert_equal 'fred',cm.get_attribute_value('name')
+    assert_equal 22,cm.get_attribute_value('age')
+    assert_nil cm.get_attribute_value('date')
+
+    get :show, params: { id: df }
+    assert_response :success
+
+    assert_select 'div.extended_metadata',text:/fred/, count:1
+    assert_select 'div.extended_metadata',text:/22/, count:1
+
+    # test update
+    old_id = cm.id
+    assert_no_difference('DataFile.count') do
+      assert_no_difference('ExtendedMetadata.count') do
+        put :update, params: { id: df.id, data_file: { title: "new title",
+                                                      extended_metadata_attributes: { extended_metadata_type_id: cmt.id, id: cm.id,
+                                                                                      data: {
+                                                                                        "age": 20,
+                                                                                        "name": 'max'
+                                                                                      } }
+        }
+        }
+      end
+    end
+
+    assert new_df = assigns(:data_file)
+    assert_equal 'new title', new_df.title
+    assert_equal 'max', new_df.extended_metadata.get_attribute_value('name')
+    assert_equal 20, new_df.extended_metadata.get_attribute_value('age')
+    assert_equal old_id, new_df.extended_metadata.id
+  end
+
   test 'new assay adopts datafile policy' do
     person = FactoryBot.create(:person)
     manager = FactoryBot.create(:person)
@@ -3568,6 +3746,23 @@ class DataFilesControllerTest < ActionController::TestCase
     end
     data_file = assigns(:data_file)
     assert_equal [good_assay],data_file.assays
+  end
+
+  test 'provide metadata with controlled vocabs' do
+    FactoryBot.create(:data_formats_controlled_vocab)
+    FactoryBot.create(:data_types_controlled_vocab)
+    df = FactoryBot.build(:data_file, content_blob:FactoryBot.create(:txt_content_blob))
+    refute_nil df.content_blob
+    assay_to_be_created = FactoryBot.build(:assay,title:'new assay')
+    session[:processed_datafile]=df
+    session[:processed_assay]=assay_to_be_created
+
+    get :provide_metadata
+
+    assert_response :success
+
+    assert_select 'input+select#data_file_data_type_annotations[data-tags-limit=10]'
+    assert_select 'input+select#data_file_data_format_annotations[data-tags-limit=10]'
   end
 
   test 'create assay should be checked with new assay containing title' do
@@ -4066,5 +4261,13 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal Seek::Config.instance_name, resource.xpath('./xmlns:publisher').first.text
     assert_equal 'Dataset', resource.xpath('./xmlns:resourceType').first.text
     assert_equal 'Dataset', resource.xpath('./xmlns:resourceType/@resourceTypeGeneral').first.text
+  end
+
+  test 'do not get index if feature disabled' do
+    with_config_value(:data_files_enabled, false) do
+      get :index
+      assert_redirected_to root_path
+      assert flash[:error].include?('disabled')
+    end
   end
 end

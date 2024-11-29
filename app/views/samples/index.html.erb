@@ -29,5 +29,5 @@
     </div>
   <% end %>
 <% else %>
-    <%= render partial: "general/index" %>
+    <%= render partial: "general/index", locals: { show_samples_query_button: Seek::Config.isa_json_compliance_enabled }  %>
 <% end %>

@@ -37,9 +37,9 @@ class ModelsController < ApplicationController
         json = compare @blob1.filepath, @blob2.filepath, ["reportHtml", "crnJson", "json", "SBML"]
         @crn = JSON.parse(json)["crnJson"]
         @comparison_html = JSON.parse(json)["reportHtml"]
-      rescue StandardError => e
+      rescue Exception => e
         raise e unless Rails.env.production?
-        flash.now[:error]="there was an error trying to compare the two versions - #{e.message}"
+        flash.now[:error]="there was an error trying to compare the two versions - #{e.message.gsub(/[\s\S]*STDERR:/,'')}"
       end
     else
       flash.now[:error]="One of the version files could not be found, or you are not authorized to examine it"
@@ -153,6 +153,7 @@ class ModelsController < ApplicationController
                                   *creator_related_params,
                                   { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                   { assay_assets_attributes: [:assay_id] }, { publication_ids: [] },
+                                  { extended_metadata_attributes: determine_extended_metadata_keys },
                                   discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
 

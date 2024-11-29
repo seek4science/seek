@@ -12,7 +12,7 @@ var SampleTypes = {
             helper: SampleTypes.fixHelper,
             handle: '.attribute-handle'
         }).on('sortupdate', function() {
-            SampleTypes.recalculatePositions();
+            SampleTypes.recalculatePositions(selector);
         });
     },
 
@@ -96,6 +96,16 @@ var SampleTypes = {
         else {
             seek_sample_element.hide();
         }
+    },
+
+    expandIRI: function () {
+        var termIRI = $j(this).next('.term-iri');
+        termIRI.toggleClass('visible');
     }
 
 };
+
+
+$j(document).ready(function() {
+    $j('.term-label').on('click', SampleTypes.expandIRI);
+});

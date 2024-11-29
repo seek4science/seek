@@ -1,0 +1,25 @@
+<%
+  row_cls = ""
+  row_cls << ' warning' if extended_metadata_type.disabled_but_used?
+  row_cls << ' text-secondary' unless extended_metadata_type.enabled?
+
+%>
+<tr class="<%= row_cls %>">
+  <td><%= extended_metadata_type.id %></td>
+  <td><%= extended_metadata_type.title %></td>
+  <td><%= extended_metadata_type.supported_type %></td>
+  <td><%= extended_metadata_type.extended_metadatas.count %></td>
+  <td><%= extended_metadata_type.enabled? ? 'Enabled' : 'Disabled' %></td>
+  <td>
+    <% unless extended_metadata_type.extended_type? %>
+      <%= form_for(extended_metadata_type, url: administer_update_extended_metadata_type_path(extended_metadata_type), method: :put) do |f| %>
+        <%= f.hidden_field :enabled, value: !extended_metadata_type.enabled? %>
+        <% if extended_metadata_type.enabled? %>
+          <%= f.submit 'Disable', class:'btn btn-warning' %>
+        <% else %>
+          <%= f.submit 'Enable', class:'btn btn-primary' %>
+        <% end %>
+      <% end %>
+    <% end %>
+  </td>
+</tr>

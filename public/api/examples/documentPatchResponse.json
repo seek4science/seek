@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "26",
+    "id": "308",
     "type": "documents",
     "attributes": {
       "policy": {
@@ -8,7 +8,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "251",
+              "id": "1022252726",
               "type": "projects"
             },
             "access": "edit"
@@ -18,6 +18,21 @@
       "discussion_links": [
 
       ],
+      "extended_attributes": {
+        "extended_metadata_type_id": "401",
+        "attribute_map": {
+          "role_email": "alice@email.com",
+          "role_phone": "0012345",
+          "role_name": {
+            "first_name": "alice",
+            "last_name": "liddell"
+          },
+          "role_address": {
+            "street": "wonder",
+            "city": "land"
+          }
+        }
+      },
       "title": "A Maximally Patched Document",
       "license": "CC-BY-4.0",
       "description": "A report about the thing that happened",
@@ -31,32 +46,32 @@
         {
           "version": 1,
           "revision_comments": null,
-          "url": "http://localhost:3000/documents/26?version=1",
+          "url": "http://localhost:3000/documents/308?version=1",
           "doi": null
         }
       ],
       "version": 1,
       "revision_comments": null,
-      "created_at": "2022-06-07T14:12:58.000Z",
-      "updated_at": "2022-06-07T14:12:58.000Z",
+      "created_at": "2024-06-20T12:39:26.000Z",
+      "updated_at": "2024-06-20T12:39:26.000Z",
       "doi": null,
       "content_blobs": [
         {
-          "original_filename": "file-26",
+          "original_filename": "file-332",
           "url": null,
-          "md5sum": "f1986c5013e53627e5d5830b84adcab5",
-          "sha1sum": "a73f327ed87f56b2aed6f886651d32a0c96abf75",
+          "md5sum": "cfd0a2fa5d67073a2046c0bfe42fb68f",
+          "sha1sum": "e40baba579e6063e7f2bec398e5657a23a421fdb",
           "content_type": "application/pdf",
-          "link": "http://localhost:3000/documents/26/content_blobs/106",
-          "size": 9
+          "link": "http://localhost:3000/documents/308/content_blobs/1050453213",
+          "size": 10
         }
       ],
       "creators": [
         {
-          "profile": "/people/236",
+          "profile": "/people/1039988618",
           "family_name": "Last",
-          "given_name": "Person192",
-          "affiliation": "An Institution: 238",
+          "given_name": "Person3431",
+          "affiliation": "An Institution: 4272",
           "orcid": null
         }
       ],
@@ -66,7 +81,7 @@
       "creators": {
         "data": [
           {
-            "id": "236",
+            "id": "1039988618",
             "type": "people"
           }
         ]
@@ -74,7 +89,7 @@
       "submitter": {
         "data": [
           {
-            "id": "235",
+            "id": "1039988617",
             "type": "people"
           }
         ]
@@ -82,11 +97,11 @@
       "people": {
         "data": [
           {
-            "id": "235",
+            "id": "1039988617",
             "type": "people"
           },
           {
-            "id": "236",
+            "id": "1039988618",
             "type": "people"
           }
         ]
@@ -94,7 +109,7 @@
       "projects": {
         "data": [
           {
-            "id": "251",
+            "id": "1022252726",
             "type": "projects"
           }
         ]
@@ -102,7 +117,7 @@
       "investigations": {
         "data": [
           {
-            "id": "38",
+            "id": "973655139",
             "type": "investigations"
           }
         ]
@@ -110,7 +125,7 @@
       "studies": {
         "data": [
           {
-            "id": "36",
+            "id": "1060385170",
             "type": "studies"
           }
         ]
@@ -118,7 +133,7 @@
       "assays": {
         "data": [
           {
-            "id": "34",
+            "id": "1035386915",
             "type": "assays"
           }
         ]
@@ -131,21 +146,21 @@
       "workflows": {
         "data": [
           {
-            "id": "14",
+            "id": "225",
             "type": "workflows"
           }
         ]
       }
     },
     "links": {
-      "self": "/documents/26?version=1"
+      "self": "/documents/308?version=1"
     },
     "meta": {
-      "created": "2022-06-07T14:12:58.000Z",
-      "modified": "2022-06-07T14:12:58.000Z",
+      "created": "2024-06-20T12:39:26.000Z",
+      "modified": "2024-06-20T12:39:26.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "db5cd6a0-c899-013a-0f7e-0a81884ed284"
+      "uuid": "0dd88500-1130-013d-1f9d-0a81884ed284"
     }
   },
   "jsonapi": {

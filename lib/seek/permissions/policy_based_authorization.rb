@@ -22,6 +22,7 @@ module Seek
           after_commit :immediate_auth_update, on: [:create, :update]
           after_commit :check_to_queue_update_auth_table, on: [:create, :update]
           after_destroy { |record| record.policy.try(:destroy_if_redundant) }
+          after_destroy :queue_auth_lookup_delete_job
 
           const_set('AuthLookup', Class.new(::AuthLookup)).class_eval do |c|
             c.table_name = klass.lookup_table_name
@@ -29,7 +30,6 @@ module Seek
           end
 
           has_many :auth_lookup, foreign_key: :asset_id, inverse_of: :asset
-          before_destroy :delete_auth_lookup_in_batches
         end
       end
       # the can_#{action}? methods are split into 2 parts, to differentiate between pure authorization and additional permissions based upon the state of the object or other objects it depends upon)
@@ -349,10 +349,9 @@ module Seek
         auth_lookup.where(user_id: user_id).limit(1).pluck("can_#{action}").first
       end
 
-      def delete_auth_lookup_in_batches
-        auth_lookup.in_batches(of: 1000).delete_all
+      def queue_auth_lookup_delete_job
+        AuthLookupDeleteJob.perform_later(self.class.name, id)
       end
-
     end
   end
 end

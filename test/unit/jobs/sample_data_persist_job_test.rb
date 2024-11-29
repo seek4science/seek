@@ -1,26 +1,26 @@
 require 'test_helper'
 
 class SampleDataPersistJobTest < ActiveSupport::TestCase
-
   def setup
     create_sample_attribute_type
     @person = FactoryBot.create(:project_administrator)
     User.with_current_user(@person.user) do
-      @data_file = FactoryBot.create :data_file, content_blob: FactoryBot.create(:sample_type_populated_template_content_blob),
-                                     policy: FactoryBot.create(:private_policy), contributor: @person
-      refute @data_file.sample_template?
-      assert_empty @data_file.possible_sample_types
+	    @project_id = @person.projects.first.id
 
-      @sample_type = SampleType.new title: 'from template', uploaded_template: true,
-                                    project_ids: [@person.projects.first.id], contributor: @person
-      @sample_type.content_blob = FactoryBot.create(:sample_type_template_content_blob)
-      @sample_type.build_attributes_from_template
-      # this is to force the full name to be 2 words, so that one row fails
-      @sample_type.sample_attributes.first.sample_attribute_type = FactoryBot.create(:full_name_sample_attribute_type)
-      @sample_type.sample_attributes[1].sample_attribute_type = FactoryBot.create(:datetime_sample_attribute_type)
-      @sample_type.save!
-    end
+	    @data_file = FactoryBot.create :data_file, content_blob: FactoryBot.create(:sample_type_populated_template_content_blob),
+		                             policy: FactoryBot.create(:private_policy), contributor: @person
+	    refute @data_file.matching_sample_type?
+	    assert_empty @data_file.possible_sample_types
 
+	    @sample_type = SampleType.new title: 'from template', uploaded_template: true,
+		                          project_ids: [@project_id], contributor: @person
+	    @sample_type.content_blob = FactoryBot.create(:sample_type_template_content_blob)
+	    @sample_type.build_attributes_from_template
+	    # this is to force the full name to be 2 words, so that one row fails
+	    @sample_type.sample_attributes.first.sample_attribute_type = FactoryBot.create(:full_name_sample_attribute_type)
+	    @sample_type.sample_attributes[1].sample_attribute_type = FactoryBot.create(:datetime_sample_attribute_type)
+	    @sample_type.save!
+	end
   end
 
   test 'queue job' do
@@ -32,11 +32,17 @@ class SampleDataPersistJobTest < ActiveSupport::TestCase
   end
 
   test 'persists samples' do
+    @data_file.policy = FactoryBot.create(:public_policy, permissions: [FactoryBot.create(:edit_permission)])
+    disable_authorization_checks{@data_file.save!}
     assert_difference('Sample.count', 3) do
-      assert_difference('ReindexingQueue.count', 3) do
-        assert_difference('AuthLookupUpdateQueue.count', 3) do
-          with_config_value(:auth_lookup_enabled, true) do # needed to test added to queue
-            SampleDataPersistJob.perform_now(@data_file, @sample_type, @person.user)
+      assert_difference('Policy.count', 3) do
+        assert_difference('Permission.count', 3) do
+          assert_difference('ReindexingQueue.count', 3) do
+            assert_difference('AuthLookupUpdateQueue.count', 3) do
+              with_config_value(:auth_lookup_enabled, true) do # needed to test added to queue
+                SampleDataPersistJob.perform_now(@data_file, @sample_type, @person.user)
+              end
+            end
           end
         end
       end
@@ -47,8 +53,27 @@ class SampleDataPersistJobTest < ActiveSupport::TestCase
     assert_equal Task::STATUS_DONE, @data_file.sample_persistence_task.status
 
     assert_equal 3, @data_file.extracted_samples.count
-    assert_equal @sample_type, @data_file.extracted_samples.first.sample_type
-    assert_equal @person, @data_file.extracted_samples.first.contributor
+
+    samples = @data_file.extracted_samples
+
+    samples.each do |sample|
+      assert_equal @sample_type, sample.sample_type
+      assert_equal @person, sample.contributor
+      assert_equal [@project_id], sample.project_ids
+      assert_equal @person, sample.contributor
+      assert_equal Policy::MANAGING, sample.policy.access_type
+      assert_equal 1, sample.policy.permissions.count
+      assert_equal Policy::EDITING, sample.policy.permissions.first.access_type
+    end
+
+    #check the policy and permissions are all uniq and not referencing each other
+    refute_equal @data_file.policy_id, samples.first.policy_id
+    policy_ids = samples.collect { |s| s.policy.id }
+    permission_ids = samples.collect { |s| s.policy.permissions.first.id }
+    assert_equal 3, policy_ids.count
+    assert_equal policy_ids, policy_ids.uniq
+    assert_equal 3, permission_ids.count
+    assert_equal permission_ids, permission_ids.uniq
   end
 
   test 'persists samples and associate with assay' do

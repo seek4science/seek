@@ -1,0 +1,54 @@
+<%
+  panel_label ||= 'Extended metadata'
+  panel_style = resource.extended_metadata.try(:extended_metadata_type) ? '' : 'display:none'
+  parent_resource ||= parent_resource
+  %>
+
+<%= folding_panel(panel_label, false, style:panel_style,id:'extended_metadata_attribute_panel') do %>
+  <div id="extended_attributes">
+    <% if resource.extended_metadata.try(:extended_metadata_type) %>
+      <%= render partial: 'extended_metadata/extended_metadata_fields', locals: { extended_metadata_type: resource.extended_metadata.extended_metadata_type, resource:, parent_resource: } %>
+    <% end %>
+  </div>
+<% end %>
+
+<script>
+
+    $j(document).ready(function () {
+
+        const parentResourceData = "<%= local_assigns.has_key?(:parent_resource) ? parent_resource : nil %>"
+
+        $j('#extended_metadata_attributes_extended_metadata_type_id').change(function() {
+            if (this.value) {
+                $j('#extended_metadata_attribute_panel').show();
+            } else {
+                $j('#extended_metadata_attribute_panel').hide();
+            }
+            $j.ajax({
+                url: "<%= form_fields_extended_metadata_types_path %>",
+                type: "get",
+                data: {'id':this.value, 'parentResource': parentResourceData},
+                dataType: 'html',
+                beforeSend: function() {
+                    $j('#extended_attributes').html('<div class="spinner"></div>');
+                }
+            })
+                .done(function(data){
+                    $j('#extended_attributes').html(data);
+                    // fixme: hack hack, copied from calendar.js - should be converted to a function if it becomes final
+                    $j('[data-calendar]').each(function () {
+                        var showTime = $j(this).data('calendar') === 'mixed';
+                        $j(this).datetimepicker({
+                            format: showTime ? 'YYYY-MM-DD HH:mm' : 'YYYY-MM-DD',
+                            sideBySide: showTime
+                        });
+                    });
+                    ObjectsInput.init();
+                })
+                .error(function() {
+                    $j('#extended_attributes').text("Something went wrong!");
+                });
+        });
+    });
+
+</script>

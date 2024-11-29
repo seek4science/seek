@@ -1,13 +1,13 @@
 {
   "data": {
-    "id": "627",
+    "id": "980191673",
     "type": "institutions",
     "attributes": {
       "discussion_links": [
 
       ],
       "avatar": null,
-      "title": "Post Institution 627 Max",
+      "title": "Post Institution 980191673 Max",
       "country": "United Kingdom",
       "country_code": "GB",
       "city": "Manchester",
@@ -27,14 +27,14 @@
       }
     },
     "links": {
-      "self": "/institutions/627"
+      "self": "/institutions/980191673"
     },
     "meta": {
-      "created": "2022-06-07T14:14:00.000Z",
-      "modified": "2022-06-07T14:14:00.000Z",
+      "created": "2024-06-20T12:35:58.000Z",
+      "modified": "2024-06-20T12:35:58.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "0054b090-c89a-013a-0f7e-0a81884ed284"
+      "uuid": "91ca2e80-112f-013d-1f9d-0a81884ed284"
     }
   },
   "jsonapi": {

@@ -273,22 +273,6 @@ module ApplicationHelper
     contributor_name_link.html_safe
   end
 
-  # this helper is to be extended to include many more types of objects that can belong to the
-  # user - for example, SOPs and others
-  def mine?(thing)
-    return false if thing.nil?
-    return false unless logged_in?
-
-    c_id = current_user.id.to_i
-
-    case thing.class.name
-    when 'Person'
-      return (current_user.person.id == thing.id)
-    else
-      return false
-    end
-  end
-
   def link_to_draggable(link_name, url, link_options = {})
     link_to(link_name, url, link_options)
   end
@@ -458,6 +442,14 @@ module ApplicationHelper
 
     ProjectCreationMessageLog.pending_requests.detect do |log|
       log.can_respond_project_creation_request?(User.current_user)
+    end.present?
+  end
+
+  def pending_project_importation_request?
+    return false unless admin_logged_in? || programme_administrator_logged_in?
+
+    ProjectImportationMessageLog.pending_requests.detect do |log|
+      log.can_respond_project_importation_request?(User.current_user)
     end.present?
   end
 

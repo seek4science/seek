@@ -60,6 +60,46 @@ class SampleType < ApplicationRecord
 
   has_annotation_type :sample_type_tag, method_name: :tags
 
+  # Creates sample attributes from an ISA template.
+  # @param template [Template] The ISA template to create sample attributes from.
+  # @param linked_sample_type [SampleType, nil] The linked sample type, if any.
+  def create_sample_attributes_from_isa_template(template, linked_sample_type = nil)
+    self.sample_attributes = template.template_attributes.map do |temp_attr|
+      has_seek_samples = temp_attr.sample_attribute_type.seek_sample? || temp_attr.sample_attribute_type.seek_sample_multi?
+      has_linked_st = linked_sample_type && has_seek_samples
+
+      SampleAttribute.new(
+        title: temp_attr.title,
+        description: temp_attr.description,
+        sample_attribute_type_id: temp_attr.sample_attribute_type_id,
+        required: temp_attr.required,
+        unit_id: temp_attr.unit_id,
+        is_title: temp_attr.is_title,
+        sample_controlled_vocab_id: temp_attr.sample_controlled_vocab_id,
+        linked_sample_type_id: has_linked_st ? linked_sample_type&.id : nil,
+        isa_tag_id: temp_attr.isa_tag_id,
+        allow_cv_free_text: temp_attr.allow_cv_free_text,
+        template_attribute_id: temp_attr.id
+      )
+    end
+  end
+
+  def level
+    isa_template&.level
+  end
+
+  def previous_linked_sample_type
+    sample_attributes.detect(&:input_attribute?)&.linked_sample_type
+  end
+
+  def next_linked_sample_types
+    linked_sample_attributes.select(&:input_attribute?).map(&:sample_type).compact
+  end
+
+  def is_isa_json_compliant?
+    studies.any? || assays.any?
+  end
+
   def validate_value?(attribute_name, value)
     attribute = sample_attributes.detect { |attr| attr.title == attribute_name }
     raise UnknownAttributeException, "Unknown attribute #{attribute_name}" unless attribute
@@ -112,19 +152,31 @@ class SampleType < ApplicationRecord
   def can_edit?(user = User.current_user)
     return false if user.nil? || user.person.nil? || !Seek::Config.samples_enabled
     return true if user.is_admin?
-    contributor == user.person || projects.detect { |project| project.can_manage?(user) }.present?
+
+    # Make the ISA JSON compliant sample types editable when a user is a project member instead of a project admin
+    if is_isa_json_compliant?
+      contributor == user.person || projects.detect { |project| project.has_member? user.person }.present?
+    else
+      contributor == user.person || projects.detect { |project| project.can_manage?(user) }.present?
+    end
   end
 
   def can_delete?(user = User.current_user)
-    can_edit?(user) && samples.empty? &&
-      linked_sample_attributes.detect do |attr|
-        attr.sample_type &&
-          attr.sample_type != self
-      end.nil?
+    # Users should be able to delete an ISA JSON compliant sample type that has linked sample attributes,
+    # as long as it's ISA JSON compliant.
+    if is_isa_json_compliant?
+      can_edit?(user) && samples.empty?
+    else
+      can_edit?(user) && samples.empty? &&
+        linked_sample_attributes.detect do |attr|
+          attr.sample_type &&
+            attr.sample_type != self
+        end.nil?
+    end
   end
 
   def can_view?(user = User.current_user, referring_sample = nil, view_in_single_page = false)
-    return false if Seek::Config.project_single_page_advanced_enabled && template_id.present? && !view_in_single_page
+    return false if Seek::Config.isa_json_compliance_enabled && template_id.present? && !view_in_single_page
 
     project_membership = user&.person && (user.person.projects & projects).any?
     is_creator = creators.include?(user&.person)

@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "1",
+    "id": "883654311",
     "type": "data_files",
     "attributes": {
       "policy": {
@@ -8,7 +8,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "2",
+              "id": "1022251011",
               "type": "projects"
             },
             "access": "edit"
@@ -31,14 +31,14 @@
         {
           "version": 1,
           "revision_comments": null,
-          "url": "http://localhost:3000/data_files/1?version=1",
+          "url": "http://localhost:3000/data_files/883654311?version=1",
           "doi": null
         }
       ],
       "version": 1,
       "revision_comments": null,
-      "created_at": "2023-03-07T10:50:32.823Z",
-      "updated_at": "2023-03-07T10:50:33.024Z",
+      "created_at": "2024-06-20T12:35:31.000Z",
+      "updated_at": "2024-06-20T12:35:31.000Z",
       "doi": null,
       "content_blobs": [
         {
@@ -47,16 +47,16 @@
           "md5sum": "565ae8a7a743c3bfd9f15c69647f5b8b",
           "sha1sum": "b9d2148740050b7f37975edd0fb97faa508ff767",
           "content_type": "application/pdf",
-          "link": "http://localhost:3000/data_files/1/content_blobs/1",
+          "link": "http://localhost:3000/data_files/883654311/content_blobs/1050452689",
           "size": 8827
         }
       ],
       "creators": [
         {
-          "profile": "/people/3",
+          "profile": "/people/1039986955",
           "family_name": "Last",
-          "given_name": "Person185",
-          "affiliation": "An Institution: 218",
+          "given_name": "Person2117",
+          "affiliation": "An Institution: 2596",
           "orcid": null
         }
       ],
@@ -78,7 +78,7 @@
       "creators": {
         "data": [
           {
-            "id": "3",
+            "id": "1039986955",
             "type": "people"
           }
         ]
@@ -86,7 +86,7 @@
       "submitter": {
         "data": [
           {
-            "id": "2",
+            "id": "1039986954",
             "type": "people"
           }
         ]
@@ -94,11 +94,11 @@
       "people": {
         "data": [
           {
-            "id": "2",
+            "id": "1039986954",
             "type": "people"
           },
           {
-            "id": "3",
+            "id": "1039986955",
             "type": "people"
           }
         ]
@@ -106,7 +106,7 @@
       "projects": {
         "data": [
           {
-            "id": "2",
+            "id": "1022251011",
             "type": "projects"
           }
         ]
@@ -114,7 +114,7 @@
       "investigations": {
         "data": [
           {
-            "id": "1",
+            "id": "973654842",
             "type": "investigations"
           }
         ]
@@ -122,7 +122,7 @@
       "studies": {
         "data": [
           {
-            "id": "1",
+            "id": "1060384900",
             "type": "studies"
           }
         ]
@@ -130,7 +130,7 @@
       "assays": {
         "data": [
           {
-            "id": "1",
+            "id": "1035386688",
             "type": "assays"
           }
         ]
@@ -138,7 +138,7 @@
       "publications": {
         "data": [
           {
-            "id": "1",
+            "id": "191",
             "type": "publications"
           }
         ]
@@ -146,7 +146,7 @@
       "events": {
         "data": [
           {
-            "id": "1",
+            "id": "1025618717",
             "type": "events"
           }
         ]
@@ -154,7 +154,7 @@
       "workflows": {
         "data": [
           {
-            "id": "1",
+            "id": "133",
             "type": "workflows"
           }
         ]
@@ -167,14 +167,14 @@
       }
     },
     "links": {
-      "self": "/data_files/1?version=1"
+      "self": "/data_files/883654311?version=1"
     },
     "meta": {
-      "created": "2023-03-07T10:50:32.812Z",
-      "modified": "2023-03-07T10:50:33.002Z",
+      "created": "2024-06-20T12:35:31.000Z",
+      "modified": "2024-06-20T12:35:31.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "cebc2810-9f03-013b-15cf-0a81884ed284"
+      "uuid": "819648d0-112f-013d-1f9d-0a81884ed284"
     }
   },
   "jsonapi": {

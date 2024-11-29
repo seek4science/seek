@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "2",
+    "id": "883654305",
     "type": "data_files",
     "attributes": {
       "policy": {
@@ -8,7 +8,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "2",
+              "id": "1022250976",
               "type": "projects"
             },
             "access": "edit"
@@ -30,14 +30,14 @@
         {
           "version": 1,
           "revision_comments": null,
-          "url": "http://localhost:3000/data_files/2?version=1",
+          "url": "http://localhost:3000/data_files/883654305?version=1",
           "doi": null
         }
       ],
       "version": 1,
       "revision_comments": null,
-      "created_at": "2023-03-07T10:50:29.057Z",
-      "updated_at": "2023-03-07T10:50:29.057Z",
+      "created_at": "2024-06-20T12:35:26.000Z",
+      "updated_at": "2024-06-20T12:35:26.000Z",
       "doi": null,
       "content_blobs": [
         {
@@ -46,16 +46,16 @@
           "md5sum": null,
           "sha1sum": null,
           "content_type": "application/pdf",
-          "link": "http://localhost:3000/data_files/2/content_blobs/3",
+          "link": "http://localhost:3000/data_files/883654305/content_blobs/1050452679",
           "size": null
         }
       ],
       "creators": [
         {
-          "profile": "/people/3",
+          "profile": "/people/1039986916",
           "family_name": "Last",
-          "given_name": "Person151",
-          "affiliation": "An Institution: 179",
+          "given_name": "Person2083",
+          "affiliation": "An Institution: 2557",
           "orcid": null
         }
       ],
@@ -77,7 +77,7 @@
       "creators": {
         "data": [
           {
-            "id": "3",
+            "id": "1039986916",
             "type": "people"
           }
         ]
@@ -85,7 +85,7 @@
       "submitter": {
         "data": [
           {
-            "id": "2",
+            "id": "1039986915",
             "type": "people"
           }
         ]
@@ -93,11 +93,11 @@
       "people": {
         "data": [
           {
-            "id": "2",
+            "id": "1039986915",
             "type": "people"
           },
           {
-            "id": "3",
+            "id": "1039986916",
             "type": "people"
           }
         ]
@@ -105,7 +105,7 @@
       "projects": {
         "data": [
           {
-            "id": "2",
+            "id": "1022250976",
             "type": "projects"
           }
         ]
@@ -113,7 +113,7 @@
       "investigations": {
         "data": [
           {
-            "id": "1",
+            "id": "973654837",
             "type": "investigations"
           }
         ]
@@ -121,7 +121,7 @@
       "studies": {
         "data": [
           {
-            "id": "1",
+            "id": "1060384895",
             "type": "studies"
           }
         ]
@@ -129,7 +129,7 @@
       "assays": {
         "data": [
           {
-            "id": "1",
+            "id": "1035386683",
             "type": "assays"
           }
         ]
@@ -137,7 +137,7 @@
       "publications": {
         "data": [
           {
-            "id": "1",
+            "id": "186",
             "type": "publications"
           }
         ]
@@ -145,7 +145,7 @@
       "events": {
         "data": [
           {
-            "id": "1",
+            "id": "1025618712",
             "type": "events"
           }
         ]
@@ -153,7 +153,7 @@
       "workflows": {
         "data": [
           {
-            "id": "1",
+            "id": "128",
             "type": "workflows"
           }
         ]
@@ -166,14 +166,14 @@
       }
     },
     "links": {
-      "self": "/data_files/2?version=1"
+      "self": "/data_files/883654305?version=1"
     },
     "meta": {
-      "created": "2023-03-07T10:50:29.027Z",
-      "modified": "2023-03-07T10:50:29.057Z",
+      "created": "2024-06-20T12:35:26.000Z",
+      "modified": "2024-06-20T12:35:26.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "cc778f60-9f03-013b-15cf-0a81884ed284"
+      "uuid": "7ed41350-112f-013d-1f9d-0a81884ed284"
     }
   },
   "jsonapi": {

@@ -16,7 +16,7 @@ SEEK::Application.routes.draw do
         get 'tools' => 'tools#index'
         get 'tools/:id' => 'tools#show'
         get 'tools/:id/versions' => 'tool_versions#index'
-        get 'tools/:id/versions/:version_id' => 'tool_versions#show'
+        get 'tools/:id/versions/:version_id' => 'tool_versions#show', as: :tool_version
         get 'tools/:id/versions/:version_id/containerfile' => 'tool_versions#containerfile'
         get 'tools/:id/versions/:version_id/:type/descriptor(/*relative_path)' => 'tool_versions#descriptor', constraints: { relative_path: /.+/ }, format: false, as: :tool_versions_descriptor
         get 'tools/:id/versions/:version_id/:type/files' => 'tool_versions#files', format: false
@@ -203,9 +203,13 @@ SEEK::Application.routes.draw do
   get 'index.html' => 'homes#index'
   get 'index' => 'homes#index'
 
-  resources :custom_metadata_types do
+  resources :extended_metadata_types do
     collection do
       get :form_fields
+      get :administer
+    end
+    member do
+      put :administer_update
     end
   end
 
@@ -318,12 +322,17 @@ SEEK::Application.routes.draw do
       get :request_institutions
       get :guided_join
       get :guided_create
+      get :guided_import
       post :request_join
       post :request_create
+      post :request_import
       get :administer_create_project_request
+      get :administer_import_project_request
       post :respond_create_project_request
+      post :respond_import_project_request
       get :project_join_requests
       get :project_creation_requests
+      get :project_importation_requests
       get  :typeahead
     end
     member do
@@ -340,6 +349,7 @@ SEEK::Application.routes.draw do
       get :administer_join_request
       post :respond_join_request
       get :guided_join
+      post :update_annotations_ajax
     end
     resources :programmes, :people, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows, :data_files, :presentations,
               :publications, :events, :sample_types, :samples, :specimens, :strains, :search, :organisms, :human_diseases, :documents, :file_templates, :placeholders, :collections, :templates, only: [:index]
@@ -405,6 +415,7 @@ SEEK::Application.routes.draw do
     resources :people, :programmes, :projects, :assays, :studies, :models, :sops, :workflows, :data_files, :publications, :documents, only: [:index]
     member do
       get :export_isatab_json
+      get :export_isa, action: :export_isa
       get :manage
       get :order_studies
       patch :manage_update
@@ -486,11 +497,12 @@ SEEK::Application.routes.draw do
       get :destroy_samples_confirm
       post :retrieve_nels_sample_metadata
       get :retrieve_nels_sample_metadata
+      get :has_matching_sample_type
     end
     resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :collections, :workflows, :file_templates, :placeholders, only: [:index]
   end
 
-  resources :presentations, concerns: [:has_content_blobs, :publishable, :has_versions, :asset] do
+  resources :presentations, concerns: [:has_content_blobs, :publishable, :has_versions, :asset, :explorable_spreadsheet] do
     resources :people, :programmes, :projects, :publications, :events, :collections, :workflows, :investigations, :studies, :assays, only: [:index]
   end
 
@@ -699,7 +711,7 @@ SEEK::Application.routes.draw do
   resources :sample_controlled_vocabs do
     collection do
       get :typeahead
-      get :fetch_ols_terms
+      get :fetch_ols_terms_html
     end
   end
 
@@ -737,6 +749,7 @@ SEEK::Application.routes.draw do
       post :template_attributes
     end
     collection do
+      post :filter_isa_tags_by_level
       get :task_status
       get :default_templates
       post :populate_template
@@ -749,7 +762,7 @@ SEEK::Application.routes.draw do
   resources :single_pages do
     member do
       get :dynamic_table_data
-      get :export_isa, action: :export_isa
+      post :update_annotations_ajax
     end
     collection do
       get :batch_sharing_permission_preview
@@ -757,6 +770,7 @@ SEEK::Application.routes.draw do
       post :batch_sharing_permission_changed
       post :export_to_excel, action: :export_to_excel
       get :download_samples_excel, action: :download_samples_excel
+      post :upload_samples, action: :upload_samples
     end
   end
 
@@ -810,7 +824,7 @@ SEEK::Application.routes.draw do
   # Omniauth
   post '/auth/:provider' => 'sessions#create', as: :omniauth_authorize # For security, ONLY POST should be enabled on this route.
   match '/auth/:provider/callback' => 'sessions#create', as: :omniauth_callback, via: [:get, :post] # Callback routes need both GET and POST enabled.
-  match '/identities/auth/:provider/callback' => 'sessions#create', via: [:get, :post] # Needed for legacy support..
+  match '/identities/auth/:provider/callback' => 'sessions#create', as: :legacy_omniauth_callback, via: [:get, :post] # Needed for legacy support..
   get '/auth/failure' => 'sessions#omniauth_failure', as: :omniauth_failure
 
   get '/activate(/:activation_code)' => 'users#activate', as: :activate

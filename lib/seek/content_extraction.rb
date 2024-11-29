@@ -69,7 +69,6 @@ module Seek
         Docsplit.extract_text(pdf_filepath, output: converted_storage_directory) unless File.exist?(txt_filepath)
         File.read(txt_filepath)
       rescue Docsplit::ExtractionFailed => e
-        extract_text_from_pdf if double_check_mime_type
         Rails.logger.error("Problem with extracting text from pdf #{id} #{e}")
         ''
       end
@@ -78,11 +77,7 @@ module Seek
 
     def to_csv(sheet = 1, trim = false)
       return '' unless is_excel?
-      begin
-        spreadsheet_to_csv(filepath, sheet, trim, Seek::Config.jvm_memory_allocation)
-      rescue SysMODB::SpreadsheetExtractionException
-        to_csv(sheet, trim) if double_check_mime_type
-      end
+      spreadsheet_to_csv(filepath, sheet, trim, Seek::Config.jvm_memory_allocation)
     end
 
     def extract_csv()
@@ -90,33 +85,10 @@ module Seek
     end
 
     def to_spreadsheet_xml
-      begin
-        spreadsheet_to_xml(filepath, Seek::Config.jvm_memory_allocation)
-      rescue SysMODB::SpreadsheetExtractionException=>e
-        if double_check_mime_type
-          to_spreadsheet_xml
-        else
-          raise e
-        end
-      end
+      spreadsheet_to_xml(filepath, Seek::Config.jvm_memory_allocation)
     end
 
     private
-
-    # checks the type using mime magic, and updates if found to be different. This is to help cases where extraction
-    # fails due to the mime type being incorrectly set
-    #
-    # @return boolean - the mime type was changed
-    def double_check_mime_type
-      suggested_type = mime_magic_content_type
-      if suggested_type && suggested_type != content_type
-        update_column(:content_type, suggested_type)
-        true
-      else
-        false
-      end
-    end
-
 
     # filters special characters, keeping alphanumeric characters, hyphen ('-'), underscore('_') and newlines
     def filter_text_content(content)

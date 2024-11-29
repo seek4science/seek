@@ -13,8 +13,7 @@ end
 
 workbook = xlsx_package.workbook
 # Prevents formula injections
-# TODO: Find out why this doesn't work
-# Axlsx.escape_formulas = true
+Axlsx.escape_formulas = true
 
 # Get Sample data
 sample_data = @samples.map do |sample|
@@ -41,12 +40,6 @@ workbook.add_worksheet(name: 'Metadata') do |sheet|
   sheet.add_row ['Fairdom ID:', @study.id]
   sheet.add_row ['UUID:', @study.uuid]
 
-  if @assay
-    sheet.add_row ['Assay:'], style: title_style
-    sheet.add_row ['Fairdom ID:', @assay.id]
-    sheet.add_row ['UUID:', @assay.uuid]
-  end
-
   sheet.add_row ['Sample Type:'], style: title_style
   sheet.add_row ['Fairdom ID:', @sample_type.id]
   sheet.add_row ['UUID:', @sample_type.uuid]
@@ -54,6 +47,12 @@ workbook.add_worksheet(name: 'Metadata') do |sheet|
   sheet.add_row ['Template:'], style: title_style
   sheet.add_row ['Fairdom ID:', @template.id]
   sheet.add_row ['UUID:', @template.uuid]
+
+  if @assay
+    sheet.add_row ['Assay:'], style: title_style
+    sheet.add_row ['Fairdom ID:', @assay.id]
+    sheet.add_row ['UUID:', @assay.uuid]
+  end
 
   sheet.sheet_protection.password = secret_pwd
 end
@@ -76,10 +75,10 @@ end
 workbook.add_worksheet name: 'cv_ontology', state: :hidden do |sheet|
   rows = []
   @sa_cv_terms.map do |cv|
-    row = [cv['name']]
+    row = [cv[:name]]
 
-    if cv['has_cv']
-      cv['data']&.map do |val|
+    if cv[:has_cv]
+      cv[:data]&.map do |val|
         row.push val
       end
     end
@@ -96,19 +95,21 @@ end
 workbook.add_worksheet(name: 'Samples') do |sheet|
   ## Adding the header cells
   header_row = @sa_cv_terms.map do |sa_cv_term|
-    sa_cv_term['required'] ? "#{sa_cv_term['name']} *" : sa_cv_term['name']
+    sa_cv_term[:required] ? "#{sa_cv_term[:name]} *" : sa_cv_term[:name]
   end
   sheet.add_row header_row
 
   ## populating the sheet with the data
-  sample_data.each do |item|
-    row = item.collect { |_key, val| val }
-    sheet.add_row row, style: unlocked
+  unless sample_data.none?
+    sample_data.each do |item|
+      row = item.collect { |_key, val| val }
+      sheet.add_row row, style: unlocked
+    end
   end
 
   ## Adding extra empty rows so new samples can be added to the table
   1000.times do
-    sheet.add_row Array::new(sample_data[0].keys.length), style: unlocked
+    sheet.add_row Array::new(header_row.size), style: unlocked
   end
 
   ## styling
@@ -124,24 +125,30 @@ workbook.add_worksheet(name: 'Samples') do |sheet|
   (0..attribute_size).map do |col_nr|
 
     # If the has_cv field is false, it should skip this iteration and not apply the data validation
-    next if @sa_cv_terms[col_nr]['has_cv'] == false
+    next unless @sa_cv_terms[col_nr][:has_cv]
 
     # Get sa_cv_terms_length
-    sa_cv_terms_size = @sa_cv_terms[col_nr]['data'].size
+    sa_cv_terms_size = @sa_cv_terms[col_nr][:data].size
 
-    prompt_text = "Choose a valid option. #{(@sa_cv_terms[col_nr]['required'] ? 'This value is REQUIRED!' : 'This value is optional.')}"
+    if @sa_cv_terms[col_nr][:is_cv_list]
+      terms = @sa_cv_terms[col_nr][:data]
+      prompt_text = "Any combination of these terms between are accepted: #{terms.join(', ')}. E.g. [''#{terms.first}'', ''#{terms.last}''].\n\r#{(@sa_cv_terms[col_nr][:required] ? 'This field is REQUIRED!' : 'This field is optional.')}"
+    else
+      prompt_text = "Choose a valid option. #{(@sa_cv_terms[col_nr][:required] ? 'This field is REQUIRED!' : 'This field is optional.')}"
+    end
 
     col_ref = Axlsx.cell_r(col_nr, 1).gsub(/\d+/, '')
     dv_range = "#{col_ref}2:#{col_ref}1000000"
     sheet.add_data_validation(dv_range,
                               type: :list,
                               formula1: "'cv_ontology'!$#{col_ref}$2:$#{col_ref}$#{sa_cv_terms_size + 1}",
-                              showErrorMessage: !@sa_cv_terms[col_nr]['allows_custom_input'],
+                              hideDropDown: @sa_cv_terms[col_nr][:is_cv_list], # CV lists should not have dropdown
+                              showErrorMessage: !@sa_cv_terms[col_nr][:allows_custom_input] && !@sa_cv_terms[col_nr][:is_cv_list], # CV Lists must have free text input
                               errorTitle: 'Input Error!',
                               error: 'Please select one of the available options',
                               errorStyle: :stop, # options here are: 'information', 'stop', 'warning'
                               showInputMessage: true,
-                              promptTitle: @sa_cv_terms[col_nr]['name'],
+                              promptTitle: @sa_cv_terms[col_nr][:name],
                               prompt: prompt_text)
   end
 
@@ -155,6 +162,3 @@ workbook.add_worksheet(name: 'Samples') do |sheet|
   sheet.sheet_protection.delete_rows = false
   sheet.sheet_protection.sort = false
 end
-
-# TODO: Extra 'very hidden' sheet with identification attributes
-# This is necessary to ensure that the user uploads the same spreadsheet back to the UI and not a altered copy.

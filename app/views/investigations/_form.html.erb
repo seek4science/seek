@@ -12,7 +12,27 @@
   <%= f.text_area :description, :rows => 5, :class=>"form-control rich-text-edit" -%>
 </div>
 
-<%= render partial: 'custom_metadata/custom_metadata_type_selection', locals:{f:f, resource:@investigation} %>
+<%= render partial: 'extended_metadata/extended_metadata_type_selection', locals:{f:f, resource:@investigation} %>
+
+<div class="<%= "hidden" if !Seek::Config.isa_json_compliance_enabled %>">
+  <%#= panel("Compliance with ISA-JSON schemas") do %>
+  <%= folding_panel("Compliance with ISA-JSON schemas", false, id: "set_ISA_JSON_compliance",
+                    help_text: "Here you can choose to adhere to ISA-JSON schemas to enable ISA-JSON export.") do %>
+    <div class="help-block">
+      You can choose to make your <%= t('investigation') %> compliant with ISA-JSON schemas to enable ISA-JSON export. If checked, all associated ISA elements such as <%= t('study').pluralize %> and <%= t('assay').pluralize %> will also be ISA-JSON compliant. <br>
+      The checkbox cannot be toggled once child ISA elements such as <%= t('study').pluralize %> and <%= t('assay').pluralize %> have been associated.
+    </div>
+    <label>
+      <% if @investigation.studies.any? %>
+        <%= f.check_box :is_isa_json_compliant, disabled: "disabled"%>
+      <% else %>
+        <%= f.check_box :is_isa_json_compliant%>
+      <% end %>
+      <%= "Make #{t('investigation')} compliant to ISA-JSON schemas?" %>
+    </label>
+  <% end %>
+</div>
+
 <div class="<%= "hidden" if displaying_single_page? %>">
   <%= render :partial => 'projects/project_selector', :locals => {:resource => @investigation,:allow_nil=>false} if show_form_manage_specific_attributes? -%>
 </div>
@@ -22,7 +42,7 @@
   <%= f.number_field :position, :rows => 5, :class=>"form-control"  -%>
 </div>
 
-<%= render partial: 'custom_metadata/custom_metadata_attribute_input', locals:{f:f,resource:@investigation} %>
+<%= render partial: 'extended_metadata/extended_metadata_attribute_input', locals:{f:f,resource:@investigation} %>
 
 <% if displaying_single_page?%>
   <input name="single_page" type="hidden" value=<%=params[:single_page]%> />
@@ -38,16 +58,16 @@
 
 <%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @investigation} -%>
 
-<!-- custom metadata experiment end -->
+<!-- extended metadata experiment end -->
 
 <%= form_submit_buttons(@investigation) %>
 
 <script>
-    $j(document).ready(function () {   
-        const urlSearchParams = new URLSearchParams(window.location.search);
-        const params = Object.fromEntries(urlSearchParams.entries());
-        const project_id = params["investigation[project_id]"]
-        if(project_id)
-          $j("#projects-selector-select").val(project_id).change();
-    }); 
+  $j(document).ready(function () {
+    const urlSearchParams = new URLSearchParams(window.location.search);
+    const params = Object.fromEntries(urlSearchParams.entries());
+    const project_id = params["investigation[project_id]"]
+    if(project_id)
+      $j("#projects-selector-select").val(project_id).change();
+  });
 </script>

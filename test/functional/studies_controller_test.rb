@@ -688,8 +688,8 @@ class StudiesControllerTest < ActionController::TestCase
 
   end
 
-  test 'create and update a study with custom metadata' do
-    cmt = FactoryBot.create(:simple_study_custom_metadata_type)
+  test 'create and update a study with extended metadata' do
+    cmt = FactoryBot.create(:simple_study_extended_metadata_type)
 
     login_as(FactoryBot.create(:person))
 
@@ -697,7 +697,7 @@ class StudiesControllerTest < ActionController::TestCase
     assert_difference('Study.count') do
       investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
       study_attributes = { title: 'test', investigation_id: investigation.id }
-      cm_attributes = {custom_metadata_attributes:{ custom_metadata_type_id: cmt.id,
+      cm_attributes = {extended_metadata_attributes:{ extended_metadata_type_id: cmt.id,
                                                    data:{
                                                    "name":'fred',
                                                    "age":22}}}
@@ -706,18 +706,18 @@ class StudiesControllerTest < ActionController::TestCase
     end
 
     assert study=assigns(:study)
-    assert cm = study.custom_metadata
-    assert_equal cmt, cm.custom_metadata_type
+    assert cm = study.extended_metadata
+    assert_equal cmt, cm.extended_metadata_type
     assert_equal 'fred',cm.get_attribute_value('name')
-    assert_equal '22',cm.get_attribute_value('age')
+    assert_equal 22,cm.get_attribute_value('age')
     assert_nil cm.get_attribute_value('date')
 
     # test update
     old_id = cm.id
     assert_no_difference('Study.count') do
-      assert_no_difference('CustomMetadata.count') do
+      assert_no_difference('ExtendedMetadata.count') do
         put :update, params: { id: study.id, study: { title: "new title",
-          custom_metadata_attributes: { custom_metadata_type_id: cmt.id, id: cm.id,
+          extended_metadata_attributes: { extended_metadata_type_id: cmt.id, id: cm.id,
                                         data: {
                                           "name": 'max',
                                           "age": 20 } }
@@ -728,13 +728,62 @@ class StudiesControllerTest < ActionController::TestCase
 
     assert new_study = assigns(:study)
     assert_equal 'new title', new_study.title
-    assert_equal 'max', new_study.custom_metadata.get_attribute_value('name')
-    assert_equal '20', new_study.custom_metadata.get_attribute_value('age')
-    assert_equal old_id, new_study.custom_metadata.id
+    assert_equal 'max', new_study.extended_metadata.get_attribute_value('name')
+    assert_equal 20, new_study.extended_metadata.get_attribute_value('age')
+    assert_equal old_id, new_study.extended_metadata.id
   end
 
-  test 'create a study with custom metadata validated' do
-    cmt = FactoryBot.create(:simple_study_custom_metadata_type)
+  test 'create a study with disabled extended metadata should fail' do
+    cmt = FactoryBot.create(:simple_study_extended_metadata_type, enabled: false)
+
+    login_as(FactoryBot.create(:person))
+
+    assert_no_difference('Study.count') do
+      assert_no_difference('ExtendedMetadata.count') do
+        investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+        study_attributes = { title: 'test', investigation_id: investigation.id }
+        cm_attributes = {extended_metadata_attributes:{ extended_metadata_type_id: cmt.id,
+                                                        data:{
+                                                          "name":'fred',
+                                                          "age":22}}}
+
+        post :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
+      end
+    end
+    assert study=assigns(:study)
+    refute study.valid?
+  end
+
+  test 'update a study with disabled extended metadata should succeed' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    emt = FactoryBot.create(:simple_study_extended_metadata_type)
+    study = FactoryBot.create(:study, extended_metadata: ExtendedMetadata.new(extended_metadata_type: emt, data: { name: 'John', age: 12 }), contributor: person)
+    study.save!
+    study.extended_metadata.extended_metadata_type.update_column(:enabled, false)
+    refute study.extended_metadata.enabled?
+
+    assert_no_difference('Study.count') do
+      assert_no_difference('ExtendedMetadata.count') do
+        put :update, params: { id: study.id, study: { title: "new title",
+                                                      extended_metadata_attributes: { extended_metadata_type_id: emt.id,
+                                                                                      id: study.extended_metadata.id,
+                                                                                      data: {
+                                                                                        "name": 'max',
+                                                                                        "age": 20 } }
+        }
+        }
+      end
+    end
+    assert study = assigns(:study)
+    assert study.valid?
+    assert_equal 'new title', study.title
+    assert_equal 'max', study.extended_metadata.get_attribute_value('name')
+    assert_equal 20, study.extended_metadata.get_attribute_value('age')
+  end
+
+  test 'create a study with extended metadata validated' do
+    cmt = FactoryBot.create(:simple_study_extended_metadata_type)
 
     login_as(FactoryBot.create(:person))
 
@@ -742,9 +791,9 @@ class StudiesControllerTest < ActionController::TestCase
     assert_no_difference('Study.count') do
       investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
       study_attributes = { title: 'test', investigation_id: investigation.id }
-      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id, data:{'name':'fred','age':'not a number'}}}
+      cm_attributes = {extended_metadata_attributes:{extended_metadata_type_id: cmt.id, data:{'name':'fred','age':'not a number'}}}
 
-      put :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
+      post :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
     end
 
     assert study=assigns(:study)
@@ -754,7 +803,7 @@ class StudiesControllerTest < ActionController::TestCase
     assert_no_difference('Study.count') do
       investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
       study_attributes = { title: 'test', investigation_id: investigation.id }
-      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id, data:{'name':nil,'age':22}}}
+      cm_attributes = {extended_metadata_attributes:{extended_metadata_type_id: cmt.id, data:{'name':nil,'age':22}}}
 
       put :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
     end
@@ -763,15 +812,34 @@ class StudiesControllerTest < ActionController::TestCase
     refute study.valid?
   end
 
-  test 'create a study with custom metadata with spaces in attribute names' do
-    cmt = FactoryBot.create(:study_custom_metadata_type_with_spaces)
+  test 'should not show extended metadata if disabled' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    emt = FactoryBot.create(:simple_study_extended_metadata_type)
+    study = FactoryBot.create(:study, extended_metadata: ExtendedMetadata.new(extended_metadata_type: emt, data: { name: 'Fred', age: 25 }), contributor: person)
+
+    #first check it's shown
+    get :show, params: {id: study}
+    assert_response :success
+    assert_select 'div#extended-metadata.panel', count: 1
+
+    emt.update_column(:enabled, false)
+    get :show, params: {id: study}
+    assert_response :success
+    assert_select 'div#extended-metadata.panel', count: 0
+
+
+  end
+
+  test 'create a study with extended metadata with spaces in attribute names' do
+    cmt = FactoryBot.create(:study_extended_metadata_type_with_spaces)
 
     login_as(FactoryBot.create(:person))
 
     assert_difference('Study.count') do
       investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
       study_attributes = { title: 'test', investigation_id: investigation.id }
-      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id,
+      cm_attributes = {extended_metadata_attributes:{extended_metadata_type_id: cmt.id,
                                                    data:{
                                                    "full name":'Paul Jones',
                                                    "full address":'London, UK'}}}
@@ -782,22 +850,22 @@ class StudiesControllerTest < ActionController::TestCase
     assert study=assigns(:study)
 
     assert study.valid?
-    assert cm = study.custom_metadata
+    assert cm = study.extended_metadata
 
-    assert_equal cmt, cm.custom_metadata_type
+    assert_equal cmt, cm.extended_metadata_type
     assert_equal 'Paul Jones',cm.get_attribute_value('full name')
     assert_equal 'London, UK',cm.get_attribute_value('full address')
   end
 
-  test 'create a study with custom metadata with clashing attribute names' do
-    cmt = FactoryBot.create(:study_custom_metadata_type_with_clashes)
+  test 'create a study with extended metadata with clashing attribute names' do
+    cmt = FactoryBot.create(:study_extended_metadata_type_with_clashes)
 
     login_as(FactoryBot.create(:person))
 
     assert_difference('Study.count') do
       investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
       study_attributes = { title: 'test', investigation_id: investigation.id }
-      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id,
+      cm_attributes = {extended_metadata_attributes:{extended_metadata_type_id: cmt.id,
                                                    data:{
                                                    "full name":'full name',
                                                    "Full name":'Full name',
@@ -809,23 +877,23 @@ class StudiesControllerTest < ActionController::TestCase
     assert study=assigns(:study)
 
     assert study.valid?
-    assert cm = study.custom_metadata
+    assert cm = study.extended_metadata
 
-    assert_equal cmt, cm.custom_metadata_type
+    assert_equal cmt, cm.extended_metadata_type
     assert_equal 'full name',cm.get_attribute_value('full name')
     assert_equal 'Full name',cm.get_attribute_value('Full name')
     assert_equal 'full  name',cm.get_attribute_value('full  name')
   end
 
-  test 'create a study with custom metadata with attribute names with symbols' do
-    cmt = FactoryBot.create(:study_custom_metadata_type_with_symbols)
+  test 'create a study with extended metadata with attribute names with symbols' do
+    cmt = FactoryBot.create(:study_extended_metadata_type_with_symbols)
 
     login_as(FactoryBot.create(:person))
 
     assert_difference('Study.count') do
       investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
       study_attributes = { title: 'test', investigation_id: investigation.id }
-      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id,
+      cm_attributes = {extended_metadata_attributes:{extended_metadata_type_id: cmt.id,
                                         data:{
                                             "+name":'+name',
                                             "-name":'-name',
@@ -839,23 +907,23 @@ class StudiesControllerTest < ActionController::TestCase
     assert study=assigns(:study)
 
     assert study.valid?
-    assert cm = study.custom_metadata
+    assert cm = study.extended_metadata
 
-    assert_equal cmt, cm.custom_metadata_type
+    assert_equal cmt, cm.extended_metadata_type
     assert_equal '+name',cm.get_attribute_value('+name')
     assert_equal '-name',cm.get_attribute_value('-name')
     assert_equal '&name',cm.get_attribute_value('&name')
     assert_equal 'name(name)',cm.get_attribute_value('name(name)')
   end
 
-  test 'create a study with custom metadata cv type' do
-    cmt = FactoryBot.create(:study_custom_metadata_type_with_cv_and_cv_list_type)
+  test 'create a study with extended metadata cv type' do
+    cmt = FactoryBot.create(:study_extended_metadata_type_with_cv_and_cv_list_type)
     login_as(FactoryBot.create(:person))
 
     assert_difference('Study.count') do
       investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
       study_attributes = { title: 'test', investigation_id: investigation.id }
-      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id,
+      cm_attributes = {extended_metadata_attributes:{extended_metadata_type_id: cmt.id,
                                                    data:{
                                                      "apple name":"Newton's Apple",
                                                      "apple list":['Granny Smith','Bramley'],
@@ -866,9 +934,9 @@ class StudiesControllerTest < ActionController::TestCase
 
     assert study=assigns(:study)
 
-    assert cm = study.custom_metadata
+    assert cm = study.extended_metadata
 
-    assert_equal cmt, cm.custom_metadata_type
+    assert_equal cmt, cm.extended_metadata_type
     assert_equal "Newton's Apple",cm.get_attribute_value('apple name')
     assert_equal 'Granny Smith',cm.get_attribute_value('apple controlled vocab')
     assert_equal ['Granny Smith','Bramley'],cm.get_attribute_value('apple list')
@@ -876,21 +944,21 @@ class StudiesControllerTest < ActionController::TestCase
     get :show, params: { id: study }
     assert_response :success
 
-    assert_select 'div.custom_metadata',text:/Granny Smith/, count:2
+    assert_select 'div.extended_metadata',text:/Granny Smith/, count:2
   end
 
-  test 'should create and update study with linked custom metadata type' do
+  test 'should create and update study with linked extended metadata type' do
 
-    cmt = FactoryBot.create(:role_custom_metadata_type)
+    cmt = FactoryBot.create(:role_extended_metadata_type)
     login_as(FactoryBot.create(:person))
 
     # test create
     assert_difference('Study.count') do
-      assert_difference('CustomMetadata.count') do
+      assert_difference('ExtendedMetadata.count') do
         investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
         study_attributes = { title: 'Alice in Wonderland', investigation_id: investigation.id }
-        cm_attributes = { custom_metadata_attributes: {
-          custom_metadata_type_id: cmt.id, data: {
+        cm_attributes = { extended_metadata_attributes: {
+          extended_metadata_type_id: cmt.id, data: {
             "role_email":"alice@email.com",
             "role_phone":"0012345",
             "role_name": {
@@ -906,8 +974,8 @@ class StudiesControllerTest < ActionController::TestCase
     end
 
     assert study = assigns(:study)
-    assert cm = study.custom_metadata
-    assert_equal cmt, cm.custom_metadata_type
+    assert cm = study.extended_metadata
+    assert_equal cmt, cm.extended_metadata_type
     assert_equal "alice@email.com", cm.data['role_email']
     assert_equal '0012345',cm.data['role_phone']
     assert_equal 'alice', cm.data['role_name']['first_name']
@@ -920,10 +988,10 @@ class StudiesControllerTest < ActionController::TestCase
 
     # test update
     assert_no_difference('Study.count') do
-      assert_no_difference('CustomMetadata.count') do
+      assert_no_difference('ExtendedMetadata.count') do
         put :update, params: { id: study.id, study: { title: "Alice Through the Looking Glass",
-                                                      custom_metadata_attributes: {
-                                                        custom_metadata_type_id: cmt.id, id:cm.id, data: {
+                                                      extended_metadata_attributes: {
+                                                        extended_metadata_type_id: cmt.id, id:cm.id, data: {
                                                           "role_email":"rabbit@email.com",
                                                           "role_name": {
                                                             "first_name":"rabbit"
@@ -937,20 +1005,20 @@ class StudiesControllerTest < ActionController::TestCase
 
     assert new_study = assigns(:study)
     assert_equal 'Alice Through the Looking Glass', new_study.title
-    assert_equal 'rabbit@email.com', new_study.custom_metadata.data['role_email']
-    assert_equal 'rabbit', new_study.custom_metadata.data['role_name']['first_name']
+    assert_equal 'rabbit@email.com', new_study.extended_metadata.data['role_email']
+    assert_equal 'rabbit', new_study.extended_metadata.data['role_name']['first_name']
   end
 
-  test 'should create and update study, whose custom metadata type contains attributes which link to the same custom metadata type' do
-    cmt = FactoryBot.create(:family_custom_metadata_type)
+  test 'should create and update study, whose extended metadata type contains attributes which link to the same extended metadata type' do
+    cmt = FactoryBot.create(:family_extended_metadata_type)
     login_as(FactoryBot.create(:person))
-    linked_cmts = cmt.attributes_with_linked_custom_metadata_type
+    linked_cmts = cmt.attributes_with_linked_extended_metadata_type
     assert_difference('Study.count') do
-      assert_difference('CustomMetadata.count') do
+      assert_difference('ExtendedMetadata.count') do
         investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
         study_attributes = { title: 'Family', investigation_id: investigation.id }
-        cm_attributes = { custom_metadata_attributes: {
-          custom_metadata_type_id: cmt.id, data: {
+        cm_attributes = { extended_metadata_attributes: {
+          extended_metadata_type_id: cmt.id, data: {
             "dad":{"first_name":"john", "last_name":"liddell"},
             "mom":{"first_name":"lily", "last_name":"liddell"},
             "child":{"0":{"first_name":"alice", "last_name":"liddell"}}
@@ -962,8 +1030,8 @@ class StudiesControllerTest < ActionController::TestCase
     end
 
     assert study = assigns(:study)
-    cm = study.custom_metadata
-    assert_equal cmt, cm.custom_metadata_type
+    cm = study.extended_metadata
+    assert_equal cmt, cm.extended_metadata_type
     data = cm.data
     assert_equal %w[dad mom child], linked_cmts.map(&:title)
     assert_equal "john",data["dad"]["first_name"]
@@ -977,10 +1045,10 @@ class StudiesControllerTest < ActionController::TestCase
 
     # test update
     assert_no_difference('Study.count') do
-      assert_no_difference('CustomMetadata.count') do
+      assert_no_difference('ExtendedMetadata.count') do
         put :update, params: { id: study.id, study: { title: "Alice Through the Looking Glass",
-                                                      custom_metadata_attributes: {
-                                                        custom_metadata_type_id: cmt.id, id:cm.id, data: {
+                                                      extended_metadata_attributes: {
+                                                        extended_metadata_type_id: cmt.id, id:cm.id, data: {
                                                           "dad":{"first_name":"tom", "last_name":"liddell"},
                                                           "child":{"0":{"first_name":"rabbit", "last_name":"wonderland"},"1":{"first_name":"mad", "last_name":"hatter"}}
                                                         }
@@ -990,7 +1058,7 @@ class StudiesControllerTest < ActionController::TestCase
       end
     end
     assert new_study = assigns(:study)
-    data = new_study.custom_metadata.data
+    data = new_study.extended_metadata.data
 
     assert_equal "tom",data["dad"]["first_name"]
     assert_equal "liddell",data["dad"]['last_name']
@@ -1003,15 +1071,15 @@ class StudiesControllerTest < ActionController::TestCase
 
   end
 
-  test 'should create and update study with multiple linked custom metadata types without entering non-required values' do
-    cmt = FactoryBot.create(:family_custom_metadata_type)
+  test 'should create and update study with multiple linked extended metadata types without entering non-required values' do
+    cmt = FactoryBot.create(:family_extended_metadata_type)
     login_as(FactoryBot.create(:person))
     assert_difference('Study.count') do
-      assert_difference('CustomMetadata.count') do
+      assert_difference('ExtendedMetadata.count') do
         investigation = FactoryBot.create(:investigation, projects: User.current_user.person.projects, contributor: User.current_user.person)
         study_attributes = { title: 'Family', investigation_id: investigation.id }
-        cm_attributes = { custom_metadata_attributes: {
-          custom_metadata_type_id: cmt.id, data: {
+        cm_attributes = { extended_metadata_attributes: {
+          extended_metadata_type_id: cmt.id, data: {
             "dad": { "first_name": "john", "last_name": "liddell" },
             "mom": { "first_name": "lily", "last_name": "liddell" },
             # the not reqiured attributes can be removed
@@ -1024,8 +1092,8 @@ class StudiesControllerTest < ActionController::TestCase
     end
 
     assert study = assigns(:study)
-    assert cm = study.custom_metadata
-    assert_equal cmt, cm.custom_metadata_type
+    assert cm = study.extended_metadata
+    assert_equal cmt, cm.extended_metadata_type
     assert_equal "john",cm.data["dad"]["first_name"]
     assert_equal "liddell",cm.data["dad"]['last_name']
     assert_equal "lily",cm.data["mom"]["first_name"]
@@ -1033,17 +1101,17 @@ class StudiesControllerTest < ActionController::TestCase
     assert_empty cm.data["child"]
   end
 
-  test 'should create and update study with multiple linked custom metadata types' do
-    cmt = FactoryBot.create(:role_multiple_custom_metadata_type)
+  test 'should create and update study with multiple linked extended metadata types' do
+    cmt = FactoryBot.create(:role_multiple_extended_metadata_type)
     login_as(FactoryBot.create(:person))
 
     # test create
     assert_difference('Study.count') do
-      assert_difference('CustomMetadata.count') do
+      assert_difference('ExtendedMetadata.count') do
         investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
         study_attributes = { title: 'Alice in Wonderland', investigation_id: investigation.id }
-        cm_attributes = { custom_metadata_attributes: {
-          custom_metadata_type_id: cmt.id, data: {
+        cm_attributes = { extended_metadata_attributes: {
+          extended_metadata_type_id: cmt.id, data: {
             "role_email":"alice@email.com",
             "role_phone":"0012345",
             "role_name": {"first_name":"alice", "last_name": "liddell"},
@@ -1056,8 +1124,8 @@ class StudiesControllerTest < ActionController::TestCase
     end
 
     assert study = assigns(:study)
-    assert cm = study.custom_metadata
-    assert_equal cmt, cm.custom_metadata_type
+    assert cm = study.extended_metadata
+    assert_equal cmt, cm.extended_metadata_type
     assert_equal "alice@email.com",cm.data['role_email']
     assert_equal '0012345',cm.data['role_phone']
     assert_equal 'alice', cm.data['role_name']['first_name']
@@ -1072,10 +1140,10 @@ class StudiesControllerTest < ActionController::TestCase
 
     # test update
     assert_no_difference('Study.count') do
-      assert_no_difference('CustomMetadata.count') do
+      assert_no_difference('ExtendedMetadata.count') do
         put :update, params: { id: study.id, study: { title: "Alice Through the Looking Glass",
-                                                      custom_metadata_attributes: {
-                                                        custom_metadata_type_id: cmt.id, id:cm.id, data: {
+                                                      extended_metadata_attributes: {
+                                                        extended_metadata_type_id: cmt.id, id:cm.id, data: {
                                                           "role_email":"rabbit@email.com",
                                                           "role_name":{
                                                               "first_name":"rabbit"
@@ -1090,24 +1158,24 @@ class StudiesControllerTest < ActionController::TestCase
 
     assert new_study = assigns(:study)
     assert_equal 'Alice Through the Looking Glass', new_study.title
-    cm = new_study.custom_metadata
+    cm = new_study.extended_metadata
     assert_equal 'rabbit@email.com', cm.data['role_email']
     assert_equal 'rabbit', cm.data['role_name']['first_name']
   end
 
   test 'multiple levels of has many relationship' do
-    cmt = FactoryBot.create(:study_custom_metadata_type)
-    # linked_cmt = cmt.attributes_with_linked_custom_metadata_type.last.linked_custom_metadata_type
-    # linked_linked_cmt = linked_cmt.attributes_with_linked_custom_metadata_type.last.linked_custom_metadata_type
-    # linked_linked_linked_cmt = linked_linked_cmt.attributes_with_linked_custom_metadata_type.last.linked_custom_metadata_type
+    cmt = FactoryBot.create(:study_extended_metadata_type)
+    # linked_cmt = cmt.attributes_with_linked_extended_metadata_type.last.linked_extended_metadata_type
+    # linked_linked_cmt = linked_cmt.attributes_with_linked_extended_metadata_type.last.linked_extended_metadata_type
+    # linked_linked_linked_cmt = linked_linked_cmt.attributes_with_linked_extended_metadata_type.last.linked_extended_metadata_type
     login_as(FactoryBot.create(:person))
 
     assert_difference('Study.count') do
-      assert_difference('CustomMetadata.count') do
+      assert_difference('ExtendedMetadata.count') do
         investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
         study_attributes = { title: 'my study', investigation_id: investigation.id }
-        cm_attributes = { custom_metadata_attributes: {
-          custom_metadata_type_id: cmt.id,
+        cm_attributes = { extended_metadata_attributes: {
+          extended_metadata_type_id: cmt.id,
           data: {
             "study_title":"happy study",
             "study_sites":{
@@ -1154,9 +1222,9 @@ class StudiesControllerTest < ActionController::TestCase
     end
 
     assert study = assigns(:study)
-    assert cm = study.custom_metadata
+    assert cm = study.extended_metadata
 
-    assert_equal cmt, cm.custom_metadata_type
+    assert_equal cmt, cm.extended_metadata_type
     assert_equal "happy study",cm.data['study_title']
     assert_equal "site1", cm.data['study_sites'][0]['study_site_name']
     assert_equal "fairyland", cm.data['study_sites'][0]['study_site_location']
@@ -1172,14 +1240,14 @@ class StudiesControllerTest < ActionController::TestCase
 
     # test update
     assert_no_difference('Study.count') do
-      assert_no_difference('CustomMetadata.count') do
+      assert_no_difference('ExtendedMetadata.count') do
         put :update, params: {
           id: study.id,
           study: {
             title: 'Updated Study',
-            custom_metadata_attributes: {
+            extended_metadata_attributes: {
               id:cm.id,
-              custom_metadata_type_id: cmt.id,
+              extended_metadata_type_id: cmt.id,
               data: {
                 "study_title":"happy study new",
                 "study_sites":{
@@ -1212,7 +1280,7 @@ class StudiesControllerTest < ActionController::TestCase
     end
 
     assert new_study = assigns(:study)
-    assert cm = new_study.custom_metadata
+    assert cm = new_study.extended_metadata
 
 
     assert_equal "site1", cm.data['study_sites'][0]['study_site_name']
@@ -1225,16 +1293,16 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
 
-  test 'when removing the study with the custom metadata, all its related custom metadtas should be destroyed' do
-    cmt = FactoryBot.create(:role_affiliation_custom_metadata_type)
+  test 'when removing the study with the extended metadata, all its related extended metadtas should be destroyed' do
+    cmt = FactoryBot.create(:role_affiliation_extended_metadata_type)
     login_as(FactoryBot.create(:person))
 
     assert_difference('Study.count') do
-      assert_difference('CustomMetadata.count') do
+      assert_difference('ExtendedMetadata.count') do
         investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
         study_attributes = { title: 'my study', investigation_id: investigation.id }
-        cm_attributes = { custom_metadata_attributes: {
-          custom_metadata_type_id: cmt.id,
+        cm_attributes = { extended_metadata_attributes: {
+          extended_metadata_type_id: cmt.id,
           data: {
             "role_affiliation_name":"HITS",
             "role_affiliation_identifiers":{
@@ -1254,7 +1322,7 @@ class StudiesControllerTest < ActionController::TestCase
 
 
     assert_difference('Study.count', -1) do
-      assert_difference('CustomMetadata.count',-1) do
+      assert_difference('ExtendedMetadata.count',-1) do
            delete :destroy, params: { id: study.id }
       end
     end
@@ -1265,18 +1333,18 @@ class StudiesControllerTest < ActionController::TestCase
 
 
 
-  test 'should create and update study whose custom metadata type contains linked custom metadata multi type' do
-    cmt = FactoryBot.create(:role_affiliation_custom_metadata_type)
+  test 'should create and update study whose extended metadata type contains linked extended metadata multi type' do
+    cmt = FactoryBot.create(:role_affiliation_extended_metadata_type)
     login_as(FactoryBot.create(:person))
 
 
     # test create
     assert_difference('Study.count') do
-      assert_difference('CustomMetadata.count') do
+      assert_difference('ExtendedMetadata.count') do
         investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
         study_attributes = { title: 'my study', investigation_id: investigation.id }
-        cm_attributes = { custom_metadata_attributes: {
-          custom_metadata_type_id: cmt.id,
+        cm_attributes = { extended_metadata_attributes: {
+          extended_metadata_type_id: cmt.id,
           data: {
             "role_affiliation_name":"HITS",
             "role_affiliation_identifiers":{
@@ -1296,8 +1364,8 @@ class StudiesControllerTest < ActionController::TestCase
     study.reload
 
 
-    cm = study.custom_metadata
-    assert_equal cmt, cm.custom_metadata_type
+    cm = study.extended_metadata
+    assert_equal cmt, cm.extended_metadata_type
 
     assert_equal 'my study', study.title
     assert_equal 'HITS',cm.data['role_affiliation_name']
@@ -1312,14 +1380,14 @@ class StudiesControllerTest < ActionController::TestCase
 
     # test update
     assert_no_difference('Study.count') do
-      assert_no_difference('CustomMetadata.count') do
+      assert_no_difference('ExtendedMetadata.count') do
         put :update, params: {
           id: study.id,
           study: {
             title: 'Updated Study',
-            custom_metadata_attributes: {
+            extended_metadata_attributes: {
               id:cm.id,
-              custom_metadata_type_id: cmt.id,
+              extended_metadata_type_id: cmt.id,
               data: {
                 "role_affiliation_name": "University of Manchester",
                 "role_affiliation_identifiers": {
@@ -1337,8 +1405,8 @@ class StudiesControllerTest < ActionController::TestCase
     assert new_study = assigns(:study)
     assert_redirected_to study_path(new_study)
     new_study.reload
-    cm = new_study.custom_metadata
-    assert_equal cmt, cm.custom_metadata_type
+    cm = new_study.extended_metadata
+    assert_equal cmt, cm.extended_metadata_type
 
     assert_equal 'Updated Study', new_study.title
     assert_equal 'University of Manchester',cm.data['role_affiliation_name']
@@ -1347,16 +1415,16 @@ class StudiesControllerTest < ActionController::TestCase
     assert_equal 'grid.5379.8', cm.data['role_affiliation_identifiers'].last['identifier']
     assert_equal 'GRID', cm.data['role_affiliation_identifiers'].last['scheme']
 
-    # test update: adding an element in the array of linked custom metadatas
+    # test update: adding an element in the array of linked extended metadatas
     assert_no_difference('Study.count') do
-      assert_no_difference('CustomMetadata.count') do
+      assert_no_difference('ExtendedMetadata.count') do
         put :update, params: {
           id: study.id,
           study: {
             title: 'Updated Study',
-            custom_metadata_attributes: {
+            extended_metadata_attributes: {
               id:cm.id,
-              custom_metadata_type_id: cmt.id,
+              extended_metadata_type_id: cmt.id,
               data: {
                 "role_affiliation_name": "University of Manchester",
                 "role_affiliation_identifiers": {
@@ -1375,8 +1443,8 @@ class StudiesControllerTest < ActionController::TestCase
     assert new_study = assigns(:study)
     assert_redirected_to study_path(new_study)
     new_study.reload
-    cm = new_study.custom_metadata
-    assert_equal cmt, cm.custom_metadata_type
+    cm = new_study.extended_metadata
+    assert_equal cmt, cm.extended_metadata_type
 
 
 
@@ -1389,17 +1457,17 @@ class StudiesControllerTest < ActionController::TestCase
     assert_equal 'ISNI', cm.data['role_affiliation_identifiers'][2]['scheme']
 
 
-    # test update: adding an element and at the same time removing two elements in the array of linked custom metadatas
+    # test update: adding an element and at the same time removing two elements in the array of linked extended metadatas
     assert_no_difference('Study.count') do
-      assert_no_difference('CustomMetadata.count') do
+      assert_no_difference('ExtendedMetadata.count') do
 
         put :update, params: {
           id: study.id,
           study: {
             title: 'Updated Study',
-            custom_metadata_attributes: {
+            extended_metadata_attributes: {
               id:cm.id,
-              custom_metadata_type_id: cmt.id,
+              extended_metadata_type_id: cmt.id,
               data: {
                 "role_affiliation_name": "University of Manchester",
                 "role_affiliation_identifiers": {
@@ -1418,8 +1486,8 @@ class StudiesControllerTest < ActionController::TestCase
     assert new_study = assigns(:study)
     assert_redirected_to study_path(new_study)
     new_study.reload
-    cm = new_study.custom_metadata
-    assert_equal cmt, cm.custom_metadata_type
+    cm = new_study.extended_metadata
+    assert_equal cmt, cm.extended_metadata_type
 
     assert_equal 'Updated Study', new_study.title
     assert_equal 'University of Manchester',cm.data['role_affiliation_name']
@@ -1436,16 +1504,16 @@ class StudiesControllerTest < ActionController::TestCase
 
   test 'should not create a study and reload the form for incomplete details' do
 
-    cmt = FactoryBot.create(:role_affiliation_custom_metadata_type)
+    cmt = FactoryBot.create(:role_affiliation_extended_metadata_type)
     login_as(FactoryBot.create(:person))
 
 
     # missing investigation
     assert_no_difference('Study.count') do
-      assert_no_difference('CustomMetadata.count') do
+      assert_no_difference('ExtendedMetadata.count') do
         study_attributes = { title: 'my study' }
-        cm_attributes = { custom_metadata_attributes: {
-          custom_metadata_type_id: cmt.id,
+        cm_attributes = { extended_metadata_attributes: {
+          extended_metadata_type_id: cmt.id,
           data: {
             "role_affiliation_name":"HITS",
             "role_affiliation_identifiers":{
@@ -1467,30 +1535,30 @@ class StudiesControllerTest < ActionController::TestCase
     # should reload the form with title
     assert_select 'form#new_study' do
       assert_select 'input#study_title[value=?]', 'my study'
-      assert_select 'input#study_custom_metadata_attributes_data_role_affiliation_name[value=?]', 'HITS'
+      assert_select 'input#study_extended_metadata_attributes_data_role_affiliation_name[value=?]', 'HITS'
     end
 
     # should reload the form with two role_affiliation_identifiers
       assert_select 'div[id$="role-0"]' do
-      assert_select 'input#study_custom_metadata_attributes_data_role_affiliation_identifiers_0_identifier[value=?]', '01f7bcy98'
-      assert_select 'input#study_custom_metadata_attributes_data_role_affiliation_identifiers_0_scheme[value=?]', 'ROR'
+      assert_select 'input#study_extended_metadata_attributes_data_role_affiliation_identifiers_0_identifier[value=?]', '01f7bcy98'
+      assert_select 'input#study_extended_metadata_attributes_data_role_affiliation_identifiers_0_scheme[value=?]', 'ROR'
     end
 
     assert_select 'div[id$="role-1"]' do
 
-      assert_select 'input#study_custom_metadata_attributes_data_role_affiliation_identifiers_1_identifier[value=?]', 'grid.424699.4'
-      assert_select 'input#study_custom_metadata_attributes_data_role_affiliation_identifiers_1_scheme[value=?]', 'GRID'
+      assert_select 'input#study_extended_metadata_attributes_data_role_affiliation_identifiers_1_identifier[value=?]', 'grid.424699.4'
+      assert_select 'input#study_extended_metadata_attributes_data_role_affiliation_identifiers_1_scheme[value=?]', 'GRID'
     end
 
 
     investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
 
-    # missing required custom metadata value
+    # missing required extended metadata value
     assert_no_difference('Study.count') do
-      assert_no_difference('CustomMetadata.count') do
+      assert_no_difference('ExtendedMetadata.count') do
           study_attributes = { title: 'my study',investigation_id: investigation.id}
-          cm_attributes = { custom_metadata_attributes: {
-            custom_metadata_type_id: cmt.id,
+          cm_attributes = { extended_metadata_attributes: {
+            extended_metadata_type_id: cmt.id,
             data: {
               "role_affiliation_name":"HITS",
               "role_affiliation_identifiers":{
@@ -1506,39 +1574,39 @@ class StudiesControllerTest < ActionController::TestCase
 
     # should show error message
     assert_select 'div#error_explanation' do
-      assert_select 'ul > li', text: "Custom metadata role affiliation identifiers 1 identifier is required"
-      assert_select 'ul > li', text: "Custom metadata role affiliation identifiers 2 scheme is required"
+      assert_select 'ul > li', text: "Extended metadata role affiliation identifiers 1 identifier is required"
+      assert_select 'ul > li', text: "Extended metadata role affiliation identifiers 2 scheme is required"
     end
 
     # should reload the form with title
     assert_select 'form#new_study' do
       assert_select 'input#study_title[value=?]', 'my study'
-      assert_select 'input#study_custom_metadata_attributes_data_role_affiliation_name[value=?]', 'HITS'
+      assert_select 'input#study_extended_metadata_attributes_data_role_affiliation_name[value=?]', 'HITS'
     end
 
     # should reload the form with two role_affiliation_identifiers
     assert_select 'div[id$="role-0"]' do
-      assert_select 'input#study_custom_metadata_attributes_data_role_affiliation_identifiers_0_identifier[value=?]', ''
-      assert_select 'input#study_custom_metadata_attributes_data_role_affiliation_identifiers_0_scheme[value=?]', 'ROR'
+      assert_select 'input#study_extended_metadata_attributes_data_role_affiliation_identifiers_0_identifier[value=?]', ''
+      assert_select 'input#study_extended_metadata_attributes_data_role_affiliation_identifiers_0_scheme[value=?]', 'ROR'
     end
 
     assert_select 'div[id$="role-1"]' do
-      assert_select 'input#study_custom_metadata_attributes_data_role_affiliation_identifiers_1_identifier[value=?]', 'grid.424699.4'
-      assert_select 'input#study_custom_metadata_attributes_data_role_affiliation_identifiers_1_scheme[value=?]', ''
+      assert_select 'input#study_extended_metadata_attributes_data_role_affiliation_identifiers_1_identifier[value=?]', 'grid.424699.4'
+      assert_select 'input#study_extended_metadata_attributes_data_role_affiliation_identifiers_1_scheme[value=?]', ''
     end
 
   end
 
   test 'should not update a study and reload the form for incomplete details' do
 
-    cmt = FactoryBot.create(:role_affiliation_custom_metadata_type)
+    cmt = FactoryBot.create(:role_affiliation_extended_metadata_type)
     login_as(FactoryBot.create(:person))
     investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
     study_attributes = { title: 'my study', investigation_id: investigation.id }
 
 
-    cm_attributes = { custom_metadata_attributes: {
-          custom_metadata_type_id: cmt.id,
+    cm_attributes = { extended_metadata_attributes: {
+          extended_metadata_type_id: cmt.id,
           data: {
             "role_affiliation_name":"HITS",
             "role_affiliation_identifiers":{
@@ -1553,20 +1621,20 @@ class StudiesControllerTest < ActionController::TestCase
     assert study = assigns(:study)
     assert_redirected_to study_path(study)
     study.reload
-    cm = study.custom_metadata
+    cm = study.extended_metadata
 
 
     #  should not update when the investigation is deleted
     assert_no_difference('Study.count') do
-      assert_no_difference('CustomMetadata.count') do
+      assert_no_difference('ExtendedMetadata.count') do
         put :update, params: {
           id: study.id,
           study: {
             title: 'my new study title',
             investigation_id: nil,
-            custom_metadata_attributes: {
+            extended_metadata_attributes: {
               id:cm.id,
-              custom_metadata_type_id: cmt.id,
+              extended_metadata_type_id: cmt.id,
               data: {
                 "role_affiliation_name": "University of Manchester",
                 "role_affiliation_identifiers": {
@@ -1601,13 +1669,13 @@ class StudiesControllerTest < ActionController::TestCase
     # the form should load updated title value
     assert_select 'form.edit_study' do
       assert_select 'input#study_title[value=?]', 'my new study title'
-      assert_select 'input#study_custom_metadata_attributes_data_role_affiliation_name[value=?]', 'University of Manchester'
+      assert_select 'input#study_extended_metadata_attributes_data_role_affiliation_name[value=?]', 'University of Manchester'
     end
 
     # the form should load updated role_affiliation_identifiers value
     assert_select 'div[id$="role-0"]' do
-      assert_select 'input#study_custom_metadata_attributes_data_role_affiliation_identifiers_0_identifier[value=?]', '027m9bs27'
-      assert_select 'input#study_custom_metadata_attributes_data_role_affiliation_identifiers_0_scheme[value=?]', 'ROR'
+      assert_select 'input#study_extended_metadata_attributes_data_role_affiliation_identifiers_0_identifier[value=?]', '027m9bs27'
+      assert_select 'input#study_extended_metadata_attributes_data_role_affiliation_identifiers_0_scheme[value=?]', 'ROR'
     end
 
     # the form should not show removed value
@@ -1615,22 +1683,22 @@ class StudiesControllerTest < ActionController::TestCase
     assert_select 'input[value="GRID"]', count: 0
 
     # the form should show new value
-    assert_select "input[id^='study_custom_metadata_attributes_data_role_affiliation_identifiers_'][id$='_identifier'][value=?]",'Q230899'
-    assert_select "input[id^='study_custom_metadata_attributes_data_role_affiliation_identifiers_'][id$='_scheme'][value=?]",'Wikidata'
+    assert_select "input[id^='study_extended_metadata_attributes_data_role_affiliation_identifiers_'][id$='_identifier'][value=?]",'Q230899'
+    assert_select "input[id^='study_extended_metadata_attributes_data_role_affiliation_identifiers_'][id$='_scheme'][value=?]",'Wikidata'
 
   end
 
-  test 'should not update a study and reload the form for missing required linked custom metadata values' do
+  test 'should not update a study and reload the form for missing required linked extended metadata values' do
 
-    cmt = FactoryBot.create(:role_affiliation_custom_metadata_type)
+    cmt = FactoryBot.create(:role_affiliation_extended_metadata_type)
     login_as(FactoryBot.create(:person))
 
     investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
     study_attributes = { title: 'my study', investigation_id: investigation.id }
 
 
-    cm_attributes = { custom_metadata_attributes: {
-      custom_metadata_type_id: cmt.id,
+    cm_attributes = { extended_metadata_attributes: {
+      extended_metadata_type_id: cmt.id,
       data: {
         "role_affiliation_name":"HITS",
         "role_affiliation_identifiers":{
@@ -1645,18 +1713,18 @@ class StudiesControllerTest < ActionController::TestCase
     assert study = assigns(:study)
     assert_redirected_to study_path(study)
     study.reload
-    cm = study.custom_metadata
+    cm = study.extended_metadata
 
-    #  should not update when the required linked custom metadata is missing
+    #  should not update when the required linked extended metadata is missing
     assert_no_difference('Study.count') do
-      assert_no_difference('CustomMetadata.count') do
+      assert_no_difference('ExtendedMetadata.count') do
           put :update, params: {
             id: study.id,
             study: {
               title: 'my new study title',
-              custom_metadata_attributes: {
+              extended_metadata_attributes: {
                 id:cm.id,
-                custom_metadata_type_id: cmt.id,
+                extended_metadata_type_id: cmt.id,
                 data: {
                   "role_affiliation_name": "University of Manchester",
                   "role_affiliation_identifiers": {
@@ -1686,19 +1754,19 @@ class StudiesControllerTest < ActionController::TestCase
 
     # should show error message
     assert_select 'div#error_explanation' do
-      assert_select 'ul > li', text: "Custom metadata role affiliation identifiers 1 identifier is required"
+      assert_select 'ul > li', text: "Extended metadata role affiliation identifiers 1 identifier is required"
     end
 
     # the form should load updated title value
     assert_select 'form.edit_study' do
       assert_select 'input#study_title[value=?]', 'my new study title'
-      assert_select 'input#study_custom_metadata_attributes_data_role_affiliation_name[value=?]', 'University of Manchester'
+      assert_select 'input#study_extended_metadata_attributes_data_role_affiliation_name[value=?]', 'University of Manchester'
     end
 
     # the form should load updated role_affiliation_identifiers value
     assert_select 'div[id$="role-0"]' do
-      assert_select 'input#study_custom_metadata_attributes_data_role_affiliation_identifiers_0_identifier[value=?]', ''
-      assert_select 'input#study_custom_metadata_attributes_data_role_affiliation_identifiers_0_scheme[value=?]', 'ROR'
+      assert_select 'input#study_extended_metadata_attributes_data_role_affiliation_identifiers_0_identifier[value=?]', ''
+      assert_select 'input#study_extended_metadata_attributes_data_role_affiliation_identifiers_0_scheme[value=?]', 'ROR'
     end
 
     # the form should not show removed value
@@ -1706,8 +1774,8 @@ class StudiesControllerTest < ActionController::TestCase
     assert_select 'input[value="GRID"]', count: 0
 
     # the form should show new value
-    assert_select "input[id^='study_custom_metadata_attributes_data_role_affiliation_identifiers_'][id$='_identifier'][value=?]",'Q230899'
-    assert_select "input[id^='study_custom_metadata_attributes_data_role_affiliation_identifiers_'][id$='_scheme'][value=?]",'Wikidata'
+    assert_select "input[id^='study_extended_metadata_attributes_data_role_affiliation_identifiers_'][id$='_identifier'][value=?]",'Q230899'
+    assert_select "input[id^='study_extended_metadata_attributes_data_role_affiliation_identifiers_'][id$='_scheme'][value=?]",'Wikidata'
 
 
   end
@@ -1976,14 +2044,18 @@ class StudiesControllerTest < ActionController::TestCase
 
   test 'should delete empty study with linked sample type' do
     person = FactoryBot.create(:person)
-    study_source_sample_type = FactoryBot.create :linked_sample_type, contributor: person
-    study_sample_sample_type = FactoryBot.create :linked_sample_type, contributor: person
+    investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true)
+    study_source_sample_type = FactoryBot.create :isa_source_sample_type, contributor: person
+    study_sample_sample_type = FactoryBot.create :isa_sample_collection_sample_type, linked_sample_type: study_source_sample_type, contributor: person
     study = FactoryBot.create(:study,
+                              investigation: investigation ,
                               policy:FactoryBot.create(:private_policy, permissions:[FactoryBot.create(:permission,contributor: person, access_type:Policy::EDITING)]),
                               sample_types: [study_source_sample_type, study_sample_sample_type],
                               contributor: person)
 
     login_as(person)
+
+    assert study.is_isa_json_compliant?
 
     assert_difference('SampleType.count', -2) do
       assert_difference('Study.count', -1) do
@@ -1992,4 +2064,51 @@ class StudiesControllerTest < ActionController::TestCase
     end
   end
 
+  test 'do not get index if feature disabled' do
+    with_config_value(:isa_enabled, false) do
+      get :index
+      assert_redirected_to root_path
+      assert flash[:error].include?('disabled')
+    end
+  end
+
+  test 'display single page button if feature enabled' do
+    with_config_value(:project_single_page_enabled, true) do
+      current_user = FactoryBot.create(:user)
+      login_as(current_user)
+      study = FactoryBot.create(:study, contributor: current_user.person)
+
+      get :show, params: { id: study }
+      assert_response :success
+
+      assert_select 'a', text: 'Single Page', count: 1
+    end
+  end
+
+  test 'display adjusted buttons if isa json compliant' do
+    with_config_value(:isa_json_compliance_enabled, true) do
+      person = FactoryBot.create(:person)
+      login_as(person)
+      investigation = FactoryBot.create(:investigation, contributor: person, is_isa_json_compliant: true)
+      study = FactoryBot.create(:isa_json_compliant_study, contributor: person, investigation: investigation)
+
+      get :show, params: { id: study }
+      assert_response :success
+
+      assert_select 'a', text: /Design #{I18n.t('assay')} Stream/i, count: 1
+      assert_select 'a', text: /Add new #{I18n.t('assay')}/i, count: 0
+    end
+  end
+
+  test 'should redirect isa json compliant study to isa study edit page' do
+    with_config_value(:isa_json_compliance_enabled, true) do
+      person = FactoryBot.create(:person)
+      login_as(person)
+      investigation = FactoryBot.create(:investigation, contributor: person, is_isa_json_compliant: true)
+      study = FactoryBot.create(:isa_json_compliant_study, contributor: person, investigation: investigation)
+
+      get :edit, params: { id: study }
+      assert_redirected_to edit_isa_study_path(study)
+    end
+  end
 end

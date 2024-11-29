@@ -1,11 +1,8 @@
-<% if Seek::ProjectFormProgrammeOptions.creation_allowed_only? %>
-  <div id='programme-details'>
-<% else %>
-  <div id='programme-details' style="display:none;">
-<% end %>
-<div class="help-block">
-  Specify a title for a new <%= t('programme') %>, which your new <%= t('project') %> will be associated with.
-</div>
-<%= label_tag :programme_title, "Title" %><span class="required">*</span>
-<%= text_field_tag 'programme[title]', '', class: 'form-control' %>
+<% show = Seek::ProjectFormProgrammeOptions.creation_allowed_only? || (@programme && !@programme.site_managed?) %>
+<div id='programme-details'<%= 'style="display:none;"' unless show -%>>
+  <div class="help-block">
+    Specify a title for a new <%= t('programme') %>, which your new <%= t('project') %> will be associated with.
+  </div>
+  <%= label_tag :programme_title, "Title" %><span class="required">*</span>
+  <%= text_field_tag 'programme[title]', @programme&.title, class: 'form-control' %>
 </div>

@@ -113,6 +113,62 @@ class CollectionsControllerTest < ActionController::TestCase
     assert_redirected_to collection_path(assigns(:collection))
   end
 
+  test 'create, update and show a collection with extended metadata' do
+    cmt = FactoryBot.create(:simple_collection_extended_metadata_type)
+
+    person = FactoryBot.create(:person)
+    login_as(person)
+
+    assert_difference('ActivityLog.count') do
+      assert_difference('Collection.count') do
+        assert_difference('ExtendedMetadata.count') do
+          post :create, params: { collection: { title: 'Collection', project_ids: [person.projects.first.id],
+                                                extended_metadata_attributes:{ extended_metadata_type_id: cmt.id,
+                                                                               data:{ 'age': 22,'name':'fred'}}},
+                                  policy_attributes: valid_sharing }
+
+        end
+      end
+    end
+
+    assert collection = assigns(:collection)
+    cm = collection.extended_metadata
+
+    assert_equal cmt, cm.extended_metadata_type
+    assert_equal 'fred',cm.get_attribute_value('name')
+    assert_equal 22,cm.get_attribute_value('age')
+    assert_nil cm.get_attribute_value('date')
+
+
+    get :show, params: { id: collection }
+    assert_response :success
+
+    assert_select 'div.extended_metadata',text:/fred/, count:1
+    assert_select 'div.extended_metadata',text:/22/, count:1
+
+    # test update
+    old_id = cm.id
+    assert_no_difference('Collection.count') do
+      assert_no_difference('ExtendedMetadata.count') do
+        put :update, params: { id: collection.id, collection: { title: "new title",
+                                                            extended_metadata_attributes: { extended_metadata_type_id: cmt.id, id: cm.id,
+                                                                                            data: {
+                                                                                              "age": 20,
+                                                                                              "name": 'max'
+                                                                                            } }
+        }
+        }
+      end
+    end
+
+
+    assert new_collection = assigns(:collection)
+    assert_equal 'new title', new_collection.title
+    assert_equal 'max', new_collection.extended_metadata.get_attribute_value('name')
+    assert_equal 20, new_collection.extended_metadata.get_attribute_value('age')
+    assert_equal old_id, new_collection.extended_metadata.id
+  end
+
   test 'should update collection' do
     person = FactoryBot.create(:person)
     collection = FactoryBot.create(:collection, contributor: person)
@@ -434,6 +490,14 @@ class CollectionsControllerTest < ActionController::TestCase
 
     assert_response :success
     assert_select 'li a[href=?]', document_path(document), count: 0
+  end
+
+  test 'do not get index if feature disabled' do
+    with_config_value(:collections_enabled, false) do
+      get :index
+      assert_redirected_to root_path
+      assert flash[:error].include?('disabled')
+    end
   end
 
   private

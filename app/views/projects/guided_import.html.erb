@@ -1,0 +1,93 @@
+<%= index_and_new_help_icon controller_name %>
+
+<%= notice %>
+
+<%= form_tag request_import_projects_path, multipart: true do %>
+  <div class="row">
+    <div  style="margin:auto;width:70%;">
+
+      <% if Seek::ProjectFormProgrammeOptions.show_programme_box? %>
+        <%= render partial: 'projects/guided_create/programme_box' %>
+      <% end %>
+
+      <%= panel(t(:project)) do %>
+
+        <div class="help-block">
+          Please upload a Data Management Plan detailing a <%= t('project') %> that will be created. The DMP must conform to the RDA DMP Common Standard. You will be able to update and add additional
+          information once it has been created.
+        </div>
+
+        <%= label_tag :project_dmp, "DMP" %><span class="required">*</span>
+        <%= file_field_tag 'project[dmp]', accept: '.json', class: 'upload' %>
+
+      <% end %>
+
+
+      <%= panel(t(:institution)) do %>
+        <div class="form-group">
+          <%= render partial: 'institutions/select_or_define' %>
+        </div>
+      <% end %>
+
+      <%= submit_tag('Submit', class: 'btn btn-primary', id: 'submit-button', disabled: true) %>
+    </div>
+  </div>
+<% end %>
+
+
+<script type=application/javascript>
+
+    function checkSubmitButtonEnabled() {
+        var progEnabled = <%= Seek::ProjectFormProgrammeOptions.show_programme_box? %>;
+        var enabled = $j('select#institution_id').val()
+            && !progEnabled || ($j('#programme_id').val() || $j('input#programme_title').val())
+            && $j('input#project_dmp').val()
+            && $j('input#institution_title').val();
+        $j('#submit-button').prop('disabled', !enabled);
+    }
+
+    $j(document).ready(function () {
+
+        <% if Seek::ProjectFormProgrammeOptions.managed_checkbox? %>
+            $j('input#managed_programme').on('change', function() {
+                if ($j('input#managed_programme:checked').length == 0) {
+                    $j('#programme-details').show();
+                    $j('#programme_id').val('');
+                }
+                else {
+                    $j('#programme_id').val('<%= Programme.site_managed_programme.id %>');
+                    $j('#programme-details').hide();
+                    $j('input#programme_title').val('');
+                }
+                checkSubmitButtonEnabled();
+            });
+        <% end %>
+
+        <% if Seek::ProjectFormProgrammeOptions.creation_allowed? && Seek::ProjectFormProgrammeOptions.programme_dropdown? %>
+            $j('input#new_programme').on('change', function() {
+                if ($j('input#new_programme:checked').length == 1) {
+                    $j('#programme-details').show();
+                    $j('select#programme_id').prop('disabled',true);
+                    $j('select#programme_id').attr('name','disabled-programme_id');
+                    $j('select#programme_id').attr('id','disabled-programme_id');
+                }
+                else {
+                    $j('#programme-details').hide();
+                    $j('input#programme_title').val('');
+                    $j('select#disabled-programme_id').attr('name','programme_id');
+                    $j('select#disabled-programme_id').attr('id','programme_id');
+                    $j('select#programme_id').prop('disabled',false);
+                }
+                checkSubmitButtonEnabled();
+            });
+        <% end %>
+
+        $j('input#programme_title').on('input',function() {
+            checkSubmitButtonEnabled();
+        });
+
+        $j('input#project_dmp').on('input', function() {
+            checkSubmitButtonEnabled();
+        });
+    });
+</script>

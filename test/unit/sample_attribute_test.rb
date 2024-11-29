@@ -67,6 +67,9 @@ class SampleAttributeTest < ActiveSupport::TestCase
                                     sample_type: FactoryBot.create(:simple_sample_type)
     refute attribute.valid?
 
+    attribute.pid = 'Source:bacterial culture'
+    refute attribute.valid?
+
     attribute.pid = 'http://somewhere.org#fish'
     assert attribute.valid?
     attribute.pid = 'dc:fish'
@@ -231,6 +234,13 @@ class SampleAttributeTest < ActiveSupport::TestCase
     refute attribute.validate_value?(1)
   end
 
+  test 'controlled vocab validate value with allowed free text' do
+    attribute = FactoryBot.create(:apples_controlled_vocab_attribute, is_title: true, allow_cv_free_text: true, sample_type: FactoryBot.create(:simple_sample_type))
+    assert attribute.validate_value?('Granny Smith')
+    assert attribute.validate_value?('Orange')
+    assert attribute.validate_value?(1)
+  end
+
   test 'controlled vocab must exist for CV type' do
     attribute = FactoryBot.create(:apples_controlled_vocab_attribute, is_title: true, sample_type: FactoryBot.create(:simple_sample_type))
     assert attribute.valid?
@@ -326,6 +336,9 @@ class SampleAttributeTest < ActiveSupport::TestCase
     attribute = FactoryBot.create(:string_sample_attribute_with_description_and_pid, is_title: true, pid: 'http://pid.org/attr/title', sample_type: FactoryBot.create(:simple_sample_type))
     assert_equal 'title',attribute.short_pid
 
+    attribute.pid = 'Source:bacterial culture'
+    assert_equal 'Source:bacterial-culture',attribute.short_pid
+
     attribute = FactoryBot.create(:sample_sample_attribute, sample_type: FactoryBot.create(:simple_sample_type))
     assert_equal '', attribute.short_pid
   end
@@ -344,6 +357,187 @@ class SampleAttributeTest < ActiveSupport::TestCase
     attribute.sample_controlled_vocab = FactoryBot.create(:topics_controlled_vocab)
     assert attribute.sample_controlled_vocab.ontology_based?
     assert attribute.ontology_based?
+  end
+
+  test 'boolean' do
+    bool_type = SampleAttributeType.new title: 'bool', base_type: Seek::Samples::BaseType::BOOLEAN
+    attribute = FactoryBot.create(:sample_attribute, is_title: true, sample_attribute_type: bool_type, sample_type: FactoryBot.create(:simple_sample_type))
+    assert attribute.validate_value?(true)
+    assert attribute.validate_value?(false)
+    refute attribute.validate_value?('fish')
+  end
+
+  test 'chebi atribute' do
+    type = SampleAttributeType.new title: 'CHEBI ID', regexp: 'CHEBI:[0-9]+', base_type: Seek::Samples::BaseType::STRING
+    attribute = FactoryBot.create(:sample_attribute, is_title: true, sample_attribute_type: type, sample_type: FactoryBot.create(:simple_sample_type))
+    assert attribute.validate_value?('CHEBI:1111')
+    assert attribute.validate_value?('CHEBI:1121')
+    refute attribute.validate_value?('fish')
+    refute attribute.validate_value?('fish:22')
+    refute attribute.validate_value?('CHEBI:1121a')
+    refute attribute.validate_value?('chebi:222')
+  end
+
+  test 'regular expression match' do
+    # whole string must match
+    type = SampleAttributeType.new(title: 'first name', base_type: Seek::Samples::BaseType::STRING, regexp: '[A-Z][a-z]+')
+    attribute = FactoryBot.create(:sample_attribute, is_title: true, sample_attribute_type: type, sample_type: FactoryBot.create(:simple_sample_type))
+    assert attribute.validate_value?('Fred')
+    refute attribute.validate_value?(' Fred')
+    refute attribute.validate_value?('FRed')
+    refute attribute.validate_value?('Fred2')
+    refute attribute.validate_value?('Fred ')
+  end
+
+  test 'uri attribute type' do
+    type = SampleAttributeType.new title: 'URI', base_type: Seek::Samples::BaseType::STRING, regexp: URI.regexp.to_s
+    attribute = FactoryBot.create(:sample_attribute, is_title: true, sample_attribute_type: type, sample_type: FactoryBot.create(:simple_sample_type))
+    assert attribute.validate_value?('zzz:222')
+    assert attribute.validate_value?('http://ontology.org#term')
+    refute attribute.validate_value?('fish')
+    refute attribute.validate_value?('fish;cow')
+  end
+
+  test 'validate text with newlines' do
+    type = SampleAttributeType.new(title: 'fish', base_type: Seek::Samples::BaseType::TEXT)
+    attribute = FactoryBot.create(:sample_attribute, is_title: true, sample_attribute_type: type, sample_type: FactoryBot.create(:simple_sample_type))
+    assert attribute.validate_value?('fish\\n\\rsoup')
+    assert attribute.validate_value?('fish\n\rsoup')
+    assert attribute.validate_value?('fish\r\nsoup')
+    assert attribute.validate_value?('   fish\n\rsoup ')
+    str = %(with
+  a
+  new
+  line%)
+    assert attribute.validate_value?(str)
+  end
+
+  test 'validate_value' do
+    type = SampleAttributeType.new(title: 'x-type', base_type: Seek::Samples::BaseType::STRING, regexp: 'xxx')
+    attribute = FactoryBot.create(:sample_attribute, is_title: true, sample_attribute_type: type, sample_type: FactoryBot.create(:simple_sample_type))
+    assert attribute.validate_value?('xxx')
+    refute attribute.validate_value?('fish')
+    refute attribute.validate_value?(nil)
+
+    type = SampleAttributeType.new(title: 'fish', base_type: Seek::Samples::BaseType::INTEGER)
+    attribute.sample_attribute_type = type
+    assert attribute.validate_value?(1)
+    assert attribute.validate_value?('1')
+    assert attribute.validate_value?('01')
+    refute attribute.validate_value?('frog')
+    refute attribute.validate_value?('1.1')
+    refute attribute.validate_value?(1.1)
+    refute attribute.validate_value?(nil)
+    refute attribute.validate_value?('')
+
+    # contriversial, but after much argument decided to allow these values as integers
+    assert attribute.validate_value?(1.0)
+    assert attribute.validate_value?('1.0')
+    assert attribute.validate_value?(1.00)
+    assert attribute.validate_value?('1.00')
+    assert attribute.validate_value?(1.000)
+    assert attribute.validate_value?('1.000')
+    assert attribute.validate_value?(2.0)
+    assert attribute.validate_value?('2.0')
+
+    type = SampleAttributeType.new(title: 'fish', base_type: Seek::Samples::BaseType::STRING, regexp: '.*yyy')
+    attribute.sample_attribute_type = type
+    assert attribute.validate_value?('yyy')
+    assert attribute.validate_value?('happpp - yyy')
+    refute attribute.validate_value?('')
+    refute attribute.validate_value?(nil)
+    refute attribute.validate_value?(1)
+    refute attribute.validate_value?('xxx')
+
+    type = SampleAttributeType.new(title: 'fish', base_type: Seek::Samples::BaseType::TEXT, regexp: '.*yyy')
+    attribute.sample_attribute_type = type
+    assert attribute.validate_value?('yyy')
+    assert attribute.validate_value?('happpp - yyy')
+
+    refute attribute.validate_value?('')
+    refute attribute.validate_value?(nil)
+    refute attribute.validate_value?(1)
+    refute attribute.validate_value?('xxx')
+
+    type = SampleAttributeType.new(title: 'fish', base_type: Seek::Samples::BaseType::FLOAT)
+    attribute.sample_attribute_type = type
+    assert attribute.validate_value?(1.0)
+    assert attribute.validate_value?(1.2)
+    assert attribute.validate_value?(0.78)
+    assert attribute.validate_value?('0.78')
+    assert attribute.validate_value?(12.70)
+    assert attribute.validate_value?('12.70')
+    refute attribute.validate_value?('fish')
+    refute attribute.validate_value?('2 Feb 2015')
+    refute attribute.validate_value?(nil)
+
+    assert attribute.validate_value?(1.0)
+    assert attribute.validate_value?(1)
+    assert attribute.validate_value?('1.0')
+    assert attribute.validate_value?('012')
+    assert attribute.validate_value?('012.3')
+    assert attribute.validate_value?('12.30')
+    assert attribute.validate_value?('1')
+
+    type = SampleAttributeType.new(title: 'fish', base_type: Seek::Samples::BaseType::DATE_TIME)
+    attribute.sample_attribute_type = type
+    assert attribute.validate_value?('2 Feb 2015')
+    assert attribute.validate_value?('Thu, 11 Feb 2016 15:39:55 +0000')
+    assert attribute.validate_value?('2016-02-11T15:40:14+00:00')
+    assert attribute.validate_value?(DateTime.parse('2 Feb 2015'))
+    assert attribute.validate_value?(DateTime.now)
+    refute attribute.validate_value?(1)
+    refute attribute.validate_value?(1.2)
+    refute attribute.validate_value?(nil)
+    refute attribute.validate_value?('30 Feb 2015')
+
+    type = SampleAttributeType.new(title: 'fish', base_type: Seek::Samples::BaseType::DATE)
+    attribute.sample_attribute_type = type
+    assert attribute.validate_value?('2 Feb 2015')
+    assert attribute.validate_value?('Thu, 11 Feb 2016 15:39:55 +0000')
+    assert attribute.validate_value?('2016-02-11T15:40:14+00:00')
+    assert attribute.validate_value?(Date.parse('2 Feb 2015'))
+    assert attribute.validate_value?(Date.today)
+    refute attribute.validate_value?(1)
+    refute attribute.validate_value?(1.2)
+    refute attribute.validate_value?(nil)
+    refute attribute.validate_value?('30 Feb 2015')
+  end
+
+  test 'web and email regexp' do
+    type = SampleAttributeType.new title: 'Email address', base_type: Seek::Samples::BaseType::STRING, regexp: RFC822::EMAIL.to_s
+    attribute = FactoryBot.create(:sample_attribute, is_title: true, sample_attribute_type: type, sample_type: FactoryBot.create(:simple_sample_type))
+    assert_equal RFC822::EMAIL.to_s, type.regexp
+
+    assert attribute.validate_value?('fred@email.com')
+    refute attribute.validate_value?('moonbeam')
+
+    type = SampleAttributeType.new title: 'Web link', base_type: Seek::Samples::BaseType::STRING, regexp: URI.regexp(%w(http https)).to_s
+    attribute.sample_attribute_type = type
+    assert attribute.validate_value?('http://google.com')
+    assert attribute.validate_value?('https://google.com')
+    refute attribute.validate_value?('moonbeam')
+  end
+
+  test 'is input attribute?' do
+    correct_input_attribute = FactoryBot.create(:sample_multi_sample_attribute, title: 'Input from previous sample type', isa_tag: nil, is_title: true, sample_type: FactoryBot.create(:simple_sample_type))
+    assert correct_input_attribute.input_attribute?
+
+    incorrect_input_attribute = FactoryBot.create(:sample_multi_sample_attribute, title: 'Input from previous sample type', isa_tag: FactoryBot.create(:default_isa_tag), is_title: true, sample_type: FactoryBot.create(:simple_sample_type))
+    refute incorrect_input_attribute.input_attribute?
+    second_incorrect_input_attribute = FactoryBot.create(:sample_multi_sample_attribute, title: 'Ingoing material', isa_tag: nil, is_title: true, sample_type: FactoryBot.create(:simple_sample_type))
+    refute second_incorrect_input_attribute.input_attribute?
+    third_incorrect_input_attribute = FactoryBot.create(:sample_sample_attribute, title: 'Input from previous sample type', isa_tag: nil, is_title: true, sample_type: FactoryBot.create(:simple_sample_type))
+    refute third_incorrect_input_attribute.input_attribute?
+  end
+
+  test 'inherited_from_template_attribute?' do
+    parent_attribute = FactoryBot.create(:template_attribute, title: 'Parent', isa_tag: nil, is_title: true, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type))
+    orphan_attribute = FactoryBot.create(:simple_string_sample_attribute, is_title: true, required: true, sample_type: FactoryBot.create(:simple_sample_type))
+    child_attribute = FactoryBot.create(:simple_string_sample_attribute, template_attribute_id: parent_attribute.id, required: true, is_title: true, sample_type: FactoryBot.create(:simple_sample_type))
+
+    refute orphan_attribute.inherited_from_template_attribute?
+    assert child_attribute.inherited_from_template_attribute?
   end
 
   private

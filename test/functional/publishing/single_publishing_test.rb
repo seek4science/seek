@@ -109,21 +109,21 @@ class SinglePublishingTest < ActionController::TestCase
     assert_select '.type_and_title', text: /Investigation/, count: 1 do
       assert_select 'a[href=?]', investigation_path(investigation), text: /#{investigation.title}/
     end
-    assert_select '.parent-btn-checkbox', text: /Publish/ do
+    assert_select '.parent-btn-checkbox' do
       assert_select "input[type='checkbox'][id=?]", "publish_Investigation_#{investigation.id}"
     end
 
     assert_select '.type_and_title', text: /Study/, count: 1 do
       assert_select 'a[href=?]', study_path(study), text: /#{study.title}/
     end
-    assert_select '.parent-btn-checkbox', text: /Publish/ do
+    assert_select '.parent-btn-checkbox' do
       assert_select "input[type='checkbox'][id=?]", "publish_Study_#{study.id}"
     end
 
     assert_select '.type_and_title', text: /Assay/, count: 1 do
       assert_select 'a[href=?]', assay_path(assay), text: /#{assay.title}/
     end
-    assert_select '.parent-btn-checkbox', text: /Publish/ do
+    assert_select '.parent-btn-checkbox' do
       assert_select "input[type='checkbox'][id=?]", "publish_Assay_#{assay.id}"
     end
 
@@ -133,12 +133,12 @@ class SinglePublishingTest < ActionController::TestCase
       assert_select 'a[href=?]', data_file_path(request_publishing_df), text: /#{request_publishing_df.title}/
       assert_select 'a[href=?]', data_file_path(notifying_df), text: /#{notifying_df.title}/
     end
-    assert_select '.parent-btn-checkbox', text: /Publish/ do
+    assert_select '.parent-btn-checkbox' do
       assert_select "input[type='checkbox'][id=?]", "publish_DataFile_#{publishing_df.id}"
       assert_select "input[type='checkbox'][id=?]", "publish_DataFile_#{request_publishing_df.id}"
     end
 
-    assert_select 'span.label-warning', text: "Can't publish", count: 1
+    assert_select '.parent-btn-checkbox.btn-warning[data-tooltip=?]', 'You do not have permission to manage this item.', count: 1
   end
 
   test 'split-button recursive selection' do
@@ -162,15 +162,15 @@ class SinglePublishingTest < ActionController::TestCase
 
     # split-button dropdown menu shown for tree branches
     should_have_dropdown.each do |asset|
-      assert_select "._#{asset.id}", count: 1 do
+      assert_select '.isa-tree[data-asset-id=?]', "#{asset.class.name}_#{asset.id}", count: 1 do
         assert_select '.parent-btn-dropdown', count: 1
         assert_select '.dropdown-menu', count: 1 do
           assert_select 'li', count: 2 do
-            assert_select 'a.selectChildren', text: /Select this item and all of its sub-items./, count: 1 do
+            assert_select 'a.batch-selection-select-children', text: /Select this item and all of its sub-items./, count: 1 do
               assert_select 'img[src=?]', '/assets/checkbox_select_all.svg'
             end
 
-            assert_select 'a.deselectChildren', text: /Deselect this item and all of its sub-items./, count: 1 do
+            assert_select 'a.batch-selection-deselect-children', text: /Deselect this item and all of its sub-items./, count: 1 do
               assert_select 'img[src=?]', '/assets/checkbox_deselect_all.svg'
             end
           end
@@ -179,7 +179,7 @@ class SinglePublishingTest < ActionController::TestCase
     end
     # split-button dropdown menu not shown for tree leafs
     should_not_have_dropdown.each do |asset|
-      assert_select "._#{asset.id}", count: 1 do
+      assert_select '.isa-tree[data-asset-id=?]', "#{asset.class.name}_#{asset.id}", count: 1 do
         assert_select '.parent-btn-dropdown', count: 0
         assert_select '.dropdown-menu', count: 0
       end

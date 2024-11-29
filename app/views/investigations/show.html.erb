@@ -18,7 +18,13 @@
           <b><%= "Investigation position" %>: </b>
           <%= @investigation.position %>
         </p>
-        <%= render partial: 'custom_metadata/custom_metadata_attribute_values', locals: {resource: @investigation} %>
+        <% if Seek::Config.isa_json_compliance_enabled %>
+          <p id="isa_json_compliance">
+            <b><%= "Is ISA-JSON compliant" %>: </b>
+            <%= @investigation.is_isa_json_compliant? %>
+          </p>
+        <% end %>
+        <%= render partial: 'extended_metadata/extended_metadata_attribute_values', locals: {resource: @investigation} %>
         <%= render partial: 'general/isa_graph', locals: { root_item: @investigation, options: { depth: 4 } } -%>
       </div>
       <div class="col-md-3 col-sm-4">

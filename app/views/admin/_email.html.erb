@@ -1,6 +1,6 @@
 <%= admin_checkbox_setting(:email_enabled, 1, Seek::Config.email_enabled,
                            "Email enabled", "Enables email support for sending notifications, requesting feedback, and requesting access to other users files.",
-                           :onchange=>toggle_appear_javascript('email_settings')) %>
+                           onchange: toggle_appear_javascript('email_settings')) %>
 <div id="email_settings" class="additional_settings" style="<%= show_or_hide_block(Seek::Config.email_enabled) -%>;" data-protected-settings-block>
   <div class="row">
     <div class="col-sm-7">
@@ -20,7 +20,7 @@
 
       <%= admin_checkbox_setting(:exception_notification_enabled, 1, Seek::Config.exception_notification_enabled,
                                  "Exception notification enabled", "Allows notifications of certain exceptions, allowing unexpected errors to be picked up quickly and fixed.",
-                                 :onchange=>toggle_appear_javascript('exception_notification_block')) %>
+                                 onchange: toggle_appear_javascript('exception_notification_block')) %>
 
       <div id="exception_notification_block" class="additional_settings" style="<%= show_or_hide_block(Seek::Config.exception_notification_enabled) -%>;">
         <%= admin_text_setting(:exception_notification_recipients,  Seek::Config.exception_notification_recipients,
@@ -28,7 +28,7 @@
 
         <%= admin_checkbox_setting(:error_grouping_enabled, 1, Seek::Config.error_grouping_enabled,
                                    "Error grouping enabled", "Groups notifications of errors of the same type, decreasing the number of emails sent. A server restart is required when changing these settings",
-                                   :onchange=>toggle_appear_javascript('error_grouping_block')) %>
+                                   onchange: toggle_appear_javascript('error_grouping_block')) %>
 
         <div id="error_grouping_block" class="additional_settings" style="<%= show_or_hide_block(Seek::Config.error_grouping_enabled) -%>;">
           <%= admin_text_setting(:error_grouping_timeout,  Seek::Config.error_grouping_timeout,

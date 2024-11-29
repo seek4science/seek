@@ -1,9 +1,9 @@
 {
   "data": {
-    "id": "1039992246",
+    "id": "1039988361",
     "type": "people",
     "attributes": {
-      "avatar": "/people/1039992246/avatars/45",
+      "avatar": "/people/1039988361/avatars/37",
       "title": "Maximilian Maxi-Mum",
       "description": "A person with all possible details",
       "first_name": "Maximilian",
@@ -23,7 +23,7 @@
       "projects": {
         "data": [
           {
-            "id": "1022256835",
+            "id": "1022252437",
             "type": "projects"
           }
         ]
@@ -31,7 +31,7 @@
       "institutions": {
         "data": [
           {
-            "id": "980196780",
+            "id": "980192883",
             "type": "institutions"
           }
         ]
@@ -39,7 +39,7 @@
       "investigations": {
         "data": [
           {
-            "id": "973655440",
+            "id": "973655106",
             "type": "investigations"
           }
         ]
@@ -47,7 +47,7 @@
       "studies": {
         "data": [
           {
-            "id": "1060385452",
+            "id": "1060385137",
             "type": "studies"
           }
         ]
@@ -55,7 +55,7 @@
       "assays": {
         "data": [
           {
-            "id": "1035387171",
+            "id": "1035386882",
             "type": "assays"
           }
         ]
@@ -63,7 +63,7 @@
       "data_files": {
         "data": [
           {
-            "id": "883654679",
+            "id": "883654361",
             "type": "data_files"
           }
         ]
@@ -71,7 +71,7 @@
       "models": {
         "data": [
           {
-            "id": "1004285720",
+            "id": "1004285589",
             "type": "models"
           }
         ]
@@ -79,7 +79,7 @@
       "sops": {
         "data": [
           {
-            "id": "1055250745",
+            "id": "1055250491",
             "type": "sops"
           }
         ]
@@ -87,7 +87,7 @@
       "publications": {
         "data": [
           {
-            "id": "165",
+            "id": "303",
             "type": "publications"
           }
         ]
@@ -95,7 +95,7 @@
       "presentations": {
         "data": [
           {
-            "id": "78",
+            "id": "118",
             "type": "presentations"
           }
         ]
@@ -103,7 +103,7 @@
       "events": {
         "data": [
           {
-            "id": "1025618735",
+            "id": "1025618752",
             "type": "events"
           }
         ]
@@ -111,7 +111,7 @@
       "documents": {
         "data": [
           {
-            "id": "211",
+            "id": "267",
             "type": "documents"
           }
         ]
@@ -119,7 +119,7 @@
       "workflows": {
         "data": [
           {
-            "id": "218",
+            "id": "183",
             "type": "workflows"
           }
         ]
@@ -127,21 +127,21 @@
       "collections": {
         "data": [
           {
-            "id": "29",
+            "id": "103",
             "type": "collections"
           }
         ]
       }
     },
     "links": {
-      "self": "/people/1039992246"
+      "self": "/people/1039988361"
     },
     "meta": {
-      "created": "2022-10-26T11:44:30.000Z",
-      "modified": "2022-10-26T11:44:30.000Z",
+      "created": "2024-06-20T12:38:46.000Z",
+      "modified": "2024-06-20T12:38:46.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "7a421450-3751-013b-356e-000c29a94011"
+      "uuid": "f5c5aed0-112f-013d-1f9d-0a81884ed284"
     }
   },
   "jsonapi": {

@@ -3,7 +3,7 @@ module Seek
     module PublishingCommon
       def self.included(base)
         base.before_action :set_asset, only: [:check_related_items, :publish_related_items, :check_gatekeeper_required, :publish, :published]
-        base.before_action :set_assets, only: [:batch_publishing_preview]
+        base.before_action :set_assets, :set_investigations, only: [:batch_publishing_preview, :batch_sharing_permission_preview, :batch_sharing_permission_changed]
         base.before_action :set_items_for_publishing, only: [:check_gatekeeper_required, :publish]
         base.before_action :set_items_for_potential_publishing, only: [:check_related_items, :publish_related_items]
         base.before_action :publish_auth, only: [:batch_publishing_preview, :check_related_items, :publish_related_items, :check_gatekeeper_required, :publish, :waiting_approval_assets, :cancel_publishing_request]
@@ -37,12 +37,8 @@ module Seek
       def check_gatekeeper_required
         @waiting_for_publish_items = @items_for_publishing.select { |item| item.gatekeeper_required? && !User.current_user.person.is_asset_gatekeeper_of?(item) }
         @items_for_immediate_publishing = @items_for_publishing - @waiting_for_publish_items
-        unless @waiting_for_publish_items.empty?
-          respond_to do |format|
-            format.html { render template: 'assets/publishing/waiting_approval_list' }
-          end
-        else
-          publish_final_confirmation
+        respond_to do |format|
+          format.html { render template: 'assets/publishing/publish_final_confirmation' }
         end
       end
 
@@ -51,12 +47,6 @@ module Seek
         current_access_type = args.first.policy.access_type.to_s
         @policy_updated = true if param_access_type != current_access_type
         super
-      end
-
-      def publish_final_confirmation
-        respond_to do |format|
-          format.html { render template: 'assets/publishing/publish_final_confirmation' }
-        end
       end
 
       def publish
@@ -133,14 +123,33 @@ module Seek
       end
 
       def set_assets
-        # get the assets that current_user can manage, then take the one that can_publish?
+        # get the assets that current_user can manage
         @assets = {}
-        publishable_types = Seek::Util.authorized_types.select { |authorized_type| authorized_type.first.try(:is_in_isa_publishable?) }
-        publishable_types.each do |klass|
+        Seek::Util.authorized_types.each do |klass|
           can_manage_assets = klass.authorized_for 'manage', current_user
-          can_manage_assets = can_manage_assets.select(&:can_publish?)
           unless can_manage_assets.empty?
             @assets[klass.name] = can_manage_assets
+          end
+        end
+      end
+
+      def set_investigations
+        @investigations = []
+        @assets['Investigation']&.each do |inv|
+          @investigations.push(inv)
+        end
+        @assets_not_in_isa = []
+        @assets.each do |type, klass|
+          next if %w[Investigation Study Assay].include? type
+          klass.each do |asset|
+            if !asset.respond_to?(:investigations) || asset.investigations.empty?
+              @assets_not_in_isa.push(asset)
+            else
+              asset.investigations.each do |inv|
+                next if @investigations.include?(inv)
+                @investigations.push(inv)
+              end
+            end
           end
         end
       end
@@ -148,6 +157,7 @@ module Seek
       # sets the @items_for_publishing based on the :publish param, and filtered by whether than can_publish?
       def set_items_for_publishing
         @items_for_publishing = resolve_publish_params(params[:publish]).select(&:can_publish?)
+        @items_cannot_publish = resolve_publish_params(params[:publish]) - @items_for_publishing
       end
 
       # sets the @items_for_publishing based on the :publish param, and filtered by whether than can_publish? OR contains_publishable_items?

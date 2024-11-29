@@ -6,6 +6,7 @@ class IndexTableColumnDefinitionsTest < ActiveSupport::TestCase
     @data_file = FactoryBot.create(:data_file)
     @person = FactoryBot.create(:person)
     @project = FactoryBot.create(:project)
+    @publication = FactoryBot.create(:publication)
   end
 
   test 'required columns' do
@@ -30,8 +31,13 @@ class IndexTableColumnDefinitionsTest < ActiveSupport::TestCase
                  Seek::IndexTableColumnDefinitions.allowed_columns(@data_file)
     assert_equal %w[title first_name last_name projects orcid description],
                  Seek::IndexTableColumnDefinitions.allowed_columns(@person)
-    assert_equal %w[title web_page start_date end_date topic_annotation_values description created_at updated_at],
+    assert_equal %w[title web_page start_date end_date topic_annotation_values description created_at updated_at tags],
                  Seek::IndexTableColumnDefinitions.allowed_columns(@project)
+  end
+
+  test 'blocked_columns' do
+    assert_not_includes %w[license],
+                        Seek::IndexTableColumnDefinitions.default_columns(@publication)
   end
 
   test 'sanity check and responds to' do

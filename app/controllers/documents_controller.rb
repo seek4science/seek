@@ -61,7 +61,8 @@ class DocumentsController < ApplicationController
                                 { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                 { assay_assets_attributes: [:assay_id] },
                                 { publication_ids: [] }, { event_ids: [] }, { workflow_ids: [] },
-                                discussion_links_attributes:[:id, :url, :label, :_destroy])
+                                     { extended_metadata_attributes: determine_extended_metadata_keys },
+                                     discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
 
   alias_method :asset_params, :document_params

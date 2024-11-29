@@ -32,7 +32,7 @@ module Seek
       end
 
       def file(path)
-        @obj.get_blob(path)&.file(fetch_remote: true)
+        @obj.get_blob(path)&.tap { |blob| blob.fetch_remote = true }
       end
 
       def licensee_project

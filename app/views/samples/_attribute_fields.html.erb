@@ -1,9 +1,18 @@
 <% sample_type.sample_attributes.each do |attribute| %>
     <div class="form-group">
-      <label><%= sample_attribute_display_title(attribute) %></label><%= required_span if attribute.required? %>
+      <label>
+        <%= sample_attribute_display_title(attribute) %>
+        <% if attribute.controlled_vocab? && attribute.allow_cv_free_text %>
+          <span class='subtle'><%= " (#{t('samples.allow_free_text_label_hint')})" %></span>
+        <% end %>
+      </label>
+      <%= required_span if attribute.required? %>
       <% if attribute.description %>
         <p class="help-block"><%= attribute.description %></p>
       <% end %>
+
+
       <%= sample_form_field_for_attribute(attribute, @sample) %>
+
     </div>
 <% end %>

@@ -27,7 +27,7 @@ class DecoratorTest < ActiveSupport::TestCase
     identifier = "http://localhost:3000/documents/#{document.id}"
     assert_equal identifier, decorator.identifier
     assert_equal %w[lorry yellow], decorator.keywords.split(',').collect(&:strip).sort
-    assert_equal 'https://creativecommons.org/licenses/by/4.0/', decorator.license
+    assert_equal 'https://spdx.org/licenses/CC-BY-4.0', decorator.license
     assert_equal 'application/pdf', decorator.content_type
     project = document.projects.first
     person = document.creators.first

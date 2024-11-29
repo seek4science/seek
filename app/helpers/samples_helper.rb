@@ -6,7 +6,7 @@ module SamplesHelper
     attribute_form_element(attribute, resource.get_attribute_value(attribute.title), element_name, element_class)
   end
 
-  def controlled_vocab_form_field(sample_controlled_vocab, element_name, values, limit = 1)
+  def controlled_vocab_form_field(sample_controlled_vocab, element_name, values, allow_new, limit = 1)
 
     scv_id = sample_controlled_vocab.id
     object_struct = Struct.new(:id, :title)
@@ -32,30 +32,32 @@ module SamplesHelper
     objects_input(element_name, existing_objects,
                   typeahead: typeahead,
                   limit: limit,
-                  allow_new: sample_controlled_vocab.custom_input?,
+                  allow_new: allow_new,
                   class: 'form-control')
 
   end
 
-  def controlled_vocab_list_form_field(sample_controlled_vocab, element_name, values)
-    controlled_vocab_form_field(sample_controlled_vocab, element_name, values, nil)
+  def controlled_vocab_list_form_field(sample_controlled_vocab, element_name, values, allow_new)
+    controlled_vocab_form_field(sample_controlled_vocab, element_name, values, allow_new, nil)
   end
 
-  def linked_custom_metadata_multi_form_field(attribute, value, element_name, element_class)
-    render partial: 'custom_metadata/fancy_linked_custom_metadata_multi_attribute_fields',
+  def linked_extended_metadata_multi_form_field(attribute, value, element_name, element_class)
+    render partial: 'extended_metadata/fancy_linked_extended_metadata_multi_attribute_fields',
            locals: { value: value, attribute: attribute, element_name: element_name, element_class: element_class, collapsed: false }
   end
 
-  def linked_custom_metadata_form_field(attribute, value, element_name, element_class,depth)
+  def linked_extended_metadata_form_field(attribute, value, element_name, element_class,depth)
     html = ''
 
-    attribute.linked_custom_metadata_type.custom_metadata_attributes.each do |attr|
+    Rails.logger.info ActiveSupport::LogSubscriber.new.send(:color, attribute.inspect, :blue, bold = true)
+
+    attribute.linked_extended_metadata_type.extended_metadata_attributes.each do |attr|
       attr_element_name = "#{element_name}[#{attr.title}]"
       html += '<div class="form-group"><label>'+attr.label+'</label>'
       html +=  required_span if attr.required?
       v = value ? value[attr.title] : nil
-      if attr.linked_custom_metadata?
-        html += '<div class="form-group linked_custom_metdata_'+(depth.even? ? 'even' : 'odd')+'">'
+      if attr.linked_extended_metadata?
+        html += '<div class="form-group linked_extended_metdata_'+(depth.even? ? 'even' : 'odd')+'">'
         html +=  attribute_form_element(attr, v, attr_element_name, element_class,depth+1)
         html += '</div>'
       else
@@ -63,7 +65,7 @@ module SamplesHelper
       end
 
       unless attr.description.nil?
-        html += custom_metadata_attribute_description(attr.description)
+        html += extended_metadata_attribute_description(attr.description)
       end
       html += '</div>'
     end
@@ -79,6 +81,8 @@ module SamplesHelper
       value = [value] unless value.is_a?(Array)
       value.compact.each do |v|
         id = v[:id]
+        next if id.blank? # Skip value if there is no ID
+
         title = v[:title]
         title = '<em>Hidden</em>' unless Sample.find(id).can_view?
         existing_objects << str.new(id, title)
@@ -139,34 +143,57 @@ module SamplesHelper
       when Seek::Samples::BaseType::CV
         seek_cv_attribute_display(value, attribute)
       when Seek::Samples::BaseType::CV_LIST
-        value.each{|v| seek_cv_attribute_display(v, attribute) }.join(', ')
-      when Seek::Samples::BaseType::LINKED_CUSTOM_METADATA
-        linked_custom_metadata_attribute_display(value, attribute)
-      when Seek::Samples::BaseType::LINKED_CUSTOM_METADATA_MULTI
-        linked_custom_metadata_multi_attribute_display(value, attribute)
+        value.map do |v|
+          seek_cv_attribute_display(v, attribute)
+        end.join(', ').html_safe
+      when Seek::Samples::BaseType::LINKED_EXTENDED_METADATA
+        linked_extended_metadata_attribute_display(value, attribute)
+      when Seek::Samples::BaseType::LINKED_EXTENDED_METADATA_MULTI
+        linked_extended_metadata_multi_attribute_display(value, attribute)
       else
         default_attribute_display(value, attribute, options)
       end
     end
   end
 
-  def seek_cv_attribute_display(value, attribute)
-    term = attribute.sample_controlled_vocab.sample_controlled_vocab_terms.where(label:value).last
-    content = value
-    if term && term.iri.present?
-      content << " (#{term.iri}) "
+  def select_cv_source_ontology(sample_controlled_vocab)
+    ontology_choices = Ebi::OlsClient.ontology_choices
+    local_options = ontology_choices.collect do |choice|
+      { id: choice[1], text: choice[0]}
     end
-    content
+    existing = []
+    if sample_controlled_vocab.source_ontology
+      label = ontology_choices.select{|choice| choice[1] == sample_controlled_vocab.source_ontology}.first.try(:[],0)
+      existing = [OpenStruct.new({id: sample_controlled_vocab.source_ontology, title: label })]
+    end
+    placeholder = 'Select or Search, or leave blank for No Ontology'
+    objects_input 'sample_controlled_vocab[source_ontology]', existing, {typeahead: {values:local_options},
+                                                                         placeholder: placeholder,
+                                                                         multiple: false}
   end
 
-  def linked_custom_metadata_attribute_display(value, attribute)
+  def seek_cv_attribute_display(value, attribute)
+    term = attribute.sample_controlled_vocab.sample_controlled_vocab_terms.where(label: value).last
+    if term && term.iri.present?
+      iri_content = term.iri.match?(/^https?:\/\//) ? link_to(term.iri, term.iri, target: '_blank') : term.iri
+      label_tag = content_tag(:label, term.label, class: 'term-label')
+      iri_tag = content_tag(:label, iri_content, class: 'term-iri badge')
+      "#{label_tag}#{iri_tag}".html_safe
+    elsif term.nil? && attribute.allow_cv_free_text?
+      value
+    else
+      term&.label
+    end
+  end
+
+  def linked_extended_metadata_attribute_display(value, attribute)
     html = ''
     html += '<ul>'
-    attribute.linked_custom_metadata_type.custom_metadata_attributes.each do |attr|
+    attribute.linked_extended_metadata_type.extended_metadata_attributes.each do |attr|
       v = value ? value[attr.title.to_s] : nil
       html += '<li>'
-      if attr.linked_custom_metadata? || attr.linked_custom_metadata_multi?
-        html += content_tag(:span, class: 'linked_custom_metdata_display') do
+      if attr.linked_extended_metadata? || attr.linked_extended_metadata_multi?
+        html += content_tag(:span, class: 'linked_extended_metdata_display') do
           folding_panel(attr.label, true, id:attr.title) do
             display_attribute_value(v, attr)
           end
@@ -181,10 +208,10 @@ module SamplesHelper
     html.html_safe
   end
 
-  def linked_custom_metadata_multi_attribute_display(values, attribute)
+  def linked_extended_metadata_multi_attribute_display(values, attribute)
     html = ''
     values.each do |value|
-      html += linked_custom_metadata_attribute_display(value, attribute)
+      html += linked_extended_metadata_attribute_display(value, attribute)
     end
     html.html_safe
   end
@@ -241,7 +268,7 @@ module SamplesHelper
 
   # link for the sample type for the provided sample. Handles a referring_sample_id if required
   def sample_type_link(sample, user=User.current_user)
-    return nil if Seek::Config.project_single_page_advanced_enabled && !sample.sample_type.template_id.nil?
+    return nil if Seek::Config.isa_json_compliance_enabled && !sample.sample_type.template_id.nil?
 
     if (sample.sample_type.can_view?(user))
       link_to sample.sample_type.title,sample.sample_type
@@ -265,9 +292,11 @@ module SamplesHelper
     link_to(link,link,target: :_blank)
   end
 
-  def ols_root_term_link(ols_id, term_uri)
-    ols_link = "#{Ebi::OlsClient::ROOT_URL}/ontologies/#{ols_id}/terms?iri=#{term_uri}"
-    link_to(term_uri, ols_link, target: :_blank)
+  def ols_root_term_link(ols_id, term_uris)
+    term_uris.split(',').collect(&:strip).collect do |uri|
+      ols_link = "#{Ebi::OlsClient::ROOT_URL}/ontologies/#{ols_id}/terms?iri=#{uri}"
+      link_to(uri, ols_link, target: :_blank)
+    end.join(', ').html_safe
   end
 
   def get_extra_info(sample)
@@ -283,13 +312,17 @@ module SamplesHelper
     }
   end
 
-  def show_extract_samples_button?(asset, display_asset)
-    return false unless ( asset.can_manage? && (display_asset.version == asset.version) && asset.sample_template? && asset.extracted_samples.empty? )
-    return ! ( asset.sample_extraction_task&.in_progress? || ( asset.sample_extraction_task&.success? && Seek::Samples::Extractor.new(asset).fetch.present? ) )
+  # whether to attempt to show the extract samples button,
+  # the final check of whether there is a sample type will be done asynchronously
+  def attempt_to_show_extract_samples_button?(asset, display_asset)
+    return false unless SampleType.any? && asset.can_manage? && asset.content_blob&.is_extractable_spreadsheet?
+    return false unless asset.extracted_samples.empty? && (display_asset.version == asset.version)
+    return false if asset.sample_extraction_task&.in_progress?
 
-    rescue Seek::Samples::FetchException
-      return true # allows to try again
+    !(asset.sample_extraction_task&.success? && Seek::Samples::Extractor.new(asset).fetch.present?)
 
+  rescue Seek::Samples::FetchException
+    true #allows to try again, the previous cached results may be broken
   end
 
   def show_sample_extraction_status?(data_file)
@@ -338,22 +371,20 @@ module SamplesHelper
                                                    :title, value.try(:[], 'id'))
       select_tag(element_name, options, include_blank: !attribute.required?, class: "form-control #{element_class}")
     when Seek::Samples::BaseType::CV
-      controlled_vocab_form_field attribute.sample_controlled_vocab, element_name, value
+      controlled_vocab_form_field attribute.sample_controlled_vocab, element_name, value, attribute.allow_cv_free_text?
     when Seek::Samples::BaseType::CV_LIST
-      controlled_vocab_list_form_field attribute.sample_controlled_vocab, element_name, value
+      controlled_vocab_list_form_field attribute.sample_controlled_vocab, element_name, value, attribute.allow_cv_free_text?
     when Seek::Samples::BaseType::SEEK_SAMPLE
       sample_form_field attribute, element_name, value
     when Seek::Samples::BaseType::SEEK_SAMPLE_MULTI
       sample_multi_form_field attribute, element_name, value
-    when Seek::Samples::BaseType::LINKED_CUSTOM_METADATA
-      linked_custom_metadata_form_field attribute, value, element_name, element_class,depth
-    when Seek::Samples::BaseType::LINKED_CUSTOM_METADATA_MULTI
-      linked_custom_metadata_multi_form_field attribute, value, element_name, element_class
+    when Seek::Samples::BaseType::LINKED_EXTENDED_METADATA
+      linked_extended_metadata_form_field attribute, value, element_name, element_class,depth
+    when Seek::Samples::BaseType::LINKED_EXTENDED_METADATA_MULTI
+      linked_extended_metadata_multi_form_field attribute, value, element_name, element_class
     else
       text_field_tag element_name, value, class: "form-control #{element_class}", placeholder: placeholder
     end
   end
 
 end
-
-

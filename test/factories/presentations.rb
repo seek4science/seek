@@ -104,4 +104,8 @@ FactoryBot.define do
       end
     end
   end
+
+  factory(:small_test_spreadsheet_presentation, parent: :presentation) do
+    association :content_blob, factory: :small_test_spreadsheet_content_blob
+  end
 end

@@ -1,6 +1,6 @@
 Hi,
 
-The request to create a <%= t('project') %> has been responded to and approved by <%= @responder.name %>.
+The request to create a <%= t('project') %> has been responded to and approved <%= @responder.nil? ? 'automatically' : "by #{@responder.name}" %>.
 
 The <%= t('project') %> created is '<%= @project.title %>' ( <%= project_url(@project) %> ), and was originally requested by
 '<%= @requester.name %>' ( <%= person_url(@requester) %> ).

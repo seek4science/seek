@@ -200,6 +200,27 @@ class GitControllerTest < ActionController::TestCase
     assert_select 'img.git-image-preview[src=?]', workflow_git_raw_path(@workflow, version: @git_version.version, path: 'diagram.png')
   end
 
+  test 'get svg file blob' do
+    @git_version.add_file('test.svg', open_fixture_file('transparent-fairdom-logo-square.svg'))
+    @git_version.save!
+    get :blob, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'test.svg', format: 'html' } # Not sure why this is needed
+
+    assert_response :success
+    assert_select 'a.btn[href=?]', workflow_git_remove_file_path(@workflow, version: @git_version.version, path: 'test.svg')
+    assert_select 'img.git-image-preview[src=?]', workflow_git_raw_path(@workflow, version: @git_version.version, path: 'test.svg')
+  end
+
+  test 'get remote blob' do
+    @git_version.add_remote_file('something', 'https://example.com/something', fetch: false)
+    @git_version.save!
+    get :blob, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'something' }
+
+    assert_response :success
+    assert_select 'a.btn[href=?]', workflow_git_remove_file_path(@workflow, version: @git_version.version, path: 'something')
+    assert_select 'a.btn[href=?]', 'https://example.com/something'
+    assert_select 'img.git-image-preview[src=?]', workflow_git_raw_path(@workflow, version: @git_version.version, path: 'something'), count: 0
+  end
+
   test 'get raw binary file' do
     get :raw, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'diagram.png' }
 
@@ -212,6 +233,24 @@ class GitControllerTest < ActionController::TestCase
 
     assert_response :success
     assert @response.header['Content-Disposition'].include?('attachment')
+  end
+
+  test 'attempting to download remote blob throws error' do
+    @git_version.add_remote_file('something', 'https://example.com/something', fetch: false)
+    @git_version.save!
+    get :download, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'something' }
+
+    assert_redirected_to workflow_path(@workflow, tab: 'files')
+    assert flash[:error].include?('held externally')
+  end
+
+  test 'attempting to get raw remote blob throws error' do
+    @git_version.add_remote_file('something', 'https://example.com/something', fetch: false)
+    @git_version.save!
+    get :raw, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'something' }
+
+    assert_redirected_to workflow_path(@workflow, tab: 'files')
+    assert flash[:error].include?('held externally')
   end
 
   test 'getting non-existent blob throws error' do

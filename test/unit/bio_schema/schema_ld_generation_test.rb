@@ -89,7 +89,6 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'dateModified' => @current_time.iso8601
     }
 
-    Seek::Util.clear_cached
     with_config_values(collections_enabled: false,
                        data_files_enabled: false,
                        documents_enabled: false,
@@ -105,7 +104,6 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       json = JSON.parse(Seek::BioSchema::DataCatalogMockModel.new.to_schema_ld)
       assert_equal expected, json
     end
-    Seek::Util.clear_cached
   end
 
   test 'person' do
@@ -327,6 +325,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'logo' => "http://localhost:3000/projects/#{@project.id}/avatars/#{@project.avatar.id}?size=250",
       'image' => "http://localhost:3000/projects/#{@project.id}/avatars/#{@project.avatar.id}?size=250",
       'url' => @project.web_page,
+      'keywords' => '',
       'member' => [
         { '@type' => 'Person', '@id' => "http://localhost:3000/people/#{@person.id}", 'name' => @person.name },
         { '@type' => 'ResearchOrganization', '@id' => "http://localhost:3000/institutions/#{institution.id}",
@@ -858,7 +857,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'name' => 'Workflows',
       'url' => 'http://localhost:3000/workflows',
       'keywords' => [],
-      'license' => 'https://creativecommons.org/publicdomain/zero/1.0/',
+      'license' => 'https://spdx.org/licenses/CC0-1.0',
       'creator' => [{'@type' => 'Organization',
                      '@id' => 'http://www.sysmo-db.org',
                      'name' => 'SysMO-DB',
@@ -892,7 +891,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'name' => 'Workflows',
       'url' => 'http://localhost:3000/workflows',
       'keywords' => [],
-      'license' => 'https://creativecommons.org/licenses/by/4.0/',
+      'license' => 'https://spdx.org/licenses/CC-BY-4.0',
       'creator' => [{ '@type' => 'Organization',
                       '@id' => 'http://www.sysmo-db.org',
                       'name' => 'SysMO-DB',
