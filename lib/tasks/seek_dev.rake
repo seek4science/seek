@@ -413,7 +413,7 @@ namespace :seek_dev do
     pub_ids = Project.find(project_id).publications.map(&:id)
     pub_ids.each do |id|
       permission = Publication.find(id).policy.permissions.where(contributor_type: "Person", contributor_id: person_id).first_or_initialize
-      permission.update_attributes(access_type: Policy::MANAGING)
+      permission.update(access_type: Policy::MANAGING)
     end
 
   end
