@@ -328,8 +328,10 @@ class PublicationsControllerTest < ActionController::TestCase
 
   test 'should show old unspecified publication type' do
     publication = FactoryBot.create(:publication, title: 'Publication without type')
-    publication.publication_type = nil
-    publication.save(validate: false)
+    disable_authorization_checks do
+      publication.publication_type = nil
+      publication.save!(validate: false)
+    end
     get :index
     assert_response :success
     assert_select '.list_item_attribute' do
@@ -549,15 +551,15 @@ class PublicationsControllerTest < ActionController::TestCase
 
   test 'should get edit' do
     pub = FactoryBot.create(:publication)
+    login_as(pub.contributor)
     get :edit, params: { id: pub.id }
     assert_response :success
   end
 
-
   test 'associates assay' do
-    login_as(User.current_user)  # can edit assay
-
     publ = FactoryBot.create(:publication)
+    login_as(publ.contributor)
+
     original_assay = FactoryBot.create :assay, contributor: User.current_user.person, publications: [publ]
     publ.assays = [original_assay]
     refute_nil publ.contributor
@@ -840,6 +842,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
   test 'should update project' do
     publ = FactoryBot.create(:publication)
+    login_as(publ.contributor)
     project = FactoryBot.create(:min_project)
     assert_not_equal project, publ.projects.first
     put :update, params: { id: publ.id, publication: { project_ids: [project.id] } }

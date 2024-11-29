@@ -1,0 +1,14 @@
+<% if @samples.any? %>
+  <div id="samples-table">
+    <%= render partial: "samples/table_view", locals: { samples: @samples, link: true }%>
+  </div>
+  <script>
+      $j(document).ready(function () {
+          Samples.initTable($j('#samples-table'));
+      });
+  </script>
+<% else %>
+  <div class='alert alert-warning'>
+    There are no Samples available to be displayed
+  </div>
+<% end %>

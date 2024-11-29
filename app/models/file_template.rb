@@ -41,5 +41,9 @@ class FileTemplate < ApplicationRecord
   def self.user_creatable?
     Seek::Config.file_templates_enabled
   end
+
+  def self.supports_extended_metadata?
+    false
+  end
   
 end

@@ -1,0 +1,74 @@
+{
+  "data": {
+    "id": "<%= res.id %>",
+    "type": "observation_units",
+    "attributes": {
+      "policy": {
+        "access": "manage",
+        "permissions": []
+      },
+      "discussion_links": [],
+      "title": "A Minimal Observation Unit",
+      "description": null,
+      "tags": [],
+      "created_at": "<%= res.created_at.as_json %>",
+      "updated_at": "<%= res.updated_at.as_json %>",
+      "creators": [],
+      "other_creators": null
+    },
+    "relationships": {
+      "creators": {
+        "data": []
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "<%= current_person.id %>",
+            "type": "people"
+          }
+        ]
+      },
+      "people": {
+        "data": [
+          {
+            "id": "<%= current_person.id %>",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "<%= res.projects.first.id %>",
+            "type": "projects"
+          }
+        ]
+      },
+      "study": {
+        "data": {
+          "id": "<%= res.study.id %>",
+          "type": "studies"
+        }
+      },
+      "samples": {
+        "data": []
+      },
+      "data_files": {
+        "data": []
+      }
+    },
+    "links": {
+      "self": "/observation_units/<%= res.id %>"
+    },
+    "meta": {
+      "created": "<%= res.created_at.as_json %>",
+      "modified": "<%= res.updated_at.as_json %>",
+      "api_version": "0.3",
+      "base_url": "http://localhost:3000",
+      "uuid": "<%= res.uuid %>"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

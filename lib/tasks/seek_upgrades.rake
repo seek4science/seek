@@ -8,17 +8,11 @@ namespace :seek do
   # these are the tasks required for this version upgrade
   task upgrade_version_tasks: %i[
     environment
-    decouple_extracted_samples_policies
-    decouple_extracted_samples_projects
-    link_sample_datafile_attributes
     db:seed:007_sample_attribute_types
-    db:seed:001_create_controlled_vocabs
-    db:seed:017_minimal_starter_isa_templates
-    recognise_isa_json_compliant_items
-    implement_assay_streams_for_isa_assays
-    set_ls_login_legacy_mode
-    rename_custom_metadata_legacy_supported_type
+    update_rdf
+    update_observation_unit_policies
     fix_xlsx_marked_as_zip
+    add_policies_to_existing_sample_types
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -53,157 +47,38 @@ namespace :seek do
     end
   end
 
-  task(decouple_extracted_samples_policies: [:environment]) do
-    puts '..... creating independent policies for extracted samples (this can take a while if there are many samples) ...'
-    affected_samples = []
-
-    Policy.skip_callback :commit, :after, :queue_update_auth_table
-    Policy.skip_callback :commit, :after, :queue_rdf_generation_job
-    Permission.skip_callback :commit, :after, :queue_update_auth_table
-    Permission.skip_callback :commit, :after, :queue_rdf_generation_job
-
-    disable_authorization_checks do
-      Sample.includes(:originating_data_file).in_batches(of: 250) do |batch|
-        batch.each do |sample|
-          # check if the sample was extracted from a datafile and their policies are linked
-          if sample.extracted? && sample.policy_id == sample.originating_data_file&.policy_id
-            policy = sample.policy.deep_copy
-            policy.save
-            sample.update_column(:policy_id, policy.id)
-            affected_samples << sample
-          end
-        end
-        putc('.')
-      end
-    end
-    puts "..... finished creating independent policies of #{affected_samples.count} extracted samples"
-  ensure
-    Policy.set_callback :commit, :after, :queue_update_auth_table
-    Policy.set_callback :commit, :after, :queue_rdf_generation_job
-    Permission.set_callback :commit, :after, :queue_update_auth_table
-    Permission.set_callback :commit, :after, :queue_rdf_generation_job
-  end
-
-  task(decouple_extracted_samples_projects: [:environment]) do
-    puts '..... copying project ids for extracted samples...'
-    decoupled_count = 0
-    hash_array = []
-    disable_authorization_checks do
-      Sample.includes(:originating_data_file).where.missing(:projects).in_batches(of: 250) do |batch|
-        batch.each do |sample|
-          # check if the sample was extracted from a datafile and their projects are linked
-          if sample.extracted? && sample.project_ids.empty?
-            sample.originating_data_file.project_ids.each do |project_id|
-              hash_array << { project_id: project_id, sample_id: sample.id }
-            end
-            decoupled_count += 1
-          end
-        end
-        putc('.')
-      end
-      unless hash_array.empty?
-        class ProjectsSample < ActiveRecord::Base; end;
-        ProjectsSample.insert_all(hash_array)
-      end
-    end
-    puts " ... finished copying project ids of #{decoupled_count.to_s} extracted samples"
-  end
-
-  task(link_sample_datafile_attributes: [:environment]) do
-    puts '... updating sample_resource_links for samples with data_file attributes...'
-    samples_updated = 0
-    disable_authorization_checks do
-      df_attrs = SampleAttribute.joins(:sample_attribute_type).where('sample_attribute_types.base_type' => Seek::Samples::BaseType::SEEK_DATA_FILE).pluck(:id)
-      samples = Sample.joins(sample_type: :sample_attributes).where('sample_attributes.id' => df_attrs)
-      samples.each do |sample|
-        if sample.sample_resource_links.where(resource_type: 'DataFile').empty?
-          sample.send(:update_sample_resource_links)
-          samples_updated += 1
+  # if rdf repository enabled then generate jobs, otherwise just clear the cache. Only runs once
+  task(update_rdf: [:environment]) do
+    only_once('seek:update_rdf 1.16.0') do
+      if Seek::Rdf::RdfRepository.instance&.configured?
+        puts '... triggering rdf generation jobs'
+        Rake::Task['seek_rdf:generate'].invoke
+      else
+        path = Seek::Config.rdf_filestore_path
+        unless Dir.empty?(path)
+          puts "... clearing rdf cache at #{path}"
+          FileUtils.rm_rf(path, secure: true)
         end
       end
     end
-    puts " ... finished updating sample_resource_links of #{samples_updated.to_s} samples with data_file attributes"
   end
 
-  task(recognise_isa_json_compliant_items: [:environment]) do
-    puts '... searching for ISA compliant investigations'
-    investigations_updated = 0
-    disable_authorization_checks do
-      investigations_to_update = Study.joins(:investigation)
-                                   .where('investigations.is_isa_json_compliant IS NULL OR investigations.is_isa_json_compliant = ?', false)
-                                      .select { |study| study.sample_types.any? }
-                                      .map(&:investigation)
-                                      .compact
-                                      .uniq
-
-      investigations_to_update.each do |inv|
-        inv.update_column(:is_isa_json_compliant, true)
-        investigations_updated += 1
+  task(update_observation_unit_policies: [:environment]) do
+    puts '..... creating observation unit policies ...'
+    affected_obs_units = []
+    ObservationUnit.where.missing(:policy).includes(:study).in_batches(of: 25) do |batch|
+      batch.each do |obs_unit|
+        policy = obs_unit.study.policy || Policy.default
+        policy = policy.deep_copy
+        policy.save
+        obs_unit.update_column(:policy_id, policy.id)
+        affected_obs_units << obs_unit
       end
+      putc('.')
     end
-    puts "...Updated #{investigations_updated.to_s} investigations"
-  end
-
-  task(implement_assay_streams_for_isa_assays: [:environment]) do
-    puts '... Organising isa json compliant assays in assay streams'
-    assay_streams_created = 0
-    disable_authorization_checks do
-      # find assays linked to a study through their sample_types
-      # Should be isa json compliant
-      # Shouldn't already have an assay stream (don't update assays that have been updated already)
-      # Previous ST should be second ST of study
-      first_assays_in_stream = Assay.joins(:sample_type, study: :investigation)
-                                    .where(assay_stream_id: nil, investigation: { is_isa_json_compliant: true })
-                                 .select { |a| a.sample_type.previous_linked_sample_type == a.study.sample_types.second }
-
-      first_assays_in_stream.map do |fas|
-        stream_name = "Assay Stream - #{UUID.generate}"
-        assay_stream = Assay.create(title: stream_name,
-                                    study_id: fas.study_id,
-                                    assay_class_id: AssayClass.assay_stream.id,
-                                    contributor: fas.contributor,
-                                    position: 0)
-
-        # Transfer extended metadata from first assay to newly created assay stream
-        unless fas.extended_metadata.nil?
-          em = ExtendedMetadata.find_by(item_id: fas.id)
-          em.update_column(:item_id, assay_stream.id)
-        end
-
-        assay_position = 1
-        current_assay = fas
-        while current_assay
-          current_assay.update_column(:position, assay_position)
-          current_assay.update_column(:assay_stream_id, assay_stream.id)
-
-          assay_position += 1
-          current_assay = if current_assay.sample_type.nil?
-                            nil
-                          else
-                            current_assay.sample_type.next_linked_sample_types.first&.assays&.first
-                          end
-        end
-        assay_streams_created += 1
-      end
-    end
-
-    puts "...Created #{assay_streams_created} new assay streams"
-  end
-
-  task(set_ls_login_legacy_mode: [:environment]) do
-    only_once('ls_login_legacy') do
-      if Seek::Config.omniauth_elixir_aai_enabled
-        puts "Enabling LS Login legacy mode"
-        Seek::Config.omniauth_elixir_aai_legacy_mode = true
-      end
-    end
-  end
-
-  task(rename_custom_metadata_legacy_supported_type: [:environment]) do
-    if ExtendedMetadataType.where(supported_type: 'CustomMetadata').any?
-      puts "... Renaming ExtendedMetadata supported_type from Custom to ExtendedMetadata"
-      ExtendedMetadataType.where(supported_type: 'CustomMetadata').update_all(supported_type: 'ExtendedMetadata')
-    end
+    AuthLookupUpdateQueue.enqueue(affected_obs_units)
+    RdfGenerationQueue.enqueue(affected_obs_units)
+    puts "..... finished updating policies for #{affected_obs_units.count} observation units"
   end
 
   task(fix_xlsx_marked_as_zip: [:environment]) do
@@ -213,6 +88,44 @@ namespace :seek do
       blobs.update_all(content_type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
       puts "... fixed #{n} XLSX blobs with zip content type"
     end
+  end
+
+  task(add_policies_to_existing_sample_types: [:environment]) do
+    puts '... Adding policies to existing sample types'
+    counter = 0
+    disable_authorization_checks do
+      SampleType.includes(:projects, :assays, :studies).where(policy_id: nil).each do |st|
+        if st.is_isa_json_compliant?
+          st.update_column(:policy_id, st.assays.first.policy_id) if st.assays.any?
+          st.update_column(:policy_id, st.studies.first.policy_id) if st.studies.any?
+        else
+          policy = Policy.new
+          policy.name = 'default policy'
+
+          # Visible if linked to public samples
+          if st.samples.any? { |sample| sample.is_published? }
+            policy.access_type = Policy::VISIBLE
+          else
+            policy.access_type = Policy::NO_ACCESS
+          end
+          # Visible to each project
+          st.projects.map do |project|
+            policy.permissions << Permission.new(contributor_type: Permission::PROJECT, contributor_id: project.id, access_type: Policy::VISIBLE)
+          end
+          # Project admins can manage
+          project_admins = st.projects.map(&:project_administrators).flatten
+          project_admins.map do |admin|
+            policy.permissions << Permission.new(contributor_type: Permission::PERSON, contributor_id: admin.id, access_type: Policy::MANAGING)
+          end
+
+          policy.save
+          st.update_column(:policy_id, policy.id)
+        end
+        putc('.')
+        counter += 1
+      end
+    end
+    puts "...Added policies to #{counter} sample types"
   end
 
   private

@@ -4,9 +4,9 @@ module HasExtendedMetadata
   included do
     def extended_metadata_attribute_values_for_search
       return [] unless extended_metadata
+
       extended_metadata.data.extract_all_values.uniq.compact
     end
-
   end
 
   class_methods do
@@ -27,4 +27,3 @@ module HasExtendedMetadata
     end
   end
 end
-

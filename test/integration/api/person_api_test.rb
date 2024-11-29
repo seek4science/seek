@@ -38,7 +38,7 @@ class PersonApiTest < ActionDispatch::IntegrationTest
     user_login(FactoryBot.create(:person))
     body = api_max_post_body
     assert_no_difference('Person.count') do
-      post "/people.json", params: body, as: :json
+      post collection_url, params: body, headers: { 'Authorization' => write_access_auth }
     end
   end
 
@@ -47,7 +47,7 @@ class PersonApiTest < ActionDispatch::IntegrationTest
     body = api_max_post_body
     body["data"]["id"] = "#{other_person.id}"
     body["data"]["attributes"]["email"] = "updateTest@email.com"
-    patch "/people/#{other_person.id}.json", params: body, as: :json
+    patch "/people/#{other_person.id}.json", params: body, as: :json, headers: { 'Authorization' => write_access_auth }
     assert_response :success
   end
 end

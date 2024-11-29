@@ -30,9 +30,11 @@ class WorkflowApiTest < ActionDispatch::IntegrationTest
     assert wf.can_edit?(@current_user)
 
     original_md5 = wf.content_blob.md5sum
-    put workflow_content_blob_path(wf, wf.content_blob),
-        headers: { 'Accept' => 'application/json',
-                   'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'workflows', 'rp2', 'workflows', 'rp2-to-rp2path.cwl')) }
+    put workflow_content_blob_path(wf, wf.content_blob), headers: {
+      'Accept' => 'application/json',
+      'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'workflows', 'rp2', 'workflows', 'rp2-to-rp2path.cwl')),
+      'Authorization' => write_access_auth
+    }
 
     assert_response :success
     blob = wf.content_blob.reload
@@ -54,7 +56,7 @@ class WorkflowApiTest < ActionDispatch::IntegrationTest
     VCR.use_cassette('bio_tools/fetch_galaxy_tool_names') do
       template = load_template('post_tooled_workflow.json.erb')
 
-      post '/workflows.json', params: template, as: :json
+      post '/workflows.json', params: template, as: :json, headers: { 'Authorization' => write_access_auth }
       assert_response :success
 
       validate_json response.body, "#/components/schemas/#{singular_name.camelize(:lower)}Response"

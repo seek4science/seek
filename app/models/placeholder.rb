@@ -28,4 +28,8 @@ class Placeholder < ApplicationRecord
     Seek::Config.placeholders_enabled
   end
 
+  def self.supports_extended_metadata?
+    false
+  end
+
 end

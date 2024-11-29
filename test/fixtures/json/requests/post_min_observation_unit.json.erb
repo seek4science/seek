@@ -1,0 +1,24 @@
+{
+  "data": {
+    "type": "observation_units",
+    "attributes": {
+      "title": "Min observation unit",
+      "description": "the mini one",
+      "extended_attributes": {
+        "extended_metadata_type_id":"<%= @extended_metadata_type.id %>",
+        "attribute_map":{
+          "name":"unit 1",
+          "strain":"strain 1"
+        }
+      }
+    },
+    "relationships": {
+      "study": {
+        "data": {
+          "id": "<%= @study.id %>",
+          "type": "studies"
+        }
+      }
+    }
+  }
+}

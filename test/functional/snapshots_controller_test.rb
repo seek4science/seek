@@ -97,6 +97,22 @@ class SnapshotsControllerTest < ActionController::TestCase
     assert_redirected_to assay_snapshot_path(assay, assigns(:snapshot).snapshot_number)
   end
 
+  test 'can create snapshot under sub-uri' do
+    with_relative_root('/seek/seek123') do
+      user = FactoryBot.create(:user)
+      assay = FactoryBot.create(:assay, policy: FactoryBot.create(:publicly_viewable_policy),
+                                contributor: user.person, creators: [user.person])
+      login_as(user)
+
+      assert_difference('Snapshot.count') do
+        post :create, params: { assay_id: assay }
+      end
+
+      assert assay.can_manage?(user)
+      assert_redirected_to assay_snapshot_path(assay, assigns(:snapshot).snapshot_number)
+    end
+  end
+
   test "can't create snapshot if no manage permissions" do
     user = FactoryBot.create(:user)
     investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:publicly_viewable_policy),
@@ -194,8 +210,6 @@ class SnapshotsControllerTest < ActionController::TestCase
     assert_response :redirect
     assert flash[:error].include?('exist')
   end
-
-
 
   test 'can get confirmation when minting DOI for snapshot' do
     datacite_mock

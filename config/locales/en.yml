@@ -16,6 +16,7 @@ en:
   investigation: &investigation "Investigation"
   study: &study "Study"
   assay: &assay "Assay"
+  observation_unit: &observation_unit "Observation Unit"
   assays:
     assay: "Assay"
     experimental_assay: "Experimental assay"
@@ -52,6 +53,7 @@ en:
   placeholder: "Placeholder"
   collection: &collection "Collection"
 
+  observation_unit: &observation_unit "Observation Unit"
   sample: &sample "Sample"
   sample_type: &sample_type "Sample type"
   template: &template "Template"
@@ -176,6 +178,7 @@ en:
     collection: *collection
     presentation: *presentation
     event: *event
+    observation_unit: *observation_unit
     sample: *sample
     template: *template
     sample_type: *sample_type
@@ -199,6 +202,7 @@ en:
     collections: 'Collections'
     presentations: 'Presentations'
     events: 'Events'
+    observation_units: 'Observation Units'
     samples: 'Samples'
     templates: 'Templates'
     sample_types: 'Samples types'
@@ -319,6 +323,7 @@ you can choose to have a %{project} linked to a site managed %{programme} instea
     template: "Templates are blueprints that can be reused and applied to Study and Assay for describing Samples. Templates must be associated with one or more Projects."
     organism: "An Organism is identified by an entry in the NCBI ontology. An Organism must be associated with one or more Projects in order to be registered in SEEK."
     file_template: "A File Template describes conforming DataFiles.For example, a File Template that is a Word document may describe conformant PNG images."
+    extended_metadata_type: "Extended Metadata Types are defined, that describe a set of attributes with names and point to a SampleAttributeType to define the attribute type."
 
   cookies:
     notice: "%{instance_name} makes use of some necessary cookies to provide its core functionality."
@@ -340,3 +345,5 @@ you can choose to have a %{project} linked to a site managed %{programme} instea
   tooltips:
     batch_permission_changes_button: "You can change the sharing policy and permissions for your items as a batch. A preview of selected items will be given before you choose new permissions for them."
     publish_your_items_button: "Publish your owned items as a batch. A preview will be given before publishing"
+
+  extended_metadata_type: "Extended Metadata Type"

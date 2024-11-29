@@ -19,7 +19,6 @@
 <% allow_required = constraints.allow_required?(sample_attribute) %>
 <% allow_attribute_removal = constraints.allow_attribute_removal?(sample_attribute)  %>
 <% allow_type_change = constraints.allow_type_change?(sample_attribute) %>
-<% allow_name_change = constraints.allow_name_change?(sample_attribute) %>
 <% seek_sample_multi = sample_attribute&.seek_sample_multi? %>
 <% link_to_self = sample_attribute && sample_attribute.deferred_link_to_self %>
 <% display_isa_tag ||= false %>
@@ -29,6 +28,8 @@
 <% isa_tag_id = sample_attribute&.isa_tag_id %>
 <% template_attribute_id = sample_attribute&.template_attribute_id if display_isa_tag %>
 <% allow_isa_tag_change = constraints.allow_isa_tag_change?(sample_attribute) if display_isa_tag %>
+<% required_title_text = allow_required ? nil : "You are not allowed to make this attribute required.\nSome samples have no value for this attribute." %>
+<% is_title_title_text = allow_required ? nil : "You are not allowed to change this attribute's title field.\nSome samples have no value for this attribute." %>
 
 <tr class="sample-attribute <%= 'success' if sample_attribute.nil? -%><%='hidden' if hide_seek_sample_multi -%>" data-index="<%= index-%>">
   <th scope="row" class="attribute-position">
@@ -41,16 +42,16 @@
   <td>
 
     <%= text_field_tag "#{field_name_prefix}[title]", title, class: 'form-control',
-                       placeholder: 'Attribute name', disabled: !allow_name_change, data: { attr: "title" } %>
+                       placeholder: 'Attribute name', data: { attr: "title" } %>
   </td>
 
-  <td class="text-center">
+  <td class="text-center" title="<%= required_title_text %>">
     <div class="checkbox-inline">
       <%= hidden_field_tag "#{field_name_prefix}[required]", '0' %>
       <%= check_box_tag "#{field_name_prefix}[required]", '1', required, class: "#{ allow_required ? '' : 'disabled' }", data: { attr: "required" } %>
     </div>
   </td>
-  <td class="text-center">
+  <td class="text-center" title="<%= is_title_title_text %>">
     <div class="checkbox-inline">
       <%= hidden_field_tag "#{field_name_prefix}[is_title]", '0' %>
       <%= check_box_tag "#{field_name_prefix}[is_title]", '1', is_title, class: "sample-type-is-title #{ allow_required ? '' : 'disabled' }"%>
@@ -130,7 +131,7 @@
                                       unit_id),
                    include_blank: true,
                    class: 'form-control',
-                   disabled: !allow_type_change, data: { attr: "unit" } %>
+                   data: { attr: "unit" } %>
   </td>
 
 

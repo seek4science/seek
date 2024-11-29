@@ -6,7 +6,7 @@ class SampleTypeApiTest < ActionDispatch::IntegrationTest
 
   def setup
     user_login(FactoryBot.create(:project_administrator))
-    @project = @current_user.person.projects.first
+    @project = current_person.projects.first
     @sample_type = FactoryBot.create(:simple_sample_type, project_ids: [@project.id], contributor: current_person)
     @sample_attribute = @sample_type.sample_attributes.first
     @sample_attribute_type = @sample_attribute.sample_attribute_type
@@ -47,7 +47,7 @@ class SampleTypeApiTest < ActionDispatch::IntegrationTest
     }
     assert_difference('SampleType.count') do
       assert_difference('SampleAttribute.count') do
-        post sample_types_path(format: :json), params: params, as: :json
+        post sample_types_path(format: :json), params: params, as: :json, headers: { 'Authorization' => write_access_auth }
       end
     end
     assert_response :success
@@ -94,7 +94,7 @@ class SampleTypeApiTest < ActionDispatch::IntegrationTest
     }
     assert_difference('SampleType.count') do
       assert_difference('SampleAttribute.count') do
-        post sample_types_path(format: :json), params: params, as: :json
+        post sample_types_path(format: :json), params: params, as: :json, headers: { 'Authorization' => write_access_auth }
       end
     end
     assert_response :success
@@ -131,7 +131,7 @@ class SampleTypeApiTest < ActionDispatch::IntegrationTest
     }
 
     assert_no_difference('SampleAttribute.count') do
-      patch sample_type_path(sample_type.id, format: :json), params: params, as: :json
+      patch sample_type_path(sample_type.id, format: :json), params: params, as: :json, headers: { 'Authorization' => write_access_auth }
     end
 
     assert_response :success
@@ -166,7 +166,7 @@ class SampleTypeApiTest < ActionDispatch::IntegrationTest
     }
 
     assert_difference('SampleAttribute.count') do
-      patch sample_type_path(sample_type.id, format: :json), params: params, as: :json
+      patch sample_type_path(sample_type.id, format: :json), params: params, as: :json, headers: { 'Authorization' => write_access_auth }
     end
 
     assert_response :success
@@ -204,7 +204,7 @@ class SampleTypeApiTest < ActionDispatch::IntegrationTest
     }
 
     assert_difference('SampleAttribute.count', -1) do
-      patch sample_type_path(sample_type.id, format: :json), params: params, as: :json
+      patch sample_type_path(sample_type.id, format: :json), as: :json, params: params, headers: { 'Authorization' => write_access_auth }
     end
 
     assert_response :success

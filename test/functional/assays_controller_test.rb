@@ -1929,15 +1929,15 @@ class AssaysControllerTest < ActionController::TestCase
     sample_collection_st = FactoryBot.create(:isa_sample_collection_sample_type, contributor: person, projects: [project],
     linked_sample_type: source_st)
 
-    study = FactoryBot.create(:study, investigation: , contributor: person,
+    study = FactoryBot.create(:study, investigation:, contributor: person,
                               policy: FactoryBot.create(:private_policy, permissions: [FactoryBot.create(:permission, contributor: person, access_type: Policy::MANAGING)]),
                               sops: [FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy))],
                               sample_types: [source_st, sample_collection_st])
-    assay_stream = FactoryBot.create(:assay_stream, study: , contributor: person)
+    assay_stream = FactoryBot.create(:assay_stream, study:, contributor: person)
     assay_sample_type = FactoryBot.create :isa_assay_material_sample_type, linked_sample_type: sample_collection_st,
                                           contributor: person, isa_template: FactoryBot.build(:isa_assay_material_template)
     assay = FactoryBot.create(:assay,
-                              study: ,
+                              study:,
                               policy: FactoryBot.create(:private_policy, permissions:[FactoryBot.create(:permission,contributor: person, access_type:Policy::EDITING)]),
                               sample_type: assay_sample_type,
                               contributor: person,
@@ -1983,8 +1983,8 @@ class AssaysControllerTest < ActionController::TestCase
                                       sops: [FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy))],
                                       sample_types: [source_st, sample_collection_st])
 
-    assay_stream = FactoryBot.create(:assay_stream, study: , contributor: person)
-    assay1 = FactoryBot.create(:assay, study: , contributor: person, sample_type: assay_st1,
+    assay_stream = FactoryBot.create(:assay_stream, study:, contributor: person)
+    assay1 = FactoryBot.create(:assay, study:, contributor: person, sample_type: assay_st1,
                                        policy: FactoryBot.create(:private_policy, permissions: [FactoryBot.create(:permission, contributor: person, access_type: Policy::MANAGING)]),
                                        position: 0, assay_stream: )
     assay2 = FactoryBot.create(:assay, study: study, contributor: person, sample_type: assay_st2,
@@ -2036,7 +2036,7 @@ class AssaysControllerTest < ActionController::TestCase
       login_as(current_user)
       investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, contributor: current_user.person)
       study = FactoryBot.create(:isa_json_compliant_study, investigation: )
-      assay_stream = FactoryBot.create(:assay_stream, study: , contributor: current_user.person)
+      assay_stream = FactoryBot.create(:assay_stream, study:, contributor: current_user.person)
       get :show, params: { id: assay_stream }
       assert_response :success
 
@@ -2044,7 +2044,7 @@ class AssaysControllerTest < ActionController::TestCase
       assert_select 'a', text: /Design #{I18n.t('assay')}/i, count: 1
 
       assay_sample_type1 = FactoryBot.create(:isa_assay_material_sample_type, linked_sample_type: study.sample_types.second)
-      assay1 = FactoryBot.create(:assay, contributor: current_user.person, study: , assay_stream:, sample_type: assay_sample_type1)
+      assay1 = FactoryBot.create(:assay, contributor: current_user.person, study:, assay_stream:, sample_type: assay_sample_type1)
 
       assert_equal assay_stream.study, assay1.study
 
@@ -2061,7 +2061,7 @@ class AssaysControllerTest < ActionController::TestCase
       assert_select 'a', text: /Design the next #{I18n.t('assay')}/i, count: 1
 
       assay_sample_type2 = FactoryBot.create(:isa_assay_material_sample_type, linked_sample_type: assay_sample_type1)
-      assay2 = FactoryBot.create(:assay, contributor: current_user.person, study: , assay_stream:, sample_type: assay_sample_type2)
+      assay2 = FactoryBot.create(:assay, contributor: current_user.person, study:, assay_stream:, sample_type: assay_sample_type2)
 
       get :show, params: { id: assay1 }
       assert_response :success
@@ -2137,16 +2137,16 @@ class AssaysControllerTest < ActionController::TestCase
       login_as(person)
       investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, contributor: person)
       study = FactoryBot.create(:isa_json_compliant_study, investigation: )
-      assay_stream = FactoryBot.create(:assay_stream, study: , contributor: person, position: 0)
+      assay_stream = FactoryBot.create(:assay_stream, study:, contributor: person, position: 0)
 
       begin_assay_sample_type = FactoryBot.create(:isa_assay_material_sample_type, linked_sample_type: study.sample_types.second, projects: [project], contributor: person)
-      begin_assay = FactoryBot.create(:assay, contributor: person, study: , assay_stream:, sample_type: begin_assay_sample_type, position: 0)
+      begin_assay = FactoryBot.create(:assay, contributor: person, study:, assay_stream:, sample_type: begin_assay_sample_type, position: 0)
 
       middle_assay_sample_type = FactoryBot.create(:isa_assay_material_sample_type, linked_sample_type: begin_assay_sample_type, projects: [project], contributor: person)
-      middle_assay = FactoryBot.create(:assay, contributor: person, study: , assay_stream:, sample_type: middle_assay_sample_type, position: 1)
+      middle_assay = FactoryBot.create(:assay, contributor: person, study:, assay_stream:, sample_type: middle_assay_sample_type, position: 1)
 
       end_assay_sample_type = FactoryBot.create(:isa_assay_data_file_sample_type, linked_sample_type: middle_assay_sample_type, projects: [project], contributor: person)
-      end_assay = FactoryBot.create(:assay, contributor: person, study: , assay_stream:, sample_type: end_assay_sample_type, position: 2)
+      end_assay = FactoryBot.create(:assay, contributor: person, study:, assay_stream:, sample_type: end_assay_sample_type, position: 2)
 
       assert_difference('Assay.count', -1) do
         assert_difference('SampleType.count', -1) do
@@ -2157,6 +2157,25 @@ class AssaysControllerTest < ActionController::TestCase
       end_assay.reload
       refute_equal end_assay.position, 2
       assert_equal end_assay.position, 1
+    end
+  end
+
+  test 'visibility of the propagate permissions button' do
+    with_config_value(:isa_json_compliance_enabled, true) do
+      person = FactoryBot.create(:person)
+      login_as(person)
+      investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, contributor: person)
+      study = FactoryBot.create(:isa_json_compliant_study, investigation: )
+      assay_stream = FactoryBot.create(:assay_stream, study:, contributor: person, position: 0)
+      experimental_assay = FactoryBot.create(:assay, contributor: person, study:, assay_stream:, position: 0)
+
+      get :manage, params: { id: assay_stream }
+      assert_response :success
+      assert_select 'input[type=checkbox][name=propagate_permissions]', count: 1
+
+      get :manage, params: { id: experimental_assay }
+      assert_response :success
+      assert_select 'input[type=checkbox][name=propagate_permissions]', count: 0
     end
   end
 
@@ -2175,4 +2194,99 @@ class AssaysControllerTest < ActionController::TestCase
       assert_redirected_to edit_isa_assay_path(assay)
     end
   end
+
+  test 'Should propagate assay stream permissions' do
+    with_config_value(:isa_json_compliance_enabled, true) do
+      person = FactoryBot.create(:person)
+      other_person = FactoryBot.create(:person)
+      investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, contributor: person)
+      study = FactoryBot.create(:isa_json_compliant_study, investigation: )
+      assay_stream = FactoryBot.create(:assay_stream, study:, contributor: person, position: 0)
+
+      authorized_child_assay = FactoryBot.create(:assay, contributor: person, study:, assay_stream:, position: 0)
+
+      login_as(person)
+      refute authorized_child_assay.can_manage?(other_person)
+      patch :manage_update, params: { id: assay_stream, propagate_permissions: '1', assay: {creator_ids: [other_person.id]}, policy_attributes: {access_type: Policy::NO_ACCESS, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}}}
+
+      # assert that the permissions of the authorized assay were propagated
+      # other_person should see the assay stream and the authorized assay
+      assay_stream.reload
+      assert assay_stream.can_manage?(other_person)
+      authorized_child_assay.reload
+      assert authorized_child_assay.can_manage?(other_person)
+    end
+  end
+
+  test 'should not propagate assay stream permissions when not authorized' do
+    with_config_value(:isa_json_compliance_enabled, true) do
+      person = FactoryBot.create(:person)
+      second_person = FactoryBot.create(:person)
+      third_person = FactoryBot.create(:person)
+
+      investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, contributor: person)
+      study = FactoryBot.create(:isa_json_compliant_study, investigation: )
+      assay_stream = FactoryBot.create(:assay_stream, study:, contributor: person, position: 0)
+      unauthorized_child_assay = FactoryBot.create(:assay, contributor: second_person, study:, assay_stream:, position: 0)
+
+      login_as(person)
+      patch :manage_update, params: { id: assay_stream, propagate_permissions: '1', assay: {creator_ids: [third_person.id]}, policy_attributes: {access_type: Policy::NO_ACCESS, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: third_person.id, access_type: Policy::MANAGING}}}}
+
+      # assert the flash[:error] text. The permissions of the unauthorized assay should not be propagated
+      assert flash[:error], "<ul><li>You do not have the necessary permissions to propagate permissions to #{t('assay').downcase} [#{unauthorized_child_assay.id}]: '#{unauthorized_child_assay.title}'</li></ul>"
+      assert_redirected_to assay_path(assay_stream)
+
+      # assert that the permissions of the unauthorized assay were not propagated
+      # third_person should not see the unauthorized assay but still see the assay stream
+      assay_stream.reload
+      assert assay_stream.can_manage?(third_person)
+      unauthorized_child_assay.reload
+      refute unauthorized_child_assay.can_manage?(third_person)
+    end
+  end
+  
+  test 'Should not propagate assay stream permissions when propagate_permissions param is not true' do
+    with_config_value(:isa_json_compliance_enabled, true) do
+      person = FactoryBot.create(:person)
+      other_person = FactoryBot.create(:person)
+      investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, contributor: person)
+      study = FactoryBot.create(:isa_json_compliant_study, investigation: )
+      assay_stream = FactoryBot.create(:assay_stream, study:, contributor: person, position: 0)
+      authorized_child_assay = FactoryBot.create(:assay, contributor: person, study:, assay_stream:, position: 0)
+      
+      login_as(person)
+      refute authorized_child_assay.can_manage?(other_person)
+      patch :manage_update, params: { id: assay_stream, assay: {creator_ids: [other_person.id] }, policy_attributes: {access_type: Policy::NO_ACCESS, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}}}
+      
+      assert flash[:error].nil?
+
+      # assert that the permissions of the authorized assay were not propagated
+      # other_person should not see the authorized assay
+      authorized_child_assay.reload
+      refute authorized_child_assay.can_manage?(other_person)
+
+      patch :manage_update, params: { id: assay_stream, propagate_permissions: '0', assay: {creator_ids: [other_person.id] }, policy_attributes: {access_type: Policy::NO_ACCESS, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}}}
+
+      assert flash[:error].nil?
+
+      # assert that the permissions of the authorized assay were not propagated
+      # other_person should not see the authorized assay
+      authorized_child_assay.reload
+      refute authorized_child_assay.can_manage?(other_person)
+
+    end
+  end
+
+  test 'can show and edit with deleted contributor' do
+    assay = FactoryBot.create(:assay, deleted_contributor:'Person:99', policy: FactoryBot.create(:public_policy))
+    assay.update_column(:contributor_id, nil)
+    assert assay.can_view?
+    assert assay.can_edit?
+    assert_nil assay.contributor
+    get :show, params: { id: assay.id }
+    assert_response :success
+    get :edit, params: { id: assay.id }
+    assert_response :success
+  end
+
 end

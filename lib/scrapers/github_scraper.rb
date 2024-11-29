@@ -7,7 +7,7 @@ module Scrapers
   class GithubScraper
     attr_reader :output
 
-    def initialize(organization, project, contributor, main_branch: 'master', debug: false, output: STDOUT, only_latest: true)
+    def initialize(project, contributor, organization:, main_branch: 'master', debug: false, output: STDOUT, only_latest: true)
       @organization = organization # The GitHub organization to scrape
       raise "Missing GitHub organization" unless @organization
       @project = project # The SEEK project who will own the resources
@@ -102,8 +102,6 @@ module Scrapers
       workflow = wiz.run
       workflow.contributor = @contributor
       workflow.projects = Array(@project)
-      workflow.policy = Policy.projects_policy(workflow.projects)
-      workflow.policy.access_type = Policy::ACCESSIBLE
       workflow.source_link_url = repo.remote.chomp('.git')
       workflow.tags = topics(repo)
       if wiz.next_step == :provide_metadata
@@ -177,7 +175,8 @@ module Scrapers
     end
 
     def all_tags(repo)
-      repo.remote_refs[:tags]&.map { |t| t[:name] } || []
+      # Reverse order
+      repo.remote_refs[:tags]&.sort_by { |t| t[:time] }&.map { |t| t[:name] } || []
     end
   end
 end

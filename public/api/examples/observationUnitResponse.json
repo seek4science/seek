@@ -1,0 +1,119 @@
+{
+  "data": {
+    "id": "31",
+    "type": "observation_units",
+    "attributes": {
+      "policy": {
+        "access": "manage",
+        "permissions": [
+
+        ]
+      },
+      "discussion_links": [
+
+      ],
+      "extended_attributes": {
+        "extended_metadata_type_id": "25",
+        "attribute_map": {
+          "name": "unit 1",
+          "strain": "strain 1"
+        }
+      },
+      "title": "Max observation unit",
+      "description": "the maximum one",
+      "tags": [
+
+      ],
+      "created_at": "2024-11-20T10:10:45.857Z",
+      "updated_at": "2024-11-20T10:10:45.857Z",
+      "creators": [
+        {
+          "profile": "/people/179",
+          "family_name": "One",
+          "given_name": "Some",
+          "affiliation": "University of Somewhere",
+          "orcid": null
+        }
+      ],
+      "other_creators": "Blogs, Joe"
+    },
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "179",
+            "type": "people"
+          }
+        ]
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "180",
+            "type": "people"
+          }
+        ]
+      },
+      "people": {
+        "data": [
+          {
+            "id": "179",
+            "type": "people"
+          },
+          {
+            "id": "180",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "180",
+            "type": "projects"
+          }
+        ]
+      },
+      "study": {
+        "data": {
+          "id": "49",
+          "type": "studies"
+        }
+      },
+      "samples": {
+        "data": [
+          {
+            "id": "31",
+            "type": "samples"
+          },
+          {
+            "id": "32",
+            "type": "samples"
+          },
+          {
+            "id": "33",
+            "type": "samples"
+          }
+        ]
+      },
+      "data_files": {
+        "data": [
+
+        ]
+      }
+    },
+    "links": {
+      "self": "/observation_units/31"
+    },
+    "meta": {
+      "created": "2024-11-20T10:10:45.857Z",
+      "modified": "2024-11-20T10:10:45.857Z",
+      "api_version": "0.3",
+      "base_url": "http://localhost:3000",
+      "uuid": "a1bed220-8955-013d-24a2-0a81884ed284"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

@@ -6,6 +6,13 @@
       "policy": {
         "access": "view",
         "permissions": [
+          {
+            "resource": {
+              "id": "<%= current_person.id %>",
+              "type": "people"
+            },
+            "access": "manage"
+          }
         ]
       },
       "discussion_links": [

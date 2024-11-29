@@ -152,6 +152,7 @@ module Seek
     end
 
     def update_sharing_policies(item, parameters = params)
+      item.policy ||= item.default_policy
       item.policy.set_attributes_with_sharing(policy_params(parameters)) if policy_params(parameters).present?
     end
 

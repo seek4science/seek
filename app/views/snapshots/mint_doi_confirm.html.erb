@@ -1,9 +1,9 @@
-<% type_text = "#{text_for_resource(@resource)} snapshot" %>
+<% type_text = "#{text_for_resource(@parent_resource)} snapshot" %>
 
 <div class="row">
   <div class="col-md-8 col-md-push-2">
     <%= panel("Confirmation") do %>
-        <%= form_tag(polymorphic_path([@resource, @snapshot], action: 'mint_doi'), method: :post) do %>
+        <%= form_tag(polymorphic_path([@parent_resource, @snapshot], action: 'mint_doi'), method: :post) do %>
             <%= image_tag('logos/doi_logo.svg', class: 'mint-doi') %>
 
             <p>
@@ -28,7 +28,7 @@
 
             <p class="text-center">
               <%= submit_tag 'Mint DOI', class: 'btn btn-primary' %>
-              <%= cancel_button(polymorphic_path(@resource)) %>
+              <%= cancel_button(polymorphic_path(@parent_resource)) %>
             </p>
         <% end %>
     <% end %>

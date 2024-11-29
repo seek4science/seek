@@ -1,0 +1,53 @@
+
+<% return unless show_unzip_folder_status?(data_file) %>
+
+<%
+  task = data_file.unzip_task
+  job_status ||= task.status
+  in_progress = task.in_progress?
+  failed = task.failed?
+  begin
+    success = task.success? && Seek::DataFiles::Unzipper.new(data_file).fetch.present?
+  rescue Seek::DataFiles::FetchException
+    success = false
+  end
+%>
+
+<%
+  alert_style = 'alert-info'
+  alert_style = 'alert-warning' if failed
+  alert_style = 'alert-success' if success
+%>
+
+<div id="unzip-status">
+  <% if in_progress || failed || success %>
+      <div class="alert <%= alert_style %>" role="alert">
+        <strong>Unzip:</strong>
+        <% if in_progress %>
+            <%= job_status.to_s.humanize %>
+            <%= image 'spinner' %>
+            <script>
+              setTimeout(function () {
+                $j.ajax('<%= unzip_status_data_file_path(data_file) %>', {
+                      data: { 'previous_status': '<%= job_status -%>' },
+                      success: function (html) {
+                        $j('#unzip-status').replaceWith(html);
+                      }
+                    }
+                );
+              }, 5000);
+            </script>
+        <% elsif failed %>
+          Failed. An administrator will have been notified of the problem, but you could try again.
+        <% elsif success  %>
+            Waiting for confirmation
+            <p>
+              Please review the unzipped files by clicking the button below, and decide whether to continue or cancel
+              the unzip process.
+            </p>
+            <%= link_to('Review Unzipped Datafiles', confirm_unzip_data_file_path(data_file),
+                        class: 'btn btn-primary') %>
+        <% end %>
+      </div>
+  <% end %>
+</div>

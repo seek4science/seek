@@ -19,7 +19,7 @@
       "administrators": {
         "data": [
           {
-            "id": "301",
+            "id": "2032",
             "type": "people"
           }
         ]
@@ -27,7 +27,7 @@
       "people": {
         "data": [
           {
-            "id": "301",
+            "id": "2032",
             "type": "people"
           }
         ]
@@ -35,7 +35,7 @@
       "projects": {
         "data": [
           {
-            "id": "364",
+            "id": "1917",
             "type": "projects"
           }
         ]
@@ -110,11 +110,11 @@
       "self": "/programmes/42"
     },
     "meta": {
-      "created": "2024-06-20T12:29:32.000Z",
-      "modified": "2024-06-20T12:29:32.000Z",
+      "created": "2024-11-20T10:15:28.000Z",
+      "modified": "2024-11-20T10:15:28.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "abc65c50-112e-013d-1f9d-0a81884ed284"
+      "uuid": "4a510000-8956-013d-24a2-0a81884ed284"
     }
   },
   "jsonapi": {

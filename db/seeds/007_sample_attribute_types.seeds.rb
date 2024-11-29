@@ -88,6 +88,9 @@ ncbi_type.update(base_type: Seek::Samples::BaseType::STRING, regexp: '[0-9]+', p
 data_file_type = SampleAttributeType.find_or_initialize_by(title: 'Registered Data file')
 data_file_type.update(base_type: Seek::Samples::BaseType::SEEK_DATA_FILE)
 
+sop_type = SampleAttributeType.find_or_initialize_by(title: 'Registered SOP')
+sop_type.update(base_type: Seek::Samples::BaseType::SEEK_SOP)
+
 linked_extended_metadata_type = SampleAttributeType.find_or_initialize_by(title:'Linked Extended Metadata')
 linked_extended_metadata_type.update(base_type: Seek::Samples::BaseType::LINKED_EXTENDED_METADATA)
 

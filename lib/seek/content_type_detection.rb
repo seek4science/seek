@@ -53,9 +53,18 @@ module Seek
     def is_extractable_spreadsheet?(blob = self)
       blob.file_exists? && (is_extractable_excel?(blob) || is_csv?(blob) || is_tsv?(blob))
     end
+    
+    # is any zipped format, that can be extracted from
+    def is_unzippable_datafile?(blob = self)
+      blob.file_exists? && (is_zip?(blob))
+    end
 
     def is_in_simulatable_size_limit?(blob = self)
       !blob.file_size.nil? && blob.file_size < MAX_SIMULATABLE_SIZE
+    end
+    
+    def is_zip?(blob = self)
+      blob.content_type_file_extensions.include?('zip')
     end
 
     def is_xlsx?(blob = self)

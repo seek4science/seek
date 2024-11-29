@@ -107,6 +107,7 @@ no_user: 'famfamfam_silk/link_break.png'
 oauth: 'famfamfam_silk/link.png'
 oauth_applications: 'famfamfam_silk/application_key.png'
 oauth_authorized_applications: 'famfamfam_silk/application_link.png'
+observation_unit_avatar: 'crystal_project/48x48/apps/search.png'
 openbis_square_small: 'logos/openbis-square-16.png'
 openbis_square: 'logos/openbis-square.png'
 openbis: 'logos/openbis.png'
@@ -171,6 +172,8 @@ extract_samples: 'famfamfam_silk/table_go.png'
 view_samples: 'famfamfam_silk/table.png'
 external_link: 'famfamfam_silk/arrow_right.png'
 
+unzip_folder: 'famfamfam_silk/folder_page_white.png'
+
 # avatars
 specimen_avatar: 'misc_icons/green_virus-64x64.png'
 strain_avatar: 'misc_icons/enterococcus_faecalis64-64.jpg'
@@ -230,6 +233,7 @@ collection: 'avatars/avatar-collection.png'
 collection_avatar: 'avatars/avatar-collection.png'
 run_galaxy: 'run_galaxy.png'
 folder_avatar: 'avatars/avatar-folder.png'
+extended_metadata_type_avatar: 'avatars/avatar-extended_metadata_type.png'
 
 # roles
 project_administrator: 'roles/role-project-admin.png'
