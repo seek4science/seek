@@ -13,6 +13,7 @@ namespace :seek do
     update_observation_unit_policies
     fix_xlsx_marked_as_zip
     add_policies_to_existing_sample_types
+    fix_previous_sample_type_permissions
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -104,13 +105,13 @@ namespace :seek do
 
           # Visible if linked to public samples
           if st.samples.any? { |sample| sample.is_published? }
-            policy.access_type = Policy::VISIBLE
+            policy.access_type = Policy::ACCESSIBLE
           else
             policy.access_type = Policy::NO_ACCESS
           end
           # Visible to each project
           st.projects.map do |project|
-            policy.permissions << Permission.new(contributor_type: Permission::PROJECT, contributor_id: project.id, access_type: Policy::VISIBLE)
+            policy.permissions << Permission.new(contributor_type: Permission::PROJECT, contributor_id: project.id, access_type: Policy::ACCESSIBLE)
           end
           # Project admins can manage
           project_admins = st.projects.map(&:project_administrators).flatten
@@ -125,7 +126,22 @@ namespace :seek do
         counter += 1
       end
     end
-    puts "...Added policies to #{counter} sample types"
+    puts "... Added policies to #{counter} sample types"
+  end
+
+  task(fix_previous_sample_type_permissions: [:environment]) do
+    only_once('fix_previous_sample_type_permissions 1.16.0') do
+      puts '... Updating previous sample type permissions ...'
+      SampleType.includes(:policy).where.not(policy_id: nil).each do |sample_type|
+        policy = sample_type.policy
+        if policy.access_type == Policy::VISIBLE
+          policy.update_column(:access_type, Policy::ACCESSIBLE)
+        end
+        policy.permissions.where(access_type: Policy::VISIBLE).where(contributor_type: Permission::PROJECT).update_all(access_type: Policy::ACCESSIBLE)
+        putc('.')
+      end
+      puts '... Finished updating previous sample type permissions'
+    end
   end
 
   private
