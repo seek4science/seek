@@ -711,7 +711,7 @@ class DocumentsControllerTest < ActionController::TestCase
 
     assert_select '.filter-category[data-filter-category="project"]' do
       assert_select '.filter-category-title', text: 'Project'
-      assert_select '.filter-option', count: 2
+      assert_select ".filter-option[rel='nofollow']", count: 2
       assert_select '.filter-option.filter-option-active', count: 0
       assert_select ".filter-option[title='#{project.title}']" do
         assert_select '[href=?]', documents_path(filter: { project: project.id })
@@ -728,7 +728,7 @@ class DocumentsControllerTest < ActionController::TestCase
 
     assert_select '.filter-category[data-filter-category="contributor"]' do
       assert_select '.filter-category-title', text: 'Submitter'
-      assert_select '.filter-option', href: /documents\?filter\[contributor\]=\d+/, count: 8
+      assert_select ".filter-option[rel='nofollow']", href: /documents\?filter\[contributor\]=\d+/, count: 8
       assert_select '.filter-option.filter-option-active', count: 0
       # Should show 6 options and hide the rest
       assert_select '.filter-option.filter-option-hidden', count: 2
@@ -737,7 +737,7 @@ class DocumentsControllerTest < ActionController::TestCase
 
     assert_select '.filter-category[data-filter-category="tag"]' do
       assert_select '.filter-category-title', text: 'Tag'
-      assert_select '.filter-option', count: 1
+      assert_select ".filter-option[rel='nofollow']", count: 1
       assert_select '.filter-option.filter-option-active', count: 0
       assert_select ".filter-option[title='awkward&id=1unsafe[]tag !']" do
         assert_select '.filter-option-label', text: 'awkward&id=1unsafe[]tag !'
@@ -772,14 +772,14 @@ class DocumentsControllerTest < ActionController::TestCase
     # Should show other project in projects category
     assert_select '.filter-category[data-filter-category="project"]' do
       assert_select '.filter-category-title', text: 'Project'
-      assert_select '.filter-option.filter-option-active', count: 1
-      assert_select '.filter-option', count: 2
-      assert_select ".filter-option[title='#{project.title}']" do
+      assert_select ".filter-option[rel='nofollow'].filter-option-active", count: 1
+      assert_select ".filter-option[rel='nofollow']", count: 2
+      assert_select ".filter-option[title='#{project.title}'][rel='nofollow']" do
         assert_select '[href=?]', documents_path(filter: { programme: programme.id, project: [other_project.id, project.id] })
         assert_select '.filter-option-label', text: project.title
         assert_select '.filter-option-count', text: '7'
       end
-      assert_select ".filter-option[title='#{other_project.title}'].filter-option-active" do
+      assert_select ".filter-option[title='#{other_project.title}'][rel='nofollow'].filter-option-active" do
         assert_select '[href=?]', documents_path(filter: { programme: programme.id })
         assert_select '.filter-option-label', text: other_project.title
         assert_select '.filter-option-count', text: '1'
@@ -789,7 +789,7 @@ class DocumentsControllerTest < ActionController::TestCase
 
     assert_select '.filter-category[data-filter-category="contributor"]' do
       assert_select '.filter-category-title', text: 'Submitter'
-      assert_select '.filter-option', count: 1
+      assert_select ".filter-option[rel='nofollow']", count: 1
       assert_select '.filter-option.filter-option-active', count: 0
       assert_select '.filter-option.filter-option-hidden', count: 0
       assert_select ".filter-option[title='#{other_project_doc.contributor.name}']" do
@@ -808,11 +808,11 @@ class DocumentsControllerTest < ActionController::TestCase
 
     assert_select '.active-filters' do
       assert_select '.active-filter-category-title', count: 2
-      assert_select ".filter-option[title='#{programme.title}'].filter-option-active" do
+      assert_select ".filter-option[title='#{programme.title}'][rel='nofollow'].filter-option-active" do
         assert_select '[href=?]', documents_path(filter: { project: other_project.id })
         assert_select '.filter-option-label', text: programme.title
       end
-      assert_select ".filter-option[title='#{other_project.title}'].filter-option-active" do
+      assert_select ".filter-option[title='#{other_project.title}'][rel='nofollow'].filter-option-active" do
         assert_select '[href=?]', documents_path(filter: { programme: programme.id })
         assert_select '.filter-option-label', text: other_project.title
       end
