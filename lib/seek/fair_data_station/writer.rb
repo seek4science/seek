@@ -211,12 +211,14 @@ module Seek
 
         # collect and sort those with the most properties that match, eliminating any where no properties match
         candidates = ::ExtendedMetadataType.where(supported_type: seek_entity.class.name).includes(:extended_metadata_attributes).collect do |emt|
-          pids = collect_extended_metadata_type_attibute_pids(emt)
-          score = (property_ids - pids).length
-          emt = nil if (property_ids & pids).empty?
-          [score, emt]
+          extended_metadata_property_ids = collect_extended_metadata_type_attibute_pids(emt)
+          intersection = (property_ids & extended_metadata_property_ids)
+          difference = (property_ids | extended_metadata_property_ids) - intersection
+          emt = nil if intersection.length.zero?
+          [intersection.length, difference.length, emt]
         end.sort_by do |x|
-          x[0]
+          # order by the number of properties matched coming top, but downgraded by the number of differences
+          [-x[0], x[1]]
         end
 
         candidates.first&.last
