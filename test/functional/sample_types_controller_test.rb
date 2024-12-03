@@ -255,6 +255,31 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_equal 'update', ActivityLog.last.action
   end
 
+  test 'template download link visibility' do
+    person = FactoryBot.create(:person)
+    sample_type = SampleType.new title: 'testing download',
+                                 uploaded_template: true,
+                                 project_ids: person.projects.collect(&:id),
+                                 contributor: person,
+                                 content_blob: FactoryBot.create(:sample_type_template_content_blob),
+                                 policy: FactoryBot.create(:downloadable_public_policy)
+    sample_type.build_attributes_from_template
+    disable_authorization_checks { sample_type.save! }
+    assert sample_type.can_view?
+    assert sample_type.can_download?
+    get :show, params: { id: sample_type }
+    assert_response :success
+    assert_select 'a[href=?]',download_sample_type_content_blob_path(sample_type,sample_type.template), text:'Download'
+
+    sample_type.policy = FactoryBot.create(:publicly_viewable_policy)
+    disable_authorization_checks { sample_type.save! }
+    assert sample_type.can_view?
+    refute sample_type.can_download?
+    get :show, params: { id: sample_type }
+    assert_response :success
+    assert_select 'a[href=?]',download_sample_type_content_blob_path(sample_type,sample_type.template), text:'Download', count:0
+  end
+
   test 'update changing from a CV attribute' do
     sample_type = FactoryBot.create(:apples_controlled_vocab_sample_type, project_ids: @project_ids,
                                                                           contributor: @person)

@@ -200,6 +200,19 @@ class SampleType < ApplicationRecord
     can_view?(user)
   end
 
+  def self.is_asset?
+    false
+  end
+
+  # although has a downloadable template, it doesn't have the full downloadable behaviour of an asset with data and it's own accessible permissions
+  def is_downloadable?
+    false
+  end
+
+  def self.supports_extended_metadata?
+    false
+  end
+
   private
 
   # whether the referring sample is valid and gives permission to view
@@ -290,10 +303,6 @@ class SampleType < ApplicationRecord
     if is_title_seek_sample_multi
       errors.add(:sample_attributes, "Attribute type of #{base_type.underscore.humanize} can not be selected as the sample type title.")
     end
-  end
-
-  def self.supports_extended_metadata?
-    false
   end
 
   class UnknownAttributeException < RuntimeError; end
