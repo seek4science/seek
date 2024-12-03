@@ -140,6 +140,7 @@ namespace :seek do
         policy.permissions.where(access_type: Policy::VISIBLE).where(contributor_type: Permission::PROJECT).update_all(access_type: Policy::ACCESSIBLE)
         putc('.')
       end
+      AuthLookupUpdateQueue.enqueue(SampleType.all)
       puts '... Finished updating previous sample type permissions'
     end
   end
