@@ -30,14 +30,12 @@ jobs:
         continue-on-error: true
       - name: Wait and check containers
         run: sleep 300 && docker ps -a
-        continue-on-error: true
       - name: Check app status
         run: |
           curl -o _curl_output.txt -s http://localhost:3000/statistics/application_status
           \[ "`cat _curl_output.txt`" == "FAIRDOM-SEEK is running | search is enabled | 7 delayed jobs running" \]
-        continue-on-error: true
       - name: Check docker logs & curl output
-        if: ${{ failure() }}
+        if: failure()
         run: |
           docker compose --file docker-compose.yml --file docker-compose.build.yml logs
           cat _curl_output.txt
