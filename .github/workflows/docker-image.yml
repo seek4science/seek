@@ -4,10 +4,8 @@ on:
   push:
     branches:
       - main
-      - workflow
       - workflowhub
       - full-test-suite
-      - docker-compose-run-test
 
   pull_request:
 
