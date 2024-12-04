@@ -1,4 +1,4 @@
-name: Test Docker Image Build
+name: Test Docker Image Build & Deploy
 
 on:
   push:
@@ -18,5 +18,17 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: Build the Docker image
-        run: docker build . --file Dockerfile --tag test-image:$(date +%s)
+      - name: Create volumes
+        run: |
+          docker volume create --name=seek-filestore
+          docker volume create --name=seek-mysql-db
+          docker volume create --name=seek-solr-data
+          docker volume create --name=seek-cache
+      - name: Build and run the Docker containers
+        run: docker compose up --build --detach --wait
+        continue-on-error: true
+      - name: Wait and check containers
+        run: sleep 300 | docker ps -a
+        continue-on-error: true
+      - name: Check app status
+        run: curl http://localhost:3000/statistics/application_status
