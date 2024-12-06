@@ -20,6 +20,8 @@ module Seek
           attribute = sample_type.sample_attributes.where(pid: property).first
           data[attribute.title] = value if attribute
         end
+        data['Title'] = title
+        data['Description'] = description
         seek_sample.data = data
       end
     end

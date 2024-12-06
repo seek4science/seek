@@ -577,24 +577,6 @@ class SamplesControllerTest < ActionController::TestCase
     refute_includes samples, sample2
   end
 
-  test 'should get table view for data file' do
-    data_file = FactoryBot.create(:data_file, policy: FactoryBot.create(:private_policy))
-    sample_type = FactoryBot.create(:simple_sample_type)
-    3.times do # public
-      FactoryBot.create(:sample, sample_type: sample_type, contributor: data_file.contributor, policy: FactoryBot.create(:private_policy),
-                                 originating_data_file: data_file)
-    end
-
-    login_as(data_file.contributor)
-
-    get :index, params: { data_file_id: data_file.id }
-
-    assert_response :success
-    # Empty table - content is loaded asynchronously (see data_files_controller_test.rb)
-    assert_select '#samples-table tbody tr', count: 0
-    assert_select '#samples-table thead th', count: 3
-  end
-
   test 'should get table view for sample type' do
     person = FactoryBot.create(:person)
     sample_type = FactoryBot.create(:simple_sample_type)
@@ -1591,6 +1573,21 @@ class SamplesControllerTest < ActionController::TestCase
       assert_select 'span.subtle', text:/#{I18n.t('samples.allow_free_text_label_hint')}/, count: 0
     end
 
+  end
+
+  test 'should not add a sample to a locked sample type' do
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+    login_as(person)
+
+    sample_type = FactoryBot.create(:simple_sample_type, contributor: person, project_ids: [project.id])
+
+    # lock the sample type by adding a fake update task
+    UpdateSampleMetadataJob.perform_later(sample_type, person.user, [])
+
+    get :new, params: { sample_type_id: sample_type.id }
+    assert_redirected_to sample_types_path(sample_type)
+    assert_equal flash[:error], 'This sample type is locked. You cannot edit the sample.'
   end
 
   def rdf_test_object

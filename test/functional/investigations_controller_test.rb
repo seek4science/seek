@@ -1314,8 +1314,10 @@ class InvestigationsControllerTest < ActionController::TestCase
         assert_difference('ObservationUnit.count', 1) do
           assert_difference('Sample.count', 1) do
             assert_difference('Assay.count', 1) do
-              post :submit_fairdata_station, params: {id: investigation, datastation_data: ttl_file }
-              assert_redirected_to investigation
+              assert_difference('ActivityLog.count',18) do
+                post :submit_fairdata_station, params: {id: investigation, datastation_data: ttl_file }
+                assert_redirected_to investigation
+              end
             end
           end
         end
@@ -1412,6 +1414,18 @@ class InvestigationsControllerTest < ActionController::TestCase
 
     # this may have changed in an update before the error, so this checks the transaction is behaving correctly and rolling back
     assert_equal 'test obs unit 1', ObservationUnit.by_external_identifier('seek-test-obs-unit-1', investigation.projects).title
+  end
+
+  test 'can show and edit with deleted contributor' do
+    investigation = FactoryBot.create(:investigation, deleted_contributor:'Person:99', policy: FactoryBot.create(:public_policy))
+    investigation.update_column(:contributor_id, nil)
+    assert investigation.can_view?
+    assert investigation.can_edit?
+    assert_nil investigation.contributor
+    get :show, params: { id: investigation.id }
+    assert_response :success
+    get :edit, params: { id: investigation.id }
+    assert_response :success
   end
 
   private

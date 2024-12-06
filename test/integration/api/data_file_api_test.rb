@@ -135,7 +135,7 @@ class DataFileApiTest < ActionDispatch::IntegrationTest
 
     with_config_value(:max_all_visitors_access_type, Policy::VISIBLE) do
       assert_no_difference(-> { model.count }) do
-        post collection_url, params: to_post, headers: { 'Authorization' => write_access_auth }
+        post collection_url, params: to_post, as: :json, headers: { 'Authorization' => write_access_auth }
         assert_response :unprocessable_entity
         validate_json response.body, '#/components/schemas/unprocessableEntityResponse'
       end

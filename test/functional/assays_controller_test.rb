@@ -2277,4 +2277,16 @@ class AssaysControllerTest < ActionController::TestCase
     end
   end
 
+  test 'can show and edit with deleted contributor' do
+    assay = FactoryBot.create(:assay, deleted_contributor:'Person:99', policy: FactoryBot.create(:public_policy))
+    assay.update_column(:contributor_id, nil)
+    assert assay.can_view?
+    assert assay.can_edit?
+    assert_nil assay.contributor
+    get :show, params: { id: assay.id }
+    assert_response :success
+    get :edit, params: { id: assay.id }
+    assert_response :success
+  end
+
 end

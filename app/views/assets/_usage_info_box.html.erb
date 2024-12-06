@@ -37,7 +37,7 @@
   </div>
 
   <%# for items created before we started collecting logs %>
-  <% if logging_start_date && @resource.created_at <= logging_start_date %>
+  <% if logging_start_date && @parent_resource.created_at <= logging_start_date %>
     <p id="logging_started">
       (Since <%= logging_start_date.strftime('%B %Y') %>)
     </p>

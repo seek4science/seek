@@ -527,7 +527,7 @@ class ApplicationController < ActionController::Base
   end
 
   def json_api_request?
-    request.format.json?
+    request.format.json? || ( request.content_type && Mime::Type.lookup(request.content_type)&.json? )
   end
 
   # filter that responds with :not_acceptable if request rdf for non rdf capable resource

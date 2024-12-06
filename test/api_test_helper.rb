@@ -76,7 +76,7 @@ module ApiTestHelper
   end
 
   def api_patch_test(resource, template)
-    get member_url(resource), headers: { 'Authorization' => read_access_auth }
+    get member_url(resource), as: :json, headers: { 'Authorization' => read_access_auth }
     assert_response :success
     expected = JSON.parse(response.body)
 

@@ -539,11 +539,11 @@ class AdminController < ApplicationController
     smtp_hash_new = { address: params[:address],
                       enable_starttls_auto: params[:enable_starttls_auto] == '1',
                       domain: params[:domain],
-                      authentication: params[:authentication],
-                      user_name: (params[:smtp_user_name].blank? ? nil : params[:smtp_user_name]),
-                      password: (params[:smtp_password].blank? ? nil : params[:smtp_password]) }
+                      authentication: params[:authentication].presence,
+                      user_name: params[:smtp_user_name].presence,
+                      password: params[:smtp_password].presence }
     smtp_hash_new[:port] = params[:port] if only_integer params[:port], 'port'
-    ActionMailer::Base.smtp_settings = smtp_hash_new
+    ActionMailer::Base.smtp_settings = smtp_hash_new.compact
     raise_delivery_errors_setting = ActionMailer::Base.raise_delivery_errors
     ActionMailer::Base.raise_delivery_errors = true
     begin

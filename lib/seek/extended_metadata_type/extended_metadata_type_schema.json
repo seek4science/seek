@@ -36,6 +36,9 @@
               },
               "pos": {
                 "type": "integer"
+              },
+              "pid": {
+                "type": "string"
               }
             },
             "required": ["title", "type"],
@@ -69,6 +72,9 @@
               },
               "pos": {
                 "type": "integer"
+              },
+              "pid": {
+                "type": "string"
               }
             },
             "required": ["title", "type", "ID"],

@@ -40,6 +40,7 @@ class Sample < ApplicationRecord
 
   validates_with SampleAttributeValidator
   validate :validate_added_linked_sample_permissions
+  validate :check_if_locked_sample_type, on: %i[create update]
 
   before_validation :set_title_to_title_attribute_value
   before_validation :update_sample_resource_links
@@ -241,12 +242,12 @@ class Sample < ApplicationRecord
     return if $authorization_checks_disabled
     return if linked_samples.empty?
     previous_linked_samples = []
-    unless new_record?
-      previous_linked_samples = Sample.find(id).referenced_samples
-    end
+    previous_linked_samples = Sample.find(id).referenced_samples unless new_record?
     additions = linked_samples - previous_linked_samples
-    if additions.detect { |sample| !sample.can_view? }
-      errors.add(:linked_samples, 'includes a new private sample')
-    end
+    errors.add(:linked_samples, 'includes a new private sample') if additions.detect { |sample| !sample.can_view? }
+  end
+
+  def check_if_locked_sample_type
+    errors.add(:sample_type, 'is locked') if sample_type&.locked?
   end
 end

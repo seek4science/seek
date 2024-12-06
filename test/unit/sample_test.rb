@@ -1455,4 +1455,17 @@ class SampleTest < ActiveSupport::TestCase
     end
   end
 
+  test 'add sample to a locked sample type' do
+    person = FactoryBot.create(:person)
+    sample_type = FactoryBot.create(:simple_sample_type, project_ids: [FactoryBot.create(:project).id], contributor: person)
+
+    # lock the sample type by adding a fake update task
+    UpdateSampleMetadataJob.perform_later(sample_type, person.user, [])
+    assert sample_type.locked?
+
+    assert_no_difference('Sample.count') do
+      sample = Sample.create(sample_type: sample_type, project_ids: [sample_type.projects.first.id])
+      sample.errors.added?(:sample_type, 'is locked')
+    end
+  end
 end
