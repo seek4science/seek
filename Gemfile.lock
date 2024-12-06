@@ -471,7 +471,7 @@ GEM
     multi_json (1.15.0)
     multi_xml (0.6.0)
     multipart-post (2.3.0)
-    mysql2 (0.5.3)
+    mysql2 (0.5.6)
     namae (1.1.1)
     nesty (1.0.2)
     net-ftp (0.2.0)
