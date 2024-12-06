@@ -776,7 +776,7 @@ GEM
     ruby2_keywords (0.0.5)
     rubyntlm (0.6.3)
     rubyzip (2.0.0)
-    rugged (1.1.0)
+    rugged (1.7.2)
     sample-template-generator (0.7.1)
       rdoc (~> 6.0)
       terrapin (~> 1.0)
