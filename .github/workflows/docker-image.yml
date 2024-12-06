@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - workflowhub
+      - ruby-3.2
       - full-test-suite
 
   pull_request:
