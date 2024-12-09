@@ -59,7 +59,6 @@ gem 'rdf-virtuoso', '>= 0.2.0'
 gem 'terrapin'
 gem 'lograge'
 gem 'psych'
-gem 'stringio', '3.0.1.1' #locked to the default version for ruby 3.1
 gem 'validate_url'
 gem "attr_encrypted", "~> 3.0.0"
 gem 'libreconv'
