@@ -4,7 +4,7 @@ module Seek
   module Rdf
     module RdfGeneration
       include RdfRepositoryStorage
-      include RightField
+      include Rightfield::Rightfield
       include CSVMappingsHandling
 
       def self.included(base)

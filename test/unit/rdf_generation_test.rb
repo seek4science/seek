@@ -2,7 +2,7 @@ require 'test_helper'
 require 'libxml'
 
 class RDFGenerationTest < ActiveSupport::TestCase
-  include RightField
+  include Rightfield::Rightfield
 
   test 'rightfield rdf generation' do
     df = FactoryBot.create :rightfield_annotated_datafile
