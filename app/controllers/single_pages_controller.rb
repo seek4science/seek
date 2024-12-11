@@ -1,4 +1,4 @@
-require 'isatab_converter'
+require 'isa_tab_converter'
 
 # Controller for the Single Page view
 class SinglePagesController < ApplicationController
