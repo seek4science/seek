@@ -133,7 +133,7 @@ class ContentBlobsController < ApplicationController
 
   def get_file_from_jerm
     project = @asset_version.projects.first
-    downloader = Jerm::DownloaderFactory.create project.title
+    downloader = JERM::DownloaderFactory.create project.title
     resource_type = @asset_version.class.name.split('::')[0] # need to handle versions, e.g. Sop::Version
     begin
       data_hash = downloader.get_remote_data @content_blob.url, project.site_username, project.site_password, resource_type
