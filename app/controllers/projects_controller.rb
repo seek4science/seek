@@ -1,4 +1,3 @@
-require 'seek/custom_exception'
 require 'zip'
 require 'securerandom'
 require 'json'
