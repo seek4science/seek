@@ -17,6 +17,10 @@ class SampleTypesControllerTest < ActionController::TestCase
     @controlled_vocab_type = FactoryBot.create(:controlled_vocab_attribute_type)
   end
 
+  teardown do
+    Rails.cache.clear
+  end
+
   test 'should get index' do
     get :index
     assert_response :success
@@ -36,7 +40,7 @@ class SampleTypesControllerTest < ActionController::TestCase
       assert_enqueued_with(job: SampleTypeUpdateJob) do
         assert_difference('ActivityLog.count') do
           assert_difference('SampleType.count') do
-            assert_difference('Task.count') do
+            assert_difference('Task.where(key: "template_generation").count') do
               post :create, params: { sample_type: { title: 'Hello!',
                                                      project_ids: @project_ids,
                                                      description: 'The description!!',
@@ -251,6 +255,31 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_equal 'update', ActivityLog.last.action
   end
 
+  test 'template download link visibility' do
+    person = FactoryBot.create(:person)
+    sample_type = SampleType.new title: 'testing download',
+                                 uploaded_template: true,
+                                 project_ids: person.projects.collect(&:id),
+                                 contributor: person,
+                                 content_blob: FactoryBot.create(:sample_type_template_content_blob),
+                                 policy: FactoryBot.create(:downloadable_public_policy)
+    sample_type.build_attributes_from_template
+    disable_authorization_checks { sample_type.save! }
+    assert sample_type.can_view?
+    assert sample_type.can_download?
+    get :show, params: { id: sample_type }
+    assert_response :success
+    assert_select 'a[href=?]',download_sample_type_content_blob_path(sample_type,sample_type.template), text:'Download'
+
+    sample_type.policy = FactoryBot.create(:publicly_viewable_policy)
+    disable_authorization_checks { sample_type.save! }
+    assert sample_type.can_view?
+    refute sample_type.can_download?
+    get :show, params: { id: sample_type }
+    assert_response :success
+    assert_select 'a[href=?]',download_sample_type_content_blob_path(sample_type,sample_type.template), text:'Download', count:0
+  end
+
   test 'update changing from a CV attribute' do
     sample_type = FactoryBot.create(:apples_controlled_vocab_sample_type, project_ids: @project_ids,
                                                                           contributor: @person)
@@ -439,16 +468,6 @@ class SampleTypesControllerTest < ActionController::TestCase
     get :edit, params: { id: type.id }
     assert_response :success
     assert_select 'a#add-attribute', count: 1
-
-    sample = FactoryBot.create(:patient_sample, contributor: @person,
-                                                sample_type: FactoryBot.create(:patient_sample_type, project_ids: @project_ids, contributor: @person))
-    type = sample.sample_type
-    refute_empty type.samples
-    assert type.can_edit?
-
-    get :edit, params: { id: type.id }
-    assert_response :success
-    assert_select 'a#add-attribute', count: 0
   end
 
   test 'cannot access when disabled' do
@@ -687,22 +706,6 @@ class SampleTypesControllerTest < ActionController::TestCase
     end
   end
 
-  test 'validates changes against editing constraints' do
-    @sample_type.samples.create!(data: { the_title: 'yes' }, sample_type: @sample_type, project_ids: @project_ids)
-
-    assert_no_difference('ActivityLog.count') do
-      put :update, params: { id: @sample_type, sample_type: {
-        sample_attributes_attributes: {
-          '0' => { id: @sample_type.sample_attributes.first.id, pos: '1', title: 'banana', required: '1' }
-        }
-      } }
-    end
-
-    assert_response :unprocessable_entity
-    assert_select 'div#error_explanation' do
-      assert_select 'ul > li', text: 'Sample attributes title cannot be changed (the_title)'
-    end
-  end
 
   test 'Should not be allowed to show the manage page of ISA-JSON compliant sample type' do
     with_config_value(:isa_json_compliance_enabled, true) do
@@ -761,6 +764,100 @@ class SampleTypesControllerTest < ActionController::TestCase
     get :show, params: { id: sample_type }
     assert_response :success
     assert_select 'a', text: 'Manage Sample Type', count: 0
+  end
+
+  test 'add new attribute to an existing sample type populated with samples' do
+    sample_type = FactoryBot.create(:simple_sample_type, project_ids: @project_ids, contributor: @person)
+    (1..10).map do |_i|
+      FactoryBot.create(:sample, contributor: @person, project_ids: @project_ids, sample_type: sample_type)
+    end
+    refute_empty sample_type.samples
+    login_as(@person)
+    get :edit, params: { id: sample_type.id }
+    assert_response :success
+    assert_select 'a#add-attribute', count: 1
+
+    # Should be able to add an optional new attribute to a sample type with samples
+    assert_difference('SampleAttribute.count', 1) do
+      patch :update, params: { id: sample_type.id, sample_type: {
+        sample_attributes_attributes: {
+          '1': { title: 'new optional attribute', sample_attribute_type_id: @string_type.id, required: '0' }
+        }
+      } }
+    end
+    assert_redirected_to sample_type_path(sample_type)
+    sample_type.reload
+    assert_equal 'new optional attribute', sample_type.sample_attributes.last.title
+
+    # Should not be able to add a mandatory new attribute to a sample type with samples
+    assert_no_difference('SampleAttribute.count') do
+      patch :update, params: { id: sample_type.id, sample_type: {
+        sample_attributes_attributes: {
+          '2': { title: 'new mandatory attribute', sample_attribute_type_id: @string_type.id, required: '1' }
+        }
+      } }
+    end
+
+  end
+
+  test 'check if sample type is locked' do
+    refute @sample_type.locked?
+
+    login_as(@person)
+
+    %i[edit manage].each do |action|
+      get action, params: { id: @sample_type.id }
+      assert_nil flash[:error]
+      assert_response :success
+    end
+
+    # lock the sample type by adding a fake update task
+    UpdateSampleMetadataJob.perform_later(@sample_type, @person.user, [])
+    assert @sample_type.locked?
+
+    %i[edit manage].each do |action|
+      get action, params: { id: @sample_type.id }
+      assert_redirected_to sample_type_path(@sample_type)
+      assert_equal flash[:error], 'This sample type is locked and cannot be edited right now.'
+    end
+  end
+
+  test 'update a locked sample type' do
+    other_person = FactoryBot.create(:person)
+    sample_type = FactoryBot.create(:simple_sample_type, project_ids: @project_ids, contributor: @person)
+    sample_type.policy.permissions << FactoryBot.create(:permission, contributor: other_person, access_type: Policy::MANAGING)
+
+    (1..10).map do |_i|
+      FactoryBot.create(:sample, contributor: @person, project_ids: @project_ids, sample_type: sample_type)
+    end
+
+    login_as(@person)
+
+    refute @sample_type.locked?
+
+    patch :update, params: { id: sample_type.id, sample_type: {
+      sample_attributes_attributes: {
+        '0': { id: sample_type.sample_attributes.detect(&:is_title), title: 'new title' }
+      }
+    } }
+    assert_nil flash[:error]
+    assert_redirected_to sample_type_path(sample_type)
+    sample_type.reload
+    assert sample_type.locked?
+
+    login_as(other_person)
+
+    patch :update, params: { id: sample_type.id, sample_type: {
+      sample_attributes_attributes: {
+        '0': { id: sample_type.sample_attributes.detect(&:is_title), title: 'new title' }
+      }
+    } }
+    sample_type.reload
+    sample_type.errors.added?(:base, 'This sample type is locked and cannot be edited right now.')
+
+    assert_redirected_to sample_type_path(sample_type)
+    assert(sample_type.locked?)
+    assert_equal flash[:error], 'This sample type is locked and cannot be edited right now.'
   end
 
   private

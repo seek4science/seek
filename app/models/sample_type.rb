@@ -54,7 +54,8 @@ class SampleType < ApplicationRecord
            :validate_attribute_title_unique,
            :validate_attribute_accessor_names_unique,
            :validate_title_is_not_type_of_seek_sample_multi,
-           :validate_against_editing_constraints
+           :validate_against_editing_constraints,
+           :validate_sample_type_is_not_locked
   validates :projects, presence: true, projects: { self: true }
 
   accepts_nested_attributes_for :sample_attributes, allow_destroy: true
@@ -63,6 +64,7 @@ class SampleType < ApplicationRecord
 
   has_annotation_type :sample_type_tag, method_name: :tags
 
+  has_task :sample_metadata_update
   def investigations
     return [] if studies.empty? && assays.empty?
 
@@ -108,6 +110,10 @@ class SampleType < ApplicationRecord
   def is_isa_json_compliant?
     has_only_isa_json_compliant_investigations = studies.map(&:investigation).compact.all?(&:is_isa_json_compliant?) || assays.map(&:investigation).compact.all?(&:is_isa_json_compliant?)
     (studies.any? || assays.any?) && has_only_isa_json_compliant_investigations && !isa_template.nil?
+  end
+
+  def locked?
+    sample_metadata_update_task&.in_progress?
   end
 
   def validate_value?(attribute_name, value)
@@ -156,6 +162,18 @@ class SampleType < ApplicationRecord
     can && (!Seek::Config.project_admin_sample_type_restriction || User.current_user.is_admin_or_project_administrator?)
   end
 
+  def state_allows_edit?(*args)
+    super && !locked?
+  end
+
+  def state_allows_manage?(*args)
+    super && !locked?
+  end
+
+  def state_allows_delete?(*args)
+    super && !locked?
+  end
+
   def can_delete?(user = User.current_user)
     # Users should be able to delete an ISA JSON compliant sample type that has linked sample attributes,
     # as long as it's ISA JSON compliant.
@@ -180,6 +198,19 @@ class SampleType < ApplicationRecord
 
   def can_see_hidden_item?(user)
     can_view?(user)
+  end
+
+  def self.is_asset?
+    false
+  end
+
+  # although has a downloadable template, it doesn't have the full downloadable behaviour of an asset with data and it's own accessible permissions
+  def is_downloadable?
+    false
+  end
+
+  def self.supports_extended_metadata?
+    false
   end
 
   private
@@ -244,11 +275,11 @@ class SampleType < ApplicationRecord
       if a.marked_for_destruction? && !c.allow_attribute_removal?(a)
         errors.add(:sample_attributes, "cannot be removed, there are existing samples using this attribute (#{a.title})")
       end
-
-      if a.new_record? && !c.allow_new_attribute?
-        errors.add(:sample_attributes, "cannot be added, new attributes are not allowed (#{a.title})")
-      end
     end
+  end
+
+  def validate_sample_type_is_not_locked
+    errors.add(:base, 'This sample type is locked and cannot be edited right now.') if locked?
   end
 
   def attribute_search_terms

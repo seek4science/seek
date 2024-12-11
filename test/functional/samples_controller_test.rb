@@ -78,11 +78,13 @@ class SamplesControllerTest < ActionController::TestCase
     creator = FactoryBot.create(:person)
     login_as(person)
     type = FactoryBot.create(:patient_sample_type)
+    obs_unit = FactoryBot.create(:observation_unit, contributor: person)
     assert_enqueued_with(job: SampleTypeUpdateJob, args: [type, false]) do
       assert_difference('Sample.count') do
         post :create, params: { sample: { sample_type_id: type.id,
                                           data: { 'full name': 'Fred Smith', age: '22', weight: '22.1', postcode: 'M13 9PL' },
-                                          project_ids: [person.projects.first.id], creator_ids: [creator.id] } }
+                                          project_ids: [person.projects.first.id], creator_ids: [creator.id],
+                                          observation_unit_id: obs_unit.id } }
       end
     end
     assert assigns(:sample)
@@ -94,6 +96,7 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal 'M13 9PL', sample.get_attribute_value(:postcode)
     assert_equal person, sample.contributor
     assert_equal [creator], sample.creators
+    assert_equal obs_unit, sample.observation_unit
   end
 
   test 'create with validation error' do
@@ -224,7 +227,9 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'edit' do
-    login_as(FactoryBot.create(:person))
+    person = FactoryBot.create(:person)
+    login_as(person)
+    FactoryBot.create(:observation_unit, contributor: person)
 
     get :edit, params: { id: populated_patient_sample.id }
 
@@ -274,10 +279,12 @@ class SamplesControllerTest < ActionController::TestCase
 
   #FIXME: there is an inconstency between the existing tests, and how the form behaved - see https://jira-bsse.ethz.ch/browse/OPSK-1205
   test 'update from form' do
-    login_as(FactoryBot.create(:person))
+    person = FactoryBot.create(:person)
+    login_as(person)
     creator = FactoryBot.create(:person)
     sample = populated_patient_sample
     type_id = sample.sample_type.id
+    obs_unit = FactoryBot.create(:observation_unit, contributor: person)
 
     assert_empty sample.creators
 
@@ -288,7 +295,8 @@ class SamplesControllerTest < ActionController::TestCase
             "full name": 'Jesus Jones',
             "age": '47',
             "postcode": 'M13 9QL'},
-            creator_ids: [creator.id]}}
+            creator_ids: [creator.id],
+            observation_unit_id: obs_unit.id }}
         assert_equal [creator], sample.creators
       end
     end
@@ -303,6 +311,7 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal 47, updated_sample.get_attribute_value(:age)
     assert_nil updated_sample.get_attribute_value(:weight)
     assert_equal 'M13 9QL', updated_sample.get_attribute_value(:postcode)
+    assert_equal obs_unit, updated_sample.observation_unit
   end
 
   test 'update' do
@@ -566,24 +575,6 @@ class SamplesControllerTest < ActionController::TestCase
     assert samples = assigns(:samples)
     assert_includes samples, sample1
     refute_includes samples, sample2
-  end
-
-  test 'should get table view for data file' do
-    data_file = FactoryBot.create(:data_file, policy: FactoryBot.create(:private_policy))
-    sample_type = FactoryBot.create(:simple_sample_type)
-    3.times do # public
-      FactoryBot.create(:sample, sample_type: sample_type, contributor: data_file.contributor, policy: FactoryBot.create(:private_policy),
-                                 originating_data_file: data_file)
-    end
-
-    login_as(data_file.contributor)
-
-    get :index, params: { data_file_id: data_file.id }
-
-    assert_response :success
-    # Empty table - content is loaded asynchronously (see data_files_controller_test.rb)
-    assert_select '#samples-table tbody tr', count: 0
-    assert_select '#samples-table thead th', count: 3
   end
 
   test 'should get table view for sample type' do
@@ -1582,6 +1573,21 @@ class SamplesControllerTest < ActionController::TestCase
       assert_select 'span.subtle', text:/#{I18n.t('samples.allow_free_text_label_hint')}/, count: 0
     end
 
+  end
+
+  test 'should not add a sample to a locked sample type' do
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+    login_as(person)
+
+    sample_type = FactoryBot.create(:simple_sample_type, contributor: person, project_ids: [project.id])
+
+    # lock the sample type by adding a fake update task
+    UpdateSampleMetadataJob.perform_later(sample_type, person.user, [])
+
+    get :new, params: { sample_type_id: sample_type.id }
+    assert_redirected_to sample_types_path(sample_type)
+    assert_equal flash[:error], 'This sample type is locked. You cannot edit the sample.'
   end
 
   def rdf_test_object

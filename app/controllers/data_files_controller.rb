@@ -145,15 +145,23 @@ class DataFilesController < ApplicationController
     end
   end
 
-  def samples_table
+  def extracted_samples
+    @samples = @data_file.extracted_samples.includes(:sample_type).authorized_for(:view)
+    respond_to do |format|
+      format.html
+    end
+  end
+
+  def extracted_samples_table
+    samples = @data_file.extracted_samples.includes(:sample_type).authorized_for(:view)
     respond_to do |format|
       format.html do
         render(partial: 'samples/table_view', locals: {
-                 samples: @data_file.extracted_samples.includes(:sample_type),
-                 source_url: samples_table_data_file_path(@data_file)
+                 samples: samples,
+                 source_url: extracted_samples_table_data_file_path(@data_file)
                })
       end
-      format.json { @samples = @data_file.extracted_samples.select([:id, :title, :json_metadata]) }
+      format.json { @samples = samples }
     end
   end
 
@@ -534,7 +542,7 @@ class DataFilesController < ApplicationController
                                       { creator_ids: [] }, { assay_assets_attributes: [:assay_id, :relationship_type_id] },
                                       :file_template_id,
                                       { data_format_annotations: [] }, { data_type_annotations: [] },
-                                      { publication_ids: [] }, { workflow_ids: [] },
+                                      { publication_ids: [] }, { workflow_ids: [] },{ observation_unit_ids: [] },
                                       { extended_metadata_attributes: determine_extended_metadata_keys },
                                       { workflow_data_files_attributes:[:id, :workflow_id, :workflow_data_file_relationship_id, :_destroy] },
                                       discussion_links_attributes:[:id, :url, :label, :_destroy])

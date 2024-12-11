@@ -401,4 +401,20 @@ namespace :seek_dev do
   task rebuild_csl_style_list: :environment do
     File.write(Seek::Citations.style_dictionary_path, Seek::Citations.generate_style_pairs.to_yaml)
   end
+
+  #bundle exec rake seek_dev:grant_a_person_the_right_to_manage_all_publications_of_a_project[project_id,person_id]
+  task :grant_a_person_the_right_to_manage_all_publications_of_a_project, [:project_id, :person_id] => [:environment] do |t, args|
+
+    project_id = args.project_id
+    person_id = args.person_id
+    puts "project_id:"+project_id.to_s
+    puts "person_id:"+person_id.to_s
+
+    pub_ids = Project.find(project_id).publications.map(&:id)
+    pub_ids.each do |id|
+      permission = Publication.find(id).policy.permissions.where(contributor_type: "Person", contributor_id: person_id).first_or_initialize
+      permission.update(access_type: Policy::MANAGING)
+    end
+
+  end
 end

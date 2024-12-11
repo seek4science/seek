@@ -171,6 +171,10 @@ end
     false
   end
 
+  def self.supports_extended_metadata?
+    false
+  end
+
   def is_in_isa_publishable?
     false
   end

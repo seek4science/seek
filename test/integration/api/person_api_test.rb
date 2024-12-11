@@ -47,7 +47,7 @@ class PersonApiTest < ActionDispatch::IntegrationTest
     body = api_max_post_body
     body["data"]["id"] = "#{other_person.id}"
     body["data"]["attributes"]["email"] = "updateTest@email.com"
-    patch "/people/#{other_person.id}.json", params: body, headers: { 'Authorization' => write_access_auth }
+    patch "/people/#{other_person.id}.json", params: body, as: :json, headers: { 'Authorization' => write_access_auth }
     assert_response :success
   end
 end

@@ -154,6 +154,13 @@ FactoryBot.define do
       ]
     end
   end
+
+
+  factory(:copasi_model, parent: :model) do
+    after(:create) do |model|
+      model.content_blobs = [FactoryBot.create(:copasi_content_blob, asset: model, asset_version: model.version)]
+    end
+  end
   
   # Model::Version
   factory(:model_version, class: Model::Version) do

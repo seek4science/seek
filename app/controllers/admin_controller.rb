@@ -122,6 +122,7 @@ class AdminController < ApplicationController
     Seek::Config.events_enabled = string_to_boolean params[:events_enabled]
     Seek::Config.isa_enabled = string_to_boolean params[:isa_enabled]
     Seek::Config.observation_units_enabled = string_to_boolean params[:observation_units_enabled]
+    Seek::Config.fair_data_station_enabled = string_to_boolean params[:fair_data_station_enabled]
     Seek::Config.models_enabled = string_to_boolean params[:models_enabled]
     Seek::Config.organisms_enabled = string_to_boolean params[:organisms_enabled]
     Seek::Config.programmes_enabled = string_to_boolean params[:programmes_enabled]
@@ -538,11 +539,11 @@ class AdminController < ApplicationController
     smtp_hash_new = { address: params[:address],
                       enable_starttls_auto: params[:enable_starttls_auto] == '1',
                       domain: params[:domain],
-                      authentication: params[:authentication],
-                      user_name: (params[:smtp_user_name].blank? ? nil : params[:smtp_user_name]),
-                      password: (params[:smtp_password].blank? ? nil : params[:smtp_password]) }
+                      authentication: params[:authentication].presence,
+                      user_name: params[:smtp_user_name].presence,
+                      password: params[:smtp_password].presence }
     smtp_hash_new[:port] = params[:port] if only_integer params[:port], 'port'
-    ActionMailer::Base.smtp_settings = smtp_hash_new
+    ActionMailer::Base.smtp_settings = smtp_hash_new.compact
     raise_delivery_errors_setting = ActionMailer::Base.raise_delivery_errors
     ActionMailer::Base.raise_delivery_errors = true
     begin

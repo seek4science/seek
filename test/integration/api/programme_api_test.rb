@@ -17,7 +17,7 @@ class ProgrammeApiTest < ActionDispatch::IntegrationTest
     user_login(a_person)
     body = api_max_post_body
     assert_difference('Programme.count') do
-      post collection_url, params: body, headers: { 'Authorization' => write_access_auth }
+      post collection_url, params: body, as: :json, headers: { 'Authorization' => write_access_auth }
       assert_response :success
     end
   end
@@ -34,7 +34,7 @@ class ProgrammeApiTest < ActionDispatch::IntegrationTest
     body["data"]['attributes']['title'] = "Updated programme"
     #change_funding_codes_before_CU("min")
 
-    patch member_url(prog), params: body, headers: { 'Authorization' => write_access_auth }
+    patch member_url(prog), params: body, as: :json, headers: { 'Authorization' => write_access_auth }
     assert_response :success
   end
 

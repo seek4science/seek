@@ -314,7 +314,7 @@ class WorkflowsController < ApplicationController
 
     if @crate_extractor.valid?
       @workflow = @crate_extractor.build
-      if @workflow.git_version.save && @workflow.save
+      if @workflow.save && @workflow.git_version.save
         render json: @workflow, include: json_api_include_param
       else
         render json: json_api_errors(@workflow), status: :unprocessable_entity

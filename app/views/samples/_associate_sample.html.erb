@@ -111,7 +111,7 @@
 <script>
   var wizard;
   $j(document).ready(function () {
-    var samplesTablePath = '<%= samples_table_data_file_path('-data_file_id-') %>';
+    var samplesTablePath = '<%= extracted_samples_table_data_file_path('-data_file_id-') %>';
     // Reset the "Add individual samples" modal after it is closed
     $j('#modalAddIndividualSamples').on('hidden.bs.modal', function () {
       $j('[data-role="seek-association-filter-group"]', $j(this)).data('filterGroup').reset();

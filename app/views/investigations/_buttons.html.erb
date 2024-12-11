@@ -47,5 +47,11 @@
 
   <%= order_icon(item, current_user, order_studies_investigation_path(item), item.studies, 'study') -%>
 
+	<% if show_update_from_fair_data_station_button?(item) %>
+		<li>
+			<%= image_tag_for_key('import', update_from_fairdata_station_investigation_path(item), "Update from FAIR Data Station", nil, "Update from FAIR Data Station") -%>
+		</li>
+	<% end %>
+
   <%= delete_icon item, current_user -%>
 <% end -%>

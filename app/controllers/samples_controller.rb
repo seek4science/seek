@@ -8,6 +8,7 @@ class SamplesController < ApplicationController
   before_action :samples_enabled?
   before_action :find_index_assets, only: :index
   before_action :find_and_authorize_requested_item, except: [:index, :new, :create, :preview]
+  before_action :check_if_locked_sample_type, only: %i[edit new create update]
   before_action :templates_enabled?, only: [:query, :query_form]
 
   before_action :auth_to_create, only: %i[new create batch_create]
@@ -297,7 +298,7 @@ class SamplesController < ApplicationController
         end
       end
     end
-    parameters.require(:sample).permit(:sample_type_id, *creator_related_params,
+    parameters.require(:sample).permit(:sample_type_id, *creator_related_params, :observation_unit_id,
                               { project_ids: [] }, { data: sample_type_param_keys },
                               { assay_assets_attributes: [:assay_id] },
                               { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
@@ -313,18 +314,7 @@ class SamplesController < ApplicationController
   end
 
   def find_index_assets
-    if params[:data_file_id]
-      @data_file = DataFile.find(params[:data_file_id])
-
-      unless @data_file.can_view?
-        flash[:error] = 'You are not authorize to view samples from this data file'
-        respond_to do |format|
-          format.html { redirect_to data_file_path(@data_file) }
-        end
-      end
-
-      @samples = @data_file.extracted_samples.includes(sample_type: :sample_attributes).authorized_for('view')
-    elsif params[:sample_type_id]
+    if params[:sample_type_id]
       @sample_type = SampleType.includes(:sample_attributes).find(params[:sample_type_id])
       @samples = @sample_type.samples.authorized_for('view')
     elsif params[:template_id]
@@ -370,5 +360,15 @@ class SamplesController < ApplicationController
       flash[:error] = 'Not available'
       redirect_to select_sample_types_path
     end
+  end
+
+  def check_if_locked_sample_type
+    return unless params[:sample_type_id]
+
+    sample_type = SampleType.find(params[:sample_type_id])
+    return unless sample_type&.locked?
+
+    flash[:error] = 'This sample type is locked. You cannot edit the sample.'
+    redirect_to sample_types_path(sample_type)
   end
 end
