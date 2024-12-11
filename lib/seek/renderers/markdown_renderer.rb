@@ -11,7 +11,7 @@ module Seek
 
       def render_standalone
         doc = CommonMarker.render_doc(blob.read, :UNSAFE, [:tagfilter, :table, :strikethrough, :autolink])
-        renderer = CommonMarker::SeekHtmlRenderer.new(options: [:UNSAFE, :GITHUB_PRE_LANG], extensions: [:tagfilter, :table, :strikethrough, :autolink])
+        renderer = CommonMarker::SeekHTMLRenderer.new(options: [:UNSAFE, :GITHUB_PRE_LANG], extensions: [:tagfilter, :table, :strikethrough, :autolink])
         "<div class=\"markdown-body\">#{renderer.render(doc)}</div>"
       end
 
