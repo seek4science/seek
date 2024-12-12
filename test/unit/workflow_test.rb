@@ -153,7 +153,7 @@ class WorkflowTest < ActiveSupport::TestCase
       raise 'oh dear'
     end
 
-    Seek::WorkflowExtractors::CwlDotGenerator.stub :new, bad_generator do
+    Seek::WorkflowExtractors::CWLDotGenerator.stub :new, bad_generator do
       workflow = FactoryBot.create(:generated_galaxy_no_diagram_ro_crate_workflow)
       assert workflow.should_generate_crate?
       crate = nil

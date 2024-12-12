@@ -513,7 +513,7 @@ class WorkflowsControllerTest < ActionController::TestCase
       raise 'oh dear'
     end
 
-    Seek::WorkflowExtractors::CwlDotGenerator.stub :new, bad_generator do
+    Seek::WorkflowExtractors::CWLDotGenerator.stub :new, bad_generator do
       wf = FactoryBot.create(:generated_galaxy_no_diagram_ro_crate_workflow)
       login_as(wf.contributor)
       refute wf.diagram_exists?

@@ -26,7 +26,7 @@ module Seek
         begin
           f = Tempfile.new('diagram.dot')
           wf = WorkflowInternals::Structure.new(metadata[:internals])
-          Seek::WorkflowExtractors::CwlDotGenerator.new(f).write_graph(wf)
+          Seek::WorkflowExtractors::CWLDotGenerator.new(f).write_graph(wf)
           f.rewind
           out = ''
           err = ''
