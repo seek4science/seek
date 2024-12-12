@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_10_15_093333) do
+ActiveRecord::Schema.define(version: 2024_12_12_105816) do
 
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
@@ -926,6 +926,7 @@ ActiveRecord::Schema.define(version: 2024_10_15_093333) do
     t.integer "avatar_id"
     t.string "first_letter", limit: 1
     t.string "uuid"
+    t.string "ror_id"
   end
 
   create_table "investigation_auth_lookup", force: :cascade do |t|
