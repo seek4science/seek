@@ -55,7 +55,7 @@ class SampleTypeTest < ActiveSupport::TestCase
 
     #contributor must belong in the same project
     sample_type = SampleType.new title: 'fish', projects: @projects, contributor: FactoryBot.create(:person)
-    FactoryBot.create(:simple_string_sample_attribute, is_title: true, sample_type: sample_type)
+    sample_type.sample_attributes << FactoryBot.build(:simple_string_sample_attribute, is_title: true)
     refute sample_type.valid?
     sample_type.errors.added?(:base, 'associate projects that you are an active member of')
     sample_type.contributor = @person
