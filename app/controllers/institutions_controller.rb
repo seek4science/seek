@@ -127,7 +127,7 @@ class InstitutionsController < ApplicationController
   private
 
   def institution_params
-    params.require(:institution).permit(:title, :web_page, :address, :city, :country,
+    params.require(:institution).permit(:title, :web_page, :address, :city, :country, :ror_id,
                                         discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
 

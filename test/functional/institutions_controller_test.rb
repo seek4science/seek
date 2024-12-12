@@ -33,6 +33,16 @@ class InstitutionsControllerTest < ActionController::TestCase
     assert_redirected_to institution_path(assigns(:institution))
   end
 
+  def test_should_create_institution
+    assert_difference('Institution.count') do
+      post :create, params: { institution: { title: 'test', country: 'FI', ror_id:'00h69cf80' } }
+    end
+    assert_redirected_to institution_path(assigns(:institution))
+    assert_equal 'test', assigns(:institution).title
+    assert_equal 'FI', assigns(:institution).country
+    assert_equal '00h69cf80', assigns(:institution).ror_id
+  end
+
   def test_should_show_institution
     get :show, params: { id: institutions(:one).id }
     assert_response :success
