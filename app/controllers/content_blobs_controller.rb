@@ -230,7 +230,7 @@ class ContentBlobsController < ApplicationController
   end
 
   def get_request_payload
-    if request.content_type == 'multipart/form-data'
+    if request.media_type == 'multipart/form-data'
       # "Unwrap" multipart requests to get at the content.
       params.values.detect { |v| v.is_a?(ActionDispatch::Http::UploadedFile) }
     else
