@@ -2,8 +2,8 @@ quentin:
   login: quentin
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
-  created_at: <%= 5.days.ago.to_s :db %>  
-  activated_at: <%= 5.days.ago.to_s :db %> 
+  created_at: <%= 5.days.ago.to_fs :db %>  
+  activated_at: <%= 5.days.ago.to_fs :db %> 
   person: quentin_person
   
 
@@ -11,7 +11,7 @@ aaron:
   login: aaron
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
-  created_at: <%= 1.days.ago.to_s :db %>  
+  created_at: <%= 1.days.ago.to_fs :db %>  
   activation_code: aarons-activation-code
   person: aaron_person
   
@@ -19,7 +19,7 @@ fred:
   login: fred
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
-  created_at: <%= 1.days.ago.to_s :db %>
+  created_at: <%= 1.days.ago.to_fs :db %>
   activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a 
   person: fred
 
@@ -32,7 +32,7 @@ owner_of_my_first_sop:
   login: owner_of_my_first_sop_login
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
-  created_at: <%= 1.days.ago.to_s :db %>
+  created_at: <%= 1.days.ago.to_fs :db %>
   activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
 
 
@@ -42,7 +42,7 @@ owner_of_fully_public_policy:
   login: owner_of_fully_public_policy_login
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
-  created_at: <%= 1.days.ago.to_s :db %>
+  created_at: <%= 1.days.ago.to_fs :db %>
   activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
 
 
@@ -52,7 +52,7 @@ owner_of_download_for_all_sysmo_users_policy:
   login: owner_of_download_for_all_sysmo_users_policy_login
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
-  created_at: <%= 1.days.ago.to_s :db %>
+  created_at: <%= 1.days.ago.to_fs :db %>
   activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
 
 
@@ -62,7 +62,7 @@ owner_of_editing_for_all_sysmo_users_policy:
   login: owner_of_editing_for_all_sysmo_users_policy_login
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
-  created_at: <%= 1.days.ago.to_s :db %>
+  created_at: <%= 1.days.ago.to_fs :db %>
   activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
 
 
@@ -72,7 +72,7 @@ owner_of_private_policy_using_custom_sharing:
   login: owner_of_private_policy_using_custom_sharing_login
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
-  created_at: <%= 1.days.ago.to_s :db %>
+  created_at: <%= 1.days.ago.to_fs :db %>
   activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
 
 
@@ -82,7 +82,7 @@ owner_of_complex_permissions_policy:
   login: owner_of_complex_permissions_policy_login
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
-  created_at: <%= 1.days.ago.to_s :db %>
+  created_at: <%= 1.days.ago.to_fs :db %>
   activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
 
 
@@ -92,7 +92,7 @@ owner_of_a_sop_with_complex_permissions:
   login: owner_of_a_sop_with_complex_permissions_login
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
-  created_at: <%= 1.days.ago.to_s :db %>
+  created_at: <%= 1.days.ago.to_fs :db %>
   activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
 
 
@@ -102,7 +102,7 @@ registered_user_with_no_projects:
   login: registered_user_with_no_projects_login
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
-  created_at: <%= 1.days.ago.to_s :db %>
+  created_at: <%= 1.days.ago.to_fs :db %>
   activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
 
 
@@ -112,7 +112,7 @@ test_user_only_in_allowlist:
   login: test_user_only_in_allowlist_login
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
-  created_at: <%= 1.days.ago.to_s :db %>
+  created_at: <%= 1.days.ago.to_fs :db %>
   activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
 
 
@@ -122,7 +122,7 @@ test_user_only_in_denylist:
   login: test_user_only_in_denylist_login
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
-  created_at: <%= 1.days.ago.to_s :db %>
+  created_at: <%= 1.days.ago.to_fs :db %>
   activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
 
 
@@ -132,7 +132,7 @@ sysmo_user_in_denylist:
   login: sysmo_user_in_denylist_login
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
-  created_at: <%= 1.days.ago.to_s :db %>
+  created_at: <%= 1.days.ago.to_fs :db %>
   activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
 
 
@@ -142,7 +142,7 @@ sysmo_user_both_in_denylist_and_allowlist:
   login: sysmo_user_both_in_denylist_and_allowlist_login
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
-  created_at: <%= 1.days.ago.to_s :db %>
+  created_at: <%= 1.days.ago.to_fs :db %>
   activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
 
 
@@ -152,7 +152,7 @@ sysmo_user_who_wants_to_access_different_things:
   login: sysmo_user_who_wants_to_access_different_things_login
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
-  created_at: <%= 1.days.ago.to_s :db %>
+  created_at: <%= 1.days.ago.to_fs :db %>
   activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
 
 
@@ -161,7 +161,7 @@ model_owner:
   login: model_owner
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
-  created_at: <%= 1.days.ago.to_s :db %>
+  created_at: <%= 1.days.ago.to_fs :db %>
   activation_code: nil
 
 
@@ -170,5 +170,5 @@ datafile_owner:
   login: datafile_owner
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
-  created_at: <%= 1.days.ago.to_s :db %>
+  created_at: <%= 1.days.ago.to_fs :db %>
   activation_code: nil
