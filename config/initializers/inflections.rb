@@ -11,6 +11,7 @@ SEEK::Application.configure do
     inflect.acronym "FTP"
     inflect.acronym "JERM"
     inflect.acronym "ROCrate"
+    inflect.acronym "ROLike"
     inflect.acronym "CWL"
     inflect.acronym "KNIME"
     inflect.acronym "CFF"
