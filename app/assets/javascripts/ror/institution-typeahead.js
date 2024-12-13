@@ -1,4 +1,4 @@
-var ROR_API_URL = "https://api.ror.org/organizations?query=";
+var ROR_API_URL = "https://api.ror.org/organizations";
 
 function extractRorId(rorUrl) {
     // Define the regular expression to match the ROR ID
@@ -15,8 +15,35 @@ function extractRorId(rorUrl) {
     }
 }
 
+
+function fetchRorData(rorId) {
+    var url = ROR_API_URL+'/' + rorId;
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Error fetching ror data: ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            $j('#ror-id-01').html(JSON.stringify(data, undefined, 4));
+            $j('#institution_title').val(data.name);
+            $j('#institution_city').val(data.addresses[0]['city']);
+            $j('#institution_country').val(data.country.country_name);
+            $j('#institution_ror_id').val(extractRorId(data.id));
+            $j('#institution_web_page').val(data.links?.[0] || 'N/A');
+        })
+        .catch(error => {
+            console.error('Error:', error.message);
+        });
+}
+
 $j(document).ready(function() {
     var $j = jQuery.noConflict();
+
+    $j('#fetch-ror-data-with-id').on('click', function() {
+            fetchRorData($j('#institution_ror_id').val());
+        });
 
     $j('#ror_query_name .typeahead').typeahead({
             hint: true,
@@ -27,7 +54,7 @@ $j(document).ready(function() {
             limit: 50,
             async: true,
             source: function (query, processSync, processAsync) {
-                var url = ROR_API_URL + encodeURIComponent(query);
+                var url = ROR_API_URL+'?query=' + encodeURIComponent(query);
                 return $j.ajax({
                     url: url,
                     type: 'GET',
