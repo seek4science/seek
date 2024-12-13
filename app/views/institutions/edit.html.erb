@@ -3,5 +3,8 @@
 <div class="asset_form">
 	<%= form_for(@institution) do |f| %>
 	  <%= render :partial => "form", :locals => { :f => f, :institution => @institution } -%>
+		<%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @institution} -%>
+		<%= f.submit("Update", data: { disable_with: ("Updating...") }, class: 'btn btn-primary') %> or
+		<%= cancel_button(institutions_path) %>
 	<% end %>
 </div>

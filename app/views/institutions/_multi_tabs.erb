@@ -1,0 +1,40 @@
+<%= f.error_messages -%>
+
+<ul class="nav nav-tabs" role="tablist">
+  <li class="nav-item active in">
+    <a class="nav-link" id="search-by-name" data-toggle="tab" href="#search-by-name-tab" role="tab" aria-controls="search-by-name" aria-selected="true">
+      Search by Name
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="search-by-ror-id" data-toggle="tab" href="#search-by-ror-id-table" role="tab" aria-controls="search-by-ror-id" aria-selected="false">
+      From ROR ID
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="manual-entry" data-toggle="tab" href="#manual-entry-tab" role="tab" aria-controls="manual-entry" aria-selected="false">
+      Manually enter
+    </a>
+  </li>
+</ul>
+
+<div class="tab-content">
+  <div class="tab-pane fade active in" id="search-by-name-tab" role="tabpanel" aria-labelledby="search-by-name-tab">
+    <%= render partial: 'tab_query_name', locals: {f:f, institution:nil} %>
+  </div>
+
+  <div class="tab-pane fade" id="search-by-ror-id-table" role="tabpanel" aria-labelledby="search-by-ror-id-table">
+    <!-- Add your form fields for ROR ID here -->
+  </div>
+
+  <div class="tab-pane fade" id="manual-entry-tab" role="tabpanel" aria-labelledby="manual-entry-tab-tab">
+    <div class="asset_form">
+      <%#= render partial: "form", locals: {f:f, institution:nil } %>
+    </div>
+  </div>
+</div>
+
+<%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @institution} -%>
+
+<%= f.submit("Create", data: { disable_with: ("Creating...") }, class: 'btn btn-primary') %> or
+<%= cancel_button(institutions_path) %>
