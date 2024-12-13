@@ -1,17 +1,12 @@
 var ROR_API_URL = "https://api.ror.org/organizations";
 
 function extractRorId(rorUrl) {
-    // Define the regular expression to match the ROR ID
     const regex = /https:\/\/ror\.org\/([^\/]+)/;
-
-    // Try to match the URL with the regex
     const match = rorUrl.match(regex);
-
-    // If a match is found, return the extracted ROR ID
     if (match) {
-        return match[1];  // Return the captured ID
+        return match[1];
     } else {
-        return null;  // Return null if no match is found
+        return null;
     }
 }
 
@@ -68,7 +63,7 @@ $j(document).ready(function() {
             templates: {
                 pending: [
                     '<div class="empty-message">',
-                    'Fetching organizations list',
+                    'Fetching list ...',
                     '</div>'
                 ].join('\n'),
                 suggestion: function (data) {
