@@ -228,7 +228,7 @@ module Seek
         send_file @content_blob.filepath, filename: @content_blob.original_filename, type: @content_blob.content_type, disposition: 'attachment'
       else
         flash[:error] = error_message if error_message
-        redirect_to redirected_url
+        redirect_to redirected_url, allow_other_host: true
       end
     end
 

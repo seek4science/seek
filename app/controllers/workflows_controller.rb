@@ -327,7 +327,7 @@ class WorkflowsController < ApplicationController
   def run
     # Support other execution methods in the future
     respond_to do |format|
-      format.html { redirect_to @display_workflow.run_url }
+      format.html { redirect_to @display_workflow.run_url, allow_other_host: true }
     end
   end
 
