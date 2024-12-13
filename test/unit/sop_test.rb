@@ -348,7 +348,7 @@ class SopTest < ActiveSupport::TestCase
 
     sample_type = FactoryBot.create(:sop_sample_type, project_ids: [project.id])
     sop_attr = FactoryBot.build(:sop_sample_attribute, title: 'sop 2', sample_type: sample_type)
-    sample_type.sample_attributes << sop_attr
+
     sop = FactoryBot.create(:sop)
     another_sop = FactoryBot.create(:sop)
     sop_without_samples = FactoryBot.create(:sop)
