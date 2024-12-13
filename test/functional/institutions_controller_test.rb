@@ -43,6 +43,13 @@ class InstitutionsControllerTest < ActionController::TestCase
     assert_equal '00h69cf80', assigns(:institution).ror_id
   end
 
+  def test_can_not_create_institution_with_invalid_ror_id
+      assert_no_difference('Institution.count') do
+        post :create, params: { institution: { title: 'test', country: 'FI', ror_id:'3333' } }
+      end
+      assert_equal assigns(:institution).errors[:ror_id].first, 'is invalid.'
+  end
+
   def test_should_show_institution
     get :show, params: { id: institutions(:one).id }
     assert_response :success
