@@ -454,7 +454,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     pub = FactoryBot.create(:publication, title: 'A paper on blabla',
                       abstract: 'WORD ' * 20,
-                      published_date: 5.days.ago.to_s(:db),
+                      published_date: 5.days.ago.to_fs(:db),
                       pubmed_id: 404,
                       publication_type: FactoryBot.create(:journal))
 
@@ -478,7 +478,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     pub = FactoryBot.create(:publication, title: 'A paper on blabla',
                   abstract: 'WORD ' * 20,
-                  published_date: 5.days.ago.to_s(:db),
+                  published_date: 5.days.ago.to_fs(:db),
                   pubmed_id: 999,
                   publication_type: FactoryBot.create(:journal))
 
@@ -1587,7 +1587,7 @@ class PublicationsControllerTest < ActionController::TestCase
   def publication_for_export_tests
     FactoryBot.create(:publication, title: 'A paper on blabla',
             abstract: 'WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD',
-            published_date: 5.days.ago.to_s(:db),
+            published_date: 5.days.ago.to_fs(:db),
             pubmed_id: 5,
             publication_type: FactoryBot.create(:journal)
 
