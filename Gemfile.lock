@@ -144,7 +144,7 @@ GEM
     amazing_print (1.4.0)
     ansi (1.5.0)
     ast (2.4.2)
-    attr_encrypted (4.0.0)
+    attr_encrypted (4.1.1)
       encryptor (~> 3.0.0)
     attr_required (1.0.1)
     auto_strip_attributes (2.6.0)
@@ -972,7 +972,7 @@ DEPENDENCIES
   acts_as_tree
   addressable
   api_smith!
-  attr_encrypted (~> 4.0.0)
+  attr_encrypted
   auto_strip_attributes
   better_errors
   bibtex-ruby (~> 5.1.0)

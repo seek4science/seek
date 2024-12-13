@@ -60,7 +60,7 @@ gem 'lograge'
 gem 'psych'
 gem 'stringio', '3.0.1.1' #locked to the default version for ruby 3.1
 gem 'validate_url'
-gem "attr_encrypted", "~> 4.0.0"
+gem "attr_encrypted"
 gem 'libreconv'
 
 # gem for BiVeS and BudHat
