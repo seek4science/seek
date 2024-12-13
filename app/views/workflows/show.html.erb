@@ -30,7 +30,7 @@
         <% begin %>
           <% if @display_workflow.diagram_exists? || @display_workflow.can_render_diagram? %>
             <% diagram_path = diagram_workflow_path(@workflow, version: @display_workflow.version) %>
-            <% is_svg = @display_workflow&.diagram.extension == 'svg' %>
+            <% is_svg = @display_workflow&.diagram&.extension == 'svg' %>
             <div class="row">
               <div class="col-md-12">
                 <div class="workflow-diagram">
