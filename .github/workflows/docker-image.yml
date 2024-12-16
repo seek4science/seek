@@ -6,6 +6,7 @@ on:
       - main
       - workflowhub
       - full-test-suite
+      - upgrade-pip # Revert before merge
 
   pull_request:
 
