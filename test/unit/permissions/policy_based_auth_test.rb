@@ -222,13 +222,13 @@ class PolicyBasedAuthTest < ActiveSupport::TestCase
         assert_equal 1, Sop.lookup_count_for_user(user.id)
         assert_equal 2, Sop::AuthLookup.count
         Sop::AuthLookup.create(
-           user_id: user.id ,asset_id: sop.id + 10 ,can_view: false ,can_manage: false ,can_edit: false ,can_download: false ,can_delete: false
+          user_id: user.id, asset_id: sop.id + 10, can_view: false, can_manage: false, can_edit: false, can_download: false, can_delete: false
         )
         Sop::AuthLookup.create(
-          user_id: user.id ,asset_id: sop.id + 11 ,can_view: false ,can_manage: false ,can_edit: false ,can_download: false ,can_delete: false
+          user_id: user.id, asset_id: sop.id + 11, can_view: false, can_manage: false, can_edit: false, can_download: false, can_delete: false
         )
         Sop::AuthLookup.create(
-          user_id: 0 ,asset_id: sop.id + 11 ,can_view: false ,can_manage: false ,can_edit: false ,can_download: false ,can_delete: false
+          user_id: 0, asset_id: sop.id + 11, can_view: false, can_manage: false, can_edit: false, can_download: false, can_delete: false
         )
         assert_equal 3, Sop.lookup_count_for_user(user.id)
         assert_equal 5, Sop::AuthLookup.count
@@ -238,10 +238,10 @@ class PolicyBasedAuthTest < ActiveSupport::TestCase
 
         # and remove duplicates
         Sop::AuthLookup.create(
-          user_id: user.id ,asset_id: sop.id ,can_view: false ,can_manage: false ,can_edit: false ,can_download: false ,can_delete: false
+          user_id: user.id, asset_id: sop.id, can_view: false, can_manage: false, can_edit: false, can_download: false, can_delete: false
         )
         Sop::AuthLookup.create(
-          user_id: user.id ,asset_id: sop.id ,can_view: false ,can_manage: false ,can_edit: false ,can_download: false ,can_delete: false
+          user_id: user.id, asset_id: sop.id, can_view: false, can_manage: false, can_edit: false, can_download: false, can_delete: false
         )
         assert_equal 3, Sop.lookup_count_for_user(user.id)
         assert_equal 4, Sop::AuthLookup.count
@@ -250,7 +250,7 @@ class PolicyBasedAuthTest < ActiveSupport::TestCase
         assert_equal 1, Sop.lookup_count_for_user(user.id)
         assert_equal 2, Sop::AuthLookup.count
         assert_empty Sop.lookup_class.select(:asset_id, :user_id).group(:asset_id, :user_id).having("count(*) > 1")
-        assert_equal 1, Sop.lookup_class.where(asset_id:sop.id, user_id:user.id).size
+        assert_equal 1, Sop.lookup_class.where(asset_id: sop.id, user_id: user.id).size
       end
     end
   end
