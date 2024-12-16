@@ -1,4 +1,4 @@
-class IsaAssaysController < ApplicationController
+class ISAAssaysController < ApplicationController
   include Seek::AssetsCommon
   include Seek::Publishing::PublishingCommon
 
@@ -29,12 +29,12 @@ class IsaAssaysController < ApplicationController
 
     @isa_assay =
       if params[:is_assay_stream]
-        IsaAssay.new({ assay: { assay_class_id: AssayClass.assay_stream.id,
+        ISAAssay.new({ assay: { assay_class_id: AssayClass.assay_stream.id,
                                 study_id: study.id,
                                 position: new_position },
                        input_sample_type_id: })
       else
-        IsaAssay.new({ assay: { assay_class_id: AssayClass.experimental.id,
+        ISAAssay.new({ assay: { assay_class_id: AssayClass.experimental.id,
                                 assay_stream_id: params[:assay_stream_id],
                                 study_id: study.id,
                                 position: new_position },
@@ -118,7 +118,7 @@ class IsaAssaysController < ApplicationController
   end
 
   def initialize_isa_assay
-    @isa_assay = IsaAssay.new(isa_assay_params)
+    @isa_assay = ISAAssay.new(isa_assay_params)
     update_sharing_policies @isa_assay.assay
     @isa_assay.assay.contributor = current_person
     @isa_assay.sample_type.contributor = User.current_user.person if isa_assay_params[:sample_type]
@@ -199,7 +199,7 @@ class IsaAssaysController < ApplicationController
   end
 
   def find_requested_item
-    @isa_assay = IsaAssay.new
+    @isa_assay = ISAAssay.new
     @isa_assay.populate(params[:id])
 
     if @isa_assay.assay.nil?

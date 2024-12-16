@@ -1,5 +1,5 @@
 # noinspection ALL
-module IsaExporter
+module ISAExporter
   class Exporter
     def initialize(investigation, user)
       @investigation = investigation

@@ -1,7 +1,7 @@
 require 'json-schema'
 # singleton class for extracting Templates and their attributes from json files
 module Seek
-  module IsaTemplates
+  module ISATemplates
     module TemplateExtractor
       def self.extract_templates
         FileUtils.touch(resultfile)
@@ -180,14 +180,14 @@ module Seek
       def self.get_isa_tag_id(title)
         return nil if title.blank?
 
-        it = IsaTag.find_by(title:)
+        it = ISATag.find_by(title:)
         @errors.append "<li>Could not find an ISA Tag named '#{title}'</li>" if it.nil?
 
         it.id
       end
 
       def self.seed_isa_tags
-        Rake::Task['db:seed:015_isa_tags'].invoke if IsaTag.all.blank?
+        Rake::Task['db:seed:015_isa_tags'].invoke if ISATag.all.blank?
       end
 
       def self.lockfile

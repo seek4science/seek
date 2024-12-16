@@ -17,7 +17,7 @@ class WorkflowsController < ApplicationController
 
   include Seek::Publishing::PublishingCommon
   include Seek::Doi::Minting
-  include Seek::IsaGraphExtensions
+  include Seek::ISAGraphExtensions
   include RoCrateHandling
   include Legacy::WorkflowSupport
 

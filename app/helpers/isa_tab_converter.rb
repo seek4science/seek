@@ -1,5 +1,5 @@
 # noinspection ALL
-class IsaTabConverter
+class ISATabConverter
   include Seek::Util.routes
 
   JERM_ONTOLOGY_URL = 'http://jermontology.org/ontology/JERMOntology'

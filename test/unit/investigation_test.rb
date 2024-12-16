@@ -65,7 +65,7 @@ class InvestigationTest < ActiveSupport::TestCase
       assay.save!
     end
 
-    the_hash = IsaTabConverter.convert_investigation(object)
+    the_hash = ISATabConverter.convert_investigation(object)
     json = JSON.pretty_generate(the_hash)
 
     # write out to a temporary file

@@ -1,5 +1,5 @@
 module Seek
-  module ActsAsIsa
+  module ActsAsISA
     module Relationships
       module InstanceMethods
         # includes publications directly related, plus those related to associated assays

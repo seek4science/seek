@@ -19,7 +19,7 @@ class InvestigationsController < ApplicationController
 
   include Seek::AnnotationCommon
 
-  include Seek::IsaGraphExtensions
+  include Seek::ISAGraphExtensions
 
   api_actions :index, :show, :create, :update, :destroy
 
@@ -60,12 +60,12 @@ class InvestigationsController < ApplicationController
   end
 
   def export_isatab_json
-    the_hash = IsaTabConverter.convert_investigation(Investigation.find(params[:id]))
+    the_hash = ISATabConverter.convert_investigation(Investigation.find(params[:id]))
     send_data JSON.pretty_generate(the_hash) , filename: 'isatab.json'
   end
 
   def export_isa
-    isa = IsaExporter::Exporter.new(Investigation.find(params[:id]), current_user).export
+    isa = ISAExporter::Exporter.new(Investigation.find(params[:id]), current_user).export
     send_data isa, filename: 'isa.json', type: 'application/json', deposition: 'attachment'
   rescue Exception => e
     respond_to do |format|

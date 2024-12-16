@@ -15,5 +15,6 @@ SEEK::Application.configure do
     inflect.acronym "CWL"
     inflect.acronym "KNIME"
     inflect.acronym "CFF"
+    inflect.acronym "ISA"
   end
 end

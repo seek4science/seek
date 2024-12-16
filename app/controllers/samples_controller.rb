@@ -13,7 +13,7 @@ class SamplesController < ApplicationController
 
   before_action :auth_to_create, only: %i[new create batch_create]
 
-  include Seek::IsaGraphExtensions
+  include Seek::ISAGraphExtensions
   include Seek::Publishing::PublishingCommon
 
   api_actions :index, :show, :create, :update, :destroy, :batch_create

@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class IsaAssaysControllerTest < ActionController::TestCase
+class ISAAssaysControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper

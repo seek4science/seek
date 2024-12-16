@@ -1,7 +1,7 @@
 module Seek
   module ActsAsAsset
     # Acts as Asset behaviour that relates to the ISA framework
-    module Isa
+    module ISA
       module InstanceMethods
         def assay_type_titles
           assays.map { |at| at.try(:assay_type_label) }.compact

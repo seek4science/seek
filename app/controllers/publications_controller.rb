@@ -13,7 +13,7 @@ class PublicationsController < ApplicationController
   before_action :suggest_authors, only: [:manage]
   before_action :find_display_asset, :only=>[:show, :download]
 
-  include Seek::IsaGraphExtensions
+  include Seek::ISAGraphExtensions
   include PublicationsHelper
 
   api_actions :index, :show

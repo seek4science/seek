@@ -1,4 +1,4 @@
-class IsaStudiesController < ApplicationController
+class ISAStudiesController < ApplicationController
   include Seek::AssetsCommon
   include Seek::Publishing::PublishingCommon
 
@@ -6,11 +6,11 @@ class IsaStudiesController < ApplicationController
   before_action :find_requested_item, only: %i[edit update]
 
   def new
-    @isa_study = IsaStudy.new({ study: { investigation_id: params[:investigation_id] } })
+    @isa_study = ISAStudy.new({ study: { investigation_id: params[:investigation_id] } })
   end
 
   def create
-    @isa_study = IsaStudy.new(isa_study_params)
+    @isa_study = ISAStudy.new(isa_study_params)
     update_sharing_policies @isa_study.study
     @isa_study.source.policy = @isa_study.study.policy
     @isa_study.sample_collection.policy = @isa_study.study.policy
@@ -129,7 +129,7 @@ class IsaStudiesController < ApplicationController
   end
 
   def find_requested_item
-    @isa_study = IsaStudy.new
+    @isa_study = ISAStudy.new
     @isa_study.populate(params[:id])
 
     @isa_study.errors.add(:study, "The #{t('isa_study')} was not found.") if @isa_study.study.nil?
