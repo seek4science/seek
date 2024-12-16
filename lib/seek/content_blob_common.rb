@@ -187,7 +187,7 @@ module Seek
         stream_with(Seek::DownloadHandling::HTTPStreamer.new(@content_blob.url), info)
       when 401, 403
         # Try redirecting the user to the URL if SEEK cannot access it
-        redirect_to @content_blob.url
+        redirect_to @content_blob.url, allow_other_host: true
       when 404
         error_message = 'This item is referenced at a remote location, which is currently unavailable'
         redirected_url = polymorphic_path(@asset_version.parent, version: @asset_version.version)
