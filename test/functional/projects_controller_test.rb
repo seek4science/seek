@@ -403,7 +403,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
     model.save
     publication.associate(model)
-    publication.save!
+    disable_authorization_checks { publication.save! }
     project = person.projects.first
 
     assert_includes publication.projects, project
