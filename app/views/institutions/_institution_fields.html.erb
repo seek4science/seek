@@ -42,7 +42,7 @@
         </div>
         <div class="form-group">
           <%= f.label :country -%>
-          <%= f.text_field :country, value: CountryCodes.country(institution.country), :class=>"form-control" -%>
+          <%= f.text_field :country, value: institution.nil? ? nil:CountryCodes.country(institution.country), :class=>"form-control" -%>
         </div>
 
         <div class="form-group">
