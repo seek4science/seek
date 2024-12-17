@@ -362,7 +362,7 @@ class ApplicationController < ActionController::Base
                              culprit: current_user,
                              controller_name: controller_name,
                              user_agent: user_agent,
-                             data: { search_query: object, result_count: @results.count })
+                             data: { search_query: object.inspect, result_count: @results.count })
         end
       when 'content_blobs'
         # action download applies for normal download
