@@ -487,7 +487,6 @@ GEM
       nokogiri (~> 1)
       rake
     mini_mime (1.1.5)
-    mini_portile2 (2.8.8)
     minitest (5.25.4)
     minitest-reporters (1.5.0)
       ansi
@@ -520,8 +519,7 @@ GEM
       net-protocol
     netrc (0.11.0)
     nio4r (2.7.4)
-    nokogiri (1.17.2)
-      mini_portile2 (~> 2.8.2)
+    nokogiri (1.17.2-x86_64-linux)
       racc (~> 1.4)
     nori (1.1.5)
     oauth2 (2.0.9)
@@ -667,9 +665,9 @@ GEM
     rainbow (3.1.1)
     raindrops (0.20.0)
     rake (13.2.1)
-    ransack (2.5.0)
-      activerecord (>= 5.2.4)
-      activesupport (>= 5.2.4)
+    ransack (4.2.1)
+      activerecord (>= 6.1.5)
+      activesupport (>= 6.1.5)
       i18n
     rb-fsevent (0.11.0)
     rb-inotify (0.10.1)
@@ -991,7 +989,7 @@ GEM
       rubyzip (~> 2.0.0)
 
 PLATFORMS
-  ruby
+  x86_64-linux
 
 DEPENDENCIES
   RedCloth (>= 4.3.0)
