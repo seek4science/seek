@@ -114,6 +114,13 @@ class SampleTypeTest < ActiveSupport::TestCase
     end
   end
 
+  test 'not an asset or downloadable' do
+    st = FactoryBot.create(:simple_sample_type)
+    refute st.is_asset?
+    refute st.is_downloadable?
+    refute st.is_downloadable_asset?
+  end
+
   test 'validate title and decription length' do
     long_desc = ('a' * 65536).freeze
     ok_desc = ('a' * 65535).freeze
