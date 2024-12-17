@@ -9,31 +9,37 @@ function extractRorId(rorUrl) {
         return null;
     }
 }
-
-
 function fetchRorData(rorId) {
-    var url = ROR_API_URL+'/' + rorId;
+    var url = ROR_API_URL + '/' + rorId;
+    console.log(url);
     fetch(url)
         .then(response => {
             if (!response.ok) {
-                throw new Error(`Error fetching ror data: ${response.statusText}`);
+                return response.json().then(err => {
+                    throw new Error(err.errors ? err.errors[0] : "Unknown error occurred");
+                });
             }
             return response.json();
         })
         .then(data => {
-            $j('#ror-id-01').html(JSON.stringify(data, undefined, 4));
+            $j('#ror-response').html(JSON.stringify(data, undefined, 4));
             $j('#institution_title').val(data.name);
             $j('#institution_city').val(data.addresses[0]['city']);
             $j('#institution_country').val(data.country.country_name);
             $j('#institution_ror_id').val(extractRorId(data.id));
             $j('#institution_web_page').val(data.links?.[0] || 'N/A');
+            $j('#ror-error-message').text('').hide();
+            $j('#institution_ror_id').removeClass("field_with_errors");
+            $j("#ror-error-message").closest(".form-group").removeClass("field_with_errors");
         })
         .catch(error => {
-            console.error('Error:', error.message);
+            $j('#ror-error-message').text(error.message).show();
+            $j('#institution_ror_id').addClass("field_with_errors");
+            $j("#ror-error-message").closest(".form-group").addClass("field_with_errors");
         });
 }
 
-$j(document).ready(function() {
+$j(document).ready(function () {
     var $j = jQuery.noConflict();
 
     $j('#fetch-ror-data-with-id').on('click', function() {
@@ -96,7 +102,7 @@ $j(document).ready(function() {
         });
 
     $j('#ror_query_name .typeahead').bind('typeahead:select', function(ev, suggestion) {
-        $j('#ror-id-01').html(JSON.stringify(suggestion, undefined, 4));
+        $j('#ror-response').html(JSON.stringify(suggestion, undefined, 4));
         $j('#institution_city').val(suggestion.addresses[0]['city']);
         $j('#institution_country').val(suggestion.country.country_name);
         $j('#institution_ror_id').val(extractRorId(suggestion.id));
@@ -104,6 +110,6 @@ $j(document).ready(function() {
     });
 
     $j('#basic #name-01').bind('change', function() {
-        $j('#ror-id-01').html('');
+        $j('#ror-response').html('');
     });
 });
