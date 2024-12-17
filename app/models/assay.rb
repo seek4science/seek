@@ -1,7 +1,7 @@
 class Assay < ApplicationRecord
   include Seek::Ontologies::AssayOntologyTypes
 
-  enum status: %i[planned running completed cancelled failed]
+  #enum status: %i[planned running completed cancelled failed]
   belongs_to :assignee, class_name: 'Person'
 
   # needs to before acts_as_isa - otherwise auto_index=>false is overridden by Seek::Search::CommonFields
