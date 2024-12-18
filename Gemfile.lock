@@ -151,8 +151,9 @@ GEM
       coderay (>= 1.0.0)
       erubi (>= 1.0.0)
       rack (>= 0.9.0)
-    bibtex-ruby (5.1.6)
+    bibtex-ruby (6.1.0)
       latex-decode (~> 0.0)
+      racc (~> 1.7)
     bindata (2.5.0)
     bindex (0.8.1)
     binding_of_caller (1.0.0)
@@ -363,7 +364,7 @@ GEM
     jwt (2.5.0)
     kgio (2.11.4)
     language_list (1.2.1)
-    latex-decode (0.3.2)
+    latex-decode (0.4.0)
     ld-patch (3.2.0)
       ebnf (~> 2.2)
       rdf (~> 3.2)
@@ -970,7 +971,7 @@ DEPENDENCIES
   attr_encrypted (~> 3.0.0)
   auto_strip_attributes
   better_errors
-  bibtex-ruby (~> 5.1.0)
+  bibtex-ruby (~> 6.1.0)
   binding_of_caller
   bio (~> 1.5.1)
   bioportal (>= 3.0)!

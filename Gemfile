@@ -95,7 +95,7 @@ gem 'rspec-rails','~> 5.1'
 
 gem 'citeproc-ruby', '~> 2.0.0'
 gem 'csl-styles', '~> 2.0.0'
-gem 'bibtex-ruby', '~> 5.1.0'
+gem 'bibtex-ruby', '~> 6.1.0'
 
 gem 'omniauth', '~> 2.1.0'
 gem 'gitlab_omniauth-ldap', '~> 2.2.0'
