@@ -7,7 +7,7 @@ class Person < ApplicationRecord
 
   auto_strip_attributes :email, :first_name, :last_name, :web_page
 
-  alias_attribute :title, :name
+
 
   acts_as_yellow_pages
 
@@ -265,6 +265,7 @@ class Person < ApplicationRecord
     lastname = last_name || ''
     "#{firstname} #{lastname}".strip
   end
+  alias title name
 
   # returns true this is an admin person, and they are the only one defined - indicating they are person creating during setting up SEEK
   def only_first_admin_person?
