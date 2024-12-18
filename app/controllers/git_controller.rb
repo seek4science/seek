@@ -144,7 +144,7 @@ class GitController < ApplicationController
   end
 
   def render_invalid_path_error(ex)
-    render_git_error("Invalid path: #{ex.path}", status: 422)
+    render_git_error("Invalid path#{ex.path ? ": #{ex.path}" : ""}", status: 422)
   end
 
   def render_invalid_url_error(ex)
