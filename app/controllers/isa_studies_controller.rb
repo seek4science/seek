@@ -3,7 +3,6 @@ class IsaStudiesController < ApplicationController
   include Seek::Publishing::PublishingCommon
 
   before_action :set_up_instance_variable
-  before_action :check_if_locked, only: %i[edit manage manage_update update]
   before_action :find_requested_item, only: %i[edit update]
   before_action :old_attributes, only: %i[update]
 
@@ -20,7 +19,7 @@ class IsaStudiesController < ApplicationController
     @isa_study.sample_collection.policy = @isa_study.study.policy
     @isa_study.source.contributor = User.current_user.person
     @isa_study.sample_collection.contributor = User.current_user.person
-    @isa_study.study.sample_types = [@isa_study.source, @isa_study.sample_collection]
+    @isa_study.study.sample_types = [ @isa_study.source, @isa_study.sample_collection ]
 
     if @isa_study.save
       flash[:notice] = "The #{t('isa_study')} was succesfully created.<br/>".html_safe
