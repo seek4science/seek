@@ -8,6 +8,10 @@ class IsaAssaysController < ApplicationController
   after_action :rearrange_assay_positions_create_isa_assay, only: :create
   after_action :fix_assay_linkage_for_new_assays, only: :create
 
+  # Update sample metadata when updating an assay
+  before_action :old_attributes, only: %i[update]
+  after_action :update_sample_json_metadata, only: :update
+
   def new
     study = Study.find(params[:study_id])
     new_position =
@@ -196,6 +200,23 @@ class IsaAssaysController < ApplicationController
 
   def set_up_instance_variable
     @single_page = true
+  end
+
+  def old_attributes
+    @old_attributes = @isa_assay.sample_type.sample_attributes.map do |attr|
+      { id: attr.id, title: attr.title }
+    end
+  end
+  def update_sample_json_metadata
+    attribute_changes = @isa_assay.sample_type.sample_attributes.map do |attr|
+      old_attr = @old_attributes.detect { |oa| oa[:id] == attr.id }
+      next if old_attr.nil?
+
+      {id: attr.id, old_title: old_attr[:title], new_title: attr.title} unless old_attr[:title] == attr.title
+    end.compact
+    return  if attribute_changes.blank?
+
+    UpdateSampleMetadataJob.perform_later(@isa_assay.sample_type, @current_user, attribute_changes)
   end
 
   def find_requested_item
