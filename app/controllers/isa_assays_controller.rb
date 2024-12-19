@@ -212,6 +212,8 @@ class IsaAssaysController < ApplicationController
     unless @isa_assay.assay&.is_assay_stream?
       if @isa_assay.sample_type.nil?
         @isa_assay.errors.add(:sample_type, 'Sample type not found.')
+      elsif @isa_assay.sample_type.locked?
+        @isa_assay.errors.add(:sample_type, "The #{t('sample_type')} is locked and cannot be edited.")
       else
         @isa_assay.errors.add(:sample_type, "You are not authorized to edit this assay's #{t('sample_type')}.") unless requested_item_authorized?(@isa_assay.sample_type)
       end
