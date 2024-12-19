@@ -173,12 +173,12 @@ class IsaStudiesController < ApplicationController
     @isa_study.errors.add(:study, "The #{t('isa_study')} was not found.") if @isa_study.study.nil?
     @isa_study.errors.add(:study, "You are not authorized to edit this #{t('isa_study')}.") unless requested_item_authorized?(@isa_study.study)
 
-    @isa_study.errors.add(:sample_type, "'Study source' #{t('sample_type')} not found.") if @isa_study.source.nil?
-    @isa_study.errors.add(:sample_type, "'Study source' #{t('sample_type')} is locked by a background process.") if @isa_study.source.locked?
-    @isa_study.errors.add(:sample_type, "You are not authorized to edit the 'study source' #{t('sample_type')}.") unless requested_item_authorized?(@isa_study.source)
-    @isa_study.errors.add(:sample_type, "'Study sample' #{t('sample_type')} not found.") if @isa_study.sample_collection.nil?
-    @isa_study.errors.add(:sample_type, "'Study sample' #{t('sample_type')} is locked by a background process.") if @isa_study.sample_collection.locked?
-    @isa_study.errors.add(:sample_type, "You are not authorized to edit the 'study sample' #{t('sample_type')}.") unless requested_item_authorized?(@isa_study.sample_collection)
+    @isa_study.errors.add(:sample_type, "'#{t('isa_study')} source' #{t('sample_type')} not found.") if @isa_study.source.nil?
+    @isa_study.errors.add(:sample_type, "'#{t('isa_study')} source' #{t('sample_type')} is locked by a background process.") if @isa_study.source.locked?
+    @isa_study.errors.add(:sample_type, "You are not authorized to edit the '#{t('isa_study')} source' #{t('sample_type')}.") unless requested_item_authorized?(@isa_study.source)
+    @isa_study.errors.add(:sample_type, "'#{t('isa_study')} sample' #{t('sample_type')} not found.") if @isa_study.sample_collection.nil?
+    @isa_study.errors.add(:sample_type, "'#{t('isa_study')} sample' #{t('sample_type')} is locked by a background process.") if @isa_study.sample_collection.locked?
+    @isa_study.errors.add(:sample_type, "You are not authorized to edit the '#{t('isa_study')} sample collection' #{t('sample_type')}.") unless requested_item_authorized?(@isa_study.sample_collection)
 
     if @isa_study.errors.any?
       error_messages = @isa_study.errors.map do |error|
