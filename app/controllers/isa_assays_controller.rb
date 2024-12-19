@@ -70,7 +70,7 @@ class IsaAssaysController < ApplicationController
   def update
     update_sharing_policies @isa_assay.assay
     @isa_assay.assay.attributes = isa_assay_params[:assay]
-    @isa_assay.sample_type.policy = @isa_assay.assay.policy
+    @isa_assay.sample_type.policy = @isa_assay.assay.policy unless @isa_assay.assay.is_assay_stream?
     # update the sample_type
     unless @isa_assay&.assay&.is_assay_stream?
       if requested_item_authorized?(@isa_assay.sample_type)
