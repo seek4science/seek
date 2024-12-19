@@ -236,7 +236,7 @@ class IsaAssaysController < ApplicationController
       elsif @isa_assay.sample_type.locked?
         @isa_assay.errors.add(:sample_type, "The #{t('isa_assay')}'s #{t('sample_type')} is locked by a background process and cannot be edited.")
       else
-        @isa_assay.errors.add(:sample_type, "You are not authorized to edit this assay's #{t('sample_type')}.") unless requested_item_authorized?(@isa_assay.sample_type)
+        @isa_assay.errors.add(:sample_type, "You are not authorized to edit this #{t('isa_assay')}'s #{t('sample_type')}.") unless requested_item_authorized?(@isa_assay.sample_type)
       end
     end
 
