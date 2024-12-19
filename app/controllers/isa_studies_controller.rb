@@ -134,7 +134,6 @@ class IsaStudiesController < ApplicationController
 
       @old_sample_type_attributes[key] = sample_type.sample_attributes.map { |attr| { id: attr.id, title: attr.title } }
     end
-    puts 'OLD ATTRIBUTES'
   end
 
   def update_sample_json_metadata
