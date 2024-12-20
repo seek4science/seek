@@ -86,6 +86,7 @@ jobs:
             ${{ runner.os }}-
       - name: Install Python dependencies
         run: |
+          python3.9 -m pip install --upgrade pip
           python3.9 -m pip install setuptools==58
           python3.9 -m pip install -r requirements.txt
       - name: Create test database
