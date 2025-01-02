@@ -111,7 +111,7 @@ class IsaAssaysController < ApplicationController
     # there is no next sample type and also no linkage to fix
     return if next_sample_type.nil?
 
-    next_sample_type.sample_attributes.detect(&:input_attribute?).update_column(:linked_sample_type_id, @isa_assay.sample_type.id)
+    next_sample_type.sample_attributes.detect(&:input_attribute?)&.update_column(:linked_sample_type_id, @isa_assay.sample_type.id)
   end
 
   def rearrange_assay_positions_create_isa_assay
