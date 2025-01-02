@@ -50,7 +50,7 @@ class IsaStudiesController < ApplicationController
     update_sharing_policies @isa_study.study
     @isa_study.source.policy = @isa_study.study.policy
     @isa_study.sample_collection.policy = @isa_study.study.policy
-    update_relationships(@isa_study.study, isa_study_params[:study])
+    update_relationships(@isa_study.study, isa_study_params[:study]) unless isa_study_params[:study].nil?
 
     # update the source
     if requested_item_authorized?(@isa_study.source)
@@ -94,6 +94,8 @@ class IsaStudiesController < ApplicationController
   end
 
   def sample_type_params(params, field)
+    return {} if params[field].nil?
+
     attributes = params[field][:sample_attributes]
     if attributes
       params[field][:sample_attributes_attributes] = []
