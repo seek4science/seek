@@ -58,7 +58,6 @@ gem 'rdf-virtuoso', '>= 0.2.0'
 gem 'terrapin'
 gem 'lograge'
 gem 'psych'
-gem 'stringio', '3.0.1.1' #locked to the default version for ruby 3.1
 gem 'validate_url'
 gem "attr_encrypted"
 gem 'libreconv'
@@ -95,7 +94,7 @@ gem 'rspec-rails','~> 5.1'
 
 gem 'citeproc-ruby', '~> 2.0.0'
 gem 'csl-styles', '~> 2.0.0'
-gem 'bibtex-ruby', '~> 5.1.0'
+gem 'bibtex-ruby', '~> 6.1.0'
 
 gem 'omniauth', '~> 2.1.0'
 gem 'gitlab_omniauth-ldap', '~> 2.2.0'
