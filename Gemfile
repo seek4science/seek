@@ -161,6 +161,11 @@ gem 'licensee'
 
 gem "sitemap_generator", "~> 6.3"
 
+gem 'observer'
+gem 'abbrev'
+gem 'csv'
+gem 'nkf'
+
 group :production do
   gem 'passenger'
 end
