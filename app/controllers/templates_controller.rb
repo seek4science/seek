@@ -90,6 +90,8 @@ class TemplatesController < ApplicationController
   end
 
   def populate_template
+    return unless @current_user&.is_admin?
+
     uploaded_file = params[:template_json_file]
     dir = Seek::Config.append_filestore_path('source_types')
 
@@ -107,7 +109,7 @@ class TemplatesController < ApplicationController
 
     begin
       running!
-      PopulateTemplatesJob.new.queue_job
+      PopulateTemplatesJob.perform_later(@current_user)
     rescue StandardError
       done!
     end

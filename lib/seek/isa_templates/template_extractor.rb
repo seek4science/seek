@@ -3,12 +3,12 @@ require 'json-schema'
 module Seek
   module IsaTemplates
     module TemplateExtractor
-      def self.extract_templates
+      def self.extract_templates(user)
         FileUtils.touch(resultfile)
         result = StringIO.new
         seed_isa_tags
 
-        disable_authorization_checks do
+        User.with_current_user(user) do
           client = Ebi::OlsClient.new
           project = Project.find_or_create_by(title: 'Default Project')
           directory = Seek::Config.append_filestore_path('source_types')
