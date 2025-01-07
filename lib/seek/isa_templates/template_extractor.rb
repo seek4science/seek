@@ -38,54 +38,14 @@ module Seek
 
               current_template_attributes = []
               item['data'].each_with_index do |attribute, j|
-                is_ontology = attribute['ontology'].present?
                 is_cv = attribute['CVList'].present?
-                if is_ontology || is_cv
-                  scv =
-                    SampleControlledVocab.new(
-                      {
-                        title: attribute['name'],
-                        source_ontology: is_ontology ? attribute['ontology']['name'] : nil,
-                        ols_root_term_uris: is_ontology ? attribute['ontology']['rootTermURI'] : nil
-                      }
-                    )
-                end
+                if is_cv
+                  is_ontology = attribute['ontology'].present?
+                  cv_exists = !SampleControlledVocab.find_by(title: attribute['name']).nil?
 
-                if is_ontology
-                  if attribute['ontology']['rootTermURI'].present?
-                    begin
-                      terms = client.all_descendants(attribute['ontology']['name'],
-                                                     attribute['ontology']['rootTermURI'])
-                    rescue StandardError => e
-                      scv.save(validate: false)
-                      next
-                    end
-                    terms.each_with_index do |term, i|
-                      puts "#{j}) #{i + 1} FROM #{terms.length}"
-                      if i.zero?
-                        # Skip the parent name
-                        des = term[:description]
-                        scv[:description] = des.is_a?(Array) ? des[0] : des
-                      elsif term[:label].present? && term[:iri].present?
-                        cvt =
-                          SampleControlledVocabTerm.new(
-                            { label: term[:label], iri: term[:iri], parent_iri: term[:parent_iri] }
-                          )
-                        scv.sample_controlled_vocab_terms << cvt
-                      end
-                    end
-                  end
-                elsif is_cv
-                  # the CV terms
-                  if attribute['CVList'].present?
-                    attribute['CVList'].each do |term|
-                      cvt = SampleControlledVocabTerm.new({ label: term })
-                      scv.sample_controlled_vocab_terms << cvt
-                    end
-                  end
+                  scv = cv_exists ? SampleControlledVocab.find_by(title: attribute['name']) : initialize_sample_controlled_vocab(attribute, is_ontology)
                 end
-
-                p scv.errors if (is_ontology || is_cv) && !scv.save(validate: false)
+                p scv.errors if is_cv && !scv.save(validate: false)
 
                 ta = TemplateAttribute.new(is_title: (attribute['title'] || 0),
                                      isa_tag_id: get_isa_tag_id(attribute['isaTag']),
@@ -116,6 +76,48 @@ module Seek
       ensure
         FileUtils.rm_f(lockfile)
         FileUtils.rm_f(@directory_files) unless @directory_files.blank?
+      end
+
+      def self.initialize_sample_controlled_vocab(attribute, is_ontology = false)
+        scv = SampleControlledVocab.new(
+          {
+            title: attribute['name'],
+            source_ontology: is_ontology ? attribute['ontology']['name'] : nil,
+            ols_root_term_uris: is_ontology ? attribute['ontology']['rootTermURI'] : nil
+          }
+        )
+
+        if is_ontology
+          if attribute['ontology']['rootTermURI'].present?
+            begin
+              terms = client.all_descendants(attribute['ontology']['name'],
+                                             attribute['ontology']['rootTermURI'])
+            rescue StandardError
+              terms = []
+            end
+            terms.each_with_index do |term, i|
+              puts "#{j}) #{i + 1} FROM #{terms.length}"
+              if i.zero?
+                # Skip the parent name
+                des = term[:description]
+                scv[:description] = des.is_a?(Array) ? des[0] : des
+              elsif term[:label].present? && term[:iri].present?
+                cvt =
+                  SampleControlledVocabTerm.new(
+                    { label: term[:label], iri: term[:iri], parent_iri: term[:parent_iri] }
+                  )
+                scv.sample_controlled_vocab_terms << cvt
+              end
+            end
+          end
+        else
+          # the CV terms
+          attribute['CVList'].each do |term|
+            cvt = SampleControlledVocabTerm.new({ label: term })
+            scv.sample_controlled_vocab_terms << cvt
+          end
+        end
+        scv
       end
 
       def self.init_template(metadata)

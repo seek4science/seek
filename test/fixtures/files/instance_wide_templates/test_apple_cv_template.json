@@ -1,0 +1,56 @@
+{
+  "data": [
+    {
+      "metadata": {
+        "name": "Test Apple CV Template",
+        "group": "SEEK Test",
+        "group_order": 1,
+        "temporary_name": "1_test_apple_cv_template",
+        "version": "1.0.0",
+        "isa_config": null,
+        "isa_measurement_type": null,
+        "isa_technology_type": null,
+        "isa_protocol_type": null,
+        "repo_schema_id": null,
+        "organism": "any",
+        "level": "study source"
+      },
+      "data": [
+        {
+          "iri": null,
+          "name": "Source Name",
+          "description": "Sources are considered as the starting biological material used in a study.",
+          "dataType": "String attribute type 1",
+          "title": true,
+          "required": true,
+          "isaTag": "source"
+        },
+        {
+          "iri": null,
+          "name": "Source Characteristic 1",
+          "description": "A characteristic of the source",
+          "dataType": "String attribute type 1",
+          "required": true,
+          "ontology": null,
+          "CVList": null,
+          "isaTag": "source_characteristic"
+        },
+        {
+          "iri": null,
+          "name": "apples controlled vocab for template",
+          "description": "",
+          "dataType": "Controlled Vocabulary",
+          "required": false,
+          "ontology": null,
+          "CVList": [
+            "Granny Smith",
+            "Golden Delicious",
+            "Bramley",
+            "Cox's Orange Pippin"
+          ],
+          "isaTag": "source_characteristic"
+        }
+      ]
+    }
+  ]
+}
