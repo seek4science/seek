@@ -653,10 +653,11 @@ class TemplatesControllerTest < ActionController::TestCase
 
   test 'should reuse existing controlled vocabularies' do
     apples_cv = FactoryBot.create(:apples_sample_controlled_vocab, title: "apples controlled vocab for template")
-    assert_equal SampleControlledVocab.count, 1
+    phisics_ontology = FactoryBot.create(:sample_controlled_vocab, title: "physics ontology", source_ontology: "edam", ols_root_term_uris: "http://edamontology.org/topic_3318")
+    assert_equal SampleControlledVocab.count, 2
 
     login_as(@admin)
-    template_json = fixture_file_upload('instance_wide_templates/test_apple_cv_template.json', 'application/json')
+    template_json = fixture_file_upload('upload_json_sample_type_template/test_apple_cv_template.json', 'application/json')
 
     assert_enqueued_jobs 1, only: PopulateTemplatesJob do
       post :populate_template, params: { template_json_file: template_json }
@@ -664,7 +665,7 @@ class TemplatesControllerTest < ActionController::TestCase
 
 
     assert_difference('Template.count', 1) do
-      assert_difference('TemplateAttribute.count', 3) do
+      assert_difference('TemplateAttribute.count', 4) do
         assert_no_difference('SampleControlledVocab.count') do
           perform_enqueued_jobs(only: PopulateTemplatesJob)
         end
@@ -672,6 +673,7 @@ class TemplatesControllerTest < ActionController::TestCase
     end
     registered_template = Template.last
     assert_equal registered_template.template_attributes.detect { |ta| ta.title == 'apples controlled vocab for template' }.sample_controlled_vocab, apples_cv
+    assert_equal registered_template.template_attributes.detect { |ta| ta.title == 'physics ontology' }.sample_controlled_vocab, phisics_ontology
   end
 
   def create_template_from_parent_template(parent_template, person= @person, linked_sample_type= nil)

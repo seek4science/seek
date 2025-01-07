@@ -38,7 +38,7 @@ module Seek
 
               current_template_attributes = []
               item['data'].each_with_index do |attribute, j|
-                is_cv = attribute['CVList'].present?
+                is_cv = attribute['dataType'] == 'Controlled Vocabulary'
                 if is_cv
                   is_ontology = attribute['ontology'].present?
                   cv_exists = !SampleControlledVocab.find_by(title: attribute['name']).nil?
@@ -61,6 +61,7 @@ module Seek
                 current_template_attributes.append ta
               end
               template.template_attributes << current_template_attributes
+              template.contributor = nil
               template.save! unless @errors.present?
             end
 

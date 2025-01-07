@@ -49,6 +49,21 @@
             "Cox's Orange Pippin"
           ],
           "isaTag": "source_characteristic"
+        },
+        {
+          "iri": null,
+          "name": "physics ontology",
+          "description": "",
+          "dataType": "Controlled Vocabulary",
+          "required": false,
+          "ontology": {
+            "name": "edam",
+            "version": "",
+            "description": "The study of matter, space and time, and related concepts such as energy and force.",
+            "rootTermURI": "http://edamontology.org/topic_3318"
+          },
+          "CVList": null,
+          "isaTag": "source_characteristic"
         }
       ]
     }
