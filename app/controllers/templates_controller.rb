@@ -90,8 +90,6 @@ class TemplatesController < ApplicationController
   end
 
   def populate_template
-    return unless @current_user&.is_admin?
-
     uploaded_file = params[:template_json_file]
     dir = Seek::Config.append_filestore_path('source_types')
 
