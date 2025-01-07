@@ -13,20 +13,10 @@ require 'uuid'
 require 'libreconv'
 
 Rails.configuration.after_initialize do
-  require 'object_extensions'
-  require 'array_extensions'
-  require 'seek/acts_as_cached_tree'
-  require 'seek/research_objects/acts_as_snapshottable'
-  require 'seek/taggable'
-  require 'bio_extensions'
-  require 'string_extensions'
-  require 'rightfield/rightfield'
-  require 'seek/rdf/rdf_generation'
-  require 'seek/search/background_reindexing'
-  require 'seek/subscribable'
-  require 'seek/permissions/publishing_permissions'
-  require 'seek/search/common_fields'
-  require 'private_address_check_monkeypatch'
+  require 'extensions/object'
+  require 'extensions/array'
+  require 'extensions/bio'
+  require 'extensions/private_address_check_monkeypatch'
 
   SEEK::Application.configure do
     ASSET_ORDER = ['Person', 'Programme', 'Project', 'Institution', 'Investigation', 'Study', 'Assay', 'Strain', 'DataFile', 'Model', 'Sop', 'Publication', 'Presentation','SavedSearch', 'Organism', 'HumanDisease', 'Event']
