@@ -663,8 +663,8 @@ class TemplatesControllerTest < ActionController::TestCase
     # 2. Source Characteristic 1 (String) => New
     # 3. apples controlled (CV) vocab for template => Reuse
     # 4. physics ontology (CV, ontology) => Reuse
-    # 5. New CV (CV) List => New
-    # 6. New ontology (CV, ontology) => New
+    # 5. New CV (CV List) List => New
+    # 6. New ontology List (CV List, ontology) => New
     # New template attributes should be 6
     # New sample controlled vocabs should be 2
     ####################################################################################################################
@@ -685,6 +685,36 @@ class TemplatesControllerTest < ActionController::TestCase
     registered_template = Template.last
     assert_equal registered_template.template_attributes.detect { |ta| ta.title == 'apples controlled vocab for template' }.sample_controlled_vocab, apples_cv
     assert_equal registered_template.template_attributes.detect { |ta| ta.title == 'physics ontology' }.sample_controlled_vocab, physics_ontology
+  end
+
+  test 'should allow controlled vocab attributes to have free text in instance-wide templates' do
+    login_as(@admin)
+    ####################################################################################################################
+    # This file contains the JSON definition for 1 template with 6 template attribute:
+    # 1. Source Name (Sting) => allowCVFreeText: null (not present)
+    # 2. Source Characteristic 1 (String) => allowCVFreeText: null
+    # 3. apples controlled vocab for template => allowCVFreeText: true
+    # 4. physics ontology (CV, ontology) => allowCVFreeText: false
+    # 5. New CV List (CV List) => allowCVFreeText: null => Should resolve to false
+    # 6. New ontology (CV List, ontology) => allowCVFreeText: null  => Should resolve to false
+    ####################################################################################################################
+    template_json = fixture_file_upload('upload_json_sample_type_template/test_apple_cv_template.json', 'application/json')
+    assert_enqueued_jobs 1, only: PopulateTemplatesJob do
+      post :populate_template, params: { template_json_file: template_json }
+    end
+    assert_difference('Template.count', 1) do
+      assert_difference('TemplateAttribute.count', 6) do
+        perform_enqueued_jobs(only: PopulateTemplatesJob)
+      end
+    end
+
+    registered_template = Template.last
+    refute registered_template.template_attributes.detect { |ta| ta.title == 'Source Name' }.allow_cv_free_text
+    refute registered_template.template_attributes.detect { |ta| ta.title == 'Source Characteristic 1' }.allow_cv_free_text
+    assert registered_template.template_attributes.detect { |ta| ta.title == 'apples controlled vocab for template' }.allow_cv_free_text
+    refute registered_template.template_attributes.detect { |ta| ta.title == 'physics ontology' }.allow_cv_free_text
+    refute registered_template.template_attributes.detect { |ta| ta.title == 'New CV List' }.allow_cv_free_text
+    refute registered_template.template_attributes.detect { |ta| ta.title == 'New ontology List' }.allow_cv_free_text
   end
 
   def create_template_from_parent_template(parent_template, person= @person, linked_sample_type= nil)
