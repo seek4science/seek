@@ -38,7 +38,7 @@ module Seek
 
               current_template_attributes = []
               item['data'].each_with_index do |attribute, j|
-                is_cv = attribute['dataType'] == 'Controlled Vocabulary'
+                is_cv = attribute['dataType'].include? 'Controlled Vocabulary'
                 if is_cv
                   is_ontology = attribute['ontology'].present?
                   cv_exists = !SampleControlledVocab.find_by(title: attribute['name']).nil?
