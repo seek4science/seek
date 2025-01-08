@@ -184,7 +184,7 @@ GEM
     bio (1.5.2)
     bives (2.0)
       terrapin
-    bootsnap (1.10.2)
+    bootsnap (1.18.4)
       msgpack (~> 1.2)
     bootstrap-sass (3.4.1)
       autoprefixer-rails (>= 5.2.1)
@@ -496,7 +496,7 @@ GEM
       builder
       minitest (>= 5.0)
       ruby-progressbar
-    msgpack (1.4.4)
+    msgpack (1.7.5)
     multi_json (1.15.0)
     multi_xml (0.6.0)
     multipart-post (2.3.0)
