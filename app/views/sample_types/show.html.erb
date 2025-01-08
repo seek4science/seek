@@ -11,8 +11,10 @@
     <div class="col-md-9 col-sm-8 box_about_actor">
       <%= item_description h(@sample_type.description) -%>
 
-
-      <%= render :partial => "template" %>
+      <% if @sample_type.can_download? %>
+        <h2>Template</h2>
+        <%= render :partial => "template" %>
+      <% end %>
 
       <h2>Attributes</h2>
 
