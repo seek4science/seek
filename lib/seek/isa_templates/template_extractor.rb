@@ -176,7 +176,7 @@ module Seek
       end
 
       def self.get_sample_attribute_type(title)
-        sa = SampleAttributeType.find_by(title:)
+        sa = SampleAttributeType.find_by(title: title)
         @errors.append "<li>Could not find a Sample Attribute Type named '#{title}'</li>" if sa.nil?
 
         return if sa.nil?
@@ -187,10 +187,10 @@ module Seek
       def self.get_isa_tag_id(title)
         return nil if title.blank?
 
-        it = IsaTag.find_by(title:)
+        it = IsaTag.find_by(title: title)
         @errors.append "<li>Could not find an ISA Tag named '#{title}'</li>" if it.nil?
 
-        it.id
+        it&.id
       end
 
       def self.seed_isa_tags
