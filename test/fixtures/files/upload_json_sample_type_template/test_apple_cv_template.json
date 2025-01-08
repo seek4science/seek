@@ -42,6 +42,7 @@
           "dataType": "Controlled Vocabulary",
           "required": false,
           "ontology": null,
+          "allowCVFreeText": true,
           "CVList": [
             "Granny Smith",
             "Golden Delicious",
@@ -62,6 +63,7 @@
             "description": "The study of matter, space and time, and related concepts such as energy and force.",
             "rootTermURI": "http://edamontology.org/topic_3318"
           },
+          "allowCVFreeText": false,
           "CVList": null,
           "isaTag": "source_characteristic"
         },

@@ -95,6 +95,16 @@
         "Linked Extended Metadata (multiple)"
       ]
     },
+    "allowCVFreeText": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
     "CVList": {
       "anyOf": [
         {

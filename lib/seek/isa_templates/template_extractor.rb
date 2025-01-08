@@ -42,6 +42,7 @@ module Seek
                 if is_cv
                   is_ontology = attribute['ontology'].present?
                   cv_exists = !SampleControlledVocab.find_by(title: attribute['name']).nil?
+                  allow_cv_free_text = attribute['allowCVFreeText'].present? ? attribute['allowCVFreeText'] : false
 
                   scv = cv_exists ? SampleControlledVocab.find_by(title: attribute['name']) : initialize_sample_controlled_vocab(attribute, is_ontology)
                 end
@@ -55,7 +56,7 @@ module Seek
                                      sample_controlled_vocab_id: scv&.id,
                                      pid: attribute['pid'],
                                      sample_attribute_type_id: get_sample_attribute_type(attribute['dataType']),
-                                     allow_cv_free_text: attribute['ontology'].present?,
+                                     allow_cv_free_text: allow_cv_free_text,
                                      title: attribute['name'])
 
                 current_template_attributes.append ta
