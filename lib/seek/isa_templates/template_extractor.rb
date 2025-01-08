@@ -9,7 +9,6 @@ module Seek
         seed_isa_tags
 
         User.with_current_user(user) do
-          client = Ebi::OlsClient.new
           project = Project.find_or_create_by(title: 'Default Project')
           directory = Seek::Config.append_filestore_path('source_types')
           @directory_files = Dir.exist?(directory) ? Dir.glob("#{directory}/*.json") : []
@@ -45,7 +44,7 @@ module Seek
                   cv_exists = !SampleControlledVocab.find_by(title: attribute['name']).nil?
                   allow_cv_free_text = attribute['allowCVFreeText'].present? ? attribute['allowCVFreeText'] : false
 
-                  scv = cv_exists ? SampleControlledVocab.find_by(title: attribute['name']) : initialize_sample_controlled_vocab(attribute, is_ontology)
+                  scv = cv_exists ? SampleControlledVocab.find_by(title: attribute['name']) : initialize_sample_controlled_vocab(template_details, attribute, is_ontology)
                 end
                 p scv.errors if is_cv && !scv.save(validate: false)
 
@@ -81,7 +80,7 @@ module Seek
         FileUtils.rm_f(@directory_files) unless @directory_files.blank?
       end
 
-      def self.initialize_sample_controlled_vocab(attribute, is_ontology = false)
+      def self.initialize_sample_controlled_vocab(template_details, attribute, is_ontology = false)
         scv = SampleControlledVocab.new(
           {
             title: attribute['name'],
@@ -91,11 +90,14 @@ module Seek
         )
 
         if is_ontology
+          client = Ebi::OlsClient.new
           if attribute['ontology']['rootTermURI'].present?
             begin
               terms = client.all_descendants(attribute['ontology']['name'],
                                              attribute['ontology']['rootTermURI'])
-            rescue StandardError
+            rescue StandardError => e
+              add_log(template_details, "Failed to fetch terms from OLS for attribute '#{attribute['name']}'. Please add terms manually!")
+              Rails.logger.debug("Failed to fetch terms from OLS for attribute '#{attribute['name']}'. Error: #{e}")
               terms = []
             end
             terms.each_with_index do |term, i|
