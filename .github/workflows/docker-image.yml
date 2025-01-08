@@ -5,8 +5,7 @@ on:
     branches:
       - main
       - workflowhub
-      - ruby-3.2
-      - ruby-3.3  
+      - rails-7-hacking-rebased
       - full-test-suite
 
   pull_request:
