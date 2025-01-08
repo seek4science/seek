@@ -8,6 +8,10 @@ class ISAAssaysController < ApplicationController
   after_action :rearrange_assay_positions_create_isa_assay, only: :create
   after_action :fix_assay_linkage_for_new_assays, only: :create
 
+  # Update sample metadata when updating an assay
+  before_action :old_attributes, only: %i[update]
+  after_action :update_sample_json_metadata, only: :update
+
   def new
     study = Study.find(params[:study_id])
     new_position =
@@ -70,7 +74,7 @@ class ISAAssaysController < ApplicationController
   def update
     update_sharing_policies @isa_assay.assay
     @isa_assay.assay.attributes = isa_assay_params[:assay]
-    @isa_assay.sample_type.policy = @isa_assay.assay.policy
+    @isa_assay.sample_type.policy = @isa_assay.assay.policy unless @isa_assay.assay.is_assay_stream?
     # update the sample_type
     unless @isa_assay&.assay&.is_assay_stream?
       if requested_item_authorized?(@isa_assay.sample_type)
@@ -107,7 +111,7 @@ class ISAAssaysController < ApplicationController
     # there is no next sample type and also no linkage to fix
     return if next_sample_type.nil?
 
-    next_sample_type.sample_attributes.detect(&:input_attribute?).update_column(:linked_sample_type_id, @isa_assay.sample_type.id)
+    next_sample_type.sample_attributes.detect(&:input_attribute?)&.update_column(:linked_sample_type_id, @isa_assay.sample_type.id)
   end
 
   def rearrange_assay_positions_create_isa_assay
@@ -198,6 +202,23 @@ class ISAAssaysController < ApplicationController
     @single_page = true
   end
 
+  def old_attributes
+    @old_attributes = @isa_assay.sample_type.sample_attributes.map do |attr|
+      { id: attr.id, title: attr.title }
+    end
+  end
+  def update_sample_json_metadata
+    attribute_changes = @isa_assay.sample_type.sample_attributes.map do |attr|
+      old_attr = @old_attributes.detect { |oa| oa[:id] == attr.id }
+      next if old_attr.nil?
+
+      {id: attr.id, old_title: old_attr[:title], new_title: attr.title} unless old_attr[:title] == attr.title
+    end.compact
+    return  if attribute_changes.blank?
+
+    UpdateSampleMetadataJob.perform_later(@isa_assay.sample_type, @current_user, attribute_changes)
+  end
+
   def find_requested_item
     @isa_assay = ISAAssay.new
     @isa_assay.populate(params[:id])
@@ -212,8 +233,10 @@ class ISAAssaysController < ApplicationController
     unless @isa_assay.assay&.is_assay_stream?
       if @isa_assay.sample_type.nil?
         @isa_assay.errors.add(:sample_type, 'Sample type not found.')
+      elsif @isa_assay.sample_type.locked?
+        @isa_assay.errors.add(:sample_type, "The #{t('isa_assay')}'s #{t('sample_type')} is locked by a background process and cannot be edited.")
       else
-        @isa_assay.errors.add(:sample_type, "You are not authorized to edit this assay's #{t('sample_type')}.") unless requested_item_authorized?(@isa_assay.sample_type)
+        @isa_assay.errors.add(:sample_type, "You are not authorized to edit this #{t('isa_assay')}'s #{t('sample_type')}.") unless requested_item_authorized?(@isa_assay.sample_type)
       end
     end
 
