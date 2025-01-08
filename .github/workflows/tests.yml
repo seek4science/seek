@@ -8,6 +8,7 @@ jobs:
     env:
       RAILS_ENV: test
       TERM: dumb-color
+      RUBYOPT: "--yjit"
     services:
       postgres:
         image: postgres:14
