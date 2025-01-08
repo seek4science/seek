@@ -20,7 +20,7 @@
           "iri": null,
           "name": "Source Name",
           "description": "Sources are considered as the starting biological material used in a study.",
-          "dataType": "String attribute type 1",
+          "dataType": "String",
           "title": true,
           "required": true,
           "isaTag": "source"
@@ -29,7 +29,7 @@
           "iri": null,
           "name": "Source Characteristic 1",
           "description": "A characteristic of the source",
-          "dataType": "String attribute type 1",
+          "dataType": "String",
           "required": true,
           "ontology": null,
           "CVList": null,
@@ -54,13 +54,41 @@
           "iri": null,
           "name": "physics ontology",
           "description": "",
-          "dataType": "Controlled Vocabulary",
+          "dataType": "Controlled Vocabulary List",
           "required": false,
           "ontology": {
             "name": "edam",
             "version": "",
             "description": "The study of matter, space and time, and related concepts such as energy and force.",
             "rootTermURI": "http://edamontology.org/topic_3318"
+          },
+          "CVList": null,
+          "isaTag": "source_characteristic"
+        },
+        {
+          "iri": null,
+          "name": "New CV List",
+          "description": "",
+          "dataType": "Controlled Vocabulary List",
+          "required": false,
+          "ontology": null,
+          "CVList": [
+            "term 1",
+            "term 2"
+          ],
+          "isaTag": "source_characteristic"
+        },
+        {
+          "iri": null,
+          "name": "New ontology",
+          "description": "",
+          "dataType": "Controlled Vocabulary List",
+          "required": false,
+          "ontology": {
+            "name": "FBbi",
+            "version": "",
+            "description": "Imaging method",
+            "rootTermURI": "http://purl.obolibrary.org/obo/FBbi_00000222"
           },
           "CVList": null,
           "isaTag": "source_characteristic"

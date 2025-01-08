@@ -92,14 +92,7 @@
         "NCBI ID",
         "Registered Data file",
         "Linked Extended Metadata",
-        "Linked Extended Metadata (multiple)",
-        "Full name",
-        "String attribute type 1",
-        "Integer attribute type 1",
-        "Sample attribute type 1",
-        "Sample multi attribute type 1",
-        "CV attribute type 1",
-        "CV List attribute type 1"
+        "Linked Extended Metadata (multiple)"
       ]
     },
     "CVList": {
