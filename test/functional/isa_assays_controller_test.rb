@@ -622,6 +622,46 @@ class IsaAssaysControllerTest < ActionController::TestCase
     refute @isa_assay.sample_type.can_manage?(second_person.user)
   end
 
+  test 'should update sample metadata when updating the isa assay sample type' do
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+
+    investigation = FactoryBot.create(:investigation, projects: [project], contributor: person)
+    source_type = FactoryBot.create(:isa_source_sample_type, contributor: person, projects: [project])
+    sample_collection_type = FactoryBot.create(:isa_sample_collection_sample_type, contributor: person, projects: [project], linked_sample_type: source_type)
+    assay_type = FactoryBot.create(:isa_assay_material_sample_type, contributor: person, projects: [project], linked_sample_type: sample_collection_type)
+
+    FactoryBot.create(:sample, sample_type: source_type, contributor: person, project_ids: [project.id], data: { 'Source Name': 'source1', 'Source Characteristic 1': 'source 1 characteristic 1', 'Source Characteristic 2': 'Bramley' })
+    FactoryBot.create(:sample, sample_type: source_type, contributor: person, project_ids: [project.id], data: { 'Source Name': 'source2', 'Source Characteristic 1': 'source 2 characteristic 1', 'Source Characteristic 2': 'Granny Smith' })
+
+    FactoryBot.create(:sample, sample_type: sample_collection_type, contributor: person, project_ids: [project.id], data: { 'Sample Name': 'sample1', 'sample collection': 'collection method 1', Input: 'source1', 'sample characteristic 1': 'value sample 1', 'sample collection parameter value 1': 'value 1' })
+    FactoryBot.create(:sample, sample_type: sample_collection_type, contributor: person, project_ids: [project.id], data: { 'Sample Name': 'sample2', 'sample collection': 'collection method 1', Input: 'source2', 'sample characteristic 1': 'value sample 2', 'sample collection parameter value 1': 'value 2' })
+
+    FactoryBot.create(:sample, sample_type: assay_type, contributor: person, project_ids: [project.id], data: { 'Extract Name': 'Extract 1', 'Protocol Assay 1': 'method 1', Input: 'sample1', 'Assay 1 parameter value 1': 'value extract 1', 'other material characteristic 1': 'characteristics value extract 1' })
+    FactoryBot.create(:sample, sample_type: assay_type, contributor: person, project_ids: [project.id], data: { 'Extract Name': 'Extract 2', 'Protocol Assay 1': 'method 1', Input: 'sample2', 'Assay 1 parameter value 1': 'value extract 2', 'other material characteristic 1': 'characteristics value extract 2' })
+
+    study = FactoryBot.create(:study, investigation: investigation, contributor: person, sample_types: [source_type, sample_collection_type])
+
+    assay_stream = FactoryBot.create(:assay_stream, study: study, contributor: person, position: 0)
+    assay = FactoryBot.create(:assay, study: , contributor: person, assay_class: AssayClass.experimental, assay_stream: assay_stream, assay_type_uri: nil, sample_type: assay_type)
+    title_attribute = assay.sample_type.sample_attributes.detect(&:is_title)
+
+    login_as person.user
+    patch :update, params: { id: assay, isa_assay:
+      { sample_type:
+          { sample_attributes: [
+            { id: title_attribute.id, title: 'New Extract Name' }
+          ] }
+      }
+    }
+    assert_response :redirect
+    assert_enqueued_with(job: UpdateSampleMetadataJob)
+    assay.sample_type.reload
+    assert_equal assay.sample_type.sample_attributes.detect(&:is_title).title, 'New Extract Name'
+    assert assay.sample_type.locked?
+
+  end
+
   private
 
   def material_assay_sample_type_attributes(project, linked_sample_type_id='self')
