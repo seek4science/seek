@@ -112,13 +112,13 @@ module Seek
                                       'ActionController::InvalidAuthenticityToken',
                                       'ActionController::UnknownHttpMethod',
                                       'ActionController::BadRequest'] | ExceptionNotifier.ignored_exceptions
-          config.error_grouping = error_grouping_enabled,
-            config.error_grouping_period = error_grouping_timeout,
-            config.notification_trigger = ->(exception, count) {
-              # Send notifications at count = x^0, x^1, x^3, x^4... where
-              # x = error_grouping_log_base
-              (Math.log(count, error_grouping_log_base) % 1).zero?
-            }
+          config.error_grouping = error_grouping_enabled
+          config.error_grouping_period = error_grouping_timeout
+          config.notification_trigger = ->(exception, count) {
+            # Send notifications at count = x^0, x^1, x^3, x^4... where
+            # x = error_grouping_log_base
+            (Math.log(count, error_grouping_log_base) % 1).zero?
+          }
           config.register_exception_notifier :email, {
             sender_address: [noreply_sender],
             email_prefix: "[ #{instance_name} ERROR ] ",
