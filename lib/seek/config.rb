@@ -114,6 +114,7 @@ module Seek
                                       'ActionController::BadRequest'] | ExceptionNotifier.ignored_exceptions
           config.error_grouping = error_grouping_enabled
           config.error_grouping_period = error_grouping_timeout
+          config.error_grouping_cache = Rails.cache
           config.notification_trigger = ->(exception, count) {
             # Send notifications at count = x^0, x^1, x^3, x^4... where
             # x = error_grouping_log_base
