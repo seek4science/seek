@@ -10,4 +10,4 @@ module Extensions
   end
 end
 
-SEEK::Application.include Extensions::SecretKeyBase
+Rails::Application::Configuration.prepend Extensions::SecretKeyBase
