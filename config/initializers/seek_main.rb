@@ -18,6 +18,7 @@ Rails.configuration.after_initialize do
   require 'extensions/bio'
   require 'extensions/private_address_check_monkeypatch'
   require 'extensions/string'
+  require 'extensions/secret_key_base'
 
   SEEK::Application.configure do
     ASSET_ORDER = ['Person', 'Programme', 'Project', 'Institution', 'Investigation', 'Study', 'Assay', 'Strain', 'DataFile', 'Model', 'Sop', 'Publication', 'Presentation','SavedSearch', 'Organism', 'HumanDisease', 'Event']
