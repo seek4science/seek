@@ -1,3 +1,3 @@
 $j('#samples-table').html('<%= escape_javascript(render(partial: "table_view", locals: { samples: @result, link: true, show_extra_info: true })) -%>');
-$j('#sample-count').html('<%= "#{@visible_samples} sample(s) visible to you" %>')
+$j('#sample-count').html('<span><%= "#{@visible_samples}"%> sample(s) visible to you' + '</span> - <span class=\"text-success\"> Successful query @ <%= "#{Time.now.strftime("%d/%m/%Y %H:%M:%S")}" %></span>')
 Samples.initTable($j('#samples-table'), false, { hideEmptyColumns: true });
