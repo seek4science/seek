@@ -161,10 +161,12 @@ gem 'licensee'
 
 gem "sitemap_generator", "~> 6.3"
 
+# removed from Standard in Ruby 3.4
 gem 'observer'
 gem 'abbrev'
 gem 'csv'
 gem 'nkf'
+gem 'mutex_m'
 
 group :production do
   gem 'passenger'

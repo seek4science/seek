@@ -494,6 +494,7 @@ GEM
     multi_json (1.15.0)
     multi_xml (0.6.0)
     multipart-post (2.3.0)
+    mutex_m (0.3.0)
     mysql2 (0.5.6)
     namae (1.1.1)
     nesty (1.0.2)
@@ -1062,6 +1063,7 @@ DEPENDENCIES
   mimemagic (~> 0.3.7)
   minitest (~> 5.14)
   minitest-reporters
+  mutex_m
   my_responds_to_parent!
   mysql2
   net-ftp
