@@ -193,6 +193,7 @@
 				method: "POST",
 				data,
 				beforeSend: function(){
+					$j('#sample-count').html("");
 					$j("#sample-query-spinner").show();
 					$j('#samples-table').html("");
 				},
