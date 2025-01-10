@@ -73,6 +73,5 @@ module SEEK
 
     config.active_record.belongs_to_required_by_default = false
     config.action_mailer.delivery_job = 'EnhancedMailDeliveryJob' # sets the configured SMTP settngs before each run
-    config.action_mailer.preview_paths << "#{Rails.root}/test/mailers/previews" # For some reason it is looking in spec/ by default
   end
 end

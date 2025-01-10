@@ -90,7 +90,7 @@ gem 'zenodo-client', git: 'https://github.com/seek4science/zenodo-client.git'
 gem 'unicorn-rails'
 gem 'seedbank'
 
-gem 'rspec-rails','~> 5.1'
+gem 'rspec-rails'
 
 gem 'citeproc-ruby', '~> 2.0.0'
 gem 'csl-styles', '~> 2.0.0'
