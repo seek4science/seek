@@ -61,4 +61,6 @@ Rails.application.configure do
 
   # TODO: Change this to: `:random` when tests are all passing
   config.active_support.test_order = :sorted
+
+  config.active_job.queue_adapter = :test
 end
