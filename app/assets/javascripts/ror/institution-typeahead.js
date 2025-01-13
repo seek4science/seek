@@ -9,6 +9,7 @@ function extractRorId(rorUrl) {
         return null;
     }
 }
+
 function fetchRorData(rorId) {
     var url = ROR_API_URL + '/' + rorId;
     console.log(url);
@@ -39,12 +40,129 @@ function fetchRorData(rorId) {
         });
 }
 
+// ROR API source logic
+function rorQuerySource(query, processSync, processAsync) {
+    if (query.length < 3) {
+        return processAsync([]); // Trigger only for 3+ characters
+    }
+    var url = ROR_API_URL + '?query=' + encodeURIComponent(query);
+    return $j.ajax({
+        url: url,
+        type: 'GET',
+        dataType: 'json',
+        success: function (json) {
+            const orgs = json.items;
+            return processAsync(orgs);
+        }
+    });
+}
+
+// Template for Local Institution suggestions
+function localSuggestionTemplate(data) {
+    return `
+        <div>
+            <strong>${data.text}</strong>
+            <small>${data.hint || ''}</small>
+        </div>`;
+}
+
+// Template for ROR suggestions
+function rorSuggestionTemplate(data) {
+    var altNames = "";
+    if (data.aliases.length > 0) {
+        altNames += data.aliases.join(", ") + ", ";
+    }
+    if (data.acronyms.length > 0) {
+        altNames += data.acronyms.join(", ") + ", ";
+    }
+    if (data.labels.length > 0) {
+        data.labels.forEach(label => {
+            altNames += label.label + ", ";
+        });
+    }
+    altNames = altNames.replace(/,\s*$/, ""); // Trim trailing comma
+    return `
+    <div>
+        <p>
+            ${data.name}<br>
+            <small>${data.types[0]}, ${data.country.country_name}<br>
+            <i>${altNames}</i></small>
+        </p>
+    </div>`;
+}
+
+
+function initializeLocalInstitutions(endpoint = '/institutions/typeahead.json', cache = false) {
+
+    const baseUrl = `${window.location.protocol}//${window.location.host}`;
+    const fullUrl = `${baseUrl}${endpoint}`;
+    console.log("Institutions URL: " + fullUrl);
+
+    // Initialize and return the Bloodhound instance
+    return new Bloodhound({
+        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('text'),
+        queryTokenizer: Bloodhound.tokenizers.whitespace,
+        prefetch: {
+            url: fullUrl,
+            cache: cache, // Use the provided cache option
+            transform: function (response) {
+                // Map the results array to the structure Bloodhound expects
+                return response.results;
+            }
+        }
+    });
+}
+
+
+
 $j(document).ready(function () {
     var $j = jQuery.noConflict();
 
-    $j('#fetch-ror-data-with-id').on('click', function() {
-            fetchRorData($j('#institution_ror_id').val());
-        });
+    $j('#fetch-ror-data-with-id').on('click', function () {
+        console.log("Fetching ROR data by ID...");
+        fetchRorData($j('#institution_ror_id').val());
+    });
+
+
+    $j('#combined_typeahead .typeahead').typeahead(
+        {
+            hint: true,
+            highlight: true,
+            minLength: 1 // Start suggestions after typing at least 1 character
+        },
+        // First Dataset: Local Institutions
+        {
+            name: 'institutions',
+            display: 'text', // Display the 'text' field in the dropdown
+            source: initializeLocalInstitutions(), // Local data source
+            templates: {
+                header: '<div class="league-name">Institutions saved in SEEK</div>',
+                suggestion: localSuggestionTemplate
+            }
+        },
+        // Second Dataset: Remote ROR Query
+        {
+            name: 'ror-query',
+            limit: 50,
+            async: true,
+            source: rorQuerySource,
+            templates: {
+                header: '<div class="league-name">Institutions fetched from ROR</div>',
+                pending: '<div class="empty-message">Fetching from ROR API ...</div>',
+                suggestion: rorSuggestionTemplate
+            },
+            display: function (data) {
+                return data.name;
+            },
+            value: function (data) {
+                return data.identifier;
+            }
+        }
+    ).on('typeahead:select', function (e, suggestion) {
+        // Close the dropdown after selection
+        $j('#combined_typeahead .typeahead').typeahead('close');
+    });
+
 
     $j('#ror_query_name .typeahead').typeahead({
             hint: true,
@@ -54,54 +172,47 @@ $j(document).ready(function () {
         {
             limit: 50,
             async: true,
-            source: function (query, processSync, processAsync) {
-                var url = ROR_API_URL+'?query=' + encodeURIComponent(query);
-                return $j.ajax({
-                    url: url,
-                    type: 'GET',
-                    dataType: 'json',
-                    success: function (json) {
-                        const orgs = json.items;
-                        return processAsync(orgs);
-                    }
-                });
-            },
+            source: rorQuerySource,
             templates: {
                 pending: [
                     '<div class="empty-message">',
                     'Fetching list ...',
                     '</div>'
                 ].join('\n'),
-                suggestion: function (data) {
-                    var altNames = "";
-                    if(data.aliases.length > 0) {
-                        for (let i = 0; i < data.aliases.length; i++){
-                            altNames += data.aliases[i] + ", ";
-                        }
-                    }
-                    if(data.acronyms.length > 0) {
-                        for (let i = 0; i < data.acronyms.length; i++){
-                            altNames += data.acronyms[i] + ", ";
-                        }
-                    }
-                    if(data.labels.length > 0) {
-                        for (let i = 0; i < data.labels.length; i++){
-                            altNames += data.labels[i].label + ", ";
-                        }
-                    }
-                    altNames = altNames.replace(/,\s*$/, "");
-                    return '<p>' + data.name + '<br><small>' + data.types[0] + ', ' + data.country.country_name + '<br><i>'+ altNames + '</i></small></p>';
-                }
+                suggestion: rorSuggestionTemplate
             },
             display: function (data) {
+                console.log("Fetching ROR data by name remotely...");
                 return data.name;
             },
-            value: function(data) {
+            value: function (data) {
                 return data.identifier;
             }
         });
 
-    $j('#ror_query_name .typeahead').bind('typeahead:select', function(ev, suggestion) {
+    $j('#combined_typeahead .typeahead').bind('typeahead:select', function (ev, data) {
+        if (data.hasOwnProperty("text")) {
+            $j('#institution_title').val(data.text);
+            $j('#institution_id').val(data.id);
+            $j('#institution_ror_id').val(data.ror_id);
+            $j('#institution_city').val(data.city);
+            $j('#institution_country').val(data.country_name);
+            $j('#institution_web_page').val(data.web_page);
+        }
+        else
+        {
+            $j('#institution_title').val(data.name);
+            $j('#institution_ror_id').val(data.id);
+            $j('#institution_city').val(data.addresses[0]['city']);
+            $j('#institution_country').val(data.country.country_name);
+            $j('#institution_ror_id').val(extractRorId(data.id));
+            $j('#institution_web_page').val(data.links[0]);
+        }
+
+
+    });
+
+    $j('#ror_query_name .typeahead').bind('typeahead:select', function (ev, suggestion) {
         $j('#ror-response').html(JSON.stringify(suggestion, undefined, 4));
         $j('#institution_city').val(suggestion.addresses[0]['city']);
         $j('#institution_country').val(suggestion.country.country_name);

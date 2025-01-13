@@ -5,8 +5,10 @@
   }
 </style>
 
+<%= hidden_field_tag 'institution[id]', @institution.id %>
+<%= hidden_field_tag 'institution[title]', @institution.title %>
 
-<div class="form-group">
+<div class="form-group" id="combined_typeahead">
   <div class="help-block">
     This is the <%= t('institution') %> <strong>you</strong> are associated with, and will be used when defining your membership with the <%= t('project') %>.
   </div>
@@ -17,28 +19,30 @@
   </div>
 
   <label class="control-label">Type the name of the <%= t('institution') %> </label><span class="required">*</span>
-
-  <%# I am setting the institution id to a junk value of 0 (if blank) to get around a bug in select2 wherein an <option>
-      with a blank `value`, that is selected when the page is loaded, does not get rendered as a "tag". %>
-  <%= objects_input('institution[id]', @institution.title.present? ? [@institution.tap { |i| i.id ||= 0 }] : [],
-                    typeahead: { query_url: typeahead_institutions_path,
-                                 handlebars_template:'typeahead/institution' },
-                    limit: 1, allow_new: true, class: 'form-control') -%>
+    <%= text_field_tag :search, nil, placeholder: "Search...", class: "form-control typeahead" %>
 </div>
 
-<%= hidden_field_tag 'institution[title]', @institution.title %>
+<div class="form-group">
+  <label class="control-label">ROR ID</label>
+  <%= link_to(image('ror_id', title: 'ROR'), 'https://ror.org/', target: '_blank') %>
+  <%= help_icon('The ROR ID (Research Organization Registry Identifier) is a unique 9-character alphanumeric code (e.g., 01f7bcy98).
+   To find out more and get your ORCID ID please visit https://ror.org/') -%>
+  <%= text_field_tag 'institution[ror_id]', @institution.ror_id, class: "form-control institution-user-input" %>
+</div>
 
-<div class="form-group" id='additional-institution-details'>
+<div class="form-group">
   <label class="control-label">Website</label>
   <%= text_field_tag('institution[web_page]', @institution.web_page, class:'form-control institution-user-input') %>
+</div>
 
+<div class="form-group">
   <label class="control-label">City</label>
   <%= text_field_tag('institution[city]', @institution.city, class:'form-control institution-user-input') %>
+</div>
 
+<div class="form-group">
   <label class="control-label">Country</label>
-  <%= country_select('institution','country',
-                     { include_blank: 'Select a country' },
-                     { class: 'form-control institution-user-input', disabled:true }) %>
+  <%= text_field_tag 'institution[country]', @institution.nil? ? '' : CountryCodes.country(@institution.country), class: "form-control" %>
 </div>
 
 <script type='application/javascript'>
