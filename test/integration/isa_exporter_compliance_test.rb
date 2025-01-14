@@ -330,13 +330,21 @@ materials.each { |p| assert processes.include?(p) }
         contributor: person
       )
 
+    assay_stream = FactoryBot.create(
+      :assay_stream,
+      study: study,
+      contributor: person,
+      position: 0
+    )
+
     FactoryBot.create(
       :assay,
       study: study,
       sample_type: assay_sample_type,
       sop_ids: [FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy)).id],
       contributor: person,
-      position: 0
+      position: 0,
+      assay_stream: assay_stream
     )
 
     # Create samples
