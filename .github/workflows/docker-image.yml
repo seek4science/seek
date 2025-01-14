@@ -6,6 +6,7 @@ on:
       - main
       - workflowhub
       - full-test-suite
+      - seek-1.16
 
   pull_request:
 
