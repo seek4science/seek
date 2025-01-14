@@ -136,6 +136,13 @@ $j(document).ready(function () {
         fetchRorData($j('#institution_ror_id').val());
     });
 
+    // if the institution title is not selected from the local list or ROR, but entered manually by user
+    $j('#institution_name').on('change', function () {
+        const inputValue = $j(this).val();
+        $j('#institution_title').val(inputValue);
+        checkSubmitButtonEnabled();
+    });
+
 
     $j('#combined_typeahead .typeahead').typeahead(
         {
