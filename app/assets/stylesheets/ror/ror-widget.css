@@ -85,15 +85,10 @@ h3 {
 .form-field,
 .tt-query,
 .tt-hint {
-  height: 30px;
   padding: 8px 12px;
   margin-right: 20px;
-  font-size: 16px;
   line-height: 30px;
-  border: 1px solid #ccc;
-  -webkit-border-radius: 8px;
-     -moz-border-radius: 8px;
-          border-radius: 8px;
+
   outline: none;
 }
 
@@ -115,13 +110,17 @@ h3 {
   color: #999
 }
 
+.tt-dataset{
+  padding-left: 5px;
+}
+
 .tt-menu {
   width: 422px;
   margin: 12px 0;
   padding: 8px 0;
   background-color: #fff;
   border: 1px solid #ccc;
-  border: 1px solid rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(0, 0, 0, 0.11);
   -webkit-border-radius: 8px;
      -moz-border-radius: 8px;
           border-radius: 8px;
@@ -131,8 +130,8 @@ h3 {
 }
 
 .tt-suggestion {
-  padding: 3px 20px;
-  font-size: 18px;
+  padding: 0px 20px;
+  margin-bottom: 15px;
   line-height: 24px;
 }
 
@@ -156,18 +155,12 @@ h3 {
   font-size: 14px;
 }
 
-/* example specific styles */
-/* ----------------------- */
 
-#custom-templates .empty-message {
-  padding: 5px 10px;
- text-align: center;
-}
-
-#multiple-datasets .league-name {
-  margin: 0 20px 5px 20px;
-  padding: 3px 0;
-  border-bottom: 1px solid #ccc;
+.league-name {
+  margin: 0 20px 5px 0px;
+  padding: 3px 6px;
+  background-color: rgba(177, 183, 187, 0.47);
+  transition: background-color 0.5s ease-in-out;
 }
 
 #scrollable-dropdown-menu .tt-menu {
