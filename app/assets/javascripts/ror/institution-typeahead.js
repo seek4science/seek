@@ -1,5 +1,10 @@
 var ROR_API_URL = "https://api.ror.org/organizations";
 
+
+function toggleUserInput(disabled) {
+    $j(".institution-user-input").prop('disabled',disabled);
+}
+
 function extractRorId(rorUrl) {
     const regex = /https:\/\/ror\.org\/([^\/]+)/;
     const match = rorUrl.match(regex);
@@ -113,6 +118,14 @@ function initializeLocalInstitutions(endpoint = '/institutions/typeahead.json', 
     });
 }
 
+function clearInstitutionFields() {
+    $j('#institution_title').val('');
+    $j('#institution_id').val('');
+    $j('#institution_ror_id').val('');
+    $j('#institution_city').val('');
+    $j('#institution_country').val('');
+    $j('#institution_web_page').val('');
+}
 
 
 $j(document).ready(function () {
@@ -136,7 +149,7 @@ $j(document).ready(function () {
             display: 'text', // Display the 'text' field in the dropdown
             source: initializeLocalInstitutions(), // Local data source
             templates: {
-                header: '<div class="league-name">Institutions saved in SEEK</div>',
+                header: '<div class="league-name">Institutions saved locally</div>',
                 suggestion: localSuggestionTemplate
             }
         },
@@ -192,24 +205,27 @@ $j(document).ready(function () {
 
     $j('#combined_typeahead .typeahead').bind('typeahead:select', function (ev, data) {
         if (data.hasOwnProperty("text")) {
+            $j('#new_institution_reminder').hide();
             $j('#institution_title').val(data.text);
             $j('#institution_id').val(data.id);
             $j('#institution_ror_id').val(data.ror_id);
             $j('#institution_city').val(data.city);
             $j('#institution_country').val(data.country_name);
             $j('#institution_web_page').val(data.web_page);
+            toggleUserInput(true);
         }
         else
         {
+            $j('#new_institution_reminder').show();
             $j('#institution_title').val(data.name);
             $j('#institution_ror_id').val(data.id);
             $j('#institution_city').val(data.addresses[0]['city']);
             $j('#institution_country').val(data.country.country_name);
             $j('#institution_ror_id').val(extractRorId(data.id));
             $j('#institution_web_page').val(data.links[0]);
+            toggleUserInput(false);
         }
-
-
+        checkSubmitButtonEnabled()
     });
 
     $j('#ror_query_name .typeahead').bind('typeahead:select', function (ev, suggestion) {
