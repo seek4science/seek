@@ -52,41 +52,4 @@
   <%= text_field_tag 'institution[country]', @institution.nil? ? '' : CountryCodes.country(@institution.country), class: "form-control institution-user-input" %>
 </div>
 
-<script type='application/javascript'>
-
-    function toggleUserInput(disabled) {
-        $j(".institution-user-input").prop('disabled',disabled);
-    }
-    $j(document).ready(function () {
-        toggleUserInput(<%= (@institution.id.blank? || @institution.id == 0) ? 'false' : 'true' -%>);
-
-        $j('select#institution_country').on('change',function() {
-            checkSubmitButtonEnabled();
-        });
-
-        $j('select#institution_id').on('select2:select', function(event) {
-            var data = event.params.data;
-            if (data.id==data.text) { //new record
-                toggleUserInput(false);
-            }
-            else {
-                toggleUserInput(true);
-            }
-            $j('#institution_title').val(data.text);
-            $j('#institution_web_page').val(data.web_page);
-            $j('#institution_city').val(data.city);
-            $j('#institution_country').val(data.country);
-            checkSubmitButtonEnabled();
-        });
-
-        $j('select#institution_id').on('select2:unselect', function(event) {
-            toggleUserInput(true);
-            $j('#institution_title').val('');
-            $j('#institution_web_page').val('');
-            $j('#institution_country').val('');
-            checkSubmitButtonEnabled();
-        });
-
-    });
-</script>
 
