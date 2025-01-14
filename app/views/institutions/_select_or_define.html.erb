@@ -10,21 +10,28 @@
 
 <div class="form-group" id="combined_typeahead">
   <div class="help-block">
-    This is the <%= t('institution') %> <strong>you</strong> are associated with, and will be used when defining your membership with the <%= t('project') %>.
+    This is the <%= t('institution').downcase %> <strong>you</strong> are associated with, and will be used when defining your membership with the <%= t('project') %>.
   </div>
   <div class="help-block">
-    Type the name of the <%= t('institution') %>, or part of the name or the city it may be associated with. From the list of the results
-    found, select the <%= t('institution') %> you are looking for. If you cannot find it in the list, continue to type the full name and select
-    the top <em>new item</em>; you will then be able to provide the additional details about the new <%= t('institution') %>.
+    Type the name of the <%= t('institution').downcase %>, or part of the name or the city it may be associated with. From the list of the results
+    found, select the <%= t('institution').downcase %> you are looking for.
+    <br>
+  </div>
+  <div class="help-block">
+    Suggested <%= t('institution').pluralize.downcase %> are sourced from the local instance first, followed by the <%= link_to(image('ror_id', title: 'ROR',width: '30'), 'https://ror.org/', target: '_blank') %> service remotely.
+    Whenever possible, select the <%= t('institution').downcase %> from the local list.
+    If the desired <%= t('institution').downcase %> is not listed, continue typing its full name and select one from ROR.
   </div>
 
-  <label class="control-label">Type the name of the <%= t('institution') %> </label><span class="required">*</span>
-    <%= text_field_tag :search, nil, placeholder: "Search...", class: "form-control typeahead" %>
+  <label class="control-label">Type the name of the <%= t('institution'.downcase) %> </label><span class="required">*</span>
+  <%= text_field_tag :search, nil, placeholder: "Search...", class: "form-control typeahead" %>
+  <small id="new_institution_reminder" style="display: none; color:darkseagreen; ">
+    This institution is not in <%= Seek::Config.instance_name %>. You will create this new institution along with your project.
+  </small>
 </div>
 
 <div class="form-group">
-  <label class="control-label">ROR ID</label>
-  <%= link_to(image('ror_id', title: 'ROR'), 'https://ror.org/', target: '_blank') %>
+  <label class="control-label">ROR ID</label>    <%= link_to(image('ror_id', title: 'ROR'), 'https://ror.org/', target: '_blank') %>
   <%= help_icon('The ROR ID (Research Organization Registry Identifier) is a unique 9-character alphanumeric code (e.g., 01f7bcy98).
    To find out more and get your ORCID ID please visit https://ror.org/') -%>
   <%= text_field_tag 'institution[ror_id]', @institution.ror_id, class: "form-control institution-user-input" %>
@@ -42,7 +49,7 @@
 
 <div class="form-group">
   <label class="control-label">Country</label>
-  <%= text_field_tag 'institution[country]', @institution.nil? ? '' : CountryCodes.country(@institution.country), class: "form-control" %>
+  <%= text_field_tag 'institution[country]', @institution.nil? ? '' : CountryCodes.country(@institution.country), class: "form-control institution-user-input" %>
 </div>
 
 <script type='application/javascript'>
