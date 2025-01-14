@@ -107,7 +107,7 @@ class TemplatesController < ApplicationController
 
     begin
       running!
-      PopulateTemplatesJob.new.queue_job
+      PopulateTemplatesJob.perform_later(@current_user)
     rescue StandardError
       done!
     end
