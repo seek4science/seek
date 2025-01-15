@@ -56,6 +56,24 @@ class SopsController < ApplicationController
     end
   end
 
+  def dt_typeahead
+    return if params[:study_id].blank? && params[:assay_id].blank?
+
+    query = params[:query] || ''
+    asset = if params[:study_id].present?
+              Study.find(params[:study_id])
+            else
+              Assay.find(params[:assay_id])
+            end
+
+    sops = asset&.sops || []
+    results = sops.select { |sop| sop.title&.downcase&.include?(query.downcase) }
+    respond_to do |format|
+      format.json { render json: results.collect { |sop| { id: sop.id, name: sop.title } } }
+    end
+  end
+
+
   private
 
   def sop_params
