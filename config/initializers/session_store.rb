@@ -5,4 +5,5 @@
 # (create the session table with "rails generate session_migration")
 SEEK::Application.config.session_store(:active_record_store,
                                        key: '_seek_session',
-                                       expire_after: Seek::Config.session_store_timeout, secure: Rails.env.production?)
+                                       expire_after: Seek::Config.session_store_timeout,
+                                       secure: Rails.env.production? && (ENV.fetch('RAILS_FORCE_SSL', 'false').downcase == 'true'))
