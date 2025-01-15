@@ -265,6 +265,25 @@ class SamplesController < ApplicationController
           template_id: params[:output_template_id] }, output_template_attribute)
     end
 
+    ####################################################################################################################
+    # Filtering by date range
+    ####################################################################################################################
+    if params[:filter_begin_date_created].present?
+      @result = @result.select { |s| s.created_at >= params[:filter_begin_date_created].to_date }
+    end
+
+    if params[:filter_end_date_created].present?
+      @result = @result.select { |s| s.created_at <= params[:filter_end_date_created].to_date }
+    end
+
+    if params[:filter_begin_date_updated].present?
+      @result = @result.select { |s| s.updated_at >= params[:filter_begin_date_updated].to_date }
+    end
+
+    if params[:filter_end_date_updated].present?
+      @result = @result.select { |s| s.updated_at <= params[:filter_end_date_updated].to_date }
+    end
+
     @result = @result.select { |s| (project_ids & s.project_ids).any? } if project_ids.present?
     @total_samples = @result.length
     @result = @result.any? ? @result.authorized_for('view') : []
