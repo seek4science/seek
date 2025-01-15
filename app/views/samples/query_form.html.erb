@@ -116,7 +116,29 @@
 				<input id="output_attribute_value" class="form-control"/>
 			</div>
 		</div>
-	<% end %>
+		<div class="row">
+			<div class="col-md-4">
+				<h4>
+					Select date range
+				</h4>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-4">
+				<label>Begin date created</label>
+				<input id="filter_begin_date_created" type="date" class="form-control"></input >
+				<label>End date created</label>
+				<input id="filter_end_date_created" type="date" class="form-control"></input >
+			</div>
+			<div class="col-md-4">
+				<label>Begin date updated</label>
+				<input id="filter_begin_date_updated" type="date" class="form-control"></input >
+				<label>End date updated</label>
+				<input id="filter_begin_date_updated" type="date" class="form-control"></input >
+			</div>
+		</div>
+
+<% end %>
 
 	<div class="row">
 		<div class="col-md-4" style="margin-bottom:20px">
@@ -187,6 +209,10 @@
 			output_template_id: $j("#output_template").val(),
 			output_attribute_id: $j("#output_template_attribute").val(),
 			output_attribute_value: $j("#output_attribute_value").val(),
+			filter_begin_date_created: $j("#filter_begin_date_created").val(),
+			filter_end_date_created: $j("#filter_end_date_created").val(),
+			filter_begin_date_updated: $j("#filter_begin_date_updated").val(),
+			filter_end_date_updated: $j("#filter_end_date_updated").val()
 		}
 		$j.ajax({
 				url: "<%=query_samples_path%>",
