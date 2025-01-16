@@ -1,8 +1,8 @@
 class ISATag < ApplicationRecord
   validates :title, presence: true
 
-  has_many :template_attributes, inverse_of: :ISATag
-  has_many :sample_attributes, inverse_of: :ISATag
+  has_many :template_attributes, inverse_of: :isa_tag
+  has_many :sample_attributes, inverse_of: :isa_tag
 
   def isa_source?
     title == Seek::ISA::TagType::SOURCE
