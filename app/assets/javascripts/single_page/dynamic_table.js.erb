@@ -120,7 +120,7 @@ const handleSelect = (e) => {
           } else if (isRegisteredSop) {
               data = sanitizedData && Array.isArray(sanitizedData) ? sanitizedData : [sanitizedData];
               data = data[0]?.id ? data : [];
-              return registeredSopObjectsInput(c, data, options, registeredSopUrl);
+              return simpleObjectsInput(c, data, options, registeredSopUrl);
           } else if(isCVList && sanitizedData !== "#HIDDEN"){
               data = sanitizedData && Array.isArray(sanitizedData) ? sanitizedData : [sanitizedData];
               data = data.map((e) => {
@@ -134,11 +134,11 @@ const handleSelect = (e) => {
           } else if (isRegisteredDataFile) {
               data = sanitizedData && Array.isArray(sanitizedData) ? sanitizedData : [sanitizedData];
               data = data[0]?.id ? data : [];
-              return registeredSopObjectsInput(c, data, options, typeaheadDataFilesUrl);
+              return simpleObjectsInput(c, data, options, typeaheadDataFilesUrl);
           } else if (isRegisteredStrain) {
               data = sanitizedData && Array.isArray(sanitizedData) ? sanitizedData : [sanitizedData];
               data = data[0]?.id ? data : [];
-              return registeredSopObjectsInput(c, data, options, typeaheadStrainsUrl);
+              return simpleObjectsInput(c, data, options, typeaheadStrainsUrl);
           } else if (sanitizedData === "#HIDDEN") {
             return "<em><small>Hidden</small></em>";
           } else {
@@ -671,7 +671,7 @@ function cvListObjectsInput(column, data, options, url){
   }
 }
 
-function registeredSopObjectsInput(column, data, options, url) {
+function simpleObjectsInput(column, data, options, url) {
     const existingOptions = data.map((e) => `<option selected="selected" title="ID: ${e.id}" value="${e.id}">${sanitizeData(e.title)}</option>`);
     if (options.readonly) {
         return data.map((e) => `<span title="ID: ${sanitizeData(e)}" class="badge">${sanitizeData(e)}</span>`).join(" ");
