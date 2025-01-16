@@ -55,6 +55,7 @@ const typeaheadSamplesUrl = "<%= typeahead_samples_path(linked_sample_type_id: '
 const typeaheadCVUrl = "<%= typeahead_sample_controlled_vocabs_path(scv_id: '_CVID_') %>";
 const typeaheadSopsUrl = "<%= dt_typeahead_sops_path(study_id: '__STUDY_ID__', assay_id: '__ASSAY_ID__') %>";
 const typeaheadDataFilesUrl = "<%= typeahead_data_files_path %>";
+const typeaheadStrainsUrl = "<%= typeahead_strains_path %>";
 
 const handleSelect = (e) => {
   $j(e).parents("table").DataTable().row(e.closest("tr")).data()[0] = e.is(":checked")
@@ -134,6 +135,10 @@ const handleSelect = (e) => {
               data = sanitizedData && Array.isArray(sanitizedData) ? sanitizedData : [sanitizedData];
               data = data[0]?.id ? data : [];
               return registeredSopObjectsInput(c, data, options, typeaheadDataFilesUrl);
+          } else if (isRegisteredStrain) {
+              data = sanitizedData && Array.isArray(sanitizedData) ? sanitizedData : [sanitizedData];
+              data = data[0]?.id ? data : [];
+              return registeredSopObjectsInput(c, data, options, typeaheadStrainsUrl);
           } else if (sanitizedData === "#HIDDEN") {
             return "<em><small>Hidden</small></em>";
           } else {
