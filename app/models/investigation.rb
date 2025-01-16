@@ -10,7 +10,6 @@ class Investigation < ApplicationRecord
 
   validates :projects, presence: true, projects: { self: true }
 
-  #enum status: [:planned, :running, :completed, :cancelled, :failed]
   belongs_to :assignee, class_name: 'Person'
 
   has_many :study_sops, through: :studies, source: :sops
