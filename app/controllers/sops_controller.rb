@@ -61,15 +61,17 @@ class SopsController < ApplicationController
 
     query = params[:query] || ''
     asset = if params[:study_id].present?
-              Study.find(params[:study_id])
+              Study.find(params[:study_id]).authorized_for('view')
             else
-              Assay.find(params[:assay_id])
+              Assay.find(params[:assay_id]).authorized_for('view')
             end
 
     sops = asset&.sops || []
-    results = sops.select { |sop| sop.title&.downcase&.include?(query.downcase) }
+    filtered_sops = sops.select { |sop| sop.title&.downcase&.include?(query.downcase) }
+    items = filtered_sops.collect { |sop| { id: sop.id, text: sop.title } }
+
     respond_to do |format|
-      format.json { render json: results.collect { |sop| { id: sop.id, name: sop.title } } }
+      format.json { render json: { results: items }.to_json }
     end
   end
 
