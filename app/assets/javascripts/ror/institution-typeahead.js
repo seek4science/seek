@@ -120,6 +120,7 @@ function initializeLocalInstitutions(endpoint = '/institutions/typeahead.json', 
 
 function clearInstitutionFields() {
     $j('#institution_title').val('');
+    $j('#institution_name').val('');
     $j('#institution_id').val('');
     $j('#institution_ror_id').val('');
     $j('#institution_city').val('');
@@ -178,10 +179,7 @@ $j(document).ready(function () {
                 return data.identifier;
             }
         }
-    ).on('typeahead:select', function (e, suggestion) {
-        // Close the dropdown after selection
-        $j('#combined_typeahead .typeahead').typeahead('close');
-    });
+    );
 
 
     $j('#ror_query_name .typeahead').typeahead({
@@ -211,6 +209,8 @@ $j(document).ready(function () {
         });
 
     $j('#combined_typeahead .typeahead').bind('typeahead:select', function (ev, data) {
+        $j('#combined_typeahead .typeahead').typeahead('close');
+
         if (data.hasOwnProperty("text")) {
             $j('#new_institution_reminder').hide();
             $j('#institution_title').val(data.text);
@@ -241,6 +241,12 @@ $j(document).ready(function () {
         $j('#institution_country').val(suggestion.country.country_name);
         $j('#institution_ror_id').val(extractRorId(suggestion.id));
         $j('#institution_web_page').val(suggestion.links[0]);
+    });
+
+    $j('#clear-fields').on('click', function(event) {
+        event.preventDefault();
+        clearInstitutionFields();
+        toggleUserInput(false);
     });
 
     $j('#basic #name-01').bind('change', function() {
