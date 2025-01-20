@@ -14,7 +14,7 @@ module Seek
 
       def to_rdf
         rdf_graph = to_rdf_graph
-        RDF::Writer.for(:rdfxml).buffer(prefixes: ns_prefixes) do |writer|
+        RDF::Writer.for(:ttl).buffer(prefixes: ns_prefixes) do |writer|
           rdf_graph.each_statement do |statement|
             writer << statement
           end
@@ -41,8 +41,8 @@ module Seek
         rdf_graph = describe_type(rdf_graph)
         rdf_graph = generate_from_csv_definitions rdf_graph
         rdf_graph = additional_triples rdf_graph
-        rdf_graph = extended_metadata_triples rdf_graph
-        rdf_graph = sample_metadata_triples(rdf_graph) if self.is_a?(Sample)
+        # rdf_graph = extended_metadata_triples rdf_graph
+        # rdf_graph = sample_metadata_triples(rdf_graph) if self.is_a?(Sample)
         rdf_graph
       end
 
