@@ -37,7 +37,7 @@ ObservationUnit,samples,JERMVocab.hasPart,u,,
 ObservationUnit,study,JERMVocab.isPartOf,u,,
 ObservationUnit,projects,JERMVocab.itemProducedBy,u,,
 Organism,assays,JERMVocab.isInvestigatedBy,u,,
-Organism,ncbi_uri,JERMVocab.NCBI_ID,l,URI.parse(item),compact
+Organism,ncbi_uri,JERMVocab.NCBI_ID,l,,compact
 Person,created_items,JERMVocab.isCreatorOf,u,,
 Person,contributed_items,JERMVocab.isContributorOf,u,,
 Person,mbox_sha1sum,RDF::Vocab::FOAF.mbox_sha1sum,l,,
@@ -46,7 +46,7 @@ Person,last_name,RDF::Vocab::FOAF.familyName,l,,
 Person,name,RDF::Vocab::SIOC.name,l,,
 Person,name,RDF::Vocab::FOAF.name,l,,
 Person,projects,JERMVocab.isAssociatedWith,u,,
-Person,web_page,RDF::Vocab::FOAF.homepage,l,URI.parse(item),compact
+Person,web_page,RDF::Vocab::FOAF.homepage,l,,compact
 Person,rdf_seek_id,JERMVocab.seekID,l,,
 Person,orcid_uri,RDF::Vocab::OWL.sameAs,u,,
 Programme,organisms,JERMVocab.investigates,u,,
@@ -58,10 +58,10 @@ Project,assets,JERMVocab.hasItem,u,,
 Project,investigations,JERMVocab.hasItem,u,,
 Project,organisms,JERMVocab.investigates,u,,
 Project,studies,JERMVocab.hasItem,u,,
-Project,web_page,RDF::Vocab::FOAF.homepage,l,URI.parse(item),compact
+Project,web_page,RDF::Vocab::FOAF.homepage,l,,compact
 Project,people,JERMVocab.isAssociatedWith,u,,
 Project,programme,JERMVocab.isPartOf,u,,
-Project,web_page,JERMVocab.webLink,l,URI.parse(item),compact
+Project,web_page,JERMVocab.webLink,l,,compact
 Project,rdf_seek_id,JERMVocab.seekID,l,,
 Publication,projects,JERMVocab.itemProducedBy,u,,
 Publication,assays,JERMVocab.isPartOf,u,,
@@ -71,7 +71,7 @@ Sop,assays,JERMVocab.isPartOf,u,,
 Sop,projects,JERMVocab.itemProducedBy,u,,
 Sop,rdf_seek_id,JERMVocab.seekID,l,,
 Strain,assays,JERMVocab.isInvestigatedBy,u,,
-Strain,ncbi_uri,JERMVocab.NCBI_ID,l,URI.parse(item),compact
+Strain,ncbi_uri,JERMVocab.NCBI_ID,l,,compact
 Strain,provider_id,JERMVocab.externalSupplierID,l,,
 Study,observation_units,JERMVocab.hasPart,u,,
 Study,assays,JERMVocab.hasPart,u,,

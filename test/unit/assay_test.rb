@@ -23,13 +23,15 @@ class AssayTest < ActiveSupport::TestCase
     assay.reload
     assert_equal 2, assay.assets.size
     rdf = assay.to_rdf
-    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
-      assert reader.statements.count > 1
-      assert_equal RDF::URI.new("http://localhost:3000/assays/#{assay.id}"), reader.statements.first.subject
-
-      #check includes the data file due to bug OPSK-1919
-      refute_nil reader.statements.detect{|s| s.object == RDF::URI.new("http://localhost:3000/data_files/#{df.id}") && s.predicate == RDF::URI("http://jermontology.org/ontology/JERMOntology#hasPart")}
+    graph = RDF::Graph.new do |graph|
+      RDF::Reader.for(:ttl).new(rdf) {|reader| graph << reader}
     end
+    assert graph.statements.count > 1
+    assert_equal RDF::URI.new("http://localhost:3000/assays/#{assay.id}"), graph.statements.first.subject
+
+    #check includes the data file due to bug OPSK-1919
+    refute_nil graph.statements.detect{|s| s.object == RDF::URI.new("http://localhost:3000/data_files/#{df.id}") && s.predicate == RDF::URI("http://jermontology.org/ontology/JERMOntology#hasPart")}
+
 
     # try modelling, with tech type nil
     assay = FactoryBot.create :modelling_assay, organisms: [FactoryBot.create(:organism)], technology_type_uri: nil
@@ -40,11 +42,12 @@ class AssayTest < ActiveSupport::TestCase
     suggested_tech_type = FactoryBot.create(:suggested_technology_type)
     assay = FactoryBot.create :experimental_assay, suggested_assay_type: suggested_assay_type, suggested_technology_type: suggested_tech_type
     rdf = assay.to_rdf
-
-    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
-      reader.statements.map(&:object).include? suggested_assay_type.ontology_uri
-      reader.statements.map(&:object).include? suggested_tech_type.ontology_uri
+    graph = RDF::Graph.new do |graph|
+      RDF::Reader.for(:ttl).new(rdf) {|reader| graph << reader}
     end
+    graph.statements.map(&:object).include? suggested_assay_type.ontology_uri
+    graph.statements.map(&:object).include? suggested_tech_type.ontology_uri
+
   end
 
   test 'is_asset?' do
