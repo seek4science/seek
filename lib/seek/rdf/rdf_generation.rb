@@ -41,8 +41,8 @@ module Seek
         rdf_graph = describe_type(rdf_graph)
         rdf_graph = generate_from_csv_definitions rdf_graph
         rdf_graph = additional_triples rdf_graph
-        # rdf_graph = extended_metadata_triples rdf_graph
-        # rdf_graph = sample_metadata_triples(rdf_graph) if self.is_a?(Sample)
+        rdf_graph = extended_metadata_triples rdf_graph
+        rdf_graph = sample_metadata_triples(rdf_graph) if self.is_a?(Sample)
         rdf_graph
       end
 
