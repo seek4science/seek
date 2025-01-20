@@ -131,7 +131,10 @@ module Seek
           'dcterms' => RDF::Vocab::DC.to_uri.to_s,
           'owl' => RDF::Vocab::OWL.to_uri.to_s,
           'foaf' => RDF::Vocab::FOAF.to_uri.to_s,
-          'sioc' => RDF::Vocab::SIOC.to_uri.to_s
+          'sioc' => RDF::Vocab::SIOC.to_uri.to_s,
+          'mixs' => 'https://w3id.org/mixs/',
+          'uniprot' => 'http://purl.uniprot.org/core/',
+          'fairbd' => 'http://fairbydesign.nl/ontology/'
         }
       end
 
