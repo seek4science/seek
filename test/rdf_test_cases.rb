@@ -18,14 +18,16 @@ module RdfTestCases
     rdf = @response.body
 
     assert_equal object.to_rdf, rdf
-    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
-      assert reader.statements.count > 0
-      assert_equal RDF::URI.new(expected_resource_uri), reader.statements.first.subject
-      reader.rewind
-      reader.each_statement do |statement|
-        assert statement.valid?, "RDF contained an invalid statement - #{statement}"
-      end
+    graph = RDF::Graph.new do |graph|
+      RDF::Reader.for(:ttl).new(rdf) {|reader| graph << reader}
     end
+
+    assert graph.statements.count > 0
+    assert_equal RDF::URI.new(expected_resource_uri), graph.statements.first.subject
+    graph.each_statement do |statement|
+      assert statement.valid?, "RDF contained an invalid statement - #{statement}"
+    end
+
   end
 
   test 'response code for not accessible rdf' do
