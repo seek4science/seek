@@ -108,7 +108,7 @@ class OrganismTest < ActiveSupport::TestCase
     end
     assert graph.statements.count >= 1
     assert_equal RDF::URI.new("http://localhost:3000/organisms/#{object.id}"), graph.statements.first.subject
-    assert graph.has_triple? ["http://localhost:3000/organisms/#{object.id}", Seek::Rdf::JERMVocab.NCBI_ID, RDF::Literal.new('http://purl.bioontology.org/ontology/NCBITAXON/2287')]
+    assert graph.has_triple? ["http://localhost:3000/organisms/#{object.id}", Seek::Rdf::JERMVocab.NCBI_ID, RDF::Literal::AnyURI.new('http://purl.bioontology.org/ontology/NCBITAXON/2287')]
 
   end
 

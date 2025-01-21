@@ -134,7 +134,7 @@ class ProjectTest < ActiveSupport::TestCase
       next unless statement.predicate == homepage_predicate
       found = true
       assert statement.valid?, 'statement is not valid'
-      assert_equal RDF::Literal.new('http://google.com'), statement.object
+      assert_equal RDF::Literal::AnyURI.new('http://google.com'), statement.object
     end
 
     assert found, "Didn't find homepage predicate"
