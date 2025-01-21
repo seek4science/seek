@@ -152,7 +152,7 @@ module Seek
       end
 
       def with_statements(item)
-        RDF::Reader.for(:rdfxml).new(item.to_rdf) do |reader|
+        RDF::Reader.for(:ttl).new(item.to_rdf) do |reader|
           reader.each_statement do |statement|
             yield(statement)
           end
