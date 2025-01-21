@@ -65,6 +65,8 @@ module RdfTestCases
 
   def invoke_rdf_get(object)
     get :show, params: { id: object, format: 'rdf' }
+    assert_equal 'text/turtle', @response.media_type
+    @response.body
   end
 
   def expected_rdf_resource_uri(object)
