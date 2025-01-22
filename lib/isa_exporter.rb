@@ -352,13 +352,13 @@ module IsaExporter
       with_tag_sample = sample_type.sample_attributes.detect { |sa| sa.isa_tag&.isa_sample? }
       with_tag_sample_characteristic =
         sample_type.sample_attributes.select { |sa| sa.isa_tag&.isa_sample_characteristic? }
-      seek_sample_multi_attribute = sample_type.sample_attributes.detect(&:seek_sample_multi?)
+      input_attribute = sample_type.sample_attributes.detect(&:input_attribute?)
       sample_type.samples.map do |s|
         if s.can_view?(@current_user)
           {
             '@id': "#sample/#{s.id}",
             name: s.get_attribute_value(with_tag_sample),
-            derivesFrom: extract_sample_ids(s.get_attribute_value(seek_sample_multi_attribute), 'source'),
+            derivesFrom: extract_sample_ids(s.get_attribute_value(input_attribute), 'source'),
             characteristics: convert_characteristics(s, with_tag_sample_characteristic),
             factorValues: [
               {
@@ -378,7 +378,7 @@ module IsaExporter
           {
             '@id': "#sample/HIDDEN",
             name: '',
-            derivesFrom: extract_sample_ids(s.get_attribute_value(seek_sample_multi_attribute), 'source'),
+            derivesFrom: extract_sample_ids(s.get_attribute_value(input_attribute), 'source'),
             characteristics: [],
             factorValues: [
               {
