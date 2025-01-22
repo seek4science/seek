@@ -24,7 +24,6 @@ services:
       SOLR_HOST: solr
       NO_ENTRYPOINT_WORKERS: 1
       RAILS_LOG_LEVEL: info # debug, info, warn, error or fatal
-      RAILS_FORCE_SSL: false # Recommended to be true in production. Sets secure cookies and redirects to HTTPS.
     env_file:
       - docker/db.env
     volumes:
@@ -51,7 +50,6 @@ services:
         SOLR_PORT: 8983
         SOLR_HOST: solr
         RAILS_LOG_LEVEL: info # debug, info, warn, error or fatal
-        RAILS_FORCE_SSL: false # Recommended to be true in production. Sets secure cookies and redirects to HTTPS.
         QUIET_SUPERCRONIC: 1 # remove to show supercronic activity logs
       env_file:
         - docker/db.env
