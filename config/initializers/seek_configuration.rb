@@ -8,7 +8,7 @@ def load_seek_config_defaults!
   Seek::Config.default :sycamore_enabled,false
   Seek::Config.default :jerm_enabled,false
   Seek::Config.default :email_enabled,false
-  Seek::Config.default :smtp, {:address => '', :port => '25', :domain => '', :authentication => :plain, :user_name => '', :password => '', :enable_starttls_auto=>false}
+  Seek::Config.default :smtp, { address: '', port: '25', domain: '', authentication: '', user_name: '', password: '', enable_starttls_auto: false }
   Seek::Config.default :noreply_sender, 'no-reply@sysmo-db.org'
   Seek::Config.default :support_email_address, ''
   Seek::Config.default :solr_enabled, false
