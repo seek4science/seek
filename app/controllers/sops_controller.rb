@@ -61,9 +61,9 @@ class SopsController < ApplicationController
 
     query = params[:query] || ''
     asset = if params[:study_id].present?
-              Study.find(params[:study_id]).authorized_for('view')
+              Study.authorized_for('view').detect { |study| study.id.to_s == params[:study_id] }
             else
-              Assay.find(params[:assay_id]).authorized_for('view')
+              Assay.authorized_for('view').detect { |assay| assay.id.to_s == params[:assay_id] }
             end
 
     sops = asset&.sops || []
