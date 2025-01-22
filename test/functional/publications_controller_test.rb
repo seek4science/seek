@@ -555,8 +555,9 @@ class PublicationsControllerTest < ActionController::TestCase
       .to_return(status: 200, body: File.new("#{Rails.root}/test/fixtures/files/mocking/efetch_response.txt"))
 
     FactoryBot.create_list(:publication_with_author, 6)
-    max = FactoryBot.create(:max_publication)
-    author = max.publication_authors.where(last_name: 'LastReg').first
+    pub = FactoryBot.create(:max_publication)
+    disable_authorization_checks { pub.save! } # Update the publication to ensure authors are turned into creators
+    author = pub.publication_authors.where(last_name: 'LastReg').first
     assert author.person
 
     # Tests e.g. /people/123/publications
