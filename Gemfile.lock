@@ -484,6 +484,7 @@ GEM
       nokogiri (~> 1)
       rake
     mini_mime (1.1.5)
+    mini_portile2 (2.8.8)
     minitest (5.25.4)
     minitest-reporters (1.5.0)
       ansi
@@ -517,6 +518,9 @@ GEM
     netrc (0.11.0)
     nio4r (2.7.4)
     nkf (0.2.0)
+    nokogiri (1.18.1)
+      mini_portile2 (~> 2.8.2)
+      racc (~> 1.4)
     nokogiri (1.18.1-x86_64-linux-gnu)
       racc (~> 1.4)
     nori (1.1.5)
@@ -665,10 +669,6 @@ GEM
     rainbow (3.1.1)
     raindrops (0.20.0)
     rake (13.2.1)
-    ransack (4.2.1)
-      activerecord (>= 6.1.5)
-      activesupport (>= 6.1.5)
-      i18n
     rb-fsevent (0.11.0)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
@@ -892,6 +892,8 @@ GEM
       actionpack (>= 6.1)
       activesupport (>= 6.1)
       sprockets (>= 3.0.0)
+    sqlite3 (1.7.3)
+      mini_portile2 (~> 2.8.0)
     sqlite3 (1.7.3-x86_64-linux)
     stackprof (0.2.25)
     stringio (3.1.2)
@@ -991,6 +993,7 @@ GEM
       rubyzip (~> 2.0.0)
 
 PLATFORMS
+  ruby
   x86_64-linux
 
 DEPENDENCIES
@@ -1097,7 +1100,6 @@ DEPENDENCIES
   rails-static-router
   rails_autolink
   rails_best_practices
-  ransack
   rdf-virtuoso (>= 0.2.0)
   rdoc
   recaptcha (~> 4.1.0)
