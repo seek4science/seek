@@ -556,7 +556,6 @@ class PublicationsControllerTest < ActionController::TestCase
 
     FactoryBot.create_list(:publication_with_author, 6)
     pub = FactoryBot.create(:max_publication)
-    disable_authorization_checks { pub.save! } # Update the publication to ensure authors are turned into creators
     author = pub.publication_authors.where(last_name: 'LastReg').first
     assert author.person
 
