@@ -110,6 +110,10 @@ h3 {
   color: #999
 }
 
+.tt-input-disable {
+  background-color: #EEEEEE !important;
+}
+
 .tt-dataset{
   padding-left: 5px;
 }

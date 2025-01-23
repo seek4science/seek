@@ -212,14 +212,12 @@ $j(document).ready(function () {
         $j('#combined_typeahead .typeahead').typeahead('close');
 
         if (data.hasOwnProperty("text")) {
-            $j('#new_institution_reminder').hide();
             $j('#institution_title').val(data.text);
             $j('#institution_id').val(data.id);
             $j('#institution_ror_id').val(data.ror_id);
             $j('#institution_city').val(data.city);
             $j('#institution_country').val(data.country_name);
             $j('#institution_web_page').val(data.web_page);
-            toggleUserInput(true);
         }
         else
         {
@@ -230,9 +228,10 @@ $j(document).ready(function () {
             $j('#institution_country').val(data.country.country_name);
             $j('#institution_ror_id').val(extractRorId(data.id));
             $j('#institution_web_page').val(data.links[0]);
-            toggleUserInput(false);
         }
+        toggleUserInput(true);
         checkSubmitButtonEnabled()
+        $j('.tt-input').addClass('tt-input-disable');
     });
 
     $j('#ror_query_name .typeahead').bind('typeahead:select', function (ev, suggestion) {
@@ -247,6 +246,8 @@ $j(document).ready(function () {
         event.preventDefault();
         clearInstitutionFields();
         toggleUserInput(false);
+        $j('#new_institution_reminder').hide();
+        $j('.tt-input').removeClass('tt-input-disable');
     });
 
     $j('#basic #name-01').bind('change', function() {
