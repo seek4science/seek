@@ -50,7 +50,7 @@ namespace :seek do
 
   # if rdf repository enabled then generate jobs, otherwise just clear the cache. Only runs once
   task(update_rdf: [:environment]) do
-    only_once('seek:update_rdf 1.16.0') do
+    only_once('seek:update_rdf 1.16.1') do
       if Seek::Rdf::RdfRepository.instance&.configured?
         puts '... triggering rdf generation jobs'
         Rake::Task['seek_rdf:generate'].invoke

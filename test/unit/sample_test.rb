@@ -1439,18 +1439,20 @@ class SampleTest < ActiveSupport::TestCase
                                })
     assert sample.rdf_supported?
     rdf = sample.to_rdf
-    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
-      assert reader.statements.count > 1
-      assert_equal RDF::URI.new("http://localhost:3000/samples/#{sample.id}"), reader.statements.first.subject
-      match = reader.statements.detect{|s| s.predicate == RDF.type}
-      assert_equal RDF::URI('http://jermontology.org/ontology/JERMOntology#Sample'), match.object
-      match = reader.statements.detect{|s| s.predicate == RDF::URI('http://fairbydesign.nl/ontology/host')}
-      assert_equal RDF::Literal('the host'), match.object
-      match = reader.statements.detect{|s| s.predicate == RDF::URI('http://fairbydesign.nl/ontology/occupation')}
-      assert_equal RDF::Literal('the occupation'), match.object
-      match = reader.statements.detect{|s| s.predicate == RDF::URI('http://fairbydesign.nl/ontology/marital_status')}
-      assert_equal RDF::Literal(''), match.object
+    graph = RDF::Graph.new do |graph|
+      RDF::Reader.for(:ttl).new(rdf) {|reader| graph << reader}
     end
+    assert graph.statements.count > 1
+    assert_equal RDF::URI.new("http://localhost:3000/samples/#{sample.id}"), graph.statements.first.subject
+    match = graph.statements.detect{|s| s.predicate == RDF.type}
+    assert_equal RDF::URI('http://jermontology.org/ontology/JERMOntology#Sample'), match.object
+    match = graph.statements.detect{|s| s.predicate == RDF::URI('http://fairbydesign.nl/ontology/host')}
+    assert_equal RDF::Literal('the host'), match.object
+    match = graph.statements.detect{|s| s.predicate == RDF::URI('http://fairbydesign.nl/ontology/occupation')}
+    assert_equal RDF::Literal('the occupation'), match.object
+    match = graph.statements.detect{|s| s.predicate == RDF::URI('http://fairbydesign.nl/ontology/marital_status')}
+    assert_equal RDF::Literal(''), match.object
+
   end
 
   test 'add sample to a locked sample type' do

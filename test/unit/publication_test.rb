@@ -135,11 +135,13 @@ class PublicationTest < ActiveSupport::TestCase
     object.reload
 
     rdf = object.to_rdf
-
-    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
-      assert reader.statements.count >= 1
-      assert_equal RDF::URI.new("http://localhost:3000/publications/#{object.id}"), reader.statements.first.subject
+    graph = RDF::Graph.new do |graph|
+      RDF::Reader.for(:ttl).new(rdf) {|reader| graph << reader}
     end
+
+    assert graph.statements.count >= 1
+    assert_equal RDF::URI.new("http://localhost:3000/publications/#{object.id}"), graph.statements.first.subject
+
   end
 
   test 'content blob search terms' do
