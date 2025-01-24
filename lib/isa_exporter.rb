@@ -425,7 +425,7 @@ module IsaExporter
 
     def convert_characteristics(sample, attributes)
       attributes.map do |attribute|
-        value = convert_characteristic_value(sample, attribute)
+        value = convert_attribute_value(sample, attribute)
         ontology = get_ontology_details(attribute, value, true)
         {
           category: {
@@ -441,7 +441,7 @@ module IsaExporter
       end
     end
 
-    def convert_characteristic_value(sample, attribute)
+    def convert_attribute_value(sample, attribute)
       return '' unless sample.can_view?(@current_user)
 
       if attribute.sample_attribute_type.seek_sample? || attribute.sample_attribute_type.seek_sample_multi? || attribute.sample_attribute_type.seek_strain? || attribute.sample_attribute_type.seek_data_file? || attribute.sample_attribute_type.seek_sop?
