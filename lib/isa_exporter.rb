@@ -416,6 +416,18 @@ module IsaExporter
       end
     end
 
+    def convert_characteristic_value(sample, attribute)
+      return '' unless sample.can_view?(@current_user)
+
+      if attribute.sample_attribute_type.seek_sample? || attribute.sample_attribute_type.seek_sample_multi? || attribute.sample_attribute_type.seek_strain? || attribute.sample_attribute_type.seek_data_file? || attribute.sample_attribute_type.seek_sop?
+        sample.get_attribute_value(attribute).to_json || ''
+      elsif attribute.sample_attribute_type.base_type == Seek::Samples::BaseType::CV_LIST
+        sample.get_attribute_value(attribute).join(', ')
+      else
+        sample.get_attribute_value(attribute) || ''
+      end
+    end
+
     def convert_characteristic_categories(study = nil, assays = nil)
       attributes = []
       if study
