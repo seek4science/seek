@@ -103,21 +103,22 @@ module IsaExporter
       isa_study[:people] = people
       isa_study[:studyDesignDescriptors] = []
       isa_study[:characteristicCategories] = convert_characteristic_categories(study)
-      protocols = fetch_study_protocols(study)
-      isa_study[:protocols] = protocols
+      protocols_maps = fetch_study_protocols(study)
+      isa_study[:protocols] = protocols_maps.map { |p| p[:protocols] }.compact.flatten
       isa_study[:materials] = {
         sources: convert_materials_sources(study.sample_types.first),
         samples: convert_materials_samples(study.sample_types.second)
       }
 
 
-      isa_study[:processSequence] = convert_process_sequence(study.sample_types.second, study.sops.map(&:id).join("_"), study.id)
+      study_protocols_map = protocols_maps.detect { |pm| pm[:sample_type_id] == study.sample_types.second.id }
+      isa_study[:processSequence] = convert_process_sequence(study.sample_types.second, study_protocols_map)
 
       unless study.assays.all?(&:is_isa_json_compliant?)
         raise "All assays in study `#{study.title}` should be ISA-JSON compliant."
       end
 
-      isa_study[:assays] = study.assay_streams.map { |assay_stream| convert_assays(assay_stream) }.compact
+      isa_study[:assays] = study.assay_streams.map { |assay_stream| convert_assays(assay_stream, protocols_maps) }.compact
       isa_study[:factors] = []
       isa_study[:unitCategories] = []
 
@@ -125,7 +126,7 @@ module IsaExporter
     end
 
     def fetch_study_protocols(study)
-      protocols = []
+      protocols_maps = []
 
       # Get all sample types from study and its assays
       sample_type_objcts = [{ sample_type: study.sample_types.second, isa: 'study', isa_id: study.id }]
@@ -156,13 +157,13 @@ module IsaExporter
         end
 
         # generate & append to protcols
-        protocols += used_sops.map do |sop|
+        protocols_maps.append({ protocols: used_sops.map do |sop|
           id = "#protocol/#{isa}_#{isa_id}_#{sop.id}"
           convert_protocol(sop, id, protocol_attribute, parameter_attributes)
-        end
+        end, isa: isa, isa_id: isa_id, sample_type_id: sample_type.id })
       end
 
-      protocols
+      protocols_maps
     end
 
     def convert_annotation(term_uri)
@@ -203,7 +204,7 @@ module IsaExporter
       assay_comments.compact
     end
 
-    def convert_assays(assay_stream)
+    def convert_assays(assay_stream, protocols_maps)
       child_assays = assay_stream.child_assays
       return unless assay_stream.can_view?(@current_user)
       return unless child_assays.all? { |a| a.can_view?(@current_user) }
@@ -239,7 +240,10 @@ module IsaExporter
         otherMaterials: convert_other_materials(all_sample_types)
       }
       isa_assay[:processSequence] =
-        child_assays.map { |a| convert_process_sequence(a.sample_type, a.sops.map(&:id).join("_"), a.id) }.flatten
+        child_assays.map do |assay|
+          assay_protocols_map = protocols_maps.detect { |pm| pm[:sample_type_id] == assay.sample_type.id }
+          convert_process_sequence(assay.sample_type,assay_protocols_map)
+        end.flatten
       isa_assay[:dataFiles] = convert_data_files(all_sample_types)
       isa_assay[:unitCategories] = []
       isa_assay
@@ -477,7 +481,7 @@ module IsaExporter
       end
     end
 
-    def convert_process_sequence(sample_type, sop_ids, id)
+    def convert_process_sequence(sample_type, protocols_map)
       # This method is meant to be used for both Studies and Assays
       return [] unless sample_type.samples.any?
 
@@ -493,25 +497,28 @@ module IsaExporter
       # should be in a different process in the processSequence
       samples_grouped_by_input_and_parameter_value = group_samples_by_input_and_parameter_value(sample_type)
       result = []
-      samples_grouped_by_input_and_parameter_value.map do |input_ids, samples_group|
-        output_ids = samples_group.pluck(:id).join('_')
+      samples_grouped_by_input_and_parameter_value.map do |sample_group|
+        # It's fine to take the first output to get the protocol name since the outputs are grouped by protocol as well.
+        protocols, isa, isa_id, _sample_type_id = protocols_map.values_at(:protocols, :isa, :isa_id, :sample_type_id)
+        executed_protocol = protocols_map[:protocols].detect { |p| p[:name] == sample_group[:executed_protocol][:title] }
+        output_ids = sample_group[:outputs].map { |s| s[:id] }.join('_')
         process = {
           '@id': normalize_id("#process/#{protocol_attribute.title}/#{output_ids}"),
           name: '',
           executesProtocol: {
-            '@id': "#protocol/#{sop_ids}_#{id}"
+            '@id': executed_protocol["@id"]
           },
-          parameterValues: convert_parameter_values(samples_group, isa_parameter_value_attributes),
+          parameterValues: convert_parameter_values(sample_group[:outputs], isa_parameter_value_attributes),
           performer: '',
           date: '',
-          inputs: process_sequence_input(input_ids.first, type),
-          outputs: process_sequence_output(samples_group)
+          inputs: process_sequence_input(sample_group[:inputs], type),
+          outputs: process_sequence_output(sample_group[:outputs])
         }
         # Study processes don't have a previousProcess and nextProcess
         unless type == 'source'
           process.merge!({
-                           previousProcess: previous_process(samples_group),
-                           nextProcess: next_process(samples_group)
+                           previousProcess: previous_process(sample_group[:outputs]),
+                           nextProcess: next_process(sample_group[:outputs])
                          })
         end
         result.push(process)
@@ -604,6 +611,15 @@ module IsaExporter
 
     private
 
+    def detect_material(sample_type)
+      sample_type.sample_attributes.detect do |sa|
+        [
+          Seek::ISA::TagType::SOURCE,
+          Seek::ISA::TagType::SAMPLE,
+          Seek::ISA::TagType::OTHER_MATERIAL
+        ].include? sa.isa_tag&.title
+      end
+    end
     def detect_sample(sample_type)
       sample_type.sample_attributes.detect { |sa| sa.isa_tag&.isa_sample? }
     end
@@ -681,10 +697,25 @@ module IsaExporter
 
       input_attribute = detect_input_attribute(sample_type)&.title&.to_sym
       parameter_value_attributes = select_parameter_values(sample_type).map(&:title).map(&:to_sym)
-      group_attributes = parameter_value_attributes.unshift(input_attribute)
+      protocol_attribute = detect_protocol(sample_type)&.title&.to_sym
+      material_attribute = detect_material(sample_type)&.title&.to_sym
+      group_attributes = parameter_value_attributes.unshift(protocol_attribute).unshift(input_attribute)
 
-      grouped_samples = samples_metadata.group_by { |smd| group_attributes.map { |attr| smd[attr] } }
-      grouped_samples.transform_keys { |key| group_id(key) }
+      # grouped_samples = samples_metadata.group_by { |smd| group_attributes.map { |attr| smd[attr] } }
+      sample_groups = samples_metadata.group_by { |smd| group_attributes.map { |attr| smd[attr] }.flatten }.map { |_key, val| val }
+
+      sample_groups.map do |sample_group|
+        inputs = sample_group.first[input_attribute]
+        executed_protocol = sample_group.first[protocol_attribute]
+        parameter_values = sample_group.first.slice(*parameter_value_attributes)
+        outputs = sample_group.map { |sample| {id: sample[:id], title: sample[material_attribute] } }
+        {
+          inputs: inputs.map { |input| input.transform_keys!(&:to_sym) },
+          executed_protocol: executed_protocol.transform_keys!(&:to_sym),
+          parameter_values: parameter_values.transform_keys!(&:to_sym),
+          outputs: outputs.map { |input| input.transform_keys!(&:to_sym) }
+        }
+      end
     end
 
     def process_sequence_input(inputs, type)
