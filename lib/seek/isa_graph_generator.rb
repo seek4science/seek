@@ -196,13 +196,7 @@ module Seek
         {
           children: %i[data_files models sops publications documents placeholders],
           parents: [:study],
-          # related: [:publications],
           aggregated_children: { samples: :samples }
-          # data_files: :data_files,
-          # models: :models,
-          # sops: :sops,
-          # documents: :documents,
-          # publications: :publications
         }
       when Publication
         {
@@ -222,7 +216,8 @@ module Seek
       when ObservationUnit
         {
           parents: %i[study],
-          related: %i[samples data_files]
+          children: %i[data_files],
+          aggregated_children: { samples: :samples }
         }
       else
         {}
