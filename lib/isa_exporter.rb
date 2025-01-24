@@ -632,8 +632,8 @@ module IsaExporter
       sample_type.sample_attributes.detect { |sa| sa.isa_tag&.isa_other_material? }
     end
 
-    def detect_sample_multi(sample_type)
-      sample_type.sample_attributes.detect(&:seek_sample_multi?)
+    def detect_input_attribute(sample_type)
+      sample_type.sample_attributes.detect(&:input_attribute?)
     end
 
     def next_process(samples_hash)
@@ -679,7 +679,7 @@ module IsaExporter
         }.merge(metadata).transform_keys!(&:to_sym)
       end
 
-      input_attribute = detect_sample_multi(sample_type)&.title&.to_sym
+      input_attribute = detect_input_attribute(sample_type)&.title&.to_sym
       parameter_value_attributes = select_parameter_values(sample_type).map(&:title).map(&:to_sym)
       group_attributes = parameter_value_attributes.unshift(input_attribute)
 
