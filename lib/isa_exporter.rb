@@ -725,7 +725,7 @@ module IsaExporter
       # So retrieving the first one in the group should be fine.
       sample = Sample.find(sample_group_hash.first[:id])
       isa_parameter_value_attributes.map do |p|
-        value = sample.get_attribute_value(p) || ''
+        value = convert_attribute_value(sample, p)
         ontology = get_ontology_details(p, value, true)
         {
           category: {
