@@ -117,14 +117,14 @@ module IsaExporter
       # raise "The Study with the title '#{study.title}' does not have any SOP" if study.sops.blank?
       protocols << convert_protocol(study.sops, study.id, with_tag_protocol_study, with_tag_parameter_value_study)
 
-      study.assay_streams.map(&:child_assays).flatten.each do |a|
+      study.assay_streams.map(&:child_assays).flatten.each do |assay|
         # There should be only one attribute with isa_tag == protocol
-        protocol_attribute = a.sample_type.sample_attributes.detect { |sa| sa.isa_tag&.isa_protocol? }
-        with_tag_parameter_value = a.sample_type.sample_attributes.select { |sa| sa.isa_tag&.isa_parameter_value? }
-        raise "Protocol ISA tag not found in #{t(:assay)} #{a.id}" if protocol_attribute.blank?
+        protocol_attribute = assay.sample_type.sample_attributes.detect { |sa| sa.isa_tag&.isa_protocol? }
+        with_tag_parameter_value = assay.sample_type.sample_attributes.select { |sa| sa.isa_tag&.isa_parameter_value? }
+        raise "Protocol ISA tag not found in #{t(:assay)} #{assay.id}" if protocol_attribute.blank?
 
         # raise "The #{t(:study)} with the title '#{study.title}' does not have an SOP" if a.sops.blank?
-        protocols << convert_protocol(a.sops, a.id, protocol_attribute, with_tag_parameter_value)
+        protocols << convert_protocol(assay.sops, assay.id, protocol_attribute, with_tag_parameter_value)
       end
       isa_study[:protocols] = protocols
 
