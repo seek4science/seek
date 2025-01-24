@@ -139,7 +139,7 @@ module Seek
         end
         @assets_not_in_isa = []
         @assets.each do |type, klass|
-          next if %w[Investigation Study Assay].include? type
+          next if %w[Investigation Study Assay ObservationUnit].include? type
           klass.each do |asset|
             if !asset.respond_to?(:investigations) || asset.investigations.empty?
               @assets_not_in_isa.push(asset)
