@@ -51,6 +51,7 @@ module Seek
   end
 
   class IsaGraphGenerator
+    MIN_AGGREGATED_CHILDREN = 5
     def initialize(object)
       @object = object
     end
@@ -126,11 +127,15 @@ module Seek
         associations(object)[:aggregated_children].each do |type, method|
           associations = resolve_association(object, method)
           next unless associations.any?
-          agg = Seek::ObjectAggregation.new(object, type, associations)
-          agg_node = Seek::IsaGraphNode.new(agg)
-          agg_node.can_view = true
-          nodes << agg_node
-          edges << [object, agg]
+          if associations.count > MIN_AGGREGATED_CHILDREN
+            agg = Seek::ObjectAggregation.new(object, type, associations)
+            agg_node = Seek::IsaGraphNode.new(agg)
+            agg_node.can_view = true
+            nodes << agg_node
+            edges << [object, agg]
+          else
+            children |= associations
+          end
         end
       end
 
