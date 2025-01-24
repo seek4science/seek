@@ -6,8 +6,7 @@ class CookieConsent
   end
 
   def options=(opts)
-    @store.permanent[:cookie_consent] = { value: opts.split(',').select { |opt| OPTIONS.include?(opt) }.join(','),
-                                          same_site: :strict }
+    @store.permanent[:cookie_consent] = opts.split(',').select { |opt| OPTIONS.include?(opt) }.join(',')
   end
 
   def options
