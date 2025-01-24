@@ -399,12 +399,12 @@ module IsaExporter
     end
 
     def convert_characteristics(sample, attributes)
-      attributes.map do |c|
-        value = sample.can_view?(@current_user) ? (sample.get_attribute_value(c) || '') : ''
-        ontology = get_ontology_details(c, value, true)
+      attributes.map do |attribute|
+        value = convert_characteristic_value(sample, attribute)
+        ontology = get_ontology_details(attribute, value, true)
         {
           category: {
-            '@id': normalize_id("#characteristic_category/#{c.title}_#{c.id}")
+            '@id': normalize_id("#characteristic_category/#{attribute.title}_#{attribute.id}")
           },
           value: {
             annotationValue: value,
