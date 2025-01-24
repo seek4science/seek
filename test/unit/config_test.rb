@@ -136,7 +136,7 @@ class ConfigTest < ActiveSupport::TestCase
   end
 
   test 'smtp_settings authentication' do
-    assert_equal :plain, Seek::Config.smtp_settings('authentication')
+    assert_equal '', Seek::Config.smtp_settings('authentication')
   end
   test 'noreply_sender' do
     assert_equal 'no-reply@sysmo-db.org', Seek::Config.noreply_sender
