@@ -3,12 +3,19 @@ var ROR_API_URL = "https://api.ror.org/organizations";
 
 function toggleUserInput(disabled) {
     const action = disabled ? 'addClass' : 'removeClass';
-    $j('#institution_title')[action]('institution-input-disable');
-    $j('#institution_city')[action]('institution-input-disable');
-    $j('#institution_country')[action]('institution-input-disable');
-    $j('#institution_ror_id')[action]('institution-input-disable');
-    $j('#institution_web_page')[action]('institution-input-disable');
-    $j('.tt-input')[action]('institution-input-disable');
+    const elements = [
+        '#institution_title',
+        '#institution_city',
+        '#institution_country',
+        '#institution_ror_id',
+        '#institution_web_page',
+        '.tt-input'
+    ];
+
+    elements.forEach(selector => {
+        $j(selector)[action]('institution-input-disable');
+        $j(selector).prop("readonly", disabled);
+    });
 }
 
 function extractRorId(rorUrl) {
