@@ -15,7 +15,7 @@
 
 <div id="ror_query_name"  class="form-group">
   <div class="form-group">
-    <%= f.label :title, class: "required" %>
+    <%= f.label :title, class: "required" %> <%= link_to "Clear Fields", "#", id: "clear-fields", class: "link-primary small" %>
     <%= f.text_field :title, class: "form-control typeahead", id: "institution_title" %>
     <small class="form-text text-muted">
       <em>
