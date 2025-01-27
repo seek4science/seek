@@ -257,6 +257,10 @@ $j(document).ready(function () {
         $j('#new_institution_reminder').hide();
     });
 
+
+    if ($j('#institution_ror_id').val().trim() !== '') {
+        toggleUserInput(true);
+    }
     $j('#basic #name-01').bind('change', function() {
         $j('#ror-response').html('');
     });
