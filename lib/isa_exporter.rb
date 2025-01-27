@@ -152,13 +152,13 @@ module IsaExporter
           used_sops = sample_type.samples.map do |sample|
             protocol_title = sample.get_attribute_value(protocol_attribute)
             raise "Sample {#{sample.id}: #{sample.title}} has no protocol" if protocol_title.blank?
-            { title: protocol_title, description: '' }
+            { id: protocol_attribute.id, title: protocol_title, description: '' }
           end.uniq
         end
 
         # generate & append to protcols
         protocols_maps.append({ protocols: used_sops.map do |sop|
-          id = "#protocol/#{isa}_#{isa_id}_#{sop.id}"
+          id = "#protocol/#{isa}_#{isa_id}_#{sop[:id]}"
           convert_protocol(sop, id, protocol_attribute, parameter_attributes)
         end, isa: isa, isa_id: isa_id, sample_type_id: sample_type.id })
       end
@@ -695,20 +695,20 @@ module IsaExporter
         }.merge(metadata).transform_keys!(&:to_sym)
       end
 
-      input_attribute = detect_input_attribute(sample_type)&.title&.to_sym
-      parameter_value_attributes = select_parameter_values(sample_type).map(&:title).map(&:to_sym)
-      protocol_attribute = detect_protocol(sample_type)&.title&.to_sym
-      material_attribute = detect_material(sample_type)&.title&.to_sym
-      group_attributes = parameter_value_attributes.unshift(protocol_attribute).unshift(input_attribute)
+      input_attribute_name = detect_input_attribute(sample_type)&.title&.to_sym
+      parameter_value_attribute_names = select_parameter_values(sample_type).map(&:title).map(&:to_sym)
+      protocol_attribute_name = detect_protocol(sample_type)&.title&.to_sym
+      material_attribute_name = detect_material(sample_type)&.title&.to_sym
+      group_attribute_names = parameter_value_attribute_names.unshift(protocol_attribute_name).unshift(input_attribute_name)
 
       # grouped_samples = samples_metadata.group_by { |smd| group_attributes.map { |attr| smd[attr] } }
-      sample_groups = samples_metadata.group_by { |smd| group_attributes.map { |attr| smd[attr] }.flatten }.map { |_key, val| val }
+      sample_groups = samples_metadata.group_by { |smd| group_attribute_names.map { |attr| smd[attr] }.flatten }.map { |_key, val| val }
 
       sample_groups.map do |sample_group|
-        inputs = sample_group.first[input_attribute]
-        executed_protocol = sample_group.first[protocol_attribute]
-        parameter_values = sample_group.first.slice(*parameter_value_attributes)
-        outputs = sample_group.map { |sample| {id: sample[:id], title: sample[material_attribute] } }
+        inputs = sample_group.first[input_attribute_name]
+        executed_protocol = detect_protocol(sample_type).sample_attribute_type.seek_sop? ? sample_group.first[protocol_attribute_name] : { id: detect_protocol(sample_type)&.id, title: sample_group.first[protocol_attribute_name] }
+        parameter_values = sample_group.first.slice(*parameter_value_attribute_names)
+        outputs = sample_group.map { |sample| {id: sample[:id], title: sample[material_attribute_name] } }
         {
           inputs: inputs.map { |input| input.transform_keys!(&:to_sym) },
           executed_protocol: executed_protocol.transform_keys!(&:to_sym),
