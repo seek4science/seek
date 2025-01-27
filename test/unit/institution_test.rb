@@ -114,11 +114,19 @@ class InstitutionTest < ActiveSupport::TestCase
     i.ror_id='01f7bcy98'
     assert i.valid?
 
+    i.ror_id = ''
+    assert i.valid?
+
     i.ror_id = '1121'
     assert !i.valid?
 
     i.ror_id = '1121-1121-1121'
     assert !i.valid?
+
+    #duplicate ror_id
+    existing_institution = FactoryBot.create(:institution, ror_id: '01f7bcy98')
+    new_institution = FactoryBot.build(:institution, ror_id: existing_institution.ror_id)
+    assert_not new_institution.valid?
   end
 
   test 'test uuid generated' do

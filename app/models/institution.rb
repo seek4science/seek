@@ -6,6 +6,7 @@ class Institution < ApplicationRecord
   auto_strip_attributes :web_page
 
   validates :title, uniqueness: true
+  validates :ror_id, uniqueness: true, allow_blank: true
   validates :web_page, url: { allow_nil: true, allow_blank: true }
   validates :country, country: true
 
