@@ -6,7 +6,6 @@
 </style>
 
 <%= hidden_field_tag 'institution[id]', @institution.id %>
-<%= hidden_field_tag 'institution[title]', @institution.title %>
 
 <div class="form-group" id="combined_typeahead">
   <div class="help-block">
@@ -25,7 +24,7 @@
 
   <label class="control-label">Type the name of the <%= t('institution'.downcase) %> </label><span class="required">*</span>
   <%= link_to "Clear Fields", "#", id: "clear-fields", class: "link-primary small" %>
-  <%= text_field_tag :institution_name, nil, placeholder: "Search...", class: "typeahead form-control" %>
+  <%= text_field_tag 'institution[title]', nil, placeholder: "Search...", class: "typeahead form-control" %>
   <small id="new_institution_reminder" style="display: none; color:darkred; ">
     This institution is not in <%= Seek::Config.instance_name %>. You will create this new institution along with your project.
   </small>

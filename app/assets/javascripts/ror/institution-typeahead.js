@@ -134,7 +134,6 @@ function initializeLocalInstitutions(endpoint = '/institutions/typeahead.json', 
 
 function clearInstitutionFields() {
     $j('#institution_title').val('');
-    $j('#institution_name').val('');
     $j('#institution_id').val('');
     $j('#institution_ror_id').val('');
     $j('#institution_city').val('');
@@ -153,7 +152,7 @@ $j(document).ready(function () {
     });
 
     // if the institution title is not selected from the local list or ROR, but entered manually by user
-    $j('#institution_name').on('change', function () {
+    $j('#institution_title').on('change', function () {
         const inputValue = $j(this).val();
         $j('#institution_title').val(inputValue);
         checkSubmitButtonEnabled();
