@@ -25,7 +25,7 @@
 
   <label class="control-label">Type the name of the <%= t('institution'.downcase) %> </label><span class="required">*</span>
   <%= link_to "Clear Fields", "#", id: "clear-fields", class: "link-primary small" %>
-  <%= text_field_tag :institution_name, nil, placeholder: "Search...", class: "typeahead form-control institution-user-input" %>
+  <%= text_field_tag :institution_name, nil, placeholder: "Search...", class: "typeahead form-control" %>
   <small id="new_institution_reminder" style="display: none; color:darkred; ">
     This institution is not in <%= Seek::Config.instance_name %>. You will create this new institution along with your project.
   </small>
@@ -35,22 +35,22 @@
   <label class="control-label">ROR ID</label>    <%= link_to(image('ror_id', title: 'ROR'), 'https://ror.org/', target: '_blank') %>
   <%= help_icon('The ROR ID (Research Organization Registry Identifier) is a unique 9-character alphanumeric code (e.g., 01f7bcy98).
    To find out more and get your ORCID ID please visit https://ror.org/') -%>
-  <%= text_field_tag 'institution[ror_id]', @institution.ror_id, class: "form-control institution-user-input" %>
+  <%= text_field_tag 'institution[ror_id]', @institution.ror_id, class: "form-control" %>
 </div>
 
 <div class="form-group">
   <label class="control-label">Website</label>
-  <%= text_field_tag('institution[web_page]', @institution.web_page, class:'form-control institution-user-input') %>
+  <%= text_field_tag('institution[web_page]', @institution.web_page, class:'form-control') %>
 </div>
 
 <div class="form-group">
   <label class="control-label">City</label>
-  <%= text_field_tag('institution[city]', @institution.city, class:'form-control institution-user-input') %>
+  <%= text_field_tag('institution[city]', @institution.city, class:'form-control') %>
 </div>
 
 <div class="form-group">
   <label class="control-label">Country</label>
-  <%= text_field_tag 'institution[country]', @institution.nil? ? '' : CountryCodes.country(@institution.country), class: "form-control institution-user-input" %>
+  <%= text_field_tag 'institution[country]', @institution.nil? ? '' : CountryCodes.country(@institution.country), class: "form-control" %>
 </div>
 
 

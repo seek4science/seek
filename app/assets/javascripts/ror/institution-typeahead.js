@@ -2,7 +2,13 @@ var ROR_API_URL = "https://api.ror.org/organizations";
 
 
 function toggleUserInput(disabled) {
-    $j(".institution-user-input").prop('disabled',disabled);
+    const action = disabled ? 'addClass' : 'removeClass';
+    $j('#institution_title')[action]('institution-input-disable');
+    $j('#institution_city')[action]('institution-input-disable');
+    $j('#institution_country')[action]('institution-input-disable');
+    $j('#institution_ror_id')[action]('institution-input-disable');
+    $j('#institution_web_page')[action]('institution-input-disable');
+    $j('.tt-input')[action]('institution-input-disable');
 }
 
 function extractRorId(rorUrl) {
@@ -37,6 +43,7 @@ function fetchRorData(rorId) {
             $j('#ror-error-message').text('').hide();
             $j('#institution_ror_id').removeClass("field_with_errors");
             $j("#ror-error-message").closest(".form-group").removeClass("field_with_errors");
+            toggleUserInput(true);
         })
         .catch(error => {
             $j('#ror-error-message').text(error.message).show();
@@ -126,6 +133,7 @@ function clearInstitutionFields() {
     $j('#institution_city').val('');
     $j('#institution_country').val('');
     $j('#institution_web_page').val('');
+    $j('#institution_address').val('');
 }
 
 
@@ -231,7 +239,6 @@ $j(document).ready(function () {
         }
         toggleUserInput(true);
         checkSubmitButtonEnabled()
-        $j('.tt-input').addClass('tt-input-disable');
     });
 
     $j('#ror_query_name .typeahead').bind('typeahead:select', function (ev, suggestion) {
@@ -240,6 +247,7 @@ $j(document).ready(function () {
         $j('#institution_country').val(suggestion.country.country_name);
         $j('#institution_ror_id').val(extractRorId(suggestion.id));
         $j('#institution_web_page').val(suggestion.links[0]);
+        toggleUserInput(true);
     });
 
     $j('#clear-fields').on('click', function(event) {
@@ -247,7 +255,6 @@ $j(document).ready(function () {
         clearInstitutionFields();
         toggleUserInput(false);
         $j('#new_institution_reminder').hide();
-        $j('.tt-input').removeClass('tt-input-disable');
     });
 
     $j('#basic #name-01').bind('change', function() {

@@ -110,9 +110,11 @@ h3 {
   color: #999
 }
 
-.tt-input-disable {
+.institution-input-disable {
   background-color: #EEEEEE !important;
+  cursor: not-allowed;
 }
+
 
 .tt-dataset{
   padding-left: 5px;
