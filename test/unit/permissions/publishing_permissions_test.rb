@@ -52,7 +52,7 @@ class PublishingPermissionsTest < ActiveSupport::TestCase
       refute item.gatekeeper_required?
 
       case item.class.name
-      when 'Study', 'Assay'
+      when 'Study', 'Assay', 'ObservationUnit'
         disable_authorization_checks { item.investigation.projects = gatekeeper.projects }
       else
         disable_authorization_checks { item.projects = gatekeeper.projects }
@@ -371,12 +371,17 @@ class PublishingPermissionsTest < ActiveSupport::TestCase
       FactoryBot.create(type, contributor: contributor, projects: contributor&.projects)
     end
 
+    #projects handled differently
     study = FactoryBot.create(:study, contributor: contributor,
                               investigation: FactoryBot.create(:investigation, projects: contributor&.projects)
     )
     assay = FactoryBot.create(:assay, contributor: contributor, study:
       FactoryBot.create(:study, contributor: contributor, investigation: FactoryBot.create(:investigation, projects: contributor&.projects))
     )
-    items | [study, assay]
+    obs_unit = FactoryBot.create(:observation_unit, contributor: contributor, policy: FactoryBot.create(:private_policy), study:
+      FactoryBot.create(:study, contributor: contributor, investigation: FactoryBot.create(:investigation, projects: contributor&.projects))
+    )
+    items | [study, assay, obs_unit]
+    [obs_unit]
   end
 end
