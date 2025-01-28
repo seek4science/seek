@@ -378,7 +378,7 @@ class PublishingPermissionsTest < ActiveSupport::TestCase
     assay = FactoryBot.create(:assay, contributor: contributor, study:
       FactoryBot.create(:study, contributor: contributor, investigation: FactoryBot.create(:investigation, projects: contributor&.projects))
     )
-    obs_unit = FactoryBot.create(:observation_unit, contributor: contributor, policy: FactoryBot.create(:private_policy), study:
+    obs_unit = FactoryBot.create(:observation_unit, contributor: contributor, study:
       FactoryBot.create(:study, contributor: contributor, investigation: FactoryBot.create(:investigation, projects: contributor&.projects))
     )
     items | [study, assay, obs_unit]
