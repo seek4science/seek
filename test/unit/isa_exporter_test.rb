@@ -127,8 +127,9 @@ class IsaExporterTest < ActionController::TestCase
     measurement_assay = assay_stream.child_assays.detect { |assay| assay.title.include? "Measurement" }
     measurement_assay_sample_type = measurement_assay.sample_type
     0.upto(10) do |i|
+      protocol_name = i%3 == 0 ? "Measurement protocol 1" : "Measurement protocol 2"
       FactoryBot.create(:sample, title: "Measurement #{i}", contributor: person, sample_type: measurement_assay_sample_type, project_ids: [study.projects.first.id],
-                         data: { 'File Name': "Measurement #{i}", Input: "Extract #{i}", 'Protocol Assay 2': "Measurement protocol", 'Assay 2 parameter value 1': "Measurement #{i} Parameter 1", 'Data file comment 1': "Measurement #{i} comment 1" })
+                         data: { 'File Name': "Measurement #{i}", Input: "Extract #{i}", 'Protocol Assay 2': protocol_name, 'Assay 2 parameter value 1': "Measurement #{i} Parameter 1", 'Data file comment 1': "Measurement #{i} comment 1" })
     end
 
     isa = JSON.parse(IsaExporter::Exporter.new(investigation, person.user).export)
@@ -141,7 +142,20 @@ class IsaExporterTest < ActionController::TestCase
     assert_equal isa['studies'][0]['assays'].count, 1
 
     # check the study protocols
+    # Study holds a registered SOP as protocol. All samples use the "Sample collection protocol".
+    # The pre-treatment assay has free text to describe the protocol. All samples use the "Pre-treatment protocol".
+    # The extraction assay has free text to describe the protocol. All samples use the "Extraction protocol".
+    # The measurement assay has free text to describe the protocol. Some samples use the "Measurement protocol 1", while others use "Measurement protocol 2".
+    # This gives a total of 5 protocols.
     protocols = isa['studies'][0]['protocols']
-    assert_equal protocols.count, 4
+    assert_equal protocols.count, 5
+
+    # check the parameters
+    parameter_attributes = [sample_collection_sample_type, pre_treatment_sample_type, extraction_assay_sample_type, measurement_assay_sample_type].map do |sample_type|
+       sample_type.sample_attributes.select { |sa| sa.isa_tag&.isa_parameter_value? }.map(&:title)
+    end.flatten.compact.uniq
+    isa_parameters = protocols.map { |protocol| protocol['parameters'] }.flatten.compact.map { |parameter| parameter['parameterName']['annotationValue'] }.compact.uniq
+    assert_equal isa_parameters.count, parameter_attributes.count
+    assert parameter_attributes.all? { |title| isa_parameters.include? title }
   end
 end
