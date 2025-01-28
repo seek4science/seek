@@ -33,14 +33,6 @@ class ObservationUnit < ApplicationRecord
     [contributor]
   end
 
-  def is_in_isa_publishable?
-    false
-  end
-
-  def can_publish?
-    false
-  end
-
   def related_people
     (creators + contributors).compact.uniq
   end
