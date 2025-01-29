@@ -606,7 +606,7 @@ SEEK::Application.routes.draw do
       get :reject_activation_confirmation
       get :storage_report
     end
-    resources :people, :projects, :institutions, :investigations, :studies, :assays, :samples,
+    resources :people, :projects, :institutions, :investigations, :studies, :assays, :observation_units, :samples,
               :data_files, :models, :sops, :workflows, :presentations, :documents, :events, :publications, :organisms, :human_diseases, :collections, only: [:index]
     concerns :has_dashboard, controller: :programme_stats
   end
