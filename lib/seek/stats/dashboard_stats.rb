@@ -95,7 +95,7 @@ module Seek
       end
 
       def scoped_isa
-        @isa ||= Investigation.all + Study.all + Assay.all
+        @isa ||= Investigation.all + Study.all + Assay.all + ObservationUnit.all
       end
 
       def project_scope
