@@ -2140,7 +2140,7 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal 0, policy.permissions.count
   end
 
-  test 'should return sops only linked to studies or assays' do
+  test 'dynamic table typeahead should return sops only linked to studies or assays' do
     person = FactoryBot.create(:person)
     project = person.projects.first
     study_sops = (1..10).collect.each { |i| FactoryBot.create(:sop, contributor: person, projects: [project], title: "My study level protocol nr. #{i}") }
@@ -2157,13 +2157,13 @@ class SopsControllerTest < ActionController::TestCase
 
     # No query
     # Should only return 10 sops linked to study
-    get :dt_typeahead, params: { study_id: study.id }, format: :json
+    get :dynamic_table_typeahead, params: { study_id: study.id }, format: :json
     results = JSON.parse(response.body)['results']
     assert_equal results.count, 10
 
     # Query '1'
     # Should return 2 sops linked to study: nr. 1 and 10
-    get :dt_typeahead, params: { study_id: study.id, query: '1' }, format: :json
+    get :dynamic_table_typeahead, params: { study_id: study.id, query: '1' }, format: :json
     results = JSON.parse(response.body)['results']
     assert_equal results.count, 2
 
@@ -2175,13 +2175,13 @@ class SopsControllerTest < ActionController::TestCase
 
     # Query 'assay'
     # Should return 5 sops linked to assay: nr. 16 to 20
-    get :dt_typeahead, params: { assay_id: assay.id, query: 'assay' }, format: :json
+    get :dynamic_table_typeahead, params: { assay_id: assay.id, query: 'assay' }, format: :json
     results = JSON.parse(response.body)['results']
     assert_equal results.count, 5
 
     # Query '12'
     # Should return 0 sops linked to assay
-    get :dt_typeahead, params: { assay_id: assay.id, query: '12' }, format: :json
+    get :dynamic_table_typeahead, params: { assay_id: assay.id, query: '12' }, format: :json
     results = JSON.parse(response.body)['results']
     assert_equal results.count, 0
   end

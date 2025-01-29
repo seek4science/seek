@@ -53,7 +53,7 @@ const objectInputTemp = '<input type="hidden" name="_NAME_[]" id="inpt-_NAME_" v
 
 const typeaheadSamplesUrl = "<%= typeahead_samples_path(linked_sample_type_id: '_LINKED_') %>";
 const typeaheadCVUrl = "<%= typeahead_sample_controlled_vocabs_path(scv_id: '_CVID_') %>";
-const typeaheadSopsUrl = "<%= dt_typeahead_sops_path(study_id: '__STUDY_ID__', assay_id: '__ASSAY_ID__') %>";
+const typeaheadSopsUrl = "<%= dynamic_table_typeahead_sops_path(study_id: '__STUDY_ID__', assay_id: '__ASSAY_ID__') %>";
 const typeaheadDataFilesUrl = "<%= typeahead_data_files_path %>";
 const typeaheadStrainsUrl = "<%= typeahead_strains_path %>";
 

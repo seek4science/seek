@@ -56,7 +56,7 @@ class SopsController < ApplicationController
     end
   end
 
-  def dt_typeahead
+  def dynamic_table_typeahead
     return if params[:study_id].blank? && params[:assay_id].blank?
 
     query = params[:query] || ''
