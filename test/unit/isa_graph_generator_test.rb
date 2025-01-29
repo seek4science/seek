@@ -179,13 +179,13 @@ class ISAGraphGeneratorTest < ActiveSupport::TestCase
   end
 
   test 'aggregated_children' do
-    assert_equal 5, Seek::IsaGraphGenerator::MIN_AGGREGATED_CHILDREN
+    assert_equal 5, Seek::ISAGraphGenerator::MIN_AGGREGATED_CHILDREN
     person = FactoryBot.create(:person)
     samples = FactoryBot.create_list(:sample, 6, contributor: person)
     obs_unit = FactoryBot.create(:observation_unit, contributor: person, samples: samples)
     assert_equal 6, obs_unit.samples.count
 
-    generator = Seek::IsaGraphGenerator.new(obs_unit)
+    generator = Seek::ISAGraphGenerator.new(obs_unit)
     result = generator.generate(parent_depth: nil)
 
     assert_equal 3, result[:edges].count
@@ -200,7 +200,7 @@ class ISAGraphGeneratorTest < ActiveSupport::TestCase
     obs_unit = FactoryBot.create(:observation_unit, contributor: person, samples: samples)
     assert_equal 5, obs_unit.samples.count
 
-    generator = Seek::IsaGraphGenerator.new(obs_unit)
+    generator = Seek::ISAGraphGenerator.new(obs_unit)
     result = generator.generate(parent_depth: nil)
 
     assert_equal 7, result[:edges].count
