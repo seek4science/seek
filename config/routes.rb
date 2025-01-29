@@ -532,6 +532,9 @@ SEEK::Application.routes.draw do
   end
 
   resources :sops, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions, :asset, :explorable_spreadsheet] do
+    collection do
+      get :dynamic_table_typeahead
+    end
     resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :workflows, :collections, only: [:index]
   end
 
