@@ -27,9 +27,11 @@
     when Investigation
       children = item.studies
     when Study
-      children = item.assays
+      children = item.assays + item.observation_units
     when Assay
       children = item.assets
+    when ObservationUnit
+      children = item.data_files
     end
   end
 -%>
