@@ -885,6 +885,7 @@ class AssaysControllerTest < ActionController::TestCase
                                             access_type: Policy::NO_ACCESS,
                                             permissions: [FactoryBot.create(:permission, contributor: proj, access_type: Policy::EDITING)]))
     get :edit, params: { id: assay.id }
+    assert_response :success
   end
 
   test "should create sharing permissions 'with your project and with all SysMO members'" do
