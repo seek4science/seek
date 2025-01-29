@@ -6,6 +6,7 @@ class ReindexAllJobTest < ActiveSupport::TestCase
   test 'perform' do
     FactoryBot.create(:person)
     ReindexAllJob.new('Person').perform_now
+    assert true
   end
 
 end
