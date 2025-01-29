@@ -244,7 +244,7 @@ $j(document).ready(function () {
             $j('#institution_web_page').val(data.links[0]);
         }
         toggleUserInput(true);
-        checkSubmitButtonEnabled()
+        checkSubmitButtonEnabled();
     });
 
     $j('#ror_query_name .typeahead').bind('typeahead:select', function (ev, suggestion) {
@@ -260,11 +260,12 @@ $j(document).ready(function () {
         event.preventDefault();
         clearInstitutionFields();
         toggleUserInput(false);
+        checkSubmitButtonEnabled();
         $j('#new_institution_reminder').hide();
     });
 
 
-    if ($j('#institution_ror_id').val().trim() !== '') {
+    if ($j('#institution_ror_id').val()!== '') {
         toggleUserInput(true);
     }
     $j('#basic #name-01').bind('change', function() {
