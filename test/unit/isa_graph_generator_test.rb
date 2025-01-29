@@ -177,4 +177,37 @@ class ISAGraphGeneratorTest < ActiveSupport::TestCase
     assert_empty inv_pub_edges
 
   end
+
+  test 'aggregated_children' do
+    assert_equal 5, Seek::IsaGraphGenerator::MIN_AGGREGATED_CHILDREN
+    person = FactoryBot.create(:person)
+    samples = FactoryBot.create_list(:sample, 6, contributor: person)
+    obs_unit = FactoryBot.create(:observation_unit, contributor: person, samples: samples)
+    assert_equal 6, obs_unit.samples.count
+
+    generator = Seek::IsaGraphGenerator.new(obs_unit)
+    result = generator.generate(parent_depth: nil)
+
+    assert_equal 3, result[:edges].count
+    assert_equal 1, result[:edges].select { |edge| edge[1].is_a?(Seek::ObjectAggregation) }.count
+    assert_equal 0, result[:edges].select { |edge| edge[1].is_a?(Sample) }.count
+    assert_equal 4, result[:nodes].count
+    assert_equal 1, result[:nodes].select { |node| node.object.is_a?(Seek::ObjectAggregation) }.count
+    assert_equal 0, result[:nodes].select { |node| node.object.is_a?(Sample) }.count
+
+    #below threshold
+    samples = FactoryBot.create_list(:sample, 5, contributor: person)
+    obs_unit = FactoryBot.create(:observation_unit, contributor: person, samples: samples)
+    assert_equal 5, obs_unit.samples.count
+
+    generator = Seek::IsaGraphGenerator.new(obs_unit)
+    result = generator.generate(parent_depth: nil)
+
+    assert_equal 7, result[:edges].count
+    assert_equal 0, result[:edges].select { |edge| edge[1].is_a?(Seek::ObjectAggregation) }.count
+    assert_equal 5, result[:edges].select { |edge| edge[1].is_a?(Sample) }.count
+    assert_equal 8, result[:nodes].count
+    assert_equal 0, result[:nodes].select { |node| node.object.is_a?(Seek::ObjectAggregation) }.count
+    assert_equal 5, result[:nodes].select { |node| node.object.is_a?(Sample) }.count
+  end
 end

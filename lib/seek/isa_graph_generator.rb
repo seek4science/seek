@@ -51,6 +51,8 @@ module Seek
   end
 
   class ISAGraphGenerator
+    MIN_AGGREGATED_CHILDREN = 5
+	
     def initialize(object)
       @object = object
     end
@@ -126,11 +128,15 @@ module Seek
         associations(object)[:aggregated_children].each do |type, method|
           associations = resolve_association(object, method)
           next unless associations.any?
-          agg = Seek::ObjectAggregation.new(object, type, associations)
-          agg_node = Seek::ISAGraphNode.new(agg)
-          agg_node.can_view = true
-          nodes << agg_node
-          edges << [object, agg]
+          if associations.count > MIN_AGGREGATED_CHILDREN
+            agg = Seek::ObjectAggregation.new(object, type, associations)
+            agg_node = Seek::ISAGraphNode.new(agg)
+            agg_node.can_view = true
+            nodes << agg_node
+            edges << [object, agg]
+          else
+            children |= associations
+          end
         end
       end
 
@@ -196,13 +202,7 @@ module Seek
         {
           children: %i[data_files models sops publications documents placeholders],
           parents: [:study],
-          # related: [:publications],
           aggregated_children: { samples: :samples }
-          # data_files: :data_files,
-          # models: :models,
-          # sops: :sops,
-          # documents: :documents,
-          # publications: :publications
         }
       when Publication
         {
@@ -222,7 +222,8 @@ module Seek
       when ObservationUnit
         {
           parents: %i[study],
-          related: %i[samples data_files]
+          children: %i[data_files],
+          aggregated_children: { samples: :samples }
         }
       else
         {}
