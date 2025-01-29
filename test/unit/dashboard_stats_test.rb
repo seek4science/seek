@@ -68,6 +68,8 @@ class DashboardStatsTest < ActiveSupport::TestCase
       study = FactoryBot.create(:study, investigation: investigation, contributor: person)
       Assay.delete_all
       assay = FactoryBot.create(:assay, study: study, contributor: person)
+      ObservationUnit.delete_all
+      obs_unit = FactoryBot.create(:observation_unit, study: study, contributor: person)
 
       instance_stats = Seek::Stats::DashboardStats.new
       # Reload to refresh associations
@@ -75,7 +77,7 @@ class DashboardStatsTest < ActiveSupport::TestCase
       programme_stats = Seek::Stats::ProgrammeDashboardStats.new(programme.reload)
 
       opts = [2.days.ago, 2.days.from_now, 'month']
-      types = [DataFile, Sop, Model, Publication, Presentation, Document, Workflow, Collection, Investigation, Study, Assay]
+      types = [DataFile, Sop, Model, Publication, Presentation, Document, Workflow, Collection, Investigation, Study, Assay, ObservationUnit]
 
       c = instance_stats.contributions(*opts)
       (types + [Project, Programme]).each do |t|
