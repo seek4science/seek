@@ -1838,6 +1838,17 @@ class ProjectsControllerTest < ActionController::TestCase
 
   end
 
+  test 'guided_import' do
+    prog = FactoryBot.create(:programme)
+    person = FactoryBot.create(:person_not_in_project)
+    login_as(person)
+    with_config_value(:managed_programme_id, prog.id) do
+      get :guided_import
+    end
+    assert_response :success
+    assert_select 'input#managed_programme', count:1
+  end
+
   test 'guided create with administered programmes' do
     person = FactoryBot.create(:programme_administrator)
     managed_prog = FactoryBot.create(:programme, title:'THE MANAGED ONE')

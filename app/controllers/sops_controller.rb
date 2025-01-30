@@ -56,6 +56,26 @@ class SopsController < ApplicationController
     end
   end
 
+  def dynamic_table_typeahead
+    return if params[:study_id].blank? && params[:assay_id].blank?
+
+    query = params[:query] || ''
+    asset = if params[:study_id].present?
+              Study.authorized_for('view').detect { |study| study.id.to_s == params[:study_id] }
+            else
+              Assay.authorized_for('view').detect { |assay| assay.id.to_s == params[:assay_id] }
+            end
+
+    sops = asset&.sops || []
+    filtered_sops = sops.select { |sop| sop.title&.downcase&.include?(query.downcase) }
+    items = filtered_sops.collect { |sop| { id: sop.id, text: sop.title } }
+
+    respond_to do |format|
+      format.json { render json: { results: items }.to_json }
+    end
+  end
+
+
   private
 
   def sop_params

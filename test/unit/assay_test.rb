@@ -765,7 +765,7 @@ class AssayTest < ActiveSupport::TestCase
     assay_stream = FactoryBot.create(:assay_stream, study: isa_json_compliant_study)
     assert assay_stream.is_isa_json_compliant?
 
-    isa_json_compliant_assay = FactoryBot.create(:isa_json_compliant_assay, study: isa_json_compliant_study)
+    isa_json_compliant_assay = FactoryBot.create(:isa_json_compliant_material_assay, study: isa_json_compliant_study, linked_sample_type: isa_json_compliant_study.sample_types.second)
     assert isa_json_compliant_assay.is_isa_json_compliant?
   end
 
@@ -791,9 +791,10 @@ class AssayTest < ActiveSupport::TestCase
     def_assay = FactoryBot.create(:assay, study:def_study)
     assert_nil def_assay.previous_linked_sample_type
 
-    first_isa_assay = FactoryBot.create(:isa_json_compliant_assay,
+    first_isa_assay = FactoryBot.create(:isa_json_compliant_material_assay,
                                          assay_stream: assay_stream ,
-                                         study: isa_study)
+                                         study: isa_study,
+                                         linked_sample_type: isa_study.sample_types.second)
     assert_equal first_isa_assay.previous_linked_sample_type, isa_study.sample_types.second
 
     data_file_sample_type = FactoryBot.create(:isa_assay_data_file_sample_type,
@@ -814,7 +815,7 @@ class AssayTest < ActiveSupport::TestCase
     def_assay = FactoryBot.create(:assay, study:def_study)
 
     assay_stream = FactoryBot.create(:assay_stream, study: isa_study)
-    first_isa_assay = FactoryBot.create(:isa_json_compliant_assay, study: isa_study)
+    first_isa_assay = FactoryBot.create(:isa_json_compliant_material_assay, study: isa_study, linked_sample_type: isa_study.sample_types.second, assay_stream: assay_stream)
     data_file_sample_type = FactoryBot.create(:isa_assay_data_file_sample_type,
                                               linked_sample_type: first_isa_assay.sample_type)
     second_isa_assay = FactoryBot.create(:assay,
@@ -835,7 +836,7 @@ class AssayTest < ActiveSupport::TestCase
     def_assay = FactoryBot.create(:assay, study:def_study)
 
     assay_stream = FactoryBot.create(:assay_stream, study: isa_study)
-    first_isa_assay = FactoryBot.create(:isa_json_compliant_assay, study: isa_study, assay_stream: assay_stream )
+    first_isa_assay = FactoryBot.create(:isa_json_compliant_material_assay, study: isa_study, assay_stream: assay_stream, linked_sample_type: isa_study.sample_types.second)
     data_file_sample_type = FactoryBot.create(:isa_assay_data_file_sample_type,
                                               linked_sample_type: first_isa_assay.sample_type)
     second_isa_assay = FactoryBot.create(:assay,

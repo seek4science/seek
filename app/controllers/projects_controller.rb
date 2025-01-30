@@ -104,6 +104,7 @@ class ProjectsController < ApplicationController
   end
 
   def guided_import
+    @institution = Institution.new
     respond_to do |format|
       format.html
     end
