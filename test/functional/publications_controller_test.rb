@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'minitest/mock'
 
 class PublicationsControllerTest < ActionController::TestCase
   fixtures :all
@@ -491,39 +492,43 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   test 'should filter publications by projects_id for export' do
-    skip('Needs fixing to work with the new version of RANSACK')
+    stub_request(:post, 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi')
+      .to_return(status: 200, body: File.new("#{Rails.root}/test/fixtures/files/mocking/efetch_response.txt"))
+
     p1 = FactoryBot.create(:project, title: 'OneProject')
     p2 = FactoryBot.create(:project, title: 'AnotherProject')
     list_of_publ = FactoryBot.create_list(:publication_with_author, 6)
-    FactoryBot.create( :max_publication, projects: [p1])
-    FactoryBot.create( :min_publication, projects: [p1])
-    FactoryBot.create( :publication, projects: [p2, p1])
+    FactoryBot.create(:max_publication, projects: [p1])
+    FactoryBot.create(:min_publication, projects: [p1])
+    FactoryBot.create(:publication, projects: [p2, p1])
     # project without publications
-    get :export, params: { query: { projects_id_in: [-100] } }
+    get :index, params: { filter: { project: [-100] } }, format: :enw
 
     assert_response :success
     p = assigns(:publications)
     assert_equal 0, p.length
     # project with publications
-    get :export, params: { query: { projects_id_in: [p1.id, p2.id] } }
+    get :index, params: { filter: { project: [p1.id, p2.id] } }, format: :enw
     assert_response :success
     p = assigns(:publications)
     assert_equal 3, p.length
   end
 
   test 'should filter publications sort by published date for export' do
-    skip('Needs fixing to work with the new version of RANSACK')
+    stub_request(:post, 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi')
+      .to_return(status: 200, body: File.new("#{Rails.root}/test/fixtures/files/mocking/efetch_response.txt"))
+
     FactoryBot.create_list(:publication_with_date, 6)
 
     # sort by published_date asc
-    get :export, params: { query: { s: [{ name: :published_date, dir: :asc }] } }
+    get :index, params: { order: :published_at_asc }, format: :enw
     assert_response :success
     p = assigns(:publications)
     assert_operator p[0].published_date, :<=, p[1].published_date
     assert_operator p[1].published_date, :<=, p[2].published_date
 
     # sort by published_date desc
-    get :export, params: { query: { s: [{ name: :published_date, dir: :desc }] } }
+    get :index, params: { order: :published_at_desc }, format: :enw
     assert_response :success
     p = assigns(:publications)
     assert_operator p[0].published_date, :>=, p[1].published_date
@@ -531,26 +536,49 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   test 'should filter publications by title contains for export' do
-    skip('Needs fixing to work with the new version of RANSACK')
-    FactoryBot.create_list(:publication, 6)
-    FactoryBot.create(:min_publication)
+    stub_request(:post, 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi')
+      .to_return(status: 200, body: File.new("#{Rails.root}/test/fixtures/files/mocking/efetch_response.txt"))
 
-    get :export, params: { query: { title_cont: 'A Minimal Publication' } }
+    FactoryBot.create_list(:publication, 6)
+    pub = FactoryBot.create(:min_publication)
+
+    Publication.stub(:solr_cache, -> (q) { [pub.id] }) do # Mock the search...
+      get :index, params: { filter: { query: 'A Minimal Publication' } }, format: :bibtex
+    end
     assert_response :success
     p = assigns(:publications)
     assert_equal 1, p.count
   end
 
-  test 'should filter publications by author name contains for export' do
-    skip('Needs fixing to work with the new version of RANSACK')
-    FactoryBot.create_list(:publication_with_author, 6)
-    FactoryBot.create(:max_publication)
+  test 'should get publications by author for export' do
+    stub_request(:post, 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi')
+      .to_return(status: 200, body: File.new("#{Rails.root}/test/fixtures/files/mocking/efetch_response.txt"))
 
-    # sort by published_date asc
-    get :export, params: { query: { publication_authors_last_name_cont: 'LastNonReg' } }
+    FactoryBot.create_list(:publication_with_author, 6)
+    pub = FactoryBot.create(:max_publication)
+    author = pub.publication_authors.where(last_name: 'LastReg').first
+    assert author.person
+
+    # Tests e.g. /people/123/publications
+    get :index, params: { person_id: author.person.id }, format: :enw
     assert_response :success
     p = assigns(:publications)
     assert_equal 1, p.count
+  end
+
+  test 'should not limit exported publications to current page' do
+    stub_request(:post, 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi')
+      .to_return(status: 200, body: File.new("#{Rails.root}/test/fixtures/files/mocking/efetch_response.txt"))
+
+    project = FactoryBot.create(:project, title: 'OneProject')
+    pubs = FactoryBot.create_list(:publication_with_author, 4, projects: [project])
+
+    with_config_value(:results_per_page_default, 2) do
+      get :index, params: { project_id: project.id }, format: :enw
+
+      assert_equal 4, assigns(:publications).length
+      assert_equal pubs.sort, assigns(:publications).to_a.sort
+    end
   end
 
   test 'should get edit' do

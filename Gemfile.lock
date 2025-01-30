@@ -665,10 +665,6 @@ GEM
     rainbow (3.1.1)
     raindrops (0.20.0)
     rake (13.2.1)
-    ransack (4.2.1)
-      activerecord (>= 6.1.5)
-      activesupport (>= 6.1.5)
-      i18n
     rb-fsevent (0.11.0)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
@@ -1097,7 +1093,6 @@ DEPENDENCIES
   rails-static-router
   rails_autolink
   rails_best_practices
-  ransack
   rdf-virtuoso (>= 0.2.0)
   rdoc
   recaptcha (~> 4.1.0)

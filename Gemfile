@@ -103,8 +103,6 @@ gem 'openid_connect','1.3.0'
 gem 'omniauth-rails_csrf_protection'
 gem 'omniauth-github'
 
-gem 'ransack'
-
 gem 'terser', '~> 1.1', '>= 1.1.1'
 
 
