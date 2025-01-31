@@ -3,7 +3,6 @@ require 'zenodo-client'
 
 class SnapshotsController < ApplicationController
   before_action :get_parent_resource
-  before_action :find_resource
   before_action :auth_resource, only: [:mint_doi_confirm, :mint_doi, :new, :create, :edit, :update, :export_preview, :export_submit, :destroy]
   before_action :check_resource_permitted_for_ro, only: [:new, :create]
   before_action :find_snapshot, only: [:show, :edit, :update, :mint_doi_confirm, :mint_doi, :download, :export_preview, :export_submit, :destroy]

@@ -219,7 +219,7 @@ class SnapshotsControllerTest < ActionController::TestCase
       assert snap.can_manage?(user)
       assert snap.creators.empty?
       type = snap.class.name.underscore
-      # Updating the request.path is needed so that @resource is correctly set, and the snapshots is created for the correct item in the loop
+      # Updating the request.path is needed so that @parent_resource is correctly set, and the snapshots is created for the correct item in the loop
       request.path = Seek::Util.routes.polymorphic_path([snap, :snapshots])
       # Get preview
       get :new, params: { "#{type}_id": snap.id }
