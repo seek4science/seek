@@ -11,7 +11,6 @@ gem 'sqlite3', '~> 1.4'
 
 gem 'feedjira'
 gem 'google-analytics-rails'
-gem 'hpricot', '~>0.8.2'
 gem 'libxml-ruby', '~>5.0', require: 'libxml'
 gem 'uuid', '~>2.3'
 gem 'RedCloth', '>=4.3.0'

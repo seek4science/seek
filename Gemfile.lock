@@ -331,7 +331,6 @@ GEM
     hashdiff (1.0.1)
     hashie (3.6.0)
     highline (2.0.3)
-    hpricot (0.8.6)
     htmlentities (4.3.4)
     http-accept (1.7.0)
     http-cookie (1.0.5)
@@ -517,6 +516,8 @@ GEM
     netrc (0.11.0)
     nio4r (2.7.4)
     nkf (0.2.0)
+    nokogiri (1.18.1-arm64-darwin)
+      racc (~> 1.4)
     nokogiri (1.18.1-x86_64-linux-gnu)
       racc (~> 1.4)
     nori (1.1.5)
@@ -888,6 +889,7 @@ GEM
       actionpack (>= 6.1)
       activesupport (>= 6.1)
       sprockets (>= 3.0.0)
+    sqlite3 (1.7.3-arm64-darwin)
     sqlite3 (1.7.3-x86_64-linux)
     stackprof (0.2.25)
     stringio (3.1.2)
@@ -987,6 +989,7 @@ GEM
       rubyzip (~> 2.0.0)
 
 PLATFORMS
+  arm64-darwin-24
   x86_64-linux
 
 DEPENDENCIES
@@ -1038,7 +1041,6 @@ DEPENDENCIES
   gitlab_omniauth-ldap (~> 2.2.0)
   google-analytics-rails
   handlebars_assets
-  hpricot (~> 0.8.2)
   i18n-js
   indefinite_article
   jbuilder (~> 2.7)
