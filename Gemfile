@@ -11,7 +11,6 @@ gem 'sqlite3', '~> 1.4'
 
 gem 'feedjira'
 gem 'google-analytics-rails'
-gem 'hpricot', '~>0.8.2'
 gem 'libxml-ruby', '~>5.0', require: 'libxml'
 gem 'uuid', '~>2.3'
 gem 'RedCloth', '>=4.3.0'
@@ -102,8 +101,6 @@ gem 'omniauth_openid_connect'
 gem 'openid_connect','1.3.0'
 gem 'omniauth-rails_csrf_protection'
 gem 'omniauth-github'
-
-gem 'ransack'
 
 gem 'terser', '~> 1.1', '>= 1.1.1'
 

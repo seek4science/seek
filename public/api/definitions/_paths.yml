@@ -789,6 +789,11 @@
     responses:
       "200":
         description: Success
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
       "403":
         description: Forbidden
         content:
@@ -3111,3 +3116,168 @@
         $ref: "#/components/responses/forbidden"
       "404":
         $ref: "#/components/responses/notFound"
+"/workflows/{id}/git/{version}/tree/{path}":
+  parameters:
+    - name: id
+      in: path
+      required: true
+      description: The ID of the workflow.
+      schema:
+        type: integer
+      example: 138
+    - name: version
+      in: path
+      required: true
+      description: The version number of the workflow.
+      schema:
+        type: integer
+      example: 2
+    - name: path
+      in: path
+      required: false
+      description: The path of the tree (directory) to retrieve, or omit to get the root.
+      schema:
+        type: string
+      example: "assets/images"
+  get:
+    operationId: readGitTree
+    summary: Fetch a Git tree (directory)
+    description:
+      $ref: ../descriptions/readGitTree.md
+    tags:
+      - read
+      - git
+      - workflows
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/gitTreeResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/gitTreeResponse.json
+      "403":
+        description: Forbidden
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/gitErrorResponse"
+      "404":
+        $ref: "#/components/responses/notFound"
+        description: Not found
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/gitErrorResponse"
+"/workflows/{id}/git/{version}/blob/{path}":
+  parameters:
+    - name: id
+      in: path
+      required: true
+      description: The ID of the workflow.
+      schema:
+        type: integer
+      example: 138
+    - name: version
+      in: path
+      required: true
+      description: The version number of the workflow.
+      schema:
+        type: integer
+      example: 2
+    - name: path
+      in: path
+      required: true
+      description: The path of the blob (file) to retrieve.
+      schema:
+        type: string
+      example: "assets/images/logo.png"
+  get:
+    operationId: readGitBlob
+    summary: Fetch a Git blob (file)
+    description:
+      $ref: ../descriptions/readGitBlob.md
+    tags:
+      - read
+      - git
+      - workflows
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/gitBlobResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/gitBlobResponse.json
+      "403":
+        description: Forbidden
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/gitErrorResponse"
+      "404":
+        $ref: "#/components/responses/notFound"
+        description: Not found
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/gitErrorResponse"
+"/workflows/{id}/git/{version}/download/{path}":
+  parameters:
+    - name: id
+      in: path
+      required: true
+      description: The ID of the workflow.
+      schema:
+        type: integer
+      example: 138
+    - name: version
+      in: path
+      required: true
+      description: The version number of the workflow.
+      schema:
+        type: integer
+      example: 2
+    - name: path
+      in: path
+      required: true
+      description: The path of the blob (file) to download.
+      schema:
+        type: string
+      example: "assets/images/logo.png"
+  get:
+    operationId: downloadGitBlob
+    summary: Download a Git blob (file)
+    description:
+      $ref: ../descriptions/downloadGitBlob.md
+    tags:
+      - read
+      - git
+      - workflows
+    responses:
+      "200":
+        description: Success
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+      "403":
+        description: Forbidden
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/gitErrorResponse"
+      "404":
+        $ref: "#/components/responses/notFound"
+        description: Not found
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/gitErrorResponse"
