@@ -4,7 +4,7 @@ module Seek
   module Rdf
     module RdfGeneration
       include RdfRepositoryStorage
-      include RightField
+      include Rightfield::Rightfield
       include CSVMappingsHandling
 
       def self.included(base)
@@ -14,7 +14,7 @@ module Seek
 
       def to_rdf
         rdf_graph = to_rdf_graph
-        RDF::Writer.for(:rdfxml).buffer(prefixes: ns_prefixes) do |writer|
+        RDF::Writer.for(:ttl).buffer(prefixes: ns_prefixes) do |writer|
           rdf_graph.each_statement do |statement|
             writer << statement
           end
@@ -131,7 +131,10 @@ module Seek
           'dcterms' => RDF::Vocab::DC.to_uri.to_s,
           'owl' => RDF::Vocab::OWL.to_uri.to_s,
           'foaf' => RDF::Vocab::FOAF.to_uri.to_s,
-          'sioc' => RDF::Vocab::SIOC.to_uri.to_s
+          'sioc' => RDF::Vocab::SIOC.to_uri.to_s,
+          'mixs' => 'https://w3id.org/mixs/',
+          'uniprot' => 'http://purl.uniprot.org/core/',
+          'fairbd' => 'http://fairbydesign.nl/ontology/'
         }
       end
 

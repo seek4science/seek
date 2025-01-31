@@ -1,4 +1,3 @@
-require 'seek/custom_exception'
 require 'zip'
 require 'securerandom'
 require 'json'
@@ -48,7 +47,7 @@ class ProjectsController < ApplicationController
 
   cache_sweeper :projects_sweeper, only: %i[update create destroy]
 
-  include Seek::IsaGraphExtensions
+  include Seek::ISAGraphExtensions
 
   respond_to :html, :json
 

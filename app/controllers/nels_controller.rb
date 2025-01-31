@@ -111,7 +111,7 @@ class NelsController < ApplicationController
 
   def unauthorized_response
     if action_name == 'index'
-      redirect_to @oauth_client.authorize_url
+      redirect_to @oauth_client.authorize_url, allow_other_host: true
     else
       render json: { error: 'Unauthorized',
                      message: 'Attempting to reauthenticate...',

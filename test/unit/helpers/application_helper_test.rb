@@ -100,9 +100,9 @@ class ApplicationHelperTest < ActionView::TestCase
     with_config_value :css_appended, 'fish' do
       with_config_value :css_prepended, 'apple' do
         tags = seek_stylesheet_tags 'carrot'
-        assert_includes tags, '<link rel="stylesheet" media="screen" href="/stylesheets/prepended/apple.css" />'
-        assert_includes tags, '<link rel="stylesheet" media="screen" href="/stylesheets/carrot.css" />'
-        assert_includes tags, '<link rel="stylesheet" media="screen" href="/stylesheets/appended/fish.css" />'
+        assert_includes tags, '<link rel="stylesheet" href="/stylesheets/prepended/apple.css" />'
+        assert_includes tags, '<link rel="stylesheet" href="/stylesheets/carrot.css" />'
+        assert_includes tags, '<link rel="stylesheet" href="/stylesheets/appended/fish.css" />'
         assert tags.index('fish.css') > tags.index('carrot.css')
         assert tags.index('carrot.css') > tags.index('apple.css')
         refute_equal 0, tags.index('apple.css')
@@ -403,4 +403,12 @@ class ApplicationHelperTest < ActionView::TestCase
     assert_equal "<p>&amp;&amp; &quot;&quot; &lt; &gt;\n<code>&amp;&amp;</code></p>\n", text_or_not_specified("&& \"\" < >\n```&&```\n\n", markdown: true).to_s
     assert_equal "&amp;&amp; \"\" &lt; &gt;\n```&amp;&amp;```\n\n", text_or_not_specified("&& \"\" < >\n```&&```\n\n", markdown: false).to_s
   end
+
+  test 'markdown generation allows tables without compromising HTML sanitization' do
+    assert_equal "<table><tr><td>hey</td></tr></table>\n",
+                 text_or_not_specified("<table><tr><td>hey</td></tr></table>", markdown: true).to_s
+    assert_equal "<table><tr><td>\nalert('hi');hey</td></tr></table>\n",
+                 text_or_not_specified("<table><tr><td><script>alert('hi');</script>hey</td></tr></table>", markdown: true).to_s
+  end
+
 end

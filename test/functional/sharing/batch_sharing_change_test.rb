@@ -48,9 +48,9 @@ class BatchSharingChangeTest < ActionController::TestCase
     o_assay = FactoryBot.create(:assay, study: o_study, contributor: other_user, policy: FactoryBot.create(:policy, access_type: Policy::VISIBLE))
     df = FactoryBot.create(:data_file, contributor: @user.person, assay_ids: [o_assay.id])
     assert df.can_manage?
-    assert !o_assay.can_manage?
-    assert !o_study.can_manage?
-    assert !o_inv.can_manage?
+    refute o_assay.can_manage?
+    refute o_study.can_manage?
+    refute o_inv.can_manage?
 
     # Items that can be changed should be 1 of each except events(+1), investigations(+3), studies(+2) and datafiles(+1)
     related_items_count = Seek::Util.authorized_types.length + 7
@@ -123,21 +123,25 @@ class BatchSharingChangeTest < ActionController::TestCase
 
     model = FactoryBot.create(:model, contributor: @person, projects: [@person.projects.first], policy: FactoryBot.create(:private_policy))
     df = FactoryBot.create(:data_file, contributor: @person, policy: FactoryBot.create(:private_policy))
+    obs_unit = FactoryBot.create(:observation_unit, contributor: @person, policy: FactoryBot.create(:private_policy))
 
     other_person = people(:quentin_person)
 
     # a private asset can not be viewed or downloaded by other people
-    assert !model.can_view?(other_person)
-    assert !df.can_view?(other_person)
-    assert !model.can_download?(other_person)
-    assert !df.can_download?(other_person)
-
-
+    refute model.can_view?(other_person)
+    refute df.can_view?(other_person)
+    refute obs_unit.can_view?(other_person)
+    refute model.can_download?(other_person)
+    refute df.can_download?(other_person)
+    refute obs_unit.can_download?(other_person)
+    
     params = { publish: {} }
     params[:publish][model.class.name] ||= {}
     params[:publish][model.class.name][model.id.to_s] = '1'
     params[:publish][df.class.name] ||= {}
     params[:publish][df.class.name][df.id.to_s] = '1'
+    params[:publish][obs_unit.class.name] ||= {}
+    params[:publish][obs_unit.class.name][obs_unit.id.to_s] = '1'
     params[:publish]['Banana'] = { '123': '1' } # Should be ignored
 
     # batch change sharing policy and grant other_people manage right
@@ -148,14 +152,18 @@ class BatchSharingChangeTest < ActionController::TestCase
 
     assert model.can_view?(other_person)
     assert df.can_view?(other_person)
+    assert obs_unit.can_view?(other_person)
     assert model.can_download?(other_person)
     assert df.can_download?(other_person)
+    assert obs_unit.can_download?(other_person)
 
     logout
-    assert !model.can_view?
-    assert !df.can_view?
-    assert !model.can_download?
-    assert !df.can_download?
+    refute model.can_view?
+    refute df.can_view?
+    refute obs_unit.can_view?
+    refute model.can_download?
+    refute df.can_download?
+    refute obs_unit.can_download?
 
   end
 
@@ -175,7 +183,7 @@ class BatchSharingChangeTest < ActionController::TestCase
     assert df.policy.access_type == Policy::NO_ACCESS
     assert gk_model.gatekeeper_required?
     assert gk_df.gatekeeper_required?
-    assert !df.gatekeeper_required?
+    refute df.gatekeeper_required?
 
     # Batch change sharing policy params
     params = { publish: {} }
@@ -292,7 +300,7 @@ class BatchSharingChangeTest < ActionController::TestCase
     other_persons_data_file = FactoryBot.create(:data_file, contributor: other_user.person, policy: FactoryBot.create(:policy, access_type: Policy::VISIBLE))
     assay.associate(df)
     assay.associate(other_persons_data_file)
-    assert !other_persons_data_file.can_manage?
+    refute other_persons_data_file.can_manage?
     df
   end
 

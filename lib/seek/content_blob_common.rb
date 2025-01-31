@@ -149,7 +149,7 @@ module Seek
           end
         rescue Seek::DownloadException => de
           redirect_on_error @asset_version, 'There was an error accessing the remote resource, and a local copy was not available. Please try again later when the remote resource may be available again.'
-        rescue Jerm::JermException => de
+        rescue JERM::JERMException => de
           redirect_on_error @asset_version, de.message
         end
       else
@@ -159,7 +159,7 @@ module Seek
 
     def download_jerm_asset
       project = @asset_version.projects.first
-      downloader = Jerm::DownloaderFactory.create project.title
+      downloader = JERM::DownloaderFactory.create project.title
       resource_type = @asset_version.class.name.split('::')[0] # need to handle versions, e.g. Sop::Version
       begin
         data_hash = downloader.get_remote_data @content_blob.url, project.site_username, project.site_password, resource_type
@@ -167,7 +167,7 @@ module Seek
                   filename: data_hash[:filename] || @content_blob.original_filename,
                   type: data_hash[:content_type] || @content_blob.content_type,
                   disposition: 'attachment'
-      rescue Seek::DownloadException, Jerm::JermException, SocketError, Errno::ECONNREFUSED, Errno::EHOSTUNREACH => de
+      rescue Seek::DownloadException, JERM::JERMException, SocketError, Errno::ECONNREFUSED, Errno::EHOSTUNREACH => de
         Rails.logger.info("Unable to fetch from remote: #{de.message}")
         if @content_blob.file_exists?
           send_file @content_blob.filepath,
@@ -187,7 +187,7 @@ module Seek
         stream_with(Seek::DownloadHandling::HTTPStreamer.new(@content_blob.url), info)
       when 401, 403
         # Try redirecting the user to the URL if SEEK cannot access it
-        redirect_to @content_blob.url
+        redirect_to @content_blob.url, allow_other_host: true
       when 404
         error_message = 'This item is referenced at a remote location, which is currently unavailable'
         redirected_url = polymorphic_path(@asset_version.parent, version: @asset_version.version)
@@ -228,7 +228,7 @@ module Seek
         send_file @content_blob.filepath, filename: @content_blob.original_filename, type: @content_blob.content_type, disposition: 'attachment'
       else
         flash[:error] = error_message if error_message
-        redirect_to redirected_url
+        redirect_to redirected_url, allow_other_host: true
       end
     end
 

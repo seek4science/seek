@@ -30,7 +30,7 @@ class DataFilesController < ApplicationController
 
   include Seek::Doi::Minting
 
-  include Seek::IsaGraphExtensions
+  include Seek::ISAGraphExtensions
 
   api_actions :index, :show, :create, :update, :destroy
 
@@ -294,7 +294,7 @@ class DataFilesController < ApplicationController
         end
       end
     rescue RestClient::Unauthorized
-      redirect_to @oauth_client.authorize_url
+      redirect_to @oauth_client.authorize_url, allow_other_host: true
     rescue RestClient::ResourceNotFound
       flash[:error] = 'No sample metadata available.'
 
@@ -561,7 +561,7 @@ class DataFilesController < ApplicationController
 
   def nels_oauth_session
     @oauth_session = current_user.oauth_sessions.where(provider: 'NeLS').first
-    redirect_to @oauth_client.authorize_url if !@oauth_session || @oauth_session.expired?
+    redirect_to(@oauth_client.authorize_url, allow_other_host: true) if !@oauth_session || @oauth_session.expired?
   end
 
   def rest_client

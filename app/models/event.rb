@@ -79,10 +79,10 @@ class Event < ApplicationRecord
     return unless time_zone.present? && time_zone_valid?
 
     if start_date.present? && (start_date_changed? || time_zone_changed?)
-      self.start_date = start_date.to_s(:db).in_time_zone(time_zone)
+      self.start_date = start_date.to_fs(:db).in_time_zone(time_zone)
     end
     if end_date.present? && (end_date_changed? || time_zone_changed?)
-      self.end_date = end_date.to_s(:db).in_time_zone(time_zone)
+      self.end_date = end_date.to_fs(:db).in_time_zone(time_zone)
     end
   end
 

@@ -1,5 +1,3 @@
-require 'isatab_converter'
-
 # Controller for the Single Page view
 class SinglePagesController < ApplicationController
   include Seek::AssetsCommon

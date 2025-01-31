@@ -22,12 +22,14 @@ class ObservationUnitTest < ActiveSupport::TestCase
     obs_unit = FactoryBot.create(:max_observation_unit)
     assert obs_unit.rdf_supported?
     rdf = obs_unit.to_rdf
-    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
-      assert reader.statements.count > 1
-      assert_equal RDF::URI.new("http://localhost:3000/observation_units/#{obs_unit.id}"), reader.statements.first.subject
-      type = reader.statements.detect{|s| s.predicate == RDF.type}
-      assert_equal RDF::URI('http://purl.org/ppeo/PPEO.owl#observation_unit'), type.object
+    graph = RDF::Graph.new do |graph|
+      RDF::Reader.for(:ttl).new(rdf) {|reader| graph << reader}
     end
+    assert graph.statements.count > 1
+    assert_equal RDF::URI.new("http://localhost:3000/observation_units/#{obs_unit.id}"), graph.statements.first.subject
+    type = graph.statements.detect{|s| s.predicate == RDF.type}
+    assert_equal RDF::URI('http://purl.org/ppeo/PPEO.owl#observation_unit'), type.object
+
   end
 
   test 'policy' do
@@ -111,6 +113,8 @@ class ObservationUnitTest < ActiveSupport::TestCase
     sample = FactoryBot.create(:sample, assays: [assay], contributor: obs_unit.contributor)
     refute_equal obs_unit.study, assay.study
     obs_unit.samples << sample
+    disable_authorization_checks { obs_unit.samples << sample }
+    assert_equal 1, obs_unit.samples.size
     refute obs_unit.valid?
     assert_equal 'Study must match the associated assay', obs_unit.errors.full_messages.first
 

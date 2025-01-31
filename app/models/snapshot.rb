@@ -9,7 +9,7 @@ class Snapshot < ApplicationRecord
   after_save :reindex_parent_resource
 
   # Must quack like an asset version to behave with DOI code
-  alias_attribute :parent, :resource
+  alias parent resource
   alias_attribute :parent_id, :resource_id
   alias_attribute :version, :snapshot_number
 

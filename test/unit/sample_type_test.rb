@@ -5,14 +5,14 @@ class SampleTypeTest < ActiveSupport::TestCase
   def setup
     @person = FactoryBot.create(:person)
     @project = @person.projects.first
-    @project_ids = [@project.id]
+    @projects = [@project]
   end
 
   test 'validation' do
-    sample_type = SampleType.new title: 'fish', project_ids: @project_ids, contributor: @person
+    sample_type = SampleType.new title: 'fish', projects: @projects, contributor: @person
     refute sample_type.valid?
     sample_type.errors.added?(:sample_attributes, 'must be 1 attribute')
-    sample_type.sample_attributes << FactoryBot.create(:simple_string_sample_attribute, is_title: true, sample_type: sample_type)
+    FactoryBot.create(:simple_string_sample_attribute, is_title: true, sample_type: sample_type)
 
     assert sample_type.valid?
     sample_type.title = nil
@@ -23,55 +23,55 @@ class SampleTypeTest < ActiveSupport::TestCase
 
     # needs to have a project
     sample_type = SampleType.new title: 'fish', contributor: @person
-    sample_type.sample_attributes << FactoryBot.create(:simple_string_sample_attribute, is_title: true, sample_type: sample_type)
+    FactoryBot.create(:simple_string_sample_attribute, is_title: true, sample_type: sample_type)
     refute sample_type.valid?
     sample_type.errors.added?(:projects, 'blank')
-    sample_type.projects = [@project]
+    sample_type.projects = @projects
     assert sample_type.valid?
 
     # cannot have 2 attributes with the same name
-    sample_type = SampleType.new title: 'fish', project_ids: @project_ids, contributor: @person
-    sample_type.sample_attributes << FactoryBot.create(:simple_string_sample_attribute, title: 'a', is_title: true, sample_type: sample_type)
+    sample_type = SampleType.new title: 'fish', projects: @projects, contributor: @person
+    FactoryBot.create(:simple_string_sample_attribute, title: 'a', is_title: true, sample_type: sample_type)
     assert sample_type.valid?
-    sample_type.sample_attributes << FactoryBot.create(:simple_string_sample_attribute, title: 'a', is_title: false, sample_type: sample_type)
+    FactoryBot.create(:simple_string_sample_attribute, title: 'a', is_title: false, sample_type: sample_type)
     refute sample_type.valid?
     sample_type.errors.added?(:sample_attributes, 'must be unique, there are duplicates of a')
 
     # uniqueness check should be case insensitive
-    sample_type = SampleType.new title: 'fish', project_ids: @project_ids, contributor: @person
-    sample_type.sample_attributes << FactoryBot.create(:simple_string_sample_attribute, title: 'aaa', is_title: true, sample_type: sample_type)
+    sample_type = SampleType.new title: 'fish', projects: @projects, contributor: @person
+    FactoryBot.create(:simple_string_sample_attribute, title: 'aaa', is_title: true, sample_type: sample_type)
     assert sample_type.valid?
-    sample_type.sample_attributes << FactoryBot.create(:simple_string_sample_attribute, title: 'aAA', is_title: false, sample_type: sample_type)
+    FactoryBot.create(:simple_string_sample_attribute, title: 'aAA', is_title: false, sample_type: sample_type)
     refute sample_type.valid?
     sample_type.errors.added?(:sample_attributes, 'must be unique, there are duplicates of aaa')
 
     #needs to have a contributor
-    sample_type = SampleType.new title: 'fish', project_ids: @project_ids
-    sample_type.sample_attributes << FactoryBot.create(:simple_string_sample_attribute, is_title: true, sample_type: sample_type)
+    sample_type = SampleType.new title: 'fish', projects: @projects
+    FactoryBot.create(:simple_string_sample_attribute, is_title: true, sample_type: sample_type)
     refute sample_type.valid?
     sample_type.errors.added?(:contributor, 'blank')
     sample_type.contributor = @person
     assert sample_type.valid?
 
     #contributor must belong in the same project
-    sample_type = SampleType.new title: 'fish', project_ids: @project_ids, contributor: FactoryBot.create(:person)
-    sample_type.sample_attributes << FactoryBot.create(:simple_string_sample_attribute, is_title: true, sample_type: sample_type)
+    sample_type = SampleType.new title: 'fish', projects: @projects, contributor: FactoryBot.create(:person)
+    sample_type.sample_attributes << FactoryBot.build(:simple_string_sample_attribute, is_title: true)
     refute sample_type.valid?
     sample_type.errors.added?(:base, 'associate projects that you are an active member of')
     sample_type.contributor = @person
     assert sample_type.valid?
 
     # accessor names unique
-    sample_type = SampleType.new title: 'fish', project_ids: @project_ids, contributor: @person
+    sample_type = SampleType.new title: 'fish', projects: @projects, contributor: @person
 
     # these cases were once concidered too similar and caused a key clash, but can now be handled
-    sample_type.sample_attributes << FactoryBot.create(:simple_string_sample_attribute, title: 'a+b', is_title: true, sample_type: sample_type)
+    FactoryBot.create(:simple_string_sample_attribute, title: 'a+b', is_title: true, sample_type: sample_type)
     assert sample_type.valid?
-    sample_type.sample_attributes << FactoryBot.create(:simple_string_sample_attribute, title: 'a-b', is_title: false, sample_type: sample_type)
+    FactoryBot.create(:simple_string_sample_attribute, title: 'a-b', is_title: false, sample_type: sample_type)
     assert sample_type.valid?
 
-    sample_type.sample_attributes << FactoryBot.create(:simple_string_sample_attribute, title: 'c-d', is_title: false, sample_type: sample_type)
-    sample_type.sample_attributes << FactoryBot.create(:simple_string_sample_attribute, title: 'c+d', is_title: false, sample_type: sample_type)
+    FactoryBot.create(:simple_string_sample_attribute, title: 'c-d', is_title: false, sample_type: sample_type)
+    FactoryBot.create(:simple_string_sample_attribute, title: 'c+d', is_title: false, sample_type: sample_type)
     assert sample_type.valid?
 
   end
@@ -140,7 +140,7 @@ class SampleTypeTest < ActiveSupport::TestCase
   end
 
   test 'is favouritable?' do
-    type = FactoryBot.create(:simple_sample_type, project_ids: @project_ids)
+    type = FactoryBot.create(:simple_sample_type, projects: @projects)
     assert type.is_favouritable?
   end
 
@@ -152,7 +152,7 @@ class SampleTypeTest < ActiveSupport::TestCase
   end
 
   test 'samples' do
-    sample_type = FactoryBot.create(:simple_sample_type, project_ids: @project_ids)
+    sample_type = FactoryBot.create(:simple_sample_type, projects: @projects)
     assert_empty sample_type.samples
     sample1 = FactoryBot.create :sample, sample_type: sample_type
     sample2 = FactoryBot.create :sample, sample_type: sample_type
@@ -162,11 +162,9 @@ class SampleTypeTest < ActiveSupport::TestCase
   end
 
   test 'associate sample attribute default order' do
-    sample_type = SampleType.new title: 'sample type', project_ids: @project_ids, contributor: @person
+    sample_type = SampleType.new title: 'sample type', projects: @projects, contributor: @person
     attribute1 = FactoryBot.create(:simple_string_sample_attribute, is_title: true, sample_type: sample_type)
     attribute2 = FactoryBot.create(:simple_string_sample_attribute, sample_type: sample_type)
-    sample_type.sample_attributes << attribute1
-    sample_type.sample_attributes << attribute2
     disable_authorization_checks { sample_type.save! }
 
     sample_type.reload
@@ -175,13 +173,10 @@ class SampleTypeTest < ActiveSupport::TestCase
   end
 
   test 'associate sample attribute specify order' do
-    sample_type = SampleType.new title: 'sample type', project_ids: @project_ids, contributor: @person
+    sample_type = SampleType.new title: 'sample type', projects: @projects, contributor: @person
     attribute3 = FactoryBot.create(:simple_string_sample_attribute, pos: 3, sample_type: sample_type)
     attribute2 = FactoryBot.create(:simple_string_sample_attribute, pos: 2, sample_type: sample_type)
     attribute1 = FactoryBot.create(:simple_string_sample_attribute, pos: 1, is_title: true, sample_type: sample_type)
-    sample_type.sample_attributes << attribute3
-    sample_type.sample_attributes << attribute2
-    sample_type.sample_attributes << attribute1
     disable_authorization_checks { sample_type.save! }
 
     sample_type.reload
@@ -275,23 +270,23 @@ class SampleTypeTest < ActiveSupport::TestCase
   end
 
   test 'must have one title attribute' do
-    sample_type = SampleType.new title: 'No title', project_ids: @project_ids, contributor: @person
-    sample_type.sample_attributes << FactoryBot.create(:sample_attribute, title: 'full name', sample_attribute_type: FactoryBot.create(:full_name_sample_attribute_type), required: true, is_title: false, sample_type: sample_type)
+    sample_type = SampleType.new title: 'No title', projects: @projects, contributor: @person
+    FactoryBot.create(:sample_attribute, title: 'full name', sample_attribute_type: FactoryBot.create(:full_name_sample_attribute_type), required: true, is_title: false, sample_type: sample_type)
 
     refute sample_type.valid?
-    sample_type.sample_attributes << FactoryBot.create(:sample_attribute, title: 'full name title', sample_attribute_type: FactoryBot.create(:full_name_sample_attribute_type), required: true, is_title: true, sample_type: sample_type)
+    FactoryBot.create(:sample_attribute, title: 'full name title', sample_attribute_type: FactoryBot.create(:full_name_sample_attribute_type), required: true, is_title: true, sample_type: sample_type)
     assert sample_type.valid?
 
     disable_authorization_checks { sample_type.save! }
 
-    sample_type.sample_attributes << FactoryBot.create(:sample_attribute, title: '2nd full name title', sample_attribute_type: FactoryBot.create(:full_name_sample_attribute_type), required: true, is_title: true, sample_type: sample_type)
+    FactoryBot.create(:sample_attribute, title: '2nd full name title', sample_attribute_type: FactoryBot.create(:full_name_sample_attribute_type), required: true, is_title: true, sample_type: sample_type)
     refute sample_type.valid?
   end
 
   test 'build from template' do
     default_type = SampleAttributeType.default || create_sample_attribute_type
 
-    sample_type = SampleType.new title: 'from template', project_ids: @project_ids, contributor: @person
+    sample_type = SampleType.new title: 'from template', projects: @projects, contributor: @person
     sample_type.content_blob = FactoryBot.create(:sample_type_template_content_blob)
     refute_nil sample_type.template
 
@@ -319,7 +314,7 @@ class SampleTypeTest < ActiveSupport::TestCase
   test 'build from template2' do
     default_type = create_sample_attribute_type
 
-    sample_type = SampleType.new title: 'from template', project_ids: @project_ids, contributor: @person
+    sample_type = SampleType.new title: 'from template', projects: @projects, contributor: @person
     sample_type.content_blob = FactoryBot.create(:sample_type_template_content_blob2)
     refute_nil sample_type.template
 
@@ -388,7 +383,7 @@ class SampleTypeTest < ActiveSupport::TestCase
     non_template2 = FactoryBot.create(:binary_content_blob)
 
     create_sample_attribute_type
-    sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: @project_ids, contributor: @person
+    sample_type = SampleType.new title: 'from template', uploaded_template: true, projects: @projects, contributor: @person
     sample_type.content_blob = FactoryBot.create(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     disable_authorization_checks { sample_type.save! }
@@ -401,18 +396,18 @@ class SampleTypeTest < ActiveSupport::TestCase
   test 'sample_types_matching_content_blob' do
     create_sample_attribute_type
     person = FactoryBot.create(:person)
-    sample_type = SampleType.new title: 'visible', uploaded_template: true, project_ids: person.projects.collect(&:id), contributor: person
+    sample_type = SampleType.new title: 'visible', uploaded_template: true, projects: person.projects, contributor: person
     sample_type.content_blob = FactoryBot.create(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     disable_authorization_checks { sample_type.save! }
 
-    sample_type2 = SampleType.new title: 'visible', uploaded_template: true, project_ids: person.projects.collect(&:id), contributor: person
+    sample_type2 = SampleType.new title: 'visible', uploaded_template: true, projects: person.projects, contributor: person
     sample_type2.content_blob = FactoryBot.create(:sample_type_template_content_blob2)
     sample_type2.build_attributes_from_template
     disable_authorization_checks { sample_type2.save! }
 
     # matches template but not visible
-    sample_type3 = SampleType.new title: 'hidden', uploaded_template: true, project_ids: @project_ids, contributor: @person
+    sample_type3 = SampleType.new title: 'hidden', uploaded_template: true, projects: @projects, contributor: @person
     sample_type3.content_blob = FactoryBot.create(:sample_type_template_content_blob)
     sample_type3.build_attributes_from_template
     disable_authorization_checks { sample_type3.save! }
@@ -433,7 +428,7 @@ class SampleTypeTest < ActiveSupport::TestCase
 
   test 'build samples from template' do
     create_sample_attribute_type
-    sample_type = SampleType.new title: 'from template', project_ids: @project_ids, contributor: @person
+    sample_type = SampleType.new title: 'from template', projects: @projects, contributor: @person
     sample_type.content_blob = FactoryBot.create(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     disable_authorization_checks { sample_type.save! }
@@ -455,7 +450,7 @@ class SampleTypeTest < ActiveSupport::TestCase
     with_config_value :project_admin_sample_type_restriction, false do
       User.with_current_user(@person.user) do
         create_sample_attribute_type
-        sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: @project_ids, contributor: @person
+        sample_type = SampleType.new title: 'from template', uploaded_template: true, projects: @projects, contributor: @person
         sample_type.content_blob = FactoryBot.create(:sample_type_template_content_blob)
         sample_type.build_attributes_from_template
         sample_type.save!
@@ -473,11 +468,10 @@ class SampleTypeTest < ActiveSupport::TestCase
   end
 
   test 'fix up controlled vocabs' do
-    type = FactoryBot.create(:simple_sample_type, project_ids: @project_ids)
+    type = FactoryBot.create(:simple_sample_type, projects: @projects)
     string_attribute = FactoryBot.create(:simple_string_sample_attribute, sample_type: type, title: 'string type')
     string_attribute.sample_controlled_vocab = FactoryBot.create(:apples_sample_controlled_vocab)
-    type.sample_attributes << string_attribute
-    type.sample_attributes << FactoryBot.create(:apples_controlled_vocab_attribute, sample_type: type, title: 'cv type')
+    FactoryBot.create(:apples_controlled_vocab_attribute, sample_type: type, title: 'cv type')
 
     refute type.valid?
     type.resolve_inconsistencies
@@ -492,11 +486,10 @@ class SampleTypeTest < ActiveSupport::TestCase
   end
 
   test 'fix up seek samples' do
-    type = FactoryBot.create(:simple_sample_type, project_ids: @project_ids)
+    type = FactoryBot.create(:simple_sample_type, projects: @projects)
     string_attribute = FactoryBot.create(:simple_string_sample_attribute, sample_type: type, title: 'string type')
     string_attribute.linked_sample_type = FactoryBot.create(:simple_sample_type)
-    type.sample_attributes << string_attribute
-    type.sample_attributes << FactoryBot.create(:sample_sample_attribute, sample_type: type, title: 'seek sample type')
+    FactoryBot.create(:sample_sample_attribute, sample_type: type, title: 'seek sample type')
 
     refute type.valid?
     type.resolve_inconsistencies
@@ -555,7 +548,7 @@ class SampleTypeTest < ActiveSupport::TestCase
 
   test 'linked sample type factory' do
     # test the factory, whilst setting it up
-    type = FactoryBot.create(:linked_sample_type, project_ids: @project_ids)
+    type = FactoryBot.create(:linked_sample_type, projects: @projects)
     assert_equal 2, type.sample_attributes.count
     assert_equal 'title', type.sample_attributes.first.title
     assert_equal 'patient', type.sample_attributes.last.title
@@ -644,7 +637,7 @@ class SampleTypeTest < ActiveSupport::TestCase
 
   test 'queue template generation' do
     # avoid the callback, which will automatically call queue_template_generation
-    type = FactoryBot.create(:simple_sample_type, project_ids: @project_ids)
+    type = FactoryBot.create(:simple_sample_type, projects: @projects)
     type.template_generation_task.destroy!
     type.reload
 
@@ -657,7 +650,7 @@ class SampleTypeTest < ActiveSupport::TestCase
     type_with_uploaded_template = FactoryBot.create(:simple_sample_type,
                                           content_blob: FactoryBot.create(:sample_type_template_content_blob),
                                           uploaded_template: true,
-                                          project_ids: @project_ids)
+                                          projects: @projects)
     refute type_with_uploaded_template.template_generation_task.pending?
 
     assert_no_difference('Task.count') do
@@ -690,7 +683,7 @@ class SampleTypeTest < ActiveSupport::TestCase
   test 'trigger template generation on save' do
     sample_type = nil
     assert_no_enqueued_jobs(only: SampleTemplateGeneratorJob) do
-      sample_type = FactoryBot.build(:simple_sample_type, project_ids: @project_ids)
+      sample_type = FactoryBot.build(:simple_sample_type, projects: @projects)
     end
 
     assert sample_type.valid?
@@ -720,7 +713,7 @@ class SampleTypeTest < ActiveSupport::TestCase
 
   test 'generate template' do
     SampleType.skip_callback(:save, :after, :queue_template_generation)
-    sample_type = FactoryBot.create(:simple_sample_type, project_ids: @project_ids)
+    sample_type = FactoryBot.create(:simple_sample_type, projects: @projects)
     SampleType.set_callback(:save, :after, :queue_template_generation)
 
     sample_type.generate_template
@@ -733,7 +726,7 @@ class SampleTypeTest < ActiveSupport::TestCase
 
   test 'generate template with cv, with quote in label' do
     SampleType.skip_callback(:save, :after, :queue_template_generation)
-    sample_type = FactoryBot.create(:apples_controlled_vocab_sample_type, project_ids: @project_ids)
+    sample_type = FactoryBot.create(:apples_controlled_vocab_sample_type, projects: @projects)
     sample_type.save!
     SampleType.set_callback(:save, :after, :queue_template_generation)
 
@@ -751,7 +744,7 @@ class SampleTypeTest < ActiveSupport::TestCase
 
   test 'generate template with cv, with quote in attribute name' do
     SampleType.skip_callback(:save, :after, :queue_template_generation)
-    sample_type = FactoryBot.create(:simple_sample_type, project_ids: @project_ids)
+    sample_type = FactoryBot.create(:simple_sample_type, projects: @projects)
     sample_type.sample_attributes.first.title = "With a ' in the title"
     sample_type.sample_attributes.first.save!
     sample_type.save!
@@ -767,7 +760,7 @@ class SampleTypeTest < ActiveSupport::TestCase
 
   test 'generate template with cv, with double quote in attribute name' do
     SampleType.skip_callback(:save, :after, :queue_template_generation)
-    sample_type = FactoryBot.create(:simple_sample_type, project_ids: @project_ids)
+    sample_type = FactoryBot.create(:simple_sample_type, projects: @projects)
     sample_type.sample_attributes.first.title = 'With a " in the title'
     sample_type.sample_attributes.first.save!
     sample_type.save!
@@ -903,7 +896,7 @@ class SampleTypeTest < ActiveSupport::TestCase
       attr = sample_type.sample_attributes.detect { |t| t.accessor_name == 'patient' }
       patient_sample = FactoryBot.create(:patient_sample, sample_type: attr.linked_sample_type, contributor: @person)
       sample_type.samples.create!(data: { title: 'Lib-4', patient: patient_sample.id }, sample_type: sample_type,
-                                  project_ids: @person.project_ids)
+                                  projects: @person.projects)
     end
 
     assert sample_type.valid?
@@ -935,7 +928,7 @@ class SampleTypeTest < ActiveSupport::TestCase
     # Changing "required" attribute
     User.with_current_user(@person.user) do
       sample_type.samples.create!(data: { title: 'Lib-5', patient: nil }, sample_type: sample_type,
-                                  project_ids: @person.project_ids)
+                                  projects: @person.projects)
     end
     sample_type.sample_attributes.last.required = true
     refute sample_type.valid?
@@ -972,7 +965,7 @@ class SampleTypeTest < ActiveSupport::TestCase
     # Changing sample controlled vocab
     sample_type = FactoryBot.create(:apples_controlled_vocab_sample_type, contributor: @person)
     User.with_current_user(@person.user) do
-      sample_type.samples.create!(data: { apples: 'Bramley' }, sample_type: sample_type, project_ids: @person.project_ids)
+      sample_type.samples.create!(data: { apples: 'Bramley' }, sample_type: sample_type, projects: @person.projects)
     end
 
     assert sample_type.valid?
@@ -1047,14 +1040,14 @@ class SampleTypeTest < ActiveSupport::TestCase
     template1 = FactoryBot.create(:isa_source_template)
     template2 = FactoryBot.create(:isa_sample_collection_template)
 
-    sample_type1 = FactoryBot.create(:simple_sample_type, title: 'Sample Type 1', project_ids: @project_ids, contributor: @person, template_id: template1.id)
+    sample_type1 = FactoryBot.create(:simple_sample_type, title: 'Sample Type 1', projects: @projects, contributor: @person, template_id: template1.id)
     sample_type1.create_sample_attributes_from_isa_template(template1)
     assert sample_type1.valid?
     sample_type1.sample_attributes.map do |sa|
       assert template1.template_attributes.map(&:id).include? sa.template_attribute_id
     end
 
-    sample_type2 = FactoryBot.create(:simple_sample_type, title: 'Sample Type 2', project_ids: @project_ids, contributor: @person, template_id: template2.id)
+    sample_type2 = FactoryBot.create(:simple_sample_type, title: 'Sample Type 2', projects: @projects, contributor: @person, template_id: template2.id)
     sample_type2.create_sample_attributes_from_isa_template(template2, sample_type1)
     assert sample_type2.valid?
     sample_type2.sample_attributes.map do |sa|
@@ -1063,7 +1056,7 @@ class SampleTypeTest < ActiveSupport::TestCase
   end
 
   test 'sample type is locked?' do
-    sample_type = FactoryBot.create(:simple_sample_type, project_ids: @project_ids, contributor: @person)
+    sample_type = FactoryBot.create(:simple_sample_type, projects: @projects, contributor: @person)
     refute sample_type.locked?
 
     # lock the sample type by adding a fake update task
@@ -1082,8 +1075,8 @@ class SampleTypeTest < ActiveSupport::TestCase
   # - full name and age are required and always have values
   def sample_type_with_samples
     sample_type = User.with_current_user(@person.user) do
-      sample_type = FactoryBot.create(:patient_sample_type, project_ids: @project_ids)
-      sample = Sample.new sample_type: sample_type, project_ids: @project_ids
+      sample_type = FactoryBot.create(:patient_sample_type, projects: @projects)
+      sample = Sample.new sample_type: sample_type, projects: @projects
       sample.set_attribute_value('full name', 'Fred Blogs')
       sample.set_attribute_value(:age, 22)
       sample.set_attribute_value(:weight, 12.2)
@@ -1091,14 +1084,14 @@ class SampleTypeTest < ActiveSupport::TestCase
       sample.set_attribute_value(:postcode, 'M12 9LL')
       sample.save!
 
-      sample = Sample.new sample_type: sample_type, project_ids: @project_ids
+      sample = Sample.new sample_type: sample_type, projects: @projects
       sample.set_attribute_value('full name', 'Fred Jones')
       sample.set_attribute_value(:age, 22)
       sample.set_attribute_value(:weight, 12.2)
       sample.set_attribute_value(:postcode, 'M12 9LJ')
       sample.save!
 
-      sample = Sample.new sample_type: sample_type, project_ids: @project_ids
+      sample = Sample.new sample_type: sample_type, projects: @projects
       sample.set_attribute_value('full name', 'Fred Smith')
       sample.set_attribute_value(:age, 22)
       sample.set_attribute_value(:weight, 12.2)

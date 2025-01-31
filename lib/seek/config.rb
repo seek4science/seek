@@ -107,28 +107,32 @@ module Seek
 
     def configure_exception_notification
       if exception_notification_enabled && Rails.env.production?
-        SEEK::Application.config.middleware.use ExceptionNotification::Rack,
-                                                ignore_exceptions: ['ActionDispatch::Http::Parameters::ParseError',
-                                                                    'ActionController::InvalidAuthenticityToken',
-                                                                    'ActionController::UnknownHttpMethod',
-                                                                    'ActionController::BadRequest'] + ExceptionNotifier.ignored_exceptions,
-                                                email: {
-                                                  sender_address: [noreply_sender],
-                                                  email_prefix: "[ #{instance_name} ERROR ] ",
-                                                  exception_recipients: exception_notification_recipients.nil? ? [] : exception_notification_recipients.split(/[, ]/)
-                                                },
-                                                error_grouping: error_grouping_enabled,
-                                                error_grouping_period: error_grouping_timeout,
-                                                notification_trigger: ->(exception, count) {
-                                                  # Send notifications at count = x^0, x^1, x^3, x^4... where
-                                                  # x = error_grouping_log_base
-                                                  (Math.log(count,error_grouping_log_base) % 1).zero?
-                                                }
+        ExceptionNotification.configure do |config|
+          config.ignored_exceptions = ['ActionDispatch::Http::Parameters::ParseError',
+                                      'ActionController::InvalidAuthenticityToken',
+                                      'ActionController::UnknownHttpMethod',
+                                      'ActionController::BadRequest'] | ExceptionNotifier.ignored_exceptions
+          config.error_grouping = error_grouping_enabled
+          config.error_grouping_period = error_grouping_timeout
+          config.error_grouping_cache = Rails.cache
+          config.notification_trigger = ->(exception, count) {
+            # Send notifications at count = x^0, x^1, x^3, x^4... where
+            # x = error_grouping_log_base
+            (Math.log(count, error_grouping_log_base) % 1).zero?
+          }
+          config.register_exception_notifier :email, {
+            sender_address: [noreply_sender],
+            email_prefix: "[ #{instance_name} ERROR ] ",
+            exception_recipients: exception_notification_recipients.nil? ? [] : exception_notification_recipients.split(/[, ]/)
+          }
+        end
       else
-        SEEK::Application.config.middleware.delete ExceptionNotifier
+        ExceptionNotification.configure do |config|
+          config.unregister_exception_notifier :email
+        end
       end
     rescue RuntimeError => e
-      Rails.logger.warn('Cannot update middleware with exception notification changes, server needs restarting')
+      Rails.logger.warn('Cannot update exception notification changes, server needs restarting')
     end
 
     def solr_enabled_propagate

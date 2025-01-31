@@ -45,10 +45,12 @@ class InvestigationTest < ActiveSupport::TestCase
     object = FactoryBot.create(:investigation, description: 'Big investigation')
     FactoryBot.create_list(:study, 2, contributor: object.contributor, investigation: object)
     rdf = object.to_rdf
-    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
-      assert reader.statements.count > 1
-      assert_equal RDF::URI.new("http://localhost:3000/investigations/#{object.id}"), reader.statements.first.subject
+    graph = RDF::Graph.new do |graph|
+      RDF::Reader.for(:ttl).new(rdf) {|reader| graph << reader}
     end
+    assert graph.statements.count > 1
+    assert_equal RDF::URI.new("http://localhost:3000/investigations/#{object.id}"), graph.statements.first.subject
+
   end
 
   test 'to_isatab' do
@@ -65,7 +67,7 @@ class InvestigationTest < ActiveSupport::TestCase
       assay.save!
     end
 
-    the_hash = IsaTabConverter.convert_investigation(object)
+    the_hash = ISATabConverter.convert_investigation(object)
     json = JSON.pretty_generate(the_hash)
 
     # write out to a temporary file

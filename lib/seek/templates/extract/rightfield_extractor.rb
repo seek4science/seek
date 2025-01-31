@@ -3,7 +3,7 @@ module Seek
     module Extract
       # Base class for handling of extracting and interpreting metadata from within a Rightfield Template
       class RightfieldExtractor
-        include RightField
+        include Rightfield::Rightfield
 
         attr_reader :current_user
 

@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-gem 'rails', '~> 6.1.7'
+gem 'rails', '~> 7.2.2'
 gem 'rdoc'
 
 #database adaptors
@@ -11,11 +11,10 @@ gem 'sqlite3', '~> 1.4'
 
 gem 'feedjira'
 gem 'google-analytics-rails'
-gem 'hpricot', '~>0.8.2'
-gem 'libxml-ruby', '~>2.9.0', require: 'libxml'
+gem 'libxml-ruby', '~>5.0', require: 'libxml'
 gem 'uuid', '~>2.3'
 gem 'RedCloth', '>=4.3.0'
-gem 'simple-spreadsheet-extractor', '0.18.1'
+gem 'simple-spreadsheet-extractor', '0.18.2'
 gem 'open4'
 gem 'sample-template-generator', '~>0.7'
 gem 'rmagick', '5.3.0'
@@ -41,7 +40,6 @@ gem 'rubyzip'
 gem 'equivalent-xml'
 # FIXME: Change back to "official" docsplit if this PR is ever merged: https://github.com/documentcloud/docsplit/pull/159
 gem 'docsplit', git: 'https://github.com/tuttiq/docsplit.git', ref: '6127e3912b8db94ed84dca6be5622d3d5ec0d879'
-gem 'pothoven-attachment_fu'
 gem 'exception_notification'
 gem 'fssm'
 gem 'acts-as-taggable-on'
@@ -59,9 +57,8 @@ gem 'rdf-virtuoso', '>= 0.2.0'
 gem 'terrapin'
 gem 'lograge'
 gem 'psych'
-gem 'stringio', '3.0.1.1' #locked to the default version for ruby 3.1
 gem 'validate_url'
-gem "attr_encrypted", "~> 3.0.0"
+gem "attr_encrypted"
 gem 'libreconv'
 
 # gem for BiVeS and BudHat
@@ -92,11 +89,11 @@ gem 'zenodo-client', git: 'https://github.com/seek4science/zenodo-client.git'
 gem 'unicorn-rails'
 gem 'seedbank'
 
-gem 'rspec-rails','~> 5.1'
+gem 'rspec-rails'
 
 gem 'citeproc-ruby', '~> 2.0.0'
 gem 'csl-styles', '~> 2.0.0'
-gem 'bibtex-ruby', '~> 5.1.0'
+gem 'bibtex-ruby', '~> 6.1.0'
 
 gem 'omniauth', '~> 2.1.0'
 gem 'gitlab_omniauth-ldap', '~> 2.2.0'
@@ -104,8 +101,6 @@ gem 'omniauth_openid_connect'
 gem 'openid_connect','1.3.0'
 gem 'omniauth-rails_csrf_protection'
 gem 'omniauth-github'
-
-gem 'ransack'
 
 gem 'terser', '~> 1.1', '>= 1.1.1'
 
@@ -162,6 +157,13 @@ gem 'net-ftp'
 gem 'licensee'
 
 gem "sitemap_generator", "~> 6.3"
+
+# removed from Standard in Ruby 3.4
+gem 'observer'
+gem 'abbrev'
+gem 'csv'
+gem 'nkf'
+gem 'mutex_m'
 
 group :production do
   gem 'passenger'

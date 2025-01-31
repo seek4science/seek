@@ -121,6 +121,9 @@
 	<div class="row">
 		<div class="col-md-4" style="margin-bottom:20px">
 			<button id="btn_submit" class="btn btn-primary" onclick="submit()">Query</button>
+			<div id= "sample-query-spinner">
+				<%= image("spinner") %>
+			</div>
 			<br>
 			<em id="sample-count"></em>
 		</div>
@@ -137,6 +140,7 @@
 	$j(document).ready(function () {
 		initSelect2($j('.select2'), $j('#query_samples'))
 		Samples.initTable($j('#samples-table'));
+		$j('#sample-query-spinner').hide();
 	});
 
 	$j("#template").on("change", function(){
@@ -187,7 +191,18 @@
 		$j.ajax({
 				url: "<%=query_samples_path%>",
 				method: "POST",
-				data
+				data,
+				beforeSend: function(){
+					$j('#sample-count').html("");
+					$j("#sample-query-spinner").show();
+					$j('#samples-table').html("");
+				},
+				error: function(err){
+					$j('#sample-count').html(`<b><p class="text-danger">Error [code ${err.status}]: Failed to fetch query results!</p></b>`)
+				},
+				complete: function(){
+					$j("#sample-query-spinner").hide()
+				}
 		})
 	}
 </script>

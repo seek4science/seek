@@ -35,7 +35,7 @@ class ExtendedMetadataTypesController < ApplicationController
     end
 
     uploaded_file = params[:emt_json_file]
-    @extended_metadata_type = Seek::ExtendedMetadataType::EMTExtractor.extract_extended_metadata_type(uploaded_file)
+    @extended_metadata_type = Seek::ExtendedMetadataType::ExtendedMetadataTypeExtractor.extract_extended_metadata_type(uploaded_file)
 
     if @extended_metadata_type.save
       flash[:notice] = 'Extended metadata type was successfully created.'

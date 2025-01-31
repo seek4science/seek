@@ -13,7 +13,7 @@ class SamplesController < ApplicationController
 
   before_action :auth_to_create, only: %i[new create batch_create]
 
-  include Seek::IsaGraphExtensions
+  include Seek::ISAGraphExtensions
   include Seek::Publishing::PublishingCommon
 
   api_actions :index, :show, :create, :update, :destroy, :batch_create
@@ -247,7 +247,7 @@ class SamplesController < ApplicationController
       end
     end
 
-    if params[:input_template_id].present? # linked
+    if params[:input_template_id].present? && params[:input_attribute_id].present? # linked
       input_template_attribute =
         TemplateAttribute.find(params[:input_attribute_id])
       @result = filter_linked_samples(@result, :linked_samples,
@@ -256,7 +256,7 @@ class SamplesController < ApplicationController
           template_id: params[:input_template_id] }, input_template_attribute)
     end
 
-    if params[:output_template_id].present? # linking
+    if params[:output_template_id].present? && params[:output_attribute_id].present? # linking
       output_template_attribute =
         TemplateAttribute.find(params[:output_attribute_id])
       @result = filter_linked_samples(@result, :linking_samples,

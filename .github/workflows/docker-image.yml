@@ -5,7 +5,9 @@ on:
     branches:
       - main
       - workflowhub
+      - rails-7-hacking-rebased
       - full-test-suite
+      - seek-1.16
 
   pull_request:
 

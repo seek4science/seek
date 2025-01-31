@@ -1,5 +1,5 @@
 module CommonMarker
-  class SeekHtmlRenderer < CommonMarker::HtmlRenderer
+  class SeekHTMLRenderer < CommonMarker::HtmlRenderer
     # Add `rel="nofollow"` to links.
     def link(node)
       out('<a rel="nofollow" href="', node.url.nil? ? '' : escape_href(node.url), '"')

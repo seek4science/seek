@@ -2,7 +2,7 @@ require 'json-schema'
 # singleton class for extracting Extended Metadata Type and their attributes from json files
 module Seek
   module ExtendedMetadataType
-    module EMTExtractor
+    module ExtendedMetadataTypeExtractor
       def self.extract_extended_metadata_type(file)
 
         begin
