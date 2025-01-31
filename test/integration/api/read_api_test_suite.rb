@@ -53,7 +53,7 @@ module ReadApiTestSuite
       assert_response :not_implemented
     else
       perform_jsonapi_checks
-      assert validate_json(response.body, index_response_fragment)
+      assert_nothing_raised { validate_json(response.body, index_response_fragment) }
     end
   end
 
@@ -64,13 +64,13 @@ module ReadApiTestSuite
     user_login(FactoryBot.create(:person))
     get member_url(res), headers: { 'Authorization' => read_access_auth }
     assert_response :forbidden
-    assert validate_json(response.body, '#/components/schemas/forbiddenResponse')
+    assert_nothing_raised { validate_json(response.body, '#/components/schemas/forbiddenResponse') }
   end
 
   test 'getting resource with non-existent ID should throw error' do
     get member_url(MissingItem.new(model)), headers: { 'Authorization' => read_access_auth }
     assert_response :not_found
-    assert validate_json(response.body, '#/components/schemas/notFoundResponse')
+    assert_nothing_raised { validate_json(response.body, '#/components/schemas/notFoundResponse') }
   end
 
   test 'write show example' do
