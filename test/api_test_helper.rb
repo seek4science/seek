@@ -33,7 +33,9 @@ module ApiTestHelper
     get member_url(res), as: :json, headers: { 'Authorization' => read_access_auth }
     assert_response :success
 
-    assert validate_json(response.body, "#/components/schemas/#{singular_name.camelize(:lower)}Response")
+    assert_nothing_raised do
+      validate_json(response.body, "#/components/schemas/#{singular_name.camelize(:lower)}Response")
+    end
 
     expected = template
     actual = JSON.parse(response.body)
@@ -48,7 +50,7 @@ module ApiTestHelper
 
   def api_post_test(template)
     expected = template
-    assert validate_json(template.to_json, "#/components/schemas/#{singular_name.camelize(:lower)}Post")
+    assert_nothing_raised { validate_json(template.to_json, "#/components/schemas/#{singular_name.camelize(:lower)}Post") }
 
     # debug note: responds with redirect 302 if not really logged in.. could happen if database resets and has no users
     assert_difference(-> { model.count }, 1) do
@@ -56,7 +58,7 @@ module ApiTestHelper
       assert_response :success
     end
 
-    assert validate_json(response.body, "#/components/schemas/#{singular_name.camelize(:lower)}Response")
+    assert_nothing_raised { validate_json(response.body, "#/components/schemas/#{singular_name.camelize(:lower)}Response") }
 
     actual = JSON.parse(response.body)
 
@@ -80,14 +82,14 @@ module ApiTestHelper
     assert_response :success
     expected = JSON.parse(response.body)
 
-    assert validate_json(template.to_json, "#/components/schemas/#{singular_name.camelize(:lower)}Patch")
+    assert_nothing_raised { validate_json(template.to_json, "#/components/schemas/#{singular_name.camelize(:lower)}Patch") }
 
     assert_no_difference(-> { model.count }) do
       patch member_url(resource), params: template, as: :json, headers: { 'Authorization' => write_access_auth }
       assert_response :success
     end
 
-    assert validate_json(response.body, "#/components/schemas/#{singular_name.camelize(:lower)}Response")
+    assert_nothing_raised { validate_json(response.body, "#/components/schemas/#{singular_name.camelize(:lower)}Response") }
 
     actual = JSON.parse(response.body)
 
@@ -212,11 +214,9 @@ module ApiTestHelper
       opts[:fragment] = fragment if fragment
       errors = JSON::Validator.fully_validate_json(definitions_path, json, opts)
       raise Minitest::Assertion, errors.join("\n") unless errors.empty?
-      return true
     rescue JSON::Schema::SchemaError => e
       if e.message.start_with?("Invalid fragment resolution for :fragment option")
         warn "#{fragment} is missing from API spec, skipping validation"
-        return true
       else
         raise e
       end

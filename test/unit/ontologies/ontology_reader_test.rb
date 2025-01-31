@@ -89,9 +89,8 @@ class OntologyReaderTest < ActiveSupport::TestCase
     reader = SubOntologyReader.instance
     begin
       reader.class_hierarchy
-      assert true
     rescue NotImplementedError => error
-      assert !error.nil?
+      assert error.present?
     end
   end
 end
