@@ -15,6 +15,7 @@ module Seek
   end
 
   class ObjectAggregation
+    include ActionView::Helpers::TextHelper
 
     attr_reader :object, :type, :count
 
