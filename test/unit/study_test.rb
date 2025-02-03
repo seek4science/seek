@@ -23,10 +23,12 @@ class StudyTest < ActiveSupport::TestCase
     object = FactoryBot.create(:study, description: 'My famous study')
     FactoryBot.create_list(:assay, 2, contributor: object.contributor, study: object)
     rdf = object.to_rdf
-    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
-      assert reader.statements.count > 1
-      assert_equal RDF::URI.new("http://localhost:3000/studies/#{object.id}"), reader.statements.first.subject
+    graph = RDF::Graph.new do |graph|
+      RDF::Reader.for(:ttl).new(rdf) {|reader| graph << reader}
     end
+    assert graph.statements.count > 1
+    assert_equal RDF::URI.new("http://localhost:3000/studies/#{object.id}"), graph.statements.first.subject
+
   end
 
   test 'supports extended metadata?' do
@@ -44,18 +46,20 @@ class StudyTest < ActiveSupport::TestCase
                                  }
                                })
     rdf = object.to_rdf
-    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
-      assert reader.statements.count > 1
-      assert_equal RDF::URI.new("http://localhost:3000/studies/#{object.id}"), reader.statements.first.subject
-      statement = reader.statements.detect{|s| s.subject == RDF::URI.new("http://localhost:3000/studies/#{object.id}") && s.predicate == RDF::URI("http://fairbydesign.nl/ontology/alias")}
-      assert_equal RDF::Literal('the alias'), statement.object
-
-      statement = reader.statements.detect{|s| s.subject == RDF::URI.new("http://localhost:3000/studies/#{object.id}") && s.predicate == RDF::URI("http://fairbydesign.nl/ontology/submission_alias")}
-      assert_equal RDF::Literal('the submission alias'), statement.object
-
-      statement = reader.statements.detect{|s| s.subject == RDF::URI.new("http://localhost:3000/studies/#{object.id}") && s.predicate == RDF::URI("http://fairbydesign.nl/ontology/submission_lab_name")}
-      assert_equal RDF::Literal(''), statement.object
+    graph = RDF::Graph.new do |graph|
+      RDF::Reader.for(:ttl).new(rdf) {|reader| graph << reader}
     end
+    assert graph.statements.count > 1
+    assert_equal RDF::URI.new("http://localhost:3000/studies/#{object.id}"), graph.statements.first.subject
+    statement = graph.statements.detect{|s| s.subject == RDF::URI.new("http://localhost:3000/studies/#{object.id}") && s.predicate == RDF::URI("http://fairbydesign.nl/ontology/alias")}
+    assert_equal RDF::Literal('the alias'), statement.object
+
+    statement = graph.statements.detect{|s| s.subject == RDF::URI.new("http://localhost:3000/studies/#{object.id}") && s.predicate == RDF::URI("http://fairbydesign.nl/ontology/submission_alias")}
+    assert_equal RDF::Literal('the submission alias'), statement.object
+
+    statement = graph.statements.detect{|s| s.subject == RDF::URI.new("http://localhost:3000/studies/#{object.id}") && s.predicate == RDF::URI("http://fairbydesign.nl/ontology/submission_lab_name")}
+    assert_equal RDF::Literal(''), statement.object
+
   end
 
   # only authorized people can delete a study, and a study must have no assays

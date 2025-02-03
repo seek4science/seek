@@ -328,6 +328,6 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
   # variables making the tests fragile
   def triple_count(object)
     rdf = object.to_rdf
-    RDF::Reader.for(:rdfxml).new(rdf).statements.count
+    RDF::Reader.for(:ttl).new(rdf).statements.count
   end
 end

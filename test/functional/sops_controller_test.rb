@@ -2140,6 +2140,52 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal 0, policy.permissions.count
   end
 
+  test 'dynamic table typeahead should return sops only linked to studies or assays' do
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+    study_sops = (1..10).collect.each { |i| FactoryBot.create(:sop, contributor: person, projects: [project], title: "My study level protocol nr. #{i}") }
+
+    # 5 sops unrelated to study
+    (11..15).collect.each { |i| FactoryBot.create(:sop, contributor: person, projects: [project], title: "My protocol nr. #{i}") }
+
+    # Project has a total of 15 sops
+    assert_equal project.sops.count, 15
+
+    investigation = FactoryBot.create(:investigation, contributor: person, projects: [project])
+    study = FactoryBot.create(:study, contributor: person, investigation: investigation, sops: study_sops)
+    login_as(person)
+
+    # No query
+    # Should only return 10 sops linked to study
+    get :dynamic_table_typeahead, params: { study_id: study.id }, format: :json
+    results = JSON.parse(response.body)['results']
+    assert_equal results.count, 10
+
+    # Query '1'
+    # Should return 2 sops linked to study: nr. 1 and 10
+    get :dynamic_table_typeahead, params: { study_id: study.id, query: '1' }, format: :json
+    results = JSON.parse(response.body)['results']
+    assert_equal results.count, 2
+
+    assay_sops = (16..20).collect.each { |i| FactoryBot.create(:sop, contributor: person, projects: [project], title: "My assay level protocol nr. #{i}") }
+    assay = FactoryBot.create(:assay, contributor: person, study: study, sops: assay_sops)
+
+    # Project has now a total of 20 sops
+    assert_equal project.sops.count, 20
+
+    # Query 'assay'
+    # Should return 5 sops linked to assay: nr. 16 to 20
+    get :dynamic_table_typeahead, params: { assay_id: assay.id, query: 'assay' }, format: :json
+    results = JSON.parse(response.body)['results']
+    assert_equal results.count, 5
+
+    # Query '12'
+    # Should return 0 sops linked to assay
+    get :dynamic_table_typeahead, params: { assay_id: assay.id, query: '12' }, format: :json
+    results = JSON.parse(response.body)['results']
+    assert_equal results.count, 0
+  end
+
   private
 
   def doi_citation_mock

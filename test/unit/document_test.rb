@@ -20,15 +20,16 @@ class DocumentTest < ActiveSupport::TestCase
     refute_empty object.creators
 
     rdf = object.to_rdf
-
-    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
-      assert reader.statements.count > 1
-      assert_equal RDF::URI.new("http://localhost:3000/documents/#{object.id}"), reader.statements.first.subject
-
-      #check for OPSK-1281 - where the creators weren't appearing
-      assert_includes reader.statements.collect(&:predicate),"http://jermontology.org/ontology/JERMOntology#hasCreator"
-      assert_includes reader.statements.collect(&:predicate),"http://rdfs.org/sioc/ns#has_creator"
+    graph = RDF::Graph.new do |graph|
+      RDF::Reader.for(:ttl).new(rdf) {|reader| graph << reader}
     end
+    assert graph.statements.count > 1
+    assert_equal RDF::URI.new("http://localhost:3000/documents/#{object.id}"), graph.statements.first.subject
+
+    #check for OPSK-1281 - where the creators weren't appearing
+    assert_includes graph.statements.collect(&:predicate),"http://jermontology.org/ontology/JERMOntology#hasCreator"
+    assert_includes graph.statements.collect(&:predicate),"http://rdfs.org/sioc/ns#has_creator"
+
   end
 
   test 'title trimmed' do

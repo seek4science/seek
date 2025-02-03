@@ -103,17 +103,20 @@ class ProjectTest < ActiveSupport::TestCase
     object.reload
     refute object.people.empty?
     rdf = object.to_rdf
-    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
-      assert reader.statements.count > 1
-      assert_equal RDF::URI.new("http://localhost:3000/projects/#{object.id}"), reader.statements.first.subject
-
-      #check includes the data file due to bug OPSK-1919
-      refute_nil reader.statements.detect{|s| s.object == RDF::URI.new("http://localhost:3000/data_files/#{df.id}") && s.predicate == RDF::URI("http://jermontology.org/ontology/JERMOntology#hasItem")}
-
-      #document and presentation shouldn't be present (see OPSK-1920)
-      assert_nil reader.statements.detect{|s| s.object == RDF::URI.new("http://localhost:3000/presentations/#{presentation.id}") && s.predicate == RDF::URI("http://jermontology.org/ontology/JERMOntology#hasItem")}
-      assert_nil reader.statements.detect{|s| s.object == RDF::URI.new("http://localhost:3000/documents/#{doc.id}") && s.predicate == RDF::URI("http://jermontology.org/ontology/JERMOntology#hasItem")}
+    graph = RDF::Graph.new do |graph|
+      RDF::Reader.for(:ttl).new(rdf) {|reader| graph << reader}
     end
+
+    assert graph.statements.count > 1
+    assert_equal RDF::URI.new("http://localhost:3000/projects/#{object.id}"), graph.statements.first.subject
+
+    #check includes the data file due to bug OPSK-1919
+    refute_nil graph.statements.detect{|s| s.object == RDF::URI.new("http://localhost:3000/data_files/#{df.id}") && s.predicate == RDF::URI("http://jermontology.org/ontology/JERMOntology#hasItem")}
+
+    #document and presentation shouldn't be present (see OPSK-1920)
+    assert_nil graph.statements.detect{|s| s.object == RDF::URI.new("http://localhost:3000/presentations/#{presentation.id}") && s.predicate == RDF::URI("http://jermontology.org/ontology/JERMOntology#hasItem")}
+    assert_nil graph.statements.detect{|s| s.object == RDF::URI.new("http://localhost:3000/documents/#{doc.id}") && s.predicate == RDF::URI("http://jermontology.org/ontology/JERMOntology#hasItem")}
+
   end
 
 
@@ -123,32 +126,41 @@ class ProjectTest < ActiveSupport::TestCase
 
     homepage_predicate = RDF::URI.new 'http://xmlns.com/foaf/0.1/homepage'
     found = false
-    RDF::Reader.for(:rdfxml).new(object.to_rdf) do |reader|
-      reader.each_statement do |statement|
-        next unless statement.predicate == homepage_predicate
-        found = true
-        assert statement.valid?, 'statement is not valid'
-        assert_equal RDF::Literal::AnyURI.new('http://google.com/'), statement.object
-      end
+    graph = RDF::Graph.new do |graph|
+      RDF::Reader.for(:ttl).new(object.to_rdf) {|reader| graph << reader}
     end
+
+    graph.each_statement do |statement|
+      next unless statement.predicate == homepage_predicate
+      found = true
+      assert statement.valid?, 'statement is not valid'
+      assert_equal RDF::Literal::AnyURI.new('http://google.com'), statement.object
+    end
+
     assert found, "Didn't find homepage predicate"
 
     object.web_page = ''
     found = false
-    RDF::Reader.for(:rdfxml).new(object.to_rdf) do |reader|
-      found = reader.statements.select do |statement|
-        statement.predicate == homepage_predicate
-      end.any?
+    graph = RDF::Graph.new do |graph|
+      RDF::Reader.for(:ttl).new(object.to_rdf) {|reader| graph << reader}
     end
+
+    found = graph.statements.select do |statement|
+      statement.predicate == homepage_predicate
+    end.any?
+
     refute found, 'The homepage statement should have been skipped'
 
     object.web_page = nil
     found = false
-    RDF::Reader.for(:rdfxml).new(object.to_rdf) do |reader|
-      found = reader.statements.select do |statement|
-        statement.predicate == homepage_predicate
-      end.any?
+    graph = RDF::Graph.new do |graph|
+      RDF::Reader.for(:ttl).new(object.to_rdf) {|reader| graph << reader}
     end
+
+    found = graph.statements.select do |statement|
+      statement.predicate == homepage_predicate
+    end.any?
+
     refute found, 'The homepage statement should have been skipped'
   end
 

@@ -99,15 +99,17 @@ module DynamicTableHelper
   def dt_cols(sample_type)
     attribs = sample_type.sample_attributes.map do |a|
       attribute = { title: a.title, name: sample_type.id.to_s, required: a.required, description: a.description,
-                    is_title: a.is_title }
-      attribute.merge!({ cv_id: a.sample_controlled_vocab_id }) unless a.sample_controlled_vocab_id.blank?
-      is_seek_sample = a.sample_attribute_type.seek_sample?
-      is_seek_multi_sample = a.sample_attribute_type.seek_sample_multi?
-      is_cv_list = a.sample_attribute_type.seek_cv_list?
-      cv_allows_free_text =  a.allow_cv_free_text
-      attribute.merge!({ multi_link: true, linked_sample_type: a.linked_sample_type_id }) if is_seek_multi_sample
-      attribute.merge!({ multi_link: false, linked_sample_type: a.linked_sample_type_id }) if is_seek_sample
-      attribute.merge!({ is_cv_list: true, cv_allows_free_text:}) if is_cv_list
+                    is_title: a.is_title, attribute_type: a.sample_attribute_type }
+
+      if a.sample_attribute_type&.controlled_vocab?
+        cv_allows_free_text = a.allow_cv_free_text
+        attribute.merge!({ cv_allows_free_text: cv_allows_free_text, cv_id: a.sample_controlled_vocab_id })
+      end
+
+      if a.sample_attribute_type&.seek_sample_multi? || a.sample_attribute_type&.seek_sample?
+        attribute.merge!({ multi_link: a.sample_attribute_type&.seek_sample_multi?, linked_sample_type: a.linked_sample_type_id })
+      end
+
       attribute
     end
     (dt_default_cols(sample_type.id.to_s) + attribs).flatten
