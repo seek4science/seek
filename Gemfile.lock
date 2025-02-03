@@ -331,6 +331,7 @@ GEM
     hashdiff (1.0.1)
     hashie (3.6.0)
     highline (2.0.3)
+    hpricot (0.8.6)
     htmlentities (4.3.4)
     http-accept (1.7.0)
     http-cookie (1.0.5)
@@ -767,7 +768,7 @@ GEM
       json (~> 2.3.0)
       ucf (~> 2.0.2)
       uuid (~> 2.3)
-    ro-crate (0.5.2)
+    ro-crate (0.5.3)
       addressable (>= 2.7, < 2.9)
       rubyzip (~> 2.0.0)
     rsolr (2.5.0)
@@ -1106,7 +1107,7 @@ DEPENDENCIES
   rfc-822
   rmagick (= 5.3.0)
   ro-bundle (~> 0.3.0)
-  ro-crate (~> 0.5.2)
+  ro-crate (~> 0.5.3)
   rspec-rails
   rubocop
   ruby-prof
