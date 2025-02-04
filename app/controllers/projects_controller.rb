@@ -1092,8 +1092,8 @@ class ProjectsController < ApplicationController
     @people = details.people
 
     if @institution.new_record?
-      # override with existing institution if already exists with same title, it could have been created since the request was made
-      @institution = Institution.find_by(title: @institution.title) if Institution.find_by(title: @institution.title)
+      # override with existing institution if already exists with same title or ROR ID, it could have been created since the request was made
+      @institution = Institution.find_by(ror_id: @institution.ror_id) || Institution.find_by(title: @institution.title)
     end
   end
 
