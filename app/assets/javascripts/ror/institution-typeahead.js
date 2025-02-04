@@ -235,7 +235,6 @@ $j(document).ready(function () {
         }
         else
         {
-            $j('#new_institution_reminder').show();
             $j('#institution_title').val(data.name);
             $j('#institution_ror_id').val(data.id);
             $j('#institution_city').val(data.addresses[0]['city']);
@@ -261,7 +260,6 @@ $j(document).ready(function () {
         clearInstitutionFields();
         toggleUserInput(false);
         checkSubmitButtonEnabled();
-        $j('#new_institution_reminder').hide();
     });
 
 

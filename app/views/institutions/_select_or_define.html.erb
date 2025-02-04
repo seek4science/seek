@@ -25,9 +25,6 @@
   <label class="control-label">Type the name of the <%= t('institution'.downcase) %> </label><span class="required">*</span>
   <%= link_to "Clear Fields", "#", id: "clear-fields", class: "link-primary small" %>
   <%= text_field_tag 'institution[title]', nil, placeholder: "Search...", class: "typeahead form-control" %>
-  <small id="new_institution_reminder" style="display: none; color:darkred; ">
-    This institution is not in <%= Seek::Config.instance_name %>. You will create this new institution along with your project.
-  </small>
 </div>
 
 <div class="form-group">
