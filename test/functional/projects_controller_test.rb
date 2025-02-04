@@ -2225,6 +2225,70 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
+
+  test 'request create project with an existing institution ror id or title' do
+
+    FactoryBot.create(:admin)
+    person = FactoryBot.create(:person_not_in_project)
+    login_as(person)
+    programme = FactoryBot.create(:programme)
+    institution_existing = FactoryBot.create(:max_institution)
+    with_config_value(:managed_programme_id, programme.id) do
+      params = {
+        project: { title: 'The Project', description:'description', web_page:'web_page'},
+        institution: { title: institution_existing.title},
+        programme_id: '',
+        programme: {title: 'the prog'}
+      }
+      assert_enqueued_emails(1) do
+        assert_difference('ProjectCreationMessageLog.count') do
+          assert_no_difference('Institution.count') do
+            assert_no_difference('Project.count') do
+              assert_no_difference('Programme.count') do
+                post :request_create, params: params
+              end
+            end
+          end
+        end
+      end
+
+      assert_response :success
+      assert flash[:notice]
+
+      assert_select 'p', text: /You have indicated that you are associated with #{institution_existing.title}/
+
+    end
+
+
+    with_config_value(:managed_programme_id, programme.id) do
+      params = {
+        project: { title: 'The Project', description:'description', web_page:'web_page'},
+        institution: { title: "new title", ror_id: institution_existing.ror_id},
+        programme_id: '',
+        programme: {title: 'the prog'}
+      }
+      assert_enqueued_emails(1) do
+        assert_difference('ProjectCreationMessageLog.count') do
+          assert_no_difference('Institution.count') do
+            assert_no_difference('Project.count') do
+              assert_no_difference('Programme.count') do
+                post :request_create, params: params
+              end
+            end
+          end
+        end
+      end
+
+      assert_response :success
+      assert flash[:notice]
+
+      assert_select 'p', text: /You have indicated that you are associated with #{institution_existing.title}/
+
+    end
+
+
+  end
+
   test 'request create project with new programme and institution' do
     FactoryBot.create(:admin)
     person = FactoryBot.create(:person_not_in_project)
@@ -2234,7 +2298,7 @@ class ProjectsControllerTest < ActionController::TestCase
     with_config_value(:managed_programme_id, programme.id) do
       params = {
           project: { title: 'The Project', description:'description', web_page:'web_page'},
-          institution: {id: ['the inst'], title: 'the inst', web_page: 'the page', city: 'London', country: 'GB'},
+          institution: {id: ['the inst'], title: 'the inst', ror_id: '027m9bs27', web_page: 'the page', city: 'London', country: 'GB'},
           programme_id: '',
           programme: {title: 'the prog'}
       }
@@ -2252,6 +2316,15 @@ class ProjectsControllerTest < ActionController::TestCase
 
       assert_response :success
       assert flash[:notice]
+
+      assert_select 'p', text: /You have described a new Institution with the following details:/
+      assert_select 'li', text: /Title: the inst/
+      assert_select 'li', text: /United Kingdom/
+      assert_select 'li', text: /027m9bs27/
+      assert_select 'li', text: /London/
+      assert_select 'li', text: /the page/
+
+
       log = ProjectCreationMessageLog.last
       details = log.parsed_details
 

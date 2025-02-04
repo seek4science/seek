@@ -228,7 +228,11 @@ class ProjectsController < ApplicationController
     proj_params = params.require(:project).permit([:title, :web_page, :description])
     @project = Project.new(proj_params)
 
-    @institution = Institution.find_by_id(params[:institution][:id])
+
+    @institution = Institution.find_by_id(params[:institution][:id]) ||
+      (params[:institution][:ror_id].present? && Institution.find_by(ror_id: params[:institution][:ror_id])) ||
+      Institution.find_by(title: params[:institution][:title])
+
     if @institution.nil?
       inst_params = params.require(:institution).permit([:title, :web_page, :city, :country, :ror_id])
       @institution = Institution.new(inst_params)
