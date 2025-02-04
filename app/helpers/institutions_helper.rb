@@ -4,6 +4,6 @@ module InstitutionsHelper
   end
 
   def ror_link(ror_id)
-    text_or_not_specified("https://ror.org/#{ror_id}", :external_link => true)
+    ror_id.blank? ? text_or_not_specified(nil) : link_to("https://ror.org/#{ror_id}", "https://ror.org/#{ror_id}", target: "_blank", rel: "noopener")
   end
 end
