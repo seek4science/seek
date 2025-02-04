@@ -3,6 +3,9 @@ require 'json-schema'
 module Seek
   module ExtendedMetadataType
     module ExtendedMetadataTypeExtractor
+
+      SCHEMA_PATH = Rails.root.join('lib', 'seek', 'extended_metadata_type', 'extended_metadata_type_schema.json').freeze
+
       def self.extract_extended_metadata_type(file)
 
         begin
@@ -24,10 +27,10 @@ module Seek
 
 
       def self.valid_emt_json?(json)
-        schema_path = Rails.root.join('lib', 'seek', 'extended_metadata_type', 'extended_metadata_type_schema.json')
-        raise StandardError, "The schema file is not readable!" unless File.readable?(schema_path)
 
-        schema = JSON.parse(File.read(schema_path))
+        raise StandardError, "The schema file is not readable!" unless File.readable?(SCHEMA_PATH)
+
+        schema = JSON.parse(File.read(SCHEMA_PATH))
         errors = JSON::Validator.fully_validate(schema, json)
 
         raise StandardError, "Invalid JSON file: #{errors.join(', ')}" if errors.present?
