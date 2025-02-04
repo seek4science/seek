@@ -53,7 +53,7 @@ module Seek
 
       # get more details about an annotation from the given property uri
       def annotation_details(property)
-        result = { 'property_id' => property }
+        result = Seek::FairDataStation::AnnotationDetails.new(property_id: property)
 
         query = RDF::Query.new do
           pattern [RDF::Resource.new(property), RDF::RDFS.label, :label]
@@ -62,10 +62,10 @@ module Seek
           pattern [RDF::URI.new(property), RDF::Vocab::SCHEMA.valueRequired, :required]
         end
         solution = query.execute(graph).first
-        result['label'] = solution[:label].value
-        result['description'] = solution[:description].value
-        result['pattern'] = solution[:pattern].value
-        result['required'] = solution[:required].true?
+        result.label = solution[:label].value
+        result.description = solution[:description].value
+        result.pattern = solution[:pattern].value
+        result.required = solution[:required].true?
         result
       end
 
