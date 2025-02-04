@@ -10,6 +10,11 @@ module Seek
         @pattern = attributes[:pattern]
         @required = attributes[:required]
       end
+
+      def to_extended_metadata_attribute_json
+        { 'title' => label, 'description' => description, 'pid' => property_id, 'required' => required,
+          'type' => 'String' }
+      end
     end
   end
 end
