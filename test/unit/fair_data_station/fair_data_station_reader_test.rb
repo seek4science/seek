@@ -165,4 +165,32 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
     assert_equal 0, obs_unit.datasets.count
     assert_equal 0, sample.datasets.count
   end
+
+  test 'get annotation details' do
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case.ttl"
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+
+    det = inv.annotation_details('http://fairbydesign.nl/ontology/date_of_birth')
+    assert_equal 'date of birth', det['label']
+    assert_equal 'Date of birth of subject the sample was derived from.', det['description']
+    assert_equal 'http://fairbydesign.nl/ontology/date_of_birth', det['property_id']
+    assert_equal '.+', det['pattern']
+    assert_equal false, det['required']
+
+    det = inv.annotation_details('http://gbol.life/0.1/scientificName')
+    assert_equal 'scientific name', det['label']
+    assert_equal 'Name of the organism', det['description']
+    assert_equal 'http://gbol.life/0.1/scientificName', det['property_id']
+    assert_equal '.*', det['pattern']
+    assert_equal true, det['required']
+  end
+
+  test 'get all additional_metadata_annotation_details' do
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case.ttl"
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+    study = inv.studies.first
+    details = study.additional_metadata_annotation_details
+    assert_equal 3, details.count
+    assert_equal ["end date of study", "experimental site name", "start date of study"], details.collect { |d| d['label'] }.sort
+  end
 end
