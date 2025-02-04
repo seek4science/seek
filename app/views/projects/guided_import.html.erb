@@ -39,10 +39,9 @@
 
     function checkSubmitButtonEnabled() {
         var progEnabled = <%= Seek::ProjectFormProgrammeOptions.show_programme_box? %>;
-        var enabled = $j('select#institution_id').val()
+        var enabled = $j('input#institution_title').val()
             && !progEnabled || ($j('#programme_id').val() || $j('input#programme_title').val())
-            && $j('input#project_dmp').val()
-            && $j('input#institution_title').val();
+            && $j('input#project_dmp').val();
         $j('#submit-button').prop('disabled', !enabled);
     }
 
