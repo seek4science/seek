@@ -2906,11 +2906,41 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as(person)
     project = Project.new(title:'new project')
     programme = Programme.new(title:'new programme')
-    institution = Institution.new(title:'my institution')
+    institution = Institution.new(title:'my institution', ror_id: "027m9bs27", country: "GB")
     log = ProjectCreationMessageLog.log_request(sender:FactoryBot.create(:person), programme:programme, project:project, institution:institution)
     get :administer_create_project_request, params:{message_log_id:log.id}
     assert_response :success
+    assert_select 'div.panel-body' do
+      assert_select 'div', text: /They have requested a new Institution, and provided the following details./
+    end
   end
+
+  test 'administer create request project with an existing institution ror id or title' do
+
+    person = FactoryBot.create(:admin)
+    institution_existing = FactoryBot.create(:max_institution)
+
+    login_as(person)
+    project = Project.new(title:'new project')
+    institution = Institution.new(title:'my new institution', ror_id: institution_existing.ror_id, country: "GB")
+    log = ProjectCreationMessageLog.log_request(sender:FactoryBot.create(:person), project:project, institution:institution)
+    get :administer_create_project_request, params:{message_log_id:log.id}
+
+    assert_response :success
+    assert_select 'div', text: /They wish to be associated with A Maximal Institution/
+
+    institution2 = Institution.new(title: institution_existing.title)
+    log2 = ProjectCreationMessageLog.log_request(sender:FactoryBot.create(:person), project:project, institution:institution2)
+    get :administer_create_project_request, params:{message_log_id:log2.id}
+
+    assert_response :success
+    assert_select 'div', text: /They wish to be associated with A Maximal Institution/
+
+
+  end
+
+
+
 
   test 'administer create project request, message log deleted' do
     person = FactoryBot.create(:admin)
