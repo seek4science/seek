@@ -36,7 +36,7 @@ module Seek
       end
 
       def annotations
-        @_cached_annotations ||= query_annotations
+        @annotations ||= query_annotations
       end
 
       def additional_metadata_annotations
@@ -49,6 +49,30 @@ module Seek
         annotations.detect do |ann|
           ann[0] == property
         end&.[](1)
+      end
+
+      # get more details about an annotation from the given property uri
+      def annotation_details(property)
+        result = { 'property_id' => property }
+
+        query = RDF::Query.new do
+          pattern [RDF::Resource.new(property), RDF::RDFS.label, :label]
+          pattern [RDF::Resource.new(property), RDF::Vocab::SCHEMA.description, :description]
+          pattern [RDF::URI.new(property), RDF::Vocab::SCHEMA.valuePattern, :pattern]
+          pattern [RDF::URI.new(property), RDF::Vocab::SCHEMA.valueRequired, :required]
+        end
+        solution = query.execute(graph).first
+        result['label'] = solution[:label].value
+        result['description'] = solution[:description].value
+        result['pattern'] = solution[:pattern].value
+        result['required'] = solution[:required].true?
+        result
+      end
+
+      def additional_metadata_annotation_details
+        additional_metadata_annotations.collect do |annotation|
+          annotation_details(annotation[0])
+        end
       end
 
       def pp_annotations
@@ -115,17 +139,17 @@ module Seek
         else
           linked_attributes = extended_metadata_type.attributes_with_linked_extended_metadata_type
           linked_attributes.each do |linked_attribute|
+            result = populate_seek_extended_metadata_for_property(linked_attribute.linked_extended_metadata_type, {},
+                                                                  property_id, value)
+            next if result.empty?
 
-            result = populate_seek_extended_metadata_for_property(linked_attribute.linked_extended_metadata_type, { }, property_id, value)
-            unless result.empty?
-              data[linked_attribute.accessor_name] ||= {}
-              data[linked_attribute.accessor_name].merge!(result)
-              break
-            end
+            data[linked_attribute.accessor_name] ||= {}
+            data[linked_attribute.accessor_name].merge!(result)
+            break
           end
         end
 
-        return data
+        data
       end
 
       def query_annotations
