@@ -75,10 +75,14 @@ module Seek
         end
       end
 
-      def pp_annotations
-        annotations.sort_by { |a| a[0] }.each do |pair|
-          pp "#{pair[0]} -> #{pair[1]}"
-        end
+      def to_extended_metadata_type_json
+        json = {}
+        json['title'] = "FDS #{type_name.underscore.humanize} #{UUID.generate}"
+        json['supported_type'] = type_name
+        json['enabled'] = true
+        seek_attributes = additional_metadata_annotation_details.collect(&:to_extended_metadata_attribute_json)
+        json['attributes'] = seek_attributes
+        json
       end
 
       def populate
@@ -161,6 +165,10 @@ module Seek
         query.execute.collect do |prop|
           [prop.type.to_s, prop.value.to_s]
         end
+      end
+
+      def type_name
+        self.class.name.demodulize
       end
     end
   end
