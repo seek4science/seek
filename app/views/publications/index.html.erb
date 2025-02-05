@@ -1,6 +1,8 @@
-<%= dropdown_button('Export', 'export', menu_options: { class: 'pull-right' }) do %>
-  <% Publication::EXPORT_TYPES.each do |key,value| %>
-    <li><%= image_tag_for_key(key.to_s, page_and_sort_params.merge(page: nil, format: key), nil, nil, value[:name]) -%></li>
+<% content_for :buttons do %>
+  <%= dropdown_button('Export', 'export', menu_options: { class: 'pull-right' }) do %>
+    <% Publication::EXPORT_TYPES.each do |key,value| %>
+      <li><%= image_tag_for_key(key.to_s, page_and_sort_params.merge(page: nil, format: key), nil, nil, value[:name]) -%></li>
+    <% end %>
   <% end %>
 <% end %>
 
