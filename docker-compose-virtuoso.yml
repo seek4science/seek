@@ -86,7 +86,7 @@ services:
     environment:
       DBA_PASSWORD: wibble
     volumes:
-      - seek-virtuoso-data:/data
+      - seek-virtuoso-data:/database
 
 
 volumes:
