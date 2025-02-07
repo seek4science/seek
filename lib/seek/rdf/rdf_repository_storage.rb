@@ -41,7 +41,6 @@ module Seek
                 items << klass.find(id)
               end
             rescue ActionController::RoutingError => e
-              puts e.message
               Rails.logger.info('Error determining route, probably not a resource', e)
             end
           end
