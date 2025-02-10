@@ -22,7 +22,7 @@
     If the desired <%= t('institution').downcase %> is not listed, continue typing its full name and select one from ROR.
   </div>
 
-  <label class="control-label">Type the name of the <%= t('institution'.downcase) %> </label><span class="required">*</span>
+  <label class="control-label">Type the name of the <%= t('institution').downcase %> </label><span class="required">*</span>
   <%= link_to "Clear Fields", "#", id: "clear-fields", class: "link-primary small" %>
   <%= text_field_tag 'institution[title]', nil, placeholder: "Search...", class: "typeahead form-control" %>
 </div>

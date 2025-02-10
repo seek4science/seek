@@ -1,0 +1,31 @@
+.institution-input-disable {
+    background-color: #EEEEEE !important;
+    cursor: not-allowed;
+}
+
+.tt-menu {
+    width: 422px;
+    margin: 12px 0;
+    padding: 8px 0;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid rgba(0, 0, 0, 0.11);
+    -webkit-border-radius: 8px;
+    -moz-border-radius: 8px;
+    border-radius: 8px;
+    -webkit-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+    -moz-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+    box-shadow: 0 5px 10px rgba(0,0,0,.2);
+
+
+}
+
+.league-name {
+    margin: 0 20px 5px 0px;
+    padding: 3px 6px;
+    background-color: rgba(177, 183, 187, 0.47);
+    transition: background-color 0.5s ease-in-out;
+}
+
