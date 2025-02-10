@@ -208,6 +208,7 @@ SEEK::Application.routes.draw do
       get :form_fields
       get :administer
       post :create
+      post :create_from_ttl
     end
     member do
       put :administer_update
