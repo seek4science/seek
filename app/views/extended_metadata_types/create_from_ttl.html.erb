@@ -3,3 +3,14 @@
   <%= render partial: 'preview_json', locals: {json: json} %>
 
 <% end %>
+
+<%= form_tag submit_jsons_extended_metadata_types_path, method: "post" do %>
+  <% @jsons.each do |json| %>
+    <%= hidden_field_tag 'emt_jsons[]', JSON.generate(json) %>
+  <% end %>
+
+  <%= submit_tag('Create', class:'btn btn-primary') %>
+  or
+  <%= cancel_button administer_extended_metadata_types_path %>
+
+<% end %>
