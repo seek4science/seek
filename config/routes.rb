@@ -209,6 +209,7 @@ SEEK::Application.routes.draw do
       get :administer
       post :create
       post :create_from_ttl
+      post :submit_jsons
     end
     member do
       put :administer_update

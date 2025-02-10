@@ -65,8 +65,17 @@ class ExtendedMetadataTypesController < ApplicationController
     respond_to do |format|
       format.html
     end
+  end
 
-
+  def submit_jsons
+    jsons = params['emt_jsons']
+    jsons.each do |json|
+      io = StringIO.new(json)
+      extended_metadata_type = Seek::ExtendedMetadataType::ExtendedMetadataTypeExtractor.extract_extended_metadata_type(io)
+      extended_metadata_type.save!
+    end
+    flash[:notice] = "#{jsons.length} #{t('extended_metadata_type').pluralize} were successfully created."
+    redirect_to administer_extended_metadata_types_path
   end
 
   def new

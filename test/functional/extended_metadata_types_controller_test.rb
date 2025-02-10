@@ -309,4 +309,17 @@ class ExtendedMetadataTypesControllerTest < ActionController::TestCase
     assert_select 'table.extended-metadata-type-attributes tbody tr', count: 10
   end
 
+  test 'submit jsons' do
+    person_emt = FactoryBot.create(:role_name_extended_metadata_type)
+    json1 = file_fixture('extended_metadata_type/valid_simple_emt.json').read
+    json2 = file_fixture('extended_metadata_type/valid_emt_with_linked_emt.json').read.gsub('PERSON_EMT_ID', person_emt.id.to_s)
+    person = FactoryBot.create(:admin)
+    login_as(person)
+    assert_difference('ExtendedMetadataType.count', 2) do
+      post :submit_jsons, params: { emt_jsons: [json1, json2] }
+    end
+    assert_redirected_to administer_extended_metadata_types_path
+    assert_equal '2 Extended Metadata Types were successfully created.', flash[:notice]
+  end
+
 end
