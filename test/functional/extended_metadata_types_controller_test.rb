@@ -276,4 +276,37 @@ class ExtendedMetadataTypesControllerTest < ActionController::TestCase
 
   end
 
+  # FAIR Data Station TTL
+
+  test 'none-admin cannot create from ttl' do
+    person = FactoryBot.create(:person)
+    refute person.is_admin?
+    login_as(person)
+
+    file = fixture_file_upload('fair_data_station/seek-fair-data-station-test-case.ttl', 'text/turtle')
+
+    assert_no_difference('ExtendedMetadataType.count') do
+      post :create_from_ttl, params: { emt_fds_ttl_file: file }
+    end
+    assert_redirected_to :root
+    assert_equal 'Admin rights required', flash[:error]
+  end
+
+  test 'create from ttl' do
+    person = FactoryBot.create(:admin)
+    assert person.is_admin?
+    login_as(person)
+
+    file = fixture_file_upload('fair_data_station/seek-fair-data-station-test-case.ttl', 'text/turtle')
+
+    assert_no_difference('ExtendedMetadataType.count') do
+      post :create_from_ttl, params: { emt_fds_ttl_file: file }
+    end
+    assert_response :success
+
+    assert_select 'div.panel.extended-metadata-type-preview', count: 4
+    assert_select 'table.extended-metadata-type-attributes', count: 4
+    assert_select 'table.extended-metadata-type-attributes tbody tr', count: 10
+  end
+
 end
