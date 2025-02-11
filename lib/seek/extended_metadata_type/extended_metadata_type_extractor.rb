@@ -3,6 +3,7 @@ require 'json-schema'
 module Seek
   module ExtendedMetadataType
     module ExtendedMetadataTypeExtractor
+      class ValidationError < StandardError; end;
 
       SCHEMA_PATH = Rails.root.join('lib', 'seek', 'extended_metadata_type', 'extended_metadata_type_schema.json').freeze
 
@@ -11,15 +12,10 @@ module Seek
         begin
           data_hash = JSON.parse(file.read)
         rescue JSON::ParserError => e
-          raise StandardError, "Failed to parse JSON file: #{e}"
+          raise JSON::ParserError, "Failed to parse JSON file: #{e.message}"
         end
 
-
-        begin
-          valid_emt_json?(data_hash)
-        rescue StandardError => e
-          raise StandardError,  e
-        end
+        valid_emt_json?(data_hash)
 
         create_extended_metadata_type_from_json(data_hash)
 
@@ -33,13 +29,13 @@ module Seek
         schema = JSON.parse(File.read(SCHEMA_PATH))
         errors = JSON::Validator.fully_validate(schema, json)
 
-        raise StandardError, "Invalid JSON file: #{errors.join(', ')}" if errors.present?
+        raise ValidationError, "Invalid JSON file: #{errors.join(', ')}" if errors.present?
 
       end
 
       def self.validate_attribute_type(type)
         unless SampleAttributeType.where(title: type).present?
-          raise StandardError, "The attribute type '#{type}' does not exist."
+          raise ValidationError, "The attribute type '#{type}' does not exist."
         end
       end
 
