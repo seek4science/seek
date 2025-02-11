@@ -69,12 +69,29 @@ class ExtendedMetadataTypesController < ApplicationController
 
   def submit_jsons
     jsons = params['emt_jsons']
+    failures = []
+    successes = []
     jsons.each do |json|
-      io = StringIO.new(json)
-      extended_metadata_type = Seek::ExtendedMetadataType::ExtendedMetadataTypeExtractor.extract_extended_metadata_type(io)
-      extended_metadata_type.save!
+      begin
+        extended_metadata_type = Seek::ExtendedMetadataType::ExtendedMetadataTypeExtractor.extract_extended_metadata_type(StringIO.new(json))
+        if extended_metadata_type.save
+          successes << "#{extended_metadata_type.title}(#{extended_metadata_type.supported_type})"
+        else
+          failures << "#{extended_metadata_type.title}(#{extended_metadata_type.supported_type}) - #{extended_metadata_type.errors.full_messages.join(', ')}"
+        end
+      rescue JSON::ParserError
+        failures << "Failed to parse JSON"
+      rescue StandardError => e
+        failures << e.message
+      end
     end
-    flash[:notice] = "#{jsons.length} #{t('extended_metadata_type').pluralize} were successfully created."
+    if successes.any?
+      flash[:notice] = "#{successes.count} #{t('extended_metadata_type').pluralize(successes.count)} successfully created for: #{successes.join(', ')}."
+    end
+    if failures.any?
+      flash[:error] = "#{failures.count} #{t('extended_metadata_type').pluralize(failures.count)} failed to be created: #{failures.join(', ')}."
+    end
+
     redirect_to administer_extended_metadata_types_path
   end
 
