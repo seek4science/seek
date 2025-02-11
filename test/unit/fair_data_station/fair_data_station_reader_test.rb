@@ -183,6 +183,30 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
     assert_equal 'http://gbol.life/0.1/scientificName', det.property_id
     assert_equal '.*', det.pattern
     assert_equal true, det.required
+
+    # has less complete Property descriptions
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/demo.ttl"
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+    det = inv.annotation_details('http://fairbydesign.nl/ontology/center_project_name')
+    assert_equal 'center project name', det.label
+    assert_equal '', det.description
+    assert_equal 'http://fairbydesign.nl/ontology/center_project_name', det.property_id
+    assert_equal '.+', det.pattern
+    assert_equal false, det.required
+
+    # packageName not even defined, so will resolve label from fragment or path
+    det = inv.annotation_details('http://fairbydesign.nl/ontology/packageName')
+    assert_equal 'package name', det.label
+    assert_equal '', det.description
+    assert_equal 'http://fairbydesign.nl/ontology/packageName', det.property_id
+    assert_equal '.*', det.pattern
+    assert_equal false, det.required
+    det = inv.annotation_details('http://fairbydesign.nl/ontology#packageName')
+    assert_equal 'package name', det.label
+    assert_equal '', det.description
+    assert_equal 'http://fairbydesign.nl/ontology#packageName', det.property_id
+    assert_equal '.*', det.pattern
+    assert_equal false, det.required
   end
 
   test 'get all additional_metadata_annotation_details' do
@@ -192,6 +216,13 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
     details = study.additional_metadata_annotation_details
     assert_equal 3, details.count
     assert_equal ["end date of study", "experimental site name", "start date of study"], details.collect(&:label).sort
+
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/indpensim.ttl"
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+    obs_unit = inv.studies.first.observation_units.first
+    details = obs_unit.additional_metadata_annotation_details
+    assert_equal 5, details.count
+    assert_equal ["brand", "fermentation", "ncbi taxonomy id", "scientific name", "volume"], details.collect(&:label).sort
   end
 
   test 'to extended metadata types json' do
