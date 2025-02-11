@@ -57,15 +57,24 @@ module Seek
 
         query = RDF::Query.new do
           pattern [RDF::Resource.new(property), RDF::RDFS.label, :label]
-          pattern [RDF::Resource.new(property), RDF::Vocab::SCHEMA.description, :description]
-          pattern [RDF::URI.new(property), RDF::Vocab::SCHEMA.valuePattern, :pattern]
-          pattern [RDF::URI.new(property), RDF::Vocab::SCHEMA.valueRequired, :required]
+          pattern [RDF::Resource.new(property), RDF::Vocab::SCHEMA.description, :description], optional: true
+          pattern [RDF::URI.new(property), RDF::Vocab::SCHEMA.valuePattern, :pattern], optional: true
+          pattern [RDF::URI.new(property), RDF::Vocab::SCHEMA.valueRequired, :required], optional: true
         end
         solution = query.execute(graph).first
-        result.label = solution[:label].value
-        result.description = solution[:description].value
-        result.pattern = solution[:pattern].value
-        result.required = solution[:required].true?
+        if solution && solution[:label].present?
+          result.label = solution[:label].value
+          result.description = solution[:description]&.value || ''
+          result.pattern = solution[:pattern]&.value || '.*'
+          result.required = solution[:required]&.true? || false
+        else
+          uri = URI.parse(property)
+          label = uri.fragment || uri.path.split('/').last
+          result.label = label.underscore.humanize(capitalize: false)
+          result.description = ''
+          result.pattern = '.*'
+          result.required = false
+        end
         result
       end
 
