@@ -235,5 +235,15 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
         Seek::ExtendedMetadataType::ExtendedMetadataTypeExtractor.valid_emt_json?(json)
       end
     end
+
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/demo.ttl"
+    jsons = Seek::FairDataStation::Reader.new.to_extended_metadata_type_json(path)
+    assert_equal 2, jsons.count
+    assert_equal ['Study', 'Assay'], jsons.collect{|j| j['supported_type']}
+    jsons.each do |json|
+      assert_nothing_raised do
+        Seek::ExtendedMetadataType::ExtendedMetadataTypeExtractor.valid_emt_json?(json)
+      end
+    end
   end
 end
