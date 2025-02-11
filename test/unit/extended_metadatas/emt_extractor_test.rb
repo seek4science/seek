@@ -101,7 +101,7 @@ class EmtExtractorTest < ActiveSupport::TestCase
 
     assert_no_difference('ExtendedMetadataType.count') do
 
-      error = assert_raises(StandardError) do
+      error = assert_raises(JSON::ParserError) do
         Seek::ExtendedMetadataType::ExtendedMetadataTypeExtractor.extract_extended_metadata_type(invalid_emt_file)
       end
 
@@ -115,7 +115,7 @@ class EmtExtractorTest < ActiveSupport::TestCase
 
     assert_no_difference('ExtendedMetadataType.count') do
 
-      error = assert_raises(StandardError) do
+      error = assert_raises(Seek::ExtendedMetadataType::ExtendedMetadataTypeExtractor::ValidationError) do
         Seek::ExtendedMetadataType::ExtendedMetadataTypeExtractor.extract_extended_metadata_type(invalid_emt_file)
       end
 
@@ -128,7 +128,7 @@ class EmtExtractorTest < ActiveSupport::TestCase
 
     assert_no_difference('ExtendedMetadataType.count') do
 
-      error = assert_raises(StandardError) do
+      error = assert_raises(ActiveRecord::RecordNotFound) do
         Seek::ExtendedMetadataType::ExtendedMetadataTypeExtractor.extract_extended_metadata_type(invalid_emt_file)
       end
 
