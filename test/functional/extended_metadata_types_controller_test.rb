@@ -319,7 +319,35 @@ class ExtendedMetadataTypesControllerTest < ActionController::TestCase
       post :submit_jsons, params: { emt_jsons: [json1, json2] }
     end
     assert_redirected_to administer_extended_metadata_types_path
-    assert_equal '2 Extended Metadata Types were successfully created.', flash[:notice]
+    assert_equal '2 Extended Metadata Types successfully created for: person(ExtendedMetadata), family(Investigation).', flash[:notice]
+    assert_nil flash[:error]
+  end
+
+  test 'submit jsons - invalid resulting EMT' do
+    json1 = file_fixture('extended_metadata_type/invalid_supported_type_emt.json').read
+    json2 = file_fixture('extended_metadata_type/valid_simple_emt.json').read
+    person = FactoryBot.create(:admin)
+    login_as(person)
+    assert_difference('ExtendedMetadataType.count', 1) do
+      post :submit_jsons, params: { emt_jsons: [json1, json2] }
+    end
+    assert_redirected_to administer_extended_metadata_types_path
+    assert_equal '1 Extended Metadata Type successfully created for: person(ExtendedMetadata).', flash[:notice]
+    assert_equal "1 Extended Metadata Type failed to be created: publication(Journal) - Supported type 'Journal' is not a valid support type!.", flash[:error]
+  end
+
+  test 'submit jsons - invalid JSON' do
+    json1 = file_fixture('extended_metadata_type/invalid_json.json').read
+    json2 = file_fixture('extended_metadata_type/invalid_emt_with_wrong_type.json').read
+    json3 = file_fixture('extended_metadata_type/valid_simple_emt.json').read
+    person = FactoryBot.create(:admin)
+    login_as(person)
+    assert_difference('ExtendedMetadataType.count', 1) do
+      post :submit_jsons, params: { emt_jsons: [json1, json2, json3] }
+    end
+    assert_redirected_to administer_extended_metadata_types_path
+    assert_equal '1 Extended Metadata Type successfully created for: person(ExtendedMetadata).', flash[:notice]
+    assert_equal "2 Extended Metadata Types failed to be created: Failed to parse JSON, The attribute type 'String1' does not exist..", flash[:error]
   end
 
 end
