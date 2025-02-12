@@ -4415,4 +4415,20 @@ class DataFilesControllerTest < ActionController::TestCase
       assert flash[:error].include?('disabled')
     end
   end
+
+  test 'view data file with nil content blob' do
+    df = FactoryBot.create(:data_file_with_no_content_blob)
+    assert_nil df.content_blob
+    login_as(df.contributor)
+    get :show, params: { id: df }
+    assert_response :success
+  end
+
+  test 'edit data file with nil content blob' do
+    df = FactoryBot.create(:data_file_with_no_content_blob)
+    assert_nil df.content_blob
+    login_as(df.contributor)
+    get :edit, params: { id: df }
+    assert_response :success
+  end
 end
