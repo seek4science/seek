@@ -307,7 +307,26 @@ class ExtendedMetadataTypesControllerTest < ActionController::TestCase
     assert_select 'div.panel.extended-metadata-type-preview', count: 4
     assert_select 'table.extended-metadata-type-attributes', count: 4
     assert_select 'table.extended-metadata-type-attributes tbody tr', count: 10
+    assert_select 'a.btn[href=?]', administer_extended_metadata_types_path, text:'Cancel'
+    assert_select 'input.btn[type="submit"][value="Create"]'
   end
+
+  test 'create from ttl no results' do
+    person = FactoryBot.create(:admin)
+    assert person.is_admin?
+    login_as(person)
+
+    file = fixture_file_upload('fair_data_station/empty.ttl', 'text/turtle')
+
+    assert_no_difference('ExtendedMetadataType.count') do
+      post :create_from_ttl, params: { emt_fds_ttl_file: file }
+    end
+    assert_response :success
+    assert_select 'p.alert.alert-info', text:/There were no new Extended Metadata Types identified as needing to be created./
+    assert_select 'a.btn[href=?]', administer_extended_metadata_types_path, text:'Cancel'
+    assert_select 'input.btn[type="submit"][value="Create"]', count: 0
+  end
+
 
   test 'submit jsons' do
     person_emt = FactoryBot.create(:role_name_extended_metadata_type)
