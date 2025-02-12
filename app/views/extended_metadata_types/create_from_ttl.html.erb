@@ -1,16 +1,28 @@
-<% @jsons.each do |json| %>
+<% if @jsons.empty? %>
 
-  <%= render partial: 'preview_json', locals: {json: json} %>
+  <p class='alert alert-info'>
+    There were no new <%= t('extended_metadata_type').pluralize %> identified as needing to be created.
+    <br/><br/>
+    If this is unexpected then check the Turtle(.ttl) file for errors.
+  </p>
 
-<% end %>
-
-<%= form_tag submit_jsons_extended_metadata_types_path, method: "post" do %>
+  <%= cancel_button administer_extended_metadata_types_path %>
+<% else %>
   <% @jsons.each do |json| %>
-    <%= hidden_field_tag 'emt_jsons[]', JSON.generate(json) %>
+
+    <%= render partial: 'preview_json', locals: {json: json} %>
+
   <% end %>
 
-  <%= submit_tag('Create', class:'btn btn-primary') %>
-  or
-  <%= cancel_button administer_extended_metadata_types_path %>
+  <%= form_tag submit_jsons_extended_metadata_types_path, method: "post" do %>
+    <% @jsons.each do |json| %>
+      <%= hidden_field_tag 'emt_jsons[]', JSON.generate(json) %>
+    <% end %>
 
+    <%= submit_tag('Create', class:'btn btn-primary') %>
+    or
+    <%= cancel_button administer_extended_metadata_types_path %>
+
+  <% end %>
 <% end %>
+
