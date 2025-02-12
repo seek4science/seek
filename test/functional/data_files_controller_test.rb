@@ -4431,4 +4431,14 @@ class DataFilesControllerTest < ActionController::TestCase
     get :edit, params: { id: df }
     assert_response :success
   end
+
+  test 'update data file with nil content blob' do
+    df = FactoryBot.create(:data_file_with_no_content_blob, title: 'old title')
+    assert_nil df.content_blob
+    login_as(df.contributor)
+    put :update, params: { id: df, data_file: { title: 'new title' } }
+    assert_response :redirect
+    df.reload
+    assert_equal 'new title', df.title
+  end
 end
