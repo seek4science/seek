@@ -119,7 +119,7 @@ class DataFile < ApplicationRecord
   
   def zipped_folder?
     return false if external_asset.is_a? OpenbisExternalAsset
-    content_blob.is_unzippable_datafile?
+    content_blob&.is_unzippable_datafile?
   end
 
   def matching_sample_type?
