@@ -111,22 +111,21 @@ function rorSuggestionTemplate(data) {
 }
 
 
-function initializeLocalInstitutions(endpoint = '/institutions/typeahead.json', cache = false) {
-
+function initializeLocalInstitutions(endpoint = '/institutions/typeahead.json', query = '', cache = false) {
     const baseUrl = `${window.location.protocol}//${window.location.host}`;
-    const fullUrl = `${baseUrl}${endpoint}`;
+    const fullUrl = `${baseUrl}${endpoint}?q=${encodeURIComponent(query)}`;
+
     console.log("Institutions URL: " + fullUrl);
 
-    // Initialize and return the Bloodhound instance
     return new Bloodhound({
         datumTokenizer: Bloodhound.tokenizers.obj.whitespace('text'),
         queryTokenizer: Bloodhound.tokenizers.whitespace,
-        prefetch: {
+        remote: {
             url: fullUrl,
-            cache: cache, // Use the provided cache option
+            wildcard: '%QUERY',
+            cache: cache,
             transform: function (response) {
-                // Map the results array to the structure Bloodhound expects
-                return response.results;
+                return response.results; // Ensure response is structured correctly
             }
         }
     });
@@ -169,7 +168,10 @@ $j(document).ready(function () {
         {
             name: 'institutions',
             display: 'text', // Display the 'text' field in the dropdown
-            source: initializeLocalInstitutions(), // Local data source
+            source: function (query, syncResults, asyncResults) {
+                const bloodhound = initializeLocalInstitutions('/institutions/typeahead.json', query);
+                bloodhound.search(query, syncResults, asyncResults);
+            }, // Local data source
             templates: {
                 header: '<div class="league-name">Institutions saved locally</div>',
                 suggestion: localSuggestionTemplate
