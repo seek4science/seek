@@ -6,7 +6,6 @@ function toggleUserInput(disabled) {
     const elements = [
         '#institution_title',
         '#institution_city',
-        '#institution_country',
         '#institution_ror_id',
         '#institution_web_page',
         '.tt-input'
@@ -15,6 +14,7 @@ function toggleUserInput(disabled) {
     elements.forEach(selector => {
         $j(selector)[action]('institution-input-disable');
         $j(selector).prop("readonly", disabled);
+        $j('#institution_country').prop('disabled', disabled);
     });
 }
 
@@ -44,7 +44,7 @@ function fetchRorData(rorId) {
             $j('#ror-response').html(JSON.stringify(data, undefined, 4));
             $j('#institution_title').val(data.name);
             $j('#institution_city').val(data.addresses[0]['city']);
-            $j('#institution_country').val(data.country.country_name);
+            $j('#institution_country').val(data.country.country_code);
             $j('#institution_ror_id').val(extractRorId(data.id));
             $j('#institution_web_page').val(data.links?.[0] || 'N/A');
             $j('#ror-error-message').text('').hide();
@@ -104,7 +104,7 @@ function rorSuggestionTemplate(data) {
     <div>
         <p>
             ${data.name}<br>
-            <small>${data.types[0]}, ${data.country.country_name}<br>
+            <small>${data.types[0]}, ${data.country.country_code}<br>
             <i>${altNames}</i></small>
         </p>
     </div>`;
@@ -230,7 +230,7 @@ $j(document).ready(function () {
             $j('#institution_id').val(data.id);
             $j('#institution_ror_id').val(data.ror_id);
             $j('#institution_city').val(data.city);
-            $j('#institution_country').val(data.country_name);
+            $j('#institution_country').val(data.country);
             $j('#institution_web_page').val(data.web_page);
         }
         else
@@ -238,7 +238,7 @@ $j(document).ready(function () {
             $j('#institution_title').val(data.name);
             $j('#institution_ror_id').val(data.id);
             $j('#institution_city').val(data.addresses[0]['city']);
-            $j('#institution_country').val(data.country.country_name);
+            $j('#institution_country').val(data.country.country_code);
             $j('#institution_ror_id').val(extractRorId(data.id));
             $j('#institution_web_page').val(data.links[0]);
         }
@@ -249,7 +249,7 @@ $j(document).ready(function () {
     $j('#ror_query_name .typeahead').bind('typeahead:select', function (ev, suggestion) {
         $j('#ror-response').html(JSON.stringify(suggestion, undefined, 4));
         $j('#institution_city').val(suggestion.addresses[0]['city']);
-        $j('#institution_country').val(suggestion.country.country_name);
+        $j('#institution_country').val(suggestion.country.country_code);
         $j('#institution_ror_id').val(extractRorId(suggestion.id));
         $j('#institution_web_page').val(suggestion.links[0]);
         toggleUserInput(true);

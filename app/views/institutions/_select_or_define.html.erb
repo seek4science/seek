@@ -46,7 +46,8 @@
 
 <div class="form-group">
   <label class="control-label">Country</label>
-  <%= text_field_tag 'institution[country]', @institution.nil? ? '' : CountryCodes.country(@institution.country), class: "form-control" %>
+  <%= country_select('institution','country',
+                     { include_blank: 'Select a country' },value: @institution.nil? ? nil:CountryCodes.country(@institution.country), class: 'form-control') %>
 </div>
 
 
