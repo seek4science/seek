@@ -1791,6 +1791,8 @@ institutionPost:
               $ref: "#/components/schemas/nullableUriString"
             title:
               $ref: "#/components/schemas/nonEmptyString"
+            ror_id:
+              $ref: "#/components/schemas/nullableNonEmptyString"
             country:
               $ref: "#/components/schemas/nullableCountryString"
             city:
@@ -1829,6 +1831,8 @@ institutionPatch:
               $ref: "#/components/schemas/nullableUriString"
             title:
               $ref: "#/components/schemas/nonEmptyString"
+            ror_id:
+              $ref: "#/components/schemas/nullableNonEmptyString"
             country:
               $ref: "#/components/schemas/nullableCountryString"
             city:
@@ -3748,6 +3752,8 @@ institutionResponse:
               $ref: "#/components/schemas/nullableUriString"
             title:
               $ref: "#/components/schemas/nonEmptyString"
+            ror_id:
+              $ref: "#/components/schemas/nullableNonEmptyString"
             country:
               $ref: "#/components/schemas/nullableCountryString"
             country_code:
@@ -3762,6 +3768,7 @@ institutionResponse:
               $ref: "#/components/schemas/assetLinkList"
           required:
             - title
+            - ror_id
             - country
             - city
             - address

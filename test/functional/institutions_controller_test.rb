@@ -33,6 +33,39 @@ class InstitutionsControllerTest < ActionController::TestCase
     assert_redirected_to institution_path(assigns(:institution))
   end
 
+  def test_should_create_institution
+    assert_difference('Institution.count') do
+      post :create, params: { institution: { title: 'test', country: 'FI', ror_id:'00h69cf80' } }
+    end
+    assert_redirected_to institution_path(assigns(:institution))
+    assert_equal 'test', assigns(:institution).title
+    assert_equal 'FI', assigns(:institution).country
+    assert_equal '00h69cf80', assigns(:institution).ror_id
+  end
+
+  def test_can_not_create_institution_with_invalid_ror_id
+      assert_no_difference('Institution.count') do
+        post :create, params: { institution: { title: 'test', country: 'FI', ror_id:'3333' } }
+      end
+      assert_equal assigns(:institution).errors[:ror_id].first, 'is invalid.'
+  end
+
+
+  def test_can_not_create_institution_with_the_title_or_ror_id_that_already_exists
+    FactoryBot.create(:institution, title: 'my Institution', ror_id:'01f7bcy98')
+
+    assert_no_difference('Institution.count') do
+      post :create, params: { institution: { title: 'my Institution'} }
+    end
+    assert_equal assigns(:institution).errors[:title].first, 'has already been taken'
+
+    assert_no_difference('Institution.count') do
+      post :create, params: { institution: { title: 'my Institution new', ror_id:'01f7bcy98'} }
+    end
+    assert_equal assigns(:institution).errors[:ror_id].first, 'has already been taken'
+
+  end
+
   def test_should_show_institution
     get :show, params: { id: institutions(:one).id }
     assert_response :success
