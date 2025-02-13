@@ -82,10 +82,17 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
     study = inv.studies.first
 
     assert_equal 8, study.additional_metadata_annotations.count
-    assert_includes study.annotations, ['http://fairbydesign.nl/ontology/center_name', 'NIID']
+    assert_includes study.additional_metadata_annotations, ['http://fairbydesign.nl/ontology/center_name', 'NIID']
     study.additional_metadata_annotations.each do |annotation|
       assert annotation[0].start_with?('http://fairbydesign.nl/ontology/'), "#{annotation[0]} is not expected"
     end
+
+    # packageName not included
+    assay = study.assays.first
+    assert_equal 12, assay.additional_metadata_annotations.count
+    refute_includes assay.additional_metadata_annotations, ['http://fairbydesign.nl/ontology/packageName', 'Amplicon demultiplexed']
+    assert_equal 'Amplicon demultiplexed', assay.package_name
+    assert_nil study.package_name
 
     # non fairbydesign annotations
     path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case.ttl"
