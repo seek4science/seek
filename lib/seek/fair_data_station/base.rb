@@ -18,6 +18,7 @@ module Seek
           @schema.name,
           @schema.title,
           @schema.contentUrl,
+          @fair.packageName,
           RDF.type,
           @jerm.hasPart
         ]
@@ -33,6 +34,10 @@ module Seek
 
       def description
         find_annotation_value(@schema.description)
+      end
+
+      def package_name
+        find_annotation_value(@fair.packageName)
       end
 
       def annotations
@@ -86,7 +91,7 @@ module Seek
 
       def to_extended_metadata_type_json
         json = {}
-        json['title'] = "FDS #{type_name.underscore.humanize} #{UUID.generate}"
+        json['title'] = "FDS #{type_name.underscore.humanize} - #{package_name || UUID.generate}"
         json['supported_type'] = type_name
         json['enabled'] = true
         seek_attributes = additional_metadata_annotation_details.collect(&:to_extended_metadata_attribute_json)
