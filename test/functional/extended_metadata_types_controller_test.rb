@@ -335,10 +335,12 @@ class ExtendedMetadataTypesControllerTest < ActionController::TestCase
     person = FactoryBot.create(:admin)
     login_as(person)
     assert_difference('ExtendedMetadataType.count', 2) do
-      post :submit_jsons, params: { emt_jsons: [json1, json2] }
+      post :submit_jsons, params: { emt_jsons: [json1, json2], emt_titles: ['person new title','family new title'] }
     end
     assert_redirected_to administer_extended_metadata_types_path
-    assert_equal '2 Extended Metadata Types successfully created for: person(ExtendedMetadata), family(Investigation).', flash[:notice]
+    emts = ExtendedMetadataType.last(2)
+    assert_equal ['person new title', 'family new title'], emts.map(&:title)
+    assert_equal '2 Extended Metadata Types successfully created for: person new title(ExtendedMetadata), family new title(Investigation).', flash[:notice]
     assert_nil flash[:error]
   end
 

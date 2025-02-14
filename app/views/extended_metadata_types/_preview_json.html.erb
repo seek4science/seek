@@ -1,6 +1,11 @@
 <%= panel(json['title'], class:'extended-metadata-type-preview') do %>
   <p>
-    <strong>Title: </strong><%= json['title'] %>
+    <strong>Title: </strong>
+    <% if editable_title %>
+      <%= text_field_tag 'emt_titles[]', json['title'], :class=>'form-control' %>
+    <% else %>
+      <%= json['title'] %>
+    <% end %>
   </p>
   <p>
     <strong>Supported type: </strong><%= json['supported_type'] %>

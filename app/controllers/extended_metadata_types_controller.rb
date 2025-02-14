@@ -69,11 +69,13 @@ class ExtendedMetadataTypesController < ApplicationController
 
   def submit_jsons
     jsons = params['emt_jsons']
+    titles = params['emt_titles']
     failures = []
     successes = []
-    jsons.each do |json|
+    jsons.zip(titles).each do |json, title|
       begin
         extended_metadata_type = Seek::ExtendedMetadataType::ExtendedMetadataTypeExtractor.extract_extended_metadata_type(StringIO.new(json))
+        extended_metadata_type.title = title
         if extended_metadata_type.save
           successes << "#{extended_metadata_type.title}(#{extended_metadata_type.supported_type})"
         else
