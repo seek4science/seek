@@ -708,6 +708,7 @@ SEEK::Application.routes.draw do
   resources :sample_types, concerns: %i[asset has_content_blobs] do
     collection do
       post :create_from_template
+      post :create_from_fds_ttl
       get :select
       get :filter_for_select
     end

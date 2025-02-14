@@ -56,6 +56,21 @@ class SampleTypesController < ApplicationController
     end
   end
 
+  def create_from_fds_ttl
+    build_sample_type_from_fds_ttl
+    @sample_type.contributor = User.current_user.person
+
+    @tab = 'from-fds-ttl'
+
+    respond_to do |format|
+      if @sample_type.errors.empty? && @sample_type.save
+        format.html { redirect_to edit_sample_type_path(@sample_type), notice: 'Sample type was successfully created.' }
+      else
+        format.html { render action: 'new' }
+      end
+    end
+  end
+
   # GET /sample_types/1/edit
   def edit
     respond_with(@sample_type)
@@ -183,6 +198,36 @@ class SampleTypesController < ApplicationController
     handle_upload_data
     @sample_type.content_blob.save! # Need's to be saved so the spreadsheet can be read from disk
     @sample_type.build_attributes_from_template
+  end
+
+  def build_sample_type_from_fds_ttl
+    @sample_type = SampleType.new(sample_type_params)
+    blob_params = params[:content_blobs]
+
+    fds_sample = nil
+    Tempfile.create('fds-ttl') do |file|
+      file << blob_params.first[:data].read.force_encoding('UTF-8')
+      inv = Seek::FairDataStation::Reader.new.parse_graph(file.path).first
+      fds_sample = inv&.studies.first&.observation_units.first&.samples.first
+    end
+    string_attribute_type = SampleAttributeType.where(title: 'String').first
+    @sample_type.sample_attributes.build({
+                                           title: 'Title',
+                                           description: '',
+                                           pid: RDF::Vocab::SCHEMA.name,
+                                           sample_attribute_type: string_attribute_type,
+                                           required: true,
+                                           is_title: true
+                                         })
+    fds_sample.additional_metadata_annotation_details.each do |details|
+      @sample_type.sample_attributes.build({
+                                             title: details.label,
+                                             description: details.description,
+                                             pid: details.property_id,
+                                             sample_attribute_type: string_attribute_type,
+                                             required: details.required
+                                           })
+    end
   end
 
   def check_isa_json_compliance
