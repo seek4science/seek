@@ -385,7 +385,7 @@ class ApplicationController < ActionController::Base
         end
       when *Seek::Util.authorized_types.map { |t|
  t.name.underscore.pluralize.split('/').last } + ["sample_types"] # TODO: Find a nicer way of doing this...
-        action = 'create' if action == 'create_metadata' || action == 'create_from_template'
+        action = 'create' if action == 'create_metadata' || action == 'create_from_template'|| action == 'create_from_fds_ttl'
         action = 'update' if action == 'create_version'
         action = 'inline_view' if action == 'explore'
         action = 'download' if action == 'ro_crate'
