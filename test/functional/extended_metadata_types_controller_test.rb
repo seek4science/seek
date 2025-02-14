@@ -350,11 +350,11 @@ class ExtendedMetadataTypesControllerTest < ActionController::TestCase
     person = FactoryBot.create(:admin)
     login_as(person)
     assert_difference('ExtendedMetadataType.count', 1) do
-      post :submit_jsons, params: { emt_jsons: [json1, json2] }
+      post :submit_jsons, params: { emt_jsons: [json1, json2], emt_titles: ['json1 title', 'json2 title'] }
     end
     assert_redirected_to administer_extended_metadata_types_path
-    assert_equal '1 Extended Metadata Type successfully created for: person(ExtendedMetadata).', flash[:notice]
-    assert_equal "1 Extended Metadata Type failed to be created: publication(Journal) - Supported type 'Journal' is not a valid support type!.", flash[:error]
+    assert_equal '1 Extended Metadata Type successfully created for: json2 title(ExtendedMetadata).', flash[:notice]
+    assert_equal "1 Extended Metadata Type failed to be created: json1 title(Journal) - Supported type 'Journal' is not a valid support type!.", flash[:error]
   end
 
   test 'submit jsons - invalid JSON' do
@@ -364,10 +364,10 @@ class ExtendedMetadataTypesControllerTest < ActionController::TestCase
     person = FactoryBot.create(:admin)
     login_as(person)
     assert_difference('ExtendedMetadataType.count', 1) do
-      post :submit_jsons, params: { emt_jsons: [json1, json2, json3] }
+      post :submit_jsons, params: { emt_jsons: [json1, json2, json3], emt_titles: ['json1 title', 'json2 title', 'json3 title'] }
     end
     assert_redirected_to administer_extended_metadata_types_path
-    assert_equal '1 Extended Metadata Type successfully created for: person(ExtendedMetadata).', flash[:notice]
+    assert_equal '1 Extended Metadata Type successfully created for: json3 title(ExtendedMetadata).', flash[:notice]
     assert_equal "2 Extended Metadata Types failed to be created: Failed to parse JSON, The attribute type 'String1' does not exist..", flash[:error]
   end
 
