@@ -448,7 +448,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_difference('ActivityLog.count', 1) do
       assert_difference('SampleType.count', 1) do
         assert_no_difference('ContentBlob.count') do
-          post :create_from_fds_ttl,
+          post :create_from_fair_ds_ttl,
                params: { sample_type: { title: 'Hello!', project_ids: @project_ids }, content_blobs: [blob] }
         end
       end
@@ -472,7 +472,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_no_difference('ActivityLog.count') do
       assert_no_difference('SampleType.count') do
         assert_no_difference('ContentBlob.count') do
-          post :create_from_fds_ttl,
+          post :create_from_fair_ds_ttl,
                params: { sample_type: { title: 'Hello!', project_ids: @project_ids }, content_blobs: [blob] }
         end
       end

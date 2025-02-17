@@ -208,7 +208,7 @@ SEEK::Application.routes.draw do
       get :form_fields
       get :administer
       post :create
-      post :create_from_ttl
+      post :create_from_fair_ds_ttl
       post :submit_jsons
     end
     member do
@@ -708,7 +708,7 @@ SEEK::Application.routes.draw do
   resources :sample_types, concerns: %i[asset has_content_blobs] do
     collection do
       post :create_from_template
-      post :create_from_fds_ttl
+      post :create_from_fair_ds_ttl
       get :select
       get :filter_for_select
     end
