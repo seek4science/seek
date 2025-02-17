@@ -25,7 +25,7 @@
   <%= cancel_button admin_path-%>
 <% end -%>
 
-<%= form_tag create_from_ttl_extended_metadata_types_path, method: "post", id: "extended_metadata_type_upload_from", multipart: true do -%>
+<%= form_tag create_from_fair_ds_ttl_extended_metadata_types_path, method: "post", id: "extended_metadata_type_upload_from", multipart: true do -%>
   <%= folding_panel("FAIR Data Station TTL file", false, body_options: { id: 'add_extended_metadata_type_file_fold_content'},
                     help_text:  "Here you can upload #{t('extended_metadata_type')} TTL file to populate the #{t('extended_metadata_type').pluralize()}.") do %>
 
@@ -38,7 +38,7 @@
       <div class="tab-content">
         <div role="tabpanel" class="tab-pane active" data-role="seek-upload-field-tab-pane" data-tab-id="local-file">
           <div class="form-group">
-            <%= file_field_tag "emt_fds_ttl_file", accept: '.ttl' -%>
+            <%= file_field_tag "emt_fair_ds_ttl_file", accept: '.ttl' -%>
           </div>
         </div>
       </div>
