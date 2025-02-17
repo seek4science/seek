@@ -49,13 +49,13 @@ class ExtendedMetadataTypesController < ApplicationController
     redirect_to new_extended_metadata_type_path
   end
 
-  def create_from_ttl
-    if params[:emt_fds_ttl_file].blank?
+  def create_from_fair_ds_ttl
+    if params[:emt_fair_ds_ttl_file].blank?
       flash[:error] = 'Please select a file to upload!'
       redirect_to new_extended_metadata_type_path and return
     end
 
-    uploaded_file = params[:emt_fds_ttl_file]
+    uploaded_file = params[:emt_fair_ds_ttl_file]
     @jsons = []
     Tempfile.create('fds-ttl') do |file|
       file << uploaded_file.read.force_encoding('UTF-8')

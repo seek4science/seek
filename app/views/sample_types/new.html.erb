@@ -17,8 +17,8 @@
     <li role="presentation" <%= 'class="active"'.html_safe if tab == 'from-template' -%>>
       <a href="#from-template" aria-controls="manual" role="tab" data-toggle="tab">Use spreadsheet template</a>
     </li>
-    <li role="presentation" <%= 'class="active"'.html_safe if tab == 'from-fds-ttl' -%>>
-      <a href="#from-fds-ttl" aria-controls="manual" role="tab" data-toggle="tab">Use FAIR Data Station RDF</a>
+    <li role="presentation" <%= 'class="active"'.html_safe if tab == 'from-fair-ds-ttl' -%>>
+      <a href="#from-fair-ds-ttl" aria-controls="manual" role="tab" data-toggle="tab">Use FAIR Data Station RDF</a>
     </li>
   </ul>
 
@@ -37,8 +37,8 @@
 
             if (id == 'from-template') {
                 form[0].action = '<%= create_from_template_sample_types_path -%>';
-            } else if (id == 'from-fds-ttl') {
-                form[0].action = '<%= create_from_fds_ttl_sample_types_path -%>';
+            } else if (id == 'from-fair-ds-ttl') {
+                form[0].action = '<%= create_from_fair_ds_ttl_sample_types_path -%>';
             } else {
                 form[0].action = '<%= sample_types_path -%>';
             }
