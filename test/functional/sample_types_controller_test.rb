@@ -413,29 +413,6 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_equal 'create', ActivityLog.last.action
   end
 
-  test 'create from fair data station ttl' do
-    blob = { data: fixture_file_upload('fair_data_station/seek-fair-data-station-test-case.ttl', 'text/turtle') }
-
-    assert_difference('ActivityLog.count', 1) do
-      assert_difference('SampleType.count', 1) do
-        assert_no_difference('ContentBlob.count') do
-          post :create_from_fds_ttl,
-               params: { sample_type: { title: 'Hello!', project_ids: @project_ids }, content_blobs: [blob] }
-        end
-      end
-    end
-
-    sample_type = assigns(:sample_type)
-    assert_redirected_to edit_sample_type_path(sample_type)
-    assert_empty sample_type.errors
-    refute sample_type.uploaded_template?
-
-    assert_equal sample_type, ActivityLog.last.activity_loggable
-    assert_equal 'create', ActivityLog.last.action
-
-    assert_equal 5, sample_type.sample_attributes.count
-  end
-
   test 'create from template with some blank columns' do
     blob = { data: missing_columns_template_for_upload }
 
@@ -462,8 +439,50 @@ class SampleTypesControllerTest < ActionController::TestCase
     end
 
     assert_template :new
-    assert_not_empty assigns(:sample_type).errors
+    refute_empty assigns(:sample_type).errors
   end
+
+  test 'create from fair data station ttl' do
+    blob = { data: fixture_file_upload('fair_data_station/seek-fair-data-station-test-case.ttl', 'text/turtle') }
+
+    assert_difference('ActivityLog.count', 1) do
+      assert_difference('SampleType.count', 1) do
+        assert_no_difference('ContentBlob.count') do
+          post :create_from_fds_ttl,
+               params: { sample_type: { title: 'Hello!', project_ids: @project_ids }, content_blobs: [blob] }
+        end
+      end
+    end
+
+    sample_type = assigns(:sample_type)
+    assert_redirected_to edit_sample_type_path(sample_type)
+    assert_empty sample_type.errors
+    refute sample_type.uploaded_template?
+    assert_equal 'Hello!', sample_type.title
+
+    assert_equal sample_type, ActivityLog.last.activity_loggable
+    assert_equal 'create', ActivityLog.last.action
+
+    assert_equal 5, sample_type.sample_attributes.count
+  end
+
+  test 'create from empty fair data station ttl' do
+    blob = { data: fixture_file_upload('fair_data_station/empty.ttl', 'text/turtle') }
+
+    assert_no_difference('ActivityLog.count') do
+      assert_no_difference('SampleType.count') do
+        assert_no_difference('ContentBlob.count') do
+          post :create_from_fds_ttl,
+               params: { sample_type: { title: 'Hello!', project_ids: @project_ids }, content_blobs: [blob] }
+        end
+      end
+    end
+
+    assert_template :new
+    assert_equal 'No Sample type metadata could be found.', flash.now[:error]
+    refute_empty assigns(:sample_type).errors
+  end
+
 
   test 'should show link to sample type for linked attribute' do
     linked_type = FactoryBot.create(:linked_sample_type, project_ids: @project_ids, contributor: @person)

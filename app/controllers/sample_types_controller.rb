@@ -47,7 +47,7 @@ class SampleTypesController < ApplicationController
     @tab = 'from-template'
 
     respond_to do |format|
-      if @sample_type.errors.empty? && @sample_type.save
+      if @sample_type.valid? && @sample_type.save
         format.html { redirect_to edit_sample_type_path(@sample_type), notice: 'Sample type was successfully created.' }
       else
         @sample_type.content_blob.destroy if @sample_type.content_blob.persisted?
@@ -63,7 +63,7 @@ class SampleTypesController < ApplicationController
     @tab = 'from-fds-ttl'
 
     respond_to do |format|
-      if @sample_type.errors.empty? && @sample_type.save
+      if @sample_type && @sample_type.valid? && @sample_type.save
         format.html { redirect_to edit_sample_type_path(@sample_type), notice: 'Sample type was successfully created.' }
       else
         format.html { render action: 'new' }
@@ -208,26 +208,33 @@ class SampleTypesController < ApplicationController
     Tempfile.create('fds-ttl') do |file|
       file << blob_params.first[:data].read.force_encoding('UTF-8')
       inv = Seek::FairDataStation::Reader.new.parse_graph(file.path).first
-      fds_sample = inv&.studies.first&.observation_units.first&.samples.first
+      if inv
+        fds_sample = inv&.studies.first&.observation_units.first&.samples.first
+      end
     end
-    string_attribute_type = SampleAttributeType.where(title: 'String').first
-    @sample_type.sample_attributes.build({
-                                           title: 'Title',
-                                           description: '',
-                                           pid: RDF::Vocab::SCHEMA.name,
-                                           sample_attribute_type: string_attribute_type,
-                                           required: true,
-                                           is_title: true
-                                         })
-    fds_sample.additional_metadata_annotation_details.each do |details|
+    if fds_sample && fds_sample.additional_metadata_annotation_details.any?
+      string_attribute_type = SampleAttributeType.where(title: 'String').first
       @sample_type.sample_attributes.build({
-                                             title: details.label,
-                                             description: details.description,
-                                             pid: details.property_id,
+                                             title: 'Title',
+                                             description: '',
+                                             pid: RDF::Vocab::SCHEMA.name,
                                              sample_attribute_type: string_attribute_type,
-                                             required: details.required
+                                             required: true,
+                                             is_title: true
                                            })
+      fds_sample.additional_metadata_annotation_details.each do |details|
+        @sample_type.sample_attributes.build({
+                                               title: details.label,
+                                               description: details.description,
+                                               pid: details.property_id,
+                                               sample_attribute_type: string_attribute_type,
+                                               required: details.required
+                                             })
+      end
+    else
+      flash.now[:error] = 'No Sample type metadata could be found.'
     end
+
   end
 
   def check_isa_json_compliance
