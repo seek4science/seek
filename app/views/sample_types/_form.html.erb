@@ -68,7 +68,7 @@
             </div>
           </div>
 
-        <div role="tabpanel" class="tab-pane<%= ' active'.html_safe if tab == 'from-fds-ttl' -%>" id="from-fds-ttl">
+        <div role="tabpanel" class="tab-pane<%= ' active'.html_safe if tab == 'from-fair-ds-ttl' -%>" id="from-fair-ds-ttl">
           <div class="form-group">
             <label class="required">Turtle file to upload</label>
             <%= file_field_tag "content_blobs[][data]", accept: '.ttl', "data-batch-upload": false, class: 'form-control'  -%>

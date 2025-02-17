@@ -56,8 +56,8 @@ class SampleTypesController < ApplicationController
     end
   end
 
-  def create_from_fds_ttl
-    build_sample_type_from_fds_ttl
+  def create_from_fair_ds_ttl
+    build_sample_type_from_fair_ds_ttl
     @sample_type.contributor = User.current_user.person
 
     @tab = 'from-fds-ttl'
@@ -199,7 +199,7 @@ class SampleTypesController < ApplicationController
     @sample_type.build_attributes_from_template
   end
 
-  def build_sample_type_from_fds_ttl
+  def build_sample_type_from_fair_ds_ttl
     @sample_type = SampleType.new(sample_type_params)
     blob_params = params[:content_blobs]
 

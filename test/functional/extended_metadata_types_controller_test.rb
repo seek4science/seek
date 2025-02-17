@@ -286,7 +286,7 @@ class ExtendedMetadataTypesControllerTest < ActionController::TestCase
     file = fixture_file_upload('fair_data_station/seek-fair-data-station-test-case.ttl', 'text/turtle')
 
     assert_no_difference('ExtendedMetadataType.count') do
-      post :create_from_ttl, params: { emt_fds_ttl_file: file }
+      post :create_from_fair_ds_ttl, params: { emt_fair_ds_ttl_file: file }
     end
     assert_redirected_to :root
     assert_equal 'Admin rights required', flash[:error]
@@ -300,7 +300,7 @@ class ExtendedMetadataTypesControllerTest < ActionController::TestCase
     file = fixture_file_upload('fair_data_station/seek-fair-data-station-test-case.ttl', 'text/turtle')
 
     assert_no_difference('ExtendedMetadataType.count') do
-      post :create_from_ttl, params: { emt_fds_ttl_file: file }
+      post :create_from_fair_ds_ttl, params: { emt_fair_ds_ttl_file: file }
     end
     assert_response :success
 
@@ -319,7 +319,7 @@ class ExtendedMetadataTypesControllerTest < ActionController::TestCase
     file = fixture_file_upload('fair_data_station/empty.ttl', 'text/turtle')
 
     assert_no_difference('ExtendedMetadataType.count') do
-      post :create_from_ttl, params: { emt_fds_ttl_file: file }
+      post :create_from_fair_ds_ttl, params: { emt_fair_ds_ttl_file: file }
     end
     assert_response :success
     assert_select 'p.alert.alert-info', text:/There were no new Extended Metadata Types identified as needing to be created./
