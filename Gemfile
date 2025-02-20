@@ -31,7 +31,7 @@ gem 'csl-styles'
 gem 'csv'
 gem 'daemons'
 gem 'delayed_job_active_record'
-gem 'docsplit', git: 'https://github.com/tuttiq/docsplit.git', ref: '6127e3912b8db94ed84dca6be5622d3d5ec0d879' # FIXME: Change back to "official" docsplit if this PR is ever merged: https://github.com/documentcloud/docsplit/pull/159
+gem 'docsplit', git: 'https://github.com/documentcloud/docsplit.git'
 gem 'doi_query_tool', git: 'https://github.com/seek4science/DOI-query-tool.git'
 gem 'doorkeeper'
 gem 'dotenv-rails'

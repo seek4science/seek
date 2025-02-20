@@ -17,6 +17,12 @@ GIT
     my_responds_to_parent (1.0.0)
 
 GIT
+  remote: https://github.com/documentcloud/docsplit.git
+  revision: 67118b82b57027686ec177132f749f7eca158316
+  specs:
+    docsplit (0.7.6)
+
+GIT
   remote: https://github.com/seek4science/DOI-query-tool.git
   revision: 7c2ba934885ad404d964cd371e236d3348efb63c
   specs:
@@ -29,13 +35,6 @@ GIT
   specs:
     zenodo-client (0.3.0)
       rest-client (~> 2.0)
-
-GIT
-  remote: https://github.com/tuttiq/docsplit.git
-  revision: 6127e3912b8db94ed84dca6be5622d3d5ec0d879
-  ref: 6127e3912b8db94ed84dca6be5622d3d5ec0d879
-  specs:
-    docsplit (0.7.6)
 
 GIT
   remote: https://github.com/youroute/api_smith.git
