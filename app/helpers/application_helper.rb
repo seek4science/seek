@@ -211,9 +211,7 @@ module ApplicationHelper
   end
 
   def render_markdown(markdown)
-    doc = CommonMarker.render_doc(markdown, :UNSAFE, [:tagfilter, :table, :strikethrough, :autolink])
-    renderer = CommonMarker::SeekHTMLRenderer.new(options: [:UNSAFE, :GITHUB_PRE_LANG], extensions: [:tagfilter, :table, :strikethrough, :autolink])
-    renderer.render(doc)
+    Seek::Markdown.render(markdown)
   end
 
   def text_or_not_specified(text, options = {})

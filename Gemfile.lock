@@ -325,6 +325,9 @@ GEM
     hashie (3.6.0)
     highline (3.1.2)
       reline
+    html-pipeline (3.2.2)
+      selma (~> 0.4)
+      zeitwerk (~> 2.5)
     htmlentities (4.3.4)
     http-accept (1.7.0)
     http-cookie (1.0.8)
@@ -865,6 +868,10 @@ GEM
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2, < 3.0)
       websocket (~> 1.0)
+    selma (0.4.12)
+      rb_sys (~> 0.9)
+    selma (0.4.12-arm64-darwin)
+    selma (0.4.12-x86_64-linux)
     set (1.1.1)
     sexp_processor (4.17.3)
     shacl (0.4.1)
@@ -1067,6 +1074,7 @@ DEPENDENCIES
   gitlab_omniauth-ldap
   google-analytics-rails
   handlebars_assets
+  html-pipeline
   i18n-js (~> 3.9.2)
   indefinite_article
   jbuilder
