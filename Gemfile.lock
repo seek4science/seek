@@ -1093,7 +1093,7 @@ DEPENDENCIES
   rack-attack
   rack-cors
   rack-mini-profiler
-  rails (~> 7.2.2)
+  rails (= 7.2.2.1)
   rails-controller-testing
   rails-html-sanitizer
   rails-observers
