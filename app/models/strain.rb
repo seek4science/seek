@@ -1,7 +1,6 @@
 class Strain < ApplicationRecord
 
   include Seek::Rdf::RdfGeneration
-  include Seek::ActsAsCachedTree
   include Seek::Subscribable
   include Seek::Biosamples::PhenoTypesAndGenoTypes
   include Seek::Search::BackgroundReindexing
