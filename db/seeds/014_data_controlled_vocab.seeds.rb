@@ -7,7 +7,9 @@ unless vocab = SampleControlledVocab::SystemVocabs.vocab_for_property(:data_type
                                     key: SampleControlledVocab::SystemVocabs.database_key_for_property(:data_types),
                                     description: data[:description],
                                     source_ontology: data[:source_ontology],
-                                    ols_root_term_uris: data[:ols_root_term_uris])
+                                    ols_root_term_uris: data[:ols_root_term_uris],
+                                    policy: Policy.public_policy,
+                                    projects: [Project.find_or_create_by(title:'Default Project')])
   data[:terms].each do |term|
     vocab.sample_controlled_vocab_terms << SampleControlledVocabTerm.new(label: term[:label], iri: term[:iri], parent_iri: term[:parent_iri])
   end

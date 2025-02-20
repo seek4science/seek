@@ -4,9 +4,14 @@
 
 <%= item_actions_dropdown do %>
 
-    <% if controlled_vocab.can_edit? -%>
-        <li><%= image_tag_for_key('edit', edit_sample_controlled_vocab_path(controlled_vocab), nil, nil, "Edit Sample Controlled Vocabulary") -%></li>
-    <% end -%>
+  <% if controlled_vocab.can_edit? -%>
+      <li><%= image_tag_for_key('edit', edit_sample_controlled_vocab_path(controlled_vocab), nil, nil, "Edit Sample Controlled Vocabulary") -%></li>
+  <% end -%>
+  <% if controlled_vocab.can_delete? %>
     <%= delete_icon(controlled_vocab, current_user) %>
+  <% end %>
+  <% if controlled_vocab.can_manage? %>
+    <li><%= image_tag_for_key('manage', manage_sample_controlled_vocab_path(controlled_vocab), nil, nil, "Manage Controlled Vocabulary") -%></li>
+  <% end %>
 
 <% end %>

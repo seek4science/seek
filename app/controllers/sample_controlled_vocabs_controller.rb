@@ -21,7 +21,8 @@ class SampleControlledVocabsController < ApplicationController
   end
 
   def new
-    @sample_controlled_vocab = SampleControlledVocab.new
+    attr = params['sample_controlled_vocabs'] ? cv_params : {}
+    @sample_controlled_vocab = SampleControlledVocab.new(attr)
     respond_with(@sample_controlled_vocab)
   end
 
@@ -132,8 +133,9 @@ class SampleControlledVocabsController < ApplicationController
 
   def cv_params
     params.require(:sample_controlled_vocab).permit(:title, :description, :group, :source_ontology, :ols_root_term_uris,
+                                                    *creator_related_params,
                                                     :required, :short_name,
-                                                    { sample_controlled_vocab_terms_attributes: %i[id _destroy label
+                                                    { project_ids: [], sample_controlled_vocab_terms_attributes: %i[id _destroy label
                                                                                                    iri parent_iri] })
   end
 end

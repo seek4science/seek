@@ -105,11 +105,13 @@ count = SampleType.count
 # Biosamples controlled vocabs
 disable_authorization_checks do
   growth_type_cv = SampleControlledVocab.where(title: 'SysMO Cell Culture Growth Type').first_or_create!(
-      sample_controlled_vocab_terms_attributes: [{ label: 'batch'}, { label: 'chemostat'}]
+    projects: [Project.find_or_create_by(title:'Default Project')],
+    sample_controlled_vocab_terms_attributes: [{ label: 'batch'}, { label: 'chemostat'}]
   )
 
   organism_part_cv = SampleControlledVocab.where(title: 'SysMO Sample Organism Part').first_or_create!(
-      sample_controlled_vocab_terms_attributes: [{ label: 'Whole cell'}, { label: 'Membrane fraction'}]
+    projects: [Project.find_or_create_by(title:'Default Project')],
+    sample_controlled_vocab_terms_attributes: [{ label: 'Whole cell'}, { label: 'Membrane fraction'}]
   )
 
   biosample_type = SampleType.where(title: 'SysMO Biosample').first_or_create(

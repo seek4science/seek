@@ -723,7 +723,7 @@ SEEK::Application.routes.draw do
 
   ### SAMPLE CONTROLLED VOCABS ###
 
-  resources :sample_controlled_vocabs do
+  resources :sample_controlled_vocabs, concerns: %i[asset] do
     collection do
       get :typeahead
       get :fetch_ols_terms_html

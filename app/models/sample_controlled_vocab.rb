@@ -23,7 +23,7 @@ class SampleControlledVocab < ApplicationRecord
   accepts_nested_attributes_for :repository_standard, reject_if: :check_repository_standard
 
   grouped_pagination
-
+  acts_as_asset
   def labels
     sample_controlled_vocab_terms.collect(&:label)
   end

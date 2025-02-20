@@ -62,6 +62,9 @@
     </div>
   <% end %>
 
+  <%= render partial: "projects/project_selector", locals: { resource: @sample_controlled_vocab } -%>
+  <%= render partial: 'assets/manage_specific_attributes', locals: {f: f} if show_form_manage_specific_attributes? %>
+
   <%= panel('Terms') do %>
 
     <span id='fetch-terms-spinner'></span>

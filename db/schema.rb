@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_02_12_145346) do
+ActiveRecord::Schema[7.2].define(version: 2025_02_20_145615) do
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
     t.string "format"
@@ -24,7 +24,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_12_145346) do
     t.datetime "updated_at"
     t.string "http_referer"
     t.text "user_agent"
-    t.text "data", limit: 16777215
+    t.text "data", size: :medium
     t.string "controller_name"
     t.index ["action"], name: "act_logs_action_index"
     t.index ["activity_loggable_type", "activity_loggable_id"], name: "act_logs_act_loggable_index"
@@ -263,8 +263,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_12_145346) do
     t.bigint "resource_id"
     t.string "bio_tools_id"
     t.string "name"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["resource_type", "resource_id"], name: "index_bio_tools_links_on_resource"
   end
 
@@ -820,7 +820,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_12_145346) do
     t.text "root_path"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.text "resource_attributes", limit: 16777215
+    t.text "resource_attributes", size: :medium
     t.bigint "git_repository_id"
     t.integer "visibility"
     t.string "doi"
@@ -1230,8 +1230,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_12_145346) do
     t.string "identifier"
     t.bigint "organism_id"
     t.bigint "extended_metadata_type_id"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.bigint "contributor_id"
     t.string "uuid"
     t.string "deleted_contributor"
@@ -1539,6 +1539,13 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_12_145346) do
     t.index ["publication_id", "project_id"], name: "index_projects_publications_on_publication_id_and_project_id"
   end
 
+  create_table "projects_sample_controlled_vocabs", force: :cascade do |t|
+    t.integer "project_id"
+    t.integer "sample_controlled_vocab_id"
+    t.index ["project_id"], name: "index_projects_sample_controlled_vocabs_on_project_id"
+    t.index ["sample_controlled_vocab_id", "project_id"], name: "index_projects_sample_controlled_vocabs_on_cv_id_and_project_id"
+  end
+
   create_table "projects_sample_types", id: false, force: :cascade do |t|
     t.integer "project_id"
     t.integer "sample_type_id"
@@ -1730,8 +1737,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_12_145346) do
     t.bigint "role_type_id"
     t.string "scope_type"
     t.bigint "scope_id"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["person_id", "role_type_id"], name: "index_roles_on_person_id_and_role_type_id"
     t.index ["person_id"], name: "index_roles_on_person_id"
     t.index ["role_type_id"], name: "index_roles_on_role_type_id"
@@ -1785,6 +1792,20 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_12_145346) do
     t.index ["user_id", "can_view"], name: "index_sample_auth_lookup_on_user_id_and_can_view"
   end
 
+  create_table "sample_controlled_vocab_auth_lookup", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "asset_id"
+    t.boolean "can_view", default: false
+    t.boolean "can_manage", default: false
+    t.boolean "can_edit", default: false
+    t.boolean "can_download", default: false
+    t.boolean "can_delete", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "asset_id", "can_view"], name: "index_cv_auth_lookup_on_user_id_asset_id_can_view"
+    t.index ["user_id", "can_view"], name: "index_cv_auth_lookup_on_user_id_and_can_view"
+  end
+
   create_table "sample_controlled_vocab_terms", id: :integer, force: :cascade do |t|
     t.text "label"
     t.integer "sample_controlled_vocab_id"
@@ -1805,6 +1826,12 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_12_145346) do
     t.string "short_name"
     t.string "key"
     t.integer "template_id"
+    t.integer "policy_id"
+    t.integer "contributor_id"
+    t.string "uuid"
+    t.string "external_identifier", limit: 2048
+    t.text "other_creators"
+    t.string "deleted_contributor"
   end
 
   create_table "sample_resource_links", id: :integer, force: :cascade do |t|
@@ -1823,8 +1850,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_12_145346) do
     t.boolean "can_edit", default: false
     t.boolean "can_download", default: false
     t.boolean "can_delete", default: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["user_id", "asset_id", "can_view"], name: "index_sample_type_user_id_asset_id_can_view"
     t.index ["user_id", "can_view"], name: "index_sample_type_auth_lookup_on_user_id_and_can_view"
   end
@@ -1880,7 +1907,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_12_145346) do
 
   create_table "sessions", id: :integer, force: :cascade do |t|
     t.string "session_id", null: false
-    t.text "data", limit: 16777215
+    t.text "data", size: :medium
     t.datetime "created_at"
     t.datetime "updated_at"
     t.index ["session_id"], name: "index_sessions_on_session_id"
@@ -2225,7 +2252,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_12_145346) do
   create_table "text_values", id: :integer, force: :cascade do |t|
     t.integer "version"
     t.integer "version_creator_id"
-    t.text "text", limit: 16777215, null: false
+    t.text "text", size: :medium, null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
