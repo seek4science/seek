@@ -41,7 +41,7 @@ gem 'fleximage', git: 'https://github.com/SysMO-DB/fleximage.git'
 gem 'gitlab_omniauth-ldap'
 gem 'google-analytics-rails'
 gem 'handlebars_assets'
-gem 'i18n-js'
+gem 'i18n-js', '~> 3.9.2' # Version 4+ does not support the asset pipeline
 gem 'indefinite_article'
 gem 'jbuilder'
 gem 'jbuilder-json_api'
