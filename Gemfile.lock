@@ -131,10 +131,6 @@ GEM
     acts-as-taggable-on (11.0.0)
       activerecord (>= 7.0, < 8.0)
       zeitwerk (>= 2.4, < 3.0)
-    acts_as_list (1.1.0)
-      activerecord (>= 4.2)
-    acts_as_tree (2.9.1)
-      activerecord (>= 3.0.0)
     addressable (2.8.1)
       public_suffix (>= 2.0.2, < 6.0)
     aes_key_wrap (1.1.0)
@@ -368,6 +364,7 @@ GEM
     json_schema (0.20.9)
     jsonapi-renderer (0.2.2)
     jwt (2.5.0)
+    kgio (2.11.4)
     language_list (1.2.1)
     latex-decode (0.4.0)
     ld-patch (3.2.0)
@@ -650,6 +647,7 @@ GEM
       thor (~> 1.0, >= 1.2.2)
       zeitwerk (~> 2.6)
     rainbow (3.1.1)
+    raindrops (0.20.1)
     rake (13.2.1)
     rb-fsevent (0.11.0)
     rb-inotify (0.10.1)
@@ -912,6 +910,12 @@ GEM
     unf_ext (0.0.8.2)
     unicode-display_width (2.1.0)
     unicode-types (1.7.0)
+    unicorn (6.1.0)
+      kgio (~> 2.6)
+      raindrops (~> 0.7)
+    unicorn-rails (2.2.1)
+      rack
+      unicorn
     useragent (0.16.11)
     uuid (2.3.9)
       macaddr (~> 1.0)
@@ -970,8 +974,6 @@ DEPENDENCIES
   activerecord-import
   activerecord-session_store
   acts-as-taggable-on
-  acts_as_list
-  acts_as_tree
   addressable
   api_smith!
   attr_encrypted
@@ -1035,7 +1037,7 @@ DEPENDENCIES
   mysql2
   net-ftp
   nkf
-  nokogiri (~> 1.16)
+  nokogiri
   observer
   omniauth
   omniauth-github
@@ -1097,6 +1099,7 @@ DEPENDENCIES
   terrapin
   terser
   test-prof
+  unicorn-rails
   uuid
   validate_url
   vcr
