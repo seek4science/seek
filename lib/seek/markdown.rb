@@ -22,7 +22,7 @@ module Seek
     MarkdownPipeline = HTMLPipeline.new(
       convert_filter: HTMLPipeline::ConvertFilter::MarkdownFilter.new(context: {
         markdown: {
-          render: { unsafe: true, github_pre_lang: true },
+          render: { unsafe: true, github_pre_lang: true, hardbreaks: false },
           extension: { tagfilter: true, table: true, strikethrough: true, autolink: true }
         }
       }),
@@ -30,6 +30,7 @@ module Seek
     )
 
     def self.render(markdown)
+      return '' if markdown.blank?
       MarkdownPipeline.call(markdown)[:output]
     end
   end
