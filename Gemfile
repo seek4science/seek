@@ -106,7 +106,6 @@ gem 'sqlite3'
 gem 'sunspot_rails'
 gem 'terrapin'
 gem 'terser'
-gem 'unicorn-rails'
 gem 'uuid'
 gem 'validate_url'
 gem 'whenever', require: false

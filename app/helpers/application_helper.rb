@@ -3,7 +3,6 @@
 
 module ApplicationHelper
   include FancyMultiselectHelper
-  include Recaptcha::ClientHelper
   include VersionHelper
   include ImagesHelper
   include SessionsHelper
