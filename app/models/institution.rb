@@ -11,8 +11,8 @@ class Institution < ApplicationRecord
   validates :country, country: true
 
 
-  VALID_ROR_ID_REGEX = /\A[0-9a-zA-Z]{9}\z/
-  validates :ror_id, format: { with: VALID_ROR_ID_REGEX, message: 'is invalid.' }, allow_blank: true
+  validates :ror_id, uniqueness: true, allow_blank: true
+  validates :ror_id, ror_id: true
 
   has_many :work_groups, dependent: :destroy, inverse_of: :institution
   has_many :projects, through: :work_groups,  inverse_of: :institutions
