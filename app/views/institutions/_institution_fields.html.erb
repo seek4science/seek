@@ -8,9 +8,6 @@
   </ul>
 </div>
 
-
-
-
 <div id="ror_query_name"  class="form-group">
   <div class="form-group">
     <%= f.label :title, class: "required" %> <%= link_to "Clear Fields", "#", id: "clear-fields", class: "link-primary small" %>
@@ -27,7 +24,7 @@
     <%= link_to(image('ror_id', title: 'ROR'), 'https://ror.org/', target: '_blank') %>
     <%= help_icon('The ROR ID (Research Organization Registry Identifier) is a unique 9-character alphanumeric code (e.g., 01f7bcy98).
    To find out more and get your ORCID ID please visit https://ror.org/') -%>
-    <%= f.text_field :ror_id, :class=>"form-control" -%>
+    <%= f.text_field :ror_id, class:"form-control" -%>
     <small class="form-text text-muted">
       <div id="ror-error-message" class="text-danger" style="display: none;"></div>
       <em>Enter the ID only (e.g., 01f7bcy98), then click on the fetch button.</em>
@@ -36,7 +33,7 @@
   </div>
   <div class="form-group">
     <%= f.label :city -%>
-    <%= f.text_field :city, :class=>"form-control" -%>
+    <%= f.text_field :city, class:"form-control" -%>
   </div>
   <div class="form-group">
     <%= f.label :country -%>
@@ -45,13 +42,13 @@
 
   <div class="form-group">
     <%= f.label :web_page -%>
-    <%= f.text_field :web_page, :class=>"form-control" -%>
+    <%= f.text_field :web_page, class:"form-control" -%>
   </div>
 
 
   <div class="form-group">
     <%= f.label :address -%>
-    <%= f.text_area :address, :rows => 5, :class=>"form-control" -%>
+    <%= f.text_area :address, rows:5, class:"form-control" -%>
     <small class="text-left form-text text-muted">
       <em>
         ROR doesn’t include detailed address information, please enter the address manually.
