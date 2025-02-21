@@ -1,5 +1,3 @@
-<% debug = false %> <!-- Set to true to display debug information -->
-
 <div class="alert alert-info">
   <b>Three Ways to Enter Institution Data</b>
   <ul>
@@ -57,25 +55,7 @@
     <small class="text-left form-text text-muted">
       <em>
         ROR doesn’t include detailed address information, please enter the address manually.
-        <% if debug %>
-          <br>
-          <span style="color:red;">remove the text before PR
-        <br>
-        If you need street-level details (e.g., street name, building number), use the latitude and longitude from the ROR API's addresses field to query a geocoding API.
-        e.g. https://nominatim.openstreetmap.org/reverse?format=json&lat=40.7128&lon=-74.0060
-      </span>
-        <% end %>
       </em>
     </small>
   </div>
-
-
-  <% if debug %>
-    <div class="row text-left">
-      <div class="col-md-12">
-        <h3>Data returned from ROR API</h3>
-        <div><pre id="ror-response"></pre></div>
-      </div>
-    </div>
-  <% end %>
 </div>

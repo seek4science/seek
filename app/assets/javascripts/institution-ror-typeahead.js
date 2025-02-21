@@ -30,7 +30,6 @@ function extractRorId(rorUrl) {
 
 function fetchRorData(rorId) {
     var url = ROR_API_URL + '/' + rorId;
-    console.log(url);
     fetch(url)
         .then(response => {
             if (!response.ok) {
@@ -114,9 +113,6 @@ function rorSuggestionTemplate(data) {
 function initializeLocalInstitutions(endpoint = '/institutions/typeahead.json', query = '', cache = false) {
     const baseUrl = `${window.location.protocol}//${window.location.host}`;
     const fullUrl = `${baseUrl}${endpoint}?q=${encodeURIComponent(query)}`;
-
-    console.log("Institutions URL: " + fullUrl);
-
     return new Bloodhound({
         datumTokenizer: Bloodhound.tokenizers.obj.whitespace('text'),
         queryTokenizer: Bloodhound.tokenizers.whitespace,
@@ -146,7 +142,6 @@ $j(document).ready(function () {
     var $j = jQuery.noConflict();
 
     $j('#fetch-ror-data-with-id').on('click', function () {
-        console.log("Fetching ROR data by ID...");
         fetchRorData($j('#institution_ror_id').val());
     });
 
@@ -216,7 +211,6 @@ $j(document).ready(function () {
                 suggestion: rorSuggestionTemplate
             },
             display: function (data) {
-                console.log("Fetching ROR data by name remotely...");
                 return data.name;
             },
             value: function (data) {
@@ -268,7 +262,5 @@ $j(document).ready(function () {
     if ($j('#institution_ror_id').val()!== '') {
         toggleUserInput(true);
     }
-    $j('#basic #name-01').bind('change', function() {
-        $j('#ror-response').html('');
-    });
+
 });
