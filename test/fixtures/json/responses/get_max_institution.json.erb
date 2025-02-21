@@ -22,12 +22,11 @@
     },
     "relationships": {
       "people": {
-        "data":
-        <%= res.people.map { |p| { id: p.id.to_s, type: 'people' } }.to_json %>
+        "data": "<%= res.people.map { |p| { id: p.id.to_s, type: 'people' } }.to_json %>"
       },
       "projects": {
         "data":
-        <%= res.projects.map { |p| { id: p.id.to_s, type: 'projects' } }.to_json %>
+        "<%= res.projects.map { |p| { id: p.id.to_s, type: 'projects' } }.to_json %>"
       }
     },
     "links": {
