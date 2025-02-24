@@ -7,11 +7,13 @@ class ProjectsControllerTest < ActionController::TestCase
   include RdfTestCases
   include ActionView::Helpers::NumberHelper
   include SharingFormTestHelper
+  include MockHelper
 
   fixtures :all
 
   def setup
     login_as(FactoryBot.create(:admin))
+    ror_mock
   end
 
   def test_title

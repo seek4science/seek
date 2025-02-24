@@ -2,10 +2,13 @@ require 'test_helper'
 require 'minitest/mock'
 
 class SchemaLdGenerationTest < ActiveSupport::TestCase
+
+  include MockHelper
   def setup
     @person = FactoryBot.create(:max_person, description: 'a lovely person')
     @project = @person.projects.first
     @current_time = Time.now.utc
+    ror_mock
   end
 
   test 'data catalogue' do

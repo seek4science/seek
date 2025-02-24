@@ -1,6 +1,9 @@
 require 'test_helper'
 
 class InstitutionTest < ActiveSupport::TestCase
+
+  include MockHelper
+
   fixtures :institutions, :projects, :work_groups, :users, :group_memberships, :people
   # Replace this with your real tests.
 
@@ -70,6 +73,7 @@ class InstitutionTest < ActiveSupport::TestCase
   end
 
   test 'validation' do
+    ror_mock
     i = FactoryBot.create(:institution)
     assert i.valid?
 
@@ -111,7 +115,7 @@ class InstitutionTest < ActiveSupport::TestCase
     i.web_page = 'http://www.mygrid.org.uk/dev/issues/secure/IssueNavigator.jspa?reset=true&mode=hide&sorter/order=DESC&sorter/field=priority&resolution=-1&pid=10051&fixfor=10110'
     assert i.valid?
 
-    i.ror_id='01f7bcy98'
+    i.ror_id='027m9bs27'
     assert i.valid?
 
     i.ror_id = ''
@@ -124,7 +128,7 @@ class InstitutionTest < ActiveSupport::TestCase
     assert !i.valid?
 
     #duplicate ror_id
-    existing_institution = FactoryBot.create(:institution, ror_id: '01f7bcy98')
+    existing_institution = FactoryBot.create(:institution, ror_id: '027m9bs27')
     new_institution = FactoryBot.build(:institution, ror_id: existing_institution.ror_id)
     assert_not new_institution.valid?
   end
