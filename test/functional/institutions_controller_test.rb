@@ -4,6 +4,7 @@ class InstitutionsControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
+  include MockHelper
 
   def setup
     login_as(:quentin)
@@ -34,6 +35,8 @@ class InstitutionsControllerTest < ActionController::TestCase
   end
 
   def test_should_create_institution
+    ror_mock
+
     assert_difference('Institution.count') do
       post :create, params: { institution: { title: 'test', country: 'FI', ror_id:'00h69cf80' } }
     end
@@ -44,15 +47,23 @@ class InstitutionsControllerTest < ActionController::TestCase
   end
 
   def test_can_not_create_institution_with_invalid_ror_id
+
       assert_no_difference('Institution.count') do
         post :create, params: { institution: { title: 'test', country: 'FI', ror_id:'3333' } }
       end
-      assert_equal assigns(:institution).errors[:ror_id].first, 'is invalid.'
+      assert_equal assigns(:institution).errors[:ror_id].first, 'ID must be a valid ROR ID format.'
+
+      assert_no_difference('Institution.count') do
+        post :create, params: { institution: { title: 'test', country: 'FI', ror_id:'P1C2O3C4T' } }
+      end
+      assert_equal assigns(:institution).errors[:ror_id].first, 'ID does not match any existing ROR organization.'
   end
 
 
   def test_can_not_create_institution_with_the_title_or_ror_id_that_already_exists
-    FactoryBot.create(:institution, title: 'my Institution', ror_id:'01f7bcy98')
+
+    ror_mock
+    FactoryBot.create(:institution, title: 'my Institution', ror_id:'00h69cf80')
 
     assert_no_difference('Institution.count') do
       post :create, params: { institution: { title: 'my Institution'} }
@@ -60,7 +71,7 @@ class InstitutionsControllerTest < ActionController::TestCase
     assert_equal assigns(:institution).errors[:title].first, 'has already been taken'
 
     assert_no_difference('Institution.count') do
-      post :create, params: { institution: { title: 'my Institution new', ror_id:'01f7bcy98'} }
+      post :create, params: { institution: { title: 'my Institution new', ror_id:'00h69cf80'} }
     end
     assert_equal assigns(:institution).errors[:ror_id].first, 'has already been taken'
 

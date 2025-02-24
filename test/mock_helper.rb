@@ -102,4 +102,10 @@ module MockHelper
     file = options[:content_file]
     stub_request(:post, url).to_return(body: File.new("#{Rails.root}/test/fixtures/files/mocking/#{file}"))
   end
+
+  def ror_mock
+    stub_request(:get, "https://api.ror.org/organizations/00h69cf80")
+      .to_return(status: 200, body: { id: "https://ror.org/00h69cf80" }.to_json, headers: { 'Content-Type' => 'application/json' })
+  end
+
 end

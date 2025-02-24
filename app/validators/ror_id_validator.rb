@@ -26,9 +26,7 @@ class RorIdValidator < ActiveModel::EachValidator
 
   def valid_ror_id?(ror_id)
     url = URI.parse("#{ROR_API_BASE_URL}#{ror_id}")
-    pp "url: #{url}"
     response = Net::HTTP.get_response(url)
-    pp "response: #{response}"
     response.is_a?(Net::HTTPSuccess) && JSON.parse(response.body)["id"].present?
   rescue StandardError
     false
