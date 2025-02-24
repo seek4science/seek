@@ -106,6 +106,9 @@ module MockHelper
   def ror_mock
     stub_request(:get, "https://api.ror.org/organizations/00h69cf80")
       .to_return(status: 200, body: { id: "https://ror.org/00h69cf80" }.to_json, headers: { 'Content-Type' => 'application/json' })
+
+    stub_request(:get, "https://api.ror.org/organizations/027m9bs27")
+      .to_return(status: 200, body: { id: "https://ror.org/027m9bs27" }.to_json, headers: { 'Content-Type' => 'application/json' })
   end
 
 end
