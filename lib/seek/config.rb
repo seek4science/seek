@@ -112,7 +112,8 @@ module Seek
                                                                     'ActionController::InvalidAuthenticityToken',
                                                                     'ActionController::UnknownHttpMethod',
                                                                     'ActionController::BadRequest',
-                                                                    'ActionDispatch::Http::MimeNegotiation::InvalidType'
+                                                                    'ActionDispatch::Http::MimeNegotiation::InvalidType',
+                                                                    'ActionController::ParameterMissing'
                                                 ] + ExceptionNotifier.ignored_exceptions,
                                                 email: {
                                                   sender_address: [noreply_sender],
