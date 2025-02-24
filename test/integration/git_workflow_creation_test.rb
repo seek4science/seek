@@ -394,6 +394,41 @@ class GitWorkflowCreationTest < ActionDispatch::IntegrationTest
     assert_equal annotation_count + 2, Git::Annotation.count
   end
 
+  test 'cannot set abstract cwl path to same as main workflow path' do
+    person = FactoryBot.create(:person)
+    cwl = WorkflowClass.find_by_key('cwl') || FactoryBot.create(:cwl_workflow_class)
+    login_as(person.user)
+
+    repo = FactoryBot.create(:unlinked_local_repository)
+
+    assert_difference('Workflow.count', 1) do
+      assert_difference('Git::Version.count', 1) do
+        # 2 annotations = Main WF path, diagram path
+        assert_difference('Git::Annotation.count', 2) do
+          post create_metadata_workflows_path, params: {
+            workflow: {
+              workflow_class_id: cwl.id,
+              title: 'blabla',
+              project_ids: [person.projects.first.id],
+              git_version_attributes: {
+                root_path: '/',
+                git_repository_id: repo.id,
+                ref: 'refs/heads/master',
+                main_workflow_path: 'Concat_two_files.cwl',
+                diagram_path: 'diagram.png',
+                abstract_cwl_path: 'Concat_two_files.cwl'
+              }
+            }
+          }
+        end
+      end
+    end
+
+    assert_redirected_to workflow_path(assigns(:workflow))
+    assert_equal 'Concat_two_files.cwl', assigns(:workflow).main_workflow_path
+    assert_nil assigns(:workflow).abstract_cwl_path
+  end
+
   private
 
   def login_as(user)
