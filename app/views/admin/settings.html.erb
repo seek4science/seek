@@ -9,7 +9,7 @@
                            'Pubmed API email', 'When adding a publication from PubMed, an email address is required to use the API. No registration is required.') %>
 
     <%= admin_text_setting(:crossref_api_email, Seek::Config.crossref_api_email,
-                           'CrossRef API email', "When adding a publication from a DOI, an email address is required to use the API. The email address needs registering at #{link_to 'http://www.crossref.org/', 'http://www.crossref.org/',:target=>:_blank}") %>
+                           'CrossRef API email', "When adding a publication from a DOI, an email address is required to use the API. No registration is required.") %>
 
     <%= admin_checkbox_setting(:allow_publications_fulltext, 1, Seek::Config.allow_publications_fulltext,
                              "Allow uploading FullTexts", "Allow the registered users to upload Fulltext (pdf) for publications. They can also be made public. Please makes sure it is allowed first.") %>
