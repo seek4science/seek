@@ -16,7 +16,7 @@ def load_seek_config_defaults!
   Seek::Config.default :jws_enabled, true
   Seek::Config.default :jws_online_root,"https://jws2.sysmo-db.org/"
   Seek::Config.default :internal_help_enabled, false
-  Seek::Config.default :external_help_url,"https://docs.seek4science.org/help"
+  Seek::Config.default :external_help_url,"https://docs.seek4science.org/help/user-guide/"
   Seek::Config.default :exception_notification_enabled,false
   Seek::Config.default :exception_notification_recipients,""
   Seek::Config.default :error_grouping_enabled,true
