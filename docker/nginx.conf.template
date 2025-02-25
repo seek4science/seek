@@ -65,9 +65,9 @@ http {
         server {
                 listen 3000;
                 client_max_body_size 50G;
-                proxy_read_timeout 3000;
-                proxy_send_timeout 3000;
-                send_timeout 3000;
+                proxy_read_timeout 300;
+                proxy_send_timeout 300;
+                send_timeout 300;
 
                 location ~ ^${SEEK_SUB_URI}(/.*|$) {
                         alias /seek/public;
