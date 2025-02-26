@@ -222,6 +222,12 @@ class SampleTypesController < ApplicationController
                                              required: true,
                                              is_title: true
                                            })
+      @sample_type.sample_attributes.build({
+                                             title: 'Description',
+                                             description: '',
+                                             pid: RDF::Vocab::SCHEMA.description,
+                                             sample_attribute_type: string_attribute_type
+                                           })
       fds_sample.additional_metadata_annotation_details.each do |details|
         @sample_type.sample_attributes.build({
                                                title: details.label,
