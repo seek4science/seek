@@ -444,7 +444,7 @@ class SampleTypesControllerTest < ActionController::TestCase
 
   test 'create from fair data station ttl' do
     blob = { data: fixture_file_upload('fair_data_station/seek-fair-data-station-test-case.ttl', 'text/turtle') }
-
+    FactoryBot.create(:string_sample_attribute_type, title: 'String') unless SampleAttributeType.where(title: 'String').any?
     assert_difference('ActivityLog.count', 1) do
       assert_difference('SampleType.count', 1) do
         assert_no_difference('ContentBlob.count') do
@@ -463,7 +463,10 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_equal sample_type, ActivityLog.last.activity_loggable
     assert_equal 'create', ActivityLog.last.action
 
-    assert_equal 5, sample_type.sample_attributes.count
+    assert_equal 6, sample_type.sample_attributes.count
+
+    assert_equal ["http://schema.org/name", "http://schema.org/description", "http://fairbydesign.nl/ontology/biosafety_level", "http://gbol.life/0.1/scientificName", "http://purl.uniprot.org/core/organism", "https://w3id.org/mixs/0000011"], sample_type.sample_attributes.collect(&:pid)
+    assert_equal ["Title", "Description", "biosafety level", "scientific name", "ncbi taxonomy id", "collection date"], sample_type.sample_attributes.collect(&:title)
   end
 
   test 'create from empty fair data station ttl' do
