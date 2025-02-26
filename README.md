@@ -33,7 +33,7 @@ For more information please visit: [FAIRDOM](http://fair-dom.org).
 We recommend installing FAIRDOM-SEEK on Debian or Ubuntu.
 
 To install the latest release please visit:
-[SEEK install guide](http://docs.seek4science.org/tech/install.html)
+[SEEK install guide](http://docs.seek4science.org/tech/install)
 
 For details about other distributions and installing on macOS please visit:
 [Other distributions guide](http://docs.seek4science.org/tech/other-distributions)
