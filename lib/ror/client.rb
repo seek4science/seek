@@ -1,4 +1,4 @@
-module ROR
+module Ror
   class Client
     ENDPOINT = 'https://api.ror.org'.freeze
 

@@ -119,7 +119,7 @@ class InstitutionsController < ApplicationController
 
 
   def ror_search
-    client = ROR::Client.new
+    client = Ror::Client.new
     if params[:query].present?
       response = client.query_name(params[:query])
     elsif params[:ror_id].present?
