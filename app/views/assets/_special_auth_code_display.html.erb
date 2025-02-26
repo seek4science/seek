@@ -1,9 +1,14 @@
 <% special_auth_code = resource.special_auth_codes.first %>
-<% if !special_auth_code.nil? && resource.can_manage? %>
-    <% temporary_link = url_for :action => :show, :only_path => false,  :code => special_auth_code.code %>
-    <p>
-      <b>Temporary access link:</b> <%= temporary_link %>
-      <br/>
-      <b>Expiration date:</b> <%= date_as_string(special_auth_code.expiration_date) -%>
-    </p>
+<% if special_auth_code.present? && resource.can_manage? %>
+  <% temporary_link = polymorphic_url(resource, code: special_auth_code.code) %>
+  <b>Temporary access link (Expiration date: <%= date_as_string(special_auth_code.expiration_date) -%>):</b>
+  <div class="input-group" id="special-auth-code">
+    <%= text_field_tag 'temp_link', temporary_link, readonly: 'readonly', class: 'form-control' %>
+    <span class="input-group-btn">
+      <button class="btn-default btn clipboard-btn" data-clipboard-target="#temp_link">
+        <span class="glyphicon glyphicon-copy" aria-hidden="true"></span>
+        Copy
+      </button>
+    </span>
+  </div>
 <% end %>

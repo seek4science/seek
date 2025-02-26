@@ -192,7 +192,7 @@ class GitController < ApplicationController
   end
 
   def authorize_parent
-    unless @parent_resource.can_download?
+    unless is_auth?(@parent_resource, :download)
       target = @parent_resource.can_view? ? @parent_resource : :root
       render_git_error('Not authorized', status: 403, redirect: target)
     end
