@@ -2,7 +2,7 @@
 <% if special_auth_code.present? && resource.can_manage? %>
   <% temporary_link = polymorphic_url(resource, code: special_auth_code.code) %>
   <b>Temporary access link (Expiration date: <%= date_as_string(special_auth_code.expiration_date) -%>):</b>
-  <div class="input-group">
+  <div class="input-group" id="special-auth-code">
     <%= text_field_tag 'temp_link', temporary_link, readonly: 'readonly', class: 'form-control' %>
     <span class="input-group-btn">
       <button class="btn-default btn clipboard-btn" data-clipboard-target="#temp_link">
