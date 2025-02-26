@@ -1,6 +1,3 @@
-var ROR_API_URL = "https://api.ror.org/organizations";
-
-
 function toggleUserInput(disabled) {
     const action = disabled ? 'addClass' : 'removeClass';
     const elements = [
@@ -29,22 +26,29 @@ function extractRorId(rorUrl) {
 }
 
 function fetchRorData(rorId) {
-    var url = ROR_API_URL + '/' + rorId;
+
+    //use /institutions/ror_search endpoint instead of the direct ROR API
+    var url = `/institutions/ror_search?ror_id=${encodeURIComponent(rorId)}`;
+
     fetch(url)
         .then(response => {
             if (!response.ok) {
                 return response.json().then(err => {
-                    throw new Error(err.errors ? err.errors[0] : "Unknown error occurred");
+                    throw new Error(err.error || "Unknown error occurred");
                 });
             }
             return response.json();
         })
         .then(data => {
-            $j('#ror-response').html(JSON.stringify(data, undefined, 4));
-            $j('#institution_title').val(data.name);
-            $j('#institution_city').val(data.addresses[0]['city']);
-            $j('#institution_country').val(data.country.country_code);
-            $j('#institution_ror_id').val(extractRorId(data.id));
+            if (!data || data.error) {
+                throw new Error(data.error || "Invalid response from server");
+            }
+
+            $j('#ror-response').html(JSON.stringify(data, null, 4));
+            $j('#institution_title').val(data.name || 'N/A');
+            $j('#institution_city').val(data.addresses?.[0]?.city || 'N/A');
+            $j('#institution_country').val(data.country?.country_code || 'N/A');
+            $j('#institution_ror_id').val(extractRorId(data.id) || '');
             $j('#institution_web_page').val(data.links?.[0] || 'N/A');
             $j('#ror-error-message').text('').hide();
             $j('#institution_ror_id').removeClass("field_with_errors");
@@ -60,17 +64,23 @@ function fetchRorData(rorId) {
 
 // ROR API source logic
 function rorQuerySource(query, processSync, processAsync) {
-    if (query.length < 3) {
-        return processAsync([]); // Trigger only for 3+ characters
+    if (query.length < 4) {
+        return processAsync([]);
     }
-    var url = ROR_API_URL + '?query=' + encodeURIComponent(query);
+
+    //use /institutions/ror_search endpoint instead of the direct ROR API
+    var url = `/institutions/ror_search?query=${encodeURIComponent(query)}`;
+
     return $j.ajax({
         url: url,
         type: 'GET',
         dataType: 'json',
         success: function (json) {
-            const orgs = json.items;
+            const orgs = json.items || [];
             return processAsync(orgs);
+        },
+        error: function (xhr, status, error) {
+            processAsync([]);
         }
     });
 }
@@ -98,7 +108,7 @@ function rorSuggestionTemplate(data) {
             altNames += label.label + ", ";
         });
     }
-    altNames = altNames.replace(/,\s*$/, ""); // Trim trailing comma
+    altNames = altNames.replace(/,\s*$/, "");
     return `
     <div>
         <p>
@@ -121,7 +131,7 @@ function initializeLocalInstitutions(endpoint = '/institutions/typeahead.json', 
             wildcard: '%QUERY',
             cache: cache,
             transform: function (response) {
-                return response.results; // Ensure response is structured correctly
+                return response.results;
             }
         }
     });
@@ -157,7 +167,7 @@ $j(document).ready(function () {
         {
             hint: true,
             highlight: true,
-            minLength: 1 // Start suggestions after typing at least 1 character
+            minLength: 4
         },
         // First Dataset: Local Institutions
         {

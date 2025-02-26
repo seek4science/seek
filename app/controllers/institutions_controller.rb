@@ -1,3 +1,5 @@
+require 'ror/client'
+
 class InstitutionsController < ApplicationController
   include Seek::IndexPager
   include CommonSweepers
@@ -112,6 +114,24 @@ class InstitutionsController < ApplicationController
        format.json do
          render json: institution_list
        end
+    end
+  end
+
+
+  def ror_search
+    client = RORClient::Client.new
+    if params[:query].present?
+      response = client.query_name(params[:query])
+    elsif params[:ror_id].present?
+      response = client.fetch_by_id(params[:ror_id])
+    else
+      render json: { error: 'Missing ROR ID' }, status: 400 and return
+    end
+
+    if response.key?(:error)
+      render json: response, status: 500
+    else
+      render json: response
     end
   end
 

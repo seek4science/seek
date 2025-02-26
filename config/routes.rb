@@ -408,6 +408,7 @@ SEEK::Application.routes.draw do
       get :request_all
       get :request_all_sharing_form
       get  :typeahead
+      get  :ror_search
     end
     resources :people, :programmes, :projects, :specimens, only: [:index]
   end
