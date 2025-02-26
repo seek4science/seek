@@ -295,6 +295,40 @@ class GitControllerTest < ActionController::TestCase
     assert flash[:error].include?('authorized')
   end
 
+  test 'get blob of private workflow via sharing link' do
+    workflow = FactoryBot.create(:local_git_workflow, policy: FactoryBot.create(:private_policy))
+    refute workflow.can_download?(nil)
+    sharing_link = nil
+    disable_authorization_checks { sharing_link = workflow.special_auth_codes.create! }
+    get :blob, params: { workflow_id: workflow.id, version: 1, path: 'diagram.png', code: sharing_link.code }, format: :html
+
+    assert_response :success
+    assert_select 'a.btn[href=?]', workflow_git_download_path(workflow, version: workflow.git_version.version, path: 'diagram.png', code: sharing_link.code)
+  end
+
+  test 'get raw blob of private workflow via sharing link' do
+    workflow = FactoryBot.create(:local_git_workflow, policy: FactoryBot.create(:private_policy))
+    refute workflow.can_download?(nil)
+    sharing_link = nil
+    disable_authorization_checks { sharing_link = workflow.special_auth_codes.create! }
+    get :raw, params: { workflow_id: workflow.id, version: 1, path: 'concat_two_files.ga', code: sharing_link.code }, format: :html
+
+    assert_response :success
+    assert @response.body.include?('galaxy_workflow')
+    assert response.headers['Content-Type'].include?('text/plain')
+  end
+
+  test 'download blob of private workflow via sharing link' do
+    workflow = FactoryBot.create(:local_git_workflow, policy: FactoryBot.create(:private_policy))
+    refute workflow.can_download?(nil)
+    sharing_link = nil
+    disable_authorization_checks { sharing_link = workflow.special_auth_codes.create! }
+    get :download, params: { workflow_id: workflow.id, version: 1, path: 'concat_two_files.ga', code: sharing_link.code }, format: :html
+
+    assert_response :success
+    assert @response.header['Content-Disposition'].include?('attachment')
+  end
+
   test 'show appropriate buttons for permissions' do
     viewer = FactoryBot.create(:person)
     downloader = FactoryBot.create(:person)
