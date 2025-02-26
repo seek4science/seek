@@ -24,7 +24,13 @@
                     <th <%= 'data-title-column="true" ' if (attribute.is_title && link) -%>data-accessor-name="<%= attribute.accessor_name -%>" data-column-type="<%= attribute.sample_attribute_type.base_type-%>" data-search-title="<%= attribute.title %>">
                       <%= sample_attribute_display_title(attribute) %>
                     </th>
-                <% end %>
+								<% end %>
+								<th>
+									Date created
+								</th>
+								<th>
+									Date updated
+								</th>
               </tr>
           <% end %>
       <% end %>
@@ -57,6 +63,8 @@
                           <td><%= display_attribute(sample, attribute, link: link) %></td>
                       <% end %>
                   <% end %>
+									<td><%= sample.created_at %></td>
+									<td><%= sample.updated_at %></td>
               <% end %>
           <% end %>
           </tbody>
