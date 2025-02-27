@@ -2,6 +2,7 @@ require 'test_helper'
 
 class PersonTest < ActiveSupport::TestCase
   fixtures :users, :people, :roles
+  include Seek::Merging::PersonMerge
 
   def test_work_groups
     p = FactoryBot.create(:person_in_multiple_projects)
@@ -1414,4 +1415,334 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal [project, project2, project3], person.projects.sort_by(&:id)
     assert_equal [project,project2], person.administered_projects.sort_by(&:id)
   end
+
+  test 'merge simple attributes' do
+    person_to_keep = FactoryBot.create(:min_person)
+    other_person = FactoryBot.create(:max_person)
+    other_person_attributes = {}
+    simple_attributes = %i[first_name last_name email phone skype_name web_page description avatar_id orcid]
+    simple_attributes.each do |attribute|
+      other_person_attributes[attribute] = other_person.send(attribute)
+    end
+
+    disable_authorization_checks { person_to_keep.merge(other_person) }
+    person_to_keep.reload
+
+    assert_equal 'Minimal', person_to_keep.last_name
+    assert_equal 'minimal_person@email.com', person_to_keep.email
+    attributes = simple_attributes - %i[last_name email]
+    attributes.each do |attribute|
+      assert_equal other_person_attributes[attribute], person_to_keep.send(attribute),
+                   "Should copy #{attribute} if empty in person to keep"
+    end
+  end
+
+  test 'merge annotations' do
+    person_to_keep = FactoryBot.create(:min_person)
+    person_to_keep.annotate_with(%w[golf merging], 'expertise', person_to_keep)
+    person_to_keep.annotate_with(%w[merger], 'tool', person_to_keep)
+    other_person = FactoryBot.create(:max_person)
+
+    disable_authorization_checks { person_to_keep.merge(other_person) }
+    person_to_keep.reload
+
+    assert_equal %w[fishing golf merging].sort, person_to_keep.expertise.sort
+    assert_equal ['fishing rod', 'merger'].sort, person_to_keep.tools.sort
+  end
+
+  test 'merge annotations_by' do
+    person_to_keep = FactoryBot.create(:person)
+    other_person = FactoryBot.create(:max_person)
+    sop = FactoryBot.create(:sop, creator_ids: [person_to_keep.id, other_person.id])
+    expected_a_by = []
+    a_by = FactoryBot.create(:tag, value: 'Tag_1', annotatable: sop, source: person_to_keep.user)
+    expected_a_by << [a_by.id, a_by.value_id]
+    a_by = FactoryBot.create(:tag, value: 'Tag_2', annotatable: sop, source: person_to_keep.user)
+    expected_a_by << [a_by.id, a_by.value_id]
+    FactoryBot.create(:tag, value: a_by.value, annotatable: sop, source: other_person.user)
+    a_by = FactoryBot.create(:tag, value: 'Tag_3', annotatable: sop, source: other_person.user)
+    expected_a_by << [a_by.id, a_by.value_id]
+
+    disable_authorization_checks { person_to_keep.merge(other_person) }
+    person_to_keep.reload
+
+    assert_equal expected_a_by.sort, person_to_keep.user.annotations_by.pluck(:id, :value_id)
+  end
+
+  test 'merge group_memberships without duplication' do
+    person_to_keep = FactoryBot.create(:person_in_multiple_projects)
+    FactoryBot.create(:programme, project_ids: [person_to_keep.project_ids.last])
+    other_person = FactoryBot.create(:max_person)
+    FactoryBot.create(:programme, project_ids: [other_person.project_ids.last])
+    other_person.work_groups << person_to_keep.work_groups[0]
+
+    ids = %i[work_group_ids programme_ids institution_ids project_ids]
+    expected = {}
+    ids.each do |var|
+      orig_ids = person_to_keep.send(var)
+      other_ids = other_person.send(var)
+      refute_empty orig_ids
+      refute_empty other_ids
+      refute_equal orig_ids, other_ids
+      expected[var] = (orig_ids + other_ids).compact.uniq.sort
+    end
+
+    disable_authorization_checks { person_to_keep.merge(other_person) }
+    person_to_keep.reload
+
+    ids.each do |var|
+      assert_equal expected[var], person_to_keep.send(var).sort
+    end
+  end
+
+  test 'merge subscriptions without duplication' do
+    sop_keep = FactoryBot.create :sop
+    sop_both = FactoryBot.create :sop
+    sop_other = FactoryBot.create :sop
+    person_to_keep = FactoryBot.create(:person)
+    other_person = FactoryBot.create(:max_person)
+    FactoryBot.create :subscription, person: person_to_keep, subscribable: sop_keep
+    FactoryBot.create :subscription, person: person_to_keep, subscribable: sop_both
+    FactoryBot.create :subscription, person: other_person, subscribable: sop_both
+    FactoryBot.create :subscription, person: other_person, subscribable: sop_other
+    orig_subs = person_to_keep.subscriptions.pluck(:subscribable_id)
+    other_subs = other_person.subscriptions.pluck(:subscribable_id)
+    assert orig_subs.include?(sop_keep.id)
+    assert orig_subs.include?(sop_both.id) && other_subs.include?(sop_both.id)
+    assert other_subs.include?(sop_other.id)
+
+    disable_authorization_checks { person_to_keep.merge(other_person) }
+    person_to_keep.reload
+
+    assert_equal (orig_subs + other_subs).compact.uniq.sort, person_to_keep.subscriptions.pluck(:subscribable_id).sort
+  end
+
+  test 'merge resources without duplication' do
+    person_to_keep = FactoryBot.create(:person)
+    other_person = FactoryBot.create(:person)
+    s1 = FactoryBot.create(:sop, contributor: person_to_keep)
+    s2 = FactoryBot.create(:sop, contributor: person_to_keep, creator_ids: [person_to_keep.id, other_person.id])
+    s3 = FactoryBot.create(:sop, contributor: other_person)
+    s4 = FactoryBot.create(:sop, contributor: other_person, creator_ids: [person_to_keep.id, other_person.id])
+    s5 = FactoryBot.create(:sop, contributor: FactoryBot.create(:person), creator_ids: [other_person.id])
+
+    disable_authorization_checks { person_to_keep.merge(other_person) }
+    person_to_keep.reload
+
+    assert_equal [s1, s2, s3, s4].sort, person_to_keep.contributed_sops.sort
+    assert_equal [s2, s4, s5].sort, person_to_keep.created_sops.sort
+  end
+
+  test 'merge all types of resources' do
+    person_to_keep = FactoryBot.create(:person)
+    other_person = FactoryBot.create(:person)
+
+    types_without_creators = %w[Event Strain]
+    contributed_items = []
+    created_items = []
+    Person::RELATED_RESOURCE_TYPES.each do |resource_type|
+      sym = resource_type == 'SampleType' ? :simple_sample_type : resource_type.underscore.to_sym
+      co = FactoryBot.create(sym, contributor: other_person)
+      contributed_items << [co.class.to_s, co.id]
+      contributed_items << ['Investigation', co.investigation.id] if %w[Study Assay].include?(resource_type)
+      contributed_items << ['Study', co.study.id] if resource_type == 'Assay'
+      unless types_without_creators.include?(resource_type)
+        cr = FactoryBot.create(sym, contributor: FactoryBot.create(:person), creator_ids: [other_person.id])
+        created_items << [cr.class.to_s, cr.id]
+      end
+    end
+
+    disable_authorization_checks { person_to_keep.merge(other_person) }
+    person_to_keep.reload
+
+    assert_equal created_items.sort, (person_to_keep.created_items.map { |cr| [cr.class.to_s, cr.id] }).sort
+    assert_equal contributed_items.sort, (person_to_keep.contributed_items.map { |co| [co.class.to_s, co.id] }).sort
+  end
+
+  test 'merge permissions without duplication' do
+    person_to_keep = FactoryBot.create(:person)
+    other_person = FactoryBot.create(:person)
+
+    sop_keep = FactoryBot.create(:sop)
+    sop_keep.policy.permissions.build(contributor: person_to_keep, access_type: Policy::MANAGING)
+    sop_keep.policy.save
+    sop_both = FactoryBot.create :sop
+    sop_both.policy.permissions.build(contributor: person_to_keep, access_type: Policy::EDITING)
+    sop_both.policy.permissions.build(contributor: other_person, access_type: Policy::EDITING)
+    sop_both.policy.save
+    sop_other = FactoryBot.create :sop
+    sop_other.policy.permissions.build(contributor: other_person, access_type: Policy::VISIBLE)
+    sop_other.policy.save
+
+    assert_equal [[person_to_keep.id, Policy::MANAGING]],
+                 sop_keep.policy.permissions.pluck(:contributor_id, :access_type)
+    assert_equal [[other_person.id, Policy::EDITING], [person_to_keep.id, Policy::EDITING]].sort,
+                 sop_both.policy.permissions.pluck(:contributor_id, :access_type)
+    assert_equal [[other_person.id, Policy::VISIBLE]],
+                 sop_other.policy.permissions.pluck(:contributor_id, :access_type)
+
+    disable_authorization_checks { person_to_keep.merge(other_person) }
+    person_to_keep.reload
+
+    assert_equal [[person_to_keep.id, Policy::MANAGING]],
+                 sop_keep.policy.permissions.pluck(:contributor_id, :access_type)
+    assert_equal [[person_to_keep.id, Policy::EDITING]],
+                 sop_both.policy.permissions.pluck(:contributor_id, :access_type)
+    assert_equal [[person_to_keep.id, Policy::VISIBLE]],
+                 sop_other.policy.permissions.pluck(:contributor_id, :access_type)
+    assert 3, Permission.where(contributor_type: 'Person', contributor_id: person_to_keep.id).length
+  end
+
+  test 'merge roles without duplication' do
+    person_to_keep = FactoryBot.create(:person_in_multiple_projects)
+    other_person = FactoryBot.create(:asset_gatekeeper)
+    other_person.work_groups << person_to_keep.work_groups.last
+
+    keep_proj = person_to_keep.projects.first
+    shared_proj = person_to_keep.projects.last
+    other_proj = other_person.projects.last
+
+    refute keep_proj.has_member?(other_person)
+    assert shared_proj.has_member?(person_to_keep)
+    assert shared_proj.has_member?(other_person)
+    refute other_proj.has_member?(person_to_keep)
+
+    person_to_keep.is_asset_housekeeper = true, keep_proj
+    person_to_keep.is_pal = true, shared_proj
+    other_person.is_pal = true, shared_proj
+    other_person.is_project_administrator = true, shared_proj
+    disable_authorization_checks do
+      person_to_keep.save!
+      other_person.save!
+    end
+    person_to_keep.reload
+    other_person.reload
+
+    assert person_to_keep.is_asset_housekeeper?(keep_proj)
+    assert person_to_keep.is_pal?(shared_proj)
+    refute person_to_keep.is_project_administrator?(shared_proj)
+    refute person_to_keep.is_asset_gatekeeper?(other_proj)
+    assert other_person.is_pal?(shared_proj)
+    assert other_person.is_project_administrator?(shared_proj)
+    assert other_person.is_asset_gatekeeper?(other_proj)
+
+    disable_authorization_checks { person_to_keep.merge(other_person) }
+    person_to_keep.reload
+
+    assert person_to_keep.is_asset_housekeeper?(keep_proj)
+    assert person_to_keep.is_pal?(shared_proj)
+    assert person_to_keep.is_project_administrator?(shared_proj)
+    assert person_to_keep.is_asset_gatekeeper?(other_proj)
+    assert_equal 4, person_to_keep.roles.length
+  end
+
+  test 'merge user identities without duplication' do
+    person_to_keep = FactoryBot.create(:person)
+    other_person = FactoryBot.create(:person)
+
+    FactoryBot.create(:identity, uid: 'ldap-keep', user_id: person_to_keep.user.id)
+    FactoryBot.create(:identity, uid: 'ldap-shared', user_id: person_to_keep.user.id)
+    FactoryBot.create(:identity, uid: 'ldap-shared', user_id: other_person.user.id)
+    FactoryBot.create(:identity, uid: 'ldap-other', user_id: other_person.user.id)
+
+    disable_authorization_checks { person_to_keep.merge(other_person) }
+    person_to_keep.reload
+
+    expected = %w[keep shared other]
+    assert_equal (expected.map { |exp| "ldap-#{exp}" }).sort, person_to_keep.user.identities.pluck(:uid).sort
+  end
+
+  test 'merge user oauth_applications without duplication' do
+    person_to_keep = FactoryBot.create(:person)
+    other_person = FactoryBot.create(:person)
+
+    oauth_url = 'https://localhost:3000/oauth'
+    FactoryBot.create(:oauth_application, redirect_uri: "#{oauth_url}_keep", owner: person_to_keep.user)
+    FactoryBot.create(:oauth_application, redirect_uri: "#{oauth_url}_shared", owner: person_to_keep.user)
+    FactoryBot.create(:oauth_application, redirect_uri: "#{oauth_url}_shared", owner: other_person.user)
+    FactoryBot.create(:oauth_application, redirect_uri: "#{oauth_url}_other", owner: other_person.user)
+
+    disable_authorization_checks { person_to_keep.merge(other_person) }
+    person_to_keep.reload
+
+    expected = %w[keep shared other]
+    assert_equal (expected.map { |exp| "#{oauth_url}_#{exp}" }).sort,
+                 person_to_keep.user.oauth_applications.pluck(:redirect_uri).sort
+  end
+
+  test 'merge user access_tokens without duplication' do
+    person_to_keep = FactoryBot.create(:person)
+    other_person = FactoryBot.create(:person)
+
+    # OAuth Applications
+    oauth_url = 'https://localhost:3000/oauth'
+    ap_k = FactoryBot.create(:oauth_application, redirect_uri: "#{oauth_url}_keep", owner: person_to_keep.user)
+    ap_s = FactoryBot.create(:oauth_application, redirect_uri: "#{oauth_url}_shared", owner: person_to_keep.user)
+    ap_o = FactoryBot.create(:oauth_application, redirect_uri: "#{oauth_url}_other", owner: other_person.user)
+    # Access tokens
+    FactoryBot.create(:oauth_access_token, application: ap_k, resource_owner_id: person_to_keep.user.id)
+    FactoryBot.create(:oauth_access_token, application: ap_s, resource_owner_id: person_to_keep.user.id)
+    FactoryBot.create(:oauth_access_token, application: ap_s, resource_owner_id: other_person.user.id)
+    FactoryBot.create(:oauth_access_token, application: ap_s, resource_owner_id: other_person.user.id, scopes: 'write')
+    FactoryBot.create(:oauth_access_token, application: ap_o, resource_owner_id: other_person.user.id)
+
+    disable_authorization_checks { person_to_keep.merge(other_person) }
+    person_to_keep.reload
+
+    assert_equal [[ap_k.id, 'read'], [ap_s.id, 'read'], [ap_s.id, 'write'], [ap_o.id, 'read']].sort,
+                 person_to_keep.user.access_tokens.pluck(:application_id, :scopes).sort
+  end
+
+  test 'merge user access_grants without duplication' do
+    person_to_keep = FactoryBot.create(:person)
+    other_person = FactoryBot.create(:person)
+
+    # OAuth Applications
+    oauth_url = 'https://localhost:3000/oauth'
+    ap_k = FactoryBot.create(:oauth_application, redirect_uri: "#{oauth_url}_keep", owner: person_to_keep.user)
+    ap_s = FactoryBot.create(:oauth_application, redirect_uri: "#{oauth_url}_shared", owner: person_to_keep.user)
+    ap_o = FactoryBot.create(:oauth_application, redirect_uri: "#{oauth_url}_other", owner: other_person.user)
+    # Access grants
+    grant_url = 'https://localhost:3000/grant'
+    FactoryBot.create(:oauth_access_grant, application: ap_k, redirect_uri: "#{grant_url}_keep",
+                                           resource_owner_id: person_to_keep.user.id)
+    FactoryBot.create(:oauth_access_grant, application: ap_s, redirect_uri: "#{grant_url}_shared",
+                                           resource_owner_id: person_to_keep.user.id)
+    FactoryBot.create(:oauth_access_grant, application: ap_s, redirect_uri: "#{grant_url}_shared",
+                                           resource_owner_id: other_person.user.id)
+    FactoryBot.create(:oauth_access_grant, application: ap_s, redirect_uri: "#{grant_url}_shared",
+                                           resource_owner_id: other_person.user.id, scopes: 'write')
+    FactoryBot.create(:oauth_access_grant, application: ap_o, redirect_uri: "#{grant_url}_other",
+                                           resource_owner_id: other_person.user.id)
+
+    disable_authorization_checks { person_to_keep.merge(other_person) }
+    person_to_keep.reload
+
+    assert_equal [[ap_k.id, 'read'], [ap_s.id, 'read'], [ap_s.id, 'write'], [ap_o.id, 'read']].sort,
+                 person_to_keep.user.access_grants.pluck(:application_id, :scopes).sort
+  end
+
+  test 'other person is destroyed after merge' do
+    person_to_keep = FactoryBot.create(:min_person)
+    other_person = FactoryBot.create(:max_person)
+    assert_difference('Person.count', -1) do
+      disable_authorization_checks { person_to_keep.merge(other_person) }
+    end
+    assert_nil Person.find_by_id(other_person.id)
+  end
+
+  test 'log added after successful merge' do
+    person_to_keep = FactoryBot.create(:person)
+    other_person = FactoryBot.create(:max_person)
+
+    assert_difference('ActivityLog.count') do
+      disable_authorization_checks { person_to_keep.merge(other_person) }
+    end
+
+    merge_log = ActivityLog.last
+    assert_equal 'MERGE-person', merge_log.action
+    assert_includes merge_log.data, "#{other_person.id} was merged into"
+    assert_includes merge_log.data, "#{person_to_keep.id}."
+  end
+
 end
