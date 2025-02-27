@@ -232,6 +232,17 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
     assert_equal ["brand", "fermentation", "ncbi taxonomy id", "scientific name", "volume"], details.collect(&:label).sort
   end
 
+  test 'get all additional annotations for type' do
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case-irregular.ttl"
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+    study = inv.studies.first
+    assert_equal ["http://fairbydesign.nl/ontology/end_date_of_study", "http://fairbydesign.nl/ontology/experimental_site_name", "http://fairbydesign.nl/ontology/start_date_of_study"], study.all_additional_metadata_annotations_for_type.sort
+    obs_unit = study.observation_units.first
+    assert_equal ["http://fairbydesign.nl/ontology/birth_weight", "http://fairbydesign.nl/ontology/date_of_birth", "https://w3id.org/mixs/0000811"], obs_unit.all_additional_metadata_annotations_for_type.sort
+    sample = obs_unit.samples.first
+    assert_equal ["http://fairbydesign.nl/ontology/biosafety_level", "http://gbol.life/0.1/scientificName", "http://purl.uniprot.org/core/organism", "https://w3id.org/mixs/0000011"], sample.all_additional_metadata_annotations_for_type.sort
+  end
+
   test 'to extended metadata types json' do
     path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case.ttl"
     jsons = Seek::FairDataStation::Reader.new.to_extended_metadata_type_json(path)
