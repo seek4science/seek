@@ -443,7 +443,7 @@ class SampleTypesControllerTest < ActionController::TestCase
   end
 
   test 'create from fair data station ttl' do
-    blob = { data: fixture_file_upload('fair_data_station/seek-fair-data-station-test-case.ttl', 'text/turtle') }
+    blob = { data: fixture_file_upload('fair_data_station/seek-fair-data-station-test-case-irregular.ttl', 'text/turtle') }
     FactoryBot.create(:string_sample_attribute_type, title: 'String') unless SampleAttributeType.where(title: 'String').any?
     assert_difference('ActivityLog.count', 1) do
       assert_difference('SampleType.count', 1) do
@@ -465,8 +465,11 @@ class SampleTypesControllerTest < ActionController::TestCase
 
     assert_equal 6, sample_type.sample_attributes.count
 
-    assert_equal ["http://schema.org/name", "http://schema.org/description", "http://fairbydesign.nl/ontology/biosafety_level", "http://gbol.life/0.1/scientificName", "http://purl.uniprot.org/core/organism", "https://w3id.org/mixs/0000011"], sample_type.sample_attributes.collect(&:pid)
-    assert_equal ["Title", "Description", "biosafety level", "scientific name", "ncbi taxonomy id", "collection date"], sample_type.sample_attributes.collect(&:title)
+    expected = ["http://schema.org/name", "http://schema.org/description", "http://fairbydesign.nl/ontology/biosafety_level", "http://gbol.life/0.1/scientificName", "http://purl.uniprot.org/core/organism", "https://w3id.org/mixs/0000011"].sort
+    assert_equal expected, sample_type.sample_attributes.collect(&:pid).sort
+
+    expected = ["Title", "Description", "biosafety level", "scientific name", "ncbi taxonomy id", "collection date"].sort
+    assert_equal expected, sample_type.sample_attributes.collect(&:title).sort
   end
 
   test 'create from empty fair data station ttl' do

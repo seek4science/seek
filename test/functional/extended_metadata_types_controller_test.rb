@@ -297,7 +297,7 @@ class ExtendedMetadataTypesControllerTest < ActionController::TestCase
     assert person.is_admin?
     login_as(person)
 
-    file = fixture_file_upload('fair_data_station/seek-fair-data-station-test-case.ttl', 'text/turtle')
+    file = fixture_file_upload('fair_data_station/seek-fair-data-station-test-case-irregular.ttl', 'text/turtle')
 
     assert_no_difference('ExtendedMetadataType.count') do
       post :create_from_fair_ds_ttl, params: { emt_fair_ds_ttl_file: file }
