@@ -26,7 +26,7 @@ module Seek
         obs_unit = study&.observation_units&.first
         assay = study&.assays&.first
         necessary = [inv, study, obs_unit, assay].compact.select do |type|
-          type.additional_metadata_annotations.any?
+          type.all_additional_metadata_annotations_for_type.any?
         end
         necessary.collect(&:to_extended_metadata_type_json)
       end
