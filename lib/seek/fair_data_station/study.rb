@@ -10,6 +10,10 @@ module Seek
       def child_class
         Seek::FairDataStation::ObservationUnit
       end
+
+      def rdf_type_uri
+        'http://jermontology.org/ontology/JERMOntology#Study'
+      end
     end
   end
 end

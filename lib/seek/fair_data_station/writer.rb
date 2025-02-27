@@ -204,7 +204,7 @@ module Seek
 
       def update_sample_metadata(seek_sample, datastation_sample)
         datastation_sample.populate_seek_sample(seek_sample)
-      end	
+      end
 
       def detect_extended_metadata_type(seek_entity, datastation_entity)
         property_ids = datastation_entity.additional_metadata_annotations.collect { |annotation| annotation[0] }
@@ -214,7 +214,7 @@ module Seek
           extended_metadata_property_ids = collect_extended_metadata_type_attibute_pids(emt)
           intersection = (property_ids & extended_metadata_property_ids)
           difference = (property_ids | extended_metadata_property_ids) - intersection
-          emt = nil if intersection.length.zero?
+          emt = nil if intersection.empty?
           [intersection.length, difference.length, emt]
         end.sort_by do |x|
           # order by the number of properties matched coming top, but downgraded by the number of differences
