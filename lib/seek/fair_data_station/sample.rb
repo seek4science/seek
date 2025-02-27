@@ -24,6 +24,10 @@ module Seek
         data['Description'] = description
         seek_sample.data = data
       end
+
+      def rdf_type_uri
+        'http://jermontology.org/ontology/JERMOntology#Sample'
+      end
     end
   end
 end
