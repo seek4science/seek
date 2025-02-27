@@ -89,6 +89,16 @@ module Seek
         end
       end
 
+      def all_annotations_for_type
+        @all_annotations_for_type ||= query_all_annotations
+      end
+
+      def all_additional_metadata_annotations_for_type
+        all_annotations_for_type.reject do |annotation|
+          core_annotations.include?(annotation)
+        end
+      end
+
       def to_extended_metadata_type_json
         json = {}
         json['title'] = "FDS #{type_name.underscore.humanize} - #{package_name || UUID.generate}"
@@ -181,8 +191,23 @@ module Seek
         end
       end
 
+      def query_all_annotations
+        sparql = SPARQL::Client.new(graph)
+        query = sparql.select.where(
+          [:object, RDF.type, RDF::URI(rdf_type_uri)],
+          %i[object property value]
+        )
+        query.execute.collect do |solution|
+          solution.property.to_s
+        end.uniq
+      end
+
       def type_name
         self.class.name.demodulize
+      end
+
+      def rdf_type_uri
+        raise 'not implemented'
       end
     end
   end
