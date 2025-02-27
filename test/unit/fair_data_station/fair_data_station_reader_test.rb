@@ -90,7 +90,8 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
     # packageName not included
     assay = study.assays.first
     assert_equal 12, assay.additional_metadata_annotations.count
-    refute_includes assay.additional_metadata_annotations, ['http://fairbydesign.nl/ontology/packageName', 'Amplicon demultiplexed']
+    refute_includes assay.additional_metadata_annotations,
+                    ['http://fairbydesign.nl/ontology/packageName', 'Amplicon demultiplexed']
     assert_equal 'Amplicon demultiplexed', assay.package_name
     assert_nil study.package_name
 
@@ -222,48 +223,53 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
     study = inv.studies.first
     details = study.additional_metadata_annotation_details
     assert_equal 3, details.count
-    assert_equal ["end date of study", "experimental site name", "start date of study"], details.collect(&:label).sort
+    assert_equal ['end date of study', 'experimental site name', 'start date of study'], details.collect(&:label).sort
 
     path = "#{Rails.root}/test/fixtures/files/fair_data_station/indpensim.ttl"
     inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
     obs_unit = inv.studies.first.observation_units.first
     details = obs_unit.additional_metadata_annotation_details
     assert_equal 5, details.count
-    assert_equal ["brand", "fermentation", "ncbi taxonomy id", "scientific name", "volume"], details.collect(&:label).sort
+    assert_equal ['brand', 'fermentation', 'ncbi taxonomy id', 'scientific name', 'volume'],
+                 details.collect(&:label).sort
   end
 
-  test 'all_additional_metadata_annotations_for_type_details' do
+  test 'all_additional_potential_annotations_details' do
     path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case-irregular.ttl"
     inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
     study = inv.studies.first
-    details = study.all_additional_metadata_annotations_for_type_details
+    details = study.all_additional_potential_annotation_details
     assert_equal 3, details.count
-    assert_equal ["end date of study", "experimental site name", "start date of study"], details.collect(&:label).sort
+    assert_equal ['end date of study', 'experimental site name', 'start date of study'], details.collect(&:label).sort
 
     path = "#{Rails.root}/test/fixtures/files/fair_data_station/indpensim.ttl"
     inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
     obs_unit = inv.studies.first.observation_units.first
-    details = obs_unit.all_additional_metadata_annotations_for_type_details
+    details = obs_unit.all_additional_potential_annotation_details
     assert_equal 6, details.count
-    assert_equal ["brand", "data stream", "fermentation", "ncbi taxonomy id", "scientific name", "volume"], details.collect(&:label).sort
+    assert_equal ['brand', 'data stream', 'fermentation', 'ncbi taxonomy id', 'scientific name', 'volume'],
+                 details.collect(&:label).sort
   end
 
-  test 'get all additional annotations for type' do
+  test 'get all_additional_potential_annotation_predicates' do
     path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case-irregular.ttl"
     inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
     study = inv.studies.first
-    assert_equal ["http://fairbydesign.nl/ontology/end_date_of_study", "http://fairbydesign.nl/ontology/experimental_site_name", "http://fairbydesign.nl/ontology/start_date_of_study"], study.all_additional_metadata_annotations_for_type.sort
+    assert_equal ['http://fairbydesign.nl/ontology/end_date_of_study', 'http://fairbydesign.nl/ontology/experimental_site_name', 'http://fairbydesign.nl/ontology/start_date_of_study'],
+                 study.all_additional_potential_annotation_predicates.sort
     obs_unit = study.observation_units.first
-    assert_equal ["http://fairbydesign.nl/ontology/birth_weight", "http://fairbydesign.nl/ontology/date_of_birth", "https://w3id.org/mixs/0000811"], obs_unit.all_additional_metadata_annotations_for_type.sort
+    assert_equal ['http://fairbydesign.nl/ontology/birth_weight', 'http://fairbydesign.nl/ontology/date_of_birth', 'https://w3id.org/mixs/0000811'],
+                 obs_unit.all_additional_potential_annotation_predicates.sort
     sample = obs_unit.samples.first
-    assert_equal ["http://fairbydesign.nl/ontology/biosafety_level", "http://gbol.life/0.1/scientificName", "http://purl.uniprot.org/core/organism", "https://w3id.org/mixs/0000011"], sample.all_additional_metadata_annotations_for_type.sort
+    assert_equal ['http://fairbydesign.nl/ontology/biosafety_level', 'http://gbol.life/0.1/scientificName', 'http://purl.uniprot.org/core/organism', 'https://w3id.org/mixs/0000011'],
+                 sample.all_additional_potential_annotation_predicates.sort
   end
 
   test 'to extended metadata types json' do
     path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case.ttl"
     jsons = Seek::FairDataStation::Reader.new.to_extended_metadata_type_json(path)
     assert_equal 4, jsons.count
-    assert_equal ['Investigation', 'Study', 'ObservationUnit', 'Assay'], jsons.collect{|j| j['supported_type']}
+    assert_equal(%w[Investigation Study ObservationUnit Assay], jsons.collect { |j| j['supported_type'] })
     jsons.each do |json|
       assert_nothing_raised do
         Seek::ExtendedMetadataType::ExtendedMetadataTypeExtractor.valid_emt_json?(json)
@@ -273,7 +279,7 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
     path = "#{Rails.root}/test/fixtures/files/fair_data_station/demo.ttl"
     jsons = Seek::FairDataStation::Reader.new.to_extended_metadata_type_json(path)
     assert_equal 2, jsons.count
-    assert_equal ['Study', 'Assay'], jsons.collect{|j| j['supported_type']}
+    assert_equal(%w[Study Assay], jsons.collect { |j| j['supported_type'] })
     jsons.each do |json|
       assert_nothing_raised do
         Seek::ExtendedMetadataType::ExtendedMetadataTypeExtractor.valid_emt_json?(json)

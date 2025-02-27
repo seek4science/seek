@@ -212,7 +212,7 @@ class SampleTypesController < ApplicationController
         fds_sample = inv&.studies.first&.observation_units.first&.samples.first
       end
     end
-    if fds_sample && fds_sample.all_additional_metadata_annotations_for_type_details.any?
+    if fds_sample && fds_sample.all_additional_potential_annotation_details.any?
       string_attribute_type = SampleAttributeType.where(title: 'String').first
       @sample_type.sample_attributes.build({
                                              title: 'Title',
@@ -228,7 +228,7 @@ class SampleTypesController < ApplicationController
                                              pid: RDF::Vocab::SCHEMA.description,
                                              sample_attribute_type: string_attribute_type
                                            })
-      fds_sample.all_additional_metadata_annotations_for_type_details.each do |details|
+      fds_sample.all_additional_potential_annotation_details.each do |details|
         @sample_type.sample_attributes.build({
                                                title: details.label,
                                                description: details.description,
