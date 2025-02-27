@@ -89,18 +89,18 @@ module Seek
         end
       end
 
-      def all_annotations_for_type
-        @all_annotations_for_type ||= query_all_annotations
+      def all_potential_annotation_predicates
+        @all_potential_annotation_predicates ||= query_all_annotations
       end
 
-      def all_additional_metadata_annotations_for_type
-        all_annotations_for_type.reject do |annotation|
+      def all_additional_potential_annotation_predicates
+        all_potential_annotation_predicates.reject do |annotation|
           core_annotations.include?(annotation)
         end
       end
 
-      def all_additional_metadata_annotations_for_type_details
-        all_additional_metadata_annotations_for_type.collect do |annotation|
+      def all_additional_potential_annotation_details
+        all_additional_potential_annotation_predicates.collect do |annotation|
           annotation_details(annotation)
         end
       end
@@ -110,7 +110,7 @@ module Seek
         json['title'] = "FDS #{type_name.underscore.humanize} - #{package_name || UUID.generate}"
         json['supported_type'] = type_name
         json['enabled'] = true
-        seek_attributes = all_additional_metadata_annotations_for_type_details.collect(&:to_extended_metadata_attribute_json)
+        seek_attributes = all_additional_potential_annotation_details.collect(&:to_extended_metadata_attribute_json)
         json['attributes'] = seek_attributes
         json
       end
