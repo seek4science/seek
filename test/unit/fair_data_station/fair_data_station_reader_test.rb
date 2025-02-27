@@ -216,7 +216,7 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
     assert_equal false, det.required
   end
 
-  test 'get all additional_metadata_annotation_details' do
+  test 'additional_metadata_annotation_details' do
     path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case.ttl"
     inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
     study = inv.studies.first
@@ -230,6 +230,22 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
     details = obs_unit.additional_metadata_annotation_details
     assert_equal 5, details.count
     assert_equal ["brand", "fermentation", "ncbi taxonomy id", "scientific name", "volume"], details.collect(&:label).sort
+  end
+
+  test 'all_additional_metadata_annotations_for_type_details' do
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case-irregular.ttl"
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+    study = inv.studies.first
+    details = study.all_additional_metadata_annotations_for_type_details
+    assert_equal 3, details.count
+    assert_equal ["end date of study", "experimental site name", "start date of study"], details.collect(&:label).sort
+
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/indpensim.ttl"
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+    obs_unit = inv.studies.first.observation_units.first
+    details = obs_unit.all_additional_metadata_annotations_for_type_details
+    assert_equal 6, details.count
+    assert_equal ["brand", "data stream", "fermentation", "ncbi taxonomy id", "scientific name", "volume"], details.collect(&:label).sort
   end
 
   test 'get all additional annotations for type' do

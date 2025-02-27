@@ -99,12 +99,18 @@ module Seek
         end
       end
 
+      def all_additional_metadata_annotations_for_type_details
+        all_additional_metadata_annotations_for_type.collect do |annotation|
+          annotation_details(annotation)
+        end
+      end
+
       def to_extended_metadata_type_json
         json = {}
         json['title'] = "FDS #{type_name.underscore.humanize} - #{package_name || UUID.generate}"
         json['supported_type'] = type_name
         json['enabled'] = true
-        seek_attributes = additional_metadata_annotation_details.collect(&:to_extended_metadata_attribute_json)
+        seek_attributes = all_additional_metadata_annotations_for_type_details.collect(&:to_extended_metadata_attribute_json)
         json['attributes'] = seek_attributes
         json
       end
