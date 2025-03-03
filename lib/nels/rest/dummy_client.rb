@@ -54,10 +54,10 @@ module Nels
       def datasettypes
         JSON.parse '["MOCK_DATA","Microarray_Methylation_data","454_seq_data","AB_SOLiD_NGS_data","Track","test-lxx","fea","illumina-test-kp","xia-test-18-03","Illumina_seq_data","Sanger_seq_data","Molecular_Dynamics_data","Proteomics_data","Microarray_Gene_Expression_data","Illimuna seq data 2","hello","wei-test","xia-test-20-03"]'
       end      
-      def create_dataset(dataset)
+      def create_dataset(project_id, datasettype, name, description)
         ## TODO: start job to send data
       end
-      def upload_metadata(file)
+      def upload_metadata(project_id, dataset_id, subtype_name, file_path)
         ## TODO: start job to send data
       end
     end

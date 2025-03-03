@@ -337,5 +337,6 @@ class NelsControllerTest < ActionController::TestCase
              params: { project: project_id, datasettype: datasettypeid, name: name, description: description }
       end
     end
+    assert_response :success
   end
 end
