@@ -403,7 +403,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
     model.save
     publication.associate(model)
-    publication.save!
+    disable_authorization_checks { publication.save! }
     project = person.projects.first
 
     assert_includes publication.projects, project
@@ -1836,6 +1836,17 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_response :success
     assert_select 'input#managed_programme', count:1
 
+  end
+
+  test 'guided_import' do
+    prog = FactoryBot.create(:programme)
+    person = FactoryBot.create(:person_not_in_project)
+    login_as(person)
+    with_config_value(:managed_programme_id, prog.id) do
+      get :guided_import
+    end
+    assert_response :success
+    assert_select 'input#managed_programme', count:1
   end
 
   test 'guided create with administered programmes' do

@@ -45,7 +45,6 @@ class Project < ApplicationRecord
 
   has_annotation_type :funding_code
 
-  enum status: [:planned, :running, :completed, :cancelled, :failed]
   belongs_to :assignee, class_name: 'Person'
   
   belongs_to :programme

@@ -30,7 +30,7 @@
       <h2><%= gen %></h2>
       <% groups.each do |group| %>
         <% group.each do |type| %>
-          <div class="isa_block <%= gen.downcase -%>-colours" style="background-color: <%= IsaHelper.const_get("#{gen.upcase}_FILL_COLOURS")[type] -%>;">
+          <div class="isa_block <%= gen.downcase -%>-colours" style="background-color: <%= ISAHelper.const_get("#{gen.upcase}_FILL_COLOURS")[type] -%>;">
             <%= image_tag(asset_path(icon_filename_for_key("#{type.downcase}_avatar") || icon_filename_for_key('misc_file'))) unless type == 'HiddenItem' %>
             <%= type.titleize %>
           </div>

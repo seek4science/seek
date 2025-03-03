@@ -107,7 +107,7 @@ class TemplatesController < ApplicationController
 
     begin
       running!
-      PopulateTemplatesJob.new.queue_job
+      PopulateTemplatesJob.perform_later(@current_user)
     rescue StandardError
       done!
     end
@@ -124,7 +124,7 @@ class TemplatesController < ApplicationController
 
   def filter_isa_tags_by_level
     level = params[:level]
-    all_isa_tags_options = IsaTag.all.map { |it| { text: it.title, value: it.id } }
+    all_isa_tags_options = ISATag.all.map { |it| { text: it.title, value: it.id } }
 
     case level
     when 'study source'

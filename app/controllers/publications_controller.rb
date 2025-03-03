@@ -8,34 +8,16 @@ class PublicationsController < ApplicationController
   include Seek::UploadHandling::DataUpload
 
   before_action :publications_enabled?
+  before_action :override_page_for_export, only: [:index]
   before_action :find_assets, only: [:index]
   before_action :find_and_authorize_requested_item, only: %i[show edit manage update destroy download upload_fulltext upload_pdf soft_delete_fulltext]
   before_action :suggest_authors, only: [:manage]
   before_action :find_display_asset, :only=>[:show, :download]
 
-  include Seek::IsaGraphExtensions
+  include Seek::ISAGraphExtensions
   include PublicationsHelper
 
   api_actions :index, :show
-
-  def export
-    @query = Publication.ransack(params[:query])
-    @publications = @query.result(distinct: true)
-                        .includes(:publication_authors, :projects)
-    # @query.build_condition
-    @query.build_sort if @query.sorts.empty?
-
-    respond_to do |format|
-      format.html
-      format.any(*Publication::EXPORT_TYPES.keys) do
-        send_data(
-          @publications.collect { |publication| publication.export(request.format.to_sym) }.join("\n\n"),
-          type: request.format.to_sym,
-          filename: "publications.#{request.format.to_sym}"
-        )
-      end
-    end
-  end
 
   # GET /publications/1
   def show
@@ -709,5 +691,9 @@ class PublicationsController < ApplicationController
       end
     end
     replace_str
+  end
+
+  def override_page_for_export
+    params[:page] = 'all' if Publication::EXPORT_TYPES.keys.include?(request.format.to_sym)
   end
 end

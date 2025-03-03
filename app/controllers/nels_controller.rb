@@ -277,7 +277,7 @@ class NelsController < ApplicationController
                      message: 'Attempting to reauthenticate...',
                      url: @oauth_client.authorize_url }, status: :unauthorized
     else
-      redirect_to @oauth_client.authorize_url
+      redirect_to @oauth_client.authorize_url, allow_other_host: true
     end
   end
 

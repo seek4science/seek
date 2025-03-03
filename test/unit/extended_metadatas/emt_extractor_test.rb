@@ -8,7 +8,7 @@ class EmtExtractorTest < ActiveSupport::TestCase
 
     emt_file = fixture_file_upload('extended_metadata_type/valid_simple_emt.json', 'application/json')
 
-    emt =  Seek::ExtendedMetadataType::EMTExtractor.extract_extended_metadata_type(emt_file)
+    emt =  Seek::ExtendedMetadataType::ExtendedMetadataTypeExtractor.extract_extended_metadata_type(emt_file)
 
     assert_not_nil emt
     assert_equal 'ExtendedMetadata', emt.supported_type
@@ -40,7 +40,7 @@ class EmtExtractorTest < ActiveSupport::TestCase
 
     uploaded_file = update_id('valid_emt_with_linked_emt.json', person_emt, 'PERSON_EMT_ID')
 
-    emt = Seek::ExtendedMetadataType::EMTExtractor.extract_extended_metadata_type(uploaded_file)
+    emt = Seek::ExtendedMetadataType::ExtendedMetadataTypeExtractor.extract_extended_metadata_type(uploaded_file)
 
     assert_not_nil emt
     assert_equal 'Investigation', emt.supported_type
@@ -76,7 +76,7 @@ class EmtExtractorTest < ActiveSupport::TestCase
 
     uploaded_file = update_id('valid_emt_with_cv_with_ontologies.json', topic_cv, 'CV_TOPICS_ID')
 
-    emt = Seek::ExtendedMetadataType::EMTExtractor.extract_extended_metadata_type(uploaded_file)
+    emt = Seek::ExtendedMetadataType::ExtendedMetadataTypeExtractor.extract_extended_metadata_type(uploaded_file)
 
     assert_not_nil emt
     assert_equal 'Study', emt.supported_type
@@ -102,7 +102,7 @@ class EmtExtractorTest < ActiveSupport::TestCase
     assert_no_difference('ExtendedMetadataType.count') do
 
       error = assert_raises(StandardError) do
-        Seek::ExtendedMetadataType::EMTExtractor.extract_extended_metadata_type(invalid_emt_file)
+        Seek::ExtendedMetadataType::ExtendedMetadataTypeExtractor.extract_extended_metadata_type(invalid_emt_file)
       end
 
       assert_match /Failed to parse JSON file: 784: unexpected token at/, error.message
@@ -116,7 +116,7 @@ class EmtExtractorTest < ActiveSupport::TestCase
     assert_no_difference('ExtendedMetadataType.count') do
 
       error = assert_raises(StandardError) do
-        Seek::ExtendedMetadataType::EMTExtractor.extract_extended_metadata_type(invalid_emt_file)
+        Seek::ExtendedMetadataType::ExtendedMetadataTypeExtractor.extract_extended_metadata_type(invalid_emt_file)
       end
 
       assert_equal "The attribute type 'String1' does not exist.", error.message
@@ -129,7 +129,7 @@ class EmtExtractorTest < ActiveSupport::TestCase
     assert_no_difference('ExtendedMetadataType.count') do
 
       error = assert_raises(StandardError) do
-        Seek::ExtendedMetadataType::EMTExtractor.extract_extended_metadata_type(invalid_emt_file)
+        Seek::ExtendedMetadataType::ExtendedMetadataTypeExtractor.extract_extended_metadata_type(invalid_emt_file)
       end
 
       assert_match /Couldn't find SampleControlledVocab with 'id'=-1/, error.message

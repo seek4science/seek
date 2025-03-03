@@ -69,7 +69,16 @@ class DataCatalogMockModelTest < ActiveSupport::TestCase
             with_config_value(:instance_description, 'The worlds best app') do
               with_config_value(:instance_name, 'bioschema supported app') do
                 json = @data_catalogue.to_schema_ld
-                JSON.parse(json)
+                json = JSON.parse(json)
+                assert_equal 'The worlds best app', json['description']
+                assert_equal 'bioschema supported app', json['name']
+                assert_equal 'http://fish.com', json['url']
+                assert_equal 'a, b, c, d, e', json['keywords']
+                provider = json['provider']
+                assert_equal 'Organization', provider['@type']
+                assert_equal 'WIBBLE', provider['name']
+                assert_equal 'http://wibble.eu', provider['url']
+                assert_equal 13, json['dataset'].count
               end
             end
           end

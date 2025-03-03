@@ -300,6 +300,10 @@ class GitVersionTest < ActiveSupport::TestCase
     assert v.commit.blank?
     assert_empty v.blobs
 
+    assert_nothing_raised do
+      v.add_file('normal_file', StringIO.new('blah'))
+    end
+
     assert_raise(Git::InvalidPathException) do
       v.add_file('///', StringIO.new('blah'))
     end

@@ -10,8 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_10_15_093333) do
-
+ActiveRecord::Schema[7.2].define(version: 2025_02_12_145346) do
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
     t.string "format"
@@ -25,7 +24,7 @@ ActiveRecord::Schema.define(version: 2024_10_15_093333) do
     t.datetime "updated_at"
     t.string "http_referer"
     t.text "user_agent"
-    t.text "data", size: :medium
+    t.text "data", limit: 16777215
     t.string "controller_name"
     t.index ["action"], name: "act_logs_action_index"
     t.index ["activity_loggable_type", "activity_loggable_id"], name: "act_logs_act_loggable_index"
@@ -821,7 +820,7 @@ ActiveRecord::Schema.define(version: 2024_10_15_093333) do
     t.text "root_path"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.text "resource_attributes", size: :medium
+    t.text "resource_attributes", limit: 16777215
     t.bigint "git_repository_id"
     t.integer "visibility"
     t.string "doi"
@@ -1881,7 +1880,7 @@ ActiveRecord::Schema.define(version: 2024_10_15_093333) do
 
   create_table "sessions", id: :integer, force: :cascade do |t|
     t.string "session_id", null: false
-    t.text "data", size: :medium
+    t.text "data", limit: 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
     t.index ["session_id"], name: "index_sessions_on_session_id"
@@ -1930,6 +1929,8 @@ ActiveRecord::Schema.define(version: 2024_10_15_093333) do
     t.datetime "updated_at", null: false
     t.integer "zenodo_deposition_id"
     t.string "zenodo_record_url"
+    t.string "title"
+    t.text "description"
   end
 
   create_table "sop_auth_lookup", force: :cascade do |t|
@@ -2224,7 +2225,7 @@ ActiveRecord::Schema.define(version: 2024_10_15_093333) do
   create_table "text_values", id: :integer, force: :cascade do |t|
     t.integer "version"
     t.integer "version_creator_id"
-    t.text "text", size: :medium, null: false
+    t.text "text", limit: 16777215, null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end

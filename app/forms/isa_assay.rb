@@ -1,4 +1,4 @@
-class IsaAssay
+class ISAAssay
   include ActiveModel::Model
 
   attr_accessor :assay, :sample_type, :input_sample_type_id

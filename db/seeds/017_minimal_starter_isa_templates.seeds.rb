@@ -23,7 +23,7 @@ source_temp_attributes << upsert_template_attribute('Source Name',
                                                     sample_attribute_type: SampleAttributeType.find_by(title: 'String'),
                                                     is_title: true,
                                                     required: true,
-                                                    isa_tag: IsaTag.find_by(title: 'source')
+                                                    isa_tag: ISATag.find_by(title: 'source')
 )
 
 source_temp_attributes << upsert_template_attribute('Source Characteristic 1',
@@ -32,7 +32,7 @@ source_temp_attributes << upsert_template_attribute('Source Characteristic 1',
                                                     sample_attribute_type: SampleAttributeType.find_by(title: 'String'),
                                                     is_title: false,
                                                     required: true,
-                                                    isa_tag: IsaTag.find_by(title: 'source_characteristic'))
+                                                    isa_tag: ISATag.find_by(title: 'source_characteristic'))
 
 disable_authorization_checks do
   source_template.update(group_order: 1,
@@ -66,7 +66,7 @@ sample_temp_attributes << upsert_template_attribute('Name of a protocol with sam
                                                     sample_attribute_type: SampleAttributeType.find_by(title: 'String'),
                                                     is_title: false,
                                                     required: true,
-                                                    isa_tag: IsaTag.find_by(title: 'protocol'))
+                                                    isa_tag: ISATag.find_by(title: 'protocol'))
 
 sample_temp_attributes << upsert_template_attribute('Name of protocol parameter 1',
                                                     sample_template.id,
@@ -74,7 +74,7 @@ sample_temp_attributes << upsert_template_attribute('Name of protocol parameter 
                                                     sample_attribute_type: SampleAttributeType.find_by(title: 'String'),
                                                     is_title: false,
                                                     required: true,
-                                                    isa_tag: IsaTag.find_by(title: 'parameter_value'))
+                                                    isa_tag: ISATag.find_by(title: 'parameter_value'))
 
 sample_temp_attributes << upsert_template_attribute('Sample Name',
                                                     sample_template.id,
@@ -82,7 +82,7 @@ sample_temp_attributes << upsert_template_attribute('Sample Name',
                                                     sample_attribute_type: SampleAttributeType.find_by(title: 'String'),
                                                     is_title: true,
                                                     required: true,
-                                                    isa_tag: IsaTag.find_by(title: 'sample'))
+                                                    isa_tag: ISATag.find_by(title: 'sample'))
 
 sample_temp_attributes << upsert_template_attribute('Sample Characteristic 1',
                                                     sample_template.id,
@@ -91,7 +91,7 @@ sample_temp_attributes << upsert_template_attribute('Sample Characteristic 1',
                                                     is_title: false,
                                                     required: true,
                                                     sample_controlled_vocab: nil,
-                                                    isa_tag: IsaTag.find_by(title: 'sample_characteristic'))
+                                                    isa_tag: ISATag.find_by(title: 'sample_characteristic'))
 
 disable_authorization_checks do
   sample_template.update(group_order: 2,
@@ -127,7 +127,7 @@ material_temp_attributes << upsert_template_attribute('Name of a protocol with m
                                                       sample_attribute_type: SampleAttributeType.find_by(title: 'String'),
                                                       is_title: false,
                                                       required: true,
-                                                      isa_tag: IsaTag.find_by(title: 'protocol'))
+                                                      isa_tag: ISATag.find_by(title: 'protocol'))
 
 material_temp_attributes << upsert_template_attribute('Name of protocol parameter 1',
                                                       material_template.id,
@@ -135,7 +135,7 @@ material_temp_attributes << upsert_template_attribute('Name of protocol paramete
                                                       sample_attribute_type: SampleAttributeType.find_by(title: 'String'),
                                                       is_title: false,
                                                       required: true,
-                                                      isa_tag: IsaTag.find_by(title: 'parameter_value'))
+                                                      isa_tag: ISATag.find_by(title: 'parameter_value'))
 
 material_temp_attributes << upsert_template_attribute('Output material Name',
                                                       material_template.id,
@@ -143,7 +143,7 @@ material_temp_attributes << upsert_template_attribute('Output material Name',
                                                       sample_attribute_type: SampleAttributeType.find_by(title: 'String'),
                                                       is_title: true,
                                                       required: true,
-                                                      isa_tag: IsaTag.find_by(title: 'other_material'))
+                                                      isa_tag: ISATag.find_by(title: 'other_material'))
 
 material_temp_attributes << upsert_template_attribute('Output material characteristic 1',
                                                       material_template.id,
@@ -151,7 +151,7 @@ material_temp_attributes << upsert_template_attribute('Output material character
                                                       sample_attribute_type: SampleAttributeType.find_by(title: 'String'),
                                                       is_title: false,
                                                       required: true,
-                                                      isa_tag: IsaTag.find_by(title: 'other_material_characteristic'))
+                                                      isa_tag: ISATag.find_by(title: 'other_material_characteristic'))
 
 disable_authorization_checks do
   material_template.update(group_order: 3,
@@ -188,7 +188,7 @@ data_file_temp_attributes << upsert_template_attribute('Name of a protocol with 
                                                        sample_attribute_type: SampleAttributeType.find_by(title: 'String'),
                                                        is_title: false,
                                                        required: true,
-                                                       isa_tag: IsaTag.find_by(title: 'protocol'))
+                                                       isa_tag: ISATag.find_by(title: 'protocol'))
 
 data_file_temp_attributes << upsert_template_attribute('Name of protocol parameter 1',
                                                        data_file_template.id,
@@ -196,7 +196,7 @@ data_file_temp_attributes << upsert_template_attribute('Name of protocol paramet
                                                        sample_attribute_type: SampleAttributeType.find_by(title: 'String'),
                                                        is_title: false,
                                                        required: true,
-                                                       isa_tag: IsaTag.find_by(title: 'data_file_comment'))
+                                                       isa_tag: ISATag.find_by(title: 'data_file_comment'))
 
 data_file_temp_attributes << upsert_template_attribute('Data file Name',
                                                        data_file_template.id,
@@ -204,7 +204,7 @@ data_file_temp_attributes << upsert_template_attribute('Data file Name',
                                                        sample_attribute_type: SampleAttributeType.find_by(title: 'String'),
                                                        is_title: true,
                                                        required: true,
-                                                       isa_tag: IsaTag.find_by(title: 'data_file'))
+                                                       isa_tag: ISATag.find_by(title: 'data_file'))
 
 data_file_temp_attributes << upsert_template_attribute('Data file characteristic 1',
                                                        data_file_template.id,
@@ -212,7 +212,7 @@ data_file_temp_attributes << upsert_template_attribute('Data file characteristic
                                                        sample_attribute_type: SampleAttributeType.find_by(title: 'String'),
                                                        is_title: false,
                                                        required: true,
-                                                       isa_tag: IsaTag.find_by(title: 'data_file_comment'))
+                                                       isa_tag: ISATag.find_by(title: 'data_file_comment'))
 
 disable_authorization_checks do
   data_file_template.update(group_order: 4,

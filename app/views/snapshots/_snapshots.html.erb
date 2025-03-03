@@ -3,7 +3,7 @@
     <% snapshots.order("created_at DESC").each do |snapshot| %>
         <div>
           <% if snapshot == selected %>
-              <%= content_tag :strong, "Snapshot #{snapshot.snapshot_number}" %>
+              <%= content_tag :strong, snapshot_display_name(snapshot), 'data-tooltip' => tooltip(snapshot.description) %>
           <% else %>
               <%= snapshot_link(resource,snapshot) %>
           <% end %>

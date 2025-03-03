@@ -25,15 +25,16 @@ class SopTest < ActiveSupport::TestCase
     refute_empty object.creators
 
     rdf = object.to_rdf
-
-    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
-      assert reader.statements.count > 1
-      assert_equal RDF::URI.new("http://localhost:3000/sops/#{object.id}"), reader.statements.first.subject
-
-      #check for OPSK-1281 - where the creators weren't appearing
-      assert_includes reader.statements.collect(&:predicate),"http://jermontology.org/ontology/JERMOntology#hasCreator"
-      assert_includes reader.statements.collect(&:predicate),"http://rdfs.org/sioc/ns#has_creator"
+    graph = RDF::Graph.new do |graph|
+      RDF::Reader.for(:ttl).new(rdf) {|reader| graph << reader}
     end
+    assert graph.statements.count > 1
+    assert_equal RDF::URI.new("http://localhost:3000/sops/#{object.id}"), graph.statements.first.subject
+
+    #check for OPSK-1281 - where the creators weren't appearing
+    assert_includes graph.statements.collect(&:predicate),"http://jermontology.org/ontology/JERMOntology#hasCreator"
+    assert_includes graph.statements.collect(&:predicate),"http://rdfs.org/sioc/ns#has_creator"
+
   end
 
   def test_title_trimmed
@@ -348,7 +349,7 @@ class SopTest < ActiveSupport::TestCase
 
     sample_type = FactoryBot.create(:sop_sample_type, project_ids: [project.id])
     sop_attr = FactoryBot.build(:sop_sample_attribute, title: 'sop 2', sample_type: sample_type)
-    sample_type.sample_attributes << sop_attr
+
     sop = FactoryBot.create(:sop)
     another_sop = FactoryBot.create(:sop)
     sop_without_samples = FactoryBot.create(:sop)

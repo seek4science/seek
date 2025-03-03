@@ -37,9 +37,12 @@ class ExceptionForwarderTest < ActiveSupport::TestCase
   test 'send notification' do
     with_config_value(:email_enabled, true) do
       with_config_value(:exception_notification_enabled, true) do
-        #assert_emails(1) do
+
+        # no errors thrown. Not possible to test if emails sent, as they are disable except in production
+        assert_nothing_raised do
           Seek::Errors::ExceptionForwarder.send_notification(StandardError.new('test'),data:{})
-        #end
+        end
+
       end
     end
   end

@@ -18,7 +18,7 @@ class ModelsController < ApplicationController
   include Bives
   include Seek::Doi::Minting
 
-  include Seek::IsaGraphExtensions
+  include Seek::ISAGraphExtensions
 
   api_actions :index, :show, :create, :update, :destroy
 

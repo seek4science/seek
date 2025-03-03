@@ -44,7 +44,7 @@ module ReadApiTestSuite
   end
 
   test 'can get index' do
-    skip if skip_index_test?
+    skip('skipping index test') if skip_index_test?
     FactoryBot.create("min_#{singular_name}".to_sym)
     FactoryBot.create("max_#{singular_name}".to_sym)
     get collection_url, as: :json
@@ -53,7 +53,7 @@ module ReadApiTestSuite
       assert_response :not_implemented
     else
       perform_jsonapi_checks
-      validate_json response.body, index_response_fragment
+      assert_nothing_raised { validate_json(response.body, index_response_fragment) }
     end
   end
 
@@ -64,17 +64,17 @@ module ReadApiTestSuite
     user_login(FactoryBot.create(:person))
     get member_url(res), headers: { 'Authorization' => read_access_auth }
     assert_response :forbidden
-    validate_json response.body, '#/components/schemas/forbiddenResponse'
+    assert_nothing_raised { validate_json(response.body, '#/components/schemas/forbiddenResponse') }
   end
 
   test 'getting resource with non-existent ID should throw error' do
     get member_url(MissingItem.new(model)), headers: { 'Authorization' => read_access_auth }
     assert_response :not_found
-    validate_json response.body, '#/components/schemas/notFoundResponse'
+    assert_nothing_raised { validate_json(response.body, '#/components/schemas/notFoundResponse') }
   end
 
   test 'write show example' do
-    skip unless write_examples?
+    skip('skipping writing examples') unless write_examples?
 
     res = FactoryBot.create("max_#{singular_name}".to_sym)
     user_login(res.contributor) if res.respond_to?(:contributor)
@@ -85,7 +85,7 @@ module ReadApiTestSuite
   end
 
   test 'write index example' do
-    skip unless write_examples? && !skip_index_test?
+    skip('skipping writing index example') unless write_examples? && !skip_index_test?
 
     model.delete_all unless model == Person
     FactoryBot.create("min_#{singular_name}".to_sym)
