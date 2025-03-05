@@ -20,7 +20,7 @@ class DataFileTest < ActiveSupport::TestCase
     assert_equal ['This is a ms word doc format', 'doc', 'word.doc'], df.content_blob_search_terms.sort
 
     df = FactoryBot.create :xlsx_spreadsheet_datafile
-    assert_includes df.content_blob_search_terms, 'mild stress on ageing in a multispecies approach Experiment Transcripto'
+    assert_includes df.content_blob_search_terms, 'MAGE-TAB template submission sheet for SysMO-DB adapted for JenAge RNA-Seq'
   end
 
   test 'event association' do
