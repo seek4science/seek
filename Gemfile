@@ -76,6 +76,7 @@ gem 'private_address_check'# Rails 5 upgrade
 gem 'progress_bar'
 gem 'psych'
 gem 'puma'
+gem 'rack', '< 3.0.0' # Rack >= 3 causes errors when running functional tests that call multiple actions in a single test
 gem 'rack-attack'
 gem 'rack-cors', require: 'rack/cors'
 gem 'rails-html-sanitizer'
