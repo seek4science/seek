@@ -593,7 +593,7 @@ GEM
       nio4r (~> 2.0)
     pyu-ruby-sasl (0.0.3.3)
     racc (1.8.1)
-    rack (2.2.11)
+    rack (2.2.12)
     rack-attack (6.6.0)
       rack (>= 1.0, < 3)
     rack-cors (1.1.1)
