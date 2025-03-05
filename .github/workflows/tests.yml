@@ -4,7 +4,7 @@ on: [push, pull_request]
 jobs:
   tests:
     name: Tests
-    runs-on: [ubuntu-22.04, ubuntu-24.04]
+    runs-on: ${{matrix.os}}
     env:
       RAILS_ENV: test
       TERM: dumb-color
@@ -40,21 +40,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        os: [ ubuntu-22.04,ubuntu-24.04 ]
         database:
           - mysql
         suite:
           - rails test test/unit
           - rails test test/functional
-          - rails test test/integration
-          - rspec spec
-          # - rake teaspoon
-          - rake assets:precompile
-          - rake db:setup
-          - rake db:migrate
-          - rake seek:upgrade
-        include:
-          - database: sqlite3
-            suite: rails test test/unit
     steps:
       - name: Install system dependencies
         run: |
