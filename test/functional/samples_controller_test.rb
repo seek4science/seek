@@ -52,7 +52,7 @@ class SamplesControllerTest < ActionController::TestCase
     get :new, params: { sample_type_id: hidden_type.id }
 
     assert_redirected_to root_path
-    refute_nil flash[:error]
+    assert_equal 'You are not authorized to use this Sample type', flash[:error]
   end
 
   test 'create from form' do
@@ -97,7 +97,7 @@ class SamplesControllerTest < ActionController::TestCase
       end
     end
     assert_redirected_to root_path
-    refute_nil flash[:error]
+    assert_equal 'You are not authorized to use this Sample type', flash[:error]
   end
 
   test 'create' do
