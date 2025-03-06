@@ -18,6 +18,7 @@ class SampleApiTest < ActionDispatch::IntegrationTest
 
     @sample = FactoryBot.create(:max_sample, contributor: current_person, policy: FactoryBot.create(:public_policy))
     @sample_type = @sample.sample_type
+    @sample_type.policy.update_column(:access_type, Policy::ACCESSIBLE)
     assert @sample_type.can_view?
     @project = @sample.projects.first
     @assay = FactoryBot.create(:assay, contributor: current_person)
