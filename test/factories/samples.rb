@@ -42,7 +42,7 @@ FactoryBot.define do
   end
 
   factory(:max_sample, parent: :sample) do
-    association :sample_type, factory: :max_sample_type, strategy: :create
+    association :sample_type, factory: :max_sample_type, strategy: :create, policy: FactoryBot.create(:public_policy)
     association :contributor, factory: :person, strategy: :create
     after(:build) do |sample|
       sample.annotate_with(['tag1', 'tag2'], 'tag', sample.contributor)
