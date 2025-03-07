@@ -124,7 +124,7 @@ var Sharing = {
       if (!Sharing.permissionsTable)
           return;
 
-      if (Sharing.defaultPolicies[project.id] && (skipPrompt || confirm('' + project.title + ' has a default policy specified, do you want to apply it?'))) {
+      if (Sharing.defaultPolicies[project.id] && (skipPrompt || confirm('' + project.title + ' has a default sharing policy specified, do you want to apply it?'))) {
           Sharing.applyPolicy(Sharing.defaultPolicies[project.id]);
       } else { // Otherwise just add a permission for the project
           Sharing.addPermissionForProject(project);
