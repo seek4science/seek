@@ -134,7 +134,7 @@ module Seek
 
     def self.delayed_job_pids
       directory = "#{Rails.root}/tmp/pids"
-      Daemons::PidFile.find_files(directory, 'delayed_job').collect do |path|
+      Daemons::PidFile.find_files(directory, 'delayed_job', false, '').collect do |path|
         file = path.sub("#{directory}/", '').sub('.pid', '')
         Daemons::PidFile.new(directory, file)
       end
