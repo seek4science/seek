@@ -126,7 +126,8 @@ class SampleTypesController < ApplicationController
   # used for ajax call to get the filtered sample types for selection
   def filter_for_select
     scope = Seek::Config.isa_json_compliance_enabled ? SampleType.without_template : SampleType
-    @sample_types = scope.joins(:projects).where('projects.id' => params[:projects]).distinct.to_a
+    sample_types = scope.joins(:projects).where('projects.id' => params[:projects]).distinct.to_a
+    @sample_types = sample_types.authorized_for(:view)
     unless params[:tags].blank?
       @sample_types.select! do |sample_type|
         if params[:exclusive_tags] == '1'
