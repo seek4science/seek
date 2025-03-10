@@ -504,10 +504,31 @@ class SampleTypesControllerTest < ActionController::TestCase
     refute_nil flash[:error]
   end
 
+  test 'filter for select authorization' do
+    visible_type = FactoryBot.create(:simple_sample_type, policy: FactoryBot.create(:public_policy), contributor: FactoryBot.create(:person))
+    hidden_type = FactoryBot.create(:simple_sample_type, policy: FactoryBot.create(:private_policy), contributor: FactoryBot.create(:person))
+    assert visible_type.can_view?
+    refute hidden_type.can_view?
+
+    projects = (visible_type.projects | hidden_type.projects).collect(&:id)
+
+    get :filter_for_select, params: { projects: projects }
+    assert_response :success
+    assert assigns(:sample_types)
+    assert_includes assigns(:sample_types), visible_type
+    refute_includes assigns(:sample_types), hidden_type
+
+    assert_select 'div.list_items_container' do
+      assert_select 'div.list_item_title a[href=?]', sample_type_path(visible_type), text:visible_type.title
+      assert_select 'div.list_item_title a[href=?]', sample_type_path(hidden_type), text:hidden_type.title, count: 0
+    end
+
+  end
+
   test 'filter for select' do
-    st1 = FactoryBot.create(:patient_sample_type)
-    st2 = FactoryBot.create(:patient_sample_type)
-    st3 = FactoryBot.create(:simple_sample_type)
+    st1 = FactoryBot.create(:patient_sample_type, policy: FactoryBot.create(:public_policy))
+    st2 = FactoryBot.create(:patient_sample_type, policy: FactoryBot.create(:public_policy))
+    st3 = FactoryBot.create(:simple_sample_type, policy: FactoryBot.create(:public_policy))
     st3.tags = 'fred,mary'
     st1.tags = 'monkey'
     st3.save!
@@ -548,9 +569,9 @@ class SampleTypesControllerTest < ActionController::TestCase
   end
 
   test 'filter for select exclusive tags' do
-    st1 = FactoryBot.create(:simple_sample_type, projects: [@project])
-    st2 = FactoryBot.create(:simple_sample_type, projects: [@project])
-    st3 = FactoryBot.create(:simple_sample_type, projects: [@project])
+    st1 = FactoryBot.create(:simple_sample_type, projects: [@project], policy: FactoryBot.create(:public_policy))
+    st2 = FactoryBot.create(:simple_sample_type, projects: [@project], policy: FactoryBot.create(:public_policy))
+    st3 = FactoryBot.create(:simple_sample_type, projects: [@project], policy: FactoryBot.create(:public_policy))
     st1.tags = 'fred,mary'
     st2.tags = 'fred,bob,jane'
     st3.tags = 'frank,john,jane,peter'
@@ -696,7 +717,7 @@ class SampleTypesControllerTest < ActionController::TestCase
 
   test 'filter sample types with template when advanced single page is enabled' do
     project = FactoryBot.create(:project)
-    FactoryBot.create(:simple_sample_type, template_id: 1, projects: [project])
+    FactoryBot.create(:simple_sample_type, template_id: 1, projects: [project], policy: FactoryBot.create(:public_policy))
     params = { projects: [project.id]}
     get :filter_for_select, params: params
     assert_equal assigns(:sample_types).length, 1
