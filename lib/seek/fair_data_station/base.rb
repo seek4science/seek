@@ -164,6 +164,24 @@ module Seek
         seek_resource.extended_metadata.data = data
       end
 
+      def detect_extended_metadata_type
+        property_ids = additional_metadata_annotations.collect { |annotation| annotation[0] }
+
+        # collect and sort those with the most properties that match, eliminating any where no properties match
+        candidates = ::ExtendedMetadataType.where(supported_type: type_name).includes(:extended_metadata_attributes).collect do |emt|
+          extended_metadata_property_ids = emt.deep_extended_metadata_attributes.collect(&:pid).compact_blank
+          intersection = (property_ids & extended_metadata_property_ids)
+          difference = (property_ids | extended_metadata_property_ids) - intersection
+          emt = nil if intersection.empty?
+          [intersection.length, difference.length, emt]
+        end.sort_by do |x|
+          # order by the number of properties matched coming top, but downgraded by the number of differences
+          [-x[0], x[1]]
+        end
+
+        candidates.first&.last
+      end
+
       private
 
       def populate_seek_extended_metadata_for_property(extended_metadata_type, data, property_id, value)
