@@ -332,6 +332,12 @@ class ExtendedMetadataTypesControllerTest < ActionController::TestCase
     assert_select 'table.extended-metadata-type-attributes tbody tr', count: 4
     assert_select 'a.btn[href=?]', administer_extended_metadata_types_path, text:'Cancel'
     assert_select 'input.btn[type="submit"][value="Create"]'
+
+    assert_select 'ul.existing-extended-metadata-types' do
+      assert_select 'li', count: 2
+      assert_select 'li', text: "Study : #{study_emt.title}"
+      assert_select 'li', text: "Assay : #{assay_emt.title}"
+    end
   end
 
   test 'create from ttl no results' do
