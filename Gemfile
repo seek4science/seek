@@ -116,6 +116,7 @@ gem 'rails-observers'
 gem 'responders'
 
 gem 'rack-attack', '~> 6.6.0'
+gem 'rack', '>= 2.2.13'
 
 gem 'private_address_check'
 
