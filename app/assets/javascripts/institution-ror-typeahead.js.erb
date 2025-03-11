@@ -1,3 +1,5 @@
+<% environment.context_class.instance_eval { include Seek::Util.routes } %>
+
 function toggleUserInput(disabled) {
     const action = disabled ? 'addClass' : 'removeClass';
     const elements = [
@@ -28,7 +30,7 @@ function extractRorId(rorUrl) {
 function fetchRorData(rorId) {
 
     //use /institutions/ror_search endpoint instead of the direct ROR API
-    var url = `/institutions/ror_search?ror_id=${encodeURIComponent(rorId)}`;
+    var url = '<%= ror_search_institutions_path %>?ror_id=' + encodeURIComponent(rorId);
 
     fetch(url)
         .then(response => {
@@ -69,8 +71,7 @@ function rorQuerySource(query, processSync, processAsync) {
     }
 
     //use /institutions/ror_search endpoint instead of the direct ROR API
-    var url = `/institutions/ror_search?query=${encodeURIComponent(query)}`;
-
+    var url = '<%= ror_search_institutions_path %>?query=' + encodeURIComponent(query);
     return $j.ajax({
         url: url,
         type: 'GET',
@@ -120,19 +121,18 @@ function rorSuggestionTemplate(data) {
 }
 
 
-function initializeLocalInstitutions(endpoint = '/institutions/typeahead.json', query = '', cache = false) {
-    const baseUrl = `${window.location.protocol}//${window.location.host}`;
-    const fullUrl = `${baseUrl}${endpoint}?q=${encodeURIComponent(query)}`;
+
+function initializeLocalInstitutions(query = '', cache = false) {
+    const url = `<%= typeahead_institutions_path %>.json?q=${encodeURIComponent(query)}`;
+
     return new Bloodhound({
         datumTokenizer: Bloodhound.tokenizers.obj.whitespace('text'),
         queryTokenizer: Bloodhound.tokenizers.whitespace,
         remote: {
-            url: fullUrl,
+            url: url,
             wildcard: '%QUERY',
             cache: cache,
-            transform: function (response) {
-                return response.results;
-            }
+            transform: response => response.results
         }
     });
 }
@@ -174,7 +174,7 @@ $j(document).ready(function () {
             name: 'institutions',
             display: 'text', // Display the 'text' field in the dropdown
             source: function (query, syncResults, asyncResults) {
-                const bloodhound = initializeLocalInstitutions('/institutions/typeahead.json', query);
+                const bloodhound = initializeLocalInstitutions(query);
                 bloodhound.search(query, syncResults, asyncResults);
             }, // Local data source
             templates: {
