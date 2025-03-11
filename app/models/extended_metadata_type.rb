@@ -62,6 +62,18 @@ class ExtendedMetadataType < ApplicationRecord
     end
   end
 
+  # collects all the attributes, including those associated through an attribute with a linked_extended_metadata_type
+  def deep_extended_metadata_attributes(extended_metadata_type = self)
+    attributes = extended_metadata_type.extended_metadata_attributes.collect do |attr|
+      if attr.linked_extended_metadata_type
+        deep_extended_metadata_attributes(attr.linked_extended_metadata_type)
+      else
+        attr
+      end
+    end
+    attributes.flatten
+  end
+
   def usage
     extended_metadatas.count
   end
