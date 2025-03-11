@@ -57,9 +57,17 @@ class ExtendedMetadataTypesController < ApplicationController
 
     uploaded_file = params[:emt_fair_ds_ttl_file]
     @jsons = []
+    @existing_extended_metadata_types = []
     Tempfile.create('fds-ttl') do |file|
       file << uploaded_file.read.force_encoding('UTF-8')
-      @jsons = Seek::FairDataStation::Reader.new.to_extended_metadata_type_json(file.path)
+      Seek::FairDataStation::Reader.new.candidates_for_extended_metadata(file.path).each do |candidate|
+        emt = candidate.find_exact_matching_extended_metadata_type
+        if emt
+          @existing_extended_metadata_types << emt
+        else
+          @jsons << candidate.to_extended_metadata_type_json
+        end
+      end
     end
 
     respond_to do |format|
