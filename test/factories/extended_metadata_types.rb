@@ -523,6 +523,7 @@ FactoryBot.define do
     after(:build) do |a|
       a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Facility', pid:'http://fairbydesign.nl/ontology/facility')
       a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Protocol', pid:'http://fairbydesign.nl/ontology/protocol')
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Assay date', pid:'http://schema.org/dateCreated')
     end
   end
 

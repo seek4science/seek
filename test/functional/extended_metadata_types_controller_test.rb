@@ -303,10 +303,33 @@ class ExtendedMetadataTypesControllerTest < ActionController::TestCase
       post :create_from_fair_ds_ttl, params: { emt_fair_ds_ttl_file: file }
     end
     assert_response :success
-
+    assert_equal 4, assigns(:jsons).count
+    assert_empty assigns(:existing_extended_metadata_types)
     assert_select 'div.panel.extended-metadata-type-preview', count: 4
     assert_select 'table.extended-metadata-type-attributes', count: 4
     assert_select 'table.extended-metadata-type-attributes tbody tr', count: 10
+    assert_select 'a.btn[href=?]', administer_extended_metadata_types_path, text:'Cancel'
+    assert_select 'input.btn[type="submit"][value="Create"]'
+  end
+
+  test 'create from ttl with existing study and assay' do
+    person = FactoryBot.create(:admin)
+    study_emt = FactoryBot.create(:fairdata_test_case_study_extended_metadata)
+    assay_emt = FactoryBot.create(:fairdata_test_case_assay_extended_metadata)
+    assert person.is_admin?
+    login_as(person)
+
+    file = fixture_file_upload('fair_data_station/seek-fair-data-station-test-case-irregular.ttl', 'text/turtle')
+
+    assert_no_difference('ExtendedMetadataType.count') do
+      post :create_from_fair_ds_ttl, params: { emt_fair_ds_ttl_file: file }
+    end
+    assert_response :success
+    assert_equal 2, assigns(:jsons).count
+    assert_equal [study_emt, assay_emt], assigns(:existing_extended_metadata_types)
+    assert_select 'div.panel.extended-metadata-type-preview', count: 2
+    assert_select 'table.extended-metadata-type-attributes', count: 2
+    assert_select 'table.extended-metadata-type-attributes tbody tr', count: 4
     assert_select 'a.btn[href=?]', administer_extended_metadata_types_path, text:'Cancel'
     assert_select 'input.btn[type="submit"][value="Create"]'
   end

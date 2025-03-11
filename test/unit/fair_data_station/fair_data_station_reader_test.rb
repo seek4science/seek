@@ -265,25 +265,41 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
                  sample.all_additional_potential_annotation_predicates.sort
   end
 
-  test 'to extended metadata types json' do
+  test 'candidates_for_extended_metadata and validate generated json' do
     path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case.ttl"
-    jsons = Seek::FairDataStation::Reader.new.to_extended_metadata_type_json(path)
-    assert_equal 4, jsons.count
-    assert_equal(%w[Investigation Study ObservationUnit Assay], jsons.collect { |j| j['supported_type'] })
-    jsons.each do |json|
+    candidates = Seek::FairDataStation::Reader.new.candidates_for_extended_metadata(path)
+    assert_equal 4, candidates.count
+    assert_equal %w[Investigation Study ObservationUnit Assay], candidates.collect(&:type_name)
+    candidates.each do |candidate|
       assert_nothing_raised do
-        Seek::ExtendedMetadataType::ExtendedMetadataTypeExtractor.valid_emt_json?(json)
+        Seek::ExtendedMetadataType::ExtendedMetadataTypeExtractor.valid_emt_json?(candidate.to_extended_metadata_type_json)
       end
     end
 
     path = "#{Rails.root}/test/fixtures/files/fair_data_station/demo.ttl"
-    jsons = Seek::FairDataStation::Reader.new.to_extended_metadata_type_json(path)
-    assert_equal 2, jsons.count
-    assert_equal(%w[Study Assay], jsons.collect { |j| j['supported_type'] })
-    jsons.each do |json|
+    candidates = Seek::FairDataStation::Reader.new.candidates_for_extended_metadata(path)
+    assert_equal 2, candidates.count
+    assert_equal %w[Study Assay], candidates.collect(&:type_name)
+    candidates.each do |candidate|
       assert_nothing_raised do
-        Seek::ExtendedMetadataType::ExtendedMetadataTypeExtractor.valid_emt_json?(json)
+        Seek::ExtendedMetadataType::ExtendedMetadataTypeExtractor.valid_emt_json?(candidate.to_extended_metadata_type_json)
       end
     end
+  end
+
+  test 'find_exact_matching_extended_metadata_type' do
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case-irregular.ttl"
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+    study = inv.studies.first
+
+    assert_nil study.find_exact_matching_extended_metadata_type
+    partial_emt = FactoryBot.create(:fairdata_test_case_study_extended_metadata, title:'partial matching')
+    partial_emt.extended_metadata_attributes.delete(partial_emt.extended_metadata_attributes.last)
+    partial_emt.reload
+    assert_equal 2, partial_emt.extended_metadata_attributes.count
+    assert_nil study.find_exact_matching_extended_metadata_type
+
+    exact_match = FactoryBot.create(:fairdata_test_case_study_extended_metadata)
+    assert_equal exact_match, study.find_exact_matching_extended_metadata_type
   end
 end

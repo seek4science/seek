@@ -16,9 +16,9 @@ module Seek
         # group sample_type_ids by the number of matching attributes
         groups = SampleAttribute.select(:sample_type_id).where(pid: property_ids).group(:sample_type_id).count
 
-        #pick those with the max number of matches
+        # pick those with the max number of matches
         max = groups.values.max
-        sample_type_ids = groups.filter {|id, matches| matches == max}.keys
+        sample_type_ids = groups.filter { |_id, matches| matches == max }.keys
 
         # pick the candidate that has the least number of mismatched attributes
         candidates = sample_type_ids.collect do |sample_type_id|

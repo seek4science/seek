@@ -164,8 +164,18 @@ module Seek
         seek_resource.extended_metadata.data = data
       end
 
-      def detect_extended_metadata_type
-        property_ids = additional_metadata_annotations.collect { |annotation| annotation[0] }
+      # finds and returns an EMT if there is an exact match
+      def find_exact_matching_extended_metadata_type
+        property_ids = all_additional_potential_annotation_predicates
+        emt = detect_extended_metadata_type(property_ids)
+        if emt && emt.extended_metadata_attributes.count == property_ids.count
+          emt
+        else
+          nil
+        end
+      end
+
+      def detect_extended_metadata_type(property_ids = additional_metadata_annotations.collect { |annotation| annotation[0] })
 
         # collect and sort those with the most properties that match, eliminating any where no properties match
         candidates = ::ExtendedMetadataType.where(supported_type: type_name).includes(:extended_metadata_attributes).collect do |emt|
@@ -180,6 +190,10 @@ module Seek
         end
 
         candidates.first&.last
+      end
+
+      def type_name
+        self.class.name.demodulize
       end
 
       private
@@ -224,10 +238,6 @@ module Seek
         query.execute.collect do |solution|
           solution.property.to_s
         end.uniq
-      end
-
-      def type_name
-        self.class.name.demodulize
       end
 
       def rdf_type_uri

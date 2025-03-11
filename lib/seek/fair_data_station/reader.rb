@@ -20,7 +20,7 @@ module Seek
         end
       end
 
-      def to_extended_metadata_type_json(path)
+      def candidates_for_extended_metadata(path)
         inv = parse_graph(path).first
         study = inv&.studies&.first
         obs_unit = study&.observation_units&.first
@@ -28,7 +28,7 @@ module Seek
         necessary = [inv, study, obs_unit, assay].compact.select do |type|
           type.all_additional_potential_annotation_predicates.any?
         end
-        necessary.collect(&:to_extended_metadata_type_json)
+        necessary
       end
     end
   end
