@@ -11,8 +11,8 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     project = contributor.projects.first
     FactoryBot.create(:experimental_assay_class)
     FactoryBot.create(:fairdatastation_virtual_demo_sample_type)
-
     investigation = Seek::FairDataStation::Writer.new.construct_isa(inv, contributor, [project], policy)
+
     studies = investigation.studies.to_a
     obs_units = studies.first.observation_units.to_a
     assays = studies.first.assays.to_a
@@ -698,23 +698,23 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
     assay = inv.studies.first.assays.first
     seek_assay = ::Assay.new
-    detected_type = writer.send(:detect_extended_metadata_type, seek_assay, assay)
+    detected_type = assay.detect_extended_metadata_type
     assert_equal seek_test_case_assay, detected_type
 
     path = "#{Rails.root}/test/fixtures/files/fair_data_station/demo.ttl"
     inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
     assay = inv.studies.first.assays.first
-    detected_type = writer.send(:detect_extended_metadata_type, seek_assay, assay)
+    detected_type = assay.detect_extended_metadata_type
     assert_equal virtual_demo_assay, detected_type
 
     path = "#{Rails.root}/test/fixtures/files/fair_data_station/indpensim.ttl"
     inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
     obs_unit = inv.studies.first.observation_units.first
-    detected_type = writer.send(:detect_extended_metadata_type, ::ObservationUnit.new, obs_unit)
+    detected_type = obs_unit.detect_extended_metadata_type
     assert_nil detected_type
 
     inpensim_obs_unit = FactoryBot.create(:fairdata_indpensim_obsv_unit_extended_metadata)
-    detected_type = writer.send(:detect_extended_metadata_type, ::ObservationUnit.new, obs_unit)
+    detected_type = obs_unit.detect_extended_metadata_type
     assert_equal inpensim_obs_unit, detected_type
   end
 
